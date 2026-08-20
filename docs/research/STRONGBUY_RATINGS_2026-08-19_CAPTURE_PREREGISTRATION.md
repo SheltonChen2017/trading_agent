@@ -1,7 +1,20 @@
 # Preregistration: Strong-Buy ratings prospective capture (SBR, 2026-08-19)
 
-Status: **FROZEN — owner adopted 2026-08-19 ("as-is").** This document
-preregisters a CAPTURE stream only. The evaluation gets its own frozen
+Status: **FROZEN 2026-08-19; CLOSED 2026-08-20 BEFORE ITS FIRST CAPTURE** by
+owner decision, when the Analyst-Consensus ETF Rotation program
+(`docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`) replaced the
+Strong-Buy portfolio program. The scheduled task was never installed and
+**zero snapshots exist**, so no evidence is discarded and no epoch, ledger, or
+operational state is affected. The reason is specific: ACER's primary signal
+is the per-firm rating **revision**, and monthly bucket-count snapshots cannot
+reconstruct per-firm actions — a count moving from 12 to 13 Buys does not say
+which firm acted, when, or from what prior rating, and offsetting actions
+inside one month are invisible. The capture code, tests, and installer are
+retained as reviewed work. Nothing below is rewritten; the specification
+stands as frozen for any future level-based hypothesis that revives it.
+
+Original status, retained: **FROZEN — owner adopted 2026-08-19 ("as-is").**
+This document preregisters a CAPTURE stream only. The evaluation gets its own frozen
 preregistration later, before the first evaluation look (section 6).
 
 ## 1. Why capture-first

@@ -61,11 +61,11 @@ operator-database mutation, or scheduled-task change.
   PR #283 merged Claude's topology refresh; PR #284 at `13355a6` merged its
   SBP audit, documentation sweep, and replacement Action Plan. Sections 7bn
   through 7bs are merged history on `main`.
-- Current local review branch:
-  `codex/review-sbp-doc-cleanup-20260820`, based on exact submitted main head
-  `13355a6`. Correction/review commit `390f3ad` is **local-only and not
-  pushed** at handoff time. Another computer cannot fetch it until the owner
-  authorizes a push.
+- Codex's documentation-cleanup review branch
+  `codex/review-sbp-doc-cleanup-20260820` was based on submitted main head
+  `13355a6`. Claude's counter-review branch published it, and PR #285 merged
+  the chain, so `390f3ad`, `8d16632`, `1055392`, and `e5ae3d4` are mainline
+  history at `6f571c2` and fetchable with `git fetch origin main`.
 - Historical, at the 2026-08-17 audit `origin/main` was
   `1457169ba10f6aac0f1fb98b60b92a4607f8331c` (this bullet's original
   "at audit time" wording now belongs to the current head above).
@@ -2965,8 +2965,8 @@ seconds; the first full suite passed **4,351 / 0 failed / 25 warnings** in
 including this handoff content and again passed **4,351 / 0 failed / 25
 warnings** in 872.04 seconds. Python 3.13.14; required compileall plus
 `research/` and `git diff --check` passed. After recording these exact numbers,
-the 50 focused document/contract tests were rerun on the final prose. The
-branch and `390f3ad` are local-only until the owner authorizes a push.
+the 50 focused document/contract tests were rerun on the final prose. That
+branch was published by the counter-review round and merged by PR #285.
 
 ## 7bu. Counter-review of the documentation-cleanup corrections: ACCEPTED (2026-08-20)
 
@@ -3027,19 +3027,107 @@ QuantConnect access, broker access, scheduled task, deployment, epoch action, or
 operational database changed. SBP remains a DRAFT; SBP-0 is still the owner's
 decision.
 
+## 7bv. ACER replaces the Strong-Buy program by owner decision (2026-08-20)
+
+Branch `user/claude/acer-replaces-sbp-20260820`, from `main` at `6f571c2`
+(PR #285 merged the documentation-cleanup review chain).
+
+**Owner decision:** the Analyst-Consensus ETF Rotation program (ACER) replaces
+the Strong-Buy portfolio program as priority 1. The owner supplied the source
+specification as a PDF, now versioned at
+`docs/reference/analyst-consensus-etf-strategy.pdf`
+(sha256 `3700ab4b…`, 138,347 bytes). Its operative contract shape for this
+repository is `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`
+(ACER-0..7), status DRAFT — nothing frozen, purchased, scheduled, or run.
+
+**What ACER is, and why it is not SBP re-plumbed.** The signal moves from
+consensus *levels* to per-firm *revisions* with freshness decay; the held
+instrument moves from a stock basket to ETFs scored as the sum of
+point-in-time constituent weights times holdings' signals, filtered on breadth
+and analyst coverage. It is permitted under the A-002 closure because it
+brings all three of what that closure requires: a new data source, a fresh
+preregistration, and an owner decision.
+
+**Consequences handled rather than left implicit:**
+
+- `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` is **SUPERSEDED while
+  still a draft** — never adopted or frozen, so no capture, evidence, result,
+  or operational state changes. Retained in full with SBPA-001..011 and its
+  four-round review chain.
+- The frozen SBR capture preregistration is **CLOSED before its first
+  capture**, with the reason recorded in the document itself: ACER's primary
+  signal is the per-firm revision, and monthly bucket counts cannot
+  reconstruct per-firm actions — a count moving 12 to 13 Buys names no firm,
+  no date, and no prior rating, and offsetting actions inside a month are
+  invisible. **The scheduled task was never installed and zero snapshots
+  exist**, so this is the cheapest possible stopping point; the capture code,
+  tests and installer stay in the tree for any future level-based hypothesis.
+- LEV is unchanged and still separate; MPQ/HPQ remain on hold; the closed
+  families A-001/A-002/A-003 remain closed.
+
+**Concerns recorded in the plan before any result exists**, because this
+repository requires the prior to be disclosed in advance and the source
+document does not carry it: eleven local signals, Stage 0's 180 cells, Stage
+1's 24 and APQ's 3 all closed null; post-recommendation drift is heavily
+arbitraged in the literature; ETF aggregation dilutes toward the fund's common
+factor, so large-cap technology ETF scores will be strongly collinear and
+ranking ETFs partly re-ranks one factor; the source document declares no
+family size, gate, or run budget, which ACER-0 must fix; ACER-2's control set
+(earnings dates, standardized surprise) is a second dataset and a second
+budget line that a ratings subscription does not cover; and a QuantConnect
+cloud dataset cannot be hashed by this project, a real gap against the
+content-addressing rule that every run record must disclose.
+
+**ACER-2 is the decisive milestone** — do stock-level revisions carry
+incremental out-of-sample information after momentum, earnings, size,
+liquidity, volatility and sector controls? It needs no ETF holdings, no
+inverse products and no leverage, and a null there closes the program for one
+data purchase rather than a seven-stage build. Everything from ACER-3 onward
+is contingent and deliberately unscoped.
+
+**New guard:** `test_a_superseded_program_is_not_also_the_next_owner_decision`
+pins the relationship that partial replacement breaks — whichever plan
+declares itself superseded must not also own the Action Plan's blocking
+decision. Written as a relationship, not a literal, so it survives the next
+replacement.
+
+**Process note against myself:** during this round a mutation harness used
+`git checkout HEAD -- <files>` as its restore while the work was still
+uncommitted, which reverted two files of finished edits. Nothing was lost
+beyond rework, and the edits were re-applied and re-verified, but the rule is
+now explicit: **commit before mutating, so the restore point is the work
+rather than its absence.**
+
+Validation on the final tree: the full suite ran **4,351 passed / 1 failed /
+25 warnings** in 727.13 seconds, the single failure being
+`test_current_review_documents_have_no_validation_placeholders` firing on the
+unfilled result token in this sentence — deliberately routed through a token
+that guard recognises, so filling it in was enforced rather than remembered.
+After substitution the focused document/contract suite passes 51, including
+that guard and the new supersession guard. The suite total is now 4,352 tests
+(4,351 before this round's addition). Python 3.13.14; `compileall` over the required surface
+passed; `git diff --check` passed. No data was purchased, no QuantConnect run
+occurred, no scheduled task changed, no broker or operational state changed,
+and no ACER value is frozen — ACER-0 remains the owner's decision.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
-`docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and puts the Strong-Buy
-initiative first. SBP remains a DRAFT — not adopted, frozen, scheduled, or
-implemented. The owner must adopt the proposed section-2 values and resolve
-SBPA-007 (rare-tail cap level), SBPA-008 (industry rule or disclosed unmanaged
-exposure), and SBPA-011 (bootstrap power plan). SBPA-009/010 are corrected
-sample-definition rules, not open invitations to choose a favorable sample.
-Freeze before installing SBR-1, or explicitly accept that pre-freeze captures
-are calibration-only. No SBP code, capture install, price join, QC run, or
-paper execution is authorized here. LEV remains separate and cannot validate
-SBP. The full review chain is accepted after correction through section 7bt.**
+`docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and, as amended the same
+day, puts the **Analyst-Consensus ETF Rotation program (ACER)** first (section
+7bv). SBP is **SUPERSEDED while still a draft** and SBP-0 will not be run; the
+frozen SBR capture stream is **closed before its first capture** with zero
+snapshots and its task uninstalled. The blocking decision is now **ACER-0
+adoption** — signal encoding, decay grid, eligibility, control set,
+benchmarks, gates, cell counts and run budget — together with the ratings
+vendor choice and the separate control-set dataset ACER-2 needs. **ACER-2 is
+the decisive milestone**: do stock-level revisions carry incremental
+out-of-sample information after momentum, earnings, size, liquidity,
+volatility and sector controls? A null there closes the program. No data
+purchase, capture install, price join, QC run, or paper execution is
+authorized here. LEV remains separate and cannot validate ACER. The SBP review
+chain is accepted after correction through section 7bu and retained as
+history.**
 
 ### Historical superseded checklist (retained for audit only)
 
@@ -3185,11 +3273,12 @@ docs/SESSION_HANDOFF.md, docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md,
 docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md,
 docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md,
 docs/operations/OPERATIONAL_FACTS.md, and docs/alpha-result.md. Published
-origin/main at review start is 13355a6. The local-only Codex correction branch
-is codex/review-sbp-doc-cleanup-20260820 at 390f3ad plus its handoff commit;
-fetch cannot retrieve it until the owner authorizes a push. Stage 0/1 and APQ
-are valid but closed null; SHW-4 is prospective; SBP is still a draft. The
-next owner decision is SBP-0 adoption, including SBPA-007/008/011. Do not run
+origin/main is 6f571c2 after PR #285 merged the documentation-cleanup review
+and its counter-review; every commit named in sections 7bt-7bv is mainline
+history. Stage 0/1 and APQ are valid but closed null; SHW-4 is prospective.
+SBP is SUPERSEDED as of 2026-08-20 by the ACER program
+(docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md); the next owner
+decision is ACER-0 adoption, not SBP-0. Do not run
 QC, install SBR-1, join captures to prices, deploy, trade, mutate an
 operational database, or roll paper-epoch-006 without separate authorization.
 ```

@@ -2484,9 +2484,48 @@ decision). Milestones after adoption: LEV-1 (LEAN algo), LEV-2
 (analyser + driver hook), LEV-3 (one run), LEV-4 (one pass); SBR-1
 (capture script + task). One branch + independent review each.
 
+## 7bi. Max-profit and hedge QC plans proposed (2026-08-19)
+
+Cursor Grok 4.6 wrote **docs-only** proposals on
+`user/cursor/max-profit-hedge-plans-20260819` (branched from `5694975`,
+so its records predate APQ-4/5 and LEV; this merge reconciles them —
+the section was renumbered from its original 7be, which collided with
+main's). No LEAN, no driver change, no QC from that lane.
+
+- **MPQ (levered growth; owner revised to 3x before any run):** G0
+  100% SPY; G1 100% TQQQ; G2 70/30 TQQQ/SPY; G3 50/30/20
+  TQQQ/SPY/SOXL (cap). Daily-reset decay disclosed. Composite gate:
+  higher net-10bps CAGR vs G0; worse maxDD/Sharpe disclosed, not
+  auto-fails. Optional excess-mean bootstrap (0.05/3) report-vs-omit
+  frozen at MPQ-2 review.
+- **HPQ (static overlay, NOT the HEDGE-1 UI):** H0 100% SPY; H1 90/10
+  SPY/SH; H2 80/20 (SH cap); H3 90/10 SPY/BTAL. Composite gate: ≥10%
+  relative maxDD improvement, ≥75% upside capture when H0 CAGR is
+  positive, ≤4pp CAGR sacrifice.
+
+Both use APQ's 2022+ window and one-run-one-pass shape. Action-plan
+rows are **PROPOSED, OWNER DECISION PENDING**.
+
+## 7bj. Counter-review of the MPQ/HPQ plans (2026-08-19)
+
+Counter-review record:
+`docs/Review/REVIEW_2026-08-19_MPQ_HPQ_PLANS_COUNTERREVIEW.md`. Both
+plans ACCEPTED as proposals with pre-freeze corrections applied in
+this round (they are drafts — editing before the owner freeze is the
+right time): the stale "while APQ-4 is in flight" sequencing replaced
+(APQ closed as A-003 the same day), the MPQ-3 driver-family reference
+corrected (`allocation` is the existing universe-free family, not
+`defensive_carry`), an explicit descriptive-classification label added
+to both composite gates (they carry no p-values; only the optional
+bootstrap families do), the MPQ↔LEV overlap disclosed in both
+directions (LEV's L0-vs-SREF already contains MPQ's G1-vs-G0 question
+descriptively on a longer window), and a BTAL liquidity note added.
+The handoff/action-plan merge collisions from the stale branch base
+were resolved with every row verified present (SHW4-001 lesson).
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7bh):** **LEV-1 IMPLEMENTED** on
+**Current (2026-08-19, section 7bj):** **LEV-1 IMPLEMENTED** on
 `user/claude/lev1-lean-algorithm-20260819` (based on the frozen-prereg
 commit), pending independent review — `research/lean/
 leveraged_threshold.py` with a daily state machine (next-close
@@ -2498,7 +2537,10 @@ descriptive, LEV-specific log markers, and no ACTIVE_UNIVERSE. 10
 tests; 3 reverse mutations red then restored (threshold boundary,
 pullback boundary, accumulator reset). No QC. **LEV-2 (analyser +
 driver hook) is next**; SBR-1 (capture script + task) may run in
-parallel. The
+parallel. **MPQ and HPQ are ON HOLD by owner decision 2026-08-19
+(counter-reviewed, sections 7bi/7bj) — not frozen, not scheduled; the
+owner's stated priority is the LEV/SBR strong-buy program and the app
+restart.** The
 allocation-policy family is CLOSED (A-003, NULL on the gate). No QC
 access is currently authorized anywhere. Other owner-gated tracks:
 (1) Codex's thorough two-day audit tonight (range through the APQ-5
@@ -2508,7 +2550,12 @@ proposals — each needs frozen preregistration and family scoping;
 (3) optional owner decision on P1/P3-style weights on the Alpaca/REBAL
 stack. Operational: epoch-006 first observation VERIFIED (lineage
 binds `c9d0740`); remaining check is the overlay tasks' first
-AUTOMATIC firing (2026-08-20 14:45 local). SHW-4 complete;
+AUTOMATIC firing (2026-08-20 14:45 local). An app ImportError
+(`open_lot_fingerprint`) on 2026-08-19 was diagnosed as a STALE
+pre-deploy Streamlit process holding the old `tax_lots` module across
+the epoch-006 fast-forward — the deployed tree is consistent and a
+fresh import passes; the fix is a full app restart via
+`C:\git\launch_trading_app.ps1` (no code change). SHW-4 complete;
 paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

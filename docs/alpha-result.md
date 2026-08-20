@@ -983,6 +983,76 @@ construction, risk, paper-observation infrastructure). Any future
 reopening requires a new owner decision, a new universe or data source,
 and a fresh preregistration — never a rehabilitation of these results.
 
+## R-029 — Allocation-policy QC family, single authorized run (UNANALYSED)
+
+The APQ-4 cloud run of the frozen allocation-policy family
+(`docs/reference/ALLOCATION_POLICY_QC_PLAN.md`; preregistration
+`docs/research/ALLOCATION_POLICY_2026-08-18_PREREGISTRATION.md`). This
+is an allocation-policy observation, NOT an alpha cell: it carries its
+own 3-cell family and 0.05/3 gate and adds nothing to the closed
+cross-sectional program's lifetime floor (A-002 untouched).
+
+| Field | Value |
+|---|---|
+| **Specification** | Four frozen ETF mixes P0 (100% SPY), P1 (40/60 SPY/BIL), P2 (40/20/20/20 +XLP/XLV), P3 (35/55/10 +XLE); monthly close settlement; bind-time drift turnover; window 2022-01-01 → run date |
+| **Research look** | Counted real-market run (run-level count 29 → 30); the plan's single authorized backtest; no statistic observed |
+| **Source commit** | `5694975` (merged main; APQ-1..3 review chain complete at this merge) |
+| **Uploaded source SHA-256** | `86fb7a3f252f8c9848b91abd07ef9607930dec48d15dc6ace1cae0b93c4f8938` (bytes uploaded UNCHANGED — universe-free family, no rewrite) |
+| **QC project** | `35377356` — `25. ALLOCATION_POLICY - 20260819` (QC stored the name without the dot) |
+| **Compile ID** | `929dd05d66d5c97c6155d25a06c42af2-ca76e88335036c8337d128e6fb01c8c2` |
+| **Backtest ID** | `b9696f67a957075103ce848b39d8cc08` |
+| **Launched / completed (UTC)** | 2026-08-19T22:59:13.294928+00:00 / 2026-08-19T22:59:27.953234+00:00 |
+| **Output** | STRUCTURALLY COMPLETE, first attempt: frozen parser round-trip accepted 54 months (202202..202607, the full expected window — January 2022 is consumed by boundary settlement, August 2026 is incomplete), all four policies on one shared date set, 216 rows, 0 declared-unavailable turnovers, 0 refusals. 54 ≥ the frozen 24-month floor. The algorithm holds no QC positions (synthetic policy accounting only), so QC's runtime statistics are the untouched-account boilerplate and reveal nothing. Structural inspection only; no statistic observed. |
+| **Raw log** | `artifacts/qc_apq4_allocation_20260819.log`, 222 lines, exact-file sha256:`898ac2ed4ce67d1f8a6b7b9de25611c79101ca88e737da46e3dafb9d1e36b4e7` (machine-local; hash recorded here) |
+| **Validity** | **VALID** — reviewed code, structurally complete output, analysed once in A-003 (upgraded in the same commit as that observation, per the plan's rung) |
+
+## A-003 — Allocation-policy single frozen-analyser pass (OBSERVED, 2026-08-19) — NULL on the gate; the family closes
+
+The one preregistered observation of the allocation-policy 3-cell
+family, run under the owner GO ("go APQ5 now") after R-029 completed
+structurally and the APQ-1..3 review chain merged.
+
+| Field | Value |
+|---|---|
+| **What** | `python -m scripts.analyse_qc_allocation_policy` run ONCE over R-029's raw log with full run identity (`--run-id 35377356,929dd05d…,b9696f67…,86fb7a3f…`); log hash re-verified against the ledger immediately before the pass. |
+| **Code identity** | Analyser tree at `c4fd16d` (merged main; APQ-2 analyser independently reviewed and counter-reviewed, reporting schema RATIFIED pre-run). |
+| **Output** | `artifacts/analysis_apq5_allocation_20260819.json`, 13,048 bytes, sha256 `4bfc831143ebc05f6e1f3099cadef53393680cce60be56aea35f4711526b8af7` (machine-local; hash recorded here). |
+| **Multiplicity** | Family: allocation-policy 2026-08-18, 3 cells (P1/P2/P3 vs P0), gate 0.05/3 = 1.667e-2; 20,000 draws, smallest attainable p 5.0e-5 < gate (ABR-001 guard passed). Scope: **this family only** — NOT added to the closed alpha program's lifetime floor; A-002 untouched. First and only observation of the family. |
+| **Disclosure** | 0 declared-unavailable turnover months in any policy, so the APQ2-001 `mean_turnover` skipna caveat is moot for this run. All 54 months priced for all four policies. |
+
+**Results against the frozen gate (two-sided stationary bootstrap on
+monthly excess vs P0):**
+
+- **0 of 3 cells pass.** P1 p = 0.080, P2 p = 0.121, P3 p = 0.214 —
+  all above 1.667e-2. Every candidate's excess monthly mean is
+  NEGATIVE (P1 −0.50%, P2 −0.41%, P3 −0.41% per month): the defensive
+  mixes gave up return against 100% SPY over this window, as the
+  preregistration anticipated for a mostly-rising tape.
+- **Descriptives (primary table, 2022-02..2026-07, gross):** P0 CAGR
+  13.5% / Sharpe 0.88 / maxDD −20.2%; P1 8.0% / 1.23 / −8.0%; P2 8.9%
+  / 0.89 / −12.3%; P3 9.1% / 1.31 / −7.1%. Sharpe differences (+0.35
+  P1, +0.01 P2, +0.43 P3) and drawdown reductions are DESCRIPTIVE
+  fields under the ratified schema — no frozen test was declared on
+  them, and none is claimed. Monthly drift turnover is tiny
+  (~1–2%/month); the 25bps net columns are nearly identical to gross,
+  so costs decide nothing here.
+- **Interpretation limits (recorded before this observation):** the
+  2022+ window is regime-conditioned in hindsight — these descriptives
+  describe that tape, not forward evidence. P3 is not mined further,
+  per the plan.
+
+**Verdict: NULL on the preregistered family.** No allocation policy
+shows a mean-return edge over 100% SPY. The descriptive record shows
+the expected shape — P1/P3 bought materially smaller drawdowns
+(−7% to −8% vs −20%) at the price of ~40% of the return — which is a
+risk-preference trade, not an edge, and any paper/live use of these
+weights is a **separate owner decision on the Alpaca/REBAL stack**,
+explicitly not a QC follow-up.
+
+**Preregistered consequence: the allocation-policy QC family is
+CLOSED.** One cloud run, one analyser pass, both spent. No reruns,
+no threshold tweaks, no window extensions on this family.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

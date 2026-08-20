@@ -2407,40 +2407,155 @@ mock updated; a mutation-verified scan test
 (`test_every_task_logon_type_default_is_interactive`) keeps the class
 closed. APQ3-003 acknowledged, no split of pushed history.
 
-## 7be. Max-profit and hedge QC plans proposed (2026-08-19)
+## 7be. APQ-4 EXECUTED: the single allocation-policy cloud run (2026-08-19)
 
-Cursor Grok 4.6 wrote **docs-only** counterparts to APQ while APQ-4
-runs on `main`. Branch
-`user/cursor/max-profit-hedge-plans-20260819` from `origin/main`
-`5694975`, isolated worktree `trading_agent-plans-mpp-hpg`. No LEAN,
-no driver change, no QC from this lane.
+Owner merged the APQ-3 counter-review (PR #273, main `5694975`) and
+gave the GO ("go APQ-4"). Branch
+`user/claude/apq4-cloud-run-20260819` off that merge. The one
+authorized backtest ran: project `35377356`
+(`25. ALLOCATION_POLICY - 20260819`), compile
+`929dd05d…`, backtest `b9696f67…`, source uploaded UNCHANGED at
+`5694975` (sha `86fb7a3f…`), launched 22:59:13Z, completed 22:59:27Z.
 
-- **MPQ (max profit = frozen 3x ETFs, owner-revised 2026-08-19 before
-  any run):** G0 100% SPY; G1 100% TQQQ; G2 70% TQQQ / 30% SPY; G3
-  50% TQQQ / 30% SPY / 20% SOXL (cap). Daily-reset decay disclosed.
-  Primary: higher net 10 bps CAGR vs G0; terminal wealth vs G0
-  reported; worse maxDD and worse Sharpe are disclosed, not auto-fails.
-  No options/margin/4x.
-- **HPQ (static overlay, not HEDGE-1 UI):** H0 100% SPY; H1 90/10
-  SPY/SH; H2 80/20 SPY/SH (SH cap 20%); H3 90/10 SPY/BTAL. Primary:
-  ≥10% relative maxDD improvement vs H0 and ≥75% upside capture (when
-  H0 CAGR is positive), with a 4 pp CAGR sacrifice cap.
+Frozen-parser round-trip: **STRUCTURALLY COMPLETE, first attempt** —
+54 months (202202..202607, the full expected window), all four
+policies on one shared date set, 216 rows, 0 declared-unavailable
+turnovers, 0 refusals; 54 ≥ the 24-month floor. **No statistic
+observed** (`parse_log` only; the algorithm holds no QC positions, so
+QC's runtime stats are untouched-account boilerplate). Ledgered as
+**R-029 UNANALYSED** in `docs/alpha-result.md`; run-level look
+29 → 30. Raw log stays machine-local under `artifacts/` (hash in the
+ledger); QC market data is never committed.
 
-Same confirmatory window as APQ (2022-01-01 through last complete
-session ≤ 2026-08-18). Action-plan rows
-`MAX-PROFIT-POLICY-QC-20260819` and `HEDGE-POLICY-QC-20260819` are
-**PROPOSED, OWNER DECISION PENDING**. They do not reorder APQ-4.
+Owner is separately having Cursor draft two new plan proposals ("max
+profits", "hedging") — they will need frozen preregistrations and
+family scoping at counter-review; the A-002 closure is not reopenable
+through them.
+
+## 7bf. APQ-5 OBSERVED: NULL on the gate; the family is CLOSED (2026-08-19)
+
+Owner merged APQ-4 (PR #274, main `c4fd16d`) and gave the GO ("go APQ5
+now"). Branch `user/claude/apq5-analyser-pass-20260819`. The log hash
+was re-verified against the ledger, then the frozen analyser ran ONCE
+with full run identity — the family's only statistic observation.
+
+**Result: 0 of 3 cells pass the 0.05/3 gate** (P1 p=0.080, P2 p=0.121,
+P3 p=0.214); every candidate's monthly excess vs P0 is NEGATIVE.
+Descriptively P1/P3 bought much smaller drawdowns (−7% to −8% vs P0's
+−20%) at ~40% of the return — a risk-preference trade, not an edge;
+Sharpe/drawdown differences are descriptive fields with no frozen
+test, and none is claimed. Ledgered as **A-003**; **R-029 upgraded
+UNANALYSED → VALID in the same commit** per the plan's rung. The
+allocation-policy QC family is **CLOSED**: one cloud run and one
+analyser pass, both spent; no reruns or tweaks. Paper/live use of any
+weights is a separate owner decision on the Alpaca/REBAL stack.
+
+## 7bg. Owner strategy → LEV + SBR preregistration drafts (2026-08-19)
+
+The owner described a three-step strategy (Strong-Buy universe with
+inverse-volatility weights → leveraged ETF of the holding-heaviest
+funds → threshold take-profit) with the goal "beat NASDAQ and SPY".
+Feasibility probe first: **QuantConnect has no point-in-time
+analyst-ratings dataset** (Morningstar = fundamentals only; Benzinga
+on QC = news; the only recommendations set tracks CNBC personalities),
+and today's consensus against old prices is look-ahead — the same wall
+that closed Stage 2 PEAD. The owner adopted the two honest paths
+("I think both B and C are worth testing"):
+
+- **LEV family (Path B)** — the leveraged-ETF engine, testable now:
+  TQQQ take-profit/re-entry state machine (L1..L4: +20%/+40% × next
+  month-end / −10% pullback re-entry), window 2011→run date including
+  the 2022 −80% drawdown, 8 cells at 0.05/8 (vs TQQQ buy-and-hold =
+  the edge test; vs QQQ = the stated goal, with the frozen label that
+  a QQQ-pass without an L0-pass is LEVERAGE, not skill), after-tax
+  37%/20% descriptive column per the SOXL lesson, one run + one pass.
+- **SBR capture stream (Path C)** — monthly snapshots of NASDAQ-100
+  analyst consensus, point-in-time BY CONSTRUCTION (capture time =
+  knowledge time), task-specific runtime per ML-LR-6, Interactive
+  logon + first-firing verification per the S4U incident, and a hard
+  look rule: joining snapshots to subsequent prices is FORBIDDEN until
+  a separate SBR-2 evaluation preregistration freezes after ≥12
+  snapshots.
+
+Both preregistrations were **FROZEN by owner adoption the same day
+("as-is")**, recorded in each document's section 7. Explicitly outside the A-002 closure (fixed
+instruments / new data source + fresh preregistration + owner
+decision). Milestones after adoption: LEV-1 (LEAN algo), LEV-2
+(analyser + driver hook), LEV-3 (one run), LEV-4 (one pass); SBR-1
+(capture script + task). One branch + independent review each.
+
+## 7bi. Max-profit and hedge QC plans proposed (2026-08-19)
+
+Cursor Grok 4.6 wrote **docs-only** proposals on
+`user/cursor/max-profit-hedge-plans-20260819` (branched from `5694975`,
+so its records predate APQ-4/5 and LEV; this merge reconciles them —
+the section was renumbered from its original 7be, which collided with
+main's). No LEAN, no driver change, no QC from that lane.
+
+- **MPQ (levered growth; owner revised to 3x before any run):** G0
+  100% SPY; G1 100% TQQQ; G2 70/30 TQQQ/SPY; G3 50/30/20
+  TQQQ/SPY/SOXL (cap). Daily-reset decay disclosed. Composite gate:
+  higher net-10bps CAGR vs G0; worse maxDD/Sharpe disclosed, not
+  auto-fails. Optional excess-mean bootstrap (0.05/3) report-vs-omit
+  frozen at MPQ-2 review.
+- **HPQ (static overlay, NOT the HEDGE-1 UI):** H0 100% SPY; H1 90/10
+  SPY/SH; H2 80/20 (SH cap); H3 90/10 SPY/BTAL. Composite gate: ≥10%
+  relative maxDD improvement, ≥75% upside capture when H0 CAGR is
+  positive, ≤4pp CAGR sacrifice.
+
+Both use APQ's 2022+ window and one-run-one-pass shape. Action-plan
+rows are **PROPOSED, OWNER DECISION PENDING**.
+
+## 7bj. Counter-review of the MPQ/HPQ plans (2026-08-19)
+
+Counter-review record:
+`docs/Review/REVIEW_2026-08-19_MPQ_HPQ_PLANS_COUNTERREVIEW.md`. Both
+plans ACCEPTED as proposals with pre-freeze corrections applied in
+this round (they are drafts — editing before the owner freeze is the
+right time): the stale "while APQ-4 is in flight" sequencing replaced
+(APQ closed as A-003 the same day), the MPQ-3 driver-family reference
+corrected (`allocation` is the existing universe-free family, not
+`defensive_carry`), an explicit descriptive-classification label added
+to both composite gates (they carry no p-values; only the optional
+bootstrap families do), the MPQ↔LEV overlap disclosed in both
+directions (LEV's L0-vs-SREF already contains MPQ's G1-vs-G0 question
+descriptively on a longer window), and a BTAL liquidity note added.
+The handoff/action-plan merge collisions from the stale branch base
+were resolved with every row verified present (SHW4-001 lesson).
 
 ## 8. What is next
 
-**Current (2026-08-19, section 7be):** **APQ-4 remains the QC step in
-flight** (owner-executed cloud run on `main`, then APQ-5). MPQ-1 and
-HPQ-1 are **not** started until the owner freezes those preregs and
-schedules them. Overlay tasks are repaired (Interactive) and proven
-runnable; their first automatic firing (2026-08-20 14:45 local) and
-the first epoch-006 paper-observation lineage check are the outstanding
-operational verifications. SHW-4 complete; paper-epoch-006 is the live
-paper epoch.
+**Current (2026-08-19, section 7bj):** **LEV-1 IMPLEMENTED** on
+`user/claude/lev1-lean-algorithm-20260819` (based on the frozen-prereg
+commit), pending independent review — `research/lean/
+leveraged_threshold.py` with a daily state machine (next-close
+execution; month-end re-entry fills AT the month-end close; pullback
+re-entry needs the full −10%), seven aligned monthly series, union
+refusal, roll-forward turnover across refusal gaps (over-charging is
+the accepted direction), LSALE lines for the preregistered after-tax
+descriptive, LEV-specific log markers, and no ACTIVE_UNIVERSE. 10
+tests; 3 reverse mutations red then restored (threshold boundary,
+pullback boundary, accumulator reset). No QC. **LEV-2 (analyser +
+driver hook) is next**; SBR-1 (capture script + task) may run in
+parallel. **MPQ and HPQ are PROPOSED and counter-reviewed (sections
+7bi/7bj) — owner decision pending; MPQ-1/HPQ-1 start only when the
+owner freezes those preregistrations and schedules them.** The
+allocation-policy family is CLOSED (A-003, NULL on the gate). No QC
+access is currently authorized anywhere. Other owner-gated tracks:
+(1) Codex's thorough two-day audit tonight (range through the APQ-5
+merge; epoch-006 `policy_fingerprint` change flagged); (2)
+counter-review of Cursor's incoming "max profits" and "hedging" plan
+proposals — each needs frozen preregistration and family scoping;
+(3) optional owner decision on P1/P3-style weights on the Alpaca/REBAL
+stack. Operational: epoch-006 first observation VERIFIED (lineage
+binds `c9d0740`); remaining check is the overlay tasks' first
+AUTOMATIC firing (2026-08-20 14:45 local). An app ImportError
+(`open_lot_fingerprint`) on 2026-08-19 was diagnosed as a STALE
+pre-deploy Streamlit process holding the old `tax_lots` module across
+the epoch-006 fast-forward — the deployed tree is consistent and a
+fresh import passes; the fix is a full app restart via
+`C:\git\launch_trading_app.ps1` (no code change). SHW-4 complete;
+paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

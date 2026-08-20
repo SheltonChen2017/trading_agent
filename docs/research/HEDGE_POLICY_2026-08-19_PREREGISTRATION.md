@@ -45,7 +45,7 @@ crash will look like 2022.
 |---|---|---|
 | SPY | long equity | — |
 | SH | ProShares Short S&P 500 | **daily-reset inverse**; path-dependent decay in chop |
-| BTAL | AGFiQ US Market Neutral Anti-Beta | already in the HEDGE-1 **app** ticker set; still not evidence |
+| BTAL | AGFiQ US Market Neutral Anti-Beta | already in the HEDGE-1 **app** ticker set; still not evidence. Counter-review note: thin AUM/volume for its class — the 0/5/10/25 bps grid may understate realized spread cost for H3; read H3's net rows as optimistic |
 
 If any name is missing or non-finite on a rebalance date, refuse that
 date for **every** policy (union alignment).
@@ -83,7 +83,15 @@ floor.
 time underwater, mean turnover (with unavailable-turnover note), net 10
 bps.
 
-**Hedge composite gate (all three vs H0, net 10 bps):**
+**Hedge composite gate (all three vs H0, net 10 bps).**
+Counter-review label (2026-08-19, pre-freeze): this composite gate is a
+DESCRIPTIVE CLASSIFICATION of one price path — no p-value, no
+statistical claim; only the optional mean-cost descriptor below
+carries significance machinery. Related evidence: APQ's P1/P2
+defensive mixes closed NULL on mean with a real drawdown trade
+(A-003), and the defensive-carry overlay stream observes a
+carry-sleeve hedge prospectively — this family is the inverse/anti-beta
+counterpart, not a duplicate.
 
 1. maxDD **strictly better** (less severe) than H0 by at least **10%
    relative** — example: H0 maxDD −20% requires the mix maxDD ≥ −18%

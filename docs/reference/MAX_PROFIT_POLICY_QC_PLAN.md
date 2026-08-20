@@ -20,8 +20,10 @@ results.
 Owner revision 2026-08-19, before any run: QQQ/SMH replaced by TQQQ/SOXL
 at the same percentages.
 
-Do **not** start MPQ-1 while APQ-4 is in flight unless the owner
-explicitly reorders. Sequencing authority remains
+Sequencing (updated at counter-review 2026-08-19: APQ-4/5 completed
+and the allocation family CLOSED as A-003 the day this plan was
+drafted): do **not** start MPQ-1 until the owner freezes the
+preregistration and schedules it. Sequencing authority remains
 `docs/ACTION_PLAN_2026-08-02.md`.
 
 ## 1. Question
@@ -90,16 +92,19 @@ from TQQQ/SOXL to QQQ/SMH, no `ml` import, no Alpaca.
 
 ### MPQ-2 — Analyser family
 
-Same JSONL contract as APQ. Levered-growth composite gate implemented
+Same JSON report contract as APQ. Levered-growth composite gate implemented
 as specified in the preregistration (CAGR vs G0; no Sharpe floor).
 Optional excess-mean test: **report vs omit frozen at this milestone’s
 review, before any cloud run.**
 
 ### MPQ-3 — Driver hook
 
-Add a second universe-free family beside `defensive_carry` (name
-`levered_growth` or equivalent). Same `require_clean` hash lock. Do not
-retarget APQ bytes.
+Add a universe-free family beside the existing ones (correction at
+counter-review 2026-08-19: the existing universe-free driver family is
+`allocation` — APQ-3 — with LEV's family arriving at LEV-2;
+`defensive_carry` is the overlay shadow stream, not a driver family).
+Name it `levered_growth` or equivalent. Same `require_clean` hash
+lock. Do not retarget APQ bytes.
 
 ### MPQ-4 — One cloud backtest
 
@@ -117,5 +122,4 @@ owner-accepted descriptive close. No second pass.
 - Raising SOXL after results
 - Changing REBAL paper targets from this family
 - Folding into SHW overlay or paper epoch
-- Starting code while APQ-4 is the scheduled QC step without owner
-  reorder
+- Starting code before the owner freezes and schedules this family

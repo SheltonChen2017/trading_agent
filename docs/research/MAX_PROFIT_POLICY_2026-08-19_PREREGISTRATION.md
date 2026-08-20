@@ -118,7 +118,15 @@ maxDD, time underwater, mean turnover (read beside
 report **terminal wealth relative to G0** (ending NAV / G0 ending NAV)
 because that is the max-profit reading.
 
-**Levered-growth composite gate (all three must hold vs G0, net 10 bps):**
+**Levered-growth composite gate (all three must hold vs G0, net 10 bps).**
+Counter-review label (2026-08-19, pre-freeze): this composite gate is a
+DESCRIPTIVE CLASSIFICATION of one price path — it carries no p-value
+and no statistical claim, and a pass is a leverage/beta reading
+conditional on this tape, never evidence of edge or skill. Only the
+optional bootstrap family below carries significance. Related coverage:
+the frozen LEV family's L0-vs-SREF descriptives already contain the
+G1-vs-G0 question on the longer 2011+ window; this family adds the
+mixes and the SOXL satellite on the shared 2022+ window.
 
 1. CAGR **higher** than G0 (no minimum spread — any positive gap after
    costs);

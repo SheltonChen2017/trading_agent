@@ -15,8 +15,10 @@ change that UI and must not cite HEDGE-1 as QC evidence.
 
 It is **not** a crash-timing model. The overlay is static.
 
-Do **not** start HPQ-1 while APQ-4 is in flight unless the owner
-explicitly reorders.
+Sequencing (updated at counter-review 2026-08-19: APQ-4/5 completed
+and the allocation family CLOSED as A-003 the day this plan was
+drafted): do **not** start HPQ-1 until the owner freezes the
+preregistration and schedules it.
 
 ## 1. Question
 
@@ -102,5 +104,4 @@ HEDGE-1 or paper.
 - Changing the HEDGE-1 application
 - Paper or live overlay from this family
 - Reopening A-002
-- Starting code while APQ-4 is the scheduled QC step without owner
-  reorder
+- Starting code before the owner freezes and schedules this family

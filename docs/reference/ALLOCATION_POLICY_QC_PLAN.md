@@ -1,17 +1,18 @@
 # Allocation-policy QuantConnect family — implementation plan
 
-Status: **proposed, not scheduled.** Prepared 2026-08-18. Branch:
-`user/cursor/allocation-policy-qc-plan-20260818`.
+Status: **COMPLETE AND CLOSED (A-003, 2026-08-19).** Prepared
+2026-08-18; implemented as APQ-1..3, executed once as R-029, and
+observed once as A-003. All three preregistered comparisons were null
+at the frozen 0.05/3 gate; no variant or rerun is authorized.
 
 This file is the authority for *how* to implement the family. Frozen
 weights, window, and gates live in
 `docs/research/ALLOCATION_POLICY_2026-08-18_PREREGISTRATION.md` and must
 not be changed in this document after a result exists.
 
-`docs/ACTION_PLAN_2026-08-02.md` remains the authority for *whether*
-implementation starts. Do not begin APQ-1 until the owner schedules it
-there. This work is independent of the SHW1 overlay/shadow branch and
-must not share a worktree with it.
+`docs/ACTION_PLAN_2026-08-02.md` remains the sequencing authority and
+records this family as closed. The instructions below remain the
+historical frozen contract; they do not authorize another run.
 
 This plan does **not** authorize a trade, a registry promotion, an Alpaca
 order, or a reopening of the closed cross-sectional alpha program (A-002).
@@ -217,7 +218,7 @@ version — not a post-hoc edit.
 | Path | Milestone |
 |---|---|
 | `docs/research/ALLOCATION_POLICY_2026-08-18_PREREGISTRATION.md` | APQ-0 (this branch) |
-| `docs/ALLOCATION_POLICY_QC_PLAN.md` | APQ-0 (this branch) |
+| `docs/reference/ALLOCATION_POLICY_QC_PLAN.md` | APQ-0 (this document) |
 | `research/lean/allocation_policy.py` | APQ-1 |
 | `tests/test_allocation_policy.py` | APQ-1 |
 | `scripts/analyse_qc_allocation_policy.py` | APQ-2 |

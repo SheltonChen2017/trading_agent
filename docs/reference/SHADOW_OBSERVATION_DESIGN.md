@@ -1,8 +1,11 @@
-# Overlay Shadow Observation — Design (REVISED DRAFT for owner review)
+# Overlay Shadow Observation — adopted design and SHW-1..4 record
 
-Status: REVISED DRAFT 2026-08-18 (supersedes the same-day first draft).
-Nothing here is implemented beyond SHW-1; this document exists to be
-reviewed, corrected, and adopted into the action plan.
+Status: **ADOPTED AND IMPLEMENTED THROUGH SHW-4 (2026-08-19).** The
+defensive-carry stream is registered as `overlay-epoch-001` in its
+dedicated shadow database, with a prospective 2026-07-31 baseline and
+the owner-frozen 24-month sufficiency requirement. This is the design
+record; the frozen preregistration and committed stream config remain
+the value authorities.
 
 ## 0. Why this draft was revised (the discovery)
 
@@ -94,25 +97,26 @@ pool.
 
 ## 4. Milestones
 
-- **SHW-1 (this round): contracts + storage** for the overlay task,
+- **SHW-1 — COMPLETE:** contracts + storage for the overlay task,
   with fresh/pre-migration, idempotency, conflict, cross-epoch, and
   read-only-guarantee tests.
-- **SHW-2: the runner CLI** (register/observe/mature/status).
+- **SHW-2 — COMPLETE:** the runner CLI
+  (register/observe/mature/status).
   (Scheduler installation moved to SHW-4, where a registered stream
   exists to schedule — SHW2-004.)
-- **SHW-3: sufficiency reporting** (CLI/file first; UI tab only if the
-  owner wants it).
-- **SHW-4: stream start** — requires the preregistration's [TO FREEZE]
-  values frozen by the owner FIRST; registration binds that document's
-  SHA-256 and the epoch clock starts.
+- **SHW-3 — COMPLETE:** counts-only sufficiency reporting through the
+  CLI/file path. Gate evaluation remains separate and owner-authorized.
+- **SHW-4 — COMPLETE:** the owner froze the preregistration values;
+  registration bound that document's SHA-256; the dedicated stream and
+  Interactive-logon scheduler were installed and first-run verified.
 
-## 5. Open decisions for the owner (unchanged)
+## 5. Owner decisions (closed for this stream)
 
-1. Cycle cadence detail: month-end computation with daily freshness
-   checks vs monthly-only computation.
-2. Host: operational clone's frozen release commit vs pinned tag on the
-   dev machine.
-3. Whether SHW-3 surfaces in the Streamlit UI or stays CLI/file-only.
+1. Cadence: daily weekday tasks check, while observations advance only
+   on a new completed month-end and remain idempotent otherwise.
+2. Host: the operational clone with a dedicated
+   `data/shadow_overlay.db`; it never writes the operator database.
+3. Surface: CLI/file only. No Streamlit UI is required for sufficiency.
 
 ## 6. Non-goals
 

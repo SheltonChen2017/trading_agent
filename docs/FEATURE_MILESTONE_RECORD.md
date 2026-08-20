@@ -318,4 +318,22 @@ strategy makes money.
 
 **Plain language:** If the rebalancing page cannot offer a sale, it now tells you the real reason. It can say that nothing is above its allowed range, or that cash and stocks outside your chosen groups are above the range but this tool is not allowed to sell them. Review also removed a sentence that could say cash was both above the range and inside it. The app still never sells cash or an ungrouped stock just because it is outside the plan, and no order happens automatically.
 
+## ALPHA-QC Stage 0 and Stage 1 evidence closure — 2026-08-18 — observations `A-001` / `A-002`
+
+**Technical:** Nine reviewed Stage 0 cloud runs and six reviewed Stage 1 cloud runs were executed serially under their frozen specifications, preserved with project/compile/backtest/source/log identities, and observed once per frozen analyser family. Stage 0 found 0/44 IC, 0/44 long-short, and 0/60 short-battery cells beyond the lifetime-corrected gate; Stage 1 found 0/6 IC and 0/6 long-short cells, while long-only performance tracked cadence-matched benchmarks and therefore did not establish selection edge. The cross-sectional program on these universes is closed at a 452-cell lifetime floor; reopening requires a new owner decision, new universe or data, and a fresh preregistration. These research results add no trading authority and were not deployed.
+
+**Plain language:** The project finished the planned historical tests of its stock-ranking ideas. Some long-only baskets rose, but the fair benchmark rose too, and none of the tests showed reliable stock-picking skill after accounting for how many ideas were tried. That is a useful negative result: the app should not pretend these signals can pick winners. The work is closed unless you deliberately start a genuinely new experiment with different data or a different market group.
+
+## SHW-4 defensive-carry prospective observation stream — 2026-08-19 — `overlay-epoch-001`
+
+**Technical:** The task-specific defensive-carry shadow contracts, append-only storage, register/observe/mature/status/sufficiency CLI, committed frozen config, dedicated shadow database, and Interactive-logon Windows task chain are complete. Registration binds the frozen preregistration and exact code lineage; the 2026-07-31 baseline is available across all 108 members; adjacent-month outcomes alone count toward the owner-frozen 24-month threshold; refusals occupy their cycle slots; and sufficiency remains counts-only until a separate owner-authorized gate evaluation. Independent audit additionally made non-finite provider closes durable ticker-named refusals and excluded unavailable outcomes from the independent count. The stream has no proposal, order, promotion, or operator-database authority.
+
+**Plain language:** The app now keeps a separate monthly notebook for a defensive mix and waits to see how it behaves over time. It does not rewrite missing months or guess when a price is bad; it records the problem and keeps counting honestly. It needs 24 usable monthly outcomes before anyone evaluates the frozen pass/fail rules. This notebook cannot buy, sell, recommend, or change the live paper-trading records.
+
+## APQ allocation-policy historical comparison — 2026-08-19 — run `R-029`, observation `A-003`
+
+**Technical:** APQ implemented one four-policy LEAN algorithm, one strict analyser, and one universe-free reviewed launch-driver path, then consumed exactly one QuantConnect run and one analyser pass as preregistered. All 54 aligned months were structurally complete. P1, P2, and P3 each had a negative mean excess return versus 100% SPY and none passed the frozen Bonferroni 0.05/3 gate (p=0.080, 0.121, and 0.214 respectively), so the family is closed null. The 2022+ window is regime-conditioned and the result does not authorize applying any weights to Alpaca or REBAL.
+
+**Plain language:** The project compared three more cautious ETF mixes with simply holding SPY. In this one fixed historical test, all three mixes lagged SPY on average and none passed the project’s evidence rule. The test is finished; the app should not keep changing the weights until something looks better. It also does not mean SPY will win in the future, and it does not change your actual portfolio.
+
 ---

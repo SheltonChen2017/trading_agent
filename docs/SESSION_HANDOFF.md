@@ -2561,42 +2561,34 @@ owner-present elevated install and a first-firing verification.
 
 ## 8. What is next
 
-**Current (2026-08-19, section 7bk): SBR-1 IMPLEMENTED** on
-`user/claude/sbr1-ratings-capture-20260819`, pending independent
-review and the owner-present elevated task install (17:15 ET,
-Interactive). The MPQ/HPQ plans are ON HOLD by owner decision
-2026-08-19 (recorded on their branch); the owner's priorities are the
-strong-buy program and app stability — the app ImportError was a stale
-pre-deploy Streamlit process, killed and relaunched clean on `c9d0740`
-(diagnosis in §8's operational note; no code change). **LEV-1
-IMPLEMENTED** on
-`user/claude/lev1-lean-algorithm-20260819` (based on the frozen-prereg
-commit), pending independent review — `research/lean/
-leveraged_threshold.py` with a daily state machine (next-close
-execution; month-end re-entry fills AT the month-end close; pullback
-re-entry needs the full −10%), seven aligned monthly series, union
-refusal, roll-forward turnover across refusal gaps (over-charging is
-the accepted direction), LSALE lines for the preregistered after-tax
-descriptive, LEV-specific log markers, and no ACTIVE_UNIVERSE. 10
-tests; 3 reverse mutations red then restored (threshold boundary,
-pullback boundary, accumulator reset). No QC. **LEV-2 (analyser +
-driver hook) is the next code milestone.** MPQ and HPQ are ON HOLD
-(counter-reviewed, sections 7bi/7bj) — not frozen, not scheduled. The
-allocation-policy family is CLOSED (A-003, NULL on the gate). No QC
-access is currently authorized anywhere. Other owner-gated tracks:
-(1) Codex's thorough two-day audit (range now through the SBR-1 merge;
-epoch-006 `policy_fingerprint` change flagged); (2) optional owner
-decision on P1/P3-style weights on the Alpaca/REBAL stack.
-Operational: epoch-006 first observation VERIFIED (lineage binds
-`c9d0740`); remaining check is the overlay tasks' first AUTOMATIC
-firing (2026-08-20 14:45 local). The 2026-08-19 app ImportError
-(`open_lot_fingerprint`) was a STALE pre-deploy Streamlit process
-holding the old `tax_lots` module across the epoch-006 fast-forward —
-the deployed tree is consistent; stale processes killed, app
-relaunched clean on `c9d0740` via `C:\git\launch_trading_app.ps1` (no
-code change; durable rule: restart the app after any operational
-deploy). SHW-4 complete; paper-epoch-006 is the live paper epoch.
+**Current (2026-08-19): independent audit accepted after correction.**
+Codex reviewed exact pushed range
+`81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a`
+(143 commits) on
+`codex/review-post-stage0-through-sbr1-20260819`. The audit found and
+corrected six behavioral/evidence defects: LEV month-end sales could
+re-enter at the same close instead of the following month-end; SBR
+silently truncated fractional provider counts and did not bind its
+frozen stream/config/preregistration or per-snapshot code commit;
+overlay observation crashed on non-finite provider closes instead of
+recording a named refusal; overlay sufficiency counted unavailable
+outcomes; and the APQ parser accepted impossible month labels. The
+canonical documentation status/path contradictions were also corrected.
+No QuantConnect access, broker access, deployment, scheduled-task
+mutation, or operational database mutation occurred.
+Product/test corrections are committed separately at `d943339`; the
+review report dispositions all 143 submitted commits.
 
+**Sequencing:** Stage 0 and Stage 1 are closed null (A-001/A-002).
+APQ is closed null (R-029/A-003). SHW-4 is live and collecting its
+prospective 24-month stream. LEV-1 and SBR-1 may proceed only after this
+review branch is merged and counter-reviewed. LEV-2 is the next code
+milestone after that gate. The SBR Interactive scheduled-task install
+is owner-present and remains unperformed. SBR evaluation remains
+forbidden until SBR-2 is frozen after at least 12 monthly snapshots.
+MPQ/HPQ remain on hold. Active paper evidence is `paper-epoch-006`;
+the next operational observation is governed by
+`docs/operations/OPERATIONAL_FACTS.md`.
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18
    and the single frozen-analyser pass has run (section 7z, ledger entry
@@ -2672,15 +2664,18 @@ deploy). SHW-4 complete; paper-epoch-006 is the live paper epoch.
    session rather than the calendar day, so Monday pre-market runs no longer
    manufacture future/stale bars. Runtime freshness behavior is unchanged.
 
-Standing operational constraints, unchanged by this round:
+Standing operational constraints at this review snapshot:
 
-- `paper-epoch-005` runs UNCHANGED for 60 days (owner decision 2026-08-14).
-  Do not deploy, roll, or disturb it. `-AllowPaperOrders` must not be used
-  while that hold stands.
+- `paper-epoch-005` is historical and closed. `paper-epoch-006` is the
+  active evidence epoch on the operational release recorded in
+  `docs/operations/OPERATIONAL_FACTS.md`. Do not deploy, roll, or disturb
+  it without a new explicit owner instruction; a runtime change closes
+  the epoch because code lineage cannot pool.
 - **The operational checkout's `my_policy.json` stays at 0.50/0.05.** The
   development copy carries 0.90/0.07 so the approved profile is reachable,
   and it is untracked so no commit contains it. Copying it across would
-  change the policy fingerprint and stall epoch-005 exactly as epoch-002
+  change the policy fingerprint and stall the active epoch exactly as
+  epoch-002
   stalled. A later agent must not "finish the job" by syncing them.
 - Never open the operator database with the development checkout's
   `AssistantStore`; that would run migrations against a frozen-epoch
@@ -2697,6 +2692,23 @@ tasks, access a funded account, enable live trading, submit a paper order,
 or roll an epoch without a new explicit owner instruction.
 
 ## 9. Resume prompt
+
+```text
+Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
+docs/SESSION_HANDOFF.md, docs/reference/ALLOCATION_POLICY_QC_PLAN.md,
+docs/reference/SHADOW_OBSERVATION_DESIGN.md, docs/alpha-result.md, and
+docs/Review/REVIEW_2026-08-19_POST_STAGE0_THROUGH_SBR1.md. The exact
+independently reviewed pushed range is
+81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a
+(143 commits). The Codex correction branch is
+codex/review-post-stage0-through-sbr1-20260819. Stage 0/1 and APQ are
+closed null; SHW-4 is live; LEV-1 and SBR-1 are accepted only after the
+review corrections and still require merge/counter-review. Do not run
+QC, install the SBR task, deploy, trade, mutate an operational database,
+or roll paper-epoch-006 without the owner's separate authorization.
+```
+
+## 9a. Archived 2026-08-17 resume prompt (historical only)
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,

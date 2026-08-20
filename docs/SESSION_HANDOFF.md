@@ -2477,8 +2477,8 @@ that closed Stage 2 PEAD. The owner adopted the two honest paths
   a separate SBR-2 evaluation preregistration freezes after ≥12
   snapshots.
 
-Both drafts are committed and PENDING OWNER ADOPTION; every value
-freezes at adoption. Explicitly outside the A-002 closure (fixed
+Both preregistrations were **FROZEN by owner adoption the same day
+("as-is")**, recorded in each document's section 7. Explicitly outside the A-002 closure (fixed
 instruments / new data source + fresh preregistration + owner
 decision). Milestones after adoption: LEV-1 (LEAN algo), LEV-2
 (analyser + driver hook), LEV-3 (one run), LEV-4 (one pass); SBR-1
@@ -2486,8 +2486,10 @@ decision). Milestones after adoption: LEV-1 (LEAN algo), LEV-2
 
 ## 8. What is next
 
-**Current (2026-08-19, section 7bg):** LEV + SBR preregistration
-drafts await owner adoption — no LEV/SBR code before that freeze. The
+**Current (2026-08-19, section 7bg):** LEV + SBR preregistrations
+FROZEN by owner adoption ("as-is"); **LEV-1 (LEAN algorithm + local
+tests, no QC) is the next milestone**, then LEV-2 (analyser + driver
+hook); SBR-1 (capture script + task) may run in parallel. The
 allocation-policy family is CLOSED (A-003, NULL on the gate). No QC
 access is currently authorized anywhere. Other owner-gated tracks:
 (1) Codex's thorough two-day audit tonight (range through the APQ-5

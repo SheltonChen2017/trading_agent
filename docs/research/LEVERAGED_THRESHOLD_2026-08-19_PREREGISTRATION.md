@@ -1,7 +1,7 @@
 # Preregistration: leveraged-ETF take-profit family (LEV, 2026-08-19)
 
-Status: **DRAFT — becomes FROZEN upon owner adoption.** Every value in
-section 3–6 is fixed at adoption, before any result is observed.
+Status: **FROZEN — owner adopted 2026-08-19 ("as-is").** Every value
+in sections 3–6 was fixed at adoption, before any result was observed.
 Author: Claude, from the owner's strategy description of 2026-08-19
 (Path B of that discussion: the leveraged-ETF engine, testable today;
 the analyst-ratings layer is the separate SBR capture stream).
@@ -100,6 +100,7 @@ Descriptive only; conservative against the strategy by construction.
 
 ## 7. Adoption
 
-Owner adoption line (date + wording) to be recorded here; all values
-above freeze at that moment. Until then this document is a proposal
-and no LEV code milestone may start.
+**Owner adoption 2026-08-19: "as-is"** (in session, after the draft
+was presented with its parameter menu and base-rate warning; handoff
+section 7bg). All values in sections 3–6 are FROZEN as written. LEV-1
+may start.

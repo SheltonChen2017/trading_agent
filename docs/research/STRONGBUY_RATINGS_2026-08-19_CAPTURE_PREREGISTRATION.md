@@ -1,6 +1,6 @@
 # Preregistration: Strong-Buy ratings prospective capture (SBR, 2026-08-19)
 
-Status: **DRAFT — becomes FROZEN upon owner adoption.** This document
+Status: **FROZEN — owner adopted 2026-08-19 ("as-is").** This document
 preregisters a CAPTURE stream only. The evaluation gets its own frozen
 preregistration later, before the first evaluation look (section 6).
 
@@ -66,5 +66,5 @@ the contract the SBR-2 reviewer enforces.
 
 ## 7. Adoption
 
-Owner adoption line (date + wording) to be recorded here; the capture
-spec above freezes at that moment. SBR-1 may then be scheduled.
+**Owner adoption 2026-08-19: "as-is"** (in session; handoff section
+7bg). The capture spec above is FROZEN. SBR-1 may be scheduled.

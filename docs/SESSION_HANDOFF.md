@@ -3138,9 +3138,8 @@ suite exited 0 on the corrected review tree; an independent collection counted
 and `git diff --check` passed. No data purchase, QuantConnect access, broker
 access, scheduler change, deployment, operational database action, epoch
 change, or order occurred. This review does not adopt ACER-0. The current
-worktree contains only this review-record and handoff update until committed;
-the branch is local-only and must not be described as published until the owner explicitly
-authorizes a push.
+review branch is local-only and must not be described as published until the
+owner explicitly authorizes a push.
 
 ## 8. What is next
 

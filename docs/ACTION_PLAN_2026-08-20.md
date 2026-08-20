@@ -13,17 +13,17 @@ remains authoritative for machine-local operational state.
 
 **Nothing here grants authority.** Live trading, funded accounts, autonomous
 execution, model promotion, epoch rolls, scheduled-task changes, and every
-ML/LLM boundary in `CLAUDE.md` remain exactly as constrained. Prioritising the
-Strong-Buy initiative is a *sequencing* decision; it does not adopt, freeze, or
-approve any value in the Strong-Buy research contract. That is a separate
-owner act (SBP-0).
+ML/LLM boundary in `CLAUDE.md` remains exactly as constrained. Prioritising
+ACER is a *sequencing* decision; it does not adopt, freeze, or approve any
+ACER value. That is a separate owner act (ACER-0).
 
-Current development topology at independent-review start (2026-08-20):
-`origin/main` is `13355a6`. PR #283 merged the handoff-topology refresh and
-PR #284 merged Claude's SBP audit, documentation sweep, and this replacement
-Action Plan. The exact submitted range under review is
-`c289f95..13355a6`; later review commits are recorded in
-`docs/SESSION_HANDOFF.md` rather than described here as already merged.
+Current development topology at the ACER review start (2026-08-20):
+`origin/main` is `6cdb423`. PR #286 merged the ACER documentation change from
+`f3b960d`; the prior SBP documentation-review chain is mainline history at
+`6f571c2`. The ACER submission is reviewed commit-by-commit from
+`6f571c2..f3b960d`, with the PR #286 merge tree also reviewed; the final
+dispositions and any review corrections are recorded in
+`docs/SESSION_HANDOFF.md`.
 
 ---
 
@@ -61,7 +61,7 @@ documentation changes).
 |---|---|---|
 | Paper evidence | **`paper-epoch-006` is active** since 2026-08-19 on deployed `c9d0740`; first observation verified the same day; 60-session / 30-order clock counting | `docs/operations/OPERATIONAL_FACTS.md` |
 | Overlay shadow | `overlay-epoch-001` (defensive carry) registered with a 2026-07-31 baseline; 24-month sufficiency floor; tasks reinstalled Interactive after the S4U failure | `docs/reference/SHADOW_OBSERVATION_DESIGN.md` |
-| Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first capture.** Code, tests and installer merged and reviewed; the task was never installed and no snapshot is committed here. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. The machine-local stream state has still not been measured, so "zero snapshots" remains an expectation rather than a verified fact | `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` |
+| Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first *verified* capture.** Code, tests and installer merged and reviewed; no snapshot is committed here. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. The machine-local task and artifact state has not been measured, so neither "the task was never installed" nor "zero snapshots exist" is a verified operational fact | `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` |
 
 **Research programs and their verdicts:**
 
@@ -168,9 +168,10 @@ and the uploaded custom-data SHA-256.
 
 SBP-0 will not be run. The plan, its amendment ledger SBPA-001..011, and the
 four-round review chain that produced them are retained as the record of a
-reviewed design decision. **SBR-1's scheduled task stays uninstalled and its
-frozen capture stream is closed with zero snapshots** — the cheapest possible
-moment to stop, since no evidence is discarded and no epoch is disturbed.
+reviewed design decision. **SBR-1's scheduled task must not be installed and
+its capture stream is closed**. No snapshot is committed, but the
+machine-local task and artifact state must be measured before asserting that
+none exists; no committed evidence or epoch is disturbed.
 The capture code, tests and installer remain in the tree; a future
 level-based hypothesis could revive them under a fresh preregistration.
 

@@ -68,7 +68,7 @@ be disclosed in advance, and because the source document does not carry it.
 | Item | Disposition |
 |---|---|
 | `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` (SBP-0..5) | **SUPERSEDED as the priority program, 2026-08-20, while still a draft.** It was never adopted or frozen, so no evidence, capture, or result is affected. Retained in full, including amendments SBPA-001..011, as the record of a reviewed design decision. |
-| `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` (SBR) | **Frozen contract, closed before its first capture.** Zero snapshots exist and the scheduled task was never installed, so nothing is discarded. See section 3.1. |
+| `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` (SBR) | **Frozen contract, closed before its first verified capture.** No snapshot is committed, and the task must not be installed. The machine-local task and artifact state has not been measured, so it cannot truthfully be described as verified absent. See section 3.1. |
 | `docs/research/LEVERAGED_THRESHOLD_2026-08-19_PREREGISTRATION.md` (LEV) | **Unchanged and still separate.** LEV-2..4 remain a fast historical read on TQQQ timing. It is not ACER evidence and ACER does not consume it. |
 | MPQ / HPQ | Unchanged: proposed, on hold. |
 | Closed families (`A-001`, `A-002`, `A-003`) | Unchanged and still closed. ACER is permitted under the A-002 closure because it brings a **new data source** (analyst revision history), a **fresh preregistration**, and an **owner decision** — all three, which that closure requires. |
@@ -83,10 +83,11 @@ does not say which firm acted, when, or from what prior rating, and two
 offsetting actions inside one month are invisible.
 
 The capture code, its tests, and its installer are **retained** (they remain
-reviewed work and a level-based hypothesis could revive them), but the
-scheduled task is **not installed** and the stream is closed with zero
-captures. This is the cheapest possible moment to stop: no evidence is
-discarded, no epoch is disturbed, and no operational state changes.
+reviewed work and a level-based hypothesis could revive them), but the stream
+is closed and its task must not be installed. No snapshot is committed. The
+machine-local task and artifact state has not been measured, so a later reader
+must not turn that absence of repository evidence into a claim of verified
+zero captures. No committed evidence or epoch is disturbed.
 
 ## 4. Data requirements, and what is actually verified
 

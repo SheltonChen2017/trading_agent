@@ -24,8 +24,9 @@ independent correction review, 7cg the counter-review of that review, and
 correction review, 7cj the counter-review of that review, and 7ck the
 ACER-0A completion proposals. Section 7cl records Codex's independent
 correction review of those proposals, 7cm the counter-review of that review,
-and 7cn the local data-capability audit; 7cn and section 8 are the current
-development state.
+7cn the local data-capability audit, and 7co Codex's independent correction
+review of both new commits; 7co and section 8 are the current development
+state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4154,6 +4155,13 @@ completed, so `FEATURE_MILESTONE_RECORD.md` was correctly left unchanged.
 Branch: `user/claude/acer-prereg-cr-20260821`, based on `734d521`. Full
 record: `docs/Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md`.
 
+**Independent correction:** the CCPR-001 state-semantics concern remains a
+real owner choice, but the quantitative scan below is not decision-grade. It
+used raw ticker/raw firm groups before identity resolution, counted all later
+state replacements rather than the incremental non-directional-zero events at
+issue, and approximated sessions from calendar days. The submitted percentages
+are historical invalid evidence and were withdrawn from the active proposal.
+
 **All six findings confirmed, two by direct computation, and both of those
 are serious defects in my draft.**
 
@@ -4209,6 +4217,16 @@ correction. That is the gate working, not failing.
 Same branch as 7cm, per the owner's relay instruction. Full record:
 `docs/research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md`.
 
+**Independent correction:** the negative result below applies to the current
+**EDGAR/yfinance path**, not every local route. Repository-wide local
+feasibility remains unresolved because the audit omitted the existing
+**Databento** research path (`ml/databento_source.py`, `ml/databento_pit.py`,
+`ml/databento_authoritative.py`). That path is an unmeasured candidate: no
+local artifact or visible credential was present during review, and its ACER
+history, delisted coverage, terminal-return semantics, access, cost, and
+licence remain unaudited. Section 7co is authoritative over the original
+repository-wide conclusion retained below.
+
 ACER-0A.3 and 0A.4 were open with unmeasured answers. Both are now answered,
 and both are **negative** — the second decisively so.
 
@@ -4228,10 +4246,13 @@ has already measured in its own legacy universe, where SIVB, SBNY and FRC are
 absent. A locally-run ACER-2 would produce an upward-biased result whose bias
 could not be bounded.
 
-Two supporting findings: the sole local price provider declares
+Two supporting findings from the submitted audit: the production read-path
+price provider declares
 `provides_point_in_time_lineage = False` in its own contract and its bars are
 adjusted as of fetch date; and **no local book-value source exists at all**,
-so the proposed value control (ACER-0A.3) has no implementation path.
+so the proposed value control (ACER-0A.3) has no implemented source. The
+original “sole local provider” and repository-wide conclusions are invalidated
+by the correction note above.
 
 A specification mismatch was also caught before it could be frozen: ACER-0A.7
 proposes **GICS** sector dummies, while the only locally available sector
@@ -4246,11 +4267,9 @@ ticker for companies that **still have a listed ticker today**", so it
 resolves survivors and omits the dead names, which are the ones that matter.
 EDGAR is a promising route, not a finished one.
 
-Four options are laid out for the owner, with the trade stated for each.
-Only acquiring point-in-time data with delisted coverage, or authorizing a
-read-only QuantConnect data path, permits ACER-2 as frozen. Amending the
-universe to drop delisted names is cheap and **not recommended**: it would
-make the milestone answerable and the answer worthless.
+The submitted option set omitted the existing Databento path and is superseded
+by the corrected audit. Amending the universe to drop delisted names remains
+**not recommended** because it reintroduces the survivorship problem.
 
 Validation on the final tree: full suite **4,450 passed / 0 failed / 25
 warnings** in 662.69 seconds — identical to the reviewed tree, because this
@@ -4265,6 +4284,50 @@ aggregate scan of the snapshot and use a 252/365 calendar-to-session
 approximation; they are not produced by any tested code path. The
 capability audit quotes existing module docstrings and contracts rather than
 executing them.
+
+## 7co. Independent review of ACER preregistration counter-review and local-data audit (Codex, 2026-08-21)
+
+Codex reviewed exact remote
+`origin/user/claude/acer-prereg-cr-20260821` from merge base
+`734d521da23267deda49fb6ce8f91d35b4d09cd0` through ordered commits
+`5372d231755c9417b8df1889dd15339577cd3f4d` and
+`f93e24d7cbb282cac407a2c8b17c4eba6d90c064`. Both commits are **accepted
+after correction**. The complete record is
+`docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md`.
+
+Three findings were confirmed. **ACERLDR-001 (P2):** the submitted CCPR-001
+scan did not isolate the effect it claimed to measure, used unresolved raw
+ticker/firm keys and a calendar approximation instead of exact NYSE sessions,
+and had no committed reproducer. Its 7.1%/19.1%/32.2% figures are therefore
+withdrawn as decision evidence. The two state-semantics alternatives remain
+owner choices; neither was selected. A later measurement must use resolved
+issuer and rating-firm identities, exact sessions, and separate directional,
+non-directional and expiry incidence. **ACERLDR-002 (P2):** the local-data
+audit omitted the repository's existing Databento capture, security-master
+and vintage-adjustment path. The current EDGAR/yfinance path is inadequate,
+but repository-wide local feasibility remains unresolved until Databento is
+audited. **ACERLDR-003 (P3):** missing terminal outcomes are disqualifying,
+but the aggregate bias direction is not known until the omitted exits are
+measured; the documentation no longer promises a deterministic sign.
+
+Correction `32a16b0` updates the active evidence and adds three dangerous-
+direction document guards; review record/action-plan commit `a2bca7f` records
+the independent disposition and corrected current state. Review-only
+inspection found no local Databento
+artifact and no credential visible to the review process; no vendor API was
+called, no data was downloaded or purchased, no rating was joined to a price
+or outcome, and no research look occurred. The next gate is an explicit owner
+authorization for a zero-outcome Databento structural capability/cost/licence
+audit, or an owner choice of another point-in-time source or a read-only QC
+data path. The Benzinga Earnings audit, final issuer mapping and all remaining
+ACER-0A freeze decisions remain open.
+
+Validation on the corrected review tree: the three new guards failed red on
+the exact pushed documents and passed after correction; the active-document
+suite passed **47/47**; the focused ACER normalization/identity, Databento
+source/PIT/authority and document suites passed **179/179**; the complete
+repository suite passed **4,453 / 0 failed / 25 warnings in 751.09 seconds**;
+and required `compileall` including `research/` passed on Python 3.13.14.
 
 ## 8. What is next
 
@@ -4304,12 +4367,22 @@ Earnings **structural audit** and only then adopt or reject that control
 dataset and freeze the standardized-surprise formula; and run Snapshot B
 after the declared interval.
 
+The current EDGAR/yfinance path cannot satisfy the frozen delisted-outcome
+requirement, but **repository-wide local feasibility remains unresolved**.
+The already reviewed Databento capture/reference/vintage-adjustment modules
+were omitted from the submitted capability audit. Databento is an unmeasured
+candidate, not an accepted ACER source: a separately authorized structural
+audit must establish access, history, known-delisted coverage, terminal-return
+semantics, price/volume and corporate-action completeness, licence, and cost
+before any purchase, download, or outcome work.
+
 **The issuer-mapping step is BLOCKED and needs an owner ruling (sections
 7ch–7ci).** There is no local LEAN or LEAN data on this host, and the QC client's
 allowlist deliberately excludes data endpoints, so read-only QC symbol
-mapping has no available path. The options are to install local LEAN with its
-data, to widen the allowlist to a read-only data path (a change to a reviewed
-control), or to nominate a different security-master source. This cannot be
+mapping has no available path. The options are to audit the existing Databento
+reference path, install local LEAN with suitable data, widen the allowlist to a
+read-only data path (a change to a reviewed control), or nominate a different
+security-master source. This cannot be
 deferred by improving the heuristic: name evidence provably misses the
 BBBY-class reuse, so the 2,885 flagged tickers are a lower bound and an
 unflagged ticker is `no_name_based_ambiguity_evidence`, not established as
@@ -4464,27 +4537,32 @@ docs/SESSION_HANDOFF.md, docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
 docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
 docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
 docs/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md,
+docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
 docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
 docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/alpha-result.md.
-The vendor-audit and event-backbone review chains are both closed and merged
-(sections 7ca and 7cd); every review branch is deleted and main is the only
-branch. The ACER-0A submission was accepted after correction on
-`codex/review-acer0a-freeze-20260820`. **ACER-0A decisions are partially
-frozen but its executable preregistration is incomplete; ACER-0B is
-deliberately not frozen.** The dataset
+The vendor-audit and event-backbone review chains are closed and merged
+(sections 7ca and 7cd). The newest independent review is section 7co on
+`codex/review-acer-local-data-audit-20260821`; its exact remote head is the
+review handoff for counter-review. **ACER-0A decisions are partially frozen,
+but its executable preregistration is incomplete; ACER-0B is deliberately
+not frozen.** The dataset
 identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
 materialized; earlier ids are superseded. Stage 0/1 and APQ are valid but
 closed null; SHW-4 is prospective. SBP is superseded by ACER and SBR-1 is
-closed on a measurement. Next: close ACER-0A.1–0A.10 (the numeric robustness
-rule is a proposal awaiting owner confirmation), run the authorized $99
-Benzinga Earnings structural audit before adopting that control dataset,
-resolve issuer mapping with ambiguity refusals over the 9,677-ticker surface
-using read-only QC symbol data, and take Snapshot B after the declared
-interval. Local LEAN is authoritative; keep reconstructable ratings off QC
-absent explicit permission evidence. Do not purchase beyond the authorized
-audit, join ratings to prices or outcomes, run a backtest, deploy, trade,
+closed on a measurement. The CCPR-001 truncation percentages are withdrawn:
+they did not isolate the proposed state-semantics choice. The current
+EDGAR/yfinance path cannot support ACER's delisted outcomes, but Databento is
+an existing **unmeasured candidate**, not a validated solution. Next: obtain
+an owner ruling before any Databento API access, purchase or download; if
+authorized, run only a zero-outcome structural capability/cost/licence audit.
+Also close ACER-0A.1–0A.10, run the separately authorized Benzinga Earnings
+structural audit before adopting that control dataset, resolve issuer mapping
+with ambiguity refusals, and take Snapshot B after the declared interval.
+Local LEAN remains authoritative; keep reconstructable ratings off QC absent
+explicit permission evidence. Do not join ratings to prices or outcomes, run
+a backtest, deploy, trade,
 acknowledge or alter an operational alert, mutate an operational database, or
 roll paper-epoch-006 without separate authorization.
 ```

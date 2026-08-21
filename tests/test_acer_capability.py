@@ -20,8 +20,12 @@ from research.acer.capability import (
     check_databento_path,
     check_delisting_returns,
     check_earnings_surprise_control,
+    check_point_in_time_corporate_actions,
     check_point_in_time_prices,
+    check_point_in_time_security_eligibility,
+    check_ratings_event_corpus,
     check_sector_classification,
+    check_size_control_source,
     check_trading_session_calendar,
     check_value_control_source,
     summarize_capabilities,
@@ -154,21 +158,78 @@ def test_the_earnings_surprise_control_has_no_point_in_time_source():
 def test_the_checklist_covers_every_control_that_needs_its_own_source():
     """The summary refuses anything but the *complete* set, so a control
     silently missing from the checklist would make the incompleteness harder
-    to notice, not easier. Value, sector and earnings surprise each need a
-    distinct source; the other five ACER-0A.7 controls are arithmetic over
+    to notice, not easier. Size, value, sector and earnings surprise each need
+    a distinct source; the other four ACER-0A.7 controls are arithmetic over
     prices and the ratings corpus and are covered by the price requirement.
     """
     requirements = {finding.requirement for finding in assess_capabilities()}
     assert any("value" in name for name in requirements)
+    assert any("shares outstanding" in name for name in requirements)
     assert any("sector" in name for name in requirements)
     assert any("earnings-surprise" in name for name in requirements)
     assert set(capability._CONTROLS_COVERED_BY_PRICES) == {
         "momentum",
-        "size",
         "liquidity",
         "volatility",
         "analyst coverage",
     }
+
+
+def test_the_core_ratings_event_corpus_is_itself_required():
+    """A checker cannot call ACER-2 runnable after checking only controls and
+    outcomes; the normalized analyst-event signal is a required input too."""
+    finding = check_ratings_event_corpus()
+    assert finding.status == STATUS_UNMEASURED
+    assert finding.blocks_acer2 is True
+    assert "normalized" in finding.evidence.lower()
+
+
+def test_size_is_not_claimed_to_be_covered_by_prices_alone():
+    """The frozen size control is log market cap, which also needs a
+    point-in-time share count. A price-only requirement cannot cover it."""
+    finding = check_size_control_source()
+    assert finding.status == STATUS_UNMEASURED
+    assert finding.blocks_acer2 is True
+    assert "shares" in finding.evidence.lower()
+
+
+def test_total_return_corporate_actions_are_a_separate_requirement():
+    """The frozen outcome includes dividends and split handling. Daily bars
+    alone do not prove a point-in-time corporate-action source."""
+    finding = check_point_in_time_corporate_actions()
+    assert finding.status in {STATUS_UNAVAILABLE, STATUS_UNMEASURED}
+    assert finding.blocks_acer2 is True
+    assert "corporate" in finding.requirement.lower()
+
+
+def test_security_type_and_listing_history_are_a_separate_requirement():
+    """Issuer identity cannot establish that a historical instrument was a
+    US primary-listed common stock rather than an excluded security type."""
+    finding = check_point_in_time_security_eligibility()
+    assert finding.status in {STATUS_UNAVAILABLE, STATUS_UNMEASURED}
+    assert finding.blocks_acer2 is True
+    assert "security" in finding.requirement.lower()
+
+
+@pytest.mark.parametrize(
+    ("check", "expected_text"),
+    [
+        (check_ratings_event_corpus, "pipeline modules"),
+        (check_size_control_source, "shares tag"),
+        (check_point_in_time_corporate_actions, "no corporate-action"),
+        (check_point_in_time_security_eligibility, "no point-in-time security"),
+    ],
+)
+def test_new_requirements_fail_closed_when_their_sources_disappear(
+    tmp_path, monkeypatch, check, expected_text
+):
+    """Each added guard is load-bearing in the dangerous direction: removing
+    all source evidence must never leave it unmeasured or available."""
+    monkeypatch.setattr(capability, "REPO_ROOT", tmp_path)
+    finding = check()
+    assert finding.status == STATUS_UNAVAILABLE
+    assert finding.blocks_acer2 is True
+    assert expected_text in finding.evidence.lower()
 
 
 def test_sector_is_sic_not_the_proposed_gics():

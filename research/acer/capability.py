@@ -44,10 +44,20 @@ _VALID_STATUSES = frozenset(
 )
 
 _REQ_SESSION_CALENDAR = "NYSE trading-session calendar"
+_REQ_RATINGS_CORPUS = "verified normalized analyst-ratings event corpus"
 _REQ_PIT_PRICES = "point-in-time daily bars (production read path)"
 _REQ_DATABENTO = "Databento point-in-time bars and reference"
 _REQ_DELISTING_RETURNS = "terminal returns for delisted securities"
 _REQ_ISSUER_IDENTITY = "durable point-in-time issuer identity"
+_REQ_SECURITY_ELIGIBILITY = (
+    "point-in-time security type and primary-listing eligibility"
+)
+_REQ_CORPORATE_ACTIONS = (
+    "point-in-time corporate actions for total-return outcomes"
+)
+_REQ_SIZE_CONTROL = (
+    "point-in-time shares outstanding for log market-cap size control"
+)
 _REQ_VALUE_CONTROL = "book-to-market value control"
 _REQ_SECTOR = "sector classification (ACER-0A.7 proposes GICS)"
 _REQ_EARNINGS_SURPRISE = "point-in-time earnings-surprise control"
@@ -55,28 +65,32 @@ _REQ_EARNINGS_SURPRISE = "point-in-time earnings-surprise control"
 _REQUIRED_REQUIREMENTS = frozenset(
     {
         _REQ_SESSION_CALENDAR,
+        _REQ_RATINGS_CORPUS,
         _REQ_PIT_PRICES,
         _REQ_DATABENTO,
         _REQ_DELISTING_RETURNS,
         _REQ_ISSUER_IDENTITY,
+        _REQ_SECURITY_ELIGIBILITY,
+        _REQ_CORPORATE_ACTIONS,
+        _REQ_SIZE_CONTROL,
         _REQ_VALUE_CONTROL,
         _REQ_SECTOR,
         _REQ_EARNINGS_SURPRISE,
     }
 )
 
-# ACER-0A.7 names eight controls. Five of them -- momentum, size, liquidity,
-# volatility, and analyst coverage -- are arithmetic over point-in-time prices,
-# share counts, and the ratings corpus itself, so they carry no data
-# requirement beyond `_REQ_PIT_PRICES` and the already-audited corpus. The
-# three that need their own source are value, sector, and earnings surprise,
+# ACER-0A.7 names eight controls. Four of them -- momentum, liquidity,
+# volatility, and analyst coverage -- are arithmetic over point-in-time bars
+# and the ratings corpus itself, so they carry no data requirement beyond
+# `_REQ_PIT_PRICES` and the already-audited corpus. Size is log market cap and
+# therefore also needs point-in-time shares outstanding. The four controls
+# that need their own source are size, value, sector, and earnings surprise,
 # and each has its own check below. This mapping is written down because the
 # summary refuses anything but the *complete* set, and a checklist that
 # asserts completeness while omitting a frozen control makes the omission
 # harder to notice rather than easier.
 _CONTROLS_COVERED_BY_PRICES = (
     "momentum",
-    "size",
     "liquidity",
     "volatility",
     "analyst coverage",
@@ -161,6 +175,43 @@ def check_trading_session_calendar() -> CapabilityFinding:
         evidence=(
             f"pinned={version!r} importable={importable} "
             f"used_in_market_data={used}"
+        ),
+        blocks_acer2=True,
+    )
+
+
+def check_ratings_event_corpus() -> CapabilityFinding:
+    """ACER's signal input must be a verified, normalized local dataset.
+
+    The committed code proves that a fail-closed build/load path exists. It
+    does not prove that the execution environment contains the licensed raw
+    snapshot and a canonical normalized dataset whose hashes verify, so the
+    capability remains unmeasured until the run preflight loads that identity.
+    No licensed row or credential is read here.
+    """
+    modules = (
+        "research/acer/snapshot.py",
+        "research/acer/normalize.py",
+        "research/acer/dataset.py",
+    )
+    present = [name for name in modules if (REPO_ROOT / name).is_file()]
+    dataset_root = (REPO_ROOT / "artifacts" / "acer_datasets").is_dir()
+    if len(present) != len(modules):
+        return CapabilityFinding(
+            requirement=_REQ_RATINGS_CORPUS,
+            status=STATUS_UNAVAILABLE,
+            evidence=f"required ratings pipeline modules present={present}",
+            blocks_acer2=True,
+        )
+    return CapabilityFinding(
+        requirement=_REQ_RATINGS_CORPUS,
+        status=STATUS_UNMEASURED,
+        evidence=(
+            "verified snapshot, normalization, and content-addressed dataset "
+            "modules are present; artifacts/acer_datasets "
+            f"present={dataset_root}; "
+            "no canonical normalized dataset identity was loaded by this "
+            "network-free, licensed-row-free check"
         ),
         blocks_acer2=True,
     )
@@ -271,6 +322,96 @@ def check_durable_issuer_identity() -> CapabilityFinding:
     )
 
 
+def check_point_in_time_security_eligibility() -> CapabilityFinding:
+    """ACER admits only historical US primary-listed common stocks.
+
+    A durable issuer key answers *which company* a row belongs to. It does not
+    answer whether the historical instrument was the primary listing or an
+    ETF, fund, preferred share, warrant, ADR, or OTC security. ACER-0A.10
+    requires those security semantics as a separate point-in-time input.
+    """
+    universe_source = _read("data/pit_universe.py")
+    if not universe_source:
+        return CapabilityFinding(
+            requirement=_REQ_SECURITY_ELIGIBILITY,
+            status=STATUS_UNAVAILABLE,
+            evidence="no point-in-time security eligibility source found",
+            blocks_acer2=True,
+        )
+    current_ticker_map = "still have a listed ticker today" in universe_source
+    states_missing = "security-type screens" in universe_source
+    return CapabilityFinding(
+        requirement=_REQ_SECURITY_ELIGIBILITY,
+        status=STATUS_UNAVAILABLE if states_missing else STATUS_UNMEASURED,
+        evidence=(
+            "data/pit_universe.py explicitly states that it does not apply "
+            "venue or security-type screens; "
+            f"current_ticker_map_only={current_ticker_map}"
+            if states_missing
+            else "no point-in-time security-type/primary-listing source is "
+            "bound; re-verify before use"
+        ),
+        blocks_acer2=True,
+    )
+
+
+def check_point_in_time_corporate_actions() -> CapabilityFinding:
+    """The frozen open-to-open outcome is a split/dividend total return."""
+    modules = (
+        "ml/databento_pit.py",
+        "ml/databento_authoritative.py",
+        "data/corporate_actions.py",
+    )
+    present = [name for name in modules if (REPO_ROOT / name).is_file()]
+    local_artifact = (REPO_ROOT / "artifacts" / "databento").is_dir()
+    if not present:
+        return CapabilityFinding(
+            requirement=_REQ_CORPORATE_ACTIONS,
+            status=STATUS_UNAVAILABLE,
+            evidence="no corporate-action or point-in-time adjustment module found",
+            blocks_acer2=True,
+        )
+    return CapabilityFinding(
+        requirement=_REQ_CORPORATE_ACTIONS,
+        status=STATUS_UNMEASURED,
+        evidence=(
+            f"candidate modules present ({', '.join(present)}); "
+            f"artifacts/databento present={local_artifact}; ACER coverage, "
+            "as-of semantics, dividend cash treatment, and split adjustment "
+            "have not been audited"
+        ),
+        blocks_acer2=True,
+    )
+
+
+def check_size_control_source() -> CapabilityFinding:
+    """The frozen size control is log market cap, not price alone."""
+    source = _read("data/pit_universe.py")
+    has_share_tag = "EntityCommonStockSharesOutstanding" in source
+    respects_availability = 'shares["known_from"] <= as_of' in source
+    current_identity_hole = "still have a listed ticker today" in source
+    if not (has_share_tag and respects_availability):
+        return CapabilityFinding(
+            requirement=_REQ_SIZE_CONTROL,
+            status=STATUS_UNAVAILABLE,
+            evidence=(
+                f"EDGAR shares tag present={has_share_tag} and "
+                f"known-from filter present={respects_availability}"
+            ),
+            blocks_acer2=True,
+        )
+    return CapabilityFinding(
+        requirement=_REQ_SIZE_CONTROL,
+        status=STATUS_UNMEASURED,
+        evidence=(
+            "data/pit_universe.py has filing-date-filtered EDGAR shares "
+            "outstanding, but ACER coverage is unmeasured and the join still "
+            f"uses a current-only ticker map={current_identity_hole}"
+        ),
+        blocks_acer2=True,
+    )
+
+
 def check_value_control_source() -> CapabilityFinding:
     """ACER-0A.7 proposes a book-to-market control."""
     hits = [
@@ -349,10 +490,14 @@ def check_earnings_surprise_control() -> CapabilityFinding:
 
 _CHECKS = (
     check_trading_session_calendar,
+    check_ratings_event_corpus,
     check_point_in_time_prices,
     check_databento_path,
     check_delisting_returns,
     check_durable_issuer_identity,
+    check_point_in_time_security_eligibility,
+    check_point_in_time_corporate_actions,
+    check_size_control_source,
     check_value_control_source,
     check_sector_classification,
     check_earnings_surprise_control,

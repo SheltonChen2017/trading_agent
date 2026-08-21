@@ -293,7 +293,12 @@ def _parse_action_date(value: object) -> dt.date | None:
 
 
 def _parse_last_updated(value: object) -> dt.datetime | None:
-    """Parse both observed Massive legacy timestamps and documented ISO values."""
+    """Parse documented ISO values, plus legacy forms defensively.
+
+    Snapshot A's 587,046 ``last_updated`` values are all ISO-8601 ``Z``
+    (measured 2026-08-20); the legacy branches are defensive coverage for
+    future payload changes, not a format observed in this delivery.
+    """
     if not isinstance(value, str) or not value.strip():
         return None
     text = value.strip()

@@ -144,9 +144,11 @@ and acquired names** (SIVB, FRC, SBNY, TWTR, ATVI and more), and
 per-row `previous_rating` makes historical state reconstructible without a
 current-state consensus endpoint. Remaining vendor gates before an ACER-0
 freeze: the snapshot B restatement measurement and the rename/ticker-reuse
-hazard. The clock fields are timezone-naive in the delivered payload, so the
-frozen safe rule is next-session eligibility after the later action/update
-date; 39 rows whose update date precedes the action date are refused. The
+hazard. The frozen timing rule is next-session eligibility after the later
+of the action date and the `last_updated` UTC date — chosen for its
+conservatism, not because the payload's clocks are naive (the counter-review
+measured all 587,046 `last_updated` values as ISO-8601 `Z`); 39 rows whose
+update date precedes the action date are refused. The
 owner correctly identified the quoted all-caps text as an investment-advice
 disclaimer, not a research ban. Separate Market Data clauses still leave
 third-party transfer and dataset-specific non-display entitlement unproven:

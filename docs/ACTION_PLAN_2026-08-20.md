@@ -152,20 +152,33 @@ gate passes, and **zero** ACER-3 executions until ACER-0B is frozen. Every
 execution, refusal, error, and accidental launch is a permanently counted
 look; a corrected rerun may repair code but never the hypothesis.
 
-**Update 2026-08-21: ACER-2 cannot run on the local path, and the binding
-reason is not the security master**
+**Corrected update 2026-08-21: ACER-2 cannot run on the current
+EDGAR/yfinance path; repository-wide local feasibility remains unresolved**
 (`docs/research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md`).
 `data/pit_universe.py` states in its own docstring that prices for delisted
 securities are unavailable and that there are **no delisting returns**, which
 "biases results upward and the size of the bias is not knowable from this
 data". The frozen universe requires delisted names to stay eligible while
-listed and the outcome is a forward return, so the local path can supply the
-population but not its outcome. The sole local price provider also declares
-`provides_point_in_time_lineage = False`, and no local book-value source
-exists, so ACER-0A.3 is negative too. **Owner ruling needed:** acquire
-point-in-time data with delisted coverage, or authorize a read-only QC data
-path. Dropping delisted names from the universe is cheap and not
-recommended — it would make ACER-2 answerable and the answer worthless.
+listed and the outcome is a forward return, so that path can supply some
+historical population evidence but not the required outcome. Its production
+price provider declares `provides_point_in_time_lineage = False`, and no
+ACER-ready local book-value source exists.
+
+The submitted audit incorrectly omitted the repository's selected Databento
+research path: `ml/databento_source.py`, `ml/databento_pit.py`, and
+`ml/databento_authoritative.py` already implement immutable bars, point-in-time
+security/adjustment capture, and vintage-correct adjustment logic. No local
+Databento artifact or credential was present during independent review, and
+its ACER history, delisted coverage, terminal-return semantics, access, cost,
+and licence have not been measured. Databento is therefore an **unmeasured
+candidate**, not a solution. **Owner ruling needed:** authorize a structural
+Databento capability/cost audit, acquire another point-in-time source with
+delisted and terminal-return coverage, or amend the local-engine ruling to use
+a read-only QC data path. Dropping delisted names remains not recommended.
+Independent review accepted the two submitted commits after correction in
+`docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md`;
+correction `32a16b0` also withdrew the counter-review's invalid state-semantics
+percentages without choosing either proposed rule.
 
 **Proposals for ACER-0A.1 and 0A.5–0A.9 now exist**
 (`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level
@@ -244,8 +257,8 @@ ambiguity-refusing mapping is the next ACER-1 step.
 
 **Update 2026-08-21: the mapping step is BLOCKED, and the blocker is
 load-bearing** (`docs/research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
-There is no local LEAN and no LEAN data on this host, so open item ACER-0A.4
-has a negative answer rather than an unmeasured one; and the QC client
+There is no local LEAN or LEAN data on this host, so the current engine/data
+configuration cannot close ACER-0A.4; and the QC client
 allowlists only project/file/compile/backtest paths, with a comment stating
 the rule exists so `data/read` cannot pass — a reviewed control that was not
 widened. The half needing no external data was built instead and independently
@@ -263,8 +276,9 @@ same-day ordering deterministic (768 rather than
 the submitted 766 interleaving flags), canonicalized ticker case, and bound
 every diagnostic to the clean code commit, source manifest, normalized
 dataset, and assessment hash. **Owner ruling needed** on how to obtain the
-security master: install local LEAN with data, widen the QC allowlist to a
-read-only data path, or nominate a different source.
+security master: audit the existing Databento reference path, install local
+LEAN with suitable data, widen the QC allowlist to a read-only data path, or
+nominate a different source.
 
 **Update 2026-08-20: engine and control-data rulings.** Local LEAN is the
 authoritative execution path and cloud execution is optional; reconstructable

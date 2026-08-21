@@ -54,6 +54,16 @@ integration testing, and installation checks only. The data-entitlement,
 licensed-data-transfer, terminal-delisting-return, and ACER-0A.4 gates remain
 open; cloud selection does not resolve them.
 
+**Current implementation sequencing amendment, 2026-08-21:** the owner has
+directed Codex to begin separating this mixed repository into a trading
+assistant product and a strategy-research product, with Claude independently
+reviewing each stable implementation snapshot. SEP-0 is the current bounded
+milestone: establish machine-checked ownership and dependency baselines before
+moving runtime files. See `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`.
+This architecture work does not close, weaken, or execute any ACER gate and
+does not authorize a backtest, deployment, broker action, operator-database
+mutation, credential move, or evidence-epoch change.
+
 ---
 
 ## 1. Verified state of the project, 2026-08-20

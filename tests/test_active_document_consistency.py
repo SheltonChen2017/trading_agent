@@ -54,6 +54,7 @@ def test_docs_root_contains_only_current_coordination_and_active_plan() -> None:
         "SESSION_HANDOFF.md",
         "FEATURE_MILESTONE_RECORD.md",
         "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md",
+        "PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md",
     }
     actual = {path.name for path in (ROOT / "docs").iterdir() if path.is_file()}
     assert actual == allowed

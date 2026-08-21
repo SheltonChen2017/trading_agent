@@ -670,6 +670,40 @@ still broken by an unguarded first-session date. It also qualified the
 restored `RECENT_IPO_ELIGIBILITY_POLICY` as a hypothetical rather than actual
 compatibility fix, since nothing in this repository still imported it.
 
+### Local LEAN and Docker are installed on the EPOCH HOST (2026-08-21)
+
+Recorded here because it is machine-local truth, and because the record that
+introduced it (`docs/reference/LOCAL_LEAN_WINDOWS_SETUP.md`) said "this
+machine" without naming which one — and there are two (see the two-machine
+section below), which is exactly why that section says to re-measure rather
+than assume.
+
+Measured read-only during the CDR review: `whoami` returns
+`REDMOND\sheltonchen`, so this is the **epoch host** — the machine running
+`paper-epoch-006` and the four `TradingAgent-Paper-*` tasks.
+`C:\QuantConnect\ACER` exists and contains `lean.json`, `data`, `storage`,
+and the generated `InstallationTest`.
+
+Recorded by Codex on install, not re-measured here: LEAN CLI `1.0.228`,
+Docker client/server `29.7.2`, and one bundled five-day SPY sample completing
+through LEAN Engine `2.5.0.0` (3,943 sample points, 13/13 data requests).
+
+Three things that follow, and that cost time to rediscover:
+
+- **A shell opened before the install has neither `lean` nor `docker` on
+  `PATH`.** Verified in this session: both command names fail. The full
+  executable paths work; a newly opened shell should inherit the update.
+- **Docker Desktop now runs on the epoch host.** No effect on the evidence
+  epoch — the repository `code_commit` is untouched, so nothing closes — but
+  it is a new resident consumer of memory and disk on a host that already
+  "keeps losing console-hosted processes" (see below). If a paper task ever
+  starts failing for resource reasons, check this first.
+- **The engine is not the ACER path.** The owner's 2026-08-21 amendment makes
+  QuantConnect **Cloud** authoritative for ACER historical and outcome
+  backtests; this installation is for implementation, unit/synthetic/
+  integration tests and sample validation only. Installing an engine grants
+  no dataset entitlement, licence, or run authorization.
+
 ### Running this machine: launch, restart, tasks, locks, backups
 
 These are standing host rules, not facts about any one milestone. They lost

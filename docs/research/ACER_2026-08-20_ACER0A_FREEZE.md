@@ -99,7 +99,7 @@ A null is a valid result and is recorded as such.
 Rules:
 
 - Every execution against real outcomes — including refusals, errors, and
-  accidental launches — is appended to `docs/Archive/Research/alpha-result.md` as a new
+  accidental launches — is appended to `docs/research/alpha-result.md` as a new
   `R-nnn` entry with full identity, and counts permanently. Records are
   never removed.
 - **No corrected rerun is authorized at present.** With exactly two slots, any
@@ -192,12 +192,23 @@ audit's licence step must answer this explicitly.
   observed.
 - **Reconstructable Benzinga rows must not be uploaded to QuantConnect**
   unless the owner separately provides explicit evidence that the applicable
-  terms permit that third-party transfer.
-- **QuantConnect access is authorized for read-only symbol-mapping work
-  only**, to establish issuer identity. During that work: no Benzinga upload,
-  no price or outcome join, no backtest launch, and no research look.
+  terms permit that third-party transfer. **This gate is load-bearing under
+  the cloud-engine amendment.** While local LEAN was authoritative the
+  ratings could stay on this machine; a cloud engine has to receive them as
+  custom data, and QuantConnect's own terms forbid taking its market data the
+  other way. So ACER-2 cannot execute at all until this transfer question is
+  answered — it is a blocking dependency of the engine choice, not a side
+  condition of it.
+- **QuantConnect access is authorized for read-only, zero-outcome structural
+  work only** — issuer/symbol mapping, and measuring the account's dataset
+  entitlements, coverage and field semantics. During that work: no Benzinga
+  upload, no price or outcome join, no backtest launch, and no research look.
   Provenance is preserved, and ticker-reuse or rename ambiguity produces a
-  refusal rather than a guess.
+  refusal rather than a guess. (Amended 2026-08-21 with the engine ruling
+  above, which made a cloud capability audit the next technical step; the
+  prior wording authorized symbol mapping alone and would have forbidden it.
+  The prohibitions are unchanged — this widens what may be *measured*, never
+  what may be *run*.)
 - **SBR-1 remains CLOSED and uninstalled.** Read-only measurement of task
   presence and artifact counts is permitted; if anything is found installed
   or running, it is reported and nothing is changed. (Measured 2026-08-20 —

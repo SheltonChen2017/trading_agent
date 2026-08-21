@@ -3,7 +3,7 @@
 > **2026-08-17 validity note:** This frozen amendment remains useful as an
 > audit record. Its generated result and universe artifacts are invalid and
 > were removed from active docs after their exact hashes were preserved in
-> `docs/Archive/Research/alpha-result.md`. The point-in-time universe idea does not rescue the
+> `docs/research/alpha-result.md`. The point-in-time universe idea does not rescue the
 > old run's turnover/NAV, classification, and measurement defects. Any future
 > test must use the reviewed QC plan and a newly recorded run identity.
 

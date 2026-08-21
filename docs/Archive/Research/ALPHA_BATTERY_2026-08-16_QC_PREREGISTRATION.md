@@ -12,7 +12,7 @@
 > Python syntax, framework-member shadowing, point-in-time factor construction,
 > exact-session refusal, analyzer provenance, and stall handling. Invalid
 > generated result files were removed from active docs only after their hashes
-> and statuses were preserved in `docs/Archive/Research/alpha-result.md`. This frozen
+> and statuses were preserved in `docs/research/alpha-result.md`. This frozen
 > preregistration remains history; it is not evidence that any submitted run
 > followed the method.
 

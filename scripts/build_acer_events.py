@@ -6,7 +6,7 @@ named refusals, writes a content-addressed immutable dataset, and prints a
 coverage report.
 
 It performs **no** price join, return computation, ranking, or evaluation,
-so running it is not a research look and it produces no `docs/Archive/Research/alpha-result.md`
+so running it is not a research look and it produces no `docs/research/alpha-result.md`
 entry. It also makes no network call: the vendor API is never contacted here.
 
 Usage:

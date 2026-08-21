@@ -8,7 +8,7 @@ V2 result exists and a clean counter-reviewed QC rerun is still pending.**
 Supersedes: the methodology used in the 2026-08-15 and 2026-08-16 battery
 result files, whose generated narratives/artifacts were invalidated and then
 removed from active docs at the owner's direction. Their exact hashes and
-dispositions remain in `docs/Archive/Research/alpha-result.md` and Git history.
+dispositions remain in `docs/research/alpha-result.md` and Git history.
 Incorporates: `docs/Archive/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md` (ABR-001..007) and
 Codex's 2026-08-16 recommendation on QuantConnect.
 

@@ -883,7 +883,7 @@ def test_closed_alpha_plan_distinguishes_valid_null_runs_from_invalid_legacy_run
 
     stale_claims = (
         "No historical alpha result in this program is valid",
-        "Every historical QuantConnect result in `docs/Archive/Research/alpha-result.md` remains invalid",
+        "Every historical QuantConnect result in `docs/research/alpha-result.md` remains invalid",
     )
     for claim in stale_claims:
         assert claim not in plan
@@ -939,37 +939,57 @@ def test_strongbuy_amendment_ledger_is_one_contiguous_markdown_table():
     )
 
 
+_SUPERSEDED_STATUS = re.compile(r"Status: \*\*(SUPERSEDED[^*]*)\*\*")
+
+
+def _superseded_status(name: str) -> str:
+    """Return a plan's superseded status, failing loudly if it cannot parse.
+
+    CDR-001. Both lifecycle guards below wrapped their entire body in
+    ``if re.search(r"Status: \\*\\*SUPERSEDED", sbp):``. That inverts the guard:
+    rewording the status line disarms it silently instead of failing it, which
+    is the mirror case of the drift it exists to catch. Mutation-proved on the
+    reviewed tree -- replacing ``SUPERSEDED`` with ``RETIRED`` left both tests
+    green while every downstream assertion went unrun.
+
+    Parsing once, loudly, keeps the relationship enforced: if the owner ever
+    un-supersedes SBP, this fails and the guards are updated deliberately.
+    """
+    match = _SUPERSEDED_STATUS.search(_text(name))
+    assert match, (
+        f"{name} no longer declares a SUPERSEDED status. Update these guards "
+        "deliberately if that is intended; a reworded status line must never "
+        "silently disable them."
+    )
+    return match.group(1)
+
+
 def test_a_superseded_program_is_not_also_the_next_owner_decision():
     """A replaced program must not still be advertised as the blocking step.
 
     2026-08-20: the owner replaced the Strong-Buy program (SBP) with the
     Analyst-Consensus ETF Rotation program. The failure this guards against is
     PARTIAL replacement -- one document marking a plan superseded while the
-    action plan still tells the reader its freeze is what happens next. Stated
-    as a relationship so it survives the next replacement: whichever plan
-    declares itself superseded must not also own the action plan's blocking
-    decision.
+    action plan still tells the reader its freeze is what happens next.
     """
-    sbp = _text("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+    _superseded_status("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
     action_plan = _text("ACTION_PLAN_2026-08-20.md")
-    if re.search(r"Status: \*\*SUPERSEDED", sbp):
-        assert "ACER" in action_plan and "priority 1" in action_plan.lower()
-        assert not re.search(
-            r"\*\*SBP-0 adoption\*\*[\s\S]{0,300}?only decision blocking",
-            action_plan,
-        )
-        assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
+    assert "ACER" in action_plan and "priority 1" in action_plan.lower()
+    assert not re.search(
+        r"\*\*SBP-0 adoption\*\*[\s\S]{0,300}?only decision blocking",
+        action_plan,
+    )
+    assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
 
 
 def test_lifecycle_indexes_do_not_advertise_superseded_sbp_as_actionable():
     """The new lifecycle indexes must route current and superseded plans."""
-    sbp = _text("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+    _superseded_status("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
     queued = _doc_path("Plan/README.md").read_text(encoding="utf-8")
     archived = _doc_path("Archive/README.md").read_text(encoding="utf-8")
-    if re.search(r"Status: \*\*SUPERSEDED", sbp):
-        assert "STRONGBUY_PORTFOLIO_TEST_PLAN.md" not in queued
-        assert "superseded" in archived.lower()
-        assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
+    assert "STRONGBUY_PORTFOLIO_TEST_PLAN.md" not in queued
+    assert "superseded" in archived.lower()
+    assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
 
 
 def test_open_acer_freeze_ledger_cannot_be_called_executable():

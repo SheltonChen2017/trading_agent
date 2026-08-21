@@ -108,7 +108,7 @@ The project has **zero confirmed predictive signals**. The reviewed Stage 0
 and Stage 1 QuantConnect runs are **VALID but null**, and the reviewed APQ run
 is valid but also closed null. Older legacy entries retain their individual
 invalid, refused, unanalysed, or provenance-incomplete states in
-`docs/Archive/Research/alpha-result.md`; validity is never inferred from age or rewritten as a
+`docs/research/alpha-result.md`; validity is never inferred from age or rewritten as a
 group. The closed cross-sectional program's conservative lifetime alpha-cell
 floor is 452 at A-002 (428 legacy/declaration cells plus the 24-cell Stage 1
 family). APQ is a separate three-cell allocation-policy family and does not
@@ -214,10 +214,11 @@ inventory, and its completeness claim is independently accepted only after a
 second correction**
 (`research/acer/capability.py`,
 `docs/Archive/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`,
-`docs/Archive/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its then-current
-twelve-item result on the isolated review tree was one
-available, five unavailable, six unmeasured, eleven blocking, and
-`acer2_runnable=false`. Correction `c9ee971`
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its
+twelve-item result on the isolated review tree `14a3a83` was one
+available, **six** unavailable, **five** unmeasured, eleven blocking, and
+`acer2_runnable=false` — the numbers that review and handoff section 7cs
+record, reproduced in a detached worktree during the CDR review. Correction `c9ee971`
 requires the complete checklist exactly once, makes every unavailable or
 unmeasured requirement blocking, and verifies that the pinned NYSE calendar
 can actually be imported and constructed rather than treating module
@@ -237,8 +238,9 @@ in `docs/Archive/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW_VERIFICA
 maps every frozen control to exact members of the requirement set. It also
 replaces the proposal document as the guard's authority with the actual
 owner freeze. In particular, GICS remains an **unaccepted proposal**, so the
-available SIC candidate is `unmeasured`, not `unavailable`; this changes the
-status split above but not the eleven blockers or the prohibition on ACER-2.
+available SIC candidate is `unmeasured`, not `unavailable`. That moved the
+split to one available, five unavailable, six unmeasured — still eleven
+blockers, and no change to the prohibition on ACER-2.
 
 **Provider-neutral correction 2026-08-21:** the twelve-item inventory
 incorrectly treated **Databento itself** as a required ACER input in addition
@@ -498,8 +500,16 @@ was wrong, and what was done:
 `docs/operations/ML_IMPLEMENTATION_STATUS.md` (2026-08-03) have not been
 re-verified line-by-line against today's code; they are companions to archived
 plans and were checked only for path accuracy and for claims contradicting
-this plan. Historical review reports under `docs/Archive/Review/` are records of what
-was true when written and are never retro-edited.
+this plan. Historical review reports under `docs/Archive/Review/` are records
+of what was true when written. Their **findings, dispositions, counts and
+validation results** are never retro-edited. One mechanical exception is
+recorded rather than left implicit: the 2026-08-21 lifecycle reorganization
+rewrote `docs/...` path references inside **69** archived reports so their
+links keep resolving, and the same rule was applied again when the run ledger
+moved (CDR-004). A consequence worth knowing when auditing an old ledger row:
+its `Location` column may now cite a path that did not exist on the review
+date. The pre-move paths remain recoverable from Git history at each report's
+own commit.
 
 ---
 

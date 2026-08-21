@@ -184,7 +184,7 @@ allocation tests green. Still no QC.
 1. Independent review of APQ-1..3 (commit-by-commit). Counter-review.
 2. Owner go for **one** backtest (node pool: one at a time).
 3. Launch via the reviewed driver; append **R-nnn UNANALYSED** to
-   `docs/Archive/Research/alpha-result.md` with full identity (treat as allocation-policy,
+   `docs/research/alpha-result.md` with full identity (treat as allocation-policy,
    not an alpha cell). Run-level look +1.
 4. Structural parser round-trip on the raw log. If incomplete, ledger
    REFUSED/INCOMPLETE; do not "fix and quietly rerun" on the same
@@ -225,7 +225,7 @@ version — not a post-hoc edit.
 | `tests/test_allocation_policy_analyser.py` | APQ-2 |
 | `scripts/run_qc_stage0.py` | APQ-3 |
 | `tests/test_qc_stage0_runner.py` | APQ-3 |
-| `docs/Archive/Research/alpha-result.md` | APQ-4, APQ-5 only |
+| `docs/research/alpha-result.md` | APQ-4, APQ-5 only |
 
 ## Explicitly out of scope
 

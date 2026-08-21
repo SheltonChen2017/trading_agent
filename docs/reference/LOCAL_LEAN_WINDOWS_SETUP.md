@@ -9,7 +9,12 @@ integration tests, and bundled sample validation. No local QuantConnect
 Security Master or US Equity-history purchase/download is planned unless the
 owner later changes this decision.
 
-Verified on this machine, 2026-08-21:
+Verified on the **epoch host** (`whoami` → `REDMOND\sheltonchen`, the machine
+running `paper-epoch-006`), 2026-08-21. The second host was not measured, so
+nothing below is a claim about it. Naming the host matters here:
+`docs/operations/OPERATIONAL_FACTS.md` carries the durable entry and warns
+that every machine-local claim must say which of the two machines it
+describes.
 
 - LEAN CLI `1.0.228` returns successfully from its installed executable;
 - `lean whoami` returns successfully without exposing or recording its output;

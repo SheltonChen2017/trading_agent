@@ -61,7 +61,7 @@ documentation changes).
 |---|---|---|
 | Paper evidence | **`paper-epoch-006` is active** since 2026-08-19 on deployed `c9d0740`; first observation verified the same day; 60-session / 30-order clock counting | `docs/operations/OPERATIONAL_FACTS.md` |
 | Overlay shadow | `overlay-epoch-001` (defensive carry) registered with a 2026-07-31 baseline; 24-month sufficiency floor; tasks reinstalled Interactive after the S4U failure | `docs/reference/SHADOW_OBSERVATION_DESIGN.md` |
-| Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first *verified* capture.** Code, tests and installer merged and reviewed; no snapshot is committed here. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. The machine-local task and artifact state has not been measured, so neither "the task was never installed" nor "zero snapshots exist" is a verified operational fact | `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` |
+| Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first verified capture.** Code, tests and installer remain, but the read-only host measurement found the task absent and zero capture artifacts. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. | `docs/operations/OPERATIONAL_FACTS.md` |
 
 **Research programs and their verdicts:**
 
@@ -72,7 +72,7 @@ documentation changes).
 | Defensive carry (SHW) | Prospective only; no result exists or may be inferred before sufficiency |
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
-| ACER (Analyst-Consensus ETF Rotation) | **DRAFT** contract and new priority 1; no data purchased, no run, no result |
+| ACER (Analyst-Consensus ETF Rotation) | Priority 1. Ratings history purchased and structurally audited; event backbone reviewed. **ACER-0A owner decisions partially frozen but executable preregistration incomplete; no real-outcome run and no result.** |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0
@@ -125,7 +125,7 @@ heavily arbitraged effects in the literature. Aggregating revisions across an
 ETF's holdings also dilutes toward that ETF's common factor, so scores across
 large-cap technology funds will be strongly collinear.
 
-### ACER-0A — FROZEN 2026-08-20; ACER-0B deliberately deferred
+### ACER-0A decisions partially frozen 2026-08-20; ACER-0B deliberately deferred
 
 **The owner split the freeze.** ACER-0A freezes the decisive stock-level
 ACER-2 test; ACER-0B — ETF benchmark and investability decisions — is
@@ -152,13 +152,12 @@ gate passes, and **zero** ACER-3 executions until ACER-0B is frozen. Every
 execution, refusal, error, and accidental launch is a permanently counted
 look; a corrected rerun may repair code but never the hypothesis.
 
-**Four named items must still close before the single development run**
-(ACER-0A.1–0A.4): the numeric rule for "not driven by one year, sector, or a
-few securities"; the standardized-surprise formula, deferred by the owner
-until after the earnings audit; the value control's data source under local
-LEAN; and local LEAN's actual data inventory for prices, corporate actions,
-delisted securities, and the session calendar that defines 21/63/126
-sessions. None may be settled after seeing a result.
+**Ten named items must still close before the single development run**
+(ACER-0A.1–0A.10). In addition to the robustness rule, surprise formula,
+value source and local-data inventory, the open ledger now names the exact
+rating scale, signal construction, control/outcome formulas, estimation and
+significance protocol, development/confirmation and error-slot rules, and
+point-in-time universe semantics. None may be settled after seeing a result.
 
 ACER-0 also settles the ratings vendor. **Update 2026-08-20: the owner
 purchased the Benzinga expansion via Massive and authorized a read-only data
@@ -275,17 +274,20 @@ These cost little but are the only prospective evidence the project owns.
    deploy.
 4. **After every operational deploy or fast-forward, restart the app** — a
    server started before a deploy mixes pre- and post-deploy modules.
-5. **Two open reconciliation alerts are stale state, not a fault** — diagnosed
+5. **Two open reconciliation alerts reflected stale state, not a mismatch, at
+   the 2026-08-21T06:02Z read-only measurement** — diagnosed
    read-only 2026-08-20 in
-   `docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`. Every long
-   reconciliation gap matches a Windows sleep window exactly, the tasks are
-   registered `WakeToRun=False`, and 20 clean reconciliations have completed
-   since the last failure. Nothing was acknowledged or changed. Awaiting an
+   `docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`. Seven of
+   22 long gaps were checked and each matches a Windows sleep window; the
+   tasks are registered `WakeToRun=False` and `StartWhenAvailable=True`, and
+   20 clean reconciliations had completed since the last failure. Nothing was
+   acknowledged or changed. Awaiting an
    owner decision on acknowledging the alerts and on whether to change sleep
    or wake behaviour; **do not loosen the 30-minute or 5-minute thresholds**,
-   which are genuine execution-readiness gates. Epoch-006 evidence is intact
-   (2 observations for 2 sessions), but a sleep spanning 23:30Z on a trading
-   day would cost an observation through the fail-closed refusal path.
+   which are genuine execution-readiness gates. Epoch-006 evidence was intact
+   (2 observations for 2 sessions). A missed 23:30Z start is queued rather
+   than categorically skipped, but a late catch-up can still refuse or no-op
+   after the session-date or freshness boundary and may cost an observation.
 
 ---
 

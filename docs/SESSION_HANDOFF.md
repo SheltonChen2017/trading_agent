@@ -22,8 +22,9 @@ counter-review of that review, 7ce the ACER-0A submission, 7cf Codex's
 independent correction review, 7cg the counter-review of that review, and
 7ch the submitted issuer-identity detector, 7ci Codex's independent
 correction review, 7cj the counter-review of that review, and 7ck the
-ACER-0A completion proposals; 7ck and section 8 are the current development
-state.
+ACER-0A completion proposals. Section 7cl records Codex's independent
+correction review of those proposals; 7cl and section 8 are the current
+development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4090,6 +4091,63 @@ proposal in particular has been checked for coverage against the corpus
 vocabulary but not exercised by any mapping code, so the 99.57% figure
 describes string frequency, not a working implementation.
 
+## 7cl. Independent review of ACER-0A completion proposals (Codex, 2026-08-21)
+
+Codex independently reviewed exact remote
+`origin/user/claude/acer-identity-cr-prereg-20260821` from merge-base
+`84bec5d9b78e83aced548b54ec43ef75183fa512` through pushed head
+`020110b7af635187606fbe24469a78c2325711c9`. Commit `3e92b84` (identity
+counter-review) and commit `020110b` (completion proposals) are both
+**accepted after correction**. The complete disposition and P0-P3 ledger is
+`docs/Review/REVIEW_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
+
+Six findings were closed. Four P2 methodology defects would have permitted
+materially different or invalid implementations: normalizing by the sum of
+decay weights canceled absolute decay; action and state transitions were not
+closed over missing, conflicting, refused, repeated, or expired events;
+validation outcomes fit the model used to call their own residuals
+out-of-sample; and the named stationary bootstrap disagreed with the
+repository's circular moving-block implementation. Two P3 record defects
+were also closed: the measured refusal vocabulary omitted eleven strings,
+and the preceding counter-review grouped commit dispositions and left one
+issue outside P0–P3.
+
+Product/specification correction `1eb3649` now supplies an implementable draft
+contract for owner consideration: live events expire at `2 * H`, the aggregate
+is `sum(w * value) / N_live` with `N_live >= 3` and must not divide by the
+weight sum; action allowlists, sign checks, fail-closed state clearing, and all
+fifteen measured refused rating strings are explicit; seven annual
+development folds fit pooled OLS on purged/embargoed training rows only and
+apply those coefficients to validation without refitting; the 21-session
+embargo is immediately before validation; and significance calls the exact
+existing circular moving-block tool with block length 21, 10,000 draws, seed
+20260821, a two-sided test, and pre-outcome synthetic-null calibration. Review
+record/action-plan/freeze updates are in `0d29b7a`; final validation was added
+in `4fbea95`.
+
+The existing machine-local licensed Snapshot A was read through its verified
+loader only to reproduce aggregate vocabulary counts: 584,916 normalized
+events, a 54-string union (53 current / 47 previous), 99.567% top-19 current
+coverage, and 2,530 current events across 34 sub-500 strings. No row or
+licensed payload was committed or disclosed. No vendor API, QuantConnect,
+price/outcome join, signal, backtest, broker, operator database, task, or
+deployment path was touched; no research look was consumed.
+
+Validation on the corrected review tree: four new guards failed red on exact
+Claude head `020110b` and passed green after correction; active-document suite
+**44 passed in 0.72 seconds**; focused ACER identity/runtime/document suite
+**78 passed in 8.86 seconds**; complete repository suite **4,450 passed / 0
+failed / 25 warnings in 741.68 seconds** on Python 3.13.14; required
+`compileall` including `research/` passed. Final diff, status, ordered-commit,
+remote-head, secret, and shared-checkout checks passed immediately before the
+single handoff push.
+
+Nothing in this review freezes ACER-0A.5–0A.9 or authorizes an earnings
+purchase, licensed-data transfer, signal/outcome join, or test run. The owner
+must still accept or amend the corrected proposals; ACER-0A.1–0A.10 and their
+data dependencies must all close before implementation. No feature milestone
+completed, so `FEATURE_MILESTONE_RECORD.md` was correctly left unchanged.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -4118,9 +4176,11 @@ authoritative engine; reconstructable ratings stay off QuantConnect absent
 explicit permission evidence; QC access is read-only symbol mapping only.
 
 What ACER needs next, in order: close the ten named open items
-(ACER-0A.1–0A.10). **Proposals now exist for 0A.1 and 0A.5–0A.9**
+(ACER-0A.1–0A.10). **Independently corrected proposals now exist for 0A.1 and
+0A.5–0A.9**
 (`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`) and are
-awaiting owner confirmation — they are drafts, not freezes. Then run the $99
+accepted as drafts after the review in section 7cl, but still await owner
+confirmation — they are not freezes. Then run the $99
 one-month Benzinga
 Earnings **structural audit** and only then adopt or reject that control
 dataset and freeze the standardized-surprise formula; and run Snapshot B

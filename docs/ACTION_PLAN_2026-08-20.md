@@ -300,10 +300,11 @@ update date precedes the action date are refused. The
 owner correctly identified the quoted all-caps text as an investment-advice
 disclaimer, not a research ban. Separate Market Data clauses still leave
 third-party transfer and dataset-specific non-display entitlement unproven:
-raw or reconstructable Benzinga rows stay local unless the order terms or
-written permission cover upload to QuantConnect. The later owner engine
-amendment selects QuantConnect Cloud for ACER backtests, so this transfer gate
-must close before that path can carry reconstructable vendor rows.
+no representation of the licensed ratings signal may be uploaded unless the
+applicable agreement or written permission covers that exact representation
+and transfer. The later owner engine amendment selects QuantConnect Cloud for
+ACER backtests, so this gate must close before that path can carry the signal;
+see freeze §8 for the governing boundary.
 The identity hazard (FB vs ANTM handled oppositely; BBBY reused) is heightened
 because this Massive delivery has neither ISIN nor exchange; ACER requires a
 security-master cross-reference and must refuse ambiguous joins.
@@ -364,9 +365,10 @@ decision.
 
 **Update 2026-08-21: engine amendment and control-data rulings.** QuantConnect
 Cloud is the authoritative ACER historical/outcome backtest engine. Local LEAN
-is development/test infrastructure only. Reconstructable Benzinga rows stay
-off QuantConnect unless the owner supplies explicit evidence that the terms
-permit that transfer. Current QuantConnect authorization remains
+is development/test infrastructure only. Ratings rows, normalized events and
+derived features stay off QuantConnect unless the applicable agreement or
+written permission covers the exact representation and transfer. Current
+QuantConnect authorization remains
 **read-only, zero-outcome structural auditing only** — no upload, price or
 outcome join, backtest, or research look. The ACER-2 control set has a
 chosen candidate rather than an adopted one: the Massive/Benzinga Earnings
@@ -504,7 +506,7 @@ this plan. Historical review reports under `docs/Archive/Review/` are records
 of what was true when written. Their **findings, dispositions, counts and
 validation results** are never retro-edited. One mechanical exception is
 recorded rather than left implicit: the 2026-08-21 lifecycle reorganization
-rewrote `docs/...` path references inside **69** archived reports so their
+rewrote `docs/...` path references inside **68** archived reports so their
 links keep resolving, and the same rule was applied again when the run ledger
 moved (CDR-004). A consequence worth knowing when auditing an old ledger row:
 its `Location` column may now cite a path that did not exist on the review
@@ -563,8 +565,9 @@ remaining list is deliberately provider-neutral.
    it is not the ACER backtest engine. Measure the cloud account's actual
    point-in-time coverage and semantics for prices, mappings, eligibility,
    corporate actions, fundamentals, shares and sector, and separately close
-   terminal-delisting-return coverage. Do not upload reconstructable Benzinga
-   rows merely because QC credentials are available. Preserve cloud-run
+   terminal-delisting-return coverage. Do not upload any representation of
+   the licensed Benzinga signal merely because QC credentials are available;
+   use freeze §8's exact-representation rule. Preserve cloud-run
    provenance with dataset/version disclosures, project and run identifiers,
    source-code SHA, and hashes of any uploaded permitted custom data.
 6. **Close ACER-0A.1–0A.10.** The existing normalization, signal, controls,

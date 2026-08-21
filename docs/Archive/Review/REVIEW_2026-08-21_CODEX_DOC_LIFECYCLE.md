@@ -86,6 +86,31 @@ No P0 or P1 issue was identified.
 
 ## Observations recorded without a code change
 
+**Counter-review clarification, 2026-08-21 — CDR-002's correction stands,
+but one supporting premise was too absolute.** QuantConnect distinguishes
+Cloud licences from separately purchasable Download licences; a Download
+licence can permit local storage for the licensed organization's internal
+LEAN use. Therefore “QuantConnect's terms forbid bringing its data down” is
+not a categorical fact. The accurate current-project statement is narrower:
+the selected Cloud path supplies no locally hashable copy, this project has
+not purchased or authorized a Download route, and the owner chose Cloud as
+the authoritative ACER engine. The transfer gate remains blocking because the
+selected architecture still needs a **permitted representation** of the
+ratings signal in Cloud; raw rows, normalized events and derived features
+must not be presumed transferable without checking the agreement that governs
+that exact representation. Freeze §8 carries the corrected ruling and links
+the official QuantConnect licence distinction. The CDR-002 finding,
+authorization-scope correction and disposition are unchanged.
+
+**Counter-review measurement correction, 2026-08-21 — CDR-006's scale was
+off by one.** `git diff --summary --find-renames=20% a1dc779^ a1dc779 --
+docs/Review docs/Archive/Review` shows **139** moved reports: 71 byte-identical
+renames and **68** with content changes. The reported 140/69 count included
+the separately modified
+`docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` when filtering a
+broader name-status listing for the word “Review”. The CDR-006 finding and
+policy correction stand; current records use the reproduced 68-report count.
+
 **CDR-003b — the merged-commit guard has a blind spot, and it is pre-existing.**
 `_repository_commits_claimed_unreachable` matches a hash and an
 unreachability claim within one sentence (`[^.]{0,80}`). The instance that

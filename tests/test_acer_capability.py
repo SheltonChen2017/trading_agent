@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import pytest
 
+import research.acer.capability as capability
 from research.acer.capability import (
     STATUS_AVAILABLE,
     STATUS_UNAVAILABLE,
@@ -53,6 +54,16 @@ def test_an_available_capability_cannot_also_block():
         )
 
 
+@pytest.mark.parametrize("status", [STATUS_UNAVAILABLE, STATUS_UNMEASURED])
+def test_a_non_available_requirement_cannot_be_non_blocking(status):
+    """Every finding describes a required ACER-2 input, so an unavailable
+    or unmeasured one must fail closed rather than permit the study."""
+    with pytest.raises(ValueError, match="must block"):
+        CapabilityFinding(
+            requirement="x", status=status, evidence="missing", blocks_acer2=False
+        )
+
+
 def test_an_unknown_status_is_refused():
     with pytest.raises(ValueError, match="unknown status"):
         CapabilityFinding(
@@ -78,6 +89,18 @@ def test_the_nyse_session_calendar_is_available():
     assert finding.status == STATUS_AVAILABLE
     assert finding.blocks_acer2 is False
     assert "pandas_market_calendars" in finding.evidence
+
+
+def test_the_calendar_is_not_called_importable_when_import_fails(monkeypatch):
+    """Module discovery alone is not an import or a usable calendar."""
+    def _fail_import(_name):
+        raise ImportError("simulated broken installation")
+
+    monkeypatch.setattr(capability.importlib, "import_module", _fail_import)
+    finding = check_trading_session_calendar()
+    assert finding.status == STATUS_UNAVAILABLE
+    assert finding.blocks_acer2 is True
+    assert "importable=False" in finding.evidence
 
 
 def test_the_production_price_path_is_reported_as_not_point_in_time():
@@ -140,6 +163,13 @@ def test_acer2_is_not_runnable_and_the_summary_says_which_requirements_block():
     )
     # The one capability that is genuinely present must not be listed as blocking.
     assert "NYSE trading-session calendar" not in report["blocking_requirements"]
+
+
+def test_an_incomplete_requirement_set_cannot_report_acer2_runnable():
+    """A caller must not obtain a green result by omitting blocking checks."""
+    calendar_only = [check_trading_session_calendar()]
+    with pytest.raises(ValueError, match="complete ACER-2 requirement set"):
+        summarize_capabilities(calendar_only)
 
 
 def test_every_requirement_carries_its_own_evidence():

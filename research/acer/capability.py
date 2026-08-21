@@ -27,7 +27,7 @@ Boundaries, which are the point of putting this in `research/acer/`:
 """
 from __future__ import annotations
 
-import importlib.util
+import importlib
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,6 +41,26 @@ STATUS_UNMEASURED = "unmeasured"
 
 _VALID_STATUSES = frozenset(
     {STATUS_AVAILABLE, STATUS_UNAVAILABLE, STATUS_UNMEASURED}
+)
+
+_REQ_SESSION_CALENDAR = "NYSE trading-session calendar"
+_REQ_PIT_PRICES = "point-in-time daily bars (production read path)"
+_REQ_DATABENTO = "Databento point-in-time bars and reference"
+_REQ_DELISTING_RETURNS = "terminal returns for delisted securities"
+_REQ_ISSUER_IDENTITY = "durable point-in-time issuer identity"
+_REQ_VALUE_CONTROL = "book-to-market value control"
+_REQ_SECTOR = "sector classification (ACER-0A.7 proposes GICS)"
+
+_REQUIRED_REQUIREMENTS = frozenset(
+    {
+        _REQ_SESSION_CALENDAR,
+        _REQ_PIT_PRICES,
+        _REQ_DATABENTO,
+        _REQ_DELISTING_RETURNS,
+        _REQ_ISSUER_IDENTITY,
+        _REQ_VALUE_CONTROL,
+        _REQ_SECTOR,
+    }
 )
 
 
@@ -69,6 +89,10 @@ class CapabilityFinding:
             raise ValueError(
                 f"{self.requirement}: an available capability cannot block"
             )
+        if self.status != STATUS_AVAILABLE and not self.blocks_acer2:
+            raise ValueError(
+                f"{self.requirement}: a non-available requirement must block"
+            )
 
     def to_payload(self) -> dict[str, Any]:
         return {name: getattr(self, name) for name in self.__dataclass_fields__}
@@ -94,11 +118,17 @@ def _pinned(package: str) -> str | None:
 def check_trading_session_calendar() -> CapabilityFinding:
     """ACER counts decay, outcome horizon, and folds in trading sessions."""
     version = _pinned("pandas_market_calendars")
-    importable = importlib.util.find_spec("pandas_market_calendars") is not None
+    try:
+        calendar_module = importlib.import_module("pandas_market_calendars")
+        calendar_module.get_calendar("NYSE")
+    except (ImportError, AttributeError, RuntimeError, ValueError):
+        importable = False
+    else:
+        importable = True
     used = 'mcal.get_calendar("NYSE")' in _read("data/market_data.py")
     if version and importable and used:
         return CapabilityFinding(
-            requirement="NYSE trading-session calendar",
+            requirement=_REQ_SESSION_CALENDAR,
             status=STATUS_AVAILABLE,
             evidence=(
                 f"pandas_market_calendars=={version} pinned and importable; "
@@ -107,7 +137,7 @@ def check_trading_session_calendar() -> CapabilityFinding:
             blocks_acer2=False,
         )
     return CapabilityFinding(
-        requirement="NYSE trading-session calendar",
+        requirement=_REQ_SESSION_CALENDAR,
         status=STATUS_UNAVAILABLE,
         evidence=(
             f"pinned={version!r} importable={importable} "
@@ -123,7 +153,7 @@ def check_point_in_time_prices() -> CapabilityFinding:
     declares_not_pit = "provides_point_in_time_lineage = False" in source
     if declares_not_pit:
         return CapabilityFinding(
-            requirement="point-in-time daily bars (production read path)",
+            requirement=_REQ_PIT_PRICES,
             status=STATUS_UNAVAILABLE,
             evidence=(
                 "data/price_source.py: YFinanceDailyBars declares "
@@ -133,7 +163,7 @@ def check_point_in_time_prices() -> CapabilityFinding:
             blocks_acer2=True,
         )
     return CapabilityFinding(
-        requirement="point-in-time daily bars (production read path)",
+        requirement=_REQ_PIT_PRICES,
         status=STATUS_UNMEASURED,
         evidence=(
             "data/price_source.py no longer declares "
@@ -159,13 +189,13 @@ def check_databento_path() -> CapabilityFinding:
     captured = (REPO_ROOT / "artifacts" / "databento").is_dir()
     if not present:
         return CapabilityFinding(
-            requirement="Databento point-in-time bars and reference",
+            requirement=_REQ_DATABENTO,
             status=STATUS_UNAVAILABLE,
             evidence="no ml/databento_*.py modules found",
             blocks_acer2=True,
         )
     return CapabilityFinding(
-        requirement="Databento point-in-time bars and reference",
+        requirement=_REQ_DATABENTO,
         status=STATUS_UNMEASURED,
         evidence=(
             f"{len(present)} capture modules present ({', '.join(present)}); "
@@ -182,7 +212,7 @@ def check_delisting_returns() -> CapabilityFinding:
     source = _read("data/pit_universe.py")
     states_missing = "No delisting returns" in source
     return CapabilityFinding(
-        requirement="terminal returns for delisted securities",
+        requirement=_REQ_DELISTING_RETURNS,
         status=STATUS_UNAVAILABLE if states_missing else STATUS_UNMEASURED,
         evidence=(
             "data/pit_universe.py states 'No delisting returns, so a company "
@@ -202,7 +232,7 @@ def check_durable_issuer_identity() -> CapabilityFinding:
     current_only = "still have a listed ticker today" in source
     if cik_primary and current_only:
         return CapabilityFinding(
-            requirement="durable point-in-time issuer identity",
+            requirement=_REQ_ISSUER_IDENTITY,
             status=STATUS_UNMEASURED,
             evidence=(
                 "data/pit_universe.py keys on CIK, but fetch_ticker_map covers "
@@ -212,7 +242,7 @@ def check_durable_issuer_identity() -> CapabilityFinding:
             blocks_acer2=True,
         )
     return CapabilityFinding(
-        requirement="durable point-in-time issuer identity",
+        requirement=_REQ_ISSUER_IDENTITY,
         status=STATUS_UNMEASURED,
         evidence=(
             f"data/pit_universe.py cik_primary={cik_primary} "
@@ -232,13 +262,13 @@ def check_value_control_source() -> CapabilityFinding:
     ]
     if hits:
         return CapabilityFinding(
-            requirement="book-to-market value control",
+            requirement=_REQ_VALUE_CONTROL,
             status=STATUS_UNMEASURED,
             evidence=f"candidate fields found under data/: {sorted(set(hits))}",
             blocks_acer2=True,
         )
     return CapabilityFinding(
-        requirement="book-to-market value control",
+        requirement=_REQ_VALUE_CONTROL,
         status=STATUS_UNAVAILABLE,
         evidence="no book-value or shareholders-equity field in any data/ module",
         blocks_acer2=True,
@@ -250,7 +280,7 @@ def check_sector_classification() -> CapabilityFinding:
     source = _read("data/pit_universe.py")
     sic = "SIC codes are the sector proxy" in source
     return CapabilityFinding(
-        requirement="sector classification (ACER-0A.7 proposes GICS)",
+        requirement=_REQ_SECTOR,
         status=STATUS_UNAVAILABLE if sic else STATUS_UNMEASURED,
         evidence=(
             "data/pit_universe.py: 'SIC codes are the sector proxy' — SIC is "
@@ -280,7 +310,16 @@ def assess_capabilities() -> list[CapabilityFinding]:
 
 
 def summarize_capabilities(findings: list[CapabilityFinding]) -> dict[str, Any]:
-    """Counting only; no capability is inferred from another."""
+    """Summarize one complete ACER-2 checklist, never a caller-selected subset."""
+    requirements = [finding.requirement for finding in findings]
+    if (
+        len(requirements) != len(_REQUIRED_REQUIREMENTS)
+        or set(requirements) != _REQUIRED_REQUIREMENTS
+    ):
+        raise ValueError(
+            "findings must contain the complete ACER-2 requirement set "
+            "exactly once"
+        )
     blocking = [f for f in findings if f.blocks_acer2]
     return {
         "requirements": len(findings),

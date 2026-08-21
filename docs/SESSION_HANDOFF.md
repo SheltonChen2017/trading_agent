@@ -3513,8 +3513,9 @@ docs/operations/OPERATIONAL_FACTS.md, and docs/alpha-result.md. Published
 origin/main is 8f681f9 at this review snapshot. Claude's pushed vendor-audit
 head is 35efda1; Codex's correction branch is
 codex/review-acer1-benzinga-20260820 and is local-only until the owner
-authorizes a push. Product/test correction 2274691 must travel with the later
-documentation commit. Stage 0/1 and APQ are valid but closed null; SHW-4 is
+authorizes a push. Product/test correction `2274691` must travel with
+documentation/review commit `9dcd54f`; this final handoff-only commit follows
+both. Stage 0/1 and APQ are valid but closed null; SHW-4 is
 prospective. SBP is superseded by ACER. Next: publish/counter-review this
 correction if authorized, then perform Snapshot B and the ambiguity-refusing
 issuer mapping before ACER-0 freezes. Keep reconstructable ratings off QC

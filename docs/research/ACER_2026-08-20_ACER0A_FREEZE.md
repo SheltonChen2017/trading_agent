@@ -1,10 +1,11 @@
 # ACER-0A freeze — stock-level signal validation (ACER-2)
 
-Status: **FROZEN by owner decision, 2026-08-20 (America/Los_Angeles;
-2026-08-21 UTC).** This document is the operative preregistration for
-**ACER-2 only**. It is a contract: the values below were chosen before any
-signal was joined to any outcome, and they may not be changed after a result
-is observed.
+Status: **PARTIAL FREEZE by owner decision, 2026-08-20
+(America/Los_Angeles; 2026-08-21 UTC).** The owner decisions recorded below
+are frozen for **ACER-2 only**, but this is **not yet an executable
+preregistration**. Section 9 names the remaining definitions. Until every one
+is frozen in writing, ACER-2 must refuse any join between real signals and
+real outcomes and must not consume either real-outcome execution slot.
 
 Scope split, per the owner's decision: **ACER-0A** freezes the decisive
 stock-level test. **ACER-0B** — the contingent ETF-level ACER-3 test —
@@ -86,13 +87,13 @@ and may not be promoted to primary after the fact.
 decay half-lives, aggregation, universe, horizon, or controls is permitted.
 A null is a valid result and is recorded as such.
 
-## 4. Run budget and look accounting
+## 4. Provisional run budget and look accounting
 
 | Category | Budget |
 |---|---|
 | Synthetic/local tests that never join real signals to real outcomes | Unlimited |
-| Frozen walk-forward / development execution against real outcomes | **One** |
-| Untouched confirmation execution | **One**, launched only if the development gate passes |
+| Frozen walk-forward / development execution against real outcomes | **One slot**, after the preregistration becomes complete |
+| Untouched confirmation execution | **One slot**, launched only if the fully specified development gate passes |
 | ACER-3 executions | **Zero** until ACER-2 passes and the owner separately authorizes ACER-0B |
 
 Rules:
@@ -106,6 +107,11 @@ Rules:
   recorded look; repairing a bug does not restore the budget.
 - The confirmation period stays untouched until the single frozen
   confirmation pass. It is not inspected, plotted, or summarized before then.
+- The owner has not yet ruled whether an error or refusal merely consumes its
+  slot or ends ACER-2. That failure rule, the exact development/confirmation
+  date boundaries, and the confirmation pass rule are open item ACER-0A.9.
+  Therefore this section does not authorize a third "corrected" run or any
+  attempt to replace a consumed slot.
 
 ## 5. Benchmark policy
 
@@ -191,11 +197,12 @@ audit's licence step must answer this explicitly.
 
 ## 9. Named open items that must close BEFORE the development run
 
-This freeze is complete for the signal family, gates, run budget, benchmark
-policy, and universe. It is **not** complete for the control layer or the
-robustness operationalization. Each item below must be frozen — in writing,
-with the owner's agreement — before the single development execution, and
-none of them may be settled after seeing a result.
+The owner decisions are frozen, but the ACER-2 preregistration is **not
+complete**. In particular, naming "residualized IC" does not define a
+reproducible statistic, and naming an encoding does not define the rating
+scale that produces it. Each item below must be frozen — in writing, with the
+owner's agreement — before the single development execution, and none may be
+settled after seeing a result.
 
 | ID | Open item | Why it cannot wait |
 |---|---|---|
@@ -203,6 +210,12 @@ none of them may be settled after seeing a result.
 | **ACER-0A.2** | The standardized-surprise formula, deliberately deferred by the owner until after the earnings audit. | It is a control definition; choosing it after seeing how it affects the IC would contaminate the primary statistic. |
 | **ACER-0A.3** | Data source for the **value** control under local LEAN. | Value needs fundamentals. The ratings and earnings expansions do not supply them, and it is not yet established that local LEAN has usable point-in-time fundamentals on this machine. |
 | **ACER-0A.4** | Local LEAN data availability for prices, corporate actions, delisted securities, and the trading-session calendar that defines "21/63/126 sessions". | The engine ruling makes local LEAN authoritative, but the local data inventory has not been measured. If it is incomplete, ACER-2 cannot run locally as designed. |
+| **ACER-0A.5** | Canonical rating scale and firm-specific aliases: exact notch values; treatment of initiations, reiterations, maintains, missing `previous_rating`, same-day duplicates, and unusable or ambiguous actions. | "Ordinal notch change" and "direction-only sign" are not computable without these rules. Choosing aliases after viewing returns would tune the signal. |
+| **ACER-0A.6** | Exact signal construction: availability session, decay equation and age convention, per-firm state/mean definition, minimum coverage, coverage control, and same-security/same-session aggregation. | The six family labels still permit materially different score series and sample sizes. |
+| **ACER-0A.7** | Exact control and outcome definitions: momentum, size, liquidity, volatility, value, sector and analyst coverage formulas; normalization/winsorization; forward residual-return endpoints; corporate-action handling; and refusal/missingness rules. | A list of control names is not a frozen design. Different standard definitions can materially change both residuals and eligibility. |
+| **ACER-0A.8** | Exact estimation and significance protocol: model form, training window, walk-forward folds, purge/embargo, development and untouched confirmation periods, Pearson-versus-Spearman IC, minimum names/dates, block construction, bootstrap draws/seed/tail, and finite-sample refusal floors. | "Existing toolkit" exposes choices; it does not select them. A p-value is not reproducible until these choices are fixed. |
+| **ACER-0A.9** | Execution-slot failure rules and confirmation gate: whether a refused/errored development or confirmation attempt ends the program, exact ledger identity, and what the confirmation run must independently pass. | The current text both caps each category at one and discusses corrected reruns. Without a ruling, an error can be used to justify an undeclared extra look. |
+| **ACER-0A.10** | Point-in-time universe implementation details: authoritative security type/listing source, first-252-session convention, price and dollar-volume field/adjustment rules, sector classification availability, and mapping-version identity. | The numeric thresholds are frozen, but the data semantics that decide membership are not. |
 
 **Proposed rule for ACER-0A.1, offered for owner confirmation and not yet
 frozen:** the primary cell's result must retain its sign and remain below
@@ -218,4 +231,5 @@ It does not adopt an ETF-level design, benchmark, or investability rule; it
 does not authorize a purchase beyond the $99 audit; it does not authorize
 any outcome join or backtest; it does not grant execution authority to any
 artifact; and it does not reopen the closed alpha, allocation-policy, or
-Strong-Buy programs.
+Strong-Buy programs. It also does not claim ACER-0A is executable: the frozen
+owner decisions remain binding while section 9 is completed.

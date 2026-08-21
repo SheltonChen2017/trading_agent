@@ -998,3 +998,38 @@ def test_reference_index_matches_a_superseded_program_status():
         )
         assert "pending owner adoption" not in sbp_row.lower()
         assert "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md" in index
+
+
+def test_open_acer_freeze_ledger_cannot_be_called_executable():
+    """An open preregistration ledger and an executable freeze conflict.
+
+    This survives later completion: once every open item is resolved, remove
+    the open-ledger heading and this conditional stops constraining status.
+    """
+    freeze = _text("ACER_2026-08-20_ACER0A_FREEZE.md")
+    reference = _text("reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    if "Named open items that must close BEFORE the development run" in freeze:
+        assert "not yet an executable preregistration" in freeze
+        assert "preregistration is INCOMPLETE" in reference
+        assert "executable preregistration incomplete" in action
+
+
+def test_active_operational_docs_honor_start_when_available_semantics():
+    """Installed catch-up semantics must not be documented as a hard skip."""
+    installer = _root_text("scripts/install_windows_operational_tasks.ps1")
+    facts = _text("OPERATIONAL_FACTS.md")
+    diagnosis = _text("RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md")
+    if "-StartWhenAvailable" in installer:
+        assert "skipped rather than deferred" not in facts
+        assert "guarantees the critical check fails" not in diagnosis
+        assert "queued" in facts.lower()
+        assert "queued" in diagnosis.lower()
+
+
+def test_measured_sbr_absence_is_not_still_called_unmeasured():
+    """The active ACER plan must consume the durable host measurement."""
+    facts = _text("OPERATIONAL_FACTS.md")
+    acer = _text("reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
+    if "SBR-1 capture: measured absent" in facts:
+        assert "task and artifact state has not been measured" not in acer

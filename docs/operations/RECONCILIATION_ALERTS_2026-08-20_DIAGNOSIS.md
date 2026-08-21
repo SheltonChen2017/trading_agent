@@ -7,11 +7,12 @@ or alert row was touched.
 
 ## Verdict
 
-**Both alerts are stale alert state, not a live fault, and not missing
-operational work.** Reconciliation is running correctly right now. The
-alerts were raised by genuine staleness at the time they fired, that
-staleness was caused by the **host sleeping**, and the condition has since
-cleared without any repair.
+**At the 2026-08-21T06:02Z measurement, both alerts were stale alert state,
+not a live mismatch.** Reconciliation was healthy at that instant. The most
+recent staleness coincided with **host sleep** and cleared without repair.
+Seven sampled long gaps have the same explanation; the full 22-gap history
+was not exhaustively correlated, so this record does not claim one proven
+cause for every occurrence.
 
 Neither alert indicates a data mismatch. Both carry `matched=True`,
 `mismatches=0`, `errors=0`.
@@ -37,10 +38,10 @@ the last failure, not a current one. The two differ only in threshold:
   02:49Z, every one `matched=True` with `mismatch_count=0`.
 - No mismatch appears anywhere in the most recent 40 runs.
 
-## Root cause: the host sleeps, and the tasks are not allowed to wake it
+## Measured cause of the sampled gaps: host sleep
 
-Every multi-hour reconciliation gap corresponds to a Windows sleep window.
-The correlation is exact, not approximate:
+Each of the seven inspected multi-hour reconciliation gaps corresponds to a
+Windows sleep window. The timestamp alignment in this sample is exact:
 
 | Sleep (Power-Troubleshooter) | Wake | Reconciliation gap |
 |---|---|---|
@@ -52,11 +53,18 @@ The correlation is exact, not approximate:
 | 2026-08-15T00:27:28Z | 01:38:33Z | 00:22:25Z → 01:44:41Z |
 | 2026-08-12T07:05:37Z | 17:09:10Z | 07:02:44Z → 17:15:15Z |
 
-There are 22 gaps over 30 minutes across the whole history, and the ones
-inspected all match a sleep window. All three paper tasks are registered
-with **`WakeToRun=False`** and `StartWhenAvailable=True`: they do not wake
-the machine, and on wake they resume rather than backfill. So a sleep longer
-than 30 minutes guarantees the critical check fails at least once on wake.
+There are 22 gaps over 30 minutes across the whole history; 15 were not
+correlated in this diagnosis. All four `TradingAgent-Paper-*` tasks are
+registered with **`WakeToRun=False`** and `StartWhenAvailable=True`: they do
+not wake the machine, but a missed time-based start is queued and can run
+after wake, normally after a Task Scheduler delay. Sleep therefore creates a
+supervision gap and has produced the freshness alert on wake; it does not by
+itself prove that every missed occurrence is discarded.
+
+Scheduler semantics source: Microsoft documents `StartWhenAvailable=True` as
+queuing a time-based task after its scheduled time has passed, with a default
+delay of ten minutes:
+<https://learn.microsoft.com/en-us/windows/win32/taskschd/tasksettings-startwhenavailable>.
 
 This is the alerting system working as designed. It is reporting a real
 property of the host — that supervision stops while the machine sleeps —
@@ -67,8 +75,8 @@ rather than misfiring.
 **No epoch-006 observation has been lost, and no captured evidence is
 corrupted.**
 
-- Paper observations are captured at 23:30Z daily. None of the sleep windows
-  above covers 23:30Z.
+- Paper observations are scheduled at 23:30Z on weekdays. None of the seven
+  sampled sleep windows above covers 23:30Z.
 - `paper-epoch-006` holds **2 observations**, session dates 2026-08-19 and
   2026-08-20 — one for each trading session since the epoch opened at
   2026-08-19T19:48Z. Nothing is missing.
@@ -81,9 +89,14 @@ fail-closed path is real and has fired before: the acknowledged alert
 "paper observation failed: Ledger reconciliation failed; refusing to capture
 paper NAV" (first seen 2026-08-05, last 2026-08-07) coincides with the
 missing 2026-08-07 session observation. If the host sleeps across 23:30Z on
-a trading day, the observation is refused rather than captured with stale
-inputs — correct behaviour, but it lengthens time-to-sufficiency for an
-epoch that needs 60 observations and currently has 2.
+a trading day, `StartWhenAvailable=True` queues a catch-up attempt. It can
+still capture the intended session if it runs on the same Eastern date after
+reconciliation becomes fresh. If it runs after the date changes, on a
+non-session date, before the next session close, or with stale
+reconciliation, the command refuses or no-ops. The safe conclusion is that
+sleep can delay or cost an observation; it does not always cost one. Either
+outcome may lengthen time-to-sufficiency for an epoch that needs 60
+observations and currently has 2.
 
 ## Proposed correction — requires owner approval, not performed
 
@@ -112,7 +125,6 @@ code change, not an operational one, and is out of scope here.
 ## What was not examined
 
 The 2,071 occurrence count spans 2026-08-05 onward and was not decomposed
-sleep-by-sleep; only the most recent gaps were correlated. Whether every one
-of the 22 long gaps has a matching sleep event is therefore probable but not
-established. No non-paper task, no broker state, and no order-lifecycle
-table was inspected.
+sleep-by-sleep; seven of 22 long gaps were correlated. Whether every remaining
+gap has a matching sleep event is not established. No non-paper task, no
+broker state, and no order-lifecycle table was inspected.

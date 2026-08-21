@@ -214,10 +214,14 @@ observation / 0 outcomes, which is the correct no-op for a monthly-cadence
 runner mid-month. The S4U-versus-Interactive logon repair is therefore proved
 end to end, by an unattended run rather than a manual start.
 
-Caveat carried forward: these tasks are registered `WakeToRun=False`, so a
-firing that falls inside a host sleep window is skipped rather than deferred.
-See `docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`, where the
-same setting explains every long reconciliation gap.
+Caveat carried forward: these tasks are registered `WakeToRun=False`, so they
+do not wake the host. They also carry `StartWhenAvailable=True`, so a missed
+time-based start is queued and may run after wake (Task Scheduler normally
+delays such catch-up work); it is not categorically skipped. The eventual
+observation still fails closed if wake/catch-up timing no longer maps to the
+intended NYSE session or reconciliation is stale. See
+`docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`; seven of the
+22 long reconciliation gaps were checked and each coincided with host sleep.
 
 ### Restart the app after any operational deploy (2026-08-19)
 

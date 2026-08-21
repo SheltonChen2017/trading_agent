@@ -14,21 +14,24 @@ network call and reads only hash-verified bytes.
 
 | Field | Value |
 |---|---|
-| dataset id | `acer-analyst-events-19c9d8e0b00da299` |
-| content hash | `19c9d8e0b00da29933ba161ca22810392f79e4ca48dcb39f4746a1803c6e0d29` |
-| events sha256 | `6e3fa3e055338f5fd8a3b5e0a79223a7911a866ce2353af050f1cc3f9721acd7` |
+| dataset id | `acer-analyst-events-b06de2e5c03fdf5e` |
+| content hash | `b06de2e5c03fdf5e2e096e2b3abeeb337f7c68ee786ec65af38c233cd090b6e8` |
+| events sha256 | `e46b5e508eab896215ccca5a9b50ea289a8ca3cd4094a24e64f51b6ede2632c5` |
 | refusals sha256 | `469493672fb38497ed5ad326849c4005c9f213ec24db2cde34a5e6a92087f3c2` |
 | source snapshot | `benzinga-ratings-20260820T233055Z` |
 | source manifest sha256 | `51954daea8432136b9c99fb4d5088e0c672664e9384475635110dd33e08a2e85` |
 | era split year | 2017 |
-| contract version | 1 |
+| contract version | 2 |
 
-The dataset lives under `artifacts/acer_datasets/` and is **not committed**
-(licensed vendor data, AP-2). Its identity is derived from its content plus
-its lineage, so a rebuild from a different snapshot, a different era rule, or
-a different normalization outcome lands at a different path and can never
-overwrite this one. Rebuilding from the same inputs is an idempotent no-op —
-verified by re-running the build and observing the same dataset id.
+The dataset belongs under `artifacts/acer_datasets/` and is **not committed**
+(licensed vendor data, AP-2). The v2 identity above was reproduced in memory
+from Snapshot A during independent review; the corrected local dataset has
+not yet been materialized. The older machine-local v1 directory
+`acer-analyst-events-19c9d8e0b00da299` is superseded and must not be used.
+Identity now authenticates the counts and complete lineage as well as both
+content blobs. A rebuild from a different snapshot, era rule, or
+normalization outcome lands at a different path and cannot overwrite an
+earlier dataset. Rebuilding from the same inputs is an idempotent no-op.
 
 ## 2. Coverage
 
@@ -42,7 +45,7 @@ verified by re-running the build and observing the same dataset id.
 | distinct rating firms | 507 |
 | events missing company name | 17 |
 | availability deferred beyond action date | 29,187 (4.99% of events) |
-| events in the Eastern-era window (2017+) | 444,116 |
+| events in the Eastern-consistent clock window (2017+) | 444,116 |
 | events in the ingestion-clock era (pre-2017) | 140,800 |
 
 Events by action year track the audit's row counts, with the disclosed 2017
@@ -73,9 +76,9 @@ the session after they happened. (The audit's comparable row-level figures
 are 29,259 later-date rows of which 22,582 defer by more than 90 days.
 Those count snapshot rows including ones later refused, so they are close to
 but not identical with the event-level count here.) Giving up same-day
-trading costs the study nothing measurable in sample size and removes any
-dependence on the vendor's clock convention, which is evidenced but not
-vendor-confirmed.
+trading removes no event rows, but its effect on returns or signal strength
+has not been measured. The rule removes dependence on the vendor's clock
+convention, which is evidenced but not vendor-confirmed.
 
 No UTC action timestamp is derived anywhere in the backbone. The vendor's
 `time` string is carried through verbatim and the era classification is
@@ -104,6 +107,7 @@ addressed here:
 
 ## 6. Validation
 
-Recorded in `docs/SESSION_HANDOFF.md` section 7cb on the final tree,
-including the mutation testing that confirms these tests detect the
-regressions they are written for.
+Claude's implementation validation is recorded in `docs/SESSION_HANDOFF.md`
+section 7cb. Independent review and its corrected validation are recorded in
+`docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md` and the appended
+handoff section.

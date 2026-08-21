@@ -158,14 +158,25 @@ The identity hazard (FB vs ANTM handled oppositely; BBBY reused) is heightened
 because this Massive delivery has neither ISIN nor exchange; ACER requires a
 security-master cross-reference and must refuse ambiguous joins.
 
-**Update, same day: the event backbone is built** (`research/acer/`,
-`docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md`) — 587,046
-snapshot rows normalized to 584,916 canonical events at 99.64% retention
-under the frozen date-level availability rule, with 2,130 named refusals and
-no row silently dropped. This is data plumbing: no price join, no signal, no
-rating scale, no research look. It sizes the identity problem rather than
-solving it — 9,677 distinct tickers with zero ISIN and zero exchange — and
-that mapping, with explicit ambiguity refusals, is the next ACER-1 step.
+**Update, same day: the event backbone is implemented and independently
+corrected** (`research/acer/`,
+`docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md`, review record
+`docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md`). The pushed Claude
+commit is accepted after correction on a local-only Codex branch, pending
+counter-review. Snapshot A still yields 584,916 canonical events at 99.64%
+retention from 587,046 rows, with 2,130 named refusals; the corrections do
+not change those counts. They do replace the derived dataset contract and
+identity, fully authenticate lineage/count metadata, refuse every occurrence
+of a duplicated vendor id, prevent incomplete snapshots from publishing a
+canonical dataset, bind rows and lineage to one verified manifest read, and
+rename the 2017+ era so it no longer overstates vendor-confirmed clock
+semantics. The corrected v2 identity is
+`acer-analyst-events-b06de2e5c03fdf5e`; the old machine-local v1 identity is
+superseded and the corrected dataset has not yet been materialized. This is
+still data plumbing: no price join, signal, rating scale, or research look.
+It sizes the unresolved issuer-identity problem — 9,677 distinct tickers
+with zero ISIN and zero exchange — and ambiguity-refusing mapping remains the
+next ACER-1 step after counter-review.
 
 ### ACER-2 is the decisive milestone; scope and price that alone
 

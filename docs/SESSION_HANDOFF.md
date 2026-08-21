@@ -4792,6 +4792,32 @@ focused active-document suite passed **48 tests**; diff and narrow secret
 checks passed. No feature milestone entry was added because installing the
 research engine does not complete an ACER milestone.
 
+## 7cy. ACER engine amended to QuantConnect Cloud (Codex, 2026-08-21)
+
+The owner explicitly superseded the earlier local-LEAN-authoritative ruling
+before any ACER outcome was observed. QuantConnect Cloud is now the
+authoritative engine for ACER historical and outcome backtests. Local LEAN
+remains installed and verified, but its project role is limited to
+implementation, unit/synthetic/integration tests, and bundled sample
+validation. No local QuantConnect Security Master or US Equity-history
+purchase/download is planned unless the owner later reverses this decision.
+
+Commit `0bd5fff95ff42030111ce0d03c0c0c74e1ba3b65` applies the ruling consistently
+to the active ACER plan, ACER-0A freeze, Action Plan, local-capability audit,
+issuer-identity record, and Windows setup guide. The amendment does not make
+ACER-2 runnable: a zero-outcome QuantConnect Cloud audit must still establish
+actual point-in-time coverage and semantics for prices, mappings, historical
+eligibility, corporate actions, fundamentals, shares and sector. Terminal
+delisting returns and permission to transfer reconstructable Benzinga data
+remain separate gates. Cloud-run provenance must use dataset/version
+disclosures, project/compile/backtest identifiers, source-code SHA, and hashes
+of any permitted uploaded custom data because cloud-resident datasets cannot
+be hashed locally. No upload, outcome join, backtest, or research look was
+authorized or performed. The focused active-document suite passed **48
+tests**; diff and narrow secret checks passed. No feature milestone entry was
+added because this is an execution-policy amendment, not a completed ACER
+milestone.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -4815,9 +4841,10 @@ two defects in the corrections; the whole round is merged.
 Bonferroni 0.05/6, a provisional two-slot budget, and numeric point-in-time
 stock thresholds. The executable preregistration is still incomplete.
 **ACER-0B is deliberately not frozen** and ACER-3's budget is zero until it
-is. Local LEAN is the
-authoritative engine; reconstructable ratings stay off QuantConnect absent
-explicit permission evidence; QC access is read-only symbol mapping only.
+is. QuantConnect Cloud is the authoritative ACER historical/outcome backtest
+engine; local LEAN is development/test-only. Reconstructable ratings stay off
+QuantConnect absent explicit permission evidence, and current QC authority is
+read-only, zero-outcome structural auditing only.
 
 What ACER needs next, in order: close the ten named open items
 (ACER-0A.1–0A.10). **Independently corrected proposals now exist for 0A.1 and
@@ -4831,13 +4858,14 @@ dataset and freeze the standardized-surprise formula; and run Snapshot B
 after the declared interval.
 
 The current EDGAR/yfinance path cannot satisfy the frozen delisted-outcome
-requirement, but **repository-wide local feasibility remains unresolved**.
-The already reviewed Databento capture/reference/vintage-adjustment modules
-were omitted from the submitted capability audit. Databento is an unmeasured
-candidate, not an accepted ACER source: a separately authorized structural
-audit must establish access, history, known-delisted coverage, terminal-return
-semantics, price/volume and corporate-action completeness, licence, and cost
-before any purchase, download, or outcome work.
+requirement and is not the selected execution path. **QuantConnect Cloud
+capability and semantics remain unmeasured for ACER.** The already reviewed
+Databento capture/reference/vintage-adjustment modules remain an unmeasured
+fallback candidate for requirements the cloud audit cannot close, especially
+terminal delisting returns. Any such fallback audit must establish access,
+history, known-delisted coverage, terminal-return semantics, price/volume and
+corporate-action completeness, licence, and cost before any purchase,
+download, or outcome work.
 
 The provider-neutral capability checker now carries eleven required
 capabilities and reports one available, five unavailable, five unmeasured, ten
@@ -4845,15 +4873,15 @@ blocking and `acer2_runnable=false`. Databento is a separate unmeasured
 provider diagnostic, not a twelfth requirement. The checker cannot substitute
 for an external audit of whichever market/reference provider is selected.
 
-**The issuer-mapping step is BLOCKED pending an entitlement/path audit
-(sections 7ch–7ci and 7cw–7cx).** Local LEAN, authentication, Docker, and the
-bundled sample execution are verified, but no local ACER security-master or
-other required dataset has been established. Credentials and a working engine
-do not prove access to the required security master. The options are to
-authorize a narrow read-only QC entitlement and symbol-mapping audit, audit the
-existing Databento reference path, obtain suitable local LEAN data, widen the
-allowlist to a read-only data path (a change to a reviewed control), or
-nominate a different security-master source. This cannot be
+**The issuer-mapping step is BLOCKED pending the QuantConnect Cloud structural
+audit (sections 7ch–7ci and 7cw–7cy).** Local LEAN, authentication, Docker, and
+the bundled sample execution are verified but are not the ACER backtest path.
+Credentials and a working engine do not prove cloud access, coverage, or
+semantics for the required security master. The next authorized technical
+step is a narrow read-only, zero-outcome QC cloud audit; audit Databento or
+nominate another source only for requirements the cloud path cannot close.
+Do not purchase/download local QC datasets under the current engine ruling.
+This cannot be
 deferred by improving the heuristic: name evidence provably misses the
 BBBY-class reuse, so the 2,885 flagged tickers are a lower bound and an
 unflagged ticker is `no_name_based_ambiguity_evidence`, not established as

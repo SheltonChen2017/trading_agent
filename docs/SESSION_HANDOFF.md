@@ -14,8 +14,10 @@ two-run Stage 0 launch (section 7s), and Codex's correction review (section
 7t). The SBP rounds in sections 7bm through 7bq then superseded that
 sequencing text, section 7br records the topology refresh, section 7bs records
 Claude's documentation/SBP audit, and section 7bt records Codex's independent
-correction review. Section 7bv records the later ACER replacement; it and
-section 8 are the current development state.
+correction review. Section 7bv records the later ACER replacement, 7bw its
+independent review, 7bx the counter-review, 7by the vendor audit, and 7bz the
+independent correction review; 7bz and section 8 are the current development
+state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -3141,7 +3143,7 @@ change, or order occurred. This review does not adopt ACER-0. The current
 review branch is local-only and must not be described as published until the
 owner explicitly authorizes a push.
 
-## 7bw. Counter-review of the ACER documentation review: ACCEPTED (2026-08-20)
+## 7bx. Counter-review of the ACER documentation review: ACCEPTED (2026-08-20)
 
 Branch `user/claude/acer-review-counterreview-20260820`, from Codex's exact
 head `832b7cf`. Record:
@@ -3192,36 +3194,177 @@ formulas I had flagged.
 - The review reported an exit code and a collection count but no pass/fail
   counts, which `CLAUDE.md` §10 requires; measured independently below.
 
-Validation on the final tree: the full suite ran **4,352 passed / 1 failed /
+Validation at submission: the full suite ran **4,352 passed / 1 failed /
 25 warnings** in 953.04 seconds, the single failure being
 `test_current_review_documents_have_no_validation_placeholders` firing on the
-unfilled result token in this sentence. After substitution the focused
-document/contract suite passes 52. The suite total is 4,353 tests, matching
-the collection count Codex reported; this record adds the pass/fail/warning
-numbers that ACRV-004 found missing. Python 3.13.14; `compileall` over the required
+then-unfilled result token; after substitution only the focused suites reran.
+
+**Codex follow-up accepted (2026-08-20), two P3s, both mine:** this section
+was numbered 7bw although the reviewed head's own review section already used
+7bw — the MHP-001 numbering-collision class; renumbered to 7bx with
+cross-references updated. And the substitute-then-focused pattern above left
+the final pushed tree without a completely green full-suite run — a
+validation-record gap, not a product defect (Codex independently reran the
+relevant file: 36 passed). Both corrected in the follow-up round below, which
+also changes its ordering so the green run precedes the recorded sentence
+rather than chasing it.
+
+Follow-up round validation (branch `user/claude/acer-cr-followups-20260820`):
+all prose above this paragraph was finalized first, with no placeholder token,
+and the full suite then ran completely green on that tree — **4,353 passed /
+0 failed / 25 warnings** in 709.06 seconds, Python 3.13.14. This paragraph and
+the recorded numbers are the only later change; the focused document/contract
+suites reran on the final prose, `compileall` over the changed surface passed,
+and `git diff --check` passed. That closes the ACRV-004-adjacent gap Codex
+raised: the green run now precedes its own record instead of being displaced
+by it. Codex's disputed vendor figures ($1,500/yr Zacks — owner-reported;
+1995/14,000+ delisted — web-search summaries; 1985 — Codex's own reading) are
+confirmed absent from every committed document and remain chat-level claims
+for the vendor audit. No product behaviour changed. Python 3.13.14; `compileall` over the required
 surface passed; `git diff --check` passed. No data purchase, QuantConnect
 access, broker access, scheduled-task change, deployment, epoch action, or
 operational database mutation occurred. ACER remains a DRAFT and ACER-0
 remains the owner's decision.
 
+## 7by. Benzinga vendor data audit: read-only, snapshot A complete (2026-08-20)
+
+Branch `user/claude/acer1-benzinga-audit-20260820` (stacked on the 7bx
+follow-ups branch, since both touch this file). Owner authorized the
+subscription purchase and a strengthened read-only audit; the key is the
+`MASSIVE_API_KEY` user environment variable (verified set, length only — the
+value appears nowhere). Record:
+`docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md`. Tool:
+`scripts/audit_benzinga_ratings.py` with refusal-direction tests
+(`tests/test_benzinga_ratings_audit.py`, 4 tests, both refusal mutations
+verified red then restored from a committed restore point).
+
+**Snapshot A**: 587,046 rows, 2011-12-08 → 2026-08-20, 596 pages, 399 MB,
+every yearly partition naturally terminated, per-page SHA-256s in the
+manifest, stored under gitignored `artifacts/benzinga_audit/
+benzinga-ratings-20260820T233055Z` (immutable; the tool refuses to overwrite
+a snapshot and refuses hash mismatches and incomplete snapshots at analysis).
+
+**Findings, condensed** (full detail in the audit record):
+
+- **Delisted coverage PASSES** — the decisive question. SIVB (240 rows to
+  2023-03-13), FRC (207 to 2023-04-26), SBNY, TWTR, ATVI, and 15 more
+  acquired/bankrupt names carry pre-delisting rating history. This does not
+  prove every action since original listing is present. OTC
+  `-Q` successors are absent (acceptable; outside any investable universe).
+- **Rename/reuse hazard, the audit's most important defect find:** FB has 0
+  rows (history re-keyed to META) while ANTM kept its history — opposite
+  handling of two renames; BBBY merges the dead retailer with the Beyond
+  Inc. reuse under one symbol; FISV rows begin 2025-12. Ticker-keyed joins
+  are unsafe across renames; ACER must join through a security master with
+  reuse boundaries. The Massive delivery contains neither ISIN nor exchange,
+  so company name and ticker are cross-reference inputs, not identity keys.
+  QC symbol-mapping cross-reference remains open.
+- `previous_rating` missingness (44%) is structural — 100% of initiations,
+  correctly — and the transitions ACER uses are ~99% complete on upgrades
+  and downgrades. Zero duplicate `benzinga_id`. 46 inconsistent transitions
+  (0.008%) become a named refusal class.
+- **Timezone convention is evidenced, not proved:** modern `time` offsets
+  look like Eastern, but delivered `last_updated` values are timezone-naive,
+  not documented `Z` timestamps. ACER therefore uses no intraday timestamp:
+  every action becomes eligible next session after the later action/update
+  date. Correct date parsing finds 557,748 same-date, 29,259 later-date, and
+  **39 reverse-order** records; the latter are refused. The earlier text
+  comparison falsely reported zero negative gaps.
+- Disclosed data limitations: 2017 rows are ~35% below neighbouring years;
+  the distinct-firm count declines 265 → ~120-150 across the history.
+- **Licence wording separated correctly:** the owner is right that the
+  all-caps text is an investment-advice disclaimer, not a strategy-testing
+  prohibition. Separate preserved Market Data clauses still restrict
+  non-display/derived-work use and third-party transfer unless the
+  dataset-specific entitlement changes that default. The local personal
+  structural audit may continue. Raw or reconstructable ratings stay off QC
+  until the order terms or written permission cover that upload; otherwise
+  use local LEAN. Retention/deletion obligations must be taken from the
+  governing dataset-specific terms rather than declared unambiguous while
+  their applicability is unresolved.
+
+The three governing ToS pages are preserved raw and hashed under
+`artifacts/benzinga_audit/tos-20260820/` (a gap the owner exposed by asking
+where the licence quotes came from: the first citation rested on a
+summarizing fetch, below this project's bar for load-bearing text; every
+quoted clause is now re-verified against the preserved bytes).
+
+Open items: snapshot B restatement diff (compare by stable `benzinga_id`);
+dataset-specific permission before any raw/reconstructable upload to QC; QC
+symbol-mapping cross-reference with ambiguity refusals. No backtest, no price
+join, no research look, no ledger entry: this was a data audit under the
+owner's explicit read-only instruction.
+
+Validation on the final tree: full suite **4,357 passed / 0 failed / 25
+warnings** in 912.13 seconds (4,353 prior tests plus this round's four
+refusal tests), run on the complete code and prose before this validation
+sentence and the ToS-preservation paragraphs were added; the focused
+document/contract suites and the new audit tests reran on the final prose.
+Python 3.13.14; `compileall` over the changed surface passed;
+`git diff --check` passed.
+
+## 7bz. Independent review of the ACER-1 Benzinga audit (Codex, 2026-08-20)
+
+Exact pushed source:
+`origin/user/claude/acer1-benzinga-audit-20260820` at
+`35efda1b6f477eba697c99c76e665016792c0c9a`, base `8f681f9`, ordered range
+`13e8081`, `062f27f`, `eec4823`, `35efda1`. Review branch:
+`codex/review-acer1-benzinga-20260820`. Full record:
+`docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md`.
+
+Disposition: `13e8081` accepted; `062f27f`, `eec4823`, and `35efda1`
+accepted after correction. No P0/P1 issue. Six P2s were confirmed: the
+analysis did not authenticate the manifest or its row-count graph; comparison
+could hide blank/duplicate IDs; incompatible timestamp formats were compared
+lexically; a timezone-naive update field was treated as unambiguous UTC; the
+licence correction overreached from an advice disclaimer to unsupported QC
+upload permission; and the delivered rows lack an issuer identifier (zero
+ISIN/exchange fields). One P3 final-validation-order issue is closed by this
+review.
+
+Product/test correction `2274691` verifies the manifest before trusting it,
+validates page and partition structure/counts, refuses unsafe or duplicate
+page references, refuses missing/duplicate comparison IDs, parses the two
+observed update formats, and reports issuer-identity missingness plus
+timezone-neutral update-date facts. Snapshot A reread cleanly under these
+checks: 587,046 rows; 557,748 same-date updates; 29,259 later-date updates;
+**39 update dates preceding the action date**; 22,582 more than 90 days
+later; zero ISIN and exchange values; 17 missing company names.
+
+The frozen safe ACER timing rule is now next-session eligibility after the
+later action/update date for every row and era; the 39 reverse-order records
+are refused. Raw or reconstructable ratings remain machine-local unless the
+dataset-specific terms or written permission expressly permit upload to QC;
+local LEAN is the fallback. Snapshot B and an ambiguity-refusing
+security-master/QC mapping remain open. No price join, backtest, research
+look, API call, broker access, deployment, scheduled-task change, or
+operational mutation occurred. ACER-1 and ACER-0 are not complete.
+
+The review branch and its commits are **local-only** until the owner
+authorizes a push. Another computer cannot fetch this review yet. Final test
+counts: focused audit/document suites **45 passed**; full suite after all
+substantive corrections **4,362 passed / 0 failed / 25 warnings** in 921.00
+seconds; Python 3.13.14; full required `compileall` passed. After inserting
+these counts, the focused 45 reran on the final prose; `git diff --check`,
+staged-content inspection, ordered-commit inspection, and shared-checkout
+branch/HEAD verification passed. The 25 warnings are one third-party
+`websockets` legacy deprecation and 24 Joblib/NumPy shape deprecations.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
-`docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and, as amended the same
-day, puts the **Analyst-Consensus ETF Rotation program (ACER)** first (section
-7bv). SBP is **SUPERSEDED while still a draft** and SBP-0 will not be run; the
-frozen SBR capture stream is **closed before its first verified capture**;
-no snapshot is committed and its task must not be installed. The blocking decision is now **ACER-0
-adoption** — signal encoding, decay grid, eligibility, control set,
-benchmarks, gates, cell counts and run budget — together with the ratings
-vendor choice and the separate control-set dataset ACER-2 needs. **ACER-2 is
-the decisive milestone**: do stock-level revisions carry incremental
-out-of-sample information after momentum, earnings, size, liquidity,
-volatility and sector controls? A null there closes the program. No data
-purchase, capture install, price join, QC run, or paper execution is
-authorized here. LEV remains separate and cannot validate ACER. The SBP review
-chain is accepted after correction through section 7bu and retained as
-history.**
+`docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and puts the
+**Analyst-Consensus ETF Rotation program (ACER)** first. SBP is superseded and
+its capture task must not be installed. Snapshot A's structural audit is
+accepted after correction, but ACER remains before its freeze: run Snapshot B
+after the declared interval; establish issuer mapping with ambiguity
+refusals; freeze the signal/control/cell/run-budget design; identify the
+separate earnings-control dataset; and establish dataset-specific permission
+before sending reconstructable ratings to QC. If that permission is absent,
+run the eventual frozen study in local LEAN. **ACER-2 remains the decisive
+milestone:** a null stock-level result closes the program. No price join,
+backtest, QC upload/run, or paper execution is authorized by this review. LEV
+remains separate and cannot validate ACER. The SBP history is retained.
 
 ### Historical superseded checklist (retained for audit only)
 
@@ -3364,16 +3507,20 @@ or roll an epoch without a new explicit owner instruction.
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
 docs/SESSION_HANDOFF.md, docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
-docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md,
-docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md,
+docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
+docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
 docs/operations/OPERATIONAL_FACTS.md, and docs/alpha-result.md. Published
-origin/main is 6cdb423 after PR #286 merged the ACER documentation snapshot;
-the ACER review branch begins at that exact head. Stage 0/1 and APQ are valid
-but closed null; SHW-4 is prospective.
-SBP is SUPERSEDED as of 2026-08-20 by the ACER program
-(docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md); the next owner
-decision is ACER-0 adoption, not SBP-0. Do not run
-QC, install SBR-1, join captures to prices, deploy, trade, mutate an
+origin/main is 8f681f9 at this review snapshot. Claude's pushed vendor-audit
+head is 35efda1; Codex's correction branch is
+codex/review-acer1-benzinga-20260820 and is local-only until the owner
+authorizes a push. Product/test correction `2274691` must travel with
+documentation/review commit `9dcd54f`; this final handoff-only commit follows
+both. Stage 0/1 and APQ are valid but closed null; SHW-4 is
+prospective. SBP is superseded by ACER. Next: publish/counter-review this
+correction if authorized, then perform Snapshot B and the ambiguity-refusing
+issuer mapping before ACER-0 freezes. Keep reconstructable ratings off QC
+unless dataset-specific permission covers the upload; otherwise use local
+LEAN. Do not join ratings to prices, run a backtest, deploy, trade, mutate an
 operational database, or roll paper-epoch-006 without separate authorization.
 ```
 

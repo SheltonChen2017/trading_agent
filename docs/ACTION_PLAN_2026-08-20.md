@@ -135,11 +135,26 @@ average variants, raw/coverage-adjusted/breadth-filtered specifications, three
 bearish implementations and a leverage overlay; without a declared family size
 and gate, that is a false-discovery generator over one historical sample.
 
-ACER-0 also settles the ratings vendor, which turns on two questions neither
-vendor page answers: does the candidate carry **dated actions for delisted and
-deregistered tickers, and from when**, and can consensus be retrieved **as of
-a past date** rather than only as current state. A current-state consensus
-endpoint is the same look-ahead that closed Stage 2 PEAD.
+ACER-0 also settles the ratings vendor. **Update 2026-08-20: the owner
+purchased the Benzinga expansion via Massive and authorized a read-only data
+audit** (`docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md`). Snapshot
+A answers the two blocking questions favourably — the feed carries dated
+per-firm actions from 2011-12 **including pre-delisting coverage for bankrupt
+and acquired names** (SIVB, FRC, SBNY, TWTR, ATVI and more), and
+per-row `previous_rating` makes historical state reconstructible without a
+current-state consensus endpoint. Remaining vendor gates before an ACER-0
+freeze: the snapshot B restatement measurement and the rename/ticker-reuse
+hazard. The clock fields are timezone-naive in the delivered payload, so the
+frozen safe rule is next-session eligibility after the later action/update
+date; 39 rows whose update date precedes the action date are refused. The
+owner correctly identified the quoted all-caps text as an investment-advice
+disclaimer, not a research ban. Separate Market Data clauses still leave
+third-party transfer and dataset-specific non-display entitlement unproven:
+raw or reconstructable Benzinga rows stay local unless the order terms or
+written permission cover upload to QuantConnect. Local LEAN is the fallback.
+The identity hazard (FB vs ANTM handled oppositely; BBBY reused) is heightened
+because this Massive delivery has neither ISIN nor exchange; ACER requires a
+security-master cross-reference and must refuse ambiguous joins.
 
 ### ACER-2 is the decisive milestone; scope and price that alone
 

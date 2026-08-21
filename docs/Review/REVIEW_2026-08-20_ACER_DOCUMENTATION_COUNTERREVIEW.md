@@ -56,7 +56,7 @@ state is unmeasured.
 | ACRV-001 | P3 | the new index guard | `next(...)` raised `StopIteration` when the SBP row was missing entirely — an error with no message rather than a failure naming what vanished. This is the same defect as CRV-003, which Codex accepted from me one round earlier and then reproduced. A deleted row is a legitimate failure mode of this guard. | Rewritten to assert exactly one matching row with a diagnostic message, then index it. Both mutations re-verified: the reverted-status case and the deleted-row case now both fail with named assertions (`assert 0 == 1 ... found 0`). |
 | ACRV-002 | P3 | ACER plan §2 | **My own overstatement, which the review did not flag.** The plan asserted that ETF scores "will be strongly collinear" — reasoning presented as established fact, with no correlation computed. That is the unsupported-quantity error that sank amendment SBPA-001, reproduced in the document that cites it as a lesson. | Rewritten as an explicit expectation, labelled "reasoning, not a measurement", with ACER-3 now required to measure realized cross-sectional correlation of ETF scores and report it beside any ranking result. |
 | ACRV-003 | P3 | ACER plan §3.1, §5 | The correction correctly refuses to claim verified absence, but assigns the measurement to nobody, so the disclaimer could persist indefinitely while the closure quietly rests on it. | ACER-1's row now requires measuring the machine-local SBR state (task presence and snapshot count) on the operational host and recording it in `OPERATIONAL_FACTS.md`, with the gate noting the measurement is read-only and that finding snapshots would be a material discovery. |
-| ACRV-004 | P3 | the review's Validation section | It reports "The full suite exited 0 on the final review tree; a separate collection counted 4,353 tests" — an exit code and a collection count, but no pass/fail/warning counts. `CLAUDE.md` §10 requires exact pass/skip/failure counts and warnings, precisely so a green claim can be checked. | Measured independently on the final counter-review tree and recorded in `docs/SESSION_HANDOFF.md` §7bw. |
+| ACRV-004 | P3 | the review's Validation section | It reports "The full suite exited 0 on the final review tree; a separate collection counted 4,353 tests" — an exit code and a collection count, but no pass/fail/warning counts. `CLAUDE.md` §10 requires exact pass/skip/failure counts and warnings, precisely so a green claim can be checked. | Measured independently on the final counter-review tree and recorded in `docs/SESSION_HANDOFF.md` §7bx. |
 
 No P0, P1, or P2 findings against the correction.
 
@@ -75,7 +75,9 @@ tree.
 - `tests/test_active_document_consistency.py`: **36 passed**; the new index
   guard verified red on both mutations before and after hardening.
 - Full-suite and compile results for the exact final tree are recorded in
-  `docs/SESSION_HANDOFF.md` §7bw.
+  `docs/SESSION_HANDOFF.md` §7bx (originally numbered 7bw; renumbered
+  2026-08-20 because the reviewed head's own section already used 7bw — the
+  MHP-001 numbering-collision class, caught by Codex's follow-up).
 - No product behaviour, schema, CLI, migration, research result, data
   purchase, QuantConnect access, broker access, scheduled task, deployment,
   epoch action, or operational database changed. ACER remains a DRAFT and

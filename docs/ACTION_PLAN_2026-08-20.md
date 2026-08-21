@@ -205,6 +205,23 @@ rating scale, or research look. It sizes the unresolved issuer-identity
 problem — 9,677 distinct tickers with zero ISIN and zero exchange — and
 ambiguity-refusing mapping is the next ACER-1 step.
 
+**Update 2026-08-21: the mapping step is BLOCKED, and the blocker is
+load-bearing** (`docs/research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
+There is no local LEAN and no LEAN data on this host, so open item ACER-0A.4
+has a negative answer rather than an unmeasured one; and the QC client
+allowlists only project/file/compile/backtest paths, with a comment stating
+the rule exists so `data/read` cannot pass — a reviewed control that was not
+widened. The half needing no external data was built instead: an
+ambiguity detector flags **2,885 of 9,677 tickers (35.7% of events)**, though
+most flags are cosmetic vendor label churn that a suffix alias table would
+collapse. **The decisive result is negative: the detector misses BBBY**,
+because the vendor labels all 270 of its events `Bed Bath & Beyond` including
+after the 2023 bankruptcy and symbol reuse. Name evidence alone is therefore
+insufficient, the flag count is a lower bound, and an external security
+master with listing/delisting dates is required. **Owner ruling needed** on
+how to obtain one: install local LEAN with data, widen the QC allowlist to a
+read-only data path, or nominate a different security-master source.
+
 **Update 2026-08-20: engine and control-data rulings.** Local LEAN is the
 authoritative execution path and cloud execution is optional; reconstructable
 Benzinga rows stay off QuantConnect unless the owner supplies explicit

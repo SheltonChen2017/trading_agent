@@ -19,8 +19,9 @@ independent review, 7bx the counter-review, 7by the vendor audit, 7bz the
 independent correction review, 7ca the counter-review of that correction,
 7cb the ACER event backbone, 7cc its independent review, 7cd the
 counter-review of that review, 7ce the ACER-0A submission, 7cf Codex's
-independent correction review, and 7cg the counter-review of that review;
-7cg and section 8 are the current development state.
+independent correction review, 7cg the counter-review of that review, and
+7ch the issuer-identity detector; 7ch and section 8 are the current
+development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -3849,6 +3850,76 @@ the owner's explicit instruction, recorded here so a reviewer reads it as
 intent rather than drift; the two are kept as separate commits so each can
 still receive its own disposition.
 
+## 7ch. Issuer-identity ambiguity detector (Claude, 2026-08-21)
+
+Same branch as 7cg, per the owner's relay instruction. Full record:
+`docs/research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`.
+
+**A hard blocker was found before any code was written, and it needs an
+owner ruling.** The named next ACER-1 step is an ambiguity-refusing security
+master join, authorized in owner decision 8 as read-only QuantConnect
+symbol-mapping work. Neither half of that path exists on this host:
+
+- **No local LEAN and no LEAN data.** `C:\Lean`, `C:\git\Lean` and
+  `C:\ProgramData\QuantConnect` are absent, and no `map_files` directory
+  exists anywhere under `C:\git`. Owner decision 9 makes local LEAN
+  authoritative; there is no local LEAN. Open item **ACER-0A.4 now has a
+  negative answer, not an unmeasured one.**
+- **The QC client cannot reach data endpoints by design.**
+  `research/quantconnect.py` allowlists only `projects/`, `files/`,
+  `compile/`, `backtests/`, `optimizations/` and `authenticate`, with a
+  comment stating the rule exists so `data/read` "cannot sneak through".
+  That is a reviewed control; widening it is an owner decision, not a
+  refactor, so I did not touch it.
+
+So I built the half that needs no external data: `research/acer/identity.py`
+measures which tickers carry evidence that a raw-ticker join is unsafe, from
+the audited corpus alone. Measured over Snapshot A: **2,885 of 9,677 tickers
+(29.8%) flagged, covering 35.7% of events** — 2,478 with multiple company
+names (1,981 rename-shaped, 497 reuse-shaped after a ≥365-day gap), 600
+sharing a name with another ticker, 766 interleaved, 9 unnamed.
+
+Most of that is cosmetic vendor label churn — `Amazon`→`Amazon.com`,
+`McDonalds`→`McDonald's`, `SVB Financial Group`→`SVB Finl Gr`. The detector
+compares case and whitespace only and deliberately does **not** alias
+punctuation or corporate suffixes, because deciding two spellings are one
+issuer is a security-master decision of the same class as the rating scale.
+The count is reported as measured rather than tuned down by loosening the
+comparison; the decision-relevant subsets are the 497 reuse-shaped flags and
+the 600 cross-ticker collisions.
+
+Genuine finds: **GOOG and GOOGL both carry `Alphabet`**; **FISV and FI both
+carry `Fiserv`** with FISV starting 2025-12-22 (the predicted re-keying); and
+a real vendor defect — **CPRI carries one event labelled
+`Chipotle Mexican Grill`** on 2026-02-04 between two `Capri Holdings` eras,
+found only because interleaving is detected rather than smoothed over.
+
+**The result that matters most is negative: this detector misses BBBY.** The
+vendor labels all 270 BBBY events `Bed Bath & Beyond` from 2012 through 2026,
+including events after the 2023 bankruptcy when the symbol was reused by an
+unrelated issuer. It never relabels, so no name signal exists and BBBY scores
+*unambiguous* — a false negative on the exact hazard that motivated the work.
+Two consequences: the 2,885 flags are a **lower bound**, and an unflagged
+ticker is not established as safe; and an external security master with
+listing/delisting dates is **required**, not a better heuristic. That makes
+the blocker above load-bearing. The limitation is pinned by
+`test_a_reuse_the_vendor_never_relabels_is_NOT_detected` rather than left in
+prose.
+
+Validation on the final tree: full suite **4,439 passed / 0 failed / 25
+warnings** in 662.25 seconds — 4,420 from the reviewed tree plus this round's
+19 identity tests. `compileall` over the required surface including
+`research/` passed; `git diff --check` passed; Python 3.13.14. Five mutations
+of the detector were applied and all five were detected: aliasing punctuation
+in the name comparison, dropping the cross-ticker refusal, swapping the
+reuse/rename labels, ignoring unnamed events, and dropping interleaving
+detection. The source was restored from a backup copy in a `finally` block.
+
+Untested surface, stated plainly: the detector has been exercised against one
+snapshot and synthetic cases only. Its false-negative class is characterized
+but not bounded — nobody knows how many BBBY-shaped reuses exist, because
+finding them is precisely what needs the security master this host lacks.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -3880,9 +3951,18 @@ What ACER needs next, in order: close the ten named open items
 (ACER-0A.1–0A.10) — above all the numeric robustness rule, which is currently
 a proposal awaiting owner confirmation; run the $99 one-month Benzinga
 Earnings **structural audit** and only then adopt or reject that control
-dataset and freeze the standardized-surprise formula; resolve issuer mapping
-with ambiguity refusals across the 9,677-ticker surface using read-only QC
-symbol data; and run Snapshot B after the declared interval. **ACER-2 remains
+dataset and freeze the standardized-surprise formula; and run Snapshot B
+after the declared interval.
+
+**The issuer-mapping step is BLOCKED and needs an owner ruling (section
+7ch).** There is no local LEAN or LEAN data on this host, and the QC client's
+allowlist deliberately excludes data endpoints, so read-only QC symbol
+mapping has no available path. The options are to install local LEAN with its
+data, to widen the allowlist to a read-only data path (a change to a reviewed
+control), or to nominate a different security-master source. This cannot be
+deferred by improving the heuristic: name evidence provably misses the
+BBBY-class reuse, so the 2,885 flagged tickers are a lower bound and an
+unflagged ticker is not established as safe. **ACER-2 remains
 the decisive milestone:** a null primary result closes the program. No
 purchase beyond the authorized $99 audit, no price or outcome join, no
 backtest, no QC upload, and no paper execution is authorized. LEV remains

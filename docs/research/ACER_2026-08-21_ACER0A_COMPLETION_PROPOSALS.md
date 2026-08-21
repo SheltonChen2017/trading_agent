@@ -1,6 +1,7 @@
 # ACER-0A completion proposals (ACER-0A.5–0A.9)
 
-Status: **PROPOSALS AWAITING OWNER CONFIRMATION. Nothing here is frozen.**
+Status: **PROPOSALS AWAITING OWNER CONFIRMATION; INDEPENDENTLY CORRECTED.
+Nothing here is frozen.**
 The ACER-0A partial freeze records the owner's decisions; the review that
 followed established that those decisions are not yet an executable
 preregistration, because naming an encoding does not define the rating scale
@@ -19,6 +20,14 @@ has a proposal in the freeze document; **ACER-0A.2** depends on the earnings
 audit; **ACER-0A.3**, **ACER-0A.4** and **ACER-0A.10** depend on data this
 host does not have and on the blocked security-master ruling.
 
+**Independent-review correction, 2026-08-21:** the submitted draft normalized
+the signal by the sum of decay weights, which could cancel decay entirely;
+fit validation outcomes in their own control regressions while calling the
+result out of sample; named a stationary bootstrap that the cited repository
+toolkit does not implement; and listed only four of fifteen measured refused
+rating strings. The corrected proposals below retain the same frozen family
+but remove those contradictions. They remain proposals, not owner decisions.
+
 ---
 
 ## ACER-0A.5 — canonical rating scale
@@ -26,9 +35,9 @@ host does not have and on the blocked security-master ruling.
 ### Measured vocabulary
 
 The corpus contains **54 distinct rating strings** (53 as current ratings, 47
-as previous). Coverage is extremely concentrated: the top 19 strings account
-for **99.57%** of the 584,916 events, and the 34 strings below 500 events
-together account for 2,530 events (0.43%).
+as previous). Coverage is extremely concentrated: the top 19 strings in the
+current-rating field account for **99.57%** of the 584,916 events, and its 34
+strings below 500 events together account for 2,530 events (0.43%).
 
 ### Proposed five-level ordinal scale
 
@@ -45,12 +54,17 @@ together account for 2,530 events (0.43%).
 ### Refusals, not defaults
 
 Any string **not** in the table produces a **named refusal**, never a default
-level. The explicitly unmappable strings measured in the corpus are `mixed`,
-`fair value`, `not rated`, and `tender`: they express no position on an
-ordinal buy-to-sell axis. Defaulting an unknown string to 3 (hold) would
-manufacture a zero-notch observation out of missing information and quietly
-dilute the signal toward zero; refusing keeps the sample honest and the
-refusal counted.
+level. The complete measured refusal vocabulary is `mixed`, `fair value`,
+`not rated`, `tender`, `developing`, `equalweight`, `gradually accumulate`,
+`hold neutral`, `performer`, `sector overweight`, `sector performer`,
+`sector underweight`, `speculative hold`, `trading buy`, and `trading sell`.
+The first four express no position on an ordinal buy-to-sell axis; several of
+the low-frequency remainder could plausibly be mapped, but doing so is an
+owner-visible specification choice rather than an alias silently invented by
+the implementation. Any future unrecognized string is refused as well.
+Defaulting an unknown string to 3 (hold) would manufacture a zero-notch
+observation out of missing information and quietly dilute the signal toward
+zero; refusing keeps the sample honest and the refusal counted.
 
 ### The judgement calls, stated rather than hidden
 
@@ -84,32 +98,50 @@ both.
   trading session strictly after the later of its action date and its
   `last_updated` UTC date, per the frozen ACER-1 rule. No intraday timestamp
   is used.
-- **Per-firm state.** Each (issuer, firm) pair carries at most one live
-  rating. A new action from that firm replaces its previous state. This makes
-  the aggregate a genuine consensus rather than a sum over duplicate opinions.
+- **Per-firm state and expiry.** Each (issuer, firm) pair carries at most one
+  live action per encoding. A new eligible action from that firm replaces its
+  previous state, and a state is live only while `0 <= age <= 2 * H`. A newer
+  refused action clears that encoding's prior state rather than allowing a
+  stale signal to survive information the mapping cannot interpret. This
+  makes the aggregate a mean of current firm-level revision signals rather
+  than a sum over duplicate opinions or an indefinitely carried history.
+- **Event values.** For the ordinal encoding, only `upgrades` and
+  `downgrades` create non-zero events. Both current and previous ratings must
+  map; an upgrade requires a strictly positive mapped notch and a downgrade a
+  strictly negative one. Missing previous ratings, zero or opposite-signed
+  mapped changes, blank actions, and unknown actions produce named refusals.
+  The measured non-directional actions `maintains`, `initiates_coverage_on`,
+  `reiterates`, `assumes`, `reinstates`, `terminates_coverage_on`, `suspends`,
+  and `removes` create an explicit zero event. Initiations therefore do not
+  manufacture a revision from the absence of a prior rating.
 - **Decay.** An action's weight at session *t* is `exp(-ln(2) * age / H)`
   where `age` is the number of **trading sessions** since the action became
   eligible and `H` is the frozen half-life (21, 63, or 126). Age is counted in
   sessions, not calendar days, so the decay does not accelerate across
   weekends and holidays.
 - **Aggregation (the frozen coverage-neutral per-firm mean).** For issuer *i*
-  at session *t*, the score is the decay-weighted mean over that issuer's
-  live per-firm actions: `sum(w * notch) / sum(w)`. Dividing by the weight
-  sum is what makes it coverage-neutral — an issuer with forty analysts and
-  one with four are on the same scale.
-- **Minimum coverage.** An issuer needs at least **3** live firm actions
-  within the trailing `2 * H` sessions to receive a score; below that the
+  at session *t*, let `N_live` be the number of live firm states for that
+  encoding. The score is `sum(w * notch) / N_live` (or `sum(w * sign) /
+  N_live` for the direction encoding). Dividing by the number of firms keeps
+  issuers with forty analysts and four analysts on the same scale while
+  preserving absolute decay toward zero. Dividing by `sum(w)` is forbidden:
+  three equally old +1 actions would otherwise always score +1 at every age
+  and under every half-life, normalizing away the intended decay.
+- **Minimum coverage.** An issuer needs `N_live >= 3`, with every counted state
+  satisfying `age <= 2 * H`, to receive a score; below that the
   issuer is refused for that session rather than scored from one opinion.
   This threshold is a proposal and is deliberately not tuned.
 - **Encoding (b) does not depend on the scale.** Direction-only sign is taken
-  from `rating_action` — `upgrades` → +1, `downgrades` → −1, everything else
-  → 0 — measured directly from the vendor's own action field. This makes
-  encoding (b) implementable independently of ACER-0A.5, and gives the family
-  one member immune to the cardinality assumption above.
+  from `rating_action`: `upgrades` → +1, `downgrades` → −1, and the eight
+  explicitly named measured non-directional actions above → 0. Blank or
+  unknown future action values refuse rather than silently becoming neutral.
+  This makes encoding (b) implementable independently of ACER-0A.5, and gives
+  the family one member immune to the cardinality assumption above.
 - **Same-session collisions.** If one firm issues two actions on the same
   issuer with the same eligibility session, both are refused rather than
   arbitrarily ordered: same-day vendor ordering does not establish
-  chronology, a fact already measured in the identity work.
+  chronology, a fact already measured in the identity work. The ambiguous
+  collision clears the prior live state for that encoding at that session.
 
 ---
 
@@ -129,44 +161,70 @@ both.
   winsorized at the 1st and 99th percentiles **within the session**, then
   z-scored within the session. Winsorizing within the session avoids using
   any cross-sectional information from other dates.
-- **Residualization.** At each session, regress the outcome on the controls
-  cross-sectionally by ordinary least squares and take the residual. The
-  primary statistic is the cross-sectional **Spearman** correlation between
-  the signal and that residual, averaged across sessions. Spearman rather
-  than Pearson because the notch encoding is ordinal with heavy mass at zero,
-  where a Pearson coefficient would be dominated by a few large moves.
+- **Out-of-sample residualization.** For each walk-forward fold, fit one pooled
+  ordinary-least-squares control model on the fold's purged and embargoed
+  **training rows only**, with an intercept, the normalized continuous
+  controls, and the frozen sector indicators. Apply those fixed coefficients
+  to the validation controls and define each validation residual as realized
+  forward return minus that prediction, **without refitting on validation
+  outcomes**. The primary statistic is the cross-sectional **Spearman**
+  correlation between the signal and those out-of-sample residuals within
+  each validation session, averaged with one equal weight per session.
+  Spearman rather than Pearson is proposed because the notch encoding is
+  ordinal with heavy mass at zero, where a Pearson coefficient would be
+  dominated by a few large moves.
 - **Missing controls refuse the row.** An issuer missing any required control
   for a session is refused for that session and the refusal is counted. No
   control is ever imputed, carried forward, or replaced with a
   cross-sectional mean.
+- **Dependency disclosure.** ACER-0A.7 cannot become final until ACER-0A.2,
+  0A.3, and 0A.10 bind the surprise, value, price/volume, sector, adjustment,
+  and mapping sources. The formulas here do not convert those open data
+  semantics into frozen facts.
 
 ---
 
 ## ACER-0A.8 — estimation and significance protocol
 
 - **Development period:** 2012-01-01 through 2021-12-31.
-  **Untouched confirmation period:** 2022-01-01 through the corpus end. The
-  confirmation period is not inspected, plotted, or summarized before the
-  single confirmation pass.
-- **Walk-forward:** expanding-window folds with a minimum 3-year initial
-  training window, stepping annually, within the development period only.
+  **Untouched confirmation period:** 2022-01-01 through the exact maximum
+  eligible session in the frozen input-dataset manifest. That terminal date
+  and dataset identity are recorded before either run; “corpus end” is not an
+  open-ended date that can grow between attempts. The confirmation period is
+  not inspected, plotted, or summarized before the single confirmation pass.
+- **Walk-forward:** seven expanding-window folds. The first training window is
+  2012-01-01 through 2014-12-31 and the validation blocks are calendar years
+  2015 through 2021, one year per fold. Each fold refits the control model on
+  its eligible historical training rows only and emits validation residuals
+  under the rule in ACER-0A.7.
 - **Purge and embargo:** because the 21-session outcome overlaps, each fold's
   training data is purged of observations whose outcome window overlaps the
-  test window, with an additional **21-session embargo** after the test
-  window. Overlapping observations are the reason a naive test would produce
-  a spurious p-value.
+  validation window, with an additional **21-session embargo immediately
+  before each validation block**. No post-validation embargo is substituted
+  for the pre-validation exclusion. Overlapping observations are the reason a
+  naive test would produce a spurious p-value.
 - **Independent observation unit: the session**, not the issuer-row. Rows
   within one session share market-wide shocks and are not independent.
-- **Significance:** stationary block bootstrap over sessions using this
-  repository's existing out-of-sample block toolkit, with **expected block
-  length 21 sessions** (matched to the outcome horizon), **10,000 draws**,
-  **seed 20260821**, and a **two-sided** test. Seed and draw count are frozen
-  here so the p-value is reproducible.
+- **Significance:** apply the repository's existing **circular moving-block
+  bootstrap** to the one-IC-per-validation-session series, with fixed block
+  length **21 sessions**, **10,000 draws**, **seed 20260821**, and a
+  **two-sided** test. This names the algorithm actually implemented by
+  `ml.cross_sectional.block_bootstrap_ic_significance`; it is not a stationary
+  bootstrap. Before any real outcome is read, the exact sample-floor/block
+  combination must pass the toolkit's refusal rule and a recorded **synthetic
+  null calibration**. A failed calibration leaves this proposal unfreezable;
+  it does not authorize choosing a new block length after seeing outcomes.
 - **Finite-sample floors:** at least **60 issuers** in a session for that
   session to contribute, and at least **500 contributing sessions** in the
-  development period. Below either floor the result is **insufficient**, which
-  is a distinct outcome from a null and does not consume the confirmation
-  slot.
+  out-of-fold development series. Floors computable before outcome access are
+  checked first. If either floor fails only after outcomes were read, the
+  development slot is consumed under ACER-0A.9 and the program closes; it is
+  not reclassified as a free pre-outcome refusal. In every case
+  `insufficient` is distinct from `null` and never launches confirmation.
+- **Confirmation model:** if and only if development passes, fit the same
+  frozen control model once on the fully purged/embargoed development rows and
+  apply it to confirmation controls. Confirmation outcomes never participate
+  in fitting, normalization choices, feature selection, or parameter changes.
 
 ---
 
@@ -175,8 +233,11 @@ both.
 Proposed, to remove the ambiguity the counter-review found:
 
 1. A development or confirmation attempt that **refuses before touching
-   outcomes** (a data, lineage, or floor refusal) does **not** consume its
-   slot. It is still ledgered as an `R-nnn` look with its refusal reason.
+   outcomes** (a data, lineage, mapping, or pre-outcome floor refusal) does
+   **not** consume its slot. It is still ledgered as an `R-nnn` look with its
+   refusal reason. The future run driver must set a durable monotonic
+   `outcomes_read` latch immediately before outcome I/O; a caller-supplied
+   status or exception label cannot decide this after the fact.
 2. An attempt that **reads outcomes and then errors** **does** consume its
    slot. Reading the data is the irreversible act, not producing a number.
 3. A consumed slot is never replaced. If the development slot is consumed

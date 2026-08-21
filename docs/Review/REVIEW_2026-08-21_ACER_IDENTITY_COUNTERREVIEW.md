@@ -28,7 +28,8 @@ or operational mutation occurred.
 |---|---|---|
 | `1805ec7` | **Accepted after correction** | The safety-label rename, lineage binding, ticker canonicalization, and deterministic same-day ordering are all correct and well tested. CCRID-001 covers a re-run refusal that reads as corruption. |
 | `d248e0e` | **Accepted** | The review record's findings, evidence, and severities are accurate, and its corrected measurement reproduced exactly. |
-| `cd0b4fc`, `84bec5d` | **Accepted** | Handoff and final validation accurate; extended here. |
+| `cd0b4fc` | **Accepted** | The handoff accurately records the correction review and its remaining external-security-master gate. |
+| `84bec5d` | **Accepted** | The final validation record matches the reproduced full-suite, compile, diff, and clean-status evidence. |
 
 ## Verification of Codex's findings
 
@@ -57,10 +58,10 @@ execution behaviour.
 
 ## Counter-review issue ledger
 
-| ID | Priority | Status | Location | Issue | Correction |
-|---|---:|---|---|---|---|
-| CCRID-001 | P3 | Fixed this round | `scripts/report_acer_identity.py` | The diagnostic artifact's identity includes `code_commit`, which changes on *any* later commit — including a documentation-only one that cannot affect the measurement. Re-running to the same output path then refuses on differing bytes. The refusal is correct, but it presents as tamper detection when the measurement is substantively identical, and an operator could reasonably read it as corruption. | Documented in the CLI docstring: give each run its own output path, and treat `identity_assessments_sha256` as the measurement's true content identity, since it is stable across commits that do not change the assessment. No design change — the lineage binding itself is right. |
-| CCRID-002 | — | Recorded, no change | `research/acer/identity.py` | The deterministic same-day sort orders rows by company name within a date, which means a genuine **same-day** name alternation can no longer be observed as interleaving. That is the correct trade: same-day vendor order does not establish chronology, so the alternation was never evidence. Recorded so a later reader does not mistake the change for lost coverage. | None. |
+| ID | Priority | Status | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---:|---|---|---|---|---|---|---|
+| CCRID-001 | P3 | Fixed this round | `scripts/report_acer_identity.py` | The diagnostic artifact's identity includes `code_commit`, which changes on *any* later commit — including a documentation-only one that cannot affect the measurement. Re-running to the same output path then refuses on differing bytes. The refusal is correct, but it presents as tamper detection when the measurement is substantively identical, and an operator could reasonably read it as corruption. | A clean rerun after the documentation commits retained assessment SHA `8a020211…` but changed the artifact bytes through `code_commit`. | Operators need to distinguish immutable-lineage refusal from corrupted measurement content. | Documented in the CLI docstring: give each run its own output path, and treat `identity_assessments_sha256` as the stable measurement-content identity. No design change — the lineage binding itself is right. | Docstring and reproduced assessment identity inspected on the final tree. |
+| CCRID-002 | P3 | Closed; accepted tradeoff | `research/acer/identity.py` | The deterministic same-day sort orders rows by company name within a date, so a genuine same-day name alternation is not observed as interleaving. | Same-day source rows have dates but no trustworthy within-day chronology. | Preserving caller order would recreate ACERIDR-004's nondeterminism; a same-day alternation without chronology is not evidence of issuer succession. | None; the deterministic tie-break is retained and the limitation is recorded. | Non-palindromic order-invariance reproduction passes under the corrected implementation. |
 
 ## Assessment
 

@@ -1049,3 +1049,49 @@ def test_active_acer_identity_docs_do_not_turn_missing_evidence_into_safety():
     assert "allowlist" in measurement.lower()
     assert "lower bound" in measurement.lower()
     assert "external" in action.lower() and "security master" in action.lower()
+
+
+def test_acer_completion_proposal_does_not_normalize_away_decay():
+    """Half-life cells must attenuate stale events, not only reweight firms."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    assert "sum(w * notch) / N_live" in proposal
+    assert "sum(w * notch) / sum(w)" not in proposal
+    assert "age <= 2 * H" in proposal
+
+
+def test_acer_completion_proposal_defines_a_real_out_of_sample_residual():
+    """Validation outcomes cannot fit their own control residualization."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    assert "training rows only" in proposal
+    assert "without refitting on validation outcomes" in proposal
+    assert "immediately before each validation block" in proposal
+    assert "embargo after the test window" not in proposal
+
+
+def test_acer_completion_proposal_names_the_existing_bootstrap_contract():
+    """The frozen method must match the repository function it delegates to."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    engine = _root_text("backtest/engine.py")
+    assert "circular moving-block bootstrap" in proposal
+    assert "stationary block bootstrap" not in proposal
+    assert "synthetic null calibration" in proposal
+    assert "Uses a circular moving-block bootstrap" in engine
+
+
+def test_acer_completion_proposal_discloses_every_measured_unmapped_rating():
+    """Owner review needs the complete refusal vocabulary, not four examples."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    for rating in (
+        "developing",
+        "equalweight",
+        "gradually accumulate",
+        "hold neutral",
+        "performer",
+        "sector overweight",
+        "sector performer",
+        "sector underweight",
+        "speculative hold",
+        "trading buy",
+        "trading sell",
+    ):
+        assert f"`{rating}`" in proposal

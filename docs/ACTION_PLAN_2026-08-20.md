@@ -211,16 +211,23 @@ There is no local LEAN and no LEAN data on this host, so open item ACER-0A.4
 has a negative answer rather than an unmeasured one; and the QC client
 allowlists only project/file/compile/backtest paths, with a comment stating
 the rule exists so `data/read` cannot pass — a reviewed control that was not
-widened. The half needing no external data was built instead: an
-ambiguity detector flags **2,885 of 9,677 tickers (35.7% of events)**, though
+widened. The half needing no external data was built instead and independently
+corrected: a name-only diagnostic flags **2,885 of 9,677 tickers (35.7% of
+events)**, though
 most flags are cosmetic vendor label churn that a suffix alias table would
 collapse. **The decisive result is negative: the detector misses BBBY**,
 because the vendor labels all 270 of its events `Bed Bath & Beyond` including
 after the 2023 bankruptcy and symbol reuse. Name evidence alone is therefore
 insufficient, the flag count is a lower bound, and an external security
-master with listing/delisting dates is required. **Owner ruling needed** on
-how to obtain one: install local LEAN with data, widen the QC allowlist to a
-read-only data path, or nominate a different security-master source.
+master with listing/delisting dates is required. Review removed the false
+`unambiguous` verdict: an unflagged ticker is now explicitly
+`no_name_based_ambiguity_evidence`, not safe or eligible. The review made
+same-day ordering deterministic (768 rather than
+the submitted 766 interleaving flags), canonicalized ticker case, and bound
+every diagnostic to the clean code commit, source manifest, normalized
+dataset, and assessment hash. **Owner ruling needed** on how to obtain the
+security master: install local LEAN with data, widen the QC allowlist to a
+read-only data path, or nominate a different source.
 
 **Update 2026-08-20: engine and control-data rulings.** Local LEAN is the
 authoritative execution path and cloud execution is optional; reconstructable

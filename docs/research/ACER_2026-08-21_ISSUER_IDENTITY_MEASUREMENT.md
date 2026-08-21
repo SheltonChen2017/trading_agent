@@ -1,11 +1,26 @@
 # ACER issuer-identity ambiguity — measurement and its limits
 
-Status: **structural measurement under ACER-1. No network call, no price or
-outcome join, no research look, no `R-nnn` entry.** It measures which tickers
-in the audited corpus carry evidence that a raw-ticker join would be unsafe.
+Status: **structural measurement under ACER-1; accepted after independent
+correction. No network call, no price or outcome join, no research look, no
+`R-nnn` entry.** It measures which tickers in the audited corpus carry
+name-based evidence that a raw-ticker join would be unsafe. Absence of a flag
+is not evidence that a ticker is safe.
 
-Produced by `scripts/report_acer_identity.py` over Snapshot A
-(`benzinga-ratings-20260820T233055Z`) via `research/acer/identity.py`.
+Corrected measurement lineage:
+
+| Field | Identity |
+|---|---|
+| source snapshot | `benzinga-ratings-20260820T233055Z` |
+| source manifest SHA-256 | `51954daea8432136b9c99fb4d5088e0c672664e9384475635110dd33e08a2e85` |
+| normalized dataset | `acer-analyst-events-73c36f9de1841b0a` (contract v2) |
+| diagnostic code commit | `1805ec7b96bc62afd6c1f6019ec68b9b8f9587f5` |
+| diagnostic contract | `acer-issuer-identity-diagnostic` v1 |
+| assessment SHA-256 | `8a020211e8ef5482abcceaa78a6d5f374bf8c0e9f60e2593db461d4f7b304a0b` |
+
+The submitted report discarded source and code lineage. The reviewed CLI now
+requires a clean code commit, verifies it again after the long read, binds the
+measurement to the normalized dataset and source manifest, and hashes the
+complete ordered assessment payload.
 
 ## 1. The blocker this work ran into first
 
@@ -36,7 +51,7 @@ that matters for the ruling itself.
 | Measure | Value |
 |---|---|
 | tickers in the corpus | 9,677 |
-| tickers flagged ambiguous | **2,885 (29.8%)** |
+| tickers with name-based ambiguity evidence | **2,885 (29.8%)** |
 | events under flagged tickers | 208,653 of 584,916 (**35.7%**) |
 
 By reason (a ticker may carry several):
@@ -44,10 +59,10 @@ By reason (a ticker may carry several):
 | Reason | Tickers |
 |---|---:|
 | multiple company names under one ticker | 2,478 |
-| — of those, name change **without** a gap (rename-shaped) | 1,981 |
+| — of those, name change after a **shorter than 365-day** gap (rename-shaped) | 1,981 |
 | — of those, name change **after ≥365 days** (reuse-shaped) | 497 |
 | company name also used by another ticker | 600 |
-| company names interleave rather than succeed | 766 |
+| company names interleave rather than succeed | **768** |
 | events with no company name | 9 |
 
 ## 3. Most flags are cosmetic, and that is stated rather than tuned away
@@ -75,7 +90,11 @@ punctuation alias table would collapse. That table is exactly the
 security-master work that is blocked, so the number is reported as measured
 and **not** tuned down by loosening the comparison. The decision-relevant
 subsets are the 497 reuse-shaped flags and the 600 cross-ticker name
-collisions.
+collisions. The submitted count of 766 interleaved tickers was order-sensitive:
+same-day actions were sorted only by date, so vendor page/id order could alter
+the era sequence. The reviewed detector uses a deterministic same-day name
+tie-break; that correction changes this one reason count to 768 without
+changing the 2,885-ticker flag count or the 35.7% event share.
 
 ## 4. Genuine findings
 
@@ -93,11 +112,13 @@ collisions.
 
 ## 5. The important negative result: this detector misses BBBY
 
-**BBBY is scored `unambiguous`.** The vendor labels all 270 of its events
-`Bed Bath & Beyond`, from 2012-03-20 through 2026-06-23 — including events
-after the retailer's 2023 bankruptcy, when the symbol was reused by an
-unrelated issuer. Because the vendor never relabels, no name-based signal
-exists, and a name-based detector cannot see it.
+**BBBY is scored `no_name_based_ambiguity_evidence`.** The vendor labels all
+270 of its events `Bed Bath & Beyond`, from 2012-03-20 through 2026-06-23 —
+including events after the retailer's 2023 bankruptcy, when the symbol was
+reused by an unrelated issuer. Because the vendor never relabels, no
+name-based signal exists and this detector cannot see the reuse. The submitted
+`unambiguous` verdict was therefore safety-shaped and false on a known case;
+the reviewed contract now says only what the evidence establishes.
 
 That is a false negative on the exact hazard that motivated this work. Its
 consequences are the point of this document:
@@ -118,7 +139,7 @@ collides with a test.
 
 It resolves no identity, adopts no alias table, joins nothing to prices or
 outcomes, and does not make any ticker eligible for ACER-2. It produces a
-refusal set and a measured description of the problem's shape. ACER-0A.10
-(authoritative security type, listing source, and mapping-version identity)
-remains open, and is now known to require an external source this host does
-not have.
+lineage-bound **diagnostic lower-bound flag set**, never an allowlist or a
+complete refusal boundary. ACER-0A.10 (authoritative security type, listing
+source, and mapping-version identity) remains open, and is now known to
+require an external source this host does not have.

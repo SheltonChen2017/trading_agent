@@ -21,8 +21,9 @@ independent correction review, 7ca the counter-review of that correction,
 counter-review of that review, 7ce the ACER-0A submission, 7cf Codex's
 independent correction review, 7cg the counter-review of that review, and
 7ch the submitted issuer-identity detector, 7ci Codex's independent
-correction review, and 7cj the counter-review of that review; 7cj and
-section 8 are the current development state.
+correction review, 7cj the counter-review of that review, and 7ck the
+ACER-0A completion proposals; 7ck and section 8 are the current development
+state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4030,6 +4031,65 @@ The recurring shape of my errors in this program is now clear enough to name:
 three of these four findings are cases where I wrote the correct caveat in
 prose and then contradicted it in code.
 
+## 7ck. ACER-0A completion proposals (Claude, 2026-08-21)
+
+Same branch as 7cj, per the owner's relay instruction. Full record:
+`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
+
+Codex's review named the next research task as closing ACER-0A.1–0A.10
+without inspecting outcomes. Most of those need owner rulings, so this round
+drafts **concrete proposals for 0A.5–0A.9** — the ones that can be specified
+from what is already known — so the owner accepts, amends, or rejects
+options rather than facing a blank page. **Nothing here is frozen**, and the
+document says so in its status line; ACER-2 remains blocked regardless.
+
+The rating scale is proposed from measurement, not guesswork. The corpus
+contains **54 distinct rating strings**, and coverage is extremely
+concentrated: the top 19 cover **99.57%** of 584,916 events, with 34 strings
+below 500 events accounting for 0.43%. The proposal is a five-level ordinal
+scale with an explicit refusal class rather than a default — `mixed`,
+`fair value`, `not rated` and `tender` express no position on a buy-to-sell
+axis, and defaulting an unknown string to hold would manufacture a
+zero-notch observation from missing information and dilute the signal toward
+zero. Three genuinely arguable assignments are named rather than hidden:
+`speculative buy`, the relative-performance band strings, and the
+firm-idiosyncratic neutrals (`sector weight`, `perform`, `peer perform`),
+which the proposal maps globally *because* a firm-specific map would be
+easier to tune after the fact.
+
+One design point worth the owner's attention: **encoding (b) can be made
+independent of the rating scale entirely.** Taking direction-only sign from
+the vendor's own `rating_action` field — measured as clean values
+`upgrades` / `downgrades` / `maintains` / `initiates_coverage_on` /
+`reiterates` and a small tail — means that half of the six-cell family does
+not depend on ACER-0A.5 at all, and is immune to the equal-spacing
+assumption the notch encoding carries.
+
+0A.6 proposes the decay equation with **age counted in trading sessions
+rather than calendar days**, per-firm state replacement so the aggregate is a
+consensus rather than a sum over duplicate opinions, and a minimum-coverage
+floor. 0A.7 proposes open-to-open 21-session outcomes, within-session
+winsorization and z-scoring, and **Spearman rather than Pearson** because the
+notch encoding is ordinal with heavy mass at zero. 0A.8 proposes the
+development/confirmation split, purge-and-embargo sized to the 21-session
+overlap, the session as the independent observation unit, and a frozen
+bootstrap seed and draw count so the p-value is reproducible. 0A.9 proposes
+slot-failure rules that turn on whether outcomes were **read**, which is a
+checkable property of the code path rather than a judgement about intent.
+
+Validation on the final tree: full suite **4,446 passed / 0 failed / 25
+warnings** in 657.06 seconds, unchanged from the reviewed tree because this
+round changed no behaviour — the only code edit was a CLI docstring.
+`compileall` over the required surface including `research/` passed;
+`git diff --check` passed; document-consistency guards reran green after
+every edit including after these counts were inserted; Python 3.13.14.
+
+Untested surface, stated plainly: **none of the ACER-0A.5–0A.9 proposals is
+implemented or tested.** They are specification text. The rating-scale
+proposal in particular has been checked for coverage against the corpus
+vocabulary but not exercised by any mapping code, so the 99.57% figure
+describes string frequency, not a working implementation.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -4058,8 +4118,10 @@ authoritative engine; reconstructable ratings stay off QuantConnect absent
 explicit permission evidence; QC access is read-only symbol mapping only.
 
 What ACER needs next, in order: close the ten named open items
-(ACER-0A.1–0A.10) — above all the numeric robustness rule, which is currently
-a proposal awaiting owner confirmation; run the $99 one-month Benzinga
+(ACER-0A.1–0A.10). **Proposals now exist for 0A.1 and 0A.5–0A.9**
+(`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`) and are
+awaiting owner confirmation — they are drafts, not freezes. Then run the $99
+one-month Benzinga
 Earnings **structural audit** and only then adopt or reject that control
 dataset and freeze the standardized-surprise formula; and run Snapshot B
 after the declared interval.

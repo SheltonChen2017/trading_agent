@@ -208,6 +208,15 @@ scale that produces it. Each item below must be frozen — in writing, with the
 owner's agreement — before the single development execution, and none may be
 settled after seeing a result.
 
+**Concrete proposals for ACER-0A.5 through 0A.9 are drafted in
+`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`**, including a
+five-level rating scale measured against the corpus's 54 distinct rating
+strings, the decay and aggregation equations, control and outcome
+definitions, the estimation and significance protocol with a frozen bootstrap
+seed, and slot-failure rules. **Those proposals are not frozen**; they exist
+so the owner has concrete options to accept, amend, or reject. They acquire
+authority only when the owner freezes them in writing.
+
 | ID | Open item | Why it cannot wait |
 |---|---|---|
 | **ACER-0A.1** | Numeric rule for "not driven by one year, sector, or a small number of securities" (section 3.3). | Left unquantified, this becomes a judgement made while looking at the result, which is the exact failure mode the freeze exists to prevent. A concrete proposal is offered below and requires owner confirmation. |

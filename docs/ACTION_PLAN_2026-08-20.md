@@ -152,6 +152,16 @@ gate passes, and **zero** ACER-3 executions until ACER-0B is frozen. Every
 execution, refusal, error, and accidental launch is a permanently counted
 look; a corrected rerun may repair code but never the hypothesis.
 
+**Proposals for ACER-0A.1 and 0A.5–0A.9 now exist**
+(`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level
+rating scale measured against the corpus's 54 distinct rating strings with an
+explicit refusal class rather than a default, the decay and aggregation
+equations, control and outcome definitions, and an estimation protocol with a
+frozen bootstrap seed. **They are drafts awaiting owner confirmation, not
+freezes.** One point deserves an early decision: encoding (b) can be taken
+from the vendor's own `rating_action` field, which makes half the six-cell
+family independent of the rating scale entirely.
+
 **Ten named items must still close before the single development run**
 (ACER-0A.1–0A.10). In addition to the robustness rule, surprise formula,
 value source and local-data inventory, the open ledger now names the exact

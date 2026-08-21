@@ -190,15 +190,22 @@ audit's licence step must answer this explicitly.
   validation only. It must not be used for ACER outcome runs. This supersedes
   the earlier local-LEAN-authoritative ruling before any ACER outcome was
   observed.
-- **Reconstructable Benzinga rows must not be uploaded to QuantConnect**
-  unless the owner separately provides explicit evidence that the applicable
-  terms permit that third-party transfer. **This gate is load-bearing under
-  the cloud-engine amendment.** While local LEAN was authoritative the
-  ratings could stay on this machine; a cloud engine has to receive them as
-  custom data, and QuantConnect's own terms forbid taking its market data the
-  other way. So ACER-2 cannot execute at all until this transfer question is
-  answered — it is a blocking dependency of the engine choice, not a side
-  condition of it.
+- **No representation of the licensed Benzinga ratings signal may be uploaded
+  to QuantConnect unless the applicable agreement or written permission
+  covers that exact representation and transfer.** This includes raw or
+  reconstructable rows and does not assume that normalized events or derived
+  features are exempt. **This gate is load-bearing under the cloud-engine
+  amendment.** ACER-2 needs a permitted representation of the ratings signal
+  inside QuantConnect Cloud, unless an equivalent point-in-time ratings
+  dataset is separately licensed there; no such alternative is established.
+  QuantConnect does offer separate **Download** licences for local storage and
+  internal LEAN use, so its terms do not categorically forbid the reverse
+  direction. This project has neither purchased nor authorized that local
+  route, and adopting it would reverse the owner's current cloud-engine
+  ruling. Therefore ACER-2 cannot execute under the selected architecture
+  until the ratings-transfer question is answered. This is a blocking
+  dependency, not a side condition. See QuantConnect's official
+  [Cloud and Download licence distinction](https://www.quantconnect.com/docs/v2/cloud-platform/datasets/licensing).
 - **QuantConnect access is authorized for read-only, zero-outcome structural
   work only** — issuer/symbol mapping, and measuring the account's dataset
   entitlements, coverage and field semantics. During that work: no Benzinga

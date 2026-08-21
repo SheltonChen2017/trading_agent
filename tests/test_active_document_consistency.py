@@ -682,6 +682,9 @@ def _repository_commits_claimed_unreachable(text: str) -> list[str]:
 
     Matches a short hash in backticks within one clause of an unreachability
     claim, in either order ("`abc1234` is local-only", "local-only: `abc1234`").
+    It also recognizes the narrow handoff form where one sentence names a
+    branch and its commits and the immediately following sentence says that
+    same branch currently remains local-only.
 
     STALLCR-004: the original alternation had `unmerged` as one word only, so
     the phrasing that actually shipped -- "not merged or deployed" -- slipped
@@ -693,8 +696,67 @@ def _repository_commits_claimed_unreachable(text: str) -> list[str]:
         r"(?:local[- ]only|not (?:yet )?(?:been )?(?:pushed|merged|published)"
         r"|unpushed|unmerged|unpublished|cannot fetch)"
     )
-    near = rf"(?:`([0-9a-f]{{7,40}})`[^.]{{0,80}}?{claim}|{claim}[^.]{{0,80}}?`([0-9a-f]{{7,40}})`)"
-    return [a or b for a, b in re.findall(near, text, flags=re.IGNORECASE)]
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    found: list[str] = []
+
+    def valid_claims(sentence: str) -> list[re.Match[str]]:
+        matches: list[re.Match[str]] = []
+        for match in re.finditer(claim, sentence, flags=re.IGNORECASE):
+            prefix = sentence[max(0, match.start() - 24) : match.start()]
+            suffix = sentence[match.end() : match.end() + 80]
+            # "not local-only" and "no longer unmerged" say the opposite
+            # of the matched token. Do not turn corrections into findings.
+            if re.search(r"\b(?:not|no longer|never)\s+$", prefix, re.IGNORECASE):
+                continue
+            # A dated description of an earlier branch state is not a claim
+            # about its current reachability.
+            if re.search(
+                r"\bwhen (?:this|the) (?:section|entry|note) was written\b",
+                suffix,
+                re.IGNORECASE,
+            ):
+                continue
+            matches.append(match)
+        return matches
+
+    for index, sentence in enumerate(sentences):
+        claims = valid_claims(sentence)
+        hashes = list(re.finditer(r"`([0-9a-f]{7,40})`", sentence, re.IGNORECASE))
+        for hash_match in hashes:
+            if any(
+                max(
+                    claim_match.start() - hash_match.end(),
+                    hash_match.start() - claim_match.end(),
+                    0,
+                )
+                <= 80
+                for claim_match in claims
+            ):
+                value = hash_match.group(1)
+                if value not in found:
+                    found.append(value)
+
+        # CDR-003b/CDCR-002: the shipped handoff shape named one branch and
+        # its commits, then said "The branch remains local-only" in the next
+        # sentence. Scope only to that explicit deictic current-state form;
+        # whole-paragraph matching conflates unrelated merged/unmerged work.
+        if index == 0 or not claims or not re.search(
+            r"\b(?:the|this|that) branch\s+(?:remains?|is|are)\b",
+            sentence,
+            re.IGNORECASE,
+        ):
+            continue
+        prior = sentences[index - 1]
+        if not re.search(
+            r"\bbranch\s+`(?:codex|user/claude)/[^`]+`",
+            prior,
+            re.IGNORECASE,
+        ):
+            continue
+        for value in re.findall(r"`([0-9a-f]{7,40})`", prior, re.IGNORECASE):
+            if value not in found:
+                found.append(value)
+    return found
 
 
 def test_no_document_calls_a_merged_commit_unreachable():
@@ -796,6 +858,41 @@ def test_the_unreachability_parser_recognizes_multi_word_claims():
             phrasing
         )
     assert _repository_commits_claimed_unreachable("`6aa7069` merged in PR #221") == []
+
+
+def test_unreachability_parser_links_current_branch_claim_to_prior_sentence():
+    """CDCR-002. A handoff commonly names the branch and commits first,
+    then states the branch's current reachability in the next sentence."""
+    text = (
+        "The implementation is on branch `codex/example`: commits `2f4e41d`, "
+        "`88d517c`, `67877f8`, and `dfefecf`. "
+        "The branch remains local-only at this handoff and must not be treated "
+        "as reviewed or merged."
+    )
+    assert set(_repository_commits_claimed_unreachable(text)) == {
+        "2f4e41d",
+        "88d517c",
+        "67877f8",
+        "dfefecf",
+    }
+
+
+def test_unreachability_parser_ignores_negated_and_historical_claims():
+    """CDCR-002. Wider scope must not turn corrections into new findings."""
+    examples = (
+        "`2f4e41d` is merged mainline, not local-only.",
+        (
+            "The work was on branch `codex/example`: commit `2f4e41d`. "
+            "That branch was local-only when this section was written; it has "
+            "since merged."
+        ),
+        (
+            "Merged branch `codex/complete` contains `2f4e41d`. "
+            "A separate branch remains local-only while its review continues."
+        ),
+    )
+    for text in examples:
+        assert _repository_commits_claimed_unreachable(text) == [], text
 
 
 def test_sell1_current_records_do_not_reopen_merged_review_work():

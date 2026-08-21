@@ -34,7 +34,7 @@ def _config(universe=("AAA", "BBB")) -> dict:
     return {
         "stream_name": "strongbuy-ratings",
         "preregistration": (
-            "docs/research/"
+            "docs/Archive/Research/"
             "STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md"
         ),
         "cadence": "monthly-first-weekday-1715-ET",
@@ -203,7 +203,7 @@ def test_config_refusals(tmp_path: Path):
 
 def test_committed_config_is_loadable_and_frozen_shape():
     root = Path(__file__).resolve().parents[1]
-    config = load_config(root / "docs" / "operations"
+    config = load_config(root / "docs" / "Archive" / "Operations"
                          / "strongbuy_ratings_config.json")
     assert config["stream_name"] == "strongbuy-ratings"
     assert len(config["universe"]) == 102

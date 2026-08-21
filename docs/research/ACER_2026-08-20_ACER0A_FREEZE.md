@@ -102,16 +102,20 @@ Rules:
   accidental launches — is appended to `docs/alpha-result.md` as a new
   `R-nnn` entry with full identity, and counts permanently. Records are
   never removed.
-- A corrected rerun may repair **code** but may not change the hypothesis,
-  parameters, universe, controls, or gates. Each corrected rerun is itself a
-  recorded look; repairing a bug does not restore the budget.
+- **No corrected rerun is authorized at present.** With exactly two slots, any
+  corrected rerun would be a third real-outcome execution, and whether one may
+  ever happen is precisely what ACER-0A.9 has to rule. If the owner does
+  authorize one, these constraints apply and are not themselves the
+  authorization: it may repair **code** only, never the hypothesis,
+  parameters, universe, controls, or gates; it is itself a permanently
+  recorded look; and repairing a bug does not restore a consumed slot.
 - The confirmation period stays untouched until the single frozen
   confirmation pass. It is not inspected, plotted, or summarized before then.
 - The owner has not yet ruled whether an error or refusal merely consumes its
   slot or ends ACER-2. That failure rule, the exact development/confirmation
   date boundaries, and the confirmation pass rule are open item ACER-0A.9.
-  Therefore this section does not authorize a third "corrected" run or any
-  attempt to replace a consumed slot.
+  Until it is ruled, no third run and no replacement of a consumed slot is
+  permitted under any reading of this section.
 
 ## 5. Benchmark policy
 

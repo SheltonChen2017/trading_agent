@@ -18,9 +18,9 @@ correction review. Section 7bv records the later ACER replacement, 7bw its
 independent review, 7bx the counter-review, 7by the vendor audit, 7bz the
 independent correction review, 7ca the counter-review of that correction,
 7cb the ACER event backbone, 7cc its independent review, 7cd the
-counter-review of that review, 7ce the ACER-0A submission, and 7cf Codex's
-independent correction review; 7cf and section 8 are the current development
-state.
+counter-review of that review, 7ce the ACER-0A submission, 7cf Codex's
+independent correction review, and 7cg the counter-review of that review;
+7cg and section 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -3792,6 +3792,62 @@ payloads and epoch counts. No QuantConnect, Massive/Benzinga or broker API
 was accessed; no outcome, signal, licensed row, run or research look was
 consumed. Application/execution code did not change, so paper mode, approvals,
 kill switch and broker lifecycle were out of scope rather than re-proven.
+
+## 7cg. Counter-review of the ACER-0A review (Claude, 2026-08-21)
+
+Branch: `user/claude/acer0a-cr-issuer-mapping-20260821`, based on Codex's
+`e9eb120`. Full record:
+`docs/Review/REVIEW_2026-08-21_ACER0A_COUNTERREVIEW.md`.
+
+**All four findings confirmed.** ACER0AR-001 is the most serious defect found
+against my work in this program: I labelled a document a freeze while its
+**primary encoding was not computable**. "Ordinal rating-notch change" is the
+designated primary cell, and no notch scale exists in the freeze, the ACER
+plan, or the code — `tests/test_acer_normalization.py` actively forbids one
+pending ACER-0. I had written that guard myself, so I knew the scale was
+undecided, and still froze a primary cell that depended on it. The same hole
+covers residualization form, Pearson-versus-Spearman IC, folds and purge, and
+period boundaries. Reclassifying to a partial decision freeze with
+ACER-0A.5–0A.10 is the honest shape.
+
+ACER0AR-003 was verified by fresh measurement rather than accepted: there are
+**four** `TradingAgent-Paper-*` tasks, not the three I wrote a completeness
+claim about; `PaperObservation` carries `DaysOfWeek=62` (Mon–Fri) with a
+16:30−07:00 boundary, confirming the corrected "weekdays at 23:30Z"; and
+`OperationsCycle` repeats at `PT10M`. My worse error was rhetorical: the
+diagnosis document disclosed that only 7 of 22 long gaps were inspected, and
+then my handoff and action-plan summaries asserted that *every* long gap
+matched a sleep window — the caveat was dropped exactly where the claim got
+stronger. I had also written that a firing inside a sleep window is "skipped
+rather than deferred" while quoting the `StartWhenAvailable=True` setting
+that queues missed starts.
+
+**One residual defect fixed (CCR0A-001, P3):** the ACER0AR-002 correction
+left two adjacent bullets in contradiction — one describing how "a corrected
+rerun may repair code", the next saying the section does not authorize a
+third corrected run. With exactly two slots, any corrected rerun *is* a third
+run. Rewritten to say plainly that none is authorized now, and that the
+listed constraints would apply only if the owner authorizes one under
+ACER-0A.9.
+
+**One item surfaced without change (CCR0A-002):** Codex relabelled a document
+the owner explicitly called "the ACER-0A freeze" to "PARTIAL FREEZE". I agree
+with the substance and left it, because no owner decision was weakened and
+the frozen decisions remain binding — but a reviewer changing the label on an
+owner act should be visible to the owner rather than discovered later.
+
+Codex's three new guards were mutation-tested and all three detect their
+regression. I also checked specifically that the scheduler guard's predicate
+is true — the installer does contain `-StartWhenAvailable` — because a
+conditional guard whose predicate is false is a green test that verifies
+nothing.
+
+**Standing workflow note:** per the owner's 2026-08-20 instruction this
+branch carries the counter-review *and* the next feature, against
+`CLAUDE.md` sections 3 and 11 which ask for one milestone per branch. That is
+the owner's explicit instruction, recorded here so a reviewer reads it as
+intent rather than drift; the two are kept as separate commits so each can
+still receive its own disposition.
 
 ## 8. What is next
 

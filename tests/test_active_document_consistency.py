@@ -1033,3 +1033,19 @@ def test_measured_sbr_absence_is_not_still_called_unmeasured():
     acer = _text("reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
     if "SBR-1 capture: measured absent" in facts:
         assert "task and artifact state has not been measured" not in acer
+
+
+def test_active_acer_identity_docs_do_not_turn_missing_evidence_into_safety():
+    """The name-only diagnostic is a lower bound, never an allowlist."""
+    measurement = _text("research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md")
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    handoff = _text("SESSION_HANDOFF.md")
+
+    for document in (measurement, action, handoff):
+        assert "no_name_based_ambiguity_evidence" in document
+        assert "768" in document
+
+    assert "BBBY scores *unambiguous*" not in handoff
+    assert "allowlist" in measurement.lower()
+    assert "lower bound" in measurement.lower()
+    assert "external" in action.lower() and "security master" in action.lower()

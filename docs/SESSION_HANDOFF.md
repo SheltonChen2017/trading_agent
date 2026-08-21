@@ -20,8 +20,8 @@ independent correction review, 7ca the counter-review of that correction,
 7cb the ACER event backbone, 7cc its independent review, 7cd the
 counter-review of that review, 7ce the ACER-0A submission, 7cf Codex's
 independent correction review, 7cg the counter-review of that review, and
-7ch the issuer-identity detector; 7ch and section 8 are the current
-development state.
+7ch the submitted issuer-identity detector, and 7ci Codex's independent
+correction review; 7ci and section 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -3897,8 +3897,9 @@ found only because interleaving is detected rather than smoothed over.
 **The result that matters most is negative: this detector misses BBBY.** The
 vendor labels all 270 BBBY events `Bed Bath & Beyond` from 2012 through 2026,
 including events after the 2023 bankruptcy when the symbol was reused by an
-unrelated issuer. It never relabels, so no name signal exists and BBBY scores
-*unambiguous* — a false negative on the exact hazard that motivated the work.
+unrelated issuer. It never relabels, so no name signal exists and the
+submitted detector reported BBBY as *unambiguous* — a false negative on the
+exact hazard that motivated the work.
 Two consequences: the 2,885 flags are a **lower bound**, and an unflagged
 ticker is not established as safe; and an external security master with
 listing/delisting dates is **required**, not a better heuristic. That makes
@@ -3919,6 +3920,57 @@ Untested surface, stated plainly: the detector has been exercised against one
 snapshot and synthetic cases only. Its false-negative class is characterized
 but not bounded — nobody knows how many BBBY-shaped reuses exist, because
 finding them is precisely what needs the security master this host lacks.
+
+**Independent-review correction:** section 7ci supersedes this section's
+safety-shaped `unambiguous` verdict, detachable refusal-list output, and
+order-sensitive 766 interleaving count. The submitted measurement remains
+historical evidence; it must not be used as an eligibility boundary.
+
+## 7ci. Independent review of the issuer-identity diagnostic (Codex, 2026-08-21)
+
+Codex reviewed exact pushed range
+`e9eb12010c317df9cedcb610c50e1375531404e1..703693bc43b62c7f6f23ed5c42e0a4f7a99b278c`
+from `origin/user/claude/acer0a-cr-issuer-mapping-20260821`, including both
+submitted commits in order. Commit `7b56e10` is **accepted**. Commit
+`703693b` is **accepted after correction**. The durable review record is
+`docs/Review/REVIEW_2026-08-21_ACER_ISSUER_IDENTITY.md`, committed with the
+corrected active research status at
+`d248e0ec5b19f23512e1b820d8d23c5fb397c5b9`.
+
+The review closed four findings. Three were P2: the absence of name evidence
+was mislabeled `unambiguous` and exposed through a bare refusal-list export;
+the report discarded source/code/result lineage while the shared clean-code
+helper omitted ignored Python under `research/`; and ticker case could split
+one symbol into two assessments. One P3 made same-day interleaving dependent
+on vendor/caller row order and described every sub-365-day change as having
+no gap. Correction commit
+`1805ec7b96bc62afd6c1f6019ec68b9b8f9587f5` replaces the verdicts with
+`name_based_ambiguity_evidence` and
+`no_name_based_ambiguity_evidence`, exports only immutable lineage-bound
+diagnostic JSON with a lower-bound warning, binds verified source,
+normalized-dataset, clean-code, contract, and assessment identities,
+includes `research/` in clean-code detection, canonicalizes ticker case, and
+adds a deterministic same-day tie-break. Three dangerous-direction tests
+were proved red on the submitted code before passing on the correction.
+
+The corrected clean-commit Snapshot A result remains 2,885 flagged tickers
+and 208,653 flagged events (35.6723%), but deterministically reports **768**
+interleaving flags rather than the submitted 766. Its exact lineage is source
+manifest `51954daea8432136b9c99fb4d5088e0c672664e9384475635110dd33e08a2e85`,
+normalized dataset `acer-analyst-events-73c36f9de1841b0a` under contract v2,
+diagnostic contract v1, clean code `1805ec7b96bc62afd6c1f6019ec68b9b8f9587f5`,
+and assessment SHA-256
+`8a020211e8ef5482abcceaa78a6d5f374bf8c0e9f60e2593db461d4f7b304a0b`.
+BBBY now receives `no_name_based_ambiguity_evidence`, which states only that
+the vendor names did not reveal its known symbol reuse; it is not a safety
+verdict.
+
+No vendor API, QuantConnect, price, outcome, signal, backtest, broker,
+scheduled task, operator database, or deployment path was touched, and no
+research look was consumed. The measurement is accepted only as a
+name-evidence lower-bound diagnostic, **not an allowlist** and not a security
+master. Issuer mapping remains blocked pending an owner-selected external
+point-in-time security-master path. No milestone completes.
 
 ## 8. What is next
 
@@ -3954,15 +4006,16 @@ Earnings **structural audit** and only then adopt or reject that control
 dataset and freeze the standardized-surprise formula; and run Snapshot B
 after the declared interval.
 
-**The issuer-mapping step is BLOCKED and needs an owner ruling (section
-7ch).** There is no local LEAN or LEAN data on this host, and the QC client's
+**The issuer-mapping step is BLOCKED and needs an owner ruling (sections
+7ch–7ci).** There is no local LEAN or LEAN data on this host, and the QC client's
 allowlist deliberately excludes data endpoints, so read-only QC symbol
 mapping has no available path. The options are to install local LEAN with its
 data, to widen the allowlist to a read-only data path (a change to a reviewed
 control), or to nominate a different security-master source. This cannot be
 deferred by improving the heuristic: name evidence provably misses the
 BBBY-class reuse, so the 2,885 flagged tickers are a lower bound and an
-unflagged ticker is not established as safe. **ACER-2 remains
+unflagged ticker is `no_name_based_ambiguity_evidence`, not established as
+safe. The corrected deterministic interleaving count is 768. **ACER-2 remains
 the decisive milestone:** a null primary result closes the program. No
 purchase beyond the authorized $99 audit, no price or outcome join, no
 backtest, no QC upload, and no paper execution is authorized. LEV remains

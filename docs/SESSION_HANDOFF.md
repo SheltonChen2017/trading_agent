@@ -4728,6 +4728,16 @@ including `research/` and `tests/`; diff checks and document-path integrity
 passed. No milestone entry was added because this round corrects readiness
 and repository organization rather than completing an ACER milestone.
 
+The owner then added the standing documentation rule implemented in
+`ce066a8`: every implementation/review commit series must update the
+authoritative associated record whose truth changed and this Session Handoff,
+but no unrelated documents. The Action Plan is now explicitly a thin
+sequencing index; it changes only for priority, milestone status, gates, or the
+next authorized step, and then only by linking to the detailed associated
+record. Documentation-only and handoff commits do not recursively trigger
+another documentation cycle. The new active-document guard passed **48
+tests** after the policy was recorded.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**

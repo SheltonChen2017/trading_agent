@@ -1,4 +1,4 @@
-# Session handoff — full research/QuantConnect audit and documentation reset
+# Session handoff — current project state
 
 Prepared: 2026-08-17 by Codex after a clean-slate review of every research and
 QuantConnect module changed during the 2026-08-16/17 alpha work, correction
@@ -31,8 +31,10 @@ fail-closed correction of those checks, and 7cr the counter-review that
 attempted to complete the requirement set. Section 7cs records Codex's
 independent correction of the remaining false-completeness path, 7ct the
 counter-review that attempted to fix the derivation guard, and 7cu Codex's
-independent verification and correction of that guard; 7cu and section 8 are
-the current development state.
+independent verification and correction of that guard. Section 7cv records
+the provider-neutral capability correction, and section 7cw records the
+owner-directed role swap, measured local access state, and documentation
+lifecycle reset; 7cw and section 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -46,25 +48,25 @@ program is closed (`A-001`, `A-002`) and is no longer the entry point.
 2. `docs/ACTION_PLAN_2026-08-20.md` — the go-to plan (ACER first)
 3. `docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` — the **partially frozen
    ACER-2 decision record** and its ACER-0A.1–0A.10 completion ledger
-4. `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — the ACER
+4. `docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — the ACER
    contract shape; ACER-0A incomplete, ACER-0B deliberately still draft
 5. `docs/reference/analyst-consensus-etf-strategy.pdf` — the owner-supplied
    design narrative; the Markdown ACER contract governs where they differ
-6. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
+6. `docs/Archive/Research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
    the closed historical capture contract
-7. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
-   `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md` and
-   `docs/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md` and
-   `docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md` and
-   `docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md` — the full
+7. `docs/Archive/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
+   `docs/Archive/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md` and
+   `docs/Archive/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md` and
+   `docs/Archive/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md` and
+   `docs/Archive/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md` — the full
    SBP review chain, in order
 8. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
 9. `docs/operations/OPERATIONS_RUNBOOK.md`
 10. `docs/operations/MANDATE.md` (§2, §4, §6)
 11. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 12. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-13. `docs/alpha-result.md` — the permanent run ledger (append-only)
-14. `docs/Alpha_Test_Implementation_Plan.md` — closed program, historical
+13. `docs/Archive/Research/alpha-result.md` — the permanent run ledger (append-only)
+14. `docs/Archive/Plans/Alpha_Test_Implementation_Plan.md` — closed program, historical
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -106,7 +108,7 @@ operator-database mutation, or scheduled-task change.
 - The 2026-08-17 Fable counter-review (section 7o) ran on
   `user/claude/alpha-qc-full-counterreview-20260817`, created from the exact
   object `5730f7b`, ended at `6bd962f`, and was merged by PR #243; its record is
-  `docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`.
+  `docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`.
 - Codex correction branch:
   `codex/review-alpha-qc-fable-counterreview-20260817`, based on exact Fable
   head `6bd962f`. Product/test correction `ac96d47` closes the four Stage 0
@@ -146,7 +148,7 @@ operator-database mutation, or scheduled-task change.
   invalid/refused/unanalysed/provenance states. The closed cross-sectional
   alpha-program floor is 452 cells at A-002; APQ's separate three-cell family
   does not change it.
-- `docs/Alpha_Test_Implementation_Plan.md` is a **closed historical
+- `docs/Archive/Plans/Alpha_Test_Implementation_Plan.md` is a **closed historical
   contract**, not the current work queue. The replacement Action Plan puts the
   draft Strong-Buy program first.
 - PR #234 first merged the prior Codex REBAL-3V/3W review through
@@ -158,14 +160,14 @@ operator-database mutation, or scheduled-task change.
   `3d58f6b`.
 - That prior reviewed literal range was `f63fe2c..3d58f6b`. It contains, in order,
   `db0045a`, `4de88d0`, `046afc3`, and merge `3d58f6b`; all four have an
-  explicit disposition in `docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md`.
+  explicit disposition in `docs/Archive/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md`.
 - That prior review branch was `codex/review-alpha-battery-20260816`.
   Product/test correction `124192ff3e29c3fc62f0c9e8bf95b9aadf216915`
   was merged by PR #237 before current `main`.
 - The submitted alpha result and audit artifacts are **invalidated pending a
   clean rerun**. At the owner's direction, invalid generated Markdown, JSON,
   and raw logs were removed from active docs only after their exact identities,
-  hashes, and dispositions were preserved in `docs/alpha-result.md` and Git
+  hashes, and dispositions were preserved in `docs/Archive/Research/alpha-result.md` and Git
   history. Nothing was promoted to the research registry or Feature Milestone
   Record.
 - The operational checkout remains separate and is frozen at `c9d0740`,
@@ -212,7 +214,7 @@ UNDEPLOYED: the operational runtime remains frozen at `752d3b7`.
 
 Issue summary: no P0, no P1, eight closed P2 findings, one closed P3 finding,
 and no open review issue. The complete evidence/reason/correction/verification
-ledger is in `docs/Review/REVIEW_2026-08-15_REBAL1_STAGE3.md`.
+ledger is in `docs/Archive/Review/REVIEW_2026-08-15_REBAL1_STAGE3.md`.
 
 The implementation-quality rating is **6.5/10 as submitted**. Claude made the
 right architectural choices—separate module, strict restoration bound,
@@ -335,7 +337,7 @@ is recorded here.
 
 Branch `user/claude/rebal1-stage3-counterreview-20260815`, based on Codex's
 review tip `0c91aa4`. Ledger in
-`docs/Review/REVIEW_2026-08-15_REBAL1_STAGE3_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-15_REBAL1_STAGE3_COUNTERREVIEW.md`.
 
 All nine of Codex's findings were re-derived on a worktree at the submitted
 tree `bedeea2` and all nine are real.
@@ -389,7 +391,7 @@ combined the whole chain -- Stage 3 (`bedeea2`), Codex's review
 (`0c91aa4`), the counter-review (`c48861e`), and this work -- and PR #230
 merged all of it into `main` at `84e73af`. The branch has since been
 deleted; its content is contained in that merge.
-Disposition in `docs/Review/REVIEW_2026-08-15_REBAL1_STAGE3_END_TO_END.md`.
+Disposition in `docs/Archive/Review/REVIEW_2026-08-15_REBAL1_STAGE3_END_TO_END.md`.
 
 `tests/test_rebalance_trim_end_to_end.py` invents no shapes. Fills are
 journaled through `journal_broker_order_update`, the ledger and coverage come
@@ -484,7 +486,7 @@ Validation for this round, on the settled tree in the repository `.venv`
   full suite was restarted afterwards so the recorded result validates the
   final tree.
 
-See `docs/Review/REVIEW_2026-08-15_REBAL1_FEASIBILITY_VISIBILITY.md`.
+See `docs/Archive/Review/REVIEW_2026-08-15_REBAL1_FEASIBILITY_VISIBILITY.md`.
 
 ## 7e. The trim refusal stated a reason that was not true (this round)
 
@@ -539,7 +541,7 @@ Validation for this round, repository `.venv`, Python 3.13.14, Streamlit
   had eighteen bare-LF lines from scripted editing and was normalized to
   CRLF before the recorded runs.
 
-See `docs/Review/REVIEW_2026-08-15_REBAL1_TRIM_REFUSAL_ACCURACY.md`.
+See `docs/Archive/Review/REVIEW_2026-08-15_REBAL1_TRIM_REFUSAL_ACCURACY.md`.
 
 **Operational note for whoever exercises Stage 3 next.** On a book whose
 profiled sleeves are all inside or below their bands, Stage 3 correctly has
@@ -593,7 +595,7 @@ range contains eight commits, including three merges.
 
 Outcome: **accepted after correction; 0 P0, 0 P1, 0 P2, 5 closed P3,
 0 open.** The complete evidence/reason/correction/verification ledger is in
-`docs/Review/REVIEW_2026-08-15_REBAL3V_REBAL3W_INDEPENDENT.md`.
+`docs/Archive/Review/REVIEW_2026-08-15_REBAL3V_REBAL3W_INDEPENDENT.md`.
 
 Product/test correction `3a506ae` does four things. It replaces the generic
 two-helper overweight API with one immutable classification returning both
@@ -632,7 +634,7 @@ The review started only after fetching exact pushed `origin/main` head
 
 Outcome: **0 P0, 0 P1, 5 closed P2, 2 closed P3, 0 open code
 issue.** Full evidence, reasons, corrections, and verification are in
-`docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md`.
+`docs/Archive/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md`.
 
 Correction `124192f` makes a future run honest: 10,000-draw stationary
 bootstrap resolution can cross the declared threshold; signed-weight turnover
@@ -686,7 +688,7 @@ non-joint/wrong-window residual momentum; wrong/reused/averaged turnover;
 an understated 135 family that omitted IC and dropped a construction;
 fail-open split-log parsing; mismatched/no-cost benchmarks; and absent cloud
 run provenance. Full evidence and exact corrections are in
-`docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`.
+`docs/Archive/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`.
 
 Product/test correction `e8eb558` was created locally for the one authorized
 final push at the end of this review; a resuming agent must verify the recorded
@@ -735,10 +737,10 @@ refuses missing, duplicate, or universe-gap histories rather than treating
 adjacent deque values as adjacent daily returns. Behavioral tests cover both
 horizons, short/misaligned factor history, and exact/missing/duplicate dates.
 Four P2 and one P3 findings are closed; none remains open. Full detail is in
-`docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`.
+`docs/Archive/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`.
 
 Documentation commit `e1aedc7` creates
-`docs/Alpha_Test_Implementation_Plan.md`, corrects `docs/alpha-result.md`, and
+`docs/Archive/Plans/Alpha_Test_Implementation_Plan.md`, corrects `docs/Archive/Research/alpha-result.md`, and
 updates the Action Plan. The ledger now counts five run-level looks and 80
 emitted repeated-look cells, giving a conservative lifetime alpha-cell floor
 of 428. It records exact log hashes/backtest IDs while marking absent compile
@@ -768,7 +770,7 @@ ended the review on branch `user/claude/alpha-qc-round-20260816` at
 was performed on isolated branch `codex/review-alpha-qc-round2-20260817`.
 
 The ordered range and explicit dispositions are in
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`. Six round-1 Codex commits are
+`docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`. Six round-1 Codex commits are
 accepted carried-forward history, not relabeled as a fresh review. Claude's
 `af045ee` counter-review is accepted without correction. Stage 1 commit
 `dc63eec` is accepted only after `b143c60`.
@@ -806,7 +808,7 @@ validation is recorded in the round-2 report and final documentation commit.
 No QuantConnect authentication, upload, compile, backtest, result read or
 market statistic occurred. No broker, order, deployment, database, scheduler,
 policy, mandate, registry or epoch state changed. The alpha-cell exposure
-floor therefore remains 428. `docs/alpha-result.md` contains no Stage 1 run;
+floor therefore remains 428. `docs/Archive/Research/alpha-result.md` contains no Stage 1 run;
 any run launched before Claude counter-review must be appended as
 `PENDING_REVIEW` and counted rather than reused.
 
@@ -815,7 +817,7 @@ any run launched before Claude counter-review must be appended as
 At the owner's request, Codex stopped treating Stage 1 as the audit boundary
 and reviewed all research/QC code created or changed during the day's alpha
 work. The exact per-commit dispositions and permanent P0-P3 ledger are in
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`. No QuantConnect API,
+`docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`. No QuantConnect API,
 cloud project, backtest, broker, order, operational database, scheduler, or
 epoch state was accessed or changed.
 
@@ -839,14 +841,14 @@ Product corrections `855941a` and `1e2b631` do the following:
   classifications are not point-in-time.
 
 The invalid result narratives, JSON artifacts, and raw logs named in
-`docs/alpha-result.md` were removed from active docs at the owner's direction.
+`docs/Archive/Research/alpha-result.md` were removed from active docs at the owner's direction.
 Their run IDs, statuses, hashes, look counts, and Git history remain. Frozen
 preregistrations and Method V2 remain under `docs/research/` as historical
 contracts, each with a current validity note. Review reports now live under
-`docs/Review/`, workflow rules under `docs/process/`, operational records
+`docs/Archive/Review/`, workflow rules under `docs/process/`, operational records
 under `docs/operations/`, and architecture records under
 `docs/architecture/`. The docs root contains only canonical/milestone/result
-documents. `docs/research/Alpha explanation.md` gives the owner a plain-
+documents. `docs/reference/Alpha explanation.md` gives the owner a plain-
 language explanation of each tested or planned alpha.
 
 There is still **no valid alpha result and no completed alpha milestone**.
@@ -866,7 +868,7 @@ active-document layout, and diff checks are clean after the final rerun.
 Claude counter-reviewed exact pushed head `b4e9ee0` of
 `codex/review-alpha-qc-round2-20260817` and fast-forwarded it into
 `user/claude/alpha-qc-round-20260816`. Full record:
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`.
 
 Verification was by seven independent mutations against the Codex head,
 deliberately different from the mutations the review reported using. Four
@@ -895,7 +897,7 @@ Codex reviewed exact pushed Claude commit `ad3b3a8`, whose only product-tree
 change is three regression tests. All three tests are worth retaining and the
 commit is **accepted after documentation correction**. Focused validation on
 the exact submitted commit passed 48 tests. The independent record is
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`.
+`docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`.
 
 One P3 documentation finding, CR2IR-001, was closed: the submitted handoff
 inherited pre-merge topology and still described `f0071bc`, an older shared
@@ -919,7 +921,7 @@ complete ten-commit chain `b143c60 .. 5730f7b` from the exact object
 named remote branch had already been merged and deleted; the head was
 verified via `refs/pull/242/head` and the merge tree proven byte-identical
 to `5730f7b`. Full record:
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`.
 
 All ten commits are accepted (the PR #242 merge as topology). Sixteen
 mutations were run: the three CR2 closures each reddened under their exact
@@ -943,7 +945,7 @@ behaviour, plus one documentation finding:
   working-tree hash; hashing the bare Git blobs mismatches on all fourteen
   artifacts, inviting a false tampering conclusion. All fourteen were
   re-verified under LF→CRLF conversion and the convention is now recorded in
-  `docs/alpha-result.md`.
+  `docs/Archive/Research/alpha-result.md`.
 
 Validation on the final tree: focused research/QC/document gate **167
 passed**; full suite **4,196 passed / 0 failed / 25 known dependency
@@ -984,7 +986,7 @@ validation is 36 QC-battery and 222 broader research/QC tests. The complete
 tree passed **4,203 tests / 0 failures / 25 known warnings in 867.87 seconds**;
 repository-wide compilation including `research/` was clean. Full review and explicit
 commit dispositions:
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`.
 
 **Current launch status: BLOCKED.** Publish the completed Codex branch only
 after final validation, then obtain an independent counter-review of its exact
@@ -1002,7 +1004,7 @@ still local-only, Claude first pushed it unchanged to
 `origin/codex/review-alpha-qc-fable-counterreview-20260817` at exact head
 `9e45803` to freeze the snapshot, then branched from that object. Full
 record:
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_CORRECTION_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_CORRECTION_COUNTERREVIEW.md`.
 
 All three commits (`ac96d47`, `dd664f9`, `9e45803`) are **accepted**. All
 four FQCV code findings were reproduced red on the pre-correction tree
@@ -1046,7 +1048,7 @@ Codex reviewed only the pushed remote
 `9e45803` through ordered commits `c2f594e`, `4ee9419`, and `9a7e9fc`.
 PR #244 merged that exact head at `b6f577e`; the merge and branch both have
 tree `0fe65449a58aaca1363fc9d4783ee89ccf1cfbcc`. Full record:
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_COUNTERREVIEW_VERIFICATION.md`.
+`docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_COUNTERREVIEW_VERIFICATION.md`.
 
 All three Claude commits are **accepted after one P3 test-sensitivity
 correction**. FCR-001's drifted long/short exit math and wiped-out refusal
@@ -1120,7 +1122,7 @@ R-numbers; R-005/R-006 remain counted.
 
 Codex reviewed the exact pushed range `423a818..eee4368` from remote branch
 `origin/user/claude/qc-stage0-run-20260817`, based on `1457169`. Full record:
-`docs/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_ROUND.md`.
+`docs/Archive/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_ROUND.md`.
 
 The two refusals, the stop decision, seven run-level looks, zero new cells,
 and unchanged 428-cell floor are accepted. All five commits are accepted
@@ -1163,7 +1165,7 @@ R-005/R-006 must never be overwritten or renumbered.
 Claude pushed Codex's local branch unchanged to freeze exact head `81db126`,
 then counter-reviewed it on `user/claude/qc-stage0-review-verify-20260817`.
 Full record:
-`docs/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_COUNTERREVIEW.md`.
 
 All three commits accepted; all six QCS0R findings confirmed, including the
 P1 in Claude's own boundary fix (new-month selection leaking backward onto
@@ -1262,7 +1264,7 @@ PENDING_REVIEW until Codex reviews `49e8160`..`d305ea0`.
 The serial rerun ran to completion overnight. Fourteen cloud runs this
 continuation (R-009..R-022, run-level look count now **TWENTY-THREE**),
 producing all nine Stage 0 cells on the same fixed tree, every one
-ledgered in `docs/alpha-result.md` with full identity and structural
+ledgered in `docs/Archive/Research/alpha-result.md` with full identity and structural
 round-trip through the frozen parsers, **no statistic observed anywhere**:
 
 - **Monthly battery:** R-009 (A_large, 619 spec-rows), R-011 (B_core,
@@ -1326,10 +1328,10 @@ explicit disposition, focused synthetic-fixture tests were run on
 PENDING_REVIEW logs. Verdict: all seven product/test commits and all
 twenty record commits **accepted**; conditionally cleared for the Stage 0
 analyser pass; **Stage 1 blocked** by two P2 findings. Full record:
-`docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md`.
+`docs/Archive/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md`.
 
 Claude counter-reviewed all eight findings the same day
-(`docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`,
+(`docs/Archive/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`,
 branch `user/claude/qc-stage0-counterreview-20260818`):
 
 - **S0R-001 (P2, confirmed):** `alpha_stage1_replications.py:444` still
@@ -1380,7 +1382,7 @@ in the safe order on branch `user/claude/qc-stage0-analysis-20260818`
    independently computed input hashes).
 2. **The single analyser pass** ran once: monthly family, short family,
    benchmark family. Outputs and their SHA-256s are recorded in ledger
-   entry **A-001** (`docs/alpha-result.md`).
+   entry **A-001** (`docs/Archive/Research/alpha-result.md`).
 3. **Headline result:** on the preregistered Bonferroni gate (0.05/180 =
    2.78e-4, 20,000 draws): **IC 0/44 pass; long-short 0/44 pass;
    long-only 6/88 pass; short battery 0/60.** MULTI_ALPHA_COMPOSITE on
@@ -1491,7 +1493,7 @@ inventory is load-bearing by stripping it from a real emitted log
 verified the VALID upgrade preceded the analyser outputs, and agreed
 with both contested counter-review classifications AND the deliberate
 settle-gate non-change (with four stated reasons). Record:
-`docs/Review/REVIEW_2026-08-18_S0R_HARDENING_REVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-18_S0R_HARDENING_REVIEW.md`.
 
 **One defect in the review report itself, flagged here as the
 acceptance record:** its section 9 claims full validation but the
@@ -1552,7 +1554,7 @@ remaining an owner decision.
 ## 7ad. Counter-review of the S0R hardening review: VERIFIED (2026-08-18)
 
 The authoring session counter-reviewed the independent review at
-`f84f5fa` (`docs/Review/REVIEW_2026-08-18_S0R_HARDENING_COUNTERREVIEW.md`,
+`f84f5fa` (`docs/Archive/Review/REVIEW_2026-08-18_S0R_HARDENING_COUNTERREVIEW.md`,
 branch `user/claude/s0r-hardening-counterreview-20260818`): all six
 tree-identity hashes re-verified exact; the upgrade-before-outputs
 timing re-verified (11:02:17 commit vs 11:03:23+ output mtimes;
@@ -1574,7 +1576,7 @@ independent re-verification, not a rubber stamp: it re-read `602dc0b`
 claim by claim, ran its own two reverse mutations (both red, restored),
 verified all nine owner merge trees, and accepted every commit with 0
 P0/P1/P2. It raised two P3s: **S0R2-001** (the nine run headings and
-two summary paragraphs in `docs/alpha-result.md` still said
+two summary paragraphs in `docs/Archive/Research/alpha-result.md` still said
 PENDING_REVIEW / "no statistic observed" above A-001 — confirmed and
 FIXED this round: headings retitled VALID, dated superseding notes
 appended, originals retained) and **S0R2-002** (the `2be903f` upgrade
@@ -1583,7 +1585,7 @@ UNANALYSED — closed without change on the final tree; the vocabulary
 rung PENDING_REVIEW → UNANALYSED → VALID is recorded for future
 rounds). Claude's counter-review executed the review's own §10
 checklist in full and verified its checkable claims 100%
-(`docs/Review/REVIEW_2026-08-18_S0R_FOLLOWUP.md` and
+(`docs/Archive/Review/REVIEW_2026-08-18_S0R_FOLLOWUP.md` and
 `…_FOLLOWUP_COUNTERREVIEW.md`). **The `602dc0b` review chain now has
 cross-vendor diversity: author + fresh Claude + Cursor/Grok, seventeen
 mutation executions across three sessions, all red.** The Stage 1 code
@@ -1632,7 +1634,7 @@ observed (stage gate 0.05/24; lifetime gate 0.05/452).
 
 Cursor/Grok reviewed the launch-driver delta (`08f23a1..f821fb1`) and
 **accepted both commits with zero findings**
-(`docs/Review/REVIEW_2026-08-18_STAGE1_LAUNCH_DRIVER.md`, pushed on
+(`docs/Archive/Review/REVIEW_2026-08-18_STAGE1_LAUNCH_DRIVER.md`, pushed on
 `user/cursor/review-stage1-launch-driver-20260818`): the diff is the
 two-entry FAMILIES table plus tests only; `require_clean=True` and the
 log-fetch `query` parameter (the two historical launch-plumbing defect
@@ -1689,7 +1691,7 @@ its fix must not re-invoke the analyser), S1R-002 and S1R-003 (stale
 STAGE1 row) — both confirmed and FIXED in this commit with the
 originals retained. Claude's counter-review executed the review's
 checklist in full and verified every checkable claim
-(`docs/Review/REVIEW_2026-08-18_STAGE1_RUNS.md` and
+(`docs/Archive/Review/REVIEW_2026-08-18_STAGE1_RUNS.md` and
 `…_RUNS_COUNTERREVIEW.md`). The closure record is now internally
 consistent everywhere: the cross-sectional alpha program on this
 universe is CLOSED, and no document any longer suggests otherwise.
@@ -1715,7 +1717,7 @@ Executed this round (branch `user/claude/analyser-hygiene-20260818`):
   citing the confirmed wide-band research result as mechanism while
   correctly not overclaiming it as evidence for the exact
   configuration. Nothing to change.
-- **Step 2 DRAFT:** `docs/reference/SHADOW_OBSERVATION_DESIGN.md` —
+- **Step 2 DRAFT:** `docs/Archive/Plans/SHADOW_OBSERVATION_DESIGN.md` —
   strategy-agnostic shadow-stream design (frozen-epoch registration,
   append-only observations, declared-unavailable outcomes, §6
   sufficiency reports, SHW-1..4 milestones, hard no-order/no-promotion
@@ -1771,7 +1773,7 @@ runner CLI), after this round's review.
 Cursor Grok 4.6 reviewed `66e2723..origin/main` at exact head
 `f40c2c1e9bac9f91788605d0274008131a27a932` (PRs #259 and #260 on top of
 Stage 1 closure). Report:
-`docs/Review/REVIEW_2026-08-18_POST_CLOSURE_MAIN.md`.
+`docs/Archive/Review/REVIEW_2026-08-18_POST_CLOSURE_MAIN.md`.
 
 **Accepted.** Every commit dispositioned. Focused tests 22 passed on an
 isolated worktree. Two reverse mutations red then restored (stage1
@@ -1802,7 +1804,7 @@ The Cursor/Grok post-closure review (`66e2723..f40c2c1`, accepted, five
 P3s, isolated-worktree mutations — the shared-worktree lesson adopted)
 was counter-reviewed on
 `user/claude/post-closure-counterreview-20260818`
-(`docs/Review/REVIEW_2026-08-18_POST_CLOSURE_COUNTERREVIEW.md`):
+(`docs/Archive/Review/REVIEW_2026-08-18_POST_CLOSURE_COUNTERREVIEW.md`):
 
 - **POST-001 confirmed by execution and understated** (registration also
   accepted near-empty dicts) — FIXED: storage round-trips every overlay
@@ -1860,7 +1862,7 @@ a contract test for the weight invariants; SHW-1's helpers updated for
 the new field. FIVE reverse mutations red then restored: band gate
 removed, baseline backfilled, gap rows skipped, partial imputation,
 alert dropped. Example config at
-`docs/reference/overlay_shadow_config.example.json`.
+`docs/Archive/Reference/overlay_shadow_config.example.json`.
 
 Deliberately NOT included: Windows scheduler installation (deferred to
 SHW-4 stream start — there is no stream to schedule yet) and any
@@ -1873,7 +1875,7 @@ requires the owner to freeze the defensive-carry preregistration's
 Cursor Grok 4.6 reviewed `d4c04c4..354a233` at exact head
 `354a233243d676aae05b1dc3bf53b29d6b96c2b3`
 (`origin/user/claude/shw2-overlay-runner-20260818`). Report:
-`docs/Review/REVIEW_2026-08-19_SHW2_OVERLAY_RUNNER.md`.
+`docs/Archive/Review/REVIEW_2026-08-19_SHW2_OVERLAY_RUNNER.md`.
 
 **Accepted with P2 blockers.** All three commits dispositioned. Focused
 tests 28 passed. One reverse mutation red then restored (baseline
@@ -1896,7 +1898,7 @@ SHW2-002 are fixed. Keep `paper-epoch-005` on `752d3b7`.
 
 Cursor/Grok reviewed SHW-2 (`d4c04c4..354a233`) and accepted the range
 with two P2 blockers and three P3s
-(`docs/Review/REVIEW_2026-08-19_SHW2_OVERLAY_RUNNER.md`, on
+(`docs/Archive/Review/REVIEW_2026-08-19_SHW2_OVERLAY_RUNNER.md`, on
 `user/cursor/review-shw2-overlay-runner-20260819`). Claude's
 counter-review (`…_SHW2_COUNTERREVIEW.md`, same branch) reproduced both
 P2 probes exactly and fixed everything fixable:
@@ -1925,7 +1927,7 @@ the owner's defensive-carry gate freeze.
 
 Cursor Grok 4.6 verified `78258af..128aac8` at exact head
 `128aac8b57e643b4eb8cfa098dc164ea31fb8a52`. Report:
-`docs/Review/REVIEW_2026-08-19_SHW2_FIX_VERIFICATION.md`.
+`docs/Archive/Review/REVIEW_2026-08-19_SHW2_FIX_VERIFICATION.md`.
 
 **Both P2s closed.** `27cb6dc` and `128aac8` accepted. Focused tests 32
 passed. Reverse mutations: baseline price-check drop red; available-only
@@ -1942,7 +1944,7 @@ remain unauthorized. `paper-epoch-005` stays on `752d3b7`.
 ## 7ao. SHW-2 fix verification accepted; SHW2-006/007 closed (2026-08-19)
 
 Cursor independently verified the counter-review fixes
-(`docs/Review/REVIEW_2026-08-19_SHW2_FIX_VERIFICATION.md`): both P2s
+(`docs/Archive/Review/REVIEW_2026-08-19_SHW2_FIX_VERIFICATION.md`): both P2s
 confirmed closed with its own reverse mutations, the Decimal
 declination accepted — and its mutation (c) caught an overclaim in the
 counter-review: deleting ONLY the calendar maturity guard stayed green,
@@ -1990,7 +1992,7 @@ document, and the scheduler installation deferred to SHW-4.
 Cursor Grok 4.6 reviewed `553da76..a384be7` at exact head
 `a384be7b3c332dc40f9996fd2706ab4c01fd0d3d`
 (`origin/user/claude/shw3-sufficiency-20260819`). Report:
-`docs/Review/REVIEW_2026-08-19_SHW3_SUFFICIENCY.md`. Written from an
+`docs/Archive/Review/REVIEW_2026-08-19_SHW3_SUFFICIENCY.md`. Written from an
 isolated worktree so the shared checkout could stay on Claude's
 gate-freeze branch.
 
@@ -2009,7 +2011,7 @@ registration + scheduler. Keep `paper-epoch-005` on `752d3b7`.
 
 Cursor/Grok accepted SHW-3 (`553da76..a384be7`) with two P3s, working
 in an isolated sibling worktree
-(`docs/Review/REVIEW_2026-08-19_SHW3_SUFFICIENCY.md`). Counter-review
+(`docs/Archive/Review/REVIEW_2026-08-19_SHW3_SUFFICIENCY.md`). Counter-review
 (`…_SHW3_COUNTERREVIEW.md`, on the review branch): **SHW3-001
 reproduced and FIXED** — sufficiency now reads closed epochs (a closed
 stream's evidence stays reportable forever; the report carries
@@ -2123,7 +2125,7 @@ epoch.** Owner options for sub-step 2:
   manage; would amend decision 5's mechanics.
 
 **Owner chose (b) 2026-08-19.** Execution order per
-`docs/EPOCH_005_ROLL_PLAN.md`'s preconditions and the runbook:
+`docs/Archive/Plans/EPOCH_005_ROLL_PLAN.md`'s preconditions and the runbook:
 
 1. THIS branch completes with the scheduler installer
    (`scripts/install_windows_overlay_shadow_task.ps1`, ML-installer
@@ -2157,7 +2159,7 @@ cost only grows — argues for executing promptly after review).
 Cursor Grok 4.6 reviewed `a384be7..a6a690c` (12 commits; the request
 said 11) at exact head `a6a690c29b5eefef7d227d8fde5b4990cad6da19` from
 isolated worktree `trading_agent-review-shw4`. Report:
-`docs/Review/REVIEW_2026-08-19_SHW4_STREAM_START.md`.
+`docs/Archive/Review/REVIEW_2026-08-19_SHW4_STREAM_START.md`.
 
 **Accepted after correction.** SHW3-001 independently mutation-verified
 (strict gate restored in `command_sufficiency` → closed-epoch
@@ -2184,7 +2186,7 @@ does **not** run the epoch roll or install the overlay tasks.
 
 Cursor/Grok reviewed `a384be7..a6a690c` (12 commits — correcting my
 11-count) and accepted after correction
-(`docs/Review/REVIEW_2026-08-19_SHW4_STREAM_START.md`): its P2 was a
+(`docs/Archive/Review/REVIEW_2026-08-19_SHW4_STREAM_START.md`): its P2 was a
 real defect in MY conflict resolution — merge `039e5cf` silently
 dropped the owner's STAGE2-PEAD-CLOSED action-plan row while the
 handoff narrative kept it; the reviewer restored it (SHW4-001) and
@@ -2233,7 +2235,7 @@ while every other identifier is unchanged (see the facts entry).
 Suggested range: everything since `de1beac` (2026-08-18's Stage 0
 acceptance) through current main — the Stage 0 closure, Stage 1
 campaign, post-closure pivot, SHW-1..4, the allocation-policy docs, the
-gate freeze, and this roll. All review records live in `docs/Review/`;
+gate freeze, and this roll. All review records live in `docs/Archive/Review/`;
 the per-round handoff sections 7z–7av are the narrative index.
 
 ## 7aw. APQ-1 implemented: the allocation-policy LEAN algorithm (2026-08-19)
@@ -2273,7 +2275,7 @@ counter-review note.
 Cursor Grok 4.6 reviewed `01508b1..e2c4a2b` (both commits on
 `origin/user/claude/apq1-allocation-policy-20260819`) from isolated
 worktree `trading_agent-review-apq1`. Report:
-`docs/Review/REVIEW_2026-08-19_APQ1_ALLOCATION_POLICY.md`. No QC.
+`docs/Archive/Review/REVIEW_2026-08-19_APQ1_ALLOCATION_POLICY.md`. No QC.
 
 **Accepted after APQ1-001.** Weights, window, union refusal, bind-time
 turnover, 24-month floor, and no `ACTIVE_UNIVERSE` match the frozen
@@ -2290,7 +2292,7 @@ not start APQ-2.
 ## 7ax. APQ-1 review counter-reviewed; all findings closed (2026-08-19)
 
 Cursor/Grok accepted APQ-1 after correction
-(`docs/Review/REVIEW_2026-08-19_APQ1_ALLOCATION_POLICY.md`): its P2 was
+(`docs/Archive/Review/REVIEW_2026-08-19_APQ1_ALLOCATION_POLICY.md`): its P2 was
 real and mine — the positivity check accepted `inf` into emitted
 returns and let `NaN` crash, where the frozen preregistration requires
 non-finite closes to refuse the date. The reviewer fixed it
@@ -2342,7 +2344,7 @@ reporting decision, then APQ-3 (the launch-driver hook).
 Cursor Grok 4.6 reviewed `92a0077..5364ae6` (both commits on
 `origin/user/claude/apq2-analyser-20260819`) from isolated worktree
 `trading_agent-review-apq2`. Report:
-`docs/Review/REVIEW_2026-08-19_APQ2_ANALYSER.md`. No QC.
+`docs/Archive/Review/REVIEW_2026-08-19_APQ2_ANALYSER.md`. No QC.
 
 **Accepted.** Nine tests passed. `fillna(1.0)→0.0` mutation red on the
 S0R-008 magnitude pin, restored green. Parser refusals and APQ1-003
@@ -2357,7 +2359,7 @@ This review does not start APQ-3 or authorize a cloud run.
 ## 7az. APQ-2 review counter-reviewed; schema ratified (2026-08-19)
 
 Cursor/Grok accepted APQ-2
-(`docs/Review/REVIEW_2026-08-19_APQ2_ANALYSER.md`) and — the round's
+(`docs/Archive/Review/REVIEW_2026-08-19_APQ2_ANALYSER.md`) and — the round's
 real event — **ratified the reporting decision before any run exists**:
 the excess-mean family is IN the schema (3 cells, 0.05/3, both labels);
 striking it later would be a new schema, never a post-result choice.
@@ -2426,7 +2428,7 @@ firings would have been `up to date` no-ops.
 
 Cursor Grok 4.6 reviewed `95a7210..1a63c8c` (both commits) from
 isolated worktree `trading_agent-review-apq3`. Report:
-`docs/Review/REVIEW_2026-08-19_APQ3_DRIVER_HOOK.md`. No QC.
+`docs/Archive/Review/REVIEW_2026-08-19_APQ3_DRIVER_HOOK.md`. No QC.
 
 **Accepted after APQ3-001.** Driver tests 18 passed. Plan mutations
 reproduced: empty `UNIVERSE_FREE_FAMILIES` reds 3 tests; dropping
@@ -2441,7 +2443,7 @@ This review does not execute APQ-4 or the elevated overlay reinstall.
 
 ## 7bd. APQ-3 review counter-reviewed; S4U class closed repo-wide (2026-08-19)
 
-Counter-review (`docs/Review/REVIEW_2026-08-19_APQ3_COUNTERREVIEW.md`)
+Counter-review (`docs/Archive/Review/REVIEW_2026-08-19_APQ3_COUNTERREVIEW.md`)
 VERIFIED the review. APQ3-001's closure was confirmed live twice over:
 the owner hit the missing-parameter prompts in real time, and the
 completed command re-registered all three overlay tasks — which now
@@ -2475,7 +2477,7 @@ policies on one shared date set, 216 rows, 0 declared-unavailable
 turnovers, 0 refusals; 54 ≥ the 24-month floor. **No statistic
 observed** (`parse_log` only; the algorithm holds no QC positions, so
 QC's runtime stats are untouched-account boilerplate). Ledgered as
-**R-029 UNANALYSED** in `docs/alpha-result.md`; run-level look
+**R-029 UNANALYSED** in `docs/Archive/Research/alpha-result.md`; run-level look
 29 → 30. Raw log stays machine-local under `artifacts/` (hash in the
 ledger); QC market data is never committed.
 
@@ -2561,7 +2563,7 @@ were subsequently placed **ON HOLD by owner decision 2026-08-19**.
 ## 7bj. Counter-review of the MPQ/HPQ plans (2026-08-19)
 
 Counter-review record:
-`docs/Review/REVIEW_2026-08-19_MPQ_HPQ_PLANS_COUNTERREVIEW.md`. Both
+`docs/Archive/Review/REVIEW_2026-08-19_MPQ_HPQ_PLANS_COUNTERREVIEW.md`. Both
 plans ACCEPTED as proposals with pre-freeze corrections applied in
 this round (they are drafts — editing before the owner freeze is the
 right time): the stale "while APQ-4 is in flight" sequencing replaced
@@ -2595,7 +2597,7 @@ frozen capture preregistration:
   snapshots, manifest/file hash mismatch, missing files, naive
   timestamps, malformed configs. No evaluation imports (AST-pinned):
   joining snapshots to prices stays forbidden until SBR-2.
-- `docs/operations/strongbuy_ratings_config.json`: frozen 102-ticker
+- `docs/Archive/Operations/strongbuy_ratings_config.json`: frozen 102-ticker
   NASDAQ-100 universe, deterministically extracted from the Wikipedia
   constituents wikitext (provenance + retrieval time recorded; a lossy
   model-extraction first attempt was REJECTED for hallucinated
@@ -2614,7 +2616,7 @@ owner-present elevated install and a first-firing verification.
 ## 7bl. Counter-review of the Codex audit: VERIFIED (2026-08-19)
 
 Counter-review record:
-`docs/Review/REVIEW_2026-08-19_POST_STAGE0_COUNTERREVIEW.md`. All six
+`docs/Archive/Review/REVIEW_2026-08-19_POST_STAGE0_COUNTERREVIEW.md`. All six
 behavioral corrections were independently re-verified red on the
 pre-correction files and green after (including the APQ month-label
 DID-NOT-RAISE); no test was deleted or weakened (SBR fixtures upgraded
@@ -2635,7 +2637,7 @@ by this audit and stays flagged.
 
 At the owner's request, Codex reviewed the proposed Strong-Buy direction and
 drafted the missing complete portfolio contract at
-`docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. The draft preserves the
+`docs/Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. The draft preserves the
 already frozen SBR-1 capture-only preregistration. It does not rewrite or
 silently expand that authority.
 
@@ -2721,7 +2723,7 @@ Codex formally reviewed exact pushed branch
 `origin/user/claude/sbp-plan-amendments-20260819`, base `5e3708e`, single
 submitted commit `5c42bfd`, and exact head `5c42bfd`. The one commit is
 **ACCEPTED AFTER CORRECTION**. Review report:
-`docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md`.
+`docs/Archive/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md`.
 
 Correction `5c3bf45` closes five P2 and two P3 findings. The submitted 33.8%
 value was one unpreserved all-candidate probe, not a hard ceiling over
@@ -2764,7 +2766,7 @@ mainline history.
 
 ## 7bp. Counter-review of the SBP review submitted (2026-08-20; clarified by 7bq)
 
-Record: `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md`. All three
+Record: `docs/Archive/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md`. All three
 rejections of my amendments are correct, and **SBPA-001 was refuted by
 re-running my own probe**: baskets built from the highest index-weight
 candidates renormalize to 51–68% overlap, so 33.8% was a property of the
@@ -2798,7 +2800,7 @@ Codex reviewed the one newly pushed commit on
 `origin/codex/review-sbp-plan-amendments-20260819`: prior verified head/base
 `9d02ee5`, submitted commit and exact remote head `f75e793`. Explicit
 disposition: **ACCEPTED AFTER CORRECTION**. Record:
-`docs/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md`.
+`docs/Archive/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md`.
 
 Claude's retractions are correct and its new SBPA-006 concept is useful: a
 security too young to supply 64 completed closes may be excluded before
@@ -2880,7 +2882,7 @@ changed. No milestone record entry was added: correcting stale prose is not a
 milestone.
 
 Not corrected here (out of the requested scope, still stale, and named so the
-next round can decide): `docs/Alpha_Test_Implementation_Plan.md`'s status
+next round can decide): `docs/Archive/Plans/Alpha_Test_Implementation_Plan.md`'s status
 header still says Stage 0 is halted with reruns beginning at R-007, though
 Stage 0 and Stage 1 closed null as A-001/A-002; and
 `docs/operations/GENERAL_READINESS_STATUS.md` /
@@ -2894,8 +2896,8 @@ instructions, in order: audit Codex's SBP amendments review; then compare all
 documentation against what the project actually does; then replace the Action
 Plan with the Strong-Buy initiative first.
 
-**1. Audit of `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md`:
-SUSTAINED** (`docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md`). All seven
+**1. Audit of `docs/Archive/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md`:
+SUSTAINED** (`docs/Archive/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md`). All seven
 findings verify against the plan text, correction `5c3bf45`, and Git; the
 one-commit range `5e3708e..5c42bfd` is complete; every claimed correction is
 present. Six findings the review did not make are recorded, four of them plan
@@ -2931,17 +2933,17 @@ exist. Corrected: the UI is **14 pages**, not the ten the README described,
 and its page names changed with TRADE-1/HEDGE-1/REBAL-1 (README now lists
 Budgeted/Discrete Buying, Policy Based/Discrete Selling, Hedging, and
 Portfolio Rebalancing, and the stale "Watchlist tab" references are gone);
-`docs/Alpha_Test_Implementation_Plan.md` no longer says Stage 0 is halted with
+`docs/Archive/Plans/Alpha_Test_Implementation_Plan.md` no longer says Stage 0 is halted with
 reruns beginning at R-007, since Stage 0 and Stage 1 closed null; the two
 `docs/operations/*_STATUS.md` companions had pre-reorganisation `docs/` paths
 and now say plainly that their milestone content is a dated snapshot;
-`docs/reference/README.md` gained the three missing archive rows. Measured
+`docs/Archive/Reference/README_legacy.md` gained the three missing archive rows. Measured
 figures that documents had quoted stale: `platform_readiness.py` 856 lines
 (not 778), `execution_service.py` 1,062 (not 900), `assistant/llm/` 9 modules
 (not 10). The new plan cites paths and behaviour instead of line counts.
 
 **3. `docs/ACTION_PLAN_2026-08-20.md` replaces the 2026-08-02 plan**, which is
-archived at `docs/reference/ACTION_PLAN_2026-08-02.md` with a superseded
+archived at `docs/Archive/Plans/ACTION_PLAN_2026-08-02.md` with a superseded
 banner. The successor is 317 lines against the predecessor's 769 (785 after
 its banner) and is
 organised by priority: Strong-Buy first (SBP-0 freeze is the only thing
@@ -2972,7 +2974,7 @@ Codex reviewed the exact merged range `c289f95..13355a6` on
 merge commits. The merge trees are identical to their submitted second-parent
 trees; neither merge added hidden conflict-resolution edits. Every commit is
 dispositioned in
-`docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md`.
+`docs/Archive/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md`.
 
 Verdict: **ACCEPTED AFTER CORRECTION**. Correction/review commit `390f3ad`
 closes one P2 evidence-status contradiction and five P3 plan/handoff defects.
@@ -2997,7 +2999,7 @@ branch was published by the counter-review round and merged by PR #285.
 
 Branch `user/claude/sbp-doc-cleanup-counterreview-20260820`, from Codex's exact
 head `8d16632`. Record:
-`docs/Review/REVIEW_2026-08-20_SBP_DOC_CLEANUP_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-20_SBP_DOC_CLEANUP_COUNTERREVIEW.md`.
 
 **Snapshot deviation:** Codex's branch was local-only, so the snapshot was
 frozen by branching from the exact local object and pushing this branch, which
@@ -3062,7 +3064,7 @@ the Strong-Buy portfolio program as priority 1. The owner supplied the source
 specification as a PDF, now versioned at
 `docs/reference/analyst-consensus-etf-strategy.pdf`
 (sha256 `3700ab4b…`, 138,347 bytes). Its operative contract shape for this
-repository is `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`
+repository is `docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`
 (ACER-0..7), status DRAFT — nothing frozen, purchased, scheduled, or run.
 
 **What ACER is, and why it is not SBP re-plumbed.** The signal moves from
@@ -3075,7 +3077,7 @@ preregistration, and an owner decision.
 
 **Consequences handled rather than left implicit:**
 
-- `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` is **SUPERSEDED while
+- `docs/Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md` is **SUPERSEDED while
   still a draft** — never adopted or frozen, so no capture, evidence, result,
   or operational state changes. Retained in full with SBPA-001..011 and its
   four-round review chain.
@@ -3164,7 +3166,7 @@ owner explicitly authorizes a push.
 
 Branch `user/claude/acer-review-counterreview-20260820`, from Codex's exact
 head `832b7cf`. Record:
-`docs/Review/REVIEW_2026-08-20_ACER_DOCUMENTATION_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-20_ACER_DOCUMENTATION_COUNTERREVIEW.md`.
 
 **Snapshot deviation:** Codex's branch was local-only in the worktree
 `trading_agent_codex_acer_review`; the snapshot was frozen by branching from
@@ -3330,7 +3332,7 @@ Exact pushed source:
 `35efda1b6f477eba697c99c76e665016792c0c9a`, base `8f681f9`, ordered range
 `13e8081`, `062f27f`, `eec4823`, `35efda1`. Review branch:
 `codex/review-acer1-benzinga-20260820`. Full record:
-`docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md`.
+`docs/Archive/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md`.
 
 Disposition: `13e8081` accepted; `062f27f`, `eec4823`, and `35efda1`
 accepted after correction. No P0/P1 issue. Six P2s were confirmed: the
@@ -3377,7 +3379,7 @@ owner merged to `main` via PR #288 (merge `7ab2f80`). This supersedes 7bz's
 closing status note, which was written before the owner authorized that
 merge: the review is now published and fetchable from any machine.
 Branch: `user/claude/acer1-audit-counterreview-20260820` off that merge.
-Full record: `docs/Review/REVIEW_2026-08-20_ACER1_AUDIT_COUNTERREVIEW.md`.
+Full record: `docs/Archive/Review/REVIEW_2026-08-20_ACER1_AUDIT_COUNTERREVIEW.md`.
 
 What was verified, against the immutable Snapshot A raw bytes and by running
 the corrected tool end to end:
@@ -3524,7 +3526,7 @@ the branch is deleted. Product/test
 correction `61abd6aeb8b2889bf9943b97af8224cd49a8c2d0` and
 review/documentation `aea84f4cc017f6e6a31091dee388c55b3e9b07fc` are committed
 separately; this section is the final handoff commit. Full record:
-`docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md`.
+`docs/Archive/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md`.
 
 No P0/P1 issue. Six P2s and one P3 were confirmed. The original normalizer
 kept the first valid occurrence of a duplicated vendor id; the identity
@@ -3575,7 +3577,7 @@ Snapshot B, ACER-0 freeze, control data, and licence boundaries remain open.
 
 Branch: `user/claude/acer-backbone-counterreview-20260820`, based on Codex's
 `06333ec`. Full record:
-`docs/Review/REVIEW_2026-08-20_ACER_BACKBONE_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-20_ACER_BACKBONE_COUNTERREVIEW.md`.
 
 **All seven of Codex's findings are confirmed.** The two with the largest
 blast radius were reproduced empirically against my own original code rather
@@ -3710,7 +3712,7 @@ installed or running, so there was nothing to stop for.
 
 **At the recorded read-only instant, both reconciliation alerts were stale
 state rather than a live mismatch**
-(`docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`). Seven of
+(`docs/Archive/Operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`). Seven of
 22 long reconciliation gaps match a Windows sleep window exactly; 15 were
 not correlated. The paper tasks are registered `WakeToRun=False`, while
 `StartWhenAvailable=True` queues missed time-based starts for catch-up. Both
@@ -3757,7 +3759,7 @@ Exact submitted remote: `origin/user/claude/acer0a-freeze-20260820` at
 `3a98fefb0808e4e9e4b3bc185ee59c12b1449bac`, based on and merge-based at
 `b58947e589c6fa92ed498f57f68ba0590048303f`. The range contained exactly one
 commit, which is **accepted after correction**. Full report:
-`docs/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md`.
+`docs/Archive/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md`.
 
 Review branch: `codex/review-acer0a-freeze-20260820`. Ordered Codex commits
 before this handoff are:
@@ -3809,7 +3811,7 @@ kill switch and broker lifecycle were out of scope rather than re-proven.
 
 Branch: `user/claude/acer0a-cr-issuer-mapping-20260821`, based on Codex's
 `e9eb120`. Full record:
-`docs/Review/REVIEW_2026-08-21_ACER0A_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-21_ACER0A_COUNTERREVIEW.md`.
 
 **All four findings confirmed.** ACER0AR-001 is the most serious defect found
 against my work in this program: I labelled a document a freeze while its
@@ -3944,7 +3946,7 @@ Codex reviewed exact pushed range
 from `origin/user/claude/acer0a-cr-issuer-mapping-20260821`, including both
 submitted commits in order. Commit `7b56e10` is **accepted**. Commit
 `703693b` is **accepted after correction**. The durable review record is
-`docs/Review/REVIEW_2026-08-21_ACER_ISSUER_IDENTITY.md`, committed with the
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_ISSUER_IDENTITY.md`, committed with the
 corrected active research status at
 `d248e0ec5b19f23512e1b820d8d23c5fb397c5b9`.
 
@@ -3994,7 +3996,7 @@ and shared-checkout checks gate the single authorized push.
 ## 7cj. Counter-review of the identity review (Claude, 2026-08-21)
 
 Branch: `user/claude/acer-identity-cr-prereg-20260821`, based on `84bec5d`.
-Full record: `docs/Review/REVIEW_2026-08-21_ACER_IDENTITY_COUNTERREVIEW.md`.
+Full record: `docs/Archive/Review/REVIEW_2026-08-21_ACER_IDENTITY_COUNTERREVIEW.md`.
 
 **All four findings confirmed by reproduction against my submitted code.**
 ACERIDR-001 is the best finding of the round and it is against me: I wrote a
@@ -4107,7 +4109,7 @@ Codex independently reviewed exact remote
 `020110b7af635187606fbe24469a78c2325711c9`. Commit `3e92b84` (identity
 counter-review) and commit `020110b` (completion proposals) are both
 **accepted after correction**. The complete disposition and P0-P3 ledger is
-`docs/Review/REVIEW_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
+`docs/Archive/Review/REVIEW_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
 
 Six findings were closed. Four P2 methodology defects would have permitted
 materially different or invalid implementations: normalizing by the sum of
@@ -4159,7 +4161,7 @@ completed, so `FEATURE_MILESTONE_RECORD.md` was correctly left unchanged.
 ## 7cm. Counter-review of the proposal review (Claude, 2026-08-21)
 
 Branch: `user/claude/acer-prereg-cr-20260821`, based on `734d521`. Full
-record: `docs/Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md`.
+record: `docs/Archive/Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md`.
 
 **Independent correction:** the CCPR-001 state-semantics concern remains a
 real owner choice, but the quantitative scan below is not decision-grade. It
@@ -4299,7 +4301,7 @@ Codex reviewed exact remote
 `5372d231755c9417b8df1889dd15339577cd3f4d` and
 `f93e24d7cbb282cac407a2c8b17c4eba6d90c064`. Both commits are **accepted
 after correction**. The complete record is
-`docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md`.
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md`.
 
 Three findings were confirmed. **ACERLDR-001 (P2):** the submitted CCPR-001
 scan did not isolate the effect it claimed to measure, used unresolved raw
@@ -4338,7 +4340,7 @@ and required `compileall` including `research/` passed on Python 3.13.14.
 ## 7cp. Counter-review, and checking instead of asserting (Claude, 2026-08-21)
 
 Branch: `user/claude/acer-databento-capability-20260821`, based on `381615b`.
-Full record: `docs/Review/REVIEW_2026-08-21_ACER_DATA_AUDIT_COUNTERREVIEW.md`.
+Full record: `docs/Archive/Review/REVIEW_2026-08-21_ACER_DATA_AUDIT_COUNTERREVIEW.md`.
 
 **All three findings confirmed; nothing found to correct in Codex's work.**
 First round in this program with no counter-finding, and the reason is that
@@ -4419,7 +4421,7 @@ Codex reviewed exact remote
 `9304f9cc9ccc6f734a4c90b0a1469b6f1e76436d`. The counter-review commit is
 **accepted**; the capability-checker commit is **accepted after correction**.
 The complete record is
-`docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`.
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`.
 
 Three P2 findings were reproduced. **ACERDCR-001:** the submitted
 `CapabilityFinding` allowed an unavailable or unmeasured required input to be
@@ -4458,7 +4460,7 @@ passed **47/47**; the complete repository suite passed **4,471 / 0 failed /
 ## 7cr. Counter-review, and the mirror-case rule (Claude, 2026-08-21)
 
 Branch: `user/claude/acer-capability-cr-20260821`, based on `2251983`. Full
-record: `docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COUNTERREVIEW.md`.
+record: `docs/Archive/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COUNTERREVIEW.md`.
 
 **All three findings confirmed by execution**, and every one is a fail-open
 path in a module I wrote specifically to fail closed. My submitted class
@@ -4525,7 +4527,7 @@ Reviewed exact remote branch
 `6fc00409249da1d0a4acf23c704f8381e550e5d9`, merge-base `2251983`, in ordered
 range `ff8ba6b`, `6fc0040`. Review branch:
 `codex/review-acer-capability-completion-20260821`. Full record:
-`docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`.
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`.
 
 Commit `ff8ba6b` is **accepted**: it correctly reproduces all three prior
 Codex findings and preserves the method error in its first probe. Commit
@@ -4564,7 +4566,7 @@ status checks passed before publication. The shared checkout remained on
 
 Branch: `user/claude/acer-capability-completion-cr-20260821`, based on
 `40a0a37`. Full record:
-`docs/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW.md`.
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW.md`.
 
 **ACERCCR-001 confirmed on every limb.** Last round I raised an
 incompleteness finding against this checklist, fixed it by adding one
@@ -4631,7 +4633,7 @@ Claude counter-review `438fb9156672808318c0bf81783d86dd9d3e4e3c` and merge
 commit `25cc6d4fca1918d05cd75db8acc4203fb07f5341`. The merge tree is
 byte-identical to its Claude parent. Both commits are **accepted after
 correction**; the complete ledger is
-`docs/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW_VERIFICATION.md`.
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW_VERIFICATION.md`.
 
 Two P2 defects were reproduced. First, the claimed exact accounting still
 accepted any string beginning with `derived from`; changing a dependency to
@@ -4652,6 +4654,79 @@ counter-reviewed. No milestone completes and no vendor, credential, licensed
 row, QuantConnect/LEAN outcome run, price join, backtest, research look,
 broker, task, operational database, deployment, or trading surface was
 accessed or changed.
+
+## 7cv. Provider-neutral ACER capability correction (Codex, 2026-08-21)
+
+The owner asked Codex to correct the capability inventory after a plan-to-code
+comparison found that it required **Databento by name** in addition to the
+point-in-time price/reference capabilities ACER actually needs. Branch
+`codex/fix-acer-provider-neutral-capabilities-20260821` separates required
+capabilities from optional provider diagnostics. `CapabilityFinding` remains
+strictly fail-closed for every required input; a new `ProviderFinding` carries
+Databento's structural evidence without a readiness-block field, and the
+required summary refuses provider records. The current required result is
+eleven capabilities: one available, five unavailable, five unmeasured, ten
+blocking, and `acer2_runnable=false`. Databento remains an unmeasured candidate
+and can satisfy nothing until audited, but an independently adequate QC, CRSP,
+or other approved route will no longer remain blocked merely because
+Databento was not selected.
+
+The dangerous-direction mutation reinserted Databento into the required-check
+tuple; the new regression failed, then the real implementation was restored
+and all 34 focused capability tests passed. No vendor API, credential,
+licensed row, purchase, download, price/outcome join, QuantConnect/LEAN run,
+research look, broker, database, task, deployment, or trading surface was
+accessed. The repository records the Benzinga Analyst Ratings expansion as
+purchased. It records only authorization—not purchase—for the separate $99
+Benzinga Earnings structural audit, and no current subscription supplies the
+remaining required market/reference/fundamental and terminal-return inputs.
+
+## 7cw. Role swap, local access measurement, and documentation lifecycle reset (Codex, 2026-08-21)
+
+The owner assigned **Codex as the ACER implementer and Claude as the
+independent reviewer** for the next development rounds. Codex completed the
+provider-neutral correction on branch
+`codex/fix-acer-provider-neutral-capabilities-20260821`: product/test commit
+`2f4e41d`, documentation-lifecycle commit `a1dc779`, and archived-path test
+correction `0a94bef`, followed by review-skill path correction `b0f7dec`.
+The branch remains local-only at this handoff and must not be treated as
+reviewed or merged.
+
+A names-only environment measurement found `MASSIVE_API_KEY`, `QC_USER_ID`,
+and `QC_API_TOKEN` present in the current Codex desktop process;
+`DATABENTO_API_KEY` was absent. None of those names was present in Windows
+User or Machine environment storage, so another process need not inherit the
+same values. No secret value was printed or committed. The `lean` command is
+not installed. Credentials establish possible authentication only: they do
+not prove dataset entitlements, licence permission, coverage, or fitness for
+ACER. No Massive, Benzinga, QuantConnect, Databento, broker, or other service
+was called in this round.
+
+The documentation tree now follows lifecycle rather than document type. The
+root contains only the current working set: Action Plan, ACER plan, Session
+Handoff, and Feature Milestone Record. Queued work is under `docs/Plan/`;
+implemented, closed, or superseded material is under `docs/Archive/`;
+process, operations, active research evidence, and current references retain
+their functional subfolders. Lifecycle indexes explain the rule. The final
+inventory is four root files, thirteen files under `docs/Plan/`, 167 under
+`docs/Archive/`, seven active research records, and two active references.
+Repository links and active-document guards were updated, and a path-integrity
+scan found no missing `docs/...` targets.
+
+The purchased Benzinga Analyst Ratings expansion is enough for the analyst-
+event side of ACER-1, not for ACER-2. Separate evidence/entitlements remain
+required for earnings estimates and standardized surprise, point-in-time
+prices and delisted coverage, terminal delisting returns, durable issuer and
+security identity, historical security type/primary-listing eligibility,
+corporate actions and total-return adjustment, point-in-time shares, value
+fundamentals, and sector taxonomy. The first complete run exposed thirteen
+archived Strong-Buy capture tests that still named the pre-move paths; those
+references were corrected and the focused capability/document/capture set
+passed **98 tests**. The final complete suite passed **4,487 tests / 0 failed
+/ 25 warnings** in 1,011.51 seconds. `compileall` passed over the full project,
+including `research/` and `tests/`; diff checks and document-path integrity
+passed. No milestone entry was added because this round corrects readiness
+and repository organization rather than completing an ACER milestone.
 
 ## 8. What is next
 
@@ -4700,15 +4775,18 @@ audit must establish access, history, known-delisted coverage, terminal-return
 semantics, price/volume and corporate-action completeness, licence, and cost
 before any purchase, download, or outcome work.
 
-The committed seven-requirement capability checker is independently accepted
-after fail-closed correction (section 7cq). It currently reports one
-available, four unavailable, two unmeasured, six blocking and
-`acer2_runnable=false`; it cannot substitute for the external Databento audit.
+The provider-neutral capability checker now carries eleven required
+capabilities and reports one available, five unavailable, five unmeasured, ten
+blocking and `acer2_runnable=false`. Databento is a separate unmeasured
+provider diagnostic, not a twelfth requirement. The checker cannot substitute
+for an external audit of whichever market/reference provider is selected.
 
-**The issuer-mapping step is BLOCKED and needs an owner ruling (sections
-7ch–7ci).** There is no local LEAN or LEAN data on this host, and the QC client's
-allowlist deliberately excludes data endpoints, so read-only QC symbol
-mapping has no available path. The options are to audit the existing Databento
+**The issuer-mapping step is BLOCKED pending an entitlement/path audit
+(sections 7ch–7ci and 7cw).** The current Codex process can see the three
+names-only Massive/QC credentials, but there is no local LEAN command or LEAN
+data and credentials alone do not prove access to the required security
+master. The options are to authorize a narrow read-only QC entitlement and
+symbol-mapping audit, audit the existing Databento
 reference path, install local LEAN with suitable data, widen the allowlist to a
 read-only data path (a change to a reviewed control), or nominate a different
 security-master source. This cannot be
@@ -4746,7 +4824,7 @@ APQ is closed null (R-029/A-003). SHW-4 is live and collecting its
 prospective 24-month stream. The SBP counter-review and its independent
 verification are merged into `main` by PR #282. The owner
 should first review the corrected proposed values in
-`docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. If accepted, SBP-0 must
+`docs/Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. If accepted, SBP-0 must
 verify official ETF pairs, machine-local snapshot count, the optional
 structural artifact, and power sensitivity before freezing. Until adoption,
 the frozen SBR-2-after-12-captures rule remains the authority; no snapshot may
@@ -4783,9 +4861,9 @@ the next operational observation is governed by
    (S0R-003 — the `nan` half verified by execution, the `inf` half a
    false alarm), one resolved by topology (S0R-006 — PR #249 merged
    `de1beac` into main after the review snapshot). Records:
-   `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md`
+   `docs/Archive/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md`
    (Cursor) and
-   `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`
+   `docs/Archive/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`
    (Claude). None of the eight findings invalidates the nine
    PENDING_REVIEW logs. **Next: the owner accepts or rejects the review
    pair. On acceptance, upgrade the nine ledger entries and run the
@@ -4807,7 +4885,7 @@ the next operational observation is governed by
    and evidence provenance. Only then run the frozen next QC stage. Record
    project, compile, backtest, exact source, log/result hashes, windows, and
    before/after look counts.
-3. Append every execution to `docs/alpha-result.md`; never rehabilitate or
+3. Append every execution to `docs/Archive/Research/alpha-result.md`; never rehabilitate or
    silently recreate historical invalid artifacts. A premature run is
    `PENDING_REVIEW`, still counted, and must be rerun from reviewed source.
 4. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
@@ -4862,20 +4940,21 @@ or roll an epoch without a new explicit owner instruction.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
-docs/SESSION_HANDOFF.md, docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
-docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
-docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
-docs/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md,
-docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md,
-docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md,
+docs/SESSION_HANDOFF.md, docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
+docs/Archive/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
+docs/Archive/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
+docs/Archive/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md,
+docs/Archive/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md,
+docs/Archive/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
 docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
-docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/alpha-result.md.
+docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/Archive/Research/alpha-result.md.
 The vendor-audit and event-backbone review chains are closed and merged
-(sections 7ca and 7cd). The newest independent review is section 7cu; it
-corrects the completion counter-review's still-fuzzy dependency guard and
-proposal/freeze conflation. **ACER-0A decisions are partially frozen,
+(sections 7ca and 7cd). Section 7cu is the latest completed independent
+review. Sections 7cv–7cw are new, local-only Codex implementation work and
+must be independently reviewed by Claude before merge. Codex is now the
+implementer and Claude the reviewer. **ACER-0A decisions are partially frozen,
 but its executable preregistration is incomplete; ACER-0B is deliberately
 not frozen.** The dataset
 identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
@@ -4885,15 +4964,19 @@ closed on a measurement. The CCPR-001 truncation percentages are withdrawn:
 they did not isolate the proposed state-semantics choice. The current
 EDGAR/yfinance path cannot support ACER's delisted outcomes, but Databento is
 an existing **unmeasured candidate**, not a validated solution. The corrected
-capability checker reports twelve requirements — one available, five
-unavailable, six unmeasured and eleven blocking — and refuses incomplete
-checklists; it does not replace vendor evidence. Next: obtain an owner ruling
-before any Databento API access, purchase or download; if
-authorized, run only a zero-outcome structural capability/cost/licence audit.
-Also close ACER-0A.1–0A.10, run the separately authorized Benzinga Earnings
+capability checker reports eleven required capabilities — one available, five
+unavailable, five unmeasured and ten blocking — and refuses incomplete
+checklists or provider diagnostics; Databento is separately reported as an
+unmeasured optional provider. It does not replace vendor evidence. Next:
+select and authorize a market/reference source. The current Codex process
+can see names-only Massive and QC credential variables, but this does not
+establish entitlements. Before any provider call, obtain the owner's narrow
+read-only authorization and measure access, coverage, licence, and cost
+without joining outcomes. Also close ACER-0A.1–0A.10, run the separately
+authorized Benzinga Earnings
 structural audit before adopting that control dataset, resolve issuer mapping
 with ambiguity refusals, and take Snapshot B after the declared interval.
-Local LEAN remains authoritative; keep reconstructable ratings off QC absent
+There is no local `lean` command. Keep reconstructable ratings off QC absent
 explicit permission evidence. Do not join ratings to prices or outcomes, run
 a backtest, deploy, trade,
 acknowledge or alter an operational alert, mutate an operational database, or
@@ -4903,9 +4986,9 @@ roll paper-epoch-006 without separate authorization.
 ## 9a. Archived 2026-08-17 resume prompt (historical only)
 
 ```text
-Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/Alpha_Test_Implementation_Plan.md,
-docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md, docs/alpha-result.md and
+Read CLAUDE.md, docs/Archive/Plans/ACTION_PLAN_2026-08-02.md,
+docs/Archive/Plans/Alpha_Test_Implementation_Plan.md,
+docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md, docs/Archive/Research/alpha-result.md and
 docs/SESSION_HANDOFF.md. origin/main is b6f577e after PR #244 merged Claude's
 Stage 0 correction counter-review head 9a7e9fc with an identical tree. PR #243
 at 4151b3f merged Fable's final counter-review (PR #242 at f937bfb merged the
@@ -4915,7 +4998,7 @@ before it). Corrections
 syntax, point-in-time/exact-session factors, Stage 1 cadence and benchmark,
 strict analyzer provenance, bounded QC polling, old local turnover/NAV,
 leave-one-out peers and joint residual regression. Invalid generated result
-files were removed only after docs/alpha-result.md preserved their exact
+files were removed only after docs/Archive/Research/alpha-result.md preserved their exact
 hashes and dispositions (ledger hashes are CRLF working-tree hashes — see
 the ledger's verification-convention note). No QC access or new result
 occurred; every old result
@@ -4924,7 +5007,7 @@ Claude counter-reviewed exact head b4e9ee0 (section 7m, three P3 closures
 CR2-001..003), Codex independently accepted ad3b3a8 after a topology
 correction (section 7n), and a final independent Claude counter-review of the
 whole ten-commit chain from exact head 5730f7b (section 7o and
-docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md) accepted every
+docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md) accepted every
 commit, ran sixteen mutations, and closed four P3 gaps (CCR3-A..D) on branch
 user/claude/alpha-qc-full-counterreview-20260817. Codex then reviewed Fable's
 exact three-commit range after PR #243 and found two P2 Stage 0 methodology
@@ -4933,7 +5016,7 @@ entry/exit turnover, per-family 12/42 annualization, strict MAX(20), and
 missing-industry grouping; see section 7p and the Fable-counterreview report.
 Claude then pushed that branch unchanged at exact head 9e45803 and
 counter-reviewed it (section 7q and
-docs/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_CORRECTION_COUNTERREVIEW.md):
+docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_CORRECTION_COUNTERREVIEW.md):
 all three commits accepted, all four findings reproduced red pre-correction,
 seven mutations run, and two follow-up P3 closures (FCR-001 exit-drift pin,
 FCR-002 Stage 1 dead-state industry port) on branch
@@ -4942,7 +5025,7 @@ accepted its exact three-commit range and FCR-001/002 after one P3 test-only
 hardening: helper correctness did not prove the live Stage 1 ingestion called
 the helper, so commit 39e5d99 pins all three `_fine` call sites and stale-code
 eviction. No algorithm behavior changed. See section 7r and
-docs/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_COUNTERREVIEW_VERIFICATION.md.
+docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_COUNTERREVIEW_VERIFICATION.md.
 The code-review gate is satisfied; before launch, the owner confirms whether
 Stage 0 battery completion or Stage 1 runs first.
 No run occurred and the 428-cell/five-run counts are unchanged.

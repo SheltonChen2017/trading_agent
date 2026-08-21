@@ -17,9 +17,9 @@ Claude's documentation/SBP audit, and section 7bt records Codex's independent
 correction review. Section 7bv records the later ACER replacement, 7bw its
 independent review, 7bx the counter-review, 7by the vendor audit, 7bz the
 independent correction review, 7ca the counter-review of that correction,
-7cb the ACER event backbone, 7cc its independent review, and 7cd the
-counter-review of that review; 7cd and section 8 are the current
-development state.
+7cb the ACER event backbone, 7cc its independent review, 7cd the
+counter-review of that review, and 7ce the ACER-0A freeze; 7ce and section 8
+are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -31,8 +31,10 @@ program is closed (`A-001`, `A-002`) and is no longer the entry point.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-20.md` — the go-to plan (ACER first)
-3. `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — the draft ACER
-   contract awaiting the owner's ACER-0 adoption
+3. `docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` — **the frozen ACER-2
+   contract**; it governs for ACER-2 wherever it differs from the plan below
+4. `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — the ACER
+   contract shape; ACER-0A frozen, ACER-0B deliberately still draft
 4. `docs/reference/analyst-consensus-etf-strategy.pdf` — the owner-supplied
    design narrative; the Markdown ACER contract governs where they differ
 5. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
@@ -3503,7 +3505,9 @@ Exact submitted snapshot: pushed
 `b8c46ce3c5b747ff4825ddb293ddfb526c1b684e`, one commit after base and
 merge-base `1c110d663d23455ebd7d4cfc0420b20ac01affe1`. Disposition:
 **accepted after correction**. Review branch
-`codex/review-acer-event-backbone-20260820` is local-only. Product/test
+`codex/review-acer-event-backbone-20260820` was local-only when this section
+was written; it has since been counter-reviewed (section 7cd) and merged, and
+the branch is deleted. Product/test
 correction `61abd6aeb8b2889bf9943b97af8224cd49a8c2d0` and
 review/documentation `aea84f4cc017f6e6a31091dee388c55b3e9b07fc` are committed
 separately; this section is the final handoff commit. Full record:
@@ -3630,6 +3634,107 @@ gates are unchanged: ambiguity-refusing issuer mapping, Snapshot B, the
 ACER-0 freeze, the earnings-control dataset, and dataset-specific permission
 before any reconstructable-data upload to QuantConnect.
 
+## 7ce. ACER-0A freeze and two read-only measurements (Claude, 2026-08-20)
+
+Branch: `user/claude/acer0a-freeze-20260820`, off `b58947e`. The owner issued
+ten decisions; this round records them and performs the two read-only
+measurements they authorized. **No purchase, price join, outcome access,
+backtest, upload, or ACER-2 run occurred, and nothing operational was
+changed.**
+
+**The freeze is split, and that is the substantive decision.**
+`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` freezes the decisive
+stock-level ACER-2 contract; ACER-0B — ETF benchmark and investability
+choices — stays deliberately unfrozen so they are not forced before a
+stock-level signal is shown to exist. ACER-3's run budget is **zero** until
+the owner separately freezes ACER-0B.
+
+ACER-2 is **six cells, not twelve**: two encodings x three half-lives (21,
+63, 126 sessions) x one coverage-neutral per-firm mean x one 21-session
+horizon. Raw sum was cut as a second aggregation because it mainly rewards
+analyst coverage. Primary cell named in advance (notch change, 63 sessions),
+primary statistic out-of-sample residualized cross-sectional IC, expected
+sign frozen positive, threshold Bonferroni **0.05/6** applied to the primary
+cell itself — deliberately more conservative than testing a designated
+primary at 0.05. Secondary cells are descriptive only. A null primary closes
+ACER with no post-result tuning. Budget: unlimited synthetic tests that never
+touch real outcomes, one development execution, one confirmation execution;
+corrected reruns may repair code but never the hypothesis, and each is still
+a counted look. Stock universe frozen point-in-time with named refusals; ETF
+thresholds deferred. Local LEAN is authoritative and reconstructable Benzinga
+rows stay off QuantConnect absent explicit permission evidence; QC access is
+read-only symbol mapping only. Control data has a **candidate, not an
+adoption**: the Benzinga Earnings expansion, $99 for a one-month structural
+audit against eight criteria, with `eps_surprise_percent` distrusted and our
+own standardized-surprise formula frozen afterwards.
+
+**Four items are named as still-open (ACER-0A.1–0A.4) and must close before
+the single development run.** The one I want the next reader to notice is
+ACER-0A.1: the owner's condition that the result "must not be driven by one
+year, sector, or a small number of securities" is frozen in principle but
+carries no number, and an unquantified robustness condition is decided while
+looking at the result — the exact failure the freeze exists to prevent. The
+document proposes a concrete rule (leave-one-year-out, leave-one-sector-out,
+and removal of the top 1% of contributing securities, each retaining sign and
+significance) and explicitly marks it as **awaiting owner confirmation rather
+than frozen**, because inventing the threshold silently would be the defect.
+The other three are the surprise formula, the value control's source under
+local LEAN, and whether local LEAN actually holds the prices, corporate
+actions, delisted securities, and session calendar the design assumes. Also
+flagged: a one-month audit subscription that is then cancelled re-raises the
+deletion-on-termination question, so an evidence snapshot may not outlive it.
+
+**SBR-1 measured absent** (`docs/operations/OPERATIONAL_FACTS.md`): the
+`TradingAgent-StrongBuy-Capture` task is not registered, no task matching
+StrongBuy/Capture/Ratings exists, and zero `snapshot-*.jsonl` files or
+capture manifests exist under any plausible root. The capture's output
+directory is caller-supplied at install time, so the search was by artifact
+filename rather than by a single default path. The closure now rests on a
+measurement instead of on absence of repository evidence. Nothing was
+installed or running, so there was nothing to stop for.
+
+**Both reconciliation alerts are stale state, not a fault**
+(`docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`). Every long
+reconciliation gap matches a Windows sleep window **exactly** across seven
+checked instances; the paper tasks are registered `WakeToRun=False`, so a
+sleep over 30 minutes guarantees the critical check fails on wake. Both
+alerts carry `matched=True, mismatches=0, errors=0`, and 20 clean
+reconciliations have completed on a 10-minute cadence since the last failure
+at 02:49Z. Nothing was acknowledged, closed, altered, or repaired. The
+recommendation is to acknowledge (owner action), decide deliberately about
+sleep or `WakeToRun`, and **not** loosen the 30-minute or 5-minute
+thresholds, which are real execution-readiness gates.
+
+**A correction I owe the record:** earlier in this session I twice reported
+epoch-006 as having "11 observations". That was the all-epoch total. Per
+epoch: 001=1, 002=1, 003=1, 004=3, 005=3, **006=2** — one for each trading
+session since the epoch opened, so nothing is missing, but the epoch is 2 of
+its required 60, not 11.
+
+**Overlay tasks closed as a byproduct.** The outstanding proof — the first
+*automatic* firing after the Interactive reinstall — succeeded: Observe
+14:45, Mature 14:55, Sufficiency 15:05 local on 2026-08-20, all
+`LastTaskResult=0`, with the operational `shadow_overlay.db` unchanged at 1
+registration / 1 baseline observation / 0 outcomes. `OPERATIONAL_FACTS.md`
+and the action plan previously described this as pending.
+
+Validation on the final tree: full suite **4,417 passed / 0 failed / 25
+warnings** in 677.78 seconds, unchanged from the previous round because this
+round changed no code. `compileall` over the required surface including
+`research/` passed; `git diff --check` passed; Python 3.13.14. The
+document-consistency guards were rerun green after every edit, including
+after these counts were inserted.
+
+One guard finding worth recording, because it was a real staleness and not a
+false positive: `test_no_document_calls_a_merged_commit_unreachable` failed
+on this branch. Section 7cc and the resume prompt still described Codex's
+review branch, and the product-correction commit it names, as unreachable —
+which stopped being true when the owner merged PR #290. Both places were
+corrected to say the branch had that status when written and has since been
+merged and deleted. The guard was not weakened, and it fired twice here: the
+first draft of this very paragraph reproduced the pattern by quoting the hash
+beside the claim it was describing.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -3643,18 +3748,30 @@ rationale, and every structural hardening was verified end to end. The
 review chain for the vendor audit is closed. The event backbone was
 implemented in section 7cb and independently accepted after correction in
 section 7cc: 584,916 canonical events at 99.64% retention, with issuer
-identity deliberately unresolved. The corrected branch is local-only and
-needs counter-review before its v2 dataset is materialized. ACER remains
-before its freeze: resolve
-issuer mapping with ambiguity refusals across the 9,677-ticker surface; run
-Snapshot B after the declared interval; freeze the
-signal/control/cell/run-budget design; identify the separate
-earnings-control dataset; and establish dataset-specific permission before
-sending reconstructable ratings to QC. If that permission is absent,
-run the eventual frozen study in local LEAN. **ACER-2 remains the decisive
-milestone:** a null stock-level result closes the program. No price join,
-backtest, QC upload/run, or paper execution is authorized by this review. LEV
-remains separate and cannot validate ACER. The SBP history is retained.
+identity deliberately unresolved. That review chain closed with the
+counter-review in section 7cd, which confirmed all seven findings and fixed
+two defects in the corrections; the whole round is merged.
+
+**ACER-0A is now FROZEN** (section 7ce,
+`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`): six cells, primary cell
+and statistic named in advance, Bonferroni 0.05/6, a two-execution run
+budget, and a point-in-time stock universe. **ACER-0B is deliberately not
+frozen** and ACER-3's budget is zero until it is. Local LEAN is the
+authoritative engine; reconstructable ratings stay off QuantConnect absent
+explicit permission evidence; QC access is read-only symbol mapping only.
+
+What ACER needs next, in order: close the four named open items
+(ACER-0A.1–0A.4) — above all the numeric robustness rule, which is currently
+a proposal awaiting owner confirmation; run the $99 one-month Benzinga
+Earnings **structural audit** and only then adopt or reject that control
+dataset and freeze the standardized-surprise formula; resolve issuer mapping
+with ambiguity refusals across the 9,677-ticker surface using read-only QC
+symbol data; and run Snapshot B after the declared interval. **ACER-2 remains
+the decisive milestone:** a null primary result closes the program. No
+purchase beyond the authorized $99 audit, no price or outcome join, no
+backtest, no QC upload, and no paper execution is authorized. LEV remains
+separate and cannot validate ACER. The SBP history is retained, and SBR-1 is
+now closed on a measurement rather than an assumption.
 
 ### Historical superseded checklist (retained for audit only)
 
@@ -3802,18 +3919,22 @@ docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
 docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
-docs/alpha-result.md. The vendor-audit review chain is closed through
-section 7ca; the ACER event backbone implementation in section 7cb was
-accepted after correction in section 7cc. The corrected branch is local-only
-at `codex/review-acer-event-backbone-20260820`; product correction `61abd6a`
-must be counter-reviewed before the v2 dataset is materialized. The old v1
-dataset id is superseded. Stage 0/1 and APQ are valid but closed null; SHW-4
-is prospective. SBP is superseded by ACER. Next after counter-review: the
-ACER-0 preregistration draft and ambiguity-refusing issuer mapping over the
-backbone's 9,677-ticker surface, then Snapshot B after the declared interval.
-Keep reconstructable ratings off QC unless dataset-specific
-permission covers the upload; otherwise use local LEAN. Do not join ratings
-to prices, run a backtest, deploy, trade, mutate an operational database, or
+docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/alpha-result.md.
+The vendor-audit and event-backbone review chains are both closed and merged
+(sections 7ca and 7cd); every review branch is deleted and main is the only
+branch. **ACER-0A is frozen; ACER-0B is deliberately not.** The dataset
+identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
+materialized; earlier ids are superseded. Stage 0/1 and APQ are valid but
+closed null; SHW-4 is prospective. SBP is superseded by ACER and SBR-1 is
+closed on a measurement. Next: close ACER-0A.1–0A.4 (the numeric robustness
+rule is a proposal awaiting owner confirmation), run the authorized $99
+Benzinga Earnings structural audit before adopting that control dataset,
+resolve issuer mapping with ambiguity refusals over the 9,677-ticker surface
+using read-only QC symbol data, and take Snapshot B after the declared
+interval. Local LEAN is authoritative; keep reconstructable ratings off QC
+absent explicit permission evidence. Do not purchase beyond the authorized
+audit, join ratings to prices or outcomes, run a backtest, deploy, trade,
+acknowledge or alter an operational alert, mutate an operational database, or
 roll paper-epoch-006 without separate authorization.
 ```
 

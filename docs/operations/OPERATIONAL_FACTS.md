@@ -19,6 +19,30 @@ delete an entry because the current round is about something else.
 
 ## 1. Standing owner decisions
 
+### SBR-1 capture: measured absent on this host (2026-08-20)
+
+ACER-1's definition of done requires the machine-local SBR state to be
+**measured**, because the plan otherwise rested on absence of committed
+evidence — and "no snapshot is in the repository" is not the same claim as
+"no capture ever ran". Measured read-only, owner-authorized, nothing changed:
+
+- Scheduled task `TradingAgent-StrongBuy-Capture`: **absent.** No task
+  matching `StrongBuy`, `Capture`, or `Ratings` is registered at all. The
+  seven registered `TradingAgent-*` tasks are the three overlay tasks and
+  four paper tasks, none of which is the capture task.
+- Capture artifacts: **zero.** No `snapshot-*.jsonl` exists under
+  `C:\git\customizedAgent\trading_agent`, `C:\git\trading_agent_operational`,
+  or anywhere else beneath `C:\git`, and no capture manifest carrying a
+  `stream_identity` key exists under those roots.
+
+The capture's output directory is caller-supplied at install time
+(`scripts/install_windows_strongbuy_capture_task.ps1` takes
+`-OutputDirectory`), so no single default path could be checked; the search
+was by artifact filename across the plausible roots instead. The stream is
+therefore **closed with a verified zero**, not an assumed one. SBR-1 stays
+uninstalled; its code, tests, and installer remain in the tree for a
+possible future level-based hypothesis under a fresh preregistration.
+
 ### `require_earnings_data` stays `false` (2026-08-06)
 
 Measured, not assumed. The earnings feed resolved 5 of the account's 7
@@ -178,8 +202,22 @@ REPAIRED same day: the owner ran the corrected elevated install
 (APQ3-001's completed command). All three tasks re-registered
 Interactive and, on manual start, **actually ran (exit 0)** as "up to
 date" no-ops with `shadow_overlay.db` unchanged (1 registration /
-1 baseline observation / 0 outcomes). Remaining proof: the first
+1 baseline observation / 0 outcomes). Remaining proof was the first
 AUTOMATIC firing, next occurrence 2026-08-20 14:45 local.
+
+**CLOSED 2026-08-20 (measured read-only): the automatic firing worked.**
+All three tasks ran unattended at their scheduled local times and exited 0 —
+Observe 14:45, Mature 14:55, Sufficiency 15:05, each with
+`LastTaskResult=0` and next occurrences rolled to 2026-08-21. The operational
+`shadow_overlay.db` is unchanged at 1 stream registration / 1 baseline
+observation / 0 outcomes, which is the correct no-op for a monthly-cadence
+runner mid-month. The S4U-versus-Interactive logon repair is therefore proved
+end to end, by an unattended run rather than a manual start.
+
+Caveat carried forward: these tasks are registered `WakeToRun=False`, so a
+firing that falls inside a host sleep window is skipped rather than deferred.
+See `docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`, where the
+same setting explains every long reconciliation gap.
 
 ### Restart the app after any operational deploy (2026-08-19)
 

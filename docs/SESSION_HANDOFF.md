@@ -3259,9 +3259,14 @@ a snapshot and refuses hash mismatches and incomplete snapshots at analysis).
   correctly — and the transitions ACER uses are ~99% complete on upgrades
   and downgrades. Zero duplicate `benzinga_id`. 46 inconsistent transitions
   (0.008%) become a named refusal class.
-- `time` looks like US Eastern (pre-market peak 06-09h; a UTC reading would
-  put the peak at 01-04h ET). Written vendor confirmation still required;
-  ambiguous rows defer to next-session eligibility per the owner's rule.
+- **Timezone resolved by measurement, and the vendor docs are wrong for the
+  modern era**: offsetting `time` against the unambiguous UTC `last_updated`
+  over 558k same-day rows shows 2011-2015 at exactly 0h (ingestion clock, no
+  independent action timing) and 2017+ at +4/+5h (true US Eastern), 2016
+  transitional. Frozen consequence: pre-2017 rows always take next-session
+  eligibility; 2017+ parse as Eastern under the conservative availability
+  bound. The docs-vs-data discrepancy is a curiosity for the vendor, not a
+  design dependency.
 - `last_updated` is not a migration artifact: 95% same-day, tracks action
   years, zero negative gaps; the owner's conservative availability rule
   (later of action time and `last_updated`) defers only ~4% of rows.

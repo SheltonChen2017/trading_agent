@@ -111,13 +111,21 @@ is exactly the right tool for this and remains an open item (section 8).
 
 ## 5. Timestamps, timezone, and availability
 
-- Time-of-day histogram peaks 06:00–09:00 with heavy mass 04:00–10:00 and
-  little overnight — the classic **pre-market Eastern-time** shape. Were the
-  field UTC, the peak would sit at 01:00–04:00 ET, which is implausible.
-  Working inference: `time` is US Eastern. **Vendor confirmation is still
-  required in writing**; until then ACER treats the field as ET and, where
-  ambiguity would matter, defers eligibility to the next market session per
-  the owner's rule.
+- **Timezone: RESOLVED BY MEASUREMENT (2026-08-20 follow-up), and the
+  official docs are wrong for the modern era.** Massive's API reference
+  documents `time` as UTC. Measuring `time` against `last_updated`
+  (documented ISO-8601 `Z`, unambiguously UTC) across 558,205 same-day rows
+  gives a clean era split: **2011–2015 rows sit 100% at 0h offset** — their
+  `time` equals the UTC ingestion clock and carries no independent action
+  timing — while **2017–2026 rows sit 91–100% at +4/+5h** (exact EDT/EST
+  offsets), so the modern `time` is genuinely US Eastern; 2016 is the
+  transition year (82%/10%). The initial histogram inference ("looks
+  Eastern") was right for 2017+ and missed the era split. Frozen handling
+  rule for ACER: pre-2017 rows always take next-session eligibility (their
+  intraday time is not action time); 2017+ rows parse as Eastern under the
+  conservative later-of-action-and-`last_updated` availability bound. The
+  vendor question drops to a documentation curiosity, since the rule is
+  derived from measurement rather than from anyone's statement.
 - A 00h spike (4,021 rows) suggests date-only records defaulting to
   midnight; those rows get next-session eligibility.
 - `last_updated` is present on all rows and is **not a migration artifact**:
@@ -210,8 +218,9 @@ disclose that.
 2. **Retention-after-termination disclosure** carried into any future
    preregistration; the written licence confirmation is downgraded to a
    courtesy item (section 7, as corrected).
-3. **Timezone confirmation in writing** (section 5) — the support message
-   this rides on.
+3. **Timezone: resolved by measurement** (section 5); the remaining vendor
+   question — why the docs say UTC while 2017+ data is Eastern — is a
+   documentation curiosity, not a design dependency.
 4. **QuantConnect symbol-mapping cross-reference** for the rename/reuse
    hazards in section 4 — a separate, owner-visible step, since it uses QC
    API access.

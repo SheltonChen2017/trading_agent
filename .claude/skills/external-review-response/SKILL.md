@@ -16,7 +16,7 @@ fixes by breaking them on purpose.
 
 ## 0. Owner-mandated review mechanics (2026-08-02)
 
-`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` is binding for every review in
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` is binding for every review in
 this repo, including this skill's rounds:
 
 - Enumerate the exact commit range first (`git log --reverse --oneline

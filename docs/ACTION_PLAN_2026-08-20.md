@@ -47,8 +47,12 @@ Massive-Benzinga and QuantConnect credential variables, but their values are
 never recorded and credential presence is not dataset entitlement. The local
 engine installation, authentication, and sample execution were verified on
 2026-08-21; see
-`docs/reference/LOCAL_LEAN_WINDOWS_SETUP.md`. The data-entitlement, licence,
-and ACER-0A.4 gates remain open.
+`docs/reference/LOCAL_LEAN_WINDOWS_SETUP.md`. **Owner amendment, 2026-08-21:**
+QuantConnect Cloud is the authoritative engine for ACER historical and
+outcome backtests. Local LEAN is retained for implementation, synthetic and
+integration testing, and installation checks only. The data-entitlement,
+licensed-data-transfer, terminal-delisting-return, and ACER-0A.4 gates remain
+open; cloud selection does not resolve them.
 
 ---
 
@@ -272,8 +276,8 @@ to the owner; they do not freeze or authorize them.
 
 **Ten named items must still close before the single development run**
 (ACER-0A.1–0A.10). In addition to the robustness rule, surprise formula,
-value source and local-data inventory, the open ledger now names the exact
-rating scale, signal construction, control/outcome formulas, estimation and
+value source and cloud-data capability audit, the open ledger now names the
+exact rating scale, signal construction, control/outcome formulas, estimation and
 significance protocol, development/confirmation and error-slot rules, and
 point-in-time universe semantics. None may be settled after seeing a result.
 
@@ -295,7 +299,9 @@ owner correctly identified the quoted all-caps text as an investment-advice
 disclaimer, not a research ban. Separate Market Data clauses still leave
 third-party transfer and dataset-specific non-display entitlement unproven:
 raw or reconstructable Benzinga rows stay local unless the order terms or
-written permission cover upload to QuantConnect. Local LEAN is the fallback.
+written permission cover upload to QuantConnect. The later owner engine
+amendment selects QuantConnect Cloud for ACER backtests, so this transfer gate
+must close before that path can carry reconstructable vendor rows.
 The identity hazard (FB vs ANTM handled oppositely; BBBY reused) is heightened
 because this Massive delivery has neither ISIN nor exchange; ACER requires a
 security-master cross-reference and must refuse ambiguous joins.
@@ -325,11 +331,12 @@ ambiguity-refusing mapping is the next ACER-1 step.
 
 **Update 2026-08-21: the mapping step is BLOCKED, and the blocker is
 load-bearing** (`docs/research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
-The original measurement found no local LEAN or LEAN data. The engine half is
-now superseded: local LEAN and Docker are installed, authenticated, and proven
-with the generated sample project, but no approved ACER market/reference/
-fundamental dataset has been inventoried or materialized, so ACER-0A.4 remains
-open. The QC client
+The original measurement found no local LEAN or LEAN data. That fact is now
+historical: local LEAN and Docker are installed, authenticated, and proven
+with the generated sample project, but the owner has selected QuantConnect
+Cloud—not local LEAN—for ACER historical and outcome backtests. No approved
+cloud ACER market/reference/fundamental path has been structurally audited,
+so ACER-0A.4 remains open. The QC client
 allowlists only project/file/compile/backtest paths, with a comment stating
 the rule exists so `data/read` cannot pass — a reviewed control that was not
 widened. The half needing no external data was built instead and independently
@@ -346,17 +353,20 @@ master with listing/delisting dates is required. Review removed the false
 same-day ordering deterministic (768 rather than
 the submitted 766 interleaving flags), canonicalized ticker case, and bound
 every diagnostic to the clean code commit, source manifest, normalized
-dataset, and assessment hash. **Owner ruling needed** on how to obtain the
-security master: audit the existing Databento reference path, obtain suitable
-local LEAN data, widen the QC allowlist to a read-only data path, or
-nominate a different source.
+dataset, and assessment hash. **Current path:** perform an authorized,
+zero-outcome QuantConnect Cloud coverage and semantics audit for the security
+master and other required inputs. Audit Databento or nominate another source
+only for requirements the cloud audit cannot close. Do not buy or download
+local QC datasets unless the owner separately reverses the cloud-engine
+decision.
 
-**Update 2026-08-20: engine and control-data rulings.** Local LEAN is the
-authoritative execution path and cloud execution is optional; reconstructable
-Benzinga rows stay off QuantConnect unless the owner supplies explicit
-evidence that the terms permit that transfer. QuantConnect access is
-authorized for **read-only symbol mapping only** — no upload, no price or
-outcome join, no backtest, no research look. The ACER-2 control set has a
+**Update 2026-08-21: engine amendment and control-data rulings.** QuantConnect
+Cloud is the authoritative ACER historical/outcome backtest engine. Local LEAN
+is development/test infrastructure only. Reconstructable Benzinga rows stay
+off QuantConnect unless the owner supplies explicit evidence that the terms
+permit that transfer. Current QuantConnect authorization remains
+**read-only, zero-outcome structural auditing only** — no upload, price or
+outcome join, backtest, or research look. The ACER-2 control set has a
 chosen candidate rather than an adopted one: the Massive/Benzinga Earnings
 expansion, with **$99** authorized for a one-month structural audit against
 eight criteria (history depth, delisted coverage, whether `estimated_eps` is
@@ -538,12 +548,15 @@ remaining list is deliberately provider-neutral.
    QuantConnect's documented delisting event does not, by itself, prove an
    after-delisting return. If another source is chosen, it must demonstrate
    equivalent coverage and semantics.
-5. **Close the licensed-data boundary and local-data inventory.** Local LEAN,
-   authentication, its isolated workspace, Docker, and sample execution are
-   verified. The remaining question is which approved point-in-time datasets
-   can be used locally and whether their licences permit the selected path.
-   Do not upload reconstructable Benzinga rows merely because QC credentials
-   are available.
+5. **Close the licensed-data boundary and QuantConnect Cloud capability
+   audit.** Local LEAN remains verified development/test infrastructure, but
+   it is not the ACER backtest engine. Measure the cloud account's actual
+   point-in-time coverage and semantics for prices, mappings, eligibility,
+   corporate actions, fundamentals, shares and sector, and separately close
+   terminal-delisting-return coverage. Do not upload reconstructable Benzinga
+   rows merely because QC credentials are available. Preserve cloud-run
+   provenance with dataset/version disclosures, project and run identifiers,
+   source-code SHA, and hashes of any uploaded permitted custom data.
 6. **Close ACER-0A.1–0A.10.** The existing normalization, signal, controls,
    statistic, split, confirmation, and refusal proposals remain drafts until
    the owner freezes them. This occurs before any real ratings/price join.

@@ -2,6 +2,13 @@
 
 Status: current setup reference, created 2026-08-21.
 
+**Project use decision, 2026-08-21:** this installation is **not** the engine
+for ACER historical or outcome backtests. Those runs are to use QuantConnect
+Cloud. Local LEAN is retained only for implementation, unit/synthetic/
+integration tests, and bundled sample validation. No local QuantConnect
+Security Master or US Equity-history purchase/download is planned unless the
+owner later changes this decision.
+
 Verified on this machine, 2026-08-21:
 
 - LEAN CLI `1.0.228` returns successfully from its installed executable;
@@ -294,9 +301,10 @@ Local LEAN needs local data. For QuantConnect-hosted US Equity downloads, the
 Security Master is a prerequisite and the underlying US Equity price files are
 separate. Installing Docker, LEAN CLI, or `lean init` does not purchase them.
 
-Do not purchase data merely to validate this installation. First decide
-whether the research contract requires local LEAN or can use QuantConnect
-Cloud, then perform a narrow entitlement/coverage audit. For ACER specifically,
+Do not purchase data merely to validate this installation. ACER uses
+QuantConnect Cloud for historical and outcome backtests, so perform a narrow,
+zero-outcome cloud entitlement/coverage/semantics audit instead. Local LEAN
+remains useful for development and synthetic testing. For ACER specifically,
 ETF constituent history is not required for the decisive stock-level ACER-2
 test; it becomes relevant only if ACER-2 passes and the owner later authorizes
 ACER-3.

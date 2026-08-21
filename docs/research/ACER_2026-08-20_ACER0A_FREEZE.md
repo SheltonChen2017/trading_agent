@@ -184,8 +184,12 @@ audit's licence step must answer this explicitly.
 
 ## 8. Engine, access, and data-boundary rulings
 
-- **Engine: local LEAN is the authoritative path.** ACER-2 must be designed
-  so that cloud execution is optional, never required.
+- **Owner amendment, 2026-08-21 — engine: QuantConnect Cloud is the
+  authoritative path for ACER historical and outcome backtests.** Local LEAN
+  is retained for implementation, unit/synthetic/integration tests and sample
+  validation only. It must not be used for ACER outcome runs. This supersedes
+  the earlier local-LEAN-authoritative ruling before any ACER outcome was
+  observed.
 - **Reconstructable Benzinga rows must not be uploaded to QuantConnect**
   unless the owner separately provides explicit evidence that the applicable
   terms permit that third-party transfer.
@@ -228,8 +232,8 @@ disclosure of the measured refusal vocabulary. See
 |---|---|---|
 | **ACER-0A.1** | Numeric rule for "not driven by one year, sector, or a small number of securities" (section 3.3). | Left unquantified, this becomes a judgement made while looking at the result, which is the exact failure mode the freeze exists to prevent. A concrete proposal is offered below and requires owner confirmation. |
 | **ACER-0A.2** | The standardized-surprise formula, deliberately deferred by the owner until after the earnings audit. | It is a control definition; choosing it after seeing how it affects the IC would contaminate the primary statistic. |
-| **ACER-0A.3** | Data source for the **value** control under local LEAN. | Value needs fundamentals. The ratings and earnings expansions do not supply them, and it is not yet established that local LEAN has usable point-in-time fundamentals on this machine. |
-| **ACER-0A.4** | Local LEAN data availability for prices, corporate actions, delisted securities, and the trading-session calendar that defines "21/63/126 sessions". | The engine ruling makes local LEAN authoritative, but the local data inventory has not been measured. If it is incomplete, ACER-2 cannot run locally as designed. |
+| **ACER-0A.3** | QuantConnect Cloud source and point-in-time semantics for the **value** control. | Value needs fundamentals. The ratings and earnings expansions do not supply them, and authenticated cloud access does not establish usable point-in-time fundamentals. |
+| **ACER-0A.4** | QuantConnect Cloud coverage and semantics for prices, corporate actions, historical eligibility, delisted securities, and the trading-session calendar that defines "21/63/126 sessions"; terminal delisting returns remain a separate explicit requirement. | Cloud is authoritative, but account entitlement, history, delisted coverage and field semantics have not been measured for ACER. QuantConnect's documented delisting event does not by itself prove a CRSP-style terminal delisting return. |
 | **ACER-0A.5** | Canonical rating scale and firm-specific aliases: exact notch values; treatment of initiations, reiterations, maintains, missing `previous_rating`, same-day duplicates, and unusable or ambiguous actions. | "Ordinal notch change" and "direction-only sign" are not computable without these rules. Choosing aliases after viewing returns would tune the signal. |
 | **ACER-0A.6** | Exact signal construction: availability session, decay equation and age convention, per-firm state/mean definition, minimum coverage, coverage control, and same-security/same-session aggregation. | The six family labels still permit materially different score series and sample sizes. |
 | **ACER-0A.7** | Exact control and outcome definitions: momentum, size, liquidity, volatility, value, sector and analyst coverage formulas; normalization/winsorization; forward residual-return endpoints; corporate-action handling; and refusal/missingness rules. | A list of control names is not a frozen design. Different standard definitions can materially change both residuals and eligibility. |

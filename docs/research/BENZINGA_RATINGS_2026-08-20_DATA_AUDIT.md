@@ -1,9 +1,10 @@
 # Benzinga analyst-ratings vendor data audit (ACER-1 vendor half)
 
 Status: **read-only audit, owner-authorized 2026-08-20. No backtest, no price
-join, no research look.** Snapshot A is complete and analysed; the
-restatement measurement (snapshot B) and the written licence clarification
-are open items listed in section 8.
+join, no research look.** Snapshot A is complete and analysed. Snapshot B,
+the historical security-identity cross-reference, and permission to upload
+raw or reconstructable vendor data to a third-party engine remain open items
+listed in section 8.
 
 - Provider: Benzinga Analyst Ratings via the Massive API
   (`/benzinga/v1/ratings`), individual paid expansion, key held as the
@@ -59,11 +60,20 @@ unverified; the analyser-era firm mix is not the 2012 mix.
   no-change action.
 - Transition consistency: 46 rows (0.008%) claim an up/downgrade while
   `previous_rating == rating` — a named refusal class, not a blocker.
+- The Massive payload has ticker on every row and company name on all but 17
+  rows, but **no `isin` or `exchange` field on any of the 596 raw pages**.
+  Benzinga's
+  direct product page advertises those fields, but they are not present in
+  this purchased delivery path. Neither company name nor ticker is a durable
+  issuer identifier, so this feed cannot resolve renames or ticker reuse by
+  itself.
 
 ## 3. Delisted coverage — the decisive question: PASSES
 
-Pre-delisting history exists for every primary listing probed, ending at the
-delisting, including the three 2023 bank failures:
+Pre-delisting rating history exists for every primary listing probed and
+continues close to its final listed period, including the three 2023 bank
+failures. This establishes delisted-name coverage; it does **not** establish
+that every action since each security's original listing is present:
 
 | symbol | rows | span | note |
 |---|---|---|---|
@@ -72,7 +82,7 @@ delisting, including the three 2023 bank failures:
 | SBNY | 213 | 2012-04-25 → 2023-03-13 | |
 | TWTR | 480 | 2013-10-07 → 2022-10-06 | |
 | ATVI | 350 | 2012-02-10 → 2023-09-22 | |
-| LNKD / YHOO / CELG / ALXN / XLNX / MXIM / CTXS / ZNGA / VMW / SGEN / MON / WFM / BRCM / EMC / HOT | 98–337 each | all spanning listing → delisting | |
+| LNKD / YHOO / CELG / ALXN / XLNX / MXIM / CTXS / ZNGA / VMW / SGEN / MON / WFM / BRCM / EMC / HOT | 98–337 each | pre-delisting history present | |
 | RAD | 56 | 2012-03-15 → 2023-04-27 | |
 | WE | 13 | 2022-04-19 → 2023-10-10 | |
 
@@ -104,72 +114,77 @@ distinct companies under one symbol**:
 
 **Consequence for ACER-1/ACER-2:** joins must go through a security master
 with company identity (the feed's `benzinga_firm_id` is the *rating* firm,
-not the issuer; `company_name` plus the reference master's delisting dates
-are the available handles), with reuse boundaries partitioned explicitly.
-The planned cross-reference against QuantConnect's historical symbol mapping
-is exactly the right tool for this and remains an open item (section 8).
+not the issuer; Massive supplies no ISIN or exchange here). Company name,
+ticker, and the reference master's dates are candidate cross-reference
+inputs, not a safe identity key. Reuse boundaries must be partitioned
+explicitly. The planned cross-reference against QuantConnect's historical
+symbol mapping remains an open item (section 8).
 
 ## 5. Timestamps, timezone, and availability
 
-- **Timezone: RESOLVED BY MEASUREMENT (2026-08-20 follow-up), and the
-  official docs are wrong for the modern era.** Massive's API reference
-  documents `time` as UTC. Measuring `time` against `last_updated`
-  (documented ISO-8601 `Z`, unambiguously UTC) across 558,205 same-day rows
-  gives a clean era split: **2011–2015 rows sit 100% at 0h offset** — their
-  `time` equals the UTC ingestion clock and carries no independent action
-  timing — while **2017–2026 rows sit 91–100% at +4/+5h** (exact EDT/EST
-  offsets), so the modern `time` is genuinely US Eastern; 2016 is the
-  transition year (82%/10%). The initial histogram inference ("looks
-  Eastern") was right for 2017+ and missed the era split. Frozen handling
-  rule for ACER: pre-2017 rows always take next-session eligibility (their
-  intraday time is not action time); 2017+ rows parse as Eastern under the
-  conservative later-of-action-and-`last_updated` availability bound. The
-  vendor question drops to a documentation curiosity, since the rule is
-  derived from measurement rather than from anyone's statement.
-- A 00h spike (4,021 rows) suggests date-only records defaulting to
-  midnight; those rows get next-session eligibility.
-- `last_updated` is present on all rows and is **not a migration artifact**:
-  its year histogram tracks the action years, **95.0% are same-day** as the
-  action, 0 precede it, and 22,582 rows (3.8%) are edited >90 days later.
-  The owner's conservative availability rule — availability = the later of
-  the action timestamp and `last_updated` — is therefore cheap: it defers
-  ~4% of rows and leaves the rest at their action time.
+- **The clock convention is strongly evidenced but not proved by this
+  payload.** Massive's reference labels `time` UTC, while Benzinga's direct
+  product page labels rating timestamps Eastern. Comparing the two delivered
+  clock strings shows an era split: 2011–2015 usually have a 0-hour offset;
+  2017–2026 usually have a +4/+5-hour offset consistent with EDT/EST; 2016 is
+  transitional. That is useful evidence that modern `time` is Eastern, but
+  the actual `last_updated` values are timezone-naive strings such as
+  `10/09/2023 12:28:43`, not the documented ISO-8601 `Z` values. Therefore
+  `last_updated` is not an unambiguous UTC reference clock and the offset
+  measurement cannot prove timezone semantics.
+- A 00h spike (4,021 rows) suggests date-only records defaulting to midnight.
+  Intraday use would create unnecessary DST, legacy-era, and vendor-clock
+  assumptions. **Frozen safe handling for ACER is date-level:** an action is
+  eligible only at the next trading session after the later of its action
+  date and `last_updated` date. This deliberately gives up same-day trading
+  and makes the backtest independent of the unresolved clock convention.
+- Correct parsing of the two different formats finds 587,046 usable
+  `last_updated` values: **557,748 are on the action date, 29,259 are later,
+  and 39 precede the action date**. Of the later rows, 22,582 are more than 90
+  days later. The earlier lexicographic comparison incorrectly reported zero
+  negative gaps because it compared `MM/DD/YYYY ...` text with
+  `YYYY-MM-DDT...` text. The 39 reverse-order records are a named refusal
+  class; they are not silently assigned a tradable timestamp.
 
 ## 6. Pagination integrity
 
 Every yearly partition ended with a page carrying no `next_url` (natural
 termination) and the manifest would have recorded `complete: false`
 otherwise; analysis refuses incomplete snapshots without an explicit
-override. Page hashes verify on read. Duplicate-id count of zero across
-partition boundaries confirms the year partitions neither overlap nor
-truncate.
+override. The manifest hash, page hashes, unique safe page references, result
+shape, and page/partition row counts verify on read. Duplicate-id count of
+zero across partition boundaries confirms the year partitions do not overlap;
+natural termination plus the verified count graph is the truncation evidence.
 
-## 7. Licence — risk DOWNGRADED after owner challenge (corrected 2026-08-20)
+## 7. Licence — disclaimer separated from data-use permission
 
-**Correction:** the first version of this section, written from a summarizing
-fetch, over-read the Market Data ToS as potentially prohibiting personal
-backtesting and local retention. The owner challenged that reading, and
-re-reading the preserved bytes confirms the challenge: the copying clause
-prohibits republication "for publication or distribution or for any business
-or commercial enterprise"; the derived-works clause prohibits transfer "to
-any third party" or "business or commercial purposes"; the non-display clause
-applies "unless you are licensed to do so"; and "display use only" is an
-explicit default "unless otherwise stated in a subsequent agreement",
-with dataset-specific entitlements named as exactly such agreements. Personal
-non-professional research is consistent with the subscriber-classification
-basis ("solely for your personal, non-business use").
+The owner correctly challenged an earlier interpretation of Massive's
+all-caps "informational purposes only" paragraph. That paragraph is an
+investment-advice disclaimer: it says the service is not advice or a
+recommendation and puts suitability decisions on the subscriber. It does
+**not**, by itself, prohibit testing a strategy.
 
-What survives, narrower: (1) **deletion on termination is unambiguous** —
-"cease all use of the Market Data and delete all Market Data in your
-possession" — so evidence snapshots may not survive cancellation, and any
-preregistration on this data must disclose that; (2) whether personal
-backtesting is "non-display use" under clause (d) is undefined here
-(exchange convention says non-display means machine consumption at
-commercial scale, supporting the permissive reading); (3) section 10 permits
-amendment by posting, which is why the hashed copies below matter. A written
-vendor confirmation is now a **courtesy item riding the timezone question**,
-not a freeze-blocking gate; the retention-after-termination disclosure is
-the part that must reach the preregistration.
+That correction does not erase the separate data-use clauses preserved in
+`market-data-tos.html`. Those bytes independently state a display-only
+default absent a later agreement, restrict non-display use and derived works
+(explicitly including an "investment strategy") unless licensed, restrict
+third-party transfer, and include deletion-on-termination language. The paid
+Benzinga entitlement may be the later agreement that changes the default,
+but no dataset-specific licence text establishing that scope is committed or
+quoted here. It is therefore also too strong to call deletion on termination
+"unambiguous" for this expansion while treating the governing-document scope
+itself as unresolved.
+
+**Operational boundary:** the owner may continue the local, personal,
+read-only structural audit they authorized. This repository does not make a
+legal conclusion about broader rights. In particular, raw or reconstructable
+Benzinga records must not be uploaded to QuantConnect or another third party
+until the subscription/order terms or written vendor permission explicitly
+allow that transfer and backtesting use. If that permission is absent, ACER
+must run against the immutable local snapshot in local LEAN; only
+non-reconstructable aggregate evidence may leave the machine if the licence
+permits it. The future preregistration must record the applicable retention
+and deletion rule once the dataset-specific entitlement is identified.
 
 The superseded original text follows, retained per this repository's
 never-delete-findings rule.
@@ -215,15 +230,19 @@ disclose that.
    interval, then `compare <A> <B>` — diffs by stable `benzinga_id`,
    reporting added/deleted/modified separately. One download cannot measure
    change; A is preserved immutably for this purpose.
-2. **Retention-after-termination disclosure** carried into any future
-   preregistration; the written licence confirmation is downgraded to a
-   courtesy item (section 7, as corrected).
-3. **Timezone: resolved by measurement** (section 5); the remaining vendor
-   question — why the docs say UTC while 2017+ data is Eastern — is a
-   documentation curiosity, not a design dependency.
+2. **Dataset-specific use and transfer terms:** identify the subscription or
+   order language that permits personal backtesting and, before any upload,
+   permits sending raw or reconstructable records to QuantConnect. Local LEAN
+   is the default if third-party transfer is not expressly covered. Record
+   the applicable retention/deletion rule in the preregistration.
+3. **Timezone-safe implementation:** no vendor answer is required for the
+   frozen next-session-after-later-date rule, but tests must enforce that rule
+   and refuse the 39 reverse-order records. Do not restore same-day timing
+   without authoritative field semantics and a new preregistration.
 4. **QuantConnect symbol-mapping cross-reference** for the rename/reuse
    hazards in section 4 — a separate, owner-visible step, since it uses QC
-   API access.
+   API access. The delivered Massive rows contain no ISIN or exchange, so the
+   mapping must refuse ambiguous company-name/ticker matches.
 5. The 2017 coverage dip and the firm-count decline go into any future
    preregistration as disclosed data limitations.
 

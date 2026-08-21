@@ -87,6 +87,18 @@ def test_git_ignore_cannot_hide_importable_runtime_source(repository):
         current_commit(require_clean=True, repository=repository)
 
 
+def test_git_ignore_cannot_hide_research_runtime_source(repository):
+    source = repository / "research"
+    source.mkdir()
+    (source / "ignored.py").write_text("SNEAKY = True\n", encoding="utf-8")
+    exclude = repository / ".git" / "info" / "exclude"
+    exclude.write_text("research/ignored.py\n", encoding="utf-8")
+
+    assert _git(repository, "status", "--porcelain", "--untracked-files=all") == ""
+    with pytest.raises(RuntimeIdentityError, match="ignored Python source"):
+        current_commit(require_clean=True, repository=repository)
+
+
 def test_modified_tracked_file_is_also_refused(repository):
     (repository / "tracked.py").write_text("VALUE = 2\n", encoding="utf-8")
     with pytest.raises(RuntimeIdentityError):

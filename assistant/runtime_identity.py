@@ -29,6 +29,7 @@ _RUNTIME_SOURCE_PATHS = (
     "execution",
     "ml",
     "risk",
+    "research",
     "scripts",
     "signals",
     "strategies",

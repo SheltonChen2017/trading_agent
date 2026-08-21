@@ -8,7 +8,7 @@ and consumes no research look.
 Usage:
     python scripts/report_acer_identity.py <snapshot_dir>
     python scripts/report_acer_identity.py <snapshot_dir> --show 40
-    python scripts/report_acer_identity.py <snapshot_dir> --refusal-list out.txt
+    python scripts/report_acer_identity.py <snapshot_dir> --diagnostic-flags out.json
 """
 from __future__ import annotations
 
@@ -21,10 +21,17 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:  # direct `python scripts/...` invocation
     sys.path.insert(0, str(REPO_ROOT))
 
+from assistant.runtime_identity import RuntimeIdentityError, current_commit  # noqa: E402
+from ml.hashing import canonical_json  # noqa: E402
+from ml.immutable_io import (  # noqa: E402
+    ImmutableFileConflictError,
+    publish_immutable_bytes,
+)
+from research.acer.dataset import build_identity  # noqa: E402
 from research.acer.identity import (  # noqa: E402
-    ambiguous_tickers,
     assess_identities,
-    summarize_identities,
+    build_diagnostic_report,
+    diagnostic_flagged_tickers,
 )
 from research.acer.normalize import normalize_rows  # noqa: E402
 from research.acer.snapshot import SnapshotError, load_verified_snapshot  # noqa: E402
@@ -40,28 +47,54 @@ def main(argv: list[str] | None = None) -> int:
         help="how many ambiguous tickers to print in detail (default 25)",
     )
     parser.add_argument(
-        "--refusal-list",
+        "--diagnostic-flags",
         type=Path,
         default=None,
-        help="write the ambiguous-ticker refusal set to this file, one per line",
+        help=(
+            "write a lineage-bound JSON diagnostic flag set; this is a lower "
+            "bound, never an allowlist"
+        ),
     )
     args = parser.parse_args(argv)
 
     try:
-        rows, _ = load_verified_snapshot(args.snapshot)
+        code_commit = current_commit(require_clean=True, repository=REPO_ROOT)
+    except RuntimeIdentityError as exc:
+        raise SystemExit(str(exc)) from exc
+
+    try:
+        rows, manifest_hash = load_verified_snapshot(args.snapshot)
     except SnapshotError as exc:
         raise SystemExit(str(exc)) from exc
 
-    events, _ = normalize_rows(rows)
+    events, refusals = normalize_rows(rows)
+    normalized_identity, _, _ = build_identity(
+        events,
+        refusals,
+        source_snapshot_name=args.snapshot.name,
+        source_manifest_sha256=manifest_hash,
+    )
     identities = assess_identities(events)
-    report = summarize_identities(identities)
+    report = build_diagnostic_report(
+        identities,
+        code_commit=code_commit,
+        normalized_dataset_identity=normalized_identity,
+    )
+    try:
+        current_commit(
+            require_clean=True,
+            repository=REPO_ROOT,
+            expected_commit=code_commit,
+        )
+    except RuntimeIdentityError as exc:
+        raise SystemExit(str(exc)) from exc
     print(json.dumps(report, indent=2, sort_keys=True))
 
-    ambiguous = [item for item in identities if item.is_ambiguous]
-    ambiguous.sort(key=lambda item: (-item.event_count, item.ticker))
-    if args.show > 0 and ambiguous:
-        print(f"\nmost active ambiguous tickers (top {min(args.show, len(ambiguous))}):")
-        for item in ambiguous[: args.show]:
+    flagged = [item for item in identities if item.has_ambiguity_evidence]
+    flagged.sort(key=lambda item: (-item.event_count, item.ticker))
+    if args.show > 0 and flagged:
+        print(f"\nmost active name-flagged tickers (top {min(args.show, len(flagged))}):")
+        for item in flagged[: args.show]:
             names = " | ".join(
                 f"{era.company_name} [{era.first_action_date}..{era.last_action_date}]"
                 for era in item.name_eras
@@ -73,12 +106,26 @@ def main(argv: list[str] | None = None) -> int:
             if item.shared_names_with:
                 print(f"      shares a name with: {', '.join(item.shared_names_with)}")
 
-    if args.refusal_list is not None:
-        refusals = ambiguous_tickers(identities)
-        args.refusal_list.write_text(
-            "\n".join(refusals) + ("\n" if refusals else ""), encoding="utf-8"
+    if args.diagnostic_flags is not None:
+        flags = diagnostic_flagged_tickers(identities)
+        artifact = {
+            **report,
+            "kind": "acer-issuer-identity-diagnostic-flags",
+            "flagged_tickers": list(flags),
+        }
+        try:
+            publish_immutable_bytes(
+                args.diagnostic_flags,
+                (canonical_json(artifact) + "\n").encode("utf-8"),
+            )
+        except ImmutableFileConflictError as exc:
+            raise SystemExit(
+                f"REFUSED: diagnostic output already contains different bytes: {exc}"
+            ) from exc
+        print(
+            f"\ndiagnostic flag set written: {len(flags)} tickers -> "
+            f"{args.diagnostic_flags}"
         )
-        print(f"\nrefusal set written: {len(refusals)} tickers -> {args.refusal_list}")
     return 0
 
 

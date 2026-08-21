@@ -895,6 +895,34 @@ def test_unreachability_parser_ignores_negated_and_historical_claims():
         assert _repository_commits_claimed_unreachable(text) == [], text
 
 
+def test_current_handoff_does_not_reopen_the_frozen_qc_audit_authorization():
+    """CDCR-004. Once freeze section 8 authorizes the structural audit, the
+    current resume block must direct that audit rather than ask the owner to
+    authorize it again."""
+    freeze = _text("research/ACER_2026-08-20_ACER0A_FREEZE.md")
+    handoff = _text("SESSION_HANDOFF.md")
+    current_resume = handoff.split("## 9. Resume prompt", 1)[1].split(
+        "## 9a.", 1
+    )[0]
+    assert re.search(
+        r"QuantConnect access is authorized for read-only, zero-outcome "
+        r"structural\s+work",
+        freeze,
+    )
+    assert not re.search(
+        r"(?:get|obtain)\s+(?:the\s+)?owner(?:'s)?[^.]{0,120}"
+        r"authorization[^.]{0,120}(?:audit|provider call)",
+        current_resume,
+        flags=re.IGNORECASE,
+    )
+    assert re.search(
+        r"(?:perform|run)[^.]{0,100}read-only[^.]{0,80}zero-outcome"
+        r"[^.]{0,80}QuantConnect Cloud[^.]{0,80}audit",
+        current_resume,
+        flags=re.IGNORECASE,
+    )
+
+
 def test_sell1_current_records_do_not_reopen_merged_review_work():
     """SELL-1 reached main before its independent review was requested.
 

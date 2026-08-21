@@ -2,6 +2,29 @@
 
 Status: current setup reference, created 2026-08-21.
 
+Verified on this machine, 2026-08-21:
+
+- LEAN CLI `1.0.228` returns successfully from its installed executable;
+- `lean whoami` returns successfully without exposing or recording its output;
+- the isolated `C:\QuantConnect\ACER` workspace contains `lean.json`, `data\`,
+  and the generated `InstallationTest` project;
+- Docker Desktop is running from its per-user installation under
+  `C:\Users\<username>\AppData\Local\Programs\DockerDesktop`; and
+- the Docker client and server both report version `29.7.2`.
+
+The generated five-day SPY `InstallationTest` also ran successfully through
+local LEAN Engine `2.5.0.0` using the official image with digest
+`sha256:817716616e7a5875964fc111a1ddd898cead5151c4d46e2007977fd03370ee24`.
+It processed 3,943 sample data points; all 13 data requests succeeded and none
+failed. This was an installation check, not an ACER signal/outcome execution
+or research look.
+
+The Codex desktop process was already open when LEAN and Docker were installed,
+so its inherited `PATH` does not expose the `lean` or `docker` command names.
+Their full executable paths work. A newly opened PowerShell should inherit the
+new paths; if it does not, use the repair steps below. Successful sample
+execution does not establish that ACER's required market datasets are present.
+
 This guide installs the QuantConnect LEAN engine locally on Windows through
 the LEAN CLI and Docker. It also covers the Windows problems encountered in
 the first installation on this project: a missing `lean` command, the

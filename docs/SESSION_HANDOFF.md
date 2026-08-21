@@ -4746,7 +4746,8 @@ workspace initialization. Codex independently observed the LEAN executable,
 `C:\QuantConnect\ACER`, and that workspace's `lean.json`; it did not read the
 configuration or credentials. Docker was not visible on the current Codex
 desktop process's `PATH`, so a local sample backtest remains the installation's
-unverified end-to-end proof rather than a completed ACER research run. Commit
+unverified end-to-end proof at that point rather than a completed ACER research
+run; section 7cx supersedes that pending observation. Commit
 `3cefeb1` adds the active reference
 `docs/reference/LOCAL_LEAN_WINDOWS_SETUP.md`, covering Docker/WSL 2, supported
 Python and CLI installation, `PATH` repair, the intentionally invisible token
@@ -4759,6 +4760,37 @@ before the guide was added. The Action Plan is unchanged because installation
 documentation did not change sequencing, milestone status, a gate, or the
 next authorized step. The focused active-document suite passed **48 tests**
 on the guide commit.
+
+## 7cx. Local LEAN installation verified end to end (Codex, 2026-08-21)
+
+At the owner's request, Codex verified the newly installed local engine
+without reading or printing credentials. LEAN CLI `1.0.228` returned
+successfully, `lean whoami` exited zero with its output suppressed, and the
+isolated `C:\QuantConnect\ACER` workspace contained `lean.json`, `data\`, and
+the generated `InstallationTest`. Docker Desktop was running from the user's
+per-user installation, and its client and server both reported `29.7.2`.
+Because the Codex desktop process predates the installations, its inherited
+`PATH` still lacks the `lean` and `docker` command names; both full executable
+paths worked, and a new PowerShell should inherit the updated paths.
+
+The generated five-day SPY sample then completed through local LEAN Engine
+`2.5.0.0` with official image digest
+`817716616e7a5875964fc111a1ddd898cead5151c4d46e2007977fd03370ee24`.
+It processed 3,943 bundled sample data points; all 13 data requests succeeded
+and zero failed. This was installation proof only: it did not read ratings,
+join an ACER signal to an outcome, consume an `R-nnn` research look, access a
+broker, place a trade, or establish any ACER dataset entitlement or licence.
+The first image acquisition took about an hour but completed normally; the
+image is now cached locally.
+
+Commit `2ec7f61` updates the setup guide, ACER plan, local-data capability
+audit, issuer-identity record, and the Action Plan's concise gate statement.
+The engine-installation blocker is resolved, but ACER-0A.4 remains open because
+no approved point-in-time market/reference/fundamental data, mapping files, or
+terminal-delisting-return source has been inventoried or materialized. The
+focused active-document suite passed **48 tests**; diff and narrow secret
+checks passed. No feature milestone entry was added because installing the
+research engine does not complete an ACER milestone.
 
 ## 8. What is next
 
@@ -4814,21 +4846,21 @@ provider diagnostic, not a twelfth requirement. The checker cannot substitute
 for an external audit of whichever market/reference provider is selected.
 
 **The issuer-mapping step is BLOCKED pending an entitlement/path audit
-(sections 7ch–7ci and 7cw).** The current Codex process can see the three
-names-only Massive/QC credentials, but there is no local LEAN command or LEAN
-data and credentials alone do not prove access to the required security
-master. The options are to authorize a narrow read-only QC entitlement and
-symbol-mapping audit, audit the existing Databento
-reference path, install local LEAN with suitable data, widen the allowlist to a
-read-only data path (a change to a reviewed control), or nominate a different
-security-master source. This cannot be
+(sections 7ch–7ci and 7cw–7cx).** Local LEAN, authentication, Docker, and the
+bundled sample execution are verified, but no local ACER security-master or
+other required dataset has been established. Credentials and a working engine
+do not prove access to the required security master. The options are to
+authorize a narrow read-only QC entitlement and symbol-mapping audit, audit the
+existing Databento reference path, obtain suitable local LEAN data, widen the
+allowlist to a read-only data path (a change to a reviewed control), or
+nominate a different security-master source. This cannot be
 deferred by improving the heuristic: name evidence provably misses the
 BBBY-class reuse, so the 2,885 flagged tickers are a lower bound and an
 unflagged ticker is `no_name_based_ambiguity_evidence`, not established as
 safe. The corrected deterministic interleaving count is 768. **ACER-2 remains
 the decisive milestone:** a null primary result closes the program. No
-purchase beyond the authorized $99 audit, no price or outcome join, no
-backtest, no QC upload, and no paper execution is authorized. LEV remains
+purchase beyond the authorized $99 audit, no ACER price or outcome join, no
+ACER backtest, no QC upload, and no paper execution is authorized. LEV remains
 separate and cannot validate ACER. The SBP history is retained, and SBR-1 is
 now closed on a measurement rather than an assumption.
 

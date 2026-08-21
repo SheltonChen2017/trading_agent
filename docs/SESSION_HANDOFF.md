@@ -4974,7 +4974,55 @@ suite passed **4,491 tests / 0 failures / 25 dependency warnings** in 918.62
 seconds on Python 3.13. Final Git/status checks follow before handoff. No
 milestone completed.
 
+## 7db. Project separation begins with a machine-checked boundary (Codex, 2026-08-21)
+
+Owner direction changed the current implementation task from ACER capability
+work to separating the mixed repository into a trading assistant product and
+a strategy-research product. Codex created
+`codex/project-separation-boundary-20260821` from clean `origin/main` at exact
+head `1fbf6395879b464381238fb770afc83482898663`. The active, reversible migration
+sequence is `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`; this does not
+replace ACER's evidence plan or close any ACER gate.
+
+SEP-0 makes no runtime move. Commit `d31604f` adds the machine-readable
+`architecture/project_boundaries.json` and a fail-closed AST boundary test.
+The current ownership baseline is trading assistant (`assistant/`,
+`execution/`, `risk/`), strategy research (`research/`, `backtest/`, `ml/`,
+`signals/`, `strategies/`, `baskets.py`), temporary shared surface (`data/`,
+`config.py`, `market_analytics.py`), and unclassified `scripts/`. Every one of
+the **13 direct cross-product imports** is recorded with a migration reason;
+an added edge or a stale ledger edge fails. Commit `6bc11f8` records the active
+plan and the concise sequencing reference in the Action Plan.
+
+The transitive check found one genuine authority violation that folder-level
+inspection would have missed:
+`assistant.allocation_batch -> assistant.context_builder -> signals.regime`.
+It is pinned as the only current authority-to-research path, not blessed as an
+API. Any expansion fails. SEP-1 must remove it first by extracting broker
+portfolio-snapshot construction from the broad context builder, then reduce
+the remaining cross-product ledger through neutral evidence schemas,
+financial primitives, mandate inputs/outputs, and a read-only research-result
+adapter. Physical repository extraction is deliberately deferred until those
+boundaries and every mixed script entry point are reviewed.
+
+Validation on the settled tree: the focused separation and active-document
+suites passed **54 tests**; repository-wide compileall, including `research/`
+and `tests/`, passed. The pre-handoff complete suite passed **4,494 tests / 0
+failures / 25 dependency warnings in 811.86 seconds**; the complete suite on
+the exact three-commit tree repeated **4,494 / 0 / 25 in 944.57 seconds** on
+Python 3.13.14. No vendor, broker, operator database, scheduled task,
+deployment, backtest, research look, credential, licensed row, or evidence
+epoch was accessed or changed. SEP-0 remains pending Claude's independent
+review of the exact pushed snapshot; it is not yet a completed milestone.
+
 ## 8. What is next
+
+**Current implementation sequencing (owner, 2026-08-21):** complete SEP-0's
+independent review, then implement SEP-1 from
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER remains the first
+research program, but its next Cloud capability audit is not the current code
+implementation task. The separation work grants no outcome-run, vendor,
+broker, deployment, database, task, or epoch authority.
 
 **Current (2026-08-20, superseding everything below):**
 `docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and puts the
@@ -5211,6 +5259,7 @@ or roll an epoch without a new explicit owner instruction.
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
 docs/SESSION_HANDOFF.md, docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
+docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md,
 docs/Archive/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
 docs/Archive/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
 docs/Archive/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md,
@@ -5242,6 +5291,12 @@ capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. Next:
+the owner has moved current implementation to repository separation. Review
+exact SEP-0 branch `codex/project-separation-boundary-20260821` from main base
+`1fbf639`; section 7db records its boundary manifest, 13 direct migration
+edges, and the single transitive allocation-batch-to-regime violation. After
+independent acceptance, SEP-1 removes that violation first. ACER remains the
+first research program, and its next authorized research step remains to
 perform the authorized narrow read-only, zero-outcome QuantConnect Cloud
 capability audit (entitlements, coverage, semantics), and settle the
 licensed-ratings transfer question, which the cloud engine makes a blocking

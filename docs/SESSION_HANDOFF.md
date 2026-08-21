@@ -28,8 +28,9 @@ correction review of those proposals, 7cm the counter-review of that review,
 review of both new commits, and 7cp the counter-review plus the committed
 capability checks. Section 7cq records Codex's independent review and
 fail-closed correction of those checks, and 7cr the counter-review that
-completed the requirement set; 7cr and section 8 are the current development
-state.
+attempted to complete the requirement set. Section 7cs records Codex's
+independent correction of the remaining false-completeness path; 7cs and
+section 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4515,6 +4516,48 @@ control; it does not exercise the module, and it would not detect a future
 earnings source added elsewhere in the repository. That is the same
 partial-look failure this section describes, bounded here by naming it.
 
+## 7cs. Independent review of capability-checker completion (Codex, 2026-08-21)
+
+Reviewed exact remote branch
+`origin/user/claude/acer-capability-cr-20260821` at
+`6fc00409249da1d0a4acf23c704f8381e550e5d9`, merge-base `2251983`, in ordered
+range `ff8ba6b`, `6fc0040`. Review branch:
+`codex/review-acer-capability-completion-20260821`. Full record:
+`docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`.
+
+Commit `ff8ba6b` is **accepted**: it correctly reproduces all three prior
+Codex findings and preserves the method error in its first probe. Commit
+`6fc0040` is **accepted after correction**: earnings surprise was a real
+omission, but adding it did not complete the data-requirement set.
+
+**ACERCCR-001 (P2, corrected in `14a3a83`):** the submitted eight-item
+checklist still omitted four inputs while asserting completeness. The frozen
+size control is log market cap and therefore needs point-in-time shares, not
+prices alone. The frozen total-return outcome needs point-in-time corporate
+actions. ACER-0A.10 separately requires historical security type and primary
+listing, which durable issuer identity does not establish. And the normalized
+ratings-event corpus is ACER's signal input, not an assumption outside an
+`acer2_runnable` verdict. The checker now gives all four their own blocking
+finding. On this isolated review tree the honest summary is **12
+requirements: 1 available, 6 unavailable, 5 unmeasured, 11 blocking,
+`acer2_runnable=false`**.
+
+The material test was red on the submitted implementation: collection failed
+because the new corporate-action check did not exist. After correction, 24
+capability tests pass, including source-disappearance mutations that force
+the normalized-corpus, shares, corporate-action, and security-eligibility
+checks to `unavailable` and blocking. The adjacent ACER focused set passes
+107 tests. No P0, P1, or P3 finding was identified. No milestone completes,
+no real outcome was read, and ACER-2 remains unauthorized and blocked.
+
+Final validation: 24 capability tests, 107 adjacent ACER tests, and 154
+active-document/focused tests passed. The complete suite passed **4,481 / 0
+failed / 25 dependency warnings in 740.68 seconds** on Python 3.13.14.
+`compileall` over application, research, scripts, and tests passed. Final
+document, diff, staged-content, ordered-commit, secret, remote-head, and clean
+status checks passed before publication. The shared checkout remained on
+`user/claude/acer-capability-cr-20260821` at `6fc0040` and was not modified.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -4735,9 +4778,9 @@ docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
 docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/alpha-result.md.
 The vendor-audit and event-backbone review chains are closed and merged
-(sections 7ca and 7cd). The newest independent review is section 7cq on
-`codex/review-acer-databento-capability-20260821`; its exact remote head is
-the review handoff for counter-review. **ACER-0A decisions are partially frozen,
+(sections 7ca and 7cd). The newest independent review is section 7cs on
+`codex/review-acer-capability-completion-20260821`; it corrects the remaining
+false-completeness path in the capability checker. **ACER-0A decisions are partially frozen,
 but its executable preregistration is incomplete; ACER-0B is deliberately
 not frozen.** The dataset
 identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
@@ -4747,8 +4790,9 @@ closed on a measurement. The CCPR-001 truncation percentages are withdrawn:
 they did not isolate the proposed state-semantics choice. The current
 EDGAR/yfinance path cannot support ACER's delisted outcomes, but Databento is
 an existing **unmeasured candidate**, not a validated solution. The corrected
-capability checker reports ACER-2 blocked and refuses incomplete checklists;
-it does not replace vendor evidence. Next: obtain
+capability checker reports twelve requirements and ACER-2 blocked, and refuses
+incomplete checklists; it does not replace vendor evidence. Next: counter-review
+the exact Codex review branch, then obtain
 an owner ruling before any Databento API access, purchase or download; if
 authorized, run only a zero-outcome structural capability/cost/licence audit.
 Also close ACER-0A.1–0A.10, run the separately authorized Benzinga Earnings

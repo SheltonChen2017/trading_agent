@@ -22,10 +22,19 @@ absence finding in section 2.1, but not this audit's data conclusion: no
 approved ACER market/reference/fundamental dataset or terminal-delisting-
 return source has been inventoried or materialized locally.
 
+**Superseding engine decision, 2026-08-21:** the owner selected QuantConnect
+Cloud as the authoritative engine for ACER historical and outcome backtests.
+This local-capability audit is retained as valid evidence about the rejected
+local route, not as the current execution plan. Local LEAN is development/test
+infrastructure only. The active gate is now a zero-outcome cloud coverage and
+semantics audit plus separate terminal-delisting-return and licensed-data-
+transfer decisions.
+
 ## 1. What the owner's engine ruling asks for
 
-Owner decision 9 makes **local LEAN the authoritative engine**, with cloud
-execution optional. The frozen ACER-0A universe requires that "**delisted
+The historical owner decision made **local LEAN the authoritative engine**;
+the 2026-08-21 amendment supersedes it and selects QuantConnect Cloud. The
+frozen ACER-0A universe still requires that "**delisted
 securities remain eligible while they were historically listed** —
 survivorship bias is a disqualifying defect, not a convenience", and the
 proposed outcome (ACER-0A.7) is a 21-session forward total return. Those two
@@ -149,8 +158,8 @@ gap. EDGAR is a promising route to issuer identity, not a finished one.
 
 | Item | Answer |
 |---|---|
-| **ACER-0A.3** (value control source under local LEAN) | **Negative for current implementation.** No ACER-ready local book-value source exists; a new point-in-time EDGAR extractor or licensed source is required. |
-| **ACER-0A.4** (local data for prices, corporate actions, delisted securities, session calendar) | **Negative for the current EDGAR/yfinance path; unresolved repository-wide.** The existing Databento path was not audited for ACER and may or may not close the price/reference/terminal-return requirements. |
+| **ACER-0A.3** (value control source) | **Negative for the audited local implementation; open on the selected cloud path.** No ACER-ready local book-value source exists. QuantConnect Cloud point-in-time value availability and semantics still require structural measurement. |
+| **ACER-0A.4** (prices, corporate actions, historical eligibility, delisted securities, session calendar) | **Negative for the audited EDGAR/yfinance path; open on the selected cloud path.** QuantConnect Cloud coverage and semantics must be measured without outcomes; terminal delisting returns remain a separate requirement. |
 
 ## 7. Options for the owner
 
@@ -165,11 +174,12 @@ None of these is chosen here; each is a different trade.
 2. **Acquire another point-in-time equity source with delisted and terminal
    return coverage** (LEAN data subscription or an equivalent vendor), after
    comparing it with the measured Databento option. This is a purchase.
-3. **Authorize a read-only QuantConnect data path** and run ACER-2 in the
-   cloud, accepting that cloud datasets cannot be hashed by this project —
-   a disclosed gap against the content-addressing rule, and one that also
-   requires resolving whether ratings may be uploaded at all and amending the
-   owner ruling that local LEAN is authoritative.
+3. **Selected by the owner: use QuantConnect Cloud for ACER backtests.** Before
+   any outcome run, authorize and complete a zero-outcome structural audit of
+   the required cloud datasets. Cloud datasets cannot be hashed locally, so
+   compensate with dataset/version disclosures, project/compile/backtest ids,
+   source-code SHA and hashes of any permitted uploaded custom data. The
+   ratings-transfer and terminal-delisting-return gates remain independent.
 4. **Amend the frozen universe rule** to exclude delisted securities. This is
    cheap and **not recommended**: it reintroduces survivorship bias into a
    study whose whole purpose is an honest out-of-sample answer, and this
@@ -179,9 +189,9 @@ None of these is chosen here; each is a different trade.
    purchase, and it still leaves the EDGAR/yfinance price limitation unsolved,
    so it complements a measured market-data option rather than replacing it.
 
-**Recommendation:** do not freeze a vendor conclusion from this audit. First
-perform a zero-outcome, separately authorized Databento capability and cost
-audit. If that path fails the delisted and terminal-return requirements,
-compare another licensed local source with a read-only QuantConnect path.
-Dropping delisted names would make the milestone answerable and the answer
-unreliable.
+**Current recommendation after the engine amendment:** perform the narrow
+QuantConnect Cloud structural audit first. Use Databento or another provider
+only for a requirement the cloud audit cannot close, especially terminal
+delisting returns. Do not purchase local QC datasets merely because local
+LEAN is installed. Dropping delisted names would make the milestone answerable
+and the answer unreliable.

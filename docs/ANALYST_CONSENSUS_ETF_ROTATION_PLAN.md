@@ -112,7 +112,7 @@ artifacts. No committed evidence or epoch was disturbed.
 | Historical ETF prices incl. leveraged/inverse | QuantConnect/AlgoSeek or another audited price source | **Unmeasured for ACER.** Do not infer availability from an API token. |
 | Corporate actions, ticker/security mapping | QuantConnect US Equity Security Master, CRSP, or another audited security master | **Unmeasured for ACER.** QuantConnect documents map/factor files and splits, dividends, delistings, mergers, and ticker changes from 1998, but the current process has not verified the owner's subscription or materialized the data. |
 | **Historical ETF constituents with weights** | QuantConnect `ETFConstituentUniverse` candidate | **Schema documented, entitlement/coverage unverified.** The API exposes `EndTime`, `LastUpdate`, `Weight`, `SharesHeld`, and `MarketValue`; actual point-in-time coverage, delay semantics, and owner access remain ACER-1 measurements. |
-| Execution simulation, fees, slippage | Local LEAN | **Local engine verified end to end; ACER data path unresolved.** LEAN CLI `1.0.228`, the isolated workspace, Docker client/server `29.7.2`, and the generated sample execution through LEAN Engine `2.5.0.0` passed on 2026-08-21. This proves the execution environment, not ACER dataset availability, licence, point-in-time fitness, or research authority. |
+| Execution simulation, fees, slippage | QuantConnect Cloud (authoritative); local LEAN (development/test only) | **Cloud selected; ACER data path unresolved.** Local LEAN CLI `1.0.228`, Docker `29.7.2`, and a generated sample execution through LEAN Engine `2.5.0.0` passed on 2026-08-21, but that environment is not used for ACER historical/outcome backtests. Cloud coverage, semantics, provenance and licensed-data-transfer gates must close before any ACER outcome run. |
 | **Analyst revision history** | Benzinga Analyst Ratings via Massive | **Purchased and structurally audited.** The immutable machine-local snapshot remains licensed data and is not committed or authorized for third-party upload. Issuer mapping and Snapshot B remain open ACER-1 gates. |
 | **Control set for Stage 2** — earnings dates, standardized surprise, size, liquidity, volatility, value, sector | Candidate: Massive/Benzinga Earnings plus separately verified point-in-time market/fundamental sources | **Not adopted.** The owner authorized up to $99 for a one-month structural Earnings audit. Surprise semantics, value source and the remaining formulas are open in ACER-0A.2–0A.10. |
 
@@ -130,7 +130,7 @@ event side of ACER-1, subject to normalization, issuer mapping, Snapshot B and
 the recorded licence boundary. It is **not enough for ACER-2**. Massive sells
 Benzinga Earnings as a separate expansion, and the repository has not recorded
 that expansion as purchased. The local LEAN CLI and authenticated QuantConnect
-session are now verified, but they do not establish access to the US Equity
+session are now verified, but neither establishes cloud access to the US Equity
 Security Master, US Equities history, US Fundamental Data, or ETF constituent
 history.
 
@@ -253,11 +253,16 @@ ledger.
    the closure now rests on a measurement rather than on absence of
    repository evidence.
 
-Two further rulings were made in the same act: **local LEAN is the
-authoritative engine** and reconstructable Benzinga rows must not be uploaded
-to QuantConnect without separate explicit evidence that the terms permit it;
-and **QuantConnect access is authorized for read-only symbol-mapping work
-only**, with no upload, no outcome join, no backtest, and no research look.
+**Owner amendment, 2026-08-21:** **QuantConnect Cloud is the authoritative
+engine for ACER historical and outcome backtests.** Local LEAN remains
+available for implementation, unit/synthetic/integration tests and bundled
+sample validation only; it must not be used for ACER outcome runs. No local QC
+Security Master or equity-history purchase/download is planned. This
+supersedes the earlier local-LEAN-authoritative ruling before any ACER outcome
+was observed. Reconstructable Benzinga rows still must not be uploaded without
+separate explicit evidence that the terms permit it. Current QuantConnect
+authority is read-only, zero-outcome structural auditing only, with no upload,
+outcome join, backtest or research look.
 
 ## 8. What this plan deliberately does not do
 

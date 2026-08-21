@@ -14,6 +14,13 @@ explains the original measurement boundary. The issuer-mapping gate remains
 open because installation supplies no security-master entitlement or mapping
 files by itself.
 
+**Superseding engine decision, 2026-08-21:** QuantConnect Cloud is now the
+authoritative ACER backtest engine; local LEAN is development/test-only. The
+identity gate therefore moves to an authorized, zero-outcome cloud
+security-master coverage and semantics audit. No local Security Master
+purchase/download is planned, and an unflagged ticker remains unsafe until an
+external point-in-time identity source establishes otherwise.
+
 Corrected measurement lineage:
 
 | Field | Identity |
@@ -41,11 +48,12 @@ now historical and superseded; the second remains current:
 - **There was no local LEAN installation and no LEAN data.** `C:\Lean`,
   `C:\git\Lean`, and `C:\ProgramData\QuantConnect` do not exist, and no
   `map_files` directory exists anywhere under `C:\git`. Owner decision 9
-  makes local LEAN the authoritative engine; there was no local LEAN at the
+  made local LEAN the authoritative engine; there was no local LEAN at the
   time. This made open item **ACER-0A.4** negative rather than merely
   unmeasured. **Superseded 2026-08-21:** the engine is installed;
-  the local security-master/data half remains unmeasured and unavailable to
-  this workflow until entitlement and materialization are audited.
+  the later owner amendment selects QuantConnect Cloud, so the active
+  security-master/data question is cloud coverage and semantics rather than
+  local materialization.
 - **The QuantConnect client cannot reach data endpoints, by design.**
   `research/quantconnect.py` restricts requests to an allowlist of
   `projects/`, `files/`, `compile/`, `backtests/`, `optimizations/` and

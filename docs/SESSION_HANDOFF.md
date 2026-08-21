@@ -18,8 +18,9 @@ correction review. Section 7bv records the later ACER replacement, 7bw its
 independent review, 7bx the counter-review, 7by the vendor audit, 7bz the
 independent correction review, 7ca the counter-review of that correction,
 7cb the ACER event backbone, 7cc its independent review, 7cd the
-counter-review of that review, and 7ce the ACER-0A freeze; 7ce and section 8
-are the current development state.
+counter-review of that review, 7ce the ACER-0A submission, and 7cf Codex's
+independent correction review; 7cf and section 8 are the current development
+state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -31,27 +32,27 @@ program is closed (`A-001`, `A-002`) and is no longer the entry point.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-20.md` — the go-to plan (ACER first)
-3. `docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` — **the frozen ACER-2
-   contract**; it governs for ACER-2 wherever it differs from the plan below
+3. `docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` — the **partially frozen
+   ACER-2 decision record** and its ACER-0A.1–0A.10 completion ledger
 4. `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — the ACER
-   contract shape; ACER-0A frozen, ACER-0B deliberately still draft
-4. `docs/reference/analyst-consensus-etf-strategy.pdf` — the owner-supplied
+   contract shape; ACER-0A incomplete, ACER-0B deliberately still draft
+5. `docs/reference/analyst-consensus-etf-strategy.pdf` — the owner-supplied
    design narrative; the Markdown ACER contract governs where they differ
-5. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
+6. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
    the closed historical capture contract
-6. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
+7. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
    `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md` — the full
    SBP review chain, in order
-7. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
-8. `docs/operations/OPERATIONS_RUNBOOK.md`
-9. `docs/operations/MANDATE.md` (§2, §4, §6)
-10. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-11. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-12. `docs/alpha-result.md` — the permanent run ledger (append-only)
-13. `docs/Alpha_Test_Implementation_Plan.md` — closed program, historical
+8. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
+9. `docs/operations/OPERATIONS_RUNBOOK.md`
+10. `docs/operations/MANDATE.md` (§2, §4, §6)
+11. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+12. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+13. `docs/alpha-result.md` — the permanent run ledger (append-only)
+14. `docs/Alpha_Test_Implementation_Plan.md` — closed program, historical
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -3634,7 +3635,7 @@ gates are unchanged: ambiguity-refusing issuer mapping, Snapshot B, the
 ACER-0 freeze, the earnings-control dataset, and dataset-specific permission
 before any reconstructable-data upload to QuantConnect.
 
-## 7ce. ACER-0A freeze and two read-only measurements (Claude, 2026-08-20)
+## 7ce. ACER-0A partial freeze and two read-only measurements (Claude, 2026-08-20)
 
 Branch: `user/claude/acer0a-freeze-20260820`, off `b58947e`. The owner issued
 ten decisions; this round records them and performs the two read-only
@@ -3643,11 +3644,12 @@ backtest, upload, or ACER-2 run occurred, and nothing operational was
 changed.**
 
 **The freeze is split, and that is the substantive decision.**
-`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` freezes the decisive
-stock-level ACER-2 contract; ACER-0B — ETF benchmark and investability
-choices — stays deliberately unfrozen so they are not forced before a
-stock-level signal is shown to exist. ACER-3's run budget is **zero** until
-the owner separately freezes ACER-0B.
+`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` freezes the owner's decisive
+stock-level choices, but not yet an executable ACER-2 preregistration;
+ACER-0B — ETF benchmark and investability choices — stays deliberately
+unfrozen so they are not forced before a stock-level signal is shown to
+exist. ACER-3's run budget is **zero** until the owner separately freezes
+ACER-0B.
 
 ACER-2 is **six cells, not twelve**: two encodings x three half-lives (21,
 63, 126 sessions) x one coverage-neutral per-firm mean x one 21-session
@@ -3668,7 +3670,7 @@ adoption**: the Benzinga Earnings expansion, $99 for a one-month structural
 audit against eight criteria, with `eps_surprise_percent` distrusted and our
 own standardized-surprise formula frozen afterwards.
 
-**Four items are named as still-open (ACER-0A.1–0A.4) and must close before
+**Ten items are named as still-open (ACER-0A.1–0A.10) and must close before
 the single development run.** The one I want the next reader to notice is
 ACER-0A.1: the owner's condition that the result "must not be driven by one
 year, sector, or a small number of securities" is frozen in principle but
@@ -3678,10 +3680,11 @@ document proposes a concrete rule (leave-one-year-out, leave-one-sector-out,
 and removal of the top 1% of contributing securities, each retaining sign and
 significance) and explicitly marks it as **awaiting owner confirmation rather
 than frozen**, because inventing the threshold silently would be the defect.
-The other three are the surprise formula, the value control's source under
-local LEAN, and whether local LEAN actually holds the prices, corporate
-actions, delisted securities, and session calendar the design assumes. Also
-flagged: a one-month audit subscription that is then cancelled re-raises the
+The other items include the surprise formula, value source, local data
+inventory, exact rating scale and signal construction, all control/outcome
+formulas, estimation/significance and split protocol, error-slot and
+confirmation rules, and point-in-time universe semantics. Also flagged: a
+one-month audit subscription that is then cancelled re-raises the
 deletion-on-termination question, so an evidence snapshot may not outlive it.
 
 **SBR-1 measured absent** (`docs/operations/OPERATIONAL_FACTS.md`): the
@@ -3693,11 +3696,12 @@ filename rather than by a single default path. The closure now rests on a
 measurement instead of on absence of repository evidence. Nothing was
 installed or running, so there was nothing to stop for.
 
-**Both reconciliation alerts are stale state, not a fault**
-(`docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`). Every long
-reconciliation gap matches a Windows sleep window **exactly** across seven
-checked instances; the paper tasks are registered `WakeToRun=False`, so a
-sleep over 30 minutes guarantees the critical check fails on wake. Both
+**At the recorded read-only instant, both reconciliation alerts were stale
+state rather than a live mismatch**
+(`docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`). Seven of
+22 long reconciliation gaps match a Windows sleep window exactly; 15 were
+not correlated. The paper tasks are registered `WakeToRun=False`, while
+`StartWhenAvailable=True` queues missed time-based starts for catch-up. Both
 alerts carry `matched=True, mismatches=0, errors=0`, and 20 clean
 reconciliations have completed on a 10-minute cadence since the last failure
 at 02:49Z. Nothing was acknowledged, closed, altered, or repaired. The
@@ -3735,6 +3739,60 @@ merged and deleted. The guard was not weakened, and it fired twice here: the
 first draft of this very paragraph reproduced the pattern by quoting the hash
 beside the claim it was describing.
 
+## 7cf. Independent ACER-0A freeze review (Codex, 2026-08-21)
+
+Exact submitted remote: `origin/user/claude/acer0a-freeze-20260820` at
+`3a98fefb0808e4e9e4b3bc185ee59c12b1449bac`, based on and merge-based at
+`b58947e589c6fa92ed498f57f68ba0590048303f`. The range contained exactly one
+commit, which is **accepted after correction**. Full report:
+`docs/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md`.
+
+Review branch: `codex/review-acer0a-freeze-20260820`. Ordered Codex commits
+before this handoff are:
+
+1. `edc0612` — correct the ACER-0A freeze, operational scheduler facts and
+   active-document regression guards;
+2. `08955d6` — record the independent review and corrected action-plan state;
+3. this separate handoff commit (the branch tip).
+
+The owner authorized exactly one final push after all work completed. This
+branch is intended to be published once to
+`origin/codex/review-acer0a-freeze-20260820` for Claude's counter-review; the
+final reviewer report must verify the exact remote head. No intermediate push
+was made.
+
+**Findings:** two P2 research-governance issues, one P2 operational-fact issue
+and one P3 active-document consistency issue were confirmed and resolved.
+The submitted record called ACER-0A frozen even though outcome-sensitive
+signal, control, residualization, fold, significance, date-split,
+confirmation and point-in-time membership choices remained open. Its one-plus-
+one run budget also failed to say what happens when an error/refusal consumes
+a slot. The alert diagnosis generalized seven checked sleep gaps to all 22
+and incorrectly described a missed timed task as skipped despite installed
+`StartWhenAvailable=True`; Microsoft and the installer say it is queued for
+catch-up. Active plan sections also retained pre-measurement SBR and
+pre-purchase ratings claims.
+
+**Correction:** the owner's selected values remain frozen, but ACER-0A is now
+accurately labelled a **partial decision freeze, not an executable
+preregistration**. ACER-0A.1–0A.10 must all close before any real
+signal/outcome join. The run slots are provisional and cannot be replaced or
+expanded until the owner freezes the error/refusal and confirmation rule. The
+operational record now says seven of 22 gaps were correlated, distinguishes
+`WakeToRun=False` from `StartWhenAvailable=True`, and describes catch-up as
+conditional: it may capture the same session or refuse/no-op after the
+session/freshness boundary. No operational setting or row changed.
+
+Independent validation on the final corrected tree: focused documents/task/
+paper-evidence tests **59 passed in 8.77s**; full suite **4,420 passed / 0
+failed / 25 warnings in 834.29s** on Python 3.13.14; required `compileall`
+including `research/` passed; `git diff --check` passed. Read-only task and
+SQLite `mode=ro` checks confirmed the installed settings, submitted alert
+payloads and epoch counts. No QuantConnect, Massive/Benzinga or broker API
+was accessed; no outcome, signal, licensed row, run or research look was
+consumed. Application/execution code did not change, so paper mode, approvals,
+kill switch and broker lifecycle were out of scope rather than re-proven.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -3752,16 +3810,18 @@ identity deliberately unresolved. That review chain closed with the
 counter-review in section 7cd, which confirmed all seven findings and fixed
 two defects in the corrections; the whole round is merged.
 
-**ACER-0A is now FROZEN** (section 7ce,
-`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`): six cells, primary cell
-and statistic named in advance, Bonferroni 0.05/6, a two-execution run
-budget, and a point-in-time stock universe. **ACER-0B is deliberately not
-frozen** and ACER-3's budget is zero until it is. Local LEAN is the
+**ACER-0A owner decisions are partially frozen and independently corrected**
+(sections 7ce–7cf,
+`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`): six cells, a named primary,
+Bonferroni 0.05/6, a provisional two-slot budget, and numeric point-in-time
+stock thresholds. The executable preregistration is still incomplete.
+**ACER-0B is deliberately not frozen** and ACER-3's budget is zero until it
+is. Local LEAN is the
 authoritative engine; reconstructable ratings stay off QuantConnect absent
 explicit permission evidence; QC access is read-only symbol mapping only.
 
-What ACER needs next, in order: close the four named open items
-(ACER-0A.1–0A.4) — above all the numeric robustness rule, which is currently
+What ACER needs next, in order: close the ten named open items
+(ACER-0A.1–0A.10) — above all the numeric robustness rule, which is currently
 a proposal awaiting owner confirmation; run the $99 one-month Benzinga
 Earnings **structural audit** and only then adopt or reject that control
 dataset and freeze the standardized-surprise formula; resolve issuer mapping
@@ -3916,17 +3976,21 @@ Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
 docs/SESSION_HANDOFF.md, docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
 docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
 docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
+docs/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
 docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
 docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/alpha-result.md.
 The vendor-audit and event-backbone review chains are both closed and merged
 (sections 7ca and 7cd); every review branch is deleted and main is the only
-branch. **ACER-0A is frozen; ACER-0B is deliberately not.** The dataset
+branch. The ACER-0A submission was accepted after correction on
+`codex/review-acer0a-freeze-20260820`. **ACER-0A decisions are partially
+frozen but its executable preregistration is incomplete; ACER-0B is
+deliberately not frozen.** The dataset
 identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
 materialized; earlier ids are superseded. Stage 0/1 and APQ are valid but
 closed null; SHW-4 is prospective. SBP is superseded by ACER and SBR-1 is
-closed on a measurement. Next: close ACER-0A.1–0A.4 (the numeric robustness
+closed on a measurement. Next: close ACER-0A.1–0A.10 (the numeric robustness
 rule is a proposal awaiting owner confirmation), run the authorized $99
 Benzinga Earnings structural audit before adopting that control dataset,
 resolve issuer mapping with ambiguity refusals over the 9,677-ticker surface

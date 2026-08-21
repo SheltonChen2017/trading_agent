@@ -86,6 +86,8 @@ DELISTED_PROBES = [
 ]
 
 RATING_FIELDS_FOR_MISSINGNESS = ("previous_rating", "time", "firm", "rating")
+ISSUER_IDENTITY_FIELDS = ("isin", "exchange", "company_name", "ticker")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def _api_key() -> str:
@@ -207,21 +209,129 @@ def download(out_root: Path) -> Path:
     return snap
 
 
+def _load_manifest(snap: Path) -> dict:
+    """Load a snapshot manifest only after its recorded hash verifies."""
+    manifest_path = snap / "manifest.json"
+    hash_path = snap / "manifest.sha256"
+    try:
+        manifest_bytes = manifest_path.read_bytes()
+        recorded_hash = hash_path.read_text(encoding="utf-8").strip().lower()
+    except OSError as exc:
+        raise SystemExit(f"REFUSED: snapshot manifest is missing or unreadable: {exc}")
+    if not SHA256_RE.fullmatch(recorded_hash):
+        raise SystemExit("REFUSED: manifest.sha256 is not one lowercase SHA-256")
+    actual_hash = hashlib.sha256(manifest_bytes).hexdigest()
+    if actual_hash != recorded_hash:
+        raise SystemExit("REFUSED: manifest hash mismatch")
+    try:
+        manifest = json.loads(manifest_bytes)
+    except (TypeError, ValueError) as exc:
+        raise SystemExit(f"REFUSED: manifest is not valid JSON: {exc}")
+    if not isinstance(manifest, dict) or not isinstance(manifest.get("partitions"), list):
+        raise SystemExit("REFUSED: manifest has no partitions list")
+    return manifest
+
+
 def _load_rows(snap: Path, allow_incomplete: bool) -> list[dict]:
-    manifest = json.loads((snap / "manifest.json").read_text(encoding="utf-8"))
+    manifest = _load_manifest(snap)
     if not manifest.get("complete", False) and not allow_incomplete:
         raise SystemExit(
             "REFUSED: snapshot is marked incomplete (a partition did not "
             "terminate naturally). Pass --allow-incomplete to analyse anyway."
         )
     rows: list[dict] = []
+    seen_files: set[str] = set()
     for partition in manifest["partitions"]:
+        if not isinstance(partition, dict) or not isinstance(partition.get("pages"), list):
+            raise SystemExit("REFUSED: malformed partition metadata")
+        if manifest.get("complete", False) and not partition.get("terminated_naturally", False):
+            raise SystemExit("REFUSED: complete manifest contains unterminated partition")
+        partition_rows = 0
         for meta in partition["pages"]:
-            payload = (snap / "raw" / meta["file"]).read_bytes()
-            if hashlib.sha256(payload).hexdigest() != meta["sha256"]:
-                raise SystemExit(f"REFUSED: hash mismatch for {meta['file']}")
-            rows.extend(json.loads(payload).get("results") or [])
+            if not isinstance(meta, dict):
+                raise SystemExit("REFUSED: malformed page metadata")
+            file_name = meta.get("file")
+            if not isinstance(file_name, str) or Path(file_name).name != file_name:
+                raise SystemExit("REFUSED: unsafe page filename in manifest")
+            if file_name in seen_files:
+                raise SystemExit(f"REFUSED: duplicate page reference: {file_name}")
+            seen_files.add(file_name)
+            expected_hash = meta.get("sha256")
+            if not isinstance(expected_hash, str) or not SHA256_RE.fullmatch(
+                expected_hash.lower()
+            ):
+                raise SystemExit(f"REFUSED: invalid page hash for {file_name}")
+            try:
+                payload = (snap / "raw" / file_name).read_bytes()
+            except OSError as exc:
+                raise SystemExit(f"REFUSED: page is missing or unreadable: {exc}")
+            if hashlib.sha256(payload).hexdigest() != expected_hash.lower():
+                raise SystemExit(f"REFUSED: hash mismatch for {file_name}")
+            try:
+                body = json.loads(payload)
+            except (TypeError, ValueError) as exc:
+                raise SystemExit(f"REFUSED: invalid JSON in {file_name}: {exc}")
+            results = body.get("results") if isinstance(body, dict) else None
+            if not isinstance(results, list) or not all(isinstance(row, dict) for row in results):
+                raise SystemExit(f"REFUSED: {file_name} has a malformed results list")
+            if meta.get("rows") != len(results):
+                raise SystemExit(f"REFUSED: row-count mismatch for {file_name}")
+            partition_rows += len(results)
+            rows.extend(results)
+        if partition.get("rows") != partition_rows:
+            raise SystemExit(
+                f"REFUSED: row-count mismatch for partition {partition.get('year')}"
+            )
     return rows
+
+
+def _parse_action_date(value: object) -> dt.date | None:
+    try:
+        return dt.date.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        return None
+
+
+def _parse_last_updated(value: object) -> dt.datetime | None:
+    """Parse both observed Massive legacy timestamps and documented ISO values."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip()
+    try:
+        return dt.datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        pass
+    for fmt in ("%m/%d/%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S"):
+        try:
+            return dt.datetime.strptime(text, fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def _last_updated_date_facts(rows: list[dict]) -> collections.Counter:
+    """Return date-level update facts without inventing a timezone."""
+    facts = collections.Counter()
+    for row in rows:
+        action_date = _parse_action_date(row.get("date"))
+        updated = _parse_last_updated(row.get("last_updated"))
+        if action_date is None:
+            facts["invalid_action_date"] += 1
+            continue
+        if updated is None:
+            facts["missing_or_invalid_last_updated"] += 1
+            continue
+        facts["parsed"] += 1
+        gap_days = (updated.date() - action_date).days
+        if gap_days < 0:
+            facts["before_action_date"] += 1
+        elif gap_days == 0:
+            facts["same_action_date"] += 1
+        else:
+            facts["after_action_date"] += 1
+        if gap_days > 90:
+            facts["more_than_90_days_after"] += 1
+    return facts
 
 
 def analyse(snap: Path, allow_incomplete: bool) -> None:
@@ -242,8 +352,6 @@ def analyse(snap: Path, allow_incomplete: bool) -> None:
     inconsistent_transitions = 0
     self_transitions = 0
     hour_hist = collections.Counter()
-    last_updated_after_time = 0
-    has_last_updated = 0
 
     for r in rows:
         year = (r.get("date") or "????")[:4]
@@ -253,7 +361,7 @@ def analyse(snap: Path, allow_incomplete: bool) -> None:
             bucket["tickers"].add(r["ticker"])
         if r.get("firm"):
             bucket["firms"].add(r["firm"])
-        for field in RATING_FIELDS_FOR_MISSINGNESS:
+        for field in (*RATING_FIELDS_FOR_MISSINGNESS, *ISSUER_IDENTITY_FIELDS):
             value = r.get(field)
             if value is None or value == "":
                 missing[field] += 1
@@ -271,12 +379,6 @@ def analyse(snap: Path, allow_incomplete: bool) -> None:
         t = r.get("time") or ""
         if re.match(r"^\d{2}:\d{2}", t):
             hour_hist[int(t[:2])] += 1
-        lu = r.get("last_updated")
-        if lu:
-            has_last_updated += 1
-            action_ts = f"{r.get('date','')}T{t}" if t else r.get("date", "")
-            if str(lu) > action_ts:
-                last_updated_after_time += 1
 
     print("\nyear  rows      tickers  firms")
     for year in sorted(by_year):
@@ -284,7 +386,11 @@ def analyse(snap: Path, allow_incomplete: bool) -> None:
         print(f"{year}  {b['rows']:>8}  {len(b['tickers']):>7}  {len(b['firms']):>5}")
 
     print("\nmissingness (of", len(rows), "rows):")
-    for field in (*RATING_FIELDS_FOR_MISSINGNESS, "benzinga_id"):
+    for field in (
+        *RATING_FIELDS_FOR_MISSINGNESS,
+        *ISSUER_IDENTITY_FIELDS,
+        "benzinga_id",
+    ):
         n = missing[field]
         print(f"  {field:<16} {n:>8}  ({n / len(rows):.2%})")
 
@@ -301,10 +407,18 @@ def analyse(snap: Path, allow_incomplete: bool) -> None:
     print("\ntime-of-day histogram (hour -> rows), for timezone inference:")
     for hour in sorted(hour_hist):
         print(f"  {hour:02d}h {hour_hist[hour]:>8}")
-    print(
-        f"rows with last_updated: {has_last_updated}; "
-        f"last_updated later than action timestamp: {last_updated_after_time}"
-    )
+    update_facts = _last_updated_date_facts(rows)
+    print("\nlast_updated date integrity (timezone-neutral):")
+    for label in (
+        "parsed",
+        "missing_or_invalid_last_updated",
+        "invalid_action_date",
+        "before_action_date",
+        "same_action_date",
+        "after_action_date",
+        "more_than_90_days_after",
+    ):
+        print(f"  {label:<31} {update_facts[label]:>8}")
 
     print("\ndelisted/renamed probe coverage (rows in snapshot, last action date):")
     probe_rows: dict[str, list[str]] = {p: [] for p in DELISTED_PROBES}
@@ -324,10 +438,17 @@ def compare(snap_a: Path, snap_b: Path, allow_incomplete: bool) -> None:
     """Restatement measurement: diff two snapshots by stable benzinga_id."""
     def keyed(snap: Path) -> dict[str, dict]:
         out: dict[str, dict] = {}
-        for r in _load_rows(snap, allow_incomplete):
+        for index, r in enumerate(_load_rows(snap, allow_incomplete)):
             rid = r.get("benzinga_id")
-            if rid:
-                out[rid] = r
+            if not isinstance(rid, str) or not rid.strip():
+                raise SystemExit(
+                    f"REFUSED: snapshot {snap} row {index} has no benzinga_id"
+                )
+            if rid in out:
+                raise SystemExit(
+                    f"REFUSED: snapshot {snap} has duplicate benzinga_id {rid}"
+                )
+            out[rid] = r
         return out
 
     a, b = keyed(snap_a), keyed(snap_b)

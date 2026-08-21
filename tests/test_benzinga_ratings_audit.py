@@ -1,10 +1,10 @@
 """Refusal-direction tests for the Benzinga ratings vendor-audit tool.
 
-The audit's evidentiary value rests on three refusals: an existing snapshot
-is never overwritten, a corrupted page is never silently analysed, and an
-incomplete download is never analysed as if it were complete. Each is tested
-in the dangerous direction. A fourth test pins the credential-stripping
-helper so a recorded URL can never carry a key.
+The audit's evidentiary value rests on immutable, internally consistent
+snapshots and stable row identities. These tests drive the dangerous
+directions: overwrite, corruption, incomplete pagination, altered metadata,
+row-count drift, duplicate or missing ids, timestamp-format confusion, and
+credential leakage.
 """
 from __future__ import annotations
 
@@ -14,30 +14,56 @@ from pathlib import Path
 
 import pytest
 
-from scripts.audit_benzinga_ratings import _load_rows, _strip_key, download
+from scripts.audit_benzinga_ratings import (
+    _last_updated_date_facts,
+    _load_rows,
+    _strip_key,
+    compare,
+    download,
+)
 
 
-def _write_snapshot(root: Path, *, complete: bool = True, corrupt: bool = False) -> Path:
-    snap = root / "benzinga-ratings-test"
+def _write_snapshot(
+    root: Path,
+    *,
+    name: str = "benzinga-ratings-test",
+    complete: bool = True,
+    corrupt: bool = False,
+    rows: list[dict] | None = None,
+    declared_page_rows: int | None = None,
+) -> Path:
+    snap = root / name
     raw = snap / "raw"
     raw.mkdir(parents=True)
-    payload = json.dumps({"results": [{"benzinga_id": "x1", "date": "2020-01-02"}]}).encode()
+    snapshot_rows = rows or [{"benzinga_id": "x1", "date": "2020-01-02"}]
+    payload = json.dumps({"results": snapshot_rows}).encode()
     (raw / "2020-p0000.json").write_bytes(payload)
     digest = hashlib.sha256(payload).hexdigest()
     if corrupt:
         (raw / "2020-p0000.json").write_bytes(payload + b" ")
+    page_rows = len(snapshot_rows) if declared_page_rows is None else declared_page_rows
     manifest = {
         "complete": complete,
         "partitions": [
             {
                 "year": 2020,
-                "rows": 1,
+                "rows": page_rows,
                 "terminated_naturally": complete,
-                "pages": [{"file": "2020-p0000.json", "sha256": digest, "rows": 1}],
+                "pages": [
+                    {
+                        "file": "2020-p0000.json",
+                        "sha256": digest,
+                        "rows": page_rows,
+                    }
+                ],
             }
         ],
     }
-    (snap / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    manifest_bytes = json.dumps(manifest).encode()
+    (snap / "manifest.json").write_bytes(manifest_bytes)
+    (snap / "manifest.sha256").write_text(
+        hashlib.sha256(manifest_bytes).hexdigest() + "\n", encoding="utf-8"
+    )
     return snap
 
 
@@ -75,6 +101,23 @@ def test_analysis_refuses_a_hash_mismatch(tmp_path):
         _load_rows(snap, allow_incomplete=False)
 
 
+def test_analysis_refuses_a_manifest_hash_mismatch(tmp_path):
+    """Completeness metadata cannot be edited without invalidating the snapshot."""
+    snap = _write_snapshot(tmp_path)
+    manifest = json.loads((snap / "manifest.json").read_text(encoding="utf-8"))
+    manifest["partitions"] = []
+    (snap / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(SystemExit, match="manifest hash mismatch"):
+        _load_rows(snap, allow_incomplete=False)
+
+
+def test_analysis_refuses_manifest_page_row_count_drift(tmp_path):
+    """A hash-valid manifest still has to agree with the hashed page contents."""
+    snap = _write_snapshot(tmp_path, declared_page_rows=2)
+    with pytest.raises(SystemExit, match="row-count mismatch"):
+        _load_rows(snap, allow_incomplete=False)
+
+
 def test_analysis_refuses_an_incomplete_snapshot_without_override(tmp_path):
     """A truncated download must not masquerade as the full history."""
     snap = _write_snapshot(tmp_path, complete=False)
@@ -91,3 +134,50 @@ def test_recorded_urls_never_carry_a_credential():
         "https://api.example.com/x?token=SECRET",
     ):
         assert "SECRET" not in _strip_key(url)
+
+
+@pytest.mark.parametrize(
+    "bad_rows, message",
+    [
+        ([{"benzinga_id": "same"}, {"benzinga_id": "same"}], "duplicate"),
+        ([{"benzinga_id": ""}], "no benzinga_id"),
+    ],
+)
+def test_snapshot_comparison_refuses_unstable_identity_keys(
+    tmp_path, capsys, bad_rows, message
+):
+    """Snapshot B cannot hide rows through dict overwrite or missing-id drops."""
+    a = _write_snapshot(tmp_path, name="a", rows=[{"benzinga_id": "a1"}])
+    b = _write_snapshot(tmp_path, name="b", rows=bad_rows)
+    with pytest.raises(SystemExit, match=message):
+        compare(a, b, allow_incomplete=False)
+    assert "modified:" not in capsys.readouterr().out
+
+
+def test_last_updated_facts_parse_legacy_and_iso_without_lexical_comparison():
+    rows = [
+        {
+            "date": "2020-01-02",
+            "last_updated": "01/02/2020 08:30:00",
+        },
+        {
+            "date": "2020-01-02",
+            "last_updated": "2020-01-03T01:00:00Z",
+        },
+        {
+            "date": "2020-01-02",
+            "last_updated": "05/01/2020 00:00:00",
+        },
+        {
+            "date": "2020-01-02",
+            "last_updated": "01/01/2020 23:59:59",
+        },
+    ]
+    facts = _last_updated_date_facts(rows)
+    assert facts == {
+        "parsed": 4,
+        "same_action_date": 1,
+        "after_action_date": 2,
+        "more_than_90_days_after": 1,
+        "before_action_date": 1,
+    }

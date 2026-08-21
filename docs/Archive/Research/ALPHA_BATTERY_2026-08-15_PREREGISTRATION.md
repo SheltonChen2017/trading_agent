@@ -3,7 +3,7 @@
 > **2026-08-17 validity note:** This remains the frozen historical declaration,
 > but the result generated from it is invalid. The result Markdown and JSON
 > were removed from active docs after their exact hashes and disposition were
-> preserved in `docs/Archive/Research/alpha-result.md`. The local runner's turnover/NAV,
+> preserved in `docs/research/alpha-result.md`. The local runner's turnover/NAV,
 > leave-one-out peer, and joint-regression defects are corrected for code
 > integrity, but static latest basket labels and survivor-selected yfinance
 > data mean this declaration cannot produce confirmation evidence.

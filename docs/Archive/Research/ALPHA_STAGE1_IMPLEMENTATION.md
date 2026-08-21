@@ -104,7 +104,7 @@ look like.
 - **No QuantConnect run.** Stage 1 code has not been reviewed by Codex, and
   the workflow forbids using cloud compute to exercise unreviewed code.
 - **No result claimed.** There is no Stage 1 entry in
-  `docs/Archive/Research/alpha-result.md` because no run exists.
+  `docs/research/alpha-result.md` because no run exists.
 - **Stage 0 is incomplete** and nothing here depends on it: one run stalled
   at 86.5% holding the only backtest node, and the organisation exhausted
   its coding sessions. No Stage 0 statistic exists.

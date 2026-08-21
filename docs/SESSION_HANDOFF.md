@@ -34,7 +34,9 @@ counter-review that attempted to fix the derivation guard, and 7cu Codex's
 independent verification and correction of that guard. Section 7cv records
 the provider-neutral capability correction, and section 7cw records the
 owner-directed role swap, measured local access state, and documentation
-lifecycle reset; 7cw and section 8 are the current development state.
+lifecycle reset. Sections 7cx–7cz record the engine amendment and Claude's
+review, and section 7da records Codex's counter-review; 7da and section 8 are
+the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -65,7 +67,7 @@ program is closed (`A-001`, `A-002`) and is no longer the entry point.
 10. `docs/operations/MANDATE.md` (§2, §4, §6)
 11. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 12. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-13. `docs/Archive/Research/alpha-result.md` — the permanent run ledger (append-only)
+13. `docs/research/alpha-result.md` — the permanent run ledger (append-only)
 14. `docs/Archive/Plans/Alpha_Test_Implementation_Plan.md` — closed program, historical
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
@@ -167,7 +169,7 @@ operator-database mutation, or scheduled-task change.
 - The submitted alpha result and audit artifacts are **invalidated pending a
   clean rerun**. At the owner's direction, invalid generated Markdown, JSON,
   and raw logs were removed from active docs only after their exact identities,
-  hashes, and dispositions were preserved in `docs/Archive/Research/alpha-result.md` and Git
+  hashes, and dispositions were preserved in `docs/research/alpha-result.md` and Git
   history. Nothing was promoted to the research registry or Feature Milestone
   Record.
 - The operational checkout remains separate and is frozen at `c9d0740`,
@@ -740,7 +742,7 @@ Four P2 and one P3 findings are closed; none remains open. Full detail is in
 `docs/Archive/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`.
 
 Documentation commit `e1aedc7` creates
-`docs/Archive/Plans/Alpha_Test_Implementation_Plan.md`, corrects `docs/Archive/Research/alpha-result.md`, and
+`docs/Archive/Plans/Alpha_Test_Implementation_Plan.md`, corrects `docs/research/alpha-result.md`, and
 updates the Action Plan. The ledger now counts five run-level looks and 80
 emitted repeated-look cells, giving a conservative lifetime alpha-cell floor
 of 428. It records exact log hashes/backtest IDs while marking absent compile
@@ -808,7 +810,7 @@ validation is recorded in the round-2 report and final documentation commit.
 No QuantConnect authentication, upload, compile, backtest, result read or
 market statistic occurred. No broker, order, deployment, database, scheduler,
 policy, mandate, registry or epoch state changed. The alpha-cell exposure
-floor therefore remains 428. `docs/Archive/Research/alpha-result.md` contains no Stage 1 run;
+floor therefore remains 428. `docs/research/alpha-result.md` contains no Stage 1 run;
 any run launched before Claude counter-review must be appended as
 `PENDING_REVIEW` and counted rather than reused.
 
@@ -841,7 +843,7 @@ Product corrections `855941a` and `1e2b631` do the following:
   classifications are not point-in-time.
 
 The invalid result narratives, JSON artifacts, and raw logs named in
-`docs/Archive/Research/alpha-result.md` were removed from active docs at the owner's direction.
+`docs/research/alpha-result.md` were removed from active docs at the owner's direction.
 Their run IDs, statuses, hashes, look counts, and Git history remain. Frozen
 preregistrations and Method V2 remain under `docs/research/` as historical
 contracts, each with a current validity note. Review reports now live under
@@ -945,7 +947,7 @@ behaviour, plus one documentation finding:
   working-tree hash; hashing the bare Git blobs mismatches on all fourteen
   artifacts, inviting a false tampering conclusion. All fourteen were
   re-verified under LF→CRLF conversion and the convention is now recorded in
-  `docs/Archive/Research/alpha-result.md`.
+  `docs/research/alpha-result.md`.
 
 Validation on the final tree: focused research/QC/document gate **167
 passed**; full suite **4,196 passed / 0 failed / 25 known dependency
@@ -1264,7 +1266,7 @@ PENDING_REVIEW until Codex reviews `49e8160`..`d305ea0`.
 The serial rerun ran to completion overnight. Fourteen cloud runs this
 continuation (R-009..R-022, run-level look count now **TWENTY-THREE**),
 producing all nine Stage 0 cells on the same fixed tree, every one
-ledgered in `docs/Archive/Research/alpha-result.md` with full identity and structural
+ledgered in `docs/research/alpha-result.md` with full identity and structural
 round-trip through the frozen parsers, **no statistic observed anywhere**:
 
 - **Monthly battery:** R-009 (A_large, 619 spec-rows), R-011 (B_core,
@@ -1382,7 +1384,7 @@ in the safe order on branch `user/claude/qc-stage0-analysis-20260818`
    independently computed input hashes).
 2. **The single analyser pass** ran once: monthly family, short family,
    benchmark family. Outputs and their SHA-256s are recorded in ledger
-   entry **A-001** (`docs/Archive/Research/alpha-result.md`).
+   entry **A-001** (`docs/research/alpha-result.md`).
 3. **Headline result:** on the preregistered Bonferroni gate (0.05/180 =
    2.78e-4, 20,000 draws): **IC 0/44 pass; long-short 0/44 pass;
    long-only 6/88 pass; short battery 0/60.** MULTI_ALPHA_COMPOSITE on
@@ -1576,7 +1578,7 @@ independent re-verification, not a rubber stamp: it re-read `602dc0b`
 claim by claim, ran its own two reverse mutations (both red, restored),
 verified all nine owner merge trees, and accepted every commit with 0
 P0/P1/P2. It raised two P3s: **S0R2-001** (the nine run headings and
-two summary paragraphs in `docs/Archive/Research/alpha-result.md` still said
+two summary paragraphs in `docs/research/alpha-result.md` still said
 PENDING_REVIEW / "no statistic observed" above A-001 — confirmed and
 FIXED this round: headings retitled VALID, dated superseding notes
 appended, originals retained) and **S0R2-002** (the `2be903f` upgrade
@@ -2477,7 +2479,7 @@ policies on one shared date set, 216 rows, 0 declared-unavailable
 turnovers, 0 refusals; 54 ≥ the 24-month floor. **No statistic
 observed** (`parse_log` only; the algorithm holds no QC positions, so
 QC's runtime stats are untouched-account boilerplate). Ledgered as
-**R-029 UNANALYSED** in `docs/Archive/Research/alpha-result.md`; run-level look
+**R-029 UNANALYSED** in `docs/research/alpha-result.md`; run-level look
 29 → 30. Raw log stays machine-local under `artifacts/` (hash in the
 ledger); QC market data is never committed.
 
@@ -4689,8 +4691,10 @@ provider-neutral correction on branch
 `codex/fix-acer-provider-neutral-capabilities-20260821`: product/test commit
 `2f4e41d`, documentation-lifecycle commit `a1dc779`, and archived-path test
 correction `0a94bef`, followed by review-skill path correction `b0f7dec`.
-The branch remains local-only at this handoff and must not be treated as
-reviewed or merged.
+That branch was local-only when this section was written. **Superseded: it was
+pushed and merged by PR #293 at `7f7e93a`, and every commit named above is now
+an ancestor of `main`.** Claude's independent review of the whole merged range
+is section 7cz.
 
 A names-only environment measurement found `MASSIVE_API_KEY`, `QC_USER_ID`,
 and `QC_API_TOKEN` present in the current Codex desktop process;
@@ -4818,6 +4822,158 @@ tests**; diff and narrow secret checks passed. No feature milestone entry was
 added because this is an execution-policy amendment, not a completed ACER
 milestone.
 
+## 7cz. Independent review of the Codex documentation-lifecycle range (Claude, 2026-08-21)
+
+First round under the new role split: Codex implements, Claude reviews.
+Branch `user/claude/review-codex-doc-lifecycle-20260821`, created from
+`origin/main` at `98e1d63`. Full record:
+`docs/Archive/Review/REVIEW_2026-08-21_CODEX_DOC_LIFECYCLE.md`.
+
+Reviewed the complete ordered range `25cc6d4..98e1d63` — twenty commits,
+four merged PRs (#292–#295), 242 files — commit by commit, merges included.
+**Accepted after correction.** No P0 or P1. Four P2 and four P3 findings,
+all corrected here.
+
+What is genuinely good, said before the findings: the reorganization moved
+~180 documents with **zero** broken `docs/...` references, verified by
+resolving every such target in every tracked file. And the provider-neutral
+capability split (`2f4e41d`) is a real conceptual correction rather than a
+weakening — ACER needs *capabilities*, not a named vendor, and
+`acer2_runnable` stays `false` because everything Databento would have
+supplied is still separately required and blocking.
+
+**The findings cluster on one shape: claims about state, written inside the
+commit that changes the state.**
+
+- **CDR-003 (P2)** — the handoff told the next session that merged mainline
+  work was "local-only" and "must be independently reviewed before merge"
+  (all eight commits are ancestors of `origin/main`), and that "There is no
+  local `lean` command" while section 7cx of the same file records LEAN CLI
+  `1.0.228` verified. This is CCR-005 for the fourth recorded time.
+- **CDR-002 (P2)** — the cloud-engine amendment rewrote freeze §8's first
+  bullet and left its third authorizing "read-only **symbol-mapping** work
+  only". That document governs for ACER-2 where documents differ, so the
+  governing record forbade the cloud capability audit that the ACER plan, the
+  local-data audit and §8 all schedule as the next step. Widened to
+  "read-only, zero-outcome structural work" with every prohibition intact.
+  Also recorded there: with a cloud engine the ratings-transfer gate stops
+  being a side condition and becomes a **blocking dependency** — the selected
+  architecture needs a permitted representation of the signal in Cloud.
+  Counter-review retained that gate but corrected the supporting overstatement:
+  QC offers separate Download licences, so its terms do not categorically
+  forbid local data; this project has not purchased or authorized that route.
+- **CDR-004 (P2)** — the permanent append-only run ledger was filed under
+  `docs/Archive/`, a folder whose index says "completed, superseded, and
+  obsolete material" and "Do not resume work from this folder", while ACER's
+  two authorized slots must each append an `R-nnn` entry to it. Moved to
+  `docs/research/alpha-result.md`; 27 files repointed; the ledger header and
+  the Archive index now say plainly that it is active and why.
+- **CDR-001 (P2)** — during the migration, two lifecycle guards had their
+  bodies wrapped in `if re.search(r"Status: \*\*SUPERSEDED", sbp):`.
+  **Mutation-proved on the reviewed tree**: rewording that one status line to
+  `RETIRED` left both tests green with every assertion unrun. The first guard
+  also lost the relationship framing it was written with. Repaired by parsing
+  the status once and asserting it; the same mutation now fails both tests
+  and passes restored, with the document byte-identical afterwards.
+- **CDR-005 (P3)** — the Action Plan attributed 1/5/6/11 to the isolated
+  review tree; checking out `14a3a83` in a detached worktree and running the
+  summarizer gives 1/**6**/**5**/11, matching the review report and §7cs.
+- **CDR-006 (P3)** — "Historical review reports … are never retro-edited",
+  asserted in the commit that rewrote paths inside **68** of them. The rule
+  now protects findings, dispositions, counts and validation results, and
+  records the mechanical path-migration exception.
+- **CDR-008 (P3)** — `Archive/Plans/` is defined as completed or superseded
+  material, yet the Action Plan cites `SHADOW_OBSERVATION_DESIGN.md` there as
+  the authority for `overlay-epoch-001`, which is live and accruing toward a
+  24-month floor. The file was deliberately not moved; the Archive index now
+  distinguishes a completed implementation from a still-governing contract.
+- **CDR-007 (P3)** — the LEAN/Docker installation is machine-local truth that
+  lived only under `docs/reference/` and said "this machine" on a repository
+  with **two** hosts. Measured read-only: `whoami` → `REDMOND\sheltonchen`,
+  the **epoch host**; `C:\QuantConnect\ACER` present; `lean`/`docker` absent
+  from a pre-install shell. Recorded in `OPERATIONAL_FACTS.md` with what I
+  measured separated from what Codex recorded, plus the note that Docker
+  Desktop is now resident on the machine running `paper-epoch-006`.
+
+Two things recorded without a code change, in the review report: the
+merged-commit guard's blind spot (hash and claim in different sentences —
+which is why it passed on `origin/main` while the claim was false), and that
+`CQC-001`'s unverified QuantConnect `success` check stops being dormant under
+a cloud engine.
+
+Nothing in this round touched a vendor API, credential, licensed row, price,
+outcome, backtest, research look, broker, scheduled task, operator database,
+deployment, or epoch. `paper-epoch-006` is undisturbed. No milestone
+completed, so `docs/FEATURE_MILESTONE_RECORD.md` is unchanged.
+
+Validation on the final tree: full suite **4,488 passed / 0 failed / 25
+warnings** in 843.24 seconds on Python 3.13.14. This round adds **no** test:
+`origin/main` at `98e1d63` and this branch both collect 4,488, measured in a
+detached worktree — CDR-001 repaired two existing guards rather than adding
+one. (Section 7cw's 4,487 was measured mid-series, before the range's last
+guard landed; it is not a discrepancy with this count.)
+`compileall` over the required surface including `research/` and `tests/`
+passed; `git diff --check` passed; the repository-wide `docs/...` link scan
+reported **0** missing targets after the ledger move; the active-document
+guards passed **48/48**, rerun after every edit including after these counts
+were inserted. An earlier full run was started before the last documentation
+edits and is therefore not the validating run; it was rerun on the exact final
+tree.
+
+Untested surface, stated plainly: this round changed documentation and one
+test module. The capability checker's behaviour is unchanged by me, and it
+still establishes only what this repository *declares* — not what any vendor
+would deliver. The host measurements are point-in-time observations of one
+machine; the second host was not measured and nothing here claims anything
+about it.
+
+## 7da. Codex counter-review of Claude's lifecycle review (2026-08-21)
+
+Exact submitted remote head
+`origin/user/claude/review-codex-doc-lifecycle-20260821` at
+`cc05ce76676e9aa8798bf03bba39aa12ff881d7e`, merge-base `98e1d63`, ordered
+commits `b4129d2`, `f14e152`, `cc05ce7`. Counter-review branch
+`codex/counterreview-claude-doc-lifecycle-20260821`. Durable record:
+`docs/Archive/Review/REVIEW_2026-08-21_CLAUDE_DOC_LIFECYCLE_COUNTERREVIEW.md`.
+
+**Accepted after correction.** Claude's eight original findings and their
+corrections remain accepted. Four counter-review findings are closed:
+
+- **CDCR-001 (P2):** the transfer gate remains load-bearing, but the claim
+  that QC categorically forbids data downloads was false. QC offers separate
+  Download licences; this project has not purchased or authorized one and
+  Cloud remains the selected engine. No ratings representation — including
+  normalized events or derived features — may be presumed transferable. The
+  applicable agreement or written permission must cover the exact
+  representation sent to QC.
+- **CDCR-002 (P3):** CDR-003b is no longer deferred. The merged-state guard
+  now catches the exact adjacent-sentence branch form that shipped, excludes
+  negated and historical claims, and avoids paragraph-wide matching. Red on
+  the submitted parser: 2 failed / 1 passed; corrected regressions: 3 passed;
+  active-document suite: 50 passed.
+- **CDCR-003 (P3):** CDR-006's migration count was one high. Exact rename
+  detection shows 139 moved reports: 68 content-changed and 71 byte-identical.
+  Current records are corrected; the submitted report retains dated notes.
+- **CDCR-004 (P2):** the current resume prompt still asked the owner to
+  authorize the QC structural audit after governing freeze §8 had authorized
+  it. The prompt now directs the authorized audit and requires it to remain
+  inside that narrow boundary; a relationship guard fails on the stale form.
+
+The two owner-facing conclusions are now precise. The next technical step is
+still the already authorized read-only, zero-outcome QC Cloud capability
+audit. Separately, ACER-2 remains blocked until the ratings agreement or
+written permission covers the exact representation to be uploaded, its Cloud
+use, storage/retention/deletion and permitted outputs. Neither gate authorizes
+an upload, outcome join, backtest, research look or purchase.
+
+No vendor API, credential value, licensed row, price, outcome, backtest,
+research look, broker, task, operator database, deployment or epoch was
+accessed or changed. Historical capability split 1/6/5/11 was independently
+reproduced at detached `14a3a83`; required compileall passed. The complete
+suite passed **4,491 tests / 0 failures / 25 dependency warnings** in 918.62
+seconds on Python 3.13. Final Git/status checks follow before handoff. No
+milestone completed.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -4891,6 +5047,28 @@ purchase beyond the authorized $99 audit, no ACER price or outcome join, no
 ACER backtest, no QC upload, and no paper execution is authorized. LEV remains
 separate and cannot validate ACER. The SBP history is retained, and SBR-1 is
 now closed on a measurement rather than an assumption.
+
+**Review status of the current mainline (added 2026-08-21, section 7cz).**
+The whole Codex range `25cc6d4..98e1d63` is merged **and independently
+reviewed**; nothing on `main` is awaiting review. The corrections from that
+review are on `user/claude/review-codex-doc-lifecycle-20260821`. Two of them
+change where a reader must look: the permanent run ledger is
+`docs/research/alpha-result.md` (not under `docs/Archive/`), and freeze §8
+now authorizes read-only, **zero-outcome structural** QuantConnect work
+rather than symbol mapping alone — which is what makes the scheduled cloud
+capability audit consistent with its governing document. The
+licensed-ratings transfer question is now a **blocking dependency** of
+ACER-2 rather than a side condition, because the selected architecture needs
+a permitted representation of the ratings signal in Cloud. Raw rows,
+normalized events and derived features must not be presumed transferable.
+QuantConnect separately offers Download licences for local internal LEAN use,
+but this project has not purchased or authorized that route and the owner has
+selected Cloud as the authoritative ACER engine.
+Section 7da counter-reviews Claude's exact `cc05ce7` review head, retains all
+eight submitted corrections, and closes four counter-review findings: the
+licensing premise, the adjacent-sentence guard gap, the 139/68/71 report
+migration count, and the stale request to re-authorize the already authorized
+cloud audit.
 
 ### Historical superseded checklist (retained for audit only)
 
@@ -4977,7 +5155,7 @@ the next operational observation is governed by
    and evidence provenance. Only then run the frozen next QC stage. Record
    project, compile, backtest, exact source, log/result hashes, windows, and
    before/after look counts.
-3. Append every execution to `docs/Archive/Research/alpha-result.md`; never rehabilitate or
+3. Append every execution to `docs/research/alpha-result.md`; never rehabilitate or
    silently recreate historical invalid artifacts. A premature run is
    `PENDING_REVIEW`, still counted, and must be rerun from reviewed source.
 4. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
@@ -5041,12 +5219,16 @@ docs/Archive/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
 docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
-docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/Archive/Research/alpha-result.md.
+docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/research/alpha-result.md.
 The vendor-audit and event-backbone review chains are closed and merged
-(sections 7ca and 7cd). Section 7cu is the latest completed independent
-review. Sections 7cv–7cw are new, local-only Codex implementation work and
-must be independently reviewed by Claude before merge. Codex is now the
-implementer and Claude the reviewer. **ACER-0A decisions are partially frozen,
+(sections 7ca and 7cd). Codex is now the implementer and Claude the reviewer.
+Sections 7cv–7cy are **merged mainline**. PRs #293, #294 and #295 put
+`2f4e41d`, `a1dc779`, `0a94bef`, `b0f7dec`, `ce066a8`, `3cefeb1`, `2ec7f61`
+and `0bd5fff` on `main` at `98e1d63`. Section 7cz is Claude's independent
+review of that whole range; section 7da is Codex's counter-review of exact
+Claude head `cc05ce7`, accepted after four corrections. **QuantConnect Cloud is now the
+authoritative ACER backtest engine (7cy); local LEAN is development/test
+only.** **ACER-0A decisions are partially frozen,
 but its executable preregistration is incomplete; ACER-0B is deliberately
 not frozen.** The dataset
 identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
@@ -5060,15 +5242,24 @@ capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. Next:
-select and authorize a market/reference source. The current Codex process
+perform the authorized narrow read-only, zero-outcome QuantConnect Cloud
+capability audit (entitlements, coverage, semantics), and settle the
+licensed-ratings transfer question, which the cloud engine makes a blocking
+dependency of ACER-2 rather than a side condition. The permission evidence
+must cover the exact representation sent; do not assume normalized or derived
+ratings are exempt. The current Codex process
 can see names-only Massive and QC credential variables, but this does not
-establish entitlements. Before any provider call, obtain the owner's narrow
-read-only authorization and measure access, coverage, licence, and cost
-without joining outcomes. Also close ACER-0A.1–0A.10, run the separately
+establish entitlements. During any provider call, remain within freeze §8's
+narrow read-only authorization and measure access, coverage, licence, and
+cost without joining outcomes. Also close ACER-0A.1–0A.10, run the separately
 authorized Benzinga Earnings
 structural audit before adopting that control dataset, resolve issuer mapping
 with ambiguity refusals, and take Snapshot B after the declared interval.
-There is no local `lean` command. Keep reconstructable ratings off QC absent
+Local LEAN is installed and verified (CLI `1.0.228`, workspace
+`C:\QuantConnect\ACER`, Docker `29.7.2`, sample run through Engine `2.5.0.0`)
+on the epoch host, but it is NOT the ACER backtest path. A shell opened before
+that install may not have `lean`/`docker` on `PATH`; use the full executable
+paths. Keep reconstructable ratings off QC absent
 explicit permission evidence. Do not join ratings to prices or outcomes, run
 a backtest, deploy, trade,
 acknowledge or alter an operational alert, mutate an operational database, or
@@ -5080,7 +5271,7 @@ roll paper-epoch-006 without separate authorization.
 ```text
 Read CLAUDE.md, docs/Archive/Plans/ACTION_PLAN_2026-08-02.md,
 docs/Archive/Plans/Alpha_Test_Implementation_Plan.md,
-docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md, docs/Archive/Research/alpha-result.md and
+docs/Archive/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md, docs/research/alpha-result.md and
 docs/SESSION_HANDOFF.md. origin/main is b6f577e after PR #244 merged Claude's
 Stage 0 correction counter-review head 9a7e9fc with an identical tree. PR #243
 at 4151b3f merged Fable's final counter-review (PR #242 at f937bfb merged the
@@ -5090,7 +5281,7 @@ before it). Corrections
 syntax, point-in-time/exact-session factors, Stage 1 cadence and benchmark,
 strict analyzer provenance, bounded QC polling, old local turnover/NAV,
 leave-one-out peers and joint residual regression. Invalid generated result
-files were removed only after docs/Archive/Research/alpha-result.md preserved their exact
+files were removed only after docs/research/alpha-result.md preserved their exact
 hashes and dispositions (ledger hashes are CRLF working-tree hashes — see
 the ledger's verification-convention note). No QC access or new result
 occurred; every old result

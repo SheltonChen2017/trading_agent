@@ -206,7 +206,7 @@ failure this repository's look registry exists to prevent.
 Binding rules for ACER, to be given concrete numbers at ACER-0:
 
 - Every execution against real outcomes, local or cloud — including refusals, errors, and accidental
-  launches — is appended to `docs/Archive/Research/alpha-result.md` as a new `R-nnn` entry with
+  launches — is appended to `docs/research/alpha-result.md` as a new `R-nnn` entry with
   full identity, and counts as a research look.
 - Each milestone declares its **cell count and family gate before any result
   is observed**, and the lifetime floor accumulates across milestones.

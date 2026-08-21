@@ -108,7 +108,7 @@ The project has **zero confirmed predictive signals**. The reviewed Stage 0
 and Stage 1 QuantConnect runs are **VALID but null**, and the reviewed APQ run
 is valid but also closed null. Older legacy entries retain their individual
 invalid, refused, unanalysed, or provenance-incomplete states in
-`docs/Archive/Research/alpha-result.md`; validity is never inferred from age or rewritten as a
+`docs/research/alpha-result.md`; validity is never inferred from age or rewritten as a
 group. The closed cross-sectional program's conservative lifetime alpha-cell
 floor is 452 at A-002 (428 legacy/declaration cells plus the 24-cell Stage 1
 family). APQ is a separate three-cell allocation-policy family and does not
@@ -214,10 +214,11 @@ inventory, and its completeness claim is independently accepted only after a
 second correction**
 (`research/acer/capability.py`,
 `docs/Archive/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`,
-`docs/Archive/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its then-current
-twelve-item result on the isolated review tree was one
-available, five unavailable, six unmeasured, eleven blocking, and
-`acer2_runnable=false`. Correction `c9ee971`
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its
+twelve-item result on the isolated review tree `14a3a83` was one
+available, **six** unavailable, **five** unmeasured, eleven blocking, and
+`acer2_runnable=false` — the numbers that review and handoff section 7cs
+record, reproduced in a detached worktree during the CDR review. Correction `c9ee971`
 requires the complete checklist exactly once, makes every unavailable or
 unmeasured requirement blocking, and verifies that the pinned NYSE calendar
 can actually be imported and constructed rather than treating module
@@ -237,8 +238,9 @@ in `docs/Archive/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW_VERIFICA
 maps every frozen control to exact members of the requirement set. It also
 replaces the proposal document as the guard's authority with the actual
 owner freeze. In particular, GICS remains an **unaccepted proposal**, so the
-available SIC candidate is `unmeasured`, not `unavailable`; this changes the
-status split above but not the eleven blockers or the prohibition on ACER-2.
+available SIC candidate is `unmeasured`, not `unavailable`. That moved the
+split to one available, five unavailable, six unmeasured — still eleven
+blockers, and no change to the prohibition on ACER-2.
 
 **Provider-neutral correction 2026-08-21:** the twelve-item inventory
 incorrectly treated **Databento itself** as a required ACER input in addition
@@ -298,10 +300,11 @@ update date precedes the action date are refused. The
 owner correctly identified the quoted all-caps text as an investment-advice
 disclaimer, not a research ban. Separate Market Data clauses still leave
 third-party transfer and dataset-specific non-display entitlement unproven:
-raw or reconstructable Benzinga rows stay local unless the order terms or
-written permission cover upload to QuantConnect. The later owner engine
-amendment selects QuantConnect Cloud for ACER backtests, so this transfer gate
-must close before that path can carry reconstructable vendor rows.
+no representation of the licensed ratings signal may be uploaded unless the
+applicable agreement or written permission covers that exact representation
+and transfer. The later owner engine amendment selects QuantConnect Cloud for
+ACER backtests, so this gate must close before that path can carry the signal;
+see freeze §8 for the governing boundary.
 The identity hazard (FB vs ANTM handled oppositely; BBBY reused) is heightened
 because this Massive delivery has neither ISIN nor exchange; ACER requires a
 security-master cross-reference and must refuse ambiguous joins.
@@ -362,9 +365,10 @@ decision.
 
 **Update 2026-08-21: engine amendment and control-data rulings.** QuantConnect
 Cloud is the authoritative ACER historical/outcome backtest engine. Local LEAN
-is development/test infrastructure only. Reconstructable Benzinga rows stay
-off QuantConnect unless the owner supplies explicit evidence that the terms
-permit that transfer. Current QuantConnect authorization remains
+is development/test infrastructure only. Ratings rows, normalized events and
+derived features stay off QuantConnect unless the applicable agreement or
+written permission covers the exact representation and transfer. Current
+QuantConnect authorization remains
 **read-only, zero-outcome structural auditing only** — no upload, price or
 outcome join, backtest, or research look. The ACER-2 control set has a
 chosen candidate rather than an adopted one: the Massive/Benzinga Earnings
@@ -498,8 +502,16 @@ was wrong, and what was done:
 `docs/operations/ML_IMPLEMENTATION_STATUS.md` (2026-08-03) have not been
 re-verified line-by-line against today's code; they are companions to archived
 plans and were checked only for path accuracy and for claims contradicting
-this plan. Historical review reports under `docs/Archive/Review/` are records of what
-was true when written and are never retro-edited.
+this plan. Historical review reports under `docs/Archive/Review/` are records
+of what was true when written. Their **findings, dispositions, counts and
+validation results** are never retro-edited. One mechanical exception is
+recorded rather than left implicit: the 2026-08-21 lifecycle reorganization
+rewrote `docs/...` path references inside **68** archived reports so their
+links keep resolving, and the same rule was applied again when the run ledger
+moved (CDR-004). A consequence worth knowing when auditing an old ledger row:
+its `Location` column may now cite a path that did not exist on the review
+date. The pre-move paths remain recoverable from Git history at each report's
+own commit.
 
 ---
 
@@ -553,8 +565,9 @@ remaining list is deliberately provider-neutral.
    it is not the ACER backtest engine. Measure the cloud account's actual
    point-in-time coverage and semantics for prices, mappings, eligibility,
    corporate actions, fundamentals, shares and sector, and separately close
-   terminal-delisting-return coverage. Do not upload reconstructable Benzinga
-   rows merely because QC credentials are available. Preserve cloud-run
+   terminal-delisting-return coverage. Do not upload any representation of
+   the licensed Benzinga signal merely because QC credentials are available;
+   use freeze §8's exact-representation rule. Preserve cloud-run
    provenance with dataset/version disclosures, project and run identifiers,
    source-code SHA, and hashes of any uploaded permitted custom data.
 6. **Close ACER-0A.1–0A.10.** The existing normalization, signal, controls,

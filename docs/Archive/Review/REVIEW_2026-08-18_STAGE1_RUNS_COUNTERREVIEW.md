@@ -10,7 +10,7 @@ No frozen analyser touched the six logs; no statistic was computed.
 1. **Range/head:** `origin/user/claude/stage1-runs-20260818` is
    `dec0a8a`; `875d003..dec0a8a` is exactly 7 commits. Unchanged.
 2. **Statistic absence in the six append commits:** grepped each
-   commit's `docs/Archive/Research/alpha-result.md` diff for
+   commit's `docs/research/alpha-result.md` diff for
    sharpe/ic_p/cagr/p_value/p-value: **0 hits in all six.** Structural
    counts only, as required.
 3. **dec0a8a structure:** 12 removed UNANALYSED lines (six headings +

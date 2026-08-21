@@ -682,6 +682,9 @@ def _repository_commits_claimed_unreachable(text: str) -> list[str]:
 
     Matches a short hash in backticks within one clause of an unreachability
     claim, in either order ("`abc1234` is local-only", "local-only: `abc1234`").
+    It also recognizes the narrow handoff form where one sentence names a
+    branch and its commits and the immediately following sentence says that
+    same branch currently remains local-only.
 
     STALLCR-004: the original alternation had `unmerged` as one word only, so
     the phrasing that actually shipped -- "not merged or deployed" -- slipped
@@ -693,8 +696,67 @@ def _repository_commits_claimed_unreachable(text: str) -> list[str]:
         r"(?:local[- ]only|not (?:yet )?(?:been )?(?:pushed|merged|published)"
         r"|unpushed|unmerged|unpublished|cannot fetch)"
     )
-    near = rf"(?:`([0-9a-f]{{7,40}})`[^.]{{0,80}}?{claim}|{claim}[^.]{{0,80}}?`([0-9a-f]{{7,40}})`)"
-    return [a or b for a, b in re.findall(near, text, flags=re.IGNORECASE)]
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    found: list[str] = []
+
+    def valid_claims(sentence: str) -> list[re.Match[str]]:
+        matches: list[re.Match[str]] = []
+        for match in re.finditer(claim, sentence, flags=re.IGNORECASE):
+            prefix = sentence[max(0, match.start() - 24) : match.start()]
+            suffix = sentence[match.end() : match.end() + 80]
+            # "not local-only" and "no longer unmerged" say the opposite
+            # of the matched token. Do not turn corrections into findings.
+            if re.search(r"\b(?:not|no longer|never)\s+$", prefix, re.IGNORECASE):
+                continue
+            # A dated description of an earlier branch state is not a claim
+            # about its current reachability.
+            if re.search(
+                r"\bwhen (?:this|the) (?:section|entry|note) was written\b",
+                suffix,
+                re.IGNORECASE,
+            ):
+                continue
+            matches.append(match)
+        return matches
+
+    for index, sentence in enumerate(sentences):
+        claims = valid_claims(sentence)
+        hashes = list(re.finditer(r"`([0-9a-f]{7,40})`", sentence, re.IGNORECASE))
+        for hash_match in hashes:
+            if any(
+                max(
+                    claim_match.start() - hash_match.end(),
+                    hash_match.start() - claim_match.end(),
+                    0,
+                )
+                <= 80
+                for claim_match in claims
+            ):
+                value = hash_match.group(1)
+                if value not in found:
+                    found.append(value)
+
+        # CDR-003b/CDCR-002: the shipped handoff shape named one branch and
+        # its commits, then said "The branch remains local-only" in the next
+        # sentence. Scope only to that explicit deictic current-state form;
+        # whole-paragraph matching conflates unrelated merged/unmerged work.
+        if index == 0 or not claims or not re.search(
+            r"\b(?:the|this|that) branch\s+(?:remains?|is|are)\b",
+            sentence,
+            re.IGNORECASE,
+        ):
+            continue
+        prior = sentences[index - 1]
+        if not re.search(
+            r"\bbranch\s+`(?:codex|user/claude)/[^`]+`",
+            prior,
+            re.IGNORECASE,
+        ):
+            continue
+        for value in re.findall(r"`([0-9a-f]{7,40})`", prior, re.IGNORECASE):
+            if value not in found:
+                found.append(value)
+    return found
 
 
 def test_no_document_calls_a_merged_commit_unreachable():
@@ -798,6 +860,69 @@ def test_the_unreachability_parser_recognizes_multi_word_claims():
     assert _repository_commits_claimed_unreachable("`6aa7069` merged in PR #221") == []
 
 
+def test_unreachability_parser_links_current_branch_claim_to_prior_sentence():
+    """CDCR-002. A handoff commonly names the branch and commits first,
+    then states the branch's current reachability in the next sentence."""
+    text = (
+        "The implementation is on branch `codex/example`: commits `2f4e41d`, "
+        "`88d517c`, `67877f8`, and `dfefecf`. "
+        "The branch remains local-only at this handoff and must not be treated "
+        "as reviewed or merged."
+    )
+    assert set(_repository_commits_claimed_unreachable(text)) == {
+        "2f4e41d",
+        "88d517c",
+        "67877f8",
+        "dfefecf",
+    }
+
+
+def test_unreachability_parser_ignores_negated_and_historical_claims():
+    """CDCR-002. Wider scope must not turn corrections into new findings."""
+    examples = (
+        "`2f4e41d` is merged mainline, not local-only.",
+        (
+            "The work was on branch `codex/example`: commit `2f4e41d`. "
+            "That branch was local-only when this section was written; it has "
+            "since merged."
+        ),
+        (
+            "Merged branch `codex/complete` contains `2f4e41d`. "
+            "A separate branch remains local-only while its review continues."
+        ),
+    )
+    for text in examples:
+        assert _repository_commits_claimed_unreachable(text) == [], text
+
+
+def test_current_handoff_does_not_reopen_the_frozen_qc_audit_authorization():
+    """CDCR-004. Once freeze section 8 authorizes the structural audit, the
+    current resume block must direct that audit rather than ask the owner to
+    authorize it again."""
+    freeze = _text("research/ACER_2026-08-20_ACER0A_FREEZE.md")
+    handoff = _text("SESSION_HANDOFF.md")
+    current_resume = handoff.split("## 9. Resume prompt", 1)[1].split(
+        "## 9a.", 1
+    )[0]
+    assert re.search(
+        r"QuantConnect access is authorized for read-only, zero-outcome "
+        r"structural\s+work",
+        freeze,
+    )
+    assert not re.search(
+        r"(?:get|obtain)\s+(?:the\s+)?owner(?:'s)?[^.]{0,120}"
+        r"authorization[^.]{0,120}(?:audit|provider call)",
+        current_resume,
+        flags=re.IGNORECASE,
+    )
+    assert re.search(
+        r"(?:perform|run)[^.]{0,100}read-only[^.]{0,80}zero-outcome"
+        r"[^.]{0,80}QuantConnect Cloud[^.]{0,80}audit",
+        current_resume,
+        flags=re.IGNORECASE,
+    )
+
+
 def test_sell1_current_records_do_not_reopen_merged_review_work():
     """SELL-1 reached main before its independent review was requested.
 
@@ -883,7 +1008,7 @@ def test_closed_alpha_plan_distinguishes_valid_null_runs_from_invalid_legacy_run
 
     stale_claims = (
         "No historical alpha result in this program is valid",
-        "Every historical QuantConnect result in `docs/Archive/Research/alpha-result.md` remains invalid",
+        "Every historical QuantConnect result in `docs/research/alpha-result.md` remains invalid",
     )
     for claim in stale_claims:
         assert claim not in plan
@@ -939,37 +1064,57 @@ def test_strongbuy_amendment_ledger_is_one_contiguous_markdown_table():
     )
 
 
+_SUPERSEDED_STATUS = re.compile(r"Status: \*\*(SUPERSEDED[^*]*)\*\*")
+
+
+def _superseded_status(name: str) -> str:
+    """Return a plan's superseded status, failing loudly if it cannot parse.
+
+    CDR-001. Both lifecycle guards below wrapped their entire body in
+    ``if re.search(r"Status: \\*\\*SUPERSEDED", sbp):``. That inverts the guard:
+    rewording the status line disarms it silently instead of failing it, which
+    is the mirror case of the drift it exists to catch. Mutation-proved on the
+    reviewed tree -- replacing ``SUPERSEDED`` with ``RETIRED`` left both tests
+    green while every downstream assertion went unrun.
+
+    Parsing once, loudly, keeps the relationship enforced: if the owner ever
+    un-supersedes SBP, this fails and the guards are updated deliberately.
+    """
+    match = _SUPERSEDED_STATUS.search(_text(name))
+    assert match, (
+        f"{name} no longer declares a SUPERSEDED status. Update these guards "
+        "deliberately if that is intended; a reworded status line must never "
+        "silently disable them."
+    )
+    return match.group(1)
+
+
 def test_a_superseded_program_is_not_also_the_next_owner_decision():
     """A replaced program must not still be advertised as the blocking step.
 
     2026-08-20: the owner replaced the Strong-Buy program (SBP) with the
     Analyst-Consensus ETF Rotation program. The failure this guards against is
     PARTIAL replacement -- one document marking a plan superseded while the
-    action plan still tells the reader its freeze is what happens next. Stated
-    as a relationship so it survives the next replacement: whichever plan
-    declares itself superseded must not also own the action plan's blocking
-    decision.
+    action plan still tells the reader its freeze is what happens next.
     """
-    sbp = _text("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+    _superseded_status("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
     action_plan = _text("ACTION_PLAN_2026-08-20.md")
-    if re.search(r"Status: \*\*SUPERSEDED", sbp):
-        assert "ACER" in action_plan and "priority 1" in action_plan.lower()
-        assert not re.search(
-            r"\*\*SBP-0 adoption\*\*[\s\S]{0,300}?only decision blocking",
-            action_plan,
-        )
-        assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
+    assert "ACER" in action_plan and "priority 1" in action_plan.lower()
+    assert not re.search(
+        r"\*\*SBP-0 adoption\*\*[\s\S]{0,300}?only decision blocking",
+        action_plan,
+    )
+    assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
 
 
 def test_lifecycle_indexes_do_not_advertise_superseded_sbp_as_actionable():
     """The new lifecycle indexes must route current and superseded plans."""
-    sbp = _text("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+    _superseded_status("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
     queued = _doc_path("Plan/README.md").read_text(encoding="utf-8")
     archived = _doc_path("Archive/README.md").read_text(encoding="utf-8")
-    if re.search(r"Status: \*\*SUPERSEDED", sbp):
-        assert "STRONGBUY_PORTFOLIO_TEST_PLAN.md" not in queued
-        assert "superseded" in archived.lower()
-        assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
+    assert "STRONGBUY_PORTFOLIO_TEST_PLAN.md" not in queued
+    assert "superseded" in archived.lower()
+    assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
 
 
 def test_open_acer_freeze_ledger_cannot_be_called_executable():

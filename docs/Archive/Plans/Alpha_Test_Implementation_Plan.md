@@ -14,7 +14,7 @@ The reviewed Stage 0 and Stage 1 QuantConnect runs are **VALID but null**:
 their statistics are usable evidence that the frozen tests did not establish
 a beta-free edge. That is different from the older legacy runs and artifacts
 whose individual ledger entries remain invalid, refused, unanalysed, pending
-review, or provenance-incomplete. `docs/Archive/Research/alpha-result.md` is the permanent,
+review, or provenance-incomplete. `docs/research/alpha-result.md` is the permanent,
 append-only authority for each run's status, including every refusal. The
 workflow, evidence rules, and stage definitions below stayed in force through
 the closure and are preserved unchanged; their sequencing statements are
@@ -46,7 +46,7 @@ For every stage:
    one `codex/` review branch with one final push.
 3. Claude counter-reviews that exact Codex head. Only then may Claude compile
    and run the reviewed algorithm in QuantConnect.
-4. Claude appends the run to `docs/Archive/Research/alpha-result.md`, including failures and
+4. Claude appends the run to `docs/research/alpha-result.md`, including failures and
    refusals, before implementing the next stage. Existing entries are never
    overwritten.
 
@@ -189,7 +189,7 @@ complete.**
 
 The invalid generated result Markdown, JSON, and raw logs were removed from
 the active docs tree at the owner's direction. This does not reset look counts:
-`docs/Archive/Research/alpha-result.md` permanently preserves every run, status, ID and hash.
+`docs/research/alpha-result.md` permanently preserves every run, status, ID and hash.
 
 Implement these in one monthly algorithm because their score and holding
 cadences match. Each specification has 3 universes x 4 tested outcomes = 12

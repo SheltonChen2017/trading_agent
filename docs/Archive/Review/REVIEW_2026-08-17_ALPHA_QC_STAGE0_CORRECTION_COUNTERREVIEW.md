@@ -159,5 +159,5 @@ workflow a Codex acknowledgement of FCR-001/002 is the clean final step
 before launch; the owner may instead waive it given the delta's size. After
 that, the owner chooses Stage 0 battery completion or Stage 1, the run
 executes from the exact merged reviewed head, and every execution is
-appended to `docs/Archive/Research/alpha-result.md` as R-005+ with full
+appended to `docs/research/alpha-result.md` as R-005+ with full
 project/compile/backtest/source/log identity and before/after look counts.

@@ -86,7 +86,7 @@ Full-audit severity summary including the four Stage 1 findings below:
 Result disposition: five cloud runs and 80 repeated cells remain counted; the
 conservative lifetime floor remains 428. Invalid generated Markdown/JSON/logs
 were removed from active docs at owner direction, while
-`docs/Archive/Research/alpha-result.md` preserves every identity, hash, provenance gap, and
+`docs/research/alpha-result.md` preserves every identity, hash, provenance gap, and
 validity status. No Feature Milestone entry was added because no alpha result
 is valid.
 
@@ -150,7 +150,7 @@ Claude must counter-review the exact final pushed Codex head, especially:
 5. strict Stage 1 parser identity and same-date benchmark gates.
 
 Only after that counter-review may Claude run each alpha universe and its
-matching benchmark. Every execution must be appended to `docs/Archive/Research/alpha-result.md`
+matching benchmark. Every execution must be appended to `docs/research/alpha-result.md`
 with project, compile, backtest, source SHA-256, raw-log SHA-256, review head,
 counter-review disposition, and before/after look counts. Any earlier run is
 `PENDING_REVIEW`, still counted, and cannot be reused.

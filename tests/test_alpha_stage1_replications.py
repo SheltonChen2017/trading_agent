@@ -337,7 +337,7 @@ def test_stage1_look_accounting_constants_match_the_permanent_ledger():
 
     Lowering ``LIFETIME_CELLS_BEFORE_STAGE`` from 428 to 24 — loosening the
     lifetime Bonferroni gate by an order of magnitude — survived the whole
-    suite. The 428 floor comes from `docs/Archive/Research/alpha-result.md` (348 declared
+    suite. The 428 floor comes from `docs/research/alpha-result.md` (348 declared
     cells + 80 emitted cells) and the 24-cell stage family from the frozen
     plan §6 (2 specs × 3 universes × 4 outcomes). Changing either is a
     research-contract change that must be made loudly, with the ledger.

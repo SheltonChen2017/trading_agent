@@ -5,6 +5,15 @@ invalidated, stale and unavailable results are kept here permanently. An
 unfavourable result is never deleted and never silently replaced by a
 rerun; a rerun is a new entry that references the one it supersedes.
 
+**This ledger is ACTIVE, not archived.** The programs recorded below are
+closed, but the ledger itself is the repository's live look-accounting record:
+every future real-outcome execution — including ACER's two authorized slots,
+and including refusals, errors and accidental launches — appends a new `R-nnn`
+entry here, and the lifetime cell floor keeps accruing across programs. The
+2026-08-21 lifecycle reorganization briefly filed it under `docs/Archive/`;
+that was corrected, because a look ledger read as history is a look ledger
+someone restarts (CDR-004).
+
 **2026-08-17 audit status:** every local and QuantConnect alpha result listed
 below is invalid, refused, unanalysed, pending review, or provenance
 incomplete. None is usable evidence of an edge. At the owner's direction,

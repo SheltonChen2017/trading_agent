@@ -99,7 +99,7 @@ A null is a valid result and is recorded as such.
 Rules:
 
 - Every execution against real outcomes — including refusals, errors, and
-  accidental launches — is appended to `docs/Archive/Research/alpha-result.md` as a new
+  accidental launches — is appended to `docs/research/alpha-result.md` as a new
   `R-nnn` entry with full identity, and counts permanently. Records are
   never removed.
 - **No corrected rerun is authorized at present.** With exactly two slots, any
@@ -190,14 +190,32 @@ audit's licence step must answer this explicitly.
   validation only. It must not be used for ACER outcome runs. This supersedes
   the earlier local-LEAN-authoritative ruling before any ACER outcome was
   observed.
-- **Reconstructable Benzinga rows must not be uploaded to QuantConnect**
-  unless the owner separately provides explicit evidence that the applicable
-  terms permit that third-party transfer.
-- **QuantConnect access is authorized for read-only symbol-mapping work
-  only**, to establish issuer identity. During that work: no Benzinga upload,
-  no price or outcome join, no backtest launch, and no research look.
+- **No representation of the licensed Benzinga ratings signal may be uploaded
+  to QuantConnect unless the applicable agreement or written permission
+  covers that exact representation and transfer.** This includes raw or
+  reconstructable rows and does not assume that normalized events or derived
+  features are exempt. **This gate is load-bearing under the cloud-engine
+  amendment.** ACER-2 needs a permitted representation of the ratings signal
+  inside QuantConnect Cloud, unless an equivalent point-in-time ratings
+  dataset is separately licensed there; no such alternative is established.
+  QuantConnect does offer separate **Download** licences for local storage and
+  internal LEAN use, so its terms do not categorically forbid the reverse
+  direction. This project has neither purchased nor authorized that local
+  route, and adopting it would reverse the owner's current cloud-engine
+  ruling. Therefore ACER-2 cannot execute under the selected architecture
+  until the ratings-transfer question is answered. This is a blocking
+  dependency, not a side condition. See QuantConnect's official
+  [Cloud and Download licence distinction](https://www.quantconnect.com/docs/v2/cloud-platform/datasets/licensing).
+- **QuantConnect access is authorized for read-only, zero-outcome structural
+  work only** — issuer/symbol mapping, and measuring the account's dataset
+  entitlements, coverage and field semantics. During that work: no Benzinga
+  upload, no price or outcome join, no backtest launch, and no research look.
   Provenance is preserved, and ticker-reuse or rename ambiguity produces a
-  refusal rather than a guess.
+  refusal rather than a guess. (Amended 2026-08-21 with the engine ruling
+  above, which made a cloud capability audit the next technical step; the
+  prior wording authorized symbol mapping alone and would have forbidden it.
+  The prohibitions are unchanged — this widens what may be *measured*, never
+  what may be *run*.)
 - **SBR-1 remains CLOSED and uninstalled.** Read-only measurement of task
   presence and artifact counts is permitted; if anything is found installed
   or running, it is reported and nothing is changed. (Measured 2026-08-20 —

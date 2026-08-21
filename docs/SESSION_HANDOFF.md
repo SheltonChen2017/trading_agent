@@ -24,9 +24,9 @@ independent correction review, 7cg the counter-review of that review, and
 correction review, 7cj the counter-review of that review, and 7ck the
 ACER-0A completion proposals. Section 7cl records Codex's independent
 correction review of those proposals, 7cm the counter-review of that review,
-7cn the local data-capability audit, and 7co Codex's independent correction
-review of both new commits; 7co and section 8 are the current development
-state.
+7cn the local data-capability audit, 7co Codex's independent correction
+review of both new commits, and 7cp the counter-review plus the committed
+capability checks; 7cp and section 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4328,6 +4328,81 @@ suite passed **47/47**; the focused ACER normalization/identity, Databento
 source/PIT/authority and document suites passed **179/179**; the complete
 repository suite passed **4,453 / 0 failed / 25 warnings in 751.09 seconds**;
 and required `compileall` including `research/` passed on Python 3.13.14.
+
+## 7cp. Counter-review, and checking instead of asserting (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-databento-capability-20260821`, based on `381615b`.
+Full record: `docs/Review/REVIEW_2026-08-21_ACER_DATA_AUDIT_COUNTERREVIEW.md`.
+
+**All three findings confirmed; nothing found to correct in Codex's work.**
+First round in this program with no counter-finding, and the reason is that
+two of the three are the same failure of mine recurring.
+
+**ACERLDR-001, confirmed from my own printed output.** CCPR-001's percentages
+existed to help the owner choose between zeroing a prior revision and letting
+it decay. My scan counted *every* later action as a supersession, and my own
+breakdown shows 21,044 upgrades and 17,826 downgrades among 86,519 — **45%
+are directional actions that replace state under both rules**. The numbers
+never discriminated between the two options they were produced to inform.
+
+**ACERLDR-002, and worse than Codex stated.** I called yfinance the sole
+local price source while ~130KB of reviewed Databento capture code sits in
+`ml/`. **My own action plan already said so** — line 91 names "the Databento
+ingest/point-in-time software" in a section I wrote. I searched `data/` and
+generalized to "the repository".
+
+**ACERLDR-003.** I took `pit_universe.py`'s "biases results upward" and
+presented it as established across the whole exit mixture. Cash acquisitions
+and mergers need not have negative terminal returns, and I had measured no
+exit types. The missing terminal outcome is disqualifying without assuming
+its sign.
+
+### The pattern, named precisely
+
+Three consecutive rounds, same class of defect: the identity round's document
+and test said "lower bound" while the API constant said `unambiguous`; the
+proposal round's prose described a decaying signal while the formula
+cancelled its own weights; this round's action plan named Databento while my
+audit said yfinance was the only source. **Each time the prose was right and
+the artifact contradicted it**, because I asserted a property of this
+repository from a partial look instead of checking it.
+
+### The response is code, not another document
+
+`research/acer/capability.py` resolves each ACER-2 data requirement by
+reading a contract, an import, or a pinned dependency, and every finding
+carries the evidence it read. Re-running is cheap, and a capability that
+disappears flips a status instead of leaving a stale sentence in a document.
+Result over seven requirements: **1 available, 4 unavailable, 2 unmeasured,
+6 blocking, `acer2_runnable: false`.**
+
+Two design choices matter. `UNMEASURED` is a distinct status from
+`UNAVAILABLE`, because Databento capture code exists and has never been
+exercised for ACER — calling it either way is a claim nobody has earned. And
+**credential presence is deliberately not consulted**: a key proves access,
+not history depth or delisted coverage, and a test asserts the key never
+reaches the evidence string.
+
+One finding is a correction to my own earlier negative: the **NYSE
+trading-session calendar is available** — `pandas_market_calendars==5.4.0` is
+pinned and `data/market_data.py` already builds the NYSE calendar. My
+`calendar_days × 252/365` approximation in CCPR-001 was never necessary,
+which is the same failure again in miniature.
+
+Validation on the final tree: full suite **4,467 passed / 0 failed / 25
+warnings** in 706.11 seconds — 4,453 from the reviewed tree plus this round's
+14 capability tests. `compileall` over the required surface including
+`research/` passed; `git diff --check` passed; document guards reran green
+after every edit including after these counts were inserted; Python 3.13.14.
+Four mutations were applied and all four detected: inferring Databento
+availability from module presence, removing the evidence guard, permitting
+the available-and-blocking incoherence, and reporting the delisting-return
+gap as available. Source restored from a backup copy in a `finally` block.
+
+Untested surface, stated plainly: these checks read contracts and pinned
+dependencies, so they establish what the repository *declares*, not what a
+vendor would actually deliver. A capability reported `UNMEASURED` stays
+unmeasured until someone exercises it; the checks cannot promote it.
 
 ## 8. What is next
 

@@ -34,7 +34,9 @@ counter-review that attempted to fix the derivation guard, and 7cu Codex's
 independent verification and correction of that guard. Section 7cv records
 the provider-neutral capability correction, and section 7cw records the
 owner-directed role swap, measured local access state, and documentation
-lifecycle reset; 7cw and section 8 are the current development state.
+lifecycle reset. Sections 7cx–7cz record the engine amendment and Claude's
+review, and section 7da records Codex's counter-review; 7da and section 8 are
+the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4855,8 +4857,11 @@ commit that changes the state.**
   local-data audit and §8 all schedule as the next step. Widened to
   "read-only, zero-outcome structural work" with every prohibition intact.
   Also recorded there: with a cloud engine the ratings-transfer gate stops
-  being a side condition and becomes a **blocking dependency** — the signal
-  must go up as custom data, and QC's terms forbid bringing its data down.
+  being a side condition and becomes a **blocking dependency** — the selected
+  architecture needs a permitted representation of the signal in Cloud.
+  Counter-review retained that gate but corrected the supporting overstatement:
+  QC offers separate Download licences, so its terms do not categorically
+  forbid local data; this project has not purchased or authorized that route.
 - **CDR-004 (P2)** — the permanent append-only run ledger was filed under
   `docs/Archive/`, a folder whose index says "completed, superseded, and
   obsolete material" and "Do not resume work from this folder", while ACER's
@@ -4874,7 +4879,7 @@ commit that changes the state.**
   review tree; checking out `14a3a83` in a detached worktree and running the
   summarizer gives 1/**6**/**5**/11, matching the review report and §7cs.
 - **CDR-006 (P3)** — "Historical review reports … are never retro-edited",
-  asserted in the commit that rewrote paths inside **69** of them. The rule
+  asserted in the commit that rewrote paths inside **68** of them. The rule
   now protects findings, dispositions, counts and validation results, and
   records the mechanical path-migration exception.
 - **CDR-008 (P3)** — `Archive/Plans/` is defined as completed or superseded
@@ -4921,6 +4926,53 @@ still establishes only what this repository *declares* — not what any vendor
 would deliver. The host measurements are point-in-time observations of one
 machine; the second host was not measured and nothing here claims anything
 about it.
+
+## 7da. Codex counter-review of Claude's lifecycle review (2026-08-21)
+
+Exact submitted remote head
+`origin/user/claude/review-codex-doc-lifecycle-20260821` at
+`cc05ce76676e9aa8798bf03bba39aa12ff881d7e`, merge-base `98e1d63`, ordered
+commits `b4129d2`, `f14e152`, `cc05ce7`. Counter-review branch
+`codex/counterreview-claude-doc-lifecycle-20260821`. Durable record:
+`docs/Archive/Review/REVIEW_2026-08-21_CLAUDE_DOC_LIFECYCLE_COUNTERREVIEW.md`.
+
+**Accepted after correction.** Claude's eight original findings and their
+corrections remain accepted. Four counter-review findings are closed:
+
+- **CDCR-001 (P2):** the transfer gate remains load-bearing, but the claim
+  that QC categorically forbids data downloads was false. QC offers separate
+  Download licences; this project has not purchased or authorized one and
+  Cloud remains the selected engine. No ratings representation — including
+  normalized events or derived features — may be presumed transferable. The
+  applicable agreement or written permission must cover the exact
+  representation sent to QC.
+- **CDCR-002 (P3):** CDR-003b is no longer deferred. The merged-state guard
+  now catches the exact adjacent-sentence branch form that shipped, excludes
+  negated and historical claims, and avoids paragraph-wide matching. Red on
+  the submitted parser: 2 failed / 1 passed; corrected regressions: 3 passed;
+  active-document suite: 50 passed.
+- **CDCR-003 (P3):** CDR-006's migration count was one high. Exact rename
+  detection shows 139 moved reports: 68 content-changed and 71 byte-identical.
+  Current records are corrected; the submitted report retains dated notes.
+- **CDCR-004 (P2):** the current resume prompt still asked the owner to
+  authorize the QC structural audit after governing freeze §8 had authorized
+  it. The prompt now directs the authorized audit and requires it to remain
+  inside that narrow boundary; a relationship guard fails on the stale form.
+
+The two owner-facing conclusions are now precise. The next technical step is
+still the already authorized read-only, zero-outcome QC Cloud capability
+audit. Separately, ACER-2 remains blocked until the ratings agreement or
+written permission covers the exact representation to be uploaded, its Cloud
+use, storage/retention/deletion and permitted outputs. Neither gate authorizes
+an upload, outcome join, backtest, research look or purchase.
+
+No vendor API, credential value, licensed row, price, outcome, backtest,
+research look, broker, task, operator database, deployment or epoch was
+accessed or changed. Historical capability split 1/6/5/11 was independently
+reproduced at detached `14a3a83`; required compileall passed. The complete
+suite passed **4,491 tests / 0 failures / 25 dependency warnings** in 918.62
+seconds on Python 3.13. Final Git/status checks follow before handoff. No
+milestone completed.
 
 ## 8. What is next
 
@@ -5006,8 +5058,17 @@ now authorizes read-only, **zero-outcome structural** QuantConnect work
 rather than symbol mapping alone — which is what makes the scheduled cloud
 capability audit consistent with its governing document. The
 licensed-ratings transfer question is now a **blocking dependency** of
-ACER-2 rather than a side condition, because a cloud engine has to receive
-the ratings as custom data.
+ACER-2 rather than a side condition, because the selected architecture needs
+a permitted representation of the ratings signal in Cloud. Raw rows,
+normalized events and derived features must not be presumed transferable.
+QuantConnect separately offers Download licences for local internal LEAN use,
+but this project has not purchased or authorized that route and the owner has
+selected Cloud as the authoritative ACER engine.
+Section 7da counter-reviews Claude's exact `cc05ce7` review head, retains all
+eight submitted corrections, and closes four counter-review findings: the
+licensing premise, the adjacent-sentence guard gap, the 139/68/71 report
+migration count, and the stale request to re-authorize the already authorized
+cloud audit.
 
 ### Historical superseded checklist (retained for audit only)
 
@@ -5164,7 +5225,8 @@ The vendor-audit and event-backbone review chains are closed and merged
 Sections 7cv–7cy are **merged mainline**. PRs #293, #294 and #295 put
 `2f4e41d`, `a1dc779`, `0a94bef`, `b0f7dec`, `ce066a8`, `3cefeb1`, `2ec7f61`
 and `0bd5fff` on `main` at `98e1d63`. Section 7cz is Claude's independent
-review of that whole range. **QuantConnect Cloud is now the
+review of that whole range; section 7da is Codex's counter-review of exact
+Claude head `cc05ce7`, accepted after four corrections. **QuantConnect Cloud is now the
 authoritative ACER backtest engine (7cy); local LEAN is development/test
 only.** **ACER-0A decisions are partially frozen,
 but its executable preregistration is incomplete; ACER-0B is deliberately
@@ -5179,15 +5241,17 @@ an existing **unmeasured candidate**, not a validated solution. The corrected
 capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
-unmeasured optional provider. It does not replace vendor evidence. Next: get
-owner authorization for a narrow read-only, zero-outcome QuantConnect Cloud
+unmeasured optional provider. It does not replace vendor evidence. Next:
+perform the authorized narrow read-only, zero-outcome QuantConnect Cloud
 capability audit (entitlements, coverage, semantics), and settle the
 licensed-ratings transfer question, which the cloud engine makes a blocking
-dependency of ACER-2 rather than a side condition. The current Codex process
+dependency of ACER-2 rather than a side condition. The permission evidence
+must cover the exact representation sent; do not assume normalized or derived
+ratings are exempt. The current Codex process
 can see names-only Massive and QC credential variables, but this does not
-establish entitlements. Before any provider call, obtain the owner's narrow
-read-only authorization and measure access, coverage, licence, and cost
-without joining outcomes. Also close ACER-0A.1–0A.10, run the separately
+establish entitlements. During any provider call, remain within freeze §8's
+narrow read-only authorization and measure access, coverage, licence, and
+cost without joining outcomes. Also close ACER-0A.1–0A.10, run the separately
 authorized Benzinga Earnings
 structural audit before adopting that control dataset, resolve issuer mapping
 with ambiguity refusals, and take Snapshot B after the declared interval.

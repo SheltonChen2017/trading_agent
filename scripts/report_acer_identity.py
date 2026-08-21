@@ -5,6 +5,14 @@ and reports which tickers carry evidence that a raw-ticker join would be
 unsafe. It makes no network call, joins no price or outcome, ranks nothing,
 and consumes no research look.
 
+The written artifact is bound to the exact code commit that produced it, so
+re-running after **any** later commit — including a documentation-only one
+that cannot affect the measurement — produces different bytes and the
+immutable write refuses rather than overwrites. That refusal is correct but
+easy to misread as corruption, so give each run its own output path. The
+measurement's true content identity is ``identity_assessments_sha256``, which
+stays stable across commits that do not change the assessment.
+
 Usage:
     python scripts/report_acer_identity.py <snapshot_dir>
     python scripts/report_acer_identity.py <snapshot_dir> --show 40

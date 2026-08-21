@@ -20,8 +20,9 @@ independent correction review, 7ca the counter-review of that correction,
 7cb the ACER event backbone, 7cc its independent review, 7cd the
 counter-review of that review, 7ce the ACER-0A submission, 7cf Codex's
 independent correction review, 7cg the counter-review of that review, and
-7ch the submitted issuer-identity detector, and 7ci Codex's independent
-correction review; 7ci and section 8 are the current development state.
+7ch the submitted issuer-identity detector, 7ci Codex's independent
+correction review, and 7cj the counter-review of that review; 7cj and
+section 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -3979,6 +3980,55 @@ active-document suite passed 40 tests before this result was recorded; and
 the required `compileall` surface including `research/` passed. Final
 active-document, diff, status, ordered-commit, narrow-secret, exact-remote,
 and shared-checkout checks gate the single authorized push.
+
+## 7cj. Counter-review of the identity review (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-identity-cr-prereg-20260821`, based on `84bec5d`.
+Full record: `docs/Review/REVIEW_2026-08-21_ACER_IDENTITY_COUNTERREVIEW.md`.
+
+**All four findings confirmed by reproduction against my submitted code.**
+ACERIDR-001 is the best finding of the round and it is against me: I wrote a
+document and a test both stating the flag set is a lower bound, then shipped
+an API whose verdict constant read `unambiguous` for a ticker that same test
+proves is a known reuse. The prose was right; the code contradicted it, and
+the code is what a later join reads. The 6,792 unflagged tickers were one
+careless join from being treated as an allowlist.
+
+ACERIDR-003 is worse than its write-up suggests: feeding my submitted code
+rows keyed `case` and `CASE` produced **two separate identities, both
+`unambiguous`** — one symbol's two issuers escaping detection entirely.
+
+A method note on ACERIDR-004 worth keeping: my first probe used a same-day
+`A,B,A` sequence and showed no order dependence, because that sequence is a
+palindrome and reversing it changes nothing. A non-palindromic `A,A,B` versus
+`B,A,A` reproduced the defect immediately. A symmetric probe cannot detect an
+asymmetry, and I nearly recorded a false "did not reproduce" on that basis.
+
+I reproduced the corrected measurement from a clean tree and matched Codex's
+figures exactly: assessment SHA-256 `8a020211…`, 768 interleaving flags,
+2,885 flagged tickers, 208,653 of 584,916 events. The change to
+`assistant/runtime_identity.py` was examined specifically because it touches
+an execution-capable package during a research review: it adds `"research"`
+to `_RUNTIME_SOURCE_PATHS`, which **strengthens** the clean-runtime check, and
+adds no import, authority, or execution behaviour.
+
+**One P3 fixed (CCRID-001):** the diagnostic artifact binds to `code_commit`,
+which changes on any later commit — including documentation-only ones that
+cannot affect the measurement — so a re-run to the same path refuses on
+differing bytes. The refusal is correct but reads as tamper detection when
+the measurement is substantively identical. Documented in the CLI rather than
+redesigned: give each run its own path, and treat
+`identity_assessments_sha256` as the stable content identity.
+
+**One item recorded without change (CCRID-002):** the deterministic same-day
+sort means a genuine same-day name alternation can no longer be seen as
+interleaving. That is the correct trade — same-day vendor order never
+established chronology — and is recorded so it is not later mistaken for lost
+coverage.
+
+The recurring shape of my errors in this program is now clear enough to name:
+three of these four findings are cases where I wrote the correct caveat in
+prose and then contradicted it in code.
 
 ## 8. What is next
 

@@ -158,6 +158,15 @@ The identity hazard (FB vs ANTM handled oppositely; BBBY reused) is heightened
 because this Massive delivery has neither ISIN nor exchange; ACER requires a
 security-master cross-reference and must refuse ambiguous joins.
 
+**Update, same day: the event backbone is built** (`research/acer/`,
+`docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md`) — 587,046
+snapshot rows normalized to 584,916 canonical events at 99.64% retention
+under the frozen date-level availability rule, with 2,130 named refusals and
+no row silently dropped. This is data plumbing: no price join, no signal, no
+rating scale, no research look. It sizes the identity problem rather than
+solving it — 9,677 distinct tickers with zero ISIN and zero exchange — and
+that mapping, with explicit ambiguity refusals, is the next ACER-1 step.
+
 ### ACER-2 is the decisive milestone; scope and price that alone
 
 The ladder runs ACER-0 freeze → ACER-1 data audit → **ACER-2 stock-level

@@ -16,8 +16,9 @@ sequencing text, section 7br records the topology refresh, section 7bs records
 Claude's documentation/SBP audit, and section 7bt records Codex's independent
 correction review. Section 7bv records the later ACER replacement, 7bw its
 independent review, 7bx the counter-review, 7by the vendor audit, 7bz the
-independent correction review, and 7ca the counter-review of that
-correction; 7ca and section 8 are the current development state.
+independent correction review, 7ca the counter-review of that correction,
+and 7cb the ACER event backbone; 7cb and section 8 are the current
+development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -3413,6 +3414,87 @@ draft quoted 7bz's reachability phrase within range of a merged hash — the
 guard behaving exactly as designed; the prose was reworded rather than the
 guard weakened.
 
+## 7cb. ACER analyst-event backbone built (Claude, 2026-08-20)
+
+Branch: `user/claude/acer-event-backbone-20260820`, off `1c110d6`. Full
+measurement record:
+`docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md`.
+
+Scope: **data plumbing only.** Verified vendor snapshot in, canonical
+event dataset out. No price join, no outcome, no ranking, no signal, no
+network call, no research look, no `R-nnn` entry, and no ACER milestone
+completes. ACER-0 remains unfrozen and this code deliberately contains
+nothing that would pre-empt it.
+
+New `research/acer/` package:
+
+- `snapshot.py` — the **single authoritative** snapshot-verification rule,
+  consolidated out of `scripts/audit_benzinga_ratings.py` (whose hardened
+  checks came from ACER1R-001/002). The audit script now delegates to it and
+  re-raises `SnapshotError` as `SystemExit`, so its CLI messages and its
+  existing tests are unchanged. Two copies of "what makes a snapshot
+  trustworthy" could have drifted apart; now there is one.
+- `normalize.py` — vendor rows to `NormalizedEvent`, with every excluded row
+  becoming a named `Refusal`. Implements the frozen rule
+  `available_date = max(action_date, last_updated UTC date)` at **date
+  level**, and deliberately derives **no** UTC action timestamp: the
+  Eastern reading of `time` is measured but not vendor-confirmed, and the
+  frozen rule does not need it. Rating strings stay unmapped because the
+  scale is an ACER-0 decision.
+- `dataset.py` — content-addressed immutable persistence through
+  `ml.immutable_io.publish_immutable_bytes`, plus the coverage summary.
+  Refusals are hashed into the dataset identity, so a build that quietly
+  started discarding rows cannot produce an identical-looking dataset.
+
+`scripts/build_acer_events.py` runs it. Measured on Snapshot A: **587,046
+input rows to 584,916 events, 99.64% retention**, 2,130 named refusals
+(2,008 missing rating, 46 inconsistent transition, **39 reverse-order**, 37
+missing firm), 9,677 distinct tickers, 507 distinct firms, and **29,187
+events (4.99%) whose availability defers past their action date** — the
+measured price of the conservative rule. Dataset
+`acer-analyst-events-19c9d8e0b00da299`, written under gitignored
+`artifacts/acer_datasets/`; a rebuild is an idempotent no-op returning the
+same id.
+
+**The headline is not the 99.64%.** Row usability is not readiness. Issuer
+identity is still unresolved: 9,677 tickers, zero ISIN, zero exchange, and
+the FB/ANTM/BBBY hazard intact. That number is the size of the security-master
+problem ACER-2 must solve before any price join, and it is the reason this
+milestone stops here.
+
+`tests/test_acer_normalization.py` (39 tests) covers the availability
+boundaries (including a non-UTC offset that would defer a day if honoured
+and not if truncated), every refusal class, caller-mutation, deterministic
+ordering, dataset immutability and tamper detection, and three AST
+invariants: the package may not import authority or outcome code, may not
+make a network call, and may not hard-code a rating scale. Five mutations
+were applied and all five were detected — collapsing availability to the
+action date (4 failures), accepting reverse-order rows (1), tracking
+duplicate ids only for accepted rows (1), assuming a naive `last_updated`
+is UTC (2), and keeping inconsistent transitions (11) — with the source
+restored from a backup copy in a `finally` block.
+
+Validation on the final tree: full suite **4,401 passed / 0 failed / 25
+warnings** in 670.50 seconds — 4,362 prior tests plus this round's 39, with
+the same third-party `websockets` and Joblib/NumPy deprecations as earlier
+rounds. Focused ACER + audit + document suites reran green after these
+counts were inserted. `compileall` over the full required surface plus the
+new `research/` package passed; `git diff --check` passed. Python 3.13.14.
+
+One process note worth carrying forward: an earlier full run on this branch
+was stopped and discarded rather than recorded, because the draft parked a
+validation-placeholder token in this section — the exact pattern
+`test_current_review_documents_have_no_validation_placeholders` forbids, and
+it fails on any occurrence, including one written only to describe itself.
+The fix is the ordering this repository already settled on: finalize the
+prose carrying no token at all, run the suite green, then insert the
+measured numbers and rerun the focused suites.
+
+Untested surface, stated plainly: the backbone has been exercised against
+exactly one real snapshot. Restatement behaviour across two snapshots is
+untested until Snapshot B exists, and no test covers a vendor payload whose
+`last_updated` format differs from Snapshot A's uniform ISO-8601 `Z`.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -3423,11 +3505,14 @@ accepted after correction, and the counter-review of that correction is
 complete (section 7ca): one factual premise in the review was overturned by
 byte-level measurement, the frozen timing rule was kept on its honest
 rationale, and every structural hardening was verified end to end. The
-review chain for the vendor audit is closed. ACER remains before its freeze:
-run Snapshot B after the declared interval; establish issuer mapping with
-ambiguity refusals; freeze the signal/control/cell/run-budget design;
-identify the separate earnings-control dataset; and establish
-dataset-specific permission before sending reconstructable ratings to QC. If that permission is absent,
+review chain for the vendor audit is closed. The event backbone is built
+(section 7cb): 584,916 canonical events at 99.64% retention, with issuer
+identity deliberately unresolved. ACER remains before its freeze: resolve
+issuer mapping with ambiguity refusals across the 9,677-ticker surface; run
+Snapshot B after the declared interval; freeze the
+signal/control/cell/run-budget design; identify the separate
+earnings-control dataset; and establish dataset-specific permission before
+sending reconstructable ratings to QC. If that permission is absent,
 run the eventual frozen study in local LEAN. **ACER-2 remains the decisive
 milestone:** a null stock-level result closes the program. No price join,
 backtest, QC upload/run, or paper execution is authorized by this review. LEV
@@ -3576,16 +3661,15 @@ Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
 docs/SESSION_HANDOFF.md, docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
 docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
-docs/operations/OPERATIONAL_FACTS.md, and docs/alpha-result.md. Codex's
-correction branch merged to main via PR #288 (merge `7ab2f80`); Claude's
-counter-review of it (section 7ca) lives on
-user/claude/acer1-audit-counterreview-20260820 and overturned the review's
-timezone-naive premise by byte-level measurement while confirming its counts
-and structural fixes. Stage 0/1 and APQ are valid but closed null; SHW-4 is
-prospective. SBP is superseded by ACER. Next: the ACER normalization
-backbone and the ACER-0 preregistration draft (parallel), then Snapshot B
-after the declared interval and the ambiguity-refusing issuer mapping before
-ACER-0 freezes. Keep reconstructable ratings off QC unless dataset-specific
+docs/operations/OPERATIONAL_FACTS.md,
+docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
+docs/alpha-result.md. The vendor-audit review chain is closed through
+section 7ca; the ACER event backbone is built in section 7cb on branch
+user/claude/acer-event-backbone-20260820. Stage 0/1 and APQ are valid but
+closed null; SHW-4 is prospective. SBP is superseded by ACER. Next: the
+ACER-0 preregistration draft and the ambiguity-refusing issuer mapping over
+the backbone's 9,677-ticker surface, then Snapshot B after the declared
+interval. Keep reconstructable ratings off QC unless dataset-specific
 permission covers the upload; otherwise use local LEAN. Do not join ratings
 to prices, run a backtest, deploy, trade, mutate an operational database, or
 roll paper-epoch-006 without separate authorization.

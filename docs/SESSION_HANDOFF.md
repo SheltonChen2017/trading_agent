@@ -27,8 +27,9 @@ correction review of those proposals, 7cm the counter-review of that review,
 7cn the local data-capability audit, 7co Codex's independent correction
 review of both new commits, and 7cp the counter-review plus the committed
 capability checks. Section 7cq records Codex's independent review and
-fail-closed correction of those checks; 7cq and section 8 are the current
-development state.
+fail-closed correction of those checks, and 7cr the counter-review that
+completed the requirement set; 7cr and section 8 are the current development
+state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4450,6 +4451,69 @@ and document set passed **215/215 in 12.82 seconds**; the active-document gate
 passed **47/47**; the complete repository suite passed **4,471 / 0 failed /
 25 warnings in 658.86 seconds**; and required `compileall` including
 `research/` passed on Python 3.13.14.
+
+## 7cr. Counter-review, and the mirror-case rule (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-capability-cr-20260821`, based on `2251983`. Full
+record: `docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COUNTERREVIEW.md`.
+
+**All three findings confirmed by execution**, and every one is a fail-open
+path in a module I wrote specifically to fail closed. My submitted class
+accepted `status=unavailable, blocks_acer2=False`; my
+`summarize_capabilities([calendar_finding])` returned **`acer2_runnable =
+True`**, so omitting the six blocking checks produced a green verdict; and I
+labelled `find_spec` "importable" without importing anything or building the
+calendar, so a broken installation would have reported the one non-blocking
+capability as available.
+
+A method note worth keeping: my first probe of the subset defect appeared to
+*refute* it, because loading the old module from a temporary directory broke
+its `REPO_ROOT` and the calendar check failed for an unrelated reason.
+Re-running with the module inside the repository tree reproduced the defect
+at once. That is the second time this session a flawed probe nearly produced
+a false "did not reproduce" — the first was a palindromic ordering test.
+
+**One new P2 raised and fixed (CCCR-001).** Codex's correction makes the
+summary refuse anything but "the complete ACER-2 requirement set exactly
+once" — and that set omitted **earnings surprise**, which ACER-0A.7 names as
+a required control and ACER-0A.2 tracks as an unpurchased dataset. A guard
+enforcing completeness over an incomplete checklist converts a visible gap
+into an assertion that nothing is missing. Added
+`check_earnings_surprise_control` (unavailable, blocking: the only local
+earnings module is yfinance-backed and exposes the vendor's `surprise_pct`,
+the value ACER-0A.5 declines to trust), and wrote down
+`_CONTROLS_COVERED_BY_PRICES` so the claim that momentum, size, liquidity,
+volatility and analyst coverage need no separate source is auditable rather
+than assumed. The assessment now reports **8 requirements, 1 available, 5
+unavailable, 2 unmeasured, 7 blocking**.
+
+### The generalization, narrower than "be careful"
+
+Four consecutive rounds, same shape: the identity constant said
+`unambiguous` while its document said "lower bound"; the proposal's formula
+cancelled the decay its prose described; the data audit contradicted my own
+action plan; and a module promising to replace assertion with checking
+contained three paths that asserted readiness without checking it.
+
+In each case I wrote the guard for the direction I was thinking about and
+left the mirror direction open — available-and-blocking guarded but
+unavailable-and-non-blocking not; the full checklist tested but not the
+subset; the pinned dependency checked but not the actual import. **The rule
+that keeps working is to ask, for every guard, what its mirror case is.**
+That question is what produced CCCR-001 against Codex's own correction.
+
+Validation on the final tree: full suite **4,473 passed / 0 failed / 25
+warnings** in 738.43 seconds — 4,471 from the reviewed tree plus this round's
+two new capability tests. `compileall` over `research/` and `tests/` passed;
+`git diff --check` passed; document guards reran green after every edit
+including after these counts were inserted; Python 3.13.14.
+
+Untested surface, stated plainly: the earnings-surprise check reads
+`data/earnings_data.py`'s source text for `yfinance` and `surprise_pct`. It
+establishes that the module is the wrong kind of source for a point-in-time
+control; it does not exercise the module, and it would not detect a future
+earnings source added elsewhere in the repository. That is the same
+partial-look failure this section describes, bounded here by naming it.
 
 ## 8. What is next
 

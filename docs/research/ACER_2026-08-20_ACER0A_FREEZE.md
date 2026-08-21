@@ -217,6 +217,13 @@ seed, and slot-failure rules. **Those proposals are not frozen**; they exist
 so the owner has concrete options to accept, amend, or reject. They acquire
 authority only when the owner freezes them in writing.
 
+Independent review accepted the proposal set after correction at `1eb3649`.
+The review preserved proposal-only status while repairing decay cancellation,
+in-sample validation residualization, reversed embargo wording, a bootstrap
+algorithm mismatch, incomplete action/state semantics, and incomplete
+disclosure of the measured refusal vocabulary. See
+`docs/Review/REVIEW_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
+
 | ID | Open item | Why it cannot wait |
 |---|---|---|
 | **ACER-0A.1** | Numeric rule for "not driven by one year, sector, or a small number of securities" (section 3.3). | Left unquantified, this becomes a judgement made while looking at the result, which is the exact failure mode the freeze exists to prevent. A concrete proposal is offered below and requires owner confirmation. |

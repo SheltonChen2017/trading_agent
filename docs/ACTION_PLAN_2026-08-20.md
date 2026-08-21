@@ -162,6 +162,18 @@ freezes.** One point deserves an early decision: encoding (b) can be taken
 from the vendor's own `rating_action` field, which makes half the six-cell
 family independent of the rating scale entirely.
 
+**Independent review accepted those proposals after correction.** The
+submitted weight-sum normalization could cancel decay; validation outcomes
+fit their own purportedly out-of-sample residuals; the embargo direction and
+stationary-bootstrap name contradicted the repository toolkit; action/refusal
+state semantics were incomplete; and eleven low-frequency refused rating
+strings were omitted from the disclosure. Correction `1eb3649` uses a
+firm-count denominator with explicit expiry, training-only control fits and a
+pre-validation embargo, the existing circular moving-block bootstrap with a
+pre-outcome calibration gate, fail-closed action/state rules, and the complete
+measured refusal vocabulary. These corrections improve the choices offered
+to the owner; they do not freeze or authorize them.
+
 **Ten named items must still close before the single development run**
 (ACER-0A.1–0A.10). In addition to the robustness rule, surprise formula,
 value source and local-data inventory, the open ledger now names the exact

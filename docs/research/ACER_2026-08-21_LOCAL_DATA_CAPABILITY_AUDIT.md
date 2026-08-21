@@ -14,6 +14,14 @@ Databento artifacts or credential in the reviewing process, and its history,
 delisted coverage, terminal-return semantics, access, and cost have not been
 audited for ACER.**
 
+**Superseding installation update, 2026-08-21:** local LEAN is now installed
+and authenticated in the isolated `C:\QuantConnect\ACER` workspace, and the
+Docker client and server both respond. The generated sample also completed
+successfully through the local engine. This changes the historical engine-
+absence finding in section 2.1, but not this audit's data conclusion: no
+approved ACER market/reference/fundamental dataset or terminal-delisting-
+return source has been inventoried or materialized locally.
+
 ## 1. What the owner's engine ruling asks for
 
 Owner decision 9 makes **local LEAN the authoritative engine**, with cloud
@@ -25,12 +33,19 @@ commitments together decide this audit.
 
 ## 2. Findings on the current EDGAR/yfinance path
 
-### 2.1 There is no local LEAN (measured 2026-08-20)
+### 2.1 Historical measurement: there was no local LEAN (2026-08-20; superseded)
 
 `C:\Lean`, `C:\git\Lean` and `C:\ProgramData\QuantConnect` do not exist, and
 no `map_files` directory exists anywhere under `C:\git`. The QuantConnect
 client also allowlists only `projects/`, `files/`, `compile/`, `backtests/`,
 `optimizations/` and `authenticate`, deliberately excluding data endpoints.
+
+That absence was true for the paths measured on 2026-08-20. On 2026-08-21,
+LEAN CLI `1.0.228`, authenticated `whoami`, the separate
+`C:\QuantConnect\ACER` workspace, Docker client/server `29.7.2`, and one
+generated sample execution through LEAN Engine `2.5.0.0` were verified. No
+`map_files` or other ACER-ready local dataset was inferred from installation
+or the bundled sample data.
 
 ### 2.2 The production read-path price source is not point-in-time
 

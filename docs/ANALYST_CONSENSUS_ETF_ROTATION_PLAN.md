@@ -112,7 +112,7 @@ artifacts. No committed evidence or epoch was disturbed.
 | Historical ETF prices incl. leveraged/inverse | QuantConnect/AlgoSeek or another audited price source | **Unmeasured for ACER.** Do not infer availability from an API token. |
 | Corporate actions, ticker/security mapping | QuantConnect US Equity Security Master, CRSP, or another audited security master | **Unmeasured for ACER.** QuantConnect documents map/factor files and splits, dividends, delistings, mergers, and ticker changes from 1998, but the current process has not verified the owner's subscription or materialized the data. |
 | **Historical ETF constituents with weights** | QuantConnect `ETFConstituentUniverse` candidate | **Schema documented, entitlement/coverage unverified.** The API exposes `EndTime`, `LastUpdate`, `Weight`, `SharesHeld`, and `MarketValue`; actual point-in-time coverage, delay semantics, and owner access remain ACER-1 measurements. |
-| Execution simulation, fees, slippage | Local LEAN or QuantConnect cloud | **Engine path unresolved.** QuantConnect credentials are process-visible; the local `lean` command is not installed. Either route remains research-only and cannot create trading authority. |
+| Execution simulation, fees, slippage | Local LEAN | **Local engine verified end to end; ACER data path unresolved.** LEAN CLI `1.0.228`, the isolated workspace, Docker client/server `29.7.2`, and the generated sample execution through LEAN Engine `2.5.0.0` passed on 2026-08-21. This proves the execution environment, not ACER dataset availability, licence, point-in-time fitness, or research authority. |
 | **Analyst revision history** | Benzinga Analyst Ratings via Massive | **Purchased and structurally audited.** The immutable machine-local snapshot remains licensed data and is not committed or authorized for third-party upload. Issuer mapping and Snapshot B remain open ACER-1 gates. |
 | **Control set for Stage 2** — earnings dates, standardized surprise, size, liquidity, volatility, value, sector | Candidate: Massive/Benzinga Earnings plus separately verified point-in-time market/fundamental sources | **Not adopted.** The owner authorized up to $99 for a one-month structural Earnings audit. Surprise semantics, value source and the remaining formulas are open in ACER-0A.2–0A.10. |
 
@@ -129,10 +129,10 @@ The recorded **Benzinga Analyst Ratings** purchase is enough for the analyst
 event side of ACER-1, subject to normalization, issuer mapping, Snapshot B and
 the recorded licence boundary. It is **not enough for ACER-2**. Massive sells
 Benzinga Earnings as a separate expansion, and the repository has not recorded
-that expansion as purchased. The existing QuantConnect credentials likewise
-prove only that authentication may be attempted; they do not establish access
-to the US Equity Security Master, US Equities history, US Fundamental Data, or
-ETF constituent history.
+that expansion as purchased. The local LEAN CLI and authenticated QuantConnect
+session are now verified, but they do not establish access to the US Equity
+Security Master, US Equities history, US Fundamental Data, or ETF constituent
+history.
 
 Before ACER-2 can become runnable, the implementer must produce non-outcome
 structural evidence for each of these capabilities:

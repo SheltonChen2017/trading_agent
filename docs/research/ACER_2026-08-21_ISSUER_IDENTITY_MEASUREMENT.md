@@ -6,6 +6,14 @@ correction. No network call, no price or outcome join, no research look, no
 name-based evidence that a raw-ticker join would be unsafe. Absence of a flag
 is not evidence that a ticker is safe.
 
+**Superseding environment update, 2026-08-21:** local LEAN, its authenticated
+session, the isolated `C:\QuantConnect\ACER` workspace, and Docker are now
+installed and verified, including a successful generated sample execution.
+The historical absence below is retained because it
+explains the original measurement boundary. The issuer-mapping gate remains
+open because installation supplies no security-master entitlement or mapping
+files by itself.
+
 Corrected measurement lineage:
 
 | Field | Identity |
@@ -26,15 +34,18 @@ complete ordered assessment payload.
 
 The ACER-1 step named in the action plan is an *ambiguity-refusing security
 master join*, and owner decision 8 authorized read-only QuantConnect
-symbol-mapping work for it. **Neither half of that path is currently
-available on this host**, measured before any code was written:
+symbol-mapping work for it. **Neither half of that path was available on this
+host when measured before the diagnostic was written.** The first bullet is
+now historical and superseded; the second remains current:
 
-- **There is no local LEAN installation and no LEAN data.** `C:\Lean`,
+- **There was no local LEAN installation and no LEAN data.** `C:\Lean`,
   `C:\git\Lean`, and `C:\ProgramData\QuantConnect` do not exist, and no
   `map_files` directory exists anywhere under `C:\git`. Owner decision 9
-  makes local LEAN the authoritative engine; there is currently no local
-  LEAN. This is open item **ACER-0A.4**, and its answer is negative rather
-  than merely unmeasured.
+  makes local LEAN the authoritative engine; there was no local LEAN at the
+  time. This made open item **ACER-0A.4** negative rather than merely
+  unmeasured. **Superseded 2026-08-21:** the engine is installed;
+  the local security-master/data half remains unmeasured and unavailable to
+  this workflow until entitlement and materialization are audited.
 - **The QuantConnect client cannot reach data endpoints, by design.**
   `research/quantconnect.py` restricts requests to an allowlist of
   `projects/`, `files/`, `compile/`, `backtests/`, `optimizations/` and

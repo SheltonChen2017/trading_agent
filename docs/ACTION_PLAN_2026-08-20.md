@@ -45,8 +45,10 @@ dispositions and any review corrections are recorded in
 a separate `user/claude/` branch. The current Codex process can see the
 Massive-Benzinga and QuantConnect credential variables, but their values are
 never recorded and credential presence is not dataset entitlement. The local
-`lean` command is absent. No provider call, licensed download, purchase, or
-research-outcome execution is implied by this access measurement.
+engine installation, authentication, and sample execution were verified on
+2026-08-21; see
+`docs/reference/LOCAL_LEAN_WINDOWS_SETUP.md`. The data-entitlement, licence,
+and ACER-0A.4 gates remain open.
 
 ---
 
@@ -323,8 +325,11 @@ ambiguity-refusing mapping is the next ACER-1 step.
 
 **Update 2026-08-21: the mapping step is BLOCKED, and the blocker is
 load-bearing** (`docs/research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
-There is no local LEAN or LEAN data on this host, so the current engine/data
-configuration cannot close ACER-0A.4; and the QC client
+The original measurement found no local LEAN or LEAN data. The engine half is
+now superseded: local LEAN and Docker are installed, authenticated, and proven
+with the generated sample project, but no approved ACER market/reference/
+fundamental dataset has been inventoried or materialized, so ACER-0A.4 remains
+open. The QC client
 allowlists only project/file/compile/backtest paths, with a comment stating
 the rule exists so `data/read` cannot pass — a reviewed control that was not
 widened. The half needing no external data was built instead and independently
@@ -342,8 +347,8 @@ same-day ordering deterministic (768 rather than
 the submitted 766 interleaving flags), canonicalized ticker case, and bound
 every diagnostic to the clean code commit, source manifest, normalized
 dataset, and assessment hash. **Owner ruling needed** on how to obtain the
-security master: audit the existing Databento reference path, install local
-LEAN with suitable data, widen the QC allowlist to a read-only data path, or
+security master: audit the existing Databento reference path, obtain suitable
+local LEAN data, widen the QC allowlist to a read-only data path, or
 nominate a different source.
 
 **Update 2026-08-20: engine and control-data rulings.** Local LEAN is the
@@ -533,11 +538,12 @@ remaining list is deliberately provider-neutral.
    QuantConnect's documented delisting event does not, by itself, prove an
    after-delisting return. If another source is chosen, it must demonstrate
    equivalent coverage and semantics.
-5. **Choose the research engine and licensed-data boundary.** The current host
-   has no local `lean` command. Either install local LEAN and approved data, or
-   use a reviewed QuantConnect cloud path only for data the licence permits to
-   leave this machine. Do not upload reconstructable Benzinga rows merely
-   because QC credentials are available.
+5. **Close the licensed-data boundary and local-data inventory.** Local LEAN,
+   authentication, its isolated workspace, Docker, and sample execution are
+   verified. The remaining question is which approved point-in-time datasets
+   can be used locally and whether their licences permit the selected path.
+   Do not upload reconstructable Benzinga rows merely because QC credentials
+   are available.
 6. **Close ACER-0A.1–0A.10.** The existing normalization, signal, controls,
    statistic, split, confirmation, and refusal proposals remain drafts until
    the owner freezes them. This occurs before any real ratings/price join.

@@ -152,6 +152,21 @@ gate passes, and **zero** ACER-3 executions until ACER-0B is frozen. Every
 execution, refusal, error, and accidental launch is a permanently counted
 look; a corrected rerun may repair code but never the hypothesis.
 
+**Update 2026-08-21: ACER-2 cannot run on the local path, and the binding
+reason is not the security master**
+(`docs/research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md`).
+`data/pit_universe.py` states in its own docstring that prices for delisted
+securities are unavailable and that there are **no delisting returns**, which
+"biases results upward and the size of the bias is not knowable from this
+data". The frozen universe requires delisted names to stay eligible while
+listed and the outcome is a forward return, so the local path can supply the
+population but not its outcome. The sole local price provider also declares
+`provides_point_in_time_lineage = False`, and no local book-value source
+exists, so ACER-0A.3 is negative too. **Owner ruling needed:** acquire
+point-in-time data with delisted coverage, or authorize a read-only QC data
+path. Dropping delisted names from the universe is cheap and not
+recommended — it would make ACER-2 answerable and the answer worthless.
+
 **Proposals for ACER-0A.1 and 0A.5–0A.9 now exist**
 (`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level
 rating scale measured against the corpus's 54 distinct rating strings with an

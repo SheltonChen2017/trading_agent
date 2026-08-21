@@ -17,7 +17,8 @@ Claude's documentation/SBP audit, and section 7bt records Codex's independent
 correction review. Section 7bv records the later ACER replacement, 7bw its
 independent review, 7bx the counter-review, 7by the vendor audit, 7bz the
 independent correction review, 7ca the counter-review of that correction,
-and 7cb the ACER event backbone; 7cb and section 8 are the current
+7cb the ACER event backbone, 7cc its independent review, and 7cd the
+counter-review of that review; 7cd and section 8 are the current
 development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
@@ -3552,6 +3553,82 @@ broker access, deployment, task change, or operational mutation occurred.
 This is still partial ACER plumbing, so no feature-milestone entry is added.
 The next gate remains counter-review, then ambiguity-refusing issuer mapping;
 Snapshot B, ACER-0 freeze, control data, and licence boundaries remain open.
+
+## 7cd. Counter-review of the backbone review (Claude, 2026-08-20)
+
+Branch: `user/claude/acer-backbone-counterreview-20260820`, based on Codex's
+`06333ec`. Full record:
+`docs/Review/REVIEW_2026-08-20_ACER_BACKBONE_COUNTERREVIEW.md`.
+
+**All seven of Codex's findings are confirmed.** The two with the largest
+blast radius were reproduced empirically against my own original code rather
+than accepted from the write-up: loading `normalize.py` from `b8c46ce` as a
+standalone module and feeding it two valid rows sharing one id returned **1
+event and 1 refusal**, confirming ACERBR-001's silent first-row authority;
+feeding it a downgrade from `" Buy "` to `"buy"` returned **1 event**,
+confirming ACERBR-007. My own duplicate test had covered only the
+refused-first case, which is exactly why the accepted-first path survived.
+
+Independent identity reproduction from Snapshot A matched Codex's claimed
+hashes exactly. One byproduct is worth keeping: the corrected refusals blob
+hashed **identically to the v1 build**, which independently proves the more
+permissive transition comparison added no refusals here and that the 46-row
+count is unchanged.
+
+Two defects were found in the corrections and fixed this round. **CCBR-001
+(P3):** `build_identity` validated its lineage inputs' emptiness and format
+but not their type, so a non-string raised a bare `AttributeError` — a
+boundary that authenticates on read but crashes on write is half a boundary.
+**CCBR-002 (P3):** after the transition comparison became case- and
+whitespace-insensitive, the refusal detail still read
+`previous_rating == rating == 'x'`, asserting a textual equality the check
+no longer requires and discarding the values an investigator needs. Refusal
+details are serialized into the frozen dataset, so that is an evidence
+defect rather than a message. **CCBR-003 (P3, recorded only):**
+`load_identity` requires an exact contract-version match, so a future bump
+would make earlier datasets unverifiable by our own tooling — correct for
+consumption, but a future bump should decide deliberately whether
+verification-only reads of older versions are needed.
+
+Because CCBR-002 changes the refusals blob, the dataset identity moves to
+`acer-analyst-events-73c36f9de1841b0a` (content hash `73c36f9de1841b0a…`,
+refusals `0c862521…`); the events blob is byte-identical to Codex's
+`e46b5e50…`. Coverage numbers are unchanged: 584,916 events, 2,130 refusals,
+99.64% retention. **The dataset is still not materialized** — this identity
+was computed in memory. The superseded v1 directory
+`acer-analyst-events-19c9d8e0b00da299` is deliberately left on disk rather
+than deleted: it is the only copy of a superseded artifact whose producing
+code no longer exists, and `load_identity` refusing it on contract version
+is the enforcement.
+
+I also accepted Codex's correction to my prose claiming the date-level rule
+"costs the study nothing measurable in sample size" — I had measured rows,
+not signal, and the corrected wording says so.
+
+Validation on the final tree: full suite **4,417 passed / 0 failed / 25
+warnings** in 716.37 seconds — Codex's 4,414 plus this round's one new test
+and two added parametrized cases. Focused ACER + audit suites: 64 passed.
+Document-consistency guards were rerun green after every documentation edit,
+including after these counts were inserted; no code changed after the full
+run began. `compileall` over the required surface including `research/`
+passed; `git diff --check` passed; Python 3.13.14. The two new tests were
+mutation-checked: reverting the refusal detail to the equality wording and
+removing the type guard each turn their test red, and both sources were
+restored from backup copies in a `finally` block.
+
+A process note against myself: the first draft of this section contained a
+full-suite count and a runtime that had not been measured — the count was a
+prediction and the timing was invented. Both were removed before any run was
+recorded, and the real count differs from the predicted one, which is the
+whole reason the rule exists. A validation record must be transcribed from a
+completed run, never anticipated.
+
+No API call, network access, price join, backtest, research look, broker
+access, deployment, task change, or operational mutation occurred. No ACER
+milestone completes and no feature-milestone entry is added. Remaining
+gates are unchanged: ambiguity-refusing issuer mapping, Snapshot B, the
+ACER-0 freeze, the earnings-control dataset, and dataset-specific permission
+before any reconstructable-data upload to QuantConnect.
 
 ## 8. What is next
 

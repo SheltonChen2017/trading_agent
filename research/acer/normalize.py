@@ -260,7 +260,8 @@ def normalize_rows(
                     rid,
                     date,
                     REFUSAL_INCONSISTENT_TRANSITION,
-                    f"action={action!r} but previous_rating == rating == {rating!r}",
+                    f"action={action!r} but previous_rating={previous!r} and "
+                    f"rating={rating!r} are the same rating",
                 )
             )
             continue

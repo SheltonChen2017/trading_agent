@@ -14,24 +14,34 @@ network call and reads only hash-verified bytes.
 
 | Field | Value |
 |---|---|
-| dataset id | `acer-analyst-events-b06de2e5c03fdf5e` |
-| content hash | `b06de2e5c03fdf5e2e096e2b3abeeb337f7c68ee786ec65af38c233cd090b6e8` |
+| dataset id | `acer-analyst-events-73c36f9de1841b0a` |
+| content hash | `73c36f9de1841b0a8d192cd9e9c13f4b528ca5fb2f247cf6047d3a09a33d434b` |
 | events sha256 | `e46b5e508eab896215ccca5a9b50ea289a8ca3cd4094a24e64f51b6ede2632c5` |
-| refusals sha256 | `469493672fb38497ed5ad326849c4005c9f213ec24db2cde34a5e6a92087f3c2` |
+| refusals sha256 | `0c862521f6391eac72bf4372f6c892bd8ee15941757101f5b392288618c6c7a0` |
 | source snapshot | `benzinga-ratings-20260820T233055Z` |
 | source manifest sha256 | `51954daea8432136b9c99fb4d5088e0c672664e9384475635110dd33e08a2e85` |
 | era split year | 2017 |
 | contract version | 2 |
 
 The dataset belongs under `artifacts/acer_datasets/` and is **not committed**
-(licensed vendor data, AP-2). The v2 identity above was reproduced in memory
-from Snapshot A during independent review; the corrected local dataset has
-not yet been materialized. The older machine-local v1 directory
-`acer-analyst-events-19c9d8e0b00da299` is superseded and must not be used.
-Identity now authenticates the counts and complete lineage as well as both
-content blobs. A rebuild from a different snapshot, era rule, or
-normalization outcome lands at a different path and cannot overwrite an
-earlier dataset. Rebuilding from the same inputs is an idempotent no-op.
+(licensed vendor data, AP-2). The identity above was reproduced in memory
+from Snapshot A during counter-review; the corrected local dataset has not
+yet been materialized. Identity now authenticates the counts and complete
+lineage as well as both content blobs. A rebuild from a different snapshot,
+era rule, or normalization outcome lands at a different path and cannot
+overwrite an earlier dataset. Rebuilding from the same inputs is an
+idempotent no-op.
+
+Two earlier identities are superseded and must not be used. The v1 directory
+`acer-analyst-events-19c9d8e0b00da299` still exists machine-locally; it is
+deliberately not deleted (it is the only copy of a superseded artifact and
+its producing code no longer exists), and `load_identity` refuses it on
+contract version, which is the enforcement. The interim review identity
+`acer-analyst-events-b06de2e5c03fdf5e` was never materialized: it differs
+from the current one only in the wording of the 46 inconsistent-transition
+refusal details, corrected during counter-review so the frozen record does
+not assert a textual equality the check no longer requires. Events bytes are
+identical across that correction; only the refusals blob changed.
 
 ## 2. Coverage
 
@@ -56,7 +66,7 @@ dip intact (18,755 events against 29,916 in 2015 and 28,260 in 2018).
 | Reason | Rows | Interpretation |
 |---|---:|---|
 | `missing_rating` | 2,008 | Matches the audit's 0.34% rating missingness exactly. A row with no rating cannot express a revision. |
-| `inconsistent_transition` | 46 | The row claims an upgrade or downgrade while `previous_rating == rating`. The vendor's own fields contradict each other. |
+| `inconsistent_transition` | 46 | The row claims an upgrade or downgrade while the previous and current ratings are the same, compared ignoring case and repeated whitespace but never aliasing punctuation. The vendor's own fields contradict each other. |
 | `update_precedes_action_date` | 39 | The reverse-order rows the ACER-1 review found. Refused rather than assigned the action date, because no availability bound derived from two disagreeing fields is trustworthy. |
 | `missing_firm` | 37 | Firm attribution is required: an unattributed action cannot be de-duplicated against the same firm's later action. |
 

@@ -209,6 +209,23 @@ def test_directional_no_change_ignores_case_and_presentation_whitespace():
     assert refusals[0].reason == REFUSAL_INCONSISTENT_TRANSITION
 
 
+def test_the_inconsistent_transition_refusal_records_both_raw_ratings():
+    """The refusal detail is frozen evidence, so it must not assert more
+    than the check enforces.
+
+    Since the comparison became case- and whitespace-insensitive, a detail
+    reading `previous_rating == rating == 'x'` would state a textual
+    equality the code no longer requires -- and both values are what a
+    human investigating the refusal actually needs.
+    """
+    _, refusals = normalize_rows(
+        [_row(rating_action="Downgrades", previous_rating=" Buy ", rating="buy")]
+    )
+    detail = refusals[0].detail
+    assert "' Buy '" in detail and "'buy'" in detail
+    assert "==" not in detail
+
+
 def test_transition_comparison_does_not_guess_punctuation_aliases():
     """Firm-specific aliases belong to ACER-0, not this plumbing layer."""
     events, refusals = normalize_rows(
@@ -385,7 +402,7 @@ def test_dataset_identity_refuses_duplicate_event_ids():
 
 @pytest.mark.parametrize(
     "source_name, source_hash",
-    [("", "0" * 64), ("snap", "not-a-sha256")],
+    [("", "0" * 64), ("snap", "not-a-sha256"), (None, "0" * 64), ("snap", 12345)],
 )
 def test_dataset_identity_refuses_malformed_source_lineage(source_name, source_hash):
     events, refusals = normalize_rows([_row()])

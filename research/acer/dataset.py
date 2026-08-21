@@ -69,6 +69,13 @@ def build_identity(
     silently started discarding rows would otherwise produce a dataset that
     looked identical to an honest one.
     """
+    if not isinstance(source_snapshot_name, str) or not isinstance(
+        source_manifest_sha256, str
+    ):
+        # The loader authenticates these on read; the constructor has to
+        # refuse in the same typed way rather than raising AttributeError,
+        # or the lineage boundary is only half a boundary.
+        raise DatasetConflictError("REFUSED: source lineage fields must be strings")
     source_snapshot_name = source_snapshot_name.strip()
     source_manifest_sha256 = source_manifest_sha256.strip().lower()
     if not source_snapshot_name:

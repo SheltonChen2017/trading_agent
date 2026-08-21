@@ -29,8 +29,9 @@ review of both new commits, and 7cp the counter-review plus the committed
 capability checks. Section 7cq records Codex's independent review and
 fail-closed correction of those checks, and 7cr the counter-review that
 attempted to complete the requirement set. Section 7cs records Codex's
-independent correction of the remaining false-completeness path, and 7ct the
-counter-review that fixed the derivation guard itself; 7ct and section 8 are
+independent correction of the remaining false-completeness path, 7ct the
+counter-review that attempted to fix the derivation guard, and 7cu Codex's
+independent verification and correction of that guard; 7cu and section 8 are
 the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
@@ -4623,6 +4624,35 @@ every requirement outside the control list. Extending the derivation to the
 universe and outcome rules is the obvious next hardening and has not been
 done.
 
+## 7cu. Independent verification of the completion counter-review (Codex, 2026-08-21)
+
+Codex reviewed the exact unreviewed range after prior review head `40a0a37`:
+Claude counter-review `438fb9156672808318c0bf81783d86dd9d3e4e3c` and merge
+commit `25cc6d4fca1918d05cd75db8acc4203fb07f5341`. The merge tree is
+byte-identical to its Claude parent. Both commits are **accepted after
+correction**; the complete ledger is
+`docs/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW_VERIFICATION.md`.
+
+Two P2 defects were reproduced. First, the claimed exact accounting still
+accepted any string beginning with `derived from`; changing a dependency to
+`derived from nothing` therefore remained green. The corrected map names
+exact members of the twelve-requirement set for every control, including both
+prices and shares for size and the ratings corpus rather than prices for
+analyst coverage. Second, the guard parsed the completion **proposal** while
+calling it frozen, although the governing ACER-0A freeze explicitly says the
+proposal is not an owner decision. The guard now derives control names from
+the actual owner freeze. Because GICS remains only a proposal, the local SIC
+candidate is honestly `unmeasured`, not `unavailable`. The result is now one
+available, five unavailable, six unmeasured, eleven blocking, and
+`acer2_runnable=false`.
+
+One P3 documentation defect was also corrected: the current resume block
+still told the next agent to counter-review work that section 7ct had already
+counter-reviewed. No milestone completes and no vendor, credential, licensed
+row, QuantConnect/LEAN outcome run, price join, backtest, research look,
+broker, task, operational database, deployment, or trading surface was
+accessed or changed.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -4843,9 +4873,9 @@ docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
 docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/alpha-result.md.
 The vendor-audit and event-backbone review chains are closed and merged
-(sections 7ca and 7cd). The newest independent review is section 7cs on
-`codex/review-acer-capability-completion-20260821`; it corrects the remaining
-false-completeness path in the capability checker. **ACER-0A decisions are partially frozen,
+(sections 7ca and 7cd). The newest independent review is section 7cu; it
+corrects the completion counter-review's still-fuzzy dependency guard and
+proposal/freeze conflation. **ACER-0A decisions are partially frozen,
 but its executable preregistration is incomplete; ACER-0B is deliberately
 not frozen.** The dataset
 identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
@@ -4855,10 +4885,10 @@ closed on a measurement. The CCPR-001 truncation percentages are withdrawn:
 they did not isolate the proposed state-semantics choice. The current
 EDGAR/yfinance path cannot support ACER's delisted outcomes, but Databento is
 an existing **unmeasured candidate**, not a validated solution. The corrected
-capability checker reports twelve requirements and ACER-2 blocked, and refuses
-incomplete checklists; it does not replace vendor evidence. Next: counter-review
-the exact Codex review branch, then obtain
-an owner ruling before any Databento API access, purchase or download; if
+capability checker reports twelve requirements — one available, five
+unavailable, six unmeasured and eleven blocking — and refuses incomplete
+checklists; it does not replace vendor evidence. Next: obtain an owner ruling
+before any Databento API access, purchase or download; if
 authorized, run only a zero-outcome structural capability/cost/licence audit.
 Also close ACER-0A.1–0A.10, run the separately authorized Benzinga Earnings
 structural audit before adopting that control dataset, resolve issuer mapping

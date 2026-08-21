@@ -187,7 +187,7 @@ second correction**
 `docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`,
 `docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its current
 complete twelve-requirement result on the isolated review tree is one
-available, six unavailable, five unmeasured, eleven blocking, and
+available, five unavailable, six unmeasured, eleven blocking, and
 `acer2_runnable=false`. Correction `c9ee971`
 requires the complete checklist exactly once, makes every unavailable or
 unmeasured requirement blocking, and verifies that the pinned NYSE calendar
@@ -200,6 +200,16 @@ the frozen signal, controls, universe, and total-return outcome. Independent
 correction `14a3a83` gives each its own fail-closed finding and absence
 mutation. These are local structural declarations, not vendor evidence:
 Databento remains unmeasured and the owner gate above is unchanged.
+
+Independent verification of Claude's completion counter-review found that
+its second guard was still not exact: any free-form value beginning with
+`derived from` passed, without naming a declared data dependency. Correction
+in `docs/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW_VERIFICATION.md`
+maps every frozen control to exact members of the requirement set. It also
+replaces the proposal document as the guard's authority with the actual
+owner freeze. In particular, GICS remains an **unaccepted proposal**, so the
+available SIC candidate is `unmeasured`, not `unavailable`; this changes the
+status split above but not the eleven blockers or the prohibition on ACER-2.
 
 **Proposals for ACER-0A.1 and 0A.5–0A.9 now exist**
 (`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level

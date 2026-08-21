@@ -170,12 +170,9 @@ def test_the_checklist_covers_every_control_that_needs_its_own_source():
     assert any("shares outstanding" in name for name in requirements)
     assert any("sector" in name for name in requirements)
     assert any("earnings-surprise" in name for name in requirements)
-    assert set(capability._CONTROLS_COVERED_BY_PRICES) == {
-        "momentum",
-        "liquidity",
-        "volatility",
-        "analyst coverage",
-    }
+    assert capability._CONTROL_ACCOUNTING["analyst coverage"] == frozenset(
+        {capability._REQ_RATINGS_CORPUS}
+    )
 
 
 def test_every_control_named_in_the_frozen_document_is_accounted_for():
@@ -193,27 +190,21 @@ def test_every_control_named_in_the_frozen_document_is_accounted_for():
     control that is neither fails here rather than being silently treated as
     satisfied.
     """
-    text = (
-        REPO_ROOT
-        / "docs"
-        / "research"
-        / "ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md"
-    ).read_text(encoding="utf-8")
-    # Strip parentheticals from the WHOLE document before matching. Doing it
-    # afterwards left "ACER-0A.2" inside the sentence, and the regex then
-    # stopped at that period and produced a fragment.
-    normalized = re.sub(r"\([^)]*\)", "", " ".join(text.split()))
-    match = re.search(
-        r"\*\*Controls\*\*, all point-in-time as of the eligibility session:(.+?)\.",
-        normalized,
+    assert capability._CONTROL_CONTRACT_PATH.endswith("ACER0A_FREEZE.md")
+    text = (REPO_ROOT / capability._CONTROL_CONTRACT_PATH).read_text(
+        encoding="utf-8"
     )
-    assert match, "the frozen control sentence was not found — fix the test, not the guard"
+    normalized = " ".join(text.split())
+    match = re.search(r"after controlling for (.+?)\?", normalized)
+    assert match, "the frozen hypothesis control list was not found"
 
     controls = {
         part.strip().strip(",").removeprefix("and ").strip().casefold()
         for part in match.group(1).split(",")
     }
     controls = {name for name in controls if name}
+    assert "Coverage enters the study as a control" in text
+    controls.add("analyst coverage")
     # Fail loudly if the parse degrades, rather than passing vacuously on an
     # empty or truncated set — the mirror case of this guard.
     assert len(controls) == 8, f"expected 8 frozen controls, parsed {sorted(controls)}"
@@ -227,18 +218,34 @@ def test_every_control_named_in_the_frozen_document_is_accounted_for():
         f"only in map={sorted(set(capability._CONTROL_ACCOUNTING) - controls)}"
     )
 
-    # Every control accounted for by a named requirement must actually be in
-    # the required set, and every price-derived claim must be declared.
-    for control, accounting in sorted(capability._CONTROL_ACCOUNTING.items()):
-        if accounting.startswith("derived from"):
-            assert control in {
-                name.casefold() for name in capability._CONTROLS_COVERED_BY_PRICES
-            }, f"{control} claims derivation but is not in the declared list"
-        else:
-            assert accounting in capability._REQUIRED_REQUIREMENTS, (
-                f"{control} maps to {accounting!r}, which is not a required "
-                "requirement"
-            )
+    for control, dependencies in sorted(capability._CONTROL_ACCOUNTING.items()):
+        assert dependencies, f"{control} has no declared data dependency"
+        assert dependencies <= capability._REQUIRED_REQUIREMENTS, (
+            f"{control} names undeclared requirements: "
+            f"{sorted(dependencies - capability._REQUIRED_REQUIREMENTS)}"
+        )
+
+
+def test_control_accounting_names_exact_data_dependencies():
+    """Free-form ``derived from ...`` prose is not dependency accounting.
+
+    The counter-review replaced substring matching with exact control names,
+    but still accepted any accounting value beginning with ``derived from``.
+    A typo or a claim such as ``derived from nothing`` therefore stayed green.
+    Require each control to name the exact declared requirements it consumes.
+    """
+    assert capability._CONTROL_ACCOUNTING == {
+        "momentum": frozenset({capability._REQ_PIT_PRICES}),
+        "liquidity": frozenset({capability._REQ_PIT_PRICES}),
+        "volatility": frozenset({capability._REQ_PIT_PRICES}),
+        "analyst coverage": frozenset({capability._REQ_RATINGS_CORPUS}),
+        "size": frozenset(
+            {capability._REQ_PIT_PRICES, capability._REQ_SIZE_CONTROL}
+        ),
+        "value": frozenset({capability._REQ_VALUE_CONTROL}),
+        "sector": frozenset({capability._REQ_SECTOR}),
+        "earnings surprise": frozenset({capability._REQ_EARNINGS_SURPRISE}),
+    }
 
 
 def test_the_core_ratings_event_corpus_is_itself_required():
@@ -300,8 +307,9 @@ def test_new_requirements_fail_closed_when_their_sources_disappear(
 
 def test_sector_is_sic_not_the_proposed_gics():
     finding = check_sector_classification()
-    assert finding.status == STATUS_UNAVAILABLE
-    assert "SIC" in finding.evidence and "GICS" in finding.requirement
+    assert finding.status == STATUS_UNMEASURED
+    assert "SIC" in finding.evidence and "GICS" not in finding.requirement
+    assert "unaccepted proposal" in finding.evidence
 
 
 # --------------------------------------------------------------------------

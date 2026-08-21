@@ -59,7 +59,7 @@ _REQ_SIZE_CONTROL = (
     "point-in-time shares outstanding for log market-cap size control"
 )
 _REQ_VALUE_CONTROL = "book-to-market value control"
-_REQ_SECTOR = "sector classification (ACER-0A.7 proposes GICS)"
+_REQ_SECTOR = "point-in-time sector classification (taxonomy not yet frozen)"
 _REQ_EARNINGS_SURPRISE = "point-in-time earnings-surprise control"
 
 _REQUIRED_REQUIREMENTS = frozenset(
@@ -79,44 +79,31 @@ _REQUIRED_REQUIREMENTS = frozenset(
     }
 )
 
-# ACER-0A.7 names eight controls. Four of them -- momentum, liquidity,
-# volatility, and analyst coverage -- are arithmetic over point-in-time bars
-# and the ratings corpus itself, so they carry no data requirement beyond
-# `_REQ_PIT_PRICES` and the already-audited corpus. Size is log market cap and
-# therefore also needs point-in-time shares outstanding. The four controls
-# that need their own source are size, value, sector, and earnings surprise,
-# and each has its own check below. This mapping is written down because the
-# summary refuses anything but the *complete* set, and a checklist that
-# asserts completeness while omitting a frozen control makes the omission
-# harder to notice rather than easier.
-_CONTROLS_COVERED_BY_PRICES = (
-    "momentum",
-    "liquidity",
-    "volatility",
-    "analyst coverage",
-)
+# The owner-frozen control contract lives here. The later completion document
+# contains candidate formulas and taxonomies, but the governing freeze says
+# explicitly that those proposals are not owner decisions.
+_CONTROL_CONTRACT_PATH = "docs/research/ACER_2026-08-20_ACER0A_FREEZE.md"
 
-# Every control ACER-0A.7 freezes, mapped to exactly how it is accounted for:
-# either a derivation over inputs already required, or the named requirement
-# that supplies it. `tests/test_acer_capability.py` parses the frozen document
-# and asserts this mapping's keys are exactly the controls named there.
+# Every owner-frozen control, mapped to the exact declared data requirements
+# it consumes. This is dependency accounting, not explanatory prose: every
+# value is a set of members of `_REQUIRED_REQUIREMENTS`, so an arbitrary claim
+# such as "derived from prices" cannot satisfy the guard. Size needs both a
+# price and point-in-time shares; analyst coverage comes from the ratings
+# corpus, not from prices.
 #
-# The mapping is exact rather than a substring search on purpose. The first
-# version of that test matched control words loosely against the joined
-# requirement strings, and the fragment `earnings surprise (acer-0a` -- left
-# by a regex that stopped at the period inside "ACER-0A.2" -- matched
-# `_REQ_SECTOR`'s own "(ACER-0A.7 proposes GICS)" text. The guard written to
-# catch a missing control was itself defeated by fuzzy matching, so the
-# accounting is spelled out instead of inferred.
+# Tests derive the names from `_CONTROL_CONTRACT_PATH` and assert the entire
+# dependency map exactly. This guards both dimensions that failed in the
+# submitted counter-review: the authority being read and what each control
+# actually depends on.
 _CONTROL_ACCOUNTING = {
-    "momentum": "derived from point-in-time bars",
-    "liquidity": "derived from point-in-time bars",
-    "volatility": "derived from point-in-time bars",
-    "analyst coverage": "derived from the ratings corpus",
-    "size": _REQ_SIZE_CONTROL,
-    "value": _REQ_VALUE_CONTROL,
-    "sector": _REQ_SECTOR,
-    "earnings surprise": _REQ_EARNINGS_SURPRISE,
+    "momentum": frozenset({_REQ_PIT_PRICES}),
+    "liquidity": frozenset({_REQ_PIT_PRICES}),
+    "volatility": frozenset({_REQ_PIT_PRICES}),
+    "analyst coverage": frozenset({_REQ_RATINGS_CORPUS}),
+    "size": frozenset({_REQ_PIT_PRICES, _REQ_SIZE_CONTROL}),
+    "value": frozenset({_REQ_VALUE_CONTROL}),
+    "sector": frozenset({_REQ_SECTOR}),
+    "earnings surprise": frozenset({_REQ_EARNINGS_SURPRISE}),
 }
 
 
@@ -459,16 +446,16 @@ def check_value_control_source() -> CapabilityFinding:
 
 
 def check_sector_classification() -> CapabilityFinding:
-    """ACER-0A.7 proposes GICS; only SIC is available."""
+    """A local SIC candidate exists, but the taxonomy is not owner-frozen."""
     source = _read("data/pit_universe.py")
     sic = "SIC codes are the sector proxy" in source
     return CapabilityFinding(
         requirement=_REQ_SECTOR,
-        status=STATUS_UNAVAILABLE if sic else STATUS_UNMEASURED,
+        status=STATUS_UNMEASURED if sic else STATUS_UNAVAILABLE,
         evidence=(
-            "data/pit_universe.py: 'SIC codes are the sector proxy' — SIC is "
-            "not GICS, and substituting one for the other silently would be a "
-            "specification change"
+            "data/pit_universe.py supplies SIC as a candidate sector proxy; "
+            "ACER-0A.7's GICS choice remains an unaccepted proposal, so the "
+            "taxonomy cannot be promoted to available or rejected as wrong"
             if sic
             else "no sector source identified under data/"
         ),

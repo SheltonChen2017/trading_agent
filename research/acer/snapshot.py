@@ -28,8 +28,8 @@ class SnapshotError(ValueError):
     """A snapshot failed verification and must not be used as evidence."""
 
 
-def load_manifest(snap: Path) -> dict:
-    """Load a snapshot manifest only after its recorded hash verifies."""
+def _load_manifest_and_hash(snap: Path) -> tuple[dict, str]:
+    """Load one manifest byte image and return it with its verified hash."""
     manifest_path = snap / "manifest.json"
     hash_path = snap / "manifest.sha256"
     try:
@@ -52,15 +52,17 @@ def load_manifest(snap: Path) -> dict:
         manifest.get("partitions"), list
     ):
         raise SnapshotError("REFUSED: manifest has no partitions list")
-    return manifest
+    return manifest, recorded_hash
+
+
+def load_manifest(snap: Path) -> dict:
+    """Load a snapshot manifest only after its recorded hash verifies."""
+    return _load_manifest_and_hash(snap)[0]
 
 
 def manifest_sha256(snap: Path) -> str:
     """Return the snapshot's verified manifest hash, for lineage records."""
-    load_manifest(snap)
-    return (
-        (snap / "manifest.sha256").read_text(encoding="utf-8").strip().lower()
-    )
+    return _load_manifest_and_hash(snap)[1]
 
 
 def load_verified_rows(snap: Path, allow_incomplete: bool = False) -> list[dict]:
@@ -72,7 +74,19 @@ def load_verified_rows(snap: Path, allow_incomplete: bool = False) -> list[dict]
     hash-valid manifest that disagrees with the hashed page contents is
     still a corrupt snapshot.
     """
-    manifest = load_manifest(snap)
+    return load_verified_snapshot(snap, allow_incomplete)[0]
+
+
+def load_verified_snapshot(
+    snap: Path, allow_incomplete: bool = False
+) -> tuple[list[dict], str]:
+    """Return verified rows and the hash of the same manifest byte image.
+
+    A builder must bind rows to the manifest it actually verified. Returning
+    them together avoids a second manifest read that could attach lineage
+    from a concurrently replaced manifest to rows loaded under the first.
+    """
+    manifest, verified_manifest_hash = _load_manifest_and_hash(snap)
     complete = manifest.get("complete", False)
     if not complete and not allow_incomplete:
         raise SnapshotError(
@@ -134,4 +148,4 @@ def load_verified_rows(snap: Path, allow_incomplete: bool = False) -> list[dict]
             raise SnapshotError(
                 f"REFUSED: row-count mismatch for partition {partition.get('year')}"
             )
-    return rows
+    return rows, verified_manifest_hash

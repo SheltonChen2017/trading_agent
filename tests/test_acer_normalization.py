@@ -23,7 +23,7 @@ from research.acer.dataset import (
     write_dataset,
 )
 from research.acer.normalize import (
-    ERA_EASTERN_ACTION_TIME,
+    ERA_EASTERN_CONSISTENT_CLOCK,
     ERA_INGESTION_CLOCK,
     REFUSAL_DUPLICATE_ID,
     REFUSAL_INCONSISTENT_TRANSITION,
@@ -37,7 +37,11 @@ from research.acer.normalize import (
     normalize_rows,
     parse_last_updated,
 )
-from research.acer.snapshot import SnapshotError, load_verified_rows
+from research.acer.snapshot import (
+    SnapshotError,
+    load_verified_rows,
+    load_verified_snapshot,
+)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ACER_PACKAGE = REPO_ROOT / "research" / "acer"
@@ -132,7 +136,7 @@ def test_time_field_era_is_recorded_by_action_year_including_the_mixed_year():
     assert eras == {
         "old": ERA_INGESTION_CLOCK,
         "mix": ERA_INGESTION_CLOCK,
-        "new": ERA_EASTERN_ACTION_TIME,
+        "new": ERA_EASTERN_CONSISTENT_CLOCK,
     }
 
 
@@ -190,6 +194,31 @@ def test_a_directional_action_whose_rating_did_not_change_is_refused():
     assert refusals[0].reason == REFUSAL_INCONSISTENT_TRANSITION
 
 
+def test_directional_no_change_ignores_case_and_presentation_whitespace():
+    """Vendor presentation differences cannot manufacture a transition."""
+    events, refusals = normalize_rows(
+        [
+            _row(
+                rating_action="  DOWNGRADES ",
+                previous_rating="  Sector   Perform ",
+                rating="sector perform",
+            )
+        ]
+    )
+    assert events == []
+    assert refusals[0].reason == REFUSAL_INCONSISTENT_TRANSITION
+
+
+def test_transition_comparison_does_not_guess_punctuation_aliases():
+    """Firm-specific aliases belong to ACER-0, not this plumbing layer."""
+    events, refusals = normalize_rows(
+        [_row(rating_action="Upgrades", previous_rating="Buy", rating="Buy+")]
+    )
+    assert not refusals
+    assert events[0].previous_rating_raw == "Buy"
+    assert events[0].rating_raw == "Buy+"
+
+
 def test_a_maintained_rating_with_no_change_is_kept_not_refused():
     """Only upgrades/downgrades must actually move; maintains legitimately
     repeat the same rating, and 205,516 Snapshot A rows do exactly that."""
@@ -220,7 +249,21 @@ def test_a_repeated_identity_is_refused_even_when_the_first_row_was_refused():
     assert events == []
     assert [refusal.reason for refusal in refusals] == [
         REFUSAL_DUPLICATE_ID,
-        REFUSAL_MISSING_RATING,
+        REFUSAL_DUPLICATE_ID,
+    ]
+
+
+def test_every_occurrence_of_an_accepted_first_duplicate_is_refused():
+    """Keeping the first row would silently choose an arbitrary authority."""
+    rows = [
+        _row(benzinga_id="dup", rating="Buy"),
+        _row(benzinga_id="dup", rating="Sell"),
+    ]
+    events, refusals = normalize_rows(rows)
+    assert events == []
+    assert [refusal.reason for refusal in refusals] == [
+        REFUSAL_DUPLICATE_ID,
+        REFUSAL_DUPLICATE_ID,
     ]
 
 
@@ -310,6 +353,51 @@ def test_dataset_identity_changes_with_source_lineage():
     assert first["content_hash"] != second["content_hash"]
 
 
+def test_dataset_identity_is_canonical_under_caller_order():
+    events, refusals = normalize_rows(
+        [_row(benzinga_id="a"), _row(benzinga_id="b", rating="")]
+    )
+    forward = build_identity(
+        events,
+        refusals,
+        source_snapshot_name="snap",
+        source_manifest_sha256="0" * 64,
+    )
+    backward = build_identity(
+        list(reversed(events)),
+        list(reversed(refusals)),
+        source_snapshot_name="snap",
+        source_manifest_sha256="0" * 64,
+    )
+    assert forward == backward
+
+
+def test_dataset_identity_refuses_duplicate_event_ids():
+    events, refusals = normalize_rows([_row()])
+    with pytest.raises(DatasetConflictError, match="duplicate benzinga_id"):
+        build_identity(
+            [events[0], events[0]],
+            refusals,
+            source_snapshot_name="snap",
+            source_manifest_sha256="0" * 64,
+        )
+
+
+@pytest.mark.parametrize(
+    "source_name, source_hash",
+    [("", "0" * 64), ("snap", "not-a-sha256")],
+)
+def test_dataset_identity_refuses_malformed_source_lineage(source_name, source_hash):
+    events, refusals = normalize_rows([_row()])
+    with pytest.raises(DatasetConflictError, match="REFUSED"):
+        build_identity(
+            events,
+            refusals,
+            source_snapshot_name=source_name,
+            source_manifest_sha256=source_hash,
+        )
+
+
 def test_writing_the_same_dataset_twice_is_idempotent(tmp_path):
     events, refusals = normalize_rows([_row()])
     kwargs = {
@@ -334,6 +422,32 @@ def test_a_tampered_dataset_file_refuses_to_load(tmp_path):
     target = tmp_path / identity["dataset_id"] / "events.jsonl"
     target.write_bytes(target.read_bytes() + b"{}\n")
     with pytest.raises(DatasetConflictError, match="does not match"):
+        load_identity(tmp_path / identity["dataset_id"])
+
+
+@pytest.mark.parametrize(
+    "field, forged",
+    [
+        ("source_manifest_sha256", "f" * 64),
+        ("event_count", 999),
+        ("dataset_id", "acer-analyst-events-forged"),
+        ("contract_version", 999),
+    ],
+)
+def test_tampered_dataset_identity_metadata_refuses_to_load(tmp_path, field, forged):
+    events, refusals = normalize_rows([_row()])
+    identity = write_dataset(
+        events,
+        refusals,
+        tmp_path,
+        source_snapshot_name="snap",
+        source_manifest_sha256="0" * 64,
+    )
+    target = tmp_path / identity["dataset_id"] / "dataset.json"
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload[field] = forged
+    target.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(DatasetConflictError, match="REFUSED"):
         load_identity(tmp_path / identity["dataset_id"])
 
 
@@ -417,6 +531,33 @@ def test_the_backbone_refuses_the_same_snapshots_the_audit_refuses(tmp_path):
         load_verified_rows(snap)
     with pytest.raises(SystemExit, match="manifest hash mismatch"):
         audit._load_rows(snap, False)
+
+
+def test_verified_rows_and_lineage_hash_come_from_one_manifest_read(
+    tmp_path, monkeypatch
+):
+    """Rows from manifest A must never be labelled with manifest B's hash."""
+    import research.acer.snapshot as snapshot
+
+    calls = []
+
+    def fake_load(_snap):
+        calls.append(True)
+        return {"complete": True, "partitions": []}, "a" * 64
+
+    monkeypatch.setattr(snapshot, "_load_manifest_and_hash", fake_load)
+    rows, manifest_hash = load_verified_snapshot(tmp_path)
+    assert rows == []
+    assert manifest_hash == "a" * 64
+    assert len(calls) == 1
+
+
+def test_an_incomplete_snapshot_cannot_publish_a_canonical_dataset(tmp_path):
+    """The audit override is diagnostic; canonical persistence stays complete."""
+    from scripts.build_acer_events import main
+
+    with pytest.raises(SystemExit, match="incomplete snapshot.*only.*dry-run"):
+        main([str(tmp_path / "not-read"), "--allow-incomplete"])
 
 
 # --------------------------------------------------------------------------

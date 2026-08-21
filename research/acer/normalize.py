@@ -38,14 +38,16 @@ evaluation layer that only exists after ACER-0.
 """
 from __future__ import annotations
 
+import collections
 import datetime as dt
 import re
 from dataclasses import dataclass
 from typing import Any, Iterable
 
 # Measured era boundary for the vendor `time` field: 2011-2015 rows carry the
-# UTC ingestion clock (no independent action timing), 2017+ rows measure as
-# genuine US Eastern, and 2016 is the mixed transition year. 2016 is grouped
+# UTC ingestion clock (no independent action timing), 2017+ rows are
+# consistent with US Eastern, and 2016 is the mixed transition year. The
+# vendor has not confirmed those field semantics. 2016 is grouped
 # with the unreliable era on purpose -- treating a mixed year as reliable
 # would grant some rows a timing quality they do not have.
 #
@@ -54,7 +56,7 @@ from typing import Any, Iterable
 # future preregistration, and so the claim stays visible enough to challenge.
 ERA_SPLIT_YEAR = 2017
 ERA_INGESTION_CLOCK = "ingestion_clock_era"
-ERA_EASTERN_ACTION_TIME = "eastern_action_time_era"
+ERA_EASTERN_CONSISTENT_CLOCK = "eastern_consistent_clock_era"
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -152,11 +154,17 @@ def normalize_rows(
     alike, so the fail-closed direction is to surface both rows rather than
     let the second silently take the slot.
     """
+    materialized_rows = list(rows)
+    id_counts = collections.Counter(
+        raw_id.strip()
+        for row in materialized_rows
+        if isinstance((raw_id := row.get("benzinga_id")), str)
+        and raw_id.strip()
+    )
     events: list[NormalizedEvent] = []
     refusals: list[Refusal] = []
-    seen_ids: set[str] = set()
 
-    for row in rows:
+    for row in materialized_rows:
         raw_id = row.get("benzinga_id")
         date = row.get("date")
         date_for_refusal = date if isinstance(date, str) else None
@@ -172,17 +180,16 @@ def normalize_rows(
             )
             continue
         rid = raw_id.strip()
-        if rid in seen_ids:
+        if id_counts[rid] > 1:
             refusals.append(
                 Refusal(
                     rid,
                     date_for_refusal,
                     REFUSAL_DUPLICATE_ID,
-                    "benzinga_id already seen in this snapshot",
+                    f"benzinga_id appears {id_counts[rid]} times in this snapshot",
                 )
             )
             continue
-        seen_ids.add(rid)
 
         if not isinstance(date, str) or not _DATE_RE.match(date):
             refusals.append(Refusal(rid, None, REFUSAL_MISSING_DATE, f"date={date!r}"))
@@ -246,7 +253,7 @@ def normalize_rows(
             isinstance(action, str)
             and action.strip().lower() in _DIRECTIONAL_ACTIONS
             and previous is not None
-            and previous == rating
+            and _comparison_text(previous) == _comparison_text(rating)
         ):
             refusals.append(
                 Refusal(
@@ -260,7 +267,7 @@ def normalize_rows(
 
         time_raw = row.get("time")
         era = (
-            ERA_EASTERN_ACTION_TIME
+            ERA_EASTERN_CONSISTENT_CLOCK
             if action_date.year >= ERA_SPLIT_YEAR
             else ERA_INGESTION_CLOCK
         )
@@ -306,6 +313,19 @@ def _optional_text(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _comparison_text(value: Any) -> str | None:
+    """Return a conservative comparison key without mapping vocabulary.
+
+    Case and repeated whitespace are presentation differences, not rating
+    changes. Punctuation is deliberately retained: deciding that, for
+    example, ``Buy`` and ``Buy+`` are aliases belongs to ACER-0's frozen
+    firm-specific rating map rather than this plumbing layer.
+    """
+    if not isinstance(value, str):
+        return None
+    return " ".join(value.split()).casefold() or None
 
 
 def _iso_z(timestamp: dt.datetime) -> str:

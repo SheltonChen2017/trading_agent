@@ -28,8 +28,7 @@ from research.acer.dataset import summarize, write_dataset  # noqa: E402
 from research.acer.normalize import normalize_rows  # noqa: E402
 from research.acer.snapshot import (  # noqa: E402
     SnapshotError,
-    load_verified_rows,
-    manifest_sha256,
+    load_verified_snapshot,
 )
 
 DEFAULT_OUT_ROOT = REPO_ROOT / "artifacts" / "acer_datasets"
@@ -56,9 +55,16 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    if args.allow_incomplete and not args.dry_run:
+        raise SystemExit(
+            "REFUSED: an incomplete snapshot may be inspected only with "
+            "--dry-run; it cannot publish a canonical ACER dataset"
+        )
+
     try:
-        rows = load_verified_rows(args.snapshot, args.allow_incomplete)
-        source_manifest = manifest_sha256(args.snapshot)
+        rows, source_manifest = load_verified_snapshot(
+            args.snapshot, args.allow_incomplete
+        )
     except SnapshotError as exc:
         raise SystemExit(str(exc)) from exc
 

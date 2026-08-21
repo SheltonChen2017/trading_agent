@@ -48,6 +48,17 @@ become materially stale.
 
 ## 3. Roles
 
+### Current ACER assignment (owner decision 2026-08-21)
+
+For the current ACER implementation sequence, **Codex implements and Claude
+independently reviews**. Codex publishes a completed `codex/<topic>-<date>`
+implementation branch. Claude starts from that exact remote object and uses a
+separate `user/claude/<review-topic>-<date>` review branch. The generic roles
+below remain the contract; this paragraph only assigns the people occupying
+them. The assignment does not authorize either agent to merge, deploy, spend,
+download licensed data, or consume a research look without the owner's
+separate instruction.
+
 ### Implementer
 
 The implementer:
@@ -113,11 +124,12 @@ moves later, stop and re-establish the exact ordered commit range.
 Create a dedicated review branch from the exact implementation commit:
 
 ```powershell
-git switch -c codex/review-<milestone>-<date> origin/<implementation-branch>
+git switch -c <reviewer-prefix>/review-<milestone>-<date> origin/<implementation-branch>
 ```
 
-Use the appropriate agent prefix if the reviewer is not Codex. Do not mix an
-unrelated feature or documentation initiative into the review branch.
+For the current ACER assignment the reviewer prefix is `user/claude`. Use the
+appropriate agent prefix after any later owner-approved role change. Do not
+mix an unrelated feature or documentation initiative into the review branch.
 
 In a shared worktree, monitor for concurrent branch switches and commits. A
 different agent can unintentionally commit onto the currently active branch.

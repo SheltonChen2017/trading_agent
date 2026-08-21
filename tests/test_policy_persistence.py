@@ -1,6 +1,6 @@
 """Policy persistence helpers behind the UI's protected policy-update workflow.
 
-docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 3.1: allow_new_positions
+docs/Archive/Plans/UI_FEATURE_CONTROLS_DESIGN.md section 3.1: allow_new_positions
 and enable_strategy_proposals are AUTHORITATIVE policy, so a UI edit must go
 through validation, produce a new version and fingerprint, persist atomically,
 and leave the file untouched when anything is invalid. These tests exercise

@@ -2,7 +2,7 @@
 growth-rotation rule, measured. Run from the repository root; results land
 in ./backtest_three_sleeve_revisions_2026_08_09.results.json and the
 adopted-revision summary is recorded in assistant/research_findings.json
-and docs/reference/THREE_SLEEVE_ENGINE_PLAN.md section 1.1. Do not re-scope
+and docs/Plan/THREE_SLEEVE_ENGINE_PLAN.md section 1.1. Do not re-scope
 this window; a new question is a new dated script.
 
 Follow-up to backtest_three_sleeve_rule_2026_08_09.py after its finding: the +5%

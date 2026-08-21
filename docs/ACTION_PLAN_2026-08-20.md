@@ -1,14 +1,16 @@
 # ACTION PLAN — 2026-08-20
 
-Status: **owner-directed replacement for `docs/reference/ACTION_PLAN_2026-08-02.md`**,
+Status: **owner-directed replacement for `docs/Archive/Plans/ACTION_PLAN_2026-08-02.md`**,
 written 2026-08-20 at the owner's instruction. **Amended the same day: the
 owner replaced the Strong-Buy portfolio program with the Analyst-Consensus ETF
 Rotation program (ACER), which is now priority 1.** The predecessor is archived, not deleted: it remains
 the record of how everything below became true.
 
 This document decides **what happens next**. It does not restate per-milestone
-internals — the archived plans in `docs/reference/` remain authoritative for
-their own definitions of done, and `docs/operations/OPERATIONAL_FACTS.md`
+internals. The active implementation plan is at the root of `docs/`, queued
+plans are in `docs/Plan/`, and completed or superseded plans are in
+`docs/Archive/Plans/`; each remains authoritative for its own definition of
+done when this action plan schedules it. `docs/operations/OPERATIONAL_FACTS.md`
 remains authoritative for machine-local operational state.
 
 **Nothing here grants authority.** Live trading, funded accounts, autonomous
@@ -17,13 +19,27 @@ ML/LLM boundary in `CLAUDE.md` remains exactly as constrained. Prioritising
 ACER is a *sequencing* decision; it does not adopt, freeze, or approve any
 ACER value. That is a separate owner act (ACER-0).
 
-Current development topology at the ACER review start (2026-08-20):
+Current development topology at the provider-neutral implementation start
+(2026-08-21): `origin/main` is `a186b2f`; Codex branch
+`codex/fix-acer-provider-neutral-capabilities-20260821` was created from that
+exact merge head. The stable code correction is `2f4e41d`; documentation and
+handoff commits follow on the same branch for Claude's independent review.
+
+Historical development topology at the ACER review start (2026-08-20):
 `origin/main` is `6cdb423`. PR #286 merged the ACER documentation change from
 `f3b960d`; the prior SBP documentation-review chain is mainline history at
 `6f571c2`. The ACER submission is reviewed commit-by-commit from
 `6f571c2..f3b960d`, with the PR #286 merge tree also reviewed; the final
 dispositions and any review corrections are recorded in
 `docs/SESSION_HANDOFF.md`.
+
+**Current owner assignment, 2026-08-21:** Codex implements ACER work on a
+`codex/` branch and Claude independently reviews the exact pushed snapshot on
+a separate `user/claude/` branch. The current Codex process can see the
+Massive-Benzinga and QuantConnect credential variables, but their values are
+never recorded and credential presence is not dataset entitlement. The local
+`lean` command is absent. No provider call, licensed download, purchase, or
+research-outcome execution is implied by this access measurement.
 
 ---
 
@@ -60,7 +76,7 @@ documentation changes).
 | Stream | State | Authority |
 |---|---|---|
 | Paper evidence | **`paper-epoch-006` is active** since 2026-08-19 on deployed `c9d0740`; first observation verified the same day; 60-session / 30-order clock counting | `docs/operations/OPERATIONAL_FACTS.md` |
-| Overlay shadow | `overlay-epoch-001` (defensive carry) registered with a 2026-07-31 baseline; 24-month sufficiency floor; tasks reinstalled Interactive after the S4U failure | `docs/reference/SHADOW_OBSERVATION_DESIGN.md` |
+| Overlay shadow | `overlay-epoch-001` (defensive carry) registered with a 2026-07-31 baseline; 24-month sufficiency floor; tasks reinstalled Interactive after the S4U failure | `docs/Archive/Plans/SHADOW_OBSERVATION_DESIGN.md` |
 | Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first verified capture.** Code, tests and installer remain, but the read-only host measurement found the task absent and zero capture artifacts. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. | `docs/operations/OPERATIONAL_FACTS.md` |
 
 **Research programs and their verdicts:**
@@ -79,7 +95,7 @@ The project has **zero confirmed predictive signals**. The reviewed Stage 0
 and Stage 1 QuantConnect runs are **VALID but null**, and the reviewed APQ run
 is valid but also closed null. Older legacy entries retain their individual
 invalid, refused, unanalysed, or provenance-incomplete states in
-`docs/alpha-result.md`; validity is never inferred from age or rewritten as a
+`docs/Archive/Research/alpha-result.md`; validity is never inferred from age or rewritten as a
 group. The closed cross-sectional program's conservative lifetime alpha-cell
 floor is 452 at A-002 (428 legacy/declaration cells plus the 24-cell Stage 1
 family). APQ is a separate three-cell allocation-policy family and does not
@@ -101,13 +117,13 @@ score each ETF as the sum of its point-in-time constituent weights times its
 holdings' decayed revision signals, filter on breadth and analyst coverage,
 rank, and only later express the strongest views through inverse or leveraged
 products under explicit regime rules. The contract is
-`docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` (ACER-0..7); the
+`docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` (ACER-0..7); the
 owner's source specification is versioned beside it as
 `analyst-consensus-etf-strategy.pdf`.
 
 This is a different hypothesis from SBP, not a re-plumbing of it: the signal
 moves from consensus *levels* to *revisions*, and the held instrument moves
-from a stock basket to ETFs. `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`
+from a stock basket to ETFs. `docs/Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md`
 is **superseded while still a draft** — never adopted or frozen, so no
 evidence, capture, or operational state is affected — and the frozen SBR
 capture stream is **closed before its first capture** with zero snapshots,
@@ -176,7 +192,7 @@ Databento capability/cost audit, acquire another point-in-time source with
 delisted and terminal-return coverage, or amend the local-engine ruling to use
 a read-only QC data path. Dropping delisted names remains not recommended.
 Independent review accepted the two submitted commits after correction in
-`docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md`;
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md`;
 correction `32a16b0` also withdrew the counter-review's invalid state-semantics
 percentages without choosing either proposed rule.
 
@@ -184,9 +200,9 @@ percentages without choosing either proposed rule.
 inventory, and its completeness claim is independently accepted only after a
 second correction**
 (`research/acer/capability.py`,
-`docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`,
-`docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its current
-complete twelve-requirement result on the isolated review tree is one
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`,
+`docs/Archive/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its then-current
+twelve-item result on the isolated review tree was one
 available, five unavailable, six unmeasured, eleven blocking, and
 `acer2_runnable=false`. Correction `c9ee971`
 requires the complete checklist exactly once, makes every unavailable or
@@ -204,12 +220,24 @@ Databento remains unmeasured and the owner gate above is unchanged.
 Independent verification of Claude's completion counter-review found that
 its second guard was still not exact: any free-form value beginning with
 `derived from` passed, without naming a declared data dependency. Correction
-in `docs/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW_VERIFICATION.md`
+in `docs/Archive/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW_VERIFICATION.md`
 maps every frozen control to exact members of the requirement set. It also
 replaces the proposal document as the guard's authority with the actual
 owner freeze. In particular, GICS remains an **unaccepted proposal**, so the
 available SIC candidate is `unmeasured`, not `unavailable`; this changes the
 status split above but not the eleven blockers or the prohibition on ACER-2.
+
+**Provider-neutral correction 2026-08-21:** the twelve-item inventory
+incorrectly treated **Databento itself** as a required ACER input in addition
+to the point-in-time price/reference capabilities a selected provider must
+supply. ACER requires capabilities, not a named vendor. Databento is now
+reported separately as an optional provider diagnostic, while the required
+checklist contains eleven capabilities. On the current tree it reports one
+available, five unavailable, five unmeasured, ten blocking, and
+`acer2_runnable=false`. This does not make ACER more ready; it prevents a
+fully audited QuantConnect, CRSP, or other approved route from remaining red
+solely because Databento was not selected. Databento's own status remains
+unmeasured.
 
 **Proposals for ACER-0A.1 and 0A.5–0A.9 now exist**
 (`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level
@@ -266,8 +294,8 @@ security-master cross-reference and must refuse ambiguous joins.
 **Update, same day: the event backbone is implemented and independently
 corrected** (`research/acer/`,
 `docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md`, review record
-`docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md`, counter-review
-`docs/Review/REVIEW_2026-08-20_ACER_BACKBONE_COUNTERREVIEW.md`). The review
+`docs/Archive/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md`, counter-review
+`docs/Archive/Review/REVIEW_2026-08-20_ACER_BACKBONE_COUNTERREVIEW.md`). The review
 chain is complete: all seven review findings were confirmed, two of the
 corrections themselves were corrected, and the round is closed.
 Snapshot A still yields 584,916 canonical events at 99.64%
@@ -323,6 +351,11 @@ eight criteria (history depth, delisted coverage, whether `estimated_eps` is
 genuinely pre-report, restatements by stable id, announcement timing and
 next-session availability, GAAP/adjusted/FFO consistency, missingness and
 issuer mapping, licence and retention). That audit consumes no research look.
+The repository records the **Analyst Ratings** expansion as purchased; it
+does not record the separate Earnings expansion as purchased or Snapshot E-A
+as downloaded. Authorization to spend up to $99 is not evidence of either.
+Even after an Earnings purchase, ACER still needs an audited market/reference,
+delisting-return, corporate-action, shares, value-fundamental, and sector path.
 
 ### ACER-2 is the decisive milestone; scope and price that alone
 
@@ -383,7 +416,7 @@ These cost little but are the only prospective evidence the project owns.
 5. **Two open reconciliation alerts reflected stale state, not a mismatch, at
    the 2026-08-21T06:02Z read-only measurement** — diagnosed
    read-only 2026-08-20 in
-   `docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`. Seven of
+   `docs/Archive/Operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`. Seven of
    22 long gaps were checked and each matches a Windows sleep window; the
    tasks are registered `WakeToRun=False` and `StartWhenAvailable=True`, and
    20 clean reconciliations had completed since the last failure. Nothing was
@@ -414,8 +447,8 @@ overlay). Both are docs-only proposals; neither is frozen or scheduled.
 
 | Item | State |
 |---|---|
-| GR-6 and the remaining general-readiness items | Incomplete; see `docs/reference/GENERAL_READINESS_IMPLEMENTATION_PLAN.md` |
-| Allocation service (`docs/reference/ALLOCATION_SERVICE_DESIGN.md`) | Design only; partially superseded by the three-sleeve engine |
+| GR-6 and the remaining general-readiness items | Incomplete; see `docs/Plan/GENERAL_READINESS_IMPLEMENTATION_PLAN.md` |
+| Allocation service (`docs/Archive/Plans/ALLOCATION_SERVICE_DESIGN.md`) | Design only; partially superseded by the three-sleeve engine |
 | Three-sleeve M4 | Deferred by decision, not by blocker |
 | ML-FS-6 real discovery/confirmation | Blocked on an owner-designated spec reviewer and purchased point-in-time data, not on code |
 | AI strategy authoring, AI debate, MCP bridge | Unbuilt. Debate's own design document doubts it is worth building; MCP's activation gate is unmet |
@@ -432,9 +465,9 @@ was wrong, and what was done:
 |---|---|
 | The handoff named a 2026-08-17 head as current `main` and the operational checkout as frozen in `paper-epoch-005` | Refreshed to `c289f95` and `paper-epoch-006` at `c9d0740` (`a2b69eb`) |
 | Three sections still described merged commits as awaiting the owner's push authorisation, which a guard test caught after the merge | Corrected; claim words kept out of the same clause as the hashes they describe |
-| `docs/Alpha_Test_Implementation_Plan.md` still said Stage 0 was halted with reruns beginning at `R-007` | Status header rewritten: Stage 0 and Stage 1 are closed null; the document is a historical contract |
-| `GENERAL_READINESS_STATUS.md` and `ML_IMPLEMENTATION_STATUS.md` cited companion plans at pre-reorganisation `docs/` paths | Repointed to `docs/reference/` |
-| `docs/reference/README.md` omitted `SHADOW_OBSERVATION_DESIGN.md` and `THREE_SLEEVE_ENGINE_PLAN.md` | Rows added, along with the newly archived predecessor plan |
+| `docs/Archive/Plans/Alpha_Test_Implementation_Plan.md` still said Stage 0 was halted with reruns beginning at `R-007` | Status header rewritten: Stage 0 and Stage 1 are closed null; the document is a historical contract |
+| `GENERAL_READINESS_STATUS.md` and `ML_IMPLEMENTATION_STATUS.md` cited companion plans at pre-reorganisation `docs/` paths | Repointed to their lifecycle locations under `docs/Plan/` or `docs/Archive/Plans/` |
+| The old reference index mixed current, future, and completed plans | Replaced by the lifecycle indexes in `docs/Plan/README.md` and `docs/Archive/README.md`; the old index is preserved at `docs/Archive/Reference/README_legacy.md` |
 | The predecessor action plan quoted module sizes (`platform_readiness.py` 778 lines, `execution_service.py` 900) and "10 files" under `assistant/llm/` | Measured now: 856, 1,062, and 9 modules. This plan cites behaviour and paths rather than line counts, which drift by construction |
 | Current-state prose implied an eight-tab / ten-page UI | Measured: 14 pages, listed in section 1 |
 
@@ -443,7 +476,7 @@ was wrong, and what was done:
 `docs/operations/ML_IMPLEMENTATION_STATUS.md` (2026-08-03) have not been
 re-verified line-by-line against today's code; they are companions to archived
 plans and were checked only for path accuracy and for claims contradicting
-this plan. Historical review reports under `docs/Review/` are records of what
+this plan. Historical review reports under `docs/Archive/Review/` are records of what
 was true when written and are never retro-edited.
 
 ---
@@ -472,25 +505,42 @@ was true when written and are never retro-edited.
 
 ---
 
-## 7. Owner decisions required
+## 7. Inputs and decisions required before ACER implementation can advance
 
-1. **ACER-0 adoption** — the frozen signal encoding, decay grid, eligibility,
-   control set, benchmarks, gates, **cell counts and run budget**. This is the
-   only decision blocking the priority-1 path.
-2. **Ratings vendor**, decided on the two open questions: dated actions for
-   delisted and deregistered tickers, and whether consensus is retrievable as
-   of a past date rather than only as current state.
-3. **Control-set data for ACER-2** — which estimates/fundamentals source
-   supplies earnings dates and standardized surprise, and its budget. A
-   ratings subscription does not cover it.
-4. **Confirmation that SBR-1 stays uninstalled** and its stream closed, or an
-   explicit decision to run it anyway as a secondary level-based dataset.
-5. **Whether LEV-2..4 runs in parallel** with ACER-0/ACER-1 or waits.
-6. Carried forward, unchanged and unblocking: historical-membership vendor
-   selection and funding; the Databento statistics/reference budget; who signs
-   the `SpecReviewAttestation` for the volatility discovery spec; the handling
-   of the 118 mixed-provenance equity snapshots; whether the experimental
-   committee gate is ever removed; whether AI debate is built at all.
+The ratings vendor and SBR-1 decisions are already closed: Benzinga Analyst
+Ratings is the selected signal source, and SBR-1 stays uninstalled. The
+remaining list is deliberately provider-neutral.
+
+1. **Authorize a read-only, zero-outcome capability audit** of the current
+   Massive and QuantConnect accounts. Credentials are process-visible, but the
+   audit must check product entitlements and schema/history without joining a
+   rating to a subsequent return or launching a backtest.
+2. **Confirm or purchase Benzinga Earnings.** Analyst Ratings is a separate
+   expansion and is not sufficient for the earnings-estimate control. The
+   repository records the Earnings audit budget as authorized, not the product
+   as purchased.
+3. **Confirm QuantConnect data entitlements** for the US Equity Security
+   Master, US Equities history, US Fundamental Data, and ETF constituent
+   history. An API token is not proof of any of these subscriptions.
+4. **Select a terminal-delisting-return source.** CRSP `DLRET` is preferred.
+   QuantConnect's documented delisting event does not, by itself, prove an
+   after-delisting return. If another source is chosen, it must demonstrate
+   equivalent coverage and semantics.
+5. **Choose the research engine and licensed-data boundary.** The current host
+   has no local `lean` command. Either install local LEAN and approved data, or
+   use a reviewed QuantConnect cloud path only for data the licence permits to
+   leave this machine. Do not upload reconstructable Benzinga rows merely
+   because QC credentials are available.
+6. **Close ACER-0A.1–0A.10.** The existing normalization, signal, controls,
+   statistic, split, confirmation, and refusal proposals remain drafts until
+   the owner freezes them. This occurs before any real ratings/price join.
+7. **Materialize and hash the normalized ratings v2 dataset**, finish
+   ambiguity-refusing issuer/security mapping, take Snapshot B, and bind all
+   market/reference/fundamental inputs to immutable provenance.
+8. Carried forward and unblocking for ACER: who signs the ML
+   `SpecReviewAttestation`; handling of the 118 mixed-provenance equity
+   snapshots; whether the experimental committee gate is ever removed; and
+   whether AI debate is built at all.
 
 ---
 
@@ -519,8 +569,8 @@ PR #182; the AP-6 fee-ingestion fix that unstalled epoch-002 merged with it.
 | ID | Priority | Issue | Resolution |
 |---|---|---|---|
 | AP-7 | P2 | **False-positive critical alert from a negative-age race** (measured read-only 2026-08-10 on the epoch host). `operational_health()` captured `now` before readiness/broker work, while overlapping scheduled processes could commit a reconciliation, backup, or restore drill just afterward. The correct future-date lower bound then treated that valid newly read fact as future-dated. The observed critical alert said matched with zero mismatches but still blocked the operations cycle and promotion gate. This is material fail-closed operational behavior, not a minor documentation issue. | **Corrected, independently reviewed, counter-reviewed, merged as PR #185 at `2c886c1`, and deployed in the owner-authorized epoch-004 roll at `b837374`.** Each freshness site contains a post-read-clock correction, reports signed `age_seconds`, and still uses a frozen caller-supplied as-of clock so genuine future rows refuse. The first two post-deployment cycles reported non-negative ages, but that observation did **not** prove the whole production call path: AP-11 later showed the outer orchestration still supplied a manufactured frozen clock to the nested readiness site. The site-level AP-7 code deployed with epoch-004; the end-to-end AP-11 repair **deployed 2026-08-13 in the epoch-005 roll** at `752d3b7`, so the full production path is now corrected — watch for the absence of new negative-age freshness warnings under epoch-005 rather than assuming it. Deliberately not unified with `risk/execution_gate.py`'s external broker-clock tolerance. |
-| AP-8 | P2 | **Ticker-suggestion surface silently withheld real, top-of-market rows** (found 2026-08-12 when the owner compared the module against yfinance by hand and asked why SPCX was missing). Live measurement that day: 3 of the 10 most-active names were dropped. Two distinct causes. (a) A genuine defect — `verify_tickers()` read only `info["longName"]`, so NBIS (Nebius Group N.V., Nasdaq NMS, ~$3.6B median daily dollar volume) was rejected as having no company name although yfinance persistently returns it in `shortName`/`displayName`; a provider metadata gap was being reported as a fact about the security. (b) `DEFAULT_ELIGIBILITY_POLICY`'s size/age/price screen removing real listings — SPCX at 41 sessions against the 60-session floor despite a ~$1.9T market cap and ~$10.7B median daily dollar volume, and PLUG at $2.28 against the $5.00 floor. Compounding both, the UI reported only a bare count ("3 candidate ticker(s) could not be verified"), which is why this stayed invisible until an external comparison. | **RESOLVED AFTER INDEPENDENT CORRECTION 2026-08-12; DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** Implementation `d326a74`, correction `7c21339`; see the AP-8b row and `docs/Review/REVIEW_2026-08-12_AP8_TICKER_SUGGESTION_DISCLOSURE.md`. The owner-directed disclosure policy now shows rather than screens real named US equities, while review restored the exact identity/data-validity boundaries and made both UI consumers disclose the relaxed screen. |
-| AP-9 | P2 | **The Buying page discarded valid Claude allocation reviews and said nothing** (owner-reported 2026-08-12 after enabling AI and finding no review under the inverse-volatility purchase split). Diagnosed read-only from the operator `ai_runs` audit log: the call fired twice that afternoon (~9s each) and both were rejected with `failed post-hoc validation`. Cause was an undocumented, untested `_MAX_SUMMARY_LENGTH = 500` character cap; the two rejected summaries were 554 and 670 characters, against 480 and 441 for the two that succeeded on 2026-08-07. **Length was never a safety property here** — the checks that carry the safety (percentages, dollar figures, unknown tickers, advice language, per-ticker number attribution) read the whole string regardless of length, and re-running every observation from both rejected responses through all four confirmed each one passes. Compounding it, `review_allocation_plan()` returned `None` on every failure path and the UI rendered `if ai_review:` — so a rejected review, a failed call, and an unticked checkbox were visually identical. `_MAX_CLAIM_LENGTH = 300` was worse in kind: an over-long claim was dropped silently, and if it was the only one the all-observations-failed rule rejected the whole review. | **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-12; DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** Claude implementation `3f1faf3`; Codex correction `6295b2f` on `codex/review-ap9-allocation-visibility-20260812`; detailed disposition in `docs/Review/REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md`. Owner decision remains no prose-length cap. Review bound every outcome to the exact cart/weights/volatility/basket inputs so stale commentary is hidden after a split change; enforced the outcome XOR invariant; classified wrong-root JSON and empty input honestly; and updated the touched Streamlit dataframe API. Reviewer validation: 3,445 passed, 0 failed/skipped, 25 known warnings under Python 3.13.14 / Streamlit 1.60.0. **Counter-review (Claude, 2026-08-12) accepted all five findings — each re-established by mutation — and closed two more, both generalizations of review findings.** AP9CR-001 (P3): AP9R-003's honesty fix guarded the JSON root but not the fields — `observations` as null or a number raised TypeError into the broad except and was reported as a failed call, and a string iterated silently into a misleading all-observations-failed reason; a non-list `observations` now reports as unparseable, while an absent key still yields a valid summary-only review. AP9CR-002 (P3): the identical stale-state defect AP9R-001 fixed existed one block above it — `watchlist_ai_suggestions` stored no cart identity, so suggestions and their measured-evidence columns rendered under a header naming the CURRENT cart after an edit; the stored state now carries its cart and a mismatch hides with a reason, legacy state failing safe as stale. Counter-review also merged `origin/main` `27fa872` (AP-8) into the branch, resolving documentation-only conflicts, so integration is done. |
+| AP-8 | P2 | **Ticker-suggestion surface silently withheld real, top-of-market rows** (found 2026-08-12 when the owner compared the module against yfinance by hand and asked why SPCX was missing). Live measurement that day: 3 of the 10 most-active names were dropped. Two distinct causes. (a) A genuine defect — `verify_tickers()` read only `info["longName"]`, so NBIS (Nebius Group N.V., Nasdaq NMS, ~$3.6B median daily dollar volume) was rejected as having no company name although yfinance persistently returns it in `shortName`/`displayName`; a provider metadata gap was being reported as a fact about the security. (b) `DEFAULT_ELIGIBILITY_POLICY`'s size/age/price screen removing real listings — SPCX at 41 sessions against the 60-session floor despite a ~$1.9T market cap and ~$10.7B median daily dollar volume, and PLUG at $2.28 against the $5.00 floor. Compounding both, the UI reported only a bare count ("3 candidate ticker(s) could not be verified"), which is why this stayed invisible until an external comparison. | **RESOLVED AFTER INDEPENDENT CORRECTION 2026-08-12; DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** Implementation `d326a74`, correction `7c21339`; see the AP-8b row and `docs/Archive/Review/REVIEW_2026-08-12_AP8_TICKER_SUGGESTION_DISCLOSURE.md`. The owner-directed disclosure policy now shows rather than screens real named US equities, while review restored the exact identity/data-validity boundaries and made both UI consumers disclose the relaxed screen. |
+| AP-9 | P2 | **The Buying page discarded valid Claude allocation reviews and said nothing** (owner-reported 2026-08-12 after enabling AI and finding no review under the inverse-volatility purchase split). Diagnosed read-only from the operator `ai_runs` audit log: the call fired twice that afternoon (~9s each) and both were rejected with `failed post-hoc validation`. Cause was an undocumented, untested `_MAX_SUMMARY_LENGTH = 500` character cap; the two rejected summaries were 554 and 670 characters, against 480 and 441 for the two that succeeded on 2026-08-07. **Length was never a safety property here** — the checks that carry the safety (percentages, dollar figures, unknown tickers, advice language, per-ticker number attribution) read the whole string regardless of length, and re-running every observation from both rejected responses through all four confirmed each one passes. Compounding it, `review_allocation_plan()` returned `None` on every failure path and the UI rendered `if ai_review:` — so a rejected review, a failed call, and an unticked checkbox were visually identical. `_MAX_CLAIM_LENGTH = 300` was worse in kind: an over-long claim was dropped silently, and if it was the only one the all-observations-failed rule rejected the whole review. | **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-12; DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** Claude implementation `3f1faf3`; Codex correction `6295b2f` on `codex/review-ap9-allocation-visibility-20260812`; detailed disposition in `docs/Archive/Review/REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md`. Owner decision remains no prose-length cap. Review bound every outcome to the exact cart/weights/volatility/basket inputs so stale commentary is hidden after a split change; enforced the outcome XOR invariant; classified wrong-root JSON and empty input honestly; and updated the touched Streamlit dataframe API. Reviewer validation: 3,445 passed, 0 failed/skipped, 25 known warnings under Python 3.13.14 / Streamlit 1.60.0. **Counter-review (Claude, 2026-08-12) accepted all five findings — each re-established by mutation — and closed two more, both generalizations of review findings.** AP9CR-001 (P3): AP9R-003's honesty fix guarded the JSON root but not the fields — `observations` as null or a number raised TypeError into the broad except and was reported as a failed call, and a string iterated silently into a misleading all-observations-failed reason; a non-list `observations` now reports as unparseable, while an absent key still yields a valid summary-only review. AP9CR-002 (P3): the identical stale-state defect AP9R-001 fixed existed one block above it — `watchlist_ai_suggestions` stored no cart identity, so suggestions and their measured-evidence columns rendered under a header naming the CURRENT cart after an edit; the stored state now carries its cart and a mismatch hides with a reason, legacy state failing safe as stale. Counter-review also merged `origin/main` `27fa872` (AP-8) into the branch, resolving documentation-only conflicts, so integration is done. |
 | AP-10 | P2 | **One malformed optional most-active volume suppressed the whole recommendation batch** (independent full-project review 2026-08-12). `classify_price_direction()` validated its adjacent provider field, but `build_recommended_tickers()` sent raw `volume` to the comma-format mini-language. A truthy string raised `ValueError`; NaN, infinity, a bool, a negative count, or a fractional count rendered as measured trading volume. This contradicted AP-8's batch-isolation and unavailable-data contracts. | **RESOLVED, MERGED to `main` via PR #196 at `1a46881` (2026-08-12); DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** Correction `67558f5` on `codex/independent-full-review-20260812`: `_trading_volume_detail()` now uses the canonical finite decimal boundary, accepts only non-negative whole share counts, and emits `trading volume today: not reported` for every unusable value without dropping any verified row. Seven dangerous-direction cases plus a valid sibling row are regression-pinned; reverse mutation failed all seven. **Counter-review (Claude, 2026-08-12): confirmed** — the mutation result was independently reproduced (7 failed reverted, 7 passed restored) and no further instance of the raw-optional-provider-field formatting class was found; two follow-ups (IPRCR-001 P3 post-merge handoff topology, IPRCR-002 P2 leftover review worktree breaking pytest collection on the development checkout) are recorded and resolved in the review report's counter-review section. Advisory presentation only; no proposal, policy, broker, order, scheduler, epoch, or execution path changed. |
 | AP-11 | P2 | **The AP-7 freshness-race fix is dead code on every production path** (observed live 2026-08-13T05:40:49Z on deployed epoch-004: `reconciliation_freshness` warned `age_seconds=-0.117315, errors=0` for a healthy reconciliation, and `healthy=all(...)` fails the operations cycle on it). The AP-7/DCCR-CR-002 corrections capture a post-read clock only when `now` is None — but `operational_health()` did `now = now or datetime.now(...)` at entry and passed that manufactured clock down as an explicit `now` into `transaction_readiness()`, freezing the nested check to a clock captured before ~5 s of integrity/broker work. `monitor-orders` rewrites `last_order_reconciliation` every 30 s; a write landing inside that window looks future-dated. `build_platform_readiness()` had the same manufacture-then-pass shape. The AP-7 regression tests stayed green because they call each function directly with `now=None` — the shape production never uses. | **RESOLVED, MERGED via PR #198 at `72b6278`, and DEPLOYED 2026-08-13 in the epoch-005 roll at `752d3b7`.** Both sites now forward the CALLER's original clock (`now=explicit_now`) instead of the manufactured entry clock: live paths let the nested checks capture post-read clocks, while a genuine caller-supplied as-of clock still freezes the whole chain (FCS-017 unchanged, pinned in both directions). New regression tests drive the exact production call shape (`operational_health` with `now=None`, advancing clock, concurrent write) and the platform-report forwarding contract; both reddened under fix-reverting mutation and passed restored. **Independent Codex review 2026-08-13: accepted after CODCR-001 (P3) corrected the current action-plan and durable operational-facts claims that still called the full deployed AP-7 path fixed. Production code and submitted AP-11 tests were accepted unchanged.** |
 
@@ -528,15 +578,15 @@ PR #182; the AP-6 fee-ingestion fix that unstalled epoch-002 merged with it.
 
 | ID | Type | Request | Resolution |
 |---|---|---|---|
-| SELL-1 | feature | **Owner request 2026-08-13: sell an individual currently-held position from the Selling tab.** Until now the Selling page could only act on a deterministic policy breach (`generate_risk_reduction_proposals`), so there was no in-app way for the owner to sell a specific holding on their own judgement. | **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-13; merged to `main` in PR #203 at `08fde9f`; DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** Claude implementation `918eecd`; integration merge `dc1233a`; Codex correction `3ba3d41` on `codex/review-claude-sell1-cleanup-20260813`; detailed dispositions and issue ledger in `docs/Review/REVIEW_2026-08-13_SELL1_AND_BRANCH_CLEANUP.md`. The reviewed module produces one `proposed`, typed-approval-gated sell with evidence status `user_directed_sell`, explicit refusals, exact broker-share and Decimal order-value boundaries, truthful fractional-remainder wording, and the same tax advisory as the policy-breach path. The Streamlit card is hidden when ticker or share selection no longer matches. The shared execution gate now checks exact broker share text, closing a P1 route where `10.999999999999999999` rounded to `11.0` and authorized an 11-share sale. Nothing auto-submits; fresh paper-only validation remains authoritative. |
-| BUY-1 | feature | **Owner request 2026-08-13: add a third cart source to the Buying panel.** The Buying page accepted candidates two ways (pick from common tickers, type any ticker). The owner asked to also pick from the most-active ticker suggestions — the same rows the Ticker Suggestions tab shows — by clicking a ticker straight into the cart. | **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-13; merged to `main` in PR #208 at `e0df810`; review correction `44a7f85` on `codex/review-buy1-suggestion-picker-20260813`; not deployed.** The explicit-click expander reuses the cached verified most-active lane without an AI or IPO call, keeps every row's AP-8 size/age/price/liquidity disclosure beside its Add control, distinguishes source fetch time from display time, and names suggestion provenance in the cart. Independent review closed two P2 and two P3 findings: flat and unavailable-change rows were named but not clickable despite the every-row contract; changing the cart left checked prices/volatility active and could expose approve-gated proposal controls for the previous cart; the click time hid cached source freshness; and current records still called the merged feature pending. Checked results now carry the exact cart identity and fail closed on any edit. Adding still buys nothing: cart selection, deterministic checking/splitting, proposal creation, typed approval, and fresh paper execution validation remain separate. **The review branch was owner-merged as PR #209 at `df83510`. Counter-review (Claude, 2026-08-13): all four findings confirmed** — each re-established red on the exact submitted tree `e0df810` and each code correction proven load-bearing by reverse mutation (3/3 caught) — **and one generalized P3 instance closed at `2fe6747` on `user/claude/buy1-counterreview-20260813` (BUY1CR-001):** the dedicated Ticker Suggestions page named flat/unavailable-change most-active rows by bare ticker without their AP-8 measurement detail, the same direction-as-disclosure-gate defect BUY1R-002 fixed on the Buying picker. **Independent Codex verification of Claude's two-commit range (`df83510..276b3c2`) accepted both commits without further correction:** the focused suite passed 69 tests, the detail-table reverse mutation failed the intended behavioral regression, and the full suite passed 3,635 tests with a writable base-temp. See `docs/Review/REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md`. |
+| SELL-1 | feature | **Owner request 2026-08-13: sell an individual currently-held position from the Selling tab.** Until now the Selling page could only act on a deterministic policy breach (`generate_risk_reduction_proposals`), so there was no in-app way for the owner to sell a specific holding on their own judgement. | **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-13; merged to `main` in PR #203 at `08fde9f`; DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** Claude implementation `918eecd`; integration merge `dc1233a`; Codex correction `3ba3d41` on `codex/review-claude-sell1-cleanup-20260813`; detailed dispositions and issue ledger in `docs/Archive/Review/REVIEW_2026-08-13_SELL1_AND_BRANCH_CLEANUP.md`. The reviewed module produces one `proposed`, typed-approval-gated sell with evidence status `user_directed_sell`, explicit refusals, exact broker-share and Decimal order-value boundaries, truthful fractional-remainder wording, and the same tax advisory as the policy-breach path. The Streamlit card is hidden when ticker or share selection no longer matches. The shared execution gate now checks exact broker share text, closing a P1 route where `10.999999999999999999` rounded to `11.0` and authorized an 11-share sale. Nothing auto-submits; fresh paper-only validation remains authoritative. |
+| BUY-1 | feature | **Owner request 2026-08-13: add a third cart source to the Buying panel.** The Buying page accepted candidates two ways (pick from common tickers, type any ticker). The owner asked to also pick from the most-active ticker suggestions — the same rows the Ticker Suggestions tab shows — by clicking a ticker straight into the cart. | **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-13; merged to `main` in PR #208 at `e0df810`; review correction `44a7f85` on `codex/review-buy1-suggestion-picker-20260813`; not deployed.** The explicit-click expander reuses the cached verified most-active lane without an AI or IPO call, keeps every row's AP-8 size/age/price/liquidity disclosure beside its Add control, distinguishes source fetch time from display time, and names suggestion provenance in the cart. Independent review closed two P2 and two P3 findings: flat and unavailable-change rows were named but not clickable despite the every-row contract; changing the cart left checked prices/volatility active and could expose approve-gated proposal controls for the previous cart; the click time hid cached source freshness; and current records still called the merged feature pending. Checked results now carry the exact cart identity and fail closed on any edit. Adding still buys nothing: cart selection, deterministic checking/splitting, proposal creation, typed approval, and fresh paper execution validation remain separate. **The review branch was owner-merged as PR #209 at `df83510`. Counter-review (Claude, 2026-08-13): all four findings confirmed** — each re-established red on the exact submitted tree `e0df810` and each code correction proven load-bearing by reverse mutation (3/3 caught) — **and one generalized P3 instance closed at `2fe6747` on `user/claude/buy1-counterreview-20260813` (BUY1CR-001):** the dedicated Ticker Suggestions page named flat/unavailable-change most-active rows by bare ticker without their AP-8 measurement detail, the same direction-as-disclosure-gate defect BUY1R-002 fixed on the Buying picker. **Independent Codex verification of Claude's two-commit range (`df83510..276b3c2`) accepted both commits without further correction:** the focused suite passed 69 tests, the detail-table reverse mutation failed the intended behavioral regression, and the full suite passed 3,635 tests with a writable base-temp. See `docs/Archive/Review/REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md`. |
 | QC-2 research-look registry | honest denominator for the multiplicity correction on the interactive research surface | **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-11; DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** Claude implementation `f09682f`, merged as PR #192 at `62c8270`; Codex correction `7fc9db8` on `codex/review-qc2-look-counting-registry-20260811`. Scope was owner-approved because no earlier definition of done existed. New `research_looks` storage and `assistant/research_looks.py` record a tested family before the Backtest engine reveals its result. Review closed four P2 defects: repeat identity now binds exact dated frame content and a clean code commit; the denominator counts every selected horizon × the two dip/up direction cells rather than one click; real-market presentation excludes synthetic fixture runs while still auditing them; and strict finite-JSON plus storage conflict checks prevent canonical-identity collisions or silent immutable-content changes. Exact replays increment only `repeat_count`; changed configuration, data, code, source, or cell count is a new family. There is no delete/rewrite path, and registry failure warns without gating research. Final validation: 3,429 passed, 0 failed/skipped, 25 dependency warnings under Python 3.13.14 / Streamlit 1.60.0. This is bookkeeping, not a significance result or authority path. | complete after review; deployed in epoch-005 |
 
 ### Milestone rows
 
 | Item | Scope | State |
 |---|---|---|
-| GR-7d | **Rebalance-to-target proposals** (+ the `docs/reference/ALLOCATION_SERVICE_DESIGN.md` fold-in) | **SUPERSEDED; ADOPTED THREE-SLEEVE REPLACEMENT COMPLETE THROUGH M3 AFTER INDEPENDENT CORRECTION AND DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** M1 plus revision 2 are complete after review at merged `02484bb`; M2 durable batched notifications are complete at implementation `8f5acb7` / validation `5ff39ed` plus correction `c314245`. M3 dividend-funded, APPROVE-gated proposals and exact earmark accounting are accepted at Claude implementation `7ee4786` plus Codex correction `b6685b5`; review closed 2 P1 and 4 P2 findings involving fill evidence, the authoritative journal-backed pool fence, corrupt/future earmark state, and JSON output. Optional M4 prepared trims remain deferred and unauthorized. See `docs/Review/REVIEW_2026-08-13_THREE_SLEEVE_M3.md`. |
+| GR-7d | **Rebalance-to-target proposals** (+ the `docs/Archive/Plans/ALLOCATION_SERVICE_DESIGN.md` fold-in) | **SUPERSEDED; ADOPTED THREE-SLEEVE REPLACEMENT COMPLETE THROUGH M3 AFTER INDEPENDENT CORRECTION AND DEPLOYED 2026-08-13 IN EPOCH-005 AT `752d3b7`.** M1 plus revision 2 are complete after review at merged `02484bb`; M2 durable batched notifications are complete at implementation `8f5acb7` / validation `5ff39ed` plus correction `c314245`. M3 dividend-funded, APPROVE-gated proposals and exact earmark accounting are accepted at Claude implementation `7ee4786` plus Codex correction `b6685b5`; review closed 2 P1 and 4 P2 findings involving fill evidence, the authoritative journal-backed pool fence, corrupt/future earmark state, and JSON output. Optional M4 prepared trims remain deferred and unauthorized. See `docs/Archive/Review/REVIEW_2026-08-13_THREE_SLEEVE_M3.md`. |
 
 ### Research-surface disclosure
 

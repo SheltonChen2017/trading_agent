@@ -307,7 +307,7 @@ def generate_leveraged_pair_rebalance_proposals(
     -- closing a gap this module previously only documented: the backtest
     assumed a fixed ~21-trading-day check counter, but the live version
     had no equivalent memory of when it was last evaluated
-    (docs/ALLOCATION_SERVICE_DESIGN.md, 2026-07-28). Recorded on every
+    (docs/Archive/Plans/ALLOCATION_SERVICE_DESIGN.md, 2026-07-28). Recorded on every
     NORMAL return (proposal or empty list) but NOT when
     MissingResearchDependencyError is raised below -- a refused evaluation
     is a distinct case, deliberately not conflated with "evaluated, no

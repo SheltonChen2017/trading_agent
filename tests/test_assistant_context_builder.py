@@ -585,7 +585,7 @@ def test_prune_decision_packets_never_touches_proposals_or_broker_orders():
         assert store.get_proposal("tp_test") is not None
 
 
-# --- strategy_evaluations table (docs/ALLOCATION_SERVICE_DESIGN.md,
+# --- strategy_evaluations table (docs/Archive/Plans/ALLOCATION_SERVICE_DESIGN.md,
 # 2026-07-28): persisted "last evaluated" bookkeeping for strategy
 # proposal generators, closing a gap assistant/strategy_proposals.py's
 # generate_soxx_soxl_rebalance_proposals() already documented.

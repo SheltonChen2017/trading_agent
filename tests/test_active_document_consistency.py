@@ -31,14 +31,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _doc_path(name: str) -> Path:
-    """Find one active document after the 2026-08-17 docs reorganization."""
-    candidates = [ROOT / "docs" / name]
-    candidates.extend(
-        ROOT / "docs" / folder / name
-        for folder in ("Review", "research", "process", "operations", "architecture")
-    )
-    found = [path for path in candidates if path.is_file()]
-    assert len(found) == 1, f"expected one active document named {name!r}, found {found}"
+    """Resolve one document after the 2026-08-21 lifecycle reorganization."""
+    direct = ROOT / "docs" / name
+    if direct.is_file():
+        return direct
+    found = list((ROOT / "docs").rglob(name)) if "/" not in name else []
+    assert len(found) == 1, f"expected one document named {name!r}, found {found}"
     return found[0]
 
 
@@ -50,15 +48,12 @@ def _root_text(name: str) -> str:
     return " ".join((ROOT / name).read_text(encoding="utf-8").split())
 
 
-def test_docs_root_contains_only_canonical_milestone_and_alpha_records() -> None:
+def test_docs_root_contains_only_current_coordination_and_active_plan() -> None:
     allowed = {
         "ACTION_PLAN_2026-08-20.md",
         "SESSION_HANDOFF.md",
-        "Alpha_Test_Implementation_Plan.md",
-        "alpha-result.md",
         "FEATURE_MILESTONE_RECORD.md",
-        "EPOCH_005_ROLL_PLAN.md",
-        "REBAL1_MILESTONE_PLAN.md",
+        "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md",
     }
     actual = {path.name for path in (ROOT / "docs").iterdir() if path.is_file()}
     assert actual == allowed
@@ -861,7 +856,7 @@ def test_buy1_current_records_close_the_merged_review():
 
 def test_deleted_gr7d_ref_is_not_called_irrecoverable_while_object_remains():
     """Deleting a branch ref is not the same event as pruning its objects."""
-    plan = _text("reference/THREE_SLEEVE_ENGINE_PLAN.md")
+    plan = _text("Plan/THREE_SLEEVE_ENGINE_PLAN.md")
     assert "no longer exists anywhere" not in plan
     assert "85a77291a3a8de88a82b3670dcf05793b6825c1c" in plan
     assert "may disappear during Git pruning" in plan
@@ -874,7 +869,7 @@ def test_closed_alpha_plan_distinguishes_valid_null_runs_from_invalid_legacy_run
 
     stale_claims = (
         "No historical alpha result in this program is valid",
-        "Every historical QuantConnect result in `docs/alpha-result.md` remains invalid",
+        "Every historical QuantConnect result in `docs/Archive/Research/alpha-result.md` remains invalid",
     )
     for claim in stale_claims:
         assert claim not in plan
@@ -896,7 +891,7 @@ def test_closed_alpha_plan_distinguishes_valid_null_runs_from_invalid_legacy_run
 
 def test_strongbuy_primary_comparison_keeps_structural_zero_months():
     """Exactly-ten-name months are real strategy months, not missing evidence."""
-    plan = _text("reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+    plan = _text("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
 
     assert "remain in the primary P2−P1 series" in plan
     assert "whether those months are excluded" not in plan
@@ -904,7 +899,7 @@ def test_strongbuy_primary_comparison_keeps_structural_zero_months():
 
 def test_strongbuy_amendment_ledger_is_one_contiguous_markdown_table():
     """All amendment rows render under the ledger header instead of as raw pipes."""
-    plan = (ROOT / "docs" / "reference" / "STRONGBUY_PORTFOLIO_TEST_PLAN.md").read_text(
+    plan = _doc_path("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md").read_text(
         encoding="utf-8"
     )
     lines = plan.splitlines()
@@ -941,63 +936,26 @@ def test_a_superseded_program_is_not_also_the_next_owner_decision():
     declares itself superseded must not also own the action plan's blocking
     decision.
     """
-    plans = {
-        "SBP": "reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md",
-        "ACER": "reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md",
-    }
+    sbp = _text("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
     action_plan = _text("ACTION_PLAN_2026-08-20.md")
-    blocking = re.search(
-        r"\*\*([A-Z]+)-0 adoption\*\*[\s\S]{0,300}?only decision blocking",
-        action_plan,
-    )
-    assert blocking, "the action plan must name one blocking -0 adoption"
-    blocking_prefix = blocking.group(1)
-
-    for prefix, name in plans.items():
-        superseded = _text(name).startswith("# ") and bool(
-            re.search(r"Status: \*\*SUPERSEDED", _text(name))
-        )
-        if superseded:
-            assert prefix != blocking_prefix, (
-                f"{name} declares itself superseded while the action plan still "
-                f"names {prefix}-0 adoption as the blocking decision"
-            )
-        elif prefix == blocking_prefix:
-            assert _doc_path(name).is_file(), (
-                f"the action plan blocks on {prefix}-0 but {name} does not exist"
-            )
-
-
-def test_reference_index_matches_a_superseded_program_status():
-    """ACERDOC-003: the archive index must not advertise SBP as actionable.
-
-    A plan can remain valuable historical design work after it is superseded,
-    but callers that start from the archive index must be sent to the current
-    program rather than to an owner decision that no longer exists.
-    """
-    sbp = _text("reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
-    index_path = _doc_path("reference/README.md")
-    index = index_path.read_text(encoding="utf-8")
     if re.search(r"Status: \*\*SUPERSEDED", sbp):
-        # ACRV-001: `next()` raised StopIteration when the row was missing
-        # -- an error with no message, the same defect CRV-003 closed in
-        # the amendment-ledger guard one round earlier. A deleted row is a
-        # legitimate failure mode of this guard and must name itself.
-        sbp_rows = [
-            line
-            for line in index.splitlines()
-            if line.startswith("| `STRONGBUY_PORTFOLIO_TEST_PLAN.md`")
-        ]
-        assert len(sbp_rows) == 1, (
-            "expected exactly one STRONGBUY_PORTFOLIO_TEST_PLAN.md row in "
-            f"the reference index, found {len(sbp_rows)}"
+        assert "ACER" in action_plan and "priority 1" in action_plan.lower()
+        assert not re.search(
+            r"\*\*SBP-0 adoption\*\*[\s\S]{0,300}?only decision blocking",
+            action_plan,
         )
-        sbp_row = sbp_rows[0]
-        assert "superseded" in sbp_row.lower(), (
-            "the reference index still advertises a superseded plan as actionable"
-        )
-        assert "pending owner adoption" not in sbp_row.lower()
-        assert "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md" in index
+        assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
+
+
+def test_lifecycle_indexes_do_not_advertise_superseded_sbp_as_actionable():
+    """The new lifecycle indexes must route current and superseded plans."""
+    sbp = _text("Archive/Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+    queued = _doc_path("Plan/README.md").read_text(encoding="utf-8")
+    archived = _doc_path("Archive/README.md").read_text(encoding="utf-8")
+    if re.search(r"Status: \*\*SUPERSEDED", sbp):
+        assert "STRONGBUY_PORTFOLIO_TEST_PLAN.md" not in queued
+        assert "superseded" in archived.lower()
+        assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
 
 
 def test_open_acer_freeze_ledger_cannot_be_called_executable():
@@ -1007,7 +965,7 @@ def test_open_acer_freeze_ledger_cannot_be_called_executable():
     the open-ledger heading and this conditional stops constraining status.
     """
     freeze = _text("ACER_2026-08-20_ACER0A_FREEZE.md")
-    reference = _text("reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
+    reference = _text("ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
     action = _text("ACTION_PLAN_2026-08-20.md")
     if "Named open items that must close BEFORE the development run" in freeze:
         assert "not yet an executable preregistration" in freeze
@@ -1030,7 +988,7 @@ def test_active_operational_docs_honor_start_when_available_semantics():
 def test_measured_sbr_absence_is_not_still_called_unmeasured():
     """The active ACER plan must consume the durable host measurement."""
     facts = _text("OPERATIONAL_FACTS.md")
-    acer = _text("reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
+    acer = _text("ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
     if "SBR-1 capture: measured absent" in facts:
         assert "task and artifact state has not been measured" not in acer
 
@@ -1100,7 +1058,9 @@ def test_acer_completion_proposal_discloses_every_measured_unmapped_rating():
 def test_acer_state_semantics_measurement_does_not_overclaim_raw_keys():
     """A pre-identity raw-ticker scan cannot be called same-issuer evidence."""
     proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
-    counterreview = _text("Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md")
+    counterreview = _text(
+        "Archive/Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md"
+    )
 
     for document in (proposal, counterreview):
         assert "raw ticker" in document.lower()

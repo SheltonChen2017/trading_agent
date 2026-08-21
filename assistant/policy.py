@@ -283,7 +283,7 @@ def policy_with_updated_flags(
     refactor away from disagreeing.
 
     Exists for the UI's protected policy-update workflow
-    (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 3.1): these two
+    (docs/Archive/Plans/UI_FEATURE_CONTROLS_DESIGN.md section 3.1): these two
     flags are authoritative trading policy, not UI preferences, so a change
     must produce a new version and therefore a new fingerprint -- proposals
     created under the previous fingerprint fail validation and must be

@@ -38,24 +38,25 @@ explicit request that clearly defines the allowed action and scope.
 ## 2. Instruction and document hierarchy
 
 `docs/ACTION_PLAN_2026-08-20.md` is the owner-directed go-to plan
-(2026-08-20, replacing the 2026-08-02 plan now archived in
-`docs/reference/`): it alone decides which milestone happens next across every
-workstream. The individual implementation plans are archived in
-`docs/reference/` and remain authoritative for their own milestone
-definitions, safety gates, and definitions of done — consult the relevant
-one when the action plan schedules its milestone, but never resume a
-milestone merely because an archived plan's own sequencing text names it.
+(2026-08-20, replacing the 2026-08-02 plan now preserved in
+`docs/Archive/Plans/`): it alone decides which milestone happens next across
+every workstream. The plan being actively implemented is kept at the root of
+`docs/`; queued plans live in `docs/Plan/`; completed, superseded, and obsolete
+plans live in `docs/Archive/Plans/`. A queued or archived plan remains
+authoritative for its own milestone definitions, safety gates, and definition
+of done when the action plan schedules it, but its internal sequencing text
+never starts work by itself.
 
 Before changing code, read the relevant authoritative documents. At minimum,
 inspect:
 
 - `README.md` for setup and platform behavior;
 - `docs/ACTION_PLAN_2026-08-20.md` for what is done, what is next, and why;
-- the implementation plan named by the user (or the archived plan in
-  `docs/reference/` covering the scheduled milestone);
+- the implementation plan named by the user (from the active root, `docs/Plan/`,
+  or `docs/Archive/Plans/`, according to its lifecycle state);
 - `docs/operations/ML_IMPLEMENTATION_STATUS.md` for current ML state when working under
   `ml/` or on ML scripts;
-- `docs/reference/GENERAL_READINESS_IMPLEMENTATION_PLAN.md` for general
+- `docs/Plan/GENERAL_READINESS_IMPLEMENTATION_PLAN.md` for general
   live-readiness milestone definitions; and
 - the closest tests and contracts for the code being changed.
 
@@ -338,8 +339,9 @@ checkout, force push, or broad deletion without explicit authorization.
 
 For planned feature work:
 
-- create a descriptive `user/claude/<topic>-<date>` branch unless the user
-  provides another naming rule;
+- create a descriptive branch using the implementing agent's prefix unless
+  the user provides another naming rule (`codex/<topic>-<date>` for Codex,
+  `user/claude/<topic>-<date>` for Claude);
 - never commit directly to protected `main`;
 - keep one milestone or coherent fix set per commit series;
 - inspect the staged diff before committing;

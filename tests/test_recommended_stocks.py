@@ -195,7 +195,7 @@ def test_include_ai_suggestions_false_prevents_the_paid_call_entirely(monkeypatc
     """The UI's optional-AI master preference must be able to stop the LLM
     call from FIRING, not merely hide its output -- and it must not disturb
     the deterministic lanes or the held-ticker exclusion while doing so
-    (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 3.2)."""
+    (docs/Archive/Plans/UI_FEATURE_CONTROLS_DESIGN.md section 3.2)."""
     monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
     with patch("assistant.recommended_stocks.fetch_most_active_tickers") as mock_active, \
          patch("assistant.recommended_stocks.suggest_similar_tickers") as mock_suggest, \

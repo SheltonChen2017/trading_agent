@@ -2,8 +2,8 @@
 
 Standing owner-mandated rules for every QuantConnect cloud run in this
 project. These supplement — never weaken — the evidence contract in
-`docs/Alpha_Test_Implementation_Plan.md` §2 and the append-only ledger rules
-in `docs/alpha-result.md`.
+`docs/Archive/Plans/Alpha_Test_Implementation_Plan.md` §2 and the append-only ledger rules
+in `docs/Archive/Research/alpha-result.md`.
 
 ## 1. Project naming
 
@@ -24,7 +24,7 @@ Every QuantConnect project is named:
 - **Date** — the launch date as `YYYYMMDD`.
 
 The exact project name is part of the run's recorded identity in
-`docs/alpha-result.md`.
+`docs/Archive/Research/alpha-result.md`.
 
 ## 2. Concurrency limit: at most TWO live sessions
 
@@ -48,7 +48,7 @@ Therefore:
 ## 3. Unchanged evidence rules (pointer, not restatement)
 
 Every run — including refusals, errors, and accidental launches — is
-appended to `docs/alpha-result.md` as a new `R-NNN` entry with stage/spec
+appended to `docs/Archive/Research/alpha-result.md` as a new `R-NNN` entry with stage/spec
 ID, exact Git source commit, SHA-256 of every uploaded source file, project
 ID and exact project name, compile ID, backtest ID, UTC times, data window,
 universe, raw-log path and SHA-256, and before/after look counts. Existing

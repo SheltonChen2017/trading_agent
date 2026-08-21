@@ -354,7 +354,7 @@ HEDGE_SLEEVE_TICKERS = ["SH", "BTAL", "TLT", "GLD"]
 # this set changes no limit, cap, or gate.
 DAILY_RESET_HEDGE_ETFS = {"SH"}
 
-# --- Three-sleeve engine (docs/reference/THREE_SLEEVE_ENGINE_PLAN.md,
+# --- Three-sleeve engine (docs/Plan/THREE_SLEEVE_ENGINE_PLAN.md,
 # --- owner-adopted 2026-08-09) ---------------------------------------
 # The owner's stated allocation preference, recorded as data. These lists
 # and thresholds are NOT validated research and NOT an allocation

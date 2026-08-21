@@ -5,7 +5,7 @@ Task-specific on purpose. This module follows the ML-LR-6 precedent
 it: a generic multi-strategy adapter would hide the overlay's own
 semantics — monthly cycles settled on exchange sessions, wide-band
 rebalancing, per-ticker unavailability — behind a common-looking
-interface (see `docs/reference/SHADOW_OBSERVATION_DESIGN.md` section 0).
+interface (see `docs/Archive/Plans/SHADOW_OBSERVATION_DESIGN.md` section 0).
 
 Everything here is observation-only. No contract in this module can
 express order, proposal, or promotion authority, and the module imports

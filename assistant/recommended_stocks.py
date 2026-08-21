@@ -288,7 +288,7 @@ def build_recommended_tickers(
     load-bearing for the dedicated UI's explicit source controls. In
     particular, `include_ai_suggestions=False` prevents the paid Claude call
     while leaving whichever deterministic lanes were selected untouched
-    (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md sections 3.2 and 4.2)."""
+    (docs/Archive/Plans/UI_FEATURE_CONTROLS_DESIGN.md sections 3.2 and 4.2)."""
     now = datetime.now(timezone.utc).isoformat()
     held_set = {t.upper() for t in (held_tickers or [])}
     recommended: list[RecommendedTicker] = []

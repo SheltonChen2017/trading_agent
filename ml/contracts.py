@@ -1,7 +1,7 @@
 """Frozen, JSON-serializable contracts for the ML observation layer.
 
 Machine learning enters this application only as versioned, auditable
-observations -- never as trade authority (docs/ML_IMPLEMENTATION_STRATEGY.md
+observations -- never as trade authority (docs/Archive/Plans/ML_IMPLEMENTATION_STRATEGY.md
 section 1). This module owns the three artifacts that make every ML output
 auditable and non-authoritative by construction:
 

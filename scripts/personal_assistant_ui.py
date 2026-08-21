@@ -381,10 +381,10 @@ def _regime_fields(regime) -> tuple:
     )
 
 
-# Optional-AI feature preferences (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md
+# Optional-AI feature preferences (docs/Archive/Plans/UI_FEATURE_CONTROLS_DESIGN.md
 # section 3.2). Session-state only, all default OFF (owner decision,
 # 2026-08-02, recorded in section 9 of the archived
-# docs/reference/ACTION_PLAN_2026-08-02.md). These are
+# docs/Archive/Plans/ACTION_PLAN_2026-08-02.md). These are
 # UI preferences, never authority: they decide whether an optional paid LLM
 # surface is OFFERED; every call still requires the per-surface checkbox, its
 # own explicit click, and a configured credential. Deterministic content is
@@ -4795,7 +4795,7 @@ if page == "History":
 
 # ---------------------------------------------------------------------------
 # Ticker Suggestions -- dedicated research-only surface
-# (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 4). The Briefing and
+# (docs/Archive/Plans/UI_FEATURE_CONTROLS_DESIGN.md section 4). The Briefing and
 # Buying keep their existing embedded suggestion features (owner decision c,
 # 2026-08-02); this tab consolidates the same verified pipeline behind explicit
 # source toggles, explicit seed selection, and an explicit run button, so every
@@ -5665,7 +5665,7 @@ if page == "Reports":
                 )
             st.caption(_objective["required_assumption"])
 
-    # Three-sleeve engine, M1 (docs/reference/THREE_SLEEVE_ENGINE_PLAN.md).
+    # Three-sleeve engine, M1 (docs/Plan/THREE_SLEEVE_ENGINE_PLAN.md).
     # Renders on load like idle cash: sleeve drift and threshold crossings
     # are standing conditions, not reports you ask for. Same read-only
     # contract -- fills and journal postings are records this app already
@@ -6008,7 +6008,7 @@ if page == "Operations":
 
     # ---------------------------------------------------------------------------
     # Settings & Features -- three distinct control classes
-    # (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md sections 2-3): UI preferences
+    # (docs/Archive/Plans/UI_FEATURE_CONTROLS_DESIGN.md sections 2-3): UI preferences
     # (session-state toggles), authoritative trading policy (protected workflow,
     # typed confirmation, new fingerprint), and read-only credential/safety status
     # (never editable here, never shows a secret value).

@@ -1,8 +1,8 @@
 """LEAN allocation-policy family: four frozen ETF mixes, one costed log.
 
-Frozen specification: `docs/research/ALLOCATION_POLICY_2026-08-18_PREREGISTRATION.md`
+Frozen specification: `docs/Archive/Research/ALLOCATION_POLICY_2026-08-18_PREREGISTRATION.md`
 (weights, window, gates — frozen 2026-08-18, before this file existed).
-Implementation authority: `docs/reference/ALLOCATION_POLICY_QC_PLAN.md`
+Implementation authority: `docs/Archive/Plans/ALLOCATION_POLICY_QC_PLAN.md`
 (APQ-1). This algorithm REPORTS POLICY RETURNS, so every cloud run is a
 counted research look. It is not an alpha cell family and does not touch
 the closed cross-sectional program (A-002).

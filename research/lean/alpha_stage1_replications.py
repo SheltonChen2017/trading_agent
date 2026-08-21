@@ -1,6 +1,6 @@
 """LEAN Stage 1 replications: REP-H52 and REP-IDV.
 
-Specifications frozen in `docs/Alpha_Test_Implementation_Plan.md` section 6.
+Specifications frozen in `docs/Archive/Plans/Alpha_Test_Implementation_Plan.md` section 6.
 This algorithm REPORTS ALPHA STATISTICS, so every run is a counted
 research look. It is not exempt.
 

@@ -18,7 +18,7 @@ ahead (tests/test_ml_features.py's
 test_point_in_time_correctness_prefix_is_unaffected_by_appending_future_rows
 proves that), but the *source* prices this module is handed may still come
 from data/market_data.py's yfinance pipeline, which
-docs/ML_IMPLEMENTATION_STRATEGY.md section 3.4 and every other research
+docs/Archive/Plans/ML_IMPLEMENTATION_STRATEGY.md section 3.4 and every other research
 entry point in this repo (scripts/run_portfolio_research_report.py) already
 flag `point_in_time_data=False` -- auto-adjusted closes retroactively
 reflect splits/dividends announced after the fact.  This builder claims True

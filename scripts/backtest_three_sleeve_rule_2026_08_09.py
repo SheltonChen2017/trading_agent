@@ -6,11 +6,11 @@ NOT a research finding -- descriptive evidence for the owner's question
 Its result (rule 3.29% modeled after-tax proxy CAGR vs 48.14% buy-and-hold;
 95-99% of
 days in cash) drove the section-1.1 revision recorded in
-docs/reference/THREE_SLEEVE_ENGINE_PLAN.md and the rejected-status entry
+docs/Plan/THREE_SLEEVE_ENGINE_PLAN.md and the rejected-status entry
 in assistant/research_findings.json. Run from the repository root; do not
 re-scope this window -- a new question is a new dated script.
 
-THE RULE (docs/reference/THREE_SLEEVE_ENGINE_PLAN.md, owner-adopted):
+THE RULE (docs/Plan/THREE_SLEEVE_ENGINE_PLAN.md, owner-adopted):
   - per-LOT basis, never average cost;
   - a lot's close >= 1.05 x its basis  -> sell that lot (gain review);
   - a lot's close <= 0.90 x its basis  -> buy an additional unit (decline

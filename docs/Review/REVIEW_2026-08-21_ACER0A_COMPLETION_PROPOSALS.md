@@ -53,8 +53,16 @@ owner decisions and every data dependency must close before development.
 - Four focused methodology guards were proved red on the exact pushed draft
   and green after correction.
 - Corrected active-document suite: **44 passed in 0.72s**.
-- Complete repository suite, required compilation, and final Git checks are
-  recorded after the exact final review tree is complete.
+- Corrected focused ACER identity/runtime/document suite: **78 passed in
+  8.86s**.
+- Complete repository suite: **4,450 passed / 0 failed / 25 warnings in
+  741.68 seconds** on Python 3.13.14.
+- Required `compileall` over `assistant/`, `backtest/`, `data/`, `execution/`,
+  `ml/`, `research/`, `risk/`, `scripts/`, `signals/`, `strategies/`, `tests/`,
+  and the root Python modules passed.
+- Final document, Git, remote-head, secret, clean-status, ordered-commit, and
+  shared-checkout checks are recorded in the session handoff after its final
+  commit.
 
 ## Acceptance
 

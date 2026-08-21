@@ -181,17 +181,25 @@ correction `32a16b0` also withdrew the counter-review's invalid state-semantics
 percentages without choosing either proposed rule.
 
 **A committed structural capability checker now replaces the prose-only
-inventory, and is independently accepted after correction**
+inventory, and its completeness claim is independently accepted only after a
+second correction**
 (`research/acer/capability.py`,
-`docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`). Its current
-complete seven-requirement result is one available, four unavailable, two
-unmeasured, six blocking, and `acer2_runnable=false`. Correction `c9ee971`
+`docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`,
+`docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its current
+complete twelve-requirement result on the isolated review tree is one
+available, six unavailable, five unmeasured, eleven blocking, and
+`acer2_runnable=false`. Correction `c9ee971`
 requires the complete checklist exactly once, makes every unavailable or
 unmeasured requirement blocking, and verifies that the pinned NYSE calendar
 can actually be imported and constructed rather than treating module
-discovery as importability. These are local structural declarations, not
-vendor evidence: Databento remains unmeasured and the owner gate above is
-unchanged.
+discovery as importability. Claude correction `6fc0040` then added the omitted
+earnings-surprise control, but still classified log-market-cap size as
+price-only and omitted the normalized ratings corpus, point-in-time shares,
+security-type/primary-listing eligibility, and corporate actions required by
+the frozen signal, controls, universe, and total-return outcome. Independent
+correction `14a3a83` gives each its own fail-closed finding and absence
+mutation. These are local structural declarations, not vendor evidence:
+Databento remains unmeasured and the owner gate above is unchanged.
 
 **Proposals for ACER-0A.1 and 0A.5–0A.9 now exist**
 (`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level

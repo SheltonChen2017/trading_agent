@@ -15,9 +15,9 @@ two-run Stage 0 launch (section 7s), and Codex's correction review (section
 sequencing text, section 7br records the topology refresh, section 7bs records
 Claude's documentation/SBP audit, and section 7bt records Codex's independent
 correction review. Section 7bv records the later ACER replacement, 7bw its
-independent review, 7bx the counter-review, 7by the vendor audit, and 7bz the
-independent correction review; 7bz and section 8 are the current development
-state.
+independent review, 7bx the counter-review, 7by the vendor audit, 7bz the
+independent correction review, and 7ca the counter-review of that
+correction; 7ca and section 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -3263,13 +3263,16 @@ a snapshot and refuses hash mismatches and incomplete snapshots at analysis).
   correctly — and the transitions ACER uses are ~99% complete on upgrades
   and downgrades. Zero duplicate `benzinga_id`. 46 inconsistent transitions
   (0.008%) become a named refusal class.
-- **Timezone convention is evidenced, not proved:** modern `time` offsets
-  look like Eastern, but delivered `last_updated` values are timezone-naive,
-  not documented `Z` timestamps. ACER therefore uses no intraday timestamp:
-  every action becomes eligible next session after the later action/update
-  date. Correct date parsing finds 557,748 same-date, 29,259 later-date, and
-  **39 reverse-order** records; the latter are refused. The earlier text
-  comparison falsely reported zero negative gaps.
+- **Timezone convention is evidenced, not vendor-confirmed:** modern `time`
+  offsets look like Eastern. [Corrected by the 2026-08-20 counter-review,
+  section 7ca: delivered `last_updated` values are **all ISO-8601 `Z`**
+  (587,046 of 587,046 measured on the raw bytes), not timezone-naive as this
+  section previously said; the naive-looking example was a culture-rendered
+  display artifact.] ACER still uses no intraday timestamp: every action
+  becomes eligible next session after the later action/update date, a rule
+  kept for its conservatism. Correct date parsing finds 557,748 same-date,
+  29,259 later-date, and **39 reverse-order** records; the latter are
+  refused. The earlier text comparison falsely reported zero negative gaps.
 - Disclosed data limitations: 2017 rows are ~35% below neighbouring years;
   the distinct-firm count declines 265 → ~120-150 across the history.
 - **Licence wording separated correctly:** the owner is right that the
@@ -3350,17 +3353,81 @@ staged-content inspection, ordered-commit inspection, and shared-checkout
 branch/HEAD verification passed. The 25 warnings are one third-party
 `websockets` legacy deprecation and 24 Joblib/NumPy shape deprecations.
 
+## 7ca. Counter-review of Codex's audit correction (Claude, 2026-08-20)
+
+Scope: Codex's correction commits `2274691`, `9dcd54f`, `0f3e0a4`, which the
+owner merged to `main` via PR #288 (merge `7ab2f80`). This supersedes 7bz's
+closing status note, which was written before the owner authorized that
+merge: the review is now published and fetchable from any machine.
+Branch: `user/claude/acer1-audit-counterreview-20260820` off that merge.
+Full record: `docs/Review/REVIEW_2026-08-20_ACER1_AUDIT_COUNTERREVIEW.md`.
+
+What was verified, against the immutable Snapshot A raw bytes and by running
+the corrected tool end to end:
+
+- **ACER1R-001/002/006 confirmed exactly as written.** The hardened loader
+  authenticates `manifest.sha256`, page structure, and the page/partition
+  row-count graph, and passes end to end on the real snapshot; comparison
+  refuses blank/duplicate identities; `isin` and `exchange` are not merely
+  empty — the keys do not exist on any of the 587,046 rows.
+- **ACER1R-003's counts reproduce exactly** by independent reparse:
+  557,748 same-date, 29,259 later-date, 39 reverse-order, 22,582 more than
+  90 days later. The original "zero negative gaps" claim was indeed false.
+- **CCRV-001 (P2, fixed this round): ACER1R-004's factual premise is
+  false.** A byte-level census finds **all 587,046 `last_updated` values are
+  ISO-8601 `Z`** — zero legacy `MM/DD/YYYY` values, zero missing. The
+  review's naive example `10/09/2023 12:28:43` matches how PowerShell's
+  `ConvertFrom-Json` culture-renders a `Z` timestamp; it is a display
+  artifact, not wire format. The review's stated defect mechanism for
+  ACER1R-003 (mixed-format lexical comparison) therefore cannot occur in
+  this payload; the real original defect was never counting the
+  before-direction at date level plus trailing-`Z` inflation. The frozen
+  date-level next-session rule is **kept** — it stands on conservatism, not
+  on the naive-format premise — and the era-split offset measurement is
+  restored to "strong internal evidence, not vendor-confirmed". Corrected in
+  the audit record §5, the action plan, and section 7by above.
+- **CCRV-002 (P3, fixed this round):** the parser docstring claimed legacy
+  timestamps were "observed"; none exist in Snapshot A. Reworded as
+  defensive parsing; the behavior and its test are unchanged.
+- **New measurement:** each of the 39 reverse-order rows has `time` matching
+  the update instant's US-Eastern wall clock within 25 seconds to ~9 minutes
+  while `date` sits one day after the update's UTC date — a systematic
+  next-day-dating anomaly. Refusal remains the right handling.
+
+ACER1R-005 (keep raw/reconstructable data off QC until dataset-specific
+permission exists; local LEAN fallback) is a boundary judgment, not a
+factual claim, and is accepted unchanged. ACER1R-007 stays closed. No
+regression test pins CCRV-001 because the falsehood is about machine-local
+snapshot bytes CI cannot see; the audit record now carries the reproduction
+method instead. No API call, price join, backtest, research look, or
+operational mutation occurred in this round.
+
+Validation on the final tree: full suite **4,362 passed / 0 failed / 25
+warnings** in 587.56 seconds (the same third-party `websockets` and
+Joblib/NumPy deprecations as 7bz); focused audit + document-consistency
+suites reran green on the final prose after these counts were inserted;
+Python 3.13.14; full required `compileall` passed; `git diff --check`
+passed. One instructive intermediate failure: the first full run failed
+`test_no_document_calls_a_merged_commit_unreachable` because this section's
+draft quoted 7bz's reachability phrase within range of a merged hash — the
+guard behaving exactly as designed; the prose was reworded rather than the
+guard weakened.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
 `docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and puts the
 **Analyst-Consensus ETF Rotation program (ACER)** first. SBP is superseded and
 its capture task must not be installed. Snapshot A's structural audit is
-accepted after correction, but ACER remains before its freeze: run Snapshot B
-after the declared interval; establish issuer mapping with ambiguity
-refusals; freeze the signal/control/cell/run-budget design; identify the
-separate earnings-control dataset; and establish dataset-specific permission
-before sending reconstructable ratings to QC. If that permission is absent,
+accepted after correction, and the counter-review of that correction is
+complete (section 7ca): one factual premise in the review was overturned by
+byte-level measurement, the frozen timing rule was kept on its honest
+rationale, and every structural hardening was verified end to end. The
+review chain for the vendor audit is closed. ACER remains before its freeze:
+run Snapshot B after the declared interval; establish issuer mapping with
+ambiguity refusals; freeze the signal/control/cell/run-budget design;
+identify the separate earnings-control dataset; and establish
+dataset-specific permission before sending reconstructable ratings to QC. If that permission is absent,
 run the eventual frozen study in local LEAN. **ACER-2 remains the decisive
 milestone:** a null stock-level result closes the program. No price join,
 backtest, QC upload/run, or paper execution is authorized by this review. LEV
@@ -3509,19 +3576,19 @@ Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
 docs/SESSION_HANDOFF.md, docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
 docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
-docs/operations/OPERATIONAL_FACTS.md, and docs/alpha-result.md. Published
-origin/main is 8f681f9 at this review snapshot. Claude's pushed vendor-audit
-head is 35efda1; Codex's correction branch is
-codex/review-acer1-benzinga-20260820 and is local-only until the owner
-authorizes a push. Product/test correction `2274691` must travel with
-documentation/review commit `9dcd54f`; this final handoff-only commit follows
-both. Stage 0/1 and APQ are valid but closed null; SHW-4 is
-prospective. SBP is superseded by ACER. Next: publish/counter-review this
-correction if authorized, then perform Snapshot B and the ambiguity-refusing
-issuer mapping before ACER-0 freezes. Keep reconstructable ratings off QC
-unless dataset-specific permission covers the upload; otherwise use local
-LEAN. Do not join ratings to prices, run a backtest, deploy, trade, mutate an
-operational database, or roll paper-epoch-006 without separate authorization.
+docs/operations/OPERATIONAL_FACTS.md, and docs/alpha-result.md. Codex's
+correction branch merged to main via PR #288 (merge `7ab2f80`); Claude's
+counter-review of it (section 7ca) lives on
+user/claude/acer1-audit-counterreview-20260820 and overturned the review's
+timezone-naive premise by byte-level measurement while confirming its counts
+and structural fixes. Stage 0/1 and APQ are valid but closed null; SHW-4 is
+prospective. SBP is superseded by ACER. Next: the ACER normalization
+backbone and the ACER-0 preregistration draft (parallel), then Snapshot B
+after the declared interval and the ambiguity-refusing issuer mapping before
+ACER-0 freezes. Keep reconstructable ratings off QC unless dataset-specific
+permission covers the upload; otherwise use local LEAN. Do not join ratings
+to prices, run a backtest, deploy, trade, mutate an operational database, or
+roll paper-epoch-006 without separate authorization.
 ```
 
 ## 9a. Archived 2026-08-17 resume prompt (historical only)

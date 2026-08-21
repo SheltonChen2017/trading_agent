@@ -122,29 +122,41 @@ symbol mapping remains an open item (section 8).
 
 ## 5. Timestamps, timezone, and availability
 
-- **The clock convention is strongly evidenced but not proved by this
-  payload.** Massive's reference labels `time` UTC, while Benzinga's direct
-  product page labels rating timestamps Eastern. Comparing the two delivered
-  clock strings shows an era split: 2011–2015 usually have a 0-hour offset;
-  2017–2026 usually have a +4/+5-hour offset consistent with EDT/EST; 2016 is
-  transitional. That is useful evidence that modern `time` is Eastern, but
-  the actual `last_updated` values are timezone-naive strings such as
-  `10/09/2023 12:28:43`, not the documented ISO-8601 `Z` values. Therefore
-  `last_updated` is not an unambiguous UTC reference clock and the offset
-  measurement cannot prove timezone semantics.
+- **The clock convention is strongly evidenced but not vendor-confirmed.**
+  Massive's reference labels `time` UTC, while Benzinga's direct product page
+  labels rating timestamps Eastern. Comparing the two delivered clock strings
+  shows an era split: 2011–2015 usually have a 0-hour offset; 2017–2026
+  usually have a +4/+5-hour offset consistent with EDT/EST; 2016 is
+  transitional. **Format correction (2026-08-20 counter-review, measured on
+  the raw bytes):** all 587,046 `last_updated` values in Snapshot A are
+  ISO-8601 with a `Z` suffix (zero legacy `MM/DD/YYYY` values, zero missing);
+  the review's claim that they are timezone-naive strings such as
+  `10/09/2023 12:28:43` came from a culture-rendered display of the JSON,
+  not from the wire format. The residual uncertainty is narrower: a `Z`
+  suffix could in principle be stamped onto a naive serializer clock, so the
+  offset measurement is strong internal evidence, not vendor confirmation.
 - A 00h spike (4,021 rows) suggests date-only records defaulting to midnight.
   Intraday use would create unnecessary DST, legacy-era, and vendor-clock
   assumptions. **Frozen safe handling for ACER is date-level:** an action is
   eligible only at the next trading session after the later of its action
-  date and `last_updated` date. This deliberately gives up same-day trading
-  and makes the backtest independent of the unresolved clock convention.
-- Correct parsing of the two different formats finds 587,046 usable
-  `last_updated` values: **557,748 are on the action date, 29,259 are later,
-  and 39 precede the action date**. Of the later rows, 22,582 are more than 90
-  days later. The earlier lexicographic comparison incorrectly reported zero
-  negative gaps because it compared `MM/DD/YYYY ...` text with
-  `YYYY-MM-DDT...` text. The 39 reverse-order records are a named refusal
-  class; they are not silently assigned a tradable timestamp.
+  date and `last_updated` UTC date. This deliberately gives up same-day
+  trading and makes the backtest independent of any residual clock-convention
+  doubt. The rule stands on its own conservatism; it does not depend on the
+  (incorrect) naive-format premise under which it was first frozen.
+- Date-level parsing finds 587,046 usable `last_updated` values: **557,748
+  are on the action date, 29,259 are later, and 39 precede the action date**.
+  Of the later rows, 22,582 are more than 90 days later. The audit's original
+  measurement never counted the before-direction at date level and its
+  full-string comparison treated the trailing `Z` as making equal instants
+  "later", so it falsely reported zero negative gaps; the review's corrected
+  counts are confirmed by independent reproduction, though its stated
+  mechanism (mixed `MM/DD/YYYY` vs ISO lexical comparison) does not occur in
+  this payload. The 39 reverse-order records are a named refusal class; they
+  are not silently assigned a tradable timestamp. Their shape is itself
+  informative: each one's `time` matches the update instant's US-Eastern
+  wall clock within 25 seconds to ~9 minutes while `date` sits one day
+  after the update's UTC date — a systematic next-day-dating anomaly, not
+  random corruption.
 
 ## 6. Pagination integrity
 

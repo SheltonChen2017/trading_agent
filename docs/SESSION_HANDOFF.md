@@ -23,7 +23,8 @@ independent correction review, 7cg the counter-review of that review, and
 7ch the submitted issuer-identity detector, 7ci Codex's independent
 correction review, 7cj the counter-review of that review, and 7ck the
 ACER-0A completion proposals. Section 7cl records Codex's independent
-correction review of those proposals; 7cl and section 8 are the current
+correction review of those proposals, 7cm the counter-review of that review,
+and 7cn the local data-capability audit; 7cn and section 8 are the current
 development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
@@ -4147,6 +4148,123 @@ purchase, licensed-data transfer, signal/outcome join, or test run. The owner
 must still accept or amend the corrected proposals; ACER-0A.1–0A.10 and their
 data dependencies must all close before implementation. No feature milestone
 completed, so `FEATURE_MILESTONE_RECORD.md` was correctly left unchanged.
+
+## 7cm. Counter-review of the proposal review (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-prereg-cr-20260821`, based on `734d521`. Full
+record: `docs/Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md`.
+
+**All six findings confirmed, two by direct computation, and both of those
+are serious defects in my draft.**
+
+**ACERPR-001** is the worst thing I have put in a specification. My proposed
+aggregation `sum(w·notch)/sum(w)` is a weighted mean, and a weighted mean
+cancels any common factor. Evaluated at H=63, three equally-aged +1 actions
+score **1.0000 at ages 0, 63, 252 and 756 sessions alike** — a three-year-old
+rating scoring identically to today's. The half-life is a *frozen family
+dimension*, and my formula would have made it very nearly inert and the three
+half-life cells near-duplicates. Codex's `sum(w·notch)/N_live` scores 1.0000,
+0.5000, 0.0625, 0.0002 at those ages: coverage-neutral and still decaying.
+
+**ACERPR-003** is circular by construction: I proposed regressing each
+session's outcome on that session's controls, taking the residual, and
+calling the correlation with it out-of-sample. Fitting on the realized
+outcomes you then score against is in-sample by definition. The residual was
+orthogonal to the controls by fitting, not by prediction.
+
+**ACERPR-004** named a stationary bootstrap with an "expected block length"
+while `backtest.engine.bootstrap_edge_significance_by_block` documents and
+implements a **circular moving-block** bootstrap with fixed length — two
+different algorithms would have satisfied my written name, so the
+preregistered threshold was not reproducible. **ACERPR-005** reproduced
+exactly: 54 strings in the union, my table listed 39, and the 15 unmapped
+ones are precisely those Codex enumerated; I had disclosed four.
+**ACERPR-006** is a fair process finding against my counter-review record's
+shape, and Codex's edits to that record are structural only — no finding was
+removed, weakened, or re-graded.
+
+**One new P2 raised and measured (CCPR-001).** Codex's correction makes
+non-directional actions create a zero event that *replaces* the firm's prior
+state, and `maintains` is 59.7% of all events — so a later `maintains`
+silently erases an earlier upgrade's decayed signal. That is not symmetric
+across the frozen half-life dimension. Measured on Snapshot A: of 121,637
+directional actions, 28.9% are never superseded, the median time to
+supersession is 212 calendar days, and the share truncated before one
+half-life elapses is **7.1% at H=21, 19.1% at H=63, and 32.2% at H=126**. The
+longest half-life loses nearly a third of its signal to truncation while the
+shortest loses a fourteenth — so a cell that cannot realize its longer memory
+is partly measuring the state rule rather than memory length. That is the
+same *class* of problem as ACERPR-001, arriving inside the fix for it.
+
+I did not change the rule. The measurement and two named alternatives —
+keep the zeroing and accept the asymmetry, or let non-directional actions
+leave the prior revision decaying untouched — are added to the proposal for
+the owner to rule on before any freeze.
+
+This is the third consecutive round in which a correction needed a
+correction. That is the gate working, not failing.
+
+## 7cn. Can ACER-2 run locally? Data-capability audit (Claude, 2026-08-21)
+
+Same branch as 7cm, per the owner's relay instruction. Full record:
+`docs/research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md`.
+
+ACER-0A.3 and 0A.4 were open with unmeasured answers. Both are now answered,
+and both are **negative** — the second decisively so.
+
+**The binding obstacle is not the missing security master.**
+`data/pit_universe.py` is this repository's genuine point-in-time capability,
+and its own docstring states the two limits that settle this: "**Prices for
+delisted securities are unavailable**… the current ticker map and price
+provider do not supply their bars", and "**No delisting returns**, so a
+company that leaves the universe leaves without a final return. This biases
+results upward and the size of the bias is not knowable from this data."
+
+The frozen ACER-0A universe requires delisted securities to remain eligible
+while historically listed; the proposed outcome is a 21-session forward
+return. The local path supplies the first and not the second, for exactly the
+population whose absence creates survivorship bias — the failure this project
+has already measured in its own legacy universe, where SIVB, SBNY and FRC are
+absent. A locally-run ACER-2 would produce an upward-biased result whose bias
+could not be bounded.
+
+Two supporting findings: the sole local price provider declares
+`provides_point_in_time_lineage = False` in its own contract and its bars are
+adjusted as of fetch date; and **no local book-value source exists at all**,
+so the proposed value control (ACER-0A.3) has no implementation path.
+
+A specification mismatch was also caught before it could be frozen: ACER-0A.7
+proposes **GICS** sector dummies, while the only locally available sector
+information is **SIC codes** via EDGAR. Freezing one and implementing the
+other would be a silent substitution.
+
+**One finding reshapes the security-master blocker rather than removing it.**
+`pit_universe.py` already establishes the right principle — "`cik` is the
+primary key, never the ticker" — and CIK is exactly the durable issuer key
+the ratings feed lacks. But `fetch_ticker_map` is documented as "CIK ->
+ticker for companies that **still have a listed ticker today**", so it
+resolves survivors and omits the dead names, which are the ones that matter.
+EDGAR is a promising route, not a finished one.
+
+Four options are laid out for the owner, with the trade stated for each.
+Only acquiring point-in-time data with delisted coverage, or authorizing a
+read-only QuantConnect data path, permits ACER-2 as frozen. Amending the
+universe to drop delisted names is cheap and **not recommended**: it would
+make the milestone answerable and the answer worthless.
+
+Validation on the final tree: full suite **4,450 passed / 0 failed / 25
+warnings** in 662.69 seconds — identical to the reviewed tree, because this
+round changed **no code at all**. `compileall` over the required surface
+including `research/` passed; `git diff --check` passed; the
+document-consistency guards reran green after every edit, including after
+these counts were inserted; Python 3.13.14.
+
+Untested surface, stated plainly: sections 7cm and 7cn are analysis and
+specification text. The truncation percentages in CCPR-001 come from an
+aggregate scan of the snapshot and use a 252/365 calendar-to-session
+approximation; they are not produced by any tested code path. The
+capability audit quotes existing module docstrings and contracts rather than
+executing them.
 
 ## 8. What is next
 

@@ -143,6 +143,50 @@ both.
   chronology, a fact already measured in the identity work. The ambiguous
   collision clears the prior live state for that encoding at that session.
 
+### The zero-event rule degrades the half-life cells unequally — owner decision needed
+
+The zero-event rule above means a later `maintains` **erases** an earlier
+upgrade's decayed signal, and `maintains` alone is 349,317 of 584,916 events
+(59.7%). That consequence is not symmetric across the frozen half-life
+dimension, so it deserves an explicit ruling rather than arriving as a side
+effect. Measured on Snapshot A (aggregate counts only; the session conversion
+uses a 252/365 approximation and is stated as approximate):
+
+| Measure | Value |
+|---|---:|
+| directional actions (`upgrades` + `downgrades`) | 121,637 |
+| never superseded by a later action from the same firm on the same issuer | 35,118 (28.9%) |
+| superseded, of which by a `maintains` | 86,519, of which 40,247 |
+| median time to supersession | 212 calendar days |
+
+**Share of directional actions superseded before one half-life elapses:**
+
+| Half-life | Truncated before one half-life |
+|---:|---:|
+| 21 sessions | **7.1%** |
+| 63 sessions | **19.1%** |
+| 126 sessions | **32.2%** |
+
+The longest half-life loses nearly a third of its signals to truncation while
+the shortest loses about a fourteenth. A cell that cannot realize its longer
+memory is partly measuring the state rule rather than memory length — the
+same *class* of problem as normalizing decay away, which is why it is
+surfaced here rather than left to implementation.
+
+**Two defensible options, for the owner to choose between:**
+
+1. **Keep the zeroing rule** (as corrected above) and accept the asymmetry,
+   recording it as a known property of the family rather than discovering it
+   after a result. The rule has a clear reading: a firm's *current* revision
+   is nil once it maintains.
+2. **Let a non-directional action leave the prior revision decaying
+   untouched**, so `maintains` neither refreshes nor erases. The signal then
+   measures "how recently and strongly did anyone revise", and the half-life
+   dimension means what its name says.
+
+Neither is obviously right, and the choice changes the signal materially, so
+it must be frozen before the development run and never after seeing a result.
+
 ---
 
 ## ACER-0A.7 — controls and outcome

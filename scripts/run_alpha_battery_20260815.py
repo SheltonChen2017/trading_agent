@@ -1,7 +1,7 @@
 """Alpha battery — cross-sectional signal research (EXPLORATORY ONLY).
 
 Runs the specifications frozen in
-`docs/research/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md`. Read that document
+`docs/Archive/Research/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md`. Read that document
 first: it records the declared look count, the Bonferroni threshold, and
 the three alphas that CANNOT be tested honestly here because this project
 has no point-in-time fundamentals.
@@ -674,7 +674,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     buckets = volume_bucket_report(closes, volumes)
 
     artifact = {
-        "generated_for": "docs/research/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md",
+        "generated_for": "docs/Archive/Research/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md",
         "point_in_time_data": False,
         "price_source": "yfinance adjusted closes (exploratory)",
         "survivorship_bias": "present and material; universe has no historical constituents",

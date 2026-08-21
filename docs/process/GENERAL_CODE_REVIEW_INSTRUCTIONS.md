@@ -133,6 +133,13 @@ materially changes. At minimum, record:
 Never place secret values, account numbers, private keys, licensed data, or
 other sensitive contents in the handoff.
 
+Every implementation or review commit series must also update only the
+authoritative associated record whose behavior or evidence changed. Do not
+make ceremonial edits to unrelated plans or records. The general Action Plan
+changes only when sequencing, milestone status, a gate, or the next authorized
+step changes; its update is a concise reference to the associated record, not
+a duplicate implementation narrative, finding ledger, or test report.
+
 Commit the handoff separately after the implementation or review commits it
 describes exist, so it can name their exact hashes. Cross-computer sync is not
 complete until the handoff commit and every commit needed to resume are

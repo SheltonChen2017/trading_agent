@@ -24,6 +24,9 @@ Boundaries, which are the point of putting this in `research/acer/`:
 - **`UNMEASURED` is a real answer**, distinct from `UNAVAILABLE`. Databento
   capture code exists and has never been exercised for ACER; calling that
   either "available" or "unavailable" would be a claim nobody has earned.
+- **Provider candidates are diagnostics, not requirements.** ACER needs
+  verified point-in-time prices and reference data; it does not need one
+  named vendor when another audited source supplies those capabilities.
 """
 from __future__ import annotations
 
@@ -46,7 +49,6 @@ _VALID_STATUSES = frozenset(
 _REQ_SESSION_CALENDAR = "NYSE trading-session calendar"
 _REQ_RATINGS_CORPUS = "verified normalized analyst-ratings event corpus"
 _REQ_PIT_PRICES = "point-in-time daily bars (production read path)"
-_REQ_DATABENTO = "Databento point-in-time bars and reference"
 _REQ_DELISTING_RETURNS = "terminal returns for delisted securities"
 _REQ_ISSUER_IDENTITY = "durable point-in-time issuer identity"
 _REQ_SECURITY_ELIGIBILITY = (
@@ -67,7 +69,6 @@ _REQUIRED_REQUIREMENTS = frozenset(
         _REQ_SESSION_CALENDAR,
         _REQ_RATINGS_CORPUS,
         _REQ_PIT_PRICES,
-        _REQ_DATABENTO,
         _REQ_DELISTING_RETURNS,
         _REQ_ISSUER_IDENTITY,
         _REQ_SECURITY_ELIGIBILITY,
@@ -136,6 +137,31 @@ class CapabilityFinding:
             raise ValueError(
                 f"{self.requirement}: a non-available requirement must block"
             )
+
+    def to_payload(self) -> dict[str, Any]:
+        return {name: getattr(self, name) for name in self.__dataclass_fields__}
+
+
+@dataclass(frozen=True)
+class ProviderFinding:
+    """Evidence about one optional provider route.
+
+    Provider diagnostics deliberately have no ``blocks_acer2`` field. The
+    required capability checks decide readiness; this record only explains
+    whether a particular vendor is a measured candidate for satisfying them.
+    """
+
+    provider: str
+    status: str
+    evidence: str
+
+    def __post_init__(self) -> None:
+        if not self.provider.strip():
+            raise ValueError("a provider finding must name its provider")
+        if self.status not in _VALID_STATUSES:
+            raise ValueError(f"unknown status {self.status!r}")
+        if not self.evidence.strip():
+            raise ValueError(f"{self.provider}: a finding must carry evidence")
 
     def to_payload(self) -> dict[str, Any]:
         return {name: getattr(self, name) for name in self.__dataclass_fields__}
@@ -253,7 +279,7 @@ def check_point_in_time_prices() -> CapabilityFinding:
     )
 
 
-def check_databento_path() -> CapabilityFinding:
+def check_databento_path() -> ProviderFinding:
     """Capture code exists; coverage for ACER has never been exercised.
 
     Credential presence is deliberately NOT consulted. A key proves access,
@@ -268,14 +294,13 @@ def check_databento_path() -> CapabilityFinding:
     present = [name for name in modules if (REPO_ROOT / name).is_file()]
     captured = (REPO_ROOT / "artifacts" / "databento").is_dir()
     if not present:
-        return CapabilityFinding(
-            requirement=_REQ_DATABENTO,
+        return ProviderFinding(
+            provider="Databento",
             status=STATUS_UNAVAILABLE,
             evidence="no ml/databento_*.py modules found",
-            blocks_acer2=True,
         )
-    return CapabilityFinding(
-        requirement=_REQ_DATABENTO,
+    return ProviderFinding(
+        provider="Databento",
         status=STATUS_UNMEASURED,
         evidence=(
             f"{len(present)} capture modules present ({', '.join(present)}); "
@@ -283,7 +308,6 @@ def check_databento_path() -> CapabilityFinding:
             "coverage, terminal-return semantics, licence and cost are "
             "unaudited for ACER"
         ),
-        blocks_acer2=True,
     )
 
 
@@ -502,7 +526,6 @@ _CHECKS = (
     check_trading_session_calendar,
     check_ratings_event_corpus,
     check_point_in_time_prices,
-    check_databento_path,
     check_delisting_returns,
     check_durable_issuer_identity,
     check_point_in_time_security_eligibility,
@@ -513,14 +536,26 @@ _CHECKS = (
     check_earnings_surprise_control,
 )
 
+_PROVIDER_CHECKS = (check_databento_path,)
+
 
 def assess_capabilities() -> list[CapabilityFinding]:
     """Run every check. Output order is the declaration order, not sorted."""
     return [check() for check in _CHECKS]
 
 
+def assess_provider_candidates() -> list[ProviderFinding]:
+    """Report optional provider routes without treating them as requirements."""
+    return [check() for check in _PROVIDER_CHECKS]
+
+
 def summarize_capabilities(findings: list[CapabilityFinding]) -> dict[str, Any]:
     """Summarize one complete ACER-2 checklist, never a caller-selected subset."""
+    if any(not isinstance(finding, CapabilityFinding) for finding in findings):
+        raise ValueError(
+            "findings must contain required ACER-2 capabilities, not provider "
+            "diagnostics"
+        )
     requirements = [finding.requirement for finding in findings]
     if (
         len(requirements) != len(_REQUIRED_REQUIREMENTS)

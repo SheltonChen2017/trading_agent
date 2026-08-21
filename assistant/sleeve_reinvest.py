@@ -1,6 +1,6 @@
 """
 Three-sleeve engine M3 -- dividend -> reinvest proposals with earmark
-accounting (docs/reference/THREE_SLEEVE_ENGINE_PLAN.md section 5 M3, as
+accounting (docs/Plan/THREE_SLEEVE_ENGINE_PLAN.md section 5 M3, as
 revised by section 1.1).
 
 The rule, exactly as adopted: confirmed dividend income funds PENDING

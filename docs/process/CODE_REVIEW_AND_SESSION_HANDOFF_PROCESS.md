@@ -48,6 +48,17 @@ become materially stale.
 
 ## 3. Roles
 
+### Current ACER assignment (owner decision 2026-08-21)
+
+For the current ACER implementation sequence, **Codex implements and Claude
+independently reviews**. Codex publishes a completed `codex/<topic>-<date>`
+implementation branch. Claude starts from that exact remote object and uses a
+separate `user/claude/<review-topic>-<date>` review branch. The generic roles
+below remain the contract; this paragraph only assigns the people occupying
+them. The assignment does not authorize either agent to merge, deploy, spend,
+download licensed data, or consume a research look without the owner's
+separate instruction.
+
 ### Implementer
 
 The implementer:
@@ -113,11 +124,12 @@ moves later, stop and re-establish the exact ordered commit range.
 Create a dedicated review branch from the exact implementation commit:
 
 ```powershell
-git switch -c codex/review-<milestone>-<date> origin/<implementation-branch>
+git switch -c <reviewer-prefix>/review-<milestone>-<date> origin/<implementation-branch>
 ```
 
-Use the appropriate agent prefix if the reviewer is not Codex. Do not mix an
-unrelated feature or documentation initiative into the review branch.
+For the current ACER assignment the reviewer prefix is `user/claude`. Use the
+appropriate agent prefix after any later owner-approved role change. Do not
+mix an unrelated feature or documentation initiative into the review branch.
 
 In a shared worktree, monitor for concurrent branch switches and commits. A
 different agent can unintentionally commit onto the currently active branch.
@@ -205,6 +217,25 @@ git commit -m "Complete independent <milestone> review"
 
 Do not push, merge, or open a pull request unless the owner has authorized it.
 
+### Step 6a — update only the associated record
+
+After exact implementation/review hashes exist, update the authoritative
+document that owns the changed behavior or evidence: normally the active
+feature plan, research record, operational record, review report, contract,
+or run ledger. Do not update unrelated documents.
+
+The general Action Plan is only a sequencing index. Change it only if the
+review changes priority, milestone status, a gate, or the next authorized
+step, and record only a concise reference to the associated document. Keep
+implementation detail, findings, validation output, and evidence in that
+associated document and the Session Handoff.
+
+Commit the associated record separately when repository rules require product
+and documentation commits to remain distinct. An implementation/review commit
+series is not ready to push or hand off until this record update and the
+Session Handoff update are committed. Those documentation-only commits do not
+recursively require another documentation cycle.
+
 ### Step 7 — update the session handoff
 
 After the correction commit exists, update `docs/SESSION_HANDOFF.md`. This
@@ -262,6 +293,7 @@ Recheck that the branch is clean and that history contains, in order:
 ```text
 implementation commit
 review correction commit
+associated-record commit (when separate)
 handoff commit
 ```
 
@@ -287,6 +319,7 @@ refactor merely because its final diff is small.
 
 Update the handoff after:
 
+- every implementation or review commit series, before handoff or push;
 - every independent implementation review;
 - every merge that changes the active milestone or next step;
 - every machine transition;

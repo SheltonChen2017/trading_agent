@@ -1,6 +1,6 @@
 # ML Implementation Status
 
-Companion to `docs/reference/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
+Companion to `docs/Archive/Plans/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
 what is deliberately not built, and why. Updated 2026-08-03; path references
 refreshed 2026-08-20 for the archived plan layout. The milestone content
 below has NOT been re-verified against the code since its own date —
@@ -8,8 +8,8 @@ below has NOT been re-verified against the code since its own date —
 state.
 
 The original readiness sequence is defined in
-`docs/reference/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`; the current end-to-end
-overlay and remaining sequence are in `docs/reference/ML_FULL_SYSTEM_EXECUTION_PLAN.md`.
+`docs/Plan/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`; the current end-to-end
+overlay and remaining sequence are in `docs/Plan/ML_FULL_SYSTEM_EXECUTION_PLAN.md`.
 
 ## Built
 
@@ -523,7 +523,7 @@ prediction to 16:30 Eastern. Weekday exchange holidays are a successful skip,
 not a false operational failure.
 
 Minimal setup, using a config shaped like
-`docs/ml_shadow_volatility_config.example.json`:
+`docs/operations/ml_shadow_volatility_config.example.json`:
 
 ```text
 python scripts/run_ml_shadow.py --database data/paper.db --config <config.json> --artifact-dir <artifact-dir> register
@@ -667,7 +667,7 @@ explicit blocker is added — absence is not a clean result.
 
 ## ML-FS-1 notes
 
-`docs/reference/ML_FULL_SYSTEM_EXECUTION_PLAN.md` layers the remaining collection,
+`docs/Plan/ML_FULL_SYSTEM_EXECUTION_PLAN.md` layers the remaining collection,
 research, evidence, and reviewed-assistance work on top of ML-LR. Its first
 milestone closes the production-writer gap in portfolio history.
 

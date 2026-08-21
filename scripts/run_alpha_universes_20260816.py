@@ -5,7 +5,7 @@ membership produced by `scripts/build_pit_universe_20260816.py` and
 evaluates each specification separately inside each universe.
 
 The specifications, the look count and the Bonferroni threshold are frozen
-in `docs/research/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md`, written
+in `docs/Archive/Research/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md`, written
 before any three-universe result was observed.
 
 Universe B is the headline. Universe C is a warning detector, never a
@@ -369,7 +369,7 @@ def main(argv: list[str] | None = None) -> int:
         results[name] = cells
 
     artifact = {
-        "specification": "docs/research/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md",
+        "specification": "docs/Archive/Research/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md",
         "declared_looks": DECLARED_LOOKS,
         "actual_looks_after_review_exclusions": 27,
         "bonferroni_threshold": bonferroni_threshold(DECLARED_LOOKS),

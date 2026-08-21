@@ -220,7 +220,7 @@ time-based start is queued and may run after wake (Task Scheduler normally
 delays such catch-up work); it is not categorically skipped. The eventual
 observation still fails closed if wake/catch-up timing no longer maps to the
 intended NYSE session or reconciliation is stale. See
-`docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`; seven of the
+`docs/Archive/Operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`; seven of the
 22 long reconciliation gaps were checked and each coincided with host sleep.
 
 ### Restart the app after any operational deploy (2026-08-19)
@@ -641,7 +641,7 @@ scheduler, ML/LLM-authority, or live-trading reach.
 At that time, the review branch was not the deployed epoch lineage and QC-2
 was deliberately kept outside `paper-epoch-004`. It subsequently deployed in
 the owner-authorized epoch-005 roll at `752d3b7`. See
-`docs/Review/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md` for the full ledger and
+`docs/Archive/Review/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md` for the full ledger and
 validation.
 
 ### AP-8 was reviewed development code outside epoch-004 (2026-08-12)
@@ -660,7 +660,7 @@ cannot propose, approve, or place an order.
 At that time, the branch was not the deployed lineage and AP-8 was
 deliberately kept outside `paper-epoch-004`. It subsequently deployed in the
 owner-authorized epoch-005 roll at `752d3b7`. See
-`docs/Review/REVIEW_2026-08-12_AP8_TICKER_SUGGESTION_DISCLOSURE.md` for the complete
+`docs/Archive/Review/REVIEW_2026-08-12_AP8_TICKER_SUGGESTION_DISCLOSURE.md` for the complete
 issue ledger and validation.
 
 Claude's counter-review accepted all five review findings and closed two more

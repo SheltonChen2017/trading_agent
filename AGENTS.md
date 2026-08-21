@@ -10,20 +10,35 @@ before acting; nothing below weakens it.
 
 `docs/ACTION_PLAN_2026-08-20.md` is the owner-directed, single sequencing
 authority for all workstreams (2026-08-20, replacing the 2026-08-02 plan now
-archived at `docs/reference/ACTION_PLAN_2026-08-02.md`; the older Codex audit
-draft is preserved at `docs/reference/ACTION_PLAN_codex.md`). Use it to
+archived at `docs/Archive/Plans/ACTION_PLAN_2026-08-02.md`; the older Codex audit
+draft is preserved at `docs/Archive/Plans/ACTION_PLAN_codex.md`). Use it to
 decide what is done, what is in progress, what is next, and what is blocked
 or prohibited.
 
-The individual implementation plans are archived in `docs/reference/` (see
-its README). They remain authoritative for their own milestone definitions,
-safety gates, and definitions of done — but their internal "begin with X"
+The actively implemented plan is kept at the root of `docs/`. Plans that are
+approved or retained for later work live in `docs/Plan/`; completed,
+superseded, and obsolete plans live in `docs/Archive/Plans/`. They remain
+authoritative for their own milestone definitions, safety gates, and
+definitions of done when scheduled — but their internal "begin with X"
 sequencing statements are superseded by the action plan. Never start a
-milestone merely because an archived plan names it next.
+milestone merely because a queued or archived plan names it next.
 
-When a phase completes or the owner reorders priorities, update
-`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` rather than
-letting the plan drift stale.
+## Current agent roles
+
+Owner decision, 2026-08-21: for the current ACER sequence, **Codex is the
+implementer and Claude is the independent reviewer**. Codex uses a `codex/`
+implementation branch and stops at a stable committed snapshot. Claude reviews
+that exact pushed snapshot on a separate `user/claude/` review branch under the
+standing review workflow. This assignment may be changed only by a later owner
+instruction; it does not weaken the requirement for independent review.
+
+Every implementation or review commit series must update the relevant
+feature/research/operations/review document and `docs/SESSION_HANDOFF.md`
+before handoff or push. Do not update unrelated documents. Update
+`docs/ACTION_PLAN_2026-08-20.md` only when sequencing, milestone status, a
+gate, or the next authorized step changes, and then add only a concise
+reference to the authoritative associated document instead of duplicating
+its implementation detail or evidence.
 
 ## Standing workflow references
 

@@ -119,5 +119,5 @@ addressed here:
 
 Claude's implementation validation is recorded in `docs/SESSION_HANDOFF.md`
 section 7cb. Independent review and its corrected validation are recorded in
-`docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md` and the appended
+`docs/Archive/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md` and the appended
 handoff section.

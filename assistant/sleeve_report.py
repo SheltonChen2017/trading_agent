@@ -5,7 +5,7 @@ approves, or ranks a trade, and no field is action-shaped: the numbers say
 what the portfolio *is* relative to the owner's stated preference, never
 what to do about it. The owner reads it and decides.
 
-The engine it measures (docs/reference/THREE_SLEEVE_ENGINE_PLAN.md,
+The engine it measures (docs/Plan/THREE_SLEEVE_ENGINE_PLAN.md,
 owner-adopted 2026-08-09) is a PREFERENCE, not validated research, and this
 module must never describe it otherwise. Three sleeves:
 
@@ -418,7 +418,7 @@ def evaluate_sleeves(
         "account_mode": snapshot.account_mode,
         "total_equity": _money(total_equity),
         "engine": {
-            "plan": "docs/reference/THREE_SLEEVE_ENGINE_PLAN.md",
+            "plan": "docs/Plan/THREE_SLEEVE_ENGINE_PLAN.md",
             "authority": (
                 "owner-stated preference (2026-08-09, revision 2); "
                 "not validated research"

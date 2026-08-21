@@ -17,7 +17,7 @@ single lookback, no out-of-sample split. **That was discovery look #1
 and it is counted.** Everything below is designed so the confirmation
 evidence is structurally distinct: walk-forward folds, block-aware
 significance, and — for the decisive evidence — the prospective shadow
-stream (SHW-4 in `docs/reference/SHADOW_OBSERVATION_DESIGN.md`).
+stream (SHW-4 in `docs/Archive/Plans/SHADOW_OBSERVATION_DESIGN.md`).
 
 This is NOT a reopening of the closed cross-sectional alpha program
 (ledger A-002): no stock selection, no ranking, no signal. It is an

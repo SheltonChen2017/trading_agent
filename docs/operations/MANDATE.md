@@ -134,7 +134,7 @@ and doesn't compete for this project's roadmap priority:
 A separate, related gap (not one of GPT's four sleeves, raised in a later
 2026-08 review): the current Watchlist allocation feature is user-directed
 inverse-volatility splitting, not automated market-volatility-driven
-allocation. See `docs/reference/ALLOCATION_SERVICE_DESIGN.md` for a design-only
+allocation. See `docs/Archive/Plans/ALLOCATION_SERVICE_DESIGN.md` for a design-only
 proposal — not implemented beyond a small persisted-cadence storage table.
 
 ## 6. Change control
@@ -144,7 +144,7 @@ targets in §2 change, so revisions are visible, not silent edits.
 
 - **2026-07-28** — initial draft, all §2 targets marked DRAFT pending
   user revision.
-- **2026-07-28** — §5 cross-links `docs/reference/ALLOCATION_SERVICE_DESIGN.md`
+- **2026-07-28** — §5 cross-links `docs/Archive/Plans/ALLOCATION_SERVICE_DESIGN.md`
   (a new gap raised in a later review, not one of the original four
   sleeves); no §2 target changes.
 - **2026-07-29** — status changed from draft to proposed; added the

@@ -1,7 +1,7 @@
 """LEAN leveraged-threshold family: TQQQ take-profit rules, one costed log.
 
 Frozen specification:
-`docs/research/LEVERAGED_THRESHOLD_2026-08-19_PREREGISTRATION.md`
+`docs/Plan/Research/LEVERAGED_THRESHOLD_2026-08-19_PREREGISTRATION.md`
 (owner-adopted as-is 2026-08-19, before this file existed). This
 algorithm REPORTS SERIES RETURNS, so every cloud run is a counted
 research look. Fixed instruments, no universe screen, and deliberately

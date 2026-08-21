@@ -1,7 +1,7 @@
 """SBR-1: monthly Strong-Buy analyst-consensus capture (observation only).
 
 Frozen capture specification:
-`docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md`
+`docs/Archive/Research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md`
 (owner-adopted as-is 2026-08-19). Task-specific runtime per the ML-LR-6
 anti-generic precedent — deliberately NOT the overlay shadow framework,
 whose contracts describe a different task.

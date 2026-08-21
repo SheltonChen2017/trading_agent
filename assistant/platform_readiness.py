@@ -4,7 +4,7 @@ Five dimensions, each scored independently and **never** averaged. An
 average lets a strong dimension hide a fatal one, which is the specific
 failure this report exists to prevent.
 
-Three deviations from docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md
+Three deviations from docs/Plan/GENERAL_READINESS_IMPLEMENTATION_PLAN.md
 section 5, all because the plan predates code that now exists. They are
 deliberate; see docs/operations/GENERAL_READINESS_STATUS.md.
 

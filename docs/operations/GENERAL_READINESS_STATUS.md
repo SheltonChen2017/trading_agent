@@ -1,6 +1,6 @@
 # General Readiness implementation status
 
-Companion to `docs/reference/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`, recording what
+Companion to `docs/Plan/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`, recording what
 is built and every deliberate deviation from the plan. Updated 2026-08-02;
 path references refreshed 2026-08-20 for the archived plan layout. The
 milestone content below has NOT been re-verified against the code since its
@@ -586,7 +586,7 @@ lookup seam changed the outcome branch, and suppressing the direct-mismatch
 kill switch failed the safety assertion. The corrected combined review tree
 passed 2,485 tests with 1 skipped and 25 warnings; compilation and diff checks
 were clean. Durable disposition:
-`docs/Review/REVIEW_2026-08-03_GR1D_RECONCILIATION.md` (`2f37210`). GR-1D is
+`docs/Archive/Review/REVIEW_2026-08-03_GR1D_RECONCILIATION.md` (`2f37210`). GR-1D is
 accepted; GR-1 remains partial pending the GR-1E assessment below.
 
 ### GR-1E — composition-thinning assessment: NO FURTHER EXTRACTION; GR-1 accepted complete (2026-08-03)
@@ -690,7 +690,7 @@ calculations remain explicit architecture debt rather than part of GR-1.
 complete against the archived plan's intended definition of done.** The
 review accepted the architectural conclusion after correcting the evidence
 and scope statements above; see
-`docs/Review/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`.
+`docs/Archive/Review/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`.
 
 ## GR-3 — fault injection and adversarial drills: COMPLETE after independent review (2026-08-03)
 
@@ -745,7 +745,7 @@ Notable mechanics:
 GR-5 now supplies the `alert_delivery` producer; `backup_restore` keeps its
 existing `recovery-drill` producer. The runbook's incident section links
 every fault row to its observed behavior and the drill command. Independent
-GR-3 review is recorded in `docs/Review/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md`.
+GR-3 review is recorded in `docs/Archive/Review/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md`.
 
 ## GR-5 — observability that actually delivers: COMPLETE AND INDEPENDENTLY REVIEWED (2026-08-03)
 
@@ -865,7 +865,7 @@ its runner while replacing a vacuous violation-code assertion. The same
 review also corrected the integrity sweep's remaining P2 warning-routing
 gap by making the CLI render durable warning batches before fallible
 portfolio/data construction. Final dispositions and evidence are in
-`docs/Review/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`.
+`docs/Archive/Review/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`.
 
 ## GR-4 — data-layer resilience and honesty: COMPLETE AFTER INDEPENDENT REVIEW (2026-08-05)
 
@@ -908,7 +908,7 @@ fetch; readiness freshness ignoring a pinned report clock; and unpaired /
 truncated exploratory dip-grid comparisons. The exploratory script now keeps
 episode and universe baselines paired on the frozen 63-session horizon and
 reports paired beat rates with an explicit non-PIT caveat. See
-`docs/Review/REVIEW_2026-08-05_GR4_DATA_HONESTY.md`.
+`docs/Archive/Review/REVIEW_2026-08-05_GR4_DATA_HONESTY.md`.
 
 ### Deliberate scope deviations from archived plan section 9
 

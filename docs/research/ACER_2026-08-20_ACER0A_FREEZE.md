@@ -13,7 +13,7 @@ is deliberately NOT frozen, so that ETF benchmark and investability choices
 are not forced before a stock-level signal is shown to exist. ACER-0B is
 authorized only by a separate owner act, and only if ACER-2 passes.
 
-Governing contract shape: `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`.
+Governing contract shape: `docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`.
 Source specification: `docs/reference/analyst-consensus-etf-strategy.pdf`
 (SHA-256 `3700ab4bb64dfd6e29e5f8bbc2b7e3dd3fa089050b25cbb5e315450a8d86cf23`).
 Where they differ, this freeze governs for ACER-2.
@@ -99,7 +99,7 @@ A null is a valid result and is recorded as such.
 Rules:
 
 - Every execution against real outcomes — including refusals, errors, and
-  accidental launches — is appended to `docs/alpha-result.md` as a new
+  accidental launches — is appended to `docs/Archive/Research/alpha-result.md` as a new
   `R-nnn` entry with full identity, and counts permanently. Records are
   never removed.
 - **No corrected rerun is authorized at present.** With exactly two slots, any
@@ -222,7 +222,7 @@ The review preserved proposal-only status while repairing decay cancellation,
 in-sample validation residualization, reversed embargo wording, a bootstrap
 algorithm mismatch, incomplete action/state semantics, and incomplete
 disclosure of the measured refusal vocabulary. See
-`docs/Review/REVIEW_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
+`docs/Archive/Review/REVIEW_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
 
 | ID | Open item | Why it cannot wait |
 |---|---|---|

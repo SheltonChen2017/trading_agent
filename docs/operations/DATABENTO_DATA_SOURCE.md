@@ -4,6 +4,14 @@ Databento is the selected real-market-data source for the volatility ML work.
 Alpaca remains the broker and execution source. The supported market-data
 request remains deliberately narrow:
 
+For ACER, Databento is only an **optional provider candidate**. ACER readiness
+is defined by the eleven capability checks in `research/acer/capability.py`,
+not by possession of a Databento key or use of this volatility-ML path. An
+independently adequate QuantConnect, CRSP, or other audited route is valid
+without Databento; conversely, this module's existence does not prove ACER
+history, delisted coverage, terminal-return semantics, fundamentals, or
+licence suitability.
+
 ```text
 dataset: EQUS.SUMMARY
 schema: ohlcv-1d

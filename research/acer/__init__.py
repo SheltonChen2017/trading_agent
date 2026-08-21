@@ -1,7 +1,7 @@
 """ACER data backbone: verified vendor snapshot -> canonical event dataset.
 
 This package is data plumbing for the Analyst-Consensus ETF Rotation program
-(`docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`). It carries no
+(`docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`). It carries no
 research authority whatsoever:
 
 - it contains no signal definition, rating-scale mapping, threshold, or gate,

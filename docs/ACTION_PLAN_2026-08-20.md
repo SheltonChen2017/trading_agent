@@ -158,6 +158,29 @@ The identity hazard (FB vs ANTM handled oppositely; BBBY reused) is heightened
 because this Massive delivery has neither ISIN nor exchange; ACER requires a
 security-master cross-reference and must refuse ambiguous joins.
 
+**Update, same day: the event backbone is implemented and independently
+corrected** (`research/acer/`,
+`docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md`, review record
+`docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md`, counter-review
+`docs/Review/REVIEW_2026-08-20_ACER_BACKBONE_COUNTERREVIEW.md`). The review
+chain is complete: all seven review findings were confirmed, two of the
+corrections themselves were corrected, and the round is closed.
+Snapshot A still yields 584,916 canonical events at 99.64%
+retention from 587,046 rows, with 2,130 named refusals; the corrections do
+not change those counts. They do replace the derived dataset contract and
+identity, fully authenticate lineage/count metadata, refuse every occurrence
+of a duplicated vendor id, prevent incomplete snapshots from publishing a
+canonical dataset, bind rows and lineage to one verified manifest read, and
+rename the 2017+ era so it no longer overstates vendor-confirmed clock
+semantics. The counter-review corrected the refusal-detail wording, which
+moves the identity once more: the current v2 identity is
+`acer-analyst-events-73c36f9de1841b0a`, with the events blob byte-identical
+to the review's. Earlier identities are superseded and the dataset has not
+yet been materialized. This is still data plumbing: no price join, signal,
+rating scale, or research look. It sizes the unresolved issuer-identity
+problem — 9,677 distinct tickers with zero ISIN and zero exchange — and
+ambiguity-refusing mapping is the next ACER-1 step.
+
 ### ACER-2 is the decisive milestone; scope and price that alone
 
 The ladder runs ACER-0 freeze → ACER-1 data audit → **ACER-2 stock-level

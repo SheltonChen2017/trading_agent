@@ -43,6 +43,8 @@ from pathlib import Path
 
 import requests
 
+from research.acer.snapshot import SnapshotError, load_verified_rows
+
 BASE = "https://api.massive.com"
 RATINGS = "/benzinga/v1/ratings"
 PAGE_LIMIT = 1000
@@ -87,7 +89,6 @@ DELISTED_PROBES = [
 
 RATING_FIELDS_FOR_MISSINGNESS = ("previous_rating", "time", "firm", "rating")
 ISSUER_IDENTITY_FIELDS = ("isin", "exchange", "company_name", "ticker")
-SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def _api_key() -> str:
@@ -209,80 +210,19 @@ def download(out_root: Path) -> Path:
     return snap
 
 
-def _load_manifest(snap: Path) -> dict:
-    """Load a snapshot manifest only after its recorded hash verifies."""
-    manifest_path = snap / "manifest.json"
-    hash_path = snap / "manifest.sha256"
-    try:
-        manifest_bytes = manifest_path.read_bytes()
-        recorded_hash = hash_path.read_text(encoding="utf-8").strip().lower()
-    except OSError as exc:
-        raise SystemExit(f"REFUSED: snapshot manifest is missing or unreadable: {exc}")
-    if not SHA256_RE.fullmatch(recorded_hash):
-        raise SystemExit("REFUSED: manifest.sha256 is not one lowercase SHA-256")
-    actual_hash = hashlib.sha256(manifest_bytes).hexdigest()
-    if actual_hash != recorded_hash:
-        raise SystemExit("REFUSED: manifest hash mismatch")
-    try:
-        manifest = json.loads(manifest_bytes)
-    except (TypeError, ValueError) as exc:
-        raise SystemExit(f"REFUSED: manifest is not valid JSON: {exc}")
-    if not isinstance(manifest, dict) or not isinstance(manifest.get("partitions"), list):
-        raise SystemExit("REFUSED: manifest has no partitions list")
-    return manifest
-
-
 def _load_rows(snap: Path, allow_incomplete: bool) -> list[dict]:
-    manifest = _load_manifest(snap)
-    if not manifest.get("complete", False) and not allow_incomplete:
-        raise SystemExit(
-            "REFUSED: snapshot is marked incomplete (a partition did not "
-            "terminate naturally). Pass --allow-incomplete to analyse anyway."
-        )
-    rows: list[dict] = []
-    seen_files: set[str] = set()
-    for partition in manifest["partitions"]:
-        if not isinstance(partition, dict) or not isinstance(partition.get("pages"), list):
-            raise SystemExit("REFUSED: malformed partition metadata")
-        if manifest.get("complete", False) and not partition.get("terminated_naturally", False):
-            raise SystemExit("REFUSED: complete manifest contains unterminated partition")
-        partition_rows = 0
-        for meta in partition["pages"]:
-            if not isinstance(meta, dict):
-                raise SystemExit("REFUSED: malformed page metadata")
-            file_name = meta.get("file")
-            if not isinstance(file_name, str) or Path(file_name).name != file_name:
-                raise SystemExit("REFUSED: unsafe page filename in manifest")
-            if file_name in seen_files:
-                raise SystemExit(f"REFUSED: duplicate page reference: {file_name}")
-            seen_files.add(file_name)
-            expected_hash = meta.get("sha256")
-            if not isinstance(expected_hash, str) or not SHA256_RE.fullmatch(
-                expected_hash.lower()
-            ):
-                raise SystemExit(f"REFUSED: invalid page hash for {file_name}")
-            try:
-                payload = (snap / "raw" / file_name).read_bytes()
-            except OSError as exc:
-                raise SystemExit(f"REFUSED: page is missing or unreadable: {exc}")
-            if hashlib.sha256(payload).hexdigest() != expected_hash.lower():
-                raise SystemExit(f"REFUSED: hash mismatch for {file_name}")
-            try:
-                body = json.loads(payload)
-            except (TypeError, ValueError) as exc:
-                raise SystemExit(f"REFUSED: invalid JSON in {file_name}: {exc}")
-            results = body.get("results") if isinstance(body, dict) else None
-            if not isinstance(results, list) or not all(isinstance(row, dict) for row in results):
-                raise SystemExit(f"REFUSED: {file_name} has a malformed results list")
-            if meta.get("rows") != len(results):
-                raise SystemExit(f"REFUSED: row-count mismatch for {file_name}")
-            partition_rows += len(results)
-            rows.extend(results)
-        if partition.get("rows") != partition_rows:
-            raise SystemExit(
-                f"REFUSED: row-count mismatch for partition {partition.get('year')}"
-            )
-    return rows
+    """Load and verify a snapshot, converting refusals to CLI exits.
+
+    The verification rules themselves live in ``research.acer.snapshot``,
+    which is the single authoritative implementation shared with the ACER
+    backbone. Keeping two copies would let the audit tool and the dataset
+    builder disagree about which snapshots are trustworthy, which is exactly
+    the kind of drift this repository's consolidation rule exists to stop.
+    """
+    try:
+        return load_verified_rows(snap, allow_incomplete)
+    except SnapshotError as exc:
+        raise SystemExit(str(exc)) from exc
 
 
 def _parse_action_date(value: object) -> dt.date | None:

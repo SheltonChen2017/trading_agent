@@ -19,7 +19,9 @@ from research.acer.capability import (
     STATUS_UNAVAILABLE,
     STATUS_UNMEASURED,
     CapabilityFinding,
+    ProviderFinding,
     assess_capabilities,
+    assess_provider_candidates,
     check_databento_path,
     check_delisting_returns,
     check_earnings_surprise_control,
@@ -49,6 +51,11 @@ def test_a_finding_cannot_be_created_without_evidence():
         CapabilityFinding(
             requirement="x", status=STATUS_AVAILABLE, evidence="  ", blocks_acer2=False
         )
+
+
+def test_a_provider_finding_cannot_be_created_without_a_provider():
+    with pytest.raises(ValueError, match="provider"):
+        ProviderFinding(provider=" ", status=STATUS_UNMEASURED, evidence="e")
 
 
 def test_an_available_capability_cannot_also_block():
@@ -123,7 +130,8 @@ def test_databento_is_unmeasured_rather_than_available_or_absent():
     either way would be a claim nobody has earned."""
     finding = check_databento_path()
     assert finding.status == STATUS_UNMEASURED
-    assert finding.blocks_acer2 is True
+    assert finding.provider == "Databento"
+    assert not hasattr(finding, "blocks_acer2")
     assert "databento_source.py" in finding.evidence
 
 
@@ -134,6 +142,14 @@ def test_databento_capability_is_not_inferred_from_a_credential(monkeypatch):
     assert finding.status == STATUS_UNMEASURED
     assert "db-not-a-real-key" not in finding.evidence
     assert "API_KEY" not in finding.evidence.upper()
+
+
+def test_databento_is_an_optional_provider_diagnostic_not_a_requirement():
+    requirements = {finding.requirement for finding in assess_capabilities()}
+    providers = {finding.provider for finding in assess_provider_candidates()}
+    assert "Databento" in providers
+    assert all("Databento" not in requirement for requirement in requirements)
+    assert len(requirements) == 11
 
 
 def test_delisting_returns_are_reported_missing():
@@ -346,13 +362,27 @@ def test_every_requirement_carries_its_own_evidence():
 def test_unmeasured_is_distinct_from_unavailable_in_the_summary():
     """Collapsing the two would let 'nobody checked' read as 'we checked'."""
     findings = _by_requirement(assess_capabilities())
-    assert (
-        findings["Databento point-in-time bars and reference"].status
-        == STATUS_UNMEASURED
-    )
+    assert check_databento_path().status == STATUS_UNMEASURED
     assert (
         findings["terminal returns for delisted securities"].status
         == STATUS_UNAVAILABLE
     )
     report = summarize_capabilities(list(findings.values()))
     assert report["unmeasured"] >= 1 and report["unavailable"] >= 1
+
+
+def test_optional_provider_diagnostic_cannot_be_smuggled_into_required_summary():
+    findings = assess_capabilities()
+    provider = check_databento_path()
+    with pytest.raises(ValueError, match="not provider diagnostics"):
+        summarize_capabilities([*findings, provider])  # type: ignore[list-item]
+
+
+def test_current_required_capability_counts_exclude_provider_choice():
+    report = summarize_capabilities(assess_capabilities())
+    assert report["requirements"] == 11
+    assert report["available"] == 1
+    assert report["unavailable"] == 5
+    assert report["unmeasured"] == 5
+    assert report["blocking"] == 10
+    assert report["acer2_runnable"] is False

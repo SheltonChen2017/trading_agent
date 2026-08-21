@@ -4697,7 +4697,10 @@ and `QC_API_TOKEN` present in the current Codex desktop process;
 `DATABENTO_API_KEY` was absent. None of those names was present in Windows
 User or Machine environment storage, so another process need not inherit the
 same values. No secret value was printed or committed. The `lean` command is
-not installed. Credentials establish possible authentication only: they do
+now installed and the owner reports completing authentication and workspace
+initialization; the later local measurement described below supersedes the
+earlier missing-command observation. Credentials establish possible
+authentication only: they do
 not prove dataset entitlements, licence permission, coverage, or fitness for
 ACER. No Massive, Benzinga, QuantConnect, Databento, broker, or other service
 was called in this round.
@@ -4709,7 +4712,7 @@ implemented, closed, or superseded material is under `docs/Archive/`;
 process, operations, active research evidence, and current references retain
 their functional subfolders. Lifecycle indexes explain the rule. The final
 inventory is four root files, thirteen files under `docs/Plan/`, 167 under
-`docs/Archive/`, seven active research records, and two active references.
+`docs/Archive/`, seven active research records, and three active references.
 Repository links and active-document guards were updated, and a path-integrity
 scan found no missing `docs/...` targets.
 
@@ -4737,6 +4740,25 @@ next authorized step, and then only by linking to the detailed associated
 record. Documentation-only and handoff commits do not recursively trigger
 another documentation cycle. The new active-document guard passed **48
 tests** after the policy was recorded.
+
+The owner then completed the Windows LEAN CLI authentication and organization-
+workspace initialization. Codex independently observed the LEAN executable,
+`C:\QuantConnect\ACER`, and that workspace's `lean.json`; it did not read the
+configuration or credentials. Docker was not visible on the current Codex
+desktop process's `PATH`, so a local sample backtest remains the installation's
+unverified end-to-end proof rather than a completed ACER research run. Commit
+`3cefeb1` adds the active reference
+`docs/reference/LOCAL_LEAN_WINDOWS_SETUP.md`, covering Docker/WSL 2, supported
+Python and CLI installation, `PATH` repair, the intentionally invisible token
+prompt, removal of embedded clipboard whitespace without printing the token,
+safe option parsing, Windows clock repair, an isolated workspace, sample-data
+verification, and cloud-versus-local data boundaries. No user ID, API token,
+credential value, licensed data, or research outcome is recorded. This makes
+the lifecycle inventory three active references rather than the two counted
+before the guide was added. The Action Plan is unchanged because installation
+documentation did not change sequencing, milestone status, a gate, or the
+next authorized step. The focused active-document suite passed **48 tests**
+on the guide commit.
 
 ## 8. What is next
 

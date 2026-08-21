@@ -1,10 +1,10 @@
 # Independent review — ACER data-capability checker
 
-Date: 2026-08-21  
-Reviewer: Codex  
-Implementation remote: `origin/user/claude/acer-databento-capability-20260821`  
-Merge base: `381615bffc97195b34b2db34ddb4369f50123aeb`  
-Exact reviewed head: `9304f9cc9ccc6f734a4c90b0a1469b6f1e76436d`  
+Date: 2026-08-21
+Reviewer: Codex
+Implementation remote: `origin/user/claude/acer-databento-capability-20260821`
+Merge base: `381615bffc97195b34b2db34ddb4369f50123aeb`
+Exact reviewed head: `9304f9cc9ccc6f734a4c90b0a1469b6f1e76436d`
 Review branch: `codex/review-acer-databento-capability-20260821`
 
 ## Outcome

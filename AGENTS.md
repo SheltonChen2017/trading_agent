@@ -32,9 +32,13 @@ that exact pushed snapshot on a separate `user/claude/` review branch under the
 standing review workflow. This assignment may be changed only by a later owner
 instruction; it does not weaken the requirement for independent review.
 
-When a phase completes or the owner reorders priorities, update
-`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` rather than
-letting the plan drift stale.
+Every implementation or review commit series must update the relevant
+feature/research/operations/review document and `docs/SESSION_HANDOFF.md`
+before handoff or push. Do not update unrelated documents. Update
+`docs/ACTION_PLAN_2026-08-20.md` only when sequencing, milestone status, a
+gate, or the next authorized step changes, and then add only a concise
+reference to the authoritative associated document instead of duplicating
+its implementation detail or evidence.
 
 ## Standing workflow references
 

@@ -60,6 +60,25 @@ inspect:
   live-readiness milestone definitions; and
 - the closest tests and contracts for the code being changed.
 
+### Documentation update discipline
+
+Every implementation or review commit series must include, before it is
+handed off or pushed, updates to **only** the documents whose truth changed
+and to `docs/SESSION_HANDOFF.md`. A relevant document is the feature plan,
+research record, operational record, review report, contract, or run ledger
+that owns the changed behavior or evidence. Do not touch unrelated documents
+merely to create matching timestamps or repeat the same narrative.
+
+`docs/ACTION_PLAN_2026-08-20.md` is a sequencing index. Update it only when
+priority, milestone status, a gate, or the next authorized step changes, and
+make that update a concise reference to the authoritative associated
+document. Do not copy implementation detail, findings, test output, evidence
+tables, or handoff prose into the Action Plan. Implementation/review commits
+may precede their records so those records can name exact hashes, but the
+branch is not a complete durable snapshot until the relevant-document and
+handoff commits follow in the same series. Documentation-only and handoff
+commits do not recursively require another handoff update.
+
 Use this priority order when instructions differ:
 
 1. safety and authorization boundaries;
@@ -394,3 +413,8 @@ Two standing owner-mandated records (2026-08-02) accompany every handoff:
   Follow `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` for its required
   contents; verify machine-local observations rather than copying them
   forward.
+- For every implementation or review commit series, update the authoritative
+  document that owns the changed behavior/evidence and no unrelated records.
+  The Action Plan receives only a concise status/sequencing reference when its
+  own truth changes; detailed implementation and validation belong in the
+  associated document and Session Handoff.

@@ -60,6 +60,20 @@ def test_docs_root_contains_only_current_coordination_and_active_plan() -> None:
     assert not list((ROOT / "docs").glob("REVIEW_*.md"))
 
 
+def test_documentation_update_policy_keeps_action_plan_as_reference_index():
+    """Owner decision: update relevant records + handoff, without duplication."""
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    instructions = _root_text("CLAUDE.md")
+    agents = _root_text("AGENTS.md")
+
+    for text in (action, instructions, agents):
+        lowered = text.lower()
+        assert "unrelated documents" in lowered
+        assert "concise reference" in lowered
+    assert "sequencing index" in instructions.lower()
+    assert "docs/session_handoff.md" in instructions.lower()
+
+
 def _active_epochs(text: str) -> set[str]:
     """Epoch ids the document asserts are currently ACTIVE."""
     return set(

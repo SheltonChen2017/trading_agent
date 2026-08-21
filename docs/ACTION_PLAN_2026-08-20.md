@@ -13,6 +13,13 @@ plans are in `docs/Plan/`, and completed or superseded plans are in
 done when this action plan schedules it. `docs/operations/OPERATIONAL_FACTS.md`
 remains authoritative for machine-local operational state.
 
+**Update rule (owner decision, 2026-08-21):** this Action Plan changes only
+when sequencing, milestone status, a gate, or the next authorized step
+changes. Each change is a concise reference to the authoritative feature,
+research, operations, or review document. Implementation detail, findings,
+evidence, and validation results belong in that associated document and
+`docs/SESSION_HANDOFF.md`; unrelated documents are not updated.
+
 **Nothing here grants authority.** Live trading, funded accounts, autonomous
 execution, model promotion, epoch rolls, scheduled-task changes, and every
 ML/LLM boundary in `CLAUDE.md` remains exactly as constrained. Prioritising

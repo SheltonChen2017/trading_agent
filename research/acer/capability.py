@@ -50,6 +50,7 @@ _REQ_DELISTING_RETURNS = "terminal returns for delisted securities"
 _REQ_ISSUER_IDENTITY = "durable point-in-time issuer identity"
 _REQ_VALUE_CONTROL = "book-to-market value control"
 _REQ_SECTOR = "sector classification (ACER-0A.7 proposes GICS)"
+_REQ_EARNINGS_SURPRISE = "point-in-time earnings-surprise control"
 
 _REQUIRED_REQUIREMENTS = frozenset(
     {
@@ -60,7 +61,25 @@ _REQUIRED_REQUIREMENTS = frozenset(
         _REQ_ISSUER_IDENTITY,
         _REQ_VALUE_CONTROL,
         _REQ_SECTOR,
+        _REQ_EARNINGS_SURPRISE,
     }
+)
+
+# ACER-0A.7 names eight controls. Five of them -- momentum, size, liquidity,
+# volatility, and analyst coverage -- are arithmetic over point-in-time prices,
+# share counts, and the ratings corpus itself, so they carry no data
+# requirement beyond `_REQ_PIT_PRICES` and the already-audited corpus. The
+# three that need their own source are value, sector, and earnings surprise,
+# and each has its own check below. This mapping is written down because the
+# summary refuses anything but the *complete* set, and a checklist that
+# asserts completeness while omitting a frozen control makes the omission
+# harder to notice rather than easier.
+_CONTROLS_COVERED_BY_PRICES = (
+    "momentum",
+    "size",
+    "liquidity",
+    "volatility",
+    "analyst coverage",
 )
 
 
@@ -293,6 +312,41 @@ def check_sector_classification() -> CapabilityFinding:
     )
 
 
+def check_earnings_surprise_control() -> CapabilityFinding:
+    """ACER-0A.7 requires a point-in-time standardized earnings surprise.
+
+    `data/earnings_data.py` does supply an earnings history, but it reads
+    yfinance and exposes the vendor's own `surprise_pct`. That fails the
+    requirement twice over: the provider is pinned `point_in_time_data=false`
+    across this repository, and ACER-0A.5's proposal explicitly declines to
+    trust a vendor-computed surprise percentage, requiring actual and
+    estimated EPS to be preserved so this project can freeze its own formula.
+    """
+    source = _read("data/earnings_data.py")
+    if not source:
+        return CapabilityFinding(
+            requirement=_REQ_EARNINGS_SURPRISE,
+            status=STATUS_UNAVAILABLE,
+            evidence="no data/earnings_data.py module found",
+            blocks_acer2=True,
+        )
+    vendor_percentage = "surprise_pct" in source
+    yfinance_backed = "yfinance" in source
+    return CapabilityFinding(
+        requirement=_REQ_EARNINGS_SURPRISE,
+        status=STATUS_UNAVAILABLE,
+        evidence=(
+            "data/earnings_data.py is yfinance-backed="
+            f"{yfinance_backed} and exposes the vendor percentage "
+            f"surprise_pct={vendor_percentage}; ACER-0A.2 requires a "
+            "point-in-time estimate available before the report and a "
+            "surprise formula frozen by this project, neither of which this "
+            "module supplies"
+        ),
+        blocks_acer2=True,
+    )
+
+
 _CHECKS = (
     check_trading_session_calendar,
     check_point_in_time_prices,
@@ -301,6 +355,7 @@ _CHECKS = (
     check_durable_issuer_identity,
     check_value_control_source,
     check_sector_classification,
+    check_earnings_surprise_control,
 )
 
 

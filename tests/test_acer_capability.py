@@ -19,6 +19,7 @@ from research.acer.capability import (
     assess_capabilities,
     check_databento_path,
     check_delisting_returns,
+    check_earnings_surprise_control,
     check_point_in_time_prices,
     check_sector_classification,
     check_trading_session_calendar,
@@ -138,6 +139,36 @@ def test_the_value_control_has_no_local_source():
     finding = check_value_control_source()
     assert finding.status == STATUS_UNAVAILABLE
     assert finding.blocks_acer2 is True
+
+
+def test_the_earnings_surprise_control_has_no_point_in_time_source():
+    """ACER-0A.7 names earnings surprise as a required control, and the only
+    local earnings module is yfinance-backed and exposes the vendor's own
+    percentage — the exact value ACER-0A.5 declines to trust."""
+    finding = check_earnings_surprise_control()
+    assert finding.status == STATUS_UNAVAILABLE
+    assert finding.blocks_acer2 is True
+    assert "surprise_pct" in finding.evidence
+
+
+def test_the_checklist_covers_every_control_that_needs_its_own_source():
+    """The summary refuses anything but the *complete* set, so a control
+    silently missing from the checklist would make the incompleteness harder
+    to notice, not easier. Value, sector and earnings surprise each need a
+    distinct source; the other five ACER-0A.7 controls are arithmetic over
+    prices and the ratings corpus and are covered by the price requirement.
+    """
+    requirements = {finding.requirement for finding in assess_capabilities()}
+    assert any("value" in name for name in requirements)
+    assert any("sector" in name for name in requirements)
+    assert any("earnings-surprise" in name for name in requirements)
+    assert set(capability._CONTROLS_COVERED_BY_PRICES) == {
+        "momentum",
+        "size",
+        "liquidity",
+        "volatility",
+        "analyst coverage",
+    }
 
 
 def test_sector_is_sic_not_the_proposed_gics():

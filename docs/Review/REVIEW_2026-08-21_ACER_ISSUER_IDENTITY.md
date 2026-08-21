@@ -56,10 +56,13 @@ flags. Its exact lineage is:
   implementation: misleading `unambiguous` output, case-split ticker identity,
   and same-day order dependence.
 - Corrected focused ACER/lineage/document suite: **128 passed in 7.02s**.
-- Complete repository suite and final active-document rerun: recorded in the
-  final session handoff after the exact final tree is validated.
-- Compilation over the changed product/test surface passed; final required
-  compile and Git checks are recorded in the handoff.
+- Complete repository suite: **4,446 passed / 0 failed / 25 warnings in
+  661.90s** on Python 3.13.14.
+- Final active-document suite: **40 passed in 0.68s** before the validation
+  result was recorded; rerun after that record is part of the final Git gate.
+- Required `compileall` over `assistant`, `backtest`, `data`, `execution`,
+  `ml`, `research`, `risk`, `scripts`, `signals`, `strategies`, `tests`, and
+  the root Python modules passed.
 
 ## Acceptance and remaining gate
 

@@ -3972,6 +3972,14 @@ name-evidence lower-bound diagnostic, **not an allowlist** and not a security
 master. Issuer mapping remains blocked pending an owner-selected external
 point-in-time security-master path. No milestone completes.
 
+Validation on the completed review tree: the focused ACER/lineage/document
+surface passed 128 tests; the complete repository suite passed **4,446 tests
+with zero failures and 25 warnings in 661.90 seconds** on Python 3.13.14; the
+active-document suite passed 40 tests before this result was recorded; and
+the required `compileall` surface including `research/` passed. Final
+active-document, diff, status, ordered-commit, narrow-secret, exact-remote,
+and shared-checkout checks gate the single authorized push.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**

@@ -96,6 +96,29 @@ _CONTROLS_COVERED_BY_PRICES = (
     "analyst coverage",
 )
 
+# Every control ACER-0A.7 freezes, mapped to exactly how it is accounted for:
+# either a derivation over inputs already required, or the named requirement
+# that supplies it. `tests/test_acer_capability.py` parses the frozen document
+# and asserts this mapping's keys are exactly the controls named there.
+#
+# The mapping is exact rather than a substring search on purpose. The first
+# version of that test matched control words loosely against the joined
+# requirement strings, and the fragment `earnings surprise (acer-0a` -- left
+# by a regex that stopped at the period inside "ACER-0A.2" -- matched
+# `_REQ_SECTOR`'s own "(ACER-0A.7 proposes GICS)" text. The guard written to
+# catch a missing control was itself defeated by fuzzy matching, so the
+# accounting is spelled out instead of inferred.
+_CONTROL_ACCOUNTING = {
+    "momentum": "derived from point-in-time bars",
+    "liquidity": "derived from point-in-time bars",
+    "volatility": "derived from point-in-time bars",
+    "analyst coverage": "derived from the ratings corpus",
+    "size": _REQ_SIZE_CONTROL,
+    "value": _REQ_VALUE_CONTROL,
+    "sector": _REQ_SECTOR,
+    "earnings surprise": _REQ_EARNINGS_SURPRISE,
+}
+
 
 @dataclass(frozen=True)
 class CapabilityFinding:

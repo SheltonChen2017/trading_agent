@@ -8,9 +8,12 @@ blocking, and `unmeasured` must stay distinct from `unavailable`.
 """
 from __future__ import annotations
 
+import re
+
 import pytest
 
 import research.acer.capability as capability
+from research.acer.capability import REPO_ROOT
 from research.acer.capability import (
     STATUS_AVAILABLE,
     STATUS_UNAVAILABLE,
@@ -173,6 +176,69 @@ def test_the_checklist_covers_every_control_that_needs_its_own_source():
         "volatility",
         "analyst coverage",
     }
+
+
+def test_every_control_named_in_the_frozen_document_is_accounted_for():
+    """Derive the control list from the frozen document instead of memory.
+
+    Twice in successive rounds this checklist was asserted complete and was
+    not: the first time it omitted earnings surprise, the second it omitted
+    size, the ratings corpus, corporate actions, and security eligibility.
+    Both omissions came from writing the list from memory rather than reading
+    the specification that fixes it.
+
+    So this test parses ACER-0A.7's frozen control list and requires every
+    control to be accounted for exactly one way — either as arithmetic over
+    prices and the corpus, or by a named requirement with its own check. A
+    control that is neither fails here rather than being silently treated as
+    satisfied.
+    """
+    text = (
+        REPO_ROOT
+        / "docs"
+        / "research"
+        / "ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md"
+    ).read_text(encoding="utf-8")
+    # Strip parentheticals from the WHOLE document before matching. Doing it
+    # afterwards left "ACER-0A.2" inside the sentence, and the regex then
+    # stopped at that period and produced a fragment.
+    normalized = re.sub(r"\([^)]*\)", "", " ".join(text.split()))
+    match = re.search(
+        r"\*\*Controls\*\*, all point-in-time as of the eligibility session:(.+?)\.",
+        normalized,
+    )
+    assert match, "the frozen control sentence was not found — fix the test, not the guard"
+
+    controls = {
+        part.strip().strip(",").removeprefix("and ").strip().casefold()
+        for part in match.group(1).split(",")
+    }
+    controls = {name for name in controls if name}
+    # Fail loudly if the parse degrades, rather than passing vacuously on an
+    # empty or truncated set — the mirror case of this guard.
+    assert len(controls) == 8, f"expected 8 frozen controls, parsed {sorted(controls)}"
+
+    # Exact set equality, never a substring search: the previous version of
+    # this assertion matched a broken parse fragment against an unrelated
+    # requirement and passed while a control was missing.
+    assert controls == set(capability._CONTROL_ACCOUNTING), (
+        "the frozen control list and the accounting map disagree: "
+        f"only in document={sorted(controls - set(capability._CONTROL_ACCOUNTING))}, "
+        f"only in map={sorted(set(capability._CONTROL_ACCOUNTING) - controls)}"
+    )
+
+    # Every control accounted for by a named requirement must actually be in
+    # the required set, and every price-derived claim must be declared.
+    for control, accounting in sorted(capability._CONTROL_ACCOUNTING.items()):
+        if accounting.startswith("derived from"):
+            assert control in {
+                name.casefold() for name in capability._CONTROLS_COVERED_BY_PRICES
+            }, f"{control} claims derivation but is not in the declared list"
+        else:
+            assert accounting in capability._REQUIRED_REQUIREMENTS, (
+                f"{control} maps to {accounting!r}, which is not a required "
+                "requirement"
+            )
 
 
 def test_the_core_ratings_event_corpus_is_itself_required():

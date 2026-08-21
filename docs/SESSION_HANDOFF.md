@@ -29,8 +29,9 @@ review of both new commits, and 7cp the counter-review plus the committed
 capability checks. Section 7cq records Codex's independent review and
 fail-closed correction of those checks, and 7cr the counter-review that
 attempted to complete the requirement set. Section 7cs records Codex's
-independent correction of the remaining false-completeness path; 7cs and
-section 8 are the current development state.
+independent correction of the remaining false-completeness path, and 7ct the
+counter-review that fixed the derivation guard itself; 7ct and section 8 are
+the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4557,6 +4558,70 @@ failed / 25 dependency warnings in 740.68 seconds** on Python 3.13.14.
 document, diff, staged-content, ordered-commit, secret, remote-head, and clean
 status checks passed before publication. The shared checkout remained on
 `user/claude/acer-capability-cr-20260821` at `6fc0040` and was not modified.
+
+## 7ct. Counter-review: the guard that failed its own test (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-capability-completion-cr-20260821`, based on
+`40a0a37`. Full record:
+`docs/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW.md`.
+
+**ACERCCR-001 confirmed on every limb.** Last round I raised an
+incompleteness finding against this checklist, fixed it by adding one
+requirement, and asserted completeness again — while still omitting four
+more, including **the ratings corpus itself**, which is ACER's signal input.
+Also confirmed: point-in-time security type and primary listing (the frozen
+universe rule), point-in-time corporate actions (the outcome is a
+split- and dividend-adjusted total return), and point-in-time shares
+outstanding — because the frozen size control is *log market cap*, which
+prices alone cannot produce, so my placement of size in
+`_CONTROLS_COVERED_BY_PRICES` was wrong. Twelve requirements now, eleven
+blocking.
+
+**The instructive failure is mine, and it is inside the fix.** I wrote a
+guard that derives the control list from the frozen document so completeness
+would stop depending on my memory. **That guard did not detect the omission
+it was written for.** It matched controls against the joined requirement
+strings with a loose `any(word in requirements)` test, and a regex that
+stopped at the period inside "ACER-0A.2" left the fragment
+`earnings surprise (acer-0a` — whose `(acer-0a` substring matched
+`_REQ_SECTOR`'s own text `"sector classification (ACER-0A.7 proposes GICS)"`.
+The missing control counted as accounted-for by an unrelated requirement.
+
+I found it only by mutation-testing the guard against the two omissions that
+had **actually happened**: removing the size requirement turned it red,
+removing the earnings requirement left it green. Half-working, and it looked
+healthy. Fixed by stripping parentheticals from the whole document before
+matching, and replacing the substring search with an explicit
+`_CONTROL_ACCOUNTING` map asserted by **exact set equality**. Both real
+omissions now fail the guard.
+
+### Two rules earned, narrower than "be careful"
+
+1. **Test a new guard against the specific failures that already happened**,
+   not invented ones. Testing only the size case would have shipped a broken
+   guard that passed.
+2. **A completeness check must compare sets exactly**, never by substring.
+   Substring matching cannot distinguish "this requirement covers that
+   control" from "these two strings share characters".
+
+The pattern across five rounds is now precise: fuzzy reasoning let my prose
+claim completeness it did not have, and fuzzy matching let my guard claim
+coverage it did not have. Same defect, one level down.
+
+Validation on the final tree: full suite **4,482 passed / 0 failed / 25
+warnings** in 705.08 seconds. `compileall` over `research/` and `tests/`
+passed; `git diff --check` passed; document guards reran green after every
+edit including after these counts were inserted; Python 3.13.14. The repaired
+derivation guard was mutation-tested against both omissions that actually
+occurred, and now fails on each.
+
+Untested surface, stated plainly: the derivation guard reads one frozen
+document's control sentence. It does **not** derive the universe, outcome, or
+signal-input requirements from their documents — those four were added by
+review, not by a check, so the same class of omission remains possible for
+every requirement outside the control list. Extending the derivation to the
+universe and outcome rules is the obvious next hardening and has not been
+done.
 
 ## 8. What is next
 

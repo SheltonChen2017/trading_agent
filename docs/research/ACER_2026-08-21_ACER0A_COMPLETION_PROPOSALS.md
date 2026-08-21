@@ -143,35 +143,31 @@ both.
   chronology, a fact already measured in the identity work. The ambiguous
   collision clears the prior live state for that encoding at that session.
 
-### The zero-event rule degrades the half-life cells unequally — owner decision needed
+### The zero-event rule is an owner decision; the submitted scan is not decision-grade
 
 The zero-event rule above means a later `maintains` **erases** an earlier
-upgrade's decayed signal, and `maintains` alone is 349,317 of 584,916 events
-(59.7%). That consequence is not symmetric across the frozen half-life
-dimension, so it deserves an explicit ruling rather than arriving as a side
-effect. Measured on Snapshot A (aggregate counts only; the session conversion
-uses a 252/365 approximation and is stated as approximate):
+upgrade's decayed signal, while the alternative below lets that revision keep
+decaying. The choice therefore changes the signal and must be frozen before a
+development run.
 
-| Measure | Value |
-|---|---:|
-| directional actions (`upgrades` + `downgrades`) | 121,637 |
-| never superseded by a later action from the same firm on the same issuer | 35,118 (28.9%) |
-| superseded, of which by a `maintains` | 86,519, of which 40,247 |
-| median time to supersession | 212 calendar days |
+The counter-review attempted to quantify this effect, but the measurement is
+**not decision-grade** and its submitted percentages are withdrawn from this
+active proposal. It grouped events by **raw ticker** and **raw firm** strings
+before issuer identity or firm aliases exist, so it cannot establish “the same
+firm on the same issuer.” More importantly, its reported half-life percentages
+counted **all later actions** that replaced state, including later upgrades and
+downgrades that replace state under both options; they did not isolate the
+incremental effect of non-directional zero events. It also converted calendar
+days with `252/365` rather than counting exact NYSE trading sessions. Those
+quantities cannot support an owner choice between the two rules.
 
-**Share of directional actions superseded before one half-life elapses:**
-
-| Half-life | Truncated before one half-life |
-|---:|---:|
-| 21 sessions | **7.1%** |
-| 63 sessions | **19.1%** |
-| 126 sessions | **32.2%** |
-
-The longest half-life loses nearly a third of its signals to truncation while
-the shortest loses about a fourteenth. A cell that cannot realize its longer
-memory is partly measuring the state rule rather than memory length — the
-same *class* of problem as normalizing decay away, which is why it is
-surfaced here rather than left to implementation.
+A decision-grade measurement, if the owner wants one before ruling, must wait
+for resolved issuer identity and a frozen firm-alias map, use exact NYSE
+trading sessions, and report at least three separate cumulative-incidence
+curves: replacement by a directional action, replacement by a non-directional
+zero event, and expiry at `2 * H`. The tool, grouping keys, source hashes, and
+result hash must be committed and independently reviewed before its numbers
+enter this proposal.
 
 **Two defensible options, for the owner to choose between:**
 

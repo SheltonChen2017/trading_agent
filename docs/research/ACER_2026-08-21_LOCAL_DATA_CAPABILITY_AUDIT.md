@@ -5,10 +5,14 @@ repository. No network call, no vendor API, no price or outcome join, no
 research look.** It answers two named open items with measured or sourced
 answers rather than leaving them unmeasured.
 
-**Headline: no. ACER-2 as frozen cannot run on the local path, and the
-binding reason is not the missing security master — it is that the local
-path has no returns for delisted securities, which the frozen universe rule
-explicitly requires.**
+**Corrected headline after independent review: the current EDGAR/yfinance path
+cannot run ACER-2 as proposed. Repository-wide local feasibility remains
+unresolved because the original audit omitted the already reviewed Databento
+price, reference, and point-in-time adjustment path. That path is an
+unmeasured candidate, not an established solution: this host has no captured
+Databento artifacts or credential in the reviewing process, and its history,
+delisted coverage, terminal-return semantics, access, and cost have not been
+audited for ACER.**
 
 ## 1. What the owner's engine ruling asks for
 
@@ -19,7 +23,7 @@ survivorship bias is a disqualifying defect, not a convenience", and the
 proposed outcome (ACER-0A.7) is a 21-session forward total return. Those two
 commitments together decide this audit.
 
-## 2. Three independent findings, in increasing severity
+## 2. Findings on the current EDGAR/yfinance path
 
 ### 2.1 There is no local LEAN (measured 2026-08-20)
 
@@ -28,9 +32,10 @@ no `map_files` directory exists anywhere under `C:\git`. The QuantConnect
 client also allowlists only `projects/`, `files/`, `compile/`, `backtests/`,
 `optimizations/` and `authenticate`, deliberately excluding data endpoints.
 
-### 2.2 The only local price source is not point-in-time
+### 2.2 The production read-path price source is not point-in-time
 
-`data/price_source.py` defines one provider, `YFinanceDailyBars`, which
+`data/price_source.py` defines the production read-path provider,
+`YFinanceDailyBars`, which
 declares **`provides_point_in_time_lineage = False`** in its own contract,
 and `ml/availability.py` pins yfinance datasets to
 `point_in_time_data=false`. Its bars are split- and dividend-adjusted as of
@@ -57,17 +62,49 @@ The frozen universe rule requires delisted securities to remain eligible for
 the period they were listed. The frozen outcome requires a forward return.
 The local path can supply the first and not the second, for precisely the
 population whose absence causes survivorship bias. A study run this way
-would produce an upward-biased result whose bias could not be bounded — the
+would inherit the module's documented survivorship limitation — the
 failure this project has already documented for its own universe
 (`SIVB`, `SBNY`, `FRC` are absent from the legacy `UNIVERSE`).
 
-## 3. ACER-0A.3 — the value control has no local source at all
+The missing terminal outcome is disqualifying without assuming its sign. The
+module docstring's blanket statement that the omission biases results upward
+has not been independently established for the complete mixture of failures,
+cash acquisitions, mergers, and other exits; the direction can differ by exit
+type. The honest repository-wide claim is that the magnitude and direction of
+the omitted terminal-return effect are unresolved until the required exit
+coverage is measured.
 
-No book value, shareholders' equity, or book-to-market field exists in any
-module under `data/`. The proposed value control in ACER-0A.7 has **no
-implementation path locally**. EDGAR company facts could in principle supply
-it, but nothing in this repository extracts it today and doing so is new
-work, not configuration.
+### 2.4 The original audit omitted an existing Databento research path
+
+Calling yfinance the repository's sole local price source was false.
+`ml/databento_source.py` implements cost-estimated, immutable capture of
+unadjusted `EQUS.SUMMARY` daily bars; `ml/databento_pit.py` captures
+receipt-timestamped statistics plus point-in-time `security_master` and
+`adjustment_factors` reference records; and
+`ml/databento_authoritative.py` implements vintage-correct listing and
+adjustment resolution in `build_authoritative_feature_batch`.
+`docs/operations/DATABENTO_DATA_SOURCE.md` identifies Databento as the selected
+external market-data vendor. These modules do not make ACER runnable by
+themselves, but omitting them made the repository-wide negative conclusion
+unsound.
+
+The independent review found no `artifacts/databento/` directory in the shared
+checkout and no `DATABENTO_API_KEY` visible to the reviewing process. It did
+not contact Databento. Before this path can support ACER, a separately
+authorized structural audit must establish account/reference access, available
+history, symbol and corporate-action coverage for known delisted names,
+whether a final bar or adjustment captures the complete terminal investor
+return, exact point-in-time listing identity, price/volume coverage, licence,
+cost, and immutable artifact lineage. Until then Databento is an **unmeasured
+candidate**, not proof that ACER-2 can or cannot run locally.
+
+## 3. ACER-0A.3 — the value control has no implemented ACER-ready source
+
+No ACER-ready book value, shareholders' equity, or book-to-market field exists
+in any current research data module. The proposed value control in ACER-0A.7
+has **no implemented local source**. EDGAR company facts could in principle
+supply it, but nothing in this repository extracts the required standardized,
+point-in-time value today and doing so is new work, not configuration.
 
 ## 4. A specification mismatch worth fixing before any freeze
 
@@ -97,29 +134,39 @@ gap. EDGAR is a promising route to issuer identity, not a finished one.
 
 | Item | Answer |
 |---|---|
-| **ACER-0A.3** (value control source under local LEAN) | **Negative.** No local book-value source exists. |
-| **ACER-0A.4** (local data for prices, corporate actions, delisted securities, session calendar) | **Negative, decisively.** No LEAN data; the sole price provider is explicitly not point-in-time; and there are no delisting returns, with an upward bias of unknowable size. |
+| **ACER-0A.3** (value control source under local LEAN) | **Negative for current implementation.** No ACER-ready local book-value source exists; a new point-in-time EDGAR extractor or licensed source is required. |
+| **ACER-0A.4** (local data for prices, corporate actions, delisted securities, session calendar) | **Negative for the current EDGAR/yfinance path; unresolved repository-wide.** The existing Databento path was not audited for ACER and may or may not close the price/reference/terminal-return requirements. |
 
 ## 7. Options for the owner
 
 None of these is chosen here; each is a different trade.
 
-1. **Acquire point-in-time equity data with delisted coverage** (LEAN data
-   subscription, or an equivalent vendor). This is the only option that lets
-   ACER-2 run as frozen. It is a purchase.
-2. **Authorize a read-only QuantConnect data path** and run ACER-2 in the
+1. **Audit the existing Databento path for ACER without buying or downloading
+   data until separately authorized.** First measure account-product access,
+   history, delisted symbol/bar/reference coverage, terminal-return semantics,
+   cost, and licence. The reviewed adapters already cover immutable capture,
+   point-in-time reference records, and vintage adjustment logic, but no ACER
+   artifact or coverage proof exists.
+2. **Acquire another point-in-time equity source with delisted and terminal
+   return coverage** (LEAN data subscription or an equivalent vendor), after
+   comparing it with the measured Databento option. This is a purchase.
+3. **Authorize a read-only QuantConnect data path** and run ACER-2 in the
    cloud, accepting that cloud datasets cannot be hashed by this project —
    a disclosed gap against the content-addressing rule, and one that also
-   requires resolving whether ratings may be uploaded at all.
-3. **Amend the frozen universe rule** to exclude delisted securities. This is
+   requires resolving whether ratings may be uploaded at all and amending the
+   owner ruling that local LEAN is authoritative.
+4. **Amend the frozen universe rule** to exclude delisted securities. This is
    cheap and **not recommended**: it reintroduces survivorship bias into a
    study whose whole purpose is an honest out-of-sample answer, and this
    project has already measured how that flatters results.
-4. **Build the EDGAR route further** — extract book value, extend the ticker
+5. **Build the EDGAR route further** — extract book value, extend the ticker
    map to historical and dead issuers from filing history. Real work, no
-   purchase, and it still leaves finding 2.3 (no delisted price bars)
-   unsolved, so it is a complement to option 1 or 2 rather than a substitute.
+   purchase, and it still leaves the EDGAR/yfinance price limitation unsolved,
+   so it complements a measured market-data option rather than replacing it.
 
-**Recommendation:** options 1 or 2 are the only ones that permit ACER-2 as
-frozen. Option 3 would make the milestone answerable and the answer
-worthless.
+**Recommendation:** do not freeze a vendor conclusion from this audit. First
+perform a zero-outcome, separately authorized Databento capability and cost
+audit. If that path fails the delisted and terminal-return requirements,
+compare another licensed local source with a read-only QuantConnect path.
+Dropping delisted names would make the milestone answerable and the answer
+unreliable.

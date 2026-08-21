@@ -9,12 +9,22 @@ Counter-review branch: `user/claude/acer-prereg-cr-20260821`.
 
 ## Outcome
 
-**Accepted; all six findings confirmed, two of them by direct computation.**
+**Accepted after independent correction; all six Codex findings confirmed,
+two of them by direct computation.**
 ACERPR-001 and ACERPR-003 are serious methodological defects in my draft, and
 both would have survived into a frozen preregistration had they not been
-caught. One new P2 is raised against Codex's own correction (CCPR-001): its
-zero-event rule interacts with the half-life dimension in a way nobody has
-measured, and this counter-review measures it.
+caught. The semantic concern behind CCPR-001 is valid: a non-directional zero
+event and an untouched decaying revision are different signals, so the owner
+must choose. Its submitted quantification was not valid evidence for that
+choice and is corrected below.
+
+**Independent correction, 2026-08-21:** CCPR-001's scan grouped by **raw
+ticker** and **raw firm** before issuer/firm identity exists, called those
+groups “the same firm on the same issuer,” converted calendar days rather
+than counting exact sessions, and reported percentages for **all later
+actions**, not the incremental non-directional-zero events at issue. The scan
+is **not decision-grade**. Its numbers are retained below as invalidated
+submitted evidence, not as support for either state rule.
 
 No API call, network access, price join, backtest, research look, purchase,
 or operational mutation occurred. Aggregate counts only were read from the
@@ -24,7 +34,7 @@ authenticated Snapshot A; no licensed row is disclosed.
 
 | Commit | Disposition | Reason |
 |---|---|---|
-| `1eb3649` | **Accepted after correction** | The aggregation, residualization, bootstrap and refusal-vocabulary fixes are all correct and necessary. CCPR-001 covers an unmeasured consequence of its own state rule. |
+| `1eb3649` | **Accepted after correction** | The aggregation, residualization, bootstrap and refusal-vocabulary fixes are all correct and necessary. Its zero-event state rule still requires an owner choice, but CCPR-001 did not validly measure that choice. |
 | `0d29b7a` | **Accepted** | Findings, evidence and severities are accurate; its 15-string refusal claim reproduced exactly. |
 | `4fbea95` | **Accepted** | Validation record consistent with the tree. |
 | `734d521` | **Accepted** | Handoff accurate; extended here. |
@@ -44,7 +54,7 @@ authenticated Snapshot A; no licensed row is disclosed.
 
 | ID | Priority | Status | Location | Issue and impact | Evidence | Reason | Correction | Verification |
 |---|---:|---|---|---|---|---|---|---|
-| CCPR-001 | P2 | Measured this round; owner decision required | ACER-0A.6 event values / per-firm state | Codex's correction makes non-directional actions create an **explicit zero event that replaces the firm's prior state**. Because `maintains` alone is 349,317 of 584,916 events (59.7%), a later `maintains` silently erases an earlier upgrade's decayed signal. The consequence is not symmetric across the frozen half-life dimension, so the same class of defect as ACERPR-001 — a rule that flattens the differences between the three half-life cells — may be present in the fix for it. Nobody had measured it. | Measured on Snapshot A: of 121,637 directional actions, 35,118 (28.9%) are never superseded by a later action from the same firm on the same issuer; 86,519 are, and 40,247 of those are superseded by a `maintains`. Median time to supersession is 212 calendar days. Truncation before one half-life elapses: **7.1% at H=21, 19.1% at H=63, and 32.2% at H=126**. | A frozen family dimension whose cells are differentially degraded by a state rule is partly measuring the state rule rather than memory length. This must be an explicit owner choice, not a side effect discovered after a result. | Not silently changed. The measurement is added to the proposal document so the owner rules on it deliberately, with two named alternatives: keep the zeroing rule and accept the asymmetry, or let a non-directional action leave the prior revision decaying untouched. | Reproduced from the authenticated snapshot; the session conversion uses a 252/365 approximation, stated as such. |
+| CCPR-001 | P2 | **Partially correct; measurement invalidated by independent review** | ACER-0A.6 event values / per-firm state | Codex's correction makes a non-directional action create an explicit zero event that replaces the prior revision; leaving the prior revision to decay is a materially different signal and remains an owner choice. The submitted claim that the rule was proved to degrade half-life cells unequally was not established. | **Invalidated submitted evidence retained for audit:** 121,637 directional actions; 35,118 called never superseded; 86,519 called superseded; 40,247 called superseded by `maintains`; reported 7.1% / 19.1% / 32.2%. The scan used raw ticker/raw firm groups, not resolved issuer/firm identity, and its percentages counted all later actions rather than non-directional zero events. An independent raw-key reproduction also did not match those counts. | The owner must choose the signal semantics, but invalid aggregate evidence must not steer that choice or be described as a measurement of the incremental zero-event effect. | Withdraw the percentages from the active proposal. Retain the two semantic alternatives. Require any future measurement to use resolved issuer and firm identities, exact NYSE trading sessions, separate directional/non-directional/expiry incidence, committed code, and hashed lineage. | Active-document guards fail on the submitted overclaim and pass after correction; no replacement quantitative claim is made. |
 
 No P0 or P1 issue was found in Codex's corrections.
 
@@ -54,11 +64,11 @@ Two of my six defects were failures of elementary algebra and elementary
 method — a weighted mean that cancels its own weights, and a residual fitted
 on the outcomes it is then scored against. Both are the kind of error that a
 frozen preregistration would have carried straight into an irreversible
-run, which is precisely what the review gate exists to catch. That the fix
-for the first one then introduced an unmeasured version of the same problem
-is worth noting without embarrassment: this is the third consecutive round in
-which a correction needed a correction, and the process is working as
-designed.
+run, which is precisely what the review gate exists to catch. The state rule
+in the first correction exposed a legitimate semantic choice, but this
+counter-review's attempted measurement of that choice was itself invalid.
+The independent review withdraws those percentages without choosing either
+state rule.
 
 ## Result and milestone effect
 

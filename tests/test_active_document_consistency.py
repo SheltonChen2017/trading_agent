@@ -1095,3 +1095,52 @@ def test_acer_completion_proposal_discloses_every_measured_unmapped_rating():
         "trading sell",
     ):
         assert f"`{rating}`" in proposal
+
+
+def test_acer_state_semantics_measurement_does_not_overclaim_raw_keys():
+    """A pre-identity raw-ticker scan cannot be called same-issuer evidence."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    counterreview = _text("Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md")
+
+    for document in (proposal, counterreview):
+        assert "raw ticker" in document.lower()
+        assert "raw firm" in document.lower()
+        assert "not decision-grade" in document.lower()
+
+    assert "exact NYSE trading sessions" in proposal
+    assert "7.1%" not in proposal
+    assert "32.2%" not in proposal
+
+
+def test_acer_local_capability_audit_includes_existing_databento_path():
+    """Repository capability cannot be inferred from the production reader alone."""
+    audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
+    source = _root_text("ml/databento_source.py")
+    pit = _root_text("ml/databento_pit.py")
+    authority = _root_text("ml/databento_authoritative.py")
+
+    assert "EQUS.SUMMARY" in source
+    assert "security_master" in pit
+    assert "build_authoritative_feature_batch" in authority
+    for path in (
+        "ml/databento_source.py",
+        "ml/databento_pit.py",
+        "ml/databento_authoritative.py",
+    ):
+        assert f"`{path}`" in audit
+    assert "unmeasured candidate" in audit.lower()
+    assert "sole local price provider" not in audit.lower()
+    assert "magnitude and direction" in audit
+    assert "are unresolved" in audit
+
+
+def test_acer_active_docs_limit_the_negative_finding_to_the_audited_path():
+    """The failed EDGAR/yfinance path must not erase an unaudited vendor path."""
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
+    handoff = _text("SESSION_HANDOFF.md")
+
+    for document in (action, audit, handoff):
+        assert "EDGAR/yfinance path" in document
+        assert "Databento" in document
+        assert "repository-wide local feasibility remains unresolved" in document.lower()

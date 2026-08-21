@@ -26,7 +26,9 @@ ACER-0A completion proposals. Section 7cl records Codex's independent
 correction review of those proposals, 7cm the counter-review of that review,
 7cn the local data-capability audit, 7co Codex's independent correction
 review of both new commits, and 7cp the counter-review plus the committed
-capability checks; 7cp and section 8 are the current development state.
+capability checks. Section 7cq records Codex's independent review and
+fail-closed correction of those checks; 7cq and section 8 are the current
+development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -4404,6 +4406,51 @@ dependencies, so they establish what the repository *declares*, not what a
 vendor would actually deliver. A capability reported `UNMEASURED` stays
 unmeasured until someone exercises it; the checks cannot promote it.
 
+## 7cq. Independent review of the ACER capability checker (Codex, 2026-08-21)
+
+Codex reviewed exact remote
+`origin/user/claude/acer-databento-capability-20260821` from merge base
+`381615bffc97195b34b2db34ddb4369f50123aeb` through ordered commits
+`477b9971f52770b2d4cb920414de9a02681f2fee` and
+`9304f9cc9ccc6f734a4c90b0a1469b6f1e76436d`. The counter-review commit is
+**accepted**; the capability-checker commit is **accepted after correction**.
+The complete record is
+`docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`.
+
+Three P2 findings were reproduced. **ACERDCR-001:** the submitted
+`CapabilityFinding` allowed an unavailable or unmeasured required input to be
+non-blocking, contradicting its own fail-closed contract. **ACERDCR-002:**
+`summarize_capabilities()` accepted a caller-selected subset, so passing only
+the available calendar finding returned `acer2_runnable=true` while omitting
+all six blockers. **ACERDCR-003:** the checker called a package “importable”
+after `find_spec()` only; a simulated broken import still returned calendar
+status `available` and non-blocking.
+
+Correction `c9ee971` makes every unavailable or unmeasured requirement block,
+requires the exact seven-requirement checklist once each before summarizing,
+and imports the pinned calendar package and constructs its NYSE calendar.
+Review record/action-plan commit `907ccac` and formatting follow-up `8ae1933`
+preserve the dispositions, ledger and corrected sequencing state.
+Four dangerous-direction cases failed red on exact pushed `9304f9c` and pass
+green after correction. The factual current result is unchanged: one
+available, four unavailable, two unmeasured, six blocking, and
+`acer2_runnable=false`.
+
+No credential was read and no vendor, QuantConnect, broker, database, task,
+deployment, price, outcome, LEAN run, backtest, or research look was touched.
+The checker proves local declarations and installed capability only; it does
+not establish that Databento supplies ACER's required data. Databento remains
+unmeasured and the owner authorization gate for a zero-outcome structural
+capability/cost/licence audit is unchanged. No ACER milestone completes.
+
+Validation on the corrected review tree: the four dangerous-direction cases
+failed red on exact pushed `9304f9c` and the capability suite passed **18/18**
+after correction; the expanded focused ACER/calendar/Databento/import-boundary
+and document set passed **215/215 in 12.82 seconds**; the active-document gate
+passed **47/47**; the complete repository suite passed **4,471 / 0 failed /
+25 warnings in 658.86 seconds**; and required `compileall` including
+`research/` passed on Python 3.13.14.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -4450,6 +4497,11 @@ candidate, not an accepted ACER source: a separately authorized structural
 audit must establish access, history, known-delisted coverage, terminal-return
 semantics, price/volume and corporate-action completeness, licence, and cost
 before any purchase, download, or outcome work.
+
+The committed seven-requirement capability checker is independently accepted
+after fail-closed correction (section 7cq). It currently reports one
+available, four unavailable, two unmeasured, six blocking and
+`acer2_runnable=false`; it cannot substitute for the external Databento audit.
 
 **The issuer-mapping step is BLOCKED and needs an owner ruling (sections
 7ch–7ci).** There is no local LEAN or LEAN data on this host, and the QC client's
@@ -4613,14 +4665,15 @@ docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
 docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
 docs/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md,
 docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md,
+docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
 docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
 docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/alpha-result.md.
 The vendor-audit and event-backbone review chains are closed and merged
-(sections 7ca and 7cd). The newest independent review is section 7co on
-`codex/review-acer-local-data-audit-20260821`; its exact remote head is the
-review handoff for counter-review. **ACER-0A decisions are partially frozen,
+(sections 7ca and 7cd). The newest independent review is section 7cq on
+`codex/review-acer-databento-capability-20260821`; its exact remote head is
+the review handoff for counter-review. **ACER-0A decisions are partially frozen,
 but its executable preregistration is incomplete; ACER-0B is deliberately
 not frozen.** The dataset
 identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
@@ -4629,7 +4682,9 @@ closed null; SHW-4 is prospective. SBP is superseded by ACER and SBR-1 is
 closed on a measurement. The CCPR-001 truncation percentages are withdrawn:
 they did not isolate the proposed state-semantics choice. The current
 EDGAR/yfinance path cannot support ACER's delisted outcomes, but Databento is
-an existing **unmeasured candidate**, not a validated solution. Next: obtain
+an existing **unmeasured candidate**, not a validated solution. The corrected
+capability checker reports ACER-2 blocked and refuses incomplete checklists;
+it does not replace vendor evidence. Next: obtain
 an owner ruling before any Databento API access, purchase or download; if
 authorized, run only a zero-outcome structural capability/cost/licence audit.
 Also close ACER-0A.1–0A.10, run the separately authorized Benzinga Earnings

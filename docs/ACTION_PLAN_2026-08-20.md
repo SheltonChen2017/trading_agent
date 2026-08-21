@@ -61,7 +61,7 @@ documentation changes).
 |---|---|---|
 | Paper evidence | **`paper-epoch-006` is active** since 2026-08-19 on deployed `c9d0740`; first observation verified the same day; 60-session / 30-order clock counting | `docs/operations/OPERATIONAL_FACTS.md` |
 | Overlay shadow | `overlay-epoch-001` (defensive carry) registered with a 2026-07-31 baseline; 24-month sufficiency floor; tasks reinstalled Interactive after the S4U failure | `docs/reference/SHADOW_OBSERVATION_DESIGN.md` |
-| Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first *verified* capture.** Code, tests and installer merged and reviewed; no snapshot is committed here. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. The machine-local task and artifact state has not been measured, so neither "the task was never installed" nor "zero snapshots exist" is a verified operational fact | `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` |
+| Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first verified capture.** Code, tests and installer remain, but the read-only host measurement found the task absent and zero capture artifacts. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. | `docs/operations/OPERATIONAL_FACTS.md` |
 
 **Research programs and their verdicts:**
 
@@ -72,7 +72,7 @@ documentation changes).
 | Defensive carry (SHW) | Prospective only; no result exists or may be inferred before sufficiency |
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
-| ACER (Analyst-Consensus ETF Rotation) | **DRAFT** contract and new priority 1; no data purchased, no run, no result |
+| ACER (Analyst-Consensus ETF Rotation) | Priority 1. Ratings history purchased and structurally audited; event backbone reviewed. **ACER-0A owner decisions partially frozen but executable preregistration incomplete; no real-outcome run and no result.** |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0
@@ -125,15 +125,110 @@ heavily arbitraged effects in the literature. Aggregating revisions across an
 ETF's holdings also dilutes toward that ETF's common factor, so scores across
 large-cap technology funds will be strongly collinear.
 
-### ACER-0 — owner freeze (the only thing blocking everything else)
+### ACER-0A decisions partially frozen 2026-08-20; ACER-0B deliberately deferred
 
-The owner freezes `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`:
-signal encoding, decay grid, eligibility, control set, benchmarks, gates,
-**cell counts, and a run budget**. The last two are not paperwork. The source
-specification asks for multiple encodings, five decay half-lives, sum and
-average variants, raw/coverage-adjusted/breadth-filtered specifications, three
-bearish implementations and a leverage overlay; without a declared family size
-and gate, that is a false-discovery generator over one historical sample.
+**The owner split the freeze.** ACER-0A freezes the decisive stock-level
+ACER-2 test; ACER-0B — ETF benchmark and investability decisions — is
+deliberately left unfrozen so those choices are not forced before a
+stock-level signal is shown to exist. ACER-0B requires a separate owner act
+and is reachable only if ACER-2 passes. The operative contract is
+`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`.
+
+What ACER-0A froze: **six cells**, not twelve — two encodings (ordinal
+notch change, direction-only sign) x three half-lives (21, 63, 126 sessions)
+x one coverage-neutral per-firm mean aggregation x one 21-session horizon.
+Raw sum was excluded as a second aggregation because it mainly rewards
+analyst coverage and would double the family for it. The primary cell is
+named in advance (notch change, 63 sessions), the primary statistic is
+out-of-sample residualized cross-sectional IC, the expected sign is positive,
+and the threshold is Bonferroni **0.05/6** applied to the primary cell
+itself. Secondary cells are descriptive; an isolated secondary pass cannot
+rescue a failed primary. **A null primary closes ACER**, with no post-result
+tuning of anything.
+
+Run budget: unlimited synthetic tests that never touch real outcomes, **one**
+frozen development execution, **one** confirmation execution if the first
+gate passes, and **zero** ACER-3 executions until ACER-0B is frozen. Every
+execution, refusal, error, and accidental launch is a permanently counted
+look; a corrected rerun may repair code but never the hypothesis.
+
+**Corrected update 2026-08-21: ACER-2 cannot run on the current
+EDGAR/yfinance path; repository-wide local feasibility remains unresolved**
+(`docs/research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md`).
+`data/pit_universe.py` states in its own docstring that prices for delisted
+securities are unavailable and that there are **no delisting returns**, which
+"biases results upward and the size of the bias is not knowable from this
+data". The frozen universe requires delisted names to stay eligible while
+listed and the outcome is a forward return, so that path can supply some
+historical population evidence but not the required outcome. Its production
+price provider declares `provides_point_in_time_lineage = False`, and no
+ACER-ready local book-value source exists.
+
+The submitted audit incorrectly omitted the repository's selected Databento
+research path: `ml/databento_source.py`, `ml/databento_pit.py`, and
+`ml/databento_authoritative.py` already implement immutable bars, point-in-time
+security/adjustment capture, and vintage-correct adjustment logic. No local
+Databento artifact or credential was present during independent review, and
+its ACER history, delisted coverage, terminal-return semantics, access, cost,
+and licence have not been measured. Databento is therefore an **unmeasured
+candidate**, not a solution. **Owner ruling needed:** authorize a structural
+Databento capability/cost audit, acquire another point-in-time source with
+delisted and terminal-return coverage, or amend the local-engine ruling to use
+a read-only QC data path. Dropping delisted names remains not recommended.
+Independent review accepted the two submitted commits after correction in
+`docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md`;
+correction `32a16b0` also withdrew the counter-review's invalid state-semantics
+percentages without choosing either proposed rule.
+
+**A committed structural capability checker now replaces the prose-only
+inventory, and its completeness claim is independently accepted only after a
+second correction**
+(`research/acer/capability.py`,
+`docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`,
+`docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`). Its current
+complete twelve-requirement result on the isolated review tree is one
+available, six unavailable, five unmeasured, eleven blocking, and
+`acer2_runnable=false`. Correction `c9ee971`
+requires the complete checklist exactly once, makes every unavailable or
+unmeasured requirement blocking, and verifies that the pinned NYSE calendar
+can actually be imported and constructed rather than treating module
+discovery as importability. Claude correction `6fc0040` then added the omitted
+earnings-surprise control, but still classified log-market-cap size as
+price-only and omitted the normalized ratings corpus, point-in-time shares,
+security-type/primary-listing eligibility, and corporate actions required by
+the frozen signal, controls, universe, and total-return outcome. Independent
+correction `14a3a83` gives each its own fail-closed finding and absence
+mutation. These are local structural declarations, not vendor evidence:
+Databento remains unmeasured and the owner gate above is unchanged.
+
+**Proposals for ACER-0A.1 and 0A.5–0A.9 now exist**
+(`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level
+rating scale measured against the corpus's 54 distinct rating strings with an
+explicit refusal class rather than a default, the decay and aggregation
+equations, control and outcome definitions, and an estimation protocol with a
+frozen bootstrap seed. **They are drafts awaiting owner confirmation, not
+freezes.** One point deserves an early decision: encoding (b) can be taken
+from the vendor's own `rating_action` field, which makes half the six-cell
+family independent of the rating scale entirely.
+
+**Independent review accepted those proposals after correction.** The
+submitted weight-sum normalization could cancel decay; validation outcomes
+fit their own purportedly out-of-sample residuals; the embargo direction and
+stationary-bootstrap name contradicted the repository toolkit; action/refusal
+state semantics were incomplete; and eleven low-frequency refused rating
+strings were omitted from the disclosure. Correction `1eb3649` uses a
+firm-count denominator with explicit expiry, training-only control fits and a
+pre-validation embargo, the existing circular moving-block bootstrap with a
+pre-outcome calibration gate, fail-closed action/state rules, and the complete
+measured refusal vocabulary. These corrections improve the choices offered
+to the owner; they do not freeze or authorize them.
+
+**Ten named items must still close before the single development run**
+(ACER-0A.1–0A.10). In addition to the robustness rule, surprise formula,
+value source and local-data inventory, the open ledger now names the exact
+rating scale, signal construction, control/outcome formulas, estimation and
+significance protocol, development/confirmation and error-slot rules, and
+point-in-time universe semantics. None may be settled after seeing a result.
 
 ACER-0 also settles the ratings vendor. **Update 2026-08-20: the owner
 purchased the Benzinga expansion via Massive and authorized a read-only data
@@ -181,6 +276,44 @@ rating scale, or research look. It sizes the unresolved issuer-identity
 problem — 9,677 distinct tickers with zero ISIN and zero exchange — and
 ambiguity-refusing mapping is the next ACER-1 step.
 
+**Update 2026-08-21: the mapping step is BLOCKED, and the blocker is
+load-bearing** (`docs/research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
+There is no local LEAN or LEAN data on this host, so the current engine/data
+configuration cannot close ACER-0A.4; and the QC client
+allowlists only project/file/compile/backtest paths, with a comment stating
+the rule exists so `data/read` cannot pass — a reviewed control that was not
+widened. The half needing no external data was built instead and independently
+corrected: a name-only diagnostic flags **2,885 of 9,677 tickers (35.7% of
+events)**, though
+most flags are cosmetic vendor label churn that a suffix alias table would
+collapse. **The decisive result is negative: the detector misses BBBY**,
+because the vendor labels all 270 of its events `Bed Bath & Beyond` including
+after the 2023 bankruptcy and symbol reuse. Name evidence alone is therefore
+insufficient, the flag count is a lower bound, and an external security
+master with listing/delisting dates is required. Review removed the false
+`unambiguous` verdict: an unflagged ticker is now explicitly
+`no_name_based_ambiguity_evidence`, not safe or eligible. The review made
+same-day ordering deterministic (768 rather than
+the submitted 766 interleaving flags), canonicalized ticker case, and bound
+every diagnostic to the clean code commit, source manifest, normalized
+dataset, and assessment hash. **Owner ruling needed** on how to obtain the
+security master: audit the existing Databento reference path, install local
+LEAN with suitable data, widen the QC allowlist to a read-only data path, or
+nominate a different source.
+
+**Update 2026-08-20: engine and control-data rulings.** Local LEAN is the
+authoritative execution path and cloud execution is optional; reconstructable
+Benzinga rows stay off QuantConnect unless the owner supplies explicit
+evidence that the terms permit that transfer. QuantConnect access is
+authorized for **read-only symbol mapping only** — no upload, no price or
+outcome join, no backtest, no research look. The ACER-2 control set has a
+chosen candidate rather than an adopted one: the Massive/Benzinga Earnings
+expansion, with **$99** authorized for a one-month structural audit against
+eight criteria (history depth, delisted coverage, whether `estimated_eps` is
+genuinely pre-report, restatements by stable id, announcement timing and
+next-session availability, GAAP/adjusted/FFO consistency, missingness and
+issuer mapping, licence and retention). That audit consumes no research look.
+
 ### ACER-2 is the decisive milestone; scope and price that alone
 
 The ladder runs ACER-0 freeze → ACER-1 data audit → **ACER-2 stock-level
@@ -209,9 +342,11 @@ and the uploaded custom-data SHA-256.
 SBP-0 will not be run. The plan, its amendment ledger SBPA-001..011, and the
 four-round review chain that produced them are retained as the record of a
 reviewed design decision. **SBR-1's scheduled task must not be installed and
-its capture stream is closed**. No snapshot is committed, but the
-machine-local task and artifact state must be measured before asserting that
-none exists; no committed evidence or epoch is disturbed.
+its capture stream is closed**. No snapshot is committed, and as of
+2026-08-20 the machine-local state is **measured, not assumed**: the task is
+absent and zero capture artifacts exist anywhere under the plausible roots
+(`docs/operations/OPERATIONAL_FACTS.md`). The closure now rests on a
+measurement. No committed evidence or epoch is disturbed.
 The capture code, tests and installer remain in the tree; a future
 level-based hypothesis could revive them under a fresh preregistration.
 
@@ -222,10 +357,12 @@ These cost little but are the only prospective evidence the project owns.
 1. **`paper-epoch-006`**: leave it alone. Any deployment changes `code_commit`
    and closes the epoch, discarding its accumulated sessions. No roll without
    an explicit owner instruction and the runbook order.
-2. **Overlay tasks**: the first *automatic* firing after the Interactive
-   reinstall (2026-08-20, 14:45 local) is still the outstanding proof that the
-   scheduled path works. Verify it and record the result; a manual start
-   already succeeded, which is not the same event.
+2. **Overlay tasks: CLOSED 2026-08-20.** The first *automatic* firing after
+   the Interactive reinstall succeeded — Observe 14:45, Mature 14:55,
+   Sufficiency 15:05 local, all `LastTaskResult=0`, next occurrences rolled to
+   2026-08-21, and the operational `shadow_overlay.db` unchanged at 1
+   registration / 1 baseline observation / 0 outcomes (the correct mid-month
+   no-op). The S4U-to-Interactive repair is proved by an unattended run.
 3. **Watch items**: the epoch-006 `policy_fingerprint` change
    (`4a942cbc…` → `4086365c…`) is still unexplained and flagged for audit;
    CR-W3's first real AEP dividend is payable ~2026-09-10 and may fail closed
@@ -233,6 +370,20 @@ These cost little but are the only prospective evidence the project owns.
    deploy.
 4. **After every operational deploy or fast-forward, restart the app** — a
    server started before a deploy mixes pre- and post-deploy modules.
+5. **Two open reconciliation alerts reflected stale state, not a mismatch, at
+   the 2026-08-21T06:02Z read-only measurement** — diagnosed
+   read-only 2026-08-20 in
+   `docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`. Seven of
+   22 long gaps were checked and each matches a Windows sleep window; the
+   tasks are registered `WakeToRun=False` and `StartWhenAvailable=True`, and
+   20 clean reconciliations had completed since the last failure. Nothing was
+   acknowledged or changed. Awaiting an
+   owner decision on acknowledging the alerts and on whether to change sleep
+   or wake behaviour; **do not loosen the 30-minute or 5-minute thresholds**,
+   which are genuine execution-readiness gates. Epoch-006 evidence was intact
+   (2 observations for 2 sessions). A missed 23:30Z start is queued rather
+   than categorically skipped, but a late catch-up can still refuse or no-op
+   after the session-date or freshness boundary and may cost an observation.
 
 ---
 

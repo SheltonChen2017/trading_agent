@@ -998,3 +998,149 @@ def test_reference_index_matches_a_superseded_program_status():
         )
         assert "pending owner adoption" not in sbp_row.lower()
         assert "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md" in index
+
+
+def test_open_acer_freeze_ledger_cannot_be_called_executable():
+    """An open preregistration ledger and an executable freeze conflict.
+
+    This survives later completion: once every open item is resolved, remove
+    the open-ledger heading and this conditional stops constraining status.
+    """
+    freeze = _text("ACER_2026-08-20_ACER0A_FREEZE.md")
+    reference = _text("reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    if "Named open items that must close BEFORE the development run" in freeze:
+        assert "not yet an executable preregistration" in freeze
+        assert "preregistration is INCOMPLETE" in reference
+        assert "executable preregistration incomplete" in action
+
+
+def test_active_operational_docs_honor_start_when_available_semantics():
+    """Installed catch-up semantics must not be documented as a hard skip."""
+    installer = _root_text("scripts/install_windows_operational_tasks.ps1")
+    facts = _text("OPERATIONAL_FACTS.md")
+    diagnosis = _text("RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md")
+    if "-StartWhenAvailable" in installer:
+        assert "skipped rather than deferred" not in facts
+        assert "guarantees the critical check fails" not in diagnosis
+        assert "queued" in facts.lower()
+        assert "queued" in diagnosis.lower()
+
+
+def test_measured_sbr_absence_is_not_still_called_unmeasured():
+    """The active ACER plan must consume the durable host measurement."""
+    facts = _text("OPERATIONAL_FACTS.md")
+    acer = _text("reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
+    if "SBR-1 capture: measured absent" in facts:
+        assert "task and artifact state has not been measured" not in acer
+
+
+def test_active_acer_identity_docs_do_not_turn_missing_evidence_into_safety():
+    """The name-only diagnostic is a lower bound, never an allowlist."""
+    measurement = _text("research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md")
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    handoff = _text("SESSION_HANDOFF.md")
+
+    for document in (measurement, action, handoff):
+        assert "no_name_based_ambiguity_evidence" in document
+        assert "768" in document
+
+    assert "BBBY scores *unambiguous*" not in handoff
+    assert "allowlist" in measurement.lower()
+    assert "lower bound" in measurement.lower()
+    assert "external" in action.lower() and "security master" in action.lower()
+
+
+def test_acer_completion_proposal_does_not_normalize_away_decay():
+    """Half-life cells must attenuate stale events, not only reweight firms."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    assert "sum(w * notch) / N_live" in proposal
+    assert "sum(w * notch) / sum(w)" not in proposal
+    assert "age <= 2 * H" in proposal
+
+
+def test_acer_completion_proposal_defines_a_real_out_of_sample_residual():
+    """Validation outcomes cannot fit their own control residualization."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    assert "training rows only" in proposal
+    assert "without refitting on validation outcomes" in proposal
+    assert "immediately before each validation block" in proposal
+    assert "embargo after the test window" not in proposal
+
+
+def test_acer_completion_proposal_names_the_existing_bootstrap_contract():
+    """The frozen method must match the repository function it delegates to."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    engine = _root_text("backtest/engine.py")
+    assert "circular moving-block bootstrap" in proposal
+    assert "stationary block bootstrap" not in proposal
+    assert "synthetic null calibration" in proposal
+    assert "Uses a circular moving-block bootstrap" in engine
+
+
+def test_acer_completion_proposal_discloses_every_measured_unmapped_rating():
+    """Owner review needs the complete refusal vocabulary, not four examples."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    for rating in (
+        "developing",
+        "equalweight",
+        "gradually accumulate",
+        "hold neutral",
+        "performer",
+        "sector overweight",
+        "sector performer",
+        "sector underweight",
+        "speculative hold",
+        "trading buy",
+        "trading sell",
+    ):
+        assert f"`{rating}`" in proposal
+
+
+def test_acer_state_semantics_measurement_does_not_overclaim_raw_keys():
+    """A pre-identity raw-ticker scan cannot be called same-issuer evidence."""
+    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    counterreview = _text("Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md")
+
+    for document in (proposal, counterreview):
+        assert "raw ticker" in document.lower()
+        assert "raw firm" in document.lower()
+        assert "not decision-grade" in document.lower()
+
+    assert "exact NYSE trading sessions" in proposal
+    assert "7.1%" not in proposal
+    assert "32.2%" not in proposal
+
+
+def test_acer_local_capability_audit_includes_existing_databento_path():
+    """Repository capability cannot be inferred from the production reader alone."""
+    audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
+    source = _root_text("ml/databento_source.py")
+    pit = _root_text("ml/databento_pit.py")
+    authority = _root_text("ml/databento_authoritative.py")
+
+    assert "EQUS.SUMMARY" in source
+    assert "security_master" in pit
+    assert "build_authoritative_feature_batch" in authority
+    for path in (
+        "ml/databento_source.py",
+        "ml/databento_pit.py",
+        "ml/databento_authoritative.py",
+    ):
+        assert f"`{path}`" in audit
+    assert "unmeasured candidate" in audit.lower()
+    assert "sole local price provider" not in audit.lower()
+    assert "magnitude and direction" in audit
+    assert "are unresolved" in audit
+
+
+def test_acer_active_docs_limit_the_negative_finding_to_the_audited_path():
+    """The failed EDGAR/yfinance path must not erase an unaudited vendor path."""
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
+    handoff = _text("SESSION_HANDOFF.md")
+
+    for document in (action, audit, handoff):
+        assert "EDGAR/yfinance path" in document
+        assert "Databento" in document
+        assert "repository-wide local feasibility remains unresolved" in document.lower()

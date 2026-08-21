@@ -17,9 +17,21 @@ Claude's documentation/SBP audit, and section 7bt records Codex's independent
 correction review. Section 7bv records the later ACER replacement, 7bw its
 independent review, 7bx the counter-review, 7by the vendor audit, 7bz the
 independent correction review, 7ca the counter-review of that correction,
-7cb the ACER event backbone, 7cc its independent review, and 7cd the
-counter-review of that review; 7cd and section 8 are the current
-development state.
+7cb the ACER event backbone, 7cc its independent review, 7cd the
+counter-review of that review, 7ce the ACER-0A submission, 7cf Codex's
+independent correction review, 7cg the counter-review of that review, and
+7ch the submitted issuer-identity detector, 7ci Codex's independent
+correction review, 7cj the counter-review of that review, and 7ck the
+ACER-0A completion proposals. Section 7cl records Codex's independent
+correction review of those proposals, 7cm the counter-review of that review,
+7cn the local data-capability audit, 7co Codex's independent correction
+review of both new commits, and 7cp the counter-review plus the committed
+capability checks. Section 7cq records Codex's independent review and
+fail-closed correction of those checks, and 7cr the counter-review that
+attempted to complete the requirement set. Section 7cs records Codex's
+independent correction of the remaining false-completeness path, and 7ct the
+counter-review that fixed the derivation guard itself; 7ct and section 8 are
+the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -31,25 +43,27 @@ program is closed (`A-001`, `A-002`) and is no longer the entry point.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-20.md` — the go-to plan (ACER first)
-3. `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — the draft ACER
-   contract awaiting the owner's ACER-0 adoption
-4. `docs/reference/analyst-consensus-etf-strategy.pdf` — the owner-supplied
+3. `docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` — the **partially frozen
+   ACER-2 decision record** and its ACER-0A.1–0A.10 completion ledger
+4. `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — the ACER
+   contract shape; ACER-0A incomplete, ACER-0B deliberately still draft
+5. `docs/reference/analyst-consensus-etf-strategy.pdf` — the owner-supplied
    design narrative; the Markdown ACER contract governs where they differ
-5. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
+6. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
    the closed historical capture contract
-6. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
+7. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
    `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md` — the full
    SBP review chain, in order
-7. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
-8. `docs/operations/OPERATIONS_RUNBOOK.md`
-9. `docs/operations/MANDATE.md` (§2, §4, §6)
-10. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-11. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-12. `docs/alpha-result.md` — the permanent run ledger (append-only)
-13. `docs/Alpha_Test_Implementation_Plan.md` — closed program, historical
+8. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
+9. `docs/operations/OPERATIONS_RUNBOOK.md`
+10. `docs/operations/MANDATE.md` (§2, §4, §6)
+11. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+12. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+13. `docs/alpha-result.md` — the permanent run ledger (append-only)
+14. `docs/Alpha_Test_Implementation_Plan.md` — closed program, historical
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -3503,7 +3517,9 @@ Exact submitted snapshot: pushed
 `b8c46ce3c5b747ff4825ddb293ddfb526c1b684e`, one commit after base and
 merge-base `1c110d663d23455ebd7d4cfc0420b20ac01affe1`. Disposition:
 **accepted after correction**. Review branch
-`codex/review-acer-event-backbone-20260820` is local-only. Product/test
+`codex/review-acer-event-backbone-20260820` was local-only when this section
+was written; it has since been counter-reviewed (section 7cd) and merged, and
+the branch is deleted. Product/test
 correction `61abd6aeb8b2889bf9943b97af8224cd49a8c2d0` and
 review/documentation `aea84f4cc017f6e6a31091dee388c55b3e9b07fc` are committed
 separately; this section is the final handoff commit. Full record:
@@ -3630,6 +3646,983 @@ gates are unchanged: ambiguity-refusing issuer mapping, Snapshot B, the
 ACER-0 freeze, the earnings-control dataset, and dataset-specific permission
 before any reconstructable-data upload to QuantConnect.
 
+## 7ce. ACER-0A partial freeze and two read-only measurements (Claude, 2026-08-20)
+
+Branch: `user/claude/acer0a-freeze-20260820`, off `b58947e`. The owner issued
+ten decisions; this round records them and performs the two read-only
+measurements they authorized. **No purchase, price join, outcome access,
+backtest, upload, or ACER-2 run occurred, and nothing operational was
+changed.**
+
+**The freeze is split, and that is the substantive decision.**
+`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` freezes the owner's decisive
+stock-level choices, but not yet an executable ACER-2 preregistration;
+ACER-0B — ETF benchmark and investability choices — stays deliberately
+unfrozen so they are not forced before a stock-level signal is shown to
+exist. ACER-3's run budget is **zero** until the owner separately freezes
+ACER-0B.
+
+ACER-2 is **six cells, not twelve**: two encodings x three half-lives (21,
+63, 126 sessions) x one coverage-neutral per-firm mean x one 21-session
+horizon. Raw sum was cut as a second aggregation because it mainly rewards
+analyst coverage. Primary cell named in advance (notch change, 63 sessions),
+primary statistic out-of-sample residualized cross-sectional IC, expected
+sign frozen positive, threshold Bonferroni **0.05/6** applied to the primary
+cell itself — deliberately more conservative than testing a designated
+primary at 0.05. Secondary cells are descriptive only. A null primary closes
+ACER with no post-result tuning. Budget: unlimited synthetic tests that never
+touch real outcomes, one development execution, one confirmation execution;
+corrected reruns may repair code but never the hypothesis, and each is still
+a counted look. Stock universe frozen point-in-time with named refusals; ETF
+thresholds deferred. Local LEAN is authoritative and reconstructable Benzinga
+rows stay off QuantConnect absent explicit permission evidence; QC access is
+read-only symbol mapping only. Control data has a **candidate, not an
+adoption**: the Benzinga Earnings expansion, $99 for a one-month structural
+audit against eight criteria, with `eps_surprise_percent` distrusted and our
+own standardized-surprise formula frozen afterwards.
+
+**Ten items are named as still-open (ACER-0A.1–0A.10) and must close before
+the single development run.** The one I want the next reader to notice is
+ACER-0A.1: the owner's condition that the result "must not be driven by one
+year, sector, or a small number of securities" is frozen in principle but
+carries no number, and an unquantified robustness condition is decided while
+looking at the result — the exact failure the freeze exists to prevent. The
+document proposes a concrete rule (leave-one-year-out, leave-one-sector-out,
+and removal of the top 1% of contributing securities, each retaining sign and
+significance) and explicitly marks it as **awaiting owner confirmation rather
+than frozen**, because inventing the threshold silently would be the defect.
+The other items include the surprise formula, value source, local data
+inventory, exact rating scale and signal construction, all control/outcome
+formulas, estimation/significance and split protocol, error-slot and
+confirmation rules, and point-in-time universe semantics. Also flagged: a
+one-month audit subscription that is then cancelled re-raises the
+deletion-on-termination question, so an evidence snapshot may not outlive it.
+
+**SBR-1 measured absent** (`docs/operations/OPERATIONAL_FACTS.md`): the
+`TradingAgent-StrongBuy-Capture` task is not registered, no task matching
+StrongBuy/Capture/Ratings exists, and zero `snapshot-*.jsonl` files or
+capture manifests exist under any plausible root. The capture's output
+directory is caller-supplied at install time, so the search was by artifact
+filename rather than by a single default path. The closure now rests on a
+measurement instead of on absence of repository evidence. Nothing was
+installed or running, so there was nothing to stop for.
+
+**At the recorded read-only instant, both reconciliation alerts were stale
+state rather than a live mismatch**
+(`docs/operations/RECONCILIATION_ALERTS_2026-08-20_DIAGNOSIS.md`). Seven of
+22 long reconciliation gaps match a Windows sleep window exactly; 15 were
+not correlated. The paper tasks are registered `WakeToRun=False`, while
+`StartWhenAvailable=True` queues missed time-based starts for catch-up. Both
+alerts carry `matched=True, mismatches=0, errors=0`, and 20 clean
+reconciliations have completed on a 10-minute cadence since the last failure
+at 02:49Z. Nothing was acknowledged, closed, altered, or repaired. The
+recommendation is to acknowledge (owner action), decide deliberately about
+sleep or `WakeToRun`, and **not** loosen the 30-minute or 5-minute
+thresholds, which are real execution-readiness gates.
+
+**A correction I owe the record:** earlier in this session I twice reported
+epoch-006 as having "11 observations". That was the all-epoch total. Per
+epoch: 001=1, 002=1, 003=1, 004=3, 005=3, **006=2** — one for each trading
+session since the epoch opened, so nothing is missing, but the epoch is 2 of
+its required 60, not 11.
+
+**Overlay tasks closed as a byproduct.** The outstanding proof — the first
+*automatic* firing after the Interactive reinstall — succeeded: Observe
+14:45, Mature 14:55, Sufficiency 15:05 local on 2026-08-20, all
+`LastTaskResult=0`, with the operational `shadow_overlay.db` unchanged at 1
+registration / 1 baseline observation / 0 outcomes. `OPERATIONAL_FACTS.md`
+and the action plan previously described this as pending.
+
+Validation on the final tree: full suite **4,417 passed / 0 failed / 25
+warnings** in 677.78 seconds, unchanged from the previous round because this
+round changed no code. `compileall` over the required surface including
+`research/` passed; `git diff --check` passed; Python 3.13.14. The
+document-consistency guards were rerun green after every edit, including
+after these counts were inserted.
+
+One guard finding worth recording, because it was a real staleness and not a
+false positive: `test_no_document_calls_a_merged_commit_unreachable` failed
+on this branch. Section 7cc and the resume prompt still described Codex's
+review branch, and the product-correction commit it names, as unreachable —
+which stopped being true when the owner merged PR #290. Both places were
+corrected to say the branch had that status when written and has since been
+merged and deleted. The guard was not weakened, and it fired twice here: the
+first draft of this very paragraph reproduced the pattern by quoting the hash
+beside the claim it was describing.
+
+## 7cf. Independent ACER-0A freeze review (Codex, 2026-08-21)
+
+Exact submitted remote: `origin/user/claude/acer0a-freeze-20260820` at
+`3a98fefb0808e4e9e4b3bc185ee59c12b1449bac`, based on and merge-based at
+`b58947e589c6fa92ed498f57f68ba0590048303f`. The range contained exactly one
+commit, which is **accepted after correction**. Full report:
+`docs/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md`.
+
+Review branch: `codex/review-acer0a-freeze-20260820`. Ordered Codex commits
+before this handoff are:
+
+1. `edc0612` — correct the ACER-0A freeze, operational scheduler facts and
+   active-document regression guards;
+2. `08955d6` — record the independent review and corrected action-plan state;
+3. this separate handoff commit (the branch tip).
+
+The owner authorized exactly one final push after all work completed. This
+branch is intended to be published once to
+`origin/codex/review-acer0a-freeze-20260820` for Claude's counter-review; the
+final reviewer report must verify the exact remote head. No intermediate push
+was made.
+
+**Findings:** two P2 research-governance issues, one P2 operational-fact issue
+and one P3 active-document consistency issue were confirmed and resolved.
+The submitted record called ACER-0A frozen even though outcome-sensitive
+signal, control, residualization, fold, significance, date-split,
+confirmation and point-in-time membership choices remained open. Its one-plus-
+one run budget also failed to say what happens when an error/refusal consumes
+a slot. The alert diagnosis generalized seven checked sleep gaps to all 22
+and incorrectly described a missed timed task as skipped despite installed
+`StartWhenAvailable=True`; Microsoft and the installer say it is queued for
+catch-up. Active plan sections also retained pre-measurement SBR and
+pre-purchase ratings claims.
+
+**Correction:** the owner's selected values remain frozen, but ACER-0A is now
+accurately labelled a **partial decision freeze, not an executable
+preregistration**. ACER-0A.1–0A.10 must all close before any real
+signal/outcome join. The run slots are provisional and cannot be replaced or
+expanded until the owner freezes the error/refusal and confirmation rule. The
+operational record now says seven of 22 gaps were correlated, distinguishes
+`WakeToRun=False` from `StartWhenAvailable=True`, and describes catch-up as
+conditional: it may capture the same session or refuse/no-op after the
+session/freshness boundary. No operational setting or row changed.
+
+Independent validation on the final corrected tree: focused documents/task/
+paper-evidence tests **59 passed in 8.77s**; full suite **4,420 passed / 0
+failed / 25 warnings in 834.29s** on Python 3.13.14; required `compileall`
+including `research/` passed; `git diff --check` passed. Read-only task and
+SQLite `mode=ro` checks confirmed the installed settings, submitted alert
+payloads and epoch counts. No QuantConnect, Massive/Benzinga or broker API
+was accessed; no outcome, signal, licensed row, run or research look was
+consumed. Application/execution code did not change, so paper mode, approvals,
+kill switch and broker lifecycle were out of scope rather than re-proven.
+
+## 7cg. Counter-review of the ACER-0A review (Claude, 2026-08-21)
+
+Branch: `user/claude/acer0a-cr-issuer-mapping-20260821`, based on Codex's
+`e9eb120`. Full record:
+`docs/Review/REVIEW_2026-08-21_ACER0A_COUNTERREVIEW.md`.
+
+**All four findings confirmed.** ACER0AR-001 is the most serious defect found
+against my work in this program: I labelled a document a freeze while its
+**primary encoding was not computable**. "Ordinal rating-notch change" is the
+designated primary cell, and no notch scale exists in the freeze, the ACER
+plan, or the code — `tests/test_acer_normalization.py` actively forbids one
+pending ACER-0. I had written that guard myself, so I knew the scale was
+undecided, and still froze a primary cell that depended on it. The same hole
+covers residualization form, Pearson-versus-Spearman IC, folds and purge, and
+period boundaries. Reclassifying to a partial decision freeze with
+ACER-0A.5–0A.10 is the honest shape.
+
+ACER0AR-003 was verified by fresh measurement rather than accepted: there are
+**four** `TradingAgent-Paper-*` tasks, not the three I wrote a completeness
+claim about; `PaperObservation` carries `DaysOfWeek=62` (Mon–Fri) with a
+16:30−07:00 boundary, confirming the corrected "weekdays at 23:30Z"; and
+`OperationsCycle` repeats at `PT10M`. My worse error was rhetorical: the
+diagnosis document disclosed that only 7 of 22 long gaps were inspected, and
+then my handoff and action-plan summaries asserted that *every* long gap
+matched a sleep window — the caveat was dropped exactly where the claim got
+stronger. I had also written that a firing inside a sleep window is "skipped
+rather than deferred" while quoting the `StartWhenAvailable=True` setting
+that queues missed starts.
+
+**One residual defect fixed (CCR0A-001, P3):** the ACER0AR-002 correction
+left two adjacent bullets in contradiction — one describing how "a corrected
+rerun may repair code", the next saying the section does not authorize a
+third corrected run. With exactly two slots, any corrected rerun *is* a third
+run. Rewritten to say plainly that none is authorized now, and that the
+listed constraints would apply only if the owner authorizes one under
+ACER-0A.9.
+
+**One item surfaced without change (CCR0A-002):** Codex relabelled a document
+the owner explicitly called "the ACER-0A freeze" to "PARTIAL FREEZE". I agree
+with the substance and left it, because no owner decision was weakened and
+the frozen decisions remain binding — but a reviewer changing the label on an
+owner act should be visible to the owner rather than discovered later.
+
+Codex's three new guards were mutation-tested and all three detect their
+regression. I also checked specifically that the scheduler guard's predicate
+is true — the installer does contain `-StartWhenAvailable` — because a
+conditional guard whose predicate is false is a green test that verifies
+nothing.
+
+**Standing workflow note:** per the owner's 2026-08-20 instruction this
+branch carries the counter-review *and* the next feature, against
+`CLAUDE.md` sections 3 and 11 which ask for one milestone per branch. That is
+the owner's explicit instruction, recorded here so a reviewer reads it as
+intent rather than drift; the two are kept as separate commits so each can
+still receive its own disposition.
+
+## 7ch. Issuer-identity ambiguity detector (Claude, 2026-08-21)
+
+Same branch as 7cg, per the owner's relay instruction. Full record:
+`docs/research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`.
+
+**A hard blocker was found before any code was written, and it needs an
+owner ruling.** The named next ACER-1 step is an ambiguity-refusing security
+master join, authorized in owner decision 8 as read-only QuantConnect
+symbol-mapping work. Neither half of that path exists on this host:
+
+- **No local LEAN and no LEAN data.** `C:\Lean`, `C:\git\Lean` and
+  `C:\ProgramData\QuantConnect` are absent, and no `map_files` directory
+  exists anywhere under `C:\git`. Owner decision 9 makes local LEAN
+  authoritative; there is no local LEAN. Open item **ACER-0A.4 now has a
+  negative answer, not an unmeasured one.**
+- **The QC client cannot reach data endpoints by design.**
+  `research/quantconnect.py` allowlists only `projects/`, `files/`,
+  `compile/`, `backtests/`, `optimizations/` and `authenticate`, with a
+  comment stating the rule exists so `data/read` "cannot sneak through".
+  That is a reviewed control; widening it is an owner decision, not a
+  refactor, so I did not touch it.
+
+So I built the half that needs no external data: `research/acer/identity.py`
+measures which tickers carry evidence that a raw-ticker join is unsafe, from
+the audited corpus alone. Measured over Snapshot A: **2,885 of 9,677 tickers
+(29.8%) flagged, covering 35.7% of events** — 2,478 with multiple company
+names (1,981 rename-shaped, 497 reuse-shaped after a ≥365-day gap), 600
+sharing a name with another ticker, 766 interleaved, 9 unnamed.
+
+Most of that is cosmetic vendor label churn — `Amazon`→`Amazon.com`,
+`McDonalds`→`McDonald's`, `SVB Financial Group`→`SVB Finl Gr`. The detector
+compares case and whitespace only and deliberately does **not** alias
+punctuation or corporate suffixes, because deciding two spellings are one
+issuer is a security-master decision of the same class as the rating scale.
+The count is reported as measured rather than tuned down by loosening the
+comparison; the decision-relevant subsets are the 497 reuse-shaped flags and
+the 600 cross-ticker collisions.
+
+Genuine finds: **GOOG and GOOGL both carry `Alphabet`**; **FISV and FI both
+carry `Fiserv`** with FISV starting 2025-12-22 (the predicted re-keying); and
+a real vendor defect — **CPRI carries one event labelled
+`Chipotle Mexican Grill`** on 2026-02-04 between two `Capri Holdings` eras,
+found only because interleaving is detected rather than smoothed over.
+
+**The result that matters most is negative: this detector misses BBBY.** The
+vendor labels all 270 BBBY events `Bed Bath & Beyond` from 2012 through 2026,
+including events after the 2023 bankruptcy when the symbol was reused by an
+unrelated issuer. It never relabels, so no name signal exists and the
+submitted detector reported BBBY as *unambiguous* — a false negative on the
+exact hazard that motivated the work.
+Two consequences: the 2,885 flags are a **lower bound**, and an unflagged
+ticker is not established as safe; and an external security master with
+listing/delisting dates is **required**, not a better heuristic. That makes
+the blocker above load-bearing. The limitation is pinned by
+`test_a_reuse_the_vendor_never_relabels_is_NOT_detected` rather than left in
+prose.
+
+Validation on the final tree: full suite **4,439 passed / 0 failed / 25
+warnings** in 662.25 seconds — 4,420 from the reviewed tree plus this round's
+19 identity tests. `compileall` over the required surface including
+`research/` passed; `git diff --check` passed; Python 3.13.14. Five mutations
+of the detector were applied and all five were detected: aliasing punctuation
+in the name comparison, dropping the cross-ticker refusal, swapping the
+reuse/rename labels, ignoring unnamed events, and dropping interleaving
+detection. The source was restored from a backup copy in a `finally` block.
+
+Untested surface, stated plainly: the detector has been exercised against one
+snapshot and synthetic cases only. Its false-negative class is characterized
+but not bounded — nobody knows how many BBBY-shaped reuses exist, because
+finding them is precisely what needs the security master this host lacks.
+
+**Independent-review correction:** section 7ci supersedes this section's
+safety-shaped `unambiguous` verdict, detachable refusal-list output, and
+order-sensitive 766 interleaving count. The submitted measurement remains
+historical evidence; it must not be used as an eligibility boundary.
+
+## 7ci. Independent review of the issuer-identity diagnostic (Codex, 2026-08-21)
+
+Codex reviewed exact pushed range
+`e9eb12010c317df9cedcb610c50e1375531404e1..703693bc43b62c7f6f23ed5c42e0a4f7a99b278c`
+from `origin/user/claude/acer0a-cr-issuer-mapping-20260821`, including both
+submitted commits in order. Commit `7b56e10` is **accepted**. Commit
+`703693b` is **accepted after correction**. The durable review record is
+`docs/Review/REVIEW_2026-08-21_ACER_ISSUER_IDENTITY.md`, committed with the
+corrected active research status at
+`d248e0ec5b19f23512e1b820d8d23c5fb397c5b9`.
+
+The review closed four findings. Three were P2: the absence of name evidence
+was mislabeled `unambiguous` and exposed through a bare refusal-list export;
+the report discarded source/code/result lineage while the shared clean-code
+helper omitted ignored Python under `research/`; and ticker case could split
+one symbol into two assessments. One P3 made same-day interleaving dependent
+on vendor/caller row order and described every sub-365-day change as having
+no gap. Correction commit
+`1805ec7b96bc62afd6c1f6019ec68b9b8f9587f5` replaces the verdicts with
+`name_based_ambiguity_evidence` and
+`no_name_based_ambiguity_evidence`, exports only immutable lineage-bound
+diagnostic JSON with a lower-bound warning, binds verified source,
+normalized-dataset, clean-code, contract, and assessment identities,
+includes `research/` in clean-code detection, canonicalizes ticker case, and
+adds a deterministic same-day tie-break. Three dangerous-direction tests
+were proved red on the submitted code before passing on the correction.
+
+The corrected clean-commit Snapshot A result remains 2,885 flagged tickers
+and 208,653 flagged events (35.6723%), but deterministically reports **768**
+interleaving flags rather than the submitted 766. Its exact lineage is source
+manifest `51954daea8432136b9c99fb4d5088e0c672664e9384475635110dd33e08a2e85`,
+normalized dataset `acer-analyst-events-73c36f9de1841b0a` under contract v2,
+diagnostic contract v1, clean code `1805ec7b96bc62afd6c1f6019ec68b9b8f9587f5`,
+and assessment SHA-256
+`8a020211e8ef5482abcceaa78a6d5f374bf8c0e9f60e2593db461d4f7b304a0b`.
+BBBY now receives `no_name_based_ambiguity_evidence`, which states only that
+the vendor names did not reveal its known symbol reuse; it is not a safety
+verdict.
+
+No vendor API, QuantConnect, price, outcome, signal, backtest, broker,
+scheduled task, operator database, or deployment path was touched, and no
+research look was consumed. The measurement is accepted only as a
+name-evidence lower-bound diagnostic, **not an allowlist** and not a security
+master. Issuer mapping remains blocked pending an owner-selected external
+point-in-time security-master path. No milestone completes.
+
+Validation on the completed review tree: the focused ACER/lineage/document
+surface passed 128 tests; the complete repository suite passed **4,446 tests
+with zero failures and 25 warnings in 661.90 seconds** on Python 3.13.14; the
+active-document suite passed 40 tests before this result was recorded; and
+the required `compileall` surface including `research/` passed. Final
+active-document, diff, status, ordered-commit, narrow-secret, exact-remote,
+and shared-checkout checks gate the single authorized push.
+
+## 7cj. Counter-review of the identity review (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-identity-cr-prereg-20260821`, based on `84bec5d`.
+Full record: `docs/Review/REVIEW_2026-08-21_ACER_IDENTITY_COUNTERREVIEW.md`.
+
+**All four findings confirmed by reproduction against my submitted code.**
+ACERIDR-001 is the best finding of the round and it is against me: I wrote a
+document and a test both stating the flag set is a lower bound, then shipped
+an API whose verdict constant read `unambiguous` for a ticker that same test
+proves is a known reuse. The prose was right; the code contradicted it, and
+the code is what a later join reads. The 6,792 unflagged tickers were one
+careless join from being treated as an allowlist.
+
+ACERIDR-003 is worse than its write-up suggests: feeding my submitted code
+rows keyed `case` and `CASE` produced **two separate identities, both
+`unambiguous`** — one symbol's two issuers escaping detection entirely.
+
+A method note on ACERIDR-004 worth keeping: my first probe used a same-day
+`A,B,A` sequence and showed no order dependence, because that sequence is a
+palindrome and reversing it changes nothing. A non-palindromic `A,A,B` versus
+`B,A,A` reproduced the defect immediately. A symmetric probe cannot detect an
+asymmetry, and I nearly recorded a false "did not reproduce" on that basis.
+
+I reproduced the corrected measurement from a clean tree and matched Codex's
+figures exactly: assessment SHA-256 `8a020211…`, 768 interleaving flags,
+2,885 flagged tickers, 208,653 of 584,916 events. The change to
+`assistant/runtime_identity.py` was examined specifically because it touches
+an execution-capable package during a research review: it adds `"research"`
+to `_RUNTIME_SOURCE_PATHS`, which **strengthens** the clean-runtime check, and
+adds no import, authority, or execution behaviour.
+
+**One P3 fixed (CCRID-001):** the diagnostic artifact binds to `code_commit`,
+which changes on any later commit — including documentation-only ones that
+cannot affect the measurement — so a re-run to the same path refuses on
+differing bytes. The refusal is correct but reads as tamper detection when
+the measurement is substantively identical. Documented in the CLI rather than
+redesigned: give each run its own path, and treat
+`identity_assessments_sha256` as the stable content identity.
+
+**One item recorded without change (CCRID-002):** the deterministic same-day
+sort means a genuine same-day name alternation can no longer be seen as
+interleaving. That is the correct trade — same-day vendor order never
+established chronology — and is recorded so it is not later mistaken for lost
+coverage.
+
+The recurring shape of my errors in this program is now clear enough to name:
+three of these four findings are cases where I wrote the correct caveat in
+prose and then contradicted it in code.
+
+## 7ck. ACER-0A completion proposals (Claude, 2026-08-21)
+
+Same branch as 7cj, per the owner's relay instruction. Full record:
+`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
+
+Codex's review named the next research task as closing ACER-0A.1–0A.10
+without inspecting outcomes. Most of those need owner rulings, so this round
+drafts **concrete proposals for 0A.5–0A.9** — the ones that can be specified
+from what is already known — so the owner accepts, amends, or rejects
+options rather than facing a blank page. **Nothing here is frozen**, and the
+document says so in its status line; ACER-2 remains blocked regardless.
+
+The rating scale is proposed from measurement, not guesswork. The corpus
+contains **54 distinct rating strings**, and coverage is extremely
+concentrated: the top 19 cover **99.57%** of 584,916 events, with 34 strings
+below 500 events accounting for 0.43%. The proposal is a five-level ordinal
+scale with an explicit refusal class rather than a default — `mixed`,
+`fair value`, `not rated` and `tender` express no position on a buy-to-sell
+axis, and defaulting an unknown string to hold would manufacture a
+zero-notch observation from missing information and dilute the signal toward
+zero. Three genuinely arguable assignments are named rather than hidden:
+`speculative buy`, the relative-performance band strings, and the
+firm-idiosyncratic neutrals (`sector weight`, `perform`, `peer perform`),
+which the proposal maps globally *because* a firm-specific map would be
+easier to tune after the fact.
+
+One design point worth the owner's attention: **encoding (b) can be made
+independent of the rating scale entirely.** Taking direction-only sign from
+the vendor's own `rating_action` field — measured as clean values
+`upgrades` / `downgrades` / `maintains` / `initiates_coverage_on` /
+`reiterates` and a small tail — means that half of the six-cell family does
+not depend on ACER-0A.5 at all, and is immune to the equal-spacing
+assumption the notch encoding carries.
+
+0A.6 proposes the decay equation with **age counted in trading sessions
+rather than calendar days**, per-firm state replacement so the aggregate is a
+consensus rather than a sum over duplicate opinions, and a minimum-coverage
+floor. 0A.7 proposes open-to-open 21-session outcomes, within-session
+winsorization and z-scoring, and **Spearman rather than Pearson** because the
+notch encoding is ordinal with heavy mass at zero. 0A.8 proposes the
+development/confirmation split, purge-and-embargo sized to the 21-session
+overlap, the session as the independent observation unit, and a frozen
+bootstrap seed and draw count so the p-value is reproducible. 0A.9 proposes
+slot-failure rules that turn on whether outcomes were **read**, which is a
+checkable property of the code path rather than a judgement about intent.
+
+Validation on the final tree: full suite **4,446 passed / 0 failed / 25
+warnings** in 657.06 seconds, unchanged from the reviewed tree because this
+round changed no behaviour — the only code edit was a CLI docstring.
+`compileall` over the required surface including `research/` passed;
+`git diff --check` passed; document-consistency guards reran green after
+every edit including after these counts were inserted; Python 3.13.14.
+
+Untested surface, stated plainly: **none of the ACER-0A.5–0A.9 proposals is
+implemented or tested.** They are specification text. The rating-scale
+proposal in particular has been checked for coverage against the corpus
+vocabulary but not exercised by any mapping code, so the 99.57% figure
+describes string frequency, not a working implementation.
+
+## 7cl. Independent review of ACER-0A completion proposals (Codex, 2026-08-21)
+
+Codex independently reviewed exact remote
+`origin/user/claude/acer-identity-cr-prereg-20260821` from merge-base
+`84bec5d9b78e83aced548b54ec43ef75183fa512` through pushed head
+`020110b7af635187606fbe24469a78c2325711c9`. Commit `3e92b84` (identity
+counter-review) and commit `020110b` (completion proposals) are both
+**accepted after correction**. The complete disposition and P0-P3 ledger is
+`docs/Review/REVIEW_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`.
+
+Six findings were closed. Four P2 methodology defects would have permitted
+materially different or invalid implementations: normalizing by the sum of
+decay weights canceled absolute decay; action and state transitions were not
+closed over missing, conflicting, refused, repeated, or expired events;
+validation outcomes fit the model used to call their own residuals
+out-of-sample; and the named stationary bootstrap disagreed with the
+repository's circular moving-block implementation. Two P3 record defects
+were also closed: the measured refusal vocabulary omitted eleven strings,
+and the preceding counter-review grouped commit dispositions and left one
+issue outside P0–P3.
+
+Product/specification correction `1eb3649` now supplies an implementable draft
+contract for owner consideration: live events expire at `2 * H`, the aggregate
+is `sum(w * value) / N_live` with `N_live >= 3` and must not divide by the
+weight sum; action allowlists, sign checks, fail-closed state clearing, and all
+fifteen measured refused rating strings are explicit; seven annual
+development folds fit pooled OLS on purged/embargoed training rows only and
+apply those coefficients to validation without refitting; the 21-session
+embargo is immediately before validation; and significance calls the exact
+existing circular moving-block tool with block length 21, 10,000 draws, seed
+20260821, a two-sided test, and pre-outcome synthetic-null calibration. Review
+record/action-plan/freeze updates are in `0d29b7a`; final validation was added
+in `4fbea95`.
+
+The existing machine-local licensed Snapshot A was read through its verified
+loader only to reproduce aggregate vocabulary counts: 584,916 normalized
+events, a 54-string union (53 current / 47 previous), 99.567% top-19 current
+coverage, and 2,530 current events across 34 sub-500 strings. No row or
+licensed payload was committed or disclosed. No vendor API, QuantConnect,
+price/outcome join, signal, backtest, broker, operator database, task, or
+deployment path was touched; no research look was consumed.
+
+Validation on the corrected review tree: four new guards failed red on exact
+Claude head `020110b` and passed green after correction; active-document suite
+**44 passed in 0.72 seconds**; focused ACER identity/runtime/document suite
+**78 passed in 8.86 seconds**; complete repository suite **4,450 passed / 0
+failed / 25 warnings in 741.68 seconds** on Python 3.13.14; required
+`compileall` including `research/` passed. Final diff, status, ordered-commit,
+remote-head, secret, and shared-checkout checks passed immediately before the
+single handoff push.
+
+Nothing in this review freezes ACER-0A.5–0A.9 or authorizes an earnings
+purchase, licensed-data transfer, signal/outcome join, or test run. The owner
+must still accept or amend the corrected proposals; ACER-0A.1–0A.10 and their
+data dependencies must all close before implementation. No feature milestone
+completed, so `FEATURE_MILESTONE_RECORD.md` was correctly left unchanged.
+
+## 7cm. Counter-review of the proposal review (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-prereg-cr-20260821`, based on `734d521`. Full
+record: `docs/Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md`.
+
+**Independent correction:** the CCPR-001 state-semantics concern remains a
+real owner choice, but the quantitative scan below is not decision-grade. It
+used raw ticker/raw firm groups before identity resolution, counted all later
+state replacements rather than the incremental non-directional-zero events at
+issue, and approximated sessions from calendar days. The submitted percentages
+are historical invalid evidence and were withdrawn from the active proposal.
+
+**All six findings confirmed, two by direct computation, and both of those
+are serious defects in my draft.**
+
+**ACERPR-001** is the worst thing I have put in a specification. My proposed
+aggregation `sum(w·notch)/sum(w)` is a weighted mean, and a weighted mean
+cancels any common factor. Evaluated at H=63, three equally-aged +1 actions
+score **1.0000 at ages 0, 63, 252 and 756 sessions alike** — a three-year-old
+rating scoring identically to today's. The half-life is a *frozen family
+dimension*, and my formula would have made it very nearly inert and the three
+half-life cells near-duplicates. Codex's `sum(w·notch)/N_live` scores 1.0000,
+0.5000, 0.0625, 0.0002 at those ages: coverage-neutral and still decaying.
+
+**ACERPR-003** is circular by construction: I proposed regressing each
+session's outcome on that session's controls, taking the residual, and
+calling the correlation with it out-of-sample. Fitting on the realized
+outcomes you then score against is in-sample by definition. The residual was
+orthogonal to the controls by fitting, not by prediction.
+
+**ACERPR-004** named a stationary bootstrap with an "expected block length"
+while `backtest.engine.bootstrap_edge_significance_by_block` documents and
+implements a **circular moving-block** bootstrap with fixed length — two
+different algorithms would have satisfied my written name, so the
+preregistered threshold was not reproducible. **ACERPR-005** reproduced
+exactly: 54 strings in the union, my table listed 39, and the 15 unmapped
+ones are precisely those Codex enumerated; I had disclosed four.
+**ACERPR-006** is a fair process finding against my counter-review record's
+shape, and Codex's edits to that record are structural only — no finding was
+removed, weakened, or re-graded.
+
+**One new P2 raised and measured (CCPR-001).** Codex's correction makes
+non-directional actions create a zero event that *replaces* the firm's prior
+state, and `maintains` is 59.7% of all events — so a later `maintains`
+silently erases an earlier upgrade's decayed signal. That is not symmetric
+across the frozen half-life dimension. Measured on Snapshot A: of 121,637
+directional actions, 28.9% are never superseded, the median time to
+supersession is 212 calendar days, and the share truncated before one
+half-life elapses is **7.1% at H=21, 19.1% at H=63, and 32.2% at H=126**. The
+longest half-life loses nearly a third of its signal to truncation while the
+shortest loses a fourteenth — so a cell that cannot realize its longer memory
+is partly measuring the state rule rather than memory length. That is the
+same *class* of problem as ACERPR-001, arriving inside the fix for it.
+
+I did not change the rule. The measurement and two named alternatives —
+keep the zeroing and accept the asymmetry, or let non-directional actions
+leave the prior revision decaying untouched — are added to the proposal for
+the owner to rule on before any freeze.
+
+This is the third consecutive round in which a correction needed a
+correction. That is the gate working, not failing.
+
+## 7cn. Can ACER-2 run locally? Data-capability audit (Claude, 2026-08-21)
+
+Same branch as 7cm, per the owner's relay instruction. Full record:
+`docs/research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md`.
+
+**Independent correction:** the negative result below applies to the current
+**EDGAR/yfinance path**, not every local route. Repository-wide local
+feasibility remains unresolved because the audit omitted the existing
+**Databento** research path (`ml/databento_source.py`, `ml/databento_pit.py`,
+`ml/databento_authoritative.py`). That path is an unmeasured candidate: no
+local artifact or visible credential was present during review, and its ACER
+history, delisted coverage, terminal-return semantics, access, cost, and
+licence remain unaudited. Section 7co is authoritative over the original
+repository-wide conclusion retained below.
+
+ACER-0A.3 and 0A.4 were open with unmeasured answers. Both are now answered,
+and both are **negative** — the second decisively so.
+
+**The binding obstacle is not the missing security master.**
+`data/pit_universe.py` is this repository's genuine point-in-time capability,
+and its own docstring states the two limits that settle this: "**Prices for
+delisted securities are unavailable**… the current ticker map and price
+provider do not supply their bars", and "**No delisting returns**, so a
+company that leaves the universe leaves without a final return. This biases
+results upward and the size of the bias is not knowable from this data."
+
+The frozen ACER-0A universe requires delisted securities to remain eligible
+while historically listed; the proposed outcome is a 21-session forward
+return. The local path supplies the first and not the second, for exactly the
+population whose absence creates survivorship bias — the failure this project
+has already measured in its own legacy universe, where SIVB, SBNY and FRC are
+absent. A locally-run ACER-2 would produce an upward-biased result whose bias
+could not be bounded.
+
+Two supporting findings from the submitted audit: the production read-path
+price provider declares
+`provides_point_in_time_lineage = False` in its own contract and its bars are
+adjusted as of fetch date; and **no local book-value source exists at all**,
+so the proposed value control (ACER-0A.3) has no implemented source. The
+original “sole local provider” and repository-wide conclusions are invalidated
+by the correction note above.
+
+A specification mismatch was also caught before it could be frozen: ACER-0A.7
+proposes **GICS** sector dummies, while the only locally available sector
+information is **SIC codes** via EDGAR. Freezing one and implementing the
+other would be a silent substitution.
+
+**One finding reshapes the security-master blocker rather than removing it.**
+`pit_universe.py` already establishes the right principle — "`cik` is the
+primary key, never the ticker" — and CIK is exactly the durable issuer key
+the ratings feed lacks. But `fetch_ticker_map` is documented as "CIK ->
+ticker for companies that **still have a listed ticker today**", so it
+resolves survivors and omits the dead names, which are the ones that matter.
+EDGAR is a promising route, not a finished one.
+
+The submitted option set omitted the existing Databento path and is superseded
+by the corrected audit. Amending the universe to drop delisted names remains
+**not recommended** because it reintroduces the survivorship problem.
+
+Validation on the final tree: full suite **4,450 passed / 0 failed / 25
+warnings** in 662.69 seconds — identical to the reviewed tree, because this
+round changed **no code at all**. `compileall` over the required surface
+including `research/` passed; `git diff --check` passed; the
+document-consistency guards reran green after every edit, including after
+these counts were inserted; Python 3.13.14.
+
+Untested surface, stated plainly: sections 7cm and 7cn are analysis and
+specification text. The truncation percentages in CCPR-001 come from an
+aggregate scan of the snapshot and use a 252/365 calendar-to-session
+approximation; they are not produced by any tested code path. The
+capability audit quotes existing module docstrings and contracts rather than
+executing them.
+
+## 7co. Independent review of ACER preregistration counter-review and local-data audit (Codex, 2026-08-21)
+
+Codex reviewed exact remote
+`origin/user/claude/acer-prereg-cr-20260821` from merge base
+`734d521da23267deda49fb6ce8f91d35b4d09cd0` through ordered commits
+`5372d231755c9417b8df1889dd15339577cd3f4d` and
+`f93e24d7cbb282cac407a2c8b17c4eba6d90c064`. Both commits are **accepted
+after correction**. The complete record is
+`docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md`.
+
+Three findings were confirmed. **ACERLDR-001 (P2):** the submitted CCPR-001
+scan did not isolate the effect it claimed to measure, used unresolved raw
+ticker/firm keys and a calendar approximation instead of exact NYSE sessions,
+and had no committed reproducer. Its 7.1%/19.1%/32.2% figures are therefore
+withdrawn as decision evidence. The two state-semantics alternatives remain
+owner choices; neither was selected. A later measurement must use resolved
+issuer and rating-firm identities, exact sessions, and separate directional,
+non-directional and expiry incidence. **ACERLDR-002 (P2):** the local-data
+audit omitted the repository's existing Databento capture, security-master
+and vintage-adjustment path. The current EDGAR/yfinance path is inadequate,
+but repository-wide local feasibility remains unresolved until Databento is
+audited. **ACERLDR-003 (P3):** missing terminal outcomes are disqualifying,
+but the aggregate bias direction is not known until the omitted exits are
+measured; the documentation no longer promises a deterministic sign.
+
+Correction `32a16b0` updates the active evidence and adds three dangerous-
+direction document guards; review record/action-plan commit `a2bca7f` records
+the independent disposition and corrected current state. Review-only
+inspection found no local Databento
+artifact and no credential visible to the review process; no vendor API was
+called, no data was downloaded or purchased, no rating was joined to a price
+or outcome, and no research look occurred. The next gate is an explicit owner
+authorization for a zero-outcome Databento structural capability/cost/licence
+audit, or an owner choice of another point-in-time source or a read-only QC
+data path. The Benzinga Earnings audit, final issuer mapping and all remaining
+ACER-0A freeze decisions remain open.
+
+Validation on the corrected review tree: the three new guards failed red on
+the exact pushed documents and passed after correction; the active-document
+suite passed **47/47**; the focused ACER normalization/identity, Databento
+source/PIT/authority and document suites passed **179/179**; the complete
+repository suite passed **4,453 / 0 failed / 25 warnings in 751.09 seconds**;
+and required `compileall` including `research/` passed on Python 3.13.14.
+
+## 7cp. Counter-review, and checking instead of asserting (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-databento-capability-20260821`, based on `381615b`.
+Full record: `docs/Review/REVIEW_2026-08-21_ACER_DATA_AUDIT_COUNTERREVIEW.md`.
+
+**All three findings confirmed; nothing found to correct in Codex's work.**
+First round in this program with no counter-finding, and the reason is that
+two of the three are the same failure of mine recurring.
+
+**ACERLDR-001, confirmed from my own printed output.** CCPR-001's percentages
+existed to help the owner choose between zeroing a prior revision and letting
+it decay. My scan counted *every* later action as a supersession, and my own
+breakdown shows 21,044 upgrades and 17,826 downgrades among 86,519 — **45%
+are directional actions that replace state under both rules**. The numbers
+never discriminated between the two options they were produced to inform.
+
+**ACERLDR-002, and worse than Codex stated.** I called yfinance the sole
+local price source while ~130KB of reviewed Databento capture code sits in
+`ml/`. **My own action plan already said so** — line 91 names "the Databento
+ingest/point-in-time software" in a section I wrote. I searched `data/` and
+generalized to "the repository".
+
+**ACERLDR-003.** I took `pit_universe.py`'s "biases results upward" and
+presented it as established across the whole exit mixture. Cash acquisitions
+and mergers need not have negative terminal returns, and I had measured no
+exit types. The missing terminal outcome is disqualifying without assuming
+its sign.
+
+### The pattern, named precisely
+
+Three consecutive rounds, same class of defect: the identity round's document
+and test said "lower bound" while the API constant said `unambiguous`; the
+proposal round's prose described a decaying signal while the formula
+cancelled its own weights; this round's action plan named Databento while my
+audit said yfinance was the only source. **Each time the prose was right and
+the artifact contradicted it**, because I asserted a property of this
+repository from a partial look instead of checking it.
+
+### The response is code, not another document
+
+`research/acer/capability.py` resolves each ACER-2 data requirement by
+reading a contract, an import, or a pinned dependency, and every finding
+carries the evidence it read. Re-running is cheap, and a capability that
+disappears flips a status instead of leaving a stale sentence in a document.
+Result over seven requirements: **1 available, 4 unavailable, 2 unmeasured,
+6 blocking, `acer2_runnable: false`.**
+
+Two design choices matter. `UNMEASURED` is a distinct status from
+`UNAVAILABLE`, because Databento capture code exists and has never been
+exercised for ACER — calling it either way is a claim nobody has earned. And
+**credential presence is deliberately not consulted**: a key proves access,
+not history depth or delisted coverage, and a test asserts the key never
+reaches the evidence string.
+
+One finding is a correction to my own earlier negative: the **NYSE
+trading-session calendar is available** — `pandas_market_calendars==5.4.0` is
+pinned and `data/market_data.py` already builds the NYSE calendar. My
+`calendar_days × 252/365` approximation in CCPR-001 was never necessary,
+which is the same failure again in miniature.
+
+Validation on the final tree: full suite **4,467 passed / 0 failed / 25
+warnings** in 706.11 seconds — 4,453 from the reviewed tree plus this round's
+14 capability tests. `compileall` over the required surface including
+`research/` passed; `git diff --check` passed; document guards reran green
+after every edit including after these counts were inserted; Python 3.13.14.
+Four mutations were applied and all four detected: inferring Databento
+availability from module presence, removing the evidence guard, permitting
+the available-and-blocking incoherence, and reporting the delisting-return
+gap as available. Source restored from a backup copy in a `finally` block.
+
+Untested surface, stated plainly: these checks read contracts and pinned
+dependencies, so they establish what the repository *declares*, not what a
+vendor would actually deliver. A capability reported `UNMEASURED` stays
+unmeasured until someone exercises it; the checks cannot promote it.
+
+## 7cq. Independent review of the ACER capability checker (Codex, 2026-08-21)
+
+Codex reviewed exact remote
+`origin/user/claude/acer-databento-capability-20260821` from merge base
+`381615bffc97195b34b2db34ddb4369f50123aeb` through ordered commits
+`477b9971f52770b2d4cb920414de9a02681f2fee` and
+`9304f9cc9ccc6f734a4c90b0a1469b6f1e76436d`. The counter-review commit is
+**accepted**; the capability-checker commit is **accepted after correction**.
+The complete record is
+`docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md`.
+
+Three P2 findings were reproduced. **ACERDCR-001:** the submitted
+`CapabilityFinding` allowed an unavailable or unmeasured required input to be
+non-blocking, contradicting its own fail-closed contract. **ACERDCR-002:**
+`summarize_capabilities()` accepted a caller-selected subset, so passing only
+the available calendar finding returned `acer2_runnable=true` while omitting
+all six blockers. **ACERDCR-003:** the checker called a package “importable”
+after `find_spec()` only; a simulated broken import still returned calendar
+status `available` and non-blocking.
+
+Correction `c9ee971` makes every unavailable or unmeasured requirement block,
+requires the exact seven-requirement checklist once each before summarizing,
+and imports the pinned calendar package and constructs its NYSE calendar.
+Review record/action-plan commit `907ccac` and formatting follow-up `8ae1933`
+preserve the dispositions, ledger and corrected sequencing state.
+Four dangerous-direction cases failed red on exact pushed `9304f9c` and pass
+green after correction. The factual current result is unchanged: one
+available, four unavailable, two unmeasured, six blocking, and
+`acer2_runnable=false`.
+
+No credential was read and no vendor, QuantConnect, broker, database, task,
+deployment, price, outcome, LEAN run, backtest, or research look was touched.
+The checker proves local declarations and installed capability only; it does
+not establish that Databento supplies ACER's required data. Databento remains
+unmeasured and the owner authorization gate for a zero-outcome structural
+capability/cost/licence audit is unchanged. No ACER milestone completes.
+
+Validation on the corrected review tree: the four dangerous-direction cases
+failed red on exact pushed `9304f9c` and the capability suite passed **18/18**
+after correction; the expanded focused ACER/calendar/Databento/import-boundary
+and document set passed **215/215 in 12.82 seconds**; the active-document gate
+passed **47/47**; the complete repository suite passed **4,471 / 0 failed /
+25 warnings in 658.86 seconds**; and required `compileall` including
+`research/` passed on Python 3.13.14.
+
+## 7cr. Counter-review, and the mirror-case rule (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-capability-cr-20260821`, based on `2251983`. Full
+record: `docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COUNTERREVIEW.md`.
+
+**All three findings confirmed by execution**, and every one is a fail-open
+path in a module I wrote specifically to fail closed. My submitted class
+accepted `status=unavailable, blocks_acer2=False`; my
+`summarize_capabilities([calendar_finding])` returned **`acer2_runnable =
+True`**, so omitting the six blocking checks produced a green verdict; and I
+labelled `find_spec` "importable" without importing anything or building the
+calendar, so a broken installation would have reported the one non-blocking
+capability as available.
+
+A method note worth keeping: my first probe of the subset defect appeared to
+*refute* it, because loading the old module from a temporary directory broke
+its `REPO_ROOT` and the calendar check failed for an unrelated reason.
+Re-running with the module inside the repository tree reproduced the defect
+at once. That is the second time this session a flawed probe nearly produced
+a false "did not reproduce" — the first was a palindromic ordering test.
+
+**One new P2 raised and fixed (CCCR-001).** Codex's correction makes the
+summary refuse anything but "the complete ACER-2 requirement set exactly
+once" — and that set omitted **earnings surprise**, which ACER-0A.7 names as
+a required control and ACER-0A.2 tracks as an unpurchased dataset. A guard
+enforcing completeness over an incomplete checklist converts a visible gap
+into an assertion that nothing is missing. Added
+`check_earnings_surprise_control` (unavailable, blocking: the only local
+earnings module is yfinance-backed and exposes the vendor's `surprise_pct`,
+the value ACER-0A.5 declines to trust), and wrote down
+`_CONTROLS_COVERED_BY_PRICES` so the claim that momentum, size, liquidity,
+volatility and analyst coverage need no separate source is auditable rather
+than assumed. The assessment now reports **8 requirements, 1 available, 5
+unavailable, 2 unmeasured, 7 blocking**.
+
+### The generalization, narrower than "be careful"
+
+Four consecutive rounds, same shape: the identity constant said
+`unambiguous` while its document said "lower bound"; the proposal's formula
+cancelled the decay its prose described; the data audit contradicted my own
+action plan; and a module promising to replace assertion with checking
+contained three paths that asserted readiness without checking it.
+
+In each case I wrote the guard for the direction I was thinking about and
+left the mirror direction open — available-and-blocking guarded but
+unavailable-and-non-blocking not; the full checklist tested but not the
+subset; the pinned dependency checked but not the actual import. **The rule
+that keeps working is to ask, for every guard, what its mirror case is.**
+That question is what produced CCCR-001 against Codex's own correction.
+
+Validation on the final tree: full suite **4,473 passed / 0 failed / 25
+warnings** in 738.43 seconds — 4,471 from the reviewed tree plus this round's
+two new capability tests. `compileall` over `research/` and `tests/` passed;
+`git diff --check` passed; document guards reran green after every edit
+including after these counts were inserted; Python 3.13.14.
+
+Untested surface, stated plainly: the earnings-surprise check reads
+`data/earnings_data.py`'s source text for `yfinance` and `surprise_pct`. It
+establishes that the module is the wrong kind of source for a point-in-time
+control; it does not exercise the module, and it would not detect a future
+earnings source added elsewhere in the repository. That is the same
+partial-look failure this section describes, bounded here by naming it.
+
+## 7cs. Independent review of capability-checker completion (Codex, 2026-08-21)
+
+Reviewed exact remote branch
+`origin/user/claude/acer-capability-cr-20260821` at
+`6fc00409249da1d0a4acf23c704f8381e550e5d9`, merge-base `2251983`, in ordered
+range `ff8ba6b`, `6fc0040`. Review branch:
+`codex/review-acer-capability-completion-20260821`. Full record:
+`docs/Review/REVIEW_2026-08-21_ACER_CAPABILITY_COMPLETION.md`.
+
+Commit `ff8ba6b` is **accepted**: it correctly reproduces all three prior
+Codex findings and preserves the method error in its first probe. Commit
+`6fc0040` is **accepted after correction**: earnings surprise was a real
+omission, but adding it did not complete the data-requirement set.
+
+**ACERCCR-001 (P2, corrected in `14a3a83`):** the submitted eight-item
+checklist still omitted four inputs while asserting completeness. The frozen
+size control is log market cap and therefore needs point-in-time shares, not
+prices alone. The frozen total-return outcome needs point-in-time corporate
+actions. ACER-0A.10 separately requires historical security type and primary
+listing, which durable issuer identity does not establish. And the normalized
+ratings-event corpus is ACER's signal input, not an assumption outside an
+`acer2_runnable` verdict. The checker now gives all four their own blocking
+finding. On this isolated review tree the honest summary is **12
+requirements: 1 available, 6 unavailable, 5 unmeasured, 11 blocking,
+`acer2_runnable=false`**.
+
+The material test was red on the submitted implementation: collection failed
+because the new corporate-action check did not exist. After correction, 24
+capability tests pass, including source-disappearance mutations that force
+the normalized-corpus, shares, corporate-action, and security-eligibility
+checks to `unavailable` and blocking. The adjacent ACER focused set passes
+107 tests. No P0, P1, or P3 finding was identified. No milestone completes,
+no real outcome was read, and ACER-2 remains unauthorized and blocked.
+
+Final validation: 24 capability tests, 107 adjacent ACER tests, and 154
+active-document/focused tests passed. The complete suite passed **4,481 / 0
+failed / 25 dependency warnings in 740.68 seconds** on Python 3.13.14.
+`compileall` over application, research, scripts, and tests passed. Final
+document, diff, staged-content, ordered-commit, secret, remote-head, and clean
+status checks passed before publication. The shared checkout remained on
+`user/claude/acer-capability-cr-20260821` at `6fc0040` and was not modified.
+
+## 7ct. Counter-review: the guard that failed its own test (Claude, 2026-08-21)
+
+Branch: `user/claude/acer-capability-completion-cr-20260821`, based on
+`40a0a37`. Full record:
+`docs/Review/REVIEW_2026-08-21_ACER_COMPLETION_COUNTERREVIEW.md`.
+
+**ACERCCR-001 confirmed on every limb.** Last round I raised an
+incompleteness finding against this checklist, fixed it by adding one
+requirement, and asserted completeness again — while still omitting four
+more, including **the ratings corpus itself**, which is ACER's signal input.
+Also confirmed: point-in-time security type and primary listing (the frozen
+universe rule), point-in-time corporate actions (the outcome is a
+split- and dividend-adjusted total return), and point-in-time shares
+outstanding — because the frozen size control is *log market cap*, which
+prices alone cannot produce, so my placement of size in
+`_CONTROLS_COVERED_BY_PRICES` was wrong. Twelve requirements now, eleven
+blocking.
+
+**The instructive failure is mine, and it is inside the fix.** I wrote a
+guard that derives the control list from the frozen document so completeness
+would stop depending on my memory. **That guard did not detect the omission
+it was written for.** It matched controls against the joined requirement
+strings with a loose `any(word in requirements)` test, and a regex that
+stopped at the period inside "ACER-0A.2" left the fragment
+`earnings surprise (acer-0a` — whose `(acer-0a` substring matched
+`_REQ_SECTOR`'s own text `"sector classification (ACER-0A.7 proposes GICS)"`.
+The missing control counted as accounted-for by an unrelated requirement.
+
+I found it only by mutation-testing the guard against the two omissions that
+had **actually happened**: removing the size requirement turned it red,
+removing the earnings requirement left it green. Half-working, and it looked
+healthy. Fixed by stripping parentheticals from the whole document before
+matching, and replacing the substring search with an explicit
+`_CONTROL_ACCOUNTING` map asserted by **exact set equality**. Both real
+omissions now fail the guard.
+
+### Two rules earned, narrower than "be careful"
+
+1. **Test a new guard against the specific failures that already happened**,
+   not invented ones. Testing only the size case would have shipped a broken
+   guard that passed.
+2. **A completeness check must compare sets exactly**, never by substring.
+   Substring matching cannot distinguish "this requirement covers that
+   control" from "these two strings share characters".
+
+The pattern across five rounds is now precise: fuzzy reasoning let my prose
+claim completeness it did not have, and fuzzy matching let my guard claim
+coverage it did not have. Same defect, one level down.
+
+Validation on the final tree: full suite **4,482 passed / 0 failed / 25
+warnings** in 705.08 seconds. `compileall` over `research/` and `tests/`
+passed; `git diff --check` passed; document guards reran green after every
+edit including after these counts were inserted; Python 3.13.14. The repaired
+derivation guard was mutation-tested against both omissions that actually
+occurred, and now fails on each.
+
+Untested surface, stated plainly: the derivation guard reads one frozen
+document's control sentence. It does **not** derive the universe, outcome, or
+signal-input requirements from their documents — those four were added by
+review, not by a check, so the same class of omission remains possible for
+every requirement outside the control list. Extending the derivation to the
+universe and outcome rules is the obvious next hardening and has not been
+done.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
@@ -3643,18 +4636,61 @@ rationale, and every structural hardening was verified end to end. The
 review chain for the vendor audit is closed. The event backbone was
 implemented in section 7cb and independently accepted after correction in
 section 7cc: 584,916 canonical events at 99.64% retention, with issuer
-identity deliberately unresolved. The corrected branch is local-only and
-needs counter-review before its v2 dataset is materialized. ACER remains
-before its freeze: resolve
-issuer mapping with ambiguity refusals across the 9,677-ticker surface; run
-Snapshot B after the declared interval; freeze the
-signal/control/cell/run-budget design; identify the separate
-earnings-control dataset; and establish dataset-specific permission before
-sending reconstructable ratings to QC. If that permission is absent,
-run the eventual frozen study in local LEAN. **ACER-2 remains the decisive
-milestone:** a null stock-level result closes the program. No price join,
-backtest, QC upload/run, or paper execution is authorized by this review. LEV
-remains separate and cannot validate ACER. The SBP history is retained.
+identity deliberately unresolved. That review chain closed with the
+counter-review in section 7cd, which confirmed all seven findings and fixed
+two defects in the corrections; the whole round is merged.
+
+**ACER-0A owner decisions are partially frozen and independently corrected**
+(sections 7ce–7cf,
+`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`): six cells, a named primary,
+Bonferroni 0.05/6, a provisional two-slot budget, and numeric point-in-time
+stock thresholds. The executable preregistration is still incomplete.
+**ACER-0B is deliberately not frozen** and ACER-3's budget is zero until it
+is. Local LEAN is the
+authoritative engine; reconstructable ratings stay off QuantConnect absent
+explicit permission evidence; QC access is read-only symbol mapping only.
+
+What ACER needs next, in order: close the ten named open items
+(ACER-0A.1–0A.10). **Independently corrected proposals now exist for 0A.1 and
+0A.5–0A.9**
+(`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`) and are
+accepted as drafts after the review in section 7cl, but still await owner
+confirmation — they are not freezes. Then run the $99
+one-month Benzinga
+Earnings **structural audit** and only then adopt or reject that control
+dataset and freeze the standardized-surprise formula; and run Snapshot B
+after the declared interval.
+
+The current EDGAR/yfinance path cannot satisfy the frozen delisted-outcome
+requirement, but **repository-wide local feasibility remains unresolved**.
+The already reviewed Databento capture/reference/vintage-adjustment modules
+were omitted from the submitted capability audit. Databento is an unmeasured
+candidate, not an accepted ACER source: a separately authorized structural
+audit must establish access, history, known-delisted coverage, terminal-return
+semantics, price/volume and corporate-action completeness, licence, and cost
+before any purchase, download, or outcome work.
+
+The committed seven-requirement capability checker is independently accepted
+after fail-closed correction (section 7cq). It currently reports one
+available, four unavailable, two unmeasured, six blocking and
+`acer2_runnable=false`; it cannot substitute for the external Databento audit.
+
+**The issuer-mapping step is BLOCKED and needs an owner ruling (sections
+7ch–7ci).** There is no local LEAN or LEAN data on this host, and the QC client's
+allowlist deliberately excludes data endpoints, so read-only QC symbol
+mapping has no available path. The options are to audit the existing Databento
+reference path, install local LEAN with suitable data, widen the allowlist to a
+read-only data path (a change to a reviewed control), or nominate a different
+security-master source. This cannot be
+deferred by improving the heuristic: name evidence provably misses the
+BBBY-class reuse, so the 2,885 flagged tickers are a lower bound and an
+unflagged ticker is `no_name_based_ambiguity_evidence`, not established as
+safe. The corrected deterministic interleaving count is 768. **ACER-2 remains
+the decisive milestone:** a null primary result closes the program. No
+purchase beyond the authorized $99 audit, no price or outcome join, no
+backtest, no QC upload, and no paper execution is authorized. LEV remains
+separate and cannot validate ACER. The SBP history is retained, and SBR-1 is
+now closed on a measurement rather than an assumption.
 
 ### Historical superseded checklist (retained for audit only)
 
@@ -3799,21 +4835,38 @@ Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
 docs/SESSION_HANDOFF.md, docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
 docs/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
 docs/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
+docs/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md,
+docs/Review/REVIEW_2026-08-21_ACER_PREREG_AND_LOCAL_DATA_AUDIT.md,
+docs/Review/REVIEW_2026-08-21_ACER_DATABENTO_CAPABILITY.md,
 docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md,
 docs/operations/OPERATIONAL_FACTS.md,
 docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md, and
-docs/alpha-result.md. The vendor-audit review chain is closed through
-section 7ca; the ACER event backbone implementation in section 7cb was
-accepted after correction in section 7cc. The corrected branch is local-only
-at `codex/review-acer-event-backbone-20260820`; product correction `61abd6a`
-must be counter-reviewed before the v2 dataset is materialized. The old v1
-dataset id is superseded. Stage 0/1 and APQ are valid but closed null; SHW-4
-is prospective. SBP is superseded by ACER. Next after counter-review: the
-ACER-0 preregistration draft and ambiguity-refusing issuer mapping over the
-backbone's 9,677-ticker surface, then Snapshot B after the declared interval.
-Keep reconstructable ratings off QC unless dataset-specific
-permission covers the upload; otherwise use local LEAN. Do not join ratings
-to prices, run a backtest, deploy, trade, mutate an operational database, or
+docs/research/ACER_2026-08-20_ACER0A_FREEZE.md, and docs/alpha-result.md.
+The vendor-audit and event-backbone review chains are closed and merged
+(sections 7ca and 7cd). The newest independent review is section 7cs on
+`codex/review-acer-capability-completion-20260821`; it corrects the remaining
+false-completeness path in the capability checker. **ACER-0A decisions are partially frozen,
+but its executable preregistration is incomplete; ACER-0B is deliberately
+not frozen.** The dataset
+identity is `acer-analyst-events-73c36f9de1841b0a` and has not been
+materialized; earlier ids are superseded. Stage 0/1 and APQ are valid but
+closed null; SHW-4 is prospective. SBP is superseded by ACER and SBR-1 is
+closed on a measurement. The CCPR-001 truncation percentages are withdrawn:
+they did not isolate the proposed state-semantics choice. The current
+EDGAR/yfinance path cannot support ACER's delisted outcomes, but Databento is
+an existing **unmeasured candidate**, not a validated solution. The corrected
+capability checker reports twelve requirements and ACER-2 blocked, and refuses
+incomplete checklists; it does not replace vendor evidence. Next: counter-review
+the exact Codex review branch, then obtain
+an owner ruling before any Databento API access, purchase or download; if
+authorized, run only a zero-outcome structural capability/cost/licence audit.
+Also close ACER-0A.1–0A.10, run the separately authorized Benzinga Earnings
+structural audit before adopting that control dataset, resolve issuer mapping
+with ambiguity refusals, and take Snapshot B after the declared interval.
+Local LEAN remains authoritative; keep reconstructable ratings off QC absent
+explicit permission evidence. Do not join ratings to prices or outcomes, run
+a backtest, deploy, trade,
+acknowledge or alter an operational alert, mutate an operational database, or
 roll paper-epoch-006 without separate authorization.
 ```
 

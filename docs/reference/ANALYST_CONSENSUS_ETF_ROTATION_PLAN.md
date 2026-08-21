@@ -1,11 +1,20 @@
 # Analyst-Consensus ETF Rotation (ACER) — research program plan
 
-Status: **DRAFT — owner-directed replacement for the Strong-Buy portfolio
-program (2026-08-20). Not frozen, not scheduled, not implemented.** The owner
-adopted this direction as the priority-1 research program; that is a
-*sequencing* decision. No signal definition, threshold, gate, universe, or
-cost assumption below acquires authority until an ACER-0 freeze, which is a
-separate owner act.
+Status: **PARTIALLY FROZEN (2026-08-20).** The owner split the freeze:
+
+- **ACER-0A owner decisions are FROZEN, but its executable
+  preregistration is INCOMPLETE.** Its operative decision record is
+  `docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`, whose section 9 lists the
+  definitions that must still be frozen before any real-outcome execution.
+  Where that document and this one differ, **it governs for ACER-2**.
+- **ACER-0B is NOT frozen** — the contingent ETF-level ACER-3 test. ETF
+  benchmark and investability decisions are deliberately deferred so they are
+  not forced before a stock-level signal is shown to exist. ACER-0B requires a
+  separate owner act and only becomes reachable if ACER-2 passes.
+
+Everything in this file that concerns ACER-3 and later remains DRAFT and
+acquires no authority. Nothing here is scheduled or implemented beyond the
+ACER-1 data plumbing already reviewed.
 
 Source specification: `docs/reference/analyst-consensus-etf-strategy.pdf`,
 SHA-256 `3700ab4bb64dfd6e29e5f8bbc2b7e3dd3fa089050b25cbb5e315450a8d86cf23`,
@@ -73,7 +82,7 @@ be disclosed in advance, and because the source document does not carry it.
 | Item | Disposition |
 |---|---|
 | `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` (SBP-0..5) | **SUPERSEDED as the priority program, 2026-08-20, while still a draft.** It was never adopted or frozen, so no evidence, capture, or result is affected. Retained in full, including amendments SBPA-001..011, as the record of a reviewed design decision. |
-| `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` (SBR) | **Frozen contract, closed before its first verified capture.** No snapshot is committed, and the task must not be installed. The machine-local task and artifact state has not been measured, so it cannot truthfully be described as verified absent. See section 3.1. |
+| `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` (SBR) | **Frozen contract, closed before its first verified capture.** No snapshot is committed, the task must not be installed, and the 2026-08-20 read-only host measurement found the task absent and zero capture artifacts. See section 3.1 and `docs/operations/OPERATIONAL_FACTS.md`. |
 | `docs/research/LEVERAGED_THRESHOLD_2026-08-19_PREREGISTRATION.md` (LEV) | **Unchanged and still separate.** LEV-2..4 remain a fast historical read on TQQQ timing. It is not ACER evidence and ACER does not consume it. |
 | MPQ / HPQ | Unchanged: proposed, on hold. |
 | Closed families (`A-001`, `A-002`, `A-003`) | Unchanged and still closed. ACER is permitted under the A-002 closure because it brings a **new data source** (analyst revision history), a **fresh preregistration**, and an **owner decision** — all three, which that closure requires. |
@@ -90,9 +99,9 @@ offsetting actions inside one month are invisible.
 The capture code, its tests, and its installer are **retained** (they remain
 reviewed work and a level-based hypothesis could revive them), but the stream
 is closed and its task must not be installed. No snapshot is committed. The
-machine-local task and artifact state has not been measured, so a later reader
-must not turn that absence of repository evidence into a claim of verified
-zero captures. No committed evidence or epoch is disturbed.
+machine-local task and artifact state was measured read-only on 2026-08-20:
+the task was absent and the plausible artifact roots contained zero capture
+artifacts. No committed evidence or epoch was disturbed.
 
 ## 4. Data requirements, and what is actually verified
 
@@ -103,15 +112,15 @@ zero captures. No committed evidence or epoch is disturbed.
 | Corporate actions, ticker/security mapping | QuantConnect | Available |
 | **Historical ETF constituents with weights** | QuantConnect `ETFConstituentUniverse` | **Verified**: exposes `EndTime`, `LastUpdate`, `Weight`, `SharesHeld`, `MarketValue`, daily resolution. QuantConnect states the dataset "is created by tracking the host ETF websites and can be delayed by up to 1 week". Coverage figures (about 2,650 ETFs from June 2009, daily from January 2015, monthly before) are the owner's research and are **not independently verified here** — ACER-1 must confirm them. |
 | Execution simulation, fees, slippage | QuantConnect / LEAN | Available; research only, never an execution path for this project |
-| **Analyst revision history** | External purchase (Zacks ZRH, Benzinga via Massive, FMP, or equivalent) | **Not owned.** QuantConnect's Benzinga integration is a news feed, not analyst ratings. |
-| **Control set for Stage 2** — earnings dates, standardized surprise, size, liquidity, volatility, value, sector | Partly QuantConnect fundamentals; standardized surprise needs an estimates dataset | **Not owned, and not covered by a ratings subscription.** This is a second, separate data cost that the source document does not price. |
+| **Analyst revision history** | Benzinga Analyst Ratings via Massive | **Purchased and structurally audited.** The immutable machine-local snapshot remains licensed data and is not committed or authorized for third-party upload. Issuer mapping and Snapshot B remain open ACER-1 gates. |
+| **Control set for Stage 2** — earnings dates, standardized surprise, size, liquidity, volatility, value, sector | Candidate: Massive/Benzinga Earnings plus separately verified point-in-time market/fundamental sources | **Not adopted.** The owner authorized up to $99 for a one-month structural Earnings audit. Surprise semantics, value source and the remaining formulas are open in ACER-0A.2–0A.10. |
 
-Two vendor questions remain open and decide the ratings purchase: does the
-candidate's ratings history contain **dated actions for delisted and
-deregistered tickers, and from what start date**; and can consensus be
-retrieved **as of a past date** rather than only as current state. A
-current-state consensus endpoint is the same look-ahead that closed Stage 2
-PEAD and is unusable for history.
+The two original ratings-vendor blockers passed the structural audit: dated
+per-firm actions reach 2011-12 and include probed delisted names, while
+`previous_rating` permits event-state reconstruction without a current-state
+consensus endpoint. That does not finish ACER-1: inconsistent ticker-rename
+and reuse behavior requires ambiguity-refusing issuer mapping, and Snapshot B
+must measure whether stable vendor rows are restated.
 
 ### 4.1 Point-in-time rules that must hold regardless of vendor
 
@@ -141,7 +150,8 @@ of done. Gates are pass/fail before the next milestone begins.
 
 | ID | Work | Gate |
 |---|---|---|
-| **ACER-0** | Freeze this contract: signal encoding, decay grid, eligibility, controls, benchmarks, gates, cell count, and the run budget. Choose the ratings vendor from the two open questions in section 4. | Owner adoption. Nothing below may start first. |
+| **ACER-0A** | **PARTIAL FREEZE 2026-08-20** (`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`): six-cell family, named primary, Bonferroni 0.05/6, provisional two-slot budget, numeric stock thresholds, benchmark policy and engine ruling are frozen owner decisions. | **Not executable.** ACER-0A.1–0A.10 must close before any real signal/outcome join; these include the actual signal, controls, statistic, split, confirmation and slot-failure definitions. |
+| **ACER-0B** | **NOT frozen, deliberately.** The ETF-level ACER-3 contract: ETF eligibility (AUM, spread, volume, holdings coverage), the equal-weight comparator, and ACER-3's own cells and budget. | Requires a separate owner act, reachable only if ACER-2 passes. ACER-3's run budget is **zero** until then. |
 | **ACER-1** | Data audit: verify point-in-time ratings timestamps and standardized histories; verify ETF constituents, weights, and actual availability semantics; build a survivorship-aware universe; quantify missingness and coverage. **Also measure the machine-local SBR state on the operational host** (task presence and snapshot count) and record it in `docs/operations/OPERATIONAL_FACTS.md`, so the closure in section 3.1 rests on a measurement rather than on absence of repository evidence. | Proceed only if the data can support a genuinely point-in-time test. A failure here ends the program cheaply. The SBR measurement is read-only; finding snapshots would be a material discovery, not a footnote. |
 | **ACER-2** | **Stock-level signal validation — the decisive milestone.** Do revisions carry incremental out-of-sample information after momentum, earnings, size, liquidity, volatility and sector controls? Levels versus revisions; alternative encodings; decay half-lives chosen out-of-sample. | Revisions must show incremental **out-of-sample** information under the frozen gate. In-sample correlation is not a pass. **Null here closes the program.** |
 | **ACER-3** | Unlevered ETF aggregation: raw, coverage-adjusted, breadth-filtered and equal-weighted variants; ETF clustering to prevent duplicated exposure; ranking and threshold portfolios. | The 1x strategy must survive costs, a cadence-matched benchmark on identical dates, and reasonable alternative specifications. |
@@ -163,7 +173,7 @@ failure this repository's look registry exists to prevent.
 
 Binding rules for ACER, to be given concrete numbers at ACER-0:
 
-- Every cloud execution — including refusals, errors, and accidental
+- Every execution against real outcomes, local or cloud — including refusals, errors, and accidental
   launches — is appended to `docs/alpha-result.md` as a new `R-nnn` entry with
   full identity, and counts as a research look.
 - Each milestone declares its **cell count and family gate before any result
@@ -177,26 +187,51 @@ Binding rules for ACER, to be given concrete numbers at ACER-0:
 - A null result closes its family. It is not a reason to tune a threshold and
   re-run.
 
-## 7. Owner decisions required before ACER-0 can freeze
+## 7. Owner decisions — resolved 2026-08-20 for ACER-0A
 
-1. **Ratings vendor**, resolved against the two open questions in section 4
-   (dated actions for delisted tickers; as-of retrieval of consensus).
-2. **Control-set data** for ACER-2 — which estimates/fundamentals source, and
-   its budget, given that a ratings subscription does not cover it.
-3. **Run budget and family sizes** for ACER-2 and ACER-3, since these fix the
-   multiplicity correction before any look.
-4. **Benchmarks**: the cadence-matched comparator for each variant, and
-   whether SPY, QQQ, or an equal-weight ETF basket is primary.
-5. **Universe eligibility**: listing history, assets, volume, spread, and
-   holdings-availability thresholds for an ETF to be investable.
-6. Confirmation that **SBR-1's task stays uninstalled** and its stream closed
-   (section 3.1), or an explicit decision to run it anyway as a secondary
-   level-based dataset.
+The six owner questions are settled at the decision level. They do not by
+themselves make ACER-2 executable; section 9 of
+`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` is the remaining freeze
+ledger.
+
+1. **Ratings vendor** — **RESOLVED**: Benzinga via Massive, purchased and
+   audited. Both blocking questions answered favourably (dated per-firm
+   actions from 2011-12 with pre-delisting coverage; `previous_rating` makes
+   state reconstructible without an as-of consensus endpoint).
+2. **Control-set data** — **CANDIDATE CHOSEN, NOT ADOPTED**: the
+   Massive/Benzinga Earnings expansion, with **$99** authorized for a
+   one-month structural audit against eight named criteria. Adoption depends
+   on that audit passing. `eps_surprise_percent` is not trusted; this project
+   freezes its own standardized-surprise formula afterwards (item ACER-0A.2).
+3. **Run budget and family sizes** — **RESOLVED for ACER-2**: six cells,
+   Bonferroni 0.05/6, one development execution, one confirmation execution,
+   unlimited synthetic tests that never touch real outcomes. **ACER-3's
+   budget is zero** until ACER-0B is separately frozen.
+4. **Benchmarks** — **RESOLVED**: ACER-2 has no index benchmark; its gate is
+   residualized stock-level IC. If ACER-2 passes, ACER-3's primary comparator
+   will be an equal-weight basket of the same eligible ETFs on identical
+   dates. SPY and QQQ are secondary descriptive comparisons only.
+5. **Universe eligibility** — **RESOLVED for stocks** (US primary-listed
+   common stock, 252 sessions, $5, $10M 60-session median dollar volume,
+   point-in-time controls, delisted-eligible, named refusals). **ETF**
+   eligibility is deliberately deferred to ACER-0B.
+6. **SBR-1** — **RESOLVED**: stays closed and uninstalled. Machine-local
+   state measured read-only 2026-08-20 and recorded in
+   `docs/operations/OPERATIONAL_FACTS.md`: task absent, zero artifacts, so
+   the closure now rests on a measurement rather than on absence of
+   repository evidence.
+
+Two further rulings were made in the same act: **local LEAN is the
+authoritative engine** and reconstructable Benzinga rows must not be uploaded
+to QuantConnect without separate explicit evidence that the terms permit it;
+and **QuantConnect access is authorized for read-only symbol-mapping work
+only**, with no upload, no outcome join, no backtest, and no research look.
 
 ## 8. What this plan deliberately does not do
 
-It does not adopt or freeze any value; it does not authorize a purchase, a
-QuantConnect run, or any operational action; it does not treat the source
-document's design as evidence of an edge; it does not reopen the closed alpha,
-allocation-policy, or Strong-Buy programs; and it grants no execution
-authority to any research artifact, in LEAN or anywhere else.
+It does not freeze ACER-3 or the still-open ACER-2 definitions; it authorizes
+no purchase beyond the $99 Earnings audit, no real-outcome execution, no
+QuantConnect run, and no operational action. It does not treat the source
+document's design as evidence of an edge, reopen the closed alpha,
+allocation-policy or Strong-Buy programs, or grant execution authority to any
+research artifact, in LEAN or anywhere else.

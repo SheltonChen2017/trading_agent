@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "sep2-launch-surface-reduced",
+  "status": "sep2-operator-database-boundary-pinned",
   "script_ownership": {
     "trading_assistant": [
       "scripts/check_epoch_cadence.py",
@@ -120,8 +120,7 @@
     "scripts/run_ml_evidence_supervisor.py": ["assistant"],
     "scripts/run_ml_promotion_dossier.py": ["assistant"],
     "scripts/run_ml_shadow.py": ["assistant"],
-    "scripts/run_overlay_shadow.py": ["assistant"],
-    "scripts/run_personal_assistant.py": ["backtest"]
+    "scripts/run_overlay_shadow.py": ["assistant"]
   },
   "data_ownership": {
     "package_markers": ["data/__init__.py"],

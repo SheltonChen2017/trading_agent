@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "sep2-launch-surface-reduced",
+  "status": "sep2-operator-database-boundary-pinned",
   "products": {
     "trading_assistant": {
       "owned_roots": [

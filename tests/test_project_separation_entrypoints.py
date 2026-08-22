@@ -15,12 +15,16 @@ import sys
 from data.research_results import (
     LeveragedPairResearchResult,
     SignalTriggerResult,
+    verify_research_report as neutral_verify_research_report,
 )
+from backtest.research_report import verify_research_report as legacy_verify_research_report
 from assistant.runtime_identity import (
     RuntimeIdentityError as AssistantRuntimeIdentityError,
     current_commit as assistant_current_commit,
 )
 from assistant.operations import append_alerts_jsonl as assistant_append_alerts_jsonl
+from assistant.storage import AssistantStore
+from assistant.storage_contracts import StrategyOperationalStore
 from data.operational_alerts import append_alerts_jsonl
 from data.runtime_identity import RuntimeIdentityError, current_commit
 
@@ -28,6 +32,7 @@ from data.runtime_identity import RuntimeIdentityError, current_commit
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY_POINT_MANIFEST = ROOT / "architecture" / "entry_points.json"
 BOUNDARY_MANIFEST = ROOT / "architecture" / "project_boundaries.json"
+OPERATOR_DATABASE_MANIFEST = ROOT / "architecture" / "operator_database_access.json"
 
 
 def _json(path: Path) -> dict:
@@ -53,6 +58,42 @@ def _imported_modules(path: Path) -> set[str]:
 
 def _import_roots(path: Path) -> set[str]:
     return {module.split(".", 1)[0] for module in _imported_modules(path)}
+
+
+def _public_methods(path: Path, class_name: str) -> set[str]:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name == class_name:
+            return {
+                child.name
+                for child in node.body
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and not child.name.startswith("_")
+            }
+    raise AssertionError(f"{class_name} is absent from {path}")
+
+
+def _store_surface(path: Path, public_methods: set[str]) -> tuple[set[str], set[str]]:
+    """Methods/attributes reached through a local ``store`` or constructor."""
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    methods: set[str] = set()
+    attributes: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Attribute):
+            continue
+        receiver_is_store = isinstance(node.value, ast.Name) and node.value.id == "store"
+        receiver_is_constructor = (
+            isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Name)
+            and node.value.func.id == "AssistantStore"
+        )
+        if not (receiver_is_store or receiver_is_constructor):
+            continue
+        if node.attr in public_methods:
+            methods.add(node.attr)
+        else:
+            attributes.add(node.attr)
+    return methods, attributes
 
 
 def _source_files(root: Path, pattern: str = "*"):
@@ -200,6 +241,63 @@ def test_composition_crossings_are_an_exact_debt_ledger():
         "composition imports changed; remove the crossing or update the exact "
         f"reviewed ledger. actual={actual!r}, declared={declared!r}"
     )
+
+
+def test_operator_database_access_is_an_exact_shrinking_debt_ledger():
+    entry_points = _json(ENTRY_POINT_MANIFEST)
+    manifest = _json(OPERATOR_DATABASE_MANIFEST)
+    declared = manifest["direct_non_assistant_importers"]
+    hosts = {
+        relative: category
+        for category in ("trading_assistant", "strategy_research")
+        for relative in entry_points["script_ownership"][category]
+    }
+    hosts.update(entry_points["composition_hosts"])
+
+    actual = {
+        relative
+        for relative, host in hosts.items()
+        if host != "trading_assistant"
+        and relative.endswith(".py")
+        and "assistant.storage" in _imported_modules(ROOT / relative)
+    }
+    assert actual == set(declared), (
+        "direct operator-database crossings changed; remove the crossing or "
+        f"review the exact debt. actual={sorted(actual)!r}, "
+        f"declared={sorted(declared)!r}"
+    )
+    assert manifest["database_owner"] == "trading_assistant"
+    assert manifest["physical_split_authorized"] is False
+
+    public_methods = _public_methods(ROOT / "assistant" / "storage.py", "AssistantStore")
+    for relative, contract in declared.items():
+        assert hosts[relative] == contract["host"] == "strategy_research"
+        methods, attributes = _store_surface(ROOT / relative, public_methods)
+        assert methods == set(contract["allowed_methods"]), (
+            f"{relative} changed its operator-store method surface. "
+            f"actual={sorted(methods)!r}, "
+            f"declared={sorted(contract['allowed_methods'])!r}"
+        )
+        assert attributes == set(contract["allowed_attributes"]), (
+            f"{relative} changed its operator-store attribute surface. "
+            f"actual={sorted(attributes)!r}, "
+            f"declared={sorted(contract['allowed_attributes'])!r}"
+        )
+
+
+def test_strategy_composition_uses_a_narrow_store_contract():
+    manifest = _json(OPERATOR_DATABASE_MANIFEST)
+    assert manifest["removed_type_only_importers"] == [
+        "scripts/product_composition.py"
+    ]
+    imports = _imported_modules(ROOT / "scripts" / "product_composition.py")
+    assert "assistant.storage" not in imports
+    assert "assistant.storage_contracts" in imports
+    assert isinstance(object.__new__(AssistantStore), StrategyOperationalStore)
+
+
+def test_research_report_verifier_facade_preserves_object_identity():
+    assert legacy_verify_research_report is neutral_verify_research_report
 
 
 def test_product_dependency_declarations_reconstruct_the_legacy_environment():

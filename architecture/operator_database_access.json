@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "status": "sep2-exact-boundary-pending-physical-split",
+  "database_owner": "trading_assistant",
+  "physical_split_authorized": false,
+  "boundary_note": "This is an exact, shrinking debt ledger for direct non-assistant imports of assistant.storage. It is not a permanent allowlist and does not authorize a database, schema, data, task, or path migration.",
+  "direct_non_assistant_importers": {
+    "scripts/run_filing_extraction.py": {
+      "host": "strategy_research",
+      "access": "write_only",
+      "allowed_methods": [
+        "record_ai_run"
+      ],
+      "allowed_attributes": [],
+      "purpose": "Record an operational audit row after a filing extraction run."
+    },
+    "scripts/run_ml_evidence_supervisor.py": {
+      "host": "strategy_research",
+      "access": "mixed",
+      "allowed_methods": [
+        "get_active_ml_evidence_epoch",
+        "get_active_paper_evidence_epoch",
+        "get_system_state",
+        "list_ml_prediction_outcomes",
+        "list_ml_predictions",
+        "list_ml_shadow_runs",
+        "list_paper_account_observations",
+        "list_portfolio_capture_sessions",
+        "set_system_state",
+        "upsert_operational_alert",
+        "verify_database_file"
+      ],
+      "allowed_attributes": [
+        "path"
+      ],
+      "purpose": "Read evidence state and write supervisor heartbeat and alerts."
+    },
+    "scripts/run_ml_promotion_dossier.py": {
+      "host": "strategy_research",
+      "access": "read_only",
+      "allowed_methods": [
+        "get_ml_evidence_epoch",
+        "list_operational_alerts",
+        "list_proposals_by_statuses"
+      ],
+      "allowed_attributes": [],
+      "purpose": "Read evidence and unresolved proposal state for the promotion dossier."
+    },
+    "scripts/run_ml_shadow.py": {
+      "host": "strategy_research",
+      "access": "mixed",
+      "allowed_methods": [
+        "claim_ml_shadow_run",
+        "close_ml_evidence_epoch",
+        "complete_ml_shadow_run",
+        "get_active_ml_evidence_epoch",
+        "get_ml_evidence_epoch",
+        "get_ml_model_registration",
+        "list_ml_evidence_epochs",
+        "list_ml_prediction_outcomes",
+        "list_ml_predictions",
+        "list_ml_shadow_runs",
+        "list_operational_alerts",
+        "open_ml_evidence_epoch",
+        "record_ml_prediction",
+        "record_ml_prediction_outcome",
+        "register_ml_model",
+        "set_system_state",
+        "upsert_operational_alert"
+      ],
+      "allowed_attributes": [],
+      "purpose": "Operate the ML shadow evidence lifecycle without broker authority."
+    },
+    "scripts/run_overlay_shadow.py": {
+      "host": "strategy_research",
+      "access": "mixed",
+      "allowed_methods": [
+        "get_overlay_observations",
+        "get_overlay_outcomes",
+        "get_overlay_stream_registration",
+        "record_overlay_observation",
+        "record_overlay_outcome",
+        "register_overlay_stream",
+        "upsert_operational_alert"
+      ],
+      "allowed_attributes": [],
+      "purpose": "Operate the read-only overlay shadow evidence lifecycle."
+    }
+  },
+  "removed_type_only_importers": [
+    "scripts/product_composition.py"
+  ]
+}

@@ -14,13 +14,13 @@ import pandas as pd
 from assistant.explanations import explain_ticker
 from assistant.policy import TradingPolicy
 from assistant.schemas import DecisionPacket, MarketRegime, PortfolioSnapshot
-from assistant.storage import AssistantStore
 from assistant.strategy_proposals import (
     SOXX_SOXL_PAIR,
     LeveragedPairConfig,
     generate_leveraged_pair_rebalance_proposals,
     prepare_leveraged_pair_market_data,
 )
+from assistant.storage_contracts import StrategyOperationalStore
 from data.market_data import fetch_historical
 from research.assistant_results import (
     build_leveraged_pair_research_result,
@@ -62,7 +62,7 @@ def generate_leveraged_pair_rebalance_proposals_with_research(
     pair_config: LeveragedPairConfig,
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
-    store: AssistantStore | None = None,
+    store: StrategyOperationalStore | None = None,
 ):
     """Compose an input-bound research target with assistant proposal policy."""
     if not _pair_is_held(packet, pair_config):
@@ -103,7 +103,7 @@ def generate_soxx_soxl_rebalance_proposals_with_research(
     policy: TradingPolicy,
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
-    store: AssistantStore | None = None,
+    store: StrategyOperationalStore | None = None,
 ):
     """Backward-facing composition wrapper for the configured SOXX/SOXL pair."""
     return generate_leveraged_pair_rebalance_proposals_with_research(

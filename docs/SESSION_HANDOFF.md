@@ -5808,9 +5808,11 @@ The next bounded implementation is commit `de2bd1a` on
 Mutation evidence: an assistant import of research-owned `data.analyst_data`
 fails the provider-ownership guard; an undeclared assistant `joblib` import
 fails the dependency guard. The restored focused implementation set passes
-76/76. Complete-suite, active-document, compilation, final Git, and shared-
-checkout checks are recorded in the final branch report after they run on the
-exact push candidate.
+76/76, and the focused implementation plus active-document set passes 129/129.
+The complete suite passes **4,522 tests / 0 failed / 25 warnings** in 671.62
+seconds on Python 3.13.14. Required `compileall`, including `research/`, passes.
+Final Git, remote-head, and shared-checkout checks run immediately before the
+single authorized push.
 
 No provider, credential, licensed row, broker, operator database, scheduled
 task, deployment, backtest, result, research look, or evidence epoch was

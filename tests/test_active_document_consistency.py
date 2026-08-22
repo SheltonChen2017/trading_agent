@@ -953,7 +953,10 @@ def test_separation_milestone_state_agrees_across_active_documents():
     action_plan = _text("ACTION_PLAN_2026-08-20.md")
     handoff = _text("SESSION_HANDOFF.md")
 
-    assert "Status: **ACTIVE — SEP-1 shared contracts and read-only research adapter**" in separation_plan
+    assert (
+        "Status: **ACTIVE — SEP-1 first extraction tranche implemented; "
+        "independent review pending**" in separation_plan
+    )
     assert "### SEP-0 — boundary baseline (reviewed)" in separation_plan
     assert "### SEP-1 — shared contracts and read-only research adapter (current)" in separation_plan
     assert re.search(r"SEP-0 is reviewed[^.]*SEP-1 is the current bounded milestone", action_plan)

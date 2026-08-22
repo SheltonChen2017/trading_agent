@@ -6041,6 +6041,55 @@ SEP-2 remains incomplete. The largest remaining item is the
 plan §3 names explicitly; then per-product launch surfaces, the residual 12
 composition files and 8 crossings, and shrinking the shared kernel.
 
+## 7dt. SEP-2 launch counter-review and operator-database boundary tranche (Codex, 2026-08-22)
+
+Codex counter-reviewed exact pushed Claude head
+`b4b896f8606f7ce520b13fcd4d71f68793328e34` from
+`origin/user/claude/review-sep2-launch-20260822`. Its merge-base with the
+submitted Codex head is exactly `7a21597`; ordered Claude commits `8f7a8ac`
+and `b4b896f` are accepted and accepted after correction, respectively. No
+P0/P1/P2 issue was opened. One P3, CRSEP2L-001, corrected the current
+handoff's undercount of Claude's two P3 findings; the archived Claude report
+already had both and remains unchanged. The durable counter-review is
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_LAUNCH_SURFACE.md`.
+Focused verification on Claude's exact tree passed 83/83, and reintroducing
+the removed broad-operations import failed the zero-tolerance guard before
+restoration.
+
+The next bounded implementation is commit `0e98d42` on
+`codex/sep2-operator-db-boundary-20260822`:
+
+- `architecture/operator_database_access.json` is an exact shrinking debt
+  ledger for the five remaining non-assistant imports of
+  `assistant.storage`. It pins host, access direction, every method and direct
+  attribute used, and explicitly refuses to authorize a physical split;
+- `scripts.product_composition` no longer imports the concrete mutable store
+  for typing. It uses the assistant-owned `StrategyOperationalStore`
+  structural contract, with `AssistantStore` compatibility regression-pinned;
+- deterministic research-report digest verification now lives in neutral
+  `data.research_results`; the old `backtest.research_report` export preserves
+  exact object identity, and `run_personal_assistant.py` consumes the neutral
+  export; and
+- script ownership stays **7 assistant / 56 research / 12 composition**,
+  declared Python crossings fall **8 → 7**, and direct non-assistant mutable-
+  database importers fall **6 → 5**.
+
+Three dangerous mutations were red and restored: an extra database importer,
+an extra store method on a retained importer, and reintroducing the removed
+personal-assistant `backtest` crossing. The focused implementation suite
+passed 130/130. The active-document suite passed 53/53. The complete suite
+passed **4,526 tests / 0 failed / 25 warnings** in 854.23 seconds on Python
+3.13.14, and required `compileall`, including `research/`, passed. No
+provider, credential, licensed row, broker, operator database, scheduled task,
+deployment, backtest, result, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**SEP-2 remains incomplete.** Five pinned database crossings, 12 composition
+files, and seven declared Python crossings remain. Physical database or task
+migration is still owner-gated; continue with product-owned adapters and the
+residual UI/PowerShell seams without moving broker authority into research or
+licensed research state into the assistant.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -6060,9 +6109,12 @@ implements the bounded provider-ownership/composition-reduction tranche at
 (accepted after correction, three P3). Section 7dr accepts that review and
 implements the launch-surface/mandate-contract tranche at `2fb1754`; section
 7ds is Claude's independent review of that tranche (accepted after correction,
-one P3), which also verified that the owner-approved mandate fingerprint
+two P3), which also verified that the owner-approved mandate fingerprint
 survives the module move and that SEP2-006's broker reach is closed as a class.
-SEP-2 is not complete and now awaits Codex's counter-review of that review head.
+Section 7dt closes Codex's counter-review and implements the exact operator-
+database boundary at `0e98d42`, reducing the Python crossing ledger to seven
+and direct non-assistant mutable-database importers to five. SEP-2 is not
+complete and now awaits independent review of that bounded implementation.
 ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code

@@ -6308,10 +6308,59 @@ SEP-2 remains incomplete: four research-hosted operator-database importers, 11
 composition files, 6 crossings, per-product launch surfaces, and the shared
 kernel.
 
+## 7dx. SEP-2 filing counter-review and milestone completion (Codex, 2026-08-22)
+
+Codex counter-reviewed exact pushed Claude head
+`fa32156307af0da5322694af5595b1e5b831efc6`, whose merge-base and exact Codex
+submission were both `b2ac54c1ee23bbad8ae0f69625c38fd4b02b92ad`.
+Ordered commits `1adabcb` and `fa32156` are both **accepted after correction**.
+The complete dispositions and ledger are in
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_FILING_OWNERSHIP.md`.
+
+**CRSEP2F-001 (P2, corrected at `624a7fd`).** Claude correctly preserved the
+old ML boundary after relocating the filing contract, but its direct-only
+guard left the transitive path `assistant -> data helper ->
+data.filing_extraction` open. A matched mutation reproduced that bypass. The
+existing fail-closed first-party import graph now protects every inventoried
+LLM-derived neutral contract against direct and transitive reach from
+`assistant`, `execution`, and `risk`; the mutation reddened and was textually
+restored.
+
+**CRSEP2F-002 (P3, corrected).** The current ML status still described the
+assistant-owned filing CLI as an ML-owned implementation. It now distinguishes
+the neutral contract, legacy ML facade, assistant-owned audited runner, and
+retained ML-LR research capability.
+
+Commit `996ccbc` closes SEP-2 against its four stated deliverables. The
+machine-readable definition-of-done audit reconstructs exhaustive script
+classification, product launch/dependency declarations, exhaustive data
+ownership with zero shared-provider debt, and the licensed research boundary.
+The remaining 11 composition files, six Python crossing roots, and four
+non-assistant operator-store importers are explicitly pinned **SEP-3 physical
+extraction inputs**, not permanent exceptions or a claim that separate
+repositories already exist. No provider, credential, licensed row, broker,
+operator database, installed task, deployment, backtest, outcome, research
+look, or evidence epoch was accessed or changed.
+
+Final validation on the combined counter-review and completion tree passed:
+95 focused separation/boundary/document tests, the complete suite at **4,533
+passed** with 25 known deprecation warnings, compilation across the full code
+tree including `research/`, active-document consistency, JSON parsing for all
+three governing architecture manifests, diff/staged/order checks, and the
+matched transitive-boundary mutation. The single durable handoff branch is
+`codex/counterreview-sep2-filing-completion-20260822`; no standalone
+counter-review or checkpoint branch was pushed.
+
+**SEP-2 is complete. SEP-3 is the current bounded milestone and requires the owner's topology
+choice**: two repositories plus an explicit shared package, or a permanently
+partitioned monorepo. Do not physically extract, rewrite history, change task
+paths, migrate a database, deploy, or disturb `paper-epoch-006` until that
+choice is explicit.
+
 ## 8. What is next
 
-**Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
-current bounded milestone.** SEP-0 is accepted after correction (sections
+**Current implementation sequencing (owner, 2026-08-22):** **SEP-2 is complete;
+SEP-3 is the current bounded milestone.** SEP-0 is accepted after correction (sections
 7dc–7dd). SEP-1's three implementation tranches and their independent review
 chain are closed in sections 7de–7dm; the direct-crossing and authority-
 exception counts are both zero, and the milestone is recorded in
@@ -6623,7 +6672,7 @@ capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. **SEP-2 is
-the current bounded milestone.** SEP-1's three extraction tranches and their
+complete; SEP-3 is the current bounded milestone.** SEP-1's three extraction tranches and their
 review chain are closed in sections 7de–7dm, with the exact direct-crossing
 ledger and authority-exception count both zero. Do not reopen SEP-1. SEP-2's
 first classification/dependency tranche is implemented at `ba8d0eb`, recorded
@@ -6637,14 +6686,16 @@ Only trading-assistant-hosted entry points may import
 the authority roots; the scanner sees parent-package spellings such as
 `from assistant import execution_service`; the `scripts/`/`data/` inventories
 are recursive; `scripts/` refuses dynamic and relative imports; and the
-remaining broad-operational reach ledger is empty. The current exact SEP-2
-surface is **8 assistant / 56 research / 11 composition files and 6 Python
-crossing roots**, with **4** direct non-assistant importers of
+remaining broad-operational reach ledger is empty. The completed SEP-2
+extraction input is **8 assistant / 56 research / 11 composition files and 6
+Python crossing roots**, with **4** direct non-assistant importers of
 `assistant.storage` bounded by `architecture/operator_database_access.json` —
 whose grants are bounded by direct call and explicit read/write state-key
 prefix, not method name alone, because
 `set_kill_switch` is `set_system_state("kill_switch", ...)`. Follow
-`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Before physical extraction,
+the owner chooses two repositories plus an explicit shared package or a
+permanently partitioned monorepo; do not infer that choice. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

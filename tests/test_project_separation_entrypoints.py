@@ -35,6 +35,11 @@ def _imported_modules(path: Path) -> set[str]:
             modules.update(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module:
             modules.add(node.module)
+            modules.update(
+                f"{node.module}.{alias.name}"
+                for alias in node.names
+                if alias.name != "*"
+            )
     return modules
 
 
@@ -301,6 +306,21 @@ def test_entry_points_outside_the_trading_assistant_cannot_import_authority():
         "an entry point that is not hosted by the trading assistant imports "
         f"execution authority: {offenders!r}"
     )
+
+
+def test_import_scanner_expands_parent_module_from_imports(tmp_path: Path):
+    """An authority or licensed child module cannot hide behind its parent."""
+    source = tmp_path / "parent_import.py"
+    source.write_text(
+        "from assistant import execution_service\n"
+        "from research import acer\n",
+        encoding="utf-8",
+    )
+
+    assert _imported_modules(source) >= {
+        "assistant.execution_service",
+        "research.acer",
+    }
 
 
 def test_only_immutable_approved_results_cross_the_product_boundary():

@@ -132,7 +132,9 @@ more direct product crossings without changing the old public import paths:
 - portfolio risk metrics, mandate evaluation, and research multiplicity
   arithmetic now live in product-neutral `data` modules;
 - existing assistant/backtest facades resolve to the same function and error
-  objects, so callers do not acquire duplicate types or altered serialization;
+  objects, so callers do not acquire duplicate runtime types or lose existing
+  exception-catching behavior; the moved exception's module/name metadata is
+  not claimed to be byte-for-byte serialization-compatible with the old class;
 - assistant context, stock lookup, paper evidence, and look accounting use the
   neutral implementations directly; and
 - the exact direct-crossing ledger falls from **9 to 4**, while the

@@ -5289,10 +5289,61 @@ equivalent by AST comparison and by the existing suite, not by new behavioural
 tests — SEP-1 deliberately added none, because it moved code rather than
 changing it.
 
+## 7dg. Counter-review of Claude's SEP-1 review (Codex, 2026-08-21)
+
+Codex counter-reviewed exact remote
+`origin/user/claude/review-sep1-extraction-20260821` at
+`a728ebc907d9f21c660e6c6dff569129f57ca0bd` in isolated branch
+`codex/counterreview-sep1-extraction-20260821`. The remote DAG merge-base is
+the exact submitted SEP-1 head `a7860747dc2f33a902c871a5c247f74b7e956eff`;
+mainline integration `6499c18` and Claude commits `ffb2208`, `4ca744a`, and
+`a728ebc` each have an explicit disposition in
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-21_SEP1_EXTRACTION_TRANCHE.md`.
+
+**Accepted after correction.** No P0 or P1; one P2 and one P3.
+
+**SEP1CR-001 (P2, resolved).** Claude correctly replaced a guard that pinned
+milestone-specific literals, but the replacement only required `SEP-1` to
+appear somewhere in each long historical document. It passed while this
+handoff's canonical resume prompt still told the next session to review the
+already-reviewed SEP-1 branch. The strengthened guard now derives the
+milestone id from the plan but scopes the matching marker to the Action Plan's
+current sequencing amendment and to handoff sections 8 and 9. It failed red
+against the stale handoff before these two current sections were corrected.
+
+**SEP1CR-002 (P3, resolved here).** Claude's report says five
+assistant-to-research calculation/context imports plus three evidence/mandate
+couplings remain, but its own list contains **six** calculation/context edges:
+context builder (1), explanations (2), stock lookup (1), and strategy
+proposals (2). Six plus three is the manifest's exact nine. The historical
+review remains intact; this section and the counter-review are the correction.
+
+The substantive acceptance is unchanged. The manifest contains nine direct
+cross-product edges and no authority exception; execution-authority roots
+cannot reach strategy research; shared modules do not import either product;
+facades preserve runtime identity; compatibility and monkeypatch seams pass;
+and portfolio/broker behavior is unchanged. CDR2-005 remains an explicit open
+P3 concerning dynamic-import census and first-path reporting asymmetries.
+
+Counter-review test correction `9949983` strengthens the relationship guard;
+review-record commit `af4f83e` preserves all dispositions and findings.
+On the corrected code/test tree, the focused document, separation, decimal,
+ML-import, context-builder, and allocation suite passed **157 tests / 1
+dependency warning in 39.00 seconds**. The complete suite passed **4,498 tests
+/ 0 failures / 25 dependency warnings in 698.14 seconds** on Python 3.13.14.
+Required compilation, including `research/` and `tests/`, passed; the boundary
+JSON parsed with exactly nine direct edges and zero authority exceptions; and
+`git diff --check` passed. Active-document and separation checks are rerun
+after these final documentation inserts. No provider,
+credential, broker, licensed data, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. SEP-1 remains incomplete and no feature milestone was recorded.
+
 ## 8. What is next
 
-**Current implementation sequencing (owner, 2026-08-21):** SEP-0 is accepted
-after correction (sections 7dc–7dd). SEP-1's first extraction tranche is
+**Current implementation sequencing (owner, 2026-08-21):** **SEP-1 is the
+current bounded milestone.** SEP-0 is accepted after correction (sections
+7dc–7dd). SEP-1's first extraction tranche is
 implemented in section 7de and **independently reviewed in section 7df
 (accepted after correction)**; its nine remaining crossings are the next
 work. The former pinned
@@ -5573,14 +5624,14 @@ an existing **unmeasured candidate**, not a validated solution. The corrected
 capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
-unmeasured optional provider. It does not replace vendor evidence. Next:
-Claude independently reviews pushed branch
-`codex/sep1-portfolio-snapshot-boundary-20260821`, based on finalized SEP-0
-counter-review `9c12ac3`; sections 7dd–7de record the accepted SEP-0 review
-and the SEP-1 implementation. The tranche removes the only transitive
-execution-authority-to-research path and four neutral direct crossings,
-leaving nine. It is not the whole SEP-1 milestone. ACER remains the
-first research program, and its next research step is the narrow read-only,
+unmeasured optional provider. It does not replace vendor evidence. **SEP-1 is
+the current bounded milestone.** Its first extraction tranche was independently
+reviewed and accepted after correction in section 7df. Continue with the nine
+remaining crossings under `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`;
+do not reopen review of `codex/sep1-portfolio-snapshot-boundary-20260821`.
+The tranche removed the only transitive execution-authority-to-research path
+and four neutral direct crossings. It is not the whole SEP-1 milestone. ACER
+remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN
 owner decision covering both the Massive and QuantConnect accounts, so

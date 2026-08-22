@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-1 second extraction tranche awaiting independent review**
+Status: **ACTIVE — SEP-1 second extraction tranche reviewed; four adapter edges remain**
 
 Owner direction: 2026-08-21
 
@@ -143,8 +143,10 @@ identity and reject restoration of a migrated product crossing. This tranche
 does not call a provider, broker, backtest, outcome, operator database, task,
 deployment, or evidence epoch.
 
-SEP-1 is **not complete** and this second tranche still requires Claude's
-independent review. The four remaining edges are deliberately policy-heavy:
+SEP-1 is **not complete**. The second tranche was independently reviewed
+2026-08-22 (accepted after correction; one P3 — restored rationales — see
+`docs/Archive/Review/REVIEW_2026-08-22_SEP1_CONTRACTS_TRANCHE.md` and
+handoff section 7di). The four remaining edges are deliberately policy-heavy:
 two explanation-to-signal imports and two strategy-proposal imports. They must
 move behind typed, read-only research-result adapters in the next tranche;
 putting their calculations in the shared kernel would hide product policy

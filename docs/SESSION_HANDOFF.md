@@ -5375,6 +5375,72 @@ research look, or evidence epoch was accessed or changed. SEP-1 remains
 incomplete; no feature milestone is recorded, and `scripts/` classification
 remains SEP-2 work.
 
+## 7di. Independent review of the second SEP-1 tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep1-contracts-20260821`, created from the exact
+pushed head `52f4c2f` (merge base `d97d1d8`). Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP1_CONTRACTS_TRANCHE.md`. Scope: the
+three tranche commits `636d164`, `e36f480`, `52f4c2f`, plus formal
+dispositions for the three PR #298 counter-review commits (`9949983`,
+`af4f83e`, `92b9a1b`) that revised my own prior corrections.
+
+**Accepted after correction. No P0/P1/P2; one P3.** The cleanest tranche of
+the separation so far, and the largest calculation move.
+
+What was verified independently rather than accepted from the submission:
+all thirteen moved functions (plus `compute_portfolio_metrics`) AST-compared
+old-tree-vs-new — every difference is annotation, rename, temp-fold, one
+unpinned error-message rewording, or a benign `float()` cast; **the owner's
+approved mandate fingerprint recomputes stable** against
+`assistant/default_mandate.json` (the move could not silently invalidate the
+2026-08-04 approval, and did not); exception identity preserved by
+same-object aliasing (`PortfolioMetricsError` imported *as*
+`ResearchReportError`, base class `ValueError` unchanged); facade identity
+holds at runtime across all eleven public seams; the independent census
+finds exactly the **4** declared edges (9 → 4) with **zero**
+authority-to-research paths; the shared modules import no product code; and
+a mutation restoring the removed `research_looks -> backtest.engine`
+crossing turns the census guard red.
+
+**SEP1B-001 (P3, corrected):** third consecutive tranche in which moved code
+arrives intact and its recorded reasons do not. Restored at the new
+canonical locations: the 2026-07-31 P2#5 bool-rejection rationale in
+`_metric_check`; the round-before-int float-imprecision rationale in
+`expected_shortfall_pct`; and `calibrate_volatility_threshold`'s
+apply-the-same-value-to-confirmation discipline sentence — the look-ahead
+rule that justifies the function's existence. Graded P3 rather than
+repeating SEP1R-001's P2 because the class is narrowing: `_capture_pct`
+kept its joint-masking rationale (with the reproduced 50%→16.67% figure)
+and `expected_shortfall_pct` gained a fails-closed docstring.
+
+On the counter-review of my own work: **SEP1CR-001 accepted and verified by
+guard-swap** — my guard passed against my own documents while Codex's failed
+against the same documents, so my `assert current in text` was vacuous
+against the 344 KB handoff; Codex's canonical-marker fix keeps the
+no-literal-milestone-id property. **SEP1CR-002 accepted** — my
+five-plus-three arithmetic was wrong; my own parenthetical listed six.
+
+Also recorded: the shared kernel grew by three modules under plan §2's
+"or be split as ownership becomes clear" clause, with the plan's new policy
+line ("putting their calculations in the shared kernel would hide product
+policy rather than separate it") correctly fencing the four remaining
+policy-heavy edges into adapter work, not moves.
+
+Validation on the final tree: full suite **4,498 passed / 0 failed / 25
+warnings** in 772.28 seconds on Python 3.13.14 — identical in count to my
+independent run of the submitted snapshot (764.37 s), because this round's
+corrections are comments, docstrings, and documents only;
+`compileall` over the required surface passed; `git diff --check` passed;
+focused boundary/document/metric/mandate/regime suites passed (89 + 100
+across the two focused runs), rerun after every edit including after these
+counts were inserted. Mutation evidence: census-guard red on a restored
+crossing; fingerprint stability re-verified after the corrections.
+
+Untested surface, stated plainly: the equivalence argument rests on AST
+comparison plus the existing suites; no new behavioural tests were added
+because the tranche moves code rather than changing it, and the one
+observable change (an unpinned error message) is asserted by nothing.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-1 is the
@@ -5382,8 +5448,10 @@ current bounded milestone.** SEP-0 is accepted after correction (sections
 7dc–7dd). SEP-1's first extraction tranche is
 implemented in section 7de and **independently reviewed in section 7df
 (accepted after correction)**. Its second neutral-contract tranche is
-implemented in section 7dh and awaits Claude review; four policy-heavy
-crossings remain after that review. The former pinned
+implemented in section 7dh and **independently reviewed in section 7di
+(accepted after correction)**; four policy-heavy
+crossings remain, to move behind typed read-only research-result adapters in
+the next tranche. The former pinned
 `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
 authority path is removed. ACER remains the first
 research program, but its next Cloud capability audit is not the current code

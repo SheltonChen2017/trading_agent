@@ -392,10 +392,45 @@ def test_operational_alert_facade_preserves_object_identity():
     assert assistant_append_alerts_jsonl is append_alerts_jsonl
 
 
-def test_ml_evidence_supervisor_avoids_broad_operational_authority_reach():
-    imported = _imported_modules(ROOT / "scripts" / "run_ml_evidence_supervisor.py")
-    assert "data.operational_alerts" in imported
-    assert "assistant.operations" not in imported
+def test_broad_operational_authority_reach_is_an_exact_shrinking_ledger():
+    """SEP2P-001. Record the relationship, not the one file that was fixed.
+
+    `assistant.operations` reaches the broker lazily through
+    `assistant.readiness`, so every entry point outside the trading assistant
+    that imports it carries the reach recorded as SEP2-006. Repointing the ML
+    evidence supervisor removed one instance; its sibling
+    `scripts/run_ml_shadow.py:36` still holds the identical import, which is
+    this repository's standing "a guard added to one generator is not added to
+    its sibling" failure. A test naming only the repaired file pins a fact: it
+    leaves a new instance free and cannot notice when the last one goes.
+
+    As an exact ledger it does three jobs — a new importer fails, the repaired
+    supervisor cannot regress, and removing the final entry fails too, so the
+    ledger has to be driven down deliberately rather than quietly persisting.
+    """
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    hosts = {
+        relative: category
+        for category in ("trading_assistant", "strategy_research")
+        for relative in manifest["script_ownership"][category]
+    }
+    hosts.update(manifest["composition_hosts"])
+
+    actual = {
+        relative
+        for relative, host in hosts.items()
+        if host != "trading_assistant"
+        and relative.endswith(".py")
+        and "assistant.operations" in _imported_modules(ROOT / relative)
+    }
+    assert actual == {"scripts/run_ml_shadow.py"}, (
+        "the broad-operational-reach ledger changed; remove the crossing or "
+        f"update this exact reviewed ledger. actual={sorted(actual)!r}"
+    )
+
+    supervisor = _imported_modules(ROOT / "scripts" / "run_ml_evidence_supervisor.py")
+    assert "data.operational_alerts" in supervisor
+    assert "assistant.operations" not in supervisor
 
 
 def test_licensed_research_surfaces_cannot_enter_execution_products():

@@ -278,7 +278,10 @@ claiming SEP-2 complete:
 - alert JSONL serialization moved to neutral `data.operational_alerts`, with
   the old assistant export preserving object identity. The ML evidence
   supervisor no longer imports broad `assistant.operations`, removing the
-  recorded lazy reach through readiness to the broker module;
+  exact lazy reach through readiness to the broker module that SEP2-006 named.
+  The class is not closed: `scripts/run_ml_shadow.py` still holds the same
+  import and therefore the same reach, and it is now pinned as an exact
+  shrinking ledger rather than by naming the one repaired file;
 - dependency guards now compare the declarations with actual product and
   hosted-launcher imports, recognize QuantConnect's platform-provided
   `AlgorithmImports`, and declare the filing extractor's lazy Anthropic

@@ -960,7 +960,11 @@ def test_separation_milestone_state_agrees_across_active_documents():
     assert "### SEP-0 — boundary baseline (reviewed)" in separation_plan
     assert "### SEP-1 — shared contracts and read-only research adapter (current)" in separation_plan
     assert re.search(r"SEP-0 is reviewed[^.]*SEP-1 is the current bounded milestone", action_plan)
-    assert re.search(r"SEP-0's independent\s+review is \*\*complete\*\*[^.]*implement\s+SEP-1", handoff)
+    assert re.search(
+        r"SEP-1's first extraction tranche is\s+implemented[^.]*Claude's "
+        r"independent review",
+        handoff,
+    )
 
 
 def test_sell1_current_records_do_not_reopen_merged_review_work():

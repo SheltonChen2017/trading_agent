@@ -29,13 +29,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from assistant.runtime_identity import RuntimeIdentityError, current_commit
+from data.runtime_identity import RuntimeIdentityError, current_commit
 from ml.experiment_contracts import ExperimentContractError, ExperimentSpec
 from ml.experiments import ExperimentError, run_experiment
 
 
 def _current_commit(expected_commit: str | None = None) -> str:
-    """Strict runtime identity; see assistant/runtime_identity.py."""
+    """Strict runtime identity; see data/runtime_identity.py."""
     try:
         return current_commit(
             require_clean=True,

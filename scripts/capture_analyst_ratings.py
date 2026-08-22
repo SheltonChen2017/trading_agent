@@ -49,7 +49,7 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from assistant.runtime_identity import current_commit  # noqa: E402
+from data.runtime_identity import current_commit  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPTURE_FIELDS = ("strongBuy", "buy", "hold", "sell", "strongSell")

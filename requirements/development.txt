@@ -1,0 +1,3 @@
+-r trading-assistant.txt
+-r strategy-research.txt
+pytest==9.1.1

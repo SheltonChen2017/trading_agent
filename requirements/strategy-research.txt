@@ -1,0 +1,7 @@
+-r common.txt
+# `scripts/run_filing_extraction.py` owns a lazy, call-time Anthropic provider.
+# Product manifests describe callable surfaces, not only eager imports.
+anthropic==0.120.0
+scikit-learn==1.9.0
+joblib==1.5.3
+databento==0.81.0

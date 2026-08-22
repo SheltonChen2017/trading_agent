@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "migration-baseline",
+  "status": "sep2-provider-ownership-enforced",
   "products": {
     "trading_assistant": {
       "owned_roots": [
@@ -27,9 +27,11 @@
     "config.py",
     "market_analytics.py"
   ],
-  "mixed_roots_pending_classification": [
+  "classified_mixed_roots": [
     "scripts"
   ],
+  "mixed_roots_pending_classification": [],
+  "entry_point_manifest": "architecture/entry_points.json",
   "authority_roots": [
     "assistant.allocation_batch",
     "assistant.execution_kernel",

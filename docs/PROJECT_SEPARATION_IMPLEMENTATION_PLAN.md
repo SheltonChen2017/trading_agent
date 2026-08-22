@@ -194,6 +194,113 @@ classification remains SEP-2 work.
 - keep licensed datasets and immutable research snapshots on the research
   side, with only non-reconstructable approved outputs crossing the boundary.
 
+#### SEP-2 first tranche — classification and dependency baseline (Codex, 2026-08-22)
+
+Commit `ba8d0eb` classifies the complete current migration surface without
+moving or relaunching anything:
+
+- `architecture/entry_points.json` owns every one of the **75** files under
+  `scripts/` exactly once: 7 trading-assistant files, 50 strategy-research
+  files, and 18 explicit cross-product composition files;
+- four files are honestly identified as helpers, while every other Python
+  file has a direct runner (except the Streamlit entry point) or is an
+  executable PowerShell surface;
+- the 14 Python composition crossings are an exact root-level debt ledger,
+  so a new assistant-to-research or research-to-assistant import fails rather
+  than being normalized as composition;
+- pinned dependency declarations now exist at
+  `requirements/trading-assistant.txt` and
+  `requirements/strategy-research.txt`, with a shared base and a development
+  union that exactly reconstructs the legacy `requirements.txt`; and
+- all 16 `data/*.py` files are classified as one package marker, six neutral
+  contracts, or nine named shared-provider debts. Licensed ACER/Databento
+  surfaces are research-only, and the immutable result contract is the only
+  approved cross-product result surface.
+
+Dangerous-direction mutations proved three guards: a newly added script is
+unowned and fails; adding a backtest import to an assistant-only watchdog
+fails; and importing an ACER snapshot module into assistant proposal code
+fails. Restored focused tests pass 16/16; the combined boundary and active-
+document set passes 69/69; the complete tree passes 4,514 tests with 25 known
+dependency warnings; and required compilation including `research/` passes.
+
+This is a classification and dependency tranche, not completion of SEP-2.
+No runtime import, launcher, provider, scheduled task, database, deployment,
+or evidence epoch changed. After independent review, the next tranche must
+give the nine shared provider modules explicit product-owned implementations
+or a justified neutral interface, and reduce the 18 composition files rather
+than broadening their exact ledger.
+
+Independently reviewed 2026-08-22 (accepted after correction; two P2 and
+three P3 corrected, two P3 recorded — see
+`docs/Archive/Review/REVIEW_2026-08-22_SEP2_ENTRYPOINT_CLASSIFICATION.md`
+and handoff section 7do). The 75-file classification, the 14-crossing ledger
+and the clean product launchers were reproduced with an independent scanner.
+Two guards were fail-open: the ledger is root-granular, so repointing an
+existing `assistant` crossing at `assistant.execution_service` failed nothing,
+and the `scripts/`/`data/` inventories were non-recursive, so a file in a new
+subdirectory was neither classified nor scanned. Both are closed and
+mutation-verified; only trading-assistant-hosted entry points may now import
+the authority roots. Two items are recorded rather than fixed and belong to
+the next tranche: the pre-existing lazy transitive chain
+`scripts/run_ml_evidence_supervisor.py -> assistant.operations ->
+assistant.readiness -> execution.alpaca_broker`, and the fact that the
+dependency manifests are still asserted only against each other, never
+against actual imports.
+
+Codex counter-reviewed Claude's exact pushed head `cd11bea` (accepted after
+correction; one P2 closed at `3cdb2ed`; see
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_ENTRYPOINT_CLASSIFICATION.md`).
+The authority scanner treated `from assistant import execution_service` as
+only an `assistant` import, so the authority and licensed-surface guards stayed
+green. It now expands parent-package imports to their exact child modules and
+the dangerous mutation is regression-pinned.
+
+#### SEP-2 second tranche — provider ownership and composition reduction
+
+Commit `de2bd1a` completes the next bounded implementation tranche without
+claiming SEP-2 complete:
+
+- the nine former shared-provider debts now have explicit ownership: three
+  assistant implementations (`corporate_actions`, `event_data`,
+  `price_source`), three research implementations (`analyst_data`,
+  `earnings_data`, `pit_universe`), and three justified provider-neutral
+  services (`macro_data`, `market_data`, `price_target_data`);
+- a permanent guard scans both product packages and their hosted launchers so
+  neither product can import the other's provider implementation; the
+  implementations keep their legacy `data.*` locations for compatibility,
+  but ownership is no longer shared or unbounded;
+- runtime identity moved to neutral `data.runtime_identity`, while
+  `assistant.runtime_identity` remains an object-identity-preserving facade;
+  five research launchers now import the neutral definition, reducing the
+  composition inventory from **18 to 13** and the exact Python crossing ledger
+  from **14 to 9**;
+- alert JSONL serialization moved to neutral `data.operational_alerts`, with
+  the old assistant export preserving object identity. The ML evidence
+  supervisor no longer imports broad `assistant.operations`, removing the
+  exact lazy reach through readiness to the broker module that SEP2-006 named.
+  The class is not closed: `scripts/run_ml_shadow.py` still holds the same
+  import and therefore the same reach, and it is now pinned as an exact
+  shrinking ledger rather than by naming the one repaired file;
+- dependency guards now compare the declarations with actual product and
+  hosted-launcher imports, recognize QuantConnect's platform-provided
+  `AlgorithmImports`, and declare the filing extractor's lazy Anthropic
+  dependency on the research side; and
+- static ownership now refuses relative imports, `__import__`,
+  `importlib.import_module`, and `exec` in `scripts/`, so a new import form
+  cannot bypass the exact graph silently.
+
+Dangerous-direction checks proved the new controls: an assistant import of a
+research-owned provider fails, and an assistant import of undeclared `joblib`
+fails its dependency declaration. No provider was called and no runtime,
+broker, database, task, deployment, backtest, result, research look, or
+evidence epoch changed.
+
+SEP-2 remains incomplete. Thirteen composition files remain, including the
+operator-database composition surfaces and PowerShell launchers. Their
+ownership and extraction must be reduced without moving broker authority into
+research or moving licensed research data into the assistant.
+
 ### SEP-3 — physical extraction decision
 
 After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction

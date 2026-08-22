@@ -29,7 +29,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:  # direct `python scripts/...` invocation
     sys.path.insert(0, str(REPO_ROOT))
 
-from assistant.runtime_identity import RuntimeIdentityError, current_commit  # noqa: E402
+from data.runtime_identity import RuntimeIdentityError, current_commit  # noqa: E402
 from ml.hashing import canonical_json  # noqa: E402
 from ml.immutable_io import (  # noqa: E402
     ImmutableFileConflictError,

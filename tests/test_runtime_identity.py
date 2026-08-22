@@ -175,6 +175,7 @@ def test_every_script_uses_the_shared_definition():
             ):
                 offenders.append(f"{path.name}:{node.lineno}")
     assert not offenders, (
-        "scripts must call assistant.runtime_identity.current_commit() rather "
+        "scripts must call data.runtime_identity.current_commit() (or the "
+        "assistant compatibility facade) rather "
         f"than shelling out to git themselves: {offenders}"
     )

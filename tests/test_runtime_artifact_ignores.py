@@ -1,6 +1,6 @@
 """AP-2 (ACTION_PLAN 2026-08-02): runtime artifact paths must be ignored.
 
-``assistant/runtime_identity.py`` refuses evidence capture when ``git
+``data/runtime_identity.py`` refuses evidence capture when ``git
 status --porcelain --untracked-files=all`` reports ANYTHING, so every path
 the documented operational commands write inside the repository must be
 git-ignored -- otherwise the first scheduled run dirties the worktree and

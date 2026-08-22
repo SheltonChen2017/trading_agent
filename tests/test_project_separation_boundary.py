@@ -181,7 +181,11 @@ def _cross_product_edges(manifest: dict, graph: dict[str, set[str]]) -> set[tupl
 def test_separation_manifest_is_narrow_complete_and_well_formed():
     manifest = _manifest()
     assert manifest["schema_version"] == 1
-    roots = _owned_roots(manifest) + manifest["mixed_roots_pending_classification"]
+    roots = (
+        _owned_roots(manifest)
+        + manifest.get("classified_mixed_roots", [])
+        + manifest["mixed_roots_pending_classification"]
+    )
     assert len(roots) == len(set(roots)), "a path cannot belong to two separation groups"
     missing = sorted(root for root in roots if not _root_path(root).exists())
     assert not missing, f"separation manifest names missing roots: {missing}"

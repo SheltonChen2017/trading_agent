@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-1 shared contracts and read-only research adapter**
+Status: **ACTIVE — SEP-1 first extraction tranche implemented; independent review pending**
 
 Owner direction: 2026-08-21
 
@@ -86,6 +86,35 @@ the exact pushed snapshot.
 - remove corresponding ledger edges rather than broadening exceptions;
 - keep all proposal, approval, execution, and reconciliation authority solely
   in the trading assistant.
+
+#### SEP-1 implementation state (Codex, 2026-08-21)
+
+Commit `18868d3` completes the first coherent extraction tranche without
+claiming the whole milestone complete:
+
+- broker/manual portfolio snapshot construction now lives in
+  `assistant.portfolio_snapshot`; `assistant.allocation_batch` imports that
+  narrow module rather than the research-aware context builder;
+- the only execution-authority-to-research path is removed, so
+  `allowed_authority_research_paths` is empty;
+- exact decimal helpers and `EvidenceStatus` now live in the temporary shared
+  kernel, with identity-preserving compatibility facades at
+  `assistant.money` and `assistant.schemas`;
+- four neutral ML-to-assistant edges leave the debt ledger, reducing the
+  direct cross-product count from **13 to 9**; and
+- new guards reject a shared-kernel dependency back into either product,
+  facade identity drift, and restoration of the allocation-to-context path.
+
+Mutation checks proved both dangerous directions: restoring the old
+allocation import produced the exact former transitive violation and failed
+two guards; adding a shared-module import of `assistant.schemas` failed the
+new shared-kernel direction guard. Existing import paths remain supported.
+
+SEP-1 is **not complete**. The nine remaining direct edges still require the
+read-only research-result adapter, provider-neutral evidence/mandate contracts,
+and removal of assistant calculation imports. Those changes remain behind
+independent review of this tranche; no exception was broadened and no runtime
+authority moved.
 
 ### SEP-2 — entry points, dependencies, and data ownership
 

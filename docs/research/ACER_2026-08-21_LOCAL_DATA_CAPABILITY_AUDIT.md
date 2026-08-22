@@ -179,7 +179,10 @@ None of these is chosen here; each is a different trade.
    the required cloud datasets. Cloud datasets cannot be hashed locally, so
    compensate with dataset/version disclosures, project/compile/backtest ids,
    source-code SHA and hashes of any permitted uploaded custom data. The
-   ratings-transfer and terminal-delisting-return gates remain independent.
+   purchase-specific vendor-use/third-party-processing terms and the
+   terminal-delisting-return gate remain independent. The former is a terms
+   verification, not an automatic requirement for a separate permission
+   letter.
 4. **Amend the frozen universe rule** to exclude delisted securities. This is
    cheap and **not recommended**: it reintroduces survivorship bias into a
    study whose whole purpose is an honest out-of-sample answer, and this

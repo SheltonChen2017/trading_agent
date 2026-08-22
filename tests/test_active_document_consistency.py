@@ -1354,3 +1354,45 @@ def test_acer_active_docs_limit_the_negative_finding_to_the_audited_path():
         assert "EDGAR/yfinance path" in document
         assert "Databento" in document
         assert "repository-wide local feasibility remains unresolved" in document.lower()
+
+
+def test_active_acer_docs_do_not_turn_advice_disclaimer_into_research_ban():
+    """Strategy research does not automatically require a permission letter.
+
+    The purchase-specific processing terms still need verification. This guard
+    prevents that narrow check from drifting back into the disproven blanket
+    claim that an investment-advice disclaimer bans personal backtesting.
+    Historical review passages in the handoff remain preserved, so only its
+    current correction and resume prompt are evaluated here.
+    """
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    plan = _text("ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
+    freeze = _text("research/ACER_2026-08-20_ACER0A_FREEZE.md")
+    audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
+    handoff = _text("SESSION_HANDOFF.md")
+    current_handoff = handoff.split(
+        "## 7dj. Codex counter-review of SEP-1 contracts review", 1
+    )[1]
+
+    for document in (action, plan, freeze, audit, current_handoff):
+        lowered = document.lower()
+        assert "permission letter" in lowered
+        assert any(
+            phrase in lowered
+            for phrase in (
+                "not automatically",
+                "not an automatic",
+                "not presumed necessary",
+                "does not by itself require",
+                "without treating written permission as an automatic",
+            )
+        )
+        assert (
+            "purchase-specific" in lowered
+            or "order form and additional terms" in lowered
+        )
+
+    for document in (action, plan, freeze, current_handoff):
+        assert "backtesting rating impact" in document.lower()
+    assert "investment-advice disclaimer" in action.lower()
+    assert "investment-advice disclaimer" in freeze.lower()

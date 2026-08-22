@@ -214,14 +214,6 @@ def test_research_result_contract_is_immutable():
         result.label = "forged"  # type: ignore[misc]
 
 
-if __name__ == "__main__":
-    test_generate_leveraged_pair_rebalance_proposals_is_ticker_agnostic()
-    test_generate_leveraged_pair_rebalance_proposals_records_evaluation_under_its_own_strategy_key()
-    test_soxx_soxl_wrapper_produces_identical_proposals_to_generic_call()
-    test_configured_leveraged_pairs_each_have_distinct_strategy_keys()
-    print("All strategy_proposals_generic tests passed.")
-
-
 def test_assistant_refuses_research_target_above_the_configured_cap():
     """SEP1C-001: the cap refusal is the assistant's own guard, so pin it.
 
@@ -255,3 +247,15 @@ def test_assistant_refuses_research_target_above_the_configured_cap():
             market_data=market_data,
             research_result=over_cap,
         )
+
+
+if __name__ == "__main__":
+    test_generate_leveraged_pair_rebalance_proposals_is_ticker_agnostic()
+    test_generate_leveraged_pair_rebalance_proposals_records_evaluation_under_its_own_strategy_key()
+    test_soxx_soxl_wrapper_produces_identical_proposals_to_generic_call()
+    test_configured_leveraged_pairs_each_have_distinct_strategy_keys()
+    test_assistant_generator_fails_closed_without_research_result()
+    test_assistant_rejects_result_bound_to_different_close_history()
+    test_research_result_contract_is_immutable()
+    test_assistant_refuses_research_target_above_the_configured_cap()
+    print("All strategy_proposals_generic tests passed.")

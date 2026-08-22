@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-1 implementation reviewed; completion pending counter-review of the review corrections**
+Status: **ACTIVE — SEP-2 entry-point, dependency, and data-ownership classification**
 
 Owner direction: 2026-08-21
 
@@ -74,7 +74,7 @@ Definition of done: the focused boundary tests, active-document checks, full
 suite, compilation, diff and secret checks pass; Claude independently reviews
 the exact pushed snapshot.
 
-### SEP-1 — shared contracts and read-only research adapter (current)
+### SEP-1 — shared contracts and read-only research adapter (reviewed)
 
 - first remove
   `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
@@ -177,12 +177,15 @@ verification added to the licence correction — see
 handoff section 7dl). The zero-edge and zero-authority-path claims were
 reproduced with an independent scanner.
 
-Claude's review is complete; Codex must counter-review its corrections
-before SEP-1 is marked complete or SEP-2 begins. `scripts/`
-classification remains SEP-2 work. No feature-milestone entry is recorded
-before that review chain closes.
+Codex counter-reviewed Claude's exact review head `6f8228f` on 2026-08-22
+(accepted after correction; one P3 direct-run-harness truth defect corrected
+at `00d5abe`; see
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP1_ADAPTER_TRANCHE.md`).
+The review chain is closed and SEP-1 meets its definition of done. The
+feature-milestone record now carries the completed milestone. `scripts/`
+classification remains SEP-2 work.
 
-### SEP-2 — entry points, dependencies, and data ownership
+### SEP-2 — entry points, dependencies, and data ownership (current)
 
 - classify every `scripts/` entry point;
 - give each product its own launch surface and dependency declaration;

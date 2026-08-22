@@ -5604,24 +5604,60 @@ strategy logic rests on side-by-side source comparison and the existing
 suites; the composition seam is exercised by the new generic-pair tests but
 not by a live UI session in this review.
 
+## 7dm. Codex counter-review of the SEP-1 adapter review (2026-08-22)
+
+Codex counter-reviewed exact pushed Claude branch
+`origin/user/claude/review-sep1-adapters-20260822` at
+`6f8228f2b6703007938c14fbed5bfc09e2b69687`, based exactly on submitted
+Codex head `71d8500548514e6f864f8f31d033e58beff8961d`. Ordered Claude commits were
+`2553493`, `6ddc787`, and `6f8228f`. Full dispositions and the issue ledger
+are in
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP1_ADAPTER_TRANCHE.md`
+(counter-review record `8299513`; test correction `00d5abe`).
+
+**Accepted after correction. No P0/P1/P2; one P3.** Both of Claude's
+findings reproduce. Disabling the configured-cap refusal makes Claude's new
+test fail, and the official Massive Analyst Ratings page visibly listed
+“backtesting rating impact” among its use cases on 2026-08-22. That public
+page supports only the narrow use-case statement; it does not settle private
+order-form or third-party-processing terms, and the current verify-before-
+upload gate remains unchanged.
+
+**SEP1CR2-001 (P3, corrected at `00d5abe`):** the test module's built-in
+direct runner sat above four newer contract tests, including Claude's cap
+refusal, yet printed “All strategy_proposals_generic tests passed.” With the
+cap check temporarily disabled, direct execution stayed green while the
+focused pytest case failed `DID NOT RAISE`. The runner now sits last and
+executes all eight tests. Direct execution and pytest both pass restored.
+
+Independent source searches reproduce zero direct cross-product imports,
+zero authority-to-research paths, no product import of the temporary
+composition seam, and no hidden dynamic product crossing. Focused boundary,
+proposal, explanation, and active-document tests passed 77/77 before the
+correction; the corrected proposal module passed 8/8. The complete final tree
+passed **4,506 tests / 0 failed / 25 warnings** in 685.05 seconds under
+Python 3.13.14, and required `compileall` including `research/` passed. No
+provider account, licensed row, broker, operator database, task, deployment,
+backtest, outcome, research look, or evidence epoch was accessed or changed.
+
+The review chain is closed. SEP-1 meets its definition of done and is now
+recorded in `docs/FEATURE_MILESTONE_RECORD.md`. SEP-2 is the current bounded
+milestone: classify every `scripts/` entry point, establish product launch
+and dependency surfaces, and resolve data ownership without weakening the
+zero-edge or zero-authority-path invariants.
+
 ## 8. What is next
 
-**Current implementation sequencing (owner, 2026-08-21):** **SEP-1 is the
+**Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
 current bounded milestone.** SEP-0 is accepted after correction (sections
-7dc–7dd). SEP-1's first extraction tranche is
-implemented in section 7de and **independently reviewed in section 7df
-(accepted after correction)**. Its second neutral-contract tranche is
-implemented in section 7dh and **independently reviewed in section 7di
-(accepted after correction)**. Its final research-result adapter tranche is
-implemented in section 7dk and **independently reviewed in section 7dl
-(accepted after correction; two P3 corrections awaiting Codex
-counter-review)**; the direct crossing
-and authority-exception counts are both zero. SEP-1's implementation is
-complete against its definition of done, and it is marked complete — with
-its feature-milestone entry — only after Codex counter-reviews the 7dl
-corrections. The former pinned
+7dc–7dd). SEP-1's three implementation tranches and their independent review
+chain are closed in sections 7de–7dm; the direct-crossing and authority-
+exception counts are both zero, and the milestone is recorded in
+`docs/FEATURE_MILESTONE_RECORD.md`. The former pinned
 `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
-authority path is removed. ACER remains the first
+authority path is removed. SEP-2 now classifies the mixed `scripts/` surface,
+launch/dependency boundaries, and data ownership under the active separation
+plan. ACER remains the first
 research program, but its next Cloud capability audit is not the current code
 implementation task. The separation work grants no outcome-run, vendor,
 broker, deployment, database, task, or epoch authority.
@@ -5901,17 +5937,13 @@ an existing **unmeasured candidate**, not a validated solution. The corrected
 capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
-unmeasured optional provider. It does not replace vendor evidence. **SEP-1 is
-the current bounded milestone.** Its first extraction tranche was independently
-reviewed and accepted after correction in section 7df. The second SEP-1
-neutral-contract tranche is implemented in section 7dh on
-`codex/sep1-research-contracts-20260821` and was independently reviewed and
-counter-reviewed in sections 7di–7dj. The final adapter tranche is implemented
-in section 7dk on `codex/sep1-research-result-adapters-20260822` and awaits
-Claude's independent review. It reduces the exact direct-crossing ledger from
-four to zero without an authority exception. Review that exact pushed head;
-do not reopen the first two tranches. SEP-2 must wait until this review chain
-closes under `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
+unmeasured optional provider. It does not replace vendor evidence. **SEP-2 is
+the current bounded milestone.** SEP-1's three extraction tranches and their
+review chain are closed in sections 7de–7dm, with the exact direct-crossing
+ledger and authority-exception count both zero. Do not reopen SEP-1. Continue
+with SEP-2's `scripts/` classification, product launch/dependency surfaces,
+and data-ownership boundaries under
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

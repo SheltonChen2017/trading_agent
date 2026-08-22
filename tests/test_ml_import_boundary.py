@@ -10,6 +10,7 @@ assistant/allocation_batch.py may import `ml` (strategy doc section 3.1:
 from __future__ import annotations
 
 import ast
+import json
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -234,6 +235,64 @@ def test_no_execution_capable_module_reaches_ml_transitively():
     assert not offending_chains, (
         "execution-capable code reaches ml through an indirect import: "
         + "; ".join(sorted(offending_chains))
+    )
+
+
+def test_execution_products_cannot_reach_llm_derived_neutral_contracts():
+    """SEP2F-003: relocation must preserve the boundary transitively.
+
+    A direct-only check can be bypassed by ``assistant -> data.helper ->
+    data.filing_extraction``. The same first-party graph that protects the
+    original ``ml`` root therefore protects every explicitly inventoried
+    LLM-derived neutral contract, including unresolved dynamic imports on a
+    reachable path.
+    """
+    manifest = json.loads(
+        (REPO_ROOT / "architecture" / "entry_points.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    forbidden = {
+        path.removesuffix(".py").replace("/", ".")
+        for path in manifest["llm_derived_neutral_contracts"]["modules"]
+    }
+    assert forbidden, "LLM-derived neutral-contract inventory may not be empty"
+
+    graph, unresolved = _internal_import_graph()
+    assert not unresolved, (
+        "the LLM-derived boundary cannot be proved while imports are unresolved: "
+        + "; ".join(sorted(unresolved))
+    )
+    roots = sorted(
+        module
+        for module in graph
+        if module.split(".", 1)[0] in {"assistant", "execution", "risk"}
+    )
+    offenders: list[str] = []
+    for root in roots:
+        seen = {root}
+        stack = [(root, (root,))]
+        while stack:
+            current, chain = stack.pop()
+            for dependency in sorted(graph.get(current, ())):
+                next_chain = chain + (dependency,)
+                if dependency.startswith("<unresolved "):
+                    offenders.append(" -> ".join(next_chain))
+                    continue
+                if any(
+                    dependency == contract
+                    or dependency.startswith(f"{contract}.")
+                    for contract in forbidden
+                ):
+                    offenders.append(" -> ".join(next_chain))
+                    continue
+                if dependency in graph and dependency not in seen:
+                    seen.add(dependency)
+                    stack.append((dependency, next_chain))
+
+    assert not offenders, (
+        "execution-capable code reaches an LLM-derived neutral contract: "
+        + "; ".join(sorted(offenders))
     )
 
 

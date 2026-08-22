@@ -240,8 +240,13 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             bucket = "integration"
         test_surfaces[bucket].append(path)
 
-    launch_counts = {
+    ownership_counts = {
         name: len(entry_points["script_ownership"][name])
+        for name in ("trading_assistant", "strategy_research", "cross_product_composition")
+    }
+    helpers = set(entry_points["non_launch_helpers"])
+    launch_counts = {
+        name: len(set(entry_points["script_ownership"][name]) - helpers)
         for name in ("trading_assistant", "strategy_research", "cross_product_composition")
     }
     destination_counts = {
@@ -259,6 +264,7 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             "destination_counts": destination_counts,
         },
         "surfaces": {
+            "script_ownership_counts": ownership_counts,
             "launch_counts": launch_counts,
             "dependency_manifests": manifest["dependency_surfaces"],
             "test_counts": {name: len(items) for name, items in test_surfaces.items()},

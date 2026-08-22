@@ -40,6 +40,16 @@ def test_reviewed_extraction_dry_run_is_exact_and_not_authorized():
         },
     }
     assert result["physical_extraction_authorized"] is False
+    assert result["surfaces"]["script_ownership_counts"] == {
+        "trading_assistant": 8,
+        "strategy_research": 56,
+        "cross_product_composition": 11,
+    }
+    assert result["surfaces"]["launch_counts"] == {
+        "trading_assistant": 7,
+        "strategy_research": 54,
+        "cross_product_composition": 10,
+    }
     assert result["blockers"] == {
         "composition_files": 11,
         "python_crossing_roots": 6,

@@ -5957,6 +5957,84 @@ remain, concentrated in operator-database composition surfaces, UI/runner
 seams, and PowerShell launchers. Continue reducing them without moving broker
 authority into research or licensed research state into the assistant.
 
+## 7ds. Independent review of the SEP-2 launch-surface tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-launch-20260822`, created from the exact
+fetched remote head `7a21597` on
+`origin/codex/sep2-launch-surface-reduction-20260822`, based on my prior review
+head `0a346a2`. That base is `origin/main`'s second parent and I had already
+verified the two trees are identical, so nothing on `main` is missed. All five
+commits carry an explicit disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP2_LAUNCH_SURFACE.md`.
+
+**Accepted after correction. No P0/P1/P2; one P3.** The cleanest tranche of the
+series; the single finding is a test name that lagged its own assertion.
+
+**The mandate move was the highest-risk change so far and it is clean.**
+Moving `PortfolioMandate` to `data.portfolio_mandate` could have invalidated
+the owner's 2026-08-04 approval, since `MANDATE.md` binds it to an
+`approved_fingerprint`. Measured: the stored fingerprint recomputes
+**identically** on this tree; `assistant.mandate.PortfolioMandate is
+data.portfolio_mandate.PortfolioMandate`; `compute_mandate_fingerprint`
+references no module, qualname, class or type token, so it is value-derived;
+`DEFAULT_MANDATE_PATH` still points at the assistant's own asset; and
+`evaluate_live_promotion`, the authority-bearing gate, correctly stayed in the
+assistant. `validate()` differs at AST level only because an intermediate
+tuple binding was inlined — all 27 string constants, both numeric constants,
+and the entire control-flow/operator sequence are identical element for
+element. `PortfolioMandate` has no pickle or joblib site, so the module move
+cannot break a stored artifact. The owner-approval property is also already
+**pinned** by `test_default_mandate_is_owner_approved_with_bound_fingerprint`,
+so a fingerprint-breaking move would have failed the suite.
+
+**SEP2-006 is genuinely closed — the class, not just the named instance.** The
+previous tranche fixed one script; this one fixed the sibling and drove my
+guard to `== set()`. I checked whether that closes the class or merely one
+route, since `assistant.storage` still reaches six non-assistant entry points:
+a breadth-first first-party trace from **every** research-hosted and
+shared-composition entry point now reaches `alpaca` **nowhere**, and
+`assistant.storage` does not reach `execution/` or `alpaca` at all. The reach
+is gone, not relocated.
+
+Also reproduced: ledger movement 7 / 56 / 12 with crossings 9 → 8, 19 declared
+`data/*.py` matching 19 actual with `portfolio_mandate` as the ninth neutral
+contract and zero shared provider debt; zero direct crossings and zero
+authority paths unchanged; all three of Codex's claimed mutations; and a
+facade-identity mutation of my own, caught by two independent tests. One
+behaviour trap that could have hidden here did not:
+`run_portfolio_research_report.py` lost the default-path loader, but its
+`--mandate` argument already constructed its own default pointing at
+`assistant/default_mandate.json`, so the same path is passed as before.
+
+**SEP2L-001 (P3, corrected):** the guard's assertion was correctly strengthened
+from a one-entry ledger to emptiness, but its name still read
+`..._is_an_exact_shrinking_ledger` — advertising a ledger over an assertion
+demanding zero, which would invite re-adding an entry as though a retained
+exception were sanctioned. Renamed to
+`test_no_entry_point_outside_the_trading_assistant_reaches_broad_operations`,
+with the docstring recording the transition. Assertion and behaviour unchanged;
+the reintroduction mutation is still red under the new name.
+
+Codex's counter-review of my previous round accepted both commits with no
+findings.
+
+Validation on the final tree: entry-point guards 16 passed; focused entry
+point + boundary + mandate set 30 passed; complete suite **4,523 passed / 0
+failed / 25 warnings** in 730.99 seconds on Python 3.13.14 — unchanged from
+Codex's 4,523 because a rename is count-neutral; `compileall` including `research/` passes;
+`git diff --check` clean. Codex's submitted-snapshot counts (4,523, 25
+warnings, 714.96s, 53/53 active-document) are accepted on its record.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+SEP-2 remains incomplete. The largest remaining item is the
+`assistant.storage` operator-database boundary across six entry points, which
+plan §3 names explicitly; then per-product launch surfaces, the residual 12
+composition files and 8 crossings, and shrinking the shared kernel.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -5974,8 +6052,11 @@ P2 fail-open guards closed). Section 7dp closes Codex's counter-review and
 implements the bounded provider-ownership/composition-reduction tranche at
 `de2bd1a`; section 7dq is Claude's independent review of that tranche
 (accepted after correction, three P3). Section 7dr accepts that review and
-implements the launch-surface/mandate-contract tranche at `2fb1754`. SEP-2 is
-not complete and now awaits Claude's independent review of this exact branch.
+implements the launch-surface/mandate-contract tranche at `2fb1754`; section
+7ds is Claude's independent review of that tranche (accepted after correction,
+one P3), which also verified that the owner-approved mandate fingerprint
+survives the module move and that SEP2-006's broker reach is closed as a class.
+SEP-2 is not complete and now awaits Codex's counter-review of that review head.
 ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
@@ -6264,9 +6345,9 @@ ledger and authority-exception count both zero. Do not reopen SEP-1. SEP-2's
 first classification/dependency tranche is implemented at `ba8d0eb`, recorded
 in section 7dn, and independently reviewed in section 7do at `fc89903`;
 Codex's counter-review and the provider-ownership tranche are in section 7dp,
-and Claude's review of that tranche is section 7dq at `e78d02a`. The 75 script
-files, **13** composition files and **9** crossings are the current exact
-baselines, and the nine former shared provider debts are now 3 assistant-owned,
+and Claude's review of that tranche is section 7dq at `e78d02a`. Section 7dr is
+the launch-surface/mandate tranche and section 7ds is Claude's review of it at
+`8f7a8ac`. The nine former shared provider debts are now 3 assistant-owned,
 3 research-owned and 3 provider-neutral services — none permanent exceptions.
 Only trading-assistant-hosted entry points may import
 the authority roots; the scanner sees parent-package spellings such as

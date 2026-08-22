@@ -10,11 +10,19 @@ import ast
 import dataclasses
 import json
 from pathlib import Path
+import sys
 
 from data.research_results import (
     LeveragedPairResearchResult,
     SignalTriggerResult,
 )
+from assistant.runtime_identity import (
+    RuntimeIdentityError as AssistantRuntimeIdentityError,
+    current_commit as assistant_current_commit,
+)
+from assistant.operations import append_alerts_jsonl as assistant_append_alerts_jsonl
+from data.operational_alerts import append_alerts_jsonl
+from data.runtime_identity import RuntimeIdentityError, current_commit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -208,8 +216,77 @@ def test_product_dependency_declarations_reconstruct_the_legacy_environment():
     assert "anthropic==0.120.0" in assistant
     assert not {"scikit-learn==1.9.0", "joblib==1.5.3", "databento==0.81.0"} & assistant
     assert {"scikit-learn==1.9.0", "joblib==1.5.3", "databento==0.81.0"} <= research
-    assert not {"alpaca-py==0.43.5", "streamlit==1.60.0", "anthropic==0.120.0"} & research
+    assert "anthropic==0.120.0" in research
+    assert not {"alpaca-py==0.43.5", "streamlit==1.60.0"} & research
     assert "pytest==9.1.1" not in assistant | research
+
+
+def test_product_dependency_manifests_cover_actual_imports():
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    boundaries = _json(BOUNDARY_MANIFEST)
+    distribution_for_import = {
+        "alpaca": "alpaca-py==0.43.5",
+        "anthropic": "anthropic==0.120.0",
+        "databento": "databento==0.81.0",
+        "joblib": "joblib==1.5.3",
+        "lxml": "lxml==6.1.1",
+        "numpy": "numpy==2.5.1",
+        "pandas": "pandas==3.0.5",
+        "pandas_market_calendars": "pandas_market_calendars==5.4.0",
+        "requests": "requests==2.34.2",
+        "sklearn": "scikit-learn==1.9.0",
+        "streamlit": "streamlit==1.60.0",
+        "yfinance": "yfinance==1.5.2",
+    }
+    first_party = {
+        Path(root).stem
+        for product in boundaries["products"].values()
+        for root in product["owned_roots"]
+    } | {"data", "scripts", "config", "market_analytics"}
+    standard = set(sys.stdlib_module_names) | {"__future__"}
+
+    for product in ("trading_assistant", "strategy_research"):
+        paths = {
+            path
+            for root in boundaries["products"][product]["owned_roots"]
+            for path in (
+                [ROOT / root]
+                if (ROOT / root).is_file()
+                else _source_files(ROOT / root, "*.py")
+            )
+        }
+        paths.update(
+            ROOT / relative
+            for relative in manifest["script_ownership"][product]
+            if relative.endswith(".py")
+        )
+        paths.update(
+            ROOT / relative
+            for relative, host in manifest["composition_hosts"].items()
+            if host == product and relative.endswith(".py")
+        )
+        imported = {root for path in paths for root in _import_roots(path)}
+        third_party = (
+            imported
+            - first_party
+            - standard
+            - set(manifest["platform_provided_imports"][product])
+        )
+        assert third_party <= set(distribution_for_import), (
+            f"{product} imports undeclared third-party roots: "
+            f"{sorted(third_party - set(distribution_for_import))}"
+        )
+        declared = _requirements(
+            ROOT / manifest["dependency_manifests"][product]
+        )
+        missing = {
+            distribution_for_import[root]
+            for root in third_party
+            if distribution_for_import[root] not in declared
+        }
+        assert missing == set(), (
+            f"{product} dependency manifest misses imports: {sorted(missing)}"
+        )
 
 
 def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
@@ -218,6 +295,9 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
     categories = (
         ownership["package_markers"]
         + ownership["neutral_contracts"]
+        + ownership["provider_neutral_services"]
+        + ownership["product_owned_provider_implementations"]["trading_assistant"]
+        + ownership["product_owned_provider_implementations"]["strategy_research"]
         + ownership["shared_provider_debt"]
     )
     actual = sorted(_relative(path) for path in _source_files(ROOT / "data", "*.py"))
@@ -226,17 +306,96 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
         "data/ ownership changed; provider access must receive explicit product "
         "ownership rather than silently enlarging shared debt"
     )
-    assert ownership["shared_provider_debt"] == [
-        "data/analyst_data.py",
-        "data/corporate_actions.py",
-        "data/earnings_data.py",
-        "data/event_data.py",
+    assert ownership["product_owned_provider_implementations"] == {
+        "trading_assistant": [
+            "data/corporate_actions.py",
+            "data/event_data.py",
+            "data/price_source.py",
+        ],
+        "strategy_research": [
+            "data/analyst_data.py",
+            "data/earnings_data.py",
+            "data/pit_universe.py",
+        ],
+    }
+    assert ownership["provider_neutral_services"] == [
         "data/macro_data.py",
         "data/market_data.py",
-        "data/pit_universe.py",
-        "data/price_source.py",
         "data/price_target_data.py",
     ]
+    assert set(ownership["provider_neutral_rationales"]) == set(
+        ownership["provider_neutral_services"]
+    )
+    assert all(ownership["provider_neutral_rationales"].values())
+    assert ownership["shared_provider_debt"] == []
+
+
+def test_product_owned_provider_implementations_do_not_cross_products():
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    boundaries = _json(BOUNDARY_MANIFEST)
+    products = boundaries["products"]
+    owned = manifest["data_ownership"]["product_owned_provider_implementations"]
+    provider_modules = {
+        product: {
+            path.removesuffix(".py").replace("/", ".") for path in paths
+        }
+        for product, paths in owned.items()
+    }
+
+    scan_paths: dict[str, set[Path]] = {}
+    for product in ("trading_assistant", "strategy_research"):
+        paths = {
+            path
+            for root in products[product]["owned_roots"]
+            for path in (
+                [ROOT / root]
+                if (ROOT / root).is_file()
+                else _source_files(ROOT / root, "*.py")
+            )
+        }
+        paths.update(
+            ROOT / relative
+            for relative in manifest["script_ownership"][product]
+            if relative.endswith(".py")
+        )
+        paths.update(
+            ROOT / relative
+            for relative, host in manifest["composition_hosts"].items()
+            if host == product and relative.endswith(".py")
+        )
+        scan_paths[product] = paths
+
+    for product, paths in scan_paths.items():
+        other = (
+            "strategy_research"
+            if product == "trading_assistant"
+            else "trading_assistant"
+        )
+        forbidden = provider_modules[other]
+        offenders = {
+            _relative(path): sorted(_imported_modules(path) & forbidden)
+            for path in paths
+            if _imported_modules(path) & forbidden
+        }
+        assert offenders == {}, (
+            f"{product} imports {other}-owned provider implementations: "
+            f"{offenders!r}"
+        )
+
+
+def test_runtime_identity_facade_preserves_object_identity():
+    assert assistant_current_commit is current_commit
+    assert AssistantRuntimeIdentityError is RuntimeIdentityError
+
+
+def test_operational_alert_facade_preserves_object_identity():
+    assert assistant_append_alerts_jsonl is append_alerts_jsonl
+
+
+def test_ml_evidence_supervisor_avoids_broad_operational_authority_reach():
+    imported = _imported_modules(ROOT / "scripts" / "run_ml_evidence_supervisor.py")
+    assert "data.operational_alerts" in imported
+    assert "assistant.operations" not in imported
 
 
 def test_licensed_research_surfaces_cannot_enter_execution_products():
@@ -321,6 +480,33 @@ def test_import_scanner_expands_parent_module_from_imports(tmp_path: Path):
         "assistant.execution_service",
         "research.acer",
     }
+
+
+def test_script_import_graph_rejects_dynamic_and_relative_bypasses():
+    offenders: list[str] = []
+    for path in _source_files(ROOT / "scripts", "*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.level:
+                offenders.append(f"{_relative(path)}:{node.lineno}:relative-import")
+            if not isinstance(node, ast.Call):
+                continue
+            function = node.func
+            if isinstance(function, ast.Name) and function.id in {"__import__", "exec"}:
+                offenders.append(f"{_relative(path)}:{node.lineno}:{function.id}")
+            if (
+                isinstance(function, ast.Attribute)
+                and isinstance(function.value, ast.Name)
+                and function.value.id == "importlib"
+                and function.attr == "import_module"
+            ):
+                offenders.append(
+                    f"{_relative(path)}:{node.lineno}:importlib.import_module"
+                )
+    assert offenders == [], (
+        "scripts use imports the static ownership graph cannot resolve: "
+        f"{offenders!r}"
+    )
 
 
 def test_only_immutable_approved_results_cross_the_product_boundary():

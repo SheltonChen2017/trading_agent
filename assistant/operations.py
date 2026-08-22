@@ -13,6 +13,7 @@ from typing import Any
 from assistant.policy import TradingPolicy
 from assistant.readiness import transaction_readiness
 from assistant.storage import AssistantStore
+from data.operational_alerts import append_alerts_jsonl
 
 
 class OperationsError(RuntimeError):
@@ -296,21 +297,6 @@ def run_operational_check(
     report["alerts"] = alerts
     report["heartbeat"] = heartbeat
     return report
-
-
-def append_alerts_jsonl(
-    alerts: list[dict[str, Any]], destination: str | Path
-) -> Path:
-    """Append alert envelopes for a local log shipper or paging sidecar."""
-    target = Path(destination)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("a", encoding="utf-8") as handle:
-        for alert in alerts:
-            handle.write(
-                json.dumps(alert, sort_keys=True, default=str) + "\n"
-            )
-        handle.flush()
-    return target
 
 
 def ensure_recent_database_backup(

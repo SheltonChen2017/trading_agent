@@ -35,7 +35,7 @@ from research.quantconnect import (  # noqa: E402
     QuantConnectClient,
     QuantConnectError,
 )
-from assistant.runtime_identity import (  # noqa: E402
+from data.runtime_identity import (  # noqa: E402
     RuntimeIdentityError,
     current_commit,
 )

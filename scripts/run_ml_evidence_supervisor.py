@@ -13,8 +13,8 @@ from typing import Any, Mapping
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from assistant.operations import append_alerts_jsonl
 from assistant.storage import AssistantStore
+from data.operational_alerts import append_alerts_jsonl
 from ml.evidence_operations import (
     EvidenceOperationsPolicy,
     build_evidence_operations_report,

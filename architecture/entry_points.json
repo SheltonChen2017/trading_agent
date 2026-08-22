@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "sep2-entry-points-classified",
+  "status": "sep2-provider-ownership-enforced",
   "script_ownership": {
     "trading_assistant": [
       "scripts/check_epoch_cadence.py",
@@ -21,6 +21,7 @@
       "scripts/backtest_three_sleeve_rule_2026_08_09.py",
       "scripts/build_acer_events.py",
       "scripts/build_pit_universe_20260816.py",
+      "scripts/capture_analyst_ratings.py",
       "scripts/candidate_screen_2026_08_03_new_signals.py",
       "scripts/candidate_screen_20260803.py",
       "scripts/run_alpha_battery_20260815.py",
@@ -40,12 +41,16 @@
       "scripts/run_kelly_ratchet_walkforward_soxx_soxl.py",
       "scripts/run_leverage_rotation_backtest.py",
       "scripts/run_macro_signals_significance_check.py",
+      "scripts/report_acer_identity.py",
+      "scripts/run_ml_experiment.py",
+      "scripts/run_ml_research_campaign.py",
       "scripts/run_momentum_block_significance.py",
       "scripts/run_new_signals_2026_08_03_significance.py",
       "scripts/run_new_signals_report.py",
       "scripts/run_out_of_sample_check.py",
       "scripts/run_pead_persistence_significance.py",
       "scripts/run_quantconnect_smoke.py",
+      "scripts/run_qc_stage0.py",
       "scripts/run_regime_rotation_backtest.py",
       "scripts/run_regime_rotation_cross_pair.py",
       "scripts/run_regime_rotation_grid_search.py",
@@ -64,23 +69,18 @@
       "scripts/run_vol_target_rotation_spy_upro.py"
     ],
     "cross_product_composition": [
-      "scripts/capture_analyst_ratings.py",
       "scripts/install_windows_ml_shadow_tasks.ps1",
       "scripts/install_windows_overlay_shadow_task.ps1",
       "scripts/install_windows_strongbuy_capture_task.ps1",
       "scripts/personal_assistant_ui.py",
       "scripts/product_composition.py",
-      "scripts/report_acer_identity.py",
       "scripts/run_filing_extraction.py",
       "scripts/run_ml_evidence_supervisor.py",
-      "scripts/run_ml_experiment.py",
       "scripts/run_ml_promotion_dossier.py",
-      "scripts/run_ml_research_campaign.py",
       "scripts/run_ml_shadow.py",
       "scripts/run_overlay_shadow.py",
       "scripts/run_personal_assistant.py",
       "scripts/run_portfolio_research_report.py",
-      "scripts/run_qc_stage0.py",
       "scripts/verify_windows_evidence_tasks.ps1"
     ]
   },
@@ -95,41 +95,35 @@
     "strategy_research": "requirements/strategy-research.txt",
     "development_union": "requirements/development.txt"
   },
+  "platform_provided_imports": {
+    "trading_assistant": [],
+    "strategy_research": ["AlgorithmImports"]
+  },
   "composition_hosts": {
-    "scripts/capture_analyst_ratings.py": "strategy_research",
     "scripts/install_windows_ml_shadow_tasks.ps1": "strategy_research",
     "scripts/install_windows_overlay_shadow_task.ps1": "strategy_research",
     "scripts/install_windows_strongbuy_capture_task.ps1": "strategy_research",
     "scripts/personal_assistant_ui.py": "trading_assistant",
     "scripts/product_composition.py": "shared_composition",
-    "scripts/report_acer_identity.py": "strategy_research",
     "scripts/run_filing_extraction.py": "strategy_research",
     "scripts/run_ml_evidence_supervisor.py": "strategy_research",
-    "scripts/run_ml_experiment.py": "strategy_research",
     "scripts/run_ml_promotion_dossier.py": "strategy_research",
-    "scripts/run_ml_research_campaign.py": "strategy_research",
     "scripts/run_ml_shadow.py": "strategy_research",
     "scripts/run_overlay_shadow.py": "strategy_research",
     "scripts/run_personal_assistant.py": "trading_assistant",
     "scripts/run_portfolio_research_report.py": "strategy_research",
-    "scripts/run_qc_stage0.py": "strategy_research",
     "scripts/verify_windows_evidence_tasks.ps1": "shared_composition"
   },
   "declared_python_cross_product_roots": {
-    "scripts/capture_analyst_ratings.py": ["assistant"],
     "scripts/personal_assistant_ui.py": ["backtest"],
     "scripts/product_composition.py": ["assistant", "research"],
-    "scripts/report_acer_identity.py": ["assistant"],
     "scripts/run_filing_extraction.py": ["assistant"],
     "scripts/run_ml_evidence_supervisor.py": ["assistant"],
-    "scripts/run_ml_experiment.py": ["assistant"],
     "scripts/run_ml_promotion_dossier.py": ["assistant"],
-    "scripts/run_ml_research_campaign.py": ["assistant"],
     "scripts/run_ml_shadow.py": ["assistant"],
     "scripts/run_overlay_shadow.py": ["assistant"],
     "scripts/run_personal_assistant.py": ["backtest"],
-    "scripts/run_portfolio_research_report.py": ["assistant"],
-    "scripts/run_qc_stage0.py": ["assistant"]
+    "scripts/run_portfolio_research_report.py": ["assistant"]
   },
   "data_ownership": {
     "package_markers": ["data/__init__.py"],
@@ -137,21 +131,35 @@
       "data/evidence_status.py",
       "data/financial_primitives.py",
       "data/mandate_evaluation.py",
+      "data/operational_alerts.py",
       "data/portfolio_metrics.py",
       "data/research_results.py",
-      "data/research_statistics.py"
+      "data/research_statistics.py",
+      "data/runtime_identity.py"
     ],
-    "shared_provider_debt": [
-      "data/analyst_data.py",
-      "data/corporate_actions.py",
-      "data/earnings_data.py",
-      "data/event_data.py",
+    "product_owned_provider_implementations": {
+      "trading_assistant": [
+        "data/corporate_actions.py",
+        "data/event_data.py",
+        "data/price_source.py"
+      ],
+      "strategy_research": [
+        "data/analyst_data.py",
+        "data/earnings_data.py",
+        "data/pit_universe.py"
+      ]
+    },
+    "provider_neutral_services": [
       "data/macro_data.py",
       "data/market_data.py",
-      "data/pit_universe.py",
-      "data/price_source.py",
       "data/price_target_data.py"
-    ]
+    ],
+    "provider_neutral_rationales": {
+      "data/macro_data.py": "Pure OHLCV transformations with no product policy or authority; both products may supply their own price frames.",
+      "data/market_data.py": "Common read-only historical-bar and synthetic-fixture service; it carries no research hypothesis, proposal, approval, or execution authority.",
+      "data/price_target_data.py": "Read-only target-history retrieval plus point-in-time aggregation used by research signals and assistant display; it exposes no licensed ACER snapshot or action-shaped output."
+    },
+    "shared_provider_debt": []
   },
   "licensed_research_surfaces": [
     "research/acer",

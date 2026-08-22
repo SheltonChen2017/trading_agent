@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from assistant.runtime_identity import RuntimeIdentityError, current_commit
+from data.runtime_identity import RuntimeIdentityError, current_commit
 from ml.research_orchestration import (
     ResearchOrchestrationError,
     load_reviewed_spec,

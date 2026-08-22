@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-1 second extraction tranche reviewed; four adapter edges remain**
+Status: **ACTIVE — SEP-1 implementation complete; awaiting independent review**
 
 Owner direction: 2026-08-21
 
@@ -145,14 +145,36 @@ identity and reject restoration of a migrated product crossing. This tranche
 does not call a provider, broker, backtest, outcome, operator database, task,
 deployment, or evidence epoch.
 
-SEP-1 is **not complete**. The second tranche was independently reviewed
+The second tranche was independently reviewed
 2026-08-22 (accepted after correction; one P3 — restored rationales — see
 `docs/Archive/Review/REVIEW_2026-08-22_SEP1_CONTRACTS_TRANCHE.md` and
-handoff section 7di). The four remaining edges are deliberately policy-heavy:
-two explanation-to-signal imports and two strategy-proposal imports. They must
-move behind typed, read-only research-result adapters in the next tranche;
-putting their calculations in the shared kernel would hide product policy
-rather than separate it. `scripts/` classification remains SEP-2 work.
+handoff section 7di).
+
+Commit `a8c2b77` completes the implementation side of SEP-1's third tranche:
+
+- immutable, provider-neutral result contracts live in
+  `data.research_results`; they contain measurements and input bindings, not
+  proposal, approval, broker, database, or execution authority;
+- research-owned builders in `research.assistant_results` retain the scanner,
+  regime, and strategy calculations;
+- assistant explanation and proposal modules consume the typed results and
+  fail closed when a result is absent or names the wrong ticker, and proposal
+  sizing additionally refuses a mismatched date, parameter digest, or exact
+  close-history digest;
+- `scripts.product_composition` is the temporary mixed-root entry-point seam
+  that builds and supplies those results while `scripts/` awaits SEP-2
+  classification; neither product imports that seam or the other product;
+- production UI/CLI entry points use the seam without changing paper-trading,
+  approval, policy, proposal, or broker authority; and
+- the exact direct-crossing ledger falls from **4 to 0**, with zero
+  execution-authority exceptions. Permanent guards require both counts to
+  remain zero and reject either product importing the temporary seam.
+
+The implementation is **not yet a reviewed milestone**. Claude must review
+the exact pushed branch and Codex must counter-review any resulting changes
+before SEP-1 can be marked complete or SEP-2 can begin. `scripts/`
+classification remains SEP-2 work. No feature-milestone entry is recorded
+before that review chain closes.
 
 ### SEP-2 — entry points, dependencies, and data ownership
 

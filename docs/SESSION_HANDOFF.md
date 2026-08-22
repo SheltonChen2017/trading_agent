@@ -6090,6 +6090,81 @@ migration is still owner-gated; continue with product-owned adapters and the
 residual UI/PowerShell seams without moving broker authority into research or
 licensed research state into the assistant.
 
+## 7du. Independent review of the SEP-2 operator-database tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-operatordb-20260822`, created from the exact
+fetched remote head `5819913` on
+`origin/codex/sep2-operator-db-boundary-20260822`, based on my prior review
+head `b4b896f`. All five commits carry an explicit disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP2_OPERATOR_DATABASE.md`.
+
+**Accepted after correction. No P0/P1; one P2 corrected at `b567e94`.**
+
+**Codex's finding against my own review is correct and I accept it without
+qualification.** Commit `9b3836d` corrects handoff section 7ds from "one P3" to
+"two P3": I found SEP2L-002 late, updated the review report's verdict and
+ledger, and never carried the change into the handoff, so my two records
+disagreed at `b4b896f`. The irony is exact — SEP2L-002 was itself a finding
+about a document contradicting itself on a current figure, and I introduced the
+same defect class into my own records while closing it. Rule kept: when a
+finding lands after a verdict line is written, the verdict line and every
+document restating it are part of the fix.
+
+**SEP2D-001 (P2, corrected).** The new operator-database ledger enumerates each
+grantee's exact `AssistantStore` method surface and deliberately withholds
+`set_kill_switch` — but it grants the generic `set_system_state` to
+`run_ml_shadow.py` and `run_ml_evidence_supervisor.py`, and
+`AssistantStore.set_kill_switch` is literally
+`set_system_state("kill_switch", {...})`. The withheld capability was therefore
+fully reachable through the granted one, along with `ledger_bootstrap`,
+`last_order_reconciliation`, the backup/restore-drill markers and the
+trade-stream state; the guard compared method **names** only and never looked
+at the key argument. Mutation-proved: a research-hosted script disarming the
+persistent kill switch through the granted method passed **all 35** separation,
+boundary and ML-import guards. The kill switch is the execution gate's terminal
+check, and plan §3 forbids exposing an execution gate to research code.
+
+The ledger now declares the nine assistant-reserved state keys and the literal
+key prefixes each grantee may write; the new guard requires every
+`set_system_state` key to resolve to a literal prefix inside those, refuses a
+key it cannot bound statically, and refuses any declared prefix that could
+produce a reserved key. Verified in four directions — `kill_switch`,
+`ledger_bootstrap`, a fully dynamic key, and an ungranted writer — each red
+then green.
+
+**This closes a latent fail-open, not an active exposure.** Both granted
+scripts write only namespaced heartbeats today, and the underlying reach
+predates this tranche. What made it a defect *in* this tranche is that its
+stated purpose is to define the exact permitted surface, and the enumeration
+did not bound the capability.
+
+Also verified independently: all six `StrategyOperationalStore` protocol
+methods exist on `AssistantStore` with matching parameter lists and
+`issubclass` is True, which matters because the change is annotation-only and
+Python enforces nothing; the moved `verify_research_report` body is
+byte-identical to the original, its writer is unchanged so digest agreement
+holds, and the legacy `backtest.research_report` export preserves object
+identity; no import was orphaned by the move; and the ledger movement matches
+the record exactly at 7 / 56 / 12 script ownership, crossings **8 → 7**, and
+direct operator-database importers **6 → 5**. The tranche is honest about
+scope: it pins the boundary rather than removing it, and its manifest records
+`physical_split_authorized: false`.
+
+Validation on the final tree: entry-point guards 20 passed; complete suite
+**4,527 passed / 0 failed / 25 warnings** in 817.78 seconds on Python
+3.13.14 — Codex's 4,526 plus my added guard; `compileall` including `research/`
+passes; `git diff --check` clean. Codex's submitted-snapshot counts (83/83,
+130/130, 53/53, 4,526, 25 warnings, 854.23s) are accepted on its record.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+SEP-2 remains incomplete. Remaining: removing rather than bounding the five
+operator-database crossings, per-product launch surfaces, the residual 12
+composition files and 7 crossings, and shrinking the shared kernel.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -6113,7 +6188,10 @@ two P3), which also verified that the owner-approved mandate fingerprint
 survives the module move and that SEP2-006's broker reach is closed as a class.
 Section 7dt closes Codex's counter-review and implements the exact operator-
 database boundary at `0e98d42`, reducing the Python crossing ledger to seven
-and direct non-assistant mutable-database importers to five. SEP-2 is not
+and direct non-assistant mutable-database importers to five; section 7du is
+Claude's independent review of that tranche (accepted after correction, one P2:
+the ledger's granted `set_system_state` subsumed the kill-switch writer it
+withheld, now bounded by reserved state key at `b567e94`). SEP-2 is not
 complete and now awaits independent review of that bounded implementation.
 ACER
 remains the first
@@ -6412,8 +6490,11 @@ the authority roots; the scanner sees parent-package spellings such as
 `from assistant import execution_service`; the `scripts/`/`data/` inventories
 are recursive; `scripts/` refuses dynamic and relative imports; and the
 remaining broad-operational reach ledger is empty. The current exact SEP-2
-surface is **7 assistant / 56 research / 12 composition files and 8 Python
-crossing roots**. Follow
+surface is **7 assistant / 56 research / 12 composition files and 7 Python
+crossing roots**, with **5** direct non-assistant importers of
+`assistant.storage` bounded by `architecture/operator_database_access.json` —
+whose grants are bounded by state key, not method name alone, because
+`set_kill_switch` is `set_system_state("kill_switch", ...)`. Follow
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,

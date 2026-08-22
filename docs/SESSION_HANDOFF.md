@@ -5689,6 +5689,86 @@ shared provider modules and reduces composition debt; it must not move a
 repository, change a scheduled task, access a provider, or weaken the zero-
 edge and zero-authority-path invariants.
 
+## 7do. Independent review of the SEP-2 classification tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-entrypoints-20260822`, created from the exact
+fetched remote head `eb2e22f` on `origin/codex/sep2-entrypoints-data-restart-20260822`,
+based on `main` `728c710`. Both commits in the range — `ba8d0eb`
+(implementation) and `eb2e22f` (documentation/handoff) — carry an explicit
+disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP2_ENTRYPOINT_CLASSIFICATION.md`.
+
+**Accepted after correction. No P0/P1; two P2 and three P3 corrected; two P3
+recorded for the next tranche.**
+
+Reproduced independently rather than read: the 75-file `scripts/`
+classification (7 / 50 / 18, exact and non-overlapping); all **14** Python
+composition crossings re-derived with my own AST scanner at 14/14 with zero
+differences; **zero** cross-product imports in the 54 product-owned Python
+launchers (4 assistant, 50 research; the other 3 assistant-owned entries are
+PowerShell); `data/` at 1 + 6 + 9 = 16 files; the development union expanding to
+exactly the 13 legacy pins; and all four declared non-launch helpers plus the
+seven `.ps1` surfaces confirmed honest. Codex's three claimed mutations all
+reproduce exactly.
+
+**SEP2-001 (P2, corrected):** the crossing ledger records root packages, not
+modules, so repointing an existing `assistant` crossing at broker submission
+changed no declared root. Adding
+`from assistant.execution_service import execute_approved_paper_proposal` to a
+research-hosted composition script left **all 16 separation guards and all 8
+ML import-boundary guards green**. A new guard now permits the authority roots
+only to trading-assistant-hosted entry points; the two launchers that
+legitimately import them still pass.
+
+**SEP2-002 (P2, corrected):** the `scripts/` and `data/` inventories were
+non-recursive, so a file in a new subdirectory escaped classification *and*
+both crossing guards at once — a rogue `scripts/<pkg>/rogue.py` importing both
+products passed 8/8. Both inventories now walk recursively.
+
+**SEP2-003 (P3, corrected):** only the research side normalized owned roots
+with `Path.stem`. Matched control: an assistant script importing research-owned
+`baskets.py` fails, while a research script importing an assistant-owned
+top-level `.py` module passes. Both sides are normalized now.
+
+**SEP2-004 (P3, corrected):** the plan said "all 15 `data/*.py` files" where
+its own enumeration sums to 16 and the filesystem holds 16.
+
+**SEP2-005 (P3, corrected):** `scripts/run_filing_extraction.py` is a
+strategy-research entry point that lazily needs `anthropic`, pinned only in
+the assistant manifest. Recorded as a comment; no package moved, because which
+product owns the LLM extraction surface is a SEP-2 ownership decision.
+
+**Recorded, not fixed:** SEP2-006, the pre-existing lazy chain
+`scripts/run_ml_evidence_supervisor.py -> assistant.operations ->
+assistant.readiness -> execution.alpaca_broker`; and SEP2-007, that the
+dependency manifests are asserted only against each other, never against
+actual imports.
+
+**A correction to my own reasoning is recorded in the report.** I first
+suspected a P2 that neither product's environment could run its own entry
+points. That was wrong: my closure treated every import as eager, and both the
+`anthropic` and `alpaca` reaches are deliberately function-local. The rule
+kept: a static import graph answers what *could* be imported, not what *must*
+be installed — read the import site before calling a declaration broken.
+
+Validation on the final tree: `test_project_separation_entrypoints.py` 9
+passed (8 submitted plus my added authority guard); focused separation +
+boundary + active-document + ML-boundary set **78 passed**; complete suite
+**4,515 passed / 0 failed / 25 warnings** in 638.69 seconds on Python
+3.13.14 — Codex's 4,514 plus this round's added authority guard, which
+corroborates the submitted-snapshot count; `compileall` including `research/`
+passes; `git diff --check` clean. Codex's submitted-snapshot counts
+(16/16, 69/69, 4,514, 25 warnings) are accepted on its record; I reproduced
+16/16 and the 69/69 composition directly. Mutations for all three code
+findings ran red before and green after, with the tree restored.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+SEP-2 remains incomplete and no feature-milestone entry is written.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -5701,7 +5781,9 @@ exception counts are both zero, and the milestone is recorded in
 authority path is removed. SEP-2 now classifies the mixed `scripts/` surface,
 launch/dependency boundaries, and data ownership under the active separation
 plan. Its first classification/dependency tranche is implemented in section
-7dn and awaits Claude's independent review; SEP-2 is not complete. ACER
+7dn and independently reviewed in section 7do (accepted after correction; two
+P2 fail-open guards closed, two P3 recorded for the next tranche); Codex's
+counter-review closes the chain, and SEP-2 is not complete. ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
 implementation task. The separation work grants no outcome-run, vendor,
@@ -5986,11 +6068,14 @@ unmeasured optional provider. It does not replace vendor evidence. **SEP-2 is
 the current bounded milestone.** SEP-1's three extraction tranches and their
 review chain are closed in sections 7de–7dm, with the exact direct-crossing
 ledger and authority-exception count both zero. Do not reopen SEP-1. SEP-2's
-first classification/dependency tranche is implemented at `ba8d0eb` and
-recorded in section 7dn; Claude must independently review the exact pushed
-SEP-2 branch before the shared-provider tranche begins. The 75 script files,
+first classification/dependency tranche is implemented at `ba8d0eb`, recorded
+in section 7dn, and independently reviewed in section 7do at `fc89903`;
+Codex counter-reviews that review head before the shared-provider tranche
+begins. The 75 script files,
 18 composition files, and nine shared provider debts are exact baselines, not
-permanent exceptions. Follow
+permanent exceptions. Only trading-assistant-hosted entry points may import
+the authority roots, and the `scripts/`/`data/` inventories are recursive, so
+neither a subdirectory nor a repointed crossing can grow silently. Follow
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,

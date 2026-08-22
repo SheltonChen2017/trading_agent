@@ -212,7 +212,7 @@ moving or relaunching anything:
   `requirements/trading-assistant.txt` and
   `requirements/strategy-research.txt`, with a shared base and a development
   union that exactly reconstructs the legacy `requirements.txt`; and
-- all 15 `data/*.py` files are classified as one package marker, six neutral
+- all 16 `data/*.py` files are classified as one package marker, six neutral
   contracts, or nine named shared-provider debts. Licensed ACER/Databento
   surfaces are research-only, and the immutable result contract is the only
   approved cross-product result surface.
@@ -230,6 +230,23 @@ or evidence epoch changed. After independent review, the next tranche must
 give the nine shared provider modules explicit product-owned implementations
 or a justified neutral interface, and reduce the 18 composition files rather
 than broadening their exact ledger.
+
+Independently reviewed 2026-08-22 (accepted after correction; two P2 and
+three P3 corrected, two P3 recorded — see
+`docs/Archive/Review/REVIEW_2026-08-22_SEP2_ENTRYPOINT_CLASSIFICATION.md`
+and handoff section 7do). The 75-file classification, the 14-crossing ledger
+and the clean product launchers were reproduced with an independent scanner.
+Two guards were fail-open: the ledger is root-granular, so repointing an
+existing `assistant` crossing at `assistant.execution_service` failed nothing,
+and the `scripts/`/`data/` inventories were non-recursive, so a file in a new
+subdirectory was neither classified nor scanned. Both are closed and
+mutation-verified; only trading-assistant-hosted entry points may now import
+the authority roots. Two items are recorded rather than fixed and belong to
+the next tranche: the pre-existing lazy transitive chain
+`scripts/run_ml_evidence_supervisor.py -> assistant.operations ->
+assistant.readiness -> execution.alpaca_broker`, and the fact that the
+dependency manifests are still asserted only against each other, never
+against actual imports.
 
 ### SEP-3 — physical extraction decision
 

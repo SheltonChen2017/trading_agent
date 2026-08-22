@@ -5907,6 +5907,53 @@ SEP-2 remains incomplete; no feature-milestone entry is written. Remaining
 work: per-product launch surfaces, further reduction of the 13 composition
 files and 9 crossings, and driving the broad-operational-reach ledger to empty.
 
+## 7dr. SEP-2 provider counter-review and launch-surface tranche (Codex, 2026-08-22)
+
+Codex counter-reviewed exact pushed Claude head
+`0a346a282bf6f4b0c979f6079d1d5df7a5bdffc3` from
+`origin/user/claude/review-sep2-provider-20260822`. Its merge-base with the
+submitted Codex head was exactly `809aa0c`; ordered commits `e78d02a` and
+`0a346a2` are both **accepted**. No P0/P1/P2/P3 issue was opened. The durable
+report is
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_PROVIDER_OWNERSHIP.md`.
+Focused verification on Claude's exact tree passed 106/106, and the generalized
+shrinking-ledger mutation named both forbidden importers before restoration.
+
+The next bounded implementation is commit `2fb1754` on
+`codex/sep2-launch-surface-reduction-20260822`:
+
+- the final `assistant.operations` import outside a trading-assistant host was
+  removed from `run_ml_shadow.py`, driving the broad operational-authority
+  ledger to empty;
+- the provider-neutral, deterministic `PortfolioMandate` contract now lives in
+  `data.portfolio_mandate`, while `assistant.mandate` retains the assistant-
+  owned default path, promotion policy, and a compatibility loader; class
+  identity and serialized behavior are regression-pinned;
+- the portfolio research report launcher now imports only the neutral mandate
+  and runtime identity, and is reclassified as a research-owned launcher;
+- ML-shadow and overlay-shadow use neutral runtime identity without moving
+  their assistant-owned storage or policy code; and
+- exact script ownership is now **7 assistant / 56 research / 12 composition**
+  with **8** declared Python crossing roots. The data inventory has nine
+  neutral contracts and zero shared-provider debt.
+
+Three dangerous-direction mutations were proved red and restored: an
+assistant import in the reclassified research launcher, a broad operations
+import in a research-hosted composition surface, and an assistant dependency
+from the neutral mandate contract. The focused implementation suite passed
+191/191, followed by the restored separation/mandate set at 30/30. Full-suite,
+compile, document, Git, exact-remote, and shared-checkout validation follows on
+the final documented tree before the one authorized push.
+
+No provider, credential, licensed row, broker, operator database, scheduled
+task, deployment, backtest, result, research look, or evidence epoch was
+accessed or changed. `paper-epoch-006` and trading authority are untouched.
+
+**SEP-2 remains incomplete.** Twelve composition files and eight crossings
+remain, concentrated in operator-database composition surfaces, UI/runner
+seams, and PowerShell launchers. Continue reducing them without moving broker
+authority into research or licensed research state into the assistant.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -5923,8 +5970,10 @@ plan. Its first classification/dependency tranche is implemented in section
 P2 fail-open guards closed). Section 7dp closes Codex's counter-review and
 implements the bounded provider-ownership/composition-reduction tranche at
 `de2bd1a`; section 7dq is Claude's independent review of that tranche
-(accepted after correction, three P3). SEP-2 is not complete and now awaits
-Codex's counter-review of the review head. ACER
+(accepted after correction, three P3). Section 7dr accepts that review and
+implements the launch-surface/mandate-contract tranche at `2fb1754`. SEP-2 is
+not complete and now awaits Claude's independent review of this exact branch.
+ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
 implementation task. The separation work grants no outcome-run, vendor,
@@ -6220,8 +6269,9 @@ Only trading-assistant-hosted entry points may import
 the authority roots; the scanner sees parent-package spellings such as
 `from assistant import execution_service`; the `scripts/`/`data/` inventories
 are recursive; `scripts/` refuses dynamic and relative imports; and the
-remaining broad-operational reach is an exact shrinking ledger holding one
-entry (`scripts/run_ml_shadow.py`). Follow
+remaining broad-operational reach ledger is empty. The current exact SEP-2
+surface is **7 assistant / 56 research / 12 composition files and 8 Python
+crossing roots**. Follow
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,

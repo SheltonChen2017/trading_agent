@@ -948,23 +948,61 @@ def test_separation_milestone_state_agrees_across_active_documents():
     Keep the three current-state declarations aligned so a new session cannot
     legitimately choose two different milestones depending on which required
     document it reads first.
+
+    SEP1R-002: the first version pinned five exact literals, including the
+    plan's status line and two section headings. Those are claims that must
+    STAY true, which this module's own docstring forbids -- and the cost was
+    immediate rather than theoretical: the guard was written in `02d7a9e` and
+    had to be edited in `4f4d6c8`, then again, inside the same session,
+    because the milestone legitimately advanced. A guard that must be edited
+    every time reality moves correctly is enforcing today's state, not
+    consistency.
+
+    Stated as a relationship instead, the way the epoch guards already are:
+    derive the current milestone id from the separation plan's own status
+    line, then require the other two sequencing authorities to name that same
+    milestone. It survives SEP-2, SEP-3, and any renaming of the prose.
     """
     separation_plan = _text("PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md")
     action_plan = _text("ACTION_PLAN_2026-08-20.md")
     handoff = _text("SESSION_HANDOFF.md")
 
-    assert (
-        "Status: **ACTIVE — SEP-1 first extraction tranche implemented; "
-        "independent review pending**" in separation_plan
+    status = re.search(r"Status: \*\*ACTIVE — (SEP-\d+)\b", separation_plan)
+    assert status, (
+        "the separation plan must declare an ACTIVE SEP-n status line; fix the "
+        "document, not this guard"
     )
-    assert "### SEP-0 — boundary baseline (reviewed)" in separation_plan
-    assert "### SEP-1 — shared contracts and read-only research adapter (current)" in separation_plan
-    assert re.search(r"SEP-0 is reviewed[^.]*SEP-1 is the current bounded milestone", action_plan)
-    assert re.search(
-        r"SEP-1's first extraction tranche is\s+implemented[^.]*Claude's "
-        r"independent review",
-        handoff,
+    current = status.group(1)
+
+    # The plan must mark exactly this milestone current, and every earlier one
+    # as finished -- not still 'current'.
+    assert re.search(rf"### {current} — [^#]*?\(current\)", separation_plan), (
+        f"{current} is the declared status but no milestone heading marks it current"
     )
+    others = {
+        milestone
+        for milestone in re.findall(r"### (SEP-\d+) — [^#]*?\(current\)", separation_plan)
+        if milestone != current
+    }
+    assert not others, f"more than one milestone marked current: {sorted(others | {current})}"
+
+    # The other two sequencing authorities must name the same milestone as the
+    # current implementation step, and must not still be advertising an
+    # earlier one as what happens next.
+    for name, text in (
+        ("ACTION_PLAN_2026-08-20.md", action_plan),
+        ("SESSION_HANDOFF.md", handoff),
+    ):
+        assert current in text, f"{name} does not mention the current milestone {current}"
+        earlier = [
+            f"SEP-{index}"
+            for index in range(int(current.split("-")[1]))
+            if re.search(rf"SEP-{index} is the current bounded milestone", text)
+        ]
+        assert not earlier, (
+            f"{name} still calls {earlier} the current milestone while the "
+            f"separation plan has advanced to {current}"
+        )
 
 
 def test_sell1_current_records_do_not_reopen_merged_review_work():

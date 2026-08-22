@@ -6357,10 +6357,89 @@ partitioned monorepo. Do not physically extract, rewrite history, change task
 paths, migrate a database, deploy, or disturb `paper-epoch-006` until that
 choice is explicit.
 
+## 7dy. Independent review of the SEP-2 completion tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-completion-20260822`, created from the exact
+fetched remote head `c708771` on
+`origin/codex/counterreview-sep2-filing-completion-20260822`, based on my prior
+review head `fa32156`. All six commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-22_SEP2_COMPLETION.md`.
+
+**Accepted after correction. No P0/P1/P2; two P3.**
+
+**I accept the SEP-2 completion claim.** This tranche declares the milestone
+complete and writes a durable feature-milestone entry, so I assessed it against
+the plan's four written bullets rather than against the flags: every `scripts/`
+entry point classified and recursively enforced; each product owning launchers
+that carry **zero** cross-product imports, with dependency manifests checked
+against actual imports rather than only against each other; every `data/*.py`
+given neutral, provider-neutral or product-owned status with **zero**
+shared-provider debt; and licensed plus relocated LLM-derived surfaces blocked
+from execution products directly and transitively. Residuals reconcile exactly
+against measurement — composition files 11 = 11, crossing roots 6 = 6,
+operator-database importers 4 = 4 — and SEP-1's invariants hold at zero direct
+crossings and zero authority paths. The records are honest about what remains:
+plan, handoff and milestone record all state that 11 composition files still
+connect the products as SEP-3 inputs, and the plain-language paragraph says so
+in as many words while disclaiming the repository split, task changes, the
+paper account, and any strategy claim.
+
+**SEP2C-001 (P3, corrected).** The definition-of-done certificate genuinely
+reconstructs the three residual counts, but four completion properties are
+hand-set boolean literals, so asserting them true proved only that the manifest
+says complete. Mutation-proved: disabling both
+`test_every_script_is_classified_exactly_once` and
+`test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow` left
+the certificate **green** while it continued to certify those exact properties.
+A completion claim that can outlive its evidence matters more than usual here
+because it backs an owner-facing milestone record. Each flag now names the
+guards that establish it, and the certificate fails if one is removed or
+renamed. The underlying facts were and remain independently enforced, which is
+why this is P3 and why I accept the completion rather than disputing it.
+
+**SEP2C-002 (P3, corrected).** The sequencing line was re-attributed to
+"(owner, 2026-08-22)", but no owner decision on that date is recorded in the
+Action Plan or anywhere else. The substance is right — SEP-3 follows from the
+plan's own ladder — but re-dating the attribution implies a fresh owner act
+that did not occur, which is the CDR2-002 pattern of wording converting a
+consequence into a decision. Restored to the standing 2026-08-21 direction with
+the absence of a new owner act stated explicitly.
+
+**Codex closed the gap I had disclosed as untested surface (SEP2F-003).** My
+SEP2F-001 guard covered only direct imports; `624a7fd` adds the transitive
+closure as `test_execution_products_cannot_reach_llm_derived_neutral_contracts`. I
+verified it by mutation rather than accepting it: routing `assistant.mandate →
+data.mandate_evaluation → data.filing_extraction` fails Codex's transitive
+guard, and my direct-only guard does not report a clean failure there — which
+is exactly why direct-only was insufficient.
+
+Validation on the final tree: entry-point guards 23 passed; complete suite
+**4,533 passed / 0 failed / 25 warnings** in 775.83 seconds on Python
+3.13.14 — unchanged from Codex's 4,533 because this round extended an
+existing guard rather than adding one; `compileall` including `research/`
+passes; `git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+With that chain closed, **SEP-3** is the next milestone — a dry-run extraction
+manifest with retained history and exact source commits, then the owner's
+choice between two repositories plus an explicit shared package, or a
+permanently partitioned monorepo. SEP-3 authorizes no repository creation,
+history rewrite, deployment, credential move, scheduled-task change, or
+operator-database move.
+
 ## 8. What is next
 
-**Current implementation sequencing (owner, 2026-08-22):** **SEP-2 is complete;
-SEP-3 is the current bounded milestone.** SEP-0 is accepted after correction (sections
+**Current implementation sequencing (owner direction of 2026-08-21, still
+standing):** **SEP-2 is complete; SEP-3 is the current bounded milestone.**
+SEP-2 completed under that standing direction and SEP-3 follows from the plan's
+own milestone ladder; **no separate owner decision was taken on 2026-08-22**,
+and none is recorded in the Action Plan (SEP2C-002). Advancing to SEP-3 grants
+no authority of its own — SEP-3 produces a dry-run extraction manifest and then
+requires an explicit owner choice. SEP-0 is accepted after correction (sections
 7dc–7dd). SEP-1's three implementation tranches and their independent review
 chain are closed in sections 7de–7dm; the direct-crossing and authority-
 exception counts are both zero, and the milestone is recorded in

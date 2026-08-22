@@ -5769,6 +5769,59 @@ or changed. `paper-epoch-006` is untouched.
 **Next:** Codex counter-reviews the exact pushed head of this review branch.
 SEP-2 remains incomplete and no feature-milestone entry is written.
 
+## 7dp. SEP-2 counter-review and provider-ownership tranche (Codex, 2026-08-22)
+
+Codex counter-reviewed exact pushed Claude head `cd11bea` from
+`origin/user/claude/review-sep2-entrypoints-20260822`. The merge-base with the
+submitted head was exactly `eb2e22f`; the ordered Claude range was `fc89903`,
+`cd11bea`. Both commits are **accepted after correction**. The durable report
+is `docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_ENTRYPOINT_CLASSIFICATION.md`.
+
+**CRSEP2-001 (P2, closed at `3cdb2ed`):** Claude's new authority guard still
+missed `from assistant import execution_service`, because the scanner retained
+only the parent `assistant` module. That real authority import left all nine
+entry-point guards green. The scanner now expands parent-package `from`
+imports to exact child modules; the same correction closes the equivalent
+`from research import acer` licensed-surface bypass. Corrected focused
+entry-point, product-boundary, and ML-boundary tests passed 26/26.
+
+The next bounded implementation is commit `de2bd1a` on
+`codex/sep2-provider-ownership-20260822`:
+
+- all nine former shared-provider debts are explicitly classified as six
+  product-owned implementations (three per product) or three justified neutral
+  services; a guard rejects cross-product consumption of owned providers;
+- neutral runtime identity and alert serialization preserve the old assistant
+  function/error identities through compatibility facades;
+- five research launchers stop importing assistant runtime identity, reducing
+  the exact surface from 7 assistant / 50 research / 18 composition and 14
+  Python crossing roots to **7 assistant / 55 research / 13 composition and 9
+  crossing roots**;
+- the ML evidence supervisor no longer imports broad assistant operations, so
+  its recorded lazy reach through readiness to the broker module is removed;
+- product dependency declarations are checked against actual source imports,
+  the research manifest declares its lazy Anthropic call-time dependency, and
+  QuantConnect's `AlgorithmImports` is explicitly platform-provided; and
+- relative/dynamic/exec import forms are forbidden in `scripts/` until the
+  ownership scanner can resolve them safely.
+
+Mutation evidence: an assistant import of research-owned `data.analyst_data`
+fails the provider-ownership guard; an undeclared assistant `joblib` import
+fails the dependency guard. The restored focused implementation set passes
+76/76. Complete-suite, active-document, compilation, final Git, and shared-
+checkout checks are recorded in the final branch report after they run on the
+exact push candidate.
+
+No provider, credential, licensed row, broker, operator database, scheduled
+task, deployment, backtest, result, research look, or evidence epoch was
+accessed or changed. Paper authority and `paper-epoch-006` remain untouched.
+
+**SEP-2 remains incomplete.** Thirteen composition files remain. Continue by
+separating their operator-database and launcher responsibilities without
+moving execution authority into research, then review the exact pushed branch
+before SEP-3. This branch is local-only until the owner-authorized single final
+push succeeds.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -5782,8 +5835,9 @@ authority path is removed. SEP-2 now classifies the mixed `scripts/` surface,
 launch/dependency boundaries, and data ownership under the active separation
 plan. Its first classification/dependency tranche is implemented in section
 7dn and independently reviewed in section 7do (accepted after correction; two
-P2 fail-open guards closed, two P3 recorded for the next tranche); Codex's
-counter-review closes the chain, and SEP-2 is not complete. ACER
+P2 fail-open guards closed). Section 7dp closes Codex's counter-review and
+implements the bounded provider-ownership/composition-reduction tranche at
+`de2bd1a`; SEP-2 is not complete and awaits Claude's independent review. ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
 implementation task. The separation work grants no outcome-run, vendor,

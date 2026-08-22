@@ -5528,6 +5528,82 @@ SEP-1 is implementation-complete but not review-complete; SEP-2 must not begin
 until Claude's review and Codex counter-review close this chain. No feature
 milestone is recorded yet.
 
+## 7dl. Independent review of the SEP-1 adapter tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep1-adapters-20260822`, created from the exact
+pushed head `71d8500` (based on my own prior head `dd30257`). Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP1_ADAPTER_TRANCHE.md`. Scope: all
+seven commits — the counter-review of my second-tranche round and the final
+adapter implementation.
+
+**Accepted after correction. No P0/P1/P2; two P3.** The hard tranche, done
+the way this repository does things: refusals instead of defaults, hashes
+instead of trust, authority untouched.
+
+Verified independently: **zero** cross-product edges (4 → 0) and **zero**
+authority-to-research paths on my own scanner; no product imports the
+temporary `scripts/product_composition` seam, and the research producer
+imports nothing from the assistant. The assistant re-derives every binding
+it can check itself — ticker pair, as-of date, parameters SHA-256, exact
+close-series SHA-256s — and refuses mismatches; a missing result raises
+rather than reading as "no rebalance" or "no signal"; the pair-not-held path
+returns `[]` before any result use, checked in source order. The producer
+reproduces the old inline trend/vol-target sequence exactly, and the UI/CLI
+swap is import-aliasing onto wrappers that keep the old signatures, so both
+existing call sites and the Briefing double-fetch optimization survive.
+Stated plainly: binding hashes prove the result was computed *for* those
+inputs, not *correctly from* them — trust is unchanged from when the same
+code was imported directly, and every target still passes the deterministic
+gate, policy caps, and typed approval.
+
+**SEP1C-001 (P3, corrected):** the assistant-side cap refusal (research
+target above `max_leveraged_weight` must raise) had no regression coverage —
+the producer self-caps, so no honest fixture can reach the check with a
+violating value. Added the test; mutation red with the check disabled, green
+restored.
+
+**SEP1C-002 (P3, corrected):** the licence-boundary correction rests on a
+claim about a live vendor page. I verified it at the source on 2026-08-22 —
+Massive's Analyst Ratings documentation lists "Market sentiment tracking,
+portfolio alerts, **backtesting rating impact**, trend analysis", with no
+restriction language on the page — and added the dated URL-and-quote note to
+the freeze bullet, with an instruction to re-verify or preserve bytes before
+any preregistration relies on it. The correction itself is **accepted**: it
+changes the presumption, not the gate — verify-before-upload survives,
+"any ratings representation" keeps the breadth, and nothing is authorized.
+
+On the counter-review of my own round: **all three findings accepted.**
+SEP1CCR-001 — I called twelve seams eleven, my second arithmetic slip in two
+rounds, and my serialization wording outran my evidence. SEP1CCR-003 — my
+manual identity census exceeded the guard I actually shipped. Both of
+Codex's fixes are right.
+
+**SEP-1's implementation side is complete against its definition of done:**
+authority path removed first, neutral contracts extracted, calculation
+imports replaced with typed input-bound results, ledger 13 → 9 → 4 → 0 with
+no exception broadened, and all proposal/approval/execution/reconciliation
+authority still solely in the trading assistant. Per the rule the submitted
+tree itself records, SEP-1 is *marked* complete — and its feature-milestone
+entry written — only after Codex counter-reviews this review's corrections.
+
+Validation on the final tree: full suite **4,506 passed / 0 failed / 25
+warnings** in 710.36 seconds on Python 3.13.14 — Codex's claimed 4,505
+plus this round's one new cap-refusal test. (An earlier run reporting the
+same 4,506 was discarded as non-validating: my test was appended and a
+two-second mutation ran while it executed, so it validated neither tree;
+the count above is a clean rerun on the exact final tree.) Codex's own
+4,505 / 0 / 25 for the submitted snapshot is accepted on its record;
+`compileall` over the required surface passed; `git diff --check` passed;
+focused separation/strategy/explanation/document suites **141 passed** plus
+doc guards **53/53**, rerun after every edit including after these counts
+were inserted. Mutations: cap-check disable → new test red; both verified
+restored byte-identical.
+
+Untested surface, stated plainly: the equivalence argument for the moved
+strategy logic rests on side-by-side source comparison and the existing
+suites; the composition seam is exercised by the new generic-pair tests but
+not by a live UI session in this review.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-1 is the
@@ -5537,8 +5613,13 @@ implemented in section 7de and **independently reviewed in section 7df
 (accepted after correction)**. Its second neutral-contract tranche is
 implemented in section 7dh and **independently reviewed in section 7di
 (accepted after correction)**. Its final research-result adapter tranche is
-implemented in section 7dk and awaits independent review; the direct crossing
-and authority-exception counts are both zero. The former pinned
+implemented in section 7dk and **independently reviewed in section 7dl
+(accepted after correction; two P3 corrections awaiting Codex
+counter-review)**; the direct crossing
+and authority-exception counts are both zero. SEP-1's implementation is
+complete against its definition of done, and it is marked complete — with
+its feature-milestone entry — only after Codex counter-reviews the 7dl
+corrections. The former pinned
 `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
 authority path is removed. ACER remains the first
 research program, but its next Cloud capability audit is not the current code

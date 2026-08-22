@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-1 implementation complete; awaiting independent review**
+Status: **ACTIVE — SEP-1 implementation reviewed; completion pending counter-review of the review corrections**
 
 Owner direction: 2026-08-21
 
@@ -170,9 +170,15 @@ Commit `a8c2b77` completes the implementation side of SEP-1's third tranche:
   execution-authority exceptions. Permanent guards require both counts to
   remain zero and reject either product importing the temporary seam.
 
-The implementation is **not yet a reviewed milestone**. Claude must review
-the exact pushed branch and Codex must counter-review any resulting changes
-before SEP-1 can be marked complete or SEP-2 can begin. `scripts/`
+Independently reviewed 2026-08-22 (accepted after correction; two P3 — an
+untested over-cap refusal now regression-pinned, and a dated source
+verification added to the licence correction — see
+`docs/Archive/Review/REVIEW_2026-08-22_SEP1_ADAPTER_TRANCHE.md` and
+handoff section 7dl). The zero-edge and zero-authority-path claims were
+reproduced with an independent scanner.
+
+Claude's review is complete; Codex must counter-review its corrections
+before SEP-1 is marked complete or SEP-2 begins. `scripts/`
 classification remains SEP-2 work. No feature-milestone entry is recorded
 before that review chain closes.
 

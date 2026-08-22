@@ -40,6 +40,11 @@ intent is mechanically provable.
 - Claude's correction to the owner-decision date is historically accurate at
   its review snapshot. The owner subsequently selected the two-repository plus
   tiny shared-contracts topology; that later decision belongs to SEP-3.
+- The corrected entry-point module passed 23/23. On the final tree containing
+  the bounded SEP-3 dry run, active-document, separation and extraction tests
+  passed 84/84; the complete repository suite passed **4,539 tests / 0 failed /
+  25 known dependency warnings** in 875.56 seconds; and required compilation,
+  including `research/`, passed.
 - No provider, credential, licensed row, broker, operator database, installed
   task, deployment, backtest, outcome, research look, or evidence epoch was
   accessed or changed.

@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-1 first extraction tranche reviewed; remaining crossings in progress**
+Status: **ACTIVE — SEP-1 second extraction tranche awaiting independent review**
 
 Owner direction: 2026-08-21
 
@@ -123,11 +123,32 @@ the `EvidenceStatus` definitions deleted during the move were restored,
 and the milestone-state guard was rewritten as a relationship after it
 had to be edited twice in one session.
 
-SEP-1 is **not complete**. The nine remaining direct edges still require the
-read-only research-result adapter, provider-neutral evidence/mandate contracts,
-and removal of assistant calculation imports. Those changes remain behind
-independent review of this tranche; no exception was broadened and no runtime
-authority moved.
+Commit `636d164` is the second coherent extraction tranche. It removes five
+more direct product crossings without changing the old public import paths:
+
+- volatility measurement and regime classification now live in neutral
+  `market_analytics`, with `signals.regime` retaining identity-preserving
+  compatibility exports;
+- portfolio risk metrics, mandate evaluation, and research multiplicity
+  arithmetic now live in product-neutral `data` modules;
+- existing assistant/backtest facades resolve to the same function and error
+  objects, so callers do not acquire duplicate types or altered serialization;
+- assistant context, stock lookup, paper evidence, and look accounting use the
+  neutral implementations directly; and
+- the exact direct-crossing ledger falls from **9 to 4**, while the
+  execution-authority exception count remains zero.
+
+The focused affected-module suite passes 200 tests. Boundary tests pin facade
+identity and reject restoration of a migrated product crossing. This tranche
+does not call a provider, broker, backtest, outcome, operator database, task,
+deployment, or evidence epoch.
+
+SEP-1 is **not complete** and this second tranche still requires Claude's
+independent review. The four remaining edges are deliberately policy-heavy:
+two explanation-to-signal imports and two strategy-proposal imports. They must
+move behind typed, read-only research-result adapters in the next tranche;
+putting their calculations in the shared kernel would hide product policy
+rather than separate it. `scripts/` classification remains SEP-2 work.
 
 ### SEP-2 — entry points, dependencies, and data ownership
 

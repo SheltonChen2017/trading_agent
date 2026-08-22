@@ -58,9 +58,10 @@ open; cloud selection does not resolve them.
 directed Codex to begin separating this mixed repository into a trading
 assistant product and a strategy-research product, with Claude independently
 reviewing each stable implementation snapshot. SEP-0 is reviewed and SEP-1 is
-the current bounded milestone: remove the pinned execution-authority path,
-then extract only the neutral contracts and read-only adapters that can move
-without broadening authority. See `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`.
+the current bounded milestone. Its first tranche is reviewed; its second
+neutral-contract tranche is implemented at `636d164` and awaits independent
+review, leaving four policy-heavy crossings for typed read-only adapters. See
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

@@ -97,7 +97,9 @@
   },
   "platform_provided_imports": {
     "trading_assistant": [],
-    "strategy_research": ["AlgorithmImports"]
+    "strategy_research": [
+      "AlgorithmImports"
+    ]
   },
   "composition_hosts": {
     "scripts/install_windows_ml_shadow_tasks.ps1": "strategy_research",
@@ -113,15 +115,30 @@
     "scripts/verify_windows_evidence_tasks.ps1": "shared_composition"
   },
   "declared_python_cross_product_roots": {
-    "scripts/personal_assistant_ui.py": ["backtest"],
-    "scripts/product_composition.py": ["assistant", "research"],
-    "scripts/run_ml_evidence_supervisor.py": ["assistant"],
-    "scripts/run_ml_promotion_dossier.py": ["assistant"],
-    "scripts/run_ml_shadow.py": ["assistant"],
-    "scripts/run_overlay_shadow.py": ["assistant"]
+    "scripts/personal_assistant_ui.py": [
+      "backtest"
+    ],
+    "scripts/product_composition.py": [
+      "assistant",
+      "research"
+    ],
+    "scripts/run_ml_evidence_supervisor.py": [
+      "assistant"
+    ],
+    "scripts/run_ml_promotion_dossier.py": [
+      "assistant"
+    ],
+    "scripts/run_ml_shadow.py": [
+      "assistant"
+    ],
+    "scripts/run_overlay_shadow.py": [
+      "assistant"
+    ]
   },
   "data_ownership": {
-    "package_markers": ["data/__init__.py"],
+    "package_markers": [
+      "data/__init__.py"
+    ],
     "neutral_contracts": [
       "data/evidence_status.py",
       "data/financial_primitives.py",
@@ -167,5 +184,11 @@
   ],
   "approved_cross_product_result_contracts": [
     "data/research_results.py"
-  ]
+  ],
+  "llm_derived_neutral_contracts": {
+    "modules": [
+      "data/filing_extraction.py"
+    ],
+    "rationale": "SEP2F-001: this contract's code was ml/filings.py until the SEP-2 filing-ownership tranche moved it into the shared kernel. While it lived under ml/, CLAUDE.md section 4 kept it out of execution-capable modules and tests/test_ml_import_boundary.py enforced that. Relocation removed the enforcement without removing the reason: it still carries LLM extraction semantics (PROMPT_VERSION, ExtractedClaim, validate_extraction, sentiment_is_not_a_signal). Execution-capable products keep the same prohibition here. data/hashing.py is deliberately NOT listed: canonical JSON and SHA-256 carry no ML semantics and are legitimate neutral primitives. Lifting this needs the separately approved exact-file read-only adapter milestone CLAUDE.md names, not an edit."
+  }
 }

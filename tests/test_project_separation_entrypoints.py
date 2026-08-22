@@ -681,6 +681,56 @@ def test_no_entry_point_outside_the_trading_assistant_reaches_broad_operations()
     assert "assistant.operations" not in shadow
 
 
+def test_llm_derived_contracts_keep_their_ml_boundary_after_relocation():
+    """SEP2F-001. Moving code out of ``ml/`` must not shed its protection.
+
+    `data/filing_extraction.py` was `ml/filings.py` until this milestone moved
+    it into the shared kernel. While it lived under `ml/`, CLAUDE.md section 4
+    kept it out of execution-capable modules and
+    `tests/test_ml_import_boundary.py` enforced that -- but that test detects
+    the `ml` root, so relocation removed the enforcement while every reason for
+    it survived: the module still carries `PROMPT_VERSION`, `ExtractedClaim`,
+    `validate_extraction` and `sentiment_is_not_a_signal`.
+
+    Matched-control mutation on the submitted tree: `assistant/proposals.py`
+    importing `ml.filings.FilingExtraction` failed three guards, while the
+    identical class imported as `data.filing_extraction.FilingExtraction`
+    passed 37/37. Same code, same capability, one spelling caught.
+
+    `data/hashing.py` is deliberately not covered: canonical JSON and SHA-256
+    carry no ML semantics, and banning a neutral primitive would be over-reach.
+    """
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    declared = manifest["llm_derived_neutral_contracts"]["modules"]
+    assert declared, "the LLM-derived contract inventory may not be emptied silently"
+    assert manifest["llm_derived_neutral_contracts"]["rationale"].strip()
+
+    forbidden_modules = {
+        path.removesuffix(".py").replace("/", ".") for path in declared
+    }
+    for path in declared:
+        assert (ROOT / path).is_file(), f"declared LLM-derived contract is missing: {path}"
+
+    offenders: dict[str, list[str]] = {}
+    for root_name in ("assistant", "execution", "risk"):
+        for path in _source_files(ROOT / root_name, "*.py"):
+            reached = sorted(
+                module
+                for module in _imported_modules(path)
+                if any(
+                    module == forbidden or module.startswith(forbidden + ".")
+                    for forbidden in forbidden_modules
+                )
+            )
+            if reached:
+                offenders[_relative(path)] = reached
+
+    assert offenders == {}, (
+        "an execution-capable module imports an LLM-derived contract that kept "
+        f"its ml-boundary prohibition after relocation: {offenders!r}"
+    )
+
+
 def test_licensed_research_surfaces_cannot_enter_execution_products():
     manifest = _json(ENTRY_POINT_MANIFEST)
     licensed_modules = {

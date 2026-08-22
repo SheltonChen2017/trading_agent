@@ -6098,7 +6098,10 @@ fetched remote head `5819913` on
 head `b4b896f`. All five commits carry an explicit disposition. Full record:
 `docs/Archive/Review/REVIEW_2026-08-22_SEP2_OPERATOR_DATABASE.md`.
 
-**Accepted after correction. No P0/P1; one P2 corrected at `b567e94`.**
+**Accepted after correction. No P0/P1; one P2 corrected at `b567e94` and one
+P3 corrected at `07ef929`.** The immutable review report always carried both;
+this current handoff verdict originally omitted SEP2D-002 and is corrected by
+Codex counter-review CRSEP2D-002.
 
 **Codex's finding against my own review is correct and I accept it without
 qualification.** Commit `9b3836d` corrects handoff section 7ds from "one P3" to
@@ -6164,6 +6167,54 @@ changed. `paper-epoch-006` is untouched.
 SEP-2 remains incomplete. Remaining: removing rather than bounding the five
 operator-database crossings, per-product launch surfaces, the residual 12
 composition files and 7 crossings, and shrinking the shared kernel.
+
+## 7dv. SEP-2 operator-database counter-review and filing ownership tranche (Codex, 2026-08-22)
+
+Codex counter-reviewed Claude's exact pushed head
+`07ef9290081ca2920ec73dc73cdc93fbd8386699`, whose merge-base and exact Codex
+submission were both `58199138afa28f1b711232b5d441a6adb305f0bb`. Ordered
+Claude commits `b567e94` and `07ef929` are both **accepted after correction**.
+The complete dispositions and P0–P3 ledger are in
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_OPERATOR_DATABASE.md`.
+
+**CRSEP2D-001 (P2, corrected at `8839c12`).** Claude correctly bounded generic
+state writes by key prefix, but its AST guard still permitted a bound-method
+alias and did not bound generic reads. On the reviewed head,
+`write_state = store.set_system_state; write_state("kill_switch", ...)` and
+`store.get_system_state("ledger_bootstrap")` both left all 20 entry-point
+guards green. The correction permits only direct calls, refuses aliases and
+reflection, requires statically bounded keys, and pins both read and write
+prefixes. Both dangerous mutations now fail closed.
+
+**CRSEP2D-002 (P3, corrected in current records).** Claude's immutable report
+listed one P2 and one P3, while section 7du's verdict listed only the P2. The
+current handoff now carries the exact count; the archived report is unchanged.
+
+The next bounded implementation at `4e8fa20` moves deterministic hashing and
+filing-extraction validation to neutral `data.hashing` and
+`data.filing_extraction`. Exact-identity `ml` facades preserve every existing
+research import. The filing runner now imports the neutral contract and is
+honestly trading-assistant-owned because its remaining mutable dependency is
+the assistant-owned AI-run audit store. Its provider call, validation, CLI,
+audit row, and error behavior are unchanged.
+
+The exact SEP-2 surface is now **8 assistant / 56 research / 11 composition
+files**, **6** Python crossing roots, and **4** direct non-assistant
+`assistant.storage` importers. The shared kernel has 11 neutral contracts and
+zero shared-provider debt. SEP-2 remains incomplete; physical database/task
+movement remains owner-gated. No provider, credential, licensed row, broker,
+operator database, scheduled task, deployment, backtest, outcome, research
+look, or evidence epoch was accessed or changed. Final combined-tree
+validation and exact pushed topology are recorded in the handoff commit and
+the session report.
+
+Validation on the final combined tree: focused filing, hashing, schema,
+entry-point, product-boundary, and ML-import coverage passed; both new
+dangerous-direction mutations reddened and were restored; active-document
+checks passed **53/53**; the complete suite passed **4,528/4,528** with 25
+warnings in 751.43 seconds; and `compileall` passed across `assistant/`,
+`data/`, `execution/`, `risk/`, `scripts/`, `signals/`, `strategies/`,
+`backtest/`, `ml/`, `research/`, `tests/`, `baskets.py`, and `config.py`.
 
 ## 8. What is next
 
@@ -6490,10 +6541,11 @@ the authority roots; the scanner sees parent-package spellings such as
 `from assistant import execution_service`; the `scripts/`/`data/` inventories
 are recursive; `scripts/` refuses dynamic and relative imports; and the
 remaining broad-operational reach ledger is empty. The current exact SEP-2
-surface is **7 assistant / 56 research / 12 composition files and 7 Python
-crossing roots**, with **5** direct non-assistant importers of
+surface is **8 assistant / 56 research / 11 composition files and 6 Python
+crossing roots**, with **4** direct non-assistant importers of
 `assistant.storage` bounded by `architecture/operator_database_access.json` —
-whose grants are bounded by state key, not method name alone, because
+whose grants are bounded by direct call and explicit read/write state-key
+prefix, not method name alone, because
 `set_kill_switch` is `set_system_state("kill_switch", ...)`. Follow
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,

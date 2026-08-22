@@ -8,11 +8,20 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.mandate import (
+    PortfolioMandate as AssistantPortfolioMandate,
     compute_mandate_fingerprint,
     evaluate_live_promotion,
     evaluate_mandate_metrics,
     load_mandate,
 )
+from data.portfolio_mandate import PortfolioMandate, load_portfolio_mandate
+
+
+def test_assistant_mandate_facade_preserves_contract_identity_and_load_behavior():
+    assert AssistantPortfolioMandate is PortfolioMandate
+    assert load_mandate().to_dict() == load_portfolio_mandate(
+        Path(__file__).resolve().parent.parent / "assistant" / "default_mandate.json"
+    ).to_dict()
 
 
 def test_default_mandate_is_owner_approved_with_bound_fingerprint():

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "sep2-provider-ownership-enforced",
+  "status": "sep2-launch-surface-reduced",
   "script_ownership": {
     "trading_assistant": [
       "scripts/check_epoch_cadence.py",
@@ -48,6 +48,7 @@
       "scripts/run_new_signals_2026_08_03_significance.py",
       "scripts/run_new_signals_report.py",
       "scripts/run_out_of_sample_check.py",
+      "scripts/run_portfolio_research_report.py",
       "scripts/run_pead_persistence_significance.py",
       "scripts/run_quantconnect_smoke.py",
       "scripts/run_qc_stage0.py",
@@ -80,7 +81,6 @@
       "scripts/run_ml_shadow.py",
       "scripts/run_overlay_shadow.py",
       "scripts/run_personal_assistant.py",
-      "scripts/run_portfolio_research_report.py",
       "scripts/verify_windows_evidence_tasks.ps1"
     ]
   },
@@ -111,7 +111,6 @@
     "scripts/run_ml_shadow.py": "strategy_research",
     "scripts/run_overlay_shadow.py": "strategy_research",
     "scripts/run_personal_assistant.py": "trading_assistant",
-    "scripts/run_portfolio_research_report.py": "strategy_research",
     "scripts/verify_windows_evidence_tasks.ps1": "shared_composition"
   },
   "declared_python_cross_product_roots": {
@@ -122,8 +121,7 @@
     "scripts/run_ml_promotion_dossier.py": ["assistant"],
     "scripts/run_ml_shadow.py": ["assistant"],
     "scripts/run_overlay_shadow.py": ["assistant"],
-    "scripts/run_personal_assistant.py": ["backtest"],
-    "scripts/run_portfolio_research_report.py": ["assistant"]
+    "scripts/run_personal_assistant.py": ["backtest"]
   },
   "data_ownership": {
     "package_markers": ["data/__init__.py"],
@@ -133,6 +131,7 @@
       "data/mandate_evaluation.py",
       "data/operational_alerts.py",
       "data/portfolio_metrics.py",
+      "data/portfolio_mandate.py",
       "data/research_results.py",
       "data/research_statistics.py",
       "data/runtime_identity.py"

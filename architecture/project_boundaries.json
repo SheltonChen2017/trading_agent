@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "sep2-provider-ownership-enforced",
+  "status": "sep2-launch-surface-reduced",
   "products": {
     "trading_assistant": {
       "owned_roots": [

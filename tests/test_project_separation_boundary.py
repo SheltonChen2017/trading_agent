@@ -260,6 +260,7 @@ def test_shared_kernel_does_not_depend_on_either_product():
 def test_neutral_contract_compatibility_facades_preserve_identity():
     """SEP1-003. Existing callers keep one type/function, not parallel copies."""
     from assistant.mandate import (
+        PortfolioMandate as AssistantPortfolioMandate,
         compute_mandate_fingerprint as assistant_mandate_fingerprint,
         evaluate_mandate_metrics as assistant_mandate_evaluation,
     )
@@ -292,6 +293,7 @@ def test_neutral_contract_compatibility_facades_preserve_identity():
         time_under_water,
         upside_capture_pct,
     )
+    from data.portfolio_mandate import PortfolioMandate
     from data.research_statistics import bonferroni_threshold
     from market_analytics import (
         calibrate_volatility_threshold,
@@ -308,6 +310,7 @@ def test_neutral_contract_compatibility_facades_preserve_identity():
     assert AssistantEvidenceStatus is EvidenceStatus
     assert assistant_mandate_fingerprint is compute_mandate_fingerprint
     assert assistant_mandate_evaluation is evaluate_mandate_metrics
+    assert AssistantPortfolioMandate is PortfolioMandate
     assert backtest_bonferroni is bonferroni_threshold
     assert backtest_portfolio_metrics is compute_portfolio_metrics
     assert ResearchReportError is PortfolioMetricsError

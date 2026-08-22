@@ -33,9 +33,9 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from assistant.operations import append_alerts_jsonl
-from assistant.runtime_identity import RuntimeIdentityError, current_commit
 from assistant.storage import AssistantStore
+from data.operational_alerts import append_alerts_jsonl
+from data.runtime_identity import RuntimeIdentityError, current_commit
 from ml.artifacts import ArtifactError, load_model_manifest
 from ml.contracts import ContractError, ModelManifest
 from ml.labels import LabelError
@@ -100,7 +100,7 @@ def _parse_instant(value: str, name: str) -> datetime:
 
 
 def _current_commit(expected_commit: str | None = None) -> str:
-    """Strict runtime identity; see assistant/runtime_identity.py.
+    """Strict runtime identity; see data/runtime_identity.py.
 
     The previous local copy used ``git diff --quiet HEAD --``, which does
     not see untracked files -- a shadow prediction could be stamped with a

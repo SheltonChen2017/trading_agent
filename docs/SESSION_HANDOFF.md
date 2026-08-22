@@ -5941,9 +5941,12 @@ Three dangerous-direction mutations were proved red and restored: an
 assistant import in the reclassified research launcher, a broad operations
 import in a research-hosted composition surface, and an assistant dependency
 from the neutral mandate contract. The focused implementation suite passed
-191/191, followed by the restored separation/mandate set at 30/30. Full-suite,
-compile, document, Git, exact-remote, and shared-checkout validation follows on
-the final documented tree before the one authorized push.
+191/191, followed by the restored separation/mandate set at 30/30. The complete
+suite passed **4,523 tests / 0 failed / 25 warnings** in 714.96 seconds on
+Python 3.13.14. Required `compileall`, including `research/`, passed. The
+active-document suite passed 53/53 before this validation result was recorded
+and is rerun on the final prose-only tree. Final Git, exact-remote, and shared-
+checkout checks gate the one authorized push.
 
 No provider, credential, licensed row, broker, operator database, scheduled
 task, deployment, backtest, result, research look, or evidence epoch was

@@ -58,11 +58,12 @@ does not resolve them.
 **Current implementation sequencing amendment, 2026-08-21:** the owner has
 directed Codex to begin separating this mixed repository into a trading
 assistant product and a strategy-research product, with Claude independently
-reviewing each stable implementation snapshot. SEP-0 is reviewed and SEP-1 is
-the current bounded milestone. All three implementation tranches are now
-complete through `a8c2b77`; the exact direct-crossing and authority-exception
-counts are both zero, and the final tranche awaits independent review. See
-`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail.
+reviewing each stable implementation snapshot. SEP-0 and SEP-1 are reviewed.
+**SEP-2 is the current bounded milestone.** The SEP-1 review chain
+closed after Codex counter-reviewed Claude's exact final-tranche review head;
+the exact direct-crossing and authority-exception counts remain zero. See
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail
+and next bounded work.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

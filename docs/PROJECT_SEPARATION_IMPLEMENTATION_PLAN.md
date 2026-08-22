@@ -105,6 +105,11 @@ claiming the whole milestone complete:
 - new guards reject a shared-kernel dependency back into either product,
   facade identity drift, and restoration of the allocation-to-context path.
 
+Commit `7f8c47f` updates the repository-wide raw-decimal guard to recognize
+`data.financial_primitives` as the canonical implementation while continuing
+to accept the `assistant.money` facade. Its focused guard/precision/boundary
+suite passes 16 tests.
+
 Mutation checks proved both dangerous directions: restoring the old
 allocation import produced the exact former transitive violation and failed
 two guards; adding a shared-module import of `assistant.schemas` failed the

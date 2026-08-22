@@ -24,7 +24,8 @@ EXPECTED_SCHEMA_VERSIONS = {
     "ml/availability.py": ("SCHEMA_VERSION", "1.0"),
     "ml/contracts.py": ("SCHEMA_VERSION", "1.0"),
     "ml/experiment_contracts.py": ("SCHEMA_VERSION", "1.0"),
-    "ml/filings.py": ("EXTRACTION_SCHEMA_VERSION", "1.0"),
+    "data/filing_extraction.py": ("EXTRACTION_SCHEMA_VERSION", "1.0"),
+    "data/research_results.py": ("RESEARCH_RESULT_SCHEMA_VERSION", "1"),
     "ml/databento_authoritative.py": ("SCHEMA_VERSION", "1"),
     "ml/databento_pit.py": ("PIT_SNAPSHOT_SCHEMA_VERSION", "1"),
     "ml/databento_source.py": ("SNAPSHOT_SCHEMA_VERSION", "2"),
@@ -46,7 +47,7 @@ ARTIFACT_BEARING = frozenset({
 
 def _module_schema_versions() -> dict[str, str]:
     found: dict[str, str] = {}
-    for package in ("assistant", "ml"):
+    for package in ("assistant", "data", "ml"):
         for path in sorted((REPO_ROOT / package).rglob("*.py")):
             if "__pycache__" in path.parts:
                 continue

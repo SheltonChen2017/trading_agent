@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-0 boundary baseline in implementation**
+Status: **ACTIVE — SEP-1 shared contracts and read-only research adapter**
 
 Owner direction: 2026-08-21
 
@@ -61,7 +61,7 @@ operator database, or licensed raw dataset to research code.
 
 ## 4. Milestones
 
-### SEP-0 — boundary baseline (current)
+### SEP-0 — boundary baseline (reviewed)
 
 - record product ownership and every existing cross-product direct import;
 - fail on a new or silently removed ledger edge;
@@ -74,7 +74,7 @@ Definition of done: the focused boundary tests, active-document checks, full
 suite, compilation, diff and secret checks pass; Claude independently reviews
 the exact pushed snapshot.
 
-### SEP-1 — shared contracts and read-only research adapter
+### SEP-1 — shared contracts and read-only research adapter (current)
 
 - first remove
   `assistant.allocation_batch -> assistant.context_builder -> signals.regime`

@@ -940,6 +940,26 @@ def test_the_capability_audit_authorization_state_agrees_across_documents():
         ), "a pending authorization must be visible in the resume block"
 
 
+def test_separation_milestone_state_agrees_across_active_documents():
+    """SEP0CR-001. Review completion must advance every sequencing authority.
+
+    A handoff that sends the next agent to SEP-1 is unsafe when the active
+    separation plan and Action Plan still call SEP-0 current or in progress.
+    Keep the three current-state declarations aligned so a new session cannot
+    legitimately choose two different milestones depending on which required
+    document it reads first.
+    """
+    separation_plan = _text("PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md")
+    action_plan = _text("ACTION_PLAN_2026-08-20.md")
+    handoff = _text("SESSION_HANDOFF.md")
+
+    assert "Status: **ACTIVE — SEP-1 shared contracts and read-only research adapter**" in separation_plan
+    assert "### SEP-0 — boundary baseline (reviewed)" in separation_plan
+    assert "### SEP-1 — shared contracts and read-only research adapter (current)" in separation_plan
+    assert re.search(r"SEP-0 is reviewed[^.]*SEP-1 is the current bounded milestone", action_plan)
+    assert re.search(r"SEP-0's independent\s+review is \*\*complete\*\*[^.]*implement\s+SEP-1", handoff)
+
+
 def test_sell1_current_records_do_not_reopen_merged_review_work():
     """SELL-1 reached main before its independent review was requested.
 

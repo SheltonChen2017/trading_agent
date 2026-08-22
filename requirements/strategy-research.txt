@@ -1,4 +1,10 @@
 -r common.txt
+# SEP2-005: `scripts/run_filing_extraction.py` is a strategy-research entry
+# point whose extraction path lazily imports `anthropic` (function-local, the
+# established optional-provider pattern). The package is pinned only in
+# requirements/trading-assistant.txt, so a research-only install imports the
+# script fine and fails at call time. Recorded rather than silently moved:
+# which product owns the LLM extraction surface is a SEP-2 ownership decision.
 scikit-learn==1.9.0
 joblib==1.5.3
 databento==0.81.0

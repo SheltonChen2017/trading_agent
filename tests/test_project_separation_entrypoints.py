@@ -26,15 +26,48 @@ def _json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _import_roots(path: Path) -> set[str]:
+def _imported_modules(path: Path) -> set[str]:
+    """Every absolute module name a file imports, not only its root package."""
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    roots: set[str] = set()
+    modules: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
-            roots.update(alias.name.split(".", 1)[0] for alias in node.names)
+            modules.update(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module:
-            roots.add(node.module.split(".", 1)[0])
-    return roots
+            modules.add(node.module)
+    return modules
+
+
+def _import_roots(path: Path) -> set[str]:
+    return {module.split(".", 1)[0] for module in _imported_modules(path)}
+
+
+def _source_files(root: Path, pattern: str = "*"):
+    """Every source file under ``root``, including files in subdirectories.
+
+    SEP2-002: the inventories originally used ``iterdir()``/``glob()``, which
+    see only the top level. A file added under a new ``scripts/`` or ``data/``
+    subdirectory was therefore neither classified nor scanned for crossings --
+    the exact silent growth this module's docstring forbids. Mutation-proved:
+    a rogue ``scripts/<pkg>/rogue.py`` importing both products passed 8/8.
+    """
+    return (
+        path
+        for path in root.rglob(pattern)
+        if path.is_file() and "__pycache__" not in path.parts
+    )
+
+
+def _product_import_roots(products: dict, product: str) -> set[str]:
+    """Import roots a product owns, normalized identically for both products.
+
+    SEP2-003: ``strategy_research`` owns ``baskets.py``, whose import root is
+    ``baskets``, so the research side applied ``Path.stem`` while the assistant
+    side used the raw manifest value. Adding any top-level ``.py`` module to
+    ``trading_assistant`` would have silently blinded that half of the guard,
+    because ``"module.py"`` can never equal an import root.
+    """
+    return {Path(root).stem for root in products[product]["owned_roots"]}
 
 
 def _relative(path: Path) -> str:
@@ -72,7 +105,7 @@ def test_every_script_is_classified_exactly_once():
         )
         for path in surfaces[category]
     ]
-    actual = sorted(_relative(path) for path in (ROOT / "scripts").iterdir() if path.is_file())
+    actual = sorted(_relative(path) for path in _source_files(ROOT / "scripts"))
     assert len(declared) == len(set(declared)), "a script has more than one owner"
     assert sorted(declared) == actual, (
         "scripts/ classification changed; classify the new entry point or "
@@ -112,10 +145,8 @@ def test_product_entry_points_do_not_gain_cross_product_imports():
     manifest = _json(ENTRY_POINT_MANIFEST)
     boundaries = _json(BOUNDARY_MANIFEST)
     products = boundaries["products"]
-    assistant_roots = set(products["trading_assistant"]["owned_roots"])
-    research_roots = {
-        Path(root).stem for root in products["strategy_research"]["owned_roots"]
-    }
+    assistant_roots = _product_import_roots(products, "trading_assistant")
+    research_roots = _product_import_roots(products, "strategy_research")
     surfaces = manifest["script_ownership"]
 
     for relative in surfaces["trading_assistant"]:
@@ -130,10 +161,8 @@ def test_composition_crossings_are_an_exact_debt_ledger():
     manifest = _json(ENTRY_POINT_MANIFEST)
     boundaries = _json(BOUNDARY_MANIFEST)
     products = boundaries["products"]
-    assistant_roots = set(products["trading_assistant"]["owned_roots"])
-    research_roots = {
-        Path(root).stem for root in products["strategy_research"]["owned_roots"]
-    }
+    assistant_roots = _product_import_roots(products, "trading_assistant")
+    research_roots = _product_import_roots(products, "strategy_research")
     declared = {
         path: set(roots)
         for path, roots in manifest["declared_python_cross_product_roots"].items()
@@ -186,7 +215,7 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
         + ownership["neutral_contracts"]
         + ownership["shared_provider_debt"]
     )
-    actual = sorted(_relative(path) for path in (ROOT / "data").glob("*.py"))
+    actual = sorted(_relative(path) for path in _source_files(ROOT / "data", "*.py"))
     assert len(categories) == len(set(categories))
     assert sorted(categories) == actual, (
         "data/ ownership changed; provider access must receive explicit product "
@@ -212,14 +241,8 @@ def test_licensed_research_surfaces_cannot_enter_execution_products():
         for path in manifest["licensed_research_surfaces"]
     }
     for root_name in ("assistant", "execution", "risk"):
-        for path in (ROOT / root_name).rglob("*.py"):
-            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-            imported: set[str] = set()
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Import):
-                    imported.update(alias.name for alias in node.names)
-                elif isinstance(node, ast.ImportFrom) and node.module:
-                    imported.add(node.module)
+        for path in _source_files(ROOT / root_name, "*.py"):
+            imported = _imported_modules(path)
             forbidden = {
                 module
                 for module in imported
@@ -229,6 +252,55 @@ def test_licensed_research_surfaces_cannot_enter_execution_products():
                 )
             }
             assert not forbidden, f"{_relative(path)} imports licensed research: {forbidden}"
+
+
+def test_entry_points_outside_the_trading_assistant_cannot_import_authority():
+    """SEP2-001. The crossing ledger records root packages, not modules.
+
+    ``declared_python_cross_product_roots`` records that a research-hosted
+    composition script imports ``assistant``; it cannot distinguish
+    ``assistant.runtime_identity`` from ``assistant.execution_service``. So the
+    single most dangerous edit to an existing crossing -- repointing it at
+    broker submission, the execution kernel, or the risk gate -- changes no
+    declared root and fails no guard. Mutation-proved: adding
+    ``from assistant.execution_service import execute_approved_paper_proposal``
+    to a research-hosted composition script left all 16 separation guards and
+    all 8 ML import-boundary guards green.
+
+    The separation plan's target boundary says strategy research does not own
+    broker submission, approvals, reconciliation, or operational authority, and
+    that no adapter may expose a broker, approval token, or execution gate to
+    research code. Only trading-assistant-hosted launchers may import the
+    authority roots. This is a direct-import guard; the pre-existing transitive
+    operational chain recorded in the review report is separate debt.
+    """
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    authority = _json(BOUNDARY_MANIFEST)["authority_roots"]
+    assert authority, "the boundary manifest declares no execution-authority roots"
+
+    hosts = {
+        relative: category
+        for category in ("trading_assistant", "strategy_research")
+        for relative in manifest["script_ownership"][category]
+    }
+    hosts.update(manifest["composition_hosts"])
+
+    offenders: dict[str, list[str]] = {}
+    for relative, host in sorted(hosts.items()):
+        if host == "trading_assistant" or not relative.endswith(".py"):
+            continue
+        forbidden = sorted(
+            module
+            for module in _imported_modules(ROOT / relative)
+            if any(module == root or module.startswith(root + ".") for root in authority)
+        )
+        if forbidden:
+            offenders[relative] = forbidden
+
+    assert offenders == {}, (
+        "an entry point that is not hosted by the trading assistant imports "
+        f"execution authority: {offenders!r}"
+    )
 
 
 def test_only_immutable_approved_results_cross_the_product_boundary():

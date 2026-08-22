@@ -41,6 +41,9 @@ def expected_shortfall_pct(
     if clean.empty or not (0.0 < confidence < 1.0):
         return 0.0
     tail_fraction = 1.0 - confidence
+    # round() before int() to absorb float imprecision in tail_fraction
+    # (e.g. 1.0 - 0.9 == 0.09999999999999998), which would otherwise
+    # truncate an intended tail_size=1 down to 0.
     tail_size = int(round(len(clean) * tail_fraction, 8))
     if tail_size < 1:
         return 0.0

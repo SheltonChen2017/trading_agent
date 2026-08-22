@@ -104,7 +104,18 @@ def calibrate_volatility_threshold(
     discovery_end_date: pd.Timestamp,
     lookback_days: int = REGIME_VOLATILITY_LOOKBACK_DAYS,
 ) -> float:
-    """Fit the median trailing volatility using dates through the cutoff."""
+    """Fit the median trailing volatility using dates through the cutoff.
+
+    The median is computed from the discovery period's own distribution
+    ONLY — and the caller must then apply the SAME fixed value when
+    classifying confirmation-period dates, so confirmation's regime labels
+    are never tuned on confirmation data. That apply-unchanged rule is the
+    reason this is a separate calibration step at all; recalibrating on a
+    later window silently reintroduces the look-ahead this exists to
+    prevent. (Discipline sentence restored after the SEP-1 move dropped it
+    from this canonical location; `signals/regime.py`'s module docstring
+    carries the fuller discovery/confirmation rationale.)
+    """
     discovery_dates = benchmark_df.index[
         benchmark_df.index <= discovery_end_date
     ]

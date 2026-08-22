@@ -62,6 +62,13 @@ def _metric_check(
     # bool is an int subclass. Accepting it would turn corrupt metric state
     # into a plausible 0.0/1.0 value and could reverse a mandate gate.
     try:
+        # Independent review, 2026-07-31 (P2 #5): float(actual) alone doesn't
+        # exclude bool before casting, unlike every other numeric-validation
+        # path in this codebase (financial_primitives/money, tax_lots,
+        # portfolio_ledger, allocation_proposals) -- isinstance(True, int) is
+        # True, so a stray boolean would otherwise silently coerce to 0.0/1.0
+        # instead of being rejected as not-a-metric. (Rationale restored after
+        # the SEP-1 move dropped it; the check itself moved intact.)
         if isinstance(actual, bool):
             raise TypeError(
                 f"metric {name!r} must be a number, got bool {actual!r}"

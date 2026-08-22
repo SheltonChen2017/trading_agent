@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import dataclasses
+import inspect
 import json
 from pathlib import Path
 import sys
@@ -249,6 +250,14 @@ def test_sep2_definition_of_done_is_reconstructed_not_self_asserted():
         "a completion flag names a guard this module no longer defines, so the "
         f"SEP-2 completion claim has outlived its evidence: {missing!r}"
     )
+    for prop, guards in enforcing.items():
+        for guard_name in guards:
+            guard = globals()[guard_name]
+            assert not inspect.signature(guard).parameters, (
+                f"{prop} names {guard_name}, which cannot be invoked by the "
+                "completion certificate without pytest fixtures"
+            )
+            guard()
 
 
 def test_launch_surface_is_every_executable_script_and_no_helper():

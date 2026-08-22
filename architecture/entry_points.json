@@ -221,6 +221,6 @@
         "test_llm_derived_contracts_keep_their_ml_boundary_after_relocation"
       ]
     },
-    "enforcing_guards_note": "SEP2C-001: the completion flags above are hand-set literals. Asserting them true proves only that the manifest says complete. Each flag names the guards that actually establish it, and the certificate fails if a named guard is removed or renamed, so the milestone claim cannot outlive its evidence."
+    "enforcing_guards_note": "SEP2C-001/CRSEP2C-001: the completion flags above are hand-set literals. Asserting them true proves only that the manifest says complete. Each flag names the fixture-free guards that establish it; the certificate invokes every named guard directly and fails if one is removed, renamed, gains an unresolved fixture, or reports a violated invariant."
   }
 }

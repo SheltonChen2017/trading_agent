@@ -193,7 +193,15 @@ audit's licence step must answer this explicitly.
 - **Correction, 2026-08-22 — do not turn a disclaimer into a research ban.**
   Massive's investment-advice disclaimer does not prohibit personal,
   non-commercial ACER research, and its Analyst Ratings documentation
-  explicitly names **backtesting rating impact** as a use case. Testing an
+  explicitly names **backtesting rating impact** as a use case.
+  (Independently verified 2026-08-22 during the SEP-1 adapter review, at
+  <https://massive.com/docs/rest/partners/benzinga/analyst-ratings>: the
+  page's use-case list reads "Market sentiment tracking, portfolio alerts,
+  backtesting rating impact, trend analysis", and the page itself carries no
+  licensing or restriction language — the restriction question lives in the
+  ToS/order-form documents, exactly as this bullet states. Vendor pages
+  change without notice; re-verify or preserve bytes before relying on this
+  quote in a preregistration.) Testing an
   investment strategy therefore does not by itself require written
   permission. Before any ratings representation is processed through
   QuantConnect custom data, verify the order form and additional terms that

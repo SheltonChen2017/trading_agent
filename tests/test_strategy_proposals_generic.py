@@ -220,3 +220,38 @@ if __name__ == "__main__":
     test_soxx_soxl_wrapper_produces_identical_proposals_to_generic_call()
     test_configured_leveraged_pairs_each_have_distinct_strategy_keys()
     print("All strategy_proposals_generic tests passed.")
+
+
+def test_assistant_refuses_research_target_above_the_configured_cap():
+    """SEP1C-001: the cap refusal is the assistant's own guard, so pin it.
+
+    The producer self-caps through compute_target_leveraged_weight, so no
+    honest run produces an over-cap target -- which is exactly why the
+    assistant-side check `target > max_leveraged_weight` had no regression
+    coverage: every fixture reached it with an honest value. A result whose
+    bindings all verify but whose target exceeds the pair's configured cap
+    must refuse loudly rather than size a larger leveraged buy and hope the
+    downstream policy gate catches it.
+    """
+    market_data = _fake_market_data()
+    packet = _overweight_packet(market_data, FAKE_STABLE, FAKE_LEVERAGED)
+    honest = build_leveraged_pair_research_result(
+        stable_ticker=FAKE_STABLE,
+        leveraged_ticker=FAKE_LEVERAGED,
+        market_data=market_data,
+        production_params=FAKE_PAIR.production_params,
+    )
+    over_cap = dataclasses.replace(
+        honest,
+        target_leveraged_weight=(
+            float(FAKE_PAIR.production_params["max_leveraged_weight"]) + 0.25
+        ),
+    )
+    with pytest.raises(ResearchResultContractError, match="cap"):
+        generate_without_research(
+            packet,
+            _policy(),
+            FAKE_PAIR,
+            market_data=market_data,
+            research_result=over_cap,
+        )

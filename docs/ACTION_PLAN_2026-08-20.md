@@ -59,14 +59,14 @@ does not resolve them.
 directed Codex to begin separating this mixed repository into a trading
 assistant product and a strategy-research product, with Claude independently
 reviewing each stable implementation snapshot. SEP-0 and SEP-1 are reviewed.
-**SEP-2 is the current bounded milestone.** The SEP-1 review chain
+**SEP-2 is complete; SEP-3 is the current bounded milestone.** The SEP-1 review chain
 closed after Codex counter-reviewed Claude's exact final-tranche review head;
 the exact direct-crossing and authority-exception counts remain zero. See
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail
-and next bounded work. The operator-database counter-review and filing-
-extraction ownership tranche are now recorded there: state capabilities fail
-closed by read/write namespace, and the residual surface is 11 composition
-files, six Python crossings, and four non-assistant operator-store importers.
+and exact SEP-2 closure. The residual 11 composition files, six Python
+crossings, and four non-assistant operator-store importers are now pinned as
+SEP-3 extraction inputs. Do not begin physical extraction until the owner
+chooses the repository/shared-package topology described by SEP-3.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

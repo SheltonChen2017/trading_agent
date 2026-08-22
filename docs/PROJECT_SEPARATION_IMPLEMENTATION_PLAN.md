@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-2 entry-point, dependency, and data-ownership classification**
+Status: **ACTIVE — SEP-3 physical extraction decision; SEP-2 complete**
 
 Owner direction: 2026-08-21
 
@@ -185,7 +185,7 @@ The review chain is closed and SEP-1 meets its definition of done. The
 feature-milestone record now carries the completed milestone. `scripts/`
 classification remains SEP-2 work.
 
-### SEP-2 — entry points, dependencies, and data ownership (current)
+### SEP-2 — entry points, dependencies, and data ownership (complete)
 
 - classify every `scripts/` entry point;
 - give each product its own launch surface and dependency declaration;
@@ -419,7 +419,38 @@ database crossings, 11 composition files, six Python crossings, the UI seam,
 and PowerShell task surfaces remain. Physical database/task movement remains
 owner-gated and must not disturb `paper-epoch-006`.
 
-### SEP-3 — physical extraction decision
+Claude independently reviewed the fifth tranche at exact head `fa32156`
+(accepted after correction). Codex counter-reviewed both Claude commits and
+closed one generalized P2: the relocated LLM-derived contract was protected
+only against direct imports, so an execution-capable module could reach it
+through another neutral module. Commit `624a7fd` extends the existing
+fail-closed first-party graph to direct and transitive reach. See
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_FILING_OWNERSHIP.md`.
+
+#### SEP-2 final definition-of-done audit
+
+Commit `996ccbc` closes SEP-2 against the four deliverables stated at the
+milestone heading, without claiming that SEP-3's physical extraction has
+already occurred:
+
+- every script remains exhaustively and uniquely classified;
+- both products have pinned launch surfaces and dependency declarations that
+  are checked against their actual imports;
+- every `data/` module has explicit neutral, provider-neutral, or product-
+  owned status, with zero shared-provider debt; and
+- licensed research surfaces remain research-only, with the immutable,
+  non-reconstructable research-result contract the sole approved result
+  crossing.
+
+The machine-readable definition-of-done relationship reconstructs those facts
+and also pins the residual extraction inputs: 11 composition files, six Python
+crossing roots, and four non-assistant operator-store importers. Those are not
+permanent exceptions or a false claim of independent repositories; they are
+the exact input to SEP-3's dry-run extraction decision. No database, task,
+deployment, credential, provider, broker, backtest, outcome, research look, or
+evidence epoch changed.
+
+### SEP-3 — physical extraction decision (current)
 
 After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction
 manifest with retained history and exact source commits. The owner then chooses

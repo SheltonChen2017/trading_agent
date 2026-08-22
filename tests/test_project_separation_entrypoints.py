@@ -285,38 +285,68 @@ def test_operator_database_access_is_an_exact_shrinking_debt_ledger():
         )
 
 
-def _system_state_write_key_prefixes(path: Path) -> list[tuple[int, str | None]]:
-    """Literal leading prefix of every ``store.set_system_state`` key argument.
+def _literal_key_prefix(node: ast.expr) -> str | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.JoinedStr) and node.values:
+        head = node.values[0]
+        if isinstance(head, ast.Constant) and isinstance(head.value, str):
+            return head.value
+    return None
+
+
+def _system_state_accesses(
+    path: Path,
+) -> tuple[dict[str, list[tuple[int, str | None]]], list[tuple[int, str]]]:
+    """Bound direct state calls and expose aliases/reflection as escapes.
 
     ``None`` means the key could not be bounded statically, which must fail:
     an unbounded key is indistinguishable from a reserved one.
     """
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    found: list[tuple[int, str | None]] = []
+    methods = {"get_system_state", "set_system_state"}
+    found = {method: [] for method in methods}
+    direct_functions: set[int] = set()
+    escapes: list[tuple[int, str]] = []
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
         function = node.func
-        if not (isinstance(function, ast.Attribute) and function.attr == "set_system_state"):
+        if not (
+            isinstance(function, ast.Attribute)
+            and isinstance(function.value, ast.Name)
+            and function.value.id == "store"
+            and function.attr in methods
+        ):
+            if (
+                isinstance(function, ast.Name)
+                and function.id in {"getattr", "setattr"}
+                and node.args
+                and isinstance(node.args[0], ast.Name)
+                and node.args[0].id == "store"
+            ):
+                escapes.append((node.lineno, function.id))
             continue
+        direct_functions.add(id(function))
         if not node.args:
-            found.append((node.lineno, None))
-            continue
-        key = node.args[0]
-        if isinstance(key, ast.Constant) and isinstance(key.value, str):
-            found.append((node.lineno, key.value))
-        elif isinstance(key, ast.JoinedStr) and key.values:
-            head = key.values[0]
-            if isinstance(head, ast.Constant) and isinstance(head.value, str):
-                found.append((node.lineno, head.value))
-            else:
-                found.append((node.lineno, None))
+            found[function.attr].append((node.lineno, None))
         else:
-            found.append((node.lineno, None))
-    return found
+            found[function.attr].append(
+                (node.lineno, _literal_key_prefix(node.args[0]))
+            )
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Attribute)
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "store"
+            and node.attr in methods
+            and id(node) not in direct_functions
+        ):
+            escapes.append((node.lineno, node.attr))
+    return found, escapes
 
 
-def test_granted_state_writes_cannot_reach_assistant_reserved_keys():
+def test_granted_state_access_is_bounded_by_keys_and_direct_calls():
     """SEP2D-001. An allowed method name is not an allowed capability.
 
     `AssistantStore.set_kill_switch` is literally
@@ -336,15 +366,44 @@ def test_granted_state_writes_cannot_reach_assistant_reserved_keys():
     assert "kill_switch" in reserved, "the execution gate's terminal check must be reserved"
 
     for relative, contract in manifest["direct_non_assistant_importers"].items():
-        prefixes = contract["allowed_state_key_write_prefixes"]
-        writes = _system_state_write_key_prefixes(ROOT / relative)
+        accesses, escapes = _system_state_accesses(ROOT / relative)
+        assert escapes == [], (
+            f"{relative} aliases or reflects generic system-state capability: {escapes!r}"
+        )
 
-        if "set_system_state" not in contract["allowed_methods"]:
-            assert prefixes == [] and writes == [], (
-                f"{relative} writes system state without being granted the method"
+        for method, field in (
+            ("get_system_state", "allowed_state_key_read_prefixes"),
+            ("set_system_state", "allowed_state_key_write_prefixes"),
+        ):
+            prefixes = contract[field]
+            calls = accesses[method]
+            if method not in contract["allowed_methods"]:
+                assert prefixes == [] and calls == [], (
+                    f"{relative} uses {method} without being granted the method"
+                )
+                continue
+            for lineno, prefix in calls:
+                assert prefix is not None, (
+                    f"{relative}:{lineno} uses a system-state key the guard cannot "
+                    "bound to a literal prefix"
+                )
+                assert any(prefix.startswith(allowed) for allowed in prefixes), (
+                    f"{relative}:{lineno} uses system-state key prefix {prefix!r}, "
+                    f"which is outside its declared prefixes {prefixes!r}"
+                )
+            unused = [
+                allowed
+                for allowed in prefixes
+                if not any(
+                    prefix is not None and prefix.startswith(allowed)
+                    for _, prefix in calls
+                )
+            ]
+            assert unused == [], (
+                f"{relative} declares unused {method} prefixes {unused!r}"
             )
-            continue
 
+        prefixes = contract["allowed_state_key_write_prefixes"]
         # No granted prefix may be able to produce a reserved key.
         reachable = sorted(
             key
@@ -357,15 +416,6 @@ def test_granted_state_writes_cannot_reach_assistant_reserved_keys():
             f"assistant-reserved state keys {reachable!r}"
         )
 
-        for lineno, prefix in writes:
-            assert prefix is not None, (
-                f"{relative}:{lineno} writes a system-state key the guard cannot "
-                "bound to a literal prefix"
-            )
-            assert any(prefix.startswith(allowed) for allowed in prefixes), (
-                f"{relative}:{lineno} writes system-state key prefix {prefix!r}, "
-                f"which is outside its declared prefixes {prefixes!r}"
-            )
 
 
 def test_strategy_composition_uses_a_narrow_store_contract():

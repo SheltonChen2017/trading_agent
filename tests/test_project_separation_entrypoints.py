@@ -17,6 +17,8 @@ from data.research_results import (
     SignalTriggerResult,
     verify_research_report as neutral_verify_research_report,
 )
+from data.filing_extraction import FilingExtraction as NeutralFilingExtraction
+from data.hashing import hash_payload as neutral_hash_payload
 from backtest.research_report import verify_research_report as legacy_verify_research_report
 from assistant.runtime_identity import (
     RuntimeIdentityError as AssistantRuntimeIdentityError,
@@ -27,6 +29,8 @@ from assistant.storage import AssistantStore
 from assistant.storage_contracts import StrategyOperationalStore
 from data.operational_alerts import append_alerts_jsonl
 from data.runtime_identity import RuntimeIdentityError, current_commit
+from ml.filings import FilingExtraction as LegacyFilingExtraction
+from ml.hashing import hash_payload as legacy_hash_payload
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -415,6 +419,11 @@ def test_granted_state_access_is_bounded_by_keys_and_direct_calls():
             f"{relative}'s declared prefixes {prefixes!r} can write "
             f"assistant-reserved state keys {reachable!r}"
         )
+
+
+def test_neutral_filing_and_hashing_facades_preserve_object_identity():
+    assert LegacyFilingExtraction is NeutralFilingExtraction
+    assert legacy_hash_payload is neutral_hash_payload
 
 
 

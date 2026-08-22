@@ -5,17 +5,6 @@
   "physical_split_authorized": false,
   "boundary_note": "This is an exact, shrinking debt ledger for direct non-assistant imports of assistant.storage. It is not a permanent allowlist and does not authorize a database, schema, data, task, or path migration. Generic system-state methods are bounded to direct calls and explicit read/write key prefixes; aliasing, reflection, and dynamically sourced keys fail closed.",
   "direct_non_assistant_importers": {
-    "scripts/run_filing_extraction.py": {
-      "host": "strategy_research",
-      "access": "write_only",
-      "allowed_methods": [
-        "record_ai_run"
-      ],
-      "allowed_attributes": [],
-      "purpose": "Record an operational audit row after a filing extraction run.",
-      "allowed_state_key_read_prefixes": [],
-      "allowed_state_key_write_prefixes": []
-    },
     "scripts/run_ml_evidence_supervisor.py": {
       "host": "strategy_research",
       "access": "mixed",

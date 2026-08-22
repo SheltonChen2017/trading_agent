@@ -5203,12 +5203,99 @@ database, scheduled task, deployment, research outcome, or evidence epoch was
 accessed or changed. This tranche stops for Claude's independent review after
 the owner's authorized single final push.
 
+## 7df. Independent review of the SEP-1 extraction tranche (Claude, 2026-08-21)
+
+Branch `user/claude/review-sep1-extraction-20260821`, from `origin/main` at
+`6499c18`. Full record:
+`docs/Archive/Review/REVIEW_2026-08-21_SEP1_EXTRACTION_TRANCHE.md`. Scope: the
+SEP-0 counter-review (`02d7a9e`, `6dfc0bc`, `9c12ac3`) and the eight SEP-1
+commits `9c12ac3..a786074`, merged as PR #297.
+
+**Accepted after correction.** No P0 or P1; two P2 and one P3.
+
+**The headline claim holds, verified independently rather than by rerunning
+the submitted guard.** I recomputed the transitive closure with my own
+scanner: from every execution-authority module, following first-party imports
+through shared and unclassified roots, **zero** paths reach strategy research.
+The extraction is also behaviour-preserving where it counts — comparing the
+moved functions as normalized ASTs, `build_portfolio_snapshot` and
+`build_portfolio_snapshot_from_alpaca` differ only in local variable names,
+one type annotation, and docstring text. Facade identity is preserved at
+runtime for `to_decimal`, `EvidenceStatus`, and the snapshot builders, which
+matters because `ml/contracts.py` does an `isinstance` check that a parallel
+copy would have broken silently. The decimal guard was not weakened: its
+allowlist moved one entry 1:1 and `data/` is genuinely in its scan scope.
+
+Three new guards answer cautions from my SEP-0 review directly — shared kernel
+may not import either product, facades must preserve identity, allocation
+preflight must keep the narrow module. The first is the one I named as the
+next boundary worth pinning.
+
+**SEP1R-001 (P2).** The `EvidenceStatus` move deleted the per-member
+definitions — `CONFIRMED` meaning "passed out-of-sample + all bootstrap layers
++ realistic execution/tax", and the rest — along with the per-claim-not-per-
+strategy semantics and the SOXX/SOXL example that makes them usable. This
+enum is the vocabulary this project's evidence discipline is written in, and
+documentation is the entire enforcement mechanism for it; an undefined
+`CONFIRMED` gets applied on weaker grounds and nothing in code objects.
+Restored in the module that now owns the type.
+
+**SEP1R-002 (P2).** The milestone-state guard added for SEP0CR-001 pinned five
+exact literals that must **stay** true, which this module's own docstring
+forbids. Not theoretical: it was written in `02d7a9e`, edited in `4f4d6c8`,
+and edited again before `a786074` — twice in one session, because the
+milestone legitimately advanced. Rewritten as a relationship: derive the
+current milestone from the plan's status line, require exactly one heading to
+mark it current, and require the other two authorities to name it. Three
+mutations red, restored green; it now survives SEP-2 without an edit.
+
+**SEP1R-003 (P3).** The moved snapshot builders kept every guard and lost the
+record of which defect each closed — the lowercase-ticker miss, the two-lot
+aggregation that let per-position caps be jointly exceeded, and the 2026-07-29
+NaN-cash finding where `check_policy_compliance()` reported zero violations
+for a corrupt portfolio — plus the caller guidance to check `is_configured()`
+rather than using `AlpacaNotConfigured` for control flow. Restored.
+
+**On the counter-review of my own SEP-0 work:** SEP0CR-001 is correct and
+accepted. I advanced the handoff and Action Plan to "SEP-0 reviewed, SEP-1
+next" and left the separation plan's own status calling SEP-0 current, so the
+three sequencing authorities disagreed — the same defect class I had just
+raised against Codex twice. The finding stands; only its guard needed
+replacing.
+
+**Where separation stands.** 13 direct edges to 9, and one authority path to
+zero, with no runtime behaviour moved. The four that left were the genuinely
+neutral ones, which is the right order. The remaining nine are harder and
+should be expected to take longer: five are assistant→research calculation or
+context imports needing the read-only adapter (a design step, not a move), and
+three are evidence/mandate couplings that require deciding who owns mandate
+evaluation. `scripts/` is still unclassified and uncounted, and is still where
+the real work is.
+
+Validation: full suite **4,498 passed / 0 failed / 25 warnings** in 823.40
+seconds on Python 3.13.14 — the same count Codex reported for the
+submitted tranche, reproduced independently. That run covered every code
+and test correction in this round; the later documentation edits (this
+section, the review report, the plan status) changed no test count, and
+the document guards were rerun green after each. `compileall`
+over the required surface passed; `git diff --check` passed; the focused
+document, separation, decimal-guard, ml-boundary and context-builder suites
+passed **109/109**, rerun after every edit including after these counts were
+inserted.
+
+Untested surface, stated plainly: this round changed one enum's documentation,
+two docstrings, and one guard. The moved production code was verified
+equivalent by AST comparison and by the existing suite, not by new behavioural
+tests — SEP-1 deliberately added none, because it moved code rather than
+changing it.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** SEP-0 is accepted
 after correction (sections 7dc–7dd). SEP-1's first extraction tranche is
-implemented in section 7de and must now receive Claude's independent review
-before any of its nine remaining crossings are changed. The former pinned
+implemented in section 7de and **independently reviewed in section 7df
+(accepted after correction)**; its nine remaining crossings are the next
+work. The former pinned
 `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
 authority path is removed. ACER remains the first
 research program, but its next Cloud capability audit is not the current code

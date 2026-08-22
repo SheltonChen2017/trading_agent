@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-1 first extraction tranche implemented; independent review pending**
+Status: **ACTIVE — SEP-1 first extraction tranche reviewed; remaining crossings in progress**
 
 Owner direction: 2026-08-21
 
@@ -114,6 +114,14 @@ Mutation checks proved both dangerous directions: restoring the old
 allocation import produced the exact former transitive violation and failed
 two guards; adding a shared-module import of `assistant.schemas` failed the
 new shared-kernel direction guard. Existing import paths remain supported.
+
+Independently reviewed 2026-08-21 (accepted after correction): handoff
+section 7df and `docs/Archive/Review/REVIEW_2026-08-21_SEP1_EXTRACTION_TRANCHE.md`.
+The zero-authority-path claim and the behaviour-equivalence of the moved
+functions were both reproduced independently. Two P2 corrections landed:
+the `EvidenceStatus` definitions deleted during the move were restored,
+and the milestone-state guard was rewritten as a relationship after it
+had to be edited twice in one session.
 
 SEP-1 is **not complete**. The nine remaining direct edges still require the
 read-only research-result adapter, provider-neutral evidence/mandate contracts,

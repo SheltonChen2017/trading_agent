@@ -263,9 +263,16 @@ def test_neutral_contract_compatibility_facades_preserve_identity():
     from assistant.schemas import EvidenceStatus as AssistantEvidenceStatus
     from backtest.engine import bonferroni_threshold as backtest_bonferroni
     from backtest.research_report import (
+        ResearchReportError,
         compute_portfolio_metrics as backtest_portfolio_metrics,
     )
-    from backtest.risk_metrics import max_drawdown_pct as backtest_drawdown
+    from backtest.risk_metrics import (
+        downside_capture_pct as backtest_downside_capture,
+        expected_shortfall_pct as backtest_expected_shortfall,
+        max_drawdown_pct as backtest_drawdown,
+        time_under_water as backtest_time_under_water,
+        upside_capture_pct as backtest_upside_capture,
+    )
     from data.evidence_status import EvidenceStatus
     from data.financial_primitives import to_decimal
     from data.mandate_evaluation import (
@@ -273,8 +280,13 @@ def test_neutral_contract_compatibility_facades_preserve_identity():
         evaluate_mandate_metrics,
     )
     from data.portfolio_metrics import (
+        PortfolioMetricsError,
         compute_portfolio_metrics,
+        downside_capture_pct,
+        expected_shortfall_pct,
         max_drawdown_pct,
+        time_under_water,
+        upside_capture_pct,
     )
     from data.research_statistics import bonferroni_threshold
     from market_analytics import (
@@ -294,7 +306,12 @@ def test_neutral_contract_compatibility_facades_preserve_identity():
     assert assistant_mandate_evaluation is evaluate_mandate_metrics
     assert backtest_bonferroni is bonferroni_threshold
     assert backtest_portfolio_metrics is compute_portfolio_metrics
+    assert ResearchReportError is PortfolioMetricsError
     assert backtest_drawdown is max_drawdown_pct
+    assert backtest_expected_shortfall is expected_shortfall_pct
+    assert backtest_time_under_water is time_under_water
+    assert backtest_downside_capture is downside_capture_pct
+    assert backtest_upside_capture is upside_capture_pct
     assert signal_trailing_volatility is compute_trailing_market_volatility
     assert calibrate_threshold_from_discovery is calibrate_volatility_threshold
     assert classify_regime is classify_volatility_regime

@@ -1,8 +1,11 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 physical extraction decision; SEP-2 complete**
+Status: **ACTIVE — SEP-3 dry run validated; physical extraction not authorized**
 
 Owner direction: 2026-08-21
+
+Topology decision: 2026-08-22 — two product repositories plus one deliberately
+tiny shared-contracts package; no Git submodules
 
 Implementer: Codex
 
@@ -452,12 +455,30 @@ evidence epoch changed.
 
 ### SEP-3 — physical extraction decision (current)
 
-After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction
-manifest with retained history and exact source commits. The owner then chooses
-between two repositories and an explicit shared package, or a permanently
-partitioned monorepo. No repository deletion, history rewrite, deployment,
-credential move, scheduled-task change, or operator-database move is authorized
-by this plan.
+The owner selected **two product repositories plus one deliberately tiny
+shared-contracts package** on 2026-08-22. The current repository remains the
+trading-assistant source; the intended research location is
+`C:\git\customizedAgent\Strategy_agent`. Development should use an editable
+local shared-package install, while durable use must pin an exact package
+version and source commit. Git submodules are excluded.
+
+The first bounded tranche is implemented by
+`architecture/sep3_extraction_manifest.json` and
+`scripts/validate_sep3_extraction.py`. It validates exact reviewed source
+commit `e642469d`, all 734 tracked paths, a three-file shared allowlist, exact
+blob identities, non-overlapping destinations, target-path uniqueness,
+authority and licensed-data ownership, dependency/launch/test surfaces, and
+the residual SEP-3 inputs. The dry run is deliberately **not ready for physical
+extraction**: 11 composition files, six Python crossing roots, four research-
+hosted operator-database importers, and the product partition of governance,
+integration tests and documentation remain open.
+
+Next, reduce those exact residuals and split the support/test surface on a
+reviewed branch. Only after a second dry run reports no blocking product
+crossings may a separately authorized migration create the research repository
+and shared package. No repository deletion, history rewrite, deployment,
+credential move, scheduled-task change, operator-database move, backtest, or
+evidence-epoch change is authorized by this tranche.
 
 ## 5. Safety and evidence invariants
 

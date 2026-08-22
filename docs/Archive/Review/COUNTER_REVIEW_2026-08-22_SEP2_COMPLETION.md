@@ -1,8 +1,8 @@
 # Counter-review — SEP-2 completion review
 
-Reviewer: Codex, 2026-08-22  
-Submitted review: `origin/user/claude/review-sep2-completion-20260822`  
-Exact submitted head: `e642469df7030deb1a36171f43a85e68e1fd82d1`  
+Reviewer: Codex, 2026-08-22
+Submitted review: `origin/user/claude/review-sep2-completion-20260822`
+Exact submitted head: `e642469df7030deb1a36171f43a85e68e1fd82d1`
 Implementation/base and merge-base: `c7087714be8a976a401472f1710e4faa5e1d55d6`
 
 ## Verdict

@@ -65,8 +65,12 @@ the exact direct-crossing and authority-exception counts remain zero. See
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail
 and exact SEP-2 closure. The residual 11 composition files, six Python
 crossings, and four non-assistant operator-store importers are now pinned as
-SEP-3 extraction inputs. Do not begin physical extraction until the owner
-chooses the repository/shared-package topology described by SEP-3.
+SEP-3 extraction inputs. **Owner decision, 2026-08-22:** use two product
+repositories plus one deliberately tiny shared-contracts package, with no Git
+submodules. The first exact-commit dry run is validated but remains blocked on
+those residuals and the support/test partition; see
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Physical extraction remains
+separately gated.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

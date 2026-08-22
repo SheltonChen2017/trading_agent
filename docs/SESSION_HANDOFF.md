@@ -5153,13 +5153,63 @@ or changed. SEP-0 is accepted after correction. This branch is committed for
 the owner's authorized single final push; the final report must verify the
 exact remote head before SEP-1 begins.
 
+## 7de. SEP-1 first extraction tranche (Codex, 2026-08-21)
+
+Codex began SEP-1 on fresh branch
+`codex/sep1-portfolio-snapshot-boundary-20260821` from finalized, pushed SEP-0
+counter-review head `9c12ac32041f3873d59dbac593fcd1ef082aa727`.
+Implementation commit `18868d3` extracts manual and Alpaca portfolio snapshot
+construction into `assistant.portfolio_snapshot`, changes allocation preflight
+to import that narrow module, and removes the former
+`assistant.allocation_batch -> assistant.context_builder -> signals.regime`
+authority path. The authority exception ledger is now empty.
+
+The same commit moves the neutral `EvidenceStatus` and exact decimal helpers
+into `data/`, preserving `assistant.schemas.EvidenceStatus` and
+`assistant.money` as identity-preserving compatibility facades. Four
+ML-to-assistant edges are removed, reducing the exact direct debt ledger from
+**13 to 9**. The boundary suite now also refuses shared-kernel imports back
+into either product. Dangerous-direction mutations independently proved that
+restoring the old allocation import fails both direct and transitive guards,
+and that a shared-module import of `assistant.schemas` fails the new direction
+guard.
+
+Commit `035715a` records the tranche in the active separation plan. Commit
+`935c5dc` keeps the active-document state guard aligned with the review-pending
+status. The first full-suite attempt exposed two stale assertions in the
+repository-wide raw-decimal guard: it still required the implementation to
+reside in `assistant.money.py`. No product behavior failed. Commit `7f8c47f`
+points that guard at `data.financial_primitives` while retaining the assistant
+facade; commit `ed46797` records the correction. Its focused
+guard/precision/boundary suite passes **16 tests**. Commit `4f4d6c8` advances
+the three-document state guard from "implement SEP-1" to "review the
+implemented SEP-1 tranche"; the final document/boundary/decimal set passes
+**61 tests**.
+
+Final validation on the exact pre-handoff tree: **4,498 passed / 0 failed / 25
+warnings in 707.43 seconds** on Python 3.13.14. The broader focused extraction
+suite passed **239 tests / 17 warnings**, the final active-document/boundary
+suite passed **58 tests**, and both dangerous-direction mutations failed for
+the intended reason before restoration. Required compilation, diff/status,
+ordered-commit, secret and remote/shared-checkout checks follow this handoff
+update and are reported with the final push.
+
+SEP-1 is **not complete**. Nine direct cross-product imports remain, including
+the read-only research-result adapter and provider-neutral mandate/evidence
+contracts. No physical second repository was created, no script was
+classified, and no runtime authority, broker, provider, licensed data,
+database, scheduled task, deployment, research outcome, or evidence epoch was
+accessed or changed. This tranche stops for Claude's independent review after
+the owner's authorized single final push.
+
 ## 8. What is next
 
-**Current implementation sequencing (owner, 2026-08-21):** SEP-0's independent
-review is **complete** (section 7dc, accepted after correction); implement
-SEP-1 from `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`, whose first task
-is removing the pinned `assistant.allocation_batch -> assistant.context_builder
--> signals.regime` authority path. ACER remains the first
+**Current implementation sequencing (owner, 2026-08-21):** SEP-0 is accepted
+after correction (sections 7dc–7dd). SEP-1's first extraction tranche is
+implemented in section 7de and must now receive Claude's independent review
+before any of its nine remaining crossings are changed. The former pinned
+`assistant.allocation_batch -> assistant.context_builder -> signals.regime`
+authority path is removed. ACER remains the first
 research program, but its next Cloud capability audit is not the current code
 implementation task. The separation work grants no outcome-run, vendor,
 broker, deployment, database, task, or epoch authority.
@@ -5436,11 +5486,12 @@ capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. Next:
-the owner has moved current implementation to repository separation. Review
-exact SEP-0 branch `codex/project-separation-boundary-20260821` from main base
-`1fbf639`; section 7db records its boundary manifest, 13 direct migration
-edges, and the single transitive allocation-batch-to-regime violation. After
-independent acceptance, SEP-1 removes that violation first. ACER remains the
+Claude independently reviews pushed branch
+`codex/sep1-portfolio-snapshot-boundary-20260821`, based on finalized SEP-0
+counter-review `9c12ac3`; sections 7dd–7de record the accepted SEP-0 review
+and the SEP-1 implementation. The tranche removes the only transitive
+execution-authority-to-research path and four neutral direct crossings,
+leaving nine. It is not the whole SEP-1 milestone. ACER remains the
 first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

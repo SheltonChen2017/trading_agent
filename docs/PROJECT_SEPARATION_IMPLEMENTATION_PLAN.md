@@ -301,6 +301,50 @@ operator-database composition surfaces and PowerShell launchers. Their
 ownership and extraction must be reduced without moving broker authority into
 research or moving licensed research data into the assistant.
 
+Claude independently reviewed that tranche at exact pushed head `0a346a2`
+(accepted after correction; three P3 corrected). Codex counter-reviewed both
+ordered Claude commits at `a723e94` and **accepted** them with no additional
+P0–P3 finding; see
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_PROVIDER_OWNERSHIP.md`.
+
+#### SEP-2 third tranche — launch-surface and mandate-contract reduction
+
+Commit `2fb1754` completes the next bounded implementation tranche without
+claiming SEP-2 complete:
+
+- `scripts/run_ml_shadow.py` now consumes the neutral alert writer directly,
+  so no research-hosted or shared-composition entry point imports broad
+  `assistant.operations`; the former one-entry shrinking ledger is now a
+  zero-tolerance invariant;
+- the deterministic, serializable `PortfolioMandate` contract and explicit-
+  path loader moved to neutral `data.portfolio_mandate`. The assistant keeps
+  its default mandate asset, promotion policy, and `load_mandate` facade, and
+  the facade preserves the exact class object and serialized behavior;
+- `scripts/run_portfolio_research_report.py` now imports only neutral mandate
+  and runtime-identity definitions, so it becomes a research-owned launch
+  surface rather than a cross-product composition surface;
+- the overlay and ML-shadow runners also use neutral runtime identity while
+  their assistant-owned storage/operational behavior remains unchanged; and
+- the exact baseline is now **7 assistant / 56 research / 12 composition**
+  script files and **8** declared Python crossing roots. Data ownership covers
+  the new mandate contract as a ninth neutral contract and retains zero shared
+  provider debt.
+
+Dangerous-direction checks proved the boundaries: importing assistant code
+from the reclassified portfolio research launcher fails product ownership;
+adding `assistant.operations` to another research-hosted composition surface
+fails the zero-tolerance authority guard; and importing the assistant from the
+neutral mandate contract fails the shared-kernel direction guard. No provider,
+credential, licensed row, broker, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed.
+
+SEP-2 remains incomplete. Twelve composition files and eight crossings remain,
+principally operator-database composition surfaces, assistant/research UI and
+runner seams, and PowerShell launchers. Continue reducing those surfaces
+without moving execution authority into research or licensed research data
+into the assistant.
+
 ### SEP-3 — physical extraction decision
 
 After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction

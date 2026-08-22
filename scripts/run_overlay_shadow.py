@@ -53,7 +53,7 @@ from assistant.overlay_shadow import (  # noqa: E402
     completed_month_end_sessions,
     sleeve_return,
 )
-from assistant.runtime_identity import (  # noqa: E402
+from data.runtime_identity import (  # noqa: E402
     RuntimeIdentityError,
     current_commit,
 )

@@ -392,21 +392,26 @@ def test_operational_alert_facade_preserves_object_identity():
     assert assistant_append_alerts_jsonl is append_alerts_jsonl
 
 
-def test_broad_operational_authority_reach_is_an_exact_shrinking_ledger():
-    """SEP2P-001. Record the relationship, not the one file that was fixed.
+def test_no_entry_point_outside_the_trading_assistant_reaches_broad_operations():
+    """SEP2P-001, driven to zero by the launch-surface tranche.
 
     `assistant.operations` reaches the broker lazily through
     `assistant.readiness`, so every entry point outside the trading assistant
     that imports it carries the reach recorded as SEP2-006. Repointing the ML
-    evidence supervisor removed one instance; its sibling
-    `scripts/run_ml_shadow.py:36` still holds the identical import, which is
-    this repository's standing "a guard added to one generator is not added to
-    its sibling" failure. A test naming only the repaired file pins a fact: it
-    leaves a new instance free and cannot notice when the last one goes.
+    evidence supervisor removed one instance and the ML shadow runner now uses
+    the same neutral alert writer. This repository's standing "a guard added
+    to one generator is not added to its sibling" failure therefore becomes a
+    zero-tolerance invariant rather than a retained exception.
 
-    As an exact ledger it does three jobs — a new importer fails, the repaired
-    supervisor cannot regress, and removing the final entry fails too, so the
-    ledger has to be driven down deliberately rather than quietly persisting.
+    SEP2L-001: named for what it asserts. It began as an exact *shrinking
+    ledger* holding `scripts/run_ml_shadow.py`; that entry is gone and the
+    assertion is now emptiness, so the old name would invite a future change to
+    re-add an entry as though a retained exception were the sanctioned form. It
+    is not — the way to satisfy this guard is to remove the import, never to
+    record it here.
+
+    A new importer must fail regardless of which research-hosted composition
+    surface introduces it.
     """
     manifest = _json(ENTRY_POINT_MANIFEST)
     hosts = {
@@ -423,14 +428,17 @@ def test_broad_operational_authority_reach_is_an_exact_shrinking_ledger():
         and relative.endswith(".py")
         and "assistant.operations" in _imported_modules(ROOT / relative)
     }
-    assert actual == {"scripts/run_ml_shadow.py"}, (
-        "the broad-operational-reach ledger changed; remove the crossing or "
-        f"update this exact reviewed ledger. actual={sorted(actual)!r}"
+    assert actual == set(), (
+        "research and shared-composition entry points may not import broad "
+        f"assistant operations authority. actual={sorted(actual)!r}"
     )
 
     supervisor = _imported_modules(ROOT / "scripts" / "run_ml_evidence_supervisor.py")
     assert "data.operational_alerts" in supervisor
     assert "assistant.operations" not in supervisor
+    shadow = _imported_modules(ROOT / "scripts" / "run_ml_shadow.py")
+    assert "data.operational_alerts" in shadow
+    assert "assistant.operations" not in shadow
 
 
 def test_licensed_research_surfaces_cannot_enter_execution_products():

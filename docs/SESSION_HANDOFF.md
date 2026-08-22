@@ -6216,6 +6216,98 @@ warnings in 751.43 seconds; and `compileall` passed across `assistant/`,
 `data/`, `execution/`, `risk/`, `scripts/`, `signals/`, `strategies/`,
 `backtest/`, `ml/`, `research/`, `tests/`, `baskets.py`, and `config.py`.
 
+## 7dw. Independent review of the SEP-2 filing-ownership tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-filing-20260822`, created from the exact
+fetched remote head `b2ac54c` on
+`origin/codex/sep2-filing-ownership-counterreview-20260822`, based on my prior
+review head `07ef929`. All six commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-22_SEP2_FILING_OWNERSHIP.md`.
+
+**Accepted after correction. No P0/P1; one P2 corrected (SEP2F-001), plus
+SEP2F-002, a guard for my own repeated record defect.**
+
+**Codex's two findings against my SEP2D-001 fix are correct and I verified
+both.** My first attempt was inconclusive — restoring my old guard onto the new
+tree hit a pre-existing failure that masked the result — so I checked my own
+head `07ef929` out into an isolated worktree. There, `write_state =
+store.set_system_state` followed by `write_state("kill_switch", ...)` passed
+**20/20**, and an undeclared `store.get_system_state("ledger_bootstrap")` in
+`run_ml_evidence_supervisor.py` also passed **20/20**. My guard matched only
+direct calls and bounded only writes. The pattern is pointed: my finding was
+"an allowed method name is not an allowed capability", and my own fix then
+bounded one direction and one call shape. Codex's `8839c12` closure — direct
+calls only, explicit read and write prefixes, dynamic keys and unused grants
+refused — is right.
+
+**SEP2F-001 (P2, corrected).** Moving `ml/filings.py` into
+`data/filing_extraction.py` shed the protection it had under `ml/`. CLAUDE.md
+§4 forbids an `ml` import under `assistant/` without a separately approved
+adapter milestone, and `test_ml_import_boundary` enforced that — but it detects
+the `ml` **root**, so relocation removed the enforcement while every reason for
+it survived. Matched control: `assistant/proposals.py` importing
+`ml.filings.FilingExtraction` fails three guards, while the **identical class**
+imported as `data.filing_extraction.FilingExtraction` passed **37/37**. The
+manifest now declares the LLM-derived neutral contracts and a guard keeps them
+out of `assistant/`, `execution/` and `risk/`. `data/hashing.py` is
+deliberately excluded — canonical JSON and SHA-256 carry no ML semantics and
+banning a neutral primitive would be over-reach, which an over-reach control
+confirms still passes.
+
+**SEP2F-002 (P3, corrected).** Twice in consecutive rounds I added a finding to
+a review report after its verdict line was written and left the handoff summary
+behind — SEP2L-002 and SEP2D-002, both caught by Codex. I wrote the resolution
+last round and then repeated the error in the same round, so a third written
+resolution is worth nothing. The relationship is now asserted: every finding ID
+a SEP-2 review report raises must appear in the current handoff, with a
+companion test so the guard cannot pass vacuously.
+
+**A near-miss in my own process, recorded because it nearly shipped.** The
+SEP2F-001 fix was first committed *without the guard in it*. My mutation script
+for verifying Codex's findings used `git checkout --` on the guard file as
+cleanup, and that file held the uncommitted fix, so the cleanup silently
+reverted it — leaving the manifest declaration with nothing enforcing it, under
+a commit message claiming otherwise. That is the exact
+declaration-without-enforcement defect I had been raising against others all
+session. It surfaced only because the test count did not reconcile: Codex
+measured 4,528 and I added three tests, so 4,531 was expected and 4,530 came
+back. Two rules kept — never use `git checkout --` as mutation cleanup on a
+file holding uncommitted work (reverse the edit instead, which the
+re-verification now does), and treat a count that does not reconcile as
+evidence rather than noise, because every guard was green precisely because the
+guard was gone.
+
+Verified independently: the relocated module imports only stdlib plus
+`data.hashing` and nothing execution-capable imports it; the `ml` facades
+preserve object identity and `test_ml_import_boundary` stays green 8/8; and the
+counts reproduce exactly at **8 assistant / 56 research / 11 composition**,
+crossings 7 → **6**, operator-database importers 5 → **4**. The record is
+honest that the importer reduction is reclassification, not decoupling —
+`run_filing_extraction.py` still imports `assistant.storage` lazily but is now
+assistant-owned, and the plan says "ownership metadata and import direction
+only".
+
+One residue worth naming: `docs/operations/ML_IMPLEMENTATION_STATUS.md` still
+lists the filing-extraction runner under ML-LR-4, so that document and the
+separation manifest now describe the same file differently. Not corrected here
+because that status document is a companion to an archived plan and was already
+recorded as unverified against current code.
+
+Validation on the final tree: entry-point guards 22 passed; active-document
+guards 55 passed; complete suite **4,531 passed / 0 failed / 25 warnings** in 757.80 seconds
+on Python 3.13.14 — Codex's 4,528 plus this round's three added guards, the
+arithmetic that exposed the near-miss above and now closes;
+`compileall` including `research/` passes; `git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+SEP-2 remains incomplete: four research-hosted operator-database importers, 11
+composition files, 6 crossings, per-product launch surfaces, and the shared
+kernel.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -6242,8 +6334,13 @@ database boundary at `0e98d42`, reducing the Python crossing ledger to seven
 and direct non-assistant mutable-database importers to five; section 7du is
 Claude's independent review of that tranche (accepted after correction, one P2:
 the ledger's granted `set_system_state` subsumed the kill-switch writer it
-withheld, now bounded by reserved state key at `b567e94`). SEP-2 is not
-complete and now awaits independent review of that bounded implementation.
+withheld, now bounded by reserved state key at `b567e94`). Section 7dv closes
+that counter-review — correctly finding that my own fix missed an alias bypass
+and left reads unbounded — and implements the filing-ownership tranche at
+`4e8fa20`; section 7dw is Claude's independent review of it (accepted after
+correction, one P2: relocating `ml/filings.py` into the shared kernel shed the
+ML boundary that protected it, restored at `b254407`). SEP-2 is not
+complete and now awaits Codex's counter-review of that review head.
 ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code

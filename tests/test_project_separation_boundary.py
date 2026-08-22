@@ -230,6 +230,40 @@ def test_no_unledgered_direct_cross_product_imports():
     )
 
 
+def test_shared_kernel_does_not_depend_on_either_product():
+    """SEP1-002. Shared primitives may be depended on, never depend back."""
+    manifest = _manifest()
+    graph, unresolved = _module_graph(manifest)
+    assert not unresolved
+    products = _product_roots(manifest)
+    shared_modules = {
+        _module_name(path)
+        for root in manifest["shared_roots"]
+        for path in _python_files(root)
+    }
+    offenders = sorted(
+        (source, dependency)
+        for source in shared_modules
+        for dependency in graph.get(source, ())
+        if _product_for(dependency, products) is not None
+    )
+    assert not offenders, (
+        "shared-kernel modules must not import either product; move the policy "
+        f"back to its owner instead of creating a dependency cycle: {offenders}"
+    )
+
+
+def test_neutral_contract_compatibility_facades_preserve_identity():
+    """SEP1-003. Existing callers keep one type/function, not parallel copies."""
+    from assistant.money import to_decimal as assistant_to_decimal
+    from assistant.schemas import EvidenceStatus as AssistantEvidenceStatus
+    from data.evidence_status import EvidenceStatus
+    from data.financial_primitives import to_decimal
+
+    assert assistant_to_decimal is to_decimal
+    assert AssistantEvidenceStatus is EvidenceStatus
+
+
 def test_execution_authority_research_reachability_cannot_expand():
     manifest = _manifest()
     graph, unresolved = _module_graph(manifest)
@@ -273,4 +307,17 @@ def test_execution_authority_research_reachability_cannot_expand():
         "execution-authority reachability changed; remove the dependency or "
         "update the reviewed migration ledger. "
         f"unexpected={sorted(actual - declared)}, stale={sorted(declared - actual)}"
+    )
+
+
+def test_allocation_preflight_uses_the_narrow_portfolio_snapshot_boundary():
+    """SEP1-001. The removed authority path must not return by facade drift."""
+    manifest = _manifest()
+    graph, unresolved = _module_graph(manifest)
+    assert not unresolved
+    assert "assistant.portfolio_snapshot" in graph["assistant.allocation_batch"]
+    assert "assistant.context_builder" not in graph["assistant.allocation_batch"]
+    assert not manifest["allowed_authority_research_paths"], (
+        "SEP-1 removed the only authority-to-research path; do not preserve it "
+        "as migration debt after the execution caller has moved"
     )

@@ -37,16 +37,7 @@
     "execution",
     "risk"
   ],
-  "allowed_authority_research_paths": [
-    {
-      "path": [
-        "assistant.allocation_batch",
-        "assistant.context_builder",
-        "signals.regime"
-      ],
-      "reason": "Known SEP-0 violation: allocation preflight imports a broad context module that also owns regime research. Remove first in SEP-1 by extracting the broker portfolio snapshot boundary."
-    }
-  ],
+  "allowed_authority_research_paths": [],
   "allowed_direct_cross_product_imports": [
     {
       "source": "assistant.context_builder",
@@ -92,26 +83,6 @@
       "source": "backtest.research_report",
       "target": "assistant.mandate",
       "reason": "Existing mandate-scoring coupling; extract mandate evaluation into a neutral contract."
-    },
-    {
-      "source": "ml.contracts",
-      "target": "assistant.schemas",
-      "reason": "Existing evidence-status type coupling; extract the shared evidence schema."
-    },
-    {
-      "source": "ml.experiments",
-      "target": "assistant.schemas",
-      "reason": "Existing evidence-status type coupling; extract the shared evidence schema."
-    },
-    {
-      "source": "ml.portfolio_volatility",
-      "target": "assistant.money",
-      "reason": "Existing decimal-conversion coupling; extract the financial primitive."
-    },
-    {
-      "source": "ml.shadow_runtime",
-      "target": "assistant.schemas",
-      "reason": "Existing evidence-status type coupling; extract the shared evidence schema."
     }
   ]
 }

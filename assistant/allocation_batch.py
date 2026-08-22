@@ -58,7 +58,7 @@ from decimal import Decimal
 from datetime import datetime
 from typing import Callable
 
-from assistant.context_builder import build_portfolio_snapshot_from_alpaca
+from assistant.portfolio_snapshot import build_portfolio_snapshot_from_alpaca
 from assistant.money import to_decimal
 from assistant.execution_service import (
     PolicyOverridableBlockError,

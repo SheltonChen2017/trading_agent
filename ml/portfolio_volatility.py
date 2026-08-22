@@ -39,7 +39,7 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 import pandas as pd
 
-from assistant.money import to_decimal
+from data.financial_primitives import to_decimal
 from ml.hashing import hash_payload
 from ml.shadow import is_trading_session, trading_sessions
 
@@ -224,7 +224,7 @@ def compute_frozen_weights(
     that was not fully invested -- overstating realized risk by ~2x exactly
     when the owner was being cautious.
 
-    Arithmetic runs through Decimal (assistant/money.py's convention) because
+    Arithmetic runs through the shared exact-decimal primitive because
     weights are ratios of stored money text; float round-tripping would make
     the weights fail to sum to one at the last digit and quietly bias every
     downstream variance.

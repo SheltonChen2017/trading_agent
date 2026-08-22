@@ -137,7 +137,7 @@ def _vol_scaled_history(params: dict[str, float | int]) -> int:
 # change (tests pin names, defaults-vs-signature agreement, and bounds).
 # Every scanner in this inventory evaluates both direction cells. QC-2 uses
 # this frozen family size so a multi-horizon click counts horizons x directions,
-# matching backtest.engine.bonferroni_threshold()'s documented denominator.
+# matching data.research_statistics.bonferroni_threshold()'s denominator.
 INTERACTIVE_DIRECTION_CELLS: tuple[str, ...] = ("dip", "up")
 
 

@@ -3,7 +3,7 @@
 Every backtest configuration a human examines is a statistical test, whether
 or not its result was liked. Testing many configurations and reporting the
 best one inflates false discovery, and the correction for that
-(`backtest.engine.bonferroni_threshold`) needs a count of how many were
+(`data.research_statistics.bonferroni_threshold`) needs a count of how many were
 looked at. Until now nothing recorded that count: `ml/experiments.py` counts
 looks declared *inside one frozen spec*, but the interactive Backtest surface
 -- the one a person clicks repeatedly while exploring -- counted nothing.
@@ -48,7 +48,7 @@ from typing import Any
 import pandas as pd
 
 from assistant.storage import AssistantStore
-from backtest.engine import bonferroni_threshold
+from data.research_statistics import bonferroni_threshold
 
 
 class ResearchLookError(ValueError):

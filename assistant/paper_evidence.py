@@ -14,7 +14,7 @@ from assistant.money import decimal_text, to_decimal
 from assistant.portfolio_ledger import ACCOUNT_CASH
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
-from backtest.research_report import compute_portfolio_metrics
+from data.portfolio_metrics import compute_portfolio_metrics
 
 
 _EASTERN = ZoneInfo("America/New_York")

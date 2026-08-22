@@ -5186,8 +5186,9 @@ the three-document state guard from "implement SEP-1" to "review the
 implemented SEP-1 tranche"; the final document/boundary/decimal set passes
 **61 tests**.
 
-Final validation on the exact pre-handoff tree: **4,498 passed / 0 failed / 25
-warnings in 707.43 seconds** on Python 3.13.14. The broader focused extraction
+Final validation on the exact branch tree through handoff commit `cf9aeac`:
+**4,498 passed / 0 failed / 25 warnings in 683.88 seconds** on Python 3.13.14.
+The broader focused extraction
 suite passed **239 tests / 17 warnings**, the final active-document/boundary
 suite passed **58 tests**, and both dangerous-direction mutations failed for
 the intended reason before restoration. Required compilation, diff/status,

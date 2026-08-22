@@ -3,7 +3,7 @@
   "status": "sep2-exact-boundary-pending-physical-split",
   "database_owner": "trading_assistant",
   "physical_split_authorized": false,
-  "boundary_note": "This is an exact, shrinking debt ledger for direct non-assistant imports of assistant.storage. It is not a permanent allowlist and does not authorize a database, schema, data, task, or path migration.",
+  "boundary_note": "This is an exact, shrinking debt ledger for direct non-assistant imports of assistant.storage. It is not a permanent allowlist and does not authorize a database, schema, data, task, or path migration. SEP2D-001: an allowed method name is not by itself an allowed capability -- set_system_state is a generic key-space writer and set_kill_switch is literally set_system_state('kill_switch', ...), so a granted method must be bounded by the state keys it may write.",
   "direct_non_assistant_importers": {
     "scripts/run_filing_extraction.py": {
       "host": "strategy_research",
@@ -12,7 +12,8 @@
         "record_ai_run"
       ],
       "allowed_attributes": [],
-      "purpose": "Record an operational audit row after a filing extraction run."
+      "purpose": "Record an operational audit row after a filing extraction run.",
+      "allowed_state_key_write_prefixes": []
     },
     "scripts/run_ml_evidence_supervisor.py": {
       "host": "strategy_research",
@@ -33,7 +34,10 @@
       "allowed_attributes": [
         "path"
       ],
-      "purpose": "Read evidence state and write supervisor heartbeat and alerts."
+      "purpose": "Read evidence state and write supervisor heartbeat and alerts.",
+      "allowed_state_key_write_prefixes": [
+        "ml_evidence_supervisor_heartbeat:"
+      ]
     },
     "scripts/run_ml_promotion_dossier.py": {
       "host": "strategy_research",
@@ -44,7 +48,8 @@
         "list_proposals_by_statuses"
       ],
       "allowed_attributes": [],
-      "purpose": "Read evidence and unresolved proposal state for the promotion dossier."
+      "purpose": "Read evidence and unresolved proposal state for the promotion dossier.",
+      "allowed_state_key_write_prefixes": []
     },
     "scripts/run_ml_shadow.py": {
       "host": "strategy_research",
@@ -69,7 +74,10 @@
         "upsert_operational_alert"
       ],
       "allowed_attributes": [],
-      "purpose": "Operate the ML shadow evidence lifecycle without broker authority."
+      "purpose": "Operate the ML shadow evidence lifecycle without broker authority.",
+      "allowed_state_key_write_prefixes": [
+        "ml_shadow_"
+      ]
     },
     "scripts/run_overlay_shadow.py": {
       "host": "strategy_research",
@@ -84,10 +92,22 @@
         "upsert_operational_alert"
       ],
       "allowed_attributes": [],
-      "purpose": "Operate the read-only overlay shadow evidence lifecycle."
+      "purpose": "Operate the read-only overlay shadow evidence lifecycle.",
+      "allowed_state_key_write_prefixes": []
     }
   },
   "removed_type_only_importers": [
     "scripts/product_composition.py"
+  ],
+  "assistant_reserved_state_keys": [
+    "kill_switch",
+    "last_backup_restore_drill",
+    "last_cancel_all_open_orders",
+    "last_database_backup",
+    "last_order_reconciliation",
+    "ledger_bootstrap",
+    "operations_heartbeat",
+    "trade_stream_heartbeat",
+    "trade_stream_state"
   ]
 }

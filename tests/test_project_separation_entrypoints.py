@@ -285,6 +285,89 @@ def test_operator_database_access_is_an_exact_shrinking_debt_ledger():
         )
 
 
+def _system_state_write_key_prefixes(path: Path) -> list[tuple[int, str | None]]:
+    """Literal leading prefix of every ``store.set_system_state`` key argument.
+
+    ``None`` means the key could not be bounded statically, which must fail:
+    an unbounded key is indistinguishable from a reserved one.
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    found: list[tuple[int, str | None]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        function = node.func
+        if not (isinstance(function, ast.Attribute) and function.attr == "set_system_state"):
+            continue
+        if not node.args:
+            found.append((node.lineno, None))
+            continue
+        key = node.args[0]
+        if isinstance(key, ast.Constant) and isinstance(key.value, str):
+            found.append((node.lineno, key.value))
+        elif isinstance(key, ast.JoinedStr) and key.values:
+            head = key.values[0]
+            if isinstance(head, ast.Constant) and isinstance(head.value, str):
+                found.append((node.lineno, head.value))
+            else:
+                found.append((node.lineno, None))
+        else:
+            found.append((node.lineno, None))
+    return found
+
+
+def test_granted_state_writes_cannot_reach_assistant_reserved_keys():
+    """SEP2D-001. An allowed method name is not an allowed capability.
+
+    `AssistantStore.set_kill_switch` is literally
+    `set_system_state("kill_switch", ...)`, so granting the generic
+    `set_system_state` in the operator-database ledger silently subsumes the
+    kill-switch writer that the ledger deliberately does not grant --
+    and `ledger_bootstrap`, `last_order_reconciliation` and the rest with it.
+    Mutation-proved: a research-hosted script disarming the persistent kill
+    switch through the granted method passed all 35 separation guards.
+
+    The method ledger is therefore bounded by the state keys each grantee may
+    write. A key that cannot be resolved to a literal prefix fails, because an
+    unbounded key is indistinguishable from a reserved one.
+    """
+    manifest = _json(OPERATOR_DATABASE_MANIFEST)
+    reserved = manifest["assistant_reserved_state_keys"]
+    assert "kill_switch" in reserved, "the execution gate's terminal check must be reserved"
+
+    for relative, contract in manifest["direct_non_assistant_importers"].items():
+        prefixes = contract["allowed_state_key_write_prefixes"]
+        writes = _system_state_write_key_prefixes(ROOT / relative)
+
+        if "set_system_state" not in contract["allowed_methods"]:
+            assert prefixes == [] and writes == [], (
+                f"{relative} writes system state without being granted the method"
+            )
+            continue
+
+        # No granted prefix may be able to produce a reserved key.
+        reachable = sorted(
+            key
+            for key in reserved
+            for prefix in prefixes
+            if key.startswith(prefix)
+        )
+        assert not reachable, (
+            f"{relative}'s declared prefixes {prefixes!r} can write "
+            f"assistant-reserved state keys {reachable!r}"
+        )
+
+        for lineno, prefix in writes:
+            assert prefix is not None, (
+                f"{relative}:{lineno} writes a system-state key the guard cannot "
+                "bound to a literal prefix"
+            )
+            assert any(prefix.startswith(allowed) for allowed in prefixes), (
+                f"{relative}:{lineno} writes system-state key prefix {prefix!r}, "
+                f"which is outside its declared prefixes {prefixes!r}"
+            )
+
+
 def test_strategy_composition_uses_a_narrow_store_contract():
     manifest = _json(OPERATOR_DATABASE_MANIFEST)
     assert manifest["removed_type_only_importers"] == [

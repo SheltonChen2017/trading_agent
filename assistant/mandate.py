@@ -7,11 +7,15 @@ turning a promising backtest into execution authority.
 from __future__ import annotations
 
 import dataclasses
-import hashlib
 import json
 import math
 from pathlib import Path
 from typing import Any, Literal
+
+from data.mandate_evaluation import (
+    compute_mandate_fingerprint,
+    evaluate_mandate_metrics,
+)
 
 DEFAULT_MANDATE_PATH = Path(__file__).resolve().parent / "default_mandate.json"
 
@@ -115,123 +119,12 @@ class PortfolioMandate:
         return result
 
 
-_APPROVAL_METADATA_FIELDS = {
-    "status",
-    "approved_at",
-    "approved_by",
-    "approved_fingerprint",
-    "notes",
-}
-
-
-def compute_mandate_fingerprint(mandate: PortfolioMandate) -> str:
-    payload = {
-        key: value
-        for key, value in mandate.to_dict().items()
-        if key not in _APPROVAL_METADATA_FIELDS
-    }
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
-
-
 def load_mandate(path: str | Path = DEFAULT_MANDATE_PATH) -> PortfolioMandate:
     raw = json.loads(Path(path).read_text(encoding="utf-8"))
     raw["permitted_instruments"] = tuple(raw.get("permitted_instruments", ()))
     mandate = PortfolioMandate(**raw)
     mandate.validate()
     return mandate
-
-
-def _metric_check(
-    name: str,
-    actual: Any,
-    *,
-    predicate,
-    target: str,
-) -> dict[str, Any]:
-    if actual is None:
-        return {
-            "name": name,
-            "passed": False,
-            "available": False,
-            "actual": None,
-            "target": target,
-            "detail": "metric unavailable",
-        }
-    # Independent review, 2026-07-31 (P2 #5): float(actual) alone doesn't
-    # exclude bool before casting, unlike every other numeric-validation
-    # path in this codebase (money.py, tax_lots.py, portfolio_ledger.py,
-    # allocation_proposals.py) -- isinstance(True, int) is True, so a stray
-    # boolean would otherwise silently coerce to 0.0/1.0 instead of being
-    # rejected as not-a-metric.
-    try:
-        if isinstance(actual, bool):
-            raise TypeError(f"metric {name!r} must be a number, got bool {actual!r}")
-        value = float(actual)
-    except (TypeError, ValueError):
-        value = math.nan
-    valid = math.isfinite(value)
-    return {
-        "name": name,
-        "passed": bool(valid and predicate(value)),
-        "available": valid,
-        "actual": value if valid else None,
-        "target": target,
-        "detail": "evaluated" if valid else "metric is not finite",
-    }
-
-
-def evaluate_mandate_metrics(
-    mandate: PortfolioMandate, metrics: dict[str, Any]
-) -> dict[str, Any]:
-    """Score deterministic portfolio metrics against the mandate."""
-    checks = [
-        _metric_check(
-            "annualized_volatility_pct",
-            metrics.get("annualized_volatility_pct"),
-            predicate=lambda value: (
-                mandate.target_annualized_volatility_min_pct
-                <= value
-                <= mandate.target_annualized_volatility_max_pct
-            ),
-            target=(
-                f"{mandate.target_annualized_volatility_min_pct}%–"
-                f"{mandate.target_annualized_volatility_max_pct}%"
-            ),
-        ),
-        _metric_check(
-            "max_drawdown_pct",
-            metrics.get("max_drawdown_pct"),
-            predicate=lambda value: (
-                value <= 0 and abs(value) <= mandate.max_drawdown_pct
-            ),
-            target=f"no worse than -{mandate.max_drawdown_pct}%",
-        ),
-        _metric_check(
-            "max_time_under_water_sessions",
-            metrics.get("max_time_under_water_sessions"),
-            predicate=lambda value: value <= mandate.max_time_under_water_sessions,
-            target=f"≤ {mandate.max_time_under_water_sessions}",
-        ),
-        _metric_check(
-            "downside_capture_pct",
-            metrics.get("downside_capture_pct"),
-            predicate=lambda value: value <= mandate.max_downside_capture_pct,
-            target=f"≤ {mandate.max_downside_capture_pct}%",
-        ),
-        _metric_check(
-            "upside_capture_pct",
-            metrics.get("upside_capture_pct"),
-            predicate=lambda value: value >= mandate.min_upside_capture_pct,
-            target=f"≥ {mandate.min_upside_capture_pct}%",
-        ),
-    ]
-    return {
-        "passed": all(check["passed"] for check in checks),
-        "mandate_version": mandate.version,
-        "mandate_fingerprint": compute_mandate_fingerprint(mandate),
-        "checks": checks,
-    }
 
 
 def evaluate_live_promotion(

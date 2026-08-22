@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-1 first extraction tranche reviewed; remaining crossings in progress**
+Status: **ACTIVE — SEP-1 implementation reviewed; completion pending counter-review of the review corrections**
 
 Owner direction: 2026-08-21
 
@@ -123,11 +123,64 @@ the `EvidenceStatus` definitions deleted during the move were restored,
 and the milestone-state guard was rewritten as a relationship after it
 had to be edited twice in one session.
 
-SEP-1 is **not complete**. The nine remaining direct edges still require the
-read-only research-result adapter, provider-neutral evidence/mandate contracts,
-and removal of assistant calculation imports. Those changes remain behind
-independent review of this tranche; no exception was broadened and no runtime
-authority moved.
+Commit `636d164` is the second coherent extraction tranche. It removes five
+more direct product crossings without changing the old public import paths:
+
+- volatility measurement and regime classification now live in neutral
+  `market_analytics`, with `signals.regime` retaining identity-preserving
+  compatibility exports;
+- portfolio risk metrics, mandate evaluation, and research multiplicity
+  arithmetic now live in product-neutral `data` modules;
+- existing assistant/backtest facades resolve to the same function and error
+  objects, so callers do not acquire duplicate runtime types or lose existing
+  exception-catching behavior; the moved exception's module/name metadata is
+  not claimed to be byte-for-byte serialization-compatible with the old class;
+- assistant context, stock lookup, paper evidence, and look accounting use the
+  neutral implementations directly; and
+- the exact direct-crossing ledger falls from **9 to 4**, while the
+  execution-authority exception count remains zero.
+
+The focused affected-module suite passes 200 tests. Boundary tests pin facade
+identity and reject restoration of a migrated product crossing. This tranche
+does not call a provider, broker, backtest, outcome, operator database, task,
+deployment, or evidence epoch.
+
+The second tranche was independently reviewed
+2026-08-22 (accepted after correction; one P3 — restored rationales — see
+`docs/Archive/Review/REVIEW_2026-08-22_SEP1_CONTRACTS_TRANCHE.md` and
+handoff section 7di).
+
+Commit `a8c2b77` completes the implementation side of SEP-1's third tranche:
+
+- immutable, provider-neutral result contracts live in
+  `data.research_results`; they contain measurements and input bindings, not
+  proposal, approval, broker, database, or execution authority;
+- research-owned builders in `research.assistant_results` retain the scanner,
+  regime, and strategy calculations;
+- assistant explanation and proposal modules consume the typed results and
+  fail closed when a result is absent or names the wrong ticker, and proposal
+  sizing additionally refuses a mismatched date, parameter digest, or exact
+  close-history digest;
+- `scripts.product_composition` is the temporary mixed-root entry-point seam
+  that builds and supplies those results while `scripts/` awaits SEP-2
+  classification; neither product imports that seam or the other product;
+- production UI/CLI entry points use the seam without changing paper-trading,
+  approval, policy, proposal, or broker authority; and
+- the exact direct-crossing ledger falls from **4 to 0**, with zero
+  execution-authority exceptions. Permanent guards require both counts to
+  remain zero and reject either product importing the temporary seam.
+
+Independently reviewed 2026-08-22 (accepted after correction; two P3 — an
+untested over-cap refusal now regression-pinned, and a dated source
+verification added to the licence correction — see
+`docs/Archive/Review/REVIEW_2026-08-22_SEP1_ADAPTER_TRANCHE.md` and
+handoff section 7dl). The zero-edge and zero-authority-path claims were
+reproduced with an independent scanner.
+
+Claude's review is complete; Codex must counter-review its corrections
+before SEP-1 is marked complete or SEP-2 begins. `scripts/`
+classification remains SEP-2 work. No feature-milestone entry is recorded
+before that review chain closes.
 
 ### SEP-2 — entry points, dependencies, and data ownership
 

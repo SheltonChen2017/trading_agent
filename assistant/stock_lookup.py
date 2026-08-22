@@ -19,8 +19,10 @@ import math
 import pandas as pd
 
 from data.price_target_data import fetch_price_target_history
-from market_analytics import run_baseline_forward_returns
-from signals.regime import compute_trailing_market_volatility
+from market_analytics import (
+    compute_trailing_market_volatility,
+    run_baseline_forward_returns,
+)
 
 BLENDED_VOL_SHORT_DAYS = 20
 BLENDED_VOL_MEDIUM_DAYS = 60

@@ -16,6 +16,12 @@ functions here removes that coupling.
 classify_trend() was strategies/trend_vol_rotation.py's; both modules
 re-export the moved function under their original name so existing
 callers and tests need no changes.
+
+SEP-1 also moved the pure trailing-volatility and caller-threshold regime
+helpers here from ``signals.regime``. They measure already-supplied price
+history and carry no signal-family, proposal, broker, or execution policy.
+``signals.regime`` remains an identity-preserving research compatibility
+facade.
 """
 from __future__ import annotations
 
@@ -23,7 +29,11 @@ import math
 
 import pandas as pd
 
-from config import BACKTEST_HOLD_DAYS, SLIPPAGE_PCT
+from config import (
+    BACKTEST_HOLD_DAYS,
+    REGIME_VOLATILITY_LOOKBACK_DAYS,
+    SLIPPAGE_PCT,
+)
 
 
 def classify_trend(close: pd.Series, as_of: pd.Timestamp, lookback_days: int = 200) -> str | None:
@@ -47,6 +57,83 @@ def classify_trend(close: pd.Series, as_of: pd.Timestamp, lookback_days: int = 2
     window = close.iloc[idx - lookback_days + 1 : idx + 1]
     sma = window.mean()
     return "uptrend" if close.loc[as_of] >= sma else "downtrend"
+
+
+def compute_trailing_market_volatility(
+    benchmark_df: pd.DataFrame,
+    as_of: pd.Timestamp,
+    lookback_days: int = REGIME_VOLATILITY_LOOKBACK_DAYS,
+) -> float | None:
+    """Return backward-looking daily-return volatility in percentage points.
+
+    The window ends at and includes ``as_of``. ``None`` means the date is not
+    present or the requested trailing history is unavailable. The caller owns
+    every interpretation of this measurement.
+    """
+    if as_of not in benchmark_df.index:
+        return None
+    idx = benchmark_df.index.get_loc(as_of)
+    start_idx = idx - lookback_days
+    if start_idx < 0:
+        return None
+
+    window = benchmark_df["close"].iloc[start_idx : idx + 1]
+    daily_returns = window.pct_change().dropna()
+    if len(daily_returns) < 2:
+        return None
+    return float(daily_returns.std() * 100)
+
+
+def classify_volatility_regime(
+    benchmark_df: pd.DataFrame,
+    as_of: pd.Timestamp,
+    threshold_pct: float,
+    lookback_days: int = REGIME_VOLATILITY_LOOKBACK_DAYS,
+) -> str | None:
+    """Classify a caller-supplied threshold as ``high_vol`` or ``low_vol``."""
+    volatility = compute_trailing_market_volatility(
+        benchmark_df, as_of, lookback_days
+    )
+    if volatility is None:
+        return None
+    return "high_vol" if volatility > threshold_pct else "low_vol"
+
+
+def calibrate_volatility_threshold(
+    benchmark_df: pd.DataFrame,
+    discovery_end_date: pd.Timestamp,
+    lookback_days: int = REGIME_VOLATILITY_LOOKBACK_DAYS,
+) -> float:
+    """Fit the median trailing volatility using dates through the cutoff.
+
+    The median is computed from the discovery period's own distribution
+    ONLY — and the caller must then apply the SAME fixed value when
+    classifying confirmation-period dates, so confirmation's regime labels
+    are never tuned on confirmation data. That apply-unchanged rule is the
+    reason this is a separate calibration step at all; recalibrating on a
+    later window silently reintroduces the look-ahead this exists to
+    prevent. (Discipline sentence restored after the SEP-1 move dropped it
+    from this canonical location; `signals/regime.py`'s module docstring
+    carries the fuller discovery/confirmation rationale.)
+    """
+    discovery_dates = benchmark_df.index[
+        benchmark_df.index <= discovery_end_date
+    ]
+    volatilities = [
+        value
+        for date in discovery_dates
+        if (
+            value := compute_trailing_market_volatility(
+                benchmark_df, date, lookback_days
+            )
+        )
+        is not None
+    ]
+    if not volatilities:
+        raise ValueError(
+            "Not enough discovery-period history to calibrate a regime threshold."
+        )
+    return float(pd.Series(volatilities).median())
 
 
 def run_baseline_forward_returns(

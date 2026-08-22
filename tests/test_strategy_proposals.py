@@ -1,8 +1,8 @@
-"""Tests for assistant/strategy_proposals.py -- the SOXX/SOXL wide-band
-rebalance proposal generator. Uses hand-injected market_data (no
-network) so results are deterministic and independently verifiable
-against the same underlying regime/vol-target functions the generator
-itself calls."""
+"""Tests for the SOXX/SOXL wide-band proposal composition.
+
+Uses hand-injected market data (no network) so the research-owned target and
+assistant-owned sizing remain deterministic and independently verifiable.
+"""
 import dataclasses
 import sys
 from pathlib import Path
@@ -31,7 +31,10 @@ from assistant.strategy_proposals import (
     STABLE_TICKER,
     StrategyMarketDataError,
     StrategyPositionDataError,
-    generate_soxx_soxl_rebalance_proposals,
+)
+from scripts.product_composition import (
+    generate_soxx_soxl_rebalance_proposals_with_research
+    as generate_soxx_soxl_rebalance_proposals,
 )
 from market_analytics import classify_trend
 from data.price_source import expected_latest_completed_session

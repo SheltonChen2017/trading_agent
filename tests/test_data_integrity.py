@@ -504,7 +504,10 @@ def test_stale_bars_block_strategy_proposals_but_not_risk_reduction():
     from assistant.strategy_proposals import (
         CONFIGURED_LEVERAGED_PAIRS,
         StaleMarketDataError,
-        generate_leveraged_pair_rebalance_proposals,
+    )
+    from scripts.product_composition import (
+        generate_leveraged_pair_rebalance_proposals_with_research
+        as generate_leveraged_pair_rebalance_proposals,
     )
 
     pair = CONFIGURED_LEVERAGED_PAIRS[0]
@@ -537,7 +540,10 @@ def test_missing_strategy_bars_are_a_visible_refusal():
     from assistant.policy import TradingPolicy
     from assistant.strategy_proposals import (
         CONFIGURED_LEVERAGED_PAIRS,
-        generate_leveraged_pair_rebalance_proposals,
+    )
+    from scripts.product_composition import (
+        generate_leveraged_pair_rebalance_proposals_with_research
+        as generate_leveraged_pair_rebalance_proposals,
     )
 
     pair = CONFIGURED_LEVERAGED_PAIRS[0]
@@ -578,7 +584,10 @@ def test_strategy_provider_failure_is_recorded_before_refusal(
     from assistant.policy import TradingPolicy
     from assistant.strategy_proposals import (
         CONFIGURED_LEVERAGED_PAIRS,
-        generate_leveraged_pair_rebalance_proposals,
+    )
+    from scripts.product_composition import (
+        generate_leveraged_pair_rebalance_proposals_with_research
+        as generate_leveraged_pair_rebalance_proposals,
     )
 
     pair = CONFIGURED_LEVERAGED_PAIRS[0]

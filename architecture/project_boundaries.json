@@ -38,51 +38,5 @@
     "risk"
   ],
   "allowed_authority_research_paths": [],
-  "allowed_direct_cross_product_imports": [
-    {
-      "source": "assistant.context_builder",
-      "target": "signals.regime",
-      "reason": "Existing assistant market-context coupling; migrate behind a research-result adapter."
-    },
-    {
-      "source": "assistant.explanations",
-      "target": "signals.breakout",
-      "reason": "Existing explanatory research coupling; migrate behind a research-result adapter."
-    },
-    {
-      "source": "assistant.explanations",
-      "target": "signals.scanner",
-      "reason": "Existing explanatory research coupling; migrate behind a research-result adapter."
-    },
-    {
-      "source": "assistant.paper_evidence",
-      "target": "backtest.research_report",
-      "reason": "Existing evidence-metric coupling; extract a provider-neutral evidence contract."
-    },
-    {
-      "source": "assistant.research_looks",
-      "target": "backtest.engine",
-      "reason": "Existing multiplicity-helper coupling; move the statistic to the research product or shared kernel."
-    },
-    {
-      "source": "assistant.stock_lookup",
-      "target": "signals.regime",
-      "reason": "Existing lookup-context coupling; migrate behind a research-result adapter."
-    },
-    {
-      "source": "assistant.strategy_proposals",
-      "target": "signals.regime",
-      "reason": "Existing proposal-context coupling; replace with a typed, read-only research result."
-    },
-    {
-      "source": "assistant.strategy_proposals",
-      "target": "strategies.vol_target_rotation",
-      "reason": "Existing strategy-proposal coupling; move strategy computation out of the assistant authority product."
-    },
-    {
-      "source": "backtest.research_report",
-      "target": "assistant.mandate",
-      "reason": "Existing mandate-scoring coupling; extract mandate evaluation into a neutral contract."
-    }
-  ]
+  "allowed_direct_cross_product_imports": []
 }

@@ -62,9 +62,12 @@ from datetime import datetime, timedelta, timezone
 import pandas as pd
 
 from data.market_data import fetch_historical
-from signals.regime import compute_trailing_market_volatility
-from strategies.vol_target_rotation import compute_target_leveraged_weight
-from market_analytics import classify_trend
+from data.research_results import (
+    LeveragedPairResearchResult,
+    ResearchResultContractError,
+    close_series_sha256,
+    research_parameters_sha256,
+)
 from assistant.context_builder import KNOWN_FINDINGS
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
@@ -191,6 +194,88 @@ class MissingResearchDependencyError(RuntimeError):
     ordinary "nothing needs rebalancing" result."""
 
 
+class MissingResearchResultError(RuntimeError):
+    """The composition layer omitted a required read-only strategy result."""
+
+
+def prepare_leveraged_pair_market_data(
+    pair_config: LeveragedPairConfig,
+    market_data: dict[str, pd.DataFrame] | None = None,
+    store: AssistantStore | None = None,
+) -> dict[str, pd.DataFrame]:
+    """Load and fail-closed validate the bars used by a pair result.
+
+    This remains assistant-owned because provider recording and freshness are
+    operational input controls. It computes no strategy signal or target.
+    """
+    stable_ticker = pair_config.stable_ticker
+    leveraged_ticker = pair_config.leveraged_ticker
+    if market_data is None:
+        if store is not None:
+            from assistant.data_integrity import fetch_daily_bars_recorded
+
+            market_data = fetch_daily_bars_recorded(
+                store,
+                [stable_ticker, leveraged_ticker],
+                pair_config.lookback_days_for_signal,
+            )
+        else:
+            try:
+                market_data = fetch_historical(
+                    [stable_ticker, leveraged_ticker],
+                    lookback_days=pair_config.lookback_days_for_signal,
+                )
+            except Exception as exc:
+                raise MarketDataUnavailableError(
+                    f"{stable_ticker}/{leveraged_ticker} market data is "
+                    f"unavailable ({type(exc).__name__}); refusing to treat "
+                    "a provider failure as no rebalance"
+                ) from None
+    if stable_ticker not in market_data or leveraged_ticker not in market_data:
+        missing = sorted(
+            {stable_ticker, leveraged_ticker} - set(market_data)
+        )
+        raise MarketDataUnavailableError(
+            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
+            f"for {', '.join(missing)}; refusing to treat missing bars as "
+            "no rebalance"
+        )
+    stable_frame = market_data[stable_ticker]
+    leveraged_frame = market_data[leveraged_ticker]
+    if (
+        not isinstance(stable_frame, pd.DataFrame)
+        or not isinstance(leveraged_frame, pd.DataFrame)
+        or "close" not in stable_frame
+        or "close" not in leveraged_frame
+    ):
+        raise MarketDataUnavailableError(
+            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
+            "or malformed; refusing to treat unusable bars as no rebalance"
+        )
+    stable_close = stable_frame["close"]
+    leveraged_close = leveraged_frame["close"]
+    if stable_close.empty or leveraged_close.empty:
+        raise MarketDataUnavailableError(
+            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
+            "because one or both bar series are empty; refusing to treat "
+            "empty bars as no rebalance"
+        )
+    as_of = min(stable_close.index[-1], leveraged_close.index[-1])
+
+    # GR-4 staleness SLA: a rebalance sized from bars that miss the latest
+    # completed NYSE session would trade current dollars on old prices.
+    from data.price_source import evaluate_bar_freshness
+
+    freshness = evaluate_bar_freshness(as_of.date().isoformat())
+    if not freshness.fresh:
+        raise StaleMarketDataError(
+            f"{stable_ticker}/{leveraged_ticker} bars are stale "
+            f"({freshness.detail}); refusing to size a rebalance from "
+            "stale market data"
+        )
+    return market_data
+
+
 def _relied_upon_findings_status(
     relied_upon_findings: dict[str, EvidenceStatus] | None = None,
 ) -> tuple[list[str], list[str]]:
@@ -262,26 +347,55 @@ def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeInten
     return "tp_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
 
-def _target_leveraged_weight(
-    stable_close: pd.Series, leveraged_close: pd.Series, as_of: pd.Timestamp, production_params: dict
+def _validated_research_target(
+    result: LeveragedPairResearchResult | None,
+    *,
+    pair_config: LeveragedPairConfig,
+    stable_close: pd.Series,
+    leveraged_close: pd.Series,
+    as_of: pd.Timestamp,
 ) -> tuple[float | None, str]:
-    """Returns (target_leveraged_weight, label). None if not computable
-    (insufficient history) -- caller should skip generating a proposal."""
-    trend = classify_trend(stable_close, as_of, lookback_days=production_params["trend_lookback_days"])
-    if trend is None:
-        return None, "insufficient_trend_history"
-    if trend == "downtrend":
-        return 0.0, "downtrend_defensive"
-
-    leveraged_df = pd.DataFrame({"close": leveraged_close})
-    realized_vol = compute_trailing_market_volatility(leveraged_df, as_of, lookback_days=production_params["vol_lookback_days"])
-    if realized_vol is None:
-        return None, "insufficient_volatility_history"
-
-    target = compute_target_leveraged_weight(
-        realized_vol, production_params["target_vol_pct"], production_params["max_leveraged_weight"]
+    """Verify identity, date, parameters, and exact close-series bindings."""
+    if result is None:
+        raise MissingResearchResultError(
+            "leveraged-pair proposal requires a read-only research result "
+            "from the product composition layer"
+        )
+    expected_as_of = as_of.isoformat() if hasattr(as_of, "isoformat") else str(as_of)
+    if result.stable_ticker != pair_config.stable_ticker.upper() or (
+        result.leveraged_ticker != pair_config.leveraged_ticker.upper()
+    ):
+        raise ResearchResultContractError(
+            "leveraged-pair research result names a different ticker pair"
+        )
+    if result.as_of != expected_as_of:
+        raise ResearchResultContractError(
+            f"research result is bound to {result.as_of}, not {expected_as_of}"
+        )
+    stable_used = stable_close.loc[:as_of]
+    leveraged_used = leveraged_close.loc[:as_of]
+    expected_bindings = (
+        close_series_sha256(stable_used),
+        close_series_sha256(leveraged_used),
+        research_parameters_sha256(pair_config.production_params),
     )
-    return target, f"uptrend_vol_target(realized={realized_vol:.2f}%)"
+    actual_bindings = (
+        result.stable_close_sha256,
+        result.leveraged_close_sha256,
+        result.parameters_sha256,
+    )
+    if actual_bindings != expected_bindings:
+        raise ResearchResultContractError(
+            "leveraged-pair research result does not match the supplied "
+            "history and production parameters"
+        )
+    target = result.target_leveraged_weight
+    max_weight = float(pair_config.production_params["max_leveraged_weight"])
+    if target is not None and float(target) > max_weight:
+        raise ResearchResultContractError(
+            "research target exceeds the pair's configured leveraged-weight cap"
+        )
+    return target, result.label
 
 
 def generate_leveraged_pair_rebalance_proposals(
@@ -291,6 +405,7 @@ def generate_leveraged_pair_rebalance_proposals(
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
     store: AssistantStore | None = None,
+    research_result: LeveragedPairResearchResult | None = None,
 ) -> list[TradeProposal]:
     """
     At most one proposal: rebalance `pair_config`'s stable/leveraged pair
@@ -300,7 +415,9 @@ def generate_leveraged_pair_rebalance_proposals(
     the band.
 
     `market_data` lets a caller/test inject price history instead of
-    hitting the network; production callers can omit it.
+    hitting the network. `research_result` is the immutable target computed
+    from that exact history by the research product. Missing or mismatched
+    results fail closed; this module never imports strategy/signal code.
 
     `store`, if given, records this evaluation via
     AssistantStore.record_strategy_evaluation() under `pair_config.strategy_key`
@@ -326,6 +443,7 @@ def generate_leveraged_pair_rebalance_proposals(
         ttl_minutes,
         market_data,
         store=store,
+        research_result=research_result,
     )
     if store is not None:
         store.record_strategy_evaluation(
@@ -342,12 +460,21 @@ def generate_soxx_soxl_rebalance_proposals(
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
     store: AssistantStore | None = None,
+    research_result: LeveragedPairResearchResult | None = None,
 ) -> list[TradeProposal]:
     """Thin backward-compatible wrapper around
     generate_leveraged_pair_rebalance_proposals(..., SOXX_SOXL_PAIR) --
     kept so existing callers/tests that import this function by name need
     no changes. See that function's docstring for full behavior."""
-    return generate_leveraged_pair_rebalance_proposals(packet, policy, SOXX_SOXL_PAIR, ttl_minutes, market_data, store)
+    return generate_leveraged_pair_rebalance_proposals(
+        packet,
+        policy,
+        SOXX_SOXL_PAIR,
+        ttl_minutes,
+        market_data,
+        store,
+        research_result,
+    )
 
 
 def _generate_leveraged_pair_rebalance_proposals(
@@ -358,6 +485,7 @@ def _generate_leveraged_pair_rebalance_proposals(
     market_data: dict[str, pd.DataFrame] | None = None,
     *,
     store: AssistantStore | None = None,
+    research_result: LeveragedPairResearchResult | None = None,
 ) -> list[TradeProposal]:
     stable_ticker = pair_config.stable_ticker
     leveraged_ticker = pair_config.leveraged_ticker
@@ -400,77 +528,21 @@ def _generate_leveraged_pair_rebalance_proposals(
                 "refusing to size a rebalance from an unpriced or halted leg"
             )
 
-    if market_data is None:
-        if store is not None:
-            from assistant.data_integrity import fetch_daily_bars_recorded
-
-            market_data = fetch_daily_bars_recorded(
-                store,
-                [stable_ticker, leveraged_ticker],
-                pair_config.lookback_days_for_signal,
-            )
-        else:
-            try:
-                market_data = fetch_historical(
-                    [stable_ticker, leveraged_ticker],
-                    lookback_days=pair_config.lookback_days_for_signal,
-                )
-            except Exception as exc:
-                raise MarketDataUnavailableError(
-                    f"{stable_ticker}/{leveraged_ticker} market data is "
-                    f"unavailable ({type(exc).__name__}); refusing to treat "
-                    "a provider failure as no rebalance"
-                ) from None
-    if stable_ticker not in market_data or leveraged_ticker not in market_data:
-        missing = sorted(
-            {
-                stable_ticker,
-                leveraged_ticker,
-            }
-            - set(market_data)
-        )
-        raise MarketDataUnavailableError(
-            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
-            f"for {', '.join(missing)}; refusing to treat missing bars as "
-            "no rebalance"
-        )
-    stable_frame = market_data[stable_ticker]
-    leveraged_frame = market_data[leveraged_ticker]
-    if (
-        not isinstance(stable_frame, pd.DataFrame)
-        or not isinstance(leveraged_frame, pd.DataFrame)
-        or "close" not in stable_frame
-        or "close" not in leveraged_frame
-    ):
-        raise MarketDataUnavailableError(
-            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
-            "or malformed; refusing to treat unusable bars as no rebalance"
-        )
-    stable_close = stable_frame["close"]
-    leveraged_close = leveraged_frame["close"]
-    if stable_close.empty or leveraged_close.empty:
-        raise MarketDataUnavailableError(
-            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
-            "because one or both bar series are empty; refusing to treat "
-            "empty bars as no rebalance"
-        )
+    market_data = prepare_leveraged_pair_market_data(
+        pair_config,
+        market_data=market_data,
+        store=store,
+    )
+    stable_close = market_data[stable_ticker]["close"]
+    leveraged_close = market_data[leveraged_ticker]["close"]
     as_of = min(stable_close.index[-1], leveraged_close.index[-1])
-
-    # GR-4 staleness SLA: a rebalance sized from bars that miss the latest
-    # completed NYSE session would trade current dollars on old prices.
-    # Refuse loudly; the caller catches per-pair and risk-reduction
-    # proposals remain unaffected (they never consult these bars).
-    from data.price_source import evaluate_bar_freshness
-
-    freshness = evaluate_bar_freshness(as_of.date().isoformat())
-    if not freshness.fresh:
-        raise StaleMarketDataError(
-            f"{stable_ticker}/{leveraged_ticker} bars are stale "
-            f"({freshness.detail}); refusing to size a rebalance from "
-            "stale market data"
-        )
-
-    target_leveraged_weight, label = _target_leveraged_weight(stable_close, leveraged_close, as_of, production_params)
+    target_leveraged_weight, label = _validated_research_target(
+        research_result,
+        pair_config=pair_config,
+        stable_close=stable_close,
+        leveraged_close=leveraged_close,
+        as_of=as_of,
+    )
     if target_leveraged_weight is None:
         return []
 

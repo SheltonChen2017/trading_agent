@@ -10,10 +10,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import numpy as np
 import pandas as pd
 
-import assistant.explanations as explanations
 from assistant.context_builder import build_portfolio_snapshot
-from assistant.explanations import explain_ticker
+from assistant.explanations import (
+    MissingResearchResultError,
+    explain_ticker as explain_ticker_without_research,
+)
 from assistant.schemas import MarketRegime
+import scripts.product_composition as composition
+from scripts.product_composition import explain_ticker_with_research as explain_ticker
 
 _FIXED_REGIME = MarketRegime(
     benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
@@ -40,9 +44,9 @@ def _dip_series(days: int = 60) -> pd.DataFrame:
 
 
 def test_explain_ticker_reports_a_triggered_signal():
-    original_fetch = explanations.fetch_historical
+    original_fetch = composition.fetch_historical
     try:
-        explanations.fetch_historical = lambda tickers, lookback_days=300: {"AAA": _dip_series()}
+        composition.fetch_historical = lambda tickers, lookback_days=300: {"AAA": _dip_series()}
         result = explain_ticker("AAA", market_regime=_FIXED_REGIME)
         assert result["ticker"] == "AAA"
         assert result["market_regime"]["trend"] == "uptrend"
@@ -51,20 +55,20 @@ def test_explain_ticker_reports_a_triggered_signal():
         dip_entry = next(t for t in result["triggered_today"] if t["rule"] == "z-score dip/up scanner")
         assert dip_entry["direction"] == "dip"
     finally:
-        explanations.fetch_historical = original_fetch
+        composition.fetch_historical = original_fetch
 
 
 def test_explain_ticker_includes_historical_evidence_for_ticker_specific_findings():
-    original_fetch = explanations.fetch_historical
+    original_fetch = composition.fetch_historical
     try:
-        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        composition.fetch_historical = lambda tickers, lookback_days=300: {}
         result = explain_ticker("SOXX", market_regime=_FIXED_REGIME)
         labels = {e["label"] for e in result["historical_evidence"]}
         assert any("SOXX/SOXL" in label for label in labels)
         # project-wide findings (no ticker restriction) should always appear too
         assert any(e["claim"] == "Beats a random-day baseline out-of-sample" for e in result["historical_evidence"])
     finally:
-        explanations.fetch_historical = original_fetch
+        composition.fetch_historical = original_fetch
 
 
 def test_explain_ticker_flags_ticker_specific_vs_project_wide_findings():
@@ -72,9 +76,9 @@ def test_explain_ticker_flags_ticker_specific_vs_project_wide_findings():
     # specifically about SOXX" apart from "this is a generic project-wide
     # result that shows up for every ticker" -- otherwise every stock's
     # evidence list looks identical and useless.
-    original_fetch = explanations.fetch_historical
+    original_fetch = composition.fetch_historical
     try:
-        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        composition.fetch_historical = lambda tickers, lookback_days=300: {}
         result = explain_ticker("SOXX", market_regime=_FIXED_REGIME)
         by_label = {e["label"]: e["ticker_specific"] for e in result["historical_evidence"]}
         soxx_specific = next(v for k, v in by_label.items() if "SOXX/SOXL" in k)
@@ -82,13 +86,13 @@ def test_explain_ticker_flags_ticker_specific_vs_project_wide_findings():
         project_wide = next(v for k, v in by_label.items() if "z-score dip/up scanner" in k)
         assert project_wide is False
     finally:
-        explanations.fetch_historical = original_fetch
+        composition.fetch_historical = original_fetch
 
 
 def test_explain_ticker_reports_currently_held_status():
-    original_fetch = explanations.fetch_historical
+    original_fetch = composition.fetch_historical
     try:
-        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        composition.fetch_historical = lambda tickers, lookback_days=300: {}
         snapshot = build_portfolio_snapshot(
             [{"ticker": "AAA", "shares": 10, "entry_price": 100.0, "current_price": 110.0}], cash=0.0,
         )
@@ -100,16 +104,16 @@ def test_explain_ticker_reports_currently_held_status():
         assert not_held["currently_held"] is None
         assert never_checked["currently_held"] == "not_checked"
     finally:
-        explanations.fetch_historical = original_fetch
+        composition.fetch_historical = original_fetch
 
 
 def test_explain_ticker_flags_non_authoritative_confirmed_findings_with_display_status():
     # GPT review, 2026-07-29: a confirmed/promising finding that hasn't
     # been re-verified since the fetch_historical lookback-days fix must
     # be visibly distinguishable, not shown as an unqualified "confirmed".
-    original_fetch = explanations.fetch_historical
+    original_fetch = composition.fetch_historical
     try:
-        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        composition.fetch_historical = lambda tickers, lookback_days=300: {}
         result = explain_ticker("SOXX", market_regime=_FIXED_REGIME)
         soxx_drawdown = next(
             e for e in result["historical_evidence"] if "SOXX/SOXL" in e["label"] and e["status"] == "confirmed"
@@ -121,17 +125,17 @@ def test_explain_ticker_flags_non_authoritative_confirmed_findings_with_display_
         assert soxx_drawdown["production_authoritative"] is False
         assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in soxx_drawdown["display_status"]
     finally:
-        explanations.fetch_historical = original_fetch
+        composition.fetch_historical = original_fetch
 
 
 def test_explain_ticker_handles_missing_data_gracefully():
-    original_fetch = explanations.fetch_historical
+    original_fetch = composition.fetch_historical
     try:
-        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        composition.fetch_historical = lambda tickers, lookback_days=300: {}
         result = explain_ticker("NODATA", market_regime=_FIXED_REGIME)
         assert result["triggered_today"] == []
     finally:
-        explanations.fetch_historical = original_fetch
+        composition.fetch_historical = original_fetch
 
 
 if __name__ == "__main__":
@@ -150,8 +154,8 @@ def test_pre_fetched_data_is_used_and_no_redundant_fetch_happens():
     # round-trips per held position on every rerun (independent review,
     # 2026-07-29).
     fetch_calls = []
-    original_fetch = explanations.fetch_historical
-    explanations.fetch_historical = lambda tickers, lookback_days=300: (
+    original_fetch = composition.fetch_historical
+    composition.fetch_historical = lambda tickers, lookback_days=300: (
         fetch_calls.append(tickers) or {"AAA": _dip_series()}
     )
     try:
@@ -167,4 +171,13 @@ def test_pre_fetched_data_is_used_and_no_redundant_fetch_happens():
         explain_ticker("AAA", market_regime=_FIXED_REGIME)
         assert len(fetch_calls) == 1
     finally:
-        explanations.fetch_historical = original_fetch
+        composition.fetch_historical = original_fetch
+
+
+def test_assistant_explanation_fails_closed_without_research_result():
+    try:
+        explain_ticker_without_research("AAA", market_regime=_FIXED_REGIME)
+    except MissingResearchResultError:
+        pass
+    else:
+        raise AssertionError("assistant must not calculate or invent signal results")

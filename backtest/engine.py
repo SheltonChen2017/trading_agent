@@ -23,6 +23,8 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
+from data.research_statistics import bonferroni_threshold
+
 from config import (
     BACKTEST_HOLD_DAYS,
     HORIZON_LABELS,
@@ -1385,51 +1387,6 @@ def bootstrap_daily_edge_significance_by_block(
         "p_value": round(float(p_value), 4),
         "refusal_reason": None,
     }
-
-
-def bonferroni_threshold(n_tests: int, alpha: float = 0.05) -> float:
-    """
-    The Bonferroni-corrected significance threshold for `n_tests`
-    simultaneous comparisons: instead of asking "is p < 0.05", ask
-    "is p < alpha/n_tests". Conservative (some real effects will be missed),
-    but appropriate here given how many basket/direction/horizon cells
-    tend to get scanned at once looking for a candidate.
-
-    CAUTION: `bootstrap_edge_significance()` run on a POOLED sample (all
-    signals across the full date range) is only ever exploratory, not
-    confirmatory — pooling mixes the discovery period (which is expected
-    to look good, since it's the data any pattern was found in) with the
-    confirmation period (the honest test), and a strong discovery-period
-    effect can drag a misleading "significant" p-value out of an
-    honestly-noisy confirmation period. This happened for real in this
-    project (`analyst` "dip": pooled p=0.014, looked significant;
-    confirmation-only p=0.656, not even close). Use
-    `out_of_sample_significance()` below for any claim that a signal's
-    edge is actually real — it computes significance SEPARATELY per
-    period and makes clear only the confirmation row counts as evidence.
-
-    SECOND CAUTION: `bootstrap_edge_significance()` and
-    `out_of_sample_significance()` both resample individual signal ROWS,
-    treating same-date signals as independent draws even though they're
-    typically correlated (driven by the same market-wide move) — use
-    `bootstrap_edge_significance_by_date()` / `out_of_sample_significance_
-    by_date()` instead (caught via `momentum`: row-level bootstrap said
-    p=0.000 significant in both periods; by-date revealed the 17,506/
-    14,000-row samples were really only ~912/700 independent trading days,
-    and significance evaporated).
-
-    THIRD CAUTION: by-date resampling still treats each TRADING DAY as
-    independent of every other day, which misses SERIAL dependence across
-    nearby dates — real when hold_days > 1 (overlapping return windows),
-    when market regimes persist, or when a signal has slow turnover (e.g.
-    momentum keeps flagging the same tickers for weeks). Use
-    `bootstrap_edge_significance_by_block()` / `out_of_sample_significance_
-    by_block()` for the most rigorous check available — it block-
-    resamples consecutive dates instead of independent ones.
-    """
-    if n_tests <= 0:
-        return alpha
-    return alpha / n_tests
 
 
 OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS = [

@@ -5339,14 +5339,287 @@ credential, broker, licensed data, operator database, scheduled task,
 deployment, backtest, outcome, research look, or evidence epoch was accessed
 or changed. SEP-1 remains incomplete and no feature milestone was recorded.
 
+## 7dh. SEP-1 second neutral-contract tranche (Codex, 2026-08-22)
+
+After the owner merged the accepted SEP-1 counter-review, Codex continued on
+fresh isolated branch `codex/sep1-research-contracts-20260821` from merged
+main `d97d1d88b36aa099302b97f386113e441c1ce587`. Product/test commit
+`636d164` removes five of the nine remaining direct product crossings while
+preserving every existing public import path by exact object identity.
+
+Three product-neutral contracts now own the previously misplaced behavior.
+`data.portfolio_metrics` owns portfolio/risk statistics,
+`data.mandate_evaluation` owns structural metric-versus-limit evaluation, and
+`data.research_statistics` owns Bonferroni arithmetic. Volatility measurement,
+threshold calibration, and regime classification move to the existing neutral
+`market_analytics` root. The old `backtest.risk_metrics`,
+`backtest.research_report`, `backtest.engine`, `assistant.mandate`, and
+`signals.regime` import surfaces remain compatibility facades or re-exports;
+tests prove they resolve to the canonical object rather than a parallel copy.
+
+Assistant context construction, stock lookup, paper evidence, and research-look
+accounting now depend on the neutral implementations. The machine ledger is
+therefore exactly **four direct cross-product imports** and **zero authority
+exceptions**. The four retained imports are intentionally policy-heavy:
+`assistant.explanations` to `signals.breakout` and `signals.scanner`, plus
+`assistant.strategy_proposals` to `signals.regime` and
+`strategies.vol_target_rotation`. They require typed, read-only result adapters
+in the next tranche; moving those calculations into shared code would conceal
+product ownership rather than solve it.
+
+Focused affected-module validation passed **200 tests / 1 dependency warning**.
+The complete repository validation and exact published head are reported with
+this branch's owner handoff. No provider, credential,
+licensed row, broker, operator database, task, deployment, backtest, outcome,
+research look, or evidence epoch was accessed or changed. SEP-1 remains
+incomplete; no feature milestone is recorded, and `scripts/` classification
+remains SEP-2 work.
+
+## 7di. Independent review of the second SEP-1 tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep1-contracts-20260821`, created from the exact
+pushed head `52f4c2f` (merge base `d97d1d8`). Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP1_CONTRACTS_TRANCHE.md`. Scope: the
+three tranche commits `636d164`, `e36f480`, `52f4c2f`, plus formal
+dispositions for the three PR #298 counter-review commits (`9949983`,
+`af4f83e`, `92b9a1b`) that revised my own prior corrections.
+
+**Accepted after correction. No P0/P1/P2; one P3.** The cleanest tranche of
+the separation so far, and the largest calculation move.
+
+What was verified independently rather than accepted from the submission:
+all thirteen moved functions (plus `compute_portfolio_metrics`) AST-compared
+old-tree-vs-new — every difference is annotation, rename, temp-fold, one
+unpinned error-message rewording, or a benign `float()` cast; **the owner's
+approved mandate fingerprint recomputes stable** against
+`assistant/default_mandate.json` (the move could not silently invalidate the
+2026-08-04 approval, and did not); exception identity preserved by
+same-object aliasing (`PortfolioMetricsError` imported *as*
+`ResearchReportError`, base class `ValueError` unchanged); facade identity
+holds at runtime across all eleven public seams; the independent census
+finds exactly the **4** declared edges (9 → 4) with **zero**
+authority-to-research paths; the shared modules import no product code; and
+a mutation restoring the removed `research_looks -> backtest.engine`
+crossing turns the census guard red.
+
+**SEP1B-001 (P3, corrected):** third consecutive tranche in which moved code
+arrives intact and its recorded reasons do not. Restored at the new
+canonical locations: the 2026-07-31 P2#5 bool-rejection rationale in
+`_metric_check`; the round-before-int float-imprecision rationale in
+`expected_shortfall_pct`; and `calibrate_volatility_threshold`'s
+apply-the-same-value-to-confirmation discipline sentence — the look-ahead
+rule that justifies the function's existence. Graded P3 rather than
+repeating SEP1R-001's P2 because the class is narrowing: `_capture_pct`
+kept its joint-masking rationale (with the reproduced 50%→16.67% figure)
+and `expected_shortfall_pct` gained a fails-closed docstring.
+
+On the counter-review of my own work: **SEP1CR-001 accepted and verified by
+guard-swap** — my guard passed against my own documents while Codex's failed
+against the same documents, so my `assert current in text` was vacuous
+against the 344 KB handoff; Codex's canonical-marker fix keeps the
+no-literal-milestone-id property. **SEP1CR-002 accepted** — my
+five-plus-three arithmetic was wrong; my own parenthetical listed six.
+
+Also recorded: the shared kernel grew by three modules under plan §2's
+"or be split as ownership becomes clear" clause, with the plan's new policy
+line ("putting their calculations in the shared kernel would hide product
+policy rather than separate it") correctly fencing the four remaining
+policy-heavy edges into adapter work, not moves.
+
+Validation on the final tree: full suite **4,498 passed / 0 failed / 25
+warnings** in 772.28 seconds on Python 3.13.14 — identical in count to my
+independent run of the submitted snapshot (764.37 s), because this round's
+corrections are comments, docstrings, and documents only;
+`compileall` over the required surface passed; `git diff --check` passed;
+focused boundary/document/metric/mandate/regime suites passed (89 + 100
+across the two focused runs), rerun after every edit including after these
+counts were inserted. Mutation evidence: census-guard red on a restored
+crossing; fingerprint stability re-verified after the corrections.
+
+Untested surface, stated plainly: the equivalence argument rests on AST
+comparison plus the existing suites; no new behavioural tests were added
+because the tranche moves code rather than changing it, and the one
+observable change (an unpinned error message) is asserted by nothing.
+
+## 7dj. Codex counter-review of SEP-1 contracts review (2026-08-22)
+
+Codex counter-reviewed exact Claude remote head `dd30257` on isolated local
+branch `codex/counterreview-sep1-contracts-20260822`. Exact ordered Claude
+range: `e6384b7`, `072382b`, `dd30257`, based on submitted Codex head
+`52f4c2f`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP1_CONTRACTS_TRANCHE.md`.
+
+**Accepted after correction.** Claude's SEP1B-001 is confirmed: all three
+rationales existed before the move, accurately explain dangerous behavior,
+and were restored without changing code. The four-edge import census, zero
+authority exceptions, shared-kernel direction, runtime alias identity, and
+approved mandate fingerprint were reproduced independently.
+
+Three P3 corrections close here. **SEP1CCR-001:** Claude's report
+enumerates **twelve**, not eleven, compatibility seams. Same-object runtime
+identity and `except ResearchReportError` behavior are preserved, but the
+moved exception now reports `data.portfolio_metrics.PortfolioMetricsError` as
+its module/name metadata, so no byte-for-byte exception-serialization claim is
+made. **SEP1CCR-002:** the prior blanket licensing blocker is superseded.
+Massive's investment-advice disclaimer is not a personal-research ban, and
+its Analyst Ratings documentation explicitly lists backtesting rating impact
+as a use case. A separate permission letter is not automatically required.
+Before QuantConnect custom-data processing, verify the purchase-specific order
+form and additional terms; they may already grant the use, and this review has
+not inspected them. This wording correction authorizes no provider call,
+upload, data work, backtest, or research look. **SEP1CCR-003:** the permanent
+facade guard pinned only 8 of the 12 function aliases and omitted the exception
+alias despite Claude's broader manual check. It now pins every function seam
+and `ResearchReportError is PortfolioMetricsError`.
+
+Validation on the final counter-review tree: focused affected suites **253
+passed / 0 failed / 1 warning** in 33.62 seconds; complete suite **4,499 passed
+/ 0 failed / 25 warnings** in 699.19 seconds; required `compileall` including
+`research/` passed. No product code changed; SEP-1 remains incomplete, its
+four policy-heavy crossings remain exact, and no feature milestone is
+recorded. Ordered local commits before this final handoff commit:
+`5fcdd41` (complete facade-identity guard), `43d49c7` (counter-review record and
+plan precision), and `c89a900` (ratings-terms correction and regression
+guard). The counter-review branch is local-only pending owner push instruction.
+
+## 7dk. SEP-1 final research-result adapter tranche (Codex, 2026-08-22)
+
+After completing the counter-review in section 7dj, Codex continued on fresh
+branch `codex/sep1-research-result-adapters-20260822`. Product/test commit
+`a8c2b77` removes SEP-1's final four direct cross-product imports without
+moving research policy into the shared kernel.
+
+The new boundary has three pieces. `data.research_results` defines immutable,
+provider-neutral measurement contracts. `research.assistant_results` owns the
+existing scanner, trend, volatility, and target calculations.
+`scripts.product_composition` is the temporary mixed-root entry-point seam
+that builds those results and supplies them to the assistant. The assistant
+no longer imports a signal or strategy module; neither product imports the
+temporary seam or the other product.
+
+The proposal result is bound to the exact stable/leveraged ticker pair,
+as-of timestamp, ordered close histories, and current production parameters.
+The assistant refuses missing results and rejects wrong tickers, altered
+history, changed parameters, mismatched dates, malformed values, or targets
+above the configured leveraged cap. The explanation path likewise refuses a
+missing or wrong-ticker result rather than silently displaying no trigger.
+Production UI and CLI entry points now use the composition seam. Proposal,
+policy, human approval, paper broker, reconciliation, operator database, and
+execution authority are unchanged.
+
+The machine-readable ledger now contains exactly **zero direct product
+crossings** and **zero execution-authority exceptions**. Guards require both
+counts to remain zero, prevent either product from importing the temporary
+composition module, and pin result immutability and the altered-history
+refusal. `scripts/` remains deliberately unclassified until SEP-2.
+
+Validation on the final tree: affected boundary/behavior suites **87 passed**;
+assistant UI/CLI/module-hygiene suites **205 passed**; active-document plus
+boundary checks **61 passed**; complete suite **4,505 passed / 0 failed / 25
+warnings** in 684.12 seconds; required compilation including `research/`
+passed; `git diff --check` passed. No provider, licensed row, broker, task,
+deployment, operator database, backtest, outcome, research look, or evidence
+epoch was accessed or changed. The shared operational checkout remained clean
+on `user/claude/review-sep1-contracts-20260821` at exact head
+`dd302570fe25654cc516d178cae7e2722138ce11`.
+
+**Next:** Claude independently reviews the exact pushed implementation head.
+SEP-1 is implementation-complete but not review-complete; SEP-2 must not begin
+until Claude's review and Codex counter-review close this chain. No feature
+milestone is recorded yet.
+
+## 7dl. Independent review of the SEP-1 adapter tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep1-adapters-20260822`, created from the exact
+pushed head `71d8500` (based on my own prior head `dd30257`). Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP1_ADAPTER_TRANCHE.md`. Scope: all
+seven commits — the counter-review of my second-tranche round and the final
+adapter implementation.
+
+**Accepted after correction. No P0/P1/P2; two P3.** The hard tranche, done
+the way this repository does things: refusals instead of defaults, hashes
+instead of trust, authority untouched.
+
+Verified independently: **zero** cross-product edges (4 → 0) and **zero**
+authority-to-research paths on my own scanner; no product imports the
+temporary `scripts/product_composition` seam, and the research producer
+imports nothing from the assistant. The assistant re-derives every binding
+it can check itself — ticker pair, as-of date, parameters SHA-256, exact
+close-series SHA-256s — and refuses mismatches; a missing result raises
+rather than reading as "no rebalance" or "no signal"; the pair-not-held path
+returns `[]` before any result use, checked in source order. The producer
+reproduces the old inline trend/vol-target sequence exactly, and the UI/CLI
+swap is import-aliasing onto wrappers that keep the old signatures, so both
+existing call sites and the Briefing double-fetch optimization survive.
+Stated plainly: binding hashes prove the result was computed *for* those
+inputs, not *correctly from* them — trust is unchanged from when the same
+code was imported directly, and every target still passes the deterministic
+gate, policy caps, and typed approval.
+
+**SEP1C-001 (P3, corrected):** the assistant-side cap refusal (research
+target above `max_leveraged_weight` must raise) had no regression coverage —
+the producer self-caps, so no honest fixture can reach the check with a
+violating value. Added the test; mutation red with the check disabled, green
+restored.
+
+**SEP1C-002 (P3, corrected):** the licence-boundary correction rests on a
+claim about a live vendor page. I verified it at the source on 2026-08-22 —
+Massive's Analyst Ratings documentation lists "Market sentiment tracking,
+portfolio alerts, **backtesting rating impact**, trend analysis", with no
+restriction language on the page — and added the dated URL-and-quote note to
+the freeze bullet, with an instruction to re-verify or preserve bytes before
+any preregistration relies on it. The correction itself is **accepted**: it
+changes the presumption, not the gate — verify-before-upload survives,
+"any ratings representation" keeps the breadth, and nothing is authorized.
+
+On the counter-review of my own round: **all three findings accepted.**
+SEP1CCR-001 — I called twelve seams eleven, my second arithmetic slip in two
+rounds, and my serialization wording outran my evidence. SEP1CCR-003 — my
+manual identity census exceeded the guard I actually shipped. Both of
+Codex's fixes are right.
+
+**SEP-1's implementation side is complete against its definition of done:**
+authority path removed first, neutral contracts extracted, calculation
+imports replaced with typed input-bound results, ledger 13 → 9 → 4 → 0 with
+no exception broadened, and all proposal/approval/execution/reconciliation
+authority still solely in the trading assistant. Per the rule the submitted
+tree itself records, SEP-1 is *marked* complete — and its feature-milestone
+entry written — only after Codex counter-reviews this review's corrections.
+
+Validation on the final tree: full suite **4,506 passed / 0 failed / 25
+warnings** in 710.36 seconds on Python 3.13.14 — Codex's claimed 4,505
+plus this round's one new cap-refusal test. (An earlier run reporting the
+same 4,506 was discarded as non-validating: my test was appended and a
+two-second mutation ran while it executed, so it validated neither tree;
+the count above is a clean rerun on the exact final tree.) Codex's own
+4,505 / 0 / 25 for the submitted snapshot is accepted on its record;
+`compileall` over the required surface passed; `git diff --check` passed;
+focused separation/strategy/explanation/document suites **141 passed** plus
+doc guards **53/53**, rerun after every edit including after these counts
+were inserted. Mutations: cap-check disable → new test red; both verified
+restored byte-identical.
+
+Untested surface, stated plainly: the equivalence argument for the moved
+strategy logic rests on side-by-side source comparison and the existing
+suites; the composition seam is exercised by the new generic-pair tests but
+not by a live UI session in this review.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-1 is the
 current bounded milestone.** SEP-0 is accepted after correction (sections
 7dc–7dd). SEP-1's first extraction tranche is
 implemented in section 7de and **independently reviewed in section 7df
-(accepted after correction)**; its nine remaining crossings are the next
-work. The former pinned
+(accepted after correction)**. Its second neutral-contract tranche is
+implemented in section 7dh and **independently reviewed in section 7di
+(accepted after correction)**. Its final research-result adapter tranche is
+implemented in section 7dk and **independently reviewed in section 7dl
+(accepted after correction; two P3 corrections awaiting Codex
+counter-review)**; the direct crossing
+and authority-exception counts are both zero. SEP-1's implementation is
+complete against its definition of done, and it is marked complete — with
+its feature-milestone entry — only after Codex counter-reviews the 7dl
+corrections. The former pinned
 `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
 authority path is removed. ACER remains the first
 research program, but its next Cloud capability audit is not the current code
@@ -5380,9 +5653,11 @@ Bonferroni 0.05/6, a provisional two-slot budget, and numeric point-in-time
 stock thresholds. The executable preregistration is still incomplete.
 **ACER-0B is deliberately not frozen** and ACER-3's budget is zero until it
 is. QuantConnect Cloud is the authoritative ACER historical/outcome backtest
-engine; local LEAN is development/test-only. Reconstructable ratings stay off
-QuantConnect absent explicit permission evidence, and current QC authority is
-read-only, zero-outcome structural auditing only.
+engine; local LEAN is development/test-only. The purchase-specific terms for
+processing a ratings representation through QuantConnect remain unverified;
+neither permission nor prohibition is presumed, and no upload is presently
+authorized. Current QC authority is read-only, zero-outcome structural
+auditing only.
 
 What ACER needs next, in order: close the ten named open items
 (ACER-0A.1–0A.10). **Independently corrected proposals now exist for 0A.1 and
@@ -5438,11 +5713,13 @@ change where a reader must look: the permanent run ledger is
 `docs/research/alpha-result.md` (not under `docs/Archive/`), and freeze §8
 now authorizes read-only, **zero-outcome structural** QuantConnect work
 rather than symbol mapping alone — which is what makes the scheduled cloud
-capability audit consistent with its governing document. The
-licensed-ratings transfer question is now a **blocking dependency** of
-ACER-2 rather than a side condition, because the selected architecture needs
-a permitted representation of the ratings signal in Cloud. Raw rows,
-normalized events and derived features must not be presumed transferable.
+capability audit consistent with its governing document. Section 7dj
+supersedes the blanket permission-letter interpretation: personal research is
+not prohibited by the investment-advice disclaimer, while the applicable
+order form and additional terms still need to be checked for the selected
+QuantConnect custom-data processing. Raw rows, normalized events and derived
+features must not be presumed either transferable or prohibited before that
+terms check.
 QuantConnect separately offers Download licences for local internal LEAN use,
 but this project has not purchased or authorized that route and the owner has
 selected Cloud as the authoritative ACER engine.
@@ -5626,20 +5903,26 @@ unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. **SEP-1 is
 the current bounded milestone.** Its first extraction tranche was independently
-reviewed and accepted after correction in section 7df. Continue with the nine
-remaining crossings under `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`;
-do not reopen review of `codex/sep1-portfolio-snapshot-boundary-20260821`.
-The tranche removed the only transitive execution-authority-to-research path
-and four neutral direct crossings. It is not the whole SEP-1 milestone. ACER
+reviewed and accepted after correction in section 7df. The second SEP-1
+neutral-contract tranche is implemented in section 7dh on
+`codex/sep1-research-contracts-20260821` and was independently reviewed and
+counter-reviewed in sections 7di–7dj. The final adapter tranche is implemented
+in section 7dk on `codex/sep1-research-result-adapters-20260822` and awaits
+Claude's independent review. It reduces the exact direct-crossing ledger from
+four to zero without an authority exception. Review that exact pushed head;
+do not reopen the first two tranches. SEP-2 must wait until this review chain
+closes under `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN
 owner decision covering both the Massive and QuantConnect accounts, so
-obtain that authorization before any provider call. Also settle the
-licensed-ratings transfer question, which the cloud engine makes a blocking
-dependency of ACER-2 rather than a side condition. The permission evidence
-must cover the exact representation sent; do not assume normalized or derived
-ratings are exempt. The current Codex process
+obtain that authorization before any provider call. Before any ratings
+representation is processed through QuantConnect custom data, verify the
+purchase-specific order form and additional terms. Massive's
+investment-advice disclaimer does not ban personal ACER research, its Analyst
+Ratings documentation names backtesting rating impact as a use case, and a
+separate permission letter is not an automatic blocker. Do not assume either
+permission or prohibition without the applicable terms. The current Codex process
 can see names-only Massive and QC credential variables, but this does not
 establish entitlements. Once authorized, stay inside freeze §8's read-only,
 zero-outcome scope limit and measure access, coverage, licence, and cost
@@ -5651,8 +5934,8 @@ Local LEAN is installed and verified (CLI `1.0.228`, workspace
 `C:\QuantConnect\ACER`, Docker `29.7.2`, sample run through Engine `2.5.0.0`)
 on the epoch host, but it is NOT the ACER backtest path. A shell opened before
 that install may not have `lean`/`docker` on `PATH`; use the full executable
-paths. Keep reconstructable ratings off QC absent
-explicit permission evidence. Do not join ratings to prices or outcomes, run
+paths. Do not upload reconstructable ratings until the purchase-specific
+third-party-processing terms are verified. Do not join ratings to prices or outcomes, run
 a backtest, deploy, trade,
 acknowledge or alter an operational alert, mutate an operational database, or
 roll paper-epoch-006 without separate authorization.

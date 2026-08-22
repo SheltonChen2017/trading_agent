@@ -1,9 +1,8 @@
 """Regression guards for the owner-directed product separation.
 
-SEP-0 does not pretend the current monorepo is already separated.  It records
-every direct import crossing between the two future products and refuses any
-new crossing.  The listed edges are migration debt, not an approved permanent
-API.  Execution-authority modules get the stricter rule now: they may not
+SEP-1 removes every direct import crossing between the two future products.
+The products exchange only immutable, provider-neutral results through the
+temporary ``scripts`` composition seam. Execution-authority modules may not
 reach strategy-research code through any first-party import chain, including
 chains that step through roots not yet assigned to a product.
 """
@@ -228,6 +227,7 @@ def test_no_unledgered_direct_cross_product_imports():
         f"migration ledger. unexpected={sorted(actual - declared)}, "
         f"stale={sorted(declared - actual)}"
     )
+    assert not actual, "SEP-1 is not complete while any direct crossing remains"
 
 
 def test_shared_kernel_does_not_depend_on_either_product():
@@ -255,13 +255,110 @@ def test_shared_kernel_does_not_depend_on_either_product():
 
 def test_neutral_contract_compatibility_facades_preserve_identity():
     """SEP1-003. Existing callers keep one type/function, not parallel copies."""
+    from assistant.mandate import (
+        compute_mandate_fingerprint as assistant_mandate_fingerprint,
+        evaluate_mandate_metrics as assistant_mandate_evaluation,
+    )
     from assistant.money import to_decimal as assistant_to_decimal
     from assistant.schemas import EvidenceStatus as AssistantEvidenceStatus
+    from backtest.engine import bonferroni_threshold as backtest_bonferroni
+    from backtest.research_report import (
+        ResearchReportError,
+        compute_portfolio_metrics as backtest_portfolio_metrics,
+    )
+    from backtest.risk_metrics import (
+        downside_capture_pct as backtest_downside_capture,
+        expected_shortfall_pct as backtest_expected_shortfall,
+        max_drawdown_pct as backtest_drawdown,
+        time_under_water as backtest_time_under_water,
+        upside_capture_pct as backtest_upside_capture,
+    )
     from data.evidence_status import EvidenceStatus
     from data.financial_primitives import to_decimal
+    from data.mandate_evaluation import (
+        compute_mandate_fingerprint,
+        evaluate_mandate_metrics,
+    )
+    from data.portfolio_metrics import (
+        PortfolioMetricsError,
+        compute_portfolio_metrics,
+        downside_capture_pct,
+        expected_shortfall_pct,
+        max_drawdown_pct,
+        time_under_water,
+        upside_capture_pct,
+    )
+    from data.research_statistics import bonferroni_threshold
+    from market_analytics import (
+        calibrate_volatility_threshold,
+        classify_volatility_regime,
+        compute_trailing_market_volatility,
+    )
+    from signals.regime import (
+        calibrate_threshold_from_discovery,
+        classify_regime,
+        compute_trailing_market_volatility as signal_trailing_volatility,
+    )
 
     assert assistant_to_decimal is to_decimal
     assert AssistantEvidenceStatus is EvidenceStatus
+    assert assistant_mandate_fingerprint is compute_mandate_fingerprint
+    assert assistant_mandate_evaluation is evaluate_mandate_metrics
+    assert backtest_bonferroni is bonferroni_threshold
+    assert backtest_portfolio_metrics is compute_portfolio_metrics
+    assert ResearchReportError is PortfolioMetricsError
+    assert backtest_drawdown is max_drawdown_pct
+    assert backtest_expected_shortfall is expected_shortfall_pct
+    assert backtest_time_under_water is time_under_water
+    assert backtest_downside_capture is downside_capture_pct
+    assert backtest_upside_capture is upside_capture_pct
+    assert signal_trailing_volatility is compute_trailing_market_volatility
+    assert calibrate_threshold_from_discovery is calibrate_volatility_threshold
+    assert classify_regime is classify_volatility_regime
+
+
+def test_temporary_composition_seam_is_not_imported_by_either_product():
+    """SEP1-004. Composition stays in deferred scripts, never in a product."""
+    manifest = _manifest()
+    graph, unresolved = _module_graph(manifest)
+    assert not unresolved
+    product_roots = _product_roots(manifest)
+    offenders = sorted(
+        (source, dependency)
+        for source, dependencies in graph.items()
+        if _product_for(source, product_roots) is not None
+        for dependency in dependencies
+        if dependency == "scripts.product_composition"
+        or dependency.startswith("scripts.product_composition.")
+    )
+    assert not offenders, (
+        "the temporary composition seam is an entry-point adapter, not a "
+        f"dependency either product may acquire: {offenders}"
+    )
+
+
+def test_research_result_contracts_are_immutable():
+    """SEP1-005. Cross-product values cannot be mutated after validation."""
+    import dataclasses
+
+    import pytest
+
+    from data.research_results import SignalTriggerResult, TickerSignalResearchResult
+
+    trigger = SignalTriggerResult(
+        rule="example",
+        direction="up",
+        date="2026-08-22",
+        return_zscore=2.0,
+        volume_zscore=1.0,
+    )
+    result = TickerSignalResearchResult(
+        ticker="SPY",
+        as_of="2026-08-22T00:00:00",
+        triggers=(trigger,),
+    )
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        result.ticker = "QQQ"  # type: ignore[misc]
 
 
 def test_execution_authority_research_reachability_cannot_expand():

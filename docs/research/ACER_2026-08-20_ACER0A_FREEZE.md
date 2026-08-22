@@ -190,22 +190,29 @@ audit's licence step must answer this explicitly.
   validation only. It must not be used for ACER outcome runs. This supersedes
   the earlier local-LEAN-authoritative ruling before any ACER outcome was
   observed.
-- **No representation of the licensed Benzinga ratings signal may be uploaded
-  to QuantConnect unless the applicable agreement or written permission
-  covers that exact representation and transfer.** This includes raw or
-  reconstructable rows and does not assume that normalized events or derived
-  features are exempt. **This gate is load-bearing under the cloud-engine
-  amendment.** ACER-2 needs a permitted representation of the ratings signal
-  inside QuantConnect Cloud, unless an equivalent point-in-time ratings
-  dataset is separately licensed there; no such alternative is established.
-  QuantConnect does offer separate **Download** licences for local storage and
-  internal LEAN use, so its terms do not categorically forbid the reverse
-  direction. This project has neither purchased nor authorized that local
-  route, and adopting it would reverse the owner's current cloud-engine
-  ruling. Therefore ACER-2 cannot execute under the selected architecture
-  until the ratings-transfer question is answered. This is a blocking
-  dependency, not a side condition. See QuantConnect's official
-  [Cloud and Download licence distinction](https://www.quantconnect.com/docs/v2/cloud-platform/datasets/licensing).
+- **Correction, 2026-08-22 — do not turn a disclaimer into a research ban.**
+  Massive's investment-advice disclaimer does not prohibit personal,
+  non-commercial ACER research, and its Analyst Ratings documentation
+  explicitly names **backtesting rating impact** as a use case.
+  (Independently verified 2026-08-22 during the SEP-1 adapter review, at
+  <https://massive.com/docs/rest/partners/benzinga/analyst-ratings>: the
+  page's use-case list reads "Market sentiment tracking, portfolio alerts,
+  backtesting rating impact, trend analysis", and the page itself carries no
+  licensing or restriction language — the restriction question lives in the
+  ToS/order-form documents, exactly as this bullet states. Vendor pages
+  change without notice; re-verify or preserve bytes before relying on this
+  quote in a preregistration.) Testing an
+  investment strategy therefore does not by itself require written
+  permission. Before any ratings representation is processed through
+  QuantConnect custom data, verify the order form and additional terms that
+  actually govern this purchase. They may already permit the intended use;
+  this repository has not inspected them and must not claim either permission
+  or prohibition. A separate permission letter is needed only if the
+  applicable terms require one or leave a material ambiguity the owner elects
+  to resolve that way. Raw licensed rows remain uncommitted, and no upload is
+  authorized by this correction. QuantConnect's separate **Download** licence
+  distinction does not answer the terms governing owner-supplied custom data.
+  See its official [Cloud and Download licence distinction](https://www.quantconnect.com/docs/v2/cloud-platform/datasets/licensing).
 - **Scope limit, not a green light: QuantConnect work is confined to
   read-only, zero-outcome structural activity** — issuer/symbol mapping, and
   measuring the account's dataset entitlements, coverage and field semantics.

@@ -13,21 +13,16 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from assistant.mandate import PortfolioMandate, evaluate_mandate_metrics
-from backtest.risk_metrics import (
-    downside_capture_pct,
-    expected_shortfall_pct,
-    max_drawdown_pct,
-    time_under_water,
-    upside_capture_pct,
+from data.mandate_evaluation import (
+    MandateMetricContract,
+    evaluate_mandate_metrics,
+)
+from data.portfolio_metrics import (
+    PortfolioMetricsError as ResearchReportError,
+    compute_portfolio_metrics,
 )
 
-TRADING_SESSIONS_PER_YEAR = 252
 REQUIRED_PRICE_COLUMNS = ("open", "high", "low", "close", "volume")
-
-
-class ResearchReportError(ValueError):
-    """Research inputs cannot support a trustworthy report."""
 
 
 def _series_digest(frame: pd.DataFrame) -> str:
@@ -193,86 +188,6 @@ def embargoed_split_dates(
     }
 
 
-def compute_portfolio_metrics(
-    equity_curve: pd.Series, benchmark_close: pd.Series
-) -> dict[str, Any]:
-    if not isinstance(equity_curve, pd.Series) or len(equity_curve) < 2:
-        raise ResearchReportError("equity_curve needs at least two observations")
-    if not isinstance(benchmark_close, pd.Series) or len(benchmark_close) < 2:
-        raise ResearchReportError(
-            "benchmark_close needs at least two observations"
-        )
-    if equity_curve.index.has_duplicates or benchmark_close.index.has_duplicates:
-        raise ResearchReportError("metric inputs cannot have duplicate timestamps")
-    equity = pd.to_numeric(equity_curve.sort_index(), errors="coerce")
-    benchmark = pd.to_numeric(benchmark_close.sort_index(), errors="coerce")
-    if (
-        not np.isfinite(equity.to_numpy(dtype=float)).all()
-        or (equity <= 0).any()
-    ):
-        raise ResearchReportError("equity_curve must be positive and finite")
-
-    common = equity.index.intersection(benchmark.index)
-    if len(common) < 2:
-        raise ResearchReportError(
-            "equity curve and benchmark have insufficient overlap"
-        )
-    equity = equity.reindex(common)
-    benchmark = benchmark.reindex(common)
-    strategy_returns_fraction = equity.pct_change().dropna()
-    benchmark_returns_fraction = benchmark.pct_change().dropna()
-    aligned = strategy_returns_fraction.index.intersection(
-        benchmark_returns_fraction.index
-    )
-    strategy_returns_pct = strategy_returns_fraction.reindex(aligned) * 100
-    benchmark_returns_pct = benchmark_returns_fraction.reindex(aligned) * 100
-    annualized_volatility = (
-        float(strategy_returns_fraction.std(ddof=1))
-        * math.sqrt(TRADING_SESSIONS_PER_YEAR)
-        * 100
-    )
-    underwater = time_under_water(equity)
-    return {
-        "sessions": len(equity),
-        "start": str(equity.index.min()),
-        "end": str(equity.index.max()),
-        "annualized_volatility_pct": round(annualized_volatility, 4),
-        "max_drawdown_pct": round(max_drawdown_pct(equity), 4),
-        "expected_shortfall_pct_95": round(
-            expected_shortfall_pct(strategy_returns_pct, confidence=0.95), 4
-        ),
-        "max_time_under_water_sessions": underwater[
-            "max_days_under_water"
-        ],
-        "current_time_under_water_sessions": underwater[
-            "current_days_under_water"
-        ],
-        "pct_of_period_under_water": round(
-            underwater["pct_of_period_under_water"], 4
-        ),
-        "downside_capture_pct": (
-            None
-            if (
-                value := downside_capture_pct(
-                    strategy_returns_pct, benchmark_returns_pct
-                )
-            )
-            is None
-            else round(value, 4)
-        ),
-        "upside_capture_pct": (
-            None
-            if (
-                value := upside_capture_pct(
-                    strategy_returns_pct, benchmark_returns_pct
-                )
-            )
-            is None
-            else round(value, 4)
-        ),
-    }
-
-
 def build_research_report(
     *,
     strategy_name: str,
@@ -280,7 +195,7 @@ def build_research_report(
     benchmark_close: pd.Series,
     data: dict[str, pd.DataFrame],
     parameters: dict[str, Any],
-    mandate: PortfolioMandate,
+    mandate: MandateMetricContract,
     code_commit: str,
     requested_sessions: int | None,
     point_in_time_data: bool,

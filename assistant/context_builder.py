@@ -21,8 +21,12 @@ import pandas as pd
 
 from config import BASKETS, REGIME_VOLATILITY_LOOKBACK_DAYS
 from data.market_data import fetch_historical
-from signals.regime import calibrate_threshold_from_discovery, classify_regime, compute_trailing_market_volatility
-from market_analytics import classify_trend
+from market_analytics import (
+    calibrate_volatility_threshold,
+    classify_trend,
+    classify_volatility_regime,
+    compute_trailing_market_volatility,
+)
 from assistant.schemas import (
     DecisionPacket,
     EvidenceStatus,
@@ -157,8 +161,8 @@ def build_market_regime(
     trailing_vol = compute_trailing_market_volatility(benchmark_df, as_of_date, lookback_days=REGIME_VOLATILITY_LOOKBACK_DAYS)
     vol_regime = None
     if trailing_vol is not None:
-        threshold = calibrate_threshold_from_discovery(benchmark_df, as_of_date, lookback_days=REGIME_VOLATILITY_LOOKBACK_DAYS)
-        vol_regime = classify_regime(benchmark_df, as_of_date, threshold, lookback_days=REGIME_VOLATILITY_LOOKBACK_DAYS)
+        threshold = calibrate_volatility_threshold(benchmark_df, as_of_date, lookback_days=REGIME_VOLATILITY_LOOKBACK_DAYS)
+        vol_regime = classify_volatility_regime(benchmark_df, as_of_date, threshold, lookback_days=REGIME_VOLATILITY_LOOKBACK_DAYS)
 
     return MarketRegime(
         benchmark_ticker=benchmark_ticker,

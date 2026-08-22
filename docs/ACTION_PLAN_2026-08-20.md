@@ -51,16 +51,18 @@ engine installation, authentication, and sample execution were verified on
 QuantConnect Cloud is the authoritative engine for ACER historical and
 outcome backtests. Local LEAN is retained for implementation, synthetic and
 integration testing, and installation checks only. The data-entitlement,
-licensed-data-transfer, terminal-delisting-return, and ACER-0A.4 gates remain
-open; cloud selection does not resolve them.
+applicable vendor-use/third-party-processing terms,
+terminal-delisting-return, and ACER-0A.4 gates remain open; cloud selection
+does not resolve them.
 
 **Current implementation sequencing amendment, 2026-08-21:** the owner has
 directed Codex to begin separating this mixed repository into a trading
 assistant product and a strategy-research product, with Claude independently
 reviewing each stable implementation snapshot. SEP-0 is reviewed and SEP-1 is
-the current bounded milestone: remove the pinned execution-authority path,
-then extract only the neutral contracts and read-only adapters that can move
-without broadening authority. See `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`.
+the current bounded milestone. All three implementation tranches are now
+complete through `a8c2b77`; the exact direct-crossing and authority-exception
+counts are both zero, and the final tranche awaits independent review. See
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.
@@ -316,13 +318,16 @@ conservatism, not because the payload's clocks are naive (the counter-review
 measured all 587,046 `last_updated` values as ISO-8601 `Z`); 39 rows whose
 update date precedes the action date are refused. The
 owner correctly identified the quoted all-caps text as an investment-advice
-disclaimer, not a research ban. Separate Market Data clauses still leave
-third-party transfer and dataset-specific non-display entitlement unproven:
-no representation of the licensed ratings signal may be uploaded unless the
-applicable agreement or written permission covers that exact representation
-and transfer. The later owner engine amendment selects QuantConnect Cloud for
-ACER backtests, so this gate must close before that path can carry the signal;
-see freeze §8 for the governing boundary.
+disclaimer, not a research ban. Massive's Analyst Ratings documentation also
+names **backtesting rating impact** as an intended use case. Personal,
+non-commercial ACER research therefore does not require a separate permission
+letter merely because it tests an investment strategy. The narrower,
+account-specific question is whether the order form and additional terms that
+actually govern this purchase permit the chosen representation to be processed
+as QuantConnect custom data. Those private purchase terms have not been
+verified in this repository; they may already grant the needed use. Verify
+them before an upload, without treating written permission as an automatic
+blocking dependency. See freeze §8 for the governing boundary.
 The identity hazard (FB vs ANTM handled oppositely; BBBY reused) is heightened
 because this Massive delivery has neither ISIN nor exchange; ACER requires a
 security-master cross-reference and must refuse ambiguous joins.
@@ -383,10 +388,13 @@ decision.
 
 **Update 2026-08-21: engine amendment and control-data rulings.** QuantConnect
 Cloud is the authoritative ACER historical/outcome backtest engine. Local LEAN
-is development/test infrastructure only. Ratings rows, normalized events and
-derived features stay off QuantConnect unless the applicable agreement or
-written permission covers the exact representation and transfer. Current
-QuantConnect authorization remains
+is development/test infrastructure only. The investment-advice disclaimer
+does not prohibit personal ACER research, and the vendor documents backtesting
+rating impact as a use case. Before uploading a ratings representation to
+QuantConnect, verify the purchase-specific order form and additional terms for
+that third-party processing; do not assume either prohibition or permission,
+and do not require a separate letter if the applicable terms already grant it.
+Current QuantConnect authorization remains
 **read-only, zero-outcome structural auditing only** — no upload, price or
 outcome join, backtest, or research look. The ACER-2 control set has a
 chosen candidate rather than an adopted one: the Massive/Benzinga Earnings

@@ -4974,7 +4974,251 @@ suite passed **4,491 tests / 0 failures / 25 dependency warnings** in 918.62
 seconds on Python 3.13. Final Git/status checks follow before handoff. No
 milestone completed.
 
+## 7db. Project separation begins with a machine-checked boundary (Codex, 2026-08-21)
+
+Owner direction changed the current implementation task from ACER capability
+work to separating the mixed repository into a trading assistant product and
+a strategy-research product. Codex created
+`codex/project-separation-boundary-20260821` from clean `origin/main` at exact
+head `1fbf6395879b464381238fb770afc83482898663`. The active, reversible migration
+sequence is `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`; this does not
+replace ACER's evidence plan or close any ACER gate.
+
+SEP-0 makes no runtime move. Commit `d31604f` adds the machine-readable
+`architecture/project_boundaries.json` and a fail-closed AST boundary test.
+The current ownership baseline is trading assistant (`assistant/`,
+`execution/`, `risk/`), strategy research (`research/`, `backtest/`, `ml/`,
+`signals/`, `strategies/`, `baskets.py`), temporary shared surface (`data/`,
+`config.py`, `market_analytics.py`), and unclassified `scripts/`. Every one of
+the **13 direct cross-product imports** is recorded with a migration reason;
+an added edge or a stale ledger edge fails. Commit `6bc11f8` records the active
+plan and the concise sequencing reference in the Action Plan.
+
+The transitive check found one genuine authority violation that folder-level
+inspection would have missed:
+`assistant.allocation_batch -> assistant.context_builder -> signals.regime`.
+It is pinned as the only current authority-to-research path, not blessed as an
+API. Any expansion fails. SEP-1 must remove it first by extracting broker
+portfolio-snapshot construction from the broad context builder, then reduce
+the remaining cross-product ledger through neutral evidence schemas,
+financial primitives, mandate inputs/outputs, and a read-only research-result
+adapter. Physical repository extraction is deliberately deferred until those
+boundaries and every mixed script entry point are reviewed.
+
+Validation on the settled tree: the focused separation and active-document
+suites passed **54 tests**; repository-wide compileall, including `research/`
+and `tests/`, passed. The pre-handoff complete suite passed **4,494 tests / 0
+failures / 25 dependency warnings in 811.86 seconds**; the complete suite on
+the exact three-commit tree repeated **4,494 / 0 / 25 in 944.57 seconds** on
+Python 3.13.14. No vendor, broker, operator database, scheduled task,
+deployment, backtest, research look, credential, licensed row, or evidence
+epoch was accessed or changed. SEP-0 remains pending Claude's independent
+review of the exact pushed snapshot; it is not yet a completed milestone.
+
+## 7dc. Independent review of SEP-0 (Claude, 2026-08-21)
+
+Branch `user/claude/review-sep0-boundary-20260821`, created from Codex's exact
+pushed head `f4be89a` (merge base `origin/main` `1fbf639`). Full record:
+`docs/Archive/Review/REVIEW_2026-08-21_SEP0_PROJECT_SEPARATION.md`.
+
+**Accepted after correction.** No P0 or P1; two P2 and three P3, one of which
+is recorded open rather than fixed.
+
+Said first because it is the substance: **the census is exact.** I recomputed
+the cross-product import graph with an independent scanner rather than reusing
+the submitted code — **13 direct edges, matching the ledger with no additions
+and no stale entries.** I also checked an assumption the whole plan rests on:
+the "temporary shared kernel" (`data/`, `config.py`, `market_analytics.py`)
+imports **neither** product today, so the shared designation is honest and the
+13-edge count is not understated through that route. And the transitive check
+found `assistant.allocation_batch -> assistant.context_builder ->
+signals.regime`, a real authority-to-research path no folder-level review
+would surface, pinned as a violation rather than blessed.
+
+**CDR2-001 (P2).** The import graph walked only classified roots, so a chain
+stepping through an unclassified root left the audit entirely — including the
+declared, 67-file `scripts/` root, and any new top-level package, because
+nothing required the manifest to classify one. The module's own docstring
+claimed authority modules cannot reach research "through any first-party
+import chain"; that was false at the boundary of the classified set. Four
+mutations, all reported **clean** before the fix and **red** after: a new
+unclassified package reaching `signals`; `assistant` through it; **`risk/`
+(an authority root) through it**; and the live-shape `risk/` -> `scripts/` ->
+research. No package imports `scripts` today, so this was latent rather than
+live — which is exactly what the guard exists to prevent. Fixed by traversing
+pending-classification roots (they resolve to no product, so no edge is added,
+only the chain is followed) plus a mirror-case assertion that every
+first-party Python root is classified, `tests` exempt.
+
+**CDR2-002 (P2), and its first step was mine.** Across three commits a pending
+owner authorization became an assumed one and was then pinned by a test. My
+earlier CDR-002 widened freeze §8's scope sentence while keeping its verb
+("is authorized"); the handoff then read the widened scope as permission and
+replaced "**before** any provider call, **obtain** the owner's authorization"
+with "perform the **authorized** audit"; and `25adfd2` added a guard requiring
+that wording and forbidding the resume block from asking for authorization at
+all. Meanwhile Action Plan §7 item 1 — in the document `CLAUDE.md` names as
+the sequencing authority — still lists that authorization as an open decision
+covering **both** the Massive and QuantConnect accounts, and freeze §8 never
+mentioned Massive. Corrected fail-closed: freeze §8 is now explicitly a scope
+limit rather than the authorization, the resume block obtains authorization
+before any provider call, and `25adfd2`'s guard is replaced by a relationship
+test that fails whenever the two documents disagree, in either direction.
+**This needs an owner ruling:** if the audit was meant to be authorized, say
+so and both documents flip together. No provider call has been made.
+
+**CDR2-003/004 (P3).** The Action Plan amendment did not say how SEP relates
+to ACER's priority-1 standing (only the handoff did), and the docs root gained
+a second active plan by adding one string to a test allowlist while
+`docs/Plan/README.md` still described activation in the singular. Both now
+state the rule where a reader will find it.
+
+**CDR2-005 (P3), recorded open.** Two asymmetries in the new guard: an
+unresolvable dynamic import is an offender in the authority check but ignored
+in the cross-product census, and the authority DFS reports only the
+first-traversed chain per start module while the manifest pins exact chain
+strings. Neither is a fail-open on the authority boundary; both are design
+questions for SEP-1 rather than review edits.
+
+**On the owner's actual question — is separation feasible?** On this evidence,
+yes, and measuring is what made it answerable. Thirteen crossings and one
+transitive path is a small, named debt for a codebase this size, and the
+direction is favourable: assistant→research edges are mostly presentation and
+context, research→assistant edges are mostly type and primitive reuse, and
+both extract cleanly behind neutral contracts. Three cautions are in the
+review report: `scripts/` is the real work and is still uncounted at the
+entry-point level; the shared kernel is clean now and nothing yet stops it
+acquiring a product dependency; and physical extraction changes the
+operational checkout's lineage, which closes `paper-epoch-006` — the epoch
+clock, not review order, is the binding constraint on SEP-3.
+
+Also recorded plainly: Codex's counter-review corrected a real overstatement of
+mine (QuantConnect does sell Download licences, so "their terms forbid the
+reverse direction" was too absolute), broadened the transfer gate from
+reconstructable rows to any representation of the licensed signal, and fixed
+the merge-state parser blind spot I had declined to fix. That work is accepted.
+
+Validation. Submitted snapshot `f4be89a`: full suite **4,494 passed / 0 failed
+/ 25 warnings** in 1,177.97 s, reproduced independently and matching §7db.
+Corrected tree: full suite **4,494 passed / 0 failed / 25 warnings** in
+924.94 s on Python 3.13.14 — unchanged in count, because this round replaced
+one guard with another and added assertions to existing ones rather than
+adding tests. `compileall` over the required surface including `research/` and
+`tests/` passed; `git diff --check` passed; the focused document, separation
+and ml-boundary guards passed, rerun after every edit including after these
+counts were inserted.
+
+One earlier run of the same tree reported two failures in
+`tests/test_ui_allocation_review.py` at 5,036 s — roughly five times the normal
+duration, because three full pytest sessions were overlapping on this host.
+Both tests pass in isolation and pass in the clean 924.94 s run above. Recorded
+rather than dropped, and **not** closed as resolved: the standing FPS-003 rule
+is that an intermittent failure is not settled by a later green run. If either
+reappears without contention, capture the full traceback.
+
+Untested surface, stated plainly: this round changed two test modules and four
+documents. The boundary guard proves what the repository's **import graph**
+declares; it says nothing about runtime coupling through configuration,
+subprocess invocation, the operator database, or shared files, and `scripts/`
+remains unclassified so its entry-point coupling is still uncounted.
+
+## 7dd. Counter-review of Claude's SEP-0 review (Codex, 2026-08-21)
+
+Codex counter-reviewed exact remote
+`origin/user/claude/review-sep0-boundary-20260821` at
+`e195fbeb5360df7895f63b6a986878e226d4aec3`, whose merge base is the exact
+SEP-0 submission `f4be89a96cbdfeaf78a52119a8bb8590d6499494`. Review branch:
+`codex/counterreview-sep0-boundary-20260821`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-21_SEP0_PROJECT_SEPARATION.md`.
+
+All three Claude commits are **accepted after correction**. Claude's
+CDR2-001 traversal fix and CDR2-002 fail-closed authorization correction are
+valid. Codex found one additional P2, SEP0CR-001: section 7dc and the resume
+block advanced to SEP-1, but the active separation plan still called SEP-0
+"in implementation" and the Action Plan still called it the current bounded
+milestone. Commit `02d7a9e` advances both sequencing authorities and adds a
+three-document consistency guard. Reverting the separation-plan status made
+that guard fail; restoring it returned the focused boundary/document suite to
+**55 passed**. Commit `6dfc0bc` records the counter-review and retains CDR2-005
+as an open P3 design issue.
+
+Final validation on the exact counter-review tree: **4,495 passed / 0 failed /
+25 warnings in 768.80 seconds** on Python 3.13.14; compileall including
+`research/` passed; diff check passed; the worktree was clean before this
+handoff-only update. Claude's reviewed remote head remained exact and the
+shared checkout remained on `user/claude/review-sep0-boundary-20260821` at
+`e195fbe`. No provider, broker, licensed data, operator database, scheduled
+task, deployment, outcome run, research look, or evidence epoch was accessed
+or changed. SEP-0 is accepted after correction. This branch is committed for
+the owner's authorized single final push; the final report must verify the
+exact remote head before SEP-1 begins.
+
+## 7de. SEP-1 first extraction tranche (Codex, 2026-08-21)
+
+Codex began SEP-1 on fresh branch
+`codex/sep1-portfolio-snapshot-boundary-20260821` from finalized, pushed SEP-0
+counter-review head `9c12ac32041f3873d59dbac593fcd1ef082aa727`.
+Implementation commit `18868d3` extracts manual and Alpaca portfolio snapshot
+construction into `assistant.portfolio_snapshot`, changes allocation preflight
+to import that narrow module, and removes the former
+`assistant.allocation_batch -> assistant.context_builder -> signals.regime`
+authority path. The authority exception ledger is now empty.
+
+The same commit moves the neutral `EvidenceStatus` and exact decimal helpers
+into `data/`, preserving `assistant.schemas.EvidenceStatus` and
+`assistant.money` as identity-preserving compatibility facades. Four
+ML-to-assistant edges are removed, reducing the exact direct debt ledger from
+**13 to 9**. The boundary suite now also refuses shared-kernel imports back
+into either product. Dangerous-direction mutations independently proved that
+restoring the old allocation import fails both direct and transitive guards,
+and that a shared-module import of `assistant.schemas` fails the new direction
+guard.
+
+Commit `035715a` records the tranche in the active separation plan. Commit
+`935c5dc` keeps the active-document state guard aligned with the review-pending
+status. The first full-suite attempt exposed two stale assertions in the
+repository-wide raw-decimal guard: it still required the implementation to
+reside in `assistant.money.py`. No product behavior failed. Commit `7f8c47f`
+points that guard at `data.financial_primitives` while retaining the assistant
+facade; commit `ed46797` records the correction. Its focused
+guard/precision/boundary suite passes **16 tests**. Commit `4f4d6c8` advances
+the three-document state guard from "implement SEP-1" to "review the
+implemented SEP-1 tranche"; the final document/boundary/decimal set passes
+**61 tests**.
+
+Final validation on the exact branch tree through handoff commit `cf9aeac`:
+**4,498 passed / 0 failed / 25 warnings in 683.88 seconds** on Python 3.13.14.
+The broader focused extraction
+suite passed **239 tests / 17 warnings**, the final active-document/boundary
+suite passed **58 tests**, and both dangerous-direction mutations failed for
+the intended reason before restoration. Required compilation, diff/status,
+ordered-commit, secret and remote/shared-checkout checks follow this handoff
+update and are reported with the final push.
+
+SEP-1 is **not complete**. Nine direct cross-product imports remain, including
+the read-only research-result adapter and provider-neutral mandate/evidence
+contracts. No physical second repository was created, no script was
+classified, and no runtime authority, broker, provider, licensed data,
+database, scheduled task, deployment, research outcome, or evidence epoch was
+accessed or changed. This tranche stops for Claude's independent review after
+the owner's authorized single final push.
+
 ## 8. What is next
+
+**Current implementation sequencing (owner, 2026-08-21):** SEP-0 is accepted
+after correction (sections 7dc–7dd). SEP-1's first extraction tranche is
+implemented in section 7de and must now receive Claude's independent review
+before any of its nine remaining crossings are changed. The former pinned
+`assistant.allocation_batch -> assistant.context_builder -> signals.regime`
+authority path is removed. ACER remains the first
+research program, but its next Cloud capability audit is not the current code
+implementation task. The separation work grants no outcome-run, vendor,
+broker, deployment, database, task, or epoch authority.
+
+**One owner decision is waiting (CDR2-002):** whether the read-only,
+zero-outcome capability audit of the Massive and QuantConnect accounts is
+authorized. Action Plan §7 item 1 lists it as open and the documents now read
+fail-closed; if it was meant to be granted, say so and both flip together.
 
 **Current (2026-08-20, superseding everything below):**
 `docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and puts the
@@ -5211,6 +5455,7 @@ or roll an epoch without a new explicit owner instruction.
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
 docs/SESSION_HANDOFF.md, docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
+docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md,
 docs/Archive/Review/REVIEW_2026-08-20_ACER1_BENZINGA_AUDIT.md,
 docs/Archive/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md,
 docs/Archive/Review/REVIEW_2026-08-20_ACER0A_FREEZE.md,
@@ -5242,16 +5487,25 @@ capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. Next:
-perform the authorized narrow read-only, zero-outcome QuantConnect Cloud
-capability audit (entitlements, coverage, semantics), and settle the
+Claude independently reviews pushed branch
+`codex/sep1-portfolio-snapshot-boundary-20260821`, based on finalized SEP-0
+counter-review `9c12ac3`; sections 7dd–7de record the accepted SEP-0 review
+and the SEP-1 implementation. The tranche removes the only transitive
+execution-authority-to-research path and four neutral direct crossings,
+leaving nine. It is not the whole SEP-1 milestone. ACER remains the
+first research program, and its next research step is the narrow read-only,
+zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
+semantics) -- which Action Plan section 7 item 1 still lists as an OPEN
+owner decision covering both the Massive and QuantConnect accounts, so
+obtain that authorization before any provider call. Also settle the
 licensed-ratings transfer question, which the cloud engine makes a blocking
 dependency of ACER-2 rather than a side condition. The permission evidence
 must cover the exact representation sent; do not assume normalized or derived
 ratings are exempt. The current Codex process
 can see names-only Massive and QC credential variables, but this does not
-establish entitlements. During any provider call, remain within freeze §8's
-narrow read-only authorization and measure access, coverage, licence, and
-cost without joining outcomes. Also close ACER-0A.1–0A.10, run the separately
+establish entitlements. Once authorized, stay inside freeze §8's read-only,
+zero-outcome scope limit and measure access, coverage, licence, and cost
+without joining outcomes. Also close ACER-0A.1–0A.10, run the separately
 authorized Benzinga Earnings
 structural audit before adopting that control dataset, resolve issuer mapping
 with ambiguity refusals, and take Snapshot B after the declared interval.

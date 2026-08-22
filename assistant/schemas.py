@@ -17,21 +17,7 @@ from decimal import Decimal
 from enum import Enum
 
 from assistant.money import to_decimal
-
-
-class EvidenceStatus(str, Enum):
-    """How much to trust a claim about a signal/strategy's edge —
-    attached per CLAIM, not per strategy. A single strategy can carry
-    two different statuses at once: SOXX/SOXL's drawdown-reduction claim
-    is CONFIRMED (survived every check run), while its "beats buy-and-
-    hold on CAGR" claim is REJECTED (failed once realistic taxes were
-    modeled) — see memory: project_leverage_rotation_strategy."""
-
-    CONFIRMED = "confirmed"                          # passed out-of-sample + all bootstrap layers + realistic execution/tax
-    PROMISING_UNCONFIRMED = "promising_unconfirmed"   # positive result, hasn't cleared every check yet
-    EXPLORATORY = "exploratory"                       # pattern noticed, not yet tested rigorously
-    REJECTED = "rejected"                             # failed confirmation, look-ahead correction, or tax/cost modeling
-    UNAVAILABLE = "unavailable"                       # data missing/stale/not yet integrated
+from data.evidence_status import EvidenceStatus
 
 
 def _to_dict(obj):

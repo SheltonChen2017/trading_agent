@@ -206,9 +206,19 @@ audit's licence step must answer this explicitly.
   until the ratings-transfer question is answered. This is a blocking
   dependency, not a side condition. See QuantConnect's official
   [Cloud and Download licence distinction](https://www.quantconnect.com/docs/v2/cloud-platform/datasets/licensing).
-- **QuantConnect access is authorized for read-only, zero-outcome structural
-  work only** — issuer/symbol mapping, and measuring the account's dataset
-  entitlements, coverage and field semantics. During that work: no Benzinga
+- **Scope limit, not a green light: QuantConnect work is confined to
+  read-only, zero-outcome structural activity** — issuer/symbol mapping, and
+  measuring the account's dataset entitlements, coverage and field semantics.
+  **This bullet bounds what an authorized session may do; it is not itself the
+  authorization to start one.** Action Plan §7 item 1 still lists "authorize a
+  read-only, zero-outcome capability audit of the current Massive and
+  QuantConnect accounts" as an open owner decision, and its Massive half has
+  no counterpart here at all. Until the owner grants that decision in writing,
+  no provider call is authorized under either document. (CDR2-002: the
+  2026-08-21 wording chain — a scope widening, then a handoff that read the
+  widened scope as permission, then a guard pinning it — converted a pending
+  authorization into an assumed one without anyone deciding it. Fail closed
+  until the owner says otherwise.) During any authorized work: no Benzinga
   upload, no price or outcome join, no backtest launch, and no research look.
   Provenance is preserved, and ticker-reuse or rename ambiguity produces a
   refusal rather than a guess. (Amended 2026-08-21 with the engine ruling

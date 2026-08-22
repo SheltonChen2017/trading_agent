@@ -27,7 +27,7 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
-from assistant.schemas import EvidenceStatus
+from data.evidence_status import EvidenceStatus
 
 SCHEMA_VERSION = "1.0"
 _SUPPORTED_SCHEMA_VERSIONS = frozenset({SCHEMA_VERSION})
@@ -158,7 +158,7 @@ def _window(value: Any, name: str) -> Mapping[str, str]:
 def _check_evidence_status(value: Any) -> None:
     if not isinstance(value, EvidenceStatus):
         raise ContractError(
-            "evidence_status must be an assistant.schemas.EvidenceStatus, "
+            "evidence_status must be a data.evidence_status.EvidenceStatus, "
             f"got {value!r}"
         )
 

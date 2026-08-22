@@ -40,7 +40,7 @@ from backtest.engine import (
     bonferroni_threshold,
     bootstrap_edge_significance_by_block,
 )
-from assistant.schemas import EvidenceStatus
+from data.evidence_status import EvidenceStatus
 from ml.artifacts import (
     load_model_artifact,
     load_model_manifest,

@@ -3,7 +3,7 @@
 `docs/operations/OPERATIONAL_FACTS.md` §3 records that three consecutive review passes
 each found another one of these (FPS-001 -> GFPS-001 -> CFPS-001) and states
 the rule explicitly: *"If a fourth appears, the answer is a lint or AST guard
-banning bare ``Decimal(str(...))`` outside ``assistant/money.py`` -- not
+banning bare ``Decimal(str(...))`` outside the canonical money helper -- not
 another point fix."* A fourth appeared on 2026-08-07 in
 ``execution/alpaca_broker.py``'s quote path, so this is that guard.
 
@@ -18,7 +18,9 @@ line cost a review round:
   the way float NaN does, so a ``<= 0`` guard written after the conversion is
   not the safe check it looks like (CFPS-001).
 
-``assistant.money.to_decimal`` normalizes all three: ``InvalidOperation`` and
+``data.financial_primitives.to_decimal`` normalizes all three; the established
+``assistant.money.to_decimal`` import is an identity-preserving facade. Both
+normalize ``InvalidOperation`` and
 ``TypeError`` become ``ValueError``, and non-finite values are rejected up
 front. Use it.
 
@@ -37,7 +39,7 @@ _REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 # reason it is safe. Adding to this list is a review decision, not a
 # formality: the entry must explain why `to_decimal` is not the right answer.
 _ALLOWED: dict[str, str] = {
-    "assistant/money.py": (
+    "data/financial_primitives.py": (
         "the canonical conversion itself -- to_decimal IS this call, wrapped "
         "in the try/except and finiteness check that make it safe"
     ),
@@ -110,9 +112,10 @@ def test_no_new_bare_decimal_str_conversion_outside_the_money_helpers():
         for line in _bare_decimal_str_sites(path):
             offenders.append(f"{relative}:{line}")
     assert not offenders, (
-        "bare Decimal(str(...)) outside assistant/money.py: "
+        "bare Decimal(str(...)) outside the canonical money helper: "
         + ", ".join(sorted(offenders))
-        + ". Use assistant.money.to_decimal -- it normalizes InvalidOperation "
+        + ". Use data.financial_primitives.to_decimal (or the compatible "
+        "assistant.money facade) -- it normalizes InvalidOperation "
         "(an ArithmeticError, so it escapes `except ValueError`) into "
         "ValueError and rejects the NaN/Infinity literals that Decimal "
         "otherwise accepts and then RAISES on when compared. If this site "

@@ -23,5 +23,15 @@ Current queued plans:
   active.
 - `Research/` — frozen or proposed research contracts for later work.
 
-When the owner activates one plan, move it to the root of `docs/`, update the
+When the owner activates a plan, move it to the root of `docs/`, update the
 Action Plan and Session Handoff, and leave no second copy here.
+
+**How many plans the root may hold (CDR2-004).** At most **one active plan per
+track**, not one overall. There are currently two tracks and therefore two
+plans at the root: the **research** track
+(`ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`) and the **architecture** track
+(`PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`). A third root plan means either a
+new track the Action Plan must name, or a plan that should have been archived.
+The allowlist in `tests/test_active_document_consistency.py` enforces the
+membership; this paragraph is the rule it enforces, so the rule cannot be
+changed by editing the test alone.

@@ -22,7 +22,7 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 import pandas as pd
 
-from assistant.schemas import EvidenceStatus
+from data.evidence_status import EvidenceStatus
 from ml.artifacts import load_model_artifact, load_model_manifest
 from ml.contracts import ModelManifest, PredictionRecord, require_matching_feature_order
 from ml.features import FeatureError, compute_point_in_time_features

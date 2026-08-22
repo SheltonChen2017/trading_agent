@@ -345,6 +345,52 @@ runner seams, and PowerShell launchers. Continue reducing those surfaces
 without moving execution authority into research or licensed research data
 into the assistant.
 
+Claude independently reviewed that tranche at exact pushed head `b4b896f`
+(accepted after correction; two P3 corrected). Codex counter-reviewed both
+ordered Claude commits at `8f7a8ac` and `b4b896f`: the test-only rename is
+accepted, and the review record is accepted after correcting the current
+handoff's undercount of Claude's two findings. See
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_LAUNCH_SURFACE.md`.
+
+#### SEP-2 fourth tranche — operator-database boundary and crossing reduction
+
+Commit `0e98d42` completes the next bounded implementation tranche without
+claiming SEP-2 complete or authorizing a physical database split:
+
+- `architecture/operator_database_access.json` now pins the five remaining
+  non-assistant direct importers of `assistant.storage`, their exact host,
+  read/write classification, method surface, attribute surface, and purpose.
+  It is explicitly an exact shrinking debt ledger, not a permanent allowlist;
+- a permanent AST guard compares the real importers and every direct
+  `AssistantStore` method/attribute used by those files with the manifest, so
+  either a new importer or a wider database surface fails closed;
+- the type-only `AssistantStore` dependency in `scripts.product_composition`
+  is replaced by the assistant-owned structural
+  `StrategyOperationalStore` contract. The real `AssistantStore` is
+  runtime-checked against that contract, while database ownership and runtime
+  behavior remain with the trading assistant;
+- the deterministic research-report digest verifier moves to the existing
+  provider-neutral `data.research_results` contract. The legacy
+  `backtest.research_report` export preserves exact function identity, and the
+  personal-assistant runner consumes the neutral export; and
+- exact script ownership remains **7 assistant / 56 research / 12
+  composition**, while the declared Python crossing ledger falls from **8 to
+  7** and the direct non-assistant operator-database importer count falls from
+  **6 to 5**.
+
+Three dangerous-direction mutations were proved red and restored: adding a
+new `assistant.storage` importer, adding a new operator-store method to an
+existing importer, and restoring the personal-assistant runner's `backtest`
+dependency. No provider, credential, licensed row, broker, operator database,
+scheduled task, deployment, backtest, outcome, research look, or evidence
+epoch was accessed or changed.
+
+SEP-2 remains incomplete. The five pinned mutable-database crossings still
+need product-owned adapters or physical ownership resolution; the residual 12
+composition files and 7 crossings include the assistant/research UI seam and
+PowerShell task surfaces. Any physical database or scheduled-task move remains
+owner-gated and must not disturb `paper-epoch-006`.
+
 ### SEP-3 — physical extraction decision
 
 After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction

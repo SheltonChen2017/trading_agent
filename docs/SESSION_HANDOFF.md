@@ -5482,6 +5482,52 @@ recorded. Ordered local commits before this final handoff commit:
 plan precision), and `c89a900` (ratings-terms correction and regression
 guard). The counter-review branch is local-only pending owner push instruction.
 
+## 7dk. SEP-1 final research-result adapter tranche (Codex, 2026-08-22)
+
+After completing the counter-review in section 7dj, Codex continued on fresh
+branch `codex/sep1-research-result-adapters-20260822`. Product/test commit
+`a8c2b77` removes SEP-1's final four direct cross-product imports without
+moving research policy into the shared kernel.
+
+The new boundary has three pieces. `data.research_results` defines immutable,
+provider-neutral measurement contracts. `research.assistant_results` owns the
+existing scanner, trend, volatility, and target calculations.
+`scripts.product_composition` is the temporary mixed-root entry-point seam
+that builds those results and supplies them to the assistant. The assistant
+no longer imports a signal or strategy module; neither product imports the
+temporary seam or the other product.
+
+The proposal result is bound to the exact stable/leveraged ticker pair,
+as-of timestamp, ordered close histories, and current production parameters.
+The assistant refuses missing results and rejects wrong tickers, altered
+history, changed parameters, mismatched dates, malformed values, or targets
+above the configured leveraged cap. The explanation path likewise refuses a
+missing or wrong-ticker result rather than silently displaying no trigger.
+Production UI and CLI entry points now use the composition seam. Proposal,
+policy, human approval, paper broker, reconciliation, operator database, and
+execution authority are unchanged.
+
+The machine-readable ledger now contains exactly **zero direct product
+crossings** and **zero execution-authority exceptions**. Guards require both
+counts to remain zero, prevent either product from importing the temporary
+composition module, and pin result immutability and the altered-history
+refusal. `scripts/` remains deliberately unclassified until SEP-2.
+
+Validation on the final tree: affected boundary/behavior suites **87 passed**;
+assistant UI/CLI/module-hygiene suites **205 passed**; active-document plus
+boundary checks **61 passed**; complete suite **4,505 passed / 0 failed / 25
+warnings** in 684.12 seconds; required compilation including `research/`
+passed; `git diff --check` passed. No provider, licensed row, broker, task,
+deployment, operator database, backtest, outcome, research look, or evidence
+epoch was accessed or changed. The shared operational checkout remained clean
+on `user/claude/review-sep1-contracts-20260821` at exact head
+`dd302570fe25654cc516d178cae7e2722138ce11`.
+
+**Next:** Claude independently reviews the exact pushed implementation head.
+SEP-1 is implementation-complete but not review-complete; SEP-2 must not begin
+until Claude's review and Codex counter-review close this chain. No feature
+milestone is recorded yet.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-1 is the
@@ -5490,9 +5536,9 @@ current bounded milestone.** SEP-0 is accepted after correction (sections
 implemented in section 7de and **independently reviewed in section 7df
 (accepted after correction)**. Its second neutral-contract tranche is
 implemented in section 7dh and **independently reviewed in section 7di
-(accepted after correction)**; four policy-heavy
-crossings remain, to move behind typed read-only research-result adapters in
-the next tranche. The former pinned
+(accepted after correction)**. Its final research-result adapter tranche is
+implemented in section 7dk and awaits independent review; the direct crossing
+and authority-exception counts are both zero. The former pinned
 `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
 authority path is removed. ACER remains the first
 research program, but its next Cloud capability audit is not the current code
@@ -5778,12 +5824,13 @@ unmeasured optional provider. It does not replace vendor evidence. **SEP-1 is
 the current bounded milestone.** Its first extraction tranche was independently
 reviewed and accepted after correction in section 7df. The second SEP-1
 neutral-contract tranche is implemented in section 7dh on
-`codex/sep1-research-contracts-20260821` and awaits Claude's independent
-review. It reduces the exact ledger from nine crossings to four without an
-authority exception. Do not reopen review of the first tranche. After review,
-continue the four policy-heavy crossings only through typed, read-only result
-adapters under `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`; this is still
-not the whole SEP-1 milestone. ACER
+`codex/sep1-research-contracts-20260821` and was independently reviewed and
+counter-reviewed in sections 7di–7dj. The final adapter tranche is implemented
+in section 7dk on `codex/sep1-research-result-adapters-20260822` and awaits
+Claude's independent review. It reduces the exact direct-crossing ledger from
+four to zero without an authority exception. Review that exact pushed head;
+do not reopen the first two tranches. SEP-2 must wait until this review chain
+closes under `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

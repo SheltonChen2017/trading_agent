@@ -6431,15 +6431,71 @@ permanently partitioned monorepo. SEP-3 authorizes no repository creation,
 history rewrite, deployment, credential move, scheduled-task change, or
 operator-database move.
 
+## 7dz. SEP-2 completion counter-review and SEP-3 extraction dry run (Codex, 2026-08-22)
+
+Codex counter-reviewed exact pushed Claude head
+`e642469df7030deb1a36171f43a85e68e1fd82d1` from
+`origin/user/claude/review-sep2-completion-20260822`. Its exact implementation
+base and merge-base are `c7087714be8a976a401472f1710e4faa5e1d55d6`;
+ordered Claude commits are `a464b40` and `e642469`. Both are accepted, with
+the first accepted after one P3 correction. The durable record is
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_COMPLETION.md`.
+
+**CRSEP2C-001 (P3, corrected).** Claude's manifest linked completion flags to
+test names but did not execute the named evidence while claiming the milestone
+could not outlive it. The completion certificate now directly invokes every
+named fixture-free guard and refuses missing, renamed, fixture-dependent, or
+failing evidence. A deliberate failing invariant inside the script-inventory
+guard made the certificate itself fail; restoration returned the focused
+module to 23/23. SEP-2 remains correctly accepted and complete.
+
+The owner then selected the SEP-3 topology: **two product repositories plus
+one deliberately tiny shared-contracts package**, with no Git submodules. The
+current repository remains the trading-assistant source and the intended
+research location is `C:\git\customizedAgent\Strategy_agent`. Local
+development uses an editable shared-package path; durable consumers must pin
+an exact version and source commit.
+
+The first non-destructive dry run is now implemented. Its manifest pins exact
+reviewed source `e642469d`, 734 tracked paths and their inventory hash, and a
+three-file shared allowlist whose exact Git blobs are authenticated. The
+validator assigns every retained path exactly once, refuses destination
+collisions, authority or licensed-data displacement, vendor/client imports in
+the shared package, unsafe shared import forms, stale residual counts, and
+unclassified paths. It reconstructs dependency and launch declarations plus
+test-surface counts and hashes. The measured candidate assignment is 560
+trading-assistant paths, 171 strategy-research paths and three shared-contract
+paths; test surfaces are 102 assistant, 60 research, three shared-contract and
+41 integration files.
+
+This is **valid dry-run evidence, not permission or readiness to move**. The
+remaining exact blockers are 11 composition files, six Python crossing roots,
+four research-hosted operator-database importers, and the partition of the
+governance/integration-test/documentation surface. No repository was created,
+rewritten, deleted or populated; no task path, database, credential, provider,
+broker, deployment, backtest, result, research look, or evidence epoch changed.
+`paper-epoch-006` is untouched.
+
+Validation on the final combined tree: the corrected counter-review entry-
+point module passed 23/23; SEP-3 extraction tests plus active-document and
+separation guards passed 84/84; the complete suite passed **4,539 tests / 0
+failed / 25 known dependency warnings** in 875.56 seconds under Python 3.13;
+and required `compileall`, including `research/`, passed. The validator itself
+reproduced the exact 734-path inventory and refused five dangerous directions:
+an unclassified retained path, authority moved to research, licensed code
+moved to the assistant, a vendor client added to the shared package, and a
+case-insensitive target collision.
+
 ## 8. What is next
 
-**Current implementation sequencing (owner direction of 2026-08-21, still
-standing):** **SEP-2 is complete; SEP-3 is the current bounded milestone.**
-SEP-2 completed under that standing direction and SEP-3 follows from the plan's
-own milestone ladder; **no separate owner decision was taken on 2026-08-22**,
-and none is recorded in the Action Plan (SEP2C-002). Advancing to SEP-3 grants
-no authority of its own — SEP-3 produces a dry-run extraction manifest and then
-requires an explicit owner choice. SEP-0 is accepted after correction (sections
+**Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the
+current bounded milestone.** SEP-2 completed under the owner direction of
+2026-08-21. Claude correctly found that no new owner decision existed at its
+review snapshot; subsequently, on 2026-08-22, the owner explicitly selected
+two product repositories plus one tiny shared-contracts package. Section 7dz
+records the first validated dry run. Advancing within SEP-3 grants no authority
+to perform the physical move — the exact residuals and support/test partition
+must first close and the migration itself remains separately gated. SEP-0 is accepted after correction (sections
 7dc–7dd). SEP-1's three implementation tranches and their independent review
 chain are closed in sections 7de–7dm; the direct-crossing and authority-
 exception counts are both zero, and the milestone is recorded in
@@ -6467,8 +6523,9 @@ that counter-review — correctly finding that my own fix missed an alias bypass
 and left reads unbounded — and implements the filing-ownership tranche at
 `4e8fa20`; section 7dw is Claude's independent review of it (accepted after
 correction, one P2: relocating `ml/filings.py` into the shared kernel shed the
-ML boundary that protected it, restored at `b254407`). SEP-2 is not
-complete and now awaits Codex's counter-review of that review head.
+ML boundary that protected it, restored at `b254407`). Sections 7dx–7dz close
+SEP-2, its independent review and Codex's counter-review, then record the first
+validated SEP-3 dry run under the owner's selected topology.
 ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
@@ -6772,9 +6829,10 @@ Python crossing roots**, with **4** direct non-assistant importers of
 whose grants are bounded by direct call and explicit read/write state-key
 prefix, not method name alone, because
 `set_kill_switch` is `set_system_state("kill_switch", ...)`. Follow
-`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Before physical extraction,
-the owner chooses two repositories plus an explicit shared package or a
-permanently partitioned monorepo; do not infer that choice. ACER
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. The owner chose two product
+repositories plus one tiny shared-contracts package on 2026-08-22, with no Git
+submodules. Section 7dz records the first validated dry run; it is not yet
+ready or authorized for physical extraction. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

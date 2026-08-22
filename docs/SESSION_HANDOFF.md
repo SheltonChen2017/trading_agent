@@ -5339,14 +5339,51 @@ credential, broker, licensed data, operator database, scheduled task,
 deployment, backtest, outcome, research look, or evidence epoch was accessed
 or changed. SEP-1 remains incomplete and no feature milestone was recorded.
 
+## 7dh. SEP-1 second neutral-contract tranche (Codex, 2026-08-22)
+
+After the owner merged the accepted SEP-1 counter-review, Codex continued on
+fresh isolated branch `codex/sep1-research-contracts-20260821` from merged
+main `d97d1d88b36aa099302b97f386113e441c1ce587`. Product/test commit
+`636d164` removes five of the nine remaining direct product crossings while
+preserving every existing public import path by exact object identity.
+
+Three product-neutral contracts now own the previously misplaced behavior.
+`data.portfolio_metrics` owns portfolio/risk statistics,
+`data.mandate_evaluation` owns structural metric-versus-limit evaluation, and
+`data.research_statistics` owns Bonferroni arithmetic. Volatility measurement,
+threshold calibration, and regime classification move to the existing neutral
+`market_analytics` root. The old `backtest.risk_metrics`,
+`backtest.research_report`, `backtest.engine`, `assistant.mandate`, and
+`signals.regime` import surfaces remain compatibility facades or re-exports;
+tests prove they resolve to the canonical object rather than a parallel copy.
+
+Assistant context construction, stock lookup, paper evidence, and research-look
+accounting now depend on the neutral implementations. The machine ledger is
+therefore exactly **four direct cross-product imports** and **zero authority
+exceptions**. The four retained imports are intentionally policy-heavy:
+`assistant.explanations` to `signals.breakout` and `signals.scanner`, plus
+`assistant.strategy_proposals` to `signals.regime` and
+`strategies.vol_target_rotation`. They require typed, read-only result adapters
+in the next tranche; moving those calculations into shared code would conceal
+product ownership rather than solve it.
+
+Focused affected-module validation passed **200 tests / 1 dependency warning**.
+The complete repository validation and exact published head are reported with
+this branch's owner handoff. No provider, credential,
+licensed row, broker, operator database, task, deployment, backtest, outcome,
+research look, or evidence epoch was accessed or changed. SEP-1 remains
+incomplete; no feature milestone is recorded, and `scripts/` classification
+remains SEP-2 work.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-1 is the
 current bounded milestone.** SEP-0 is accepted after correction (sections
 7dc–7dd). SEP-1's first extraction tranche is
 implemented in section 7de and **independently reviewed in section 7df
-(accepted after correction)**; its nine remaining crossings are the next
-work. The former pinned
+(accepted after correction)**. Its second neutral-contract tranche is
+implemented in section 7dh and awaits Claude review; four policy-heavy
+crossings remain after that review. The former pinned
 `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
 authority path is removed. ACER remains the first
 research program, but its next Cloud capability audit is not the current code
@@ -5626,11 +5663,14 @@ unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. **SEP-1 is
 the current bounded milestone.** Its first extraction tranche was independently
-reviewed and accepted after correction in section 7df. Continue with the nine
-remaining crossings under `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`;
-do not reopen review of `codex/sep1-portfolio-snapshot-boundary-20260821`.
-The tranche removed the only transitive execution-authority-to-research path
-and four neutral direct crossings. It is not the whole SEP-1 milestone. ACER
+reviewed and accepted after correction in section 7df. The second SEP-1
+neutral-contract tranche is implemented in section 7dh on
+`codex/sep1-research-contracts-20260821` and awaits Claude's independent
+review. It reduces the exact ledger from nine crossings to four without an
+authority exception. Do not reopen review of the first tranche. After review,
+continue the four policy-heavy crossings only through typed, read-only result
+adapters under `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`; this is still
+not the whole SEP-1 milestone. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

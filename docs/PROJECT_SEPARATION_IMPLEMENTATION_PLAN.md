@@ -1,8 +1,11 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-2 entry-point, dependency, and data-ownership classification**
+Status: **ACTIVE — SEP-3 dry run validated; physical extraction not authorized**
 
 Owner direction: 2026-08-21
+
+Topology decision: 2026-08-22 — two product repositories plus one deliberately
+tiny shared-contracts package; no Git submodules
 
 Implementer: Codex
 
@@ -185,7 +188,7 @@ The review chain is closed and SEP-1 meets its definition of done. The
 feature-milestone record now carries the completed milestone. `scripts/`
 classification remains SEP-2 work.
 
-### SEP-2 — entry points, dependencies, and data ownership (current)
+### SEP-2 — entry points, dependencies, and data ownership (complete)
 
 - classify every `scripts/` entry point;
 - give each product its own launch surface and dependency declaration;
@@ -345,14 +348,137 @@ runner seams, and PowerShell launchers. Continue reducing those surfaces
 without moving execution authority into research or licensed research data
 into the assistant.
 
-### SEP-3 — physical extraction decision
+Claude independently reviewed that tranche at exact pushed head `b4b896f`
+(accepted after correction; two P3 corrected). Codex counter-reviewed both
+ordered Claude commits at `8f7a8ac` and `b4b896f`: the test-only rename is
+accepted, and the review record is accepted after correcting the current
+handoff's undercount of Claude's two findings. See
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_LAUNCH_SURFACE.md`.
 
-After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction
-manifest with retained history and exact source commits. The owner then chooses
-between two repositories and an explicit shared package, or a permanently
-partitioned monorepo. No repository deletion, history rewrite, deployment,
-credential move, scheduled-task change, or operator-database move is authorized
-by this plan.
+#### SEP-2 fourth tranche — operator-database boundary and crossing reduction
+
+Commit `0e98d42` completes the next bounded implementation tranche without
+claiming SEP-2 complete or authorizing a physical database split:
+
+- `architecture/operator_database_access.json` now pins the five remaining
+  non-assistant direct importers of `assistant.storage`, their exact host,
+  read/write classification, method surface, attribute surface, and purpose.
+  It is explicitly an exact shrinking debt ledger, not a permanent allowlist;
+- a permanent AST guard compares the real importers and every direct
+  `AssistantStore` method/attribute used by those files with the manifest, so
+  either a new importer or a wider database surface fails closed;
+- the type-only `AssistantStore` dependency in `scripts.product_composition`
+  is replaced by the assistant-owned structural
+  `StrategyOperationalStore` contract. The real `AssistantStore` is
+  runtime-checked against that contract, while database ownership and runtime
+  behavior remain with the trading assistant;
+- the deterministic research-report digest verifier moves to the existing
+  provider-neutral `data.research_results` contract. The legacy
+  `backtest.research_report` export preserves exact function identity, and the
+  personal-assistant runner consumes the neutral export; and
+- exact script ownership remains **7 assistant / 56 research / 12
+  composition**, while the declared Python crossing ledger falls from **8 to
+  7** and the direct non-assistant operator-database importer count falls from
+  **6 to 5**.
+
+Three dangerous-direction mutations were proved red and restored: adding a
+new `assistant.storage` importer, adding a new operator-store method to an
+existing importer, and restoring the personal-assistant runner's `backtest`
+dependency. No provider, credential, licensed row, broker, operator database,
+scheduled task, deployment, backtest, outcome, research look, or evidence
+epoch was accessed or changed.
+
+SEP-2 remains incomplete. The five pinned mutable-database crossings still
+need product-owned adapters or physical ownership resolution; the residual 12
+composition files and 7 crossings include the assistant/research UI seam and
+PowerShell task surfaces. Any physical database or scheduled-task move remains
+owner-gated and must not disturb `paper-epoch-006`.
+
+#### SEP-2 fifth tranche — filing-extraction ownership and state-capability closure
+
+The combined counter-review and next bounded implementation tranche closes
+one more composition surface without moving a database, task, credential, or
+runtime path:
+
+- generic operator-state reads and writes are now limited to direct calls and
+  explicit literal key prefixes. Aliases, reflection, dynamically sourced
+  keys, unused grants, undeclared reads, and writes capable of reaching an
+  assistant-reserved key fail closed;
+- deterministic canonical hashing and filing-extraction validation move to
+  neutral `data` contracts. `ml.hashing` and `ml.filings` remain exact-identity
+  compatibility facades, so existing research imports and serialized behavior
+  do not change;
+- `scripts/run_filing_extraction.py` consumes only the neutral extraction
+  contract plus the assistant-owned audit store and is therefore honestly
+  trading-assistant-owned rather than research-hosted composition; and
+- the exact surface becomes **8 assistant / 56 research / 11 composition**,
+  **6** declared Python crossing roots, **4** direct non-assistant operator-
+  database importers, and **11** neutral `data` contracts.
+
+The reclassification changes ownership metadata and import direction only.
+The Anthropic call, deterministic validation, audit row, CLI, and failure
+behavior remain unchanged. SEP-2 remains incomplete: four research-hosted
+database crossings, 11 composition files, six Python crossings, the UI seam,
+and PowerShell task surfaces remain. Physical database/task movement remains
+owner-gated and must not disturb `paper-epoch-006`.
+
+Claude independently reviewed the fifth tranche at exact head `fa32156`
+(accepted after correction). Codex counter-reviewed both Claude commits and
+closed one generalized P2: the relocated LLM-derived contract was protected
+only against direct imports, so an execution-capable module could reach it
+through another neutral module. Commit `624a7fd` extends the existing
+fail-closed first-party graph to direct and transitive reach. See
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_FILING_OWNERSHIP.md`.
+
+#### SEP-2 final definition-of-done audit
+
+Commit `996ccbc` closes SEP-2 against the four deliverables stated at the
+milestone heading, without claiming that SEP-3's physical extraction has
+already occurred:
+
+- every script remains exhaustively and uniquely classified;
+- both products have pinned launch surfaces and dependency declarations that
+  are checked against their actual imports;
+- every `data/` module has explicit neutral, provider-neutral, or product-
+  owned status, with zero shared-provider debt; and
+- licensed research surfaces remain research-only, with the immutable,
+  non-reconstructable research-result contract the sole approved result
+  crossing.
+
+The machine-readable definition-of-done relationship reconstructs those facts
+and also pins the residual extraction inputs: 11 composition files, six Python
+crossing roots, and four non-assistant operator-store importers. Those are not
+permanent exceptions or a false claim of independent repositories; they are
+the exact input to SEP-3's dry-run extraction decision. No database, task,
+deployment, credential, provider, broker, backtest, outcome, research look, or
+evidence epoch changed.
+
+### SEP-3 — physical extraction decision (current)
+
+The owner selected **two product repositories plus one deliberately tiny
+shared-contracts package** on 2026-08-22. The current repository remains the
+trading-assistant source; the intended research location is
+`C:\git\customizedAgent\Strategy_agent`. Development should use an editable
+local shared-package install, while durable use must pin an exact package
+version and source commit. Git submodules are excluded.
+
+The first bounded tranche is implemented by
+`architecture/sep3_extraction_manifest.json` and
+`scripts/validate_sep3_extraction.py`. It validates exact reviewed source
+commit `e642469d`, all 734 tracked paths, a three-file shared allowlist, exact
+blob identities, non-overlapping destinations, target-path uniqueness,
+authority and licensed-data ownership, dependency/launch/test surfaces, and
+the residual SEP-3 inputs. The dry run is deliberately **not ready for physical
+extraction**: 11 composition files, six Python crossing roots, four research-
+hosted operator-database importers, and the product partition of governance,
+integration tests and documentation remain open.
+
+Next, reduce those exact residuals and split the support/test surface on a
+reviewed branch. Only after a second dry run reports no blocking product
+crossings may a separately authorized migration create the research repository
+and shared package. No repository deletion, history rewrite, deployment,
+credential move, scheduled-task change, operator-database move, backtest, or
+evidence-epoch change is authorized by this tranche.
 
 ## 5. Safety and evidence invariants
 

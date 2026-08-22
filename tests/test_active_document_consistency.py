@@ -1396,3 +1396,45 @@ def test_active_acer_docs_do_not_turn_advice_disclaimer_into_research_ban():
         assert "backtesting rating impact" in document.lower()
     assert "investment-advice disclaimer" in action.lower()
     assert "investment-advice disclaimer" in freeze.lower()
+
+
+# SEP2F-002. A review's own two records must agree on what it found.
+#
+# Twice in consecutive rounds a finding was added to a review report after its
+# verdict line was written, and the corresponding SESSION_HANDOFF section kept
+# the earlier count: SEP2L-002 and SEP2D-002 were each in the archived report's
+# ledger and absent from the handoff's summary. Codex caught both. Writing the
+# resolution down did not prevent the repeat, so this asserts the relationship
+# instead: every finding ID a SEP-2 review report raises must appear somewhere
+# in the current handoff.
+#
+# Scoped to the SEP-2 review reports because that is the milestone whose
+# handoff sections are current. Archived rounds are historical records and are
+# never retro-edited.
+_SEP2_REVIEW_GLOB = "REVIEW_2026-08-22_SEP2_*.md"
+_FINDING_ID = re.compile(r"\bSEP2[A-Z]?-?\d{3}\b|\bSEP2[A-Z]-\d{3}\b")
+
+
+def _sep2_review_reports() -> list[Path]:
+    return sorted((ROOT / "docs" / "Archive" / "Review").glob(_SEP2_REVIEW_GLOB))
+
+
+def test_sep2_review_reports_exist_so_this_guard_cannot_pass_vacuously():
+    assert _sep2_review_reports(), "no SEP-2 review report found; the guard would be vacuous"
+
+
+def test_every_sep2_review_finding_appears_in_the_current_handoff():
+    handoff = _text("SESSION_HANDOFF.md")
+    missing: dict[str, list[str]] = {}
+    for report in _sep2_review_reports():
+        ids = {
+            match
+            for match in _FINDING_ID.findall(report.read_text(encoding="utf-8"))
+        }
+        absent = sorted(one for one in ids if one not in handoff)
+        if absent:
+            missing[report.name] = absent
+    assert missing == {}, (
+        "a SEP-2 review report raises findings the current handoff never "
+        f"mentions: {missing!r}"
+    )

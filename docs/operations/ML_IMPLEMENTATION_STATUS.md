@@ -22,13 +22,13 @@ overlay and remaining sequence are in `docs/Plan/ML_FULL_SYSTEM_EXECUTION_PLAN.m
 | ML-5 | Earnings-gap mapping, support checks, and model-fit primitives | `ml/earnings_gap.py` | None (read-only research) |
 | ML-6 | Shadow persistence plus coverage, freshness, drift, error, and lineage reports | `ml/monitoring.py`, three `ml_*` tables + `portfolio_position_snapshots` in `assistant/storage.py` | Writes observations only when called |
 | ML-7 | Cross-sectional ranker model/statistical-evaluation primitives | `ml/cross_sectional.py` | None |
-| ML-8 | Filing/transcript extraction contract + deterministic validator | `ml/filings.py` | None (context only) |
+| ML-8 | Filing/transcript extraction contract + deterministic validator | neutral `data/filing_extraction.py`, compatibility facade `ml/filings.py` | None (context only) |
 | ML-LR-0 | Shared experiment identity, preregistered research gates, run records | `ml/experiment_contracts.py` | None |
 | ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
 | ML data-source prerequisite | Cost-capped Databento bars/statistics, immutable DBN and PIT reference snapshots, fail-closed prerequisite report | `ml/databento_source.py`, `ml/databento_pit.py`, `scripts/run_databento_ingest.py` | None (research data only) |
 | ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
 | ML-LR-3 / ML-FS-4 software | Portfolio-volatility targets, frozen account-session dataset contract, shared experiment evaluation, immutable reports, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py`, `ml/portfolio_research.py`, `ml/experiments.py` | None (read-only research) |
-| ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, `scripts/run_filing_extraction.py` | None (research/context only) |
+| ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction integration | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, neutral `data/filing_extraction.py`; the audited CLI is assistant-owned at `scripts/run_filing_extraction.py` | None (research/context only) |
 | ML-LR-6 | Automated volatility shadow prediction, exact-calendar maturity, evidence epochs, monitoring/status CLI, durable operational failures, separate Windows scheduler | `ml/shadow.py`, `ml/shadow_runtime.py`, `scripts/run_ml_shadow.py`, `scripts/install_windows_ml_shadow_tasks.ps1`, ML epoch/run columns and tables in `assistant/storage.py` | Writes non-authoritative observations and operational alerts only |
 | ML-LR-7 | Evidence-epoch monitoring and immutable promotion dossier | `ml/monitoring_reports.py`, `ml/promotion.py`, `scripts/run_ml_promotion_dossier.py` | Read-only reports only |
 | ML-LR-8 | Read-only model-observation presentation | `ml/presentation.py`, `scripts/run_ml_shadow.py status` | Context display only |
@@ -450,6 +450,12 @@ states, and prediction-bearing unavailable records.
 `EarningsGapForecast` carries no trade field and states in its own payload
 that it never overrides the deterministic earnings blackout and never delays
 a risk-reducing sale.
+
+The deterministic filing contracts now live in neutral
+`data/filing_extraction.py`, with `ml/filings.py` preserving the legacy ML
+import identity. The audited CLI is owned by the trading assistant because its
+remaining mutable dependency is the assistant's AI-run audit store; ML-LR-4
+retains the research capability without claiming ownership of that launcher.
 
 `scripts/run_filing_extraction.py` declares **no tools at all**, which is the
 strongest available form of plan 10.5's "no tool calls initiated by retrieved

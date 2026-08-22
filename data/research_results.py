@@ -42,6 +42,20 @@ def research_parameters_sha256(parameters: Mapping[str, Any]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def verify_research_report(report: dict[str, Any]) -> bool:
+    """Verify a canonical research-report digest without research imports."""
+    expected = report.get("report_sha256")
+    if not isinstance(expected, str) or len(expected) != 64:
+        return False
+    material = dict(report)
+    material.pop("report_sha256", None)
+    encoded = json.dumps(
+        material, sort_keys=True, default=str, separators=(",", ":")
+    )
+    actual = hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+    return actual == expected
+
+
 def close_series_sha256(series: pd.Series) -> str:
     """Hash an ordered close series using explicit timestamp/value strings."""
     if not isinstance(series, pd.Series):
@@ -209,4 +223,5 @@ __all__ = [
     "TickerSignalResearchResult",
     "close_series_sha256",
     "research_parameters_sha256",
+    "verify_research_report",
 ]

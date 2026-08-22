@@ -15,9 +15,9 @@ calendar-based freshness). This module adds the stateful half:
     boolean: a machine with no recorded fetches is blocked, not assumed
     healthy.
 
-Boundary note: this lives under assistant/ (not data/) because it imports
-AssistantStore; data/ stays importable by research code with no assistant
-dependency, and nothing here imports ml.
+Boundary note: this lives under assistant/ (not data/) because it consumes the
+assistant-owned operational-store contract; data/ stays importable by research
+code with no assistant dependency, and nothing here imports ml.
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ from typing import Any
 
 import pandas as pd
 
-from assistant.storage import AssistantStore
+from assistant.storage_contracts import StrategyOperationalStore
 from data.price_source import (
     BAR_DATA_CLASS,
     BarFreshness,
@@ -50,7 +50,7 @@ def provider_health_fingerprint(provider_id: str, data_class: str) -> str:
     return f"provider_health:{provider_id}:{data_class}"
 
 
-def _record(store: AssistantStore, record: ProviderFetchRecord) -> None:
+def _record(store: StrategyOperationalStore, record: ProviderFetchRecord) -> None:
     store.record_provider_fetch(
         provider_id=record.provider_id,
         data_class=record.data_class,
@@ -66,7 +66,7 @@ def _record(store: AssistantStore, record: ProviderFetchRecord) -> None:
 
 
 def fetch_daily_bars_recorded(
-    store: AssistantStore,
+    store: StrategyOperationalStore,
     tickers: list[str],
     lookback_days: int,
     *,
@@ -128,7 +128,7 @@ def fetch_daily_bars_recorded(
 
 
 def build_data_layer_evidence(
-    store: AssistantStore, *, now: datetime | None = None
+    store: StrategyOperationalStore, *, now: datetime | None = None
 ) -> dict[str, dict[str, Any]]:
     """GR-0's three data_integrity checks, derived from recorded fetches.
 

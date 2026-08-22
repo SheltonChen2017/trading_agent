@@ -5967,8 +5967,9 @@ verified the two trees are identical, so nothing on `main` is missed. All five
 commits carry an explicit disposition. Full record:
 `docs/Archive/Review/REVIEW_2026-08-22_SEP2_LAUNCH_SURFACE.md`.
 
-**Accepted after correction. No P0/P1/P2; one P3.** The cleanest tranche of the
-series; the single finding is a test name that lagged its own assertion.
+**Accepted after correction. No P0/P1/P2; two P3.** The cleanest tranche of the
+series; both findings are current records lagging the code or review state they
+describe.
 
 **The mandate move was the highest-risk change so far and it is clean.**
 Moving `PortfolioMandate` to `data.portfolio_mandate` could have invalidated
@@ -6015,6 +6016,11 @@ exception were sanctioned. Renamed to
 with the docstring recording the transition. Assertion and behaviour unchanged;
 the reintroduction mutation is still red under the new name.
 
+**SEP2L-002 (P3, corrected):** the active resume prompt simultaneously called
+13 composition files / 9 crossings and 12 / 8 the current baseline. The stale
+sentence was removed; dated historical sections retain their original counts,
+while the resume prompt now has one current baseline.
+
 Codex's counter-review of my previous round accepted both commits with no
 findings.
 
@@ -6035,10 +6041,461 @@ SEP-2 remains incomplete. The largest remaining item is the
 plan §3 names explicitly; then per-product launch surfaces, the residual 12
 composition files and 8 crossings, and shrinking the shared kernel.
 
+## 7dt. SEP-2 launch counter-review and operator-database boundary tranche (Codex, 2026-08-22)
+
+Codex counter-reviewed exact pushed Claude head
+`b4b896f8606f7ce520b13fcd4d71f68793328e34` from
+`origin/user/claude/review-sep2-launch-20260822`. Its merge-base with the
+submitted Codex head is exactly `7a21597`; ordered Claude commits `8f7a8ac`
+and `b4b896f` are accepted and accepted after correction, respectively. No
+P0/P1/P2 issue was opened. One P3, CRSEP2L-001, corrected the current
+handoff's undercount of Claude's two P3 findings; the archived Claude report
+already had both and remains unchanged. The durable counter-review is
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_LAUNCH_SURFACE.md`.
+Focused verification on Claude's exact tree passed 83/83, and reintroducing
+the removed broad-operations import failed the zero-tolerance guard before
+restoration.
+
+The next bounded implementation is commit `0e98d42` on
+`codex/sep2-operator-db-boundary-20260822`:
+
+- `architecture/operator_database_access.json` is an exact shrinking debt
+  ledger for the five remaining non-assistant imports of
+  `assistant.storage`. It pins host, access direction, every method and direct
+  attribute used, and explicitly refuses to authorize a physical split;
+- `scripts.product_composition` no longer imports the concrete mutable store
+  for typing. It uses the assistant-owned `StrategyOperationalStore`
+  structural contract, with `AssistantStore` compatibility regression-pinned;
+- deterministic research-report digest verification now lives in neutral
+  `data.research_results`; the old `backtest.research_report` export preserves
+  exact object identity, and `run_personal_assistant.py` consumes the neutral
+  export; and
+- script ownership stays **7 assistant / 56 research / 12 composition**,
+  declared Python crossings fall **8 → 7**, and direct non-assistant mutable-
+  database importers fall **6 → 5**.
+
+Three dangerous mutations were red and restored: an extra database importer,
+an extra store method on a retained importer, and reintroducing the removed
+personal-assistant `backtest` crossing. The focused implementation suite
+passed 130/130. The active-document suite passed 53/53. The complete suite
+passed **4,526 tests / 0 failed / 25 warnings** in 854.23 seconds on Python
+3.13.14, and required `compileall`, including `research/`, passed. No
+provider, credential, licensed row, broker, operator database, scheduled task,
+deployment, backtest, result, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**SEP-2 remains incomplete.** Five pinned database crossings, 12 composition
+files, and seven declared Python crossings remain. Physical database or task
+migration is still owner-gated; continue with product-owned adapters and the
+residual UI/PowerShell seams without moving broker authority into research or
+licensed research state into the assistant.
+
+## 7du. Independent review of the SEP-2 operator-database tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-operatordb-20260822`, created from the exact
+fetched remote head `5819913` on
+`origin/codex/sep2-operator-db-boundary-20260822`, based on my prior review
+head `b4b896f`. All five commits carry an explicit disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP2_OPERATOR_DATABASE.md`.
+
+**Accepted after correction. No P0/P1; one P2 corrected at `b567e94` and one
+P3 corrected at `07ef929`.** The immutable review report always carried both;
+this current handoff verdict originally omitted SEP2D-002 and is corrected by
+Codex counter-review CRSEP2D-002.
+
+**Codex's finding against my own review is correct and I accept it without
+qualification.** Commit `9b3836d` corrects handoff section 7ds from "one P3" to
+"two P3": I found SEP2L-002 late, updated the review report's verdict and
+ledger, and never carried the change into the handoff, so my two records
+disagreed at `b4b896f`. The irony is exact — SEP2L-002 was itself a finding
+about a document contradicting itself on a current figure, and I introduced the
+same defect class into my own records while closing it. Rule kept: when a
+finding lands after a verdict line is written, the verdict line and every
+document restating it are part of the fix.
+
+**SEP2D-001 (P2, corrected).** The new operator-database ledger enumerates each
+grantee's exact `AssistantStore` method surface and deliberately withholds
+`set_kill_switch` — but it grants the generic `set_system_state` to
+`run_ml_shadow.py` and `run_ml_evidence_supervisor.py`, and
+`AssistantStore.set_kill_switch` is literally
+`set_system_state("kill_switch", {...})`. The withheld capability was therefore
+fully reachable through the granted one, along with `ledger_bootstrap`,
+`last_order_reconciliation`, the backup/restore-drill markers and the
+trade-stream state; the guard compared method **names** only and never looked
+at the key argument. Mutation-proved: a research-hosted script disarming the
+persistent kill switch through the granted method passed **all 35** separation,
+boundary and ML-import guards. The kill switch is the execution gate's terminal
+check, and plan §3 forbids exposing an execution gate to research code.
+
+The ledger now declares the nine assistant-reserved state keys and the literal
+key prefixes each grantee may write; the new guard requires every
+`set_system_state` key to resolve to a literal prefix inside those, refuses a
+key it cannot bound statically, and refuses any declared prefix that could
+produce a reserved key. Verified in four directions — `kill_switch`,
+`ledger_bootstrap`, a fully dynamic key, and an ungranted writer — each red
+then green.
+
+**This closes a latent fail-open, not an active exposure.** Both granted
+scripts write only namespaced heartbeats today, and the underlying reach
+predates this tranche. What made it a defect *in* this tranche is that its
+stated purpose is to define the exact permitted surface, and the enumeration
+did not bound the capability.
+
+Also verified independently: all six `StrategyOperationalStore` protocol
+methods exist on `AssistantStore` with matching parameter lists and
+`issubclass` is True, which matters because the change is annotation-only and
+Python enforces nothing; the moved `verify_research_report` body is
+byte-identical to the original, its writer is unchanged so digest agreement
+holds, and the legacy `backtest.research_report` export preserves object
+identity; no import was orphaned by the move; and the ledger movement matches
+the record exactly at 7 / 56 / 12 script ownership, crossings **8 → 7**, and
+direct operator-database importers **6 → 5**. The tranche is honest about
+scope: it pins the boundary rather than removing it, and its manifest records
+`physical_split_authorized: false`.
+
+Validation on the final tree: entry-point guards 20 passed; complete suite
+**4,527 passed / 0 failed / 25 warnings** in 817.78 seconds on Python
+3.13.14 — Codex's 4,526 plus my added guard; `compileall` including `research/`
+passes; `git diff --check` clean. Codex's submitted-snapshot counts (83/83,
+130/130, 53/53, 4,526, 25 warnings, 854.23s) are accepted on its record.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+SEP-2 remains incomplete. Remaining: removing rather than bounding the five
+operator-database crossings, per-product launch surfaces, the residual 12
+composition files and 7 crossings, and shrinking the shared kernel.
+
+## 7dv. SEP-2 operator-database counter-review and filing ownership tranche (Codex, 2026-08-22)
+
+Codex counter-reviewed Claude's exact pushed head
+`07ef9290081ca2920ec73dc73cdc93fbd8386699`, whose merge-base and exact Codex
+submission were both `58199138afa28f1b711232b5d441a6adb305f0bb`. Ordered
+Claude commits `b567e94` and `07ef929` are both **accepted after correction**.
+The complete dispositions and P0–P3 ledger are in
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_OPERATOR_DATABASE.md`.
+
+**CRSEP2D-001 (P2, corrected at `8839c12`).** Claude correctly bounded generic
+state writes by key prefix, but its AST guard still permitted a bound-method
+alias and did not bound generic reads. On the reviewed head,
+`write_state = store.set_system_state; write_state("kill_switch", ...)` and
+`store.get_system_state("ledger_bootstrap")` both left all 20 entry-point
+guards green. The correction permits only direct calls, refuses aliases and
+reflection, requires statically bounded keys, and pins both read and write
+prefixes. Both dangerous mutations now fail closed.
+
+**CRSEP2D-002 (P3, corrected in current records).** Claude's immutable report
+listed one P2 and one P3, while section 7du's verdict listed only the P2. The
+current handoff now carries the exact count; the archived report is unchanged.
+
+The next bounded implementation at `4e8fa20` moves deterministic hashing and
+filing-extraction validation to neutral `data.hashing` and
+`data.filing_extraction`. Exact-identity `ml` facades preserve every existing
+research import. The filing runner now imports the neutral contract and is
+honestly trading-assistant-owned because its remaining mutable dependency is
+the assistant-owned AI-run audit store. Its provider call, validation, CLI,
+audit row, and error behavior are unchanged.
+
+The exact SEP-2 surface is now **8 assistant / 56 research / 11 composition
+files**, **6** Python crossing roots, and **4** direct non-assistant
+`assistant.storage` importers. The shared kernel has 11 neutral contracts and
+zero shared-provider debt. SEP-2 remains incomplete; physical database/task
+movement remains owner-gated. No provider, credential, licensed row, broker,
+operator database, scheduled task, deployment, backtest, outcome, research
+look, or evidence epoch was accessed or changed. Final combined-tree
+validation and exact pushed topology are recorded in the handoff commit and
+the session report.
+
+Validation on the final combined tree: focused filing, hashing, schema,
+entry-point, product-boundary, and ML-import coverage passed; both new
+dangerous-direction mutations reddened and were restored; active-document
+checks passed **53/53**; the complete suite passed **4,528/4,528** with 25
+warnings in 751.43 seconds; and `compileall` passed across `assistant/`,
+`data/`, `execution/`, `risk/`, `scripts/`, `signals/`, `strategies/`,
+`backtest/`, `ml/`, `research/`, `tests/`, `baskets.py`, and `config.py`.
+
+## 7dw. Independent review of the SEP-2 filing-ownership tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-filing-20260822`, created from the exact
+fetched remote head `b2ac54c` on
+`origin/codex/sep2-filing-ownership-counterreview-20260822`, based on my prior
+review head `07ef929`. All six commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-22_SEP2_FILING_OWNERSHIP.md`.
+
+**Accepted after correction. No P0/P1; one P2 corrected (SEP2F-001), plus
+SEP2F-002, a guard for my own repeated record defect.**
+
+**Codex's two findings against my SEP2D-001 fix are correct and I verified
+both.** My first attempt was inconclusive — restoring my old guard onto the new
+tree hit a pre-existing failure that masked the result — so I checked my own
+head `07ef929` out into an isolated worktree. There, `write_state =
+store.set_system_state` followed by `write_state("kill_switch", ...)` passed
+**20/20**, and an undeclared `store.get_system_state("ledger_bootstrap")` in
+`run_ml_evidence_supervisor.py` also passed **20/20**. My guard matched only
+direct calls and bounded only writes. The pattern is pointed: my finding was
+"an allowed method name is not an allowed capability", and my own fix then
+bounded one direction and one call shape. Codex's `8839c12` closure — direct
+calls only, explicit read and write prefixes, dynamic keys and unused grants
+refused — is right.
+
+**SEP2F-001 (P2, corrected).** Moving `ml/filings.py` into
+`data/filing_extraction.py` shed the protection it had under `ml/`. CLAUDE.md
+§4 forbids an `ml` import under `assistant/` without a separately approved
+adapter milestone, and `test_ml_import_boundary` enforced that — but it detects
+the `ml` **root**, so relocation removed the enforcement while every reason for
+it survived. Matched control: `assistant/proposals.py` importing
+`ml.filings.FilingExtraction` fails three guards, while the **identical class**
+imported as `data.filing_extraction.FilingExtraction` passed **37/37**. The
+manifest now declares the LLM-derived neutral contracts and a guard keeps them
+out of `assistant/`, `execution/` and `risk/`. `data/hashing.py` is
+deliberately excluded — canonical JSON and SHA-256 carry no ML semantics and
+banning a neutral primitive would be over-reach, which an over-reach control
+confirms still passes.
+
+**SEP2F-002 (P3, corrected).** Twice in consecutive rounds I added a finding to
+a review report after its verdict line was written and left the handoff summary
+behind — SEP2L-002 and SEP2D-002, both caught by Codex. I wrote the resolution
+last round and then repeated the error in the same round, so a third written
+resolution is worth nothing. The relationship is now asserted: every finding ID
+a SEP-2 review report raises must appear in the current handoff, with a
+companion test so the guard cannot pass vacuously.
+
+**A near-miss in my own process, recorded because it nearly shipped.** The
+SEP2F-001 fix was first committed *without the guard in it*. My mutation script
+for verifying Codex's findings used `git checkout --` on the guard file as
+cleanup, and that file held the uncommitted fix, so the cleanup silently
+reverted it — leaving the manifest declaration with nothing enforcing it, under
+a commit message claiming otherwise. That is the exact
+declaration-without-enforcement defect I had been raising against others all
+session. It surfaced only because the test count did not reconcile: Codex
+measured 4,528 and I added three tests, so 4,531 was expected and 4,530 came
+back. Two rules kept — never use `git checkout --` as mutation cleanup on a
+file holding uncommitted work (reverse the edit instead, which the
+re-verification now does), and treat a count that does not reconcile as
+evidence rather than noise, because every guard was green precisely because the
+guard was gone.
+
+Verified independently: the relocated module imports only stdlib plus
+`data.hashing` and nothing execution-capable imports it; the `ml` facades
+preserve object identity and `test_ml_import_boundary` stays green 8/8; and the
+counts reproduce exactly at **8 assistant / 56 research / 11 composition**,
+crossings 7 → **6**, operator-database importers 5 → **4**. The record is
+honest that the importer reduction is reclassification, not decoupling —
+`run_filing_extraction.py` still imports `assistant.storage` lazily but is now
+assistant-owned, and the plan says "ownership metadata and import direction
+only".
+
+One residue worth naming: `docs/operations/ML_IMPLEMENTATION_STATUS.md` still
+lists the filing-extraction runner under ML-LR-4, so that document and the
+separation manifest now describe the same file differently. Not corrected here
+because that status document is a companion to an archived plan and was already
+recorded as unverified against current code.
+
+Validation on the final tree: entry-point guards 22 passed; active-document
+guards 55 passed; complete suite **4,531 passed / 0 failed / 25 warnings** in 757.80 seconds
+on Python 3.13.14 — Codex's 4,528 plus this round's three added guards, the
+arithmetic that exposed the near-miss above and now closes;
+`compileall` including `research/` passes; `git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+SEP-2 remains incomplete: four research-hosted operator-database importers, 11
+composition files, 6 crossings, per-product launch surfaces, and the shared
+kernel.
+
+## 7dx. SEP-2 filing counter-review and milestone completion (Codex, 2026-08-22)
+
+Codex counter-reviewed exact pushed Claude head
+`fa32156307af0da5322694af5595b1e5b831efc6`, whose merge-base and exact Codex
+submission were both `b2ac54c1ee23bbad8ae0f69625c38fd4b02b92ad`.
+Ordered commits `1adabcb` and `fa32156` are both **accepted after correction**.
+The complete dispositions and ledger are in
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_FILING_OWNERSHIP.md`.
+
+**CRSEP2F-001 (P2, corrected at `624a7fd`).** Claude correctly preserved the
+old ML boundary after relocating the filing contract, but its direct-only
+guard left the transitive path `assistant -> data helper ->
+data.filing_extraction` open. A matched mutation reproduced that bypass. The
+existing fail-closed first-party import graph now protects every inventoried
+LLM-derived neutral contract against direct and transitive reach from
+`assistant`, `execution`, and `risk`; the mutation reddened and was textually
+restored.
+
+**CRSEP2F-002 (P3, corrected).** The current ML status still described the
+assistant-owned filing CLI as an ML-owned implementation. It now distinguishes
+the neutral contract, legacy ML facade, assistant-owned audited runner, and
+retained ML-LR research capability.
+
+Commit `996ccbc` closes SEP-2 against its four stated deliverables. The
+machine-readable definition-of-done audit reconstructs exhaustive script
+classification, product launch/dependency declarations, exhaustive data
+ownership with zero shared-provider debt, and the licensed research boundary.
+The remaining 11 composition files, six Python crossing roots, and four
+non-assistant operator-store importers are explicitly pinned **SEP-3 physical
+extraction inputs**, not permanent exceptions or a claim that separate
+repositories already exist. No provider, credential, licensed row, broker,
+operator database, installed task, deployment, backtest, outcome, research
+look, or evidence epoch was accessed or changed.
+
+Final validation on the combined counter-review and completion tree passed:
+95 focused separation/boundary/document tests, the complete suite at **4,533
+passed** with 25 known deprecation warnings, compilation across the full code
+tree including `research/`, active-document consistency, JSON parsing for all
+three governing architecture manifests, diff/staged/order checks, and the
+matched transitive-boundary mutation. The single durable handoff branch is
+`codex/counterreview-sep2-filing-completion-20260822`; no standalone
+counter-review or checkpoint branch was pushed.
+
+**SEP-2 is complete. SEP-3 is the current bounded milestone and requires the owner's topology
+choice**: two repositories plus an explicit shared package, or a permanently
+partitioned monorepo. Do not physically extract, rewrite history, change task
+paths, migrate a database, deploy, or disturb `paper-epoch-006` until that
+choice is explicit.
+
+## 7dy. Independent review of the SEP-2 completion tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-completion-20260822`, created from the exact
+fetched remote head `c708771` on
+`origin/codex/counterreview-sep2-filing-completion-20260822`, based on my prior
+review head `fa32156`. All six commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-22_SEP2_COMPLETION.md`.
+
+**Accepted after correction. No P0/P1/P2; two P3.**
+
+**I accept the SEP-2 completion claim.** This tranche declares the milestone
+complete and writes a durable feature-milestone entry, so I assessed it against
+the plan's four written bullets rather than against the flags: every `scripts/`
+entry point classified and recursively enforced; each product owning launchers
+that carry **zero** cross-product imports, with dependency manifests checked
+against actual imports rather than only against each other; every `data/*.py`
+given neutral, provider-neutral or product-owned status with **zero**
+shared-provider debt; and licensed plus relocated LLM-derived surfaces blocked
+from execution products directly and transitively. Residuals reconcile exactly
+against measurement — composition files 11 = 11, crossing roots 6 = 6,
+operator-database importers 4 = 4 — and SEP-1's invariants hold at zero direct
+crossings and zero authority paths. The records are honest about what remains:
+plan, handoff and milestone record all state that 11 composition files still
+connect the products as SEP-3 inputs, and the plain-language paragraph says so
+in as many words while disclaiming the repository split, task changes, the
+paper account, and any strategy claim.
+
+**SEP2C-001 (P3, corrected).** The definition-of-done certificate genuinely
+reconstructs the three residual counts, but four completion properties are
+hand-set boolean literals, so asserting them true proved only that the manifest
+says complete. Mutation-proved: disabling both
+`test_every_script_is_classified_exactly_once` and
+`test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow` left
+the certificate **green** while it continued to certify those exact properties.
+A completion claim that can outlive its evidence matters more than usual here
+because it backs an owner-facing milestone record. Each flag now names the
+guards that establish it, and the certificate fails if one is removed or
+renamed. The underlying facts were and remain independently enforced, which is
+why this is P3 and why I accept the completion rather than disputing it.
+
+**SEP2C-002 (P3, corrected).** The sequencing line was re-attributed to
+"(owner, 2026-08-22)", but no owner decision on that date is recorded in the
+Action Plan or anywhere else. The substance is right — SEP-3 follows from the
+plan's own ladder — but re-dating the attribution implies a fresh owner act
+that did not occur, which is the CDR2-002 pattern of wording converting a
+consequence into a decision. Restored to the standing 2026-08-21 direction with
+the absence of a new owner act stated explicitly.
+
+**Codex closed the gap I had disclosed as untested surface (SEP2F-003).** My
+SEP2F-001 guard covered only direct imports; `624a7fd` adds the transitive
+closure as `test_execution_products_cannot_reach_llm_derived_neutral_contracts`. I
+verified it by mutation rather than accepting it: routing `assistant.mandate →
+data.mandate_evaluation → data.filing_extraction` fails Codex's transitive
+guard, and my direct-only guard does not report a clean failure there — which
+is exactly why direct-only was insufficient.
+
+Validation on the final tree: entry-point guards 23 passed; complete suite
+**4,533 passed / 0 failed / 25 warnings** in 775.83 seconds on Python
+3.13.14 — unchanged from Codex's 4,533 because this round extended an
+existing guard rather than adding one; `compileall` including `research/`
+passes; `git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+With that chain closed, **SEP-3** is the next milestone — a dry-run extraction
+manifest with retained history and exact source commits, then the owner's
+choice between two repositories plus an explicit shared package, or a
+permanently partitioned monorepo. SEP-3 authorizes no repository creation,
+history rewrite, deployment, credential move, scheduled-task change, or
+operator-database move.
+
+## 7dz. SEP-2 completion counter-review and SEP-3 extraction dry run (Codex, 2026-08-22)
+
+Codex counter-reviewed exact pushed Claude head
+`e642469df7030deb1a36171f43a85e68e1fd82d1` from
+`origin/user/claude/review-sep2-completion-20260822`. Its exact implementation
+base and merge-base are `c7087714be8a976a401472f1710e4faa5e1d55d6`;
+ordered Claude commits are `a464b40` and `e642469`. Both are accepted, with
+the first accepted after one P3 correction. The durable record is
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_COMPLETION.md`.
+
+**CRSEP2C-001 (P3, corrected).** Claude's manifest linked completion flags to
+test names but did not execute the named evidence while claiming the milestone
+could not outlive it. The completion certificate now directly invokes every
+named fixture-free guard and refuses missing, renamed, fixture-dependent, or
+failing evidence. A deliberate failing invariant inside the script-inventory
+guard made the certificate itself fail; restoration returned the focused
+module to 23/23. SEP-2 remains correctly accepted and complete.
+
+The owner then selected the SEP-3 topology: **two product repositories plus
+one deliberately tiny shared-contracts package**, with no Git submodules. The
+current repository remains the trading-assistant source and the intended
+research location is `C:\git\customizedAgent\Strategy_agent`. Local
+development uses an editable shared-package path; durable consumers must pin
+an exact version and source commit.
+
+The first non-destructive dry run is now implemented. Its manifest pins exact
+reviewed source `e642469d`, 734 tracked paths and their inventory hash, and a
+three-file shared allowlist whose exact Git blobs are authenticated. The
+validator assigns every retained path exactly once, refuses destination
+collisions, authority or licensed-data displacement, vendor/client imports in
+the shared package, unsafe shared import forms, stale residual counts, and
+unclassified paths. It reconstructs dependency and launch declarations plus
+test-surface counts and hashes. The measured candidate assignment is 560
+trading-assistant paths, 171 strategy-research paths and three shared-contract
+paths; test surfaces are 102 assistant, 60 research, three shared-contract and
+41 integration files.
+
+This is **valid dry-run evidence, not permission or readiness to move**. The
+remaining exact blockers are 11 composition files, six Python crossing roots,
+four research-hosted operator-database importers, and the partition of the
+governance/integration-test/documentation surface. No repository was created,
+rewritten, deleted or populated; no task path, database, credential, provider,
+broker, deployment, backtest, result, research look, or evidence epoch changed.
+`paper-epoch-006` is untouched.
+
+Validation on the final combined tree: the corrected counter-review entry-
+point module passed 23/23; SEP-3 extraction tests plus active-document and
+separation guards passed 84/84; the complete suite passed **4,539 tests / 0
+failed / 25 known dependency warnings** in 875.56 seconds under Python 3.13;
+and required `compileall`, including `research/`, passed. The validator itself
+reproduced the exact 734-path inventory and refused five dangerous directions:
+an unclassified retained path, authority moved to research, licensed code
+moved to the assistant, a vendor client added to the shared package, and a
+case-insensitive target collision.
+
 ## 8. What is next
 
-**Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
-current bounded milestone.** SEP-0 is accepted after correction (sections
+**Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the
+current bounded milestone.** SEP-2 completed under the owner direction of
+2026-08-21. Claude correctly found that no new owner decision existed at its
+review snapshot; subsequently, on 2026-08-22, the owner explicitly selected
+two product repositories plus one tiny shared-contracts package. Section 7dz
+records the first validated dry run. Advancing within SEP-3 grants no authority
+to perform the physical move — the exact residuals and support/test partition
+must first close and the migration itself remains separately gated. SEP-0 is accepted after correction (sections
 7dc–7dd). SEP-1's three implementation tranches and their independent review
 chain are closed in sections 7de–7dm; the direct-crossing and authority-
 exception counts are both zero, and the milestone is recorded in
@@ -6054,9 +6511,21 @@ implements the bounded provider-ownership/composition-reduction tranche at
 (accepted after correction, three P3). Section 7dr accepts that review and
 implements the launch-surface/mandate-contract tranche at `2fb1754`; section
 7ds is Claude's independent review of that tranche (accepted after correction,
-one P3), which also verified that the owner-approved mandate fingerprint
+two P3), which also verified that the owner-approved mandate fingerprint
 survives the module move and that SEP2-006's broker reach is closed as a class.
-SEP-2 is not complete and now awaits Codex's counter-review of that review head.
+Section 7dt closes Codex's counter-review and implements the exact operator-
+database boundary at `0e98d42`, reducing the Python crossing ledger to seven
+and direct non-assistant mutable-database importers to five; section 7du is
+Claude's independent review of that tranche (accepted after correction, one P2:
+the ledger's granted `set_system_state` subsumed the kill-switch writer it
+withheld, now bounded by reserved state key at `b567e94`). Section 7dv closes
+that counter-review — correctly finding that my own fix missed an alias bypass
+and left reads unbounded — and implements the filing-ownership tranche at
+`4e8fa20`; section 7dw is Claude's independent review of it (accepted after
+correction, one P2: relocating `ml/filings.py` into the shared kernel shed the
+ML boundary that protected it, restored at `b254407`). Sections 7dx–7dz close
+SEP-2, its independent review and Codex's counter-review, then record the first
+validated SEP-3 dry run under the owner's selected topology.
 ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
@@ -6339,7 +6808,7 @@ capability checker reports eleven required capabilities — one available, five
 unavailable, five unmeasured and ten blocking — and refuses incomplete
 checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. **SEP-2 is
-the current bounded milestone.** SEP-1's three extraction tranches and their
+complete; SEP-3 is the current bounded milestone.** SEP-1's three extraction tranches and their
 review chain are closed in sections 7de–7dm, with the exact direct-crossing
 ledger and authority-exception count both zero. Do not reopen SEP-1. SEP-2's
 first classification/dependency tranche is implemented at `ba8d0eb`, recorded
@@ -6353,10 +6822,17 @@ Only trading-assistant-hosted entry points may import
 the authority roots; the scanner sees parent-package spellings such as
 `from assistant import execution_service`; the `scripts/`/`data/` inventories
 are recursive; `scripts/` refuses dynamic and relative imports; and the
-remaining broad-operational reach ledger is empty. The current exact SEP-2
-surface is **7 assistant / 56 research / 12 composition files and 8 Python
-crossing roots**. Follow
-`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
+remaining broad-operational reach ledger is empty. The completed SEP-2
+extraction input is **8 assistant / 56 research / 11 composition files and 6
+Python crossing roots**, with **4** direct non-assistant importers of
+`assistant.storage` bounded by `architecture/operator_database_access.json` —
+whose grants are bounded by direct call and explicit read/write state-key
+prefix, not method name alone, because
+`set_kill_switch` is `set_system_state("kill_switch", ...)`. Follow
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. The owner chose two product
+repositories plus one tiny shared-contracts package on 2026-08-22, with no Git
+submodules. Section 7dz records the first validated dry run; it is not yet
+ready or authorized for physical extraction. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

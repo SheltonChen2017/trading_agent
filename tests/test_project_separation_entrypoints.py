@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import dataclasses
+import inspect
 import json
 from pathlib import Path
 import sys
@@ -15,19 +16,28 @@ import sys
 from data.research_results import (
     LeveragedPairResearchResult,
     SignalTriggerResult,
+    verify_research_report as neutral_verify_research_report,
 )
+from data.filing_extraction import FilingExtraction as NeutralFilingExtraction
+from data.hashing import hash_payload as neutral_hash_payload
+from backtest.research_report import verify_research_report as legacy_verify_research_report
 from assistant.runtime_identity import (
     RuntimeIdentityError as AssistantRuntimeIdentityError,
     current_commit as assistant_current_commit,
 )
 from assistant.operations import append_alerts_jsonl as assistant_append_alerts_jsonl
+from assistant.storage import AssistantStore
+from assistant.storage_contracts import StrategyOperationalStore
 from data.operational_alerts import append_alerts_jsonl
 from data.runtime_identity import RuntimeIdentityError, current_commit
+from ml.filings import FilingExtraction as LegacyFilingExtraction
+from ml.hashing import hash_payload as legacy_hash_payload
 
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY_POINT_MANIFEST = ROOT / "architecture" / "entry_points.json"
 BOUNDARY_MANIFEST = ROOT / "architecture" / "project_boundaries.json"
+OPERATOR_DATABASE_MANIFEST = ROOT / "architecture" / "operator_database_access.json"
 
 
 def _json(path: Path) -> dict:
@@ -53,6 +63,42 @@ def _imported_modules(path: Path) -> set[str]:
 
 def _import_roots(path: Path) -> set[str]:
     return {module.split(".", 1)[0] for module in _imported_modules(path)}
+
+
+def _public_methods(path: Path, class_name: str) -> set[str]:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name == class_name:
+            return {
+                child.name
+                for child in node.body
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and not child.name.startswith("_")
+            }
+    raise AssertionError(f"{class_name} is absent from {path}")
+
+
+def _store_surface(path: Path, public_methods: set[str]) -> tuple[set[str], set[str]]:
+    """Methods/attributes reached through a local ``store`` or constructor."""
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    methods: set[str] = set()
+    attributes: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Attribute):
+            continue
+        receiver_is_store = isinstance(node.value, ast.Name) and node.value.id == "store"
+        receiver_is_constructor = (
+            isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Name)
+            and node.value.func.id == "AssistantStore"
+        )
+        if not (receiver_is_store or receiver_is_constructor):
+            continue
+        if node.attr in public_methods:
+            methods.add(node.attr)
+        else:
+            attributes.add(node.attr)
+    return methods, attributes
 
 
 def _source_files(root: Path, pattern: str = "*"):
@@ -129,6 +175,91 @@ def test_every_script_is_classified_exactly_once():
     )
 
 
+def test_sep2_definition_of_done_is_reconstructed_not_self_asserted():
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    boundary = _json(BOUNDARY_MANIFEST)
+    operator = _json(OPERATOR_DATABASE_MANIFEST)
+    done = manifest["sep2_definition_of_done"]
+    ownership = manifest["script_ownership"]
+
+    assert done["status"] == "complete"
+    assert manifest["status"] == boundary["status"] == "sep2-complete-extraction-ready"
+    assert operator["status"] == "sep2-complete-bounded-sep3-extraction-input"
+    assert done["script_inventory_exhaustive"] is True
+    assert all(ownership[product] for product in ("trading_assistant", "strategy_research"))
+    assert done["product_launch_surfaces_and_dependencies_pinned"] is True
+    assert set(manifest["dependency_manifests"]) == {
+        "trading_assistant",
+        "strategy_research",
+        "development_union",
+    }
+    assert done["data_ownership_exhaustive"] is True
+    assert manifest["data_ownership"]["shared_provider_debt"] == []
+    assert done["shared_provider_debt"] == 0
+    assert done["licensed_research_boundary_pinned"] is True
+    assert manifest["licensed_research_surfaces"]
+    assert manifest["approved_cross_product_result_contracts"] == [
+        "data/research_results.py"
+    ]
+
+    assert done["residual_composition_files"] == len(
+        ownership["cross_product_composition"]
+    )
+    assert done["residual_python_crossing_roots"] == len(
+        manifest["declared_python_cross_product_roots"]
+    )
+    assert done["residual_operator_database_importers"] == len(
+        operator["direct_non_assistant_importers"]
+    )
+    assert done["residuals_are_sep3_extraction_inputs"] is True
+    assert done["next_milestone"].startswith("SEP-3")
+
+    # SEP2C-001: the flags above are hand-set literals, so asserting them true
+    # proves only that the manifest says complete. Mutation-proved: disabling
+    # both `test_every_script_is_classified_exactly_once` and
+    # `test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow`
+    # left this certificate green while it still certified those exact
+    # properties. Bind each flag to the guards that establish it, so the
+    # milestone claim cannot outlive its own evidence.
+    module = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    defined_guards = {
+        node.name
+        for node in ast.walk(module)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name.startswith("test_")
+    }
+    enforcing = done["enforcing_guards"]
+    assert done["enforcing_guards_note"].strip()
+
+    claimed_properties = {
+        "script_inventory_exhaustive",
+        "product_launch_surfaces_and_dependencies_pinned",
+        "data_ownership_exhaustive",
+        "licensed_research_boundary_pinned",
+    }
+    assert set(enforcing) == claimed_properties, (
+        "every completion flag must name the guards that establish it; "
+        f"unlinked={sorted(claimed_properties - set(enforcing))!r}"
+    )
+    missing = {
+        prop: sorted(set(guards) - defined_guards)
+        for prop, guards in enforcing.items()
+        if set(guards) - defined_guards
+    }
+    assert missing == {}, (
+        "a completion flag names a guard this module no longer defines, so the "
+        f"SEP-2 completion claim has outlived its evidence: {missing!r}"
+    )
+    for prop, guards in enforcing.items():
+        for guard_name in guards:
+            guard = globals()[guard_name]
+            assert not inspect.signature(guard).parameters, (
+                f"{prop} names {guard_name}, which cannot be invoked by the "
+                "completion certificate without pytest fixtures"
+            )
+            guard()
+
+
 def test_launch_surface_is_every_executable_script_and_no_helper():
     manifest = _json(ENTRY_POINT_MANIFEST)
     ownership = manifest["script_ownership"]
@@ -140,6 +271,7 @@ def test_launch_surface_is_every_executable_script_and_no_helper():
         "scripts/candidate_screen_2026_08_03_new_signals.py",
         "scripts/candidate_screen_20260803.py",
         "scripts/product_composition.py",
+        "scripts/validate_sep3_extraction.py",
         "scripts/ui_theme.py",
     }
     assert helpers == expected_helpers
@@ -200,6 +332,201 @@ def test_composition_crossings_are_an_exact_debt_ledger():
         "composition imports changed; remove the crossing or update the exact "
         f"reviewed ledger. actual={actual!r}, declared={declared!r}"
     )
+
+
+def test_operator_database_access_is_an_exact_shrinking_debt_ledger():
+    entry_points = _json(ENTRY_POINT_MANIFEST)
+    manifest = _json(OPERATOR_DATABASE_MANIFEST)
+    declared = manifest["direct_non_assistant_importers"]
+    hosts = {
+        relative: category
+        for category in ("trading_assistant", "strategy_research")
+        for relative in entry_points["script_ownership"][category]
+    }
+    hosts.update(entry_points["composition_hosts"])
+
+    actual = {
+        relative
+        for relative, host in hosts.items()
+        if host != "trading_assistant"
+        and relative.endswith(".py")
+        and "assistant.storage" in _imported_modules(ROOT / relative)
+    }
+    assert actual == set(declared), (
+        "direct operator-database crossings changed; remove the crossing or "
+        f"review the exact debt. actual={sorted(actual)!r}, "
+        f"declared={sorted(declared)!r}"
+    )
+    assert manifest["database_owner"] == "trading_assistant"
+    assert manifest["physical_split_authorized"] is False
+
+    public_methods = _public_methods(ROOT / "assistant" / "storage.py", "AssistantStore")
+    for relative, contract in declared.items():
+        assert hosts[relative] == contract["host"] == "strategy_research"
+        methods, attributes = _store_surface(ROOT / relative, public_methods)
+        assert methods == set(contract["allowed_methods"]), (
+            f"{relative} changed its operator-store method surface. "
+            f"actual={sorted(methods)!r}, "
+            f"declared={sorted(contract['allowed_methods'])!r}"
+        )
+        assert attributes == set(contract["allowed_attributes"]), (
+            f"{relative} changed its operator-store attribute surface. "
+            f"actual={sorted(attributes)!r}, "
+            f"declared={sorted(contract['allowed_attributes'])!r}"
+        )
+
+
+def _literal_key_prefix(node: ast.expr) -> str | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.JoinedStr) and node.values:
+        head = node.values[0]
+        if isinstance(head, ast.Constant) and isinstance(head.value, str):
+            return head.value
+    return None
+
+
+def _system_state_accesses(
+    path: Path,
+) -> tuple[dict[str, list[tuple[int, str | None]]], list[tuple[int, str]]]:
+    """Bound direct state calls and expose aliases/reflection as escapes.
+
+    ``None`` means the key could not be bounded statically, which must fail:
+    an unbounded key is indistinguishable from a reserved one.
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    methods = {"get_system_state", "set_system_state"}
+    found = {method: [] for method in methods}
+    direct_functions: set[int] = set()
+    escapes: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        function = node.func
+        if not (
+            isinstance(function, ast.Attribute)
+            and isinstance(function.value, ast.Name)
+            and function.value.id == "store"
+            and function.attr in methods
+        ):
+            if (
+                isinstance(function, ast.Name)
+                and function.id in {"getattr", "setattr"}
+                and node.args
+                and isinstance(node.args[0], ast.Name)
+                and node.args[0].id == "store"
+            ):
+                escapes.append((node.lineno, function.id))
+            continue
+        direct_functions.add(id(function))
+        if not node.args:
+            found[function.attr].append((node.lineno, None))
+        else:
+            found[function.attr].append(
+                (node.lineno, _literal_key_prefix(node.args[0]))
+            )
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Attribute)
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "store"
+            and node.attr in methods
+            and id(node) not in direct_functions
+        ):
+            escapes.append((node.lineno, node.attr))
+    return found, escapes
+
+
+def test_granted_state_access_is_bounded_by_keys_and_direct_calls():
+    """SEP2D-001. An allowed method name is not an allowed capability.
+
+    `AssistantStore.set_kill_switch` is literally
+    `set_system_state("kill_switch", ...)`, so granting the generic
+    `set_system_state` in the operator-database ledger silently subsumes the
+    kill-switch writer that the ledger deliberately does not grant --
+    and `ledger_bootstrap`, `last_order_reconciliation` and the rest with it.
+    Mutation-proved: a research-hosted script disarming the persistent kill
+    switch through the granted method passed all 35 separation guards.
+
+    The method ledger is therefore bounded by the state keys each grantee may
+    write. A key that cannot be resolved to a literal prefix fails, because an
+    unbounded key is indistinguishable from a reserved one.
+    """
+    manifest = _json(OPERATOR_DATABASE_MANIFEST)
+    reserved = manifest["assistant_reserved_state_keys"]
+    assert "kill_switch" in reserved, "the execution gate's terminal check must be reserved"
+
+    for relative, contract in manifest["direct_non_assistant_importers"].items():
+        accesses, escapes = _system_state_accesses(ROOT / relative)
+        assert escapes == [], (
+            f"{relative} aliases or reflects generic system-state capability: {escapes!r}"
+        )
+
+        for method, field in (
+            ("get_system_state", "allowed_state_key_read_prefixes"),
+            ("set_system_state", "allowed_state_key_write_prefixes"),
+        ):
+            prefixes = contract[field]
+            calls = accesses[method]
+            if method not in contract["allowed_methods"]:
+                assert prefixes == [] and calls == [], (
+                    f"{relative} uses {method} without being granted the method"
+                )
+                continue
+            for lineno, prefix in calls:
+                assert prefix is not None, (
+                    f"{relative}:{lineno} uses a system-state key the guard cannot "
+                    "bound to a literal prefix"
+                )
+                assert any(prefix.startswith(allowed) for allowed in prefixes), (
+                    f"{relative}:{lineno} uses system-state key prefix {prefix!r}, "
+                    f"which is outside its declared prefixes {prefixes!r}"
+                )
+            unused = [
+                allowed
+                for allowed in prefixes
+                if not any(
+                    prefix is not None and prefix.startswith(allowed)
+                    for _, prefix in calls
+                )
+            ]
+            assert unused == [], (
+                f"{relative} declares unused {method} prefixes {unused!r}"
+            )
+
+        prefixes = contract["allowed_state_key_write_prefixes"]
+        # No granted prefix may be able to produce a reserved key.
+        reachable = sorted(
+            key
+            for key in reserved
+            for prefix in prefixes
+            if key.startswith(prefix)
+        )
+        assert not reachable, (
+            f"{relative}'s declared prefixes {prefixes!r} can write "
+            f"assistant-reserved state keys {reachable!r}"
+        )
+
+
+def test_neutral_filing_and_hashing_facades_preserve_object_identity():
+    assert LegacyFilingExtraction is NeutralFilingExtraction
+    assert legacy_hash_payload is neutral_hash_payload
+
+
+
+def test_strategy_composition_uses_a_narrow_store_contract():
+    manifest = _json(OPERATOR_DATABASE_MANIFEST)
+    assert manifest["removed_type_only_importers"] == [
+        "scripts/product_composition.py"
+    ]
+    imports = _imported_modules(ROOT / "scripts" / "product_composition.py")
+    assert "assistant.storage" not in imports
+    assert "assistant.storage_contracts" in imports
+    assert isinstance(object.__new__(AssistantStore), StrategyOperationalStore)
+
+
+def test_research_report_verifier_facade_preserves_object_identity():
+    assert legacy_verify_research_report is neutral_verify_research_report
 
 
 def test_product_dependency_declarations_reconstruct_the_legacy_environment():
@@ -439,6 +766,56 @@ def test_no_entry_point_outside_the_trading_assistant_reaches_broad_operations()
     shadow = _imported_modules(ROOT / "scripts" / "run_ml_shadow.py")
     assert "data.operational_alerts" in shadow
     assert "assistant.operations" not in shadow
+
+
+def test_llm_derived_contracts_keep_their_ml_boundary_after_relocation():
+    """SEP2F-001. Moving code out of ``ml/`` must not shed its protection.
+
+    `data/filing_extraction.py` was `ml/filings.py` until this milestone moved
+    it into the shared kernel. While it lived under `ml/`, CLAUDE.md section 4
+    kept it out of execution-capable modules and
+    `tests/test_ml_import_boundary.py` enforced that -- but that test detects
+    the `ml` root, so relocation removed the enforcement while every reason for
+    it survived: the module still carries `PROMPT_VERSION`, `ExtractedClaim`,
+    `validate_extraction` and `sentiment_is_not_a_signal`.
+
+    Matched-control mutation on the submitted tree: `assistant/proposals.py`
+    importing `ml.filings.FilingExtraction` failed three guards, while the
+    identical class imported as `data.filing_extraction.FilingExtraction`
+    passed 37/37. Same code, same capability, one spelling caught.
+
+    `data/hashing.py` is deliberately not covered: canonical JSON and SHA-256
+    carry no ML semantics, and banning a neutral primitive would be over-reach.
+    """
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    declared = manifest["llm_derived_neutral_contracts"]["modules"]
+    assert declared, "the LLM-derived contract inventory may not be emptied silently"
+    assert manifest["llm_derived_neutral_contracts"]["rationale"].strip()
+
+    forbidden_modules = {
+        path.removesuffix(".py").replace("/", ".") for path in declared
+    }
+    for path in declared:
+        assert (ROOT / path).is_file(), f"declared LLM-derived contract is missing: {path}"
+
+    offenders: dict[str, list[str]] = {}
+    for root_name in ("assistant", "execution", "risk"):
+        for path in _source_files(ROOT / root_name, "*.py"):
+            reached = sorted(
+                module
+                for module in _imported_modules(path)
+                if any(
+                    module == forbidden or module.startswith(forbidden + ".")
+                    for forbidden in forbidden_modules
+                )
+            )
+            if reached:
+                offenders[_relative(path)] = reached
+
+    assert offenders == {}, (
+        "an execution-capable module imports an LLM-derived contract that kept "
+        f"its ml-boundary prohibition after relocation: {offenders!r}"
+    )
 
 
 def test_licensed_research_surfaces_cannot_enter_execution_products():

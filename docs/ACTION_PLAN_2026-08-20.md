@@ -59,11 +59,18 @@ does not resolve them.
 directed Codex to begin separating this mixed repository into a trading
 assistant product and a strategy-research product, with Claude independently
 reviewing each stable implementation snapshot. SEP-0 and SEP-1 are reviewed.
-**SEP-2 is the current bounded milestone.** The SEP-1 review chain
+**SEP-2 is complete; SEP-3 is the current bounded milestone.** The SEP-1 review chain
 closed after Codex counter-reviewed Claude's exact final-tranche review head;
 the exact direct-crossing and authority-exception counts remain zero. See
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail
-and next bounded work.
+and exact SEP-2 closure. The residual 11 composition files, six Python
+crossings, and four non-assistant operator-store importers are now pinned as
+SEP-3 extraction inputs. **Owner decision, 2026-08-22:** use two product
+repositories plus one deliberately tiny shared-contracts package, with no Git
+submodules. The first exact-commit dry run is validated but remains blocked on
+those residuals and the support/test partition; see
+`docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Physical extraction remains
+separately gated.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

@@ -77,7 +77,7 @@ from assistant.proposals import (
     sellable_whole_shares,
 )
 from assistant.schemas import DecisionPacket, EvidenceStatus
-from assistant.storage import AssistantStore
+from assistant.storage_contracts import StrategyOperationalStore
 from risk.execution_gate import TradeIntent
 
 STABLE_TICKER = "SOXX"
@@ -201,7 +201,7 @@ class MissingResearchResultError(RuntimeError):
 def prepare_leveraged_pair_market_data(
     pair_config: LeveragedPairConfig,
     market_data: dict[str, pd.DataFrame] | None = None,
-    store: AssistantStore | None = None,
+    store: StrategyOperationalStore | None = None,
 ) -> dict[str, pd.DataFrame]:
     """Load and fail-closed validate the bars used by a pair result.
 
@@ -404,7 +404,7 @@ def generate_leveraged_pair_rebalance_proposals(
     pair_config: LeveragedPairConfig,
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
-    store: AssistantStore | None = None,
+    store: StrategyOperationalStore | None = None,
     research_result: LeveragedPairResearchResult | None = None,
 ) -> list[TradeProposal]:
     """
@@ -459,7 +459,7 @@ def generate_soxx_soxl_rebalance_proposals(
     policy: TradingPolicy,
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
-    store: AssistantStore | None = None,
+    store: StrategyOperationalStore | None = None,
     research_result: LeveragedPairResearchResult | None = None,
 ) -> list[TradeProposal]:
     """Thin backward-compatible wrapper around
@@ -484,7 +484,7 @@ def _generate_leveraged_pair_rebalance_proposals(
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
     *,
-    store: AssistantStore | None = None,
+    store: StrategyOperationalStore | None = None,
     research_result: LeveragedPairResearchResult | None = None,
 ) -> list[TradeProposal]:
     stable_ticker = pair_config.stable_ticker

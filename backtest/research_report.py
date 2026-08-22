@@ -21,6 +21,7 @@ from data.portfolio_metrics import (
     PortfolioMetricsError as ResearchReportError,
     compute_portfolio_metrics,
 )
+from data.research_results import verify_research_report
 
 REQUIRED_PRICE_COLUMNS = ("open", "high", "low", "close", "volume")
 
@@ -306,19 +307,6 @@ def build_research_report(
         report_hash_material.encode("utf-8")
     ).hexdigest()
     return report
-
-
-def verify_research_report(report: dict[str, Any]) -> bool:
-    expected = report.get("report_sha256")
-    if not isinstance(expected, str) or len(expected) != 64:
-        return False
-    material = dict(report)
-    material.pop("report_sha256", None)
-    encoded = json.dumps(
-        material, sort_keys=True, default=str, separators=(",", ":")
-    )
-    actual = hashlib.sha256(encoded.encode("utf-8")).hexdigest()
-    return actual == expected
 
 
 def write_research_report(

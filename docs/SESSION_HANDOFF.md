@@ -5122,6 +5122,37 @@ declares; it says nothing about runtime coupling through configuration,
 subprocess invocation, the operator database, or shared files, and `scripts/`
 remains unclassified so its entry-point coupling is still uncounted.
 
+## 7dd. Counter-review of Claude's SEP-0 review (Codex, 2026-08-21)
+
+Codex counter-reviewed exact remote
+`origin/user/claude/review-sep0-boundary-20260821` at
+`e195fbeb5360df7895f63b6a986878e226d4aec3`, whose merge base is the exact
+SEP-0 submission `f4be89a96cbdfeaf78a52119a8bb8590d6499494`. Review branch:
+`codex/counterreview-sep0-boundary-20260821`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-21_SEP0_PROJECT_SEPARATION.md`.
+
+All three Claude commits are **accepted after correction**. Claude's
+CDR2-001 traversal fix and CDR2-002 fail-closed authorization correction are
+valid. Codex found one additional P2, SEP0CR-001: section 7dc and the resume
+block advanced to SEP-1, but the active separation plan still called SEP-0
+"in implementation" and the Action Plan still called it the current bounded
+milestone. Commit `02d7a9e` advances both sequencing authorities and adds a
+three-document consistency guard. Reverting the separation-plan status made
+that guard fail; restoring it returned the focused boundary/document suite to
+**55 passed**. Commit `6dfc0bc` records the counter-review and retains CDR2-005
+as an open P3 design issue.
+
+Final validation on the exact counter-review tree: **4,495 passed / 0 failed /
+25 warnings in 768.80 seconds** on Python 3.13.14; compileall including
+`research/` passed; diff check passed; the worktree was clean before this
+handoff-only update. Claude's reviewed remote head remained exact and the
+shared checkout remained on `user/claude/review-sep0-boundary-20260821` at
+`e195fbe`. No provider, broker, licensed data, operator database, scheduled
+task, deployment, outcome run, research look, or evidence epoch was accessed
+or changed. SEP-0 is accepted after correction. This branch is committed for
+the owner's authorized single final push; the final report must verify the
+exact remote head before SEP-1 begins.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** SEP-0's independent

@@ -10,6 +10,7 @@
       "scripts/run_fault_drill.py",
       "scripts/run_operations_watchdog.py",
       "scripts/setup_operational_host.ps1",
+      "scripts/validate_sep3_extraction.py",
       "scripts/ui_theme.py"
     ],
     "strategy_research": [
@@ -88,6 +89,7 @@
     "scripts/candidate_screen_2026_08_03_new_signals.py",
     "scripts/candidate_screen_20260803.py",
     "scripts/product_composition.py",
+    "scripts/validate_sep3_extraction.py",
     "scripts/ui_theme.py"
   ],
   "dependency_manifests": {

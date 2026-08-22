@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "status": "dry-run-not-authorized-for-physical-extraction",
+  "owner_topology_decision": {
+    "date": "2026-08-22",
+    "topology": "two-product-repositories-plus-tiny-shared-contracts-package",
+    "trading_assistant_source": "C:/git/customizedAgent/trading_agent",
+    "strategy_research_target": "C:/git/customizedAgent/Strategy_agent",
+    "shared_contracts_package": "agent_contracts",
+    "git_submodules": false
+  },
+  "source": {
+    "reviewed_commit": "e642469df7030deb1a36171f43a85e68e1fd82d1",
+    "tracked_path_count": 734,
+    "tracked_path_inventory_sha256": "853a139ca133103f838b66ec5c143566daae951bd2fea1a1f13576718ab72dcb",
+    "physical_extraction_requires_new_reviewed_clean_commit": true
+  },
+  "product_roots": {
+    "trading_assistant": ["assistant", "execution", "risk"],
+    "strategy_research": ["backtest", "ml", "research", "signals", "strategies"]
+  },
+  "product_top_level_files": {
+    "trading_assistant": ["config.py", "market_analytics.py"],
+    "strategy_research": ["baskets.py"]
+  },
+  "script_ownership_source": "architecture/entry_points.json",
+  "data_destination": {
+    "trading_assistant": [
+      "data/corporate_actions.py",
+      "data/event_data.py",
+      "data/price_source.py"
+    ],
+    "strategy_research": [
+      "data/analyst_data.py",
+      "data/earnings_data.py",
+      "data/filing_extraction.py",
+      "data/hashing.py",
+      "data/macro_data.py",
+      "data/mandate_evaluation.py",
+      "data/market_data.py",
+      "data/operational_alerts.py",
+      "data/pit_universe.py",
+      "data/portfolio_mandate.py",
+      "data/portfolio_metrics.py",
+      "data/price_target_data.py",
+      "data/research_statistics.py",
+      "data/runtime_identity.py"
+    ]
+  },
+  "shared_contracts": {
+    "source_to_package": {
+      "data/evidence_status.py": "agent_contracts/evidence_status.py",
+      "data/financial_primitives.py": "agent_contracts/financial_primitives.py",
+      "data/research_results.py": "agent_contracts/research_results.py"
+    },
+    "source_blob_ids": {
+      "data/evidence_status.py": "8d41eb89061ffb23bdb5bebbb52d24160835282f",
+      "data/financial_primitives.py": "7dba2361d800a74eb7ab199173256ce06eb8781d",
+      "data/research_results.py": "ea2bff4dbe865f02cdf0174fe7fda2b9413a06a1"
+    },
+    "allowed_third_party_imports": ["pandas"],
+    "forbidden_import_roots": [
+      "assistant", "backtest", "execution", "ml", "research", "risk",
+      "signals", "strategies", "alpaca", "anthropic", "databento",
+      "requests", "yfinance"
+    ],
+    "development_install": "editable-local-path",
+    "durable_install": "exact-version-and-source-commit-pin"
+  },
+  "dependency_surfaces": {
+    "trading_assistant": "requirements/trading-assistant.txt",
+    "strategy_research": "requirements/strategy-research.txt",
+    "shared_contracts": ["pandas==3.0.5"]
+  },
+  "support_paths": {
+    "destination": "trading_assistant",
+    "prefixes": [
+      ".claude/", ".github/", ".streamlit/", "architecture/", "docs/",
+      "requirements/", "tests/"
+    ],
+    "exact_files": [
+      ".gitignore", "AGENTS.md", "CLAUDE.md", "HOW_TO_USE.md", "README.md",
+      "pytest.ini", "requirements.txt"
+    ],
+    "note": "This first dry run keeps governance, integration tests and migration tooling with the source repository. Product-pure tests and documents must be reassigned before physical extraction."
+  },
+  "known_blockers": {
+    "composition_files": 11,
+    "python_crossing_roots": 6,
+    "operator_database_importers": 4,
+    "support_surface_partition": "pending",
+    "installed_task_paths": "unchanged",
+    "operator_database_move": "not-authorized",
+    "paper_epoch_006": "must-remain-untouched"
+  },
+  "physical_extraction_authorized": false
+}

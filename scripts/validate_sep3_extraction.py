@@ -1,0 +1,290 @@
+"""Validate the reviewed SEP-3 extraction dry run without moving a file.
+
+The validator reads one exact Git commit, classifies every tracked path once,
+and fails closed on inventory drift, shared-package expansion, authority or
+licensed-data leakage, unsafe import forms, path collisions, or stale residual
+counts. It never writes another repository and never reads provider data.
+"""
+from __future__ import annotations
+
+import argparse
+import ast
+import hashlib
+import json
+from pathlib import Path, PurePosixPath
+import subprocess
+import sys
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MANIFEST = ROOT / "architecture" / "sep3_extraction_manifest.json"
+DESTINATIONS = {"trading_assistant", "strategy_research", "shared_contracts"}
+
+
+class ExtractionValidationError(RuntimeError):
+    """The dry-run extraction contract is incomplete or unsafe."""
+
+
+def _git(*args: str) -> str:
+    result = subprocess.run(
+        ["git", *args], cwd=ROOT, text=True, capture_output=True, check=False
+    )
+    if result.returncode:
+        raise ExtractionValidationError(result.stderr.strip() or "git command failed")
+    return result.stdout
+
+
+def _commit_text(commit: str, path: str) -> str:
+    return _git("show", f"{commit}:{path}")
+
+
+def _commit_json(commit: str, path: str) -> dict[str, Any]:
+    return json.loads(_commit_text(commit, path))
+
+
+def _module_roots(source: str, path: str, *, enforce_static: bool = True) -> set[str]:
+    tree = ast.parse(source, filename=path)
+    roots: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            roots.update(alias.name.split(".", 1)[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level and enforce_static:
+                raise ExtractionValidationError(
+                    f"relative import is not extraction-safe: {path}:{node.lineno}"
+                )
+            if node.module:
+                roots.add(node.module.split(".", 1)[0])
+        elif isinstance(node, ast.Call):
+            function = node.func
+            if enforce_static and isinstance(function, ast.Name) and function.id in {"__import__", "exec"}:
+                raise ExtractionValidationError(
+                    f"dynamic code/import is not extraction-safe: {path}:{node.lineno}"
+                )
+            if (
+                enforce_static
+                and isinstance(function, ast.Attribute)
+                and isinstance(function.value, ast.Name)
+                and function.value.id == "importlib"
+                and function.attr == "import_module"
+            ):
+                raise ExtractionValidationError(
+                    f"dynamic import is not extraction-safe: {path}:{node.lineno}"
+                )
+    return roots
+
+
+def _inventory(commit: str) -> list[str]:
+    paths = _git("ls-tree", "-r", "--name-only", commit).splitlines()
+    if paths != sorted(paths):
+        raise ExtractionValidationError("Git tree inventory is not stably ordered")
+    return paths
+
+
+def _inventory_sha256(paths: list[str]) -> str:
+    return hashlib.sha256(("\n".join(paths) + "\n").encode("utf-8")).hexdigest()
+
+
+def _starts_with_root(path: str, root: str) -> bool:
+    return path == root or path.startswith(root.rstrip("/") + "/")
+
+
+def _classify(
+    path: str,
+    manifest: dict[str, Any],
+    entry_points: dict[str, Any],
+) -> tuple[str, str]:
+    matches: list[tuple[str, str]] = []
+    shared = manifest["shared_contracts"]["source_to_package"]
+    if path in shared:
+        matches.append(("shared_contracts", "shared allowlist"))
+
+    for destination, roots in manifest["product_roots"].items():
+        for root in roots:
+            if _starts_with_root(path, root):
+                matches.append((destination, f"owned root {root}"))
+    for destination, files in manifest["product_top_level_files"].items():
+        if path in files:
+            matches.append((destination, "owned top-level file"))
+    for destination, files in manifest["data_destination"].items():
+        if path in files:
+            matches.append((destination, "data ownership decision"))
+
+    scripts = entry_points["script_ownership"]
+    if path in scripts["trading_assistant"]:
+        matches.append(("trading_assistant", "entry-point ownership"))
+    elif path in scripts["strategy_research"]:
+        matches.append(("strategy_research", "entry-point ownership"))
+    elif path in scripts["cross_product_composition"]:
+        host = entry_points["composition_hosts"][path]
+        destination = (
+            "strategy_research" if host == "strategy_research" else "trading_assistant"
+        )
+        matches.append((destination, f"composition host {host}"))
+
+    support = manifest["support_paths"]
+    if path in support["exact_files"] or any(
+        path.startswith(prefix) for prefix in support["prefixes"]
+    ):
+        matches.append((support["destination"], "migration support"))
+    if path == "data/__init__.py":
+        matches.append((support["destination"], "source package marker"))
+
+    if len(matches) != 1:
+        raise ExtractionValidationError(
+            f"{path} must have exactly one destination, got {matches!r}"
+        )
+    return matches[0]
+
+
+def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest["schema_version"] != 1:
+        raise ExtractionValidationError("unsupported extraction schema")
+    if manifest["physical_extraction_authorized"] is not False:
+        raise ExtractionValidationError("this tranche cannot authorize a physical move")
+    if manifest["owner_topology_decision"]["git_submodules"] is not False:
+        raise ExtractionValidationError("Git submodules are not an approved topology")
+
+    commit = manifest["source"]["reviewed_commit"]
+    if _git("cat-file", "-t", commit).strip() != "commit":
+        raise ExtractionValidationError("reviewed source is not a commit")
+    paths = _inventory(commit)
+    if len(paths) != manifest["source"]["tracked_path_count"]:
+        raise ExtractionValidationError("reviewed source path count changed")
+    if _inventory_sha256(paths) != manifest["source"]["tracked_path_inventory_sha256"]:
+        raise ExtractionValidationError("reviewed source inventory hash changed")
+
+    entry_points = _commit_json(commit, manifest["script_ownership_source"])
+    boundaries = _commit_json(commit, "architecture/project_boundaries.json")
+    operator = _commit_json(commit, "architecture/operator_database_access.json")
+    assignments: dict[str, str] = {}
+    reasons: dict[str, str] = {}
+    targets: dict[tuple[str, str], str] = {}
+    shared_map = manifest["shared_contracts"]["source_to_package"]
+    for path in paths:
+        destination, reason = _classify(path, manifest, entry_points)
+        if destination not in DESTINATIONS:
+            raise ExtractionValidationError(f"unknown destination for {path}")
+        target = shared_map[path] if destination == "shared_contracts" else path
+        key = (destination, target.casefold())
+        if key in targets:
+            raise ExtractionValidationError(
+                f"target collision: {targets[key]} and {path} -> {destination}/{target}"
+            )
+        targets[key] = path
+        assignments[path] = destination
+        reasons[path] = reason
+
+    shared = manifest["shared_contracts"]
+    if set(shared["source_blob_ids"]) != set(shared_map):
+        raise ExtractionValidationError("every shared source needs an exact blob pin")
+    forbidden = set(shared["forbidden_import_roots"])
+    allowed_third_party = set(shared["allowed_third_party_imports"])
+    stdlib = set(sys.stdlib_module_names) | {"__future__"}
+    for path, expected_blob in shared["source_blob_ids"].items():
+        actual_blob = _git("rev-parse", f"{commit}:{path}").strip()
+        if actual_blob != expected_blob:
+            raise ExtractionValidationError(f"shared contract blob drift: {path}")
+        roots = _module_roots(_commit_text(commit, path), path)
+        unsafe = roots & forbidden
+        unknown = roots - stdlib - allowed_third_party
+        if unsafe or unknown:
+            raise ExtractionValidationError(
+                f"shared contract import leakage in {path}: "
+                f"forbidden={sorted(unsafe)!r}, unknown={sorted(unknown)!r}"
+            )
+
+    for root in boundaries["authority_roots"]:
+        path = root.replace(".", "/") + ".py"
+        package = root.replace(".", "/")
+        candidates = [p for p in paths if p == path or _starts_with_root(p, package)]
+        if not candidates or any(assignments[p] != "trading_assistant" for p in candidates):
+            raise ExtractionValidationError(f"authority root escaped assistant: {root}")
+    for surface in entry_points["licensed_research_surfaces"]:
+        candidates = [p for p in paths if _starts_with_root(p, surface)]
+        if not candidates or any(assignments[p] != "strategy_research" for p in candidates):
+            raise ExtractionValidationError(f"licensed surface escaped research: {surface}")
+
+    blockers = manifest["known_blockers"]
+    measured = {
+        "composition_files": len(entry_points["script_ownership"]["cross_product_composition"]),
+        "python_crossing_roots": len(entry_points["declared_python_cross_product_roots"]),
+        "operator_database_importers": len(operator["direct_non_assistant_importers"]),
+    }
+    for name, value in measured.items():
+        if blockers[name] != value:
+            raise ExtractionValidationError(
+                f"stale extraction blocker {name}: declared={blockers[name]}, measured={value}"
+            )
+
+    test_surfaces = {"trading_assistant": [], "strategy_research": [], "shared_contracts": [], "integration": []}
+    assistant_roots = {root.split("/", 1)[0] for root in manifest["product_roots"]["trading_assistant"]}
+    research_roots = {root.split("/", 1)[0] for root in manifest["product_roots"]["strategy_research"]} | {"baskets"}
+    shared_roots = {PurePosixPath(path).stem for path in shared_map}
+    for path in paths:
+        if not path.startswith("tests/") or not path.endswith(".py"):
+            continue
+        roots = _module_roots(_commit_text(commit, path), path, enforce_static=False)
+        touches_assistant = bool(roots & assistant_roots)
+        touches_research = bool(roots & research_roots)
+        touches_shared = bool(roots & shared_roots) or "data" in roots
+        if touches_assistant and not touches_research:
+            bucket = "trading_assistant"
+        elif touches_research and not touches_assistant:
+            bucket = "strategy_research"
+        elif touches_shared and not touches_assistant and not touches_research:
+            bucket = "shared_contracts"
+        else:
+            bucket = "integration"
+        test_surfaces[bucket].append(path)
+
+    launch_counts = {
+        name: len(entry_points["script_ownership"][name])
+        for name in ("trading_assistant", "strategy_research", "cross_product_composition")
+    }
+    destination_counts = {
+        destination: sum(value == destination for value in assignments.values())
+        for destination in sorted(DESTINATIONS)
+    }
+    return {
+        "schema_version": 1,
+        "status": "valid-dry-run-not-ready-for-physical-extraction",
+        "source_commit": commit,
+        "inventory": {
+            "tracked_paths": len(paths),
+            "sha256": _inventory_sha256(paths),
+            "assigned_exactly_once": True,
+            "destination_counts": destination_counts,
+        },
+        "surfaces": {
+            "launch_counts": launch_counts,
+            "dependency_manifests": manifest["dependency_surfaces"],
+            "test_counts": {name: len(items) for name, items in test_surfaces.items()},
+            "test_inventory_sha256": {
+                name: _inventory_sha256(items) for name, items in test_surfaces.items()
+            },
+        },
+        "blockers": measured | {
+            "support_surface_partition": blockers["support_surface_partition"]
+        },
+        "physical_extraction_authorized": False,
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    args = parser.parse_args(argv)
+    try:
+        result = validate(args.manifest)
+    except (ExtractionValidationError, json.JSONDecodeError, OSError) as exc:
+        print(f"REFUSED|{exc}", file=sys.stderr)
+        return 2
+    print(json.dumps(result, sort_keys=True, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

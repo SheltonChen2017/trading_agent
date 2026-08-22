@@ -271,6 +271,7 @@ def test_launch_surface_is_every_executable_script_and_no_helper():
         "scripts/candidate_screen_2026_08_03_new_signals.py",
         "scripts/candidate_screen_20260803.py",
         "scripts/product_composition.py",
+        "scripts/validate_sep3_extraction.py",
         "scripts/ui_theme.py",
     }
     assert helpers == expected_helpers

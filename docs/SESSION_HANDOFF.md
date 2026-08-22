@@ -5824,6 +5824,89 @@ moving execution authority into research, then review the exact pushed branch
 before SEP-3. This branch is local-only until the owner-authorized single final
 push succeeds.
 
+## 7dq. Independent review of the SEP-2 provider-ownership tranche (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep2-provider-20260822`, created from the exact
+fetched remote head `809aa0c` on
+`origin/codex/sep2-provider-ownership-20260822`, based on my prior review head
+`cd11bea`. All six commits carry an explicit disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-22_SEP2_PROVIDER_OWNERSHIP.md`.
+
+**Accepted after correction. No P0/P1/P2; three P3 corrected.**
+
+**Codex's counter-review finding against my own work is confirmed, and I
+verified it rather than accepting it.** CRSEP2-001 is correct: my
+`_imported_modules` kept only `node.module`, so
+`from assistant import execution_service` produced `"assistant"` and my new
+authority guard stayed blind. Measured against my own head: my scanner
+**passed** the bypass, Codex's corrected scanner **fails** it. This was the
+same granularity defect I had raised against Codex's ledger, reproduced one
+level down inside my own fix — I moved from root to module granularity and
+left the one spelling that collapses back to a root. The same hole also let
+`from research import acer` evade the licensed-surface guard.
+
+Reproduced independently on the provider tranche: the moved
+`data/runtime_identity.py` body is byte-identical to the former assistant
+module after its docstring; `_REPOSITORY_ROOT` still resolves to the
+repository root, so the move did not silently repoint every lineage check;
+all three facades (`current_commit`, `RuntimeIdentityError`,
+`append_alerts_jsonl`) preserve **object** identity; neither new `data/`
+module imports a product; and for all six product-owned providers, **no
+provider is imported by its non-owner** — I listed the actual importers rather
+than trusting the labels. Ledger movement is exact: composition 18 → 13,
+crossings 14 → 9, shared debt 9 → 0 replaced by 3 + 3 owned and 3 neutral
+services with written rationales, with all 18 `data/*.py` accounted for. Both
+of Codex's dangerous-direction mutations reproduce.
+
+Codex also closed my recorded **SEP2-007** (dependency manifests are now
+checked against actual imports, with a declared `platform_provided_imports`
+escape for QuantConnect's injected `AlgorithmImports`) and the dynamic-import
+gap I had listed only as untested surface.
+
+**SEP2P-001 (P3, corrected):** the new broad-operational-reach guard named the
+one repaired file. Its sibling `scripts/run_ml_shadow.py:36` holds the
+identical `assistant.operations` import and therefore the identical lazy reach
+to the broker module — this repository's standing "a guard added to one
+generator is not added to its sibling" case, plus CCX-002's rule that a
+consistency test must assert a relationship rather than a current value.
+Replaced with an exact shrinking ledger, mutation-verified in three
+directions: a new importer fails, the repaired supervisor cannot regress, and
+removing the last entry fails, so the debt must be driven down deliberately.
+
+**SEP2P-002 (P3, corrected):** the move orphaned `import json` in
+`assistant/operations.py`; AST confirms zero remaining uses.
+
+**SEP2P-003 (P3, corrected):** the plan said the supervisor change removed the
+recorded lazy broker reach. It removed the exact chain SEP2-006 named, not the
+class; the residual `run_ml_shadow.py` instance is now stated, which also
+resolves a tension with Codex's own counter-review record.
+
+**Forward-looking note, not a defect:** `data/corporate_actions.py` is
+assistant-owned on today's evidence, but ACER's data requirements put
+corporate actions on the research side for total-return outcomes. That
+assignment will need revisiting when ACER data work begins.
+
+Validation on the final tree: `test_project_separation_entrypoints.py` 16
+passed; focused operations/separation/boundary/document/ML/runtime set 106
+passed; complete suite **4,522 passed / 0 failed / 25 warnings** in 719.15
+seconds on Python 3.13.14, run on the tree carrying the code corrections, with
+the documentation added afterwards and the document guards rerun (53/53) since
+prose cannot change any other outcome; `compileall` including `research/`
+passes; `git diff --check` clean. The total is unchanged from Codex's 4,522
+because this round's correction replaced one guard with another rather than
+adding one — a provisional 4,523 written before the run was wrong and is
+corrected here. Codex's submitted-snapshot counts (26/26, 76/76, 129/129,
+4,522, 25 warnings) are accepted on its record.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews the exact pushed head of this review branch.
+SEP-2 remains incomplete; no feature-milestone entry is written. Remaining
+work: per-product launch surfaces, further reduction of the 13 composition
+files and 9 crossings, and driving the broad-operational-reach ledger to empty.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -5839,7 +5922,9 @@ plan. Its first classification/dependency tranche is implemented in section
 7dn and independently reviewed in section 7do (accepted after correction; two
 P2 fail-open guards closed). Section 7dp closes Codex's counter-review and
 implements the bounded provider-ownership/composition-reduction tranche at
-`de2bd1a`; SEP-2 is not complete and awaits Claude's independent review. ACER
+`de2bd1a`; section 7dq is Claude's independent review of that tranche
+(accepted after correction, three P3). SEP-2 is not complete and now awaits
+Codex's counter-review of the review head. ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
 implementation task. The separation work grants no outcome-run, vendor,
@@ -6126,12 +6211,17 @@ review chain are closed in sections 7de–7dm, with the exact direct-crossing
 ledger and authority-exception count both zero. Do not reopen SEP-1. SEP-2's
 first classification/dependency tranche is implemented at `ba8d0eb`, recorded
 in section 7dn, and independently reviewed in section 7do at `fc89903`;
-Codex counter-reviews that review head before the shared-provider tranche
-begins. The 75 script files,
-18 composition files, and nine shared provider debts are exact baselines, not
-permanent exceptions. Only trading-assistant-hosted entry points may import
-the authority roots, and the `scripts/`/`data/` inventories are recursive, so
-neither a subdirectory nor a repointed crossing can grow silently. Follow
+Codex's counter-review and the provider-ownership tranche are in section 7dp,
+and Claude's review of that tranche is section 7dq at `e78d02a`. The 75 script
+files, **13** composition files and **9** crossings are the current exact
+baselines, and the nine former shared provider debts are now 3 assistant-owned,
+3 research-owned and 3 provider-neutral services — none permanent exceptions.
+Only trading-assistant-hosted entry points may import
+the authority roots; the scanner sees parent-package spellings such as
+`from assistant import execution_service`; the `scripts/`/`data/` inventories
+are recursive; `scripts/` refuses dynamic and relative imports; and the
+remaining broad-operational reach is an exact shrinking ledger holding one
+entry (`scripts/run_ml_shadow.py`). Follow
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,

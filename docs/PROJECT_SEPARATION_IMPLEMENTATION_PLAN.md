@@ -194,6 +194,43 @@ classification remains SEP-2 work.
 - keep licensed datasets and immutable research snapshots on the research
   side, with only non-reconstructable approved outputs crossing the boundary.
 
+#### SEP-2 first tranche — classification and dependency baseline (Codex, 2026-08-22)
+
+Commit `ba8d0eb` classifies the complete current migration surface without
+moving or relaunching anything:
+
+- `architecture/entry_points.json` owns every one of the **75** files under
+  `scripts/` exactly once: 7 trading-assistant files, 50 strategy-research
+  files, and 18 explicit cross-product composition files;
+- four files are honestly identified as helpers, while every other Python
+  file has a direct runner (except the Streamlit entry point) or is an
+  executable PowerShell surface;
+- the 14 Python composition crossings are an exact root-level debt ledger,
+  so a new assistant-to-research or research-to-assistant import fails rather
+  than being normalized as composition;
+- pinned dependency declarations now exist at
+  `requirements/trading-assistant.txt` and
+  `requirements/strategy-research.txt`, with a shared base and a development
+  union that exactly reconstructs the legacy `requirements.txt`; and
+- all 15 `data/*.py` files are classified as one package marker, six neutral
+  contracts, or nine named shared-provider debts. Licensed ACER/Databento
+  surfaces are research-only, and the immutable result contract is the only
+  approved cross-product result surface.
+
+Dangerous-direction mutations proved three guards: a newly added script is
+unowned and fails; adding a backtest import to an assistant-only watchdog
+fails; and importing an ACER snapshot module into assistant proposal code
+fails. Restored focused tests pass 16/16; the combined boundary and active-
+document set passes 69/69; the complete tree passes 4,514 tests with 25 known
+dependency warnings; and required compilation including `research/` passes.
+
+This is a classification and dependency tranche, not completion of SEP-2.
+No runtime import, launcher, provider, scheduled task, database, deployment,
+or evidence epoch changed. After independent review, the next tranche must
+give the nine shared provider modules explicit product-owned implementations
+or a justified neutral interface, and reduce the 18 composition files rather
+than broadening their exact ledger.
+
 ### SEP-3 — physical extraction decision
 
 After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction

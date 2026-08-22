@@ -5646,6 +5646,49 @@ milestone: classify every `scripts/` entry point, establish product launch
 and dependency surfaces, and resolve data ownership without weakening the
 zero-edge or zero-authority-path invariants.
 
+## 7dn. SEP-2 entry-point and dependency classification tranche (Codex, 2026-08-22)
+
+After PR #300 merged the SEP-1 counter-review, Codex restarted from clean
+synced `main@728c710` on branch
+`codex/sep2-entrypoints-data-restart-20260822`. Commit `ba8d0eb` establishes
+the first SEP-2 baseline without changing runtime behavior.
+
+`architecture/entry_points.json` classifies all 75 files under `scripts/`
+exactly once: 7 trading-assistant, 50 strategy-research, and 18 explicit
+composition files. Four are non-launch helpers; the remaining 71 are direct
+Python, Streamlit, or PowerShell launch surfaces. The 14 Python composition
+crossings are an exact debt ledger rather than a blanket exception. New
+crossings in product-owned launchers fail. The former unclassified `scripts`
+root is now a classified mixed root in `architecture/project_boundaries.json`.
+
+Product dependency declarations now live at
+`requirements/trading-assistant.txt` and
+`requirements/strategy-research.txt`; their shared base plus
+`requirements/development.txt` reconstructs the existing pinned development
+environment exactly. This adds no package, upgrade, installation, download,
+or runtime environment change.
+
+The data inventory is also exact: one package marker, six neutral contracts,
+and nine shared-provider debts. The licensed ACER and Databento surfaces are
+pinned research-only, while `data/research_results.py` is the sole approved
+immutable result surface crossing the product boundary. This is honest debt,
+not a claim that shared provider ownership is solved.
+
+Three reverse mutations reddened the intended guards: a new unclassified
+script, a `backtest` import added to the assistant-only operational watchdog,
+and an ACER licensed-snapshot import added to assistant proposal code. The
+restored SEP-2/boundary set passes 16/16. The combined implementation and
+active-document set passes 69/69; the complete suite passes **4,514 tests / 0
+failed / 25 warnings** in 804.49 seconds under Python 3.13.14; and required
+`compileall`, including `research/`, passes.
+
+**SEP-2 remains incomplete.** Claude must independently review exact commit
+`ba8d0eb` and the accompanying documentation/handoff snapshot. After that
+review chain closes, the next SEP-2 tranche owns or interfaces the nine named
+shared provider modules and reduces composition debt; it must not move a
+repository, change a scheduled task, access a provider, or weaken the zero-
+edge and zero-authority-path invariants.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-2 is the
@@ -5657,7 +5700,9 @@ exception counts are both zero, and the milestone is recorded in
 `assistant.allocation_batch -> assistant.context_builder -> signals.regime`
 authority path is removed. SEP-2 now classifies the mixed `scripts/` surface,
 launch/dependency boundaries, and data ownership under the active separation
-plan. ACER remains the first
+plan. Its first classification/dependency tranche is implemented in section
+7dn and awaits Claude's independent review; SEP-2 is not complete. ACER
+remains the first
 research program, but its next Cloud capability audit is not the current code
 implementation task. The separation work grants no outcome-run, vendor,
 broker, deployment, database, task, or epoch authority.
@@ -5940,9 +5985,12 @@ checklists or provider diagnostics; Databento is separately reported as an
 unmeasured optional provider. It does not replace vendor evidence. **SEP-2 is
 the current bounded milestone.** SEP-1's three extraction tranches and their
 review chain are closed in sections 7de–7dm, with the exact direct-crossing
-ledger and authority-exception count both zero. Do not reopen SEP-1. Continue
-with SEP-2's `scripts/` classification, product launch/dependency surfaces,
-and data-ownership boundaries under
+ledger and authority-exception count both zero. Do not reopen SEP-1. SEP-2's
+first classification/dependency tranche is implemented at `ba8d0eb` and
+recorded in section 7dn; Claude must independently review the exact pushed
+SEP-2 branch before the shared-provider tranche begins. The 75 script files,
+18 composition files, and nine shared provider debts are exact baselines, not
+permanent exceptions. Follow
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,

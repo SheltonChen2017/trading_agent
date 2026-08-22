@@ -5967,8 +5967,9 @@ verified the two trees are identical, so nothing on `main` is missed. All five
 commits carry an explicit disposition. Full record:
 `docs/Archive/Review/REVIEW_2026-08-22_SEP2_LAUNCH_SURFACE.md`.
 
-**Accepted after correction. No P0/P1/P2; one P3.** The cleanest tranche of the
-series; the single finding is a test name that lagged its own assertion.
+**Accepted after correction. No P0/P1/P2; two P3.** The cleanest tranche of the
+series; both findings are current records lagging the code or review state they
+describe.
 
 **The mandate move was the highest-risk change so far and it is clean.**
 Moving `PortfolioMandate` to `data.portfolio_mandate` could have invalidated
@@ -6014,6 +6015,11 @@ exception were sanctioned. Renamed to
 `test_no_entry_point_outside_the_trading_assistant_reaches_broad_operations`,
 with the docstring recording the transition. Assertion and behaviour unchanged;
 the reintroduction mutation is still red under the new name.
+
+**SEP2L-002 (P3, corrected):** the active resume prompt simultaneously called
+13 composition files / 9 crossings and 12 / 8 the current baseline. The stale
+sentence was removed; dated historical sections retain their original counts,
+while the resume prompt now has one current baseline.
 
 Codex's counter-review of my previous round accepted both commits with no
 findings.

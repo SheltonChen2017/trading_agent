@@ -32,9 +32,35 @@ def build_portfolio_snapshot(
 ) -> PortfolioSnapshot:
     """Build a validated, canonical portfolio snapshot.
 
-    Position rows are canonicalized and duplicate tickers are aggregated.
-    Cash, buying power, shares, costs, and prices must be finite. Duplicate
-    rows for one ticker must carry one current price; ambiguity is refused.
+    ``positions`` is a list of dicts: {ticker, shares, entry_price,
+    current_price}. See ``build_portfolio_snapshot_from_alpaca()`` for pulling
+    this shape from a live account instead of supplying it manually.
+
+    SEP1R-003 restored the reasons below. The SEP-1 extraction moved this
+    function unchanged but reduced its docstring to a summary of behaviour,
+    which dropped the record of *which* defect each rule closed. Each one was
+    found by an independent review, and each is invisible from the code alone:
+
+    * **Ticker identity is canonicalized here** (whitespace-stripped,
+      uppercased) so a manually supplied ``"aapl"`` is recognized identically
+      to ``"AAPL"`` by every downstream basket/exposure check. A lowercase
+      ticker was silently invisible to case-sensitive basket membership.
+    * **Multiple rows for one canonical ticker are aggregated** into one
+      ``PortfolioPosition`` — shares and market value sum, ``entry_price``
+      becomes the share-weighted average cost basis. Left as separate rows,
+      downstream per-ticker lookups (``{p.ticker: p for p in positions}``)
+      silently keep only one of them, so two AAPL lots each under a
+      per-position cap could jointly exceed it undetected.
+    * **Rows for one ticker must report the same ``current_price``** — they
+      describe the same instant. Inconsistent prices raise ``ValueError``
+      rather than being combined, because there is no principled way to pick.
+    * **``cash``, ``buying_power`` and every position number must be finite.**
+      ``total_equity = cash + sum(market_value)``, so a NaN in *either* makes
+      ``total_equity`` NaN and silently defeats every downstream ``>``/``<=``
+      exposure comparison. The first version of this guard covered only the
+      position rows, which left NaN cash producing exactly the failure it was
+      meant to stop: ``check_policy_compliance()`` reported zero violations
+      for a corrupt portfolio (independent review, 2026-07-29).
     """
     try:
         cash_decimal = to_decimal(cash, name="portfolio.cash")
@@ -152,7 +178,19 @@ def build_portfolio_snapshot(
 
 
 def build_portfolio_snapshot_from_alpaca() -> PortfolioSnapshot:
-    """Pull broker state and build the same validated snapshot shape."""
+    """Pull broker state and build the same validated snapshot shape.
+
+    Pulls live positions and cash from the connected Alpaca account (paper or
+    live, per ``config.PAPER_TRADING``) and builds the same
+    ``PortfolioSnapshot`` shape as the manual path.
+
+    Raises ``execution.alpaca_broker.AlpacaNotConfigured`` when the API
+    credentials are absent. **Callers should check
+    ``execution.alpaca_broker.is_configured()`` first** — see
+    ``build_decision_packet()``'s ``use_live_alpaca`` handling — rather than
+    relying on this exception for control flow (SEP1R-003: this caller
+    guidance was dropped when the function moved).
+    """
     from execution.alpaca_broker import get_account, get_open_orders, get_open_positions
 
     account = get_account()

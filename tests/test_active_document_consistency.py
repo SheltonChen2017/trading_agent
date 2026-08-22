@@ -986,22 +986,31 @@ def test_separation_milestone_state_agrees_across_active_documents():
     }
     assert not others, f"more than one milestone marked current: {sorted(others | {current})}"
 
-    # The other two sequencing authorities must name the same milestone as the
-    # current implementation step, and must not still be advertising an
-    # earlier one as what happens next.
+    # Merely mentioning the milestone anywhere in these long historical
+    # records is not enough. SEP1CR-001 found that the resume block still told
+    # the next agent to review an already-reviewed branch while this guard was
+    # green because "SEP-1" appeared thousands of lines earlier. Require one
+    # stable, value-derived marker in each *current* sequencing surface. The
+    # marker text stays stable while ``current`` advances, so the test itself
+    # does not need a milestone-specific edit.
+    current_marker = f"{current} is the current bounded milestone"
+    current_action_plan = action_plan.split(
+        "**Current implementation sequencing amendment", 1
+    )[1].split("**How the two tracks relate", 1)[0]
+    assert current_marker in current_action_plan, (
+        "the Action Plan does not identify the separation plan's current "
+        f"milestone with the canonical marker: {current_marker!r}"
+    )
+
+    current_handoff = handoff.split("## 8. What is next", 1)[1]
+    next_section, resume_section = current_handoff.split("## 9. Resume prompt", 1)
     for name, text in (
-        ("ACTION_PLAN_2026-08-20.md", action_plan),
-        ("SESSION_HANDOFF.md", handoff),
+        ("SESSION_HANDOFF.md section 8", next_section),
+        ("SESSION_HANDOFF.md resume prompt", resume_section),
     ):
-        assert current in text, f"{name} does not mention the current milestone {current}"
-        earlier = [
-            f"SEP-{index}"
-            for index in range(int(current.split("-")[1]))
-            if re.search(rf"SEP-{index} is the current bounded milestone", text)
-        ]
-        assert not earlier, (
-            f"{name} still calls {earlier} the current milestone while the "
-            f"separation plan has advanced to {current}"
+        assert current_marker in text, (
+            f"{name} does not identify the current milestone with the "
+            f"canonical marker: {current_marker!r}"
         )
 
 

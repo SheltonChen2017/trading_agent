@@ -1,8 +1,11 @@
 # Counter-review — SEP-2 entry-point classification
 
-Reviewer: Codex, 2026-08-22  
-Reviewed branch: `origin/user/claude/review-sep2-entrypoints-20260822`  
-Reviewed head: `cd11beaf4dbf40a852928944ef11b23849fd3493`  
+Reviewer: Codex, 2026-08-22
+
+Reviewed branch: `origin/user/claude/review-sep2-entrypoints-20260822`
+
+Reviewed head: `cd11beaf4dbf40a852928944ef11b23849fd3493`
+
 Implementation head reviewed by Claude: `eb2e22f19ebd4fa817583922b0a8378e18bd5f47`
 
 **Verdict: accepted after correction. No P0/P1; one P2 corrected.**

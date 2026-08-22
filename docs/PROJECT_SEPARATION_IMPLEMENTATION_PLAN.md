@@ -248,6 +248,56 @@ assistant.readiness -> execution.alpaca_broker`, and the fact that the
 dependency manifests are still asserted only against each other, never
 against actual imports.
 
+Codex counter-reviewed Claude's exact pushed head `cd11bea` (accepted after
+correction; one P2 closed at `3cdb2ed`; see
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP2_ENTRYPOINT_CLASSIFICATION.md`).
+The authority scanner treated `from assistant import execution_service` as
+only an `assistant` import, so the authority and licensed-surface guards stayed
+green. It now expands parent-package imports to their exact child modules and
+the dangerous mutation is regression-pinned.
+
+#### SEP-2 second tranche — provider ownership and composition reduction
+
+Commit `de2bd1a` completes the next bounded implementation tranche without
+claiming SEP-2 complete:
+
+- the nine former shared-provider debts now have explicit ownership: three
+  assistant implementations (`corporate_actions`, `event_data`,
+  `price_source`), three research implementations (`analyst_data`,
+  `earnings_data`, `pit_universe`), and three justified provider-neutral
+  services (`macro_data`, `market_data`, `price_target_data`);
+- a permanent guard scans both product packages and their hosted launchers so
+  neither product can import the other's provider implementation; the
+  implementations keep their legacy `data.*` locations for compatibility,
+  but ownership is no longer shared or unbounded;
+- runtime identity moved to neutral `data.runtime_identity`, while
+  `assistant.runtime_identity` remains an object-identity-preserving facade;
+  five research launchers now import the neutral definition, reducing the
+  composition inventory from **18 to 13** and the exact Python crossing ledger
+  from **14 to 9**;
+- alert JSONL serialization moved to neutral `data.operational_alerts`, with
+  the old assistant export preserving object identity. The ML evidence
+  supervisor no longer imports broad `assistant.operations`, removing the
+  recorded lazy reach through readiness to the broker module;
+- dependency guards now compare the declarations with actual product and
+  hosted-launcher imports, recognize QuantConnect's platform-provided
+  `AlgorithmImports`, and declare the filing extractor's lazy Anthropic
+  dependency on the research side; and
+- static ownership now refuses relative imports, `__import__`,
+  `importlib.import_module`, and `exec` in `scripts/`, so a new import form
+  cannot bypass the exact graph silently.
+
+Dangerous-direction checks proved the new controls: an assistant import of a
+research-owned provider fails, and an assistant import of undeclared `joblib`
+fails its dependency declaration. No provider was called and no runtime,
+broker, database, task, deployment, backtest, result, research look, or
+evidence epoch changed.
+
+SEP-2 remains incomplete. Thirteen composition files remain, including the
+operator-database composition surfaces and PowerShell launchers. Their
+ownership and extraction must be reduced without moving broker authority into
+research or moving licensed research data into the assistant.
+
 ### SEP-3 — physical extraction decision
 
 After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction

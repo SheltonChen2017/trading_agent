@@ -213,6 +213,43 @@ def test_sep2_definition_of_done_is_reconstructed_not_self_asserted():
     assert done["residuals_are_sep3_extraction_inputs"] is True
     assert done["next_milestone"].startswith("SEP-3")
 
+    # SEP2C-001: the flags above are hand-set literals, so asserting them true
+    # proves only that the manifest says complete. Mutation-proved: disabling
+    # both `test_every_script_is_classified_exactly_once` and
+    # `test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow`
+    # left this certificate green while it still certified those exact
+    # properties. Bind each flag to the guards that establish it, so the
+    # milestone claim cannot outlive its own evidence.
+    module = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    defined_guards = {
+        node.name
+        for node in ast.walk(module)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name.startswith("test_")
+    }
+    enforcing = done["enforcing_guards"]
+    assert done["enforcing_guards_note"].strip()
+
+    claimed_properties = {
+        "script_inventory_exhaustive",
+        "product_launch_surfaces_and_dependencies_pinned",
+        "data_ownership_exhaustive",
+        "licensed_research_boundary_pinned",
+    }
+    assert set(enforcing) == claimed_properties, (
+        "every completion flag must name the guards that establish it; "
+        f"unlinked={sorted(claimed_properties - set(enforcing))!r}"
+    )
+    missing = {
+        prop: sorted(set(guards) - defined_guards)
+        for prop, guards in enforcing.items()
+        if set(guards) - defined_guards
+    }
+    assert missing == {}, (
+        "a completion flag names a guard this module no longer defines, so the "
+        f"SEP-2 completion claim has outlived its evidence: {missing!r}"
+    )
+
 
 def test_launch_surface_is_every_executable_script_and_no_helper():
     manifest = _json(ENTRY_POINT_MANIFEST)

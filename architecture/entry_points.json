@@ -202,6 +202,25 @@
     "residual_python_crossing_roots": 6,
     "residual_operator_database_importers": 4,
     "residuals_are_sep3_extraction_inputs": true,
-    "next_milestone": "SEP-3 dry-run physical extraction decision"
+    "next_milestone": "SEP-3 dry-run physical extraction decision",
+    "enforcing_guards": {
+      "script_inventory_exhaustive": [
+        "test_every_script_is_classified_exactly_once"
+      ],
+      "product_launch_surfaces_and_dependencies_pinned": [
+        "test_product_entry_points_do_not_gain_cross_product_imports",
+        "test_product_dependency_declarations_reconstruct_the_legacy_environment",
+        "test_product_dependency_manifests_cover_actual_imports"
+      ],
+      "data_ownership_exhaustive": [
+        "test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow",
+        "test_product_owned_provider_implementations_do_not_cross_products"
+      ],
+      "licensed_research_boundary_pinned": [
+        "test_licensed_research_surfaces_cannot_enter_execution_products",
+        "test_llm_derived_contracts_keep_their_ml_boundary_after_relocation"
+      ]
+    },
+    "enforcing_guards_note": "SEP2C-001: the completion flags above are hand-set literals. Asserting them true proves only that the manifest says complete. Each flag names the guards that actually establish it, and the certificate fails if a named guard is removed or renamed, so the milestone claim cannot outlive its evidence."
   }
 }

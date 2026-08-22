@@ -392,8 +392,8 @@ def test_operational_alert_facade_preserves_object_identity():
     assert assistant_append_alerts_jsonl is append_alerts_jsonl
 
 
-def test_broad_operational_authority_reach_is_an_exact_shrinking_ledger():
-    """SEP2P-001. Record the relationship, not the one file that was fixed.
+def test_no_entry_point_outside_the_trading_assistant_reaches_broad_operations():
+    """SEP2P-001, driven to zero by the launch-surface tranche.
 
     `assistant.operations` reaches the broker lazily through
     `assistant.readiness`, so every entry point outside the trading assistant
@@ -402,6 +402,13 @@ def test_broad_operational_authority_reach_is_an_exact_shrinking_ledger():
     the same neutral alert writer. This repository's standing "a guard added
     to one generator is not added to its sibling" failure therefore becomes a
     zero-tolerance invariant rather than a retained exception.
+
+    SEP2L-001: named for what it asserts. It began as an exact *shrinking
+    ledger* holding `scripts/run_ml_shadow.py`; that entry is gone and the
+    assertion is now emptiness, so the old name would invite a future change to
+    re-add an entry as though a retained exception were the sanctioned form. It
+    is not — the way to satisfy this guard is to remove the import, never to
+    record it here.
 
     A new importer must fail regardless of which research-hosted composition
     surface introduces it.

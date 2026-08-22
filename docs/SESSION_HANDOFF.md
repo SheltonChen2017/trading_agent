@@ -5441,6 +5441,47 @@ comparison plus the existing suites; no new behavioural tests were added
 because the tranche moves code rather than changing it, and the one
 observable change (an unpinned error message) is asserted by nothing.
 
+## 7dj. Codex counter-review of SEP-1 contracts review (2026-08-22)
+
+Codex counter-reviewed exact Claude remote head `dd30257` on isolated local
+branch `codex/counterreview-sep1-contracts-20260822`. Exact ordered Claude
+range: `e6384b7`, `072382b`, `dd30257`, based on submitted Codex head
+`52f4c2f`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-22_SEP1_CONTRACTS_TRANCHE.md`.
+
+**Accepted after correction.** Claude's SEP1B-001 is confirmed: all three
+rationales existed before the move, accurately explain dangerous behavior,
+and were restored without changing code. The four-edge import census, zero
+authority exceptions, shared-kernel direction, runtime alias identity, and
+approved mandate fingerprint were reproduced independently.
+
+Three P3 corrections close here. **SEP1CCR-001:** Claude's report
+enumerates **twelve**, not eleven, compatibility seams. Same-object runtime
+identity and `except ResearchReportError` behavior are preserved, but the
+moved exception now reports `data.portfolio_metrics.PortfolioMetricsError` as
+its module/name metadata, so no byte-for-byte exception-serialization claim is
+made. **SEP1CCR-002:** the prior blanket licensing blocker is superseded.
+Massive's investment-advice disclaimer is not a personal-research ban, and
+its Analyst Ratings documentation explicitly lists backtesting rating impact
+as a use case. A separate permission letter is not automatically required.
+Before QuantConnect custom-data processing, verify the purchase-specific order
+form and additional terms; they may already grant the use, and this review has
+not inspected them. This wording correction authorizes no provider call,
+upload, data work, backtest, or research look. **SEP1CCR-003:** the permanent
+facade guard pinned only 8 of the 12 function aliases and omitted the exception
+alias despite Claude's broader manual check. It now pins every function seam
+and `ResearchReportError is PortfolioMetricsError`.
+
+Validation on the final counter-review tree: focused affected suites **253
+passed / 0 failed / 1 warning** in 33.62 seconds; complete suite **4,499 passed
+/ 0 failed / 25 warnings** in 699.19 seconds; required `compileall` including
+`research/` passed. No product code changed; SEP-1 remains incomplete, its
+four policy-heavy crossings remain exact, and no feature milestone is
+recorded. Ordered local commits before this final handoff commit:
+`5fcdd41` (complete facade-identity guard), `43d49c7` (counter-review record and
+plan precision), and `c89a900` (ratings-terms correction and regression
+guard). The counter-review branch is local-only pending owner push instruction.
+
 ## 8. What is next
 
 **Current implementation sequencing (owner, 2026-08-21):** **SEP-1 is the
@@ -5485,9 +5526,11 @@ Bonferroni 0.05/6, a provisional two-slot budget, and numeric point-in-time
 stock thresholds. The executable preregistration is still incomplete.
 **ACER-0B is deliberately not frozen** and ACER-3's budget is zero until it
 is. QuantConnect Cloud is the authoritative ACER historical/outcome backtest
-engine; local LEAN is development/test-only. Reconstructable ratings stay off
-QuantConnect absent explicit permission evidence, and current QC authority is
-read-only, zero-outcome structural auditing only.
+engine; local LEAN is development/test-only. The purchase-specific terms for
+processing a ratings representation through QuantConnect remain unverified;
+neither permission nor prohibition is presumed, and no upload is presently
+authorized. Current QC authority is read-only, zero-outcome structural
+auditing only.
 
 What ACER needs next, in order: close the ten named open items
 (ACER-0A.1–0A.10). **Independently corrected proposals now exist for 0A.1 and
@@ -5543,11 +5586,13 @@ change where a reader must look: the permanent run ledger is
 `docs/research/alpha-result.md` (not under `docs/Archive/`), and freeze §8
 now authorizes read-only, **zero-outcome structural** QuantConnect work
 rather than symbol mapping alone — which is what makes the scheduled cloud
-capability audit consistent with its governing document. The
-licensed-ratings transfer question is now a **blocking dependency** of
-ACER-2 rather than a side condition, because the selected architecture needs
-a permitted representation of the ratings signal in Cloud. Raw rows,
-normalized events and derived features must not be presumed transferable.
+capability audit consistent with its governing document. Section 7dj
+supersedes the blanket permission-letter interpretation: personal research is
+not prohibited by the investment-advice disclaimer, while the applicable
+order form and additional terms still need to be checked for the selected
+QuantConnect custom-data processing. Raw rows, normalized events and derived
+features must not be presumed either transferable or prohibited before that
+terms check.
 QuantConnect separately offers Download licences for local internal LEAN use,
 but this project has not purchased or authorized that route and the owner has
 selected Cloud as the authoritative ACER engine.
@@ -5743,11 +5788,13 @@ remains the first research program, and its next research step is the narrow rea
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN
 owner decision covering both the Massive and QuantConnect accounts, so
-obtain that authorization before any provider call. Also settle the
-licensed-ratings transfer question, which the cloud engine makes a blocking
-dependency of ACER-2 rather than a side condition. The permission evidence
-must cover the exact representation sent; do not assume normalized or derived
-ratings are exempt. The current Codex process
+obtain that authorization before any provider call. Before any ratings
+representation is processed through QuantConnect custom data, verify the
+purchase-specific order form and additional terms. Massive's
+investment-advice disclaimer does not ban personal ACER research, its Analyst
+Ratings documentation names backtesting rating impact as a use case, and a
+separate permission letter is not an automatic blocker. Do not assume either
+permission or prohibition without the applicable terms. The current Codex process
 can see names-only Massive and QC credential variables, but this does not
 establish entitlements. Once authorized, stay inside freeze §8's read-only,
 zero-outcome scope limit and measure access, coverage, licence, and cost
@@ -5759,8 +5806,8 @@ Local LEAN is installed and verified (CLI `1.0.228`, workspace
 `C:\QuantConnect\ACER`, Docker `29.7.2`, sample run through Engine `2.5.0.0`)
 on the epoch host, but it is NOT the ACER backtest path. A shell opened before
 that install may not have `lean`/`docker` on `PATH`; use the full executable
-paths. Keep reconstructable ratings off QC absent
-explicit permission evidence. Do not join ratings to prices or outcomes, run
+paths. Do not upload reconstructable ratings until the purchase-specific
+third-party-processing terms are verified. Do not join ratings to prices or outcomes, run
 a backtest, deploy, trade,
 acknowledge or alter an operational alert, mutate an operational database, or
 roll paper-epoch-006 without separate authorization.

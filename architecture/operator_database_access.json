@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "sep2-exact-boundary-pending-physical-split",
+  "status": "sep2-complete-bounded-sep3-extraction-input",
   "database_owner": "trading_assistant",
   "physical_split_authorized": false,
   "boundary_note": "This is an exact, shrinking debt ledger for direct non-assistant imports of assistant.storage. It is not a permanent allowlist and does not authorize a database, schema, data, task, or path migration. Generic system-state methods are bounded to direct calls and explicit read/write key prefixes; aliasing, reflection, and dynamically sourced keys fail closed.",

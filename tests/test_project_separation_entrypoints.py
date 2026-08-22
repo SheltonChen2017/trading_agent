@@ -174,6 +174,46 @@ def test_every_script_is_classified_exactly_once():
     )
 
 
+def test_sep2_definition_of_done_is_reconstructed_not_self_asserted():
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    boundary = _json(BOUNDARY_MANIFEST)
+    operator = _json(OPERATOR_DATABASE_MANIFEST)
+    done = manifest["sep2_definition_of_done"]
+    ownership = manifest["script_ownership"]
+
+    assert done["status"] == "complete"
+    assert manifest["status"] == boundary["status"] == "sep2-complete-extraction-ready"
+    assert operator["status"] == "sep2-complete-bounded-sep3-extraction-input"
+    assert done["script_inventory_exhaustive"] is True
+    assert all(ownership[product] for product in ("trading_assistant", "strategy_research"))
+    assert done["product_launch_surfaces_and_dependencies_pinned"] is True
+    assert set(manifest["dependency_manifests"]) == {
+        "trading_assistant",
+        "strategy_research",
+        "development_union",
+    }
+    assert done["data_ownership_exhaustive"] is True
+    assert manifest["data_ownership"]["shared_provider_debt"] == []
+    assert done["shared_provider_debt"] == 0
+    assert done["licensed_research_boundary_pinned"] is True
+    assert manifest["licensed_research_surfaces"]
+    assert manifest["approved_cross_product_result_contracts"] == [
+        "data/research_results.py"
+    ]
+
+    assert done["residual_composition_files"] == len(
+        ownership["cross_product_composition"]
+    )
+    assert done["residual_python_crossing_roots"] == len(
+        manifest["declared_python_cross_product_roots"]
+    )
+    assert done["residual_operator_database_importers"] == len(
+        operator["direct_non_assistant_importers"]
+    )
+    assert done["residuals_are_sep3_extraction_inputs"] is True
+    assert done["next_milestone"].startswith("SEP-3")
+
+
 def test_launch_surface_is_every_executable_script_and_no_helper():
     manifest = _json(ENTRY_POINT_MANIFEST)
     ownership = manifest["script_ownership"]

@@ -896,32 +896,48 @@ def test_unreachability_parser_ignores_negated_and_historical_claims():
         assert _repository_commits_claimed_unreachable(text) == [], text
 
 
-def test_current_handoff_does_not_reopen_the_frozen_qc_audit_authorization():
-    """CDCR-004. Once freeze section 8 authorizes the structural audit, the
-    current resume block must direct that audit rather than ask the owner to
-    authorize it again."""
-    freeze = _text("research/ACER_2026-08-20_ACER0A_FREEZE.md")
+def test_the_capability_audit_authorization_state_agrees_across_documents():
+    """CDR2-002. The handoff and the Action Plan must agree on whether the
+    capability audit is already authorized.
+
+    The original guard (CDCR-004) pinned one side of this: it required the
+    resume block to describe the audit as authorized and FORBADE it from
+    asking the owner to authorize one. But the Action Plan -- the sequencing
+    authority -- still lists that authorization as an open decision, and its
+    scope covers the Massive account, which the freeze never mentions. A test
+    that locks in the more permissive reading of an authorization boundary is
+    pointed the wrong way for this repository, and it locks it in the place
+    hardest to reverse casually.
+
+    Stated as a relationship instead, so it survives either resolution: if the
+    Action Plan still lists the audit as a decision the owner must make, the
+    resume block must not tell the next agent it is already granted.
+    """
+    action_plan = _text("ACTION_PLAN_2026-08-20.md")
     handoff = _text("SESSION_HANDOFF.md")
-    current_resume = handoff.split("## 9. Resume prompt", 1)[1].split(
-        "## 9a.", 1
-    )[0]
-    assert re.search(
-        r"QuantConnect access is authorized for read-only, zero-outcome "
-        r"structural\s+work",
-        freeze,
+    current_resume = handoff.split("## 9. Resume prompt", 1)[1].split("## 9a.", 1)[0]
+
+    pending = re.search(
+        r"\*\*Authorize a read-only, zero-outcome capability audit\*\*",
+        action_plan,
     )
-    assert not re.search(
-        r"(?:get|obtain)\s+(?:the\s+)?owner(?:'s)?[^.]{0,120}"
-        r"authorization[^.]{0,120}(?:audit|provider call)",
+    granted = re.search(
+        r"(?:the\s+)?authorized[^.]{0,60}(?:zero-outcome|read-only)[^.]{0,80}"
+        r"(?:QuantConnect|Cloud)[^.]{0,80}capability audit",
         current_resume,
         flags=re.IGNORECASE,
     )
-    assert re.search(
-        r"(?:perform|run)[^.]{0,100}read-only[^.]{0,80}zero-outcome"
-        r"[^.]{0,80}QuantConnect Cloud[^.]{0,80}audit",
-        current_resume,
-        flags=re.IGNORECASE,
+    assert not (pending and granted), (
+        "the Action Plan lists the capability audit as an open owner decision "
+        "while the resume block calls it already authorized; resolve in one "
+        "direction rather than leaving an authorization boundary ambiguous"
     )
+    if pending:
+        assert re.search(
+            r"(?:obtain|get)\s+that\s+authorization|open\s+owner\s+decision",
+            current_resume,
+            flags=re.IGNORECASE,
+        ), "a pending authorization must be visible in the resume block"
 
 
 def test_sell1_current_records_do_not_reopen_merged_review_work():

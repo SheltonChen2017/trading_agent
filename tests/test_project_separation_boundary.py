@@ -4,7 +4,8 @@ SEP-0 does not pretend the current monorepo is already separated.  It records
 every direct import crossing between the two future products and refuses any
 new crossing.  The listed edges are migration debt, not an approved permanent
 API.  Execution-authority modules get the stricter rule now: they may not
-reach strategy-research code through any first-party import chain.
+reach strategy-research code through any first-party import chain, including
+chains that step through roots not yet assigned to a product.
 """
 from __future__ import annotations
 
@@ -55,6 +56,12 @@ def _absolute_from_import(path: Path, node: ast.ImportFrom) -> str | None:
     return ".".join(base) or None
 
 
+# Roots that hold first-party Python but are deliberately outside the product
+# split. `tests` imports both products by design and is never a runtime
+# dependency of either.
+_UNCLASSIFIED_EXEMPT_ROOTS = frozenset({"tests"})
+
+
 def _owned_roots(manifest: dict) -> list[str]:
     roots: list[str] = []
     for product in manifest["products"].values():
@@ -63,8 +70,36 @@ def _owned_roots(manifest: dict) -> list[str]:
     return roots
 
 
+def _graph_roots(manifest: dict) -> list[str]:
+    """Every first-party root the audit must be able to walk THROUGH.
+
+    CDR2-001: the graph originally covered only classified roots, so an import
+    chain that stepped through an unclassified root left the audit entirely.
+    Mutation-proved: an authority module reaching `signals` via one hop through
+    a new top-level package was reported clean, contradicting this module's own
+    "any first-party import chain" claim. Modules in these extra roots resolve
+    to no product, so including them adds no cross-product edge -- it only lets
+    the traversal follow the chain instead of stopping at the boundary of the
+    classified set.
+    """
+    return _owned_roots(manifest) + list(manifest["mixed_roots_pending_classification"])
+
+
+def _first_party_python_roots() -> set[str]:
+    """Top-level roots in this repository that actually contain Python."""
+    roots: set[str] = set()
+    for entry in REPO_ROOT.iterdir():
+        if entry.name.startswith(".") or entry.name in {"docs", "artifacts"}:
+            continue
+        if entry.is_file() and entry.suffix == ".py":
+            roots.add(entry.name)
+        elif entry.is_dir() and next(entry.rglob("*.py"), None) is not None:
+            roots.add(entry.name)
+    return roots
+
+
 def _module_graph(manifest: dict) -> tuple[dict[str, set[str]], list[str]]:
-    paths = [path for root in _owned_roots(manifest) for path in _python_files(root)]
+    paths = [path for root in _graph_roots(manifest) for path in _python_files(root)]
     known_modules = {_module_name(path) for path in paths}
     graph: dict[str, set[str]] = {}
     unresolved: list[str] = []
@@ -151,6 +186,19 @@ def test_separation_manifest_is_narrow_complete_and_well_formed():
     assert len(roots) == len(set(roots)), "a path cannot belong to two separation groups"
     missing = sorted(root for root in roots if not _root_path(root).exists())
     assert not missing, f"separation manifest names missing roots: {missing}"
+
+    # CDR2-001 mirror case: the check above proves every NAMED root exists.
+    # Without its opposite -- every EXISTING first-party root is named -- a new
+    # top-level package is invisible to the audit, and an import chain routed
+    # through it escapes both guards below.
+    classified = set(roots)
+    unclassified = sorted(
+        _first_party_python_roots() - classified - _UNCLASSIFIED_EXEMPT_ROOTS
+    )
+    assert not unclassified, (
+        "these first-party Python roots are not classified in the separation "
+        f"manifest, so the boundary audit cannot see them: {unclassified}"
+    )
 
     declared = manifest["allowed_direct_cross_product_imports"]
     pairs = [(entry["source"], entry["target"]) for entry in declared]

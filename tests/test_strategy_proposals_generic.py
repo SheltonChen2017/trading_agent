@@ -1,8 +1,10 @@
-"""Tests for the generic leveraged-pair rebalance generator in
-assistant/strategy_proposals.py -- confirms generate_leveraged_pair_rebalance_proposals()
-is truly ticker-agnostic (not just SOXX/SOXL wearing a new name), and that
-generate_soxx_soxl_rebalance_proposals() is a pure delegation to it, not a
-divergent reimplementation. Uses hand-injected market_data (no network)."""
+"""Tests for the generic leveraged-pair research/assistant composition.
+
+Confirms the temporary composition adapter is ticker-agnostic and that the
+SOXX/SOXL adapter delegates without divergent behavior. Uses hand-injected
+market data (no network).
+"""
+import dataclasses
 import sys
 import tempfile
 from pathlib import Path
@@ -11,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy
@@ -23,8 +26,16 @@ from assistant.strategy_proposals import (
     SOXX_SOXL_PAIR,
     STABLE_TICKER,
     LeveragedPairConfig,
-    generate_leveraged_pair_rebalance_proposals,
-    generate_soxx_soxl_rebalance_proposals,
+    MissingResearchResultError,
+    generate_leveraged_pair_rebalance_proposals as generate_without_research,
+)
+from data.research_results import ResearchResultContractError
+from research.assistant_results import build_leveraged_pair_research_result
+from scripts.product_composition import (
+    generate_leveraged_pair_rebalance_proposals_with_research
+    as generate_leveraged_pair_rebalance_proposals,
+    generate_soxx_soxl_rebalance_proposals_with_research
+    as generate_soxx_soxl_rebalance_proposals,
 )
 from market_analytics import classify_trend
 from data.price_source import expected_latest_completed_session
@@ -156,6 +167,51 @@ def test_soxx_soxl_wrapper_produces_identical_proposals_to_generic_call():
 def test_configured_leveraged_pairs_each_have_distinct_strategy_keys():
     keys = [pair.strategy_key for pair in CONFIGURED_LEVERAGED_PAIRS]
     assert len(keys) == len(set(keys))
+
+
+def test_assistant_generator_fails_closed_without_research_result():
+    market_data = _fake_market_data()
+    packet = _overweight_packet(market_data, FAKE_STABLE, FAKE_LEVERAGED)
+    with pytest.raises(MissingResearchResultError, match="research result"):
+        generate_without_research(
+            packet,
+            _policy(),
+            FAKE_PAIR,
+            market_data=market_data,
+        )
+
+
+def test_assistant_rejects_result_bound_to_different_close_history():
+    market_data = _fake_market_data()
+    packet = _overweight_packet(market_data, FAKE_STABLE, FAKE_LEVERAGED)
+    result = build_leveraged_pair_research_result(
+        stable_ticker=FAKE_STABLE,
+        leveraged_ticker=FAKE_LEVERAGED,
+        market_data=market_data,
+        production_params=FAKE_PAIR.production_params,
+    )
+    altered = {ticker: frame.copy() for ticker, frame in market_data.items()}
+    altered[FAKE_LEVERAGED].iloc[-2, altered[FAKE_LEVERAGED].columns.get_loc("close")] *= 1.01
+    with pytest.raises(ResearchResultContractError, match="does not match"):
+        generate_without_research(
+            packet,
+            _policy(),
+            FAKE_PAIR,
+            market_data=altered,
+            research_result=result,
+        )
+
+
+def test_research_result_contract_is_immutable():
+    market_data = _fake_market_data()
+    result = build_leveraged_pair_research_result(
+        stable_ticker=FAKE_STABLE,
+        leveraged_ticker=FAKE_LEVERAGED,
+        market_data=market_data,
+        production_params=FAKE_PAIR.production_params,
+    )
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        result.label = "forged"  # type: ignore[misc]
 
 
 if __name__ == "__main__":

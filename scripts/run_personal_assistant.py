@@ -125,7 +125,11 @@ from assistant.storage import (
     configured_db_path,
     verify_database_schema,
 )
-from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS, generate_leveraged_pair_rebalance_proposals
+from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS
+from scripts.product_composition import (
+    generate_leveraged_pair_rebalance_proposals_with_research
+    as generate_leveraged_pair_rebalance_proposals,
+)
 from backtest.research_report import verify_research_report
 from execution.alpaca_broker import (
     get_account,

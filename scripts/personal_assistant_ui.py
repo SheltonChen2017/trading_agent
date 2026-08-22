@@ -97,7 +97,11 @@ from assistant.order_reconciler import (
     cancel_all_open_orders,
     cancel_assistant_order,
 )
-from assistant.explanations import explain_ticker
+from scripts.product_composition import (
+    explain_ticker_with_research as explain_ticker,
+    generate_leveraged_pair_rebalance_proposals_with_research
+    as generate_leveraged_pair_rebalance_proposals,
+)
 from assistant.ai_advisor import (
     allocation_review_input_hash,
     curate_recommended_tickers,
@@ -199,7 +203,6 @@ from assistant.strategy_proposals import (
     # The two strategy exception types are deliberately no longer imported:
     # the handler below catches `Exception` (FCS-001), so naming a narrow pair
     # here would only invite someone to reinstate the narrow catch.
-    generate_leveraged_pair_rebalance_proposals,
 )
 from config import (
     BASKETS,

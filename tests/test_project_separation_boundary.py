@@ -1,9 +1,8 @@
 """Regression guards for the owner-directed product separation.
 
-SEP-0 does not pretend the current monorepo is already separated.  It records
-every direct import crossing between the two future products and refuses any
-new crossing.  The listed edges are migration debt, not an approved permanent
-API.  Execution-authority modules get the stricter rule now: they may not
+SEP-1 removes every direct import crossing between the two future products.
+The products exchange only immutable, provider-neutral results through the
+temporary ``scripts`` composition seam. Execution-authority modules may not
 reach strategy-research code through any first-party import chain, including
 chains that step through roots not yet assigned to a product.
 """
@@ -228,6 +227,7 @@ def test_no_unledgered_direct_cross_product_imports():
         f"migration ledger. unexpected={sorted(actual - declared)}, "
         f"stale={sorted(declared - actual)}"
     )
+    assert not actual, "SEP-1 is not complete while any direct crossing remains"
 
 
 def test_shared_kernel_does_not_depend_on_either_product():
@@ -315,6 +315,50 @@ def test_neutral_contract_compatibility_facades_preserve_identity():
     assert signal_trailing_volatility is compute_trailing_market_volatility
     assert calibrate_threshold_from_discovery is calibrate_volatility_threshold
     assert classify_regime is classify_volatility_regime
+
+
+def test_temporary_composition_seam_is_not_imported_by_either_product():
+    """SEP1-004. Composition stays in deferred scripts, never in a product."""
+    manifest = _manifest()
+    graph, unresolved = _module_graph(manifest)
+    assert not unresolved
+    product_roots = _product_roots(manifest)
+    offenders = sorted(
+        (source, dependency)
+        for source, dependencies in graph.items()
+        if _product_for(source, product_roots) is not None
+        for dependency in dependencies
+        if dependency == "scripts.product_composition"
+        or dependency.startswith("scripts.product_composition.")
+    )
+    assert not offenders, (
+        "the temporary composition seam is an entry-point adapter, not a "
+        f"dependency either product may acquire: {offenders}"
+    )
+
+
+def test_research_result_contracts_are_immutable():
+    """SEP1-005. Cross-product values cannot be mutated after validation."""
+    import dataclasses
+
+    import pytest
+
+    from data.research_results import SignalTriggerResult, TickerSignalResearchResult
+
+    trigger = SignalTriggerResult(
+        rule="example",
+        direction="up",
+        date="2026-08-22",
+        return_zscore=2.0,
+        volume_zscore=1.0,
+    )
+    result = TickerSignalResearchResult(
+        ticker="SPY",
+        as_of="2026-08-22T00:00:00",
+        triggers=(trigger,),
+    )
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        result.ticker = "QQQ"  # type: ignore[misc]
 
 
 def test_execution_authority_research_reachability_cannot_expand():

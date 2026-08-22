@@ -38,26 +38,5 @@
     "risk"
   ],
   "allowed_authority_research_paths": [],
-  "allowed_direct_cross_product_imports": [
-    {
-      "source": "assistant.explanations",
-      "target": "signals.breakout",
-      "reason": "Existing explanatory research coupling; migrate behind a research-result adapter."
-    },
-    {
-      "source": "assistant.explanations",
-      "target": "signals.scanner",
-      "reason": "Existing explanatory research coupling; migrate behind a research-result adapter."
-    },
-    {
-      "source": "assistant.strategy_proposals",
-      "target": "signals.regime",
-      "reason": "Existing proposal-context coupling; replace with a typed, read-only research result."
-    },
-    {
-      "source": "assistant.strategy_proposals",
-      "target": "strategies.vol_target_rotation",
-      "reason": "Existing strategy-proposal coupling; move strategy computation out of the assistant authority product."
-    }
-  ]
+  "allowed_direct_cross_product_imports": []
 }

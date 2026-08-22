@@ -14,25 +14,25 @@ regardless of today's trigger status.
 """
 from __future__ import annotations
 
-from data.market_data import fetch_historical
-from signals.breakout import scan_52_week_breakout
-from signals.scanner import scan_dips_and_ups
 from assistant.context_builder import KNOWN_FINDINGS, build_market_regime
 from assistant.research_registry import underfilled_dataset_warning
 from assistant.schemas import MarketRegime, PortfolioSnapshot
+from data.research_results import (
+    ResearchResultContractError,
+    TickerSignalResearchResult,
+)
 
-PER_TICKER_SCAN_FNS = {
-    "z-score dip/up scanner": scan_dips_and_ups,
-    "52-week breakout": scan_52_week_breakout,
-}
+
+class MissingResearchResultError(RuntimeError):
+    """The composition layer omitted the read-only signal result."""
 
 
 def explain_ticker(
     ticker: str,
     portfolio: PortfolioSnapshot | None = None,
-    lookback_days: int = 300,
     market_regime: MarketRegime | None = None,
-    data: dict | None = None,
+    *,
+    signal_result: TickerSignalResearchResult | None = None,
 ) -> dict:
     """
     Returns a plain, JSON-serializable dict explaining a ticker's current
@@ -44,33 +44,22 @@ def explain_ticker(
     avoid an extra benchmark data fetch when explaining several tickers
     in one session — computed fresh via build_market_regime() otherwise.
 
-    Pass `data` (a {ticker: DataFrame} mapping, as returned by
-    fetch_historical) when the caller has ALREADY fetched this ticker's
-    history, to avoid re-fetching it here. `lookback_days` is then unused.
-    The Streamlit Briefing tab's per-holding panel does exactly this: it
-    needs the same history for its own trend/volatility figures, so
-    without this parameter every held position cost two separate yfinance
-    round-trips instead of one.
+    `signal_result` is an immutable, display-only result produced by the
+    research product and supplied by the composition layer. This assistant
+    module never imports or executes a scanner. Missing or wrong-ticker
+    results fail closed instead of silently showing "no signal".
     """
     ticker = ticker.upper()
-    if data is None:
-        data = fetch_historical([ticker], lookback_days=lookback_days)
-
-    triggered = []
-    if ticker in data and not data[ticker].empty:
-        for name, scan_fn in PER_TICKER_SCAN_FNS.items():
-            result = scan_fn({ticker: data[ticker]})
-            if result.empty:
-                continue
-            latest = result.iloc[-1]
-            date_val = latest["date"]
-            triggered.append({
-                "rule": name,
-                "direction": latest["direction"],
-                "date": date_val.date().isoformat() if hasattr(date_val, "date") else str(date_val),
-                "return_zscore": round(float(latest["return_zscore"]), 2),
-                "volume_zscore": round(float(latest["volume_zscore"]), 2),
-            })
+    if signal_result is None:
+        raise MissingResearchResultError(
+            "ticker explanation requires a read-only research result from "
+            "the product composition layer"
+        )
+    if signal_result.ticker != ticker:
+        raise ResearchResultContractError(
+            f"research result is for {signal_result.ticker}, not {ticker}"
+        )
+    triggered = [trigger.to_dict() for trigger in signal_result.triggers]
 
     relevant_findings = [
         e for e in KNOWN_FINDINGS

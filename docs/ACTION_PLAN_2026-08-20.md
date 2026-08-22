@@ -63,7 +63,10 @@ reviewing each stable implementation snapshot. SEP-0 and SEP-1 are reviewed.
 closed after Codex counter-reviewed Claude's exact final-tranche review head;
 the exact direct-crossing and authority-exception counts remain zero. See
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail
-and next bounded work.
+and next bounded work. The operator-database counter-review and filing-
+extraction ownership tranche are now recorded there: state capabilities fail
+closed by read/write namespace, and the residual surface is 11 composition
+files, six Python crossings, and four non-assistant operator-store importers.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

@@ -391,6 +391,34 @@ composition files and 7 crossings include the assistant/research UI seam and
 PowerShell task surfaces. Any physical database or scheduled-task move remains
 owner-gated and must not disturb `paper-epoch-006`.
 
+#### SEP-2 fifth tranche — filing-extraction ownership and state-capability closure
+
+The combined counter-review and next bounded implementation tranche closes
+one more composition surface without moving a database, task, credential, or
+runtime path:
+
+- generic operator-state reads and writes are now limited to direct calls and
+  explicit literal key prefixes. Aliases, reflection, dynamically sourced
+  keys, unused grants, undeclared reads, and writes capable of reaching an
+  assistant-reserved key fail closed;
+- deterministic canonical hashing and filing-extraction validation move to
+  neutral `data` contracts. `ml.hashing` and `ml.filings` remain exact-identity
+  compatibility facades, so existing research imports and serialized behavior
+  do not change;
+- `scripts/run_filing_extraction.py` consumes only the neutral extraction
+  contract plus the assistant-owned audit store and is therefore honestly
+  trading-assistant-owned rather than research-hosted composition; and
+- the exact surface becomes **8 assistant / 56 research / 11 composition**,
+  **6** declared Python crossing roots, **4** direct non-assistant operator-
+  database importers, and **11** neutral `data` contracts.
+
+The reclassification changes ownership metadata and import direction only.
+The Anthropic call, deterministic validation, audit row, CLI, and failure
+behavior remain unchanged. SEP-2 remains incomplete: four research-hosted
+database crossings, 11 composition files, six Python crossings, the UI seam,
+and PowerShell task surfaces remain. Physical database/task movement remains
+owner-gated and must not disturb `paper-epoch-006`.
+
 ### SEP-3 — physical extraction decision
 
 After SEP-0 through SEP-2 are reviewed and green, produce a dry-run extraction

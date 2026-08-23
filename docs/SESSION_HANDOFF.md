@@ -6686,6 +6686,50 @@ research look or evidence epoch changed. Physical extraction remains
 separately owner-gated; next reduce the exact residuals, partition support and
 tests, and run a second dry run.
 
+## 7ee. SEP-3 exact support partition and second dry run (Codex, 2026-08-23)
+
+After removing 19 merged local branches, 16 merged remote branches and eight
+clean obsolete worktrees, Codex branched
+`codex/sep3-residual-reduction-20260823` from finalized local counter-review
+head `edb1e1d`. The unmerged counter-review branch was preserved. The shared
+checkout remained clean on `main` at `bc8900a`.
+
+Implementation commit `b15aac8` replaces SEP-3's heuristic test report with an
+enforced exact partition. The first validator classified by import root and
+therefore treated any product-neutral `data.*` import as shared; that falsely
+placed research-owned macro, price-target and alpha-battery tests in the tiny
+shared package. The new scanner expands full static import names and resolves
+them against the exact product roots, data ownership and script ownership.
+Count and ordered-inventory SHA-256 pins now fail closed on drift. Three
+dangerous directions are directly covered: count drift, inventory-hash drift,
+and hiding integration tests in the research repository. Disabling the hash
+comparison made its targeted regression fail red with `DID NOT RAISE`; the
+restored guard passes. A dedicated shared-contract test now pins evidence
+labels, exact finite decimal behavior, immutable result serialization and
+deterministic parameter binding without importing either product.
+
+Dry-run contract commit `4e1aae4` binds exact candidate source
+`b15aac8e176bb892f4fb3bd8da87f3eaac66af80`: 743 tracked paths, inventory
+SHA-256 `32590d8b...d32282`, and exactly-once destinations **498 trading
+assistant / 241 strategy research / 4 shared contracts**. Test ownership is
+**83 assistant / 70 research / 1 shared-contract / 54 integration**, each with
+an exact ordered-inventory hash. The second dry run is valid but not ready for
+physical extraction. Runtime blockers remain exactly **11 composition files / 6
+Python crossing roots / 4 non-assistant operator-store importers**; the 54
+integration tests and governance/documentation ownership also remain open.
+Independent review is pending.
+
+Validation on the final documented tree: focused SEP-3, entry-point, shared-
+contract and active-document gates **92 passed**; complete suite **4,547
+passed / 0 failed / 25 known dependency warnings** in 882.32 seconds. The
+partition-hash guard was mutation-proved red before restoration.
+
+No product runtime, authority, provider, licensed row, broker, operator
+database, installed task, deployment, backtest, outcome, research look or
+evidence epoch changed. `paper-epoch-006` is untouched. Nothing in this tranche
+authorizes creating `Strategy_agent`, creating the shared package, changing a
+task path, moving the database or performing physical extraction.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the
@@ -6694,8 +6738,10 @@ current bounded milestone.** SEP-2 completed under the owner direction of
 review snapshot; subsequently, on 2026-08-22, the owner explicitly selected
 two product repositories plus one tiny shared-contracts package. Section 7dz
 records the first validated dry run. Advancing within SEP-3 grants no authority
-to perform the physical move — the exact residuals and support/test partition
-must first close and the migration itself remains separately gated. SEP-0 is accepted after correction (sections
+to perform the physical move — section 7ee records a valid second dry run, but
+the exact runtime residuals, 54 integration tests and governance/documentation
+partition must first close and the migration itself remains separately gated.
+SEP-0 is accepted after correction (sections
 7dc–7dd). SEP-1's three implementation tranches and their independent review
 chain are closed in sections 7de–7dm; the direct-crossing and authority-
 exception counts are both zero, and the milestone is recorded in
@@ -6729,6 +6775,8 @@ validated SEP-3 dry run under the owner's selected topology. Sections 7ea–7eb
 close the dry-run review chain, accepted after the Git-topology wording
 correction in CRSEP3-001. Sections 7ec–7ed close the second review round after
 CRSEP3R-001 completes the separation-finding guard's identifier grammar.
+Section 7ee records the exact support/test partition and second dry run;
+independent review is next.
 ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
@@ -7037,8 +7085,11 @@ repositories plus one tiny shared-contracts package on 2026-08-22, with no Git
 submodules. Section 7dz records the first validated dry run; it is not yet
 ready or authorized for physical extraction. Sections 7ea–7eb close its
 independent review and counter-review; sections 7ec–7ed close the follow-up
-review after one P3 guard correction. Continue with residual reduction and the
-support/test partition before a second dry run. ACER
+review after one P3 guard correction. Section 7ee records the second dry run:
+83 assistant, 70 research, one shared-contract and 54 integration test files
+are exact and hash-pinned, while 11 / 6 / 4 runtime residuals plus integration
+and governance ownership still block physical extraction. Independently review
+that exact candidate next. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

@@ -232,6 +232,55 @@ def _partition_tests(
     return surfaces
 
 
+def _stranded_data_modules(
+    paths: list[str],
+    commit: str,
+    manifest: dict[str, Any],
+    entry_points: dict[str, Any],
+) -> dict[str, list[str]]:
+    """Data modules destined to one product while the other still imports them.
+
+    SEP3R-001: both dry runs validated a partition that destines ten ``data``
+    modules — the mandate-fingerprint pair, runtime identity, and the alert
+    writer among them — to the strategy-research repository while
+    trading-assistant packages or assistant-owned scripts import them.
+    Executed as declared, the extraction would break the assistant at import
+    time or force exactly the cross-repository dependency the plan's objective
+    forbids. A dry run exists to surface that, so the stranded set is measured
+    from the candidate commit, must match the declared blocker exactly, and
+    keeps the run non-extraction-ready while non-empty.
+    """
+    destination: dict[str, str] = {}
+    for product, files in manifest["data_destination"].items():
+        for path in files:
+            destination[path.removesuffix(".py").replace("/", ".")] = product
+
+    ownership = entry_points["script_ownership"]
+    side_prefixes = {
+        side: list(manifest["product_roots"][side])
+        + [path for path in ownership[side] if path.endswith(".py")]
+        for side in ("trading_assistant", "strategy_research")
+    }
+
+    stranded: dict[str, set[str]] = {}
+    for side, prefixes in side_prefixes.items():
+        other = (
+            "strategy_research"
+            if side == "trading_assistant"
+            else "trading_assistant"
+        )
+        for path in paths:
+            if not path.endswith(".py"):
+                continue
+            if not any(_starts_with_root(path, prefix) for prefix in prefixes):
+                continue
+            for module in _imported_modules(_commit_text(commit, path), path):
+                key = ".".join(module.split(".")[:2])
+                if destination.get(key) == other:
+                    stranded.setdefault(key, set()).add(path)
+    return {module: sorted(files) for module, files in sorted(stranded.items())}
+
+
 def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest["schema_version"] != 2:
@@ -367,6 +416,14 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
                 f"stale extraction blocker {name}: declared={blockers[name]}, measured={value}"
             )
 
+    stranded = _stranded_data_modules(paths, commit, manifest, entry_points)
+    declared_stranded = blockers["stranded_data_modules"]
+    if sorted(declared_stranded) != sorted(stranded):
+        raise ExtractionValidationError(
+            "stale extraction blocker stranded_data_modules: "
+            f"declared={sorted(declared_stranded)}, measured={sorted(stranded)}"
+        )
+
     ownership_counts = {
         name: len(entry_points["script_ownership"][name])
         for name in ("trading_assistant", "strategy_research", "cross_product_composition")
@@ -404,6 +461,7 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             "governance_support_partition": blockers[
                 "governance_support_partition"
             ],
+            "stranded_data_modules": sorted(stranded),
         },
         "physical_extraction_authorized": False,
     }

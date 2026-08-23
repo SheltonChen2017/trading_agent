@@ -37,7 +37,10 @@ def test_second_extraction_dry_run_is_exact_and_not_authorized():
         "sha256": "32590d8bb3d44e67ee90dd0008e2c73cc2356a5004b0484ab7ba908c25d32282",
         "assigned_exactly_once": True,
         "destination_counts": {
-            "shared_contracts": 3,
+            # SEP3R-002: this dict briefly carried both `"shared_contracts": 3`
+            # and `"shared_contracts": 4`; Python keeps the later duplicate
+            # key silently, so the stale 3 was dead text masking an
+            # incomplete edit rather than a failing assertion.
             "shared_contracts": 4,
             "strategy_research": 241,
             "trading_assistant": 498,
@@ -63,6 +66,9 @@ def test_second_extraction_dry_run_is_exact_and_not_authorized():
         ),
         "integration_test_files": 54,
         "governance_support_partition": "pending",
+        # SEP3R-001: the partition strands ten assistant-needed data modules
+        # in the research repository; see the dedicated test below.
+        "stranded_data_modules": _STRANDED_DATA_MODULES,
     }
     assert result["surfaces"]["shared_contract_test_files"] == 1
 
@@ -153,3 +159,62 @@ def test_full_import_names_distinguish_shared_contracts_from_product_data():
         "data.macro_data",
         "data.price_target_data",
     }
+
+
+_STRANDED_DATA_MODULES = [
+    "data.filing_extraction",
+    "data.macro_data",
+    "data.mandate_evaluation",
+    "data.market_data",
+    "data.operational_alerts",
+    "data.portfolio_mandate",
+    "data.portfolio_metrics",
+    "data.price_target_data",
+    "data.research_statistics",
+    "data.runtime_identity",
+]
+
+
+def test_stranded_data_modules_are_measured_declared_and_blocking():
+    """SEP3R-001. The declared partition must not strand a product's imports.
+
+    Both dry runs destined these ten ``data`` modules to the research
+    repository while trading-assistant packages or assistant-owned scripts
+    import them — `data.mandate_evaluation` and `data.portfolio_mandate` carry
+    the owner-approved mandate fingerprint, `data.runtime_identity` the
+    evidence lineage, `data.operational_alerts` the alert writer. Executed as
+    declared, extraction would break the assistant at import time or force the
+    cross-repository dependency the plan's objective forbids. The validator
+    now measures the stranded set from the candidate commit; this pins it as
+    an exact shrinking blocker rather than a silent pass.
+    """
+    result = validate()
+    assert result["blockers"]["stranded_data_modules"] == _STRANDED_DATA_MODULES
+    assert "data.mandate_evaluation" in result["blockers"]["stranded_data_modules"]
+    assert result["physical_extraction_authorized"] is False
+
+
+def test_missing_stranded_declaration_is_refused(tmp_path: Path):
+    manifest = _manifest()
+    manifest["known_blockers"]["stranded_data_modules"] = (
+        _STRANDED_DATA_MODULES[:-1]
+    )
+    with pytest.raises(
+        ExtractionValidationError,
+        match="stale extraction blocker stranded_data_modules",
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_overdeclared_stranded_module_is_refused(tmp_path: Path):
+    """A blocker list padded with a resolved entry must fail, so the ledger
+    is driven down by fixing modules, never by editing the declaration."""
+    manifest = _manifest()
+    manifest["known_blockers"]["stranded_data_modules"] = (
+        _STRANDED_DATA_MODULES + ["data.evidence_status"]
+    )
+    with pytest.raises(
+        ExtractionValidationError,
+        match="stale extraction blocker stranded_data_modules",
+    ):
+        validate(_write_manifest(tmp_path, manifest))

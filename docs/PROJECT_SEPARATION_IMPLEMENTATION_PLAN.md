@@ -491,8 +491,26 @@ explicit support blockers, and the runtime residuals remain exactly 11
 composition files, six Python crossing roots and four research-hosted operator-
 database importers. Those runtime residuals are tied to the separately gated
 database, installed-task and physical-repository topology; this tranche does
-not disguise them as interfaces or silently reclassify them. Independent
-review of the candidate is pending.
+not disguise them as interfaces or silently reclassify them.
+
+Independent review of the candidate (2026-08-23, accepted after correction)
+found one residual the dry runs had not measured: **ten `data` modules are
+destined to the research repository while trading-assistant packages or
+assistant-owned scripts import them** (SEP3R-001) — among them
+`data.mandate_evaluation` and `data.portfolio_mandate` (the owner-approved
+mandate fingerprint), `data.runtime_identity` (evidence lineage) and
+`data.operational_alerts`. Executed as declared, the extraction would break
+the assistant at import time or force the cross-repository dependency this
+plan's own objective forbids. Both dry runs had passed silently on this; the
+validator now measures the stranded set from the candidate commit, requires
+the manifest to declare it exactly (over- and under-declaration both refuse),
+reports it as a named blocker, and the set is pinned by regression tests.
+Resolving each module — shared package, assistant ownership, or a removed
+import — is partition design work for a later reviewed tranche, not a
+reviewer's unilateral call; note the tiny-package route is closed for
+`data.market_data`-class modules, whose vendor imports the shared allowlist
+correctly refuses. See
+`docs/Archive/Review/REVIEW_2026-08-23_SEP3_RESIDUAL_REDUCTION.md`.
 
 Next, independently review this exact candidate, then resolve the remaining
 integration/governance partition and owner-gated runtime topology. Only after a

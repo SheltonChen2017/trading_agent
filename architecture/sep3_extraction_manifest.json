@@ -17,12 +17,27 @@
     "physical_extraction_requires_new_reviewed_clean_commit": true
   },
   "product_roots": {
-    "trading_assistant": ["assistant", "execution", "risk"],
-    "strategy_research": ["backtest", "ml", "research", "signals", "strategies"]
+    "trading_assistant": [
+      "assistant",
+      "execution",
+      "risk"
+    ],
+    "strategy_research": [
+      "backtest",
+      "ml",
+      "research",
+      "signals",
+      "strategies"
+    ]
   },
   "product_top_level_files": {
-    "trading_assistant": ["config.py", "market_analytics.py"],
-    "strategy_research": ["baskets.py"]
+    "trading_assistant": [
+      "config.py",
+      "market_analytics.py"
+    ],
+    "strategy_research": [
+      "baskets.py"
+    ]
   },
   "script_ownership_source": "architecture/entry_points.json",
   "data_destination": {
@@ -59,11 +74,23 @@
       "data/financial_primitives.py": "7dba2361d800a74eb7ab199173256ce06eb8781d",
       "data/research_results.py": "ea2bff4dbe865f02cdf0174fe7fda2b9413a06a1"
     },
-    "allowed_third_party_imports": ["pandas"],
+    "allowed_third_party_imports": [
+      "pandas"
+    ],
     "forbidden_import_roots": [
-      "assistant", "backtest", "execution", "ml", "research", "risk",
-      "signals", "strategies", "alpaca", "anthropic", "databento",
-      "requests", "yfinance"
+      "assistant",
+      "backtest",
+      "execution",
+      "ml",
+      "research",
+      "risk",
+      "signals",
+      "strategies",
+      "alpaca",
+      "anthropic",
+      "databento",
+      "requests",
+      "yfinance"
     ],
     "development_install": "editable-local-path",
     "durable_install": "exact-version-and-source-commit-pin"
@@ -71,17 +98,29 @@
   "dependency_surfaces": {
     "trading_assistant": "requirements/trading-assistant.txt",
     "strategy_research": "requirements/strategy-research.txt",
-    "shared_contracts": ["pandas==3.0.5"]
+    "shared_contracts": [
+      "pandas==3.0.5"
+    ]
   },
   "support_paths": {
     "destination": "trading_assistant",
     "prefixes": [
-      ".claude/", ".github/", ".streamlit/", "architecture/", "docs/",
-      "requirements/", "tests/"
+      ".claude/",
+      ".github/",
+      ".streamlit/",
+      "architecture/",
+      "docs/",
+      "requirements/",
+      "tests/"
     ],
     "exact_files": [
-      ".gitignore", "AGENTS.md", "CLAUDE.md", "HOW_TO_USE.md", "README.md",
-      "pytest.ini", "requirements.txt"
+      ".gitignore",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "HOW_TO_USE.md",
+      "README.md",
+      "pytest.ini",
+      "requirements.txt"
     ],
     "note": "Governance, integration tests and migration tooling remain with the source repository. Python tests are reassigned by the exact support_partition below; non-test documentation still requires product ownership before physical extraction."
   },
@@ -116,7 +155,20 @@
     "governance_support_partition": "pending",
     "installed_task_paths": "unchanged",
     "operator_database_move": "not-authorized",
-    "paper_epoch_006": "must-remain-untouched"
+    "paper_epoch_006": "must-remain-untouched",
+    "stranded_data_modules": [
+      "data.filing_extraction",
+      "data.macro_data",
+      "data.mandate_evaluation",
+      "data.market_data",
+      "data.operational_alerts",
+      "data.portfolio_mandate",
+      "data.portfolio_metrics",
+      "data.price_target_data",
+      "data.research_statistics",
+      "data.runtime_identity"
+    ],
+    "stranded_data_modules_note": "SEP3R-001: these data modules are destined to strategy_research while trading-assistant packages or assistant-owned scripts import them \u2014 the mandate-fingerprint pair, runtime identity, and the alert writer among them. Executed as declared, the extraction would break the assistant at import time or force the cross-repository dependency the plan's objective forbids. The validator measures this set from the candidate commit and refuses a stale declaration; resolving each module (shared package, assistant ownership, or a removed import) is partition design work for a later reviewed tranche, not a reviewer's unilateral call."
   },
   "physical_extraction_authorized": false
 }

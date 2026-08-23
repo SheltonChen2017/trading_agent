@@ -7010,6 +7010,57 @@ and implement the earliest safe bounded SEP-3 partition item. If a dual-use
 module requires new owner policy, stop rather than expanding the tiny shared
 package or creating a cross-repository product dependency by assumption.
 
+## 7ej. SEP-3 research-statistics ownership tranche (Codex, 2026-08-23)
+
+Fresh implementation branch
+`codex/sep3-research-statistics-ownership-20260823` begins at finalized
+counter-review handoff `afc8dc4`. The standalone counter-review branch remains
+local-only; this implementation branch carries its complete ancestry for the
+single combined Codex push authorized by the owner workflow.
+
+Implementation `8cb47e1714ebea2e93ddd578801d2a953588bef0` assigns
+`data.research_statistics` to strategy research. The assistant no longer
+imports a research-owned service: it performs the same private Bonferroni
+display arithmetic over an already-recorded look count, without defining a
+hypothesis family, evidence result, strategy calculation, or portfolio
+policy. Restoring the assistant-to-research import makes the product-owned-
+service guard fail with the exact offender; the restored tree and threshold
+behavior pass. The deliberately tiny shared package does not grow.
+
+Fourth-dry-run contract `cb0177126080eab8a5479560bba4372e93dba52f`
+pins candidate `8cb47e1`: **747 tracked paths**, inventory SHA-256
+`b22d5c3450a5f00fcbfa035c151bea9cc4443e8211951d0be74bf5c37add5834`,
+assigned exactly once as **503 trading assistant / 240 strategy research / 4
+shared contracts**. The test partition remains **83 assistant / 70 research /
+1 shared / 54 integration**. The stranded set falls from nine to **eight**,
+and every remaining module has importers on both product sides. Documentation
+commit `df34d68` records the bounded sequencing and status change.
+
+Final combined-tree validation: focused research-statistics ownership and
+behavior tests **25 passed**; the complete fourth-dry-run, entry-point and
+research-look set **60 passed** in 319.62 seconds; active-document checks **56
+passed**. The dangerous-direction import mutation failed with the exact
+assistant-to-research offender and the restored direction passed. The
+complete suite then passed **4,552 / 0 failed / 25 known dependency warnings**
+in 1,361.73 seconds on Python 3.13.14. Compileall including `research/`, the
+fourth-dry-run validator, architecture JSON parsing, diff/staged/ordered-
+commit checks, narrow secret-shape scan, exact Claude-head recheck, and shared-
+checkout branch/HEAD/status verification also pass before the one authorized
+push.
+
+SEP-3 is **not complete**. Remaining blockers are eight dual-use data modules,
+11 composition files, six Python crossing roots, four non-assistant operator-
+store importers, 54 integration tests, and pending governance/documentation
+ownership. Physical extraction, repository creation, operator-database or
+installed-task movement, and deployment remain separately owner-gated. No
+provider, credential, licensed row, broker, backtest, outcome, research look,
+evidence epoch, or `paper-epoch-006` state was accessed or changed.
+
+After final validation and exact remote-base checks, push only
+`codex/sep3-research-statistics-ownership-20260823` once. Do not push the
+standalone counter-review branch, main, Claude's branch, a checkpoint, or a
+tag. Then create the next exact-head ten-minute Claude-review alarm.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

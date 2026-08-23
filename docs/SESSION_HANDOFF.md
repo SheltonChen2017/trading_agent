@@ -6950,9 +6950,10 @@ this session a merge outran a record, caught by the guard rather than
 vigilance.
 
 Validation on the final tree: doc guards 56 passed; focused SEP suites 41
-passed; complete suite **4,552 passed / 0 failed / 25 warnings** —
-unchanged from Codex's 4,552, since this round extended globs and a
-grammar rather than adding a test; `git diff
+passed; complete suite **4,552 passed / 0 failed / 25 warnings** in 965.56
+seconds on Python 3.13.14, run clean on the final tree — unchanged from
+Codex's 4,552, since this round extended globs and a grammar rather than
+adding a test; `git diff
 --check` clean.
 
 No provider, broker, licensed row, operator database, scheduled task,

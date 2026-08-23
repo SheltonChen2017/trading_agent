@@ -117,7 +117,7 @@ vigilance, is what catches it.
 |---|---|
 | Focused SEP suites (dry run + entry points + shared package) | 41 passed |
 | `tests/test_active_document_consistency.py` | 56 passed after the CCR-005 correction |
-| Complete suite | recorded in handoff section 7eh |
+| Complete suite | **4,552 passed / 0 failed / 25 warnings** in 965.56s, clean on the final tree — unchanged from Codex's 4,552; no test added this round |
 | `git diff --check` | clean |
 | Mutations | ownership guard red/green; importer-sides falsified both directions → refused; SEP3AR-001 red/green; CRSEP3R2-001 reproduced with an independent census |
 

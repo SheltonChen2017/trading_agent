@@ -6851,6 +6851,56 @@ task path moved, and no provider, credential, licensed row, broker, backtest,
 outcome, research look, deployment, evidence epoch, or `paper-epoch-006` state
 was accessed or changed.
 
+## 7eg. SEP-3 assistant-owned operational-alert tranche (Codex, 2026-08-23)
+
+Fresh implementation branch
+`codex/sep3-operational-alert-ownership-20260823` begins at finalized counter-
+review handoff `9f68fb5`, so the unpushed counter-review commits remain in its
+ancestry and are not published as a standalone branch.
+
+Implementation `73acf482cf8d4c36c28b2d1745bd914ae08eb6a3` resolves the
+one stranded-data ownership decision the exact importer graph already makes:
+`data/operational_alerts.py` is a trading-assistant-owned operational service.
+It preserves the existing `assistant.operations` object-identity facade and
+runtime behavior. Product-owned research packages and entry points may not
+import it; research-hosted composition runners that currently do remain in
+the explicit 11-file composition ledger. A reverse mutation adding the import
+to research-owned `scripts/run_ml_experiment.py` failed the new guard with the
+exact offender, and the restored tree passed.
+
+Third-dry-run contract `984fee3` pins candidate `73acf48`: **745 tracked
+paths**, inventory SHA-256
+`a985372c467d5841dd9a2d99dbda64e6e91d6e4c70a3d78e39d7b4e4cfdf9cfd`,
+assigned exactly once as **501 trading assistant / 240 strategy research / 4
+shared contracts**. The test partition remains **83 assistant / 70 research /
+1 shared / 54 integration**. The stranded set falls from ten to **nine**, and
+the exact importer-side ledger proves all nine are used by both products.
+Documentation commit `e75f4f5` records the sequencing/status change without
+claiming SEP-3 complete.
+
+Final combined-tree validation: focused third-dry-run, ownership,
+compatibility and import-bypass set **21 passed** in 273.81 seconds; active-
+document checks **56 passed**; complete suite **4,552 passed, 0 failed, 25
+known dependency warnings** on Python 3.13.14; compileall including
+`research/`, all architecture JSON parsing, `git diff --check`, staged-diff,
+ordered-commit, narrow secret-shape, exact Claude-head and shared-checkout
+branch/HEAD checks pass. These figures are measured on the final combined
+tree before its one authorized push.
+
+SEP-3 is **not complete**. Remaining blockers are nine dual-use data modules,
+11 composition files, six Python crossing roots, four non-assistant operator-
+store importers, 54 integration tests, and pending governance/documentation
+ownership. Physical extraction, repository creation, operator-database or
+installed-task movement, and deployment remain separately owner-gated. No
+provider, credential, licensed row, broker, backtest, outcome, research look,
+evidence epoch, or `paper-epoch-006` state changed.
+
+This handoff commit is the final local commit in the owner-authorized series.
+After the final clean-tree and remote-base checks, push only
+`codex/sep3-operational-alert-ownership-20260823` once; do not push the
+standalone counter-review branch, main, Claude's branch, a checkpoint, or a
+tag.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

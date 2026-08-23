@@ -241,11 +241,10 @@ def _data_module_importers(
     """Return exact product-side importers for every assigned data module.
 
     CRSEP3R2-001: the independent review correctly found the stranded module
-    set, but its supporting claim said only five modules were used by both
-    products. Exact measurement shows nine: only ``data.operational_alerts``
-    is assistant-only under the declared package/owned-script scope. Pinning
-    both sides prevents a future partition decision from treating a dual-use
-    module as a simple ownership reassignment.
+    set, but its supporting claim mixed two importer scopes. Pinning both
+    sides prevents a future partition decision from treating a dual-use
+    module as a simple ownership reassignment. Later tranches may shrink this
+    set only by changing the measured import graph or product destination.
     """
     assigned_modules = {
         path.removesuffix(".py").replace("/", ".")
@@ -285,12 +284,11 @@ def _stranded_data_modules(
 ) -> dict[str, list[str]]:
     """Data modules destined to one product while the other still imports them.
 
-    SEP3R-001 found ten such modules in the first two dry runs. SEP3A-001
-    resolves the one assistant-only module, ``data.operational_alerts``, by
-    assigning it to the assistant. The remaining nine are imported by both
-    product sides. A dry run exists to surface that, so the stranded set is
-    measured from the candidate commit, must match the declared blocker
-    exactly, and keeps the run non-extraction-ready while non-empty.
+    SEP3R-001 found ten such modules in the first two dry runs. Subsequent
+    bounded tranches resolve only ownership decisions proven by the candidate
+    graph. A dry run exists to surface the remaining set, so it is measured
+    from the candidate commit, must match the declared blocker exactly, and
+    keeps the run non-extraction-ready while non-empty.
     """
     destination: dict[str, str] = {}
     for product, files in manifest["data_destination"].items():
@@ -480,7 +478,7 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     }
     return {
         "schema_version": 2,
-        "status": "valid-third-dry-run-not-ready-for-physical-extraction",
+        "status": "valid-fourth-dry-run-not-ready-for-physical-extraction",
         "source_commit": commit,
         "inventory": {
             "tracked_paths": len(paths),

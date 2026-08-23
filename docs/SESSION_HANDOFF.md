@@ -6730,6 +6730,79 @@ evidence epoch changed. `paper-epoch-006` is untouched. Nothing in this tranche
 authorizes creating `Strategy_agent`, creating the shared package, changing a
 task path, moving the database or performing physical extraction.
 
+## 7ee. Independent review of the SEP-3 second dry run (Claude, 2026-08-23)
+
+Branch `user/claude/review-sep3-residuals-20260823`, created from the exact
+fetched remote head `e03a69f` on `origin/codex/sep3-residual-reduction-20260823`,
+based on my prior review head `18afbf4` (tree-identical to merged `main`
+`bc8900a`, verified). All seven commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-23_SEP3_RESIDUAL_REDUCTION.md`.
+
+**Accepted after correction. No P0/P1; one P2 (SEP3R-001) and one P3
+(SEP3R-002) corrected.**
+
+**SEP3R-001 (P2): the declared partition strands ten assistant-needed data
+modules.** Cross-checking every `data_destination` module against what
+actually imports it — product packages plus each product's owned scripts, by
+AST over full module names — shows ten modules destined to the research
+repository that the trading assistant imports: `data.mandate_evaluation` and
+`data.portfolio_mandate` (the owner-approved mandate fingerprint),
+`data.runtime_identity` (evidence lineage), `data.operational_alerts`,
+`data.market_data` (three assistant modules), `data.portfolio_metrics`,
+`data.price_target_data`, `data.research_statistics`, `data.macro_data`, and
+`data.filing_extraction` (via the assistant-owned extraction runner). Five of
+the ten are imported by **both** products — the modules SEP-2 called neutral,
+which is exactly why no single product repository can own them. Executed as
+declared, extraction would break the assistant at import time or force the
+cross-repository dependency the plan's objective forbids. **Both dry runs
+passed silently on this, and the destinations are byte-identical to the first
+dry run's — which my own previous review accepted without measuring
+destination against importer. That gap is mine and the review record states
+it plainly.** The validator now measures the stranded set from the candidate
+commit, requires `known_blockers.stranded_data_modules` to match it exactly —
+under- and over-declaration both refuse, so the ledger is driven down by
+fixing modules, never by editing the declaration — and reports it as a named
+blocker. Resolving each module (shared package, assistant ownership, or a
+removed import) is deliberately left as partition design for a later reviewed
+tranche; the tiny-package route is closed for `data.market_data`-class
+modules, whose vendor imports the shared allowlist correctly refuses.
+Mutations: staleness check disabled → both refusal tests red; restored green
+16/16.
+
+**SEP3R-002 (P3):** the submitted dry-run test carried a duplicate dict key —
+`"shared_contracts": 3` immediately followed by `"shared_contracts": 4`;
+Python keeps the later value silently, so the stale `3` was dead text masking
+an incomplete edit. Removed; the asserted `4` was correct.
+
+**Codex's CRSEP3R-001 against my finding-ID grammar is correct and verified
+on my own head**: `SEP3CR-001` and `SEP3CR2-002` did not match my
+one-optional-letter pattern; the `[A-Z0-9]*` correction accepts them while
+`SEPTEMBER-123` and `STEP3-001` still refuse.
+
+Also verified: the claimed first-validator defect is real (old line 232
+counted any `data.*` import as shared) and the full-module-name replacement is
+the correct fix; all counts reproduce on my own validator run (candidate
+`b15aac8`, 743 paths, 498/241/4, tests 83/70/1/54); the validator remains
+genuinely read-only (git plumbing only, tree unchanged after execution); and
+the shared-package suite tests real behavior.
+
+Validation on the final tree: SEP-3 dry-run plus shared-package suites 16
+passed; complete suite **4,550 passed / 0 failed / 25 warnings** in 913.67
+seconds on Python 3.13.14 — Codex's 4,547 plus this round's three
+stranded-module tests, rerun clean on the final tree after an interim run
+caught my own report/handoff edits mid-flight via the SEP2F-002 guard;
+`compileall`
+including `research/` passes; `git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 then continues:
+resolve the ten stranded data modules (partition design, in places an owner
+call), the integration/governance partition, and the owner-gated runtime
+topology — then a third dry run.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

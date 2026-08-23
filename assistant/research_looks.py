@@ -2,9 +2,9 @@
 
 Every backtest configuration a human examines is a statistical test, whether
 or not its result was liked. Testing many configurations and reporting the
-best one inflates false discovery, and the correction for that
-(`data.research_statistics.bonferroni_threshold`) needs a count of how many were
-looked at. Until now nothing recorded that count: `ml/experiments.py` counts
+best one inflates false discovery, and the correction for that needs a count
+of how many were looked at. Until now nothing recorded that count:
+`ml/experiments.py` counts
 looks declared *inside one frozen spec*, but the interactive Backtest surface
 -- the one a person clicks repeatedly while exploring -- counted nothing.
 
@@ -48,7 +48,6 @@ from typing import Any
 import pandas as pd
 
 from assistant.storage import AssistantStore
-from data.research_statistics import bonferroni_threshold
 
 
 class ResearchLookError(ValueError):
@@ -57,6 +56,17 @@ class ResearchLookError(ValueError):
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _COMMIT = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+
+
+def _bonferroni_threshold(n_tests: int, *, alpha: float) -> float:
+    """Assistant-owned display arithmetic for the recorded-look ledger.
+
+    Research owns hypothesis-family definitions and statistical evidence.
+    This helper only renders the conservative threshold for the assistant's
+    already-recorded cell count, so extracting the products does not make the
+    assistant depend on a research implementation.
+    """
+    return alpha / n_tests
 
 
 def _required_text(value: Any, field: str) -> str:
@@ -297,7 +307,9 @@ def research_look_summary(
         surface=surface, data_source=data_source
     )
     threshold = (
-        float(alpha) if total == 0 else bonferroni_threshold(total, alpha=float(alpha))
+        float(alpha)
+        if total == 0
+        else _bonferroni_threshold(total, alpha=float(alpha))
     )
     family_parts = []
     if surface is not None:

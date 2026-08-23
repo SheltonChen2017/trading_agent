@@ -26,23 +26,26 @@ def _write_manifest(tmp_path: Path, manifest: dict) -> Path:
     return path
 
 
-def test_reviewed_extraction_dry_run_is_exact_and_not_authorized():
+def test_second_extraction_dry_run_is_exact_and_not_authorized():
     result = validate()
-    assert result["status"] == "valid-dry-run-not-ready-for-physical-extraction"
-    assert result["source_commit"] == "e642469df7030deb1a36171f43a85e68e1fd82d1"
+    assert result["status"] == (
+        "valid-second-dry-run-not-ready-for-physical-extraction"
+    )
+    assert result["source_commit"] == "b15aac8e176bb892f4fb3bd8da87f3eaac66af80"
     assert result["inventory"] == {
-        "tracked_paths": 734,
-        "sha256": "853a139ca133103f838b66ec5c143566daae951bd2fea1a1f13576718ab72dcb",
+        "tracked_paths": 743,
+        "sha256": "32590d8bb3d44e67ee90dd0008e2c73cc2356a5004b0484ab7ba908c25d32282",
         "assigned_exactly_once": True,
         "destination_counts": {
             "shared_contracts": 3,
+            "shared_contracts": 4,
             "strategy_research": 241,
-            "trading_assistant": 490,
+            "trading_assistant": 498,
         },
     }
     assert result["physical_extraction_authorized"] is False
     assert result["surfaces"]["script_ownership_counts"] == {
-        "trading_assistant": 8,
+        "trading_assistant": 9,
         "strategy_research": 56,
         "cross_product_composition": 11,
     }
@@ -59,10 +62,9 @@ def test_reviewed_extraction_dry_run_is_exact_and_not_authorized():
             "product-pure-tests-pinned-integration-explicit"
         ),
         "integration_test_files": 54,
-        "shared_contract_test_files": 0,
-        "shared_contract_test_surface": "pending",
         "governance_support_partition": "pending",
     }
+    assert result["surfaces"]["shared_contract_test_files"] == 1
 
 
 def test_unclassified_retained_path_is_refused(tmp_path: Path):
@@ -92,7 +94,7 @@ def test_licensed_surface_cannot_move_to_assistant(tmp_path: Path):
 
 def test_vendor_client_cannot_enter_tiny_shared_package(tmp_path: Path):
     manifest = _manifest()
-    source = manifest["source"]["reviewed_commit"]
+    source = manifest["source"]["candidate_commit"]
     path = "data/market_data.py"
     manifest["data_destination"]["strategy_research"].remove(path)
     manifest["shared_contracts"]["source_to_package"][path] = (

@@ -234,14 +234,19 @@ def _partition_tests(
 
 def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if manifest["schema_version"] != 1:
+    if manifest["schema_version"] != 2:
         raise ExtractionValidationError("unsupported extraction schema")
     if manifest["physical_extraction_authorized"] is not False:
         raise ExtractionValidationError("this tranche cannot authorize a physical move")
     if manifest["owner_topology_decision"]["git_submodules"] is not False:
         raise ExtractionValidationError("Git submodules are not an approved topology")
 
-    commit = manifest["source"]["reviewed_commit"]
+    source = manifest["source"]
+    if source["independent_review_status"] != "pending":
+        raise ExtractionValidationError(
+            "this implementation tranche must remain pending independent review"
+        )
+    commit = source["candidate_commit"]
     if _git("cat-file", "-t", commit).strip() != "commit":
         raise ExtractionValidationError("reviewed source is not a commit")
     paths = _inventory(commit)
@@ -343,11 +348,11 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         raise ExtractionValidationError("stale shared-contract test count")
     if (
         not shared_contract_tests
-        and support_partition["shared_contract_test_status"]
-        != "pending-dedicated-package-tests"
+        or support_partition["shared_contract_test_status"]
+        != "pinned-dedicated-package-tests"
     ):
         raise ExtractionValidationError(
-            "missing shared-contract tests must remain an explicit blocker"
+            "the shared package requires a pinned dedicated test surface"
         )
 
     blockers = manifest["known_blockers"]
@@ -376,8 +381,8 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         for destination in sorted(DESTINATIONS)
     }
     return {
-        "schema_version": 1,
-        "status": "valid-dry-run-not-ready-for-physical-extraction",
+        "schema_version": 2,
+        "status": "valid-second-dry-run-not-ready-for-physical-extraction",
         "source_commit": commit,
         "inventory": {
             "tracked_paths": len(paths),
@@ -391,14 +396,11 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             "dependency_manifests": manifest["dependency_surfaces"],
             "test_counts": actual_counts,
             "test_inventory_sha256": actual_hashes,
+            "shared_contract_test_files": len(shared_contract_tests),
         },
         "blockers": measured | {
             "support_surface_partition": blockers["support_surface_partition"],
             "integration_test_files": len(integration),
-            "shared_contract_test_files": len(shared_contract_tests),
-            "shared_contract_test_surface": blockers[
-                "shared_contract_test_surface"
-            ],
             "governance_support_partition": blockers[
                 "governance_support_partition"
             ],

@@ -1408,15 +1408,24 @@ def test_active_acer_docs_do_not_turn_advice_disclaimer_into_research_ban():
 # instead: every finding ID a SEP-2 review report raises must appear somewhere
 # in the current handoff.
 #
-# Scoped to the SEP-2 review reports because that is the milestone whose
-# handoff sections are current. Archived rounds are historical records and are
-# never retro-edited.
-_SEP2_REVIEW_GLOB = "REVIEW_2026-08-22_SEP2_*.md"
-_FINDING_ID = re.compile(r"\bSEP2[A-Z]?-?\d{3}\b|\bSEP2[A-Z]-\d{3}\b")
+# Scoped to the separation milestone's review reports, whose handoff sections
+# are current. Archived rounds are historical records and are never retro-edited.
+#
+# SEP2F-004: this was originally globbed on the literal
+# "REVIEW_2026-08-22_SEP2_*.md". The day SEP-3 became the current milestone the
+# guard would have kept passing while silently covering nothing current -- a
+# guard that quietly narrows to history is the vacuous-check failure this
+# module exists to prevent. The glob follows the milestone instead of a date.
+_SEPARATION_REVIEW_GLOBS = ("REVIEW_*_SEP2_*.md", "REVIEW_*_SEP3_*.md")
+_FINDING_ID = re.compile(r"\bSEP[23][A-Z]?-\d{3}\b")
 
 
 def _sep2_review_reports() -> list[Path]:
-    return sorted((ROOT / "docs" / "Archive" / "Review").glob(_SEP2_REVIEW_GLOB))
+    review_dir = ROOT / "docs" / "Archive" / "Review"
+    found: set[Path] = set()
+    for pattern in _SEPARATION_REVIEW_GLOBS:
+        found.update(review_dir.glob(pattern))
+    return sorted(found)
 
 
 def test_sep2_review_reports_exist_so_this_guard_cannot_pass_vacuously():

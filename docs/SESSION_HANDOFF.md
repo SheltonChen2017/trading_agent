@@ -6803,6 +6803,54 @@ resolve the ten stranded data modules (partition design, in places an owner
 call), the integration/governance partition, and the owner-gated runtime
 topology — then a third dry run.
 
+## 7ef. Codex counter-review of Claude's SEP-3 residual review (2026-08-23)
+
+Claude's exact pushed review branch
+`origin/user/claude/review-sep3-residuals-20260823` was stable at
+`717b014ab22a997d268264fb0a3782b70f6cac19`. Its merge-base with the submitted
+Codex tree is `e03a69f`; the complete ordered range is `f16bbac`, then
+`717b014`. The counter-review used isolated branch
+`codex/counterreview-sep3-residuals-20260823` and did not alter the shared
+checkout.
+
+**Verdict: accepted after correction.** `f16bbac` and `717b014` are each
+accepted after correction. No P0, P1, or P2 counter-review finding; one P3,
+CRSEP3R2-001, is resolved. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-23_SEP3_RESIDUAL_REDUCTION.md`.
+
+Claude's ten-module P2 is correct, but its supporting five-dual-use split was
+not. Exact AST measurement at candidate `b15aac8` shows **nine** stranded
+modules imported by both product sides; only `data.operational_alerts` is
+assistant-only under the declared product-package and owned-script scope.
+Research-owned sources visibly import the modules the review marked absent:
+`scripts/run_portfolio_research_report.py` imports `portfolio_mandate` and
+`runtime_identity`, while research scripts import `macro_data`. Correction
+`80819d6` derives and pins exact importer sides, includes product-owned top-
+level files in the measurement, and refuses either an understated or stale
+side ledger. The dangerous-direction test failed with `DID NOT RAISE` when
+that comparison was disabled and passed after restoration. Review record
+commit: `d1fdac9`.
+
+Counter-review validation: focused SEP-3/shared-package suite **17 passed** in
+293.29 seconds; complete suite **4,551 passed, 0 failed, 25 known dependency
+warnings** in 1,027.58 seconds on Python 3.13.14. Required compile, active-
+document, JSON, diff, secret-shape, exact Claude-head, shared-checkout and final
+combined-tree checks run again before the one owner-authorized push.
+
+At this handoff commit the counter-review commits are local-only and must not
+be pushed as a standalone counter-review branch. The owner directed Codex to
+continue immediately on a fresh implementation branch and make one combined
+push only after the next bounded SEP item is clean. The safe next item is the
+one exact reassignment the measured graph already decides:
+`data.operational_alerts` becomes trading-assistant-owned extraction surface.
+The nine dual-use modules remain open; this does not expand the tiny shared
+package or make an owner-level topology choice.
+
+No repository was created, no history was rewritten, no database or installed
+task path moved, and no provider, credential, licensed row, broker, backtest,
+outcome, research look, deployment, evidence epoch, or `paper-epoch-006` state
+was accessed or changed.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

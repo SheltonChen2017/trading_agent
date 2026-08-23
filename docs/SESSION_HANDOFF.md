@@ -6855,8 +6855,11 @@ was accessed or changed.
 
 Fresh implementation branch
 `codex/sep3-operational-alert-ownership-20260823` begins at finalized counter-
-review handoff `9f68fb5`, so the unpushed counter-review commits remain in its
-ancestry and are not published as a standalone branch.
+review handoff `9f68fb5`. (When this section was written those counter-review
+commits were unpublished except through this branch's ancestry; PR #305 has
+since merged the whole branch, so `9f68fb5` and everything below is now
+reachable from `main` — corrected post-merge per CCR-005, which caught the
+stale claim.)
 
 Implementation `73acf482cf8d4c36c28b2d1745bd914ae08eb6a3` resolves the
 one stranded-data ownership decision the exact importer graph already makes:

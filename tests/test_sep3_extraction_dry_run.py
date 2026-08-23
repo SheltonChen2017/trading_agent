@@ -26,15 +26,15 @@ def _write_manifest(tmp_path: Path, manifest: dict) -> Path:
     return path
 
 
-def test_third_extraction_dry_run_is_exact_and_not_authorized():
+def test_fourth_extraction_dry_run_is_exact_and_not_authorized():
     result = validate()
     assert result["status"] == (
-        "valid-third-dry-run-not-ready-for-physical-extraction"
+        "valid-fourth-dry-run-not-ready-for-physical-extraction"
     )
-    assert result["source_commit"] == "73acf482cf8d4c36c28b2d1745bd914ae08eb6a3"
+    assert result["source_commit"] == "8cb47e1714ebea2e93ddd578801d2a953588bef0"
     assert result["inventory"] == {
-        "tracked_paths": 745,
-        "sha256": "a985372c467d5841dd9a2d99dbda64e6e91d6e4c70a3d78e39d7b4e4cfdf9cfd",
+        "tracked_paths": 747,
+        "sha256": "b22d5c3450a5f00fcbfa035c151bea9cc4443e8211951d0be74bf5c37add5834",
         "assigned_exactly_once": True,
         "destination_counts": {
             # SEP3R-002: this dict briefly carried both `"shared_contracts": 3`
@@ -43,7 +43,7 @@ def test_third_extraction_dry_run_is_exact_and_not_authorized():
             # incomplete edit rather than a failing assertion.
             "shared_contracts": 4,
             "strategy_research": 240,
-            "trading_assistant": 501,
+            "trading_assistant": 503,
         },
     }
     assert result["physical_extraction_authorized"] is False
@@ -66,8 +66,8 @@ def test_third_extraction_dry_run_is_exact_and_not_authorized():
         ),
         "integration_test_files": 54,
         "governance_support_partition": "pending",
-        # SEP3A-001 assigns the one assistant-only service correctly; nine
-        # genuinely dual-use data modules remain blocking.
+        # SEP3A-001 and SEP3S-001 assign two services without widening the
+        # shared package; eight genuinely dual-use data modules remain.
         "stranded_data_modules": _STRANDED_DATA_MODULES,
         "stranded_data_module_importer_sides": _STRANDED_IMPORTER_SIDES,
     }
@@ -170,7 +170,6 @@ _STRANDED_DATA_MODULES = [
     "data.portfolio_mandate",
     "data.portfolio_metrics",
     "data.price_target_data",
-    "data.research_statistics",
     "data.runtime_identity",
 ]
 
@@ -185,12 +184,13 @@ def test_stranded_data_modules_are_measured_declared_and_blocking():
 
     The first two dry runs destined ten assistant-needed modules to research.
     SEP3A-001 assigns the sole assistant-only service, operational alerts, to
-    the assistant. The remaining nine modules are imported by both products,
-    including the mandate-fingerprint pair and runtime identity. Extraction
-    would still break one product or force the cross-repository dependency the
-    plan forbids. The validator measures both set and importer sides from the
-    candidate commit, pinning an exact shrinking blocker rather than a silent
-    pass.
+    the assistant. SEP3S-001 makes research statistics research-owned and
+    removes the assistant import. The remaining eight modules are imported by
+    both products, including the mandate-fingerprint pair and runtime identity.
+    Extraction would still break one product or force the cross-repository
+    dependency the plan forbids. The validator measures both set and importer
+    sides from the candidate commit, pinning an exact shrinking blocker rather
+    than a silent pass.
     """
     result = validate()
     assert result["blockers"]["stranded_data_modules"] == _STRANDED_DATA_MODULES
@@ -201,7 +201,7 @@ def test_stranded_data_modules_are_measured_declared_and_blocking():
     assert sum(
         sides == _DUAL_USE_SIDES
         for sides in result["blockers"]["stranded_data_module_importer_sides"].values()
-    ) == 9
+    ) == 8
     assert "data.operational_alerts" not in result["blockers"][
         "stranded_data_modules"
     ]

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "third-dry-run-not-ready-for-physical-extraction",
+  "status": "fourth-dry-run-not-ready-for-physical-extraction",
   "owner_topology_decision": {
     "date": "2026-08-22",
     "topology": "two-product-repositories-plus-tiny-shared-contracts-package",
@@ -10,10 +10,10 @@
     "git_submodules": false
   },
   "source": {
-    "candidate_commit": "73acf482cf8d4c36c28b2d1745bd914ae08eb6a3",
+    "candidate_commit": "8cb47e1714ebea2e93ddd578801d2a953588bef0",
     "independent_review_status": "pending",
-    "tracked_path_count": 745,
-    "tracked_path_inventory_sha256": "a985372c467d5841dd9a2d99dbda64e6e91d6e4c70a3d78e39d7b4e4cfdf9cfd",
+    "tracked_path_count": 747,
+    "tracked_path_inventory_sha256": "b22d5c3450a5f00fcbfa035c151bea9cc4443e8211951d0be74bf5c37add5834",
     "physical_extraction_requires_new_reviewed_clean_commit": true
   },
   "product_roots": {
@@ -164,7 +164,6 @@
       "data.portfolio_mandate",
       "data.portfolio_metrics",
       "data.price_target_data",
-      "data.research_statistics",
       "data.runtime_identity"
     ],
     "stranded_data_module_importer_sides": {
@@ -196,16 +195,12 @@
         "strategy_research",
         "trading_assistant"
       ],
-      "data.research_statistics": [
-        "strategy_research",
-        "trading_assistant"
-      ],
       "data.runtime_identity": [
         "strategy_research",
         "trading_assistant"
       ]
     },
-    "stranded_data_modules_note": "SEP3R-001/CRSEP3R2-001/SEP3A-001: the third dry run assigns the one assistant-only module, data.operational_alerts, to trading_assistant. The nine remaining modules are imported by both product sides and cannot be resolved by a simple single-product reassignment. Executed as declared, extraction would still break one product at import time or force the cross-repository dependency the plan forbids. The validator measures both the stranded set and exact importer sides from the candidate commit and refuses stale declarations; resolving the nine dual-use modules remains later reviewed partition design."
+    "stranded_data_modules_note": "SEP3R-001/CRSEP3R2-001/SEP3A-001/SEP3S-001: the fourth dry run keeps data.operational_alerts assistant-owned and data.research_statistics research-owned. The assistant renders its recorded-look threshold locally without importing the research calculation. Eight modules remain imported by both product sides and cannot be resolved by simple reassignment. Executed as declared, extraction would still break one product or force the forbidden cross-repository dependency. The validator measures both the stranded set and exact importer sides from the candidate commit and refuses stale declarations."
   },
   "physical_extraction_authorized": false
 }

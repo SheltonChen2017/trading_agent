@@ -6855,8 +6855,11 @@ was accessed or changed.
 
 Fresh implementation branch
 `codex/sep3-operational-alert-ownership-20260823` begins at finalized counter-
-review handoff `9f68fb5`, so the unpushed counter-review commits remain in its
-ancestry and are not published as a standalone branch.
+review handoff `9f68fb5`. (When this section was written those counter-review
+commits were unpublished except through this branch's ancestry; PR #305 has
+since merged the whole branch, so `9f68fb5` and everything below is now
+reachable from `main` — corrected post-merge per CCR-005, which caught the
+stale claim.)
 
 Implementation `73acf482cf8d4c36c28b2d1745bd914ae08eb6a3` resolves the
 one stranded-data ownership decision the exact importer graph already makes:
@@ -6900,6 +6903,163 @@ After the final clean-tree and remote-base checks, push only
 `codex/sep3-operational-alert-ownership-20260823` once; do not push the
 standalone counter-review branch, main, Claude's branch, a checkpoint, or a
 tag.
+
+## 7eh. Independent review of the SEP-3 alert-ownership tranche (Claude, 2026-08-23)
+
+Branch `user/claude/review-sep3-alertown-20260823`, created from the exact
+fetched remote head `4bea7f9` on
+`origin/codex/sep3-operational-alert-ownership-20260823`, based on my prior
+review head `717b014`. All seven commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-23_SEP3_ALERT_OWNERSHIP.md`.
+PR #305 merged this branch to `main` as `802ed34` **while the review was in
+flight**; the merged tree is byte-identical to the reviewed head.
+
+**Accepted. No findings against the submission's substance.**
+
+**Codex's CRSEP3R2-001 against my previous round is correct, reproduced with
+my own census.** My review said five of the ten stranded modules were
+dual-use; the true count is **nine**, with only `data.operational_alerts`
+assistant-only. My error, stated precisely: the review table's dual-use
+column came from my first measurement pass (packages only) while the stranded
+set came from the second (packages plus owned scripts) — I published a
+composite of two scopes without noticing they disagreed. The blocker still
+failed closed; the miscount could only have misled a later reassignment,
+which is exactly what Codex's importer-side ledger now prevents.
+
+**The tranche's substance verified:** the `operational_alerts` reassignment
+is the one move the import graph already decides — it becomes an
+assistant-owned `product_owned_service` with a written rationale, the two
+research-hosted runners that call it are composition-ledger debt and say so,
+and nine genuinely dual-use modules remain blocking. Mutations:
+`ml/monitoring.py` importing the service fails the new ownership guard;
+falsifying an importer side and deleting a sides entry both make the
+validator refuse. Third dry-run counts reproduce on my own run (candidate
+`73acf48`, 745 paths, 501 / 240 / 4, tests 83 / 70 / 1 / 54, extraction
+refused). Focused suites 41 passed.
+
+**Two items landed with this review, neither against the tranche.**
+SEP3AR-001 (P3, mine): counter-review records escaped the separation
+finding-ID guard (`COUNTER_REVIEW_*` does not start with `REVIEW_`), the same
+risk class as SEP2F-002; measured green across all nine counter-review files
+before extending the globs and grammar, and mutation-verified by dropping
+`CRSEP3R2-001` from this handoff. And a CCR-005 post-merge correction:
+PR #305 made section 7eg's "unpushed counter-review commits" sentence false
+by construction the moment it landed; the reachability guard caught it on my
+first doc-guard run and the sentence now records the merge — the third time
+this session a merge outran a record, caught by the guard rather than
+vigilance.
+
+Validation on the final tree: doc guards 56 passed; focused SEP suites 41
+passed; complete suite **4,552 passed / 0 failed / 25 warnings** in 965.56
+seconds on Python 3.13.14, run clean on the final tree — unchanged from
+Codex's 4,552, since this round extended globs and a grammar rather than
+adding a test; `git diff
+--check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 continues: the nine
+dual-use modules (partly an owner call), the integration/governance
+partition, the composition ledger, and the owner-gated runtime topology —
+then a fourth dry run. Physical extraction remains unauthorized.
+
+## 7ei. Codex counter-review of Claude's SEP-3 alert review (2026-08-23)
+
+Codex counter-reviewed exact pushed Claude head
+`dabf00f051007527820c14ea0fea404c2ac1a003` on
+`origin/user/claude/review-sep3-alertown-20260823`. The stable remote
+merge-base is implementation head
+`4bea7f9defa10b7599b4de2ff4c25b1b7c808bd2`; the complete ordered Claude
+range is `d7c521d`, `effcdda`, `dabf00f`. The isolated local review branch is
+`codex/counterreview-sep3-alert-ownership-20260823` and must not be pushed as
+a standalone branch.
+
+**Accepted after correction.** `d7c521d` is accepted after correction;
+`effcdda` and `dabf00f` are accepted. No P0, P1, or P2 issue was found.
+CRSEP3A-001 (P3, resolved): Claude's guard correctly recognized `CRSEP...`
+finding IDs, but its direct grammar test asserted only `SEP...` examples, so
+a future deletion of the optional prefix could escape that narrow unit test.
+Correction `ee7d2ed784761d0e04d309a452f87f4ee1a9b2cc` adds the exact
+`CRSEP3R2-001` direction. Removing the prefix recognition then failed the
+focused test as intended; restoring it passed. Counter-review record commit
+`3a129ca` contains the full disposition and P0–P3 ledger.
+
+Independent dry-run validation reproduced candidate `73acf48`, 745 paths,
+inventory SHA-256 `a985372c...fdf9cfd`, destinations 501 / 240 / 4, tests
+83 / 70 / 1 / 54, nine dual-use stranded modules, 11 composition files, six
+Python crossing roots, four non-assistant operator-store importers, pending
+governance ownership, and physical extraction refused. The assistant-owned
+`data.operational_alerts` decision remains honest; its research-hosted callers
+remain explicit composition debt.
+
+Validation on the finalized counter-review tree: focused SEP and active-
+document suites **97 passed** in 345.27 seconds; corrected finding guard 2/2
+passed; reverse mutation 1/1 failed as intended and restored green; complete
+suite **4,552 passed / 0 failed / 25 known warnings** in 1,066.28 seconds on
+Python 3.13.14; compileall including `research/` passed; all architecture JSON
+parsed; the dry-run validator reproduced the exact evidence above; and
+`git diff --check` was clean.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed. Next, create one fresh
+`codex/` implementation branch from this finalized local counter-review tree
+and implement the earliest safe bounded SEP-3 partition item. If a dual-use
+module requires new owner policy, stop rather than expanding the tiny shared
+package or creating a cross-repository product dependency by assumption.
+
+## 7ej. SEP-3 research-statistics ownership tranche (Codex, 2026-08-23)
+
+Fresh implementation branch
+`codex/sep3-research-statistics-ownership-20260823` begins at finalized
+counter-review handoff `afc8dc4`. The standalone counter-review branch remains
+local-only; this implementation branch carries its complete ancestry for the
+single combined Codex push authorized by the owner workflow.
+
+Implementation `8cb47e1714ebea2e93ddd578801d2a953588bef0` assigns
+`data.research_statistics` to strategy research. The assistant no longer
+imports a research-owned service: it performs the same private Bonferroni
+display arithmetic over an already-recorded look count, without defining a
+hypothesis family, evidence result, strategy calculation, or portfolio
+policy. Restoring the assistant-to-research import makes the product-owned-
+service guard fail with the exact offender; the restored tree and threshold
+behavior pass. The deliberately tiny shared package does not grow.
+
+Fourth-dry-run contract `cb0177126080eab8a5479560bba4372e93dba52f`
+pins candidate `8cb47e1`: **747 tracked paths**, inventory SHA-256
+`b22d5c3450a5f00fcbfa035c151bea9cc4443e8211951d0be74bf5c37add5834`,
+assigned exactly once as **503 trading assistant / 240 strategy research / 4
+shared contracts**. The test partition remains **83 assistant / 70 research /
+1 shared / 54 integration**. The stranded set falls from nine to **eight**,
+and every remaining module has importers on both product sides. Documentation
+commit `df34d68` records the bounded sequencing and status change.
+
+Final combined-tree validation: focused research-statistics ownership and
+behavior tests **25 passed**; the complete fourth-dry-run, entry-point and
+research-look set **60 passed** in 319.62 seconds; active-document checks **56
+passed**. The dangerous-direction import mutation failed with the exact
+assistant-to-research offender and the restored direction passed. The
+complete suite then passed **4,552 / 0 failed / 25 known dependency warnings**
+in 1,361.73 seconds on Python 3.13.14. Compileall including `research/`, the
+fourth-dry-run validator, architecture JSON parsing, diff/staged/ordered-
+commit checks, narrow secret-shape scan, exact Claude-head recheck, and shared-
+checkout branch/HEAD/status verification also pass before the one authorized
+push.
+
+SEP-3 is **not complete**. Remaining blockers are eight dual-use data modules,
+11 composition files, six Python crossing roots, four non-assistant operator-
+store importers, 54 integration tests, and pending governance/documentation
+ownership. Physical extraction, repository creation, operator-database or
+installed-task movement, and deployment remain separately owner-gated. No
+provider, credential, licensed row, broker, backtest, outcome, research look,
+evidence epoch, or `paper-epoch-006` state was accessed or changed.
+
+After final validation and exact remote-base checks, push only
+`codex/sep3-research-statistics-ownership-20260823` once. Do not push the
+standalone counter-review branch, main, Claude's branch, a checkpoint, or a
+tag. Then create the next exact-head ten-minute Claude-review alarm.
 
 ## 8. What is next
 

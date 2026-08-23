@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 third dry run pending review; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 fourth dry run pending review; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -533,16 +533,42 @@ Contract commit `984fee3` records the third dry run at exact candidate
 exactly once as **501 trading assistant / 240 strategy research / 4 shared**.
 The test partition remains **83 / 70 / 1 / 54**. The stranded-data blocker
 falls from ten to **nine**, and every remaining module has both assistant and
-research importers. The third dry run is valid but pending independent review
-and is not extraction-ready.
+research importers. The third dry run is valid but not extraction-ready.
 
-Next, independently review this exact candidate, then resolve the nine dual-
-use data modules, integration/governance partition, and owner-gated runtime
-topology. Only after a dry run reports no blocking product crossings may a
-separately authorized migration create the research repository and shared
-package. No repository creation, history rewrite, deployment, credential
-move, scheduled-task change, operator-database move, backtest, or evidence-
-epoch change is authorized by this tranche.
+Claude independently reviewed that exact submission at pushed head `dabf00f`
+and accepted its substance. Codex counter-reviewed all three Claude commits
+and accepted them after one P3 test correction: `ee7d2ed` pins the
+`CRSEP...` grammar direction that Claude's direct test omitted. The complete
+counter-review record is
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-23_SEP3_ALERT_OWNERSHIP.md`.
+
+The fourth bounded implementation candidate is
+`8cb47e1714ebea2e93ddd578801d2a953588bef0`. It makes
+`data.research_statistics` research-owned and removes the assistant product's
+dependency on that research calculation. The assistant keeps identical
+Bonferroni display arithmetic locally for its already-recorded look count; it
+does not define a research family or evidence result. Restoring the
+assistant-to-research import fails the product-owned-service guard, while the
+behavior suite keeps the exact threshold output pinned. The deliberately tiny
+shared package does not grow.
+
+Contract commit `cb0177126080eab8a5479560bba4372e93dba52f` records the
+fourth dry run: **747 paths**, inventory SHA-256
+`b22d5c34...add5834`, assigned exactly once as **503 trading assistant / 240
+strategy research / 4 shared**. Tests remain **83 / 70 / 1 / 54**. The
+stranded-data blocker falls from nine to **eight**; all eight still have both
+assistant and research importers. The 11 composition files, six Python
+crossing roots, four non-assistant operator-store importers, 54 integration
+tests, and governance/documentation ownership remain blocking. Physical
+extraction remains unauthorized.
+
+Next, independently review this exact fourth candidate, then continue the
+eight dual-use data modules, integration/governance partition, and owner-gated
+runtime topology. Only after a dry run reports no blocking product crossings
+may a separately authorized migration create the research repository and
+shared package. No repository creation, history rewrite, deployment,
+credential move, scheduled-task change, operator-database move, backtest, or
+evidence-epoch change is authorized by this tranche.
 
 ## 5. Safety and evidence invariants
 

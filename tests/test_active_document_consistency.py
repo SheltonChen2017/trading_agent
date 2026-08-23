@@ -1416,18 +1416,29 @@ def test_active_acer_docs_do_not_turn_advice_disclaimer_into_research_ban():
 # guard would have kept passing while silently covering nothing current -- a
 # guard that quietly narrows to history is the vacuous-check failure this
 # module exists to prevent. The glob follows the milestone instead of a date.
-_SEPARATION_REVIEW_GLOBS = ("REVIEW_*_SEP2_*.md", "REVIEW_*_SEP3_*.md")
+# SEP3AR-001: counter-review records escaped these globs — "COUNTER_REVIEW_*"
+# does not start with "REVIEW_", so a CRSEP finding raised only in a
+# counter-review could vanish from the current handoff without failing
+# anything. Same risk class as SEP2F-002; measured green across all nine
+# existing counter-review files before extending.
+_SEPARATION_REVIEW_GLOBS = (
+    "REVIEW_*_SEP2_*.md",
+    "REVIEW_*_SEP3_*.md",
+    "COUNTER_REVIEW_*_SEP2_*.md",
+    "COUNTER_REVIEW_*_SEP3_*.md",
+)
 # CRSEP3R-001: one optional letter recognized SEP3X-001 but silently ignored
 # multi-part round identifiers such as SEP3CR-001 and SEP3CR2-002. Those forms
 # already occur in adjacent separation review chains, so the guard must parse
 # the complete milestone-local suffix rather than the one example it mutated.
-_FINDING_ID = re.compile(r"\bSEP[23][A-Z0-9]*-\d{3}\b")
+_FINDING_ID = re.compile(r"\b(?:CR)?SEP[23][A-Z0-9]*-\d{3}\b")
 
 
 def test_separation_finding_id_pattern_accepts_multi_part_round_ids():
     assert _FINDING_ID.fullmatch("SEP2F-004")
     assert _FINDING_ID.fullmatch("SEP3CR-001")
     assert _FINDING_ID.fullmatch("SEP3CR2-002")
+    assert _FINDING_ID.fullmatch("CRSEP3R2-001")
 
 
 def _separation_review_reports() -> list[Path]:

@@ -1438,6 +1438,7 @@ def test_separation_finding_id_pattern_accepts_multi_part_round_ids():
     assert _FINDING_ID.fullmatch("SEP2F-004")
     assert _FINDING_ID.fullmatch("SEP3CR-001")
     assert _FINDING_ID.fullmatch("SEP3CR2-002")
+    assert _FINDING_ID.fullmatch("CRSEP3R2-001")
 
 
 def _separation_review_reports() -> list[Path]:

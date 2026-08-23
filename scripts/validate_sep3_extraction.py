@@ -232,11 +232,56 @@ def _partition_tests(
     return surfaces
 
 
-def _stranded_data_modules(
+def _data_module_importers(
     paths: list[str],
     commit: str,
     manifest: dict[str, Any],
     entry_points: dict[str, Any],
+) -> dict[str, dict[str, list[str]]]:
+    """Return exact product-side importers for every assigned data module.
+
+    CRSEP3R2-001: the independent review correctly found the stranded module
+    set, but its supporting claim said only five modules were used by both
+    products. Exact measurement shows nine: only ``data.operational_alerts``
+    is assistant-only under the declared package/owned-script scope. Pinning
+    both sides prevents a future partition decision from treating a dual-use
+    module as a simple ownership reassignment.
+    """
+    assigned_modules = {
+        path.removesuffix(".py").replace("/", ".")
+        for files in manifest["data_destination"].values()
+        for path in files
+    }
+    ownership = entry_points["script_ownership"]
+    side_prefixes = {
+        side: list(manifest["product_roots"][side])
+        + list(manifest["product_top_level_files"][side])
+        + [path for path in ownership[side] if path.endswith(".py")]
+        for side in ("trading_assistant", "strategy_research")
+    }
+
+    importers: dict[str, dict[str, set[str]]] = {}
+    for side, prefixes in side_prefixes.items():
+        for path in paths:
+            if not path.endswith(".py"):
+                continue
+            if not any(_starts_with_root(path, prefix) for prefix in prefixes):
+                continue
+            for imported in _imported_modules(_commit_text(commit, path), path):
+                module = ".".join(imported.split(".")[:2])
+                if module in assigned_modules:
+                    importers.setdefault(module, {}).setdefault(side, set()).add(path)
+    return {
+        module: {
+            side: sorted(files) for side, files in sorted(sides.items())
+        }
+        for module, sides in sorted(importers.items())
+    }
+
+
+def _stranded_data_modules(
+    manifest: dict[str, Any],
+    importers: dict[str, dict[str, list[str]]],
 ) -> dict[str, list[str]]:
     """Data modules destined to one product while the other still imports them.
 
@@ -254,31 +299,17 @@ def _stranded_data_modules(
     for product, files in manifest["data_destination"].items():
         for path in files:
             destination[path.removesuffix(".py").replace("/", ".")] = product
-
-    ownership = entry_points["script_ownership"]
-    side_prefixes = {
-        side: list(manifest["product_roots"][side])
-        + [path for path in ownership[side] if path.endswith(".py")]
-        for side in ("trading_assistant", "strategy_research")
-    }
-
-    stranded: dict[str, set[str]] = {}
-    for side, prefixes in side_prefixes.items():
-        other = (
-            "strategy_research"
-            if side == "trading_assistant"
-            else "trading_assistant"
+    stranded: dict[str, list[str]] = {}
+    for module, sides in importers.items():
+        wrong_side_files = sorted(
+            path
+            for side, files in sides.items()
+            if side != destination[module]
+            for path in files
         )
-        for path in paths:
-            if not path.endswith(".py"):
-                continue
-            if not any(_starts_with_root(path, prefix) for prefix in prefixes):
-                continue
-            for module in _imported_modules(_commit_text(commit, path), path):
-                key = ".".join(module.split(".")[:2])
-                if destination.get(key) == other:
-                    stranded.setdefault(key, set()).add(path)
-    return {module: sorted(files) for module, files in sorted(stranded.items())}
+        if wrong_side_files:
+            stranded[module] = wrong_side_files
+    return stranded
 
 
 def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
@@ -416,12 +447,25 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
                 f"stale extraction blocker {name}: declared={blockers[name]}, measured={value}"
             )
 
-    stranded = _stranded_data_modules(paths, commit, manifest, entry_points)
+    data_importers = _data_module_importers(paths, commit, manifest, entry_points)
+    stranded = _stranded_data_modules(manifest, data_importers)
     declared_stranded = blockers["stranded_data_modules"]
     if sorted(declared_stranded) != sorted(stranded):
         raise ExtractionValidationError(
             "stale extraction blocker stranded_data_modules: "
             f"declared={sorted(declared_stranded)}, measured={sorted(stranded)}"
+        )
+
+    declared_importer_sides = blockers["stranded_data_module_importer_sides"]
+    measured_importer_sides = {
+        module: sorted(sides)
+        for module, sides in data_importers.items()
+        if module in stranded
+    }
+    if declared_importer_sides != measured_importer_sides:
+        raise ExtractionValidationError(
+            "stale extraction blocker stranded_data_module_importer_sides: "
+            f"declared={declared_importer_sides}, measured={measured_importer_sides}"
         )
 
     ownership_counts = {
@@ -462,6 +506,7 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
                 "governance_support_partition"
             ],
             "stranded_data_modules": sorted(stranded),
+            "stranded_data_module_importer_sides": measured_importer_sides,
         },
         "physical_extraction_authorized": False,
     }

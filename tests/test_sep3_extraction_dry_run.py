@@ -69,6 +69,7 @@ def test_second_extraction_dry_run_is_exact_and_not_authorized():
         # SEP3R-001: the partition strands ten assistant-needed data modules
         # in the research repository; see the dedicated test below.
         "stranded_data_modules": _STRANDED_DATA_MODULES,
+        "stranded_data_module_importer_sides": _STRANDED_IMPORTER_SIDES,
     }
     assert result["surfaces"]["shared_contract_test_files"] == 1
 
@@ -174,6 +175,13 @@ _STRANDED_DATA_MODULES = [
     "data.runtime_identity",
 ]
 
+_DUAL_USE_SIDES = ["strategy_research", "trading_assistant"]
+_STRANDED_IMPORTER_SIDES = {
+    module: _DUAL_USE_SIDES
+    for module in _STRANDED_DATA_MODULES
+    if module != "data.operational_alerts"
+} | {"data.operational_alerts": ["trading_assistant"]}
+
 
 def test_stranded_data_modules_are_measured_declared_and_blocking():
     """SEP3R-001. The declared partition must not strand a product's imports.
@@ -191,6 +199,13 @@ def test_stranded_data_modules_are_measured_declared_and_blocking():
     result = validate()
     assert result["blockers"]["stranded_data_modules"] == _STRANDED_DATA_MODULES
     assert "data.mandate_evaluation" in result["blockers"]["stranded_data_modules"]
+    assert result["blockers"]["stranded_data_module_importer_sides"] == (
+        _STRANDED_IMPORTER_SIDES
+    )
+    assert sum(
+        sides == _DUAL_USE_SIDES
+        for sides in result["blockers"]["stranded_data_module_importer_sides"].values()
+    ) == 9
     assert result["physical_extraction_authorized"] is False
 
 
@@ -216,5 +231,18 @@ def test_overdeclared_stranded_module_is_refused(tmp_path: Path):
     with pytest.raises(
         ExtractionValidationError,
         match="stale extraction blocker stranded_data_modules",
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_incorrect_stranded_importer_side_is_refused(tmp_path: Path):
+    """A dual-use module cannot be presented as a simple reassignment."""
+    manifest = _manifest()
+    manifest["known_blockers"]["stranded_data_module_importer_sides"][
+        "data.runtime_identity"
+    ] = ["trading_assistant"]
+    with pytest.raises(
+        ExtractionValidationError,
+        match="stale extraction blocker stranded_data_module_importer_sides",
     ):
         validate(_write_manifest(tmp_path, manifest))

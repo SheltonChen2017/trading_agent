@@ -168,6 +168,47 @@
       "data.research_statistics",
       "data.runtime_identity"
     ],
+    "stranded_data_module_importer_sides": {
+      "data.filing_extraction": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.macro_data": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.mandate_evaluation": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.market_data": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.operational_alerts": [
+        "trading_assistant"
+      ],
+      "data.portfolio_mandate": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.portfolio_metrics": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.price_target_data": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.research_statistics": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.runtime_identity": [
+        "strategy_research",
+        "trading_assistant"
+      ]
+    },
     "stranded_data_modules_note": "SEP3R-001: these data modules are destined to strategy_research while trading-assistant packages or assistant-owned scripts import them \u2014 the mandate-fingerprint pair, runtime identity, and the alert writer among them. Executed as declared, the extraction would break the assistant at import time or force the cross-repository dependency the plan's objective forbids. The validator measures this set from the candidate commit and refuses a stale declaration; resolving each module (shared package, assistant ownership, or a removed import) is partition design work for a later reviewed tranche, not a reviewer's unilateral call."
   },
   "physical_extraction_authorized": false

@@ -6904,6 +6904,66 @@ After the final clean-tree and remote-base checks, push only
 standalone counter-review branch, main, Claude's branch, a checkpoint, or a
 tag.
 
+## 7eh. Independent review of the SEP-3 alert-ownership tranche (Claude, 2026-08-23)
+
+Branch `user/claude/review-sep3-alertown-20260823`, created from the exact
+fetched remote head `4bea7f9` on
+`origin/codex/sep3-operational-alert-ownership-20260823`, based on my prior
+review head `717b014`. All seven commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-23_SEP3_ALERT_OWNERSHIP.md`.
+PR #305 merged this branch to `main` as `802ed34` **while the review was in
+flight**; the merged tree is byte-identical to the reviewed head.
+
+**Accepted. No findings against the submission's substance.**
+
+**Codex's CRSEP3R2-001 against my previous round is correct, reproduced with
+my own census.** My review said five of the ten stranded modules were
+dual-use; the true count is **nine**, with only `data.operational_alerts`
+assistant-only. My error, stated precisely: the review table's dual-use
+column came from my first measurement pass (packages only) while the stranded
+set came from the second (packages plus owned scripts) — I published a
+composite of two scopes without noticing they disagreed. The blocker still
+failed closed; the miscount could only have misled a later reassignment,
+which is exactly what Codex's importer-side ledger now prevents.
+
+**The tranche's substance verified:** the `operational_alerts` reassignment
+is the one move the import graph already decides — it becomes an
+assistant-owned `product_owned_service` with a written rationale, the two
+research-hosted runners that call it are composition-ledger debt and say so,
+and nine genuinely dual-use modules remain blocking. Mutations:
+`ml/monitoring.py` importing the service fails the new ownership guard;
+falsifying an importer side and deleting a sides entry both make the
+validator refuse. Third dry-run counts reproduce on my own run (candidate
+`73acf48`, 745 paths, 501 / 240 / 4, tests 83 / 70 / 1 / 54, extraction
+refused). Focused suites 41 passed.
+
+**Two items landed with this review, neither against the tranche.**
+SEP3AR-001 (P3, mine): counter-review records escaped the separation
+finding-ID guard (`COUNTER_REVIEW_*` does not start with `REVIEW_`), the same
+risk class as SEP2F-002; measured green across all nine counter-review files
+before extending the globs and grammar, and mutation-verified by dropping
+`CRSEP3R2-001` from this handoff. And a CCR-005 post-merge correction:
+PR #305 made section 7eg's "unpushed counter-review commits" sentence false
+by construction the moment it landed; the reachability guard caught it on my
+first doc-guard run and the sentence now records the merge — the third time
+this session a merge outran a record, caught by the guard rather than
+vigilance.
+
+Validation on the final tree: doc guards 56 passed; focused SEP suites 41
+passed; complete suite **4,552 passed / 0 failed / 25 warnings** —
+unchanged from Codex's 4,552, since this round extended globs and a
+grammar rather than adding a test; `git diff
+--check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 continues: the nine
+dual-use modules (partly an owner call), the integration/governance
+partition, the composition ledger, and the owner-gated runtime topology —
+then a fourth dry run. Physical extraction remains unauthorized.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

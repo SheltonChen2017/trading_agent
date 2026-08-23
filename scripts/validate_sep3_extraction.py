@@ -11,7 +11,7 @@ import argparse
 import ast
 import hashlib
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import subprocess
 import sys
 from typing import Any
@@ -75,6 +75,29 @@ def _module_roots(source: str, path: str, *, enforce_static: bool = True) -> set
     return roots
 
 
+def _imported_modules(source: str, path: str) -> set[str]:
+    """Return full static import names, expanding ``from parent import child``.
+
+    Root-only scanning cannot distinguish the three shared ``data`` contracts
+    from product-owned ``data`` implementations. The support partition needs
+    the full names so research provider tests cannot leak into the tiny shared
+    package merely because both begin with ``data``.
+    """
+    tree = ast.parse(source, filename=path)
+    modules: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            modules.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            modules.add(node.module)
+            modules.update(
+                f"{node.module}.{alias.name}"
+                for alias in node.names
+                if alias.name != "*"
+            )
+    return modules
+
+
 def _inventory(commit: str) -> list[str]:
     paths = _git("ls-tree", "-r", "--name-only", commit).splitlines()
     if paths != sorted(paths):
@@ -94,6 +117,7 @@ def _classify(
     path: str,
     manifest: dict[str, Any],
     entry_points: dict[str, Any],
+    test_destinations: dict[str, str],
 ) -> tuple[str, str]:
     matches: list[tuple[str, str]] = []
     shared = manifest["shared_contracts"]["source_to_package"]
@@ -124,7 +148,9 @@ def _classify(
         matches.append((destination, f"composition host {host}"))
 
     support = manifest["support_paths"]
-    if path in support["exact_files"] or any(
+    if path in test_destinations:
+        matches.append((test_destinations[path], "pinned test partition"))
+    elif path in support["exact_files"] or any(
         path.startswith(prefix) for prefix in support["prefixes"]
     ):
         matches.append((support["destination"], "migration support"))
@@ -136,6 +162,74 @@ def _classify(
             f"{path} must have exactly one destination, got {matches!r}"
         )
     return matches[0]
+
+
+def _partition_tests(
+    paths: list[str],
+    commit: str,
+    manifest: dict[str, Any],
+    entry_points: dict[str, Any],
+) -> dict[str, list[str]]:
+    """Classify Python tests by the product roots they exercise.
+
+    Product-pure tests follow their product. Tests that exercise both products
+    stay with the source/trading-assistant repository as explicit integration
+    debt until the physical extraction is separately authorized. A test that
+    exercises only the tiny shared contracts follows that package.
+    """
+    surfaces = {
+        "trading_assistant": [],
+        "strategy_research": [],
+        "shared_contracts": [],
+        "integration": [],
+    }
+    owned_modules: dict[str, set[str]] = {}
+
+    def own(module: str, *destinations: str) -> None:
+        owned_modules.setdefault(module, set()).update(destinations)
+
+    for destination, roots in manifest["product_roots"].items():
+        for root in roots:
+            own(root.replace("/", "."), destination)
+    for destination, files in manifest["product_top_level_files"].items():
+        for path in files:
+            own(path.removesuffix(".py").replace("/", "."), destination)
+    for destination, files in manifest["data_destination"].items():
+        for path in files:
+            own(path.removesuffix(".py").replace("/", "."), destination)
+    for path in manifest["shared_contracts"]["source_to_package"]:
+        own(path.removesuffix(".py").replace("/", "."), "shared_contracts")
+    ownership = entry_points["script_ownership"]
+    for path in ownership["trading_assistant"]:
+        own(path.removesuffix(".py").replace("/", "."), "trading_assistant")
+    for path in ownership["strategy_research"]:
+        own(path.removesuffix(".py").replace("/", "."), "strategy_research")
+    for path in ownership["cross_product_composition"]:
+        own(
+            path.removesuffix(".py").replace("/", "."),
+            "trading_assistant",
+            "strategy_research",
+        )
+
+    for path in paths:
+        if not path.startswith("tests/") or not path.endswith(".py"):
+            continue
+        modules = _imported_modules(_commit_text(commit, path), path)
+        destinations: set[str] = set()
+        for module in modules:
+            for owned_module, owners in owned_modules.items():
+                if module == owned_module or module.startswith(owned_module + "."):
+                    destinations.update(owners)
+        if destinations == {"trading_assistant"}:
+            bucket = "trading_assistant"
+        elif destinations == {"strategy_research"}:
+            bucket = "strategy_research"
+        elif destinations == {"shared_contracts"}:
+            bucket = "shared_contracts"
+        else:
+            bucket = "integration"
+        surfaces[bucket].append(path)
+    return surfaces
 
 
 def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
@@ -159,15 +253,41 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     entry_points = _commit_json(commit, manifest["script_ownership_source"])
     boundaries = _commit_json(commit, "architecture/project_boundaries.json")
     operator = _commit_json(commit, "architecture/operator_database_access.json")
+    test_surfaces = _partition_tests(paths, commit, manifest, entry_points)
+    support_partition = manifest["support_partition"]
+    expected_counts = support_partition["test_counts"]
+    actual_counts = {name: len(items) for name, items in test_surfaces.items()}
+    expected_hashes = support_partition["test_inventory_sha256"]
+    actual_hashes = {
+        name: _inventory_sha256(items) for name, items in test_surfaces.items()
+    }
+    integration = test_surfaces["integration"]
+    if support_partition["integration_destination"] != "trading_assistant":
+        raise ExtractionValidationError(
+            "integration tests must remain in the source repository until extraction"
+        )
+    bucket_destinations = {
+        "trading_assistant": "trading_assistant",
+        "strategy_research": "strategy_research",
+        "shared_contracts": "shared_contracts",
+        "integration": support_partition["integration_destination"],
+    }
+    test_destinations = {
+        path: bucket_destinations[bucket]
+        for bucket, items in test_surfaces.items()
+        for path in items
+    }
     assignments: dict[str, str] = {}
     reasons: dict[str, str] = {}
     targets: dict[tuple[str, str], str] = {}
     shared_map = manifest["shared_contracts"]["source_to_package"]
     for path in paths:
-        destination, reason = _classify(path, manifest, entry_points)
+        destination, reason = _classify(
+            path, manifest, entry_points, test_destinations
+        )
         if destination not in DESTINATIONS:
             raise ExtractionValidationError(f"unknown destination for {path}")
-        target = shared_map[path] if destination == "shared_contracts" else path
+        target = shared_map[path] if path in shared_map else path
         key = (destination, target.casefold())
         if key in targets:
             raise ExtractionValidationError(
@@ -207,6 +327,29 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         if not candidates or any(assignments[p] != "strategy_research" for p in candidates):
             raise ExtractionValidationError(f"licensed surface escaped research: {surface}")
 
+    # Check the support partition after the primary authority/licensed-data
+    # invariants so their dangerous-direction tests continue to prove the
+    # intended boundary rather than failing incidentally on a derived test
+    # bucket. Partition drift remains fail-closed on an otherwise valid tree.
+    if actual_counts != expected_counts or actual_hashes != expected_hashes:
+        raise ExtractionValidationError(
+            "test support partition drifted: "
+            f"counts={actual_counts!r}, hashes={actual_hashes!r}"
+        )
+    if support_partition["integration_test_files"] != len(integration):
+        raise ExtractionValidationError("stale integration-test blocker count")
+    shared_contract_tests = test_surfaces["shared_contracts"]
+    if support_partition["shared_contract_test_files"] != len(shared_contract_tests):
+        raise ExtractionValidationError("stale shared-contract test count")
+    if (
+        not shared_contract_tests
+        and support_partition["shared_contract_test_status"]
+        != "pending-dedicated-package-tests"
+    ):
+        raise ExtractionValidationError(
+            "missing shared-contract tests must remain an explicit blocker"
+        )
+
     blockers = manifest["known_blockers"]
     measured = {
         "composition_files": len(entry_points["script_ownership"]["cross_product_composition"]),
@@ -218,27 +361,6 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             raise ExtractionValidationError(
                 f"stale extraction blocker {name}: declared={blockers[name]}, measured={value}"
             )
-
-    test_surfaces = {"trading_assistant": [], "strategy_research": [], "shared_contracts": [], "integration": []}
-    assistant_roots = {root.split("/", 1)[0] for root in manifest["product_roots"]["trading_assistant"]}
-    research_roots = {root.split("/", 1)[0] for root in manifest["product_roots"]["strategy_research"]} | {"baskets"}
-    shared_roots = {PurePosixPath(path).stem for path in shared_map}
-    for path in paths:
-        if not path.startswith("tests/") or not path.endswith(".py"):
-            continue
-        roots = _module_roots(_commit_text(commit, path), path, enforce_static=False)
-        touches_assistant = bool(roots & assistant_roots)
-        touches_research = bool(roots & research_roots)
-        touches_shared = bool(roots & shared_roots) or "data" in roots
-        if touches_assistant and not touches_research:
-            bucket = "trading_assistant"
-        elif touches_research and not touches_assistant:
-            bucket = "strategy_research"
-        elif touches_shared and not touches_assistant and not touches_research:
-            bucket = "shared_contracts"
-        else:
-            bucket = "integration"
-        test_surfaces[bucket].append(path)
 
     ownership_counts = {
         name: len(entry_points["script_ownership"][name])
@@ -267,13 +389,19 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             "script_ownership_counts": ownership_counts,
             "launch_counts": launch_counts,
             "dependency_manifests": manifest["dependency_surfaces"],
-            "test_counts": {name: len(items) for name, items in test_surfaces.items()},
-            "test_inventory_sha256": {
-                name: _inventory_sha256(items) for name, items in test_surfaces.items()
-            },
+            "test_counts": actual_counts,
+            "test_inventory_sha256": actual_hashes,
         },
         "blockers": measured | {
-            "support_surface_partition": blockers["support_surface_partition"]
+            "support_surface_partition": blockers["support_surface_partition"],
+            "integration_test_files": len(integration),
+            "shared_contract_test_files": len(shared_contract_tests),
+            "shared_contract_test_surface": blockers[
+                "shared_contract_test_surface"
+            ],
+            "governance_support_partition": blockers[
+                "governance_support_partition"
+            ],
         },
         "physical_extraction_authorized": False,
     }

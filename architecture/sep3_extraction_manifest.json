@@ -82,13 +82,38 @@
       ".gitignore", "AGENTS.md", "CLAUDE.md", "HOW_TO_USE.md", "README.md",
       "pytest.ini", "requirements.txt"
     ],
-    "note": "This first dry run keeps governance, integration tests and migration tooling with the source repository. Product-pure tests and documents must be reassigned before physical extraction."
+    "note": "Governance, integration tests and migration tooling remain with the source repository. Python tests are reassigned by the exact support_partition below; non-test documentation still requires product ownership before physical extraction."
+  },
+  "support_partition": {
+    "status": "product-pure-tests-pinned-integration-explicit",
+    "classification": "static-first-party-import-roots-at-reviewed-source",
+    "test_counts": {
+      "trading_assistant": 82,
+      "strategy_research": 70,
+      "shared_contracts": 0,
+      "integration": 54
+    },
+    "test_inventory_sha256": {
+      "trading_assistant": "600ce5936777b7565e83c5b4df73b9604f95c2c8d64744beb0f4eba9fcc47fea",
+      "strategy_research": "0240723aa37db873c1e1e3630f1ddbe9f484f8b20fcb5b61b3b32be75dac3fd1",
+      "shared_contracts": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "integration": "5a3894e1770cbf1f92a041b54daa36c6d4f5fb8bb022436d8e2c42a9bc46dfe1"
+    },
+    "integration_test_files": 54,
+    "integration_destination": "trading_assistant",
+    "integration_disposition": "blocking-shrinking-debt-until-physical-extraction",
+    "shared_contract_test_files": 0,
+    "shared_contract_test_status": "pending-dedicated-package-tests",
+    "non_python_test_assets_destination": "trading_assistant",
+    "governance_and_documentation_status": "pending-product-ownership"
   },
   "known_blockers": {
     "composition_files": 11,
     "python_crossing_roots": 6,
     "operator_database_importers": 4,
-    "support_surface_partition": "pending",
+    "support_surface_partition": "product-pure-tests-pinned-integration-explicit",
+    "shared_contract_test_surface": "pending",
+    "governance_support_partition": "pending",
     "installed_task_paths": "unchanged",
     "operator_database_move": "not-authorized",
     "paper_epoch_006": "must-remain-untouched"

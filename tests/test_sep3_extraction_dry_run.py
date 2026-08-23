@@ -11,6 +11,7 @@ from scripts.validate_sep3_extraction import (
     DEFAULT_MANIFEST,
     ExtractionValidationError,
     _git,
+    _imported_modules,
     validate,
 )
 
@@ -35,8 +36,8 @@ def test_reviewed_extraction_dry_run_is_exact_and_not_authorized():
         "assigned_exactly_once": True,
         "destination_counts": {
             "shared_contracts": 3,
-            "strategy_research": 171,
-            "trading_assistant": 560,
+            "strategy_research": 241,
+            "trading_assistant": 490,
         },
     }
     assert result["physical_extraction_authorized"] is False
@@ -54,7 +55,13 @@ def test_reviewed_extraction_dry_run_is_exact_and_not_authorized():
         "composition_files": 11,
         "python_crossing_roots": 6,
         "operator_database_importers": 4,
-        "support_surface_partition": "pending",
+        "support_surface_partition": (
+            "product-pure-tests-pinned-integration-explicit"
+        ),
+        "integration_test_files": 54,
+        "shared_contract_test_files": 0,
+        "shared_contract_test_surface": "pending",
+        "governance_support_partition": "pending",
     }
 
 
@@ -105,3 +112,42 @@ def test_shared_target_path_collision_is_refused(tmp_path: Path):
     ] = "agent_contracts/evidence_status.py"
     with pytest.raises(ExtractionValidationError, match="target collision"):
         validate(_write_manifest(tmp_path, manifest))
+
+
+def test_test_partition_count_drift_is_refused(tmp_path: Path):
+    manifest = _manifest()
+    manifest["support_partition"]["test_counts"]["integration"] -= 1
+    with pytest.raises(ExtractionValidationError, match="test support partition drifted"):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_test_partition_hash_drift_is_refused(tmp_path: Path):
+    manifest = _manifest()
+    manifest["support_partition"]["test_inventory_sha256"]["strategy_research"] = (
+        "0" * 64
+    )
+    with pytest.raises(ExtractionValidationError, match="test support partition drifted"):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_integration_tests_cannot_be_hidden_in_research(tmp_path: Path):
+    manifest = _manifest()
+    manifest["support_partition"]["integration_destination"] = "strategy_research"
+    with pytest.raises(
+        ExtractionValidationError,
+        match="integration tests must remain in the source repository",
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_full_import_names_distinguish_shared_contracts_from_product_data():
+    modules = _imported_modules(
+        "from data import financial_primitives, macro_data\n"
+        "from data.price_target_data import fetch_price_targets\n",
+        "synthetic_test.py",
+    )
+    assert modules >= {
+        "data.financial_primitives",
+        "data.macro_data",
+        "data.price_target_data",
+    }

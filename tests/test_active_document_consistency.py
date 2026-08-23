@@ -1417,10 +1417,20 @@ def test_active_acer_docs_do_not_turn_advice_disclaimer_into_research_ban():
 # guard that quietly narrows to history is the vacuous-check failure this
 # module exists to prevent. The glob follows the milestone instead of a date.
 _SEPARATION_REVIEW_GLOBS = ("REVIEW_*_SEP2_*.md", "REVIEW_*_SEP3_*.md")
-_FINDING_ID = re.compile(r"\bSEP[23][A-Z]?-\d{3}\b")
+# CRSEP3R-001: one optional letter recognized SEP3X-001 but silently ignored
+# multi-part round identifiers such as SEP3CR-001 and SEP3CR2-002. Those forms
+# already occur in adjacent separation review chains, so the guard must parse
+# the complete milestone-local suffix rather than the one example it mutated.
+_FINDING_ID = re.compile(r"\bSEP[23][A-Z0-9]*-\d{3}\b")
 
 
-def _sep2_review_reports() -> list[Path]:
+def test_separation_finding_id_pattern_accepts_multi_part_round_ids():
+    assert _FINDING_ID.fullmatch("SEP2F-004")
+    assert _FINDING_ID.fullmatch("SEP3CR-001")
+    assert _FINDING_ID.fullmatch("SEP3CR2-002")
+
+
+def _separation_review_reports() -> list[Path]:
     review_dir = ROOT / "docs" / "Archive" / "Review"
     found: set[Path] = set()
     for pattern in _SEPARATION_REVIEW_GLOBS:
@@ -1428,14 +1438,16 @@ def _sep2_review_reports() -> list[Path]:
     return sorted(found)
 
 
-def test_sep2_review_reports_exist_so_this_guard_cannot_pass_vacuously():
-    assert _sep2_review_reports(), "no SEP-2 review report found; the guard would be vacuous"
+def test_separation_review_reports_exist_so_this_guard_cannot_pass_vacuously():
+    assert _separation_review_reports(), (
+        "no separation review report found; the guard would be vacuous"
+    )
 
 
-def test_every_sep2_review_finding_appears_in_the_current_handoff():
+def test_every_separation_review_finding_appears_in_the_current_handoff():
     handoff = _text("SESSION_HANDOFF.md")
     missing: dict[str, list[str]] = {}
-    for report in _sep2_review_reports():
+    for report in _separation_review_reports():
         ids = {
             match
             for match in _FINDING_ID.findall(report.read_text(encoding="utf-8"))
@@ -1444,6 +1456,6 @@ def test_every_sep2_review_finding_appears_in_the_current_handoff():
         if absent:
             missing[report.name] = absent
     assert missing == {}, (
-        "a SEP-2 review report raises findings the current handoff never "
+        "a separation review report raises findings the current handoff never "
         f"mentions: {missing!r}"
     )

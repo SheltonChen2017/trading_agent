@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 dry run validated; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 third dry run pending review; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -462,7 +462,7 @@ trading-assistant source; the intended research location is
 local shared-package install, while durable use must pin an exact package
 version and source commit. Git submodules are excluded.
 
-The first bounded tranche is implemented by
+The first bounded tranche was implemented by
 `architecture/sep3_extraction_manifest.json` and
 `scripts/validate_sep3_extraction.py`. It validates exact reviewed source
 commit `e642469d`, all 734 tracked paths, a three-file shared allowlist, exact
@@ -473,12 +473,76 @@ extraction**: 11 composition files, six Python crossing roots, four research-
 hosted operator-database importers, and the product partition of governance,
 integration tests and documentation remain open.
 
-Next, reduce those exact residuals and split the support/test surface on a
-reviewed branch. Only after a second dry run reports no blocking product
-crossings may a separately authorized migration create the research repository
-and shared package. No repository deletion, history rewrite, deployment,
-credential move, scheduled-task change, operator-database move, backtest, or
-evidence-epoch change is authorized by this tranche.
+The second bounded tranche is recorded at implementation commit `b15aac8` and
+dry-run contract commit `4e1aae4`. It corrects the first validator's root-only
+test heuristic: treating every `data.*` import as shared had falsely assigned
+research-owned macro and price-target tests to the tiny package. Full imported
+module names now resolve against the exact product, data and script ownership
+manifests. The candidate inventory is **743 paths** with SHA-256
+`32590d8b...d32282`, assigned exactly once as **498 trading assistant / 241
+strategy research / 4 shared-contracts** paths. Python tests are hash-pinned as
+**83 assistant-pure / 70 research-pure / 1 shared-contract / 54 integration**;
+the shared package now has a dedicated behavior suite rather than borrowed
+product tests.
+
+This is a valid second dry run, but deliberately **not extraction-ready**.
+The 54 integration tests and governance/documentation ownership remain
+explicit support blockers, and the runtime residuals remain exactly 11
+composition files, six Python crossing roots and four research-hosted operator-
+database importers. Those runtime residuals are tied to the separately gated
+database, installed-task and physical-repository topology; this tranche does
+not disguise them as interfaces or silently reclassify them.
+
+Independent review of the candidate (2026-08-23, accepted after correction)
+found one residual the dry runs had not measured: **ten `data` modules are
+destined to the research repository while trading-assistant packages or
+assistant-owned scripts import them** (SEP3R-001) — among them
+`data.mandate_evaluation` and `data.portfolio_mandate` (the owner-approved
+mandate fingerprint), `data.runtime_identity` (evidence lineage) and
+`data.operational_alerts`. Executed as declared, the extraction would break
+the assistant at import time or force the cross-repository dependency this
+plan's own objective forbids. Both dry runs had passed silently on this; the
+validator now measures the stranded set from the candidate commit, requires
+the manifest to declare it exactly (over- and under-declaration both refuse),
+reports it as a named blocker, and the set is pinned by regression tests.
+Resolving each module — shared package, assistant ownership, or a removed
+import — is partition design work for a later reviewed tranche, not a
+reviewer's unilateral call; note the tiny-package route is closed for
+`data.market_data`-class modules, whose vendor imports the shared allowlist
+correctly refuses. See
+`docs/Archive/Review/REVIEW_2026-08-23_SEP3_RESIDUAL_REDUCTION.md`.
+
+Codex counter-reviewed Claude's exact pushed head `717b014` and accepted both
+review commits after one P3 correction. Claude's ten-module stranded set was
+correct, but the review understated dual use: exact importer-side measurement
+shows **nine** modules are imported by both products; only
+`data.operational_alerts` is assistant-only. Correction `80819d6` pins the
+exact side ledger and refuses a stale or understated declaration. See
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-23_SEP3_RESIDUAL_REDUCTION.md`.
+
+The next bounded implementation commit `73acf48` therefore makes the one
+ownership decision the measured graph already determines:
+`data.operational_alerts` is an assistant-owned operational service. Product-
+owned research code is permanently forbidden from importing it; the existing
+research-hosted composition runners remain explicit composition debt rather
+than being silently reclassified. Compatibility identity and runtime behavior
+are unchanged.
+
+Contract commit `984fee3` records the third dry run at exact candidate
+`73acf48`: **745 paths**, inventory SHA-256 `a985372c...fdf9cfd`, assigned
+exactly once as **501 trading assistant / 240 strategy research / 4 shared**.
+The test partition remains **83 / 70 / 1 / 54**. The stranded-data blocker
+falls from ten to **nine**, and every remaining module has both assistant and
+research importers. The third dry run is valid but pending independent review
+and is not extraction-ready.
+
+Next, independently review this exact candidate, then resolve the nine dual-
+use data modules, integration/governance partition, and owner-gated runtime
+topology. Only after a dry run reports no blocking product crossings may a
+separately authorized migration create the research repository and shared
+package. No repository creation, history rewrite, deployment, credential
+move, scheduled-task change, operator-database move, backtest, or evidence-
+epoch change is authorized by this tranche.
 
 ## 5. Safety and evidence invariants
 

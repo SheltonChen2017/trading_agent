@@ -623,6 +623,8 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
         ownership["package_markers"]
         + ownership["neutral_contracts"]
         + ownership["provider_neutral_services"]
+        + ownership["product_owned_services"]["trading_assistant"]
+        + ownership["product_owned_services"]["strategy_research"]
         + ownership["product_owned_provider_implementations"]["trading_assistant"]
         + ownership["product_owned_provider_implementations"]["strategy_research"]
         + ownership["shared_provider_debt"]
@@ -654,7 +656,60 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
         ownership["provider_neutral_services"]
     )
     assert all(ownership["provider_neutral_rationales"].values())
+    assert ownership["product_owned_services"] == {
+        "trading_assistant": ["data/operational_alerts.py"],
+        "strategy_research": [],
+    }
+    assert set(ownership["product_owned_service_rationales"]) == {
+        "data/operational_alerts.py"
+    }
+    assert all(ownership["product_owned_service_rationales"].values())
     assert ownership["shared_provider_debt"] == []
+
+
+def test_product_owned_services_do_not_cross_product_owned_sources():
+    """SEP3A-001. Composition debt is explicit; owned products stay clean."""
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    boundaries = _json(BOUNDARY_MANIFEST)
+    services = {
+        product: {
+            path.removesuffix(".py").replace("/", ".")
+            for path in paths
+        }
+        for product, paths in manifest["data_ownership"][
+            "product_owned_services"
+        ].items()
+    }
+
+    for product in ("trading_assistant", "strategy_research"):
+        other = (
+            "strategy_research"
+            if product == "trading_assistant"
+            else "trading_assistant"
+        )
+        paths = {
+            path
+            for root in boundaries["products"][product]["owned_roots"]
+            for path in (
+                [ROOT / root]
+                if (ROOT / root).is_file()
+                else _source_files(ROOT / root, "*.py")
+            )
+        }
+        paths.update(
+            ROOT / relative
+            for relative in manifest["script_ownership"][product]
+            if relative.endswith(".py")
+        )
+        forbidden = services[other]
+        offenders = {
+            _relative(path): sorted(_imported_modules(path) & forbidden)
+            for path in paths
+            if _imported_modules(path) & forbidden
+        }
+        assert offenders == {}, (
+            f"{product} imports {other}-owned services: {offenders!r}"
+        )
 
 
 def test_product_owned_provider_implementations_do_not_cross_products():

@@ -147,13 +147,21 @@
       "data/filing_extraction.py",
       "data/hashing.py",
       "data/mandate_evaluation.py",
-      "data/operational_alerts.py",
       "data/portfolio_metrics.py",
       "data/portfolio_mandate.py",
       "data/research_results.py",
       "data/research_statistics.py",
       "data/runtime_identity.py"
     ],
+    "product_owned_services": {
+      "trading_assistant": [
+        "data/operational_alerts.py"
+      ],
+      "strategy_research": []
+    },
+    "product_owned_service_rationales": {
+      "data/operational_alerts.py": "Assistant-owned durable operational alert serialization. Research-hosted composition runners may call it only while they remain explicit SEP-3 composition debt; product-owned research code does not import it."
+    },
     "product_owned_provider_implementations": {
       "trading_assistant": [
         "data/corporate_actions.py",

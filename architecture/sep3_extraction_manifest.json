@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "status": "dry-run-not-authorized-for-physical-extraction",
+  "schema_version": 2,
+  "status": "third-dry-run-not-ready-for-physical-extraction",
   "owner_topology_decision": {
     "date": "2026-08-22",
     "topology": "two-product-repositories-plus-tiny-shared-contracts-package",
@@ -10,24 +10,41 @@
     "git_submodules": false
   },
   "source": {
-    "reviewed_commit": "e642469df7030deb1a36171f43a85e68e1fd82d1",
-    "tracked_path_count": 734,
-    "tracked_path_inventory_sha256": "853a139ca133103f838b66ec5c143566daae951bd2fea1a1f13576718ab72dcb",
+    "candidate_commit": "73acf482cf8d4c36c28b2d1745bd914ae08eb6a3",
+    "independent_review_status": "pending",
+    "tracked_path_count": 745,
+    "tracked_path_inventory_sha256": "a985372c467d5841dd9a2d99dbda64e6e91d6e4c70a3d78e39d7b4e4cfdf9cfd",
     "physical_extraction_requires_new_reviewed_clean_commit": true
   },
   "product_roots": {
-    "trading_assistant": ["assistant", "execution", "risk"],
-    "strategy_research": ["backtest", "ml", "research", "signals", "strategies"]
+    "trading_assistant": [
+      "assistant",
+      "execution",
+      "risk"
+    ],
+    "strategy_research": [
+      "backtest",
+      "ml",
+      "research",
+      "signals",
+      "strategies"
+    ]
   },
   "product_top_level_files": {
-    "trading_assistant": ["config.py", "market_analytics.py"],
-    "strategy_research": ["baskets.py"]
+    "trading_assistant": [
+      "config.py",
+      "market_analytics.py"
+    ],
+    "strategy_research": [
+      "baskets.py"
+    ]
   },
   "script_ownership_source": "architecture/entry_points.json",
   "data_destination": {
     "trading_assistant": [
       "data/corporate_actions.py",
       "data/event_data.py",
+      "data/operational_alerts.py",
       "data/price_source.py"
     ],
     "strategy_research": [
@@ -38,7 +55,6 @@
       "data/macro_data.py",
       "data/mandate_evaluation.py",
       "data/market_data.py",
-      "data/operational_alerts.py",
       "data/pit_universe.py",
       "data/portfolio_mandate.py",
       "data/portfolio_metrics.py",
@@ -58,11 +74,23 @@
       "data/financial_primitives.py": "7dba2361d800a74eb7ab199173256ce06eb8781d",
       "data/research_results.py": "ea2bff4dbe865f02cdf0174fe7fda2b9413a06a1"
     },
-    "allowed_third_party_imports": ["pandas"],
+    "allowed_third_party_imports": [
+      "pandas"
+    ],
     "forbidden_import_roots": [
-      "assistant", "backtest", "execution", "ml", "research", "risk",
-      "signals", "strategies", "alpaca", "anthropic", "databento",
-      "requests", "yfinance"
+      "assistant",
+      "backtest",
+      "execution",
+      "ml",
+      "research",
+      "risk",
+      "signals",
+      "strategies",
+      "alpaca",
+      "anthropic",
+      "databento",
+      "requests",
+      "yfinance"
     ],
     "development_install": "editable-local-path",
     "durable_install": "exact-version-and-source-commit-pin"
@@ -70,28 +98,114 @@
   "dependency_surfaces": {
     "trading_assistant": "requirements/trading-assistant.txt",
     "strategy_research": "requirements/strategy-research.txt",
-    "shared_contracts": ["pandas==3.0.5"]
+    "shared_contracts": [
+      "pandas==3.0.5"
+    ]
   },
   "support_paths": {
     "destination": "trading_assistant",
     "prefixes": [
-      ".claude/", ".github/", ".streamlit/", "architecture/", "docs/",
-      "requirements/", "tests/"
+      ".claude/",
+      ".github/",
+      ".streamlit/",
+      "architecture/",
+      "docs/",
+      "requirements/",
+      "tests/"
     ],
     "exact_files": [
-      ".gitignore", "AGENTS.md", "CLAUDE.md", "HOW_TO_USE.md", "README.md",
-      "pytest.ini", "requirements.txt"
+      ".gitignore",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "HOW_TO_USE.md",
+      "README.md",
+      "pytest.ini",
+      "requirements.txt"
     ],
-    "note": "This first dry run keeps governance, integration tests and migration tooling with the source repository. Product-pure tests and documents must be reassigned before physical extraction."
+    "note": "Governance, integration tests and migration tooling remain with the source repository. Python tests are reassigned by the exact support_partition below; non-test documentation still requires product ownership before physical extraction."
+  },
+  "support_partition": {
+    "status": "product-pure-tests-pinned-integration-explicit",
+    "classification": "static-first-party-import-roots-at-reviewed-source",
+    "test_counts": {
+      "trading_assistant": 83,
+      "strategy_research": 70,
+      "shared_contracts": 1,
+      "integration": 54
+    },
+    "test_inventory_sha256": {
+      "trading_assistant": "999402d7ec0c4173920f8d07a2334ece3d12ede41b879741a5f29131ecc571d1",
+      "strategy_research": "0240723aa37db873c1e1e3630f1ddbe9f484f8b20fcb5b61b3b32be75dac3fd1",
+      "shared_contracts": "99f98d144d43c92720202126fdff6734a3a310720c18e9f974903b95e8a0f192",
+      "integration": "5a3894e1770cbf1f92a041b54daa36c6d4f5fb8bb022436d8e2c42a9bc46dfe1"
+    },
+    "integration_test_files": 54,
+    "integration_destination": "trading_assistant",
+    "integration_disposition": "blocking-shrinking-debt-until-physical-extraction",
+    "shared_contract_test_files": 1,
+    "shared_contract_test_status": "pinned-dedicated-package-tests",
+    "non_python_test_assets_destination": "trading_assistant",
+    "governance_and_documentation_status": "pending-product-ownership"
   },
   "known_blockers": {
     "composition_files": 11,
     "python_crossing_roots": 6,
     "operator_database_importers": 4,
-    "support_surface_partition": "pending",
+    "support_surface_partition": "product-pure-tests-pinned-integration-explicit",
+    "governance_support_partition": "pending",
     "installed_task_paths": "unchanged",
     "operator_database_move": "not-authorized",
-    "paper_epoch_006": "must-remain-untouched"
+    "paper_epoch_006": "must-remain-untouched",
+    "stranded_data_modules": [
+      "data.filing_extraction",
+      "data.macro_data",
+      "data.mandate_evaluation",
+      "data.market_data",
+      "data.portfolio_mandate",
+      "data.portfolio_metrics",
+      "data.price_target_data",
+      "data.research_statistics",
+      "data.runtime_identity"
+    ],
+    "stranded_data_module_importer_sides": {
+      "data.filing_extraction": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.macro_data": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.mandate_evaluation": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.market_data": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.portfolio_mandate": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.portfolio_metrics": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.price_target_data": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.research_statistics": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "data.runtime_identity": [
+        "strategy_research",
+        "trading_assistant"
+      ]
+    },
+    "stranded_data_modules_note": "SEP3R-001/CRSEP3R2-001/SEP3A-001: the third dry run assigns the one assistant-only module, data.operational_alerts, to trading_assistant. The nine remaining modules are imported by both product sides and cannot be resolved by a simple single-product reassignment. Executed as declared, extraction would still break one product at import time or force the cross-repository dependency the plan forbids. The validator measures both the stranded set and exact importer sides from the candidate commit and refuses stale declarations; resolving the nine dual-use modules remains later reviewed partition design."
   },
   "physical_extraction_authorized": false
 }

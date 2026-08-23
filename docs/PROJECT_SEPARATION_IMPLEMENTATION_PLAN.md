@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 second dry run validated; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 third dry run pending review; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -512,13 +512,37 @@ reviewer's unilateral call; note the tiny-package route is closed for
 correctly refuses. See
 `docs/Archive/Review/REVIEW_2026-08-23_SEP3_RESIDUAL_REDUCTION.md`.
 
-Next, independently review this exact candidate, then resolve the remaining
-integration/governance partition and owner-gated runtime topology. Only after a
-dry run reports no blocking product crossings may a separately authorized
-migration create the research repository and shared package. No repository
-creation, history rewrite, deployment, credential move, scheduled-task change,
-operator-database move, backtest, or evidence-epoch change is authorized by
-this tranche.
+Codex counter-reviewed Claude's exact pushed head `717b014` and accepted both
+review commits after one P3 correction. Claude's ten-module stranded set was
+correct, but the review understated dual use: exact importer-side measurement
+shows **nine** modules are imported by both products; only
+`data.operational_alerts` is assistant-only. Correction `80819d6` pins the
+exact side ledger and refuses a stale or understated declaration. See
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-23_SEP3_RESIDUAL_REDUCTION.md`.
+
+The next bounded implementation commit `73acf48` therefore makes the one
+ownership decision the measured graph already determines:
+`data.operational_alerts` is an assistant-owned operational service. Product-
+owned research code is permanently forbidden from importing it; the existing
+research-hosted composition runners remain explicit composition debt rather
+than being silently reclassified. Compatibility identity and runtime behavior
+are unchanged.
+
+Contract commit `984fee3` records the third dry run at exact candidate
+`73acf48`: **745 paths**, inventory SHA-256 `a985372c...fdf9cfd`, assigned
+exactly once as **501 trading assistant / 240 strategy research / 4 shared**.
+The test partition remains **83 / 70 / 1 / 54**. The stranded-data blocker
+falls from ten to **nine**, and every remaining module has both assistant and
+research importers. The third dry run is valid but pending independent review
+and is not extraction-ready.
+
+Next, independently review this exact candidate, then resolve the nine dual-
+use data modules, integration/governance partition, and owner-gated runtime
+topology. Only after a dry run reports no blocking product crossings may a
+separately authorized migration create the research repository and shared
+package. No repository creation, history rewrite, deployment, credential
+move, scheduled-task change, operator-database move, backtest, or evidence-
+epoch change is authorized by this tranche.
 
 ## 5. Safety and evidence invariants
 

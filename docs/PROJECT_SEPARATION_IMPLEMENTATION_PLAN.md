@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 dry run validated; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 second dry run validated; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -462,7 +462,7 @@ trading-assistant source; the intended research location is
 local shared-package install, while durable use must pin an exact package
 version and source commit. Git submodules are excluded.
 
-The first bounded tranche is implemented by
+The first bounded tranche was implemented by
 `architecture/sep3_extraction_manifest.json` and
 `scripts/validate_sep3_extraction.py`. It validates exact reviewed source
 commit `e642469d`, all 734 tracked paths, a three-file shared allowlist, exact
@@ -473,12 +473,34 @@ extraction**: 11 composition files, six Python crossing roots, four research-
 hosted operator-database importers, and the product partition of governance,
 integration tests and documentation remain open.
 
-Next, reduce those exact residuals and split the support/test surface on a
-reviewed branch. Only after a second dry run reports no blocking product
-crossings may a separately authorized migration create the research repository
-and shared package. No repository deletion, history rewrite, deployment,
-credential move, scheduled-task change, operator-database move, backtest, or
-evidence-epoch change is authorized by this tranche.
+The second bounded tranche is recorded at implementation commit `b15aac8` and
+dry-run contract commit `4e1aae4`. It corrects the first validator's root-only
+test heuristic: treating every `data.*` import as shared had falsely assigned
+research-owned macro and price-target tests to the tiny package. Full imported
+module names now resolve against the exact product, data and script ownership
+manifests. The candidate inventory is **743 paths** with SHA-256
+`32590d8b...d32282`, assigned exactly once as **498 trading assistant / 241
+strategy research / 4 shared-contracts** paths. Python tests are hash-pinned as
+**83 assistant-pure / 70 research-pure / 1 shared-contract / 54 integration**;
+the shared package now has a dedicated behavior suite rather than borrowed
+product tests.
+
+This is a valid second dry run, but deliberately **not extraction-ready**.
+The 54 integration tests and governance/documentation ownership remain
+explicit support blockers, and the runtime residuals remain exactly 11
+composition files, six Python crossing roots and four research-hosted operator-
+database importers. Those runtime residuals are tied to the separately gated
+database, installed-task and physical-repository topology; this tranche does
+not disguise them as interfaces or silently reclassify them. Independent
+review of the candidate is pending.
+
+Next, independently review this exact candidate, then resolve the remaining
+integration/governance partition and owner-gated runtime topology. Only after a
+dry run reports no blocking product crossings may a separately authorized
+migration create the research repository and shared package. No repository
+creation, history rewrite, deployment, credential move, scheduled-task change,
+operator-database move, backtest, or evidence-epoch change is authorized by
+this tranche.
 
 ## 5. Safety and evidence invariants
 

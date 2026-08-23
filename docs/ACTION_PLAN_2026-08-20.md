@@ -67,8 +67,10 @@ and exact SEP-2 closure. The residual 11 composition files, six Python
 crossings, and four non-assistant operator-store importers are now pinned as
 SEP-3 extraction inputs. **Owner decision, 2026-08-22:** use two product
 repositories plus one deliberately tiny shared-contracts package, with no Git
-submodules. The first exact-commit dry run is validated but remains blocked on
-those residuals and the support/test partition; see
+submodules. The second exact-commit dry run now pins 83 assistant, 70 research,
+one shared-contract and 54 integration Python-test files after correcting the
+first dry run's root-only data-module heuristic. It remains blocked on the
+unchanged runtime residuals plus integration and governance ownership; see
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Physical extraction remains
 separately gated.
 This architecture work does not close, weaken, or execute any ACER gate and

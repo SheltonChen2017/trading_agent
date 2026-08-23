@@ -1,4 +1,4 @@
-"""Dangerous-direction tests for the first SEP-3 extraction dry run."""
+"""Dangerous-direction tests for the current SEP-3 extraction dry run."""
 from __future__ import annotations
 
 import copy
@@ -26,15 +26,15 @@ def _write_manifest(tmp_path: Path, manifest: dict) -> Path:
     return path
 
 
-def test_second_extraction_dry_run_is_exact_and_not_authorized():
+def test_third_extraction_dry_run_is_exact_and_not_authorized():
     result = validate()
     assert result["status"] == (
-        "valid-second-dry-run-not-ready-for-physical-extraction"
+        "valid-third-dry-run-not-ready-for-physical-extraction"
     )
-    assert result["source_commit"] == "b15aac8e176bb892f4fb3bd8da87f3eaac66af80"
+    assert result["source_commit"] == "73acf482cf8d4c36c28b2d1745bd914ae08eb6a3"
     assert result["inventory"] == {
-        "tracked_paths": 743,
-        "sha256": "32590d8bb3d44e67ee90dd0008e2c73cc2356a5004b0484ab7ba908c25d32282",
+        "tracked_paths": 745,
+        "sha256": "a985372c467d5841dd9a2d99dbda64e6e91d6e4c70a3d78e39d7b4e4cfdf9cfd",
         "assigned_exactly_once": True,
         "destination_counts": {
             # SEP3R-002: this dict briefly carried both `"shared_contracts": 3`
@@ -42,8 +42,8 @@ def test_second_extraction_dry_run_is_exact_and_not_authorized():
             # key silently, so the stale 3 was dead text masking an
             # incomplete edit rather than a failing assertion.
             "shared_contracts": 4,
-            "strategy_research": 241,
-            "trading_assistant": 498,
+            "strategy_research": 240,
+            "trading_assistant": 501,
         },
     }
     assert result["physical_extraction_authorized"] is False
@@ -66,8 +66,8 @@ def test_second_extraction_dry_run_is_exact_and_not_authorized():
         ),
         "integration_test_files": 54,
         "governance_support_partition": "pending",
-        # SEP3R-001: the partition strands ten assistant-needed data modules
-        # in the research repository; see the dedicated test below.
+        # SEP3A-001 assigns the one assistant-only service correctly; nine
+        # genuinely dual-use data modules remain blocking.
         "stranded_data_modules": _STRANDED_DATA_MODULES,
         "stranded_data_module_importer_sides": _STRANDED_IMPORTER_SIDES,
     }
@@ -167,7 +167,6 @@ _STRANDED_DATA_MODULES = [
     "data.macro_data",
     "data.mandate_evaluation",
     "data.market_data",
-    "data.operational_alerts",
     "data.portfolio_mandate",
     "data.portfolio_metrics",
     "data.price_target_data",
@@ -177,24 +176,21 @@ _STRANDED_DATA_MODULES = [
 
 _DUAL_USE_SIDES = ["strategy_research", "trading_assistant"]
 _STRANDED_IMPORTER_SIDES = {
-    module: _DUAL_USE_SIDES
-    for module in _STRANDED_DATA_MODULES
-    if module != "data.operational_alerts"
-} | {"data.operational_alerts": ["trading_assistant"]}
+    module: _DUAL_USE_SIDES for module in _STRANDED_DATA_MODULES
+}
 
 
 def test_stranded_data_modules_are_measured_declared_and_blocking():
     """SEP3R-001. The declared partition must not strand a product's imports.
 
-    Both dry runs destined these ten ``data`` modules to the research
-    repository while trading-assistant packages or assistant-owned scripts
-    import them — `data.mandate_evaluation` and `data.portfolio_mandate` carry
-    the owner-approved mandate fingerprint, `data.runtime_identity` the
-    evidence lineage, `data.operational_alerts` the alert writer. Executed as
-    declared, extraction would break the assistant at import time or force the
-    cross-repository dependency the plan's objective forbids. The validator
-    now measures the stranded set from the candidate commit; this pins it as
-    an exact shrinking blocker rather than a silent pass.
+    The first two dry runs destined ten assistant-needed modules to research.
+    SEP3A-001 assigns the sole assistant-only service, operational alerts, to
+    the assistant. The remaining nine modules are imported by both products,
+    including the mandate-fingerprint pair and runtime identity. Extraction
+    would still break one product or force the cross-repository dependency the
+    plan forbids. The validator measures both set and importer sides from the
+    candidate commit, pinning an exact shrinking blocker rather than a silent
+    pass.
     """
     result = validate()
     assert result["blockers"]["stranded_data_modules"] == _STRANDED_DATA_MODULES
@@ -206,6 +202,9 @@ def test_stranded_data_modules_are_measured_declared_and_blocking():
         sides == _DUAL_USE_SIDES
         for sides in result["blockers"]["stranded_data_module_importer_sides"].values()
     ) == 9
+    assert "data.operational_alerts" not in result["blockers"][
+        "stranded_data_modules"
+    ]
     assert result["physical_extraction_authorized"] is False
 
 

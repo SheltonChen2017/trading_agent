@@ -285,15 +285,12 @@ def _stranded_data_modules(
 ) -> dict[str, list[str]]:
     """Data modules destined to one product while the other still imports them.
 
-    SEP3R-001: both dry runs validated a partition that destines ten ``data``
-    modules — the mandate-fingerprint pair, runtime identity, and the alert
-    writer among them — to the strategy-research repository while
-    trading-assistant packages or assistant-owned scripts import them.
-    Executed as declared, the extraction would break the assistant at import
-    time or force exactly the cross-repository dependency the plan's objective
-    forbids. A dry run exists to surface that, so the stranded set is measured
-    from the candidate commit, must match the declared blocker exactly, and
-    keeps the run non-extraction-ready while non-empty.
+    SEP3R-001 found ten such modules in the first two dry runs. SEP3A-001
+    resolves the one assistant-only module, ``data.operational_alerts``, by
+    assigning it to the assistant. The remaining nine are imported by both
+    product sides. A dry run exists to surface that, so the stranded set is
+    measured from the candidate commit, must match the declared blocker
+    exactly, and keeps the run non-extraction-ready while non-empty.
     """
     destination: dict[str, str] = {}
     for product, files in manifest["data_destination"].items():
@@ -483,7 +480,7 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     }
     return {
         "schema_version": 2,
-        "status": "valid-second-dry-run-not-ready-for-physical-extraction",
+        "status": "valid-third-dry-run-not-ready-for-physical-extraction",
         "source_commit": commit,
         "inventory": {
             "tracked_paths": len(paths),

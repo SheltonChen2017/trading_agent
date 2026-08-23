@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "second-dry-run-not-ready-for-physical-extraction",
+  "status": "third-dry-run-not-ready-for-physical-extraction",
   "owner_topology_decision": {
     "date": "2026-08-22",
     "topology": "two-product-repositories-plus-tiny-shared-contracts-package",
@@ -10,10 +10,10 @@
     "git_submodules": false
   },
   "source": {
-    "candidate_commit": "b15aac8e176bb892f4fb3bd8da87f3eaac66af80",
+    "candidate_commit": "73acf482cf8d4c36c28b2d1745bd914ae08eb6a3",
     "independent_review_status": "pending",
-    "tracked_path_count": 743,
-    "tracked_path_inventory_sha256": "32590d8bb3d44e67ee90dd0008e2c73cc2356a5004b0484ab7ba908c25d32282",
+    "tracked_path_count": 745,
+    "tracked_path_inventory_sha256": "a985372c467d5841dd9a2d99dbda64e6e91d6e4c70a3d78e39d7b4e4cfdf9cfd",
     "physical_extraction_requires_new_reviewed_clean_commit": true
   },
   "product_roots": {
@@ -44,6 +44,7 @@
     "trading_assistant": [
       "data/corporate_actions.py",
       "data/event_data.py",
+      "data/operational_alerts.py",
       "data/price_source.py"
     ],
     "strategy_research": [
@@ -54,7 +55,6 @@
       "data/macro_data.py",
       "data/mandate_evaluation.py",
       "data/market_data.py",
-      "data/operational_alerts.py",
       "data/pit_universe.py",
       "data/portfolio_mandate.py",
       "data/portfolio_metrics.py",
@@ -161,7 +161,6 @@
       "data.macro_data",
       "data.mandate_evaluation",
       "data.market_data",
-      "data.operational_alerts",
       "data.portfolio_mandate",
       "data.portfolio_metrics",
       "data.price_target_data",
@@ -185,9 +184,6 @@
         "strategy_research",
         "trading_assistant"
       ],
-      "data.operational_alerts": [
-        "trading_assistant"
-      ],
       "data.portfolio_mandate": [
         "strategy_research",
         "trading_assistant"
@@ -209,7 +205,7 @@
         "trading_assistant"
       ]
     },
-    "stranded_data_modules_note": "SEP3R-001: these data modules are destined to strategy_research while trading-assistant packages or assistant-owned scripts import them \u2014 the mandate-fingerprint pair, runtime identity, and the alert writer among them. Executed as declared, the extraction would break the assistant at import time or force the cross-repository dependency the plan's objective forbids. The validator measures this set from the candidate commit and refuses a stale declaration; resolving each module (shared package, assistant ownership, or a removed import) is partition design work for a later reviewed tranche, not a reviewer's unilateral call."
+    "stranded_data_modules_note": "SEP3R-001/CRSEP3R2-001/SEP3A-001: the third dry run assigns the one assistant-only module, data.operational_alerts, to trading_assistant. The nine remaining modules are imported by both product sides and cannot be resolved by a simple single-product reassignment. Executed as declared, extraction would still break one product at import time or force the cross-repository dependency the plan forbids. The validator measures both the stranded set and exact importer sides from the candidate commit and refuses stale declarations; resolving the nine dual-use modules remains later reviewed partition design."
   },
   "physical_extraction_authorized": false
 }

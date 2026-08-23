@@ -6965,6 +6965,51 @@ dual-use modules (partly an owner call), the integration/governance
 partition, the composition ledger, and the owner-gated runtime topology —
 then a fourth dry run. Physical extraction remains unauthorized.
 
+## 7ei. Codex counter-review of Claude's SEP-3 alert review (2026-08-23)
+
+Codex counter-reviewed exact pushed Claude head
+`dabf00f051007527820c14ea0fea404c2ac1a003` on
+`origin/user/claude/review-sep3-alertown-20260823`. The stable remote
+merge-base is implementation head
+`4bea7f9defa10b7599b4de2ff4c25b1b7c808bd2`; the complete ordered Claude
+range is `d7c521d`, `effcdda`, `dabf00f`. The isolated local review branch is
+`codex/counterreview-sep3-alert-ownership-20260823` and must not be pushed as
+a standalone branch.
+
+**Accepted after correction.** `d7c521d` is accepted after correction;
+`effcdda` and `dabf00f` are accepted. No P0, P1, or P2 issue was found.
+CRSEP3A-001 (P3, resolved): Claude's guard correctly recognized `CRSEP...`
+finding IDs, but its direct grammar test asserted only `SEP...` examples, so
+a future deletion of the optional prefix could escape that narrow unit test.
+Correction `ee7d2ed784761d0e04d309a452f87f4ee1a9b2cc` adds the exact
+`CRSEP3R2-001` direction. Removing the prefix recognition then failed the
+focused test as intended; restoring it passed. Counter-review record commit
+`3a129ca` contains the full disposition and P0–P3 ledger.
+
+Independent dry-run validation reproduced candidate `73acf48`, 745 paths,
+inventory SHA-256 `a985372c...fdf9cfd`, destinations 501 / 240 / 4, tests
+83 / 70 / 1 / 54, nine dual-use stranded modules, 11 composition files, six
+Python crossing roots, four non-assistant operator-store importers, pending
+governance ownership, and physical extraction refused. The assistant-owned
+`data.operational_alerts` decision remains honest; its research-hosted callers
+remain explicit composition debt.
+
+Validation on the finalized counter-review tree: focused SEP and active-
+document suites **97 passed** in 345.27 seconds; corrected finding guard 2/2
+passed; reverse mutation 1/1 failed as intended and restored green; complete
+suite **4,552 passed / 0 failed / 25 known warnings** in 1,066.28 seconds on
+Python 3.13.14; compileall including `research/` passed; all architecture JSON
+parsed; the dry-run validator reproduced the exact evidence above; and
+`git diff --check` was clean.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed. Next, create one fresh
+`codex/` implementation branch from this finalized local counter-review tree
+and implement the earliest safe bounded SEP-3 partition item. If a dual-use
+module requires new owner policy, stop rather than expanding the tiny shared
+package or creating a cross-repository product dependency by assumption.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

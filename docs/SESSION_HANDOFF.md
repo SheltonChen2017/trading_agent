@@ -6486,6 +6486,77 @@ an unclassified retained path, authority moved to research, licensed code
 moved to the assistant, a vendor client added to the shared package, and a
 case-insensitive target collision.
 
+## 7ea. Independent review of the SEP-3 extraction dry run (Claude, 2026-08-22)
+
+Branch `user/claude/review-sep3-dryrun-20260822`, created from the exact
+fetched remote head `1b67848` on
+`origin/codex/counterreview-sep2-completion-sep3-dryrun-20260822`, based on my
+prior review head `e642469`. All six commits carry an explicit disposition.
+Full record: `docs/Archive/Review/REVIEW_2026-08-22_SEP3_DRY_RUN.md`.
+
+**Accepted. No P0/P1/P2/P3 findings.** PR #303 merged this branch to `main` as
+`8f508ce` before the review completed; the merge carries the reviewed content
+and nothing is stranded.
+
+**The dry run is genuinely a dry run.** `scripts/validate_sep3_extraction.py`
+makes only read-only git plumbing calls — `show`, `ls-tree`, `cat-file -t`,
+`rev-parse` — with no `checkout`, `filter-branch`, `subtree`, `clone`, `init`,
+`push`, `commit` or `rm`, and no filesystem write of any kind. I ran it: it
+completes, emits inventory hashes, and the working tree is unchanged
+afterwards. The manifest carries
+`status: dry-run-not-authorized-for-physical-extraction` and
+`physical_extraction_authorized: false`, both pinned by tests (6/6). Blockers
+are declared rather than glossed: 11 composition files, 6 crossing roots, 4
+operator-database importers, a pending support-surface partition,
+`installed_task_paths: unchanged`, `operator_database_move: not-authorized`,
+and `paper_epoch_006: must-remain-untouched`. Provenance binds the exact
+reviewed source commit, the tracked-path count, and an inventory SHA-256.
+
+**Codex's CRSEP2C-001 against my own guard is correct.** My `enforcing_guards`
+linkage checked only that a named guard existed — the limitation I had myself
+disclosed. The certificate now directly invokes each named fixture-free guard.
+Verified by mutation: injecting a failing invariant into
+`test_every_script_is_classified_exactly_once`, leaving its name intact so my
+version would still have passed, now makes the certificate fail.
+
+**A finding I raised and withdrew, recorded because it cost the round
+something.** I opened a candidate P2 that the plan asserted an owner topology
+decision recorded nowhere, and escalated it to the owner rather than editing
+the plan myself. The owner confirmed the decision is real — and it was
+recorded all along, in the Action Plan at the sequencing amendment ("**Owner
+decision, 2026-08-22:** use two product repositories plus one deliberately tiny
+shared-contracts package, with no Git submodules"), added by `ed8cac2`, exactly
+where owner decisions belong. **Withdrawn without a code change; nothing was
+wrong.** I had searched for `selected|chose|decided` and the text says "use",
+then reported absence on the strength of an empty grep instead of reading the
+governing section. Rule kept: an empty grep is evidence about the pattern, not
+about the document. Escalating rather than self-correcting was right and is
+what prevented damage to a correct record; the false premise in the question
+was still a real cost.
+
+**Carried forward for the owner, not a finding:** the chosen two-repository
+topology eventually means the operational checkout deploys from a different
+source, which changes its `code_commit` lineage and therefore **closes
+`paper-epoch-006`**, discarding its accumulated sessions toward the
+60-session / 30-order floor. That is a cost of the topology rather than of this
+dry run, and it is cheapest to pay deliberately at an epoch boundary.
+
+Validation on the final tree: SEP-3 dry-run tests 6 passed; entry-point guards
+23 passed; validator executed read-only with the tree unchanged; complete suite
+**4,539 passed / 0 failed / 25 warnings** in 848.39 seconds on Python
+3.13.14 — identical to Codex's 4,539, as expected since this round added no
+test; `compileall` including `research/`
+passes; `git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 continues by reducing
+the residual crossings and splitting the support/test surface, then a second
+dry run. Only after that reports no blocking product crossings may a separately
+authorized migration create the research repository and shared package.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

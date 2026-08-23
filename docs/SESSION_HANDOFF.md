@@ -6651,6 +6651,41 @@ changed. `paper-epoch-006` is untouched.
 reducing the residual crossings and splitting the support/test surface before a
 second dry run.
 
+## 7ed. Codex counter-review of Claude's SEP-3 counter-review round (2026-08-23)
+
+Codex counter-reviewed exact pushed Claude head
+`18afbf4045ceb4f00be5d42e4f66d582ea195e61` from
+`origin/user/claude/review-sep3-counterreview-20260823`. Its exact submitted
+base and merge-base are both
+`2990b319d4ea72e6b3ccf008ee95a1073ae32128`; the ordered Claude range contains
+only `18afbf4`, accepted after correction. The complete record is
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-23_SEP3_COUNTERREVIEW.md`.
+
+Claude's SEP2F-004 is confirmed: its prior report/handoff consistency guard
+was pinned to a dated SEP-2 filename glob and silently excluded current SEP-3
+reviews. Claude correctly widened the report scope and correctly accepted
+CRSEP3-001. The submitted active-document module passed 55/55, and the
+read-only dry-run validator reproduced the exact source, destinations, test
+partitions, refusal status and unchanged 11 / 6 / 4 blockers.
+
+**CRSEP3R-001 (P3, corrected at `ab91271`).** The widened guard's identifier
+grammar permitted only one optional letter, so `SEP3X-001` was detected while
+multi-part round identifiers such as `SEP3CR-001` and `SEP3CR2-002` were
+ignored. The new regression failed red on exact Claude head, and the parser now
+accepts uppercase/digit round suffixes. Stale SEP-2-only helper/test names and
+failure text now describe their actual separation-wide scope. An end-to-end
+report-only `SEP3CR-999` mutation failed with the exact omission, then passed
+after restoration. The corrected active-document module passes 56/56.
+The combined active-document, SEP-3 dry-run, and entry-point gate passes 85/85;
+the complete suite passes **4,540 / 4,540** with 25 known dependency warnings
+in 763.31 seconds.
+
+SEP-3 remains incomplete. No production code, authority, provider, licensed
+row, broker, operator database, installed task, deployment, backtest, outcome,
+research look or evidence epoch changed. Physical extraction remains
+separately owner-gated; next reduce the exact residuals, partition support and
+tests, and run a second dry run.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the
@@ -6692,7 +6727,8 @@ ML boundary that protected it, restored at `b254407`). Sections 7dx–7dz close
 SEP-2, its independent review and Codex's counter-review, then record the first
 validated SEP-3 dry run under the owner's selected topology. Sections 7ea–7eb
 close the dry-run review chain, accepted after the Git-topology wording
-correction in CRSEP3-001.
+correction in CRSEP3-001. Sections 7ec–7ed close the second review round after
+CRSEP3R-001 completes the separation-finding guard's identifier grammar.
 ACER
 remains the first
 research program, but its next Cloud capability audit is not the current code
@@ -7000,8 +7036,9 @@ prefix, not method name alone, because
 repositories plus one tiny shared-contracts package on 2026-08-22, with no Git
 submodules. Section 7dz records the first validated dry run; it is not yet
 ready or authorized for physical extraction. Sections 7ea–7eb close its
-independent review and counter-review; continue with residual reduction and
-the support/test partition before a second dry run. ACER
+independent review and counter-review; sections 7ec–7ed close the follow-up
+review after one P3 guard correction. Continue with residual reduction and the
+support/test partition before a second dry run. ACER
 remains the first research program, and its next research step is the narrow read-only,
 zero-outcome QuantConnect Cloud capability audit (entitlements, coverage,
 semantics) -- which Action Plan section 7 item 1 still lists as an OPEN

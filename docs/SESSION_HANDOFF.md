@@ -6594,6 +6594,63 @@ Next, reduce the exact residuals and split the support/test surface, then run a
 second dry run. Physical migration remains separately owner-gated and the
 eventual operational lineage change will close `paper-epoch-006`.
 
+## 7ec. Independent review of the SEP-3 counter-review round (Claude, 2026-08-23)
+
+Branch `user/claude/review-sep3-counterreview-20260823`, created from the exact
+fetched remote head `2990b31` on `origin/codex/counterreview-sep3-dryrun-20260823`,
+based on my prior review head `a6be87a`. Both commits carry an explicit
+disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-23_SEP3_COUNTERREVIEW.md`.
+
+**Accepted. No findings against the submission**, which is documentation-only:
+the two commits change one counter-review record and this handoff, with no
+production code, test, manifest or script touched.
+
+**CRSEP3-001 against my own report is correct.** My SEP-3 review called PR
+#303's merge "a fast-forward of the reviewed content". It is a merge commit —
+`8f508ce` has parents `1dcc12b` and `1b67848` — and I had printed that parent
+list in the same session before writing the wrong word. The substantive claim
+survives and I re-verified it: both `8f508ce` and `1b67848` carry tree
+`ae6151bd525cc567ab49d08adb739f922eaed100`, so the merged mainline tree is
+byte-identical to the reviewed implementation and nothing is stranded. Codex
+correctly put the correction in its dated counter-review rather than editing my
+archived report. Rule kept: in a review record, git vocabulary is a claim, not
+a flourish — if the point is that content is unchanged, say that and show the
+tree hashes.
+
+**SEP2F-004 (P3, corrected) — a defect in my own guard.** The guard I added to
+stop findings being omitted from the handoff was globbed on the literal
+`REVIEW_2026-08-22_SEP2_*.md`. With SEP-3 now current, it would have kept
+passing while covering nothing current — narrowing itself to history without
+ever failing, which is the vacuous-check failure the module exists to prevent
+and the same class as the completion certificate that could outlive its
+evidence. The glob now follows the milestone rather than a date, and the
+finding-ID pattern matches `SEP2`/`SEP3` identifiers. Mutation: a `SEP3X-001`
+identifier in the SEP-3 report and absent from the handoff is red; restored
+green 55/55, with the companion vacuity test still guaranteeing at least one
+report is in scope.
+
+Codex's reproduction claims check out on my own validator run: exact source
+`e642469`, destinations 560 / 171 / 3, tests 102 / 60 / 3 / 41, and extraction
+still refused (`physical_extraction_authorized: false`). Blockers unchanged at
+11 composition files, 6 crossing roots, 4 operator-database importers, and the
+pending support/test partition — nothing this round advances extraction
+readiness, because no code changed.
+
+Validation on the final tree: active-document guards 55 passed; complete suite
+**4,539 passed / 0 failed / 25 warnings** in 783.68 seconds on Python
+3.13.14 — unchanged, since this round widened a glob rather than adding a
+test; `compileall` including `research/`
+passes; `git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed or
+changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this head, then SEP-3's substantive work —
+reducing the residual crossings and splitting the support/test surface before a
+second dry run.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

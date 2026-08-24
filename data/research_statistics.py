@@ -1,4 +1,4 @@
-"""Policy-neutral statistical primitives shared across both products."""
+"""Research-owned multiplicity arithmetic for strategy research."""
 from __future__ import annotations
 
 def bonferroni_threshold(n_tests: int, alpha: float = 0.05) -> float:
@@ -6,8 +6,9 @@ def bonferroni_threshold(n_tests: int, alpha: float = 0.05) -> float:
 
     The helper only performs ``alpha / n_tests`` (or returns ``alpha`` when no
     tests are counted). Research code remains responsible for defining the
-    family and counting every look; assistant code may display the correction
-    but cannot create evidence or choose the denominator through this helper.
+    family and counting every look. The assistant may independently display
+    equivalent arithmetic, but it cannot import this helper, create evidence,
+    or choose the research denominator through it.
 
     A pooled bootstrap over discovery and confirmation rows is exploratory,
     never confirmatory: a strong discovery effect can drag a misleading

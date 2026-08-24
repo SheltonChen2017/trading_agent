@@ -7111,6 +7111,248 @@ remaining dual-use modules — the genuinely contested destinations, partly an
 owner call — the integration/governance partition, the composition ledger,
 and the owner-gated runtime topology, then a fifth dry run.
 
+## 7ek. Codex counter-review of Claude's SEP-3 statistics review (2026-08-24)
+
+Claude's exact pushed branch
+`origin/user/claude/review-sep3-resstats-20260823` was stable at
+`ea6448425ba1508503081e6eb35e30ee4a55f894`. Its merge-base with submitted
+Codex head `0de7920d0f2bcf2b2329600959a2208de4ea15c1` is that submitted head;
+the complete Claude range is the single commit `ea64484`. The isolated local
+counter-review branch is
+`codex/counterreview-sep3-research-statistics-20260824` and must not be pushed
+alone. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-24_SEP3_RESEARCH_STATISTICS.md`.
+
+**Accepted after correction.** Claude's central review conclusions reproduce,
+including the 747-path inventory, 503 / 240 / 4 destination partition,
+83 / 70 / 1 / 54 test partition, exact positive-domain threshold arithmetic,
+eight stranded modules, unchanged runtime/support blockers, and physical-
+extraction refusal. Merged main tree `3391875` and submitted head `0de7920`
+share exact tree `f2b0207b2cef6575c9991b1684e1250ffdbaa7ea`.
+
+CRSEP3S-001 (P3, resolved): the newly product-owned services retained stale
+source contracts from their former classification. `data/operational_alerts`
+still called itself provider-neutral; `data/research_statistics` called itself
+policy-neutral and shared across both products. Correction `6341d6a` makes the
+source contracts assistant-owned and research-owned, clarifies that the
+assistant independently renders equivalent arithmetic without importing the
+research helper, and adds a generalized manifest-driven guard. Restoring the
+stale research docstring failed with the exact path and forbidden claims;
+restoration passed. No P0, P1, or P2 issue was found.
+
+Focused dry-run, entry-point, active-document, and research-look suites pass
+**117 tests** in 372.11 seconds after correction; the exact arithmetic sweep
+matches all 60,000 reachable combinations. Under the owner's standing loop,
+the counter-review commits stay local-only while Codex creates one fresh
+implementation branch from this finalized tree and completes the next safe
+bounded SEP-3 item before exactly one combined push.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed.
+
+## 7el. SEP-3 statistics counter-review and explicit support-test ownership (Codex, 2026-08-24)
+
+Codex counter-reviewed Claude's exact one-commit review range
+`0de7920..ea64484` from remote head
+`origin/user/claude/review-sep3-resstats-20260823` at
+`ea6448425ba1508503081e6eb35e30ee4a55f894`. The review commit was accepted,
+and its central arithmetic, manifest, destination, test-partition, and
+not-ready-for-extraction claims were independently reproduced. One generalized
+P3 documentation defect, `CRSEP3S-001`, was accepted after correction: the
+newly product-owned `data.operational_alerts` and `data.research_statistics`
+services still described themselves as neutral/shared. Their module contracts
+now state assistant and research ownership respectively, and a
+manifest-driven regression refuses stale neutrality language in every
+product-owned service module. A dangerous-direction mutation restoring the
+stale research wording failed as intended. There were no P0-P2 findings. The
+counter-review is recorded in
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-24_SEP3_RESEARCH_STATISTICS.md` and
+committed as `6341d6a`, `fb7f4f1`, and `2ad686f`; no standalone counter-review
+branch was pushed.
+
+From that finalized tree, Codex implemented the next safe bounded SEP-3 item:
+explicit ownership for the twelve support tests whose dynamic source loading
+or repository-text inspection had left them in the integration residual. Three
+are assistant-owned, three are research-owned, and six are governance tests
+owned by the source/trading-assistant repository. Overrides are permitted only
+when static first-party product imports are empty; duplicate ownership, stale
+paths, attempts to hide static imports, and attempts to reclassify governance
+tests as research all fail closed. A dangerous-direction mutation removing the
+static-import guard failed as intended. The implementation/reporting commits
+are `f252285` and `df7eb48`, the exact candidate source is
+`df7eb48b5e17a769d6977d513cafab680f336b66`, the contract commit is `be869e4`,
+and the plan/documentation commit is `fca7ba0`.
+
+The fifth dry run is valid but **not ready or authorized for physical
+extraction**. It inventories 749 tracked paths at SHA-256
+`a5c57b9896d22faff9fe3b2bc32126e7ebc89245ce2433b44f69086dbde86797`, with
+502 assistant, 243 research, and four shared destinations. Its test partition
+is 86 assistant, 73 research, one shared, 42 integration, and six governance,
+with ordered hashes
+`f74ad0c89ace4331cd288ff5514926f27ab64362dbd0ce0e853debcd4729b450`,
+`974deb9edeaf54c1691f6246295ecfe38a4db59b513258fad4ea40e40e8ce015`,
+`99f98d144d43c92720202126fdff6734a3a310720c18e9f974903b95e8a0f192`,
+`bf2688760aeb8136b30f625fb0fdbaec62cfafa3f81ff534d0cd7f3ac9b1d0fe`, and
+`7d7bb973104f5c31718293cec1768bd1684b88b5a7a4d6619572ef2df6126fab`
+respectively. The unresolved integration-test count therefore falls from 54
+to 42 without changing runtime authority, the operator-store location,
+installed task paths, or repository topology. The eight genuinely dual-use
+data modules, 11 composition files, six Python crossing roots, four
+non-assistant operator-store importers, 42 integration tests, and non-test
+governance/documentation ownership remain explicit gates. The shared-contract
+package remains exactly four files.
+
+Validation was clean: the corrected service-contract focus passed 24 tests;
+the complete counter-review focus passed 117; explicit support ownership
+passed four; backward-compatibility/new ownership checks passed five; the
+fifth-dry-run subset passed seven; the complete dry-run file passed 18; active
+document checks passed 56 before this final handoff; and the combined final
+focus passed 121. The complete suite passed **4,557 tests** with 25 dependency
+deprecation warnings in 1,138.59 seconds. No provider, broker, credential,
+licensed row, operator database, outcome, research-look, backtest, deployment,
+evidence epoch, or `paper-epoch-006` access or mutation occurred. After this
+handoff's active-document and repository-integrity checks pass, the whole
+combined range will be pushed exactly once on
+`codex/sep3-support-test-ownership-20260824`, then a new exact-head alarm will
+wait for Claude's independent review before the next Codex counter-review and
+bounded SEP-3 item.
+
+## 7el. Independent review of the SEP-3 support-test tranche (Claude, 2026-08-24)
+
+Branch `user/claude/review-sep3-supporttest-20260824`, created from the exact
+fetched remote head `ae0d563` on
+`origin/codex/sep3-support-test-ownership-20260824`, based on my prior review
+head `ea64484`. All eight commits carry an explicit disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-24_SEP3_SUPPORT_TESTS.md`.
+
+**Accepted. No findings.**
+
+**Codex's CRSEP3S-001 against my previous round is correct, verified on my
+own head**: after the ownership reassignments, `data/operational_alerts.py`
+still opened with "Provider-neutral…" and `data/research_statistics.py` with
+"…shared across both products" — I verified imports, arithmetic and guards
+and never read the module docstrings against their new classification. The
+correction is prose-only (verified), and the new manifest-driven
+ownership-claims guard is the right generalization; restoring the stale
+docstring fails it with the exact path. Codex's wording qualification is also
+accepted: a direct zero call raises `ZeroDivisionError` rather than producing
+the "stricter negative threshold" my sentence implied — still unreachable,
+but imprecise.
+
+**The support-test partition verified by probing, not reading.** Twelve
+dynamic/introspective support tests receive exact reviewed ownership (3
+assistant, 3 research, 6 governance, governance destined to the source
+repository); integration debt falls **54 → 42** with no silent re-bucketing.
+Dangerous directions probed live: an override on a test with measured product
+imports **refuses** with the exact path; a typo'd override naming a
+nonexistent test **refuses** as stale (the completeness check I initially
+suspected was missing exists and fires); duplicates and non-test paths refuse
+structurally. Fifth dry run reproduces: candidate `df7eb48`, stranded
+unchanged at **8**, extraction refused, partition 86 / 73 / 1 / 42 / 6.
+Focused suites **99 passed**.
+
+Validation on the final tree: complete suite **4,557 passed / 0 failed / 25
+warnings** in 1062.43 seconds on Python 3.13.14 — unchanged from Codex's
+4,557, since this round added no test; doc guards rerun on the final prose;
+`git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 continues: the eight
+dual-use modules (partly an owner call), the governance-document partition,
+the composition ledger, and the owner-gated runtime topology — then a sixth
+dry run.
+
+## 7em. Codex counter-review of Claude's support-test review (2026-08-24)
+
+Codex counter-reviewed exact stable remote head `1680f6e` from
+`origin/user/claude/review-sep3-supporttest-20260824` in a separate isolated
+worktree. Its merge-base with submitted Codex head `ae0d563` is that exact
+submission, and the complete Claude range contains the single review-record
+commit `1680f6e`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-24_SEP3_SUPPORT_TESTS.md`.
+
+**Accepted after correction.** Claude's support-test conclusion reproduces:
+the twelve exact overrides remain statically product-import-free and split
+three assistant / three research / six governance, while duplicate, stale,
+hidden-static-import, and governance-to-research directions fail closed.
+Codex found two omissions in the accepted fifth-dry-run record. CRSEP3ST-001
+(P2, resolved by `aa2fe4f`) generalizes stranded-module measurement beyond
+`data.*`: exact candidate imports also strand top-level `config.py` and
+`market_analytics.py`, each on both product sides. CRSEP3ST-002 (P3, resolved
+by `aa2fe4f` and `cb0c7f8`) synchronizes the manifest and active plans after
+the accepted review instead of continuing to claim it is pending. No P0 or P1
+finding was found. Claude's sole commit is accepted after correction.
+
+The original focused review suites pass 99 tests. The four new guards first
+failed on the uncorrected tree and then passed after correction; disabling
+both new top-level comparisons made the two refusal tests fail, and restoring
+them made the corrected combined focus pass **103 tests** in 488.33 seconds.
+The fifth candidate remains exact at 749 paths, destination counts 502 / 243 /
+4, test partitions 86 / 73 / 1 / 42 / 6, and eight stranded data modules.
+The two newly explicit top-level blockers bring the measured module boundary
+total to ten. This is still an independently reviewed fifth dry run, not
+physical-extraction readiness or authorization.
+
+Under the owner's standing loop the counter-review branch remains local-only.
+The next bounded implementation branch begins from this finalized tree and
+removes the assistant's dependency on research-owned `market_analytics.py`
+with behavior-identical private calculations. It must then produce a sixth
+dry run, validate the combined series, and be the only branch Codex pushes in
+this cycle.
+
+## 7en. SEP-3 market-analytics ownership and sixth dry run (Codex, 2026-08-24)
+
+Codex continued from finalized counter-review head `74d194a` on fresh isolated
+branch `codex/sep3-market-analytics-ownership-20260824`. The bounded
+implementation series is:
+
+1. `273e4e1` — create assistant-private, behavior-equivalent market-display
+   arithmetic and remove production assistant imports of root
+   `market_analytics`;
+2. `2c59df4` — route the assistant-hosted UI through the private calculation
+   instead of adding a composition exception;
+3. `c4c6ed8` — assign root `market_analytics.py` to strategy research and
+   remove it from the temporary shared roots;
+4. `6ea5f88` — record the exact sixth extraction dry run and its dangerous-
+   direction regression; and
+5. `650555d` — synchronize the Action Plan and separation plan.
+
+The exact sixth candidate is
+`c4c6ed897be3c8cf7d11f345523f43ea6647e316`: **752 tracked paths**, inventory
+SHA-256 `dbf460e5def6a06f8d65b4d09029b7a7b05739f8de05653bb06e0f4ce8fa7460`,
+assigned exactly once as **502 trading assistant / 246 strategy research / 4
+shared**. Tests partition as **84 assistant / 75 research / 1 shared / 42
+integration / 6 governance** with exact ordered hashes in the manifest.
+`market_analytics` leaves the stranded top-level ledger; `config` is its sole
+remaining entry and still has both product-side importers. The eight dual-use
+data modules, 11 composition files, six Python crossing roots, four non-
+assistant operator-store importers, 42 integration tests, non-test
+documentation ownership, and owner-gated runtime topology remain explicit
+blockers. Status is `sixth-dry-run-not-ready-for-physical-extraction`, pending
+independent review, with physical authorization false.
+
+Validation is clean. The behavior regression first failed because
+`assistant.market_analytics` did not exist, then the affected behavior suite
+passed 56 tests and the product/entry-point boundaries passed 34. The combined
+dry-run, behavior, boundary, and active-document focus passed 159 tests in
+511.27 seconds. The restored assistant-to-research import is refused with the
+exact stranded-module direction; disabling the primary comparison made that
+regression fail against the secondary side ledger, and restoration passed.
+The complete suite passed **4,563 tests** with 25 dependency deprecation
+warnings and zero failures in 2,118.86 seconds. Architecture JSON validation,
+repository-wide `compileall` including `research/`, diff checks, and the
+narrow changed-file secret scan are clean.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed. After this final handoff's
+active-document and repository checks pass, Codex will push this implementation
+branch exactly once and create the next exact-head alarm for Claude's review.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

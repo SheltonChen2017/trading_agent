@@ -229,7 +229,7 @@ from backtest.interactive import (
 from data.event_data import fetch_upcoming_earnings
 from data.market_data import fetch_historical, generate_synthetic
 from execution.alpaca_broker import is_configured
-from market_analytics import classify_trend
+from assistant.market_analytics import classify_trend
 from scripts.ui_theme import THEME_CSS
 
 st.set_page_config(

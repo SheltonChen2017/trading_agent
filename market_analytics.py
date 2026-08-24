@@ -1,21 +1,16 @@
 """
-Generic, backward-looking market-analytics primitives shared by
-production (`assistant/`) and research (`strategies/`, `backtest/`) code.
+Research-owned backward-looking market-analytics primitives used by
+`strategies/`, `signals/`, `ml/`, and `backtest/` code.
 
-Lives at the repo root, alongside config.py/baskets.py, deliberately --
-NOT inside assistant/ (would force research code to import from the
-production layer to re-export its own helper) or data/ (every existing
-data/* module fetches over the network; these functions are pure
-computation on already-fetched data). assistant/stock_lookup.py used to import
-run_baseline_forward_returns from backtest/engine.py just to compute
-holding-period ranges, which transitively pulled in
-`from signals.scanner import scan_dips_and_ups` (backtest/engine.py's own
-top-level import) whether or not anything needed it -- moving both
-functions here removes that coupling.
+The assistant carries behavior-equivalent private display arithmetic in
+``assistant.market_analytics``. Production assistant code must not import
+this research-owned module: that would become a cross-repository product
+dependency after physical extraction. An integration boundary test is the
+only place that imports both implementations and holds their behavior equal.
 
-classify_trend() was strategies/trend_vol_rotation.py's; both modules
-re-export the moved function under their original name so existing
-callers and tests need no changes.
+classify_trend() was strategies/trend_vol_rotation.py's; that compatibility
+module re-exports the moved function under its original name so existing
+research callers and tests need no changes.
 
 SEP-1 also moved the pure trailing-volatility and caller-threshold regime
 helpers here from ``signals.regime``. They measure already-supplied price

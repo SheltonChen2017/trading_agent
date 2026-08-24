@@ -7304,6 +7304,55 @@ with behavior-identical private calculations. It must then produce a sixth
 dry run, validate the combined series, and be the only branch Codex pushes in
 this cycle.
 
+## 7en. SEP-3 market-analytics ownership and sixth dry run (Codex, 2026-08-24)
+
+Codex continued from finalized counter-review head `74d194a` on fresh isolated
+branch `codex/sep3-market-analytics-ownership-20260824`. The bounded
+implementation series is:
+
+1. `273e4e1` — create assistant-private, behavior-equivalent market-display
+   arithmetic and remove production assistant imports of root
+   `market_analytics`;
+2. `2c59df4` — route the assistant-hosted UI through the private calculation
+   instead of adding a composition exception;
+3. `c4c6ed8` — assign root `market_analytics.py` to strategy research and
+   remove it from the temporary shared roots;
+4. `6ea5f88` — record the exact sixth extraction dry run and its dangerous-
+   direction regression; and
+5. `650555d` — synchronize the Action Plan and separation plan.
+
+The exact sixth candidate is
+`c4c6ed897be3c8cf7d11f345523f43ea6647e316`: **752 tracked paths**, inventory
+SHA-256 `dbf460e5def6a06f8d65b4d09029b7a7b05739f8de05653bb06e0f4ce8fa7460`,
+assigned exactly once as **502 trading assistant / 246 strategy research / 4
+shared**. Tests partition as **84 assistant / 75 research / 1 shared / 42
+integration / 6 governance** with exact ordered hashes in the manifest.
+`market_analytics` leaves the stranded top-level ledger; `config` is its sole
+remaining entry and still has both product-side importers. The eight dual-use
+data modules, 11 composition files, six Python crossing roots, four non-
+assistant operator-store importers, 42 integration tests, non-test
+documentation ownership, and owner-gated runtime topology remain explicit
+blockers. Status is `sixth-dry-run-not-ready-for-physical-extraction`, pending
+independent review, with physical authorization false.
+
+Validation is clean. The behavior regression first failed because
+`assistant.market_analytics` did not exist, then the affected behavior suite
+passed 56 tests and the product/entry-point boundaries passed 34. The combined
+dry-run, behavior, boundary, and active-document focus passed 159 tests in
+511.27 seconds. The restored assistant-to-research import is refused with the
+exact stranded-module direction; disabling the primary comparison made that
+regression fail against the secondary side ledger, and restoration passed.
+The complete suite passed **4,563 tests** with 25 dependency deprecation
+warnings and zero failures in 2,118.86 seconds. Architecture JSON validation,
+repository-wide `compileall` including `research/`, diff checks, and the
+narrow changed-file secret scan are clean.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed. After this final handoff's
+active-document and repository checks pass, Codex will push this implementation
+branch exactly once and create the next exact-head alarm for Claude's review.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

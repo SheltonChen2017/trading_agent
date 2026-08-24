@@ -17,15 +17,15 @@
         "research",
         "signals",
         "strategies",
-        "baskets.py"
+        "baskets.py",
+        "market_analytics.py"
       ],
       "purpose": "Hypothesis definition, point-in-time datasets, signals, backtests, statistical validation, research evidence, and ACER."
     }
   },
   "shared_roots": [
     "data",
-    "config.py",
-    "market_analytics.py"
+    "config.py"
   ],
   "classified_mixed_roots": [
     "scripts"

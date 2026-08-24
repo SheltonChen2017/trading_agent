@@ -7061,6 +7061,56 @@ After final validation and exact remote-base checks, push only
 standalone counter-review branch, main, Claude's branch, a checkpoint, or a
 tag. Then create the next exact-head ten-minute Claude-review alarm.
 
+## 7ej. Independent review of the SEP-3 research-statistics tranche (Claude, 2026-08-23)
+
+Branch `user/claude/review-sep3-resstats-20260823`, created from the exact
+fetched remote head `0de7920` on
+`origin/codex/sep3-research-statistics-ownership-20260823`, based on my prior
+review head `dabf00f`. All seven commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-23_SEP3_RESEARCH_STATISTICS.md`.
+**This round was reviewed after PR #306 merged it** — the watch was down
+across a session restart — and the merged mainline tree is byte-identical to
+the reviewed head, so the review stands on the same content the owner merged.
+
+**Accepted. No findings.**
+
+**Codex's CRSEP3A-001 against my guard test is correct**: my grammar
+extension was mutation-verified but the permanent unit test asserted only
+`SEP…` examples, so deleting the `(?:CR)?` prefix later would have escaped
+it. `ee7d2ed` pins `CRSEP3R2-001` as a full-match example — the
+pin-the-dangerous-direction discipline applied to my own test.
+
+**The production change is verified, not assumed.** `8cb47e1` is the first
+stranded-module resolution that edits assistant production code:
+`assistant/research_looks.py` — the QC-2 look-accounting module — drops its
+`data.research_statistics` import and inlines display-only Bonferroni
+arithmetic, so the module becomes research-owned and the stranded list falls
+**9 → 8**. Checked harder than its size suggests: the two implementations are
+**bit-identical over the reachable domain** (measured, n ≥ 1 across alphas);
+the one divergent branch (`n ≤ 0`) is unreachable and fails *closed* where
+the canonical form failed open; the threshold's sole consumer is the
+Streamlit Backtest page, so no gate or evidence path is touched and QC-2's
+look counting is unchanged; and the deliberate duplication of `alpha / n` is
+the scoped alternative to a post-extraction cross-repository dependency,
+documented on both sides. Mutation: re-adding the import fails the ownership
+guard with the exact offender; restored green. Fourth dry run reproduces
+(candidate `8cb47e1`, stranded 8, extraction refused). Focused suites **116
+passed**.
+
+Validation on the final tree: complete suite **4,552 passed / 0 failed / 25
+warnings** in 937.61 seconds on Python 3.13.14 — unchanged from Codex's
+4,552, since this round added no test; the doc-consistency guards were
+rerun on the final prose (56 passed); `git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 continues: the eight
+remaining dual-use modules — the genuinely contested destinations, partly an
+owner call — the integration/governance partition, the composition ledger,
+and the owner-gated runtime topology, then a fifth dry run.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

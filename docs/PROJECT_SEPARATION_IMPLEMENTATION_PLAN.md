@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 fifth dry run pending review; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 fifth dry run independently reviewed; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -591,9 +591,14 @@ composition files, six Python crossing roots, four non-assistant operator-
 store importers, and owner-gated runtime topology remain blocking. Physical
 extraction remains unauthorized.
 
-Next, independently review this exact fifth candidate, then continue the eight
-dual-use data modules, 42 integration tests, non-test documentation partition,
-and owner-gated runtime topology. Only after a dry run reports no blocking
+Claude independently accepted the exact fifth candidate at pushed review head
+`1680f6e`. Codex's counter-review found that the existing stranded-module
+measurement covered `data.*` but not the separately assigned top-level files:
+both `config.py` and `market_analytics.py` are sent to the assistant while
+research-owned sources still import them. They are now measured, side-pinned
+blockers alongside the eight dual-use data modules. Continue those ten module
+boundaries, 42 integration tests, non-test documentation partition, and
+owner-gated runtime topology. Only after a dry run reports no blocking
 product crossings may a separately authorized migration create the research
 repository and shared package. No repository creation, history rewrite,
 deployment, credential move, scheduled-task change, operator-database move,

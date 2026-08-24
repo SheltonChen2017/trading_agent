@@ -75,7 +75,10 @@ research, one shared-contract, 42 integration and six governance files. It
 remains blocked on eight dual-use modules, the unchanged runtime residuals,
 42 integration tests and non-test documentation ownership; see
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Physical extraction remains
-separately gated and the fifth dry run awaits independent review.
+separately gated. Claude independently accepted the fifth dry run; Codex's
+counter-review then exposed two additional dual-use top-level-module blockers
+(`config.py` and `market_analytics.py`) that the data-only stranded-module
+measurement had not covered.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

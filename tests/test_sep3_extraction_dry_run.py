@@ -26,15 +26,15 @@ def _write_manifest(tmp_path: Path, manifest: dict) -> Path:
     return path
 
 
-def test_fourth_extraction_dry_run_is_exact_and_not_authorized():
+def test_fifth_extraction_dry_run_is_exact_and_not_authorized():
     result = validate()
     assert result["status"] == (
-        "valid-fourth-dry-run-not-ready-for-physical-extraction"
+        "valid-fifth-dry-run-not-ready-for-physical-extraction"
     )
-    assert result["source_commit"] == "8cb47e1714ebea2e93ddd578801d2a953588bef0"
+    assert result["source_commit"] == "df7eb48b5e17a769d6977d513cafab680f336b66"
     assert result["inventory"] == {
-        "tracked_paths": 747,
-        "sha256": "b22d5c3450a5f00fcbfa035c151bea9cc4443e8211951d0be74bf5c37add5834",
+        "tracked_paths": 749,
+        "sha256": "a5c57b9896d22faff9fe3b2bc32126e7ebc89245ce2433b44f69086dbde86797",
         "assigned_exactly_once": True,
         "destination_counts": {
             # SEP3R-002: this dict briefly carried both `"shared_contracts": 3`
@@ -42,8 +42,8 @@ def test_fourth_extraction_dry_run_is_exact_and_not_authorized():
             # key silently, so the stale 3 was dead text masking an
             # incomplete edit rather than a failing assertion.
             "shared_contracts": 4,
-            "strategy_research": 240,
-            "trading_assistant": 503,
+            "strategy_research": 243,
+            "trading_assistant": 502,
         },
     }
     assert result["physical_extraction_authorized"] is False
@@ -62,16 +62,43 @@ def test_fourth_extraction_dry_run_is_exact_and_not_authorized():
         "python_crossing_roots": 6,
         "operator_database_importers": 4,
         "support_surface_partition": (
-            "product-pure-tests-pinned-integration-explicit"
+            "product-and-governance-tests-pinned-integration-explicit"
         ),
-        "integration_test_files": 54,
-        "governance_support_partition": "pending",
+        "integration_test_files": 42,
+        "governance_support_partition": (
+            "non-test-documentation-product-ownership-pending"
+        ),
         # SEP3A-001 and SEP3S-001 assign two services without widening the
         # shared package; eight genuinely dual-use data modules remain.
         "stranded_data_modules": _STRANDED_DATA_MODULES,
         "stranded_data_module_importer_sides": _STRANDED_IMPORTER_SIDES,
     }
     assert result["surfaces"]["shared_contract_test_files"] == 1
+    assert result["surfaces"]["governance_test_files"] == 6
+    assert result["surfaces"]["test_counts"] == {
+        "trading_assistant": 86,
+        "strategy_research": 73,
+        "shared_contracts": 1,
+        "integration": 42,
+        "governance": 6,
+    }
+    assert result["surfaces"]["test_inventory_sha256"] == {
+        "trading_assistant": (
+            "f74ad0c89ace4331cd288ff5514926f27ab64362dbd0ce0e853debcd4729b450"
+        ),
+        "strategy_research": (
+            "974deb9edeaf54c1691f6246295ecfe38a4db59b513258fad4ea40e40e8ce015"
+        ),
+        "shared_contracts": (
+            "99f98d144d43c92720202126fdff6734a3a310720c18e9f974903b95e8a0f192"
+        ),
+        "integration": (
+            "bf2688760aeb8136b30f625fb0fdbaec62cfafa3f81ff534d0cd7f3ac9b1d0fe"
+        ),
+        "governance": (
+            "7d7bb973104f5c31718293cec1768bd1684b88b5a7a4d6619572ef2df6126fab"
+        ),
+    }
 
 
 def test_unclassified_retained_path_is_refused(tmp_path: Path):

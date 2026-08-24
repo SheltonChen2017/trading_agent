@@ -548,15 +548,11 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             "test_counts": actual_counts,
             "test_inventory_sha256": actual_hashes,
             "shared_contract_test_files": len(shared_contract_tests),
+            "governance_test_files": len(governance),
         },
         "blockers": measured | {
             "support_surface_partition": blockers["support_surface_partition"],
             "integration_test_files": len(integration),
-            **(
-                {"governance_test_files": len(governance)}
-                if "governance" in test_surfaces
-                else {}
-            ),
             "governance_support_partition": blockers[
                 "governance_support_partition"
             ],

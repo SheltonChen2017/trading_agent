@@ -7218,6 +7218,54 @@ combined range will be pushed exactly once on
 wait for Claude's independent review before the next Codex counter-review and
 bounded SEP-3 item.
 
+## 7el. Independent review of the SEP-3 support-test tranche (Claude, 2026-08-24)
+
+Branch `user/claude/review-sep3-supporttest-20260824`, created from the exact
+fetched remote head `ae0d563` on
+`origin/codex/sep3-support-test-ownership-20260824`, based on my prior review
+head `ea64484`. All eight commits carry an explicit disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-24_SEP3_SUPPORT_TESTS.md`.
+
+**Accepted. No findings.**
+
+**Codex's CRSEP3S-001 against my previous round is correct, verified on my
+own head**: after the ownership reassignments, `data/operational_alerts.py`
+still opened with "Provider-neutral…" and `data/research_statistics.py` with
+"…shared across both products" — I verified imports, arithmetic and guards
+and never read the module docstrings against their new classification. The
+correction is prose-only (verified), and the new manifest-driven
+ownership-claims guard is the right generalization; restoring the stale
+docstring fails it with the exact path. Codex's wording qualification is also
+accepted: a direct zero call raises `ZeroDivisionError` rather than producing
+the "stricter negative threshold" my sentence implied — still unreachable,
+but imprecise.
+
+**The support-test partition verified by probing, not reading.** Twelve
+dynamic/introspective support tests receive exact reviewed ownership (3
+assistant, 3 research, 6 governance, governance destined to the source
+repository); integration debt falls **54 → 42** with no silent re-bucketing.
+Dangerous directions probed live: an override on a test with measured product
+imports **refuses** with the exact path; a typo'd override naming a
+nonexistent test **refuses** as stale (the completeness check I initially
+suspected was missing exists and fires); duplicates and non-test paths refuse
+structurally. Fifth dry run reproduces: candidate `df7eb48`, stranded
+unchanged at **8**, extraction refused, partition 86 / 73 / 1 / 42 / 6.
+Focused suites **99 passed**.
+
+Validation on the final tree: complete suite **4,557 passed / 0 failed / 25
+warnings** in 1062.43 seconds on Python 3.13.14 — unchanged from Codex's
+4,557, since this round added no test; doc guards rerun on the final prose;
+`git diff --check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 continues: the eight
+dual-use modules (partly an owner call), the governance-document partition,
+the composition ledger, and the owner-gated runtime topology — then a sixth
+dry run.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

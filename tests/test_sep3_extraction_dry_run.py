@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+import scripts.validate_sep3_extraction as sep3_validator
 
 from scripts.validate_sep3_extraction import (
     DEFAULT_MANIFEST,
@@ -26,15 +27,15 @@ def _write_manifest(tmp_path: Path, manifest: dict) -> Path:
     return path
 
 
-def test_fifth_extraction_dry_run_is_exact_and_not_authorized():
+def test_sixth_extraction_dry_run_is_exact_and_not_authorized():
     result = validate()
     assert result["status"] == (
-        "valid-fifth-dry-run-not-ready-for-physical-extraction"
+        "valid-sixth-dry-run-not-ready-for-physical-extraction"
     )
-    assert result["source_commit"] == "df7eb48b5e17a769d6977d513cafab680f336b66"
+    assert result["source_commit"] == "c4c6ed897be3c8cf7d11f345523f43ea6647e316"
     assert result["inventory"] == {
-        "tracked_paths": 749,
-        "sha256": "a5c57b9896d22faff9fe3b2bc32126e7ebc89245ce2433b44f69086dbde86797",
+        "tracked_paths": 752,
+        "sha256": "dbf460e5def6a06f8d65b4d09029b7a7b05739f8de05653bb06e0f4ce8fa7460",
         "assigned_exactly_once": True,
         "destination_counts": {
             # SEP3R-002: this dict briefly carried both `"shared_contracts": 3`
@@ -42,7 +43,7 @@ def test_fifth_extraction_dry_run_is_exact_and_not_authorized():
             # key silently, so the stale 3 was dead text masking an
             # incomplete edit rather than a failing assertion.
             "shared_contracts": 4,
-            "strategy_research": 243,
+            "strategy_research": 246,
             "trading_assistant": 502,
         },
     }
@@ -80,18 +81,18 @@ def test_fifth_extraction_dry_run_is_exact_and_not_authorized():
     assert result["surfaces"]["shared_contract_test_files"] == 1
     assert result["surfaces"]["governance_test_files"] == 6
     assert result["surfaces"]["test_counts"] == {
-        "trading_assistant": 86,
-        "strategy_research": 73,
+        "trading_assistant": 84,
+        "strategy_research": 75,
         "shared_contracts": 1,
         "integration": 42,
         "governance": 6,
     }
     assert result["surfaces"]["test_inventory_sha256"] == {
         "trading_assistant": (
-            "f74ad0c89ace4331cd288ff5514926f27ab64362dbd0ce0e853debcd4729b450"
+            "f073b27da5b4cfd28bd516b84b47a947848e30cf5215f2eb54d0253bcccaa744"
         ),
         "strategy_research": (
-            "974deb9edeaf54c1691f6246295ecfe38a4db59b513258fad4ea40e40e8ce015"
+            "236ef9fc29d9023d6fc3a625da1755225446920e5b1e7bf62d4cff09c20a0016"
         ),
         "shared_contracts": (
             "99f98d144d43c92720202126fdff6734a3a310720c18e9f974903b95e8a0f192"
@@ -324,10 +325,10 @@ _STRANDED_IMPORTER_SIDES = {
 }
 
 # CRSEP3ST-001: SEP3R-001 measured only data.* assignments. The same
-# dangerous direction existed in the separately assigned top-level modules:
-# research-owned code imports config and market_analytics even though the
-# fifth manifest sends both to the assistant repository.
-_STRANDED_TOP_LEVEL_MODULES = ["config", "market_analytics"]
+# dangerous direction existed in the separately assigned top-level modules.
+# SEP3M-001 removes the assistant's research-owned market_analytics import;
+# config remains dual-use on the sixth candidate.
+_STRANDED_TOP_LEVEL_MODULES = ["config"]
 _STRANDED_TOP_LEVEL_IMPORTER_SIDES = {
     module: _DUAL_USE_SIDES for module in _STRANDED_TOP_LEVEL_MODULES
 }
@@ -416,9 +417,7 @@ def test_missing_stranded_product_top_level_declaration_is_refused(
     tmp_path: Path,
 ):
     manifest = _manifest()
-    manifest["known_blockers"]["stranded_product_top_level_modules"] = [
-        "config"
-    ]
+    manifest["known_blockers"]["stranded_product_top_level_modules"] = []
     with pytest.raises(
         ExtractionValidationError,
         match="stale extraction blocker stranded_product_top_level_modules",
@@ -430,7 +429,7 @@ def test_incorrect_product_top_level_importer_side_is_refused(tmp_path: Path):
     manifest = _manifest()
     manifest["known_blockers"][
         "stranded_product_top_level_importer_sides"
-    ]["market_analytics"] = ["strategy_research"]
+    ]["config"] = ["strategy_research"]
     with pytest.raises(
         ExtractionValidationError,
         match=(
@@ -439,3 +438,21 @@ def test_incorrect_product_top_level_importer_side_is_refused(tmp_path: Path):
         ),
     ):
         validate(_write_manifest(tmp_path, manifest))
+
+
+def test_restored_assistant_market_analytics_import_is_refused(monkeypatch):
+    """SEP3M-001: the removed product-to-product direction stays closed."""
+    original_commit_text = sep3_validator._commit_text
+
+    def with_restored_import(commit: str, path: str) -> str:
+        source = original_commit_text(commit, path)
+        if path == "assistant/context_builder.py":
+            return source + "\nfrom market_analytics import classify_trend\n"
+        return source
+
+    monkeypatch.setattr(sep3_validator, "_commit_text", with_restored_import)
+    with pytest.raises(
+        ExtractionValidationError,
+        match="stale extraction blocker stranded_product_top_level_modules",
+    ):
+        validate()

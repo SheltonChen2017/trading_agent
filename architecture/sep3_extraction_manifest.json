@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "fifth-dry-run-not-ready-for-physical-extraction",
+  "status": "sixth-dry-run-not-ready-for-physical-extraction",
   "owner_topology_decision": {
     "date": "2026-08-22",
     "topology": "two-product-repositories-plus-tiny-shared-contracts-package",
@@ -10,10 +10,10 @@
     "git_submodules": false
   },
   "source": {
-    "candidate_commit": "df7eb48b5e17a769d6977d513cafab680f336b66",
-    "independent_review_status": "accepted",
-    "tracked_path_count": 749,
-    "tracked_path_inventory_sha256": "a5c57b9896d22faff9fe3b2bc32126e7ebc89245ce2433b44f69086dbde86797",
+    "candidate_commit": "c4c6ed897be3c8cf7d11f345523f43ea6647e316",
+    "independent_review_status": "pending",
+    "tracked_path_count": 752,
+    "tracked_path_inventory_sha256": "dbf460e5def6a06f8d65b4d09029b7a7b05739f8de05653bb06e0f4ce8fa7460",
     "physical_extraction_requires_new_reviewed_clean_commit": true
   },
   "product_roots": {
@@ -32,11 +32,11 @@
   },
   "product_top_level_files": {
     "trading_assistant": [
-      "config.py",
-      "market_analytics.py"
+      "config.py"
     ],
     "strategy_research": [
-      "baskets.py"
+      "baskets.py",
+      "market_analytics.py"
     ]
   },
   "script_ownership_source": "architecture/entry_points.json",
@@ -128,15 +128,15 @@
     "status": "product-and-governance-tests-pinned-integration-explicit",
     "classification": "static-first-party-import-roots-at-reviewed-source",
     "test_counts": {
-      "trading_assistant": 86,
-      "strategy_research": 73,
+      "trading_assistant": 84,
+      "strategy_research": 75,
       "shared_contracts": 1,
       "integration": 42,
       "governance": 6
     },
     "test_inventory_sha256": {
-      "trading_assistant": "f74ad0c89ace4331cd288ff5514926f27ab64362dbd0ce0e853debcd4729b450",
-      "strategy_research": "974deb9edeaf54c1691f6246295ecfe38a4db59b513258fad4ea40e40e8ce015",
+      "trading_assistant": "f073b27da5b4cfd28bd516b84b47a947848e30cf5215f2eb54d0253bcccaa744",
+      "strategy_research": "236ef9fc29d9023d6fc3a625da1755225446920e5b1e7bf62d4cff09c20a0016",
       "shared_contracts": "99f98d144d43c92720202126fdff6734a3a310720c18e9f974903b95e8a0f192",
       "integration": "bf2688760aeb8136b30f625fb0fdbaec62cfafa3f81ff534d0cd7f3ac9b1d0fe",
       "governance": "7d7bb973104f5c31718293cec1768bd1684b88b5a7a4d6619572ef2df6126fab"
@@ -182,15 +182,10 @@
     "operator_database_move": "not-authorized",
     "paper_epoch_006": "must-remain-untouched",
     "stranded_product_top_level_modules": [
-      "config",
-      "market_analytics"
+      "config"
     ],
     "stranded_product_top_level_importer_sides": {
       "config": [
-        "strategy_research",
-        "trading_assistant"
-      ],
-      "market_analytics": [
         "strategy_research",
         "trading_assistant"
       ]
@@ -239,8 +234,8 @@
         "trading_assistant"
       ]
     },
-    "stranded_data_modules_note": "SEP3R-001/CRSEP3R2-001/SEP3A-001/SEP3S-001: the fifth dry run keeps data.operational_alerts assistant-owned and data.research_statistics research-owned. The assistant renders its recorded-look threshold locally without importing the research calculation. Eight modules remain imported by both product sides and cannot be resolved by simple reassignment. Executed as declared, extraction would still break one product or force the forbidden cross-repository dependency. The validator measures both the stranded set and exact importer sides from the candidate commit and refuses stale declarations.",
-    "stranded_product_top_level_modules_note": "CRSEP3ST-001: SEP3R-001 measured only assigned data modules. Exact candidate import measurement also finds that strategy-research and trading-assistant sources both import config and market_analytics even though the fifth manifest sends both top-level files to the assistant repository. Both remain explicit extraction blockers until their product dependencies are split or reassigned without a cross-repository product import."
+    "stranded_data_modules_note": "SEP3R-001/CRSEP3R2-001/SEP3A-001/SEP3S-001: the sixth dry run keeps data.operational_alerts assistant-owned and data.research_statistics research-owned. The assistant renders its recorded-look threshold locally without importing the research calculation. Eight modules remain imported by both product sides and cannot be resolved by simple reassignment. Executed as declared, extraction would still break one product or force the forbidden cross-repository dependency. The validator measures both the stranded set and exact importer sides from the candidate commit and refuses stale declarations.",
+    "stranded_product_top_level_modules_note": "CRSEP3ST-001/SEP3M-001: the validator measures separately assigned top-level modules. The assistant now owns behavior-identical private market-display arithmetic and no assistant-owned source imports research-owned market_analytics; that former blocker is closed. Exact candidate measurement still finds both product sides importing config, so config remains the single explicit top-level blocker until its product dependencies are split without a cross-repository import."
   },
   "physical_extraction_authorized": false
 }

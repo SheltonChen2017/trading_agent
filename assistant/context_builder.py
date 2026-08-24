@@ -21,7 +21,7 @@ import pandas as pd
 
 from config import BASKETS, REGIME_VOLATILITY_LOOKBACK_DAYS
 from data.market_data import fetch_historical
-from market_analytics import (
+from assistant.market_analytics import (
     calibrate_volatility_threshold,
     classify_trend,
     classify_volatility_regime,

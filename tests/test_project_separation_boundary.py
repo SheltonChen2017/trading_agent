@@ -324,6 +324,92 @@ def test_neutral_contract_compatibility_facades_preserve_identity():
     assert classify_regime is classify_volatility_regime
 
 
+def test_assistant_private_market_analytics_match_research_behavior():
+    """SEP3M-001: split the product dependency without semantic drift.
+
+    The assistant must not import the research-owned root module in
+    production. This integration guard is the only place that imports both
+    implementations, so future safety or arithmetic changes cannot silently
+    diverge across the repository split.
+    """
+    import numpy as np
+    import pandas as pd
+    import pytest
+
+    from assistant.market_analytics import (
+        calibrate_volatility_threshold as assistant_calibrate,
+        classify_trend as assistant_classify_trend,
+        classify_volatility_regime as assistant_classify_volatility,
+        compute_historical_forward_returns,
+        compute_trailing_market_volatility as assistant_trailing_volatility,
+    )
+    from market_analytics import (
+        calibrate_volatility_threshold as research_calibrate,
+        classify_trend as research_classify_trend,
+        classify_volatility_regime as research_classify_volatility,
+        compute_trailing_market_volatility as research_trailing_volatility,
+        run_baseline_forward_returns,
+    )
+
+    dates = pd.bdate_range("2025-01-02", periods=90)
+    close = pd.Series(
+        100.0 * np.cumprod(1.0 + np.linspace(-0.01, 0.015, len(dates))),
+        index=dates,
+    )
+    frame = pd.DataFrame(
+        {
+            "open": close.shift(1).fillna(close.iloc[0]),
+            "high": close * 1.01,
+            "low": close * 0.99,
+            "close": close,
+            "volume": 1_000_000.0,
+        },
+        index=dates,
+    )
+    as_of = dates[-1]
+
+    assert assistant_classify_trend(close, as_of, 20) == research_classify_trend(
+        close, as_of, 20
+    )
+    assert assistant_classify_trend(close, dates[5], 20) is None
+    for invalid_lookback in (0, -1, True, 1.5):
+        with pytest.raises(ValueError) as assistant_error:
+            assistant_classify_trend(close, as_of, invalid_lookback)
+        with pytest.raises(ValueError) as research_error:
+            research_classify_trend(close, as_of, invalid_lookback)
+        assert str(assistant_error.value) == str(research_error.value)
+    assistant_volatility = assistant_trailing_volatility(frame, as_of, 20)
+    research_volatility = research_trailing_volatility(frame, as_of, 20)
+    assert assistant_volatility == research_volatility
+    assert assistant_classify_volatility(
+        frame, as_of, research_volatility, 20
+    ) == research_classify_volatility(frame, as_of, research_volatility, 20)
+    assert assistant_calibrate(frame, dates[60], 20) == research_calibrate(
+        frame, dates[60], 20
+    )
+
+    for timing in ("same_close", "next_open", "same_day_open_to_close"):
+        assistant_result = compute_historical_forward_returns(
+            {"TEST": frame}, hold_days=5, slippage_pct=0.01, entry_timing=timing
+        )
+        research_result = run_baseline_forward_returns(
+            {"TEST": frame}, hold_days=5, slippage_pct=0.01, entry_timing=timing
+        )
+        pd.testing.assert_frame_equal(assistant_result, research_result)
+
+    for invalid_kwargs in (
+        {"hold_days": 0},
+        {"hold_days": True},
+        {"slippage_pct": -0.01},
+        {"entry_timing": "future_close"},
+    ):
+        with pytest.raises(ValueError) as assistant_error:
+            compute_historical_forward_returns({"TEST": frame}, **invalid_kwargs)
+        with pytest.raises(ValueError) as research_error:
+            run_baseline_forward_returns({"TEST": frame}, **invalid_kwargs)
+        assert str(assistant_error.value) == str(research_error.value)
+
+
 def test_temporary_composition_seam_is_not_imported_by_either_product():
     """SEP1-004. Composition stays in deferred scripts, never in a product."""
     manifest = _manifest()

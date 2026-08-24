@@ -19,9 +19,9 @@ import math
 import pandas as pd
 
 from data.price_target_data import fetch_price_target_history
-from market_analytics import (
+from assistant.market_analytics import (
+    compute_historical_forward_returns,
     compute_trailing_market_volatility,
-    run_baseline_forward_returns,
 )
 
 BLENDED_VOL_SHORT_DAYS = 20
@@ -52,13 +52,15 @@ def historical_hold_period_range(
     """The REAL range of hold_days forward returns across this ticker's
     own price history -- not a forecast. Answers "historically, what was
     the best and worst outcome of holding this for N days starting on
-    any day," using run_baseline_forward_returns() (every day, not just
+    any day," using compute_historical_forward_returns() (every day, not just
     flagged signal days) so it isn't biased toward any particular entry
     rule. Returns None if the ticker has no/insufficient data.
     """
     if ticker not in data or data[ticker].empty:
         return None
-    baseline = run_baseline_forward_returns({ticker: data[ticker]}, hold_days=hold_days, slippage_pct=0.0)
+    baseline = compute_historical_forward_returns(
+        {ticker: data[ticker]}, hold_days=hold_days, slippage_pct=0.0
+    )
     if baseline.empty:
         return None
     returns = baseline["net_return_pct"]

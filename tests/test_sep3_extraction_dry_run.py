@@ -149,6 +149,83 @@ def test_integration_tests_cannot_be_hidden_in_research(tmp_path: Path):
         validate(_write_manifest(tmp_path, manifest))
 
 
+def _manifest_with_explicit_test_ownership() -> dict:
+    manifest = _manifest()
+    manifest["support_partition"]["explicit_test_ownership"] = {
+        "trading_assistant": [
+            "tests/test_launch_dev_app.py",
+            "tests/test_operational_task_resilience.py",
+            "tests/test_setup_operational_host.py",
+        ],
+        "strategy_research": [
+            "tests/test_allocation_policy.py",
+            "tests/test_leveraged_threshold.py",
+            "tests/test_ml_helper_divergence.py",
+        ],
+        "governance": [
+            "tests/conftest.py",
+            "tests/test_active_document_consistency.py",
+            "tests/test_ml_import_boundary.py",
+            "tests/test_overlay_import_boundary.py",
+            "tests/test_runtime_artifact_ignores.py",
+            "tests/test_schema_version_inventory.py",
+        ],
+    }
+    manifest["support_partition"]["governance_destination"] = (
+        "trading_assistant"
+    )
+    manifest["support_partition"]["governance_test_files"] = 6
+    return manifest
+
+
+def test_explicit_test_ownership_cannot_hide_static_product_imports(
+    tmp_path: Path,
+):
+    manifest = _manifest_with_explicit_test_ownership()
+    manifest["support_partition"]["explicit_test_ownership"]["governance"].append(
+        "tests/test_research_looks.py"
+    )
+    with pytest.raises(
+        ExtractionValidationError,
+        match="cannot override statically measured product imports",
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_explicit_test_ownership_cannot_duplicate_a_path(tmp_path: Path):
+    manifest = _manifest_with_explicit_test_ownership()
+    manifest["support_partition"]["explicit_test_ownership"][
+        "strategy_research"
+    ].append("tests/test_launch_dev_app.py")
+    with pytest.raises(
+        ExtractionValidationError, match="duplicate explicit test ownership"
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_explicit_test_ownership_cannot_name_a_stale_path(tmp_path: Path):
+    manifest = _manifest_with_explicit_test_ownership()
+    manifest["support_partition"]["explicit_test_ownership"]["governance"].append(
+        "tests/test_missing_sep3_support.py"
+    )
+    with pytest.raises(
+        ExtractionValidationError, match="stale explicit test ownership paths"
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_governance_tests_stay_with_source_repository_support(tmp_path: Path):
+    manifest = _manifest_with_explicit_test_ownership()
+    manifest["support_partition"]["governance_destination"] = (
+        "strategy_research"
+    )
+    with pytest.raises(
+        ExtractionValidationError,
+        match="governance tests must remain with migration support",
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
 def test_full_import_names_distinguish_shared_contracts_from_product_data():
     modules = _imported_modules(
         "from data import financial_primitives, macro_data\n"

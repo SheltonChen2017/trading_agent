@@ -175,7 +175,10 @@ def _partition_tests(
     Product-pure tests follow their product. Tests that exercise both products
     stay with the source/trading-assistant repository as explicit integration
     debt until the physical extraction is separately authorized. A test that
-    exercises only the tiny shared contracts follows that package.
+    exercises only the tiny shared contracts follows that package. Tests that
+    load source dynamically or inspect repository text may receive an exact
+    reviewed ownership override only while their static product-import set is
+    empty; a later product import makes the override fail closed.
     """
     surfaces = {
         "trading_assistant": [],
@@ -183,6 +186,31 @@ def _partition_tests(
         "shared_contracts": [],
         "integration": [],
     }
+    explicit = manifest["support_partition"].get("explicit_test_ownership")
+    explicit_by_path: dict[str, str] = {}
+    if explicit is not None:
+        expected_buckets = {
+            "trading_assistant",
+            "strategy_research",
+            "governance",
+        }
+        if set(explicit) != expected_buckets:
+            raise ExtractionValidationError(
+                "explicit test ownership must declare assistant, research, "
+                "and governance buckets"
+            )
+        surfaces["governance"] = []
+        for bucket, declared in explicit.items():
+            for path in declared:
+                if path in explicit_by_path:
+                    raise ExtractionValidationError(
+                        f"duplicate explicit test ownership: {path}"
+                    )
+                if not path.startswith("tests/") or not path.endswith(".py"):
+                    raise ExtractionValidationError(
+                        f"explicit test ownership is not a Python test: {path}"
+                    )
+                explicit_by_path[path] = bucket
     owned_modules: dict[str, set[str]] = {}
 
     def own(module: str, *destinations: str) -> None:
@@ -220,7 +248,15 @@ def _partition_tests(
             for owned_module, owners in owned_modules.items():
                 if module == owned_module or module.startswith(owned_module + "."):
                     destinations.update(owners)
-        if destinations == {"trading_assistant"}:
+        explicit_bucket = explicit_by_path.get(path)
+        if explicit_bucket is not None:
+            if destinations:
+                raise ExtractionValidationError(
+                    "explicit test ownership cannot override statically measured "
+                    f"product imports: {path} -> {sorted(destinations)!r}"
+                )
+            bucket = explicit_bucket
+        elif destinations == {"trading_assistant"}:
             bucket = "trading_assistant"
         elif destinations == {"strategy_research"}:
             bucket = "strategy_research"
@@ -229,6 +265,11 @@ def _partition_tests(
         else:
             bucket = "integration"
         surfaces[bucket].append(path)
+    missing = sorted(set(explicit_by_path) - set(paths))
+    if missing:
+        raise ExtractionValidationError(
+            f"stale explicit test ownership paths: {missing!r}"
+        )
     return surfaces
 
 
@@ -352,6 +393,18 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         "shared_contracts": "shared_contracts",
         "integration": support_partition["integration_destination"],
     }
+    governance = test_surfaces.get("governance", [])
+    if governance:
+        if support_partition.get("governance_destination") != manifest[
+            "support_paths"
+        ]["destination"]:
+            raise ExtractionValidationError(
+                "governance tests must remain with migration support in the "
+                "source repository"
+            )
+        bucket_destinations["governance"] = support_partition[
+            "governance_destination"
+        ]
     test_destinations = {
         path: bucket_destinations[bucket]
         for bucket, items in test_surfaces.items()
@@ -418,6 +471,8 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         )
     if support_partition["integration_test_files"] != len(integration):
         raise ExtractionValidationError("stale integration-test blocker count")
+    if support_partition.get("governance_test_files", 0) != len(governance):
+        raise ExtractionValidationError("stale governance-test partition count")
     shared_contract_tests = test_surfaces["shared_contracts"]
     if support_partition["shared_contract_test_files"] != len(shared_contract_tests):
         raise ExtractionValidationError("stale shared-contract test count")
@@ -478,7 +533,7 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     }
     return {
         "schema_version": 2,
-        "status": "valid-fourth-dry-run-not-ready-for-physical-extraction",
+        "status": f"valid-{manifest['status']}",
         "source_commit": commit,
         "inventory": {
             "tracked_paths": len(paths),
@@ -497,6 +552,11 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         "blockers": measured | {
             "support_surface_partition": blockers["support_surface_partition"],
             "integration_test_files": len(integration),
+            **(
+                {"governance_test_files": len(governance)}
+                if "governance" in test_surfaces
+                else {}
+            ),
             "governance_support_partition": blockers[
                 "governance_support_partition"
             ],

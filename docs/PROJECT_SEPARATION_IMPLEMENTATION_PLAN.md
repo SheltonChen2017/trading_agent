@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 fifth dry run independently reviewed; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 sixth dry run pending review; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -33,8 +33,8 @@ gates, and the still-running paper evidence epoch.
 | Product | Initial owned code | Does not own |
 |---|---|---|
 | Trading assistant | `assistant/`, `execution/`, `risk/` | Backtests, research hypotheses, ML experiments, or strategy calculations |
-| Strategy research | `research/`, `backtest/`, `ml/`, `signals/`, `strategies/`, `baskets.py` | Broker submission, approvals, reconciliation, or operational authority |
-| Shared kernel (temporary) | `data/`, `config.py`, `market_analytics.py` | Product policy; this surface must shrink or be split as ownership becomes clear |
+| Strategy research | `research/`, `backtest/`, `ml/`, `signals/`, `strategies/`, `baskets.py`, `market_analytics.py` | Broker submission, approvals, reconciliation, or operational authority |
+| Shared kernel (temporary) | `data/`, `config.py` | Product policy; this surface must shrink or be split as ownership becomes clear |
 | Unclassified migration surface | `scripts/` | No whole-directory ownership is assumed; each entry point must be classified before extraction |
 
 The machine-readable counterpart is
@@ -596,10 +596,28 @@ Claude independently accepted the exact fifth candidate at pushed review head
 measurement covered `data.*` but not the separately assigned top-level files:
 both `config.py` and `market_analytics.py` are sent to the assistant while
 research-owned sources still import them. They are now measured, side-pinned
-blockers alongside the eight dual-use data modules. Continue those ten module
-boundaries, 42 integration tests, non-test documentation partition, and
-owner-gated runtime topology. Only after a dry run reports no blocking
-product crossings may a separately authorized migration create the research
+blockers alongside the eight dual-use data modules.
+
+The sixth bounded candidate is
+`c4c6ed897be3c8cf7d11f345523f43ea6647e316`. Root
+`market_analytics.py` is now explicitly research-owned. Assistant context,
+stock lookup, and its assistant-hosted UI use behavior-identical private
+calculations in `assistant.market_analytics`; production assistant code no
+longer imports the research module. The integration boundary test compares
+valid calculations and refusal behavior across both implementations, while
+the exact top-level-module measurement makes restoration of the assistant
+import a blocker again.
+
+The sixth dry run records **752 paths**, inventory SHA-256
+`dbf460e5...fa7460`, assigned exactly once as **502 trading assistant / 246
+strategy research / 4 shared**. The test partition is **84 assistant / 75
+research / 1 shared / 42 integration / 6 governance** with exact ordered
+hashes. `market_analytics` leaves the stranded top-level ledger; `config`
+remains its sole entry, alongside the eight dual-use data modules. The 11
+composition files, six Python crossing roots, four non-assistant operator-
+store importers, 42 integration tests, non-test documentation partition, and
+owner-gated runtime topology remain blocking. Only after a dry run reports no
+blocking product crossings may a separately authorized migration create the research
 repository and shared package. No repository creation, history rewrite,
 deployment, credential move, scheduled-task change, operator-database move,
 backtest, or evidence-epoch change is authorized by this tranche.

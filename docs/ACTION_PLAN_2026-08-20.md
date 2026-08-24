@@ -67,18 +67,16 @@ and exact SEP-2 closure. The residual 11 composition files, six Python
 crossings, and four non-assistant operator-store importers are now pinned as
 SEP-3 extraction inputs. **Owner decision, 2026-08-22:** use two product
 repositories plus one deliberately tiny shared-contracts package, with no Git
-submodules. The fifth exact-commit dry run keeps the operational-alert service
-assistant-owned and multiplicity arithmetic research-owned without growing
-the tiny shared package, while assigning twelve dynamically loaded or source-
-inspection tests explicitly. Tests are now pinned as 86 assistant, 73
-research, one shared-contract, 42 integration and six governance files. It
-remains blocked on eight dual-use modules, the unchanged runtime residuals,
-42 integration tests and non-test documentation ownership; see
+submodules. The sixth exact-commit dry run keeps the operational-alert service
+assistant-owned and multiplicity arithmetic and market analytics research-
+owned without growing the tiny shared package. The assistant uses private,
+behavior-identical market-display arithmetic instead of importing the
+research module. Tests are pinned as 84 assistant, 75 research, one shared-
+contract, 42 integration and six governance files. It remains blocked on
+eight dual-use data modules, `config.py`, the unchanged runtime residuals, 42
+integration tests and non-test documentation ownership; see
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Physical extraction remains
-separately gated. Claude independently accepted the fifth dry run; Codex's
-counter-review then exposed two additional dual-use top-level-module blockers
-(`config.py` and `market_analytics.py`) that the data-only stranded-module
-measurement had not covered.
+separately gated. The sixth dry run awaits independent review.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

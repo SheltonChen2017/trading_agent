@@ -273,6 +273,43 @@ def _partition_tests(
     return surfaces
 
 
+def _assigned_module_importers(
+    paths: list[str],
+    commit: str,
+    manifest: dict[str, Any],
+    entry_points: dict[str, Any],
+    assigned_modules: set[str],
+) -> dict[str, dict[str, list[str]]]:
+    """Return exact product-side importers for assigned first-party modules."""
+    ownership = entry_points["script_ownership"]
+    side_prefixes = {
+        side: list(manifest["product_roots"][side])
+        + list(manifest["product_top_level_files"][side])
+        + [path for path in ownership[side] if path.endswith(".py")]
+        for side in ("trading_assistant", "strategy_research")
+    }
+
+    importers: dict[str, dict[str, set[str]]] = {}
+    for side, prefixes in side_prefixes.items():
+        for path in paths:
+            if not path.endswith(".py"):
+                continue
+            if not any(_starts_with_root(path, prefix) for prefix in prefixes):
+                continue
+            for imported in _imported_modules(_commit_text(commit, path), path):
+                for module in assigned_modules:
+                    if imported == module or imported.startswith(module + "."):
+                        importers.setdefault(module, {}).setdefault(side, set()).add(
+                            path
+                        )
+    return {
+        module: {
+            side: sorted(files) for side, files in sorted(sides.items())
+        }
+        for module, sides in sorted(importers.items())
+    }
+
+
 def _data_module_importers(
     paths: list[str],
     commit: str,
@@ -292,31 +329,51 @@ def _data_module_importers(
         for files in manifest["data_destination"].values()
         for path in files
     }
-    ownership = entry_points["script_ownership"]
-    side_prefixes = {
-        side: list(manifest["product_roots"][side])
-        + list(manifest["product_top_level_files"][side])
-        + [path for path in ownership[side] if path.endswith(".py")]
-        for side in ("trading_assistant", "strategy_research")
-    }
+    return _assigned_module_importers(
+        paths, commit, manifest, entry_points, assigned_modules
+    )
 
-    importers: dict[str, dict[str, set[str]]] = {}
-    for side, prefixes in side_prefixes.items():
-        for path in paths:
-            if not path.endswith(".py"):
-                continue
-            if not any(_starts_with_root(path, prefix) for prefix in prefixes):
-                continue
-            for imported in _imported_modules(_commit_text(commit, path), path):
-                module = ".".join(imported.split(".")[:2])
-                if module in assigned_modules:
-                    importers.setdefault(module, {}).setdefault(side, set()).add(path)
-    return {
-        module: {
-            side: sorted(files) for side, files in sorted(sides.items())
-        }
-        for module, sides in sorted(importers.items())
+
+def _product_top_level_importers(
+    paths: list[str],
+    commit: str,
+    manifest: dict[str, Any],
+    entry_points: dict[str, Any],
+) -> dict[str, dict[str, list[str]]]:
+    """Return importer sides for each separately assigned top-level module.
+
+    CRSEP3ST-001: SEP3R-001 measured only ``data.*`` destinations. The same
+    extraction-breaking direction existed in the top-level-file partition:
+    research-owned sources import assistant-destined ``config`` and
+    ``market_analytics``. Measuring every assigned top-level module prevents
+    that parallel surface from escaping the exact shrinking blocker ledger.
+    """
+    assigned_modules = {
+        path.removesuffix(".py").replace("/", ".")
+        for files in manifest["product_top_level_files"].values()
+        for path in files
     }
+    return _assigned_module_importers(
+        paths, commit, manifest, entry_points, assigned_modules
+    )
+
+
+def _stranded_assigned_modules(
+    destination: dict[str, str],
+    importers: dict[str, dict[str, list[str]]],
+) -> dict[str, list[str]]:
+    """Assigned modules imported by a product other than their destination."""
+    stranded: dict[str, list[str]] = {}
+    for module, sides in importers.items():
+        wrong_side_files = sorted(
+            path
+            for side, files in sides.items()
+            if side != destination[module]
+            for path in files
+        )
+        if wrong_side_files:
+            stranded[module] = wrong_side_files
+    return stranded
 
 
 def _stranded_data_modules(
@@ -335,17 +392,19 @@ def _stranded_data_modules(
     for product, files in manifest["data_destination"].items():
         for path in files:
             destination[path.removesuffix(".py").replace("/", ".")] = product
-    stranded: dict[str, list[str]] = {}
-    for module, sides in importers.items():
-        wrong_side_files = sorted(
-            path
-            for side, files in sides.items()
-            if side != destination[module]
-            for path in files
-        )
-        if wrong_side_files:
-            stranded[module] = wrong_side_files
-    return stranded
+    return _stranded_assigned_modules(destination, importers)
+
+
+def _stranded_product_top_level_modules(
+    manifest: dict[str, Any],
+    importers: dict[str, dict[str, list[str]]],
+) -> dict[str, list[str]]:
+    destination = {
+        path.removesuffix(".py").replace("/", "."): product
+        for product, files in manifest["product_top_level_files"].items()
+        for path in files
+    }
+    return _stranded_assigned_modules(destination, importers)
 
 
 def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
@@ -358,9 +417,13 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         raise ExtractionValidationError("Git submodules are not an approved topology")
 
     source = manifest["source"]
-    if source["independent_review_status"] != "pending":
+    if source["independent_review_status"] not in {
+        "pending",
+        "accepted",
+        "accepted-after-correction",
+    }:
         raise ExtractionValidationError(
-            "this implementation tranche must remain pending independent review"
+            "unsupported independent review status"
         )
     commit = source["candidate_commit"]
     if _git("cat-file", "-t", commit).strip() != "commit":
@@ -518,6 +581,34 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             f"declared={declared_importer_sides}, measured={measured_importer_sides}"
         )
 
+    top_level_importers = _product_top_level_importers(
+        paths, commit, manifest, entry_points
+    )
+    stranded_top_level = _stranded_product_top_level_modules(
+        manifest, top_level_importers
+    )
+    declared_stranded_top_level = blockers["stranded_product_top_level_modules"]
+    if sorted(declared_stranded_top_level) != sorted(stranded_top_level):
+        raise ExtractionValidationError(
+            "stale extraction blocker stranded_product_top_level_modules: "
+            f"declared={sorted(declared_stranded_top_level)}, "
+            f"measured={sorted(stranded_top_level)}"
+        )
+    declared_top_level_sides = blockers[
+        "stranded_product_top_level_importer_sides"
+    ]
+    measured_top_level_sides = {
+        module: sorted(sides)
+        for module, sides in top_level_importers.items()
+        if module in stranded_top_level
+    }
+    if declared_top_level_sides != measured_top_level_sides:
+        raise ExtractionValidationError(
+            "stale extraction blocker stranded_product_top_level_importer_sides: "
+            f"declared={declared_top_level_sides}, "
+            f"measured={measured_top_level_sides}"
+        )
+
     ownership_counts = {
         name: len(entry_points["script_ownership"][name])
         for name in ("trading_assistant", "strategy_research", "cross_product_composition")
@@ -535,6 +626,7 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         "schema_version": 2,
         "status": f"valid-{manifest['status']}",
         "source_commit": commit,
+        "independent_review_status": source["independent_review_status"],
         "inventory": {
             "tracked_paths": len(paths),
             "sha256": _inventory_sha256(paths),
@@ -558,6 +650,10 @@ def validate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
             ],
             "stranded_data_modules": sorted(stranded),
             "stranded_data_module_importer_sides": measured_importer_sides,
+            "stranded_product_top_level_modules": sorted(stranded_top_level),
+            "stranded_product_top_level_importer_sides": (
+                measured_top_level_sides
+            ),
         },
         "physical_extraction_authorized": False,
     }

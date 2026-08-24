@@ -11,7 +11,7 @@
   },
   "source": {
     "candidate_commit": "df7eb48b5e17a769d6977d513cafab680f336b66",
-    "independent_review_status": "pending",
+    "independent_review_status": "accepted",
     "tracked_path_count": 749,
     "tracked_path_inventory_sha256": "a5c57b9896d22faff9fe3b2bc32126e7ebc89245ce2433b44f69086dbde86797",
     "physical_extraction_requires_new_reviewed_clean_commit": true
@@ -181,6 +181,20 @@
     "installed_task_paths": "unchanged",
     "operator_database_move": "not-authorized",
     "paper_epoch_006": "must-remain-untouched",
+    "stranded_product_top_level_modules": [
+      "config",
+      "market_analytics"
+    ],
+    "stranded_product_top_level_importer_sides": {
+      "config": [
+        "strategy_research",
+        "trading_assistant"
+      ],
+      "market_analytics": [
+        "strategy_research",
+        "trading_assistant"
+      ]
+    },
     "stranded_data_modules": [
       "data.filing_extraction",
       "data.macro_data",
@@ -225,7 +239,8 @@
         "trading_assistant"
       ]
     },
-    "stranded_data_modules_note": "SEP3R-001/CRSEP3R2-001/SEP3A-001/SEP3S-001: the fifth dry run keeps data.operational_alerts assistant-owned and data.research_statistics research-owned. The assistant renders its recorded-look threshold locally without importing the research calculation. Eight modules remain imported by both product sides and cannot be resolved by simple reassignment. Executed as declared, extraction would still break one product or force the forbidden cross-repository dependency. The validator measures both the stranded set and exact importer sides from the candidate commit and refuses stale declarations."
+    "stranded_data_modules_note": "SEP3R-001/CRSEP3R2-001/SEP3A-001/SEP3S-001: the fifth dry run keeps data.operational_alerts assistant-owned and data.research_statistics research-owned. The assistant renders its recorded-look threshold locally without importing the research calculation. Eight modules remain imported by both product sides and cannot be resolved by simple reassignment. Executed as declared, extraction would still break one product or force the forbidden cross-repository dependency. The validator measures both the stranded set and exact importer sides from the candidate commit and refuses stale declarations.",
+    "stranded_product_top_level_modules_note": "CRSEP3ST-001: SEP3R-001 measured only assigned data modules. Exact candidate import measurement also finds that strategy-research and trading-assistant sources both import config and market_analytics even though the fifth manifest sends both top-level files to the assistant repository. Both remain explicit extraction blockers until their product dependencies are split or reassigned without a cross-repository product import."
   },
   "physical_extraction_authorized": false
 }

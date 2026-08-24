@@ -72,6 +72,10 @@ def test_fifth_extraction_dry_run_is_exact_and_not_authorized():
         # shared package; eight genuinely dual-use data modules remain.
         "stranded_data_modules": _STRANDED_DATA_MODULES,
         "stranded_data_module_importer_sides": _STRANDED_IMPORTER_SIDES,
+        "stranded_product_top_level_modules": _STRANDED_TOP_LEVEL_MODULES,
+        "stranded_product_top_level_importer_sides": (
+            _STRANDED_TOP_LEVEL_IMPORTER_SIDES
+        ),
     }
     assert result["surfaces"]["shared_contract_test_files"] == 1
     assert result["surfaces"]["governance_test_files"] == 6
@@ -99,6 +103,43 @@ def test_fifth_extraction_dry_run_is_exact_and_not_authorized():
             "7d7bb973104f5c31718293cec1768bd1684b88b5a7a4d6619572ef2df6126fab"
         ),
     }
+
+
+def test_current_dry_run_review_status_matches_accepted_review_record():
+    """CRSEP3ST-002: active status must advance when review is committed.
+
+    A new candidate starts pending. Once a committed independent SEP-3 report
+    accepts that exact candidate prefix, the manifest and both active plans
+    must stop claiming the same dry run still awaits review. A later candidate
+    naturally returns to pending until its own report exists.
+    """
+    manifest = _manifest()
+    candidate_prefix = manifest["source"]["candidate_commit"][:7]
+    review_root = DEFAULT_MANIFEST.parents[1] / "docs" / "Archive" / "Review"
+    accepted = any(
+        candidate_prefix in text
+        and ("Verdict: accepted" in text or "**Accepted" in text)
+        for path in review_root.glob("REVIEW_*SEP3*.md")
+        if (text := path.read_text(encoding="utf-8"))
+    )
+    expected = "accepted" if accepted else "pending"
+    assert manifest["source"]["independent_review_status"] == expected
+
+    separation_plan = (
+        DEFAULT_MANIFEST.parents[1]
+        / "docs"
+        / "PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md"
+    ).read_text(encoding="utf-8")
+    action_plan = (
+        DEFAULT_MANIFEST.parents[1] / "docs" / "ACTION_PLAN_2026-08-20.md"
+    ).read_text(encoding="utf-8")
+    ordinal = manifest["status"].split("-dry-run", 1)[0]
+    if expected == "accepted":
+        assert f"{ordinal} dry run pending review" not in separation_plan.lower()
+        assert f"{ordinal} dry run awaits independent review" not in action_plan.lower()
+    else:
+        assert f"{ordinal} dry run pending review" in separation_plan.lower()
+        assert f"{ordinal} dry run awaits independent review" in action_plan.lower()
 
 
 def test_unclassified_retained_path_is_refused(tmp_path: Path):
@@ -282,6 +323,15 @@ _STRANDED_IMPORTER_SIDES = {
     module: _DUAL_USE_SIDES for module in _STRANDED_DATA_MODULES
 }
 
+# CRSEP3ST-001: SEP3R-001 measured only data.* assignments. The same
+# dangerous direction existed in the separately assigned top-level modules:
+# research-owned code imports config and market_analytics even though the
+# fifth manifest sends both to the assistant repository.
+_STRANDED_TOP_LEVEL_MODULES = ["config", "market_analytics"]
+_STRANDED_TOP_LEVEL_IMPORTER_SIDES = {
+    module: _DUAL_USE_SIDES for module in _STRANDED_TOP_LEVEL_MODULES
+}
+
 
 def test_stranded_data_modules_are_measured_declared_and_blocking():
     """SEP3R-001. The declared partition must not strand a product's imports.
@@ -347,5 +397,45 @@ def test_incorrect_stranded_importer_side_is_refused(tmp_path: Path):
     with pytest.raises(
         ExtractionValidationError,
         match="stale extraction blocker stranded_data_module_importer_sides",
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_product_top_level_crossings_are_measured_declared_and_blocking():
+    result = validate()
+    assert result["blockers"]["stranded_product_top_level_modules"] == (
+        _STRANDED_TOP_LEVEL_MODULES
+    )
+    assert result["blockers"][
+        "stranded_product_top_level_importer_sides"
+    ] == _STRANDED_TOP_LEVEL_IMPORTER_SIDES
+    assert result["physical_extraction_authorized"] is False
+
+
+def test_missing_stranded_product_top_level_declaration_is_refused(
+    tmp_path: Path,
+):
+    manifest = _manifest()
+    manifest["known_blockers"]["stranded_product_top_level_modules"] = [
+        "config"
+    ]
+    with pytest.raises(
+        ExtractionValidationError,
+        match="stale extraction blocker stranded_product_top_level_modules",
+    ):
+        validate(_write_manifest(tmp_path, manifest))
+
+
+def test_incorrect_product_top_level_importer_side_is_refused(tmp_path: Path):
+    manifest = _manifest()
+    manifest["known_blockers"][
+        "stranded_product_top_level_importer_sides"
+    ]["market_analytics"] = ["strategy_research"]
+    with pytest.raises(
+        ExtractionValidationError,
+        match=(
+            "stale extraction blocker "
+            "stranded_product_top_level_importer_sides"
+        ),
     ):
         validate(_write_manifest(tmp_path, manifest))

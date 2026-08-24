@@ -7266,6 +7266,44 @@ dual-use modules (partly an owner call), the governance-document partition,
 the composition ledger, and the owner-gated runtime topology — then a sixth
 dry run.
 
+## 7em. Codex counter-review of Claude's support-test review (2026-08-24)
+
+Codex counter-reviewed exact stable remote head `1680f6e` from
+`origin/user/claude/review-sep3-supporttest-20260824` in a separate isolated
+worktree. Its merge-base with submitted Codex head `ae0d563` is that exact
+submission, and the complete Claude range contains the single review-record
+commit `1680f6e`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-24_SEP3_SUPPORT_TESTS.md`.
+
+**Accepted after correction.** Claude's support-test conclusion reproduces:
+the twelve exact overrides remain statically product-import-free and split
+three assistant / three research / six governance, while duplicate, stale,
+hidden-static-import, and governance-to-research directions fail closed.
+Codex found two omissions in the accepted fifth-dry-run record. CRSEP3ST-001
+(P2, resolved by `aa2fe4f`) generalizes stranded-module measurement beyond
+`data.*`: exact candidate imports also strand top-level `config.py` and
+`market_analytics.py`, each on both product sides. CRSEP3ST-002 (P3, resolved
+by `aa2fe4f` and `cb0c7f8`) synchronizes the manifest and active plans after
+the accepted review instead of continuing to claim it is pending. No P0 or P1
+finding was found. Claude's sole commit is accepted after correction.
+
+The original focused review suites pass 99 tests. The four new guards first
+failed on the uncorrected tree and then passed after correction; disabling
+both new top-level comparisons made the two refusal tests fail, and restoring
+them made the corrected combined focus pass **103 tests** in 488.33 seconds.
+The fifth candidate remains exact at 749 paths, destination counts 502 / 243 /
+4, test partitions 86 / 73 / 1 / 42 / 6, and eight stranded data modules.
+The two newly explicit top-level blockers bring the measured module boundary
+total to ten. This is still an independently reviewed fifth dry run, not
+physical-extraction readiness or authorization.
+
+Under the owner's standing loop the counter-review branch remains local-only.
+The next bounded implementation branch begins from this finalized tree and
+removes the assistant's dependency on research-owned `market_analytics.py`
+with behavior-identical private calculations. It must then produce a sixth
+dry run, validate the combined series, and be the only branch Codex pushes in
+this cycle.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

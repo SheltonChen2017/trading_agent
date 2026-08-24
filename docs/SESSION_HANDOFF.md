@@ -7111,6 +7111,46 @@ remaining dual-use modules — the genuinely contested destinations, partly an
 owner call — the integration/governance partition, the composition ledger,
 and the owner-gated runtime topology, then a fifth dry run.
 
+## 7ek. Codex counter-review of Claude's SEP-3 statistics review (2026-08-24)
+
+Claude's exact pushed branch
+`origin/user/claude/review-sep3-resstats-20260823` was stable at
+`ea6448425ba1508503081e6eb35e30ee4a55f894`. Its merge-base with submitted
+Codex head `0de7920d0f2bcf2b2329600959a2208de4ea15c1` is that submitted head;
+the complete Claude range is the single commit `ea64484`. The isolated local
+counter-review branch is
+`codex/counterreview-sep3-research-statistics-20260824` and must not be pushed
+alone. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-24_SEP3_RESEARCH_STATISTICS.md`.
+
+**Accepted after correction.** Claude's central review conclusions reproduce,
+including the 747-path inventory, 503 / 240 / 4 destination partition,
+83 / 70 / 1 / 54 test partition, exact positive-domain threshold arithmetic,
+eight stranded modules, unchanged runtime/support blockers, and physical-
+extraction refusal. Merged main tree `3391875` and submitted head `0de7920`
+share exact tree `f2b0207b2cef6575c9991b1684e1250ffdbaa7ea`.
+
+CRSEP3S-001 (P3, resolved): the newly product-owned services retained stale
+source contracts from their former classification. `data/operational_alerts`
+still called itself provider-neutral; `data/research_statistics` called itself
+policy-neutral and shared across both products. Correction `6341d6a` makes the
+source contracts assistant-owned and research-owned, clarifies that the
+assistant independently renders equivalent arithmetic without importing the
+research helper, and adds a generalized manifest-driven guard. Restoring the
+stale research docstring failed with the exact path and forbidden claims;
+restoration passed. No P0, P1, or P2 issue was found.
+
+Focused dry-run, entry-point, active-document, and research-look suites pass
+**117 tests** in 372.11 seconds after correction; the exact arithmetic sweep
+matches all 60,000 reachable combinations. Under the owner's standing loop,
+the counter-review commits stay local-only while Codex creates one fresh
+implementation branch from this finalized tree and completes the next safe
+bounded SEP-3 item before exactly one combined push.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

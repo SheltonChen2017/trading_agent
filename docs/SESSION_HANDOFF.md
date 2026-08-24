@@ -7151,6 +7151,73 @@ No provider, credential, licensed row, broker, operator database, installed
 task, deployment, backtest, outcome, research look, evidence epoch, or
 `paper-epoch-006` state was accessed or changed.
 
+## 7el. SEP-3 statistics counter-review and explicit support-test ownership (Codex, 2026-08-24)
+
+Codex counter-reviewed Claude's exact one-commit review range
+`0de7920..ea64484` from remote head
+`origin/user/claude/review-sep3-resstats-20260823` at
+`ea6448425ba1508503081e6eb35e30ee4a55f894`. The review commit was accepted,
+and its central arithmetic, manifest, destination, test-partition, and
+not-ready-for-extraction claims were independently reproduced. One generalized
+P3 documentation defect, `CRSEP3S-001`, was accepted after correction: the
+newly product-owned `data.operational_alerts` and `data.research_statistics`
+services still described themselves as neutral/shared. Their module contracts
+now state assistant and research ownership respectively, and a
+manifest-driven regression refuses stale neutrality language in every
+product-owned service module. A dangerous-direction mutation restoring the
+stale research wording failed as intended. There were no P0-P2 findings. The
+counter-review is recorded in
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-24_SEP3_RESEARCH_STATISTICS.md` and
+committed as `6341d6a`, `fb7f4f1`, and `2ad686f`; no standalone counter-review
+branch was pushed.
+
+From that finalized tree, Codex implemented the next safe bounded SEP-3 item:
+explicit ownership for the twelve support tests whose dynamic source loading
+or repository-text inspection had left them in the integration residual. Three
+are assistant-owned, three are research-owned, and six are governance tests
+owned by the source/trading-assistant repository. Overrides are permitted only
+when static first-party product imports are empty; duplicate ownership, stale
+paths, attempts to hide static imports, and attempts to reclassify governance
+tests as research all fail closed. A dangerous-direction mutation removing the
+static-import guard failed as intended. The implementation/reporting commits
+are `f252285` and `df7eb48`, the exact candidate source is
+`df7eb48b5e17a769d6977d513cafab680f336b66`, the contract commit is `be869e4`,
+and the plan/documentation commit is `fca7ba0`.
+
+The fifth dry run is valid but **not ready or authorized for physical
+extraction**. It inventories 749 tracked paths at SHA-256
+`a5c57b9896d22faff9fe3b2bc32126e7ebc89245ce2433b44f69086dbde86797`, with
+502 assistant, 243 research, and four shared destinations. Its test partition
+is 86 assistant, 73 research, one shared, 42 integration, and six governance,
+with ordered hashes
+`f74ad0c89ace4331cd288ff5514926f27ab64362dbd0ce0e853debcd4729b450`,
+`974deb9edeaf54c1691f6246295ecfe38a4db59b513258fad4ea40e40e8ce015`,
+`99f98d144d43c92720202126fdff6734a3a310720c18e9f974903b95e8a0f192`,
+`bf2688760aeb8136b30f625fb0fdbaec62cfafa3f81ff534d0cd7f3ac9b1d0fe`, and
+`7d7bb973104f5c31718293cec1768bd1684b88b5a7a4d6619572ef2df6126fab`
+respectively. The unresolved integration-test count therefore falls from 54
+to 42 without changing runtime authority, the operator-store location,
+installed task paths, or repository topology. The eight genuinely dual-use
+data modules, 11 composition files, six Python crossing roots, four
+non-assistant operator-store importers, 42 integration tests, and non-test
+governance/documentation ownership remain explicit gates. The shared-contract
+package remains exactly four files.
+
+Validation was clean: the corrected service-contract focus passed 24 tests;
+the complete counter-review focus passed 117; explicit support ownership
+passed four; backward-compatibility/new ownership checks passed five; the
+fifth-dry-run subset passed seven; the complete dry-run file passed 18; active
+document checks passed 56 before this final handoff; and the combined final
+focus passed 121. The complete suite passed **4,557 tests** with 25 dependency
+deprecation warnings in 1,138.59 seconds. No provider, broker, credential,
+licensed row, operator database, outcome, research-look, backtest, deployment,
+evidence epoch, or `paper-epoch-006` access or mutation occurred. After this
+handoff's active-document and repository-integrity checks pass, the whole
+combined range will be pushed exactly once on
+`codex/sep3-support-test-ownership-20260824`, then a new exact-head alarm will
+wait for Claude's independent review before the next Codex counter-review and
+bounded SEP-3 item.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

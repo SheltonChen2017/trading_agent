@@ -713,6 +713,28 @@ def test_product_owned_services_do_not_cross_product_owned_sources():
         )
 
 
+def test_product_owned_service_docstrings_do_not_claim_shared_ownership():
+    """CRSEP3S-001. Source contracts must agree with enforced ownership."""
+    manifest = _json(ENTRY_POINT_MANIFEST)
+    forbidden_claims = (
+        "provider-neutral",
+        "policy-neutral",
+        "shared across both products",
+    )
+    offenders = []
+    for paths in manifest["data_ownership"]["product_owned_services"].values():
+        for relative in paths:
+            tree = ast.parse((ROOT / relative).read_text(encoding="utf-8"))
+            docstring = (ast.get_docstring(tree) or "").lower()
+            claims = [claim for claim in forbidden_claims if claim in docstring]
+            if claims:
+                offenders.append((relative, claims))
+    assert offenders == [], (
+        "product-owned service docstrings claim neutral/shared ownership: "
+        f"{offenders}"
+    )
+
+
 def test_product_owned_provider_implementations_do_not_cross_products():
     manifest = _json(ENTRY_POINT_MANIFEST)
     boundaries = _json(BOUNDARY_MANIFEST)

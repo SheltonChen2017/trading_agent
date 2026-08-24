@@ -1,4 +1,4 @@
-"""Provider-neutral serialization for immutable operational alert envelopes."""
+"""Assistant-owned serialization for immutable operational alert envelopes."""
 from __future__ import annotations
 
 import json

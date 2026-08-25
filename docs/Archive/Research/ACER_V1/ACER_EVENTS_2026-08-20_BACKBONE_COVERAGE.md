@@ -1,5 +1,8 @@
 # ACER analyst-event backbone — build and coverage measurement
 
+Archive status: **V1 evidence record. The underlying immutable event backbone
+may be reused only after the V2 migration audit.**
+
 Status: **data plumbing under ACER-1. No price join, no outcome, no research
 look, no `R-nnn` ledger entry.** This record measures how much of the
 purchased ratings history survives normalization under the frozen

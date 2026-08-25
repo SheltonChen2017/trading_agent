@@ -2,7 +2,7 @@
 
 Status: **FROZEN 2026-08-19; CLOSED 2026-08-20 BEFORE ITS FIRST CAPTURE** by
 owner decision, when the Analyst-Consensus ETF Rotation program
-(`docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`) replaced the
+(`docs/Archive/Plans/ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md`) replaced the
 Strong-Buy portfolio program. No snapshot is committed, and the scheduled task
 must not be installed; the machine-local task and artifact state has not been
 measured, so neither claim can be strengthened to verified absence. No

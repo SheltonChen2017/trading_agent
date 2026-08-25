@@ -17,7 +17,8 @@ semantics, and three of its non-behaviours matter more than its behaviour:
   dataset's content identity.
 
 Availability follows the rule frozen by the ACER-1 audit and its review
-(`docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md` section 5), and
+(`docs/Archive/Research/ACER_V1/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md`
+section 5), and
 that rule is **date-level on purpose**::
 
     available_date = max(action_date, last_updated UTC date)

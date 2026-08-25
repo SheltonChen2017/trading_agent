@@ -21,6 +21,7 @@ claim), never one that must stay true.
 """
 from __future__ import annotations
 
+import hashlib
 import re
 import subprocess
 from pathlib import Path
@@ -64,7 +65,6 @@ def test_docs_root_contains_only_current_coordination_and_active_plan() -> None:
         "ACTION_PLAN_2026-08-20.md",
         "SESSION_HANDOFF.md",
         "FEATURE_MILESTONE_RECORD.md",
-        "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md",
         "PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md",
         "README.md",
     }
@@ -97,6 +97,55 @@ def test_current_handoff_is_a_bounded_unique_resume_snapshot() -> None:
     assert len(identifiers) == len(set(identifiers)), (
         f"current handoff section identifiers are ambiguous: {identifiers}"
     )
+
+
+def test_three_strategy_parallel_baseline_is_exact_and_fail_closed() -> None:
+    """The owner-directed lanes must not drift into competing coordination."""
+    strategy_dir = ROOT / "docs" / "Strategy Description"
+    workflow = _text("Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md")
+    handoff = _text("SESSION_HANDOFF.md")
+    action = _text("ACTION_PLAN_2026-08-20.md")
+
+    lanes = {
+        "codex/strategy-analyst-revisions-v2": (
+            "ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md",
+            "ANALYST_REVISIONS_ETF_STRATEGY_BLUEPRINT_V2_EN.pdf",
+            "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193",
+        ),
+        "codex/strategy-insider-buying": (
+            "INSIDER_BUYING_IMPLEMENTATION_RECORD.md",
+            "INSIDER_BUYING_ETF_STRATEGY_BLUEPRINT.pdf",
+            "f8834e13bb22d63a1a5a055a24cc2638ecb2e535b733c1fdd1741a28c65db88c",
+        ),
+        "codex/strategy-short-interest": (
+            "SHORT_INTEREST_IMPLEMENTATION_RECORD.md",
+            "SHORT_INTEREST_ETF_STRATEGY_BLUEPRINT_EN.pdf",
+            "2f7ccff9bcd35810b11350314fd6e47c7c92e24ac35a866addb82ce66645b14c",
+        ),
+    }
+    for branch, (record_name, pdf_name, digest) in lanes.items():
+        record = (strategy_dir / record_name).read_text(encoding="utf-8")
+        with (strategy_dir / pdf_name).open("rb") as source:
+            actual_digest = hashlib.file_digest(source, "sha256").hexdigest()
+        assert branch in workflow and branch in handoff and branch in record
+        assert actual_digest == digest
+        assert actual_digest in record.lower()
+        assert "docs/ACTION_PLAN_2026-08-20.md" in record
+        assert "docs/SESSION_HANDOFF.md" in record
+
+    for document in (workflow, handoff, action):
+        assert "same" in document.lower() and "branch" in document.lower()
+    assert "must not edit" in workflow.lower()
+    assert "leverage" in workflow.lower()
+    assert "neither codex nor claude creates an implementation, review" in workflow.lower()
+    assert "counter-review" in workflow.lower()
+
+    archived = ROOT / "docs" / "Archive" / "Plans" / (
+        "ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md"
+    )
+    assert archived.is_file()
+    assert "SUPERSEDED" in archived.read_text(encoding="utf-8")
+    assert not (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").exists()
 
 
 def test_sep3_freeze_record_pins_the_reviewed_pause_without_authorizing_extraction():
@@ -1265,7 +1314,12 @@ def test_a_superseded_program_is_not_also_the_next_owner_decision():
         r"\*\*SBP-0 adoption\*\*[\s\S]{0,300}?only decision blocking",
         action_plan,
     )
-    assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
+    assert (ROOT / "docs" / "Strategy Description" / (
+        "ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md"
+    )).is_file()
+    assert (ROOT / "docs" / "Archive" / "Plans" / (
+        "ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md"
+    )).is_file()
 
 
 def test_lifecycle_indexes_do_not_advertise_superseded_sbp_as_actionable():
@@ -1275,22 +1329,23 @@ def test_lifecycle_indexes_do_not_advertise_superseded_sbp_as_actionable():
     archived = _doc_path("Archive/README.md").read_text(encoding="utf-8")
     assert "STRONGBUY_PORTFOLIO_TEST_PLAN.md" not in queued
     assert "superseded" in archived.lower()
-    assert (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").is_file()
+    assert "ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md" in archived
+    assert (ROOT / "docs" / "Strategy Description" / (
+        "ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md"
+    )).is_file()
 
 
-def test_open_acer_freeze_ledger_cannot_be_called_executable():
-    """An open preregistration ledger and an executable freeze conflict.
-
-    This survives later completion: once every open item is resolved, remove
-    the open-ledger heading and this conditional stops constraining status.
-    """
-    freeze = _text("ACER_2026-08-20_ACER0A_FREEZE.md")
-    reference = _text("ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
-    action = _text("ACTION_PLAN_2026-08-20.md")
+def test_archived_open_acer_freeze_is_not_current_or_executable():
+    """The superseded V1 freeze remains reproducible but cannot govern V2."""
+    freeze = _text("Archive/Research/ACER_V1/ACER_2026-08-20_ACER0A_FREEZE.md")
+    reference = _text("Archive/Plans/ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md")
+    active = _text("Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md")
     if "Named open items that must close BEFORE the development run" in freeze:
         assert "not yet an executable preregistration" in freeze
         assert "preregistration is INCOMPLETE" in reference
-        assert "executable preregistration incomplete" in action
+    assert "SUPERSEDED" in freeze
+    assert "SUPERSEDED" in reference
+    assert "NO V2 SIGNAL" in active
 
 
 def test_active_operational_docs_honor_start_when_available_semantics():
@@ -1306,32 +1361,34 @@ def test_active_operational_docs_honor_start_when_available_semantics():
 
 
 def test_measured_sbr_absence_is_not_still_called_unmeasured():
-    """The active ACER plan must consume the durable host measurement."""
+    """The archived V1 plan must preserve the durable host measurement."""
     facts = _text("OPERATIONAL_FACTS.md")
-    acer = _text("ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
+    acer = _text("Archive/Plans/ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md")
     if "SBR-1 capture: measured absent" in facts:
         assert "task and artifact state has not been measured" not in acer
 
 
-def test_active_acer_identity_docs_do_not_turn_missing_evidence_into_safety():
+def test_v2_acer_identity_docs_do_not_turn_missing_evidence_into_safety():
     """The name-only diagnostic is a lower bound, never an allowlist."""
-    measurement = _text("research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md")
-    action = _text("ACTION_PLAN_2026-08-20.md")
+    measurement = _text(
+        "Archive/Research/ACER_V1/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md"
+    )
+    active = _text("Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md")
     handoff = _text("SESSION_HANDOFF.md")
 
-    for document in (measurement, action, handoff):
-        assert "no_name_based_ambiguity_evidence" in document
+    for document in (measurement, active, handoff):
         assert "768" in document
 
     assert "BBBY scores *unambiguous*" not in handoff
     assert "allowlist" in measurement.lower()
     assert "lower bound" in measurement.lower()
-    assert "external" in action.lower() and "security master" in action.lower()
+    assert "current-ticker joins are prohibited" in active.lower()
+    assert "security master" in active.lower()
 
 
 def test_acer_completion_proposal_does_not_normalize_away_decay():
     """Half-life cells must attenuate stale events, not only reweight firms."""
-    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    proposal = _text("Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
     assert "sum(w * notch) / N_live" in proposal
     assert "sum(w * notch) / sum(w)" not in proposal
     assert "age <= 2 * H" in proposal
@@ -1339,7 +1396,7 @@ def test_acer_completion_proposal_does_not_normalize_away_decay():
 
 def test_acer_completion_proposal_defines_a_real_out_of_sample_residual():
     """Validation outcomes cannot fit their own control residualization."""
-    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    proposal = _text("Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
     assert "training rows only" in proposal
     assert "without refitting on validation outcomes" in proposal
     assert "immediately before each validation block" in proposal
@@ -1348,7 +1405,7 @@ def test_acer_completion_proposal_defines_a_real_out_of_sample_residual():
 
 def test_acer_completion_proposal_names_the_existing_bootstrap_contract():
     """The frozen method must match the repository function it delegates to."""
-    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    proposal = _text("Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
     engine = _root_text("backtest/engine.py")
     assert "circular moving-block bootstrap" in proposal
     assert "stationary block bootstrap" not in proposal
@@ -1358,7 +1415,7 @@ def test_acer_completion_proposal_names_the_existing_bootstrap_contract():
 
 def test_acer_completion_proposal_discloses_every_measured_unmapped_rating():
     """Owner review needs the complete refusal vocabulary, not four examples."""
-    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    proposal = _text("Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
     for rating in (
         "developing",
         "equalweight",
@@ -1377,7 +1434,7 @@ def test_acer_completion_proposal_discloses_every_measured_unmapped_rating():
 
 def test_acer_state_semantics_measurement_does_not_overclaim_raw_keys():
     """A pre-identity raw-ticker scan cannot be called same-issuer evidence."""
-    proposal = _text("research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
+    proposal = _text("Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")
     counterreview = _text(
         "Archive/Review/REVIEW_2026-08-21_ACER_PREREG_COUNTERREVIEW.md"
     )
@@ -1394,7 +1451,7 @@ def test_acer_state_semantics_measurement_does_not_overclaim_raw_keys():
 
 def test_acer_local_capability_audit_includes_existing_databento_path():
     """Repository capability cannot be inferred from the production reader alone."""
-    audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
+    audit = _text("Archive/Research/ACER_V1/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
     source = _root_text("ml/databento_source.py")
     pit = _root_text("ml/databento_pit.py")
     authority = _root_text("ml/databento_authoritative.py")
@@ -1414,56 +1471,33 @@ def test_acer_local_capability_audit_includes_existing_databento_path():
     assert "are unresolved" in audit
 
 
-def test_acer_active_docs_limit_the_negative_finding_to_the_audited_path():
-    """The failed EDGAR/yfinance path must not erase an unaudited vendor path."""
-    action = _text("ACTION_PLAN_2026-08-20.md")
-    audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
+def test_v2_plan_does_not_promote_an_unaudited_price_route():
+    """Archived provider evidence must remain a blocker, never a V2 solution."""
+    audit = _text("Archive/Research/ACER_V1/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
+    active = _text("Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md")
+    register = _text("Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md")
+
+    assert "EDGAR/yfinance path" in audit
+    assert "Databento" in audit
+    assert "repository-wide local feasibility remains unresolved" in audit.lower()
+    assert "Databento remains unmeasured" in active
+    assert "delistings/terminal returns" in register
+
+
+def test_active_strategy_docs_require_exact_vendor_to_qc_processing_rights():
+    """A subscription is not permission to move arbitrary rows into QC."""
+    workflow = _text("Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md")
+    analyst = _text("Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md")
+    register = _text("Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md")
     handoff = _text("SESSION_HANDOFF.md")
 
-    for document in (action, audit, handoff):
-        assert "EDGAR/yfinance path" in document
-        assert "Databento" in document
-        assert "repository-wide local feasibility remains unresolved" in document.lower()
-
-
-def test_active_acer_docs_do_not_turn_advice_disclaimer_into_research_ban():
-    """Strategy research does not automatically require a permission letter.
-
-    The purchase-specific processing terms still need verification. This guard
-    prevents that narrow check from drifting back into the disproven blanket
-    claim that an investment-advice disclaimer bans personal backtesting.
-    Historical review passages in the handoff remain preserved, so only its
-    current correction and resume prompt are evaluated here.
-    """
-    action = _text("ACTION_PLAN_2026-08-20.md")
-    plan = _text("ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md")
-    freeze = _text("research/ACER_2026-08-20_ACER0A_FREEZE.md")
-    audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
-    handoff = _text("SESSION_HANDOFF.md")
-    current_handoff = handoff
-
-    for document in (action, plan, freeze, audit, current_handoff):
+    for document in (workflow, analyst, register, handoff):
         lowered = document.lower()
-        assert "permission letter" in lowered
-        assert any(
-            phrase in lowered
-            for phrase in (
-                "not automatically",
-                "not an automatic",
-                "not presumed necessary",
-                "does not by itself require",
-                "without treating written permission as an automatic",
-            )
-        )
-        assert (
-            "purchase-specific" in lowered
-            or "order form and additional terms" in lowered
-        )
-
-    for document in (action, plan, freeze, current_handoff):
-        assert "backtesting rating impact" in document.lower()
-    assert "investment-advice disclaimer" in action.lower()
-    assert "investment-advice disclaimer" in freeze.lower()
+        assert "quantconnect" in lowered or "qc" in lowered
+        assert "permission" in lowered or "rights" in lowered
+    assert "subscription name" in register.lower()
+    assert "not evidence" in register.lower()
+    assert "raw, normalized, or derived" in register.lower()
 
 
 # SEP2F-002. A review's own two records must agree on what it found.

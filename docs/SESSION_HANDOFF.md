@@ -1,74 +1,133 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-25 by Codex after completing the owner-directed SEP-3 pause
-transition.
+Prepared: 2026-08-25 by Codex for the owner-directed three-strategy parallel
+development baseline.
 
-Audience: repository owner, Claude, Codex, and the next verifier.
-
-This file replaces the former append-only handoff, preserved in full at
-`docs/Archive/Session/SESSION_HANDOFF_THROUGH_2026-08-25_SEP3_EIGHTH_DRY_RUN.md`.
-Historical review detail belongs there and in `docs/Archive/Review/`; this
-root file states only what is current and required to resume safely.
+This concise handoff replaces the SEP-3 pause-transition snapshot. Historical
+detail remains at
+`docs/Archive/Session/SESSION_HANDOFF_THROUGH_2026-08-25_SEP3_EIGHTH_DRY_RUN.md`
+and in `docs/Archive/Review/`.
 
 ## 1. Read first
 
 1. `CLAUDE.md` and `AGENTS.md`.
 2. `docs/ACTION_PLAN_2026-08-20.md`.
-3. `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`.
-4. `docs/Archive/Review/REVIEW_2026-08-25_SEP3_MACRO_PROXIES.md`.
-5. `docs/Archive/Review/COUNTER_REVIEW_2026-08-25_SEP3_MACRO_PROXIES.md`.
-6. `docs/operations/OPERATIONAL_FACTS.md` before any operational work.
+3. `docs/Strategy Description/README.md`.
+4. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
+5. The selected lane's PDF and implementation record.
+6. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
+7. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
+   discussion and `docs/operations/OPERATIONAL_FACTS.md` before operational
+   work.
 
-The owner separately authorized exactly one push of the completed Codex branch
-on 2026-08-25. That publication does not authorize a merge, deployment,
-physical extraction, provider or broker access, operator-database mutation,
-scheduled-task change, backtest, research look, evidence-epoch change, or live
-trading.
-
-## 2. Exact repository state
+## 2. Exact baseline and branches
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
 - Published `origin/main` at audit time:
-  `b660b3fb6ddff8e4641624d35a97d23473e7741b`.
-- Reviewed Codex submission:
-  `origin/codex/sep3-macro-proxy-ownership-20260825` at
-  `441f790535676ff819724bb43713280d5b0b7837`.
-- Claude review: `origin/user/claude/review-sep3-macroproxy-20260825` at
-  `ba915eec55b8cd1e6ae84f9ec4d2bcaf6b8a8e05`, pushed and stable, with parent
-  and merge-base exactly `441f790535676ff819724bb43713280d5b0b7837`.
-- Current isolated Codex branch:
-  `codex/counterreview-sep3-macrofreeze-20260825`, based on Claude's exact
-  review head. Its ordered Codex commits before the publication handoff are:
-  1. `728571016dede310d1d7f5936bbdefc07b770d3d` — counter-review and factual
-     separation-plan correction;
-  2. `02c2eaf551ed1a8f1fc18789a24865b01df618d2` — documentation lifecycle
-     cleanup and concise handoff replacement; and
-  3. `fb612bb68d1ef7ae594afc170a1a04e091a59aff` — owner-directed SEP-3 freeze
-     record, sequencing update, and regression guards; and
-  4. `8f2f0b05b67868be2b36ef7913c0f726700a00b1` — exact validation results and
-     completed freeze-transition handoff.
-- The shared checkout was clean on Claude's review branch at the review start
-  and was not switched or edited by Codex.
+  `6156ef9b92737c9b390a96d286b0fbde4ff4b19c`.
+- The owner directed deletion of merged branches; after cleanup only `main`
+  and `origin/main` remained.
+- Three long-lived lane branches are created from one identical committed
+  documentation baseline:
+  - `codex/strategy-analyst-revisions-v2`
+  - `codex/strategy-insider-buying`
+  - `codex/strategy-short-interest`
+- These branches are local until the owner separately requests a push. Branch
+  publication is not a research run, merge, deployment, or trading authority.
 
-The publication handoff commit follows the four commits above and is the final
-branch tip authorized for the one push. After its remote head is verified, the
-complete branch is fetchable from another computer as
-`origin/codex/counterreview-sep3-macrofreeze-20260825`. No merge or second push
-is authorized by this record.
+The three owner PDFs were inspected as text and visually page by page. Their
+page counts, byte sizes, and SHA-256 hashes are pinned in the lane records.
+No strategy code, vendor data, outcome, backtest, or QuantConnect job was
+executed while creating this baseline.
 
-## 3. Counter-review result
+## 3. Parallel-work exception and handoff rule
 
-Claude's one-commit review is **accepted after documentation correction**.
-No runtime, authority, financial, provider, persistence, or extraction-safety
-defect was found. The exact macro-proxy equivalence and extraction-refusal
-claims reproduce.
+During the three-lane phase, agents must not edit this handoff or the Action
+Plan on any lane. This common baseline is the one authorized update before the
+branches diverge. The relevant lane implementation record becomes that
+branch's status, review ledger, validation record, and resume prompt.
 
-P0 0 / P1 0 / P2 0 / P3 3. CRSEP3MPCR-001 corrects the separation plan's
-pending-versus-accepted contradiction. CRSEP3MPCR-002 replaces the ambiguous
-append-only handoff and its duplicate section identifiers. CRSEP3MPCR-003
-records the non-descriptive Claude commit subject without rewriting history.
-All three are resolved. Full evidence and the commit disposition are in the
-counter-review report.
+Codex implements, Claude independently reviews, and Codex counter-reviews on
+the same strategy branch. No review/counter-review branch is created. Work is
+serialized: fetch and fast-forward, verify exact branch/HEAD/status, commit one
+bounded stage with its record update, then push. Never force-push or rewrite
+published lane history.
+
+## 4. Strategy state
+
+### Analyst Revisions V2
+
+The active V2 record is
+`docs/Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md`.
+Existing `research/acer/` code supplies a reviewed immutable ratings-event
+backbone only. It does not implement the V2 firm-specific rating ontology,
+institution-stock-day dedupe, 20-session signal, sector standardization,
+reliability shrinkage, consensus/novelty diagnostics, ETF mapping, portfolio,
+walk-forward study, or QC algorithm. No V2 outcome look exists.
+
+The V1 identity scan's 768 interleavings remain a lower-bound warning; an
+unflagged ticker means `no_name_based_ambiguity_evidence`, never a safety
+allowlist. A durable external security master is still required.
+
+The former ACER V1 plan/source/freeze/proposals/audits are archived and marked
+superseded. Their data lineage and null priors remain valid historical
+evidence; their strategy parameters are not current instructions.
+
+### Insider Buying
+
+The active record is
+`docs/Strategy Description/INSIDER_BUYING_IMPLEMENTATION_RECORD.md`. It is a
+new lane. No SEC ingest, Form 4 classifier, identity map, signal, ETF score,
+portfolio, or QC algorithm exists. The SEC quarterly datasets and full EDGAR
+filings are the canonical free source; public acceptance time governs.
+
+### Short Interest
+
+The active record is
+`docs/Strategy Description/SHORT_INTEREST_IMPLEMENTATION_RECORD.md`. It is a
+new lane. No ingest, signal, ETF score, portfolio, or QC algorithm exists.
+Canonical V1 requires official-style twice-monthly short-interest snapshots;
+daily short-sale volume is prohibited as a proxy. A licensed historical/vintage
+short-interest source is the clearest missing paid input.
+
+## 5. Data acquisitions and confirmations
+
+The assumed Massive-Benzinga Analyst Ratings subscription is sufficient to
+begin a structural V2 ratings audit, not to prove every needed dataset or
+license. The assumed QuantConnect subscription does not establish entitlement
+to US ETF Constituents, US Equity Security Master, US Equities, US Fundamental
+Data, local downloads, or vendor-data processing in Object Store.
+
+Owner priorities are:
+
+1. obtain/confirm a historical-vintage short-interest license (Intrinio or
+   equivalent) with corrections, stable IDs, delisted coverage, and export/QC
+   processing rights;
+2. confirm exact QC dataset entitlements and holdings availability semantics;
+3. confirm Massive and short-interest vendor permission for the exact raw,
+   normalized, or derived representation sent to QC Cloud;
+4. obtain a PIT ETF reference feed if QC cannot supply historical product
+   classification, inception, AUM, and holdings availability; and
+5. optionally add PIT earnings controls. EPS-revision and lending/ORTEX data
+   are later extensions, not canonical blockers.
+
+SEC insider history is free; the work is careful accession/version ingestion,
+acceptance-time handling, identity resolution, and fair-access compliance.
+
+## 6. Separation and operational state
+
+SEP-3 is the current bounded milestone and remains **FROZEN, PAUSED, and
+incomplete** at its independently accepted eighth
+dry run. Physical extraction is false and unauthorized. Its six dual-use data
+modules, `config`, 11 composition files, six Python crossing roots, four
+non-assistant operator-store importers, 42 integration tests, non-test
+documentation ownership, equivalence-test placement, and runtime topology
+remain open. Strategy work neither advances nor weakens SEP-3.
+
+`paper-epoch-006` remains untouched. Nothing in this baseline authorizes
+provider credential access, licensed-row retrieval, broker access, operator
+database changes, scheduled tasks, deployment, backtests, outcomes, evidence
+epochs, paper orders, or live trading.
 
 Separation finding identifiers retained for audit routing:
 `CRSEP2-001`, `CRSEP2C-001`, `CRSEP2D-001`, `CRSEP2D-002`, `CRSEP2F-001`,
@@ -81,101 +140,27 @@ Separation finding identifiers retained for audit routing:
 `SEP2P-001`, `SEP2P-002`, `SEP2P-003`, `SEP3AR-001`, `SEP3CR-001`,
 `SEP3CR-999`, `SEP3CR2-002`, `SEP3R-001`, `SEP3R-002`, and `SEP3X-001`.
 
-## 4. SEP-3 state
+## 7. Integration boundary
 
-SEP-3 is the current bounded milestone and is **PAUSED** until a later owner
-instruction.
-
-The eighth dry run is independently accepted. Its exact candidate is
-`80b9a7ed006210d80f89ff798b4f2477cb027f82`: 757 tracked paths, inventory
-SHA-256 `5916ffcff7e5d86d5aab3aead0d2aa489cc0fdd87476908e2b94208205921b1e`,
-assigned exactly once as 507 trading-assistant / 246 strategy-research / 4
-shared paths. Tests partition as 84 / 75 / 1 / 42 / 6 with manifest-pinned
-ordered hashes.
-
-The dry run is not ready or authorized for physical extraction. Remaining
-gates are six dual-use `data.*` modules, `config`, 11 composition files, six
-Python crossing roots, four non-assistant operator-store importers, 42
-integration tests, non-test documentation ownership, cross-repository
-equivalence-test placement, and owner-gated runtime topology. The selected
-future topology remains two product repositories plus one four-file
-shared-contracts package, with no Git submodules; it has not been created.
-
-The owner has directed SEP-3 to pause after this counter-review. The
-authoritative freeze record is
-`docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`. Do not begin another SEP
-tranche until the owner explicitly unfreezes it.
-
-## 5. Validation
-
-On Claude's exact tree:
-
-- focused boundary/extraction/document suite: 107 passed in 598.64 seconds;
-- exact SEP-3 validator: reproduced every candidate, inventory, partition,
-  blocker, review-state, and extraction-refusal claim;
-- dangerous-direction mutation: a `1e-7` credit-spread drift failed the exact
-  equivalence guard; restoration passed 1 test and restored the original blob.
-
-On the final committed freeze tree before this handoff update:
-
-- expanded focused suite: **116 passed in 590.64 seconds**;
-- complete suite: **4,568 passed / 0 failed / 25 warnings in 1,259.75
-  seconds**;
-- warnings: one existing `websockets.legacy` deprecation and 24 existing
-  joblib/NumPy shape deprecations;
-- required `compileall`, including `research/`: passed;
-- all 15 tracked JSON files parse;
-- all backticked documentation references across 42 active Markdown files
-  resolve;
-- narrow secret-shape scan: clean; and
-- active-document suite alone: **58 passed**.
-
-Python is 3.13.14. No provider, credential, licensed row, broker, operator
-database, task, deployment, backtest, outcome, research look, evidence epoch,
-or `paper-epoch-006` state was accessed or changed.
-
-## 6. Documentation lifecycle
-
-- Root coordination: Action Plan, this handoff, and Feature Milestone Record.
-- Root plans: ACER research and project-separation architecture, one per
-  active track.
-- Queued work: `docs/Plan/`.
-- Historical plans, research, operations, reviews, references, and replaced
-  handoffs: `docs/Archive/`.
-
-The prior 493 KB append-only handoff is preserved, not deleted. Its historical
-“next” instructions and repeated section identifiers are not current.
-
-## 7. Research-track safeguards and next action
-
-ACER remains the priority-1 research program, but no particular strategy
-milestone starts by implication. Its issuer-identity measurement is a lower
-bound: 768 deterministic interleavings are flagged, and an unflagged ticker is
-`no_name_based_ambiguity_evidence`, never an allowlist decision. The current
-EDGAR/yfinance path cannot satisfy the delisted-outcome requirement;
-Databento remains an unmeasured candidate and repository-wide local
-feasibility remains unresolved. An investment-advice disclaimer does not
-automatically require a permission letter for personal backtesting, while the
-purchase-specific order form and additional terms for processing licensed
-ratings through a selected platform still require verification. No
-backtesting rating impact or outcome join is authorized here.
-
-The read-only, zero-outcome Massive/QuantConnect capability audit remains an
-open owner decision in Action Plan section 7 item 1; this handoff does not
-grant it.
-
-The counter-review, documentation cleanup, and SEP-3 freeze are complete.
-Stop and wait for the owner's next important task. Do not infer that ACER,
-another strategy, or another SEP tranche starts without that scope.
+The ultimate target is one autopiloted QuantConnect trading agent, but the
+three lanes must not build it independently. After canonical strategies are
+independently validated, the owner must schedule a separate integration
+milestone for merge order, common schemas, late fusion, cross-signal
+correlation, risk budgets, combined costs/turnover/capacity, untouched final
+holdout, QC parity, paper deployment, monitoring, reconciliation, kill switch,
+and explicit promotion. No leverage is planned for the canonical strategies.
 
 ## 8. Resume prompt
 
 ```text
-Fetch without changing the shared checkout. Read CLAUDE.md, AGENTS.md,
-docs/ACTION_PLAN_2026-08-20.md, docs/SESSION_HANDOFF.md, the SEP-3 freeze
-record, and the macro-proxy counter-review. Verify the exact branch/head and
-working-tree state. SEP-3 is paused at its independently accepted eighth dry
-run; physical extraction and all operational/provider/research-look actions
-remain unauthorized. Continue only the owner's newly specified task in a
-fresh isolated worktree and branch. Preserve paper-epoch-006.
+Select exactly one strategy lane and use its long-lived codex/strategy-*
+branch. Read CLAUDE.md, AGENTS.md, the shared workflow, that lane's owner PDF,
+implementation record, and the data-source register. Verify exact branch,
+HEAD, upstream, and clean status. Do not edit the Action Plan, Session Handoff,
+shared workflow/data register, another lane, or SEP-3. Codex implements one
+bounded milestone and updates the lane record before pushing; Claude reviews
+the exact pushed commits on the same branch; Codex counter-reviews there.
+Access no outcomes or providers unless that exact action is separately
+authorized and preregistered; provider access is an open owner decision.
+Preserve paper-epoch-006.
 ```

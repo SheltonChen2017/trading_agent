@@ -6,14 +6,16 @@ owner replaced the Strong-Buy portfolio program with the Analyst-Consensus ETF
 Rotation program (ACER), which is now priority 1.** The predecessor is archived, not deleted: it remains
 the record of how everything below became true.
 
-**Current sequencing amendment, 2026-08-25:** after Claude accepted the exact
-SEP-3 eighth dry run and Codex counter-reviewed it, the owner paused project
-separation until further notice. SEP-3 is frozen at the reviewed eighth dry
-run; it is incomplete, not extraction-ready, and grants no physical migration
-authority. The exact frozen baseline and restart protocol are in
-`docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`. The owner intends to move
-to trading-strategy implementation, but the exact next milestone will arrive
-as a separate instruction; no strategy run or SEP work starts by inference.
+**Current sequencing amendment, 2026-08-25:** SEP-3 remains frozen at its
+independently accepted eighth dry run and grants no physical-migration
+authority. The owner has now authorized a three-lane strategy-development
+program: Analyst Revisions V2, Insider Buying, and Short Interest. The common
+documentation/branch baseline is governed by
+`docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`; each lane's
+PDF and implementation record define its bounded work. No real-outcome run,
+QuantConnect launch, paper/live deployment, or combined autopilot is
+authorized by this sequencing change. SEP-3's exact paused state remains in
+`docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`.
 
 This document decides **what happens next**. It does not restate per-milestone
 internals. The active implementation plan is at the root of `docs/`, queued
@@ -43,9 +45,12 @@ counter-review begins at `728571016dede310d1d7f5936bbdefc07b770d3d`.
 Current branch availability and later documentation commits belong in
 `docs/SESSION_HANDOFF.md`, not in this sequencing index.
 
-**Current owner assignment, 2026-08-21:** Codex implements ACER work on a
-`codex/` branch and Claude independently reviews the exact pushed snapshot on
-a separate `user/claude/` branch. The current Codex process can see the
+**Current owner assignment, amended 2026-08-25:** Codex implements and Claude
+independently reviews each strategy serially on that strategy's one long-lived
+`codex/strategy-*` branch. No review/counter-review branches are created
+during this parallel phase. The Action Plan and Session Handoff are frozen
+after the common baseline; every push updates the lane implementation record.
+The current Codex process can see the
 Massive-Benzinga and QuantConnect credential variables, but their values are
 never recorded and credential presence is not dataset entitlement. The local
 engine installation, authentication, and sample execution were verified on
@@ -164,15 +169,27 @@ is recorded; the subscription decision is still open in section 7).
 
 ## 2. Priority 1 — the Analyst-Consensus ETF Rotation program (ACER)
 
+**Current replacement, 2026-08-25:** the owner-supplied Analyst Revisions ETF
+Strategy Blueprint V2 replaces ACER V1 as the active analyst-revision
+contract. The active record is
+`docs/Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md`; the
+source PDF is beside it. Insider Buying and Short Interest are parallel
+research lanes under the shared workflow, not subordinate ACER cells. The
+former plan is preserved at
+`docs/Archive/Plans/ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md`, with its source
+and supporting freeze/audits in the corresponding Archive directories. The
+remainder of this section is retained as the historical V1 rationale and does
+not override V2.
+
 **Owner decision, 2026-08-20: ACER replaces the Strong-Buy portfolio program.**
 The strategy converts stock-level analyst *revisions* into ETF-level signals:
 score each ETF as the sum of its point-in-time constituent weights times its
 holdings' decayed revision signals, filter on breadth and analyst coverage,
 rank, and only later express the strongest views through inverse or leveraged
 products under explicit regime rules. The contract is
-`docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` (ACER-0..7); the
-owner's source specification is versioned beside it as
-`analyst-consensus-etf-strategy.pdf`.
+`docs/Archive/Plans/ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md` (ACER-0..7);
+the owner's superseded V1 source specification is preserved at
+`docs/Archive/Reference/analyst-consensus-etf-strategy-v1.pdf`.
 
 This is a different hypothesis from SBP, not a re-plumbing of it: the signal
 moves from consensus *levels* to *revisions*, and the held instrument moves
@@ -201,7 +218,7 @@ ACER-2 test; ACER-0B — ETF benchmark and investability decisions — is
 deliberately left unfrozen so those choices are not forced before a
 stock-level signal is shown to exist. ACER-0B requires a separate owner act
 and is reachable only if ACER-2 passes. The operative contract is
-`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`.
+`docs/Archive/Research/ACER_V1/ACER_2026-08-20_ACER0A_FREEZE.md`.
 
 What ACER-0A froze: **six cells**, not twelve — two encodings (ordinal
 notch change, direction-only sign) x three half-lives (21, 63, 126 sessions)
@@ -223,7 +240,7 @@ look; a corrected rerun may repair code but never the hypothesis.
 
 **Corrected update 2026-08-21: ACER-2 cannot run on the current
 EDGAR/yfinance path; repository-wide local feasibility remains unresolved**
-(`docs/research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md`).
+(`docs/Archive/Research/ACER_V1/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md`).
 `data/pit_universe.py` states in its own docstring that prices for delisted
 securities are unavailable and that there are **no delisting returns**, which
 "biases results upward and the size of the bias is not knowable from this
@@ -295,7 +312,7 @@ solely because Databento was not selected. Databento's own status remains
 unmeasured.
 
 **Proposals for ACER-0A.1 and 0A.5–0A.9 now exist**
-(`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level
+(`docs/Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`): a five-level
 rating scale measured against the corpus's 54 distinct rating strings with an
 explicit refusal class rather than a default, the decay and aggregation
 equations, control and outcome definitions, and an estimation protocol with a
@@ -325,7 +342,7 @@ point-in-time universe semantics. None may be settled after seeing a result.
 
 ACER-0 also settles the ratings vendor. **Update 2026-08-20: the owner
 purchased the Benzinga expansion via Massive and authorized a read-only data
-audit** (`docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md`). Snapshot
+audit** (`docs/Archive/Research/ACER_V1/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md`). Snapshot
 A answers the two blocking questions favourably — the feed carries dated
 per-firm actions from 2011-12 **including pre-delisting coverage for bankrupt
 and acquired names** (SIVB, FRC, SBNY, TWTR, ATVI and more), and
@@ -354,7 +371,7 @@ security-master cross-reference and must refuse ambiguous joins.
 
 **Update, same day: the event backbone is implemented and independently
 corrected** (`research/acer/`,
-`docs/research/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md`, review record
+`docs/Archive/Research/ACER_V1/ACER_EVENTS_2026-08-20_BACKBONE_COVERAGE.md`, review record
 `docs/Archive/Review/REVIEW_2026-08-20_ACER_EVENT_BACKBONE.md`, counter-review
 `docs/Archive/Review/REVIEW_2026-08-20_ACER_BACKBONE_COUNTERREVIEW.md`). The review
 chain is complete: all seven review findings were confirmed, two of the
@@ -376,7 +393,7 @@ problem — 9,677 distinct tickers with zero ISIN and zero exchange — and
 ambiguity-refusing mapping is the next ACER-1 step.
 
 **Update 2026-08-21: the mapping step is BLOCKED, and the blocker is
-load-bearing** (`docs/research/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
+load-bearing** (`docs/Archive/Research/ACER_V1/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
 The original measurement found no local LEAN or LEAN data. That fact is now
 historical: local LEAN and Docker are installed, authenticated, and proven
 with the generated sample project, but the owner has selected QuantConnect
@@ -586,6 +603,12 @@ own commit.
 ---
 
 ## 7. Inputs and decisions required before ACER implementation can advance
+
+**Current routing:** use
+`docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md` and the
+three lane records for present acquisition and implementation gates. The
+items below are the retained ACER V1 decision history; they remain useful
+evidence but are not a V2 milestone schedule.
 
 The ratings vendor and SBR-1 decisions are already closed: Benzinga Analyst
 Ratings is the selected signal source, and SBR-1 stays uninstalled. The

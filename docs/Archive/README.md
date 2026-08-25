@@ -24,8 +24,10 @@ current instructions.
   context but are not current resume instructions.
 
 The superseded Strong-Buy plan is preserved at
-`Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md`; the current successor is the active
-`docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` plan.
+`Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. Its former successor, ACER V1, was
+itself superseded on 2026-08-25 and is preserved at
+`Plans/ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md`. The current strategy
+contracts are under `docs/Strategy Description/`.
 
 Do not resume work from this folder merely because an archived document says
 "next." The current sequence is always in `docs/ACTION_PLAN_2026-08-20.md`.

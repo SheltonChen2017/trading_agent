@@ -14,8 +14,9 @@ plan.
 
 ## Current plan tracks
 
-- `ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — active research-program contract;
-  its outcome and authorization gates remain binding.
+- `Strategy Description/` — the three active strategy source PDFs, shared
+  parallel-workflow contract, per-lane implementation records, and data-source
+  register. The former ACER V1 plan is archived.
 - `PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` — architecture-track contract;
   it is currently paused. The exact frozen baseline and restart procedure are
   in `architecture/SEP3_FREEZE_STATE_2026-08-25.md`.
@@ -28,6 +29,8 @@ work by being present here; the Action Plan must schedule it.
 - `architecture/` — architecture decisions, debt, and bounded state records.
 - `operations/` — current operational facts, runbooks, mandates, and status.
 - `research/` — active research records and the permanent run ledger.
+- `Strategy Description/` — active owner strategy specifications and lane
+  records; PDFs are immutable inputs.
 - `Plan/` — queued plans and preregistrations; not authorized by themselves.
 - `process/` — mandatory review, handoff, and research-run procedures.
 - `reference/` — current reference material.

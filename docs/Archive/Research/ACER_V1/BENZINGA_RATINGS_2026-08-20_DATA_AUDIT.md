@@ -1,5 +1,8 @@
 # Benzinga analyst-ratings vendor data audit (ACER-1 vendor half)
 
+Archive status: **V1 source audit retained for reproducibility. Re-audit the
+current entitlement and snapshot before V2 implementation.**
+
 Status: **read-only audit, owner-authorized 2026-08-20. No backtest, no price
 join, no research look.** Snapshot A is complete and analysed. Snapshot B,
 the historical security-identity cross-reference, and permission to upload

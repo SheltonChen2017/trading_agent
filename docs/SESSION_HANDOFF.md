@@ -7596,6 +7596,64 @@ task, deployment, backtest, outcome, research look, evidence epoch, or
 `paper-epoch-006` state was accessed or changed. Physical extraction remains
 unauthorized.
 
+## 7es. SEP-3 macro-proxy ownership and eighth dry run (Codex, 2026-08-25)
+
+Codex continued from finalized counter-review head `624580d2` on fresh branch
+`codex/sep3-macro-proxy-ownership-20260825`. The complete local-only cycle is:
+
+1. `773d6241` — counter-review Claude's exact runtime-identity review head;
+2. `624580d2` — update the handoff and close the counter-review;
+3. `80b9a7ed` — split assistant-private descriptive macro proxies from the
+   research-owned service and add exact equivalence and ownership guards;
+4. `68e18699` — pin the eighth dry-run architecture contract and restored-
+   import refusal;
+5. `b485d7d7` — update the Action Plan and authoritative separation plan; and
+6. `6b6febd7` — finalize the counter-review's combined-tree validation record.
+
+The exact eighth candidate is
+`80b9a7ed006210d80f89ff798b4f2477cb027f82`: **757 tracked paths**, inventory
+SHA-256 `5916ffcff7e5d86d5aab3aead0d2aa489cc0fdd87476908e2b94208205921b1e`,
+assigned exactly once as **507 trading assistant / 246 strategy research / 4
+shared**. Tests remain **84 assistant / 75 research / 1 shared / 42 integration
+/ 6 governance** with unchanged ordered hashes. `data.macro_data` leaves the
+stranded ledger; six dual-use data modules and `config` remain, alongside 11
+composition files, six Python crossing roots, four non-assistant operator-
+store importers, 42 integration tests, non-test documentation ownership,
+cross-repository equivalence-test placement, and owner-gated runtime topology.
+Status is `eighth-dry-run-not-ready-for-physical-extraction`, review pending,
+with physical authorization false.
+
+Research retains macro-signal semantics in `data.macro_data`. The assistant's
+descriptive-only context now uses `assistant.macro_proxies`, whose three
+function implementations are AST-identical to the research versions after
+docstring removal and behavior-identical on overlapping credit and yield
+inputs. Restoring `assistant.macro_context -> data.macro_data` makes the
+product-owned-service guard fail with the exact offender; restoration returns
+the focused boundary tests green. The tiny shared package remains exactly four
+files. No predictive claim, proposal, approval, sizing, execution, provider,
+or policy behavior changes.
+
+Validation on the committed implementation and documentation tree is clean:
+focused final suites **114 passed in 706.51 seconds**; complete suite **4,566
+passed / 0 failed / 25 warnings in 6,264.34 seconds** on Python 3.13.14;
+required compileall including `research/` passed; all 15 tracked JSON files
+parse; the exact validator reproduces the candidate and six-module blocker;
+and the narrow secret scan is clean. The 25 warnings are the existing
+websockets and joblib/NumPy deprecations. Active-document, diff/status/staged,
+ordered-commit, exact-Claude-head, and shared-checkout checks are rerun after
+this handoff commit.
+
+This branch and every Codex commit in the cycle remain local-only until the
+one authorized final push. After that push, Claude independently reviews the
+exact remote branch/head; Codex then counter-reviews that exact Claude push and
+implements the next safe SEP-3 item before the following single Codex push. No
+feature-milestone entry is added because SEP-3 is not complete and physical
+extraction remains unauthorized.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

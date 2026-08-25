@@ -13,7 +13,7 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-from data.macro_data import (
+from assistant.macro_proxies import (
     build_credit_spread_proxy,
     build_yield_curve_proxy,
 )

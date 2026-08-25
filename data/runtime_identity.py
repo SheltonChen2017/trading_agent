@@ -1,4 +1,4 @@
-"""Product-neutral definition of which code produced a runtime record.
+"""Research-owned definition of which code produced a runtime record.
 
 Four scripts previously carried their own ``_current_commit()`` and had
 drifted into four different strictness levels. The dangerous pair used
@@ -10,10 +10,10 @@ files sit in it:
     clean
 
 So a shadow run could stamp observations with a commit while importing a
-module that commit does not contain, and a research report could be
-stamped from a fully dirty tree. Evidence lineage is only worth recording
-if the recorded identity is true, so this module keeps one strict
-definition and every caller uses it.
+module that commit does not contain, and a research report could be stamped
+from a fully dirty tree. Evidence lineage is only worth recording if the
+recorded identity is true. The trading assistant owns a behavior-identical
+private implementation rather than importing this research service.
 """
 from __future__ import annotations
 

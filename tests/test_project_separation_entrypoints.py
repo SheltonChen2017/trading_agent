@@ -658,11 +658,15 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
     assert all(ownership["provider_neutral_rationales"].values())
     assert ownership["product_owned_services"] == {
         "trading_assistant": ["data/operational_alerts.py"],
-        "strategy_research": ["data/research_statistics.py"],
+        "strategy_research": [
+            "data/research_statistics.py",
+            "data/runtime_identity.py",
+        ],
     }
     assert set(ownership["product_owned_service_rationales"]) == {
         "data/operational_alerts.py",
         "data/research_statistics.py",
+        "data/runtime_identity.py",
     }
     assert all(ownership["product_owned_service_rationales"].values())
     assert ownership["shared_provider_debt"] == []
@@ -788,9 +792,50 @@ def test_product_owned_provider_implementations_do_not_cross_products():
         )
 
 
-def test_runtime_identity_facade_preserves_object_identity():
-    assert assistant_current_commit is current_commit
-    assert AssistantRuntimeIdentityError is RuntimeIdentityError
+def test_assistant_private_runtime_identity_matches_research_behavior(tmp_path):
+    """SEP3RI-001: split product ownership without weakening lineage checks."""
+    import subprocess
+
+    import pytest
+
+    repository = tmp_path / "repo"
+    repository.mkdir()
+
+    def _git(*arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments],
+            cwd=repository,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+
+    _git("init", "--quiet")
+    _git("config", "user.email", "test@example.invalid")
+    _git("config", "user.name", "Test")
+    (repository / "tracked.py").write_text("VALUE = 1\n", encoding="utf-8")
+    _git("add", "tracked.py")
+    _git("commit", "--quiet", "-m", "initial")
+
+    assert assistant_current_commit is not current_commit
+    assert AssistantRuntimeIdentityError is not RuntimeIdentityError
+    assert AssistantRuntimeIdentityError.__module__ == "assistant.runtime_identity"
+    assert RuntimeIdentityError.__module__ == "data.runtime_identity"
+
+    expected = _git("rev-parse", "HEAD")
+    assert assistant_current_commit(repository=repository) == expected
+    assert current_commit(repository=repository) == expected
+
+    (repository / "untracked.py").write_text("SNEAKY = True\n", encoding="utf-8")
+    messages = []
+    for implementation, error_type in (
+        (assistant_current_commit, AssistantRuntimeIdentityError),
+        (current_commit, RuntimeIdentityError),
+    ):
+        with pytest.raises(error_type, match="uncommitted or untracked") as error:
+            implementation(repository=repository)
+        messages.append(str(error.value))
+    assert messages[0] == messages[1]
 
 
 def test_operational_alert_facade_preserves_object_identity():

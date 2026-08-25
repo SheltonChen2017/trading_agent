@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 seventh dry run accepted on review; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 eighth dry run pending review; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -650,6 +650,34 @@ topology remain blocking. Cross-implementation equivalence tests remain in the
 source-repository integration partition until physical extraction receives a
 separately reviewed CI/home decision. Physical extraction remains
 unauthorized.
+
+Claude independently accepted the seventh candidate at exact pushed review
+head `7ed9bdba`. Codex counter-reviewed the single Claude commit and accepted
+it with no P0–P3 finding; the exact 124-test focused suite, validator output,
+merge-tree identity, and dangerous lineage mutation all reproduced. See
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-25_SEP3_RUNTIME_IDENTITY.md`.
+
+The eighth bounded candidate is
+`80b9a7ed006210d80f89ff798b4f2477cb027f82`. It makes
+`data.macro_data` strategy-research-owned and removes the assistant product's
+dependency on that research service. `assistant.macro_proxies` contains
+behavior-identical private calculations used only by descriptive macro
+context; the existing predictive-rejection label and prohibition on proposal
+or execution influence remain unchanged. Restoring the assistant-to-research
+import fails the product-owned-service guard. The tiny shared package does not
+grow.
+
+The eighth dry run records **757 paths**, inventory SHA-256
+`5916ffcf...21b1e`, assigned exactly once as **507 trading assistant / 246
+strategy research / 4 shared**. The test partition remains **84 assistant / 75
+research / 1 shared / 42 integration / 6 governance** with unchanged ordered
+hashes. The stranded-data blocker falls from seven to **six**; `config`
+remains the sole stranded top-level module. The 11 composition files, six
+Python crossing roots, four non-assistant operator-store importers, 42
+integration tests, non-test documentation partition, cross-repository
+equivalence-test placement, and owner-gated runtime topology remain blocking.
+Status is a valid eighth dry run pending independent review, not physical-
+extraction readiness or authorization.
 
 ## 5. Safety and evidence invariants
 

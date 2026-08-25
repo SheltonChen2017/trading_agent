@@ -7560,6 +7560,42 @@ or changed. `paper-epoch-006` is untouched.
 owner-sensitive), `config`, the governance-document partition, and the
 composition ledger — then an eighth dry run.
 
+## 7er. Codex counter-review of Claude's runtime-identity review (2026-08-25)
+
+Codex counter-reviewed exact stable remote head `7ed9bdba` from
+`origin/user/claude/review-sep3-runtimeid-20260825` in a fresh isolated
+worktree. Its merge-base with submitted head `89e6cba3` is exactly that
+submission, and the complete Claude range contains the single review-record
+commit `7ed9bdba`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-25_SEP3_RUNTIME_IDENTITY.md`.
+
+**Accepted; no P0–P3 finding.** Claude's one commit has an explicit accepted
+disposition. The exact five-file focused suite named by the review passes
+**124 tests in 501.02 seconds**; the handoff's separate 105 count is a narrower
+post-status subset, not contradictory evidence. The validator reproduces the
+exact 754-path inventory, SHA-256, 504 / 246 / 4 destinations, 84 / 75 / 1 /
+42 / 6 test partition, seven stranded data modules, `config`, all runtime
+residuals, and extraction refusal. Mainline merge `cf9bd094` is byte-identical
+to submitted tree `89e6cba3`.
+
+The dangerous lineage weakening `--untracked-files=no` fails the runtime-
+identity equivalence test because untracked Python source reads clean;
+restoring `all` returns the test green and the file's cleaned blob exactly to
+the reviewed object. No correction is required.
+
+This counter-review branch remains local-only and must not be pushed as a
+standalone review. The next implementation branch will begin from its
+finalized tree and resolve the code-determined macro-proxy ownership seam:
+research keeps `data.macro_data`, while the assistant's descriptive-only
+macro context receives a private behavior-identical calculation. The tiny
+shared package will not grow. Full validation will run on the combined final
+tree before one Codex push.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed. Physical extraction remains
+unauthorized.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

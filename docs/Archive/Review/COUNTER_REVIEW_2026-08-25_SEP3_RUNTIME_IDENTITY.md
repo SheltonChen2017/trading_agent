@@ -1,8 +1,11 @@
 # Counter-review — SEP-3 runtime-identity ownership and seventh dry run
 
-Reviewer: Codex, 2026-08-25  
-Reviewed branch: `origin/user/claude/review-sep3-runtimeid-20260825`  
-Exact reviewed head: `7ed9bdba7c1a4bc2a844976b065e0b0ec474592b`  
+Reviewer: Codex, 2026-08-25
+
+Reviewed branch: `origin/user/claude/review-sep3-runtimeid-20260825`
+
+Exact reviewed head: `7ed9bdba7c1a4bc2a844976b065e0b0ec474592b`
+
 Exact submitted head and merge-base: `89e6cba3b3cf4e15a0e536ea03fcf0c0fdfa60e4`
 
 **Verdict: accepted. No P0–P3 finding.** The remote review head was stable

@@ -676,8 +676,12 @@ remains the sole stranded top-level module. The 11 composition files, six
 Python crossing roots, four non-assistant operator-store importers, 42
 integration tests, non-test documentation partition, cross-repository
 equivalence-test placement, and owner-gated runtime topology remain blocking.
-Status is a valid eighth dry run pending independent review, not physical-
-extraction readiness or authorization.
+Claude independently accepted the exact eighth candidate at pushed review
+head `ba915eec55b8cd1e6ae84f9ec4d2bcaf6b8a8e05`. The status is therefore a
+valid reviewed eighth dry run, not physical-extraction readiness or
+authorization. Codex's counter-review reproduces the exact inventory,
+boundary, refusal, and mutation claims; see
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-25_SEP3_MACRO_PROXIES.md`.
 
 ## 5. Safety and evidence invariants
 

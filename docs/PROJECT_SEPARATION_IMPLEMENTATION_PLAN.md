@@ -1,6 +1,7 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 eighth dry run accepted on review; physical extraction not authorized**
+Status: **PAUSED — SEP-3 frozen at the independently accepted eighth dry run;
+physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -10,6 +11,11 @@ tiny shared-contracts package; no Git submodules
 Implementer: Codex
 
 Independent reviewer: Claude
+
+Freeze authority: owner instruction, 2026-08-25. The exact frozen baseline,
+remaining gates, permitted adjacent work, and restart procedure are in
+`docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`. No later paragraph's
+historical “next” language overrides that record.
 
 ## 1. Plain-language objective
 
@@ -453,7 +459,7 @@ the exact input to SEP-3's dry-run extraction decision. No database, task,
 deployment, credential, provider, broker, backtest, outcome, research look, or
 evidence epoch changed.
 
-### SEP-3 — physical extraction decision (current)
+### SEP-3 — physical extraction decision (current, paused)
 
 The owner selected **two product repositories plus one deliberately tiny
 shared-contracts package** on 2026-08-22. The current repository remains the
@@ -694,8 +700,11 @@ boundary, refusal, and mutation claims; see
 - A moved module is not complete until imports, tests, documents, provenance,
   and the reverse dependency direction are verified.
 
-## 6. Explicit non-goals for SEP-0
+## 6. Explicit non-goals while SEP-3 is frozen
 
-SEP-0 does not create a second repository, move files, rename packages, change
-the Streamlit UI, call a broker or vendor, run a backtest, consume a research
-look, alter the operator database, deploy, or roll an evidence epoch.
+The freeze does not create a second repository or shared package, move files,
+rename packages, alter runtime topology, change installed task paths, migrate
+the operator database, change the Streamlit UI, call a broker or vendor, run a
+backtest, consume a research look, deploy, or roll an evidence epoch. Strategy
+work on a separate branch may add or change paths that a resumed dry run must
+reclassify; it does not silently amend this plan or its manifest.

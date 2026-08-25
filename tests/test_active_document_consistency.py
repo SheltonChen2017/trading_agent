@@ -84,6 +84,50 @@ def test_docs_root_contains_only_current_coordination_and_active_plan() -> None:
     )
 
 
+def test_current_handoff_is_a_bounded_unique_resume_snapshot() -> None:
+    """A replaced handoff must not silently become another append-only archive."""
+    path = ROOT / "docs" / "SESSION_HANDOFF.md"
+    raw = path.read_text(encoding="utf-8")
+    assert path.stat().st_size < 50_000, (
+        "the current handoff has accumulated enough history to require another "
+        "archive-and-replace cycle"
+    )
+    identifiers = re.findall(r"^##\s+(\d+)\.", raw, flags=re.MULTILINE)
+    assert identifiers
+    assert len(identifiers) == len(set(identifiers)), (
+        f"current handoff section identifiers are ambiguous: {identifiers}"
+    )
+
+
+def test_sep3_freeze_record_pins_the_reviewed_pause_without_authorizing_extraction():
+    freeze = _text("architecture/SEP3_FREEZE_STATE_2026-08-25.md")
+    separation = _text("PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md")
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    handoff = _text("SESSION_HANDOFF.md")
+    manifest = (ROOT / "architecture" / "sep3_extraction_manifest.json").read_text(
+        encoding="utf-8"
+    )
+
+    for expected in (
+        "FROZEN BY OWNER",
+        "80b9a7ed006210d80f89ff798b4f2477cb027f82",
+        "441f790535676ff819724bb43713280d5b0b7837",
+        "ba915eec55b8cd1e6ae84f9ec4d2bcaf6b8a8e05",
+        "5916ffcff7e5d86d5aab3aead0d2aa489cc0fdd87476908e2b94208205921b1e",
+        "757 tracked paths",
+        "507 trading assistant / 246 strategy research / 4 shared",
+        "physical extraction false",
+    ):
+        assert expected.lower() in freeze.lower()
+
+    assert '"independent_review_status": "accepted"' in manifest
+    assert '"physical_extraction_authorized": false' in manifest
+    assert "pending independent review" not in separation.lower()
+    for document in (separation, action, handoff):
+        assert "paused" in document.lower()
+        assert "SEP3_FREEZE_STATE_2026-08-25.md" in document
+
+
 def test_documentation_update_policy_keeps_action_plan_as_reference_index():
     """Owner decision: update relevant records + handoff, without duplication."""
     action = _text("ACTION_PLAN_2026-08-20.md")

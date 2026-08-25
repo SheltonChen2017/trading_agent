@@ -7353,6 +7353,70 @@ task, deployment, backtest, outcome, research look, evidence epoch, or
 active-document and repository checks pass, Codex will push this implementation
 branch exactly once and create the next exact-head alarm for Claude's review.
 
+## 7en. Independent review of the SEP-3 market-analytics tranche (Claude, 2026-08-25)
+
+Branch `user/claude/review-sep3-marketanalytics-20260825`, created from tip
+`8db2251` of `codex/sep3-market-analytics-ownership-20260824` (remote copy
+deleted in the owner-directed merged-branch cleanup; tip retained locally and
+byte-identical to merged `main` `38def14` per PR #308), based on my prior
+review head `1680f6e`. All ten commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-25_SEP3_MARKET_ANALYTICS.md`.
+
+**Accepted. No findings against the submission.**
+
+**Codex's CRSEP3ST-001 (P2) against my stranded check is correct**: my
+SEP3R-001 fix measured only the `data.*` partition, so the top-level
+assignment of `config.py` and `market_analytics.py` to the assistant — both
+with importers on both sides — was invisible to it. The generalization is
+verified live: falsifying `config`'s importer sides refuses, and emptying the
+top-level stranded list refuses with declared-versus-measured detail.
+CRSEP3ST-002 (P3, stale review-state records) is also accepted.
+
+**The market-analytics split — the first hard dual-use surface — holds.**
+The assistant gets a behavior-equivalent private copy of five analytics
+functions for context/lookup/UI display; the top-level module becomes
+research-owned; and the single cross-implementation equivalence test carries
+the design. That guard is genuinely sensitive: a **1e-9-relative** drift on
+the assistant volatility copy fails it. Proposal authority is untouched — the
+strategy path still consumes research results through the input-bound seam.
+Sixth dry run reproduces: candidate `c4c6ed8`, stranded `data.*` at **8**,
+top-level stranded now `config` only, extraction refused.
+
+**Two invalid probes of my own, recorded rather than buried**: a drift probe
+whose anchor text did not exist (bash without `-e` carried past the failed
+assert and pytest "passed" on an unmutated tree) and a falsification probe
+whose mutation branch never applied. Both were caught by re-reading the
+target before believing the result; both re-runs with verified anchors went
+red as expected. Rule kept: mutation scripts run under `set -eu`, and a
+mutation is only evidence after confirming the mutated text exists.
+
+**Owner-directed cleanup this round**: all merged branches deleted — nine
+remote and nine local; five local branches remain only because Codex's
+worktrees pin them (all merged, nothing at risk).
+
+The review's documentation duty was enforced by the guard itself: the first
+full run failed exactly one test — CRSEP3ST-002's review-state guard — the
+moment my accepting report appeared on disk while the manifest still said
+`pending`. The manifest and both active plans now record the sixth candidate
+as accepted, and the validator still refuses extraction after the advance.
+
+Validation on the final tree: focused boundary/dry-run/entry-point/doc suites
+79 passed after the status advance; complete suite **4,563 passed / 0 failed
+/ 25 warnings** in 1212.02 seconds on Python 3.13.14, run clean on the final
+tree — Codex's 4,563 with no test added by this round; `git diff
+--check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 continues: the eight
+`data.*` dual-use modules and `config` (partly owner calls), the
+governance-document partition, the composition ledger, and the runtime
+topology — then a seventh dry run. One extraction-design question the plan
+should answer before any split: where the cross-implementation equivalence
+test lives once the two products are separate repositories.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

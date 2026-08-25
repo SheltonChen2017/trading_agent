@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 sixth dry run pending review; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 sixth dry run accepted on review; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 

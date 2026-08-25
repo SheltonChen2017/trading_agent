@@ -7654,6 +7654,42 @@ No provider, credential, licensed row, broker, operator database, installed
 task, deployment, backtest, outcome, research look, evidence epoch, or
 `paper-epoch-006` state was accessed or changed.
 
+## 7es. Independent review of the SEP-3 macro-proxy tranche (Claude, 2026-08-25)
+
+Branch `user/claude/review-sep3-macroproxy-20260825`, created from the exact
+fetched remote head `441f790` on
+`origin/codex/sep3-macro-proxy-ownership-20260825`, based on my prior review
+head `7ed9bdb`. All seven commits carry an explicit disposition. Full record:
+`docs/Archive/Review/REVIEW_2026-08-25_SEP3_MACRO_PROXIES.md`.
+
+**Accepted. No findings.** Codex's counter-review of my runtime-identity round
+was also zero-findings — the second fully clean exchange in a row.
+
+The smallest twin so far: two descriptive proxy builders (LQD/HYG credit
+stress, short-minus-long yield slope) plus the OHLCV shaper, all three
+**AST-identical post-docstring** to their `data.macro_data` originals,
+consumed only by `assistant/macro_context.py` for observed-context display.
+The equivalence guard fails on a `1e-7` drift with a verified anchor under
+`set -eu`. Eighth dry run reproduces: candidate `80b9a7e`, stranded `data.*`
+down to **6** (`macro_data` resolved), top-level still `config` only,
+extraction refused; the eighth candidate's review status is advanced per the
+CRSEP3ST-002 guard and the validator still refuses extraction after the
+advance.
+
+Validation on the final tree: focused dry-run/entry-point/doc suites **107
+passed** after the status advance; complete suite **4,566 passed / 0 failed /
+25 warnings**; `git diff --check`
+clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. Remaining: six `data.*`
+dual-use modules (mandate-fingerprint pair the most owner-sensitive),
+`config`, the governance-document partition, and the composition ledger —
+then a ninth dry run.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

@@ -77,7 +77,7 @@ remains blocked on six dual-use data modules, `config.py`, the unchanged
 runtime residuals, 42
 integration tests and non-test documentation ownership; see
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Physical extraction remains
-separately gated. The eighth dry run awaits independent review.
+separately gated. The eighth dry run is independently accepted (`docs/Archive/Review/REVIEW_2026-08-25_SEP3_MACRO_PROXIES.md`).
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

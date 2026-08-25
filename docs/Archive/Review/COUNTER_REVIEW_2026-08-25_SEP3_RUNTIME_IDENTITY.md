@@ -63,10 +63,14 @@ subset. No factual correction is required.
   functions and exception classes remain distinct, and no assistant-owned
   source imports `data.runtime_identity`.
 
-The complete suite, compile pass, JSON validation, secret scan, ordered-commit
-and final Git checks will run on the combined counter-review plus next-item
-tree before the one authorized Codex push. This avoids treating a pre-
-implementation run as validation of the final cycle.
+Final combined-tree validation later passed: the implementation-focused suite
+passed **114 tests in 706.51 seconds**; the complete repository suite passed
+**4,566 tests / 0 failed / 25 warnings in 6,264.34 seconds**; compileall
+including `research/` passed; all 15 tracked JSON files parsed; the exact
+eighth-dry-run validator reproduced; and the narrow secret scan was clean.
+The warnings are the existing websockets and joblib/NumPy deprecations. Final
+ordered-commit, staged/status, exact-Claude-head, and shared-checkout checks
+remain the post-handoff gates before the one authorized Codex push.
 
 ## Scope and remaining gates
 

@@ -21,7 +21,6 @@ from assistant.overlay_shadow import (
     completed_month_end_sessions,
     sleeve_return,
 )
-from assistant.runtime_identity import RuntimeIdentityError
 from assistant.storage import AssistantStore
 from scripts import run_overlay_shadow as runner
 
@@ -164,7 +163,7 @@ def test_register_refuses_a_dirty_tree_with_a_durable_alert(
     monkeypatch.setattr(
         runner, "current_commit",
         lambda require_clean=True, repository=None: (_ for _ in ()).throw(
-            RuntimeIdentityError("worktree is dirty")
+            runner.RuntimeIdentityError("worktree is dirty")
         ),
     )
     assert runner.main([*argv, "register"]) == 1

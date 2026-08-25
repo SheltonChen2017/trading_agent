@@ -340,14 +340,15 @@ def test_campaign_modules_have_no_execution_or_registry_imports():
 def test_campaign_cli_treats_code_commit_as_runtime_assertion(
     tmp_path, monkeypatch, capsys
 ):
-    from assistant.runtime_identity import RuntimeIdentityError
     from scripts import run_ml_research_campaign
 
     seen = {}
 
     def _runtime_commit(**kwargs):
         seen.update(kwargs)
-        raise RuntimeIdentityError("expected code commit does not match runtime HEAD")
+        raise run_ml_research_campaign.RuntimeIdentityError(
+            "expected code commit does not match runtime HEAD"
+        )
 
     monkeypatch.setattr(run_ml_research_campaign, "current_commit", _runtime_commit)
     code = run_ml_research_campaign.main(

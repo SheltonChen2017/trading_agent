@@ -7448,6 +7448,64 @@ No provider, credential, licensed row, broker, operator database, installed
 task, deployment, backtest, outcome, research look, evidence epoch, or
 `paper-epoch-006` state was accessed or changed.
 
+## 7ep. SEP-3 runtime-identity ownership and seventh dry run (Codex, 2026-08-25)
+
+Codex continued from finalized counter-review head `6d350ab` on fresh isolated
+branch `codex/sep3-runtime-identity-ownership-20260825`. The combined cycle
+contains the local-only counter-review commits `e467d3f` and `6d350ab`, followed
+by this bounded implementation series:
+
+1. `3724838` — replace the assistant runtime-identity facade with a private,
+   behavior-identical implementation and remove stale research-test imports of
+   the assistant exception;
+2. `32b56ae` — assign `data.runtime_identity` to strategy research in the
+   exact ownership contract;
+3. `53b6cf5` — record the seventh dry-run manifest and restored-import
+   dangerous-direction regression; and
+4. `75ba889` — synchronize the Action Plan and authoritative separation plan.
+
+The exact seventh candidate is
+`32b56aed73dab328ce6c83316aa8d38b4301f9d2`: **754 tracked paths**, inventory
+SHA-256 `312ba0af5ad59c10fe81831ead62b8807e0c6a67043cd68c15616a16940cbb1d`,
+assigned exactly once as **504 trading assistant / 246 strategy research / 4
+shared**. Tests remain **84 assistant / 75 research / 1 shared / 42 integration
+/ 6 governance** with unchanged ordered hashes. `data.runtime_identity` leaves
+the stranded ledger; seven dual-use data modules and `config` remain, alongside
+11 composition files, six Python crossing roots, four non-assistant operator-
+store importers, 42 integration tests, non-test documentation ownership, and
+the owner-gated runtime topology. Status is
+`seventh-dry-run-not-ready-for-physical-extraction`, review pending, with
+physical authorization false.
+
+Behavior remains fail-closed. Both product-private runtime-identity modules
+return the same clean commit, reject untracked source with the same reason,
+and treat `expected_commit` as an assertion. Research tests raise the research
+module's exception rather than importing an assistant service. The new
+dangerous-direction test restores `assistant -> data.runtime_identity` and the
+validator refuses the stale seven-module declaration. The tiny shared package
+remains four files. No live-assistant authority, proposal, execution, policy,
+database, task path, or evidence behavior changes.
+
+Validation on the committed implementation/documentation tree is clean:
+focused final suites **149 passed** in 487.52 seconds; complete suite **4,564
+passed / 0 failed / 25 warnings** in 1232.50 seconds on Python 3.13.14; required
+`compileall` including `research/` passed; all 15 tracked JSON files parse; the
+seventh validator reproduces the exact candidate and blockers; and active-
+document checks passed 57 tests. The warnings are the existing websockets and
+joblib/NumPy deprecations. Final diff/status/staged/secret, exact-Claude-head,
+and shared-checkout checks are performed after this handoff commit.
+
+This branch and every Codex commit in the cycle are local-only until the one
+authorized final push. After that push, Claude independently reviews the exact
+remote branch/head; Codex then counter-reviews that exact Claude push and
+implements the next safe SEP-3 item before the following single Codex push.
+No feature-milestone entry is added because SEP-3 is not complete and physical
+extraction remains unauthorized.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

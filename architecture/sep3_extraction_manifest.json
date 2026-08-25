@@ -11,7 +11,7 @@
   },
   "source": {
     "candidate_commit": "80b9a7ed006210d80f89ff798b4f2477cb027f82",
-    "independent_review_status": "pending",
+    "independent_review_status": "accepted",
     "tracked_path_count": 757,
     "tracked_path_inventory_sha256": "5916ffcff7e5d86d5aab3aead0d2aa489cc0fdd87476908e2b94208205921b1e",
     "physical_extraction_requires_new_reviewed_clean_commit": true

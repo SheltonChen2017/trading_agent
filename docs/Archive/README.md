@@ -20,6 +20,8 @@ current instructions.
 - `Operations/` — historical deployment or diagnosis records whose current
   facts are now carried by `docs/operations/OPERATIONAL_FACTS.md`.
 - `Reference/` — retired indexes and examples retained for provenance.
+- `Session/` — replaced session handoffs. They preserve complete historical
+  context but are not current resume instructions.
 
 The superseded Strong-Buy plan is preserved at
 `Plans/STRONGBUY_PORTFOLIO_TEST_PLAN.md`; the current successor is the active

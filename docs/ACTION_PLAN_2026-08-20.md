@@ -6,6 +6,15 @@ owner replaced the Strong-Buy portfolio program with the Analyst-Consensus ETF
 Rotation program (ACER), which is now priority 1.** The predecessor is archived, not deleted: it remains
 the record of how everything below became true.
 
+**Current sequencing amendment, 2026-08-25:** after Claude accepted the exact
+SEP-3 eighth dry run and Codex counter-reviewed it, the owner paused project
+separation until further notice. SEP-3 is frozen at the reviewed eighth dry
+run; it is incomplete, not extraction-ready, and grants no physical migration
+authority. The exact frozen baseline and restart protocol are in
+`docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`. The owner intends to move
+to trading-strategy implementation, but the exact next milestone will arrive
+as a separate instruction; no strategy run or SEP work starts by inference.
+
 This document decides **what happens next**. It does not restate per-milestone
 internals. The active implementation plan is at the root of `docs/`, queued
 plans are in `docs/Plan/`, and completed or superseded plans are in
@@ -26,19 +35,13 @@ ML/LLM boundary in `CLAUDE.md` remains exactly as constrained. Prioritising
 ACER is a *sequencing* decision; it does not adopt, freeze, or approve any
 ACER value. That is a separate owner act (ACER-0).
 
-Current development topology at the provider-neutral implementation start
-(2026-08-21): `origin/main` is `a186b2f`; Codex branch
-`codex/fix-acer-provider-neutral-capabilities-20260821` was created from that
-exact merge head. The stable code correction is `2f4e41d`; documentation and
-handoff commits follow on the same branch for Claude's independent review.
-
-Historical development topology at the ACER review start (2026-08-20):
-`origin/main` is `6cdb423`. PR #286 merged the ACER documentation change from
-`f3b960d`; the prior SBP documentation-review chain is mainline history at
-`6f571c2`. The ACER submission is reviewed commit-by-commit from
-`6f571c2..f3b960d`, with the PR #286 merge tree also reviewed; the final
-dispositions and any review corrections are recorded in
-`docs/SESSION_HANDOFF.md`.
+Current reviewed topology at the SEP pause transition (2026-08-25):
+`origin/main` is `b660b3fb6ddff8e4641624d35a97d23473e7741b`; the exact Codex macro-proxy
+submission is `441f790535676ff819724bb43713280d5b0b7837`; Claude's pushed accepting
+review is `ba915eec55b8cd1e6ae84f9ec4d2bcaf6b8a8e05`; and Codex's local
+counter-review begins at `728571016dede310d1d7f5936bbdefc07b770d3d`.
+Current branch availability and later documentation commits belong in
+`docs/SESSION_HANDOFF.md`, not in this sequencing index.
 
 **Current owner assignment, 2026-08-21:** Codex implements ACER work on a
 `codex/` branch and Claude independently reviews the exact pushed snapshot on
@@ -55,11 +58,12 @@ applicable vendor-use/third-party-processing terms,
 terminal-delisting-return, and ACER-0A.4 gates remain open; cloud selection
 does not resolve them.
 
-**Current implementation sequencing amendment, 2026-08-21:** the owner has
-directed Codex to begin separating this mixed repository into a trading
-assistant product and a strategy-research product, with Claude independently
-reviewing each stable implementation snapshot. SEP-0 and SEP-1 are reviewed.
-**SEP-2 is complete; SEP-3 is the current bounded milestone.** The SEP-1 review chain
+**Architecture-track sequencing:** the owner directed Codex on 2026-08-21 to
+separate this mixed repository into a trading-assistant product and a
+strategy-research product, with Claude independently reviewing each stable
+snapshot. SEP-0 and SEP-1 are reviewed.
+**SEP-2 is complete; SEP-3 is the current bounded milestone but is PAUSED and
+frozen until a later owner instruction.** The SEP-1 review chain
 closed after Codex counter-reviewed Claude's exact final-tranche review head;
 the exact direct-crossing and authority-exception counts remain zero. See
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md` for the authoritative detail
@@ -77,7 +81,7 @@ remains blocked on six dual-use data modules, `config.py`, the unchanged
 runtime residuals, 42
 integration tests and non-test documentation ownership; see
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Physical extraction remains
-separately gated. The eighth dry run awaits independent review.
+separately gated. The eighth dry run is independently accepted (`docs/Archive/Review/REVIEW_2026-08-25_SEP3_MACRO_PROXIES.md`).
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.
@@ -85,9 +89,10 @@ mutation, credential move, or evidence-epoch change.
 **How the two tracks relate, stated here rather than only in the handoff
 (CDR2-003):** ACER remains the **priority-1 research program** — section 2 is
 unchanged. Separation is a **parallel architecture track** that consumes none
-of ACER's gates, run slots, budget, or owner decisions. What the amendment
-changes is only which of the two is the current *code implementation* task;
-ACER's next step stays the authorization decision in section 7 item 1.
+of ACER's gates, run slots, budget, or owner decisions. The architecture track
+is now paused. Strategy implementation may proceed only under the owner's next
+exact scope and its own ACER/research gates; it does not unfreeze SEP-3 or
+authorize section 7's capability audit by implication.
 
 ---
 
@@ -115,9 +120,9 @@ execution mode, `allow_new_positions` false in the committed default.
 `allow_autonomous_execution` false and a 60-session / 30-order minimum
 evidence floor.
 
-**Test surface**: 197 test files, **4,348 tests passing** with 25 warnings on
-Python 3.13.14 (measured this session on `main` plus this session's
-documentation changes).
+**Test surface**: 208 manifest-classified Python test files and **4,566 tests
+passing** with 25 warnings on Python 3.13.14 at the reviewed eighth-dry-run
+handoff. This count is a measured snapshot, not a permanent invariant.
 
 **Prospective evidence actually running:**
 

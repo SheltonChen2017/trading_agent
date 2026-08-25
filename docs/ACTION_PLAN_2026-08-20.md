@@ -67,16 +67,17 @@ and exact SEP-2 closure. The residual 11 composition files, six Python
 crossings, and four non-assistant operator-store importers are now pinned as
 SEP-3 extraction inputs. **Owner decision, 2026-08-22:** use two product
 repositories plus one deliberately tiny shared-contracts package, with no Git
-submodules. The seventh exact-commit dry run keeps operational alerts
-assistant-owned and multiplicity arithmetic, market analytics, and runtime
-identity research-owned without growing the tiny shared package. The assistant
-uses behavior-identical private runtime identity instead of importing the
-research service. Tests remain pinned as 84 assistant, 75 research, one shared-contract,
-42 integration and six governance files. It remains blocked on seven dual-use
-data modules, `config.py`, the unchanged runtime residuals, 42
+submodules. The eighth exact-commit dry run keeps operational alerts
+assistant-owned and multiplicity arithmetic, market analytics, runtime
+identity, and macro proxies research-owned without growing the tiny shared
+package. The assistant uses behavior-identical private calculations instead of
+importing those research services. Tests remain pinned as 84 assistant, 75
+research, one shared-contract, 42 integration and six governance files. It
+remains blocked on six dual-use data modules, `config.py`, the unchanged
+runtime residuals, 42
 integration tests and non-test documentation ownership; see
 `docs/PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md`. Physical extraction remains
-separately gated. The seventh dry run awaits independent review.
+separately gated. The eighth dry run awaits independent review.
 This architecture work does not close, weaken, or execute any ACER gate and
 does not authorize a backtest, deployment, broker action, operator-database
 mutation, credential move, or evidence-epoch change.

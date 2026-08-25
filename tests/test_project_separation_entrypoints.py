@@ -7,6 +7,7 @@ until it is deliberately owned or removed in a reviewed change.
 from __future__ import annotations
 
 import ast
+import copy
 import dataclasses
 import inspect
 import json
@@ -25,11 +26,21 @@ from assistant.runtime_identity import (
     RuntimeIdentityError as AssistantRuntimeIdentityError,
     current_commit as assistant_current_commit,
 )
+from assistant.macro_proxies import (
+    build_credit_spread_proxy as assistant_build_credit_spread_proxy,
+    build_yield_curve_proxy as assistant_build_yield_curve_proxy,
+)
+import assistant.macro_proxies as assistant_macro_proxies
 from assistant.operations import append_alerts_jsonl as assistant_append_alerts_jsonl
 from assistant.storage import AssistantStore
 from assistant.storage_contracts import StrategyOperationalStore
 from data.operational_alerts import append_alerts_jsonl
 from data.runtime_identity import RuntimeIdentityError, current_commit
+from data.macro_data import (
+    build_credit_spread_proxy as research_build_credit_spread_proxy,
+    build_yield_curve_proxy as research_build_yield_curve_proxy,
+)
+import data.macro_data as research_macro_data
 from ml.filings import FilingExtraction as LegacyFilingExtraction
 from ml.hashing import hash_payload as legacy_hash_payload
 
@@ -648,7 +659,6 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
         ],
     }
     assert ownership["provider_neutral_services"] == [
-        "data/macro_data.py",
         "data/market_data.py",
         "data/price_target_data.py",
     ]
@@ -659,11 +669,13 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
     assert ownership["product_owned_services"] == {
         "trading_assistant": ["data/operational_alerts.py"],
         "strategy_research": [
+            "data/macro_data.py",
             "data/research_statistics.py",
             "data/runtime_identity.py",
         ],
     }
     assert set(ownership["product_owned_service_rationales"]) == {
+        "data/macro_data.py",
         "data/operational_alerts.py",
         "data/research_statistics.py",
         "data/runtime_identity.py",
@@ -836,6 +848,71 @@ def test_assistant_private_runtime_identity_matches_research_behavior(tmp_path):
             implementation(repository=repository)
         messages.append(str(error.value))
     assert messages[0] == messages[1]
+
+
+def test_assistant_private_macro_proxies_match_research_behavior():
+    """SEP3MP-001: remove the assistant-to-research macro service import."""
+    import pandas as pd
+    from pandas.testing import assert_frame_equal
+
+    def _implementation_ast(function) -> str:
+        tree = ast.parse(inspect.getsource(function))
+        function_node = copy.deepcopy(tree.body[0])
+        if (
+            function_node.body
+            and isinstance(function_node.body[0], ast.Expr)
+            and isinstance(function_node.body[0].value, ast.Constant)
+            and isinstance(function_node.body[0].value.value, str)
+        ):
+            function_node.body.pop(0)
+        return ast.dump(function_node, include_attributes=False)
+
+    for name in (
+        "_as_ohlcv",
+        "build_credit_spread_proxy",
+        "build_yield_curve_proxy",
+    ):
+        assert _implementation_ast(getattr(assistant_macro_proxies, name)) == (
+            _implementation_ast(getattr(research_macro_data, name))
+        )
+
+    dates = pd.bdate_range("2026-01-01", periods=4)
+
+    def _frame(values: list[float]) -> pd.DataFrame:
+        return pd.DataFrame(
+            {
+                "open": values,
+                "high": values,
+                "low": values,
+                "close": values,
+                "volume": 1_000_000.0,
+            },
+            index=dates,
+        )
+
+    high_yield = _frame([100.0, 98.0, 97.0, 95.0])
+    investment_grade = _frame([100.0, 100.5, 100.0, 101.0])
+    short_yield = _frame([4.0, 4.1, 4.3, 4.4])
+    long_yield = _frame([4.8, 4.7, 4.6, 4.5])
+
+    assert (
+        assistant_build_credit_spread_proxy is not research_build_credit_spread_proxy
+    )
+    assert (
+        assistant_build_yield_curve_proxy is not research_build_yield_curve_proxy
+    )
+    assert_frame_equal(
+        assistant_build_credit_spread_proxy(high_yield, investment_grade),
+        research_build_credit_spread_proxy(high_yield, investment_grade),
+    )
+    assert_frame_equal(
+        assistant_build_yield_curve_proxy(short_yield, long_yield),
+        research_build_yield_curve_proxy(short_yield, long_yield),
+    )
+
+    macro_context_imports = _imported_modules(ROOT / "assistant" / "macro_context.py")
+    assert "assistant.macro_proxies" in macro_context_imports
+    assert "data.macro_data" not in macro_context_imports
 
 
 def test_operational_alert_facade_preserves_object_identity():

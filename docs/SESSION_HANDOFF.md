@@ -7452,7 +7452,10 @@ task, deployment, backtest, outcome, research look, evidence epoch, or
 
 Codex continued from finalized counter-review head `6d350ab` on fresh isolated
 branch `codex/sep3-runtime-identity-ownership-20260825`. The combined cycle
-contains the local-only counter-review commits `e467d3f` and `6d350ab`, followed
+contains the counter-review commits `e467d3f` and `6d350ab` (local-only when
+this section was written; PR #309 has since merged the whole branch, so both
+are now reachable from `main` — corrected post-merge per CCR-005, which caught
+the stale claim on the reviewing session's first doc-guard run), followed
 by this bounded implementation series:
 
 1. `3724838` — replace the assistant runtime-identity facade with a private,
@@ -7500,6 +7503,151 @@ authorized final push. After that push, Claude independently reviews the exact
 remote branch/head; Codex then counter-reviews that exact Claude push and
 implements the next safe SEP-3 item before the following single Codex push.
 No feature-milestone entry is added because SEP-3 is not complete and physical
+extraction remains unauthorized.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed.
+
+## 7eq. Independent review of the SEP-3 runtime-identity tranche (Claude, 2026-08-25)
+
+Branch `user/claude/review-sep3-runtimeid-20260825`, created from the exact
+fetched remote head `89e6cba` on
+`origin/codex/sep3-runtime-identity-ownership-20260825`, based on my prior
+review head `8f0ec2d`. All seven commits carry an explicit disposition. Full
+record: `docs/Archive/Review/REVIEW_2026-08-25_SEP3_RUNTIME_IDENTITY.md`.
+PR #309 merged this branch as `cf9bd09` while the review was in flight; the
+merged tree is byte-identical to the reviewed head.
+
+**Accepted. No findings.** Codex's counter-review of my market-analytics
+round accepted it with zero findings — the round before this one is the first
+in the SEP series with no correction in either direction.
+
+**The runtime-identity split — evidence-lineage critical — verified at the
+semantic level.** The assistant's private `current_commit` is AST-identical to
+the research module after docstring strip; `_RUNTIME_SOURCE_PATHS`, `_HEX`,
+and both runtime-resolved repository roots are equal; and every caller now
+imports the error class from the same module whose function it calls, so the
+class split leaves no cross-module catch. The equivalence guard has the right
+sensitivity profile, probed in both directions with verified anchors under
+`set -eu`: weakening the assistant copy's untracked-file policy to `no` — a
+dirty tree reading clean, the exact danger the module's docstring names —
+**fails** the guard, while the semantically-null `normal` variant (porcelain
+still reports untracked content) correctly passes. Behavior-equivalence, not
+text-equivalence.
+
+Seventh dry run reproduces: candidate `32b56ae`, stranded `data.*` down to
+**7** (`runtime_identity` resolved), top-level stranded still `config` only,
+extraction refused. The review-state advance for the seventh candidate is
+part of this commit series, per the CRSEP3ST-002 guard; the validator still
+refuses extraction after the advance. CCR-005 fired mid-round on PR #309's
+merge — the third mid-review merge caught by that guard — and the stale
+"local-only counter-review commits" sentence in section 7ep now records the
+merge.
+
+Validation on the final tree: focused suites 105 passed after the status
+advance; complete suite **4,564 passed / 0 failed / 25 warnings** in 981.29
+seconds on Python 3.13.14, run clean on the final tree — Codex's 4,564 with
+no test added by this round; `git diff
+--check` clean.
+
+No provider, broker, licensed row, operator database, scheduled task,
+deployment, backtest, outcome, research look, or evidence epoch was accessed
+or changed. `paper-epoch-006` is untouched.
+
+**Next:** Codex counter-reviews this review head. SEP-3 continues: seven
+`data.*` dual-use modules (the mandate-fingerprint pair the most
+owner-sensitive), `config`, the governance-document partition, and the
+composition ledger — then an eighth dry run.
+
+## 7er. Codex counter-review of Claude's runtime-identity review (2026-08-25)
+
+Codex counter-reviewed exact stable remote head `7ed9bdba` from
+`origin/user/claude/review-sep3-runtimeid-20260825` in a fresh isolated
+worktree. Its merge-base with submitted head `89e6cba3` is exactly that
+submission, and the complete Claude range contains the single review-record
+commit `7ed9bdba`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-25_SEP3_RUNTIME_IDENTITY.md`.
+
+**Accepted; no P0–P3 finding.** Claude's one commit has an explicit accepted
+disposition. The exact five-file focused suite named by the review passes
+**124 tests in 501.02 seconds**; the handoff's separate 105 count is a narrower
+post-status subset, not contradictory evidence. The validator reproduces the
+exact 754-path inventory, SHA-256, 504 / 246 / 4 destinations, 84 / 75 / 1 /
+42 / 6 test partition, seven stranded data modules, `config`, all runtime
+residuals, and extraction refusal. Mainline merge `cf9bd094` is byte-identical
+to submitted tree `89e6cba3`.
+
+The dangerous lineage weakening `--untracked-files=no` fails the runtime-
+identity equivalence test because untracked Python source reads clean;
+restoring `all` returns the test green and the file's cleaned blob exactly to
+the reviewed object. No correction is required.
+
+This counter-review branch remains local-only and must not be pushed as a
+standalone review. The next implementation branch will begin from its
+finalized tree and resolve the code-determined macro-proxy ownership seam:
+research keeps `data.macro_data`, while the assistant's descriptive-only
+macro context receives a private behavior-identical calculation. The tiny
+shared package will not grow. Full validation will run on the combined final
+tree before one Codex push.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed. Physical extraction remains
+unauthorized.
+
+## 7es. SEP-3 macro-proxy ownership and eighth dry run (Codex, 2026-08-25)
+
+Codex continued from finalized counter-review head `624580d2` on fresh branch
+`codex/sep3-macro-proxy-ownership-20260825`. The complete local-only cycle is:
+
+1. `773d6241` — counter-review Claude's exact runtime-identity review head;
+2. `624580d2` — update the handoff and close the counter-review;
+3. `80b9a7ed` — split assistant-private descriptive macro proxies from the
+   research-owned service and add exact equivalence and ownership guards;
+4. `68e18699` — pin the eighth dry-run architecture contract and restored-
+   import refusal;
+5. `b485d7d7` — update the Action Plan and authoritative separation plan; and
+6. `6b6febd7` — finalize the counter-review's combined-tree validation record.
+
+The exact eighth candidate is
+`80b9a7ed006210d80f89ff798b4f2477cb027f82`: **757 tracked paths**, inventory
+SHA-256 `5916ffcff7e5d86d5aab3aead0d2aa489cc0fdd87476908e2b94208205921b1e`,
+assigned exactly once as **507 trading assistant / 246 strategy research / 4
+shared**. Tests remain **84 assistant / 75 research / 1 shared / 42 integration
+/ 6 governance** with unchanged ordered hashes. `data.macro_data` leaves the
+stranded ledger; six dual-use data modules and `config` remain, alongside 11
+composition files, six Python crossing roots, four non-assistant operator-
+store importers, 42 integration tests, non-test documentation ownership,
+cross-repository equivalence-test placement, and owner-gated runtime topology.
+Status is `eighth-dry-run-not-ready-for-physical-extraction`, review pending,
+with physical authorization false.
+
+Research retains macro-signal semantics in `data.macro_data`. The assistant's
+descriptive-only context now uses `assistant.macro_proxies`, whose three
+function implementations are AST-identical to the research versions after
+docstring removal and behavior-identical on overlapping credit and yield
+inputs. Restoring `assistant.macro_context -> data.macro_data` makes the
+product-owned-service guard fail with the exact offender; restoration returns
+the focused boundary tests green. The tiny shared package remains exactly four
+files. No predictive claim, proposal, approval, sizing, execution, provider,
+or policy behavior changes.
+
+Validation on the committed implementation and documentation tree is clean:
+focused final suites **114 passed in 706.51 seconds**; complete suite **4,566
+passed / 0 failed / 25 warnings in 6,264.34 seconds** on Python 3.13.14;
+required compileall including `research/` passed; all 15 tracked JSON files
+parse; the exact validator reproduces the candidate and six-module blocker;
+and the narrow secret scan is clean. The 25 warnings are the existing
+websockets and joblib/NumPy deprecations. Active-document, diff/status/staged,
+ordered-commit, exact-Claude-head, and shared-checkout checks are rerun after
+this handoff commit.
+
+This branch and every Codex commit in the cycle remain local-only until the
+one authorized final push. After that push, Claude independently reviews the
+exact remote branch/head; Codex then counter-reviews that exact Claude push and
+implements the next safe SEP-3 item before the following single Codex push. No
+feature-milestone entry is added because SEP-3 is not complete and physical
 extraction remains unauthorized.
 
 No provider, credential, licensed row, broker, operator database, installed

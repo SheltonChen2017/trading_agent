@@ -27,15 +27,15 @@ def _write_manifest(tmp_path: Path, manifest: dict) -> Path:
     return path
 
 
-def test_seventh_extraction_dry_run_is_exact_and_not_authorized():
+def test_eighth_extraction_dry_run_is_exact_and_not_authorized():
     result = validate()
     assert result["status"] == (
-        "valid-seventh-dry-run-not-ready-for-physical-extraction"
+        "valid-eighth-dry-run-not-ready-for-physical-extraction"
     )
-    assert result["source_commit"] == "32b56aed73dab328ce6c83316aa8d38b4301f9d2"
+    assert result["source_commit"] == "80b9a7ed006210d80f89ff798b4f2477cb027f82"
     assert result["inventory"] == {
-        "tracked_paths": 754,
-        "sha256": "312ba0af5ad59c10fe81831ead62b8807e0c6a67043cd68c15616a16940cbb1d",
+        "tracked_paths": 757,
+        "sha256": "5916ffcff7e5d86d5aab3aead0d2aa489cc0fdd87476908e2b94208205921b1e",
         "assigned_exactly_once": True,
         "destination_counts": {
             # SEP3R-002: this dict briefly carried both `"shared_contracts": 3`
@@ -44,7 +44,7 @@ def test_seventh_extraction_dry_run_is_exact_and_not_authorized():
             # incomplete edit rather than a failing assertion.
             "shared_contracts": 4,
             "strategy_research": 246,
-            "trading_assistant": 504,
+            "trading_assistant": 507,
         },
     }
     assert result["physical_extraction_authorized"] is False
@@ -70,8 +70,9 @@ def test_seventh_extraction_dry_run_is_exact_and_not_authorized():
             "non-test-documentation-product-ownership-pending"
         ),
         # SEP3A-001 and SEP3S-001 assign two services without widening the
-        # shared package. SEP3RI-001 privately splits runtime identity, so
-        # seven genuinely dual-use data modules remain.
+        # shared package. SEP3RI-001 privately splits runtime identity and
+        # SEP3MP-001 privately splits descriptive macro proxies, so six
+        # genuinely dual-use data modules remain.
         "stranded_data_modules": _STRANDED_DATA_MODULES,
         "stranded_data_module_importer_sides": _STRANDED_IMPORTER_SIDES,
         "stranded_product_top_level_modules": _STRANDED_TOP_LEVEL_MODULES,
@@ -311,7 +312,6 @@ def test_full_import_names_distinguish_shared_contracts_from_product_data():
 
 _STRANDED_DATA_MODULES = [
     "data.filing_extraction",
-    "data.macro_data",
     "data.mandate_evaluation",
     "data.market_data",
     "data.portfolio_mandate",
@@ -327,7 +327,7 @@ _STRANDED_IMPORTER_SIDES = {
 # CRSEP3ST-001: SEP3R-001 measured only data.* assignments. The same
 # dangerous direction existed in the separately assigned top-level modules.
 # SEP3M-001 removes the assistant's research-owned market_analytics import;
-# config remains dual-use on the seventh candidate.
+# config remains dual-use on the eighth candidate.
 _STRANDED_TOP_LEVEL_MODULES = ["config"]
 _STRANDED_TOP_LEVEL_IMPORTER_SIDES = {
     module: _DUAL_USE_SIDES for module in _STRANDED_TOP_LEVEL_MODULES
@@ -342,8 +342,10 @@ def test_stranded_data_modules_are_measured_declared_and_blocking():
     the assistant. SEP3S-001 makes research statistics research-owned and
     removes the assistant import. SEP3RI-001 makes runtime identity research-
     owned and gives the assistant a behavior-identical private implementation.
-    The remaining seven modules are imported by both products, including the
-    mandate-fingerprint pair.
+    SEP3MP-001 makes the macro proxies research-owned and gives the assistant
+    behavior-identical private descriptive calculations. The remaining six
+    modules are imported by both products, including the mandate-fingerprint
+    pair.
     Extraction would still break one product or force the cross-repository
     dependency the plan forbids. The validator measures both set and importer
     sides from the candidate commit, pinning an exact shrinking blocker rather
@@ -358,7 +360,7 @@ def test_stranded_data_modules_are_measured_declared_and_blocking():
     assert sum(
         sides == _DUAL_USE_SIDES
         for sides in result["blockers"]["stranded_data_module_importer_sides"].values()
-    ) == 7
+    ) == 6
     assert "data.operational_alerts" not in result["blockers"][
         "stranded_data_modules"
     ]
@@ -468,6 +470,24 @@ def test_restored_assistant_runtime_identity_import_is_refused(monkeypatch):
         source = original_commit_text(commit, path)
         if path == "assistant/runtime_identity.py":
             return source + "\nfrom data.runtime_identity import current_commit\n"
+        return source
+
+    monkeypatch.setattr(sep3_validator, "_commit_text", with_restored_import)
+    with pytest.raises(
+        ExtractionValidationError,
+        match="stale extraction blocker stranded_data_modules",
+    ):
+        validate()
+
+
+def test_restored_assistant_macro_data_import_is_refused(monkeypatch):
+    """SEP3MP-001: the removed assistant-to-research import stays closed."""
+    original_commit_text = sep3_validator._commit_text
+
+    def with_restored_import(commit: str, path: str) -> str:
+        source = original_commit_text(commit, path)
+        if path == "assistant/macro_context.py":
+            return source + "\nfrom data.macro_data import build_credit_spread_proxy\n"
         return source
 
     monkeypatch.setattr(sep3_validator, "_commit_text", with_restored_import)

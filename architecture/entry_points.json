@@ -156,12 +156,14 @@
         "data/operational_alerts.py"
       ],
       "strategy_research": [
+        "data/macro_data.py",
         "data/research_statistics.py",
         "data/runtime_identity.py"
       ]
     },
     "product_owned_service_rationales": {
       "data/operational_alerts.py": "Assistant-owned durable operational alert serialization. Research-hosted composition runners may call it only while they remain explicit SEP-3 composition debt; product-owned research code does not import it.",
+      "data/macro_data.py": "Research-owned macro-signal proxy construction. The assistant's descriptive-only context uses behavior-identical private calculations and cannot import the research service or turn the proxy into proposal or execution authority.",
       "data/research_statistics.py": "Research-owned multiplicity arithmetic. The assistant renders its own already-recorded look count without importing research calculations; research retains hypothesis-family and evidence semantics.",
       "data/runtime_identity.py": "Research-owned evidence-lineage attribution. The assistant keeps a behavior-identical private implementation and does not import the research service; neither product can weaken clean-tree or expected-commit assertions."
     },
@@ -178,12 +180,10 @@
       ]
     },
     "provider_neutral_services": [
-      "data/macro_data.py",
       "data/market_data.py",
       "data/price_target_data.py"
     ],
     "provider_neutral_rationales": {
-      "data/macro_data.py": "Pure OHLCV transformations with no product policy or authority; both products may supply their own price frames.",
       "data/market_data.py": "Common read-only historical-bar and synthetic-fixture service; it carries no research hypothesis, proposal, approval, or execution authority.",
       "data/price_target_data.py": "Read-only target-history retrieval plus point-in-time aggregation used by research signals and assistant display; it exposes no licensed ACER snapshot or action-shaped output."
     },

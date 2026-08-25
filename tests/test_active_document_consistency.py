@@ -48,6 +48,17 @@ def _root_text(name: str) -> str:
     return " ".join((ROOT / name).read_text(encoding="utf-8").split())
 
 
+def _archived_handoff_text() -> str:
+    path = (
+        ROOT
+        / "docs"
+        / "Archive"
+        / "Session"
+        / "SESSION_HANDOFF_THROUGH_2026-08-25_SEP3_EIGHTH_DRY_RUN.md"
+    )
+    return " ".join(path.read_text(encoding="utf-8").split())
+
+
 def test_docs_root_contains_only_current_coordination_and_active_plan() -> None:
     allowed = {
         "ACTION_PLAN_2026-08-20.md",
@@ -55,10 +66,22 @@ def test_docs_root_contains_only_current_coordination_and_active_plan() -> None:
         "FEATURE_MILESTONE_RECORD.md",
         "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md",
         "PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md",
+        "README.md",
     }
     actual = {path.name for path in (ROOT / "docs").iterdir() if path.is_file()}
     assert actual == allowed
     assert not list((ROOT / "docs").glob("REVIEW_*.md"))
+    archived_handoff = (
+        ROOT
+        / "docs"
+        / "Archive"
+        / "Session"
+        / "SESSION_HANDOFF_THROUGH_2026-08-25_SEP3_EIGHTH_DRY_RUN.md"
+    )
+    assert archived_handoff.is_file()
+    assert "not a current instruction source" in " ".join(
+        archived_handoff.read_text(encoding="utf-8").split()
+    )
 
 
 def test_documentation_update_policy_keeps_action_plan_as_reference_index():
@@ -287,9 +310,10 @@ def test_current_handoff_records_the_epoch005_roll_and_reviewable_head():
         "awaiting the owner's merge at handoff",
     ):
         assert stale not in handoff, f"current handoff retains pre-roll state: {stale!r}"
-    assert "paper-epoch-005" in handoff
-    assert "4de784e" in handoff
-    assert "1cb8abf" in handoff
+    history = _archived_handoff_text()
+    assert "paper-epoch-005" in history
+    assert "4de784e" in history
+    assert "1cb8abf" in history
 
 
 def test_roll_freshness_guidance_is_conditional_not_universal():
@@ -623,7 +647,9 @@ def _mainline_ref() -> str | None:
 
 
 _TOPOLOGY_PATTERNS = {
-    "ACTION_PLAN_2026-08-20.md": r"Current development topology.*?`([0-9a-f]{7,40})`",
+    "ACTION_PLAN_2026-08-20.md": (
+        r"Current (?:development|reviewed) topology.*?`([0-9a-f]{7,40})`"
+    ),
     "SESSION_HANDOFF.md": r"Published `origin/main` at audit time:\s*`([0-9a-f]{7,40})`",
 }
 
@@ -915,7 +941,7 @@ def test_the_capability_audit_authorization_state_agrees_across_documents():
     """
     action_plan = _text("ACTION_PLAN_2026-08-20.md")
     handoff = _text("SESSION_HANDOFF.md")
-    current_resume = handoff.split("## 9. Resume prompt", 1)[1].split("## 9a.", 1)[0]
+    current_resume = handoff
 
     pending = re.search(
         r"\*\*Authorize a read-only, zero-outcome capability audit\*\*",
@@ -967,21 +993,26 @@ def test_separation_milestone_state_agrees_across_active_documents():
     action_plan = _text("ACTION_PLAN_2026-08-20.md")
     handoff = _text("SESSION_HANDOFF.md")
 
-    status = re.search(r"Status: \*\*ACTIVE — (SEP-\d+)\b", separation_plan)
-    assert status, (
-        "the separation plan must declare an ACTIVE SEP-n status line; fix the "
-        "document, not this guard"
+    status = re.search(
+        r"Status: \*\*(ACTIVE|PAUSED) — (SEP-\d+)\b", separation_plan
     )
-    current = status.group(1)
+    assert status, (
+        "the separation plan must declare an ACTIVE or PAUSED SEP-n status "
+        "line; fix the document, not this guard"
+    )
+    lifecycle = status.group(1)
+    current = status.group(2)
 
     # The plan must mark exactly this milestone current, and every earlier one
     # as finished -- not still 'current'.
-    assert re.search(rf"### {current} — [^#]*?\(current\)", separation_plan), (
+    assert re.search(rf"### {current} — [^#]*?\(current(?:, paused)?\)", separation_plan), (
         f"{current} is the declared status but no milestone heading marks it current"
     )
     others = {
         milestone
-        for milestone in re.findall(r"### (SEP-\d+) — [^#]*?\(current\)", separation_plan)
+        for milestone in re.findall(
+            r"### (SEP-\d+) — [^#]*?\(current(?:, paused)?\)", separation_plan
+        )
         if milestone != current
     }
     assert not others, f"more than one milestone marked current: {sorted(others | {current})}"
@@ -995,23 +1026,18 @@ def test_separation_milestone_state_agrees_across_active_documents():
     # does not need a milestone-specific edit.
     current_marker = f"{current} is the current bounded milestone"
     current_action_plan = action_plan.split(
-        "**Current implementation sequencing amendment", 1
+        "**Architecture-track sequencing:**", 1
     )[1].split("**How the two tracks relate", 1)[0]
     assert current_marker in current_action_plan, (
         "the Action Plan does not identify the separation plan's current "
         f"milestone with the canonical marker: {current_marker!r}"
     )
 
-    current_handoff = handoff.split("## 8. What is next", 1)[1]
-    next_section, resume_section = current_handoff.split("## 9. Resume prompt", 1)
-    for name, text in (
-        ("SESSION_HANDOFF.md section 8", next_section),
-        ("SESSION_HANDOFF.md resume prompt", resume_section),
-    ):
-        assert current_marker in text, (
-            f"{name} does not identify the current milestone with the "
-            f"canonical marker: {current_marker!r}"
-        )
+    assert current_marker in handoff
+    if lifecycle == "PAUSED":
+        for document in (separation_plan, action_plan, handoff):
+            assert "paused" in document.lower()
+            assert "SEP3_FREEZE_STATE_2026-08-25.md" in document
 
 
 def test_sell1_current_records_do_not_reopen_merged_review_work():
@@ -1079,9 +1105,9 @@ def test_buy1_current_records_close_the_merged_review():
     assert not hits, "the BUY-1 row still describes merged work as pending: " + "; ".join(hits)
     assert "e0df810" in buy1_row and "44a7f85" in buy1_row
 
-    handoff = _text("SESSION_HANDOFF.md")
-    assert "codex/review-buy1-suggestion-picker-20260813" in handoff
-    assert "44a7f85" in handoff
+    history = _archived_handoff_text()
+    assert "codex/review-buy1-suggestion-picker-20260813" in history
+    assert "44a7f85" in history
 
 
 def test_deleted_gr7d_ref_is_not_called_irrecoverable_while_object_remains():
@@ -1370,9 +1396,7 @@ def test_active_acer_docs_do_not_turn_advice_disclaimer_into_research_ban():
     freeze = _text("research/ACER_2026-08-20_ACER0A_FREEZE.md")
     audit = _text("research/ACER_2026-08-21_LOCAL_DATA_CAPABILITY_AUDIT.md")
     handoff = _text("SESSION_HANDOFF.md")
-    current_handoff = handoff.split(
-        "## 7dj. Codex counter-review of SEP-1 contracts review", 1
-    )[1]
+    current_handoff = handoff
 
     for document in (action, plan, freeze, audit, current_handoff):
         lowered = document.lower()

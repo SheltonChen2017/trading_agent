@@ -1,6 +1,6 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-25 by Codex during the owner-directed SEP-3 pause
+Prepared: 2026-08-25 by Codex after completing the owner-directed SEP-3 pause
 transition.
 
 Audience: repository owner, Claude, Codex, and the next verifier.
@@ -36,8 +36,13 @@ backtest, research look, evidence-epoch change, or live trading.
   and merge-base exactly `441f790535676ff819724bb43713280d5b0b7837`.
 - Current isolated Codex branch:
   `codex/counterreview-sep3-macrofreeze-20260825`, based on Claude's exact
-  review head. Counter-review commit
-  `728571016dede310d1d7f5936bbdefc07b770d3d` is local-only at this snapshot.
+  review head. Its ordered local-only commits before this final handoff are:
+  1. `728571016dede310d1d7f5936bbdefc07b770d3d` — counter-review and factual
+     separation-plan correction;
+  2. `02c2eaf551ed1a8f1fc18789a24865b01df618d2` — documentation lifecycle
+     cleanup and concise handoff replacement; and
+  3. `fb612bb68d1ef7ae594afc170a1a04e091a59aff` — owner-directed SEP-3 freeze
+     record, sequencing update, and regression guards.
 - The shared checkout was clean on Claude's review branch at the review start
   and was not switched or edited by Codex.
 
@@ -104,10 +109,23 @@ On Claude's exact tree:
 - dangerous-direction mutation: a `1e-7` credit-spread drift failed the exact
   equivalence guard; restoration passed 1 test and restored the original blob.
 
-Final documentation and full-suite validation are pending completion of the
-freeze transition. Python is 3.13.14. No provider, credential, licensed row,
-broker, operator database, task, deployment, backtest, outcome, research look,
-evidence epoch, or `paper-epoch-006` state was accessed or changed.
+On the final committed freeze tree before this handoff update:
+
+- expanded focused suite: **116 passed in 590.64 seconds**;
+- complete suite: **4,568 passed / 0 failed / 25 warnings in 1,259.75
+  seconds**;
+- warnings: one existing `websockets.legacy` deprecation and 24 existing
+  joblib/NumPy shape deprecations;
+- required `compileall`, including `research/`: passed;
+- all 15 tracked JSON files parse;
+- all backticked documentation references across 42 active Markdown files
+  resolve;
+- narrow secret-shape scan: clean; and
+- active-document suite alone: **58 passed**.
+
+Python is 3.13.14. No provider, credential, licensed row, broker, operator
+database, task, deployment, backtest, outcome, research look, evidence epoch,
+or `paper-epoch-006` state was accessed or changed.
 
 ## 6. Documentation lifecycle
 
@@ -139,10 +157,9 @@ The read-only, zero-outcome Massive/QuantConnect capability audit remains an
 open owner decision in Action Plan section 7 item 1; this handoff does not
 grant it.
 
-Complete and validate the owner-directed SEP-3 freeze record and current
-documentation cleanup. Then stop and wait for the owner's next important
-task. Do not infer that ACER, another strategy, or another SEP tranche starts
-without that scope.
+The counter-review, documentation cleanup, and SEP-3 freeze are complete.
+Stop and wait for the owner's next important task. Do not infer that ACER,
+another strategy, or another SEP tranche starts without that scope.
 
 ## 8. Resume prompt
 

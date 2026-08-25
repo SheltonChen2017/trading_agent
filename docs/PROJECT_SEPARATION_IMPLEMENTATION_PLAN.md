@@ -1,6 +1,6 @@
 # PROJECT SEPARATION IMPLEMENTATION PLAN
 
-Status: **ACTIVE — SEP-3 sixth dry run accepted on review; physical extraction not authorized**
+Status: **ACTIVE — SEP-3 seventh dry run pending review; physical extraction not authorized**
 
 Owner direction: 2026-08-21
 
@@ -621,6 +621,35 @@ blocking product crossings may a separately authorized migration create the rese
 repository and shared package. No repository creation, history rewrite,
 deployment, credential move, scheduled-task change, operator-database move,
 backtest, or evidence-epoch change is authorized by this tranche.
+
+Claude independently accepted that sixth candidate at exact pushed review
+head `8f0ec2d`. Codex counter-reviewed the single Claude commit and accepted it
+with no P0–P3 finding; exact inventory, boundary, refusal and mutation claims
+reproduced. See
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-25_SEP3_MARKET_ANALYTICS.md`.
+
+The seventh bounded candidate is
+`32b56aed73dab328ce6c83316aa8d38b4301f9d2`. It makes
+`data.runtime_identity` research-owned and replaces the assistant's former
+compatibility facade with a behavior-identical private implementation. Both
+products still refuse dirty or unattributable trees and treat an expected
+commit as an assertion rather than a caller override; their exception types
+are product-private, so research tests no longer import an assistant service.
+Restoring the assistant-to-research import fails the measured stranded-module
+guard. The tiny shared package does not grow.
+
+The seventh dry run records **754 paths**, inventory SHA-256
+`312ba0af...cbb1d`, assigned exactly once as **504 trading assistant / 246
+strategy research / 4 shared**. The test partition remains **84 assistant / 75
+research / 1 shared / 42 integration / 6 governance** with unchanged ordered
+hashes. The stranded-data blocker falls from eight to **seven**; `config`
+remains the sole stranded top-level module. The 11 composition files, six
+Python crossing roots, four non-assistant operator-store importers, 42
+integration tests, non-test documentation partition, and owner-gated runtime
+topology remain blocking. Cross-implementation equivalence tests remain in the
+source-repository integration partition until physical extraction receives a
+separately reviewed CI/home decision. Physical extraction remains
+unauthorized.
 
 ## 5. Safety and evidence invariants
 

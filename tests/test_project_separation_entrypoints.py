@@ -658,11 +658,15 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
     assert all(ownership["provider_neutral_rationales"].values())
     assert ownership["product_owned_services"] == {
         "trading_assistant": ["data/operational_alerts.py"],
-        "strategy_research": ["data/research_statistics.py"],
+        "strategy_research": [
+            "data/research_statistics.py",
+            "data/runtime_identity.py",
+        ],
     }
     assert set(ownership["product_owned_service_rationales"]) == {
         "data/operational_alerts.py",
         "data/research_statistics.py",
+        "data/runtime_identity.py",
     }
     assert all(ownership["product_owned_service_rationales"].values())
     assert ownership["shared_provider_debt"] == []

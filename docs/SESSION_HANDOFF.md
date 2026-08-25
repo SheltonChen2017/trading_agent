@@ -19,9 +19,11 @@ root file states only what is current and required to resume safely.
 5. `docs/Archive/Review/COUNTER_REVIEW_2026-08-25_SEP3_MACRO_PROXIES.md`.
 6. `docs/operations/OPERATIONAL_FACTS.md` before any operational work.
 
-Nothing here authorizes a push, merge, deployment, physical extraction,
-provider or broker access, operator-database mutation, scheduled-task change,
-backtest, research look, evidence-epoch change, or live trading.
+The owner separately authorized exactly one push of the completed Codex branch
+on 2026-08-25. That publication does not authorize a merge, deployment,
+physical extraction, provider or broker access, operator-database mutation,
+scheduled-task change, backtest, research look, evidence-epoch change, or live
+trading.
 
 ## 2. Exact repository state
 
@@ -36,18 +38,23 @@ backtest, research look, evidence-epoch change, or live trading.
   and merge-base exactly `441f790535676ff819724bb43713280d5b0b7837`.
 - Current isolated Codex branch:
   `codex/counterreview-sep3-macrofreeze-20260825`, based on Claude's exact
-  review head. Its ordered local-only commits before this final handoff are:
+  review head. Its ordered Codex commits before the publication handoff are:
   1. `728571016dede310d1d7f5936bbdefc07b770d3d` — counter-review and factual
      separation-plan correction;
   2. `02c2eaf551ed1a8f1fc18789a24865b01df618d2` — documentation lifecycle
      cleanup and concise handoff replacement; and
   3. `fb612bb68d1ef7ae594afc170a1a04e091a59aff` — owner-directed SEP-3 freeze
-     record, sequencing update, and regression guards.
+     record, sequencing update, and regression guards; and
+  4. `8f2f0b05b67868be2b36ef7913c0f726700a00b1` — exact validation results and
+     completed freeze-transition handoff.
 - The shared checkout was clean on Claude's review branch at the review start
   and was not switched or edited by Codex.
 
-Do not assume this local-only Codex branch is fetchable from another computer.
-No push is authorized by this handoff.
+The publication handoff commit follows the four commits above and is the final
+branch tip authorized for the one push. After its remote head is verified, the
+complete branch is fetchable from another computer as
+`origin/codex/counterreview-sep3-macrofreeze-20260825`. No merge or second push
+is authorized by this record.
 
 ## 3. Counter-review result
 

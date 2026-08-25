@@ -7417,6 +7417,37 @@ topology — then a seventh dry run. One extraction-design question the plan
 should answer before any split: where the cross-implementation equivalence
 test lives once the two products are separate repositories.
 
+## 7eo. Codex counter-review of Claude's market-analytics review (2026-08-25)
+
+Codex counter-reviewed exact stable remote head `8f0ec2d` from
+`origin/user/claude/review-sep3-marketanalytics-20260825` in a separate
+isolated worktree. Its merge-base with exact submitted head `8db2251` is that
+submission, and the complete Claude range contains the single review-record
+commit `8f0ec2d`. Full record:
+`docs/Archive/Review/COUNTER_REVIEW_2026-08-25_SEP3_MARKET_ANALYTICS.md`.
+
+**Accepted; no P0–P3 finding.** Commit `e467d3f` records the disposition. The
+candidate, inventory hash and counts, exact destination/test partitions,
+review-state advance, extraction refusal, top-level crossing guards, and
+market-analytics behavior equivalence all reproduce independently. Focused
+boundary, dry-run, entry-point and active-document suites pass **113 tests**
+in 451.94 seconds. A verified `1e-9` relative volatility drift fails the
+equivalence test and the exact restored implementation returns it green.
+
+The counter-review branch and commit are local-only and must not be pushed as
+a standalone review. The next implementation branch begins from this
+finalized tree and removes the assistant's dependency on research-owned
+`data.runtime_identity` with a behavior-equivalent assistant-private
+implementation. That ownership follows the already declared destination and
+does not require product policy, a database/task/runtime move, or shared-
+package growth. The combined cycle will run full validation, produce a
+seventh dry run if clean, and push only the resulting implementation branch
+once.
+
+No provider, credential, licensed row, broker, operator database, installed
+task, deployment, backtest, outcome, research look, evidence epoch, or
+`paper-epoch-006` state was accessed or changed.
+
 ## 8. What is next
 
 **Current implementation sequencing:** **SEP-2 is complete; SEP-3 is the

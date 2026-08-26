@@ -57,15 +57,20 @@ Each lane uses this serialized loop on its one branch:
    ledger in the lane record or a lane-specific review record, commits any
    authorized corrections and the review record on the **same lane branch**,
    and pushes once.
-3. Codex fetches and fast-forwards the reviewed head; repeat from step 1 for
-   the next bounded milestone.
+3. **Codex counter-review and next milestone.** Codex fetches and fast-forwards
+   the exact reviewed head, counter-reviews every Claude commit, independently
+   reproduces material claims, corrects confirmed defects, and adds
+   dangerous-direction regressions. If the review is accepted or
+   accepted-after-correction and no owner decision blocks progress, Codex then
+   implements the next bounded lane milestone. Codex validates both stages,
+   updates the lane record, commits them separately where appropriate, and
+   makes exactly one combined push. A rejection or owner-decision blocker
+   stops the loop before the next milestone and before any push.
+4. Claude reviews that exact combined push, and the loop repeats from step 3.
 
-**Owner decision, 2026-08-26: the Codex counter-review step is removed.**
-Claude's review disposition is final for each milestone, and the three lane
-review sessions run as dedicated Claude sessions. Because no counter-review
-follows, Claude's review must independently reproduce material claims, rerun
-the validation it relies on, mutation-test its own corrections, and add the
-dangerous-direction regressions the counter-review step would have added.
+**Owner clarification, 2026-08-26:** the standing Codex counter-review step is
+required. An instruction removing it was accidental and is superseded by this
+three-step loop.
 
 Only one agent may write or push a lane at a time. Before every commit and
 push, the acting agent must recheck the branch, exact `HEAD`, upstream head,
@@ -78,7 +83,8 @@ advanced unexpectedly, stop and reconcile by review; do not overwrite it.
 Before every push, the acting agent updates the relevant strategy's
 implementation record with:
 
-- role and agent (`Codex implementation` or `Claude review`);
+- role and agent (`Codex implementation`, `Claude review`, or `Codex
+  counter-review and implementation`);
 - exact starting and ending commits;
 - milestone and bounded scope;
 - files changed;

@@ -1,5 +1,8 @@
 # ACER-0A freeze — stock-level signal validation (ACER-2)
 
+Archive status: **SUPERSEDED by Analyst Revisions V2 on 2026-08-25; retained
+only to reproduce V1 decisions and existing capability tests.**
+
 Status: **PARTIAL FREEZE by owner decision, 2026-08-20
 (America/Los_Angeles; 2026-08-21 UTC).** The owner decisions recorded below
 are frozen for **ACER-2 only**, but this is **not yet an executable
@@ -13,8 +16,8 @@ is deliberately NOT frozen, so that ETF benchmark and investability choices
 are not forced before a stock-level signal is shown to exist. ACER-0B is
 authorized only by a separate owner act, and only if ACER-2 passes.
 
-Governing contract shape: `docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`.
-Source specification: `docs/reference/analyst-consensus-etf-strategy.pdf`
+Governing contract shape: `docs/Archive/Plans/ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md`.
+Source specification: `docs/Archive/Reference/analyst-consensus-etf-strategy-v1.pdf`
 (SHA-256 `3700ab4bb64dfd6e29e5f8bbc2b7e3dd3fa089050b25cbb5e315450a8d86cf23`).
 Where they differ, this freeze governs for ACER-2.
 
@@ -248,7 +251,7 @@ owner's agreement — before the single development execution, and none may be
 settled after seeing a result.
 
 **Concrete proposals for ACER-0A.5 through 0A.9 are drafted in
-`docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`**, including a
+`docs/Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md`**, including a
 five-level rating scale measured against the corpus's 54 distinct rating
 strings, the decay and aggregation equations, control and outcome
 definitions, the estimation and significance protocol with a frozen bootstrap

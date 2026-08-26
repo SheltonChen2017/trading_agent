@@ -2,7 +2,8 @@
 
 Status: **SUPERSEDED 2026-08-20 as the priority research program**, by owner
 decision, in favour of
-`docs/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`. This plan was never
+the plan now archived at
+`docs/Archive/Plans/ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md`. This plan was never
 adopted or frozen, so no capture, evidence, result, or operational state is
 affected by the change; SBP-0 will not be run. It is retained in full —
 including amendments SBPA-001..011 and the review chain that produced them —

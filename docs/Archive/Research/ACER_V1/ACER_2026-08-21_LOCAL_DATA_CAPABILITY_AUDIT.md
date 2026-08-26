@@ -1,5 +1,8 @@
 # Can ACER-2 run locally? — data-capability audit (ACER-0A.3, 0A.4)
 
+Archive status: **V1 capability evidence retained for reproducibility;
+superseded as an active strategy instruction by V2 on 2026-08-25.**
+
 Status: **structural audit of code and configuration already in this
 repository. No network call, no vendor API, no price or outcome join, no
 research look.** It answers two named open items with measured or sourced

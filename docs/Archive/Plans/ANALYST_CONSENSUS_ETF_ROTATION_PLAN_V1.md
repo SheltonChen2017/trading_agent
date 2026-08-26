@@ -1,10 +1,14 @@
 # Analyst-Consensus ETF Rotation (ACER) — research program plan
 
+Archive status: **SUPERSEDED on 2026-08-25 by the owner-supplied Analyst
+Revisions ETF Strategy Blueprint V2. Historical V1 evidence only; not a
+current instruction source.**
+
 Status: **PARTIALLY FROZEN (2026-08-20).** The owner split the freeze:
 
 - **ACER-0A owner decisions are FROZEN, but its executable
   preregistration is INCOMPLETE.** Its operative decision record is
-  `docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`, whose section 9 lists the
+  `docs/Archive/Research/ACER_V1/ACER_2026-08-20_ACER0A_FREEZE.md`, whose section 9 lists the
   definitions that must still be frozen before any real-outcome execution.
   Where that document and this one differ, **it governs for ACER-2**.
 - **ACER-0B is NOT frozen** — the contingent ETF-level ACER-3 test. ETF
@@ -16,7 +20,7 @@ Everything in this file that concerns ACER-3 and later remains DRAFT and
 acquires no authority. Nothing here is scheduled or implemented beyond the
 ACER-1 data plumbing already reviewed.
 
-Source specification: `docs/reference/analyst-consensus-etf-strategy.pdf`,
+Source specification: `docs/Archive/Reference/analyst-consensus-etf-strategy-v1.pdf`,
 SHA-256 `3700ab4bb64dfd6e29e5f8bbc2b7e3dd3fa089050b25cbb5e315450a8d86cf23`,
 138,347 bytes, supplied by the owner 2026-08-20. That document is the design
 narrative; this file is the operative contract shape used by this repository,
@@ -182,7 +186,7 @@ of done. Gates are pass/fail before the next milestone begins.
 
 | ID | Work | Gate |
 |---|---|---|
-| **ACER-0A** | **PARTIAL FREEZE 2026-08-20** (`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md`): six-cell family, named primary, Bonferroni 0.05/6, provisional two-slot budget, numeric stock thresholds, benchmark policy and engine ruling are frozen owner decisions. | **Not executable.** ACER-0A.1–0A.10 must close before any real signal/outcome join; these include the actual signal, controls, statistic, split, confirmation and slot-failure definitions. |
+| **ACER-0A** | **PARTIAL FREEZE 2026-08-20** (`docs/Archive/Research/ACER_V1/ACER_2026-08-20_ACER0A_FREEZE.md`): six-cell family, named primary, Bonferroni 0.05/6, provisional two-slot budget, numeric stock thresholds, benchmark policy and engine ruling are frozen owner decisions. | **Not executable.** ACER-0A.1–0A.10 must close before any real signal/outcome join; these include the actual signal, controls, statistic, split, confirmation and slot-failure definitions. |
 | **ACER-0B** | **NOT frozen, deliberately.** The ETF-level ACER-3 contract: ETF eligibility (AUM, spread, volume, holdings coverage), the equal-weight comparator, and ACER-3's own cells and budget. | Requires a separate owner act, reachable only if ACER-2 passes. ACER-3's run budget is **zero** until then. |
 | **ACER-1** | Data audit: verify point-in-time ratings timestamps and standardized histories; verify ETF constituents, weights, and actual availability semantics; build a survivorship-aware universe; quantify missingness and coverage. **Also measure the machine-local SBR state on the operational host** (task presence and snapshot count) and record it in `docs/operations/OPERATIONAL_FACTS.md`, so the closure in section 3.1 rests on a measurement rather than on absence of repository evidence. | Proceed only if the data can support a genuinely point-in-time test. A failure here ends the program cheaply. The SBR measurement is read-only; finding snapshots would be a material discovery, not a footnote. |
 | **ACER-2** | **Stock-level signal validation — the decisive milestone.** Do revisions carry incremental out-of-sample information after momentum, earnings, size, liquidity, volatility and sector controls? Levels versus revisions; alternative encodings; decay half-lives chosen out-of-sample. | Revisions must show incremental **out-of-sample** information under the frozen gate. In-sample correlation is not a pass. **Null here closes the program.** |
@@ -223,7 +227,7 @@ Binding rules for ACER, to be given concrete numbers at ACER-0:
 
 The six owner questions are settled at the decision level. They do not by
 themselves make ACER-2 executable; section 9 of
-`docs/research/ACER_2026-08-20_ACER0A_FREEZE.md` is the remaining freeze
+`docs/Archive/Research/ACER_V1/ACER_2026-08-20_ACER0A_FREEZE.md` is the remaining freeze
 ledger.
 
 1. **Ratings vendor** — **RESOLVED**: Benzinga via Massive, purchased and

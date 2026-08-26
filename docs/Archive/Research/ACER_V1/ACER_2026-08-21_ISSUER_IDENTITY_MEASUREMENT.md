@@ -1,5 +1,8 @@
 # ACER issuer-identity ambiguity — measurement and its limits
 
+Archive status: **V1 diagnostic retained as evidence; superseded as an active
+strategy instruction by Analyst Revisions V2 on 2026-08-25.**
+
 Status: **structural measurement under ACER-1; accepted after independent
 correction. No network call, no price or outcome join, no research look, no
 `R-nnn` entry.** It measures which tickers in the audited corpus carry

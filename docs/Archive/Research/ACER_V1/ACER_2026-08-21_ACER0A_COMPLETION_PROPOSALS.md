@@ -1,5 +1,8 @@
 # ACER-0A completion proposals (ACER-0A.5–0A.9)
 
+Archive status: **SUPERSEDED by Analyst Revisions V2 on 2026-08-25; these
+proposals were never an executable freeze and are not current instructions.**
+
 Status: **PROPOSALS AWAITING OWNER CONFIRMATION; INDEPENDENTLY CORRECTED.
 Nothing here is frozen.**
 The ACER-0A partial freeze records the owner's decisions; the review that

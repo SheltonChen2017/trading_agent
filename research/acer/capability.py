@@ -80,10 +80,12 @@ _REQUIRED_REQUIREMENTS = frozenset(
     }
 )
 
-# The owner-frozen control contract lives here. The later completion document
-# contains candidate formulas and taxonomies, but the governing freeze says
-# explicitly that those proposals are not owner decisions.
-_CONTROL_CONTRACT_PATH = "docs/research/ACER_2026-08-20_ACER0A_FREEZE.md"
+# This checker preserves the archived ACER V1 control audit. V2 has not yet
+# adopted an executable control contract, so callers must not mistake this
+# historical capability result for V2 readiness.
+_CONTROL_CONTRACT_PATH = (
+    "docs/Archive/Research/ACER_V1/ACER_2026-08-20_ACER0A_FREEZE.md"
+)
 
 # Every owner-frozen control, mapped to the exact declared data requirements
 # it consumes. This is dependency accounting, not explanatory prose: every

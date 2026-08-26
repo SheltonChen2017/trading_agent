@@ -346,6 +346,13 @@ class ExecutionAuthorization:
     proof: str  # HMAC-signed; only authorize_trade_intent() can produce a valid one
     approved_at: str
     expires_at: str
+    # A production broker dispatch supplies all four fields.  Defaults keep
+    # the pure risk-gate primitive usable in research/unit contexts that never
+    # contact a broker; submit adapters require the complete binding.
+    account_id: str | None = None
+    account_mode: str | None = None
+    snapshot_id: str | None = None
+    policy_fingerprint: str | None = None
 
 
 def intent_fingerprint(intent: TradeIntent) -> str:
@@ -394,7 +401,16 @@ def _validation_proof(
     return _sign(f"validated:{approved}:{intent_fingerprint(intent)}:{canonical_codes}")
 
 
-def _authorization_proof(intent: TradeIntent, token: str, expires_at: str) -> str:
+def _authorization_proof(
+    intent: TradeIntent,
+    token: str,
+    expires_at: str,
+    *,
+    account_id: str | None,
+    account_mode: str | None,
+    snapshot_id: str | None,
+    policy_fingerprint: str | None,
+) -> str:
     # `expires_at` is part of the signed payload -- NOT just intent
     # identity -- so the expiry itself can't be extended after the fact.
     # ExecutionAuthorization is frozen, but dataclasses.replace() (or any
@@ -413,13 +429,66 @@ def _authorization_proof(intent: TradeIntent, token: str, expires_at: str) -> st
     # the SAME valid intent+expiry binding, completely bypassing replay
     # detection. Binding token into the proof means swapping it invalidates
     # the proof, exactly like swapping expires_at or the intent already did.
-    return _sign(f"authorized:{intent_fingerprint(intent)}:{token}:{expires_at}")
+    payload = json.dumps(
+        {
+            "intent_fingerprint": intent_fingerprint(intent),
+            "token": token,
+            "expires_at": expires_at,
+            "account_id": account_id,
+            "account_mode": account_mode,
+            "snapshot_id": snapshot_id,
+            "policy_fingerprint": policy_fingerprint,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return _sign(f"authorized:{payload}")
+
+
+def _validated_authorization_binding(
+    *,
+    account_id: str | None,
+    account_mode: str | None,
+    snapshot_id: str | None,
+    policy_fingerprint: str | None,
+) -> tuple[str | None, str | None, str | None, str | None]:
+    """Validate an all-or-none execution context before signing it."""
+    values = (account_id, account_mode, snapshot_id, policy_fingerprint)
+    if all(value is None for value in values):
+        return values
+    if any(value is None for value in values):
+        raise ValueError(
+            "Execution authorization binding requires account_id, account_mode, "
+            "snapshot_id, and policy_fingerprint together."
+        )
+    if not isinstance(account_id, str) or not account_id.strip() or account_id != account_id.strip():
+        raise ValueError("account_id must be a non-empty canonical string")
+    if account_mode not in ("paper", "live"):
+        raise ValueError("account_mode must be exactly 'paper' or 'live'")
+    for value, name in (
+        (snapshot_id, "snapshot_id"),
+        (policy_fingerprint, "policy_fingerprint"),
+    ):
+        if not isinstance(value, str) or len(value) != 64 or value != value.lower():
+            raise ValueError(f"{name} must be a lowercase 64-character sha256 digest")
+        try:
+            int(value, 16)
+        except ValueError as exc:
+            raise ValueError(
+                f"{name} must be a lowercase 64-character sha256 digest"
+            ) from exc
+    return account_id, account_mode, snapshot_id, policy_fingerprint
 
 
 def authorize_trade_intent(
     intent: TradeIntent,
     validation: ValidationResult,
     ttl_seconds: int = 120,
+    *,
+    account_id: str | None = None,
+    account_mode: str | None = None,
+    snapshot_id: str | None = None,
+    policy_fingerprint: str | None = None,
 ) -> ExecutionAuthorization:
     if not validation.approved:
         raise ValueError("Cannot authorize a trade intent that failed validation.")
@@ -431,15 +500,33 @@ def authorize_trade_intent(
             "called with this exact trade intent -- refusing to authorize. A hand-constructed "
             "or mismatched ValidationResult cannot be signed correctly."
         )
+    binding = _validated_authorization_binding(
+        account_id=account_id,
+        account_mode=account_mode,
+        snapshot_id=snapshot_id,
+        policy_fingerprint=policy_fingerprint,
+    )
     now = datetime.now(timezone.utc)
     token = secrets.token_urlsafe(32)
     expires_at = (now + timedelta(seconds=ttl_seconds)).isoformat()
     return ExecutionAuthorization(
         token=token,
         intent_fingerprint=intent_fingerprint(intent),
-        proof=_authorization_proof(intent, token, expires_at),
+        proof=_authorization_proof(
+            intent,
+            token,
+            expires_at,
+            account_id=binding[0],
+            account_mode=binding[1],
+            snapshot_id=binding[2],
+            policy_fingerprint=binding[3],
+        ),
         approved_at=now.isoformat(),
         expires_at=expires_at,
+        account_id=binding[0],
+        account_mode=binding[1],
+        snapshot_id=binding[2],
+        policy_fingerprint=binding[3],
     )
 
 
@@ -447,6 +534,11 @@ def authorize_overridden_trade_intent(
     intent: TradeIntent,
     validation: ValidationResult,
     ttl_seconds: int = 120,
+    *,
+    account_id: str | None = None,
+    account_mode: str | None = None,
+    snapshot_id: str | None = None,
+    policy_fingerprint: str | None = None,
 ) -> ExecutionAuthorization:
     """
     A second, narrowly-scoped path to a real ExecutionAuthorization for a
@@ -489,15 +581,33 @@ def authorize_overridden_trade_intent(
             "At least one violation is not override-eligible (only concentration-cap and "
             "earnings-blackout violations can be overridden) -- refusing to authorize."
         )
+    binding = _validated_authorization_binding(
+        account_id=account_id,
+        account_mode=account_mode,
+        snapshot_id=snapshot_id,
+        policy_fingerprint=policy_fingerprint,
+    )
     now = datetime.now(timezone.utc)
     token = secrets.token_urlsafe(32)
     expires_at = (now + timedelta(seconds=ttl_seconds)).isoformat()
     return ExecutionAuthorization(
         token=token,
         intent_fingerprint=intent_fingerprint(intent),
-        proof=_authorization_proof(intent, token, expires_at),
+        proof=_authorization_proof(
+            intent,
+            token,
+            expires_at,
+            account_id=binding[0],
+            account_mode=binding[1],
+            snapshot_id=binding[2],
+            policy_fingerprint=binding[3],
+        ),
         approved_at=now.isoformat(),
         expires_at=expires_at,
+        account_id=binding[0],
+        account_mode=binding[1],
+        snapshot_id=binding[2],
+        policy_fingerprint=binding[3],
     )
 
 
@@ -533,6 +643,10 @@ def verify_execution_authorization(
     intent: TradeIntent,
     authorization: ExecutionAuthorization | None,
     now: datetime | None = None,
+    *,
+    expected_account_id: str | None = None,
+    expected_account_mode: str | None = None,
+    require_bound: bool = False,
 ) -> None:
     if authorization is None:
         raise PermissionError("Broker submission requires a short-lived execution-gate authorization.")
@@ -544,9 +658,35 @@ def verify_execution_authorization(
     if not authorization.token:
         raise PermissionError("Execution-gate authorization has an empty or missing token.")
     if not hmac.compare_digest(
-        authorization.proof, _authorization_proof(intent, authorization.token, authorization.expires_at)
+        authorization.proof,
+        _authorization_proof(
+            intent,
+            authorization.token,
+            authorization.expires_at,
+            account_id=authorization.account_id,
+            account_mode=authorization.account_mode,
+            snapshot_id=authorization.snapshot_id,
+            policy_fingerprint=authorization.policy_fingerprint,
+        ),
     ):
         raise PermissionError("Execution-gate authorization does not match this trade intent.")
+    if not isinstance(require_bound, bool):
+        raise ValueError("require_bound must be a bool")
+    binding = (
+        authorization.account_id,
+        authorization.account_mode,
+        authorization.snapshot_id,
+        authorization.policy_fingerprint,
+    )
+    is_bound = all(value is not None for value in binding)
+    if require_bound and not is_bound:
+        raise PermissionError(
+            "Broker submission requires an account-, snapshot-, and policy-bound authorization."
+        )
+    if expected_account_id is not None and authorization.account_id != expected_account_id:
+        raise PermissionError("Execution-gate authorization is bound to a different broker account.")
+    if expected_account_mode is not None and authorization.account_mode != expected_account_mode:
+        raise PermissionError("Execution-gate authorization is bound to a different broker account mode.")
     current = now or datetime.now(timezone.utc)
     expires = datetime.fromisoformat(authorization.expires_at)
     if current > expires:

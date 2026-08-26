@@ -72,12 +72,17 @@ There are no P0 or P1 findings.
 | Complete `tests/test_active_document_consistency.py` | 61 passed |
 | Dangerous-direction mutation | deleting the exact one-common-holdout requirement failed the new guard; restored green |
 | First complete-suite attempt | 4,570 passed / 1 failed / 25 warnings; the counter-review handoff had omitted the exact open-owner-decision wording required by an existing authorization guard |
-| Clean complete-suite rerun | **4,571 passed / 0 failed / 25 warnings** in 1,350.86 seconds at `f4dbd95418de3b8e8f144f904ab9bcb5d73599be` |
+| Shared-checkout complete rerun | 4,571 passed / 0 failed / 25 warnings in 1,350.86 seconds; another session changed three unstaged coordination files during the run, so this is corroborating rather than exact-head evidence |
+| Exact detached-head complete rerun | **4,571 passed / 0 failed / 25 warnings** in 1,626.69 seconds at `80e76e765ca66ad2735aa1c74a6a4228a519e537` |
 | `compileall` including `research/` | passed |
 | `git diff --check` | clean before the correction commit |
 | Remote review head | stable at `c88ac4f379aba996b48fb7f70e5210edda3c7320` |
 | Three remote lane heads | all remain `c9dcdb647914acbfcefce187a138f52fcdad0c68` |
 | Outcomes/provider/broker/operator store/QC/deployment | not accessed |
+
+The exact detached worktree was clean before and after its run and was removed
+after verification. Concurrent uncommitted owner-workflow edits in the shared
+checkout were preserved, not staged or incorporated into this counter-review.
 
 ## 6. Remaining gates and next step
 

@@ -69,9 +69,14 @@ dangerous-direction mutation failed as intended and restored green, and
 reported 4,570 passed and one active-document failure: this handoff's resume
 prompt had lost the exact statement that provider access remains an open owner
 decision. That counter-review-introduced wording defect was corrected and the
-61 active-document checks passed again. The clean complete-suite rerun at
-`f4dbd95418de3b8e8f144f904ab9bcb5d73599be` then passed **4,571 tests with 0
-failures and 25 known warnings in 1,350.86 seconds**.
+61 active-document checks passed again. A shared-checkout complete rerun then
+passed 4,571 tests, but another session changed three unstaged coordination
+files while it was running. Codex therefore repeated the complete suite in a
+clean detached worktree at exact commit
+`80e76e765ca66ad2735aa1c74a6a4228a519e537`: **4,571 passed, 0 failed, and 25
+known warnings in 1,626.69 seconds**. The temporary worktree was clean and was
+removed. The concurrent unstaged workflow edits were preserved and excluded
+from every counter-review commit.
 
 ## 3. Parallel-work exception and handoff rule
 

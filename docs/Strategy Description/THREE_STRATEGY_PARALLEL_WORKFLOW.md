@@ -57,11 +57,15 @@ Each lane uses this serialized loop on its one branch:
    ledger in the lane record or a lane-specific review record, commits any
    authorized corrections and the review record on the **same lane branch**,
    and pushes once.
-3. **Codex counter-review.** Codex fetches and fast-forwards the same lane,
-   reviews every Claude commit, independently reproduces material claims,
-   corrects confirmed defects, adds dangerous-direction regressions, updates
-   the lane record, commits, and pushes the same branch.
-4. Repeat from step 1 for the next bounded milestone.
+3. Codex fetches and fast-forwards the reviewed head; repeat from step 1 for
+   the next bounded milestone.
+
+**Owner decision, 2026-08-26: the Codex counter-review step is removed.**
+Claude's review disposition is final for each milestone, and the three lane
+review sessions run as dedicated Claude sessions. Because no counter-review
+follows, Claude's review must independently reproduce material claims, rerun
+the validation it relies on, mutation-test its own corrections, and add the
+dangerous-direction regressions the counter-review step would have added.
 
 Only one agent may write or push a lane at a time. Before every commit and
 push, the acting agent must recheck the branch, exact `HEAD`, upstream head,
@@ -74,8 +78,7 @@ advanced unexpectedly, stop and reconcile by review; do not overwrite it.
 Before every push, the acting agent updates the relevant strategy's
 implementation record with:
 
-- role and agent (`Codex implementation`, `Claude review`, or `Codex
-  counter-review`);
+- role and agent (`Codex implementation` or `Claude review`);
 - exact starting and ending commits;
 - milestone and bounded scope;
 - files changed;

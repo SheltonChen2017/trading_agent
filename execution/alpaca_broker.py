@@ -84,18 +84,42 @@ def is_configured() -> bool:
     return bool(os.environ.get("APCA_API_KEY_ID")) and bool(os.environ.get("APCA_API_SECRET_KEY"))
 
 
-def _get_client():
+def _capture_connection_settings() -> tuple[str, str, bool]:
+    """Capture one immutable broker connection boundary.
+
+    Execution code must not assemble a portfolio from one set of environment
+    credentials and submit through another.  The module-level compatibility
+    facade intentionally opens a fresh client per call, while
+    :class:`AlpacaBrokerSession` calls this helper exactly once and retains the
+    resulting client, credentials, and paper/live mode for its whole lifetime.
+    """
     if not is_configured():
         raise AlpacaNotConfigured(
             "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set. Sign up for free "
             "paper trading keys at https://alpaca.markets, then set both as "
             "environment variables before calling any execution function."
         )
+    paper = PAPER_TRADING
+    if type(paper) is not bool:
+        raise BrokerPreflightError(
+            "config.PAPER_TRADING must be an actual bool before opening a broker session."
+        )
+    return (
+        os.environ["APCA_API_KEY_ID"],
+        os.environ["APCA_API_SECRET_KEY"],
+        paper,
+    )
+
+
+def _new_trading_client(key: str, secret: str, *, paper: bool):
     from alpaca.trading.client import TradingClient  # lazy import — package optional until used
 
-    key = os.environ["APCA_API_KEY_ID"]
-    secret = os.environ["APCA_API_SECRET_KEY"]
-    return TradingClient(key, secret, paper=PAPER_TRADING)
+    return TradingClient(key, secret, paper=paper)
+
+
+def _get_client():
+    key, secret, paper = _capture_connection_settings()
+    return _new_trading_client(key, secret, paper=paper)
 
 
 def _enum_value(value: Any) -> Any:
@@ -103,9 +127,12 @@ def _enum_value(value: Any) -> Any:
 
 
 def _optional_float(value: Any) -> float | None:
-    if value is None:
+    if value is None or isinstance(value, bool):
         return None
-    parsed = float(value)
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
     return parsed if math.isfinite(parsed) else None
 
 
@@ -160,7 +187,12 @@ def _normalize_order(order: Any) -> dict:
         return order.get(name, default) if isinstance(order, Mapping) else getattr(order, name, default)
 
     return {
-        "order_id": str(field("id")),
+        # Missing external identity must remain visibly missing.  ``str(None)``
+        # manufactured the non-empty-looking order id "None", which could be
+        # journaled as if the broker had supplied usable acceptance evidence.
+        "order_id": (
+            str(field("id")) if field("id") is not None else None
+        ),
         "client_order_id": field("client_order_id"),
         "ticker": field("symbol"),
         "shares": _optional_float(field("qty")),
@@ -205,11 +237,27 @@ def _normalize_order(order: Any) -> dict:
     }
 
 
-def get_account() -> dict:
-    """Current account snapshot, including broker-side trading blocks."""
-    account = _get_client().get_account()
+def _normalized_trade_update_numbers(
+    *, fill_qty: Any, fill_price: Any
+) -> dict[str, float | str | None]:
+    """Normalize incremental stream fills without losing decimal evidence."""
     return {
-        "account_id": str(account.id),
+        "fill_qty": _optional_float(fill_qty),
+        "fill_qty_decimal": _optional_decimal_text(fill_qty),
+        "fill_price": _optional_float(fill_price),
+        "fill_price_decimal": _optional_decimal_text(fill_price),
+    }
+
+
+def _normalize_account(account: Any, *, paper: bool) -> dict:
+    account_id = getattr(account, "id", None)
+    def broker_bool(field: str) -> bool | None:
+        # Missing provider evidence is unknown, never an implicit safe False.
+        value = getattr(account, field, None)
+        return value if type(value) is bool else None
+
+    return {
+        "account_id": str(account_id) if account_id is not None else None,
         "status": str(_enum_value(getattr(account, "status", "unknown"))),
         "equity": float(account.equity),
         "equity_decimal": _optional_decimal_text(account.equity),
@@ -217,28 +265,475 @@ def get_account() -> dict:
         "cash_decimal": _optional_decimal_text(account.cash),
         "buying_power": float(account.buying_power),
         "buying_power_decimal": _optional_decimal_text(account.buying_power),
-        "trading_blocked": bool(getattr(account, "trading_blocked", False)),
-        "account_blocked": bool(getattr(account, "account_blocked", False)),
-        "trade_suspended_by_user": bool(getattr(account, "trade_suspended_by_user", False)),
-        "transfers_blocked": bool(getattr(account, "transfers_blocked", False)),
-        "paper": PAPER_TRADING,
+        "trading_blocked": broker_bool("trading_blocked"),
+        "account_blocked": broker_bool("account_blocked"),
+        "trade_suspended_by_user": broker_bool("trade_suspended_by_user"),
+        "transfers_blocked": broker_bool("transfers_blocked"),
+        "paper": paper,
     }
+
+
+def _normalize_asset(asset: Any) -> dict:
+    def broker_bool(field: str) -> bool | None:
+        value = getattr(asset, field, None)
+        return value if type(value) is bool else None
+
+    symbol = getattr(asset, "symbol", None)
+    return {
+        "ticker": str(symbol).strip().upper() if symbol is not None else None,
+        "status": str(_enum_value(getattr(asset, "status", "unknown"))),
+        "asset_class": str(
+            _enum_value(getattr(asset, "asset_class", "unknown"))
+        ),
+        "tradable": broker_bool("tradable"),
+        "fractionable": broker_bool("fractionable"),
+    }
+
+
+def _usable_account_id(value: object) -> str:
+    if not isinstance(value, str):
+        raise BrokerPreflightError(
+            "Broker account did not return a usable account identity."
+        )
+    account_id = value.strip()
+    if account_id.lower() in {"", "none", "null", "unknown"}:
+        raise BrokerPreflightError(
+            "Broker account did not return a usable account identity."
+        )
+    return account_id
+
+
+def _assert_asset_evidence(asset: Mapping[str, Any], ticker: str) -> None:
+    expected_ticker = ticker.strip().upper()
+    if asset.get("ticker") != expected_ticker:
+        raise BrokerPreflightError(
+            f"Broker returned asset {asset.get('ticker')!r} while {expected_ticker!r} "
+            "was requested."
+        )
+    for field in ("tradable", "fractionable"):
+        if type(asset.get(field)) is not bool:
+            raise BrokerPreflightError(
+                f"Broker asset returned malformed {field} evidence."
+            )
+
+
+def _normalize_position(position: Any) -> dict:
+    normalized = {
+        "ticker": position.symbol,
+        "shares": float(position.qty),
+        "shares_decimal": _optional_decimal_text(position.qty),
+        "avg_entry_price": float(position.avg_entry_price),
+        "avg_entry_price_decimal": _optional_decimal_text(
+            position.avg_entry_price
+        ),
+        "current_price": float(position.current_price),
+        "current_price_decimal": _optional_decimal_text(position.current_price),
+        "unrealized_pl": float(position.unrealized_pl),
+    }
+    market_value = getattr(position, "market_value", None)
+    if market_value is not None:
+        normalized["market_value"] = float(market_value)
+        normalized["market_value_decimal"] = _optional_decimal_text(market_value)
+    return normalized
+
+
+def _get_orders_for_client(client: Any) -> list[dict]:
+    try:
+        orders = client.get_orders()
+    except TypeError:
+        from alpaca.trading.requests import GetOrdersRequest
+
+        orders = client.get_orders(filter=GetOrdersRequest())
+    return [_normalize_order(order) for order in orders]
+
+
+class AlpacaBrokerSession:
+    """One account-scoped Alpaca connection used across an execution attempt.
+
+    Credentials and paper/live mode are captured at construction and are never
+    read from the mutable process environment again.  All trading account,
+    asset, position, order, lookup, cancellation, and SDK submission calls use
+    the same ``TradingClient`` instance.  Quote data and exact fractional REST
+    submissions necessarily use Alpaca's separate APIs, but they use the same
+    frozen credentials and endpoint mode retained by this session.
+    """
+
+    __slots__ = (
+        "_account_id",
+        "_client",
+        "_data_client",
+        "_key",
+        "_secret",
+        "PAPER_TRADING",
+    )
+
+    def __init__(
+        self,
+        *,
+        key: str,
+        secret: str,
+        paper: bool,
+        client: Any,
+    ) -> None:
+        if not isinstance(key, str) or not key:
+            raise AlpacaNotConfigured("Alpaca key must be a non-empty string.")
+        if not isinstance(secret, str) or not secret:
+            raise AlpacaNotConfigured("Alpaca secret must be a non-empty string.")
+        if type(paper) is not bool:
+            raise BrokerPreflightError("paper must be an actual bool.")
+        if client is None:
+            raise TypeError("client must be a TradingClient instance")
+        self._key = key
+        self._secret = secret
+        self.PAPER_TRADING = paper
+        self._client = client
+        self._data_client = None
+        self._account_id = None
+
+    @property
+    def account_mode(self) -> str:
+        return "paper" if self.PAPER_TRADING else "live"
+
+    def is_configured(self) -> bool:
+        return True
+
+    def get_account(self) -> dict:
+        account = _normalize_account(
+            self._client.get_account(), paper=self.PAPER_TRADING
+        )
+        observed_id = _usable_account_id(account["account_id"])
+        if self._account_id is None:
+            self._account_id = observed_id
+        elif observed_id != self._account_id:
+            raise BrokerPreflightError(
+                "Broker account identity changed inside one account-scoped session."
+            )
+        account["account_id"] = observed_id
+        return account
+
+    def get_asset(self, ticker: str) -> dict:
+        return _normalize_asset(self._client.get_asset(ticker.upper()))
+
+    def assert_account_and_asset_ready(self, ticker: str) -> dict:
+        account = self.get_account()
+        for field in (
+            "trading_blocked",
+            "account_blocked",
+            "trade_suspended_by_user",
+        ):
+            if type(account[field]) is not bool:
+                raise BrokerPreflightError(
+                    f"Broker account returned malformed {field} evidence."
+                )
+        blocked = [
+            field
+            for field in (
+                "trading_blocked",
+                "account_blocked",
+                "trade_suspended_by_user",
+            )
+            if account[field]
+        ]
+        if blocked:
+            raise BrokerPreflightError(
+                "Broker account is not trading-ready: " + ", ".join(blocked) + "."
+            )
+        if str(account["status"]).upper() != "ACTIVE":
+            raise BrokerPreflightError(
+                f"Broker account status is {account['status']!r}, not ACTIVE."
+            )
+        if not self.PAPER_TRADING:
+            expected_account_id = os.environ.get(
+                "TRADING_ASSISTANT_LIVE_ACCOUNT_ID"
+            )
+            if not expected_account_id:
+                raise LiveTradingNotConfirmed(
+                    "Live account execution also requires "
+                    "TRADING_ASSISTANT_LIVE_ACCOUNT_ID to be set to the exact "
+                    "intended Alpaca account ID."
+                )
+            if expected_account_id != account["account_id"]:
+                raise LiveTradingNotConfirmed(
+                    "TRADING_ASSISTANT_LIVE_ACCOUNT_ID does not match the "
+                    "connected Alpaca account."
+                )
+        asset = self.get_asset(ticker)
+        _assert_asset_evidence(asset, ticker)
+        if asset["status"].lower() != "active" or not asset["tradable"]:
+            raise BrokerPreflightError(
+                f"{asset['ticker']} is not broker-tradable "
+                f"(status={asset['status']!r}, tradable={asset['tradable']})."
+            )
+        return {"account": account, "asset": asset}
+
+    def get_open_positions(self) -> list[dict]:
+        return [
+            _normalize_position(position)
+            for position in self._client.get_all_positions()
+        ]
+
+    def get_open_orders(self) -> list[dict]:
+        return _get_orders_for_client(self._client)
+
+    def find_order_by_client_id(self, client_order_id: str) -> dict | None:
+        try:
+            order = self._client.get_order_by_client_id(client_order_id)
+        except Exception as exc:
+            if getattr(exc, "status_code", None) == 404:
+                return None
+            raise
+        return None if order is None else _normalize_order(order)
+
+    def get_order_by_id(self, order_id: str) -> dict | None:
+        try:
+            order = self._client.get_order_by_id(order_id)
+        except Exception as exc:
+            if getattr(exc, "status_code", None) == 404:
+                return None
+            raise
+        return None if order is None else _normalize_order(order)
+
+    def cancel_order(self, order_id: str) -> dict:
+        self._client.cancel_order_by_id(order_id)
+        return {"order_id": str(order_id), "status": "pending_cancel"}
+
+    def get_latest_quote(self, ticker: str) -> dict:
+        from alpaca.data.historical import StockHistoricalDataClient
+        from alpaca.data.requests import StockLatestQuoteRequest
+
+        if self._data_client is None:
+            self._data_client = StockHistoricalDataClient(self._key, self._secret)
+        quotes = self._data_client.get_stock_latest_quote(
+            StockLatestQuoteRequest(symbol_or_symbols=[ticker])
+        )
+        return _normalize_latest_quote(ticker, quotes[ticker])
+
+    def _http_post_json(self, url: str, payload: dict[str, Any]) -> Any:
+        request = urllib.request.Request(
+            url,
+            data=json.dumps(payload, separators=(",", ":")).encode("utf-8"),
+            headers={
+                "APCA-API-KEY-ID": self._key,
+                "APCA-API-SECRET-KEY": self._secret,
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return json.loads(response.read())
+
+    def _submit_fractional_order(
+        self,
+        *,
+        ticker: str,
+        quantity: str,
+        side: str,
+        order_type: str,
+        idempotency_key: str,
+        limit_price: float | None = None,
+    ) -> dict:
+        payload: dict[str, Any] = {
+            "symbol": ticker,
+            "qty": quantity,
+            "side": side,
+            "type": order_type,
+            "time_in_force": "day",
+            "client_order_id": idempotency_key,
+        }
+        if order_type == "limit":
+            payload["limit_price"] = limit_price
+        base_url = (
+            "https://paper-api.alpaca.markets"
+            if self.PAPER_TRADING
+            else "https://api.alpaca.markets"
+        )
+        response = self._http_post_json(f"{base_url}/v2/orders", payload)
+        if not isinstance(response, Mapping):
+            raise RuntimeError(
+                f"unexpected order response shape: {type(response).__name__}"
+            )
+        return _normalize_order(response)
+
+    def submit_market_order(
+        self,
+        ticker: str,
+        shares: int | str,
+        side: str = "buy",
+        *,
+        authorization: ExecutionAuthorization | None = None,
+        idempotency_key: str,
+        whole_shares_only: bool = True,
+    ) -> dict:
+        if not idempotency_key:
+            raise ValueError("idempotency_key is required and must be non-empty")
+        if (
+            not self.PAPER_TRADING
+            and os.environ.get("CONFIRM_LIVE_TRADING") != "I_UNDERSTAND"
+        ):
+            raise LiveTradingNotConfirmed(
+                "The captured broker session is live but live trading was not confirmed."
+            )
+        quantity = _require_valid_shares(
+            shares, whole_shares_only=whole_shares_only
+        )
+        if side not in ("buy", "sell"):
+            raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
+        intent = TradeIntent(
+            ticker=ticker,
+            shares=quantity,
+            side=side,
+            order_type="market",
+        )
+        if authorization is None:
+            # Missing authority is independently knowable and should not even
+            # trigger a broker read.  A present token is checked only after the
+            # session account is observed, so an account mismatch cannot
+            # consume it.
+            verify_execution_authorization(intent, authorization, require_bound=True)
+        readiness = self.assert_account_and_asset_ready(ticker)
+        verify_execution_authorization(
+            intent,
+            authorization,
+            expected_account_id=readiness["account"]["account_id"],
+            expected_account_mode=self.account_mode,
+            require_bound=True,
+        )
+        if (
+            is_fractional_order_quantity(quantity)
+            and not readiness["asset"]["fractionable"]
+        ):
+            raise BrokerPreflightError(
+                f"{ticker.upper()} is not marked fractionable by the broker."
+            )
+        if is_fractional_order_quantity(quantity):
+            return self._submit_fractional_order(
+                ticker=ticker,
+                quantity=str(quantity),
+                side=side,
+                order_type="market",
+                idempotency_key=idempotency_key,
+            )
+        from alpaca.trading.enums import OrderSide, TimeInForce
+        from alpaca.trading.requests import MarketOrderRequest
+
+        order = self._client.submit_order(
+            MarketOrderRequest(
+                symbol=ticker,
+                qty=quantity,
+                side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
+                time_in_force=TimeInForce.DAY,
+                client_order_id=idempotency_key,
+            )
+        )
+        return _normalize_order(order)
+
+    def submit_limit_order(
+        self,
+        ticker: str,
+        shares: int | str,
+        limit_price: float,
+        side: str = "buy",
+        *,
+        authorization: ExecutionAuthorization | None = None,
+        idempotency_key: str,
+        whole_shares_only: bool = True,
+    ) -> dict:
+        if not idempotency_key:
+            raise ValueError("idempotency_key is required and must be non-empty")
+        if (
+            not self.PAPER_TRADING
+            and os.environ.get("CONFIRM_LIVE_TRADING") != "I_UNDERSTAND"
+        ):
+            raise LiveTradingNotConfirmed(
+                "The captured broker session is live but live trading was not confirmed."
+            )
+        quantity = _require_valid_shares(
+            shares, whole_shares_only=whole_shares_only
+        )
+        if side not in ("buy", "sell"):
+            raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
+        intent = TradeIntent(
+            ticker=ticker,
+            shares=quantity,
+            side=side,
+            order_type="limit",
+            limit_price=limit_price,
+        )
+        if authorization is None:
+            verify_execution_authorization(intent, authorization, require_bound=True)
+        readiness = self.assert_account_and_asset_ready(ticker)
+        verify_execution_authorization(
+            intent,
+            authorization,
+            expected_account_id=readiness["account"]["account_id"],
+            expected_account_mode=self.account_mode,
+            require_bound=True,
+        )
+        if (
+            is_fractional_order_quantity(quantity)
+            and not readiness["asset"]["fractionable"]
+        ):
+            raise BrokerPreflightError(
+                f"{ticker.upper()} is not marked fractionable by the broker."
+            )
+        if is_fractional_order_quantity(quantity):
+            return self._submit_fractional_order(
+                ticker=ticker,
+                quantity=str(quantity),
+                side=side,
+                order_type="limit",
+                idempotency_key=idempotency_key,
+                limit_price=limit_price,
+            )
+        from alpaca.trading.enums import OrderSide, TimeInForce
+        from alpaca.trading.requests import LimitOrderRequest
+
+        order = self._client.submit_order(
+            LimitOrderRequest(
+                symbol=ticker,
+                qty=quantity,
+                side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
+                time_in_force=TimeInForce.DAY,
+                limit_price=limit_price,
+                client_order_id=idempotency_key,
+            )
+        )
+        return _normalize_order(order)
+
+
+def open_alpaca_broker_session() -> AlpacaBrokerSession:
+    """Open one immutable credential/mode/session boundary for execution."""
+    key, secret, paper = _capture_connection_settings()
+    return AlpacaBrokerSession(
+        key=key,
+        secret=secret,
+        paper=paper,
+        client=_new_trading_client(key, secret, paper=paper),
+    )
+
+
+def get_account() -> dict:
+    """Current account snapshot, including broker-side trading blocks."""
+    return _normalize_account(_get_client().get_account(), paper=PAPER_TRADING)
 
 
 def get_asset(ticker: str) -> dict:
-    asset = _get_client().get_asset(ticker.upper())
-    return {
-        "ticker": str(asset.symbol).upper(),
-        "status": str(_enum_value(getattr(asset, "status", "unknown"))),
-        "asset_class": str(_enum_value(getattr(asset, "asset_class", "unknown"))),
-        "tradable": bool(getattr(asset, "tradable", False)),
-        "fractionable": bool(getattr(asset, "fractionable", False)),
-    }
+    return _normalize_asset(_get_client().get_asset(ticker.upper()))
 
 
 def assert_account_and_asset_ready(ticker: str) -> dict:
     """Fail before submission if Alpaca says trading or the asset is blocked."""
     account = get_account()
+    account["account_id"] = _usable_account_id(account.get("account_id"))
+    for field in (
+        "trading_blocked",
+        "account_blocked",
+        "trade_suspended_by_user",
+    ):
+        if type(account[field]) is not bool:
+            raise BrokerPreflightError(
+                f"Broker account returned malformed {field} evidence."
+            )
     blocked = [
         field
         for field in ("trading_blocked", "account_blocked", "trade_suspended_by_user")
@@ -264,6 +759,7 @@ def assert_account_and_asset_ready(ticker: str) -> dict:
                 "TRADING_ASSISTANT_LIVE_ACCOUNT_ID does not match the connected Alpaca account."
             )
     asset = get_asset(ticker)
+    _assert_asset_evidence(asset, ticker)
     if asset["status"].lower() != "active" or not asset["tradable"]:
         raise BrokerPreflightError(
             f"{asset['ticker']} is not broker-tradable "
@@ -274,19 +770,28 @@ def assert_account_and_asset_ready(ticker: str) -> dict:
 
 def get_open_positions() -> list[dict]:
     client = _get_client()
-    return [
-        {
-            "ticker": p.symbol,
-            "shares": float(p.qty),
-            "shares_decimal": _optional_decimal_text(p.qty),
-            "avg_entry_price": float(p.avg_entry_price),
-            "avg_entry_price_decimal": _optional_decimal_text(p.avg_entry_price),
-            "current_price": float(p.current_price),
-            "current_price_decimal": _optional_decimal_text(p.current_price),
-            "unrealized_pl": float(p.unrealized_pl),
-        }
-        for p in client.get_all_positions()
-    ]
+    return [_normalize_position(position) for position in client.get_all_positions()]
+
+
+def _normalize_latest_quote(ticker: str, quote: Any) -> dict:
+    """Normalize one quote while preserving exact broker decimal text."""
+    bid_decimal = _required_decimal(quote.bid_price, f"{ticker} bid price")
+    ask_decimal = _required_decimal(quote.ask_price, f"{ticker} ask price")
+    bid, ask = float(bid_decimal), float(ask_decimal)
+    if bid_decimal > 0 and ask_decimal > 0:
+        price_decimal = (bid_decimal + ask_decimal) / Decimal("2")
+    else:
+        price_decimal = ask_decimal if ask_decimal > 0 else bid_decimal
+    return {
+        "ticker": ticker,
+        "price": float(price_decimal),
+        "price_decimal": format(price_decimal, "f"),
+        "bid": bid,
+        "bid_decimal": format(bid_decimal, "f"),
+        "ask": ask,
+        "ask_decimal": format(ask_decimal, "f"),
+        "timestamp": quote.timestamp,
+    }
 
 
 def get_latest_quote(ticker: str) -> dict:
@@ -314,7 +819,6 @@ def get_latest_quote(ticker: str) -> dict:
     secret = os.environ["APCA_API_SECRET_KEY"]
     client = StockHistoricalDataClient(key, secret)
     quotes = client.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=[ticker]))
-    quote = quotes[ticker]
     # FCS-005: through the guarded helper, never a bare Decimal(str(...)).
     # A NaN bid parses fine and then RAISES InvalidOperation on the `> 0`
     # comparison two lines down -- an ArithmeticError, so it escapes every
@@ -323,23 +827,7 @@ def get_latest_quote(ticker: str) -> dict:
     # reference price. Neither is hypothetical: `_optional_float` in this same
     # module already filters non-finite broker values, so this file has always
     # assumed they occur.
-    bid_decimal = _required_decimal(quote.bid_price, f"{ticker} bid price")
-    ask_decimal = _required_decimal(quote.ask_price, f"{ticker} ask price")
-    bid, ask = float(bid_decimal), float(ask_decimal)
-    if bid_decimal > 0 and ask_decimal > 0:
-        price_decimal = (bid_decimal + ask_decimal) / Decimal("2")
-    else:
-        price_decimal = ask_decimal if ask_decimal > 0 else bid_decimal
-    return {
-        "ticker": ticker,
-        "price": float(price_decimal),
-        "price_decimal": format(price_decimal, "f"),
-        "bid": bid,
-        "bid_decimal": format(bid_decimal, "f"),
-        "ask": ask,
-        "ask_decimal": format(ask_decimal, "f"),
-        "timestamp": quote.timestamp,
-    }
+    return _normalize_latest_quote(ticker, quotes[ticker])
 
 
 def find_order_by_client_id(client_order_id: str) -> dict | None:
@@ -389,14 +877,7 @@ def get_order_by_id(order_id: str) -> dict | None:
 
 def get_open_orders() -> list[dict]:
     """Return currently open broker orders in a JSON-friendly shape."""
-    client = _get_client()
-    try:
-        orders = client.get_orders()
-    except TypeError:
-        from alpaca.trading.requests import GetOrdersRequest
-
-        orders = client.get_orders(filter=GetOrdersRequest())
-    return [_normalize_order(order) for order in orders]
+    return _get_orders_for_client(_get_client())
 
 
 def cancel_order(order_id: str) -> dict:
@@ -584,12 +1065,15 @@ def run_trade_update_stream(
 
     async def handle_update(update) -> None:
         order = _normalize_order(update.order)
+        fill_numbers = _normalized_trade_update_numbers(
+            fill_qty=getattr(update, "qty", None),
+            fill_price=getattr(update, "price", None),
+        )
         normalized = {
             "event": str(_enum_value(getattr(update, "event", order["status"]))),
             "event_id": getattr(update, "execution_id", None),
             "event_at": _optional_iso(getattr(update, "timestamp", None)),
-            "fill_qty": _optional_float(getattr(update, "qty", None)),
-            "fill_price": _optional_float(getattr(update, "price", None)),
+            **fill_numbers,
             "order": order,
         }
         result = callback(normalized)
@@ -654,36 +1138,19 @@ def submit_market_order(
     # thing to lean on in the last-mile authorization reconstruction --
     # see submit_limit_order()'s docstring for why the two are kept apart.
     intent = TradeIntent(ticker=ticker, shares=quantity, side=side, order_type="market")
-    verify_execution_authorization(intent, authorization)
-    readiness = assert_account_and_asset_ready(ticker)
-    if is_fractional_order_quantity(quantity) and not readiness["asset"]["fractionable"]:
-        raise BrokerPreflightError(
-            f"{ticker.upper()} is not marked fractionable by the broker."
-        )
-
-    if is_fractional_order_quantity(quantity):
-        return _submit_fractional_order(
-            ticker=ticker,
-            quantity=str(quantity),
-            side=side,
-            order_type="market",
-            idempotency_key=idempotency_key,
-        )
-
-    client = _get_client()
-    from alpaca.trading.enums import OrderSide, TimeInForce
-    from alpaca.trading.requests import MarketOrderRequest
-
-    order = client.submit_order(
-        MarketOrderRequest(
-            symbol=ticker,
-            qty=quantity,
-            side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
-            time_in_force=TimeInForce.DAY,
-            client_order_id=idempotency_key,
-        )
+    if authorization is None:
+        verify_execution_authorization(intent, authorization, require_bound=True)
+    # Compatibility facade only: one frozen session now owns readiness,
+    # account binding, and the final submit.  It is never safe to preflight on
+    # one freshly created client and submit through another.
+    return open_alpaca_broker_session().submit_market_order(
+        ticker,
+        quantity,
+        side,
+        authorization=authorization,
+        idempotency_key=idempotency_key,
+        whole_shares_only=whole_shares_only,
     )
-    return _normalize_order(order)
 
 
 def submit_limit_order(
@@ -718,35 +1185,14 @@ def submit_limit_order(
     if side not in ("buy", "sell"):
         raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
     intent = TradeIntent(ticker=ticker, shares=quantity, side=side, order_type="limit", limit_price=limit_price)
-    verify_execution_authorization(intent, authorization)
-    readiness = assert_account_and_asset_ready(ticker)
-    if is_fractional_order_quantity(quantity) and not readiness["asset"]["fractionable"]:
-        raise BrokerPreflightError(
-            f"{ticker.upper()} is not marked fractionable by the broker."
-        )
-
-    if is_fractional_order_quantity(quantity):
-        return _submit_fractional_order(
-            ticker=ticker,
-            quantity=str(quantity),
-            side=side,
-            order_type="limit",
-            idempotency_key=idempotency_key,
-            limit_price=limit_price,
-        )
-
-    client = _get_client()
-    from alpaca.trading.enums import OrderSide, TimeInForce
-    from alpaca.trading.requests import LimitOrderRequest
-
-    order = client.submit_order(
-        LimitOrderRequest(
-            symbol=ticker,
-            qty=quantity,
-            side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
-            time_in_force=TimeInForce.DAY,
-            limit_price=limit_price,
-            client_order_id=idempotency_key,
-        )
+    if authorization is None:
+        verify_execution_authorization(intent, authorization, require_bound=True)
+    return open_alpaca_broker_session().submit_limit_order(
+        ticker,
+        quantity,
+        limit_price,
+        side,
+        authorization=authorization,
+        idempotency_key=idempotency_key,
+        whole_shares_only=whole_shares_only,
     )
-    return _normalize_order(order)

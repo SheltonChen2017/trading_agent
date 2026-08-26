@@ -140,6 +140,14 @@ class PortfolioSnapshot:
     cash_exact: str | None = None
     total_equity_exact: str | None = None
     buying_power_exact: str | None = None
+    # Execution-owned broker evidence.  These remain optional so historical,
+    # manually constructed, and read-only briefing snapshots retain their
+    # existing schema contract.  The strict Alpaca capture path requires all
+    # four fields and binds them into ``broker_snapshot_id``.
+    captured_at: str | None = None
+    broker_snapshot_id: str | None = None
+    component_equity_exact: str | None = None
+    component_equity_delta_exact: str | None = None
 
     @property
     def has_exact_numerics(self) -> bool:

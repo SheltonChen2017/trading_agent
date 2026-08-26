@@ -171,6 +171,31 @@ def test_main_strategy_direction_preserves_integration_and_authority_gates() -> 
     assert "THREE_STRATEGY_PROJECT_DIRECTION.md" in handoff
 
 
+def test_main_strategy_direction_pins_reviewed_parallel_coordination_gates() -> None:
+    """Claude's accepted amendments must remain explicit and fail closed."""
+    direction = _text("THREE_STRATEGY_PROJECT_DIRECTION.md").lower()
+
+    for phrase in (
+        "own clone or worktree",
+        "requirements.txt",
+        "config.py",
+        "ci/tooling configuration",
+        "lane-owned modules",
+        "one audit, one agent performs it",
+        "common-baseline amendment",
+        "one shared final-holdout boundary",
+        "shared period unconsumed",
+        "one selection family",
+        "selected from three parallel attempts",
+    ):
+        assert phrase in direction
+
+    assert "must not tune or rerun that family to make it pass" in direction
+    assert "separately preregistered family" in direction
+    assert "new owner-authorized permanent look budget" in direction
+    assert "cannot retroactively rescue the canonical result" in direction
+
+
 def test_sep3_freeze_record_pins_the_reviewed_pause_without_authorizing_extraction():
     freeze = _text("architecture/SEP3_FREEZE_STATE_2026-08-25.md")
     separation = _text("PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md")

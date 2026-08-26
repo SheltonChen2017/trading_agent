@@ -138,9 +138,11 @@ separately characterize, the same shared account.
 
 Parallel development ends only after each canonical strategy has completed
 its independent review/counter-review chain and has an honest disposition:
-accepted, accepted-after-correction, rejected, or valid null. A null result
-closes that lane's canonical family; no lane re-tunes a null strategy until
-it passes.
+accepted, accepted-after-correction, rejected, or valid null. A valid null
+closes that lane's canonical family; the lane must not tune or rerun that
+family to make it pass. Any later hypothesis must be a separately
+preregistered family with a new owner-authorized permanent look budget, and
+it cannot retroactively rescue the canonical result.
 
 Because the combined evaluation must be untouched by all three lanes, the
 owner freezes one shared final-holdout boundary — a common cutoff date and

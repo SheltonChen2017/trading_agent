@@ -439,9 +439,11 @@ def test_emergency_cancel_all_continues_after_one_broker_rejection():
             reason="cancel-all partial failure test",
         )
 
-        assert attempted == ["order-1", "order-2"]
+        assert attempted.count("order-1") == 5
+        assert attempted.count("order-2") == 1
         assert result["cancel_requested_count"] == 1
-        assert len(result["errors"]) == 1
+        assert len(result["errors"]) == 5
+        assert result["book_stable"] is False
         assert store.get_kill_switch()["active"] is True
 
 

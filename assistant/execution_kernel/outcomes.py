@@ -163,16 +163,13 @@ def resolve_failed_submission(
                 f"key does NOT match the intent (mismatch: {mismatch_detail}) -- refusing to "
                 "auto-resolve. Persistent kill switch activated; investigate manually."
             )
-            store.update_proposal_status_if_current(
+            store.park_reconciliation_anomaly_and_halt(
                 proposal_id,
                 expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                new_status=SUBMISSION_UNKNOWN,
-                error=reason,
-            )
-            store.activate_reconciliation_halt(
-                proposal_id=proposal_id,
                 reason=reason,
+                reconciled_at=datetime.now(timezone.utc).isoformat(),
                 details={"mismatch": mismatch_detail, "path": "submit_lookup"},
+                anomaly_key="failed_submission_lookup_identity_mismatch",
             )
             raise ProposalExecutionError(
                 f"Order submission failed for {proposal_id}, and a MISMATCHED order was found "
@@ -194,17 +191,23 @@ def resolve_failed_submission(
                 + ("Persistent kill switch activated; investigate manually."
                    if is_mismatch else "Left retryable as 'submission_unknown'.")
             )
-            store.update_proposal_status_if_current(
-                proposal_id,
-                expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                new_status=SUBMISSION_UNKNOWN,
-                error=reason,
-            )
             if is_mismatch:
-                store.activate_reconciliation_halt(
-                    proposal_id=proposal_id,
+                store.park_reconciliation_anomaly_and_halt(
+                    proposal_id,
+                    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
                     reason=reason,
+                    reconciled_at=datetime.now(timezone.utc).isoformat(),
                     details={"path": "submit_replacement_chain"},
+                    anomaly_key=(
+                        "failed_submission_replacement_chain_identity_mismatch"
+                    ),
+                )
+            else:
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+                    new_status=SUBMISSION_UNKNOWN,
+                    error=reason,
                 )
             raise ProposalExecutionError(reason) from exc
 

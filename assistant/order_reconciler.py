@@ -95,17 +95,21 @@ def _record_chain_failure(
         + ("Persistent kill switch activated; investigate manually."
            if mismatch else "Manual investigation is required.")
     )
-    store.update_proposal_status_if_current(
-        proposal_id,
-        expected_statuses=RECONCILABLE_STATUSES,
-        new_status=SUBMISSION_UNKNOWN,
-        error=reason,
-    )
     if mismatch:
-        store.activate_reconciliation_halt(
-            proposal_id=proposal_id,
+        store.park_reconciliation_anomaly_and_halt(
+            proposal_id,
+            expected_statuses=RECONCILABLE_STATUSES,
             reason=reason,
+            reconciled_at=datetime.now(timezone.utc).isoformat(),
             details={"path": "startup_replacement_chain"},
+            anomaly_key="startup_replacement_chain_identity_mismatch",
+        )
+    else:
+        store.update_proposal_status_if_current(
+            proposal_id,
+            expected_statuses=RECONCILABLE_STATUSES,
+            new_status=SUBMISSION_UNKNOWN,
+            error=reason,
         )
     if result is not None:
         result["errors"].append(reason)
@@ -203,16 +207,13 @@ def apply_broker_update(
             f"Broker reconciliation identity mismatch for {proposal['proposal_id']}: {detail}. "
             "Persistent kill switch activated."
         )
-        store.update_proposal_status_if_current(
+        store.park_reconciliation_anomaly_and_halt(
             proposal["proposal_id"],
             expected_statuses=RECONCILABLE_STATUSES,
-            new_status=SUBMISSION_UNKNOWN,
-            error=reason,
-        )
-        store.activate_reconciliation_halt(
-            proposal_id=proposal["proposal_id"],
             reason=reason,
+            reconciled_at=datetime.now(timezone.utc).isoformat(),
             details={"mismatch": detail, "path": "broker_update_identity"},
+            anomaly_key="broker_update_identity_mismatch",
         )
         raise ProposalExecutionError(reason)
     return journal_broker_order_update(

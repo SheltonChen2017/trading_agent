@@ -29,9 +29,11 @@ from assistant.proposal_status import (
     FILLED,
     PARTIALLY_FILLED,
     STATUSES,
+    SUBMISSION_UNKNOWN,
     UNRESOLVED_BROKER_STATE_STATUSES,
 )
 from assistant.money import decimal_text, to_decimal
+from assistant.dispatch_fence import execution_dispatch_fence
 from assistant.schemas import DecisionPacket
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trading_assistant.db"
@@ -4428,6 +4430,152 @@ class AssistantStore:
                 (fingerprint,),
             ).fetchone()
         return self._operational_alert_row(row)
+
+    def park_reconciliation_anomaly_and_halt(
+        self,
+        proposal_id: str,
+        *,
+        expected_statuses: tuple[str, ...],
+        reason: str,
+        reconciled_at: str,
+        details: dict[str, Any] | None = None,
+        anomaly_key: str,
+        new_status: str = SUBMISSION_UNKNOWN,
+    ) -> dict[str, Any]:
+        """Atomically park a broker anomaly and engage durable containment.
+
+        Identity anomalies are one logical safety transition: when the
+        proposal is still reconcilable it moves to ``submission_unknown``,
+        while the persistent kill switch and critical operator alert are
+        written in the same transaction.  A concurrent terminal projection
+        is allowed to win the proposal row, but never suppresses the halt.
+
+        ``anomaly_key`` identifies one observation path for one proposal.
+        Replaying that key reasserts the halt without rewriting the proposal
+        or incrementing the alert occurrence count.  The execution reservation
+        is deliberately untouched: ambiguity must continue consuming the
+        submission budget and duplicate-intent slot.
+        """
+        if not isinstance(proposal_id, str) or not proposal_id.strip():
+            raise ValueError("proposal_id must be a non-empty string")
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError("reason must be a non-empty string")
+        reconciled_at = _parse_aware_timestamp(
+            reconciled_at, "reconciled_at"
+        ).astimezone(timezone.utc).isoformat()
+        if not isinstance(anomaly_key, str) or not anomaly_key.strip():
+            raise ValueError("anomaly_key must be a non-empty string")
+        if not isinstance(new_status, str) or not new_status.strip():
+            raise ValueError("new_status must be a non-empty string")
+
+        fingerprint = f"broker_reconciliation:{proposal_id}:{anomaly_key}"
+        alert_details = {
+            **(details or {}),
+            "proposal_id": proposal_id,
+            "anomaly_key": anomaly_key,
+        }
+        kill_switch = {
+            "active": True,
+            "reason": reason,
+            "changed_at": reconciled_at,
+        }
+        connection = self._open_database(self.path)
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            proposal_row = connection.execute(
+                "SELECT payload_json, status FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+            if proposal_row is None:
+                raise KeyError(f"Unknown proposal: {proposal_id}")
+
+            existing_alert = connection.execute(
+                "SELECT alert_id FROM operational_alerts WHERE fingerprint = ?",
+                (fingerprint,),
+            ).fetchone()
+            replay = existing_alert is not None
+            proposal = json.loads(proposal_row["payload_json"])
+            proposal["status"] = proposal_row["status"]
+            proposal_parked = False
+            if not replay and proposal_row["status"] in expected_statuses:
+                proposal.update(
+                    {
+                        "status": new_status,
+                        "reconciled_at": reconciled_at,
+                        "error": reason,
+                    }
+                )
+                updated = connection.execute(
+                    "UPDATE trade_proposals SET status = ?, payload_json = ?, updated_at = ? "
+                    "WHERE proposal_id = ? AND status = ?",
+                    (
+                        new_status,
+                        json.dumps(proposal, sort_keys=True, default=str),
+                        reconciled_at,
+                        proposal_id,
+                        proposal_row["status"],
+                    ),
+                )
+                if updated.rowcount != 1:
+                    raise RuntimeError(
+                        f"Proposal {proposal_id} changed during atomic anomaly containment"
+                    )
+                proposal_parked = True
+
+            connection.execute(
+                "INSERT INTO system_state(state_key, value_json, updated_at) "
+                "VALUES (?, ?, ?) ON CONFLICT(state_key) DO UPDATE SET "
+                "value_json = excluded.value_json, updated_at = excluded.updated_at",
+                (
+                    "kill_switch",
+                    json.dumps(kill_switch, sort_keys=True),
+                    reconciled_at,
+                ),
+            )
+            if not replay:
+                connection.execute(
+                    """
+                    INSERT INTO operational_alerts(
+                        fingerprint, severity, category, message, details_json,
+                        status, occurrences, first_seen_at, last_seen_at,
+                        acknowledged_at
+                    ) VALUES (?, 'critical', 'broker_reconciliation', ?, ?,
+                              'open', 1, ?, ?, NULL)
+                    """,
+                    (
+                        fingerprint,
+                        reason,
+                        json.dumps(alert_details, sort_keys=True, default=str),
+                        reconciled_at,
+                        reconciled_at,
+                    ),
+                )
+            alert_row = connection.execute(
+                "SELECT * FROM operational_alerts WHERE fingerprint = ?",
+                (fingerprint,),
+            ).fetchone()
+            connection.commit()
+            result = {
+                "proposal": proposal,
+                "proposal_parked": proposal_parked,
+                "kill_switch": kill_switch,
+                "alert": self._operational_alert_row(alert_row),
+            }
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+        # The halt is durable before waiting here.  Draining the same fence
+        # used by broker dispatch guarantees this method cannot report
+        # containment complete while a process that passed an earlier switch
+        # check is still between authorization and durable broker projection.
+        # Re-entry is safe when the anomaly is discovered by the dispatching
+        # thread itself.
+        with execution_dispatch_fence(self.path):
+            pass
+        return result
 
     def get_kill_switch(self) -> dict[str, Any]:
         value = self.get_system_state("kill_switch", default={"active": False, "reason": ""})

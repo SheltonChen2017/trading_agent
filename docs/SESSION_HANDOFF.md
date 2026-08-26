@@ -2,7 +2,12 @@
 
 Prepared: 2026-08-26 by Codex after counter-reviewing Claude's amendments to
 the owner-directed main-line coordination of the three-strategy parallel
-development program.
+development program. Amended the same day by Claude under owner direction:
+the Codex counter-review step is removed from the lane loop, Claude's review
+disposition is final for each milestone, and the owner directed finalization:
+publish the coordination branch, merge it to `main`, and fast-forward the
+three lane branches onto the merged head. The exact published topology after
+those steps is verifiable in Git and is not restated here as prose.
 
 This concise handoff replaces the SEP-3 pause-transition snapshot. Historical
 detail remains at
@@ -48,8 +53,9 @@ and in `docs/Archive/Review/`.
   `a6cc4fb4b9cf83d1651226983e5e80c9bce104a8`; the exact commit disposition and
   P0-P3 ledger are in
   `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`
-  at `bcd2e79`. These counter-review commits are local until the owner directs
-  a push.
+  at `bcd2e79`. That was the final counter-review: the owner removed the
+  counter-review step from the operating model the same day and directed
+  publication of the counter-review commits together with this finalization.
 
 The three owner PDFs were inspected as text and visually page by page. Their
 page counts, byte sizes, and SHA-256 hashes are pinned in the lane records.
@@ -63,8 +69,9 @@ dangerous-direction mutation failed as intended and restored green, and
 reported 4,570 passed and one active-document failure: this handoff's resume
 prompt had lost the exact statement that provider access remains an open owner
 decision. That counter-review-introduced wording defect was corrected and the
-61 active-document checks passed again. The clean complete-suite rerun result
-is recorded by the final validation-only handoff commit.
+61 active-document checks passed again. The clean complete-suite rerun at
+`f4dbd95418de3b8e8f144f904ab9bcb5d73599be` then passed **4,571 tests with 0
+failures and 25 known warnings in 1,350.86 seconds**.
 
 ## 3. Parallel-work exception and handoff rule
 
@@ -78,12 +85,15 @@ The owner-directed main-line coordination surface is
 main-line coordination change may update that record, this handoff, or the
 Action Plan while strategy branches are active.
 
-Each lane uses a dedicated isolated clone or worktree. Codex implements,
-Claude independently reviews, and Codex counter-reviews on the same strategy
-branch, but agents and lanes do not share a checkout. No review/counter-review
-branch is created. Work is serialized: fetch and fast-forward, verify exact
-branch/HEAD/status, commit one bounded stage with its record update, then push.
-Never force-push or rewrite published lane history.
+Each lane uses a dedicated isolated clone or worktree. Codex implements and
+Claude independently reviews on the same strategy branch, but agents and
+lanes do not share a checkout. There is no Codex counter-review step;
+Claude's review disposition is final for each milestone (owner decision,
+2026-08-26), and the three lane review sessions run as dedicated Claude
+sessions. No review/counter-review branch is created. Work is serialized:
+fetch and fast-forward, verify exact branch/HEAD/status, commit one bounded
+stage with its record update, then push. Never force-push or rewrite
+published lane history.
 
 Lane agents also leave repository-shared merge surfaces unchanged, including
 `requirements.txt`, `config.py`, CI/tooling configuration, and shared test or
@@ -207,7 +217,8 @@ workflow/data register, another lane, SEP-3, requirements.txt, config.py,
 CI/tooling configuration, or shared test/classification manifests. Codex
 implements one bounded milestone in lane-owned files and updates the lane
 record before pushing; Claude reviews the exact pushed commits on the same
-branch from a separate checkout; Codex counter-reviews there. Access no
+branch from a separate checkout, and Claude's review disposition is final —
+there is no counter-review step. Access no
 outcomes or providers unless that exact action is separately authorized and
 preregistered; provider access remains an open owner decision. Before any
 real-outcome study, freeze the one shared final holdout and three-attempt

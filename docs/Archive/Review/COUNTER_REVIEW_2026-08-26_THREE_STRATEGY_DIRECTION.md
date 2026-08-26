@@ -71,14 +71,13 @@ There are no P0 or P1 findings.
 | Focused three-strategy direction checks | 3 passed |
 | Complete `tests/test_active_document_consistency.py` | 61 passed |
 | Dangerous-direction mutation | deleting the exact one-common-holdout requirement failed the new guard; restored green |
+| First complete-suite attempt | 4,570 passed / 1 failed / 25 warnings; the counter-review handoff had omitted the exact open-owner-decision wording required by an existing authorization guard |
+| Clean complete-suite rerun | **4,571 passed / 0 failed / 25 warnings** in 1,350.86 seconds at `f4dbd95418de3b8e8f144f904ab9bcb5d73599be` |
+| `compileall` including `research/` | passed |
 | `git diff --check` | clean before the correction commit |
 | Remote review head | stable at `c88ac4f379aba996b48fb7f70e5210edda3c7320` |
 | Three remote lane heads | all remain `c9dcdb647914acbfcefce187a138f52fcdad0c68` |
 | Outcomes/provider/broker/operator store/QC/deployment | not accessed |
-
-The complete repository suite and compile check are run on the finalized
-counter-review tree before handoff. Their exact results belong in the final
-handoff rather than being predicted here.
 
 ## 6. Remaining gates and next step
 

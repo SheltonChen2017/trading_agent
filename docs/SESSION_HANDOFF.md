@@ -2,12 +2,11 @@
 
 Prepared: 2026-08-26 by Codex after counter-reviewing Claude's amendments to
 the owner-directed main-line coordination of the three-strategy parallel
-development program. Amended the same day by Claude under owner direction:
-the Codex counter-review step is removed from the lane loop, Claude's review
-disposition is final for each milestone, and the owner directed finalization:
-publish the coordination branch, merge it to `main`, and fast-forward the
-three lane branches onto the merged head. The exact published topology after
-those steps is verifiable in Git and is not restated here as prose.
+development program. Corrected the same day under explicit owner clarification:
+the instruction removing Codex counter-review was accidental and is
+superseded. The standing lane loop remains Codex implementation, Claude
+independent review, then Codex counter-review plus the next bounded milestone
+before one combined Codex push.
 
 This concise handoff replaces the SEP-3 pause-transition snapshot. Historical
 detail remains at
@@ -53,9 +52,9 @@ and in `docs/Archive/Review/`.
   `a6cc4fb4b9cf83d1651226983e5e80c9bce104a8`; the exact commit disposition and
   P0-P3 ledger are in
   `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`
-  at `bcd2e79`. That was the final counter-review: the owner removed the
-  counter-review step from the operating model the same day and directed
-  publication of the counter-review commits together with this finalization.
+  at `bcd2e79`. The owner later clarified that an instruction removing future
+  counter-reviews was accidental; counter-review remains a required stage in
+  every lane cycle.
 
 The three owner PDFs were inspected as text and visually page by page. Their
 page counts, byte sizes, and SHA-256 hashes are pinned in the lane records.
@@ -78,6 +77,17 @@ known warnings in 1,626.69 seconds**. The temporary worktree was clean and was
 removed. The concurrent unstaged workflow edits were preserved and excluded
 from every counter-review commit.
 
+Owner-clarification restoration, 2026-08-26: the standing Codex
+counter-review-plus-next-milestone loop was restored on
+`codex/restore-counterreview-workflow-20260826` without changing `main`
+directly. The three focused coordination checks passed; deleting the exact
+counter-review stage heading made the guard fail and restoration returned it
+green; all 61 active-document checks passed; `compileall` including
+`research/` passed; and the complete suite passed **4,571 tests with 0
+failures and 25 known warnings in 1,644.79 seconds**. No provider, outcome,
+QuantConnect job, broker, operator store, deployment, or strategy runtime was
+accessed or changed.
+
 ## 3. Parallel-work exception and handoff rule
 
 During the three-lane phase, agents must not edit this handoff or the Action
@@ -90,15 +100,15 @@ The owner-directed main-line coordination surface is
 main-line coordination change may update that record, this handoff, or the
 Action Plan while strategy branches are active.
 
-Each lane uses a dedicated isolated clone or worktree. Codex implements and
-Claude independently reviews on the same strategy branch, but agents and
-lanes do not share a checkout. There is no Codex counter-review step;
-Claude's review disposition is final for each milestone (owner decision,
-2026-08-26), and the three lane review sessions run as dedicated Claude
-sessions. No review/counter-review branch is created. Work is serialized:
-fetch and fast-forward, verify exact branch/HEAD/status, commit one bounded
-stage with its record update, then push. Never force-push or rewrite
-published lane history.
+Each lane uses a dedicated isolated clone or worktree. Codex implements,
+Claude independently reviews, and Codex counter-reviews on the same strategy
+branch, but agents and lanes do not share a checkout. No
+review/counter-review branch is created. After Claude pushes its review,
+Codex counter-reviews every Claude commit and corrects confirmed defects. If
+accepted or accepted-after-correction and no owner decision blocks progress,
+Codex then implements the next bounded milestone, validates both stages,
+updates the lane record, and makes exactly one combined push. Never
+force-push or rewrite published lane history.
 
 Lane agents also leave repository-shared merge surfaces unchanged, including
 `requirements.txt`, `config.py`, CI/tooling configuration, and shared test or
@@ -222,8 +232,9 @@ workflow/data register, another lane, SEP-3, requirements.txt, config.py,
 CI/tooling configuration, or shared test/classification manifests. Codex
 implements one bounded milestone in lane-owned files and updates the lane
 record before pushing; Claude reviews the exact pushed commits on the same
-branch from a separate checkout, and Claude's review disposition is final —
-there is no counter-review step. Access no
+branch from a separate checkout; Codex then counter-reviews every Claude
+commit, corrects confirmed defects, and, only when accepted and unblocked,
+implements the next bounded milestone before one combined push. Access no
 outcomes or providers unless that exact action is separately authorized and
 preregistered; provider access remains an open owner decision. Before any
 real-outcome study, freeze the one shared final holdout and three-attempt

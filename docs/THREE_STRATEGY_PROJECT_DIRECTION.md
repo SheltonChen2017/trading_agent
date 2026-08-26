@@ -36,15 +36,17 @@ checkout. Work is independent and serialized inside each lane:
    records commit dispositions and a P0-P3 ledger, corrects only confirmed
    defects, adds regression guards for its own corrections, updates the lane
    record, commits, and pushes that same branch.
-3. Codex fetches and fast-forwards the reviewed head, then the loop repeats
-   for the next bounded milestone.
+3. Codex counter-reviews every Claude commit, independently reproduces
+   material claims, corrects confirmed defects, and adds dangerous-direction
+   regressions. If the review is accepted or accepted-after-correction and no
+   owner decision blocks progress, Codex implements the next bounded lane
+   milestone, validates both stages, updates the lane record, and makes one
+   combined push.
+4. Claude reviews that exact combined push, and the loop repeats from step 3.
 
-**Owner decision, 2026-08-26: there is no Codex counter-review step.**
-Claude's review disposition is final for each milestone. The three lane
-review sessions run as dedicated Claude sessions. Because no second reviewer
-follows, Claude's review must itself carry the full burden: reproduce
-material claims independently, mutation-test its own corrections, and never
-accept a validation claim without rerunning it.
+**Owner clarification, 2026-08-26:** the standing Codex counter-review step
+remains required. The instruction that removed it was accidental and is
+superseded by this operating model.
 
 No implementation, review, counter-review, or checkpoint branch is created
 inside a strategy lane. Only one agent writes or pushes a lane at a time. No
@@ -143,7 +145,7 @@ separately characterize, the same shared account.
 ## 5. Main-line integration direction
 
 Parallel development ends only after each canonical strategy has completed
-its independent review chain and has an honest disposition:
+its independent review/counter-review chain and has an honest disposition:
 accepted, accepted-after-correction, rejected, or valid null. A valid null
 closes that lane's canonical family; the lane must not tune or rerun that
 family to make it pass. Any later hypothesis must be a separately
@@ -210,8 +212,9 @@ single-execution main-line audits for shared providers.
 **Codex counter-review, 2026-08-26:** accepted after correction (`a6cc4fb`);
 the commit disposition and P0-P3 ledger are in
 `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`.
-That was the final counter-review: the owner then removed the counter-review
-step from the operating model the same day, as recorded in section 1.
+The owner later clarified that removing future counter-reviews was accidental;
+the standing counter-review-plus-next-milestone loop remains required, as
+recorded in section 1.
 Finalization — publishing this record, merging it to `main`, and
 fast-forwarding the three lane branches onto the merged head so every lane
 carries the final coordination documents — precedes the creation of the three

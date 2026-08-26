@@ -124,18 +124,14 @@ def run_submission_reconciliation(
                     f"proposal's intent (mismatch: {mismatch_detail}; expected {expected_desc}; broker "
                     f"returned {outcome}) -- persistent kill switch activated; investigate manually."
                 )
-                store.update_proposal_status_if_current(
+                store.park_reconciliation_anomaly_and_halt(
                     proposal_id,
                     expected_statuses=(deps.reconciling,),
-                    new_status=deps.submission_unknown,
                     reconciled_at=reconciled_at,
-                    error=reason,
-                )
-                store.activate_reconciliation_halt(
-                    proposal_id=proposal_id,
                     reason=reason,
-                    seen_at=reconciled_at,
+                    new_status=deps.submission_unknown,
                     details={"mismatch": mismatch_detail, "path": "manual_lookup"},
+                    anomaly_key="manual_lookup_identity_mismatch",
                 )
                 raise deps.proposal_execution_error(
                     f"Reconciliation for {proposal_id} found a MISMATCHED order ({mismatch_detail}) -- left "
@@ -156,19 +152,23 @@ def run_submission_reconciliation(
                     + ("Persistent kill switch activated; investigate manually."
                        if is_mismatch else "Left retryable as 'submission_unknown'.")
                 )
-                store.update_proposal_status_if_current(
-                    proposal_id,
-                    expected_statuses=(deps.reconciling,),
-                    new_status=deps.submission_unknown,
-                    reconciled_at=reconciled_at,
-                    error=reason,
-                )
                 if is_mismatch:
-                    store.activate_reconciliation_halt(
-                        proposal_id=proposal_id,
+                    store.park_reconciliation_anomaly_and_halt(
+                        proposal_id,
+                        expected_statuses=(deps.reconciling,),
                         reason=reason,
-                        seen_at=reconciled_at,
+                        reconciled_at=reconciled_at,
+                        new_status=deps.submission_unknown,
                         details={"path": "manual_replacement_chain"},
+                        anomaly_key="manual_replacement_chain_identity_mismatch",
+                    )
+                else:
+                    store.update_proposal_status_if_current(
+                        proposal_id,
+                        expected_statuses=(deps.reconciling,),
+                        new_status=deps.submission_unknown,
+                        reconciled_at=reconciled_at,
+                        error=reason,
                     )
                 raise deps.proposal_execution_error(reason)
 

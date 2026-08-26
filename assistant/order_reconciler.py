@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import inspect
 import math
+import time
 from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
 from threading import Event, Thread
@@ -31,6 +32,7 @@ from assistant.proposal_status import (
     RECONCILING,
     SUBMISSION_UNKNOWN,
     SUBMITTING,
+    UNRESOLVED_BROKER_STATE_STATUSES,
 )
 from assistant.storage import AssistantStore
 
@@ -42,7 +44,9 @@ _STREAM_SHUTDOWN_POLL_SECONDS = 0.1
 # preflight + submit + the broker's own order-indexing latency). See
 # _absence_is_believable() for why believing it too early is harmful.
 MIN_ABSENCE_AGE_SECONDS = BROKER_ABSENCE_GRACE_SECONDS
-_CANCEL_ALL_MAX_BOOK_SCANS = 4
+_CANCEL_ALL_MAX_BOOK_SCANS = 5
+_CANCEL_ALL_REQUIRED_STABLE_SCANS = 3
+_CANCEL_ALL_SCAN_INTERVAL_SECONDS = 0.05
 
 
 def _emergency_order_mapping(order: Any) -> dict[str, Any]:
@@ -480,7 +484,13 @@ def cancel_all_open_orders(
     investigation after the cancellation request.
     """
     if broker_module is None:
-        import execution.alpaca_broker as broker_module
+        # One emergency operation must stay on one immutable credential/mode
+        # context.  Re-reading module-level environment configuration between
+        # the open-book scan, client-ID lookup, and cancel request could query
+        # one account and cancel on another if credentials rotate mid-drain.
+        from execution.alpaca_broker import open_alpaca_broker_session
+
+        broker_module = open_alpaca_broker_session()
     if not isinstance(reason, str) or not reason.strip():
         raise ValueError("cancel-all reason must be non-empty")
     normalized_reason = reason.strip()
@@ -498,29 +508,40 @@ def cancel_all_open_orders(
     unmanaged = 0
     requested_ids: set[str] = set()
     previous_ids: frozenset[str] | None = None
+    consecutive_stable_scans = 0
     initial_order_count: int | None = None
     final_open_order_count: int | None = None
+    unresolved_attempt_count = 0
     book_stable = False
     scans = 0
 
-    # The switch is already durable.  Acquiring the common fence now drains
-    # any dispatch that passed an earlier switch check; its order must become
-    # visible to one of the bounded scans before cancel-all can return.
+    # The switch is already durable. Acquiring the common fence now drains a
+    # dispatch that passed an earlier switch check. Open-order indexing may lag
+    # a successful submit, so every scan also resolves durable local attempts
+    # by order ID or idempotency key; one empty endpoint response is never
+    # accepted as proof that cancellation is complete.
     with execution_dispatch_fence(store.path):
-        for _ in range(_CANCEL_ALL_MAX_BOOK_SCANS):
+        for scan_index in range(_CANCEL_ALL_MAX_BOOK_SCANS):
             scans += 1
+            scan_incomplete = False
+            candidates: dict[
+                str, tuple[dict[str, Any], dict[str, Any] | None]
+            ] = {}
+
             try:
                 orders = broker_module.get_open_orders()
             except Exception as exc:
+                orders = []
+                scan_incomplete = True
                 errors.append(
                     {
                         "order_id": None,
                         "error": f"open-order query failed: {exc}",
                     }
                 )
-                final_open_order_count = None
-                break
             if not isinstance(orders, (list, tuple)):
+                orders = []
+                scan_incomplete = True
                 errors.append(
                     {
                         "order_id": None,
@@ -530,23 +551,19 @@ def cancel_all_open_orders(
                         ),
                     }
                 )
-                final_open_order_count = None
-                break
-            if initial_order_count is None:
+            if initial_order_count is None and not scan_incomplete:
                 initial_order_count = len(orders)
 
-            identified: list[tuple[str, dict[str, Any]]] = []
-            current_ids: set[str] = set()
-            unusable_rows = 0
             for order in orders:
                 order_id, normalized_order = _emergency_order_id(order)
                 if order_id is None:
-                    unusable_rows += 1
+                    scan_incomplete = True
                     errors.append(
                         {"order_id": None, "error": "broker open order has no usable ID"}
                     )
                     continue
-                if order_id in current_ids:
+                if order_id in candidates:
+                    scan_incomplete = True
                     errors.append(
                         {
                             "order_id": order_id,
@@ -554,53 +571,122 @@ def cancel_all_open_orders(
                         }
                     )
                     continue
-                current_ids.add(order_id)
                 normalized_order["order_id"] = order_id
-                identified.append((order_id, normalized_order))
+                candidates[order_id] = (normalized_order, None)
 
-            current_fingerprint = frozenset(current_ids)
+            unresolved_attempt_count = 0
+            try:
+                durable_proposals = store.list_proposals_by_statuses(
+                    UNRESOLVED_BROKER_STATE_STATUSES
+                )
+            except Exception as exc:
+                durable_proposals = []
+                scan_incomplete = True
+                errors.append(
+                    {
+                        "order_id": None,
+                        "error": f"durable submission query failed: {exc}",
+                    }
+                )
+            for proposal in durable_proposals:
+                order: dict[str, Any] | None = None
+                for key in ("broker_order", "broker_order_update"):
+                    value = proposal.get(key)
+                    if isinstance(value, Mapping):
+                        order = dict(value)
+                        break
+                order_id: str | None = None
+                if order is not None:
+                    order_id, order = _emergency_order_id(order)
+                if order_id is None:
+                    idempotency_key = proposal.get("idempotency_key")
+                    lookup = getattr(broker_module, "find_order_by_client_id", None)
+                    if not isinstance(idempotency_key, str) or not idempotency_key:
+                        scan_incomplete = True
+                        unresolved_attempt_count += 1
+                        errors.append(
+                            {
+                                "order_id": None,
+                                "proposal_id": proposal.get("proposal_id"),
+                                "error": "unresolved submission has no usable idempotency key",
+                            }
+                        )
+                        continue
+                    if not callable(lookup):
+                        scan_incomplete = True
+                        unresolved_attempt_count += 1
+                        continue
+                    try:
+                        found = lookup(idempotency_key)
+                    except Exception as exc:
+                        scan_incomplete = True
+                        unresolved_attempt_count += 1
+                        errors.append(
+                            {
+                                "order_id": None,
+                                "proposal_id": proposal.get("proposal_id"),
+                                "error": f"unresolved submission lookup failed: {exc}",
+                            }
+                        )
+                        continue
+                    if found is None:
+                        # Broker absence is not credible during this short
+                        # emergency drain; normal reconciliation owns the
+                        # documented absence-grace proof.
+                        scan_incomplete = True
+                        unresolved_attempt_count += 1
+                        continue
+                    order_id, order = _emergency_order_id(found)
+                if order_id is None or order is None:
+                    scan_incomplete = True
+                    unresolved_attempt_count += 1
+                    errors.append(
+                        {
+                            "order_id": None,
+                            "proposal_id": proposal.get("proposal_id"),
+                            "error": "unresolved broker evidence has no usable order ID",
+                        }
+                    )
+                    continue
+                order["order_id"] = order_id
+                existing = candidates.get(order_id)
+                candidates[order_id] = (
+                    existing[0] if existing is not None else order,
+                    proposal,
+                )
+
+            current_ids = frozenset(candidates)
             final_open_order_count = (
-                None if unusable_rows else len(current_ids)
+                None if scan_incomplete else len(current_ids)
             )
-            if unusable_rows:
-                # The switch stays engaged and every identifiable order was
-                # still attempted below, but no scan containing an anonymous
-                # row can prove cancellation completeness.
-                book_stable = False
-            if not current_ids:
-                book_stable = not unusable_rows and not orders
-                break
-            if not unusable_rows and previous_ids == current_fingerprint:
-                book_stable = True
-                break
-            previous_ids = current_fingerprint
 
-            for order_id, order in identified:
+            # Retry failed requests on later scans. Stability is evaluated only
+            # after every currently visible/durable ID has a successful broker
+            # cancellation acknowledgement.
+            for order_id, (order, proposal_hint) in candidates.items():
                 if order_id in requested_ids:
                     continue
                 try:
-                    # Reach the broker before doing any local attribution or
-                    # projection. In an emergency, a damaged local database
-                    # must not stop a later order receiving cancellation.
                     cancel_result = broker_module.cancel_order(order_id)
                 except Exception as exc:
                     errors.append({"order_id": order_id, "error": str(exc)})
                     continue
                 requested_ids.add(order_id)
 
-                proposal: dict[str, Any] | None = None
-                try:
-                    proposal = _proposal_for_update(store, order)
-                except Exception as exc:
-                    errors.append(
-                        {
-                            "order_id": order_id,
-                            "error": (
-                                "cancel requested; local attribution failed: "
-                                f"{exc}"
-                            ),
-                        }
-                    )
+                proposal = proposal_hint
+                if proposal is None:
+                    try:
+                        proposal = _proposal_for_update(store, order)
+                    except Exception as exc:
+                        errors.append(
+                            {
+                                "order_id": order_id,
+                                "error": (
+                                    "cancel requested; local attribution failed: "
+                                    f"{exc}"
+                                ),
+                            }
+                        )
                 canceled.append(
                     {
                         "order_id": order_id,
@@ -631,8 +717,6 @@ def cancel_all_open_orders(
                         },
                     )
                 except Exception as exc:
-                    # Cancellation already reached the broker. Keep going so
-                    # corrupt local projection cannot strand later orders.
                     errors.append(
                         {
                             "order_id": order_id,
@@ -644,8 +728,39 @@ def cancel_all_open_orders(
                         }
                     )
 
-            if unusable_rows:
+            all_current_requested = current_ids.issubset(requested_ids)
+            if (
+                not scan_incomplete
+                and all_current_requested
+                and current_ids == previous_ids
+            ):
+                consecutive_stable_scans += 1
+            else:
+                consecutive_stable_scans = 1 if (
+                    not scan_incomplete and all_current_requested
+                ) else 0
+            previous_ids = current_ids
+            if consecutive_stable_scans >= _CANCEL_ALL_REQUIRED_STABLE_SCANS:
+                book_stable = True
                 break
+            if scan_index + 1 < _CANCEL_ALL_MAX_BOOK_SCANS:
+                time.sleep(_CANCEL_ALL_SCAN_INTERVAL_SECONDS)
+
+        if not book_stable:
+            store.activate_reconciliation_halt(
+                proposal_id="emergency-cancel-all",
+                reason=(
+                    "Emergency cancel-all could not prove every broker order "
+                    "received a cancellation request."
+                ),
+                seen_at=requested_at.isoformat(),
+                details={
+                    "reason": normalized_reason,
+                    "book_scan_count": scans,
+                    "unresolved_attempt_count": unresolved_attempt_count,
+                    "requested_order_ids": sorted(requested_ids),
+                },
+            )
 
         result = {
             "requested_at": requested_at.isoformat(),
@@ -659,6 +774,7 @@ def cancel_all_open_orders(
             "book_scan_count": scans,
             "book_stable": book_stable,
             "final_open_order_count": final_open_order_count,
+            "unresolved_attempt_count": unresolved_attempt_count,
         }
         store.set_system_state("last_cancel_all_open_orders", result)
         return result

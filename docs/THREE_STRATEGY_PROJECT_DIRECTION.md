@@ -26,8 +26,9 @@ records a later explicit amendment.
 ## 1. Operating model
 
 The project uses three Codex implementation sessions and three Claude review
-sessions, one pair per strategy. Work is independent and serialized inside
-each lane:
+sessions, one pair per strategy. Each lane's agents operate in their own
+clone or worktree; two lanes, or two agents inside one lane, never share a
+checkout. Work is independent and serialized inside each lane:
 
 1. Codex implements one bounded milestone, validates it, updates the lane
    record, commits, and pushes the lane branch.
@@ -54,8 +55,17 @@ During parallel development, strategy-lane agents must not edit:
 - `docs/ACTION_PLAN_2026-08-20.md`;
 - `docs/SESSION_HANDOFF.md`;
 - this main-line direction record;
-- the shared workflow/data-source register; or
-- another lane's source PDF or implementation record.
+- the shared workflow/data-source register;
+- another lane's source PDF or implementation record; or
+- repository-shared files whose change would bind every lane at merge time:
+  `requirements.txt`, `config.py`, CI/tooling configuration, and shared test
+  or classification manifests.
+
+Each lane keeps its new code, tests, and fixtures in lane-owned modules and
+test files named for its strategy, so the eventual merges cannot collide. A
+lane that genuinely needs a new dependency or a shared-file change stops and
+asks for one common-baseline amendment instead of editing the file on its
+branch.
 
 Every lane push updates its own implementation record with exact starting and
 ending commits, role, milestone, files, validation, findings, data vintages,
@@ -117,12 +127,28 @@ No credential, licensed row, provider endpoint, or outcome is accessed merely
 because a branch exists. Acquisition, structural audit, and research-look
 authority remain separate owner decisions.
 
+Structural audits of providers that serve every lane — QuantConnect dataset
+entitlements, the security master, prices/corporate actions, ETF
+constituents, calendars — are main-line coordination tasks: the owner
+authorizes one audit, one agent performs it, and the result is recorded once
+by a common-baseline amendment. Three lanes must not separately audit, or
+separately characterize, the same shared account.
+
 ## 5. Main-line integration direction
 
 Parallel development ends only after each canonical strategy has completed
 its independent review/counter-review chain and has an honest disposition:
-accepted, accepted-after-correction, rejected, or valid null. A null strategy
-is not tuned until it passes.
+accepted, accepted-after-correction, rejected, or valid null. A null result
+closes that lane's canonical family; no lane re-tunes a null strategy until
+it passes.
+
+Because the combined evaluation must be untouched by all three lanes, the
+owner freezes one shared final-holdout boundary — a common cutoff date and
+reserved period — before any lane performs its first real-outcome study, and
+every lane's preregistered splits must leave that shared period unconsumed.
+The combined evaluation also treats the three lanes as one selection family:
+its evidence thresholds must account for the fact that the surviving
+strategies were selected from three parallel attempts.
 
 The owner then schedules a separate integration milestone. That milestone
 must:
@@ -163,3 +189,13 @@ common branch baseline. After that review, each Codex strategy session starts
 only the first contract/fixture milestone named in its own implementation
 record. No lane starts a real-outcome study or QuantConnect execution by
 inference.
+
+**Claude review, 2026-08-26 (owner-directed):** the coordination record and
+the common baseline `c9dcdb6` were reviewed against the workflow, the
+data-source register, all three lane records, and the consistency tests; the
+three published lane heads were re-verified at the stated baseline commit.
+The direction was accepted with four amendments incorporated above: per-lane
+checkouts, a frozen shared-file list with lane-owned namespaces, a shared
+final-holdout reservation with cross-lane selection accounting, and
+single-execution main-line audits for shared providers. Codex counter-review
+of this record is the next coordination step.

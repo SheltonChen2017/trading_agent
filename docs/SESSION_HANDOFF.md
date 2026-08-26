@@ -1,7 +1,8 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-26 by Codex for the owner-directed main-line coordination of
-the three-strategy parallel development program.
+Prepared: 2026-08-26 by Codex after counter-reviewing Claude's amendments to
+the owner-directed main-line coordination of the three-strategy parallel
+development program.
 
 This concise handoff replaces the SEP-3 pause-transition snapshot. Historical
 detail remains at
@@ -13,11 +14,12 @@ and in `docs/Archive/Review/`.
 1. `CLAUDE.md` and `AGENTS.md`.
 2. `docs/ACTION_PLAN_2026-08-20.md`.
 3. `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`.
-4. `docs/Strategy Description/README.md`.
-5. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
-6. The selected lane's PDF and implementation record.
-7. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
-8. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
+4. `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`.
+5. `docs/Strategy Description/README.md`.
+6. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
+7. The selected lane's PDF and implementation record.
+8. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
+9. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
    discussion and `docs/operations/OPERATIONAL_FACTS.md` before operational
    work.
 
@@ -36,14 +38,33 @@ and in `docs/Archive/Review/`.
 - Each corresponding `origin/codex/strategy-*` remote head was verified at
   `c9dcdb647914acbfcefce187a138f52fcdad0c68`. Branch publication is not a
   research run, merge, deployment, or trading authority.
-- Main-line direction is being prepared on
-  `codex/main-three-strategy-direction-20260826`, descended from the shared
-  baseline so the strategy branches retain one common history after merge.
+- Main-line direction was implemented at
+  `d00c0e0eb7bae35df34aa031404cdb7940d84301` on
+  `codex/main-three-strategy-direction-20260826`. Claude amended and accepted
+  it at the stable pushed head
+  `c88ac4f379aba996b48fb7f70e5210edda3c7320`.
+- Codex counter-reviewed Claude's sole commit as **accepted after correction**.
+  The null-result correction and coordination regression guard are
+  `a6cc4fb4b9cf83d1651226983e5e80c9bce104a8`; the exact commit disposition and
+  P0-P3 ledger are in
+  `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`
+  at `bcd2e79`. These counter-review commits are local until the owner directs
+  a push.
 
 The three owner PDFs were inspected as text and visually page by page. Their
 page counts, byte sizes, and SHA-256 hashes are pinned in the lane records.
 No strategy code, vendor data, outcome, backtest, or QuantConnect job was
 executed while creating this baseline.
+
+Counter-review validation before finalization: the three focused direction
+checks passed, all 61 active-document checks passed, the common-holdout
+dangerous-direction mutation failed as intended and restored green, and
+`compileall` including `research/` passed. The first complete-suite attempt
+reported 4,570 passed and one active-document failure: this handoff's resume
+prompt had lost the exact statement that provider access remains an open owner
+decision. That counter-review-introduced wording defect was corrected and the
+61 active-document checks passed again. The clean complete-suite rerun result
+is recorded by the final validation-only handoff commit.
 
 ## 3. Parallel-work exception and handoff rule
 
@@ -57,11 +78,18 @@ The owner-directed main-line coordination surface is
 main-line coordination change may update that record, this handoff, or the
 Action Plan while strategy branches are active.
 
-Codex implements, Claude independently reviews, and Codex counter-reviews on
-the same strategy branch. No review/counter-review branch is created. Work is
-serialized: fetch and fast-forward, verify exact branch/HEAD/status, commit one
-bounded stage with its record update, then push. Never force-push or rewrite
-published lane history.
+Each lane uses a dedicated isolated clone or worktree. Codex implements,
+Claude independently reviews, and Codex counter-reviews on the same strategy
+branch, but agents and lanes do not share a checkout. No review/counter-review
+branch is created. Work is serialized: fetch and fast-forward, verify exact
+branch/HEAD/status, commit one bounded stage with its record update, then push.
+Never force-push or rewrite published lane history.
+
+Lane agents also leave repository-shared merge surfaces unchanged, including
+`requirements.txt`, `config.py`, CI/tooling configuration, and shared test or
+classification manifests. New code, tests, and fixtures use lane-owned
+strategy namespaces. A true shared-file or dependency need stops for one
+owner-directed common-baseline amendment.
 
 ## 4. Strategy state
 
@@ -160,17 +188,28 @@ correlation, risk budgets, combined costs/turnover/capacity, untouched final
 holdout, QC parity, paper deployment, monitoring, reconciliation, kill switch,
 and explicit promotion. No leverage is planned for the canonical strategies.
 
+Before any lane performs its first real-outcome study, the owner must freeze
+one common final-holdout cutoff and reserved period that all three lanes leave
+unconsumed. The combined evidence threshold must treat the three lanes as one
+selection family. A valid canonical null closes its family; it is not tuned or
+rerun to pass. Any later hypothesis needs a separately preregistered family
+and a new owner-authorized permanent look budget.
+
 ## 8. Resume prompt
 
 ```text
 Select exactly one strategy lane and use its long-lived codex/strategy-*
-branch. Read CLAUDE.md, AGENTS.md, the shared workflow, that lane's owner PDF,
-implementation record, and the data-source register. Verify exact branch,
-HEAD, upstream, and clean status. Do not edit the Action Plan, Session Handoff,
-shared workflow/data register, another lane, or SEP-3. Codex implements one
-bounded milestone and updates the lane record before pushing; Claude reviews
-the exact pushed commits on the same branch; Codex counter-reviews there.
-Access no outcomes or providers unless that exact action is separately
-authorized and preregistered; provider access is an open owner decision.
-Preserve paper-epoch-006.
+branch in its own dedicated clone or worktree. Read CLAUDE.md, AGENTS.md, the
+main-line direction, shared workflow, that lane's owner PDF, implementation
+record, and the data-source register. Verify exact branch, HEAD, upstream, and
+clean status. Do not edit the Action Plan, Session Handoff, shared
+workflow/data register, another lane, SEP-3, requirements.txt, config.py,
+CI/tooling configuration, or shared test/classification manifests. Codex
+implements one bounded milestone in lane-owned files and updates the lane
+record before pushing; Claude reviews the exact pushed commits on the same
+branch from a separate checkout; Codex counter-reviews there. Access no
+outcomes or providers unless that exact action is separately authorized and
+preregistered; provider access remains an open owner decision. Before any
+real-outcome study, freeze the one shared final holdout and three-attempt
+selection contract. Preserve paper-epoch-006.
 ```

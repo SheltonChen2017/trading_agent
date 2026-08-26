@@ -1,7 +1,9 @@
 # Counter-review — three-strategy project direction
 
-Counter-reviewer: Codex, 2026-08-26  
-Independent reviewer: Claude  
+Counter-reviewer: Codex, 2026-08-26
+
+Independent reviewer: Claude
+
 Governing documents: `CLAUDE.md`,
 `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, and
 `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`

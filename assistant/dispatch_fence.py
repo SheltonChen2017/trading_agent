@@ -15,6 +15,7 @@ would allow two processes to believe they hold the same named fence.
 from __future__ import annotations
 
 import math
+import os
 import sys
 import threading
 import time
@@ -42,7 +43,11 @@ def _finite_nonnegative_seconds(value: object, *, name: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ValueError(f"{name} must be a finite non-negative real number")
     parsed = float(value)
-    if not math.isfinite(parsed) or parsed < 0:
+    if (
+        not math.isfinite(parsed)
+        or parsed < 0
+        or parsed > threading.TIMEOUT_MAX
+    ):
         raise ValueError(f"{name} must be a finite non-negative real number")
     return parsed
 
@@ -81,6 +86,30 @@ class _ProcessFenceState:
 
 _STATES_GUARD = threading.Lock()
 _STATES: dict[Path, _ProcessFenceState] = {}
+
+
+def _reset_after_fork() -> None:
+    """Discard process-local ownership inherited by a POSIX fork child.
+
+    ``flock`` state follows the inherited open file description.  Treating an
+    inherited ``depth`` as same-thread re-entry would let the child enter the
+    critical section without independently contending with its parent.  Close
+    only the child's duplicated handles (never issue an unlock against the
+    shared description), then rebuild all thread locks and state.
+    """
+    global _STATES, _STATES_GUARD
+    for state in _STATES.values():
+        if state.handle is not None:
+            try:
+                state.handle.close()
+            except OSError:
+                pass
+    _STATES = {}
+    _STATES_GUARD = threading.Lock()
+
+
+if hasattr(os, "register_at_fork"):
+    os.register_at_fork(after_in_child=_reset_after_fork)
 
 
 def _state_for(path: Path) -> _ProcessFenceState:

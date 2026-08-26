@@ -67,6 +67,7 @@ def test_docs_root_contains_only_current_coordination_and_active_plan() -> None:
         "FEATURE_MILESTONE_RECORD.md",
         "PROJECT_SEPARATION_IMPLEMENTATION_PLAN.md",
         "README.md",
+        "THREE_STRATEGY_PROJECT_DIRECTION.md",
     }
     actual = {path.name for path in (ROOT / "docs").iterdir() if path.is_file()}
     assert actual == allowed
@@ -105,6 +106,7 @@ def test_three_strategy_parallel_baseline_is_exact_and_fail_closed() -> None:
     workflow = _text("Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md")
     handoff = _text("SESSION_HANDOFF.md")
     action = _text("ACTION_PLAN_2026-08-20.md")
+    direction = _text("THREE_STRATEGY_PROJECT_DIRECTION.md")
 
     lanes = {
         "codex/strategy-analyst-revisions-v2": (
@@ -127,13 +129,14 @@ def test_three_strategy_parallel_baseline_is_exact_and_fail_closed() -> None:
         record = (strategy_dir / record_name).read_text(encoding="utf-8")
         with (strategy_dir / pdf_name).open("rb") as source:
             actual_digest = hashlib.file_digest(source, "sha256").hexdigest()
-        assert branch in workflow and branch in handoff and branch in record
+        assert branch in workflow and branch in handoff and branch in direction
+        assert branch in record
         assert actual_digest == digest
         assert actual_digest in record.lower()
         assert "docs/ACTION_PLAN_2026-08-20.md" in record
         assert "docs/SESSION_HANDOFF.md" in record
 
-    for document in (workflow, handoff, action):
+    for document in (workflow, handoff, action, direction):
         assert "same" in document.lower() and "branch" in document.lower()
     assert "must not edit" in workflow.lower()
     assert "leverage" in workflow.lower()
@@ -146,6 +149,26 @@ def test_three_strategy_parallel_baseline_is_exact_and_fail_closed() -> None:
     assert archived.is_file()
     assert "SUPERSEDED" in archived.read_text(encoding="utf-8")
     assert not (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").exists()
+
+
+def test_main_strategy_direction_preserves_integration_and_authority_gates() -> None:
+    direction = _text("THREE_STRATEGY_PROJECT_DIRECTION.md")
+    action = _text("ACTION_PLAN_2026-08-20.md")
+    handoff = _text("SESSION_HANDOFF.md")
+
+    assert "c9dcdb647914acbfcefce187a138f52fcdad0c68" in direction
+    for phrase in (
+        "three Codex implementation sessions",
+        "three Claude review sessions",
+        "separate integration milestone",
+        "No branch may add leverage",
+        "paper-epoch-006",
+        "SEP-3 remains frozen and incomplete",
+    ):
+        assert phrase.lower() in direction.lower()
+    assert "daily short-sale volume is not a substitute" in direction.lower()
+    assert "THREE_STRATEGY_PROJECT_DIRECTION.md" in action
+    assert "THREE_STRATEGY_PROJECT_DIRECTION.md" in handoff
 
 
 def test_sep3_freeze_record_pins_the_reviewed_pause_without_authorizing_extraction():

@@ -1,7 +1,7 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-25 by Codex for the owner-directed three-strategy parallel
-development baseline.
+Prepared: 2026-08-26 by Codex for the owner-directed main-line coordination of
+the three-strategy parallel development program.
 
 This concise handoff replaces the SEP-3 pause-transition snapshot. Historical
 detail remains at
@@ -12,11 +12,12 @@ and in `docs/Archive/Review/`.
 
 1. `CLAUDE.md` and `AGENTS.md`.
 2. `docs/ACTION_PLAN_2026-08-20.md`.
-3. `docs/Strategy Description/README.md`.
-4. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
-5. The selected lane's PDF and implementation record.
-6. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
-7. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
+3. `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`.
+4. `docs/Strategy Description/README.md`.
+5. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
+6. The selected lane's PDF and implementation record.
+7. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
+8. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
    discussion and `docs/operations/OPERATIONAL_FACTS.md` before operational
    work.
 
@@ -27,13 +28,17 @@ and in `docs/Archive/Review/`.
   `6156ef9b92737c9b390a96d286b0fbde4ff4b19c`.
 - The owner directed deletion of merged branches; after cleanup only `main`
   and `origin/main` remained.
-- Three long-lived lane branches are created from one identical committed
-  documentation baseline:
+- Three published long-lived lane branches were created from one identical
+  committed documentation baseline:
   - `codex/strategy-analyst-revisions-v2`
   - `codex/strategy-insider-buying`
   - `codex/strategy-short-interest`
-- These branches are local until the owner separately requests a push. Branch
-  publication is not a research run, merge, deployment, or trading authority.
+- Each corresponding `origin/codex/strategy-*` remote head was verified at
+  `c9dcdb647914acbfcefce187a138f52fcdad0c68`. Branch publication is not a
+  research run, merge, deployment, or trading authority.
+- Main-line direction is being prepared on
+  `codex/main-three-strategy-direction-20260826`, descended from the shared
+  baseline so the strategy branches retain one common history after merge.
 
 The three owner PDFs were inspected as text and visually page by page. Their
 page counts, byte sizes, and SHA-256 hashes are pinned in the lane records.
@@ -46,6 +51,11 @@ During the three-lane phase, agents must not edit this handoff or the Action
 Plan on any lane. This common baseline is the one authorized update before the
 branches diverge. The relevant lane implementation record becomes that
 branch's status, review ledger, validation record, and resume prompt.
+
+The owner-directed main-line coordination surface is
+`docs/THREE_STRATEGY_PROJECT_DIRECTION.md`. Only a separately directed
+main-line coordination change may update that record, this handoff, or the
+Action Plan while strategy branches are active.
 
 Codex implements, Claude independently reviews, and Codex counter-reviews on
 the same strategy branch. No review/counter-review branch is created. Work is

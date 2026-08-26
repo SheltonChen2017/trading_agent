@@ -14,6 +14,8 @@ plan.
 
 ## Current plan tracks
 
+- `THREE_STRATEGY_PROJECT_DIRECTION.md` — main-line coordination record for
+  the three parallel strategy branches and their later integration path.
 - `Strategy Description/` — the three active strategy source PDFs, shared
   parallel-workflow contract, per-lane implementation records, and data-source
   register. The former ACER V1 plan is archived.

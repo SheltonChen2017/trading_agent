@@ -6,14 +6,15 @@ owner replaced the Strong-Buy portfolio program with the Analyst-Consensus ETF
 Rotation program (ACER), which is now priority 1.** The predecessor is archived, not deleted: it remains
 the record of how everything below became true.
 
-**Current sequencing amendment, 2026-08-25:** SEP-3 remains frozen at its
+**Current sequencing amendment, 2026-08-26:** SEP-3 remains frozen at its
 independently accepted eighth dry run and grants no physical-migration
 authority. The owner has now authorized a three-lane strategy-development
 program: Analyst Revisions V2, Insider Buying, and Short Interest. The common
 documentation/branch baseline is governed by
-`docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`; each lane's
-PDF and implementation record define its bounded work. No real-outcome run,
-QuantConnect launch, paper/live deployment, or combined autopilot is
+`docs/THREE_STRATEGY_PROJECT_DIRECTION.md`; its detailed lane protocol is
+`docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`, and each
+lane's PDF and implementation record define its bounded work. No real-outcome
+run, QuantConnect launch, paper/live deployment, or combined autopilot is
 authorized by this sequencing change. SEP-3's exact paused state remains in
 `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`.
 

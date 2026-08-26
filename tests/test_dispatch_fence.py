@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import multiprocessing
+import os
 import subprocess
 import sys
 import threading
@@ -11,6 +13,16 @@ from assistant.dispatch_fence import (
     DispatchFenceTimeout,
     execution_dispatch_fence,
 )
+
+
+def _fork_fence_attempt(database: str, connection, timeout: float) -> None:
+    try:
+        with execution_dispatch_fence(database, timeout_seconds=timeout):
+            connection.send("acquired")
+    except DispatchFenceTimeout:
+        connection.send("timed-out")
+    finally:
+        connection.close()
 
 
 def test_dispatch_fence_is_reentrant_and_keeps_one_stable_lock_file(tmp_path):
@@ -100,12 +112,44 @@ def test_dispatch_fence_is_released_when_owner_process_crashes(tmp_path):
         pass
 
 
+@pytest.mark.skipif(not hasattr(os, "fork"), reason="POSIX fork regression")
+def test_fork_child_does_not_inherit_parent_fence_ownership(tmp_path):
+    database = tmp_path / "assistant.sqlite3"
+    context = multiprocessing.get_context("fork")
+
+    parent_connection, child_connection = context.Pipe(duplex=False)
+    with execution_dispatch_fence(database):
+        contender = context.Process(
+            target=_fork_fence_attempt,
+            args=(str(database), child_connection, 0.1),
+        )
+        contender.start()
+        child_connection.close()
+        assert parent_connection.recv() == "timed-out"
+        contender.join(timeout=5)
+        assert contender.exitcode == 0
+    parent_connection.close()
+
+    parent_connection, child_connection = context.Pipe(duplex=False)
+    successor = context.Process(
+        target=_fork_fence_attempt,
+        args=(str(database), child_connection, 1.0),
+    )
+    successor.start()
+    child_connection.close()
+    assert parent_connection.recv() == "acquired"
+    successor.join(timeout=5)
+    assert successor.exitcode == 0
+    parent_connection.close()
+
+
 @pytest.mark.parametrize(
     "keyword,value",
     [
         ("timeout_seconds", True),
         ("timeout_seconds", -1),
         ("timeout_seconds", float("nan")),
+        ("timeout_seconds", threading.TIMEOUT_MAX * 2),
         ("poll_seconds", False),
         ("poll_seconds", 0),
         ("poll_seconds", float("inf")),

@@ -10,12 +10,37 @@ Run with: python tests/test_alpaca_broker.py
 import os
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import execution.alpaca_broker as broker
+
+
+def _session_account_model(account_id="paper-account-1"):
+    return SimpleNamespace(
+        id=account_id,
+        status="ACTIVE",
+        equity="1000",
+        cash="1000",
+        buying_power="1000",
+        trading_blocked=False,
+        account_blocked=False,
+        trade_suspended_by_user=False,
+        transfers_blocked=False,
+    )
+
+
+def _session_asset_model(ticker, *, fractionable):
+    return SimpleNamespace(
+        symbol=ticker,
+        status="active",
+        asset_class="us_equity",
+        tradable=True,
+        fractionable=fractionable,
+    )
 
 
 def _clear_alpaca_env():
@@ -134,17 +159,10 @@ def test_submit_limit_order_rejects_nan_shares():
 
 
 def test_fractional_market_order_uses_exact_rest_quantity_text(monkeypatch):
-    monkeypatch.setenv("APCA_API_KEY_ID", "test-key")
-    monkeypatch.setenv("APCA_API_SECRET_KEY", "test-secret")
     monkeypatch.setattr(broker, "verify_execution_authorization", lambda *_a, **_k: None)
-    monkeypatch.setattr(
-        broker,
-        "assert_account_and_asset_ready",
-        lambda _ticker: {"account": {}, "asset": {"fractionable": True}},
-    )
     captured = {}
 
-    def fake_post(url, payload):
+    def fake_post(_self, url, payload):
         captured.update(url=url, payload=payload)
         return {
             "id": "fractional-1",
@@ -157,8 +175,21 @@ def test_fractional_market_order_uses_exact_rest_quantity_text(monkeypatch):
             "status": "accepted",
         }
 
-    monkeypatch.setattr(broker, "_http_post_json", fake_post)
-    result = broker.submit_market_order(
+    client = type(
+        "FractionalClient",
+        (),
+        {
+            "get_account": lambda _self: _session_account_model(),
+            "get_asset": lambda _self, ticker: _session_asset_model(
+                ticker, fractionable=True
+            ),
+        },
+    )()
+    session = broker.AlpacaBrokerSession(
+        key="test-key", secret="test-secret", paper=True, client=client
+    )
+    monkeypatch.setattr(broker.AlpacaBrokerSession, "_http_post_json", fake_post)
+    result = session.submit_market_order(
         "AAPL",
         "0.123456789",
         whole_shares_only=False,
@@ -170,21 +201,27 @@ def test_fractional_market_order_uses_exact_rest_quantity_text(monkeypatch):
 
 
 def test_fractional_order_refuses_a_nonfractionable_asset_before_http(monkeypatch):
-    monkeypatch.setenv("APCA_API_KEY_ID", "test-key")
-    monkeypatch.setenv("APCA_API_SECRET_KEY", "test-secret")
     monkeypatch.setattr(broker, "verify_execution_authorization", lambda *_a, **_k: None)
-    monkeypatch.setattr(
-        broker,
-        "assert_account_and_asset_ready",
-        lambda _ticker: {"account": {}, "asset": {"fractionable": False}},
+    client = type(
+        "NonfractionableClient",
+        (),
+        {
+            "get_account": lambda _self: _session_account_model(),
+            "get_asset": lambda _self, ticker: _session_asset_model(
+                ticker, fractionable=False
+            ),
+        },
+    )()
+    session = broker.AlpacaBrokerSession(
+        key="test-key", secret="test-secret", paper=True, client=client
     )
     monkeypatch.setattr(
-        broker,
+        broker.AlpacaBrokerSession,
         "_http_post_json",
         lambda *_a, **_k: pytest.fail("nonfractionable order contacted HTTP"),
     )
     with pytest.raises(broker.BrokerPreflightError):
-        broker.submit_market_order(
+        session.submit_market_order(
             "NOFRAC",
             "0.5",
             whole_shares_only=False,
@@ -611,6 +648,11 @@ def test_optional_float_passes_none_through_untouched():
     assert broker._optional_float(float("inf")) is None
 
 
+@pytest.mark.parametrize("bad", ["not-a-number", object(), True])
+def test_optional_float_treats_malformed_broker_numbers_as_unusable(bad):
+    assert broker._optional_float(bad) is None
+
+
 if __name__ == "__main__":
     test_is_configured_false_without_env_vars()
     test_is_configured_true_with_both_env_vars()
@@ -678,6 +720,27 @@ def test_normalize_order_tolerates_a_broker_object_without_chain_fields():
     normalized = _normalize_order(minimal)
     assert normalized["replaces"] is None
     assert normalized["replaced_by"] is None
+
+
+def test_normalize_order_never_turns_a_missing_id_into_literal_none():
+    from types import SimpleNamespace
+
+    normalized = broker._normalize_order(
+        SimpleNamespace(id=None, symbol="AAPL", qty="1", status="new")
+    )
+
+    assert normalized["order_id"] is None
+
+
+def test_normalize_trade_update_numbers_retain_exact_decimal_companions():
+    assert broker._normalized_trade_update_numbers(
+        fill_qty="0.123456789", fill_price="100.0001"
+    ) == {
+        "fill_qty": pytest.approx(0.123456789),
+        "fill_qty_decimal": "0.123456789",
+        "fill_price": pytest.approx(100.0001),
+        "fill_price_decimal": "100.0001",
+    }
 
 
 # --------------------------------------------------------------------------

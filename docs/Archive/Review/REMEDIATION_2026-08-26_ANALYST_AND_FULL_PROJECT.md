@@ -2861,38 +2861,53 @@ marked accepted solely because another group's integration test passes.
 
 ## 13. Required final validation evidence
 
-The implementation work has produced green development runs, including a final
-Analyst contract-module run of **24 passed in 6.57s** after the last score-state
-guard, an adjacent Analyst V2 contracts/statistics/preregistration/quarantine/
-firewall run of **138 passed in 136.83s** after the substantive authority,
-rank-containment, and deterministic-aggregation changes, and an earlier broad
-remediation baseline of **541 passed, 1 skipped, 2 warnings**. The one source
-change after the 138-test run was covered by the later 24-test rerun. All are
-still intermediate development evidence, not independent acceptance or an
-exact-final-tree full run; they must not be copied into the final handoff as if
-they covered later documentation/integration edits. Targeted syntax compilation
-of `formulas.py`, `holdings.py`, `portfolio.py`, `costs.py`, and the contract
-test file was also green, but it does not replace the required repository-wide
-compile command below.
+The superseding root implementation code snapshot is
+`66168eda687d42a3cfda45a05e0de8f7781d3b87`. It separates the final shared
+follow-up as `6770db3bc3934c4b0872d0cea6a256c28dec2cc8` and the Analyst-only
+follow-up as `66168ed`, so the latter cannot enter the other two strategy
+lanes by an undifferentiated merge. The exact touched-surface run passed
+**922 tests in 313.42 seconds**. The complete repository suite on that code
+tree passed **5,441 tests, skipped 2, failed 0, and emitted 25 dependency-
+deprecation warnings in 2,083.27 seconds (34m43s)**. The required repository-
+wide `compileall` command exited 0; the Windows verifier parsed with 0
+PowerShell errors; `git diff --check` was clean; and the narrow credential-
+literal scan found no likely secret in the diff. After the two record-only
+documentation updates, the 362-test documentation/active-contract regression
+set passed in 125.06 seconds; that same set was rerun after recording this
+evidence on the final documentation tree.
 
-Before the implementation snapshot is handed to the independent reviewer, the
-implementer must record results from the exact final committed tree for:
+The one-time owner-authorized synchronization was then validated separately
+on each lane before its record-only commit and non-force push:
 
-| Validation | Required evidence |
+| Lane | Validated code snapshot | Exact full-suite evidence | Published recorded snapshot |
+|---|---|---|---|
+| Analyst Revisions V2 | `653a9c01ac12863db2d7488154014a662c893add` | 5,434 passed, 2 skipped, 0 failed, 25 warnings in 2,354.46s (39m14s); compileall/parser/diff/status clean | `d8d0ad6e86dee1b05a5f62f3dd9d53c7b51b9729` |
+| Insider Buying | `e770b059f06dd8af9a52bd6dd96f7f83af2fc835` | 5,223 passed, 2 skipped, 0 failed, 25 warnings in 2,200.25s (36m40s); compileall/parser/diff/status clean | `8a65e3ca38cdc6f0feff8f3d7f6c8ae4a722b83d` |
+| Short Interest | `81eede4ef8de10609d4b5375b795abf916132dd0` | 5,223 passed, 2 skipped, 0 failed, 25 warnings in 2,274.58s (37m54s); compileall/parser/diff/status clean | `0a77b9cd2fb8f96ced51194ce68060b6a08b3de9` |
+
+The shared landing commits have the identical stable patch ID
+`30e807c0ae2cf05016a2ce17c416daaaa275dcbc`. Range and ancestry checks proved
+that neither Analyst hardening commit nor any of its five-file surface entered
+Insider Buying or Short Interest. Final Codex diff audits found no remaining
+P0-P3 issue in the submitted implementation, including the corrected closed-
+position normalization and exact Windows scheduled-task contract. Those audits
+and green tests are implementation evidence, not the required independent
+Claude acceptance.
+
+| Validation | Recorded disposition |
 |---|---|
-| Research/Analyst focused | All ACER and `analyst_revisions_v2` snapshot, normalization, dataset, preregistration, formulas, holdings, portfolio, costs, statistics, legacy quarantine, documentation, and import-firewall tests; exact pass/skip/warning count and duration |
-| P1 execution focused | Policy, coherent broker snapshot, authorization binding, broker order contract, dispatch/cancel-all fence, atomic anomaly, replacement chain, execution characterization, and broker-event ledger tests |
-| P2/P3 system focused | Temporal/recovery/readiness, schema, exact fill, portfolio/risk, earnings, market data, backtest input, operations policy, and ML session-maturity tests |
-| Architecture boundaries | Direct and transitive ML/LLM/authority/outcome/import boundaries plus project-separation entrypoint/manifest tests |
-| Full suite | `python -m pytest -q` with exact pass/skip/failure/warning count and duration |
-| Compilation | `python -m compileall -q assistant backtest data execution ml risk scripts signals strategies tests baskets.py config.py market_analytics.py` |
-| Repository checks | `git diff --check`, narrow secret-shape scan, exact branch/HEAD, and a clean `git status --short --branch` |
-| Independent review | Exact pushed implementation head, ordered commit dispositions, P0–P3 ledger, reviewer correction commits, mutation evidence, and reviewer reruns |
-| Counter-review | Exact reviewed head, disposition of every reviewer correction, final reruns, and handoff/associated-record commits |
+| Research/Analyst focused | Covered by the 922-test touched-surface run and the 5,434-test exact Analyst lane run, including snapshot, normalization, dataset, formula, holdings, portfolio, cost, preregistration, quarantine, and architecture boundaries. |
+| P1 execution focused | Covered by the 922-test touched-surface run and all four complete-suite runs, including coherent snapshot, authorization, dispatch/cancel-all fence, broker contract, anomaly, fault, and ledger regressions. |
+| P2/P3 system focused | Covered by the 922-test touched-surface run and complete suites, including portfolio/risk, exact fills, scheduler identity, policy parity, recovery, UI, and ML evidence operations. |
+| Architecture boundaries | Included in every complete suite; Analyst-only ancestry/range checks separately proved lane isolation. |
+| Compilation/static checks | Required compileall, PowerShell parsing, diff checks, clean status, and the root narrow secret-shape scan passed. |
+| Independent review | **Pending.** Claude must review every commit in each exact published range, retain a P0-P3 ledger, and push any authorized correction on the same lane branch (or use the generic root review workflow for the root remediation branch). |
+| Counter-review | **Pending.** Codex must disposition every Claude commit and rerun affected/full validation before acceptance or another milestone. |
 
-The final validation record must replace intermediate counts with the exact final
-tree results. Any edit after a run invalidates the affected result and requires a
-rerun.
+No provider, credential, licensed row, outcome, QuantConnect job, broker,
+operator database, live scheduler, deployment, evidence epoch, paper order, or
+live order was accessed or changed during implementation, validation, or
+synchronization. The Analyst permanent-look count remains **0**.
 
 ## 14. Remaining owner/data/operations gates that code did not close
 

@@ -587,12 +587,14 @@ def test_report_only_discloses_an_unknown_pending_order_instead_of_refusing():
 
 
 def test_a_zero_share_row_reads_as_not_held_rather_than_bricking_the_page():
-    """HEDGE1CR-003. `build_portfolio_snapshot` constructs a zero-share,
-    zero-value row through its documented API. Refusing it blocked even the
-    read-only view of the current weight, and called a value "unreadable"
-    that was read perfectly well and was zero. Zero shares means not held.
+    """HEDGE1CR-003. ``build_portfolio_snapshot`` accepts a zero-share,
+    zero-value source row but normalizes it away. Refusing the source row
+    blocked even the read-only current-weight view; retaining it could make
+    ticker-presence consumers treat a closed lot as held. Zero shares means
+    not held, represented canonically by absence from ``positions``.
     """
     snapshot = _snapshot([_held("TLT", 0, 100.0)])
+    assert snapshot.positions == []
     report = evaluate_hedge_sleeve(snapshot, target_pct=10)
 
     assert report.usable, report.refusals

@@ -15,6 +15,7 @@ import pytest
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy
+from assistant.portfolio_snapshot import PortfolioSnapshotIntegrityError
 from assistant.schemas import (
     DecisionPacket,
     EvidenceStatus,
@@ -106,6 +107,35 @@ def test_returns_nothing_when_stable_leg_not_held():
     packet = _packet([{"ticker": LEVERAGED_TICKER, "shares": 100, "entry_price": 20.0, "current_price": 20.0}])
     proposals = generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=_market_data())
     assert proposals == []
+
+
+def test_zero_share_pair_leg_is_normalized_to_not_held():
+    packet = _packet(
+        [
+            {
+                "ticker": STABLE_TICKER,
+                "shares": 100,
+                "entry_price": 50.0,
+                "current_price": 50.0,
+            },
+            {
+                "ticker": LEVERAGED_TICKER,
+                "shares": 0,
+                "entry_price": 20.0,
+                "current_price": 20.0,
+            },
+        ]
+    )
+
+    assert {position.ticker for position in packet.portfolio.positions} == {
+        STABLE_TICKER
+    }
+    assert (
+        generate_soxx_soxl_rebalance_proposals(
+            packet, _policy(), market_data=_market_data()
+        )
+        == []
+    )
 
 
 def test_returns_nothing_when_within_band():
@@ -518,75 +548,68 @@ def test_no_store_given_does_not_raise():
 # already been computed in the same handler.
 # --------------------------------------------------------------------------
 
-def _packet_with_leveraged_price(price: float) -> DecisionPacket:
-    """Both legs held and far outside the band, but one leg has no usable price."""
-    return _packet(
-        [
-            {"ticker": STABLE_TICKER, "shares": 100, "entry_price": 50.0, "current_price": 50.0},
-            {"ticker": LEVERAGED_TICKER, "shares": 100, "entry_price": 20.0, "current_price": price},
-        ]
-    )
-
-
-# Zero and negative only. NaN/Infinity are rejected upstream by
-# context_builder.build_portfolio_snapshot -- which the live Alpaca builder
-# delegates to -- so they cannot reach this generator through either
-# production path. Zero and negative ARE finite, pass that boundary, and are
-# what a halted or unpriced leg actually looks like; both proposals.py and
-# allocation_proposals.py guard `price <= 0` for the same reason.
 @pytest.mark.parametrize("bad_price", [0.0, -5.0])
-def test_an_unusable_leveraged_price_refuses_instead_of_crashing(bad_price):
-    packet = _packet_with_leveraged_price(bad_price)
-    with pytest.raises(StrategyPositionDataError) as excinfo:
-        generate_soxx_soxl_rebalance_proposals(
-            packet, _policy(), market_data=_market_data()
-        )
-    assert LEVERAGED_TICKER in str(excinfo.value)
+@pytest.mark.parametrize("bad_ticker", [STABLE_TICKER, LEVERAGED_TICKER])
+def test_snapshot_boundary_refuses_a_nonpositive_held_price(
+    bad_price, bad_ticker
+):
+    positions = [
+        {
+            "ticker": STABLE_TICKER,
+            "shares": 100,
+            "entry_price": 50.0,
+            "current_price": bad_price if bad_ticker == STABLE_TICKER else 50.0,
+        },
+        {
+            "ticker": LEVERAGED_TICKER,
+            "shares": 100,
+            "entry_price": 20.0,
+            "current_price": bad_price if bad_ticker == LEVERAGED_TICKER else 20.0,
+        },
+    ]
+
+    with pytest.raises(PortfolioSnapshotIntegrityError, match=bad_ticker):
+        _packet(positions)
 
 
-@pytest.mark.parametrize("bad_price", [0.0, -5.0])
-def test_an_unusable_stable_price_refuses_instead_of_crashing(bad_price):
-    packet = _packet(
-        [
-            {"ticker": STABLE_TICKER, "shares": 100, "entry_price": 50.0, "current_price": bad_price},
-            {"ticker": LEVERAGED_TICKER, "shares": 100, "entry_price": 20.0, "current_price": 20.0},
-        ]
-    )
-    with pytest.raises(StrategyPositionDataError) as excinfo:
-        generate_soxx_soxl_rebalance_proposals(
-            packet, _policy(), market_data=_market_data()
-        )
-    assert STABLE_TICKER in str(excinfo.value)
-
-
-@pytest.mark.parametrize("bad_price", [float("nan"), float("inf")])
-def test_a_non_finite_price_is_refused_if_the_snapshot_boundary_is_bypassed(bad_price):
+@pytest.mark.parametrize(
+    "bad_price", [0.0, -5.0, float("nan"), float("inf")]
+)
+@pytest.mark.parametrize("bad_ticker", [STABLE_TICKER, LEVERAGED_TICKER])
+def test_an_unusable_price_is_refused_if_the_snapshot_boundary_is_bypassed(
+    bad_price, bad_ticker
+):
     """Defense in depth for a snapshot that did NOT come from the builder.
 
-    `build_portfolio_snapshot` rejects non-finite prices, so neither live
-    production path can deliver one here. A `PortfolioSnapshot` assembled
-    directly -- a deserialized stored packet, a fixture, a future caller --
-    carries no such guarantee, and `PortfolioPosition` has no `__post_init__`
-    of its own. The guard must not depend on someone else having validated.
+    ``build_portfolio_snapshot`` now rejects every nonpositive or non-finite
+    held price, so neither production builder can deliver one here. A direct
+    or deserialized ``PortfolioSnapshot`` carries no such guarantee, and the
+    strategy boundary must still refuse both legs without crashing.
     """
     snapshot = PortfolioSnapshot(
         positions=[
             PortfolioPosition(
                 ticker=STABLE_TICKER, shares=100.0, entry_price=50.0,
-                current_price=50.0, market_value=5_000.0,
+                current_price=(
+                    bad_price if bad_ticker == STABLE_TICKER else 50.0
+                ),
+                market_value=5_000.0,
                 unrealized_pnl_pct=0.0, is_leveraged_etf=False,
             ),
             PortfolioPosition(
                 ticker=LEVERAGED_TICKER, shares=100.0, entry_price=20.0,
-                current_price=bad_price, market_value=8_000.0,
+                current_price=(
+                    bad_price if bad_ticker == LEVERAGED_TICKER else 20.0
+                ),
+                market_value=2_000.0,
                 unrealized_pnl_pct=0.0, is_leveraged_etf=True,
             ),
         ],
-        cash=5_000.0, total_equity=18_000.0, as_of="2026-08-07",
+        cash=5_000.0, total_equity=12_000.0, as_of="2026-08-07",
         source="alpaca", account_mode="paper",
     )
     packet = dataclasses.replace(_packet([]), portfolio=snapshot)
-    with pytest.raises(StrategyPositionDataError):
+    with pytest.raises(StrategyPositionDataError, match=bad_ticker):
         generate_soxx_soxl_rebalance_proposals(
             packet, _policy(), market_data=_market_data()
         )

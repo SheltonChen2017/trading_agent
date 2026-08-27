@@ -125,40 +125,50 @@ def _force_status(store, proposal_id, new_status, *, expected=PROPOSED):
 
 
 def _plant_fill_event(store, proposal_id, fill_qty):
-    with store._connect() as connection:  # test-only: plant broker history
-        connection.execute(
-            "INSERT INTO broker_orders(order_id, proposal_id, submitted_at, status, payload_json) "
-            "VALUES (?, ?, ?, ?, '{}')",
-            (f"order-{proposal_id}", proposal_id, _NOW.isoformat(), "canceled"),
-        )
-        connection.execute(
-            "INSERT INTO broker_order_events(event_id, order_id, proposal_id, event_type, "
-            "event_at, status, fill_qty, fill_price, payload_json) "
-            "VALUES (?, ?, ?, 'fill', ?, 'partially_filled', ?, 30.0, '{}')",
-            (
-                f"event-{proposal_id}", f"order-{proposal_id}", proposal_id,
-                _NOW.isoformat(), fill_qty,
-            ),
-        )
+    fill_qty_text = str(fill_qty)
+    order = {
+        "order_id": f"order-{proposal_id}",
+        "status": "partially_filled",
+        "submitted_at": _NOW.isoformat(),
+    }
+    store.project_broker_order_event(
+        event_id=f"event-{proposal_id}",
+        proposal_id=proposal_id,
+        order=order,
+        event_type="fill",
+        event_at=_NOW.isoformat(),
+        new_proposal_status=PROPOSED,
+        expected_current_statuses=(PROPOSED,),
+        proposal_updates={"broker_order": order},
+        fill_qty=fill_qty,
+        fill_qty_decimal=fill_qty_text,
+        fill_price=30,
+        fill_price_decimal="30",
+    )
 
 
 def _plant_cumulative_fill_event(store, proposal_id, filled_qty):
     """Plant the shape written by broker polling (no incremental fill_qty)."""
-    with store._connect() as connection:  # test-only: plant broker history
-        connection.execute(
-            "INSERT INTO broker_orders(order_id, proposal_id, submitted_at, status, payload_json) "
-            "VALUES (?, ?, ?, ?, '{}')",
-            (f"order-{proposal_id}", proposal_id, _NOW.isoformat(), "canceled"),
-        )
-        connection.execute(
-            "INSERT INTO broker_order_events(event_id, order_id, proposal_id, event_type, "
-            "event_at, status, filled_qty, filled_avg_price, payload_json) "
-            "VALUES (?, ?, ?, 'poll_reconciliation', ?, 'canceled', ?, 30.0, '{}')",
-            (
-                f"event-{proposal_id}", f"order-{proposal_id}", proposal_id,
-                _NOW.isoformat(), filled_qty,
-            ),
-        )
+    filled_qty_text = str(filled_qty)
+    order = {
+        "order_id": f"order-{proposal_id}",
+        "status": "canceled",
+        "submitted_at": _NOW.isoformat(),
+        "filled_qty": filled_qty,
+        "filled_qty_decimal": filled_qty_text,
+        "filled_avg_price": 30,
+        "filled_avg_price_decimal": "30",
+    }
+    store.project_broker_order_event(
+        event_id=f"event-{proposal_id}",
+        proposal_id=proposal_id,
+        order=order,
+        event_type="poll_reconciliation",
+        event_at=_NOW.isoformat(),
+        new_proposal_status=PROPOSED,
+        expected_current_statuses=(PROPOSED,),
+        proposal_updates={"broker_order": order},
+    )
 
 
 # --- income measurement ----------------------------------------------------

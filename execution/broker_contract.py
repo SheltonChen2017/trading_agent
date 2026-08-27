@@ -18,8 +18,10 @@ import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import Any, Literal
+
+from data.financial_primitives import to_decimal
 
 
 AccountMode = Literal["paper", "live"]
@@ -289,13 +291,11 @@ def _decimal(
     if isinstance(value, bool):
         _fail(code, f"{field} cannot be boolean", field=field)
     try:
-        parsed = Decimal(str(value))
-    except (InvalidOperation, TypeError, ValueError) as exc:
+        parsed = to_decimal(value, name=field)  # type: ignore[arg-type]
+    except ValueError as exc:
         raise BrokerOrderIntegrityError(
             code, f"{field} is not numeric: {value!r}", field=field
         ) from exc
-    if not parsed.is_finite():
-        _fail(code, f"{field} is not finite: {value!r}", field=field)
     if parsed < 0 or (parsed == 0 and not allow_zero):
         comparator = "nonnegative" if allow_zero else "positive"
         _fail(code, f"{field} must be {comparator}: {value!r}", field=field)

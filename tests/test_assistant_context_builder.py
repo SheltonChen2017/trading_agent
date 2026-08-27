@@ -868,7 +868,9 @@ def test_non_finite_total_equity_says_so_instead_of_reporting_no_warnings():
         corrupt = dataclasses.replace(healthy, total_equity=bad)
         exposure = build_risk_exposure(corrupt)
         assert exposure.concentration_warnings, "must not report a clean portfolio"
-        assert "not a usable number" in exposure.concentration_warnings[0]
+        warning = exposure.concentration_warnings[0]
+        assert warning.startswith("Portfolio integrity unavailable:")
+        assert "finite decimal number" in warning
         assert math.isfinite(exposure.leveraged_etf_exposure_pct)
         assert math.isfinite(exposure.cash_pct)
 

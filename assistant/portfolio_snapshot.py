@@ -60,12 +60,12 @@ def _evidence_decimal(
 def validate_long_only_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
     """Validate the canonical no-short/no-margin portfolio contract.
 
-    Zero-share rows are invalid rather than being treated as holdings. An
-    empty account is represented by ``positions=[]``. Every nonzero holding
-    must have positive quantity and prices, positive value consistent with
-    quantity times current price to within one cent, and a unique canonical
-    ticker. Exact decimal evidence outranks display floats, but the two must
-    agree so no consumer sees a different portfolio than the risk engine.
+    Canonical snapshots contain holdings only: the builder normalizes a
+    zero-share, zero-value source row away as not held. Every retained row must
+    have positive quantity and prices, positive value consistent with quantity
+    times current price to within one cent, and a unique canonical ticker.
+    Exact decimal evidence outranks display floats, but the two must agree so
+    no consumer sees a different portfolio than the risk engine.
     """
     if not isinstance(snapshot, PortfolioSnapshot):
         raise PortfolioSnapshotIntegrityError("snapshot must be a PortfolioSnapshot")
@@ -274,12 +274,24 @@ def build_portfolio_snapshot(
             if "market_value" in position
             else shares_decimal * current_price_decimal
         )
-        if shares_decimal <= 0:
+        if shares_decimal < 0:
             raise PortfolioSnapshotIntegrityError(
-                f"Position {ticker!r} must have positive shares; remove zero-share rows "
-                "and short positions before snapshot construction."
+                f"Position {ticker!r} must have non-negative shares; short positions "
+                "are unsupported."
             )
-        if entry_price_decimal <= 0 or current_price_decimal <= 0:
+        if entry_price_decimal < 0 or current_price_decimal < 0:
+            raise PortfolioSnapshotIntegrityError(
+                f"Position {ticker!r} must have non-negative entry_price and current_price."
+            )
+        if shares_decimal == 0:
+            if market_value_decimal != 0:
+                raise PortfolioSnapshotIntegrityError(
+                    f"Position {ticker!r} must have zero market_value when shares are zero."
+                )
+            # A closed lot is not a holding. Keeping the row would let consumers
+            # that key on ticker presence treat it as sellable/current exposure.
+            continue
+        if entry_price_decimal == 0 or current_price_decimal == 0:
             raise PortfolioSnapshotIntegrityError(
                 f"Position {ticker!r} must have positive entry_price and current_price."
             )

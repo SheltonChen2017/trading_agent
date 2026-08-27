@@ -35,6 +35,7 @@ from assistant.data_integrity import (
 )
 from assistant.platform_readiness import BLOCKED, READY, build_data_integrity
 from assistant.storage import AssistantStore
+from data.market_data import _NYSE_CALENDAR
 from data.price_source import (
     YFinanceDailyBars,
     build_fetch_record,
@@ -54,7 +55,16 @@ def store(tmp_path):
 
 
 def _bars(end: str, periods: int = 30) -> pd.DataFrame:
-    index = pd.bdate_range(end=pd.Timestamp(end), periods=periods)
+    end_date = pd.Timestamp(end).normalize()
+    start_date = end_date - pd.Timedelta(days=periods * 2 + 30)
+    index = pd.DatetimeIndex(
+        _NYSE_CALENDAR.schedule(
+            start_date=start_date.date().isoformat(),
+            end_date=end_date.date().isoformat(),
+        ).index
+    ).tz_localize(None)[-periods:]
+    if len(index) != periods:
+        raise AssertionError("test fixture did not allocate enough NYSE sessions")
     frame = pd.DataFrame(
         {
             "open": 100.0,
@@ -76,9 +86,11 @@ class _FakeSource:
         self.data = data if data is not None else {}
         self.error = error
         self.calls = 0
+        self.last_tickers = None
 
     def fetch_daily_bars(self, tickers, lookback_days):
         self.calls += 1
+        self.last_tickers = list(tickers)
         if self.error is not None:
             raise self.error
         return self.data
@@ -153,6 +165,10 @@ def test_fetch_record_counts_missing_tickers_and_latest_session():
     assert record.returned_count == 1
     assert record.missing_tickers == ("BBB", "CCC")  # empty frame = missing
     assert record.latest_session == "2026-08-05"
+    assert record.transport_ok is True
+    assert record.usable_tickers == ("AAA",)
+    assert record.universe_complete is False
+    assert record.ticker_latest_sessions == (("AAA", "2026-08-05"),)
     assert record.point_in_time_lineage is False
 
 
@@ -161,7 +177,10 @@ def test_all_empty_response_is_a_failed_fetch_not_zero_matches():
     failure presenting as data."""
     record = build_fetch_record(_FakeSource(), ["AAA"], {}, fetched_at=NOW)
     assert not record.ok
-    assert record.error == "provider returned no usable data"
+    assert record.transport_ok is True
+    assert record.error == (
+        "provider transport succeeded but returned no usable requested data"
+    )
     assert record.latest_session is None
 
 
@@ -179,7 +198,45 @@ def test_spurious_ticker_response_is_not_a_successful_requested_fetch():
     assert record.returned_count == 0
     assert record.missing_tickers == ("AAA",)
     assert record.latest_session is None
-    assert record.error == "provider returned no usable data"
+    assert record.transport_ok is True
+    assert record.error == (
+        "provider transport succeeded but returned no usable requested data"
+    )
+
+
+def test_fetch_record_canonicalizes_identity_and_uses_worst_ticker_session():
+    record = build_fetch_record(
+        _FakeSource(),
+        [" fresh ", "stale"],
+        {
+            "FRESH": _bars(EXPECTED_SESSION),
+            " stale ": _bars("2026-08-03"),
+        },
+        fetched_at=NOW,
+    )
+    assert record.ok is True
+    assert record.transport_ok is True
+    assert record.universe_complete is True
+    assert record.usable_tickers == ("FRESH", "STALE")
+    assert record.latest_session == "2026-08-03"
+    assert dict(record.ticker_latest_sessions) == {
+        "FRESH": EXPECTED_SESSION,
+        "STALE": "2026-08-03",
+    }
+
+
+def test_duplicate_canonical_provider_keys_make_only_that_ticker_unusable():
+    frame = _bars(EXPECTED_SESSION)
+    record = build_fetch_record(
+        _FakeSource(),
+        ["AAA", "GOOD"],
+        {"AAA": frame, " aaa ": frame, "GOOD": frame},
+        fetched_at=NOW,
+    )
+    assert record.ok is True
+    assert record.usable_tickers == ("GOOD",)
+    assert record.missing_tickers == ("AAA",)
+    assert "duplicate canonical keys" in dict(record.ticker_errors)["AAA"]
 
 
 def test_provider_exception_is_recorded_without_leaking_detail():
@@ -191,6 +248,7 @@ def test_provider_exception_is_recorded_without_leaking_detail():
         fetched_at=NOW,
     )
     assert not record.ok
+    assert record.transport_ok is False
     assert record.error == "RuntimeError: provider fetch failed"
     assert "secret" not in record.error
 
@@ -235,6 +293,15 @@ def _open_provider_alerts(store):
     ]
 
 
+def _open_quality_alerts(store):
+    return [
+        alert
+        for alert in store.list_operational_alerts(status="open", limit=20)
+        if alert["fingerprint"]
+        == "provider_data_quality:fake-provider:bar"
+    ]
+
+
 def test_successful_fetch_is_recorded_and_returned_unaltered(store):
     frame = _bars("2026-08-05")
     data = fetch_daily_bars_recorded(
@@ -245,6 +312,109 @@ def test_successful_fetch_is_recorded_and_returned_unaltered(store):
     records = store.list_provider_fetches(provider_id="fake-provider")
     assert len(records) == 1 and records[0]["ok"]
     assert records[0]["latest_session"] == "2026-08-05"
+
+
+def test_recorded_fetch_sends_only_canonical_tickers_to_provider(store):
+    frame = _bars(EXPECTED_SESSION)
+    source = _FakeSource({"aaa": frame})
+    data = fetch_daily_bars_recorded(
+        store, [" aaa "], 30, source=source, now=NOW
+    )
+    assert source.last_tickers == ["AAA"]
+    assert set(data) == {"AAA"}
+    assert data["AAA"] is frame
+
+
+def test_partial_malformed_batch_preserves_valid_sibling_and_is_alertable(store):
+    valid = _bars(EXPECTED_SESSION)
+    malformed = _bars(EXPECTED_SESSION)
+    malformed.loc[malformed.index[-1], "close"] = float("nan")
+
+    data = fetch_daily_bars_recorded(
+        store,
+        ["GOOD", "BAD"],
+        30,
+        source=_FakeSource({"GOOD": valid, "BAD": malformed}),
+        now=NOW,
+    )
+
+    assert set(data) == {"GOOD"}
+    assert data["GOOD"] is valid
+    records = store.list_provider_fetches(provider_id="fake-provider")
+    assert len(records) == 1
+    assert records[0]["ok"] is True  # transport/provider still returned usable data
+    assert records[0]["returned_count"] == 1
+    assert records[0]["missing_tickers"] == ["BAD"]
+
+    alerts = _open_quality_alerts(store)
+    assert len(alerts) == 1
+    details = alerts[0]["details"]
+    assert details["transport_ok"] is True
+    assert details["universe_complete"] is False
+    assert details["usable_tickers"] == ["GOOD"]
+    assert details["ticker_freshness"]["GOOD"]["fresh"] is True
+    assert details["ticker_freshness"]["BAD"]["fresh"] is False
+    assert "non-finite" in details["ticker_errors"]["BAD"]
+
+    evidence = build_data_layer_evidence(store, now=NOW)
+    assert evidence["provider_health"]["ok"] is True
+    assert evidence["price_freshness"]["ok"] is False
+    assert evidence["price_freshness"]["evidence"]["universe_complete"] is False
+
+
+def test_mixed_staleness_uses_worst_required_ticker_and_persists_breakdown(store):
+    fresh = _bars(EXPECTED_SESSION)
+    stale = _bars("2026-08-03")
+
+    data = fetch_daily_bars_recorded(
+        store,
+        ["FRESH", "STALE"],
+        30,
+        source=_FakeSource({"FRESH": fresh, "STALE": stale}),
+        now=NOW,
+    )
+
+    assert set(data) == {"FRESH", "STALE"}
+    record = store.list_provider_fetches(provider_id="fake-provider")[0]
+    assert record["ok"] is True
+    assert record["returned_count"] == 2
+    assert record["latest_session"] == "2026-08-03"
+
+    evidence = build_data_layer_evidence(store, now=NOW)
+    assert evidence["price_freshness"]["ok"] is False
+    assert evidence["price_freshness"]["evidence"]["latest_session"] == "2026-08-03"
+
+    details = _open_quality_alerts(store)[0]["details"]
+    assert details["universe_complete"] is True
+    assert details["worst_required_session"] == "2026-08-03"
+    assert details["ticker_freshness"]["FRESH"]["fresh"] is True
+    assert details["ticker_freshness"]["STALE"]["fresh"] is False
+
+
+def test_latest_unusable_attempt_cannot_hide_behind_older_success(store):
+    earlier = NOW.replace(minute=0)
+    fetch_daily_bars_recorded(
+        store,
+        ["AAA"],
+        30,
+        source=_FakeSource({"AAA": _bars(EXPECTED_SESSION)}),
+        now=earlier,
+    )
+    malformed = _bars(EXPECTED_SESSION)
+    malformed.loc[malformed.index[-1], "high"] = 0.0
+    fetch_daily_bars_recorded(
+        store,
+        ["AAA"],
+        30,
+        source=_FakeSource({"AAA": malformed}),
+        now=NOW,
+    )
+
+    evidence = build_data_layer_evidence(store, now=NOW)
+    assert evidence["price_freshness"]["ok"] is False
+    assert "latest provider fetch returned no usable" in (
+        evidence["price_freshness"]["detail"]
+    )
 
 
 def test_failure_streak_raises_one_deduplicated_alert(store):

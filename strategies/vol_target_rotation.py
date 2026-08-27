@@ -34,9 +34,19 @@ in from day one, not bolted on after finding out it mattered.
 from __future__ import annotations
 
 import math
+from numbers import Real
 
 import pandas as pd
 
+from data.research_input_contracts import (
+    require_aligned_price_series,
+    require_combined_rates_at_most_one,
+    require_finite_number,
+    require_long_only_weights,
+    require_positive_int,
+    require_positive_number,
+    require_rate,
+)
 from strategies.leverage_rotation import cagr_pct, max_drawdown_pct
 from strategies.trend_vol_rotation import classify_trend
 from signals.regime import compute_trailing_market_volatility
@@ -62,7 +72,20 @@ def compute_target_leveraged_weight(
     leveraged weight, the exact opposite of this function's purpose and of
     what its own docstring promised. `None` and `inf` already returned 0.0
     correctly; only NaN failed, and it failed toward more leverage."""
-    if realized_vol_pct is None or not math.isfinite(realized_vol_pct) or realized_vol_pct <= 0:
+    target_vol_pct = require_positive_number(target_vol_pct, name="target_vol_pct")
+    max_leveraged_weight = require_finite_number(
+        max_leveraged_weight,
+        name="max_leveraged_weight",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    if (
+        realized_vol_pct is None
+        or isinstance(realized_vol_pct, bool)
+        or not isinstance(realized_vol_pct, Real)
+        or not math.isfinite(float(realized_vol_pct))
+        or realized_vol_pct <= 0
+    ):
         return 0.0
     return max(0.0, min(max_leveraged_weight, target_vol_pct / realized_vol_pct))
 
@@ -97,6 +120,39 @@ def simulate_vol_target_rotation(
     docstring for the general mechanics this shares (pending-rebalance
     pattern, running average cost basis, band-based turnover control).
     """
+    require_aligned_price_series(
+        {
+            "stable_close": stable_close,
+            "leveraged_close": leveraged_close,
+            "stable_open": stable_open,
+            "leveraged_open": leveraged_open,
+        }
+    )
+    target_vol_pct = require_positive_number(target_vol_pct, name="target_vol_pct")
+    max_leveraged_weight = require_finite_number(
+        max_leveraged_weight,
+        name="max_leveraged_weight",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    trend_lookback_days = require_positive_int(trend_lookback_days, name="trend_lookback_days")
+    vol_lookback_days = require_positive_int(vol_lookback_days, name="vol_lookback_days")
+    rebalance_check_days = require_positive_int(rebalance_check_days, name="rebalance_check_days")
+    band_pct = require_finite_number(band_pct, name="band_pct", minimum=0.0, maximum=100.0)
+    initial_total = require_positive_number(initial_total, name="initial_total")
+    fallback_weights = require_long_only_weights(
+        fallback_weights,
+        name="fallback_weights",
+        expected_size=2,
+    )
+    cost_pct = require_rate(cost_pct, name="cost_pct")
+    tax_rate = require_rate(tax_rate, name="tax_rate", allow_one=True)
+    require_combined_rates_at_most_one(
+        cost_pct,
+        tax_rate,
+        first_name="cost_pct",
+        second_name="tax_rate",
+    )
     all_dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     stable_close = stable_close.reindex(all_dates)
     leveraged_close = leveraged_close.reindex(all_dates)
@@ -223,6 +279,29 @@ def grid_search_vol_target(
     """Grid-searches (target_vol_pct, max_leveraged_weight) combos,
     scored by Calmar ratio (CAGR / |max drawdown|). Caller is responsible
     for only passing DISCOVERY-period price series."""
+    require_aligned_price_series(
+        {
+            "stable_close": stable_close,
+            "leveraged_close": leveraged_close,
+            "stable_open": stable_open,
+            "leveraged_open": leveraged_open,
+        }
+    )
+    if not target_vol_options or not max_leveraged_weight_options:
+        raise ValueError("target_vol_options and max_leveraged_weight_options must be non-empty")
+    target_vol_options = tuple(
+        require_positive_number(value, name="target_vol_options item")
+        for value in target_vol_options
+    )
+    max_leveraged_weight_options = tuple(
+        require_finite_number(
+            value,
+            name="max_leveraged_weight_options item",
+            minimum=0.0,
+            maximum=1.0,
+        )
+        for value in max_leveraged_weight_options
+    )
     rows = []
     for target_vol in target_vol_options:
         for max_weight in max_leveraged_weight_options:

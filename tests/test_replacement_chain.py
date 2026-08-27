@@ -29,6 +29,15 @@ from assistant.proposal_status import (
     SUBMISSION_UNKNOWN,
 )
 from assistant.storage import AssistantStore
+from execution.broker_contract import BrokerAccountIdentity
+
+_ACCOUNT_ID = "paper-account-1"
+_SNAPSHOT_ID = "a" * 64
+_POLICY_FINGERPRINT = "b" * 64
+
+
+def _broker_account() -> dict:
+    return {"account_id": _ACCOUNT_ID, "paper": True}
 
 
 def _proposal(status: str = "broker_accepted", proposal_id: str = "tp-ready") -> dict:
@@ -38,6 +47,12 @@ def _proposal(status: str = "broker_accepted", proposal_id: str = "tp-ready") ->
         "expires_at": "2026-07-30T14:00:00+00:00",
         "status": status,
         "idempotency_key": f"idem-{proposal_id}",
+        "broker_execution_context": {
+            "account_id": _ACCOUNT_ID,
+            "account_mode": "paper",
+            "snapshot_id": _SNAPSHOT_ID,
+            "policy_fingerprint": _POLICY_FINGERPRINT,
+        },
         "intent": {
             "ticker": "AAPL",
             "side": "buy",
@@ -49,23 +64,43 @@ def _proposal(status: str = "broker_accepted", proposal_id: str = "tp-ready") ->
 
 
 def _order(status: str, *, filled_qty: float = 0.0) -> dict:
+    filled_text = str(filled_qty)
+    filled_price = 100.0 if filled_qty else None
     return {
         "order_id": "order-1",
         "client_order_id": "idem-tp-ready",
         "ticker": "AAPL",
+        "asset_class": "us_equity",
+        "order_class": "simple",
+        "extended_hours": False,
+        "legs": None,
         "shares": 10.0,
+        "shares_decimal": "10",
+        "notional": None,
+        "notional_decimal": None,
         "side": "buy",
         "type": "market",
         "limit_price": None,
+        "limit_price_decimal": None,
         "time_in_force": "day",
         "status": status,
         "filled_qty": filled_qty,
-        "filled_avg_price": 100.0 if filled_qty else None,
+        "filled_qty_decimal": filled_text,
+        "filled_avg_price": filled_price,
+        "filled_avg_price_decimal": None if filled_price is None else "100",
         "submitted_at": "2026-07-29T14:00:00+00:00",
         "updated_at": None,
+        "filled_at": (
+            "2026-07-29T14:00:00+00:00" if status == "filled" else None
+        ),
+        "canceled_at": None,
+        "expired_at": None,
+        "failed_at": None,
         "replaced_by": None,
         "replaces": None,
-        "replaced_at": None,
+        "replaced_at": (
+            "2026-07-29T14:00:00+00:00" if status == "replaced" else None
+        ),
     }
 
 
@@ -73,6 +108,10 @@ def _replaced(order_id: str, replaced_by: str) -> dict:
     order = _order("replaced")
     order["order_id"] = order_id
     order["replaced_by"] = replaced_by
+    if order_id.startswith("order-"):
+        sequence = int(order_id.removeprefix("order-"))
+        if sequence > 1:
+            order["replaces"] = f"order-{sequence - 1}"
     return order
 
 
@@ -89,6 +128,13 @@ def _chain_broker(orders: dict, *, record: list | None = None):
     broker does after a replacement); the chain is served by get_order_by_id."""
 
     class ChainBroker:
+        PAPER_TRADING = True
+        account_mode = "paper"
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
+
         @staticmethod
         def find_order_by_client_id(client_order_id):
             return orders.get("order-1")
@@ -97,7 +143,8 @@ def _chain_broker(orders: dict, *, record: list | None = None):
         def get_order_by_id(order_id):
             if record is not None:
                 record.append(order_id)
-            return orders.get(order_id)
+            scripted = orders.get(order_id)
+            return scripted() if callable(scripted) else scripted
 
         @staticmethod
         def cancel_order(order_id):
@@ -168,9 +215,16 @@ def test_polling_follows_multiple_successive_replacements():
 
 def test_polling_detects_a_replacement_cycle_and_stays_unresolved():
     """A broker reporting A -> B -> A must not loop forever."""
+    order_2_revisit = _replaced("order-2", "order-5")
+    order_2_revisit["replaces"] = "order-4"
+    order_2_versions = iter(
+        (_replaced("order-2", "order-3"), order_2_revisit)
+    )
     orders = {
         "order-1": _replaced("order-1", "order-2"),
-        "order-2": _replaced("order-2", "order-1"),
+        "order-2": lambda: next(order_2_versions),
+        "order-3": _replaced("order-3", "order-4"),
+        "order-4": _replaced("order-4", "order-2"),
     }
     with tempfile.TemporaryDirectory() as temp:
         store = _store(temp)
@@ -208,11 +262,18 @@ def test_a_replaced_order_without_replaced_by_stays_unresolved():
         store = _store(temp)
         result = reconcile_nonterminal_orders(store, broker_module=_chain_broker(orders))
         assert store.get_proposal("tp-ready")["status"] == SUBMISSION_UNKNOWN
-        assert any("no replaced_by" in e for e in result["errors"]), result["errors"]
+        assert any("replaced_by" in e for e in result["errors"]), result["errors"]
 
 
 def test_a_broker_lookup_failure_stays_unresolved():
     class ExplodingBroker:
+        PAPER_TRADING = True
+        account_mode = "paper"
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
+
         @staticmethod
         def find_order_by_client_id(client_order_id):
             return _replaced("order-1", "order-2")
@@ -234,6 +295,7 @@ def test_a_replacement_with_an_altered_quantity_trips_the_kill_switch():
     stored intent -- a changed quantity must fail closed."""
     altered = _replacement("order-2", "accepted", "order-1")
     altered["shares"] = 999.0
+    altered["shares_decimal"] = "999"
     orders = {"order-1": _replaced("order-1", "order-2"), "order-2": altered}
     with tempfile.TemporaryDirectory() as temp:
         store = _store(temp)
@@ -305,7 +367,12 @@ def test_a_late_replaced_event_cannot_regress_an_already_filled_proposal():
         assert store.get_proposal("tp-ready")["status"] == FILLED
 
         handle_trade_update(
-            store, {"order": _replaced("order-1", "order-2"), "event": "replaced"}
+            store,
+            {"order": _replaced("order-1", "order-2"), "event": "replaced"},
+            observed_account=BrokerAccountIdentity(
+                account_id=_ACCOUNT_ID,
+                account_mode="paper",
+            ),
         )
         assert store.get_proposal("tp-ready")["status"] == FILLED, (
             "a stale replaced event must not regress a filled proposal"

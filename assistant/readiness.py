@@ -8,6 +8,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from assistant.kill_switch import env_kill_switch_active
+from assistant.dispatch_fence import get_runtime_emergency_stop
 from assistant.money import to_decimal
 from assistant.policy import TradingPolicy
 from assistant.proposal_status import (
@@ -22,6 +23,11 @@ from assistant.proposal_status import (
     VALIDATING,
 )
 from assistant.storage import AssistantStore
+from assistant.temporal_integrity import (
+    MAX_READINESS_WINDOW_SECONDS as _MAX_READINESS_WINDOW_SECONDS,
+    bounded_timing_number,
+    timestamp_disposition,
+)
 
 CRITICAL_UNRESOLVED_STATUSES = (
     SUBMITTING,
@@ -39,6 +45,10 @@ ACTIVE_ORDER_STATUSES = (BROKER_ACCEPTED, PARTIALLY_FILLED, CANCEL_PENDING)
 # be claimed at all (found 2026-07-30 reviewing the duplicate-guard change that
 # introduced the blocking).
 STRANDED_CLAIM_STATUSES = (VALIDATING, APPROVED)
+# Tests and production fault-injection may replace the module's ``datetime``
+# clock with a subclass.  Keep the real type separately so an ordinary aware
+# datetime supplied by the caller remains valid under that injected clock.
+_DATETIME_TYPE = datetime
 
 
 def _check(name: str, ok: bool, detail: str) -> dict[str, Any]:
@@ -46,13 +56,46 @@ def _check(name: str, ok: bool, detail: str) -> dict[str, Any]:
 
 
 def _parse_timestamp(value: Any) -> datetime | None:
-    if not value:
+    if value is None or value == "":
         return None
-    try:
-        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-    except ValueError:
+    if isinstance(value, _DATETIME_TYPE):
+        parsed = value
+    elif isinstance(value, str):
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    else:
         return None
-    return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
+def _bounded_readiness_number(name: str, value: Any, *, maximum: float) -> float:
+    return bounded_timing_number(
+        name,
+        value,
+        minimum=0.0,
+        maximum=maximum,
+        minimum_inclusive=False,
+    )
+
+
+def _aware_readiness_now(value: datetime | None) -> datetime:
+    if value is None:
+        return datetime.now(timezone.utc)
+    if (
+        not isinstance(value, _DATETIME_TYPE)
+        or value.tzinfo is None
+        or value.utcoffset() is None
+    ):
+        raise ValueError("now must be a timezone-aware datetime or None")
+    return value.astimezone(timezone.utc)
+
+
+def _claim_timestamp_disposition(value: Any, *, now: datetime) -> dict[str, Any]:
+    return timestamp_disposition(value, now=now, field="updated_at")
 
 
 def transaction_readiness(
@@ -66,8 +109,20 @@ def transaction_readiness(
     check_broker: bool = True,
 ) -> dict[str, Any]:
     """Return a machine-readable, fail-closed readiness report."""
-    explicit_now = now
-    now = now or datetime.now(timezone.utc)
+    explicit_now = now is not None
+    now = _aware_readiness_now(now)
+    max_reconciliation_age_minutes = _bounded_readiness_number(
+        "max_reconciliation_age_minutes",
+        max_reconciliation_age_minutes,
+        maximum=_MAX_READINESS_WINDOW_SECONDS / 60.0,
+    )
+    stale_claim_seconds = _bounded_readiness_number(
+        "stale_claim_seconds",
+        stale_claim_seconds,
+        maximum=_MAX_READINESS_WINDOW_SECONDS,
+    )
+    if type(check_broker) is not bool:
+        raise ValueError("check_broker must be an actual bool")
     checks: list[dict[str, Any]] = []
 
     try:
@@ -99,15 +154,43 @@ def transaction_readiness(
             "active" if environment_kill_switch else "inactive",
         )
     )
-
-    kill_switch = store.get_kill_switch()
-    checks.append(
-        _check(
-            "persistent_kill_switch",
-            not bool(kill_switch.get("active")),
-            str(kill_switch.get("reason") or "inactive"),
+    try:
+        runtime_stop = get_runtime_emergency_stop(store.path)
+    except Exception as exc:
+        checks.append(
+            _check(
+                "runtime_emergency_stop",
+                False,
+                f"state could not be read; treating the runtime stop as active: {exc}",
+            )
         )
-    )
+    else:
+        checks.append(
+            _check(
+                "runtime_emergency_stop",
+                runtime_stop.get("active") is False,
+                str(runtime_stop.get("reason") or "inactive"),
+            )
+        )
+
+    try:
+        kill_switch = store.get_kill_switch()
+    except Exception as exc:
+        checks.append(
+            _check(
+                "persistent_kill_switch",
+                False,
+                f"state is unreadable; treating the emergency stop as active: {exc}",
+            )
+        )
+    else:
+        checks.append(
+            _check(
+                "persistent_kill_switch",
+                not kill_switch["active"],
+                str(kill_switch["reason"] or "inactive"),
+            )
+        )
 
     critical = store.list_proposals_by_statuses(CRITICAL_UNRESOLVED_STATUSES)
     checks.append(
@@ -144,14 +227,21 @@ def transaction_readiness(
     # different: its age cannot be proved, so fail closed and surface the row
     # instead of silently omitting a ticker/side block from the report.
     stranded: list[dict[str, Any]] = []
-    unreadable_claim_ages: list[dict[str, Any]] = []
-    for proposal in store.list_proposals_by_statuses(STRANDED_CLAIM_STATUSES):
-        parsed = _parse_timestamp(proposal.get("updated_at"))
-        if parsed is None:
-            unreadable_claim_ages.append(proposal)
-        elif now - parsed > timedelta(seconds=stale_claim_seconds):
+    unreadable_claim_ages: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    future_claim_ages: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    claim_proposals = store.list_proposals_by_statuses(STRANDED_CLAIM_STATUSES)
+    claim_checked_at = now if explicit_now else datetime.now(timezone.utc)
+    for proposal in claim_proposals:
+        disposition = _claim_timestamp_disposition(
+            proposal.get("updated_at"), now=claim_checked_at
+        )
+        if disposition["kind"] == "material_future":
+            future_claim_ages.append((proposal, disposition))
+        elif not disposition["integrity_ok"]:
+            unreadable_claim_ages.append((proposal, disposition))
+        elif float(disposition["signed_age_seconds"] or 0.0) > stale_claim_seconds:
             stranded.append(proposal)
-    claim_age_issues = bool(stranded or unreadable_claim_ages)
+    claim_age_issues = bool(stranded or unreadable_claim_ages or future_claim_ages)
     detail_parts: list[str] = []
     if stranded:
         detail_parts.append(
@@ -162,8 +252,17 @@ def transaction_readiness(
     if unreadable_claim_ages:
         detail_parts.append(
             "unreadable updated_at: " + ", ".join(
-                f"{p['proposal_id']}:{p['status']}={p.get('updated_at')!r}"
-                for p in unreadable_claim_ages
+                f"{p['proposal_id']}:{p['status']}={p.get('updated_at')!r} "
+                f"({d['kind']})"
+                for p, d in unreadable_claim_ages
+            )
+        )
+    if future_claim_ages:
+        detail_parts.append(
+            "materially future updated_at: " + ", ".join(
+                f"{p['proposal_id']}:{p['status']}={p.get('updated_at')!r}, "
+                f"signed_age_seconds={d['signed_age_seconds']:.6f}"
+                for p, d in future_claim_ages
             )
         )
     if stranded:
@@ -175,6 +274,11 @@ def transaction_readiness(
         detail_parts.append(
             "repair unreadable timestamp metadata before trading"
         )
+    if future_claim_ages:
+        detail_parts.append(
+            "do not auto-reclaim from future clock evidence; reconcile the clock "
+            "and claim metadata manually"
+        )
     checks.append(
         _check(
             "stranded_pre_broker_claims",
@@ -184,6 +288,9 @@ def transaction_readiness(
     )
 
     last_reconciliation = store.get_system_state("last_order_reconciliation")
+    reconciliation_state = (
+        last_reconciliation if isinstance(last_reconciliation, dict) else {}
+    )
     # AP-7 (second instance, found by counter-review): compare against a clock
     # captured AFTER reading the row, exactly as assistant/operations.py does.
     # `monitor-orders` rewrites this key every poll (30s in the deployed task)
@@ -195,12 +302,16 @@ def transaction_readiness(
     # readiness failure. An explicitly supplied clock stays frozen, so
     # deterministic/as-of evaluation and genuine future-date refusal are
     # unchanged.
-    reconciliation_checked_at = explicit_now or datetime.now(timezone.utc)
+    reconciliation_checked_at = now if explicit_now else datetime.now(timezone.utc)
     reconciled_at = _parse_timestamp(
-        last_reconciliation.get("at") if isinstance(last_reconciliation, dict) else None
+        reconciliation_state.get("at")
     )
     reconciliation_age = (
         None if reconciled_at is None else reconciliation_checked_at - reconciled_at
+    )
+    reconciliation_error_count = int(reconciliation_state.get("error_count", 0))
+    timestamp_integrity_error_count = int(
+        reconciliation_state.get("timestamp_integrity_error_count", 0)
     )
     reconciliation_fresh = (
         reconciled_at is not None
@@ -208,7 +319,8 @@ def transaction_readiness(
         and timedelta(0)
         <= reconciliation_age
         <= timedelta(minutes=max_reconciliation_age_minutes)
-        and int(last_reconciliation.get("error_count", 0)) == 0
+        and reconciliation_error_count == 0
+        and timestamp_integrity_error_count == 0
     )
     checks.append(
         _check(
@@ -219,13 +331,36 @@ def transaction_readiness(
                 if reconciled_at is None
                 else f"last completed at {reconciled_at.isoformat()}, "
                 f"age_seconds={reconciliation_age.total_seconds():.6f}, "
-                f"errors={last_reconciliation.get('error_count', 0)}"
+                f"errors={reconciliation_error_count}, "
+                f"timestamp_integrity_errors={timestamp_integrity_error_count}"
             ),
         )
     )
 
     trading_day = now.astimezone(ZoneInfo("America/New_York")).date().isoformat()
     usage = store.get_execution_budget_usage(trading_day)
+    fill_evidence_status = usage.get("evidence_status")
+    fill_integrity_errors = usage.get("integrity_errors")
+    fill_ledger_ok = (
+        fill_evidence_status
+        in {"provider_exact", "legacy_rounded_unrecoverable"}
+        and isinstance(fill_integrity_errors, list)
+        and not fill_integrity_errors
+    )
+    checks.append(
+        _check(
+            "fill_ledger_integrity",
+            fill_ledger_ok,
+            (
+                f"evidence_status={fill_evidence_status!r}; no integrity errors"
+                if fill_ledger_ok
+                else (
+                    f"evidence_status={fill_evidence_status!r}; "
+                    f"integrity_errors={fill_integrity_errors!r}"
+                )
+            ),
+        )
+    )
     submitted_notional = to_decimal(
         usage.get("submitted_notional_decimal", usage["submitted_notional"]),
         name="submitted_notional",

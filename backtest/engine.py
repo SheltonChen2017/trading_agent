@@ -24,6 +24,13 @@ import numpy as np
 import pandas as pd
 
 from data.research_statistics import bonferroni_threshold
+from data.research_input_contracts import (
+    require_horizon,
+    require_positive_int as _require_positive_int,
+    require_price_frame,
+    require_price_frame_mapping,
+    require_rate,
+)
 
 from config import (
     BACKTEST_HOLD_DAYS,
@@ -113,7 +120,8 @@ def run_backtest(
         TODAY's own close (e.g. signals/overnight_gap.py -- a signal
         known at the open, like an overnight-gap reversal, rather than
         after that day's own close). `hold_days` is IGNORED in this mode
-        (entry and exit are always the same row) -- pass any value. Use
+        (entry and exit are always the same row). Pass a non-negative
+        integer; zero is the explicit same-session horizon. Use
         this explicitly for a signal that's genuinely known at the open;
         do not rely on the general "next_open" default for it.
 
@@ -137,6 +145,18 @@ def run_backtest(
         raise ValueError(
             f"entry_timing must be 'same_close', 'next_open', or 'same_day_open_to_close', got {entry_timing!r}"
         )
+
+    hold_days = require_horizon(
+        hold_days,
+        allow_same_session_zero=entry_timing == "same_day_open_to_close",
+    )
+    slippage_pct = require_rate(slippage_pct, name="slippage_pct")
+    required_price_columns = ("close",) if entry_timing == "same_close" else ("open", "close")
+    require_price_frame_mapping(
+        data,
+        name="data",
+        required_columns=required_price_columns,
+    )
 
     kwargs = _resolve_scan_kwargs(scan_fn, scan_kwargs, return_z_threshold, volume_z_threshold)
     all_dates = sorted(set().union(*(df.index for df in data.values())))
@@ -609,6 +629,22 @@ def compute_benchmark_forward_returns(
             f"entry_timing must be 'same_close', 'next_open', or 'same_day_open_to_close', got {entry_timing!r}"
         )
 
+    hold_days = require_horizon(
+        hold_days,
+        allow_same_session_zero=entry_timing == "same_day_open_to_close",
+    )
+    slippage_pct = require_rate(slippage_pct, name="slippage_pct")
+    required_price_columns = (
+        ("close",)
+        if entry_timing == "same_close"
+        else (("open", "close") if entry_timing == "same_day_open_to_close" else ("open",))
+    )
+    require_price_frame(
+        benchmark_df,
+        name="benchmark_df",
+        required_columns=required_price_columns,
+    )
+
     if entry_timing == "same_close":
         entry_price, forward_price = benchmark_df["close"], benchmark_df["close"].shift(-hold_days)
     elif entry_timing == "same_day_open_to_close":
@@ -1059,12 +1095,6 @@ _MIN_RESOLVABLE_STEPS_BELOW_THRESHOLD = 10
 
 # Conventional target used by the approximate MDE reported with each cell.
 MIN_DETECTABLE_EFFECT_POWER = 0.80
-
-
-def _require_positive_int(value, *, name: str) -> int:
-    if isinstance(value, bool) or not isinstance(value, (int, np.integer)) or value < 1:
-        raise ValueError(f"{name} must be a positive integer, got {value!r}")
-    return int(value)
 
 
 def recommended_n_bootstrap(

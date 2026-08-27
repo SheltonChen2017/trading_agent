@@ -54,6 +54,22 @@ def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct
     leveraged-ETF exposure, cash %, and simple concentration warnings.
     Baskets overlap by design (see config.BASKETS) — a ticker can and
     often does count toward several basket exposures at once."""
+    from assistant.portfolio_snapshot import (
+        PortfolioSnapshotIntegrityError,
+        validate_long_only_portfolio_snapshot,
+    )
+
+    try:
+        validate_long_only_portfolio_snapshot(snapshot)
+    except PortfolioSnapshotIntegrityError as exc:
+        return RiskExposure(
+            basket_exposure_pct={},
+            leveraged_etf_exposure_pct=0.0,
+            cash_pct=0.0,
+            largest_single_position_pct=0.0,
+            concentration_warnings=[f"Portfolio integrity unavailable: {exc}"],
+        )
+
     total = snapshot.total_equity
     # isfinite first, not just `<= 0`: NaN loses every ordered comparison, so a
     # corrupt total silently produced NaN percentages and ZERO concentration

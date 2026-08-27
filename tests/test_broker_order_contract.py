@@ -18,6 +18,7 @@ from execution.broker_contract import (
     active_order_material_fingerprint,
     validate_active_order_set,
     validate_broker_order,
+    validated_broker_order_mapping,
 )
 
 
@@ -31,6 +32,10 @@ def _limit_order(**overrides):
         "order_id": "order-1",
         "client_order_id": "proposal-1:attempt-1",
         "ticker": "AAPL",
+        "asset_class": "us_equity",
+        "order_class": "simple",
+        "extended_hours": False,
+        "legs": None,
         "shares": 10.0,
         "shares_decimal": "10",
         "notional": None,
@@ -87,11 +92,23 @@ def test_valid_root_order_returns_canonical_exact_evidence():
     assert result.order_id == "order-1"
     assert result.client_order_id == "proposal-1:attempt-1"
     assert result.ticker == "AAPL"
+    assert result.asset_class == "us_equity"
+    assert result.order_class == "simple"
+    assert result.extended_hours is False
     assert result.quantity == Decimal("10")
     assert result.limit_price == Decimal("100.01")
     assert result.filled_quantity == Decimal("0")
     assert result.account == _PAPER_ACCOUNT
     assert result.submitted_at.utcoffset().total_seconds() == 0
+
+    canonical = validated_broker_order_mapping(result)
+    assert canonical["shares"] == canonical["shares_decimal"] == "10"
+    assert canonical["limit_price"] == canonical["limit_price_decimal"] == "100.01"
+    assert canonical["filled_qty"] == canonical["filled_qty_decimal"] == "0"
+    assert canonical["asset_class"] == "us_equity"
+    assert canonical["order_class"] == "simple"
+    assert canonical["extended_hours"] is False
+    assert canonical["legs"] is None
 
 
 @pytest.mark.parametrize(
@@ -114,6 +131,34 @@ def test_root_client_order_id_must_match_exactly(bad_client_id):
             _limit_order(client_order_id=bad_client_id), context=_root_context()
         ),
     )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_code"),
+    [
+        ({"order_id": " order-1 "}, "invalid_order_id"),
+        (
+            {"client_order_id": " proposal-1:attempt-1 "},
+            "client_order_id_mismatch",
+        ),
+        ({"replaces": " order-0 "}, "invalid_replaces_order_id"),
+        ({"replaced_by": " order-2 "}, "invalid_replaced_by_order_id"),
+    ],
+)
+def test_whitespace_padded_broker_identities_refuse(mutation, expected_code):
+    _assert_code(
+        expected_code,
+        lambda: validate_broker_order(
+            _limit_order(**mutation), context=_root_context()
+        ),
+    )
+
+
+def test_whitespace_padded_account_identity_refuses():
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        BrokerAccountIdentity(
+            account_id=" paper-account-1 ", account_mode="paper"
+        )
 
 
 def test_bound_account_requires_observed_identity_and_exact_match():
@@ -139,6 +184,21 @@ def test_bound_account_requires_observed_identity_and_exact_match():
                     account_id="paper-account-1", account_mode="live"
                 )
             ),
+        ),
+    )
+
+
+def test_empty_active_book_still_refuses_an_account_mismatch():
+    foreign_account = BrokerAccountIdentity(
+        account_id="paper-account-2", account_mode="paper"
+    )
+
+    _assert_code(
+        "account_mismatch",
+        lambda: validate_active_order_set(
+            [],
+            expected_account=_PAPER_ACCOUNT,
+            observed_account=foreign_account,
         ),
     )
 
@@ -174,8 +234,14 @@ def test_replacement_lineage_is_separate_from_root_client_identity():
         ({"type": "market", "limit_price": None,
           "limit_price_decimal": None}, "order_type_mismatch"),
         ({"time_in_force": "gtc"}, "invalid_time_in_force"),
-        ({"shares_decimal": "10.000000001"}, "quantity_mismatch"),
-        ({"limit_price_decimal": "100.02"}, "limit_price_mismatch"),
+        (
+            {"shares": 10.000000001, "shares_decimal": "10.000000001"},
+            "quantity_mismatch",
+        ),
+        (
+            {"limit_price": 100.02, "limit_price_decimal": "100.02"},
+            "limit_price_mismatch",
+        ),
         ({"status": "future_status"}, "unknown_status"),
     ],
 )
@@ -193,6 +259,66 @@ def test_material_identity_and_closed_status_vocabulary_refuse_drift(
 @pytest.mark.parametrize(
     ("mutation", "expected_code"),
     [
+        ({"asset_class": "crypto"}, "unsupported_asset_class"),
+        ({"order_class": "bracket"}, "unsupported_order_class"),
+        ({"extended_hours": True}, "unsupported_extended_hours"),
+        ({"legs": [{"order_id": "child-order"}]}, "unsupported_order_legs"),
+    ],
+)
+def test_unsupported_order_structure_refuses(mutation, expected_code):
+    _assert_code(
+        expected_code,
+        lambda: validate_broker_order(
+            _limit_order(**mutation), context=_root_context()
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_field"),
+    [
+        ({"shares": 9.0, "shares_decimal": "10"}, "shares"),
+        (
+            {
+                "shares": None,
+                "shares_decimal": None,
+                "notional": 999.0,
+                "notional_decimal": "1000",
+            },
+            "notional",
+        ),
+        (
+            {"limit_price": 100.02, "limit_price_decimal": "100.01"},
+            "limit_price",
+        ),
+        ({"filled_qty": 1.0, "filled_qty_decimal": "0"}, "filled_qty"),
+        (
+            {
+                "status": "partially_filled",
+                "filled_qty": 1.0,
+                "filled_qty_decimal": "1",
+                "filled_avg_price": 99.0,
+                "filled_avg_price_decimal": "100",
+            },
+            "filled_avg_price",
+        ),
+    ],
+)
+def test_exact_and_legacy_numeric_companions_must_agree(
+    mutation, expected_field
+):
+    error = _assert_code(
+        "numeric_companion_mismatch",
+        lambda: validate_broker_order(
+            _limit_order(**mutation), context=_root_context()
+        ),
+    )
+    assert error.field == expected_field
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_code"),
+    [
         ({"shares": float("nan"), "shares_decimal": None}, "invalid_quantity"),
         ({"shares": float("inf"), "shares_decimal": None}, "invalid_quantity"),
         ({"shares": True, "shares_decimal": None}, "invalid_quantity"),
@@ -203,7 +329,7 @@ def test_material_identity_and_closed_status_vocabulary_refuse_drift(
          "invalid_filled_quantity"),
     ],
 )
-def test_malformed_or_nonfinite_exact_evidence_refuses(mutation, expected_code):
+def test_malformed_or_nonfinite_numeric_evidence_refuses(mutation, expected_code):
     _assert_code(
         expected_code,
         lambda: validate_broker_order(
@@ -217,17 +343,26 @@ def test_malformed_or_nonfinite_exact_evidence_refuses(mutation, expected_code):
     [
         ({"filled_qty": None, "filled_qty_decimal": None},
          "invalid_filled_quantity"),
-        ({"status": "new", "filled_qty_decimal": "1",
+        ({"status": "new", "filled_qty": 1.0, "filled_qty_decimal": "1",
+          "filled_avg_price": 100.0,
           "filled_avg_price_decimal": "100"}, "invalid_fill_state"),
-        ({"status": "partially_filled", "filled_qty_decimal": "0"},
+        ({"status": "partially_filled", "filled_qty": 0.0,
+          "filled_qty_decimal": "0"},
          "invalid_fill_state"),
-        ({"status": "partially_filled", "filled_qty_decimal": "10",
+        ({"status": "partially_filled", "filled_qty": 10.0,
+          "filled_qty_decimal": "10", "filled_avg_price": 100.0,
           "filled_avg_price_decimal": "100"}, "invalid_fill_state"),
-        ({"status": "partially_filled", "filled_qty_decimal": "1",
+        ({"status": "partially_filled", "filled_qty": 1.0,
+          "filled_qty_decimal": "1", "filled_avg_price": None,
           "filled_avg_price_decimal": None}, "invalid_fill_state"),
-        ({"status": "filled", "filled_qty_decimal": "9",
+        ({"status": "partially_filled", "filled_qty": 1.0,
+          "filled_qty_decimal": "1", "filled_avg_price": 0.0,
+          "filled_avg_price_decimal": "0"}, "invalid_fill_state"),
+        ({"status": "filled", "filled_qty": 9.0,
+          "filled_qty_decimal": "9", "filled_avg_price": 100.0,
           "filled_avg_price_decimal": "100"}, "invalid_fill_state"),
-        ({"status": "filled", "filled_qty_decimal": "10",
+        ({"status": "filled", "filled_qty": 10.0,
+          "filled_qty_decimal": "10", "filled_avg_price": None,
           "filled_avg_price_decimal": None}, "invalid_fill_state"),
     ],
 )
@@ -246,9 +381,11 @@ def test_partial_terminal_order_with_positive_exact_fill_is_valid():
     result = validate_broker_order(
         _limit_order(
             status="canceled",
+            filled_qty=2.5,
             filled_qty_decimal="2.5",
+            filled_avg_price=99.875,
             filled_avg_price_decimal="99.875",
-            canceled_at="2026-08-26T15:31:00Z",
+            canceled_at="2026-08-26T15:30:01Z",
         ),
         context=_root_context(),
     )
@@ -305,7 +442,8 @@ def test_one_bad_active_row_invalidates_the_entire_open_order_set():
         {"time_in_force": None},
         {"shares": None, "shares_decimal": None},
         {"shares": float("nan"), "shares_decimal": None},
-        {"status": "filled", "filled_qty_decimal": "10",
+        {"status": "filled", "filled_qty": 10.0,
+         "filled_qty_decimal": "10", "filled_avg_price": 100.0,
          "filled_avg_price_decimal": "100"},
     ],
 )
@@ -349,6 +487,7 @@ def test_active_order_material_fingerprint_is_exact_and_order_independent():
     assert fingerprint == active_order_material_fingerprint(equivalent_validated)
 
     changed = deepcopy(second)
+    changed["shares"] = 10.000000001
     changed["shares_decimal"] = "10.000000001"
     changed_validated = validate_active_order_set(
         [first, changed],

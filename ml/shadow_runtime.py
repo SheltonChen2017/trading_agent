@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 
 from data.evidence_status import EvidenceStatus
+from data.exchange_calendar import resolve_target_session, trading_sessions
 from ml.artifacts import load_model_artifact, load_model_manifest
 from ml.contracts import ModelManifest, PredictionRecord, require_matching_feature_order
 from ml.features import FeatureError, compute_point_in_time_features
@@ -34,7 +35,6 @@ from ml.prospective import (
     ProspectiveInferenceContract,
     derive_volatility_uncertainty,
 )
-from ml.shadow import trading_sessions
 from ml.volatility import (
     VolatilityModelError,
     annualize_pct,
@@ -612,6 +612,9 @@ def build_unavailable_prediction(
         as_of_session=as_of_session,
         generated_at=generated_at,
         horizon_sessions=config.horizon_sessions,
+        target_session=resolve_target_session(
+            as_of_session, config.horizon_sessions
+        ),
         target_available_at=target_available_at,
         values={},
         uncertainty={},
@@ -956,6 +959,9 @@ def build_volatility_prediction(
         as_of_session=as_of_session,
         generated_at=generated_at,
         horizon_sessions=config.horizon_sessions,
+        target_session=resolve_target_session(
+            as_of_session, config.horizon_sessions
+        ),
         target_available_at=target_available_at,
         values={
             "daily_volatility_pct": round(daily_volatility, 6),

@@ -103,6 +103,17 @@ from __future__ import annotations
 
 import pandas as pd
 
+from data.research_input_contracts import (
+    require_finite_number,
+    require_index_window,
+    require_nonnegative_int,
+    require_positive_int,
+    require_positive_number,
+    require_price_frame,
+    require_price_frame_mapping,
+    require_rate,
+)
+
 RESULT_COLUMNS = [
     "ticker", "entry_signal_date", "entry_date", "exit_date",
     "n_buys", "n_sells", "total_deployed", "total_returned",
@@ -134,6 +145,15 @@ def find_entry_dates(
     Every quantity uses only data up to and including that row -- causal,
     same discipline as every other signal in this project.
     """
+    require_price_frame(df, name="df", required_columns=("close",))
+    low_lookback_days = require_positive_int(low_lookback_days, name="low_lookback_days")
+    window_days = require_positive_int(window_days, name="window_days")
+    drop_threshold_pct = require_finite_number(
+        drop_threshold_pct,
+        name="drop_threshold_pct",
+        minimum=0.0,
+        maximum=100.0,
+    )
     close = df["close"]
     n = len(close)
     entries = []
@@ -170,7 +190,40 @@ def simulate_episode(
     last available bar). Every fill is at the FOLLOWING day's open
     (see module docstring); every trigger is evaluated on daily closes.
     """
+    require_price_frame(df, name="df", required_columns=("open", "close"))
+    signal_idx = require_nonnegative_int(signal_idx, name="signal_idx")
     n = len(df)
+    if signal_idx >= n:
+        raise ValueError(f"signal_idx must be less than data length {n}, got {signal_idx}")
+    trim_pct = require_finite_number(
+        trim_pct,
+        name="trim_pct",
+        minimum=0.0,
+        minimum_inclusive=False,
+        maximum=1.0,
+    )
+    trigger_pct = require_finite_number(
+        trigger_pct,
+        name="trigger_pct",
+        minimum=0.0,
+        minimum_inclusive=False,
+        maximum=1.0,
+    )
+    position_cap_multiple = require_finite_number(
+        position_cap_multiple,
+        name="position_cap_multiple",
+        minimum=1.0,
+    )
+    stop_loss_pct = require_finite_number(
+        stop_loss_pct,
+        name="stop_loss_pct",
+        minimum=0.0,
+        minimum_inclusive=False,
+        maximum=100.0,
+    )
+    max_hold_days = require_positive_int(max_hold_days, name="max_hold_days")
+    initial_notional = require_positive_number(initial_notional, name="initial_notional")
+    slippage_pct = require_rate(slippage_pct, name="slippage_pct")
     entry_idx = signal_idx + 1
     if entry_idx >= n:
         return None
@@ -285,6 +338,11 @@ def simulate_episode(
 
     net_return_pct = (cash_in - cash_out) / cash_out * 100 if cash_out > 0 else 0.0
     exit_idx = min(exit_idx, n - 1)
+    entry_idx, exit_idx = require_index_window(
+        entry_idx=entry_idx,
+        exit_idx=exit_idx,
+        length=n,
+    )
 
     return {
         "entry_signal_date": df.index[signal_idx],
@@ -322,8 +380,19 @@ def simulate_buy_and_hold(
     """
     if exit_price_column not in {"open", "close"}:
         raise ValueError("exit_price_column must be 'open' or 'close'")
+    require_price_frame(
+        df,
+        name="df",
+        required_columns=("open", exit_price_column),
+    )
+    entry_idx, exit_idx = require_index_window(
+        entry_idx=entry_idx,
+        exit_idx=exit_idx,
+        length=len(df),
+    )
+    initial_notional = require_positive_number(initial_notional, name="initial_notional")
+    slippage_pct = require_rate(slippage_pct, name="slippage_pct")
     entry_fill = float(df["open"].iloc[entry_idx]) * (1 + slippage_pct)
-    exit_idx = min(exit_idx, len(df) - 1)
     exit_fill = float(df[exit_price_column].iloc[exit_idx]) * (1 - slippage_pct)
     return (exit_fill - entry_fill) / entry_fill * 100
 
@@ -348,6 +417,48 @@ def run_decline_grid_backtest(
     episode per ticker at a time, matching backtest/portfolio_simulator.py's
     existing convention), and return one row per completed episode.
     """
+    require_price_frame_mapping(
+        data,
+        name="data",
+        required_columns=("open", "close"),
+    )
+    trim_pct = require_finite_number(
+        trim_pct,
+        name="trim_pct",
+        minimum=0.0,
+        minimum_inclusive=False,
+        maximum=1.0,
+    )
+    window_days = require_positive_int(window_days, name="window_days")
+    low_lookback_days = require_positive_int(low_lookback_days, name="low_lookback_days")
+    drop_threshold_pct = require_finite_number(
+        drop_threshold_pct,
+        name="drop_threshold_pct",
+        minimum=0.0,
+        maximum=100.0,
+    )
+    trigger_pct = require_finite_number(
+        trigger_pct,
+        name="trigger_pct",
+        minimum=0.0,
+        minimum_inclusive=False,
+        maximum=1.0,
+    )
+    position_cap_multiple = require_finite_number(
+        position_cap_multiple,
+        name="position_cap_multiple",
+        minimum=1.0,
+    )
+    stop_loss_pct = require_finite_number(
+        stop_loss_pct,
+        name="stop_loss_pct",
+        minimum=0.0,
+        minimum_inclusive=False,
+        maximum=100.0,
+    )
+    max_hold_days = require_positive_int(max_hold_days, name="max_hold_days")
+    initial_notional = require_positive_number(initial_notional, name="initial_notional")
+    slippage_pct = require_rate(slippage_pct, name="slippage_pct")
     rows = []
     for ticker, df in data.items():
         entry_indices = find_entry_dates(df, low_lookback_days, window_days, drop_threshold_pct)

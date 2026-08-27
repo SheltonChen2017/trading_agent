@@ -24,11 +24,12 @@ import contextlib
 import sys
 import tempfile
 import types
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
 
+import assistant.dispatch_fence as dispatch_fence_module
 from assistant.order_lifecycle import (
     CHAIN_ERROR_IDENTITY_MISMATCH,
     CHAIN_ERROR_UNRESOLVED,
@@ -52,6 +53,20 @@ from assistant.storage import AssistantStore
 
 _INTENT = {"ticker": "AAPL", "side": "buy", "shares": 10, "order_type": "market", "limit_price": None}
 _OLD = "2020-01-01T00:00:00+00:00"
+_ACCOUNT_ID = "paper-account-1"
+_SNAPSHOT_ID = "a" * 64
+_POLICY_FINGERPRINT = "b" * 64
+
+
+@pytest.fixture(autouse=True)
+def _isolated_dispatch_runtime(tmp_path, monkeypatch):
+    """Prevent emergency-stop latches from leaking across focused tests."""
+    runtime_root = (tmp_path / "runtime").resolve()
+    monkeypatch.setattr(dispatch_fence_module, "_RUNTIME_FENCE_ROOT", runtime_root)
+
+
+def _broker_account() -> dict:
+    return {"account_id": _ACCOUNT_ID, "paper": True}
 
 
 def _proposal(status: str = "broker_accepted", pid: str = "tp-ready") -> dict:
@@ -61,25 +76,63 @@ def _proposal(status: str = "broker_accepted", pid: str = "tp-ready") -> dict:
         "expires_at": "2026-07-30T14:00:00+00:00",
         "status": status,
         "idempotency_key": f"idem-{pid}",
+        "broker_execution_context": {
+            "account_id": _ACCOUNT_ID,
+            "account_mode": "paper",
+            "snapshot_id": _SNAPSHOT_ID,
+            "policy_fingerprint": _POLICY_FINGERPRINT,
+        },
         "intent": dict(_INTENT),
     }
 
 
 def _order(order_id: str, status: str, **kw) -> dict:
     order = {
-        "order_id": order_id, "client_order_id": f"c-{order_id}", "ticker": "AAPL",
-        "shares": 10.0, "side": "buy", "type": "market", "limit_price": None,
+        "order_id": order_id,
+        "client_order_id": (
+            "idem-tp-ready" if order_id == "order-1" else f"c-{order_id}"
+        ),
+        "ticker": "AAPL", "asset_class": "us_equity", "order_class": "simple",
+        "extended_hours": False, "legs": None,
+        "shares": 10.0, "shares_decimal": "10", "notional": None,
+        "notional_decimal": None, "side": "buy", "type": "market",
+        "limit_price": None, "limit_price_decimal": None,
         "time_in_force": "day", "status": status, "filled_qty": 0.0,
-        "filled_avg_price": None, "submitted_at": "2026-07-29T14:00:00+00:00",
-        "updated_at": None, "replaced_by": None, "replaces": None, "replaced_at": None,
+        "filled_qty_decimal": "0", "filled_avg_price": None,
+        "filled_avg_price_decimal": None,
+        "submitted_at": "2026-07-29T14:00:00+00:00", "updated_at": None,
+        "filled_at": None, "canceled_at": None, "expired_at": None,
+        "failed_at": None, "replaced_by": None, "replaces": None,
+        "replaced_at": None,
     }
     order.update(kw)
+    order["shares_decimal"] = str(order["shares"])
+    order["limit_price_decimal"] = (
+        None if order["limit_price"] is None else str(order["limit_price"])
+    )
+    order["filled_qty_decimal"] = str(order["filled_qty"])
+    order["filled_avg_price_decimal"] = (
+        None
+        if order["filled_avg_price"] is None
+        else str(order["filled_avg_price"])
+    )
+    if status == "filled" and order["filled_at"] is None:
+        order["filled_at"] = order["submitted_at"]
+    if status == "replaced" and order["replaced_at"] is None:
+        order["replaced_at"] = order["submitted_at"]
     return order
 
 
 def _broker(orders: dict, *, lookups: list | None = None, canceled: list | None = None,
             cancel_raises: bool = False):
     class B:
+        PAPER_TRADING = True
+        account_mode = "paper"
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
+
         @staticmethod
         def find_order_by_client_id(key):
             return orders.get("order-1")
@@ -88,7 +141,8 @@ def _broker(orders: dict, *, lookups: list | None = None, canceled: list | None 
         def get_order_by_id(oid):
             if lookups is not None:
                 lookups.append(oid)
-            return orders.get(oid)
+            scripted = orders.get(oid)
+            return scripted() if callable(scripted) else scripted
 
         @staticmethod
         def cancel_order(oid):
@@ -148,11 +202,15 @@ def _run_manual(orders: dict, lookups: list):
     from assistant.execution_service import reconcile_submission
 
     fake = types.ModuleType("execution.alpaca_broker")
+    fake.PAPER_TRADING = True
+    fake.account_mode = "paper"
+    fake.get_account = _broker_account
     fake.find_order_by_client_id = lambda key: orders.get("order-1")
 
     def _get(oid):
         lookups.append(oid)
-        return orders.get(oid)
+        scripted = orders.get(oid)
+        return scripted() if callable(scripted) else scripted
 
     fake.get_order_by_id = _get
     with _patched_broker(fake):
@@ -222,6 +280,9 @@ def test_manual_reconciliation_survives_a_lookup_exception():
     from assistant.execution_service import reconcile_submission
 
     fake = types.ModuleType("execution.alpaca_broker")
+    fake.PAPER_TRADING = True
+    fake.account_mode = "paper"
+    fake.get_account = _broker_account
     fake.find_order_by_client_id = lambda key: orders["order-1"]
 
     def _boom(oid):
@@ -239,9 +300,20 @@ def test_manual_reconciliation_survives_a_lookup_exception():
 
 
 def test_manual_reconciliation_detects_a_cycle():
+    order_2_revisit = _order(
+        "order-2", "replaced", replaced_by="order-5", replaces="order-4"
+    )
+    order_2_versions = iter(
+        (
+            _order("order-2", "replaced", replaced_by="order-3", replaces="order-1"),
+            order_2_revisit,
+        )
+    )
     orders = {
         "order-1": _order("order-1", "replaced", replaced_by="order-2"),
-        "order-2": _order("order-2", "replaced", replaced_by="order-1", replaces="order-1"),
+        "order-2": lambda: next(order_2_versions),
+        "order-3": _order("order-3", "replaced", replaced_by="order-4", replaces="order-2"),
+        "order-4": _order("order-4", "replaced", replaced_by="order-2", replaces="order-3"),
     }
     out = _run_manual(orders, [])
     assert out["status"] == SUBMISSION_UNKNOWN
@@ -388,6 +460,13 @@ def test_emergency_cancel_all_engages_kill_switch_and_cancels_unmanaged_orders()
     canceled: list[str] = []
 
     class Broker:
+        PAPER_TRADING = True
+        account_mode = "paper"
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
+
         @staticmethod
         def get_open_orders():
             return [managed, unmanaged]
@@ -420,6 +499,13 @@ def test_emergency_cancel_all_continues_after_one_broker_rejection():
     attempted: list[str] = []
 
     class Broker:
+        PAPER_TRADING = True
+        account_mode = "paper"
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
+
         @staticmethod
         def get_open_orders():
             return [first, second]
@@ -449,6 +535,13 @@ def test_emergency_cancel_all_continues_after_one_broker_rejection():
 
 def test_emergency_cancel_all_records_an_open_order_query_failure():
     class Broker:
+        PAPER_TRADING = True
+        account_mode = "paper"
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
+
         @staticmethod
         def get_open_orders():
             raise RuntimeError("broker unavailable")
@@ -519,6 +612,218 @@ def test_a_failed_cancellation_is_not_reported_as_requested():
         )
         assert result["cancellation_requested"] == 0, "a refused cancel must not be counted"
         assert result["errors"], "the failure must surface as an error"
+
+
+@pytest.mark.parametrize(
+    ("submitted_at", "expected_kind"),
+    [
+        (None, "missing"),
+        ("not-a-timestamp", "malformed"),
+        ("2026-08-26T16:00:00", "naive"),
+        ("2026-08-26T16:00:05.001000+00:00", "material_future"),
+    ],
+)
+def test_bad_stale_order_time_enters_explicit_operator_recovery(
+    submitted_at, expected_kind
+):
+    """Ambiguous time cannot be reported as a successful stale-order pass.
+
+    Automatic cancellation from corrupt time evidence is unsafe: the order may
+    have been submitted moments ago.  The risk-reducing seam is therefore an
+    explicit operator-recovery disposition backed by a durable halt/alert.
+    """
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    orders = {
+        "order-1": _order(
+            "order-1", "accepted", submitted_at=submitted_at
+        )
+    }
+    canceled: list[str] = []
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = reconcile_nonterminal_orders(
+            store,
+            broker_module=_broker(orders, canceled=canceled),
+            cancel_stale=True,
+            max_order_age_minutes=30.0,
+            now=now,
+        )
+
+        assert canceled == []
+        assert result["cancellation_requested"] == 0
+        assert result["timestamp_integrity_failures"] == 1
+        assert len(result["errors"]) == 1
+        disposition = result["cancellation_dispositions"][0]
+        assert disposition["timestamp"]["kind"] == expected_kind
+        assert disposition["timestamp"]["integrity_ok"] is False
+        assert disposition["cancellation"] == {
+            "kind": "operator_recovery_required",
+            "requested": False,
+        }
+        assert disposition["order_id"] == "order-1"
+        assert store.get_kill_switch()["active"] is True
+        heartbeat = store.get_system_state("last_order_reconciliation")
+        assert heartbeat["error_count"] == 1
+        assert heartbeat["timestamp_integrity_error_count"] == 1
+        alerts = store.list_operational_alerts()
+        assert len(alerts) == 1
+        assert alerts[0]["severity"] == "critical"
+        assert alerts[0]["details"]["order_id"] == "order-1"
+        assert (
+            alerts[0]["details"]["timestamp_disposition"]["kind"]
+            == expected_kind
+        )
+        assert (
+            alerts[0]["details"]["cancellation_disposition"]
+            == "operator_recovery_required"
+        )
+
+
+def test_bad_authoritative_replacement_time_keeps_structured_disposition():
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    orders = {
+        "order-1": _order(
+            "order-1",
+            "replaced",
+            replaced_by="order-2",
+            submitted_at=(now - timedelta(hours=1)).isoformat(),
+        ),
+        "order-2": _order(
+            "order-2",
+            "accepted",
+            replaces="order-1",
+            submitted_at="2026-08-26T16:00:00",
+        ),
+    }
+    canceled: list[str] = []
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = reconcile_nonterminal_orders(
+            store,
+            broker_module=_broker(orders, canceled=canceled),
+            cancel_stale=True,
+            max_order_age_minutes=30.0,
+            now=now,
+        )
+
+        assert canceled == []
+        assert result["timestamp_integrity_failures"] == 1
+        disposition = result["cancellation_dispositions"][0]
+        assert disposition["order_id"] == "order-2"
+        assert disposition["timestamp"]["kind"] == "naive"
+        assert (
+            disposition["cancellation"]["kind"]
+            == "operator_recovery_required"
+        )
+
+
+@pytest.mark.parametrize(
+    ("offset_seconds", "expected_kind"),
+    [
+        (0.0, "valid"),
+        (-60.0, "valid"),
+        (5.0, "small_future_skew"),
+    ],
+)
+def test_recent_order_time_and_frozen_future_skew_boundary_are_healthy(
+    offset_seconds, expected_kind
+):
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    submitted_at = (now + timedelta(seconds=offset_seconds)).isoformat()
+    orders = {
+        "order-1": _order(
+            "order-1", "accepted", submitted_at=submitted_at
+        )
+    }
+    canceled: list[str] = []
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = reconcile_nonterminal_orders(
+            store,
+            broker_module=_broker(orders, canceled=canceled),
+            cancel_stale=True,
+            max_order_age_minutes=30.0,
+            now=now,
+        )
+
+        assert canceled == []
+        assert result["errors"] == []
+        assert result["timestamp_integrity_failures"] == 0
+        disposition = result["cancellation_dispositions"][0]
+        assert disposition["timestamp"]["kind"] == expected_kind
+        assert disposition["cancellation"]["kind"] == "recent"
+        assert store.get_kill_switch()["active"] is False
+
+
+def test_implicit_order_clock_is_captured_after_the_broker_read(monkeypatch):
+    """A slow lookup must not manufacture a materially-future timestamp."""
+    import assistant.order_reconciler as reconciler_module
+
+    started_at = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    submitted_at = started_at + timedelta(seconds=6)
+
+    class AdvancingDateTime(datetime):
+        calls = 0
+
+        @classmethod
+        def now(cls, tz=None):
+            cls.calls += 1
+            value = started_at if cls.calls == 1 else started_at + timedelta(seconds=10)
+            return value if tz is None else value.astimezone(tz)
+
+    monkeypatch.setattr(reconciler_module, "datetime", AdvancingDateTime)
+    orders = {
+        "order-1": _order(
+            "order-1", "accepted", submitted_at=submitted_at.isoformat()
+        )
+    }
+    canceled: list[str] = []
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = reconcile_nonterminal_orders(
+            store,
+            broker_module=_broker(orders, canceled=canceled),
+            cancel_stale=True,
+            max_order_age_minutes=30.0,
+        )
+
+        assert canceled == []
+        assert result["errors"] == []
+        assert result["timestamp_integrity_failures"] == 0
+        assert (
+            result["cancellation_dispositions"][0]["timestamp"]["kind"]
+            == "valid"
+        )
+        assert store.get_kill_switch()["active"] is False
+
+
+def test_stale_boundary_requests_cancellation_and_records_its_disposition():
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    orders = {
+        "order-1": _order(
+            "order-1",
+            "accepted",
+            submitted_at=(now - timedelta(minutes=30)).isoformat(),
+        )
+    }
+    canceled: list[str] = []
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = reconcile_nonterminal_orders(
+            store,
+            broker_module=_broker(orders, canceled=canceled),
+            cancel_stale=True,
+            max_order_age_minutes=30.0,
+            now=now,
+        )
+
+        assert canceled == ["order-1"]
+        assert result["errors"] == []
+        assert result["cancellation_requested"] == 1
+        disposition = result["cancellation_dispositions"][0]
+        assert disposition["timestamp"]["signed_age_seconds"] == 30.0 * 60.0
+        assert disposition["cancellation"]["kind"] == "requested_for_staleness"
+        assert disposition["cancellation"]["requested"] is True
 
 
 def test_the_stored_broker_order_is_the_authoritative_replacement():
@@ -680,7 +985,10 @@ def test_resolver_leaves_a_non_replaced_order_untouched():
 
 
 def test_resolver_depth_bound_is_the_documented_constant():
-    orders = {f"order-{i}": _order(f"order-{i}", "replaced", replaced_by=f"order-{i + 1}")
+    orders = {f"order-{i}": _order(
+                  f"order-{i}", "replaced", replaced_by=f"order-{i + 1}",
+                  replaces=f"order-{i - 1}" if i > 1 else None,
+              )
               for i in range(1, 60)}
     out = resolve_replacement_chain(orders["order-1"], lambda oid: orders.get(oid))
     assert out.error_kind == CHAIN_ERROR_UNRESOLVED

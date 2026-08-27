@@ -9,7 +9,6 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import json
-import math
 from datetime import datetime, timezone
 from typing import Any, Callable, TYPE_CHECKING
 
@@ -28,6 +27,7 @@ from assistant.proposal_status import (
     SUBMITTING,
     EXECUTED,
 )
+from execution.broker_contract import KNOWN_BROKER_ORDER_STATUSES
 
 if TYPE_CHECKING:
     from assistant.storage import AssistantStore
@@ -36,13 +36,13 @@ if TYPE_CHECKING:
 _ACCEPTED = {
     "accepted",
     "accepted_for_bidding",
-    "calculated",
-    "held",
     "new",
     "pending_new",
+    "pending_review",
     "stopped",
     "suspended",
 }
+_KNOWN_BUT_AMBIGUOUS = {"calculated", "held"}
 _PARTIAL = {"partially_filled"}
 _CANCEL_PENDING = {"pending_cancel", "pending_replace"}
 # "replaced" is NOT cancel-pending. It is terminal for THIS order id -- the
@@ -124,16 +124,6 @@ def normalize_broker_status(value: Any) -> str:
     return text.rsplit(".", 1)[-1]
 
 
-def _finite_float(value: Any) -> float | None:
-    if value is None:
-        return None
-    try:
-        parsed = float(value)
-    except (TypeError, ValueError):
-        return None
-    return parsed if math.isfinite(parsed) else None
-
-
 MAX_REPLACEMENT_CHAIN_DEPTH = 10
 
 # Distinguishes the two failure modes, because callers must react differently:
@@ -154,10 +144,18 @@ class ReplacementResolution:
     chain: tuple[str, ...]
     error: str | None = None
     error_kind: str | None = None
+    root_order_id: str | None = None
 
     @property
     def followed_a_replacement(self) -> bool:
         return bool(self.chain)
+
+    @property
+    def order_path(self) -> tuple[str, ...]:
+        """The explicit root-to-authoritative broker replacement path."""
+        if self.root_order_id is None:
+            return self.chain
+        return (self.root_order_id, *self.chain)
 
 
 def resolve_replacement_chain(
@@ -166,6 +164,7 @@ def resolve_replacement_chain(
     *,
     validate: Callable[[dict[str, Any]], tuple[bool, str]] | None = None,
     max_depth: int = MAX_REPLACEMENT_CHAIN_DEPTH,
+    require_back_reference: bool = True,
 ) -> ReplacementResolution:
     """
     Follow `replaced_by` from `order` to the order that is authoritative NOW,
@@ -206,6 +205,12 @@ def resolve_replacement_chain(
     traversed: list[dict[str, Any]] = []
     visited: set[str] = set()
     current = order
+    raw_root_order_id = order.get("order_id")
+    root_order_id = (
+        raw_root_order_id
+        if isinstance(raw_root_order_id, str) and raw_root_order_id
+        else None
+    )
 
     while is_replaced_order(current):
         current_id = str(current.get("order_id") or "")
@@ -214,6 +219,7 @@ def resolve_replacement_chain(
                 None, tuple(traversed), tuple(chain),
                 f"replacement chain revisits order {current_id} (cycle)",
                 CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
             )
         if current_id:
             visited.add(current_id)
@@ -225,12 +231,23 @@ def resolve_replacement_chain(
                 "order is marked replaced but the broker reported no replaced_by, "
                 "so the replacement cannot be located",
                 CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
+            )
+        if current_id and str(replaced_by) == current_id:
+            return ReplacementResolution(
+                None,
+                tuple(traversed),
+                tuple(chain),
+                f"order {current_id} claims to replace itself",
+                CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
             )
         if len(chain) >= max_depth:
             return ReplacementResolution(
                 None, tuple(traversed), tuple(chain),
                 f"replacement chain exceeded {max_depth} hops (stopped at {replaced_by})",
                 CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
             )
         chain.append(str(replaced_by))
 
@@ -241,28 +258,50 @@ def resolve_replacement_chain(
                 None, tuple(traversed), tuple(chain),
                 f"replacement order {replaced_by} lookup failed: {exc}",
                 CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
             )
         if nxt is None:
             return ReplacementResolution(
                 None, tuple(traversed), tuple(chain),
                 f"replacement order {replaced_by} could not be found at the broker",
                 CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
             )
 
         fetched_id = str(nxt.get("order_id") or "")
-        if fetched_id and fetched_id != str(replaced_by):
+        if not fetched_id:
+            return ReplacementResolution(
+                None,
+                tuple(traversed),
+                tuple(chain),
+                f"broker returned a replacement with no usable order ID for {replaced_by}",
+                CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
+            )
+        if fetched_id != str(replaced_by):
             return ReplacementResolution(
                 None, tuple(traversed), tuple(chain),
                 f"broker returned order {fetched_id} when asked for replacement {replaced_by}",
                 CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
             )
         back_reference = nxt.get("replaces")
+        if require_back_reference and current_id and not back_reference:
+            return ReplacementResolution(
+                None,
+                tuple(traversed),
+                tuple(chain),
+                f"replacement {replaced_by} does not identify the order it replaces",
+                CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
+            )
         if back_reference and current_id and str(back_reference) != current_id:
             return ReplacementResolution(
                 None, tuple(traversed), tuple(chain),
                 f"replacement {replaced_by} claims to replace {back_reference}, "
                 f"not {current_id}",
                 CHAIN_ERROR_UNRESOLVED,
+                root_order_id,
             )
 
         traversed.append(nxt)
@@ -274,10 +313,16 @@ def resolve_replacement_chain(
                     f"replacement order {replaced_by} does not match the stored intent "
                     f"({detail})",
                     CHAIN_ERROR_IDENTITY_MISMATCH,
+                    root_order_id,
                 )
         current = nxt
 
-    return ReplacementResolution(current, tuple(traversed), tuple(chain))
+    return ReplacementResolution(
+        current,
+        tuple(traversed),
+        tuple(chain),
+        root_order_id=root_order_id,
+    )
 
 
 def is_replaced_order(order: dict[str, Any]) -> bool:
@@ -292,6 +337,8 @@ def is_replaced_order(order: dict[str, Any]) -> bool:
 
 def proposal_status_for_order(order: dict[str, Any]) -> str:
     status = normalize_broker_status(order.get("status"))
+    if status not in KNOWN_BROKER_ORDER_STATUSES or status in _KNOWN_BUT_AMBIGUOUS:
+        return SUBMISSION_UNKNOWN
     if status in _FILLED:
         return FILLED
     if status in _PARTIAL:
@@ -309,15 +356,9 @@ def proposal_status_for_order(order: dict[str, Any]) -> str:
     if status in _ACCEPTED:
         return BROKER_ACCEPTED
 
-    filled_qty = _finite_float(order.get("filled_qty")) or 0.0
-    requested_qty = _finite_float(order.get("shares"))
-    if requested_qty is not None and filled_qty >= requested_qty > 0:
-        return FILLED
-    if filled_qty > 0:
-        return PARTIALLY_FILLED
-    # Unknown nonterminal statuses fail conservatively: keep reserving the
-    # exposure and require reconciliation rather than declaring a failure.
-    return BROKER_ACCEPTED
+    # A new provider status is not evidence of acceptance or terminality.
+    # Keep the reservation/duplicate slot and require reviewed semantics.
+    return SUBMISSION_UNKNOWN
 
 
 def broker_event_id(
@@ -330,26 +371,47 @@ def broker_event_id(
     """Stable event identity for stream replay and polling deduplication."""
     if external_event_id:
         return str(external_event_id)
+    canonical_event_at = normalized_event_at(order, event_at)
     material = {
         "order_id": order.get("order_id"),
         "client_order_id": order.get("client_order_id"),
         "event_type": event_type or normalize_broker_status(order.get("status")),
-        "event_at": event_at or order.get("updated_at") or order.get("filled_at"),
+        # Timestamp spelling is transport trivia, not event identity.  Hash the
+        # validated UTC instant so ``Z``, ``+00:00``, and an equivalent offset
+        # cannot manufacture separate fallback ledger rows for one observation.
+        "event_at": canonical_event_at,
         "status": normalize_broker_status(order.get("status")),
-        "filled_qty": order.get("filled_qty"),
-        "filled_avg_price": order.get("filled_avg_price"),
+        "filled_qty": order.get(
+            "filled_qty_decimal", order.get("filled_qty")
+        ),
+        "filled_avg_price": order.get(
+            "filled_avg_price_decimal", order.get("filled_avg_price")
+        ),
     }
     encoded = json.dumps(material, sort_keys=True, default=str)
     return "boe_" + hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def normalized_event_at(order: dict[str, Any], event_at: str | None = None) -> str:
-    return str(
+    value = (
         event_at
         or order.get("updated_at")
         or order.get("filled_at")
-        or datetime.now(timezone.utc).isoformat()
+        or order.get("submitted_at")
     )
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("broker event time must be a non-empty ISO timestamp")
+    text = value.strip()
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("broker event time must be a valid ISO timestamp") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("broker event time must be timezone-aware")
+    parsed = parsed.astimezone(timezone.utc)
+    if parsed > datetime.now(timezone.utc):
+        raise ValueError("broker event time cannot be in the future")
+    return parsed.isoformat()
 
 
 def journal_broker_order_update(
@@ -360,19 +422,40 @@ def journal_broker_order_update(
     event_type: str | None = None,
     event_at: str | None = None,
     external_event_id: str | None = None,
-    fill_qty: float | None = None,
-    fill_price: float | None = None,
+    fill_qty: Any = None,
+    fill_price: Any = None,
     raw_event: dict[str, Any] | None = None,
     clear_error: bool = False,
     extra_updates: dict[str, Any] | None = None,
+    broker_order_root_id: str | None = None,
+    replacement_order_path: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     """Persist one broker update and project it onto the proposal state."""
     proposal_status = proposal_status_for_order(order)
+    raw_status = normalize_broker_status(order.get("status"))
+    if (
+        proposal_status == SUBMISSION_UNKNOWN
+        and raw_status not in KNOWN_BROKER_ORDER_STATUSES
+    ):
+        reason = (
+            f"Broker order status {raw_status!r} has unresolved lifecycle "
+            "semantics; refusing a positive projection and activating the "
+            "persistent reconciliation halt."
+        )
+        containment = store.park_reconciliation_anomaly_and_halt(
+            proposal_id,
+            expected_statuses=_expected_current_statuses(SUBMISSION_UNKNOWN),
+            reason=reason,
+            reconciled_at=datetime.now(timezone.utc).isoformat(),
+            details={"path": "broker_status_semantics", "status": raw_status},
+            anomaly_key=f"broker_status_semantics:{raw_status}",
+        )
+        return containment["proposal"]
     normalized_at = normalized_event_at(order, event_at)
     event_id = broker_event_id(
         order,
         event_type=event_type,
-        event_at=event_at,
+        event_at=normalized_at,
         external_event_id=external_event_id,
     )
     updates: dict[str, Any] = {
@@ -405,6 +488,16 @@ def journal_broker_order_update(
     elif proposal_status in (CANCELED, BROKER_REJECTED, BROKER_EXPIRED):
         updates["broker_terminal_at"] = normalized_at
     updates.update(extra_updates or {})
+    fill_qty_decimal = (
+        raw_event.get("fill_qty_decimal")
+        if isinstance(raw_event, dict)
+        else None
+    )
+    fill_price_decimal = (
+        raw_event.get("fill_price_decimal")
+        if isinstance(raw_event, dict)
+        else None
+    )
     return store.project_broker_order_event(
         event_id=event_id,
         proposal_id=proposal_id,
@@ -416,6 +509,10 @@ def journal_broker_order_update(
         proposal_updates=updates,
         fill_qty=fill_qty,
         fill_price=fill_price,
+        fill_qty_decimal=fill_qty_decimal,
+        fill_price_decimal=fill_price_decimal,
         raw_event=raw_event,
         preserve_if_set=preserve_if_set,
+        broker_order_root_id=broker_order_root_id,
+        replacement_order_path=replacement_order_path,
     )

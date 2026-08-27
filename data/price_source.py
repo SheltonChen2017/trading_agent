@@ -36,7 +36,12 @@ from typing import Protocol
 
 import pandas as pd
 
-from data.market_data import _NYSE_CALENDAR, fetch_historical
+from data.market_data import (
+    _NYSE_CALENDAR,
+    canonical_ticker,
+    fetch_historical,
+    validated_daily_bar_frame,
+)
 
 BAR_DATA_CLASS = "bar"
 EARNINGS_DATA_CLASS = "earnings"
@@ -90,13 +95,16 @@ class YFinanceDailyBars:
 class ProviderFetchRecord:
     """What one fetch actually did -- successes, gaps, and lineage.
 
-    ``ok`` is False when the provider raised OR returned no usable data
-    for any requested ticker: an all-empty response is a provider outage
-    presenting as data, and treating it as "zero matching tickers" is the
-    silent failure mode GR-4 exists to remove. ``latest_session`` is the
-    newest bar date across returned frames (None on failure) and is what
-    freshness derivations consume, so readiness evidence comes from
-    recorded fetches rather than a caller's assertion.
+    ``transport_ok`` records whether the provider call itself completed;
+    ``usable_tickers``/``missing_tickers`` record data usability;
+    ``universe_complete`` records requested-universe coverage; and
+    ``ticker_latest_sessions`` retains each usable ticker's freshness input.
+    The legacy persisted ``ok`` field remains the provider-health verdict:
+    transport succeeded and at least one requested ticker was usable.
+
+    ``latest_session`` is deliberately the *oldest* latest-session among
+    usable requested tickers. It is the batch's worst required-symbol
+    freshness input, so one fresh sibling cannot mask a stale one.
     """
 
     provider_id: str
@@ -109,9 +117,103 @@ class ProviderFetchRecord:
     error: str | None
     point_in_time_lineage: bool
     latest_session: str | None
+    transport_ok: bool
+    usable_tickers: tuple[str, ...]
+    universe_complete: bool
+    ticker_latest_sessions: tuple[tuple[str, str], ...]
+    ticker_errors: tuple[tuple[str, str], ...]
 
 
-def build_fetch_record(
+@dataclasses.dataclass(frozen=True)
+class ProviderOutputValidation:
+    """Validated requested-universe output, preserving usable frame objects."""
+
+    requested_tickers: tuple[str, ...]
+    usable_data: dict[str, pd.DataFrame] = dataclasses.field(
+        compare=False, repr=False
+    )
+    missing_tickers: tuple[str, ...] = ()
+    ticker_latest_sessions: tuple[tuple[str, str], ...] = ()
+    ticker_errors: tuple[tuple[str, str], ...] = ()
+
+    @property
+    def universe_complete(self) -> bool:
+        return not self.missing_tickers
+
+
+def canonical_requested_tickers(
+    requested_tickers: list[str],
+) -> tuple[str, ...]:
+    requested = tuple(canonical_ticker(ticker) for ticker in requested_tickers)
+    if not requested:
+        raise ValueError("requested_tickers must contain at least one ticker")
+    if len(set(requested)) != len(requested):
+        raise ValueError("requested_tickers must be unique after canonicalization")
+    return requested
+
+
+def validate_provider_output(
+    requested_tickers: list[str],
+    data: dict[str, pd.DataFrame] | None,
+) -> ProviderOutputValidation:
+    """Validate every requested ticker independently at the provider boundary.
+
+    Invalid or absent tickers do not erase clean siblings. Response keys are
+    canonicalized before matching, while duplicate keys that collapse to the
+    same canonical symbol are rejected as ambiguous for that symbol.
+    """
+
+    requested = canonical_requested_tickers(requested_tickers)
+
+    by_ticker: dict[str, object] = {}
+    collisions: set[str] = set()
+    malformed_response = data is not None and not isinstance(data, dict)
+    if isinstance(data, dict):
+        for raw_ticker, frame in data.items():
+            try:
+                ticker = canonical_ticker(raw_ticker)
+            except ValueError:
+                continue
+            if ticker not in requested:
+                continue
+            if ticker in by_ticker:
+                collisions.add(ticker)
+            else:
+                by_ticker[ticker] = frame
+
+    usable_data: dict[str, pd.DataFrame] = {}
+    sessions: list[tuple[str, str]] = []
+    errors: list[tuple[str, str]] = []
+    for ticker in requested:
+        if malformed_response:
+            errors.append((ticker, "provider response is not a ticker mapping"))
+            continue
+        if ticker in collisions:
+            errors.append((ticker, "provider response has duplicate canonical keys"))
+            continue
+        if ticker not in by_ticker:
+            errors.append((ticker, "ticker absent from provider response"))
+            continue
+        validation, usable_frame = validated_daily_bar_frame(
+            ticker, by_ticker[ticker]
+        )
+        if not validation.usable or usable_frame is None:
+            errors.append((ticker, validation.error or "ticker data is unusable"))
+            continue
+        usable_data[ticker] = usable_frame
+        sessions.append((ticker, validation.latest_session or ""))
+
+    missing = tuple(ticker for ticker in requested if ticker not in usable_data)
+    return ProviderOutputValidation(
+        requested_tickers=requested,
+        usable_data=usable_data,
+        missing_tickers=missing,
+        ticker_latest_sessions=tuple(sessions),
+        ticker_errors=tuple(errors),
+    )
+
+
+def build_validated_fetch(
     source: PriceSource,
     requested_tickers: list[str],
     data: dict[str, pd.DataFrame] | None,
@@ -119,7 +221,9 @@ def build_fetch_record(
     data_class: str = BAR_DATA_CLASS,
     error: Exception | None = None,
     fetched_at: datetime | None = None,
-) -> ProviderFetchRecord:
+) -> tuple[dict[str, pd.DataFrame], ProviderFetchRecord]:
+    """Build the durable fetch metadata and return only validated siblings."""
+
     provider_id = getattr(source, "provider_id", None)
     if not isinstance(provider_id, str) or not provider_id.strip():
         raise ValueError("PriceSource.provider_id must be a non-empty string")
@@ -133,40 +237,73 @@ def build_fetch_record(
     if at.tzinfo is None or at.utcoffset() is None:
         raise ValueError("fetched_at must be timezone-aware")
     at = at.astimezone(timezone.utc)
-    # Success is defined only over the requested universe. Spurious keys in
-    # the provider dict must never launder an empty requested response into
-    # a successful health/freshness record.
-    requested = list(requested_tickers)
-    returned = {
-        ticker: frame
-        for ticker, frame in (data or {}).items()
-        if ticker in requested
-        and isinstance(frame, pd.DataFrame)
-        and not frame.empty
-    }
-    missing = tuple(ticker for ticker in requested if ticker not in returned)
-    latest_session: str | None = None
-    if returned:
-        latest_session = max(
-            frame.index.max() for frame in returned.values()
-        ).date().isoformat()
-    failed = error is not None or not returned
-    return ProviderFetchRecord(
-        provider_id=provider_id,
+
+    validation = validate_provider_output(requested_tickers, data)
+    transport_ok = error is None
+    if transport_ok:
+        usable_data = validation.usable_data
+        missing = validation.missing_tickers
+        sessions = validation.ticker_latest_sessions
+        ticker_errors = validation.ticker_errors
+    else:
+        # A raised call has no coherent response even if a direct caller also
+        # supplied a dict. Never persist or return partial data from a failed
+        # transport attempt.
+        usable_data = {}
+        missing = validation.requested_tickers
+        sessions = ()
+        ticker_errors = tuple(
+            (ticker, "provider transport failed") for ticker in missing
+        )
+
+    latest_session = min((session for _, session in sessions), default=None)
+    ok = transport_ok and bool(usable_data)
+    record = ProviderFetchRecord(
+        provider_id=provider_id.strip(),
         data_class=data_class,
         fetched_at=at.isoformat(),
-        requested_count=len(requested),
-        returned_count=len(returned),
+        requested_count=len(validation.requested_tickers),
+        returned_count=len(usable_data),
         missing_tickers=missing,
-        ok=not failed,
+        ok=ok,
         error=(
             f"{type(error).__name__}: provider fetch failed"
             if error is not None
-            else ("provider returned no usable data" if not returned else None)
+            else (
+                "provider transport succeeded but returned no usable requested data"
+                if not usable_data
+                else None
+            )
         ),
         point_in_time_lineage=lineage,
         latest_session=latest_session,
+        transport_ok=transport_ok,
+        usable_tickers=tuple(usable_data),
+        universe_complete=transport_ok and not missing,
+        ticker_latest_sessions=sessions,
+        ticker_errors=ticker_errors,
     )
+    return usable_data, record
+
+
+def build_fetch_record(
+    source: PriceSource,
+    requested_tickers: list[str],
+    data: dict[str, pd.DataFrame] | None,
+    *,
+    data_class: str = BAR_DATA_CLASS,
+    error: Exception | None = None,
+    fetched_at: datetime | None = None,
+) -> ProviderFetchRecord:
+    _, record = build_validated_fetch(
+        source,
+        requested_tickers,
+        data,
+        data_class=data_class,
+        error=error,
+        fetched_at=fetched_at,
+    )
+    return record
 
 
 def expected_latest_completed_session(now: datetime | None = None) -> str:

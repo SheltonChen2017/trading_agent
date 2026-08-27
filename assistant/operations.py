@@ -3,13 +3,18 @@ from __future__ import annotations
 
 import hashlib
 import math
+import os
 import sqlite3
 import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from assistant.policy import TradingPolicy
+from assistant.policy import (
+    TradingPolicy,
+    compute_policy_fingerprint,
+    load_policy,
+)
 from assistant.readiness import transaction_readiness
 from assistant.storage import AssistantStore
 from data.operational_alerts import append_alerts_jsonl
@@ -17,6 +22,182 @@ from data.operational_alerts import append_alerts_jsonl
 
 class OperationsError(RuntimeError):
     """An operational control could not be evaluated safely."""
+
+
+# These are deliberately separate state rows. A fast operations cycle must
+# not make a dead long-running watchdog or order monitor look alive. The
+# watchdog retains the historical ``operations_heartbeat`` state key used by
+# the existing UI and ML-evidence supervisor consumers.
+OPERATIONAL_POLICY_HEARTBEAT_KEYS = {
+    "cycle": "operations_cycle_heartbeat",
+    "monitor": "order_monitor_heartbeat",
+    "observation": "paper_observation_heartbeat",
+    "watchdog": "operations_heartbeat",
+    "operations_check": "operations_check_heartbeat",
+}
+REQUIRED_OPERATIONAL_POLICY_HEARTBEATS = (
+    "cycle",
+    "monitor",
+    "observation",
+    "watchdog",
+)
+
+
+def operational_policy_identity(
+    policy: TradingPolicy,
+    policy_path: str | Path,
+) -> dict[str, str]:
+    """Return a canonical, disk-verified policy identity.
+
+    The object fingerprint and the file fingerprint must agree. This catches
+    a policy file changed after a long-running process loaded it instead of
+    letting that process keep certifying obsolete limits.
+    """
+    try:
+        resolved = Path(policy_path).expanduser().resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise OperationsError(
+            f"Operational policy path is not readable: {policy_path}"
+        ) from exc
+    if not resolved.is_file():
+        raise OperationsError(
+            f"Operational policy path is not a file: {resolved}"
+        )
+    object_fingerprint = compute_policy_fingerprint(policy)
+    disk_fingerprint = compute_policy_fingerprint(load_policy(resolved))
+    if object_fingerprint != disk_fingerprint:
+        raise OperationsError(
+            "The loaded operational policy no longer matches its policy file."
+        )
+    return {
+        "policy_path": str(resolved),
+        "policy_fingerprint": object_fingerprint,
+    }
+
+
+def record_operational_policy_heartbeat(
+    store: AssistantStore,
+    task: str,
+    policy: TradingPolicy,
+    policy_path: str | Path,
+    *,
+    at: str | None = None,
+    healthy: bool | None = None,
+    **details: Any,
+) -> dict[str, Any]:
+    """Persist one task heartbeat bound to the exact governing policy."""
+    if task not in OPERATIONAL_POLICY_HEARTBEAT_KEYS:
+        raise OperationsError(f"Unknown operational heartbeat task: {task!r}")
+    if healthy is not None and not isinstance(healthy, bool):
+        raise OperationsError("heartbeat healthy must be bool or None")
+    identity = operational_policy_identity(policy, policy_path)
+    heartbeat = dict(details)
+    heartbeat.update(
+        {
+            "at": at or datetime.now(timezone.utc).isoformat(),
+            "healthy": healthy,
+            **identity,
+        }
+    )
+    store.set_system_state(OPERATIONAL_POLICY_HEARTBEAT_KEYS[task], heartbeat)
+    return heartbeat
+
+
+def verify_operational_policy_heartbeats(
+    store: AssistantStore,
+    policy: TradingPolicy,
+    policy_path: str | Path,
+    *,
+    require_all: bool = True,
+) -> dict[str, Any]:
+    """Compare every operational task heartbeat to one on-disk policy.
+
+    Missing never-ran tasks may be reported as degraded during installation
+    preview verification. Once task execution is required, missing heartbeats
+    fail exactly like mismatches. A present heartbeat always fails on a bad
+    fingerprint, changed file, unreadable path, or different canonical path.
+    """
+    expected = operational_policy_identity(policy, policy_path)
+    expected_path = Path(expected["policy_path"])
+    checks: dict[str, dict[str, Any]] = {}
+    for task in REQUIRED_OPERATIONAL_POLICY_HEARTBEATS:
+        state_key = OPERATIONAL_POLICY_HEARTBEAT_KEYS[task]
+        heartbeat = store.get_system_state(state_key)
+        if not isinstance(heartbeat, dict):
+            checks[task] = {
+                "ok": False,
+                "status": "missing",
+                "state_key": state_key,
+                "detail": "heartbeat has not been recorded",
+            }
+            continue
+
+        recorded_path = heartbeat.get("policy_path")
+        recorded_fingerprint = heartbeat.get("policy_fingerprint")
+        if not isinstance(recorded_path, str) or not recorded_path.strip():
+            checks[task] = {
+                "ok": False,
+                "status": "invalid",
+                "state_key": state_key,
+                "detail": "heartbeat policy_path is missing or invalid",
+            }
+            continue
+        try:
+            recorded_policy = load_policy(recorded_path)
+            observed = operational_policy_identity(
+                recorded_policy, recorded_path
+            )
+            observed_path = Path(observed["policy_path"])
+        except Exception as exc:
+            checks[task] = {
+                "ok": False,
+                "status": "unreadable",
+                "state_key": state_key,
+                "detail": f"recorded policy is unreadable: {exc}",
+            }
+            continue
+
+        path_matches = os.path.normcase(str(observed_path)) == os.path.normcase(
+            str(expected_path)
+        )
+        fingerprint_matches = (
+            isinstance(recorded_fingerprint, str)
+            and recorded_fingerprint == observed["policy_fingerprint"]
+            and recorded_fingerprint == expected["policy_fingerprint"]
+        )
+        ok = path_matches and fingerprint_matches
+        checks[task] = {
+            "ok": ok,
+            "status": "matched" if ok else "mismatched",
+            "state_key": state_key,
+            "policy_path": observed["policy_path"],
+            "policy_fingerprint": recorded_fingerprint,
+            "detail": (
+                "policy path and fingerprint match"
+                if ok
+                else (
+                    f"path_matches={path_matches}, "
+                    f"fingerprint_matches={fingerprint_matches}"
+                )
+            ),
+        }
+
+    failures = [
+        task
+        for task, check in checks.items()
+        if not check["ok"]
+        and (require_all or check["status"] != "missing")
+    ]
+    degraded = any(not check["ok"] for check in checks.values())
+    return {
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+        "ok": not failures,
+        "degraded": degraded,
+        "require_all": bool(require_all),
+        "expected_policy": expected,
+        "checks": checks,
+        "failed_tasks": failures,
+    }
 
 
 def _parse_timestamp(value: Any) -> datetime | None:
@@ -259,6 +440,8 @@ def run_operational_check(
     broker_module=None,
     now: datetime | None = None,
     check_broker: bool = True,
+    policy_path: str | Path | None = None,
+    heartbeat_task: str = "operations_check",
     **health_options,
 ) -> dict[str, Any]:
     """Run health checks, persist failures as deduplicated alerts and heartbeat."""
@@ -292,7 +475,18 @@ def run_operational_check(
         ),
         "emitted_alert_count": len(alerts),
     }
-    store.set_system_state("operations_heartbeat", heartbeat)
+    if policy_path is None:
+        # Compatibility for library callers that do not own an entry-point
+        # policy path. Scheduled operational callers always pass one.
+        store.set_system_state("operations_heartbeat", heartbeat)
+    else:
+        heartbeat = record_operational_policy_heartbeat(
+            store,
+            heartbeat_task,
+            policy,
+            policy_path,
+            **heartbeat,
+        )
     report["alerts"] = alerts
     report["heartbeat"] = heartbeat
     return report

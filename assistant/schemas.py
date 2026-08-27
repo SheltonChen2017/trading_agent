@@ -143,11 +143,14 @@ class PortfolioSnapshot:
     # Execution-owned broker evidence.  These remain optional so historical,
     # manually constructed, and read-only briefing snapshots retain their
     # existing schema contract.  The strict Alpaca capture path requires all
-    # four fields and binds them into ``broker_snapshot_id``.
+    # fields below. ``broker_snapshot_material_json`` retains the immutable
+    # canonical bytes whose SHA-256 is ``broker_snapshot_id`` so a later gate
+    # can detect mutation instead of trusting an opaque label.
     captured_at: str | None = None
     broker_snapshot_id: str | None = None
     component_equity_exact: str | None = None
     component_equity_delta_exact: str | None = None
+    broker_snapshot_material_json: str | None = None
 
     @property
     def has_exact_numerics(self) -> bool:

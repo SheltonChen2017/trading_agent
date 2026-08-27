@@ -4,9 +4,12 @@ import os
 import sqlite3
 import sys
 import tempfile
+from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -21,6 +24,7 @@ from assistant.execution_service import (
     validate_proposal_for_execution,
 )
 from assistant.policy import TradingPolicy, compute_policy_fingerprint, load_policy
+from assistant.portfolio_snapshot import build_portfolio_snapshot_from_alpaca
 from assistant.proposal_status import POLICY_OVERRIDE_AVAILABLE
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.schemas import DecisionPacket, MarketRegime
@@ -151,9 +155,10 @@ def test_list_broker_orders_attaches_originating_intent():
                 "shares": proposal["intent"]["shares"],
                 "side": "sell",
                 "type": "market",
-                "limit_price": None,
-                "status": "accepted",
-            },
+                    "limit_price": None,
+                    "status": "accepted",
+                    "submitted_at": "2026-07-27T14:00:00+00:00",
+                },
             external_event_id="paper-order-1-accepted",
         )
         orders = store.list_broker_orders()
@@ -462,17 +467,164 @@ def test_execution_authorization_expiry_cannot_be_extended_by_replacing_the_obje
 def test_broker_rejects_direct_order_without_gate_authorization():
     broker.PAPER_TRADING = True
     try:
-        broker.submit_market_order("AAPL", 1, side="buy", idempotency_key="test-key")
+        broker.submit_market_order(
+            "AAPL",
+            1,
+            side="buy",
+            idempotency_key="test-key",
+            expected_policy_fingerprint="b" * 64,
+        )
         assert False, "expected direct broker submission to fail"
     except PermissionError:
         pass
 
 
+_FAKE_BROKER_ACCOUNT_ID = "test-paper-account"
+_RECONCILIATION_SNAPSHOT_ID = "a" * 64
+
+
+def _fake_broker_account(cash=5_000) -> dict:
+    cash_exact = Decimal(str(cash))
+    equity_exact = cash_exact + Decimal("5000")
+    return {
+        "account_id": _FAKE_BROKER_ACCOUNT_ID,
+        "status": "ACTIVE",
+        "equity": float(equity_exact),
+        "equity_decimal": _decimal_text(equity_exact),
+        "cash": float(cash_exact),
+        "cash_decimal": _decimal_text(cash_exact),
+        "buying_power": float(cash_exact),
+        "buying_power_decimal": _decimal_text(cash_exact),
+        "trading_blocked": False,
+        "account_blocked": False,
+        "trade_suspended_by_user": False,
+        "transfers_blocked": False,
+        "paper": True,
+    }
+
+
+def _fake_broker_position() -> dict:
+    return {
+        "ticker": "TQQQ",
+        "shares": 100.0,
+        "shares_decimal": "100",
+        "avg_entry_price": 50.0,
+        "avg_entry_price_decimal": "50",
+        "current_price": 50.0,
+        "current_price_decimal": "50",
+        "market_value": 5_000.0,
+        "market_value_decimal": "5000",
+        "unrealized_pl": 0.0,
+    }
+
+
+def _decimal_text(value) -> str:
+    amount = Decimal(str(value))
+    if amount == 0:
+        return "0"
+    text = format(amount, "f")
+    return text.rstrip("0").rstrip(".") if "." in text else text
+
+
+def _strict_broker_order(
+    *,
+    client_order_id: str,
+    ticker: str,
+    side: str,
+    shares=None,
+    notional=None,
+    order_type: str = "market",
+    limit_price=None,
+    order_id: str = "candidate-order",
+    status: str = "accepted",
+    **overrides,
+) -> dict:
+    """Complete normalized broker evidence for submit and lookup tests."""
+    submitted = datetime.now(timezone.utc) - timedelta(seconds=2)
+    if (shares is None) == (notional is None):
+        raise ValueError("strict test orders require exactly one of shares/notional")
+    shares_exact = None if shares is None else _decimal_text(shares)
+    notional_exact = None if notional is None else _decimal_text(notional)
+    limit_exact = None if limit_price is None else _decimal_text(limit_price)
+    order = {
+        "order_id": order_id,
+        "client_order_id": client_order_id,
+        "ticker": ticker,
+        "asset_class": "us_equity",
+        "order_class": "simple",
+        "extended_hours": False,
+        "legs": None,
+        "shares": None if shares_exact is None else float(Decimal(shares_exact)),
+        "shares_decimal": shares_exact,
+        "notional": (
+            None if notional_exact is None else float(Decimal(notional_exact))
+        ),
+        "notional_decimal": notional_exact,
+        "side": side,
+        "type": order_type,
+        "limit_price": None if limit_exact is None else float(Decimal(limit_exact)),
+        "limit_price_decimal": limit_exact,
+        "time_in_force": "day",
+        "status": status,
+        "filled_qty": 0.0,
+        "filled_qty_decimal": "0",
+        "filled_avg_price": None,
+        "filled_avg_price_decimal": None,
+        "submitted_at": submitted.isoformat(),
+        "updated_at": (submitted + timedelta(seconds=1)).isoformat(),
+        "filled_at": None,
+        "canceled_at": None,
+        "expired_at": None,
+        "failed_at": None,
+        "replaced_at": None,
+        "replaces": None,
+        "replaced_by": None,
+    }
+    order.update(overrides)
+    return order
+
+
+def _valid_broker_execution_context(policy: TradingPolicy) -> dict:
+    return {
+        "account_id": _FAKE_BROKER_ACCOUNT_ID,
+        "account_mode": "paper",
+        "snapshot_id": _RECONCILIATION_SNAPSHOT_ID,
+        "policy_fingerprint": compute_policy_fingerprint(policy),
+    }
+
+
+def _set_reconcilable_status(
+    store: AssistantStore,
+    proposal_id: str,
+    status: str,
+    policy: TradingPolicy,
+    **updates,
+) -> dict:
+    return store.update_proposal_status(
+        proposal_id,
+        status,
+        broker_execution_context=_valid_broker_execution_context(policy),
+        **updates,
+    )
+
+
 def _mock_execution_dependencies(
-    quote_price=50.0, quote_timestamp=None, earnings_available=False, bid=None, ask=None,
+    quote_price=50.0,
+    quote_timestamp=None,
+    earnings_available=False,
+    bid=None,
+    ask=None,
+    open_orders_error=None,
+    broker_cash_sequence=None,
+    broker_open_orders=None,
 ):
-    """Patches broker.is_configured/get_latest_quote/submit_market_order/
-    submit_limit_order/find_order_by_client_id and
+    """Patch one frozen fake paper session and its provider seams.
+
+    The session captures a genuine strict portfolio snapshot through the same
+    production builder, while module functions remain patchable by individual
+    fault tests. It supports the complete submit/lookup/cancel contract and
+    consumes the expected snapshot/policy keywords at the session boundary.
+
     data.event_data.fetch_upcoming_earnings so execute_approved_paper_proposal()
     tests never hit the network. Returns (captured_orders, restore_fn)."""
     import data.event_data as event_data
@@ -485,7 +637,10 @@ def _mock_execution_dependencies(
         "submit_market_order": broker.submit_market_order,
         "submit_limit_order": broker.submit_limit_order,
         "find_order_by_client_id": broker.find_order_by_client_id,
+        "get_order_by_id": broker.get_order_by_id,
+        "cancel_order": broker.cancel_order,
         "assert_account_and_asset_ready": broker.assert_account_and_asset_ready,
+        "open_alpaca_broker_session": broker.open_alpaca_broker_session,
         "PAPER_TRADING": broker.PAPER_TRADING,
         "fetch_upcoming_earnings": event_data.fetch_upcoming_earnings,
     }
@@ -504,7 +659,7 @@ def _mock_execution_dependencies(
     broker.get_latest_quote = fake_quote
     broker.assert_account_and_asset_ready = lambda ticker: {
         "account": {
-            "account_id": "test-paper-account",
+            "account_id": _FAKE_BROKER_ACCOUNT_ID,
             "paper": True,
             "status": "ACTIVE",
         },
@@ -515,36 +670,183 @@ def _mock_execution_dependencies(
         for t in tickers
     }
 
-    def fake_submit(ticker, shares, side="buy", *, authorization=None, idempotency_key=None):
+    def fake_submit(
+        ticker,
+        shares,
+        side="buy",
+        *,
+        authorization=None,
+        idempotency_key=None,
+        whole_shares_only=True,
+    ):
         assert authorization is not None
         captured.append((ticker, shares, side, idempotency_key))
-        return {
-            "order_id": f"paper-{len(captured)}",
-            "ticker": ticker,
-            "shares": shares,
-            "side": side,
-            "status": "accepted",
-        }
+        return _strict_broker_order(
+            order_id=f"paper-{len(captured)}",
+            client_order_id=idempotency_key,
+            ticker=ticker,
+            shares=shares,
+            side=side,
+        )
 
-    def fake_submit_limit(ticker, shares, limit_price, side="buy", *, authorization=None, idempotency_key=None):
+    def fake_submit_limit(
+        ticker,
+        shares,
+        limit_price,
+        side="buy",
+        *,
+        authorization=None,
+        idempotency_key=None,
+        whole_shares_only=True,
+    ):
         assert authorization is not None
         captured.append((ticker, shares, side, idempotency_key, limit_price))
-        return {
-            "order_id": f"paper-limit-{len(captured)}",
-            "ticker": ticker, "shares": shares, "side": side,
-            "limit_price": limit_price, "status": "accepted",
-        }
+        return _strict_broker_order(
+            order_id=f"paper-limit-{len(captured)}",
+            client_order_id=idempotency_key,
+            ticker=ticker,
+            shares=shares,
+            side=side,
+            order_type="limit",
+            limit_price=limit_price,
+        )
 
     broker.submit_market_order = fake_submit
     broker.submit_limit_order = fake_submit_limit
     broker.find_order_by_client_id = lambda client_order_id: None
+    broker.get_order_by_id = lambda order_id: None
+    broker.cancel_order = lambda order_id: None
+
+    class FakeAccountScopedBrokerSession:
+        PAPER_TRADING = True
+        account_mode = "paper"
+
+        def __init__(self):
+            self._latest_snapshot_id = None
+            self._capture_count = 0
+            self._active_cash = 5_000
+
+        def is_configured(self):
+            return True
+
+        def get_account(self):
+            return deepcopy(_fake_broker_account(self._active_cash))
+
+        def get_open_positions(self):
+            return [deepcopy(_fake_broker_position())]
+
+        def get_open_orders(self):
+            if open_orders_error is not None:
+                raise open_orders_error
+            return deepcopy(list(broker_open_orders or []))
+
+        def capture_execution_portfolio_snapshot(self):
+            if broker_cash_sequence:
+                index = min(self._capture_count, len(broker_cash_sequence) - 1)
+                self._active_cash = broker_cash_sequence[index]
+            snapshot = build_portfolio_snapshot_from_alpaca(
+                broker_session=self,
+                require_execution_coherence=True,
+                expected_account_id=_FAKE_BROKER_ACCOUNT_ID,
+            )
+            self._capture_count += 1
+            self._latest_snapshot_id = snapshot.broker_snapshot_id
+            return snapshot
+
+        def assert_account_and_asset_ready(self, ticker):
+            return broker.assert_account_and_asset_ready(ticker)
+
+        def get_latest_quote(self, ticker):
+            return broker.get_latest_quote(ticker)
+
+        def get_execution_validation_quote(
+            self, ticker, *, expected_snapshot_id
+        ):
+            assert expected_snapshot_id == self._latest_snapshot_id
+            return broker.get_latest_quote(ticker)
+
+        def _assert_dispatch_context(
+            self, expected_snapshot_id, expected_policy_fingerprint
+        ):
+            assert expected_snapshot_id == self._latest_snapshot_id
+            assert isinstance(expected_policy_fingerprint, str)
+            assert len(expected_policy_fingerprint) == 64
+            assert all(c in "0123456789abcdef" for c in expected_policy_fingerprint)
+
+        def submit_market_order(
+            self,
+            ticker,
+            shares,
+            side="buy",
+            *,
+            authorization=None,
+            idempotency_key=None,
+            dispatch_permit=None,
+            expected_snapshot_id=None,
+            expected_policy_fingerprint=None,
+            whole_shares_only=True,
+        ):
+            self._assert_dispatch_context(
+                expected_snapshot_id, expected_policy_fingerprint
+            )
+            assert dispatch_permit is not None
+            kwargs = {
+                "authorization": authorization,
+                "idempotency_key": idempotency_key,
+            }
+            if whole_shares_only is False:
+                kwargs["whole_shares_only"] = False
+            return broker.submit_market_order(ticker, shares, side=side, **kwargs)
+
+        def submit_limit_order(
+            self,
+            ticker,
+            shares,
+            limit_price,
+            side="buy",
+            *,
+            authorization=None,
+            idempotency_key=None,
+            dispatch_permit=None,
+            expected_snapshot_id=None,
+            expected_policy_fingerprint=None,
+            whole_shares_only=True,
+        ):
+            self._assert_dispatch_context(
+                expected_snapshot_id, expected_policy_fingerprint
+            )
+            assert dispatch_permit is not None
+            kwargs = {
+                "authorization": authorization,
+                "idempotency_key": idempotency_key,
+            }
+            if whole_shares_only is False:
+                kwargs["whole_shares_only"] = False
+            return broker.submit_limit_order(
+                ticker, shares, limit_price, side=side, **kwargs
+            )
+
+        def find_order_by_client_id(self, client_order_id):
+            return broker.find_order_by_client_id(client_order_id)
+
+        def get_order_by_id(self, order_id):
+            return broker.get_order_by_id(order_id)
+
+        def cancel_order(self, order_id):
+            return broker.cancel_order(order_id)
+
+    fake_session = FakeAccountScopedBrokerSession()
+    broker.open_alpaca_broker_session = lambda: fake_session
 
     def restore():
         broker.is_configured = originals["is_configured"]
         broker.submit_market_order = originals["submit_market_order"]
         broker.submit_limit_order = originals["submit_limit_order"]
         broker.find_order_by_client_id = originals["find_order_by_client_id"]
+        broker.get_order_by_id = originals["get_order_by_id"]
+        broker.cancel_order = originals["cancel_order"]
         broker.assert_account_and_asset_ready = originals["assert_account_and_asset_ready"]
+        broker.open_alpaca_broker_session = originals["open_alpaca_broker_session"]
         broker.PAPER_TRADING = originals["PAPER_TRADING"]
         event_data.fetch_upcoming_earnings = originals["fetch_upcoming_earnings"]
         if originals["get_latest_quote"] is not None:
@@ -595,6 +897,62 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
         restore()
 
 
+def test_malformed_padded_submission_order_id_is_never_rewritten_for_cancel():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _captured, restore = _mock_execution_dependencies(
+        quote_price=proposal.reference_price
+    )
+    cancel_calls = []
+
+    def padded_id_submit(
+        ticker,
+        shares,
+        side="buy",
+        *,
+        authorization=None,
+        idempotency_key=None,
+        whole_shares_only=True,
+    ):
+        del whole_shares_only
+        assert authorization is not None
+        order = _strict_broker_order(
+            order_id="accepted-but-padded",
+            client_order_id=idempotency_key,
+            ticker=ticker,
+            shares=shares,
+            side=side,
+        )
+        order["order_id"] = " accepted-but-padded "
+        return order
+
+    broker.submit_market_order = padded_id_submit
+    broker.cancel_order = lambda order_id: cancel_calls.append(order_id)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            with pytest.raises(
+                ProposalExecutionError,
+                match="failed strict identity/schema validation",
+            ):
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    "approve",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(
+                        2026, 7, 27, 10, 0, tzinfo=timezone.utc
+                    ),
+                )
+            assert cancel_calls == []
+            assert store.get_kill_switch()["active"] is True
+    finally:
+        restore()
+
+
 def test_fractional_policy_reaches_the_broker_as_exact_text_end_to_end():
     """SET-1 is executable authority, not a UI-only preference.
 
@@ -630,15 +988,13 @@ def test_fractional_policy_reaches_the_broker_as_exact_text_end_to_end():
     ):
         assert authorization is not None
         submitted.append((ticker, shares, side, whole_shares_only))
-        return {
-            "order_id": "paper-fractional-1",
-            "ticker": ticker,
-            "shares": float(shares),
-            "shares_decimal": shares,
-            "side": side,
-            "type": "market",
-            "status": "accepted",
-        }
+        return _strict_broker_order(
+            order_id="paper-fractional-1",
+            client_order_id=idempotency_key,
+            ticker=ticker,
+            shares=shares,
+            side=side,
+        )
 
     broker.submit_market_order = fractional_submit
     broker.assert_account_and_asset_ready = lambda ticker: {
@@ -785,12 +1141,9 @@ def test_recovered_pre_broker_claim_fences_a_worker_that_resumes():
 def test_unsupported_order_type_is_refused_not_downgraded_to_a_market_order():
     # Independent review, 2026-07-29: the submit dispatch used to read
     # "limit, else market", so ANY other order type would have been
-    # submitted as an unbounded-price MARKET order. risk/execution_gate.py
-    # still approves order_type="stop" (it has no view of policy), and
-    # policy.allowed_order_types is only enforced one layer up -- so the
-    # dispatch itself must fail closed rather than silently downgrade.
-    # A policy permitting "stop" is constructed directly here (policy.validate()
-    # would reject it) precisely to reach the dispatch.
+    # submitted as an unbounded-price MARKET order. Bound execution now
+    # validates the exact TradingPolicy inside the gate, so an unsupported
+    # policy/order type is rejected even earlier and can never reach dispatch.
     packet = _packet()
     permissive_policy = dataclasses.replace(
         _policy(), allowed_order_types=("market", "limit", "stop")
@@ -810,12 +1163,12 @@ def test_unsupported_order_type_is_refused_not_downgraded_to_a_market_order():
                     now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
                 assert False, "expected an unsupported order type to be refused"
-            except ProposalExecutionError as exc:
-                assert "order_type" in str(exc)
+            except ValueError as exc:
+                assert "Unsupported/unimplemented allowed_order_types" in str(exc)
             # The critical property: no order reached the broker at all.
             assert captured == []
             refreshed = store.get_proposal(proposal.proposal_id)
-            assert refreshed["status"] == "blocked"
+            assert refreshed["status"] == "validation_failed"
     finally:
         restore()
 
@@ -927,8 +1280,10 @@ def test_approval_fails_closed_when_open_orders_unavailable():
     packet = _packet()
     policy = _policy()
     proposal = generate_risk_reduction_proposals(packet, policy)[0]
-    unreliable_portfolio = dataclasses.replace(packet.portfolio, open_orders_available=False)
-    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal.reference_price,
+        open_orders_error=ConnectionError("broker open orders unavailable"),
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -937,32 +1292,48 @@ def test_approval_fails_closed_when_open_orders_unavailable():
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
                     "approve",
-                    unreliable_portfolio,
+                    packet.portfolio,
                     policy,
                     store,
                     now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
                 assert False, "expected approval to fail closed when open orders can't be verified"
-            except ProposalExecutionError as exc:
+            except ConnectionError as exc:
                 assert "open orders" in str(exc)
             assert len(captured) == 0
-            assert store.get_proposal(proposal.proposal_id)["status"] == "blocked"
+            assert (
+                store.get_proposal(proposal.proposal_id)["status"]
+                == "validation_failed"
+            )
     finally:
         restore()
 
 
-def test_approval_blocked_when_earnings_are_near():
+def _earnings_buy_fixture():
     packet = _packet()
-    policy = _policy()
-    proposal = generate_risk_reduction_proposals(packet, policy)[0]
-    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price, earnings_available=True)
+    policy = dataclasses.replace(
+        _policy(),
+        max_position_pct=1.0,
+        max_total_exposure_pct=1.0,
+        max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0,
+    )
+    proposal = _buy_proposal_dict(packet, policy, "TQQQ", 1)
+    return packet, policy, proposal
+
+
+def test_approval_blocked_when_earnings_are_near_for_a_buy():
+    packet, policy, proposal = _earnings_buy_fixture()
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal["reference_price"], earnings_available=True
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
-            store.save_proposal(proposal.to_dict())
+            store.save_proposal(proposal)
             try:
                 execute_approved_paper_proposal(
-                    proposal.proposal_id,
+                    proposal["proposal_id"],
                     "approve",
                     packet.portfolio,
                     policy,
@@ -977,25 +1348,50 @@ def test_approval_blocked_when_earnings_are_near():
         restore()
 
 
-def test_earnings_only_block_raises_overridable_error_and_leaves_proposal_re_claimable():
+def test_earnings_blackout_does_not_block_a_proved_risk_reducing_sell():
     packet = _packet()
     policy = _policy()
     proposal = generate_risk_reduction_proposals(packet, policy)[0]
-    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price, earnings_available=True)
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal.reference_price, earnings_available=True
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
+            order = execute_approved_paper_proposal(
+                proposal.proposal_id,
+                "approve",
+                packet.portfolio,
+                policy,
+                store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order["status"] == "accepted"
+            assert len(captured) == 1
+    finally:
+        restore()
+
+
+def test_earnings_only_block_raises_overridable_error_and_leaves_proposal_re_claimable():
+    packet, policy, proposal = _earnings_buy_fixture()
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal["reference_price"], earnings_available=True
+    )
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal)
             try:
                 execute_approved_paper_proposal(
-                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    proposal["proposal_id"], "approve", packet.portfolio, policy, store,
                     now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
                 assert False, "expected an overridable earnings-blackout block"
             except PolicyOverridableBlockError as exc:
                 assert any("earnings" in v.lower() for v in exc.overridable_violations)
             assert len(captured) == 0
-            assert store.get_proposal(proposal.proposal_id)["status"] == POLICY_OVERRIDE_AVAILABLE
+            assert store.get_proposal(proposal["proposal_id"])["status"] == POLICY_OVERRIDE_AVAILABLE
     finally:
         restore()
 
@@ -1008,17 +1404,17 @@ def test_override_flag_proceeds_past_an_earnings_only_block_and_records_it():
     # PolicyOverridableBlockError), exactly like an ordinary discovery
     # call would. Only a SECOND call, once the human has (at least
     # notionally) seen that exact violation set, actually proceeds.
-    packet = _packet()
-    policy = _policy()
-    proposal = generate_risk_reduction_proposals(packet, policy)[0]
-    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price, earnings_available=True)
+    packet, policy, proposal = _earnings_buy_fixture()
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal["reference_price"], earnings_available=True
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
-            store.save_proposal(proposal.to_dict())
+            store.save_proposal(proposal)
             try:
                 execute_approved_paper_proposal(
-                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    proposal["proposal_id"], "approve", packet.portfolio, policy, store,
                     now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                     override_policy_violations=True,
                 )
@@ -1030,13 +1426,13 @@ def test_override_flag_proceeds_past_an_earnings_only_block_and_records_it():
             # Second call: same portfolio/quote, so the freshly revalidated
             # violations exactly match what was just reviewed -- proceeds.
             order = execute_approved_paper_proposal(
-                proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                proposal["proposal_id"], "approve", packet.portfolio, policy, store,
                 now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
                 override_policy_violations=True,
             )
             assert order["status"] == "accepted"
             assert len(captured) == 1
-            stored = store.get_proposal(proposal.proposal_id)
+            stored = store.get_proposal(proposal["proposal_id"])
             assert stored["status"] == "broker_accepted"
             assert "policy_override" in stored
             assert any("earnings" in v.lower() for v in stored["policy_override"]["overridden_violations"])
@@ -1214,7 +1610,10 @@ def test_same_code_but_materially_different_severity_requires_fresh_review():
     policy = _tiny_cap_policy()
     small_account_packet = _packet_with_cash(5_000.0)
     proposal = _position_cap_buy_proposal(small_account_packet, policy)
-    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    captured, restore = _mock_execution_dependencies(
+        quote_price=50.0,
+        broker_cash_sequence=(5_000.0, 500_000.0),
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -1231,15 +1630,13 @@ def test_same_code_but_materially_different_severity_requires_fresh_review():
             first_reviewed = store.get_proposal(proposal.proposal_id)["reviewed_override"]
             assert first_reviewed["violation_codes"] == ["max_position_pct"]
 
-            # A much bigger account (materially different existing
-            # equity) makes the SAME $2,000 buy a much smaller percentage
-            # of the account -- same violation CODE (max_position_pct,
-            # still over the 0.1% cap), but a materially different
-            # projected-exposure MESSAGE.
-            big_account_packet = _packet_with_cash(500_000.0)
+            # The next broker-owned capture observes a much bigger account.
+            # The same $2,000 buy is therefore a much smaller percentage --
+            # same violation CODE (still over the 0.1% cap), but a materially
+            # different projected-exposure MESSAGE.
             try:
                 execute_approved_paper_proposal(
-                    proposal.proposal_id, "approve", big_account_packet.portfolio, policy, store,
+                    proposal.proposal_id, "approve", small_account_packet.portfolio, policy, store,
                     now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
                     override_policy_violations=True,
                 )
@@ -1698,7 +2095,18 @@ def test_pending_buy_value_lookup_failure_blocks_a_buy_approval():
     # quote that fails), undercounting exposure exactly like the bug this
     # mechanism exists to fix. A buy must fail closed instead.
     packet, policy, proposal_id, proposal = _buy_proposal_with_a_pending_order_on_another_ticker("buy")
-    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    pending_buy = _strict_broker_order(
+        order_id="o1",
+        client_order_id="pending-nvda-buy",
+        ticker="NVDA",
+        shares=10,
+        side="buy",
+        status="new",
+    )
+    captured, restore = _mock_execution_dependencies(
+        quote_price=50.0,
+        broker_open_orders=[pending_buy],
+    )
     original_get_latest_quote = broker.get_latest_quote
 
     def flaky_quote(ticker):
@@ -1724,11 +2132,70 @@ def test_pending_buy_value_lookup_failure_blocks_a_buy_approval():
         restore()
 
 
+def test_stale_pending_market_buy_quote_blocks_a_buy_approval():
+    packet, policy, proposal_id, proposal = (
+        _buy_proposal_with_a_pending_order_on_another_ticker("buy")
+    )
+    pending_buy = _strict_broker_order(
+        order_id="o1",
+        client_order_id="pending-nvda-buy",
+        ticker="NVDA",
+        shares=10,
+        side="buy",
+        status="new",
+    )
+    captured, restore = _mock_execution_dependencies(
+        quote_price=50.0,
+        broker_open_orders=[pending_buy],
+    )
+    original_get_latest_quote = broker.get_latest_quote
+
+    def stale_pending_quote(ticker):
+        quote = dict(original_get_latest_quote(ticker))
+        if ticker == "NVDA":
+            quote["timestamp"] = datetime(
+                2026, 7, 27, 8, 0, tzinfo=timezone.utc
+            )
+        return quote
+
+    broker.get_latest_quote = stale_pending_quote
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal)
+            with pytest.raises(ProposalExecutionError, match="pending buy") as caught:
+                execute_approved_paper_proposal(
+                    proposal_id,
+                    "approve",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(
+                        2026, 7, 27, 10, 0, tzinfo=timezone.utc
+                    ),
+                )
+            assert "minutes old" in str(caught.value)
+            assert captured == []
+    finally:
+        restore()
+
+
 def test_pending_buy_value_lookup_failure_does_not_block_a_sell_approval():
     # A risk-reducing sell never consults pending_buy_value_by_ticker, so
     # an unrelated pending buy's quote failure shouldn't block it.
     packet, policy, proposal_id, proposal = _buy_proposal_with_a_pending_order_on_another_ticker("sell")
-    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    pending_buy = _strict_broker_order(
+        order_id="o1",
+        client_order_id="pending-nvda-buy",
+        ticker="NVDA",
+        shares=10,
+        side="buy",
+        status="new",
+    )
+    captured, restore = _mock_execution_dependencies(
+        quote_price=50.0,
+        broker_open_orders=[pending_buy],
+    )
     original_get_latest_quote = broker.get_latest_quote
 
     def flaky_quote(ticker):
@@ -1865,7 +2332,18 @@ def test_notional_only_pending_order_blocks_a_duplicate_proposal_on_the_same_tic
         uncertainties=[],
     ).to_dict()
 
-    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    pending_sell = _strict_broker_order(
+        order_id="o1",
+        client_order_id="pending-tqqq-sell",
+        ticker="TQQQ",
+        side="sell",
+        notional=500.0,
+        status="new",
+    )
+    captured, restore = _mock_execution_dependencies(
+        quote_price=50.0,
+        broker_open_orders=[pending_sell],
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -1923,7 +2401,7 @@ def test_limit_order_routes_to_submit_limit_order_not_market():
                 now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
             )
             assert order["order_id"] == "paper-limit-1"
-            assert order["limit_price"] == 49.5
+            assert order["limit_price"] == "49.5"
             assert len(captured) == 1
             assert captured[0][:3] == ("TQQQ", 10, "sell")
             assert captured[0][4] == 49.5  # limit_price reached submit_limit_order
@@ -1942,11 +2420,15 @@ def test_ambiguous_submission_failure_reconciles_to_executed_when_broker_actuall
         raise TimeoutError("simulated network timeout after the broker may have accepted the order")
 
     broker.submit_market_order = failing_submit
-    broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "reconciled-1", "ticker": proposal.intent.ticker, "shares": proposal.intent.shares,
-        "side": proposal.intent.side, "type": proposal.intent.order_type,
-        "limit_price": proposal.intent.limit_price, "status": "accepted",
-    }
+    broker.find_order_by_client_id = lambda client_order_id: _strict_broker_order(
+        order_id="reconciled-1",
+        client_order_id=client_order_id,
+        ticker=proposal.intent.ticker,
+        shares=proposal.intent.shares,
+        side=proposal.intent.side,
+        order_type=proposal.intent.order_type,
+        limit_price=proposal.intent.limit_price,
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -2059,20 +2541,22 @@ def test_reconcile_submission_resolves_stuck_proposal_to_executed():
     _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
     from assistant.execution_service import reconcile_submission
 
-    broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "reconciled-2",
-        "ticker": proposal.intent.ticker,
-        "shares": proposal.intent.shares,
-        "side": proposal.intent.side,
-        "type": proposal.intent.order_type,
-        "limit_price": proposal.intent.limit_price,
-        "status": "accepted",
-    }
+    broker.find_order_by_client_id = lambda client_order_id: _strict_broker_order(
+        order_id="reconciled-2",
+        client_order_id=client_order_id,
+        ticker=proposal.intent.ticker,
+        shares=proposal.intent.shares,
+        side=proposal.intent.side,
+        order_type=proposal.intent.order_type,
+        limit_price=proposal.intent.limit_price,
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submission_unknown", policy
+            )
 
             order = reconcile_submission(proposal.proposal_id, store)
             assert order["order_id"] == "reconciled-2"
@@ -2090,19 +2574,21 @@ def test_reconcile_submission_refuses_a_mismatched_order():
     _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
     from assistant.execution_service import reconcile_submission
 
-    broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "wrong-order",
-        "ticker": "AAPL",  # does not match the proposal's ticker
-        "shares": 999,
-        "side": "buy",
-        "status": "accepted",
-    }
+    broker.find_order_by_client_id = lambda client_order_id: _strict_broker_order(
+        order_id="wrong-order",
+        client_order_id=client_order_id,
+        ticker="AAPL",  # does not match the proposal's ticker
+        shares=999,
+        side="buy",
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             proposal_dict = proposal.to_dict()
             store.save_proposal(proposal_dict)
-            store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submission_unknown", policy
+            )
 
             try:
                 reconcile_submission(proposal.proposal_id, store)
@@ -2122,22 +2608,37 @@ def _reconcile_mismatch_case(order_overrides: dict, expected_mismatch_substring:
     _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
     from assistant.execution_service import reconcile_submission
 
-    order = {
-        "order_id": "candidate-order",
-        "ticker": proposal.intent.ticker,
-        "shares": proposal.intent.shares,
-        "side": proposal.intent.side,
-        "type": proposal.intent.order_type,
-        "limit_price": proposal.intent.limit_price,
-        "status": "accepted",
-    }
-    order.update(order_overrides)
-    broker.find_order_by_client_id = lambda client_order_id: order
+    def lookup_order(client_order_id):
+        order = _strict_broker_order(
+            order_id="candidate-order",
+            client_order_id=client_order_id,
+            ticker=proposal.intent.ticker,
+            shares=proposal.intent.shares,
+            side=proposal.intent.side,
+            order_type=proposal.intent.order_type,
+            limit_price=proposal.intent.limit_price,
+        )
+        order.update(order_overrides)
+        if "shares" in order_overrides:
+            value = order_overrides["shares"]
+            order["shares_decimal"] = (
+                None if value is None else _decimal_text(value)
+            )
+        if "limit_price" in order_overrides:
+            value = order_overrides["limit_price"]
+            order["limit_price_decimal"] = (
+                None if value is None else _decimal_text(value)
+            )
+        return order
+
+    broker.find_order_by_client_id = lookup_order
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submission_unknown", policy
+            )
             try:
                 reconcile_submission(proposal.proposal_id, store)
                 assert False, f"expected a mismatch on {order_overrides!r} to be refused"
@@ -2151,23 +2652,25 @@ def _reconcile_mismatch_case(order_overrides: dict, expected_mismatch_substring:
 
 
 def test_reconcile_submission_refuses_mismatched_quantity():
-    _reconcile_mismatch_case({"shares": 1}, "shares:")
+    _reconcile_mismatch_case({"shares": 1}, "quantity_mismatch")
 
 
 def test_reconcile_submission_refuses_mismatched_order_type():
-    _reconcile_mismatch_case({"type": "limit", "limit_price": 50.0}, "order type:")
+    _reconcile_mismatch_case(
+        {"type": "limit", "limit_price": 50.0}, "order_type_mismatch"
+    )
 
 
 def test_reconcile_submission_refuses_mismatched_side():
-    _reconcile_mismatch_case({"side": "buy"}, "side:")
+    _reconcile_mismatch_case({"side": "buy"}, "side_mismatch")
 
 
 def test_reconcile_submission_refuses_missing_quantity():
-    _reconcile_mismatch_case({"shares": None}, "shares:")
+    _reconcile_mismatch_case({"shares": None}, "invalid_order_size")
 
 
 def test_reconcile_submission_refuses_missing_order_type():
-    _reconcile_mismatch_case({"type": None}, "order type:")
+    _reconcile_mismatch_case({"type": None}, "invalid_order_type")
 
 
 def test_reconcile_submission_accepts_numerically_equivalent_share_counts():
@@ -2179,20 +2682,23 @@ def test_reconcile_submission_accepts_numerically_equivalent_share_counts():
     _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
     from assistant.execution_service import reconcile_submission
 
-    broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "candidate-order",
-        "ticker": proposal.intent.ticker,
-        "shares": float(proposal.intent.shares),  # equivalent, not identical, representation
-        "side": proposal.intent.side,
-        "type": proposal.intent.order_type,
-        "limit_price": proposal.intent.limit_price,
-        "status": "accepted",
-    }
+    broker.find_order_by_client_id = lambda client_order_id: _strict_broker_order(
+        order_id="candidate-order",
+        client_order_id=client_order_id,
+        ticker=proposal.intent.ticker,
+        # Equivalent, not identical, numeric representation.
+        shares=float(proposal.intent.shares),
+        side=proposal.intent.side,
+        order_type=proposal.intent.order_type,
+        limit_price=proposal.intent.limit_price,
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submission_unknown", policy
+            )
             order = reconcile_submission(proposal.proposal_id, store)
             assert order["order_id"] == "candidate-order"
             assert store.get_proposal(proposal.proposal_id)["status"] == "broker_accepted"
@@ -2219,16 +2725,22 @@ def test_reconcile_submission_refuses_mismatched_limit_price():
         alternatives=[], uncertainties=[],
     ).to_dict()
     _, restore = _mock_execution_dependencies(quote_price=50.0)
-    broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "candidate-order", "ticker": "TQQQ", "shares": 10, "side": "sell",
-        "type": "limit", "limit_price": 45.0,  # does NOT match the proposal's 49.5
-        "status": "accepted",
-    }
+    broker.find_order_by_client_id = lambda client_order_id: _strict_broker_order(
+        order_id="candidate-order",
+        client_order_id=client_order_id,
+        ticker="TQQQ",
+        shares=10,
+        side="sell",
+        order_type="limit",
+        limit_price=45.0,  # does NOT match the proposal's 49.5
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(limit_proposal)
-            store.update_proposal_status(proposal_id, "submission_unknown")
+            _set_reconcilable_status(
+                store, proposal_id, "submission_unknown", policy
+            )
             try:
                 reconcile_submission(proposal_id, store)
                 assert False, "expected a mismatched limit price to be refused"
@@ -2236,7 +2748,7 @@ def test_reconcile_submission_refuses_mismatched_limit_price():
                 assert "MISMATCHED" in str(exc)
             record = store.get_proposal(proposal_id)
             assert record["status"] == "submission_unknown"
-            assert "limit_price:" in record["error"]
+            assert "limit_price_mismatch" in record["error"]
     finally:
         restore()
 
@@ -2260,16 +2772,22 @@ def test_reconcile_submission_accepts_a_correctly_matching_limit_order():
         alternatives=[], uncertainties=[],
     ).to_dict()
     _, restore = _mock_execution_dependencies(quote_price=50.0)
-    broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "candidate-order", "ticker": "TQQQ", "shares": 10, "side": "sell",
-        "type": "limit", "limit_price": 49.5,
-        "status": "accepted",
-    }
+    broker.find_order_by_client_id = lambda client_order_id: _strict_broker_order(
+        order_id="candidate-order",
+        client_order_id=client_order_id,
+        ticker="TQQQ",
+        shares=10,
+        side="sell",
+        order_type="limit",
+        limit_price=49.5,
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(limit_proposal)
-            store.update_proposal_status(proposal_id, "submission_unknown")
+            _set_reconcilable_status(
+                store, proposal_id, "submission_unknown", policy
+            )
             order = reconcile_submission(proposal_id, store)
             assert order["order_id"] == "candidate-order"
             assert store.get_proposal(proposal_id)["status"] == "broker_accepted"
@@ -2289,7 +2807,9 @@ def test_reconcile_submission_marks_submission_failed_when_broker_confirms_absen
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submitting")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submitting", policy
+            )
             _backdate_updated_at(store, proposal.proposal_id, seconds_ago=120)
 
             try:
@@ -2314,7 +2834,9 @@ def test_reconcile_submission_keeps_a_recent_404_unresolved_and_reserved():
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submitting")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submitting", policy
+            )
             store.reserve_execution_budget(
                 proposal.proposal_id,
                 trading_day="2026-07-30",
@@ -2351,7 +2873,9 @@ def test_reconcile_submission_recovers_from_a_malformed_stored_intent():
             store = AssistantStore(Path(temp) / "assistant.db")
             proposal_dict = proposal.to_dict()
             store.save_proposal(proposal_dict)
-            store.update_proposal_status(proposal.proposal_id, "submitting")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submitting", policy
+            )
             # Corrupt the stored intent so _intent_from_dict() raises (missing "shares").
             corrupted_intent = dict(proposal_dict["intent"])
             del corrupted_intent["shares"]
@@ -2464,7 +2988,9 @@ def test_reconcile_submission_recovers_when_broker_lookup_itself_raises():
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submitting")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submitting", policy
+            )
             try:
                 reconcile_submission(proposal.proposal_id, store)
                 assert False, "expected the unconfirmed lookup to raise"
@@ -2488,16 +3014,22 @@ def test_reconcile_submission_recovers_when_atomic_journal_fails():
     _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
     from assistant.execution_service import reconcile_submission
 
-    broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "candidate-order", "ticker": proposal.intent.ticker, "shares": proposal.intent.shares,
-        "side": proposal.intent.side, "type": proposal.intent.order_type,
-        "limit_price": proposal.intent.limit_price, "status": "accepted",
-    }
+    broker.find_order_by_client_id = lambda client_order_id: _strict_broker_order(
+        order_id="candidate-order",
+        client_order_id=client_order_id,
+        ticker=proposal.intent.ticker,
+        shares=proposal.intent.shares,
+        side=proposal.intent.side,
+        order_type=proposal.intent.order_type,
+        limit_price=proposal.intent.limit_price,
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submitting")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submitting", policy
+            )
 
             original_record = store.project_broker_order_event
 
@@ -2524,16 +3056,22 @@ def test_reconcile_submission_recovers_when_the_atomic_projection_fails():
     _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
     from assistant.execution_service import reconcile_submission
 
-    broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "candidate-order", "ticker": proposal.intent.ticker, "shares": proposal.intent.shares,
-        "side": proposal.intent.side, "type": proposal.intent.order_type,
-        "limit_price": proposal.intent.limit_price, "status": "accepted",
-    }
+    broker.find_order_by_client_id = lambda client_order_id: _strict_broker_order(
+        order_id="candidate-order",
+        client_order_id=client_order_id,
+        ticker=proposal.intent.ticker,
+        shares=proposal.intent.shares,
+        side=proposal.intent.side,
+        order_type=proposal.intent.order_type,
+        limit_price=proposal.intent.limit_price,
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submitting")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submitting", policy
+            )
 
             original_projection = store.project_broker_order_event
 
@@ -2569,7 +3107,9 @@ def test_reconcile_submission_raises_critical_when_even_the_recovery_write_fails
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
-            store.update_proposal_status(proposal.proposal_id, "submitting")
+            _set_reconcilable_status(
+                store, proposal.proposal_id, "submitting", policy
+            )
 
             def always_failing_update(pid, status, **updates):
                 raise sqlite3.OperationalError("database is locked")

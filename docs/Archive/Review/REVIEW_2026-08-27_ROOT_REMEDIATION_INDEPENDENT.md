@@ -262,6 +262,28 @@ escape, secret exposure, or unrecoverable corruption.
 7. **Make unavailability explicit rather than zero** in `build_risk_exposure`
    (`EXE-002`) before any second snapshot construction path is introduced.
 
+## 7A. Corrections applied by this review (2026-08-27)
+
+The owner authorized the reviewer to implement the fixes after the findings were
+recorded. Three were implemented on
+`user/claude/fix-risk-reduction-guards-20260827`; one was deliberately deferred.
+Each fix was proven red before the change and green after, and each new guard
+was mutation-verified.
+
+| Finding | Correction | Verification |
+|---|---|---|
+| `VAL-001` | `tests/test_remediation_ledger_consistency.py` expectations updated to the 110-finding ledger (`SYS-FU-P1` family 5→6, P1 46→47, grand total 109→110). The guard was **not** weakened — deriving its expectations from the ledger would defeat its purpose. `SYS-FU-P1-006`'s status line was additionally normalized to the canonical wording, with its exact commit retained in the entry's HOW-and-WHERE bullet; no finding's substance was altered. | The guard's own three mutation tests (duplicate row, weakened status, stale total) pass, so it remains load-bearing. |
+| `EXE-001` | `_refuse_while_prior_dispatch_is_ambiguous` now takes the proposal's side and returns early for any non-buy, mirroring the earnings blackout's registry scoping. The call site derives the side from the already-loaded proposal. The docstring now states the exposure-increasing-only contract and why. | Two new tests in `tests/test_execution_characterization.py`: a risk-reducing sell now completes while an unrelated proposal is stranded in `submission_unknown` (red before the fix), and an exposure-increasing buy still refuses with no broker contact (green throughout, so the guard was not simply removed). Both use a distinct ticker for the stranded proposal so the ticker/side duplicate guard cannot be what refuses. |
+| `STO-001` | `AssistantStore.__init__` gains `permit_contained_integrity_failure`, default **False** so ordinary construction still refuses a damaged ledger. When set, containment still fires, the error is retained on `broker_event_integrity_error`, and construction succeeds so emergency cancellation stays reachable. Only the `cancel-all-orders` CLI command opts in — it reads no broker-event evidence, and containment has already engaged the kill switch by that point. | Four new tests in `tests/test_contained_integrity_emergency_access.py`, including a full `cancel_all_open_orders` run against a contained store. A scope test pins that exactly one command opts in; adding a second command to the opt-in was mutation-verified red, then reverted. |
+| `BRK-001` | **Deliberately not fixed.** | Marking or dropping an unusable position row would change `total_equity` and the position set that `_check_position_data_integrity`, `_check_sell_exceeds_held`, and the exposure checks all consume, so a partial book cannot safely drive the gate. Choosing what the gate validates for a sell against an incomplete book is a design decision with real safety content, not an implementation detail — CLAUDE.md section 2 directs stopping and naming the conflict rather than choosing the convenient reading. It also remains the only finding here whose trigger is not demonstrated reachable against a real broker. |
+
+Validation on the corrected tree: full suite **5,448 passed, 2 skipped, 0
+failed, 25 warnings in 1,430.00 s** on Python 3.13.14 — `main` is green again.
+The count reconciles exactly: 5,442 collected at `e6a654d`, minus the 4 `VAL-001`
+failures, plus 6 new tests. `compileall` exited 0 and `git diff --check` is
+clean. No production behaviour outside the three named paths was changed, and no
+existing test was weakened, skipped, or deleted.
+
 ## 8. Unverified concerns (not findings)
 
 - `_cancel_if_stale` refuses to cancel on a timestamp-integrity failure while

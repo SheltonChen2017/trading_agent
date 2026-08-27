@@ -139,8 +139,41 @@ and in `docs/Archive/Review/`.
   from both other lanes.
 - The review consumed **zero** research looks and touched no provider,
   credential, broker, operator database, scheduled task, deployment, or evidence
-  epoch. `paper-epoch-006` is untouched. Findings are recorded for Codex to
-  verify and correct; this review applied no production-code change.
+  epoch. `paper-epoch-006` is untouched.
+
+### 0A.1 Corrections applied (owner-authorized, 2026-08-27)
+
+- Branch `user/claude/fix-risk-reduction-guards-20260827`, which merges the
+  review branch so the record and the corrections travel together. Detail is in
+  section 7A of the review report; this is the summary.
+- **`VAL-001` closed.** The ledger guard's expectations now match the
+  110-finding ledger, and `SYS-FU-P1-006`'s status line was normalized to the
+  canonical wording with its commit retained in the entry body. The guard was
+  not weakened and no finding's substance was changed — its own three mutation
+  tests still pass. **`main` is green again.**
+- **`EXE-001` closed.** `_refuse_while_prior_dispatch_is_ambiguous` is now
+  exposure-increasing only, mirroring the earnings blackout's registry scoping.
+  A risk-reducing sell completes while an unrelated proposal is stranded in
+  `submission_unknown`; an exposure-increasing buy still refuses without broker
+  contact.
+- **`STO-001` closed.** `AssistantStore` gains an explicit, default-off
+  `permit_contained_integrity_failure`. Ordinary construction still refuses a
+  damaged broker-event ledger; only `cancel-all-orders` opts in, so emergency
+  cancellation stays reachable while containment holds the kill switch active. A
+  scope test pins the opt-in to exactly that one command.
+- **`BRK-001` deliberately deferred** — a partial position book cannot safely
+  drive the gate's exposure and sell-exceeds-held checks, so what the gate
+  validates for a sell against an incomplete book is an owner/design decision,
+  not an implementation detail. It is also the only finding whose trigger is not
+  demonstrated reachable against a real broker.
+- Validation on the corrected tree: full suite **5,448 passed, 2 skipped, 0
+  failed, 25 warnings in 1,430.00s**; `compileall` exited 0; `git diff --check`
+  clean. No existing test was weakened, skipped, or deleted; no broker,
+  provider, operator database, scheduled task, deployment, or evidence epoch was
+  touched.
+- Still open for Codex: the remaining 11 P2 findings, all P3/P4 items, and
+  `BRK-001`'s design decision. The remediation ledger's per-finding statuses
+  remain Codex's to update after counter-review.
 
 ## 1. Read first
 

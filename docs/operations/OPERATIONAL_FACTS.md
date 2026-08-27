@@ -838,27 +838,32 @@ should held tickers and recognized ETFs widen what a summary may name, or
 stay as-is? That widens a safety control and should be reviewed, not
 quietly changed.
 
-### CQC-001: the QuantConnect success check is unverified (2026-08-07)
+### CQC-001: QuantConnect success is verified only for exercised endpoints
 
 `research/quantconnect.py` refuses any response whose body does not carry
 `success: true`. That is fail-closed and correct in principle — QuantConnect
 signals failure in-band with HTTP 200, so treating a missing field as
 success would be fail-open.
 
-**But no live call has ever been made from this project.** Whether every
-endpoint sets `success` is an assumption, not a verified contract. If a real
-call fails with `"failed (HTTP 200): no reason given"` on an otherwise
-sensible body, **suspect that check before suspecting the credentials.**
+Historical authenticated research calls and cloud backtests have been made;
+their permanent identities and dispositions are in
+`docs/research/alpha-result.md`. The 2026-08-16 smoke round observed
+`success: true` on authenticate, project/file, compile, and backtest
+create/read. Those calls verify the field only for the exercised response
+shapes; whether every future or unexercised endpoint sets it remains an
+endpoint-specific compatibility assumption. If a later call fails with
+`"failed (HTTP 200): no reason given"` on an otherwise sensible body,
+**suspect that check before suspecting the credentials.**
 
 Expect it on `read_backtest` / `list_backtests` rather than `authenticate`,
 which QuantConnect documents as returning `success` — so a clean
 `authenticate()` does **not** prove the assumption holds for the endpoints
 that matter.
 
-Dormant until someone deliberately points the client at QuantConnect: the
-module is present in deployed `ef05dc1`, but has no UI wiring and nothing
-calls it automatically. Without a deliberate caller and configured
-credentials it cannot affect the app or the running epoch.
+The client still has no UI or automatic execution wiring. Historical research
+calls required a deliberate runner and credentials; without both it cannot
+affect the app or the running paper epoch. QuantConnect research calls are not
+broker calls and grant no order authority.
 
 Do not loosen it speculatively. Confirm the real response shape, then relax
 it for that specific endpoint with the observed body recorded.

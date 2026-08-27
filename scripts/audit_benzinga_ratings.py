@@ -40,6 +40,7 @@ import re
 import sys
 import time
 from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import requests
 
@@ -50,6 +51,40 @@ RATINGS = "/benzinga/v1/ratings"
 PAGE_LIMIT = 1000
 REQUEST_PAUSE_SECONDS = 0.15
 MAX_RETRIES = 5
+
+# Query-parameter names which must never survive into a manifest, terminal
+# message, or wrapped provider exception.  ``parse_qsl`` percent-decodes names
+# before this exact case-folded comparison, so spellings such as ``APIKEY``,
+# ``Api%5FKey``, and repeated credential fields cannot bypass the guard.
+_CREDENTIAL_QUERY_KEYS = frozenset(
+    {
+        "access-token",
+        "access_token",
+        "accesstoken",
+        "api-key",
+        "api_key",
+        "api-token",
+        "api_token",
+        "apikey",
+        "apitoken",
+        "auth-token",
+        "auth_token",
+        "authtoken",
+        "authorization",
+        "bearer-token",
+        "bearer_token",
+        "bearertoken",
+        "client-secret",
+        "client_secret",
+        "clientsecret",
+        "key",
+        "password",
+        "secret",
+        "secret-key",
+        "secret_key",
+        "token",
+    }
+)
 
 # Delisted / bankrupt / acquired / renamed probe set (owner instruction 2).
 # Chosen to span delisting years 2016-2024 and every removal mechanism.
@@ -110,19 +145,70 @@ def _api_key() -> str:
 
 
 def _strip_key(url: str) -> str:
-    """Defensively remove any credential-looking query parameter."""
-    return re.sub(r"([?&])(apiKey|apikey|api_key|token)=[^&]*", r"\1\2=REDACTED", url)
+    """Return a structurally parsed URL with credentials and fragment removed.
+
+    URL fragments are never needed for an HTTP request or snapshot provenance,
+    and some OAuth-style providers place credentials there.  Dropping the
+    fragment in full is therefore both simpler and safer than attempting to
+    distinguish a harmless fragment from a credential-bearing one.
+    """
+    if not isinstance(url, str):
+        return "<invalid URL redacted>"
+    try:
+        parts = urlsplit(url)
+        sanitized_query = []
+        for name, value in parse_qsl(parts.query, keep_blank_values=True):
+            sanitized_query.append(
+                (
+                    name,
+                    "REDACTED"
+                    if name.casefold() in _CREDENTIAL_QUERY_KEYS
+                    else value,
+                )
+            )
+        # User-info is also credential material.  Massive URLs do not use it,
+        # but retaining it would make this defensive sanitizer incomplete.
+        netloc = parts.netloc
+        if "@" in netloc:
+            netloc = "REDACTED@" + netloc.rsplit("@", 1)[1]
+        return urlunsplit(
+            (
+                parts.scheme,
+                netloc,
+                parts.path,
+                urlencode(sanitized_query),
+                "",
+            )
+        )
+    except (TypeError, ValueError, UnicodeError):
+        # Never return the original string when parsing fails: it is precisely
+        # the value that may contain a credential.
+        return "<malformed URL redacted>"
+
+
+def _sanitize_exception_text(exc: BaseException) -> str:
+    """Return a diagnostic that cannot echo arbitrary provider material.
+
+    Request-library exception strings are not a trusted structured surface:
+    besides URLs they may include headers or response fragments. Retaining
+    only the exception class is the fail-closed way to guarantee a bearer or
+    future credential spelling cannot re-enter terminal output.
+    """
+    return f"{type(exc).__name__}: provider request failed"
 
 
 def _get(session: requests.Session, url: str, params: dict | None = None) -> requests.Response:
     for attempt in range(MAX_RETRIES):
-        response = session.get(url, params=params, timeout=60)
-        if response.status_code == 429:
-            wait = 2.0 * (attempt + 1)
-            time.sleep(wait)
-            continue
-        response.raise_for_status()
-        return response
+        try:
+            response = session.get(url, params=params, timeout=60)
+            if response.status_code == 429:
+                wait = 2.0 * (attempt + 1)
+                time.sleep(wait)
+                continue
+            response.raise_for_status()
+            return response
+        except Exception as exc:
+            raise RuntimeError(_sanitize_exception_text(exc)) from None
     raise RuntimeError(f"rate-limited {MAX_RETRIES} times at {_strip_key(url)}")
 
 

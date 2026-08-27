@@ -22,9 +22,13 @@ from data.market_data import fetch_historical
 from data.price_target_data import fetch_price_target_history
 from backtest.engine import out_of_sample_significance_by_block
 from signals.analyst_target import scan_analyst_target_gap
+from research.analyst_revisions_v2.legacy_reproduction import quarantine_legacy_runner
 
 
-def main():
+def main(argv=None):
+    quarantine_legacy_runner(
+        script_name="run_analyst_target_significance_check.py", argv=argv
+    )
     print(f"Fetching real historical price data for {len(UNIVERSE)} tickers over {LOOKBACK_DAYS} trading days...")
     data = fetch_historical(UNIVERSE, lookback_days=LOOKBACK_DAYS)
     print(f"Got price data for {len(data)}/{len(UNIVERSE)} tickers.")

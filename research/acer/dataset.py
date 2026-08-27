@@ -19,6 +19,7 @@ research look.
 from __future__ import annotations
 
 import collections
+import dataclasses
 import json
 import re
 from pathlib import Path
@@ -46,6 +47,97 @@ _LINEAGE_KEYS = (
 
 class DatasetConflictError(ValueError):
     """A dataset path exists and holds different content."""
+
+
+@dataclasses.dataclass(frozen=True, init=False)
+class ValidatedDatasetIdentity:
+    """A legacy identity whose complete record and both blobs were verified."""
+
+    kind: str
+    contract_version: int
+    source_snapshot_name: str
+    source_manifest_sha256: str
+    era_split_year: int
+    event_count: int
+    refusal_count: int
+    events_sha256: str
+    refusals_sha256: str
+    content_hash: str
+    dataset_id: str
+
+    @classmethod
+    def _from_verified(cls, identity: dict) -> "ValidatedDatasetIdentity":
+        instance = object.__new__(cls)
+        for field in dataclasses.fields(cls):
+            object.__setattr__(instance, field.name, identity[field.name])
+        return instance
+
+    def to_record(self) -> dict:
+        return {
+            field.name: getattr(self, field.name)
+            for field in dataclasses.fields(self)
+        }
+
+
+_IDENTITY_KEYS = frozenset((*_LINEAGE_KEYS, "content_hash", "dataset_id"))
+
+
+def validate_identity_record(
+    identity: object,
+    *,
+    events_bytes: bytes,
+    refusals_bytes: bytes,
+    expected_directory_name: str | None = None,
+) -> ValidatedDatasetIdentity:
+    """Authenticate an exact legacy identity record against its full content."""
+    if not isinstance(identity, dict) or set(identity) != _IDENTITY_KEYS:
+        raise DatasetConflictError(
+            "REFUSED: dataset identity has missing or unknown fields"
+        )
+    if type(events_bytes) is not bytes or type(refusals_bytes) is not bytes:
+        raise DatasetConflictError("REFUSED: dataset content must be exact bytes")
+    lineage = {key: identity[key] for key in _LINEAGE_KEYS}
+    if lineage["kind"] != DATASET_KIND:
+        raise DatasetConflictError("REFUSED: dataset identity has an unknown kind")
+    if type(lineage["contract_version"]) is not int or lineage["contract_version"] != DATASET_CONTRACT_VERSION:
+        raise DatasetConflictError("REFUSED: dataset contract version is unsupported")
+    if type(lineage["era_split_year"]) is not int or lineage["era_split_year"] != ERA_SPLIT_YEAR:
+        raise DatasetConflictError("REFUSED: dataset era boundary is unsupported")
+    snapshot_name = lineage["source_snapshot_name"]
+    if (
+        not isinstance(snapshot_name, str)
+        or not snapshot_name
+        or snapshot_name != snapshot_name.strip()
+    ):
+        raise DatasetConflictError("REFUSED: source snapshot name is noncanonical")
+    for hash_key in ("source_manifest_sha256", "events_sha256", "refusals_sha256"):
+        value = lineage[hash_key]
+        if not isinstance(value, str) or not _SHA256_RE.fullmatch(value):
+            raise DatasetConflictError(f"REFUSED: {hash_key} is invalid")
+    for count_key in ("event_count", "refusal_count"):
+        value = lineage[count_key]
+        if type(value) is not int or value < 0:
+            raise DatasetConflictError(f"REFUSED: {count_key} is invalid")
+    if hash_bytes(events_bytes) != lineage["events_sha256"]:
+        raise DatasetConflictError("REFUSED: events content does not match events_sha256")
+    if hash_bytes(refusals_bytes) != lineage["refusals_sha256"]:
+        raise DatasetConflictError("REFUSED: refusal content does not match refusals_sha256")
+    if len(events_bytes.splitlines()) != lineage["event_count"]:
+        raise DatasetConflictError("REFUSED: event_count does not match content")
+    if len(refusals_bytes.splitlines()) != lineage["refusal_count"]:
+        raise DatasetConflictError("REFUSED: refusal_count does not match content")
+    content_hash = identity["content_hash"]
+    if not isinstance(content_hash, str) or not _SHA256_RE.fullmatch(content_hash):
+        raise DatasetConflictError("REFUSED: content_hash is invalid")
+    expected_hash = hash_payload(lineage)
+    if content_hash != expected_hash:
+        raise DatasetConflictError("REFUSED: content_hash does not authenticate lineage")
+    expected_id = f"{DATASET_KIND}-{expected_hash[:16]}"
+    if identity["dataset_id"] != expected_id:
+        raise DatasetConflictError("REFUSED: full dataset_id does not bind content")
+    if expected_directory_name is not None and expected_directory_name != expected_id:
+        raise DatasetConflictError("REFUSED: dataset directory does not match full dataset_id")
+    return ValidatedDatasetIdentity._from_verified(identity)
 
 
 def _jsonl_bytes(payloads: list[dict]) -> bytes:
@@ -166,8 +258,8 @@ def write_dataset(
     return identity
 
 
-def load_identity(dataset_dir: Path) -> dict:
-    """Read and authenticate a dataset identity plus its content blobs."""
+def load_validated_identity(dataset_dir: Path) -> ValidatedDatasetIdentity:
+    """Read and authenticate an exact identity plus both complete blobs."""
     dataset_dir = Path(dataset_dir)
     identity_path = dataset_dir / "dataset.json"
     try:
@@ -176,82 +268,24 @@ def load_identity(dataset_dir: Path) -> dict:
         raise DatasetConflictError(
             f"REFUSED: {identity_path} is missing or invalid: {exc}"
         ) from exc
-    if not isinstance(identity, dict):
-        raise DatasetConflictError(f"REFUSED: {identity_path} is not an object")
+    try:
+        events_bytes = (dataset_dir / "events.jsonl").read_bytes()
+        refusals_bytes = (dataset_dir / "refusals.jsonl").read_bytes()
+    except OSError as exc:
+        raise DatasetConflictError(
+            f"REFUSED: normalized dataset content is missing or unreadable: {exc}"
+        ) from exc
+    return validate_identity_record(
+        identity,
+        events_bytes=events_bytes,
+        refusals_bytes=refusals_bytes,
+        expected_directory_name=dataset_dir.name,
+    )
 
-    missing = [
-        key
-        for key in (*_LINEAGE_KEYS, "content_hash", "dataset_id")
-        if key not in identity
-    ]
-    if missing:
-        raise DatasetConflictError(
-            f"REFUSED: {identity_path} is missing identity fields: {missing}"
-        )
-    lineage = {key: identity[key] for key in _LINEAGE_KEYS}
-    if lineage["kind"] != DATASET_KIND:
-        raise DatasetConflictError(f"REFUSED: {identity_path} has an unknown kind")
-    if lineage["contract_version"] != DATASET_CONTRACT_VERSION:
-        raise DatasetConflictError(
-            f"REFUSED: {identity_path} has an unsupported contract version"
-        )
-    if lineage["era_split_year"] != ERA_SPLIT_YEAR:
-        raise DatasetConflictError(
-            f"REFUSED: {identity_path} has an unsupported era boundary"
-        )
-    if not isinstance(lineage["source_snapshot_name"], str) or not lineage[
-        "source_snapshot_name"
-    ].strip():
-        raise DatasetConflictError(
-            f"REFUSED: {identity_path} has no source snapshot name"
-        )
-    source_manifest = lineage["source_manifest_sha256"]
-    if not isinstance(source_manifest, str) or not _SHA256_RE.fullmatch(
-        source_manifest
-    ):
-        raise DatasetConflictError(
-            f"REFUSED: {identity_path} has an invalid source manifest hash"
-        )
-    for count_key in ("event_count", "refusal_count"):
-        count = lineage[count_key]
-        if not isinstance(count, int) or isinstance(count, bool) or count < 0:
-            raise DatasetConflictError(
-                f"REFUSED: {identity_path} has an invalid {count_key}"
-            )
-    expected_hash = hash_payload(lineage)
-    if identity.get("content_hash") != expected_hash:
-        raise DatasetConflictError(
-            f"REFUSED: {identity_path} content_hash does not authenticate lineage"
-        )
-    expected_id = f"{DATASET_KIND}-{expected_hash[:16]}"
-    if identity.get("dataset_id") != expected_id or dataset_dir.name != expected_id:
-        raise DatasetConflictError(
-            f"REFUSED: {identity_path} dataset_id does not match its content or path"
-        )
 
-    for filename, key in (
-        ("events.jsonl", "events_sha256"),
-        ("refusals.jsonl", "refusals_sha256"),
-    ):
-        path = dataset_dir / filename
-        try:
-            blob = path.read_bytes()
-        except OSError as exc:
-            raise DatasetConflictError(
-                f"REFUSED: {path} is missing or unreadable: {exc}"
-            ) from exc
-        actual = hash_bytes(blob)
-        if actual != identity.get(key):
-            raise DatasetConflictError(
-                f"REFUSED: {path} does not match {key}"
-            )
-        count_key = "event_count" if filename == "events.jsonl" else "refusal_count"
-        line_count = len(blob.splitlines())
-        if line_count != identity.get(count_key):
-            raise DatasetConflictError(
-                f"REFUSED: {path} row count does not match {count_key}"
-            )
-    return identity
+def load_identity(dataset_dir: Path) -> dict:
+    """Compatibility view backed by the strict typed loader."""
+    return load_validated_identity(dataset_dir).to_record()
 
 
 def summarize(events: list[NormalizedEvent], refusals: list[Refusal]) -> dict:

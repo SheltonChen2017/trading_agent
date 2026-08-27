@@ -1,7 +1,8 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
-Status: **PLANNED; NO V2 SIGNAL, OUTCOME TEST, ETF PORTFOLIO, OR QC ALGORITHM
-HAS BEEN IMPLEMENTED.**
+Status: **ARV2 CONTRACT/SAFETY REMEDIATION IMPLEMENTED; PENDING REQUIRED
+CLAUDE REVIEW AND CODEX COUNTER-REVIEW. NO V2 SIGNAL OR OUTCOME TEST, ETF
+RESEARCH PORTFOLIO, QC ALGORITHM, OR DEPLOYMENT HAS BEEN RUN.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -12,8 +13,10 @@ bytes, SHA-256
 The PDF identifies itself as v2.0 dated 2026-08-22 and replaces the former
 analyst-consensus plan.
 
-Codex is the primary implementer. Claude is the independent reviewer. Both
-agents work serially on the same branch and follow
+Codex is the primary implementer. Claude is the independent reviewer, and
+Codex counter-reviews Claude's exact reviewed push before combining that
+disposition with the next authorized bounded milestone. Both agents work
+serially on the same branch and follow
 `THREE_STRATEGY_PARALLEL_WORKFLOW.md`. During parallel development neither
 agent may edit `docs/ACTION_PLAN_2026-08-20.md` or
 `docs/SESSION_HANDOFF.md`; this record is the lane's status and handoff.
@@ -56,7 +59,7 @@ completion.
 
 | Area | Current repository state | V2 requirement / gap | Disposition |
 |---|---|---|---|
-| Vendor capture | Immutable Massive-Benzinga snapshot validation exists. | Re-verify current entitlement, complete pagination, amendment/deletion behavior, and transfer rights for QC. | Reuse after audit. |
+| Vendor capture | Legacy ACER byte-hash validation exists. | V2 requires semantic completeness, exact partition/page coverage, immutable source locators, amendment/deletion behavior, and transfer rights for QC. | Use only through the separate typed V2 verifier; legacy tuples are not publishable V2 evidence. |
 | Event normalization | `research/acer/` produces a canonical event table with named refusals. Reviewed snapshot: 587,046 raw rows, 584,916 accepted events, 2,130 refusals (99.64% retained), roughly Dec-2011 through Aug-2026. | Add V2 institution-stock-day dedupe, event taxonomy, corrected/withdrawn-event lineage, and explicit availability rules. | Extend; do not rewrite raw history. |
 | Time semantics | Date-level conservative availability exists. | V2 needs trustworthy `effective_time` and `available_time`, next-open cohorting, and explicit date-only delay. Intraday history may be incomplete. | Blocking audit. |
 | Firm identity | Firm name and Benzinga firm/analyst identifiers are present in source rows. | Build durable firm identity and a firm-specific ordered-rating ontology; reject ambiguous vocabularies. | Not implemented. |
@@ -79,15 +82,118 @@ it must preserve the immutable original rather than mutating it in place.
 
 | Milestone | Scope | Exit gate |
 |---|---|---|
-| ARV2-0 | Freeze schemas, ontology rules, event availability, identifiers, data quality, test family, cost model, and look budget. | Every ambiguous choice is fixed; no outcome code can run. |
+| ARV2-0 | Freeze schemas, ontology rules, event availability, identifiers, data quality, test family, cost model, and look budget. | Every ambiguous choice is fixed in a reviewed, content-addressed spec; no outcome code can run before that gate. |
 | ARV2-1 | Audit/extend immutable ratings ingest and build firm-rating ontology with fail-closed refusals. | Synthetic and sampled structural tests; exact lineage and dedupe invariants. |
-| ARV2-2 | Build PIT issuer/security master and event-to-security mapping. | Ticker reuse/share-class/delisting mutations fail; coverage and ambiguity reported. |
-| ARV2-3 | Implement canonical stock score and separate diagnostic channels. | Golden equations, sparse-sector behavior, no outcome imports, no leakage. |
-| ARV2-4 | Build PIT ETF reverse index, eligibility, mapping, and ETF aggregation. | >=99% mapped candidate weight; stale/dynamic/transitive bypasses fail. |
-| ARV2-5 | Register and run stock-first structural/event study under the frozen budget. | Permanent look logged; topology decision made without final holdout. |
+| ARV2-2 | Build PIT issuer/security master and outcome prerequisites. | Ticker reuse/share-class/delisting mutations fail; coverage and ambiguity reported. |
+| ARV2-3 | Implement the canonical stock score and separate diagnostic channels. | Golden equations, sparse-sector behavior, no outcome imports, no leakage. |
+| ARV2-4 | Register and run the one-shot stock-first structural/event study under the frozen budget. | Permanent look logged; a valid null closes the canonical family; the shared final holdout remains untouched. |
+| ARV2-5 | Only after an ARV2-4 pass, build the PIT ETF reverse index, eligibility, mapping, and ETF aggregation. | >=99% mapped candidate weight; stale/dynamic/transitive bypasses fail. |
 | ARV2-6 | Walk-forward ETF research with fixed costs and baselines. | OOS gate, robustness, capacity, turnover, overlap, and null handling. |
 | ARV2-7 | Implement QC algorithm using immutable custom/precomputed signals. | Deterministic parity, scheduling, sizing, cash/cap/failure tests; still research-only. |
-| ARV2-8 | Independent final holdout and promotion dossier. | Explicit owner decision required for any paper deployment. |
+| ARV2-8 | Produce the lane dossier without opening the shared integration holdout. | Independent lane review complete; integration/final evaluation remains a separately owner-scheduled main-line milestone. |
+
+ETF topology construction is deliberately downstream of the stock-first stop/go
+test. A structural provider-capability audit may occur earlier, but no ETF
+signal topology may be tuned or completed before ARV2-4 passes.
+
+## 3A. Normative V2 errata and executable safety boundary (2026-08-26)
+
+The immutable PDF remains the owner source; the following corrections are a
+versioned implementation decision register for places where its equations or
+prose are incomplete or internally inconsistent. They do not rewrite ACER V1
+or claim a research result.
+
+- **Package boundary:** all new contracts live in
+  `research/analyst_revisions_v2/`. `research/acer/` remains legacy capture
+  evidence and is never relabeled as V2.
+- **Snapshot and dataset identity:** publishable data must be a typed complete
+  snapshot with exact schema, booleans, requested bounds, contiguous
+  partitions/pages, count reconciliation, raw-page inventory, and hashes.
+  Every raw source locator receives exactly one accepted event or refusal.
+  The derived identity binds the clean producing commit, schema/normalizer,
+  configuration, provider contract, evidence epoch, and build recipe. A
+  diagnostic incomplete snapshot has a distinct non-publishable type.
+- **Canonical events:** V2 uses semantic schema
+  `arv2-canonical-event-v1`, with immutable raw locator/hash, provider event
+  and version IDs, revision/supersession/correction state, four timing
+  instants, permanent firm/analyst/issuer/security/share-class identity,
+  historical ticker validity, rating ontology evidence, and producing
+  lineage. A later correction never rewrites what was known earlier.
+- **Timing:** an exact public instant becomes eligible at the first exchange
+  open strictly after that instant. A date-only row becomes eligible only at
+  the second exchange-session open strictly after its date. Ambiguous or
+  inconsistent clocks are refusals, not fractional quality discounts.
+- **Validity versus quality:** timing, ontology, entity/security mapping,
+  revision state, and PIT availability are binary admission gates. Only
+  noncritical measurement diagnostics may enter `analyst_reliability` after
+  admission. The word `confidence` is reserved for a prospectively calibrated
+  quantity.
+- **Breadth:** contribution probabilities contain no epsilon. Zero mass gives
+  score/breadth/reliability zero. Events are aggregated by stable institution
+  and common catalyst; canonical independent breadth is the conservative
+  minimum of their effective counts. Raw event count is diagnostic intensity,
+  not independent evidence.
+- **Normalization:** no event is a structural zero; missing and invalid are
+  different states. Sparse and zero-MAD groups return named refusals. Fixed
+  score clipping is not called winsorization, and epsilon is never used as an
+  invented variance estimate.
+- **Holdings and classifications:** the content-addressed PIT holdings book
+  reconciles declared and independently summed weight including explicit
+  cash/derivatives, rejects duplicate or noncanonical permanent identities,
+  shorts, stale/incomplete snapshots, and includes every long-equity position
+  (including unmapped weight) in the coverage denominator. The portfolio and
+  stock-score paths accept only reauthenticated holdings evidence with the
+  fixed one-session lag and 99% threshold. ETF peer classifications likewise
+  come from canonical hashed source bytes and bind ETF, holdings content, and
+  decision time; a caller-supplied category label has no authority.
+- **Costs:** commission, half-spread, and square-root impact are calculated in
+  dollars per net security target change, then divided once by NAV. Split rows
+  cannot lower impact or multiply minimum fees. Missing ADV refuses except for
+  a separately labeled forced terminal exit.
+- **Portfolio:** forced exits precede eligibility; incumbents use rank 70 and
+  entrants rank 90; descending rank, incumbent-on-exact-tie, then permanent ID
+  is the total order. A strictly stronger entrant may evict the weakest
+  incumbent. The hard five-name, 20% ETF, 40% look-through sector, and 30%
+  overlap-cluster caps are never relaxed; inverse-volatility redistribution
+  stops at constraints and leaves residual cash.
+- **Provider history:** Snapshot A factually contains 5 accepted 2011 events,
+  24,296 in 2012, and 28,609 in 2013. Every pre-2013 source row is quarantined
+  with the exact named refusal
+  `provider_backfill_semantics_unverified_pre_2013` until provider
+  coverage/backfill semantics are reviewed; a later row cannot use that
+  refusal. Partition year must equal event effective year, so a caller cannot
+  launder an early event through a later partition. The PDF's 2013 design
+  statement is not used to erase measured bytes.
+- **Legacy outcome runners:** the rejected target/timing runners are
+  quarantined before data fetch. They require a permanent owner registry ID
+  and exact frozen local artifact, remain non-new/non-V2, have no network
+  fallback, and cannot update active findings.
+
+The machine-readable round-0 inventory is
+`research/analyst_revisions_v2/specs/arv2_round0.draft.json`. It is deliberately
+`blocked_owner_decisions`, not outcome-executable: the common final holdout,
+contaminated periods, corporate-action source, exact universe, normalization
+fallback, primary stock cell IDs, multiplicity IDs, and lane validation dates
+still require owner decisions. The strict loader returns a distinct draft
+type. A future executable spec must be committed and clean, match an entry in
+the separate committed review registry, bind its exact independently reviewed
+Git blob and review ancestry, and pass semantic validation of every mandatory
+cell. Outcome authorization must then reauthenticate that source and obtain an
+atomic spend receipt from an independently pinned, cross-machine append-only
+permanent-look authority before any outcome I/O. No local file or SQLite
+database can grant or reset that authority. The request must also bind frozen
+data/code/cost identity, the one-shot period, a purged split, horizon-sized
+embargo/bootstrap block, every mandatory control, stock-primary topology, and
+proof that it ends before the shared holdout. Both the reviewed-spec registry
+and external spend-authority integration are presently absent: the committed
+authority artifact declares exact `zero_access`, every authorization attempt
+refuses before the outcome loader can execute, and the legacy machine-local
+ledger path has no authority. No outcome was loaded and no look was consumed
+by this work.
+
+Source precedence is explicit: normative strategy design governs the intended
+formula, while observed provider availability/history governs factual data
+claims. Neither category is permitted to overwrite the other.
 
 ## 4. First implementation scope
 

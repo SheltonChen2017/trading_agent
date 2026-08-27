@@ -111,6 +111,16 @@ direction:
 
 DST is handled correctly (13:30Z summer open vs 14:30Z winter open).
 
+**Import boundary is transitively enforced, not merely asserted.** The
+package's own closure validator was executed directly against the lane tree: it
+reaches **21 modules** and **zero** modules rooted in `assistant`, `execution`,
+`risk`, `backtest`, `ml`, `signals`, `strategies`, or `scripts`. The reachable
+set is confined to `data.exchange_calendar`, `data.financial_primitives`, and
+the ARV2 package itself. This closes AR-P3-002's "direct imports only"
+weakness: a forbidden dependency hidden behind a benign-looking local facade
+would be followed and rejected, and non-literal dynamic imports are refused
+outright.
+
 **Mutation testing — the tests genuinely bite.** Five safety invariants were
 reverted one at a time in a throwaway worktree pinned at `d8d0ad6`; every one
 turned the ARV2 suite red (baseline 169 passed):
@@ -138,6 +148,8 @@ The worktree was restored and removed; the lane checkout was never modified.
 | CLR-007 | P3 | Open | `a7c423b` | `tests/test_dispatch_fence.py:166` | The fork-inheritance regression test — the entire point of `a7c423b` — is `skipif(not hasattr(os, "fork"))`, so it never executes on Windows, the owner's only supported platform. | Line read. | The hardening is unverified on the platform that actually runs it; a regression would be invisible here. | Not applied — needs a Windows-expressible equivalent. | — |
 | CLR-008 | P3 | Open | `26b14ff` | `tests/test_atomic_reconciliation_anomaly.py:127` | "Crash" fault injection is simulated with monkeypatch/`RAISE(ABORT)` on a live store object; no process kill and no database reopen. | Verified by reading the test bodies. | The audit asked for "crash after each SQL statement, reopen the database"; durability across a real crash rests on SQLite's guarantee alone. The repo already has a genuine `os._exit` crash test in `tests/test_dispatch_fence.py:144`, so the technique exists and was simply not applied here. | Not applied — shared test surface. | — |
 
+| CLR-009 | P3 | Open | `49fe8e8` | `research/analyst_revisions_v2/formulas.py:38`, `holdings.py:50` | The ARV2 layer keeps five out-of-band authority registries, but only three guard access with a lock. `_POLICY_AUTHORITIES` and `_STOCK_SCORE_AUTHORITIES` are bare dicts, while `_SNAPSHOT_AUTHORITIES`, `_DATASET_AUTHORITIES` and `_REVIEWED_AUTHORITIES` each use a `threading.RLock`. | Found by reading; confirmed by locating every registry and lock in the package. | The out-of-band registry is the mechanism that defeats forged authority objects, so its concurrency discipline should be uniform rather than accidental; the asymmetry is a drift seam in the layer's central safety primitive. | Not applied — no defect is demonstrable, and changing a safety primitive without a failing test would be speculative. | **No exploit could be constructed.** Under CPython the dict operations are atomic, the caller holds a live strong reference during verification so its weakref cannot die mid-check, and a stale `id()` entry fails the `authority[0]() is not value` identity test. Reported as consistency/defense-in-depth only. |
+
 Resolved and open items are both retained. Nothing was deleted after fixing.
 
 ## 5. Governance findings
@@ -159,9 +171,10 @@ files on both `codex/strategy-insider-buying` and
 `codex/strategy-short-interest`**.
 
 **Shared-remediation commits are patch-identical to the merged main work.** All
-sixteen synchronized commits were compared to their `main`-side sources by
-stable patch ID; every pair is identical, so this lane introduced no divergent
-variant of a shared safety fix.
+seventeen synchronized commits were compared to their `main`-side sources by
+stable patch ID; every pair is identical (including `a8f9071` against
+`1ed0602`, patch ID `cbc98a73962e1592d9242dd31fbbd16278432dd0`), so this lane
+introduced no divergent variant of a shared safety fix.
 
 ## 6. Validation on the exact final tree (`5a5c7ab`)
 
@@ -170,8 +183,18 @@ variant of a shared safety fix.
   dependent, not a product defect.
 - Focused ARV2 suite: **169 passed** (baseline for the mutation matrix).
 - `tests/test_dispatch_fence.py`: 24 passed, 1 skipped (the skip is CLR-007).
-- Full suite rerun on the final tree after the CLR-001 correction: recorded in
-  the lane record ledger row for this push.
+- Full suite rerun on the exact committed tree `48a8b08` after the CLR-001
+  correction: **5,434 passed, 0 failed, 3 skipped, 25 known dependency
+  warnings** in 1,403 s.
+- The two runs reconcile exactly: 5,436 tests at `d8d0ad6` versus 5,437 at
+  `48a8b08`. The extra test is the regression `a8f9071` added to
+  `tests/test_assistant_risk_copilot.py`; the previously failing test became
+  the third skip. No test was weakened, deleted, or silenced to obtain a green
+  run — CLR-001's test still executes and passes wherever its precondition
+  holds.
+- `python -m compileall` over `assistant backtest data execution ml risk
+  scripts signals strategies tests research` plus the root modules: exit 0.
+- `git diff --check`: clean. Worktree clean at the reviewed head.
 - No provider, credential, licensed row, outcome, QuantConnect, broker,
   operator-database, or live-scheduler access occurred. **Zero research looks.**
 

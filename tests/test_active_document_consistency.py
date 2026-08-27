@@ -142,12 +142,17 @@ def test_three_strategy_parallel_baseline_is_exact_and_fail_closed() -> None:
     assert "leverage" in workflow.lower()
     assert "neither codex nor claude creates an implementation, review" in workflow.lower()
     assert "counter-review" in workflow.lower()
-    # Owner decision 2026-08-26: the lane loop is two-step. Claude's review
-    # disposition is final; no Codex counter-review step follows it.
+    # Owner clarification 2026-08-26: the standing three-step lane loop keeps
+    # Codex counter-review and combines it with the next bounded milestone.
     for document in (workflow, handoff, direction):
-        assert "review disposition is final" in document.lower()
-    assert "the codex counter-review step is removed" in workflow.lower()
-    assert "there is no codex counter-review step" in direction.lower()
+        assert "codex counter-review" in document.lower()
+    assert "codex counter-review and next milestone" in workflow.lower()
+    assert "standing codex counter-review step" in direction.lower()
+    assert "one combined push" in workflow.lower()
+    assert "one combined push" in handoff.lower()
+    assert "counter-review step is removed" not in workflow.lower()
+    assert "there is no codex counter-review step" not in direction.lower()
+    assert "review disposition is final" not in handoff.lower()
 
     archived = ROOT / "docs" / "Archive" / "Plans" / (
         "ANALYST_CONSENSUS_ETF_ROTATION_PLAN_V1.md"

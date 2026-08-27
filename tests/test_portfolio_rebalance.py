@@ -518,7 +518,10 @@ def test_a_cash_target_below_the_reserve_floor_is_marked():
 def test_total_invested_target_above_policy_cap_is_disclosed():
     report = _report(
         _snapshot(cash=10_000.0),
-        policy=_policy(max_total_exposure_pct=0.50),
+        policy=_policy(
+            max_position_pct=0.50,
+            max_total_exposure_pct=0.50,
+        ),
     )
     assert all(
         "total-exposure" in _row(report, sleeve).policy_conflict_reason

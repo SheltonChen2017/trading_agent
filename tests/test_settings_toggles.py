@@ -162,20 +162,61 @@ def test_fractional_quantity_survives_durable_intent_rehydration_as_exact_text()
 
 def test_reconciliation_does_not_tolerate_a_one_nanoshare_identity_mismatch():
     from assistant.execution_kernel.outcomes import _order_matches_intent
+    from execution.broker_contract import BrokerAccountIdentity
     from risk.execution_gate import TradeIntent
 
+    account = BrokerAccountIdentity("paper-account-1", "paper")
+    proposal = {
+        "proposal_id": "proposal-nanoshare",
+        "idempotency_key": "proposal-nanoshare:attempt-1",
+        "broker_execution_context": {
+            "account_id": account.account_id,
+            "account_mode": account.account_mode,
+            "snapshot_id": "a" * 64,
+            "policy_fingerprint": "b" * 64,
+        },
+    }
     order = {
+        "order_id": "order-nanoshare",
+        "client_order_id": proposal["idempotency_key"],
         "ticker": "NVDA",
+        "asset_class": "us_equity",
+        "order_class": "simple",
+        "extended_hours": False,
+        "legs": None,
         "side": "buy",
         "shares": 0.5,
         "shares_decimal": "0.500000001",
+        "notional": None,
+        "notional_decimal": None,
         "type": "market",
+        "limit_price": None,
+        "limit_price_decimal": None,
+        "time_in_force": "day",
+        "status": "new",
+        "filled_qty": 0.0,
+        "filled_qty_decimal": "0",
+        "filled_avg_price": None,
+        "filled_avg_price_decimal": None,
+        "replaces": None,
+        "replaced_by": None,
+        "replaced_at": None,
+        "submitted_at": "2026-08-26T15:30:00+00:00",
+        "updated_at": "2026-08-26T15:30:01+00:00",
+        "filled_at": None,
+        "canceled_at": None,
+        "expired_at": None,
+        "failed_at": None,
     }
     matches, detail = _order_matches_intent(
-        order, TradeIntent(ticker="NVDA", side="buy", shares="0.5")
+        order,
+        TradeIntent(ticker="NVDA", side="buy", shares="0.5"),
+        proposal=proposal,
+        observed_account=account,
     )
     assert not matches
-    assert "shares" in detail
+    assert "numeric_companion_mismatch" in detail
+    assert "shares_decimal=0.500000001 disagrees with shares=0.5" in detail
 
 
 # --- the cash reserve ------------------------------------------------------

@@ -42,11 +42,21 @@ for _credential in ("APCA_API_KEY_ID", "APCA_API_SECRET_KEY"):
 def _isolate_execution_runtime_authority(tmp_path, monkeypatch):
     """Tests may isolate only the private root, never a production env seam."""
     import assistant.dispatch_fence as dispatch_fence
+    import risk.execution_gate as execution_gate
 
     monkeypatch.setattr(
         dispatch_fence, "_RUNTIME_FENCE_ROOT", (tmp_path / "runtime").resolve()
     )
     monkeypatch.setattr(dispatch_fence, "_RUNTIME_STOP_LOCAL_FAILURE", None)
+    with dispatch_fence._DISPATCH_PERMITS_GUARD:
+        dispatch_fence._DISPATCH_PERMITS.clear()
+    with execution_gate._consumed_authorization_tokens_lock:
+        execution_gate._consumed_authorization_tokens.clear()
+    yield
+    with dispatch_fence._DISPATCH_PERMITS_GUARD:
+        dispatch_fence._DISPATCH_PERMITS.clear()
+    with execution_gate._consumed_authorization_tokens_lock:
+        execution_gate._consumed_authorization_tokens.clear()
 
 
 @atexit.register

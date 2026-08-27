@@ -25,20 +25,59 @@ milestone merely because a queued or archived plan names it next.
 
 ## Current agent roles
 
-Owner decision, 2026-08-21: for the current ACER sequence, **Codex is the
-implementer and Claude is the independent reviewer**. Codex uses a `codex/`
-implementation branch and stops at a stable committed snapshot. Claude reviews
-that exact pushed snapshot on a separate `user/claude/` review branch under the
-standing review workflow. This assignment may be changed only by a later owner
-instruction; it does not weaken the requirement for independent review.
+Owner decision, 2026-08-21: under the generic/legacy ACER workflow, **Codex is
+the implementer and Claude is the independent reviewer**. Codex uses a
+`codex/` implementation branch and stops at a stable committed snapshot.
+Claude reviews that exact pushed snapshot on a separate `user/claude/` review
+branch under the standing review workflow. This remains the repository default
+outside a later, explicitly scoped owner exception; it does not weaken the
+requirement for independent review.
 
-Every implementation or review commit series must update the relevant
-feature/research/operations/review document and `docs/SESSION_HANDOFF.md`
-before handoff or push. Do not update unrelated documents. Update
-`docs/ACTION_PLAN_2026-08-20.md` only when sequencing, milestone status, a
-gate, or the next authorized step changes, and then add only a concise
-reference to the authoritative associated document instead of duplicating
-its implementation detail or evidence.
+### Three-strategy lane exception (later owner decision, 2026-08-26)
+
+The following three lanes use one serialized, long-lived branch each:
+
+- `codex/strategy-analyst-revisions-v2`
+- `codex/strategy-insider-buying`
+- `codex/strategy-short-interest`
+
+For only these lanes, Codex pushes one bounded implementation milestone;
+Claude independently reviews the exact pushed Codex snapshot, commits any
+authorized corrections, updates the lane record, and pushes on that **same
+lane branch**. Codex then counter-reviews every Claude commit. If the review is
+accepted or accepted-after-correction and no owner decision blocks progress,
+Codex implements the next bounded milestone, validates both stages, updates
+the lane record, and makes one combined push. No implementation, review,
+counter-review, checkpoint, or handoff branch is created for these lanes.
+This branch-topology exception supersedes the generic separate-review-branch
+default only for the three named lanes; it does not make a review non-independent.
+
+#### One-time common-remediation exception (owner direction, 2026-08-26)
+
+The owner has authorized one bounded common-remediation synchronization
+from `codex/full-review-p1-remediation-20260826`. Shared safety fixes from that
+series may be synchronized identically to all three named lanes.
+Analyst-specific research-layer fixes may be synchronized only to
+`codex/strategy-analyst-revisions-v2`; they must not enter either other lane.
+Each lane must update its own record.
+Synchronization is not acceptance: acceptance remains withheld until Claude
+reviews the exact pushed lane snapshot and Codex counter-reviews every Claude
+commit. This one-time exception grants no provider or outcome access, no
+QuantConnect job, no QC processing or upload permission, no broker or
+operator-database action, no paper/live deployment, and no trading authority.
+It expires after this owner-directed synchronization and does not authorize
+later shared-file changes by inference.
+
+Under the generic workflow, every implementation or review commit series must
+update the relevant feature/research/operations/review document and
+`docs/SESSION_HANDOFF.md` before handoff or push. For the three named strategy
+lanes, the lane implementation record replaces the root Session Handoff and
+the project-wide documents stay frozen except for an explicit owner-directed
+coordination change such as the one-time synchronization above. Do not update
+unrelated documents. Update `docs/ACTION_PLAN_2026-08-20.md` only when
+sequencing, milestone status, a gate, or the next authorized step changes, and
+then add only a concise reference to the authoritative associated document
+instead of duplicating its implementation detail or evidence.
 
 ## Standing workflow references
 
@@ -48,8 +87,10 @@ its implementation detail or evidence.
   sequence both agents follow.
 - `docs/FEATURE_MILESTONE_RECORD.md` — two-paragraph entry (technical +
   plain-language) for every genuinely completed milestone.
-- `docs/SESSION_HANDOFF.md` — the canonical cross-computer state; update
-  and commit it before ending any session that changed durable state.
+- `docs/SESSION_HANDOFF.md` — the canonical project-wide cross-computer state;
+  update and commit it before ending any generic-workflow session that changed
+  durable state. During the three-strategy parallel phase, each lane's own
+  implementation record is its branch-local handoff instead.
 
 ## Shared-worktree caution
 

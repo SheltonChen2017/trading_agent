@@ -3,15 +3,17 @@
 The operator database was last written by older code and lacks
 ``execution_telemetry_events`` and ``portfolio_capture_sessions``, so the
 telemetry and portfolio-capture chains cannot run against it. Opening the
-database with current code (``AssistantStore.__init__``) applies the
-declared schema idempotently; ``verify_database_schema()`` proves the
-result read-only. These tests cover both directions:
+database with current code (``AssistantStore.__init__``) applies additive
+migrations; ``verify_database_schema()`` independently proves whether the
+result has the complete semantic schema. These tests cover both directions:
 
 - a fresh database matches the declared schema, including both AP-1 tables;
 - a pre-migration database is reported incomplete BY NAME, without the
   verification itself modifying anything;
-- opening with current code migrates the same database and preserves and
-  backfills the rows it already held;
+- opening with current code preserves and backfills legacy rows, while the
+  verifier refuses constraints that additive SQLite migrations cannot restore;
+- primary-key, inline-unique, not-null, default, affinity/type, foreign-key,
+  generated-column, CHECK, STRICT, and WITHOUT ROWID weakening is detected;
 - verification fails closed on a missing database instead of creating one;
 - the CLI's ``verify-db-schema`` runs without the store construction that
   every other command performs (that construction IS the migration), so
@@ -21,6 +23,7 @@ Run with: python -m pytest tests/test_storage_schema_verification.py
 """
 import hashlib
 import json
+import re
 import sqlite3
 import sys
 from pathlib import Path
@@ -33,6 +36,8 @@ import scripts.run_personal_assistant as personal_assistant_cli
 from assistant.storage import (
     AssistantStore,
     SchemaVerificationResult,
+    _compare_schema_objects,
+    _schema_objects,
     verify_database_schema,
 )
 
@@ -134,6 +139,52 @@ def _file_digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _replace_once(sql: str, old: str, new: str) -> str:
+    assert sql.count(old) == 1, (old, sql)
+    return sql.replace(old, new, 1)
+
+
+def _rebuild_empty_table(path: Path, table: str, mutate) -> None:
+    """Rebuild one empty fresh-schema table with exactly one weaker clause.
+
+    Named indexes and triggers are restored byte-for-byte so each mutation
+    isolates table/implicit-index evidence instead of passing merely because
+    unrelated named enforcement objects disappeared with DROP TABLE.
+    """
+    connection = sqlite3.connect(path)
+    connection.row_factory = sqlite3.Row
+    try:
+        table_sql = connection.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+            (table,),
+        ).fetchone()["sql"]
+        named_objects = [
+            row["sql"]
+            for row in connection.execute(
+                "SELECT sql FROM sqlite_master WHERE tbl_name = ? "
+                "AND type IN ('index', 'trigger') AND sql IS NOT NULL",
+                (table,),
+            ).fetchall()
+        ]
+        mutated_sql = mutate(str(table_sql))
+        assert mutated_sql != table_sql
+        connection.execute("PRAGMA foreign_keys=OFF")
+        connection.execute(f'DROP TABLE "{table}"')
+        connection.execute(mutated_sql)
+        for object_sql in named_objects:
+            connection.execute(object_sql)
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def _schema_from_ddl(path: Path, ddl: str):
+    with sqlite3.connect(path) as connection:
+        connection.row_factory = sqlite3.Row
+        connection.execute(ddl)
+        return _schema_objects(connection)
+
+
 # --- verification of a fresh (current-code) database -----------------------
 
 
@@ -147,8 +198,12 @@ def test_fresh_database_matches_declared_schema(tmp_path):
     assert result.missing_columns == ()
     assert result.missing_indexes == ()
     assert result.missing_triggers == ()
+    assert result.mismatched_columns == ()
+    assert result.mismatched_foreign_keys == ()
+    assert result.mismatched_table_constraints == ()
     assert result.mismatched_indexes == ()
     assert result.mismatched_triggers == ()
+    assert result.unexpected_managed_triggers == ()
 
 
 def test_fresh_database_contains_both_ap1_tables_with_expected_columns(tmp_path):
@@ -262,31 +317,241 @@ def test_same_named_weakened_index_and_trigger_are_detected(tmp_path):
     assert "fk_broker_orders_proposal_insert" in result.mismatched_triggers
 
 
+def test_unexpected_trigger_on_managed_table_fails_schema_verification(tmp_path):
+    db_path = tmp_path / "unexpected_trigger.db"
+    AssistantStore(db_path)
+    with sqlite3.connect(db_path) as connection:
+        connection.execute(
+            "CREATE TRIGGER unexpected_broker_event_side_effect "
+            "AFTER INSERT ON broker_order_events BEGIN SELECT 1; END"
+        )
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert result.unexpected_managed_triggers == (
+        "unexpected_broker_event_side_effect",
+    )
+
+
+@pytest.mark.parametrize(
+    ("table", "mutation", "expected_column"),
+    [
+        (
+            "trade_proposals",
+            lambda sql: _replace_once(
+                sql,
+                "proposal_id TEXT PRIMARY KEY",
+                "proposal_id TEXT",
+            ),
+            "trade_proposals.proposal_id",
+        ),
+        (
+            "trade_proposals",
+            lambda sql: _replace_once(
+                sql,
+                "created_at TEXT NOT NULL",
+                "created_at TEXT",
+            ),
+            "trade_proposals.created_at",
+        ),
+        (
+            "trade_proposals",
+            lambda sql: _replace_once(
+                sql,
+                "status TEXT NOT NULL",
+                "status BLOB NOT NULL",
+            ),
+            "trade_proposals.status",
+        ),
+        (
+            "decision_packets",
+            lambda sql: _replace_once(
+                sql,
+                "payload_hash TEXT NOT NULL DEFAULT ''",
+                "payload_hash TEXT NOT NULL",
+            ),
+            "decision_packets.payload_hash",
+        ),
+    ],
+    ids=("primary-key", "not-null", "type-affinity", "default"),
+)
+def test_structured_column_constraint_removal_is_detected(
+    tmp_path,
+    table,
+    mutation,
+    expected_column,
+):
+    db_path = tmp_path / f"{table}.db"
+    AssistantStore(db_path)
+    _rebuild_empty_table(db_path, table, mutation)
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert expected_column in result.mismatched_columns
+
+
+def test_removing_trade_proposal_idempotency_uniqueness_is_detected(tmp_path):
+    """Inline UNIQUE is an implicit autoindex, not a named schema object."""
+    db_path = tmp_path / "idempotency.db"
+    AssistantStore(db_path)
+    _rebuild_empty_table(
+        db_path,
+        "trade_proposals",
+        lambda sql: _replace_once(
+            sql,
+            "idempotency_key TEXT NOT NULL UNIQUE",
+            "idempotency_key TEXT NOT NULL",
+        ),
+    )
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert "sqlite_autoindex_trade_proposals_2" in result.missing_indexes
+
+
+def test_implicit_unique_index_column_identity_is_detected(tmp_path):
+    """index_xinfo must prove what the autoindex uniquely indexes."""
+    db_path = tmp_path / "retargeted_unique.db"
+    AssistantStore(db_path)
+
+    def _retarget_unique(sql: str) -> str:
+        without_inline = _replace_once(
+            sql,
+            "idempotency_key TEXT NOT NULL UNIQUE",
+            "idempotency_key TEXT NOT NULL",
+        )
+        closing = without_inline.rfind(")")
+        assert closing > 0
+        return (
+            without_inline[:closing].rstrip()
+            + ",\n                    UNIQUE(status)\n                )"
+        )
+
+    _rebuild_empty_table(db_path, "trade_proposals", _retarget_unique)
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert "sqlite_autoindex_trade_proposals_2" in result.mismatched_indexes
+
+
+def test_removing_declared_foreign_key_is_detected(tmp_path):
+    db_path = tmp_path / "foreign_key.db"
+    AssistantStore(db_path)
+
+    def _remove_proposal_fk(sql: str) -> str:
+        mutated, count = re.subn(
+            r",\s*FOREIGN KEY\s*\(\s*proposal_id\s*\)\s*"
+            r"REFERENCES\s+trade_proposals\s*\(\s*proposal_id\s*\)",
+            "",
+            sql,
+            count=1,
+            flags=re.IGNORECASE,
+        )
+        assert count == 1
+        return mutated
+
+    _rebuild_empty_table(db_path, "broker_orders", _remove_proposal_fk)
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert "broker_orders" in result.mismatched_foreign_keys
+
+
+def test_table_xinfo_detects_generated_column_weakening(tmp_path):
+    expected = _schema_from_ddl(
+        tmp_path / "expected_generated.db",
+        "CREATE TABLE generated_probe ("
+        "amount INTEGER NOT NULL, "
+        "doubled INTEGER GENERATED ALWAYS AS (amount * 2) STORED)",
+    )
+    actual = _schema_from_ddl(
+        tmp_path / "actual_generated.db",
+        "CREATE TABLE generated_probe (amount INTEGER NOT NULL, doubled INTEGER)",
+    )
+
+    result = _compare_schema_objects(expected, actual)
+
+    assert result.matches is False
+    assert "generated_probe.doubled" in result.mismatched_columns
+
+
+@pytest.mark.parametrize(
+    "actual_ddl",
+    [
+        (
+            "CREATE TABLE semantic_probe (id TEXT PRIMARY KEY, amount INTEGER) "
+            "STRICT, WITHOUT ROWID"
+        ),
+        (
+            "CREATE TABLE semantic_probe (id TEXT PRIMARY KEY, "
+            "amount INTEGER CHECK (amount >= 0)) WITHOUT ROWID"
+        ),
+        (
+            "CREATE TABLE semantic_probe (id TEXT PRIMARY KEY, "
+            "amount INTEGER CHECK (amount >= 0)) STRICT"
+        ),
+    ],
+    ids=("check", "strict", "without-rowid"),
+)
+def test_canonical_table_sql_constraint_removal_is_detected(
+    tmp_path,
+    actual_ddl,
+):
+    expected = _schema_from_ddl(
+        tmp_path / "expected_semantics.db",
+        "CREATE TABLE semantic_probe (id TEXT PRIMARY KEY, "
+        "amount INTEGER CHECK (amount >= 0)) STRICT, WITHOUT ROWID",
+    )
+    actual = _schema_from_ddl(tmp_path / "actual_semantics.db", actual_ddl)
+
+    result = _compare_schema_objects(expected, actual)
+
+    assert result.matches is False
+    assert "semantic_probe" in result.mismatched_table_constraints
+
+
 def test_extra_operator_local_tables_never_fail_verification(tmp_path):
     db_path = tmp_path / "extra.db"
     AssistantStore(db_path)
     connection = sqlite3.connect(db_path)
     try:
-        connection.execute("CREATE TABLE operator_scratch (id INTEGER PRIMARY KEY)")
+        connection.executescript(
+            "CREATE TABLE operator_scratch (id INTEGER PRIMARY KEY);"
+            "CREATE TRIGGER operator_scratch_audit AFTER INSERT ON operator_scratch "
+            "BEGIN SELECT 1; END;"
+        )
         connection.commit()
     finally:
         connection.close()
     result = verify_database_schema(db_path)
     assert result.matches is True
     assert "operator_scratch" in result.extra_tables
+    assert result.unexpected_managed_triggers == ()
 
 
-# --- opening with current code applies the schema and keeps the data -------
+# --- additive migration keeps data but cannot manufacture constraints ------
 
 
-def test_opening_with_current_code_migrates_and_preserves_rows(tmp_path):
+def test_opening_with_current_code_preserves_rows_but_semantic_drift_remains(
+    tmp_path,
+):
     db_path = tmp_path / "legacy.db"
     _create_pre_migration_database(db_path)
 
     AssistantStore(db_path)
 
     result = verify_database_schema(db_path)
-    assert result.matches is True, result.to_dict()
+    assert result.matches is False
+    assert "execution_reservations.reserved_notional_text" in (
+        result.mismatched_columns
+    )
+    assert "execution_reservations" in result.mismatched_foreign_keys
+    assert "ml_predictions" in result.mismatched_foreign_keys
 
     connection = sqlite3.connect(db_path)
     connection.row_factory = sqlite3.Row
@@ -344,7 +609,11 @@ def test_cli_read_only_verify_exits_2_without_migrating(tmp_path, monkeypatch, c
         assert table in report["missing_tables"]
 
 
-def test_cli_apply_migrates_then_verifies_ok(tmp_path, monkeypatch, capsys):
+def test_cli_apply_still_fails_closed_when_additive_migration_cannot_restore_constraints(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
     db_path = tmp_path / "legacy.db"
     _create_pre_migration_database(db_path)
     monkeypatch.setattr(
@@ -352,10 +621,15 @@ def test_cli_apply_migrates_then_verifies_ok(tmp_path, monkeypatch, capsys):
         "argv",
         ["prog", "--database", str(db_path), "verify-db-schema", "--apply"],
     )
-    personal_assistant_cli.main()
+    with pytest.raises(SystemExit) as excinfo:
+        personal_assistant_cli.main()
+    assert excinfo.value.code == 2
     report = json.loads(capsys.readouterr().out)
-    assert report["matches"] is True
+    assert report["matches"] is False
     assert report["missing_tables"] == []
+    assert "execution_reservations.reserved_notional_text" in report[
+        "mismatched_columns"
+    ]
     for table in AP1_TABLES:
         assert table in _table_names(db_path)
 

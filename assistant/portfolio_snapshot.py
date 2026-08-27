@@ -19,6 +19,159 @@ from assistant.money import decimal_text, to_decimal
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 
 
+POSITION_VALUE_TOLERANCE = Decimal("0.01")
+
+
+class PortfolioSnapshotIntegrityError(ValueError):
+    """A snapshot cannot represent this project's long-only cash account."""
+
+
+def _evidence_decimal(
+    *,
+    exact_text: str | None,
+    display_value: Any,
+    name: str,
+    rounded_display: bool,
+) -> Decimal:
+    try:
+        display = to_decimal(display_value, name=f"{name} display")
+        exact = (
+            to_decimal(exact_text, name=f"{name} exact")
+            if exact_text is not None
+            else display
+        )
+    except ValueError as exc:
+        raise PortfolioSnapshotIntegrityError(str(exc)) from exc
+    if exact_text is not None:
+        try:
+            expected_display = float(round(exact, 2)) if rounded_display else float(exact)
+        except (OverflowError, ValueError) as exc:
+            raise PortfolioSnapshotIntegrityError(
+                f"{name} exact evidence cannot be represented for display"
+            ) from exc
+        if display_value != expected_display:
+            raise PortfolioSnapshotIntegrityError(
+                f"{name} display value {display_value!r} disagrees with exact "
+                f"evidence {exact_text!r}"
+            )
+    return exact
+
+
+def validate_long_only_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
+    """Validate the canonical no-short/no-margin portfolio contract.
+
+    Zero-share rows are invalid rather than being treated as holdings. An
+    empty account is represented by ``positions=[]``. Every nonzero holding
+    must have positive quantity and prices, positive value consistent with
+    quantity times current price to within one cent, and a unique canonical
+    ticker. Exact decimal evidence outranks display floats, but the two must
+    agree so no consumer sees a different portfolio than the risk engine.
+    """
+    if not isinstance(snapshot, PortfolioSnapshot):
+        raise PortfolioSnapshotIntegrityError("snapshot must be a PortfolioSnapshot")
+
+    cash = _evidence_decimal(
+        exact_text=snapshot.cash_exact,
+        display_value=snapshot.cash,
+        name="portfolio.cash",
+        rounded_display=True,
+    )
+    equity = _evidence_decimal(
+        exact_text=snapshot.total_equity_exact,
+        display_value=snapshot.total_equity,
+        name="portfolio.total_equity",
+        rounded_display=True,
+    )
+    buying_power = None
+    if snapshot.buying_power is not None:
+        buying_power = _evidence_decimal(
+            exact_text=snapshot.buying_power_exact,
+            display_value=snapshot.buying_power,
+            name="portfolio.buying_power",
+            rounded_display=True,
+        )
+    if cash < 0:
+        raise PortfolioSnapshotIntegrityError(
+            "portfolio.cash must be non-negative; margin cash is unsupported"
+        )
+    if equity < 0:
+        raise PortfolioSnapshotIntegrityError(
+            "portfolio.total_equity must be non-negative"
+        )
+    if buying_power is not None and buying_power < 0:
+        raise PortfolioSnapshotIntegrityError(
+            "portfolio.buying_power must be non-negative; margin debt is unsupported"
+        )
+
+    seen: set[str] = set()
+    component_value = cash
+    for position in snapshot.positions:
+        ticker = position.ticker
+        if (
+            not isinstance(ticker, str)
+            or not ticker
+            or ticker != ticker.strip().upper()
+        ):
+            raise PortfolioSnapshotIntegrityError(
+                f"position ticker {ticker!r} is not canonical"
+            )
+        if ticker in seen:
+            raise PortfolioSnapshotIntegrityError(
+                f"duplicate position row for canonical ticker {ticker}"
+            )
+        seen.add(ticker)
+        shares = _evidence_decimal(
+            exact_text=position.shares_exact,
+            display_value=position.shares,
+            name=f"{ticker}.shares",
+            rounded_display=False,
+        )
+        entry_price = _evidence_decimal(
+            exact_text=position.entry_price_exact,
+            display_value=position.entry_price,
+            name=f"{ticker}.entry_price",
+            rounded_display=False,
+        )
+        current_price = _evidence_decimal(
+            exact_text=position.current_price_exact,
+            display_value=position.current_price,
+            name=f"{ticker}.current_price",
+            rounded_display=False,
+        )
+        market_value = _evidence_decimal(
+            exact_text=position.market_value_exact,
+            display_value=position.market_value,
+            name=f"{ticker}.market_value",
+            rounded_display=True,
+        )
+        if shares <= 0:
+            raise PortfolioSnapshotIntegrityError(
+                f"{ticker}.shares must be positive; remove zero-share rows and short positions"
+            )
+        if entry_price <= 0 or current_price <= 0:
+            raise PortfolioSnapshotIntegrityError(
+                f"{ticker} entry_price and current_price must be positive"
+            )
+        if market_value <= 0:
+            raise PortfolioSnapshotIntegrityError(
+                f"{ticker}.market_value must be positive for a nonzero holding"
+            )
+        expected_value = shares * current_price
+        if abs(market_value - expected_value) > POSITION_VALUE_TOLERANCE:
+            raise PortfolioSnapshotIntegrityError(
+                f"{ticker}.market_value {decimal_text(market_value)} disagrees with "
+                f"shares*current_price {decimal_text(expected_value)} by more than "
+                f"{decimal_text(POSITION_VALUE_TOLERANCE)}"
+            )
+        component_value += market_value
+
+    if abs(component_value - equity) > POSITION_VALUE_TOLERANCE:
+        raise PortfolioSnapshotIntegrityError(
+            "portfolio.total_equity disagrees with exact cash plus position values "
+            f"by {decimal_text(abs(component_value - equity))}"
+        )
+
+
 def _classify_leveraged(ticker: str) -> bool:
     return ticker.upper() in LEVERAGED_ETF_TICKERS
 
@@ -83,6 +236,14 @@ def build_portfolio_snapshot(
         raise ValueError(
             f"Portfolio buying_power must be a finite number or None, got {buying_power!r}."
         ) from None
+    if cash_decimal < 0:
+        raise PortfolioSnapshotIntegrityError(
+            "Portfolio cash must be non-negative; margin cash is unsupported."
+        )
+    if buying_power_decimal is not None and buying_power_decimal < 0:
+        raise PortfolioSnapshotIntegrityError(
+            "Portfolio buying_power must be non-negative; margin debt is unsupported."
+        )
 
     grouped: dict[str, dict] = {}
     order: list[str] = []
@@ -113,6 +274,28 @@ def build_portfolio_snapshot(
             if "market_value" in position
             else shares_decimal * current_price_decimal
         )
+        if shares_decimal <= 0:
+            raise PortfolioSnapshotIntegrityError(
+                f"Position {ticker!r} must have positive shares; remove zero-share rows "
+                "and short positions before snapshot construction."
+            )
+        if entry_price_decimal <= 0 or current_price_decimal <= 0:
+            raise PortfolioSnapshotIntegrityError(
+                f"Position {ticker!r} must have positive entry_price and current_price."
+            )
+        if market_value_decimal <= 0:
+            raise PortfolioSnapshotIntegrityError(
+                f"Position {ticker!r} must have positive market_value."
+            )
+        expected_market_value = shares_decimal * current_price_decimal
+        if (
+            abs(market_value_decimal - expected_market_value)
+            > POSITION_VALUE_TOLERANCE
+        ):
+            raise PortfolioSnapshotIntegrityError(
+                f"Position {ticker!r} market_value disagrees with shares*current_price "
+                f"by more than {decimal_text(POSITION_VALUE_TOLERANCE)}."
+            )
         if ticker not in grouped:
             grouped[ticker] = {
                 "shares": Decimal("0"),
@@ -166,7 +349,7 @@ def build_portfolio_snapshot(
     exact_total_equity = cash_decimal + sum(
         (position.exact_field("market_value") for position in built), Decimal("0")
     )
-    return PortfolioSnapshot(
+    snapshot = PortfolioSnapshot(
         positions=built,
         cash=float(round(cash_decimal, 2)),
         total_equity=float(round(total_equity, 2)),
@@ -189,6 +372,8 @@ def build_portfolio_snapshot(
         open_orders_available=open_orders_available,
         account_id=account_id,
     )
+    validate_long_only_portfolio_snapshot(snapshot)
+    return snapshot
 
 
 EXECUTION_COMPONENT_EQUITY_TOLERANCE = Decimal("0.01")
@@ -398,14 +583,199 @@ def _require_exact_active_order_numerics(
                 )
 
 
-def _canonical_snapshot_id(payload: Mapping[str, Any]) -> str:
-    encoded = json.dumps(
+def _canonical_snapshot_material_json(payload: Mapping[str, Any]) -> str:
+    return json.dumps(
         payload,
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=True,
-    ).encode("utf-8")
+    )
+
+
+def _canonical_snapshot_id(payload: Mapping[str, Any]) -> str:
+    encoded = _canonical_snapshot_material_json(payload).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
+    """Recompute strict snapshot evidence and reject any post-capture mutation.
+
+    ``broker_snapshot_id`` is not trusted as an opaque label.  The canonical
+    material bytes captured from the broker are retained with the snapshot;
+    this verifier hashes those bytes and independently compares every field
+    that downstream risk math can read (including the active-order book) with
+    the current object.
+    """
+    if not isinstance(snapshot, PortfolioSnapshot):
+        raise BrokerSnapshotCoherenceError("execution snapshot has the wrong type")
+    material_json = snapshot.broker_snapshot_material_json
+    if not isinstance(material_json, str) or not material_json:
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot lacks canonical broker material"
+        )
+    try:
+        material = json.loads(
+            material_json,
+            parse_constant=lambda value: (_ for _ in ()).throw(
+                ValueError(f"non-finite JSON constant {value}")
+            ),
+        )
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise BrokerSnapshotCoherenceError(
+            f"execution snapshot material is not canonical JSON: {exc}"
+        ) from exc
+    if not isinstance(material, Mapping) or material.get("schema") != (
+        "alpaca-execution-portfolio-v1"
+    ):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot material has an unsupported schema"
+        )
+    if _canonical_snapshot_material_json(material) != material_json:
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot material is not in canonical byte form"
+        )
+    expected_id = hashlib.sha256(material_json.encode("utf-8")).hexdigest()
+    if snapshot.broker_snapshot_id != expected_id:
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot ID does not match its canonical material"
+        )
+    if snapshot.source != "alpaca" or snapshot.account_mode != "paper":
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot must remain an Alpaca paper observation"
+        )
+    if snapshot.captured_at != material.get("captured_at"):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot capture time changed after capture"
+        )
+
+    account = material.get("account")
+    if not isinstance(account, Mapping):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot material lacks an account record"
+        )
+    if (
+        account.get("account_id") != snapshot.account_id
+        or account.get("account_mode") != "paper"
+        or account.get("status") != "ACTIVE"
+    ):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot account identity/state changed after capture"
+        )
+    for flag in (
+        "trading_blocked",
+        "account_blocked",
+        "trade_suspended_by_user",
+        "transfers_blocked",
+    ):
+        if type(account.get(flag)) is not bool:
+            raise BrokerSnapshotCoherenceError(
+                f"execution snapshot account material has invalid {flag}"
+            )
+    if any(
+        account.get(flag)
+        for flag in (
+            "trading_blocked",
+            "account_blocked",
+            "trade_suspended_by_user",
+        )
+    ):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot account material is trading-blocked"
+        )
+
+    cash = snapshot.cash_exact_decimal
+    equity = snapshot.total_equity_exact_decimal
+    buying_power = snapshot.buying_power_exact_decimal
+    if buying_power is None:
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot lacks exact buying power"
+        )
+    if (
+        account.get("cash") != decimal_text(cash)
+        or account.get("equity") != decimal_text(equity)
+        or account.get("buying_power") != decimal_text(buying_power)
+    ):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot account numerics changed after capture"
+        )
+    if (
+        snapshot.cash != float(round(cash, 2))
+        or snapshot.total_equity != float(round(equity, 2))
+        or snapshot.buying_power != float(round(buying_power, 2))
+    ):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot rounded account fields disagree with exact evidence"
+        )
+
+    current_positions: list[dict[str, str]] = []
+    for position in snapshot.positions:
+        row = {
+            "ticker": position.ticker,
+            "shares": decimal_text(position.exact_field("shares")),
+            "entry_price": decimal_text(position.exact_field("entry_price")),
+            "current_price": decimal_text(position.exact_field("current_price")),
+            "market_value": decimal_text(position.exact_field("market_value")),
+        }
+        if (
+            position.shares != float(position.exact_field("shares"))
+            or position.entry_price != float(position.exact_field("entry_price"))
+            or position.current_price != float(position.exact_field("current_price"))
+            or position.market_value
+            != float(round(position.exact_field("market_value"), 2))
+            or position.is_leveraged_etf != _classify_leveraged(position.ticker)
+        ):
+            raise BrokerSnapshotCoherenceError(
+                f"execution snapshot position {position.ticker!r} changed after capture"
+            )
+        current_positions.append(row)
+    current_positions.sort(key=lambda row: row["ticker"])
+    if material.get("positions") != current_positions:
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot positions changed after capture"
+        )
+
+    if snapshot.open_orders_available is not True:
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot active-order book is unavailable"
+        )
+    from execution.broker_contract import (
+        BrokerAccountIdentity,
+        active_order_material_fingerprint,
+        validate_active_order_set,
+    )
+
+    identity = BrokerAccountIdentity(snapshot.account_id or "", "paper")
+    validated_orders = validate_active_order_set(
+        snapshot.open_orders,
+        expected_account=identity,
+        observed_account=identity,
+    )
+    _require_exact_active_order_numerics(snapshot.open_orders, validated_orders)
+    if material.get("active_order_fingerprint") != (
+        active_order_material_fingerprint(validated_orders)
+    ):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot active orders changed after capture"
+        )
+
+    component_equity = cash + sum(
+        (position.exact_field("market_value") for position in snapshot.positions),
+        Decimal("0"),
+    )
+    component_delta = component_equity - equity
+    if abs(component_delta) > EXECUTION_COMPONENT_EQUITY_TOLERANCE:
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot component equity exceeds the allowed tolerance"
+        )
+    if (
+        snapshot.component_equity_exact != decimal_text(component_equity)
+        or snapshot.component_equity_delta_exact != decimal_text(component_delta)
+        or material.get("component_equity") != decimal_text(component_equity)
+        or material.get("component_equity_delta") != decimal_text(component_delta)
+    ):
+        raise BrokerSnapshotCoherenceError(
+            "execution snapshot component evidence changed after capture"
+        )
 
 
 def _capture_strict_alpaca_snapshot_once(
@@ -494,17 +864,19 @@ def _capture_strict_alpaca_snapshot_once(
     }
     component_text = decimal_text(component_equity)
     delta_text = decimal_text(component_delta)
-    snapshot_id = _canonical_snapshot_id(
-        {
-            "schema": "alpaca-execution-portfolio-v1",
-            "captured_at": captured_at,
-            "account": account_material,
-            "positions": material_positions,
-            "active_order_fingerprint": orders_b_fingerprint,
-            "component_equity": component_text,
-            "component_equity_delta": delta_text,
-        }
-    )
+    snapshot_material = {
+        "schema": "alpaca-execution-portfolio-v1",
+        "captured_at": captured_at,
+        "account": account_material,
+        "positions": material_positions,
+        "active_order_fingerprint": orders_b_fingerprint,
+        "component_equity": component_text,
+        "component_equity_delta": delta_text,
+    }
+    snapshot_material_json = _canonical_snapshot_material_json(snapshot_material)
+    snapshot_id = hashlib.sha256(
+        snapshot_material_json.encode("utf-8")
+    ).hexdigest()
 
     # The broker's account equity is authoritative; the component sum and
     # signed delta remain explicit evidence instead of silently replacing it.
@@ -514,6 +886,8 @@ def _capture_strict_alpaca_snapshot_once(
     snapshot.broker_snapshot_id = snapshot_id
     snapshot.component_equity_exact = component_text
     snapshot.component_equity_delta_exact = delta_text
+    snapshot.broker_snapshot_material_json = snapshot_material_json
+    verify_execution_portfolio_snapshot(snapshot)
     return snapshot
 
 
@@ -574,6 +948,12 @@ def build_portfolio_snapshot_from_alpaca(
                 )
             except _TransientBrokerSnapshotMutation as exc:
                 last_mutation = exc
+                continue
+            except PortfolioSnapshotIntegrityError as exc:
+                # A provider position can change between the account/order
+                # brackets just as balances can. Retry a bounded number of
+                # times, but never publish the malformed intermediate row.
+                last_mutation = _TransientBrokerSnapshotMutation(str(exc))
                 continue
             if (
                 snapshot.source != "alpaca"

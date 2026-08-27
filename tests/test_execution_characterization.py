@@ -104,7 +104,219 @@ class BrokerRecorder:
         return tuple(name for name, _, _ in self.calls)
 
 
+def _complete_broker_order(
+    value: dict[str, Any],
+    *,
+    idempotency_key: str | None = None,
+) -> dict[str, Any]:
+    """Upgrade an old characterization fixture to the strict broker schema."""
+    order = dict(value)
+    shares = order.get("shares", 1)
+    notional = order.get("notional")
+    status = str(order.get("status", "accepted")).lower()
+    submitted_at = order.get("submitted_at", "2026-08-03T14:29:00+00:00")
+    updated_at = order.get("updated_at", submitted_at)
+    filled_qty = order.get("filled_qty", shares if status == "filled" else 0)
+    filled_price = order.get(
+        "filled_avg_price",
+        100 if status == "filled" or float(filled_qty or 0) > 0 else None,
+    )
+    order.update(
+        {
+            "order_id": order.get("order_id", "paper-order-1"),
+            "client_order_id": order.get(
+                "client_order_id", idempotency_key or "idem-p-1"
+            ),
+            "ticker": order.get("ticker", "AAPL"),
+            "asset_class": order.get("asset_class", "us_equity"),
+            "order_class": order.get("order_class", "simple"),
+            "extended_hours": order.get("extended_hours", False),
+            "legs": order.get("legs"),
+            "shares": shares,
+            "shares_decimal": order.get(
+                "shares_decimal", None if shares is None else str(shares)
+            ),
+            "notional": notional,
+            "notional_decimal": order.get(
+                "notional_decimal", None if notional is None else str(notional)
+            ),
+            "side": order.get("side", "buy"),
+            "type": order.get("type", "market"),
+            "limit_price": order.get("limit_price"),
+            "limit_price_decimal": order.get(
+                "limit_price_decimal",
+                None
+                if order.get("limit_price") is None
+                else str(order.get("limit_price")),
+            ),
+            "time_in_force": order.get("time_in_force", "day"),
+            "status": status,
+            "filled_qty": filled_qty,
+            "filled_qty_decimal": order.get(
+                "filled_qty_decimal", str(filled_qty)
+            ),
+            "filled_avg_price": filled_price,
+            "filled_avg_price_decimal": order.get(
+                "filled_avg_price_decimal",
+                None if filled_price is None else str(filled_price),
+            ),
+            "submitted_at": submitted_at,
+            "updated_at": updated_at,
+            "filled_at": order.get(
+                "filled_at", updated_at if status == "filled" else None
+            ),
+            "canceled_at": order.get(
+                "canceled_at", updated_at if status == "canceled" else None
+            ),
+            "expired_at": order.get(
+                "expired_at", updated_at if status == "expired" else None
+            ),
+            "failed_at": order.get(
+                "failed_at", updated_at if status == "rejected" else None
+            ),
+            "replaced_at": order.get(
+                "replaced_at", updated_at if status == "replaced" else None
+            ),
+            "replaces": order.get("replaces"),
+            "replaced_by": order.get("replaced_by"),
+        }
+    )
+    return order
+
+
+class _RecorderBrokerSession:
+    """One frozen paper/account seam backed by a BrokerRecorder."""
+
+    PAPER_TRADING = True
+    account_mode = "paper"
+
+    def __init__(self, recorder: BrokerRecorder) -> None:
+        self.recorder = recorder
+        self._execution_snapshot_id: str | None = None
+
+    def capture_execution_portfolio_snapshot(self) -> PortfolioSnapshot:
+        from assistant.portfolio_snapshot import build_portfolio_snapshot_from_alpaca
+
+        class Capture:
+            PAPER_TRADING = True
+            account_mode = "paper"
+
+            @staticmethod
+            def get_account():
+                return {
+                    "account_id": "paper-account-1",
+                    "status": "ACTIVE",
+                    "equity": 101_000.0,
+                    "equity_decimal": "101000",
+                    "cash": 100_000.0,
+                    "cash_decimal": "100000",
+                    "buying_power": 100_000.0,
+                    "buying_power_decimal": "100000",
+                    "trading_blocked": False,
+                    "account_blocked": False,
+                    "trade_suspended_by_user": False,
+                    "transfers_blocked": False,
+                    "paper": True,
+                }
+
+            @staticmethod
+            def get_open_orders():
+                return []
+
+            @staticmethod
+            def get_open_positions():
+                return [
+                    {
+                        "ticker": "AAPL",
+                        "shares": 10.0,
+                        "shares_decimal": "10",
+                        "avg_entry_price": 90.0,
+                        "avg_entry_price_decimal": "90",
+                        "current_price": 100.0,
+                        "current_price_decimal": "100",
+                        "market_value": 1000.0,
+                        "market_value_decimal": "1000",
+                        "unrealized_pl": 100.0,
+                    }
+                ]
+
+        snapshot = build_portfolio_snapshot_from_alpaca(
+            broker_session=Capture(),
+            require_execution_coherence=True,
+        )
+        self._execution_snapshot_id = snapshot.broker_snapshot_id
+        return snapshot
+
+    def get_account(self):
+        return {
+            "account_id": "paper-account-1",
+            "paper": True,
+            "status": "ACTIVE",
+            "equity": 101_000.0,
+            "equity_decimal": "101000",
+            "cash": 100_000.0,
+            "cash_decimal": "100000",
+            "buying_power": 100_000.0,
+            "buying_power_decimal": "100000",
+            "trading_blocked": False,
+            "account_blocked": False,
+            "trade_suspended_by_user": False,
+            "transfers_blocked": False,
+        }
+
+    def _call(self, name: str, *args, **kwargs):
+        value = self.recorder._record(name)(*args, **kwargs)
+        if isinstance(value, dict) and name in {
+            "submit_market_order",
+            "submit_limit_order",
+            "find_order_by_client_id",
+            "get_order_by_id",
+        }:
+            key = kwargs.get("idempotency_key")
+            if key is None and name == "find_order_by_client_id" and args:
+                key = args[0]
+            return _complete_broker_order(value, idempotency_key=key)
+        return value
+
+    def is_configured(self):
+        return self._call("is_configured")
+
+    def assert_account_and_asset_ready(self, *args, **kwargs):
+        return self._call("assert_account_and_asset_ready", *args, **kwargs)
+
+    def get_latest_quote(self, *args, **kwargs):
+        return self._call("get_latest_quote", *args, **kwargs)
+
+    def get_execution_validation_quote(
+        self,
+        ticker: str,
+        *,
+        expected_snapshot_id: str,
+    ):
+        if expected_snapshot_id != self._execution_snapshot_id:
+            raise PermissionError(
+                "Execution quote belongs to a different broker snapshot."
+            )
+        return self._call("get_latest_quote", ticker)
+
+    def submit_market_order(self, *args, **kwargs):
+        return self._call("submit_market_order", *args, **kwargs)
+
+    def submit_limit_order(self, *args, **kwargs):
+        return self._call("submit_limit_order", *args, **kwargs)
+
+    def find_order_by_client_id(self, *args, **kwargs):
+        return self._call("find_order_by_client_id", *args, **kwargs)
+
+    def get_order_by_id(self, *args, **kwargs):
+        return self._call("get_order_by_id", *args, **kwargs)
+
+    def cancel_order(self, *args, **kwargs):
+        return self._call("cancel_order", *args, **kwargs)
+
+
 _PATCHED = (
+    "open_alpaca_broker_session",
     "is_configured",
     "assert_account_and_asset_ready",
     "get_latest_quote",
@@ -125,8 +337,14 @@ def patched_broker(recorder: BrokerRecorder):
         if hasattr(broker_module, name)
     }
     try:
+        session = _RecorderBrokerSession(recorder)
         for name in originals:
-            setattr(broker_module, name, recorder._record(name))
+            replacement = (
+                (lambda: session)
+                if name == "open_alpaca_broker_session"
+                else recorder._record(name)
+            )
+            setattr(broker_module, name, replacement)
         yield recorder
     finally:
         for name, original in originals.items():
@@ -197,6 +415,12 @@ def _proposal(
         "idempotency_key": f"idem-{proposal_id}",
         "policy_version": load_policy().version,
         "policy_fingerprint": compute_policy_fingerprint(load_policy()),
+        "broker_execution_context": {
+            "account_id": "paper-account-1",
+            "account_mode": "paper",
+            "snapshot_id": "a" * 64,
+            "policy_fingerprint": compute_policy_fingerprint(load_policy()),
+        },
         "intent": {
             "ticker": "AAPL",
             "side": side,
@@ -271,6 +495,15 @@ def _submission_recorder(*, submit: Any, lookup: Any = None) -> BrokerRecorder:
 @pytest.fixture()
 def store(tmp_path):
     return AssistantStore(tmp_path / "characterize.db")
+
+
+@pytest.fixture(autouse=True)
+def _account_scoped_gr1d_broker(request, monkeypatch):
+    """Keep facade-dependency seam tests off real credentials/network."""
+    if not request.node.name.startswith("test_gr1d_"):
+        return
+    session = _RecorderBrokerSession(BrokerRecorder())
+    monkeypatch.setattr(execution_service, "_import_execution_broker", lambda: session)
 
 
 # --------------------------------------------------------------------------
@@ -954,7 +1187,10 @@ def test_successful_submission_freezes_call_order_state_and_evidence(store):
             earnings_days_away=10,
         )
 
-    assert result == accepted
+    assert result["order_id"] == accepted["order_id"]
+    assert result["shares_decimal"] == "1"
+    assert result["client_order_id"] == "idem-p-1"
+    assert result["broker_account_id"] == "paper-account-1"
     assert recorder.call_names == (
         "is_configured",
         "assert_account_and_asset_ready",
@@ -1108,7 +1344,9 @@ def test_timeout_reconciles_by_idempotency_key_without_resubmitting(store):
             earnings_days_away=10,
         )
 
-    assert result == reconciled
+    assert result["order_id"] == reconciled["order_id"]
+    assert result["shares_decimal"] == "1"
+    assert result["client_order_id"] == "idem-p-1"
     assert recorder.call_names == (
         "is_configured",
         "assert_account_and_asset_ready",
@@ -1164,7 +1402,9 @@ def test_manual_reconciliation_freezes_lookup_state_and_held_reservation(store):
     with patched_broker(recorder):
         result = reconcile_submission("p-1", store)
 
-    assert result == accepted
+    assert result["order_id"] == accepted["order_id"]
+    assert result["shares_decimal"] == "1"
+    assert result["broker_account_id"] == "paper-account-1"
     assert recorder.call_names == ("find_order_by_client_id",)
     state = observable_state(store, "p-1")
     assert state["proposal_status"] == "broker_accepted"
@@ -1376,15 +1616,12 @@ def test_submission_carries_the_proposals_exact_idempotency_key(store):
 
 
 def test_an_unsupported_order_type_blocks_and_releases_its_reservation(store):
-    """The 2026-07-29 fail-closed branch, previously uncharacterised.
+    """A mutated policy cannot authorize an unsupported broker order type.
 
-    execution_gate.validate_trade_intent() approves order_type="stop"; it is
-    a lower layer with no view of policy. The dispatch refuses rather than
-    silently downgrading a stop to a MARKET order -- an unbounded-price
-    order where a bounded one was intended -- and must release the budget it
-    had already reserved. Verified by mutation: deleting that
-    release_execution_reservation() call left the suite green before this
-    test existed.
+    The account-bound gate now revalidates the exact fingerprinted policy,
+    closing the older layer disagreement before authorization or reservation.
+    A hand-mutated ``TradingPolicy`` therefore fails as invalid policy state;
+    it can never reach the broker dispatcher or be downgraded to market.
 
     Reaching the branch requires a policy that permits "stop", which
     TradingPolicy.__post_init__ rejects. Constructing it through
@@ -1407,13 +1644,13 @@ def test_an_unsupported_order_type_blocks_and_releases_its_reservation(store):
     recorder = _submission_recorder(submit={"order_id": "must-not-exist"})
 
     with patched_broker(recorder):
-        with pytest.raises(ProposalExecutionError) as caught:
+        with pytest.raises(ValueError) as caught:
             execute_approved_paper_proposal(
                 "p-1", "approve", _held_portfolio(), policy, store,
                 now_et=NOW_ET, earnings_days_away=10,
             )
 
-    assert "order_type" in str(caught.value)
+    assert "order_types" in str(caught.value)
     state = observable_state(store, "p-1")
     assert state["reservations"] == [], (
         "an unsupported order type left budget reserved with no order to release it"
@@ -1596,11 +1833,19 @@ def test_a_budget_refusal_fences_the_proposal_out_of_submitting(store):
     directly left the execution suite green -- the raise still happened,
     only the status was wrong. Uncovered until this test.
     """
-    # A policy that permits zero orders today: the reservation is refused
-    # by the persistent daily cap, after the SUBMITTING fence is written.
+    # A valid one-order policy whose one slot is already reserved: the next
+    # reservation is refused by the persistent daily cap, after SUBMITTING.
     # The proposal must be bound to THIS policy's fingerprint, or execution
     # refuses at the policy-binding gate long before the budget is touched.
-    exhausted = dataclasses.replace(load_policy(), max_daily_order_count=0)
+    exhausted = dataclasses.replace(load_policy(), max_daily_order_count=1)
+    store.save_proposal(_proposal(proposal_id="already-reserved", side="sell"))
+    store.reserve_execution_budget(
+        "already-reserved",
+        trading_day=NOW_ET.date().isoformat(),
+        notional="100.00",
+        max_daily_notional=exhausted.max_daily_submitted_notional,
+        max_daily_orders=exhausted.max_daily_order_count,
+    )
     store.save_proposal(
         _proposal(
             side="sell",
@@ -1667,6 +1912,67 @@ def test_the_persistent_kill_switch_blocks_execution_on_its_own(store):
     assert "submit_market_order" not in recorder.call_names
     assert "submit_limit_order" not in recorder.call_names
     assert observable_state(store, "p-1")["broker_orders"] == []
+
+
+@pytest.mark.parametrize(
+    "malformed_state",
+    [
+        [],
+        {"active": False, "reason": "looks inactive"},
+        {
+            "active": "false",
+            "reason": "string booleans are not authoritative",
+            "changed_at": "2026-08-26T15:00:00+00:00",
+        },
+        {
+            "active": False,
+            "reason": 0,
+            "changed_at": "2026-08-26T15:00:00+00:00",
+        },
+        {
+            "active": False,
+            "reason": "naive clock",
+            "changed_at": "2026-08-26T15:00:00",
+        },
+    ],
+    ids=(
+        "non-object",
+        "missing-change-time",
+        "string-false",
+        "non-string-reason",
+        "naive-change-time",
+    ),
+)
+def test_malformed_persistent_kill_switch_refuses_before_broker_contact(
+    store, malformed_state
+):
+    """Corrupt stop evidence is unknown, never equivalent to an inactive stop."""
+    store.save_proposal(_proposal(status="proposed"))
+    store.set_system_state("kill_switch", malformed_state)
+    recorder = BrokerRecorder(is_configured=True)
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-1",
+                "approve",
+                _portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                kill_switch_active=False,
+            )
+
+    assert "persistent kill switch" in str(caught.value).lower()
+    assert recorder.call_names == ()
+    assert store.get_proposal("p-1")["status"] == "proposed"
+    assert observable_state(store, "p-1")["broker_orders"] == []
+
+
+@pytest.mark.parametrize("active", [0, 1, "false", None])
+def test_persistent_kill_switch_writer_rejects_non_boolean_active(store, active):
+    with pytest.raises(TypeError, match="actual bool"):
+        store.set_kill_switch(active, reason="must not coerce")
 
 
 def test_a_proposal_bound_to_a_different_policy_content_is_refused(store):
@@ -1801,7 +2107,7 @@ def test_a_mismatched_order_under_our_key_halts_the_platform(store):
     message = str(caught.value)
     assert "MISMATCHED" in message, message
     # The audit trail must name WHICH field disagreed, not just that one did.
-    assert "shares" in message, message
+    assert "quantity" in message, message
 
     assert recorder.call_names.count("submit_market_order") == 1, (
         "a mismatch must never be retried -- that is how a duplicate real "
@@ -1929,7 +2235,7 @@ def test_gr1c_preserves_the_facades_export_only_names():
 # reconcile_submission() historically resolved twelve runtime names from
 # this facade's module namespace (symtable-enumerated before the move):
 # ProposalExecutionError, SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING,
-# _intent_from_dict, _lookup_order_outcome, _order_matches_intent,
+# _intent_from_dict, _lookup_order_outcome, strict account/order evidence,
 # _authoritative_order_for, _broker_absence_is_old_enough,
 # journal_broker_order_update, datetime, timezone -- plus the deferred
 # `import execution.alpaca_broker` (frozen separately by the sys.modules
@@ -1988,13 +2294,16 @@ def test_gr1d_patching_order_match_on_the_facade_drives_the_mismatch_path(
     monkeypatch.setattr(
         execution_service,
         "_lookup_order_outcome",
-        lambda broker, key: {"order_id": "o-1", "status": "accepted"},
+        lambda broker, key: _complete_broker_order(
+            {"order_id": "o-1", "status": "accepted"},
+            idempotency_key="idem-p-1",
+        ),
     )
-    monkeypatch.setattr(
-        execution_service,
-        "_order_matches_intent",
-        lambda outcome, intent: (False, "gr1d-sentinel-mismatch"),
-    )
+
+    def reject_order(*args, **kwargs):
+        raise ValueError("gr1d-sentinel-mismatch")
+
+    monkeypatch.setattr(execution_service, "canonical_order_for_proposal", reject_order)
 
     with pytest.raises(ProposalExecutionError) as caught:
         reconcile_submission("p-1", store)
@@ -2014,15 +2323,21 @@ def test_gr1d_patching_chain_resolution_on_the_facade_is_honoured(
     monkeypatch.setattr(
         execution_service,
         "_lookup_order_outcome",
-        lambda broker, key: {"order_id": "o-1", "status": "accepted"},
-    )
-    monkeypatch.setattr(
-        execution_service, "_order_matches_intent", lambda outcome, intent: (True, None)
+        lambda broker, key: _complete_broker_order(
+            {"order_id": "o-1", "status": "accepted"},
+            idempotency_key="idem-p-1",
+        ),
     )
     monkeypatch.setattr(
         execution_service,
         "_authoritative_order_for",
-        lambda broker, outcome, intent: (None, "gr1d-chain-error", False, ()),
+        lambda broker, outcome, intent, **kwargs: (
+            None,
+            "gr1d-chain-error",
+            False,
+            (),
+            (),
+        ),
     )
 
     with pytest.raises(ProposalExecutionError) as caught:
@@ -2047,18 +2362,19 @@ def test_gr1d_patching_journal_on_the_facade_receives_the_authoritative_order(
     monkeypatch.setattr(
         execution_service,
         "_lookup_order_outcome",
-        lambda broker, key: {"order_id": "o-1", "status": "accepted"},
-    )
-    monkeypatch.setattr(
-        execution_service, "_order_matches_intent", lambda outcome, intent: (True, None)
+        lambda broker, key: _complete_broker_order(
+            {"order_id": "o-1", "status": "accepted"},
+            idempotency_key="idem-p-1",
+        ),
     )
     monkeypatch.setattr(
         execution_service,
         "_authoritative_order_for",
-        lambda broker, outcome, intent: (
+        lambda broker, outcome, intent, **kwargs: (
             authoritative,
             None,
             False,
+            ("o-1", "o-replacement"),
             ("o-1", "o-replacement"),
         ),
     )
@@ -2118,19 +2434,20 @@ def test_gr1d_the_reconciliation_clock_and_timezone_resolve_from_the_facade(
     monkeypatch.setattr(
         execution_service,
         "_lookup_order_outcome",
-        lambda broker, key: {"order_id": "o-1", "status": "accepted"},
-    )
-    monkeypatch.setattr(
-        execution_service, "_order_matches_intent", lambda outcome, intent: (True, None)
+        lambda broker, key: _complete_broker_order(
+            {"order_id": "o-1", "status": "accepted"},
+            idempotency_key="idem-p-1",
+        ),
     )
     monkeypatch.setattr(
         execution_service,
         "_authoritative_order_for",
-        lambda broker, outcome, intent: (
+        lambda broker, outcome, intent, **kwargs: (
             {"order_id": "o-1", "status": "accepted"},
             None,
             False,
             (),
+            ("o-1",),
         ),
     )
     monkeypatch.setattr(

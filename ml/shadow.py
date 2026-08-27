@@ -28,41 +28,23 @@ evidence (plan 12.5), never a default.
 from __future__ import annotations
 
 import dataclasses
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any, Mapping
 
-import pandas as pd
-import pandas_market_calendars as mcal
-
+from data.exchange_calendar import (
+    ExchangeCalendarError,
+    is_trading_session,
+    parse_session_date,
+    resolve_decision_cutoff,
+    resolve_target_availability,
+    resolve_target_session,
+    session_close_instant,
+    trading_sessions,
+)
 from ml.hashing import hash_payload
 
-_NYSE = mcal.get_calendar("NYSE")
-_EASTERN = "America/New_York"
-
-# There is deliberately no default close-hour constant. An earlier draft
-# carried DEFAULT_CLOSE_HOUR_ET = 16, which was never read and actively
-# contradicted the behavior: session_close_instant() takes market_close from
-# the exchange calendar, so a half-day resolves to 13:00 ET and the DST
-# transition moves the UTC offset. A constant asserting 16:00 would be the
-# first thing a reader trusted and the first thing that was wrong.
-
-
-class ShadowScheduleError(ValueError):
-    """A shadow run cannot be scheduled or matured as requested."""
-
-
-def _parse_session(value: Any, name: str) -> date:
-    if not isinstance(value, str):
-        raise ShadowScheduleError(f"{name} must use canonical YYYY-MM-DD format")
-    try:
-        parsed = date.fromisoformat(value)
-    except ValueError as exc:
-        raise ShadowScheduleError(
-            f"{name} must use canonical YYYY-MM-DD format"
-        ) from exc
-    if parsed.isoformat() != value:
-        raise ShadowScheduleError(f"{name} must use canonical YYYY-MM-DD format")
-    return parsed
+ShadowScheduleError = ExchangeCalendarError
+_parse_session = parse_session_date
 
 
 def _parse_instant(value: Any, name: str) -> datetime:
@@ -80,103 +62,6 @@ def _parse_instant(value: Any, name: str) -> datetime:
         # that assumption decides whether data was available.
         raise ShadowScheduleError(f"{name} must be timezone-aware")
     return parsed.astimezone(timezone.utc)
-
-
-def _schedule(start: date, end: date) -> pd.DataFrame:
-    return _NYSE.schedule(
-        start_date=start.isoformat(), end_date=end.isoformat()
-    )
-
-
-def trading_sessions(start: date, end: date) -> tuple[date, ...]:
-    """Real NYSE sessions in [start, end]. Holidays are absent, not weekends
-    only -- Thanksgiving and Good Friday are the cases naive weekday
-    arithmetic silently gets wrong."""
-    if end < start:
-        raise ShadowScheduleError("end must not precede start")
-    schedule = _schedule(start, end)
-    return tuple(pd.DatetimeIndex(schedule.index).date)
-
-
-def is_trading_session(session: str) -> bool:
-    target = _parse_session(session, "session")
-    return target in trading_sessions(target, target)
-
-
-def session_close_instant(session: str) -> datetime:
-    """The session's actual closing instant in UTC.
-
-    Reads `market_close` from the exchange calendar rather than assuming
-    16:00 ET, so an early-close session (the day after Thanksgiving,
-    Christmas Eve) resolves to 13:00 ET and a job keyed to it does not wait
-    three hours for data that already exists.
-    """
-    target = _parse_session(session, "session")
-    schedule = _schedule(target, target)
-    if schedule.empty:
-        raise ShadowScheduleError(f"{session} is not an NYSE trading session")
-    close = pd.Timestamp(schedule.iloc[0]["market_close"])
-    if close.tzinfo is None:
-        close = close.tz_localize(_EASTERN)
-    return close.tz_convert("UTC").to_pydatetime()
-
-
-def resolve_decision_cutoff(as_of_session: str) -> str:
-    """The instant a prediction for `as_of_session` may first be made.
-
-    Derived from the session's own close, NOT from wall-clock time. A job
-    that fires late must produce the same prediction it would have produced
-    on time; deriving the cutoff from `now` would make a delayed scheduler a
-    different experiment, and the delay would be invisible in the output.
-    """
-    return session_close_instant(as_of_session).isoformat()
-
-
-def resolve_target_session(as_of_session: str, horizon_sessions: int) -> str:
-    """The session `horizon_sessions` trading days after `as_of_session`.
-
-    Walks the exchange calendar. Calendar-day arithmetic lands on a weekend
-    roughly two-sevenths of the time and inside a holiday week often enough
-    to matter, and both produce a target that never traded.
-    """
-    if (
-        isinstance(horizon_sessions, bool)
-        or not isinstance(horizon_sessions, int)
-        or horizon_sessions < 1
-    ):
-        raise ShadowScheduleError("horizon_sessions must be a positive integer")
-    start = _parse_session(as_of_session, "as_of_session")
-    # Over-fetch generously: 20 sessions can span more than a month across
-    # holidays, and an under-fetch would silently truncate the horizon.
-    horizon_days = max(horizon_sessions * 3, horizon_sessions + 30)
-    try:
-        window_end = start + timedelta(days=horizon_days)
-    except OverflowError as exc:
-        # date arithmetic overflows past year 9999 before any coverage check
-        # could run, so the guard below never fires and a raw OverflowError
-        # escapes a module whose contract is to refuse cleanly.
-        raise ShadowScheduleError(
-            f"horizon_sessions={horizon_sessions} extends beyond representable "
-            "dates; no exchange calendar can cover it"
-        ) from exc
-    sessions = trading_sessions(start, window_end)
-    if not sessions or sessions[0] != start:
-        raise ShadowScheduleError(
-            f"{as_of_session} is not an NYSE trading session"
-        )
-    if len(sessions) <= horizon_sessions:
-        raise ShadowScheduleError(
-            f"exchange calendar does not yet cover {horizon_sessions} sessions "
-            f"after {as_of_session}"
-        )
-    return sessions[horizon_sessions].isoformat()
-
-
-def resolve_target_availability(as_of_session: str, horizon_sessions: int) -> str:
-    """The instant the target for a prediction becomes observable."""
-    return session_close_instant(
-        resolve_target_session(as_of_session, horizon_sessions)
-    ).isoformat()
 
 
 @dataclasses.dataclass(frozen=True)

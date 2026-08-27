@@ -4,6 +4,8 @@ only after maturity, refusals logged alongside successes, and monitoring
 that cannot retrain or promote anything."""
 from __future__ import annotations
 
+import sqlite3
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -164,6 +166,45 @@ def test_prediction_insertion_is_idempotent_and_never_rewrites(tmp_path):
     second = store.record_ml_prediction(_prediction())
     assert second["prediction_id"] == first["prediction_id"]
     assert len(store.list_ml_predictions()) == 1
+    assert first["target_session"] == "2026-08-28"
+    assert first["prediction"]["target_session"] == "2026-08-28"
+
+
+def test_storage_rejects_caller_supplied_wrong_target_session(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
+    with pytest.raises(ValueError, match="target_session"):
+        store.record_ml_prediction(_prediction(target_session="2026-08-27"))
+
+
+def test_friday_horizon_cannot_claim_saturday_maturity(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
+    with pytest.raises(ValueError, match="exchange-session close"):
+        store.record_ml_prediction(
+            _prediction(
+                as_of_session="2026-11-27",
+                generated_at="2026-11-27T18:05:00+00:00",
+                data_available_at="2026-11-27T18:00:00+00:00",
+                horizon_sessions=1,
+                target_available_at="2026-11-28T21:00:00+00:00",
+            )
+        )
+
+
+def test_delayed_availability_is_allowed_but_canonical_session_is_persisted(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
+    stored = store.record_ml_prediction(
+        _prediction(target_available_at="2026-08-31T20:00:00+00:00")
+    )
+    assert stored["target_session"] == "2026-08-28"
+    with pytest.raises(ValueError, match="precedes"):
+        store.record_ml_prediction_outcome(
+            stored["prediction_id"],
+            {"realized_vol_pct": 28.4},
+            matured_at="2026-08-28T20:00:00+00:00",
+        )
 
 
 def test_prediction_conflict_is_rejected_instead_of_hidden(tmp_path):
@@ -223,6 +264,51 @@ def test_outcome_cannot_exist_before_its_prediction(tmp_path):
     store = AssistantStore(tmp_path / "a.db")
     with pytest.raises(ValueError, match="cannot"):
         store.record_ml_prediction_outcome("ghost", {"x": 1}, matured_at="2026-08-28")
+
+
+def test_migrated_legacy_prediction_without_session_proof_cannot_mature(tmp_path):
+    path = tmp_path / "legacy.db"
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute(
+            """
+            CREATE TABLE ml_predictions (
+                prediction_id TEXT PRIMARY KEY,
+                model_key TEXT NOT NULL,
+                task TEXT NOT NULL,
+                subject_key TEXT NOT NULL,
+                as_of_session TEXT NOT NULL,
+                generated_at TEXT NOT NULL,
+                horizon_sessions INTEGER NOT NULL,
+                feature_snapshot_hash TEXT NOT NULL,
+                prediction_json TEXT NOT NULL,
+                prediction_hash TEXT NOT NULL,
+                available INTEGER NOT NULL,
+                refusal_reasons_json TEXT NOT NULL
+            )
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO ml_predictions VALUES (
+                'legacy-prediction', 'vol:0.1.0', 'volatility_forecast',
+                'NVDA', '2026-07-31', '2026-07-31T21:00:00+00:00', 20,
+                ?, '{}', ?, 1, '[]'
+            )
+            """,
+            ("a" * 64, "b" * 64),
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+    store = AssistantStore(path)
+    with pytest.raises(ValueError, match="lacks target_session"):
+        store.record_ml_prediction_outcome(
+            "legacy-prediction",
+            {"realized_vol_pct": 28.4},
+            matured_at="2026-08-28T20:00:00+00:00",
+        )
 
 
 def test_outcome_cannot_predate_the_prediction_session(tmp_path):

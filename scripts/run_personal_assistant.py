@@ -15,6 +15,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.kill_switch import env_kill_switch_active
+from assistant.dispatch_fence import get_runtime_emergency_stop
 from assistant.llm import ProjectionError, project_committee_input
 from assistant.llm.anthropic_provider import (
     AnthropicCommitteeProvider,
@@ -59,8 +60,11 @@ from assistant.mandate import (
 from assistant.operations import (
     append_alerts_jsonl,
     ensure_recent_database_backup,
+    operational_policy_identity,
+    record_operational_policy_heartbeat,
     run_backup_restore_drill,
     run_operational_check,
+    verify_operational_policy_heartbeats,
 )
 from assistant.process_singleton import (
     ProcessSingletonError,
@@ -125,6 +129,10 @@ from assistant.storage import (
     configured_db_path,
     verify_database_schema,
 )
+from assistant.temporal_integrity import (
+    MAX_MONITOR_INTERVAL_SECONDS,
+    MAX_RECOVERY_WINDOW_SECONDS,
+)
 from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS
 from scripts.product_composition import (
     generate_leveraged_pair_rebalance_proposals_with_research
@@ -154,6 +162,26 @@ def _positive_int(value: str) -> int:
         raise argparse.ArgumentTypeError(f"must be a positive integer, got {value!r}")
     if parsed <= 0:
         raise argparse.ArgumentTypeError(f"must be a positive integer, got {parsed}")
+    return parsed
+
+
+def _recovery_window_seconds(value: str) -> int:
+    parsed = _positive_int(value)
+    maximum = int(MAX_RECOVERY_WINDOW_SECONDS)
+    if parsed > maximum:
+        raise argparse.ArgumentTypeError(
+            f"must be no greater than {maximum} seconds, got {parsed}"
+        )
+    return parsed
+
+
+def _monitor_interval_seconds(value: str) -> int:
+    parsed = _positive_int(value)
+    maximum = int(MAX_MONITOR_INTERVAL_SECONDS)
+    if parsed > maximum:
+        raise argparse.ArgumentTypeError(
+            f"must be no greater than {maximum} seconds, got {parsed}"
+        )
     return parsed
 
 
@@ -204,7 +232,7 @@ def _cli_policy_path(args) -> str:
     """
     raw = getattr(args, "policy", None)
     if raw is None:
-        return str(resolve_policy_path())
+        return str(resolve_policy_path().resolve(strict=True))
     return str(Path(raw).expanduser())
 
 
@@ -928,14 +956,41 @@ def command_monitor_orders(args, store: AssistantStore) -> None:
         acquire_process_singleton(args.database, "order-monitor")
     except ProcessSingletonError as exc:
         raise SystemExit(f"Order monitor already running: {exc}") from exc
+    policy_path = _cli_policy_path(args)
     policy = load_policy(_cli_policy_path(args))
-    print("Running startup reconciliation, then listening for Alpaca trade updates.")
-    monitor_orders(
+    record_operational_policy_heartbeat(
         store,
-        cancel_stale=args.cancel_stale,
-        max_order_age_minutes=policy.max_order_age_minutes,
-        poll_interval_seconds=args.poll_seconds,
+        "monitor",
+        policy,
+        policy_path,
+        healthy=True,
+        status="running",
     )
+    print("Running startup reconciliation, then listening for Alpaca trade updates.")
+    try:
+        monitor_orders(
+            store,
+            cancel_stale=args.cancel_stale,
+            max_order_age_minutes=policy.max_order_age_minutes,
+            poll_interval_seconds=args.poll_seconds,
+        )
+    except (Exception, SystemExit) as exc:
+        try:
+            record_operational_policy_heartbeat(
+                store,
+                "monitor",
+                policy,
+                policy_path,
+                healthy=False,
+                status="failed",
+                error_type=type(exc).__name__,
+            )
+        except Exception:
+            # The worker is already failing closed. Preserve its primary
+            # exception; verification will independently reject a missing or
+            # unreadable policy heartbeat.
+            pass
+        raise
 
 
 def command_cancel_order(args, store: AssistantStore) -> None:
@@ -1557,12 +1612,33 @@ def command_platform_readiness(args, store: AssistantStore) -> None:
 
 def command_kill_switch(args, store: AssistantStore) -> None:
     if args.state == "status":
-        print(json.dumps(store.get_kill_switch(), indent=2, sort_keys=True))
+        print(
+            json.dumps(
+                {
+                    "local": store.get_kill_switch(),
+                    "runtime_stop": get_runtime_emergency_stop(store.path),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
         return
     active = args.state == "on"
     reason = args.reason or ("Manually activated from CLI." if active else "Manually cleared from CLI.")
-    store.set_kill_switch(active, reason=reason)
-    print(json.dumps(store.get_kill_switch(), indent=2, sort_keys=True))
+    if not active and (
+        args.incident_id is None or args.expected_generation is None
+    ):
+        raise SystemExit(
+            "kill-switch off requires --incident-id and --expected-generation "
+            "copied from a fresh kill-switch status"
+        )
+    result = store.set_kill_switch(
+        active,
+        reason=reason,
+        incident_id=args.incident_id,
+        expected_runtime_generation=args.expected_generation,
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
 
 
 def command_backup_db(args, store: AssistantStore) -> None:
@@ -1934,14 +2010,45 @@ def command_ledger_fee(args, store: AssistantStore) -> None:
 
 
 def command_operations_check(args, store: AssistantStore) -> None:
+    policy_path = _cli_policy_path(args)
     policy = load_policy(_cli_policy_path(args))
     report = run_operational_check(
-        store, policy, check_broker=not args.offline
+        store,
+        policy,
+        check_broker=not args.offline,
+        policy_path=policy_path,
+        heartbeat_task="operations_check",
     )
     if args.alerts_jsonl and report["alerts"]:
         append_alerts_jsonl(report["alerts"], args.alerts_jsonl)
     print(json.dumps(report, indent=2, sort_keys=True))
     if not report["healthy"]:
+        raise SystemExit(2)
+
+
+def command_policy_identity(args) -> None:
+    """Print the canonical policy identity without opening the database."""
+    policy_path = _cli_policy_path(args)
+    policy = load_policy(_cli_policy_path(args))
+    identity = operational_policy_identity(policy, policy_path)
+    identity.update({"policy_name": policy.name, "policy_version": policy.version})
+    print(json.dumps(identity, indent=2, sort_keys=True))
+
+
+def command_verify_operational_policy_heartbeats(
+    args, store: AssistantStore
+) -> None:
+    """Fail closed when scheduled tasks did not use one policy identity."""
+    policy_path = _cli_policy_path(args)
+    policy = load_policy(_cli_policy_path(args))
+    report = verify_operational_policy_heartbeats(
+        store,
+        policy,
+        policy_path,
+        require_all=args.require_all,
+    )
+    print(json.dumps(report, indent=2, sort_keys=True))
+    if not report["ok"]:
         raise SystemExit(2)
 
 
@@ -2122,9 +2229,22 @@ def command_paper_observation(args, store: AssistantStore) -> None:
         raise SystemExit(
             "Alpaca paper credentials are required for paper evidence."
         )
+    policy_path = _cli_policy_path(args)
+    policy = load_policy(_cli_policy_path(args))
     cycle_started_at = datetime.now(timezone.utc)
     session = paper_session_schedule(cycle_started_at)
     if session is None:
+        record_operational_policy_heartbeat(
+            store,
+            "observation",
+            policy,
+            policy_path,
+            at=cycle_started_at.isoformat(),
+            healthy=True,
+            status="skipped",
+            captured=False,
+            reason="not an NYSE trading session",
+        )
         print(
             json.dumps(
                 {
@@ -2139,8 +2259,17 @@ def command_paper_observation(args, store: AssistantStore) -> None:
         return
     session_date = session[0]
     try:
+        record_operational_policy_heartbeat(
+            store,
+            "observation",
+            policy,
+            policy_path,
+            at=cycle_started_at.isoformat(),
+            healthy=None,
+            status="running",
+            session_date=session_date,
+        )
         lineage = _active_runtime_lineage(store, args)
-        policy = load_policy(_cli_policy_path(args))
         order_report = reconcile_nonterminal_orders(
             store,
             cancel_stale=args.cancel_stale,
@@ -2172,6 +2301,19 @@ def command_paper_observation(args, store: AssistantStore) -> None:
             expected_lineage=lineage,
         )
     except (Exception, SystemExit) as exc:
+        try:
+            record_operational_policy_heartbeat(
+                store,
+                "observation",
+                policy,
+                policy_path,
+                healthy=False,
+                status="failed",
+                session_date=session_date,
+                error_type=type(exc).__name__,
+            )
+        except Exception:
+            pass
         alert = store.upsert_operational_alert(
             fingerprint="scheduled-paper-observation-failure",
             severity="critical",
@@ -2185,6 +2327,17 @@ def command_paper_observation(args, store: AssistantStore) -> None:
         if args.alerts_jsonl:
             append_alerts_jsonl([alert], args.alerts_jsonl)
         raise
+    record_operational_policy_heartbeat(
+        store,
+        "observation",
+        policy,
+        policy_path,
+        at=captured_at.isoformat(),
+        healthy=True,
+        status="captured",
+        captured=True,
+        session_date=session_date,
+    )
     print(
         json.dumps(
             {
@@ -2235,8 +2388,17 @@ def command_operations_cycle(args, store: AssistantStore) -> None:
         raise SystemExit(
             "Alpaca paper credentials are required for an operational cycle."
         )
+    policy_path = _cli_policy_path(args)
     policy = load_policy(_cli_policy_path(args))
     try:
+        record_operational_policy_heartbeat(
+            store,
+            "cycle",
+            policy,
+            policy_path,
+            healthy=None,
+            status="running",
+        )
         order_report = reconcile_nonterminal_orders(
             store,
             cancel_stale=args.cancel_stale,
@@ -2264,13 +2426,29 @@ def command_operations_cycle(args, store: AssistantStore) -> None:
             max_age_hours=args.backup_max_age_hours,
         )
         health = run_operational_check(
-            store, policy, check_broker=True
+            store,
+            policy,
+            check_broker=True,
+            policy_path=policy_path,
+            heartbeat_task="cycle",
         )
         if args.alerts_jsonl and health["alerts"]:
             append_alerts_jsonl(health["alerts"], args.alerts_jsonl)
         if activity_error is not None:
             raise activity_error
     except (Exception, SystemExit) as exc:
+        try:
+            record_operational_policy_heartbeat(
+                store,
+                "cycle",
+                policy,
+                policy_path,
+                healthy=False,
+                status="failed",
+                error_type=type(exc).__name__,
+            )
+        except Exception:
+            pass
         alert = store.upsert_operational_alert(
             fingerprint="scheduled-operations-cycle-failure",
             severity="critical",
@@ -2471,7 +2649,9 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     recover_stale.add_argument("proposal_id")
-    recover_stale.add_argument("--stale-after-seconds", type=_positive_int, default=300)
+    recover_stale.add_argument(
+        "--stale-after-seconds", type=_recovery_window_seconds, default=300
+    )
     recover_stale.set_defaults(handler=command_recover_stale)
 
     recover_claim = commands.add_parser(
@@ -2486,7 +2666,9 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     recover_claim.add_argument("proposal_id")
-    recover_claim.add_argument("--stale-after-seconds", type=_positive_int, default=900)
+    recover_claim.add_argument(
+        "--stale-after-seconds", type=_recovery_window_seconds, default=900
+    )
     recover_claim.set_defaults(handler=command_recover_stale_claim)
 
     prune_packets = commands.add_parser(
@@ -2522,7 +2704,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     monitor.add_argument(
         "--poll-seconds",
-        type=_positive_int,
+        type=_monitor_interval_seconds,
         default=30,
         help="Polling fallback interval while the trade-update stream runs (default: 30).",
     )
@@ -2596,6 +2778,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     kill_switch.add_argument("state", choices=("on", "off", "status"))
     kill_switch.add_argument("--reason")
+    kill_switch.add_argument(
+        "--incident-id",
+        help="Exact open runtime incident to clear; required for off.",
+    )
+    kill_switch.add_argument(
+        "--expected-generation",
+        type=int,
+        help="Exact runtime generation from a fresh status; required for off.",
+    )
     kill_switch.set_defaults(handler=command_kill_switch)
 
     idle_cash = commands.add_parser(
@@ -2730,6 +2921,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Apply the current schema (open with current code) before verifying.",
     )
     verify_schema.set_defaults(handler=command_verify_db_schema, needs_store=False)
+
+    policy_identity = commands.add_parser(
+        "policy-identity",
+        help=(
+            "Print the canonical resolved policy path and deterministic "
+            "fingerprint without opening the operator database."
+        ),
+    )
+    policy_identity.set_defaults(handler=command_policy_identity, needs_store=False)
 
     committee = commands.add_parser(
         "committee-review",
@@ -2968,6 +3168,23 @@ def build_parser() -> argparse.ArgumentParser:
     operations_check.add_argument("--alerts-jsonl", type=Path)
     operations_check.set_defaults(handler=command_operations_check)
 
+    policy_heartbeat_check = commands.add_parser(
+        "verify-operational-policy-heartbeats",
+        help=(
+            "Compare the cycle, monitor, observation and watchdog policy "
+            "paths/fingerprints without mutating the operator database."
+        ),
+    )
+    policy_heartbeat_check.add_argument(
+        "--require-all",
+        action="store_true",
+        help="Fail when any operational task has not recorded a heartbeat.",
+    )
+    policy_heartbeat_check.set_defaults(
+        handler=command_verify_operational_policy_heartbeats,
+        read_only_store=True,
+    )
+
     list_alerts = commands.add_parser(
         "alerts", help="List durable operational alerts."
     )
@@ -3127,11 +3344,11 @@ def main() -> None:
     # so direct test invocations with default=None stay safe.
     try:
         args.policy = _cli_policy_path(args)
-    except FileNotFoundError as exc:
+    except OSError as exc:
         raise SystemExit(f"Policy resolution failed: {exc}") from exc
-    # verify-db-schema declares needs_store=False: constructing the store
-    # would migrate the database before the handler runs, making read-only
-    # verification of a pre-migration database impossible.
+    # Some inspection commands declare needs_store=False. In particular,
+    # constructing the store for verify-db-schema would migrate the database
+    # before read-only verification of a pre-migration database can run.
     if not getattr(args, "needs_store", True):
         args.handler(args)
         return

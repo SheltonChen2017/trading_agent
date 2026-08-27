@@ -64,6 +64,7 @@ class ReconciliationDeps:
     # recovery path, and so sys.modules/parent-package broker fakes are
     # resolved at call time exactly as the inline import resolved them.
     import_broker: Callable[[], Any]
+    open_broker_session: Callable[[Any], Any]
     datetime_type: Any
     timezone_type: Any
     proposal_execution_error: type[Exception]
@@ -73,6 +74,9 @@ class ReconciliationDeps:
     intent_from_dict: Callable[[dict], Any]
     lookup_order_outcome: Callable[..., Any]
     order_matches_intent: Callable[..., tuple]
+    observed_broker_account: Callable[..., Any]
+    assert_expected_broker_account: Callable[..., Any]
+    canonical_order_for_proposal: Callable[..., dict]
     authoritative_order_for: Callable[..., tuple]
     broker_absence_is_old_enough: Callable[..., bool]
     journal_broker_order_update: Callable[..., Any]
@@ -107,15 +111,46 @@ def run_submission_reconciliation(
         )
 
     try:
-        broker = deps.import_broker()
+        broker_module = deps.import_broker()
+        broker = deps.open_broker_session(broker_module)
 
         stored_intent = deps.intent_from_dict(proposal["intent"])
+        observed_account = deps.observed_broker_account(broker)
+        try:
+            deps.assert_expected_broker_account(proposal, observed_account)
+        except Exception as binding_exc:
+            reconciled_at = deps.datetime_type.now(
+                deps.timezone_type.utc
+            ).isoformat()
+            reason = (
+                "Manual reconciliation cannot prove the proposal belongs to "
+                f"the connected broker account: {binding_exc}. Persistent kill "
+                "switch activated; investigate manually."
+            )
+            store.park_reconciliation_anomaly_and_halt(
+                proposal_id,
+                expected_statuses=(deps.reconciling,),
+                reconciled_at=reconciled_at,
+                reason=reason,
+                new_status=deps.submission_unknown,
+                details={"path": "manual_account_binding"},
+                anomaly_key="manual_account_binding_mismatch",
+            )
+            raise deps.proposal_execution_error(reason) from binding_exc
         outcome = deps.lookup_order_outcome(broker, proposal["idempotency_key"])
         reconciled_at = deps.datetime_type.now(deps.timezone_type.utc).isoformat()
 
         if isinstance(outcome, dict):
-            matches, mismatch_detail = deps.order_matches_intent(outcome, stored_intent)
-            if not matches:
+            try:
+                root_order = deps.canonical_order_for_proposal(
+                    outcome,
+                    stored_intent,
+                    proposal,
+                    observed_account=observed_account,
+                    root_order=True,
+                )
+            except Exception as evidence_exc:
+                mismatch_detail = str(evidence_exc)
                 expected_desc = f"{stored_intent.side} {stored_intent.shares} {stored_intent.ticker} {stored_intent.order_type}"
                 if stored_intent.order_type == "limit":
                     expected_desc += f" @ {stored_intent.limit_price}"
@@ -142,8 +177,18 @@ def run_submission_reconciliation(
             # out of band; the live state then lives on the replacement, which
             # has its own order id. Resolve before journaling, or this manual
             # operation cannot fix the very condition it exists to fix.
-            authoritative, chain_error, is_mismatch, chain = deps.authoritative_order_for(
-                broker, outcome, stored_intent
+            (
+                authoritative,
+                chain_error,
+                is_mismatch,
+                chain,
+                replacement_order_path,
+            ) = deps.authoritative_order_for(
+                broker,
+                root_order,
+                stored_intent,
+                proposal=proposal,
+                observed_account=observed_account,
             )
             if chain_error is not None:
                 reason = (
@@ -181,6 +226,12 @@ def run_submission_reconciliation(
                 clear_error=True,
                 extra_updates={"reconciled_at": reconciled_at},
                 raw_event={"replacement_chain": list(chain)} if chain else None,
+                broker_order_root_id=(
+                    replacement_order_path[0]
+                    if replacement_order_path
+                    else None
+                ),
+                replacement_order_path=replacement_order_path,
             )
             return authoritative
 

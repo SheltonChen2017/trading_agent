@@ -35,6 +35,7 @@ KNOWN_BROKER_ORDER_STATUSES = frozenset(
         "held",
         "new",
         "pending_new",
+        "pending_review",
         "stopped",
         "suspended",
         "partially_filled",
@@ -57,6 +58,7 @@ ACTIVE_BROKER_ORDER_STATUSES = frozenset(
         "held",
         "new",
         "pending_new",
+        "pending_review",
         "stopped",
         "suspended",
         "partially_filled",
@@ -69,10 +71,10 @@ _UNFILLED_BROKER_ORDER_STATUSES = frozenset(
     {
         "accepted",
         "accepted_for_bidding",
-        "calculated",
         "held",
         "new",
         "pending_new",
+        "pending_review",
         "stopped",
         "suspended",
         "rejected",
@@ -129,7 +131,9 @@ class BrokerAccountIdentity:
     def __post_init__(self) -> None:
         if not isinstance(self.account_id, str) or not self.account_id.strip():
             raise ValueError("account_id must be a non-empty string")
-        account_id = self.account_id.strip()
+        if self.account_id != self.account_id.strip():
+            raise ValueError("account_id must not contain surrounding whitespace")
+        account_id = self.account_id
         if account_id.lower() in _IDENTITY_SENTINELS:
             raise ValueError("account_id must identify a real broker account")
         if self.account_mode not in {"paper", "live"}:
@@ -141,14 +145,17 @@ class BrokerAccountIdentity:
 class BrokerOrderValidationContext:
     """Optional material expectations applied after strict row validation.
 
-    Root submissions/lookups provide ``expected_client_order_id``.  A broker
-    replacement instead supplies ``expected_replaces_order_id`` and separately
-    requires its own non-empty client identity; replacement lineage must never
-    be inferred merely because another client ID looks similar.
+    Root submissions/lookups provide ``expected_client_order_id``.  Once the
+    broker has assigned an order ID, every later observation of that root also
+    provides ``expected_order_id``.  A broker replacement instead supplies
+    ``expected_replaces_order_id`` and separately requires its own non-empty
+    client identity; replacement lineage must never be inferred merely because
+    another client ID looks similar.
     """
 
     expected_account: BrokerAccountIdentity
     observed_account: BrokerAccountIdentity
+    expected_order_id: str | None = None
     expected_client_order_id: str | None = None
     require_client_order_id: bool = False
     expected_replaces_order_id: str | None = None
@@ -158,6 +165,7 @@ class BrokerOrderValidationContext:
     expected_quantity: object | None = None
     expected_limit_price: object | None = None
     require_active: bool = False
+    require_exact_numerics: bool = False
 
     def __post_init__(self) -> None:
         if not isinstance(self.expected_account, BrokerAccountIdentity):
@@ -192,6 +200,9 @@ class ValidatedBrokerOrder:
     order_id: str
     client_order_id: str | None
     ticker: str
+    asset_class: Literal["us_equity"]
+    order_class: Literal["simple"]
+    extended_hours: Literal[False]
     side: Literal["buy", "sell"]
     order_type: Literal["market", "limit"]
     time_in_force: Literal["day"]
@@ -227,6 +238,12 @@ def _identity(
     if not isinstance(value, str):
         _fail(code, f"{field} must be a string, got {type(value).__name__}", field=field)
     text = value.strip()
+    if value != text:
+        _fail(
+            code,
+            f"{field} must not contain surrounding whitespace",
+            field=field,
+        )
     if not text or text.lower() in _IDENTITY_SENTINELS:
         _fail(code, f"{field} is not a usable identity: {value!r}", field=field)
     if len(text) > 128 or not text.isascii() or not text.isprintable():
@@ -292,15 +309,37 @@ def _optional_decimal_field(
     legacy_field: str,
     code: str,
     allow_zero: bool,
+    require_exact: bool = False,
 ) -> Decimal | None:
-    # A present exact companion wins.  Do not silently fall back from a
-    # malformed exact value to a rounded display float.
     exact = order.get(exact_field)
+    legacy = order.get(legacy_field)
+    if require_exact and exact is None and legacy is not None:
+        _fail(
+            "missing_exact_numeric",
+            f"{exact_field} is required for strict broker evidence",
+            field=exact_field,
+        )
     if exact is not None:
-        return _decimal(
+        parsed_exact = _decimal(
             exact, code=code, field=exact_field, allow_zero=allow_zero
         )
-    legacy = order.get(legacy_field)
+        if legacy is None:
+            _fail(
+                "missing_legacy_numeric_companion",
+                f"{legacy_field} is required alongside {exact_field}",
+                field=legacy_field,
+            )
+        parsed_legacy = _decimal(
+            legacy, code=code, field=legacy_field, allow_zero=allow_zero
+        )
+        if parsed_legacy != parsed_exact:
+            _fail(
+                "numeric_companion_mismatch",
+                f"{exact_field}={parsed_exact} disagrees with "
+                f"{legacy_field}={parsed_legacy}",
+                field=legacy_field,
+            )
+        return parsed_exact
     if legacy is None:
         return None
     return _decimal(
@@ -315,6 +354,7 @@ def _required_decimal_field(
     legacy_field: str,
     code: str,
     allow_zero: bool,
+    require_exact: bool = False,
 ) -> Decimal:
     parsed = _optional_decimal_field(
         order,
@@ -322,6 +362,7 @@ def _required_decimal_field(
         legacy_field=legacy_field,
         code=code,
         allow_zero=allow_zero,
+        require_exact=require_exact,
     )
     if parsed is None:
         _fail(code, f"{exact_field} is required", field=exact_field)
@@ -436,6 +477,98 @@ def _validate_fill_state(
         )
 
 
+def _validate_lifecycle_evidence(
+    *,
+    order_id: str,
+    status: str,
+    submitted_at: datetime,
+    updated_at: datetime | None,
+    filled_at: datetime | None,
+    canceled_at: datetime | None,
+    expired_at: datetime | None,
+    failed_at: datetime | None,
+    replaced_at: datetime | None,
+    replaces: str | None,
+    replaced_by: str | None,
+) -> None:
+    """Reject contradictory chronology, terminal markers, and lineage."""
+    if replaces == order_id or replaced_by == order_id:
+        _fail(
+            "invalid_replacement_lineage",
+            "an order cannot replace or be replaced by itself",
+            field="replaces" if replaces == order_id else "replaced_by",
+        )
+    if replaces is not None and replaces == replaced_by:
+        _fail(
+            "invalid_replacement_lineage",
+            "replaces and replaced_by cannot identify the same adjacent order",
+            field="replaced_by",
+        )
+
+    timestamp_values = {
+        "updated_at": updated_at,
+        "filled_at": filled_at,
+        "canceled_at": canceled_at,
+        "expired_at": expired_at,
+        "failed_at": failed_at,
+        "replaced_at": replaced_at,
+    }
+    for field, value in timestamp_values.items():
+        if value is not None and value < submitted_at:
+            _fail(
+                "invalid_order_chronology",
+                f"{field} cannot precede submitted_at",
+                field=field,
+            )
+        if updated_at is not None and value is not None and value > updated_at:
+            _fail(
+                "invalid_order_chronology",
+                f"{field} cannot be later than updated_at",
+                field=field,
+            )
+
+    marker_rules = {
+        "filled_at": ({"filled", "calculated"}, filled_at),
+        "canceled_at": ({"canceled"}, canceled_at),
+        "expired_at": ({"expired"}, expired_at),
+        "failed_at": ({"rejected"}, failed_at),
+        "replaced_at": ({"replaced"}, replaced_at),
+    }
+    for field, (allowed_statuses, value) in marker_rules.items():
+        if value is not None and status not in allowed_statuses:
+            _fail(
+                "invalid_status_timestamp",
+                f"{field} is incompatible with status {status!r}",
+                field=field,
+            )
+
+    required_marker = {
+        "filled": ("filled_at", filled_at),
+        "canceled": ("canceled_at", canceled_at),
+        "expired": ("expired_at", expired_at),
+        "rejected": ("failed_at", failed_at),
+        "replaced": ("replaced_at", replaced_at),
+    }.get(status)
+    if required_marker is not None and required_marker[1] is None:
+        _fail(
+            "missing_status_timestamp",
+            f"status {status!r} requires {required_marker[0]}",
+            field=required_marker[0],
+        )
+    if status == "replaced" and replaced_by is None:
+        _fail(
+            "invalid_replacement_lineage",
+            "a replaced order requires replaced_by",
+            field="replaced_by",
+        )
+    if status != "replaced" and replaced_by is not None:
+        _fail(
+            "invalid_replacement_lineage",
+            f"status {status!r} cannot carry replaced_by",
+            field="replaced_by",
+        )
+
+
 def validate_broker_order(
     order: Mapping[str, Any],
     *,
@@ -461,6 +594,19 @@ def validate_broker_order(
         required=True,
     )
     assert order_id is not None
+    if context.expected_order_id is not None:
+        expected_order_id = _identity(
+            context.expected_order_id,
+            code="invalid_validation_expectation",
+            field="expected_order_id",
+            required=True,
+        )
+        if order_id != expected_order_id:
+            _fail(
+                "order_id_mismatch",
+                f"expected {expected_order_id!r}, got {order_id!r}",
+                field="order_id",
+            )
 
     client_order_id = _identity(
         order.get("client_order_id"),
@@ -514,8 +660,40 @@ def validate_broker_order(
                 f"expected replaces={expected_replaces!r}, got {replaces!r}",
                 field="replaces",
             )
+    if context.expected_client_order_id is not None and replaces is not None:
+        _fail(
+            "replacement_lineage_mismatch",
+            "a root client-order lookup returned a replacement order",
+            field="replaces",
+        )
 
     ticker = _ticker(order.get("ticker"))
+    asset_class = _choice(
+        order.get("asset_class"),
+        field="asset_class",
+        choices=frozenset({"us_equity"}),
+        code="unsupported_asset_class",
+    )
+    order_class = _choice(
+        order.get("order_class"),
+        field="order_class",
+        choices=frozenset({"simple"}),
+        code="unsupported_order_class",
+    )
+    extended_hours = order.get("extended_hours")
+    if type(extended_hours) is not bool or extended_hours:
+        _fail(
+            "unsupported_extended_hours",
+            "broker evidence must explicitly identify a regular-hours order",
+            field="extended_hours",
+        )
+    legs = order.get("legs")
+    if legs not in (None, []):
+        _fail(
+            "unsupported_order_legs",
+            "contingent or multi-leg orders are not supported",
+            field="legs",
+        )
     side = _choice(
         order.get("side"),
         field="side",
@@ -553,6 +731,7 @@ def validate_broker_order(
         legacy_field="shares",
         code="invalid_quantity",
         allow_zero=False,
+        require_exact=context.require_exact_numerics,
     )
     notional = _optional_decimal_field(
         order,
@@ -560,6 +739,7 @@ def validate_broker_order(
         legacy_field="notional",
         code="invalid_notional",
         allow_zero=False,
+        require_exact=context.require_exact_numerics,
     )
     if (quantity is None) == (notional is None):
         _fail(
@@ -583,6 +763,7 @@ def validate_broker_order(
         legacy_field="limit_price",
         code="invalid_limit_price",
         allow_zero=False,
+        require_exact=context.require_exact_numerics,
     )
     if order_type == "limit" and limit_price is None:
         _fail(
@@ -660,14 +841,28 @@ def validate_broker_order(
         legacy_field="filled_qty",
         code="invalid_filled_quantity",
         allow_zero=True,
+        require_exact=context.require_exact_numerics,
     )
     filled_average_price = _optional_decimal_field(
         order,
         exact_field="filled_avg_price_decimal",
         legacy_field="filled_avg_price",
         code="invalid_filled_average_price",
-        allow_zero=False,
+        allow_zero=True,
+        require_exact=context.require_exact_numerics,
     )
+    if filled_quantity == 0 and filled_average_price == 0:
+        # Alpaca may emit 0 until an outside-hours order is processed. It is
+        # unavailable evidence, not an economic zero fill price.
+        filled_average_price = None
+    if filled_quantity > 0 and (
+        filled_average_price is None or filled_average_price <= 0
+    ):
+        _fail(
+            "invalid_fill_state",
+            "a positive fill requires a positive average fill price",
+            field="filled_avg_price_decimal",
+        )
     _validate_fill_state(
         status=status,
         quantity=quantity,
@@ -684,6 +879,20 @@ def validate_broker_order(
         for field in _TIMESTAMP_FIELDS
     }
 
+    _validate_lifecycle_evidence(
+        order_id=order_id,
+        status=status,
+        submitted_at=submitted_at,
+        updated_at=timestamps["updated_at"],
+        filled_at=timestamps["filled_at"],
+        canceled_at=timestamps["canceled_at"],
+        expired_at=timestamps["expired_at"],
+        failed_at=timestamps["failed_at"],
+        replaced_at=timestamps["replaced_at"],
+        replaces=replaces,
+        replaced_by=replaced_by,
+    )
+
     expected_account = context.expected_account
     observed_account = context.observed_account
     if observed_account != expected_account:
@@ -697,6 +906,9 @@ def validate_broker_order(
         order_id=order_id,
         client_order_id=client_order_id,
         ticker=ticker,
+        asset_class=asset_class,  # type: ignore[arg-type]
+        order_class=order_class,  # type: ignore[arg-type]
+        extended_hours=False,
         side=side,  # type: ignore[arg-type]
         order_type=order_type,  # type: ignore[arg-type]
         time_in_force=time_in_force,  # type: ignore[arg-type]
@@ -736,10 +948,17 @@ def validate_active_order_set(
             "invalid_active_order_set",
             f"active orders must be a sequence, got {type(orders).__name__}",
         )
+    if observed_account != expected_account:
+        _fail(
+            "account_mismatch",
+            f"expected {expected_account!r}, got {observed_account!r}",
+            field="account",
+        )
     context = BrokerOrderValidationContext(
         expected_account=expected_account,
         observed_account=observed_account,
         require_active=True,
+        require_exact_numerics=True,
     )
     validated: list[ValidatedBrokerOrder] = []
     seen_order_ids: set[str] = set()
@@ -776,6 +995,60 @@ def _timestamp_text(value: datetime | None) -> str | None:
     return None if value is None else value.astimezone(timezone.utc).isoformat()
 
 
+def validated_broker_order_mapping(order: ValidatedBrokerOrder) -> dict[str, Any]:
+    """Materialize one typed order with identical exact/legacy numerics.
+
+    Lifecycle/storage code historically reads the legacy keys. Returning a
+    fresh canonical mapping prevents a validated exact companion from being
+    discarded while a conflicting raw legacy value drives projection.
+    """
+    if not isinstance(order, ValidatedBrokerOrder):
+        raise TypeError("order must be ValidatedBrokerOrder")
+    quantity = _decimal_text(order.quantity)
+    notional = _decimal_text(order.notional)
+    limit_price = _decimal_text(order.limit_price)
+    filled_quantity = _decimal_text(order.filled_quantity)
+    filled_average_price = _decimal_text(order.filled_average_price)
+    return {
+        "order_id": order.order_id,
+        "client_order_id": order.client_order_id,
+        "ticker": order.ticker,
+        "asset_class": order.asset_class,
+        "order_class": order.order_class,
+        "extended_hours": order.extended_hours,
+        "legs": None,
+        "side": order.side,
+        "type": order.order_type,
+        "time_in_force": order.time_in_force,
+        "status": order.status,
+        "shares": quantity,
+        "shares_decimal": quantity,
+        "notional": notional,
+        "notional_decimal": notional,
+        "limit_price": limit_price,
+        "limit_price_decimal": limit_price,
+        "filled_qty": filled_quantity,
+        "filled_qty_decimal": filled_quantity,
+        "filled_avg_price": filled_average_price,
+        "filled_avg_price_decimal": filled_average_price,
+        "submitted_at": _timestamp_text(order.submitted_at),
+        "updated_at": _timestamp_text(order.updated_at),
+        "filled_at": _timestamp_text(order.filled_at),
+        "canceled_at": _timestamp_text(order.canceled_at),
+        "expired_at": _timestamp_text(order.expired_at),
+        "failed_at": _timestamp_text(order.failed_at),
+        "replaced_at": _timestamp_text(order.replaced_at),
+        "replaces": order.replaces,
+        "replaced_by": order.replaced_by,
+        "broker_account_id": (
+            None if order.account is None else order.account.account_id
+        ),
+        "broker_account_mode": (
+            None if order.account is None else order.account.account_mode
+        ),
+    }
+
+
 def _material_record(order: ValidatedBrokerOrder) -> dict[str, Any]:
     if not isinstance(order, ValidatedBrokerOrder):
         raise TypeError("fingerprints require ValidatedBrokerOrder values")
@@ -783,6 +1056,9 @@ def _material_record(order: ValidatedBrokerOrder) -> dict[str, Any]:
         "order_id": order.order_id,
         "client_order_id": order.client_order_id,
         "ticker": order.ticker,
+        "asset_class": order.asset_class,
+        "order_class": order.order_class,
+        "extended_hours": order.extended_hours,
         "side": order.side,
         "type": order.order_type,
         "time_in_force": order.time_in_force,
@@ -839,4 +1115,5 @@ __all__ = [
     "active_order_material_fingerprint",
     "validate_active_order_set",
     "validate_broker_order",
+    "validated_broker_order_mapping",
 ]

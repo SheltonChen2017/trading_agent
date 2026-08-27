@@ -43,9 +43,19 @@ FOLLOWING trading day's OPEN. Tax/cost modeling built in from the start.
 from __future__ import annotations
 
 import math
+from numbers import Real
 
 import pandas as pd
 
+from data.research_input_contracts import (
+    require_aligned_price_series,
+    require_combined_rates_at_most_one,
+    require_finite_number,
+    require_long_only_weights,
+    require_positive_int,
+    require_positive_number,
+    require_rate,
+)
 from strategies.leverage_rotation import cagr_pct, max_drawdown_pct
 from strategies.trend_vol_rotation import classify_trend
 
@@ -56,6 +66,8 @@ def compute_trailing_mean_and_variance(close: pd.Series, as_of: pd.Timestamp, lo
     """Trailing daily mean return and variance (both as plain decimals,
     e.g. 0.001 = 0.1%/day), ending at (and including) `as_of`. Purely
     backward-looking. Returns (None, None) if there isn't enough history."""
+    require_aligned_price_series({"close": close})
+    lookback_days = require_positive_int(lookback_days, name="lookback_days")
     if as_of not in close.index:
         return None, None
     idx = close.index.get_loc(as_of)
@@ -78,6 +90,9 @@ def compute_trend_acceleration_multiplier(
     (decelerating), even if the underlying is still above its long-term
     trend filter. Returns 1.0 (no dampening) if there isn't enough
     history to compute the slope, rather than guessing."""
+    require_aligned_price_series({"close": close})
+    medium_lookback_days = require_positive_int(medium_lookback_days, name="medium_lookback_days")
+    slope_lookback_days = require_positive_int(slope_lookback_days, name="slope_lookback_days")
     if as_of not in close.index:
         return 1.0
     idx = close.index.get_loc(as_of)
@@ -109,11 +124,27 @@ def compute_kelly_leveraged_weight(
     unknown inputs produced the MAXIMUM leveraged weight. None/zero/
     negative/inf were already handled correctly; only NaN failed, and it
     failed toward more leverage."""
+    kelly_fraction = require_finite_number(
+        kelly_fraction,
+        name="kelly_fraction",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    max_leveraged_weight = require_finite_number(
+        max_leveraged_weight,
+        name="max_leveraged_weight",
+        minimum=0.0,
+        maximum=1.0,
+    )
     if (
         mean_daily_return is None
         or variance_daily_return is None
-        or not math.isfinite(mean_daily_return)
-        or not math.isfinite(variance_daily_return)
+        or isinstance(mean_daily_return, bool)
+        or isinstance(variance_daily_return, bool)
+        or not isinstance(mean_daily_return, Real)
+        or not isinstance(variance_daily_return, Real)
+        or not math.isfinite(float(mean_daily_return))
+        or not math.isfinite(float(variance_daily_return))
         or variance_daily_return <= 0
     ):
         return 0.0
@@ -141,6 +172,52 @@ def simulate_kelly_rotation(
     cost_pct: float = 0.0,
     tax_rate: float = 0.0,
 ) -> dict:
+    require_aligned_price_series(
+        {
+            "stable_close": stable_close,
+            "leveraged_close": leveraged_close,
+            "stable_open": stable_open,
+            "leveraged_open": leveraged_open,
+        }
+    )
+    kelly_fraction = require_finite_number(
+        kelly_fraction,
+        name="kelly_fraction",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    max_leveraged_weight = require_finite_number(
+        max_leveraged_weight,
+        name="max_leveraged_weight",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    trend_lookback_days = require_positive_int(trend_lookback_days, name="trend_lookback_days")
+    kelly_lookback_days = require_positive_int(kelly_lookback_days, name="kelly_lookback_days")
+    rebalance_check_days = require_positive_int(rebalance_check_days, name="rebalance_check_days")
+    trend_acceleration_medium_days = require_positive_int(
+        trend_acceleration_medium_days,
+        name="trend_acceleration_medium_days",
+    )
+    trend_acceleration_slope_days = require_positive_int(
+        trend_acceleration_slope_days,
+        name="trend_acceleration_slope_days",
+    )
+    band_pct = require_finite_number(band_pct, name="band_pct", minimum=0.0, maximum=100.0)
+    initial_total = require_positive_number(initial_total, name="initial_total")
+    fallback_weights = require_long_only_weights(
+        fallback_weights,
+        name="fallback_weights",
+        expected_size=2,
+    )
+    cost_pct = require_rate(cost_pct, name="cost_pct")
+    tax_rate = require_rate(tax_rate, name="tax_rate", allow_one=True)
+    require_combined_rates_at_most_one(
+        cost_pct,
+        tax_rate,
+        first_name="cost_pct",
+        second_name="tax_rate",
+    )
     all_dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     stable_close = stable_close.reindex(all_dates)
     leveraged_close = leveraged_close.reindex(all_dates)
@@ -277,6 +354,34 @@ def grid_search_kelly(
     """Grid-searches (kelly_fraction, max_leveraged_weight), scored by
     Calmar ratio. Caller is responsible for only passing DISCOVERY-period
     price series."""
+    require_aligned_price_series(
+        {
+            "stable_close": stable_close,
+            "leveraged_close": leveraged_close,
+            "stable_open": stable_open,
+            "leveraged_open": leveraged_open,
+        }
+    )
+    if not kelly_fraction_options or not max_leveraged_weight_options:
+        raise ValueError("kelly_fraction_options and max_leveraged_weight_options must be non-empty")
+    kelly_fraction_options = tuple(
+        require_finite_number(
+            value,
+            name="kelly_fraction_options item",
+            minimum=0.0,
+            maximum=1.0,
+        )
+        for value in kelly_fraction_options
+    )
+    max_leveraged_weight_options = tuple(
+        require_finite_number(
+            value,
+            name="max_leveraged_weight_options item",
+            minimum=0.0,
+            maximum=1.0,
+        )
+        for value in max_leveraged_weight_options
+    )
     rows = []
     for kelly_fraction in kelly_fraction_options:
         for max_weight in max_leveraged_weight_options:

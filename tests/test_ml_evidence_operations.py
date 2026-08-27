@@ -5,6 +5,7 @@ import copy
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -370,6 +371,33 @@ def test_market_clock_conversion_is_after_close_across_host_zones_and_dst(
 
 WINDOWS_VERIFIER_REASON = "The verifier targets Windows PowerShell and Task Scheduler."
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
+REAL_INTERPRETER_REASON = (
+    "sys.executable is a Microsoft Store app execution alias, which the "
+    "installer refuses by contract; run under a real interpreter to exercise "
+    "the installer preview."
+)
+
+
+def _interpreter_is_store_alias() -> bool:
+    """Report whether ``sys.executable`` is a Store app execution alias.
+
+    Such an alias is a zero-byte reparse point, not an executable. The
+    installer refuses it deliberately, because a scheduled task pointed at one
+    can fail to launch while the task still looks healthy. A test that feeds
+    ``sys.executable`` to the installer therefore depends on how the developer
+    installed Python, so it must skip rather than report a product failure.
+    """
+    if os.name != "nt":
+        return False
+    try:
+        status = os.lstat(sys.executable)
+    except OSError:
+        return False
+    reparse = bool(
+        getattr(status, "st_file_attributes", 0)
+        & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+    )
+    return reparse or status.st_size == 0
 
 
 def _ps_quote(value: str | Path) -> str:
@@ -759,6 +787,7 @@ def _task_checks(report: dict) -> dict[str, dict]:
 
 
 @pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+@pytest.mark.skipif(_interpreter_is_store_alias(), reason=REAL_INTERPRETER_REASON)
 def test_windows_verifier_green_actions_match_installer_whatif_previews(tmp_path):
     """Data-only installer previews are the source of truth for action strings.
 

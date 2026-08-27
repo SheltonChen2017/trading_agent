@@ -1,21 +1,39 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-27 by Codex after the owner-authorized P1/P2/P3 remediation
-and one-time three-lane synchronization. This is a durable implementation
-handoff, not an acceptance record: Claude independent review of the exact
-pushed snapshots and Codex counter-review remain mandatory.
+Prepared: 2026-08-27 by Codex after the owner-authorized P1/P2/P3 remediation,
+one-time three-lane synchronization, and post-merge portfolio-equity correction.
+This is a durable implementation handoff, not an acceptance record: Claude
+independent review of the exact pushed snapshots and Codex counter-review remain
+mandatory.
 
 ## 0. Remediation implementation handoff
 
-- Root branch: `codex/full-review-p1-remediation-20260826`.
+- The root remediation was merged to `main` through PR #314 and PR #315; exact
+  merged head is `9e9843e9fc332cbbed63480834abe2c3f093a652` and the temporary root branch was
+  deleted after merge.
+- Current correction branch:
+  `codex/fix-portfolio-equity-rounding-20260827`. Exact code commit
+  `1ed06022d7f811a5977239be71e99c2fd7d37952` fixes an owner-reproduced P1 where
+  summing already-rounded position displays produced a total-equity display that
+  disagreed with the exact aggregate and prevented the paper assistant UI from
+  loading. The builder now aggregates exact Decimals and rounds once; the strict
+  integrity validator was not weakened.
 - Exact root code snapshot before this record-only update:
   `66168eda687d42a3cfda45a05e0de8f7781d3b87`. The final shared follow-up is
   `6770db3bc3934c4b0872d0cea6a256c28dec2cc8`; the isolated Analyst-only
   follow-up is `66168ed`. This handoff and the remediation ledger are the only
   later root-tree changes in the record commit.
-- The complete 109-finding ledger is retained at P0=0, P1=46, P2=49, P3=14.
-  Final Codex diff audits found no remaining P0-P3 implementation issue; this
-  does not substitute for the owner-required independent reviewer.
+- The complete 110-finding ledger is retained at P0=0, P1=47, P2=49, P3=14.
+  `SYS-FU-P1-006` records the post-merge correction. Codex found no generalized
+  second snapshot-construction instance; this does not substitute for the
+  owner-required independent reviewer.
+- Post-merge correction validation: focused portfolio/risk/coherent-snapshot
+  suite **112 passed, 0 failed, 1 dependency warning**; reverse mutation failed
+  the new regression at display `100.01` versus exact `100`; complete suite
+  **5,442 passed, 2 skipped, 0 failed, 25 dependency warnings in 1,944.33s
+  (32m24s)**; required repository-wide compileall exited 0 and `git diff --check`
+  was clean. Validation used fixtures only; Codex did not access a broker,
+  provider, credential, account, order, or operator database.
 - Exact root validation: touched-surface suite **922 passed in 313.42s**;
   complete suite **5,441 passed, 2 skipped, 0 failed, 25 dependency-
   deprecation warnings in 2,083.27s (34m43s)**; required repository-wide
@@ -43,6 +61,9 @@ pushed snapshots and Codex counter-review remain mandatory.
   that neither Analyst hardening commit nor any of its five-file surface
   entered Insider Buying or Short Interest. Each lane changed only its own
   implementation record after code validation.
+- The post-merge `SYS-FU-P1-006` correction has not been copied to any strategy
+  lane. The one-time common-remediation synchronization authority expired and
+  grants no authority for a later shared-file synchronization by inference.
 - No provider, credential, licensed row, outcome, QuantConnect job, broker,
   operator database, live scheduler, deployment, evidence epoch, paper order,
   or live order was accessed or changed. No research or trading authority was

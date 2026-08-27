@@ -39,7 +39,11 @@ from assistant.proposal_status import (
     SUBMISSION_UNKNOWN,
     SUBMITTING,
 )
-from assistant.storage import AssistantStore
+from assistant.storage import (
+    AssistantStore,
+    BrokerOrderBindingConflictError,
+    JournalTransactionConflictError,
+)
 from risk.execution_gate import TradeIntent, worst_case_fill_price_decimal
 
 
@@ -205,6 +209,12 @@ def journal_accepted_order(
             order,
             event_type="submission_response",
         )
+    except (BrokerOrderBindingConflictError, JournalTransactionConflictError):
+        # Storage already retained the original broker root/event, parked the
+        # ambiguity where applicable, and activated global containment. The
+        # compatibility fallback below must never overwrite that retained
+        # authority with the incoming colliding order.
+        raise
     except Exception as exc:
         store.update_proposal_status_if_current(
             proposal_id,

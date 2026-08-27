@@ -96,6 +96,7 @@ def _prediction_kwargs(**overrides):
         as_of_session="2026-07-30",
         generated_at="2026-07-31T00:00:00+00:00",
         horizon_sessions=20,
+        target_session="2026-08-27",
         target_available_at="2026-08-27T20:00:00+00:00",
         values={"annualized_volatility_pct": 24.3},
         uncertainty={"prediction_interval_pct": [18.1, 33.7]},
@@ -326,6 +327,22 @@ def test_prediction_record_rejects_non_finite_value():
 def test_prediction_record_rejects_non_positive_horizon():
     with pytest.raises(ContractError, match="integer >= 1"):
         PredictionRecord(**_prediction_kwargs(horizon_sessions=0))
+
+
+def test_prediction_record_rejects_a_calendar_day_or_wrong_target_session():
+    with pytest.raises(ContractError, match="target_session"):
+        PredictionRecord(
+            **_prediction_kwargs(target_session="2026-08-26")
+        )
+
+
+def test_prediction_record_rejects_availability_before_exchange_close():
+    with pytest.raises(ContractError, match="exchange-session close"):
+        PredictionRecord(
+            **_prediction_kwargs(
+                target_available_at="2026-08-27T19:59:59+00:00"
+            )
+        )
 
 
 def test_prediction_record_rejects_nonfinite_payload_even_when_unavailable():

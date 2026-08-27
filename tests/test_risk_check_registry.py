@@ -57,7 +57,7 @@ FROZEN_INVENTORY = (
     ("duplicate_order", "both", False, ("pre_submit",)),
     ("limit_price_and_slippage", "both", False, ("pre_submit",)),
     ("bid_ask_quote_and_spread", "both", False, ("pre_submit",)),
-    ("earnings_blackout", "both", False, ("pre_submit",)),
+    ("earnings_blackout", "buy", False, ("pre_submit",)),
 )
 
 

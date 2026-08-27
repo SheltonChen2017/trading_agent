@@ -9,6 +9,7 @@ Run with: python tests/test_alpaca_broker.py
 """
 import os
 import sys
+from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -17,6 +18,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import execution.alpaca_broker as broker
+
+_POLICY_FINGERPRINT = "b" * 64
 
 
 def _session_account_model(account_id="paper-account-1"):
@@ -49,6 +52,59 @@ def _clear_alpaca_env():
     os.environ.pop("CONFIRM_LIVE_TRADING", None)
 
 
+def _open_test_session(client, *, key="test-key", secret="test-secret", paper=True):
+    """Exercise the production constructor while substituting one SDK fake."""
+    client._api_key = key
+    client._secret_key = secret
+    client._sandbox = paper
+    client._base_url = (
+        broker._TRADING_PAPER_BASE_URL
+        if paper
+        else broker._TRADING_LIVE_BASE_URL
+    )
+    client._oauth_token = None
+    client._use_basic_auth = False
+    original_capture = broker._capture_connection_settings
+    original_factory = broker._new_trading_client
+    broker._capture_connection_settings = lambda: (key, secret, paper)
+    broker._new_trading_client = lambda *_args, **_kwargs: client
+    try:
+        return broker.AlpacaBrokerSession()
+    finally:
+        broker._capture_connection_settings = original_capture
+        broker._new_trading_client = original_factory
+
+
+def _validation_only_session(*, paper=True):
+    """A session whose local argument gates run before any broker method."""
+    return _open_test_session(SimpleNamespace(), paper=paper)
+
+
+def _bypass_final_dispatch_capabilities(monkeypatch):
+    """Keep narrow payload-format tests focused below already-tested guards."""
+    import assistant.dispatch_fence as dispatch_fence
+
+    @contextmanager
+    def permit_fence(*_args, **_kwargs):
+        yield
+
+    monkeypatch.setattr(
+        dispatch_fence,
+        "execution_dispatch_permit_fence",
+        permit_fence,
+    )
+    monkeypatch.setattr(
+        dispatch_fence,
+        "consume_execution_dispatch_permit",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(
+        broker.AlpacaBrokerSession,
+        "_assert_execution_quote_unchanged",
+        lambda *_args, **_kwargs: None,
+    )
+
+
 def test_is_configured_false_without_env_vars():
     _clear_alpaca_env()
     assert broker.is_configured() is False
@@ -72,99 +128,88 @@ def test_get_account_raises_when_not_configured():
 
 
 def test_submit_market_order_rejects_bad_share_count():
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
-    try:
-        broker.submit_market_order("AAPL", 0, idempotency_key="test-key")
-        assert False, "expected ValueError for zero shares"
-    except ValueError:
-        pass
-    finally:
-        _clear_alpaca_env()
+    with pytest.raises(ValueError):
+        _validation_only_session().submit_market_order(
+            "AAPL", 0, idempotency_key="test-key",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
+        )
 
 
 def test_submit_market_order_rejects_nan_shares():
     # GPT review, 2026-07-29: `shares <= 0` does not reject NaN (every
     # ordered comparison against NaN is False in Python), so this used to
     # reach client.submit_order() with zero protection at this layer.
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
-    try:
-        broker.submit_market_order("AAPL", float("nan"), idempotency_key="test-key")
-        assert False, "expected ValueError for NaN shares"
-    except ValueError:
-        pass
-    finally:
-        _clear_alpaca_env()
+    with pytest.raises(ValueError):
+        _validation_only_session().submit_market_order(
+            "AAPL", float("nan"), idempotency_key="test-key",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
+        )
 
 
 def test_submit_market_order_rejects_infinite_shares():
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
-    try:
-        broker.submit_market_order("AAPL", float("inf"), idempotency_key="test-key")
-        assert False, "expected ValueError for infinite shares"
-    except ValueError:
-        pass
-    finally:
-        _clear_alpaca_env()
+    with pytest.raises(ValueError):
+        _validation_only_session().submit_market_order(
+            "AAPL", float("inf"), idempotency_key="test-key",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
+        )
 
 
 def test_submit_market_order_rejects_fractional_shares():
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
-    try:
-        broker.submit_market_order("AAPL", 1.5, idempotency_key="test-key")
-        assert False, "expected ValueError for fractional shares"
-    except ValueError:
-        pass
-    finally:
-        _clear_alpaca_env()
+    with pytest.raises(ValueError):
+        _validation_only_session().submit_market_order(
+            "AAPL", 1.5, idempotency_key="test-key",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
+        )
 
 
 def test_submit_market_order_rejects_bool_shares():
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
-    try:
-        broker.submit_market_order("AAPL", True, idempotency_key="test-key")
-        assert False, "expected ValueError for bool shares"
-    except ValueError:
-        pass
-    finally:
-        _clear_alpaca_env()
+    with pytest.raises(ValueError):
+        _validation_only_session().submit_market_order(
+            "AAPL", True, idempotency_key="test-key",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
+        )
 
 
 def test_submit_limit_order_rejects_nan_shares():
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
-    try:
-        broker.submit_limit_order("AAPL", float("nan"), 150.0, idempotency_key="test-key")
-        assert False, "expected ValueError for NaN shares"
-    except ValueError:
-        pass
-    finally:
-        _clear_alpaca_env()
+    with pytest.raises(ValueError):
+        _validation_only_session().submit_limit_order(
+            "AAPL", float("nan"), 150.0, idempotency_key="test-key",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
+        )
 
 
 def test_fractional_market_order_uses_exact_rest_quantity_text(monkeypatch):
+    import json
+
+    _bypass_final_dispatch_capabilities(monkeypatch)
     monkeypatch.setattr(broker, "verify_execution_authorization", lambda *_a, **_k: None)
+    monkeypatch.setattr(
+        broker.AlpacaBrokerSession,
+        "_assert_registered_execution_snapshot",
+        lambda *_a, **_k: None,
+    )
+    monkeypatch.setattr(
+        broker.AlpacaBrokerSession,
+        "_assert_execution_snapshot_unchanged",
+        lambda *_a, **_k: None,
+    )
+    monkeypatch.setattr(
+        broker.AlpacaBrokerSession,
+        "_consume_registered_execution_snapshot",
+        lambda *_a, **_k: None,
+    )
     captured = {}
 
-    def fake_post(_self, url, payload):
-        captured.update(url=url, payload=payload)
-        return {
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            payload = captured["payload"]
+            return json.dumps({
             "id": "fractional-1",
             "client_order_id": payload["client_order_id"],
             "symbol": payload["symbol"],
@@ -173,7 +218,15 @@ def test_fractional_market_order_uses_exact_rest_quantity_text(monkeypatch):
             "type": payload["type"],
             "time_in_force": payload["time_in_force"],
             "status": "accepted",
-        }
+            }).encode("utf-8")
+
+    def fake_urlopen(request, *, timeout):
+        assert timeout == 30
+        captured.update(
+            url=request.full_url,
+            payload=json.loads(request.data.decode("utf-8")),
+        )
+        return FakeResponse()
 
     client = type(
         "FractionalClient",
@@ -185,15 +238,15 @@ def test_fractional_market_order_uses_exact_rest_quantity_text(monkeypatch):
             ),
         },
     )()
-    session = broker.AlpacaBrokerSession(
-        key="test-key", secret="test-secret", paper=True, client=client
-    )
-    monkeypatch.setattr(broker.AlpacaBrokerSession, "_http_post_json", fake_post)
+    session = _open_test_session(client)
+    monkeypatch.setattr(broker.urllib.request, "urlopen", fake_urlopen)
     result = session.submit_market_order(
         "AAPL",
         "0.123456789",
         whole_shares_only=False,
         idempotency_key="fractional-client-id",
+        expected_snapshot_id="unit-snapshot",
+        expected_policy_fingerprint=_POLICY_FINGERPRINT,
     )
     assert captured["payload"]["qty"] == "0.123456789"
     assert isinstance(captured["payload"]["qty"], str)
@@ -201,7 +254,13 @@ def test_fractional_market_order_uses_exact_rest_quantity_text(monkeypatch):
 
 
 def test_fractional_order_refuses_a_nonfractionable_asset_before_http(monkeypatch):
+    _bypass_final_dispatch_capabilities(monkeypatch)
     monkeypatch.setattr(broker, "verify_execution_authorization", lambda *_a, **_k: None)
+    monkeypatch.setattr(
+        broker.AlpacaBrokerSession,
+        "_assert_registered_execution_snapshot",
+        lambda *_a, **_k: None,
+    )
     client = type(
         "NonfractionableClient",
         (),
@@ -212,12 +271,10 @@ def test_fractional_order_refuses_a_nonfractionable_asset_before_http(monkeypatc
             ),
         },
     )()
-    session = broker.AlpacaBrokerSession(
-        key="test-key", secret="test-secret", paper=True, client=client
-    )
+    session = _open_test_session(client)
     monkeypatch.setattr(
-        broker.AlpacaBrokerSession,
-        "_http_post_json",
+        broker.urllib.request,
+        "urlopen",
         lambda *_a, **_k: pytest.fail("nonfractionable order contacted HTTP"),
     )
     with pytest.raises(broker.BrokerPreflightError):
@@ -226,16 +283,18 @@ def test_fractional_order_refuses_a_nonfractionable_asset_before_http(monkeypatc
             "0.5",
             whole_shares_only=False,
             idempotency_key="fractional-client-id",
+            expected_snapshot_id="unit-snapshot",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
         )
 
 
 def test_submit_market_order_refuses_live_without_confirmation():
     _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = False
     try:
-        broker.submit_market_order("AAPL", 10, idempotency_key="test-key")
+        _validation_only_session(paper=False).submit_market_order(
+            "AAPL", 10, idempotency_key="test-key",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
+        )
         assert False, "expected LiveTradingNotConfirmed"
     except broker.LiveTradingNotConfirmed:
         pass
@@ -251,18 +310,18 @@ def test_submit_market_order_refuses_live_without_confirmation():
 # future direct caller to supply one too.
 
 def test_submit_market_order_requires_idempotency_key():
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
+    session = _validation_only_session()
     try:
         try:
-            broker.submit_market_order("AAPL", 10)
+            session.submit_market_order("AAPL", 10)
             assert False, "expected a missing idempotency_key to raise"
         except TypeError:
             pass  # Python's own required-keyword-argument enforcement
         try:
-            broker.submit_market_order("AAPL", 10, idempotency_key="")
+            session.submit_market_order(
+                "AAPL", 10, idempotency_key="",
+                expected_policy_fingerprint=_POLICY_FINGERPRINT,
+            )
             assert False, "expected an empty idempotency_key to raise"
         except ValueError:
             pass
@@ -271,13 +330,13 @@ def test_submit_market_order_requires_idempotency_key():
 
 
 def test_submit_limit_order_requires_idempotency_key():
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
+    session = _validation_only_session()
     try:
         try:
-            broker.submit_limit_order("AAPL", 10, 150.0, idempotency_key="")
+            session.submit_limit_order(
+                "AAPL", 10, 150.0, idempotency_key="",
+                expected_policy_fingerprint=_POLICY_FINGERPRINT,
+            )
             assert False, "expected an empty idempotency_key to raise"
         except ValueError:
             pass
@@ -555,29 +614,73 @@ def test_live_preflight_accepts_the_matching_account_id():
 
 def test_submit_limit_order_refuses_live_without_confirmation():
     _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    original_paper = broker.PAPER_TRADING
-    broker.PAPER_TRADING = False
     try:
-        broker.submit_limit_order("AAPL", 10, 150.0, idempotency_key="k")
+        _validation_only_session(paper=False).submit_limit_order(
+            "AAPL", 10, 150.0, idempotency_key="k",
+            expected_policy_fingerprint=_POLICY_FINGERPRINT,
+        )
         assert False, "expected LiveTradingNotConfirmed for a live limit order"
     except broker.LiveTradingNotConfirmed:
         pass
     finally:
-        broker.PAPER_TRADING = original_paper
         _clear_alpaca_env()
 
 
+@pytest.mark.parametrize(
+    "method_name,args",
+    [
+        ("submit_market_order", ("AAPL", 1)),
+        ("submit_limit_order", ("AAPL", 1, 100.0)),
+    ],
+)
+def test_session_submit_requires_policy_fingerprint_before_broker_contact(
+    method_name, args
+):
+    class NoContactClient:
+        calls = 0
+
+        def __getattr__(self, _name):
+            type(self).calls += 1
+            raise AssertionError("missing policy binding contacted the broker")
+
+    session = _open_test_session(NoContactClient())
+    submit = getattr(session, method_name)
+
+    with pytest.raises(TypeError, match="expected_policy_fingerprint"):
+        submit(*args, idempotency_key="policy-required")
+    with pytest.raises(ValueError, match="expected_policy_fingerprint"):
+        submit(
+            *args,
+            idempotency_key="policy-required",
+            expected_policy_fingerprint=None,
+        )
+
+    assert NoContactClient.calls == 0
+
+
+def test_module_submit_facade_requires_policy_fingerprint_before_dispatch():
+    session = _validation_only_session()
+    with pytest.raises(TypeError, match="expected_policy_fingerprint"):
+        broker.submit_market_order(
+            "AAPL",
+            1,
+            idempotency_key="policy-required",
+            broker_session=session,
+        )
+
+
 def test_submit_orders_reject_an_invalid_side():
-    _clear_alpaca_env()
-    os.environ["APCA_API_KEY_ID"] = "test-key"
-    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
-    broker.PAPER_TRADING = True
+    session = _validation_only_session()
     try:
         for call in (
-            lambda: broker.submit_market_order("AAPL", 10, side="short", idempotency_key="k"),
-            lambda: broker.submit_limit_order("AAPL", 10, 150.0, side="short", idempotency_key="k"),
+            lambda: session.submit_market_order(
+                "AAPL", 10, side="short", idempotency_key="k",
+                expected_policy_fingerprint=_POLICY_FINGERPRINT,
+            ),
+            lambda: session.submit_limit_order(
+                "AAPL", 10, 150.0, side="short", idempotency_key="k",
+                expected_policy_fingerprint=_POLICY_FINGERPRINT,
+            ),
         ):
             try:
                 call()
@@ -732,6 +835,29 @@ def test_normalize_order_never_turns_a_missing_id_into_literal_none():
     assert normalized["order_id"] is None
 
 
+@pytest.mark.parametrize(
+    "bad_id",
+    ({"nested": "id"}, ["id"], 7, True, " padded ", "unknown", "bad\nid", "x" * 129),
+)
+def test_normalize_order_never_manufactures_a_broker_id_from_malformed_data(
+    bad_id,
+):
+    normalized = broker._normalize_order(
+        SimpleNamespace(id=bad_id, symbol="AAPL", qty="1", status="new")
+    )
+    assert normalized["order_id"] is None
+
+
+def test_normalize_order_canonicalizes_a_real_sdk_uuid_identity():
+    from uuid import UUID
+
+    order_id = UUID("12345678-1234-5678-1234-567812345678")
+    normalized = broker._normalize_order(
+        SimpleNamespace(id=order_id, symbol="AAPL", qty="1", status="new")
+    )
+    assert normalized["order_id"] == str(order_id)
+
+
 def test_normalize_trade_update_numbers_retain_exact_decimal_companions():
     assert broker._normalized_trade_update_numbers(
         fill_qty="0.123456789", fill_price="100.0001"
@@ -766,6 +892,21 @@ def test_a_usable_quote_component_converts_exactly():
     # float's binary expansion.
     assert _required_decimal(0.1, "bid price") == Decimal("0.1")
     assert _required_decimal("123.456", "ask price") == Decimal("123.456")
+
+
+def test_quote_midpoint_is_independent_of_ambient_decimal_context():
+    from decimal import localcontext
+
+    raw_quote = SimpleNamespace(
+        bid_price="10000000000000000000000000001",
+        ask_price="10000000000000000000000000003",
+        timestamp=None,
+    )
+    with localcontext() as hostile_context:
+        hostile_context.prec = 2
+        normalized = broker._normalize_latest_quote("AAPL", raw_quote)
+
+    assert normalized["price_decimal"] == "10000000000000000000000000002"
 
 
 def test_the_decimal_nan_comparison_trap_is_what_this_guards():

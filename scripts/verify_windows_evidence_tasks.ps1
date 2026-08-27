@@ -10,6 +10,10 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$DatabasePath,
 
+    # Optional highest-precedence override. When omitted, resolve through the
+    # same environment -> personal -> committed-default chain as runtime.
+    [string]$PolicyPath,
+
     # Required for the full eight-task verification (Scope "all"); with
     # Scope "operational" the ML shadow config/artifact checks are skipped
     # explicitly, so these may be omitted. Existence is validated at run
@@ -68,6 +72,9 @@ if ($verifyMl) {
 $resolvedPython = (Resolve-Path -LiteralPath $PythonPath).Path
 $database = [IO.Path]::GetFullPath($DatabasePath)
 $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+$repository = Split-Path -Parent $PSScriptRoot
+$assistantScript = Join-Path $repository "scripts\run_personal_assistant.py"
+$resolvedPolicy = ""
 
 function Resolve-AccountSid {
     # Task Scheduler stores the principal's UserId in short form
@@ -121,6 +128,69 @@ function Add-Check {
     $checks.Add([PSCustomObject]@{ Name = $Name; Ok = $Ok; Detail = $Detail })
 }
 
+$policyPathOk = $false
+$policyPathDetail = "policy identity could not be resolved"
+$policyIdentityOk = $false
+$policyFingerprint = ""
+$policyIdentityDetail = "required script is missing: $assistantScript"
+if (Test-Path -LiteralPath $assistantScript -PathType Leaf) {
+    $policyIdentityArguments = @($assistantScript)
+    if (-not [string]::IsNullOrWhiteSpace($PolicyPath)) {
+        $policyIdentityArguments += @("--policy", $PolicyPath.Trim())
+    }
+    $policyIdentityArguments += "policy-identity"
+    $policyIdentityOutput = @(
+        & $resolvedPython @policyIdentityArguments 2>&1
+    )
+    $policyIdentityExit = $LASTEXITCODE
+    if ($policyIdentityExit -eq 0) {
+        try {
+            $policyIdentity = ($policyIdentityOutput -join [Environment]::NewLine) |
+                ConvertFrom-Json
+            $identityPath = [string]$policyIdentity.policy_path
+            $policyFingerprint = [string]$policyIdentity.policy_fingerprint
+            $policyPathOk = (
+                -not [string]::IsNullOrWhiteSpace($identityPath) -and
+                (Test-Path -LiteralPath $identityPath -PathType Leaf)
+            )
+            if ($policyPathOk) {
+                $resolvedPolicy = (Resolve-Path -LiteralPath $identityPath).Path
+                $policyPathOk = $identityPath -eq $resolvedPolicy
+            }
+            $policyPathDetail = if ($policyPathOk) {
+                $resolvedPolicy
+            }
+            else {
+                "policy identity returned an unreadable or noncanonical path: $identityPath"
+            }
+            $policyIdentityOk = (
+                $policyPathOk -and
+                -not [string]::IsNullOrWhiteSpace($policyFingerprint) -and
+                $identityPath -eq $resolvedPolicy
+            )
+            $policyIdentityDetail = (
+                "path=$($policyIdentity.policy_path), " +
+                "fingerprint=$policyFingerprint"
+            )
+        }
+        catch {
+            $policyIdentityDetail = (
+                "policy identity output was invalid JSON: " +
+                $_.Exception.Message
+            )
+        }
+    }
+    else {
+        $policyIdentityDetail = (
+            "policy identity command failed with exit ${policyIdentityExit}: " +
+            ($policyIdentityOutput -join [Environment]::NewLine)
+        )
+        $policyPathDetail = $policyIdentityDetail
+    }
+}
+Add-Check -Name "policy_path" -Ok $policyPathOk -Detail $policyPathDetail
+Add-Check -Name "policy_identity" -Ok $policyIdentityOk -Detail $policyIdentityDetail
+
 Add-Check -Name "python_path" -Ok (Test-Path -LiteralPath $resolvedPython -PathType Leaf) -Detail $resolvedPython
 Add-Check -Name "database_path" -Ok (Test-Path -LiteralPath $database -PathType Leaf) -Detail $database
 if ($verifyMl) {
@@ -168,6 +238,11 @@ foreach ($taskName in $expectedTasks) {
     $task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
     if ($null -eq $task) {
         Add-Check -Name "task:$taskName" -Ok $false -Detail "not installed"
+        if ($operationalTasks -contains $taskName) {
+            Add-Check -Name "task_policy:$taskName" -Ok $false -Detail (
+                "task is not installed; policy identity cannot be verified"
+            )
+        }
         continue
     }
     $info = Get-ScheduledTaskInfo -TaskName $taskName
@@ -182,6 +257,36 @@ foreach ($taskName in $expectedTasks) {
     $actions = @($task.Actions)
     $pythonOk = $actions.Count -eq 1 -and `
         $actions[0].Execute -eq $resolvedPython
+    if ($operationalTasks -contains $taskName) {
+        $taskPolicyOk = $false
+        $taskPolicyDetail = "task must have exactly one action with one --policy path"
+        if ($actions.Count -eq 1) {
+            $matches = [regex]::Matches(
+                [string]$actions[0].Arguments,
+                '(?:^|\s)--policy\s+"([^"]+)"'
+            )
+            if ($matches.Count -eq 1) {
+                $taskPolicyPath = $matches[0].Groups[1].Value
+                if (Test-Path -LiteralPath $taskPolicyPath -PathType Leaf) {
+                    $taskPolicyPath = (Resolve-Path -LiteralPath $taskPolicyPath).Path
+                    $taskPolicyOk = $policyIdentityOk -and (
+                        $taskPolicyPath -eq $resolvedPolicy
+                    )
+                    $taskPolicyDetail = (
+                        "path=$taskPolicyPath, expected=$resolvedPolicy, " +
+                        "fingerprint=$policyFingerprint"
+                    )
+                }
+                else {
+                    $taskPolicyDetail = (
+                        "task policy path does not exist or is unreadable: " +
+                        $taskPolicyPath
+                    )
+                }
+            }
+        }
+        Add-Check -Name "task_policy:$taskName" -Ok $taskPolicyOk -Detail $taskPolicyDetail
+    }
     # Task Scheduler's "never ran" sentinel is 1999-11-30, not
     # [datetime]::MinValue, and a not-yet-run task reports LastTaskResult
     # 267011 (SCHED_S_TASK_HAS_NOT_RUN); a currently running task reports
@@ -213,6 +318,49 @@ foreach ($taskName in $expectedTasks) {
     )
 }
 
+$heartbeatReport = $null
+$heartbeatCheckOk = $false
+$heartbeatCheckDetail = "policy identity or database path was not usable"
+if (
+    $policyIdentityOk -and
+    (Test-Path -LiteralPath $database -PathType Leaf) -and
+    (Test-Path -LiteralPath $assistantScript -PathType Leaf)
+) {
+    $heartbeatArguments = @(
+        $assistantScript,
+        "--database", $database,
+        "--policy", $resolvedPolicy,
+        "verify-operational-policy-heartbeats"
+    )
+    if ($RequireTaskRun) {
+        $heartbeatArguments += "--require-all"
+    }
+    $heartbeatOutput = @(& $resolvedPython @heartbeatArguments 2>&1)
+    $heartbeatExit = $LASTEXITCODE
+    try {
+        $heartbeatReport = ($heartbeatOutput -join [Environment]::NewLine) |
+            ConvertFrom-Json
+        $heartbeatCheckOk = $heartbeatExit -eq 0 -and [bool]$heartbeatReport.ok
+        $heartbeatStatuses = @(
+            $heartbeatReport.checks.psobject.Properties | ForEach-Object {
+                "$($_.Name)=$($_.Value.status)"
+            }
+        ) -join ", "
+        $heartbeatCheckDetail = (
+            "expected_fingerprint=$policyFingerprint, " +
+            "degraded=$($heartbeatReport.degraded), " +
+            "statuses=[$heartbeatStatuses], exit=$heartbeatExit"
+        )
+    }
+    catch {
+        $heartbeatCheckDetail = (
+            "heartbeat verification output was invalid JSON (exit " +
+            "$heartbeatExit): " + ($heartbeatOutput -join [Environment]::NewLine)
+        )
+    }
+}
+Add-Check -Name "operational_policy_heartbeats" -Ok $heartbeatCheckOk -Detail $heartbeatCheckDetail
+
 $failed = @($checks | Where-Object { -not $_.Ok })
 $report = [PSCustomObject]@{
     CheckedAt = [datetime]::UtcNow.ToString("o")
@@ -222,6 +370,9 @@ $report = [PSCustomObject]@{
     CurrentUser = $currentUser
     ExpectedTaskLogonType = $ExpectedTaskLogonType
     RequireTaskRun = [bool]$RequireTaskRun
+    PolicyPath = $resolvedPolicy
+    PolicyFingerprint = $policyFingerprint
+    PolicyHeartbeatReport = $heartbeatReport
     Checks = $checks
     SkippedChecks = $skippedChecks
     FailedCheckCount = $failed.Count

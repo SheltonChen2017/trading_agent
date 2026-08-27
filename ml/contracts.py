@@ -28,6 +28,11 @@ from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
 from data.evidence_status import EvidenceStatus
+from data.exchange_calendar import (
+    ExchangeCalendarError,
+    resolve_target_availability,
+    resolve_target_session,
+)
 
 SCHEMA_VERSION = "1.0"
 _SUPPORTED_SCHEMA_VERSIONS = frozenset({SCHEMA_VERSION})
@@ -459,6 +464,7 @@ class PredictionRecord:
     as_of_session: str
     generated_at: str
     horizon_sessions: int
+    target_session: str
     target_available_at: str
     values: Mapping[str, Any]
     uncertainty: Mapping[str, Any]
@@ -501,9 +507,26 @@ class PredictionRecord:
             raise ContractError("data_available_at must not be after generated_at")
         if target_available_at <= generated_at:
             raise ContractError("target_available_at must be after generated_at")
-        if target_available_at.date() < as_of_session + timedelta(days=self.horizon_sessions):
+        try:
+            canonical_target_session = resolve_target_session(
+                self.as_of_session, self.horizon_sessions
+            )
+            canonical_target_available_at = _parse_timestamp(
+                resolve_target_availability(
+                    self.as_of_session, self.horizon_sessions
+                ),
+                "canonical_target_available_at",
+            )
+        except ExchangeCalendarError as exc:
+            raise ContractError(f"session horizon cannot be resolved: {exc}") from exc
+        if self.target_session != canonical_target_session:
             raise ContractError(
-                "target_available_at is earlier than the minimum possible horizon date"
+                "target_session does not match the exchange-session horizon: "
+                f"expected {canonical_target_session}, got {self.target_session!r}"
+            )
+        if target_available_at < canonical_target_available_at:
+            raise ContractError(
+                "target_available_at precedes the canonical exchange-session close"
             )
         _check_bool(self.available, "available")
         if not isinstance(self.refusal_reasons, (list, tuple)):

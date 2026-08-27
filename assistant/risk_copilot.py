@@ -9,6 +9,7 @@ estimate (see schemas.py's module docstring for why that rule matters).
 from __future__ import annotations
 
 import math
+from decimal import Decimal
 from typing import Any
 
 import numpy as np
@@ -17,6 +18,7 @@ import pandas as pd
 from config import BASKETS, INVERSE_LEVERAGED_ETF_TICKERS, LEVERAGED_ETF_UNDERLYING
 from data.market_data import fetch_historical
 from assistant.policy import TradingPolicy
+from assistant.money import to_decimal
 from assistant.schemas import PortfolioSnapshot, RiskExposure
 
 
@@ -502,50 +504,76 @@ def check_policy_compliance(portfolio: PortfolioSnapshot, policy: TradingPolicy)
     full set of caps assistant/proposals.py and risk/execution_gate.py
     already enforce.
     """
+    from assistant.portfolio_snapshot import (
+        PortfolioSnapshotIntegrityError,
+        validate_long_only_portfolio_snapshot,
+    )
+
+    try:
+        validate_long_only_portfolio_snapshot(portfolio)
+    except PortfolioSnapshotIntegrityError as exc:
+        return [f"Portfolio integrity unavailable: {exc}"]
+
     violations: list[str] = []
-    total = portfolio.total_equity
-    if not math.isfinite(total) or total <= 0:
+    total = portfolio.total_equity_exact_decimal
+    if total <= 0:
         return [
-            "Portfolio total equity is non-positive or non-finite; policy "
+            "Portfolio total equity is non-positive; policy "
             "compliance cannot be computed safely."
         ]
 
     for position in portfolio.positions:
-        pct = position.market_value / total * 100
-        if pct > policy.max_position_pct * 100:
+        pct = position.exact_field("market_value") / total * Decimal("100")
+        if pct > to_decimal(policy.max_position_pct) * Decimal("100"):
             violations.append(
                 f"{position.ticker} is {pct:.2f}% of equity, exceeding the policy's "
                 f"max_position_pct limit of {policy.max_position_pct * 100:.1f}%."
             )
 
     for basket_name, basket_tickers in BASKETS.items():
-        basket_value = sum(p.market_value for p in portfolio.positions if p.ticker.upper() in basket_tickers)
+        basket_value = sum(
+            (
+                p.exact_field("market_value")
+                for p in portfolio.positions
+                if p.ticker.upper() in basket_tickers
+            ),
+            Decimal("0"),
+        )
         if basket_value <= 0:
             continue
         pct = basket_value / total * 100
-        if pct > policy.max_basket_pct * 100:
+        if pct > to_decimal(policy.max_basket_pct) * Decimal("100"):
             violations.append(
                 f"Basket '{basket_name}' is {pct:.2f}% of equity, exceeding the policy's "
                 f"max_basket_pct limit of {policy.max_basket_pct * 100:.1f}%."
             )
 
-    leveraged_value = sum(p.market_value for p in portfolio.positions if p.is_leveraged_etf)
+    leveraged_value = sum(
+        (
+            p.exact_field("market_value")
+            for p in portfolio.positions
+            if p.is_leveraged_etf
+        ),
+        Decimal("0"),
+    )
     leveraged_pct = leveraged_value / total * 100
-    if leveraged_pct > policy.max_leveraged_etf_pct * 100:
+    if leveraged_pct > to_decimal(policy.max_leveraged_etf_pct) * Decimal("100"):
         violations.append(
             f"Leveraged-ETF exposure is {leveraged_pct:.2f}% of equity, exceeding the policy's "
             f"max_leveraged_etf_pct limit of {policy.max_leveraged_etf_pct * 100:.1f}%."
         )
 
-    invested_pct = sum(p.market_value for p in portfolio.positions) / total * 100
-    if invested_pct > policy.max_total_exposure_pct * 100:
+    invested_pct = sum(
+        (p.exact_field("market_value") for p in portfolio.positions), Decimal("0")
+    ) / total * Decimal("100")
+    if invested_pct > to_decimal(policy.max_total_exposure_pct) * Decimal("100"):
         violations.append(
             f"Total invested exposure is {invested_pct:.2f}% of equity, exceeding the policy's "
             f"max_total_exposure_pct limit of {policy.max_total_exposure_pct * 100:.1f}%."
         )
 
-    cash_pct = portfolio.cash / total * 100
-    if cash_pct < policy.min_cash_reserve_pct * 100:
+    cash_pct = portfolio.cash_exact_decimal / total * Decimal("100")
+    if cash_pct < to_decimal(policy.min_cash_reserve_pct) * Decimal("100"):
         violations.append(
             f"Cash reserve is {cash_pct:.2f}% of equity, below the policy's "
             f"min_cash_reserve_pct minimum of {policy.min_cash_reserve_pct * 100:.1f}%."

@@ -17,6 +17,7 @@ from typing import Literal
 
 from config import MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
 from assistant.process_singleton import ProcessSingleton, ProcessSingletonError
+from assistant.temporal_integrity import MAX_ORDER_AGE_MINUTES
 
 DEFAULT_POLICY_PATH = Path(__file__).resolve().parent / "default_policy.json"
 PERSONAL_POLICY_PATH = Path(__file__).resolve().parent / "my_policy.json"
@@ -202,10 +203,14 @@ class TradingPolicy:
         max_order_age_minutes = _finite_real(
             "max_order_age_minutes", self.max_order_age_minutes
         )
-        if max_order_age_minutes <= 0:
+        if (
+            max_order_age_minutes <= 0
+            or max_order_age_minutes > MAX_ORDER_AGE_MINUTES
+        ):
             raise ValueError(
-                "max_order_age_minutes must be a positive, finite number, "
-                f"got {self.max_order_age_minutes}."
+                "max_order_age_minutes must be a positive, finite number no "
+                f"greater than {MAX_ORDER_AGE_MINUTES}, got "
+                f"{self.max_order_age_minutes}."
             )
         max_stale_price_minutes = _finite_real(
             "max_stale_price_minutes", self.max_stale_price_minutes

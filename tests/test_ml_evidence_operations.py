@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import copy
 import json
 import os
 import shutil
@@ -311,7 +312,7 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
     assert "Get-ScheduledTask" in verifier
     assert "Get-ScheduledTaskInfo" in verifier
     assert "value not displayed" in verifier
-    assert "$task.Principal.LogonType -eq $ExpectedTaskLogonType" in verifier
+    assert '$logonType -eq $ExpectedTaskLogonType' in verifier
     assert "not verifiable: rerun as $RunAsUser" in verifier
     assert "ProductionAuthoritative = $false" in verifier
     assert "[datetime]$PaperObservationLocalTime = [datetime]::MinValue" in operational
@@ -367,186 +368,319 @@ def test_market_clock_conversion_is_after_close_across_host_zones_and_dst(
     assert (market_clock.hour, market_clock.minute) > (16, 0)
 
 
-@pytest.mark.skipif(
-    os.name != "nt",
-    reason="The verifier targets Windows PowerShell and Task Scheduler.",
-)
-def test_windows_verifier_accepts_a_freshly_installed_never_run_task(tmp_path):
-    """Field failure 2026-08-05 (first install on the operational host):
-    Task Scheduler stores the principal UserId in SHORT form while the
-    operator passes DOMAIN\\name, reports LastTaskResult 267011
-    (SCHED_S_TASK_HAS_NOT_RUN) for a fresh task, and uses 1999-11-30 (not
-    DateTime.MinValue) as the never-ran sentinel. The submitted verifier
-    failed every correctly installed task on all three. This harness stubs
-    ONE present task exactly as the field reported it -- short-form user,
-    267011, 1999 sentinel -- using the real current user's two name forms
-    so the SID normalization genuinely resolves, and requires the overall
-    report to pass. A completed run's genuine nonzero exit must still
-    fail (second stub)."""
-    powershell = shutil.which("powershell")
-    assert powershell is not None, "Windows validation requires powershell.exe"
+WINDOWS_VERIFIER_REASON = "The verifier targets Windows PowerShell and Task Scheduler."
+REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 
-    database = tmp_path / "paper.db"
-    database.touch()
-    verifier = (
-        Path(__file__).resolve().parent.parent
-        / "scripts"
-        / "verify_windows_evidence_tasks.ps1"
-    )
 
-    def ps_quote(value) -> str:
-        return "'" + str(value).replace("'", "''") + "'"
+def _ps_quote(value: str | Path) -> str:
+    return "'" + str(value).replace("'", "''") + "'"
 
+
+def _task_quote(value: str | Path) -> str:
+    escaped = str(value).replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+def _cim(class_name: str) -> dict:
+    return {"CimClassName": class_name}
+
+
+def _time_trigger(minutes: int) -> dict:
+    return {
+        "CimClass": _cim("MSFT_TaskTimeTrigger"),
+        "Enabled": True,
+        "StartBoundary": (datetime.now() - timedelta(minutes=1)).isoformat(
+            timespec="seconds"
+        ),
+        "Repetition": {"Interval": f"PT{minutes}M", "Duration": "P3650D"},
+    }
+
+
+def _weekly_trigger(hour: int, minute: int) -> dict:
+    boundary = datetime.now().replace(hour=hour, minute=minute, second=0, microsecond=0)
+    return {
+        "CimClass": _cim("MSFT_TaskWeeklyTrigger"),
+        "Enabled": True,
+        "StartBoundary": boundary.isoformat(timespec="seconds"),
+        "WeeksInterval": 1,
+        "DaysOfWeek": 62,
+    }
+
+
+def _logon_trigger(user: str) -> dict:
+    return {
+        "CimClass": _cim("MSFT_TaskLogonTrigger"),
+        "Enabled": True,
+        "UserId": user,
+    }
+
+
+def _settings(
+    *, restart_count: int, restart_minutes: int, execution_minutes: int,
+    battery_operation: bool,
+) -> dict:
+    settings = {
+        "Enabled": True,
+        "StartWhenAvailable": True,
+        "MultipleInstances": "IgnoreNew",
+        "RestartCount": restart_count,
+        "RestartInterval": f"PT{restart_minutes}M",
+        "ExecutionTimeLimit": (
+            "PT0S" if execution_minutes == 0 else f"PT{execution_minutes}M"
+        ),
+        "DisallowStartIfOnBatteries": not battery_operation,
+        "StopIfGoingOnBatteries": not battery_operation,
+    }
+    return settings
+
+
+def _task(
+    name: str,
+    arguments: str,
+    triggers: list[dict],
+    *,
+    user: str,
+    settings: dict,
+) -> dict:
+    return {
+        "TaskName": name,
+        "TaskPath": "\\",
+        "State": "Ready",
+        "Principal": {
+            "UserId": user,
+            "RunLevel": "Limited",
+            "LogonType": "Interactive",
+        },
+        "Actions": [
+            {
+                "CimClass": _cim("MSFT_TaskExecAction"),
+                "Execute": str(Path(sys.executable).resolve()),
+                "Arguments": arguments,
+                "WorkingDirectory": str(REPOSITORY_ROOT),
+            }
+        ],
+        "Triggers": triggers,
+        "Settings": settings,
+    }
+
+
+def _windows_verifier_case(tmp_path: Path, scope: str = "operational") -> dict:
+    from assistant.policy import DEFAULT_POLICY_PATH
+    from assistant.storage import AssistantStore
+
+    database = (tmp_path / "paper.db").resolve()
+    AssistantStore(database)
+    config = (tmp_path / "shadow.json").resolve()
+    config.write_text("{}", encoding="utf-8")
+    artifacts = (tmp_path / "shadow-artifacts").resolve()
+    artifacts.mkdir()
+    policy = DEFAULT_POLICY_PATH.resolve()
+    python = Path(sys.executable).resolve()
     short_user = os.environ["USERNAME"]
     full_user = f"{os.environ.get('USERDOMAIN', short_user)}\\{short_user}"
 
-    def harness_script(last_task_result: int) -> str:
-        return "\n".join(
-            (
-                "$ErrorActionPreference = 'Stop'",
-                "function Get-ScheduledTask {",
-                "    [CmdletBinding()]",
-                "    param([string]$TaskName)",
-                "    return [PSCustomObject]@{",
-                "        TaskName = $TaskName",
-                "        State = 'Ready'",
-                "        Principal = [PSCustomObject]@{",
-                f"            UserId = {ps_quote(short_user)}",
-                "            RunLevel = 'Limited'",
-                "            LogonType = 'Interactive'",
-                "        }",
-                "        Actions = @([PSCustomObject]@{",
-                f"            Execute = {ps_quote(sys.executable)}",
-                "        })",
-                "    }",
-                "}",
-                "function Get-ScheduledTaskInfo {",
-                "    [CmdletBinding()]",
-                "    param([string]$TaskName)",
-                "    return [PSCustomObject]@{",
-                f"        LastTaskResult = {last_task_result}",
-                "        LastRunTime = [datetime]'1999-11-30'",
-                "        NextRunTime = $null",
-                "    }",
-                "}",
-                (
-                    f"& {ps_quote(verifier)} "
-                    f"-RunAsUser {ps_quote(full_user)} "
-                    f"-PythonPath {ps_quote(sys.executable)} "
-                    f"-DatabasePath {ps_quote(database)} "
-                    "-RequiredCredentialNames @() "
-                    "-Scope operational"
-                ),
-                "exit $LASTEXITCODE",
+    assistant = REPOSITORY_ROOT / "scripts" / "run_personal_assistant.py"
+    watchdog = REPOSITORY_ROOT / "scripts" / "run_operations_watchdog.py"
+    shadow = REPOSITORY_ROOT / "scripts" / "run_ml_shadow.py"
+    supervisor = REPOSITORY_ROOT / "scripts" / "run_ml_evidence_supervisor.py"
+    alerts = REPOSITORY_ROOT / "data" / "alerts.jsonl"
+    monitoring = REPOSITORY_ROOT / "artifacts" / "ml-shadow-monitoring.json"
+    supervisor_output = REPOSITORY_ROOT / "artifacts" / "ml-evidence-supervisor.json"
+
+    assistant_arg = _task_quote(assistant)
+    watchdog_arg = _task_quote(watchdog)
+    database_arg = _task_quote(database)
+    policy_arg = _task_quote(policy)
+    alerts_arg = _task_quote(alerts)
+    operational_commands = {
+        "TradingAgent-Paper-OperationsCycle": (
+            f"{assistant_arg} --database {database_arg} --policy {policy_arg} "
+            f"operations-cycle --cancel-stale --alerts-jsonl {alerts_arg}"
+        ),
+        "TradingAgent-Paper-OrderMonitor": (
+            f"{assistant_arg} --database {database_arg} --policy {policy_arg} "
+            "monitor-orders --cancel-stale --poll-seconds 30"
+        ),
+        "TradingAgent-Paper-Watchdog": (
+            f"{watchdog_arg} --database {database_arg} --policy {policy_arg} "
+            f"--interval-seconds 60 --alerts-jsonl {alerts_arg}"
+        ),
+        "TradingAgent-Paper-PaperObservation": (
+            f"{assistant_arg} --database {database_arg} --policy {policy_arg} "
+            f"paper-observation --cancel-stale --alerts-jsonl {alerts_arg}"
+        ),
+    }
+    short_settings = _settings(
+        restart_count=3,
+        restart_minutes=1,
+        execution_minutes=8,
+        battery_operation=True,
+    )
+    long_settings = _settings(
+        restart_count=10,
+        restart_minutes=1,
+        execution_minutes=0,
+        battery_operation=True,
+    )
+    tasks = [
+        _task(
+            "TradingAgent-Paper-OperationsCycle",
+            operational_commands["TradingAgent-Paper-OperationsCycle"],
+            [_time_trigger(10)],
+            user=short_user,
+            settings=copy.deepcopy(short_settings),
+        ),
+        _task(
+            "TradingAgent-Paper-OrderMonitor",
+            operational_commands["TradingAgent-Paper-OrderMonitor"],
+            [_logon_trigger(short_user), _time_trigger(5)],
+            user=short_user,
+            settings=copy.deepcopy(long_settings),
+        ),
+        _task(
+            "TradingAgent-Paper-Watchdog",
+            operational_commands["TradingAgent-Paper-Watchdog"],
+            [_logon_trigger(short_user), _time_trigger(5)],
+            user=short_user,
+            settings=copy.deepcopy(long_settings),
+        ),
+        _task(
+            "TradingAgent-Paper-PaperObservation",
+            operational_commands["TradingAgent-Paper-PaperObservation"],
+            [_weekly_trigger(16, 30)],
+            user=short_user,
+            settings=copy.deepcopy(short_settings),
+        ),
+    ]
+
+    ml_commands: dict[str, str] = {}
+    if scope == "all":
+        shadow_arg = _task_quote(shadow)
+        supervisor_arg = _task_quote(supervisor)
+        config_arg = _task_quote(config)
+        artifacts_arg = _task_quote(artifacts)
+        monitoring_arg = _task_quote(monitoring)
+        supervisor_output_arg = _task_quote(supervisor_output)
+        common = (
+            f"{shadow_arg} --database {database_arg} --config {config_arg} "
+            f"--artifact-dir {artifacts_arg} --alerts-jsonl {alerts_arg}"
+        )
+        ml_commands = {
+            "TradingAgent-ML-Shadow-Predict": f"{common} predict",
+            "TradingAgent-ML-Shadow-Mature": f"{common} mature",
+            "TradingAgent-ML-Shadow-Monitor": (
+                f"{common} monitor --output {monitoring_arg}"
+            ),
+            # The installer retains this trailing space for an empty credential list.
+            "TradingAgent-ML-Shadow-Supervisor": (
+                f"{supervisor_arg} --database {database_arg} --config {config_arg} "
+                f"--artifact-dir {artifacts_arg} --alerts-jsonl {alerts_arg} "
+                f"--output {supervisor_output_arg} "
+            ),
+        }
+        ml_settings = _settings(
+            restart_count=3,
+            restart_minutes=5,
+            execution_minutes=30,
+            battery_operation=False,
+        )
+        for name, trigger in (
+            ("TradingAgent-ML-Shadow-Predict", _weekly_trigger(16, 30)),
+            ("TradingAgent-ML-Shadow-Mature", _weekly_trigger(17, 0)),
+            ("TradingAgent-ML-Shadow-Monitor", _weekly_trigger(17, 15)),
+            ("TradingAgent-ML-Shadow-Supervisor", _time_trigger(15)),
+        ):
+            tasks.append(
+                _task(
+                    name,
+                    ml_commands[name],
+                    [trigger],
+                    user=short_user,
+                    settings=copy.deepcopy(ml_settings),
+                )
             )
-        )
 
-    def run_harness(last_task_result: int):
-        harness = tmp_path / f"run-verifier-{last_task_result}.ps1"
-        harness.write_text(harness_script(last_task_result), encoding="utf-8")
-        result = subprocess.run(
-            [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-        return result, json.loads(result.stdout)
+    infos = {
+        task["TaskName"]: {
+            "LastTaskResult": 0,
+            "LastRunTime": datetime.now().isoformat(timespec="seconds"),
+            "NextRunTime": None,
+        }
+        for task in tasks
+    }
+    return {
+        "fixture": {"Tasks": tasks, "Infos": infos},
+        "database": database,
+        "config": config,
+        "artifacts": artifacts,
+        "policy": policy,
+        "python": python,
+        "short_user": short_user,
+        "full_user": full_user,
+        "operational_commands": operational_commands,
+        "ml_commands": ml_commands,
+    }
 
-    # 267011 = not yet run: a fresh, correctly installed task must PASS.
-    result, report = run_harness(267011)
-    assert result.returncode == 0, result.stdout
-    assert report["Ok"] is True
-    assert report["FailedCheckCount"] == 0
 
-    # A post-start verification must NOT accept the same never-ran state.
-    # Credential Guard exposed exactly this failure direction: requesting a
-    # start can return without error while the task remains at 267011.
-    harness = tmp_path / "run-verifier-require-task-run.ps1"
-    harness.write_text(
-        harness_script(267011).replace(
-            "-Scope operational", "-Scope operational -RequireTaskRun"
-        ),
-        encoding="utf-8",
+def _task_by_name(case: dict, task_name: str) -> dict:
+    return next(
+        task for task in case["fixture"]["Tasks"] if task["TaskName"] == task_name
     )
-    result = subprocess.run(
-        [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    report = json.loads(result.stdout)
-    assert result.returncode == 1
-    assert report["Ok"] is False
-    assert report["RequireTaskRun"] is True
-
-    # An inconsistent sentinel date plus a genuine error code must fail
-    # closed; only the exact 1999/267011 never-run pair is tolerated.
-    result, report = run_harness(1)
-    assert result.returncode == 1
-    assert report["Ok"] is False
-
-    # A completed run's genuine nonzero exit (e.g. 1) must still FAIL --
-    # this second shape uses a real run date so only the exit code decides.
-    harness = tmp_path / "run-verifier-real-failure.ps1"
-    harness.write_text(
-        harness_script(1).replace(
-            "[datetime]'1999-11-30'", "[datetime]'2026-08-05'"
-        ),
-        encoding="utf-8",
-    )
-    result = subprocess.run(
-        [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    report = json.loads(result.stdout)
-    assert result.returncode == 1
-    assert report["Ok"] is False
 
 
-def test_windows_operational_verifier_executes_without_ml_paths(tmp_path):
-    """Exercise the real PowerShell scope instead of only inspecting source.
-
-    Scheduler cmdlets are replaced with read-only no-task stubs so this test
-    verifies parameter binding, conditional expressions, JSON reporting, and
-    fail-closed task absence without touching the host scheduler.
-    """
+def _run_windows_verifier(
+    tmp_path: Path,
+    case: dict,
+    *,
+    scope: str,
+    require_task_run: bool = False,
+) -> tuple[subprocess.CompletedProcess[str], dict]:
     powershell = shutil.which("powershell")
     assert powershell is not None, "Windows validation requires powershell.exe"
-
-    database = tmp_path / "paper.db"
-    database.touch()
-    verifier = (
-        Path(__file__).resolve().parent.parent
-        / "scripts"
-        / "verify_windows_evidence_tasks.ps1"
-    )
-
-    def ps_quote(value: str | Path) -> str:
-        return "'" + str(value).replace("'", "''") + "'"
-
+    fixture_path = tmp_path / "scheduled-task-fixture.json"
+    fixture_path.write_text(json.dumps(case["fixture"]), encoding="utf-8")
+    verifier = REPOSITORY_ROOT / "scripts" / "verify_windows_evidence_tasks.ps1"
+    ml_arguments = ""
+    if scope == "all":
+        ml_arguments = (
+            f" -ConfigPath {_ps_quote(case['config'])}"
+            f" -ArtifactPath {_ps_quote(case['artifacts'])}"
+        )
+    require_argument = " -RequireTaskRun" if require_task_run else ""
     harness = tmp_path / "run-verifier.ps1"
     harness.write_text(
         "\n".join(
             (
                 "$ErrorActionPreference = 'Stop'",
+                (
+                    "$global:VerifierFixture = Get-Content -Raw -LiteralPath "
+                    f"{_ps_quote(fixture_path)} | ConvertFrom-Json"
+                ),
                 "function Get-ScheduledTask {",
                 "    [CmdletBinding()]",
                 "    param([string]$TaskName)",
+                "    @($global:VerifierFixture.Tasks) | Where-Object { $_.TaskName -eq $TaskName }",
+                "}",
+                "function Get-ScheduledTaskInfo {",
+                "    [CmdletBinding()]",
+                "    param([Parameter(Mandatory = $true)][object]$InputObject)",
+                "    $property = $global:VerifierFixture.Infos.PSObject.Properties[$InputObject.TaskName]",
+                "    if ($null -ne $property) { return $property.Value }",
                 "    return $null",
                 "}",
-                "function Get-ScheduledTaskInfo { throw 'unexpected task-info call' }",
                 (
-                    f"& {ps_quote(verifier)} "
-                    f"-RunAsUser 'REVIEW\\verifier' "
-                    f"-PythonPath {ps_quote(sys.executable)} "
-                    f"-DatabasePath {ps_quote(database)} "
-                    "-RequiredCredentialNames @() "
-                    "-Scope operational"
+                    f"& {_ps_quote(verifier)}"
+                    f" -RunAsUser {_ps_quote(case['full_user'])}"
+                    f" -PythonPath {_ps_quote(case['python'])}"
+                    f" -DatabasePath {_ps_quote(case['database'])}"
+                    f" -RepositoryPath {_ps_quote(REPOSITORY_ROOT)}"
+                    f" -PolicyPath {_ps_quote(case['policy'])}"
+                    " -RequiredCredentialNames @()"
+                    " -PaperObservationLocalTime '2000-01-01T16:30:00'"
+                    " -PredictionLocalTime '2000-01-01T16:30:00'"
+                    " -MaturityLocalTime '2000-01-01T17:00:00'"
+                    " -MonitoringLocalTime '2000-01-01T17:15:00'"
+                    f" -Scope {scope}{ml_arguments}{require_argument}"
                 ),
                 "exit $LASTEXITCODE",
             )
@@ -554,30 +688,297 @@ def test_windows_operational_verifier_executes_without_ml_paths(tmp_path):
         encoding="utf-8",
     )
     result = subprocess.run(
-        [
-            powershell,
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            str(harness),
-        ],
+        [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
         check=False,
         capture_output=True,
         text=True,
         timeout=30,
     )
-    assert result.returncode == 1, result.stderr
-    report = json.loads(result.stdout)
+    assert result.stdout, (
+        f"verifier emitted no JSON (exit={result.returncode}): {result.stderr}"
+    )
+    return result, json.loads(result.stdout)
+
+
+def _run_installer_preview(tmp_path: Path, case: dict, *, lane: str) -> list[dict]:
+    powershell = shutil.which("powershell")
+    assert powershell is not None, "Windows validation requires powershell.exe"
+    if lane == "operational":
+        installer = REPOSITORY_ROOT / "scripts" / "install_windows_operational_tasks.ps1"
+        lane_arguments = (
+            f" -PolicyPath {_ps_quote(case['policy'])}"
+            " -PaperObservationLocalTime '2000-01-01T16:30:00'"
+        )
+    else:
+        installer = REPOSITORY_ROOT / "scripts" / "install_windows_ml_shadow_tasks.ps1"
+        lane_arguments = (
+            f" -ConfigPath {_ps_quote(case['config'])}"
+            f" -ArtifactPath {_ps_quote(case['artifacts'])}"
+            " -RequiredCredentialNames @()"
+            " -PredictionLocalTime '2000-01-01T16:30:00'"
+            " -MaturityLocalTime '2000-01-01T17:00:00'"
+            " -MonitoringLocalTime '2000-01-01T17:15:00'"
+        )
+    harness = tmp_path / f"preview-{lane}-installer.ps1"
+    harness.write_text(
+        "\n".join(
+            (
+                "$ErrorActionPreference = 'Stop'",
+                (
+                    f"$preview = @(& {_ps_quote(installer)}"
+                    f" -PythonPath {_ps_quote(case['python'])}"
+                    f" -DatabasePath {_ps_quote(case['database'])}"
+                    f" -RepositoryPath {_ps_quote(REPOSITORY_ROOT)}"
+                    f" -RunAsUser {_ps_quote(case['full_user'])}"
+                    " -TaskLogonType Interactive"
+                    f"{lane_arguments} -WhatIf)"
+                ),
+                "$preview | ConvertTo-Json -Depth 5",
+            )
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout, result.stderr
+    return json.loads(result.stdout)
+
+
+def _task_checks(report: dict) -> dict[str, dict]:
+    return {
+        check["Name"].removeprefix("task:"): check
+        for check in report["Checks"]
+        if check["Name"].startswith("task:")
+    }
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+def test_windows_verifier_green_actions_match_installer_whatif_previews(tmp_path):
+    """Data-only installer previews are the source of truth for action strings.
+
+    Neither preview reaches a ScheduledTasks cmdlet. This pins the behavioral
+    fixtures (and therefore the verifier's green contract) to both installers,
+    so future argument-order or default-path drift fails before deployment.
+    """
+    case = _windows_verifier_case(tmp_path, scope="all")
+    expected = {
+        task["TaskName"]: task["Actions"][0] for task in case["fixture"]["Tasks"]
+    }
+    previews = _run_installer_preview(tmp_path, case, lane="operational")
+    previews += _run_installer_preview(tmp_path, case, lane="ml")
+    assert len(previews) == 8
+    for preview in previews:
+        action = expected[preview["TaskName"]]
+        assert preview["Execute"] == action["Execute"]
+        assert preview["Arguments"] == action["Arguments"]
+        assert preview["WorkingDirectory"] == action["WorkingDirectory"]
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+def test_windows_verifier_accepts_exact_operational_contract_and_queued_state(tmp_path):
+    case = _windows_verifier_case(tmp_path)
+    _task_by_name(case, "TradingAgent-Paper-OperationsCycle")["State"] = "Queued"
+    result, report = _run_windows_verifier(tmp_path, case, scope="operational")
+    assert result.returncode == 0, report
+    assert report["Ok"] is True
+    assert report["FailedCheckCount"] == 0
+    assert len(_task_checks(report)) == 4
+    assert all(check["Ok"] is True for check in _task_checks(report).values())
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+def test_windows_verifier_accepts_exact_all_eight_task_contract(tmp_path):
+    case = _windows_verifier_case(tmp_path, scope="all")
+    result, report = _run_windows_verifier(tmp_path, case, scope="all")
+    assert result.returncode == 0, report
+    assert report["Ok"] is True
+    assert report["FailedCheckCount"] == 0
+    assert len(_task_checks(report)) == 8
+    assert all(check["Ok"] is True for check in _task_checks(report).values())
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+@pytest.mark.parametrize(
+    ("scope", "mutation", "task_name", "detail_fragment"),
+    [
+        ("operational", "swapped_command", "TradingAgent-Paper-OperationsCycle", "arguments"),
+        ("operational", "wrong_database", "TradingAgent-Paper-OperationsCycle", "arguments"),
+        ("operational", "wrong_policy", "TradingAgent-Paper-OrderMonitor", "arguments"),
+        ("operational", "missing_subcommand", "TradingAgent-Paper-Watchdog", "arguments"),
+        ("operational", "working_directory", "TradingAgent-Paper-PaperObservation", "working_directory"),
+        ("operational", "extra_action", "TradingAgent-Paper-OperationsCycle", "action_count"),
+        ("operational", "wrong_action_type", "TradingAgent-Paper-OperationsCycle", "action_type"),
+        ("operational", "wrong_interval", "TradingAgent-Paper-OperationsCycle", "interval"),
+        ("operational", "missing_trigger", "TradingAgent-Paper-OrderMonitor", "expected 2"),
+        ("operational", "wrong_weekdays", "TradingAgent-Paper-PaperObservation", "days_of_week"),
+        ("operational", "disabled", "TradingAgent-Paper-Watchdog", "enabled"),
+        ("operational", "wrong_task_path", "TradingAgent-Paper-OperationsCycle", "exact root"),
+        ("operational", "multiple_instances", "TradingAgent-Paper-OrderMonitor", "multiple_instances"),
+        ("operational", "start_when_available", "TradingAgent-Paper-OperationsCycle", "start_when_available"),
+        ("operational", "restart_interval", "TradingAgent-Paper-Watchdog", "restart_interval"),
+        ("operational", "battery_stop", "TradingAgent-Paper-PaperObservation", "battery_stop"),
+        ("operational", "restart_count", "TradingAgent-Paper-Watchdog", "restart_count"),
+        ("all", "wrong_config", "TradingAgent-ML-Shadow-Predict", "arguments"),
+        ("all", "wrong_artifact", "TradingAgent-ML-Shadow-Mature", "arguments"),
+        ("all", "wrong_output", "TradingAgent-ML-Shadow-Monitor", "arguments"),
+        ("all", "extra_credential", "TradingAgent-ML-Shadow-Supervisor", "arguments"),
+        ("all", "wrong_clock", "TradingAgent-ML-Shadow-Predict", "local_time"),
+        ("all", "wrong_supervisor_interval", "TradingAgent-ML-Shadow-Supervisor", "interval"),
+        ("all", "ml_execution_limit", "TradingAgent-ML-Shadow-Mature", "execution_time_limit"),
+        ("all", "ml_battery_start", "TradingAgent-ML-Shadow-Predict", "battery_start"),
+    ],
+)
+def test_windows_verifier_rejects_dangerous_one_field_task_mutations(
+    tmp_path, scope, mutation, task_name, detail_fragment
+):
+    case = _windows_verifier_case(tmp_path, scope=scope)
+    task = _task_by_name(case, task_name)
+    action = task["Actions"][0]
+    if mutation == "swapped_command":
+        action["Arguments"] = case["operational_commands"][
+            "TradingAgent-Paper-PaperObservation"
+        ]
+    elif mutation == "wrong_database":
+        action["Arguments"] = action["Arguments"].replace(
+            _task_quote(case["database"]), _task_quote(tmp_path / "other.db")
+        )
+    elif mutation == "wrong_policy":
+        action["Arguments"] = action["Arguments"].replace(
+            _task_quote(case["policy"]), _task_quote(tmp_path / "other-policy.json")
+        )
+    elif mutation == "missing_subcommand":
+        action["Arguments"] = action["Arguments"].replace(" --interval-seconds 60", "")
+    elif mutation == "working_directory":
+        action["WorkingDirectory"] = str(tmp_path)
+    elif mutation == "extra_action":
+        task["Actions"].append(copy.deepcopy(action))
+    elif mutation == "wrong_action_type":
+        action["CimClass"] = _cim("MSFT_TaskComHandlerAction")
+    elif mutation == "wrong_interval":
+        task["Triggers"][0]["Repetition"]["Interval"] = "PT11M"
+    elif mutation == "missing_trigger":
+        task["Triggers"] = task["Triggers"][:1]
+    elif mutation == "wrong_weekdays":
+        task["Triggers"][0]["DaysOfWeek"] = 2
+    elif mutation == "disabled":
+        task["Settings"]["Enabled"] = False
+        task["State"] = "Disabled"
+    elif mutation == "wrong_task_path":
+        task["TaskPath"] = "\\Other\\"
+    elif mutation == "multiple_instances":
+        task["Settings"]["MultipleInstances"] = "Parallel"
+    elif mutation == "start_when_available":
+        task["Settings"]["StartWhenAvailable"] = False
+    elif mutation == "restart_interval":
+        task["Settings"]["RestartInterval"] = "PT30M"
+    elif mutation == "battery_stop":
+        task["Settings"]["StopIfGoingOnBatteries"] = True
+    elif mutation == "restart_count":
+        task["Settings"]["RestartCount"] = 0
+    elif mutation == "wrong_config":
+        action["Arguments"] = action["Arguments"].replace(
+            _task_quote(case["config"]), _task_quote(tmp_path / "other-shadow.json")
+        )
+    elif mutation == "wrong_artifact":
+        action["Arguments"] = action["Arguments"].replace(
+            _task_quote(case["artifacts"]), _task_quote(tmp_path / "other-artifacts")
+        )
+    elif mutation == "wrong_output":
+        action["Arguments"] = action["Arguments"].replace(
+            _task_quote(REPOSITORY_ROOT / "artifacts" / "ml-shadow-monitoring.json"),
+            _task_quote(tmp_path / "other-monitoring.json"),
+        )
+    elif mutation == "extra_credential":
+        action["Arguments"] += '--required-credential "UNEXPECTED_SECRET_NAME"'
+    elif mutation == "wrong_clock":
+        task["Triggers"][0]["StartBoundary"] = datetime.now().replace(
+            hour=9, minute=30, second=0, microsecond=0
+        ).isoformat(timespec="seconds")
+    elif mutation == "wrong_supervisor_interval":
+        task["Triggers"][0]["Repetition"]["Interval"] = "PT30M"
+    elif mutation == "ml_execution_limit":
+        task["Settings"]["ExecutionTimeLimit"] = "PT5M"
+    elif mutation == "ml_battery_start":
+        task["Settings"]["DisallowStartIfOnBatteries"] = False
+    else:  # pragma: no cover - keeps additions fail-closed
+        raise AssertionError(f"unknown mutation: {mutation}")
+
+    result, report = _run_windows_verifier(tmp_path, case, scope=scope)
+    assert result.returncode == 1
+    assert report["Ok"] is False
+    checks = _task_checks(report)
+    assert checks[task_name]["Ok"] is False
+    assert detail_fragment in checks[task_name]["Detail"]
+    assert all(
+        check["Ok"] is True for name, check in checks.items() if name != task_name
+    )
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+def test_windows_verifier_preserves_never_run_and_completed_error_contract(tmp_path):
+    case = _windows_verifier_case(tmp_path)
+    for info in case["fixture"]["Infos"].values():
+        info["LastTaskResult"] = 267011
+        info["LastRunTime"] = "1999-11-30T00:00:00"
+
+    result, report = _run_windows_verifier(tmp_path, case, scope="operational")
+    assert result.returncode == 0, report
+    assert all(check["Ok"] is True for check in _task_checks(report).values())
+
+    result, report = _run_windows_verifier(
+        tmp_path, case, scope="operational", require_task_run=True
+    )
+    assert result.returncode == 1
+    assert report["RequireTaskRun"] is True
+    assert all(check["Ok"] is False for check in _task_checks(report).values())
+
+    # The sentinel date only permits the exact SCHED_S_TASK_HAS_NOT_RUN code.
+    # Sentinel + genuine failure must remain a fail-closed inconsistency.
+    for info in case["fixture"]["Infos"].values():
+        info["LastTaskResult"] = 1
+    result, report = _run_windows_verifier(tmp_path, case, scope="operational")
+    assert result.returncode == 1
+    assert all(check["Ok"] is False for check in _task_checks(report).values())
+
+    for info in case["fixture"]["Infos"].values():
+        info["LastTaskResult"] = 1
+        info["LastRunTime"] = datetime.now().isoformat(timespec="seconds")
+    result, report = _run_windows_verifier(tmp_path, case, scope="operational")
+    assert result.returncode == 1
+    assert all(check["Ok"] is False for check in _task_checks(report).values())
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+def test_windows_operational_verifier_executes_without_ml_paths(tmp_path):
+    case = _windows_verifier_case(tmp_path)
+    case["fixture"]["Tasks"] = []
+    case["fixture"]["Infos"] = {}
+    result, report = _run_windows_verifier(tmp_path, case, scope="operational")
+    assert result.returncode == 1
     assert report["Scope"] == "operational"
     assert report["Ok"] is False
     assert report["ProductionAuthoritative"] is False
-    assert report["FailedCheckCount"] == 4
-    assert [item["Name"] for item in report["Checks"] if item["Name"].startswith("task:")] == [
-        "task:TradingAgent-Paper-OperationsCycle",
-        "task:TradingAgent-Paper-OrderMonitor",
-        "task:TradingAgent-Paper-Watchdog",
-        "task:TradingAgent-Paper-PaperObservation",
+    assert report["FailedCheckCount"] == 8
+    assert list(_task_checks(report)) == [
+        "TradingAgent-Paper-OperationsCycle",
+        "TradingAgent-Paper-OrderMonitor",
+        "TradingAgent-Paper-Watchdog",
+        "TradingAgent-Paper-PaperObservation",
+    ]
+    assert [
+        item["Name"] for item in report["Checks"]
+        if item["Name"].startswith("task_policy:")
+    ] == [
+        "task_policy:TradingAgent-Paper-OperationsCycle",
+        "task_policy:TradingAgent-Paper-OrderMonitor",
+        "task_policy:TradingAgent-Paper-Watchdog",
+        "task_policy:TradingAgent-Paper-PaperObservation",
     ]
     assert [item["Name"] for item in report["SkippedChecks"]] == [
         "config_path",

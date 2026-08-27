@@ -75,7 +75,11 @@ def _reserve(store: AssistantStore, proposal_id: str) -> None:
     )
 
 
-def _sell_broker(**overrides) -> ScriptedBroker:
+def _sell_broker(
+    *,
+    execution_positions=None,
+    **overrides,
+) -> ScriptedBroker:
     behaviours = {
         "is_configured": True,
         "assert_account_and_asset_ready": ready_account(),
@@ -84,7 +88,10 @@ def _sell_broker(**overrides) -> ScriptedBroker:
         "find_order_by_client_id": None,
     }
     behaviours.update(overrides)
-    return ScriptedBroker(**behaviours)
+    return ScriptedBroker(
+        execution_positions=execution_positions,
+        **behaviours,
+    )
 
 
 # --------------------------------------------------------------------------
@@ -268,7 +275,11 @@ def test_f5_halted_ticker_refused_but_other_risk_reducing_sell_proceeds(store, p
     holdings = _held_portfolio(held_position("HALTX"), held_position("AAPL"))
 
     store.save_proposal(make_proposal("p-f5-halt", side="sell", ticker="HALTX"))
-    broker = _sell_broker(assert_account_and_asset_ready=preflight)
+    execution_positions = [held_position("HALTX"), held_position("AAPL")]
+    broker = _sell_broker(
+        execution_positions=execution_positions,
+        assert_account_and_asset_ready=preflight,
+    )
     with scripted_broker(broker):
         with pytest.raises(ProposalExecutionError) as caught:
             execute_approved_paper_proposal(
@@ -286,7 +297,10 @@ def test_f5_halted_ticker_refused_but_other_risk_reducing_sell_proceeds(store, p
 
     # The OTHER holding's risk-reducing sell still executes.
     store.save_proposal(make_proposal("p-f5-sell", side="sell", ticker="AAPL"))
-    broker_ok = _sell_broker(assert_account_and_asset_ready=preflight)
+    broker_ok = _sell_broker(
+        execution_positions=execution_positions,
+        assert_account_and_asset_ready=preflight,
+    )
     with scripted_broker(broker_ok):
         result = execute_approved_paper_proposal(
             "p-f5-sell", "approve", holdings, policy, store, now_et=NOW_ET,
@@ -309,7 +323,9 @@ def test_f6_share_count_mismatch_after_corporate_action_is_refused(store, policy
     proposal["expected_impact"] = {"position_shares_before": "10"}
     store.save_proposal(proposal)
     post_split = _held_portfolio(held_position("AAPL", shares=20.0))
-    broker = _sell_broker()
+    broker = _sell_broker(
+        execution_positions=[held_position("AAPL", shares=20.0)]
+    )
 
     with scripted_broker(broker):
         with pytest.raises(ProposalExecutionError):

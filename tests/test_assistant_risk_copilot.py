@@ -44,7 +44,7 @@ def test_check_concentration_reports_specific_basket():
     "positions,cash,buying_power",
     [
         ([{"ticker": "AAPL", "shares": -1, "entry_price": 10, "current_price": 10}], 100, None),
-        ([{"ticker": "AAPL", "shares": 0, "entry_price": 10, "current_price": 10}], 100, None),
+        ([{"ticker": "AAPL", "shares": 0, "entry_price": 10, "current_price": 10, "market_value": 1}], 100, None),
         ([{"ticker": "AAPL", "shares": 1, "entry_price": 0, "current_price": 10}], 100, None),
         ([{"ticker": "AAPL", "shares": 1, "entry_price": 10, "current_price": 0}], 100, None),
         ([{"ticker": "AAPL", "shares": 1, "entry_price": 10, "current_price": 10, "market_value": 11}], 100, None),
@@ -61,6 +61,23 @@ def test_snapshot_builder_refuses_non_long_only_or_inconsistent_state(
             cash=cash,
             buying_power=buying_power,
         )
+
+
+def test_zero_share_zero_value_row_is_normalized_to_not_held_state():
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "AAPL",
+                "shares": 0,
+                "entry_price": 10,
+                "current_price": 10,
+            }
+        ],
+        cash=100,
+    )
+
+    assert snapshot.positions == []
+    assert snapshot.total_equity_exact == "100"
 
 
 def test_direct_malformed_snapshot_is_degraded_in_reports_and_blocked_by_gate():
@@ -207,7 +224,10 @@ def test_check_policy_compliance_flags_a_basket_breach_rounding_would_have_hidde
     # of this check. AAPL is a member of config.BASKETS["tech"].
     positions = [{"ticker": "AAPL", "shares": 1, "entry_price": 4_004.0, "current_price": 4_004.0}]
     snapshot = build_portfolio_snapshot(positions, cash=5_996.0)  # AAPL = 4004/10000 = 40.04%
-    violations = check_policy_compliance(snapshot, _policy(max_position_pct=1.0, max_basket_pct=0.40))
+    violations = check_policy_compliance(
+        snapshot,
+        _policy(max_position_pct=0.50, max_basket_pct=0.40),
+    )
     assert any("tech" in v and "40.04%" in v for v in violations)
 
 
@@ -246,10 +266,31 @@ def test_check_policy_compliance_flags_total_exposure_over_the_cap():
     # GPT review, 2026-07-28, reproduced: a 60%-invested portfolio against
     # a 50% max_total_exposure_pct limit reported no violation at all --
     # this check was entirely missing.
-    positions = [{"ticker": "AAPL", "shares": 1, "entry_price": 6_000.0, "current_price": 6_000.0}]
-    snapshot = build_portfolio_snapshot(positions, cash=4_000.0)  # invested = 6000/10000 = 60%
+    positions = [
+        {
+            "ticker": "AAA",
+            "shares": 1,
+            "entry_price": 3_000.0,
+            "current_price": 3_000.0,
+        },
+        {
+            "ticker": "BBB",
+            "shares": 1,
+            "entry_price": 3_000.0,
+            "current_price": 3_000.0,
+        },
+    ]
+    snapshot = build_portfolio_snapshot(
+        positions, cash=4_000.0
+    )  # invested = 6000/10000 = 60%; each position = 30%
     violations = check_policy_compliance(
-        snapshot, _policy(max_position_pct=1.0, max_basket_pct=1.0, max_leveraged_etf_pct=1.0, max_total_exposure_pct=0.50),
+        snapshot,
+        _policy(
+            max_position_pct=0.50,
+            max_basket_pct=1.0,
+            max_leveraged_etf_pct=1.0,
+            max_total_exposure_pct=0.50,
+        ),
     )
     assert any("Total invested exposure" in v and "60.00%" in v for v in violations)
 

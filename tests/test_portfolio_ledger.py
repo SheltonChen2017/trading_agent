@@ -37,7 +37,12 @@ from assistant.portfolio_ledger import (
     sync_broker_activities,
     acknowledge_broker_activity,
 )
-from assistant.storage import BrokerActivityAcknowledgementConflictError
+from assistant.dispatch_fence import get_runtime_emergency_stop
+from assistant.storage import (
+    BrokerActivityAcknowledgementConflictError,
+    BrokerOrderBindingConflictError,
+    JournalTransactionConflictError,
+)
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 from assistant.storage import AssistantStore
 
@@ -406,7 +411,10 @@ def test_broker_order_and_event_ids_cannot_be_rebound(tmp_path):
         proposal_updates={"broker_order": order},
     )
 
-    with pytest.raises(ValueError, match="already bound to proposal"):
+    with pytest.raises(
+        BrokerOrderBindingConflictError,
+        match="already bound to proposal",
+    ):
         store.project_broker_order_event(
             event_id="event-2",
             proposal_id="tp-2",
@@ -419,7 +427,10 @@ def test_broker_order_and_event_ids_cannot_be_rebound(tmp_path):
         )
 
     second_order = dict(order, order_id="order-2")
-    with pytest.raises(ValueError, match="event-1.*already bound"):
+    with pytest.raises(
+        JournalTransactionConflictError,
+        match="event-1.*already bound",
+    ):
         store.project_broker_order_event(
             event_id="event-1",
             proposal_id="tp-2",
@@ -431,8 +442,24 @@ def test_broker_order_and_event_ids_cannot_be_rebound(tmp_path):
             proposal_updates={"broker_order": second_order},
         )
 
-    assert store.list_broker_orders()[0]["proposal_id"] == "tp-1"
-    assert store.get_proposal("tp-2")["status"] == "submitting"
+    orders = store.list_broker_orders()
+    assert len(orders) == 1
+    assert orders[0]["proposal_id"] == "tp-1"
+    assert orders[0]["order_id"] == "order-1"
+    events = store.list_broker_order_events()
+    assert len(events) == 1
+    assert events[0]["event_id"] == "event-1"
+    assert events[0]["proposal_id"] == "tp-1"
+    assert events[0]["order_id"] == "order-1"
+    second = store.get_proposal("tp-2")
+    assert second["status"] == "submission_unknown"
+    assert "existing broker projection was retained" in second["error"]
+    assert store.get_kill_switch()["active"] is True
+    assert get_runtime_emergency_stop(store.path)["active"] is True
+    alert_categories = {
+        alert["category"] for alert in store.list_operational_alerts(status="open")
+    }
+    assert alert_categories == {"broker_order_binding", "broker_event_integrity"}
 
 
 def _postings_for_account(store: AssistantStore, account: str) -> list[dict]:

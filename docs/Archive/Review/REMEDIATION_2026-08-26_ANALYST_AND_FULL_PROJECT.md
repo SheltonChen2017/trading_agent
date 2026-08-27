@@ -50,12 +50,12 @@ refusal behavior, but it cannot register production bytes or lift any gate.
 | Area | Original P1 | Follow-up P1 | Final P1 | Original P2 | Follow-up P2 | Final P2 | Original P3 | Follow-up P3 | Final P3 | P0 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Research / Analyst Revisions V2 | 0 | 14 | 2 | 17 | 11 | 0 | 7 | 2 | 0 | 0 |
-| Remaining project | 6 | 5 | 19 | 13 | 4 | 4 | 3 | 2 | 0 | 0 |
-| **Total** | **6** | **19** | **21** | **30** | **15** | **4** | **10** | **4** | **0** | **0** |
+| Remaining project | 6 | 6 | 19 | 13 | 4 | 4 | 3 | 2 | 0 | 0 |
+| **Total** | **6** | **20** | **21** | **30** | **15** | **4** | **10** | **4** | **0** | **0** |
 
-The 46 original findings, 38 first-follow-up findings, and 25 final-adversarial
-findings are all mapped below. The aggregate is explicit: **P0=0, P1=46,
-P2=49, P3=14, total=109**. Follow-up IDs use `AR-FU-*` and `SYS-FU-*`; final
+The 46 original findings, 39 first-follow-up findings, and 25 final-adversarial
+findings are all mapped below. The aggregate is explicit: **P0=0, P1=47,
+P2=49, P3=14, total=110**. Follow-up IDs use `AR-FU-*` and `SYS-FU-*`; final
 adversarial IDs use `AR-FINAL-*` and `SYS-FINAL-*`. Both are additive to, not
 replacements for, the original audit IDs.
 
@@ -1463,6 +1463,7 @@ replacements for, the original audit IDs.
 | SYS-FU-P1-003 | P1 | Malformed persistent stop fails closed | Execution/readiness tests |
 | SYS-FU-P1-004 | P1 | Broker-session mode is immutable after client capture | `tests/test_coherent_broker_snapshot.py` |
 | SYS-FU-P1-005 | P1 | Final recapture binds policy-driving valuations | `tests/test_coherent_broker_snapshot.py` |
+| SYS-FU-P1-006 | P1 | Portfolio equity display aggregates exact values before one rounding step | `tests/test_assistant_risk_copilot.py` |
 | SYS-FU-P2-001 | P2 | Anomaly recurrence preserves/reopens halt and alert | Reconciliation anomaly tests |
 | SYS-FU-P2-002 | P2 | Unexpected managed triggers rejected; event insert read back exactly once | Schema/event-ledger tests |
 | SYS-FU-P2-003 | P2 | Fallback event identity uses normalized UTC time | Broker-event ledger tests |
@@ -2075,6 +2076,37 @@ replacements for, the original audit IDs.
 - **Residual owner/operational decision:** this intentionally favors refusal under
   ordinary market movement; any future tolerance policy would be a separately
   reviewed authorization design.
+
+### SYS-FU-P1-006 — Rounded position displays made valid portfolios fail integrity
+
+**Implementation status:** Implemented at `1ed06022d7f811a5977239be71e99c2fd7d37952` — pending required independent review/counter-review.
+
+- **Root cause:** `build_portfolio_snapshot` computed the displayed total equity
+  by adding each position's already-cent-rounded display value, but paired that
+  result with exact equity computed from the unrounded position evidence. With
+  multiple fractional-share positions, independent rounding errors accumulated
+  and the newly strict display/exact validator correctly rejected the builder's
+  internally inconsistent snapshot. The owner reproduced this on the paper UI;
+  packet construction stopped before the application rendered.
+- **HOW and WHERE:** `assistant/portfolio_snapshot.py` now sums cash and every
+  exact `market_value` Decimal first and rounds that single authoritative total
+  once for `PortfolioSnapshot.total_equity`. The exact companion is derived from
+  the same aggregate. No tolerance was widened and the validator remains strict.
+- **Safety invariant:** a displayed aggregate and its exact companion derive from
+  one authoritative sum; presentation rounding cannot accumulate into a second
+  competing portfolio value. Corrupt caller-supplied companions still fail
+  closed.
+- **Regression evidence:**
+  `test_snapshot_builder_aggregates_exact_values_before_display_rounding`
+  constructs two positions whose individual `$25.00` displays plus displayed
+  cash would produce `$100.01`, while their exact aggregate is `$100.00`. The
+  corrected builder returns exact `100` and display `100.0`. Reverse mutation to
+  the old sum-of-displays implementation fails at the integrity validator with
+  display `100.01` versus exact `100`.
+- **Residual owner/operational decision:** this correction was made on the generic
+  post-merge branch only. The expired one-time lane synchronization exception
+  does not authorize copying it to the three long-lived strategy branches; that
+  requires explicit owner direction.
 
 ### SYS-FU-P2-001 — Repeated anomaly handling could leave a proposal reconciling without an open alert
 
@@ -2894,6 +2926,15 @@ position normalization and exact Windows scheduled-task contract. Those audits
 and green tests are implementation evidence, not the required independent
 Claude acceptance.
 
+After the merge, the owner reproduced `SYS-FU-P1-006` while loading the paper
+assistant UI. Post-merge correction `1ed06022d7f811a5977239be71e99c2fd7d37952`
+passed the 112-test portfolio/risk/coherent-snapshot focus set with one dependency
+warning. Its reverse mutation failed the new regression exactly as intended.
+The exact corrected code tree then passed **5,442 tests, 2 skipped, 0 failed,
+25 dependency warnings in 1,944.33 seconds (32m24s)**; required repository-wide
+`compileall` exited 0 and `git diff --check` was clean. No broker or provider was
+contacted by this correction or its fixture-only validation.
+
 | Validation | Recorded disposition |
 |---|---|
 | Research/Analyst focused | Covered by the 922-test touched-surface run and the 5,434-test exact Analyst lane run, including snapshot, normalization, dataset, formula, holdings, portfolio, cost, preregistration, quarantine, and architecture boundaries. |
@@ -2950,7 +2991,7 @@ authorization to observe outcomes or operate an account.
 An independent reviewer must not close this ledger until all of the following are
 true on one exact pushed snapshot:
 
-1. all 109 IDs above receive an explicit independent disposition;
+1. all 110 IDs above receive an explicit independent disposition;
 2. every original finding is cross-checked against the source audit and retained;
 3. every follow-up finding is reproduced or otherwise concretely verified;
 4. all P1 fixes receive concurrency/crash/fault/restart evidence where applicable;

@@ -9,9 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
 import pandas as pd
+import pytest
 
 import assistant.risk_copilot as risk_copilot
-from assistant.context_builder import build_portfolio_snapshot
+from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy
 from assistant.risk_copilot import (
     check_concentration,
@@ -20,7 +21,9 @@ from assistant.risk_copilot import (
     find_correlated_clusters,
     portfolio_risk_decomposition,
 )
-from assistant.schemas import RiskExposure
+from assistant.portfolio_snapshot import PortfolioSnapshotIntegrityError
+from assistant.schemas import PortfolioPosition, PortfolioSnapshot, RiskExposure
+from risk.execution_gate import TradeIntent, ViolationCode, validate_trade_intent
 
 
 def test_check_concentration_reports_specific_basket():
@@ -35,6 +38,62 @@ def test_check_concentration_reports_specific_basket():
 
     answer_unheld = check_concentration(risk, basket_name="utilities")
     assert "No current exposure" in answer_unheld
+
+
+@pytest.mark.parametrize(
+    "positions,cash,buying_power",
+    [
+        ([{"ticker": "AAPL", "shares": -1, "entry_price": 10, "current_price": 10}], 100, None),
+        ([{"ticker": "AAPL", "shares": 0, "entry_price": 10, "current_price": 10}], 100, None),
+        ([{"ticker": "AAPL", "shares": 1, "entry_price": 0, "current_price": 10}], 100, None),
+        ([{"ticker": "AAPL", "shares": 1, "entry_price": 10, "current_price": 0}], 100, None),
+        ([{"ticker": "AAPL", "shares": 1, "entry_price": 10, "current_price": 10, "market_value": 11}], 100, None),
+        ([], -1, None),
+        ([], 100, -1),
+    ],
+)
+def test_snapshot_builder_refuses_non_long_only_or_inconsistent_state(
+    positions, cash, buying_power
+):
+    with pytest.raises(PortfolioSnapshotIntegrityError):
+        build_portfolio_snapshot(
+            positions,
+            cash=cash,
+            buying_power=buying_power,
+        )
+
+
+def test_direct_malformed_snapshot_is_degraded_in_reports_and_blocked_by_gate():
+    malformed = PortfolioSnapshot(
+        positions=[
+            PortfolioPosition(
+                ticker="AAPL",
+                shares=-1,
+                entry_price=10,
+                current_price=10,
+                market_value=-10,
+                unrealized_pnl_pct=0,
+                is_leveraged_etf=False,
+            )
+        ],
+        cash=110,
+        total_equity=100,
+        as_of="2026-08-26",
+    )
+    policy = TradingPolicy(version="integrity-test", name="integrity-test")
+
+    compliance = check_policy_compliance(malformed, policy)
+    exposure = build_risk_exposure(malformed)
+    gate = validate_trade_intent(
+        TradeIntent(ticker="AAPL", side="sell", shares=1),
+        malformed,
+        reference_price=10,
+    )
+
+    assert compliance and "integrity unavailable" in compliance[0].lower()
+    assert exposure.concentration_warnings
+    assert "integrity unavailable" in exposure.concentration_warnings[0].lower()
+    assert ViolationCode.INVALID_POSITION_DATA.value in gate.violation_codes
 
 
 def test_check_concentration_general_summary_when_no_basket_given():

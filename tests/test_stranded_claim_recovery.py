@@ -63,11 +63,17 @@ def _store(temp: str, *proposals: dict) -> AssistantStore:
 
 def _backdate(store: AssistantStore, proposal_id: str, *, seconds: int) -> None:
     stamp = (datetime.now(timezone.utc) - timedelta(seconds=seconds)).isoformat()
+    _set_updated_at(store, proposal_id, stamp)
+
+
+def _set_updated_at(
+    store: AssistantStore, proposal_id: str, value: str
+) -> None:
     connection = sqlite3.connect(store.path)
     try:
         connection.execute(
             "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
-            (stamp, proposal_id),
+            (value, proposal_id),
         )
         connection.commit()
     finally:
@@ -156,7 +162,7 @@ def test_an_unknown_proposal_raises_rather_than_reporting_success():
         assert "Unknown proposal" in str(caught.value)
 
 
-@pytest.mark.parametrize("bad", [0, -1, True, 1.5, "900"])
+@pytest.mark.parametrize("bad", [0, -1, True, 1.5, "900", 604801, 10**1000])
 def test_a_bad_staleness_window_is_rejected(bad):
     """A zero/negative window makes every claim look stale immediately,
     defeating the guard -- the same trap already fixed on
@@ -270,6 +276,153 @@ def test_a_stranded_claim_makes_the_overall_report_not_ready():
         assert _readiness(store)["ready"] is False
 
 
+@pytest.mark.parametrize(
+    ("offset_seconds", "expected_detail"),
+    [
+        (0.0, "none"),
+        (-899.0, "none"),
+        (-900.0, "none"),
+        (5.0, "none"),
+    ],
+)
+def test_pre_broker_claim_time_healthy_and_tolerance_boundaries(
+    offset_seconds, expected_detail
+):
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-clock", VALIDATING))
+        _set_updated_at(
+            store,
+            "tp-clock",
+            (now + timedelta(seconds=offset_seconds)).isoformat(),
+        )
+
+        check = _named(
+            _readiness(store, now=now, stale_claim_seconds=900.0),
+            "stranded_pre_broker_claims",
+        )
+
+        assert check["ok"] is True
+        assert check["detail"] == expected_detail
+
+
+def test_implicit_claim_clock_is_captured_after_claims_are_read(monkeypatch):
+    """A slow readiness pass must not manufacture a future claim anomaly."""
+    import assistant.readiness as readiness_module
+
+    started_at = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    committed_at = started_at + timedelta(seconds=6)
+
+    class AdvancingDateTime(datetime):
+        calls = 0
+
+        @classmethod
+        def now(cls, tz=None):
+            cls.calls += 1
+            value = started_at if cls.calls == 1 else started_at + timedelta(seconds=10)
+            return value if tz is None else value.astimezone(tz)
+
+    monkeypatch.setattr(readiness_module, "datetime", AdvancingDateTime)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-concurrent", VALIDATING))
+        _set_updated_at(store, "tp-concurrent", committed_at.isoformat())
+
+        check = _named(
+            _readiness(store), "stranded_pre_broker_claims"
+        )
+
+        assert check["ok"] is True
+        assert check["detail"] == "none"
+
+
+def test_pre_broker_claim_just_past_stale_boundary_blocks_readiness():
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-stale", VALIDATING))
+        _set_updated_at(
+            store,
+            "tp-stale",
+            (now - timedelta(seconds=900, microseconds=1)).isoformat(),
+        )
+
+        report = _readiness(store, now=now, stale_claim_seconds=900.0)
+        check = _named(report, "stranded_pre_broker_claims")
+
+        assert check["ok"] is False
+        assert "stale: tp-stale:validating" in check["detail"]
+        assert "recover-stale-claim" in check["detail"]
+        assert report["ready"] is False
+
+
+def test_materially_future_pre_broker_claim_blocks_without_auto_recovery():
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    future = now + timedelta(seconds=5, microseconds=1)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-future", VALIDATING))
+        _set_updated_at(store, "tp-future", future.isoformat())
+
+        report = _readiness(store, now=now)
+        check = _named(report, "stranded_pre_broker_claims")
+
+        assert check["ok"] is False
+        assert "tp-future:validating" in check["detail"]
+        assert repr(future.isoformat()) in check["detail"]
+        assert "signed_age_seconds=-5.000001" in check["detail"]
+        assert "do not auto-reclaim" in check["detail"]
+        assert "recover-stale-claim" not in check["detail"]
+        assert store.get_proposal("tp-future")["status"] == VALIDATING
+        assert report["ready"] is False
+
+
+@pytest.mark.parametrize(
+    ("raw_timestamp", "expected_kind"),
+    [
+        ("2026-08-26T16:00:00", "naive"),
+        ("not-a-timestamp", "malformed"),
+    ],
+)
+def test_ambiguous_pre_broker_claim_timestamp_blocks_readiness(
+    raw_timestamp, expected_kind
+):
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-corrupt", VALIDATING))
+        _set_updated_at(store, "tp-corrupt", raw_timestamp)
+
+        report = _readiness(store, now=now)
+        check = _named(report, "stranded_pre_broker_claims")
+
+        assert check["ok"] is False
+        assert f"tp-corrupt:validating={raw_timestamp!r}" in check["detail"]
+        assert f"({expected_kind})" in check["detail"]
+        assert store.get_proposal("tp-corrupt")["status"] == VALIDATING
+        assert report["ready"] is False
+
+
+def test_reconciler_timestamp_integrity_count_explicitly_blocks_readiness():
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        store.set_system_state(
+            "last_order_reconciliation",
+            {
+                "at": now.isoformat(),
+                "checked": 1,
+                "updated": 0,
+                "error_count": 0,
+                "timestamp_integrity_error_count": 1,
+            },
+        )
+
+        check = _named(
+            _readiness(store, now=now), "reconciliation_freshness"
+        )
+
+        assert check["ok"] is False
+        assert "errors=0" in check["detail"]
+        assert "timestamp_integrity_errors=1" in check["detail"]
+
+
 # --- verification follow-ups (reviewing the claim-fencing round) --------
 
 def test_a_fenced_worker_raises_claim_lost_rather_than_a_generic_error():
@@ -307,10 +460,9 @@ def test_a_fenced_worker_raises_claim_lost_rather_than_a_generic_error():
 
 def test_an_unreadable_claim_timestamp_reports_the_real_reason():
     """readiness now BLOCKS on a corrupt updated_at, so recovery must not send
-    the operator to wait out a staleness window that can never expire: the
-    guard is a lexical SQL comparison, which a non-timestamp always loses.
-    Recovery still refuses (staleness is unprovable, and assuming stale would
-    revoke a possibly-live worker) -- but says so honestly."""
+    the operator to wait out a staleness window that can never expire.
+    Recovery refuses before its timestamp-CAS because staleness is unprovable
+    and assuming stale would revoke a possibly-live worker."""
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
         store = _store(temp, _proposal("tp-corrupt", VALIDATING))
         connection = sqlite3.connect(store.path)
@@ -327,12 +479,125 @@ def test_an_unreadable_claim_timestamp_reports_the_real_reason():
             recover_stale_claim("tp-corrupt", store)
 
         message = str(caught.value)
-        assert "not a readable timestamp" in message
-        assert "data-integrity problem" in message
-        assert "claimed less than" not in message, (
+        assert "timestamp integrity failure" in message
+        assert "malformed" in message
+        assert "Persistent kill switch activated" in message
+        assert "presumed in flight" not in message, (
             "must not report a timing reason for a data-integrity failure"
         )
         assert store.get_proposal("tp-corrupt")["status"] == VALIDATING
+        assert store.get_kill_switch()["active"] is True
+
+
+@pytest.mark.parametrize(
+    ("raw_timestamp", "expected_kind"),
+    [
+        ("0000", "malformed"),
+        ("2000-01-01T00:00:00", "naive"),
+        ("2099-01-01T00:00:00+00:00", "material_future"),
+    ],
+)
+def test_manual_claim_recovery_never_reclaims_ambiguous_time_evidence(
+    raw_timestamp, expected_kind
+):
+    """These values all defeated the old lexical SQL stale comparison."""
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-ambiguous", VALIDATING))
+        _set_updated_at(store, "tp-ambiguous", raw_timestamp)
+
+        with pytest.raises(ProposalExecutionError) as caught:
+            recover_stale_claim(
+                "tp-ambiguous", store, stale_after_seconds=1
+            )
+
+        assert expected_kind in str(caught.value)
+        assert store.get_proposal("tp-ambiguous")["status"] == VALIDATING
+        assert store.get_kill_switch()["active"] is True
+        alerts = store.list_operational_alerts()
+        assert len(alerts) == 1
+        details = alerts[0]["details"]
+        assert details["path"] == "pre_broker_claim_timestamp_integrity"
+        assert details["status"] == VALIDATING
+        assert details["timestamp_disposition"]["kind"] == expected_kind
+        assert details["recovery_disposition"] == {
+            "kind": "operator_repair_required",
+            "reclaimed": False,
+        }
+
+
+def test_manual_claim_recovery_allows_small_future_skew_without_reclaiming(
+    monkeypatch,
+):
+    import assistant.execution_service as execution_service_module
+
+    now = datetime(2026, 8, 26, 16, 0, tzinfo=timezone.utc)
+    future = now + timedelta(seconds=4)
+
+    class FrozenDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return now if tz is None else now.astimezone(tz)
+
+    monkeypatch.setattr(execution_service_module, "datetime", FrozenDateTime)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-small-skew", VALIDATING))
+        _set_updated_at(store, "tp-small-skew", future.isoformat())
+
+        with pytest.raises(ProposalExecutionError) as caught:
+            recover_stale_claim(
+                "tp-small-skew", store, stale_after_seconds=1
+            )
+
+        assert "small_future_skew" in str(caught.value)
+        assert "presumed in flight" in str(caught.value)
+        assert store.get_proposal("tp-small-skew")["status"] == VALIDATING
+        assert store.get_kill_switch()["active"] is False
+        assert store.list_operational_alerts() == []
+
+
+def test_manual_claim_recovery_parses_offset_time_before_atomic_reclaim():
+    """Lexical UTC comparison rejected this valid stale +14:00 timestamp."""
+    stale = (datetime.now(timezone.utc) - timedelta(seconds=10)).astimezone(
+        timezone(timedelta(hours=14))
+    )
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-offset", VALIDATING))
+        _set_updated_at(store, "tp-offset", stale.isoformat())
+
+        recovered = recover_stale_claim(
+            "tp-offset", store, stale_after_seconds=1
+        )
+
+        assert recovered["status"] == VALIDATION_FAILED
+        disposition = recovered["recovery_timestamp_disposition"]
+        assert disposition["kind"] == "valid"
+        assert disposition["signed_age_seconds"] >= 9.0
+
+
+def test_manual_claim_recovery_refuses_timestamp_change_after_validation(
+    monkeypatch,
+):
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-race", VALIDATING))
+        _set_updated_at(store, "tp-race", "2000-01-01T00:00:00+00:00")
+        original_reclaim = store.reclaim_stale_status
+
+        def race_timestamp(*args, **kwargs):
+            _set_updated_at(
+                store,
+                "tp-race",
+                datetime.now(timezone.utc).isoformat(),
+            )
+            return original_reclaim(*args, **kwargs)
+
+        monkeypatch.setattr(store, "reclaim_stale_status", race_timestamp)
+
+        with pytest.raises(ProposalExecutionError) as caught:
+            recover_stale_claim("tp-race", store, stale_after_seconds=1)
+
+        assert "changed while" in str(caught.value)
+        assert "no recovery write" in str(caught.value)
+        assert store.get_proposal("tp-race")["status"] == VALIDATING
 
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))

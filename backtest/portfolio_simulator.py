@@ -73,6 +73,14 @@ from typing import Callable
 import pandas as pd
 
 from config import BACKTEST_HOLD_DAYS, RETURN_Z_THRESHOLD, ROLLING_WINDOW, SLIPPAGE_PCT, VOLUME_Z_THRESHOLD
+from data.research_input_contracts import (
+    require_finite_number,
+    require_horizon,
+    require_positive_int,
+    require_positive_number,
+    require_price_frame_mapping,
+    require_rate,
+)
 from signals.scanner import scan_dips_and_ups
 from backtest.engine import _resolve_scan_kwargs
 from backtest.risk_metrics import max_drawdown_pct as _max_drawdown_pct
@@ -126,6 +134,26 @@ def simulate_portfolio(
     """
     if entry_timing not in ("same_close", "next_open"):
         raise ValueError(f"entry_timing must be 'same_close' or 'next_open', got {entry_timing!r}")
+    hold_days = require_horizon(hold_days)
+    slippage_pct = require_rate(slippage_pct, name="slippage_pct")
+    initial_cash = require_positive_number(initial_cash, name="initial_cash")
+    max_concurrent_positions = require_positive_int(
+        max_concurrent_positions,
+        name="max_concurrent_positions",
+    )
+    position_size_pct = require_finite_number(
+        position_size_pct,
+        name="position_size_pct",
+        minimum=0.0,
+        minimum_inclusive=False,
+        maximum=1.0,
+    )
+    required_price_columns = ("close",) if entry_timing == "same_close" else ("open", "close")
+    require_price_frame_mapping(
+        data,
+        name="data",
+        required_columns=required_price_columns,
+    )
     if not data:
         return _empty_result(initial_cash)
 

@@ -52,7 +52,11 @@ from assistant.money import MoneyInput
 from assistant.policy import TradingPolicy
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
-from risk.execution_gate import TradeIntent, ValidationResult
+from risk.execution_gate import (
+    ExecutionValidationContext,
+    TradeIntent,
+    ValidationResult,
+)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -181,6 +185,7 @@ class ProposalValidationDeps:
     outcome_factory: Callable[..., ProposalValidationOutcome]
     datetime_type: Any
     timezone_type: Any
+    eastern_timezone: Any
     decimal_factory: Callable[[str], Decimal]
     trade_intent_factory: Callable[..., TradeIntent]
     to_decimal: Callable[..., Decimal]
@@ -213,6 +218,7 @@ def run_proposal_validation(
     available_cash_override: float | None = None,
     available_buying_power_override: float | None = None,
     extra_open_order_count: int = 0,
+    execution_context: ExecutionValidationContext | None = None,
 ) -> ProposalValidationOutcome:
     """The validation orchestration behind the facade's
     validate_proposal_for_execution() -- see that wrapper's docstring for
@@ -490,7 +496,23 @@ def run_proposal_validation(
             )
 
     try:
-        quote = broker.get_latest_quote(intent.ticker)
+        if execution_context is None:
+            quote = broker.get_latest_quote(intent.ticker)
+        else:
+            quote_getter = getattr(
+                broker,
+                "get_execution_validation_quote",
+                None,
+            )
+            if not callable(quote_getter):
+                raise PermissionError(
+                    "Bound execution validation requires a session-owned "
+                    "snapshot quote capability."
+                )
+            quote = quote_getter(
+                intent.ticker,
+                expected_snapshot_id=execution_context.snapshot_id,
+            )
         quote_received_at = deps.datetime_type.now(deps.timezone_type.utc).isoformat()
         reference_price = quote.get("price_decimal", quote["price"])
         price_timestamp = quote["timestamp"]
@@ -507,8 +529,104 @@ def run_proposal_validation(
     pending_buy_value_by_ticker: dict[str, Decimal] = {}
     if intent.side == "buy":
         try:
+            if execution_context is None:
+                pending_quote_broker = broker
+            else:
+                # Local by design: ProposalValidationDeps freezes every
+                # runtime collaborator and the kernel characterization test
+                # rejects new module-global seams.
+                class SnapshotBoundQuoteBroker:
+                    __slots__ = (
+                        "broker",
+                        "datetime_type",
+                        "eastern_timezone",
+                        "max_stale_minutes",
+                        "now",
+                        "snapshot_id",
+                    )
+
+                    def __init__(
+                        self,
+                        bound_broker,
+                        snapshot_id,
+                        validation_now,
+                        max_stale_minutes,
+                        datetime_type,
+                        eastern_timezone,
+                    ):
+                        self.broker = bound_broker
+                        self.snapshot_id = snapshot_id
+                        self.now = validation_now
+                        self.max_stale_minutes = max_stale_minutes
+                        self.datetime_type = datetime_type
+                        self.eastern_timezone = eastern_timezone
+
+                    def get_latest_quote(self, ticker):
+                        getter = getattr(
+                            self.broker,
+                            "get_execution_validation_quote",
+                            None,
+                        )
+                        if not callable(getter):
+                            raise PermissionError(
+                                "Bound execution validation requires "
+                                "session-owned quote evidence."
+                            )
+                        quote = getter(
+                            ticker,
+                            expected_snapshot_id=self.snapshot_id,
+                        )
+                        timestamp = quote.get("timestamp")
+                        if not isinstance(timestamp, self.datetime_type):
+                            raise PermissionError(
+                                "Pending execution quote has no typed timestamp."
+                            )
+                        if (
+                            timestamp.tzinfo is None
+                            or timestamp.utcoffset() is None
+                        ):
+                            raise PermissionError(
+                                "Pending execution quote timestamp must be "
+                                "timezone-aware."
+                            )
+                        if self.now.tzinfo is None:
+                            comparable_timestamp = timestamp.astimezone(
+                                self.eastern_timezone
+                            ).replace(tzinfo=None)
+                            comparable_now = self.now
+                        else:
+                            comparable_timestamp = timestamp
+                            comparable_now = self.now
+                        age_minutes = (
+                            comparable_now - comparable_timestamp
+                        ).total_seconds() / 60
+                        if age_minutes > self.max_stale_minutes:
+                            raise PermissionError(
+                                f"Pending execution quote for {ticker} is "
+                                f"{age_minutes:.1f} minutes old, exceeding "
+                                f"the {self.max_stale_minutes:.1f}-minute "
+                                "policy limit."
+                            )
+                        if age_minutes < -1.0:
+                            raise PermissionError(
+                                f"Pending execution quote for {ticker} is "
+                                f"{abs(age_minutes):.1f} minutes in the future."
+                            )
+                        return quote
+
+                pending_quote_broker = SnapshotBoundQuoteBroker(
+                    broker,
+                    execution_context.snapshot_id,
+                    now_et,
+                    policy.max_stale_price_minutes,
+                    deps.datetime_type,
+                    deps.eastern_timezone,
+                )
             pending_buy_value_by_ticker = dict(
-                deps.pending_buy_value_by_ticker(current_portfolio.open_orders, broker)
+                deps.pending_buy_value_by_ticker(
+                    current_portfolio.open_orders,
+                    pending_quote_broker,
+                )
             )
         except Exception as exc:
             return deps.outcome_factory(
@@ -582,6 +700,8 @@ def run_proposal_validation(
         available_cash_override=available_cash_override,
         available_buying_power_override=available_buying_power_override,
         whole_shares_only=policy.whole_shares_only,
+        execution_context=execution_context,
+        execution_policy=(policy if execution_context is not None else None),
     )
     return deps.outcome_factory(
         proposal=proposal,

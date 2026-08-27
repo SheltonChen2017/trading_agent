@@ -172,18 +172,24 @@ def _pending_buy_value_by_ticker(
         # pending exposure and blocks more, rather than understating it and
         # permitting more), matching this function's fail-closed contract for
         # quote failures described above.
-        raw_filled = order.get("filled_qty")
+        raw_filled = order.get("filled_qty_decimal")
+        if raw_filled is None:
+            raw_filled = order.get("filled_qty")
         filled_qty = decimal_or_none(raw_filled) if raw_filled else Decimal("0")
         if filled_qty is None or filled_qty < 0:
             filled_qty = Decimal("0")
 
-        notional = order.get("notional")
+        notional = order.get("notional_decimal")
+        if notional is None:
+            notional = order.get("notional")
         if notional:
             value = to_decimal(notional, name=f"{ticker} pending notional")
             # A notional order carries no share count, so net out the filled
             # dollars directly. Without a usable fill price the full notional
             # stays counted (again, the conservative direction).
-            raw_fill_price = order.get("filled_avg_price")
+            raw_fill_price = order.get("filled_avg_price_decimal")
+            if raw_fill_price is None:
+                raw_fill_price = order.get("filled_avg_price")
             fill_price = (
                 decimal_or_none(raw_fill_price)
                 if raw_fill_price
@@ -195,7 +201,9 @@ def _pending_buy_value_by_ticker(
                     value - filled_qty * fill_price,
                 )
         else:
-            shares = order.get("shares")
+            shares = order.get("shares_decimal")
+            if shares is None:
+                shares = order.get("shares")
             if not shares:
                 continue
             remaining_shares = (
@@ -204,15 +212,20 @@ def _pending_buy_value_by_ticker(
             )
             if remaining_shares <= 0:
                 continue
-            limit_price = order.get("limit_price")
+            limit_price = order.get("limit_price_decimal")
+            if limit_price is None:
+                limit_price = order.get("limit_price")
             if limit_price:
                 value = remaining_shares * to_decimal(
                     limit_price, name=f"{ticker} pending limit_price"
                 )
             else:
                 quote = broker_module.get_latest_quote(ticker)
+                quote_price = quote.get("price_decimal")
+                if quote_price is None:
+                    quote_price = quote["price"]
                 value = remaining_shares * to_decimal(
-                    quote["price"], name=f"{ticker} quote price"
+                    quote_price, name=f"{ticker} quote price"
                 )
         totals[ticker.upper()] = (
             totals.get(ticker.upper(), Decimal("0")) + value

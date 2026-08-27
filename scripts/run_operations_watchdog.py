@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.operations import append_alerts_jsonl, run_operational_check
-from assistant.policy import load_policy
+from assistant.policy import load_policy, resolve_policy_path
 from assistant.process_singleton import (
     ProcessSingletonError,
     acquire_process_singleton,
@@ -44,17 +44,29 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--alerts-jsonl", type=Path)
     parser.add_argument(
         "--policy",
-        default=str(
-            Path(__file__).resolve().parent.parent
-            / "assistant"
-            / "default_policy.json"
+        default=None,
+        help=(
+            "Policy file governing health checks. When omitted, resolves via "
+            "TRADING_ASSISTANT_POLICY, then assistant/my_policy.json when "
+            "present, otherwise assistant/default_policy.json."
         ),
     )
     return parser
 
 
+def _resolve_runtime_policy(explicit: str | Path | None):
+    """Resolve and load one canonical policy, failing before any DB access."""
+    try:
+        policy_path = resolve_policy_path(explicit).resolve(strict=True)
+        policy = load_policy(policy_path)
+    except (OSError, ValueError, TypeError) as exc:
+        raise SystemExit(f"Policy resolution failed: {exc}") from exc
+    return policy_path, policy
+
+
 def main() -> None:
     args = build_parser().parse_args()
+    policy_path, policy = _resolve_runtime_policy(args.policy)
     # Same orphan/self-heal race as monitor-orders: Task Scheduler
     # IgnoreNew is not enough when a previous process is still alive.
     try:
@@ -65,10 +77,13 @@ def main() -> None:
     for signum in (signal.SIGINT, signal.SIGTERM):
         signal.signal(signum, lambda *_: stop.set())
     store = AssistantStore(args.database)
-    policy = load_policy(args.policy)
     while not stop.is_set():
         report = run_operational_check(
-            store, policy, check_broker=not args.offline
+            store,
+            policy,
+            check_broker=not args.offline,
+            policy_path=policy_path,
+            heartbeat_task="watchdog",
         )
         print(json.dumps(report["heartbeat"], sort_keys=True), flush=True)
         if args.alerts_jsonl and report["alerts"]:

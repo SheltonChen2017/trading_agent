@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import re
+import secrets
 import sqlite3
 import tempfile
 from contextlib import contextmanager
@@ -33,8 +34,19 @@ from assistant.proposal_status import (
     UNRESOLVED_BROKER_STATE_STATUSES,
 )
 from assistant.money import decimal_text, to_decimal
-from assistant.dispatch_fence import execution_dispatch_fence
+from assistant.dispatch_fence import (
+    _latch_runtime_emergency_stop_failure,
+    activate_runtime_emergency_stop,
+    clear_runtime_emergency_stop,
+    execution_dispatch_fence,
+    get_runtime_emergency_stop,
+)
 from assistant.schemas import DecisionPacket
+from data.exchange_calendar import (
+    ExchangeCalendarError,
+    resolve_target_availability,
+    resolve_target_session,
+)
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trading_assistant.db"
 # Trading days in this project are Eastern-market days (see
@@ -44,6 +56,10 @@ _EASTERN = ZoneInfo("America/New_York")
 
 class JournalTransactionConflictError(ValueError):
     """An external journal identity was reused for different content."""
+
+
+class BrokerOrderBindingConflictError(ValueError):
+    """A proposal observed a second broker root without replacement lineage."""
 
 
 class LedgerBootstrapConflictError(ValueError):
@@ -93,6 +109,339 @@ _EXECUTION_VALUE_KEYS = frozenset(
 
 def _hash_payload(payload_json: str) -> str:
     return hashlib.sha256(payload_json.encode("utf-8")).hexdigest()
+
+
+def _canonical_event_json(payload: Any, name: str) -> str:
+    """Canonical finite JSON for immutable broker-event content."""
+    try:
+        return json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+            default=str,
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be finite JSON-compatible data") from exc
+
+
+def _provider_decimal_text(
+    value: Any,
+    *,
+    name: str,
+    allow_zero: bool,
+) -> str | None:
+    """Validate decimal source text without manufacturing it from a float."""
+    if value is None:
+        return None
+    if isinstance(value, (bool, float)):
+        return None
+    if not isinstance(value, (str, int, Decimal)):
+        return None
+    if isinstance(value, str):
+        if not value or value != value.strip():
+            raise ValueError(f"{name} must be unpadded decimal text")
+        text = value
+    elif isinstance(value, Decimal):
+        text = format(value, "f")
+    else:
+        text = str(value)
+    parsed = to_decimal(text, name=name)
+    if parsed < 0 or (parsed == 0 and not allow_zero):
+        qualifier = "nonnegative" if allow_zero else "positive"
+        raise ValueError(f"{name} must be {qualifier}")
+    return text
+
+
+def _validated_decimal_value(
+    value: Any,
+    *,
+    name: str,
+    allow_zero: bool,
+) -> Decimal | None:
+    if value is None:
+        return None
+    parsed = to_decimal(value, name=name)
+    if parsed < 0 or (parsed == 0 and not allow_zero):
+        qualifier = "nonnegative" if allow_zero else "positive"
+        raise ValueError(f"{name} must be {qualifier}")
+    return parsed
+
+
+def _validated_decimal_evidence(
+    legacy_value: Any,
+    exact_value: Any,
+    *,
+    name: str,
+    allow_zero: bool,
+) -> tuple[Decimal | None, str | None]:
+    """Return authoritative Decimal plus provider text when it truly exists."""
+    exact_text = _provider_decimal_text(
+        exact_value,
+        name=f"{name} exact text",
+        allow_zero=allow_zero,
+    )
+    # A string/int/Decimal passed through the compatibility slot still carries
+    # exact source digits.  Binary floats never do.
+    if exact_text is None and isinstance(legacy_value, (str, int, Decimal)) and not isinstance(legacy_value, bool):
+        exact_text = _provider_decimal_text(
+            legacy_value,
+            name=f"{name} source text",
+            allow_zero=allow_zero,
+        )
+    legacy_decimal = _validated_decimal_value(
+        legacy_value,
+        name=name,
+        allow_zero=allow_zero,
+    )
+    exact_decimal = (
+        _validated_decimal_value(
+            exact_text,
+            name=f"{name} exact text",
+            allow_zero=allow_zero,
+        )
+        if exact_text is not None
+        else None
+    )
+    if legacy_decimal is not None and exact_decimal is not None:
+        try:
+            same_compatibility_value = float(legacy_decimal) == float(exact_decimal)
+        except (OverflowError, ValueError):
+            same_compatibility_value = False
+        if not same_compatibility_value:
+            raise ValueError(
+                f"{name} compatibility value disagrees with provider exact text"
+            )
+    return exact_decimal if exact_decimal is not None else legacy_decimal, exact_text
+
+
+def _numeric_evidence_status(
+    *,
+    filled_qty: Any,
+    filled_qty_text: str | None,
+    filled_avg_price: Any,
+    filled_avg_price_text: str | None,
+    fill_qty: Any,
+    fill_qty_text: str | None,
+    fill_price: Any,
+    fill_price_text: str | None,
+) -> str:
+    pairs = (
+        (filled_qty, filled_qty_text),
+        (filled_avg_price, filled_avg_price_text),
+        (fill_qty, fill_qty_text),
+        (fill_price, fill_price_text),
+    )
+    material = [(legacy, exact) for legacy, exact in pairs if legacy is not None or exact is not None]
+    if not material:
+        return "not_applicable"
+    if any(exact is None for _legacy, exact in material):
+        return "legacy_rounded_unrecoverable"
+    return "provider_exact"
+
+
+def _broker_event_scope(
+    *, proposal_id: str, order_id: str, proposal: dict[str, Any]
+) -> str:
+    context = proposal.get("broker_execution_context")
+    if not isinstance(context, dict):
+        context = {}
+    material = _canonical_event_json(
+        {
+            "account_id": context.get("account_id"),
+            "account_mode": context.get("account_mode"),
+            "order_id": order_id,
+            "proposal_id": proposal_id,
+        },
+        "broker event scope",
+    )
+    return "broker-event-scope:" + _hash_payload(material)
+
+
+_BROKER_EVENT_INTEGRITY_MIGRATION = "broker_order_event_integrity_v1"
+_BROKER_EVENT_BASE_CONTENT_FIELDS = frozenset(
+    {
+        "version",
+        "event_scope",
+        "event_id",
+        "order_id",
+        "proposal_id",
+        "event_type",
+        "event_at",
+        "status",
+        "filled_qty_decimal",
+        "filled_avg_price_decimal",
+        "fill_qty_decimal",
+        "fill_price_decimal",
+        "filled_qty",
+        "filled_avg_price",
+        "fill_qty",
+        "fill_price",
+        "payload",
+    }
+)
+_BROKER_EVENT_V2_EXTRA_CONTENT_FIELDS = frozenset(
+    {
+        "order_projection",
+        "new_proposal_status",
+        "expected_current_statuses",
+        "proposal_updates",
+        "preserve_if_set",
+    }
+)
+
+
+def _broker_event_integrity_error(row: sqlite3.Row) -> str | None:
+    """Reauthenticate one immutable broker-event row from canonical content."""
+    event_id = str(row["event_id"])
+    try:
+        version = row["event_hash_version"]
+        if version not in {"legacy_v1", "2"}:
+            raise ValueError("missing or unknown event_hash_version")
+        content_json = row["event_content_json"]
+        content_hash = row["event_content_hash"]
+        if not isinstance(content_json, str) or not content_json:
+            raise ValueError("missing event_content_json")
+        if (
+            not isinstance(content_hash, str)
+            or re.fullmatch(r"[0-9a-f]{64}", content_hash) is None
+        ):
+            raise ValueError("missing or malformed event_content_hash")
+        if _hash_payload(content_json) != content_hash:
+            raise ValueError("event_content_hash does not authenticate content")
+        content = json.loads(content_json)
+        if not isinstance(content, dict):
+            raise ValueError("event_content_json is not an object")
+        if _canonical_event_json(content, "broker event content") != content_json:
+            raise ValueError("event_content_json is not canonical")
+        expected_fields = _BROKER_EVENT_BASE_CONTENT_FIELDS | (
+            _BROKER_EVENT_V2_EXTRA_CONTENT_FIELDS if version == "2" else frozenset()
+        )
+        if set(content) != expected_fields:
+            raise ValueError("event content has missing or unknown fields")
+        if content["version"] != version:
+            raise ValueError("event content version disagrees with hash version")
+
+        duplicated = {
+            "event_scope": "event_scope",
+            "event_id": "event_id",
+            "order_id": "order_id",
+            "proposal_id": "proposal_id",
+            "event_type": "event_type",
+            "event_at": "event_at",
+            "status": "status",
+            "filled_qty_decimal": "filled_qty_text",
+            "filled_avg_price_decimal": "filled_avg_price_text",
+            "fill_qty_decimal": "fill_qty_text",
+            "fill_price_decimal": "fill_price_text",
+        }
+        for content_name, column_name in duplicated.items():
+            if content[content_name] != row[column_name]:
+                raise ValueError(
+                    f"duplicated field {column_name} disagrees with canonical content"
+                )
+        for name in ("filled_qty", "filled_avg_price", "fill_qty", "fill_price"):
+            canonical_value = content[name]
+            stored_value = row[name]
+            if canonical_value is None or stored_value is None:
+                if canonical_value is not None or stored_value is not None:
+                    raise ValueError(
+                        f"duplicated field {name} disagrees with canonical content"
+                    )
+            elif (
+                isinstance(canonical_value, bool)
+                or not isinstance(canonical_value, (int, float))
+                or float(canonical_value) != float(stored_value)
+            ):
+                raise ValueError(
+                    f"duplicated field {name} disagrees with canonical content"
+                )
+        payload = json.loads(row["payload_json"])
+        if _canonical_event_json(payload, "broker event payload") != _canonical_event_json(
+            content["payload"], "canonical broker event payload"
+        ):
+            raise ValueError("payload_json disagrees with canonical content")
+        evidence_status = _numeric_evidence_status(
+            filled_qty=row["filled_qty"],
+            filled_qty_text=row["filled_qty_text"],
+            filled_avg_price=row["filled_avg_price"],
+            filled_avg_price_text=row["filled_avg_price_text"],
+            fill_qty=row["fill_qty"],
+            fill_qty_text=row["fill_qty_text"],
+            fill_price=row["fill_price"],
+            fill_price_text=row["fill_price_text"],
+        )
+        if row["numeric_evidence_status"] != evidence_status:
+            raise ValueError(
+                "numeric_evidence_status disagrees with duplicated numeric evidence"
+            )
+        _parse_aware_timestamp(row["event_at"], "broker event event_at")
+    except Exception as exc:
+        return f"broker event {event_id!r} integrity violation: {exc}"
+    return None
+
+
+def _assert_broker_event_integrity(row: sqlite3.Row) -> None:
+    error = _broker_event_integrity_error(row)
+    if error is not None:
+        raise JournalTransactionConflictError(error)
+
+
+def _containment_incident_id(category: str, material: str) -> str:
+    return f"{category}:{_hash_payload(material)[:40]}"
+
+
+def _drain_and_retry_runtime_incident(
+    database: str | Path,
+    *,
+    incident_id: str,
+    reason: str,
+    changed_at: str,
+    activation_error: Exception | None,
+) -> Exception | None:
+    """Drain dispatch and retry a failed publication under that same fence."""
+    database_text = str(Path(database).expanduser().resolve())
+
+    def _incident_is_open(observed: dict[str, Any]) -> bool:
+        return any(
+            item.get("incident_id") == incident_id
+            and item.get("reason") == reason
+            and item.get("origin_database") == database_text
+            for item in observed.get("open_incidents", [])
+        )
+
+    try:
+        with execution_dispatch_fence(database):
+            observed = get_runtime_emergency_stop(database)
+            if observed.get("integrity_error") or _incident_is_open(observed):
+                return None
+            try:
+                activate_runtime_emergency_stop(
+                    database,
+                    incident_id=incident_id,
+                    reason=reason,
+                    changed_at=datetime.now(timezone.utc).isoformat(),
+                )
+            except Exception as retry_error:
+                activation_error = retry_error
+            observed = get_runtime_emergency_stop(database)
+            if observed.get("integrity_error") or _incident_is_open(observed):
+                return activation_error
+            containment_error = activation_error or RuntimeError(
+                "runtime containment incident was cleared before the global "
+                "dispatch drain completed"
+            )
+            _latch_runtime_emergency_stop_failure(containment_error)
+            return containment_error
+    except Exception as fence_error:
+        _latch_runtime_emergency_stop_failure(fence_error)
+        if activation_error is not None:
+            if hasattr(activation_error, "add_note"):
+                activation_error.add_note(
+                    f"global dispatch fence acquisition also failed: {fence_error}"
+                )
+            return activation_error
+        return fence_error
 
 
 def _canonical_ml_json(payload: Any, name: str) -> str:
@@ -360,7 +709,14 @@ class AssistantStore:
                 )
         else:
             self.path.parent.mkdir(parents=True, exist_ok=True)
-            self._initialize()
+            try:
+                self._initialize()
+            except JournalTransactionConflictError as exc:
+                self._activate_detected_broker_integrity_incident(
+                    event_id="initialization", reason=str(exc)
+                )
+                raise
+            self._promote_existing_local_kill_switch()
 
     @staticmethod
     def _open_database(path: str | Path) -> sqlite3.Connection:
@@ -436,9 +792,18 @@ class AssistantStore:
                     event_at TEXT NOT NULL,
                     status TEXT NOT NULL,
                     filled_qty REAL,
+                    filled_qty_text TEXT,
                     filled_avg_price REAL,
+                    filled_avg_price_text TEXT,
                     fill_qty REAL,
+                    fill_qty_text TEXT,
                     fill_price REAL,
+                    fill_price_text TEXT,
+                    numeric_evidence_status TEXT,
+                    event_scope TEXT,
+                    event_content_hash TEXT,
+                    event_content_json TEXT,
+                    event_hash_version TEXT,
                     payload_json TEXT NOT NULL,
                     FOREIGN KEY(order_id)
                         REFERENCES broker_orders(order_id),
@@ -473,6 +838,10 @@ class AssistantStore:
                     state_key TEXT PRIMARY KEY,
                     value_json TEXT NOT NULL,
                     updated_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS storage_migrations (
+                    migration_id TEXT PRIMARY KEY,
+                    applied_at TEXT NOT NULL
                 );
                 CREATE TABLE IF NOT EXISTS allocation_batches (
                     batch_id TEXT PRIMARY KEY,
@@ -660,6 +1029,7 @@ class AssistantStore:
                     as_of_session TEXT NOT NULL,
                     generated_at TEXT NOT NULL,
                     horizon_sessions INTEGER NOT NULL,
+                    target_session TEXT NOT NULL,
                     target_available_at TEXT NOT NULL,
                     feature_snapshot_hash TEXT NOT NULL,
                     prediction_json TEXT NOT NULL,
@@ -980,6 +1350,21 @@ class AssistantStore:
             )
             self._migrate_decision_packet_identity(connection)
             self._migrate_execution_reservation_money(connection)
+            self._migrate_broker_event_integrity(connection)
+            connection.executescript(
+                """
+                CREATE TRIGGER IF NOT EXISTS broker_order_events_append_only_update
+                BEFORE UPDATE ON broker_order_events
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker order events are append-only');
+                END;
+                CREATE TRIGGER IF NOT EXISTS broker_order_events_append_only_delete
+                BEFORE DELETE ON broker_order_events
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker order events are append-only');
+                END;
+                """
+            )
             self._migrate_paper_observation_money(connection)
             self._migrate_ml_prediction_maturity(connection)
             self._migrate_research_look_lineage(connection)
@@ -1020,6 +1405,10 @@ class AssistantStore:
         if "target_available_at" not in columns:
             connection.execute(
                 "ALTER TABLE ml_predictions ADD COLUMN target_available_at TEXT"
+            )
+        if "target_session" not in columns:
+            connection.execute(
+                "ALTER TABLE ml_predictions ADD COLUMN target_session TEXT"
             )
         # ML-LR-6 (plan 12.2): nullable so databases written before the
         # shadow runtime existed still load. Legacy rows keep NULL and are
@@ -1115,6 +1504,204 @@ class AssistantStore:
                     row["proposal_id"],
                 ),
             )
+
+    def _migrate_broker_event_integrity(
+        self, connection: sqlite3.Connection
+    ) -> None:
+        """Add lossless fill evidence and immutable event identity metadata.
+
+        Legacy REAL values are never promoted to exact evidence. Text is
+        backfilled only when the durable normalized payload still contains a
+        provider decimal companion; all other old rows remain explicitly
+        rounded and unrecoverable.
+        """
+        columns = {
+            row["name"]
+            for row in connection.execute(
+                "PRAGMA table_info(broker_order_events)"
+            )
+        }
+        pre_migration_columns = frozenset(columns)
+        integrity_metadata_columns = frozenset(
+            {"event_content_hash", "event_content_json", "event_hash_version"}
+        )
+        declarations = {
+            "filled_qty_text": "TEXT",
+            "filled_avg_price_text": "TEXT",
+            "fill_qty_text": "TEXT",
+            "fill_price_text": "TEXT",
+            "numeric_evidence_status": "TEXT",
+            "event_scope": "TEXT",
+            "event_content_hash": "TEXT",
+            "event_content_json": "TEXT",
+            "event_hash_version": "TEXT",
+        }
+        for column, declaration in declarations.items():
+            if column not in columns:
+                connection.execute(
+                    f"ALTER TABLE broker_order_events ADD COLUMN {column} {declaration}"
+                )
+
+        migration_row = connection.execute(
+            "SELECT applied_at FROM storage_migrations WHERE migration_id = ?",
+            (_BROKER_EVENT_INTEGRITY_MIGRATION,),
+        ).fetchone()
+        preexisting_metadata = integrity_metadata_columns & pre_migration_columns
+        if preexisting_metadata and preexisting_metadata != integrity_metadata_columns:
+            raise JournalTransactionConflictError(
+                "Broker-event integrity schema is only partially present; "
+                "refusing to infer whether existing rows are legacy or damaged."
+            )
+        if migration_row is not None or preexisting_metadata == integrity_metadata_columns:
+            errors = [
+                error
+                for row in connection.execute("SELECT * FROM broker_order_events")
+                if (error := _broker_event_integrity_error(row)) is not None
+            ]
+            if errors:
+                raise JournalTransactionConflictError("; ".join(errors))
+            if migration_row is None:
+                connection.execute(
+                    "INSERT INTO storage_migrations(migration_id, applied_at) "
+                    "VALUES (?, ?)",
+                    (
+                        _BROKER_EVENT_INTEGRITY_MIGRATION,
+                        datetime.now(timezone.utc).isoformat(),
+                    ),
+                )
+            return
+
+        # Only the historical schema fact that *all* three integrity metadata
+        # columns were absent authorizes recovery as legacy_v1. Once those
+        # columns have existed, missing values are indistinguishable from
+        # deletion/tampering and must never be re-blessed by initialization.
+
+        rows = connection.execute(
+            "SELECT e.*, tp.payload_json AS proposal_payload_json "
+            "FROM broker_order_events e "
+            "LEFT JOIN trade_proposals tp ON tp.proposal_id = e.proposal_id"
+        ).fetchall()
+        for row in rows:
+            try:
+                payload = json.loads(row["payload_json"])
+            except (TypeError, ValueError):
+                payload = {}
+            order_payload = (
+                payload.get("order")
+                if isinstance(payload, dict)
+                and isinstance(payload.get("order"), dict)
+                else payload
+            )
+            if not isinstance(order_payload, dict):
+                order_payload = {}
+            candidates = {
+                "filled_qty_text": order_payload.get("filled_qty_decimal"),
+                "filled_avg_price_text": order_payload.get(
+                    "filled_avg_price_decimal"
+                ),
+                "fill_qty_text": (
+                    payload.get("fill_qty_decimal")
+                    if isinstance(payload, dict)
+                    else None
+                ),
+                "fill_price_text": (
+                    payload.get("fill_price_decimal")
+                    if isinstance(payload, dict)
+                    else None
+                ),
+            }
+            recovered: dict[str, str | None] = {}
+            for column, candidate in candidates.items():
+                if row[column] not in (None, ""):
+                    recovered[column] = str(row[column])
+                    continue
+                try:
+                    recovered[column] = _provider_decimal_text(
+                        candidate,
+                        name=column,
+                        allow_zero=(column == "filled_qty_text"),
+                    )
+                except ValueError:
+                    recovered[column] = None
+
+            evidence_status = _numeric_evidence_status(
+                filled_qty=row["filled_qty"],
+                filled_qty_text=recovered["filled_qty_text"],
+                filled_avg_price=row["filled_avg_price"],
+                filled_avg_price_text=recovered["filled_avg_price_text"],
+                fill_qty=row["fill_qty"],
+                fill_qty_text=recovered["fill_qty_text"],
+                fill_price=row["fill_price"],
+                fill_price_text=recovered["fill_price_text"],
+            )
+            try:
+                proposal_payload = json.loads(row["proposal_payload_json"] or "{}")
+            except (TypeError, ValueError):
+                proposal_payload = {}
+            event_scope = row["event_scope"] or _broker_event_scope(
+                proposal_id=row["proposal_id"],
+                order_id=row["order_id"],
+                proposal=proposal_payload,
+            )
+            legacy_content = _canonical_event_json(
+                {
+                    "version": "legacy_v1",
+                    "event_scope": event_scope,
+                    "event_id": row["event_id"],
+                    "order_id": row["order_id"],
+                    "proposal_id": row["proposal_id"],
+                    "event_type": row["event_type"],
+                    "event_at": row["event_at"],
+                    "status": row["status"],
+                    "filled_qty_decimal": recovered["filled_qty_text"],
+                    "filled_avg_price_decimal": recovered[
+                        "filled_avg_price_text"
+                    ],
+                    "fill_qty_decimal": recovered["fill_qty_text"],
+                    "fill_price_decimal": recovered["fill_price_text"],
+                    "filled_qty": row["filled_qty"],
+                    "filled_avg_price": row["filled_avg_price"],
+                    "fill_qty": row["fill_qty"],
+                    "fill_price": row["fill_price"],
+                    "payload": payload,
+                },
+                "legacy broker event content",
+            )
+            content_json = row["event_content_json"] or legacy_content
+            content_hash = row["event_content_hash"] or _hash_payload(content_json)
+            connection.execute(
+                "UPDATE broker_order_events SET filled_qty_text = ?, "
+                "filled_avg_price_text = ?, fill_qty_text = ?, fill_price_text = ?, "
+                "numeric_evidence_status = ?, event_scope = ?, "
+                "event_content_hash = ?, event_content_json = ?, "
+                "event_hash_version = ? WHERE event_id = ?",
+                (
+                    recovered["filled_qty_text"],
+                    recovered["filled_avg_price_text"],
+                    recovered["fill_qty_text"],
+                    recovered["fill_price_text"],
+                    evidence_status,
+                    event_scope,
+                    content_hash,
+                    content_json,
+                    row["event_hash_version"] or "legacy_v1",
+                    row["event_id"],
+                ),
+            )
+        errors = [
+            error
+            for row in connection.execute("SELECT * FROM broker_order_events")
+            if (error := _broker_event_integrity_error(row)) is not None
+        ]
+        if errors:
+            raise JournalTransactionConflictError("; ".join(errors))
+        connection.execute(
+            "INSERT INTO storage_migrations(migration_id, applied_at) VALUES (?, ?)",
+            (
+                _BROKER_EVENT_INTEGRITY_MIGRATION,
+                datetime.now(timezone.utc).isoformat(),
+            ),
+        )
 
     def _migrate_paper_observation_money(
         self, connection: sqlite3.Connection
@@ -2539,11 +3126,28 @@ class AssistantStore:
         horizon = prediction["horizon_sessions"]
         if isinstance(horizon, bool) or not isinstance(horizon, int) or horizon < 1:
             raise ValueError("horizon_sessions must be a positive integer")
-        earliest_possible_target = as_of + timedelta(days=horizon)
-        if target_available_at.date() < earliest_possible_target:
+        try:
+            canonical_target_session = resolve_target_session(
+                prediction["as_of_session"], horizon
+            )
+            canonical_target_available = _parse_aware_timestamp(
+                resolve_target_availability(prediction["as_of_session"], horizon),
+                "canonical_target_available_at",
+            )
+        except ExchangeCalendarError as exc:
+            raise ValueError(f"prediction session horizon is invalid: {exc}") from exc
+        supplied_target_session = prediction.get("target_session")
+        if (
+            supplied_target_session is not None
+            and supplied_target_session != canonical_target_session
+        ):
             raise ValueError(
-                "target_available_at is earlier than the minimum possible date "
-                "for horizon_sessions"
+                "prediction.target_session does not match the canonical "
+                f"exchange-session horizon ({canonical_target_session})"
+            )
+        if target_available_at < canonical_target_available:
+            raise ValueError(
+                "target_available_at precedes the canonical exchange-session close"
             )
         if target_available_at <= generated_at:
             raise ValueError("target_available_at must be after generated_at")
@@ -2611,6 +3215,8 @@ class AssistantStore:
             _reject_execution_shaped_values(
                 prospective, path="prediction.prospective_contract"
             )
+        prediction = dict(prediction)
+        prediction["target_session"] = canonical_target_session
         payload_json = _canonical_ml_json(prediction, "prediction")
         prediction_hash = _hash_payload(payload_json)
         prediction_id = prediction.get("prediction_id") or (
@@ -2709,10 +3315,11 @@ class AssistantStore:
                 """
                 INSERT INTO ml_predictions(
                     prediction_id, model_key, task, subject_key, as_of_session,
-                    generated_at, horizon_sessions, target_available_at, feature_snapshot_hash,
+                    generated_at, horizon_sessions, target_session,
+                    target_available_at, feature_snapshot_hash,
                     prediction_json, prediction_hash, available, refusal_reasons_json,
                     evidence_epoch, shadow_run_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT DO NOTHING
                 """,
                 (
@@ -2723,6 +3330,7 @@ class AssistantStore:
                     prediction["as_of_session"],
                     prediction["generated_at"],
                     horizon,
+                    canonical_target_session,
                     prediction["target_available_at"],
                     prediction["feature_snapshot_hash"],
                     payload_json,
@@ -2768,6 +3376,7 @@ class AssistantStore:
             "as_of_session": row["as_of_session"],
             "generated_at": row["generated_at"],
             "horizon_sessions": row["horizon_sessions"],
+            "target_session": row["target_session"],
             "target_available_at": row["target_available_at"],
             "feature_snapshot_hash": row["feature_snapshot_hash"],
             "prediction": json.loads(row["prediction_json"]),
@@ -2844,18 +3453,44 @@ class AssistantStore:
                 raise ValueError("an unavailable prediction cannot receive a realized outcome")
             matured_timestamp = _parse_aware_timestamp(matured_at, "matured_at")
             target_available_raw = prediction["target_available_at"]
-            if not target_available_raw:
+            target_session_raw = prediction["target_session"]
+            if not target_available_raw or not target_session_raw:
                 raise ValueError(
-                    "legacy prediction has no target_available_at; maturity cannot "
-                    "be established safely"
+                    "legacy prediction lacks target_session/target_available_at proof; "
+                    "maturity cannot be established safely"
                 )
             target_available = _parse_aware_timestamp(
                 target_available_raw, "prediction.target_available_at"
             )
-            if matured_timestamp < target_available:
+            try:
+                canonical_target_session = resolve_target_session(
+                    prediction["as_of_session"], prediction["horizon_sessions"]
+                )
+                canonical_target_available = _parse_aware_timestamp(
+                    resolve_target_availability(
+                        prediction["as_of_session"], prediction["horizon_sessions"]
+                    ),
+                    "canonical_target_available_at",
+                )
+            except ExchangeCalendarError as exc:
+                raise ValueError(
+                    f"prediction session horizon cannot be revalidated: {exc}"
+                ) from exc
+            if target_session_raw != canonical_target_session:
+                raise ValueError(
+                    "stored target_session does not match the canonical "
+                    "exchange-session horizon"
+                )
+            if target_available < canonical_target_available:
+                raise ValueError(
+                    "stored target availability precedes the canonical "
+                    "exchange-session close"
+                )
+            required_maturity = max(target_available, canonical_target_available)
+            if matured_timestamp < required_maturity:
                 raise ValueError(
                     f"matured_at {matured_at!r} precedes target availability "
-                    f"{target_available_raw!r}"
+                    f"{required_maturity.isoformat()!r}"
                 )
             if not isinstance(outcome, dict) or not outcome:
                 raise ValueError("outcome must be a non-empty dictionary")
@@ -3245,6 +3880,7 @@ class AssistantStore:
         expected_status: str,
         new_status: str,
         stale_before: str,
+        validated_stale_updated_at: str | None = None,
         extra_updates: dict[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         """
@@ -3273,18 +3909,39 @@ class AssistantStore:
         overwriting whatever the row became -- the same principle
         claim_proposal() already relies on for its own atomicity.
 
+        When ``validated_stale_updated_at`` is supplied, the caller has
+        parsed that exact timestamp as aware, non-future, and older than its
+        recovery window. The transaction then compares exact text equality
+        instead of doing a lexical time comparison. This prevents malformed,
+        naive, offset-formatted, or concurrently changed text from winning a
+        supposedly temporal SQL comparison.
+
         Atomic and safe against a concurrent recovery attempt or a
         genuinely still-in-flight (recent) claim for the same reason
-        claim_proposal() is: exactly one `UPDATE ... WHERE status = ? AND
-        updated_at < ?` can affect the row, so a proposal claimed only
-        moments ago (not actually stranded) is correctly left alone
-        (2026-07-28, GPT review).
+        claim_proposal() is: exactly one conditional `UPDATE` can affect the
+        observed status/timestamp, so a proposal claimed only moments ago (not
+        actually stranded) is correctly left alone (2026-07-28, GPT review).
         """
+        if validated_stale_updated_at is not None and (
+            not isinstance(validated_stale_updated_at, str)
+            or not validated_stale_updated_at
+        ):
+            raise ValueError(
+                "validated_stale_updated_at must be a non-empty string when supplied"
+            )
+        if validated_stale_updated_at is None:
+            timestamp_predicate = "updated_at < ?"
+            timestamp_value = stale_before
+        else:
+            timestamp_predicate = "updated_at = ?"
+            timestamp_value = validated_stale_updated_at
+
         now = datetime.now(timezone.utc).isoformat()
         with self._connect() as connection:
             row = connection.execute(
-                "SELECT payload_json FROM trade_proposals WHERE proposal_id = ? AND status = ? AND updated_at < ?",
-                (proposal_id, expected_status, stale_before),
+                "SELECT payload_json FROM trade_proposals WHERE proposal_id = ? "
+                f"AND status = ? AND {timestamp_predicate}",
+                (proposal_id, expected_status, timestamp_value),
             ).fetchone()
             if row is None:
                 return None
@@ -3293,8 +3950,15 @@ class AssistantStore:
             payload["status"] = new_status
             cursor = connection.execute(
                 "UPDATE trade_proposals SET status = ?, payload_json = ?, updated_at = ? "
-                "WHERE proposal_id = ? AND status = ? AND updated_at < ?",
-                (new_status, json.dumps(payload, sort_keys=True), now, proposal_id, expected_status, stale_before),
+                f"WHERE proposal_id = ? AND status = ? AND {timestamp_predicate}",
+                (
+                    new_status,
+                    json.dumps(payload, sort_keys=True),
+                    now,
+                    proposal_id,
+                    expected_status,
+                    timestamp_value,
+                ),
             )
             if cursor.rowcount != 1:
                 # Something changed the row between our read and this
@@ -3682,18 +4346,24 @@ class AssistantStore:
         new_proposal_status: str,
         expected_current_statuses: tuple[str, ...],
         proposal_updates: dict[str, Any],
-        fill_qty: float | None = None,
-        fill_price: float | None = None,
+        fill_qty: Any = None,
+        fill_price: Any = None,
+        fill_qty_decimal: Any = None,
+        fill_price_decimal: Any = None,
         raw_event: dict[str, Any] | None = None,
         preserve_if_set: tuple[str, ...] = (),
+        broker_order_root_id: str | None = None,
+        replacement_order_path: tuple[str, ...] = (),
     ) -> dict[str, Any]:
         """Atomically append an event and advance its proposal/order projection.
 
         The conditional current-status set prevents a delayed accepted event
         from racing a fill and moving the proposal backward. A lower
         cumulative filled quantity is also journaled but never projected.
-        Duplicate events remain eligible to project so a crash after event
-        insertion but before an older-version proposal update can self-heal.
+        Every projection-driving field is content-hashed. Exact replay is a
+        no-op; reuse of the same event ID for changed content commits a global
+        halt and critical alert while leaving order/proposal projections and
+        the original journal row unchanged.
 
         `preserve_if_set` names fields in `proposal_updates` that must NOT
         overwrite an already-present truthy value on the stored proposal
@@ -3708,9 +4378,131 @@ class AssistantStore:
         clobber the first writer's correctly-preserved value (independent
         review, 2026-07-29).
         """
+        for name, value in (
+            ("event_id", event_id),
+            ("proposal_id", proposal_id),
+            ("event_type", event_type),
+            ("new_proposal_status", new_proposal_status),
+        ):
+            if not isinstance(value, str) or not value or value != value.strip():
+                raise ValueError(f"{name} must be a non-empty unpadded string")
+        if not isinstance(order, dict):
+            raise ValueError("order must be a mapping")
+        if "broker_order_root_id" in proposal_updates:
+            raise ValueError(
+                "broker_order_root_id is storage-owned binding metadata"
+            )
+        order_id_value = order.get("order_id")
+        if (
+            not isinstance(order_id_value, str)
+            or not order_id_value
+            or order_id_value != order_id_value.strip()
+        ):
+            raise ValueError("order.order_id must be a non-empty unpadded string")
+        order_id = order_id_value
+        if broker_order_root_id is not None and (
+            not isinstance(broker_order_root_id, str)
+            or not broker_order_root_id
+            or broker_order_root_id != broker_order_root_id.strip()
+        ):
+            raise ValueError(
+                "broker_order_root_id must be a non-empty unpadded string"
+            )
+        if not isinstance(replacement_order_path, tuple):
+            raise ValueError("replacement_order_path must be a tuple")
+        if any(
+            not isinstance(item, str)
+            or not item
+            or item != item.strip()
+            for item in replacement_order_path
+        ):
+            raise ValueError(
+                "replacement_order_path must contain non-empty unpadded IDs"
+            )
+        if len(set(replacement_order_path)) != len(replacement_order_path):
+            raise ValueError("replacement_order_path cannot contain a cycle")
+        if replacement_order_path and replacement_order_path[-1] != order_id:
+            raise ValueError(
+                "replacement_order_path must end at order.order_id"
+            )
+        raw_status = order.get("status")
+        if not isinstance(raw_status, str) or not raw_status.strip():
+            raise ValueError("order.status must be a non-empty string")
+
+        parsed_event_at = _parse_aware_timestamp(event_at, "event_at").astimezone(
+            timezone.utc
+        )
+        observed_now = datetime.now(timezone.utc)
+        if parsed_event_at > observed_now:
+            raise ValueError("event_at cannot be in the future")
+        event_at = parsed_event_at.isoformat()
+        now = observed_now.isoformat()
+
+        cumulative_qty, cumulative_qty_text = _validated_decimal_evidence(
+            order.get("filled_qty"),
+            order.get("filled_qty_decimal"),
+            name="cumulative filled quantity",
+            allow_zero=True,
+        )
+        cumulative_price, cumulative_price_text = _validated_decimal_evidence(
+            order.get("filled_avg_price"),
+            order.get("filled_avg_price_decimal"),
+            name="cumulative average fill price",
+            allow_zero=False,
+        )
+        if cumulative_qty is None and cumulative_price is not None:
+            raise ValueError(
+                "cumulative average fill price requires cumulative filled quantity"
+            )
+        if cumulative_qty is not None:
+            if cumulative_qty > 0 and cumulative_price is None:
+                raise ValueError(
+                    "positive cumulative filled quantity requires a positive average price"
+                )
+            if cumulative_qty == 0 and cumulative_price is not None:
+                raise ValueError(
+                    "zero cumulative filled quantity cannot carry an average price"
+                )
+
+        incremental_qty, incremental_qty_text = _validated_decimal_evidence(
+            fill_qty,
+            fill_qty_decimal,
+            name="incremental fill quantity",
+            allow_zero=False,
+        )
+        incremental_price, incremental_price_text = _validated_decimal_evidence(
+            fill_price,
+            fill_price_decimal,
+            name="incremental fill price",
+            allow_zero=False,
+        )
+        if (incremental_qty is None) != (incremental_price is None):
+            raise ValueError(
+                "incremental fill quantity and price must be present together"
+            )
+
         payload = raw_event if raw_event is not None else order
-        now = datetime.now(timezone.utc).isoformat()
+        payload_json = _canonical_event_json(payload, "broker event payload")
+        order_json = _canonical_event_json(order, "broker order projection")
+        numeric_evidence_status = _numeric_evidence_status(
+            filled_qty=(None if cumulative_qty is None else float(cumulative_qty)),
+            filled_qty_text=cumulative_qty_text,
+            filled_avg_price=(
+                None if cumulative_price is None else float(cumulative_price)
+            ),
+            filled_avg_price_text=cumulative_price_text,
+            fill_qty=(None if incremental_qty is None else float(incremental_qty)),
+            fill_qty_text=incremental_qty_text,
+            fill_price=(
+                None if incremental_price is None else float(incremental_price)
+            ),
+            fill_price_text=incremental_price_text,
+        )
         connection = self._open_database(self.path)
+        containment_pending = False
+        containment_reason: str | None = None
+        containment_incident_id: str | None = None
+        runtime_activation_error: Exception | None = None
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -3720,7 +4512,195 @@ class AssistantStore:
             if row is None:
                 raise KeyError(f"Unknown proposal: {proposal_id}")
 
-            order_id = str(order["order_id"])
+            proposal = json.loads(row["payload_json"])
+            proposal["status"] = row["status"]
+            event_scope = _broker_event_scope(
+                proposal_id=proposal_id,
+                order_id=order_id,
+                proposal=proposal,
+            )
+            content_json = _canonical_event_json(
+                {
+                    "version": "2",
+                    "event_scope": event_scope,
+                    "event_id": event_id,
+                    "order_id": order_id,
+                    "proposal_id": proposal_id,
+                    "event_type": event_type,
+                    "event_at": event_at,
+                    "status": raw_status,
+                    "filled_qty_decimal": cumulative_qty_text,
+                    "filled_avg_price_decimal": cumulative_price_text,
+                    "fill_qty_decimal": incremental_qty_text,
+                    "fill_price_decimal": incremental_price_text,
+                    "filled_qty": (
+                        None if cumulative_qty is None else float(cumulative_qty)
+                    ),
+                    "filled_avg_price": (
+                        None if cumulative_price is None else float(cumulative_price)
+                    ),
+                    "fill_qty": (
+                        None if incremental_qty is None else float(incremental_qty)
+                    ),
+                    "fill_price": (
+                        None if incremental_price is None else float(incremental_price)
+                    ),
+                    "payload": json.loads(payload_json),
+                    "order_projection": json.loads(order_json),
+                    "new_proposal_status": new_proposal_status,
+                    "expected_current_statuses": sorted(expected_current_statuses),
+                    "proposal_updates": proposal_updates,
+                    "preserve_if_set": sorted(preserve_if_set),
+                },
+                "broker event content",
+            )
+            content_hash = _hash_payload(content_json)
+
+            existing_event = connection.execute(
+                "SELECT * FROM broker_order_events WHERE event_id = ?",
+                (event_id,),
+            ).fetchone()
+            exact_replay = False
+            if existing_event is not None:
+                stored_integrity_error = _broker_event_integrity_error(existing_event)
+                if stored_integrity_error is not None:
+                    exact_replay = False
+                elif existing_event["event_hash_version"] == "2":
+                    exact_replay = (
+                        existing_event["event_scope"] == event_scope
+                        and existing_event["event_content_hash"] == content_hash
+                    )
+                else:
+                    legacy_content = _canonical_event_json(
+                        {
+                            "version": "legacy_v1",
+                            "event_scope": event_scope,
+                            "event_id": event_id,
+                            "order_id": order_id,
+                            "proposal_id": proposal_id,
+                            "event_type": event_type,
+                            "event_at": event_at,
+                            "status": raw_status,
+                            "filled_qty_decimal": cumulative_qty_text,
+                            "filled_avg_price_decimal": cumulative_price_text,
+                            "fill_qty_decimal": incremental_qty_text,
+                            "fill_price_decimal": incremental_price_text,
+                            "filled_qty": (
+                                None
+                                if cumulative_qty is None
+                                else float(cumulative_qty)
+                            ),
+                            "filled_avg_price": (
+                                None
+                                if cumulative_price is None
+                                else float(cumulative_price)
+                            ),
+                            "fill_qty": (
+                                None
+                                if incremental_qty is None
+                                else float(incremental_qty)
+                            ),
+                            "fill_price": (
+                                None
+                                if incremental_price is None
+                                else float(incremental_price)
+                            ),
+                            "payload": json.loads(payload_json),
+                        },
+                        "legacy broker event replay content",
+                    )
+                    exact_replay = (
+                        existing_event["event_scope"] == event_scope
+                        and existing_event["event_content_hash"]
+                        == _hash_payload(legacy_content)
+                    )
+                if exact_replay:
+                    connection.commit()
+                    proposal["broker_event_inserted"] = False
+                    proposal["broker_event_projected"] = False
+                    proposal["broker_event_replay"] = True
+                    return proposal
+
+                if stored_integrity_error is not None:
+                    reason = (
+                        f"Stored broker event {event_id!r} failed integrity "
+                        f"reauthentication: {stored_integrity_error}. The original "
+                        "journal/projection was retained and execution halted."
+                    )
+                elif (
+                    existing_event["order_id"] != order_id
+                    or existing_event["proposal_id"] != proposal_id
+                ):
+                    reason = (
+                        f"Broker event {event_id!r} is already bound to order "
+                        f"{existing_event['order_id']} / proposal "
+                        f"{existing_event['proposal_id']} and was reused with "
+                        "changed content; the original journal/projection was "
+                        "retained and execution halted."
+                    )
+                else:
+                    reason = (
+                        f"Broker event {event_id!r} was reused with changed content; "
+                        "the original journal/projection was retained and execution halted."
+                    )
+                collision_at = now
+                containment_pending = True
+                containment_reason = reason
+                containment_incident_id = _containment_incident_id(
+                    "broker-event-integrity",
+                    f"{self.path.resolve()}:{event_scope}:{event_id}",
+                )
+                try:
+                    activate_runtime_emergency_stop(
+                        self.path,
+                        incident_id=containment_incident_id,
+                        reason=reason,
+                        changed_at=collision_at,
+                    )
+                except Exception as exc:
+                    # A corrupt runtime state is itself read as active. Keep
+                    # pursuing the independent database halt and alert.
+                    runtime_activation_error = exc
+                kill_switch = {
+                    "active": True,
+                    "reason": reason,
+                    "changed_at": collision_at,
+                }
+                connection.execute(
+                    "INSERT INTO system_state(state_key, value_json, updated_at) "
+                    "VALUES ('kill_switch', ?, ?) ON CONFLICT(state_key) DO UPDATE SET "
+                    "value_json = excluded.value_json, updated_at = excluded.updated_at",
+                    (json.dumps(kill_switch, sort_keys=True), collision_at),
+                )
+                self._upsert_operational_alert_in_connection(
+                    connection,
+                    fingerprint=(
+                        "broker_event_integrity:"
+                        + _hash_payload(f"{event_scope}:{event_id}")
+                    ),
+                    severity="critical",
+                    category="broker_event_integrity",
+                    message=reason,
+                    details={
+                        "event_id": event_id,
+                        "incoming_event_scope": event_scope,
+                        "stored_event_scope": existing_event["event_scope"],
+                        "incoming_content_hash": content_hash,
+                        "stored_content_hash": existing_event[
+                            "event_content_hash"
+                        ],
+                        "stored_order_id": existing_event["order_id"],
+                        "incoming_order_id": order_id,
+                        "stored_proposal_id": existing_event["proposal_id"],
+                        "incoming_proposal_id": proposal_id,
+                        "stored_integrity_error": stored_integrity_error,
+                    },
+                    seen_at=collision_at,
+                )
+                connection.commit()
+                raise JournalTransactionConflictError(reason)
+
+            binding_reason: str | None = None
             existing_order = connection.execute(
                 """
                 SELECT proposal_id FROM broker_orders
@@ -3732,29 +4712,314 @@ class AssistantStore:
                 existing_order is not None
                 and existing_order["proposal_id"] != proposal_id
             ):
-                raise ValueError(
-                    f"Broker order {order_id} is already bound to proposal "
-                    f"{existing_order['proposal_id']}, not {proposal_id}."
-                )
-            existing_event = connection.execute(
-                """
-                SELECT order_id, proposal_id
-                FROM broker_order_events
-                WHERE event_id = ?
-                """,
-                (event_id,),
-            ).fetchone()
-            if existing_event is not None and (
-                existing_event["order_id"] != order_id
-                or existing_event["proposal_id"] != proposal_id
-            ):
-                raise ValueError(
-                    f"Broker event {event_id} is already bound to order "
-                    f"{existing_event['order_id']} / proposal "
-                    f"{existing_event['proposal_id']}."
+                binding_reason = (
+                    f"broker order {order_id!r} is already bound to proposal "
+                    f"{existing_order['proposal_id']!r}, not {proposal_id!r}"
                 )
 
+            # One assistant execution has one durable broker root.  A later
+            # observation may name another order ID only through a forward,
+            # explicit replacement edge/path.  This check lives inside the
+            # same BEGIN IMMEDIATE transaction as insertion/projection: two
+            # concurrent first observations cannot both see an unbound
+            # proposal and establish different roots.
+            current_order_id: str | None = None
+            current_order = proposal.get("broker_order")
+            if current_order is not None:
+                if not isinstance(current_order, dict):
+                    binding_reason = (
+                        "stored broker_order is not a mapping, so its durable "
+                        "order identity cannot be verified"
+                    )
+                else:
+                    raw_current_id = current_order.get("order_id")
+                    if (
+                        not isinstance(raw_current_id, str)
+                        or not raw_current_id
+                        or raw_current_id != raw_current_id.strip()
+                    ):
+                        binding_reason = (
+                            "stored broker_order has no usable durable order ID"
+                        )
+                    else:
+                        current_order_id = raw_current_id
+
+            stored_root_id: str | None = None
+            if "broker_order_root_id" in proposal:
+                raw_stored_root_id = proposal.get("broker_order_root_id")
+                if (
+                    not isinstance(raw_stored_root_id, str)
+                    or not raw_stored_root_id
+                    or raw_stored_root_id != raw_stored_root_id.strip()
+                ):
+                    binding_reason = (
+                        binding_reason
+                        or "stored broker_order_root_id is malformed"
+                    )
+                else:
+                    stored_root_id = raw_stored_root_id
+
+            bound_rows = connection.execute(
+                "SELECT order_id, payload_json FROM broker_orders "
+                "WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchall()
+            bound_order_ids = {str(bound["order_id"]) for bound in bound_rows}
+            parent_by_order_id: dict[str, str | None] = {}
+            for bound in bound_rows:
+                bound_id = str(bound["order_id"])
+                try:
+                    bound_payload = json.loads(bound["payload_json"])
+                except (TypeError, ValueError):
+                    binding_reason = (
+                        binding_reason
+                        or f"stored broker order {bound_id!r} has unreadable lineage"
+                    )
+                    continue
+                raw_parent = (
+                    bound_payload.get("replaces")
+                    if isinstance(bound_payload, dict)
+                    else None
+                )
+                if raw_parent is not None and (
+                    not isinstance(raw_parent, str)
+                    or not raw_parent
+                    or raw_parent != raw_parent.strip()
+                ):
+                    binding_reason = (
+                        binding_reason
+                        or f"stored broker order {bound_id!r} has malformed replacement lineage"
+                    )
+                    continue
+                parent_by_order_id[bound_id] = raw_parent
+
+            raw_incoming_parent = order.get("replaces")
+            if raw_incoming_parent is not None and (
+                not isinstance(raw_incoming_parent, str)
+                or not raw_incoming_parent
+                or raw_incoming_parent != raw_incoming_parent.strip()
+            ):
+                binding_reason = (
+                    binding_reason or "incoming replacement parent is malformed"
+                )
+                incoming_parent = None
+            else:
+                incoming_parent = raw_incoming_parent
+            if (
+                order_id in parent_by_order_id
+                and parent_by_order_id[order_id] != incoming_parent
+            ):
+                binding_reason = (
+                    binding_reason
+                    or f"later observation changed durable parent of {order_id!r} "
+                    f"from {parent_by_order_id[order_id]!r} to {incoming_parent!r}"
+                )
+            else:
+                parent_by_order_id[order_id] = incoming_parent
+            for index in range(1, len(replacement_order_path)):
+                child = replacement_order_path[index]
+                parent = replacement_order_path[index - 1]
+                if (
+                    child in parent_by_order_id
+                    and parent_by_order_id[child] != parent
+                ):
+                    binding_reason = (
+                        binding_reason
+                        or f"replacement path says {child!r} replaces {parent!r}, "
+                        "but durable evidence says it replaces "
+                        f"{parent_by_order_id[child]!r}"
+                    )
+                else:
+                    parent_by_order_id[child] = parent
+
+            def _lineage_root(candidate: str) -> str | None:
+                seen: set[str] = set()
+                current = candidate
+                while True:
+                    if current in seen:
+                        return None
+                    seen.add(current)
+                    parent = parent_by_order_id.get(current)
+                    if parent is None:
+                        return current
+                    if parent not in parent_by_order_id:
+                        return parent
+                    current = parent
+
+            topology_roots = {
+                root
+                for candidate in (*bound_order_ids, order_id)
+                if (root := _lineage_root(candidate)) is not None
+            }
+            if any(_lineage_root(candidate) is None for candidate in bound_order_ids):
+                binding_reason = binding_reason or "stored broker order lineage contains a cycle"
+            if len(topology_roots) > 1:
+                binding_reason = (
+                    binding_reason
+                    or "broker observations form more than one disconnected order root"
+                )
+            inferred_root_id = (
+                next(iter(topology_roots)) if len(topology_roots) == 1 else None
+            )
+
+            effective_root_id = stored_root_id
+            if effective_root_id is None:
+                effective_root_id = broker_order_root_id or inferred_root_id
+            elif (
+                broker_order_root_id is not None
+                and broker_order_root_id != effective_root_id
+            ):
+                binding_reason = (
+                    binding_reason
+                    or f"durable broker root is {effective_root_id!r}, not "
+                    f"{broker_order_root_id!r}"
+                )
+            if (
+                broker_order_root_id is not None
+                and inferred_root_id is not None
+                and broker_order_root_id != inferred_root_id
+            ):
+                binding_reason = (
+                    binding_reason
+                    or f"claimed broker root {broker_order_root_id!r} disagrees "
+                    f"with durable replacement topology rooted at {inferred_root_id!r}"
+                )
+            if effective_root_id is None:
+                binding_reason = (
+                    binding_reason or "broker order root identity could not be established"
+                )
+            if (
+                replacement_order_path
+                and effective_root_id is not None
+                and replacement_order_path[0] != effective_root_id
+            ):
+                binding_reason = (
+                    binding_reason
+                    or "replacement path does not begin at the durable broker root"
+                )
+            if len(replacement_order_path) > 1 and (
+                incoming_parent != replacement_order_path[-2]
+            ):
+                binding_reason = (
+                    binding_reason
+                    or "incoming order does not replace the preceding order in "
+                    "the explicit replacement path"
+                )
+
+            # The root can be durable before it has its own broker_orders row
+            # (for example the first persisted observation was an already-
+            # replaced child). A delayed root event is therefore known
+            # lineage, but it remains an ancestor and cannot project over the
+            # current child below.
+            incoming_is_known = (
+                order_id in bound_order_ids or order_id == effective_root_id
+            )
+            forward_replacement = False
+            if current_order_id is not None and order_id != current_order_id:
+                direct_replacement = incoming_parent == current_order_id
+                path_replacement = (
+                    current_order_id in replacement_order_path
+                    and replacement_order_path.index(current_order_id)
+                    < len(replacement_order_path) - 1
+                )
+                forward_replacement = direct_replacement or path_replacement
+                if not incoming_is_known and not forward_replacement:
+                    binding_reason = (
+                        binding_reason
+                        or f"later broker observation changed order ID from "
+                        f"{current_order_id!r} to {order_id!r} without a "
+                        "validated replacement transition"
+                    )
+            elif current_order_id is None and bound_order_ids:
+                forward_replacement = any(
+                    bound_id in replacement_order_path[:-1]
+                    for bound_id in bound_order_ids
+                )
+                if not incoming_is_known and not forward_replacement:
+                    binding_reason = (
+                        binding_reason
+                        or "proposal has durable broker orders but no coherent "
+                        "current order binding for this new observation"
+                    )
+
+            if binding_reason is not None:
+                reason = (
+                    f"Broker order binding conflict for proposal {proposal_id}: "
+                    f"{binding_reason}. The existing broker projection was "
+                    "retained and execution halted."
+                )
+                containment_pending = True
+                containment_reason = reason
+                containment_incident_id = _containment_incident_id(
+                    "broker-order-binding",
+                    f"{self.path.resolve()}:{proposal_id}:{order_id}:"
+                    f"{effective_root_id}",
+                )
+                try:
+                    activate_runtime_emergency_stop(
+                        self.path,
+                        incident_id=containment_incident_id,
+                        reason=reason,
+                        changed_at=now,
+                    )
+                except Exception as exc:
+                    runtime_activation_error = exc
+                kill_switch = {
+                    "active": True,
+                    "reason": reason,
+                    "changed_at": now,
+                }
+                connection.execute(
+                    "INSERT INTO system_state(state_key, value_json, updated_at) "
+                    "VALUES ('kill_switch', ?, ?) ON CONFLICT(state_key) DO UPDATE SET "
+                    "value_json = excluded.value_json, updated_at = excluded.updated_at",
+                    (json.dumps(kill_switch, sort_keys=True), now),
+                )
+                if row["status"] in UNRESOLVED_BROKER_STATE_STATUSES:
+                    proposal["status"] = SUBMISSION_UNKNOWN
+                    proposal["error"] = reason
+                    proposal["reconciled_at"] = now
+                    connection.execute(
+                        "UPDATE trade_proposals SET status = ?, payload_json = ?, "
+                        "updated_at = ? WHERE proposal_id = ?",
+                        (
+                            SUBMISSION_UNKNOWN,
+                            json.dumps(proposal, sort_keys=True, default=str),
+                            now,
+                            proposal_id,
+                        ),
+                    )
+                self._upsert_operational_alert_in_connection(
+                    connection,
+                    fingerprint=(
+                        "broker_order_binding:"
+                        + _hash_payload(f"{proposal_id}:{order_id}:{effective_root_id}")
+                    ),
+                    severity="critical",
+                    category="broker_order_binding",
+                    message=reason,
+                    details={
+                        "proposal_id": proposal_id,
+                        "durable_root_order_id": effective_root_id,
+                        "current_order_id": current_order_id,
+                        "incoming_order_id": order_id,
+                        "incoming_replaces": incoming_parent,
+                        "replacement_order_path": list(replacement_order_path),
+                    },
+                    seen_at=now,
+                )
+                connection.commit()
+                raise BrokerOrderBindingConflictError(reason)
+
+            assert effective_root_id is not None
+            root_binding_changed = stored_root_id != effective_root_id
+            proposal["broker_order_root_id"] = effective_root_id
             submitted_at = str(order.get("submitted_at") or event_at)
+            event_count_before = int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM broker_order_events"
+                ).fetchone()[0]
+            )
             # The order row must exist before the event insert now that
             # broker_order_events has a real foreign key. Insert a missing
             # row first, but do not update an existing row until we know this
@@ -3772,47 +5037,114 @@ class AssistantStore:
                     order_id,
                     proposal_id,
                     submitted_at,
-                    str(order.get("status", "unknown")),
-                    json.dumps(order, sort_keys=True, default=str),
+                    raw_status,
+                    order_json,
                 ),
             )
+            event_columns = (
+                "event_id",
+                "order_id",
+                "proposal_id",
+                "event_type",
+                "event_at",
+                "status",
+                "filled_qty",
+                "filled_qty_text",
+                "filled_avg_price",
+                "filled_avg_price_text",
+                "fill_qty",
+                "fill_qty_text",
+                "fill_price",
+                "fill_price_text",
+                "numeric_evidence_status",
+                "event_scope",
+                "event_content_hash",
+                "event_content_json",
+                "event_hash_version",
+                "payload_json",
+            )
+            event_values = (
+                event_id,
+                order_id,
+                proposal_id,
+                event_type,
+                event_at,
+                raw_status,
+                None if cumulative_qty is None else float(cumulative_qty),
+                cumulative_qty_text,
+                None if cumulative_price is None else float(cumulative_price),
+                cumulative_price_text,
+                None if incremental_qty is None else float(incremental_qty),
+                incremental_qty_text,
+                None if incremental_price is None else float(incremental_price),
+                incremental_price_text,
+                numeric_evidence_status,
+                event_scope,
+                content_hash,
+                content_json,
+                "2",
+                payload_json,
+            )
+            changes_before_event_insert = connection.total_changes
             cursor = connection.execute(
                 """
                 INSERT INTO broker_order_events(
                     event_id, order_id, proposal_id, event_type, event_at,
-                    status, filled_qty, filled_avg_price, fill_qty, fill_price,
+                    status, filled_qty, filled_qty_text, filled_avg_price,
+                    filled_avg_price_text, fill_qty, fill_qty_text, fill_price,
+                    fill_price_text, numeric_evidence_status, event_scope,
+                    event_content_hash, event_content_json, event_hash_version,
                     payload_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(event_id) DO NOTHING
                 """,
-                (
-                    event_id,
-                    order_id,
-                    proposal_id,
-                    event_type,
-                    event_at,
-                    str(order.get("status", "unknown")),
-                    order.get("filled_qty"),
-                    order.get("filled_avg_price"),
-                    fill_qty,
-                    fill_price,
-                    json.dumps(payload, sort_keys=True, default=str),
-                ),
+                event_values,
             )
-            proposal = json.loads(row["payload_json"])
-            proposal["status"] = row["status"]
+            event_insert_changes = connection.total_changes - changes_before_event_insert
+            expected_event_row = dict(zip(event_columns, event_values))
 
-            current_filled = 0.0
-            incoming_filled = 0.0
-            try:
-                current_filled = float(
-                    (proposal.get("broker_order") or {}).get("filled_qty") or 0.0
+            def assert_exact_immutable_event_row() -> None:
+                stored_events = connection.execute(
+                    "SELECT " + ", ".join(event_columns)
+                    + " FROM broker_order_events WHERE event_id = ?",
+                    (event_id,),
+                ).fetchall()
+                event_count_after = int(
+                    connection.execute(
+                        "SELECT COUNT(*) FROM broker_order_events"
+                    ).fetchone()[0]
                 )
-                incoming_filled = float(order.get("filled_qty") or 0.0)
-            except (TypeError, ValueError):
-                # Malformed broker quantities are never used to justify an
-                # otherwise-forbidden transition.
-                current_filled = incoming_filled = 0.0
+                stored_event = (
+                    dict(stored_events[0]) if len(stored_events) == 1 else None
+                )
+                if (
+                    cursor.rowcount != 1
+                    or event_insert_changes != 1
+                    or event_count_after != event_count_before + 1
+                    or stored_event != expected_event_row
+                ):
+                    raise JournalTransactionConflictError(
+                        "Broker event insertion did not produce exactly one "
+                        "immutable canonical ledger row; rolling back the "
+                        "order and proposal projection."
+                    )
+
+            # Do not let trigger side effects or a silently ignored conflict
+            # become projection evidence. A second check immediately before
+            # commit below proves later order/proposal writes did not mutate or
+            # delete the append-only row either.
+            assert_exact_immutable_event_row()
+
+            stored_order = proposal.get("broker_order") or {}
+            current_filled = to_decimal(
+                stored_order.get(
+                    "filled_qty_decimal",
+                    stored_order.get("filled_qty", 0),
+                )
+                or 0,
+                name="stored cumulative filled quantity",
+            )
+            incoming_filled = cumulative_qty or Decimal("0")
             status_allows_projection = row["status"] in expected_current_statuses
             cancel_fill_progress = (
                 row["status"] == CANCEL_PENDING
@@ -3827,7 +5159,30 @@ class AssistantStore:
                 if cancel_fill_progress
                 else incoming_filled >= current_filled
             )
-            if not status_allows_projection or not quantity_allows_projection:
+            identity_allows_projection = (
+                current_order_id is None
+                or order_id == current_order_id
+                or forward_replacement
+            )
+            if (
+                not status_allows_projection
+                or not quantity_allows_projection
+                or not identity_allows_projection
+            ):
+                if root_binding_changed:
+                    # Establishing the immutable root is independent of
+                    # whether a delayed event is eligible to move lifecycle
+                    # state. Do not refresh updated_at: no status transition
+                    # happened.
+                    connection.execute(
+                        "UPDATE trade_proposals SET payload_json = ? "
+                        "WHERE proposal_id = ?",
+                        (
+                            json.dumps(proposal, sort_keys=True, default=str),
+                            proposal_id,
+                        ),
+                    )
+                assert_exact_immutable_event_row()
                 connection.commit()
                 proposal["broker_event_inserted"] = cursor.rowcount == 1
                 proposal["broker_event_projected"] = False
@@ -3864,8 +5219,8 @@ class AssistantStore:
                 """,
                 (
                     proposal_id,
-                    str(order.get("status", "unknown")),
-                    json.dumps(order, sort_keys=True, default=str),
+                    raw_status,
+                    order_json,
                     order_id,
                 ),
             )
@@ -3882,15 +5237,76 @@ class AssistantStore:
                     proposal_id,
                 ),
             )
+            assert_exact_immutable_event_row()
             connection.commit()
             proposal["broker_event_inserted"] = cursor.rowcount == 1
             proposal["broker_event_projected"] = True
             return proposal
-        except Exception:
+        except Exception as exc:
+            if (
+                not containment_pending
+                and (
+                    isinstance(exc, JournalTransactionConflictError)
+                    or "broker order events are append-only" in str(exc)
+                )
+            ):
+                containment_pending = True
+                containment_reason = str(exc)
+                containment_incident_id = _containment_incident_id(
+                    "broker-event-integrity",
+                    f"{self.path.resolve()}:{event_scope}:{event_id}:{exc}",
+                )
+                try:
+                    activate_runtime_emergency_stop(
+                        self.path,
+                        incident_id=containment_incident_id,
+                        reason=str(exc),
+                        changed_at=now,
+                    )
+                except Exception as activation_exc:
+                    runtime_activation_error = activation_exc
             connection.rollback()
+            if containment_pending:
+                fallback_reason = containment_reason or str(exc)
+                try:
+                    self.set_system_state(
+                        "kill_switch",
+                        {
+                            "active": True,
+                            "reason": fallback_reason,
+                            "changed_at": now,
+                        },
+                    )
+                except Exception as fallback_exc:
+                    if hasattr(exc, "add_note"):
+                        exc.add_note(
+                            "minimal local kill-switch fallback also failed: "
+                            f"{fallback_exc}"
+                        )
+                if runtime_activation_error is not None and hasattr(exc, "add_note"):
+                    exc.add_note(
+                        "runtime-global emergency-stop activation also failed: "
+                        f"{runtime_activation_error}"
+                    )
+                if not isinstance(
+                    exc,
+                    (JournalTransactionConflictError, BrokerOrderBindingConflictError),
+                ):
+                    raise JournalTransactionConflictError(
+                        containment_reason or str(exc)
+                    ) from exc
             raise
         finally:
             connection.close()
+            if containment_pending:
+                assert containment_incident_id is not None
+                _drain_and_retry_runtime_incident(
+                    self.path,
+                    incident_id=containment_incident_id,
+                    reason=containment_reason or "broker integrity incident",
+                    changed_at=now,
+                    activation_error=runtime_activation_error,
+                )
 
     def list_broker_order_events(
         self,
@@ -3914,6 +5330,13 @@ class AssistantStore:
         params.append(limit)
         with self._connect() as connection:
             rows = connection.execute(query, params).fetchall()
+        for row in rows:
+            error = _broker_event_integrity_error(row)
+            if error is not None:
+                self._activate_detected_broker_integrity_incident(
+                    event_id=str(row["event_id"]), reason=error
+                )
+                raise JournalTransactionConflictError(error)
         return [
             {
                 "event_id": row["event_id"],
@@ -3923,9 +5346,17 @@ class AssistantStore:
                 "event_at": row["event_at"],
                 "status": row["status"],
                 "filled_qty": row["filled_qty"],
+                "filled_qty_decimal": row["filled_qty_text"],
                 "filled_avg_price": row["filled_avg_price"],
+                "filled_avg_price_decimal": row["filled_avg_price_text"],
                 "fill_qty": row["fill_qty"],
+                "fill_qty_decimal": row["fill_qty_text"],
                 "fill_price": row["fill_price"],
+                "fill_price_decimal": row["fill_price_text"],
+                "numeric_evidence_status": row["numeric_evidence_status"],
+                "event_scope": row["event_scope"],
+                "event_content_hash": row["event_content_hash"],
+                "event_hash_version": row["event_hash_version"],
                 "payload": json.loads(row["payload_json"]),
             }
             for row in rows
@@ -4206,26 +5637,11 @@ class AssistantStore:
                 "FROM execution_reservations WHERE trading_day = ?",
                 (trading_day,),
             ).fetchall()
-            # Pre-filter to the 3 UTC dates that can possibly contain the
-            # Eastern day (yesterday/today/tomorrow) so this stays an
-            # indexed-ish scan rather than reading the whole journal.
-            candidate_dates = [trading_day]
             try:
-                day = datetime.fromisoformat(trading_day).date()
-                candidate_dates = [
-                    (day - timedelta(days=1)).isoformat(),
-                    day.isoformat(),
-                    (day + timedelta(days=1)).isoformat(),
-                ]
+                requested_day = datetime.fromisoformat(trading_day).date()
             except ValueError:
-                pass
-            placeholders = ",".join("?" for _ in candidate_dates)
-            rows = connection.execute(
-                f"SELECT event_at, fill_qty, fill_price FROM broker_order_events "
-                f"WHERE substr(event_at, 1, 10) IN ({placeholders}) "
-                "AND fill_qty IS NOT NULL AND fill_price IS NOT NULL",
-                candidate_dates,
-            ).fetchall()
+                requested_day = None
+            rows = connection.execute("SELECT * FROM broker_order_events").fetchall()
 
         submitted_notional = sum(
             (
@@ -4240,22 +5656,67 @@ class AssistantStore:
             Decimal("0"),
         )
         filled_notional = Decimal("0")
+        integrity_errors: list[dict[str, str]] = []
+        legacy_unrecoverable_event_ids: list[str] = []
         for row in rows:
             try:
-                parsed = datetime.fromisoformat(str(row["event_at"]).replace("Z", "+00:00"))
-            except ValueError:
-                continue
-            if parsed.tzinfo is None:
-                parsed = parsed.replace(tzinfo=timezone.utc)
-            if parsed.astimezone(_EASTERN).date().isoformat() != trading_day:
-                continue
-            try:
-                filled_notional += abs(
-                    to_decimal(row["fill_qty"], name="fill_qty")
-                    * to_decimal(row["fill_price"], name="fill_price")
+                integrity_error = _broker_event_integrity_error(row)
+                if integrity_error is not None:
+                    raise ValueError(integrity_error)
+                parsed = _parse_aware_timestamp(
+                    row["event_at"],
+                    f"event_at for broker event {row['event_id']}",
+                ).astimezone(timezone.utc)
+                if parsed > datetime.now(timezone.utc):
+                    raise ValueError("event_at cannot be in the future")
+                qty_source = (
+                    row["fill_qty_text"]
+                    if row["fill_qty_text"] not in (None, "")
+                    else row["fill_qty"]
                 )
-            except ValueError:
+                price_source = (
+                    row["fill_price_text"]
+                    if row["fill_price_text"] not in (None, "")
+                    else row["fill_price"]
+                )
+                if (qty_source is None) != (price_source is None):
+                    raise ValueError("incremental fill quantity/price pair is incomplete")
+                if qty_source is None:
+                    continue
+                qty_decimal = to_decimal(qty_source, name="fill_qty")
+                price_decimal = to_decimal(price_source, name="fill_price")
+                if qty_decimal <= 0 or price_decimal <= 0:
+                    raise ValueError("incremental fill quantity/price must be positive")
+            except (TypeError, ValueError) as exc:
+                integrity_errors.append(
+                    {"event_id": str(row["event_id"]), "error": str(exc)}
+                )
                 continue
+            if row["fill_qty_text"] in (None, "") or row["fill_price_text"] in (
+                None,
+                "",
+            ):
+                legacy_unrecoverable_event_ids.append(str(row["event_id"]))
+            if (
+                requested_day is None
+                or parsed.astimezone(_EASTERN).date() != requested_day
+            ):
+                continue
+            filled_notional += abs(qty_decimal * price_decimal)
+
+        if integrity_errors:
+            evidence_status = "integrity_error"
+            self._activate_detected_broker_integrity_incident(
+                event_id="execution-budget-scan",
+                reason="; ".join(
+                    f"{item['event_id']}: {item['error']}"
+                    for item in integrity_errors
+                ),
+            )
+        elif legacy_unrecoverable_event_ids:
+            evidence_status = "legacy_rounded_unrecoverable"
+        else:
+            evidence_status = "provider_exact"
 
         return {
             "trading_day": trading_day,
@@ -4264,6 +5725,11 @@ class AssistantStore:
             "submitted_notional_decimal": decimal_text(submitted_notional),
             "filled_notional": float(filled_notional),
             "filled_notional_decimal": decimal_text(filled_notional),
+            "evidence_status": evidence_status,
+            "integrity_errors": integrity_errors,
+            "legacy_unrecoverable_event_ids": sorted(
+                set(legacy_unrecoverable_event_ids)
+            ),
         }
 
     def release_execution_reservation(self, proposal_id: str) -> bool:
@@ -4279,6 +5745,61 @@ class AssistantStore:
                 (proposal_id,),
             )
         return cursor.rowcount == 1
+
+    def mark_pre_contact_blocked_and_release(
+        self,
+        proposal_id: str,
+        *,
+        expected_statuses: tuple[str, ...],
+        error: str,
+    ) -> dict[str, Any] | None:
+        """Atomically block a dispatch proven not to have contacted a broker.
+
+        This is the post-reservation counterpart to the ordinary pre-broker
+        claim transition.  The reservation and proposal state must change in
+        the same transaction; otherwise a crash between two separate writes
+        either strands budget or releases budget while the proposal still
+        appears dispatchable.
+        """
+        if not expected_statuses:
+            raise ValueError("expected_statuses must not be empty")
+        connection = self._open_database(self.path)
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            row = connection.execute(
+                "SELECT payload_json, status FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+            if row is None:
+                raise KeyError(f"Unknown proposal: {proposal_id}")
+            if row["status"] not in expected_statuses:
+                connection.rollback()
+                return None
+            proposal = json.loads(row["payload_json"])
+            proposal.update(
+                {
+                    "status": "blocked",
+                    "error": error,
+                    "violations": [error],
+                }
+            )
+            now = datetime.now(timezone.utc).isoformat()
+            connection.execute(
+                "UPDATE trade_proposals SET status = 'blocked', payload_json = ?, "
+                "updated_at = ? WHERE proposal_id = ?",
+                (json.dumps(proposal, sort_keys=True, default=str), now, proposal_id),
+            )
+            connection.execute(
+                "DELETE FROM execution_reservations WHERE proposal_id = ?",
+                (proposal_id,),
+            )
+            connection.commit()
+            return proposal
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
 
     def mark_submission_failed_and_release(
         self,
@@ -4352,6 +5873,119 @@ class AssistantStore:
                 (key, json.dumps(value, sort_keys=True), now),
             )
 
+    def _activate_detected_broker_integrity_incident(
+        self,
+        *,
+        event_id: str,
+        reason: str,
+        category: str = "broker-event-integrity",
+    ) -> dict[str, Any] | None:
+        """Fail closed globally for integrity evidence found outside a write."""
+        changed_at = datetime.now(timezone.utc).isoformat()
+        incident_id = _containment_incident_id(
+            category,
+            f"{self.path.resolve()}:{event_id}:{reason}",
+        )
+        runtime_state: dict[str, Any] | None = None
+        activation_error: Exception | None = None
+        try:
+            runtime_state = activate_runtime_emergency_stop(
+                self.path,
+                incident_id=incident_id,
+                reason=reason,
+                changed_at=changed_at,
+            )
+        except Exception as exc:  # preserve the primary integrity evidence
+            activation_error = exc
+        if not self.read_only:
+            local_reason = reason
+            if activation_error is not None:
+                local_reason += (
+                    "; runtime-global containment persistence also failed: "
+                    f"{activation_error}"
+                )
+            try:
+                self.set_system_state(
+                    "kill_switch",
+                    {
+                        "active": True,
+                        "reason": local_reason,
+                        "changed_at": changed_at,
+                    },
+                )
+            except Exception:
+                pass
+        _drain_and_retry_runtime_incident(
+            self.path,
+            incident_id=incident_id,
+            reason=reason,
+            changed_at=changed_at,
+            activation_error=activation_error,
+        )
+        return runtime_state
+
+    def _promote_existing_local_kill_switch(self) -> None:
+        """Upgrade a pre-runtime database stop into machine-global authority."""
+        malformed_error: Exception | None = None
+        raw_material = ""
+        try:
+            local_stop = self.get_kill_switch()
+        except Exception as exc:
+            malformed_error = exc
+            with self._connect() as connection:
+                row = connection.execute(
+                    "SELECT value_json FROM system_state WHERE state_key = 'kill_switch'"
+                ).fetchone()
+            raw_material = "<missing>" if row is None else str(row["value_json"])
+            local_stop = {
+                "active": True,
+                "reason": f"database-local kill switch is malformed: {exc}",
+                "changed_at": datetime.now(timezone.utc).isoformat(),
+            }
+        if local_stop.get("active") is not True:
+            return
+
+        origin_database = str(self.path.resolve())
+        runtime_state = get_runtime_emergency_stop(self.path)
+        if not runtime_state.get("integrity_error") and any(
+            item.get("origin_database") == origin_database
+            and item.get("reason") == local_stop["reason"]
+            and item.get("activated_at") == local_stop["changed_at"]
+            for item in runtime_state.get("open_incidents", [])
+        ):
+            return
+        material = (
+            f"{origin_database}:{raw_material}"
+            if malformed_error is not None
+            else (
+                f"{origin_database}:{local_stop['changed_at']}:"
+                f"{local_stop['reason']}"
+            )
+        )
+        incident_id = _containment_incident_id("legacy-local-stop", material)
+        effective_reason = local_stop["reason"] or (
+            "pre-runtime database-local kill switch was active"
+        )
+        activation_error: Exception | None = None
+        try:
+            activate_runtime_emergency_stop(
+                self.path,
+                incident_id=incident_id,
+                reason=effective_reason,
+                changed_at=local_stop["changed_at"],
+            )
+        except Exception as exc:
+            activation_error = exc
+        retry_error = _drain_and_retry_runtime_incident(
+            self.path,
+            incident_id=incident_id,
+            reason=effective_reason,
+            changed_at=local_stop["changed_at"],
+            activation_error=activation_error,
+        )
+        if retry_error is not None:
+            raise retry_error
+
     def get_system_state(self, key: str, default: Any = None) -> Any:
         with self._connect() as connection:
             row = connection.execute(
@@ -4359,15 +5993,110 @@ class AssistantStore:
             ).fetchone()
         return default if row is None else json.loads(row["value_json"])
 
-    def set_kill_switch(self, active: bool, *, reason: str = "") -> None:
+    def set_kill_switch(
+        self,
+        active: bool,
+        *,
+        reason: str = "",
+        incident_id: str | None = None,
+        expected_runtime_generation: int | None = None,
+        changed_at: str | None = None,
+    ) -> dict[str, Any]:
+        """Set the local switch and, for activation, the runtime-global latch.
+
+        Clearing the legacy local switch alone never clears runtime authority.
+        A runtime incident can be cleared only by naming that incident and the
+        exact generation observed by the operator.
+        """
+        if type(active) is not bool:
+            raise TypeError("kill-switch active must be an actual bool")
+        if not isinstance(reason, str):
+            raise TypeError("kill-switch reason must be a string")
+        if changed_at is None:
+            timestamp = datetime.now(timezone.utc).isoformat()
+        else:
+            timestamp = _parse_aware_timestamp(
+                changed_at, "changed_at"
+            ).astimezone(timezone.utc).isoformat()
+        if active:
+            if not reason.strip():
+                raise ValueError("an active kill switch requires a non-empty reason")
+            effective_incident_id = incident_id or (
+                "manual:" + secrets.token_hex(20)
+            )
+            runtime_error: Exception | None = None
+            try:
+                runtime_state = activate_runtime_emergency_stop(
+                    self.path,
+                    incident_id=effective_incident_id,
+                    reason=reason.strip(),
+                    changed_at=timestamp,
+                )
+            except Exception as exc:
+                runtime_error = exc
+                runtime_state = get_runtime_emergency_stop(self.path)
+            try:
+                self.set_system_state(
+                    "kill_switch",
+                    {
+                        "active": True,
+                        "reason": reason.strip(),
+                        "changed_at": timestamp,
+                    },
+                )
+            finally:
+                retry_error = _drain_and_retry_runtime_incident(
+                    self.path,
+                    incident_id=effective_incident_id,
+                    reason=reason.strip(),
+                    changed_at=timestamp,
+                    activation_error=runtime_error,
+                )
+            if retry_error is not None:
+                if hasattr(retry_error, "add_note"):
+                    retry_error.add_note(
+                        "the database-local kill switch was persisted and this "
+                        "process remains fail-closed"
+                    )
+                raise retry_error
+            runtime_state = get_runtime_emergency_stop(self.path)
+            return {
+                "local": self.get_kill_switch(),
+                "runtime_stop": runtime_state,
+                "incident_id": effective_incident_id,
+            }
+
+        if (incident_id is None) != (expected_runtime_generation is None):
+            raise ValueError(
+                "runtime clearing requires both incident_id and "
+                "expected_runtime_generation"
+            )
+        runtime_state = get_runtime_emergency_stop(self.path)
+        if incident_id is not None:
+            runtime_state = clear_runtime_emergency_stop(
+                self.path,
+                incident_id=incident_id,
+                expected_generation=expected_runtime_generation,
+                reason=reason or "operator cleared incident after verification",
+                changed_at=timestamp,
+            )
+        # A legacy/local reset is intentionally allowed without runtime
+        # authority, but it cannot weaken an open runtime incident.
+        local_active = bool(runtime_state.get("active"))
+        local_reason = str(runtime_state.get("reason") or reason) if local_active else reason
         self.set_system_state(
             "kill_switch",
             {
-                "active": bool(active),
-                "reason": reason,
-                "changed_at": datetime.now(timezone.utc).isoformat(),
+                "active": local_active,
+                "reason": local_reason,
+                "changed_at": timestamp,
             },
         )
+        return {
+            "local": self.get_kill_switch(),
+            "runtime_stop": runtime_state,
+            "incident_id": incident_id,
+        }
 
     def activate_reconciliation_halt(
         self,
@@ -4392,44 +6121,83 @@ class AssistantStore:
             "reason": reason,
             "changed_at": now,
         }
-        with self._connect() as connection:
-            connection.execute(
-                "INSERT INTO system_state(state_key, value_json, updated_at) "
-                "VALUES (?, ?, ?) ON CONFLICT(state_key) DO UPDATE SET "
-                "value_json = excluded.value_json, updated_at = excluded.updated_at",
-                ("kill_switch", json.dumps(kill_switch, sort_keys=True), now),
+        incident_id = _containment_incident_id(
+            "broker-reconciliation",
+            f"{self.path.resolve()}:{proposal_id}:{reason}",
+        )
+        runtime_activation_error: Exception | None = None
+        try:
+            activate_runtime_emergency_stop(
+                self.path,
+                incident_id=incident_id,
+                reason=reason,
+                changed_at=now,
             )
-            connection.execute(
-                """
-                INSERT INTO operational_alerts(
-                    fingerprint, severity, category, message, details_json,
-                    status, occurrences, first_seen_at, last_seen_at,
-                    acknowledged_at
-                ) VALUES (?, 'critical', 'broker_reconciliation', ?, ?,
-                          'open', 1, ?, ?, NULL)
-                ON CONFLICT(fingerprint) DO UPDATE SET
-                    severity = excluded.severity,
-                    category = excluded.category,
-                    message = excluded.message,
-                    details_json = excluded.details_json,
-                    status = 'open',
-                    occurrences = operational_alerts.occurrences + 1,
-                    last_seen_at = excluded.last_seen_at,
-                    acknowledged_at = NULL
-                """,
-                (
-                    fingerprint,
-                    reason,
-                    json.dumps(alert_details, sort_keys=True, default=str),
-                    now,
-                    now,
-                ),
+        except Exception as exc:
+            runtime_activation_error = exc
+        try:
+            with self._connect() as connection:
+                connection.execute(
+                    "INSERT INTO system_state(state_key, value_json, updated_at) "
+                    "VALUES (?, ?, ?) ON CONFLICT(state_key) DO UPDATE SET "
+                    "value_json = excluded.value_json, updated_at = excluded.updated_at",
+                    ("kill_switch", json.dumps(kill_switch, sort_keys=True), now),
+                )
+                connection.execute(
+                    """
+                    INSERT INTO operational_alerts(
+                        fingerprint, severity, category, message, details_json,
+                        status, occurrences, first_seen_at, last_seen_at,
+                        acknowledged_at
+                    ) VALUES (?, 'critical', 'broker_reconciliation', ?, ?,
+                              'open', 1, ?, ?, NULL)
+                    ON CONFLICT(fingerprint) DO UPDATE SET
+                        severity = excluded.severity,
+                        category = excluded.category,
+                        message = excluded.message,
+                        details_json = excluded.details_json,
+                        status = 'open',
+                        occurrences = operational_alerts.occurrences + 1,
+                        last_seen_at = excluded.last_seen_at,
+                        acknowledged_at = NULL
+                    """,
+                    (
+                        fingerprint,
+                        reason,
+                        json.dumps(alert_details, sort_keys=True, default=str),
+                        now,
+                        now,
+                    ),
+                )
+                row = connection.execute(
+                    "SELECT * FROM operational_alerts WHERE fingerprint = ?",
+                    (fingerprint,),
+                ).fetchone()
+                result = self._operational_alert_row(row)
+        except Exception as exc:
+            try:
+                self.set_system_state("kill_switch", kill_switch)
+            except Exception as fallback_exc:
+                if hasattr(exc, "add_note"):
+                    exc.add_note(
+                        "minimal local kill-switch fallback also failed: "
+                        f"{fallback_exc}"
+                    )
+            if runtime_activation_error is not None and hasattr(exc, "add_note"):
+                exc.add_note(
+                    "runtime-global emergency-stop activation also failed: "
+                    f"{runtime_activation_error}"
+                )
+            raise
+        finally:
+            _drain_and_retry_runtime_incident(
+                self.path,
+                incident_id=incident_id,
+                reason=reason,
+                changed_at=now,
+                activation_error=runtime_activation_error,
             )
-            row = connection.execute(
-                "SELECT * FROM operational_alerts WHERE fingerprint = ?",
-                (fingerprint,),
-            ).fetchone()
-        return self._operational_alert_row(row)
+        return result
 
     def park_reconciliation_anomaly_and_halt(
         self,
@@ -4451,10 +6219,11 @@ class AssistantStore:
         is allowed to win the proposal row, but never suppresses the halt.
 
         ``anomaly_key`` identifies one observation path for one proposal.
-        Replaying that key reasserts the halt without rewriting the proposal
-        or incrementing the alert occurrence count.  The execution reservation
-        is deliberately untouched: ambiguity must continue consuming the
-        submission budget and duplicate-intent slot.
+        Replaying that key is a no-op only while the proposal remains parked
+        and its alert remains open.  If either state has drifted, the same
+        transaction re-parks the proposal and/or reopens the alert.  The
+        execution reservation is deliberately untouched: ambiguity must
+        continue consuming the submission budget and duplicate-intent slot.
         """
         if not isinstance(proposal_id, str) or not proposal_id.strip():
             raise ValueError("proposal_id must be a non-empty string")
@@ -4479,6 +6248,20 @@ class AssistantStore:
             "reason": reason,
             "changed_at": reconciled_at,
         }
+        incident_id = _containment_incident_id(
+            "broker-reconciliation",
+            f"{self.path.resolve()}:{proposal_id}:{anomaly_key}",
+        )
+        runtime_activation_error: Exception | None = None
+        try:
+            activate_runtime_emergency_stop(
+                self.path,
+                incident_id=incident_id,
+                reason=reason,
+                changed_at=reconciled_at,
+            )
+        except Exception as exc:
+            runtime_activation_error = exc
         connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
@@ -4490,14 +6273,16 @@ class AssistantStore:
                 raise KeyError(f"Unknown proposal: {proposal_id}")
 
             existing_alert = connection.execute(
-                "SELECT alert_id FROM operational_alerts WHERE fingerprint = ?",
+                "SELECT status FROM operational_alerts WHERE fingerprint = ?",
                 (fingerprint,),
             ).fetchone()
-            replay = existing_alert is not None
             proposal = json.loads(proposal_row["payload_json"])
             proposal["status"] = proposal_row["status"]
             proposal_parked = False
-            if not replay and proposal_row["status"] in expected_statuses:
+            if (
+                proposal_row["status"] in expected_statuses
+                and proposal_row["status"] != new_status
+            ):
                 proposal.update(
                     {
                         "status": new_status,
@@ -4532,23 +6317,15 @@ class AssistantStore:
                     reconciled_at,
                 ),
             )
-            if not replay:
-                connection.execute(
-                    """
-                    INSERT INTO operational_alerts(
-                        fingerprint, severity, category, message, details_json,
-                        status, occurrences, first_seen_at, last_seen_at,
-                        acknowledged_at
-                    ) VALUES (?, 'critical', 'broker_reconciliation', ?, ?,
-                              'open', 1, ?, ?, NULL)
-                    """,
-                    (
-                        fingerprint,
-                        reason,
-                        json.dumps(alert_details, sort_keys=True, default=str),
-                        reconciled_at,
-                        reconciled_at,
-                    ),
+            if existing_alert is None or existing_alert["status"] != "open":
+                self._upsert_operational_alert_in_connection(
+                    connection,
+                    fingerprint=fingerprint,
+                    severity="critical",
+                    category="broker_reconciliation",
+                    message=reason,
+                    details=alert_details,
+                    seen_at=reconciled_at,
                 )
             alert_row = connection.execute(
                 "SELECT * FROM operational_alerts WHERE fingerprint = ?",
@@ -4561,29 +6338,77 @@ class AssistantStore:
                 "kill_switch": kill_switch,
                 "alert": self._operational_alert_row(alert_row),
             }
-        except Exception:
+        except Exception as exc:
             connection.rollback()
+            try:
+                self.set_system_state("kill_switch", kill_switch)
+            except Exception as fallback_exc:
+                if hasattr(exc, "add_note"):
+                    exc.add_note(
+                        "minimal local kill-switch fallback also failed: "
+                        f"{fallback_exc}"
+                    )
+            if runtime_activation_error is not None and hasattr(exc, "add_note"):
+                exc.add_note(
+                    "runtime-global emergency-stop activation also failed: "
+                    f"{runtime_activation_error}"
+                )
             raise
         finally:
             connection.close()
-
-        # The halt is durable before waiting here.  Draining the same fence
-        # used by broker dispatch guarantees this method cannot report
-        # containment complete while a process that passed an earlier switch
-        # check is still between authorization and durable broker projection.
-        # Re-entry is safe when the anomaly is discovered by the dispatching
-        # thread itself.
-        with execution_dispatch_fence(self.path):
-            pass
+            # Runtime containment is independent of this SQLite transaction;
+            # drain even when proposal/alert persistence rolls back.
+            _drain_and_retry_runtime_incident(
+                self.path,
+                incident_id=incident_id,
+                reason=reason,
+                changed_at=reconciled_at,
+                activation_error=runtime_activation_error,
+            )
         return result
 
     def get_kill_switch(self) -> dict[str, Any]:
-        value = self.get_system_state("kill_switch", default={"active": False, "reason": ""})
-        return value if isinstance(value, dict) else {"active": bool(value), "reason": ""}
+        missing = object()
+        value = self.get_system_state("kill_switch", default=missing)
+        if value is missing:
+            return {"active": False, "reason": ""}
+        if not isinstance(value, dict):
+            raise ValueError("persistent kill-switch state must be a JSON object")
+        expected_fields = {"active", "reason", "changed_at"}
+        if set(value) != expected_fields:
+            raise ValueError(
+                "persistent kill-switch state must contain exactly active, reason, "
+                "and changed_at"
+            )
+        if type(value["active"]) is not bool:
+            raise ValueError("persistent kill-switch active must be an actual bool")
+        if not isinstance(value["reason"], str):
+            raise ValueError("persistent kill-switch reason must be a string")
+        changed_at = _parse_aware_timestamp(
+            value["changed_at"], "persistent kill-switch changed_at"
+        ).astimezone(timezone.utc).isoformat()
+        return {
+            "active": value["active"],
+            "reason": value["reason"],
+            "changed_at": changed_at,
+        }
 
     def database_integrity_check(self) -> list[str]:
-        with self._connect() as connection:
-            return self._integrity_results(connection)
+        try:
+            with self._connect() as connection:
+                results = self._integrity_results(connection)
+        except Exception as exc:
+            results = [
+                "database integrity check could not complete: "
+                f"{type(exc).__name__}: {exc}"
+            ]
+        if results != ["ok"]:
+            self._activate_detected_broker_integrity_incident(
+                event_id="database-integrity-scan",
+                reason="; ".join(results),
+                category="database-integrity",
+            )
+        return results
 
     @staticmethod
     def _integrity_results(
@@ -4659,6 +6484,10 @@ class AssistantStore:
             )
             if detail not in results:
                 results.append(detail)
+        for row in connection.execute("SELECT * FROM broker_order_events"):
+            error = _broker_event_integrity_error(row)
+            if error is not None:
+                results.append(error)
         return results or ["ok"]
 
     def backup_to(self, destination: str | Path) -> Path:
@@ -6259,8 +8088,7 @@ class AssistantStore:
         with self._connect() as connection:
             rows = connection.execute(
                 """
-                SELECT e.event_id, e.order_id, e.proposal_id, e.event_at,
-                       e.fill_qty, e.fill_price, e.filled_qty, e.filled_avg_price,
+                SELECT e.*,
                        tp.payload_json AS proposal_payload_json
                 FROM broker_order_events e
                 LEFT JOIN trade_proposals tp ON tp.proposal_id = e.proposal_id
@@ -6271,46 +8099,140 @@ class AssistantStore:
         fills: list[dict[str, Any]] = []
         cumulative_only: dict[str, dict[str, Any]] = {}
         saw_incremental: set[str] = set()
-        incremental_totals: dict[str, tuple[Decimal, Decimal]] = {}
+        incremental_totals: dict[str, tuple[Decimal, Decimal, bool]] = {}
 
         for row in rows:
+            error = _broker_event_integrity_error(row)
+            if error is not None:
+                self._activate_detected_broker_integrity_incident(
+                    event_id=str(row["event_id"]), reason=error
+                )
+                raise JournalTransactionConflictError(error)
+            event_time = _parse_aware_timestamp(
+                row["event_at"], f"event_at for broker event {row['event_id']}"
+            ).astimezone(timezone.utc)
+            if event_time > datetime.now(timezone.utc):
+                raise ValueError(
+                    f"future event_at for broker event {row['event_id']}"
+                )
             intent = {}
             if row["proposal_payload_json"]:
                 intent = json.loads(row["proposal_payload_json"]).get("intent") or {}
             ticker, side = intent.get("ticker"), intent.get("side")
+            has_numeric_fill = any(
+                row[field] is not None
+                for field in (
+                    "fill_qty",
+                    "fill_qty_text",
+                    "fill_price",
+                    "fill_price_text",
+                    "filled_qty",
+                    "filled_qty_text",
+                    "filled_avg_price",
+                    "filled_avg_price_text",
+                )
+            )
+            if (not ticker or side not in ("buy", "sell")) and has_numeric_fill:
+                raise ValueError(
+                    f"broker event {row['event_id']} has fill evidence that "
+                    "cannot be attributed to a ticker and side"
+                )
             if not ticker or side not in ("buy", "sell"):
-                continue  # cannot attribute a fill without a ticker and side
+                continue
 
-            qty, price = row["fill_qty"], row["fill_price"]
-            if qty and price:
-                qty_decimal = to_decimal(qty, name="incremental fill quantity")
-                price_decimal = to_decimal(price, name="incremental fill price")
+            incremental_qty_source = (
+                row["fill_qty_text"]
+                if row["fill_qty_text"] not in (None, "")
+                else row["fill_qty"]
+            )
+            incremental_price_source = (
+                row["fill_price_text"]
+                if row["fill_price_text"] not in (None, "")
+                else row["fill_price"]
+            )
+            if (incremental_qty_source is None) != (
+                incremental_price_source is None
+            ):
+                raise ValueError(
+                    f"incomplete incremental fill for order {row['order_id']}"
+                )
+            if incremental_qty_source is not None:
+                qty_decimal = to_decimal(
+                    incremental_qty_source, name="incremental fill quantity"
+                )
+                price_decimal = to_decimal(
+                    incremental_price_source, name="incremental fill price"
+                )
                 if qty_decimal <= 0 or price_decimal <= 0:
                     raise ValueError(
                         f"invalid incremental fill for order {row['order_id']}"
                     )
                 saw_incremental.add(row["order_id"])
-                prior_qty, prior_notional = incremental_totals.get(
-                    row["order_id"], (Decimal("0"), Decimal("0"))
+                prior_qty, prior_notional, prior_exact = incremental_totals.get(
+                    row["order_id"], (Decimal("0"), Decimal("0"), True)
+                )
+                provider_exact = (
+                    row["fill_qty_text"] not in (None, "")
+                    and row["fill_price_text"] not in (None, "")
                 )
                 incremental_totals[row["order_id"]] = (
                     prior_qty + qty_decimal,
                     prior_notional + qty_decimal * price_decimal,
+                    prior_exact and provider_exact,
                 )
                 fills.append({
                     "ticker": ticker, "side": side,
                     "qty": float(qty_decimal), "price": float(price_decimal),
+                    "qty_decimal": (
+                        row["fill_qty_text"]
+                        if provider_exact
+                        else decimal_text(qty_decimal)
+                    ),
+                    "price_decimal": (
+                        row["fill_price_text"]
+                        if provider_exact
+                        else decimal_text(price_decimal)
+                    ),
+                    "numeric_evidence_status": (
+                        "provider_exact"
+                        if provider_exact
+                        else "legacy_rounded_unrecoverable"
+                    ),
                     "at": row["event_at"], "fill_id": row["event_id"],
                     "order_id": row["order_id"], "proposal_id": row["proposal_id"],
                 })
                 continue
 
-            if row["filled_qty"] and row["filled_avg_price"]:
-                cumulative_qty = to_decimal(
-                    row["filled_qty"], name="cumulative filled quantity"
+            cumulative_qty_source = (
+                row["filled_qty_text"]
+                if row["filled_qty_text"] not in (None, "")
+                else row["filled_qty"]
+            )
+            cumulative_price_source = (
+                row["filled_avg_price_text"]
+                if row["filled_avg_price_text"] not in (None, "")
+                else row["filled_avg_price"]
+            )
+            if (
+                cumulative_qty_source is None
+                and cumulative_price_source is not None
+            ):
+                raise ValueError(
+                    f"incomplete cumulative fill for order {row['order_id']}"
                 )
+            if cumulative_qty_source is not None:
+                cumulative_qty = to_decimal(
+                    cumulative_qty_source, name="cumulative filled quantity"
+                )
+                if cumulative_qty == 0 and cumulative_price_source is None:
+                    continue
+                if cumulative_price_source is None:
+                    raise ValueError(
+                        f"incomplete cumulative fill for order {row['order_id']}"
+                    )
                 cumulative_price = to_decimal(
-                    row["filled_avg_price"], name="cumulative average fill price"
+                    cumulative_price_source,
+                    name="cumulative average fill price",
                 )
                 if cumulative_qty <= 0 or cumulative_price <= 0:
                     raise ValueError(
@@ -6322,6 +8244,22 @@ class AssistantStore:
                 cumulative_only[row["order_id"]] = {
                     "ticker": ticker, "side": side,
                     "qty": float(cumulative_qty), "price": float(cumulative_price),
+                    "qty_decimal": (
+                        row["filled_qty_text"]
+                        if row["filled_qty_text"] not in (None, "")
+                        else decimal_text(cumulative_qty)
+                    ),
+                    "price_decimal": (
+                        row["filled_avg_price_text"]
+                        if row["filled_avg_price_text"] not in (None, "")
+                        else decimal_text(cumulative_price)
+                    ),
+                    "numeric_evidence_status": (
+                        "provider_exact"
+                        if row["filled_qty_text"] not in (None, "")
+                        and row["filled_avg_price_text"] not in (None, "")
+                        else "legacy_rounded_unrecoverable"
+                    ),
                     "at": row["event_at"], "fill_id": f"{row['order_id']}-cumulative",
                     "order_id": row["order_id"], "proposal_id": row["proposal_id"],
                     "_qty_decimal": cumulative_qty,
@@ -6334,7 +8272,9 @@ class AssistantStore:
             if order_id not in saw_incremental:
                 fills.append(fill)
                 continue
-            incremental_qty, incremental_notional = incremental_totals[order_id]
+            incremental_qty, incremental_notional, incremental_exact = (
+                incremental_totals[order_id]
+            )
             if cumulative_qty < incremental_qty:
                 continue
             cumulative_notional = cumulative_qty * cumulative_price
@@ -6356,6 +8296,16 @@ class AssistantStore:
                     "side": fill["side"],
                     "qty": float(remainder_qty),
                     "price": float(remainder_notional / remainder_qty),
+                    "qty_decimal": decimal_text(remainder_qty),
+                    "price_decimal": decimal_text(
+                        remainder_notional / remainder_qty
+                    ),
+                    "numeric_evidence_status": (
+                        "provider_exact"
+                        if incremental_exact
+                        and fill["numeric_evidence_status"] == "provider_exact"
+                        else "legacy_rounded_unrecoverable"
+                    ),
                     "at": fill["at"],
                     "fill_id": f"{order_id}-cumulative-remainder",
                     "order_id": order_id,
@@ -6790,26 +8740,27 @@ class AssistantStore:
 
 # --- Schema verification (AP-1, ACTION_PLAN 2026-08-02) --------------------
 #
-# AssistantStore.__init__ applies the declared schema idempotently
-# (CREATE ... IF NOT EXISTS plus column-presence-guarded migrations), so a
-# database is brought current by simply opening it with current code. What
-# opening cannot do is PROVE the result: an operator database written by
-# older code silently lacks newer tables until something checks. These
-# helpers compare a database's actual schema objects against the schema the
-# current code creates, read-only and fail-closed.
+# AssistantStore.__init__ applies additive schema changes idempotently
+# (CREATE ... IF NOT EXISTS plus column-presence-guarded migrations). Those
+# changes cannot always reconstruct constraints or column order on a legacy
+# SQLite table, so opening is not itself proof that the database is current.
+# These helpers compare the database's semantic schema against a fresh schema
+# created by current code, read-only and fail-closed.
 
 
 @dataclass(frozen=True)
 class SchemaVerificationResult:
     """Outcome of comparing a database against the currently declared schema.
 
-    ``matches`` is True only when every declared table and column exists and
-    every declared index and trigger exists with the definition produced by
-    current code. Index and trigger definitions are enforcement mechanisms,
-    not labels: a same-named non-unique index or no-op trigger must fail the
-    check. ``extra_tables`` is informational only: legacy or operator-local
-    tables never fail verification, because the contract is "current code's
-    compatible schema is present", not "nothing else is".
+    ``matches`` is True only when every declared table and column exists with
+    its declared type/affinity, ordinal, nullability, default, primary-key
+    ordinal, and generated-column disposition; foreign keys, table-level SQL
+    constraints, indexes (including implicit autoindexes), and triggers must
+    also match. Enforcement objects are not labels: a same-named weaker
+    object must fail the check. ``extra_tables`` is informational only:
+    legacy or operator-local tables never fail verification, because the
+    contract is "current code's compatible schema is present", not "nothing
+    else is".
     """
 
     matches: bool
@@ -6817,8 +8768,12 @@ class SchemaVerificationResult:
     missing_columns: tuple[str, ...]
     missing_indexes: tuple[str, ...]
     missing_triggers: tuple[str, ...]
+    mismatched_columns: tuple[str, ...]
+    mismatched_foreign_keys: tuple[str, ...]
+    mismatched_table_constraints: tuple[str, ...]
     mismatched_indexes: tuple[str, ...]
     mismatched_triggers: tuple[str, ...]
+    unexpected_managed_triggers: tuple[str, ...]
     extra_tables: tuple[str, ...]
 
     def to_dict(self) -> dict[str, Any]:
@@ -6828,8 +8783,16 @@ class SchemaVerificationResult:
             "missing_columns": list(self.missing_columns),
             "missing_indexes": list(self.missing_indexes),
             "missing_triggers": list(self.missing_triggers),
+            "mismatched_columns": list(self.mismatched_columns),
+            "mismatched_foreign_keys": list(self.mismatched_foreign_keys),
+            "mismatched_table_constraints": list(
+                self.mismatched_table_constraints
+            ),
             "mismatched_indexes": list(self.mismatched_indexes),
             "mismatched_triggers": list(self.mismatched_triggers),
+            "unexpected_managed_triggers": list(
+                self.unexpected_managed_triggers
+            ),
             "extra_tables": list(self.extra_tables),
         }
 
@@ -6839,41 +8802,407 @@ def _normalize_schema_sql(sql: str) -> str:
     return " ".join(sql.split())
 
 
+@dataclass(frozen=True)
+class _ColumnSchema:
+    ordinal: int
+    declared_type: str
+    affinity: str
+    not_null: bool
+    default_sql: str | None
+    primary_key_ordinal: int
+    hidden: int
+
+
+@dataclass(frozen=True)
+class _ForeignKeySchema:
+    ordinal: int
+    sequence: int
+    target_table: str
+    source_column: str
+    target_column: str | None
+    on_update: str
+    on_delete: str
+    match: str
+
+
+@dataclass(frozen=True)
+class _IndexColumnSchema:
+    sequence: int
+    column_id: int
+    column_name: str | None
+    descending: bool
+    collation: str | None
+    key_column: bool
+
+
+@dataclass(frozen=True)
+class _IndexSchema:
+    table_name: str
+    name: str
+    unique: bool
+    origin: str
+    partial: bool
+    columns: tuple[_IndexColumnSchema, ...]
+
+
+@dataclass(frozen=True)
+class _TableSqlConstraints:
+    checks: tuple[str, ...]
+    strict: bool
+    without_rowid: bool
+    autoincrement: bool
+
+
+@dataclass(frozen=True)
+class _TableSchema:
+    columns: dict[str, _ColumnSchema]
+    foreign_keys: tuple[_ForeignKeySchema, ...]
+    indexes: dict[str, _IndexSchema]
+    sql_constraints: _TableSqlConstraints
+
+
+@dataclass(frozen=True)
+class _SchemaObjects:
+    tables: dict[str, _TableSchema]
+    named_index_sql: dict[str, str]
+    trigger_sql: dict[str, str]
+    trigger_tables: dict[str, str]
+
+
+def _quote_sqlite_identifier(value: str) -> str:
+    return '"' + value.replace('"', '""') + '"'
+
+
+def _sqlite_affinity(declared_type: str) -> str:
+    """Apply SQLite's documented five-rule declared-type affinity mapping."""
+    normalized = declared_type.upper()
+    if "INT" in normalized:
+        return "INTEGER"
+    if any(token in normalized for token in ("CHAR", "CLOB", "TEXT")):
+        return "TEXT"
+    if not normalized or "BLOB" in normalized:
+        return "BLOB"
+    if any(token in normalized for token in ("REAL", "FLOA", "DOUB")):
+        return "REAL"
+    return "NUMERIC"
+
+
+def _schema_sql_tokens(sql: str) -> tuple[str, ...]:
+    """Tokenize schema SQL without confusing quoted text with constraints.
+
+    Unquoted words are case-folded and whitespace/comments are discarded;
+    quoted tokens are preserved exactly so changing a CHECK string literal
+    remains visible. This is canonical enough to ignore formatting while
+    retaining the semantics the verifier is responsible for.
+    """
+    tokens: list[str] = []
+    index = 0
+    while index < len(sql):
+        char = sql[index]
+        if char.isspace():
+            index += 1
+            continue
+        if sql.startswith("--", index):
+            newline = sql.find("\n", index + 2)
+            index = len(sql) if newline < 0 else newline + 1
+            continue
+        if sql.startswith("/*", index):
+            end = sql.find("*/", index + 2)
+            index = len(sql) if end < 0 else end + 2
+            continue
+        if char in ("'", '"', "`"):
+            quote = char
+            start = index
+            index += 1
+            while index < len(sql):
+                if sql[index] == quote:
+                    if index + 1 < len(sql) and sql[index + 1] == quote:
+                        index += 2
+                        continue
+                    index += 1
+                    break
+                index += 1
+            tokens.append(sql[start:index])
+            continue
+        if char == "[":
+            start = index
+            index += 1
+            while index < len(sql):
+                if sql[index] == "]":
+                    if index + 1 < len(sql) and sql[index + 1] == "]":
+                        index += 2
+                        continue
+                    index += 1
+                    break
+                index += 1
+            tokens.append(sql[start:index])
+            continue
+        if char.isalnum() or char in ("_", "$"):
+            start = index
+            index += 1
+            while index < len(sql) and (
+                sql[index].isalnum() or sql[index] in ("_", "$")
+            ):
+                index += 1
+            tokens.append(sql[start:index].casefold())
+            continue
+        tokens.append(char)
+        index += 1
+    return tuple(tokens)
+
+
+def _canonical_schema_fragment(sql: str | None) -> str | None:
+    if sql is None:
+        return None
+    return " ".join(_schema_sql_tokens(str(sql)))
+
+
+def _matching_sql_parenthesis(tokens: tuple[str, ...], opening: int) -> int:
+    depth = 0
+    for index in range(opening, len(tokens)):
+        if tokens[index] == "(":
+            depth += 1
+        elif tokens[index] == ")":
+            depth -= 1
+            if depth == 0:
+                return index
+    raise sqlite3.DatabaseError("malformed CREATE TABLE SQL: unbalanced parentheses")
+
+
+def _table_sql_constraints(sql: str | None) -> _TableSqlConstraints:
+    tokens = _schema_sql_tokens(sql or "")
+    checks: list[str] = []
+    for index, token in enumerate(tokens[:-1]):
+        if token != "check" or tokens[index + 1] != "(":
+            continue
+        closing = _matching_sql_parenthesis(tokens, index + 1)
+        checks.append(" ".join(tokens[index + 2 : closing]))
+
+    try:
+        table_opening = tokens.index("(")
+    except ValueError:
+        table_tail: tuple[str, ...] = ()
+    else:
+        table_closing = _matching_sql_parenthesis(tokens, table_opening)
+        table_tail = tokens[table_closing + 1 :]
+    without_rowid = any(
+        table_tail[index : index + 2] == ("without", "rowid")
+        for index in range(max(0, len(table_tail) - 1))
+    )
+    return _TableSqlConstraints(
+        checks=tuple(sorted(checks)),
+        strict="strict" in table_tail,
+        without_rowid=without_rowid,
+        autoincrement="autoincrement" in tokens,
+    )
+
+
+def _table_schema(
+    connection: sqlite3.Connection,
+    *,
+    table_name: str,
+    table_sql: str | None,
+) -> _TableSchema:
+    quoted_table = _quote_sqlite_identifier(table_name)
+    columns = {
+        str(row["name"]): _ColumnSchema(
+            ordinal=int(row["cid"]),
+            declared_type=" ".join(str(row["type"] or "").upper().split()),
+            affinity=_sqlite_affinity(str(row["type"] or "")),
+            not_null=bool(row["notnull"]),
+            default_sql=_canonical_schema_fragment(row["dflt_value"]),
+            primary_key_ordinal=int(row["pk"]),
+            hidden=int(row["hidden"]),
+        )
+        for row in connection.execute(f"PRAGMA table_xinfo({quoted_table})")
+    }
+    foreign_keys = tuple(
+        _ForeignKeySchema(
+            ordinal=int(row["id"]),
+            sequence=int(row["seq"]),
+            target_table=str(row["table"]),
+            source_column=str(row["from"]),
+            target_column=(str(row["to"]) if row["to"] is not None else None),
+            on_update=str(row["on_update"]).upper(),
+            on_delete=str(row["on_delete"]).upper(),
+            match=str(row["match"]).upper(),
+        )
+        for row in connection.execute(f"PRAGMA foreign_key_list({quoted_table})")
+    )
+    indexes: dict[str, _IndexSchema] = {}
+    for row in connection.execute(f"PRAGMA index_list({quoted_table})"):
+        index_name = str(row["name"])
+        quoted_index = _quote_sqlite_identifier(index_name)
+        index_columns = tuple(
+            _IndexColumnSchema(
+                sequence=int(column["seqno"]),
+                column_id=int(column["cid"]),
+                column_name=(
+                    str(column["name"]) if column["name"] is not None else None
+                ),
+                descending=bool(column["desc"]),
+                collation=(
+                    str(column["coll"]) if column["coll"] is not None else None
+                ),
+                key_column=bool(column["key"]),
+            )
+            for column in connection.execute(f"PRAGMA index_xinfo({quoted_index})")
+        )
+        indexes[index_name] = _IndexSchema(
+            table_name=table_name,
+            name=index_name,
+            unique=bool(row["unique"]),
+            origin=str(row["origin"]),
+            partial=bool(row["partial"]),
+            columns=index_columns,
+        )
+    return _TableSchema(
+        columns=columns,
+        foreign_keys=foreign_keys,
+        indexes=indexes,
+        sql_constraints=_table_sql_constraints(table_sql),
+    )
+
+
 def _schema_objects(
     connection: sqlite3.Connection,
-) -> tuple[dict[str, set[str]], dict[str, str], dict[str, str]]:
-    """Read tables/columns and enforcement-object definitions.
-
-    SQLite-internal objects (``sqlite_*`` tables, ``sqlite_autoindex*``
-    implicit indexes) are excluded: they are storage details rather than
-    independently declared schema objects. Named index and trigger SQL is
-    retained so verification cannot be fooled by a weaker object reusing the
-    expected name.
-    """
-    tables: dict[str, set[str]] = {}
+) -> _SchemaObjects:
+    """Read tables and all structural/enforcement schema evidence."""
+    tables: dict[str, _TableSchema] = {}
     for row in connection.execute(
-        "SELECT name FROM sqlite_master "
+        "SELECT name, sql FROM sqlite_master "
         "WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"
     ).fetchall():
-        name = row["name"]
-        tables[name] = {
-            column["name"]
-            for column in connection.execute(f'PRAGMA table_info("{name}")')
-        }
-    indexes = {
+        name = str(row["name"])
+        tables[name] = _table_schema(
+            connection,
+            table_name=name,
+            table_sql=row["sql"],
+        )
+    named_index_sql = {
         row["name"]: _normalize_schema_sql(row["sql"])
         for row in connection.execute(
             "SELECT name, sql FROM sqlite_master "
-            "WHERE type = 'index' AND name NOT LIKE 'sqlite_autoindex%'"
+            "WHERE type = 'index' AND sql IS NOT NULL "
+            "AND name NOT LIKE 'sqlite_%'"
         ).fetchall()
     }
-    triggers = {
+    trigger_rows = connection.execute(
+        "SELECT name, tbl_name, sql FROM sqlite_master WHERE type = 'trigger'"
+    ).fetchall()
+    trigger_sql = {
         row["name"]: _normalize_schema_sql(row["sql"])
-        for row in connection.execute(
-            "SELECT name, sql FROM sqlite_master WHERE type = 'trigger'"
-        ).fetchall()
+        for row in trigger_rows
     }
-    return tables, indexes, triggers
+    trigger_tables = {
+        str(row["name"]): str(row["tbl_name"])
+        for row in trigger_rows
+    }
+    return _SchemaObjects(
+        tables=tables,
+        named_index_sql=named_index_sql,
+        trigger_sql=trigger_sql,
+        trigger_tables=trigger_tables,
+    )
+
+
+def _all_indexes(schema: _SchemaObjects) -> dict[str, _IndexSchema]:
+    return {
+        name: index
+        for table in schema.tables.values()
+        for name, index in table.indexes.items()
+    }
+
+
+def _compare_schema_objects(
+    expected: _SchemaObjects,
+    actual: _SchemaObjects,
+) -> SchemaVerificationResult:
+    expected_tables = expected.tables
+    actual_tables = actual.tables
+    missing_tables = sorted(set(expected_tables) - set(actual_tables))
+    missing_columns = sorted(
+        f"{table}.{column}"
+        for table, expected_table in expected_tables.items()
+        if table in actual_tables
+        for column in set(expected_table.columns) - set(actual_tables[table].columns)
+    )
+    mismatched_columns = sorted(
+        f"{table}.{column}"
+        for table, expected_table in expected_tables.items()
+        if table in actual_tables
+        for column in set(expected_table.columns) & set(actual_tables[table].columns)
+        if expected_table.columns[column] != actual_tables[table].columns[column]
+    )
+    mismatched_foreign_keys = sorted(
+        table
+        for table, expected_table in expected_tables.items()
+        if table in actual_tables
+        and expected_table.foreign_keys != actual_tables[table].foreign_keys
+    )
+    mismatched_table_constraints = sorted(
+        table
+        for table, expected_table in expected_tables.items()
+        if table in actual_tables
+        and expected_table.sql_constraints
+        != actual_tables[table].sql_constraints
+    )
+
+    expected_indexes = _all_indexes(expected)
+    actual_indexes = _all_indexes(actual)
+    missing_indexes = sorted(
+        (set(expected_indexes) - set(actual_indexes))
+        | (set(expected.named_index_sql) - set(actual.named_index_sql))
+    )
+    mismatched_indexes = sorted(
+        {
+            name
+            for name in set(expected_indexes) & set(actual_indexes)
+            if expected_indexes[name] != actual_indexes[name]
+        }
+        | {
+            name
+            for name in set(expected.named_index_sql) & set(actual.named_index_sql)
+            if expected.named_index_sql[name] != actual.named_index_sql[name]
+        }
+    )
+    missing_triggers = sorted(set(expected.trigger_sql) - set(actual.trigger_sql))
+    mismatched_triggers = sorted(
+        name
+        for name in set(expected.trigger_sql) & set(actual.trigger_sql)
+        if expected.trigger_sql[name] != actual.trigger_sql[name]
+    )
+    unexpected_managed_triggers = sorted(
+        name
+        for name in set(actual.trigger_sql) - set(expected.trigger_sql)
+        if actual.trigger_tables.get(name) in expected_tables
+    )
+    extra_tables = sorted(set(actual_tables) - set(expected_tables))
+    return SchemaVerificationResult(
+        matches=not (
+            missing_tables
+            or missing_columns
+            or missing_indexes
+            or missing_triggers
+            or mismatched_columns
+            or mismatched_foreign_keys
+            or mismatched_table_constraints
+            or mismatched_indexes
+            or mismatched_triggers
+            or unexpected_managed_triggers
+        ),
+        missing_tables=tuple(missing_tables),
+        missing_columns=tuple(missing_columns),
+        missing_indexes=tuple(missing_indexes),
+        missing_triggers=tuple(missing_triggers),
+        mismatched_columns=tuple(mismatched_columns),
+        mismatched_foreign_keys=tuple(mismatched_foreign_keys),
+        mismatched_table_constraints=tuple(mismatched_table_constraints),
+        mismatched_indexes=tuple(mismatched_indexes),
+        mismatched_triggers=tuple(mismatched_triggers),
+        unexpected_managed_triggers=tuple(unexpected_managed_triggers),
+        extra_tables=tuple(extra_tables),
+    )
 
 
 def verify_database_schema(path: str | Path) -> SchemaVerificationResult:
@@ -6898,9 +9227,7 @@ def verify_database_schema(path: str | Path) -> SchemaVerificationResult:
         reference = AssistantStore(Path(reference_dir) / "schema_reference.db")
         reference_connection = AssistantStore._open_database(reference.path)
         try:
-            expected_tables, expected_indexes, expected_triggers = _schema_objects(
-                reference_connection
-            )
+            expected = _schema_objects(reference_connection)
         finally:
             reference_connection.close()
     target_connection = sqlite3.connect(
@@ -6908,46 +9235,8 @@ def verify_database_schema(path: str | Path) -> SchemaVerificationResult:
     )
     target_connection.row_factory = sqlite3.Row
     try:
-        actual_tables, actual_indexes, actual_triggers = _schema_objects(
-            target_connection
-        )
+        actual = _schema_objects(target_connection)
     finally:
         target_connection.close()
 
-    missing_tables = sorted(set(expected_tables) - set(actual_tables))
-    missing_columns = sorted(
-        f"{table}.{column}"
-        for table, expected_columns in expected_tables.items()
-        if table in actual_tables
-        for column in expected_columns - actual_tables[table]
-    )
-    missing_indexes = sorted(set(expected_indexes) - set(actual_indexes))
-    missing_triggers = sorted(set(expected_triggers) - set(actual_triggers))
-    mismatched_indexes = sorted(
-        name
-        for name in set(expected_indexes) & set(actual_indexes)
-        if expected_indexes[name] != actual_indexes[name]
-    )
-    mismatched_triggers = sorted(
-        name
-        for name in set(expected_triggers) & set(actual_triggers)
-        if expected_triggers[name] != actual_triggers[name]
-    )
-    extra_tables = sorted(set(actual_tables) - set(expected_tables))
-    return SchemaVerificationResult(
-        matches=not (
-            missing_tables
-            or missing_columns
-            or missing_indexes
-            or missing_triggers
-            or mismatched_indexes
-            or mismatched_triggers
-        ),
-        missing_tables=tuple(missing_tables),
-        missing_columns=tuple(missing_columns),
-        missing_indexes=tuple(missing_indexes),
-        missing_triggers=tuple(missing_triggers),
-        mismatched_indexes=tuple(mismatched_indexes),
-        mismatched_triggers=tuple(mismatched_triggers),
-        extra_tables=tuple(extra_tables),
-    )
+    return _compare_schema_objects(expected, actual)

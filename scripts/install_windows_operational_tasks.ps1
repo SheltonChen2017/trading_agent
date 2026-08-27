@@ -9,6 +9,11 @@ param(
 
     [string]$RepositoryPath,
 
+    # Optional highest-precedence override. When omitted, use the same
+    # environment -> personal -> committed-default precedence as the Python
+    # entry points, then bind the resolved path explicitly into every task.
+    [string]$PolicyPath,
+
     [string]$TaskPrefix = "TradingAgent-Paper",
 
     [string]$RunAsUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name,
@@ -121,6 +126,39 @@ foreach ($requiredPath in @($assistantScript, $watchdogScript)) {
         throw "Required script does not exist: $requiredPath"
     }
 }
+# Ask the canonical Python loader to validate the file and compute its exact
+# fingerprint before any scheduled-task object or mutation is attempted.
+$policyIdentityArguments = @($assistantScript)
+if (-not [string]::IsNullOrWhiteSpace($PolicyPath)) {
+    $policyIdentityArguments += @("--policy", $PolicyPath.Trim())
+}
+$policyIdentityArguments += "policy-identity"
+$policyIdentityOutput = @(
+    & $resolvedPython @policyIdentityArguments 2>&1
+)
+if ($LASTEXITCODE -ne 0) {
+    throw (
+        "Operational policy validation failed: " +
+        ($policyIdentityOutput -join [Environment]::NewLine)
+    )
+}
+try {
+    $policyIdentity = ($policyIdentityOutput -join [Environment]::NewLine) |
+        ConvertFrom-Json
+}
+catch {
+    throw "Operational policy identity output was not valid JSON: $($_.Exception.Message)"
+}
+$resolvedPolicy = [string]$policyIdentity.policy_path
+if (
+    [string]::IsNullOrWhiteSpace([string]$policyIdentity.policy_fingerprint) -or
+    [string]::IsNullOrWhiteSpace($resolvedPolicy) -or
+    -not (Test-Path -LiteralPath $resolvedPolicy -PathType Leaf) -or
+    (Resolve-Path -LiteralPath $resolvedPolicy).Path -ne $resolvedPolicy
+) {
+    throw "Operational policy identity did not match the resolved policy path."
+}
+$policyFingerprint = [string]$policyIdentity.policy_fingerprint
 
 # The evidence capture is defined by the NYSE clock, not by the host's wall
 # clock. 16:30 Eastern is after both the normal 16:00 close and 13:00 half-day
@@ -133,6 +171,13 @@ $databaseArgument = Quote-TaskArgument $database
 $alertsArgument = Quote-TaskArgument $alerts
 $assistantArgument = Quote-TaskArgument $assistantScript
 $watchdogArgument = Quote-TaskArgument $watchdogScript
+$policyArgument = Quote-TaskArgument $resolvedPolicy
+$taskCommands = [ordered]@{
+    OperationsCycle = "$assistantArgument --database $databaseArgument --policy $policyArgument operations-cycle --cancel-stale --alerts-jsonl $alertsArgument"
+    OrderMonitor = "$assistantArgument --database $databaseArgument --policy $policyArgument monitor-orders --cancel-stale --poll-seconds 30"
+    Watchdog = "$watchdogArgument --database $databaseArgument --policy $policyArgument --interval-seconds 60 --alerts-jsonl $alertsArgument"
+    PaperObservation = "$assistantArgument --database $databaseArgument --policy $policyArgument paper-observation --cancel-stale --alerts-jsonl $alertsArgument"
+}
 
 # ScheduledTasks object construction can itself require access to the local
 # Task Scheduler CIM provider.  A non-elevated operator must still be able to
@@ -140,10 +185,10 @@ $watchdogArgument = Quote-TaskArgument $watchdogScript
 # New-ScheduledTask* cmdlet.
 if ($WhatIfPreference) {
     @(
-        @{ Name = "$TaskPrefix-OperationsCycle"; Command = "$assistantArgument --database $databaseArgument operations-cycle --cancel-stale --alerts-jsonl $alertsArgument" },
-        @{ Name = "$TaskPrefix-OrderMonitor"; Command = "$assistantArgument --database $databaseArgument monitor-orders --cancel-stale --poll-seconds 30" },
-        @{ Name = "$TaskPrefix-Watchdog"; Command = "$watchdogArgument --database $databaseArgument --interval-seconds 60 --alerts-jsonl $alertsArgument" },
-        @{ Name = "$TaskPrefix-PaperObservation"; Command = "$assistantArgument --database $databaseArgument paper-observation --cancel-stale --alerts-jsonl $alertsArgument" }
+        @{ Name = "$TaskPrefix-OperationsCycle"; Command = $taskCommands.OperationsCycle },
+        @{ Name = "$TaskPrefix-OrderMonitor"; Command = $taskCommands.OrderMonitor },
+        @{ Name = "$TaskPrefix-Watchdog"; Command = $taskCommands.Watchdog },
+        @{ Name = "$TaskPrefix-PaperObservation"; Command = $taskCommands.PaperObservation }
     ) | ForEach-Object {
         [PSCustomObject]@{
             TaskName = $_.Name
@@ -156,6 +201,8 @@ if ($WhatIfPreference) {
             LogonType = $TaskLogonType
             Database = $database
             AlertsJsonl = $alerts
+            PolicyPath = $resolvedPolicy
+            PolicyFingerprint = $policyFingerprint
         }
     }
     return
@@ -163,19 +210,19 @@ if ($WhatIfPreference) {
 
 $cycleAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
-    -Argument "$assistantArgument --database $databaseArgument operations-cycle --cancel-stale --alerts-jsonl $alertsArgument" `
+    -Argument $taskCommands.OperationsCycle `
     -WorkingDirectory $resolvedRepository
 $monitorAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
-    -Argument "$assistantArgument --database $databaseArgument monitor-orders --cancel-stale --poll-seconds 30" `
+    -Argument $taskCommands.OrderMonitor `
     -WorkingDirectory $resolvedRepository
 $watchdogAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
-    -Argument "$watchdogArgument --database $databaseArgument --interval-seconds 60 --alerts-jsonl $alertsArgument" `
+    -Argument $taskCommands.Watchdog `
     -WorkingDirectory $resolvedRepository
 $observationAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
-    -Argument "$assistantArgument --database $databaseArgument paper-observation --cancel-stale --alerts-jsonl $alertsArgument" `
+    -Argument $taskCommands.PaperObservation `
     -WorkingDirectory $resolvedRepository
 
 $cycleTrigger = New-ScheduledTaskTrigger `
@@ -329,6 +376,8 @@ if (-not $attempted) {
             LogonType = $TaskLogonType
             Database = $database
             AlertsJsonl = $alerts
+            PolicyPath = $resolvedPolicy
+            PolicyFingerprint = $policyFingerprint
         }
     }
     return
@@ -346,5 +395,7 @@ $tasks | ForEach-Object {
         LogonType = $live.Principal.LogonType
         Database = $database
         AlertsJsonl = $alerts
+        PolicyPath = $resolvedPolicy
+        PolicyFingerprint = $policyFingerprint
     }
 }

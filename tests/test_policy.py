@@ -21,6 +21,7 @@ from assistant.policy import (
     load_policy,
     policy_with_updated_flags,
 )
+from assistant.temporal_integrity import MAX_ORDER_AGE_MINUTES
 
 
 def _valid_policy(**overrides) -> TradingPolicy:
@@ -45,6 +46,14 @@ _REAL_POLICY_FIELDS = (
 
 def test_default_policy_is_valid():
     _valid_policy().validate()  # must not raise
+
+
+def test_order_age_policy_uses_the_reconciler_maximum():
+    _valid_policy(max_order_age_minutes=MAX_ORDER_AGE_MINUTES).validate()
+    with pytest.raises(ValueError, match="max_order_age_minutes"):
+        _valid_policy(
+            max_order_age_minutes=MAX_ORDER_AGE_MINUTES + 0.001
+        ).validate()
 
 
 def test_policy_fingerprint_same_content_same_fingerprint():

@@ -7,8 +7,17 @@ from threading import Barrier, Event, Thread
 
 import pytest
 
-from assistant.proposal_status import FILLED, SUBMISSION_UNKNOWN, SUBMITTING
-from assistant.dispatch_fence import execution_dispatch_fence
+import assistant.storage as storage_module
+from assistant.proposal_status import (
+    FILLED,
+    RECONCILING,
+    SUBMISSION_UNKNOWN,
+    SUBMITTING,
+)
+from assistant.dispatch_fence import (
+    execution_dispatch_fence,
+    get_runtime_emergency_stop,
+)
 from assistant.storage import AssistantStore
 
 
@@ -83,7 +92,7 @@ def test_anomaly_containment_parks_and_halts_without_releasing_reservation(tmp_p
     }
 
 
-def test_anomaly_containment_rolls_back_proposal_and_halt_when_alert_write_fails(
+def test_alert_failure_rolls_back_proposal_but_preserves_independent_containment(
     tmp_path,
 ):
     store = AssistantStore(tmp_path / "assistant.db")
@@ -106,11 +115,39 @@ def test_anomaly_containment_rolls_back_proposal_and_halt_when_alert_write_fails
         _contain(store)
 
     assert store.get_proposal("p-anomaly")["status"] == SUBMITTING
-    assert store.get_kill_switch()["active"] is False
+    assert store.get_kill_switch()["active"] is True
+    assert get_runtime_emergency_stop(store.path)["active"] is True
     assert store.list_operational_alerts() == []
     assert store.get_execution_budget_usage("2026-08-26")[
         "submitted_notional_decimal"
     ] == "1000"
+
+
+def test_runtime_and_alert_failure_falls_back_to_separate_local_stop(
+    tmp_path, monkeypatch
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    _seed(store)
+
+    def fail_runtime(*_args, **_kwargs):
+        raise OSError("injected runtime persistence failure")
+
+    monkeypatch.setattr(
+        storage_module, "activate_runtime_emergency_stop", fail_runtime
+    )
+    with store._connect() as connection:
+        connection.execute(
+            "CREATE TRIGGER inject_dual_alert_failure "
+            "BEFORE INSERT ON operational_alerts BEGIN "
+            "SELECT RAISE(ABORT, 'injected alert failure'); END"
+        )
+
+    with pytest.raises(sqlite3.IntegrityError, match="injected alert failure"):
+        _contain(store)
+
+    assert store.get_proposal("p-anomaly")["status"] == SUBMITTING
+    assert store.get_kill_switch()["active"] is True
+    assert store.list_operational_alerts() == []
 
 
 def test_same_anomaly_key_is_idempotent(tmp_path):
@@ -133,6 +170,76 @@ def test_same_anomaly_key_is_idempotent(tmp_path):
     assert store.get_proposal("p-anomaly")["reconciled_at"] == (
         "2026-08-26T15:01:00+00:00"
     )
+
+
+def test_acknowledged_anomaly_replay_reopens_alert_and_reparks_proposal_drift(
+    tmp_path,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    _seed(store)
+    first = _contain(store)
+    assert store.acknowledge_operational_alert(first["alert"]["alert_id"]) is True
+    store.update_proposal_status("p-anomaly", RECONCILING)
+
+    replay = _contain(
+        store,
+        expected_statuses=(RECONCILING,),
+        reconciled_at="2026-08-26T15:02:00+00:00",
+    )
+
+    proposal = store.get_proposal("p-anomaly")
+    assert replay["proposal_parked"] is True
+    assert proposal["status"] == SUBMISSION_UNKNOWN
+    assert proposal["reconciled_at"] == "2026-08-26T15:02:00+00:00"
+    alerts = store.list_operational_alerts(status=None)
+    assert len(alerts) == 1
+    assert replay["alert"] == alerts[0]
+    assert alerts[0]["status"] == "open"
+    assert alerts[0]["occurrences"] == 2
+    assert alerts[0]["first_seen_at"] == "2026-08-26T15:01:00+00:00"
+    assert alerts[0]["last_seen_at"] == "2026-08-26T15:02:00+00:00"
+    assert alerts[0]["acknowledged_at"] is None
+    assert store.get_execution_budget_usage("2026-08-26")[
+        "submitted_notional_decimal"
+    ] == "1000"
+
+
+def test_anomaly_replay_alert_failure_keeps_independent_containment(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    _seed(store)
+    first = _contain(store)
+    assert store.acknowledge_operational_alert(first["alert"]["alert_id"]) is True
+    store.update_proposal_status("p-anomaly", RECONCILING)
+    store.set_kill_switch(False, reason="baseline")
+    with store._connect() as connection:
+        connection.execute(
+            """
+            CREATE TRIGGER inject_atomic_anomaly_reopen_failure
+            BEFORE UPDATE ON operational_alerts
+            WHEN NEW.status = 'open'
+            BEGIN
+                SELECT RAISE(ABORT, 'injected atomic anomaly reopen failure');
+            END
+            """
+        )
+
+    with pytest.raises(
+        sqlite3.IntegrityError, match="injected atomic anomaly reopen failure"
+    ):
+        _contain(
+            store,
+            expected_statuses=(RECONCILING,),
+            reconciled_at="2026-08-26T15:02:00+00:00",
+        )
+
+    assert store.get_proposal("p-anomaly")["status"] == RECONCILING
+    assert store.get_kill_switch()["active"] is True
+    assert get_runtime_emergency_stop(store.path)["active"] is True
+    alerts = store.list_operational_alerts(status=None)
+    assert len(alerts) == 1
+    assert alerts[0]["status"] == "acknowledged"
+    assert alerts[0]["occurrences"] == 1
+    assert store.list_operational_alerts() == []
 
 
 def test_simultaneous_anomaly_writers_create_one_containment_record(tmp_path):

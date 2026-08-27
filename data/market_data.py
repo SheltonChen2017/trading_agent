@@ -10,12 +10,203 @@ scanner and backtester logic without hitting any external API.
 """
 from __future__ import annotations
 
+import dataclasses
+import re
+
 import numpy as np
 import pandas as pd
 import pandas_market_calendars as mcal
 
 _NYSE_CALENDAR = mcal.get_calendar("NYSE")
-_REQUIRED_OHLCV_COLUMNS = {"open", "high", "low", "close", "volume"}
+_REQUIRED_OHLCV_COLUMNS = ("open", "high", "low", "close", "volume")
+_CANONICAL_TICKER_PATTERN = re.compile(r"[A-Z0-9^][A-Z0-9.^=_-]{0,31}")
+
+
+@dataclasses.dataclass(frozen=True)
+class DailyBarValidation:
+    """Result of the one authoritative daily-bar usability check.
+
+    A bad frame is data-quality evidence, not an exception that should erase
+    usable sibling tickers. Invalid requested ticker identities remain
+    programmer/input errors and therefore raise from ``canonical_ticker``.
+    """
+
+    ticker: str
+    usable: bool
+    latest_session: str | None
+    error: str | None
+
+
+def canonical_ticker(raw_ticker: object) -> str:
+    """Return the canonical provider symbol or reject an ambiguous identity.
+
+    Yahoo symbols used by this project include ordinary equities (``AAPL``),
+    class shares (``BRK.B``), indices (``^VIX``), and rate proxies
+    (``^IRX``/``^TNX``), so the allowed alphabet intentionally covers those
+    provider identities without accepting whitespace or control characters.
+    """
+
+    if not isinstance(raw_ticker, str):
+        raise ValueError("ticker must be a string")
+    ticker = raw_ticker.strip().upper()
+    if not ticker or _CANONICAL_TICKER_PATTERN.fullmatch(ticker) is None:
+        raise ValueError(f"ticker is not a canonical provider symbol: {raw_ticker!r}")
+    return ticker
+
+
+def _invalid_bars(ticker: str, error: str) -> DailyBarValidation:
+    return DailyBarValidation(
+        ticker=ticker,
+        usable=False,
+        latest_session=None,
+        error=error,
+    )
+
+
+def validate_daily_bar_frame(
+    ticker: object,
+    frame: object,
+) -> DailyBarValidation:
+    """Validate one provider's daily OHLCV frame without repairing it.
+
+    The index is a sequence of NYSE session *labels*, not arbitrary business
+    days or intraday timestamps. It must be strictly ascending and unique.
+    Required numeric observations must all be finite; OHLC must be positive
+    and internally possible; volume must be non-negative. Rows that are
+    entirely absent across all required fields are provider alignment padding
+    and are ignored, but a partially populated or otherwise malformed row
+    makes the ticker unusable. At least one complete row must remain.
+    """
+
+    name = canonical_ticker(ticker)
+    if not isinstance(frame, pd.DataFrame):
+        return _invalid_bars(name, "provider value is not a DataFrame")
+    if frame.empty:
+        return _invalid_bars(name, "provider frame has no rows")
+    if not frame.columns.is_unique:
+        return _invalid_bars(name, "provider frame has duplicate columns")
+
+    missing_columns = [
+        column for column in _REQUIRED_OHLCV_COLUMNS if column not in frame.columns
+    ]
+    if missing_columns:
+        return _invalid_bars(
+            name,
+            "provider frame is missing required columns: "
+            + ", ".join(missing_columns),
+        )
+
+    index = frame.index
+    if not isinstance(index, pd.DatetimeIndex):
+        return _invalid_bars(name, "provider frame index must be a DatetimeIndex")
+    if index.hasnans:
+        return _invalid_bars(name, "provider frame index contains NaT")
+
+    # Daily labels may be timezone-aware. Dropping (rather than converting)
+    # the timezone preserves the provider's exchange-local session date.
+    local_index = index.tz_localize(None) if index.tz is not None else index
+    all_session_index = local_index.normalize()
+    if not local_index.equals(all_session_index):
+        return _invalid_bars(name, "provider frame index contains intraday timestamps")
+    if not all_session_index.is_unique:
+        return _invalid_bars(name, "provider frame index contains duplicate sessions")
+    if not all_session_index.is_monotonic_increasing:
+        return _invalid_bars(name, "provider frame index is not ascending")
+
+    try:
+        schedule = _NYSE_CALENDAR.schedule(
+            start_date=all_session_index[0].date().isoformat(),
+            end_date=all_session_index[-1].date().isoformat(),
+        )
+    except (OverflowError, TypeError, ValueError):
+        return _invalid_bars(name, "provider frame index is outside calendar bounds")
+    exchange_sessions = pd.DatetimeIndex(schedule.index).tz_localize(None).normalize()
+    non_sessions = all_session_index.difference(exchange_sessions)
+    if not non_sessions.empty:
+        return _invalid_bars(
+            name,
+            "provider frame index contains non-NYSE sessions: "
+            + ", ".join(value.date().isoformat() for value in non_sessions[:3]),
+        )
+
+    # A multi-ticker provider response commonly aligns every symbol to the
+    # union of all dates. Fully absent rows are not bars and may be ignored;
+    # partially absent bars are malformed and fail below.
+    required = frame.loc[:, list(_REQUIRED_OHLCV_COLUMNS)]
+    present_mask = ~required.isna().all(axis=1)
+    required = required.loc[present_mask]
+    if required.empty:
+        return _invalid_bars(name, "provider frame has no usable rows")
+    usable_session_index = all_session_index[present_mask.to_numpy()]
+
+    contains_boolean = any(
+        required[column].map(lambda value: isinstance(value, (bool, np.bool_))).any()
+        for column in _REQUIRED_OHLCV_COLUMNS
+    )
+    if contains_boolean:
+        return _invalid_bars(name, "provider frame contains boolean numerics")
+    non_numeric_columns = [
+        column
+        for column in _REQUIRED_OHLCV_COLUMNS
+        if (
+            not pd.api.types.is_numeric_dtype(required[column].dtype)
+            or pd.api.types.is_complex_dtype(required[column].dtype)
+        )
+    ]
+    if non_numeric_columns:
+        return _invalid_bars(
+            name,
+            "provider frame contains non-numeric required columns: "
+            + ", ".join(non_numeric_columns),
+        )
+    numeric = required.apply(pd.to_numeric, errors="coerce")
+    values = numeric.to_numpy(dtype=float, na_value=np.nan)
+    if not np.isfinite(values).all():
+        return _invalid_bars(name, "provider frame contains non-finite numerics")
+
+    ohlc = numeric.loc[:, ["open", "high", "low", "close"]]
+    if (ohlc <= 0).to_numpy().any():
+        return _invalid_bars(name, "provider frame contains non-positive OHLC")
+    if (numeric["volume"] < 0).any():
+        return _invalid_bars(name, "provider frame contains negative volume")
+
+    impossible = (
+        (numeric["high"] < numeric["open"])
+        | (numeric["high"] < numeric["close"])
+        | (numeric["high"] < numeric["low"])
+        | (numeric["low"] > numeric["open"])
+        | (numeric["low"] > numeric["close"])
+    )
+    if impossible.any():
+        return _invalid_bars(name, "provider frame contains inconsistent OHLC")
+
+    return DailyBarValidation(
+        ticker=name,
+        usable=True,
+        latest_session=usable_session_index[-1].date().isoformat(),
+        error=None,
+    )
+
+
+def validated_daily_bar_frame(
+    ticker: object,
+    frame: object,
+) -> tuple[DailyBarValidation, pd.DataFrame | None]:
+    """Return validation plus the unmodified usable observations.
+
+    For an already clean frame the same object is returned. The only allowed
+    filtering is removal of rows that are absent across every required field,
+    which are multi-ticker alignment padding rather than market observations.
+    """
+
+    validation = validate_daily_bar_frame(ticker, frame)
+    if not validation.usable or not isinstance(frame, pd.DataFrame):
+        return validation, None
+    required = frame.loc[:, list(_REQUIRED_OHLCV_COLUMNS)]
+    present_mask = ~required.isna().all(axis=1)
+    if present_mask.all():
+        return validation, frame
+    return validation, frame.loc[present_mask]
 
 
 def _trading_session_start_date(lookback_days: int, end_date: pd.Timestamp | None = None) -> str:
@@ -73,19 +264,29 @@ def fetch_historical(tickers: list[str], lookback_days: int = 252) -> dict[str, 
     """
     import yfinance as yf  # imported lazily so this module still loads without the package
 
+    requested = [canonical_ticker(ticker) for ticker in tickers]
+    if not requested:
+        raise ValueError("tickers must contain at least one ticker")
+    if len(set(requested)) != len(requested):
+        raise ValueError("tickers must be unique after canonicalization")
     start_date = _trading_session_start_date(lookback_days)
     data: dict[str, pd.DataFrame] = {}
 
     raw = yf.download(
-        tickers=tickers,
+        tickers=requested,
         start=start_date,
         interval="1d",
         group_by="ticker",
         auto_adjust=True,
         progress=False,
     )
+    if not isinstance(raw, pd.DataFrame):
+        return {}
+    if len(requested) > 1 and not isinstance(raw.columns, pd.MultiIndex):
+        # A flat multi-symbol response has no trustworthy symbol identity.
+        return {}
 
-    for ticker in tickers:
+    for ticker in requested:
         try:
             # yfinance returns MultiIndex (ticker, field) columns with
             # group_by="ticker" regardless of how many tickers were
@@ -93,17 +294,14 @@ def fetch_historical(tickers: list[str], lookback_days: int = 252) -> dict[str, 
             # index by ticker when that's the shape we got back.
             df = raw[ticker].copy() if isinstance(raw.columns, pd.MultiIndex) else raw.copy()
             df.columns = [c.lower() for c in df.columns]
-            if not _REQUIRED_OHLCV_COLUMNS.issubset(df.columns):
-                continue
-            df = df.dropna(subset=["close"])
-            # Defensive: a provider response should already be sorted and
-            # unique, but never trust that silently -- a duplicated or
-            # out-of-order index would corrupt every rolling-window
-            # calculation downstream (scanner z-scores, volatility, trend).
-            df = df[~df.index.duplicated(keep="last")].sort_index()
-            data[ticker] = df.tail(lookback_days)
-        except (KeyError, TypeError):
-            # Ticker delisted, typo'd, or no data returned — skip rather than crash the whole scan
+            candidate = df.tail(lookback_days)
+            validation, usable_frame = validated_daily_bar_frame(ticker, candidate)
+            if validation.usable and usable_frame is not None:
+                # No malformed observation is sorted, deduplicated, filled,
+                # coerced, or otherwise repaired into apparent market data.
+                data[ticker] = usable_frame
+        except (AttributeError, KeyError, OverflowError, TypeError, ValueError):
+            # One missing/malformed ticker must not erase usable siblings.
             continue
 
     return data
@@ -124,9 +322,14 @@ def generate_synthetic(
     it has no relationship to any real stock's actual behavior.
     """
     rng = np.random.default_rng(seed)
-    # Small buffer + trim: bdate_range's periods count can be off by one when
-    # `end` itself falls on a weekend, so over-request slightly and slice.
-    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    end = pd.Timestamp.today().normalize()
+    start = _trading_session_start_date(days, end_date=end)
+    dates = pd.DatetimeIndex(
+        _NYSE_CALENDAR.schedule(
+            start_date=start,
+            end_date=end.date().isoformat(),
+        ).index
+    ).tz_localize(None)[-days:]
 
     data: dict[str, pd.DataFrame] = {}
     for ticker in tickers:

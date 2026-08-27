@@ -24,16 +24,21 @@ def _frame(opens, closes):
     ("kwargs", "expected_outcome", "expected_column"),
     [
         ({"stop_loss_pct": 10.0}, "stop_loss", "open"),
-        ({"max_hold_days": 0}, "max_hold", "open"),
+        ({"max_hold_days": 1}, "max_hold", "open"),
         ({"trigger_pct": 0.05, "trim_pct": 1.0}, "fully_sold", "open"),
     ],
 )
 def test_next_session_episode_exits_record_open_price_source(
     kwargs, expected_outcome, expected_column
 ):
-    closes = [100.0, 60.0, 60.0] if expected_outcome == "stop_loss" else [100.0, 110.0, 110.0]
+    if expected_outcome == "max_hold":
+        opens = [100.0, 100.0, 100.0, 100.0]
+        closes = [100.0, 100.0, 100.0, 100.0]
+    else:
+        opens = [100.0, 100.0, 80.0]
+        closes = [100.0, 60.0, 60.0] if expected_outcome == "stop_loss" else [100.0, 110.0, 110.0]
     episode = decline_grid.simulate_episode(
-        _frame([100.0, 100.0, 80.0], closes),
+        _frame(opens, closes),
         0,
         slippage_pct=0.0,
         **kwargs,
@@ -47,16 +52,22 @@ def test_next_session_episode_exits_record_open_price_source(
     ("kwargs", "expected_outcome"),
     [
         ({"stop_loss_pct": 10.0}, "stop_loss"),
-        ({"max_hold_days": 0}, "max_hold"),
+        ({"max_hold_days": 1}, "max_hold"),
         ({"trigger_pct": 0.05}, "forced_end_no_more_data"),
     ],
 )
 def test_final_session_episode_exits_record_close_price_source(
     kwargs, expected_outcome
 ):
-    final_close = 60.0 if expected_outcome == "stop_loss" else 110.0
+    if expected_outcome == "max_hold":
+        opens = [100.0, 100.0, 100.0]
+        closes = [100.0, 100.0, 100.0]
+    else:
+        opens = [100.0, 100.0]
+        final_close = 60.0 if expected_outcome == "stop_loss" else 110.0
+        closes = [100.0, final_close]
     episode = decline_grid.simulate_episode(
-        _frame([100.0, 100.0], [100.0, final_close]),
+        _frame(opens, closes),
         0,
         slippage_pct=0.0,
         **kwargs,

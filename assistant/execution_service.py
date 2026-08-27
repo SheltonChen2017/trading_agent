@@ -201,6 +201,7 @@ from __future__ import annotations
 import dataclasses
 from decimal import Decimal
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from assistant.execution_kernel.outcomes import (
     _LOOKUP_UNCONFIRMED,
@@ -221,7 +222,6 @@ from assistant.execution_kernel.intents import (
 )
 from assistant.execution_kernel.claim import (
     PRE_BROKER_STRANDED_STATUSES,
-    _parse_recovery_timestamp,
     _transition_pre_broker_claim,
     claim_for_execution,
     resolve_kill_switch,
@@ -249,6 +249,18 @@ from assistant.execution_kernel.validate import (
 from assistant.execution_kernel.reconcile import (
     ReconciliationDeps,
     run_submission_reconciliation,
+)
+from assistant.execution_kernel.broker_evidence import (
+    assert_expected_broker_account,
+    canonical_order_for_proposal,
+    observed_broker_account,
+    validate_order_for_proposal,
+)
+from assistant.dispatch_fence import (
+    execution_dispatch_fence,
+    get_runtime_emergency_stop,
+    _mint_execution_service_dispatch_permit,
+    record_runtime_dispatch_attempt,
 )
 from assistant.share_reconciliation import detect_split_like_share_mismatch
 from assistant.kill_switch import env_kill_switch_active
@@ -288,7 +300,13 @@ from assistant.proposal_status import (
 )
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore, DuplicateIntentConflict
+from assistant.temporal_integrity import (
+    MAX_RECOVERY_WINDOW_SECONDS,
+    bounded_positive_int,
+    timestamp_disposition,
+)
 from risk.execution_gate import (
+    ExecutionValidationContext,
     TradeIntent,
     ValidationResult,
     authorize_overridden_trade_intent,
@@ -325,6 +343,168 @@ def _import_execution_broker():
     import execution.alpaca_broker as broker
 
     return broker
+
+
+def _open_account_scoped_reconciliation_broker(broker_module):
+    """Open one frozen broker session for every reconciliation read.
+
+    The module-level broker facade rebuilds clients from mutable environment
+    state.  Reconciliation must instead keep account observation, root lookup,
+    replacement traversal, and cancellation on one captured credential/mode
+    boundary, just like normal dispatch.
+    """
+    opener = getattr(broker_module, "open_alpaca_broker_session", None)
+    if callable(opener):
+        return opener()
+    # Explicitly injected tests may pass a session object directly.  Real
+    # production modules are required to expose the opener above.
+    if (
+        getattr(broker_module, "account_mode", None) in {"paper", "live"}
+        and callable(getattr(broker_module, "get_account", None))
+    ):
+        return broker_module
+    raise ProposalExecutionError(
+        "Broker reconciliation requires an account-scoped broker session."
+    )
+
+
+def _build_execution_owned_portfolio_snapshot(
+    broker_session,
+    *,
+    caller_preview: PortfolioSnapshot,
+) -> PortfolioSnapshot:
+    """Capture the only portfolio evidence allowed to authorize dispatch.
+
+    ``caller_preview`` is accepted solely as an explicit compatibility/test
+    seam and is deliberately never read.  UI/CLI snapshots are useful for
+    displaying and proposing a trade, but they are not execution authority.
+    """
+    del caller_preview
+    from assistant.portfolio_snapshot import verify_execution_portfolio_snapshot
+
+    capture = getattr(broker_session, "capture_execution_portfolio_snapshot", None)
+    if not callable(capture):
+        raise ProposalExecutionError(
+            "Broker session cannot produce registered execution snapshots."
+        )
+    snapshot = capture()
+    verify_execution_portfolio_snapshot(snapshot)
+    return snapshot
+
+
+_AMBIGUOUS_ACCOUNT_DISPATCH_STATUSES = (
+    SUBMITTING,
+    SUBMISSION_UNKNOWN,
+    RECONCILING,
+)
+_EXECUTION_SNAPSHOT_AUTHORITY_SECONDS = 30
+
+
+def _snapshot_bound_authorization_ttl(snapshot: PortfolioSnapshot) -> int:
+    """Never let an authorization outlive the broker snapshot it validates."""
+    if not isinstance(snapshot.captured_at, str):
+        raise ProposalExecutionError(
+            "Execution snapshot has no captured_at timestamp."
+        )
+    captured_at = datetime.fromisoformat(snapshot.captured_at)
+    if captured_at.tzinfo is None or captured_at.utcoffset() is None:
+        raise ProposalExecutionError(
+            "Execution snapshot captured_at must be timezone-aware."
+        )
+    expires_at = captured_at.astimezone(timezone.utc) + timedelta(
+        seconds=_EXECUTION_SNAPSHOT_AUTHORITY_SECONDS
+    )
+    remaining_whole_seconds = int(
+        (expires_at - datetime.now(timezone.utc)).total_seconds()
+    )
+    if remaining_whole_seconds <= 0:
+        raise ProposalExecutionError(
+            "Execution snapshot expired before authorization; capture a fresh broker snapshot."
+        )
+    return min(120, remaining_whole_seconds)
+
+
+def _refuse_while_prior_dispatch_is_ambiguous(
+    store: AssistantStore,
+    *,
+    proposal_id: str,
+) -> None:
+    """Do not add account exposure while an earlier contact is unresolved."""
+    ambiguous = [
+        proposal
+        for proposal in store.list_proposals_by_statuses(
+            _AMBIGUOUS_ACCOUNT_DISPATCH_STATUSES
+        )
+        if proposal.get("proposal_id") != proposal_id
+    ]
+    if not ambiguous:
+        return
+    identities = ", ".join(
+        f"{item.get('proposal_id')} ({item.get('status')})"
+        for item in ambiguous[:5]
+    )
+    if len(ambiguous) > 5:
+        identities += f", and {len(ambiguous) - 5} more"
+    raise ProposalExecutionError(
+        "A prior broker dispatch is still ambiguous; refusing any new account "
+        f"submission until it is reconciled: {identities}."
+    )
+
+
+def _validate_submission_response(
+    order: dict,
+    *,
+    intent: TradeIntent,
+    proposal: dict,
+    observed_account,
+):
+    """Return typed, fail-closed evidence for a normal submit response."""
+    return validate_order_for_proposal(
+        order,
+        intent,
+        proposal,
+        observed_account=observed_account,
+        root_order=True,
+    )
+
+
+def _canonical_broker_order_id_or_none(value: object) -> str | None:
+    """Return only an already-canonical normalized broker order identity."""
+    if (
+        not isinstance(value, str)
+        or not value
+        or value != value.strip()
+        or value.lower() in {"none", "null", "unknown"}
+        or len(value) > 128
+        or not value.isascii()
+        or not value.isprintable()
+    ):
+        return None
+    return value
+
+
+def _park_post_contact_anomaly(
+    store: AssistantStore,
+    *,
+    proposal_id: str,
+    reason: str,
+    anomaly_key: str,
+    details: dict,
+) -> None:
+    store.park_reconciliation_anomaly_and_halt(
+        proposal_id,
+        expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+        reason=reason,
+        reconciled_at=datetime.now(timezone.utc).isoformat(),
+        details=details,
+        anomaly_key=anomaly_key,
+    )
+
+
+def _runtime_emergency_stop_active(store: AssistantStore) -> tuple[bool, str]:
+    """Read the crash-durable stop shared by every execution database."""
+    state = get_runtime_emergency_stop(store.path)
+    return bool(state.get("active")), str(state.get("reason") or "active")
 
 
 #: Proposal families whose validity depends on the allocation profile as
@@ -442,6 +622,8 @@ def validate_proposal_for_execution(
     available_cash_override: float | None = None,
     available_buying_power_override: float | None = None,
     extra_open_order_count: int = 0,
+    broker_session=None,
+    execution_context: ExecutionValidationContext | None = None,
 ) -> ProposalValidationOutcome:
     """
     Checks, in the same order execute_approved_paper_proposal() always
@@ -494,10 +676,19 @@ def validate_proposal_for_execution(
         store,
         now_et=now_et,
         deps=ProposalValidationDeps(
-            import_broker=_import_execution_broker,
+            # Read-only preflight keeps the historical deferred module facade.
+            # A claimed execution supplies one frozen account-scoped session,
+            # and every account/asset/quote/open-order read then stays on that
+            # exact credential and mode context through submission.
+            import_broker=(
+                _import_execution_broker
+                if broker_session is None
+                else (lambda: broker_session)
+            ),
             outcome_factory=ProposalValidationOutcome,
             datetime_type=datetime,
             timezone_type=timezone,
+            eastern_timezone=ZoneInfo("America/New_York"),
             decimal_factory=Decimal,
             trade_intent_factory=TradeIntent,
             to_decimal=to_decimal,
@@ -519,10 +710,45 @@ def validate_proposal_for_execution(
         available_cash_override=available_cash_override,
         available_buying_power_override=available_buying_power_override,
         extra_open_order_count=extra_open_order_count,
+        execution_context=execution_context,
     )
 
 
 def execute_approved_paper_proposal(
+    proposal_id: str,
+    confirmation: str,
+    current_portfolio: PortfolioSnapshot,
+    policy: TradingPolicy,
+    store: AssistantStore,
+    *,
+    now_et: datetime,
+    kill_switch_active: bool = False,
+    earnings_days_away: int | None = None,
+    override_policy_violations: bool = False,
+) -> dict:
+    """Execute one paper proposal inside the cross-process dispatch fence.
+
+    The fence covers admission, execution-owned broker capture, validation,
+    authorization, the final kill-switch check, broker contact, and durable
+    projection.  Emergency cancel-all uses the same fence, so neither path can
+    return while the other is between its last safety observation and broker
+    contact.
+    """
+    with execution_dispatch_fence(store.path):
+        return _execute_approved_paper_proposal_under_dispatch_fence(
+            proposal_id,
+            confirmation,
+            current_portfolio,
+            policy,
+            store,
+            now_et=now_et,
+            kill_switch_active=kill_switch_active,
+            earnings_days_away=earnings_days_away,
+            override_policy_violations=override_policy_violations,
+        )
+
+
+def _execute_approved_paper_proposal_under_dispatch_fence(
     proposal_id: str,
     confirmation: str,
     current_portfolio: PortfolioSnapshot,
@@ -583,29 +809,62 @@ def execute_approved_paper_proposal(
     """
     # PHASE 1-3: admission. Kill switch, then preconditions, then the atomic
     # claim -- in that order, and none of them contacts the broker.
-    kill_switch_active = resolve_kill_switch(store, kill_switch_active)
+    runtime_stop_active, _ = _runtime_emergency_stop_active(store)
+    kill_switch_active = (
+        resolve_kill_switch(store, kill_switch_active) or runtime_stop_active
+    )
     proposal = verify_execution_preconditions(store, proposal_id, confirmation, policy)
     now_utc = datetime.now(timezone.utc)
     claim_for_execution(store, proposal_id, now_utc)
-
-    import execution.alpaca_broker as broker
+    if kill_switch_active:
+        message = (
+            "The execution kill switch is active; refusing before snapshot "
+            "acquisition, reservation, or broker contact."
+        )
+        _transition_pre_broker_claim(
+            store,
+            proposal_id,
+            expected_status=VALIDATING,
+            new_status=BLOCKED,
+            violations=[message],
+        )
+        raise ProposalExecutionError(message)
 
     validation = None
     validation_outcome = None
     intent = None
     reference_price = None
+    broker_session = None
     attempt_started_at = now_utc.isoformat()
     attempt_id = execution_attempt_id(proposal_id, attempt_started_at)
     try:
+        _refuse_while_prior_dispatch_is_ambiguous(
+            store,
+            proposal_id=proposal_id,
+        )
+        broker = _import_execution_broker()
+        broker_session = broker.open_alpaca_broker_session()
+        execution_portfolio = _build_execution_owned_portfolio_snapshot(
+            broker_session,
+            caller_preview=current_portfolio,
+        )
+        execution_context = ExecutionValidationContext(
+            account_id=execution_portfolio.account_id or "",
+            account_mode=execution_portfolio.account_mode,
+            snapshot_id=execution_portfolio.broker_snapshot_id or "",
+            policy_fingerprint=compute_policy_fingerprint(policy),
+        )
         validation_outcome = validate_proposal_for_execution(
             proposal_id,
-            current_portfolio,
+            execution_portfolio,
             policy,
             store,
             now_et=now_et,
             kill_switch_active=kill_switch_active,
             earnings_days_away=earnings_days_away,
             proposal=proposal,
+            broker_session=broker_session,
+            execution_context=execution_context,
         )
         record_validation_outcome(
             store,
@@ -673,6 +932,17 @@ def execute_approved_paper_proposal(
             # what was previously reviewed: fall through to
             # authorize_overridden_trade_intent() below instead of the
             # normal approved path.
+        from assistant.portfolio_snapshot import verify_execution_portfolio_snapshot
+
+        verify_execution_portfolio_snapshot(execution_portfolio)
+        if execution_context.policy_fingerprint != compute_policy_fingerprint(policy):
+            raise ProposalExecutionError(
+                "The active policy changed during execution validation; refusing "
+                "to authorize against a stale policy fingerprint."
+            )
+        authorization_ttl_seconds = _snapshot_bound_authorization_ttl(
+            execution_portfolio
+        )
     except _ProposalClaimLostError:
         raise
     except PolicyOverridableBlockError:
@@ -715,7 +985,15 @@ def execute_approved_paper_proposal(
         raise
 
     if validation.approved:
-        authorization = authorize_trade_intent(intent, validation)
+        authorization = authorize_trade_intent(
+            intent,
+            validation,
+            ttl_seconds=authorization_ttl_seconds,
+            account_id=execution_context.account_id,
+            account_mode=execution_context.account_mode,
+            snapshot_id=execution_context.snapshot_id,
+            policy_fingerprint=execution_context.policy_fingerprint,
+        )
         _transition_pre_broker_claim(
             store,
             proposal_id,
@@ -730,7 +1008,15 @@ def execute_approved_paper_proposal(
         # raised for anything else). Audit trail: the overridden
         # violations are recorded on the proposal rather than silently
         # disappearing into an ordinary approval.
-        authorization = authorize_overridden_trade_intent(intent, validation)
+        authorization = authorize_overridden_trade_intent(
+            intent,
+            validation,
+            ttl_seconds=authorization_ttl_seconds,
+            account_id=execution_context.account_id,
+            account_mode=execution_context.account_mode,
+            snapshot_id=execution_context.snapshot_id,
+            policy_fingerprint=execution_context.policy_fingerprint,
+        )
         _transition_pre_broker_claim(
             store,
             proposal_id,
@@ -753,6 +1039,12 @@ def execute_approved_paper_proposal(
         proposal_id,
         expected_status=APPROVED,
         new_status=SUBMITTING,
+        broker_execution_context={
+            "account_id": execution_context.account_id,
+            "account_mode": execution_context.account_mode,
+            "snapshot_id": execution_context.snapshot_id,
+            "policy_fingerprint": execution_context.policy_fingerprint,
+        },
     )
 
     # PHASE 7-9: reserve, choose the dispatch, record the attempt. Order is
@@ -761,7 +1053,7 @@ def execute_approved_paper_proposal(
         store, proposal_id, intent, reference_price, policy, now_et.date().isoformat()
     )
     submit, submit_kwargs = resolve_submission_call(
-        broker,
+        broker_session,
         store,
         proposal_id,
         intent,
@@ -788,7 +1080,98 @@ def execute_approved_paper_proposal(
         # telemetry failure fall through to a live order submission.
         raise
 
-    # PHASE 10: the only line in this function that contacts the broker.
+    # PHASE 10: re-read every durable/environment stop immediately before the
+    # only broker-contacting line.  Validation's earlier observation is not a
+    # dispatch guarantee: emergency cancel-all may have engaged the switch
+    # while quote/risk/telemetry work was running.
+    try:
+        runtime_stop_active, runtime_stop_reason = _runtime_emergency_stop_active(
+            store
+        )
+        final_kill_switch_active = (
+            resolve_kill_switch(store, False) or runtime_stop_active
+        )
+    except Exception as exc:
+        final_kill_switch_active = True
+        final_switch_reason = f"final kill-switch state was unreadable: {exc}"
+    else:
+        final_switch_reason = (
+            runtime_stop_reason
+            if runtime_stop_active
+            else "the execution kill switch became active"
+        )
+    if final_kill_switch_active:
+        message = f"Refusing broker contact because {final_switch_reason}."
+        blocked = store.mark_pre_contact_blocked_and_release(
+            proposal_id,
+            expected_statuses=(SUBMITTING,),
+            error=message,
+        )
+        if blocked is None:
+            raise _ProposalClaimLostError(
+                f"Proposal {proposal_id} changed state before the final "
+                "kill-switch refusal could be recorded."
+            )
+        raise ProposalExecutionError(message)
+
+    dispatch_attempted_at = datetime.now(timezone.utc).isoformat()
+    try:
+        record_runtime_dispatch_attempt(
+            store.path,
+            proposal_id=proposal_id,
+            idempotency_key=proposal["idempotency_key"],
+            attempted_at=dispatch_attempted_at,
+            account_id=execution_context.account_id,
+            account_mode=execution_context.account_mode,
+            state="pre_contact",
+        )
+    except Exception as exc:
+        message = (
+            "Refusing broker contact because the shared dispatch-attempt "
+            f"record could not be persisted: {exc}."
+        )
+        blocked = store.mark_pre_contact_blocked_and_release(
+            proposal_id,
+            expected_statuses=(SUBMITTING,),
+            error=message,
+        )
+        if blocked is None:
+            raise _ProposalClaimLostError(
+                f"Proposal {proposal_id} changed state before dispatch-attempt "
+                "recording failure could be contained."
+            ) from exc
+        raise ProposalExecutionError(message) from exc
+
+    try:
+        dispatch_permit = _mint_execution_service_dispatch_permit(
+            store.path,
+            broker_session=broker_session,
+            proposal_id=proposal_id,
+            idempotency_key=proposal["idempotency_key"],
+            attempted_at=dispatch_attempted_at,
+            account_id=execution_context.account_id,
+            account_mode=execution_context.account_mode,
+            snapshot_id=execution_context.snapshot_id,
+            policy_fingerprint=execution_context.policy_fingerprint,
+        )
+    except Exception as exc:
+        message = (
+            "Refusing broker contact because the single-use dispatch permit "
+            f"could not be minted: {exc}."
+        )
+        blocked = store.mark_pre_contact_blocked_and_release(
+            proposal_id,
+            expected_statuses=(SUBMITTING,),
+            error=message,
+        )
+        if blocked is None:
+            raise _ProposalClaimLostError(
+                f"Proposal {proposal_id} changed state before dispatch-permit "
+                "failure could be contained."
+            ) from exc
+        raise ProposalExecutionError(message) from exc
+
+    # This is the only line in this function that contacts the broker.
     try:
         order = submit(
             intent.ticker,
@@ -796,15 +1179,160 @@ def execute_approved_paper_proposal(
             side=intent.side,
             authorization=authorization,
             idempotency_key=proposal["idempotency_key"],
+            dispatch_permit=dispatch_permit,
+            expected_snapshot_id=execution_context.snapshot_id,
+            expected_policy_fingerprint=execution_context.policy_fingerprint,
             **submit_kwargs,
         )
     except Exception as exc:
         # PHASE 11: the submit raised. What that MEANS is the kernel's job --
         # it may or may not have reached the broker, and only a lookup under
         # the same idempotency key can tell us. Never a blind retry.
-        return resolve_failed_submission(
-            broker, store, proposal_id, proposal["idempotency_key"], intent, exc
+        resolved = resolve_failed_submission(
+            broker_session,
+            store,
+            proposal_id,
+            proposal["idempotency_key"],
+            intent,
+            exc,
         )
+        resolved_order_id = _canonical_broker_order_id_or_none(
+            resolved.get("order_id")
+        )
+        if resolved_order_id is not None:
+            try:
+                record_runtime_dispatch_attempt(
+                    store.path,
+                    proposal_id=proposal_id,
+                    idempotency_key=proposal["idempotency_key"],
+                    attempted_at=dispatch_attempted_at,
+                    account_id=execution_context.account_id,
+                    account_mode=execution_context.account_mode,
+                    order_id=resolved_order_id,
+                    state="reconciled_after_submit_error",
+                )
+            except Exception:
+                # The pre-contact marker remains sufficient for cancellation
+                # by the exact client ID; never reinterpret broker acceptance.
+                pass
+        return resolved
+
+    # A normal return is not trusted merely because it is a mapping.  Validate
+    # every material field before it can drive lifecycle projection.  If the
+    # broker returned malformed/mismatched evidence, make a best-effort direct
+    # cancel using only a usable external ID, then atomically park+halt while
+    # retaining the reservation and duplicate slot.
+    try:
+        durable_proposal = store.get_proposal(proposal_id)
+        if durable_proposal is None:
+            raise ValueError("proposal disappeared after broker submission")
+        from execution.broker_contract import BrokerAccountIdentity
+
+        observed_account = BrokerAccountIdentity(
+            account_id=execution_context.account_id,
+            account_mode=execution_context.account_mode,
+        )
+        validated_order = _validate_submission_response(
+            order,
+            intent=intent,
+            proposal=durable_proposal,
+            observed_account=observed_account,
+        )
+    except Exception as evidence_exc:
+        cancel_error = None
+        raw_order_id = order.get("order_id") if isinstance(order, dict) else None
+        canonical_order_id = _canonical_broker_order_id_or_none(raw_order_id)
+        if canonical_order_id is not None:
+            try:
+                broker_session.cancel_order(canonical_order_id)
+            except Exception as exc:
+                cancel_error = str(exc)
+        elif raw_order_id is not None:
+            cancel_error = (
+                "direct cancellation was not attempted because the response "
+                "order_id was not canonical"
+            )
+        reason = (
+            "Broker accepted or may have accepted an order, but its submission "
+            f"response failed strict identity/schema validation: {evidence_exc}. "
+            "Persistent kill switch activated; investigate the broker account."
+        )
+        _park_post_contact_anomaly(
+            store,
+            proposal_id=proposal_id,
+            reason=reason,
+            anomaly_key="submission_response_integrity",
+            details={
+                "validation_error": str(evidence_exc),
+                "cancel_error": cancel_error,
+                "raw_order_id": raw_order_id,
+            },
+        )
+        raise ProposalExecutionError(reason) from evidence_exc
+
+    from execution.broker_contract import validated_broker_order_mapping
+
+    order = validated_broker_order_mapping(validated_order)
+    try:
+        record_runtime_dispatch_attempt(
+            store.path,
+            proposal_id=proposal_id,
+            idempotency_key=proposal["idempotency_key"],
+            attempted_at=dispatch_attempted_at,
+            account_id=execution_context.account_id,
+            account_mode=execution_context.account_mode,
+            order_id=validated_order.order_id,
+            state="broker_accepted",
+        )
+    except Exception:
+        # The durable pre-contact marker still provides exact client-ID lookup.
+        pass
+
+    # Emergency cancel-all can set the switch while the network call is in
+    # flight, before it waits on this fence.  Do not release the fence with a
+    # newly accepted order merely queued for a later scan: cancel its proven
+    # ID directly first, then durably project pending-cancel state.
+    try:
+        runtime_stop_active, runtime_stop_reason = _runtime_emergency_stop_active(
+            store
+        )
+        post_submit_switch_active = (
+            resolve_kill_switch(store, False) or runtime_stop_active
+        )
+    except Exception as exc:
+        post_submit_switch_active = True
+        post_submit_switch_reason = f"post-submit kill-switch state unreadable: {exc}"
+    else:
+        post_submit_switch_reason = (
+            runtime_stop_reason
+            if runtime_stop_active
+            else "kill switch activated during broker submission"
+        )
+    if post_submit_switch_active:
+        try:
+            broker_session.cancel_order(validated_order.order_id)
+        except Exception as cancel_exc:
+            reason = (
+                f"{post_submit_switch_reason}; direct cancellation of newly "
+                f"accepted order {validated_order.order_id!r} failed: {cancel_exc}. "
+                "Persistent kill switch remains active; investigate immediately."
+            )
+            _park_post_contact_anomaly(
+                store,
+                proposal_id=proposal_id,
+                reason=reason,
+                anomaly_key="post_submit_emergency_cancel_failed",
+                details={
+                    "order_id": validated_order.order_id,
+                    "cancel_error": str(cancel_exc),
+                },
+            )
+            raise ProposalExecutionError(reason) from cancel_exc
+        order = {
+            **order,
+            "status": "pending_cancel",
+            "cancel_requested_at": datetime.now(timezone.utc).isoformat(),
+        }
 
     # PHASE 12: the broker accepted it. A local journal failure from here on
     # must never be reported as a submission failure.
@@ -869,6 +1397,7 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
         store,
         deps=ReconciliationDeps(
             import_broker=_import_execution_broker,
+            open_broker_session=_open_account_scoped_reconciliation_broker,
             datetime_type=datetime,
             timezone_type=timezone,
             proposal_execution_error=ProposalExecutionError,
@@ -878,6 +1407,9 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
             intent_from_dict=_intent_from_dict,
             lookup_order_outcome=_lookup_order_outcome,
             order_matches_intent=_order_matches_intent,
+            observed_broker_account=observed_broker_account,
+            assert_expected_broker_account=assert_expected_broker_account,
+            canonical_order_for_proposal=canonical_order_for_proposal,
             authoritative_order_for=_authoritative_order_for,
             broker_absence_is_old_enough=_broker_absence_is_old_enough,
             journal_broker_order_update=journal_broker_order_update,
@@ -928,12 +1460,11 @@ def recover_stale_reconciliation(
     layer). Validated FIRST, before any read or mutation of proposal
     state, so a bad value can never even attempt a reclaim.
     """
-    if isinstance(stale_after_seconds, bool) or not isinstance(stale_after_seconds, int) or stale_after_seconds <= 0:
-        raise ValueError(
-            f"stale_after_seconds must be a positive int, got {stale_after_seconds!r} "
-            f"({type(stale_after_seconds).__name__}) -- zero, negative, non-integer, and bool values are "
-            "never valid: they would let a genuinely in-flight reconciliation be reclaimed immediately."
-        )
+    stale_after_seconds = bounded_positive_int(
+        "stale_after_seconds",
+        stale_after_seconds,
+        maximum=int(MAX_RECOVERY_WINDOW_SECONDS),
+    )
     cutoff = (datetime.now(timezone.utc) - timedelta(seconds=stale_after_seconds)).isoformat()
     recovered_at = datetime.now(timezone.utc).isoformat()
     recovered = store.reclaim_stale_status(
@@ -989,74 +1520,112 @@ def recover_stale_claim(
     attempt vanished mid-flight. The user regenerates a fresh proposal, which
     is cheap and re-runs every check against current prices.
 
-    Uses the same stale-guard + single conditional UPDATE as
-    recover_stale_reconciliation(), so a recently claimed validation is left
-    alone and two concurrent recoveries cannot both win. Staleness is not
+    Parses ``updated_at`` as aware temporal evidence before attempting the
+    single conditional UPDATE. Missing, malformed, naive, or materially future
+    timestamps activate durable containment and require operator repair; a
+    small frozen future-skew tolerance remains presumed in flight. The write
+    compares the exact timestamp that was validated, so a concurrent refresh
+    or text mutation cannot be reclaimed from a stale read. Staleness is not
     proof that the original worker is dead, however: it may merely be paused.
     Safety therefore also depends on execute_approved_paper_proposal() using
     _transition_pre_broker_claim() for every later transition. If this recovery
     wins, those conditional writes fence the old worker out before any budget
-    reservation or broker call.
+    reservation or broker call. ``stale_after_seconds`` is a positive integer
+    capped by the canonical seven-day recovery window.
     """
-    if (
-        isinstance(stale_after_seconds, bool)
-        or not isinstance(stale_after_seconds, int)
-        or stale_after_seconds <= 0
-    ):
-        raise ValueError(
-            f"stale_after_seconds must be a positive int, got {stale_after_seconds!r} -- "
-            "a zero or negative value would make every claim look stale immediately, "
-            "defeating the guard."
-        )
+    stale_after_seconds = bounded_positive_int(
+        "stale_after_seconds",
+        stale_after_seconds,
+        maximum=int(MAX_RECOVERY_WINDOW_SECONDS),
+    )
     now = datetime.now(timezone.utc)
-    cutoff = (now - timedelta(seconds=stale_after_seconds)).isoformat()
-    for status in PRE_BROKER_STRANDED_STATUSES:
-        recovered = store.reclaim_stale_status(
-            proposal_id,
-            expected_status=status,
-            new_status=VALIDATION_FAILED,
-            stale_before=cutoff,
-            extra_updates={
-                "recovered_at": now.isoformat(),
-                "error": (
-                    f"Recovered from a stale {status!r} status (no update for at least "
-                    f"{stale_after_seconds}s, most likely a process crash before submission). "
-                    "No broker order exists for this proposal -- that status is written before "
-                    "any broker call. Marked 'validation_failed' so it stops holding this "
-                    "ticker/side against new proposals; generate a fresh one."
-                ),
+    claims = store.list_proposals_by_statuses(PRE_BROKER_STRANDED_STATUSES)
+    current = next(
+        (row for row in claims if row.get("proposal_id") == proposal_id),
+        None,
+    )
+    if current is None:
+        current = store.get_proposal(proposal_id)
+        if current is None:
+            raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
+        raise ProposalExecutionError(
+            f"Proposal {proposal_id} is not a stale pre-broker claim "
+            f"(status={current['status']!r}); only "
+            f"{' / '.join(PRE_BROKER_STRANDED_STATUSES)} can be recovered."
+        )
+
+    raw_updated_at = current.get("updated_at")
+    disposition = timestamp_disposition(
+        raw_updated_at,
+        now=now,
+        field="updated_at",
+    )
+    if not disposition["integrity_ok"]:
+        reason = (
+            f"Pre-broker claim timestamp integrity failure for {proposal_id}: "
+            f"updated_at is {disposition['kind']} ({disposition['raw']!r}); "
+            f"signed_age_seconds={disposition['signed_age_seconds']!r}. "
+            "The claim was not reclaimed. Persistent kill switch activated; "
+            "repair the timestamp/clock evidence and recover explicitly."
+        )
+        store.activate_reconciliation_halt(
+            proposal_id=proposal_id,
+            reason=reason,
+            seen_at=now.isoformat(),
+            details={
+                "path": "pre_broker_claim_timestamp_integrity",
+                "status": current["status"],
+                "timestamp_disposition": disposition,
+                "recovery_disposition": {
+                    "kind": "operator_repair_required",
+                    "reclaimed": False,
+                },
             },
         )
-        if recovered is not None:
-            return recovered
+        raise ProposalExecutionError(reason)
 
+    signed_age_seconds = float(disposition["signed_age_seconds"])
+    if signed_age_seconds <= stale_after_seconds:
+        raise ProposalExecutionError(
+            f"Proposal {proposal_id} is not a stale pre-broker claim "
+            f"(status={current['status']!r}); signed_age_seconds="
+            f"{signed_age_seconds:.6f}, recovery threshold="
+            f"{stale_after_seconds}s, timestamp_disposition="
+            f"{disposition['kind']!r}. The claim remains presumed in flight."
+        )
+
+    raw_timestamp_text = str(raw_updated_at)
+    cutoff = (now - timedelta(seconds=stale_after_seconds)).isoformat()
+    recovered = store.reclaim_stale_status(
+        proposal_id,
+        expected_status=current["status"],
+        new_status=VALIDATION_FAILED,
+        stale_before=cutoff,
+        validated_stale_updated_at=raw_timestamp_text,
+        extra_updates={
+            "recovered_at": now.isoformat(),
+            "recovery_timestamp_disposition": disposition,
+            "error": (
+                f"Recovered from a stale {current['status']!r} status "
+                f"(signed age {signed_age_seconds:.6f}s, threshold "
+                f"{stale_after_seconds}s; most likely a process crash before "
+                "submission). No broker order exists for this proposal -- that "
+                "status is written before any broker call. Marked "
+                "'validation_failed' so it stops holding this ticker/side "
+                "against new proposals; generate a fresh one."
+            ),
+        },
+    )
+    if recovered is not None:
+        return recovered
+
+    # The status or exact timestamp changed after classification. Never act on
+    # the stale snapshot; a live worker may have refreshed or advanced it.
     current = store.get_proposal(proposal_id)
     if current is None:
         raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
-
-    # An unparseable updated_at reaches the generic message below as "claimed
-    # less than Ns ago", which is simply the wrong reason: the staleness guard
-    # is a lexical `updated_at < cutoff` comparison in SQL, and a non-timestamp
-    # string loses it regardless of age. Recovery genuinely CANNOT proceed --
-    # staleness is unprovable, and assuming stale would revoke a live worker's
-    # claim, which is exactly the P1 this fencing round closed. But readiness
-    # now blocks on such a row, so the operator must at least be told the real
-    # reason rather than sent to wait out a window that will never expire.
-    if (
-        current["status"] in PRE_BROKER_STRANDED_STATUSES
-        and _parse_recovery_timestamp(store, proposal_id) is None
-    ):
-        raise ProposalExecutionError(
-            f"Proposal {proposal_id} is in {current['status']!r} but its updated_at is not a "
-            "readable timestamp, so its age cannot be proved and recovery cannot safely run "
-            "(assuming it is stale would revoke a possibly-live worker's claim). This is a "
-            "data-integrity problem, not a timing one: repair the row's updated_at directly, "
-            "then re-run this command."
-        )
     raise ProposalExecutionError(
-        f"Proposal {proposal_id} is not a stale pre-broker claim (status={current['status']!r}) -- "
-        f"either it is not in {' / '.join(PRE_BROKER_STRANDED_STATUSES)}, or it was claimed less "
-        f"than {stale_after_seconds}s ago and is presumed genuinely in flight. Post-submission "
-        "statuses are NOT recoverable this way: use reconcile_submission() or "
-        "recover_stale_reconciliation(), which never assume a broker order is absent."
+        f"Proposal {proposal_id} changed while its stale claim was being "
+        f"recovered (current status={current['status']!r}); no recovery write "
+        "was made. Re-read temporal evidence before retrying."
     )

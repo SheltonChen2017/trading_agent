@@ -8,11 +8,13 @@ import statistics
 import weakref
 from collections import defaultdict
 from contextlib import contextmanager
-from decimal import Context, Decimal, InvalidOperation, ROUND_HALF_EVEN, localcontext
+from decimal import Context, Decimal, ROUND_HALF_EVEN, localcontext
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
 from typing import Iterable, Iterator, Mapping
+
+from data.financial_primitives import to_decimal
 
 from .canonical import CanonicalEvidenceError, require_canonical_json_bytes
 
@@ -411,11 +413,9 @@ def _decimal(value: object, name: str) -> Decimal:
     if isinstance(value, bool):
         raise FormulaError(f"{name} must be a finite real number, not bool")
     try:
-        parsed = value if isinstance(value, Decimal) else Decimal(str(value))
-    except (InvalidOperation, TypeError, ValueError) as exc:
+        parsed = to_decimal(value, name=name)  # type: ignore[arg-type]
+    except ValueError as exc:
         raise FormulaError(f"{name} must be a finite real number") from exc
-    if not parsed.is_finite():
-        raise FormulaError(f"{name} must be finite")
     return parsed
 
 
@@ -536,12 +536,20 @@ class SignalObservation:
         if not isinstance(self.state, ObservationState):
             raise FormulaError("state must be an ObservationState")
         if self.state is ObservationState.STRUCTURAL_ZERO:
-            if self.value not in (None, 0, "0", Decimal("0")):
-                raise FormulaError("structural_zero cannot carry a nonzero value")
+            if self.value is not None:
+                value = _decimal(self.value, "value")
+                if value != 0:
+                    raise FormulaError(
+                        "structural_zero cannot carry a nonzero value"
+                    )
+                object.__setattr__(self, "value", value)
         elif self.state is ObservationState.SIGNAL:
-            if self.value is None or _decimal(self.value, "value") == 0:
+            if self.value is None:
                 raise FormulaError("signal observations require a nonzero finite value")
-            object.__setattr__(self, "value", _decimal(self.value, "value"))
+            value = _decimal(self.value, "value")
+            if value == 0:
+                raise FormulaError("signal observations require a nonzero finite value")
+            object.__setattr__(self, "value", value)
         elif self.value is not None:
             raise FormulaError("missing/invalid observations cannot carry a value")
 
@@ -613,9 +621,12 @@ def robust_group_normalize(
                 None,
                 None,
             )
-        median = Decimal(str(statistics.median(usable.values())))
+        # All usable values are already finite Decimals.  Preserve that exact
+        # internal type through statistics.median instead of reparsing a
+        # derived value as though it were untrusted ingress.
+        median = statistics.median(usable.values())
         absolute_deviations = [abs(value - median) for value in usable.values()]
-        mad = Decimal(str(statistics.median(absolute_deviations)))
+        mad = statistics.median(absolute_deviations)
         if mad == 0:
             return RobustNormalization(
                 False, MappingProxyType({}), "zero_mad", len(usable), active, median, mad

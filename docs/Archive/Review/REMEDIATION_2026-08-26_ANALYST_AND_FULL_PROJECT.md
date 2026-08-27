@@ -38,22 +38,25 @@ behavior only; they do not prove market edge or readiness.
 
 The current fail-closed state has distinct gates that must not be conflated:
 the reviewed-spec registry is empty; the permanent-look declaration is
-`zero_access` because no external append-only spend authority exists; the
-external research-source catalog contains no real hashes; and the ETF
-cross-section/nonempty-portfolio boundary refuses unconditionally because its
-universe/rank/tie/inverse-volatility derivation is not owner-frozen. Passing a
-synthetic test through a private fixture catalog does not lift any of them.
+`zero_access` because no external append-only spend authority exists; and the
+canonical checked-in research-source authority declares exact zero access and
+has no positive production-registration path. The ETF cross-section/nonempty-
+portfolio boundary also refuses unconditionally because its universe/rank/tie/
+inverse-volatility derivation is not owner-frozen. A synthetic fixture can test
+refusal behavior, but it cannot register production bytes or lift any gate.
 
 ## 2. Coverage summary
 
-| Area | Original P1 | Follow-up P1 | Original P2 | Follow-up P2 | Original P3 | Follow-up P3 | P0 |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Research / Analyst Revisions V2 | 0 | 14 | 17 | 11 | 7 | 2 | 0 |
-| Remaining project | 6 | 5 | 13 | 4 | 3 | 2 | 0 |
-| **Total** | **6** | **19** | **30** | **15** | **10** | **4** | **0** |
+| Area | Original P1 | Follow-up P1 | Final P1 | Original P2 | Follow-up P2 | Final P2 | Original P3 | Follow-up P3 | Final P3 | P0 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Research / Analyst Revisions V2 | 0 | 14 | 2 | 17 | 11 | 0 | 7 | 2 | 0 | 0 |
+| Remaining project | 6 | 5 | 19 | 13 | 4 | 4 | 3 | 2 | 0 | 0 |
+| **Total** | **6** | **19** | **21** | **30** | **15** | **4** | **10** | **4** | **0** | **0** |
 
-The 46 original findings and 38 follow-up findings are all mapped below. The
-follow-up IDs use `AR-FU-*` and `SYS-FU-*`; they are additive to, not
+The 46 original findings, 38 first-follow-up findings, and 25 final-adversarial
+findings are all mapped below. The aggregate is explicit: **P0=0, P1=46,
+P2=49, P3=14, total=109**. Follow-up IDs use `AR-FU-*` and `SYS-FU-*`; final
+adversarial IDs use `AR-FINAL-*` and `SYS-FINAL-*`. Both are additive to, not
 replacements for, the original audit IDs.
 
 ---
@@ -107,7 +110,7 @@ replacements for, the original audit IDs.
 | AR-FU-P2-003 | P2 | Authenticated classification evidence bound to ETF/holdings/decision | `tests/test_analyst_revisions_v2_contracts.py` |
 | AR-FU-P2-004 | P2 | Typed PIT terminal-exit evidence and conservative missing-ADV treatment | `tests/test_analyst_revisions_v2_contracts.py` |
 | AR-FU-P2-005 | P2 | INVALID observations hard-refuse the group | `tests/test_analyst_revisions_v2_contracts.py` |
-| AR-FU-P2-006 | P2 | Private empty external-source catalog makes self-attested holdings/stock-score/classification/cost/PIT bytes zero-access | `tests/test_analyst_revisions_v2_contracts.py` |
+| AR-FU-P2-006 | P2 | Canonical checked-in zero-access source authority makes self-attested holdings/stock-score/classification/cost/PIT bytes non-authoritative | `tests/test_analyst_revisions_v2_contracts.py` |
 | AR-FU-P2-007 | P2 | Mixed-time nonempty cross-sections remain zero-access pending one reviewed simultaneous-context derivation | `tests/test_analyst_revisions_v2_contracts.py` |
 | AR-FU-P2-008 | P2 | Exact sector mass and non-dilutable overlap-cluster membership | `tests/test_analyst_revisions_v2_contracts.py` |
 | AR-FU-P2-009 | P2 | Holdings effective/decision lag is derived on canonical NYSE sessions | `tests/test_analyst_revisions_v2_contracts.py` |
@@ -115,6 +118,8 @@ replacements for, the original audit IDs.
 | AR-FU-P2-011 | P2 | Fixed Decimal context and canonical ordering across score, allocation, and cost calculations | `tests/test_analyst_revisions_v2_contracts.py` |
 | AR-FU-P3-001 | P3 | Canonical holdings identity and unmapped-category refusal | `tests/test_analyst_revisions_v2_contracts.py` |
 | AR-FU-P3-002 | P3 | Missing legacy artifact maps to named quarantine exception | `tests/test_analyst_revisions_v2_legacy_quarantine.py` |
+| AR-FINAL-P1-001 | P1 | Canonical checked-in zero-access source authority; no runtime production re-registration | Analyst contracts and source-authority mutation tests |
+| AR-FINAL-P1-002 | P1 | Accepted rows prohibited until a deterministic provider-specific raw-to-canonical normalizer exists | Analyst snapshot/normalization/dataset tests |
 
 ## 4. Original P2 research findings
 
@@ -371,7 +376,7 @@ replacements for, the original audit IDs.
   terminal exit are covered.
 - **Residual owner/data decision:** the reviewed policy fixes the allowed cost
   scenario grid and participation/fee limits; actual commission, spread, impact,
-  and ADV values must come from a future externally registered PIT cost source.
+  and ADV values must come from a future independently governed PIT cost source.
   Synthetic tests are not empirical calibration.
 
 ### AR-P2-013 — Portfolio hysteresis conflicted with the five-name cap
@@ -897,25 +902,25 @@ replacements for, the original audit IDs.
   in-clip values and thereby choose the ETF score. A digest computed over those
   values would remain self-attestation unless the score artifact also carried
   authenticated dataset, derivation, policy, and time lineage.
-- **HOW and WHERE:** `ResearchSourceKind.STOCK_SCORE` and the empty external
-  source catalog extend the common zero-access source seam. In `holdings.py`,
+- **HOW and WHERE:** `ResearchSourceKind.STOCK_SCORE` and the canonical checked-in
+  zero-access source declaration extend the common refusal seam. In `holdings.py`,
   `StockScoreDatasetIdentity` binds canonical dataset ID, normalization result,
   snapshot/manifest, normalizer config/code, build recipe, producing commit/tree,
   evidence epoch, and event/refusal hashes;
   `StockScoreDerivationIdentity` binds derivation ID/config/code and producing
-  commit/tree. `build_verified_stock_score_evidence` parses only externally
-  registered canonical bytes, requires a dataset ID authorized by the reviewed
-  policy, validates derived/available/decision ordering, rejects missing/invalid/
-  duplicate/out-of-clip rows, and privately identity-registers the resulting
-  init-disabled `VerifiedStockScoreEvidence`.
+  commit/tree. The strict stock-score parser validates canonical bytes and the
+  dormant factory contract requires a dataset ID authorized by the reviewed
+  policy, derived/available/decision ordering, and complete valid in-clip rows;
+  the public authority boundary nevertheless refuses every source because no
+  positive production registration path exists.
   `require_verified_stock_score_evidence` rechecks that identity, external
   digest, policy, and every reparsed field. `weighted_stock_score` now accepts
   only that evidence and requires exact mapped-security coverage plus equality
   with holdings policy, decision instant, and evidence epoch.
 - **Safety invariant:** a caller-authored mapping, copied evidence shell,
   substituted bytes, foreign dataset/policy/decision/epoch, missing/extra row, or
-  convenient in-clip scalar cannot enter ETF scoring. With the production score
-  source catalog empty, no real score artifact currently has authority.
+  convenient in-clip scalar cannot enter ETF scoring. The checked-in authority's
+  exact access set is empty, so no real score artifact currently has authority.
 - **Regression evidence:**
   `test_weighted_score_requires_loader_authenticated_exact_score_artifact`,
   `test_stock_score_artifact_refuses_missing_extra_duplicate_and_invalid_rows`,
@@ -923,8 +928,8 @@ replacements for, the original audit IDs.
   `test_stock_score_authority_refuses_clone_mutation_substitution_and_foreign_context`
   cover the naked-map, clone, mutation, source substitution, policy, dataset,
   decision, epoch, completeness, state, ordering, and clip failure directions.
-- **Residual owner/data decision:** the source catalog and reviewed registry are
-  intentionally empty, and no real score derivation was run. A future external
+- **Residual owner/data decision:** the source authority and reviewed registry
+  intentionally authorize nothing, and no real score derivation was run. A future external
   authority must prove that the embedded normalized-dataset and derivation
   identities correspond to the actual immutable artifacts and clean code; hash
   registration alone is not scientific validation or provider QC.
@@ -943,7 +948,7 @@ replacements for, the original audit IDs.
   `build_verified_cross_section_evidence` and
   `require_verified_cross_section_evidence` boundaries in `portfolio.py`
   deliberately raise the named `_CROSS_SECTION_ZERO_ACCESS_REASON` for every
-  input, even if tests place its digest in the synthetic source catalog.
+  input, even if a private parser fixture has a matching digest.
   Consequently `PortfolioCandidate` cannot acquire a verified cross-section and
   `construct_portfolio` cannot construct any nonempty portfolio; the only public
   result before the stock-first/rank rule is reviewed is 100% cash for an empty
@@ -956,7 +961,7 @@ replacements for, the original audit IDs.
   around the stock-first study.
 - **Regression evidence:**
   `test_cross_section_and_nonempty_portfolio_are_zero_access_until_rank_rule_is_frozen`
-  registers a synthetic arbitrary-rank source and proves both its loader and a
+  supplies a synthetic arbitrary-rank parser fixture and proves both its loader and a
   nonempty candidate refuse; the empty all-cash result is the only positive
   control.
 - **Residual owner/data decision:** a future owner decision and independent
@@ -1142,33 +1147,31 @@ replacements for, the original audit IDs.
   earlier bytes. It does not prove who produced them, when the information was
   actually observed/ingested, whether a provider later amended/deleted it, or
   whether the caller invented convenient effective/available timestamps.
-- **HOW and WHERE:** `ResearchSourceKind`, the private immutable
-  `_EXTERNALLY_REGISTERED_SOURCE_SHA256` catalog, and
+- **HOW and WHERE:** `ResearchSourceKind`,
+  `_require_zero_access_source_authority`, and
   `require_registered_source_bytes` in `formulas.py` form the common source
-  authority seam. The production catalog deliberately contains an empty
-  `frozenset` for holdings, stock-score, classification, cross-section,
-  terminal-event, and trade-cost artifacts and exposes no runtime registration
-  API. Every factory
-  in `holdings.py`, `portfolio.py`, and `costs.py` first requires its exact byte
-  digest in that catalog; every consumer repeats the catalog check, reparses the
-  canonical bytes, and compares all typed values. Tests replace the entire
-  private catalog only with synthetic fixture hashes.
+  authority seam. The loader re-reads
+  `specs/research_source_authority.json` and accepts only its exact canonical
+  zero-access schema/ID/mode/empty entries; `require_registered_source_bytes`
+  then refuses every kind and every byte string. Strict parsers in `holdings.py`,
+  `portfolio.py`, and `costs.py` remain testable without becoming authority, and
+  no runtime registration API or positive production registry exists.
 - **Safety invariant:** self-hashing or rebinding source IDs/timestamps cannot
-  create production authority. Until a separately governed catalog admits a
+  create production authority. Until a separately governed authority admits a
   real artifact, all production source-dependent scoring, ranking, portfolio,
   terminal, and cost paths are intentionally zero-access.
-- **Regression evidence:** holdings, stock-score, and cost tests prove
-  unregistered sources fail; stock-score tests cover clone/byte substitution;
+- **Regression evidence:** holdings, stock-score, and cost tests prove every
+  production source refuses; stock-score tests cover clone/byte substitution;
   terminal tests prove absent/foreign source refusal; classification tests bind
-  exact registered bytes; and the cross-section test proves registration itself
-  cannot lift the independent rank zero-access gate. Synthetic positive controls
-  register only exact fixture hashes and are not provider evidence.
+  exact parsed bytes; and the cross-section test proves strict parsing itself
+  cannot lift the independent rank zero-access gate. Synthetic parser-positive
+  controls are not provider evidence or production registration.
 - **Residual owner/data decision:** a future independently reviewed, committed or
   signed provider/ingestion authority must bind provider contract, immutable
   artifact digest, observed/ingested availability evidence, evidence epoch,
   amendment/deletion handling, and access/transfer rights. Source-authored PIT
-  clocks alone are not provenance, and the empty catalog must not be populated
-  merely to make tests or research run.
+  clocks alone are not provenance, and the checked-in zero-access declaration
+  must not be replaced merely to make tests or research run.
 
 ### AR-FU-P2-007 — Portfolio candidates could mix different-time cross-sections
 
@@ -1277,8 +1280,8 @@ replacements for, the original audit IDs.
   covers opposing rows and mixed epochs; the split-invariance test proves honest
   same-direction splits match one trade; cost-source and terminal tests mutate
   source content, policy, decision, epoch, and position context.
-- **Residual owner/data decision:** the production trade-cost/ADV and terminal
-  catalogs are empty. Real model calibration, source quality, and conservative
+- **Residual owner/data decision:** the checked-in source authority grants zero
+  access to trade-cost/ADV and terminal artifacts. Real model calibration, source quality, and conservative
   parameter review remain blocked by AR-FU-P2-006.
 
 ### AR-FU-P2-011 — Input order and ambient Decimal context changed authoritative numerics
@@ -1353,6 +1356,78 @@ replacements for, the original audit IDs.
 - **Residual owner/data decision:** none beyond the standing rule that legacy
   reproduction cannot update active V2 evidence.
 
+## 6A. Final adversarial research findings
+
+### AR-FINAL-P1-001 — Production research-source authority was runtime-rebindable
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** a process-local registration seam could assign authority to
+  caller-supplied bytes after startup. Hash equality inside that mutable registry
+  therefore proved only self-consistency, not independent, immutable approval of
+  a production source.
+- **HOW and WHERE:** `research/analyst_revisions_v2/formulas.py` removes the
+  positive production registry and makes `require_registered_source_bytes`
+  re-read `specs/research_source_authority.json` through
+  `_require_zero_access_source_authority`. The checked-in artifact must be the
+  exact canonical schema, authority ID, `authority_mode="zero_access"`, and
+  empty-entry declaration; every source kind and every supplied byte string is
+  refused. Holdings, stock-score, classification, cost, terminal, and
+  cross-section consumers in `holdings.py`, `portfolio.py`, and `costs.py`
+  retain their strict parsers but cannot turn parsed fixture bytes into
+  production authority.
+- **Safety invariant:** no supported production interface can create, replace,
+  or broaden production source authority. This is a capability boundary, not a
+  defense against hostile arbitrary code that can rewrite the module itself.
+  Until a separately governed immutable authority is designed, reviewed, and
+  owner-approved, the exact production access set is empty.
+- **Regression evidence:**
+  `test_checked_in_source_authority_is_canonical_zero_access_and_not_rebindable`
+  exercises every `ResearchSourceKind`, mutation of the declaration, attempted
+  module rebinding, and synthetic bytes; all dangerous directions refuse.
+  Parser-positive tests remain private software-contract tests and explicitly do
+  not grant source authority.
+- **Residual owner/data gate:** the owner must later approve an independently
+  administered, append-only production-source authority and the provider
+  contracts, licensing, immutable artifacts, access controls, and incident
+  process behind it. This correction performs no provider access, registers no
+  real hashes, consumes no outcome, and grants no research or trading authority.
+
+### AR-FINAL-P1-002 — Accepted rows bypassed provider-specific raw derivation
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** exactly-once row accounting authenticated that an accepted
+  event pointed at a raw row, but it did not prove that every canonical field was
+  deterministically derived from that provider's raw schema. A caller could
+  author economically meaningful canonical values and bind them to an unrelated
+  authenticated locator.
+- **HOW and WHERE:** `NormalizationResult.__post_init__` and
+  `revalidate_normalization_result` in
+  `research/analyst_revisions_v2/normalization.py` now enforce
+  `ACCEPTED_EVENT_ZERO_ACCESS_REASON`: `events` must be empty until a reviewed,
+  deterministic provider-specific raw-to-canonical normalizer exists. Exhaustive
+  refusal-only results remain permitted when every `VerifiedSourceRow` has one
+  justified terminal refusal. `result_sha256` reconstructs and revalidates the
+  complete object before hashing, so post-construction mutation or an
+  `object.__new__` shell cannot obtain authority. Publication and loading in
+  `research/analyst_revisions_v2/dataset.py` cross-check the same invariant.
+- **Safety invariant:** no accepted canonical event exists unless its complete
+  semantic derivation from authenticated raw bytes is encoded and independently
+  reviewed; locator/hash binding alone is insufficient. Today the accepted-event
+  production set is exactly empty.
+- **Regression evidence:**
+  `test_arbitrary_canonical_event_fields_are_zero_access_without_raw_derivation`
+  and the snapshot/normalization/dataset mutation suite reject arbitrary accepted
+  fields, post-construction mutation, forged shells, pre-2013 laundering, and
+  digest recomputation, while accepting an exhaustive canonically ordered
+  refusal-only dataset as the fail-closed control.
+- **Residual owner/data gate:** a later provider adapter must freeze the observed
+  provider schema, field-level mappings, correction/withdrawal semantics,
+  timestamp derivation, identity mappings, refusal taxonomy, and golden raw-byte
+  fixtures before any accepted row is possible. No real row, score, portfolio,
+  outcome, or strategy conclusion was authorized by this remediation.
+
 ---
 
 # Part II — Remaining Project
@@ -1394,6 +1469,29 @@ replacements for, the original audit IDs.
 | SYS-FU-P2-004 | P2 | Root observations bind to durable broker order ID | Reconciliation/replacement tests |
 | SYS-FU-P3-001 | P3 | Readiness includes non-authoritative fill-ledger integrity | Readiness/event-ledger tests |
 | SYS-FU-P3-002 | P3 | Strict broker submit boundary requires expected policy fingerprint | Broker-session tests |
+| SYS-FINAL-P1-001 | P1 | Final binding covers every policy-driving quote, including pending market buys | Broker snapshot/authorization tests |
+| SYS-FINAL-P1-002 | P1 | Sealed session and complete SDK/client identity | Broker session identity tests |
+| SYS-FINAL-P1-003 | P1 | Authorization and dispatch permits cannot survive a process fork | Risk authorization/fork tests |
+| SYS-FINAL-P1-004 | P1 | Runtime-stop activation/clear is incident-bound and race-safe | Dispatch-fence activation/clear tests |
+| SYS-FINAL-P1-005 | P1 | Every broker-adapter submit path requires a one-use dispatch permit | Broker direct-adapter tests |
+| SYS-FINAL-P1-006 | P1 | Database integrity anomalies activate runtime-global containment | Storage integrity/containment tests |
+| SYS-FINAL-P1-007 | P1 | Runtime stop retains concurrent incident causes | Dispatch-fence incident tests |
+| SYS-FINAL-P1-008 | P1 | Malformed emergency siblings cannot hide later raw order IDs | Emergency cancel-all tests |
+| SYS-FINAL-P1-009 | P1 | Incomplete open scans do not skip older durable attempts | Reconciler emergency-attempt tests |
+| SYS-FINAL-P1-010 | P1 | Persisted broker events are versioned and reauthenticated before reuse | Broker-event ledger tests |
+| SYS-FINAL-P1-011 | P1 | Containment survives alert-persistence failure | Storage containment fault tests |
+| SYS-FINAL-P1-012 | P1 | Journal fallback preserves the first retained incident | Storage journal-fallback tests |
+| SYS-FINAL-P1-013 | P1 | Runtime-global attempt ledger rejects collision, tamper, and replay | Dispatch-attempt ledger tests |
+| SYS-FINAL-P1-014 | P1 | One broker order ID cannot bind multiple proposals | Broker-order binding tests |
+| SYS-FINAL-P1-015 | P1 | Foreign account/mode attempts make emergency scans incomplete | Reconciler emergency-scope tests |
+| SYS-FINAL-P1-016 | P1 | Cancel-all proves its exact runtime/local stop before stability claims | Cancel-all stop-proof tests |
+| SYS-FINAL-P1-017 | P1 | Append-only containment conflicts cannot overwrite root cause | Storage append-only fault tests |
+| SYS-FINAL-P1-018 | P1 | Integrity scans include foreign-key, page, and order-binding invariants | Storage integrity tests |
+| SYS-FINAL-P1-019 | P1 | Transient runtime publication failure latches execution fail-closed | Runtime publication fault tests |
+| SYS-FINAL-P2-001 | P2 | Runtime namespace is fixed rather than caller-configurable | Dispatch namespace tests |
+| SYS-FINAL-P2-002 | P2 | Readiness reports and blocks on runtime-global stops | Readiness/runtime-stop tests |
+| SYS-FINAL-P2-003 | P2 | Reverse architecture guard prevents non-lane code importing Analyst V2 | Architecture boundary tests |
+| SYS-FINAL-P2-004 | P2 | Active workflow documents pin review plus Codex counter-review | `tests/test_active_document_consistency.py` |
 
 ## 8. Original P1 execution and policy findings
 
@@ -2120,42 +2218,639 @@ replacements for, the original audit IDs.
   compatibility must be assessed during independent review, with safety taking
   precedence over permissive legacy calling.
 
+## 11A. Final adversarial system findings
+
+### SYS-FINAL-P1-001 — Final authorization did not bind every policy-driving quote
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** snapshot recapture bound account, positions, and open orders,
+  but pending market-buy notional could still depend on a quote whose value or
+  timestamp was not re-established at the final broker boundary.
+- **HOW and WHERE:** `_ExecutionSnapshotRegistration`,
+  `get_execution_validation_quote`, `_assert_all_execution_quotes_unchanged`,
+  and the market/limit submit methods in `execution/alpaca_broker.py` maintain an
+  immutable per-snapshot quote registry. `assistant/execution_kernel/validate.py`
+  obtains policy-driving quotes through that snapshot-bound broker. Final submit
+  re-fetches every registered quote, requires identical bid/ask material, and
+  reapplies the same freshness and future-skew limits before contact.
+- **Safety invariant:** every quote used to authorize current or pending exposure
+  is tied to the exact snapshot and remains identical and temporally admissible
+  at dispatch; an unbound, stale, future, missing, or changed quote yields zero
+  submit.
+- **Regression evidence:** broker snapshot/authorization tests mutate pending-
+  market-buy prices and timestamps, inject stale/future quotes, omit registrations,
+  and alter bid/ask after validation; all dangerous cases refuse before submit,
+  with an unchanged fresh quote as the positive control.
+- **Residual owner/operational gate:** real quote-provider latency and failure
+  drills remain required. No tolerance, live contact, account access, or trading
+  authority is introduced.
+
+### SYS-FINAL-P1-002 — Broker session and SDK identity remained mutable or incomplete
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** protecting only paper/live mode and account ID left other
+  connection identity mutable, and an SDK client check that omitted credential,
+  sandbox, authentication, or endpoint material could validate one context while
+  a different context performed the request.
+- **HOW and WHERE:** `AlpacaBrokerSession` in `execution/alpaca_broker.py` is a
+  sealed, non-subclassable, non-copyable, process-owned object with guarded
+  `__setattr__`. Its private slots freeze key, secret, mode, account ID, client
+  objects, canonical trading/data endpoints, OAuth/basic-auth flags, and process
+  owner. `_assert_sdk_client_identity` checks the complete SDK/client identity,
+  and every read/contact path reasserts session ownership and immutable endpoint
+  slots rather than mutable module constants.
+- **Safety invariant:** the account, mode, credentials, authentication mode,
+  endpoint, clients, and process that generated evidence are the same immutable
+  context that performs final dispatch.
+- **Regression evidence:** session tests attempt attribute mutation, subclassing,
+  copy/pickle, fork reuse, endpoint-constant mutation, client base-URL mutation,
+  key/secret mismatch, sandbox mismatch, and authentication-mode mismatch; all
+  refuse, while one unchanged session completes only the synthetic positive path.
+- **Residual owner/operational gate:** credential rotation, endpoint failover,
+  paper/live fault drills, and live confirmation remain separate reviewed
+  operations. No credential was used or stored by this remediation.
+
+### SYS-FINAL-P1-003 — Execution authority could replay after process fork
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** inherited process memory could carry an authorization secret,
+  token registry, lock, or dispatch permit into a child; a token consumed in one
+  process was not necessarily consumed in the other.
+- **HOW and WHERE:** the after-fork reset in `risk/execution_gate.py` rotates the
+  process-local authorization secret and replaces the consumed-token registry
+  and lock. `_reset_after_fork` in `assistant/dispatch_fence.py` replaces fence
+  and one-use permit state. Authorizations, broker sessions, and
+  `ExecutionDispatchPermit` records all bind their creating process and are
+  rechecked immediately before contact.
+- **Safety invariant:** neither a validated execution authorization nor a
+  dispatch permit is transferable across a fork, and parent/child consumption
+  state cannot diverge into two valid submits.
+- **Regression evidence:** fork-specific risk/dispatch tests mint before fork and
+  attempt use in both processes, including inherited-lock/registry mutation;
+  child reuse refuses and the parent remains one-use. Platforms without fork are
+  explicitly skipped rather than reported as proof.
+- **Residual owner/operational gate:** spawn/service-manager crash-restart drills
+  remain required on the deployment platform. This is containment code, not
+  permission to start an execution service.
+
+### SYS-FINAL-P1-004 — Runtime-stop activation and clear had a stale-read race
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** activation, observation, and clearing could occur across
+  separate lock windows; a clearer could act on stale state or remove a newer
+  concurrent cause that happened to share an earlier global stop generation.
+- **HOW and WHERE:** `activate_runtime_emergency_stop`,
+  `get_runtime_emergency_stop`, `clear_runtime_emergency_stop`, and
+  `runtime_state_fence` in `assistant/dispatch_fence.py` use a canonical incident
+  set under the runtime-state fence. Clear requires the exact open `incident_id`,
+  reason, origin database, and observed activation identity and removes only that
+  incident. Storage recovery helpers re-read and re-prove the exact incident
+  under the global dispatch fence; if it disappeared, they republish it before
+  any local clear.
+- **Safety invariant:** a stale observer cannot clear a concurrent or changed
+  containment cause, and execution cannot resume between local and runtime stop
+  transitions without proving the named incident remains contained.
+- **Regression evidence:** dispatch-fence tests interleave activation, stale
+  clear, same-ID/different-content reuse, concurrent causes, and removal between
+  read and fence acquisition; stale/different clears refuse or republish the
+  exact incident.
+- **Residual owner/operational gate:** operators still need a reviewed incident-
+  resolution and multi-process drill. The remediation clears no actual stop.
+
+### SYS-FINAL-P1-005 — Direct broker-adapter paths bypassed the service dispatch fence
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** validating an authorization inside the normal execution service
+  did not prevent another in-process caller from invoking a broker adapter submit
+  directly after bypassing the service's final fence checks.
+- **HOW and WHERE:** `_mint_execution_service_dispatch_permit`,
+  `execution_dispatch_permit_fence`, and
+  `consume_execution_dispatch_permit` in `assistant/dispatch_fence.py` create a
+  private, opaque, process-bound, one-use permit tied to database, proposal,
+  idempotency key, broker-session identity, account/mode, policy, snapshot,
+  runtime-stop generation, and fence ownership. The broker adapter separately
+  revalidates and consumes the bound execution authorization immediately before
+  permit consumption. `assistant/execution_service.py` is the sole production minter.
+  Both strict submit methods and module facades in `execution/alpaca_broker.py`
+  require and consume that permit while the dispatch fence remains held; obsolete
+  private POST helpers were removed/inlined inside those fenced methods.
+- **Safety invariant:** no route to `/v2/orders` or an SDK order submit can make
+  broker contact without the exact one-use permit and the still-held global
+  dispatch fence.
+- **Regression evidence:** direct-adapter tests call session and module submit
+  methods with missing, forged, reconstructed, mismatched, reused, post-fork,
+  and out-of-fence permits and monkeypatch every broker-contact seam; contact
+  remains zero. Exact service-issued permit is the bounded positive control.
+- **Residual owner/operational gate:** independent review must repeat lexical and
+  dynamic submit-path enumeration when the adapter changes. No real order or
+  endpoint contact occurred.
+
+### SYS-FINAL-P1-006 — Database anomalies were contained only inside one database
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** a corrupt operator database could set its own kill state while
+  another database in the same runtime continued dispatching, even though broker
+  account exposure is shared outside those database boundaries.
+- **HOW and WHERE:** `_activate_detected_broker_integrity_incident`,
+  `park_reconciliation_anomaly_and_halt`, and the integrity paths in
+  `assistant/storage.py` derive a stable incident ID, publish it through
+  `activate_runtime_emergency_stop`, persist the database-local halt and critical
+  alert, and use `_drain_and_retry_runtime_incident` to prove or republish the
+  exact runtime incident under the dispatch fence. Dispatch checks the canonical
+  runtime state in addition to local state.
+- **Safety invariant:** any database capable of detecting execution-evidence
+  corruption stops new/increasing exposure across every operator database in the
+  runtime; containment is not scoped to the damaged file.
+- **Regression evidence:** storage/dispatch integration tests corrupt event,
+  schema, page, foreign-key, and binding evidence in one database and attempt a
+  dispatch from another; the global stop blocks it, including restart and
+  repeated-detection cases.
+- **Residual owner/operational gate:** repair and incident-clear procedures remain
+  manual and independently reviewed. The code does not infer that a stopped or
+  repaired database is operationally trustworthy.
+
+### SYS-FINAL-P1-007 — A single runtime-stop record lost concurrent causes
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** representing the runtime stop as one mutable reason meant a
+  later incident could overwrite an earlier one, or resolving one cause could
+  incorrectly release the runtime while another remained unresolved.
+- **HOW and WHERE:** runtime-state schema and validators in
+  `assistant/dispatch_fence.py` store canonical `open_incidents`, each with
+  immutable incident ID, reason, origin database, and activation time.
+  `activate_runtime_emergency_stop` adds idempotently but rejects content reuse;
+  `clear_runtime_emergency_stop` removes only the named, exactly matched cause and
+  derives the aggregate reason/generation from the remaining set.
+- **Safety invariant:** runtime dispatch stays stopped until every independently
+  identified incident is explicitly and correctly cleared; one cause cannot
+  overwrite or clear another.
+- **Regression evidence:** concurrent-incident tests activate causes from
+  multiple databases, repeat exact activation, attempt same-ID content mutation,
+  clear in both orders, and restart between operations; the stop remains active
+  while any cause survives.
+- **Residual owner/operational gate:** the owner must define who may resolve each
+  incident class and how that approval is audited. No incident is auto-resolved.
+
+### SYS-FINAL-P1-008 — One malformed emergency sibling hid later raw order IDs
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** normalizing an emergency open-order sequence as one batch meant
+  a malformed or repeated sibling could abort enumeration before later usable raw
+  broker order IDs were discovered and cancelled.
+- **HOW and WHERE:** `_emergency_order_mapping`, `_emergency_order_id`, and
+  `cancel_all_open_orders` in `assistant/order_reconciler.py` process emergency
+  siblings independently. Strict normalized IDs are preferred; when normalization
+  fails, bounded raw-object/mapping extraction attempts a canonical string/UUID
+  ID, records the malformed sibling and incomplete scan, continues through the
+  sequence, and merges every unique usable raw ID into the cancellation set.
+  `AlpacaBrokerSession.get_open_order_ids_for_emergency` supplies the parallel
+  fail-degraded adapter view.
+- **Safety invariant:** malformed evidence can prevent a claim that the book is
+  complete, but it cannot conceal a later usable order ID or prevent best-effort
+  risk-reducing cancellation.
+- **Regression evidence:** emergency tests place malformed, exception-raising,
+  duplicated, padded, and valid raw-ID siblings in different orders and prove all
+  canonical usable IDs are attempted exactly once while completeness remains
+  false.
+- **Residual owner/operational gate:** unresolved malformed broker objects require
+  operator/provider investigation; a cancellation attempt is not proof of broker
+  cancellation or book stability.
+
+### SYS-FINAL-P1-009 — An incomplete open scan skipped older durable attempts
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** emergency logic could treat current open-order enumeration as
+  the candidate universe even after admitting it was incomplete, omitting older
+  durable dispatch attempts whose broker state was still unresolved.
+- **HOW and WHERE:** `cancel_all_open_orders` in
+  `assistant/order_reconciler.py` always merges
+  `list_runtime_dispatch_attempts` with normalized/raw open-order IDs. It scans
+  durable attempts independent of open-book completeness, validates account and
+  mode scope, resolves proposal/order bindings where possible, and keeps unknown
+  or unconfirmable attempts in the unresolved set across rounds and restarts.
+- **Safety invariant:** an incomplete live scan broadens emergency uncertainty;
+  it never narrows the durable set of potentially live orders that must be
+  cancelled or explicitly left unresolved.
+- **Regression evidence:** reconciler tests combine malformed/throwing open scans
+  with older durable attempts absent from the live response, restart the store,
+  and prove each usable durable order ID is attempted while `book_stable` remains
+  false for unresolved evidence.
+- **Residual owner/operational gate:** broker/provider confirmation and an
+  operator-reviewed drain remain necessary before stability or restart is
+  asserted. No simulated cancel result grants that confirmation.
+
+### SYS-FINAL-P1-010 — Persisted broker events could be reblessed after downgrade
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** a migration or read path could recompute missing integrity
+  metadata from current row contents, allowing previously persisted broker-event
+  bytes to be modified or downgraded and then treated as newly authenticated.
+- **HOW and WHERE:** `_migrate_broker_event_integrity`,
+  `_broker_event_integrity_error`, `_assert_broker_event_integrity`, and
+  `list_broker_order_events` in `assistant/storage.py` use a versioned canonical
+  event schema/content hash. The one-time legacy backfill is allowed only when
+  the complete metadata column family was absent; once any integrity metadata
+  exists, reads and migrations verify it and never rewrite/rebless mismatches.
+  Projection reauthenticates canonical bytes, scope, binding, and version before
+  use.
+- **Safety invariant:** after the integrity boundary exists, no modified,
+  downgraded, partly migrated, or version-confused event can acquire fresh
+  authority by recomputing metadata from itself.
+- **Regression evidence:** event-ledger migration tests mutate content/version/
+  hash/scope before and after legacy migration, create partially present metadata,
+  and reopen the database; every dangerous direction is contained rather than
+  backfilled, while a pristine all-columns-absent legacy fixture migrates once.
+- **Residual owner/operational gate:** real legacy databases require backup,
+  offline rehearsal, and independent migration review. The remediation neither
+  repairs corrupted history nor declares it trustworthy.
+
+### SYS-FINAL-P1-011 — Alert persistence failure could defeat containment
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** if local halt, proposal park, alert, and runtime publication
+  were treated as one all-or-nothing success, failure to write the diagnostic
+  alert could roll back or bypass the safety-critical stop.
+- **HOW and WHERE:** containment paths in `assistant/storage.py`, including
+  `_activate_detected_broker_integrity_incident` and
+  `park_reconciliation_anomaly_and_halt`, publish the runtime incident and retain
+  a process fail-closed latch independently of diagnostic success. The durable
+  local transaction still attempts monotonic proposal state, local halt, and
+  critical alert atomically; on alert/storage failure,
+  `_drain_and_retry_runtime_incident` re-proves or republishes the exact runtime
+  cause and surfaces the persistence error without releasing dispatch.
+- **Safety invariant:** observability failure may reduce diagnostics but cannot
+  authorize new/increasing exposure or erase the original containment cause.
+- **Regression evidence:** storage fault-injection tests fail alert insert/upsert,
+  transaction commit, runtime publication, and retry in combinations; another
+  database still observes the runtime stop or process latch, and the original
+  error remains reported.
+- **Residual owner/operational gate:** alert-delivery channels and degraded-
+  containment runbooks require operational drills. A process latch is deliberately
+  non-clearable in-process and requires controlled restart after durable repair.
+
+### SYS-FINAL-P1-012 — Journal fallback could overwrite the retained root incident
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** fallback error handling could catch a secondary journal or
+  containment exception and write a new generic failure over the first broker
+  anomaly, destroying the evidence needed to understand and resolve the stop.
+- **HOW and WHERE:** broker-event projection and fallback paths in
+  `assistant/storage.py` preserve the first canonical incident ID/reason and use
+  append-only, stable-fingerprint updates. Expected journal/containment conflicts
+  are normalized to `JournalTransactionConflictError` and routed through the
+  same retained-root containment seam; fallback diagnostics are appended or
+  associated without replacing the root incident.
+- **Safety invariant:** secondary failure handling cannot change the identity,
+  reason, or origin of the first safety-critical incident and cannot weaken its
+  runtime/local stop.
+- **Regression evidence:** broker-event/storage tests inject a root collision and
+  then fail alert, journal, append-only trigger, and retry paths; the original
+  incident remains open and byte-identical while secondary errors are reported.
+- **Residual owner/operational gate:** retained incident evidence still requires
+  human diagnosis and protected backup/export. The code does not adjudicate the
+  broker truth or clear the stop.
+
+### SYS-FINAL-P1-013 — Dispatch-attempt identity allowed collision, tamper, or replay
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** database-local or permissively parsed attempt records could let
+  two databases reuse an attempt identity, mutate its binding, replay a terminal
+  attempt, or smuggle padded identifiers that compared differently at later
+  boundaries.
+- **HOW and WHERE:** `_validated_runtime_dispatch_attempt`,
+  `_runtime_dispatch_attempt_identity`, `record_runtime_dispatch_attempt`, and
+  `list_runtime_dispatch_attempts` in `assistant/dispatch_fence.py` maintain a
+  canonical runtime-global append/state-transition ledger. Exact schema,
+  canonical IDs (including untrimmed-equality rejection), digests, account/mode,
+  proposal/order bindings, timestamps, state transitions, and content identity
+  are revalidated under `runtime_state_fence`; collision/tamper/replay invokes
+  `_contain_runtime_dispatch_attempt_integrity`.
+- **Safety invariant:** one attempt identity has one immutable cross-database
+  meaning and one monotonic lifecycle; malformed, colliding, changed, or replayed
+  attempts stop runtime dispatch.
+- **Regression evidence:** attempt-ledger tests exercise padded IDs, unknown keys,
+  same-ID/different-content records, cross-database collision, terminal replay,
+  backward transition, file tamper, crash/restart, and concurrent writers; each
+  dangerous case activates/retains containment.
+- **Residual owner/operational gate:** attempt-ledger backup, permissions, disk-
+  failure, and multi-host coordination remain deployment gates. No durable record
+  proves a broker outcome by itself.
+
+### SYS-FINAL-P1-014 — One broker order ID could bind multiple proposals
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** event identity checks protected one event/proposal scope but did
+  not globally prevent the same broker order ID from appearing under two
+  proposals, allowing fills/status to project onto inconsistent local intents.
+- **HOW and WHERE:** the primary-key-backed broker-order lookup and
+  `BrokerOrderBindingConflictError` in `assistant/storage.py` enforce one durable
+  proposal per canonical broker order ID. `project_broker_order_event` validates
+  the binding before projection; a cross-proposal conflict rolls back projection,
+  parks the affected proposal where possible, preserves the root diagnostic,
+  activates local and runtime-global containment, and opens/refreshes a critical
+  alert.
+- **Safety invariant:** a broker order identity cannot authorize or update more
+  than one proposal; ambiguity stops all new/increasing exposure rather than
+  choosing a winner.
+- **Regression evidence:** broker-order/event-ledger tests bind the same ID to two
+  proposals through insert, replay, replacement, migration, and concurrent paths;
+  no second projection commits and global/local halt plus retained alert are
+  asserted.
+- **Residual owner/operational gate:** the broker and operator must determine the
+  true intent/order relationship. Automatic reassignment or merge remains
+  forbidden.
+
+### SYS-FINAL-P1-015 — Foreign account or mode attempts disappeared from emergency completeness
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** filtering runtime attempts to the active account/mode could make
+  an unexpected foreign-scope attempt vanish from the emergency report and allow
+  a false claim that all relevant orders were resolved.
+- **HOW and WHERE:** `cancel_all_open_orders` in
+  `assistant/order_reconciler.py` validates every durable attempt's account and
+  mode against the active account-scoped broker. A mismatch is retained as an
+  explicit foreign-scope unresolved record, marks the scan incomplete, activates
+  containment, and prevents `book_stable`; it is not silently cancelled through
+  the wrong session or filtered away.
+- **Safety invariant:** foreign-scope execution evidence always widens uncertainty
+  and blocks stability. The system neither ignores it nor uses current credentials
+  to act on an unproven account/mode.
+- **Regression evidence:** emergency-scope tests mix local, foreign-account,
+  foreign-mode, malformed-scope, and otherwise usable attempts; local IDs remain
+  cancellable, every foreign item is reported unresolved, and stability/readiness
+  remain false across restart.
+- **Residual owner/operational gate:** an operator with correctly authorized
+  credentials must investigate the foreign scope separately. The remediation
+  performs no cross-account access or cancellation.
+
+### SYS-FINAL-P1-016 — Cancel-all claimed an active stop without proving publication
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** reporting a requested stop or relying on an earlier activation
+  call was not proof that the exact runtime and local incident remained active
+  after races, write failures, or a concurrent clear.
+- **HOW and WHERE:** `cancel_all_open_orders` in
+  `assistant/order_reconciler.py` reports requested, observed-active, and
+  confirmed stop state separately. Under the global dispatch fence it re-reads
+  the exact runtime incident ID/reason/origin and local stop, republishes a missing
+  runtime incident when possible, and treats read/proof exceptions as
+  `active=None`. `book_stable` requires confirmed runtime stop, confirmed local
+  stop, a complete drain, and no unresolved orders; a request or best-effort
+  activation alone never satisfies it.
+- **Safety invariant:** emergency output cannot claim stable containment unless
+  the exact stop is durably observed at the protected boundary; unknown proof is
+  fail-closed, not truthy.
+- **Regression evidence:** cancel-all tests remove/change the incident between
+  activation and verification, fail runtime/local reads and writes, race a clear,
+  and return empty broker books; requested remains distinguishable from active,
+  `active=None` is preserved, and stability remains false without full proof.
+- **Residual owner/operational gate:** broker-side cancellation confirmation and
+  operator review remain required; even a confirmed local/runtime stop does not
+  prove the external order book is empty.
+
+### SYS-FINAL-P1-017 — Append-only containment exceptions fell into root-overwrite fallback
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** SQLite append-only triggers correctly rejected a forbidden
+  journal mutation, but their driver-specific exception escaped the recognized
+  conflict family and entered generic fallback logic that could replace the root
+  anomaly or lose containment context.
+- **HOW and WHERE:** append-only writes and broker-event transaction handling in
+  `assistant/storage.py` catch the narrow SQLite trigger/integrity exception at
+  the transaction boundary, normalize it to `JournalTransactionConflictError`,
+  roll back the forbidden mutation, and route it through the stable incident,
+  alert, local-halt, and runtime-containment path. The original incident remains
+  the root; the append-only conflict is retained as secondary evidence.
+- **Safety invariant:** enforcing immutability cannot itself weaken containment or
+  authorize an overwrite; a rejected journal mutation leaves both history and
+  the first incident intact.
+- **Regression evidence:** storage fault tests fire append-only triggers during
+  normal projection, anomaly parking, alert fallback, and nested failure paths;
+  they assert the forbidden update never commits, the canonical exception is
+  surfaced, and the original runtime incident remains open.
+- **Residual owner/operational gate:** trigger activation indicates database or
+  code drift requiring deliberate repair and backup. Automatic trigger removal
+  or journal rewriting is not authorized.
+
+### SYS-FINAL-P1-018 — Integrity scans missed foreign-key, page, and order-binding corruption
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** a nominal SQLite integrity result and schema comparison did not
+  cover foreign-key violations, all page-level results, or semantic one-order/
+  one-proposal bindings; some non-`ok` results were reported without invoking the
+  common containment boundary.
+- **HOW and WHERE:** `_integrity_results` and `database_integrity_check` in
+  `assistant/storage.py` consume all rows from `PRAGMA integrity_check` and
+  `PRAGMA foreign_key_check`, verify managed schema objects/event content, and
+  scan broker-order bindings for duplicates or inconsistent roots. Every non-
+  `ok` result—not only a selected message—flows through
+  `_activate_detected_broker_integrity_incident`, which establishes the stable
+  local/runtime incident and alert.
+- **Safety invariant:** any detected physical, relational, schema, journal, or
+  order-binding corruption makes readiness false and stops new/increasing
+  exposure across the runtime.
+- **Regression evidence:** storage integrity tests inject multiple page messages,
+  FK violations, extra/missing managed objects, event corruption, and duplicate/
+  conflicting order bindings, including combinations where the first result is
+  benign; every non-`ok` item is returned and containment is asserted.
+- **Residual owner/operational gate:** offline SQLite diagnostics, backup restore,
+  and independent evidence reconciliation are required before repair/clear. Code
+  detection is not proof that the database can be safely salvaged.
+
+### SYS-FINAL-P1-019 — Transient runtime-stop publication failure allowed another database to resume
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** if runtime publication failed transiently after a local anomaly,
+  the detecting process could raise while another database observed no global
+  stop and continued dispatching.
+- **HOW and WHERE:** `_latch_runtime_emergency_stop_failure` in
+  `assistant/dispatch_fence.py` installs a process fail-closed latch on runtime-
+  state fence, read, validation, or publication failure. Runtime stop readers and
+  permit/dispatch-fence acquisition honor the latch. `_contain_runtime_dispatch_attempt_integrity`
+  and `_drain_and_retry_runtime_incident` in `assistant/storage.py` re-read the
+  exact incident under the global fence, republish if absent, and latch on every
+  inability to prove it before propagating the original error.
+- **Safety invariant:** inability to durably publish or verify global containment
+  is itself a global stop for that process; no database serviced by it can resume
+  on an unknown runtime state.
+- **Regression evidence:** fault-injection tests fail initial publication, fence
+  acquisition, atomic replace, subsequent read, and republish; dispatch from a
+  second database remains blocked by the latch, which cannot be cleared inside
+  the compromised process.
+- **Residual owner/operational gate:** multi-host containment still needs an
+  independently designed shared authority; this runtime mechanism is host-local.
+  Recovery requires controlled process restart after durable-state diagnosis.
+
+### SYS-FINAL-P2-001 — Runtime namespace was configurable or split by caller context
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** deriving runtime fence/stop/attempt files from database paths or
+  mutable environment configuration let two processes choose different
+  namespaces and each believe it held the global execution boundary.
+- **HOW and WHERE:** `_canonical_runtime_root`, `dispatch_fence_path`,
+  `runtime_emergency_stop_path`, `runtime_state_fence_path`, and
+  `runtime_dispatch_attempts_path` in `assistant/dispatch_fence.py` use a fixed
+  per-user application-data root: the Windows known-folder API or a literal,
+  ownership-checked POSIX location. Database input is retained only for API
+  compatibility/origin metadata and cannot select the synchronization namespace;
+  environment overrides and caller-relative roots cannot select it; on POSIX,
+  symlink or ownership ambiguity at the fixed literal fallback refuses.
+- **Safety invariant:** all local operator databases and processes for the same
+  user converge on one runtime fence, stop state, and attempt ledger; callers
+  cannot opt out through configuration.
+- **Regression evidence:** namespace tests vary database locations, current
+  directory, environment variables, separators, and process boundaries and
+  assert identical canonical paths; unavailable/unsafe known folders fail closed.
+- **Residual owner/operational gate:** multi-user, container, roaming-profile,
+  network-filesystem, and multi-host deployment topologies require a new reviewed
+  coordination design before use.
+
+### SYS-FINAL-P2-002 — Readiness ignored the runtime-global emergency stop
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** readiness checked local database kill state and integrity but
+  could report healthy while another database had activated the runtime-global
+  stop or runtime state was unreadable.
+- **HOW and WHERE:** `transaction_readiness` in `assistant/readiness.py` calls
+  `get_runtime_emergency_stop`, emits a dedicated runtime-stop check with open
+  incident identities, and makes overall readiness false for active, malformed,
+  unreadable, or latched state. This check is independent of the local kill-
+  switch and database-integrity checks so their differing scope stays visible.
+- **Safety invariant:** readiness cannot be green while runtime dispatch is
+  stopped or its state is unknown, regardless of the selected database's local
+  health.
+- **Regression evidence:** readiness tests activate incidents from another
+  database, retain multiple causes, corrupt/remove runtime state, inject read
+  failures/latches, and clear only one cause; every non-proven-clear state is red.
+- **Residual owner/operational gate:** readiness remains a diagnostic, not restart
+  authority. Operators must resolve and explicitly clear every incident through
+  the reviewed workflow.
+
+### SYS-FINAL-P2-003 — Architecture checks guarded Analyst V2 only in one direction
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** the Analyst package import firewall prevented V2 from importing
+  outcome/execution/legacy authority, but no reverse guard stopped production,
+  other strategy lanes, or shared modules from importing Analyst V2 internals and
+  turning incomplete research objects into de facto shared authority.
+- **HOW and WHERE:** the architecture/project-separation tests enumerate the
+  repository's transitive local import graph in both directions. They permit only
+  the declared Analyst V2 research/test/document surfaces and reject imports of
+  `research.analyst_revisions_v2` from execution, risk, assistant, data, ML,
+  shared strategy code, Insider Buying, Short Interest, and production entrypoint
+  manifests. Dynamic imports and parent-package aliases are included.
+- **Safety invariant:** incomplete Analyst V2 research remains lane-owned and
+  non-production; no other layer can silently consume it as a signal, policy,
+  portfolio, outcome, or execution authority.
+- **Regression evidence:** architecture mutation tests insert direct, transitive,
+  dynamic, and parent-package imports on both sides and require the guard to turn
+  red; the existing explicit research-only surface is the positive control.
+- **Residual owner/operational gate:** any future shared contract must be proposed
+  as a narrow reviewed interface with a versioned migration, not by weakening the
+  guard. No strategy result or cross-lane authority is created.
+
+### SYS-FINAL-P2-004 — Active documents encoded a superseded review workflow
+
+**Implementation status:** Implemented — pending required independent review/counter-review.
+
+- **Root cause:** active direction, workflow, handoff, agent, and action-plan text
+  disagreed on separate review branches versus the later owner-directed serialized
+  same-lane workflow and omitted the required Codex counter-review, making a
+  code-correct snapshot operationally ambiguous.
+- **HOW and WHERE:** `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`,
+  `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`,
+  `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`, `AGENTS.md`,
+  `docs/ACTION_PLAN_2026-08-20.md`, and `docs/SESSION_HANDOFF.md` are reconciled to
+  the later owner decision: for these three strategy lanes work is serialized on
+  the long-lived lane branch, Claude independently reviews the exact pushed Codex
+  snapshot, and Codex counter-reviews the exact reviewed snapshot before final
+  acceptance. `tests/test_active_document_consistency.py` pins the exception and
+  its precedence.
+- **Safety invariant:** no lane milestone can be represented as accepted without
+  exact-snapshot independent review, correction disposition, Codex counter-review,
+  final validation, and updated lane/root records, while shared remediation does
+  not import Analyst-only authority into the other lanes.
+- **Regression evidence:** active-document consistency tests fail when review is
+  moved to a separate lane branch, counter-review is omitted, obsolete sequencing
+  returns, or required stock-first/no-outcome/no-authority language drifts.
+- **Residual owner/operational gate:** documentation alignment does not itself
+  complete review, counter-review, branch synchronization, provider work, outcome
+  access, or deployment. Exact remote heads and final validation evidence remain
+  pending until recorded in the handoff.
+
 ## 12. Implementation dependency and review order
 
 The corrections should be reviewed in this order because later guarantees rely
 on earlier boundaries. A green later-layer test is not a substitute for reviewing
 its prerequisites.
 
-1. **Strict primitives and persisted contracts:** policy numerics, canonical
-   JSON/Decimal/time/session parsing, typed dataset/broker/snapshot evidence,
-   semantic database-schema verification.
-2. **Execution identity:** immutable account-scoped broker session, coherent
-   snapshot, policy/account/mode/snapshot authorization binding, central broker
-   order/status/fill/replacement validation.
-3. **Dispatch containment:** runtime-global emergency stop, cross-process fence,
-   durable attempt index, atomic anomaly park/halt/alert, fail-degraded emergency
-   cancellation.
-4. **Durable journal and recovery:** exact decimal text, immutable event content,
-   root order identity, unknown-state behavior, temporal recovery, readiness.
-5. **Supporting correctness:** portfolio/risk parity, earnings risk reduction,
-   market-data usability, backtest contracts, operational policy parity, ML
-   exchange-session maturity.
-6. **Research evidence identity:** strict snapshot, exactly-once normalization,
-   loader-only/out-of-band snapshot and dataset authority, justified refusal
-   evidence, V2 event/revision contract, immutable dataset, import/legacy
-   quarantine.
-7. **Analyst formulas/topology:** reviewed policy identity, validity states,
-   breadth/normalization, externally registered holdings/stock-scores/
-   classifications/costs, one PIT context, nested consumer revalidation,
-   deterministic arithmetic, and explicit production zero-access while the
-   external source catalog is empty. Review the stronger independent
-   cross-section/nonempty-portfolio zero-access boundary separately: rank/
-   universe/volatility derivation is not yet frozen and cannot be registered.
-8. **Preregistration authority last:** external review anchor, semantic frozen
-   cells, a full-request outcome boundary, and externally pinned append-only
-   permanent-look spending. The checked-in authority is explicitly zero-access;
-   it is not a local spend ledger and grants no permit while either external
-   authority or reviewed registry is absent.
+1. **Strict primitives and fixed runtime namespace:** policy numerics, canonical
+   JSON/Decimal/time/session parsing, typed evidence, the non-configurable
+   per-user Windows known-folder root or ownership-checked POSIX runtime root,
+   and fork-reset process state.
+2. **Sealed execution identity and complete valuation context:** immutable
+   account/mode/credential/authentication/endpoint SDK identity, coherent exact
+   snapshot, every policy-driving quote (including pending market buys), and
+   final freshness/future-skew recapture.
+3. **Unbypassable dispatch authorization:** policy/account/mode/snapshot token
+   binding, fork invalidation, one-use service-minted dispatch permits held
+   through every SDK/HTTP submit, and the canonical runtime-global attempt
+   ledger's collision/tamper/replay rules.
+4. **Multi-incident containment:** incident-bound activation/clear, runtime-global
+   propagation from every database anomaly, concurrent-cause retention, alert-
+   failure independence, republish-under-fence behavior, and the process
+   fail-closed latch when runtime publication or proof fails.
+5. **Emergency cancellation and drain:** independent raw sibling enumeration,
+   durable attempts even after incomplete open scans, explicit foreign-scope
+   unresolved evidence, canonical order IDs, and separate requested/active/
+   confirmed stop claims before `book_stable`.
+6. **Durable journal and database integrity:** exact Decimal/event bytes,
+   versioned read reauthentication without downgrade/reblessing, immutable first
+   incident across fallback, normalized append-only conflicts, one order ID per
+   proposal, and full page/foreign-key/schema/binding containment.
+7. **Recovery, readiness, and supporting correctness:** unknown-state behavior,
+   temporal recovery, local and runtime-stop readiness, portfolio/risk parity,
+   earnings risk reduction, market-data usability, backtest contracts,
+   operational policy parity, and ML exchange-session maturity.
+8. **Research evidence identity:** strict snapshot, exactly-once refusal coverage,
+   loader-only/out-of-band snapshot and dataset authority, V2 event/revision
+   contract, immutable dataset, import/legacy quarantine, and the final accepted-
+   event zero-access barrier until provider-specific raw derivation exists.
+9. **Analyst source authority and formulas/topology:** first prove the canonical
+   checked-in source authority is exact zero-access and has no positive runtime
+   registration seam; then review policy identity, validity states, breadth,
+   nested revalidation, and deterministic arithmetic as non-authoritative
+   primitives. Review cross-section/nonempty-portfolio refusal separately:
+   rank/universe/volatility derivation is not frozen, and no source can be
+   registered by the current production boundary.
+10. **Preregistration and acceptance workflow last:** external review anchor,
+    semantic frozen cells, full-request outcome boundary, and externally pinned
+    append-only permanent-look spending, followed by exact-pushed-snapshot Claude
+    review, correction disposition, Codex counter-review, final validation, and
+    lane/root records. Checked-in source/look authorities and the reviewed-spec
+    registry authorize nothing throughout this review.
 
 For each group, the independent reviewer should inspect the uncorrected finding,
 the correction diff, and the dangerous-direction test; temporarily break the
@@ -2166,38 +2861,53 @@ marked accepted solely because another group's integration test passes.
 
 ## 13. Required final validation evidence
 
-The implementation work has produced green development runs, including a final
-Analyst contract-module run of **24 passed in 6.57s** after the last score-state
-guard, an adjacent Analyst V2 contracts/statistics/preregistration/quarantine/
-firewall run of **138 passed in 136.83s** after the substantive authority,
-rank-containment, and deterministic-aggregation changes, and an earlier broad
-remediation baseline of **541 passed, 1 skipped, 2 warnings**. The one source
-change after the 138-test run was covered by the later 24-test rerun. All are
-still intermediate development evidence, not independent acceptance or an
-exact-final-tree full run; they must not be copied into the final handoff as if
-they covered later documentation/integration edits. Targeted syntax compilation
-of `formulas.py`, `holdings.py`, `portfolio.py`, `costs.py`, and the contract
-test file was also green, but it does not replace the required repository-wide
-compile command below.
+The superseding root implementation code snapshot is
+`66168eda687d42a3cfda45a05e0de8f7781d3b87`. It separates the final shared
+follow-up as `6770db3bc3934c4b0872d0cea6a256c28dec2cc8` and the Analyst-only
+follow-up as `66168ed`, so the latter cannot enter the other two strategy
+lanes by an undifferentiated merge. The exact touched-surface run passed
+**922 tests in 313.42 seconds**. The complete repository suite on that code
+tree passed **5,441 tests, skipped 2, failed 0, and emitted 25 dependency-
+deprecation warnings in 2,083.27 seconds (34m43s)**. The required repository-
+wide `compileall` command exited 0; the Windows verifier parsed with 0
+PowerShell errors; `git diff --check` was clean; and the narrow credential-
+literal scan found no likely secret in the diff. After the two record-only
+documentation updates, the 362-test documentation/active-contract regression
+set passed in 125.06 seconds; that same set was rerun after recording this
+evidence on the final documentation tree.
 
-Before the implementation snapshot is handed to the independent reviewer, the
-implementer must record results from the exact final committed tree for:
+The one-time owner-authorized synchronization was then validated separately
+on each lane before its record-only commit and non-force push:
 
-| Validation | Required evidence |
+| Lane | Validated code snapshot | Exact full-suite evidence | Published recorded snapshot |
+|---|---|---|---|
+| Analyst Revisions V2 | `653a9c01ac12863db2d7488154014a662c893add` | 5,434 passed, 2 skipped, 0 failed, 25 warnings in 2,354.46s (39m14s); compileall/parser/diff/status clean | `d8d0ad6e86dee1b05a5f62f3dd9d53c7b51b9729` |
+| Insider Buying | `e770b059f06dd8af9a52bd6dd96f7f83af2fc835` | 5,223 passed, 2 skipped, 0 failed, 25 warnings in 2,200.25s (36m40s); compileall/parser/diff/status clean | `8a65e3ca38cdc6f0feff8f3d7f6c8ae4a722b83d` |
+| Short Interest | `81eede4ef8de10609d4b5375b795abf916132dd0` | 5,223 passed, 2 skipped, 0 failed, 25 warnings in 2,274.58s (37m54s); compileall/parser/diff/status clean | `0a77b9cd2fb8f96ced51194ce68060b6a08b3de9` |
+
+The shared landing commits have the identical stable patch ID
+`30e807c0ae2cf05016a2ce17c416daaaa275dcbc`. Range and ancestry checks proved
+that neither Analyst hardening commit nor any of its five-file surface entered
+Insider Buying or Short Interest. Final Codex diff audits found no remaining
+P0-P3 issue in the submitted implementation, including the corrected closed-
+position normalization and exact Windows scheduled-task contract. Those audits
+and green tests are implementation evidence, not the required independent
+Claude acceptance.
+
+| Validation | Recorded disposition |
 |---|---|
-| Research/Analyst focused | All ACER and `analyst_revisions_v2` snapshot, normalization, dataset, preregistration, formulas, holdings, portfolio, costs, statistics, legacy quarantine, documentation, and import-firewall tests; exact pass/skip/warning count and duration |
-| P1 execution focused | Policy, coherent broker snapshot, authorization binding, broker order contract, dispatch/cancel-all fence, atomic anomaly, replacement chain, execution characterization, and broker-event ledger tests |
-| P2/P3 system focused | Temporal/recovery/readiness, schema, exact fill, portfolio/risk, earnings, market data, backtest input, operations policy, and ML session-maturity tests |
-| Architecture boundaries | Direct and transitive ML/LLM/authority/outcome/import boundaries plus project-separation entrypoint/manifest tests |
-| Full suite | `python -m pytest -q` with exact pass/skip/failure/warning count and duration |
-| Compilation | `python -m compileall -q assistant backtest data execution ml risk scripts signals strategies tests baskets.py config.py market_analytics.py` |
-| Repository checks | `git diff --check`, narrow secret-shape scan, exact branch/HEAD, and a clean `git status --short --branch` |
-| Independent review | Exact pushed implementation head, ordered commit dispositions, P0–P3 ledger, reviewer correction commits, mutation evidence, and reviewer reruns |
-| Counter-review | Exact reviewed head, disposition of every reviewer correction, final reruns, and handoff/associated-record commits |
+| Research/Analyst focused | Covered by the 922-test touched-surface run and the 5,434-test exact Analyst lane run, including snapshot, normalization, dataset, formula, holdings, portfolio, cost, preregistration, quarantine, and architecture boundaries. |
+| P1 execution focused | Covered by the 922-test touched-surface run and all four complete-suite runs, including coherent snapshot, authorization, dispatch/cancel-all fence, broker contract, anomaly, fault, and ledger regressions. |
+| P2/P3 system focused | Covered by the 922-test touched-surface run and complete suites, including portfolio/risk, exact fills, scheduler identity, policy parity, recovery, UI, and ML evidence operations. |
+| Architecture boundaries | Included in every complete suite; Analyst-only ancestry/range checks separately proved lane isolation. |
+| Compilation/static checks | Required compileall, PowerShell parsing, diff checks, clean status, and the root narrow secret-shape scan passed. |
+| Independent review | **Pending.** Claude must review every commit in each exact published range, retain a P0-P3 ledger, and push any authorized correction on the same lane branch (or use the generic root review workflow for the root remediation branch). |
+| Counter-review | **Pending.** Codex must disposition every Claude commit and rerun affected/full validation before acceptance or another milestone. |
 
-The final validation record must replace intermediate counts with the exact final
-tree results. Any edit after a run invalidates the affected result and requires a
-rerun.
+No provider, credential, licensed row, outcome, QuantConnect job, broker,
+operator database, live scheduler, deployment, evidence epoch, paper order, or
+live order was accessed or changed during implementation, validation, or
+synchronization. The Analyst permanent-look count remains **0**.
 
 ## 14. Remaining owner/data/operations gates that code did not close
 
@@ -2211,7 +2921,7 @@ The following are deliberately still blocked even if every test passes:
   deletion semantics, and immutable real artifacts;
 - PIT security master, prices/corporate actions/delistings, ETF holdings/NAV,
   classifications, stock-score, terminal-event, ADV/spread, controls, and
-  outcome evidence, plus an independently governed external source catalog;
+  outcome evidence, plus an independently governed positive source authority;
 - an externally pinned append-only permanent-look authority with atomic
   exactly-once spend, full-request receipts, independent administration,
   backup/transfer/access-control/incident procedures, and cross-machine
@@ -2240,7 +2950,7 @@ authorization to observe outcomes or operate an account.
 An independent reviewer must not close this ledger until all of the following are
 true on one exact pushed snapshot:
 
-1. all 84 IDs above receive an explicit independent disposition;
+1. all 109 IDs above receive an explicit independent disposition;
 2. every original finding is cross-checked against the source audit and retained;
 3. every follow-up finding is reproduced or otherwise concretely verified;
 4. all P1 fixes receive concurrency/crash/fault/restart evidence where applicable;

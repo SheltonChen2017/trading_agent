@@ -1,8 +1,10 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
-Status: **ARV2 CONTRACT/SAFETY REMEDIATION IMPLEMENTED; PENDING REQUIRED
-CLAUDE REVIEW AND CODEX COUNTER-REVIEW. NO V2 SIGNAL OR OUTCOME TEST, ETF
-RESEARCH PORTFOLIO, QC ALGORITHM, OR DEPLOYMENT HAS BEEN RUN.**
+Status: **ARV2 CONTRACT/SAFETY CANDIDATE ASSEMBLED BUT UNACCEPTED; PENDING
+CLAUDE REVIEW OF THE EXACT PUSHED SNAPSHOT AND CODEX COUNTER-REVIEW OF CLAUDE'S
+EXACT REVIEWED PUSH. NO AUTHENTICATED PRODUCTION EVENT EXISTS. NO V2
+SIGNAL/SCORE, CROSS-SECTION, NONEMPTY PORTFOLIO, OUTCOME TEST, QC RESULT, OR
+DEPLOYMENT EXISTS.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -19,7 +21,8 @@ disposition with the next authorized bounded milestone. Both agents work
 serially on the same branch and follow
 `THREE_STRATEGY_PARALLEL_WORKFLOW.md`. During parallel development neither
 agent may edit `docs/ACTION_PLAN_2026-08-20.md` or
-`docs/SESSION_HANDOFF.md`; this record is the lane's status and handoff.
+`docs/SESSION_HANDOFF.md` outside an explicit owner-directed common
+reconciliation; this record is the lane's status and handoff.
 
 ## 1. Canonical strategy contract
 
@@ -57,26 +60,29 @@ The old ACER V1 documents are archived. The existing code and datasets are
 not discarded; they are assessed below as infrastructure, not as V2
 completion.
 
-| Area | Current repository state | V2 requirement / gap | Disposition |
+| Area | Current repository state | Remaining production/evidence gate | Disposition |
 |---|---|---|---|
-| Vendor capture | Legacy ACER byte-hash validation exists. | V2 requires semantic completeness, exact partition/page coverage, immutable source locators, amendment/deletion behavior, and transfer rights for QC. | Use only through the separate typed V2 verifier; legacy tuples are not publishable V2 evidence. |
-| Event normalization | `research/acer/` produces a canonical event table with named refusals. Reviewed snapshot: 587,046 raw rows, 584,916 accepted events, 2,130 refusals (99.64% retained), roughly Dec-2011 through Aug-2026. | Add V2 institution-stock-day dedupe, event taxonomy, corrected/withdrawn-event lineage, and explicit availability rules. | Extend; do not rewrite raw history. |
-| Time semantics | Date-level conservative availability exists. | V2 needs trustworthy `effective_time` and `available_time`, next-open cohorting, and explicit date-only delay. Intraday history may be incomplete. | Blocking audit. |
-| Firm identity | Firm name and Benzinga firm/analyst identifiers are present in source rows. | Build durable firm identity and a firm-specific ordered-rating ontology; reject ambiguous vocabularies. | Not implemented. |
-| Rating scale | No production rating scale exists. Old V1 proposed a global five-level map but it was never adopted. | V2 requires firm-specific normalized ordered scales in `[-1,+1]`. | Replace proposal; implement only after tests. |
-| Signal formula | No production ACER signal exists. Old V1 proposed two encodings, 21/63/126 half-lives, coverage-neutral means, and a six-cell family. | Canonical V2 is genuine changes, 20-session half-life, decayed event sum, sector robust z-score, reliability shrinkage. | Entirely new work. |
-| Consensus/novelty | No historical active-rating state engine. | Reconstruct contributor-excluded consensus with 90/180/365-day rating expiry; keep novelty diagnostic separate. | Not implemented. |
-| Targets/EPS | Raw current/previous targets exist; no vetted target signal. No analyst EPS-revision history is established. | Targets and EPS are diagnostic/extension channels and need their own PIT availability, units, splits/currency, and multiplicity budget. | Deferred from canonical. |
-| Issuer identity | A name/ticker diagnostic found 768 deterministic interleavings; it is explicitly a lower bound, not an allowlist. | Durable PIT security master across ticker reuse, share classes, mergers, delistings, and corporate actions. | Blocking. |
-| Sector model | SIC may be locally available; no accepted PIT V2 sector taxonomy. | Robust sector standardization with a frozen, point-in-time taxonomy and sparse-sector fallback. | Not implemented. |
-| Prices/outcomes | No event has been joined to price or return. The EDGAR/yfinance path lacks decision-grade delisting/terminal returns; Databento remains unmeasured. | Split/dividend-adjusted PIT total returns including delistings, next-open execution, 20-day primary horizon, and 0/5/10/20 bps cost grid. | Blocking; no look consumed. |
-| ETF topology | ACER V1 deliberately deferred ETF contract; no reverse constituent index or ETF score exists. | Stock-first discovery, PIT holdings, >=99% mapped candidate weight, ETF eligibility, coverage normalization, reliability, peer ranking. | Not implemented. |
-| Portfolio/QC | No ACER portfolio or QC algorithm exists. | Hysteresis, caps, overlap clusters, cash, scheduling, custom immutable signal ingest, and execution tests. | Not implemented. |
-| Research design | Legacy residualized-IC/bootstrap utilities exist; old preregistration remained incomplete. | Re-preregister V2 rounds 0-8, stock/industry/ETF topology comparison, 5y/2y/1y walk-forward, 20-day primary horizon, multiplicity and permanent look ledger. | New freeze required before outcomes. |
+| Snapshot and source authority | V2 has strict complete and diagnostic snapshot types, exact partition/page/raw-inventory reconciliation, immutable locator/hash checks, and clean producing-lineage bindings. The canonical checked-in research-source authority is an exact `zero_access` declaration with no positive entries and cannot be rebound at runtime. | A separately governed, append-only production-source authority must admit an exact real artifact after source entitlement, semantics, completeness, retention, and exact vendor permission/rights for transfer to QuantConnect/QC processing are independently established. | Safety primitive implemented; production source access refuses; pending review/counter-review. |
+| Event normalization | V2 has typed canonical-event/refusal/result contracts, exactly-one disposition, correction/supersession lineage, build-recipe identity, post-construction revalidation, and immutable dataset publication checks. Legacy `research/acer/` rows remain legacy evidence. | No deterministic provider-specific raw-to-canonical V2 normalizer exists. Accepted production rows therefore remain prohibited; only exhaustive refusal results can be formed. | Contract implemented; accepted-event boundary deliberately zero-access. |
+| Time semantics | Exchange-session availability rules, strict UTC instants, next-open handling, and the conservative date-only delay are implemented as deterministic contracts. | Provider clock semantics and actual timestamp completeness have not been authenticated for a production V2 snapshot. | Safety rule implemented; no production event admitted. |
+| Firm identity and rating ontology | Permanent firm/analyst identities, ontology evidence, genuine-change admission, and verified-policy bindings are represented by strict contracts. | No production firm-specific ordered vocabulary, reviewed policy artifact, or authenticated identity mapping exists. | Schema/admission layer implemented; production catalog empty. |
+| Canonical stock formula | Deterministic primitives cover genuine changes, 20-session decay, independent breadth, robust sector normalization, reliability shrinkage, and explicit invalid/sparse states. | No authenticated production events, sector classifications, or score artifact exist. | Formula safety primitives implemented; no production signal or score. |
+| Consensus, novelty, targets, and EPS | Canonical-versus-diagnostic separation is contract-pinned; legacy target/timing runners are quarantined from V2 and from new outcome access. | No production historical active-rating state, novelty series, or decision-grade target/EPS extension has been built or authorized. | Deferred diagnostics/extensions; they cannot alter the canonical score. |
+| Provider-history boundary | Measured pre-2013 source rows have a named quarantine rule and cannot be laundered through a later partition; normative strategy design remains separate from observed provider history. | Provider coverage, backfill, correction, and deletion semantics remain unauthenticated for V2 production use. | Refusal rule implemented; factual provider audit still required. |
+| Issuer/security identity | V2 contracts require permanent issuer/security/share-class identities and historical ticker validity. A legacy name/ticker diagnostic found 768 deterministic interleavings; it is a lower bound, not an allowlist, and current-ticker joins are prohibited. | No accepted PIT security master covering ticker reuse, share classes, mergers, delistings, and corporate actions exists. | Identity admission implemented; real mapping remains blocked. |
+| Sector/classification | Strict PIT classification evidence, freshness, content identity, and reauthentication boundaries exist. | The production classification source catalog is empty; no accepted PIT V2 taxonomy exists. | Consumer safety implemented; production classification access refuses. |
+| Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. No event has been joined to a later price or return; Databento remains unmeasured. | Production cost/ADV/terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. | Cost safety primitives implemented; no outcome I/O and zero looks. |
+| ETF holdings/topology | PIT holdings, declared-versus-summed weight reconciliation, stale/incomplete refusal, fixed lag, 99% coverage, eligibility, and stock-score lineage primitives exist. | No authenticated production holdings or stock-score artifact exists, so no production reverse index, ETF score, or peer topology exists. | Consumer safety implemented; production topology remains zero-access. |
+| Cross-section and portfolio | Deterministic rank/hysteresis/tie/eviction/cap/overlap/cash allocator primitives and verified policy bindings exist. | No reviewed simultaneous rank/volatility derivation or authenticated rank/classification/cost source exists. The public boundary therefore refuses every nonempty portfolio and can return only the safe empty/all-cash result. | Dormant safety algorithm implemented; no research portfolio or QC result. |
+| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. | Required owner decisions remain open; the independently reviewed exact-spec registry is empty; no independent review anchor or external cross-machine append-only permanent-look authority exists. | Validation/gating primitives implemented; every outcome authorization refuses. |
+| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps the legacy outcome runners non-new/non-V2 with no network fallback. | Independent review and Codex counter-review of the exact candidate are still required. | Candidate assembled, not accepted. |
 
-No real-outcome research look has been performed for V2. The migration of the
-existing event dataset into a V2 schema is the first bounded engineering task;
-it must preserve the immutable original rather than mutating it in place.
+The production source/classification/cost/rank catalogs remain empty. The
+canonical source authority permits no positive production source; accepted
+normalization and nonempty-portfolio boundaries both refuse. Accordingly there
+is no authenticated production event, score, cross-section, nonempty portfolio,
+outcome, or QC result. No real-outcome research look has been performed for V2,
+and this implementation consumed **zero looks**.
 
 ## 3. Milestone ladder
 
@@ -119,6 +125,13 @@ or claim a research result.
   instants, permanent firm/analyst/issuer/security/share-class identity,
   historical ticker validity, rating ontology evidence, and producing
   lineage. A later correction never rewrites what was known earlier.
+- **Production admission:** the canonical checked-in research-source authority
+  is an exact immutable `zero_access` declaration with no positive entries and
+  no runtime registration seam. Every source-dependent production consumer
+  refuses. Normalization likewise prohibits accepted rows until a deterministic
+  provider-specific raw-to-canonical normalizer is implemented and reviewed;
+  current exhaustive builds may contain refusals only. The production
+  source/classification/cost/rank catalogs remain empty.
 - **Timing:** an exact public instant becomes eligible at the first exchange
   open strictly after that instant. A date-only row becomes eligible only at
   the second exchange-session open strictly after its date. Ambiguous or
@@ -195,21 +208,27 @@ Source precedence is explicit: normative strategy design governs the intended
 formula, while observed provider availability/history governs factual data
 claims. Neither category is permitted to overwrite the other.
 
-## 4. First implementation scope
+## 4. Exact next step
 
-The first Codex implementation session should implement **tests and schema
-only for ARV2-0/ARV2-1**:
+The next step is acceptance of the existing contract/safety candidate, not a
+new research milestone:
 
-1. pin the V2 raw/canonical fields and availability ordering;
-2. prove institution-stock-day deduplication and corrected-event lineage;
-3. build a versioned, data-derived firm-rating vocabulary inventory without
-   assigning outcome-informed scores;
-4. add dangerous-direction tests for global-map fallback, current-ticker
-   joins, date-only same-day trading, and silent unknown-rating coercion; and
-5. update this record before the first push.
+1. place the shared and Analyst-only remediation commits on
+   `codex/strategy-analyst-revisions-v2`, validate the exact candidate, append
+   its exact push row below, and push it without opening any data or outcome
+   authority;
+2. Claude independently reviews that exact pushed snapshot commit by commit
+   and pushes the complete disposition and any corrections to the same lane;
+3. Codex counter-reviews Claude's exact reviewed push, including dangerous-
+   direction regression evidence, before the candidate can be accepted; and
+4. only after that review chain closes may the Action Plan authorize another
+   bounded milestone. Owner decisions, a reviewed spec anchor, governed source
+   admission, and external append-only permanent-look authority must still be
+   closed before any production normalization, price/outcome join, real score,
+   ETF construction, nonempty portfolio, QC run, or QuantConnect launch.
 
-Do not add a price join, calculate forward returns, tune a rating order from
-returns, construct ETFs, or launch QuantConnect in this milestone.
+Until those steps are recorded, the candidate remains unaccepted and all
+production research and outcome boundaries remain zero-access.
 
 ## 5. Session / push ledger
 

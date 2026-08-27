@@ -70,7 +70,8 @@ from assistant.proposal_status import (
 )
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 from assistant.storage import AssistantStore
-from risk.execution_gate import TradeIntent
+from risk.execution_gate import TradeIntent, verify_execution_authorization
+from tests.execution_test_support import scripted_broker_contact_boundary
 
 NOW_ET = datetime(2026, 8, 3, 14, 30, tzinfo=timezone.utc)
 
@@ -299,11 +300,65 @@ class _RecorderBrokerSession:
             )
         return self._call("get_latest_quote", ticker)
 
-    def submit_market_order(self, *args, **kwargs):
-        return self._call("submit_market_order", *args, **kwargs)
+    def _submit(
+        self,
+        name,
+        ticker,
+        shares,
+        side="buy",
+        *,
+        authorization=None,
+        idempotency_key=None,
+        dispatch_permit=None,
+        expected_snapshot_id=None,
+        expected_policy_fingerprint=None,
+        limit_price=None,
+        **kwargs,
+    ):
+        with scripted_broker_contact_boundary(
+            broker_session=self,
+            snapshot_id_reader=lambda: self._execution_snapshot_id,
+            consume_snapshot=lambda: setattr(
+                self, "_execution_snapshot_id", None
+            ),
+            ticker=ticker,
+            shares=shares,
+            side=side,
+            order_type="limit" if name == "submit_limit_order" else "market",
+            limit_price=limit_price,
+            authorization=authorization,
+            idempotency_key=idempotency_key,
+            dispatch_permit=dispatch_permit,
+            expected_snapshot_id=expected_snapshot_id,
+            expected_policy_fingerprint=expected_policy_fingerprint,
+        ):
+            call_kwargs = {
+                "side": side,
+                "authorization": authorization,
+                "idempotency_key": idempotency_key,
+                "dispatch_permit": dispatch_permit,
+                "expected_snapshot_id": expected_snapshot_id,
+                "expected_policy_fingerprint": expected_policy_fingerprint,
+                **kwargs,
+            }
+            if name == "submit_limit_order":
+                call_kwargs["limit_price"] = limit_price
+            return self._call(name, ticker, shares, **call_kwargs)
 
-    def submit_limit_order(self, *args, **kwargs):
-        return self._call("submit_limit_order", *args, **kwargs)
+    def submit_market_order(self, ticker, shares, side="buy", **kwargs):
+        return self._submit(
+            "submit_market_order", ticker, shares, side=side, **kwargs
+        )
+
+    def submit_limit_order(self, ticker, shares, limit_price, side="buy", **kwargs):
+        return self._submit(
+            "submit_limit_order",
+            ticker,
+            shares,
+            side=side,
+            limit_price=limit_price,
+            **kwargs,
+        )
 
     def find_order_by_client_id(self, *args, **kwargs):
         return self._call("find_order_by_client_id", *args, **kwargs)
@@ -490,6 +545,34 @@ def _submission_recorder(*, submit: Any, lookup: Any = None) -> BrokerRecorder:
         submit_market_order=submit,
         find_order_by_client_id=lookup,
     )
+
+
+def _assert_submit_capabilities_were_spent(recorder: BrokerRecorder) -> None:
+    """Prove the fake did not leave teardown to hide reusable authority."""
+    import assistant.dispatch_fence as dispatch_fence
+
+    with dispatch_fence._DISPATCH_PERMITS_GUARD:
+        assert dispatch_fence._DISPATCH_PERMITS == {}
+
+    submits = [call for call in recorder.calls if call[0] == "submit_market_order"]
+    assert len(submits) == 1
+    _, args, kwargs = submits[0]
+    intent = TradeIntent(
+        ticker=args[0],
+        shares=args[1],
+        side=kwargs["side"],
+        order_type="market",
+    )
+    with pytest.raises(PermissionError, match="already been consumed"):
+        verify_execution_authorization(
+            intent,
+            kwargs["authorization"],
+            expected_account_id="paper-account-1",
+            expected_account_mode="paper",
+            expected_snapshot_id=kwargs["expected_snapshot_id"],
+            expected_policy_fingerprint=kwargs["expected_policy_fingerprint"],
+            require_bound=True,
+        )
 
 
 @pytest.fixture()
@@ -1195,6 +1278,7 @@ def test_successful_submission_freezes_call_order_state_and_evidence(store):
         "is_configured",
         "assert_account_and_asset_ready",
         "get_latest_quote",
+        "assert_account_and_asset_ready",
         "submit_market_order",
     )
     state = observable_state(store, "p-1")
@@ -1209,6 +1293,7 @@ def test_successful_submission_freezes_call_order_state_and_evidence(store):
     ]
     assert state["order_events"] == ["submission_response"]
     assert state["telemetry"] == ["validation_approved", "submission_started"]
+    _assert_submit_capabilities_were_spent(recorder)
 
 
 def test_pre_submit_telemetry_failure_releases_budget_without_broker_contact(
@@ -1351,6 +1436,7 @@ def test_timeout_reconciles_by_idempotency_key_without_resubmitting(store):
         "is_configured",
         "assert_account_and_asset_ready",
         "get_latest_quote",
+        "assert_account_and_asset_ready",
         "submit_market_order",
         "find_order_by_client_id",
     )
@@ -1360,6 +1446,7 @@ def test_timeout_reconciles_by_idempotency_key_without_resubmitting(store):
     assert len(state["reservations"]) == 1
     assert state["order_events"] == ["submission_reconciled"]
     assert state["telemetry"] == ["validation_approved", "submission_started"]
+    _assert_submit_capabilities_were_spent(recorder)
 
 
 # --------------------------------------------------------------------------

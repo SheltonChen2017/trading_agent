@@ -40,7 +40,10 @@ from risk.execution_gate import TradeIntent
 # Reuse the same network-free mocking helper test_personal_assistant.py
 # uses, imported directly rather than duplicated.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from test_personal_assistant import _mock_execution_dependencies  # noqa: E402
+from test_personal_assistant import (  # noqa: E402
+    _mock_execution_dependencies,
+    _strict_broker_order,
+)
 
 
 def _packet(cash=10_000.0):
@@ -323,7 +326,7 @@ def test_cumulative_preflight_fails_on_collective_total_exposure():
     packet = _packet(cash=10_000.0)
     policy = TradingPolicy(
         version="test", name="test", execution_mode="paper",
-        max_position_pct=1.0, max_total_exposure_pct=0.6, max_basket_pct=1.0,
+        max_position_pct=0.6, max_total_exposure_pct=0.6, max_basket_pct=1.0,
         max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
         allow_new_positions=True,
     )
@@ -483,7 +486,7 @@ def test_cumulative_preflight_test_a_exact_exposure_cap_is_allowed():
     packet = _packet(cash=10_000.0)
     policy = TradingPolicy(
         version="test", name="test", execution_mode="paper",
-        max_position_pct=1.0, max_total_exposure_pct=0.8, max_basket_pct=1.0,
+        max_position_pct=0.8, max_total_exposure_pct=0.8, max_basket_pct=1.0,
         max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
         allow_new_positions=True,
     )
@@ -518,7 +521,7 @@ def test_cumulative_preflight_test_b_genuinely_excessive_exposure_is_rejected():
     packet = _packet(cash=10_000.0)
     policy = TradingPolicy(
         version="test", name="test", execution_mode="paper",
-        max_position_pct=1.0, max_total_exposure_pct=0.8, max_basket_pct=1.0,
+        max_position_pct=0.8, max_total_exposure_pct=0.8, max_basket_pct=1.0,
         max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
         allow_new_positions=True,
     )
@@ -713,7 +716,7 @@ def test_cumulative_preflight_test_f_real_pending_order_plus_simulated_legs_each
     )
     policy = TradingPolicy(
         version="test", name="test", execution_mode="paper",
-        max_position_pct=1.0, max_total_exposure_pct=0.8, max_basket_pct=1.0,
+        max_position_pct=0.8, max_total_exposure_pct=0.8, max_basket_pct=1.0,
         max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
         allow_new_positions=True,
     )
@@ -748,7 +751,7 @@ def test_cumulative_preflight_test_f_real_pending_order_plus_simulated_legs_reje
     )
     policy = TradingPolicy(
         version="test", name="test", execution_mode="paper",
-        max_position_pct=1.0, max_total_exposure_pct=0.8, max_basket_pct=1.0,
+        max_position_pct=0.8, max_total_exposure_pct=0.8, max_basket_pct=1.0,
         max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
         allow_new_positions=True,
     )
@@ -817,7 +820,7 @@ def test_cumulative_preflight_test_h_single_execution_unaffected_by_new_override
     packet = _packet(cash=10_000.0)
     policy = TradingPolicy(
         version="test", name="test", execution_mode="paper",
-        max_position_pct=1.0, max_total_exposure_pct=0.5, max_basket_pct=1.0,
+        max_position_pct=0.5, max_total_exposure_pct=0.5, max_basket_pct=1.0,
         max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
         allow_new_positions=True,
     )
@@ -845,7 +848,11 @@ def test_cumulative_preflight_test_h_single_execution_unaffected_by_new_override
         restore()
 
     execution_proposal = _buy_proposal(packet, policy, "BBB", 100, 40.0)
-    captured, restore = _mock_execution_dependencies(quote_price=40.0)
+    captured, restore = _mock_execution_dependencies(
+        quote_price=40.0,
+        broker_cash_sequence=[10_000.0],
+        broker_positions=[],
+    )
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -916,7 +923,13 @@ def test_second_leg_immediate_404_after_submit_error_stops_until_reconciled():
         if ticker == second_ticker:
             raise RuntimeError("simulated definitive broker rejection")
         captured.append((ticker, shares, side, idempotency_key))
-        return {"order_id": "paper-1", "ticker": ticker, "shares": shares, "side": side, "status": "accepted"}
+        return _strict_broker_order(
+            order_id="paper-1",
+            client_order_id=idempotency_key,
+            ticker=ticker,
+            shares=shares,
+            side=side,
+        )
 
     broker.submit_market_order = failing_submit_for_second
     # A 404 immediately after a generic submit exception can be broker-index
@@ -956,7 +969,13 @@ def test_second_leg_submission_unknown_stops_the_batch():
         if ticker == second_ticker:
             raise TimeoutError("simulated ambiguous network failure")
         captured.append((ticker, shares, side, idempotency_key))
-        return {"order_id": "paper-1", "ticker": ticker, "shares": shares, "side": side, "status": "accepted"}
+        return _strict_broker_order(
+            order_id="paper-1",
+            client_order_id=idempotency_key,
+            ticker=ticker,
+            shares=shares,
+            side=side,
+        )
 
     def unresolvable_lookup(client_order_id):
         raise ConnectionError("lookup itself also fails -- stays unresolved")

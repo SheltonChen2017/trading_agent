@@ -48,9 +48,9 @@ checkout. Work is independent and serialized inside each lane:
 remains required. The instruction that removed it was accidental and is
 superseded by this operating model.
 
-No implementation, review, counter-review, or checkpoint branch is created
-inside a strategy lane. Only one agent writes or pushes a lane at a time. No
-published history is rebased, force-pushed, or rewritten.
+No implementation, review, counter-review, checkpoint, or handoff branch is
+created inside a strategy lane. Only one agent writes or pushes a lane at a
+time. No published history is rebased, force-pushed, or rewritten.
 
 ## 2. Isolation and documentation ownership
 
@@ -83,6 +83,30 @@ record is the branch-local handoff.
 Only an owner-directed main-line coordination change may update this document,
 the Action Plan, or the root Session Handoff while the lanes are parallel.
 This prevents three conflicting versions of project-wide state.
+
+### One-time common-remediation exception (owner direction, 2026-08-26)
+
+The owner has authorized one bounded synchronization from
+`codex/full-review-p1-remediation-20260826` before the ordinary per-lane loop
+resumes. Shared safety fixes from that remediation series may be synchronized
+identically to all three named strategy lanes, including the minimum shared
+files and regression tests required to preserve those fixes. Analyst-specific
+research-layer fixes may be synchronized only to
+`codex/strategy-analyst-revisions-v2`; they must not enter the Insider Buying
+or Short Interest lanes. Each target lane updates only its own implementation
+record with the exact synchronized commits, validation, zero-access accounting,
+and remaining review gates.
+
+This is a one-time exception to the shared-file freeze, not a new shared
+development model. Synchronization is not acceptance: acceptance remains
+withheld until Claude reviews the exact pushed snapshot on each same lane
+branch and Codex counter-reviews every Claude commit. The synchronization
+grants no credential, provider endpoint, licensed row, or outcome access; no
+QuantConnect research or backtest job; no QC processing or upload permission;
+no broker or operator-database action; no paper/live deployment; and no
+trading authority. After the three owner-directed synchronizations and lane
+record updates, this exception expires. Any later common-baseline or shared-
+file change again requires a separate owner decision.
 
 ## 3. Common implementation discipline
 

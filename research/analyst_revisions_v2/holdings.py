@@ -6,9 +6,11 @@ import hashlib
 import json
 import weakref
 from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from enum import Enum
 from typing import Iterable
+
+from data.financial_primitives import to_decimal
 
 from data.exchange_calendar import (
     ExchangeCalendarError,
@@ -123,11 +125,9 @@ def _decimal(value: object, name: str) -> Decimal:
     if isinstance(value, bool):
         raise HoldingsError(f"{name} must be finite, not bool")
     try:
-        parsed = value if isinstance(value, Decimal) else Decimal(str(value))
-    except (InvalidOperation, TypeError, ValueError) as exc:
+        parsed = to_decimal(value, name=name)  # type: ignore[arg-type]
+    except ValueError as exc:
         raise HoldingsError(f"{name} must be finite") from exc
-    if not parsed.is_finite():
-        raise HoldingsError(f"{name} must be finite")
     return parsed
 
 

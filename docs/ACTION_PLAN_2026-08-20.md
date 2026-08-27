@@ -48,9 +48,17 @@ Current branch availability and later documentation commits belong in
 
 **Current owner assignment, amended 2026-08-25:** Codex implements and Claude
 independently reviews each strategy serially on that strategy's one long-lived
-`codex/strategy-*` branch. No review/counter-review branches are created
-during this parallel phase. The Action Plan and Session Handoff are frozen
-after the common baseline; every push updates the lane implementation record.
+`codex/strategy-*` branch. The required loop is: Codex implements a bounded
+candidate and pushes its exact snapshot; Claude independently reviews that
+exact push and pushes the review disposition/corrections; Codex then
+counter-reviews every Claude commit. If the review is accepted or
+accepted-after-correction and no owner decision blocks progress, Codex
+implements the next bounded lane milestone, validates both stages, updates the
+lane record, and makes one combined push. A rejection or owner-decision blocker
+stops before that next milestone and push. No review/counter-review branches
+are created during this parallel phase. Outside an explicit owner-directed
+common reconciliation, the Action Plan and Session Handoff remain frozen after
+the common baseline; every push updates the lane implementation record.
 The current Codex process can see the
 Massive-Benzinga and QuantConnect credential variables, but their values are
 never recorded and credential presence is not dataset entitlement. The local
@@ -147,7 +155,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | Defensive carry (SHW) | Prospective only; no result exists or may be inferred before sufficiency |
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
-| ACER (Analyst-Consensus ETF Rotation) | Priority 1. Ratings history purchased and structurally audited; event backbone reviewed. **ACER-0A owner decisions partially frozen but executable preregistration incomplete; no real-outcome run and no result.** |
+| Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0
@@ -182,15 +190,26 @@ and supporting freeze/audits in the corresponding Archive directories. The
 remainder of this section is retained as the historical V1 rationale and does
 not override V2.
 
-**V2 contract correction, 2026-08-26:** the executable order is contracts and
-immutable data -> stock signal -> registered stock-first event study -> stop on
-a valid null -> ETF topology only after a pass -> ETF walk-forward/QC -> a
-lane dossier that does not open the shared integration holdout. The separate
-V2 package and strict outcome gate are under
-`research/analyst_revisions_v2/`. Its round-0 inventory remains explicitly
-blocked on named owner decisions, including the common final-holdout dates;
-therefore this correction authorizes no outcome, provider, QC, or deployment
-activity.
+**V2 contract/safety candidate, 2026-08-26:** strict typed snapshot, lineage,
+availability, preregistration, formula, holdings, cost, and portfolio safety
+primitives now exist under `research/analyst_revisions_v2/`, but the candidate
+is not accepted. It awaits Claude's independent review of the exact pushed
+lane snapshot followed by Codex's counter-review of Claude's exact reviewed
+push. The canonical checked-in research-source authority admits no positive
+production source, and accepted normalization rows refuse until a deterministic
+provider-specific raw-to-canonical normalizer exists. The draft round-0
+inventory still lacks named owner decisions, an independent reviewed-spec
+anchor, and an external append-only permanent-look authority. Consequently no
+authenticated production event, signal/score, cross-section, nonempty
+portfolio, real-outcome run, or QC result exists; zero research looks were
+consumed. The executable order remains contracts and immutable data -> stock
+signal -> registered stock-first event study -> stop on a valid null -> ETF
+topology only after a pass -> ETF walk-forward/QC -> a lane dossier that does
+not open the shared integration holdout. Detailed findings, fixes, and residual
+gates are maintained in
+`docs/Archive/Review/REMEDIATION_2026-08-26_ANALYST_AND_FULL_PROJECT.md`.
+Nothing in this candidate authorizes provider access, outcome access,
+QuantConnect launch, portfolio/QC research, deployment, or trading.
 
 **Owner decision, 2026-08-20: ACER replaces the Strong-Buy portfolio program.**
 The strategy converts stock-level analyst *revisions* into ETF-level signals:

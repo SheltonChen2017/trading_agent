@@ -44,6 +44,30 @@ says otherwise.
 If a shared file truly must change, stop and ask the owner to coordinate one
 common-baseline amendment. Do not make three competing copies.
 
+### One-time common-remediation exception (owner direction, 2026-08-26)
+
+The owner has authorized one bounded synchronization from
+`codex/full-review-p1-remediation-20260826` before the ordinary lane loop
+resumes. Shared safety fixes from that remediation series may be synchronized
+identically to all three named strategy lanes, including the minimum shared
+files and regression tests required to preserve those fixes. Analyst-specific
+research-layer fixes may be synchronized only to
+`codex/strategy-analyst-revisions-v2`; they must not enter the Insider Buying
+or Short Interest lanes. Each target lane updates only its own implementation
+record with exact synchronized commits, validation, zero-access accounting,
+and remaining review gates.
+
+This is a one-time exception to the frozen-file rule, not permission for
+ordinary cross-lane development. Synchronization is not acceptance:
+acceptance remains withheld until Claude reviews the exact pushed snapshot on
+each same lane branch and Codex counter-reviews every Claude commit. The
+synchronization grants no credential, provider endpoint, licensed row, or
+outcome access; no QuantConnect research or backtest job; no QC processing or
+upload permission; no broker or operator-database action; no paper/live
+deployment; and no trading authority. It expires after the three directed
+synchronizations and lane-record updates. A later common-baseline or shared-
+file change again requires a separate owner decision.
+
 ## 3. Same-branch Codex/Claude loop
 
 Each lane uses this serialized loop on its one branch:

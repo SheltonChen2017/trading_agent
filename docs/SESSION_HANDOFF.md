@@ -1,44 +1,60 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-26 by Codex for the owner's requested interim push of the
-Analyst/full-project remediation candidate. This is a durable checkpoint, not
-an acceptance record: documentation reconciliation, exact-final-tree full
-validation, three-lane synchronization, Claude independent review, and Codex
-counter-review remain open.
+Prepared: 2026-08-27 by Codex after the owner-authorized P1/P2/P3 remediation
+and one-time three-lane synchronization. This is a durable implementation
+handoff, not an acceptance record: Claude independent review of the exact
+pushed snapshots and Codex counter-review remain mandatory.
 
-## 0. Interim remediation checkpoint
+## 0. Remediation implementation handoff
 
-- Branch: `codex/full-review-p1-remediation-20260826`.
-- Exact implementation/merge snapshot before this handoff update:
-  `fc05c26bcc19f32b532942d825df3d33dd26bfc9`.
-- Governing `origin/main` merged into that snapshot:
-  `25724728977696a79547107be3114a52b74fc3fc`.
-- Shared safety implementation: `bf82838`; Analyst-only authority layer:
-  `e13baa1`; mixed shared/Analyst architecture registration: `8cab638`;
-  remediation and Analyst-record checkpoints: `7d4e12f` and `ee17967`.
-- Focused validation on the integrated code tree: **344 Analyst/ACER tests
-  passed**; **622 execution-safety tests passed and 2 skipped**; repository
-  compilation and `git diff --check` passed. These are implementation checks,
-  not the still-required final full-suite result or independent acceptance.
-- The remediation ledger still requires reconciliation from 84 documented
-  IDs to the complete 109-finding inventory (P0=0, P1=46, P2=49, P3=14).
-  Governing workflow records and lane records also require their final exact
-  synchronization heads and validation evidence.
-- The three published strategy branches remain at
-  `a4f58e6e0d0cf3d4ca08903e9184846259b17e24`; none has received or published
-  this remediation yet. Shared fixes must later reach all three, while
-  Analyst-specific code must reach only
-  `codex/strategy-analyst-revisions-v2`.
-- No provider, licensed row, outcome, QuantConnect job, broker, operator
-  database, scheduler, deployment, evidence epoch, paper order, or live order
-  was accessed or changed. No research or trading authority was created.
+- Root branch: `codex/full-review-p1-remediation-20260826`.
+- Exact root code snapshot before this record-only update:
+  `66168eda687d42a3cfda45a05e0de8f7781d3b87`. The final shared follow-up is
+  `6770db3bc3934c4b0872d0cea6a256c28dec2cc8`; the isolated Analyst-only
+  follow-up is `66168ed`. This handoff and the remediation ledger are the only
+  later root-tree changes in the record commit.
+- The complete 109-finding ledger is retained at P0=0, P1=46, P2=49, P3=14.
+  Final Codex diff audits found no remaining P0-P3 implementation issue; this
+  does not substitute for the owner-required independent reviewer.
+- Exact root validation: touched-surface suite **922 passed in 313.42s**;
+  complete suite **5,441 passed, 2 skipped, 0 failed, 25 dependency-
+  deprecation warnings in 2,083.27s (34m43s)**; required repository-wide
+  compileall exited 0; PowerShell parser reported 0 errors; `git diff --check`
+  was clean; and the narrow secret-shape scan found no likely credential
+  literal. After the record-only documentation edits, the 362-test
+  documentation/active-contract regression set passed in 125.06 seconds and
+  was rerun after this result was recorded on the final documentation tree.
+- The owner-authorized synchronization was non-force-pushed and then verified
+  at these exact remote heads:
+  - Analyst Revisions V2:
+    `d8d0ad6e86dee1b05a5f62f3dd9d53c7b51b9729` (validated code
+    `653a9c01ac12863db2d7488154014a662c893add`; 5,434 passed, 2 skipped,
+    25 warnings in 39m14s).
+  - Insider Buying:
+    `8a65e3ca38cdc6f0feff8f3d7f6c8ae4a722b83d` (validated code
+    `e770b059f06dd8af9a52bd6dd96f7f83af2fc835`; 5,223 passed, 2 skipped,
+    25 warnings in 36m40s).
+  - Short Interest:
+    `0a77b9cd2fb8f96ced51194ce68060b6a08b3de9` (validated code
+    `81eede4ef8de10609d4b5375b795abf916132dd0`; 5,223 passed, 2 skipped,
+    25 warnings in 37m54s).
+- The three shared landing commits have stable patch ID
+  `30e807c0ae2cf05016a2ce17c416daaaa275dcbc`. Ancestry and range checks proved
+  that neither Analyst hardening commit nor any of its five-file surface
+  entered Insider Buying or Short Interest. Each lane changed only its own
+  implementation record after code validation.
+- No provider, credential, licensed row, outcome, QuantConnect job, broker,
+  operator database, live scheduler, deployment, evidence epoch, paper order,
+  or live order was accessed or changed. No research or trading authority was
+  created; Analyst consumed **0 research looks**.
 - Analyst identity semantics remain explicit: the measured `768` diagnostic
   count is a **lower bound**, never an **allowlist**; **current-ticker joins are
   prohibited**. **Normative strategy design** and **observed provider**
   availability/history remain separate evidence categories.
-- Resume by completing the 109-item ledger and active-document reconciliation,
-  running focused plus complete validation on the exact final tree, then
-  constructing, validating, and non-force-pushing the three lane updates.
+- Resume with Claude reviewing every commit in each exact pushed lane range on
+  the same long-lived lane branch. Codex then counter-reviews every Claude
+  commit. Do not start a new lane milestone, provider audit, outcome run, or
+  deployment before that chain and the relevant owner gates close.
 
 The owner clarification remains binding: the instruction removing Codex
 counter-review was accidental and is superseded. The standing lane loop is
@@ -124,12 +140,20 @@ failures and 25 known warnings in 1,644.79 seconds**. No provider, outcome,
 QuantConnect job, broker, operator store, deployment, or strategy runtime was
 accessed or changed.
 
+One-time common-remediation synchronization, 2026-08-27: the owner-authorized
+exception was completed from `codex/full-review-p1-remediation-20260826` and
+published at the three exact heads in section 0. Shared patches are identical;
+Analyst-only code is present only on the Analyst lane. This synchronization did
+not accept a strategy or authorize the next milestone, and the exception is now
+exhausted.
+
 ## 3. Parallel-work exception and handoff rule
 
 During the three-lane phase, agents must not edit this handoff or the Action
-Plan on any lane. This common baseline is the one authorized update before the
-branches diverge. The relevant lane implementation record becomes that
-branch's status, review ledger, validation record, and resume prompt.
+Plan on any lane. The completed owner-directed one-time remediation
+synchronization was the sole exception; it is exhausted. The relevant lane
+implementation record is that branch's status, review ledger, validation
+record, and resume prompt.
 
 The owner-directed main-line coordination surface is
 `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`. Only a separately directed
@@ -146,11 +170,12 @@ Codex then implements the next bounded milestone, validates both stages,
 updates the lane record, and makes exactly one combined push. Never
 force-push or rewrite published lane history.
 
-Lane agents also leave repository-shared merge surfaces unchanged, including
-`requirements.txt`, `config.py`, CI/tooling configuration, and shared test or
-classification manifests. New code, tests, and fixtures use lane-owned
-strategy namespaces. A true shared-file or dependency need stops for one
-owner-directed common-baseline amendment.
+After the exhausted one-time exception, lane agents again leave repository-
+shared merge surfaces unchanged, including `requirements.txt`, `config.py`,
+CI/tooling configuration, and shared test or classification manifests. New
+code, tests, and fixtures use lane-owned strategy namespaces. A later true
+shared-file or dependency need stops for a new owner-directed common-baseline
+amendment; the completed synchronization grants no continuing inference.
 
 ## 4. Strategy state
 
@@ -158,11 +183,18 @@ owner-directed common-baseline amendment.
 
 The active V2 record is
 `docs/Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md`.
-Existing `research/acer/` code supplies a reviewed immutable ratings-event
-backbone only. It does not implement the V2 firm-specific rating ontology,
-institution-stock-day dedupe, 20-session signal, sector standardization,
-reliability shrinkage, consensus/novelty diagnostics, ETF mapping, portfolio,
-walk-forward study, or QC algorithm. No V2 outcome look exists.
+The synchronized candidate now implements a strict zero-access safety and
+contract layer for immutable snapshots/datasets, canonical event/refusal and
+revision lineage, availability timing, permanent identities, rating ontology,
+stock-score primitives, sector validity, holdings/topology evidence, decimal
+costs, constrained all-cash-safe portfolio construction, preregistration, and
+outcome authorization refusal. The checked-in production source authority and
+all production source/classification/cost/rank catalogs remain empty; no
+provider-specific accepted-row normalizer, authenticated production event,
+real stock score, nonempty research portfolio, outcome study, walk-forward
+result, or QC algorithm exists. The candidate is unaccepted until Claude
+reviews the exact pushed range and Codex counter-reviews every Claude commit.
+No V2 outcome look exists.
 
 The V1 identity scan's 768 interleavings remain a lower-bound warning; an
 unflagged ticker means `no_name_based_ambiguity_evidence`, never a safety
@@ -259,20 +291,19 @@ and a new owner-authorized permanent look budget.
 ## 8. Resume prompt
 
 ```text
-Select exactly one strategy lane and use its long-lived codex/strategy-*
-branch in its own dedicated clone or worktree. Read CLAUDE.md, AGENTS.md, the
-main-line direction, shared workflow, that lane's owner PDF, implementation
-record, and the data-source register. Verify exact branch, HEAD, upstream, and
-clean status. Do not edit the Action Plan, Session Handoff, shared
-workflow/data register, another lane, SEP-3, requirements.txt, config.py,
-CI/tooling configuration, or shared test/classification manifests. Codex
-implements one bounded milestone in lane-owned files and updates the lane
-record before pushing; Claude reviews the exact pushed commits on the same
-branch from a separate checkout; Codex then counter-reviews every Claude
-commit, corrects confirmed defects, and, only when accepted and unblocked,
-implements the next bounded milestone before one combined push. Access no
-outcomes or providers unless that exact action is separately authorized and
-preregistered; provider access remains an open owner decision. Before any
-real-outcome study, freeze the one shared final holdout and three-attempt
-selection contract. Preserve paper-epoch-006.
+Do not begin another strategy milestone. Read CLAUDE.md, AGENTS.md, the Action
+Plan, THREE_STRATEGY_PROJECT_DIRECTION.md, the shared workflow, and the chosen
+lane record. In a separate clean checkout, Claude independently reviews every
+commit from a4f58e6 through the exact published lane head: Analyst d8d0ad6,
+Insider 8a65e3c, or Short Interest 0a77b9c. The review stays on that same
+long-lived lane branch, gives every commit an explicit disposition, retains a
+P0-P3 ledger, mutation-checks dangerous boundaries, updates only that lane's
+record, and pushes any authorized correction without rewriting history. Codex
+then counter-reviews every Claude commit and reruns affected plus full
+validation before acceptance or any next milestone. The root remediation
+branch uses the generic separate-review-branch workflow if it is reviewed as
+its own generic workstream. Access no provider, credential, licensed row,
+outcome, QuantConnect job, broker, operator database, live scheduler, or
+deployment surface. Provider/outcome access remains an open owner decision;
+preserve zero looks, paper-epoch-006, and the untouched shared final holdout.
 ```

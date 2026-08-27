@@ -343,6 +343,85 @@ def test_effective_contributors_has_no_epsilon_or_ambient_context_pathology() ->
         } == {expected}
 
 
+@pytest.mark.parametrize(
+    "bad_value",
+    [
+        "not-a-number",
+        "NaN",
+        "Infinity",
+        Decimal("NaN"),
+        Decimal("Infinity"),
+        float("nan"),
+        float("inf"),
+        None,
+        True,
+    ],
+)
+def test_all_analyst_decimal_boundaries_reject_unsafe_values(bad_value) -> None:
+    boundaries = (
+        (formula_module._decimal, FormulaError),
+        (cost_module._d, CostModelError),
+        (holdings_module._decimal, HoldingsError),
+        (portfolio_module._d, PortfolioConstructionError),
+    )
+    for parser, error_type in boundaries:
+        with pytest.raises(error_type):
+            parser(bad_value, "test_value")
+
+
+@pytest.mark.parametrize(
+    "bad_value",
+    [
+        False,
+        True,
+        "not-a-number",
+        Decimal("sNaN"),
+        Decimal("NaN"),
+        Decimal("Infinity"),
+        float("nan"),
+        float("inf"),
+    ],
+)
+def test_structural_zero_observations_use_the_strict_decimal_boundary(
+    bad_value,
+) -> None:
+    with pytest.raises(FormulaError):
+        SignalObservation(
+            "sec-structural-zero",
+            ObservationState.STRUCTURAL_ZERO,
+            bad_value,
+        )
+
+
+def test_structural_zero_observation_canonicalizes_explicit_zero() -> None:
+    observation = SignalObservation(
+        "sec-structural-zero",
+        ObservationState.STRUCTURAL_ZERO,
+        "-0.000",
+    )
+
+    assert observation.value == Decimal("0")
+    assert isinstance(observation.value, Decimal)
+
+
+def test_robust_normalization_preserves_exact_decimal_median_and_mad() -> None:
+    result = robust_group_normalize(
+        [
+            SignalObservation(
+                f"sec-{index:02}",
+                ObservationState.SIGNAL,
+                Decimal(index) / Decimal("10"),
+            )
+            for index in range(1, 21)
+        ],
+        policy=_policy(),
+    )
+
+    assert result.available
+    assert result.median == Decimal("1.05")
+    assert result.mad == Decimal("0.5")
+
+
 def test_independent_breadth_does_not_multiply_repeats_or_common_catalyst() -> None:
     one_firm = independent_evidence_breadth(
         IndependentContribution("firm-1", f"event-{index}", 1)

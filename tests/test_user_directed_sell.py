@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy
+from assistant.portfolio_snapshot import PortfolioSnapshotIntegrityError
 from assistant.schemas import (
     DecisionPacket,
     MarketRegime,
@@ -179,10 +180,10 @@ def test_selling_all_whole_shares_of_a_fractional_holding_does_not_claim_close()
 def _raw_packet(position: PortfolioPosition) -> DecisionPacket:
     """A snapshot built WITHOUT build_portfolio_snapshot's validation.
 
-    That constructor already refuses non-finite rows (verified: it raises on
-    a NaN/inf price), so these adversarial rows cannot arrive through it
-    today. The generator's own guards are the second line of defence for any
-    other snapshot source, and an untested second line is an assumed one.
+    That constructor already refuses nonpositive and non-finite held prices,
+    so these adversarial rows cannot arrive through it today. The generator's
+    own guards are the second line of defence for any other snapshot source,
+    and an untested second line is an assumed one.
     """
     snapshot = PortfolioSnapshot(
         positions=[position], cash=10_000.0, total_equity=11_000.0,
@@ -257,18 +258,16 @@ def test_fractional_policy_refuses_one_nano_share_more_than_held():
 
 
 @pytest.mark.parametrize("price", [0.0, -5.0])
-def test_a_nonpositive_price_refuses_rather_than_pricing_the_sale_wrong(price):
-    result = _sell(shares=1, positions=[_position(price=price)])
-    assert result["created"] is False
-    assert "no usable current price" in result["reason"]
+def test_snapshot_boundary_refuses_a_nonpositive_held_price(price):
+    with pytest.raises(PortfolioSnapshotIntegrityError, match="NVDA"):
+        _sell(shares=1, positions=[_position(price=price)])
 
 
-@pytest.mark.parametrize("price", [float("nan"), float("inf")])
-def test_a_non_finite_price_refuses_at_the_generator_too(price):
-    """Defence in depth: build_portfolio_snapshot already refuses these, so
-    this exercises the generator's own guard through a raw snapshot. Without
-    it, NaN would defeat the max-order-value comparison silently (every
-    ordered comparison against NaN is False)."""
+@pytest.mark.parametrize(
+    "price", [0.0, -5.0, float("nan"), float("inf")]
+)
+def test_an_unusable_price_refuses_at_the_generator_too(price):
+    """Defence in depth when a direct/deserialized snapshot bypasses validation."""
     result = generate_user_directed_sell_proposal(
         _raw_packet(_raw_position(price=price)),
         _policy(), ticker="BAD", shares=1, now=_NOW,

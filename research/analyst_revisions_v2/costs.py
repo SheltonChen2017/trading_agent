@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import dataclasses
 from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from enum import Enum
 from typing import Iterable
+
+from data.financial_primitives import to_decimal
 
 from .canonical import (
     CanonicalEvidenceError,
@@ -67,11 +69,9 @@ def _d(value: object, name: str) -> Decimal:
     if isinstance(value, bool):
         raise CostModelError(f"{name} must be finite, not bool")
     try:
-        parsed = value if isinstance(value, Decimal) else Decimal(str(value))
-    except (InvalidOperation, TypeError, ValueError) as exc:
+        parsed = to_decimal(value, name=name)  # type: ignore[arg-type]
+    except ValueError as exc:
         raise CostModelError(f"{name} must be finite") from exc
-    if not parsed.is_finite():
-        raise CostModelError(f"{name} must be finite")
     return parsed
 
 

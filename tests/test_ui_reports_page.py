@@ -1,6 +1,6 @@
 """GR-7a: the Reports page's tax export through the real Streamlit app.
 
-Seeds one round-trip fill in the session-isolated database, builds the
+Seeds one round-trip fill in a test-isolated database, builds the
 report through the actual page, and pins the honesty contract the artifact
 depends on: coverage status is stated, wash-sale wording stays advisory,
 the export is downloadable, and the page proposes nothing.
@@ -9,13 +9,13 @@ Run with: python -m pytest tests/test_ui_reports_page.py
 """
 from __future__ import annotations
 
-import os
 import sys
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import streamlit as st
 from streamlit.testing.v1 import AppTest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -26,7 +26,6 @@ _APP_PATH = Path(__file__).resolve().parents[1] / "scripts" / "personal_assistan
 UTC = timezone.utc
 _BUY_AT = datetime(2026, 1, 6, 15, 0, tzinfo=UTC)
 _SELL_AT = datetime(2026, 2, 9, 15, 0, tzinfo=UTC)
-_SEED_PROPOSALS = ("p-gr7a-buy", "p-gr7a-sell")
 
 
 def _seed_fill(store, fill_id, ticker, side, qty, price, at):
@@ -75,31 +74,21 @@ def _seed_fill(store, fill_id, ticker, side, qty, price, at):
 
 
 @pytest.fixture()
-def seeded_round_trip():
+def seeded_round_trip(tmp_path, monkeypatch):
     """One completed AAPL round trip: 10 @ 100 bought, 10 @ 150 sold."""
-    store = AssistantStore(Path(os.environ["TRADING_ASSISTANT_DB"]))
+    database = tmp_path / "assistant.db"
+    monkeypatch.setenv("TRADING_ASSISTANT_DB", str(database))
+    # ``personal_assistant_ui._store`` is a cached no-argument resource. Clear
+    # it after changing the environment so AppTest honors this private path,
+    # then clear it again so later UI tests reopen the restored session path.
+    st.cache_resource.clear()
+    store = AssistantStore(database)
     _seed_fill(store, "gr7a-buy", "AAPL", "buy", 10, 100.0, _BUY_AT)
     _seed_fill(store, "gr7a-sell", "AAPL", "sell", 10, 150.0, _SELL_AT)
     try:
         yield store
     finally:
-        # The session database is shared by every UI test in this process.
-        with store._connect() as connection:
-            connection.execute(
-                "DELETE FROM broker_order_events WHERE proposal_id IN "
-                f"({','.join('?' for _ in _SEED_PROPOSALS)})",
-                _SEED_PROPOSALS,
-            )
-            connection.execute(
-                "DELETE FROM broker_orders WHERE proposal_id IN "
-                f"({','.join('?' for _ in _SEED_PROPOSALS)})",
-                _SEED_PROPOSALS,
-            )
-            connection.execute(
-                "DELETE FROM trade_proposals WHERE proposal_id IN "
-                f"({','.join('?' for _ in _SEED_PROPOSALS)})",
-                _SEED_PROPOSALS,
-            )
+        st.cache_resource.clear()
 
 
 def _reports_app() -> AppTest:

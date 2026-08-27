@@ -2,22 +2,24 @@
 
 Prepared: 2026-08-27 by Codex after the owner-authorized P1/P2/P3 remediation,
 one-time three-lane synchronization, and post-merge portfolio-equity correction.
-This is a durable implementation handoff, not an acceptance record: Claude
-independent review of the exact pushed snapshots and Codex counter-review remain
-mandatory.
+Amended 2026-08-27 by Claude with the independent review of the root
+remediation range (section 0A). This is a durable implementation handoff, not an
+acceptance record: Codex counter-review of the review commits remains mandatory,
+and the three lane branches still require their own independent review.
 
 ## 0. Remediation implementation handoff
 
 - The root remediation was merged to `main` through PR #314 and PR #315; exact
   merged head is `9e9843e9fc332cbbed63480834abe2c3f093a652` and the temporary root branch was
   deleted after merge.
-- Current correction branch:
-  `codex/fix-portfolio-equity-rounding-20260827`. Exact code commit
-  `1ed06022d7f811a5977239be71e99c2fd7d37952` fixes an owner-reproduced P1 where
-  summing already-rounded position displays produced a total-equity display that
-  disagreed with the exact aggregate and prevented the paper assistant UI from
-  loading. The builder now aggregates exact Decimals and rounds once; the strict
-  integrity validator was not weakened.
+- The portfolio-equity correction is **merged**: branch
+  `codex/fix-portfolio-equity-rounding-20260827` was merged as PR #316 at
+  `e6a654dcf4fed67b5abbd1d312bb8031bc91fe2d` and no longer exists. Exact code
+  commit `1ed06022d7f811a5977239be71e99c2fd7d37952` fixes an owner-reproduced
+  P1 where summing already-rounded position displays produced a total-equity
+  display that disagreed with the exact aggregate and prevented the paper
+  assistant UI from loading. The builder now aggregates exact Decimals and
+  rounds once; the strict integrity validator was not weakened.
 - Exact root code snapshot before this record-only update:
   `66168eda687d42a3cfda45a05e0de8f7781d3b87`. The final shared follow-up is
   `6770db3bc3934c4b0872d0cea6a256c28dec2cc8`; the isolated Analyst-only
@@ -85,6 +87,60 @@ plus the next bounded milestone before one combined push.
 Historical coordination detail remains at
 `docs/Archive/Session/SESSION_HANDOFF_THROUGH_2026-08-25_SEP3_EIGHTH_DRY_RUN.md`
 and in `docs/Archive/Review/`.
+
+## 0A. Independent review of the root remediation (Claude, 2026-08-27)
+
+- Review branch `user/claude/review-root-remediation-20260827`; full record in
+  `docs/Archive/Review/REVIEW_2026-08-27_ROOT_REMEDIATION_INDEPENDENT.md`.
+  Reviewed range `2572472..e6a654d` — **27 commits**, covering the 22-commit
+  remediation series (PR #314, PR #315) **and** PR #316's portfolio-equity
+  rounding fix. Every commit carries an explicit disposition; all three merge
+  commits were reviewed as commits and each merge tree is byte-identical to its
+  topic-branch parent, so no commit or content was stranded.
+- **Disposition: accepted after correction, conditional on the P1 band and
+  `VAL-001` being closed.** No P0. The ledger is P0=0, **P1=2**, P2=13, P3=21,
+  P4=10 (46 findings). Severities were calibrated against reachability on a
+  production path, per this repository's own FCS-007 lesson.
+- **`main` does not currently pass its own test suite (`VAL-001`, P2).** PR #316
+  added a 110th ledger finding (`SYS-FU-P1-006`) without the paired update to
+  `tests/test_remediation_ledger_consistency.py`, whose expected family counts
+  and grand total are deliberately hard-coded. Four tests fail. Reproduced in a
+  throwaway detached worktree pinned at `e6a654d`, so it is a property of the
+  commit. The recorded PR #316 validation of "5,442 passed, 0 failed" cannot
+  describe that tree — 5,442 is exactly its collection count, so the run
+  predated the ledger commit.
+- Reviewer validation, two trees:
+  - tree of `9e9843e` (≡ `6906a6c`, the remediation series head):
+    **5,441 passed, 2 skipped, 0 failed, 25 warnings in 1,878.57s** —
+    reproduces the implementer's recorded root-range validation exactly.
+  - review head `e6a654d`: **4 failed, 5,438 passed, 2 skipped, 25 warnings in
+    1,495.77s**. `compileall` exited 0; `git diff --check` clean; a narrow
+    secret-shape scan matched nothing.
+- The two P1s share one root cause and are recorded as one systemic finding:
+  the remediation hardened the execution path fail-closed without carrying
+  CLAUDE.md section 5's risk-reduction exception through the new guards.
+  `EXE-001` (an unrelated ambiguous dispatch blocks every sell, reproduced end
+  to end through the real execution path) and `STO-001` (one corrupt
+  broker-event row makes a writable store unconstructable, removing emergency
+  cancel-all, with no repair command). `BRK-001` is the same class held at P2
+  only because no trigger is demonstrated reachable against a real broker. The
+  earnings blackout and `cancel_all_open_orders` are the two places the rule
+  *was* applied correctly.
+- Two claimed properties are not met at their stated strength: `AR-FU-P1-010`
+  (`ARV-001`/`ARV-002` — reviewed-policy identity is a self-rehash, not held out
+  of band) and `SYS-P2-005` (`POL-002` — the integrity validator is not shared
+  with the execution gate).
+- Independently reproduced as correct: the 110-finding ledger is internally
+  consistent; cross-process dispatch-fence exclusion demonstrated between two
+  live processes; the ML/research import boundary closed transitively from eight
+  execution-capable roots; the research layer's zero-access outcome and
+  nonempty-portfolio gates unbreakable under direct attack; legacy operator
+  databases upgrade safely; and the Analyst-only follow-up `66168ed` is absent
+  from both other lanes.
+- The review consumed **zero** research looks and touched no provider,
+  credential, broker, operator database, scheduled task, deployment, or evidence
+  epoch. `paper-epoch-006` is untouched. Findings are recorded for Codex to
+  verify and correct; this review applied no production-code change.
 
 ## 1. Read first
 

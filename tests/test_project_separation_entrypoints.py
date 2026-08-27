@@ -62,7 +62,11 @@ def _imported_modules(path: Path) -> set[str]:
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             modules.update(alias.name for alias in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module:
+        elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+            # ``from .canonical import ...`` names a sibling first-party
+            # module. Treating its bare relative name as a top-level package
+            # manufactures undeclared third-party dependencies for every
+            # package with internal relative imports.
             modules.add(node.module)
             modules.update(
                 f"{node.module}.{alias.name}"
@@ -670,6 +674,7 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
         "trading_assistant": ["data/operational_alerts.py"],
         "strategy_research": [
             "data/macro_data.py",
+            "data/research_input_contracts.py",
             "data/research_statistics.py",
             "data/runtime_identity.py",
         ],
@@ -677,6 +682,7 @@ def test_data_ownership_is_exhaustive_and_shared_provider_debt_cannot_grow():
     assert set(ownership["product_owned_service_rationales"]) == {
         "data/macro_data.py",
         "data/operational_alerts.py",
+        "data/research_input_contracts.py",
         "data/research_statistics.py",
         "data/runtime_identity.py",
     }
@@ -1024,6 +1030,7 @@ def test_licensed_research_surfaces_cannot_enter_execution_products():
         path.removesuffix(".py").replace("/", ".")
         for path in manifest["licensed_research_surfaces"]
     }
+    assert "research.analyst_revisions_v2" in licensed_modules
     for root_name in ("assistant", "execution", "risk"):
         for path in _source_files(ROOT / root_name, "*.py"):
             imported = _imported_modules(path)

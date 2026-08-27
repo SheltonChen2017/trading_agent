@@ -18,7 +18,9 @@ only when:
 3. confirmed defects were reproduced and corrected where practical;
 4. focused and full validation passed on the corrected tree;
 5. review corrections were committed separately; and
-6. `docs/SESSION_HANDOFF.md` was updated to reflect the new durable state.
+6. `docs/SESSION_HANDOFF.md` was updated to reflect the new durable state, or
+   the lane implementation record was updated under the named three-strategy
+   exception in section 3.
 
 The session handoff is part of the review deliverable, not optional cleanup.
 It is read by both Codex and Claude and may be the only reliable context after
@@ -26,8 +28,10 @@ a machine change, session reset, or context compaction.
 
 ## 2. Core rule
 
-> Every completed independent code review must update
-> `docs/SESSION_HANDOFF.md` before the review is handed back to the owner.
+> Under the generic workflow, every completed independent code review must
+> update `docs/SESSION_HANDOFF.md` before the review is handed back to the
+> owner. Under the named three-strategy exception, the lane implementation
+> record replaces the frozen root handoff.
 
 An implementation review starts only after the implementer has pushed a
 committed branch. The reviewer must fetch and branch from the exact
@@ -48,16 +52,53 @@ become materially stale.
 
 ## 3. Roles
 
-### Current ACER assignment (owner decision 2026-08-21)
+### Generic/legacy ACER default (owner decision 2026-08-21)
 
-For the current ACER implementation sequence, **Codex implements and Claude
+Under the generic/legacy ACER workflow, **Codex implements and Claude
 independently reviews**. Codex publishes a completed `codex/<topic>-<date>`
 implementation branch. Claude starts from that exact remote object and uses a
 separate `user/claude/<review-topic>-<date>` review branch. The generic roles
-below remain the contract; this paragraph only assigns the people occupying
-them. The assignment does not authorize either agent to merge, deploy, spend,
-download licensed data, or consume a research look without the owner's
-separate instruction.
+below remain the default contract; this paragraph only assigns the people
+occupying them. The assignment does not authorize either agent to merge,
+deploy, spend, download licensed data, or consume a research look without the
+owner's separate instruction.
+
+### Three-strategy same-lane exception (later owner decision 2026-08-26)
+
+The generic separate-review-branch topology does not apply to these three
+serialized, long-lived lanes:
+
+- `codex/strategy-analyst-revisions-v2`
+- `codex/strategy-insider-buying`
+- `codex/strategy-short-interest`
+
+For only these lanes, Codex implements and pushes one bounded milestone on the
+named lane branch. Claude reviews the exact pushed Codex snapshot, commits any
+authorized corrections and the review record, and pushes on that **same lane
+branch**. Codex counter-reviews every Claude commit and independently verifies
+material claims. If the review is accepted or accepted-after-correction and
+no owner decision blocks progress, Codex then implements the next bounded
+milestone, validates both stages, updates the lane record, and makes one
+combined push. A rejection or owner-decision blocker stops before the next
+milestone and before any push. No implementation, review, counter-review,
+checkpoint, or handoff branch is created for these lanes. The review remains
+independent even though its commits share the long-lived lane branch.
+
+#### One-time common-remediation exception (owner direction 2026-08-26)
+
+The owner has separately authorized one bounded common-remediation
+synchronization from `codex/full-review-p1-remediation-20260826`. Shared safety
+fixes from that series may be synchronized identically to all three named
+lanes. Analyst-specific research-layer fixes may be synchronized only to
+`codex/strategy-analyst-revisions-v2`; they must not enter either other lane.
+Each lane must update its own record.
+Synchronization is not acceptance: acceptance remains withheld until Claude
+reviews the exact pushed lane snapshot and Codex counter-reviews every Claude
+commit. This one-time exception grants no provider or outcome access, no
+QuantConnect job, no QC processing or upload permission, no broker or
+operator-database action, no paper/live deployment, and no trading authority.
+It expires after this owner-directed synchronization and does not authorize a
+future common-baseline or shared-file change by inference.
 
 ### Implementer
 
@@ -78,7 +119,8 @@ The implementer's test report is evidence to verify, not proof of acceptance.
 The reviewer:
 
 - starts from the implementer's exact commit;
-- creates a separate review branch;
+- creates a separate review branch under the generic workflow, or remains on
+  the named lane branch under the three-strategy exception above;
 - examines the code independently rather than accepting the commit message;
 - reproduces suspected defects with focused tests;
 - applies corrections within the authorized scope;
@@ -127,9 +169,16 @@ Create a dedicated review branch from the exact implementation commit:
 git switch -c <reviewer-prefix>/review-<milestone>-<date> origin/<implementation-branch>
 ```
 
-For the current ACER assignment the reviewer prefix is `user/claude`. Use the
+For the generic/legacy ACER assignment the reviewer prefix is `user/claude`. Use the
 appropriate agent prefix after any later owner-approved role change. Do not
 mix an unrelated feature or documentation initiative into the review branch.
+
+For the three named strategy lanes, isolation is by exact pushed snapshot,
+serialized ownership, and a separate clone or worktree—not by a review branch.
+Claude fetches and fast-forwards the named lane branch, verifies its exact
+remote head and ordered Codex commit range, and performs the review on that
+same lane branch. Creating a review, counter-review, checkpoint, or handoff
+branch for one of those lanes violates the later owner decision.
 
 In a shared worktree, monitor for concurrent branch switches and commits. A
 different agent can unintentionally commit onto the currently active branch.
@@ -216,6 +265,10 @@ git commit -m "Complete independent <milestone> review"
 ```
 
 Do not push, merge, or open a pull request unless the owner has authorized it.
+The three-strategy same-lane loop is standing authorization for its one
+serialized review push and the later Codex combined counter-review/next-
+milestone push; it is not merge, pull-request, force-push, or deployment
+authority.
 
 ### Step 6a — update only the associated record
 
@@ -235,6 +288,11 @@ and documentation commits to remain distinct. An implementation/review commit
 series is not ready to push or hand off until this record update and the
 Session Handoff update are committed. Those documentation-only commits do not
 recursively require another documentation cycle.
+
+For the three strategy lanes, the lane implementation record is the associated
+record and the branch-local handoff. The project-wide Action Plan, root Session
+Handoff, shared workflow, and main-line direction record remain frozen unless
+the owner separately directs a coordinated main-line amendment.
 
 ### Step 7 — update the session handoff
 
@@ -270,6 +328,14 @@ Never place secret values, account numbers, licensed data, or private artifact
 contents in the handoff. Credential presence booleans, file hashes, sizes, and
 non-sensitive row counts are acceptable when useful.
 
+For the three named strategy lanes, apply all of this step's substantive
+content requirements to that lane's implementation record instead of editing
+`docs/SESSION_HANDOFF.md`. The lane record must name the one lane branch, the
+exact pre-review and reviewed heads, every reviewed commit and disposition,
+any correction and validation, look accounting, remaining gates, and next
+bounded step. This documentation exception ends when the owner ends the
+parallel phase.
+
 ### Step 8 — verify and commit the handoff
 
 Run:
@@ -296,6 +362,10 @@ review correction commit
 associated-record commit (when separate)
 handoff commit
 ```
+
+For the three named strategy lanes, substitute the lane implementation record
+for the root handoff in these checks. Its record commit must be present before
+the authorized same-lane push.
 
 ### Step 9 — report to the owner
 
@@ -375,7 +445,9 @@ than implying it was re-proven.
 
 ## 8. Minimal reusable instruction
 
-Use this when assigning an implementation review:
+Use this generic/default instruction when assigning an implementation review.
+For one of the three named strategy lanes, replace its separate-review-branch
+and root-handoff steps with the same-lane and lane-record exception above:
 
 ```text
 Review the implementer's exact committed branch independently. Read CLAUDE.md,

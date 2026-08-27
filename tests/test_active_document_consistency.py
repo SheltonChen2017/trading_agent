@@ -162,6 +162,143 @@ def test_three_strategy_parallel_baseline_is_exact_and_fail_closed() -> None:
     assert not (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").exists()
 
 
+_THREE_STRATEGY_LANES = (
+    "codex/strategy-analyst-revisions-v2",
+    "codex/strategy-insider-buying",
+    "codex/strategy-short-interest",
+)
+
+
+def test_three_strategy_review_exception_preserves_both_branch_topologies() -> None:
+    """The later same-lane rule must not erase or inherit the generic default.
+
+    This is intentionally relational. Merely mentioning ``counter-review`` is
+    insufficient: all four governing sources must bind the exact three lanes
+    to the complete serialized cycle, while AGENTS and the process document
+    must continue to state the separate-review-branch default outside it.
+    """
+    governance = {
+        "AGENTS": _root_text("AGENTS.md"),
+        "review process": _text(
+            "process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md"
+        ),
+        "project direction": _text("THREE_STRATEGY_PROJECT_DIRECTION.md"),
+        "parallel workflow": _text(
+            "Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md"
+        ),
+    }
+
+    for label in ("AGENTS", "review process"):
+        lowered = governance[label].lower()
+        assert "generic/legacy acer" in lowered, (
+            f"{label} lost the generic/legacy ACER scope of the default"
+        )
+        assert re.search(r"separate\s+`?user/claude/[^ ]*`?\s+review branch", lowered), (
+            f"{label} no longer preserves the generic separate review branch"
+        )
+        assert "three-strategy" in lowered and "exception" in lowered, (
+            f"{label} no longer identifies the later strategy-lane exception"
+        )
+        assert "lane implementation record" in lowered
+        assert "root session handoff" in lowered and "frozen" in lowered, (
+            f"{label} still routes per-lane pushes through the frozen root handoff"
+        )
+
+    no_extra_branch = re.compile(
+        r"(?:no|neither codex nor claude creates an) implementation, review, "
+        r"counter-review, checkpoint, or handoff branch",
+        re.IGNORECASE,
+    )
+    for label, document in governance.items():
+        lowered = document.lower()
+        for branch in _THREE_STRATEGY_LANES:
+            assert branch in document, f"{label} omits governed lane {branch}"
+        assert "same lane branch" in lowered or "same branch" in lowered, (
+            f"{label} no longer binds Claude review to the lane branch"
+        )
+        assert "counter-reviews every claude commit" in lowered, (
+            f"{label} weakens the required Codex counter-review scope"
+        )
+        assert "accepted or accepted-after-correction" in lowered, (
+            f"{label} lost the acceptance gate before the next milestone"
+        )
+        assert "no owner decision blocks progress" in lowered, (
+            f"{label} lost the owner-decision stop gate"
+        )
+        assert "next bounded" in lowered and "one combined push" in lowered, (
+            f"{label} no longer couples counter-review to the next bounded milestone"
+        )
+        assert no_extra_branch.search(document), (
+            f"{label} permits a forbidden per-lane review/checkpoint branch"
+        )
+
+
+def test_one_time_common_remediation_is_narrow_and_non_authorizing() -> None:
+    """The temporary synchronization cannot become cross-lane authority.
+
+    Each governing source must preserve both routing directions (shared fixes
+    to all lanes, Analyst-only fixes to one lane), withhold acceptance, and
+    deny every external/operational authority named by the owner. Deleting one
+    half of that relationship or broadening it to future shared work reddens
+    this test even if the heading remains.
+    """
+    governance = {
+        "AGENTS": _root_text("AGENTS.md"),
+        "review process": _text(
+            "process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md"
+        ),
+        "project direction": _text("THREE_STRATEGY_PROJECT_DIRECTION.md"),
+        "parallel workflow": _text(
+            "Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md"
+        ),
+    }
+    source = "codex/full-review-p1-remediation-20260826"
+    analyst_lane = "codex/strategy-analyst-revisions-v2"
+
+    for label, document in governance.items():
+        lowered = document.lower()
+        assert "one-time common-remediation exception" in lowered, (
+            f"{label} no longer scopes the remediation as one-time"
+        )
+        assert source in document, f"{label} lost the exact remediation source"
+        assert re.search(
+            r"shared safety fixes.{0,140}synchronized identically to all three",
+            lowered,
+        ), f"{label} no longer routes identical shared fixes to all three lanes"
+        assert re.search(
+            r"analyst-specific research-layer fixes.{0,140}synchronized only to\s+"
+            + re.escape(f"`{analyst_lane}`"),
+            lowered,
+        ), f"{label} no longer confines Analyst-specific fixes to Analyst V2"
+        assert "must not enter" in lowered, (
+            f"{label} lost the explicit prohibition on Analyst code in other lanes"
+        )
+        assert re.search(r"each (?:target )?lane.{0,90}own .*record", lowered), (
+            f"{label} no longer requires a lane-owned synchronization record"
+        )
+        assert "synchronization is not acceptance" in lowered
+        assert "acceptance remains withheld" in lowered
+        assert "exact pushed" in lowered and "same lane branch" in lowered
+        assert "codex counter-reviews every claude commit" in lowered
+
+        for denied in (
+            "provider",
+            "outcome",
+            "qc",
+            "broker",
+            "deployment",
+            "trading authority",
+        ):
+            assert re.search(rf"\bno\b[^.;]{{0,180}}\b{denied}\b", lowered), (
+                f"{label} no longer explicitly denies remediation {denied!r} authority"
+            )
+
+        assert "expires" in lowered, f"{label} made the exception permanent"
+        assert (
+            "by inference" in lowered or "separate owner decision" in lowered
+        ), f"{label} permits later shared work without renewed owner authority"
+
+
 def test_main_strategy_direction_preserves_integration_and_authority_gates() -> None:
     direction = _text("THREE_STRATEGY_PROJECT_DIRECTION.md")
     action = _text("ACTION_PLAN_2026-08-20.md")

@@ -1,0 +1,202 @@
+{
+  "schema": "arv2-round0-preregistration-v1",
+  "status": "blocked_owner_decisions",
+  "spec_id": "arv2-round0-draft-unexecutable",
+  "spec_hash": null,
+  "producing_commit": null,
+  "reviewed_by": null,
+  "reviewed_at": null,
+  "cells": [
+    {
+      "cell_id": "shared_holdout",
+      "state": "owner_decision_required",
+      "value": null,
+      "source": "THREE_STRATEGY_PROJECT_DIRECTION.md requires one owner-frozen common cutoff and reserved period"
+    },
+    {
+      "cell_id": "contaminated_legacy_periods",
+      "state": "owner_decision_required",
+      "value": null,
+      "source": "legacy analyst outcome history must be classified before a new look"
+    },
+    {
+      "cell_id": "canonical_family",
+      "state": "frozen",
+      "value": "rating_only",
+      "source": "owner V2 blueprint and analyst implementation record"
+    },
+    {
+      "cell_id": "channel_family_policy",
+      "state": "frozen",
+      "value": {
+        "price_target": "separate_future_family",
+        "eps_revision": "separate_future_family",
+        "news": "separate_future_family"
+      },
+      "source": "owner V2 blueprint canonical-family boundary"
+    },
+    {
+      "cell_id": "availability_rule",
+      "state": "frozen",
+      "value": {
+        "exact_clock": "first_exchange_open_strictly_after_public_instant",
+        "date_only": "second_exchange_session_open_strictly_after_event_date",
+        "ambiguous_clock": "refuse"
+      },
+      "source": "V2 timing erratum AR-P2-009"
+    },
+    {
+      "cell_id": "label_contract",
+      "state": "frozen",
+      "value": {
+        "horizon_sessions": 20,
+        "entry": "eligible_session_open",
+        "exit": "h_session_open",
+        "missing_exit": "terminal_return_or_named_refusal_never_drop"
+      },
+      "source": "owner V2 blueprint primary horizon"
+    },
+    {
+      "cell_id": "corporate_action_contract",
+      "state": "owner_decision_required",
+      "value": null,
+      "source": "PIT split dividend delisting and terminal-return source is not yet authorized"
+    },
+    {
+      "cell_id": "walk_forward_contract",
+      "state": "frozen",
+      "value": {
+        "train_years": 5,
+        "validation_years": 2,
+        "test_years": 1,
+        "purge_group": "decision_date_and_common_event",
+        "embargo_sessions": 20
+      },
+      "source": "owner V2 blueprint plus outcome-horizon embargo correction"
+    },
+    {
+      "cell_id": "inference_contract",
+      "state": "frozen",
+      "value": {
+        "sample_unit": "decision_date",
+        "cluster": "common_event",
+        "block_length_sessions": 20,
+        "minimum_independent_dates": 50
+      },
+      "source": "standing calibrated-block lower bound and AR-P2-007/AR-P3-005"
+    },
+    {
+      "cell_id": "mandatory_controls",
+      "state": "frozen",
+      "value": [
+        "earnings_guidance",
+        "immediate_price_jump",
+        "liquidity",
+        "momentum",
+        "sector",
+        "size",
+        "volatility"
+      ],
+      "source": "owner V2 stock-first incremental-information design"
+    },
+    {
+      "cell_id": "missing_control_policy",
+      "state": "frozen",
+      "value": "refuse_row_before_cross_section",
+      "source": "binary admissibility erratum AR-P2-008"
+    },
+    {
+      "cell_id": "universe_contract",
+      "state": "owner_decision_required",
+      "value": null,
+      "source": "PIT security-master source and exact listing filters remain unauthorized"
+    },
+    {
+      "cell_id": "normalization_contract",
+      "state": "owner_decision_required",
+      "value": null,
+      "source": "peer fallback and population require owner freeze before outcomes"
+    },
+    {
+      "cell_id": "stock_topology",
+      "state": "owner_decision_required",
+      "value": null,
+      "source": "exact primary stock cell IDs and signs require owner freeze"
+    },
+    {
+      "cell_id": "topology_comparison_hierarchy",
+      "state": "frozen",
+      "value": ["stock", "industry", "etf"],
+      "source": "three-strategy stock-first stopping rule"
+    },
+    {
+      "cell_id": "observation_rule_parity",
+      "state": "frozen",
+      "value": "identical_timing_universe_missingness_and_cost_rules_for_signal_and_baselines",
+      "source": "owner V2 blueprint baseline contract"
+    },
+    {
+      "cell_id": "cost_contract",
+      "state": "frozen",
+      "value": {
+        "scenario_bps": ["0", "5", "10", "20"],
+        "units": "dollars_then_divide_once_by_nav",
+        "missing_adv": "refuse_except_forced_terminal_exit"
+      },
+      "source": "owner V2 blueprint cost grid and AR-P2-012 erratum"
+    },
+    {
+      "cell_id": "holdings_contract",
+      "state": "frozen",
+      "value": {
+        "minimum_mapped_candidate_weight": "0.99",
+        "point_in_time": true,
+        "stale_or_incomplete": "refuse"
+      },
+      "source": "owner V2 blueprint and AR-P2-011 erratum"
+    },
+    {
+      "cell_id": "portfolio_contract",
+      "state": "frozen",
+      "value": {
+        "maximum_holdings": 5,
+        "etf_cap": "0.20",
+        "sector_cap": "0.40",
+        "cluster_cap": "0.30",
+        "leverage": false
+      },
+      "source": "owner V2 blueprint hard portfolio constraints"
+    },
+    {
+      "cell_id": "multiplicity_family",
+      "state": "owner_decision_required",
+      "value": null,
+      "source": "permanent cell and look IDs require owner approval"
+    },
+    {
+      "cell_id": "lane_validation_period",
+      "state": "owner_decision_required",
+      "value": null,
+      "source": "must be chosen relative to the unresolved shared final holdout"
+    },
+    {
+      "cell_id": "three_lane_selection_correction",
+      "state": "frozen",
+      "value": 3,
+      "source": "THREE_STRATEGY_PROJECT_DIRECTION.md integration rule"
+    },
+    {
+      "cell_id": "valid_null_closes_family",
+      "state": "frozen",
+      "value": true,
+      "source": "THREE_STRATEGY_PROJECT_DIRECTION.md family closure rule"
+    },
+    {
+      "cell_id": "legacy_reproduction_policy",
+      "state": "frozen",
+      "value": "non_new_non_v2_offline_registered_only",
+      "source": "AR-P2-005 quarantine decision"
+    }
+  ],
+  "looks": []
+}

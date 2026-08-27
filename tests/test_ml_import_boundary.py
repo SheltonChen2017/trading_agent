@@ -24,6 +24,7 @@ _FIRST_PARTY_PATHS = (
     REPO_ROOT / "data",
     REPO_ROOT / "execution",
     REPO_ROOT / "ml",
+    REPO_ROOT / "research",
     REPO_ROOT / "risk",
     REPO_ROOT / "scripts",
     REPO_ROOT / "signals",
@@ -294,6 +295,79 @@ def test_execution_products_cannot_reach_llm_derived_neutral_contracts():
         "execution-capable code reaches an LLM-derived neutral contract: "
         + "; ".join(sorted(offenders))
     )
+
+
+def _forbidden_module_dependency_chains(
+    graph: dict[str, set[str]], roots: list[str], forbidden: set[str]
+) -> list[str]:
+    """Return fail-closed direct or transitive paths into forbidden modules."""
+    offending: list[str] = []
+    for root in roots:
+        seen = {root}
+        stack = [(root, (root,))]
+        while stack:
+            current, chain = stack.pop()
+            for dependency in sorted(graph.get(current, ())):
+                next_chain = chain + (dependency,)
+                if dependency.startswith("<unresolved "):
+                    offending.append(" -> ".join(next_chain))
+                    continue
+                if any(
+                    dependency == module or dependency.startswith(f"{module}.")
+                    for module in forbidden
+                ):
+                    offending.append(" -> ".join(next_chain))
+                    continue
+                if dependency in graph and dependency not in seen:
+                    seen.add(dependency)
+                    stack.append((dependency, next_chain))
+    return offending
+
+
+def test_execution_products_cannot_reach_licensed_research_transitively():
+    """Execution authority cannot acquire licensed research semantics indirectly."""
+    manifest = json.loads(
+        (REPO_ROOT / "architecture" / "entry_points.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    forbidden = {
+        path.removesuffix(".py").replace("/", ".")
+        for path in manifest["licensed_research_surfaces"]
+    }
+    assert "research.analyst_revisions_v2" in forbidden
+
+    graph, unresolved = _internal_import_graph()
+    assert not unresolved, (
+        "the licensed-research boundary cannot be proved while imports are "
+        "unresolved: " + "; ".join(sorted(unresolved))
+    )
+    roots = sorted(
+        module
+        for module in graph
+        if module.split(".", 1)[0] in {"assistant", "execution", "risk"}
+    )
+    offenders = _forbidden_module_dependency_chains(graph, roots, forbidden)
+    assert not offenders, (
+        "execution-capable code reaches licensed research semantics: "
+        + "; ".join(sorted(offenders))
+    )
+
+
+def test_licensed_research_walker_detects_indirect_analyst_import_mutation():
+    """Mutation proof: a helper cannot conceal an Analyst-v2 dependency."""
+    graph = {
+        "assistant.execution_service": {"data.execution_helper"},
+        "data.execution_helper": {"research.analyst_revisions_v2.formulas"},
+    }
+    assert _forbidden_module_dependency_chains(
+        graph,
+        ["assistant.execution_service"],
+        {"research.analyst_revisions_v2"},
+    ) == [
+        "assistant.execution_service -> data.execution_helper -> "
+        "research.analyst_revisions_v2.formulas"
+    ]
 
 
 def test_interactive_backtest_cannot_reach_authority_or_ml_transitively():

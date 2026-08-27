@@ -48,6 +48,7 @@ from signals.credit_spread import scan_credit_spread
 from signals.yield_curve import scan_yield_curve
 from signals.momentum import scan_momentum
 from signals.analyst_target import scan_analyst_target_gap
+from research.analyst_revisions_v2.legacy_reproduction import quarantine_legacy_runner
 
 
 ENTRY_TIMINGS = ("same_close", "next_open")
@@ -70,7 +71,10 @@ def _run_one(name: str, data: dict, scan_fn, n_tests: int) -> None:
             print(confirmation_primary.to_string(index=False))
 
 
-def main():
+def main(argv=None):
+    quarantine_legacy_runner(
+        script_name="run_execution_timing_revalidation.py", argv=argv
+    )
     print(f"Fetching real historical price data for {len(UNIVERSE)} tickers over {LOOKBACK_DAYS} trading days...")
     data = fetch_historical(UNIVERSE, lookback_days=LOOKBACK_DAYS)
     print(f"Got price data for {len(data)}/{len(UNIVERSE)} tickers.")

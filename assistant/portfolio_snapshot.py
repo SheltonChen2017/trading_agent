@@ -355,16 +355,17 @@ def build_portfolio_snapshot(
             )
         )
 
-    total_equity = cash_decimal + sum(
-        (to_decimal(position.market_value) for position in built), Decimal("0")
-    )
     exact_total_equity = cash_decimal + sum(
         (position.exact_field("market_value") for position in built), Decimal("0")
     )
     snapshot = PortfolioSnapshot(
         positions=built,
         cash=float(round(cash_decimal, 2)),
-        total_equity=float(round(total_equity, 2)),
+        # Aggregate authoritative values before rounding. Summing each
+        # position's already-rounded display value can accumulate multiple
+        # cents of drift and create a display/exact pair that fails its own
+        # integrity contract.
+        total_equity=float(round(exact_total_equity, 2)),
         cash_exact=decimal_text(cash_decimal),
         total_equity_exact=decimal_text(exact_total_equity),
         buying_power_exact=(

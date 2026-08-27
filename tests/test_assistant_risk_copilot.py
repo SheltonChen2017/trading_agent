@@ -80,6 +80,30 @@ def test_zero_share_zero_value_row_is_normalized_to_not_held_state():
     assert snapshot.total_equity_exact == "100"
 
 
+def test_snapshot_builder_aggregates_exact_values_before_display_rounding():
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "KO-A",
+                "shares": "1",
+                "entry_price": "24.997",
+                "current_price": "24.997",
+            },
+            {
+                "ticker": "KO",
+                "shares": "1",
+                "entry_price": "24.997",
+                "current_price": "24.997",
+            },
+        ],
+        cash="50.006",
+    )
+
+    assert [position.market_value for position in snapshot.positions] == [25.0, 25.0]
+    assert snapshot.total_equity_exact == "100"
+    assert snapshot.total_equity == 100.0
+
+
 def test_direct_malformed_snapshot_is_degraded_in_reports_and_blocked_by_gate():
     malformed = PortfolioSnapshot(
         positions=[

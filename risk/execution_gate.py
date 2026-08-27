@@ -49,7 +49,10 @@ import hashlib
 import hmac
 import json
 import math
+import os
+import re
 import secrets
+import threading
 from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from typing import Literal
@@ -59,6 +62,7 @@ import pandas_market_calendars as mcal
 
 from config import BASKETS, LEVERAGED_ETF_TICKERS, MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
 from assistant.money import MoneyInput, decimal_or_none, decimal_text, to_decimal
+from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.schemas import PortfolioSnapshot
 
 _EASTERN = ZoneInfo("America/New_York")
@@ -70,6 +74,21 @@ _NYSE_CALENDAR = mcal.get_calendar("NYSE")
 # provider, not so large that a genuinely bad timestamp (e.g. a bug that
 # adds hours instead of subtracting) would slip through as "fresh."
 _FUTURE_TIMESTAMP_TOLERANCE_MINUTES = 1.0
+
+# Execution-bound validations are intended to run immediately after the
+# broker capture, inside the same dispatch fence.  These local invariants avoid
+# a risk->portfolio_snapshot import cycle while matching that capture path's
+# one-cent component reconciliation tolerance.
+_EXECUTION_COMPONENT_EQUITY_TOLERANCE = Decimal("0.01")
+_EXECUTION_SNAPSHOT_MAX_AGE = timedelta(seconds=30)
+_EXECUTION_SNAPSHOT_FUTURE_SKEW = timedelta(seconds=5)
+
+# Execution authorizations exist only to bridge the in-process gap between a
+# completed validation and the matching broker call. Keep the public
+# parameter for deterministic tests and narrow integrations, but never accept
+# a caller-selected zero, negative, fractional, boolean, or long-lived TTL.
+_MIN_AUTHORIZATION_TTL_SECONDS = 1
+_MAX_AUTHORIZATION_TTL_SECONDS = 300
 
 # Process-local secret, generated once at import time. intent_fingerprint()
 # below is a PLAIN hash of public TradeIntent fields -- any code that can
@@ -280,6 +299,33 @@ OVERRIDABLE_VIOLATION_CODES: frozenset[ViolationCode] = frozenset(
 
 
 @dataclasses.dataclass(frozen=True)
+class ExecutionValidationContext:
+    """Broker execution facts that validation and authorization share.
+
+    A context is created from an execution-owned broker snapshot and policy,
+    then supplied to :func:`validate_trade_intent`.  The validation proof
+    covers every field, so an authorization can only inherit (never add or
+    relabel) the account/snapshot/policy facts that were actually validated.
+    The gate independently matches the broker fields to PortfolioSnapshot;
+    the orchestration layer must compute ``policy_fingerprint`` from the
+    actual TradingPolicy whose values it passes into this pure primitive.
+    """
+
+    account_id: str
+    account_mode: str
+    snapshot_id: str
+    policy_fingerprint: str
+
+    def __post_init__(self) -> None:
+        _validated_authorization_binding(
+            account_id=self.account_id,
+            account_mode=self.account_mode,
+            snapshot_id=self.snapshot_id,
+            policy_fingerprint=self.policy_fingerprint,
+        )
+
+
+@dataclasses.dataclass(frozen=True)
 class ValidationResult:
     approved: bool
     # Human-readable messages -- display only. Same order and length as
@@ -293,7 +339,8 @@ class ValidationResult:
     violation_codes: tuple[str, ...] = ()
     # HMAC (keyed by this module's process-local secret) over the exact
     # intent this result was computed for, the approved/rejected outcome,
-    # AND the full (canonically ordered) violation_codes. Only
+    # the full (canonically ordered) violation_codes, AND the optional
+    # execution_context. Only
     # validate_trade_intent() can produce a proof that verifies -- unlike
     # a plain content hash, this can't be recomputed by code that merely
     # knows the intent's public fields, so a hand-constructed
@@ -312,6 +359,10 @@ class ValidationResult:
     # -looking codes via dataclasses.replace() while the proof (which
     # never covered that field) kept verifying.
     validation_proof: str | None = None
+    # None keeps this pure risk-gate primitive usable without broker context.
+    # When present, the proof above binds all four fields and authorizers must
+    # derive their execution binding from this exact context.
+    execution_context: ExecutionValidationContext | None = None
 
     @property
     def overridable(self) -> bool:
@@ -346,6 +397,13 @@ class ExecutionAuthorization:
     proof: str  # HMAC-signed; only authorize_trade_intent() can produce a valid one
     approved_at: str
     expires_at: str
+    # A production broker dispatch supplies all four fields.  Defaults keep
+    # the pure risk-gate primitive usable in research/unit contexts that never
+    # contact a broker; submit adapters require the complete binding.
+    account_id: str | None = None
+    account_mode: str | None = None
+    snapshot_id: str | None = None
+    policy_fingerprint: str | None = None
 
 
 def intent_fingerprint(intent: TradeIntent) -> str:
@@ -368,7 +426,10 @@ def intent_fingerprint(intent: TradeIntent) -> str:
 
 
 def _validation_proof(
-    intent: TradeIntent, approved: bool, violation_codes: tuple[str, ...] = ()
+    intent: TradeIntent,
+    approved: bool,
+    violation_codes: tuple[str, ...] = (),
+    execution_context: ExecutionValidationContext | None = None,
 ) -> str:
     # `approved` is part of the signed payload -- NOT just intent identity
     # -- so a REJECTED validation's proof can never be reused as if it were
@@ -390,11 +451,36 @@ def _validation_proof(
     # Sorted before joining so that two otherwise-identical code sets in a
     # different order (not semantically meaningful) still produce the
     # same signature.
-    canonical_codes = ":".join(sorted(violation_codes))
-    return _sign(f"validated:{approved}:{intent_fingerprint(intent)}:{canonical_codes}")
+    payload = json.dumps(
+        {
+            "approved": approved,
+            "intent_fingerprint": intent_fingerprint(intent),
+            "violation_codes": sorted(violation_codes),
+            "execution_context": None
+            if execution_context is None
+            else {
+                "account_id": execution_context.account_id,
+                "account_mode": execution_context.account_mode,
+                "snapshot_id": execution_context.snapshot_id,
+                "policy_fingerprint": execution_context.policy_fingerprint,
+            },
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return _sign(f"validated:{payload}")
 
 
-def _authorization_proof(intent: TradeIntent, token: str, expires_at: str) -> str:
+def _authorization_proof(
+    intent: TradeIntent,
+    token: str,
+    expires_at: str,
+    *,
+    account_id: str | None,
+    account_mode: str | None,
+    snapshot_id: str | None,
+    policy_fingerprint: str | None,
+) -> str:
     # `expires_at` is part of the signed payload -- NOT just intent
     # identity -- so the expiry itself can't be extended after the fact.
     # ExecutionAuthorization is frozen, but dataclasses.replace() (or any
@@ -413,33 +499,397 @@ def _authorization_proof(intent: TradeIntent, token: str, expires_at: str) -> st
     # the SAME valid intent+expiry binding, completely bypassing replay
     # detection. Binding token into the proof means swapping it invalidates
     # the proof, exactly like swapping expires_at or the intent already did.
-    return _sign(f"authorized:{intent_fingerprint(intent)}:{token}:{expires_at}")
+    payload = json.dumps(
+        {
+            "intent_fingerprint": intent_fingerprint(intent),
+            "token": token,
+            "expires_at": expires_at,
+            "account_id": account_id,
+            "account_mode": account_mode,
+            "snapshot_id": snapshot_id,
+            "policy_fingerprint": policy_fingerprint,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return _sign(f"authorized:{payload}")
+
+
+def _validated_authorization_binding(
+    *,
+    account_id: str | None,
+    account_mode: str | None,
+    snapshot_id: str | None,
+    policy_fingerprint: str | None,
+) -> tuple[str | None, str | None, str | None, str | None]:
+    """Validate an all-or-none execution context before signing it."""
+    values = (account_id, account_mode, snapshot_id, policy_fingerprint)
+    if all(value is None for value in values):
+        return values
+    if any(value is None for value in values):
+        raise ValueError(
+            "Execution authorization binding requires account_id, account_mode, "
+            "snapshot_id, and policy_fingerprint together."
+        )
+    if not isinstance(account_id, str) or not account_id.strip() or account_id != account_id.strip():
+        raise ValueError("account_id must be a non-empty canonical string")
+    if account_mode not in ("paper", "live"):
+        raise ValueError("account_mode must be exactly 'paper' or 'live'")
+    for value, name in (
+        (snapshot_id, "snapshot_id"),
+        (policy_fingerprint, "policy_fingerprint"),
+    ):
+        if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None:
+            raise ValueError(f"{name} must be a lowercase 64-character sha256 digest")
+    return account_id, account_mode, snapshot_id, policy_fingerprint
+
+
+def _authorization_binding_from_validation(
+    validation: ValidationResult,
+    *,
+    account_id: str | None,
+    account_mode: str | None,
+    snapshot_id: str | None,
+    policy_fingerprint: str | None,
+) -> tuple[str | None, str | None, str | None, str | None]:
+    """Derive authorization binding from the proof-bound validation facts.
+
+    Explicit fields remain accepted only as a compatibility assertion: all
+    four must be present, canonical, and exactly equal to the validation's
+    signed context.  They can never promote an unbound validation or relabel a
+    validation produced for a different broker snapshot/account/policy.
+    """
+
+    supplied_values = (account_id, account_mode, snapshot_id, policy_fingerprint)
+    supplied = None
+    if any(value is not None for value in supplied_values):
+        supplied = _validated_authorization_binding(
+            account_id=account_id,
+            account_mode=account_mode,
+            snapshot_id=snapshot_id,
+            policy_fingerprint=policy_fingerprint,
+        )
+
+    context = validation.execution_context
+    if context is None:
+        if supplied is not None:
+            raise ValueError(
+                "An unbound ValidationResult cannot be promoted to a broker-bound "
+                "authorization; pass ExecutionValidationContext to "
+                "validate_trade_intent()."
+            )
+        return (None, None, None, None)
+
+    derived = _validated_authorization_binding(
+        account_id=context.account_id,
+        account_mode=context.account_mode,
+        snapshot_id=context.snapshot_id,
+        policy_fingerprint=context.policy_fingerprint,
+    )
+    if supplied is not None and supplied != derived:
+        raise ValueError(
+            "Authorization binding does not match the signed execution validation context."
+        )
+    return derived
+
+
+def _validate_execution_context_against_portfolio(
+    execution_context: ExecutionValidationContext,
+    portfolio: PortfolioSnapshot,
+) -> None:
+    """Refuse a context that does not describe strict broker evidence.
+
+    This closes the pre-signing variant of context relabeling: a caller may
+    not validate a manual/account-A snapshot while merely asserting that it
+    came from account B.  The policy fingerprint cannot be recomputed in this
+    generic primitive because its arguments are intentionally policy-agnostic;
+    production orchestration must derive it from the exact TradingPolicy.
+    """
+
+    if portfolio.source != "alpaca":
+        raise ValueError(
+            "An execution-bound validation requires an Alpaca execution snapshot."
+        )
+    # Lazy import avoids widening the module-level risk dependency surface.
+    # The public SHA label alone is forgeable and does not reveal mutation;
+    # recompute the canonical material and active-order fingerprint before a
+    # validation proof can bless this object.  The broker session separately
+    # requires that the same ID was registered by its own strict capture.
+    from assistant.portfolio_snapshot import (
+        BrokerSnapshotCoherenceError,
+        verify_execution_portfolio_snapshot,
+    )
+
+    try:
+        verify_execution_portfolio_snapshot(portfolio)
+    except (BrokerSnapshotCoherenceError, ValueError, TypeError) as exc:
+        raise ValueError(
+            f"Execution portfolio snapshot integrity verification failed: {exc}"
+        ) from exc
+    if portfolio.account_id != execution_context.account_id:
+        raise ValueError(
+            "Execution validation account_id does not match the portfolio snapshot."
+        )
+    if portfolio.account_mode != execution_context.account_mode:
+        raise ValueError(
+            "Execution validation account_mode does not match the portfolio snapshot."
+        )
+    if portfolio.broker_snapshot_id != execution_context.snapshot_id:
+        raise ValueError(
+            "Execution validation snapshot_id does not match the portfolio snapshot."
+        )
+    if portfolio.open_orders_available is not True:
+        raise ValueError(
+            "An execution-bound validation requires a verified broker open-order book."
+        )
+    if not portfolio.has_exact_numerics:
+        raise ValueError(
+            "An execution-bound validation requires exact broker portfolio numerics."
+        )
+
+    required_evidence = {
+        "captured_at": portfolio.captured_at,
+        "component_equity_exact": portfolio.component_equity_exact,
+        "component_equity_delta_exact": portfolio.component_equity_delta_exact,
+    }
+    for field, value in required_evidence.items():
+        if not isinstance(value, str) or not value or value != value.strip():
+            raise ValueError(
+                f"An execution-bound validation requires canonical {field} evidence."
+            )
+
+    try:
+        captured_at = datetime.fromisoformat(portfolio.captured_at)
+    except ValueError as exc:
+        raise ValueError(
+            "An execution-bound validation requires an ISO captured_at timestamp."
+        ) from exc
+    if captured_at.tzinfo is None or captured_at.utcoffset() is None:
+        raise ValueError(
+            "An execution-bound validation requires a timezone-aware captured_at timestamp."
+        )
+    captured_at_utc = captured_at.astimezone(timezone.utc)
+    snapshot_age = datetime.now(timezone.utc) - captured_at_utc
+    if snapshot_age > _EXECUTION_SNAPSHOT_MAX_AGE:
+        raise ValueError(
+            "An execution-bound validation requires a freshly captured broker snapshot."
+        )
+    if snapshot_age < -_EXECUTION_SNAPSHOT_FUTURE_SKEW:
+        raise ValueError(
+            "Execution snapshot captured_at is implausibly far in the future."
+        )
+
+    try:
+        component_equity = to_decimal(
+            portfolio.component_equity_exact,
+            name="portfolio.component_equity_exact",
+        )
+        component_delta = to_decimal(
+            portfolio.component_equity_delta_exact,
+            name="portfolio.component_equity_delta_exact",
+        )
+        expected_component = portfolio.cash_exact_decimal + sum(
+            (position.exact_field("market_value") for position in portfolio.positions),
+            Decimal("0"),
+        )
+        broker_equity = portfolio.total_equity_exact_decimal
+    except ValueError as exc:
+        raise ValueError(
+            "An execution-bound validation requires valid exact component-equity evidence."
+        ) from exc
+    if component_equity != expected_component:
+        raise ValueError(
+            "Execution snapshot component equity does not match exact cash plus positions."
+        )
+    if component_delta != component_equity - broker_equity:
+        raise ValueError(
+            "Execution snapshot component-equity delta is internally inconsistent."
+        )
+    if abs(component_delta) > _EXECUTION_COMPONENT_EQUITY_TOLERANCE:
+        raise ValueError(
+            "Execution snapshot component-equity delta exceeds the execution tolerance."
+        )
+
+
+def _validate_bound_policy_contract(
+    *,
+    execution_context: ExecutionValidationContext,
+    execution_policy: TradingPolicy | None,
+    intent: TradeIntent,
+    portfolio: PortfolioSnapshot,
+    earnings_days_away: int | None,
+    max_position_pct: float,
+    max_total_exposure_pct: float,
+    max_basket_pct: float,
+    max_leveraged_etf_pct: float,
+    max_stale_price_minutes: float,
+    max_slippage_pct: float,
+    max_spread_pct: float,
+    earnings_blackout_days: int,
+    max_order_value: float | None,
+    min_cash_reserve_pct: float,
+    whole_shares_only: bool,
+) -> None:
+    """Prove the signed policy label matches every scalar the gate used."""
+    if not isinstance(execution_policy, TradingPolicy):
+        raise ValueError(
+            "An execution-bound validation requires the exact TradingPolicy object."
+        )
+    execution_policy.validate()
+    if compute_policy_fingerprint(execution_policy) != (
+        execution_context.policy_fingerprint
+    ):
+        raise ValueError(
+            "Execution validation policy fingerprint does not match the supplied policy."
+        )
+    if execution_policy.execution_mode != "paper":
+        raise ValueError("Execution-bound broker authorization is paper-only.")
+
+    actual_to_expected = (
+        (max_position_pct, execution_policy.max_position_pct, "max_position_pct"),
+        (
+            max_total_exposure_pct,
+            execution_policy.max_total_exposure_pct,
+            "max_total_exposure_pct",
+        ),
+        (max_basket_pct, execution_policy.max_basket_pct * 100, "max_basket_pct"),
+        (
+            max_leveraged_etf_pct,
+            execution_policy.max_leveraged_etf_pct * 100,
+            "max_leveraged_etf_pct",
+        ),
+        (
+            max_stale_price_minutes,
+            execution_policy.max_stale_price_minutes,
+            "max_stale_price_minutes",
+        ),
+        (max_slippage_pct, execution_policy.max_slippage_pct, "max_slippage_pct"),
+        (max_spread_pct, execution_policy.max_spread_pct, "max_spread_pct"),
+        (
+            earnings_blackout_days,
+            execution_policy.earnings_blackout_days,
+            "earnings_blackout_days",
+        ),
+        (
+            min_cash_reserve_pct,
+            execution_policy.min_cash_reserve_pct,
+            "min_cash_reserve_pct",
+        ),
+    )
+    for actual, expected, field in actual_to_expected:
+        if to_decimal(actual, name=field) != to_decimal(expected, name=field):
+            raise ValueError(
+                f"Execution validation {field} does not match the signed policy."
+            )
+    if (max_order_value is None) != (execution_policy.max_order_value is None):
+        raise ValueError(
+            "Execution validation max_order_value does not match the signed policy."
+        )
+    if max_order_value is not None and to_decimal(
+        max_order_value, name="max_order_value"
+    ) != to_decimal(execution_policy.max_order_value, name="max_order_value"):
+        raise ValueError(
+            "Execution validation max_order_value does not match the signed policy."
+        )
+    if whole_shares_only is not execution_policy.whole_shares_only:
+        raise ValueError(
+            "Execution validation quantity granularity does not match the signed policy."
+        )
+    if intent.side not in execution_policy.allowed_sides:
+        raise ValueError("Intent side is not allowed by the signed execution policy.")
+    if intent.order_type not in execution_policy.allowed_order_types:
+        raise ValueError("Intent order type is not allowed by the signed execution policy.")
+    if len(portfolio.open_orders) >= execution_policy.max_open_orders:
+        raise ValueError("Open-order cap is already reached under the signed policy.")
+    if intent.side == "buy" and not execution_policy.allow_new_positions:
+        held = {position.ticker.upper() for position in portfolio.positions}
+        if intent.ticker.upper() not in held:
+            raise ValueError(
+                "Opening a new position is disabled by the signed execution policy."
+            )
+    if (
+        execution_policy.require_earnings_data
+        and intent.side == "buy"
+        and earnings_days_away is None
+    ):
+        raise ValueError(
+            "The signed execution policy requires earnings data for buys."
+        )
+
+
+def _validated_authorization_ttl(ttl_seconds: object) -> int:
+    if (
+        not isinstance(ttl_seconds, int)
+        or isinstance(ttl_seconds, bool)
+        or not (
+            _MIN_AUTHORIZATION_TTL_SECONDS
+            <= ttl_seconds
+            <= _MAX_AUTHORIZATION_TTL_SECONDS
+        )
+    ):
+        raise ValueError(
+            "ttl_seconds must be a whole number from "
+            f"{_MIN_AUTHORIZATION_TTL_SECONDS} through "
+            f"{_MAX_AUTHORIZATION_TTL_SECONDS}, excluding booleans"
+        )
+    return ttl_seconds
 
 
 def authorize_trade_intent(
     intent: TradeIntent,
     validation: ValidationResult,
     ttl_seconds: int = 120,
+    *,
+    account_id: str | None = None,
+    account_mode: str | None = None,
+    snapshot_id: str | None = None,
+    policy_fingerprint: str | None = None,
 ) -> ExecutionAuthorization:
+    ttl_seconds = _validated_authorization_ttl(ttl_seconds)
     if not validation.approved:
         raise ValueError("Cannot authorize a trade intent that failed validation.")
     if validation.validation_proof is None or not hmac.compare_digest(
-        validation.validation_proof, _validation_proof(intent, True, validation.violation_codes)
+        validation.validation_proof,
+        _validation_proof(
+            intent,
+            True,
+            validation.violation_codes,
+            validation.execution_context,
+        ),
     ):
         raise ValueError(
             "This ValidationResult was not produced by validate_trade_intent(intent, ...) "
             "called with this exact trade intent -- refusing to authorize. A hand-constructed "
             "or mismatched ValidationResult cannot be signed correctly."
         )
+    binding = _authorization_binding_from_validation(
+        validation,
+        account_id=account_id,
+        account_mode=account_mode,
+        snapshot_id=snapshot_id,
+        policy_fingerprint=policy_fingerprint,
+    )
     now = datetime.now(timezone.utc)
     token = secrets.token_urlsafe(32)
     expires_at = (now + timedelta(seconds=ttl_seconds)).isoformat()
     return ExecutionAuthorization(
         token=token,
         intent_fingerprint=intent_fingerprint(intent),
-        proof=_authorization_proof(intent, token, expires_at),
+        proof=_authorization_proof(
+            intent,
+            token,
+            expires_at,
+            account_id=binding[0],
+            account_mode=binding[1],
+            snapshot_id=binding[2],
+            policy_fingerprint=binding[3],
+        ),
         approved_at=now.isoformat(),
         expires_at=expires_at,
+        account_id=binding[0],
+        account_mode=binding[1],
+        snapshot_id=binding[2],
+        policy_fingerprint=binding[3],
     )
 
 
@@ -447,6 +897,11 @@ def authorize_overridden_trade_intent(
     intent: TradeIntent,
     validation: ValidationResult,
     ttl_seconds: int = 120,
+    *,
+    account_id: str | None = None,
+    account_mode: str | None = None,
+    snapshot_id: str | None = None,
+    policy_fingerprint: str | None = None,
 ) -> ExecutionAuthorization:
     """
     A second, narrowly-scoped path to a real ExecutionAuthorization for a
@@ -475,10 +930,17 @@ def authorize_overridden_trade_intent(
     constant) must be True -- if even one violation code isn't
     override-eligible, this raises exactly like a normal rejection would.
     """
+    ttl_seconds = _validated_authorization_ttl(ttl_seconds)
     if validation.approved:
         raise ValueError("Use authorize_trade_intent() for an already-approved validation.")
     if validation.validation_proof is None or not hmac.compare_digest(
-        validation.validation_proof, _validation_proof(intent, False, validation.violation_codes)
+        validation.validation_proof,
+        _validation_proof(
+            intent,
+            False,
+            validation.violation_codes,
+            validation.execution_context,
+        ),
     ):
         raise ValueError(
             "This ValidationResult was not produced by validate_trade_intent(intent, ...) called with "
@@ -489,15 +951,34 @@ def authorize_overridden_trade_intent(
             "At least one violation is not override-eligible (only concentration-cap and "
             "earnings-blackout violations can be overridden) -- refusing to authorize."
         )
+    binding = _authorization_binding_from_validation(
+        validation,
+        account_id=account_id,
+        account_mode=account_mode,
+        snapshot_id=snapshot_id,
+        policy_fingerprint=policy_fingerprint,
+    )
     now = datetime.now(timezone.utc)
     token = secrets.token_urlsafe(32)
     expires_at = (now + timedelta(seconds=ttl_seconds)).isoformat()
     return ExecutionAuthorization(
         token=token,
         intent_fingerprint=intent_fingerprint(intent),
-        proof=_authorization_proof(intent, token, expires_at),
+        proof=_authorization_proof(
+            intent,
+            token,
+            expires_at,
+            account_id=binding[0],
+            account_mode=binding[1],
+            snapshot_id=binding[2],
+            policy_fingerprint=binding[3],
+        ),
         approved_at=now.isoformat(),
         expires_at=expires_at,
+        account_id=binding[0],
+        account_mode=binding[1],
+        snapshot_id=binding[2],
+        policy_fingerprint=binding[3],
     )
 
 
@@ -518,6 +999,31 @@ def authorize_overridden_trade_intent(
 # second broker call for the same proposal), but hardens the primitive
 # itself for any future caller of these lower-level execution functions.
 _consumed_authorization_tokens: dict[str, str] = {}
+_consumed_authorization_tokens_lock = threading.Lock()
+
+
+def _reset_execution_authority_after_fork() -> None:
+    """Invalidate every parent-process capability in a forked child.
+
+    POSIX ``fork`` clones both the HMAC secret and the in-memory spent-token
+    table.  Without an after-fork reset, the parent and child can each consume
+    the same pre-fork authorization from independent dictionaries.  A lock
+    held by a vanished parent thread can also remain permanently locked in the
+    child.  Rotating the secret makes all inherited validations and
+    authorizations unverifiable there, while replacing the table and mutex
+    gives future child-owned validations a clean process-local authority.
+    """
+
+    global _GATE_SECRET
+    global _consumed_authorization_tokens
+    global _consumed_authorization_tokens_lock
+    _GATE_SECRET = secrets.token_bytes(32)
+    _consumed_authorization_tokens = {}
+    _consumed_authorization_tokens_lock = threading.Lock()
+
+
+if hasattr(os, "register_at_fork"):
+    os.register_at_fork(after_in_child=_reset_execution_authority_after_fork)
 
 
 def _prune_expired_consumed_tokens(current: datetime) -> None:
@@ -533,6 +1039,12 @@ def verify_execution_authorization(
     intent: TradeIntent,
     authorization: ExecutionAuthorization | None,
     now: datetime | None = None,
+    *,
+    expected_account_id: str | None = None,
+    expected_account_mode: str | None = None,
+    expected_snapshot_id: str | None = None,
+    expected_policy_fingerprint: str | None = None,
+    require_bound: bool = False,
 ) -> None:
     if authorization is None:
         raise PermissionError("Broker submission requires a short-lived execution-gate authorization.")
@@ -544,19 +1056,73 @@ def verify_execution_authorization(
     if not authorization.token:
         raise PermissionError("Execution-gate authorization has an empty or missing token.")
     if not hmac.compare_digest(
-        authorization.proof, _authorization_proof(intent, authorization.token, authorization.expires_at)
+        authorization.proof,
+        _authorization_proof(
+            intent,
+            authorization.token,
+            authorization.expires_at,
+            account_id=authorization.account_id,
+            account_mode=authorization.account_mode,
+            snapshot_id=authorization.snapshot_id,
+            policy_fingerprint=authorization.policy_fingerprint,
+        ),
     ):
         raise PermissionError("Execution-gate authorization does not match this trade intent.")
+    if not isinstance(require_bound, bool):
+        raise ValueError("require_bound must be a bool")
+    binding = (
+        authorization.account_id,
+        authorization.account_mode,
+        authorization.snapshot_id,
+        authorization.policy_fingerprint,
+    )
+    is_bound = all(value is not None for value in binding)
+    if require_bound and not is_bound:
+        raise PermissionError(
+            "Broker submission requires an account-, snapshot-, and policy-bound authorization."
+        )
+    if expected_account_id is not None and authorization.account_id != expected_account_id:
+        raise PermissionError("Execution-gate authorization is bound to a different broker account.")
+    if expected_account_mode is not None and authorization.account_mode != expected_account_mode:
+        raise PermissionError("Execution-gate authorization is bound to a different broker account mode.")
+    if expected_snapshot_id is not None:
+        if (
+            not isinstance(expected_snapshot_id, str)
+            or re.fullmatch(r"[0-9a-f]{64}", expected_snapshot_id) is None
+        ):
+            raise ValueError(
+                "expected_snapshot_id must be a lowercase 64-character sha256 digest"
+            )
+        if authorization.snapshot_id != expected_snapshot_id:
+            raise PermissionError(
+                "Execution-gate authorization is bound to a different broker snapshot."
+            )
+    if expected_policy_fingerprint is not None:
+        if (
+            not isinstance(expected_policy_fingerprint, str)
+            or re.fullmatch(r"[0-9a-f]{64}", expected_policy_fingerprint) is None
+        ):
+            raise ValueError(
+                "expected_policy_fingerprint must be a lowercase 64-character sha256 digest"
+            )
+        if authorization.policy_fingerprint != expected_policy_fingerprint:
+            raise PermissionError(
+                "Execution-gate authorization is bound to a different trading policy."
+            )
     current = now or datetime.now(timezone.utc)
     expires = datetime.fromisoformat(authorization.expires_at)
     if current > expires:
         raise PermissionError("Execution-gate authorization has expired.")
-    _prune_expired_consumed_tokens(current)
-    if authorization.token in _consumed_authorization_tokens:
-        raise PermissionError(
-            "This execution-gate authorization has already been consumed -- authorizations are single-use."
-        )
-    _consumed_authorization_tokens[authorization.token] = authorization.expires_at
+    # Prune, check, and consume are one critical section. Without this lock,
+    # two broker threads can both observe an unused token before either sets
+    # it, defeating the primitive's explicit single-use contract.
+    with _consumed_authorization_tokens_lock:
+        _prune_expired_consumed_tokens(current)
+        if authorization.token in _consumed_authorization_tokens:
+            raise PermissionError(
+                "This execution-gate authorization has already been consumed -- authorizations are single-use."
+            )
+        _consumed_authorization_tokens[authorization.token] = authorization.expires_at
 
 
 def worst_case_fill_price_decimal(
@@ -699,17 +1265,65 @@ def _check_portfolio_numeric_integrity(ctx: _GateContext) -> None:
     # all silently fail OPEN instead of blocking. These are always hard,
     # non-overridable violations -- never a risk-preference call.
     portfolio = ctx.portfolio
-    ctx.portfolio_cash = decimal_or_none(portfolio.cash)
-    ctx.portfolio_equity = decimal_or_none(portfolio.total_equity)
+    cash_source = (
+        portfolio.cash_exact
+        if portfolio.cash_exact is not None
+        else portfolio.cash
+    )
+    equity_source = (
+        portfolio.total_equity_exact
+        if portfolio.total_equity_exact is not None
+        else portfolio.total_equity
+    )
+    buying_power_source = (
+        portfolio.buying_power_exact
+        if portfolio.buying_power_exact is not None
+        else portfolio.buying_power
+    )
+    ctx.portfolio_cash = decimal_or_none(cash_source)
+    ctx.portfolio_equity = decimal_or_none(equity_source)
     ctx.portfolio_buying_power = (
+        decimal_or_none(buying_power_source)
+        if portfolio.buying_power is not None
+        else None
+    )
+    display_cash = decimal_or_none(portfolio.cash)
+    display_equity = decimal_or_none(portfolio.total_equity)
+    display_buying_power = (
         decimal_or_none(portfolio.buying_power)
         if portfolio.buying_power is not None
         else None
     )
-    if ctx.portfolio_cash is None:
+    if display_cash is None:
         ctx.violate(
             ViolationCode.INVALID_PORTFOLIO_CASH,
             f"portfolio.cash must be finite, got {portfolio.cash}.",
+        )
+    elif display_cash < 0:
+        ctx.violate(
+            ViolationCode.INVALID_PORTFOLIO_CASH,
+            f"portfolio.cash must be non-negative (this project does not model margin/short cash "
+            f"balances), got {portfolio.cash}.",
+        )
+    if display_equity is None:
+        ctx.violate(
+            ViolationCode.INVALID_PORTFOLIO_EQUITY,
+            f"portfolio.total_equity must be finite, got {portfolio.total_equity}.",
+        )
+    elif ctx.intent.side == "buy" and display_equity <= 0:
+        ctx.violate(
+            ViolationCode.INVALID_PORTFOLIO_EQUITY,
+            f"portfolio.total_equity must be positive to size a buy against it, got {portfolio.total_equity}.",
+        )
+    if portfolio.buying_power is not None and display_buying_power is None:
+        ctx.violate(
+            ViolationCode.INVALID_BUYING_POWER,
+            f"portfolio.buying_power must be finite when present, got {portfolio.buying_power}.",
+        )
+    if ctx.portfolio_cash is None:
+        ctx.violate(
+            ViolationCode.INVALID_PORTFOLIO_CASH,
+            f"portfolio.cash must have finite exact evidence, got {cash_source}.",
         )
     elif ctx.portfolio_cash < 0:
         ctx.violate(
@@ -720,7 +1334,7 @@ def _check_portfolio_numeric_integrity(ctx: _GateContext) -> None:
     if ctx.portfolio_equity is None:
         ctx.violate(
             ViolationCode.INVALID_PORTFOLIO_EQUITY,
-            f"portfolio.total_equity must be finite, got {portfolio.total_equity}.",
+            f"portfolio.total_equity must have finite exact evidence, got {equity_source}.",
         )
     elif ctx.intent.side == "buy" and ctx.portfolio_equity <= 0:
         ctx.violate(
@@ -730,8 +1344,44 @@ def _check_portfolio_numeric_integrity(ctx: _GateContext) -> None:
     if portfolio.buying_power is not None and ctx.portfolio_buying_power is None:
         ctx.violate(
             ViolationCode.INVALID_BUYING_POWER,
-            f"portfolio.buying_power must be finite when present, got {portfolio.buying_power}.",
+            f"portfolio.buying_power must have finite exact evidence when present, got {buying_power_source}.",
         )
+    exact_account_pairs = (
+        (
+            "cash",
+            ViolationCode.INVALID_PORTFOLIO_CASH,
+            portfolio.cash_exact,
+            portfolio.cash,
+            ctx.portfolio_cash,
+        ),
+        (
+            "total_equity",
+            ViolationCode.INVALID_PORTFOLIO_EQUITY,
+            portfolio.total_equity_exact,
+            portfolio.total_equity,
+            ctx.portfolio_equity,
+        ),
+        (
+            "buying_power",
+            ViolationCode.INVALID_BUYING_POWER,
+            portfolio.buying_power_exact,
+            portfolio.buying_power,
+            ctx.portfolio_buying_power,
+        ),
+    )
+    for field, code, exact_text, display_value, exact_value in exact_account_pairs:
+        if exact_text is None or display_value is None or exact_value is None:
+            continue
+        try:
+            display_matches = display_value == float(round(exact_value, 2))
+        except (OverflowError, ValueError):
+            display_matches = False
+        if not display_matches:
+            ctx.violate(
+                code,
+                f"portfolio.{field} display value {display_value!r} disagrees with "
+                f"exact evidence {exact_text!r}.",
+            )
 
 
 def _check_position_data_integrity(ctx: _GateContext) -> None:
@@ -742,18 +1392,33 @@ def _check_position_data_integrity(ctx: _GateContext) -> None:
             else position.shares
         )
         shares = decimal_or_none(raw_shares)
-        entry_price = decimal_or_none(position.entry_price)
-        current_price = decimal_or_none(position.current_price)
-        market_value = decimal_or_none(position.market_value)
+        raw_entry_price = (
+            position.entry_price_exact
+            if position.entry_price_exact is not None
+            else position.entry_price
+        )
+        raw_current_price = (
+            position.current_price_exact
+            if position.current_price_exact is not None
+            else position.current_price
+        )
+        raw_market_value = (
+            position.market_value_exact
+            if position.market_value_exact is not None
+            else position.market_value
+        )
+        entry_price = decimal_or_none(raw_entry_price)
+        current_price = decimal_or_none(raw_current_price)
+        market_value = decimal_or_none(raw_market_value)
         ctx.position_shares.append(shares)
         ctx.position_money.append((entry_price, current_price, market_value))
         bad_fields = [
             (name, value)
             for name, value, converted in (
                 ("shares", raw_shares, shares),
-                ("entry_price", position.entry_price, entry_price),
-                ("current_price", position.current_price, current_price),
-                ("market_value", position.market_value, market_value),
+                ("entry_price", raw_entry_price, entry_price),
+                ("current_price", raw_current_price, current_price),
+                ("market_value", raw_market_value, market_value),
             )
             if converted is None
         ]
@@ -765,6 +1430,28 @@ def _check_position_data_integrity(ctx: _GateContext) -> None:
                 "exposure with corrupted position data.",
             )
             continue
+        try:
+            display_matches = (
+                position.shares == float(shares)
+                and position.entry_price == float(entry_price)
+                and position.current_price == float(current_price)
+                and position.market_value == float(round(market_value, 2))
+            )
+        except (OverflowError, ValueError):
+            display_matches = False
+        if any(
+            value is not None
+            for value in (
+                position.shares_exact,
+                position.entry_price_exact,
+                position.current_price_exact,
+                position.market_value_exact,
+            )
+        ) and not display_matches:
+            ctx.violate(
+                ViolationCode.INVALID_POSITION_DATA,
+                f"Position {position.ticker} display numerics disagree with exact evidence.",
+            )
         if shares is not None and shares < 0:
             ctx.violate(
                 ViolationCode.INVALID_POSITION_DATA,
@@ -1265,8 +1952,11 @@ def _check_bid_ask_quote_and_spread(ctx: _GateContext) -> None:
 
 
 def _check_earnings_blackout(ctx: _GateContext) -> None:
-    # Symmetric window: blocks both the run-up to earnings and the days right
-    # after, since a caller could someday pass a negative "days since" value.
+    # Symmetric time window, exposure-increasing side only. The registry
+    # deliberately routes this check to buys; a valid long-only sell remains
+    # available during earnings because obstructing risk reduction is itself
+    # unsafe. The independent sell-exceeds-held check still refuses an
+    # oversell or short-opening order.
     if (
         ctx.earnings_days_away is not None
         and abs(ctx.earnings_days_away) <= ctx.earnings_blackout_days
@@ -1349,7 +2039,11 @@ RISK_CHECK_REGISTRY: tuple[RiskCheck, ...] = (
     _entry("duplicate_order", _check_duplicate_order),
     _entry("limit_price_and_slippage", _check_limit_price_and_slippage),
     _entry("bid_ask_quote_and_spread", _check_bid_ask_quote_and_spread),
-    _entry("earnings_blackout", _check_earnings_blackout),
+    _entry(
+        "earnings_blackout",
+        _check_earnings_blackout,
+        applies_to_side=_SIDE_BUY,
+    ),
 )
 
 
@@ -1416,6 +2110,8 @@ def validate_trade_intent(
     available_cash_override: float | None = None,
     available_buying_power_override: float | None = None,
     whole_shares_only: bool = True,
+    execution_context: ExecutionValidationContext | None = None,
+    execution_policy: TradingPolicy | None = None,
 ) -> ValidationResult:
     """
     Validates one TradeIntent against every configured limit. Returns
@@ -1427,8 +2123,10 @@ def validate_trade_intent(
 
     Buying vs. selling: exposure/concentration checks (position size,
     total exposure, basket, leveraged-ETF) only apply to BUYS, since a
-    sell reduces exposure. Stale-price, trading-hours, duplicate-order,
-    spread, slippage, earnings, and the kill switch apply to both sides.
+    sell reduces exposure. Earnings blackout is also buy-only so it cannot
+    obstruct a proved long-only risk reduction. Stale-price, trading-hours,
+    duplicate-order, spread, slippage, and the kill switch apply to both
+    sides.
 
     `bid_price`/`ask_price`: when both are supplied (a market order can
     now be checked, not just a limit order against its limit price), a
@@ -1480,6 +2178,35 @@ def validate_trade_intent(
     overrides reproduces the exact single-proposal-execution behavior
     from before this parameter existed.
     """
+    if execution_context is not None and not isinstance(
+        execution_context, ExecutionValidationContext
+    ):
+        raise TypeError("execution_context must be an ExecutionValidationContext or None")
+    if execution_context is not None:
+        _validate_execution_context_against_portfolio(execution_context, portfolio)
+        _validate_bound_policy_contract(
+            execution_context=execution_context,
+            execution_policy=execution_policy,
+            intent=intent,
+            portfolio=portfolio,
+            earnings_days_away=earnings_days_away,
+            max_position_pct=max_position_pct,
+            max_total_exposure_pct=max_total_exposure_pct,
+            max_basket_pct=max_basket_pct,
+            max_leveraged_etf_pct=max_leveraged_etf_pct,
+            max_stale_price_minutes=max_stale_price_minutes,
+            max_slippage_pct=max_slippage_pct,
+            max_spread_pct=max_spread_pct,
+            earnings_blackout_days=earnings_blackout_days,
+            max_order_value=max_order_value,
+            min_cash_reserve_pct=min_cash_reserve_pct,
+            whole_shares_only=whole_shares_only,
+        )
+    elif execution_policy is not None:
+        raise ValueError(
+            "execution_policy is valid only with ExecutionValidationContext."
+        )
+
     context = _GateContext(
         intent=intent,
         portfolio=portfolio,
@@ -1526,7 +2253,13 @@ def validate_trade_intent(
         approved=approved,
         violations=violations_t,
         violation_codes=codes_t,
-        validation_proof=_validation_proof(intent, approved, codes_t),
+        validation_proof=_validation_proof(
+            intent,
+            approved,
+            codes_t,
+            execution_context,
+        ),
+        execution_context=execution_context,
     )
 
 

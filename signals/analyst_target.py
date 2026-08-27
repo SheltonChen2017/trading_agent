@@ -1,6 +1,9 @@
 """
 Analyst price-target consensus signal.
 
+This is a retained legacy/advisory surface, not Analyst Revisions V2 evidence.
+V2 must not import or reinterpret this provider path.
+
 Genuinely different data category from signals/analyst.py's net-
 upgrades/downgrades signal (rating DIRECTION, already tested and
 REJECTED — see memory: project_signal_findings). This uses the actual
@@ -39,10 +42,17 @@ as PEAD/fundamentals):
 """
 from __future__ import annotations
 
+import math
+from numbers import Real
+
 import pandas as pd
 
 from config import ANALYST_TARGET_GAP_THRESHOLD_PCT
-from data.price_target_data import compute_consensus_price_target
+from data.price_target_data import (
+    PriceTargetContractError,
+    compute_consensus_price_target,
+    validate_effective_session,
+)
 
 RESULT_COLUMNS = ["ticker", "date", "close", "return_pct", "return_zscore", "volume_zscore", "direction"]
 
@@ -65,23 +75,57 @@ def scan_analyst_target_gap(
     """
     if as_of is None:
         return pd.DataFrame(columns=RESULT_COLUMNS)
+    as_of = validate_effective_session(as_of, "as_of")
+    if (
+        isinstance(gap_threshold_pct, bool)
+        or not isinstance(gap_threshold_pct, Real)
+        or not math.isfinite(float(gap_threshold_pct))
+        or float(gap_threshold_pct) <= 0
+    ):
+        raise PriceTargetContractError(
+            "gap_threshold_pct must be a finite positive number"
+        )
 
     rows = []
     for ticker, price_df in data.items():
+        if not isinstance(price_df, pd.DataFrame):
+            raise PriceTargetContractError(f"{ticker}: price history must be a DataFrame")
+        if not isinstance(price_df.index, pd.DatetimeIndex):
+            raise PriceTargetContractError(f"{ticker}: price history needs a DatetimeIndex")
+        if price_df.index.tz is not None:
+            raise PriceTargetContractError(
+                f"{ticker}: price history index must use timezone-free session labels"
+            )
         if as_of not in price_df.index:
             continue
+        if not price_df.index.is_unique:
+            raise PriceTargetContractError(
+                f"{ticker}: price history session labels must be unique"
+            )
+        if "close" not in price_df.columns:
+            raise PriceTargetContractError(f"{ticker}: price history is missing close")
         history = price_target_history.get(ticker)
-        if history is None or history.empty:
+        if history is None:
             continue
+        close_value = price_df.loc[as_of, "close"]
+        if (
+            isinstance(close_value, bool)
+            or not isinstance(close_value, Real)
+            or not math.isfinite(float(close_value))
+            or float(close_value) <= 0
+        ):
+            raise PriceTargetContractError(
+                f"{ticker}: close must be a finite positive number"
+            )
+        close_price = float(close_value)
 
         consensus = compute_consensus_price_target(history, as_of)
         if consensus is None:
             continue
 
-        close_price = float(price_df.loc[as_of, "close"])
-        if close_price <= 0:
-            continue
         gap_pct = (consensus - close_price) / close_price * 100
+        if not math.isfinite(gap_pct):
+            raise PriceTargetContractError(f"{ticker}: computed target gap is non-finite")
 
         if abs(gap_pct) < gap_threshold_pct:
             continue

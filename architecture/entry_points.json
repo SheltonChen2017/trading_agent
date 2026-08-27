@@ -142,6 +142,7 @@
       "data/__init__.py"
     ],
     "neutral_contracts": [
+      "data/exchange_calendar.py",
       "data/evidence_status.py",
       "data/financial_primitives.py",
       "data/filing_extraction.py",
@@ -157,6 +158,7 @@
       ],
       "strategy_research": [
         "data/macro_data.py",
+        "data/research_input_contracts.py",
         "data/research_statistics.py",
         "data/runtime_identity.py"
       ]
@@ -164,6 +166,7 @@
     "product_owned_service_rationales": {
       "data/operational_alerts.py": "Assistant-owned durable operational alert serialization. Research-hosted composition runners may call it only while they remain explicit SEP-3 composition debt; product-owned research code does not import it.",
       "data/macro_data.py": "Research-owned macro-signal proxy construction. The assistant's descriptive-only context uses behavior-identical private calculations and cannot import the research service or turn the proxy into proposal or execution authority.",
+      "data/research_input_contracts.py": "Research-owned fail-closed validation of backtest and strategy inputs. It validates experiment economics and has no assistant, broker, proposal, or execution authority.",
       "data/research_statistics.py": "Research-owned multiplicity arithmetic. The assistant renders its own already-recorded look count without importing research calculations; research retains hypothesis-family and evidence semantics.",
       "data/runtime_identity.py": "Research-owned evidence-lineage attribution. The assistant keeps a behavior-identical private implementation and does not import the research service; neither product can weaken clean-tree or expected-commit assertions."
     },
@@ -191,6 +194,7 @@
   },
   "licensed_research_surfaces": [
     "research/acer",
+    "research/analyst_revisions_v2",
     "ml/databento_authoritative.py",
     "ml/databento_pit.py",
     "ml/databento_source.py"

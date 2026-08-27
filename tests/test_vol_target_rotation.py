@@ -8,6 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
+import pytest
 
 from signals.regime import compute_trailing_market_volatility
 from strategies.vol_target_rotation import (
@@ -27,7 +28,8 @@ def test_compute_target_leveraged_weight_scales_inversely_with_realized_vol():
     assert compute_target_leveraged_weight(2.0, target_vol_pct=1.0, max_leveraged_weight=1.0) == 0.5
     # formula would give 2.0 (below target vol -> lever up) but must cap at max_leveraged_weight
     assert compute_target_leveraged_weight(0.5, target_vol_pct=1.0, max_leveraged_weight=1.0) == 1.0
-    assert compute_target_leveraged_weight(0.5, target_vol_pct=1.0, max_leveraged_weight=1.5) == 1.5
+    with pytest.raises(ValueError, match="max_leveraged_weight"):
+        compute_target_leveraged_weight(0.5, target_vol_pct=1.0, max_leveraged_weight=1.5)
 
 
 def test_compute_target_leveraged_weight_zero_on_missing_or_zero_vol():

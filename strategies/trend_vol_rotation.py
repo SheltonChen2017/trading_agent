@@ -42,6 +42,16 @@ from __future__ import annotations
 
 import pandas as pd
 
+from data.research_input_contracts import (
+    require_aligned_price_series,
+    require_combined_rates_at_most_one,
+    require_finite_number,
+    require_long_only_weight_mapping,
+    require_long_only_weights,
+    require_positive_int,
+    require_positive_number,
+    require_rate,
+)
 from strategies.leverage_rotation import cagr_pct, max_drawdown_pct
 from signals.regime import classify_regime, compute_trailing_market_volatility  # noqa: F401 (re-exported for callers)
 from market_analytics import classify_trend  # noqa: F401 (re-exported for callers)
@@ -94,7 +104,42 @@ def simulate_regime_rotation(
     for losses; both conservative simplifications). Both default to 0.0
     for backward compatibility.
     """
-    state_weights = state_weights or DEFAULT_STATE_WEIGHTS
+    require_aligned_price_series(
+        {
+            "stable_close": stable_close,
+            "leveraged_close": leveraged_close,
+            "stable_open": stable_open,
+            "leveraged_open": leveraged_open,
+        }
+    )
+    vol_threshold_pct = require_finite_number(
+        vol_threshold_pct,
+        name="vol_threshold_pct",
+        minimum=0.0,
+    )
+    trend_lookback_days = require_positive_int(trend_lookback_days, name="trend_lookback_days")
+    vol_lookback_days = require_positive_int(vol_lookback_days, name="vol_lookback_days")
+    rebalance_check_days = require_positive_int(rebalance_check_days, name="rebalance_check_days")
+    band_pct = require_finite_number(band_pct, name="band_pct", minimum=0.0, maximum=100.0)
+    initial_total = require_positive_number(initial_total, name="initial_total")
+    fallback_weights = require_long_only_weights(
+        fallback_weights,
+        name="fallback_weights",
+        expected_size=2,
+    )
+    state_weights = require_long_only_weight_mapping(
+        DEFAULT_STATE_WEIGHTS if state_weights is None else state_weights,
+        name="state_weights",
+        expected_size=2,
+    )
+    cost_pct = require_rate(cost_pct, name="cost_pct")
+    tax_rate = require_rate(tax_rate, name="tax_rate", allow_one=True)
+    require_combined_rates_at_most_one(
+        cost_pct,
+        tax_rate,
+        first_name="cost_pct",
+        second_name="tax_rate",
+    )
     all_dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     stable_close = stable_close.reindex(all_dates)
     leveraged_close = leveraged_close.reindex(all_dates)
@@ -211,6 +256,18 @@ def build_state_weights(low_vol_lev_weight: float, high_vol_lev_weight: float) -
     is parameterized, since defensive-on-downtrend is what delivers the
     drawdown protection (see strategies/trend_vol_rotation.py findings in
     memory)."""
+    low_vol_lev_weight = require_finite_number(
+        low_vol_lev_weight,
+        name="low_vol_lev_weight",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    high_vol_lev_weight = require_finite_number(
+        high_vol_lev_weight,
+        name="high_vol_lev_weight",
+        minimum=0.0,
+        maximum=1.0,
+    )
     return {
         "uptrend_low_vol": (1 - low_vol_lev_weight, low_vol_lev_weight),
         "uptrend_high_vol": (1 - high_vol_lev_weight, high_vol_lev_weight),
@@ -238,6 +295,29 @@ def grid_search_state_weights(
     itself, to keep the discovery/confirmation discipline explicit at the
     call site.
     """
+    require_aligned_price_series(
+        {
+            "stable_close": stable_close,
+            "leveraged_close": leveraged_close,
+            "stable_open": stable_open,
+            "leveraged_open": leveraged_open,
+        }
+    )
+    vol_threshold_pct = require_finite_number(
+        vol_threshold_pct,
+        name="vol_threshold_pct",
+        minimum=0.0,
+    )
+    if not low_vol_weights or not high_vol_weights:
+        raise ValueError("low_vol_weights and high_vol_weights must be non-empty")
+    low_vol_weights = tuple(
+        require_finite_number(value, name="low_vol_weights item", minimum=0.0, maximum=1.0)
+        for value in low_vol_weights
+    )
+    high_vol_weights = tuple(
+        require_finite_number(value, name="high_vol_weights item", minimum=0.0, maximum=1.0)
+        for value in high_vol_weights
+    )
     rows = []
     for low in low_vol_weights:
         for high in high_vol_weights:

@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import sqlite3
 import tempfile
+from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Event
 
 from assistant.execution_service import _execution_budget_notional
+from assistant.dispatch_fence import (
+    get_runtime_emergency_stop,
+    runtime_emergency_stop_path,
+)
 from assistant.order_lifecycle import journal_broker_order_update
 from assistant.order_reconciler import (
     apply_broker_update,
@@ -17,6 +23,14 @@ from assistant.readiness import transaction_readiness
 from assistant.storage import AssistantStore
 from risk.execution_gate import TradeIntent
 
+_ACCOUNT_ID = "paper-account-1"
+_SNAPSHOT_ID = "a" * 64
+_POLICY_FINGERPRINT = "b" * 64
+
+
+def _broker_account() -> dict:
+    return {"account_id": _ACCOUNT_ID, "paper": True}
+
 
 def _proposal(status: str = "submitting", proposal_id: str = "tp-ready") -> dict:
     return {
@@ -25,6 +39,12 @@ def _proposal(status: str = "submitting", proposal_id: str = "tp-ready") -> dict
         "expires_at": "2026-07-30T14:00:00+00:00",
         "status": status,
         "idempotency_key": f"idem-{proposal_id}",
+        "broker_execution_context": {
+            "account_id": _ACCOUNT_ID,
+            "account_mode": "paper",
+            "snapshot_id": _SNAPSHOT_ID,
+            "policy_fingerprint": _POLICY_FINGERPRINT,
+        },
         "intent": {
             "ticker": "AAPL",
             "side": "buy",
@@ -36,20 +56,39 @@ def _proposal(status: str = "submitting", proposal_id: str = "tp-ready") -> dict
 
 
 def _order(status: str, *, filled_qty: float = 0.0, updated_at: str | None = None) -> dict:
+    filled_price = 100.0 if filled_qty else None
+    submitted_at = "2026-07-29T14:00:00+00:00"
     return {
         "order_id": "order-1",
         "client_order_id": "idem-tp-ready",
         "ticker": "AAPL",
+        "asset_class": "us_equity",
+        "order_class": "simple",
+        "extended_hours": False,
+        "legs": None,
         "shares": 10.0,
+        "shares_decimal": "10",
+        "notional": None,
+        "notional_decimal": None,
         "side": "buy",
         "type": "market",
         "limit_price": None,
+        "limit_price_decimal": None,
         "time_in_force": "day",
         "status": status,
         "filled_qty": filled_qty,
-        "filled_avg_price": 100.0 if filled_qty else None,
-        "submitted_at": "2026-07-29T14:00:00+00:00",
+        "filled_qty_decimal": str(filled_qty),
+        "filled_avg_price": filled_price,
+        "filled_avg_price_decimal": None if filled_price is None else "100",
+        "submitted_at": submitted_at,
         "updated_at": updated_at,
+        "filled_at": submitted_at if status == "filled" else None,
+        "canceled_at": submitted_at if status == "canceled" else None,
+        "expired_at": submitted_at if status == "expired" else None,
+        "failed_at": submitted_at if status == "rejected" else None,
+        "replaced_at": submitted_at if status == "replaced" else None,
+        "replaces": None,
+        "replaced_by": None,
     }
 
 
@@ -434,7 +473,13 @@ def test_filled_notional_tolerates_an_unparseable_trading_day():
 
 def test_poll_reconciliation_cancels_a_stale_accepted_order_without_repricing():
     class FakeBroker:
+        PAPER_TRADING = True
+        account_mode = "paper"
         canceled = []
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
 
         @staticmethod
         def find_order_by_client_id(client_order_id):
@@ -466,7 +511,13 @@ def test_monitor_keeps_poll_fallback_while_stream_is_running():
     stop = Event()
 
     class FakeBroker:
+        PAPER_TRADING = True
+        account_mode = "paper"
         lookups = 0
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
 
         @classmethod
         def find_order_by_client_id(cls, client_order_id):
@@ -522,6 +573,158 @@ def test_readiness_requires_recent_error_free_reconciliation_and_inactive_kill_s
         assert transaction_readiness(
             store, policy, now=now, check_broker=False,
         )["ready"] is False
+
+
+def test_readiness_refuses_corrupt_non_authoritative_fill_ledger():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        now = datetime(2026, 7, 29, 15, 0, tzinfo=timezone.utc)
+        store.save_proposal(_proposal(status="broker_accepted"))
+        journal_broker_order_update(
+            store,
+            "tp-ready",
+            _order(
+                "partially_filled",
+                filled_qty=1,
+                updated_at="2026-07-29T14:30:00+00:00",
+            ),
+            event_type="partial_fill",
+            event_at="2026-07-29T14:30:00+00:00",
+            external_event_id="readiness-corrupt-fill",
+            fill_qty=1,
+            fill_price=100,
+        )
+        with closing(sqlite3.connect(store.path)) as connection:
+            connection.execute("DROP TRIGGER broker_order_events_append_only_update")
+            connection.execute("DROP TRIGGER broker_order_events_append_only_delete")
+            connection.execute(
+                "UPDATE broker_order_events SET fill_qty_text = 'NaN' "
+                "WHERE event_id = 'readiness-corrupt-fill'"
+            )
+            connection.commit()
+        store.set_system_state(
+            "last_order_reconciliation",
+            {"at": now.isoformat(), "checked": 1, "updated": 1, "error_count": 0},
+        )
+
+        report = transaction_readiness(
+            store,
+            TradingPolicy(version="test", name="test", execution_mode="paper"),
+            now=now,
+            check_broker=False,
+        )
+
+        check = next(
+            item for item in report["checks"]
+            if item["name"] == "fill_ledger_integrity"
+        )
+        assert report["ready"] is False
+        assert check["ok"] is False
+        assert "readiness-corrupt-fill" in check["detail"]
+
+
+def test_readiness_treats_unreadable_runtime_stop_as_active():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        now = datetime(2026, 7, 29, 15, 0, tzinfo=timezone.utc)
+        store.set_system_state(
+            "last_order_reconciliation",
+            {"at": now.isoformat(), "checked": 0, "updated": 0, "error_count": 0},
+        )
+        path = runtime_emergency_stop_path(store.path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("not-json", encoding="utf-8")
+
+        report = transaction_readiness(
+            store,
+            TradingPolicy(version="test", name="test", execution_mode="paper"),
+            now=now,
+            check_broker=False,
+        )
+
+        check = next(
+            item for item in report["checks"]
+            if item["name"] == "runtime_emergency_stop"
+        )
+        assert report["ready"] is False
+        assert check["ok"] is False
+        assert "unreadable" in check["detail"]
+
+
+def test_database_integrity_orphan_activates_runtime_containment(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    with sqlite3.connect(store.path) as connection:
+        connection.execute("DROP TRIGGER fk_broker_orders_proposal_insert")
+        connection.execute(
+            "INSERT INTO broker_orders(order_id, proposal_id, submitted_at, "
+            "status, payload_json) VALUES (?, ?, ?, ?, ?)",
+            (
+                "orphan-order",
+                "missing-proposal",
+                "2026-08-26T12:00:00+00:00",
+                "accepted",
+                "{}",
+            ),
+        )
+
+    results = store.database_integrity_check()
+
+    assert any("broker_orders.proposal_id" in item for item in results)
+    assert get_runtime_emergency_stop(store.path)["active"] is True
+
+
+def test_database_integrity_scan_exception_activates_runtime_containment(
+    tmp_path, monkeypatch
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+
+    def failed_integrity_scan(_connection):
+        raise sqlite3.DatabaseError("database image is unreadable")
+
+    monkeypatch.setattr(store, "_integrity_results", failed_integrity_scan)
+
+    results = store.database_integrity_check()
+
+    assert results == [
+        "database integrity check could not complete: DatabaseError: "
+        "database image is unreadable"
+    ]
+    assert store.get_kill_switch()["active"] is True
+    assert get_runtime_emergency_stop(store.path)["active"] is True
+    assert store.get_kill_switch()["active"] is True
+
+
+def test_readiness_reports_malformed_persistent_kill_switch_as_blocked():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        now = datetime(2026, 7, 29, 15, 0, tzinfo=timezone.utc)
+        store.set_system_state(
+            "last_order_reconciliation",
+            {"at": now.isoformat(), "checked": 0, "updated": 0, "error_count": 0},
+        )
+        store.set_system_state(
+            "kill_switch",
+            {
+                "active": "false",
+                "reason": "corrupt string boolean",
+                "changed_at": now.isoformat(),
+            },
+        )
+
+        report = transaction_readiness(
+            store,
+            TradingPolicy(version="test", name="test", execution_mode="paper"),
+            now=now,
+            check_broker=False,
+        )
+
+        check = next(
+            item for item in report["checks"]
+            if item["name"] == "persistent_kill_switch"
+        )
+        assert report["ready"] is False
+        assert check["ok"] is False
+        assert "unreadable" in check["detail"]
 
 
 def test_database_backup_is_consistent_and_cannot_target_the_live_database():
@@ -642,6 +845,13 @@ def test_stop_event_interrupts_a_healthy_connected_stream_promptly():
     STREAM_TIMEOUT = 10.0
 
     class BlockingStreamBroker:
+        PAPER_TRADING = True
+        account_mode = "paper"
+
+        @staticmethod
+        def get_account():
+            return _broker_account()
+
         @staticmethod
         def find_order_by_client_id(client_order_id):
             return _order("accepted")

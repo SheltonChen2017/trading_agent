@@ -35,7 +35,7 @@ from ml.immutable_io import (  # noqa: E402
     ImmutableFileConflictError,
     publish_immutable_bytes,
 )
-from research.acer.dataset import build_identity  # noqa: E402
+from research.acer.dataset import build_identity, validate_identity_record  # noqa: E402
 from research.acer.identity import (  # noqa: E402
     assess_identities,
     build_diagnostic_report,
@@ -76,17 +76,22 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(str(exc)) from exc
 
     events, refusals = normalize_rows(rows)
-    normalized_identity, _, _ = build_identity(
+    normalized_identity, event_bytes, refusal_bytes = build_identity(
         events,
         refusals,
         source_snapshot_name=args.snapshot.name,
         source_manifest_sha256=manifest_hash,
     )
+    validated_identity = validate_identity_record(
+        normalized_identity,
+        events_bytes=event_bytes,
+        refusals_bytes=refusal_bytes,
+    )
     identities = assess_identities(events)
     report = build_diagnostic_report(
         identities,
         code_commit=code_commit,
-        normalized_dataset_identity=normalized_identity,
+        normalized_dataset_identity=validated_identity,
     )
     try:
         current_commit(

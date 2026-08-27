@@ -1445,6 +1445,48 @@ def test_v2_acer_identity_docs_do_not_turn_missing_evidence_into_safety():
     assert "security master" in active.lower()
 
 
+def test_every_active_analyst_summary_pins_identity_and_source_precedence():
+    """AR-P3-006: active summaries must carry the complete safety meaning."""
+    active_documents = (
+        _text("ACTION_PLAN_2026-08-20.md"),
+        _text("Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md"),
+        _text("SESSION_HANDOFF.md"),
+    )
+    for document in active_documents:
+        lowered = document.lower()
+        assert "768" in document
+        assert "lower bound" in lowered
+        assert "allowlist" in lowered
+        assert "current-ticker joins are prohibited" in lowered
+        assert "normative strategy design" in lowered
+        assert "observed provider" in lowered
+
+
+def test_analyst_v2_milestones_enforce_stock_first_before_etf_topology():
+    """AR-P2-016: milestone presence is insufficient; order is binding."""
+    record = _text("Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md")
+    stock = record.index("ARV2-4")
+    etf = record.index("ARV2-5")
+    assert stock < etf
+    assert "valid null closes the canonical family" in record.lower()
+    assert "only after an arv2-4 pass" in record.lower()
+
+
+def test_stock_first_direction_and_historical_qc_calls_are_not_denied():
+    """AR-P3-007: mandate scope and factual QC history cannot drift backward."""
+    mandate = _text("operations/MANDATE.md").lower()
+    direction = _text("THREE_STRATEGY_PROJECT_DIRECTION.md").lower()
+    readme = _root_text("README.md").lower()
+    facts = _text("operations/OPERATIONAL_FACTS.md").lower()
+    ledger = _text("research/alpha-result.md")
+    assert "stock-first" in mandate and "stock-first" in direction
+    assert "grants no execution" in mandate
+    assert "R-001" in ledger and "cloud" in ledger.lower()
+    for document in (readme, facts):
+        assert "historical authenticated research calls" in document
+        assert "no live call has ever been made" not in document
+
+
 def test_acer_completion_proposal_does_not_normalize_away_decay():
     """Half-life cells must attenuate stale events, not only reweight firms."""
     proposal = _text("Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md")

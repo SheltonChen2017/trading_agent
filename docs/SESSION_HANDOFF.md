@@ -1,15 +1,51 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-26 by Codex after counter-reviewing Claude's amendments to
-the owner-directed main-line coordination of the three-strategy parallel
-development program. Corrected the same day under explicit owner clarification:
-the instruction removing Codex counter-review was accidental and is
-superseded. The standing lane loop remains Codex implementation, Claude
-independent review, then Codex counter-review plus the next bounded milestone
-before one combined Codex push.
+Prepared: 2026-08-26 by Codex for the owner's requested interim push of the
+Analyst/full-project remediation candidate. This is a durable checkpoint, not
+an acceptance record: documentation reconciliation, exact-final-tree full
+validation, three-lane synchronization, Claude independent review, and Codex
+counter-review remain open.
 
-This concise handoff replaces the SEP-3 pause-transition snapshot. Historical
-detail remains at
+## 0. Interim remediation checkpoint
+
+- Branch: `codex/full-review-p1-remediation-20260826`.
+- Exact implementation/merge snapshot before this handoff update:
+  `fc05c26bcc19f32b532942d825df3d33dd26bfc9`.
+- Governing `origin/main` merged into that snapshot:
+  `25724728977696a79547107be3114a52b74fc3fc`.
+- Shared safety implementation: `bf82838`; Analyst-only authority layer:
+  `e13baa1`; mixed shared/Analyst architecture registration: `8cab638`;
+  remediation and Analyst-record checkpoints: `7d4e12f` and `ee17967`.
+- Focused validation on the integrated code tree: **344 Analyst/ACER tests
+  passed**; **622 execution-safety tests passed and 2 skipped**; repository
+  compilation and `git diff --check` passed. These are implementation checks,
+  not the still-required final full-suite result or independent acceptance.
+- The remediation ledger still requires reconciliation from 84 documented
+  IDs to the complete 109-finding inventory (P0=0, P1=46, P2=49, P3=14).
+  Governing workflow records and lane records also require their final exact
+  synchronization heads and validation evidence.
+- The three published strategy branches remain at
+  `a4f58e6e0d0cf3d4ca08903e9184846259b17e24`; none has received or published
+  this remediation yet. Shared fixes must later reach all three, while
+  Analyst-specific code must reach only
+  `codex/strategy-analyst-revisions-v2`.
+- No provider, licensed row, outcome, QuantConnect job, broker, operator
+  database, scheduler, deployment, evidence epoch, paper order, or live order
+  was accessed or changed. No research or trading authority was created.
+- Analyst identity semantics remain explicit: the measured `768` diagnostic
+  count is a **lower bound**, never an **allowlist**; **current-ticker joins are
+  prohibited**. **Normative strategy design** and **observed provider**
+  availability/history remain separate evidence categories.
+- Resume by completing the 109-item ledger and active-document reconciliation,
+  running focused plus complete validation on the exact final tree, then
+  constructing, validating, and non-force-pushing the three lane updates.
+
+The owner clarification remains binding: the instruction removing Codex
+counter-review was accidental and is superseded. The standing lane loop is
+Codex implementation, Claude independent review, then Codex counter-review
+plus the next bounded milestone before one combined push.
+
+Historical coordination detail remains at
 `docs/Archive/Session/SESSION_HANDOFF_THROUGH_2026-08-25_SEP3_EIGHTH_DRY_RUN.md`
 and in `docs/Archive/Review/`.
 

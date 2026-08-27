@@ -30,6 +30,13 @@ from assistant.proposal_status import SUBMISSION_FAILED, SUBMISSION_UNKNOWN, SUB
 from assistant.storage import AssistantStore
 
 RESERVED_NOTIONAL = 1_000.0
+_ACCOUNT_ID = "paper-account-1"
+_SNAPSHOT_ID = "a" * 64
+_POLICY_FINGERPRINT = "b" * 64
+
+
+def _broker_account() -> dict:
+    return {"account_id": _ACCOUNT_ID, "paper": True}
 
 
 def _proposal(status: str = SUBMITTING, proposal_id: str = "tp-inflight") -> dict:
@@ -39,6 +46,12 @@ def _proposal(status: str = SUBMITTING, proposal_id: str = "tp-inflight") -> dic
         "expires_at": "2026-07-31T14:00:00+00:00",
         "status": status,
         "idempotency_key": f"idem-{proposal_id}",
+        "broker_execution_context": {
+            "account_id": _ACCOUNT_ID,
+            "account_mode": "paper",
+            "snapshot_id": _SNAPSHOT_ID,
+            "policy_fingerprint": _POLICY_FINGERPRINT,
+        },
         "intent": {
             "ticker": "AAPL",
             "side": "buy",
@@ -52,6 +65,13 @@ def _proposal(status: str = SUBMITTING, proposal_id: str = "tp-inflight") -> dic
 class _AbsentBroker:
     """Every lookup finds nothing -- exactly what a real broker returns in the
     window between our "submitting" write and the order being indexed."""
+
+    PAPER_TRADING = True
+    account_mode = "paper"
+
+    @staticmethod
+    def get_account():
+        return _broker_account()
 
     @staticmethod
     def find_order_by_client_id(client_order_id):
@@ -225,7 +245,7 @@ def test_age_is_rechecked_atomically_before_releasing_the_reservation():
         assert _reserved_notional(store) == RESERVED_NOTIONAL
 
 
-def test_a_blocked_reconcile_attempt_does_not_restart_the_grace_clock():
+def test_a_blocked_reconcile_attempt_does_not_restart_the_grace_clock(monkeypatch):
     """Found while reviewing the reconciliation-hardening round (2026-07-30).
 
     reconcile_submission() bounces a too-recent 404 back to
@@ -240,25 +260,25 @@ def test_a_blocked_reconcile_attempt_does_not_restart_the_grace_clock():
     from assistant.execution_service import reconcile_submission
     import execution.alpaca_broker as broker_module
 
-    original_lookup = broker_module.find_order_by_client_id
-    broker_module.find_order_by_client_id = lambda client_order_id: None
-    try:
-        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
-            store = _store_with_reservation(temp, status=SUBMISSION_UNKNOWN)
-            before = _updated_at(store, SUBMISSION_UNKNOWN)
+    monkeypatch.setattr(
+        broker_module,
+        "open_alpaca_broker_session",
+        lambda: _AbsentBroker,
+    )
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store_with_reservation(temp, status=SUBMISSION_UNKNOWN)
+        before = _updated_at(store, SUBMISSION_UNKNOWN)
 
-            for _ in range(3):
-                with pytest.raises(Exception):
-                    reconcile_submission("tp-inflight", store)
+        for _ in range(3):
+            with pytest.raises(Exception):
+                reconcile_submission("tp-inflight", store)
 
-            after = _updated_at(store, SUBMISSION_UNKNOWN)
-            assert after == before, (
-                "a no-progress bounce must not refresh updated_at -- doing so "
-                "restarts the very grace period the caller is waiting on"
-            )
-            assert _reserved_notional(store) == RESERVED_NOTIONAL
-    finally:
-        broker_module.find_order_by_client_id = original_lookup
+        after = _updated_at(store, SUBMISSION_UNKNOWN)
+        assert after == before, (
+            "a no-progress bounce must not refresh updated_at -- doing so "
+            "restarts the very grace period the caller is waiting on"
+        )
+        assert _reserved_notional(store) == RESERVED_NOTIONAL
 
 
 def test_absence_age_helper_fails_closed_without_claim_metadata():

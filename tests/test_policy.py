@@ -6,13 +6,22 @@ hand-edited policy file silently misbehave rather than fail loudly at
 load time.
 """
 import dataclasses
+import json
 import math
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from assistant.policy import TradingPolicy, compute_policy_fingerprint
+from assistant.policy import (
+    TradingPolicy,
+    compute_policy_fingerprint,
+    load_policy,
+    policy_with_updated_flags,
+)
+from assistant.temporal_integrity import MAX_ORDER_AGE_MINUTES
 
 
 def _valid_policy(**overrides) -> TradingPolicy:
@@ -20,8 +29,31 @@ def _valid_policy(**overrides) -> TradingPolicy:
     return dataclasses.replace(base, **overrides)
 
 
+_REAL_POLICY_FIELDS = (
+    "max_order_value",
+    "max_daily_submitted_notional",
+    "max_order_age_minutes",
+    "max_stale_price_minutes",
+    "max_slippage_pct",
+    "max_spread_pct",
+    "max_position_pct",
+    "max_total_exposure_pct",
+    "max_basket_pct",
+    "max_leveraged_etf_pct",
+    "min_cash_reserve_pct",
+)
+
+
 def test_default_policy_is_valid():
     _valid_policy().validate()  # must not raise
+
+
+def test_order_age_policy_uses_the_reconciler_maximum():
+    _valid_policy(max_order_age_minutes=MAX_ORDER_AGE_MINUTES).validate()
+    with pytest.raises(ValueError, match="max_order_age_minutes"):
+        _valid_policy(
+            max_order_age_minutes=MAX_ORDER_AGE_MINUTES + 0.001
+        ).validate()
 
 
 def test_policy_fingerprint_same_content_same_fingerprint():
@@ -146,26 +178,70 @@ def test_non_finite_numeric_fields_rejected():
     # disabling that cap instead of rejecting the policy. json.loads()
     # accepts a literal NaN/Infinity by default, so this is reachable from
     # a malformed policy file, not just a caller bug.
-    numeric_fields = (
-        "max_order_value",
-        "max_daily_submitted_notional",
-        "max_order_age_minutes",
-        "max_stale_price_minutes",
-        "max_slippage_pct",
-        "max_spread_pct",
-        "max_position_pct",
-        "max_total_exposure_pct",
-        "max_basket_pct",
-        "max_leveraged_etf_pct",
-        "min_cash_reserve_pct",
-    )
-    for field_name in numeric_fields:
+    for field_name in _REAL_POLICY_FIELDS:
         for bad_value in (float("nan"), float("inf")):
             try:
                 _valid_policy(**{field_name: bad_value}).validate()
                 assert False, f"expected {field_name}={bad_value} to be rejected"
             except ValueError as exc:
                 assert field_name in str(exc), (field_name, bad_value, str(exc))
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    _REAL_POLICY_FIELDS,
+)
+@pytest.mark.parametrize("bad_value", (False, True))
+def test_boolean_numeric_policy_fields_are_rejected(field_name, bad_value):
+    """JSON booleans must never become authoritative 0/1 policy values."""
+    with pytest.raises(ValueError, match=field_name):
+        _valid_policy(**{field_name: bad_value}).validate()
+
+
+@pytest.mark.parametrize("bad_value", (False, True))
+def test_boolean_cash_reserve_update_is_rejected_before_float_coercion(bad_value):
+    with pytest.raises(ValueError, match="min_cash_reserve_pct"):
+        policy_with_updated_flags(
+            _valid_policy(min_cash_reserve_pct=0.10),
+            min_cash_reserve_pct=bad_value,
+        )
+
+
+@pytest.mark.parametrize("field_name", _REAL_POLICY_FIELDS)
+@pytest.mark.parametrize("bad_value", (False, True))
+def test_boolean_numeric_value_loaded_from_json_is_rejected(
+    tmp_path, field_name, bad_value
+):
+    raw = _valid_policy().to_dict()
+    raw[field_name] = bad_value
+    path = tmp_path / "boolean-policy.json"
+    path.write_text(json.dumps(raw), encoding="utf-8")
+
+    with pytest.raises(ValueError, match=field_name):
+        load_policy(path)
+
+
+def test_cash_reserve_update_accepts_valid_zero():
+    updated = policy_with_updated_flags(
+        _valid_policy(min_cash_reserve_pct=0.10),
+        min_cash_reserve_pct=0.0,
+    )
+    assert updated.min_cash_reserve_pct == 0.0
+    updated.validate()
+
+
+def test_nonstandard_json_nan_is_rejected_at_parse_boundary(tmp_path):
+    path = tmp_path / "nan-policy.json"
+    path.write_text(
+        json.dumps(_valid_policy().to_dict()).replace(
+            '"max_basket_pct": 0.4',
+            '"max_basket_pct": NaN',
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="non-finite JSON constant"):
+        load_policy(path)
 
 
 def test_daily_order_and_open_order_caps_require_positive_integers():

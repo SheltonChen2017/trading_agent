@@ -18,7 +18,26 @@ import types
 import pandas as pd
 import pytest
 
-from data.market_data import _trading_session_start_date, fetch_historical
+from data.market_data import (
+    _NYSE_CALENDAR,
+    _trading_session_start_date,
+    canonical_ticker,
+    fetch_historical,
+    validate_daily_bar_frame,
+)
+
+
+def _sessions(start, periods):
+    start_date = pd.Timestamp(start).normalize()
+    end_date = start_date + pd.Timedelta(days=periods * 2 + 30)
+    sessions = pd.DatetimeIndex(
+        _NYSE_CALENDAR.schedule(
+            start_date=start_date.date().isoformat(),
+            end_date=end_date.date().isoformat(),
+        ).index
+    ).tz_localize(None)
+    assert len(sessions) >= periods
+    return sessions[:periods]
 
 
 def _ohlcv_frame(dates, seed_offset=0.0):
@@ -62,7 +81,7 @@ def test_252_session_request_spans_enough_calendar_days_not_262():
 
 
 def test_extra_provider_rows_are_trimmed_to_exactly_the_requested_count():
-    dates = pd.bdate_range("2025-01-01", periods=300)  # more than the 252 requested
+    dates = _sessions("2025-01-01", 300)  # more than the 252 requested
 
     def fake_download(tickers, **kwargs):
         return _ohlcv_frame(dates)
@@ -79,7 +98,7 @@ def test_extra_provider_rows_are_trimmed_to_exactly_the_requested_count():
 def test_insufficient_history_is_returned_honestly_not_padded():
     # A recent IPO with only 30 real trading days of history -- must
     # return exactly those 30 rows, never padded/faked up to 252.
-    dates = pd.bdate_range("2026-06-01", periods=30)
+    dates = _sessions("2026-06-01", 30)
 
     def fake_download(tickers, **kwargs):
         return _ohlcv_frame(dates)
@@ -93,7 +112,7 @@ def test_insufficient_history_is_returned_honestly_not_padded():
 
 
 def test_multi_ticker_multiindex_columns_format_works():
-    dates = pd.bdate_range("2025-01-01", periods=260)
+    dates = _sessions("2025-01-01", 260)
     frame_a = _ohlcv_frame(dates, seed_offset=0.0)
     frame_b = _ohlcv_frame(dates, seed_offset=50.0)
     combined = pd.concat({"AAA": frame_a, "BBB": frame_b}, axis=1)
@@ -115,7 +134,7 @@ def test_multi_ticker_multiindex_columns_format_works():
 
 
 def test_single_ticker_flat_columns_format_works():
-    dates = pd.bdate_range("2025-01-01", periods=260)
+    dates = _sessions("2025-01-01", 260)
     flat = _ohlcv_frame(dates)
 
     def fake_download(tickers, **kwargs):
@@ -130,8 +149,8 @@ def test_single_ticker_flat_columns_format_works():
         _remove_fake_yfinance()
 
 
-def test_results_are_sorted_and_deduplicated():
-    dates = list(pd.bdate_range("2025-01-01", periods=250))
+def test_out_of_order_or_duplicate_provider_rows_are_rejected_not_repaired():
+    dates = list(_sessions("2025-01-01", 250))
     # Corrupt: out of order, plus a duplicated date.
     shuffled_dates = [dates[5], dates[0]] + dates[1:5] + dates[5:] + [dates[-1]]
     df = _ohlcv_frame(shuffled_dates)
@@ -142,15 +161,13 @@ def test_results_are_sorted_and_deduplicated():
     _install_fake_yfinance(fake_download)
     try:
         data = fetch_historical(["MESSY"], lookback_days=252)
-        result_dates = list(data["MESSY"].index)
-        assert result_dates == sorted(result_dates)
-        assert len(result_dates) == len(set(result_dates))  # no duplicates survived
+        assert "MESSY" not in data
     finally:
         _remove_fake_yfinance()
 
 
 def test_missing_ticker_does_not_corrupt_other_tickers():
-    dates = pd.bdate_range("2025-01-01", periods=260)
+    dates = _sessions("2025-01-01", 260)
     frame_a = _ohlcv_frame(dates)
     # "GONE" is requested but not present in the provider's response at all.
     combined = pd.concat({"AAA": frame_a}, axis=1)
@@ -169,7 +186,7 @@ def test_missing_ticker_does_not_corrupt_other_tickers():
 
 
 def test_rows_missing_required_ohlcv_columns_are_skipped():
-    dates = pd.bdate_range("2025-01-01", periods=260)
+    dates = _sessions("2025-01-01", 260)
     incomplete = pd.DataFrame({"Close": [100.0] * len(dates)}, index=dates)  # no open/high/low/volume
 
     def fake_download(tickers, **kwargs):
@@ -183,13 +200,156 @@ def test_rows_missing_required_ohlcv_columns_are_skipped():
         _remove_fake_yfinance()
 
 
+def _lower_ohlcv_frame(periods=3):
+    frame = _ohlcv_frame(_sessions("2026-07-27", periods))
+    frame.columns = [column.lower() for column in frame.columns]
+    return frame
+
+
+@pytest.mark.parametrize(
+    ("column", "value"),
+    [
+        ("open", float("nan")),
+        ("high", float("inf")),
+        ("low", float("-inf")),
+        ("close", "not-a-number"),
+        ("open", 0.0),
+        ("high", -1.0),
+        ("low", 0.0),
+        ("close", -1.0),
+        ("volume", float("nan")),
+        ("volume", float("inf")),
+        ("volume", -1.0),
+        ("volume", True),
+    ],
+)
+def test_validator_rejects_each_invalid_numeric_direction(column, value):
+    frame = _lower_ohlcv_frame()
+    frame[column] = frame[column].astype(object)
+    frame.loc[frame.index[-1], column] = value
+    validation = validate_daily_bar_frame("AAA", frame)
+    assert validation.usable is False
+    assert validation.latest_session is None
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("high", 99.5),  # below open/close
+        ("low", 100.25),  # above open
+        ("low", 100.75),  # above close
+    ],
+)
+def test_validator_rejects_impossible_high_low_relationships(field, value):
+    frame = _lower_ohlcv_frame()
+    frame.loc[frame.index[0], field] = value
+    validation = validate_daily_bar_frame("AAA", frame)
+    assert validation.usable is False
+    assert validation.error == "provider frame contains inconsistent OHLC"
+
+
+@pytest.mark.parametrize(
+    "defect",
+    ["non_datetime", "nat", "duplicate", "descending", "weekend", "intraday"],
+)
+def test_validator_rejects_invalid_session_indices(defect):
+    frame = _lower_ohlcv_frame()
+    if defect == "non_datetime":
+        frame.index = [value.date().isoformat() for value in frame.index]
+    elif defect == "nat":
+        frame.index = pd.DatetimeIndex([frame.index[0], pd.NaT, frame.index[2]])
+    elif defect == "duplicate":
+        frame.index = pd.DatetimeIndex(
+            [frame.index[0], frame.index[0], frame.index[2]]
+        )
+    elif defect == "descending":
+        frame = frame.iloc[::-1]
+    elif defect == "weekend":
+        frame.index = pd.DatetimeIndex(
+            [frame.index[0], pd.Timestamp("2026-08-01"), frame.index[2]]
+        ).sort_values()
+    elif defect == "intraday":
+        frame.index = frame.index + pd.Timedelta(hours=16)
+    validation = validate_daily_bar_frame("AAA", frame)
+    assert validation.usable is False
+
+
+def test_validator_requires_unique_columns_and_all_required_fields():
+    missing = _lower_ohlcv_frame().drop(columns=["volume"])
+    assert validate_daily_bar_frame("AAA", missing).usable is False
+
+    duplicate = _lower_ohlcv_frame()
+    duplicate.columns = ["open", "high", "low", "close", "close"]
+    assert validate_daily_bar_frame("AAA", duplicate).usable is False
+
+
+def test_validator_rejects_numeric_strings_in_uncoerced_provider_output():
+    frame = _lower_ohlcv_frame()
+    frame["close"] = frame["close"].map(str)
+    validation = validate_daily_bar_frame("AAA", frame)
+    assert validation.usable is False
+    assert "non-numeric required columns" in validation.error
+
+
+def test_validator_rejects_complex_numeric_values():
+    frame = _lower_ohlcv_frame()
+    frame["close"] = frame["close"].astype(complex) + 1j
+    validation = validate_daily_bar_frame("AAA", frame)
+    assert validation.usable is False
+    assert "non-numeric required columns" in validation.error
+
+
+def test_all_field_empty_alignment_padding_is_ignored_but_cannot_be_all_rows():
+    frame = _lower_ohlcv_frame()
+    frame.loc[frame.index[0], :] = float("nan")
+    assert validate_daily_bar_frame("AAA", frame).usable is True
+
+    frame.loc[:, :] = float("nan")
+    validation = validate_daily_bar_frame("AAA", frame)
+    assert validation.usable is False
+    assert validation.error == "provider frame has no usable rows"
+
+
+def test_validator_accepts_canonicalized_supported_provider_symbols():
+    frame = _lower_ohlcv_frame()
+    validation = validate_daily_bar_frame("  brk.b ", frame)
+    assert validation.usable is True
+    assert validation.ticker == "BRK.B"
+    assert canonical_ticker(" ^tnx ") == "^TNX"
+
+
+def test_malformed_ticker_does_not_erase_valid_multi_ticker_sibling():
+    dates = _sessions("2026-07-01", 10)
+    valid = _ohlcv_frame(dates)
+    malformed = _ohlcv_frame(dates, seed_offset=50.0)
+    malformed.loc[dates[-1], "High"] = 0.0
+    combined = pd.concat({"GOOD": valid, "BAD": malformed}, axis=1)
+
+    _install_fake_yfinance(lambda tickers, **kwargs: combined)
+    try:
+        data = fetch_historical(["GOOD", "BAD"], lookback_days=10)
+        assert set(data) == {"GOOD"}
+        assert data["GOOD"].index.equals(dates)
+    finally:
+        _remove_fake_yfinance()
+
+
+def test_flat_response_for_multiple_tickers_is_ambiguous_and_rejected():
+    dates = _sessions("2026-07-01", 10)
+    _install_fake_yfinance(lambda tickers, **kwargs: _ohlcv_frame(dates))
+    try:
+        assert fetch_historical(["AAA", "BBB"], lookback_days=10) == {}
+    finally:
+        _remove_fake_yfinance()
+
+
 if __name__ == "__main__":
     test_252_session_request_spans_enough_calendar_days_not_262()
     test_extra_provider_rows_are_trimmed_to_exactly_the_requested_count()
     test_insufficient_history_is_returned_honestly_not_padded()
     test_multi_ticker_multiindex_columns_format_works()
     test_single_ticker_flat_columns_format_works()
-    test_results_are_sorted_and_deduplicated()
+    test_out_of_order_or_duplicate_provider_rows_are_rejected_not_repaired()
     test_missing_ticker_does_not_corrupt_other_tickers()
     test_rows_missing_required_ohlcv_columns_are_skipped()
     print("All market_data tests passed.")

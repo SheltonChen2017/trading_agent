@@ -37,6 +37,15 @@ from __future__ import annotations
 import pandas as pd
 
 from backtest.risk_metrics import max_drawdown_pct as _canonical_max_drawdown_pct
+from data.research_input_contracts import (
+    require_aligned_price_series,
+    require_combined_rates_at_most_one,
+    require_finite_number,
+    require_long_only_weights,
+    require_positive_int,
+    require_positive_number,
+    require_rate,
+)
 
 
 def simulate_leverage_rotation(
@@ -57,6 +66,28 @@ def simulate_leverage_rotation(
     (marked to market at each day's close, net of any tax/cost already
     paid), final value, total return, number of trades, the trade log,
     and cumulative tax/cost paid."""
+    require_aligned_price_series(
+        {
+            "stable_close": stable_close,
+            "leveraged_close": leveraged_close,
+            "stable_open": stable_open,
+            "leveraged_open": leveraged_open,
+        }
+    )
+    initial_stable = require_finite_number(initial_stable, name="initial_stable", minimum=0.0)
+    initial_leveraged = require_finite_number(initial_leveraged, name="initial_leveraged", minimum=0.0)
+    if initial_stable + initial_leveraged <= 0:
+        raise ValueError("initial_stable + initial_leveraged must be positive")
+    threshold_pct = require_finite_number(threshold_pct, name="threshold_pct", minimum=0.0)
+    trade_size = require_positive_number(trade_size, name="trade_size")
+    cost_pct = require_rate(cost_pct, name="cost_pct")
+    tax_rate = require_rate(tax_rate, name="tax_rate", allow_one=True)
+    require_combined_rates_at_most_one(
+        cost_pct,
+        tax_rate,
+        first_name="cost_pct",
+        second_name="tax_rate",
+    )
     dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     stable_close = stable_close.reindex(dates)
     leveraged_close = leveraged_close.reindex(dates)
@@ -150,6 +181,18 @@ def buy_and_hold(
     initial_total: float = 10_000.0,
 ) -> dict:
     """Static baseline: buy once at the given weights, never rebalance."""
+    require_aligned_price_series(
+        {
+            "stable_close": stable_close,
+            "leveraged_close": leveraged_close,
+        }
+    )
+    stable_weight, leveraged_weight = require_long_only_weights(
+        (stable_weight, leveraged_weight),
+        name="weights",
+        expected_size=2,
+    )
+    initial_total = require_positive_number(initial_total, name="initial_total")
     dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     stable_close = stable_close.reindex(dates)
     leveraged_close = leveraged_close.reindex(dates)
@@ -171,10 +214,20 @@ def max_drawdown_pct(series: pd.Series) -> float:
     canonical implementation (docs/architecture/ARCHITECTURE_DEBT.md) -- kept as a
     thin re-export here so the ~15 dependent scripts/strategies that
     import this name don't need any changes."""
+    if series.empty:
+        return _canonical_max_drawdown_pct(series)
+    require_aligned_price_series({"series": series})
     return _canonical_max_drawdown_pct(series)
 
 
 def cagr_pct(series: pd.Series, trading_days_per_year: int = 252) -> float:
+    trading_days_per_year = require_positive_int(
+        trading_days_per_year,
+        name="trading_days_per_year",
+    )
+    if series.empty:
+        return 0.0
+    require_aligned_price_series({"series": series})
     years = len(series) / trading_days_per_year
     if years <= 0 or series.iloc[0] <= 0:
         return 0.0

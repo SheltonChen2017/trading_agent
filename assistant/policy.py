@@ -17,6 +17,7 @@ from typing import Literal
 
 from config import MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
 from assistant.process_singleton import ProcessSingleton, ProcessSingletonError
+from assistant.temporal_integrity import MAX_ORDER_AGE_MINUTES
 
 DEFAULT_POLICY_PATH = Path(__file__).resolve().parent / "default_policy.json"
 PERSONAL_POLICY_PATH = Path(__file__).resolve().parent / "my_policy.json"
@@ -25,6 +26,37 @@ POLICY_PATH_ENV_VAR = "TRADING_ASSISTANT_POLICY"
 
 class PolicyWriteConflictError(RuntimeError):
     """The policy changed after the caller loaded its editing base."""
+
+
+def _finite_real(field_name: str, value: object) -> int | float:
+    """Return a validated JSON-representable authoritative number.
+
+    Policy files use JSON numbers, so only the builtin integer and float types
+    are accepted. Boolean values are deliberately rejected because Python
+    otherwise treats False/True as 0/1. Policy percentages are later
+    multiplied by 100, so a JSON boolean can silently turn an intended
+    exposure cap into 100 percent or a cash reserve into zero.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(
+            f"{field_name} must be a finite real number, got {value!r}."
+        )
+    try:
+        finite = math.isfinite(value)
+    except (OverflowError, TypeError, ValueError) as exc:
+        raise ValueError(
+            f"{field_name} must be a finite real number, got {value!r}."
+        ) from exc
+    if not finite:
+        raise ValueError(
+            f"{field_name} must be a finite real number, got {value!r}."
+        )
+    return value
+
+
+def _reject_non_finite_json_constant(token: str) -> None:
+    """Reject Python's non-standard JSON NaN/Infinity extensions."""
+    raise ValueError(f"Policy contains non-finite JSON constant {token!r}.")
 
 
 def resolve_policy_path(
@@ -140,8 +172,8 @@ class TradingPolicy:
             "min_cash_reserve_pct",
         )
         for field_name in percentage_fields:
-            value = getattr(self, field_name)
-            if not (math.isfinite(value) and 0 <= value <= 1):
+            value = _finite_real(field_name, getattr(self, field_name))
+            if not 0 <= value <= 1:
                 raise ValueError(f"{field_name} must be a finite number between 0 and 1, got {value}.")
         if self.max_position_pct > self.max_total_exposure_pct:
             raise ValueError("max_position_pct cannot exceed max_total_exposure_pct.")
@@ -152,12 +184,14 @@ class TradingPolicy:
         # 2026-07-27). json.loads() also accepts a literal `NaN` in a
         # policy file by default, so this is reachable from a malformed
         # config, not just a caller bug.
-        if not math.isfinite(self.max_order_value) or self.max_order_value <= 0:
+        max_order_value = _finite_real("max_order_value", self.max_order_value)
+        if max_order_value <= 0:
             raise ValueError(f"max_order_value must be a positive, finite number, got {self.max_order_value}.")
-        if (
-            not math.isfinite(self.max_daily_submitted_notional)
-            or self.max_daily_submitted_notional <= 0
-        ):
+        max_daily_submitted_notional = _finite_real(
+            "max_daily_submitted_notional",
+            self.max_daily_submitted_notional,
+        )
+        if max_daily_submitted_notional <= 0:
             raise ValueError(
                 "max_daily_submitted_notional must be a positive, finite number, "
                 f"got {self.max_daily_submitted_notional}."
@@ -166,18 +200,32 @@ class TradingPolicy:
             value = getattr(self, field_name)
             if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
                 raise ValueError(f"{field_name} must be a positive integer, got {value!r}.")
-        if not math.isfinite(self.max_order_age_minutes) or self.max_order_age_minutes <= 0:
+        max_order_age_minutes = _finite_real(
+            "max_order_age_minutes", self.max_order_age_minutes
+        )
+        if (
+            max_order_age_minutes <= 0
+            or max_order_age_minutes > MAX_ORDER_AGE_MINUTES
+        ):
             raise ValueError(
-                "max_order_age_minutes must be a positive, finite number, "
-                f"got {self.max_order_age_minutes}."
+                "max_order_age_minutes must be a positive, finite number no "
+                f"greater than {MAX_ORDER_AGE_MINUTES}, got "
+                f"{self.max_order_age_minutes}."
             )
-        if not math.isfinite(self.max_stale_price_minutes) or self.max_stale_price_minutes <= 0:
+        max_stale_price_minutes = _finite_real(
+            "max_stale_price_minutes", self.max_stale_price_minutes
+        )
+        if max_stale_price_minutes <= 0:
             raise ValueError(
                 f"max_stale_price_minutes must be a positive, finite number, got {self.max_stale_price_minutes}."
             )
-        if not math.isfinite(self.max_slippage_pct) or self.max_slippage_pct < 0:
+        max_slippage_pct = _finite_real(
+            "max_slippage_pct", self.max_slippage_pct
+        )
+        if max_slippage_pct < 0:
             raise ValueError(f"max_slippage_pct must be a non-negative, finite number, got {self.max_slippage_pct}.")
-        if not math.isfinite(self.max_spread_pct) or self.max_spread_pct < 0:
+        max_spread_pct = _finite_real("max_spread_pct", self.max_spread_pct)
+        if max_spread_pct < 0:
             raise ValueError(f"max_spread_pct must be a non-negative, finite number, got {self.max_spread_pct}.")
         # isinstance(x, int), not a `< 0` comparison alone: NaN/inf/1.5 are
         # all `float`, not `int`, so this rejects them along with negative
@@ -241,7 +289,10 @@ def compute_policy_fingerprint(policy: TradingPolicy) -> str:
 
 def load_policy(path: str | Path = DEFAULT_POLICY_PATH) -> TradingPolicy:
     policy_path = Path(path)
-    raw = json.loads(policy_path.read_text(encoding="utf-8"))
+    raw = json.loads(
+        policy_path.read_text(encoding="utf-8"),
+        parse_constant=_reject_non_finite_json_constant,
+    )
     raw["allowed_sides"] = tuple(raw.get("allowed_sides", ("buy", "sell")))
     raw["allowed_order_types"] = tuple(raw.get("allowed_order_types", ("market", "limit")))
     policy = TradingPolicy(**raw)
@@ -294,6 +345,14 @@ def policy_with_updated_flags(
     that still bumped the version would invalidate every pending proposal
     for no behavioral reason.
     """
+    for field_name, value in (
+        ("allow_new_positions", allow_new_positions),
+        ("enable_strategy_proposals", enable_strategy_proposals),
+        ("whole_shares_only", whole_shares_only),
+    ):
+        if value is not None and not isinstance(value, bool):
+            raise ValueError(f"{field_name} must be a boolean, got {value!r}.")
+
     changes: dict[str, object] = {}
     if allow_new_positions is not None and allow_new_positions != policy.allow_new_positions:
         changes["allow_new_positions"] = allow_new_positions
@@ -304,13 +363,17 @@ def policy_with_updated_flags(
         changes["enable_strategy_proposals"] = enable_strategy_proposals
     if whole_shares_only is not None and whole_shares_only != policy.whole_shares_only:
         changes["whole_shares_only"] = whole_shares_only
-    if (
-        min_cash_reserve_pct is not None
-        and float(min_cash_reserve_pct) != float(policy.min_cash_reserve_pct)
-    ):
-        # validate() enforces the 0..1 bound; an out-of-range value must
-        # raise there rather than be silently clamped here.
-        changes["min_cash_reserve_pct"] = float(min_cash_reserve_pct)
+    if min_cash_reserve_pct is not None:
+        validated_reserve = _finite_real(
+            "min_cash_reserve_pct", min_cash_reserve_pct
+        )
+        if not 0 <= validated_reserve <= 1:
+            raise ValueError(
+                "min_cash_reserve_pct must be a finite number between 0 and 1, "
+                f"got {validated_reserve}."
+            )
+        if validated_reserve != policy.min_cash_reserve_pct:
+            changes["min_cash_reserve_pct"] = float(validated_reserve)
     if not changes:
         raise ValueError(
             "No policy change requested: the proposed values match the active policy."

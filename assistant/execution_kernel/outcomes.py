@@ -14,12 +14,14 @@ absence.
 """
 from __future__ import annotations
 
-import math
-from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 
+from assistant.execution_kernel.broker_evidence import (
+    canonical_order_for_proposal,
+    observed_broker_account,
+    validate_order_for_proposal,
+)
 from assistant.execution_kernel.errors import ProposalExecutionError
-from assistant.money import decimal_or_none
 from assistant.order_lifecycle import (
     CHAIN_ERROR_IDENTITY_MISMATCH,
     journal_broker_order_update,
@@ -70,57 +72,37 @@ def _lookup_order_outcome(broker_module, idempotency_key: str):
         return _LOOKUP_UNCONFIRMED
 
 
-def _order_matches_intent(order: dict, intent: TradeIntent) -> tuple[bool, str]:
-    """Verifies the COMPLETE material identity of a broker order (as
-    returned by execution.alpaca_broker.find_order_by_client_id()) against
-    the TradeIntent it's being reconciled against: ticker, side, shares,
-    order type, and (for limit orders) limit price. A missing material
-    field fails closed -- treated as a mismatch, never assumed to match
-    (GPT review, 2026-07-28: a prior version compared only ticker+side, so
-    an order under the expected idempotency key for BUY 1 AAPL could
-    reconcile a proposal for BUY 100 AAPL, or a market order could be
-    mistaken for a limit order). Returns (matches, detail); `detail`
-    explains the first mismatch found, for an audit message -- empty
-    string when matches is True.
+def _order_matches_intent(
+    order: dict,
+    intent: TradeIntent,
+    *,
+    proposal: dict | None = None,
+    observed_account=None,
+    root_order: bool = True,
+    expected_replaces_order_id: str | None = None,
+) -> tuple[bool, str]:
+    """Compatibility verdict backed by the single strict broker boundary.
 
-    Share counts use exact Decimal comparison so numerically-equivalent
-    representations (10 vs 10.0) count as equal without a tolerance that
-    could accept a one-nanoshare identity mismatch.
+    A two-argument material-only comparison is no longer sufficient for an
+    execution decision: it cannot prove client identity, account/mode, TIF,
+    status/fill invariants, timestamps, or exact/legacy numeric agreement.
+    Production callers therefore provide the durable proposal and observed
+    account.  Missing context returns a mismatch rather than silently falling
+    back to the former loose comparison.
     """
-    if str(order.get("ticker", "")).upper() != intent.ticker.upper():
-        return False, f"ticker: expected {intent.ticker.upper()!r}, got {order.get('ticker')!r}"
-    if order.get("side") != intent.side:
-        return False, f"side: expected {intent.side!r}, got {order.get('side')!r}"
-
-    order_shares = order.get("shares_decimal", order.get("shares"))
-    if order_shares is None:
-        return False, "shares: missing from broker response"
-    order_shares_value = decimal_or_none(order_shares)
-    intent_shares_value = decimal_or_none(intent.shares)
-    if order_shares_value is None or intent_shares_value is None:
-        return False, f"shares: not numeric ({order_shares!r})"
-    if order_shares_value != intent_shares_value:
-        return False, f"shares: expected {intent.shares}, got {order_shares_value}"
-
-    order_type = order.get("type")
-    if order_type is None:
-        return False, "order type: missing from broker response"
-    if str(order_type).lower() != str(intent.order_type).lower():
-        return False, f"order type: expected {intent.order_type!r}, got {order_type!r}"
-
-    if intent.order_type == "limit":
-        order_limit_price = order.get("limit_price")
-        if order_limit_price is None:
-            return False, "limit_price: missing from broker response for a limit order"
-        try:
-            order_limit_price_value = float(order_limit_price)
-        except (TypeError, ValueError):
-            return False, f"limit_price: not numeric ({order_limit_price!r})"
-        if intent.limit_price is None or not math.isclose(
-            order_limit_price_value, float(intent.limit_price), rel_tol=0.0, abs_tol=0.005
-        ):
-            return False, f"limit_price: expected {intent.limit_price}, got {order_limit_price_value}"
-
+    if proposal is None or observed_account is None:
+        return False, "strict broker proposal/account context is required"
+    try:
+        validate_order_for_proposal(
+            order,
+            intent,
+            proposal,
+            observed_account=observed_account,
+            root_order=root_order,
+            expected_replaces_order_id=expected_replaces_order_id,
+        )
+    except Exception as exc:
+        return False, str(exc)
     return True, ""
 
 
@@ -150,10 +132,41 @@ def resolve_failed_submission(
     released only once absence is genuinely confirmed, which happens in
     delayed reconciliation, not here.
     """
+    proposal = store.get_proposal(proposal_id)
+    if proposal is None:
+        raise ProposalExecutionError(
+            f"Submission outcome for unknown proposal {proposal_id} cannot be reconciled."
+        ) from exc
+    try:
+        observed_account = observed_broker_account(broker_module)
+    except Exception as account_exc:
+        reason = (
+            f"Order submission raised ({exc}), and the frozen broker session's "
+            f"account identity could not be re-verified: {account_exc}. Persistent "
+            "kill switch activated; the broker outcome remains ambiguous."
+        )
+        store.park_reconciliation_anomaly_and_halt(
+            proposal_id,
+            expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+            reason=reason,
+            reconciled_at=datetime.now(timezone.utc).isoformat(),
+            details={"path": "submit_lookup_account_binding"},
+            anomaly_key="failed_submission_account_binding",
+        )
+        raise ProposalExecutionError(reason) from account_exc
+
     outcome = _lookup_order_outcome(broker_module, idempotency_key)
     if isinstance(outcome, dict):
-        matches, mismatch_detail = _order_matches_intent(outcome, intent)
-        if not matches:
+        try:
+            root_order = canonical_order_for_proposal(
+                outcome,
+                intent,
+                proposal,
+                observed_account=observed_account,
+                root_order=True,
+            )
+        except Exception as evidence_exc:
+            mismatch_detail = str(evidence_exc)
             # An order exists under our exact idempotency key but does
             # NOT match what we submitted -- never auto-resolve this;
             # it's exactly the anomaly duplicate-order protection
@@ -163,16 +176,13 @@ def resolve_failed_submission(
                 f"key does NOT match the intent (mismatch: {mismatch_detail}) -- refusing to "
                 "auto-resolve. Persistent kill switch activated; investigate manually."
             )
-            store.update_proposal_status_if_current(
+            store.park_reconciliation_anomaly_and_halt(
                 proposal_id,
                 expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                new_status=SUBMISSION_UNKNOWN,
-                error=reason,
-            )
-            store.activate_reconciliation_halt(
-                proposal_id=proposal_id,
                 reason=reason,
+                reconciled_at=datetime.now(timezone.utc).isoformat(),
                 details={"mismatch": mismatch_detail, "path": "submit_lookup"},
+                anomaly_key="failed_submission_lookup_identity_mismatch",
             )
             raise ProposalExecutionError(
                 f"Order submission failed for {proposal_id}, and a MISMATCHED order was found "
@@ -184,8 +194,18 @@ def resolve_failed_submission(
         # replaced out of band between the failed submit and this lookup.
         # Narrower window than reconcile_submission()'s, but the identical
         # defect -- journaling a superseded order as the outcome.
-        authoritative, chain_error, is_mismatch, chain = _authoritative_order_for(
-            broker_module, outcome, intent
+        (
+            authoritative,
+            chain_error,
+            is_mismatch,
+            chain,
+            replacement_order_path,
+        ) = _authoritative_order_for(
+            broker_module,
+            root_order,
+            intent,
+            proposal=proposal,
+            observed_account=observed_account,
         )
         if chain_error is not None:
             reason = (
@@ -194,17 +214,23 @@ def resolve_failed_submission(
                 + ("Persistent kill switch activated; investigate manually."
                    if is_mismatch else "Left retryable as 'submission_unknown'.")
             )
-            store.update_proposal_status_if_current(
-                proposal_id,
-                expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                new_status=SUBMISSION_UNKNOWN,
-                error=reason,
-            )
             if is_mismatch:
-                store.activate_reconciliation_halt(
-                    proposal_id=proposal_id,
+                store.park_reconciliation_anomaly_and_halt(
+                    proposal_id,
+                    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
                     reason=reason,
+                    reconciled_at=datetime.now(timezone.utc).isoformat(),
                     details={"path": "submit_replacement_chain"},
+                    anomaly_key=(
+                        "failed_submission_replacement_chain_identity_mismatch"
+                    ),
+                )
+            else:
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+                    new_status=SUBMISSION_UNKNOWN,
+                    error=reason,
                 )
             raise ProposalExecutionError(reason) from exc
 
@@ -216,6 +242,10 @@ def resolve_failed_submission(
             clear_error=True,
             extra_updates={"reconciled_after_error": str(exc)},
             raw_event={"replacement_chain": list(chain)} if chain else None,
+            broker_order_root_id=(
+                replacement_order_path[0] if replacement_order_path else None
+            ),
+            replacement_order_path=replacement_order_path,
         )
         return authoritative
     if outcome is None:
@@ -263,12 +293,26 @@ def resolve_failed_submission(
 
 
 def _authoritative_order_for(
-    broker_module, order: dict, intent: TradeIntent
-) -> tuple[dict | None, str | None, bool, tuple[str, ...]]:
+    broker_module,
+    order: dict,
+    intent: TradeIntent,
+    *,
+    proposal: dict,
+    observed_account,
+) -> tuple[
+    dict | None,
+    str | None,
+    bool,
+    tuple[str, ...],
+    tuple[str, ...],
+]:
     """
     Resolve a looked-up order through its replacement chain.
 
-    Returns `(authoritative_order, error, is_identity_mismatch, chain)`.
+    Returns `(authoritative_order, error, is_identity_mismatch, chain,
+    replacement_order_path)`.  The final path is the durable root-to-current
+    broker-order identity used by the event journal; it is distinct from the
+    diagnostic replacement-chain trace.
 
     Both of this module's broker-lookup consumers need this:
     reconcile_submission() (the user-facing manual operation) and
@@ -291,7 +335,13 @@ def _authoritative_order_for(
         # Lazy for the same reason as order_reconciler's adapter: never touch
         # get_order_by_id unless a replacement actually has to be fetched.
         lambda oid: broker_module.get_order_by_id(oid),
-        validate=lambda candidate: _order_matches_intent(candidate, intent),
+        validate=lambda candidate: _order_matches_intent(
+            candidate,
+            intent,
+            proposal=proposal,
+            observed_account=observed_account,
+            root_order=False,
+        ),
     )
     if resolution.error is not None:
         return (
@@ -299,5 +349,17 @@ def _authoritative_order_for(
             resolution.error,
             resolution.error_kind == CHAIN_ERROR_IDENTITY_MISMATCH,
             resolution.chain,
+            resolution.order_path,
         )
-    return resolution.authoritative_order, None, False, resolution.chain
+    assert resolution.authoritative_order is not None
+    try:
+        canonical = canonical_order_for_proposal(
+            resolution.authoritative_order,
+            intent,
+            proposal,
+            observed_account=observed_account,
+            root_order=not resolution.followed_a_replacement,
+        )
+    except Exception as exc:
+        return None, str(exc), True, resolution.chain, resolution.order_path
+    return canonical, None, False, resolution.chain, resolution.order_path

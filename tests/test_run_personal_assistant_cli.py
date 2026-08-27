@@ -22,6 +22,10 @@ import scripts.run_personal_assistant as personal_assistant_cli
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.schemas import DecisionPacket, FindingProvenance, MarketRegime, EvidenceStatus, SignalEvidence
 from assistant.storage import AssistantStore
+from assistant.temporal_integrity import (
+    MAX_MONITOR_INTERVAL_SECONDS,
+    MAX_RECOVERY_WINDOW_SECONDS,
+)
 from scripts.run_personal_assistant import _print_briefing, build_parser, command_risk_check
 
 
@@ -83,6 +87,38 @@ def test_recover_stale_rejects_non_integer():
         assert False, "expected argparse to reject a non-integer value"
     except SystemExit as exc:
         assert exc.code != 0
+
+
+@pytest.mark.parametrize("command", ["recover-stale", "recover-stale-claim"])
+def test_recovery_cli_uses_the_canonical_maximum(command):
+    maximum = str(int(MAX_RECOVERY_WINDOW_SECONDS))
+    accepted = build_parser().parse_args(
+        [command, "tp_123", "--stale-after-seconds", maximum]
+    )
+    assert accepted.stale_after_seconds == int(maximum)
+
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(
+            [
+                command,
+                "tp_123",
+                "--stale-after-seconds",
+                str(int(maximum) + 1),
+            ]
+        )
+
+
+def test_monitor_poll_cli_uses_the_canonical_maximum():
+    maximum = str(int(MAX_MONITOR_INTERVAL_SECONDS))
+    accepted = build_parser().parse_args(
+        ["monitor-orders", "--poll-seconds", maximum]
+    )
+    assert accepted.poll_seconds == int(maximum)
+
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(
+            ["monitor-orders", "--poll-seconds", str(int(maximum) + 1)]
+        )
 
 
 @pytest.mark.parametrize("bad_limit", ["0", "-1"])
@@ -604,6 +640,11 @@ def test_operations_cycle_preserves_backup_and_health_after_activity_failure(
     monkeypatch.setattr(personal_assistant_cli.config, "PAPER_TRADING", True)
     monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
     monkeypatch.setattr(personal_assistant_cli, "load_policy", lambda path: policy)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "record_operational_policy_heartbeat",
+        lambda *args, **kwargs: None,
+    )
     monkeypatch.setattr(
         personal_assistant_cli,
         "reconcile_nonterminal_orders",

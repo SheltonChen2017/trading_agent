@@ -182,6 +182,16 @@ and supporting freeze/audits in the corresponding Archive directories. The
 remainder of this section is retained as the historical V1 rationale and does
 not override V2.
 
+**V2 contract correction, 2026-08-26:** the executable order is contracts and
+immutable data -> stock signal -> registered stock-first event study -> stop on
+a valid null -> ETF topology only after a pass -> ETF walk-forward/QC -> a
+lane dossier that does not open the shared integration holdout. The separate
+V2 package and strict outcome gate are under
+`research/analyst_revisions_v2/`. Its round-0 inventory remains explicitly
+blocked on named owner decisions, including the common final-holdout dates;
+therefore this correction authorizes no outcome, provider, QC, or deployment
+activity.
+
 **Owner decision, 2026-08-20: ACER replaces the Strong-Buy portfolio program.**
 The strategy converts stock-level analyst *revisions* into ETF-level signals:
 score each ETF as the sum of its point-in-time constituent weights times its
@@ -380,9 +390,10 @@ corrections themselves were corrected, and the round is closed.
 Snapshot A still yields 584,916 canonical events at 99.64%
 retention from 587,046 rows, with 2,130 named refusals; the corrections do
 not change those counts. They do replace the derived dataset contract and
-identity, fully authenticate lineage/count metadata, refuse every occurrence
-of a duplicated vendor id, prevent incomplete snapshots from publishing a
-canonical dataset, bind rows and lineage to one verified manifest read, and
+identity, authenticate the legacy byte hashes and recorded count metadata,
+refuse every occurrence of a duplicated vendor id, prevent the known CLI path
+from publishing an incomplete snapshot, bind rows and lineage to one verified
+manifest read, and
 rename the 2017+ era so it no longer overstates vendor-confirmed clock
 semantics. The counter-review corrected the refusal-detail wording, which
 moves the identity once more: the current v2 identity is
@@ -392,6 +403,13 @@ yet been materialized. This is still data plumbing: no price join, signal,
 rating scale, or research look. It sizes the unresolved issuer-identity
 problem — 9,677 distinct tickers with zero ISIN and zero exchange — and
 ambiguity-refusing mapping is the next ACER-1 step.
+
+That completed V1 review did **not** prove V2 semantic source completeness,
+exactly-once disposition of every raw locator, strict persisted row schemas,
+correction lineage, clean producing-code/config identity, or the absence of
+unreferenced raw pages. The V2 typed snapshot/dataset boundary supplies those
+requirements separately; no loose ACER tuple/dictionary is publishable V2
+evidence.
 
 **Update 2026-08-21: the mapping step is BLOCKED, and the blocker is
 load-bearing** (`docs/Archive/Research/ACER_V1/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
@@ -423,6 +441,12 @@ master and other required inputs. Audit Databento or nominate another source
 only for requirements the cloud audit cannot close. Do not buy or download
 local QC datasets unless the owner separately reverses the cloud-engine
 decision.
+
+The 768 diagnostic count is explicitly a **lower bound, never an allowlist**;
+current-ticker joins are prohibited in V2. Normative strategy design and
+observed provider availability/history are separate evidence categories: a
+normative 2013 design statement cannot erase measured 2011–2012 bytes, and
+measured bytes cannot establish their own backfill semantics.
 
 **Update 2026-08-21: engine amendment and control-data rulings.** QuantConnect
 Cloud is the authoritative ACER historical/outcome backtest engine. Local LEAN

@@ -36,6 +36,7 @@ from risk.execution_gate import (
     validate_trade_intent,
     verify_execution_authorization,
 )
+from tests.execution_test_support import scripted_broker_contact_boundary
 
 
 def _packet():
@@ -483,9 +484,9 @@ _FAKE_BROKER_ACCOUNT_ID = "test-paper-account"
 _RECONCILIATION_SNAPSHOT_ID = "a" * 64
 
 
-def _fake_broker_account(cash=5_000) -> dict:
+def _fake_broker_account(cash=5_000, *, position_market_value=5_000) -> dict:
     cash_exact = Decimal(str(cash))
-    equity_exact = cash_exact + Decimal("5000")
+    equity_exact = cash_exact + Decimal(str(position_market_value))
     return {
         "account_id": _FAKE_BROKER_ACCOUNT_ID,
         "status": "ACTIVE",
@@ -617,6 +618,7 @@ def _mock_execution_dependencies(
     open_orders_error=None,
     broker_cash_sequence=None,
     broker_open_orders=None,
+    broker_positions=None,
 ):
     """Patch one frozen fake paper session and its provider seams.
 
@@ -730,10 +732,29 @@ def _mock_execution_dependencies(
             return True
 
         def get_account(self):
-            return deepcopy(_fake_broker_account(self._active_cash))
+            position_value = sum(
+                (
+                    Decimal(str(position["market_value_decimal"]))
+                    for position in self._position_rows()
+                ),
+                Decimal("0"),
+            )
+            return deepcopy(
+                _fake_broker_account(
+                    self._active_cash,
+                    position_market_value=position_value,
+                )
+            )
+
+        def _position_rows(self):
+            return (
+                [_fake_broker_position()]
+                if broker_positions is None
+                else broker_positions
+            )
 
         def get_open_positions(self):
-            return [deepcopy(_fake_broker_position())]
+            return deepcopy(list(self._position_rows()))
 
         def get_open_orders(self):
             if open_orders_error is not None:
@@ -765,14 +786,6 @@ def _mock_execution_dependencies(
             assert expected_snapshot_id == self._latest_snapshot_id
             return broker.get_latest_quote(ticker)
 
-        def _assert_dispatch_context(
-            self, expected_snapshot_id, expected_policy_fingerprint
-        ):
-            assert expected_snapshot_id == self._latest_snapshot_id
-            assert isinstance(expected_policy_fingerprint, str)
-            assert len(expected_policy_fingerprint) == 64
-            assert all(c in "0123456789abcdef" for c in expected_policy_fingerprint)
-
         def submit_market_order(
             self,
             ticker,
@@ -786,17 +799,32 @@ def _mock_execution_dependencies(
             expected_policy_fingerprint=None,
             whole_shares_only=True,
         ):
-            self._assert_dispatch_context(
-                expected_snapshot_id, expected_policy_fingerprint
-            )
-            assert dispatch_permit is not None
-            kwargs = {
-                "authorization": authorization,
-                "idempotency_key": idempotency_key,
-            }
-            if whole_shares_only is False:
-                kwargs["whole_shares_only"] = False
-            return broker.submit_market_order(ticker, shares, side=side, **kwargs)
+            with scripted_broker_contact_boundary(
+                broker_session=self,
+                snapshot_id_reader=lambda: self._latest_snapshot_id,
+                consume_snapshot=lambda: setattr(
+                    self, "_latest_snapshot_id", None
+                ),
+                ticker=ticker,
+                shares=shares,
+                side=side,
+                order_type="market",
+                limit_price=None,
+                authorization=authorization,
+                idempotency_key=idempotency_key,
+                dispatch_permit=dispatch_permit,
+                expected_snapshot_id=expected_snapshot_id,
+                expected_policy_fingerprint=expected_policy_fingerprint,
+            ):
+                kwargs = {
+                    "authorization": authorization,
+                    "idempotency_key": idempotency_key,
+                }
+                if whole_shares_only is False:
+                    kwargs["whole_shares_only"] = False
+                return broker.submit_market_order(
+                    ticker, shares, side=side, **kwargs
+                )
 
         def submit_limit_order(
             self,
@@ -812,19 +840,32 @@ def _mock_execution_dependencies(
             expected_policy_fingerprint=None,
             whole_shares_only=True,
         ):
-            self._assert_dispatch_context(
-                expected_snapshot_id, expected_policy_fingerprint
-            )
-            assert dispatch_permit is not None
-            kwargs = {
-                "authorization": authorization,
-                "idempotency_key": idempotency_key,
-            }
-            if whole_shares_only is False:
-                kwargs["whole_shares_only"] = False
-            return broker.submit_limit_order(
-                ticker, shares, limit_price, side=side, **kwargs
-            )
+            with scripted_broker_contact_boundary(
+                broker_session=self,
+                snapshot_id_reader=lambda: self._latest_snapshot_id,
+                consume_snapshot=lambda: setattr(
+                    self, "_latest_snapshot_id", None
+                ),
+                ticker=ticker,
+                shares=shares,
+                side=side,
+                order_type="limit",
+                limit_price=limit_price,
+                authorization=authorization,
+                idempotency_key=idempotency_key,
+                dispatch_permit=dispatch_permit,
+                expected_snapshot_id=expected_snapshot_id,
+                expected_policy_fingerprint=expected_policy_fingerprint,
+            ):
+                kwargs = {
+                    "authorization": authorization,
+                    "idempotency_key": idempotency_key,
+                }
+                if whole_shares_only is False:
+                    kwargs["whole_shares_only"] = False
+                return broker.submit_limit_order(
+                    ticker, shares, limit_price, side=side, **kwargs
+                )
 
         def find_order_by_client_id(self, client_order_id):
             return broker.find_order_by_client_id(client_order_id)

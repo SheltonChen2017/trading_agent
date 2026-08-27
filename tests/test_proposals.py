@@ -27,9 +27,15 @@ def _packet(positions: list[dict], cash: float) -> DecisionPacket:
     )
 
 
-def _permissive_policy(max_total_exposure_pct: float = 1.0, max_basket_pct: float = 1.0,
-                        max_position_pct: float = 1.0, max_leveraged_etf_pct: float = 1.0,
-                        max_order_value: float = 100_000.0) -> TradingPolicy:
+def _permissive_policy(
+    max_total_exposure_pct: float = 1.0,
+    max_basket_pct: float = 1.0,
+    max_position_pct: float | None = None,
+    max_leveraged_etf_pct: float = 1.0,
+    max_order_value: float = 100_000.0,
+) -> TradingPolicy:
+    if max_position_pct is None:
+        max_position_pct = max_total_exposure_pct
     return TradingPolicy(
         version="test", name="test", execution_mode="paper",
         max_position_pct=max_position_pct, max_total_exposure_pct=max_total_exposure_pct,

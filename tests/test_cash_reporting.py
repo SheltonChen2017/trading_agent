@@ -674,7 +674,7 @@ def test_reported_headroom_matches_execution_gate_boundary():
         ),
         buying_power=6_000.0,
     )
-    policy = _policy(max_position_pct=1.0)
+    policy = _policy(max_position_pct=0.50)
     bounds = evaluate_idle_cash(snapshot, policy, _MANDATE)["policy_bounds"]
     assert bounds["policy_headroom"] == "1000"
 
@@ -683,7 +683,7 @@ def test_reported_headroom_matches_execution_gate_boundary():
         snapshot,
         reference_price=1.0,
         now=datetime(2026, 8, 3, 10, 0),  # Monday during market hours
-        max_position_pct=1.0,
+        max_position_pct=policy.max_position_pct,
         max_total_exposure_pct=policy.max_total_exposure_pct,
         min_cash_reserve_pct=policy.min_cash_reserve_pct,
         pending_buy_value_by_ticker={"MSFT": 1_000.0},
@@ -693,7 +693,7 @@ def test_reported_headroom_matches_execution_gate_boundary():
         snapshot,
         reference_price=1.0,
         now=datetime(2026, 8, 3, 10, 0),
-        max_position_pct=1.0,
+        max_position_pct=policy.max_position_pct,
         max_total_exposure_pct=policy.max_total_exposure_pct,
         min_cash_reserve_pct=policy.min_cash_reserve_pct,
         pending_buy_value_by_ticker={"MSFT": 1_000.0},

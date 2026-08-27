@@ -112,6 +112,23 @@ def test_valid_root_order_returns_canonical_exact_evidence():
 
 
 @pytest.mark.parametrize(
+    "bad_quantity",
+    ["not-a-number", "NaN", "Infinity", float("nan"), float("inf")],
+)
+def test_quantity_parser_normalizes_malformed_and_nonfinite_values(
+    bad_quantity,
+):
+    error = _assert_code(
+        "invalid_quantity",
+        lambda: validate_broker_order(
+            _limit_order(shares=bad_quantity, shares_decimal=None),
+            context=_root_context(),
+        ),
+    )
+    assert error.field == "shares"
+
+
+@pytest.mark.parametrize(
     "bad_id", [None, "", "   ", "None", "null", "unknown", 123, "id\nline"]
 )
 def test_missing_or_sentinel_order_id_refuses(bad_id):

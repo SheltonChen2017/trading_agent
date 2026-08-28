@@ -556,8 +556,11 @@ beyond the behaviours the named tests exercise.
 - Independent re-verification of the runtime-stop condition through
   `runtime_emergency_stop_path()`, read-only: present, active, generation 19,
   19 open incidents, 3 of analyst-lane origin.
-- `git diff --check` clean. Complete-suite result for the pushed tree is
-  recorded in the section 5 ledger row for this push.
+- Complete suite on the code tree at `f4257de`, run with no competing load:
+  **5,255 passed, 3 skipped, 0 failed, 25 warnings in 2,347.37s (39m07s)**.
+  `compileall` (including `research/`) exit 0 and `git diff --check` clean on
+  that same tree. The pushed tip adds only this validation sentence and was
+  revalidated with the 63-check active-document suite.
 
 ### 8.7 Residual gates and next authorized step
 

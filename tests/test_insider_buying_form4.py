@@ -20,6 +20,7 @@ from research.insider_buying.contracts import (
     AvailabilityPrecision,
     ContractError,
     ExecutionRule,
+    PublicAvailability,
 )
 from research.insider_buying.form4_xml import Form4ParseError
 
@@ -386,3 +387,83 @@ def test_package_has_no_provider_outcome_execution_or_scheduler_imports():
             elif isinstance(node, ast.ImportFrom) and node.module:
                 imported.add(node.module.split(".", 1)[0])
         assert imported.isdisjoint(forbidden_roots), (path, imported & forbidden_roots)
+
+
+# ---------------------------------------------------------------------------
+# Direct PublicAvailability contract guards.
+#
+# The tests above reach availability semantics through parse_form4_xml(), so
+# they exercise the parser's refusals rather than the contract's own. A
+# mutation sweep of PublicAvailability.__post_init__ showed all five guards
+# surviving with the suite green, which means the object that encodes the
+# look-ahead invariant was unprotected on any path that does not go through
+# the XML parser. The blueprint's IB-1 bulk-dataset ingest is exactly such a
+# path: it constructs availability from the SEC quarterly tables directly.
+# These tests pin each guard at the contract boundary.
+# ---------------------------------------------------------------------------
+
+
+def _timestamp_availability(**overrides):
+    kwargs = {
+        "accepted_at": ACCEPTED,
+        "accepted_date": ACCEPTED.date(),
+        "precision": AvailabilityPrecision.ACCEPTANCE_TIMESTAMP,
+        "execution_rule": ExecutionRule.NEXT_REGULAR_OPEN_AFTER_ACCEPTANCE,
+    }
+    kwargs.update(overrides)
+    return PublicAvailability(**kwargs)
+
+
+def _date_only_availability(**overrides):
+    kwargs = {
+        "accepted_at": None,
+        "accepted_date": ACCEPTED.date(),
+        "precision": AvailabilityPrecision.ACCEPTANCE_DATE_ONLY,
+        "execution_rule": ExecutionRule.NEXT_REGULAR_OPEN_AFTER_ACCEPTANCE_DATE,
+    }
+    kwargs.update(overrides)
+    return PublicAvailability(**kwargs)
+
+
+def test_valid_availability_values_are_accepted_at_the_contract_boundary():
+    """The guards below must refuse bad input without refusing good input."""
+    timestamped = _timestamp_availability()
+    assert timestamped.accepted_at == ACCEPTED
+    date_only = _date_only_availability()
+    assert date_only.accepted_at is None
+
+
+def test_contract_refuses_naive_acceptance_instant_without_the_parser():
+    with pytest.raises(ContractError, match="timezone-aware"):
+        _timestamp_availability(accepted_at=datetime(2026, 8, 20, 17, 30))
+
+
+def test_contract_refuses_missing_instant_for_timestamp_precision():
+    with pytest.raises(ContractError, match="timezone-aware"):
+        _timestamp_availability(accepted_at=None)
+
+
+def test_contract_refuses_accepted_date_disagreeing_with_the_instant():
+    """A disagreeing date could advance availability by a whole session."""
+    with pytest.raises(ContractError, match="accepted date"):
+        _timestamp_availability(accepted_date=date(2026, 8, 19))
+
+
+def test_contract_refuses_timestamp_precision_with_the_date_only_rule():
+    with pytest.raises(ContractError, match="wrong execution rule"):
+        _timestamp_availability(
+            execution_rule=ExecutionRule.NEXT_REGULAR_OPEN_AFTER_ACCEPTANCE_DATE
+        )
+
+
+def test_contract_refuses_date_only_precision_carrying_an_instant():
+    """Date-only evidence must not be upgraded into an intraday instant."""
+    with pytest.raises(ContractError, match="contains an instant"):
+        _date_only_availability(accepted_at=ACCEPTED)
+
+
+def test_contract_refuses_date_only_precision_with_the_timestamp_rule():
+    with pytest.raises(ContractError, match="wrong execution rule"):
+        _date_only_availability(
+            execution_rule=ExecutionRule.NEXT_REGULAR_OPEN_AFTER_ACCEPTANCE
+        )

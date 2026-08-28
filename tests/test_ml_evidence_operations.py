@@ -369,6 +369,33 @@ def test_market_clock_conversion_is_after_close_across_host_zones_and_dst(
 
 
 WINDOWS_VERIFIER_REASON = "The verifier targets Windows PowerShell and Task Scheduler."
+
+# The installers refuse a Microsoft Store app execution alias as an
+# interpreter, because such an alias is a zero-byte reparse point that a
+# scheduled task cannot launch. That refusal is correct product behavior, so
+# an installer-preview test cannot run against an interpreter the installer
+# is required to reject. This predicate mirrors the installers' own
+# condition exactly (`$isReparse -or $item.Length -eq 0` in
+# scripts/install_windows_operational_tasks.ps1) so the skip boundary cannot
+# drift away from the enforcing boundary. lstat() is used deliberately:
+# stat() would follow the reparse point and report the target instead.
+STORE_ALIAS_INTERPRETER_REASON = (
+    "sys.executable is a Microsoft Store app execution alias, which the "
+    "task installers correctly refuse; run the suite under a python.org "
+    "interpreter or a virtual environment to exercise this check."
+)
+
+
+def _is_store_app_execution_alias(interpreter: Path) -> bool:
+    try:
+        stat_result = interpreter.lstat()
+    except OSError:
+        return False
+    is_reparse_point = bool(getattr(stat_result, "st_reparse_tag", 0))
+    return is_reparse_point or stat_result.st_size == 0
+
+
+INTERPRETER_IS_STORE_ALIAS = _is_store_app_execution_alias(Path(sys.executable))
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -759,6 +786,9 @@ def _task_checks(report: dict) -> dict[str, dict]:
 
 
 @pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+@pytest.mark.skipif(
+    INTERPRETER_IS_STORE_ALIAS, reason=STORE_ALIAS_INTERPRETER_REASON
+)
 def test_windows_verifier_green_actions_match_installer_whatif_previews(tmp_path):
     """Data-only installer previews are the source of truth for action strings.
 

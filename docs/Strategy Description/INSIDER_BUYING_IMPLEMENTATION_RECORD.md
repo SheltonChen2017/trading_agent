@@ -1,7 +1,8 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **PLANNED; NO INGEST, SIGNAL, OUTCOME TEST, ETF PORTFOLIO, OR QC
-ALGORITHM HAS BEEN IMPLEMENTED.**
+Status: **THE FIRST IB-0/IB-1 OFFLINE STRUCTURAL SLICE IS IMPLEMENTED. FULL
+INGEST, SIGNAL CONSTRUCTION, OUTCOME TESTING, ETF PORTFOLIO WORK, AND QC
+IMPLEMENTATION REMAIN UNSTARTED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -97,6 +98,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-27 | Codex validation | `29efc30` -> `29efc30` (exact isolated tested snapshot; this validation-record commit follows) | Portfolio-equity correction final validation | Revalidated the complete Insider Buying lane after its code and required lane-record commits in a detached isolated worktree pinned to `29efc30`; no product file changed during the run. | Complete exact-tree suite: **5,224 passed, 2 skipped, 0 failed, 25 dependency warnings in 1,832.32s (30m32s)**. The earlier focused 112-test suite, 63-test active-document suite, compileall, and diff checks were also green. Fixture-only; no SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | No new P0-P3 finding. `SYS-FU-P1-006` remains implemented but unaccepted pending the required review chain; IB-0/IB-1 remains unstarted. | Commit this validation record and push the complete three-commit lane range; Claude reviews every new commit before IB-0/IB-1 or any later milestone. |
 | 2026-08-28 | Claude review | `b4ba4b2` -> this review snapshot | Independent review of the owner-authorized shared remediation synchronization (`a4f58e6..b4ba4b2`, 16 commits) | Verified provenance by stable patch ID (12 of 13 synchronized commits patch-identical to their merged main-line counterparts; the single divergence correctly omits the analyst-only entry-point registration), confirmed the frozen-file freeze held, and reviewed every commit for fail-open, atomicity, money-type, and test-weakening defects. Corrected one confirmed defect and escalated one open P1. Full dispositions and the P0-P3 ledger are in section 6. | Complete suite at `8a65e3c`: 1 failed, 5,222 passed, 2 skipped in 29m07s (the failure is R-02, contradicting the recorded zero-failure claim on this host). After correction: affected file 49 passed, 1 skipped; import-boundary/entry-point/active-document 98 passed; execution-gate and characterization 76 passed; dispatch-fence and cancel-all 89 passed, 1 skipped; broker-binding suites 263 passed, 1 skipped; compileall exit 0; PowerShell parser 0 errors; `git diff --check` clean. Final complete suite on the exact pushed tree `58bf2f8`: **5,223 passed, 3 skipped, 0 failed, 25 warnings in 36m32s**. An intermediate complete run under host contention reported 6 `TimeoutExpired` failures against byte-identical code and is recorded as R-19 rather than omitted. Two mutations run and reverted cleanly. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, or scheduler access; **0 research looks**. | R-01 (P1, OPEN): strict snapshot coherence refuses submission on any price tick with no risk-reducing-sell exemption, conflicting with the CLAUDE.md section 5 exception; escalated for an owner decision rather than corrected on a lane branch. R-02 (P2) fixed in `1c1d943`. R-03 to R-08 recorded open for counter-review. A second audit then changed the `9406a34` disposition to defect-found: R-09 to R-15 are seven further P1 issues open at HEAD, four verified directly against this host, including a machine-global execution stop currently latched active by test-origin incidents. R-18 records that the same stop defeats cross-lane isolation; R-16, R-17, and R-19 are lower-severity. Nine P1 issues are open in total and none was corrected on this lane, because they are shared execution semantics synchronized from `main`. | Codex counter-reviews every Claude commit in this range, then may begin IB-0/IB-1 in one combined push. R-01 needs an explicit owner decision before it can be closed. IB-0/IB-1 remains unstarted. |
 | 2026-08-28 | Codex counter-review | `17c1bb2` -> this counter-review record commit | Counter-review of all five Claude commits after `b4ba4b2` | Re-read every diff in chronological order, independently verified the 13-commit provenance claim, reproduced the executable correction and material safety findings, generalized the affected paths, and recorded a superseding disposition for every R-01 through R-19 item in section 7. No shared production code was changed. | Stable patch IDs: 12 exact matches and the intended two-line Analyst-only omission in `800c689`; focused offline suite: **31 passed** in 30.88s; direct lifecycle probe mapped both `held` and `calculated` to critical `submission_unknown`; R-02 actual-interpreter test passed; R-07/R-15 deterministic component disagreement reproduced. `git diff --check` and active-document checks follow before commit. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | Accepted after documentation correction. R-04 is rejected as a false positive: the outer dispatch fence is acquired before authoritative snapshot capture and the adapter fence is same-thread re-entry. R-09's historical host condition is no longer current because the reported runtime-stop file is absent; its global-state mechanism remains covered by R-10/R-18. All other classifications and residual gates are retained as scoped in section 7. | Commit this counter-review checkpoint. Because no owner decision blocks offline structure work, proceed to the bounded IB-0/IB-1 milestone before one combined lane push. |
+| 2026-08-28 | Codex implementation | `4e51e14` -> this implementation record commit | IB-0/IB-1 offline structural contracts and fixture parser | Added a dependency-free `research/insider_buying` package, frozen canonical constants and zero-look authority, named include/exclude outcomes, exact/date-only public-availability contracts, SHA-256 source/event identities, original/amended accession lineage that retains every as-filed version, and a bounded XML fixture parser. Added four synthetic fixtures and dangerous-direction tests; no downloader, persisted dataset, security mapping, score engine, outcome, ETF, or execution surface exists. | Focused implementation suite: **25 passed**. Two reverse mutations were killed and restored. First complete run: **1 failed, 5,248 passed, 2 skipped** in 51m25s; the sole failure was a five-second subprocess timeout in a pre-existing dispatch-fence test. That test passed alone in 2.72s and its file passed 24 with 1 skip in 4.86s. Clean complete rerun on the unchanged code tree: **5,249 passed, 2 skipped, 0 failed, 25 warnings in 1h10m04s**. Final exact-tree checks follow below. No SEC/provider/credential/licensed-row/outcome/QC/broker/operator-database/scheduler access; **0 research looks**. | Self-review corrected four implementation issues before handoff. One shared P3 test-load finding, IB01-R05, remains open; no open P0-P3 finding exists in the new lane-owned diff. Section 8 retains every disposition. | Commit this milestone and push the combined counter-review plus implementation range for Claude review. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -355,3 +357,104 @@ the shared execution surface as operationally cleared.
 
 Counter-review gate: **PASS, accepted after documentation correction**. The
 next authorized step is the bounded offline IB-0/IB-1 milestone only.
+
+## 8. IB-0/IB-1 offline structural slice (2026-08-28)
+
+This is the deliberately bounded first implementation named in section 3.
+It does not claim that the full IB-0 preregistration or the full IB-1 ingest
+exit gate is complete. In particular, there is no network collector,
+quarterly-package schema, immutable disk publisher, security mapping, score
+engine, outcome join, ETF construction, or QuantConnect algorithm.
+
+### 8.1 Frozen contracts
+
+`research/insider_buying/contracts.py` pins the following before any outcome
+access:
+
+- canonical inputs: Form 4/4-A source family, with original Form 4 as the
+  primary row family; non-derivative common stock; code `P`; acquired `A`;
+  direct ownership; officer/director; and at least $50,000 of purchase value;
+- public acceptance time as availability, never transaction date. An exact
+  timezone-aware timestamp carries a next-regular-open-after-acceptance rule;
+  date-only metadata remains date-only and carries the more conservative
+  next-regular-open-after-that-date rule;
+- `ln(1 + purchase_value_usd / 50000)`, 20-trading-day half-life, and
+  30-trading-day lookback;
+- full event-study windows `1/5/10/20/40/60/120`, primary windows `5/20/60`,
+  and the required `0/5/10/20` bps-per-side cost grid; and
+- outcome access disabled and authorized outcome looks fixed at zero.
+
+The implementation names every canonical inclusion or quarantine reason.
+Form 5, Form 4/A rows, derivatives, multiple reporting owners, incomplete or
+ineligible roles, any 10% owner, non-common securities, non-purchase codes,
+disposals, indirect ownership, missing dates, nonpositive shares, price
+ranges, missing/nonpositive prices, private purchases, 10b5-1 transactions,
+sub-threshold value, and unresolved footnotes cannot silently enter V1.
+
+### 8.2 Offline parser and lineage
+
+`research/insider_buying/form4_xml.py` accepts only caller-supplied bytes and
+caller-supplied accession/acceptance metadata. It performs no file discovery
+or external access. Source bytes are capped at 2 MiB, DTD/entity declarations
+are refused before parsing, and the exact byte image is SHA-256 bound to the
+filing and every emitted transaction. All non-derivative and derivative
+transaction rows are retained with stable row indices and named outcomes.
+
+The in-memory corpus rejects duplicate accessions, missing amendment targets,
+cross-issuer amendment links, non-original targets, and amendments that do
+not follow an original when exact timestamps can establish order. It retains
+both the original and every amendment and records the explicit
+original-to-amendment edge; it never overwrites or deletes the as-filed row.
+This is the lineage contract for the future immutable publisher, not that
+publisher itself.
+
+All four XML fixtures are synthetic and repository-local. They contain no
+provider row, credential, licensed data, market outcome, or operating account
+information.
+
+### 8.3 Implementation self-review ledger
+
+Resolved findings are retained rather than erased.
+
+| ID | Sev | Status | Finding and disposition |
+|---|---|---|---|
+| IB01-R01 | P2 | **FIXED before commit** | The first focused run exposed a two-site inversion: the Form 5 input allowance had been applied to the classifier instead of the parser gate. That direction failed closed by refusing Form 5, but it prevented the required explicit `exclude_unsupported_form` record. The predicates were corrected and the Form 5 fixture now parses to exactly that named exclusion. |
+| IB01-R02 | P1 | **FIXED before commit** | DTD/entity screening initially examined only the first 4 KiB. A bounded payload could pad a declaration beyond that prefix and reach the XML parser. The check now examines the complete, already size-capped byte image; a 5-KiB-padding regression verifies the boundary. |
+| IB01-R03 | P1 | **FIXED before commit** | The first role predicate excluded a 10% owner only when the person was neither officer nor director. That could silently mix an officer/director carrying the 10% flag into canonical V1, contrary to the frozen lane contract. Any true 10% flag now produces `exclude_ten_percent_owner`; the combined-role regression passes. |
+| IB01-R04 | P2 | **FIXED before commit** | Amendment lineage compared only acceptance dates, so equal exact timestamps were accepted. When both instants are known the amendment must now be strictly later; date-only metadata remains explicitly uncertain and conservatively date-scoped. |
+| IB01-R05 | P3 | **OPEN - shared test harness, not caused by this milestone** | The first complete run timed out `test_dispatch_fence_serializes_independent_processes` while waiting five seconds for its Python child process. The same test passed alone in 2.72 seconds, its complete file passed 24 with one platform skip in 4.86 seconds, and the unchanged code tree then passed the complete suite. Like R-19, this is a load-fragile subprocess budget; unlike R-19 it is a separate five-second timeout in `tests/test_dispatch_fence.py`. No shared-test correction is authorized on this lane. |
+
+Open findings in this new lane-owned diff: **none at P0-P3**. IB01-R05 is an
+open shared test-harness finding observed during validation, not an Insider
+code defect. The shared execution findings retained in section 7 remain open
+and unchanged; this offline package has no import path to those surfaces.
+
+### 8.4 Verification
+
+- Focused structural/parser suite: **25 passed**.
+- Joint-owner reverse mutation (`len(owners) != 1` weakened to `< 1`): the
+  joint-owner regression failed because the row incorrectly entered V1.
+- Amendment reverse mutation (amended-form predicate reversed): the lineage
+  regression failed because the amendment incorrectly entered V1.
+- Both mutations were reverted with patches; the complete focused suite then
+  returned to **25 passed**.
+- Package compileall: exit 0. `git diff --check`: clean.
+- First complete run: **1 failed, 5,248 passed, 2 skipped, 25 warnings in
+  3,085.83 seconds (51m25s)**. The only failure was the five-second
+  subprocess timeout retained as IB01-R05; it was not omitted.
+- Immediate reproduction on the unchanged tree: the exact timed-out test
+  passed in 2.72 seconds, then all of `tests/test_dispatch_fence.py` passed
+  **24 tests with 1 platform skip** in 4.86 seconds.
+- Clean complete rerun on the unchanged code tree: **5,249 passed, 2 skipped,
+  0 failed, 25 warnings in 4,204.91 seconds (1h10m04s)**.
+- Final focused plus active-document suite: **88 passed** in 4.84 seconds.
+  Whole-repository compileall exited 0; staged `git diff --check` was clean;
+  the staged file list contains only the lane-owned package, synthetic
+  fixtures, tests, and this record; and the branch remained
+  `codex/strategy-insider-buying` in its dedicated worktree. A final read-only
+  check also confirmed the machine-global runtime-stop file remained absent.
+
+Research-look ledger for this milestone: **0**. No outcomes were loaded or
+computed, and no SEC/provider, credential, licensed row, QuantConnect,
+broker, operator database, scheduler, deployment, or order surface was
+accessed.

@@ -4,7 +4,7 @@ from __future__ import annotations
 import ast
 import copy
 import json
-from dataclasses import replace
+from dataclasses import fields, replace
 from pathlib import Path
 
 import pytest
@@ -179,3 +179,33 @@ def test_canonical_modules_never_import_daily_short_volume_module():
                 )
                 if node.module:
                     assert not node.module.endswith(".daily_short_volume")
+
+
+def test_snapshot_subclass_cannot_substitute_for_the_exact_canonical_type():
+    """Both boundaries require the exact type, not merely an instance of it.
+
+    ``isinstance`` would admit a subclass that overrides validated behaviour --
+    an availability property, a denominator, or ``to_payload`` -- and carry
+    non-canonical semantics into the immutable dataset under a canonical name.
+    The daily-volume record is a separate class, so it is rejected either way;
+    only a subclass distinguishes the exact-type rule from ``isinstance`` and
+    keeps that deliberate predicate mutation-sensitive.
+    """
+    vintage = load_synthetic_fixture(FIXTURE)
+    genuine = vintage.snapshots[0]
+
+    class SubclassedSnapshot(type(genuine)):
+        pass
+
+    impostor = SubclassedSnapshot(
+        **{field.name: getattr(genuine, field.name) for field in fields(genuine)}
+    )
+    assert isinstance(impostor, type(genuine))
+    assert type(impostor) is not type(genuine)
+
+    with pytest.raises(ShortInterestDatasetError, match="exact ShortInterestSnapshot"):
+        build_vintage(
+            vintage.manifest, vintage.release_calendar, (impostor,)
+        )
+    with pytest.raises(ShortInterestContractError, match="daily volume is forbidden"):
+        snapshot_execution_cohort(impostor, vintage.release_calendar[0])

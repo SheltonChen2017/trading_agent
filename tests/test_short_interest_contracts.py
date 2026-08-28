@@ -244,3 +244,22 @@ def test_direct_nested_contracts_round_trip_strictly():
         DenominatorObservation.from_payload(snapshot.denominator.to_payload())
         == snapshot.denominator
     )
+
+
+def test_collection_manifest_digest_is_deterministic_and_content_bound():
+    """The manifest's own content digest must react to any manifest fact.
+
+    Nothing consumes this property yet, so without a test it can silently stop
+    identifying the manifest -- returning a constant, or ignoring a field --
+    and the first consumer would inherit a digest that cannot distinguish two
+    different collections. Pinning it now keeps the frozen contract honest.
+    """
+    manifest = CollectionManifest.from_payload(_fixture_payload()["manifest"])
+    digest = manifest.sha256
+
+    assert len(digest) == 64
+    assert digest == CollectionManifest.from_payload(
+        _fixture_payload()["manifest"]
+    ).sha256
+    assert digest != replace(manifest, snapshot_name="other-fixture-name").sha256
+    assert digest != replace(manifest, source_version="2026-08-28.v2").sha256

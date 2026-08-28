@@ -711,3 +711,70 @@ def test_unknown_float_and_unprefixed_dataset_id_refuse(tmp_path: Path) -> None:
     _rehash(unprefixed)
     with pytest.raises(PreregistrationError, match="arv2_ds"):
         load_reviewed_preregistration(_write(tmp_path, unprefixed))
+
+
+def _candidate_rehash(raw: dict[str, object]) -> None:
+    _rehash(raw)
+    raw["spec_id"] = f"arv2-round0-candidate-{raw['spec_hash'][:16]}"
+
+
+@pytest.mark.parametrize(
+    ("mutate", "match"),
+    [
+        # Each case carries EXACTLY ONE violation, so removing any single
+        # loader guard turns its case red. The earlier bundled test combined a
+        # source violation with a look violation, which let the look guard be
+        # deleted while the source guard kept the test green.
+        (
+            lambda raw: raw["looks"][0].update(dataset_id=DATASET_ID),
+            "unbound and non-executable",
+        ),
+        (
+            lambda raw: raw["looks"][0].update(code_identity=HASH_A),
+            "unbound and non-executable",
+        ),
+        (
+            lambda raw: _cell(raw, "corporate_action_contract")["value"].update(
+                source_id="invented"
+            ),
+            "explicitly unbound",
+        ),
+        (
+            lambda raw: _cell(raw, "universe_contract")["value"].update(
+                security_master_sha256=HASH_A
+            ),
+            "explicitly unbound",
+        ),
+        (
+            lambda raw: _cell(raw, "multiplicity_family")["value"].update(
+                alpha="0.5"
+            ),
+            "alpha must remain 0.05",
+        ),
+        (
+            lambda raw: _cell(raw, "walk_forward_contract")["value"].update(
+                embargo_sessions=5
+            ),
+            "embargo",
+        ),
+        (
+            lambda raw: _cell(raw, "portfolio_contract")["value"].update(
+                leverage=True
+            ),
+            "hard caps",
+        ),
+    ],
+)
+def test_candidate_refuses_each_single_violation_alone(tmp_path, mutate, match):
+    """One violation per case, correctly re-hashed, must refuse on semantics.
+
+    A correctly recomputed content hash and spec_id must never launder a
+    weakened policy value or a premature evidence binding, and each guard must
+    carry its own regression rather than hiding behind a sibling violation in
+    the same fixture.
+    """
+    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    mutate(raw)
+    _candidate_rehash(raw)
+    with pytest.raises(PreregistrationError, match=match):
+        load_draft_preregistration(_write(tmp_path, raw))

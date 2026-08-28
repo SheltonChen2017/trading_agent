@@ -507,6 +507,82 @@ permanent-look authority are unchanged. Focused preregistration validation is
 recorded in the push row after the final tree is tested. No provider or
 outcome access occurred; **0 research looks**.
 
+## 4C. Independent Claude review of the counter-review and ARV2-0 freeze, 2026-08-28
+
+**Range reviewed:** `bd3393d..b912459`, three commits, each disposed below.
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, 0 P2, 2 P3 (both
+corrected by this review). **Zero research looks.** No provider, credential,
+licensed row, price, return, outcome, broker, operator-database, QuantConnect
+or scheduler access occurred.
+
+### 4C.1 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `7f493d1` | Accepted | Counter-review of the inherited correction set. Verified byte-level that my six corrections entered unmodified (`portfolio_snapshot.py`, `ml/earnings_gap.py`, the CLR-009 locks, and four test modules). Codex's two modifications are genuine improvements: ARV2CR-001 accepts the legacy float-derived journal header alongside the exact header, preventing the `LedgerError`-on-resync my version would have raised against every journal written before exact digits were consumed, without weakening conflict detection; ARV2CR-003 replaces my define-only lock test with an AST audit of every registry access site, pins the five-file inventory, and self-tests the audit both ways. **The rejection of my CLR-003 fix is confirmed correct**: I independently traced the fenced pre-submit body to `TradingClient` SDK calls carrying no local timeout, so my `3 × 30 s` premise was factually wrong, and the 180 s wait would stack to roughly 420 s of pure waiting before any cancellation under a stuck holder — trading prompt risk reduction for an unproven completeness bound. CLR-003 stays open pending a structural design. |
+| `c83782d` | Accepted | Documentation-only record of the owner's explicit `push` instruction as a narrow exception to the stop-before-push consequence; scope stated accurately. |
+| `b912459` | Accepted after correction | The ARV2-0 owner-decision freeze. Content verified against the loader, not the prose (§4C.2). Correction: two guard-test sensitivity gaps (§4C.3). |
+
+### 4C.2 Independent verification of the freeze
+
+- The candidate loader was executed directly: status
+  `owner_decisions_frozen_pending_external_bindings_and_review`, zero
+  unresolved owner decisions, exactly the eight declared pending external
+  bindings, one `planned_unbound` look; `load_reviewed_preregistration`
+  refuses the same artifact.
+- **Nine re-hashed weakening attempts all refused on semantic pins**, proving
+  the pins hold independently of the content hash: `etf_cap` 0.20→0.50,
+  `leverage` true, validation end moved into the shared holdout, embargo
+  20→5, alpha 0.05→0.5, a second smuggled stock cell, look state
+  `planned_unbound`→`registered_unspent`, status→`reviewed_frozen`, and
+  deletion of the contaminated-period inventory.
+- The full zero-access probe re-ran unchanged at this head: all six research
+  source kinds refuse, the outcome loader never executes, forged permits and
+  a self-consistent forged policy are rejected, the legacy runners refuse,
+  and no non-empty portfolio is constructible.
+- Internal consistency of the frozen dates verified: lane one-shot validation
+  2026-09-01→2027-08-31 is **prospective**, ends exactly at the shared cutoff,
+  precedes the reserved holdout 2027-09-01→2029-08-31, does not overlap the
+  discovery-only contaminated interval 2019-07-16→2026-07-23, and historical
+  development (2013-01-02→2026-08-31) ends before prospective validation
+  begins. Embargo and bootstrap block both equal the 20-session horizon
+  floor.
+- No frozen shared file was touched anywhere in the range (verified by name
+  against the Action Plan, Session Handoff, coordination documents,
+  `requirements.txt`, `config.py`, and `AGENTS.md`).
+
+### 4C.3 Findings
+
+| ID | Pri | Status | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|---|
+| ARV2R2-001 | P3 | **Corrected** | `tests/test_analyst_revisions_v2_preregistration.py` | The candidate-binding test bundled a source violation and a look violation in one fixture, so deleting the look `dataset_id`/`code_identity` guard from the loader left the whole suite green — the companion source violation carried the test. Demonstrated by mutation: removing the guard, 35/35 still passed. | Added single-violation parametrized cases: look `dataset_id` alone, look `code_identity` alone, corporate `source_id` alone, universe `security_master_sha256` alone, plus embargo and leverage single-violation cases, each correctly re-hashed so only semantics can refuse. | Re-ran the mutation: 2 cases fail; restored tree green. |
+| ARV2R2-002 | P3 | **Corrected** | same file | Nothing covered the `alpha` 0.05 pin: removing it from the loader left the suite green, after which a correctly re-hashed candidate carrying `alpha: "0.5"` loads — a twentyfold multiplicity-budget weakening laundered through a valid hash. | Single-violation case tampering `alpha` to `0.5` with a correct re-hash, expecting the exact refusal. | Re-ran the mutation: the alpha case fails; restored tree green. |
+
+Both are test-sensitivity findings: the production guards themselves were
+present and working (my tamper probe refused both weakenings before any test
+existed for them).
+
+### 4C.4 Validation
+
+- As-received head `b912459`: full suite **5,453 passed, 3 skipped, 0 failed,
+  25 known dependency warnings in 2,174.92 s**, independently reproducing the
+  freeze row's exact claim.
+- Focused battery over every file the range touched: **469 passed, 1
+  skipped**; preregistration file after the new tests: **42 passed**.
+- Full suite re-run on the exact final code tree containing the new
+  regression tests, with the result recorded in this push's commit message;
+  `compileall` over every package exit 0; `git diff --check` clean.
+
+### 4C.5 Next step
+
+Codex counter-reviews this exact pushed head — the two test corrections and
+this record — before accepting ARV2-0 or combining that disposition with the
+next authorized bounded milestone. The reviewed spec anchor, audited
+corporate-action/security-master sources, dataset and code identities,
+vendor-to-QC processing rights, and the external append-only permanent-look
+authority all remain required before ARV2-1 or any outcome access; CLR-003
+remains open in shared execution code.
+
 ## 5. Session / push ledger
 
 Append one row before every push. Never rewrite earlier rows.
@@ -521,3 +597,4 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-27 | Codex counter-review | `bd3393d` -> this commit | Counter-review both pushed Claude commits and complete the inherited correction set on this one lane | Stayed on `codex/strategy-analyst-revisions-v2` in the dedicated worktree. Accepted `48a8b08` and `bd3393d`; independently reviewed every inherited correction. Retained CLR-002/004/006/007/008 and CLR-009 production locking, fixed exact-fill retry/legacy compatibility and lock-test sensitivity, and rejected/reverted the unsupported CLR-003 180 s delay. Consolidated the separate report into this required branch-specific record and removed the duplicate live copy. | Focused final-tree suite: **334 passed, 1 skipped, 1 known dependency warning in 351.68 s**; isolated new regressions: **9 passed in 10.65 s**. Exact full-tree result and compile/diff evidence are recorded before commit. No provider, credential, licensed row, outcome, broker, operator database, QuantConnect, scheduler, or order access; **0 research looks**. | 0 P0, 0 P1, 2 P2, 1 P3 in the proposed correction set: ARV2CR-001 and ARV2CR-003 corrected; ARV2CR-002 caused the attempted fix to be reverted and CLR-003 to remain explicitly open. The existing candidate is accepted after correction. | ARV2-0 is the next milestone but is blocked by eight owner decisions plus empty reviewed-spec/source/look authorities. Per the same-branch workflow, stop before ARV2-1 and before push; commit the counter-review locally and request owner direction. |
 | 2026-08-27 | Codex push authorization | `7f493d1` -> this record commit | Owner-directed counter-review-only push | After Codex reported the ARV2-0 owner-decision blocker and the normal stop-before-push consequence, the owner explicitly instructed: `push`. This is recorded as a narrow exception for the completed counter-review series only; no next-milestone implementation was added. | Documentation-only update after the exact counter-review validation above; final active-document gate and diff check rerun before commit. No provider, credential, licensed row, outcome, broker, operator database, QuantConnect, scheduler, or order access; **0 research looks**. | No new P0-P3 finding. CLR-003 remains open; all eight ARV2-0 owner-decision cells and all zero-access authorities remain unchanged. | Push the exact two-commit local range once. Remain stopped before ARV2-1 pending the recorded owner decisions and authority gates. |
 | 2026-08-28 | Codex implementation | `c83782d` -> this commit | ARV2-0 owner-decision freeze candidate | Resolved all eight owner-decision cells under the owner's risk/profit direction; added the all-history plus objective/named-regime evaluation contract; made the candidate content-addressed; split frozen source policy from still-null external evidence; froze one stock-primary cell and one planned, unbound permanent look. Extended universe and normalization schemas to encode the exact owner choices rather than vague fallback text. No branch was created or switched. | Final exact worktree: **5,453 passed, 3 skipped, 0 failed, 25 known dependency warnings in 1,974.84s (32m54s)**; final focused preregistration file **35 passed**; repository compileall exit 0; final active-document and diff/status gates recorded immediately before commit. No credential, provider row, licensed artifact, price, return, outcome, broker, operator database, QuantConnect job, scheduler, or order access; **0 research looks and no permanent look consumed**. | 0 new P0-P3 findings. One broad-suite failure was only a stale expected error-message substring after the multiplicity guard was strengthened; the diagnostic was corrected and the exact full tree passed. Candidate remains unreviewed and zero-access. | Push this one bounded commit to the existing lane. Claude independently reviews the exact pushed snapshot and pushes its disposition/corrections on this branch. Codex then counter-reviews every Claude commit before ARV2-1 or any source audit/outcome work. |
+| 2026-08-28 | Claude review | `b912459` -> this commit | Independent review of the counter-review push and the ARV2-0 owner-decision freeze | Reviewed all three commits in `bd3393d..b912459` with an explicit disposition each (section 4C): counter-review `7f493d1` accepted, including independent confirmation that rejecting my CLR-003 attempt was correct; push record `c83782d` accepted; freeze `b912459` accepted after correction. Verified my six inherited corrections entered byte-identical and that Codex's two modifications (journal retry compatibility, AST lock audit) are genuine improvements. Ran the candidate loader directly; nine correctly re-hashed weakening attempts all refused on semantic pins; the reviewed-spec path refuses the candidate; the complete zero-access probe is unchanged. Corrected two guard-test sensitivity gaps (ARV2R2-001/002) with seven single-violation regression cases in `tests/test_analyst_revisions_v2_preregistration.py`; no production file changed. Stayed on this one lane branch; single combined push. | As-received `b912459`: full suite **5,453 passed, 3 skipped, 0 failed, 25 known warnings in 2,174.92s**, exactly reproducing the freeze row's claim. Final code tree with the new tests: full-suite result in this push's commit message; focused battery 469 passed, 1 skipped; preregistration file 42 passed; both mutations now turn the new tests red and the restored tree is green; compileall exit 0; `git diff --check` clean. No provider, credential, licensed row, price, return, outcome, broker, operator-database, QuantConnect or scheduler access. **0 research looks.** | 0 P0, 0 P1, 0 P2, 2 P3 - both corrected and mutation-verified. The production guards were never absent (the tamper probe refused both weakenings); the gaps were test sensitivity only. CLR-003 remains open in shared execution code with the loud incomplete-containment behavior as the interim. | Codex counter-reviews this exact pushed head before accepting ARV2-0 or combining that disposition with the next authorized bounded milestone. ARV2-1, source admission, review anchoring and any outcome authority remain gated as recorded in sections 3A/4/4B. |

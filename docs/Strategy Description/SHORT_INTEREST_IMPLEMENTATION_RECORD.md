@@ -1,7 +1,8 @@
 # Short Interest ETF Strategy — implementation and session record
 
 Status: **SI-0/SI-1 SOURCE-CONTRACT AND SYNTHETIC-FIXTURE TRANCHE
-IMPLEMENTED AT `c821b10`; PENDING CLAUDE REVIEW. NO LICENSED INGEST, SIGNAL,
+IMPLEMENTED AT `c821b10` AND REVIEWED BY CLAUDE AT `11063c7` (ACCEPTED
+AFTER CORRECTION); PENDING CODEX COUNTER-REVIEW. NO LICENSED INGEST, SIGNAL,
 OUTCOME TEST, ETF PORTFOLIO, OR QC ALGORITHM HAS BEEN IMPLEMENTED.**
 
 Branch: `codex/strategy-short-interest`
@@ -105,6 +106,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-28 | Claude review | `a4f58e6` -> `d28fb3d` reviewed; corrections at `54c678c` (this record commit follows) | Independent review of the owner-authorized common-remediation synchronization and the shared portfolio-equity correction | Reviewed all 16 pushed commits individually. Verified the synchronization is faithful rather than accepting it: 11 of the 12 shared code commits are patch-identical to their merged `main` originals, and the single difference (`2e4748b` vs `8cab638`) is exactly the required removal of the Analyst-only `research/analyst_revisions_v2` licensed-surface entry. No Analyst or Insider content, no frozen shared file, and no Short Interest strategy code entered this lane. | Complete suite on the exact code tree `54c678c`: **5,225 passed, 3 skipped, 0 failed, 25 known dependency warnings in 2,310.10s (38m30s)**. The count reconciles arithmetically against the pre-correction run on this host (5,223 passed / 1 failed / 2 skipped at `d28fb3d`): the non-portable preview test moved from failed to skipped and the new parametrized guard contributed two passes, giving 5,228 collected in both runs. The 63-check active-document suite was rerun green against this record's final text, which is documentation-only and inert to every other test. Focused: 51 passed / 1 skipped in `test_ml_evidence_operations.py`; 72 passed across fault-matrix, proposals and data-integrity; 35 passed across the import-boundary and entry-point manifests. Two mutations run: removing the alias guard from both installers turned my new test red (2 failed) and restore returned it green; reverting the equity fix to per-position summing turned Codex's new test red, independently confirming their claim. compileall exit 0; `git diff --check` clean; 0 PowerShell parser errors across `scripts/`; blueprint SHA-256 re-verified as `2f7ccff9...45b14c`. No provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or order access; **0 research looks**. | Two P2 findings, both confirmed and corrected in `54c678c`: a non-portable installer-preview harness that failed the suite on the owner's documented Store-Python host, and a new interpreter-alias safety guard shipped with no behavioral coverage. No P0 or P1 found. Details in section 6. | Codex counter-reviews this Claude commit. Synchronization and this review are not acceptance of SI-0/SI-1, which remains unstarted and still blocked on the licensed historical/vintage short-interest source. |
 | 2026-08-28 | Codex counter-review | `da798f0` -> `60d181a` (correction; this record commit follows) | Counter-review of Claude commits `54c678c` and `da798f0` | Dispositioned both Claude commits, corrected the installer-test coverage regression, and reconciled the review record's scope, arithmetic, shared-file, metadata, and next-step claims in section 7. The earlier Claude row is retained verbatim as historical evidence; section 7 explicitly supersedes its inaccurate clauses. | Pre-correction: the two zero-byte refusal cases passed while the eight-task parity test skipped on the documented Store-Python host. Corrected focused run: **5 passed** (one parity plus four zero-byte/reparse cases). Reverse mutation to the Store alias failed the parity test as intended: **1 failed in 3.44s**; restore returned all five focused cases green. `git diff --check` clean. Python 3.13.14, pytest 9.1.1. No provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | No P0/P1. `SI-CCR-001` P2 and `SI-CCR-002`/`003`/`004` P3 are closed by `60d181a` and this record correction; details in section 7. | Commit the counter-review record. The owner has now explicitly authorized the fixture-only SI-0/SI-1 source-contract tranche; licensed history remains a later full-ingest gate, not a blocker to synthetic contracts and fixtures. |
 | 2026-08-28 | Codex implementation | `1de489c` -> `c821b10` (exact code snapshot; this lane-record commit follows) | SI-0/SI-1 source-contract and synthetic-fixture tranche | Added a lane-owned, outcome-free `research/short_interest_etf` package that freezes preregistration, official-snapshot/source/release/revision/security/volume/denominator contracts, conservative next-open availability, named refusals, stable-ID prior-cycle validation, append-only revisions, authenticated immutable vintage storage, and a separate noncanonical daily-short-volume type. Added one two-cycle synthetic official-style fixture and 66 dangerous-direction tests. No signal, provider adapter, licensed ingest, outcome join, ETF, or QC code was added. | Exact tree `c821b10`: **5,294 passed, 2 skipped, 0 failed, 25 known dependency warnings in 2,724.14s (45m24s)**. Final focused set: **77 passed in 18.24s**; 66 new Short Interest tests collected. Four reverse mutations each turned its guard red before textual restore: settlement/publication separation, full-payload event identity, immediate release-calendar prior linkage, and immutable-writer preflight. Full compileall exit 0; `git diff --check` clean. Python 3.13.14, pytest 9.1.1. Synthetic fixture only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. | Independent read-only code and adversarial reviews found P1 temporal/prior-link gaps, P2 identity/storage/boundary gaps, and P3 numeric-contract gaps; all were corrected before `c821b10`. Both final dispositions are accepted-after-correction with no remaining P0-P3. Details in section 8. | Finalize and commit this lane record, then push the complete post-`da798f0` range once. Claude independently reviews the exact pushed range before any later implementation. Full licensed SI-1 remains gated on owner-approved historical/vintage data and release/identity/denominator entitlements. |
+| 2026-08-28 | Claude review | `da798f0` -> `fee1978` reviewed; corrections at `11063c7` (this record commit follows) | Independent review of the Codex counter-review and the SI-0/SI-1 source-contract and synthetic-fixture tranche | Reviewed all four pushed commits individually. Accepted every finding of the Codex counter-review against my own prior work, including two that were my errors. Audited the new lane package against the owner PDF's frozen V1 specification and the section 3 bounded scope: the preregistration matches the blueprint exactly, the fixture is synthetic (`entitlement: synthetic_fixture_only`, ticker `SYN`), and no signal, ETF, portfolio, provider adapter, licensed ingest, outcome join, or QC code was added. | Complete suite in a clean detached worktree pinned to `11063c7`: **5,296 passed, 2 skipped, 0 failed, 25 known dependency warnings in 3,118.72s (51m59s)**. This independently confirms the implementer's 5,294-pass claim at `c821b10`: my tree is that tree plus exactly my two new tests (5,294 + 2 = 5,296) with the two skips unchanged. Lane suite 68 passed. Ten mutations run: four probing mutations survived and exposed the two findings plus one advisory; my two new guards each turn red against two independent mutants and green on restore; and two of Codex's four claimed mutations were reproduced independently (settlement/publication separation and full-payload event identity each turned exactly one test red). compileall exit 0; `git diff --check` clean. Synthetic fixture only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | Two P3 findings confirmed and corrected in `11063c7`; three P3 advisory observations recorded with no code change. No P0, P1, or P2. Details in section 9. | Codex counter-reviews `11063c7` and this record commit. Full licensed SI-1 ingest remains gated on owner-approved historical/vintage data, archived FINRA dissemination evidence, and identity/denominator entitlements. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -402,3 +404,131 @@ Commit this record and push the complete range after
 reviews every pushed Codex commit on this same lane. Codex must counter-review
 every resulting Claude commit before any later milestone. No later
 implementation is authorized by this entry.
+
+## 9. Claude independent review - 2026-08-28 (counter-review and SI-0/SI-1 source-contract tranche)
+
+Reviewer: Claude, dedicated Short Interest lane session, isolated worktree
+`C:\git\customizedAgent\trading_agent_short_interest`. Governing documents:
+`CLAUDE.md`, `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`,
+`THREE_STRATEGY_PARALLEL_WORKFLOW.md`, and the owner blueprint
+`SHORT_INTEREST_ETF_STRATEGY_BLUEPRINT_EN.pdf`.
+
+**Disposition: accepted after correction.** No P0, P1, or P2 issue was found.
+Two P3 issues were confirmed and corrected; three P3 advisory observations are
+recorded without a code change. Accepting this tranche accepts an offline
+contract and fixture boundary only. It creates no market evidence, completes no
+research milestone, and authorizes no later implementation.
+
+### 9.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous reviewed head | `da798f073160dfd8074ff87b19ac942456f9c60c` |
+| Reviewed remote head | `fee1978e6854468f4c0dbae51fcb0823107aef43` |
+| Ordered reviewed range | `da798f0..fee1978` (4 commits, no merge commit) |
+| Ancestry | `da798f0` is an ancestor of `fee1978`; clean fast-forward, no rebase, and both earlier Claude commits are preserved |
+| Claude correction commit | `11063c7` |
+| Python / pytest | 3.13.14 / 9.1.1 |
+
+### 9.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `60d181a` | Preserve installer preview coverage in counter-review | accepted |
+| 2 | `1de489c` | Record short-interest counter-review | accepted |
+| 3 | `c821b10` | Implement short-interest source contracts and fixtures | **accepted after correction** (`SI-CR2-001`, `SI-CR2-002`) |
+| 4 | `fee1978` | Record short-interest source-contract milestone | accepted |
+
+### 9.3 The counter-review against my own prior work is accepted in full
+
+All four Codex findings were independently checked rather than conceded.
+
+- `SI-CCR-001` (P2) is **correct and its fix is better than mine**. My skip gave
+  up the successful-path eight-task parity contract on the owner's own host.
+  I had wrongly concluded the real interpreter was unusable: the ACL-denied
+  binary is `python.exe` inside the package directory, while the running
+  process image that `60d181a` resolves is `python3.13.exe`, which executes
+  normally. Verified here: the five focused cases pass on this Store-Python
+  host. The mocked `Get-Item` used for the reparse-only predicate is safely
+  scoped, because each installer calls `Get-Item` exactly once.
+- `SI-CCR-002` (P3) is correct. Section 3 authorizes a fixture-only tranche and
+  forbids downloading licensed history, so naming licensed data as an SI-0/SI-1
+  blocker conflated full ingest with the synthetic contract scope.
+- `SI-CCR-003` (P3) is correct and was my arithmetic error. The pre-correction
+  run collected 5,226, not 5,228; only the corrected tree collected 5,228.
+- `SI-CCR-004` (P3) is correct. Shared coordination files, `AGENTS.md`,
+  `architecture/entry_points.json`, and shared tests did enter this lane under
+  the authorized one-time synchronization, so "no frozen shared file entered
+  this lane" overstated isolation. The accurate statement is that no shared
+  file changed outside that authorization and no Analyst-only content entered.
+
+### 9.4 P0-P3 issue ledger
+
+Resolved items are retained. There are no P0, P1, or P2 findings.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR2-001 | P3 | Closed | `c821b10` | `research/short_interest_etf/dataset.py` snapshot type check; `research/short_interest_etf/availability.py` `snapshot_execution_cohort` | Both boundaries deliberately require the exact `ShortInterestSnapshot` type, and their error text advertises that rule, but no test distinguished it from `isinstance`. A later simplification to `isinstance` would admit a subclass that overrides validated behaviour and carry non-canonical semantics into the immutable dataset under a canonical name, with no test turning red. | Replacing the dataset check with `isinstance` left 26 tests green; replacing the availability check with `isinstance` left 20 tests green. No lane test constructs a subclass; the daily-volume record is a separate class and is refused either way. | A deliberate fail-closed predicate must stay mutation-sensitive; this is the same standard the counter-review correctly applied to my own unpinned reparse predicate. | Added `test_snapshot_subclass_cannot_substitute_for_the_exact_canonical_type`, which builds a subclass impostor from the fixture snapshot and requires both boundaries to reject it. | The new test turns red against the mutated dataset check and against the mutated availability check, and returns green after textual restore of each. |
+| SI-CR2-002 | P3 | Closed | `c821b10` | `research/short_interest_etf/contracts.py` `CollectionManifest.sha256` | The manifest's own content digest is reached by no caller in the package and by none of the 67 lane tests, so it could silently stop identifying its manifest and the first consumer would inherit a digest that cannot distinguish two collections. | Replacing the property body with `raise AssertionError` left all 67 lane tests green, proving it is never evaluated. The sibling `PREREGISTRATION.sha256` is both consumed by dataset lineage and asserted by a test. | A frozen contract's identity surface must be pinned rather than left unexercised, and pinning is less destructive than removing a property a later consumer is expected to use. | Added `test_collection_manifest_digest_is_deterministic_and_content_bound`, asserting a stable 64-character digest, reproducibility, and sensitivity to two independent manifest facts. | The new test turns red against a constant-digest mutant and against a mutant that drops one field before hashing, and green on restore. |
+| SI-CR2-003 | P3 | Open (advisory, no change) | `c821b10` | `research/short_interest_etf/availability.py` `release_execution_cohort` | The `cohort.session <= release.settlement_date` fallthrough is unreachable: `contracts.py:358` already refuses any release whose date does not strictly follow settlement, and an exact release timestamp must carry the same Eastern date. | Replacing the whole branch with `if False:` left the 12 availability tests green, because no constructible input reaches it. | No fix is proposed. The branch is deliberate defence in depth and section 8.2 already describes it as defensive. It is recorded so that a future reader does not mistake a surviving mutation there for a coverage hole. | None. | Reachability traced to the constructor invariants at `contracts.py:358` and the Eastern-date pin. |
+| SI-CR2-004 | P3 | Open (advisory, no change) | `c821b10` | `research/short_interest_etf/availability.py` `snapshot_execution_cohort` | The conservative rule selects the latest cohort with `max(..., key=lambda cohort: cohort.opens_at)` over ISO strings. Lexicographic order matches chronological order only while every value has identical width, because `2026-08-11T13:30:00.5Z` sorts before `2026-08-11T13:30:00Z`. | Verified empirically that `session_open_instant` yields microsecond 0 for regular and half-day sessions, so every `opens_at` is whole-second and the current comparison is correct. | No current defect and therefore no change. Recorded because this is the single most safety-critical function in the lane, and comparing the parsed instant would remove the latent ordering hazard permanently if sub-second availability is ever introduced. | None. | Empirical precision check across regular and early-close sessions. |
+| SI-CR2-005 | P3 | Open (advisory, no change) | `c821b10` | `research/short_interest_etf/dataset.py` import of `ml.immutable_io` | The lane package depends on `ml`. This is correct today, but it means the lane package can never be imported by execution-capable code without breaching the ML import boundary. | `ml/immutable_io.py` is the only immutable-byte publisher in the repository, so reuse is right and a parallel copy would be worse; nothing under `assistant/`, `execution/`, `risk/`, or `scripts/` imports the lane package, so no transitive path exists; and the lane's own boundary test allow-lists the module explicitly. | No fix. Recorded as a forward constraint for SI-7 and the later integration milestone, when a QuantConnect or execution-adjacent consumer would have to take a non-`ml` path to immutable storage. | None. | Import graph inspected from the execution-capable roots and from the lane package. |
+
+### 9.5 Independent verification of the implementation
+
+- **Frozen specification matches the owner PDF.** The preregistration pins the
+  official open-short-position semantic, XNYS, canonical PIT shares outstanding
+  with audited float preferred, the `S0`-`S4` family with canonical `S1`, a
+  20-session diagnostic, 10 bps primary cost with 0/5/20 sensitivity, unlevered
+  V1, and a **zero outcome-look budget**. Every field is `init=False`, so a
+  caller cannot override a frozen choice. These agree with the blueprint's
+  frozen V1 specification and with section 1 of this record.
+- **The fixture is synthetic.** `fixture_kind` is
+  `synthetic-short-interest-official-style-v1`, the manifest entitlement is
+  `synthetic_fixture_only`, the source is `synthetic-official-style-short-
+  interest`, and the only security is the invented `SYN` / `sec-synth-001`. No
+  licensed row is present, consistent with the section 3 prohibition.
+- **Scope is respected.** The range adds no signal computation, ETF
+  aggregation, portfolio, provider adapter, credential use, outcome join, or
+  QuantConnect artefact. It touches no other lane and no shared file.
+- **The daily-short-volume firewall holds at four independent levels**: a
+  separate class that is not a subclass, absence from the package exports, an
+  exact-type refusal at both the dataset and availability boundaries, and an
+  AST guard that forbids canonical modules from importing the quarantined
+  module. Its refusal is also bound into the immutable dataset identity, so a
+  rejected row cannot be silently dropped.
+- **Availability is conservative in the right direction.** A snapshot becomes
+  tradable only at the first open after the latest of its release, its revision
+  publication, its volume-basis availability, and its denominator availability,
+  so a late input defers the whole snapshot rather than being ignored.
+- **Codex's own evidence was spot-checked, not assumed.** Two of its four
+  claimed mutations were reproduced independently: weakening the
+  settlement/publication separation to `<` and reverting event identity to the
+  caller-supplied raw digest each turned exactly one test red. Its reported
+  test counts also reconcile with my own measurements on this host.
+
+### 9.6 Review scope and what was not audited
+
+- `contracts.py` and `dataset.py` were reviewed for the safety-critical
+  properties named above and exercised by mutation at four sites. They were not
+  re-derived line by line; the strict-schema, refusal, and immutable-storage
+  behaviour is taken from the 68 lane tests plus the mutations recorded here.
+- No licensed, provider, or market data exists to test against, so every claim
+  in this tranche is a claim about software behaviour on a synthetic fixture.
+  Consistent with `CLAUDE.md`, that is **not** evidence of any market edge, and
+  no part of this review constitutes research evidence.
+- The Windows installer behaviour reviewed in section 6 was re-verified only
+  through the corrected focused tests; no scheduled task was registered.
+
+### 9.7 Remaining gates and next authorized step
+
+1. Codex counter-reviews `11063c7` and this record commit.
+2. Full licensed SI-1 ingest remains gated on an owner-approved historical or
+   vintage short-interest source, archived official FINRA dissemination
+   evidence, and stable-identity, denominator, and ADV entitlements. None of
+   these is required for, or unblocked by, this synthetic tranche.
+3. SI-2 and every later milestone remain unauthorized. No outcome join, ETF
+   construction, QuantConnect job, provider access, deployment, or trading
+   authority follows from accepting this tranche, and the permanent research-
+   look count remains 0.

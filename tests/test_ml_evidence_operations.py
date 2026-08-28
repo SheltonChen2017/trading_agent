@@ -369,10 +369,6 @@ def test_market_clock_conversion_is_after_close_across_host_zones_and_dst(
 
 
 WINDOWS_VERIFIER_REASON = "The verifier targets Windows PowerShell and Task Scheduler."
-STORE_ALIAS_INTERPRETER_REASON = (
-    "sys.executable is a Microsoft Store execution alias, which both installers "
-    "refuse by contract because a scheduled task cannot launch it."
-)
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -704,24 +700,9 @@ def _run_windows_verifier(
     return result, json.loads(result.stdout)
 
 
-def _skip_unless_interpreter_can_drive_a_task(interpreter: Path) -> None:
-    """Skip when the running interpreter cannot serve as a task interpreter.
-
-    Microsoft Store publishes python.exe as a zero-byte execution alias that
-    resolves only inside an interactive session, so both installers refuse it up
-    front. Previewing with one would assert the harness's own environment rather
-    than the argument contract under test. The refusal itself stays covered by
-    test_installer_refuses_zero_byte_interpreter, which builds its own alias
-    stand-in and therefore runs on every Windows host.
-    """
-    if interpreter.stat().st_size == 0:
-        pytest.skip(STORE_ALIAS_INTERPRETER_REASON)
-
-
 def _run_installer_preview(tmp_path: Path, case: dict, *, lane: str) -> list[dict]:
     powershell = shutil.which("powershell")
     assert powershell is not None, "Windows validation requires powershell.exe"
-    _skip_unless_interpreter_can_drive_a_task(Path(case["python"]))
     if lane == "operational":
         installer = REPOSITORY_ROOT / "scripts" / "install_windows_operational_tasks.ps1"
         lane_arguments = (
@@ -777,6 +758,19 @@ def _task_checks(report: dict) -> dict[str, dict]:
     }
 
 
+def _running_process_image() -> Path:
+    """Return the real Windows process image behind a Store execution alias."""
+    import ctypes
+
+    buffer = ctypes.create_unicode_buffer(32768)
+    length = ctypes.windll.kernel32.GetModuleFileNameW(None, buffer, len(buffer))
+    assert length, "Windows did not report the running Python process image"
+    image = Path(buffer.value).resolve()
+    status = image.stat()
+    assert status.st_size > 0, "the resolved process image must be a real executable"
+    return image
+
+
 @pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
 def test_windows_verifier_green_actions_match_installer_whatif_previews(tmp_path):
     """Data-only installer previews are the source of truth for action strings.
@@ -786,6 +780,14 @@ def test_windows_verifier_green_actions_match_installer_whatif_previews(tmp_path
     so future argument-order or default-path drift fails before deployment.
     """
     case = _windows_verifier_case(tmp_path, scope="all")
+    # The operational installer runs policy-identity before emitting its
+    # -WhatIf preview, so this must be a runnable interpreter. Resolve the real
+    # process image behind a Store execution alias rather than skipping the
+    # successful eight-task parity contract on that host.
+    preview_interpreter = _running_process_image()
+    case["python"] = preview_interpreter
+    for task in case["fixture"]["Tasks"]:
+        task["Actions"][0]["Execute"] = str(preview_interpreter)
     expected = {
         task["TaskName"]: task["Actions"][0] for task in case["fixture"]["Tasks"]
     }
@@ -804,20 +806,35 @@ def test_windows_verifier_green_actions_match_installer_whatif_previews(tmp_path
     "installer_name",
     ["install_windows_operational_tasks.ps1", "install_windows_ml_shadow_tasks.ps1"],
 )
-def test_installer_refuses_zero_byte_interpreter(tmp_path, installer_name):
-    """Both installers must reject an alias interpreter before touching a task.
+@pytest.mark.parametrize("invalid_kind", ["zero_byte", "reparse_point"])
+def test_installer_refuses_invalid_interpreter(tmp_path, installer_name, invalid_kind):
+    """Both installers reject every invalid-interpreter predicate before tasks.
 
     Microsoft Store publishes python.exe as a zero-byte execution alias that
     satisfies Test-Path -PathType Leaf but cannot be launched by the scheduler.
     A task registered against one looks healthy and silently never runs, so the
-    refusal has to happen up front. The stand-in is built here rather than taken
-    from sys.executable so the guard is exercised on every Windows host.
+    refusal has to happen up front.  A mocked Get-Item result covers the separate
+    reparse-only predicate without requiring administrator symlink privileges.
     """
     powershell = shutil.which("powershell")
     assert powershell is not None, "Windows validation requires powershell.exe"
     alias = tmp_path / "python.exe"
-    alias.touch()
-    assert alias.stat().st_size == 0, "the stand-in must be a zero-byte file"
+    if invalid_kind == "zero_byte":
+        alias.touch()
+        assert alias.stat().st_size == 0, "the stand-in must be a zero-byte file"
+        get_item_override = ()
+    else:
+        alias.write_bytes(b"MZ")
+        assert alias.stat().st_size > 0, "the reparse stand-in must be non-empty"
+        get_item_override = (
+            "function Get-Item {",
+            "    param([string]$LiteralPath, [switch]$Force)",
+            "    [pscustomobject]@{",
+            "        Attributes = [IO.FileAttributes]::ReparsePoint",
+            "        Length = 1",
+            "    }",
+            "}",
+        )
     config = tmp_path / "shadow.json"
     config.write_text("{}", encoding="utf-8")
     artifacts = tmp_path / "shadow-artifacts"
@@ -835,6 +852,7 @@ def test_installer_refuses_zero_byte_interpreter(tmp_path, installer_name):
         "\n".join(
             (
                 "$ErrorActionPreference = 'Stop'",
+                *get_item_override,
                 (
                     f"$preview = @(& {_ps_quote(installer)}"
                     f" -PythonPath {_ps_quote(alias)}"

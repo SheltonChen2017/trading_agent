@@ -140,10 +140,10 @@ exception recorded in `THREE_STRATEGY_PARALLEL_WORKFLOW.md` and
 | `c31f1e3` | Fence and drain emergency order cancellation | Accepted after correction later in range |
 | `2fc3dd6` | Bind broker access to coherent account snapshots | Accepted after correction; **one P1 open at HEAD (R-01)** |
 | `b4f4532` | Close emergency cancel-all indexing races | Accepted after correction later in range |
-| `9406a34` | Harden shared trading safety boundaries | Accepted on the checks completed; a line-level audit of storage and calendar internals is carried as a stated residual gate |
+| `9406a34` | Harden shared trading safety boundaries | **Defect-found** - seven P1 issues open at HEAD (R-09 to R-15); `assistant/storage.py` is byte-identical between this commit and HEAD, so nothing here was repaired downstream |
 | `800c689` | Register shared research input boundaries | Accepted, lane-correct divergence verified |
 | `52518d6` | Reconcile three-strategy review workflow | Accepted |
-| `e770b05` | fix: close shared remediation regressions | Accepted after correction (**R-02**, corrected here) |
+| `e770b05` | fix: close shared remediation regressions | Accepted after correction (**R-02**, corrected here); one silent-row-drop loosening recorded as R-16. It fixes real code and is not a loosen-the-tests commit. |
 | `8a65e3c` | docs: record shared remediation synchronization | Accepted |
 | `f943bfc` | Fix portfolio equity display aggregation | Accepted, mutation-verified |
 | `29efc30` | Record insider lane portfolio rounding sync | Accepted |
@@ -169,7 +169,17 @@ Resolved items are retained, never deleted.
 | R-07 | P3 | OPEN | A permanent component-equity disagreement is raised as a transient mutation, so it burns the retry budget and is reported as broker state did not stabilize, pointing the operator at a race rather than the real cause. |
 | R-08 | P3 | OPEN | Order-level account identity is self-asserted: `portfolio_snapshot.py` passes the same identity object as both expected and observed, making that mismatch check a tautology at those call sites. The durable `assert_expected_broker_account` path remains meaningful. |
 
-Deliberately **not** corrected: R-01 and R-03 through R-08 are owner-level
+| R-09 | P1 | **OPEN - LIVE OPERATIONAL CONDITION, owner action required** | The machine-global runtime execution stop is **currently active on this host**. `C:\Users\<user>\AppData\Local\trading_agent\runtime\state\execution-emergency-stop.json` reads `active: true`, `generation: 16`, `scope: execution_runtime`, with **16 open incidents whose `origin_database` values are all throwaway paths** (pytest temp directories and audit scratch databases), the most recent stamped 2026-08-28. `execution_service` consults this file for every database, so the real operational app would refuse every proposal, **risk-reducing sells included**, until an explicit clear naming the exact incident ids and generation. Verified by reading the file directly, read-only. Deliberately **not cleared**: mutating operational runtime state is an owner action, not a reviewer action. Test suites run by any lane can latch it, so this recurs until the scoping in R-15 changes. |
+| R-10 | P1 | OPEN - verified by this review | Read-only and reporting paths latch that machine-global stop. `assistant/storage.py:5876` `_activate_detected_broker_integrity_incident` calls `activate_runtime_emergency_stop` **before and outside** the `if not self.read_only:` guard, and its callers include `get_execution_budget_usage`, `database_integrity_check`, and `AssistantStore.__init__`, which `assistant/readiness.py` invokes as a report. One corrupt historical row therefore lets a readiness poll halt execution. Contradicts CLAUDE.md section 7 (registry status must not be a side effect of presentation) and section 9 (read-only commands leave execution tables unchanged). This is the mechanism behind R-09. |
+| R-11 | P1 | OPEN - verified by this review | `_refuse_while_prior_dispatch_is_ambiguous` (`assistant/execution_service.py:427`, called unconditionally) refuses **any** new submission while an earlier dispatch is unresolved, with no branch on `side`, although its own docstring scopes the intent to "do not add account exposure". A timed-out BUY therefore blocks an approved risk-reducing SELL, and the raised `ProposalExecutionError` is converted to `BLOCKED`, so the sell proposal is consumed and must be regenerated and re-approved. |
+| R-12 | P1 | OPEN - verified by this review | `get_execution_budget_usage` (`assistant/storage.py:5644`) now issues `SELECT * FROM broker_order_events` with no `WHERE` clause, re-hashing the entire event history on the readiness and pre-dispatch hot path that the deployed monitor polls every 30 seconds. Combined with R-10, a single bad historical row halts the machine. |
+| R-13 | P1 | OPEN - reported, structurally confirmed | A skewed or missing broker `submitted_at` escalates to a global halt rather than a skip. `assistant/order_reconciler.py:588` routes `not integrity_ok` into `activate_reconciliation_halt` (persistent kill switch plus runtime-global stop); `assistant/temporal_integrity.py:14` sets a 5.0 second future-skew tolerance; the deployed `OrderMonitor` task polls every 30 seconds. A local clock a few seconds behind the broker can therefore halt all trading unattended, and also suppress stale-order cancellation, itself a risk-reducing action. The prior behavior skipped instead. Tolerance constants and the halt call verified; the end-to-end unattended scenario is not reproduced here. |
+| R-14 | P1 | OPEN - reported, not independently reproduced | `held` and `calculated`, both normal in-lifecycle broker states still listed in `KNOWN_BROKER_ORDER_STATUSES` and `ACTIVE_BROKER_ORDER_STATUSES`, now project to `submission_unknown` (`assistant/order_lifecycle.py:45`), which feeds both the R-11 gate and the critical-unresolved set. One order going `held` would make readiness not-ready and block every later proposal. Reported to have no test coverage for either status. |
+| R-15 | P1 | OPEN - reported, not independently reproduced | Two further fail-closed traps: a legacy `broker_order_events` row with a naive `event_at` is reported to make the database permanently unopenable read-write with no self-heal, and deterministic snapshot-integrity failures (negative cash, zero entry price, component disagreement) are reported to be retried as transient and then surfaced as "broker state did not stabilize", blocking all submission while naming the wrong cause. Also the scoping question behind R-09: the runtime stop is shared per OS user and ignores the database, so a per-database fault halts every database on the host. |
+| R-16 | P2 | OPEN | `e770b05` changed a zero-share position row from a refusal to a silent `continue` in `assistant/portfolio_snapshot.py`, with no record. A broker feed reporting zero shares for a genuinely held position makes it vanish from the snapshot, so a risk-reducing sell for that ticker reads as not held. Violates CLAUDE.md section 8 (no silent row dropping). The strict Alpaca path is unaffected. |
+| R-17 | P2 | OPEN | Two characterization tests are now vacuous: policy revalidation moved earlier, so they fail before any reservation is made and `assert state["reservations"] == []` is trivially true. Deleting the reservation release from the submit kernel reportedly leaves the suite green, although that test was originally created by mutation testing against exactly that deletion. |
+
+Deliberately **not** corrected: R-01, R-03 through R-08, and R-09 through R-17 are owner-level
 design decisions, unverified against a live broker, or outside a reviewer
 surgical-correction mandate on shared code synchronized from `main`.
 Correcting them on this lane would also diverge shared execution semantics
@@ -220,8 +230,17 @@ before it can be closed: either a preregistered tolerance that distinguishes a
 material policy-input change from a price mark ticking, or an explicit
 risk-reducing-sell path that does not require a byte-identical recapture.
 
-Stated untested areas: the deep internals of `assistant/storage.py` migrations
-and the new `data/exchange_calendar.py` and `assistant/temporal_integrity.py`
-modules were exercised only through the suites above, not line-audited by this
-review. No SEC crawl, outcome join, ETF construction, QuantConnect job, or
+The storage, calendar, and temporal-integrity audit that was in progress when
+this section was first drafted has since completed; its findings are R-09
+through R-17 above and the `9406a34` disposition was corrected from accepted
+to defect-found accordingly. Of the seven P1 issues, four (R-09 to R-12) were
+independently verified by this reviewer against the running system and the
+code paths; R-13 was structurally confirmed at its constants and call site;
+R-14 and R-15 are recorded as reported and still need independent
+reproduction during counter-review.
+
+**R-09 needs owner attention before the next operational run**, independently
+of this lane: the host emergency stop is latched active by throwaway test
+databases and would refuse live paper proposals, including risk-reducing
+sells. It was deliberately left untouched. No SEC crawl, outcome join, ETF construction, QuantConnect job, or
 broker action is authorized by this review.

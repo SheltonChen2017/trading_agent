@@ -1,179 +1,78 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-27 by Codex after the owner-authorized P1/P2/P3 remediation,
-one-time three-lane synchronization, and post-merge portfolio-equity correction.
-Amended 2026-08-27 by Claude with the independent review of the root
-remediation range (section 0A). This is a durable implementation handoff, not an
-acceptance record: Codex counter-review of the review commits remains mandatory,
-and the three lane branches still require their own independent review.
+Prepared: 2026-08-28 by Codex after completing the main-line counter-review of
+Claude's root-remediation review and correction series. This is the canonical
+generic-workflow handoff for the root project. The three strategy lanes remain
+independent and were not inspected, modified, synchronized, or reviewed here.
 
-## 0. Remediation implementation handoff
+## 0. Root-remediation counter-review handoff
 
-- The root remediation was merged to `main` through PR #314 and PR #315; exact
-  merged head is `9e9843e9fc332cbbed63480834abe2c3f093a652` and the temporary root branch was
-  deleted after merge.
-- The portfolio-equity correction is **merged**: branch
-  `codex/fix-portfolio-equity-rounding-20260827` was merged as PR #316 at
-  `e6a654dcf4fed67b5abbd1d312bb8031bc91fe2d` and no longer exists. Exact code
-  commit `1ed06022d7f811a5977239be71e99c2fd7d37952` fixes an owner-reproduced
-  P1 where summing already-rounded position displays produced a total-equity
-  display that disagreed with the exact aggregate and prevented the paper
-  assistant UI from loading. The builder now aggregates exact Decimals and
-  rounds once; the strict integrity validator was not weakened.
-- Exact root code snapshot before this record-only update:
-  `66168eda687d42a3cfda45a05e0de8f7781d3b87`. The final shared follow-up is
-  `6770db3bc3934c4b0872d0cea6a256c28dec2cc8`; the isolated Analyst-only
-  follow-up is `66168ed`. This handoff and the remediation ledger are the only
-  later root-tree changes in the record commit.
-- The complete 110-finding ledger is retained at P0=0, P1=47, P2=49, P3=14.
-  `SYS-FU-P1-006` records the post-merge correction. Codex found no generalized
-  second snapshot-construction instance; this does not substitute for the
-  owner-required independent reviewer.
-- Post-merge correction validation: focused portfolio/risk/coherent-snapshot
-  suite **112 passed, 0 failed, 1 dependency warning**; reverse mutation failed
-  the new regression at display `100.01` versus exact `100`; complete suite
-  **5,442 passed, 2 skipped, 0 failed, 25 dependency warnings in 1,944.33s
-  (32m24s)**; required repository-wide compileall exited 0 and `git diff --check`
-  was clean. Validation used fixtures only; Codex did not access a broker,
-  provider, credential, account, order, or operator database.
-- Exact root validation: touched-surface suite **922 passed in 313.42s**;
-  complete suite **5,441 passed, 2 skipped, 0 failed, 25 dependency-
-  deprecation warnings in 2,083.27s (34m43s)**; required repository-wide
-  compileall exited 0; PowerShell parser reported 0 errors; `git diff --check`
-  was clean; and the narrow secret-shape scan found no likely credential
-  literal. After the record-only documentation edits, the 362-test
-  documentation/active-contract regression set passed in 125.06 seconds and
-  was rerun after this result was recorded on the final documentation tree.
-- The owner-authorized synchronization was non-force-pushed and then verified
-  at these exact remote heads:
-  - Analyst Revisions V2:
-    `d8d0ad6e86dee1b05a5f62f3dd9d53c7b51b9729` (validated code
-    `653a9c01ac12863db2d7488154014a662c893add`; 5,434 passed, 2 skipped,
-    25 warnings in 39m14s).
-  - Insider Buying:
-    `8a65e3ca38cdc6f0feff8f3d7f6c8ae4a722b83d` (validated code
-    `e770b059f06dd8af9a52bd6dd96f7f83af2fc835`; 5,223 passed, 2 skipped,
-    25 warnings in 36m40s).
-  - Short Interest:
-    `0a77b9cd2fb8f96ced51194ce68060b6a08b3de9` (validated code
-    `81eede4ef8de10609d4b5375b795abf916132dd0`; 5,223 passed, 2 skipped,
-    25 warnings in 37m54s).
-- The three shared landing commits have stable patch ID
-  `30e807c0ae2cf05016a2ce17c416daaaa275dcbc`. Ancestry and range checks proved
-  that neither Analyst hardening commit nor any of its five-file surface
-  entered Insider Buying or Short Interest. Each lane changed only its own
-  implementation record after code validation.
-- The post-merge `SYS-FU-P1-006` correction has not been copied to any strategy
-  lane. The one-time common-remediation synchronization authority expired and
-  grants no authority for a later shared-file synchronization by inference.
-- No provider, credential, licensed row, outcome, QuantConnect job, broker,
-  operator database, live scheduler, deployment, evidence epoch, paper order,
-  or live order was accessed or changed. No research or trading authority was
-  created; Analyst consumed **0 research looks**.
+- Active local branch:
+  `codex/counterreview-root-remediation-20260827`.
+- Published base and unchanged local `main`/`origin/main`:
+  `6a507341896850076c13050da080f888d6eb31aa`.
+- Accepted-after-correction implementation commit:
+  `242f8eb7ef5022ed17e86502896ae19e7621e55c` (parent `6a50734`, tree
+  `b97cccb5be0a2f19fe96ffc5a194bdfa411a83f3`).
+- Authoritative counter-review record commit:
+  `699f6bc970f1ab5978c9a994d803b5dc09fc1fbd`. The full P0–P3 ledger,
+  six-commit disposition table, corrected historical count, implementation
+  record, validation evidence, and open HOW/WHERE plans are in
+  `docs/Archive/Review/COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md`.
+- All six Claude commits are **accepted after correction**:
+  `4fc2c60e41c49056b4c3babf35af3acc56c6e6fe`,
+  `0eaf420293733b7a31b4b62e07fe3eb0c2dfdad8`,
+  `ae55d865f184d513448e571ebe3e1e8bd863aa34`,
+  `eeeab1370923ec0c2bf6f06c643f5d63ec6019c9`,
+  `76139b4efb751de8f7fd863a7a5dfc6f2f92da9d`, and
+  `6a507341896850076c13050da080f888d6eb31aa`. Merge-tree identity was accepted
+  separately from inherited content correctness.
+- No P0 remains. The historical Claude report has 45 unique finding IDs, not
+  46: P1=2, P2=13, P3=20, and ten invalidly classified P4 rows. `BRK-003` has
+  no finding row. Claude's claimed explicit dispositions for 27 earlier
+  implementation commits were not present and were not invented here.
+- Final implementation validation on the exact code tree: changed/new tests
+  **1,681 passed, 0 failed, 1 warning**; complete suite **5,720 passed, 2
+  skipped, 0 failed, 25 warnings in 1,843.55 seconds**; repository-wide
+  `compileall` exited 0; `git diff --check` was clean; and no likely added
+  credential/private-key shape was found. The 70 documentation and remediation
+  ledger guards passed after the report update and again after this handoff
+  replacement.
+- Open P2 items: a safe evidence contract for risk-reducing sells when an
+  unrelated position row makes the account book incomplete (`BRK-001`), and an
+  authenticated corrupt-journal repair/quarantine/restore workflow.
+- Open P3 items: independently observed per-order account provenance, exact
+  limit-price transport across the final broker boundary, authenticated
+  broker-event-ledger checkpoints, bounded Decimal/reporting serialization,
+  and explicit documentation/process isolation for the same-process Python
+  trust boundary.
+- `ARV-001` through `ARV-014` remain delegated to the Analyst Revisions V2
+  lane. They are not accepted, closed, or implemented by this root review.
+  Insider Buying and Short Interest were likewise untouched. No feature-lane
+  record was changed.
 - Analyst identity semantics remain explicit: the measured `768` diagnostic
   count is a **lower bound**, never an **allowlist**; **current-ticker joins are
   prohibited**. **Normative strategy design** and **observed provider**
   availability/history remain separate evidence categories.
-- Resume with Claude reviewing every commit in each exact pushed lane range on
-  the same long-lived lane branch. Codex then counter-reviews every Claude
-  commit. Do not start a new lane milestone, provider audit, outcome run, or
-  deployment before that chain and the relevant owner gates close.
+- No provider, credential, licensed row, outcome, QuantConnect job, broker,
+  operator database, live scheduler, deployment, evidence epoch, paper order,
+  live order, or research look was accessed or changed.
+- No feature milestone completed and no sequencing, gate, or next-step status
+  changed, so `docs/FEATURE_MILESTONE_RECORD.md` and
+  `docs/ACTION_PLAN_2026-08-20.md` remain unchanged.
+- The branch and its commits are local-only; no push was performed. Push only
+  if the owner explicitly requests it. Otherwise archive this session until
+  the three strategy lanes complete. The owner will then initiate a new
+  whole-project review from the exact integrated `main` snapshot.
 
-The owner clarification remains binding: the instruction removing Codex
-counter-review was accidental and is superseded. The standing lane loop is
+The owner clarification remains binding: the standing strategy-lane loop is
 Codex implementation, Claude independent review, then Codex counter-review
-plus the next bounded milestone before one combined push.
+plus the next bounded milestone before one combined push. That lane-specific
+workflow did not authorize edits from this generic root review.
 
 Historical coordination detail remains at
 `docs/Archive/Session/SESSION_HANDOFF_THROUGH_2026-08-25_SEP3_EIGHTH_DRY_RUN.md`
 and in `docs/Archive/Review/`.
-
-## 0A. Independent review of the root remediation (Claude, 2026-08-27)
-
-- Review branch `user/claude/review-root-remediation-20260827`; full record in
-  `docs/Archive/Review/REVIEW_2026-08-27_ROOT_REMEDIATION_INDEPENDENT.md`.
-  Reviewed range `2572472..e6a654d` — **27 commits**, covering the 22-commit
-  remediation series (PR #314, PR #315) **and** PR #316's portfolio-equity
-  rounding fix. Every commit carries an explicit disposition; all three merge
-  commits were reviewed as commits and each merge tree is byte-identical to its
-  topic-branch parent, so no commit or content was stranded.
-- **Disposition: accepted after correction, conditional on the P1 band and
-  `VAL-001` being closed.** No P0. The ledger is P0=0, **P1=2**, P2=13, P3=21,
-  P4=10 (46 findings). Severities were calibrated against reachability on a
-  production path, per this repository's own FCS-007 lesson.
-- **`main` does not currently pass its own test suite (`VAL-001`, P2).** PR #316
-  added a 110th ledger finding (`SYS-FU-P1-006`) without the paired update to
-  `tests/test_remediation_ledger_consistency.py`, whose expected family counts
-  and grand total are deliberately hard-coded. Four tests fail. Reproduced in a
-  throwaway detached worktree pinned at `e6a654d`, so it is a property of the
-  commit. The recorded PR #316 validation of "5,442 passed, 0 failed" cannot
-  describe that tree — 5,442 is exactly its collection count, so the run
-  predated the ledger commit.
-- Reviewer validation, two trees:
-  - tree of `9e9843e` (≡ `6906a6c`, the remediation series head):
-    **5,441 passed, 2 skipped, 0 failed, 25 warnings in 1,878.57s** —
-    reproduces the implementer's recorded root-range validation exactly.
-  - review head `e6a654d`: **4 failed, 5,438 passed, 2 skipped, 25 warnings in
-    1,495.77s**. `compileall` exited 0; `git diff --check` clean; a narrow
-    secret-shape scan matched nothing.
-- The two P1s share one root cause and are recorded as one systemic finding:
-  the remediation hardened the execution path fail-closed without carrying
-  CLAUDE.md section 5's risk-reduction exception through the new guards.
-  `EXE-001` (an unrelated ambiguous dispatch blocks every sell, reproduced end
-  to end through the real execution path) and `STO-001` (one corrupt
-  broker-event row makes a writable store unconstructable, removing emergency
-  cancel-all, with no repair command). `BRK-001` is the same class held at P2
-  only because no trigger is demonstrated reachable against a real broker. The
-  earnings blackout and `cancel_all_open_orders` are the two places the rule
-  *was* applied correctly.
-- Two claimed properties are not met at their stated strength: `AR-FU-P1-010`
-  (`ARV-001`/`ARV-002` — reviewed-policy identity is a self-rehash, not held out
-  of band) and `SYS-P2-005` (`POL-002` — the integrity validator is not shared
-  with the execution gate).
-- Independently reproduced as correct: the 110-finding ledger is internally
-  consistent; cross-process dispatch-fence exclusion demonstrated between two
-  live processes; the ML/research import boundary closed transitively from eight
-  execution-capable roots; the research layer's zero-access outcome and
-  nonempty-portfolio gates unbreakable under direct attack; legacy operator
-  databases upgrade safely; and the Analyst-only follow-up `66168ed` is absent
-  from both other lanes.
-- The review consumed **zero** research looks and touched no provider,
-  credential, broker, operator database, scheduled task, deployment, or evidence
-  epoch. `paper-epoch-006` is untouched.
-
-### 0A.1 Corrections applied (owner-authorized, 2026-08-27)
-
-- Branch `user/claude/fix-risk-reduction-guards-20260827`, which merges the
-  review branch so the record and the corrections travel together. Detail is in
-  section 7A of the review report; this is the summary.
-- **`VAL-001` closed.** The ledger guard's expectations now match the
-  110-finding ledger, and `SYS-FU-P1-006`'s status line was normalized to the
-  canonical wording with its commit retained in the entry body. The guard was
-  not weakened and no finding's substance was changed — its own three mutation
-  tests still pass. **`main` is green again.**
-- **`EXE-001` closed.** `_refuse_while_prior_dispatch_is_ambiguous` is now
-  exposure-increasing only, mirroring the earnings blackout's registry scoping.
-  A risk-reducing sell completes while an unrelated proposal is stranded in
-  `submission_unknown`; an exposure-increasing buy still refuses without broker
-  contact.
-- **`STO-001` closed.** `AssistantStore` gains an explicit, default-off
-  `permit_contained_integrity_failure`. Ordinary construction still refuses a
-  damaged broker-event ledger; only `cancel-all-orders` opts in, so emergency
-  cancellation stays reachable while containment holds the kill switch active. A
-  scope test pins the opt-in to exactly that one command.
-- **`BRK-001` deliberately deferred** — a partial position book cannot safely
-  drive the gate's exposure and sell-exceeds-held checks, so what the gate
-  validates for a sell against an incomplete book is an owner/design decision,
-  not an implementation detail. It is also the only finding whose trigger is not
-  demonstrated reachable against a real broker.
-- Validation on the corrected tree: full suite **5,448 passed, 2 skipped, 0
-  failed, 25 warnings in 1,430.00s**; `compileall` exited 0; `git diff --check`
-  clean. No existing test was weakened, skipped, or deleted; no broker,
-  provider, operator database, scheduled task, deployment, or evidence epoch was
-  touched.
-- Still open for Codex: the remaining 11 P2 findings, all P3/P4 items, and
-  `BRK-001`'s design decision. The remediation ledger's per-finding statuses
-  remain Codex's to update after counter-review.
 
 ## 1. Read first
 
@@ -401,19 +300,22 @@ and a new owner-authorized permanent look budget.
 ## 8. Resume prompt
 
 ```text
-Do not begin another strategy milestone. Read CLAUDE.md, AGENTS.md, the Action
-Plan, THREE_STRATEGY_PROJECT_DIRECTION.md, the shared workflow, and the chosen
-lane record. In a separate clean checkout, Claude independently reviews every
-commit from a4f58e6 through the exact published lane head: Analyst d8d0ad6,
-Insider 8a65e3c, or Short Interest 0a77b9c. The review stays on that same
-long-lived lane branch, gives every commit an explicit disposition, retains a
-P0-P3 ledger, mutation-checks dangerous boundaries, updates only that lane's
-record, and pushes any authorized correction without rewriting history. Codex
-then counter-reviews every Claude commit and reruns affected plus full
-validation before acceptance or any next milestone. The root remediation
-branch uses the generic separate-review-branch workflow if it is reviewed as
-its own generic workstream. Access no provider, credential, licensed row,
-outcome, QuantConnect job, broker, operator database, live scheduler, or
-deployment surface. Provider/outcome access remains an open owner decision;
-preserve zero looks, paper-epoch-006, and the untouched shared final holdout.
+Resume this root task only if the owner explicitly asks to push the completed
+counter-review, or after all three strategy lanes are integrated and the owner
+initiates the next whole-project review. Read CLAUDE.md, AGENTS.md,
+ACTION_PLAN_2026-08-20.md, THREE_STRATEGY_PROJECT_DIRECTION.md, and
+COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md. Preserve implementation commit
+242f8eb7ef5022ed17e86502896ae19e7621e55c and report commit
+699f6bc970f1ab5978c9a994d803b5dc09fc1fbd. Do not modify or synchronize the
+Analyst Revisions V2, Insider Buying, or Short Interest branches/worktrees from
+this task. If pushing is requested, first verify the current branch, exact
+HEAD, clean worktree, unchanged origin/main at 6a50734, and all three local
+commits; do not force-push. If starting the later review, begin from the exact
+post-integration main snapshot and establish a new bounded commit range under
+the generic separate-review-branch workflow. Access no provider, credential,
+licensed row, outcome, QuantConnect job, broker, operator database, live
+scheduler, deployment, paper-order, live-order, or evidence-epoch surface.
+Provider/outcome access remains an open owner decision; obtain that
+authorization before any such audit or run. Preserve zero looks,
+paper-epoch-006, and the untouched shared final holdout.
 ```

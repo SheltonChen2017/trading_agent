@@ -559,3 +559,56 @@ def test_dispatch_attempt_ledger_rejects_unknown_fields_and_contains(tmp_path):
     with pytest.raises(RuntimeDispatchAttemptConflictError, match="unknown fields"):
         list_runtime_dispatch_attempts(database)
     assert get_runtime_emergency_stop(database)["active"] is True
+
+
+def test_fork_child_reset_discards_inherited_ownership_on_every_platform():
+    """Exercise the fork-child hardening where os.fork does not exist.
+
+    The POSIX regression test above is skipped on Windows, which is the
+    owner's only supported host, so the reset that the fork hardening added
+    was never executed by the suite there. The reset itself is platform
+    neutral: call it directly and prove it discards inherited depth, handles
+    and permits instead of leaving state that would look like same-thread
+    re-entry.
+    """
+    from pathlib import Path as _Path
+
+    inherited_path = _Path("inherited-fence.lock")
+    original_states = dispatch_fence_module._STATES
+    original_states_guard = dispatch_fence_module._STATES_GUARD
+    original_permits = dispatch_fence_module._DISPATCH_PERMITS
+    original_permits_guard = dispatch_fence_module._DISPATCH_PERMITS_GUARD
+
+    class _InheritedHandle:
+        def __init__(self) -> None:
+            self.closed = False
+
+        def close(self) -> None:
+            self.closed = True
+
+    handle = _InheritedHandle()
+    try:
+        inherited_state = dispatch_fence_module._ProcessFenceState(
+            depth=3, handle=handle, owner_thread_id=threading.get_ident()
+        )
+        dispatch_fence_module._STATES = {inherited_path: inherited_state}
+        dispatch_fence_module._DISPATCH_PERMITS = {"inherited-permit": object()}
+
+        dispatch_fence_module._reset_after_fork()
+
+        # The child must not inherit an open description or any depth that a
+        # re-entry check could mistake for ownership it actually contended for.
+        assert handle.closed is True
+        assert dispatch_fence_module._STATES == {}
+        assert dispatch_fence_module._DISPATCH_PERMITS == {}
+        # Guards are rebuilt rather than reused, so a lock held at fork time
+        # cannot stay latched in the child.
+        assert dispatch_fence_module._STATES_GUARD is not original_states_guard
+        assert dispatch_fence_module._DISPATCH_PERMITS_GUARD is not original_permits_guard
+        assert dispatch_fence_module._STATES_GUARD.acquire(blocking=False) is True
+        dispatch_fence_module._STATES_GUARD.release()
+    finally:
+        dispatch_fence_module._STATES = original_states
+        dispatch_fence_module._STATES_GUARD = original_states_guard
+        dispatch_fence_module._DISPATCH_PERMITS = original_permits
+        dispatch_fence_module._DISPATCH_PERMITS_GUARD = original_permits_guard

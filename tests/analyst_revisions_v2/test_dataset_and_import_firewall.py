@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import dataclasses
 import json
 from pathlib import Path
@@ -545,3 +546,153 @@ def test_dynamic_imports_cannot_bypass_the_firewall(tmp_path, source):
     (package / "__init__.py").write_text(source, encoding="utf-8")
     with pytest.raises(ImportBoundaryError):
         validate_transitive_import_closure(tmp_path, package_name="guarded")
+
+
+def _authority_registry_names(tree: ast.Module) -> set[str]:
+    """Module-level names bound to an out-of-band authority registry dict."""
+    names: set[str] = set()
+    for node in tree.body:
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for target in targets:
+            if (
+                isinstance(target, ast.Name)
+                and target.id.endswith("_AUTHORITIES")
+                and isinstance(node.value, ast.Dict)
+            ):
+                names.add(target.id)
+    return names
+
+
+def _module_assignment_value(tree: ast.Module, name: str) -> ast.expr | None:
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            if any(isinstance(target, ast.Name) and target.id == name for target in node.targets):
+                return node.value
+        elif isinstance(node, ast.AnnAssign):
+            if isinstance(node.target, ast.Name) and node.target.id == name:
+                return node.value
+    return None
+
+
+def _unguarded_registry_access_lines(tree: ast.Module, registry: str) -> list[int]:
+    """Return non-declaration registry accesses outside its matching lock."""
+    parents = {
+        child: parent
+        for parent in ast.walk(tree)
+        for child in ast.iter_child_nodes(parent)
+    }
+    declaration_targets = {
+        target
+        for node in tree.body
+        if isinstance(node, (ast.Assign, ast.AnnAssign))
+        for target in (
+            node.targets if isinstance(node, ast.Assign) else [node.target]
+        )
+        if isinstance(target, ast.Name) and target.id == registry
+    }
+    lock_name = f"{registry}_LOCK"
+    violations: list[int] = []
+    for access in ast.walk(tree):
+        if (
+            not isinstance(access, ast.Name)
+            or access.id != registry
+            or access in declaration_targets
+        ):
+            continue
+        ancestor = parents.get(access)
+        guarded = False
+        while ancestor is not None:
+            if isinstance(ancestor, (ast.With, ast.AsyncWith)) and any(
+                isinstance(item.context_expr, ast.Name)
+                and item.context_expr.id == lock_name
+                for item in ancestor.items
+            ):
+                guarded = True
+                break
+            ancestor = parents.get(ancestor)
+        if not guarded:
+            violations.append(access.lineno)
+    return sorted(violations)
+
+
+def test_every_authority_registry_is_guarded_by_its_own_lock():
+    """Authority registries are the mechanism that defeats forged objects.
+
+    Their concurrency discipline must be uniform rather than accidental: a
+    weakref callback can fire on any thread during collection, and identity
+    keys are reused memory addresses. CPython's GIL makes the individual dict
+    operations atomic, so no runtime test can observe a missing lock; the
+    invariant is therefore pinned at the source level.
+    """
+    package = Path(__file__).resolve().parents[2] / "research" / "analyst_revisions_v2"
+    expected = {
+        "dataset.py": {"_DATASET_AUTHORITIES"},
+        "formulas.py": {"_POLICY_AUTHORITIES"},
+        "holdings.py": {"_STOCK_SCORE_AUTHORITIES"},
+        "preregistration.py": {"_REVIEWED_AUTHORITIES"},
+        "snapshot.py": {"_SNAPSHOT_AUTHORITIES"},
+    }
+    checked: dict[str, set[str]] = {}
+    for path in sorted(package.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        registries = _authority_registry_names(tree)
+        if not registries:
+            continue
+        checked[path.name] = registries
+        for registry in registries:
+            lock_name = f"{registry}_LOCK"
+            lock_value = _module_assignment_value(tree, lock_name)
+            assert (
+                isinstance(lock_value, ast.Call)
+                and isinstance(lock_value.func, ast.Attribute)
+                and isinstance(lock_value.func.value, ast.Name)
+                and lock_value.func.value.id == "threading"
+                and lock_value.func.attr == "RLock"
+                and not lock_value.args
+                and not lock_value.keywords
+            ), (
+                f"{path.name} must define {lock_name} as threading.RLock()"
+            )
+            assert not _unguarded_registry_access_lines(tree, registry), (
+                f"{path.name} accesses {registry} outside with {lock_name}: "
+                f"lines {_unguarded_registry_access_lines(tree, registry)}"
+            )
+    # Pin the inventory so a renamed/deleted registry cannot make the audit
+    # silently cover less authority than it did before.
+    assert checked == expected
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        "return _TEST_AUTHORITIES.get(1)",
+        "_TEST_AUTHORITIES[1] = object()",
+        "_TEST_AUTHORITIES.pop(1, None)",
+        "with _OTHER_LOCK:\n        return _TEST_AUTHORITIES.get(1)",
+    ],
+)
+def test_authority_registry_guard_audit_rejects_unguarded_mutations(body):
+    indented = "\n".join(f"    {line}" for line in body.splitlines())
+    tree = ast.parse(
+        "import threading\n"
+        "_TEST_AUTHORITIES = {}\n"
+        "_TEST_AUTHORITIES_LOCK = threading.RLock()\n"
+        "_OTHER_LOCK = threading.RLock()\n"
+        "def mutate():\n"
+        f"{indented}\n"
+    )
+    assert _unguarded_registry_access_lines(tree, "_TEST_AUTHORITIES")
+
+
+def test_authority_registry_guard_audit_accepts_the_matching_lock():
+    tree = ast.parse(
+        "import threading\n"
+        "_TEST_AUTHORITIES = {}\n"
+        "_TEST_AUTHORITIES_LOCK = threading.RLock()\n"
+        "def read():\n"
+        "    with _TEST_AUTHORITIES_LOCK:\n"
+        "        return _TEST_AUTHORITIES.get(1)\n"
+    )
+    assert _unguarded_registry_access_lines(tree, "_TEST_AUTHORITIES") == []

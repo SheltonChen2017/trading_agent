@@ -1850,3 +1850,71 @@ def test_acknowledgement_timestamp_must_be_timezone_aware(tmp_path):
             ticker="AEP",
             now=datetime(2026, 8, 11, 12, 0),
         )
+
+
+def _fractional_exact_fill(boot_at):
+    exact_qty = "0.123456789012345678"
+    exact_price = "412.335000000000000001"
+    return {
+        "ticker": "AAPL",
+        "side": "buy",
+        "qty": float(exact_qty),
+        "price": float(exact_price),
+        "qty_decimal": exact_qty,
+        "price_decimal": exact_price,
+        "at": (boot_at + timedelta(hours=1)).isoformat(),
+        "fill_id": "f-exact",
+        "order_id": "o-exact",
+        "proposal_id": "p-exact",
+    }
+
+
+def test_exact_fill_sync_is_idempotent_and_preserves_provider_digits(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 1, 5, 14, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(store, _snapshot(), confirmation="bootstrap", now=boot_at)
+    fill = _fractional_exact_fill(boot_at)
+    store.list_fills = lambda: [fill]
+
+    assert sync_app_fills(store)["inserted"] == 1
+    assert sync_app_fills(store)["duplicates"] == 1
+
+    transaction = store.get_journal_transaction_by_external_id("app_fill:f-exact")
+    assert transaction["metadata"]["qty"] == fill["qty_decimal"]
+    assert transaction["metadata"]["price"] == fill["price_decimal"]
+    assert fill["qty_decimal"] in transaction["description"]
+    assert fill["price_decimal"] in transaction["description"]
+    balances = ledger_balances(store)
+    exact_gross = Decimal(fill["qty_decimal"]) * Decimal(fill["price_decimal"])
+    assert balances["cash"] == Decimal("1000") - exact_gross
+
+
+def test_legacy_float_fill_remains_idempotent_when_exact_companions_appear(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 1, 5, 14, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(store, _snapshot(), confirmation="bootstrap", now=boot_at)
+    exact_fill = _fractional_exact_fill(boot_at)
+    legacy_fill = {
+        key: value for key, value in exact_fill.items() if not key.endswith("_decimal")
+    }
+    store.list_fills = lambda: [legacy_fill]
+    assert sync_app_fills(store)["inserted"] == 1
+    stored = store.get_journal_transaction_by_external_id("app_fill:f-exact")
+
+    store.list_fills = lambda: [exact_fill]
+    assert sync_app_fills(store)["duplicates"] == 1
+    assert store.get_journal_transaction_by_external_id("app_fill:f-exact") == stored
+
+
+def test_exact_fill_companion_change_is_still_a_content_conflict(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 1, 5, 14, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(store, _snapshot(), confirmation="bootstrap", now=boot_at)
+    fill = _fractional_exact_fill(boot_at)
+    store.list_fills = lambda: [fill]
+    assert sync_app_fills(store)["inserted"] == 1
+
+    changed = dict(fill, qty_decimal="0.123456789012345679")
+    store.list_fills = lambda: [changed]
+    with pytest.raises(LedgerError, match="different content"):
+        sync_app_fills(store)

@@ -5,6 +5,7 @@ import dataclasses
 import hashlib
 import json
 import statistics
+import threading
 import weakref
 from collections import defaultdict
 from contextlib import contextmanager
@@ -38,6 +39,10 @@ _POLICY_TOKEN = object()
 _POLICY_AUTHORITIES: dict[
     int, tuple[weakref.ReferenceType["VerifiedAnalystPolicy"], str]
 ] = {}
+# The out-of-band registry is what defeats forged authority objects, so every
+# ARV2 registry guards access with one re-entrant lock. A weakref callback can
+# fire on any thread during collection, and identity keys are reused addresses.
+_POLICY_AUTHORITIES_LOCK = threading.RLock()
 
 
 @contextmanager
@@ -175,17 +180,23 @@ def _policy_payload(values: Mapping[str, object]) -> bytes:
     ).encode("utf-8")
 
 
-def _register_policy_authority(policy: VerifiedAnalystPolicy) -> None:
-    """Record loader-derived policy identity outside the mutable value itself."""
-    identity = id(policy)
-
-    def remove(reference: weakref.ReferenceType[VerifiedAnalystPolicy]) -> None:
+def _forget_policy_authority(
+    identity: int, reference: weakref.ReferenceType["VerifiedAnalystPolicy"]
+) -> None:
+    with _POLICY_AUTHORITIES_LOCK:
         registered = _POLICY_AUTHORITIES.get(identity)
         if registered is not None and registered[0] is reference:
             _POLICY_AUTHORITIES.pop(identity, None)
 
-    reference = weakref.ref(policy, remove)
-    _POLICY_AUTHORITIES[identity] = (reference, policy.evidence_sha256)
+
+def _register_policy_authority(policy: VerifiedAnalystPolicy) -> None:
+    """Record loader-derived policy identity outside the mutable value itself."""
+    identity = id(policy)
+    reference = weakref.ref(
+        policy, lambda ref, key=identity: _forget_policy_authority(key, ref)
+    )
+    with _POLICY_AUTHORITIES_LOCK:
+        _POLICY_AUTHORITIES[identity] = (reference, policy.evidence_sha256)
 
 
 def _create_verified_analyst_policy(
@@ -349,7 +360,8 @@ def derive_verified_analyst_policy(spec: object) -> VerifiedAnalystPolicy:
 def require_verified_analyst_policy(value: object) -> VerifiedAnalystPolicy:
     if type(value) is not VerifiedAnalystPolicy or value._token is not _POLICY_TOKEN:
         raise FormulaError("authoritative calculation requires verified ARV2 policy")
-    authority = _POLICY_AUTHORITIES.get(id(value))
+    with _POLICY_AUTHORITIES_LOCK:
+        authority = _POLICY_AUTHORITIES.get(id(value))
     if (
         authority is None
         or authority[0]() is not value

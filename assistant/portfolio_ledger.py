@@ -354,6 +354,54 @@ def _transaction_id(external_id: str) -> str:
     return "journal-" + digest[:24]
 
 
+def _exact_fill_decimal(fill: dict[str, Any], field: str) -> Decimal:
+    """Prefer the provider's exact decimal text over the rounded float.
+
+    ``list_fills`` emits both ``<field>`` as a float for compatibility and
+    ``<field>_decimal`` as the provider's exact text.  Reading the float
+    re-rounds a fractional fill before it reaches book cost and realized P&L,
+    so the exact text is authoritative whenever it is present.  Legacy rows
+    predating the text columns keep the float and are disclosed through
+    ``numeric_evidence_status``.
+    """
+    exact = fill.get(f"{field}_decimal")
+    if isinstance(exact, str) and exact.strip():
+        return _decimal(exact, f"fill.{field}_decimal")
+    return _decimal(fill[field], f"fill.{field}")
+
+
+def _fill_transaction_header(
+    fill: dict[str, Any], *, qty: Decimal, price: Decimal
+) -> tuple[str, str, str, str, str, dict[str, Any]]:
+    """Build the immutable journal identity shared by insert and retry paths."""
+    ticker = str(fill["ticker"]).upper()
+    side = str(fill["side"]).lower()
+    fill_id = str(fill["fill_id"])
+    external_id = f"app_fill:{fill_id}"
+    metadata = {
+        "fill_id": fill_id,
+        "order_id": fill.get("order_id"),
+        "proposal_id": fill.get("proposal_id"),
+        "ticker": ticker,
+        "side": side,
+        "qty": _decimal_text(qty),
+        "price": _decimal_text(price),
+        "fees_included": False,
+        # Deliberately NOT extended with numeric_evidence_status. This
+        # metadata is part of the journal's content identity, so adding a key
+        # makes every previously journaled row mismatch on re-sync. Carrying
+        # that disclosure requires an additive migration.
+    }
+    return (
+        _transaction_id(external_id),
+        _parse_at(fill["at"], "fill.at").isoformat(),
+        "assistant_broker_event",
+        external_id,
+        f"{side.upper()} {qty} {ticker} @ {price}",
+        metadata,
+    )
+
+
 def _fill_transaction(
     *,
     fill: dict[str, Any],
@@ -361,11 +409,18 @@ def _fill_transaction(
 ) -> JournalTransaction:
     ticker = str(fill["ticker"]).upper()
     side = str(fill["side"]).lower()
-    qty = _decimal(fill["qty"], "fill.qty")
-    price = _decimal(fill["price"], "fill.price")
+    qty = _exact_fill_decimal(fill, "qty")
+    price = _exact_fill_decimal(fill, "price")
     if side not in ("buy", "sell") or qty <= 0 or price <= 0:
         raise LedgerError(f"invalid fill: {fill!r}")
-    occurred_at = _parse_at(fill["at"], "fill.at").isoformat()
+    (
+        transaction_id,
+        occurred_at,
+        source,
+        external_id,
+        description,
+        metadata,
+    ) = _fill_transaction_header(fill, qty=qty, price=price)
     gross = qty * price
     security_account = _security_account(ticker)
 
@@ -399,25 +454,14 @@ def _fill_transaction(
             Posting(ACCOUNT_REALIZED_PNL, basis_removed - gross),
         )
 
-    fill_id = str(fill["fill_id"])
-    external_id = f"app_fill:{fill_id}"
     return JournalTransaction(
-        transaction_id=_transaction_id(external_id),
+        transaction_id=transaction_id,
         occurred_at=occurred_at,
-        source="assistant_broker_event",
+        source=source,
         external_id=external_id,
-        description=f"{side.upper()} {qty} {ticker} @ {price}",
+        description=description,
         postings=postings,
-        metadata={
-            "fill_id": fill_id,
-            "order_id": fill.get("order_id"),
-            "proposal_id": fill.get("proposal_id"),
-            "ticker": ticker,
-            "side": side,
-            "qty": _decimal_text(qty),
-            "price": _decimal_text(price),
-            "fees_included": False,
-        },
+        metadata=metadata,
     )
 
 
@@ -440,27 +484,19 @@ def sync_app_fills(store: AssistantStore) -> dict[str, Any]:
         external_id = f"app_fill:{fill['fill_id']}"
         if external_id in existing_external_ids:
             existing = store.get_journal_transaction_by_external_id(external_id)
-            ticker = str(fill["ticker"]).upper()
-            side = str(fill["side"]).lower()
-            qty = _decimal(fill["qty"], "fill.qty")
-            price = _decimal(fill["price"], "fill.price")
-            expected_metadata = {
-                "fill_id": str(fill["fill_id"]),
-                "order_id": fill.get("order_id"),
-                "proposal_id": fill.get("proposal_id"),
-                "ticker": ticker,
-                "side": side,
-                "qty": _decimal_text(qty),
-                "price": _decimal_text(price),
-                "fees_included": False,
-            }
-            expected_header = (
-                _transaction_id(external_id),
-                _parse_at(fill["at"], "fill.at").isoformat(),
-                "assistant_broker_event",
-                external_id,
-                f"{side.upper()} {qty} {ticker} @ {price}",
-                expected_metadata,
+            exact_header = _fill_transaction_header(
+                fill,
+                qty=_exact_fill_decimal(fill, "qty"),
+                price=_exact_fill_decimal(fill, "price"),
+            )
+            # Journals written before exact companions were consumed have an
+            # immutable float-derived header. Accept that legacy identity as
+            # well, without rewriting it or weakening conflict detection for
+            # journals already written with provider-exact digits.
+            legacy_header = _fill_transaction_header(
+                fill,
+                qty=_decimal(fill["qty"], "fill.qty"),
+                price=_decimal(fill["price"], "fill.price"),
             )
             actual_header = (
                 existing["transaction_id"],
@@ -470,7 +506,7 @@ def sync_app_fills(store: AssistantStore) -> dict[str, Any]:
                 existing["description"],
                 existing["metadata"],
             )
-            if actual_header != expected_header:
+            if actual_header not in (exact_header, legacy_header):
                 raise LedgerError(
                     f"journal external_id {external_id!r} already exists "
                     "with different content"

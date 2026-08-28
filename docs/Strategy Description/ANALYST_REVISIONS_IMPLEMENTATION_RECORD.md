@@ -230,6 +230,188 @@ new research milestone:
 Until those steps are recorded, the candidate remains unaccepted and all
 production research and outcome boundaries remain zero-access.
 
+## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
+
+**Range reviewed:** `a4f58e6^..5a5c7ab`, 21 commits, every one disposed.
+**Claude disposition: accepted after correction.** 0 P0, 0 P1, 3 P2, 6 P3.
+**Codex counter-review disposition:** both pushed Claude commits accepted; the
+inherited uncommitted correction set was accepted after correction. Codex
+found 0 P0, 0 P1, 2 P2, and 1 P3 in that proposed correction set.
+**Zero research looks.** No provider, credential, licensed row, broker,
+operator-database, QuantConnect or scheduler access occurred.
+
+### 4A.1 Scope change recorded during the review
+
+The owner-specified range ended at `d8d0ad6`. While the review was running the
+lane advanced to `5a5c7ab` and this checkout was fast-forwarded by a
+`pull --ff-only` (reflog verified; clean fast-forward, no history rewritten).
+Per `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` §1 the range was
+**extended deliberately rather than allowed to drift**. The extension is safe
+to combine with the earlier work because `research/analyst_revisions_v2/`,
+`data/exchange_calendar.py`, `assistant/temporal_integrity.py`,
+`execution/broker_contract.py` and `assistant/dispatch_fence.py` are
+byte-identical between the two commits, so every probe and mutation performed
+against `d8d0ad6` still holds at the review head.
+
+### 4A.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `a4f58e6` | Accepted | Counter-review restoration; 61/61 active-document checks, guard mutation-tested. |
+| `5d99ae4` | Accepted | Bool-as-number policy weakening closed at the parser boundary. |
+| `6b3b734` | Accepted | Cross-process dispatch fence introduced. |
+| `4c671d3` | Accepted | Execution authorization bound to broker context. |
+| `26b14ff` | Accepted | Park + kill switch + alert made one `BEGIN IMMEDIATE`; halt written even when a terminal transition wins the row. |
+| `7a79109` | Accepted | Cancel-all drain fenced. |
+| `a7c423b` | Accepted after correction | Fork hardening correct; its regression test could not run on Windows (CLR-007). |
+| `6b9ef21` | Accepted | Coherent account-scoped snapshot; execution discards the caller preview and captures its own. |
+| `31c7144` | Accepted | Closes the broker open-order indexing race. |
+| `00954b2` | Accepted after correction | Large shared hardening commit; source of CLR-002, CLR-004, CLR-005. |
+| `49fe8e8` | Accepted after correction | ARV2 fail-closed authority layer; source of CLR-009. |
+| `1a6f6cb` | Accepted | Registers the ARV2 research entry point and boundary. |
+| `5fb451c` | Accepted (governance verified) | Edits otherwise-frozen coordination files under an explicit bounded owner exception; see §4A.5. |
+| `130af4c` | Accepted | Lane-record boundary statement. |
+| `7029acb` | Accepted | Corrects candidate status to "assembled but unaccepted". |
+| `68ae4b4` | Accepted after correction | Shared regression closure; source of CLR-001. |
+| `653a9c0` | Accepted | ARV2 decimal/structural-zero hardening. |
+| `d8d0ad6` | Accepted | Lane-record ledger row. |
+| `a8f9071` | Accepted | Correct fix: `total_equity` aggregated already-rounded display values while `total_equity_exact` aggregated exact ones, so a multi-position portfolio could drift cents apart and fail its own display/exact integrity contract. Rounds the exact aggregate once. |
+| `c167574` | Accepted | Lane-record ledger row. |
+| `5a5c7ab` | Accepted | Lane-record ledger row. |
+
+None rejected. No commit was reviewed only as part of a combined diff.
+
+### 4A.3 Material claims reproduced independently
+
+The record's central claim is that the ARV2 layer is fail-closed with zero
+looks. It was re-derived with an adversarial probe written outside the
+repository, not accepted from the record:
+
+| Probe | Result |
+|---|---|
+| `require_registered_source_bytes`, all six source kinds | all refuse |
+| `run_authorized_outcome_slice` with an instrumented loader | refused; **`outcome_loader` never executed** |
+| `authorize_outcome_access` | cannot mint a permit under any input |
+| Forged `OutcomeAccessPermit` carrying the real module token | refused |
+| Forged, internally self-consistent `VerifiedAnalystPolicy` (valid evidence hash + real token) | refused — out-of-band weakref authority defeats it |
+| `load_reviewed_preregistration` on the draft | refused (registry empty) |
+| Legacy analyst runner | refused before any network or outcome access |
+| Cross-section evidence / `PortfolioRules` | both refuse; no non-empty portfolio constructible |
+
+The four committed authority artifacts were read directly and are genuinely
+empty (`entries: []`, `authority_mode: "zero_access"`).
+
+**Blueprint errata verified by golden values.** `N_eff`: zero mass → `0`; a
+single `1e-30` contributor → `0` (no epsilon blow-up); one → `1`; four equal →
+`4`; `[1000,1,1]` → `1.004002`. Independence: five events from **one** firm →
+`1` (raw intensity 5 kept separately); five firms → `5`; fifteen firms on one
+catalyst → `1`.
+
+**Timing boundaries verified exhaustively**, including the dangerous direction:
+exactly at the 09:30 open → next session; 1 µs before/after → same/next
+session; intraday and after-close → next session; Friday/Saturday → Monday;
+Jul 3 half day and Dec 24 → Jul 5 and Dec 26; date-only → the **second**
+session strictly after; naive, malformed and non-string clocks all refuse;
+four-clock monotonicity refuses each inversion. DST handled (13:30Z summer vs
+14:30Z winter open).
+
+**Import boundary is transitively enforced.** The package's own closure
+validator reaches 21 modules and **zero** rooted in `assistant`, `execution`,
+`risk`, `backtest`, `ml`, `signals`, `strategies` or `scripts`.
+
+**Mutation testing.** Five ARV2 safety invariants were reverted one at a time
+in a throwaway worktree pinned at `d8d0ad6`; each turned the suite red
+(baseline 169 passed): date-only delay 2→1 session (6 failed), accepted-event
+zero-access latch removed (16 failed), `N_eff` epsilon reintroduced (1),
+independence `min`→`max` (1), next-open `>`→`>=` (1).
+
+### 4A.4 Issue ledger
+
+| ID | Pri | Status | Location | Issue and impact | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|
+| CLR-001 | P3 | **Corrected** | `tests/test_ml_evidence_operations.py` | A new test fed `sys.executable` to an installer that refuses Microsoft Store app-execution aliases by contract, so it failed on any machine whose `python` is the Store alias — the default on the owner's host — while passing elsewhere. | CLAUDE.md §10 requires the full suite to pass on the exact final tree; a test whose outcome depends on interpreter provenance makes that gate unreproducible and reports a permanent false failure. | Skips when the interpreter is not a real executable, matching how sibling tests skip off-Windows. | Red under the Store alias before, skipped after, and **still passes under a real interpreter**, so the skip is not vacuous. |
+| CLR-002 | P2 | **Corrected after counter-review** | `assistant/portfolio_ledger.py` | SYS-P2-002's exact-decimal chain stopped at `list_fills`: the durable journal re-read the rounded float and ignored `qty_decimal`/`price_decimal`, so a fractional fill was re-rounded before becoming book cost and realized P&L. The first proposed correction also made an exact fill fail on its second identical sync because duplicate validation still rebuilt the header from the float companions. | Money paths must not round-trip through binary float, and an immutable operator journal must remain retry-safe across the upgrade. | `_exact_fill_decimal` prefers provider text. One shared header builder now drives insertion and duplicate validation; retries accept either the current exact header or the immutable legacy float-derived header, while a changed exact companion still conflicts. | Public-boundary tests prove exact sync twice (insert then duplicate), legacy row followed by exact companions, and changed exact digits in the dangerous direction. **Deliberately bounded:** `assistant/tax_lots.py` remains float throughout and requires a separate conversion milestone. `numeric_evidence_status` was not added to immutable metadata because that needs an additive migration. |
+| CLR-003 | P2 | **Open - attempted correction rejected by Codex** | `assistant/dispatch_fence.py`, `assistant/order_reconciler.py` | A busy final broker-contact fence can outlast the ordinary timeout, but the proposed 180 s replacement was not a proven upper bound and delayed all best-effort cancellation of already-open orders. | Emergency cancellation must reduce risk promptly without claiming a guessed broker-call bound as a correctness proof. | Reverted the 180 s constant, API threading, and constant-only test. The existing bounded failure remains loud (`book_stable=False` plus a durable critical incomplete-containment incident). A real fix requires independently bounded broker operations and a stop-request/cancellation design that does not synchronously wait several minutes before contacting the broker. | Static call-path reproduction showed waits of roughly 420 s under a stuck holder (180 + 30 + 30 + 180) before the cancellation body. Final preflight can perform repeated account/order/position/asset/quote calls, most through SDK clients without the claimed local 30 s timeout, so `3 × 30 s` was false. Existing fail-loud cancellation tests remain green. |
+| CLR-004 | P2 | **Corrected** | `assistant/portfolio_snapshot.py` | The non-strict snapshot builder set `open_orders_available=True` over unvalidated broker rows, so a malformed order was silently skipped by the duplicate and pending-exposure checks while the book appeared complete. | Advisory and preflight surfaces presented an incomplete order book as complete, and operators read preflight as "this would be approved". | A successful call is now treated as transport success only; the book is validated through the same strict contract, and any invalid risk-relevant row makes the evidence unavailable. | Red/green mutation-verified with a positive control proving a healthy book stays available. Execution was never exposed: it does `del caller_preview` and captures its own strict snapshot. |
+| CLR-005 | P3 | **Closed — owner decision, no code change** | `risk/execution_gate.py` | The remediation widens what trips the global kill switch, and the kill switch blocks **all** orders including legitimate risk-reducing sells. | CLAUDE.md §5 says a conservative safeguard must not obstruct a risk-reducing sell. | **Owner decision 2026-08-27: leave the kill switch absolute and document the deviation.** It is the master emergency stop, not an ordinary safeguard; admitting orders while it is active is the one direction that can let an order reach the broker during an incident. Risk can still be reduced because emergency cancel-all and `cancel_assistant_order` never consult it. | Recorded as an accepted documented deviation. Any future carve-out must be a separate owner-authorized milestone proving no new exposure can be opened. |
+| CLR-006 | P3 | **Corrected** | `ml/earnings_gap.py` | A hardcoded 16:00 ET close survived the shared-calendar consolidation, so on roughly nine early-close sessions a year a 14:30 ET release was classified `intraday` instead of `after_close`, misaligning its event window. Dead `_NYSE`/`mcal` objects made the module look calendar-aware. | Event-time misalignment in a research path, plus a second drifting definition of "market close". | Classification now uses the exchange calendar's real close for the release's own session, with the fixed hour kept only as the fallback for a date that is not a trading session. Dead calendar objects removed. | Red/green mutation-verified. Normal sessions keep the exact 16:00 boundary, so ordinary sessions cannot be silently reclassified. |
+| CLR-007 | P3 | **Corrected** | `tests/test_dispatch_fence.py` | The fork-inheritance regression test — the entire point of `a7c423b` — is `skipif(not hasattr(os, "fork"))`, so the hardening never executed on Windows, the owner's only supported platform. | The hardening was unverified on the platform that actually runs it; a regression would be invisible here. | Added a platform-neutral test that calls the fork-child reset directly and proves it discards inherited handles, depth and permits and rebuilds the guards. The POSIX test is retained. | Red/green mutation-verified: neutering the reset fails it. |
+| CLR-008 | P3 | **Corrected** | `tests/test_atomic_reconciliation_anomaly.py` | Crash fault injection was simulated with aborting triggers and patched exceptions asserted against the same live store; no process kill and no database reopen, so durability across a real crash rested on SQLite's guarantee alone. | The audit asked for a crash mid-transaction followed by a database reopen; the repo already had a genuine `os._exit` technique that had simply not been applied here. | Added a test that really terminates a child interpreter with `os._exit` between the proposal park and the commit — skipping every `except`/`finally` and the fallback kill-switch write — then reopens the database and asserts there is never a committed anomaly without its halt and alert. | Mutation-verified against the exact pre-remediation failure mode: splitting the transaction so the park commits before the halt makes it fail. |
+| CLR-009 | P3 | **Corrected after counter-review test hardening** | `research/analyst_revisions_v2/formulas.py`, `holdings.py`; `tests/analyst_revisions_v2/test_dataset_and_import_firewall.py` | Five out-of-band authority registries, but only three guarded by a lock; `_POLICY_AUTHORITIES` and `_STOCK_SCORE_AUTHORITIES` were bare dicts. The first source test only proved matching lock declarations existed; deleting the actual `with` guard still passed. | The out-of-band registry is the mechanism that defeats forged authority objects, so both production discipline and regression sensitivity must be uniform. | Both registries use `threading.RLock()` and guarded register/get/weakref-forget paths. The AST audit pins all five registries, validates an actual `threading.RLock()` declaration, and requires every non-declaration registry access to have its own lock as a lexical `with` ancestor. | Four synthetic dangerous-direction mutations (unguarded get, set, pop, and wrong lock) are rejected; a matching-lock positive control passes. No exploit was constructed, and the live production code was independently confirmed guarded. |
+
+Resolved and open items are both retained; nothing was deleted after fixing.
+
+### 4A.5 Governance verification
+
+**Frozen-file edits are covered.** `5fb451c` edits the workflow, direction and
+review-process documents under an explicit, bounded, self-describing one-time
+common-remediation exception that names its scope and expiry and states that
+synchronization is not acceptance and grants no credential, provider, outcome,
+QC, broker or deployment authority. The same text is present on `main`, merged
+by the owner, corroborating that it is owner-directed rather than
+self-authorized.
+
+**Cross-lane isolation held.** Verified against the live remotes:
+`research/analyst_revisions_v2/` contains **30 files on this lane and 0 on both
+`codex/strategy-insider-buying` and `codex/strategy-short-interest`**.
+
+**Synchronized commits are patch-identical to the merged main work.** All
+seventeen were compared to their `main`-side sources by stable patch ID and
+every pair matches, including `a8f9071` against `1ed0602`
+(`cbc98a73962e1592d9242dd31fbbd16278432dd0`). This lane introduced no divergent
+variant of a shared safety fix.
+
+**Corrections stayed on this one lane branch.** No side branch was created. The
+frozen list is the coordination documents plus `requirements.txt`,
+`config.py`, CI/tooling configuration and shared test or classification
+manifests; general shared implementation code is not frozen, and this lane
+already carries shared execution fixes from the remediation synchronization.
+
+### 4A.6 Remaining gates
+
+Unchanged by this review: owner decisions on the ARV2-0 open cells, a reviewed
+spec anchor, governed source admission, and an external cross-machine
+append-only permanent-look authority must all close before any production
+normalization, price/outcome join, real score, ETF construction, non-empty
+portfolio or QuantConnect run. ARV2-4 remains the stock-first stop/go gate
+ahead of any ETF topology work. The required Codex counter-review is recorded
+below; its accepted-after-correction disposition does not resolve those gates.
+
+### 4A.7 Codex counter-review dispositions and findings
+
+| Reviewed item | Disposition | Independent basis |
+|---|---|---|
+| `48a8b08` | **Accepted** | The CLR-001 Store-alias skip is restricted to an interpreter the installer refuses by contract; the same test remains executable under the real project interpreter. The review range and 21 commit dispositions were rechecked. |
+| `bd3393d` | **Accepted** | It records the completed Claude validation and required same-branch handoff without changing product behavior. Its separate review report was consolidated into this branch-specific record under the owner's documentation instruction; Git history retains the original. |
+| Inherited, uncommitted Claude correction set | **Accepted after correction** | CLR-002, CLR-004, CLR-006, CLR-007, CLR-008, and the CLR-009 production locks were accepted. Codex corrected CLR-002 retry compatibility and CLR-009 test sensitivity, and rejected/reverted the unsafe CLR-003 timeout attempt. CLR-005 remains the recorded owner decision with no code change. |
+
+| Counter-review ID | Pri | Status | Finding and disposition |
+|---|---|---|---|
+| ARV2CR-001 | P2 | **Corrected** | Exact fill insertion used provider digits while duplicate validation used float companions, so the second identical sync raised `LedgerError`; exact-only validation would also strand legacy journals. Centralized the header and accepted exact-current or legacy immutable identity. |
+| ARV2CR-002 | P2 | **Correction rejected; CLR-003 remains open** | The proposed 180 s emergency wait was an unsupported bound and could postpone broker cancellation for roughly seven minutes. Reverted it and retained the bounded, loud-incomplete behavior pending a structural owner-authorized safety milestone. |
+| ARV2CR-003 | P3 | **Corrected** | The registry test checked only declaration strings and passed after removing real guards. Replaced it with an exact-inventory AST guard audit plus four red-direction mutations and a positive control. |
+
+Focused final-tree validation for every reviewed surface: **334 passed, 1
+skipped, 1 known dependency warning in 351.68 s**. The three new exact-fill
+and six lock-audit tests also passed alone (**9 passed in 10.65 s**).
+Complete fixture-only final-tree validation: **5,448 passed, 2 skipped, 0
+failed, 25 known dependency warnings in 10,766.38 s (2h59m26s)**.
+Forced `compileall` over application, research, and test modules exited 0;
+the post-record active-document gate passed **63 tests**; `git diff --check`
+was clean.
+No provider, credential, licensed row, outcome, broker, operator database,
+QuantConnect, scheduler, or order access occurred; **0 research looks** and no
+permanent look identifier was consumed.
+
+The review chain closes as accepted after correction, but the next milestone
+is blocked before implementation and before push by the explicit workflow
+rule. ARV2-0 still has eight `owner_decision_required` cells:
+`shared_holdout`, `contaminated_legacy_periods`, `corporate_action_contract`,
+`universe_contract`, `normalization_contract`, `stock_topology`,
+`multiplicity_family`, and `lane_validation_period`. The reviewed-spec
+registry is empty, and both source and permanent-look authorities remain
+`zero_access`. ARV2-1 must not begin.
+
 ## 5. Session / push ledger
 
 Append one row before every push. Never rewrite earlier rows.
@@ -241,3 +423,4 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-27 | Codex implementation | `d8d0ad6` -> `a8f9071` (code snapshot; this lane-record commit follows) | Owner-authorized shared portfolio-equity correction | Cherry-picked source fix `1ed0602` into `assistant/portfolio_snapshot.py` and `tests/test_assistant_risk_copilot.py`. The builder now aggregates exact Decimal cash and position values before rounding the single total-equity display, preventing legitimate fractional-share portfolios from failing the strict display/exact integrity check. The validator, policy limits, broker contracts, strategy code, and research gates were not weakened or changed. | Focused portfolio/risk/coherent-snapshot suite: 112 passed, 0 failed, 1 dependency warning in 20.25s; compileall exit 0; `git diff --check` clean. Source correction previously passed the complete 5,442-test suite and a reverse mutation that reproduced display `100.01` versus exact `100`. No provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | `SYS-FU-P1-006` reproduced: per-position display rounding accumulated into a competing equity total and prevented UI load. Corrected without adding tolerance; pending Claude review and Codex counter-review. | Validate and push the exact recorded lane snapshot. Claude then reviews both new commits on this lane before any later milestone. |
 | 2026-08-27 | Codex validation | `c167574` -> `c167574` (exact isolated tested snapshot; this validation-record commit follows) | Portfolio-equity correction final validation | Revalidated the complete Analyst Revisions V2 lane after its code and required lane-record commits in a detached isolated worktree pinned to `c167574`; no product file changed during the run. | Complete exact-tree suite: **5,435 passed, 2 skipped, 0 failed, 25 dependency warnings in 2,017.42s (33m37s)**. The earlier focused 112-test suite, 63-test active-document suite, compileall, and diff checks were also green. Fixture-only; no provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | No new P0-P3 finding. `SYS-FU-P1-006` remains implemented but unaccepted pending the required review chain; all Analyst source/outcome gates remain zero-access. | Commit this validation record and push the complete three-commit lane range; Claude reviews every new commit before any later milestone. |
 | 2026-08-27 | Claude review | `5a5c7ab` -> `48a8b08` (this lane-record commit follows) | Independent review of the owner-authorized remediation synchronization | Reviewed all 21 commits in `a4f58e6^..5a5c7ab` with an explicit disposition each; none rejected. The owner-specified range ended at `d8d0ad6`, but the lane advanced to `5a5c7ab` during the review (clean `pull --ff-only`, reflog verified), so scope was deliberately extended rather than allowed to drift; `research/analyst_revisions_v2/`, `data/exchange_calendar.py`, `assistant/temporal_integrity.py`, `execution/broker_contract.py` and `assistant/dispatch_fence.py` are byte-identical across that extension. Corrected CLR-001 in `tests/test_ml_evidence_operations.py`; added `docs/Archive/Review/REVIEW_2026-08-27_ARV2_LANE_REMEDIATION_SYNC.md`. No production file was changed. | Exact committed tree `48a8b08`: **5,434 passed, 0 failed, 3 skipped, 25 known warnings in 1,403s**; compileall exit 0; `git diff --check` clean. As received at `d8d0ad6`: 5,433 passed, 1 failed, 2 skipped (that failure was CLR-001, interpreter-provenance dependent, now corrected). Independently reproduced rather than accepted: the outcome loader never executes, all six research source kinds refuse, forged permit and self-consistent forged policy objects are rejected, the ETF `N_eff` and institution/catalyst independence errata return their hand-computed values, every event-timing boundary including exactly-at-open is correct, and the transitive import closure reaches 21 modules with zero execution-capable roots. Five safety invariants were mutation-tested in a pinned throwaway worktree and each turned the suite red (6, 16, 1, 1 and 1 failures). 17/17 synchronized commits are patch-identical to their `main` sources. Data sources: none; no provider, credential, licensed row, broker, operator-database, QuantConnect or scheduler access. **0 research looks; no permanent look identifier consumed.** | 0 P0, 0 P1, 3 P2, 6 P3. CLR-001 corrected and verified red/green across two interpreters. One proposed P1 (cancel-all fence timeout) was downgraded to P2 after confirming it records a durable critical incident instead of reporting success. CLR-002/003/004 are shared-execution items with mitigations, not lane regressions; six files flagged by deeper sweeps were confirmed untouched by this range and are pre-existing. The ARV2 lane-owned research layer yielded no defects; CLR-009 is a self-found locking-consistency note with no demonstrable exploit. Disposition: **accepted after correction**; synchronization remains not acceptance. | Codex counter-reviews this exact pushed head including the CLR-001 correction, and disposes CLR-002 through CLR-009 - several belong to the shared remediation owner rather than this lane. Owner decisions, a reviewed spec anchor, governed source admission and an external append-only permanent-look authority all remain open before any production normalization, outcome join, ETF construction or QC run. |
+| 2026-08-27 | Codex counter-review | `bd3393d` -> this commit | Counter-review both pushed Claude commits and complete the inherited correction set on this one lane | Stayed on `codex/strategy-analyst-revisions-v2` in the dedicated worktree. Accepted `48a8b08` and `bd3393d`; independently reviewed every inherited correction. Retained CLR-002/004/006/007/008 and CLR-009 production locking, fixed exact-fill retry/legacy compatibility and lock-test sensitivity, and rejected/reverted the unsupported CLR-003 180 s delay. Consolidated the separate report into this required branch-specific record and removed the duplicate live copy. | Focused final-tree suite: **334 passed, 1 skipped, 1 known dependency warning in 351.68 s**; isolated new regressions: **9 passed in 10.65 s**. Exact full-tree result and compile/diff evidence are recorded before commit. No provider, credential, licensed row, outcome, broker, operator database, QuantConnect, scheduler, or order access; **0 research looks**. | 0 P0, 0 P1, 2 P2, 1 P3 in the proposed correction set: ARV2CR-001 and ARV2CR-003 corrected; ARV2CR-002 caused the attempted fix to be reverted and CLR-003 to remain explicitly open. The existing candidate is accepted after correction. | ARV2-0 is the next milestone but is blocked by eight owner decisions plus empty reviewed-spec/source/look authorities. Per the same-branch workflow, stop before ARV2-1 and before push; commit the counter-review locally and request owner direction. |

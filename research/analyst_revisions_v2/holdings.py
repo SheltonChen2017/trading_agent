@@ -4,6 +4,7 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import json
+import threading
 import weakref
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -50,6 +51,9 @@ _VERIFIED_STOCK_SCORE_TOKEN = object()
 _STOCK_SCORE_AUTHORITIES: dict[
     int, tuple[weakref.ReferenceType["VerifiedStockScoreEvidence"], str]
 ] = {}
+# Matches the snapshot/dataset/preregistration/policy registries: a weakref
+# callback can fire on any thread, so registry access is uniformly locked.
+_STOCK_SCORE_AUTHORITIES_LOCK = threading.RLock()
 _HOLDINGS_SOURCE_SCHEMA = "arv2-holdings-source-v1"
 _STOCK_SCORE_SOURCE_SCHEMA = "arv2-stock-score-source-v1"
 _HOLDINGS_SOURCE_KEYS = frozenset(
@@ -1040,16 +1044,22 @@ class VerifiedStockScoreEvidence:
     _token: object = dataclasses.field(repr=False, compare=False)
 
 
-def _register_stock_score_authority(value: VerifiedStockScoreEvidence) -> None:
-    identity = id(value)
-
-    def remove(reference: weakref.ReferenceType[VerifiedStockScoreEvidence]) -> None:
+def _forget_stock_score_authority(
+    identity: int, reference: weakref.ReferenceType["VerifiedStockScoreEvidence"]
+) -> None:
+    with _STOCK_SCORE_AUTHORITIES_LOCK:
         registered = _STOCK_SCORE_AUTHORITIES.get(identity)
         if registered is not None and registered[0] is reference:
             _STOCK_SCORE_AUTHORITIES.pop(identity, None)
 
-    reference = weakref.ref(value, remove)
-    _STOCK_SCORE_AUTHORITIES[identity] = (reference, value.source_sha256)
+
+def _register_stock_score_authority(value: VerifiedStockScoreEvidence) -> None:
+    identity = id(value)
+    reference = weakref.ref(
+        value, lambda ref, key=identity: _forget_stock_score_authority(key, ref)
+    )
+    with _STOCK_SCORE_AUTHORITIES_LOCK:
+        _STOCK_SCORE_AUTHORITIES[identity] = (reference, value.source_sha256)
 
 
 def build_verified_stock_score_evidence(
@@ -1102,7 +1112,8 @@ def require_verified_stock_score_evidence(
         raise HoldingsError(
             "weighted score requires loader-authenticated stock-score evidence"
         )
-    authority = _STOCK_SCORE_AUTHORITIES.get(id(value))
+    with _STOCK_SCORE_AUTHORITIES_LOCK:
+        authority = _STOCK_SCORE_AUTHORITIES.get(id(value))
     if (
         authority is None
         or authority[0]() is not value

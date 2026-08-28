@@ -999,12 +999,37 @@ def build_portfolio_snapshot_from_alpaca(
     account = get_account()
     try:
         open_orders = get_open_orders()
-        open_orders_available = True
     except Exception:
         # A read-only briefing can still expose positions and cash, but order
         # availability must remain explicitly unknown so execution fails closed.
         open_orders = []
         open_orders_available = False
+    else:
+        # A successful call is transport success, not a usable order book. One
+        # malformed risk-relevant row makes the book incomplete, and an
+        # incomplete book reported as available lets duplicate and pending
+        # exposure checks silently skip the row they most need to see.
+        from execution.broker_contract import (
+            BrokerAccountIdentity,
+            BrokerOrderIntegrityError,
+            validate_active_order_set,
+        )
+
+        account_mode = "paper" if account["paper"] else "live"
+        try:
+            identity = BrokerAccountIdentity(
+                account_id=account["account_id"], account_mode=account_mode
+            )
+            validate_active_order_set(
+                open_orders,
+                expected_account=identity,
+                observed_account=identity,
+            )
+        except (BrokerOrderIntegrityError, ValueError):
+            open_orders = []
+            open_orders_available = False
+        else:
+            open_orders_available = True
     positions = [
         {
             "ticker": position["ticker"],

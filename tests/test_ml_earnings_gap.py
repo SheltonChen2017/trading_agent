@@ -295,3 +295,30 @@ def test_quantile_models_are_ordered_and_refuse_bad_quantiles():
 
     with pytest.raises(EarningsGapError, match="quantiles"):
         fit_gap_magnitude_quantiles(x, y, quantiles=(1.5,))
+
+
+def test_release_timing_uses_the_real_session_close_on_an_early_close_day():
+    """A 14:30 ET release on a 13:00 ET half day is after_close, not intraday.
+
+    The classifier previously compared against a fixed 16:00 ET hour, so on
+    roughly nine early-close sessions a year it placed a genuinely
+    after-close release inside the session and misaligned its event window.
+    """
+    import pandas as pd
+
+    from ml.earnings_gap import classify_release_timing
+
+    # 2024-07-03 is the July 3rd half day: NYSE closes at 13:00 ET.
+    assert classify_release_timing(pd.Timestamp("2024-07-03T14:30:00-04:00")) == "after_close"
+    assert classify_release_timing(pd.Timestamp("2024-07-03T13:00:00-04:00")) == "after_close"
+    # Just before that real close it is still intraday.
+    assert classify_release_timing(pd.Timestamp("2024-07-03T12:59:00-04:00")) == "intraday"
+
+    # A full session keeps the 16:00 ET boundary exactly as before, so the
+    # calendar lookup cannot silently reclassify ordinary sessions.
+    assert classify_release_timing(pd.Timestamp("2024-01-02T15:59:00-05:00")) == "intraday"
+    assert classify_release_timing(pd.Timestamp("2024-01-02T16:00:00-05:00")) == "after_close"
+    assert classify_release_timing(pd.Timestamp("2024-01-02T09:00:00-05:00")) == "before_open"
+
+    # A non-session date has no real close and keeps the fixed-hour fallback.
+    assert classify_release_timing(pd.Timestamp("2024-01-06T17:00:00-05:00")) == "after_close"

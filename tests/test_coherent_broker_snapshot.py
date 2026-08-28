@@ -2000,3 +2000,33 @@ def test_coherence_retry_bound_rejects_ambiguous_values(bad_attempts):
             require_execution_coherence=True,
             max_coherence_attempts=bad_attempts,
         )
+
+
+def test_non_strict_snapshot_marks_a_malformed_open_order_book_unavailable():
+    """A successful broker call is transport success, not a usable book.
+
+    The duplicate-order and pending-exposure checks silently skip a row that
+    has no ticker, so reporting availability over such a book would present an
+    incomplete order book as complete to every advisory and preflight caller.
+    """
+    from assistant.portfolio_snapshot import build_portfolio_snapshot_from_alpaca
+
+    malformed = _order()
+    malformed["ticker"] = None
+    degraded = build_portfolio_snapshot_from_alpaca(
+        broker_session=_ScriptedSession(
+            accounts=[_account()], order_books=[[malformed]], positions=[[]]
+        )
+    )
+    assert degraded.open_orders_available is False
+    assert list(degraded.open_orders) == []
+
+    # Positive control: the identical book without the defect stays available,
+    # so the guard cannot pass by making every book unavailable.
+    healthy = build_portfolio_snapshot_from_alpaca(
+        broker_session=_ScriptedSession(
+            accounts=[_account()], order_books=[[_order()]], positions=[[]]
+        )
+    )
+    assert healthy.open_orders_available is True
+    assert len(list(healthy.open_orders)) == 1

@@ -100,6 +100,60 @@ def test_current_handoff_is_a_bounded_unique_resume_snapshot() -> None:
     )
 
 
+def test_open_root_p2_p3_findings_are_durably_queued_after_strategy_merge() -> None:
+    """The post-integration backlog must carry every open reviewed issue.
+
+    The archived counter-review owns the finding evidence.  The queued plan
+    owns future closure.  Deriving the IDs from the review prevents a finding
+    from disappearing because one status document was edited without the
+    other; the exact 2/5 distribution is deliberately load-bearing.
+    """
+    report_path = (
+        ROOT
+        / "docs"
+        / "Archive"
+        / "Review"
+        / "COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md"
+    )
+    plan_name = (
+        "POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md"
+    )
+    plan_path = ROOT / "docs" / "Plan" / plan_name
+    report = report_path.read_text(encoding="utf-8")
+    plan = plan_path.read_text(encoding="utf-8")
+
+    open_rows = re.findall(
+        r"^\| `(RCR-\d{3})` \| (P[23]) \| Open \|",
+        report,
+        flags=re.MULTILINE,
+    )
+    assert len(open_rows) == 7, open_rows
+    assert sum(priority == "P2" for _issue_id, priority in open_rows) == 2
+    assert sum(priority == "P3" for _issue_id, priority in open_rows) == 5
+
+    queued_rows = re.findall(
+        r"^\| `(RCR-\d{3})` \| (P[23]) \| Open — queued \|",
+        plan,
+        flags=re.MULTILINE,
+    )
+    assert dict(queued_rows) == dict(open_rows)
+
+    for document in (
+        ROOT / "docs" / "Plan" / "README.md",
+        ROOT / "docs" / "ACTION_PLAN_2026-08-20.md",
+        ROOT / "docs" / "SESSION_HANDOFF.md",
+    ):
+        assert plan_name in document.read_text(encoding="utf-8")
+
+    lowered = " ".join(plan.split()).lower()
+    assert all(branch.lower() in lowered for branch in _THREE_STRATEGY_LANES)
+    assert "merged into `main`" in lowered
+    assert "owner explicitly starts" in lowered
+    assert "does not unfreeze sep-3" in lowered
+    assert "strategy research / quantconnect" in lowered
+    assert "trading assistant / paper-live operations" in lowered
+
+
 def test_three_strategy_parallel_baseline_is_exact_and_fail_closed() -> None:
     """The owner-directed lanes must not drift into competing coordination."""
     strategy_dir = ROOT / "docs" / "Strategy Description"

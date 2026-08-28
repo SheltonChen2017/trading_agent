@@ -60,10 +60,14 @@ independent and were not inspected, modified, synchronized, or reviewed here.
 - No feature milestone completed and no sequencing, gate, or next-step status
   changed, so `docs/FEATURE_MILESTONE_RECORD.md` and
   `docs/ACTION_PLAN_2026-08-20.md` remain unchanged.
-- The branch and its commits are local-only; no push was performed. Push only
-  if the owner explicitly requests it. Otherwise archive this session until
-  the three strategy lanes complete. The owner will then initiate a new
-  whole-project review from the exact integrated `main` snapshot.
+- On 2026-08-28 the owner explicitly directed publication of this completed
+  counter-review branch. This handoff is the intended non-force-pushed branch
+  tip; publishing it does not merge or change `main` and grants no additional
+  implementation, research, provider, deployment, or trading authority.
+- After the remote head is verified, this whole-project review session is
+  **DONE** and should be archived. Do not begin another whole-project review
+  until all three feature branches are complete and merged into `main`; the
+  owner will then initiate that review from the exact integrated snapshot.
 
 The owner clarification remains binding: the standing strategy-lane loop is
 Codex implementation, Claude independent review, then Codex counter-review
@@ -300,19 +304,18 @@ and a new owner-authorized permanent look budget.
 ## 8. Resume prompt
 
 ```text
-Resume this root task only if the owner explicitly asks to push the completed
-counter-review, or after all three strategy lanes are integrated and the owner
-initiates the next whole-project review. Read CLAUDE.md, AGENTS.md,
+This root counter-review is complete and its branch was owner-directed for
+publication. Do not resume the whole-project review until all three strategy
+lanes are complete, merged into main, and the owner initiates the next review.
+Then read CLAUDE.md, AGENTS.md,
 ACTION_PLAN_2026-08-20.md, THREE_STRATEGY_PROJECT_DIRECTION.md, and
 COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md. Preserve implementation commit
 242f8eb7ef5022ed17e86502896ae19e7621e55c and report commit
 699f6bc970f1ab5978c9a994d803b5dc09fc1fbd. Do not modify or synchronize the
 Analyst Revisions V2, Insider Buying, or Short Interest branches/worktrees from
-this task. If pushing is requested, first verify the current branch, exact
-HEAD, clean worktree, unchanged origin/main at 6a50734, and all three local
-commits; do not force-push. If starting the later review, begin from the exact
-post-integration main snapshot and establish a new bounded commit range under
-the generic separate-review-branch workflow. Access no provider, credential,
+this task. Begin the later review from the exact post-integration main snapshot
+and establish a new bounded commit range under the generic
+separate-review-branch workflow. Access no provider, credential,
 licensed row, outcome, QuantConnect job, broker, operator database, live
 scheduler, deployment, paper-order, live-order, or evidence-epoch surface.
 Provider/outcome access remains an open owner decision; obtain that

@@ -52,6 +52,7 @@ REQUIRED_CELL_IDS = (
     "holdings_contract",
     "portfolio_contract",
     "multiplicity_family",
+    "historical_evaluation_contract",
     "lane_validation_period",
     "three_lane_selection_correction",
     "valid_null_closes_family",
@@ -115,19 +116,40 @@ _UNIVERSE_KEYS = {
     "security_master_sha256",
     "point_in_time",
     "listing_venues",
+    "issuer_incorporation",
     "instrument_types",
+    "excluded_instrument_types",
+    "share_class_policy",
     "include_delisted",
     "current_ticker_joins",
     "unknown_identity",
 }
 _NORMALIZATION_KEYS = {
     "population",
-    "peer_fallback",
+    "method",
+    "peer_hierarchy",
+    "minimum_total_names",
+    "minimum_active_names",
     "structural_zero",
     "clipping",
     "residualization",
     "degenerate_group",
 }
+_HISTORICAL_EVALUATION_KEYS = {
+    "eligible_history_start",
+    "development_end",
+    "history_extension_policy",
+    "market_benchmark",
+    "regime_signal_timing",
+    "stress_rule",
+    "boom_rule",
+    "ordinary_rule",
+    "formal_selection_policy",
+    "regime_output_policy",
+    "named_episode_policy",
+    "named_episodes",
+}
+_NAMED_EPISODE_KEYS = {"episode_id", "start", "end", "label"}
 _STOCK_TOPOLOGY_KEYS = {"topology_id", "primary_cell_id", "cells"}
 _STOCK_CELL_KEYS = {
     "cell_id",
@@ -163,6 +185,12 @@ PERMANENT_LOOK_AUTHORITY_PATH = (
 REVIEW_REGISTRY_SCHEMA = "arv2-reviewed-spec-registry-v1"
 PERMANENT_LOOK_AUTHORITY_SCHEMA = "arv2-permanent-look-authority-v1"
 ZERO_ACCESS_AUTHORITY_ID = "arv2-zero-access-no-external-authority"
+OWNER_DECISION_CANDIDATE_STATUS = (
+    "owner_decisions_frozen_pending_external_bindings_and_review"
+)
+_PENDING_SOURCE_CELL_IDS = frozenset(
+    {"corporate_action_contract", "universe_contract"}
+)
 _REVIEWED_AUTHORITY = object()
 _PERMIT_AUTHORITY = object()
 _REVIEWED_AUTHORITIES: dict[
@@ -456,7 +484,11 @@ def _reviewed_preregistration(
 @dataclasses.dataclass(frozen=True)
 class DraftPreregistration:
     status: str
-    unresolved_cells: tuple[str, ...]
+    spec_id: str
+    spec_hash: str
+    unresolved_owner_decisions: tuple[str, ...]
+    pending_external_bindings: tuple[str, ...]
+    planned_look_ids: tuple[str, ...]
 
 
 def _parse_root(path: Path) -> dict[str, object]:
@@ -647,24 +679,105 @@ def require_reviewed_preregistration(
 
 def load_draft_preregistration(path: Path) -> DraftPreregistration:
     raw = _parse_root(path)
-    if raw["status"] != "blocked_owner_decisions":
-        raise PreregistrationError("artifact is not the blocked decision draft")
+    if raw["status"] != OWNER_DECISION_CANDIDATE_STATUS:
+        raise PreregistrationError("artifact is not the owner-decision candidate")
+    spec_hash = _sha256(raw["spec_hash"], "spec_hash")
+    if spec_hash != hashlib.sha256(_canonical_payload(raw)).hexdigest():
+        raise PreregistrationError("owner-decision candidate content hash mismatch")
+    if raw["spec_id"] != f"arv2-round0-candidate-{spec_hash[:16]}":
+        raise PreregistrationError("candidate spec_id is not content-derived")
+    if any(
+        raw[field] is not None
+        for field in ("producing_commit", "reviewed_by", "reviewed_at")
+    ):
+        raise PreregistrationError(
+            "unreviewed candidate cannot claim production or review authority"
+        )
     cells = raw["cells"]
     if not isinstance(cells, list) or len(cells) != len(REQUIRED_CELL_IDS):
-        raise PreregistrationError("draft must inventory every required cell")
-    unresolved: list[str] = []
+        raise PreregistrationError("candidate must inventory every required cell")
+    values: dict[str, object] = {}
     for expected, cell in zip(REQUIRED_CELL_IDS, cells, strict=True):
         if not isinstance(cell, dict) or set(cell) != _CELL_KEYS or cell["cell_id"] != expected:
-            raise PreregistrationError("draft cells must have exact fields and canonical order")
-        if cell["state"] not in {"frozen", "owner_decision_required"}:
-            raise PreregistrationError("draft cell state is invalid")
-        if cell["state"] == "owner_decision_required":
-            if cell["value"] is not None:
-                raise PreregistrationError("unresolved draft cells must not carry guessed values")
-            unresolved.append(expected)
-    if not unresolved:
-        raise PreregistrationError("blocked draft must identify unresolved owner decisions")
-    return DraftPreregistration(str(raw["status"]), tuple(unresolved))
+            raise PreregistrationError(
+                "candidate cells must have exact fields and canonical order"
+            )
+        expected_state = (
+            "frozen_policy_external_binding_required"
+            if expected in _PENDING_SOURCE_CELL_IDS
+            else "frozen"
+        )
+        if cell["state"] != expected_state or cell["value"] is None:
+            raise PreregistrationError(
+                "every owner decision must be populated and frozen; only exact "
+                "external source bindings may remain pending"
+            )
+        _text(cell["source"], f"{expected} source")
+        values[expected] = cell["value"]
+    _validate_semantics(values, allow_unbound_external_sources=True)
+
+    validation = values["lane_validation_period"]
+    multiplicity = values["multiplicity_family"]
+    raw_looks = raw["looks"]
+    if not isinstance(raw_looks, list) or not raw_looks:
+        raise PreregistrationError("candidate must freeze at least one planned look")
+    planned_look_ids: list[str] = []
+    for item in raw_looks:
+        if not isinstance(item, dict) or set(item) != _LOOK_KEYS:
+            raise PreregistrationError("planned look has missing or unknown fields")
+        look_id = item["look_id"]
+        if (
+            not isinstance(look_id, str)
+            or not look_id.startswith("arv2-look-")
+            or look_id in planned_look_ids
+        ):
+            raise PreregistrationError("planned look_id is invalid or duplicated")
+        planned_look_ids.append(look_id)
+        if (
+            item["state"] != "planned_unbound"
+            or item["dataset_id"] is not None
+            or item["code_identity"] is not None
+        ):
+            raise PreregistrationError(
+                "candidate looks must remain explicitly unbound and non-executable"
+            )
+        if (
+            item["validation_start"] != validation["start"]
+            or item["validation_end"] != validation["end"]
+        ):
+            raise PreregistrationError(
+                "planned look period differs from the frozen validation period"
+            )
+        if (
+            item["family_id"] != multiplicity["family_id"]
+            or item["topology_id"] != "stock_primary"
+        ):
+            raise PreregistrationError("planned look changed family or topology")
+        _sha256(item["cost_cell_hash"], "planned look cost_cell_hash")
+        if item["cost_cell_hash"] != _cell_sha256(values["cost_contract"]):
+            raise PreregistrationError("planned look does not bind the frozen cost cell")
+    if tuple(multiplicity["permanent_look_ids"]) != tuple(planned_look_ids):
+        raise PreregistrationError(
+            "multiplicity family does not cover every planned look"
+        )
+    pending = (
+        "corporate_action_contract.source_id",
+        "corporate_action_contract.source_sha256",
+        "universe_contract.security_master_id",
+        "universe_contract.security_master_sha256",
+        f"looks.{planned_look_ids[0]}.dataset_id",
+        f"looks.{planned_look_ids[0]}.code_identity",
+        "independent_review_anchor",
+        "external_permanent_look_authority",
+    )
+    return DraftPreregistration(
+        status=str(raw["status"]),
+        spec_id=str(raw["spec_id"]),
+        spec_hash=spec_hash,
+        unresolved_owner_decisions=(),
+        pending_external_bindings=pending,
+        planned_look_ids=tuple(planned_look_ids),
+    )
 
 
 def _require_mapping(value: object, name: str, keys: set[str]) -> dict[str, object]:
@@ -682,7 +795,11 @@ def _string_list(value: object, name: str, *, nonempty: bool = True) -> tuple[st
     return materialized
 
 
-def _validate_semantics(cells: Mapping[str, object]) -> None:
+def _validate_semantics(
+    cells: Mapping[str, object],
+    *,
+    allow_unbound_external_sources: bool = False,
+) -> None:
     holdout = _require_mapping(
         cells["shared_holdout"],
         "shared_holdout",
@@ -750,8 +867,14 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
         "corporate_action_contract",
         _CORPORATE_ACTION_KEYS,
     )
-    _text(corporate["source_id"], "corporate action source_id")
-    _sha256(corporate["source_sha256"], "corporate action source_sha256")
+    if allow_unbound_external_sources:
+        if corporate["source_id"] is not None or corporate["source_sha256"] is not None:
+            raise PreregistrationError(
+                "candidate corporate-action source must remain explicitly unbound"
+            )
+    else:
+        _text(corporate["source_id"], "corporate action source_id")
+        _sha256(corporate["source_sha256"], "corporate action source_sha256")
     if corporate != {
         "source_id": corporate["source_id"],
         "source_sha256": corporate["source_sha256"],
@@ -795,17 +918,47 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
     universe = _require_mapping(
         cells["universe_contract"], "universe_contract", _UNIVERSE_KEYS
     )
-    _text(universe["security_master_id"], "security master id")
-    _sha256(universe["security_master_sha256"], "security master sha256")
+    if allow_unbound_external_sources:
+        if (
+            universe["security_master_id"] is not None
+            or universe["security_master_sha256"] is not None
+        ):
+            raise PreregistrationError(
+                "candidate security-master source must remain explicitly unbound"
+            )
+    else:
+        _text(universe["security_master_id"], "security master id")
+        _sha256(universe["security_master_sha256"], "security master sha256")
     venues = _string_list(universe["listing_venues"], "listing venues")
     instruments = _string_list(universe["instrument_types"], "instrument types")
+    exclusions = _string_list(
+        universe["excluded_instrument_types"], "excluded instrument types"
+    )
     if (
         universe["point_in_time"] is not True
         or universe["include_delisted"] is not True
         or universe["current_ticker_joins"] is not False
         or universe["unknown_identity"] != "refuse"
+        or universe["issuer_incorporation"] != "united_states"
+        or venues != ("XASE", "XNAS", "XNYS")
         or instruments != ("common_stock",)
-        or not venues
+        or exclusions
+        != (
+            "adr",
+            "bdc",
+            "closed_end_fund",
+            "etf",
+            "foreign_ordinary",
+            "limited_partnership",
+            "preferred_stock",
+            "reit",
+            "right",
+            "trust",
+            "unit",
+            "warrant",
+        )
+        or universe["share_class_policy"]
+        != "separate_security_with_point_in_time_issuer_link"
     ):
         raise PreregistrationError("universe is not point-in-time and survivorship-safe")
     normalization = _require_mapping(
@@ -815,7 +968,10 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
     )
     if normalization != {
         "population": "eligible_point_in_time_cross_section",
-        "peer_fallback": "predeclared_hierarchy_only",
+        "method": "sector_median_mad",
+        "peer_hierarchy": ["sector", "refuse"],
+        "minimum_total_names": 20,
+        "minimum_active_names": 5,
         "structural_zero": "valid_no_event_only",
         "clipping": "frozen_cell_specific",
         "residualization": "mandatory_controls_cross_sectional",
@@ -829,8 +985,14 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
         raise PreregistrationError("first topology must remain stock_primary")
     primary_cell_id = _text(topology["primary_cell_id"], "primary stock cell id")
     raw_stock_cells = topology["cells"]
-    if not isinstance(raw_stock_cells, list) or not raw_stock_cells:
-        raise PreregistrationError("stock topology must freeze at least one cell")
+    if (
+        primary_cell_id != "arv2-stock-primary-20d"
+        or not isinstance(raw_stock_cells, list)
+        or len(raw_stock_cells) != 1
+    ):
+        raise PreregistrationError(
+            "stock topology must contain only the frozen primary 20-day cell"
+        )
     stock_cell_ids: list[str] = []
     for index, raw_cell in enumerate(raw_stock_cells):
         cell = _require_mapping(
@@ -846,9 +1008,18 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
             or cell["residualization"] != "mandatory_controls_cross_sectional"
         ):
             raise PreregistrationError("stock topology changed the rating-only primary family")
-        _positive_int(cell["half_life_sessions"], "stock half-life sessions")
-        _decimal_text(cell["threshold"], "stock threshold", minimum=Decimal("0"))
-        _decimal_text(cell["clip"], "stock clip", strictly_positive=True)
+        if _positive_int(
+            cell["half_life_sessions"], "stock half-life sessions"
+        ) != 20:
+            raise PreregistrationError("stock half-life must remain 20 sessions")
+        if _decimal_text(
+            cell["threshold"], "stock threshold", minimum=Decimal("0")
+        ) != Decimal("0"):
+            raise PreregistrationError("stock threshold must remain zero")
+        if _decimal_text(
+            cell["clip"], "stock clip", strictly_positive=True
+        ) != Decimal("4"):
+            raise PreregistrationError("stock clip must remain four")
     if primary_cell_id not in stock_cell_ids:
         raise PreregistrationError("primary stock cell is absent from the frozen topology")
     if cells["topology_comparison_hierarchy"] != ["stock", "industry", "etf"]:
@@ -891,6 +1062,72 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
         "leverage": False,
     }:
         raise PreregistrationError("portfolio hard caps changed")
+    historical = _require_mapping(
+        cells["historical_evaluation_contract"],
+        "historical_evaluation_contract",
+        _HISTORICAL_EVALUATION_KEYS,
+    )
+    history_start = _session(
+        historical["eligible_history_start"], "eligible history start"
+    )
+    development_end = _session(
+        historical["development_end"], "historical development end"
+    )
+    if history_start > development_end:
+        raise PreregistrationError("historical evaluation period is reversed")
+    if historical != {
+        "eligible_history_start": historical["eligible_history_start"],
+        "development_end": historical["development_end"],
+        "history_extension_policy": (
+            "earlier_only_after_independent_source_coverage_and_semantics_review"
+        ),
+        "market_benchmark": "SPY_total_return",
+        "regime_signal_timing": "prior_session_close_only",
+        "stress_rule": "trailing_252_session_drawdown_lte_-0.20",
+        "boom_rule": (
+            "trailing_252_session_total_return_gte_0.20_and_not_stress"
+        ),
+        "ordinary_rule": "neither_boom_nor_stress",
+        "formal_selection_policy": "all_periods_walk_forward_only",
+        "regime_output_policy": "descriptive_non_rescuing",
+        "named_episode_policy": "descriptive_non_rescuing_no_model_selection",
+        "named_episodes": historical["named_episodes"],
+    }:
+        raise PreregistrationError(
+            "historical and regime evaluation contract is not the frozen V2 design"
+        )
+    episodes = historical["named_episodes"]
+    if not isinstance(episodes, list) or not episodes:
+        raise PreregistrationError("named historical episodes must be explicit")
+    episode_ids: list[str] = []
+    episode_labels: list[str] = []
+    episode_ranges: list[tuple[date, date]] = []
+    for index, episode in enumerate(episodes):
+        item = _require_mapping(
+            episode,
+            f"historical_evaluation_contract.named_episodes[{index}]",
+            _NAMED_EPISODE_KEYS,
+        )
+        episode_id = _text(item["episode_id"], "named episode id")
+        if episode_id in episode_ids:
+            raise PreregistrationError("named episode IDs are duplicated")
+        episode_ids.append(episode_id)
+        episode_start = _session(item["start"], "named episode start")
+        episode_end = _session(item["end"], "named episode end")
+        episode_labels.append(_text(item["label"], "named episode label"))
+        if not history_start <= episode_start <= episode_end <= development_end:
+            raise PreregistrationError("named episode is outside eligible history")
+        episode_ranges.append((episode_start, episode_end))
+    ordered_episodes = sorted(episode_ranges)
+    if any(
+        current[0] <= prior[1]
+        for prior, current in zip(ordered_episodes, ordered_episodes[1:])
+    ):
+        raise PreregistrationError("named historical episodes overlap")
+    if not {"boom", "stress"}.issubset(episode_labels):
+        raise PreregistrationError(
+            "named historical episodes must include boom and stress diagnostics"
+        )
     validation = _require_mapping(
         cells["lane_validation_period"],
         "lane_validation_period",
@@ -900,6 +1137,10 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
     validation_end = _session(validation["end"], "lane validation end")
     if validation["one_shot"] is not True or not validation_start <= validation_end <= cutoff:
         raise PreregistrationError("lane validation is not one-shot and holdout-excluded")
+    if development_end >= validation_start:
+        raise PreregistrationError(
+            "historical development must end before prospective validation starts"
+        )
     if any(
         validation_start <= contaminated_end and contaminated_start <= validation_end
         for contaminated_start, contaminated_end in contaminated_ranges
@@ -910,7 +1151,7 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
     )
     if multiplicity["family_id"] != "arv2-rating-only-v1":
         raise PreregistrationError("multiplicity family ID changed")
-    _decimal_text(
+    alpha = _decimal_text(
         multiplicity["alpha"],
         "multiplicity alpha",
         strictly_positive=True,
@@ -924,10 +1165,14 @@ def _validate_semantics(cells: Mapping[str, object]) -> None:
     permanent_looks = _string_list(
         multiplicity["permanent_look_ids"], "permanent look IDs"
     )
-    if permanent_cells != tuple(stock_cell_ids):
+    if alpha != Decimal("0.05"):
+        raise PreregistrationError("multiplicity alpha must remain 0.05")
+    if permanent_cells != ("arv2-stock-primary-20d",):
         raise PreregistrationError("multiplicity family does not cover every stock cell")
-    if any(not look_id.startswith("arv2-look-") for look_id in permanent_looks):
-        raise PreregistrationError("permanent look ID is invalid")
+    if permanent_looks != ("arv2-look-stock-primary-001",):
+        raise PreregistrationError(
+            "multiplicity family permanent-look budget must remain one named look"
+        )
     if cells["three_lane_selection_correction"] != 3:
         raise PreregistrationError("three-lane selection family must count all three attempts")
     if cells["valid_null_closes_family"] is not True:

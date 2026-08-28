@@ -100,15 +100,36 @@ def _reviewed_raw(producing_commit: str = "d" * 40) -> dict[str, object]:
             "security_master_id": "pit-security-master-v1",
             "security_master_sha256": "2" * 64,
             "point_in_time": True,
-            "listing_venues": ["XNAS", "XNYS"],
+            "listing_venues": ["XASE", "XNAS", "XNYS"],
+            "issuer_incorporation": "united_states",
             "instrument_types": ["common_stock"],
+            "excluded_instrument_types": [
+                "adr",
+                "bdc",
+                "closed_end_fund",
+                "etf",
+                "foreign_ordinary",
+                "limited_partnership",
+                "preferred_stock",
+                "reit",
+                "right",
+                "trust",
+                "unit",
+                "warrant",
+            ],
+            "share_class_policy": (
+                "separate_security_with_point_in_time_issuer_link"
+            ),
             "include_delisted": True,
             "current_ticker_joins": False,
             "unknown_identity": "refuse",
         },
         "normalization_contract": {
             "population": "eligible_point_in_time_cross_section",
-            "peer_fallback": "predeclared_hierarchy_only",
+            "method": "sector_median_mad",
+            "peer_hierarchy": ["sector", "refuse"],
+            "minimum_total_names": 20,
+            "minimum_active_names": 5,
             "structural_zero": "valid_no_event_only",
             "clipping": "frozen_cell_specific",
             "residualization": "mandatory_controls_cross_sectional",
@@ -135,6 +156,39 @@ def _reviewed_raw(producing_commit: str = "d" * 40) -> dict[str, object]:
             "correction": "bonferroni_all_registered_cells_and_looks",
             "permanent_cell_ids": [CELL_ID],
             "permanent_look_ids": [LOOK_ID],
+        },
+        "historical_evaluation_contract": {
+            "eligible_history_start": "2013-01-02",
+            "development_end": "2022-12-30",
+            "history_extension_policy": (
+                "earlier_only_after_independent_source_coverage_and_semantics_review"
+            ),
+            "market_benchmark": "SPY_total_return",
+            "regime_signal_timing": "prior_session_close_only",
+            "stress_rule": "trailing_252_session_drawdown_lte_-0.20",
+            "boom_rule": (
+                "trailing_252_session_total_return_gte_0.20_and_not_stress"
+            ),
+            "ordinary_rule": "neither_boom_nor_stress",
+            "formal_selection_policy": "all_periods_walk_forward_only",
+            "regime_output_policy": "descriptive_non_rescuing",
+            "named_episode_policy": (
+                "descriptive_non_rescuing_no_model_selection"
+            ),
+            "named_episodes": [
+                {
+                    "episode_id": "covid_crash_2020",
+                    "start": "2020-02-19",
+                    "end": "2020-03-23",
+                    "label": "stress",
+                },
+                {
+                    "episode_id": "post_covid_boom_2020_2021",
+                    "start": "2020-03-24",
+                    "end": "2021-12-31",
+                    "label": "boom",
+                },
+            ],
         },
         "lane_validation_period": {
             "start": "2023-01-03",
@@ -283,10 +337,33 @@ def _request(raw: dict[str, object] | None = None) -> OutcomeAccessRequest:
 
 def test_repository_draft_is_complete_but_non_executable() -> None:
     draft = load_draft_preregistration(DRAFT)
-    assert "shared_holdout" in draft.unresolved_cells
-    assert "lane_validation_period" in draft.unresolved_cells
+    assert draft.unresolved_owner_decisions == ()
+    assert draft.planned_look_ids == (LOOK_ID,)
+    assert "corporate_action_contract.source_id" in draft.pending_external_bindings
+    assert "independent_review_anchor" in draft.pending_external_bindings
     with pytest.raises(PreregistrationError, match="reviewed_frozen"):
         load_reviewed_preregistration(DRAFT)
+
+
+def test_owner_decision_candidate_cannot_claim_unreviewed_source_or_look_bindings(
+    tmp_path: Path,
+) -> None:
+    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    _cell(raw, "corporate_action_contract")["value"]["source_id"] = "invented"
+    raw["looks"][0]["dataset_id"] = DATASET_ID
+    _rehash(raw)
+    raw["spec_id"] = f"arv2-round0-candidate-{raw['spec_hash'][:16]}"
+    with pytest.raises(PreregistrationError, match="explicitly unbound"):
+        load_draft_preregistration(_write(tmp_path, raw))
+
+
+def test_owner_decision_candidate_hash_covers_every_policy_choice(
+    tmp_path: Path,
+) -> None:
+    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    _cell(raw, "normalization_contract")["value"]["minimum_active_names"] = 4
+    with pytest.raises(PreregistrationError, match="content hash"):
+        load_draft_preregistration(_write(tmp_path, raw))
 
 
 def test_reviewed_spec_round_trip_is_zero_access_without_external_authority(
@@ -550,8 +627,20 @@ def test_single_runner_reauthenticates_inputs_but_never_invokes_outcome_loader(
             "universe",
         ),
         (
+            lambda raw: _cell(raw, "universe_contract")["value"].update(
+                issuer_incorporation="all"
+            ),
+            "universe",
+        ),
+        (
             lambda raw: _cell(raw, "normalization_contract")["value"].update(
                 degenerate_group="drop"
+            ),
+            "normalization",
+        ),
+        (
+            lambda raw: _cell(raw, "normalization_contract")["value"].update(
+                peer_hierarchy=["sector", "market"]
             ),
             "normalization",
         ),
@@ -570,6 +659,18 @@ def test_single_runner_reauthenticates_inputs_but_never_invokes_outcome_loader(
                 permanent_look_ids=["arv2-look-unregistered"]
             ),
             "multiplicity family",
+        ),
+        (
+            lambda raw: _cell(raw, "historical_evaluation_contract")[
+                "value"
+            ].update(formal_selection_policy="best_regime_result"),
+            "historical and regime",
+        ),
+        (
+            lambda raw: _cell(raw, "historical_evaluation_contract")[
+                "value"
+            ].update(development_end="2023-01-03"),
+            "before prospective validation",
         ),
         (
             lambda raw: _cell(raw, "lane_validation_period")["value"].update(

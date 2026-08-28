@@ -184,25 +184,38 @@ or claim a research result.
 
 The machine-readable round-0 inventory is
 `research/analyst_revisions_v2/specs/arv2_round0.draft.json`. It is deliberately
-`blocked_owner_decisions`, not outcome-executable: the common final holdout,
-contaminated periods, corporate-action source, exact universe, normalization
-fallback, primary stock cell IDs, multiplicity IDs, and lane validation dates
-still require owner decisions. The strict loader returns a distinct draft
-type. A future executable spec must be committed and clean, match an entry in
+`owner_decisions_frozen_pending_external_bindings_and_review`, not
+outcome-executable. Owner direction on 2026-08-28 adopted the recommended
+risk-balanced choices for all eight formerly open cells. The exact candidate
+is content-addressed as
+`arv2-round0-candidate-8d13a0a4577df322` / SHA-256
+`8d13a0a4577df3223c96c4c11722457e059b4ade63f578ab860ce7364494e847`.
+The loader now distinguishes a decided policy from evidence that does not yet
+exist: corporate-action and security-master policies are frozen while their
+source IDs and hashes remain explicitly null; the single permanent look ID is
+frozen while its dataset and code identities remain explicitly null. Any
+attempt to populate those fields in the unreviewed candidate refuses.
+
+The candidate also freezes the requested history design: all eligible audited
+history from 2013-01-02 through 2026-08-31, point-in-time ordinary/boom/stress
+classification, and named COVID, 2022 rate-shock, and 2023-2026 AI-boom
+diagnostics. Only the all-period walk-forward result may select the strategy;
+regime and named-episode outputs are descriptive, non-rescuing diagnostics.
+Earlier history can enter only after an independent source-coverage and
+semantics review, so the unavailable 2008 example is not fabricated.
+
+A future executable spec must still be committed and clean, match an entry in
 the separate committed review registry, bind its exact independently reviewed
 Git blob and review ancestry, and pass semantic validation of every mandatory
 cell. Outcome authorization must then reauthenticate that source and obtain an
 atomic spend receipt from an independently pinned, cross-machine append-only
 permanent-look authority before any outcome I/O. No local file or SQLite
-database can grant or reset that authority. The request must also bind frozen
-data/code/cost identity, the one-shot period, a purged split, horizon-sized
-embargo/bootstrap block, every mandatory control, stock-primary topology, and
-proof that it ends before the shared holdout. Both the reviewed-spec registry
-and external spend-authority integration are presently absent: the committed
+database can grant or reset that authority. Both the reviewed-spec registry
+and external spend-authority integration remain absent: the committed
 authority artifact declares exact `zero_access`, every authorization attempt
 refuses before the outcome loader can execute, and the legacy machine-local
-ledger path has no authority. No outcome was loaded and no look was consumed
-by this work.
+ledger path has no authority. No credential, provider row, price, return, or
+outcome was accessed; no look was consumed.
 
 Source precedence is explicit: normative strategy design governs the intended
 formula, while observed provider availability/history governs factual data
@@ -210,25 +223,26 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-The next step is acceptance of the existing contract/safety candidate, not a
-new research milestone:
+The next step is independent review of this ARV2-0 owner-decision candidate:
 
-1. place the shared and Analyst-only remediation commits on
-   `codex/strategy-analyst-revisions-v2`, validate the exact candidate, append
-   its exact push row below, and push it without opening any data or outcome
-   authority;
+1. Codex validates, commits, records, and pushes the exact bounded ARV2-0
+   candidate on `codex/strategy-analyst-revisions-v2`, without opening source
+   or outcome authority;
 2. Claude independently reviews that exact pushed snapshot commit by commit
    and pushes the complete disposition and any corrections to the same lane;
-3. Codex counter-reviews Claude's exact reviewed push, including dangerous-
-   direction regression evidence, before the candidate can be accepted; and
-4. only after that review chain closes may the Action Plan authorize another
-   bounded milestone. Owner decisions, a reviewed spec anchor, governed source
-   admission, and external append-only permanent-look authority must still be
-   closed before any production normalization, price/outcome join, real score,
-   ETF construction, nonempty portfolio, QC run, or QuantConnect launch.
+3. Codex counter-reviews every Claude commit before accepting ARV2-0 or
+   combining that disposition with the next authorized bounded milestone; and
+4. only after that review chain closes may a read-only, zero-outcome
+   entitlement/source audit bind real evidence or ARV2-1 capture a governed raw
+   analyst snapshot. ARV2-1 must not begin from this unreviewed candidate.
 
-Until those steps are recorded, the candidate remains unaccepted and all
-production research and outcome boundaries remain zero-access.
+The reviewed spec anchor, audited corporate-action/security-master sources,
+normalized dataset and code identities, vendor-to-QC processing rights, and
+external append-only permanent-look authority remain required before any
+production normalization, price/outcome join, real score, ETF construction,
+nonempty portfolio, QC run, or QuantConnect launch. Until then the candidate
+is unaccepted and every production research/outcome boundary remains
+zero-access.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -418,6 +432,81 @@ push it. This authorizes one counter-review-only push despite the normal
 combined-push stop rule. It does not resolve any ARV2-0 cell, authorize a next
 milestone, open source or outcome authority, consume a look, or permit ARV2-1.
 
+## 4B. ARV2-0 owner-decision freeze candidate, 2026-08-28
+
+The owner authorized implementation of Codex's recommendations wherever a
+direct choice had not been supplied, with the objective of balancing profit
+potential and risk control. This authorizes the bounded ARV2-0 policy/fixture
+milestone and its push on this lane. It does not self-review the candidate,
+admit a provider artifact, open an outcome, consume a look, or authorize
+ARV2-1.
+
+### 4B.1 Action taken for each formerly open owner decision
+
+| Decision cell | Action taken | Risk/profit rationale |
+|---|---|---|
+| `shared_holdout` | Freeze the lane cutoff at 2027-08-31 and reserve 2027-09-01 through 2029-08-31 as the shared final holdout, prohibited to this lane. | A two-year untouched common period is long enough to expose regime dependence while preserving earlier history for development. |
+| `contaminated_legacy_periods` | Classify the exact legacy analyst outcome-inspection interval 2019-07-16 through 2026-07-23 as `discovery_only`, never untouched confirmation evidence. | Keeps useful engineering knowledge without laundering prior outcome exposure into statistical evidence. V2 remains a separate package and implementation, informed by ACER reviews rather than copied from ACER. |
+| `corporate_action_contract` | Require PIT split handling on the effective session, ex-date cash dividends in total return, mandatory terminal delisting return, and named refusal when terminal return is absent. Leave source ID/hash null pending audit. | Prevents survivorship and corporate-action distortions; refusing incomplete terminal outcomes is safer than silently dropping likely difficult names. |
+| `universe_contract` | Freeze US-incorporated ordinary common stocks on XASE/XNAS/XNYS, include delisted names, keep share classes separate with a PIT issuer link, prohibit current-ticker joins, and exclude ADRs, BDCs, closed-end funds, ETFs, foreign ordinaries, partnerships, preferreds, REITs, rights, trusts, units, and warrants. Leave security-master ID/hash null pending audit. | Produces a more economically comparable stock universe while retaining failed/delisted securities and refusing ambiguous identity. |
+| `normalization_contract` | Freeze PIT eligible cross-sections, sector median/MAD normalization, no market fallback (`sector -> refuse`), at least 20 usable and 5 active names, structural zero only for valid no-event state, clip at the cell's frozen bound, mandatory control residualization, and named refusal for degenerate groups. | Robust normalization preserves signal in ordinary conditions but refuses sparse or structurally incomparable cross-sections instead of inventing confidence. |
+| `stock_topology` | Freeze one primary stock cell, `arv2-stock-primary-20d`: rating changes only, upgrades positive/downgrades negative, 20-session half-life, zero threshold, clip 4, mandatory controls. | One economically motivated primary cell maximizes interpretability and avoids post-result parameter shopping; stock evidence must pass before industry/ETF aggregation. |
+| `multiplicity_family` | Freeze family `arv2-rating-only-v1`, alpha 0.05, Bonferroni over every registered cell/look, one permanent cell, and one permanent look `arv2-look-stock-primary-001`; a valid null closes the family and the three-lane correction remains 3. | One honest chance limits false discovery while preserving power for the canonical hypothesis. |
+| `lane_validation_period` | Freeze one prospective look from 2026-09-01 through 2027-08-31. The look is only `planned_unbound`; dataset/code identities remain null. | A full year samples changing market conditions and starts after the policy freeze, but cannot run until source, code, review, and spend authorities are real. |
+
+The owner's additional period instruction is frozen in a new
+`historical_evaluation_contract`: use every eligible audited session from
+2013-01-02 through 2026-08-31; separately report objective boom, stress, and
+ordinary states using prior-close information; and separately report named
+COVID-crash, 2022 rate-shock, and AI-boom episodes. The all-period
+walk-forward result is the only formal selection result. Regime results are
+descriptive and cannot rescue failure. Pre-2013 history, including 2008, may
+be added only after the selected source proves PIT coverage and semantics.
+
+### 4B.2 Data/subscription action list
+
+The owner reports that Massive-Benzinga and QuantConnect credentials and
+subscriptions exist on this computer. No credential or account was accessed
+in ARV2-0, because possession of a credential does not prove a dataset
+entitlement, history, PIT semantics, terminal-return coverage, or processing
+rights. Purchase nothing solely from this inventory; first perform the later
+owner-authorized read-only, zero-outcome entitlement audit.
+
+1. Treat the existing Massive-Benzinga Analyst Ratings expansion as the
+   candidate canonical event source; re-audit its exact entitlement, history,
+   corrections/vintages, stable IDs, and purchase-specific right to process an
+   allowed raw/normalized/derived representation in QC Cloud.
+2. Audit the QC account for US Equities daily history, US Equity Security
+   Master, and US Fundamental Data. Together they are candidates for prices,
+   splits/dividends/symbol changes, PIT identities, original-reported
+   fundamentals, shares, market cap, sector, size, value, momentum,
+   volatility, and liquidity. A generic QC subscription or API token is not
+   proof of these entitlements or semantics.
+3. Confirm whether the Massive account separately includes **Benzinga
+   Corporate Guidance** and **Benzinga Earnings**. If not, these are the first
+   likely incremental purchases for the mandatory earnings/guidance control;
+   buy only after a schema/history/identifier/license audit shows QC
+   fundamentals cannot close the same PIT control.
+4. Select a genuine terminal-delisting-return source. CRSP `DLRET` remains the
+   preferred research-grade candidate. QC's documented delisting event and
+   last tradable price do not by themselves prove an after-delisting return;
+   an equivalent cheaper source is acceptable only after it proves complete
+   coverage and semantics.
+5. Defer ETF constituent/holdings entitlement purchases until the stock-first
+   gate passes. They are not needed for ARV2-0 through the decisive stock
+   validation and should not dilute the current data budget.
+
+### 4B.3 Implementation and validation boundary
+
+The loader now authenticates the candidate's content hash, canonical cell
+order, all owner semantics, the cost-cell hash, and the exact planned look.
+It exposes zero unresolved owner decisions separately from eight pending
+external/review bindings. Unreviewed source or dataset/code bindings refuse;
+the existing `reviewed_frozen` loader, Git review registry, and zero-access
+permanent-look authority are unchanged. Focused preregistration validation is
+recorded in the push row after the final tree is tested. No provider or
+outcome access occurred; **0 research looks**.
+
 ## 5. Session / push ledger
 
 Append one row before every push. Never rewrite earlier rows.
@@ -431,3 +520,4 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-27 | Claude review | `5a5c7ab` -> `48a8b08` (this lane-record commit follows) | Independent review of the owner-authorized remediation synchronization | Reviewed all 21 commits in `a4f58e6^..5a5c7ab` with an explicit disposition each; none rejected. The owner-specified range ended at `d8d0ad6`, but the lane advanced to `5a5c7ab` during the review (clean `pull --ff-only`, reflog verified), so scope was deliberately extended rather than allowed to drift; `research/analyst_revisions_v2/`, `data/exchange_calendar.py`, `assistant/temporal_integrity.py`, `execution/broker_contract.py` and `assistant/dispatch_fence.py` are byte-identical across that extension. Corrected CLR-001 in `tests/test_ml_evidence_operations.py`; added `docs/Archive/Review/REVIEW_2026-08-27_ARV2_LANE_REMEDIATION_SYNC.md`. No production file was changed. | Exact committed tree `48a8b08`: **5,434 passed, 0 failed, 3 skipped, 25 known warnings in 1,403s**; compileall exit 0; `git diff --check` clean. As received at `d8d0ad6`: 5,433 passed, 1 failed, 2 skipped (that failure was CLR-001, interpreter-provenance dependent, now corrected). Independently reproduced rather than accepted: the outcome loader never executes, all six research source kinds refuse, forged permit and self-consistent forged policy objects are rejected, the ETF `N_eff` and institution/catalyst independence errata return their hand-computed values, every event-timing boundary including exactly-at-open is correct, and the transitive import closure reaches 21 modules with zero execution-capable roots. Five safety invariants were mutation-tested in a pinned throwaway worktree and each turned the suite red (6, 16, 1, 1 and 1 failures). 17/17 synchronized commits are patch-identical to their `main` sources. Data sources: none; no provider, credential, licensed row, broker, operator-database, QuantConnect or scheduler access. **0 research looks; no permanent look identifier consumed.** | 0 P0, 0 P1, 3 P2, 6 P3. CLR-001 corrected and verified red/green across two interpreters. One proposed P1 (cancel-all fence timeout) was downgraded to P2 after confirming it records a durable critical incident instead of reporting success. CLR-002/003/004 are shared-execution items with mitigations, not lane regressions; six files flagged by deeper sweeps were confirmed untouched by this range and are pre-existing. The ARV2 lane-owned research layer yielded no defects; CLR-009 is a self-found locking-consistency note with no demonstrable exploit. Disposition: **accepted after correction**; synchronization remains not acceptance. | Codex counter-reviews this exact pushed head including the CLR-001 correction, and disposes CLR-002 through CLR-009 - several belong to the shared remediation owner rather than this lane. Owner decisions, a reviewed spec anchor, governed source admission and an external append-only permanent-look authority all remain open before any production normalization, outcome join, ETF construction or QC run. |
 | 2026-08-27 | Codex counter-review | `bd3393d` -> this commit | Counter-review both pushed Claude commits and complete the inherited correction set on this one lane | Stayed on `codex/strategy-analyst-revisions-v2` in the dedicated worktree. Accepted `48a8b08` and `bd3393d`; independently reviewed every inherited correction. Retained CLR-002/004/006/007/008 and CLR-009 production locking, fixed exact-fill retry/legacy compatibility and lock-test sensitivity, and rejected/reverted the unsupported CLR-003 180 s delay. Consolidated the separate report into this required branch-specific record and removed the duplicate live copy. | Focused final-tree suite: **334 passed, 1 skipped, 1 known dependency warning in 351.68 s**; isolated new regressions: **9 passed in 10.65 s**. Exact full-tree result and compile/diff evidence are recorded before commit. No provider, credential, licensed row, outcome, broker, operator database, QuantConnect, scheduler, or order access; **0 research looks**. | 0 P0, 0 P1, 2 P2, 1 P3 in the proposed correction set: ARV2CR-001 and ARV2CR-003 corrected; ARV2CR-002 caused the attempted fix to be reverted and CLR-003 to remain explicitly open. The existing candidate is accepted after correction. | ARV2-0 is the next milestone but is blocked by eight owner decisions plus empty reviewed-spec/source/look authorities. Per the same-branch workflow, stop before ARV2-1 and before push; commit the counter-review locally and request owner direction. |
 | 2026-08-27 | Codex push authorization | `7f493d1` -> this record commit | Owner-directed counter-review-only push | After Codex reported the ARV2-0 owner-decision blocker and the normal stop-before-push consequence, the owner explicitly instructed: `push`. This is recorded as a narrow exception for the completed counter-review series only; no next-milestone implementation was added. | Documentation-only update after the exact counter-review validation above; final active-document gate and diff check rerun before commit. No provider, credential, licensed row, outcome, broker, operator database, QuantConnect, scheduler, or order access; **0 research looks**. | No new P0-P3 finding. CLR-003 remains open; all eight ARV2-0 owner-decision cells and all zero-access authorities remain unchanged. | Push the exact two-commit local range once. Remain stopped before ARV2-1 pending the recorded owner decisions and authority gates. |
+| 2026-08-28 | Codex implementation | `c83782d` -> this commit | ARV2-0 owner-decision freeze candidate | Resolved all eight owner-decision cells under the owner's risk/profit direction; added the all-history plus objective/named-regime evaluation contract; made the candidate content-addressed; split frozen source policy from still-null external evidence; froze one stock-primary cell and one planned, unbound permanent look. Extended universe and normalization schemas to encode the exact owner choices rather than vague fallback text. No branch was created or switched. | Final exact worktree: **5,453 passed, 3 skipped, 0 failed, 25 known dependency warnings in 1,974.84s (32m54s)**; final focused preregistration file **35 passed**; repository compileall exit 0; final active-document and diff/status gates recorded immediately before commit. No credential, provider row, licensed artifact, price, return, outcome, broker, operator database, QuantConnect job, scheduler, or order access; **0 research looks and no permanent look consumed**. | 0 new P0-P3 findings. One broad-suite failure was only a stale expected error-message substring after the multiplicity guard was strengthened; the diagnostic was corrected and the exact full tree passed. Candidate remains unreviewed and zero-access. | Push this one bounded commit to the existing lane. Claude independently reviews the exact pushed snapshot and pushes its disposition/corrections on this branch. Codex then counter-reviews every Claude commit before ARV2-1 or any source audit/outcome work. |

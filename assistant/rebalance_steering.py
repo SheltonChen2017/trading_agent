@@ -42,8 +42,20 @@ import json
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
-from assistant.allocation_proposals import build_allocation_plan
-from assistant.money import decimal_or_none, decimal_text
+from assistant.allocation_proposals import (
+    build_allocation_plan,
+    buy_proposal_refusal_reason,
+)
+from assistant.money import (
+    decimal_or_none,
+    decimal_text,
+    deterministic_decimal_divide,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    exact_decimal_sum,
+    to_decimal,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.portfolio_rebalance import (
@@ -144,8 +156,41 @@ def _shortfall_to_lower_edge(
     pending_value = decimal_or_none(row.pending_value_exact)
     if market_value is None or pending_value is None:
         return None
-    lower, _ = profile.band_edges(sleeve)
-    shortfall = equity * lower / Decimal("100") - market_value - pending_value
+    target = decimal_or_none(profile.targets.get(sleeve))
+    band_fraction = decimal_or_none(profile.band_fraction)
+    if target is None or band_fraction is None:
+        return None
+    try:
+        half_width = exact_decimal_multiply(
+            target,
+            band_fraction,
+            name=f"{sleeve} band half-width",
+        )
+        lower = exact_decimal_subtract(
+            target,
+            half_width,
+            name=f"{sleeve} lower band edge",
+        )
+        lower_edge_value = exact_decimal_multiply(
+            exact_decimal_multiply(
+                equity,
+                lower,
+                name=f"{sleeve} lower-edge dollar numerator",
+            ),
+            Decimal("0.01"),
+            name=f"{sleeve} lower-edge dollar value",
+        )
+        shortfall = exact_decimal_subtract(
+            exact_decimal_subtract(
+                lower_edge_value,
+                market_value,
+                name=f"{sleeve} held-value shortfall",
+            ),
+            pending_value,
+            name=f"{sleeve} projected shortfall",
+        )
+    except ValueError:
+        return None
     return shortfall if shortfall > 0 else Decimal("0")
 
 
@@ -204,7 +249,18 @@ def plan_cash_steering(
     refusals: list[str] = list(report.refusals)
     disclosures = [UNPROVEN_SHAPE_DISCLOSURE, *report.disclosures]
 
-    budget_decimal = decimal_or_none(budget)
+    evidence_refusal = buy_proposal_refusal_reason(packet)
+    if evidence_refusal is not None:
+        refusals.append(evidence_refusal)
+
+    try:
+        budget_decimal = exact_decimal_add(
+            Decimal("0"),
+            to_decimal(budget, name="new-money budget"),  # type: ignore[arg-type]
+            name="new-money budget normalization",
+        )
+    except ValueError:
+        budget_decimal = None
     if budget_decimal is None or budget_decimal <= 0:
         refusals.append(
             f"The new-money budget must be a positive amount, got {budget!r}."
@@ -245,11 +301,16 @@ def plan_cash_steering(
         chosen[sleeve] = name
 
     if refusals:
+        refused_budget = (
+            decimal_text(budget_decimal)
+            if budget_decimal is not None and budget_decimal > 0
+            else "0"
+        )
         return SteeringPlan(
             profile_version=report.profile_version,
             profile_fingerprint=report.profile_fingerprint,
-            budget_exact=decimal_text(budget_decimal) if budget_decimal else "0",
-            legs=(), unallocated_exact="0",
+            budget_exact=refused_budget,
+            legs=(), unallocated_exact=refused_budget,
             eligible_sleeves=tuple(eligible),
             disclosures=tuple(disclosures), refusals=tuple(refusals),
         )
@@ -267,7 +328,16 @@ def plan_cash_steering(
             )
             continue
         shortfalls[sleeve] = shortfall
-    total_shortfall = sum(shortfalls.values(), Decimal("0"))
+    try:
+        total_shortfall = exact_decimal_sum(
+            shortfalls.values(),
+            name="selected sleeve shortfalls",
+        )
+    except ValueError:
+        total_shortfall = Decimal("0")
+        refusals.append(
+            "The selected sleeve shortfalls exceed the exact sizing boundary."
+        )
     if not refusals and total_shortfall <= 0:
         refusals.append(
             "Every selected sleeve already reaches its lower band, so no new "
@@ -285,24 +355,49 @@ def plan_cash_steering(
         )
 
     allocations: dict[str, Decimal] = {}
-    remaining = budget_decimal
-    for sleeve in sorted(shortfalls):
-        share = budget_decimal * shortfalls[sleeve] / total_shortfall
-        allocated = min(share, shortfalls[sleeve])
-        allocations[sleeve] = allocated
-        remaining -= allocated
+    try:
+        remaining = budget_decimal
+        for sleeve in sorted(shortfalls):
+            share = deterministic_decimal_divide(
+                exact_decimal_multiply(
+                    budget_decimal,
+                    shortfalls[sleeve],
+                    name=f"{sleeve} proportional allocation numerator",
+                ),
+                total_shortfall,
+                name=f"{sleeve} proportional allocation",
+            )
+            allocated = min(share, shortfalls[sleeve], remaining)
+            allocations[sleeve] = allocated
+            remaining = exact_decimal_subtract(
+                remaining,
+                allocated,
+                name="steering allocation remainder",
+            )
+    except ValueError:
+        return SteeringPlan(
+            profile_version=report.profile_version,
+            profile_fingerprint=report.profile_fingerprint,
+            budget_exact=decimal_text(budget_decimal),
+            legs=(),
+            unallocated_exact=decimal_text(budget_decimal),
+            eligible_sleeves=tuple(eligible),
+            disclosures=tuple(disclosures),
+            refusals=(
+                "The new-money split exceeds the exact sizing boundary, so "
+                "no buy was prepared.",
+            ),
+        )
 
-    weights_pct = {
-        chosen[s]: float(allocations[s] / budget_decimal * 100)
-        for s in allocations
-        if allocations[s] > 0
+    tickers_to_size = {
+        chosen[s] for s in allocations if allocations[s] > 0
     }
     usable_prices = {
         ticker: price
-        for ticker, raw in ((t, prices.get(t)) for t in weights_pct)
+        for ticker, raw in ((t, prices.get(t)) for t in tickers_to_size)
         if (price := decimal_or_none(raw)) is not None and price > 0
     }
-    missing = sorted(set(weights_pct) - set(usable_prices))
+    missing = sorted(tickers_to_size - set(usable_prices))
     if missing:
         return SteeringPlan(
             profile_version=report.profile_version,
@@ -317,9 +412,38 @@ def plan_cash_steering(
             ),
         )
 
-    plan_entries = build_allocation_plan(
-        packet, policy, weights_pct, usable_prices, float(budget_decimal)
-    )
+    # Size each sleeve directly from its exact allocated dollars. Routing a
+    # ratio through the planner's legacy percentage input would project that
+    # ratio and could make the reconstructed target differ from the exact
+    # sleeve allocation at a sub-cent boundary.
+    plan_entries = []
+    for sleeve in sorted(allocations):
+        if allocations[sleeve] <= 0:
+            continue
+        ticker = chosen[sleeve]
+        sized = build_allocation_plan(
+            packet,
+            policy,
+            {ticker: Decimal("100")},
+            {ticker: usable_prices[ticker]},
+            allocations[sleeve],
+        )
+        if len(sized) != 1:
+            return SteeringPlan(
+                profile_version=report.profile_version,
+                profile_fingerprint=report.profile_fingerprint,
+                budget_exact=decimal_text(budget_decimal),
+                legs=(),
+                unallocated_exact=decimal_text(budget_decimal),
+                eligible_sleeves=tuple(eligible),
+                disclosures=tuple(disclosures),
+                refusals=(
+                    "The shared allocation planner could not prove this "
+                    "steering split from current portfolio evidence, so no "
+                    "buy was prepared.",
+                ),
+            )
+        plan_entries.extend(sized)
     by_ticker = {entry.ticker: entry for entry in plan_entries}
 
     legs: list[SteeringLeg] = []
@@ -340,10 +464,71 @@ def plan_cash_steering(
                 f"{ticker} ({SLEEVE_LABELS.get(sleeve, sleeve)}): "
                 f"{entry.skip_reason or 'below the minimum order quantity'}"
             )
-            unallocated += allocations[sleeve]
+            try:
+                unallocated = exact_decimal_add(
+                    unallocated,
+                    allocations[sleeve],
+                    name="unaffordable steering allocation remainder",
+                )
+            except ValueError:
+                return SteeringPlan(
+                    profile_version=report.profile_version,
+                    profile_fingerprint=report.profile_fingerprint,
+                    budget_exact=decimal_text(budget_decimal),
+                    legs=(),
+                    unallocated_exact=decimal_text(budget_decimal),
+                    eligible_sleeves=tuple(eligible),
+                    disclosures=tuple(disclosures),
+                    refusals=(
+                        "The steering remainder could not be represented "
+                        "exactly, so no buy was prepared.",
+                    ),
+                )
             continue
-        notional = decimal_or_none(str(entry.planned_notional)) or Decimal("0")
-        unallocated += allocations[sleeve] - notional
+        notional = decimal_or_none(entry.planned_notional_exact)
+        if (
+            entry.planned_notional_exact is None
+            or notional is None
+            or notional < 0
+            or notional > allocations[sleeve]
+        ):
+            return SteeringPlan(
+                profile_version=report.profile_version,
+                profile_fingerprint=report.profile_fingerprint,
+                budget_exact=decimal_text(budget_decimal),
+                legs=(),
+                unallocated_exact=decimal_text(budget_decimal),
+                eligible_sleeves=tuple(eligible),
+                disclosures=tuple(disclosures),
+                refusals=(
+                    f"{ticker}'s exact planned notional could not be proved "
+                    "within its sleeve allocation, so no buy was prepared.",
+                ),
+            )
+        try:
+            unallocated = exact_decimal_add(
+                unallocated,
+                exact_decimal_subtract(
+                    allocations[sleeve],
+                    notional,
+                    name=f"{ticker} unspent steering allocation",
+                ),
+                name="steering unallocated total",
+            )
+        except ValueError:
+            return SteeringPlan(
+                profile_version=report.profile_version,
+                profile_fingerprint=report.profile_fingerprint,
+                budget_exact=decimal_text(budget_decimal),
+                legs=(),
+                unallocated_exact=decimal_text(budget_decimal),
+                eligible_sleeves=tuple(eligible),
+                disclosures=tuple(disclosures),
+                refusals=(
+                    "The steering remainder could not be represented "
+                    "exactly, so no buy was prepared.",
+                ),
+            )
         legs.append(
             SteeringLeg(
                 sleeve=sleeve, ticker=ticker,

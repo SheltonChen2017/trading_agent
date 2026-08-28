@@ -58,9 +58,12 @@ from assistant.allocation_batch import (
     preflight_allocation_batch,
 )
 from assistant.allocation_proposals import (
+    allocation_plan_entry_notional_display,
     build_allocation_plan,
+    buy_proposal_refusal_reason,
     estimate_pending_buy_value_by_ticker,
     generate_allocation_buy_proposals,
+    summarize_allocation_plan,
 )
 from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
 from assistant.rebalance_trim import (
@@ -182,6 +185,7 @@ from assistant.portfolio_history import (
     capture_briefing_equity_snapshot,
     portfolio_performance_report,
 )
+from assistant.portfolio_snapshot import PortfolioSnapshotIntegrityError
 from assistant.research_registry import summarize_evidence_authority, underfilled_dataset_warning
 from assistant.risk_copilot import (
     check_concentration,
@@ -984,6 +988,41 @@ def _render_submission_failure(
     st.error(f"Order not submitted: {exc}")
 
 
+def _render_cancel_all_result(result: dict) -> None:
+    """Render cancel-all completion from its authoritative stability proof."""
+    if result.get("book_stable") is not True:
+        st.error(
+            "Cancel-all is incomplete: a stable, fully covered broker book "
+            "and confirmed stop boundary were not proved. Keep the kill "
+            "switch active and verify Alpaca directly."
+        )
+    elif result.get("errors"):
+        st.warning(
+            "Cancel-all proved stable cancellation coverage, but recorded "
+            "diagnostic errors. Review the result below and keep the kill "
+            "switch active as appropriate."
+        )
+    else:
+        st.success(
+            "Kill switch active; cancellation requested for "
+            f"{result['cancel_requested_count']} open order(s)."
+        )
+    st.json(result)
+
+
+def _open_order_metric_value(portfolio, analytics: dict) -> int | str:
+    """Return a proven count for display, never a false zero placeholder."""
+    count = analytics.get("open_order_count")
+    if (
+        portfolio.open_orders_available is not True
+        or not isinstance(count, int)
+        or isinstance(count, bool)
+        or count < 0
+    ):
+        return "Unavailable"
+    return count
+
+
 def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str, portfolio, packet: DecisionPacket) -> None:
     """One proposal card with the typed-confirmation approve flow.
     Shared by the Selling, Propose & Approve, and Buying pages --
@@ -1603,6 +1642,16 @@ if page == "Briefing":
                     f"last {_warning_alert['last_seen_at'][:19]})"
                 )
     policy, packet = _load_packet(policy_path, include_events)
+    _risk_available = packet.risk.available is True
+    _analytics_available = packet.analytics.get("available") is True
+    if not _risk_available:
+        # A prior valid packet may have populated these session-scoped
+        # presentation caches.  Hide and discard them immediately, including
+        # on a rerun of the same unavailable packet where the packet-save
+        # guard below does not execute again.
+        st.session_state.pop("portfolio_history_report", None)
+        st.session_state.pop("portfolio_history_error", None)
+        st.session_state.pop("portfolio_risk_decomposition", None)
     # Persist one row per genuinely NEW packet (a fresh live fetch --
     # packet.generated_at changes only when _load_packet()'s cache
     # actually re-executes), not one row per Streamlit rerun -- every
@@ -1612,22 +1661,23 @@ if page == "Briefing":
     # (GPT review, 2026-07-31).
     if st.session_state.get("last_saved_packet_generated_at") != packet.generated_at:
         store.save_decision_packet(packet)
-        try:
-            captured_history = capture_briefing_equity_snapshot(
-                store,
-                packet.portfolio,
-                captured_at=packet.generated_at,
-            )
-            st.session_state["portfolio_history_report"] = (
-                portfolio_performance_report(
-                    store, captured_history["account_key"]
+        if _risk_available:
+            try:
+                captured_history = capture_briefing_equity_snapshot(
+                    store,
+                    packet.portfolio,
+                    captured_at=packet.generated_at,
                 )
-            )
-            st.session_state.pop("portfolio_history_error", None)
-        except Exception as exc:
-            # A benchmark/history problem must never make the live account
-            # briefing unavailable.
-            st.session_state["portfolio_history_error"] = str(exc)
+                st.session_state["portfolio_history_report"] = (
+                    portfolio_performance_report(
+                        store, captured_history["account_key"]
+                    )
+                )
+                st.session_state.pop("portfolio_history_error", None)
+            except Exception as exc:
+                # A benchmark/history problem must never make the live account
+                # briefing unavailable.
+                st.session_state["portfolio_history_error"] = str(exc)
         st.session_state["last_saved_packet_generated_at"] = packet.generated_at
 
     st.caption(
@@ -1637,13 +1687,50 @@ if page == "Briefing":
         f"research registry v{packet.data_freshness.get('research_registry_version', '?')}"
     )
 
+    if not _risk_available:
+        st.error(
+            "Portfolio integrity is unavailable. Equity, cash, holdings, "
+            "performance history, and derived risk analytics are suppressed "
+            "until a canonical portfolio snapshot can be proved."
+        )
+    elif not _analytics_available:
+        st.error(
+            str(
+                packet.analytics.get("unavailable_reason")
+                or "Portfolio analytics are unavailable. Derived briefing "
+                "metrics are suppressed."
+            )
+        )
+
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total equity", f"${packet.portfolio.total_equity:,.2f}")
-    col2.metric("Cash", f"${packet.portfolio.cash:,.2f} ({packet.risk.cash_pct}%)")
-    col3.metric("Positions", packet.analytics["position_count"])
-    col4.metric("Open orders", packet.analytics["open_order_count"])
+    col1.metric(
+        "Total equity",
+        f"${packet.portfolio.total_equity:,.2f}"
+        if _risk_available
+        else "Unavailable",
+    )
+    col2.metric(
+        "Cash",
+        f"${packet.portfolio.cash:,.2f} ({packet.risk.cash_pct}%)"
+        if _risk_available
+        else "Unavailable",
+    )
+    col3.metric(
+        "Positions",
+        packet.analytics["position_count"]
+        if _risk_available and _analytics_available
+        else "Unavailable",
+    )
+    col4.metric(
+        "Open orders",
+        _open_order_metric_value(packet.portfolio, packet.analytics),
+    )
     history_report = st.session_state.get("portfolio_history_report")
-    if isinstance(history_report, dict) and history_report.get("available"):
+    if (
+        _risk_available
+        and isinstance(history_report, dict)
+        and history_report.get("available")
+    ):
         benchmark_bits = [
             (
                 f"{ticker} {details['total_return_pct']:+.2f}% "
@@ -1658,10 +1745,15 @@ if page == "Briefing":
             f"max drawdown **{history_report['max_drawdown_pct']:.2f}%**"
             + (f"; {'; '.join(benchmark_bits)}" if benchmark_bits else "")
         )
-    elif st.session_state.get("portfolio_history_error"):
+    elif _risk_available and st.session_state.get("portfolio_history_error"):
         st.caption(
             "Portfolio history unavailable: "
             + st.session_state["portfolio_history_error"]
+        )
+    elif not _risk_available:
+        st.caption(
+            "Portfolio performance history is suppressed because the current "
+            "portfolio snapshot failed integrity validation."
         )
 
     with st.container(border=True):
@@ -1672,22 +1764,42 @@ if page == "Briefing":
     with st.container(border=True):
         st.subheader("Risk exposure")
         risk_col1, risk_col2, risk_col3 = st.columns(3)
-        risk_col1.metric("Largest single position", f"{packet.risk.largest_single_position_pct}%")
-        risk_col2.metric("Leveraged ETF exposure", f"{packet.risk.leveraged_etf_exposure_pct}%")
-        risk_col3.metric("Invested", f"{packet.analytics['invested_pct']:.1f}%")
-        if packet.risk.basket_exposure_pct:
+        risk_col1.metric(
+            "Largest single position",
+            f"{packet.risk.largest_single_position_pct}%"
+            if _risk_available
+            else "Unavailable",
+        )
+        risk_col2.metric(
+            "Leveraged ETF exposure",
+            f"{packet.risk.leveraged_etf_exposure_pct}%"
+            if _risk_available
+            else "Unavailable",
+        )
+        risk_col3.metric(
+            "Invested",
+            f"{packet.analytics['invested_pct']:.1f}%"
+            if _risk_available and _analytics_available
+            else "Unavailable",
+        )
+        if _risk_available and packet.risk.basket_exposure_pct:
             st.write("Basket exposure (overlapping, doesn't sum to 100%):")
             st.dataframe(
                 [{"Basket": b, "% of equity": pct} for b, pct in sorted(packet.risk.basket_exposure_pct.items(), key=lambda kv: -kv[1])],
                 width="stretch",
                 hide_index=True,
             )
-        else:
+        elif _risk_available:
             st.caption("No basket exposure -- no positions held.")
+        else:
+            st.error(
+                packet.risk.unavailable_reason
+                or "Portfolio exposure metrics are unavailable."
+            )
 
         for policy_violation in check_policy_compliance(packet.portfolio, policy):
             st.error(f"Policy violation: {policy_violation}")
-        if not packet.risk.concentration_warnings:
+        if _risk_available and not packet.risk.concentration_warnings:
             # Only show this caption in the "all clear" case -- when
             # concentration_warnings IS non-empty, its content already appears
             # once in the "Warnings" section below (packet.warnings includes
@@ -1696,8 +1808,9 @@ if page == "Briefing":
             # policy; showing it a third time here via check_concentration()
             # was pure duplication (GPT review, 2026-07-28, reproduced).
             st.caption("Informational summary (not a policy-compliance check): " + check_concentration(packet.risk))
-        for cluster_warning in find_correlated_clusters(packet.portfolio):
-            st.warning(cluster_warning)
+        if _risk_available:
+            for cluster_warning in find_correlated_clusters(packet.portfolio):
+                st.warning(cluster_warning)
     with st.expander("Descriptive macro context"):
         st.caption(
             "Credit/yield proxies are shown as context only. Their predictive "
@@ -1726,12 +1839,23 @@ if page == "Briefing":
             "Uses explicitly date-aligned finite daily returns. Positive "
             "correlation clusters identify holdings behaving like one bet."
         )
-        if st.button("Compute portfolio risk", key="run_portfolio_risk"):
+        if not _risk_available:
+            st.error(
+                "Portfolio-risk computation is disabled because the current "
+                "portfolio snapshot failed integrity validation."
+            )
+        if st.button(
+            "Compute portfolio risk",
+            key="run_portfolio_risk",
+            disabled=not _risk_available,
+        ):
             st.session_state["portfolio_risk_decomposition"] = (
                 portfolio_risk_decomposition(packet.portfolio)
             )
-        decomposition = st.session_state.get(
-            "portfolio_risk_decomposition"
+        decomposition = (
+            st.session_state.get("portfolio_risk_decomposition")
+            if _risk_available
+            else None
         )
         if isinstance(decomposition, dict):
             if not decomposition.get("available"):
@@ -1767,9 +1891,29 @@ if page == "Briefing":
                     )
     with st.expander("Stress test"):
         stress_col1, stress_col2 = st.columns(2)
-        stress_benchmark = stress_col1.text_input("Benchmark ticker", value="SPY", key="stress_benchmark")
-        stress_move_pct = stress_col2.number_input("Hypothetical move (%)", value=-10.0, step=1.0, key="stress_move_pct")
-        if st.button("Estimate impact", key="run_stress_test"):
+        stress_benchmark = stress_col1.text_input(
+            "Benchmark ticker",
+            value="SPY",
+            key="stress_benchmark",
+            disabled=not _risk_available,
+        )
+        stress_move_pct = stress_col2.number_input(
+            "Hypothetical move (%)",
+            value=-10.0,
+            step=1.0,
+            key="stress_move_pct",
+            disabled=not _risk_available,
+        )
+        if not _risk_available:
+            st.error(
+                "Stress analytics are disabled because the current portfolio "
+                "snapshot failed integrity validation."
+            )
+        if st.button(
+            "Estimate impact",
+            key="run_stress_test",
+            disabled=not _risk_available,
+        ):
             # Live fetch_historical() call for OLS beta -- explicitly
             # button-gated, not run on every rerun, matching this tab's
             # existing "no expensive work on every Streamlit rerun"
@@ -1801,8 +1945,13 @@ if page == "Briefing":
                 st.warning(warning)
 
     with st.container(border=True):
-        if packet.portfolio.positions:
-            st.subheader("Positions")
+        st.subheader("Positions")
+        if not _risk_available:
+            st.error(
+                "Position details are suppressed because the current portfolio "
+                "snapshot failed integrity validation."
+            )
+        elif packet.portfolio.positions:
             st.dataframe(
                 [
                     {
@@ -1810,7 +1959,11 @@ if page == "Briefing":
                         "Shares": p.shares,
                         "Current price": p.current_price,
                         "Market value": p.market_value,
-                        "Unrealized P&L %": p.unrealized_pnl_pct,
+                        "Unrealized P&L %": (
+                            p.unrealized_pnl_pct
+                            if _analytics_available
+                            else "Unavailable"
+                        ),
                         "Leveraged ETF": p.is_leveraged_etf,
                     }
                     for p in packet.portfolio.positions
@@ -1818,12 +1971,17 @@ if page == "Briefing":
                 width="stretch",
                 hide_index=True,
             )
-            st.caption(f"Unrealized P&L: ${packet.analytics['unrealized_pnl']:,.2f}")
+            if _analytics_available:
+                st.caption(
+                    "Unrealized P&L: "
+                    f"${packet.analytics['unrealized_pnl']:,.2f}"
+                )
+            else:
+                st.caption("Unrealized P&L: unavailable")
         else:
-            st.subheader("Positions")
             st.caption("No positions held.")
 
-    if packet.portfolio.positions:
+    if _risk_available and packet.portfolio.positions:
         with st.container(border=True):
             st.subheader("Holdings analysis")
             st.caption(
@@ -1833,7 +1991,16 @@ if page == "Briefing":
             )
             for position in packet.portfolio.positions:
                 with st.container(border=True):
-                    st.write(f"**{position.ticker}** -- {position.shares:g} sh, ${position.market_value:,.2f} ({position.unrealized_pnl_pct:+.1f}% unrealized)")
+                    _position_pnl_text = (
+                        f"{position.unrealized_pnl_pct:+.1f}% unrealized"
+                        if _analytics_available
+                        else "unrealized P&L unavailable"
+                    )
+                    st.write(
+                        f"**{position.ticker}** -- {position.shares:g} sh, "
+                        f"${position.market_value:,.2f} "
+                        f"({_position_pnl_text})"
+                    )
                     # One cached call per ticker for BOTH the trend/volatility
                     # figures and the evidence lookup -- see
                     # _load_holding_analysis() for why this must not re-fetch on
@@ -1862,12 +2029,17 @@ if page == "Briefing":
                             st.caption(f"Signal firing today: {trig['rule']} ({trig['direction']})")
             st.caption("For price targets, news, and the full history/best-worst range for any holding, look it up in the Buying page.")
 
-    if packet.portfolio.open_orders:
+    if packet.portfolio.open_orders_available is not True:
+        st.error(
+            "Open-order data is unavailable. The active-order book and count "
+            "are unknown; verify Alpaca directly before relying on this briefing."
+        )
+    elif packet.portfolio.open_orders:
         with st.container(border=True):
             st.subheader("Open orders")
             st.dataframe(packet.portfolio.open_orders, width="stretch", hide_index=True)
 
-    if packet.upcoming_events:
+    if _risk_available and packet.upcoming_events:
         with st.container(border=True):
             st.subheader("Upcoming events")
             for event in sorted(packet.upcoming_events, key=lambda e: e.event_date or "~"):
@@ -1876,7 +2048,7 @@ if page == "Briefing":
                 else:
                     st.caption(f"{event.ticker}: {event.event_type} date unavailable [{event.status.value}]")
 
-    if packet.signals:
+    if _risk_available and packet.signals:
         with st.container(border=True):
             # Historical verdicts and current authority are reported as TWO
             # separate tallies, never one aggregate (GPT review, 2026-07-30):
@@ -1907,6 +2079,15 @@ if page == "Briefing":
                         st.warning(dataset_warning)
 
         st.divider()
+    if not _risk_available:
+        with st.container(border=True):
+            st.subheader("Recommended stocks to explore")
+            st.error(
+                "This briefing surface is suppressed because the app cannot "
+                "prove which tickers are currently held or safely label a "
+                "candidate as not held."
+            )
+        st.stop()
     with st.container(border=True):
         st.subheader("Recommended stocks to explore (not held, not a proposal)")
         st.caption(
@@ -2522,8 +2703,28 @@ if page == "Budgeted Buying":
     if weights:
         st.subheader("Create purchase proposals using this split")
         alloc_policy, alloc_packet = _load_packet(policy_path, include_events=False)
-        available_cash = alloc_packet.portfolio.cash
-        if not alloc_policy.allow_new_positions:
+        allocation_refusal = buy_proposal_refusal_reason(alloc_packet)
+        allocation_evidence_available = allocation_refusal is None
+        if not allocation_evidence_available:
+            st.error(allocation_refusal)
+            # Never leave an earlier approve-gated batch/card visible beside
+            # a current packet that cannot measure the new buy. The durable
+            # proposal/order audit records remain untouched; only stale UI
+            # authority is removed.
+            st.session_state["allocation_proposals"] = []
+            st.session_state["allocation_proposals_signature"] = None
+            for stale_key in (
+                "allocation_batch_id",
+                "allocation_batch_id_for_signature",
+                "allocation_bulk_confirm",
+            ):
+                st.session_state.pop(stale_key, None)
+        available_cash = (
+            alloc_packet.portfolio.cash
+            if allocation_evidence_available
+            else 0.0
+        )
+        if allocation_evidence_available and not alloc_policy.allow_new_positions:
             st.warning(
                 "Your active policy has allow_new_positions=false (the default). You can still generate "
                 "proposals below, but approving them will be blocked until you set "
@@ -2531,9 +2732,14 @@ if page == "Budgeted Buying":
             )
         st.caption("This only sizes the split across your cart -- it is not a recommendation to buy these specific stocks.")
 
-        pending_value_by_ticker, pending_unknown_tickers = estimate_pending_buy_value_by_ticker(
-            alloc_packet.portfolio.open_orders
-        )
+        if allocation_evidence_available:
+            pending_value_by_ticker, pending_unknown_tickers = (
+                estimate_pending_buy_value_by_ticker(
+                    alloc_packet.portfolio.open_orders
+                )
+            )
+        else:
+            pending_value_by_ticker, pending_unknown_tickers = {}, set()
         cart_pending_unknown = pending_unknown_tickers & {t.upper() for t in weights}
         if cart_pending_unknown:
             st.warning(
@@ -2567,10 +2773,21 @@ if page == "Budgeted Buying":
                 step=50.0,
                 key="allocation_dollar_amount",
                 help="Capped at your current available cash, pulled live from Alpaca.",
-                disabled=available_cash <= 0,
+                disabled=(
+                    not allocation_evidence_available or available_cash <= 0
+                ),
             )
-        st.caption(f"Available cash right now (live from Alpaca): ${available_cash:,.2f}")
-        if available_cash <= 0:
+        if allocation_evidence_available:
+            st.caption(
+                "Available cash right now (live from Alpaca): "
+                f"${available_cash:,.2f}"
+            )
+        else:
+            st.caption(
+                "Available cash is suppressed because current portfolio and "
+                "pending-order evidence cannot support a new buy."
+            )
+        if allocation_evidence_available and available_cash <= 0:
             st.caption("No available cash to allocate right now -- allocation is disabled.")
 
         plan = (
@@ -2579,28 +2796,66 @@ if page == "Budgeted Buying":
                 pending_buy_value_by_ticker=pending_value_by_ticker,
                 pending_value_unknown_tickers=pending_unknown_tickers,
             )
-            if dollar_amount > 0
+            if allocation_evidence_available and dollar_amount > 0
             else []
         )
-        planned_spend = sum(e.planned_notional for e in plan)
+        plan_summary = None
+        if allocation_evidence_available and dollar_amount > 0 and not plan:
+            st.error(
+                "The allocation planner could not prove a plan from the "
+                "current inputs. No proposal was created."
+            )
+            st.session_state["allocation_proposals"] = []
+            st.session_state["allocation_proposals_signature"] = None
+        elif allocation_evidence_available:
+            try:
+                plan_summary = summarize_allocation_plan(
+                    plan,
+                    dollar_amount=dollar_amount,
+                    available_cash=alloc_packet.portfolio.cash_exact_decimal,
+                )
+            except ValueError as exc:
+                st.error(
+                    "The allocation summary could not be proved from exact "
+                    f"portfolio evidence ({exc}). No proposal was created."
+                )
+                st.session_state["allocation_proposals"] = []
+                st.session_state["allocation_proposals_signature"] = None
+        allocation_plan_available = (
+            allocation_evidence_available and plan_summary is not None
+        )
         allocation_granularity = (
             "whole-share" if alloc_policy.whole_shares_only
             else "fractional-share (up to 9 decimals)"
         )
 
         with balance_col:
-            st.metric("Remaining balance after this purchase", f"${available_cash - planned_spend:,.2f}")
-            st.caption(
-                f"Reflects the actual {allocation_granularity} plan below. Quantity rounding and any "
-                "ticker whose allocation cannot buy the minimum quantity can leave more cash than a "
-                "raw percentage split would."
+            st.metric(
+                "Remaining balance after this purchase",
+                (
+                    f"${plan_summary['remaining_cash_display']}"
+                    if allocation_plan_available
+                    else "Unavailable"
+                ),
             )
+            if allocation_plan_available:
+                st.caption(
+                    f"Reflects the actual {allocation_granularity} plan below. Quantity rounding and any "
+                    "ticker whose allocation cannot buy the minimum quantity can leave more cash than a "
+                    "raw percentage split would."
+                )
+            else:
+                st.caption(
+                    "A post-purchase balance is not projected from unavailable "
+                    "portfolio or active-order evidence."
+                )
 
-        if plan:
-            unallocated = dollar_amount - planned_spend
+        if plan and allocation_plan_available:
             st.write(
-                f"Requested: **${dollar_amount:,.2f}** -- Planned spend: **${planned_spend:,.2f}** -- "
-                f"Unallocated: **${unallocated:,.2f}** (cap headroom, quantity rounding, and/or a "
+                f"Requested: **${plan_summary['budget_display']}** -- "
+                f"Planned spend: **${plan_summary['planned_spend_display']}** -- "
+                f"Unallocated: **${plan_summary['unallocated_display']}** "
+                "(cap headroom, quantity rounding, and/or a "
                 "ticker allocation below the minimum permitted quantity)."
             )
             plan_rows = [
@@ -2608,7 +2863,9 @@ if page == "Budgeted Buying":
                     "Ticker": e.ticker,
                     "Weight %": e.weight_pct,
                     "Shares": e.shares,
-                    "Planned $": f"${e.planned_notional:,.2f}",
+                    "Planned $": (
+                        f"${allocation_plan_entry_notional_display(e)}"
+                    ),
                     "Existing value": f"${e.existing_market_value:,.2f}",
                     "Pending buys": "unknown" if e.pending_value_unknown else f"${e.pending_buy_value:,.2f}",
                     "Projected total %": round(e.projected_pct_of_equity, 1),
@@ -2640,28 +2897,50 @@ if page == "Budgeted Buying":
             st.session_state["allocation_proposals"] = []
             st.session_state["allocation_proposals_signature"] = None
 
-        if st.button("Create purchase proposals using this split", type="primary", disabled=dollar_amount <= 0):
-            alloc_proposals = generate_allocation_buy_proposals(
-                alloc_packet, alloc_policy, weights, prices, dollar_amount,
-                pending_buy_value_by_ticker=pending_value_by_ticker,
-                pending_value_unknown_tickers=pending_unknown_tickers,
-            )
-            for p in alloc_proposals:
-                store.save_proposal(p.to_dict())
-            st.session_state["allocation_proposals"] = [p.to_dict() for p in alloc_proposals]
-            st.session_state["allocation_proposals_signature"] = current_signature
-            if not alloc_proposals:
-                minimum_label = (
-                    "1 whole share"
-                    if alloc_policy.whole_shares_only
-                    else "the 0.000000001-share minimum"
+        if st.button(
+            "Create purchase proposals using this split",
+            type="primary",
+            disabled=(
+                not allocation_plan_available or dollar_amount <= 0
+            ),
+        ):
+            # The disabled widget is presentation only; re-check before the
+            # durable save so a stale browser event cannot bypass the evidence
+            # boundary.
+            current_refusal = buy_proposal_refusal_reason(alloc_packet)
+            if current_refusal is not None:
+                st.error(current_refusal)
+                st.session_state["allocation_proposals"] = []
+                st.session_state["allocation_proposals_signature"] = None
+            else:
+                alloc_proposals = generate_allocation_buy_proposals(
+                    alloc_packet, alloc_policy, weights, prices, dollar_amount,
+                    pending_buy_value_by_ticker=pending_value_by_ticker,
+                    pending_value_unknown_tickers=pending_unknown_tickers,
                 )
-                st.warning(
-                    f"No proposals generated -- the amount may be too small to buy {minimum_label} of any "
-                    "cart ticker at its current price."
+                for p in alloc_proposals:
+                    store.save_proposal(p.to_dict())
+                st.session_state["allocation_proposals"] = [
+                    p.to_dict() for p in alloc_proposals
+                ]
+                st.session_state["allocation_proposals_signature"] = (
+                    current_signature
                 )
+                if not alloc_proposals:
+                    minimum_label = (
+                        "1 whole share"
+                        if alloc_policy.whole_shares_only
+                        else "the 0.000000001-share minimum"
+                    )
+                    st.warning(
+                        f"No proposals generated -- the amount may be too small to buy {minimum_label} of any "
+                        "cart ticker at its current price."
+                    )
 
-        if st.session_state.get("allocation_proposals"):
+        if (
+            allocation_evidence_available
+            and st.session_state.get("allocation_proposals")
+        ):
             st.subheader("Submit all proposals in this split (one at a time, not atomic)")
             st.caption(
                 "Submits every proposal above SEQUENTIALLY, one order at a time -- this is NOT a single "
@@ -2756,8 +3035,15 @@ if page == "Budgeted Buying":
                     })
                 st.dataframe(leg_rows, width="stretch", hide_index=True)
 
-        for proposal in st.session_state.get("allocation_proposals", []):
-            _render_proposal_approval(proposal, store, policy_path, alloc_packet.portfolio, alloc_packet)
+        if allocation_evidence_available:
+            for proposal in st.session_state.get("allocation_proposals", []):
+                _render_proposal_approval(
+                    proposal,
+                    store,
+                    policy_path,
+                    alloc_packet.portfolio,
+                    alloc_packet,
+                )
 
     for ticker, result in watchlist_results.items():
         with st.container(border=True):
@@ -3037,7 +3323,27 @@ if page == "Policy Based Selling":
         # expression in the Selling tab not sourced from assistant/*.py,
         # which is what the "no separate logic between CLI and UI" design
         # otherwise guarantees everywhere else.
-        position_weights_pct = compute_portfolio_analytics(packet.portfolio)["position_weights_pct"]
+        selling_analytics_available = packet.risk.available is True
+        try:
+            if not selling_analytics_available:
+                raise PortfolioSnapshotIntegrityError(
+                    packet.risk.unavailable_reason
+                    or "portfolio risk evidence is unavailable"
+                )
+            position_weights_pct = compute_portfolio_analytics(
+                packet.portfolio
+            )["position_weights_pct"]
+        except PortfolioSnapshotIntegrityError as exc:
+            # Keep the risk-reducing sell controls reachable, but do not
+            # publish derived weights from a snapshot that failed the
+            # canonical analytics boundary.
+            selling_analytics_available = False
+            position_weights_pct = {}
+            st.warning(
+                "Portfolio weights are unavailable because integrity could "
+                f"not be proved ({exc}). Existing holding facts and sell "
+                "controls remain available for risk reduction."
+            )
         st.dataframe(
             [
                 {
@@ -3045,9 +3351,15 @@ if page == "Policy Based Selling":
                     "Shares": p.shares,
                     "Avg cost basis": p.entry_price,
                     "Current price": p.current_price,
-                    "Unrealized P&L %": p.unrealized_pnl_pct,
+                    "Unrealized P&L %": (
+                        p.unrealized_pnl_pct
+                        if selling_analytics_available
+                        else "Unavailable"
+                    ),
                     "Market value": p.market_value,
-                    "% of portfolio": position_weights_pct.get(p.ticker, 0.0),
+                    "% of portfolio": position_weights_pct.get(
+                        p.ticker, "Unavailable"
+                    ),
                 }
                 for p in packet.portfolio.positions
             ],
@@ -3265,6 +3577,12 @@ if page == "Discrete Buying":
         "at that moment."
     )
     _db_policy, _db_packet = _load_packet(policy_path, include_events=False)
+    _db_refusal = buy_proposal_refusal_reason(_db_packet)
+    if _db_refusal is not None:
+        st.error(_db_refusal)
+        # A proposal created under earlier valid evidence must not remain
+        # actionable beside a packet that cannot measure this new buy.
+        st.session_state.pop("discrete_buy_proposal", None)
 
     _db_ticker = st.text_input(
         "Ticker to buy", key="discrete_buy_ticker", placeholder="e.g. NVDA"
@@ -3379,7 +3697,22 @@ if page == "Discrete Buying":
                     + "."
                 )
 
-    if not _db_ticker:
+    if _db_refusal is not None:
+        st.info(
+            "Buy sizing and proposal saving are disabled until portfolio "
+            "integrity and the active-order book are both available."
+        )
+        st.button(
+            (
+                f"Create buy proposal for {_db_ticker}"
+                if _db_ticker
+                else "Create buy proposal"
+            ),
+            type="primary",
+            disabled=True,
+            key="discrete_buy_create",
+        )
+    elif not _db_ticker:
         st.info("Enter a ticker above, or pick one from the suggestions.")
     else:
         _db_price, _db_price_error = _discrete_reference_price(store, _db_ticker)
@@ -4421,17 +4754,7 @@ if page == "History":
                 result = cancel_all_open_orders(
                     store, reason=emergency_reason
                 )
-                if result["errors"]:
-                    st.error(
-                        "Cancel-all completed with failures. Keep the kill "
-                        "switch active and verify Alpaca directly."
-                    )
-                else:
-                    st.success(
-                        "Kill switch active; cancellation requested for "
-                        f"{result['cancel_requested_count']} open order(s)."
-                    )
-                st.json(result)
+                _render_cancel_all_result(result)
             except Exception as exc:
                 st.error(
                     "Emergency cancel-all failed. The persistent kill switch "

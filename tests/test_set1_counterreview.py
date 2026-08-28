@@ -18,7 +18,7 @@ Four findings, each with the dangerous direction it protects:
   ArithmeticError rather than ValueError.
 """
 import sys
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -173,6 +173,20 @@ def test_budget_notional_still_computes_a_valid_fractional_quantity():
 
     intent = TradeIntent(ticker="NVDA", side="buy", shares="0.5", order_type="market")
     assert _execution_budget_notional(intent, 100.0) == Decimal("50.0")
+
+
+def test_budget_notional_ignores_lowered_ambient_decimal_precision():
+    from assistant.execution_kernel.submit import _execution_budget_notional
+    from risk.execution_gate import TradeIntent
+
+    intent = TradeIntent(
+        ticker="NVDA", side="buy", shares="1.23", order_type="market"
+    )
+    with localcontext() as context:
+        context.prec = 3
+        notional = _execution_budget_notional(intent, Decimal("9.87"))
+
+    assert notional == Decimal("12.1401")
 
 
 def test_the_durable_path_refuses_an_unreadable_quantity_upstream(tmp_path):

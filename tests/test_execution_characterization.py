@@ -891,6 +891,111 @@ def test_gr1c_runtime_constructors_resolve_from_the_facade_at_call_time(
     assert converted and converted[0][0] == 25.0
 
 
+def test_gr1c_extra_pending_exposure_ignores_lowered_decimal_precision(
+    store, monkeypatch
+):
+    from decimal import Decimal, localcontext
+
+    from risk.execution_gate import ValidationResult
+
+    store.save_proposal(_proposal("p-exact-pending", side="buy"))
+    captured: dict[str, Decimal] = {}
+
+    monkeypatch.setattr(
+        execution_service,
+        "_pending_buy_value_by_ticker",
+        lambda open_orders, broker: {"AAPL": Decimal("66.67")},
+    )
+
+    def recording_gate(intent, portfolio, reference_price, **kwargs):
+        captured.update(kwargs["pending_buy_value_by_ticker"])
+        return ValidationResult(
+            approved=False,
+            violations=("stop",),
+            violation_codes=("sentinel",),
+        )
+
+    monkeypatch.setattr(
+        execution_service,
+        "validate_trade_intent",
+        recording_gate,
+    )
+
+    with localcontext() as context:
+        context.prec = 2
+        with patched_broker(_validation_recorder()):
+            outcome = validate_proposal_for_execution(
+                "p-exact-pending",
+                _held_portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                earnings_days_away=10,
+                extra_pending_buy_value_by_ticker={
+                    "AAPL": Decimal("33.34"),
+                },
+            )
+
+    assert outcome.validation is not None, outcome.error
+    assert captured == {"AAPL": Decimal("100.01")}
+
+
+def test_gr1c_policy_percent_conversion_is_exact(store, monkeypatch):
+    from decimal import Decimal
+
+    from risk.execution_gate import ValidationResult
+
+    policy = dataclasses.replace(
+        load_policy(),
+        max_basket_pct=0.07,
+        max_leveraged_etf_pct=0.07,
+    )
+    policy.validate()
+    fingerprint = compute_policy_fingerprint(policy)
+    proposal = _proposal(
+        "p-exact-policy-percent",
+        side="buy",
+        policy_fingerprint=fingerprint,
+        broker_execution_context={
+            "account_id": "paper-account-1",
+            "account_mode": "paper",
+            "snapshot_id": "a" * 64,
+            "policy_fingerprint": fingerprint,
+        },
+    )
+    store.save_proposal(proposal)
+    captured: dict[str, object] = {}
+
+    def recording_gate(intent, portfolio, reference_price, **kwargs):
+        captured.update(kwargs)
+        return ValidationResult(
+            approved=False,
+            violations=("stop",),
+            violation_codes=("sentinel",),
+        )
+
+    monkeypatch.setattr(
+        execution_service,
+        "validate_trade_intent",
+        recording_gate,
+    )
+
+    with patched_broker(_validation_recorder()):
+        outcome = validate_proposal_for_execution(
+            "p-exact-policy-percent",
+            _held_portfolio(),
+            policy,
+            store,
+            now_et=NOW_ET,
+            earnings_days_away=10,
+        )
+
+    assert outcome.validation is not None, outcome.error
+    assert captured["max_basket_pct"] == Decimal("7")
+    assert captured["max_leveraged_etf_pct"] == Decimal("7")
+    assert captured["max_basket_pct"] != Decimal(str(0.07 * 100))
+
+
 def test_gr1c_validation_clock_still_resolves_from_the_facade(store, monkeypatch):
     """Callers could replace the facade clock before the body moved.
 
@@ -1318,6 +1423,114 @@ def test_exposure_increasing_buy_still_refuses_while_a_dispatch_is_ambiguous(sto
     assert observable_state(store, "p-1")["proposal_status"] == "blocked"
 
 
+@pytest.mark.parametrize("malformed_side", [None, "", "hold", "SELL", " sell "])
+def test_ambiguity_guard_bypasses_only_the_exact_sell_value(store, malformed_side):
+    """Normalization cannot turn unknown input into a risk-reduction grant."""
+    store.save_proposal(
+        _proposal(
+            "p-stuck",
+            side="buy",
+            status=SUBMISSION_UNKNOWN,
+            intent_overrides={"ticker": "MSFT"},
+        )
+    )
+
+    with pytest.raises(ProposalExecutionError, match="still ambiguous"):
+        execution_service._refuse_while_prior_dispatch_is_ambiguous(
+            store,
+            proposal_id="p-1",
+            side=malformed_side,
+        )
+
+
+def test_ambiguity_guard_rejects_an_object_that_only_compares_equal_to_sell(store):
+    """Caller-controlled equality cannot mint the risk-reduction exception."""
+
+    class SellEqualityTrap:
+        def __eq__(self, other):
+            return other == "sell"
+
+    store.save_proposal(
+        _proposal(
+            "p-stuck",
+            side="buy",
+            status=SUBMISSION_UNKNOWN,
+            intent_overrides={"ticker": "MSFT"},
+        )
+    )
+
+    with pytest.raises(ProposalExecutionError, match="still ambiguous"):
+        execution_service._refuse_while_prior_dispatch_is_ambiguous(
+            store,
+            proposal_id="p-1",
+            side=SellEqualityTrap(),
+        )
+
+
+@pytest.mark.parametrize("malformed_side", [None, "", "hold", "SELL"])
+def test_malformed_side_never_contacts_broker_during_ambiguous_dispatch(
+    store, malformed_side
+):
+    """Earlier validation may also refuse, but broker contact stays impossible."""
+    store.save_proposal(
+        _proposal(
+            "p-stuck",
+            side="buy",
+            status=SUBMISSION_UNKNOWN,
+            intent_overrides={"ticker": "MSFT"},
+        )
+    )
+    store.save_proposal(
+        _proposal("p-1", side="sell", intent_overrides={"side": malformed_side})
+    )
+    recorder = _submission_recorder(submit={"order_id": "should-not-happen"})
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError):
+            execute_approved_paper_proposal(
+                "p-1",
+                "approve",
+                _held_portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                earnings_days_away=10,
+            )
+
+    assert recorder.call_names == ()
+
+
+def test_sell_over_held_bypasses_ambiguity_guard_but_never_submits(store):
+    """The downstream sell-exceeds-held gate remains load-bearing."""
+    store.save_proposal(
+        _proposal(
+            "p-stuck",
+            side="buy",
+            status=SUBMISSION_UNKNOWN,
+            intent_overrides={"ticker": "MSFT"},
+        )
+    )
+    store.save_proposal(
+        _proposal("p-1", side="sell", intent_overrides={"shares": 11})
+    )
+    recorder = _submission_recorder(submit={"order_id": "should-not-happen"})
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError, match="exceeds"):
+            execute_approved_paper_proposal(
+                "p-1",
+                "approve",
+                _held_portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                earnings_days_away=10,
+            )
+
+    assert "submit_market_order" not in recorder.call_names
+    assert observable_state(store, "p-1")["proposal_status"] == "blocked"
+
+
 def test_successful_submission_freezes_call_order_state_and_evidence(store):
     """Characterise the ordinary path all four GR-1 seams participate in."""
     store.save_proposal(_proposal(side="sell"))
@@ -1607,7 +1820,7 @@ def test_recovery_on_an_unknown_proposal_also_refuses(store):
 
 
 def _make_proposal_stale(store: AssistantStore, proposal_id: str) -> None:
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
             ("2000-01-01T00:00:00+00:00", proposal_id),
@@ -1838,7 +2051,7 @@ def _unresolved_with_reservation(store, *, updated_at: str) -> None:
         max_daily_notional="1000000.00",
         max_daily_orders=100,
     )
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
             (updated_at, "p-1"),

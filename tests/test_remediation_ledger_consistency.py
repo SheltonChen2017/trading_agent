@@ -231,7 +231,7 @@ def _ledger_errors(text: str) -> list[str]:
     if declaration_counts != Counter({priority: 1 for priority in EXPECTED_PRIORITY_TOTALS}):
         errors.append(
             "coverage summary must declare each aggregate exactly once as "
-            "P1=46, P2=49, P3=14, P0=0; observed "
+            "P1=47, P2=49, P3=14, P0=0; observed "
             f"{priority_declarations}"
         )
     elif declared_totals != EXPECTED_PRIORITY_TOTALS:
@@ -245,7 +245,7 @@ def _ledger_errors(text: str) -> list[str]:
     )
     if grand_declarations != [str(EXPECTED_GRAND_TOTAL)]:
         errors.append(
-            "coverage summary must declare `total=109` exactly once; observed "
+            "coverage summary must declare `total=110` exactly once; observed "
             f"{grand_declarations}"
         )
     if sum(EXPECTED_PRIORITY_TOTALS.values()) != EXPECTED_GRAND_TOTAL:

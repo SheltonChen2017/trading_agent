@@ -127,6 +127,41 @@ def test_a_number_present_in_the_source_is_accepted():
     assert validate_extraction(extraction) == ()
 
 
+def test_number_grounding_is_independent_of_ambient_decimal_precision():
+    """Low ambient precision cannot merge distinct filing figures, while
+    additional trailing zeros remain a formatting-only difference."""
+    from decimal import localcontext
+
+    document = _document(text="Management reported margin of 1.2344%.")
+    invented = _extraction(
+        source_documents=(document,),
+        claims=(
+            _claim(
+                field="reported_margin",
+                value="1.2345%",
+                supporting_excerpt="Management reported margin of 1.2344%.",
+            ),
+        ),
+    )
+    equivalent = _extraction(
+        source_documents=(document,),
+        claims=(
+            _claim(
+                field="reported_margin",
+                value="1.2344000%",
+                supporting_excerpt="Management reported margin of 1.2344%.",
+            ),
+        ),
+    )
+
+    with localcontext() as context:
+        context.prec = 3
+        invented_codes = {issue.code for issue in validate_extraction(invented)}
+        assert "unsupported_number" in invented_codes
+        assert "number_not_in_supporting_excerpt" in invented_codes
+        assert validate_extraction(equivalent) == ()
+
+
 def test_percentages_preserve_their_numeric_unit():
     extraction = _extraction(
         claims=(

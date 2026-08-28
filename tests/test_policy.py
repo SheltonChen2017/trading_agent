@@ -244,6 +244,22 @@ def test_nonstandard_json_nan_is_rejected_at_parse_boundary(tmp_path):
         load_policy(path)
 
 
+@pytest.mark.parametrize(
+    ("field_name", "bad_value"),
+    [
+        ("version", True),
+        ("version", float("inf")),
+        ("name", False),
+        ("name", float("nan")),
+        ("notes", True),
+        ("notes", float("inf")),
+    ],
+)
+def test_policy_identity_and_notes_fields_require_text(field_name, bad_value):
+    with pytest.raises(ValueError, match=field_name):
+        _valid_policy(**{field_name: bad_value}).validate()
+
+
 def test_daily_order_and_open_order_caps_require_positive_integers():
     for field_name in ("max_daily_order_count", "max_open_orders"):
         for bad_value in (0, -1, 1.5, True):

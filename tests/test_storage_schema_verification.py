@@ -21,18 +21,22 @@ result has the complete semantic schema. These tests cover both directions:
 
 Run with: python -m pytest tests/test_storage_schema_verification.py
 """
+import ast
 import hashlib
+import inspect
 import json
 import re
 import sqlite3
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import scripts.run_personal_assistant as personal_assistant_cli
+from assistant.dispatch_fence import get_runtime_emergency_stop
 from assistant.storage import (
     AssistantStore,
     SchemaVerificationResult,
@@ -43,6 +47,33 @@ from assistant.storage import (
 
 
 AP1_TABLES = ("execution_telemetry_events", "portfolio_capture_sessions")
+
+_MIGRATED_BROKER_EVENT_DDL = """
+CREATE TABLE broker_order_events (
+    event_id TEXT PRIMARY KEY,
+    order_id TEXT NOT NULL,
+    proposal_id TEXT NOT NULL,
+    event_type TEXT NOT NULL,
+    event_at TEXT NOT NULL,
+    status TEXT NOT NULL,
+    filled_qty REAL,
+    filled_avg_price REAL,
+    fill_qty REAL,
+    fill_price REAL,
+    payload_json TEXT NOT NULL,
+    filled_qty_text TEXT,
+    filled_avg_price_text TEXT,
+    fill_qty_text TEXT,
+    fill_price_text TEXT,
+    numeric_evidence_status TEXT,
+    event_scope TEXT,
+    event_content_hash TEXT,
+    event_content_json TEXT,
+    event_hash_version TEXT,
+    FOREIGN KEY(order_id) REFERENCES broker_orders(order_id),
+    FOREIGN KEY(proposal_id) REFERENCES trade_proposals(proposal_id)
+)
+"""
 
 
 def _create_pre_migration_database(path: Path) -> None:
@@ -230,6 +261,92 @@ def test_fresh_database_contains_both_ap1_tables_with_expected_columns(tmp_path)
             )
     finally:
         connection.close()
+
+
+def test_known_broker_event_additive_column_order_is_semantically_equivalent(
+    tmp_path,
+):
+    """The exact historical ALTER TABLE layout is not reported as drift."""
+    db_path = tmp_path / "migrated-order.db"
+    AssistantStore(db_path)
+    _rebuild_empty_table(
+        db_path,
+        "broker_order_events",
+        lambda _sql: _MIGRATED_BROKER_EVENT_DDL,
+    )
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is True
+    assert result.mismatched_columns == ()
+    assert result.mismatched_foreign_keys == ()
+    assert result.mismatched_indexes == ()
+
+
+def test_arbitrary_broker_event_column_reordering_is_still_drift(tmp_path):
+    """Only the declared append layout receives the ordinal exception."""
+    db_path = tmp_path / "arbitrary-order.db"
+    AssistantStore(db_path)
+    reordered = _MIGRATED_BROKER_EVENT_DDL.replace(
+        "    event_id TEXT PRIMARY KEY,\n    order_id TEXT NOT NULL,",
+        "    order_id TEXT NOT NULL,\n    event_id TEXT PRIMARY KEY,",
+    )
+    _rebuild_empty_table(
+        db_path,
+        "broker_order_events",
+        lambda _sql: reordered,
+    )
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert "broker_order_events.event_id" in result.mismatched_columns
+    assert "broker_order_events.order_id" in result.mismatched_columns
+
+
+def test_migrated_broker_event_layout_does_not_hide_column_or_index_drift(tmp_path):
+    db_path = tmp_path / "migrated-weakened.db"
+    AssistantStore(db_path)
+    weakened_column = _MIGRATED_BROKER_EVENT_DDL.replace(
+        "    event_scope TEXT,",
+        "    event_scope BLOB,",
+    )
+    _rebuild_empty_table(
+        db_path,
+        "broker_order_events",
+        lambda _sql: weakened_column,
+    )
+    with sqlite3.connect(db_path) as connection:
+        connection.executescript(
+            "DROP INDEX idx_broker_events_order_at;"
+            "CREATE INDEX idx_broker_events_order_at "
+            "ON broker_order_events(status, event_at);"
+        )
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert "broker_order_events.event_scope" in result.mismatched_columns
+    assert "idx_broker_events_order_at" in result.mismatched_indexes
+
+
+def test_migrated_broker_event_layout_does_not_hide_foreign_key_drift(tmp_path):
+    db_path = tmp_path / "migrated-foreign-key.db"
+    AssistantStore(db_path)
+    missing_foreign_key = _MIGRATED_BROKER_EVENT_DDL.replace(
+        "    FOREIGN KEY(order_id) REFERENCES broker_orders(order_id),\n",
+        "",
+    )
+    _rebuild_empty_table(
+        db_path,
+        "broker_order_events",
+        lambda _sql: missing_foreign_key,
+    )
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert "broker_order_events" in result.mismatched_foreign_keys
 
 
 # --- pre-migration database: report, don't touch ---------------------------
@@ -671,3 +788,403 @@ def test_read_only_store_does_not_migrate_an_old_schema(tmp_path):
 
     assert tables == {"legacy_only"}
     assert db_path.read_bytes() == before
+
+
+def test_public_store_methods_do_not_open_the_source_database_around_read_only():
+    """Inventory every source writer, including helper-indirected writers.
+
+    A direct-opener-only check misses methods that write through ``_connect``
+    or a nested helper.  This test resolves self-call reachability, recognizes
+    both literal and locally assembled mutation SQL, freezes the complete
+    public writer inventory, and requires every route to reach the central
+    pre-contact writable guard.
+    """
+    class_node = ast.parse(inspect.getsource(AssistantStore)).body[0]
+    methods = {
+        method.name: method
+        for method in class_node.body
+        if isinstance(method, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+
+    def self_calls(method):
+        return {
+            node.func.attr
+            for node in ast.walk(method)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == "self"
+        }
+
+    def literal_text(expression):
+        return "".join(
+            node.value
+            for node in ast.walk(expression)
+            if isinstance(node, ast.Constant) and isinstance(node.value, str)
+        )
+
+    def contains_mutation_sql(method):
+        assigned_sql = {}
+        for node in ast.walk(method):
+            if isinstance(node, (ast.Assign, ast.AnnAssign)):
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                value = literal_text(node.value) if node.value is not None else ""
+                for target in targets:
+                    if isinstance(target, ast.Name):
+                        assigned_sql[target.id] = assigned_sql.get(target.id, "") + value
+            elif isinstance(node, ast.AugAssign) and isinstance(node.target, ast.Name):
+                assigned_sql[node.target.id] = (
+                    assigned_sql.get(node.target.id, "") + literal_text(node.value)
+                )
+
+        mutation = re.compile(
+            r"\b(?:INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|REPLACE|VACUUM|REINDEX)\b",
+            re.IGNORECASE,
+        )
+        for node in ast.walk(method):
+            if (
+                not isinstance(node, ast.Call)
+                or not isinstance(node.func, ast.Attribute)
+                or node.func.attr not in {"execute", "executemany", "executescript"}
+                or not node.args
+            ):
+                continue
+            sql_expression = node.args[0]
+            sql = (
+                assigned_sql.get(sql_expression.id, "")
+                if isinstance(sql_expression, ast.Name)
+                else literal_text(sql_expression)
+            )
+            if mutation.search(sql):
+                return True
+        return False
+
+    call_graph = {name: self_calls(method) for name, method in methods.items()}
+
+    def reachable(method_name):
+        reached = set()
+        pending = [method_name]
+        while pending:
+            current = pending.pop()
+            if current in reached:
+                continue
+            reached.add(current)
+            pending.extend(call_graph.get(current, set()) & methods.keys())
+        return reached
+
+    sql_mutation_sinks = {
+        name for name, method in methods.items() if contains_mutation_sql(method)
+    }
+    containment_capable_reads = {
+        "database_integrity_check",
+        "get_execution_budget_usage",
+        "list_broker_order_events",
+        "list_fills",
+    }
+    public_writers = {
+        name
+        for name in methods
+        if not name.startswith("_") and reachable(name) & sql_mutation_sinks
+    } - containment_capable_reads
+
+    assert public_writers == {
+        "acknowledge_operational_alert",
+        "activate_reconciliation_halt",
+        "append_execution_telemetry_event",
+        "append_journal_transaction",
+        "append_paper_account_observation",
+        "append_portfolio_capture_session",
+        "append_portfolio_equity_snapshot",
+        "append_portfolio_position_snapshots",
+        "backup_to",
+        "bootstrap_portfolio_ledger",
+        "claim_ml_shadow_run",
+        "claim_proposal",
+        "close_ml_evidence_epoch",
+        "close_paper_evidence_epoch",
+        "commit_sleeve_notification_cycle",
+        "complete_ml_shadow_run",
+        "create_allocation_batch",
+        "create_dividend_earmark_with_proposal",
+        "dismiss_proposals",
+        "mark_pre_contact_blocked_and_release",
+        "mark_submission_failed_and_release",
+        "open_ml_evidence_epoch",
+        "park_reconciliation_anomaly_and_halt",
+        "project_broker_order_event",
+        "prune_decision_packets_older_than",
+        "reclaim_stale_status",
+        "record_ai_run",
+        "record_alert_delivery",
+        "record_broker_activity_acknowledgement",
+        "record_ledger_reconciliation",
+        "record_ml_prediction",
+        "record_ml_prediction_outcome",
+        "record_operational_drill",
+        "record_overlay_observation",
+        "record_overlay_outcome",
+        "record_provider_fetch",
+        "record_research_look",
+        "record_strategy_evaluation",
+        "register_ml_model",
+        "register_overlay_stream",
+        "release_execution_reservation",
+        "reserve_execution_budget",
+        "resolve_dividend_earmark_if_active",
+        "save_decision_packet",
+        "save_proposal",
+        "save_sleeve_watch_states",
+        "set_kill_switch",
+        "set_system_state",
+        "start_paper_evidence_epoch",
+        "update_allocation_batch",
+        "update_proposal_status",
+        "update_proposal_status_if_current",
+        "upsert_operational_alert",
+    }
+
+    guard_methods = {
+        "_connect_writable",
+        "_open_writable_database",
+        "_require_writable",
+    }
+    for method_name in public_writers:
+        assert reachable(method_name) & guard_methods, method_name
+
+    # Nominal reads use the read-only connection even on a writable store.
+    # The four named readers may publish emergency containment only after
+    # detecting corrupt evidence; they are not ordinary source writers.
+    assert self_calls(methods["_connect"]) == {"_open_database_read_only"}
+    assert {
+        name
+        for name in methods
+        if not name.startswith("_")
+        and reachable(name) & sql_mutation_sinks
+        and name not in public_writers
+    } == containment_capable_reads
+
+    # snapshot_to writes only a distinct destination and is intentionally
+    # usable for a read-only preview. No other public method may bypass the
+    # central source-database opener.
+    direct_unguarded_openers = {
+        name
+        for name, method in methods.items()
+        if not name.startswith("_") and "_open_database" in self_calls(method)
+    }
+    assert direct_unguarded_openers == {"snapshot_to"}
+
+
+def test_read_only_store_refuses_direct_transaction_and_containment_writes(
+    tmp_path,
+):
+    db_path = tmp_path / "operator.db"
+    writable = AssistantStore(db_path)
+    writable.save_proposal(
+        {
+            "proposal_id": "p-read-only",
+            "created_at": "2026-08-27T18:00:00+00:00",
+            "expires_at": "2099-01-01T00:00:00+00:00",
+            "status": "proposed",
+            "idempotency_key": "idem-read-only",
+            "intent": {
+                "ticker": "AAPL",
+                "side": "buy",
+                "shares": 1,
+                "order_type": "market",
+                "limit_price": None,
+            },
+        }
+    )
+    read_only = AssistantStore(db_path, read_only=True)
+
+    with pytest.raises(PermissionError, match="read-only"):
+        read_only.update_proposal_status_if_current(
+            "p-read-only",
+            expected_statuses=("proposed",),
+            new_status="blocked",
+        )
+    with pytest.raises(PermissionError, match="read-only"):
+        read_only.park_reconciliation_anomaly_and_halt(
+            "p-read-only",
+            expected_statuses=("proposed",),
+            reason="read-only containment must not persist",
+            reconciled_at="2026-08-27T18:01:00+00:00",
+            details={"path": "test"},
+            anomaly_key="read_only_probe",
+        )
+    backup = tmp_path / "must-not-exist.db"
+    with pytest.raises(PermissionError, match="read-only"):
+        read_only.backup_to(backup)
+
+    assert writable.get_proposal("p-read-only")["status"] == "proposed"
+    assert writable.get_kill_switch()["active"] is False
+    assert writable.list_operational_alerts() == []
+    assert get_runtime_emergency_stop(db_path)["active"] is False
+    assert not backup.exists()
+
+
+def test_read_only_store_refuses_representative_and_nested_writers_pre_contact(
+    tmp_path,
+    monkeypatch,
+):
+    db_path = tmp_path / "operator.db"
+    writable = AssistantStore(db_path)
+    writable.save_proposal(
+        {
+            "proposal_id": "p-existing",
+            "created_at": "2026-08-27T18:00:00+00:00",
+            "expires_at": "2099-01-01T00:00:00+00:00",
+            "status": "proposed",
+            "idempotency_key": "idem-existing",
+            "intent": {"ticker": "AAPL", "side": "buy", "shares": 1},
+        }
+    )
+    read_only = AssistantStore(db_path, read_only=True)
+    database_contacts = []
+
+    def forbidden_database_contact(*args, **kwargs):
+        database_contacts.append((args, kwargs))
+        raise AssertionError("read-only writer contacted SQLite")
+
+    monkeypatch.setattr(read_only, "_open_database", forbidden_database_contact)
+    monkeypatch.setattr(
+        read_only, "_open_database_read_only", forbidden_database_contact
+    )
+
+    packet = SimpleNamespace(
+        generated_at="2026-08-27T18:00:00+00:00",
+        schema_version="test",
+        to_dict=lambda: {"schema_version": "test", "generated_at": "now"},
+    )
+    operations = {
+        "save_decision_packet": lambda: read_only.save_decision_packet(packet),
+        "append_portfolio_equity_snapshot": lambda: (
+            read_only.append_portfolio_equity_snapshot(
+                {
+                    "account_key": "paper-account",
+                    "session_date": "2026-08-27",
+                    "captured_at": "2026-08-27T18:00:00+00:00",
+                    "total_equity": "100",
+                    "cash": "100",
+                    "net_external_flow": "0",
+                }
+            )
+        ),
+        "save_proposal": lambda: read_only.save_proposal(
+            {
+                "proposal_id": "p-new",
+                "created_at": "2026-08-27T18:00:00+00:00",
+                "expires_at": "2099-01-01T00:00:00+00:00",
+                "status": "proposed",
+                "idempotency_key": "idem-new",
+            }
+        ),
+        "update_proposal_status": lambda: read_only.update_proposal_status(
+            "p-existing", "blocked"
+        ),
+        "release_execution_reservation": lambda: (
+            read_only.release_execution_reservation("p-existing")
+        ),
+        "set_system_state": lambda: read_only.set_system_state("probe", {}),
+        "resolve_dividend_earmark_if_active": lambda: (
+            read_only.resolve_dividend_earmark_if_active(
+                "p-existing",
+                new_status="released",
+                resolved_reason="test",
+                now="2026-08-27T18:01:00+00:00",
+            )
+        ),
+        "append_execution_telemetry_event": lambda: (
+            read_only.append_execution_telemetry_event(
+                attempt_id="attempt-read-only",
+                proposal_id="p-existing",
+                event_type="validation_started",
+                event_at="2026-08-27T18:01:00+00:00",
+                account_mode="paper",
+                source="test",
+                payload={},
+            )
+        ),
+        "create_allocation_batch": lambda: read_only.create_allocation_batch(
+            "batch-read-only", ["p-existing"], 10.0
+        ),
+        "record_strategy_evaluation": lambda: (
+            read_only.record_strategy_evaluation(
+                "strategy-read-only",
+                "2026-08-27T18:01:00+00:00",
+                {"available": False},
+            )
+        ),
+        "upsert_operational_alert_nested_helper": lambda: (
+            read_only.upsert_operational_alert(
+                fingerprint="read-only-probe",
+                severity="critical",
+                category="test",
+                message="must not persist",
+            )
+        ),
+        "private_overlay_upsert": lambda: read_only._overlay_upsert(
+            table="overlay_stream_registrations",
+            identity_columns=("stream_name", "evidence_epoch"),
+            identity=("probe", "epoch"),
+            extra_columns={"registered_at": "2026-08-27T18:01:00+00:00"},
+            payload_json="{}",
+            payload_hash="0" * 64,
+            json_column="registration_json",
+            hash_column="registration_hash",
+            conflict_label="test overlay",
+        ),
+    }
+
+    for operation_name, operation in operations.items():
+        with pytest.raises(PermissionError, match="read-only"):
+            operation()
+        assert database_contacts == [], operation_name
+
+
+def test_read_only_store_refuses_before_runtime_stop_clear_or_activation(tmp_path):
+    db_path = tmp_path / "operator.db"
+    writable = AssistantStore(db_path)
+    activated = writable.set_kill_switch(
+        True,
+        reason="existing cross-worktree safety incident",
+        incident_id="read-only-runtime-guard",
+        changed_at="2026-08-27T18:00:00+00:00",
+    )
+    before = get_runtime_emergency_stop(db_path)
+    assert before["active"] is True
+    assert activated["runtime_stop"] == before
+
+    read_only = AssistantStore(db_path, read_only=True)
+    with pytest.raises(PermissionError, match="read-only"):
+        read_only.set_kill_switch(
+            False,
+            reason="must not clear through a read-only store",
+            incident_id="read-only-runtime-guard",
+            expected_runtime_generation=before["generation"],
+            changed_at="2026-08-27T18:01:00+00:00",
+        )
+    assert get_runtime_emergency_stop(db_path) == before
+
+    with pytest.raises(PermissionError, match="read-only"):
+        read_only.set_kill_switch(
+            True,
+            reason="must not activate through a read-only store",
+            incident_id="read-only-runtime-new-incident",
+            changed_at="2026-08-27T18:02:00+00:00",
+        )
+    assert get_runtime_emergency_stop(db_path) == before
+
+    with pytest.raises(PermissionError, match="read-only"):
+        read_only.activate_reconciliation_halt(
+            proposal_id="p-read-only",
+            reason="must not publish a reconciliation incident",
+            seen_at="2026-08-27T18:03:00+00:00",
+        )
+    assert get_runtime_emergency_stop(db_path) == before
+    assert writable.get_kill_switch() == {
+        "active": True,
+        "reason": "existing cross-worktree safety incident",
+        "changed_at": "2026-08-27T18:00:00+00:00",
+    }
+    assert writable.list_operational_alerts() == []

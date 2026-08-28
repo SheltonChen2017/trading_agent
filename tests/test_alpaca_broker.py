@@ -11,7 +11,7 @@ import os
 import sys
 from contextlib import contextmanager
 from pathlib import Path
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 
 import pytest
 
@@ -64,6 +64,7 @@ def _open_test_session(client, *, key="test-key", secret="test-secret", paper=Tr
     )
     client._oauth_token = None
     client._use_basic_auth = False
+    client._use_raw_data = False
     original_capture = broker._capture_connection_settings
     original_factory = broker._new_trading_client
     broker._capture_connection_settings = lambda: (key, secret, paper)
@@ -867,6 +868,63 @@ def test_normalize_trade_update_numbers_retain_exact_decimal_companions():
         "fill_price": pytest.approx(100.0001),
         "fill_price_decimal": "100.0001",
     }
+
+
+def test_trade_stream_does_not_fabricate_missing_event_from_order_status(
+    monkeypatch,
+):
+    import asyncio
+
+    observed = []
+
+    class FakeTradingStream:
+        def __init__(self, key, secret, *, paper):
+            self.handler = None
+
+        def subscribe_trade_updates(self, handler):
+            self.handler = handler
+
+        def run(self):
+            assert self.handler is not None
+            asyncio.run(
+                self.handler(
+                    SimpleNamespace(
+                        order=SimpleNamespace(
+                            id="order-1",
+                            symbol="AAPL",
+                            qty="1",
+                            status="filled",
+                        ),
+                        execution_id=None,
+                        timestamp=None,
+                        qty=None,
+                        price=None,
+                    )
+                )
+            )
+
+    alpaca_module = ModuleType("alpaca")
+    trading_module = ModuleType("alpaca.trading")
+    stream_module = ModuleType("alpaca.trading.stream")
+    alpaca_module.__path__ = []
+    trading_module.__path__ = []
+    alpaca_module.trading = trading_module
+    trading_module.stream = stream_module
+    stream_module.TradingStream = FakeTradingStream
+    monkeypatch.setitem(sys.modules, "alpaca", alpaca_module)
+    monkeypatch.setitem(sys.modules, "alpaca.trading", trading_module)
+    monkeypatch.setitem(sys.modules, "alpaca.trading.stream", stream_module)
+
+    broker._run_trade_update_stream_with_credentials(
+        observed.append,
+        key="test-key",
+        secret="test-secret",
+        paper=True,
+    )
+
+    assert observed[0]["order"]["status"] == "filled"
+    assert observed[0]["event"] is None
+    assert observed[0]["event_available"] is False
 
 
 # --------------------------------------------------------------------------

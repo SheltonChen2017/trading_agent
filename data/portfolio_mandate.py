@@ -9,10 +9,31 @@ from __future__ import annotations
 import dataclasses
 import json
 import math
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
 
 from data.mandate_evaluation import compute_mandate_fingerprint
+
+
+def _reject_non_finite_json_constant(token: str) -> None:
+    raise ValueError(f"Mandate contains non-finite JSON constant {token!r}.")
+
+
+def _canonical_aware_iso_timestamp(value: Any, *, name: str) -> str:
+    if type(value) is not str or not value or value != value.strip():
+        raise ValueError(f"{name} must be a canonical timezone-aware ISO-8601 string")
+    try:
+        parsed = datetime.fromisoformat(value)
+        offset = parsed.utcoffset()
+        parsed.astimezone(timezone.utc)
+    except (OSError, OverflowError, TypeError, ValueError) as exc:
+        raise ValueError(
+            f"{name} must be a canonical timezone-aware ISO-8601 string"
+        ) from exc
+    if offset is None or parsed.isoformat() != value:
+        raise ValueError(f"{name} must be a canonical timezone-aware ISO-8601 string")
+    return value
 
 
 @dataclasses.dataclass(frozen=True)
@@ -41,8 +62,15 @@ class PortfolioMandate:
     notes: str = ""
 
     def validate(self) -> None:
-        if not self.version.strip() or not self.name.strip():
+        if any(
+            not isinstance(value, str)
+            or not value
+            or value != value.strip()
+            for value in (self.version, self.name)
+        ):
             raise ValueError("mandate version and name must be non-empty")
+        if not isinstance(self.notes, str):
+            raise ValueError("mandate notes must be text")
         if self.status not in ("proposed", "approved", "retired"):
             raise ValueError(f"unsupported mandate status: {self.status!r}")
 
@@ -54,10 +82,15 @@ class PortfolioMandate:
             "min_upside_capture_pct",
         ):
             value = getattr(self, field_name)
+            valid_type = (
+                isinstance(value, (int, float)) and not isinstance(value, bool)
+            )
+            try:
+                finite = valid_type and math.isfinite(value)
+            except (OverflowError, TypeError, ValueError):
+                finite = False
             if (
-                not isinstance(value, (int, float))
-                or isinstance(value, bool)
-                or not math.isfinite(value)
+                not finite
                 or value < 0
             ):
                 raise ValueError(f"{field_name} must be a non-negative finite number")
@@ -92,13 +125,25 @@ class PortfolioMandate:
         ):
             raise ValueError("permitted_instruments must contain non-empty names")
 
+        if self.approved_by is not None and (
+            type(self.approved_by) is not str
+            or not self.approved_by
+            or self.approved_by != self.approved_by.strip()
+        ):
+            raise ValueError("approved_by must be canonical non-empty text")
+        if self.approved_at is not None:
+            _canonical_aware_iso_timestamp(self.approved_at, name="approved_at")
+
         if self.status == "approved":
-            if not self.approved_at or not self.approved_by:
+            if self.approved_at is None or self.approved_by is None:
                 raise ValueError(
                     "an approved mandate requires approved_at and approved_by"
                 )
             expected = compute_mandate_fingerprint(self)
-            if self.approved_fingerprint != expected:
+            if (
+                type(self.approved_fingerprint) is not str
+                or self.approved_fingerprint != expected
+            ):
                 raise ValueError(
                     "approved_fingerprint does not match the mandate's behavior fields"
                 )
@@ -111,7 +156,10 @@ class PortfolioMandate:
 
 def load_portfolio_mandate(path: str | Path) -> PortfolioMandate:
     """Load and validate a mandate from an explicit caller-owned path."""
-    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    raw = json.loads(
+        Path(path).read_text(encoding="utf-8"),
+        parse_constant=_reject_non_finite_json_constant,
+    )
     raw["permitted_instruments"] = tuple(raw.get("permitted_instruments", ()))
     mandate = PortfolioMandate(**raw)
     mandate.validate()

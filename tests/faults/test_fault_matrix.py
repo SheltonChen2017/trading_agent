@@ -58,7 +58,7 @@ def _held_portfolio(*positions):
 def _age_proposal(store: AssistantStore, proposal_id: str, seconds: int) -> None:
     """Backdate updated_at so stale-guards see a genuinely old row."""
     stamp = (datetime.now(timezone.utc) - timedelta(seconds=seconds)).isoformat()
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
             (stamp, proposal_id),

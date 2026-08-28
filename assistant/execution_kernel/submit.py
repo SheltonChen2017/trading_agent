@@ -27,7 +27,7 @@ from assistant.execution_kernel.errors import (
     ProposalClaimLostError,
     ProposalExecutionError,
 )
-from assistant.money import MoneyInput, to_decimal
+from assistant.money import MoneyInput, exact_decimal_multiply, to_decimal
 from assistant.order_lifecycle import (
     journal_broker_order_update,
     proposal_status_for_order,
@@ -65,8 +65,10 @@ def _execution_budget_notional(
     # daily-budget reservation, which is precisely the FPS-001/CFPS-001 class
     # of defect this repository has already paid for three times. The intent
     # is validated before this runs; this is the defense-in-depth copy.
-    return to_decimal(intent.shares, name="intent.shares") * worst_case_fill_price_decimal(
-        intent, reference_price
+    return exact_decimal_multiply(
+        to_decimal(intent.shares, name="intent.shares"),
+        worst_case_fill_price_decimal(intent, reference_price),
+        name="execution budget notional",
     )
 
 

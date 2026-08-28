@@ -34,7 +34,11 @@ def _clean_text(value: Any, *, maximum: int = 1_500) -> str:
 def _finite_number(value: Any, *, name: str) -> int | float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ProjectionError(f"{name} must be numeric.")
-    if not math.isfinite(float(value)):
+    try:
+        finite = math.isfinite(float(value))
+    except (OverflowError, TypeError, ValueError):
+        finite = False
+    if not finite:
         raise ProjectionError(f"{name} must be finite.")
     return value
 
@@ -189,20 +193,35 @@ def project_committee_input(
         )
 
     analytics = packet.analytics
+    risk_available = packet.risk.available is True
+    analytics_available = analytics.get("available") is True
+    portfolio_evidence_available = risk_available and analytics_available
     percent_metrics = {
-        "metric.invested_pct": ("Portfolio invested", analytics.get("invested_pct")),
+        "metric.invested_pct": (
+            "Portfolio invested",
+            analytics.get("invested_pct") if portfolio_evidence_available else None,
+        ),
         "metric.unrealized_pnl_pct": (
             "Portfolio unrealized return",
-            analytics.get("unrealized_pnl_pct"),
+            analytics.get("unrealized_pnl_pct")
+            if portfolio_evidence_available
+            else None,
         ),
-        "metric.cash_pct": ("Portfolio cash", packet.risk.cash_pct),
+        "metric.cash_pct": (
+            "Portfolio cash",
+            packet.risk.cash_pct if portfolio_evidence_available else None,
+        ),
         "metric.largest_position_pct": (
             "Largest position",
-            packet.risk.largest_single_position_pct,
+            packet.risk.largest_single_position_pct
+            if portfolio_evidence_available
+            else None,
         ),
         "metric.leveraged_etf_exposure_pct": (
             "Leveraged ETF exposure",
-            packet.risk.leveraged_etf_exposure_pct,
+            packet.risk.leveraged_etf_exposure_pct
+            if portfolio_evidence_available
+            else None,
         ),
     }
     for source_id, (label, value) in percent_metrics.items():
@@ -217,29 +236,51 @@ def project_committee_input(
             as_of=packet.portfolio.as_of,
         )
 
-    for ticker_key, value in sorted(
-        (analytics.get("position_weights_pct") or {}).items()
-    ):
-        ticker_key = str(ticker_key).upper()
+    if portfolio_evidence_available:
+        for ticker_key, value in sorted(
+            (analytics.get("position_weights_pct") or {}).items()
+        ):
+            ticker_key = str(ticker_key).upper()
+            add(
+                _source_id("holding", f"{ticker_key}.weight_pct"),
+                "holding_metric",
+                f"{ticker_key} portfolio weight",
+                _finite_number(value, name=f"position_weights_pct.{ticker_key}"),
+                unit="percent",
+                as_of=packet.portfolio.as_of,
+                tickers=(ticker_key,),
+            )
+
+    if not portfolio_evidence_available:
+        unavailable_reason = (
+            packet.risk.unavailable_reason
+            if not risk_available
+            else str(
+                analytics.get("unavailable_reason")
+                or "Portfolio analytics are unavailable."
+            )
+        )
         add(
-            _source_id("holding", f"{ticker_key}.weight_pct"),
-            "holding_metric",
-            f"{ticker_key} portfolio weight",
-            _finite_number(value, name=f"position_weights_pct.{ticker_key}"),
-            unit="percent",
+            "risk.exposure_availability",
+            "portfolio_metric",
+            "Portfolio exposure metrics",
+            "unavailable",
             as_of=packet.portfolio.as_of,
-            tickers=(ticker_key,),
+            availability=FactAvailability.UNAVAILABLE,
+            detail=unavailable_reason,
+            critical=True,
         )
 
-    for basket, value in sorted(packet.risk.basket_exposure_pct.items()):
-        add(
-            _source_id("basket", basket),
-            "basket_metric",
-            f"{basket} exposure",
-            _finite_number(value, name=f"basket_exposure_pct.{basket}"),
-            unit="percent",
-            as_of=packet.portfolio.as_of,
-        )
+    if portfolio_evidence_available:
+        for basket, value in sorted(packet.risk.basket_exposure_pct.items()):
+            add(
+                _source_id("basket", basket),
+                "basket_metric",
+                f"{basket} exposure",
+                _finite_number(value, name=f"basket_exposure_pct.{basket}"),
+                unit="percent",
+                as_of=packet.portfolio.as_of,
+            )
 
     add(
         "regime.trend",
@@ -366,7 +407,10 @@ def project_committee_input(
             critical=availability != FactAvailability.AVAILABLE,
         )
 
-    if privacy_mode != PrivacyMode.PERCENTAGES_ONLY:
+    if (
+        privacy_mode != PrivacyMode.PERCENTAGES_ONLY
+        and portfolio_evidence_available
+    ):
         dollar_values = {
             "value.total_equity": ("Total equity", packet.portfolio.total_equity),
             "value.cash": ("Cash value", packet.portfolio.cash),
@@ -401,16 +445,39 @@ def project_committee_input(
         *,
         unit: str | None = None,
         detail: str = "",
+        requires_risk: bool = False,
     ) -> None:
+        portfolio_unavailable = (
+            requires_risk and not portfolio_evidence_available
+        )
+        unavailable_reason = (
+            packet.risk.unavailable_reason
+            if not risk_available
+            else str(
+                analytics.get("unavailable_reason")
+                or "Portfolio analytics are unavailable."
+            )
+        )
         add(
             source_id,
             "candidate",
             label,
-            value,
+            "unavailable" if portfolio_unavailable else value,
             unit=unit,
             as_of=raw_proposal.get("created_at"),
-            detail=detail,
+            availability=(
+                FactAvailability.UNAVAILABLE
+                if portfolio_unavailable
+                else FactAvailability.AVAILABLE
+            ),
+            detail=(
+                unavailable_reason
+                if portfolio_unavailable
+                else detail
+            ),
             tickers=(ticker,),
+            production_authoritative=not portfolio_unavailable,
+            critical=portfolio_unavailable,
         )
         candidate_ids.append(source_id)
 
@@ -421,12 +488,14 @@ def project_committee_input(
         f"{ticker} weight before candidate",
         before,
         unit="percent",
+        requires_risk=True,
     )
     add_candidate(
         "candidate.position_weight_after_pct",
         f"{ticker} weight after candidate",
         after,
         unit="percent",
+        requires_risk=True,
     )
     for key, value in sorted(impact.items()):
         if key in {"position_weight_before_pct", "position_weight_after_pct"}:
@@ -435,8 +504,13 @@ def project_committee_input(
             add_candidate(
                 _source_id("candidate", key),
                 key.replace("_", " "),
-                _finite_number(value, name=f"candidate.{key}"),
+                (
+                    _finite_number(value, name=f"candidate.{key}")
+                    if portfolio_evidence_available
+                    else None
+                ),
                 unit="percent",
+                requires_risk=True,
             )
         elif (
             privacy_mode != PrivacyMode.PERCENTAGES_ONLY
@@ -444,14 +518,22 @@ def project_committee_input(
             and isinstance(value, (int, float))
             and not isinstance(value, bool)
         ):
-            number = _finite_number(value, name=f"candidate.{key}")
-            if privacy_mode == PrivacyMode.ROUNDED_DOLLARS:
+            number = (
+                _finite_number(value, name=f"candidate.{key}")
+                if portfolio_evidence_available
+                else None
+            )
+            if (
+                number is not None
+                and privacy_mode == PrivacyMode.ROUNDED_DOLLARS
+            ):
                 number = _rounded_dollars(number)
             add_candidate(
                 _source_id("candidate", key),
                 key.replace("_", " "),
                 number,
                 unit="USD",
+                requires_risk=True,
             )
 
     add_candidate(

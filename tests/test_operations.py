@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pytest
 
 import assistant.operations as operations_module
+import assistant.readiness as readiness_module
 from assistant.operations import (
     ensure_recent_database_backup,
     operational_health,
@@ -111,6 +112,48 @@ def test_a_future_dated_control_is_not_fresh():
     assert not (timedelta(0) <= now - future <= limit)
     # The form that shipped, for contrast -- this is what read as fresh.
     assert now - future <= limit
+
+
+def test_operational_timestamp_parser_refuses_naive_or_non_temporal_values():
+    class EqualityTrap:
+        def __eq__(self, _other):
+            raise AssertionError("non-temporal values must be rejected by type")
+
+    assert operations_module._parse_timestamp("2026-08-27T12:00:00") is None
+    assert operations_module._parse_timestamp(12345) is None
+    assert operations_module._parse_timestamp(EqualityTrap()) is None
+    assert readiness_module._parse_timestamp(EqualityTrap()) is None
+    parsed = operations_module._parse_timestamp("2026-08-27T12:00:00-07:00")
+    assert parsed == datetime(2026, 8, 27, 19, 0, tzinfo=timezone.utc)
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        "0001-01-01T00:00:00+14:00",
+        "9999-12-31T23:59:59.999999-14:00",
+    ),
+)
+def test_operational_timestamp_parsers_refuse_utc_normalization_overflow(value):
+    assert operations_module._parse_timestamp(value) is None
+    assert readiness_module._parse_timestamp(value) is None
+
+
+def test_operational_numeric_limits_normalize_huge_integers_to_operations_error():
+    policy = load_policy()
+    with pytest.raises(operations_module.OperationsError, match="positive and finite"):
+        operational_health(
+            object(),
+            policy,
+            check_broker=False,
+            max_backup_age_hours=10**10000,
+        )
+    with pytest.raises(operations_module.OperationsError, match="positive and finite"):
+        ensure_recent_database_backup(
+            object(),
+            Path("unused"),
+            max_age_hours=10**10000,
+        )
 
 
 @pytest.mark.parametrize(

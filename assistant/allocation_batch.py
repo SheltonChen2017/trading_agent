@@ -59,7 +59,12 @@ from datetime import datetime
 from typing import Callable
 
 from assistant.portfolio_snapshot import build_portfolio_snapshot_from_alpaca
-from assistant.money import to_decimal
+from assistant.money import (
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    to_decimal,
+)
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     ProposalExecutionError,
@@ -294,24 +299,57 @@ def preflight_allocation_batch(
     simulated_open_orders = 0
     simulated_intents: set[tuple[str, str]] = set()
     trading_day = now_et.date().isoformat()
-    usage = store.get_execution_budget_usage(trading_day)
-    budget_order_count = int(usage["submitted_order_count"])
-    budget_notional = to_decimal(
-        usage.get("submitted_notional_decimal", usage["submitted_notional"]),
-        name="submitted_notional",
-    )
-    daily_notional_cap = to_decimal(
-        policy.max_daily_submitted_notional,
-        name="max_daily_submitted_notional",
-    )
+    try:
+        usage = store.get_execution_budget_usage(trading_day)
+        budget_order_count = int(usage["submitted_order_count"])
+        budget_notional = to_decimal(
+            usage.get("submitted_notional_decimal", usage["submitted_notional"]),
+            name="submitted_notional",
+        )
+        daily_notional_cap = to_decimal(
+            policy.max_daily_submitted_notional,
+            name="max_daily_submitted_notional",
+        )
+    except (KeyError, OverflowError, TypeError, ValueError) as exc:
+        return {
+            proposal_id: ValidationResult(
+                approved=False,
+                violations=(
+                    "Batch preflight could not prove the persistent daily "
+                    f"execution budget: {exc}",
+                ),
+                violation_codes=("preflight_error",),
+            )
+            for proposal_id in proposal_ids
+        }
 
     for proposal_id in proposal_ids:
-        available_cash_override = current_portfolio.cash_decimal - reserved_cash
-        available_buying_power_override = (
-            current_portfolio.buying_power_decimal - reserved_cash
-            if current_portfolio.buying_power_decimal is not None
-            else None
-        )
+        try:
+            available_cash_override = exact_decimal_subtract(
+                current_portfolio.cash_exact_decimal,
+                reserved_cash,
+                name="batch available cash",
+            )
+            current_buying_power = current_portfolio.buying_power_exact_decimal
+            available_buying_power_override = (
+                exact_decimal_subtract(
+                    current_buying_power,
+                    reserved_cash,
+                    name="batch available buying power",
+                )
+                if current_buying_power is not None
+                else None
+            )
+        except ValueError as exc:
+            results[proposal_id] = ValidationResult(
+                approved=False,
+                violations=(
+                    "Batch preflight could not prove exact available-capital "
+                    f"evidence: {exc}",
+                ),
+                violation_codes=("preflight_error",),
+            )
+            continue
         outcome = validate_proposal_for_execution(
             proposal_id,
             current_portfolio,
@@ -359,11 +397,26 @@ def preflight_allocation_batch(
         # side-aware price reserve_execution_budget() uses at submit time
         # (strict `>`, gross submitted notional), so preflight and the enforcer
         # cannot disagree about which leg is the one that breaks the cap.
-        leg_budget_notional = _execution_budget_notional(
-            outcome.intent, outcome.reference_price
-        )
+        try:
+            leg_budget_notional = _execution_budget_notional(
+                outcome.intent, outcome.reference_price
+            )
+            next_notional = exact_decimal_add(
+                budget_notional,
+                leg_budget_notional,
+                name="batch daily submitted notional",
+            )
+        except ValueError as exc:
+            results[proposal_id] = ValidationResult(
+                approved=False,
+                violations=(
+                    "Daily execution budget could not be proved exactly: "
+                    f"{exc}",
+                ),
+                violation_codes=("daily_execution_budget",),
+            )
+            continue
         next_order_count = budget_order_count + 1
-        next_notional = budget_notional + leg_budget_notional
         budget_violation = None
         if next_order_count > policy.max_daily_order_count:
             budget_violation = (
@@ -382,6 +435,46 @@ def preflight_allocation_batch(
                 violation_codes=("daily_execution_budget",),
             )
             continue
+
+        next_reserved_cash = reserved_cash
+        pending_key = None
+        next_pending_value = None
+        if outcome.intent.side == "buy":
+            # worst_case_fill_price, not the raw quote: a buy limit order can
+            # fill up to its limit price, so reserving only the quoted notional
+            # here understated the cash/pending exposure carried into every
+            # LATER leg of the same batch (GPT review, 2026-07-29). Shared with
+            # validate_trade_intent() so the two can't drift.
+            try:
+                planned_notional = exact_decimal_multiply(
+                    to_decimal(outcome.intent.shares, name="intent.shares"),
+                    worst_case_fill_price_decimal(
+                        outcome.intent, outcome.reference_price
+                    ),
+                    name="batch planned notional",
+                )
+                next_reserved_cash = exact_decimal_add(
+                    reserved_cash,
+                    planned_notional,
+                    name="batch reserved cash",
+                )
+                pending_key = outcome.intent.ticker.upper()
+                next_pending_value = exact_decimal_add(
+                    reserved_pending_by_ticker.get(pending_key, Decimal("0")),
+                    planned_notional,
+                    name=f"{pending_key} batch pending buy value",
+                )
+            except ValueError as exc:
+                results[proposal_id] = ValidationResult(
+                    approved=False,
+                    violations=(
+                        "Batch preflight could not prove the leg's exact "
+                        f"planned notional: {exc}",
+                    ),
+                    violation_codes=("preflight_error",),
+                )
+                continue
+
         budget_order_count = next_order_count
         budget_notional = next_notional
         simulated_intents.add(intent_identity)
@@ -390,25 +483,9 @@ def preflight_allocation_batch(
         # is -- so this increments for sells too, unlike the cash reservation
         # below.
         simulated_open_orders += 1
-
-        if outcome.intent.side == "buy":
-            # worst_case_fill_price, not the raw quote: a buy limit order can
-            # fill up to its limit price, so reserving only the quoted notional
-            # here understated the cash/pending exposure carried into every
-            # LATER leg of the same batch (GPT review, 2026-07-29). Shared with
-            # validate_trade_intent() so the two can't drift.
-            planned_notional = (
-                Decimal(outcome.intent.shares)
-                * worst_case_fill_price_decimal(
-                    outcome.intent, outcome.reference_price
-                )
-            )
-            reserved_cash += planned_notional
-            key = outcome.intent.ticker.upper()
-            reserved_pending_by_ticker[key] = (
-                reserved_pending_by_ticker.get(key, Decimal("0"))
-                + planned_notional
-            )
+        reserved_cash = next_reserved_cash
+        if pending_key is not None and next_pending_value is not None:
+            reserved_pending_by_ticker[pending_key] = next_pending_value
 
     return results
 

@@ -168,7 +168,7 @@ def test_atomic_report_write_removes_temporary_file_on_publish_failure(
 def test_reconciliation_alert_failure_preserves_local_and_runtime_halt(tmp_path):
     store = storage.AssistantStore(tmp_path / "halt.db")
     store.set_kill_switch(False, reason="review baseline")
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             """
             CREATE TRIGGER inject_alert_failure

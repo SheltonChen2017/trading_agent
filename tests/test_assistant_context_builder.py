@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import execution.alpaca_broker as broker
+import assistant.context_builder as context_builder
 from assistant.context_builder import (
     build_decision_packet,
     build_portfolio_snapshot,
@@ -777,8 +778,69 @@ def test_build_decision_packet_falls_back_when_alpaca_not_configured():
         )
         assert any("not configured" in w for w in packet.warnings)
         assert packet.portfolio.positions[0].ticker == "AAA"  # used the manual fallback data
+        assert packet.portfolio.open_orders_available is False
+        assert any("active-order book" in w for w in packet.warnings)
     finally:
         broker.is_configured = original_is_configured
+
+
+def test_build_decision_packet_marks_analytics_unavailable_on_snapshot_mutation(
+    monkeypatch,
+):
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "AAA",
+                "shares": 1,
+                "entry_price": 10.0,
+                "current_price": 10.0,
+            }
+        ],
+        cash=100.0,
+        open_orders=[{"id": "known-open-order"}],
+        open_orders_available=True,
+    )
+    snapshot.total_equity = 999.0
+    monkeypatch.setattr(
+        context_builder,
+        "build_portfolio_snapshot",
+        lambda *args, **kwargs: snapshot,
+    )
+    monkeypatch.setattr(
+        context_builder,
+        "build_market_regime",
+        lambda *args, **kwargs: context_builder.MarketRegime(
+            benchmark_ticker="QQQ",
+            trend=None,
+            volatility_regime=None,
+            trailing_volatility_pct=None,
+            as_of="2026-08-28",
+        ),
+    )
+
+    packet = build_decision_packet()
+
+    assert packet.risk.available is False
+    assert packet.analytics == {
+        "available": False,
+        "unavailable_reason": packet.analytics["unavailable_reason"],
+        "position_count": None,
+        "invested_value": None,
+        "invested_pct": None,
+        "cash_value": None,
+        "unrealized_pnl": None,
+        "unrealized_pnl_pct": None,
+        "position_weights_pct": {},
+        "open_order_count": 1,
+    }
+    assert packet.analytics["unavailable_reason"].startswith(
+        "Portfolio analytics unavailable:"
+    )
+    assert packet.analytics["unavailable_reason"] in packet.warnings
+
+    snapshot.open_orders_available = False
+    unavailable_book_packet = build_decision_packet()
+    assert unavailable_book_packet.analytics["open_order_count"] is None
 
 
 def test_build_decision_packet_uses_live_alpaca_when_configured():

@@ -52,7 +52,14 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import config
-from assistant.money import decimal_text, to_decimal
+from assistant.money import (
+    decimal_or_none,
+    decimal_text,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    to_decimal,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.portfolio_ledger import ACCOUNT_DIVIDEND_INCOME
@@ -71,7 +78,7 @@ from assistant.proposals import TradeProposal
 from assistant.schemas import DecisionPacket
 from assistant.sleeve_notifications import DECLINE_REVIEW, REENTRY_DECLINE
 from assistant.storage import AssistantStore
-from risk.execution_gate import TradeIntent
+from risk.execution_gate import TradeIntent, canonical_order_quantity
 
 
 class SleeveReinvestError(ValueError):
@@ -164,13 +171,23 @@ def confirmed_dividend_income_text(journal_postings: list[dict]) -> str:
     means the books hold something this module does not understand, and
     guessing either direction could mint spendable dollars.
     """
-    total = Decimal(0)
+    total = Decimal("0")
     for posting in journal_postings:
         if posting.get("source") != "corporate_action":
             continue
         if posting.get("account") != ACCOUNT_DIVIDEND_INCOME:
             continue
-        amount = -to_decimal(posting["amount"], name="dividend posting amount")
+        try:
+            amount = exact_decimal_subtract(
+                Decimal("0"),
+                to_decimal(posting["amount"], name="dividend posting amount"),
+                name="confirmed dividend amount",
+            )
+        except ValueError as exc:
+            raise SleeveReinvestError(
+                "a confirmed dividend posting has an amount that cannot be "
+                "represented exactly; refusing to measure the dividend pool"
+            ) from exc
         if amount < 0:
             raise SleeveReinvestError(
                 "a positive INCOME:DIVIDENDS posting exists "
@@ -178,7 +195,17 @@ def confirmed_dividend_income_text(journal_postings: list[dict]) -> str:
                 "measure the dividend pool over books this module does not "
                 "understand"
             )
-        total += amount
+        try:
+            total = exact_decimal_add(
+                total,
+                amount,
+                name="confirmed dividend income total",
+            )
+        except ValueError as exc:
+            raise SleeveReinvestError(
+                "confirmed dividend income cannot be summed exactly; "
+                "refusing to measure the dividend pool"
+            ) from exc
     return decimal_text(total)
 
 
@@ -259,9 +286,9 @@ def dividend_reinvest_status(store: AssistantStore) -> dict:
     confirmed = to_decimal(confirmed_text, name="confirmed dividend income")
 
     earmarks: list[dict] = []
-    unavailable_total = Decimal(0)
-    consumed_total = Decimal(0)
-    released_total = Decimal(0)
+    unavailable_total = Decimal("0")
+    consumed_total = Decimal("0")
+    released_total = Decimal("0")
     for row in store.list_dividend_earmarks():
         try:
             amount = to_decimal(row["amount_text"], name="stored earmark amount")
@@ -296,12 +323,30 @@ def dividend_reinvest_status(store: AssistantStore) -> dict:
             # disposition fails closed to hold.
             effective = "hold"
             proposal_status = None
-        if effective in ("hold", "consume", "consumed"):
-            unavailable_total += amount
-        if effective in ("consume", "consumed"):
-            consumed_total += amount
-        if effective in ("release", "released"):
-            released_total += amount
+        try:
+            if effective in ("hold", "consume", "consumed"):
+                unavailable_total = exact_decimal_add(
+                    unavailable_total,
+                    amount,
+                    name="unavailable dividend earmark total",
+                )
+            if effective in ("consume", "consumed"):
+                consumed_total = exact_decimal_add(
+                    consumed_total,
+                    amount,
+                    name="consumed dividend earmark total",
+                )
+            if effective in ("release", "released"):
+                released_total = exact_decimal_add(
+                    released_total,
+                    amount,
+                    name="released dividend earmark total",
+                )
+        except ValueError as exc:
+            raise SleeveReinvestError(
+                "dividend earmarks cannot be summed exactly; refusing to "
+                "measure the dividend pool"
+            ) from exc
         earmarks.append(
             {
                 **row,
@@ -329,7 +374,17 @@ def dividend_reinvest_status(store: AssistantStore) -> dict:
             "APPROVE-gated reinvestment into an owner-chosen candidate."
         )
 
-    available = confirmed - unavailable_total
+    try:
+        available = exact_decimal_subtract(
+            confirmed,
+            unavailable_total,
+            name="available dividend income",
+        )
+    except ValueError as exc:
+        raise SleeveReinvestError(
+            "available dividend income cannot be computed exactly; refusing "
+            "to measure the dividend pool"
+        ) from exc
     return {
         "confirmed_income_total": confirmed_text,
         "unavailable_total": decimal_text(unavailable_total),
@@ -408,7 +463,10 @@ def generate_dividend_reinvest_proposal(
             "reason": f"no usable reference price for {ticker_upper}",
         }
 
-    status = dividend_reinvest_status(store)
+    try:
+        status = dividend_reinvest_status(store)
+    except SleeveReinvestError as exc:
+        return {"created": False, "reason": str(exc)}
     available = to_decimal(status["available_total"], name="available dividend pool")
     if amount_decimal > available:
         return {
@@ -435,8 +493,25 @@ def generate_dividend_reinvest_proposal(
             )
         return {"created": False, "reason": reason}
 
-    shares = int(amount_decimal // price_decimal)
-    if shares <= 0:
+    amount_numerator, amount_denominator = amount_decimal.as_integer_ratio()
+    price_numerator, price_denominator = price_decimal.as_integer_ratio()
+    affordable_shares = (
+        amount_numerator * price_denominator
+        // (amount_denominator * price_numerator)
+    )
+    shares = canonical_order_quantity(
+        affordable_shares,
+        whole_shares_only=True,
+    )
+    if shares is None or shares <= 0:
+        if affordable_shares > 0:
+            return {
+                "created": False,
+                "reason": (
+                    "the affordable share count exceeds the broker quantity "
+                    "limit; choose a smaller reinvest amount"
+                ),
+            }
         return {
             "created": False,
             "reason": (
@@ -444,8 +519,26 @@ def generate_dividend_reinvest_proposal(
                 f"{ticker_upper} at {decimal_text(price_decimal)}"
             ),
         }
-    earmark_amount = price_decimal * shares
-    reference_price = float(price_decimal)
+    try:
+        earmark_amount = exact_decimal_multiply(
+            price_decimal,
+            shares,
+            name="dividend reinvest earmark",
+        )
+        reference_price = float(price_decimal)
+    except (OverflowError, ValueError) as exc:
+        return {
+            "created": False,
+            "reason": f"the reinvestment cannot be priced exactly ({exc})",
+        }
+    if decimal_or_none(reference_price) != price_decimal:
+        return {
+            "created": False,
+            "reason": (
+                f"{ticker_upper}'s exact reference price cannot be preserved "
+                "by the proposal schema; refusing a rounded proposal"
+            ),
+        }
 
     at = now or datetime.now(timezone.utc)
     if route == ROUTE_DECLINE_ADD:

@@ -176,10 +176,12 @@ Resolved items are retained, never deleted.
 | R-13 | P1 | OPEN - reported, structurally confirmed | A skewed or missing broker `submitted_at` escalates to a global halt rather than a skip. `assistant/order_reconciler.py:588` routes `not integrity_ok` into `activate_reconciliation_halt` (persistent kill switch plus runtime-global stop); `assistant/temporal_integrity.py:14` sets a 5.0 second future-skew tolerance; the deployed `OrderMonitor` task polls every 30 seconds. A local clock a few seconds behind the broker can therefore halt all trading unattended, and also suppress stale-order cancellation, itself a risk-reducing action. The prior behavior skipped instead. Tolerance constants and the halt call verified; the end-to-end unattended scenario is not reproduced here. |
 | R-14 | P1 | OPEN - reported, not independently reproduced | `held` and `calculated`, both normal in-lifecycle broker states still listed in `KNOWN_BROKER_ORDER_STATUSES` and `ACTIVE_BROKER_ORDER_STATUSES`, now project to `submission_unknown` (`assistant/order_lifecycle.py:45`), which feeds both the R-11 gate and the critical-unresolved set. One order going `held` would make readiness not-ready and block every later proposal. Reported to have no test coverage for either status. |
 | R-15 | P1 | OPEN - reported, not independently reproduced | Two further fail-closed traps: a legacy `broker_order_events` row with a naive `event_at` is reported to make the database permanently unopenable read-write with no self-heal, and deterministic snapshot-integrity failures (negative cash, zero entry price, component disagreement) are reported to be retried as transient and then surfaced as "broker state did not stabilize", blocking all submission while naming the wrong cause. Also the scoping question behind R-09: the runtime stop is shared per OS user and ignores the database, so a per-database fault halts every database on the host. |
+| R-18 | P1 | **OPEN - cross-lane isolation defeated** | The machine-global runtime execution stop couples the three supposedly isolated strategy lanes. Enumerating the open incident set shows two whose `origin_database` is the **analyst-revisions lane** (`...\codex_arv2_full_tmp\test_real_process_crash_mid_tr0\assistant.db` and `...\trading_agent_analyst_revisions\.codex-test-tmp-counter-review\...\assistant.db`). One lane running its own test suite therefore latches an execution stop that halts every other lane and the operational app. The parallel-workflow contract requires per-lane checkouts precisely so lanes cannot affect one another; that guarantee holds for the filesystem and for git, but not for this per-user runtime file, which ignores its `database` argument. Directly related to R-09 and R-15, and recorded separately because it is a program-level isolation defect rather than only an execution-safety one. Verified by enumerating the live incident set, read-only. |
+| R-19 | P3 | OPEN | The Windows verifier and installer-preview tests hard-code a 30-second `subprocess.run` timeout for each PowerShell child process, which makes them load-fragile. On a busy host the identical tree produced 6 `subprocess.TimeoutExpired` failures in `tests/test_ml_evidence_operations.py` and 24 timeout traces overall, and the same file then passed 49 of 49 (1 skipped) in 4m08s once the host was idle. The failure mode is indistinguishable at a glance from a real regression, and it appears exactly when a reviewer runs other work in parallel. A load-independent budget, or a documented serial-execution requirement for this file, would remove the ambiguity. |
 | R-16 | P2 | OPEN | `e770b05` changed a zero-share position row from a refusal to a silent `continue` in `assistant/portfolio_snapshot.py`, with no record. A broker feed reporting zero shares for a genuinely held position makes it vanish from the snapshot, so a risk-reducing sell for that ticker reads as not held. Violates CLAUDE.md section 8 (no silent row dropping). The strict Alpaca path is unaffected. |
 | R-17 | P2 | OPEN | Two characterization tests are now vacuous: policy revalidation moved earlier, so they fail before any reservation is made and `assert state["reservations"] == []` is trivially true. Deleting the reservation release from the submit kernel reportedly leaves the suite green, although that test was originally created by mutation testing against exactly that deletion. |
 
-Deliberately **not** corrected: R-01, R-03 through R-08, and R-09 through R-17 are owner-level
+Deliberately **not** corrected: R-01, R-03 through R-08, and R-09 through R-19 are owner-level
 design decisions, unverified against a live broker, or outside a reviewer
 surgical-correction mandate on shared code synchronized from `main`.
 Correcting them on this lane would also diverge shared execution semantics
@@ -221,6 +223,28 @@ All runs on this exact lane tree in the isolated worktree.
   does **not** skip, so coverage is preserved on a provisioned host; a
   zero-byte file skips; and a **missing** interpreter does not skip, so an
   absent interpreter still fails loudly instead of being masked.
+
+### 6.4a Validation provenance for this push
+
+Stated precisely, so that no claim is broader than what was actually run.
+
+The complete suite was run three times on this lane:
+
+1. Tree at `2eb3f5d`: **5,223 passed, 3 skipped, 0 failed, 25 warnings in
+   2,262.86s (37m43s)**.
+2. Tree at `f5f3ec5`, run while other review work loaded the host:
+   **6 failed, 5,217 passed, 3 skipped in 3,411.17s (56m51s)**. All six
+   failures were `subprocess.TimeoutExpired` on PowerShell child processes in
+   `tests/test_ml_evidence_operations.py`, against a code tree byte-identical
+   to run 1. Re-running that file alone on an idle host gave **49 passed,
+   1 skipped in 248.76s**, so the failures were host contention, not a
+   regression. This is recorded as R-19 rather than dismissed, and the red
+   run is reported here rather than omitted.
+3. The final complete run on the exact pushed tree; its result is recorded in
+   the section 5 ledger row for this push.
+
+The three skips are the two pre-existing platform skips plus the R-02 guard
+added by this review.
 
 ### 6.5 Residual gates and next authorized step
 

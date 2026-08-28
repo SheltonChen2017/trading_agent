@@ -699,9 +699,33 @@ class DuplicateIntentConflict(Exception):
 
 
 class AssistantStore:
-    def __init__(self, path: str | Path | None = None, *, read_only: bool = False):
+    def __init__(
+        self,
+        path: str | Path | None = None,
+        *,
+        read_only: bool = False,
+        permit_contained_integrity_failure: bool = False,
+    ):
+        """Open the operator database.
+
+        ``permit_contained_integrity_failure`` is a narrow escape hatch for
+        emergency risk reduction ONLY.  A damaged broker-event ledger must keep
+        refusing ordinary use, but it must not also make the store
+        unconstructable: every writable entry point builds a store first, so an
+        unconditional refusal removes operator cancellation, reconciliation, and
+        emergency cancel-all -- the last-resort tool -- with no repair path.
+        CLAUDE.md section 1 forbids a component failure from stopping
+        reconciliation or legitimate risk reduction.
+
+        Containment has already fired by the time this flag is consulted, so a
+        contained store carries an active kill switch and cannot add exposure.
+        ``cancel_all_open_orders`` reads no broker-event evidence at all, so it
+        is unaffected by the damage it is running in spite of.  Callers that DO
+        consume event evidence must keep using the strict default.
+        """
         self.path = Path(path) if path is not None else configured_db_path()
         self.read_only = bool(read_only)
+        self.broker_event_integrity_error: str | None = None
         if self.read_only:
             if not self.path.is_file():
                 raise FileNotFoundError(
@@ -715,7 +739,11 @@ class AssistantStore:
                 self._activate_detected_broker_integrity_incident(
                     event_id="initialization", reason=str(exc)
                 )
-                raise
+                if not permit_contained_integrity_failure:
+                    raise
+                # Retained rather than discarded: the damage stays visible to
+                # every later reader and to the operator record.
+                self.broker_event_integrity_error = str(exc)
             self._promote_existing_local_kill_switch()
 
     @staticmethod

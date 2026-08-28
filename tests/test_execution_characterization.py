@@ -1246,6 +1246,78 @@ def test_early_refusals_never_create_a_reservation(store):
         )
 
 
+def test_risk_reducing_sell_proceeds_while_an_unrelated_dispatch_is_ambiguous(store):
+    """CLAUDE.md 5: a safeguard must never obstruct a risk-reducing sell.
+
+    An unrelated proposal stranded in an ambiguous post-contact state must not
+    remove the operator's ability to reduce exposure.  Reverting the
+    exposure-direction check in _refuse_while_prior_dispatch_is_ambiguous()
+    turns this red.
+    """
+    # A different ticker, so the ticker+side duplicate guard cannot be what
+    # refuses: this test must exercise the ambiguity guard itself.
+    stuck = _proposal(
+        "p-stuck",
+        side="buy",
+        status=SUBMISSION_UNKNOWN,
+        intent_overrides={"ticker": "MSFT"},
+    )
+    store.save_proposal(stuck)
+    store.save_proposal(_proposal("p-1", side="sell"))
+    accepted = {
+        "order_id": "paper-derisk-1",
+        "ticker": "AAPL",
+        "shares": 1,
+        "side": "sell",
+        "type": "market",
+        "status": "accepted",
+    }
+    recorder = _submission_recorder(submit=accepted)
+
+    with patched_broker(recorder):
+        result = execute_approved_paper_proposal(
+            "p-1",
+            "approve",
+            _held_portfolio(),
+            load_policy(),
+            store,
+            now_et=NOW_ET,
+            earnings_days_away=10,
+        )
+
+    assert result["order_id"] == accepted["order_id"]
+    assert observable_state(store, "p-1")["proposal_status"] == "broker_accepted"
+
+
+def test_exposure_increasing_buy_still_refuses_while_a_dispatch_is_ambiguous(store):
+    """The guard must keep blocking NEW exposure -- only reduction is exempt."""
+    store.save_proposal(
+        _proposal(
+            "p-stuck",
+            side="buy",
+            status=SUBMISSION_UNKNOWN,
+            intent_overrides={"ticker": "MSFT"},
+        )
+    )
+    store.save_proposal(_proposal("p-1", side="buy"))
+    recorder = _submission_recorder(submit={"order_id": "should-not-happen"})
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError, match="still ambiguous"):
+            execute_approved_paper_proposal(
+                "p-1",
+                "approve",
+                _portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                earnings_days_away=10,
+            )
+
+    assert "submit_market_order" not in recorder.call_names
+    assert observable_state(store, "p-1")["proposal_status"] == "blocked"
+
+
 def test_successful_submission_freezes_call_order_state_and_evidence(store):
     """Characterise the ordinary path all four GR-1 seams participate in."""
     store.save_proposal(_proposal(side="sell"))

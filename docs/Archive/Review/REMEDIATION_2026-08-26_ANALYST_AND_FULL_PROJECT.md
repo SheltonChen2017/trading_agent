@@ -2079,7 +2079,7 @@ replacements for, the original audit IDs.
 
 ### SYS-FU-P1-006 — Rounded position displays made valid portfolios fail integrity
 
-**Implementation status:** Implemented at `1ed06022d7f811a5977239be71e99c2fd7d37952` — pending required independent review/counter-review.
+**Implementation status:** Implemented — pending required independent review/counter-review.
 
 - **Root cause:** `build_portfolio_snapshot` computed the displayed total equity
   by adding each position's already-cent-rounded display value, but paired that
@@ -2088,7 +2088,9 @@ replacements for, the original audit IDs.
   and the newly strict display/exact validator correctly rejected the builder's
   internally inconsistent snapshot. The owner reproduced this on the paper UI;
   packet construction stopped before the application rendered.
-- **HOW and WHERE:** `assistant/portfolio_snapshot.py` now sums cash and every
+- **HOW and WHERE:** implemented at
+  `1ed06022d7f811a5977239be71e99c2fd7d37952`.
+  `assistant/portfolio_snapshot.py` now sums cash and every
   exact `market_value` Decimal first and rounds that single authoritative total
   once for `PortfolioSnapshot.total_equity`. The exact companion is derived from
   the same aggregate. No tolerance was widened and the validator remains strict.

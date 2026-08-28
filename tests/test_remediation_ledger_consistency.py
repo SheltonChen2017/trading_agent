@@ -66,15 +66,15 @@ EXPECTED_IDS = frozenset(
     | _numbered("SYS-P1", 6)
     | _numbered("SYS-P2", 13)
     | _numbered("SYS-P3", 3)
-    | _numbered("SYS-FU-P1", 5)
+    | _numbered("SYS-FU-P1", 6)
     | _numbered("SYS-FU-P2", 4)
     | _numbered("SYS-FU-P3", 2)
     | _numbered("AR-FINAL-P1", 2)
     | _numbered("SYS-FINAL-P1", 19)
     | _numbered("SYS-FINAL-P2", 4)
 )
-EXPECTED_PRIORITY_TOTALS = {"P0": 0, "P1": 46, "P2": 49, "P3": 14}
-EXPECTED_GRAND_TOTAL = 109
+EXPECTED_PRIORITY_TOTALS = {"P0": 0, "P1": 47, "P2": 49, "P3": 14}
+EXPECTED_GRAND_TOTAL = 110
 
 
 def _read_ledger() -> str:

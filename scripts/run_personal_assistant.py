@@ -2742,7 +2742,13 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Operator incident reason stored with the durable kill switch.",
     )
-    cancel_all.set_defaults(handler=command_cancel_all_orders)
+    # Emergency cancellation must remain reachable even when the broker-event
+    # ledger fails its integrity sweep: this command reads no event evidence,
+    # and containment has already engaged the kill switch by that point.
+    cancel_all.set_defaults(
+        handler=command_cancel_all_orders,
+        permits_contained_integrity_failure=True,
+    )
 
     readiness = commands.add_parser(
         "readiness",
@@ -3355,6 +3361,9 @@ def main() -> None:
     store = AssistantStore(
         args.database,
         read_only=getattr(args, "read_only_store", False),
+        permit_contained_integrity_failure=getattr(
+            args, "permits_contained_integrity_failure", False
+        ),
     )
     args.handler(args, store)
 

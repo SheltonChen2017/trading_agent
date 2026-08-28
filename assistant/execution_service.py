@@ -392,6 +392,9 @@ def _build_execution_owned_portfolio_snapshot(
     return snapshot
 
 
+# Only an exposure-increasing side is fenced by the ambiguity guard below.
+_SIDE_BUY = "buy"
+
 _AMBIGUOUS_ACCOUNT_DISPATCH_STATUSES = (
     SUBMITTING,
     SUBMISSION_UNKNOWN,
@@ -428,8 +431,22 @@ def _refuse_while_prior_dispatch_is_ambiguous(
     store: AssistantStore,
     *,
     proposal_id: str,
+    side: str,
 ) -> None:
-    """Do not add account exposure while an earlier contact is unresolved."""
+    """Do not add account exposure while an earlier contact is unresolved.
+
+    Exposure-INCREASING dispatch only.  CLAUDE.md section 5 makes obstructing a
+    legitimate risk-reducing sell a safety defect in its own right, and an
+    ambiguous prior contact is exactly the state a broker outage produces --
+    the moment an operator most needs to reduce exposure.  A non-buy is
+    therefore never refused here; the independent sell-exceeds-held check, the
+    ticker/side duplicate guard, and the execution gate still apply to it.
+
+    This mirrors the earnings blackout, which the risk registry scopes to buys
+    for the same stated reason.
+    """
+    if side != _SIDE_BUY:
+        return
     ambiguous = [
         proposal
         for proposal in store.list_proposals_by_statuses(
@@ -841,6 +858,7 @@ def _execute_approved_paper_proposal_under_dispatch_fence(
         _refuse_while_prior_dispatch_is_ambiguous(
             store,
             proposal_id=proposal_id,
+            side=str(proposal.get("intent", {}).get("side", "")).strip().lower(),
         )
         broker = _import_execution_broker()
         broker_session = broker.open_alpaca_broker_session()

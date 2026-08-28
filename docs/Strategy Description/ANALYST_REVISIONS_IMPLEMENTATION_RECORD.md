@@ -583,6 +583,39 @@ vendor-to-QC processing rights, and the external append-only permanent-look
 authority all remain required before ARV2-1 or any outcome access; CLR-003
 remains open in shared execution code.
 
+## 4D. Codex counter-review of Claude's ARV2-0 review, 2026-08-28
+
+**Range counter-reviewed:** `b912459..1507777`, one commit. **Disposition:
+ACCEPTED.** No correction was required. 0 new P0, 0 P1, 0 P2, and 0 P3
+findings. This closes the ARV2-0 implementation/review/counter-review chain as
+accepted after Claude's two test corrections. **Zero research looks.** No
+provider, credential, licensed row, price, return, outcome, broker,
+operator-database, QuantConnect, scheduler, or order access occurred.
+
+### 4D.1 Commit disposition
+
+| Commit | Disposition | Independent basis |
+|---|---|---|
+| `1507777` | **Accepted** | The commit changes only the preregistration guard tests and this lane record. Its seven single-violation cases isolate look dataset/code identity, corporate source, universe source, embargo, leverage, and alpha pins without weakening production code. The recorded dispositions for `7f493d1`, `c83782d`, and `b912459` agree with the independently rechecked diffs and the prior counter-review evidence. |
+
+### 4D.2 Reproduction and dangerous-direction checks
+
+- The exact preregistration file passed **42 tests** at `1507777`.
+- In a detached throwaway worktree pinned to the reviewed commit, removing
+  both look `dataset_id` and `code_identity` semantic guards made exactly the
+  two new look cases fail: **2 failed, 5 passed, 35 deselected**.
+- After restoring that guard, removing the alpha `0.05` semantic pin made
+  exactly the new alpha case fail: **1 failed, 6 passed, 35 deselected**.
+- The throwaway worktree was removed after restoration. The reviewed lane
+  tree remained unchanged and clean.
+
+The two Claude findings ARV2R2-001 and ARV2R2-002 are therefore accepted as
+real test-sensitivity corrections. They are load-bearing in the dangerous
+direction and introduce no product behavior. The owner's current instruction
+authorizes the next bounded structural milestone on this branch, but does not
+open credentials, licensed provider rows, outcomes, QuantConnect jobs, or any
+execution surface.
+
 ## 5. Session / push ledger
 
 Append one row before every push. Never rewrite earlier rows.

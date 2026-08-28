@@ -1,7 +1,8 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **PLANNED; NO INGEST, SIGNAL, OUTCOME TEST, ETF PORTFOLIO, OR QC
-ALGORITHM HAS BEEN IMPLEMENTED.**
+Status: **SI-0/SI-1 SOURCE-CONTRACT AND SYNTHETIC-FIXTURE TRANCHE
+IMPLEMENTED AT `c821b10`; PENDING CLAUDE REVIEW. NO LICENSED INGEST, SIGNAL,
+OUTCOME TEST, ETF PORTFOLIO, OR QC ALGORITHM HAS BEEN IMPLEMENTED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -103,6 +104,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-27 | Codex validation | `72d6894` -> `72d6894` (exact isolated tested snapshot; this validation-record commit follows) | Portfolio-equity correction final validation | Revalidated the complete Short Interest lane after its code and required lane-record commits in a detached isolated worktree pinned to `72d6894`; no product file changed during the run. | Complete exact-tree suite: **5,224 passed, 2 skipped, 0 failed, 25 dependency warnings in 1,744.53s (29m04s)**. The earlier focused 112-test suite, 63-test active-document suite, compileall, and diff checks were also green. Fixture-only; no short-interest/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. A separate run invalidated by a concurrent main-checkout branch switch is intentionally excluded. | No new P0-P3 finding. `SYS-FU-P1-006` remains implemented but unaccepted pending the required review chain. | Commit this validation record and push the complete three-commit lane range; Claude reviews every new commit before SI-0/SI-1 or any later milestone. |
 | 2026-08-28 | Claude review | `a4f58e6` -> `d28fb3d` reviewed; corrections at `54c678c` (this record commit follows) | Independent review of the owner-authorized common-remediation synchronization and the shared portfolio-equity correction | Reviewed all 16 pushed commits individually. Verified the synchronization is faithful rather than accepting it: 11 of the 12 shared code commits are patch-identical to their merged `main` originals, and the single difference (`2e4748b` vs `8cab638`) is exactly the required removal of the Analyst-only `research/analyst_revisions_v2` licensed-surface entry. No Analyst or Insider content, no frozen shared file, and no Short Interest strategy code entered this lane. | Complete suite on the exact code tree `54c678c`: **5,225 passed, 3 skipped, 0 failed, 25 known dependency warnings in 2,310.10s (38m30s)**. The count reconciles arithmetically against the pre-correction run on this host (5,223 passed / 1 failed / 2 skipped at `d28fb3d`): the non-portable preview test moved from failed to skipped and the new parametrized guard contributed two passes, giving 5,228 collected in both runs. The 63-check active-document suite was rerun green against this record's final text, which is documentation-only and inert to every other test. Focused: 51 passed / 1 skipped in `test_ml_evidence_operations.py`; 72 passed across fault-matrix, proposals and data-integrity; 35 passed across the import-boundary and entry-point manifests. Two mutations run: removing the alias guard from both installers turned my new test red (2 failed) and restore returned it green; reverting the equity fix to per-position summing turned Codex's new test red, independently confirming their claim. compileall exit 0; `git diff --check` clean; 0 PowerShell parser errors across `scripts/`; blueprint SHA-256 re-verified as `2f7ccff9...45b14c`. No provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or order access; **0 research looks**. | Two P2 findings, both confirmed and corrected in `54c678c`: a non-portable installer-preview harness that failed the suite on the owner's documented Store-Python host, and a new interpreter-alias safety guard shipped with no behavioral coverage. No P0 or P1 found. Details in section 6. | Codex counter-reviews this Claude commit. Synchronization and this review are not acceptance of SI-0/SI-1, which remains unstarted and still blocked on the licensed historical/vintage short-interest source. |
 | 2026-08-28 | Codex counter-review | `da798f0` -> `60d181a` (correction; this record commit follows) | Counter-review of Claude commits `54c678c` and `da798f0` | Dispositioned both Claude commits, corrected the installer-test coverage regression, and reconciled the review record's scope, arithmetic, shared-file, metadata, and next-step claims in section 7. The earlier Claude row is retained verbatim as historical evidence; section 7 explicitly supersedes its inaccurate clauses. | Pre-correction: the two zero-byte refusal cases passed while the eight-task parity test skipped on the documented Store-Python host. Corrected focused run: **5 passed** (one parity plus four zero-byte/reparse cases). Reverse mutation to the Store alias failed the parity test as intended: **1 failed in 3.44s**; restore returned all five focused cases green. `git diff --check` clean. Python 3.13.14, pytest 9.1.1. No provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | No P0/P1. `SI-CCR-001` P2 and `SI-CCR-002`/`003`/`004` P3 are closed by `60d181a` and this record correction; details in section 7. | Commit the counter-review record. The owner has now explicitly authorized the fixture-only SI-0/SI-1 source-contract tranche; licensed history remains a later full-ingest gate, not a blocker to synthetic contracts and fixtures. |
+| 2026-08-28 | Codex implementation | `1de489c` -> `c821b10` (exact code snapshot; this lane-record commit follows) | SI-0/SI-1 source-contract and synthetic-fixture tranche | Added a lane-owned, outcome-free `research/short_interest_etf` package that freezes preregistration, official-snapshot/source/release/revision/security/volume/denominator contracts, conservative next-open availability, named refusals, stable-ID prior-cycle validation, append-only revisions, authenticated immutable vintage storage, and a separate noncanonical daily-short-volume type. Added one two-cycle synthetic official-style fixture and 66 dangerous-direction tests. No signal, provider adapter, licensed ingest, outcome join, ETF, or QC code was added. | Exact tree `c821b10`: **5,294 passed, 2 skipped, 0 failed, 25 known dependency warnings in 2,724.14s (45m24s)**. Final focused set: **77 passed in 18.24s**; 66 new Short Interest tests collected. Four reverse mutations each turned its guard red before textual restore: settlement/publication separation, full-payload event identity, immediate release-calendar prior linkage, and immutable-writer preflight. Full compileall exit 0; `git diff --check` clean. Python 3.13.14, pytest 9.1.1. Synthetic fixture only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. | Independent read-only code and adversarial reviews found P1 temporal/prior-link gaps, P2 identity/storage/boundary gaps, and P3 numeric-contract gaps; all were corrected before `c821b10`. Both final dispositions are accepted-after-correction with no remaining P0-P3. Details in section 8. | Finalize and commit this lane record, then push the complete post-`da798f0` range once. Claude independently reviews the exact pushed range before any later implementation. Full licensed SI-1 remains gated on owner-approved historical/vintage data and release/identity/denominator entitlements. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -292,3 +294,111 @@ historical/vintage data, an archived official FINRA publication calendar,
 stable-identity/denominator entitlements, and shared QC dataset audits remain
 open gates for full ingest and later milestones; they do not block this
 synthetic fixture tranche.
+
+## 8. SI-0/SI-1 source-contract and synthetic-fixture implementation - 2026-08-28
+
+Implementer: Codex in the dedicated Short Interest worktree. Repository:
+`https://github.com/SheltonChen2017/trading_agent.git`; branch:
+`codex/strategy-short-interest`; implementation commit:
+`c821b106ca2679159b0ea51543d1ffafcbbf9fb9`; starting record commit:
+`1de489c9e7ce3ca1194a46b40e0d97790c7362f3`; lane remote before the combined
+push: `da798f073160dfd8074ff87b19ac942456f9c60c`; `origin/main` observed at
+`6a507341896850076c13050da080f888d6eb31aa`.
+
+### 8.1 Bounded delivered scope
+
+- `research/short_interest_etf/preregistration.py` fixes the official open-
+  short-position source semantic, XNYS execution calendar, audited-float versus
+  canonical PIT-shares denominator order, `S0`-`S4` family with canonical
+  `S1`, 20-session diagnostic, 10 bps primary and 0/5/20 bps sensitivity,
+  unlevered V1, and a zero outcome-look budget. Preregistration SHA-256:
+  `83165e805a8ad91787d10f066b28e14a1d6655d2dd19c4b5efd8a02a1ceeef9f`.
+- `contracts.py` pins strict collection, stable security identity, settlement,
+  release-calendar, revision, PIT denominator, exact ADV, reported and
+  independently recomputed days-to-cover, and snapshot schemas. Financial
+  quantities use canonical decimal text; bool, float-coercion, nonfinite,
+  negative, zero-divisor, mismatched-security, future-window, and unknown-field
+  inputs fail closed. Event identity hashes the complete canonical normalized
+  payload rather than trusting a caller-supplied raw digest.
+- `availability.py` maps an exact dissemination instant to the first XNYS open
+  strictly after it and a date-only release to the next regular-session open.
+  Settlement-day publication is structurally refused, and later revision,
+  denominator, or volume availability defers the whole snapshot. Retrieval and
+  observation timestamps are lineage only; neither grants earlier availability.
+- `normalize.py` dispositions every input row as an accepted official snapshot
+  or a named refusal. Duplicate source identities, malformed rows, invalid
+  semantics, and daily-short-volume substitution cannot be silently dropped or
+  coerced.
+- `dataset.py` validates the immediately preceding official release-calendar
+  cycle by stable `security_id`, retains every revision with immediate
+  supersession, derives warm-up versus delta eligibility, and publishes an
+  exact-file-set, content-addressed immutable vintage. The loader authenticates
+  canonical control bytes, every blob hash and count, directory identity,
+  caller-independent preregistration identity, and absence of unknown sidecars.
+- `daily_short_volume.py` is a distinct transaction-flow type. It is not
+  re-exported by the canonical package and cannot cross the snapshot type,
+  normalization, dataset, availability, or AST import boundaries.
+- `tests/fixtures/short_interest_etf/official_style_v1.json` is synthetic and
+  contains two releases, two snapshot cycles, and zero refusals. Its source-body
+  SHA-256 is
+  `ef2818ead91c6ebee714eb0c63139a60a2442fb8789462e58840d46605053393`;
+  normalized immutable identity is
+  `short-interest-vintage-10651715ecb06a2f` with full content SHA-256
+  `10651715ecb06a2fb4d703efe9ae8008f41b8d83d8b0e7c148600d7887657df5`.
+
+This tranche implements contracts and synthetic fixtures only. It does not
+claim completion of full lane SI-0 or licensed SI-1, does not implement any
+stock score, and establishes no market evidence.
+
+### 8.2 Implementation review findings
+
+The implementation was reviewed while uncommitted by two independent,
+read-only Codex agents. Findings were reproduced and corrected before the
+stable code commit; both final reviews accepted the corrected tree and found
+no remaining P0-P3 issue.
+
+| ID | Priority | Status | Location | Finding and unsafe direction | Correction and verification |
+|---|---|---|---|---|---|
+| SI-M1-001 | P1 | Closed | Release and availability contracts | An exact pre-open timestamp could initially map a release to its settlement-day open. | Publication must strictly follow settlement, and the cohort function defensively refuses a settlement-date execution session. The direct mutation from `<=` back to `<` made the settlement-day test fail: **1 failed in 2.81s**. |
+| SI-M1-002 | P1 | Closed | Prior-cycle and warm-up validation | A later row could initially fake a pre-window prior; omitting an intermediate release cycle could turn a multi-period move into a canonical delta; the first stored row was not visibly marked non-delta-eligible. | Prior linkage now follows the immediately preceding in-range release-calendar settlement by stable ID, only the manifest-start cycle may be warm-up, and delta eligibility is derived only when the authenticated prior is visible and share-consistent. Bypassing the calendar link made the omission test fail: **1 failed in 2.28s**. |
+| SI-M1-003 | P2 | Closed | Normalized event and nested financial identities | Event IDs initially trusted raw lineage plus a few keys, so changed normalized facts could retain an ID. ADV and denominator records also lacked their own stable security binding. | Event ID now hashes the complete canonical payload; volume and denominator schemas carry `security_id` and must match the snapshot. Reverting event identity to raw hash made the binding test fail: **1 failed in 4.62s**. |
+| SI-M1-004 | P2 | Closed | Immutable vintage read/write boundary | The first loader draft did not authenticate canonical `dataset.json` bytes or refuse unknown sidecars, and the writer could begin publication in a pre-squatted directory. | Reader and writer enforce exactly five regular authenticated files, canonical control bytes, immutable exact retries, preflight and post-publication authentication, and content/path identity. Removing preflight made its dedicated test fail before restore: **1 failed in 13.66s**. |
+| SI-M1-005 | P2 | Closed | Offline semantic/import firewall | A root-only import check could miss internal price/QC modules, relative daily-volume imports, or future subpackages. | The AST guard recursively applies an exact standard/shared-helper allowlist to every package file and separately forbids canonical imports of the quarantined daily-volume module. Object, row, package-export, and refusal-identity tests pin the runtime boundary. |
+| SI-M1-006 | P3 | Closed | Exact financial and error contracts | PIT shares outstanding initially allowed fractional values, and extreme finite DTC inputs could leak `decimal.InvalidOperation` instead of a named typed refusal. | Shares-outstanding denominators require whole positive shares. DTC uses input-sized exact precision, fixed 12-place half-even recomputation, and typed range errors; extreme finite and JSON-float/zero/negative mutations are covered. |
+
+### 8.3 Validation and access accounting
+
+- Exact committed code tree `c821b10`: **5,294 passed, 2 skipped, 0 failed,
+  25 known dependency-deprecation warnings in 2,724.14 seconds (45m24s)**.
+- Final focused run across the four new Short Interest modules plus the existing
+  ML and overlay import boundaries: **77 passed in 18.24 seconds**. The four
+  new test files collect **66 tests**.
+- Four manual reverse mutations produced the four intended red cases recorded
+  in section 8.2; every edit was textually restored, the focused set returned
+  green, and the worktree was clean before the code commit.
+- Full `compileall` across application, research, and tests exited 0;
+  `git diff --check` was clean. The finalized active-document suite passed all
+  **63 tests**.
+- Only the Git-tracked synthetic fixture was opened. No credential, provider,
+  licensed row, market outcome, QuantConnect job/upload, broker, operator
+  database, scheduler, paper/live deployment, order, or trading surface was
+  accessed. Permanent research-look count remains **0**.
+
+### 8.4 Disposition, remaining gates, and next step
+
+The bounded **SI-0/SI-1 source-contract and synthetic-fixture tranche is
+implemented but not yet independently accepted by Claude**. It freezes the
+offline boundary needed for later data work; it does not satisfy the full
+licensed SI-1 ingest exit gate and creates no strategy evidence.
+
+Still unresolved and intentionally absent: a licensed historical/vintage
+short-interest source, archived official FINRA dissemination evidence, real
+stable-identity and PIT denominator/ADV entitlements, split/restatement and
+delisted-name coverage audits, QC data/holdings timing, every outcome join,
+`S0`/`S1` computation, ETF construction, and deployment authority.
+
+Commit this record and push the complete range after
+`da798f073160dfd8074ff87b19ac942456f9c60c` once. Claude then independently
+reviews every pushed Codex commit on this same lane. Codex must counter-review
+every resulting Claude commit before any later milestone. No later
+implementation is authorized by this entry.

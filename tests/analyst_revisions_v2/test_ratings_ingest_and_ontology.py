@@ -707,3 +707,69 @@ def test_daily_dedupe_rejects_duplicate_event_ids_and_non_exact_scores():
             previous_score=0,  # type: ignore[arg-type]
             current_score=Fraction(1),
         )
+
+
+def test_upgrade_with_nonpositive_reviewed_change_is_direction_mismatch(tmp_path):
+    """The UPGRADE branch of the direction gate needs its own regression.
+
+    The sibling test covers only the downgrade branch, so deleting the
+    upgrade-side check (an 'upgrades' action whose reviewed mapping moves the
+    score down or not at all) previously left the whole file green. One case
+    per branch, so neither can vanish behind the other.
+    """
+    ontology = _write_ontology(tmp_path / "ontology.json", _three_level_entries())
+
+    # 'upgrades' action, but the reviewed order says Buy -> Hold is downward.
+    downward_audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(
+            tmp_path / "upgrade-downward",
+            [
+                _rating_row(
+                    "upgrade-down-1",
+                    action="upgrades",
+                    rating="Hold",
+                    previous_rating="Buy",
+                )
+            ],
+        )
+    )
+    downward = normalize_firm_rating_event(
+        downward_audit, ontology, provider_event_id="upgrade-down-1"
+    )
+    assert isinstance(downward, FirmNormalizationRefusal)
+    assert downward.reason is TransitionRefusalReason.ACTION_DIRECTION_MISMATCH
+
+    # 'upgrades' between two reviewed aliases of the SAME rank is a zero
+    # change: raw labels differ so structural ingest accepts the row, and only
+    # the reviewed order can prove the claimed upgrade moved nothing.
+    alias_entries = sorted(
+        _three_level_entries()
+        + [_entry("Overweight", 3, 3, quality="reviewed_alias")],
+        key=lambda entry: (
+            entry["provider_firm_id"],
+            entry["valid_from"],
+            "9999-12-31" if entry["valid_to"] is None else entry["valid_to"],
+            entry["ordered_rank"],
+            entry["raw_label"].casefold(),
+            entry["raw_label"],
+        ),
+    )
+    alias_ontology = _write_ontology(tmp_path / "alias-ontology.json", alias_entries)
+    zero_audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(
+            tmp_path / "upgrade-zero",
+            [
+                _rating_row(
+                    "upgrade-zero-1",
+                    action="upgrades",
+                    rating="Overweight",
+                    previous_rating="Buy",
+                )
+            ],
+        )
+    )
+    zero = normalize_firm_rating_event(
+        zero_audit, alias_ontology, provider_event_id="upgrade-zero-1"
+    )
+    assert isinstance(zero, FirmNormalizationRefusal)
+    assert zero.reason is TransitionRefusalReason.ACTION_DIRECTION_MISMATCH

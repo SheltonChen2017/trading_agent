@@ -96,6 +96,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-27 | Codex implementation | `8a65e3c` -> `f943bfc` (code snapshot; this lane-record commit follows) | Owner-authorized shared portfolio-equity correction | Cherry-picked source fix `1ed0602` into `assistant/portfolio_snapshot.py` and `tests/test_assistant_risk_copilot.py`. The builder now aggregates exact Decimal cash and position values before rounding the single total-equity display, preventing legitimate fractional-share portfolios from failing the strict display/exact integrity check. The validator, policy limits, broker contracts, strategy code, and research gates were not weakened or changed. | Focused portfolio/risk/coherent-snapshot suite: 112 passed, 0 failed, 1 dependency warning in 3.01s; compileall exit 0; `git diff --check` clean. Source correction previously passed the complete 5,442-test suite and a reverse mutation that reproduced display `100.01` versus exact `100`. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | `SYS-FU-P1-006` reproduced: per-position display rounding accumulated into a competing equity total and prevented UI load. Corrected without adding tolerance; pending Claude review and Codex counter-review. IB-0/IB-1 remains unstarted. | Validate and push the exact recorded lane snapshot. Claude then reviews both new commits on this lane before IB-0/IB-1 or any later milestone. |
 | 2026-08-27 | Codex validation | `29efc30` -> `29efc30` (exact isolated tested snapshot; this validation-record commit follows) | Portfolio-equity correction final validation | Revalidated the complete Insider Buying lane after its code and required lane-record commits in a detached isolated worktree pinned to `29efc30`; no product file changed during the run. | Complete exact-tree suite: **5,224 passed, 2 skipped, 0 failed, 25 dependency warnings in 1,832.32s (30m32s)**. The earlier focused 112-test suite, 63-test active-document suite, compileall, and diff checks were also green. Fixture-only; no SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | No new P0-P3 finding. `SYS-FU-P1-006` remains implemented but unaccepted pending the required review chain; IB-0/IB-1 remains unstarted. | Commit this validation record and push the complete three-commit lane range; Claude reviews every new commit before IB-0/IB-1 or any later milestone. |
 | 2026-08-28 | Claude review | `b4ba4b2` -> this review snapshot | Independent review of the owner-authorized shared remediation synchronization (`a4f58e6..b4ba4b2`, 16 commits) | Verified provenance by stable patch ID (12 of 13 synchronized commits patch-identical to their merged main-line counterparts; the single divergence correctly omits the analyst-only entry-point registration), confirmed the frozen-file freeze held, and reviewed every commit for fail-open, atomicity, money-type, and test-weakening defects. Corrected one confirmed defect and escalated one open P1. Full dispositions and the P0-P3 ledger are in section 6. | Complete suite at `8a65e3c`: 1 failed, 5,222 passed, 2 skipped in 29m07s (the failure is R-02, contradicting the recorded zero-failure claim on this host). After correction: affected file 49 passed, 1 skipped; import-boundary/entry-point/active-document 98 passed; execution-gate and characterization 76 passed; dispatch-fence and cancel-all 89 passed, 1 skipped; broker-binding suites 263 passed, 1 skipped; compileall exit 0; PowerShell parser 0 errors; `git diff --check` clean. Final complete suite on the exact pushed tree `58bf2f8`: **5,223 passed, 3 skipped, 0 failed, 25 warnings in 36m32s**. An intermediate complete run under host contention reported 6 `TimeoutExpired` failures against byte-identical code and is recorded as R-19 rather than omitted. Two mutations run and reverted cleanly. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, or scheduler access; **0 research looks**. | R-01 (P1, OPEN): strict snapshot coherence refuses submission on any price tick with no risk-reducing-sell exemption, conflicting with the CLAUDE.md section 5 exception; escalated for an owner decision rather than corrected on a lane branch. R-02 (P2) fixed in `1c1d943`. R-03 to R-08 recorded open for counter-review. A second audit then changed the `9406a34` disposition to defect-found: R-09 to R-15 are seven further P1 issues open at HEAD, four verified directly against this host, including a machine-global execution stop currently latched active by test-origin incidents. R-18 records that the same stop defeats cross-lane isolation; R-16, R-17, and R-19 are lower-severity. Nine P1 issues are open in total and none was corrected on this lane, because they are shared execution semantics synchronized from `main`. | Codex counter-reviews every Claude commit in this range, then may begin IB-0/IB-1 in one combined push. R-01 needs an explicit owner decision before it can be closed. IB-0/IB-1 remains unstarted. |
+| 2026-08-28 | Codex counter-review | `17c1bb2` -> this counter-review record commit | Counter-review of all five Claude commits after `b4ba4b2` | Re-read every diff in chronological order, independently verified the 13-commit provenance claim, reproduced the executable correction and material safety findings, generalized the affected paths, and recorded a superseding disposition for every R-01 through R-19 item in section 7. No shared production code was changed. | Stable patch IDs: 12 exact matches and the intended two-line Analyst-only omission in `800c689`; focused offline suite: **31 passed** in 30.88s; direct lifecycle probe mapped both `held` and `calculated` to critical `submission_unknown`; R-02 actual-interpreter test passed; R-07/R-15 deterministic component disagreement reproduced. `git diff --check` and active-document checks follow before commit. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, or order access; **0 research looks**. | Accepted after documentation correction. R-04 is rejected as a false positive: the outer dispatch fence is acquired before authoritative snapshot capture and the adapter fence is same-thread re-entry. R-09's historical host condition is no longer current because the reported runtime-stop file is absent; its global-state mechanism remains covered by R-10/R-18. All other classifications and residual gates are retained as scoped in section 7. | Commit this counter-review checkpoint. Because no owner decision blocks offline structure work, proceed to the bounded IB-0/IB-1 milestone before one combined lane push. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -274,3 +275,83 @@ of this lane: the host emergency stop is latched active by throwaway test
 databases and would refuse live paper proposals, including risk-reducing
 sells. It was deliberately left untouched. No SEC crawl, outcome join, ETF construction, QuantConnect job, or
 broker action is authorized by this review.
+
+## 7. Codex counter-review of Claude review commits (2026-08-28)
+
+Counter-reviewer: Codex. Exact range reviewed in chronological order:
+`b4ba4b2..17c1bb2`. Work remained on
+`codex/strategy-insider-buying` in its dedicated worktree; no branch switch,
+provider access, outcome access, operator-database access, or operational
+mutation occurred.
+
+### 7.1 Claude commit dispositions
+
+| Commit | Disposition | Counter-review evidence |
+|---|---|---|
+| `1c1d943` | Accepted | The `lstat()` predicate matches the installer refusal boundary (reparse point or zero length), leaves missing interpreters unmasked, and the real-interpreter installer-preview test passed. |
+| `2eb3f5d` | Accepted after later record completion and this counter-review correction | Every implementation commit is dispositioned and the retained ledger is substantive. The initially incomplete storage audit was corrected by later Claude commits. R-04 is a false positive and R-09 is no longer a current host condition; both are superseded below without deleting Claude's original observations. |
+| `f5f3ec5` | Accepted after counter-review correction | The seven added P1 code-path findings were checked individually. R-09's live-state wording is historical now; R-10 through R-15 remain open as classified below. |
+| `58bf2f8` | Accepted with clarification | The runtime namespace is structurally machine-global, so R-18's isolation mechanism is real, but the two enumerated Analyst-origin incidents cannot be re-observed because the runtime-stop file is now absent. R-19's 30-second subprocess budget is present; this counter-review did not recreate artificial host contention. |
+| `17c1bb2` | Accepted | Documentation-only commit. Its exact-code-tree validation provenance is internally coherent and does not claim the record-only tip received the complete suite. |
+
+Overall disposition: **accepted after documentation correction**. No Claude
+product-code change was rejected and no shared production correction is
+authorized on this lane. The only executable Claude change, R-02, remains
+accepted.
+
+### 7.2 Superseding R-01 through R-19 dispositions
+
+This table retains every Claude identifier. It supersedes status wording where
+the counter-review produced stronger evidence; it does not erase section 6.
+
+| ID | Counter-review disposition |
+|---|---|
+| R-01 | **Confirmed P1, OPEN / owner decision.** The snapshot fingerprint includes current prices and market values, both submit methods recapture unconditionally, and neither path branches on side. The fail-closed direction is correct, but it can obstruct a legitimate risk-reducing sell. |
+| R-02 | **Confirmed P2, FIXED in `1c1d943`.** Focused regression passed under the real non-alias virtual-environment interpreter. The guard is load-bearing on Store-alias hosts and does not weaken installer behavior. |
+| R-03 | **Retained P2 as a provider-conditional hypothesis, not independently confirmed.** Stable scans require successful cancel acknowledgements for every visible ID. Whether a second cancel of `pending_cancel` is acknowledged or rejected is provider behavior; provider access is prohibited in this milestone. No code change is justified from an unverified assumption. |
+| R-04 | **REJECTED - false positive.** `execute_approved_paper_proposal()` acquires `execution_dispatch_fence(store.path)` before `_execute_approved_paper_proposal_under_dispatch_fence()` opens the broker session or captures the authoritative snapshot. The adapter's later permit fence is nested same-thread re-entry over the same path, so it does not spend a second 30-second contention wait. A proposal can time out waiting for the outer fence, but it does not wait while holding the execution snapshot described by R-04. |
+| R-05 | **Confirmed P3, OPEN.** The authorization layer accepts `none`, `null`, and `unknown`; stricter account and broker layers reject them. Current upstream construction prevents exploitation, but the contract remains inconsistent. |
+| R-06 | **Confirmed P3, OPEN.** `activate_reconciliation_halt()` keys `broker_reconciliation:<proposal>`, while anomaly parking keys `broker_reconciliation:<proposal>:<anomaly>`. Acknowledgement behavior can therefore diverge. |
+| R-07 | **Confirmed P3, OPEN.** Component disagreement raises `_TransientBrokerSnapshotMutation` and is ultimately reported as failure to stabilize. The focused regression reproduced that exact message for stable contradictory inputs. |
+| R-08 | **Confirmed P3, OPEN with bounded impact.** Strict snapshot order validation passes the same `BrokerAccountIdentity` as expected and observed. Account bracketing and `expected_account_id` remain independently meaningful, so only the order-level mismatch check is tautological. |
+| R-09 | **Historical P1 host condition; NOT CURRENT at counter-review.** A read-only check found the recorded runtime-stop path absent. Codex did not clear or otherwise mutate it. The earlier observation remains evidence that tests can latch global state, but there is no current file or incident set requiring the owner action claimed in section 6. Underlying mechanisms remain R-10 and R-18. |
+| R-10 | **Confirmed P1, OPEN.** Runtime-stop activation occurs before and outside the `read_only` branch, and reporting/readiness callers reach it. This is a real presentation-to-execution side effect. |
+| R-11 | **Confirmed P1, OPEN.** The ambiguous-dispatch gate has no side branch; its `ProposalExecutionError` is converted from `VALIDATING` to `BLOCKED`, consuming a risk-reducing sell proposal before broker contact. |
+| R-12 | **Confirmed structural P1 risk, OPEN.** The hot path executes unbounded `SELECT * FROM broker_order_events` and verifies every row. Counter-review confirmed the code path but did not manufacture an operational-size ledger to claim a measured latency. |
+| R-13 | **Confirmed structural P1, OPEN.** Timestamp integrity outside the five-second future tolerance activates reconciliation halt, and monitor cadence defaults to 30 seconds. No provider or unattended end-to-end run was performed. |
+| R-14 | **Confirmed P1, OPEN.** Direct invocation mapped both branch-declared active statuses, `held` and `calculated`, to `submission_unknown`; that status is in readiness's critical unresolved set and in the account-wide ambiguous-dispatch gate. No test otherwise names either raw status. |
+| R-15 | **Confirmed P1, OPEN.** The legacy migration authenticates the original `event_at`, rejects a naive timestamp, then rolls the migration transaction back, so reopen repeats the refusal. Separately, the stable component-disagreement fixture exhausted the retry budget and reported "did not stabilize." The runtime path ignores its database argument by design. No operator database was opened. |
+| R-16 | **Confirmed P2, OPEN.** The non-strict broker/read-only builder silently normalizes a zero-share/zero-value row away, while the strict execution builder rejects it. The silent drop violates the repository's no-silent-row-dropping rule even though it cannot reach strict dispatch evidence. |
+| R-17 | **Confirmed P2 test gap, OPEN.** The unsupported-order characterization fails policy validation before reservation, so its reservation assertion is vacuous and cannot protect the later `release_execution_reservation()` call. This is a test-sensitivity defect, not evidence that production currently leaks a reservation. |
+| R-18 | **Confirmed structural P1, OPEN; historical incident details unavailable.** Runtime fence/stop paths deliberately ignore the database and use one OS-user namespace, so lane tests can affect sibling lanes. The exact two Analyst-origin incidents recorded by Claude are not current because the state file is absent. |
+| R-19 | **Confirmed P3 test-harness risk, OPEN.** The 30-second PowerShell subprocess timeouts are hard coded. Claude's red/green load evidence is retained; this counter-review ran the focused path successfully and did not force contention merely to recreate a timeout. |
+
+The current P1 set after counter-review is R-01, R-10 through R-15, and R-18:
+eight open P1 findings. R-09 remains a retained historical host condition, not
+a currently active incident; R-04 is rejected. None blocks the isolated,
+offline, non-executing IB-0/IB-1 structural milestone. They do block treating
+the shared execution surface as operationally cleared.
+
+### 7.3 Counter-review verification
+
+- Recomputed stable patch IDs for all 13 synchronized commits. Twelve match
+  their main-line counterparts exactly. `800c689` intentionally differs from
+  `8cab638` only by omitting the Analyst licensed-surface registration and its
+  matching assertion: one added line in each of two files.
+- Direct lifecycle probe: `held -> submission_unknown` and
+  `calculated -> submission_unknown`; both raw statuses are declared active,
+  and `submission_unknown` is critical.
+- Focused offline suite covering the executable correction, provenance
+  boundary, re-entrant fence, vacuous reservation characterization, legacy
+  migration, and deterministic snapshot disagreement: **31 passed in
+  30.88 seconds**.
+- The earlier two-test subset for R-02 and R-07/R-15 also passed in 5.25
+  seconds. The real R-02 installer-preview test alone passed in 6.35 seconds.
+- Read-only runtime-state check: the exact file named by R-09 was absent. No
+  clear, acknowledgement, database open, or state mutation was performed.
+- No SEC/EDGAR/provider request, credential, licensed row, research outcome,
+  QuantConnect job, broker action, operator database, scheduler, order, or
+  deployment was accessed. **Research looks: 0.**
+
+Counter-review gate: **PASS, accepted after documentation correction**. The
+next authorized step is the bounded offline IB-0/IB-1 milestone only.

@@ -1,16 +1,26 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-28 by Codex after completing the main-line counter-review of
-Claude's root-remediation review and correction series. This is the canonical
-generic-workflow handoff for the root project. The three strategy lanes remain
-independent and were not inspected, modified, synchronized, or reviewed here.
+Prepared: 2026-08-28 by Codex after the owner directed durable documentation of
+the seven remaining root-review P2/P3 findings and their future correction
+gate. This is the canonical generic-workflow handoff for the root project. The
+three strategy lanes remain independent and were not inspected, modified,
+synchronized, or reviewed by this documentation task.
 
-## 0. Root-remediation counter-review handoff
+## 0. Deferred P2/P3 remediation handoff
 
-- Active local branch:
-  `codex/counterreview-root-remediation-20260827`.
-- Published base and unchanged local `main`/`origin/main`:
-  `6a507341896850076c13050da080f888d6eb31aa`.
+- Current documentation branch:
+  `codex/document-deferred-p2-p3-remediation-20260828`, created from exact
+  integrated root-review baseline
+  `da7e0d8b63aeb48a19dca86f0811777c8c74078c`.
+- Published `origin/main` at audit time:
+  `da7e0d8b63aeb48a19dca86f0811777c8c74078c`. Local `main` matched it before
+  this documentation branch was created. This is PR #319's merge of the
+  accepted root-remediation counter-review; it does not contain the three
+  still-independent strategy lanes.
+- Queued-plan record commit:
+  `3c55b3c3d522f83201f45c22b9f11bed956cd6e1`. Its authoritative HOW/WHERE,
+  sequencing, acceptance and authority record is
+  `docs/Plan/POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md`.
 - Accepted-after-correction implementation commit:
   `242f8eb7ef5022ed17e86502896ae19e7621e55c` (parent `6a50734`, tree
   `b97cccb5be0a2f19fe96ffc5a194bdfa411a83f3`).
@@ -38,14 +48,34 @@ independent and were not inspected, modified, synchronized, or reviewed here.
   credential/private-key shape was found. The 70 documentation and remediation
   ledger guards passed after the report update and again after this handoff
   replacement.
-- Open P2 items: a safe evidence contract for risk-reducing sells when an
-  unrelated position row makes the account book incomplete (`BRK-001`), and an
-  authenticated corrupt-journal repair/quarantine/restore workflow.
-- Open P3 items: independently observed per-order account provenance, exact
-  limit-price transport across the final broker boundary, authenticated
-  broker-event-ledger checkpoints, bounded Decimal/reporting serialization,
-  and explicit documentation/process isolation for the same-process Python
-  trust boundary.
+- Validation of this documentation change: the 71 active-document/remediation
+  guards passed; deleting one queued finding made the new relational guard fail
+  and restoration returned it green; and repository-wide `compileall` exited
+  0. `git diff --check` was clean and the changed paths contained no recognized
+  credential/private-key shape. The complete 5,723-test run reported **5,720
+  passed, 2 skipped, 1 failed, 25 warnings in 4,259.71 seconds**. The sole
+  failure was a host-load timeout:
+  the exact Windows operational-contract verifier exceeded its hard-coded
+  30-second PowerShell subprocess limit. It passed both in its complete
+  50-test module (**50 passed in 237.75 seconds**) and again alone after the
+  full run (**1 passed in 20.19 seconds**). No product assertion failed; the
+  complete-suite result is nevertheless recorded as red, not called green.
+- The seven carried findings remain open and mandatory: `RCR-014` and
+  `RCR-015` are P2; `RCR-016` through `RCR-020` are P3. Their source evidence
+  remains unchanged in the archived counter-review. The queued plan refines
+  how and where they must be corrected, how each closes, and how the final
+  integrated tree must be reviewed.
+- These findings principally belong to the trading assistant / paper-live
+  product, broker/event storage, reporting and process boundary. Only the
+  provider-neutral Decimal primitive tranche of `RCR-019` belongs to the
+  temporary shared kernel. None of the seven is a research/QC strategy defect,
+  although the future Full Project Review must independently review the merged
+  research/QC product and the integration seam.
+- Current row hashes are unkeyed consistency evidence, not cryptographic
+  authentication. The future recovery and checkpoint work must share one
+  explicit threat model and must not claim deletion, reorder, rollback or
+  hostile-rewrite resistance without an ordered prefix and an appropriate
+  authority outside the mutable database.
 - `ARV-001` through `ARV-014` remain delegated to the Analyst Revisions V2
   lane. They are not accepted, closed, or implemented by this root review.
   Insider Buying and Short Interest were likewise untouched. No feature-lane
@@ -57,17 +87,19 @@ independent and were not inspected, modified, synchronized, or reviewed here.
 - No provider, credential, licensed row, outcome, QuantConnect job, broker,
   operator database, live scheduler, deployment, evidence epoch, paper order,
   live order, or research look was accessed or changed.
-- No feature milestone completed and no sequencing, gate, or next-step status
-  changed, so `docs/FEATURE_MILESTONE_RECORD.md` and
-  `docs/ACTION_PLAN_2026-08-20.md` remain unchanged.
-- On 2026-08-28 the owner explicitly directed publication of this completed
-  counter-review branch. This handoff is the intended non-force-pushed branch
-  tip; publishing it does not merge or change `main` and grants no additional
-  implementation, research, provider, deployment, or trading authority.
-- After the remote head is verified, this whole-project review session is
-  **DONE** and should be archived. Do not begin another whole-project review
-  until all three feature branches are complete and merged into `main`; the
-  owner will then initiate that review from the exact integrated snapshot.
+- This documentation is not a feature milestone, so
+  `docs/FEATURE_MILESTONE_RECORD.md` remains unchanged. The owner-directed
+  future gate was added concisely to `docs/ACTION_PLAN_2026-08-20.md`; the
+  implementation detail stays in the queued plan.
+- The root counter-review remains **DONE**. This documentation task does not
+  reopen it and grants no remediation authority now. The next Full Project
+  Review may begin only after all three feature branches complete their lane
+  review loops, the owner merges those exact heads into `main`, and the owner
+  explicitly starts the review/correction work from that integrated commit.
+- Until that explicit activation, do not implement `RCR-014` through
+  `RCR-020`, start a new whole-project audit, edit a strategy lane, unfreeze
+  SEP-3, or infer provider, research-look, QC, broker, operator-database,
+  deployment, paper-order, live-order or trading authority.
 
 The owner clarification remains binding: the standing strategy-lane loop is
 Codex implementation, Claude independent review, then Codex counter-review
@@ -82,20 +114,22 @@ and in `docs/Archive/Review/`.
 
 1. `CLAUDE.md` and `AGENTS.md`.
 2. `docs/ACTION_PLAN_2026-08-20.md`.
-3. `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`.
-4. `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`.
-5. `docs/Strategy Description/README.md`.
-6. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
-7. The selected lane's PDF and implementation record.
-8. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
-9. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
+3. `docs/Plan/POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md`.
+4. `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`.
+5. `docs/Archive/Review/COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md`.
+6. `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`.
+7. `docs/Strategy Description/README.md`.
+8. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
+9. The selected lane's PDF and implementation record.
+10. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
+11. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
    discussion and `docs/operations/OPERATIONAL_FACTS.md` before operational
    work.
 
 ## 2. Exact baseline and branches
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Published `origin/main` at audit time:
+- Historical three-lane baseline `origin/main`:
   `6156ef9b92737c9b390a96d286b0fbde4ff4b19c`.
 - The owner directed deletion of merged branches; after cleanup only `main`
   and `origin/main` remained.
@@ -304,21 +338,27 @@ and a new owner-authorized permanent look budget.
 ## 8. Resume prompt
 
 ```text
-This root counter-review is complete and its branch was owner-directed for
-publication. Do not resume the whole-project review until all three strategy
-lanes are complete, merged into main, and the owner initiates the next review.
-Then read CLAUDE.md, AGENTS.md,
-ACTION_PLAN_2026-08-20.md, THREE_STRATEGY_PROJECT_DIRECTION.md, and
-COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md. Preserve implementation commit
-242f8eb7ef5022ed17e86502896ae19e7621e55c and report commit
-699f6bc970f1ab5978c9a994d803b5dc09fc1fbd. Do not modify or synchronize the
-Analyst Revisions V2, Insider Buying, or Short Interest branches/worktrees from
-this task. Begin the later review from the exact post-integration main snapshot
-and establish a new bounded commit range under the generic
-separate-review-branch workflow. Access no provider, credential,
-licensed row, outcome, QuantConnect job, broker, operator database, live
-scheduler, deployment, paper-order, live-order, or evidence-epoch surface.
+The root counter-review is complete. Do not start another whole-project review
+until the Analyst Revisions V2, Insider Buying, and Short Interest lanes have
+each completed their implementation/review/counter-review chain, the owner has
+merged their exact final heads into main, and the owner explicitly activates
+the post-integration Full Project Review and correction program. Then begin
+from the exact fetched main head and read CLAUDE.md, AGENTS.md,
+ACTION_PLAN_2026-08-20.md,
+POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md,
+THREE_STRATEGY_PROJECT_DIRECTION.md, all three final lane records,
+COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md, and the SEP-3 freeze record.
+Review every commit and merge since da7e0d8 plus the cumulative tree. Apply
+authorized corrections for every newly confirmed P0-P3 finding and close all
+seven carried findings RCR-014 through RCR-020. Report research/QC,
+paper-live, shared-kernel, architecture and integration conclusions
+separately; do not treat the seven assistant/shared findings as research
+defects. Use the generic independent-review workflow and preserve exact commit
+dispositions. Access no provider, credential, licensed row, outcome,
+QuantConnect job, broker, operator database, live scheduler, deployment,
+paper-order, live-order, evidence-epoch or SEP-3 surface by inference.
 Provider/outcome access remains an open owner decision; obtain that
 authorization before any such audit or run. Preserve zero looks,
-paper-epoch-006, and the untouched shared final holdout.
+paper-epoch-006, the untouched shared final holdout, and the frozen SEP-3
+manifest.
 ```

@@ -369,6 +369,10 @@ def test_market_clock_conversion_is_after_close_across_host_zones_and_dst(
 
 
 WINDOWS_VERIFIER_REASON = "The verifier targets Windows PowerShell and Task Scheduler."
+STORE_ALIAS_INTERPRETER_REASON = (
+    "sys.executable is a Microsoft Store execution alias, which both installers "
+    "refuse by contract because a scheduled task cannot launch it."
+)
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -700,9 +704,24 @@ def _run_windows_verifier(
     return result, json.loads(result.stdout)
 
 
+def _skip_unless_interpreter_can_drive_a_task(interpreter: Path) -> None:
+    """Skip when the running interpreter cannot serve as a task interpreter.
+
+    Microsoft Store publishes python.exe as a zero-byte execution alias that
+    resolves only inside an interactive session, so both installers refuse it up
+    front. Previewing with one would assert the harness's own environment rather
+    than the argument contract under test. The refusal itself stays covered by
+    test_installer_refuses_zero_byte_interpreter, which builds its own alias
+    stand-in and therefore runs on every Windows host.
+    """
+    if interpreter.stat().st_size == 0:
+        pytest.skip(STORE_ALIAS_INTERPRETER_REASON)
+
+
 def _run_installer_preview(tmp_path: Path, case: dict, *, lane: str) -> list[dict]:
     powershell = shutil.which("powershell")
     assert powershell is not None, "Windows validation requires powershell.exe"
+    _skip_unless_interpreter_can_drive_a_task(Path(case["python"]))
     if lane == "operational":
         installer = REPOSITORY_ROOT / "scripts" / "install_windows_operational_tasks.ps1"
         lane_arguments = (
@@ -778,6 +797,69 @@ def test_windows_verifier_green_actions_match_installer_whatif_previews(tmp_path
         assert preview["Execute"] == action["Execute"]
         assert preview["Arguments"] == action["Arguments"]
         assert preview["WorkingDirectory"] == action["WorkingDirectory"]
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+@pytest.mark.parametrize(
+    "installer_name",
+    ["install_windows_operational_tasks.ps1", "install_windows_ml_shadow_tasks.ps1"],
+)
+def test_installer_refuses_zero_byte_interpreter(tmp_path, installer_name):
+    """Both installers must reject an alias interpreter before touching a task.
+
+    Microsoft Store publishes python.exe as a zero-byte execution alias that
+    satisfies Test-Path -PathType Leaf but cannot be launched by the scheduler.
+    A task registered against one looks healthy and silently never runs, so the
+    refusal has to happen up front. The stand-in is built here rather than taken
+    from sys.executable so the guard is exercised on every Windows host.
+    """
+    powershell = shutil.which("powershell")
+    assert powershell is not None, "Windows validation requires powershell.exe"
+    alias = tmp_path / "python.exe"
+    alias.touch()
+    assert alias.stat().st_size == 0, "the stand-in must be a zero-byte file"
+    config = tmp_path / "shadow.json"
+    config.write_text("{}", encoding="utf-8")
+    artifacts = tmp_path / "shadow-artifacts"
+    artifacts.mkdir()
+    installer = REPOSITORY_ROOT / "scripts" / installer_name
+    lane_arguments = ""
+    if installer_name.endswith("ml_shadow_tasks.ps1"):
+        lane_arguments = (
+            f" -ConfigPath {_ps_quote(config)}"
+            f" -ArtifactPath {_ps_quote(artifacts)}"
+            " -RequiredCredentialNames @()"
+        )
+    harness = tmp_path / "refuse-alias.ps1"
+    harness.write_text(
+        "\n".join(
+            (
+                "$ErrorActionPreference = 'Stop'",
+                (
+                    f"$preview = @(& {_ps_quote(installer)}"
+                    f" -PythonPath {_ps_quote(alias)}"
+                    f" -DatabasePath {_ps_quote(tmp_path / 'paper.db')}"
+                    f" -RepositoryPath {_ps_quote(REPOSITORY_ROOT)}"
+                    f"{lane_arguments} -WhatIf)"
+                ),
+                "$preview | ConvertTo-Json -Depth 5",
+            )
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+
+    assert result.returncode != 0, "a zero-byte interpreter must not be accepted"
+    combined = f"{result.stdout}{result.stderr}"
+    assert "not a real interpreter" in combined, combined
+    # The refusal must precede every task object, so no preview may be emitted.
+    assert "TaskName" not in result.stdout, result.stdout
 
 
 @pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)

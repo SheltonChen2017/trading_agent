@@ -18,6 +18,10 @@ Current queued plans:
 - `ML_FULL_SYSTEM_EXECUTION_PLAN.md` and
   `ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md` — future ML work; the
   current software/status record remains under `docs/operations/`.
+- `POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md` — mandatory
+  re-review/correction of the integrated three-strategy tree and closure of
+  the seven carried root P2/P3 findings, but only after all three feature
+  branches are complete, owner-merged into `main`, and explicitly activated.
 - `THREE_SLEEVE_ENGINE_PLAN.md` — implemented through M3; optional M4 remains
   deferred and unauthorized, so the remaining plan is queued rather than
   active.

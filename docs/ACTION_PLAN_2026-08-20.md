@@ -18,6 +18,16 @@ run, QuantConnect launch, paper/live deployment, or combined autopilot is
 authorized by this sequencing change. SEP-3's exact paused state remains in
 `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`.
 
+**Post-integration review/remediation gate, owner direction 2026-08-28:** only
+after all three feature branches complete their lane review loops and the owner
+merges them into `main`, the owner will explicitly initiate a new Full Project
+Review. That future work must correct newly confirmed findings and close all
+seven carried root findings (`RCR-014` through `RCR-020`) under
+`docs/Plan/POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md`.
+The plan is queued and grants no implementation authority before that explicit
+activation. It does not unfreeze SEP-3 or authorize provider/outcome access,
+QuantConnect work, broker/operator-database action, deployment or trading.
+
 This document decides **what happens next**. It does not restate per-milestone
 internals. The active implementation plan is at the root of `docs/`, queued
 plans are in `docs/Plan/`, and completed or superseded plans are in

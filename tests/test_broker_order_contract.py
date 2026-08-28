@@ -7,7 +7,7 @@ can share across submit responses, lookups, polling, streams, and open books.
 from __future__ import annotations
 
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal, localcontext
 
 import pytest
 
@@ -109,6 +109,80 @@ def test_valid_root_order_returns_canonical_exact_evidence():
     assert canonical["order_class"] == "simple"
     assert canonical["extended_hours"] is False
     assert canonical["legs"] is None
+
+
+def test_quantity_scale_and_canonical_mapping_ignore_ambient_context():
+    quantity = "0.1234567890000"
+    exact_limit = "100.1234567890123456789012345678"
+    with localcontext() as context:
+        context.prec = 3
+        validated = validate_broker_order(
+            _limit_order(
+                shares=quantity,
+                shares_decimal=quantity,
+                limit_price=exact_limit,
+                limit_price_decimal=exact_limit,
+            ),
+            context=_root_context(
+                expected_quantity=Decimal(quantity),
+                expected_limit_price=Decimal(exact_limit),
+            ),
+        )
+        canonical = validated_broker_order_mapping(validated)
+
+    assert canonical["shares"] == canonical["shares_decimal"] == "0.123456789"
+    assert canonical["limit_price"] == exact_limit
+    assert canonical["limit_price_decimal"] == exact_limit
+
+
+def test_broker_quantity_over_nine_places_refuses_under_low_ambient_precision():
+    quantity = "0.1234567891"
+    with localcontext() as context:
+        context.prec = 3
+        error = _assert_code(
+            "invalid_quantity",
+            lambda: validate_broker_order(
+                _limit_order(shares=quantity, shares_decimal=quantity),
+                context=_root_context(expected_quantity=Decimal(quantity)),
+            ),
+        )
+
+    assert error.field == "shares_decimal"
+
+
+def test_integral_broker_quantity_with_trailing_zeroes_remains_usable():
+    quantity = "1.0000000000"
+    with localcontext() as context:
+        context.prec = 2
+        validated = validate_broker_order(
+            _limit_order(shares=quantity, shares_decimal=quantity),
+            context=_root_context(expected_quantity=Decimal("1")),
+        )
+
+    canonical = validated_broker_order_mapping(validated)
+    assert canonical["shares"] == canonical["shares_decimal"] == "1"
+
+
+@pytest.mark.parametrize(
+    "submitted_at",
+    [
+        "0001-01-01T00:00:00+14:00",
+        "9999-12-31T23:59:59-14:00",
+    ],
+)
+def test_unrepresentable_timestamp_offsets_refuse_with_typed_integrity_error(
+    submitted_at,
+):
+    error = _assert_code(
+        "invalid_submitted_at",
+        lambda: validate_broker_order(
+            _limit_order(submitted_at=submitted_at, updated_at=None),
+            context=_root_context(),
+        ),
+    )
+
+    assert error.field == "submitted_at"
+    assert isinstance(error.__cause__, OverflowError)
 
 
 @pytest.mark.parametrize(

@@ -6,6 +6,7 @@ import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, localcontext
 from pathlib import Path
 from threading import Barrier, Event, Thread
 
@@ -16,7 +17,15 @@ from assistant.dispatch_fence import (
     get_runtime_emergency_stop,
 )
 from assistant.order_lifecycle import broker_event_id, journal_broker_order_update
+from assistant.portfolio_ledger import (
+    LedgerError,
+    bootstrap_opening_snapshot,
+    ledger_balances,
+    sync_app_fills,
+)
+from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore, JournalTransactionConflictError
+from data.financial_primitives import exact_decimal_multiply, exact_decimal_subtract
 from execution.alpaca_broker import (
     BrokerPreflightError,
     _normalized_trade_update_numbers,
@@ -247,6 +256,80 @@ def test_provider_decimal_text_survives_restart_and_drives_fill_reconstruction(
     assert fill["numeric_evidence_status"] == "provider_exact"
 
 
+def test_provider_exact_fill_drives_the_durable_portfolio_journal_without_float_loss(
+    store: AssistantStore,
+):
+    boot_at = datetime(2026, 1, 5, 14, 0, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(
+        store,
+        PortfolioSnapshot(
+            positions=[],
+            cash=1000.0,
+            cash_exact="1000",
+            total_equity=1000.0,
+            total_equity_exact="1000",
+            as_of="2026-01-05",
+            source="alpaca",
+            account_mode="paper",
+            account_id="paper-account-1",
+        ),
+        confirmation="bootstrap",
+        now=boot_at,
+    )
+    quantity = "0.123456789123456789"
+    price = "100.000000000000000019"
+    order = _order(
+        "partially_filled",
+        filled_qty_decimal=quantity,
+        filled_avg_price_decimal=price,
+    )
+    _journal_exact(
+        store,
+        order,
+        event_id="journal-exact-fill",
+        fill_qty_decimal=quantity,
+        fill_price_decimal=price,
+    )
+
+    fill = store.list_fills()[0]
+    assert fill["numeric_evidence_status"] == "provider_exact"
+    assert sync_app_fills(store)["inserted"] == 1
+
+    exact_quantity = Decimal(quantity)
+    exact_gross = exact_decimal_multiply(
+        exact_quantity,
+        Decimal(price),
+        name="expected provider-exact fill gross",
+    )
+    balances = ledger_balances(store)
+    assert balances["shares"]["AAPL"] == exact_quantity
+    assert balances["security_book_value"]["AAPL"] == exact_gross
+    assert balances["cash"] == exact_decimal_subtract(
+        Decimal("1000"),
+        exact_gross,
+        name="expected provider-exact fill cash",
+    )
+    transaction = store.get_journal_transaction_by_external_id(
+        "app_fill:journal-exact-fill"
+    )
+    assert transaction["metadata"]["qty"] == quantity
+    assert transaction["metadata"]["price"] == price
+    assert transaction["metadata"]["numeric_evidence_status"] == "provider_exact"
+    assert sync_app_fills(store)["duplicates"] == 1
+
+    # Both exact quantities have the same binary-float compatibility value.
+    # Duplicate verification must nevertheless compare the preserved decimal
+    # evidence and refuse the changed provider record instead of treating it
+    # as an idempotent replay.
+    changed_fill = {
+        **fill,
+        "qty_decimal": "0.123456789123456788",
+    }
+    store.list_fills = lambda: [changed_fill]
+    with pytest.raises(LedgerError, match="different content"):
+        sync_app_fills(store)
+
+
 def test_stream_normalizer_never_labels_binary_float_digits_as_provider_exact():
     normalized = _normalized_trade_update_numbers(
         fill_qty=0.1,
@@ -282,7 +365,7 @@ def test_stream_normalizer_rejects_incomplete_or_malformed_fill_evidence(
         )
 
 
-def test_mixed_stream_and_poll_remainder_uses_exact_decimal_text(
+def test_mixed_stream_and_poll_remainder_ignores_low_ambient_precision(
     store: AssistantStore,
 ):
     partial = _order(
@@ -310,12 +393,39 @@ def test_mixed_stream_and_poll_remainder_uses_exact_decimal_text(
         event_at="2026-01-05T15:01:00+00:00",
     )
 
-    fills = store.list_fills()
+    with localcontext() as context:
+        context.prec = 3
+        fills = store.list_fills()
     assert [fill["qty_decimal"] for fill in fills] == [
         "0.100000000000000001",
         "0.899999999999999999",
     ]
     assert fills[1]["price_decimal"] == "4.111111111111111112234567901"
+    assert fills[1]["numeric_evidence_status"] == "derived_rounded"
+
+
+def test_budget_filled_notional_ignores_low_ambient_precision(
+    store: AssistantStore,
+):
+    order = _order(
+        "partially_filled",
+        filled_qty_decimal="0.123",
+        filled_avg_price_decimal="98.7",
+    )
+    _journal_exact(
+        store,
+        order,
+        event_id="precision-budget-fill",
+        fill_qty_decimal="0.123",
+        fill_price_decimal="98.7",
+    )
+
+    with localcontext() as context:
+        context.prec = 3
+        usage = store.get_execution_budget_usage("2026-01-05")
+
+    assert usage["filled_notional_decimal"] == "12.1401"
+    assert usage["evidence_status"] == "provider_exact"
 
 
 def test_exact_event_replay_is_a_noop_and_never_reprojects_caller_state(

@@ -3,11 +3,17 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
-import math
 from datetime import datetime, timedelta, timezone
-from decimal import ROUND_FLOOR
+from decimal import Decimal, ROUND_FLOOR
 
-from assistant.money import decimal_or_none
+from assistant.money import (
+    decimal_or_none,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    exact_decimal_sum,
+    to_decimal,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.schemas import DecisionPacket, PortfolioPosition
@@ -69,6 +75,23 @@ def sellable_whole_shares(position_shares: object) -> int:
 def exact_position_shares(position: PortfolioPosition) -> object:
     """The exact broker quantity when present, else the display float."""
     return position.shares_exact if position.shares_exact is not None else position.shares
+
+
+def _whole_units_not_exceeding(value: object, unit_price: object) -> int:
+    """Floor ``value / unit_price`` exactly, independent of Decimal context."""
+    amount = to_decimal(value, name="dollar value")
+    price = to_decimal(unit_price, name="unit price")
+    if amount <= 0 or price <= 0:
+        return 0
+    # Decimal.as_integer_ratio() is exact.  Integer cross-products and floor
+    # division therefore cannot round a just-over-cap notional down onto the
+    # authorization boundary, even if a caller lowered Decimal precision.
+    amount_numerator, amount_denominator = amount.as_integer_ratio()
+    price_numerator, price_denominator = price.as_integer_ratio()
+    return (
+        amount_numerator * price_denominator
+        // (amount_denominator * price_numerator)
+    )
 
 
 def attach_tax_lot_advisory(
@@ -166,20 +189,14 @@ def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeInten
 def _add_reduction(
     reductions: dict[str, dict],
     position: PortfolioPosition,
-    dollar_reduction: float,
+    dollar_reduction: Decimal,
     reason: str,
 ) -> None:
-    # math.isfinite, not just `<= 0`: a NaN price defeats every ordered
-    # comparison, and int(x / NaN) then raises ValueError -- crashing
-    # proposal GENERATION before risk/execution_gate.py's own
-    # INVALID_POSITION_DATA check ever gets to reject the position
-    # (independent review, 2026-07-29).
-    if (
-        not math.isfinite(dollar_reduction)
-        or dollar_reduction <= 0
-        or not math.isfinite(position.current_price)
-        or position.current_price <= 0
-    ):
+    # The caller validates the complete snapshot first, and all sizing below
+    # stays on its exact Decimal companions. A non-positive row is still
+    # isolated here so one unusable position cannot abort the batch.
+    current_price = position.exact_field("current_price")
+    if dollar_reduction <= 0 or current_price <= 0:
         return
     # SELCR-001: floor the HELD side exactly. `int(position.shares)` rounded a
     # fractional broker quantity up, and the hardened gate then refused the
@@ -187,7 +204,7 @@ def _add_reduction(
     # exists to produce.
     shares = min(
         sellable_whole_shares(exact_position_shares(position)),
-        max(1, int(dollar_reduction / position.current_price)),
+        max(1, _whole_units_not_exceeding(dollar_reduction, current_price)),
     )
     entry = reductions.setdefault(
         position.ticker,
@@ -226,45 +243,80 @@ def generate_risk_reduction_proposals(
     concentration-limit logic worth knowing about.
     """
     snapshot = packet.portfolio
-    # isfinite first (see build_risk_exposure's note): with a NaN total every
-    # `market_value > max_*_value` comparison is False, so a portfolio in
-    # blatant breach silently generated ZERO risk-reduction proposals -- the
-    # fail-open direction on the one path whose whole job is reducing risk.
-    if not math.isfinite(snapshot.total_equity) or snapshot.total_equity <= 0:
+    from assistant.portfolio_snapshot import (
+        PortfolioSnapshotIntegrityError,
+        validate_long_only_portfolio_snapshot,
+    )
+
+    try:
+        validate_long_only_portfolio_snapshot(snapshot)
+    except PortfolioSnapshotIntegrityError:
+        return []
+    total_equity = snapshot.total_equity_exact_decimal
+    # The canonical validator above rejects non-finite and inconsistent
+    # evidence before any comparison. Exact totals then drive every limit.
+    if total_equity <= 0:
         return []
 
     reductions: dict[str, dict] = {}
     position_by_ticker = {p.ticker.upper(): p for p in snapshot.positions}
-    max_position_value = snapshot.total_equity * policy.max_position_pct
+    max_position_value = exact_decimal_multiply(
+        total_equity,
+        to_decimal(
+            policy.max_position_pct,
+            name="policy.max_position_pct",
+        ),
+        name="maximum position value",
+    )
     for position in snapshot.positions:
-        if position.market_value > max_position_value:
+        market_value = position.exact_field("market_value")
+        if market_value > max_position_value:
             _add_reduction(
                 reductions,
                 position,
-                position.market_value - max_position_value,
+                exact_decimal_subtract(
+                    market_value,
+                    max_position_value,
+                    name=f"{position.ticker} position excess",
+                ),
                 f"Position exceeds the {policy.max_position_pct * 100:.1f}% policy limit.",
             )
 
     leveraged = sorted(
         (p for p in snapshot.positions if p.is_leveraged_etf),
-        key=lambda p: p.market_value,
+        key=lambda p: p.exact_field("market_value"),
         reverse=True,
     )
-    leveraged_excess = (
-        sum(p.market_value for p in leveraged)
-        - snapshot.total_equity * policy.max_leveraged_etf_pct
+    leveraged_excess = exact_decimal_subtract(
+        exact_decimal_sum(
+            (p.exact_field("market_value") for p in leveraged),
+            name="leveraged ETF value",
+        ),
+        exact_decimal_multiply(
+            total_equity,
+            to_decimal(
+                policy.max_leveraged_etf_pct,
+                name="policy.max_leveraged_etf_pct",
+            ),
+            name="maximum leveraged ETF value",
+        ),
+        name="leveraged ETF excess",
     )
     for position in leveraged:
         if leveraged_excess <= 0:
             break
-        reduction = min(position.market_value, leveraged_excess)
+        reduction = min(position.exact_field("market_value"), leveraged_excess)
         _add_reduction(
             reductions,
             position,
             reduction,
             f"Leveraged-ETF exposure exceeds the {policy.max_leveraged_etf_pct * 100:.1f}% policy limit.",
         )
-        leveraged_excess -= reduction
+        leveraged_excess = exact_decimal_subtract(
+            leveraged_excess,
+            reduction,
+            name="remaining leveraged ETF excess",
+        )
 
     # Iterates config.BASKETS directly and computes each basket's EXACT
     # market value here, rather than reading packet.risk.basket_exposure_pct
@@ -272,19 +324,37 @@ def generate_risk_reduction_proposals(
     # for display purposes) -- a true exposure just above the boundary
     # (e.g. 40.04%) could round down to exactly the limit (40.0%) and
     # silently evade proposal generation entirely (GPT review, 2026-07-31).
-    max_basket_value = snapshot.total_equity * policy.max_basket_pct
+    max_basket_value = exact_decimal_multiply(
+        total_equity,
+        to_decimal(
+            policy.max_basket_pct,
+            name="policy.max_basket_pct",
+        ),
+        name="maximum basket value",
+    )
     for basket_name, basket_tickers in BASKETS.items():
-        basket_value = sum(p.market_value for p in snapshot.positions if p.ticker.upper() in basket_tickers)
+        basket_value = exact_decimal_sum(
+            (
+                p.exact_field("market_value")
+                for p in snapshot.positions
+                if p.ticker.upper() in basket_tickers
+            ),
+            name=f"{basket_name} basket value",
+        )
         if basket_value <= max_basket_value:
             continue
         basket_positions = sorted(
             (position_by_ticker[t] for t in basket_tickers if t in position_by_ticker),
-            key=lambda p: p.market_value,
+            key=lambda p: p.exact_field("market_value"),
             reverse=True,
         )
         if not basket_positions:
             continue
-        excess = basket_value - max_basket_value
+        excess = exact_decimal_subtract(
+            basket_value,
+            max_basket_value,
+            name=f"{basket_name} basket excess",
+        )
         _add_reduction(
             reductions,
             basket_positions[0],
@@ -313,52 +383,110 @@ def generate_risk_reduction_proposals(
     # that new (larger) ABSOLUTE target back through _add_reduction() --
     # never just the marginal amount, which _add_reduction()'s max-merge
     # would otherwise silently ignore in favor of a larger existing plan.
-    def _planned_dollars(ticker: str) -> float:
+    def _planned_dollars(ticker: str) -> Decimal:
         entry = reductions.get(ticker)
         if entry is None:
-            return 0.0
-        return entry["shares"] * entry["position"].current_price
+            return Decimal("0")
+        return exact_decimal_multiply(
+            entry["shares"],
+            entry["position"].exact_field("current_price"),
+            name=f"planned {ticker} reduction value",
+        )
 
-    invested_value = sum(p.market_value for p in snapshot.positions)
-    max_total_exposure_value = snapshot.total_equity * policy.max_total_exposure_pct
-    already_closed = sum(_planned_dollars(p.ticker) for p in snapshot.positions)
-    remaining_gap = (invested_value - max_total_exposure_value) - already_closed
+    invested_value = exact_decimal_sum(
+        (p.exact_field("market_value") for p in snapshot.positions),
+        name="invested portfolio value",
+    )
+    max_total_exposure_value = exact_decimal_multiply(
+        total_equity,
+        to_decimal(
+            policy.max_total_exposure_pct,
+            name="policy.max_total_exposure_pct",
+        ),
+        name="maximum total exposure value",
+    )
+    already_closed = exact_decimal_sum(
+        (_planned_dollars(p.ticker) for p in snapshot.positions),
+        name="already planned reduction value",
+    )
+    remaining_gap = exact_decimal_subtract(
+        exact_decimal_subtract(
+            invested_value,
+            max_total_exposure_value,
+            name="total exposure excess",
+        ),
+        already_closed,
+        name="remaining total exposure excess",
+    )
     if remaining_gap > 0:
         for position in sorted(
             snapshot.positions,
-            key=lambda p: p.market_value - _planned_dollars(p.ticker),
+            key=lambda p: exact_decimal_subtract(
+                p.exact_field("market_value"),
+                _planned_dollars(p.ticker),
+                name=f"remaining {p.ticker} position value",
+            ),
             reverse=True,
         ):
             if remaining_gap <= 0:
                 break
             planned_so_far = _planned_dollars(position.ticker)
-            remaining_value = position.market_value - planned_so_far
-            # Same NaN reasoning as _add_reduction() above.
+            remaining_value = exact_decimal_subtract(
+                position.exact_field("market_value"),
+                planned_so_far,
+                name=f"remaining {position.ticker} position value",
+            )
             if (
-                not math.isfinite(remaining_value)
-                or remaining_value <= 0
-                or not math.isfinite(position.current_price)
-                or position.current_price <= 0
+                remaining_value <= 0
+                or position.exact_field("current_price") <= 0
             ):
                 continue
             incremental = min(remaining_value, remaining_gap)
             _add_reduction(
                 reductions,
                 position,
-                planned_so_far + incremental,
+                exact_decimal_add(
+                    planned_so_far,
+                    incremental,
+                    name=f"planned {position.ticker} reduction target",
+                ),
                 f"Total invested exposure exceeds the {policy.max_total_exposure_pct * 100:.1f}% policy limit.",
             )
-            remaining_gap -= incremental
+            remaining_gap = exact_decimal_subtract(
+                remaining_gap,
+                incremental,
+                name="remaining total exposure gap",
+            )
 
     now = datetime.now(timezone.utc)
     proposals = []
     for ticker, reduction in sorted(reductions.items()):
         position = reduction["position"]
-        max_order_shares = int(policy.max_order_value / position.current_price)
+        max_order_value = to_decimal(
+            policy.max_order_value,
+            name="policy.max_order_value",
+        )
+        max_order_shares = _whole_units_not_exceeding(
+            max_order_value,
+            position.exact_field("current_price"),
+        )
         if max_order_shares <= 0:
             continue
         shares = min(reduction["shares"], max_order_shares)
         if shares <= 0:
+            continue
+        try:
+            proposal_value = exact_decimal_multiply(
+                shares,
+                position.exact_field("current_price"),
+                name=f"{ticker} proposal value",
+            )
+        except ValueError:
+            continue
+        if proposal_value > max_order_value:
+            # This postcondition is deliberately redundant with exact integer
+            # floor sizing. It is the last fail-closed guard before emitting
+            # an actionable proposal artifact.
             continue
         intent = TradeIntent(
             ticker=ticker,

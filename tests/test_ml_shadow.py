@@ -9,9 +9,15 @@ leaves every execution table unchanged.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import pytest
 
 from assistant.storage import AssistantStore
+from data.exchange_calendar import (
+    next_session_open_strictly_after,
+    resolve_nth_session_after,
+)
 from ml.shadow import (
     MaturityDecision,
     ShadowScheduleError,
@@ -101,6 +107,42 @@ def test_a_non_canonical_session_is_refused():
         resolve_target_session("2026-2-25", 5)
 
 
+@pytest.mark.parametrize(
+    "session",
+    ("1800-01-02", "2036-01-02", "9999-12-30"),
+)
+def test_exchange_calendar_refuses_dates_outside_project_authority(session):
+    with pytest.raises(ShadowScheduleError, match="project authority range"):
+        is_trading_session(session)
+
+
+def test_next_open_resolves_on_the_first_supported_calendar_date():
+    session, market_open = next_session_open_strictly_after(
+        datetime(1990, 1, 1, tzinfo=timezone.utc)
+    )
+
+    assert session == "1990-01-02"
+    assert market_open.isoformat() == "1990-01-02T14:30:00+00:00"
+
+
+@pytest.mark.parametrize("anchor", ("1989-12-31", "2036-01-01"))
+def test_nth_session_search_refuses_anchors_outside_project_authority(anchor):
+    with pytest.raises(ShadowScheduleError, match="project authority range"):
+        resolve_nth_session_after(anchor, 1)
+
+
+@pytest.mark.parametrize(
+    "instant",
+    (
+        datetime(1989, 12, 31, tzinfo=timezone.utc),
+        datetime(2036, 1, 1, tzinfo=timezone.utc),
+    ),
+)
+def test_next_open_refuses_instants_outside_project_authority(instant):
+    with pytest.raises(ShadowScheduleError, match="project authority range"):
+        next_session_open_strictly_after(instant)
+
+
 def test_a_non_positive_horizon_is_refused():
     with pytest.raises(ShadowScheduleError, match="positive integer"):
         resolve_target_session("2026-02-25", 0)
@@ -109,9 +151,9 @@ def test_a_non_positive_horizon_is_refused():
 def test_a_long_horizon_resolves_rather_than_silently_truncating():
     """The over-fetch must scale with the horizon. If it did not, a long
     horizon would quietly return the last session in a too-short window --
-    a target years earlier than requested, with nothing to indicate it.
-    pandas_market_calendars generates rules-based schedules far into the
-    future, so this resolves rather than refusing."""
+    a target years earlier than requested, with nothing to indicate it. The
+    conservative calendar-day over-fetch extends past the configured calendar
+    edge, but the actual 2,000th session remains inside it and must resolve."""
     assert resolve_target_session("2026-02-25", 2000) == "2034-02-10"
     # And a horizon genuinely beyond the calendar still refuses rather than
     # truncating.

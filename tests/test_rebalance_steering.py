@@ -23,7 +23,7 @@ import dataclasses
 import json
 import sys
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -218,6 +218,49 @@ def test_leftover_money_is_reported_never_pushed_onto_another_sleeve():
     spent = sum(Decimal(leg.planned_notional_exact) for leg in plan.legs)
     assert spent + Decimal(plan.unallocated_exact) == Decimal("2000")
     assert Decimal(plan.unallocated_exact) > 0
+
+
+def test_steering_exact_notionals_and_identity_ignore_ambient_precision():
+    prices = {
+        "MSFT": Decimal("30.005"),
+        "SH": Decimal("7.005"),
+        "NVDL": Decimal("13.005"),
+        "JEPQ": Decimal("9.005"),
+    }
+    arguments = {
+        "budget": Decimal("2000.015"),
+        "prices": prices,
+        "policy": _policy(whole_shares_only=True),
+    }
+    expected = _plan(**arguments)
+
+    with localcontext() as context:
+        context.prec = 2
+        actual = _plan(**arguments)
+
+    assert actual == expected
+    assert actual.usable, actual.refusals
+    spent = sum(Decimal(leg.planned_notional_exact) for leg in actual.legs)
+    assert spent + Decimal(actual.unallocated_exact) == Decimal("2000.015")
+    assert any(
+        Decimal(leg.planned_notional_exact).as_tuple().exponent < -2
+        for leg in actual.legs
+    )
+    for leg in actual.legs:
+        quantity = Decimal(str(leg.shares))
+        price = Decimal(str(leg.reference_price))
+        assert Decimal(leg.planned_notional_exact) == quantity * price
+
+
+def test_steering_refuses_when_active_order_evidence_is_unavailable():
+    plan = _plan(packet=_packet(open_orders_available=False))
+
+    assert not plan.usable
+    assert any(
+        "active-order data is unavailable" in reason.lower()
+        for reason in plan.refusals
+    )
+    assert plan.unallocated_exact == plan.budget_exact == "2000"
 
 
 def test_an_unaffordable_chosen_leg_is_named_not_silently_dropped():

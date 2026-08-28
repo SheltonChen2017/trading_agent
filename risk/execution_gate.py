@@ -53,7 +53,7 @@ import os
 import re
 import secrets
 import threading
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 from zoneinfo import ZoneInfo
@@ -61,8 +61,24 @@ from zoneinfo import ZoneInfo
 import pandas_market_calendars as mcal
 
 from config import BASKETS, LEVERAGED_ETF_TICKERS, MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
-from assistant.money import MoneyInput, decimal_or_none, decimal_text, to_decimal
+from assistant.money import (
+    MoneyInput,
+    decimal_effective_scale,
+    decimal_or_none,
+    decimal_text,
+    deterministic_decimal_divide,
+    deterministic_decimal_quantize,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    exact_decimal_sum,
+    to_decimal,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
+from assistant.portfolio_snapshot import (
+    PortfolioSnapshotIntegrityError,
+    validate_long_only_portfolio_snapshot,
+)
 from assistant.schemas import PortfolioSnapshot
 
 _EASTERN = ZoneInfo("America/New_York")
@@ -203,9 +219,7 @@ def order_quantity_decimal(
     quantity = decimal_or_none(value)
     if quantity is None or quantity <= 0:
         return None
-    normalized = quantity.normalize()
-    decimal_places = max(0, -normalized.as_tuple().exponent)
-    if decimal_places > 9:
+    if decimal_effective_scale(quantity, name="order quantity") > 9:
         return None
     # SET1CR-002: bound the MAGNITUDE here, not only the precision. Without
     # this, `1E+1000` satisfied both tests above (it is positive and has zero
@@ -228,7 +242,7 @@ def canonical_order_quantity(
         return None
     if whole_shares_only:
         return int(quantity)
-    if quantity == quantity.to_integral_value():
+    if decimal_effective_scale(quantity, name="order quantity") == 0:
         return int(quantity)
     return decimal_text(quantity)
 
@@ -236,7 +250,10 @@ def canonical_order_quantity(
 def is_fractional_order_quantity(value: object) -> bool:
     """Whether a usable exact quantity contains a fractional share."""
     quantity = order_quantity_decimal(value, whole_shares_only=False)
-    return quantity is not None and quantity != quantity.to_integral_value()
+    return (
+        quantity is not None
+        and decimal_effective_scale(quantity, name="order quantity") > 0
+    )
 
 
 class ViolationCode(str, enum.Enum):
@@ -660,15 +677,32 @@ def _validate_execution_context_against_portfolio(
 
     try:
         captured_at = datetime.fromisoformat(portfolio.captured_at)
-    except ValueError as exc:
+    except (OverflowError, TypeError, ValueError) as exc:
         raise ValueError(
             "An execution-bound validation requires an ISO captured_at timestamp."
         ) from exc
-    if captured_at.tzinfo is None or captured_at.utcoffset() is None:
+    if captured_at.tzinfo is None:
         raise ValueError(
             "An execution-bound validation requires a timezone-aware captured_at timestamp."
         )
-    captured_at_utc = captured_at.astimezone(timezone.utc)
+    try:
+        offset = captured_at.utcoffset()
+    except (OSError, OverflowError, TypeError, ValueError) as exc:
+        raise ValueError(
+            "An execution-bound validation requires a representable "
+            "timezone-aware captured_at timestamp."
+        ) from exc
+    if offset is None:
+        raise ValueError(
+            "An execution-bound validation requires a timezone-aware captured_at timestamp."
+        )
+    try:
+        captured_at_utc = captured_at.astimezone(timezone.utc)
+    except (OSError, OverflowError, TypeError, ValueError) as exc:
+        raise ValueError(
+            "An execution-bound validation requires a representable "
+            "timezone-aware captured_at timestamp."
+        ) from exc
     snapshot_age = datetime.now(timezone.utc) - captured_at_utc
     if snapshot_age > _EXECUTION_SNAPSHOT_MAX_AGE:
         raise ValueError(
@@ -688,9 +722,16 @@ def _validate_execution_context_against_portfolio(
             portfolio.component_equity_delta_exact,
             name="portfolio.component_equity_delta_exact",
         )
-        expected_component = portfolio.cash_exact_decimal + sum(
-            (position.exact_field("market_value") for position in portfolio.positions),
-            Decimal("0"),
+        expected_component = exact_decimal_add(
+            portfolio.cash_exact_decimal,
+            exact_decimal_sum(
+                (
+                    position.exact_field("market_value")
+                    for position in portfolio.positions
+                ),
+                name="execution snapshot position value",
+            ),
+            name="execution snapshot component equity",
         )
         broker_equity = portfolio.total_equity_exact_decimal
     except ValueError as exc:
@@ -701,11 +742,22 @@ def _validate_execution_context_against_portfolio(
         raise ValueError(
             "Execution snapshot component equity does not match exact cash plus positions."
         )
-    if component_delta != component_equity - broker_equity:
+    try:
+        expected_delta = exact_decimal_subtract(
+            component_equity,
+            broker_equity,
+            name="execution snapshot component-equity delta",
+        )
+    except ValueError as exc:
+        raise ValueError(
+            "An execution-bound validation requires exactly representable "
+            "component-equity evidence."
+        ) from exc
+    if component_delta != expected_delta:
         raise ValueError(
             "Execution snapshot component-equity delta is internally inconsistent."
         )
-    if abs(component_delta) > _EXECUTION_COMPONENT_EQUITY_TOLERANCE:
+    if component_delta.copy_abs() > _EXECUTION_COMPONENT_EQUITY_TOLERANCE:
         raise ValueError(
             "Execution snapshot component-equity delta exceeds the execution tolerance."
         )
@@ -752,10 +804,22 @@ def _validate_bound_policy_contract(
             execution_policy.max_total_exposure_pct,
             "max_total_exposure_pct",
         ),
-        (max_basket_pct, execution_policy.max_basket_pct * 100, "max_basket_pct"),
+        (
+            max_basket_pct,
+            exact_decimal_multiply(
+                execution_policy.max_basket_pct,
+                Decimal("100"),
+                name="signed policy max_basket_pct percent conversion",
+            ),
+            "max_basket_pct",
+        ),
         (
             max_leveraged_etf_pct,
-            execution_policy.max_leveraged_etf_pct * 100,
+            exact_decimal_multiply(
+                execution_policy.max_leveraged_etf_pct,
+                Decimal("100"),
+                name="signed policy max_leveraged_etf_pct percent conversion",
+            ),
             "max_leveraged_etf_pct",
         ),
         (
@@ -1320,6 +1384,12 @@ def _check_portfolio_numeric_integrity(ctx: _GateContext) -> None:
             ViolationCode.INVALID_BUYING_POWER,
             f"portfolio.buying_power must be finite when present, got {portfolio.buying_power}.",
         )
+    if portfolio.buying_power is None and portfolio.buying_power_exact is not None:
+        ctx.violate(
+            ViolationCode.INVALID_BUYING_POWER,
+            "portfolio.buying_power_exact cannot exist without "
+            "portfolio.buying_power.",
+        )
     if ctx.portfolio_cash is None:
         ctx.violate(
             ViolationCode.INVALID_PORTFOLIO_CASH,
@@ -1373,8 +1443,14 @@ def _check_portfolio_numeric_integrity(ctx: _GateContext) -> None:
         if exact_text is None or display_value is None or exact_value is None:
             continue
         try:
-            display_matches = display_value == float(round(exact_value, 2))
-        except (OverflowError, ValueError):
+            display_matches = display_value == float(
+                deterministic_decimal_quantize(
+                    exact_value,
+                    Decimal("0.01"),
+                    name=f"portfolio.{field} display",
+                )
+            )
+        except (InvalidOperation, OverflowError, ValueError):
             display_matches = False
         if not display_matches:
             ctx.violate(
@@ -1385,6 +1461,18 @@ def _check_portfolio_numeric_integrity(ctx: _GateContext) -> None:
 
 
 def _check_position_data_integrity(ctx: _GateContext) -> None:
+    # Use the same complete long-only integrity contract as every reporting
+    # surface.  The local field loop below remains useful for stable,
+    # field-specific violation messages and for populating downstream exact
+    # arithmetic, but it must not be a weaker substitute for the canonical
+    # duplicate/ticker/value/component-equity checks.
+    try:
+        validate_long_only_portfolio_snapshot(ctx.portfolio)
+    except PortfolioSnapshotIntegrityError as exc:
+        ctx.violate(
+            ViolationCode.INVALID_POSITION_DATA,
+            f"Canonical portfolio integrity failed: {exc}",
+        )
     for position in ctx.portfolio.positions:
         raw_shares = (
             position.shares_exact
@@ -1435,9 +1523,16 @@ def _check_position_data_integrity(ctx: _GateContext) -> None:
                 position.shares == float(shares)
                 and position.entry_price == float(entry_price)
                 and position.current_price == float(current_price)
-                and position.market_value == float(round(market_value, 2))
+                and position.market_value
+                == float(
+                    deterministic_decimal_quantize(
+                        market_value,
+                        Decimal("0.01"),
+                        name=f"portfolio position {position.ticker} market-value display",
+                    )
+                )
             )
-        except (OverflowError, ValueError):
+        except (InvalidOperation, OverflowError, ValueError):
             display_matches = False
         if any(
             value is not None
@@ -1524,6 +1619,21 @@ def _check_order_type(ctx: _GateContext) -> None:
         )
 
 
+def _deterministic_percentage(
+    numerator: Decimal,
+    denominator: Decimal,
+    *,
+    name: str,
+) -> Decimal:
+    """Return a stable display percentage, never an authorization value."""
+    ratio = deterministic_decimal_divide(
+        numerator,
+        denominator,
+        name=f"{name} ratio",
+    )
+    return exact_decimal_multiply(ratio, Decimal("100"), name=name)
+
+
 def _check_reference_price_and_order_value(ctx: _GateContext) -> None:
     ctx.reference_price_decimal = decimal_or_none(ctx.reference_price)
     if ctx.reference_price_decimal is None or ctx.reference_price_decimal <= 0:
@@ -1538,7 +1648,20 @@ def _check_reference_price_and_order_value(ctx: _GateContext) -> None:
         fill_price = worst_case_fill_price_decimal(ctx.intent, arithmetic_reference_price)
     except ValueError:
         fill_price = arithmetic_reference_price
-    ctx.trade_value = ctx.safe_shares * fill_price
+    try:
+        ctx.trade_value = exact_decimal_multiply(
+            ctx.safe_shares,
+            fill_price,
+            name="trade value",
+        )
+    except ValueError as exc:
+        # MAX_ORDER_VALUE is a hard, non-overridable refusal.  Leave a safe
+        # zero only so later checks can continue collecting other violations.
+        ctx.trade_value = Decimal("0")
+        ctx.violate(
+            ViolationCode.MAX_ORDER_VALUE,
+            f"Trade value could not be proved exactly: {exc}.",
+        )
     max_order_value_decimal = (
         decimal_or_none(ctx.max_order_value)
         if ctx.max_order_value is not None
@@ -1554,7 +1677,8 @@ def _check_reference_price_and_order_value(ctx: _GateContext) -> None:
     elif max_order_value_decimal is not None and ctx.trade_value > max_order_value_decimal:
         ctx.violate(
             ViolationCode.MAX_ORDER_VALUE,
-            f"Trade value ${ctx.trade_value:,.2f} exceeds the ${ctx.max_order_value:,.2f} maximum order value.",
+            f"Trade value ${ctx.trade_value:,.2f} exceeds the "
+            f"${max_order_value_decimal:,.2f} maximum order value.",
         )
 
 
@@ -1577,34 +1701,87 @@ def _check_pending_buy_values(ctx: _GateContext) -> None:
             )
             continue
         key = raw_ticker.upper()
-        ctx.pending_by_ticker[key] = (
-            ctx.pending_by_ticker.get(key, Decimal("0")) + pending_value
+        try:
+            ctx.pending_by_ticker[key] = exact_decimal_add(
+                ctx.pending_by_ticker.get(key, Decimal("0")),
+                pending_value,
+                name=f"pending buy value for {key}",
+            )
+        except ValueError as exc:
+            ctx.violate(
+                ViolationCode.INVALID_PENDING_VALUE,
+                f"Pending buy value for {key} could not be represented exactly: {exc}.",
+            )
+    try:
+        ctx.total_pending_buy_value = exact_decimal_sum(
+            ctx.pending_by_ticker.values(),
+            name="total pending buy value",
         )
-    ctx.total_pending_buy_value = sum(ctx.pending_by_ticker.values(), Decimal("0"))
+    except ValueError as exc:
+        ctx.total_pending_buy_value = Decimal("0")
+        ctx.violate(
+            ViolationCode.INVALID_PENDING_VALUE,
+            f"Total pending buy value could not be represented exactly: {exc}.",
+        )
 
 
 def _check_max_position_pct(ctx: _GateContext) -> None:
-    existing_position_value = sum(
-        (
-            market_value
-            for p, (_, _, market_value) in zip(ctx.portfolio.positions, ctx.position_money)
-            if p.ticker.upper() == ctx.intent.ticker.upper() and market_value is not None
-        ),
-        Decimal("0"),
-    ) + ctx.pending_by_ticker.get(ctx.intent.ticker.upper(), Decimal("0"))
-    new_position_pct = (
-        (existing_position_value + ctx.trade_value)
-        / ctx.portfolio_equity
-        * Decimal("100")
-        if ctx.portfolio_equity is not None and ctx.portfolio_equity
-        else Decimal("0")
-    )
-    max_position_percent = to_decimal(ctx.max_position_pct) * Decimal("100")
-    if new_position_pct > max_position_percent:
+    if ctx.portfolio_equity is None or ctx.portfolio_equity <= 0:
+        return
+    try:
+        existing_position_value = exact_decimal_sum(
+            (
+                market_value
+                for p, (_, _, market_value) in zip(
+                    ctx.portfolio.positions,
+                    ctx.position_money,
+                )
+                if p.ticker.upper() == ctx.intent.ticker.upper()
+                and market_value is not None
+            ),
+            name="existing position value",
+        )
+        existing_position_value = exact_decimal_add(
+            existing_position_value,
+            ctx.pending_by_ticker.get(ctx.intent.ticker.upper(), Decimal("0")),
+            name="existing and pending position value",
+        )
+        projected_position_value = exact_decimal_add(
+            existing_position_value,
+            ctx.trade_value,
+            name="projected position value",
+        )
+        max_position_fraction = to_decimal(
+            ctx.max_position_pct,
+            name="max_position_pct",
+        )
+        max_position_value = exact_decimal_multiply(
+            max_position_fraction,
+            ctx.portfolio_equity,
+            name="maximum position value",
+        )
+        if projected_position_value > max_position_value:
+            projected_pct = _deterministic_percentage(
+                projected_position_value,
+                ctx.portfolio_equity,
+                name="projected position percentage",
+            )
+            max_position_percent = exact_decimal_multiply(
+                max_position_fraction,
+                Decimal("100"),
+                name="maximum position percentage",
+            )
+            ctx.violate(
+                ViolationCode.MAX_POSITION_PCT,
+                f"Position size would be {projected_pct:.1f}% of equity, exceeding the "
+                f"{max_position_percent:.1f}% per-position limit.",
+            )
+    except ValueError as exc:
+        # Exposure-limit codes are owner-overridable.  Arithmetic uncertainty
+        # is not, so normalize it to a hard data-integrity refusal.
         ctx.violate(
-            ViolationCode.MAX_POSITION_PCT,
-            f"Position size would be {new_position_pct:.1f}% of equity, exceeding the "
-            f"{ctx.max_position_pct * 100:.1f}% per-position limit.",
+            ViolationCode.INVALID_POSITION_DATA,
+            f"Position exposure could not be proved exactly: {exc}.",
         )
 
 
@@ -1619,24 +1796,30 @@ def _check_cash_and_reserve(ctx: _GateContext) -> None:
         if ctx.available_cash_override is not None
         else None
     )
-    if ctx.available_cash_override is not None and available_cash_decimal is None:
-        ctx.violate(
-            ViolationCode.INVALID_AVAILABLE_CAPITAL_OVERRIDE,
-            f"available_cash_override must be finite, got {ctx.available_cash_override}.",
-        )
+    if ctx.available_cash_override is not None:
+        if available_cash_decimal is None or available_cash_decimal < 0:
+            ctx.violate(
+                ViolationCode.INVALID_AVAILABLE_CAPITAL_OVERRIDE,
+                "available_cash_override must be non-negative and finite, "
+                f"got {ctx.available_cash_override}.",
+            )
+            available_cash_decimal = None
     available_buying_power_decimal = (
         decimal_or_none(ctx.available_buying_power_override)
         if ctx.available_buying_power_override is not None
         else None
     )
-    if (
-        ctx.available_buying_power_override is not None
-        and available_buying_power_decimal is None
-    ):
-        ctx.violate(
-            ViolationCode.INVALID_AVAILABLE_CAPITAL_OVERRIDE,
-            f"available_buying_power_override must be finite, got {ctx.available_buying_power_override}.",
-        )
+    if ctx.available_buying_power_override is not None:
+        if (
+            available_buying_power_decimal is None
+            or available_buying_power_decimal < 0
+        ):
+            ctx.violate(
+                ViolationCode.INVALID_AVAILABLE_CAPITAL_OVERRIDE,
+                "available_buying_power_override must be non-negative and "
+                f"finite, got {ctx.available_buying_power_override}.",
+            )
+            available_buying_power_decimal = None
 
     # portfolio.cash alone ignores pending/open orders reserving that
     # same cash (e.g. two proposals approved back-to-back, or an
@@ -1651,32 +1834,44 @@ def _check_cash_and_reserve(ctx: _GateContext) -> None:
     # portfolio.cash/buying_power themselves, since those two also feed
     # `existing_invested` below and must stay at their real, unreserved
     # values there.
-    available_capital = (
-        available_cash_decimal
-        if available_cash_decimal is not None
-        else (ctx.portfolio_cash or Decimal("0"))
-    )
-    effective_buying_power = (
-        available_buying_power_decimal
-        if available_buying_power_decimal is not None
-        else ctx.portfolio_buying_power
-    )
-    if effective_buying_power is not None:
-        available_capital = min(available_capital, effective_buying_power)
+    available_capital = ctx.portfolio_cash or Decimal("0")
+    # Overrides are simulation ceilings, never replacement evidence.  Taking
+    # the minimum independently against every available authoritative or
+    # simulated limit preserves the documented tighten-only contract even if
+    # a direct caller supplies an accidentally inflated value.
+    for capital_ceiling in (
+        ctx.portfolio_buying_power,
+        available_cash_decimal,
+        available_buying_power_decimal,
+    ):
+        if capital_ceiling is not None:
+            available_capital = min(available_capital, capital_ceiling)
     if ctx.trade_value > available_capital:
         ctx.violate(
             ViolationCode.INSUFFICIENT_CASH,
             f"Trade value ${ctx.trade_value:,.2f} exceeds available cash ${available_capital:,.2f}.",
         )
-    minimum_cash = (
-        (ctx.portfolio_equity or Decimal("0"))
-        * to_decimal(ctx.min_cash_reserve_pct)
-    )
-    if available_capital - ctx.trade_value < minimum_cash:
+    try:
+        minimum_cash = exact_decimal_multiply(
+            ctx.portfolio_equity or Decimal("0"),
+            to_decimal(ctx.min_cash_reserve_pct, name="min_cash_reserve_pct"),
+            name="minimum cash reserve",
+        )
+        remaining_cash = exact_decimal_subtract(
+            available_capital,
+            ctx.trade_value,
+            name="cash after trade",
+        )
+        if remaining_cash < minimum_cash:
+            ctx.violate(
+                ViolationCode.MIN_CASH_RESERVE,
+                f"Cash after trade would be ${remaining_cash:,.2f}, below the "
+                f"${minimum_cash:,.2f} minimum cash reserve.",
+            )
+    except ValueError as exc:
         ctx.violate(
-            ViolationCode.MIN_CASH_RESERVE,
-            f"Cash after trade would be ${available_capital - ctx.trade_value:,.2f}, below the "
-            f"${minimum_cash:,.2f} minimum cash reserve.",
+            ViolationCode.INVALID_PORTFOLIO_EQUITY,
+            f"Cash-reserve compliance could not be proved exactly: {exc}.",
         )
 
 
@@ -1688,26 +1883,53 @@ def _check_max_total_exposure(ctx: _GateContext) -> None:
     # would be counted twice: once here (via a shrunk cash figure)
     # and again via total_pending_buy_value (see validate_trade_intent's
     # docstring).
-    existing_invested = (
-        (ctx.portfolio_equity or Decimal("0"))
-        - (ctx.portfolio_cash or Decimal("0"))
-        + ctx.total_pending_buy_value
-    )
-    new_invested_pct = (
-        (existing_invested + ctx.trade_value)
-        / ctx.portfolio_equity
-        * Decimal("100")
-        if ctx.portfolio_equity is not None and ctx.portfolio_equity
-        else Decimal("0")
-    )
-    max_total_exposure_percent = (
-        to_decimal(ctx.max_total_exposure_pct) * Decimal("100")
-    )
-    if new_invested_pct > max_total_exposure_percent:
+    if ctx.portfolio_equity is None or ctx.portfolio_equity <= 0:
+        return
+    try:
+        existing_invested = exact_decimal_subtract(
+            ctx.portfolio_equity,
+            ctx.portfolio_cash or Decimal("0"),
+            name="existing invested value",
+        )
+        existing_invested = exact_decimal_add(
+            existing_invested,
+            ctx.total_pending_buy_value,
+            name="existing and pending invested value",
+        )
+        projected_invested = exact_decimal_add(
+            existing_invested,
+            ctx.trade_value,
+            name="projected invested value",
+        )
+        max_total_fraction = to_decimal(
+            ctx.max_total_exposure_pct,
+            name="max_total_exposure_pct",
+        )
+        max_total_value = exact_decimal_multiply(
+            max_total_fraction,
+            ctx.portfolio_equity,
+            name="maximum total exposure value",
+        )
+        if projected_invested > max_total_value:
+            projected_pct = _deterministic_percentage(
+                projected_invested,
+                ctx.portfolio_equity,
+                name="projected total-exposure percentage",
+            )
+            max_total_percent = exact_decimal_multiply(
+                max_total_fraction,
+                Decimal("100"),
+                name="maximum total-exposure percentage",
+            )
+            ctx.violate(
+                ViolationCode.MAX_TOTAL_EXPOSURE_PCT,
+                f"Total invested exposure would be {projected_pct:.1f}% of equity, exceeding the "
+                f"{max_total_percent:.1f}% total-exposure limit.",
+            )
+    except ValueError as exc:
         ctx.violate(
-            ViolationCode.MAX_TOTAL_EXPOSURE_PCT,
-            f"Total invested exposure would be {new_invested_pct:.1f}% of equity, exceeding the "
-            f"{ctx.max_total_exposure_pct * 100:.1f}% total-exposure limit.",
+            ViolationCode.INVALID_POSITION_DATA,
+            f"Total exposure could not be proved exactly: {exc}.",
         )
 
 
@@ -1718,74 +1940,131 @@ def _check_basket_concentration(ctx: _GateContext) -> None:
             and ctx.intent.ticker not in basket_tickers
         ):
             continue
-        existing_basket_value = sum(
-            (
-                market_value
-                for p, (_, _, market_value) in zip(ctx.portfolio.positions, ctx.position_money)
-                if p.ticker.upper() in basket_tickers and market_value is not None
-            ),
-            Decimal("0"),
-        ) + sum(
-            (v for t, v in ctx.pending_by_ticker.items() if t in basket_tickers),
-            Decimal("0"),
-        )
-        new_basket_pct = (
-            (existing_basket_value + ctx.trade_value)
-            / ctx.portfolio_equity
-            * Decimal("100")
-            if ctx.portfolio_equity is not None and ctx.portfolio_equity
-            else Decimal("0")
-        )
-        if new_basket_pct > to_decimal(ctx.max_basket_pct):
+        if ctx.portfolio_equity is None or ctx.portfolio_equity <= 0:
+            return
+        try:
+            existing_basket_value = exact_decimal_sum(
+                (
+                    market_value
+                    for p, (_, _, market_value) in zip(
+                        ctx.portfolio.positions,
+                        ctx.position_money,
+                    )
+                    if p.ticker.upper() in basket_tickers
+                    and market_value is not None
+                ),
+                name=f"existing {basket_name} basket value",
+            )
+            pending_basket_value = exact_decimal_sum(
+                (v for t, v in ctx.pending_by_ticker.items() if t in basket_tickers),
+                name=f"pending {basket_name} basket value",
+            )
+            projected_basket_value = exact_decimal_sum(
+                (existing_basket_value, pending_basket_value, ctx.trade_value),
+                name=f"projected {basket_name} basket value",
+            )
+            projected_scaled = exact_decimal_multiply(
+                projected_basket_value,
+                Decimal("100"),
+                name=f"projected {basket_name} scaled basket value",
+            )
+            maximum_scaled = exact_decimal_multiply(
+                to_decimal(ctx.max_basket_pct, name="max_basket_pct"),
+                ctx.portfolio_equity,
+                name=f"maximum {basket_name} scaled basket value",
+            )
+            if projected_scaled > maximum_scaled:
+                projected_pct = _deterministic_percentage(
+                    projected_basket_value,
+                    ctx.portfolio_equity,
+                    name=f"projected {basket_name} basket percentage",
+                )
+                ctx.violate(
+                    ViolationCode.MAX_BASKET_PCT,
+                    f"'{basket_name}' exposure would be {projected_pct:.1f}% of equity, exceeding the "
+                    f"{to_decimal(ctx.max_basket_pct):.1f}% basket concentration limit.",
+                )
+        except ValueError as exc:
             ctx.violate(
-                ViolationCode.MAX_BASKET_PCT,
-                f"'{basket_name}' exposure would be {new_basket_pct:.1f}% of equity, exceeding the "
-                f"{ctx.max_basket_pct:.1f}% basket concentration limit.",
+                ViolationCode.INVALID_POSITION_DATA,
+                f"'{basket_name}' exposure could not be proved exactly: {exc}.",
             )
 
 
 def _check_leveraged_etf_concentration(ctx: _GateContext) -> None:
     if ctx.intent.ticker.upper() not in LEVERAGED_ETF_TICKERS:
         return
-    existing_leveraged_value = sum(
-        (
-            market_value
-            for p, (_, _, market_value) in zip(ctx.portfolio.positions, ctx.position_money)
-            if p.is_leveraged_etf and market_value is not None
-        ),
-        Decimal("0"),
-    ) + sum(
-        (
-            v
-            for t, v in ctx.pending_by_ticker.items()
-            if t in LEVERAGED_ETF_TICKERS
-        ),
-        Decimal("0"),
-    )
-    new_leveraged_pct = (
-        (existing_leveraged_value + ctx.trade_value)
-        / ctx.portfolio_equity
-        * Decimal("100")
-        if ctx.portfolio_equity is not None and ctx.portfolio_equity
-        else Decimal("0")
-    )
-    if new_leveraged_pct > to_decimal(ctx.max_leveraged_etf_pct):
+    if ctx.portfolio_equity is None or ctx.portfolio_equity <= 0:
+        return
+    try:
+        existing_leveraged_value = exact_decimal_sum(
+            (
+                market_value
+                for p, (_, _, market_value) in zip(
+                    ctx.portfolio.positions,
+                    ctx.position_money,
+                )
+                if p.is_leveraged_etf and market_value is not None
+            ),
+            name="existing leveraged ETF value",
+        )
+        pending_leveraged_value = exact_decimal_sum(
+            (
+                value
+                for ticker, value in ctx.pending_by_ticker.items()
+                if ticker in LEVERAGED_ETF_TICKERS
+            ),
+            name="pending leveraged ETF value",
+        )
+        projected_leveraged_value = exact_decimal_sum(
+            (existing_leveraged_value, pending_leveraged_value, ctx.trade_value),
+            name="projected leveraged ETF value",
+        )
+        projected_scaled = exact_decimal_multiply(
+            projected_leveraged_value,
+            Decimal("100"),
+            name="projected leveraged ETF scaled value",
+        )
+        maximum_scaled = exact_decimal_multiply(
+            to_decimal(ctx.max_leveraged_etf_pct, name="max_leveraged_etf_pct"),
+            ctx.portfolio_equity,
+            name="maximum leveraged ETF scaled value",
+        )
+        if projected_scaled > maximum_scaled:
+            projected_pct = _deterministic_percentage(
+                projected_leveraged_value,
+                ctx.portfolio_equity,
+                name="projected leveraged ETF percentage",
+            )
+            ctx.violate(
+                ViolationCode.MAX_LEVERAGED_ETF_PCT,
+                f"Leveraged ETF exposure would be {projected_pct:.1f}% of equity, exceeding the "
+                f"{to_decimal(ctx.max_leveraged_etf_pct):.1f}% leveraged-ETF limit.",
+            )
+    except ValueError as exc:
         ctx.violate(
-            ViolationCode.MAX_LEVERAGED_ETF_PCT,
-            f"Leveraged ETF exposure would be {new_leveraged_pct:.1f}% of equity, exceeding the "
-            f"{ctx.max_leveraged_etf_pct:.1f}% leveraged-ETF limit.",
+            ViolationCode.INVALID_POSITION_DATA,
+            f"Leveraged ETF exposure could not be proved exactly: {exc}.",
         )
 
 
 def _check_sell_exceeds_held(ctx: _GateContext) -> None:
-    held_shares = sum(
-        (
-            shares
-            for p, shares in zip(ctx.portfolio.positions, ctx.position_shares)
-            if p.ticker.upper() == ctx.intent.ticker.upper() and shares is not None
-        ),
-        Decimal("0"),
-    )
+    try:
+        held_shares = exact_decimal_sum(
+            (
+                shares
+                for p, shares in zip(ctx.portfolio.positions, ctx.position_shares)
+                if p.ticker.upper() == ctx.intent.ticker.upper()
+                and shares is not None
+            ),
+            name="held share quantity",
+        )
+    except ValueError as exc:
+        ctx.violate(
+            ViolationCode.INVALID_POSITION_DATA,
+            f"Held share quantity could not be proved exactly: {exc}.",
+        )
+        return
     if ctx.safe_shares > held_shares:
         ctx.violate(
             ViolationCode.SELL_EXCEEDS_HELD,
@@ -1892,16 +2171,37 @@ def _check_limit_price_and_slippage(ctx: _GateContext) -> None:
             "Limit orders require a positive, finite limit price.",
         )
     elif ctx.reference_price_decimal is not None and ctx.reference_price_decimal > 0:
-        slippage_pct = (
-            abs(limit_price_decimal - ctx.reference_price_decimal)
-            / ctx.reference_price_decimal
-            * Decimal("100")
-        )
-        if slippage_pct > to_decimal(ctx.max_slippage_pct):
+        try:
+            price_delta = exact_decimal_subtract(
+                limit_price_decimal,
+                ctx.reference_price_decimal,
+                name="limit/reference price difference",
+            ).copy_abs()
+            scaled_delta = exact_decimal_multiply(
+                price_delta,
+                Decimal("100"),
+                name="scaled limit/reference price difference",
+            )
+            maximum_scaled_delta = exact_decimal_multiply(
+                to_decimal(ctx.max_slippage_pct, name="max_slippage_pct"),
+                ctx.reference_price_decimal,
+                name="maximum scaled slippage",
+            )
+            if scaled_delta > maximum_scaled_delta:
+                slippage_pct = _deterministic_percentage(
+                    price_delta,
+                    ctx.reference_price_decimal,
+                    name="limit-price slippage percentage",
+                )
+                ctx.violate(
+                    ViolationCode.MAX_SLIPPAGE,
+                    f"Limit price ${limit_price_decimal:.2f} is {slippage_pct:.1f}% away from the reference price "
+                    f"${ctx.reference_price_decimal:.2f}, exceeding the {to_decimal(ctx.max_slippage_pct):.1f}% max-slippage limit.",
+                )
+        except ValueError as exc:
             ctx.violate(
                 ViolationCode.MAX_SLIPPAGE,
-                f"Limit price ${limit_price_decimal:.2f} is {slippage_pct:.1f}% away from the reference price "
-                f"${ctx.reference_price_decimal:.2f}, exceeding the {ctx.max_slippage_pct:.1f}% max-slippage limit.",
+                f"Limit-price slippage could not be proved exactly: {exc}.",
             )
 
 
@@ -1936,18 +2236,51 @@ def _check_bid_ask_quote_and_spread(ctx: _GateContext) -> None:
             "a stale or corrupted quote, not a tradeable market.",
         )
     else:
-        mid = (bid_price_decimal + ask_price_decimal) / Decimal("2")
-        spread_pct = (
-            (ask_price_decimal - bid_price_decimal)
-            / mid
-            * Decimal("100")
-        )
-        if spread_pct > to_decimal(ctx.max_spread_pct):
+        try:
+            quote_sum = exact_decimal_add(
+                bid_price_decimal,
+                ask_price_decimal,
+                name="bid/ask sum",
+            )
+            spread = exact_decimal_subtract(
+                ask_price_decimal,
+                bid_price_decimal,
+                name="bid/ask spread",
+            )
+            # spread / midpoint * 100 == spread * 200 / (bid + ask).
+            # Compare the exact cross-products; the quotient below is display
+            # only and cannot authorize the order.
+            scaled_spread = exact_decimal_multiply(
+                spread,
+                Decimal("200"),
+                name="scaled bid/ask spread",
+            )
+            maximum_scaled_spread = exact_decimal_multiply(
+                to_decimal(ctx.max_spread_pct, name="max_spread_pct"),
+                quote_sum,
+                name="maximum scaled bid/ask spread",
+            )
+            if scaled_spread > maximum_scaled_spread:
+                spread_ratio = deterministic_decimal_divide(
+                    spread,
+                    quote_sum,
+                    name="bid/ask spread ratio",
+                )
+                spread_pct = exact_decimal_multiply(
+                    spread_ratio,
+                    Decimal("200"),
+                    name="bid/ask spread percentage",
+                )
+                ctx.violate(
+                    ViolationCode.MAX_SPREAD,
+                    f"Bid/ask spread is {spread_pct:.2f}% (bid ${bid_price_decimal:.2f} / ask ${ask_price_decimal:.2f}), "
+                    f"exceeding the {to_decimal(ctx.max_spread_pct):.2f}% max-spread limit -- a market order here could fill "
+                    "well away from the reference price.",
+                )
+        except ValueError as exc:
             ctx.violate(
                 ViolationCode.MAX_SPREAD,
-                f"Bid/ask spread is {spread_pct:.2f}% (bid ${bid_price_decimal:.2f} / ask ${ask_price_decimal:.2f}), "
-                f"exceeding the {ctx.max_spread_pct:.2f}% max-spread limit -- a market order here could fill "
-                "well away from the reference price.",
+                f"Bid/ask spread compliance could not be proved exactly: {exc}.",
             )
 
 

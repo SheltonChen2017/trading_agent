@@ -26,10 +26,10 @@ import os
 import re
 import time
 import warnings
-from decimal import Decimal, InvalidOperation
 
 import config
 from assistant.storage import AssistantStore
+from data.financial_primitives import decimal_text
 
 _MODEL = "claude-opus-5"
 _REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v4"
@@ -622,14 +622,9 @@ def _canonical_number(token: str) -> str | None:
     """
     cleaned = token.replace(",", "")
     try:
-        value = Decimal(cleaned)
-    except InvalidOperation:
+        return decimal_text(cleaned)
+    except ValueError:
         return None
-    # normalize() collapses trailing zeros; the explicit zero case avoids
-    # Decimal("-0") and Decimal("0.0") canonicalizing to different strings.
-    if value == 0:
-        return "0"
-    return str(value.normalize())
 
 
 def _unsupported_numbers(text: str, source_text: str) -> list[str]:

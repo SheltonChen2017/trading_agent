@@ -1,5 +1,16 @@
 # Independent review — root P1/P2/P3 remediation series (2026-08-27)
 
+> **Superseded for current-state use by Codex counter-review.** This file is
+> retained as Claude's historical, as-written review record. Its verdict,
+> finding distribution, per-commit-review claim, validation conclusion, and
+> correction design are not authoritative after the counter-review. Use
+> [`COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md`](COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md)
+> for the exact six-commit disposition, corrected count, accepted corrections,
+> remaining open issues, and final validation. The historical body below says
+> 46 findings, but contains **45 unique finding IDs**: P1=2, P2=13, P3=20,
+> P4=10. `BRK-003` is referenced as superseded by `POL-001` but has no ledger
+> row. P4 is not a permitted issue priority under the governing review process.
+
 Reviewer: Claude (independent), generic separate-review-branch workflow
 Review branch: `user/claude/review-root-remediation-20260827`
 Implementer: Codex

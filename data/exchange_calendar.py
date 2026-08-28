@@ -16,14 +16,34 @@ import pandas_market_calendars as mcal
 
 _NYSE = mcal.get_calendar("NYSE")
 _EASTERN = "America/New_York"
+# pandas-market-calendars can synthesize schedules arbitrarily far into the
+# past or future.  That is useful library behaviour, but it is not evidence
+# that an extreme date belongs to this project's operating horizon.  Bound the
+# authority surface explicitly: 1990 retains the intended modern-history
+# research window, while 2035 covers the pinned 2,000-session horizon through
+# 2034.  This is an input-safety policy, not a claim that every session in the
+# interval was independently audited; moving either edge requires review.
+SUPPORTED_SESSION_START = date(1990, 1, 1)
+SUPPORTED_SESSION_END = date(2035, 12, 31)
 
 
 class ExchangeCalendarError(ValueError):
     """A date or horizon cannot be proved against the exchange calendar."""
 
 
+def _require_supported_date(value: date, name: str) -> date:
+    if type(value) is not date:
+        raise ExchangeCalendarError(f"{name} must be a calendar date")
+    if value < SUPPORTED_SESSION_START or value > SUPPORTED_SESSION_END:
+        raise ExchangeCalendarError(
+            f"{name} falls outside the configured project authority range "
+            f"{SUPPORTED_SESSION_START.isoformat()}..{SUPPORTED_SESSION_END.isoformat()}"
+        )
+    return value
+
+
 def parse_session_date(value: Any, name: str = "session") -> date:
-    if not isinstance(value, str):
+    if type(value) is not str:
         raise ExchangeCalendarError(f"{name} must use canonical YYYY-MM-DD format")
     try:
         parsed = date.fromisoformat(value)
@@ -33,15 +53,21 @@ def parse_session_date(value: Any, name: str = "session") -> date:
         ) from exc
     if parsed.isoformat() != value:
         raise ExchangeCalendarError(f"{name} must use canonical YYYY-MM-DD format")
-    return parsed
+    return _require_supported_date(parsed, name)
 
 
 def _schedule(start: date, end: date) -> pd.DataFrame:
+    start = _require_supported_date(start, "start")
+    end = _require_supported_date(end, "end")
+    if end < start:
+        raise ExchangeCalendarError("end must not precede start")
     return _NYSE.schedule(start_date=start.isoformat(), end_date=end.isoformat())
 
 
 def trading_sessions(start: date, end: date) -> tuple[date, ...]:
     """Real NYSE sessions in the inclusive interval ``[start, end]``."""
+    start = _require_supported_date(start, "start")
+    end = _require_supported_date(end, "end")
     if end < start:
         raise ExchangeCalendarError("end must not precede start")
     schedule = _schedule(start, end)
@@ -84,10 +110,15 @@ def resolve_nth_session_after(anchor_date: str, count: int) -> str:
     anchor = parse_session_date(anchor_date, "anchor_date")
     horizon_days = max(count * 3, count + 30)
     try:
-        end = anchor + timedelta(days=horizon_days)
+        requested_end = anchor + timedelta(days=horizon_days)
         start = anchor + timedelta(days=1)
     except OverflowError as exc:
         raise ExchangeCalendarError("session search exceeds representable dates") from exc
+    # The conservative calendar-day over-fetch can extend well beyond the
+    # actual target session.  Clamp the query, not the requested session count,
+    # so a target inside the authority range remains resolvable while a target
+    # beyond it still fails on insufficient covered sessions.
+    end = min(requested_end, SUPPORTED_SESSION_END)
     sessions = trading_sessions(start, end)
     if len(sessions) < count:
         raise ExchangeCalendarError(
@@ -98,15 +129,24 @@ def resolve_nth_session_after(anchor_date: str, count: int) -> str:
 
 def next_session_open_strictly_after(instant: datetime) -> tuple[str, datetime]:
     """Return the first NYSE session/open whose open is strictly after ``instant``."""
-    if not isinstance(instant, datetime) or instant.tzinfo is None or instant.utcoffset() is None:
+    if not isinstance(instant, datetime) or instant.tzinfo is None:
         raise ExchangeCalendarError("instant must be a timezone-aware datetime")
-    instant_utc = instant.astimezone(timezone.utc)
-    anchor = instant_utc.date()
     try:
-        end = anchor + timedelta(days=31)
-        start = anchor - timedelta(days=1)
+        if instant.utcoffset() is None:
+            raise ExchangeCalendarError("instant must be a timezone-aware datetime")
+        instant_utc = instant.astimezone(timezone.utc)
+    except (OSError, OverflowError, TypeError, ValueError) as exc:
+        raise ExchangeCalendarError(
+            "instant must be a representable timezone-aware datetime"
+        ) from exc
+    anchor = _require_supported_date(instant_utc.date(), "instant")
+    try:
+        requested_end = anchor + timedelta(days=31)
+        requested_start = anchor - timedelta(days=1)
     except OverflowError as exc:
         raise ExchangeCalendarError("session search exceeds representable dates") from exc
+    start = max(requested_start, SUPPORTED_SESSION_START)
+    end = min(requested_end, SUPPORTED_SESSION_END)
     for session in trading_sessions(start, end):
         session_text = session.isoformat()
         market_open = session_open_instant(session_text)
@@ -130,12 +170,13 @@ def resolve_target_session(as_of_session: str, horizon_sessions: int) -> str:
     start = parse_session_date(as_of_session, "as_of_session")
     horizon_days = max(horizon_sessions * 3, horizon_sessions + 30)
     try:
-        window_end = start + timedelta(days=horizon_days)
+        requested_window_end = start + timedelta(days=horizon_days)
     except OverflowError as exc:
         raise ExchangeCalendarError(
             f"horizon_sessions={horizon_sessions} extends beyond representable "
             "dates; no exchange calendar can cover it"
         ) from exc
+    window_end = min(requested_window_end, SUPPORTED_SESSION_END)
     sessions = trading_sessions(start, window_end)
     if not sessions or sessions[0] != start:
         raise ExchangeCalendarError(

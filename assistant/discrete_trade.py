@@ -27,9 +27,15 @@ through `assistant.money`.
 from __future__ import annotations
 
 import dataclasses
-from decimal import ROUND_FLOOR, Decimal, DecimalException
+from decimal import Context, ROUND_FLOOR, Decimal, DecimalException, localcontext
 
-from assistant.money import decimal_or_none, decimal_text
+from assistant.money import (
+    decimal_or_none,
+    decimal_text,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+)
 from risk.execution_gate import (
     MAX_ORDER_QUANTITY,
     canonical_order_quantity,
@@ -49,6 +55,86 @@ from risk.execution_gate import (
 # alias is kept so this module's existing call sites and their tests keep
 # reading in local terms.
 _MAX_SIZABLE_SHARES = MAX_ORDER_QUANTITY
+_FRACTIONAL_QUANTUM = Decimal("0.000000001")
+_FLOOR_CONTEXT_PRECISION = 64
+
+
+def _floor_budget_quantity(
+    amount: Decimal,
+    price: Decimal,
+    *,
+    whole_shares_only: bool,
+) -> Decimal | None:
+    """Return the greatest permitted quantity that cannot exceed ``amount``.
+
+    Division is a projection, so it uses an explicit floor-rounded context.
+    Exact cross-products on both sides then prove that the result neither
+    overspends nor leaves one additional share quantum affordable.
+    """
+    quantum = Decimal("1") if whole_shares_only else _FRACTIONAL_QUANTUM
+    try:
+        maximum_notional = exact_decimal_multiply(
+            price,
+            _MAX_SIZABLE_SHARES,
+            name="maximum discrete-trade notional",
+        )
+    except ValueError:
+        return None
+    if amount > maximum_notional:
+        return None
+
+    try:
+        with localcontext(
+            Context(prec=_FLOOR_CONTEXT_PRECISION, rounding=ROUND_FLOOR)
+        ):
+            quotient = amount / price
+            sized = (
+                quotient.to_integral_value(rounding=ROUND_FLOOR)
+                if whole_shares_only
+                else quotient.quantize(quantum, rounding=ROUND_FLOOR)
+            )
+        notional = exact_decimal_multiply(
+            sized,
+            price,
+            name="floored discrete-trade notional",
+        )
+        if notional > amount:
+            # Defensive correction if a future Decimal implementation ever
+            # violates the floor-context assumption. Never return an
+            # overspending quantity.
+            sized = exact_decimal_subtract(
+                sized,
+                quantum,
+                name="discrete-trade floor correction",
+            )
+            if sized < 0:
+                return None
+            notional = exact_decimal_multiply(
+                sized,
+                price,
+                name="corrected discrete-trade notional",
+            )
+            if notional > amount:
+                return None
+
+        if sized < _MAX_SIZABLE_SHARES:
+            next_quantity = exact_decimal_add(
+                sized,
+                quantum,
+                name="next discrete-trade quantity",
+            )
+            next_notional = exact_decimal_multiply(
+                next_quantity,
+                price,
+                name="next discrete-trade notional",
+            )
+            if next_notional <= amount:
+                # A fixed projection that undersized by a whole quantum is
+                # not the exact budget conversion this API promises.
+                return None
+    except (DecimalException, ValueError):
+        return None
+    return sized
 
 
 @dataclasses.dataclass(frozen=True)
@@ -98,14 +184,12 @@ def size_by_dollar_amount(
             ),
         }
 
-    try:
-        raw_quantity = amount / price_decimal
-        sized_quantity = (
-            raw_quantity.to_integral_value(rounding=ROUND_FLOOR)
-            if whole_shares_only
-            else raw_quantity.quantize(Decimal("0.000000001"), rounding=ROUND_FLOOR)
-        )
-    except DecimalException:
+    sized_quantity = _floor_budget_quantity(
+        amount,
+        price_decimal,
+        whole_shares_only=whole_shares_only,
+    )
+    if sized_quantity is None:
         return {
             "ok": False,
             "reason": "The resulting share quantity is too large to size safely.",
@@ -136,9 +220,21 @@ def size_by_dollar_amount(
         quantity_decimal = order_quantity_decimal(
             shares, whole_shares_only=whole_shares_only
         )
-        notional = price_decimal * quantity_decimal
-        unallocated = amount - notional
-    except DecimalException:
+        if quantity_decimal is None:
+            raise ValueError("canonical quantity has no exact representation")
+        notional = exact_decimal_multiply(
+            price_decimal,
+            quantity_decimal,
+            name="discrete-trade notional",
+        )
+        unallocated = exact_decimal_subtract(
+            amount,
+            notional,
+            name="discrete-trade unallocated budget",
+        )
+        if unallocated < 0:
+            raise ValueError("sized quantity exceeds the owner budget")
+    except (DecimalException, ValueError):
         return {
             "ok": False,
             "reason": "The resulting dollar calculation is too large to size safely.",
@@ -181,8 +277,19 @@ def notional_for_shares(
                 else "Shares must be a positive exact number with at most 9 decimal places."
             ),
         }
+    try:
+        notional = exact_decimal_multiply(
+            price_decimal,
+            quantity,
+            name="share-mode discrete-trade notional",
+        )
+    except ValueError:
+        return {
+            "ok": False,
+            "reason": "The resulting dollar calculation is too large to size safely.",
+        }
     return {
         "ok": True,
-        "notional_text": decimal_text(price_decimal * quantity),
+        "notional_text": decimal_text(notional),
         "reference_price_text": decimal_text(price_decimal),
     }

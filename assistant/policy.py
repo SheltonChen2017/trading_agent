@@ -160,6 +160,18 @@ class TradingPolicy:
     SUPPORTED_ORDER_TYPES = ("market", "limit")
 
     def validate(self) -> None:
+        for field_name in ("version", "name"):
+            value = getattr(self, field_name)
+            if (
+                not isinstance(value, str)
+                or not value
+                or value != value.strip()
+            ):
+                raise ValueError(
+                    f"{field_name} must be canonical non-empty text, got {value!r}."
+                )
+        if not isinstance(self.notes, str):
+            raise ValueError(f"notes must be text, got {self.notes!r}.")
         if self.execution_mode not in ("read_only", "paper"):
             raise ValueError(
                 f"execution_mode must be 'read_only' or 'paper', got {self.execution_mode!r}."

@@ -11,7 +11,7 @@ A dollar amount is a BUDGET floored to whole shares (owner decision
   order at $0.10 against a $0.30 cap because 3 * 0.10 is 0.30000000000000004.
 """
 import sys
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -51,6 +51,30 @@ def test_the_float_boundary_that_broke_the_max_order_value_check():
     # module's job is to be exact, and the float version got 2 shares here.
     assert Decimal(sizing.notional_text) == Decimal("0.30")
     assert Decimal(sizing.unallocated_text) == 0
+
+
+@pytest.mark.parametrize("whole_shares_only", [True, False])
+def test_dollar_sizing_never_rounds_over_budget_under_low_ambient_precision(
+    whole_shares_only,
+):
+    amount = "9.999" if whole_shares_only else "0.9999999999"
+    price = "1" if whole_shares_only else "0.1"
+
+    with localcontext() as context:
+        context.prec = 2
+        result = size_by_dollar_amount(
+            amount,
+            price,
+            whole_shares_only=whole_shares_only,
+        )
+
+    assert result["ok"] is True
+    sizing = result["sizing"]
+    assert Decimal(sizing.notional_text) <= Decimal(amount)
+    assert Decimal(sizing.notional_text) + Decimal(
+        sizing.unallocated_text
+    ) == Decimal(amount)
+    assert sizing.shares == (9 if whole_shares_only else "9.999999999")
 
 
 def test_a_budget_below_one_share_is_refused_not_rounded_up():
@@ -98,6 +122,15 @@ def test_notional_for_shares_is_exact():
     assert Decimal(result["notional_text"]) == Decimal("0.30"), (
         "float would give 0.30000000000000004"
     )
+
+
+def test_share_mode_notional_is_exact_under_low_ambient_precision():
+    with localcontext() as context:
+        context.prec = 2
+        result = notional_for_shares(999, "123.45")
+
+    assert result["ok"] is True
+    assert result["notional_text"] == "123326.55"
 
 
 @pytest.mark.parametrize("shares", [0, -1, 2.0, True, "3", None])

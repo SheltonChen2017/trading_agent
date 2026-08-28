@@ -629,6 +629,7 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
     package = Path(__file__).resolve().parents[2] / "research" / "analyst_revisions_v2"
     expected = {
         "dataset.py": {"_DATASET_AUTHORITIES"},
+        "firm_ontology.py": {"_ONTOLOGY_AUTHORITIES"},
         "formulas.py": {"_POLICY_AUTHORITIES"},
         "holdings.py": {"_STOCK_SCORE_AUTHORITIES"},
         "preregistration.py": {"_REVIEWED_AUTHORITIES"},

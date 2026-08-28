@@ -27,7 +27,7 @@ from .canonical import (
 from .evidence import SourceRowLocator
 
 
-SNAPSHOT_MANIFEST_SCHEMA = "arv2-source-snapshot-manifest-v1"
+SNAPSHOT_MANIFEST_SCHEMA = "arv2-source-snapshot-manifest-v2"
 INCOMPLETE_DIAGNOSTIC_STATUS = "INVALID_INCOMPLETE_DIAGNOSTIC_ONLY"
 MANIFEST_FILENAME = "manifest.json"
 _MANIFEST_KEYS = frozenset(
@@ -36,6 +36,7 @@ _MANIFEST_KEYS = frozenset(
         "snapshot_id",
         "provider_contract_id",
         "provider_contract_sha256",
+        "captured_at",
         "complete",
         "terminated_naturally",
         "requested_first_year",
@@ -101,6 +102,7 @@ class VerifiedSnapshot:
     snapshot_id: str
     provider_contract_id: str
     provider_contract_sha256: str
+    captured_at: str
     manifest_bytes: bytes
     manifest_sha256: str
     requested_first_year: int
@@ -125,6 +127,7 @@ def _snapshot_fingerprint(snapshot: VerifiedSnapshot) -> tuple[object, ...]:
         snapshot.snapshot_id,
         snapshot.provider_contract_id,
         snapshot.provider_contract_sha256,
+        snapshot.captured_at,
         snapshot.manifest_bytes,
         snapshot.manifest_sha256,
         snapshot.requested_first_year,
@@ -170,6 +173,7 @@ def _verified_snapshot(
     snapshot_id: str,
     provider_contract_id: str,
     provider_contract_sha256: str,
+    captured_at: str,
     manifest_bytes: bytes,
     manifest_sha256: str,
     requested_first_year: int,
@@ -187,6 +191,7 @@ def _verified_snapshot(
         "snapshot_id": snapshot_id,
         "provider_contract_id": provider_contract_id,
         "provider_contract_sha256": provider_contract_sha256,
+        "captured_at": captured_at,
         "manifest_bytes": manifest_bytes,
         "manifest_sha256": manifest_sha256,
         "requested_first_year": requested_first_year,
@@ -205,8 +210,11 @@ def _verified_snapshot(
     require_identifier(snapshot_id, "snapshot_id")
     require_identifier(provider_contract_id, "provider_contract_id")
     require_sha256(provider_contract_sha256, "provider_contract_sha256")
+    captured = parse_utc_timestamp(captured_at, "captured_at")
     require_sha256(manifest_sha256, "manifest_sha256")
-    parse_utc_timestamp(verified_at, "verified_at")
+    verified = parse_utc_timestamp(verified_at, "verified_at")
+    if captured > verified:
+        raise SnapshotVerificationError("captured_at cannot be later than verified_at")
     if sha256_bytes(manifest_bytes) != manifest_sha256:
         raise SnapshotVerificationError("manifest bytes/hash mismatch")
     if source_row_count != len(rows) or source_row_count <= 0:
@@ -266,6 +274,7 @@ class IncompleteDiagnosticSnapshot:
     snapshot_id: str
     provider_contract_id: str
     provider_contract_sha256: str
+    captured_at: str
     manifest_bytes: bytes
     manifest_sha256: str
     requested_first_year: int
@@ -297,6 +306,7 @@ def _manifest_record(payload: bytes) -> dict[str, Any]:
     require_identifier(value["snapshot_id"], "snapshot_id")
     require_identifier(value["provider_contract_id"], "provider_contract_id")
     require_sha256(value["provider_contract_sha256"], "provider_contract_sha256")
+    parse_utc_timestamp(value["captured_at"], "captured_at")
     require_exact_bool(value["complete"], "complete")
     require_exact_bool(value["terminated_naturally"], "terminated_naturally")
     if value["complete"] != value["terminated_naturally"]:
@@ -411,7 +421,10 @@ def load_snapshot(
     verified_timestamp = verified_at or format_utc_timestamp(
         datetime.now(timezone.utc)
     )
-    parse_utc_timestamp(verified_timestamp, "verified_at")
+    verified_instant = parse_utc_timestamp(verified_timestamp, "verified_at")
+    captured_instant = parse_utc_timestamp(manifest["captured_at"], "captured_at")
+    if captured_instant > verified_instant:
+        raise SnapshotVerificationError("captured_at cannot be later than verified_at")
 
     partitions: list[VerifiedPartition] = []
     rows: list[VerifiedSourceRow] = []
@@ -509,6 +522,7 @@ def load_snapshot(
         snapshot_id=manifest["snapshot_id"],
         provider_contract_id=manifest["provider_contract_id"],
         provider_contract_sha256=manifest["provider_contract_sha256"],
+        captured_at=manifest["captured_at"],
         manifest_bytes=manifest_bytes,
         manifest_sha256=manifest_sha256,
         requested_first_year=manifest["requested_first_year"],

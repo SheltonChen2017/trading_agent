@@ -74,6 +74,10 @@ def write_snapshot(
     requested_last_year: int | None = None,
     complete: bool = True,
     pages_per_year: int = 1,
+    snapshot_id: str = "snapshot-main",
+    provider_contract_id: str = "provider-contract-v1",
+    provider_contract_sha256: str = PROVIDER_CONTRACT_HASH,
+    captured_at: str = "2026-08-26T11:59:00.000000Z",
 ) -> Path:
     root.mkdir(parents=True)
     if rows_by_year:
@@ -111,9 +115,10 @@ def write_snapshot(
         total += len(year_rows)
     manifest = {
         "schema": SNAPSHOT_MANIFEST_SCHEMA,
-        "snapshot_id": "snapshot-main",
-        "provider_contract_id": "provider-contract-v1",
-        "provider_contract_sha256": PROVIDER_CONTRACT_HASH,
+        "snapshot_id": snapshot_id,
+        "provider_contract_id": provider_contract_id,
+        "provider_contract_sha256": provider_contract_sha256,
+        "captured_at": captured_at,
         "complete": complete,
         "terminated_naturally": complete,
         "requested_first_year": first,

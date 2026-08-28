@@ -126,6 +126,8 @@ def test_every_snapshot_consumer_reloads_bound_manifest_and_pages(tmp_path):
         "reversed_years",
         "wrong_partition_key",
         "unknown_manifest_key",
+        "invalid_capture_time",
+        "future_capture_time",
     ],
 )
 def test_snapshot_manifest_is_exact_and_complete(tmp_path, mutation):
@@ -142,6 +144,10 @@ def test_snapshot_manifest_is_exact_and_complete(tmp_path, mutation):
         manifest["requested_first_year"] = 2021
     elif mutation == "wrong_partition_key":
         manifest["partition_key"] = "year"
+    elif mutation == "invalid_capture_time":
+        manifest["captured_at"] = "2026-08-26 11:59:00"
+    elif mutation == "future_capture_time":
+        manifest["captured_at"] = "2026-08-27T11:59:00.000000Z"
     else:
         manifest["unexpected"] = "not allowed"
     write_manifest(root, manifest)
@@ -257,6 +263,17 @@ def test_incomplete_snapshot_is_a_diagnostic_type_never_publishable(tmp_path):
             build_recipe_id="recipe-1",
             producing_commit=COMMIT,
         )
+
+
+def test_incomplete_snapshot_still_refuses_a_future_capture_time(tmp_path):
+    root = write_snapshot(
+        tmp_path / "future-diagnostic",
+        rows_by_year={2020: [raw_row(2020, "a")]},
+        complete=False,
+        captured_at="2026-08-27T12:00:00.000000Z",
+    )
+    with pytest.raises(SnapshotVerificationError, match="later than verified_at"):
+        load_snapshot(root, verified_at=FIXED_VERIFIED_AT)
 
 
 def test_non_authoritative_event_contract_replays_revision_states(tmp_path):

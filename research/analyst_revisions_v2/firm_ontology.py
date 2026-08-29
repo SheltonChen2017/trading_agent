@@ -30,9 +30,14 @@ from .canonical import (
     require_text,
     sha256_bytes,
 )
+from .production_registry import require_production_registry_entry
 
 
 FIRM_ONTOLOGY_SCHEMA = "arv2-firm-rating-ontology-v1"
+FIRM_ONTOLOGY_REGISTRY_SCHEMA = "arv2-firm-ontology-registry-v1"
+FIRM_ONTOLOGY_REGISTRY_PATH = (
+    Path(__file__).resolve().parent / "specs" / "firm_ontology_registry.json"
+)
 _ONTOLOGY_KEYS = frozenset(
     {"schema", "ontology_id", "version", "status", "reviewed_at", "entries"}
 )
@@ -338,8 +343,11 @@ def _ontology_from_payload(path: Path, payload: bytes) -> ReviewedFirmRatingOnto
 def load_reviewed_firm_rating_ontology(
     path: str | Path,
 ) -> ReviewedFirmRatingOntology:
+    candidate = Path(path).expanduser()
+    if candidate.is_symlink():
+        raise FirmOntologyError("firm rating ontology must not be a symlink")
     try:
-        resolved = Path(path).expanduser().resolve(strict=True)
+        resolved = candidate.resolve(strict=True)
     except OSError as exc:
         raise FirmOntologyError("firm rating ontology is absent or unreadable") from exc
     if not resolved.is_file() or resolved.is_symlink():
@@ -376,6 +384,27 @@ def revalidate_firm_rating_ontology(
     if reparsed != ontology.entries:
         raise FirmOntologyError("firm rating ontology entries changed")
     return ontology
+
+
+def require_registered_production_firm_ontology(
+    ontology: ReviewedFirmRatingOntology,
+) -> ReviewedFirmRatingOntology:
+    """Require the exact structural ontology to have an external review anchor.
+
+    The checked-in registry is intentionally empty.  Structural/synthetic
+    fixtures can still exercise ontology semantics, but no local file can bind
+    a production event until an independent review adds its exact bytes.
+    """
+    revalidate_firm_rating_ontology(ontology)
+    require_production_registry_entry(
+        artifact_path=Path(ontology.source_path),
+        artifact_id=ontology.ontology_id,
+        artifact_sha256=ontology.payload_sha256,
+        registry_path=FIRM_ONTOLOGY_REGISTRY_PATH,
+        registry_schema=FIRM_ONTOLOGY_REGISTRY_SCHEMA,
+        artifact_kind="firm rating ontology",
+    )
+    return revalidate_firm_rating_ontology(ontology)
 
 
 def resolve_firm_rating(

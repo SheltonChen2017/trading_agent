@@ -838,8 +838,13 @@ this Windows host.
   R-24; the first sweep's summary counts were lost to this reviewer's own
   output truncation and the sweep was rerun in full rather than quoting an
   unread figure.
-- `git diff --check` clean. Complete-suite results for the pushed tree are
-  recorded in the section 5 ledger row for this push.
+- Complete suite on the code tree at `76f0c21`, run with no competing load:
+  **5,389 passed, 7 skipped, 0 failed, 25 warnings in 1,591.75s (26m31s)**,
+  with `compileall` (including `research/`) exit 0 and `git diff --check`
+  clean on that same tree. The pushed tip adds only this validation sentence
+  and was revalidated with the 63-check active-document suite. The seven skips
+  are the two pre-existing platform skips, the R-02 Store-alias guard, and
+  four IB-1A platform-conditional skips.
 
 ### 11.7 Residual gates and next authorized step
 

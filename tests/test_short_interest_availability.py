@@ -1,7 +1,7 @@
 """Dangerous-direction tests for release-time and next-open cohorting."""
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import fields, replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -41,6 +41,19 @@ def test_exact_after_close_release_enters_only_the_next_open_cohort():
     assert release.public_release_date == "2024-01-25"
     assert cohort.session == "2024-01-26"
     assert cohort.opens_at == "2024-01-26T14:30:00Z"
+
+
+def test_release_subclass_cannot_override_validated_availability_semantics():
+    genuine = _vintage().release_calendar[0]
+
+    class ReleaseSubclass(type(genuine)):
+        pass
+
+    impostor = ReleaseSubclass(
+        **{field.name: getattr(genuine, field.name) for field in fields(genuine)}
+    )
+    with pytest.raises(ShortInterestContractError, match="exact ReleaseCalendarEntry"):
+        release_execution_cohort(impostor)
 
 
 def test_exact_preopen_release_can_use_that_days_later_open():

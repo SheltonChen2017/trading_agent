@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import copy
 import json
-from dataclasses import replace
+from dataclasses import fields, replace
 from pathlib import Path
 
 import pytest
 
+from data.hashing import hash_payload
 from research.short_interest_etf.contracts import (
     CollectionManifest,
     DenominatorObservation,
@@ -59,6 +60,7 @@ def test_preregistration_pins_zero_look_fixture_scope_and_canonical_choices():
     assert PREREGISTRATION.outcome_looks_used == 0
     assert PREREGISTRATION.production_authoritative is False
     assert len(PREREGISTRATION.sha256) == 64
+    assert PREREGISTRATION.sha256 == hash_payload(PREREGISTRATION.to_payload())
 
 
 @pytest.mark.parametrize(
@@ -258,8 +260,39 @@ def test_collection_manifest_digest_is_deterministic_and_content_bound():
     digest = manifest.sha256
 
     assert len(digest) == 64
+    assert digest == digest.lower()
+    assert set(digest) <= set("0123456789abcdef")
+    assert digest == hash_payload(manifest.to_payload())
     assert digest == CollectionManifest.from_payload(
         _fixture_payload()["manifest"]
     ).sha256
     assert digest != replace(manifest, snapshot_name="other-fixture-name").sha256
     assert digest != replace(manifest, source_version="2026-08-28.v2").sha256
+
+
+@pytest.mark.parametrize(
+    ("field_name", "error_pattern"),
+    [
+        ("security", "exact SecurityIdentity"),
+        ("volume_basis", "exact VolumeBasis"),
+        ("denominator", "exact DenominatorObservation"),
+    ],
+)
+def test_snapshot_nested_contract_subclasses_cannot_change_serialized_facts(
+    field_name, error_pattern
+):
+    """Validated nested facts must be the same facts later serialized."""
+    snapshot = ShortInterestSnapshot.from_payload(_snapshot_payload())
+    genuine = getattr(snapshot, field_name)
+
+    class ContractSubclass(type(genuine)):
+        pass
+
+    impostor = ContractSubclass(
+        **{field.name: getattr(genuine, field.name) for field in fields(genuine)}
+    )
+    assert isinstance(impostor, type(genuine))
+    assert type(impostor) is not type(genuine)
+
+    with pytest.raises(ShortInterestContractError, match=error_pattern):
+        replace(snapshot, **{field_name: impostor})

@@ -98,8 +98,8 @@ class ShortInterestVintage:
     refusals: tuple[SnapshotRefusal, ...]
 
     def __post_init__(self) -> None:
-        if not isinstance(self.manifest, CollectionManifest):
-            raise _refuse("manifest must be a CollectionManifest")
+        if type(self.manifest) is not CollectionManifest:
+            raise _refuse("manifest must be the exact CollectionManifest type")
         if not isinstance(self.release_calendar, tuple) or not all(
             type(item) is ReleaseCalendarEntry for item in self.release_calendar
         ):

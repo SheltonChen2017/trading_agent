@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
+from dataclasses import fields, replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -80,6 +80,74 @@ def test_identity_is_deterministic_under_input_reordering():
     )
     assert reordered == vintage
     assert build_identity(reordered) == build_identity(vintage)
+
+
+def test_manifest_subclass_cannot_serialize_facts_other_than_those_validated():
+    vintage = _vintage()
+    genuine = vintage.manifest
+
+    class ManifestSubclass(type(genuine)):
+        def to_payload(self):
+            return {**super().to_payload(), "snapshot_name": "tampered-after-validation"}
+
+    impostor = ManifestSubclass(
+        **{field.name: getattr(genuine, field.name) for field in fields(genuine)}
+    )
+    assert impostor.snapshot_name == genuine.snapshot_name
+    assert impostor.to_payload()["snapshot_name"] != genuine.snapshot_name
+
+    with pytest.raises(ShortInterestDatasetError, match="exact CollectionManifest"):
+        build_vintage(
+            impostor,
+            vintage.release_calendar,
+            vintage.snapshots,
+            vintage.refusals,
+        )
+
+
+def test_release_and_refusal_subclasses_cannot_cross_vintage_boundary():
+    vintage = _vintage()
+    genuine_release = vintage.release_calendar[0]
+
+    class ReleaseSubclass(type(genuine_release)):
+        pass
+
+    release_impostor = ReleaseSubclass(
+        **{
+            field.name: getattr(genuine_release, field.name)
+            for field in fields(genuine_release)
+        }
+    )
+    with pytest.raises(ShortInterestDatasetError, match="exact ReleaseCalendarEntry"):
+        build_vintage(
+            vintage.manifest,
+            (release_impostor, *vintage.release_calendar[1:]),
+            vintage.snapshots,
+        )
+
+    genuine_refusal = SnapshotRefusal(
+        source_record_id="synthetic-refusal",
+        settlement_date=None,
+        reason="synthetic_reason",
+        detail="synthetic detail",
+    )
+
+    class RefusalSubclass(type(genuine_refusal)):
+        pass
+
+    refusal_impostor = RefusalSubclass(
+        **{
+            field.name: getattr(genuine_refusal, field.name)
+            for field in fields(genuine_refusal)
+        }
+    )
+    with pytest.raises(ShortInterestDatasetError, match="exact SnapshotRefusal"):
+        build_vintage(
+            _manifest(vintage, accepted=2, refused=1),
+            vintage.release_calendar,
+            vintage.snapshots,
+            (refusal_impostor,),
+        )
 
 
 def test_immutable_write_exact_retry_and_authenticated_round_trip(tmp_path):

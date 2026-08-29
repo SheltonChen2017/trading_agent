@@ -578,8 +578,10 @@ class ShortInterestSnapshot:
             "revision_id",
         ):
             _required_text(getattr(self, name), name)
-        if not isinstance(self.security, SecurityIdentity):
-            raise ShortInterestContractError("security must be a SecurityIdentity")
+        if type(self.security) is not SecurityIdentity:
+            raise ShortInterestContractError(
+                "security must be the exact SecurityIdentity type"
+            )
         settlement = _canonical_date(self.settlement_date, "settlement_date")
         previous = _canonical_date(
             self.previous_settlement_date, "previous_settlement_date"
@@ -594,11 +596,13 @@ class ShortInterestSnapshot:
             )
         _integer(self.current_short_shares, "current_short_shares")
         _integer(self.previous_short_shares, "previous_short_shares")
-        if not isinstance(self.volume_basis, VolumeBasis):
-            raise ShortInterestContractError("volume_basis must be a VolumeBasis")
-        if not isinstance(self.denominator, DenominatorObservation):
+        if type(self.volume_basis) is not VolumeBasis:
             raise ShortInterestContractError(
-                "denominator must be a DenominatorObservation"
+                "volume_basis must be the exact VolumeBasis type"
+            )
+        if type(self.denominator) is not DenominatorObservation:
+            raise ShortInterestContractError(
+                "denominator must be the exact DenominatorObservation type"
             )
         if self.volume_basis.security_id != self.security.security_id:
             raise ShortInterestContractError(

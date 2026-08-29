@@ -38,8 +38,10 @@ def _next_open_after(instant: datetime) -> ExecutionCohort:
 
 def release_execution_cohort(release: ReleaseCalendarEntry) -> ExecutionCohort:
     """First open usable after a documented release, never settlement date."""
-    if not isinstance(release, ReleaseCalendarEntry):
-        raise ShortInterestContractError("release must be a ReleaseCalendarEntry")
+    if type(release) is not ReleaseCalendarEntry:
+        raise ShortInterestContractError(
+            "release must be the exact ReleaseCalendarEntry type"
+        )
     try:
         if release.precision is ReleasePrecision.DATE_ONLY:
             session = resolve_nth_session_after(release.public_release_date, 1)
@@ -71,10 +73,13 @@ def snapshot_execution_cohort(
     """First open after release and every exact input-availability instant."""
     if type(snapshot) is not ShortInterestSnapshot:
         raise ShortInterestContractError(
-            "snapshot must be a ShortInterestSnapshot; daily volume is forbidden"
+            "snapshot must be the exact ShortInterestSnapshot type; "
+            "daily volume is forbidden"
         )
-    if not isinstance(release, ReleaseCalendarEntry):
-        raise ShortInterestContractError("release must be a ReleaseCalendarEntry")
+    if type(release) is not ReleaseCalendarEntry:
+        raise ShortInterestContractError(
+            "release must be the exact ReleaseCalendarEntry type"
+        )
     if snapshot.release_calendar_key != release.key:
         raise ShortInterestContractError(
             "snapshot release_calendar_key does not match release entry"

@@ -3,14 +3,14 @@
 The parser is not an EDGAR client. Callers must supply accession and public
 acceptance metadata from an immutable source boundary. XML rows are never
 silently discarded: every non-derivative and derivative transaction becomes
-a :class:`ParsedTransaction` with a named include/exclude disposition.
+a :class:`ParsedTransaction` with a named pre-aggregation disposition.
 """
 from __future__ import annotations
 
 import hashlib
 import re
 from datetime import date, datetime
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, DecimalException, InvalidOperation, localcontext
 from xml.etree import ElementTree
 
 from research.insider_buying.contracts import (
@@ -25,6 +25,7 @@ from research.insider_buying.contracts import (
     ParsedTransaction,
     PublicAvailability,
     ReportingOwner,
+    TransactionDiagnostic,
 )
 
 
@@ -36,6 +37,15 @@ _PRIVATE_WORDS = (
 )
 _RANGE_WORDS = ("price range", "range of prices", "prices ranging")
 _PLAN_WORDS = ("10b5-1", "10b5 1")
+_DECIMAL_RE = re.compile(r"^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$")
+_DATE_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+_MAX_DECIMAL_TEXT_LENGTH = 128
+_MAX_DECIMAL_DIGITS = 64
+_MAX_DECIMAL_SCALE = 64
+_XML_DECLARATION_RE = re.compile(
+    r"^<\?xml\s+[^>]*?encoding\s*=\s*(['\"])(?P<encoding>[^'\"]+)\1[^>]*?\?>",
+    re.IGNORECASE,
+)
 
 
 class Form4ParseError(ContractError):
@@ -84,10 +94,10 @@ def _required_text(element: ElementTree.Element, name: str) -> str:
 def _parse_bool(raw: str | None) -> bool | None:
     if raw is None:
         return None
-    normalized = raw.strip().lower()
-    if normalized in {"1", "true", "yes"}:
+    normalized = raw.strip()
+    if normalized in {"1", "true"}:
         return True
-    if normalized in {"0", "false", "no"}:
+    if normalized in {"0", "false"}:
         return False
     return None
 
@@ -95,24 +105,59 @@ def _parse_bool(raw: str | None) -> bool | None:
 def _parse_decimal(raw: str | None) -> Decimal | None:
     if raw is None:
         return None
+    normalized = raw.strip()
+    if (
+        not normalized
+        or len(normalized) > _MAX_DECIMAL_TEXT_LENGTH
+        or _DECIMAL_RE.fullmatch(normalized) is None
+    ):
+        return None
     try:
-        value = Decimal(raw.replace(",", "").strip())
+        value = Decimal(normalized)
     except (InvalidOperation, AttributeError):
         return None
-    return value if value.is_finite() else None
+    value_tuple = value.as_tuple()
+    if (
+        not value.is_finite()
+        or len(value_tuple.digits) > _MAX_DECIMAL_DIGITS
+        or abs(value_tuple.exponent) > _MAX_DECIMAL_SCALE
+    ):
+        return None
+    return value
+
+
+def _multiply_decimals(
+    first: Decimal | None, second: Decimal | None
+) -> Decimal | None:
+    if first is None or second is None:
+        return None
+    precision = max(
+        28,
+        len(first.as_tuple().digits) + len(second.as_tuple().digits),
+    )
+    try:
+        with localcontext() as context:
+            context.prec = precision
+            result = first * second
+    except DecimalException:
+        return None
+    return result if result.is_finite() else None
 
 
 def _parse_date(raw: str | None) -> date | None:
     if raw is None:
         return None
+    normalized = raw.strip()
+    if _DATE_RE.fullmatch(normalized) is None:
+        return None
     try:
-        return date.fromisoformat(raw.strip())
+        return date.fromisoformat(normalized)
     except ValueError:
         return None
 
 
 def _normalize_cik(raw: str, field: str) -> str:
-    if not raw.isdigit() or len(raw) > 10:
+    if re.fullmatch(r"[0-9]{1,10}", raw) is None:
         raise Form4ParseError(f"REFUSED: {field} is not a numeric CIK")
     return raw.zfill(10)
 
@@ -152,12 +197,15 @@ def _common_stock(title: str | None) -> bool:
 
 
 def _footnote_references(element: ElementTree.Element) -> tuple[str, ...]:
-    ids = {
-        node.attrib.get("id", "").strip()
-        for node in element.iter()
-        if _local_name(node.tag) == "footnoteId"
-    }
-    return tuple(sorted(item for item in ids if item))
+    ids: set[str] = set()
+    for node in element.iter():
+        if _local_name(node.tag) != "footnoteId":
+            continue
+        footnote_id = node.attrib.get("id", "").strip()
+        if not footnote_id:
+            raise Form4ParseError("REFUSED: transaction footnote reference id is missing")
+        ids.add(footnote_id)
+    return tuple(sorted(ids))
 
 
 def _classify(
@@ -171,10 +219,10 @@ def _classify(
     acquired_disposed: str | None,
     shares: Decimal | None,
     price: Decimal | None,
+    purchase_value: Decimal | None,
     direct_indirect: str | None,
     footnote_texts: tuple[str, ...],
     unresolved_footnote: bool,
-    aff10b5_one: bool,
 ) -> tuple[ClassificationOutcome, ...]:
     reasons: list[ClassificationOutcome] = []
 
@@ -192,18 +240,21 @@ def _classify(
         add(ClassificationOutcome.EXCLUDE_MULTIPLE_REPORTING_OWNERS)
     if not owners or any(not owner.relationship_complete for owner in owners):
         add(ClassificationOutcome.EXCLUDE_INCOMPLETE_OWNER_RELATIONSHIP)
-    has_ten_percent_owner = any(owner.is_ten_percent_owner for owner in owners)
-    if has_ten_percent_owner:
+    has_ineligible_ten_percent_owner = any(
+        owner.is_ten_percent_owner
+        and not (owner.is_director or owner.is_officer)
+        for owner in owners
+    )
+    if has_ineligible_ten_percent_owner:
         add(ClassificationOutcome.EXCLUDE_TEN_PERCENT_OWNER)
     if (
         owners
-        and not has_ten_percent_owner
         and all(not owner.is_director and not owner.is_officer for owner in owners)
     ):
         add(ClassificationOutcome.EXCLUDE_NO_OFFICER_OR_DIRECTOR)
     if not _common_stock(security_title):
         add(ClassificationOutcome.EXCLUDE_NON_COMMON_STOCK)
-    code = transaction_code.upper() if transaction_code else None
+    code = transaction_code
     if code == "S":
         add(ClassificationOutcome.EXCLUDE_SALE)
     elif code == "G":
@@ -226,22 +277,46 @@ def _classify(
         add(ClassificationOutcome.EXCLUDE_PRICE_RANGE)
     if price is None or price <= 0:
         add(ClassificationOutcome.EXCLUDE_MISSING_OR_NONPOSITIVE_PRICE)
-    if any(word in combined_footnotes for word in _PRIVATE_WORDS):
-        add(ClassificationOutcome.EXCLUDE_PRIVATE_PURCHASE)
-    if aff10b5_one or any(word in combined_footnotes for word in _PLAN_WORDS):
-        add(ClassificationOutcome.EXCLUDE_10B5_1)
+    if shares is not None and price is not None and purchase_value is None:
+        add(ClassificationOutcome.EXCLUDE_UNREPRESENTABLE_PURCHASE_VALUE)
     if unresolved_footnote:
         add(ClassificationOutcome.EXCLUDE_UNRESOLVED_FOOTNOTE)
 
-    purchase_value = shares * price if shares is not None and price is not None else None
-    if (
-        purchase_value is not None
-        and purchase_value < CANONICAL_SPEC.minimum_purchase_value_usd
-    ):
-        add(ClassificationOutcome.EXCLUDE_BELOW_MINIMUM_VALUE)
     if not reasons:
-        return (ClassificationOutcome.INCLUDE_CANONICAL_PURCHASE,)
+        return (ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,)
     return tuple(reasons)
+
+
+def _diagnostics(
+    *,
+    owners: tuple[ReportingOwner, ...],
+    footnote_texts: tuple[str, ...],
+    aff10b5_one: bool | None,
+) -> tuple[TransactionDiagnostic, ...]:
+    """Return retained PDF-defined features without changing eligibility."""
+
+    flags: list[TransactionDiagnostic] = []
+
+    def add(flag: TransactionDiagnostic) -> None:
+        if flag not in flags:
+            flags.append(flag)
+
+    combined_footnotes = " ".join(footnote_texts).lower()
+    if any(word in combined_footnotes for word in _PRIVATE_WORDS):
+        add(TransactionDiagnostic.PRIVATE_PURCHASE_FOOTNOTE_MENTION)
+    plan_mentioned = any(word in combined_footnotes for word in _PLAN_WORDS)
+    if aff10b5_one is True:
+        add(TransactionDiagnostic.TEN_B5_1_PLAN)
+    elif plan_mentioned:
+        add(TransactionDiagnostic.TEN_B5_1_FOOTNOTE_MENTION)
+    if any(
+        owner.is_ten_percent_owner and (owner.is_director or owner.is_officer)
+        for owner in owners
+    ):
+        add(
+            TransactionDiagnostic.TEN_PERCENT_OWNER_WITH_OFFICER_OR_DIRECTOR_ROLE
+        )
+    return tuple(flags)
 
 
 def parse_form4_xml(
@@ -258,17 +333,31 @@ def parse_form4_xml(
         raise Form4ParseError("REFUSED: XML source must be bytes")
     if not xml_bytes or len(xml_bytes) > MAX_XML_BYTES:
         raise Form4ParseError("REFUSED: XML source is empty or exceeds 2 MiB")
-    upper_source = xml_bytes.upper()
-    if b"<!DOCTYPE" in upper_source or b"<!ENTITY" in upper_source:
-        raise Form4ParseError("REFUSED: DTD/entity declarations are prohibited")
+    if b"\x00" in xml_bytes:
+        raise Form4ParseError("REFUSED: Form 4 XML must be UTF-8 encoded")
     try:
-        root = ElementTree.fromstring(xml_bytes)
+        decoded_source = xml_bytes.decode("utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise Form4ParseError(
+            "REFUSED: Form 4 XML must be UTF-8 encoded"
+        ) from exc
+    upper_source = decoded_source.upper()
+    if "<!DOCTYPE" in upper_source or "<!ENTITY" in upper_source:
+        raise Form4ParseError("REFUSED: DTD/entity declarations are prohibited")
+    declaration = _XML_DECLARATION_RE.match(decoded_source)
+    if (
+        declaration is not None
+        and declaration.group("encoding").casefold() != "utf-8"
+    ):
+        raise Form4ParseError("REFUSED: XML declaration must specify UTF-8")
+    try:
+        root = ElementTree.fromstring(decoded_source)
     except ElementTree.ParseError as exc:
         raise Form4ParseError(f"REFUSED: malformed Form 4 XML: {exc}") from exc
     if _local_name(root.tag) != "ownershipDocument":
         raise Form4ParseError("REFUSED: root element is not ownershipDocument")
 
-    form_type = _required_text(root, "documentType").upper()
+    form_type = _required_text(root, "documentType")
     if form_type not in PARSED_OWNERSHIP_FORMS:
         raise Form4ParseError(
             f"REFUSED: unsupported ownership-document form {form_type}"
@@ -356,7 +445,8 @@ def parse_form4_xml(
         references = _footnote_references(row)
         unresolved = any(reference not in footnote_map for reference in references)
         texts = tuple(footnote_map[item] for item in references if item in footnote_map)
-        aff10b5_one = _parse_bool(_text(row, "aff10b5One")) is True
+        aff10b5_one = _parse_bool(_text(row, "aff10b5One"))
+        purchase_value = _multiply_decimals(shares, price)
         outcomes = _classify(
             form_type=form_type,
             owners=owner_tuple,
@@ -367,13 +457,15 @@ def parse_form4_xml(
             acquired_disposed=acquired_disposed,
             shares=shares,
             price=price,
+            purchase_value=purchase_value,
             direct_indirect=direct_indirect,
             footnote_texts=texts,
             unresolved_footnote=unresolved,
-            aff10b5_one=aff10b5_one,
         )
-        purchase_value = (
-            shares * price if shares is not None and price is not None else None
+        diagnostics = _diagnostics(
+            owners=owner_tuple,
+            footnote_texts=texts,
+            aff10b5_one=aff10b5_one,
         )
         event_id = hashlib.sha256(
             f"{accession_number}:{source_sha256}:{row_index}:{int(derivative)}".encode()
@@ -394,9 +486,11 @@ def parse_form4_xml(
                 purchase_value_usd=purchase_value,
                 shares_owned_after=shares_owned_after,
                 direct_indirect=direct_indirect,
+                aff10b5_one=aff10b5_one,
                 footnote_ids=references,
                 footnote_texts=texts,
                 outcomes=outcomes,
+                diagnostics=diagnostics,
             )
         )
 

@@ -1,7 +1,7 @@
 """Frozen IB-0 contracts and accession-preserving filing lineage.
 
 The types in this module are intentionally research-inert. They describe
-what an as-filed record means and whether it is eligible for canonical V1;
+what an as-filed record means and whether it may enter later lot aggregation;
 they do not download data, join outcomes, calculate returns, place orders, or
 decide a portfolio. Ambiguity is represented by a named exclusion rather
 than by dropping the source row.
@@ -24,9 +24,9 @@ class ContractError(ValueError):
 
 
 class ClassificationOutcome(str, Enum):
-    """Named labels for every included or excluded row."""
+    """Named row-level dispositions before event-lot aggregation."""
 
-    INCLUDE_CANONICAL_PURCHASE = "include_canonical_purchase"
+    ELIGIBLE_FOR_LOT_AGGREGATION = "eligible_for_lot_aggregation"
     EXCLUDE_UNSUPPORTED_FORM = "exclude_unsupported_form"
     EXCLUDE_AMENDED_FILING = "exclude_amended_filing"
     EXCLUDE_DERIVATIVE = "exclude_derivative"
@@ -51,10 +51,21 @@ class ClassificationOutcome(str, Enum):
     EXCLUDE_MISSING_OR_NONPOSITIVE_PRICE = (
         "exclude_missing_or_nonpositive_price"
     )
-    EXCLUDE_PRIVATE_PURCHASE = "exclude_private_purchase"
-    EXCLUDE_10B5_1 = "exclude_10b5_1"
-    EXCLUDE_BELOW_MINIMUM_VALUE = "exclude_below_minimum_value"
+    EXCLUDE_UNREPRESENTABLE_PURCHASE_VALUE = (
+        "exclude_unrepresentable_purchase_value"
+    )
     EXCLUDE_UNRESOLVED_FOOTNOTE = "exclude_unresolved_footnote"
+
+
+class TransactionDiagnostic(str, Enum):
+    """Retained V1 features that are not canonical exclusion reasons."""
+
+    PRIVATE_PURCHASE_FOOTNOTE_MENTION = "private_purchase_footnote_mention"
+    TEN_B5_1_PLAN = "10b5_1_plan"
+    TEN_B5_1_FOOTNOTE_MENTION = "10b5_1_footnote_mention"
+    TEN_PERCENT_OWNER_WITH_OFFICER_OR_DIRECTOR_ROLE = (
+        "ten_percent_owner_with_officer_or_director_role"
+    )
 
 
 class AvailabilityPrecision(str, Enum):
@@ -80,6 +91,8 @@ class CanonicalSpec:
     acquired_disposed_code: str
     ownership_nature: str
     minimum_purchase_value_usd: Decimal
+    lot_aggregation_key: tuple[str, ...]
+    minimum_purchase_value_applies_after_aggregation: bool
     score_formula: str
     decay_half_life_trading_days: int
     lookback_trading_days: int
@@ -98,6 +111,12 @@ CANONICAL_SPEC = CanonicalSpec(
     acquired_disposed_code="A",
     ownership_nature="D",
     minimum_purchase_value_usd=Decimal("50000"),
+    lot_aggregation_key=(
+        "reporting_owner_identity",
+        "security_identity",
+        "transaction_date",
+    ),
+    minimum_purchase_value_applies_after_aggregation=True,
     score_formula="ln(1 + purchase_value_usd / 50000)",
     decay_half_life_trading_days=20,
     lookback_trading_days=30,
@@ -119,6 +138,16 @@ class PublicAvailability:
     execution_rule: ExecutionRule
 
     def __post_init__(self) -> None:
+        if type(self.accepted_date) is not date:
+            raise ContractError("REFUSED: accepted_date must be an exact date")
+        if not isinstance(self.precision, AvailabilityPrecision):
+            raise ContractError("REFUSED: availability precision is unsupported")
+        if not isinstance(self.execution_rule, ExecutionRule):
+            raise ContractError("REFUSED: availability execution rule is unsupported")
+        if self.accepted_at is not None and type(self.accepted_at) is not datetime:
+            raise ContractError(
+                "REFUSED: accepted_at must be a datetime or absent"
+            )
         if self.precision is AvailabilityPrecision.ACCEPTANCE_TIMESTAMP:
             if self.accepted_at is None or self.accepted_at.utcoffset() is None:
                 raise ContractError(
@@ -187,6 +216,33 @@ class ReportingOwner:
     is_other: bool | None
     officer_title: str | None
 
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.owner_cik, str)
+            or re.fullmatch(r"[0-9]{10}", self.owner_cik) is None
+        ):
+            raise ContractError("REFUSED: reporting-owner CIK must be ten digits")
+        if not isinstance(self.owner_name, str) or not self.owner_name.strip():
+            raise ContractError("REFUSED: reporting-owner name is required")
+        for field_name in (
+            "is_director",
+            "is_officer",
+            "is_ten_percent_owner",
+            "is_other",
+        ):
+            value = getattr(self, field_name)
+            if value is not None and type(value) is not bool:
+                raise ContractError(
+                    f"REFUSED: reporting-owner {field_name} must be bool or absent"
+                )
+        if self.officer_title is not None and (
+            not isinstance(self.officer_title, str)
+            or not self.officer_title.strip()
+        ):
+            raise ContractError(
+                "REFUSED: reporting-owner officer title must be text or absent"
+            )
+
     @property
     def relationship_complete(self) -> bool:
         return all(
@@ -216,14 +272,16 @@ class ParsedTransaction:
     purchase_value_usd: Decimal | None
     shares_owned_after: Decimal | None
     direct_indirect: str | None
+    aff10b5_one: bool | None
     footnote_ids: tuple[str, ...]
     footnote_texts: tuple[str, ...]
     outcomes: tuple[ClassificationOutcome, ...]
+    diagnostics: tuple[TransactionDiagnostic, ...] = ()
 
     @property
-    def included(self) -> bool:
+    def eligible_for_lot_aggregation(self) -> bool:
         return self.outcomes == (
-            ClassificationOutcome.INCLUDE_CANONICAL_PURCHASE,
+            ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,
         )
 
 

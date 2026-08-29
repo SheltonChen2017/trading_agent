@@ -5,10 +5,12 @@ import copy
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -758,6 +760,22 @@ def _task_checks(report: dict) -> dict[str, dict]:
     }
 
 
+def _is_task_runnable_interpreter(path: Path) -> bool:
+    """Mirror both installer predicates for a resolved interpreter path."""
+    try:
+        status = path.stat()
+    except OSError:
+        return False
+    return (
+        stat.S_ISREG(status.st_mode)
+        and status.st_size > 0
+        and not (
+            getattr(status, "st_file_attributes", 0)
+            & stat.FILE_ATTRIBUTE_REPARSE_POINT
+        )
+    )
+
+
 def _running_process_image() -> Path:
     """Return the real Windows process image behind a Store execution alias."""
     import ctypes
@@ -766,9 +784,83 @@ def _running_process_image() -> Path:
     length = ctypes.windll.kernel32.GetModuleFileNameW(None, buffer, len(buffer))
     assert length, "Windows did not report the running Python process image"
     image = Path(buffer.value).resolve()
-    status = image.stat()
-    assert status.st_size > 0, "the resolved process image must be a real executable"
+    assert _is_task_runnable_interpreter(image), (
+        "the resolved process image must satisfy the installer predicates"
+    )
     return image
+
+
+def _preview_interpreter() -> Path:
+    """Preserve an active virtual environment, with Store-alias fallback."""
+    configured = Path(sys.executable).resolve()
+    if _is_task_runnable_interpreter(configured):
+        return configured
+    return _running_process_image()
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+def test_preview_interpreter_preserves_a_runnable_active_environment(
+    tmp_path, monkeypatch
+):
+    active = (tmp_path / "active-python.exe").resolve()
+    active.write_bytes(b"MZ")
+    monkeypatch.setattr(sys, "executable", str(active))
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "_running_process_image",
+        lambda: pytest.fail("a runnable environment must not fall back"),
+    )
+    assert _is_task_runnable_interpreter(active)
+    assert _preview_interpreter() == active
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+def test_preview_interpreter_resolves_an_invalid_store_alias(
+    tmp_path, monkeypatch
+):
+    alias = (tmp_path / "python.exe").resolve()
+    alias.touch()
+    process_image = (tmp_path / "process-python.exe").resolve()
+    process_image.write_bytes(b"MZ")
+    monkeypatch.setattr(sys, "executable", str(alias))
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "_running_process_image",
+        lambda: process_image,
+    )
+    assert not _is_task_runnable_interpreter(alias)
+    assert _preview_interpreter() == process_image
+
+
+@pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
+def test_preview_interpreter_resolves_a_reparse_only_alias(
+    tmp_path, monkeypatch
+):
+    alias = (tmp_path / "python.exe").resolve()
+    alias.write_bytes(b"MZ")
+    process_image = (tmp_path / "process-python.exe").resolve()
+    process_image.write_bytes(b"MZ")
+    real_stat = Path.stat
+
+    def reparse_stat(path, *args, **kwargs):
+        status = real_stat(path, *args, **kwargs)
+        if path == alias:
+            return SimpleNamespace(
+                st_file_attributes=stat.FILE_ATTRIBUTE_REPARSE_POINT,
+                st_mode=status.st_mode,
+                st_size=status.st_size,
+            )
+        return status
+
+    monkeypatch.setattr(sys, "executable", str(alias))
+    monkeypatch.setattr(Path, "stat", reparse_stat)
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "_running_process_image",
+        lambda: process_image,
+    )
+    assert not _is_task_runnable_interpreter(alias)
+    assert _preview_interpreter() == process_image
 
 
 @pytest.mark.skipif(os.name != "nt", reason=WINDOWS_VERIFIER_REASON)
@@ -781,10 +873,10 @@ def test_windows_verifier_green_actions_match_installer_whatif_previews(tmp_path
     """
     case = _windows_verifier_case(tmp_path, scope="all")
     # The operational installer runs policy-identity before emitting its
-    # -WhatIf preview, so this must be a runnable interpreter. Resolve the real
-    # process image behind a Store execution alias rather than skipping the
-    # successful eight-task parity contract on that host.
-    preview_interpreter = _running_process_image()
+    # -WhatIf preview, so this must be a runnable interpreter with the active
+    # environment's dependencies. Preserve a real virtual-environment launcher;
+    # only resolve the process image behind an invalid Store execution alias.
+    preview_interpreter = _preview_interpreter()
     case["python"] = preview_interpreter
     for task in case["fixture"]["Tasks"]:
         task["Actions"][0]["Execute"] = str(preview_interpreter)

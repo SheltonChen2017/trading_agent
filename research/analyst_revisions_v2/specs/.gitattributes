@@ -1,0 +1,11 @@
+# These artifacts are content-addressed evidence, not ordinary text. Their
+# loaders require canonical JSON terminated by exactly one LF, and several
+# verify the file's SHA-256 against a registered or reviewed blob. Any
+# end-of-line translation on checkout changes those bytes, so on a Windows
+# host with core.autocrlf=true the committed zero-access declarations and
+# production registries become unreadable and the authority check they exist
+# to perform is never reached.
+#
+# -text disables all conversion in both directions, so the working tree always
+# holds exactly the committed bytes.
+*.json -text

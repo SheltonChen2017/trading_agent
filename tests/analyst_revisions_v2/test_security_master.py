@@ -1195,3 +1195,93 @@ def test_security_type_enum_exactly_matches_frozen_universe_vocabulary():
         "unit",
         "warrant",
     }
+
+
+def test_unexplained_listing_closure_is_rejected_at_load(tmp_path):
+    """A ticker may not simply stop without lineage explaining why.
+
+    This guard exists and works, but nothing pinned it: disabling it left the
+    whole file green. An unexplained closure is exactly how a delisting hides
+    as a quiet gap, which would silently drop the hardest names from the
+    identity layer feeding the QC test.
+    """
+    payload = _master_payload(
+        securities=[_security("security-live", "issuer-live", "class-live")],
+        listings=[
+            _listing("listing-live", "security-live", "LIVE", valid_to="2020-01-01")
+        ],
+        lineage_events=[],
+    )
+    with pytest.raises(SecurityMasterError, match="transition or terminal lineage"):
+        _write_master(tmp_path / "master.json", payload)
+
+
+def test_identity_coverage_rejects_non_exhaustive_counts():
+    """Coverage must stay exhaustive even when constructed directly.
+
+    The audit builds consistent coverage today, but the dataclass is public
+    and its arithmetic guard had no regression: mapped + refused must equal
+    total, and the per-reason counts must sum to the refusals.
+    """
+    from research.analyst_revisions_v2.security_master import SecurityIdentityCoverage
+
+    with pytest.raises(SecurityMasterError, match="not exhaustive"):
+        SecurityIdentityCoverage(
+            total_records=5, mapped_records=2, refused_records=2, refusal_counts=(
+                (IdentityRefusalReason.NO_ACTIVE_TICKER_MAPPING, 2),
+            ),
+        )
+    with pytest.raises(SecurityMasterError, match="do not sum"):
+        SecurityIdentityCoverage(
+            total_records=4, mapped_records=2, refused_records=2, refusal_counts=(
+                (IdentityRefusalReason.NO_ACTIVE_TICKER_MAPPING, 1),
+            ),
+        )
+
+
+def test_identity_eligibility_matches_the_frozen_arv2_0_universe():
+    """The identity layer must enforce exactly the frozen owner decision.
+
+    ARV2-0 froze the research universe; this module independently hardcodes
+    the same venues, incorporation country and instrument vocabulary. They
+    agree today, but nothing bound them, so amending the frozen universe would
+    silently leave the identity gate enforcing the old one - and that gate is
+    what decides which securities can ever reach the QuantConnect test.
+    """
+    import json
+    from pathlib import Path as _Path
+
+    from research.analyst_revisions_v2.security_master import (
+        ELIGIBLE_ISSUER_COUNTRY,
+        ELIGIBLE_LISTING_EXCHANGES,
+    )
+
+    spec = json.loads(
+        (
+            _Path(__file__).resolve().parents[2]
+            / "research"
+            / "analyst_revisions_v2"
+            / "specs"
+            / "arv2_round0.draft.json"
+        ).read_text(encoding="utf-8")
+    )
+    universe = next(
+        cell["value"]
+        for cell in spec["cells"]
+        if cell["cell_id"] == "universe_contract"
+    )
+
+    assert set(universe["listing_venues"]) == set(ELIGIBLE_LISTING_EXCHANGES)
+    # The spec states incorporation in prose; pin the exact code equivalent so
+    # neither representation can drift from the other unnoticed.
+    assert universe["issuer_incorporation"] == "united_states"
+    assert ELIGIBLE_ISSUER_COUNTRY == "US"
+    # The enum must cover the eligible type plus every excluded type, so a new
+    # instrument category cannot be added to the frozen universe without also
+    # being representable (and therefore refusable) here.
+    assert {item.value for item in SecurityType} == set(
+        universe["instrument_types"]
+    ) | set(universe["excluded_instrument_types"])
+    # Exactly one type is eligible, and it is the one resolution admits.
+    assert universe["instrument_types"] == ["common_stock"]
+    assert SecurityType.COMMON_STOCK.value == "common_stock"

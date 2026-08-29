@@ -1,12 +1,61 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-28 by Codex after the owner directed durable documentation of
-the seven remaining root-review P2/P3 findings and their future correction
-gate. This is the canonical generic-workflow handoff for the root project. The
-three strategy lanes remain independent and were not inspected, modified,
-synchronized, or reviewed by this documentation task.
+Prepared: 2026-08-29 by Codex after the owner directed a separate
+Target-Price Revision planning lane and a revised research/QC plan that can
+evolve through later gates into bounded QuantConnect autopilot. This remains
+the canonical generic-workflow handoff for the root project and preserves the
+2026-08-28 deferred-remediation state below. The three existing strategy lanes
+remain independent and were not inspected, modified, synchronized, or reviewed
+by this documentation task.
 
-## 0. Deferred P2/P3 remediation handoff
+## 0. Target-Price Revision fourth-lane planning addition
+
+- The owner directed a new sibling worktree at
+  `C:\git\customizedAgent\trading_agent_TargetPriceRevision` on branch
+  `codex/strategy-target-price-revisions`, based on exact `main` commit
+  `086b782e43a5ff889e71ec8e26334bb791ccac74`. The branch was local-only when
+  this documentation snapshot was prepared; no push or merge was performed.
+- The governing planning candidate is
+  `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
+  (26 pages; SHA-256
+  `9f00dd56bf7bec79b3f5362bba61fe71768d1f25e6e4350631dafd1253682633`).
+  Its authoritative lane state is
+  `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
+  The submitted source PDF remains proposal content only; its SHA-256 is
+  `53c549aef18aa1a63e6db8deb184bd654eb8ec637bb4ff3ae03f29abc4a2df0`.
+- The revised plan treats target-price revisions as a separate family from the
+  rating-only Analyst Revisions V2 lane. It adopts stock-first null closure,
+  cutoff-safe corrections, institution/catalyst independence, binary validity,
+  separate mapping/feature/active-signal coverage, immutable QC packets, and
+  separately gated shadow, paper, restricted-live, and bounded-unattended
+  stages. A valid target-price stock null cannot be rescued by ETF aggregation,
+  rating fusion, or a secondary cell.
+- The lane has zero authenticated production target events, accepted target
+  signals, outcome permits, permanent looks, ETF topologies, nonempty
+  portfolios, QC uploads/jobs/results, broker connections, shadow sessions,
+  paper/live intents, or promotion approvals. No credential, licensed row,
+  provider, outcome, QC, broker, operator database, scheduler, deployment,
+  evidence epoch, paper order, live order, or capital surface was accessed.
+- The existing same-branch exception still applies only to the three named
+  lanes. Target-Price Revisions uses the generic topology unless the owner
+  explicitly changes it: Codex stable implementation snapshot, Claude review
+  of that exact snapshot on a separate review branch, Codex counter-review,
+  and owner-controlled merge.
+- Before any target-price outcome access, TPR-0 must freeze its exact source,
+  timing, formula, split/FX/horizon, primary cell, power/economic gates,
+  permanent look budget and null disposition. The owner must also amend the
+  common multiplicity/final-holdout contract to four families or explicitly
+  exclude TPR. Local configuration cannot grant that authority.
+- The exact next step is independent review of this documentation-only
+  snapshot. TPR-0 is not started by creating the worktree. Provider/data
+  access, outcome research, ETF work, QC execution, shadow, paper, live and
+  unattended operation remain separately gated.
+- `docs/ACTION_PLAN_2026-08-20.md` receives only the concise sequencing and
+  authority reference above. The existing three-lane direction, records and
+  data-source register remain unchanged; no same-branch or shared-file
+  exception was extended by inference.
+
+## 0A. Deferred P2/P3 remediation handoff
 
 - Current documentation branch:
   `codex/document-deferred-p2-p3-remediation-20260828`, created from exact
@@ -197,10 +246,14 @@ exhausted.
 ## 3. Parallel-work exception and handoff rule
 
 During the three-lane phase, agents must not edit this handoff or the Action
-Plan on any lane. The completed owner-directed one-time remediation
-synchronization was the sole exception; it is exhausted. The relevant lane
-implementation record is that branch's status, review ledger, validation
-record, and resume prompt.
+Plan on any of the three named lanes. The completed owner-directed one-time
+remediation synchronization was their sole implementation exception; it is
+exhausted. The owner's 2026-08-29 direction created a separate fourth planning
+lane under the generic workflow and is recorded here as a coordination change;
+it does not edit any existing lane record, revive the exhausted synchronization
+exception, or extend the same-branch topology. Each named lane's implementation
+record remains that branch's status, review ledger, validation record, and
+resume prompt.
 
 The owner-directed main-line coordination surface is
 `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`. Only a separately directed
@@ -268,6 +321,18 @@ Canonical V1 requires official-style twice-monthly short-interest snapshots;
 daily short-sale volume is prohibited as a proxy. A licensed historical/vintage
 short-interest source is the clearest missing paid input.
 
+### Target-Price Revisions
+
+The documentation-only record is
+`docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
+It is a separate fourth planning lane under the generic review workflow. No
+provider-specific target normalizer, authenticated target event, permanent
+target look authority, stock score, ETF topology, portfolio, QC algorithm,
+prospective shadow/paper evidence, or live authority exists. The submitted
+plan is replaced by a corrected stock-first blueprint whose later QC/autopilot
+stages remain individually owner-gated. The exact next action is independent
+review of the documentation snapshot, not implementation or data access.
+
 ## 5. Data acquisitions and confirmations
 
 The assumed Massive-Benzinga Analyst Ratings subscription is sufficient to
@@ -321,12 +386,14 @@ Separation finding identifiers retained for audit routing:
 ## 7. Integration boundary
 
 The ultimate target is one autopiloted QuantConnect trading agent, but the
-three lanes must not build it independently. After canonical strategies are
-independently validated, the owner must schedule a separate integration
-milestone for merge order, common schemas, late fusion, cross-signal
-correlation, risk budgets, combined costs/turnover/capacity, untouched final
-holdout, QC parity, paper deployment, monitoring, reconciliation, kill switch,
-and explicit promotion. No leverage is planned for the canonical strategies.
+three existing lanes and the separately planned Target-Price Revision lane
+must not build the combined agent independently. The target lane may prove
+standalone QC parity and later bounded operations under its own gates, but
+multi-signal fusion remains a separate owner-scheduled integration milestone
+for merge order, common schemas, late fusion, cross-signal correlation, risk
+budgets, combined costs/turnover/capacity, untouched final holdout, QC parity,
+paper deployment, monitoring, reconciliation, kill switch, and explicit
+promotion. No leverage is planned for the canonical strategies.
 
 Before any lane performs its first real-outcome study, the owner must freeze
 one common final-holdout cutoff and reserved period that all three lanes leave
@@ -334,6 +401,12 @@ unconsumed. The combined evidence threshold must treat the three lanes as one
 selection family. A valid canonical null closes its family; it is not tuned or
 rerun to pass. Any later hypothesis needs a separately preregistered family
 and a new owner-authorized permanent look budget.
+
+Target-Price Revisions does not silently change that three-family contract.
+Before its first outcome access, the owner must either amend the combined
+evidence threshold and common holdout to four families or explicitly exclude
+TPR and assign it a separate permanent look/holdout contract. Until then its
+outcome authority is zero.
 
 ## 8. Resume prompt
 

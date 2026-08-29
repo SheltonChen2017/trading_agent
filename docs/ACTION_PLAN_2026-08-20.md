@@ -18,6 +18,24 @@ run, QuantConnect launch, paper/live deployment, or combined autopilot is
 authorized by this sequencing change. SEP-3's exact paused state remains in
 `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`.
 
+**Owner-directed Target-Price Revision planning lane, 2026-08-29:** the owner
+directed a separate fourth worktree and branch for the target-price-revision
+hypothesis and requested a corrected research/QC plan capable of evolving,
+through later gates, into bounded QuantConnect autopilot. The authoritative
+planning candidate and status record are
+`docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
+and
+`docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
+This addition authorizes only the documentation baseline and its independent
+review. It does not inherit the three named lanes' same-branch exception, does
+not reorder or merge those lanes, and does not schedule provider, outcome,
+research-look, ETF, QC, broker, shadow, paper, live, deployment, or capital
+authority. Before any target-price outcome access, an owner-directed TPR-0
+must freeze its separate family/look contract and either add the fourth family
+to the common multiplicity/final-holdout design or explicitly exclude it.
+Shadow, paper, restricted-live canary, and bounded unattended operation are
+separate future promotion decisions; no stage authorizes the next.
+
 **Post-integration review/remediation gate, owner direction 2026-08-28:** only
 after all three feature branches complete their lane review loops and the owner
 merges them into `main`, the owner will explicitly initiate a new Full Project
@@ -166,6 +184,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
 | Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
+| Target-Price Revisions (TPR) | Separate fourth planning lane, documentation-only and unaccepted. The revised PDF and implementation record define a stock-first target-price family and a later, independently gated QC/autopilot ladder. The generic separate-review workflow applies. No authenticated source, event, signal, outcome access, look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0
@@ -220,6 +239,16 @@ gates are maintained in
 `docs/Archive/Review/REMEDIATION_2026-08-26_ANALYST_AND_FULL_PROJECT.md`.
 Nothing in this candidate authorizes provider access, outcome access,
 QuantConnect launch, portfolio/QC research, deployment, or trading.
+
+**Separate target-price family, 2026-08-29:** the owner-directed Target-Price
+Revision lane does not replace this rating-only V2 contract and cannot use ETF
+aggregation or a rating blend to rescue a valid stock-level null. Its own
+documentation-only baseline is governed by
+`docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
+Any later reuse of analyst-lane infrastructure requires an exact accepted
+source snapshot and a deliberate reviewed synchronization; unaccepted
+analyst-lane work, rating evidence epochs, results, look receipts, and rating
+semantics are not target-price authority.
 
 **Owner decision, 2026-08-20: ACER replaces the Strong-Buy portfolio program.**
 The strategy converts stock-level analyst *revisions* into ETF-level signals:

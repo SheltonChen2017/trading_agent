@@ -403,8 +403,8 @@ def build_identity(vintage: ShortInterestVintage) -> dict[str, Any]:
 
 def write_vintage(vintage: ShortInterestVintage, out_root: str | Path) -> dict[str, Any]:
     """Publish all authenticated parts without replacing an existing byte."""
-    if not isinstance(vintage, ShortInterestVintage):
-        raise _refuse("vintage must be a ShortInterestVintage")
+    if type(vintage) is not ShortInterestVintage:
+        raise _refuse("vintage must be the exact ShortInterestVintage type")
     identity, blobs = _content(vintage)
     target = Path(out_root) / identity["dataset_id"]
     identity_bytes = (canonical_json(identity) + "\n").encode("utf-8")
@@ -612,8 +612,8 @@ def visible_source_snapshots_as_of(
     This is a data-lineage view, not a delta-signal boundary. Call
     ``delta_eligible_snapshots_as_of`` before any future ratio-change work.
     """
-    if not isinstance(vintage, ShortInterestVintage):
-        raise _refuse("vintage must be a ShortInterestVintage")
+    if type(vintage) is not ShortInterestVintage:
+        raise _refuse("vintage must be the exact ShortInterestVintage type")
     if (
         not isinstance(cutoff, datetime)
         or cutoff.tzinfo is None

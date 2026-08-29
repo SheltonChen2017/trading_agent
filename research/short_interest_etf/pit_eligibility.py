@@ -642,14 +642,14 @@ def _select_lifecycle(
 def _select_classification(
     bundle: PitReferenceBundle,
     security_id: str,
-    settlement_date: str,
+    execution_session: str,
     execution_at: datetime,
 ) -> tuple[SectorClassificationObservation | None, str | None]:
     candidates = [
         item
         for item in bundle.classifications
         if item.security_id == security_id
-        and item.valid_on(settlement_date)
+        and item.valid_on(execution_session)
         and parse_utc_timestamp(item.available_at, "classification.available_at")
         <= execution_at
     ]

@@ -416,3 +416,36 @@ def test_named_refusals_are_hashed_into_dataset_identity():
     )
     assert build_identity(with_refusal)["refusal_count"] == 1
     assert build_identity(with_refusal) != build_identity(vintage)
+
+
+def test_vintage_subclass_cannot_cross_the_storage_or_as_of_boundary(tmp_path):
+    """The vintage container itself must be the exact type at both boundaries.
+
+    A subclass can override ``__post_init__`` and skip every canonicalisation
+    and type check the genuine contract performs. ``_content`` would then hash
+    whatever it was handed, publishing non-canonical bytes under a canonical
+    dataset identity, and the as-of view would report snapshots the vintage
+    never validated. Nested exact-type rules do not cover the container itself.
+    """
+    vintage = _vintage()
+
+    class UnvalidatedVintage(type(vintage)):
+        def __post_init__(self):  # deliberately skips the real contract
+            return None
+
+    impostor = UnvalidatedVintage(
+        manifest=vintage.manifest,
+        release_calendar=vintage.release_calendar,
+        snapshots=tuple(reversed(vintage.snapshots)),
+        refusals=vintage.refusals,
+    )
+    assert isinstance(impostor, type(vintage))
+    assert type(impostor) is not type(vintage)
+
+    with pytest.raises(ShortInterestDatasetError, match="exact ShortInterestVintage"):
+        write_vintage(impostor, tmp_path / "vintage-out")
+    with pytest.raises(ShortInterestDatasetError, match="exact ShortInterestVintage"):
+        visible_source_snapshots_as_of(
+            impostor, datetime(2024, 2, 14, 15, 0, tzinfo=timezone.utc)
+        )
+    assert not (tmp_path / "vintage-out").exists(), "refusal must precede any write"

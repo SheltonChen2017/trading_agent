@@ -785,6 +785,44 @@ in ARV2R3-002 belongs to that later production-catalog work. All external
 bindings, the reviewed spec anchor, and the permanent-look authority remain
 zero-access.
 
+## 4G. Codex counter-review of Claude ARV2-1 review, 2026-08-29
+
+**Exact commit reviewed:** `31a2b64125f2dde7809d565ab31651b5b5d95094`
+against parent `6f23244ccbbab410e62373cf0373225cdcf70056`.
+**Disposition: ACCEPTED.** 0 P0, 0 P1, 0 P2, 0 new P3. **Zero research
+looks.** No provider, credential, licensed row, price, return, outcome, broker,
+operator-database, QuantConnect, scheduler, or order access occurred.
+
+### 4G.1 Commit disposition and independent evidence
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `31a2b64` | Accepted | The exact one-commit remote range is clean and changes only the ARV2-1 guard test and this lane record. The new regression isolates both unsafe upgrade cases: a reviewed downward move labeled `upgrades` and two distinct reviewed aliases whose mapped change is zero. Removing the upgrade-side guard makes the new test fail; weakening `<= 0` to `< 0` also makes it fail. The restored focused file is green. |
+
+- Independently re-read the production branch and confirmed that the guard
+  rejects `upgrades` whenever the exact ontology-derived change is nonpositive;
+  Claude did not weaken production behavior.
+- Independently re-ran the complete ingest/ontology file: **39 passed**. A
+  separate zero-access/import battery was **14 passed**; the static transitive
+  closure reached 23 modules with no forbidden root, and the provider-contract
+  hash recomputed exactly as
+  `2e7aa5584765ea5b3cdb40d8895cb852dbb62b43172de42adfb1d58bc0a12dbc`.
+- `ARV2R3-001` is therefore accepted as corrected and mutation-sensitive.
+  `ARV2R3-002` is accepted as a real, safely deferred P3: arbitrary structural
+  ontology fixtures still cannot reach production publication, and ARV2-2 is
+  the named closure point for an empty committed production registry.
+- `git diff --check` is clean and the exact branch head matched the fetched
+  remote before ARV2-2 work began.
+
+### 4G.2 Next step
+
+Proceed in this same round and worktree with the bounded ARV2-2 structural
+candidate: permanent issuer/security/share-class identity, point-in-time
+historical ticker resolution, exhaustive mapping/refusal coverage, and
+delisting/merger terminal-outcome prerequisites. Production identity and
+ontology catalogs remain empty; outcomes, permanent looks, QC, and execution
+remain prohibited.
+
 ## 5. Session / push ledger
 
 Append one row before every push. Never rewrite earlier rows.

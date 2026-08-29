@@ -115,6 +115,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-28 | Codex implementation | `1de489c` -> `c821b10` (exact code snapshot; this lane-record commit follows) | SI-0/SI-1 source-contract and synthetic-fixture tranche | Added a lane-owned, outcome-free `research/short_interest_etf` package that freezes preregistration, official-snapshot/source/release/revision/security/volume/denominator contracts, conservative next-open availability, named refusals, stable-ID prior-cycle validation, append-only revisions, authenticated immutable vintage storage, and a separate noncanonical daily-short-volume type. Added one two-cycle synthetic official-style fixture and 66 dangerous-direction tests. No signal, provider adapter, licensed ingest, outcome join, ETF, or QC code was added. | Exact tree `c821b10`: **5,294 passed, 2 skipped, 0 failed, 25 known dependency warnings in 2,724.14s (45m24s)**. Final focused set: **77 passed in 18.24s**; 66 new Short Interest tests collected. Four reverse mutations each turned its guard red before textual restore: settlement/publication separation, full-payload event identity, immediate release-calendar prior linkage, and immutable-writer preflight. Full compileall exit 0; `git diff --check` clean. Python 3.13.14, pytest 9.1.1. Synthetic fixture only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. | Independent read-only code and adversarial reviews found P1 temporal/prior-link gaps, P2 identity/storage/boundary gaps, and P3 numeric-contract gaps; all were corrected before `c821b10`. Both final dispositions are accepted-after-correction with no remaining P0-P3. Details in section 8. | Finalize and commit this lane record, then push the complete post-`da798f0` range once. Claude independently reviews the exact pushed range before any later implementation. Full licensed SI-1 remains gated on owner-approved historical/vintage data and release/identity/denominator entitlements. |
 | 2026-08-28 | Claude review | `da798f0` -> `fee1978` reviewed; corrections at `11063c7` (this record commit follows) | Independent review of the Codex counter-review and the SI-0/SI-1 source-contract and synthetic-fixture tranche | Reviewed all four pushed commits individually. Accepted every finding of the Codex counter-review against my own prior work, including two that were my errors. Audited the new lane package against the owner PDF's frozen V1 specification and the section 3 bounded scope: the preregistration matches the blueprint exactly, the fixture is synthetic (`entitlement: synthetic_fixture_only`, ticker `SYN`), and no signal, ETF, portfolio, provider adapter, licensed ingest, outcome join, or QC code was added. | Complete suite in a clean detached worktree pinned to `11063c7`: **5,296 passed, 2 skipped, 0 failed, 25 known dependency warnings in 3,118.72s (51m59s)**. This independently confirms the implementer's 5,294-pass claim at `c821b10`: my tree is that tree plus exactly my two new tests (5,294 + 2 = 5,296) with the two skips unchanged. Lane suite 68 passed. Ten mutations run: four probing mutations survived and exposed the two findings plus one advisory; my two new guards each turn red against two independent mutants and green on restore; and two of Codex's four claimed mutations were reproduced independently (settlement/publication separation and full-payload event identity each turned exactly one test red). compileall exit 0; `git diff --check` clean. Synthetic fixture only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | Two P3 findings confirmed and corrected in `11063c7`; three P3 advisory observations recorded with no code change. No P0, P1, or P2. Details in section 9. | Codex counter-reviews `11063c7` and this record commit. Full licensed SI-1 ingest remains gated on owner-approved historical/vintage data, archived FINRA dissemination evidence, and identity/denominator entitlements. |
 | 2026-08-29 | Codex counter-review + implementation | `0a6561e` -> `6ef0ee9` (exact code snapshot; this lane-record commit follows) | Claude counter-review corrections + lane SI-2A offline PIT data readiness | Dispositioned Claude commits `11063c7` and `0a6561e` accepted after correction. `48fa344` closes exact-type, full-digest, exact-predicate, error-contract, and record-accuracy gaps. `de468f7` adds synthetic-only PIT lifecycle, classification, identity, denominator, ADV, and source-vintage readiness contracts. `6ef0ee9` preserves the active virtualenv during Windows preview validation while still refusing Store aliases. Recorded the owner's Short Interest/QC-only lane direction; no Trading App/Streamlit work was added. | Final complete suite on code snapshot `6ef0ee9`: **5,331 passed, 2 skipped, 0 failed, 26 known dependency warnings in 966.91s (16m06s)**; final SI-focused suite **100 passed in 12.08s**; installer evidence suite **57 passed in 101.79s**; compileall exit 0; `git diff --check` clean. Twelve reverse mutations across the SI-2A and Windows corrections each turned a guard red before textual restore. Synthetic fixtures only; no credentials, provider/licensed rows, outcomes, QuantConnect upload/job, broker, database, scheduler, deployment, order, or trading access; **0 research looks**. | `SI-CCR3-001` through `SI-CCR3-005` are closed with no remaining P0-P3 finding. SI-2A passed independent code/test audit after corrections. Details in sections 10 and 11. | Commit this record and push the four-commit combined round exactly once. Claude reviews that exact pushed snapshot. Full licensed SI-1/full SI-2 and all signals, outcomes, ETF aggregation, and QC algorithm/job work remain gated; future work in this lane stays Short Interest/QC-specific. |
+| 2026-08-29 | Claude review | `0a6561e` -> `b7ec5fb` reviewed; corrections at `f976773` (this record commit follows) | Independent review of the Codex counter-review corrections and the SI-2A offline PIT data-readiness tranche | Reviewed all four pushed commits individually. Accepted every counter-review finding against my own work, including a valid P2: my exact-type guard fixed only the two sites I had mutated and never swept for siblings, which is the generalisation step `CLAUDE.md` requires. Audited SI-2A against the lane ladder's SI-2 exit gate and confirmed both fixtures remain synthetic (`entitlement: synthetic_fixture_only`). | Complete suite in a clean detached worktree pinned to `f976773`: **5,332 passed, 2 skipped, 0 failed, 25 known dependency warnings in 1,724.08s (28m44s)**. This is the baseline 5,331 plus exactly the one regression test added here, with the two skips unchanged (5,334 collected in both runs). Baseline run on the exact pushed tree `b7ec5fb` reproduced the implementer's claim exactly: **5,331 passed, 2 skipped, 0 failed** in 1,676.49s, on Python 3.13.14 against their Python 3.12.13, so the result agrees across two interpreter versions. Lane suite 101 passed. Five mutations run: the lifecycle availability constraint and the lifecycle ambiguity refusal each turned a guard red, deleting the vintage type check left all 46 dataset and PIT tests green and produced the finding below, and my new guard turns red against reverting either corrected site. compileall exit 0; `git diff --check` clean. Synthetic fixtures only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | Two P3 findings confirmed and corrected in `f976773`. No P0, P1, or P2. Details in section 12. | Codex counter-reviews `f976773` and this record commit. Full licensed SI-1, full SI-2 ETF aggregation, every signal and outcome join, and all QC work remain gated. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -670,3 +671,137 @@ synthetic fixture and consumed **0 research looks**.
 4. Per the 2026-08-29 owner direction, every next milestone in this branch must
    stay Short Interest/QC-specific. Trading App/Streamlit work is out of scope.
    An external QuantConnect upload/job run still requires explicit authority.
+
+## 12. Claude independent review - 2026-08-29 (counter-review corrections and SI-2A PIT readiness)
+
+Reviewer: Claude, dedicated Short Interest lane session, isolated worktree
+`C:\git\customizedAgent\trading_agent_short_interest`. Governing documents:
+`CLAUDE.md`, `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`,
+`THREE_STRATEGY_PARALLEL_WORKFLOW.md`, and the owner blueprint.
+
+**Disposition: accepted after correction.** No P0, P1, or P2 issue was found.
+Two P3 issues were confirmed and corrected. SI-2A is an offline data-readiness
+contract on synthetic fixtures; accepting it establishes no market evidence and
+completes no research milestone.
+
+### 12.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous reviewed head | `0a6561e0f436b81d31d0c0d843fb8b666733fc06` |
+| Reviewed remote head | `b7ec5fb560cef0abbf07b814d9e2c2d0f1df9a8b` |
+| Ordered reviewed range | `0a6561e..b7ec5fb` (4 commits, no merge commit) |
+| Ancestry | `0a6561e` is an ancestor of `b7ec5fb`; clean fast-forward, no rebase, all earlier Claude commits preserved |
+| Claude correction commit | `f976773` |
+| Reviewer interpreter | Python 3.13.14 / pytest 9.1.1 (implementer used Python 3.12.13) |
+
+### 12.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `48fa344` | Close short-interest exact-type review gaps | **accepted after correction** (`SI-CR3-001`) |
+| 2 | `de468f7` | Implement short-interest PIT data readiness | **accepted after correction** (`SI-CR3-002`) |
+| 3 | `6ef0ee9` | Preserve virtualenv Windows preview validation | accepted |
+| 4 | `b7ec5fb` | Record SI-2A counter-review and milestone | accepted |
+
+### 12.3 The counter-review against my own work is accepted in full
+
+- `SI-CCR3-001` (P2) is **correct and is the most useful finding of the round**.
+  My guard pinned the exact-type rule only at the two sites I happened to
+  mutate. `CLAUDE.md` requires searching for generalised instances after a
+  confirmed finding, and I did not do that; `48fa344` correctly extended the
+  rule to `CollectionManifest`, `SecurityIdentity`, `VolumeBasis`,
+  `DenominatorObservation`, `ReleaseCalendarEntry`, and `SnapshotRefusal`.
+- `SI-CCR3-002` (P3) is correct. My manifest-digest test asserted inequality
+  against two mutated fields rather than equality with a full recomputed
+  payload hash, so a partial-payload digest could have survived it.
+- `SI-CCR3-003` (P3) is correct and is the same generalisation gap as 001.
+- `SI-CCR3-004` (P3) is correct, and this is the **second consecutive round**
+  in which I made an overbroad lane-isolation claim. Section 9.5 said the range
+  touched no shared file while `60d181a` had changed the shared
+  `tests/test_ml_evidence_operations.py`. The accurate formulation names the
+  shared files that changed and the authorisation covering them.
+- `SI-CCR3-005` (P2) was the implementer's own regression, found and fixed by
+  the implementer, and its intermediate failing run was disclosed rather than
+  hidden. That is the right handling.
+
+### 12.4 P0-P3 issue ledger
+
+Resolved items are retained. There are no P0, P1, or P2 findings.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR3-001 | P3 | Closed | `48fa344` | `research/short_interest_etf/dataset.py` `write_vintage` and `visible_source_snapshots_as_of` | The exact-type sweep stopped short of the container it protects: `ShortInterestVintage` itself was still admitted by `isinstance` at both boundaries, while the same commit converted every nested contract and the new `pit_eligibility.build_stock_data_readiness` already required the exact type for that same class. The module owning the type was laxer than the module consuming it. | Deleting the check outright left all 46 dataset and PIT-eligibility tests green, so neither site was pinned at all. The bypass is real and was demonstrated directly: a subclass overriding `__post_init__` skips every canonicalisation, and constructing one with reversed snapshots produced a different `snapshots_sha256`, so `write_vintage` would publish non-canonical bytes under a canonical dataset identity and the as-of view would report snapshots the vintage never validated. | The same fail-closed policy the round established for every nested contract must hold for the container that carries them into immutable storage; leaving it on `isinstance` is an inconsistency a later reader would reasonably resolve in the wrong direction. | Both sites now require the exact `ShortInterestVintage` type with a matching message, and `test_vintage_subclass_cannot_cross_the_storage_or_as_of_boundary` builds a validation-skipping subclass that both boundaries must reject before any file is written. | The new test turns red when either site is reverted to `isinstance` and green after each restore; the full lane suite passes at 101. |
+| SI-CR3-002 | P3 | Closed | `de468f7` | `research/short_interest_etf/pit_eligibility.py` `_select_classification` | The third parameter was named `settlement_date`, but every caller passes `cohort.session`. In the lane's most safety-critical point-in-time function, the name asserts the opposite of the rule: it reads as backdating sector validity to the settlement snapshot when validity is in fact evaluated at the executable release session. | The behaviour is correct and is pinned by `test_sector_mapping_must_be_valid_at_execution_not_only_settlement`, which fails if validity is evaluated at settlement. The name nevertheless misled this reviewer into recording the wrong rule until the call site was traced. | `CLAUDE.md` requires explicit names and units, and a point-in-time parameter whose name contradicts its argument invites a future maintainer to "fix" the call site and silently backdate availability. | Renamed the parameter to `execution_session`; no behavioural change, and the existing test continues to pin the rule. | The 101-test lane suite and the PIT-eligibility file pass unchanged after the rename. |
+
+### 12.5 Independent verification of SI-2A
+
+- **The implementer's validation claim reproduces exactly.** My baseline run on
+  the untouched pushed tree gave 5,331 passed, 2 skipped, 0 failed, matching the
+  recorded figures, and it did so on Python 3.13.14 where the implementer used
+  3.12.13. Agreement across two interpreter versions is stronger evidence than
+  either run alone.
+- **The two guards that matter most are load-bearing.** Dropping the lifecycle
+  `available_at <= execution_at` constraint, which is the module's look-ahead
+  boundary, turned a test red. Replacing the lifecycle ambiguity refusal so that
+  an arbitrary candidate is chosen also turned a test red. Neither fail-closed
+  rule is decorative.
+- **Selection is conservative in both directions.** Lifecycle and classification
+  refuse on missing *and* on ambiguous matches rather than picking a winner, and
+  each requires both an effective date at or before the execution session and an
+  availability timestamp at or before the execution instant.
+- **The readiness contract is observation-only.** `StockDataReadiness` carries
+  identity hashes, dates, sector and industry codes, a `ready` flag, and named
+  refusal reasons. It contains no order, side, size, weight, or target field, so
+  it cannot be mistaken for an action payload.
+- **The refusal taxonomy matches the lane ladder's SI-2 exit gate**: ticker
+  reuse and identity expiry, delisting, denominator vintage via the unaudited-
+  float refusal, and stale volume via the settlement-aligned ADV window, plus
+  superseded revisions, missing priors, ambiguity, and unresolved corporate
+  actions.
+- **Scope and provenance hold.** `pit_reference_v1.json` is
+  `synthetic_fixture_only` with an invented security, the tranche adds no
+  signal, ETF, portfolio, provider adapter, licensed ingest, or QC code, and the
+  SI-2A label is correctly distinguished from the blueprint's SI-2 ETF
+  aggregation round.
+
+### 12.6 Review scope and a correction to my own method
+
+- `pit_eligibility.py` was reviewed for its point-in-time, identity, ambiguity,
+  and refusal semantics and exercised by mutation at two sites. It was not
+  re-derived line by line; its strict-schema and lineage behaviour rests on the
+  21 tests shipped with it plus the mutations recorded here.
+- I initially attributed the vintage bypass to a subclass shadowing a validated
+  field with a property. That mechanism does not work, because the dataclass
+  `__init__` assigns the field and the property has no setter. I discarded that
+  reasoning and re-established the finding on the mechanism that does work, a
+  subclass overriding `__post_init__`, before writing the regression test. The
+  finding stands on the verified mechanism, not the first one I proposed.
+- Everything in this tranche remains a claim about software behaviour on
+  synthetic fixtures. It is not evidence of any market edge.
+
+### 12.7 Owner lane-scope direction, 2026-08-29
+
+The owner directed that this lane is used solely for Short Interest
+development toward QuantConnect testing and, eventually, autopiloted live
+trading. Any issue found during review that is unrelated to that purpose must
+be **documented but not fixed**.
+
+Both corrections in `f976773` fall inside the lane package
+(`research/short_interest_etf/dataset.py` and `pit_eligibility.py`), so this
+round complies. The rule applies to later rounds: a defect found in shared
+assistant, execution, ML, or operational code will be recorded here with its
+evidence and left uncorrected for a separately scoped decision. Note for
+continuity that the previous round's correction touched the shared
+`tests/test_ml_evidence_operations.py`; that predates this direction and is
+not retroactively reverted.
+
+### 12.8 Remaining gates and next authorized step
+
+1. Codex counter-reviews `f976773` and this record commit.
+2. Full licensed SI-1 ingest, full SI-2 ETF aggregation, every signal
+   computation, every outcome join, and all QuantConnect work remain gated on
+   separate owner authorisation. The permanent research-look count remains 0.
+3. No provider, credential, broker, scheduler, or deployment access is
+   authorised by accepting this tranche.

@@ -27,8 +27,18 @@ Submitted source-plan SHA-256:
 
 The governing PDF and this record are specifications, not research evidence,
 deployment approval, or trading authority. Codex is the primary implementer
-and Claude is the independent reviewer. This fourth lane is not covered by the
-three named lanes' same-branch exception.
+and Claude is the independent reviewer.
+
+**Owner workflow override, 2026-08-29:** the owner explicitly extended the
+serialized same-branch lane workflow to Target-Price Revisions. All Codex
+implementation, Claude review, Codex counter-review/correction, and the next
+bounded milestone remain on `codex/strategy-target-price-revisions` in
+`C:\git\customizedAgent\trading_agent_TargetPriceRevision`. A role may create
+several commits during its round, but makes only one push at the end of that
+round. No review, counter-review, checkpoint, handoff, or feature branch is
+created. This decision supersedes only the governing PDF's generic
+separate-review-branch statements on physical pages 3, 21, 23, and 26; every
+research, evidence, safety, outcome, QC, paper, and live gate remains intact.
 
 ## 1. Decision and canonical strategy boundary
 
@@ -176,8 +186,10 @@ a local configuration value grants no authority.
     restricted-live, and bounded-unattended stages.
 17. Add health/SLO monitoring, fixed capital/risk envelopes, kill switch,
     incident evidence, tested rollback, and new approval for every expansion.
-18. Use the generic separate-review topology until the owner explicitly
-    extends the three-lane exception.
+18. Use the owner-directed serialized same-branch topology: Codex write,
+    Claude review, Codex counter-review plus the next bounded milestone, then
+    Claude review again; several commits are permitted within a round but only
+    one push occurs at its end.
 
 ## 4. Milestone ladder
 
@@ -254,45 +266,72 @@ Creating this branch, worktree, PDF, and record changes none of these entries.
 
 ## 7. Review and repository topology
 
-The same-branch workflow is an owner exception for exactly three named strategy
-lanes and does not extend to this lane by inference. The generic repository
-workflow applies unless the owner explicitly changes it:
+The owner explicitly assigned this lane the following repeating serialized
+cycle. Review independence comes from role separation, exact pushed commit
+ranges, evidence, and explicit dispositions, not a separate branch.
 
-1. Codex implements one bounded milestone on
-   `codex/strategy-target-price-revisions` and stops at a stable, committed
-   snapshot.
-2. Claude independently reviews that exact snapshot commit by commit on a
-   separate `user/claude/...` review branch, maintains the P0-P3 ledger, and
-   records an explicit disposition for every commit.
-3. Corrections and acceptance follow the standing review and handoff process;
-   no next milestone begins until the current snapshot is accepted and the
-   Action Plan schedules the next bounded scope.
-4. Every implementation or review series updates this authoritative record and
-   `docs/SESSION_HANDOFF.md`. The Action Plan receives only a concise reference
-   when sequencing, milestone status, a gate, or the next authorized step
-   changes.
-5. No push, merge, provider access, outcome access, QC job, broker operation,
-   paper deployment, or live deployment is authorized merely by this record.
+1. **Codex write.** Codex implements only the currently authorized bounded
+   milestone in this branch and worktree, updates this record, may make several
+   local commits, validates the cumulative head, and pushes exactly once at the
+   end of the Codex round. Codex then stops.
+2. **Claude review.** Claude reviews every commit in the exact pushed Codex
+   range and the cumulative tree on this same branch/worktree, maintains the
+   P0-P3 ledger, commits any authorized corrections and record updates, may use
+   several commits, and pushes exactly once at the end of the Claude round.
+3. **Codex counter-review plus next milestone.** Codex reviews and dispositions
+   every Claude commit. Codex corrects confirmed defects. If the reviewed
+   snapshot is accepted or accepted-after-correction and no owner decision or
+   gate blocks progress, Codex implements the next bounded milestone in the
+   same round, validates the review corrections and new milestone separately
+   and cumulatively, updates this record, and pushes exactly once at the end.
+4. **Claude reviews again.** Claude reviews the exact new pushed range and the
+   cycle repeats. A rejection or unresolved owner/gate blocker stops before
+   next-milestone implementation and before any combined push that would imply
+   progress.
+
+No review, counter-review, checkpoint, handoff, or feature branch is created.
+Never force-push or rewrite published history. Before committing or pushing,
+reverify `HEAD`, the branch, worktree, and uncommitted state. One round may
+contain several commits, but it has one push at its end and no intermediate
+pushes.
+
+This branch and worktree are dedicated solely to Target-Price Revisions.
+Feature code, tests, fixtures, and lane documentation remain target-owned.
+If work reveals a defect outside this lane, record its identifier, severity,
+evidence, affected paths, safety impact, and proposed future owner-routed work
+in the out-of-lane ledger below; do not correct the external area. If the
+external defect blocks safe or truthful lane progress, stop at the gate and
+request owner direction rather than crossing the boundary.
+
+No push, merge, provider access, outcome access, QC job, broker operation,
+paper deployment, or live deployment is authorized merely by this workflow.
 
 ## 8. Exact next step
 
-The exact next step is independent review of the documentation-only baseline,
-not TPR-1 implementation or data acquisition:
-
-1. commit the revised PDF and this record on
-   `codex/strategy-target-price-revisions`;
-2. Claude reviews the exact committed documentation snapshot on a separate
-   review branch;
-3. Codex resolves or dispositions every review finding and leaves a clean,
-   accepted planning snapshot; and
-4. only an explicit Action Plan scheduling decision may then start TPR-0.
+The exact next step is to finish the current Codex documentation round, then
+make its single end-of-round push when the owner requests publication. Claude
+then independently reviews the complete pushed documentation range on this
+same branch and worktree. After that review, Codex counter-reviews every Claude
+commit. Only if the planning snapshot is accepted or accepted-after-correction
+and no owner/gate blocker remains may the same Codex round implement TPR-0.
 
 If scheduled, TPR-0 is limited to the content-addressed preregistration and
 zero-outcome structural controls named above. It grants no provider purchase
 or credential use, real-data normalization, outcome access, research look, ETF
 construction, QC processing, broker action, paper operation, or live trading.
 
-## 9. Session / commit ledger
+## 9. Out-of-lane findings ledger
+
+Do not fix findings outside Target-Price Revisions from this branch. Append a
+row with sufficient evidence for later owner routing. `None` is the current
+measured state; it is not a claim that the rest of the repository is defect
+free.
+
+| ID | Severity | External area / paths | Evidence and lane impact | Disposition / future route |
+|---|---|---|---|---|
+| None | - | - | No out-of-lane finding was established during the documentation-only planning work. | No action. |
+
+## 10. Session / commit ledger
 
 Append one row for every durable implementation, review, correction, handoff,
 or push. Never rewrite or delete an earlier row. Record exact commits once
@@ -301,4 +340,5 @@ known.
 | UTC date | Role | Start -> end | Milestone | Summary | Validation / looks | Findings | Authority change | Next |
 |---|---|---|---|---|---|---|---|---|
 | 2026-08-29 | Codex planning | `086b782e43a5ff889e71ec8e26334bb791ccac74` -> documentation candidate | Documentation only | Created the dedicated branch/worktree, corrected the target-price research/QC plan, added separately gated shadow, paper, restricted-live, and bounded-unattended stages, and recorded lane governance; no code or data. | PDF generated with ReportLab; `pdfinfo` reports 26 letter-size pages and no encryption, JavaScript, forms, or suspect state; all 26 rendered pages visually inspected; extracted text contains every part and final gate; 67 active-document tests passed; the three Markdown staged paths pass `git diff --check`; the staged PDF blob is byte-identical to the visually reviewed file and pinned SHA-256; 0 outcome accesses; 0 looks. | Target-price revisions require a separate family, provider normalizer, timing/basis audit, four-family multiplicity decision, permanent look authority, and independent review. | None; all production, outcome, QC, broker, paper, and live authority remains zero. | Claude independently reviews the exact documentation snapshot; implementation waits for Action Plan scheduling. |
+| 2026-08-29 | Codex documentation | `c1798013d911ef54dba82157326c826ac7763ec3` -> workflow-override candidate | Owner workflow direction | Recorded the explicit same-branch/same-worktree serialized loop, several-commits/one-push-per-role-round rule, target-only branch boundary, and document-but-do-not-fix rule for external findings. The override supersedes only the PDF's prior separate-review-branch wording. | 67 active-document tests passed; Markdown `git diff --check` clean; 0 provider/outcome/QC/broker accesses; 0 looks. | No out-of-lane finding established. | Workflow topology only; no implementation, source, outcome, QC, paper, live, deployment, or capital authority added. | Keep the cumulative Codex round local until its single end-of-round push is requested; Claude then reviews the exact pushed range on this branch/worktree. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |

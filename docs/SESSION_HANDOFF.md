@@ -36,24 +36,30 @@ by this documentation task.
   paper/live intents, or promotion approvals. No credential, licensed row,
   provider, outcome, QC, broker, operator database, scheduler, deployment,
   evidence epoch, paper order, live order, or capital surface was accessed.
-- The existing same-branch exception still applies only to the three named
-  lanes. Target-Price Revisions uses the generic topology unless the owner
-  explicitly changes it: Codex stable implementation snapshot, Claude review
-  of that exact snapshot on a separate review branch, Codex counter-review,
-  and owner-controlled merge.
+- Later owner workflow decision, 2026-08-29: Target-Price Revisions uses the
+  serialized Codex-write -> Claude-review -> Codex-counter-review plus next
+  milestone -> Claude-review loop on the same
+  `codex/strategy-target-price-revisions` branch and dedicated worktree. Each
+  role may make several commits in its round but pushes exactly once at the
+  end. No review, counter-review, checkpoint, handoff, or feature branch is
+  created. The worktree is target-price-only; external findings are recorded
+  for later owner routing and are not fixed from this lane.
 - Before any target-price outcome access, TPR-0 must freeze its exact source,
   timing, formula, split/FX/horizon, primary cell, power/economic gates,
   permanent look budget and null disposition. The owner must also amend the
   common multiplicity/final-holdout contract to four families or explicitly
   exclude TPR. Local configuration cannot grant that authority.
-- The exact next step is independent review of this documentation-only
-  snapshot. TPR-0 is not started by creating the worktree. Provider/data
-  access, outcome research, ETF work, QC execution, shadow, paper, live and
-  unattended operation remain separately gated.
+- The exact next step is to complete the current Codex documentation round and
+  make its one end-of-round push when publication is requested. Claude then
+  independently reviews the exact pushed range on this same branch/worktree.
+  TPR-0 is not started by creating the worktree. Provider/data access, outcome
+  research, ETF work, QC execution, shadow, paper, live and unattended
+  operation remain separately gated.
 - `docs/ACTION_PLAN_2026-08-20.md` receives only the concise sequencing and
   authority reference above. The existing three-lane direction, records and
-  data-source register remain unchanged; no same-branch or shared-file
-  exception was extended by inference.
+  data-source register remain unchanged. The same-branch exception is now
+  explicitly extended only to Target-Price Revisions; no shared-file or other
+  lane exception is extended by inference.
 
 ## 0A. Deferred P2/P3 remediation handoff
 
@@ -249,11 +255,11 @@ During the three-lane phase, agents must not edit this handoff or the Action
 Plan on any of the three named lanes. The completed owner-directed one-time
 remediation synchronization was their sole implementation exception; it is
 exhausted. The owner's 2026-08-29 direction created a separate fourth planning
-lane under the generic workflow and is recorded here as a coordination change;
-it does not edit any existing lane record, revive the exhausted synchronization
-exception, or extend the same-branch topology. Each named lane's implementation
-record remains that branch's status, review ledger, validation record, and
-resume prompt.
+lane and later explicitly assigned that target lane the same serialized
+same-branch review loop. This coordination update does not edit an existing
+lane record, revive the exhausted synchronization exception, or grant a
+shared-file exception. Each named lane's implementation record remains that
+branch's status, review ledger, validation record, and resume prompt.
 
 The owner-directed main-line coordination surface is
 `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`. Only a separately directed
@@ -325,13 +331,17 @@ short-interest source is the clearest missing paid input.
 
 The documentation-only record is
 `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
-It is a separate fourth planning lane under the generic review workflow. No
+It is a separate fourth planning lane under the owner-directed serialized
+same-branch, one-push-per-role-round workflow. All feature implementation,
+review, counter-review, and next-milestone work stays on
+`codex/strategy-target-price-revisions` in the dedicated target worktree. No
 provider-specific target normalizer, authenticated target event, permanent
 target look authority, stock score, ETF topology, portfolio, QC algorithm,
 prospective shadow/paper evidence, or live authority exists. The submitted
 plan is replaced by a corrected stock-first blueprint whose later QC/autopilot
-stages remain individually owner-gated. The exact next action is independent
-review of the documentation snapshot, not implementation or data access.
+stages remain individually owner-gated. The exact next action is the single
+end-of-round Codex push followed by Claude review of that exact range on the
+same branch, not implementation or data access.
 
 ## 5. Data acquisitions and confirmations
 

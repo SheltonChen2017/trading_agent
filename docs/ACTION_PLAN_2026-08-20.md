@@ -27,14 +27,23 @@ planning candidate and status record are
 and
 `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
 This addition authorizes only the documentation baseline and its independent
-review. It does not inherit the three named lanes' same-branch exception, does
-not reorder or merge those lanes, and does not schedule provider, outcome,
-research-look, ETF, QC, broker, shadow, paper, live, deployment, or capital
-authority. Before any target-price outcome access, an owner-directed TPR-0
-must freeze its separate family/look contract and either add the fourth family
-to the common multiplicity/final-holdout design or explicitly exclude it.
-Shadow, paper, restricted-live canary, and bounded unattended operation are
-separate future promotion decisions; no stage authorizes the next.
+review. **Later owner workflow decision, 2026-08-29:** this target lane uses
+the serialized Codex-write -> Claude-review -> Codex-counter-review plus next
+milestone -> Claude-review loop on the one long-lived
+`codex/strategy-target-price-revisions` branch and dedicated
+`trading_agent_TargetPriceRevision` worktree. Each role may make several
+commits in its round but pushes exactly once at the end; no review,
+counter-review, checkpoint, handoff, or feature branch is created. The branch
+and worktree are target-price-only. Findings outside this feature are recorded
+for later owner routing and are not corrected here. This explicit exception is
+limited to Target-Price Revisions and does not reorder, merge, or modify the
+three existing lanes. It does not schedule provider, outcome, research-look,
+ETF, QC, broker, shadow, paper, live, deployment, or capital authority. Before
+any target-price outcome access, an owner-directed TPR-0 must freeze its
+separate family/look contract and either add the fourth family to the common
+multiplicity/final-holdout design or explicitly exclude it. Shadow, paper,
+restricted-live canary, and bounded unattended operation are separate future
+promotion decisions; no stage authorizes the next.
 
 **Post-integration review/remediation gate, owner direction 2026-08-28:** only
 after all three feature branches complete their lane review loops and the owner
@@ -184,7 +193,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
 | Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
-| Target-Price Revisions (TPR) | Separate fourth planning lane, documentation-only and unaccepted. The revised PDF and implementation record define a stock-first target-price family and a later, independently gated QC/autopilot ladder. The generic separate-review workflow applies. No authenticated source, event, signal, outcome access, look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
+| Target-Price Revisions (TPR) | Separate fourth planning lane, documentation-only and unaccepted. The revised PDF and implementation record define a stock-first target-price family and a later, independently gated QC/autopilot ladder. The owner-directed serialized same-branch, one-push-per-role-round workflow applies in the dedicated target worktree. No authenticated source, event, signal, outcome access, look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0

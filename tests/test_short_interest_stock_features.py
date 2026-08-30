@@ -123,6 +123,22 @@ def test_every_source_event_keeps_a_feature_or_its_exact_readiness_refusal():
     assert ready.feature is not None
 
 
+def test_non_ready_disposition_cannot_carry_an_otherwise_valid_feature():
+    dispositions = _dispositions()
+    non_ready = next(item for item in dispositions if not item.readiness.ready)
+    _, valid_feature = _ready_feature()
+
+    with pytest.raises(
+        StockFeatureError,
+        match="non-ready source data cannot carry a stock feature",
+    ):
+        StockFeatureDisposition(
+            readiness=non_ready.readiness,
+            feature=valid_feature,
+            refusal_reasons=non_ready.refusal_reasons,
+        )
+
+
 def test_golden_current_prior_and_delta_ratios_are_exact_and_use_each_denominator():
     disposition, feature = _ready_feature()
     vintage = _vintage()

@@ -43,7 +43,7 @@ DRAFT = (
 HASH_A = "a" * 64
 HASH_B = "b" * 64
 DATASET_ID = "arv2_ds_" + HASH_A
-LOOK_ID = "arv2-look-stock-primary-001"
+LOOK_ID = "arv2-look-legacy-v1-migration-only"
 CELL_ID = "arv2-stock-primary-20d"
 
 
@@ -336,19 +336,28 @@ def _request(raw: dict[str, object] | None = None) -> OutcomeAccessRequest:
 
 
 def test_repository_draft_is_complete_but_non_executable() -> None:
-    draft = load_draft_preregistration(DRAFT)
-    assert draft.unresolved_owner_decisions == ()
-    assert draft.planned_look_ids == (LOOK_ID,)
-    assert "corporate_action_contract.source_id" in draft.pending_external_bindings
-    assert "independent_review_anchor" in draft.pending_external_bindings
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
+        load_draft_preregistration(DRAFT)
     with pytest.raises(PreregistrationError, match="reviewed_frozen"):
         load_reviewed_preregistration(DRAFT)
+
+
+def test_superseded_look_identity_cannot_be_revived_by_date_edit(
+    tmp_path: Path,
+) -> None:
+    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    _cell(raw, "lane_validation_period")["value"]["start"] = "2026-09-02"
+    raw["looks"][0]["validation_start"] = "2026-09-02"
+    _candidate_rehash(raw)
+
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
+        load_draft_preregistration(_write(tmp_path, raw))
 
 
 def test_owner_decision_candidate_cannot_claim_unreviewed_source_or_look_bindings(
     tmp_path: Path,
 ) -> None:
-    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    raw = _migration_only_candidate_raw()
     _cell(raw, "corporate_action_contract")["value"]["source_id"] = "invented"
     raw["looks"][0]["dataset_id"] = DATASET_ID
     _rehash(raw)
@@ -366,12 +375,12 @@ def test_owner_decision_candidate_hash_covers_every_policy_choice(
         load_draft_preregistration(_write(tmp_path, raw))
 
 
-def test_reviewed_spec_round_trip_is_zero_access_without_external_authority(
+def test_reviewed_legacy_spec_is_retired_even_without_external_authority(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     path, raw = _anchored_spec(tmp_path, monkeypatch)
     spec = load_reviewed_preregistration(path)
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
 
 
@@ -455,7 +464,7 @@ def test_dangerous_outcome_request_mutations_refuse_without_spending(
     request = replace(_request(raw), **mutation)
     with pytest.raises(PreregistrationError, match=message):
         authorize_outcome_access(spec, request)
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
 
 
@@ -467,13 +476,13 @@ def test_deleting_or_substituting_a_local_ledger_cannot_reset_access(
     legacy = tmp_path / "permanent-look-ledger.sqlite3"
     legacy.write_bytes(b"forged local state")
     monkeypatch.setattr(preregistration, "LEGACY_LOCAL_LOOK_LEDGER_PATH", legacy)
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
     legacy.unlink()
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
     legacy.write_bytes(b"substituted unspent database")
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
 
 
@@ -484,7 +493,7 @@ def test_no_local_concurrent_caller_can_win_a_permanent_look(
     spec = load_reviewed_preregistration(path)
 
     for _ in range(2):
-        with pytest.raises(PreregistrationError, match="zero-access"):
+        with pytest.raises(PreregistrationError, match="superseded unspent"):
             authorize_outcome_access(spec, _request(raw))
 
 
@@ -507,7 +516,7 @@ def test_substituted_repository_authority_cannot_enable_access(
     monkeypatch.setattr(
         preregistration, "PERMANENT_LOOK_AUTHORITY_PATH", substituted
     )
-    with pytest.raises(PreregistrationError, match="externally pinned"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
 
 
@@ -593,7 +602,7 @@ def test_single_runner_reauthenticates_inputs_but_never_invokes_outcome_loader(
         invoked = True
         return b"forbidden outcome bytes"
 
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         run_authorized_outcome_slice(
             preregistration_path=spec_path,
             snapshot_root=snapshot_root,
@@ -718,6 +727,24 @@ def _candidate_rehash(raw: dict[str, object]) -> None:
     raw["spec_id"] = f"arv2-round0-candidate-{raw['spec_hash'][:16]}"
 
 
+def _migration_only_candidate_raw() -> dict[str, object]:
+    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    _cell(raw, "lane_validation_period")["value"].update(
+        start="2026-09-02",
+        end="2027-08-31",
+    )
+    raw["looks"][0].update(
+        look_id=LOOK_ID,
+        validation_start="2026-09-02",
+        validation_end="2027-08-31",
+    )
+    _cell(raw, "multiplicity_family")["value"]["permanent_look_ids"] = [
+        LOOK_ID
+    ]
+    _candidate_rehash(raw)
+    return raw
+
+
 @pytest.mark.parametrize(
     ("mutate", "match"),
     [
@@ -773,7 +800,7 @@ def test_candidate_refuses_each_single_violation_alone(tmp_path, mutate, match):
     carry its own regression rather than hiding behind a sibling violation in
     the same fixture.
     """
-    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    raw = _migration_only_candidate_raw()
     mutate(raw)
     _candidate_rehash(raw)
     with pytest.raises(PreregistrationError, match=match):

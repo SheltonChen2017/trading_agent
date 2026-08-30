@@ -3,12 +3,14 @@
 Status: **ARV2-1 ACCEPTED. ARV2-2 PIT IDENTITY/OUTCOME-PREREQUISITE CANDIDATE
 ACCEPTED AFTER CLAUDE REVIEW AND CODEX COUNTER-REVIEW CORRECTION. ARV2-3
 OUTCOME-FREE STRUCTURAL STOCK-SCORE CANDIDATE ACCEPTED AFTER INDEPENDENT
-CLAUDE REVIEW AND CODEX COUNTER-REVIEW CORRECTION. ARV2-4 IS BLOCKED BEFORE
-IMPLEMENTATION, OUTCOME ACCESS, OR QC ACCESS BY UNFROZEN MANDATORY-CONTROL
-AND PRIMARY EVENT-STUDY SEMANTICS PLUS THE RECORDED SOURCE, RIGHTS, REVIEW,
-TIME, AND ONE-USE AUTHORITY GATES. NO AUTHENTICATED PRODUCTION EVENT EXISTS. NO V2
-SIGNAL/SCORE/CROSS-SECTION WITH PRODUCTION OR EXECUTABLE AUTHORITY,
-NONEMPTY PORTFOLIO, OUTCOME TEST, QC RESULT, OR DEPLOYMENT EXISTS.**
+CLAUDE REVIEW AND CODEX COUNTER-REVIEW CORRECTION. THE OWNER-FROZEN QC-FIRST
+OUTCOME-FREE PLAN IS IMPLEMENTED AS A CONTENT-ADDRESSED CANDIDATE PENDING
+INDEPENDENT CLAUDE REVIEW. ARV2-4 IMPLEMENTATION AND EVERY DATA, OUTCOME,
+UPLOAD, COMPILE, QC-RUN, PAPER, OR FUNDED ACTION REMAIN BLOCKED BY THE
+RECORDED SOURCE, RIGHTS, REVIEW, RUN-IDENTITY, AND ONE-USE AUTHORITY GATES.
+NO AUTHENTICATED PRODUCTION EVENT EXISTS. NO V2 SIGNAL/SCORE/CROSS-SECTION
+WITH PRODUCTION OR EXECUTABLE AUTHORITY, NONEMPTY PORTFOLIO, OUTCOME TEST,
+QC RESULT, OR DEPLOYMENT EXISTS.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -78,7 +80,7 @@ completion.
 | Event normalization | In addition to the zero-access canonical-event/refusal/result contracts, V2 now has a content-addressed Massive/Benzinga provider contract, exact documented field/action parsing, one source-derived ingest disposition per raw row, duplicate-ID refusal, immutable raw-hash version IDs, two-snapshot correction/addition/disappearance lineage, and an exhaustive structural binding of accepted rows to PIT permanent identity or a named refusal. The firm/identity join retains the exact ARV2-1 rational mapping. Legacy `research/acer/` rows remain legacy evidence. | The production source, security-master, and firm-ontology registries are empty. The older zero-access `CanonicalSourceEvent` representation is not yet a publishable rational firm-score event, and no real event has passed production registration. | ARV2-1 accepted; ARV2-2 structural identity candidate implemented; accepted production events remain prohibited. |
 | Time semantics | Exchange-session availability rules, strict UTC instants, next-open handling, and the conservative date-only delay are implemented as deterministic contracts. | Provider clock semantics and actual timestamp completeness have not been authenticated for a production V2 snapshot. | Safety rule implemented; no production event admitted. |
 | Firm identity and rating ontology | A loader-authenticated, content-addressed mapping now requires firm ID/name, half-open valid date range, exact raw label, complete ordered rank/scale size, company/sector/absolute scope, mapping quality, reviewer, source evidence, and ontology version. It implements the blueprint score as an exact rational number, refuses unreviewed labels and periods, inventories observed labels without ordering them, admits only direction-consistent upgrades/downgrades, and keeps initiations, target-only actions, and terminations out of the rating-change channel. A separate fixed Git-anchored production registry now prevents a structural fixture from self-promoting. | The committed production ontology registry is empty. No production firm-specific ordered vocabulary, reviewed policy artifact, or authenticated permanent firm/analyst identity mapping exists. No label is inferred from the public sample or legacy ACER map; documented `assumes` remains quarantined pending semantic review. | ARV2-1 accepted; production ontology access refuses. |
-| Canonical stock formula | ARV2-3 adds exact 20-session exponential decay without a hard cutoff, NYSE-session age derived inside the assembler, institution-stock-session dedupe, rational rating deltas, stable raw summation, absolute-mass institution/catalyst breadth, activity-aware sector median/MAD normalization with the frozen 1.4826 scale and symmetric ±4 clip, and the stock-specific `N_eff / (N_eff + 3) * q_data` reliability. It revalidates the complete ARV2-2 source/ontology/identity chain, preserves structural zero versus active cancellation, and emits only a content-addressed fixture-only pre-control candidate. | No authenticated production events, institution/common-event mappings, PIT sector classifications, measured stock-level data quality, or production score artifact exists. The mandatory control-residualization sentence has no frozen executable estimator/intercept/scaling/collinearity contract, so final executable publication refuses rather than inventing one. | ARV2-3 structural pre-control candidate accepted after Claude review and Codex counter-review correction; no production signal or score. |
+| Canonical stock formula | ARV2-3 adds exact 20-session exponential decay without a hard cutoff, NYSE-session age derived inside the assembler, institution-stock-session dedupe, rational rating deltas, stable raw summation, absolute-mass institution/catalyst breadth, activity-aware sector median/MAD normalization with the frozen 1.4826 scale and symmetric ±4 clip, and the stock-specific `N_eff / (N_eff + 3) * q_data` reliability. It revalidates the complete ARV2-2 source/ontology/identity chain, preserves structural zero versus active cancellation, and emits only a content-addressed fixture-only pre-control candidate. | No authenticated production events, institution/common-event mappings, PIT sector classifications, measured stock-level data quality, or production score artifact exists. The QC-first plan now freezes the estimator, fitting population, timing, scaling, missingness, collinearity, structural-zero, and operation-order choices, but they remain independently unreviewed and unimplemented; final executable publication still refuses. | ARV2-3 structural pre-control candidate accepted; QC-first control specification candidate pending Claude review. |
 | Consensus, novelty, targets, and EPS | Canonical-versus-diagnostic separation is contract-pinned; legacy target/timing runners are quarantined from V2 and from new outcome access. | No production historical active-rating state, novelty series, or decision-grade target/EPS extension has been built or authorized. | Deferred diagnostics/extensions; they cannot alter the canonical score. |
 | Provider-history boundary | Measured pre-2013 source rows retain the exact dominant quarantine even when another defect is present and cannot be laundered through a later partition. Chronologically captured snapshots compare stable IDs/raw hashes as unchanged, added, corrected, or missing-from-later-without-invented-withdrawal. | Provider coverage, backfill, correction, and deletion semantics remain unauthenticated for V2 production use; no current licensed snapshot was accessed in this milestone. | Structural lineage implemented; factual provider audit still requires exact owner authorization. |
 | Issuer/security identity | A canonical, content-addressed, loader-reauthenticated PIT master now separates issuers, securities, share classes, vendor/standard identifiers, listings, and lineage. It binds base and interval-closure availability, redacts future endpoints, resolves historical tickers by event date/cutoff, preserves ticker reuse and share classes, represents symbol/listing changes, mergers and delistings, refuses ambiguity/ineligibility/late evidence, and reports exhaustive integer coverage. The legacy name/ticker diagnostic's 768 deterministic interleavings remain a lower bound, not an allowlist; current-ticker joins are prohibited. | The committed production security-master registry is empty. No real source, rights/entitlement evidence, production vintage/correction builder, or accepted mapping exists; structural fixtures cannot self-promote. | ARV2-2 structural identity candidate implemented; production identity access refuses. |
@@ -86,8 +88,8 @@ completion.
 | Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. ARV2-2 now derives a revalidatable, fail-closed inventory of in-range merger/delisting terminal-return requirements and never silently omits an unavailable terminal name. No event has been joined to a later price or return; Databento remains unmeasured. | Production split/dividend, cost/ADV, and terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. | Outcome prerequisites implemented structurally; no outcome I/O and zero looks. |
 | ETF holdings/topology | PIT holdings, declared-versus-summed weight reconciliation, stale/incomplete refusal, fixed lag, 99% coverage, eligibility, and stock-score lineage primitives exist. | No authenticated production holdings or stock-score artifact exists, so no production reverse index, ETF score, or peer topology exists. | Consumer safety implemented; production topology remains zero-access. |
 | Cross-section and portfolio | Deterministic rank/hysteresis/tie/eviction/cap/overlap/cash allocator primitives and verified policy bindings exist. | No reviewed simultaneous rank/volatility derivation or authenticated rank/classification/cost source exists. The public boundary therefore refuses every nonempty portfolio and can return only the safe empty/all-cash result. | Dormant safety algorithm implemented; no research portfolio or QC result. |
-| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. | Required owner decisions remain open; the independently reviewed exact-spec registry is empty; no independent review anchor or external cross-machine append-only permanent-look authority exists. | Validation/gating primitives implemented; every outcome authorization refuses. |
-| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps the legacy outcome runners non-new/non-V2 with no network fallback. ARV2-3 is included in the transitive import firewall and reaches neither outcomes, execution, QC, nor legacy ACER. Its structural evidence and candidate authority are explicitly fixture-only, diagnostics revalidate the complete candidate chain, and every refusing cross-section clears partial scores and normalization records. | Production source, ontology, security-master, institution, common-event, classification, quality, outcome, look, QC, and execution authorities remain absent or zero-access. | ARV2-2 accepted after correction; ARV2-3 structural candidate implemented and pending independent review. |
+| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period now refuses as superseded unspent. A separate exact loader authenticates the QC-first planning candidate while exposing four constant-false side-effect capabilities. | The QC-first candidate still needs independent review and future executable-spec integration. The reviewed-spec registry is empty; no source/run binding, independent review anchor, upload authority, external cross-machine append-only permanent-look authority, or QC plan hash exists. | Old prospective candidate retired with zero looks; QC-first semantics frozen as planning-only; every outcome/QC authorization refuses. |
+| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps the legacy outcome runners non-new/non-V2 with no network fallback. ARV2-3 and the pure QC-first planning contract are included in the transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. Structural evidence remains fixture-only, diagnostics revalidate the complete candidate chain, and every refusing cross-section clears partial scores and normalization records. | Production source, ontology, security-master, institution, common-event, classification, quality, outcome, look, QC, and execution authorities remain absent or zero-access. | ARV2-3 accepted after correction; QC-first planning candidate pending independent review. |
 
 The production source, firm-ontology, security-master, classification, cost,
 and rank catalogs remain empty. The canonical source authority permits no
@@ -105,11 +107,14 @@ and this implementation consumed **zero looks**.
 | ARV2-1 | Audit/extend immutable ratings ingest and build firm-rating ontology with fail-closed refusals. | Synthetic and sampled structural tests; exact lineage and dedupe invariants. |
 | ARV2-2 | Build PIT issuer/security master and outcome prerequisites. | Ticker reuse/share-class/delisting mutations fail; coverage and ambiguity reported. |
 | ARV2-3 | Implement the canonical stock score and separate diagnostic channels. | Golden equations, sparse-sector behavior, no outcome imports, no leakage. |
-| ARV2-4 | Register and run the one-shot stock-first structural/event study under the frozen budget. | Permanent look logged; a valid null closes the canonical family; the shared final holdout remains untouched. |
+| ARV2-3Q | Freeze the outcome-free control, stock-event-study, QC-first, multiplicity, paper-confirmation, and funded-pilot separation contract. | Content-addressed candidate independently reviewed; old period proved superseded unspent; zero data/outcome/QC/deployment authority. |
+| ARV2-4 | Materialize the full V2 historical-evaluation schema, implement the frozen stock control adjustment, bind the exact QC run and power plans, and run the one-shot historical stock event study in QC Cloud. | Immutable development-evaluation receipt logged with no confirmatory alpha; a screen failure closes the family, while a pass unlocks ARV2-5 only. |
 | ARV2-5 | Only after an ARV2-4 pass, build the PIT ETF reverse index, eligibility, mapping, and ETF aggregation. | >=99% mapped candidate weight; stale/dynamic/transitive bypasses fail. |
-| ARV2-6 | Walk-forward ETF research with fixed costs and baselines. | OOS gate, robustness, capacity, turnover, overlap, and null handling. |
-| ARV2-7 | Implement QC algorithm using immutable custom/precomputed signals. | Deterministic parity, scheduling, sizing, cash/cap/failure tests; still research-only. |
-| ARV2-8 | Produce the lane dossier without opening the shared integration holdout. | Independent lane review complete; integration/final evaluation remains a separately owner-scheduled main-line milestone. |
+| ARV2-6 | Freeze the ETF-specific residualization, estimand, power, and cost contracts, then run the one-shot walk-forward ETF historical backtest in QC Cloud. | Immutable development-evaluation receipt logged with no confirmatory alpha; OOS/robustness/capacity/turnover/overlap screen; failure closes the family. |
+| ARV2-7 | Implement the QC paper algorithm using immutable custom/precomputed signals. | Deterministic research/backtest/paper parity, scheduling, sizing, cash/cap/failure tests; no deployment authority. |
+| ARV2-8 | Produce the paper-ready lane dossier and freeze the exact future evidence epoch before observation. | Independent review complete; exact future dates and shared-holdout treatment owner-frozen; paper deployment separately authorized. |
+| ARV2-9 | Run 252 NYSE sessions in QC Paper Trading as the blind prospective confirmation vehicle. | The sole Analyst prospective look is irrevocably committed on its first accepted observation and reaches one terminal state; efficacy remains sealed until a valid final unseal, and invalid/underfilled closure cannot reuse alpha or create a replacement look. |
+| ARV2-10 | Optionally consider a small funded QC canary after a successful paper confirmation. | New exact owner live-risk authority, account/risk/run bindings, review, kill switch, reconciliation, and no leverage/shorts/options; no paper authority converts. |
 
 ETF topology construction is deliberately downstream of the stock-first stop/go
 test. A structural provider-capability audit may occur earlier, but no ETF
@@ -195,40 +200,92 @@ or claim a research result.
   and exact frozen local artifact, remain non-new/non-V2, have no network
   fallback, and cannot update active findings.
 
-The machine-readable round-0 inventory is
-`research/analyst_revisions_v2/specs/arv2_round0.draft.json`. It is deliberately
-`owner_decisions_frozen_pending_external_bindings_and_review`, not
-outcome-executable. Owner direction on 2026-08-28 adopted the recommended
-risk-balanced choices for all eight formerly open cells. The exact candidate
-is content-addressed as
+The former machine-readable round-0 inventory remains at
+`research/analyst_revisions_v2/specs/arv2_round0.draft.json` as the exact
+content-addressed predecessor
 `arv2-round0-candidate-8d13a0a4577df322` / SHA-256
 `8d13a0a4577df3223c96c4c11722457e059b4ade63f578ab860ce7364494e847`.
-The loader now distinguishes a decided policy from evidence that does not yet
-exist: corporate-action and security-master policies are frozen while their
-source IDs and hashes remain explicitly null; the single permanent look ID is
-frozen while its dataset and code identities remain explicitly null. Any
-attempt to populate those fields in the unreviewed candidate refuses.
+Owner direction on 2026-08-30 superseded its planned-unbound
+2026-09-01 through 2027-08-31 look before any dataset/code binding, review
+registration, outcome access, or spend. It therefore consumed **zero looks**.
+The legacy v1 loader remains usable only for migration/structural validation:
+the old look identity and exact period refuse, its only replacement identity is
+explicitly `migration-only`, and its public outcome-authority entry point
+always refuses. It cannot authorize ARV2-4, be relabeled prospective, or be
+backfilled. A separate complete V2 historical-evaluation schema is required.
 
-The candidate also freezes the requested history design: all eligible audited
-history from 2013-01-02 through 2026-08-31, point-in-time ordinary/boom/stress
-classification, and named COVID, 2022 rate-shock, and 2023-2026 AI-boom
-diagnostics. Only the all-period walk-forward result may select the strategy;
-regime and named-episode outputs are descriptive, non-rescuing diagnostics.
-Earlier history can enter only after an independent source-coverage and
-semantics review, so the unavailable 2008 example is not fabricated.
+The active outcome-free hash-bound amendment, not a complete successor spec, is
+`research/analyst_revisions_v2/specs/arv2_qc_first.draft.json`, authenticated by
+`research/analyst_revisions_v2/qc_first_plan.py` as
+`arv2-qc-first-plan-9574bf824e9b9735` / SHA-256
+`9574bf824e9b9735d3c40d0a09b50a48a452fdf7533ccb56061f788510e706e7`.
+Its authority is exactly
+`planning_only_no_data_no_outcome_no_qc_action_no_deployment`; its public
+upload, historical-launch, paper-deployment, and funded-live capabilities are
+all constant false.
 
-A future executable spec must still be committed and clean, match an entry in
+The amendment freezes the stock control/event-study constraints and makes every
+remaining executable definition an explicit null hash rather than choosing it
+after outcomes. Stock control coefficients must fit only active stock rows in
+each training fold after same-date point-in-time transforms, then apply unchanged
+to validation/test; structural zeros remain exact zero. Exact control-definition,
+fold-manifest, power, reporting-registry, and economic-gate hashes are still null,
+so stock execution is constant false. ETF residualization is a
+different contract deliberately deferred to ARV2-6 and may not reuse stock
+coefficients. Mandatory controls cover the PDF's full momentum, peer momentum,
+earnings/guidance proximity, immediate event jump, beta/volatility,
+value/growth/size, liquidity/turnover, holdings concentration, analyst coverage,
+event-intensity, and event-diversity families. Immediate event jump is
+outcome-regression-only and missing active-event intraday evidence refuses.
+
+The stock development screen reports 1/5/20/60-session date-level Spearman IC
+summaries and Fama-MacBeth coefficients, with 20 sessions primary, bullish and
+bearish effects separate, horizon-specific embargo/block/HAC distances measured
+on the actual NYSE-session axis, 19,999 centered block resamples, and the PDF's
+predeclared earnings cohorts. A deterministic bipartite common-event graph puts
+each outcome in exactly one component; cross-date components refuse before fold
+assignment, so neither folds nor date blocks split them. PRIMARY, SECONDARY, and
+EXPLORATORY outputs are labeled; secondary FDR and deflated-Sharpe reports are
+non-rescuing and their exact hypothesis/trial registries must be hashed before a
+run. The exact primary cost gate is 10 bps **per side**. Liquidity impact is a
+non-promoting diagnostic until its coefficient, dollar-NAV grid, and ADV
+convention are separately frozen. A content-addressed power plan is still null
+and is therefore a hard pre-launch gate rather than a post-result choice.
+
+The historical stock and ETF QC runs are immutable **development evaluations**,
+not permanent looks and not prospective confirmation; each failure closes the
+family, while a pass unlocks only the next bounded stage. The fixed history
+cutoff is 2026-08-28, with last mature decision sessions 2026-08-27,
+2026-08-21, 2026-07-31, and 2026-06-03 for horizons 1, 5, 20, and 60. Later
+decisions are named immature refusals and cannot be filled with later data.
+
+Only the future QC Paper confirmation consumes formal alpha: one Analyst-lane
+look at `1/60` after the three-lane correction. Its dates, estimand, power-plan
+hash, and evidence epoch are deliberately null and non-backfillable until
+ARV2-4/5/6/7/8 pass and the exact future 252-session target is frozen before
+observation. The sole look becomes irrevocably non-reusable on its first accepted
+observation and ends spent/unsealed, invalid/uninspected, or underfilled/
+uninspected; the latter two close the family without replacement. Efficacy stays
+sealed until one atomic final unseal, while monitoring is limited to named
+operational/safety metrics. Timely event, corporate-action, security-master,
+and fixed-lag holdings facts may only append under a monotone hash-chained frozen
+feed/mapping contract; retroactive corrections/backfills/reordering, mapping-
+method changes, or any provider/right/schema/ontology/code/configuration/
+execution/runtime change invalidates the epoch. A small funded pilot is an
+optional later stage only after successful paper confirmation and a separate
+exact live-risk decision; paper authority never converts into funded authority.
+
+A future complete V2 executable spec must still be committed and clean, match an entry in
 the separate committed review registry, bind its exact independently reviewed
 Git blob and review ancestry, and pass semantic validation of every mandatory
 cell. Outcome authorization must then reauthenticate that source and obtain an
-atomic spend receipt from an independently pinned, cross-machine append-only
-permanent-look authority before any outcome I/O. No local file or SQLite
-database can grant or reset that authority. Both the reviewed-spec registry
-and external spend-authority integration remain absent: the committed
-authority artifact declares exact `zero_access`, every authorization attempt
-refuses before the outcome loader can execute, and the legacy machine-local
-ledger path has no authority. No credential, provider row, price, return, or
-outcome was accessed; no look was consumed.
+immutable evaluation receipt for historical screens and, separately, an atomic
+spend receipt from an independently pinned cross-machine append-only authority
+for the final paper look. No local file or SQLite database can grant or reset
+either authority. The reviewed-spec registry and external integrations remain
+absent; every authorization attempt refuses before an outcome loader can run.
+No credential, provider row, price, return, outcome, QC job, or deployment was
+accessed; no look was consumed.
 
 Source precedence is explicit: normative strategy design governs the intended
 formula, while observed provider availability/history governs factual data
@@ -236,42 +293,48 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-Claude commits `6e8edab` and `12157dd` have been counter-reviewed. Section 4M
-records their accepted-after-correction dispositions. The ARV2-3 review chain
-is closed; the accepted candidate remains structural, non-executable, and
-zero-production-authority.
+Claude commits `6e8edab` and `12157dd` are accepted after the section 4M
+counter-review corrections. The owner then froze the QC-backtest-first sequence,
+and section 4N records the bounded ARV2-3Q planning candidate. The exact next
+step is to commit ARV2-3Q separately from local counter-review commit `9309de3`,
+push that two-commit range once, and wait for Claude's independent review on this
+same branch.
 
-The exact next step requires owner decisions and later external evidence, so
-ARV2-4 must not start and this counter-review must not be pushed by itself:
+ARV2-4 still must not run. After Claude review and Codex counter-review, its next
+bounded implementation step is to materialize the complete V2
+historical-evaluation schema and stock residualization/reporting code. Later
+authority proceeds in strict phases; credentials never substitute for one:
 
-1. freeze and independently review the executable mandatory-control contract,
-   including whether the signal is residualized, the outcome regression carries
-   the controls, or both; estimator and fitting sample; intercept/fixed effects;
-   definitions, windows, timing and scaling; collinearity/rank-deficiency
-   handling; and operation order relative to sector MAD, clipping, and
-   reliability;
-2. freeze and independently review the primary stock event-study estimand and
-   promotion/null rule, including the primary statistic and direction,
-   regression/IC choice, HAC or block-bootstrap details, and exact decision
-   threshold;
-3. establish the authenticated Massive/Benzinga source and measured provider
-   semantics, PIT firm/common-event/security/classification evidence, audited
-   prices/returns/corporate actions/terminal returns/benchmark/control inputs,
-   and the entitlement, retention, and vendor-to-QuantConnect processing rights;
-4. bind the exact normalized dataset and code identity into a committed,
-   independently reviewed `reviewed_frozen` specification and nonempty review
-   registry, then establish cross-machine append-only look authority; and
-5. only after those gates close, obtain explicit owner authority to spend
-   `arv2-look-stock-primary-001` and to perform the exact QuantConnect Cloud
-   upload/job/run. The registered prospective interval is 2026-09-01 through
-   2027-08-31 and cannot presently be completed.
+1. current entitlement, retention, and vendor-to-QC processing rights plus
+   separate owner capture authority precede the first licensed row and produce
+   an immutable raw snapshot;
+2. reviewed source/ontology/identity contracts plus normalization authority
+   produce the content-addressed dataset;
+3. the reviewed dataset/right receipts plus distinct upload authority produce
+   QC project/custom-data identities, after which distinct compile authority
+   produces the QC compile identity;
+4. only then can the complete V2 spec, QC-first amendment, exact control/fold/
+   power/economic/reporting definitions, code/algorithm/config/custom-data bytes,
+   Claude review, and Codex counter-review freeze the exact run-plan hash; and
+5. distinct owner backtest/launch authorities and external append-only
+   evaluation authority atomically claim the immutable development evaluation
+   before launch. Ambiguous submission locks that evaluation for exact
+   reconciliation and is never retried blindly.
 
-Credentials must not be pasted into this record or chat. A separately
-authorized read-only entitlement/rights audit may use secrets already installed
-on the machine. Broker, order, or live-trading credentials are not required for
-ARV2-4. Until every applicable gate closes, no credential, licensed row,
-price, return, outcome, permanent look, QC job, or production publication may
-be opened.
+The historical stock run is development evidence only. Failure closes the lane;
+success unlocks ARV2-5, not paper trading. ETF construction, an independently
+frozen ETF residualization/estimand, the ETF historical QC backtest, QC parity,
+and a paper-ready review remain between stock history and paper. The future
+paper epoch then requires exact future dates, estimand/power hashes, rights,
+blinded external look registration, paper-deployment authority, and a live node/
+data provider. A funded canary remains later and separately gated.
+
+Credentials must never be pasted into this record or chat. Structural work
+needs none. A later authenticated QC run may use secrets already installed or
+entered directly into the relevant provider; a paper run does not need real
+brokerage credentials, while a funded canary does. Nothing in this candidate
+authorizes credential use, provider ingestion, outcomes, QC upload/compile/run,
+deployment, brokerage, or orders.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -1316,6 +1379,65 @@ Streamlit access occurred.
   lane workflow. This counter-review is committed locally only. No next
   milestone, provider/entitlement audit, outcome access, or QC work was begun.
 
+## 4N. Owner QC-first sequence and ARV2-3Q planning candidate, 2026-08-30
+
+**Owner decision:** run historical backtests in QuantConnect before beginning a
+new untouched prospective year; after successful historical screens, complete
+the intervening ETF/QC milestones and use QC Paper Trading for the prospective
+confirmation. A small funded QC canary may be considered only after successful
+paper confirmation under a separate live-risk gate. This is sequencing, not
+current run or trading authority.
+
+**Implemented:** a strict, content-addressed, outcome-free QC-first amendment
+and loader; an explicit legacy-v1 outcome tombstone; a stock-only training-fold
+control contract; a date-level stock event-study contract; separate historical
+development evaluations and future paper confirmation; exact historical cutoff
+and horizon maturity dates; and constant-false upload/run/deployment/live
+capabilities. `stock_signal.py` now names the owner-frozen control boundary but
+does not implement or publish a residualized score.
+
+**Pre-commit review findings corrected:**
+
+- ARV2Q-001 (P1): the first draft reused the legacy prospective v1 permit for a
+  historical evaluation. The old ID and period now remain superseded unspent,
+  v1 has only a migration-only structural identity, public v1 outcome access
+  always refuses, and ARV2-4 requires a separate full V2 evaluation schema.
+- ARV2Q-002 (P2): historical tests were initially described as permanent looks.
+  They are now immutable development screens with no confirmatory alpha; only
+  the future blinded paper look receives `1/60`.
+- ARV2Q-003 (P2): the initial control/event-study draft conflated stock and ETF
+  fits, left common-event multi-membership and actual-session inference
+  ambiguous, under-specified horizon/IC/classification reporting, and allowed
+  later power/capacity choices. Stock and ETF contracts are split; common-event
+  components, fold/HAC/block constraints, exact Spearman IC/Fama-MacBeth
+  outputs, PRIMARY/SECONDARY/EXPLORATORY labels, FDR/deflated-Sharpe reporting,
+  10-bps-per-side primary costs, pre-run definition/manifest/power/economic/
+  reporting hashes, and separately bound diagnostic capacity choices now fail
+  closed. None of the actual null hashes may execute.
+- ARV2Q-004 (P2): paper blindness and evidence epochs were incomplete. Efficacy
+  output sealing, the safety-monitor whitelist, monotone hash-chained ordinary
+  appends, exact committed/terminal look accounting, rights/counter-review
+  prerequisites, no replacement or blind extension, and invalidation for
+  retroactive data/provider/ontology/code/configuration/execution/runtime changes
+  are now frozen.
+- ARV2Q-005 (P2): mutable policy globals and Python Boolean/integer equality
+  or a mutable root-key allowlist could weaken a correctly rehashed artifact.
+  Recursive immutable templates, an immutable root schema, and type-aware exact
+  comparison now refuse those attacks.
+- ARV2Q-006 (P2): the amendment trusted the predecessor's embedded hash, flattened
+  source/upload/compile/launch authorities into a circular list, and left funded
+  gates as prose. The loader now recomputes the exact retired predecessor hash;
+  historical authority is a strict phased state machine with separately null
+  bindings; and the funded policy machine-binds paper success, reviews, rights,
+  exact QC/risk/account artifacts, kill-switch and reconciliation receipts while
+  retaining zero live/order authority.
+
+**Boundary:** the power-plan, run-plan, data/source/right, reviewed-spec,
+external evaluation/look authority, QC project/compile, paper epoch, and funded
+risk bindings remain null or absent. This milestone used synthetic structure
+only: zero provider rows, outcomes, evaluations, permanent looks, QC jobs,
+deployments, broker actions, or orders.
+
 ## 5. Session / push ledger
 
 Append one row before every push. Never rewrite earlier rows.
@@ -1339,3 +1461,4 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-29 | Codex implementation | `f592334` -> this commit (`a597ac3` is the separate counter-review commit) | ARV2-3 structural canonical stock-score candidate and isolated diagnostics | Implemented exact stock decay/reliability, source-derived NYSE ages, dedupe/raw aggregation, absolute-mass institution/catalyst breadth, activity-aware sector MAD normalization, strict structural evidence timing/refusals, ARV2-2 universe/source-chain revalidation, and separately revalidated diagnostics. The fixture-only candidate remains blocked at unspecified mandatory control residualization and can never become executable from this milestone. Preserved reviewed inclusive security-master PIT semantics while requiring new ARV2-3 evidence strictly before the decision open. Added one shared session-age index/decay cache. Stayed in the dedicated worktree and touched only Analyst V2 code, tests, and this lane record. | Focused stock-score file **55 passed in 44.35 s**; complete Analyst V2 battery **328 passed, 1 host symlink skip in 106.54 s**; exact repository code tree **5,601 passed, 3 skipped, 0 failed, 26 known warnings in 1,307.06 s**; active-document **63 passed in 1.17 s after the final record row with only the non-semantic cache provider disabled for ARV2ENV-001**; changed-file `py_compile`, transitive 26-module outcome/QC firewall, and `git diff --check` pass. Three independent audits ended clean; session-age equivalence matched 2,173 ages. Synthetic fixtures only. No provider/QC credential, licensed row, price, return, outcome, broker, operator database, QC job, scheduler, order, UI, or Streamlit access; **0 research looks and no permanent look consumed**. | ARV2I3-001 through ARV2I3-004 P2 and ARV2I3-005/006 P3 corrected; 0 unresolved P0-P3. No unrelated issue was changed; ARV2ENV-001 is documented without a repository change. ARV2-3 remains unaccepted, structural-only, non-executable, and zero-authority. | Commit ARV2-3 and this required record separately from `a597ac3`, verify the exact two-commit local range and clean worktree, then push once. Claude independently reviews every pushed commit on this same branch; Codex counter-reviews before ARV2-4 or any source/outcome/QC step. |
 | 2026-08-29 | Claude review | `8701880` -> this commit | Independent review of the ARV2-2 counter-review and the ARV2-3 structural stock-score candidate | Reviewed both commits in `f592334..8701880` with an explicit disposition each (section 4L): `a597ac3` accepted after correction, `8701880` accepted after correction. Read `stock_signal.py` (1,779 lines) in full plus the `formulas.py` diff. Reproduced the decay, reliability and MAD goldens by independent formulations, and confirmed the 26-module transitive closure reaches no execution, ML, network or legacy-ACER module. Ran a 14-mutation matrix in a detached scratch worktree aimed at guards the implementation's own list does not claim to pin: 7 killed, 7 survived, 4 corrected and 2 documented. Applied the owner's lane-scope rule: every correction is a test in `tests/analyst_revisions_v2/`; no production module changed. Stayed on this one lane branch; single combined push. | As received `8701880`: **5601 passed, 3 skipped, 25 warnings in 1068.06s (0:17:48)**. Final tree with the new regressions: **5604 passed, 3 skipped, 25 warnings in 1068.48s (0:17:48)**. Focused: stock signal 55 as received then **58 passed**; dataset/import firewall **39 passed**; active-document **63 passed**. Every new guard verified red under reverse mutation and green restored. Python 3.12.13. Fixtures only; no provider, credential, licensed row, price, return, outcome, broker, operator-database, QuantConnect, scheduler or order access; **0 research looks and no permanent look consumed.** | 0 P0, 0 P1, 1 P2, 3 P3 corrected, 1 P3 documented. ARV2R5-001 (P2): ARV2CR5-001's schema-v2 migration refreshed three of the seven artifacts `*.json -text` governs, so four spec artifacts sat CRLF against LF blobs in this lane checkout while `git status` reported clean via the stat cache; that state makes `_review_anchor`'s committed-and-clean precondition refuse the first reviewed-spec registration and risks committing CRLF into content-addressed artifacts. Working files repaired from their existing LF blobs with no committed content change. ARV2R5-002/003/004 pin the no-hard-cutoff decay beyond age 120, the identity-refusal exemption set's actual use, and the frozen candidate authority/residualization/no-partial guards. ARV2R5-005 records two deliberately unpinned redundancy properties. | Codex counter-reviews this exact pushed head before accepting ARV2-3 or starting ARV2-4. Whether the remaining four spec artifacts should receive a blob-level refresh, and whether the blocked mandatory-control residualization needs an owner decision before ARV2-4, are named in 4L.5. All production source, ontology, identity, outcome, look and QC authorities remain zero-access. |
 | 2026-08-30 | Codex counter-review | `12157dd` -> this commit | Accept Claude's ARV2-3 review after correcting its tests and canonical handoff | Counter-reviewed both Claude commits `6e8edab` and `12157dd` under the repository workflow and the strategy PDF. Accepted each after correction. Replaced unsafe EOL remediation, strengthened the long-decay and partial-artifact regressions, pinned the effective Git EOL rule, corrected the stale handoff and mutation arithmetic, and made the mandatory-control/event-study decision a hard pre-look gate. Stayed in the dedicated branch/worktree and touched only two Analyst V2 test files plus this lane record; no production module changed. | Corrected focused files: **58 passed in 36.71 s** and **39 passed in 43.52 s**; complete Analyst V2 battery **331 passed, 1 host symlink skip in 104.79 s**; exact repository code tree **5,604 passed, 3 skipped, 25 known warnings in 923.36 s (15m23s)**; final active-document gate **63 passed**; compileall exit 0; final diff/status gates run before local commit. No credential, provider row, licensed artifact, price, return, outcome, broker, operator database, QC job, scheduler, order, UI, or Streamlit access; **0 research looks and no permanent look consumed**. | `6e8edab` and `12157dd` accepted after correction. ARV2CR6-001/005/006 are P2; ARV2CR6-002/003/004/007 are P3; all corrected, 0 unresolved P0-P3. ARV2-3 is accepted but remains structural, non-executable, and zero-production-authority. ARV2-4 remains blocked by the decisions and authorities in section 4. | Commit this counter-review locally only and stop before ARV2-4 and before push. Owner must first freeze the executable mandatory-control and primary event-study contracts; later source/rights/review/time/look/QC gates remain separately required. Do not request pasted credentials. |
+| 2026-08-30 | Codex implementation | `9309de3` -> this commit | ARV2-3Q owner-frozen QC-first planning candidate | Implemented content-addressed amendment `arv2-qc-first-plan-9574bf824e9b9735`, authenticated its exact retired predecessor, permanently disabled the legacy-v1 outcome path, separated historical development screens from the sole future paper look, froze stock/event-study constraints and explicit null pre-run definition hashes, staged source/upload/compile/evaluation authorities, and machine-gated future paper/funded states. Stayed on the one Analyst lane branch/worktree; no UI or unrelated strategy work. | Exact repository tree **5,626 passed, 3 skipped, 0 failed, 25 known warnings in 1,091.35 s (18m11s)**; complete Analyst V2 battery **352 passed, 1 host symlink skip in 96.25 s**; final plan/document gate rerun after the hash settled; compileall and final diff/status gates run before commit. Three independent audits ended with 0 unresolved P0-P3. Synthetic/outcome-free planning only: no credential, licensed row, price, return, outcome, QC upload/compile/job, deployment, broker, scheduler, or order; **0 development evaluations and 0 permanent looks consumed**. | ARV2Q-001 P1 and ARV2Q-002 through ARV2Q-006 P2 corrected; all later statistical, authority, state-accounting, reporting, test-sensitivity, and documentation findings corrected. The amendment is unreviewed and planning-only; all action capabilities remain false. | Commit ARV2-3Q separately from `9309de3`, verify the exact two-commit local range, and push once. Claude independently reviews both commits on this same branch. Codex counter-reviews before materializing the full V2 evaluation schema or performing any provider/outcome/QC action. |

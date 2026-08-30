@@ -1,0 +1,847 @@
+{
+  "schema": "arv2-qc-first-study-plan-v1",
+  "status": "owner_frozen_outcome_free_pending_independent_review_and_external_bindings",
+  "plan_id": "arv2-qc-first-plan-9574bf824e9b9735",
+  "plan_hash": "9574bf824e9b9735d3c40d0a09b50a48a452fdf7533ccb56061f788510e706e7",
+  "authority": "planning_only_no_data_no_outcome_no_qc_action_no_deployment",
+  "supersession": {
+    "legacy_spec_id": "arv2-round0-candidate-8d13a0a4577df322",
+    "legacy_spec_hash": "8d13a0a4577df3223c96c4c11722457e059b4ade63f578ab860ce7364494e847",
+    "legacy_look_id": "arv2-look-stock-primary-001",
+    "legacy_period_start": "2026-09-01",
+    "legacy_period_end": "2027-08-31",
+    "legacy_state_at_supersession": "planned_unbound",
+    "disposition": "superseded_unspent_by_owner_qc_first_direction",
+    "looks_consumed": 0
+  },
+  "inheritance_contract": {
+    "mode": "hash_bound_amendment_not_complete_successor_specification",
+    "base_spec_id": "arv2-round0-candidate-8d13a0a4577df322",
+    "base_spec_hash": "8d13a0a4577df3223c96c4c11722457e059b4ade63f578ab860ce7364494e847",
+    "inherited_cell_ids": [
+      "shared_holdout",
+      "contaminated_legacy_periods",
+      "canonical_family",
+      "channel_family_policy",
+      "availability_rule",
+      "corporate_action_contract",
+      "missing_control_policy",
+      "universe_contract",
+      "topology_comparison_hierarchy",
+      "observation_rule_parity",
+      "holdings_contract",
+      "portfolio_contract",
+      "three_lane_selection_correction",
+      "valid_null_closes_family",
+      "legacy_reproduction_policy"
+    ],
+    "amended_cell_ids": [
+      "mandatory_controls",
+      "label_contract",
+      "walk_forward_contract",
+      "inference_contract",
+      "normalization_contract",
+      "stock_topology",
+      "multiplicity_family",
+      "historical_evaluation_contract",
+      "cost_contract",
+      "lane_validation_period",
+      "looks"
+    ],
+    "inherited_historical_rules": [
+      "contaminated_periods_remain_discovery_only",
+      "regime_and_named_episode_outputs_remain_non_rescuing",
+      "missing_exit_is_terminal_return_or_named_refusal_never_drop",
+      "universe_and_baseline_observation_rule_parity",
+      "corporate_action_and_terminal_return_fail_closed"
+    ],
+    "base_source_and_outcome_authority": "zero_access",
+    "materialize_full_reviewed_v2_spec_before_any_data_or_qc_action": true
+  },
+  "multiplicity_contract": {
+    "family_id": "arv2-rating-only-v2-qc-first",
+    "family_alpha": {
+      "numerator": 1,
+      "denominator": 20
+    },
+    "three_lane_correction_factor": 3,
+    "development_evaluation_ids": [
+      "arv2-eval-stock-historical-qc-001",
+      "arv2-eval-etf-historical-qc-001"
+    ],
+    "development_evidence_role": "selection_and_engineering_only_no_confirmatory_alpha_claim",
+    "prospective_permanent_look_ids": [
+      "arv2-look-etf-paper-prospective-001"
+    ],
+    "prospective_permanent_look_alpha": {
+      "numerator": 1,
+      "denominator": 60
+    },
+    "gatekeeping_order": [
+      "stock_historical_qc",
+      "etf_historical_qc",
+      "etf_paper_prospective"
+    ],
+    "correction": "bonferroni_three_lanes_for_one_prospective_lane_look",
+    "historical_screen_failure_closes_family": true,
+    "prospective_valid_null_closes_family": true,
+    "unused_alpha_reallocation": "prohibited"
+  },
+  "control_contract": {
+    "source_score": "pdf_reliable_score",
+    "stock_control_definitions_sha256": null,
+    "stock_control_definition_state": "incomplete_must_be_content_addressed_and_reviewed_before_ARV2_4",
+    "stock_control_required_definition_fields": [
+      "exact_guidance_and_earnings_windows_ties_and_overlap",
+      "exact_value_growth_size_provider_fields_units_and_point_in_time_vintage",
+      "restatement_and_late_revision_policy",
+      "all_momentum_beta_volatility_liquidity_and_turnover_formulas",
+      "cross_section_minimum_rows_and_coverage",
+      "missing_stale_and_unseen_peer_refusal_denominators"
+    ],
+    "stock_control_execution_authorized": false,
+    "stock_residualization": {
+      "coefficient_fit_scope": "walk_forward_train_fold_only",
+      "application": "freeze_train_beta_apply_unchanged_to_validation_and_test",
+      "fit_population": "active_rating_signal_stock_rows_in_training_fold_only",
+      "estimator": "pooled_equal_weight_training_ols_after_datewise_transform",
+      "intercept": true,
+      "peer_fixed_effects": [
+        "industry"
+      ],
+      "peer_encoding": "industry_one_hot_drop_lexicographically_first_training_level",
+      "unseen_peer_level": "refuse_row",
+      "operation_order": [
+        "canonical_rating_contributions",
+        "activity_aware_sector_median_mad",
+        "clip_sector_z_to_minus4_plus4",
+        "multiply_by_reliability",
+        "fit_stock_control_residualization_on_training_active_rows",
+        "freeze_stock_training_coefficients_and_peer_levels",
+        "apply_unchanged_to_stock_validation_and_test",
+        "preserve_structural_zeros",
+        "clip_active_stock_residual_to_minus4_plus4"
+      ]
+    },
+    "etf_residualization": {
+      "state": "deferred_to_content_addressed_ARV2_6_pre_outcome_contract",
+      "must_freeze": [
+        "etf_training_population",
+        "etf_estimator",
+        "etf_peer_groups",
+        "etf_operation_order",
+        "etf_training_boundary",
+        "final_pre_paper_fit"
+      ],
+      "may_reuse_stock_coefficients": false,
+      "current_execution_authorized": false
+    },
+    "continuous_scaling": "same_date_eligible_census_median_mad_no_epsilon",
+    "same_session_transform_scope": "strictly_preopen_controls_only_no_outcomes_and_no_coefficient_refit",
+    "binary_scaling": "none",
+    "stock_pretrade_signal_controls": [
+      "momentum_20d",
+      "momentum_60d",
+      "momentum_12_1",
+      "sector_momentum_20d",
+      "sector_momentum_60d",
+      "sector_momentum_12_1",
+      "industry_momentum_20d",
+      "industry_momentum_60d",
+      "industry_momentum_12_1",
+      "earnings_guidance_proximity_vector",
+      "market_beta_252d",
+      "realized_volatility_60d",
+      "value_book_to_market",
+      "growth_trailing_revenue",
+      "size_market_cap",
+      "liquidity_dollar_volume_60d",
+      "turnover_60d",
+      "analyst_coverage_60d",
+      "event_intensity_20d",
+      "event_diversity_20d"
+    ],
+    "stock_outcome_only_controls": [
+      "event_price_jump_vector"
+    ],
+    "etf_pretrade_signal_controls": [
+      "etf_momentum_20d",
+      "etf_momentum_60d",
+      "etf_momentum_12_1",
+      "sector_momentum_20d",
+      "sector_momentum_60d",
+      "sector_momentum_12_1",
+      "industry_momentum_20d",
+      "industry_momentum_60d",
+      "industry_momentum_12_1",
+      "earnings_guidance_proximity_vector",
+      "market_beta_252d",
+      "realized_volatility_60d",
+      "value_growth_size_tilts",
+      "liquidity_and_turnover_60d",
+      "holdings_concentration",
+      "analyst_coverage_60d",
+      "event_intensity_20d",
+      "event_diversity_20d"
+    ],
+    "etf_outcome_only_controls": [
+      "event_price_jump_vector"
+    ],
+    "control_definitions": {
+      "price_momentum": "split_dividend_adjusted_total_return_20_and_60_completed_sessions_plus_252_to_21_sessions_all_ending_before_eligible_open",
+      "peer_momentum": "point_in_time_sector_and_industry_equal_weight_20_60_and_252_to_21_returns_ending_before_eligible_open",
+      "earnings_guidance_proximity_vector": {
+        "columns_in_order": [
+          "exact_earnings_day",
+          "1_to_2_days_after",
+          "3_to_5_days_after",
+          "over_5_days_after",
+          "pre_earnings",
+          "public_guidance_proximity"
+        ],
+        "encoding": "binary_point_in_time_indicators_no_synthesized_event",
+        "reference": "no_public_earnings_or_guidance_proximity"
+      },
+      "event_price_jump_vector": {
+        "columns_in_order": [
+          "active_event_indicator",
+          "absolute_contribution_weighted_publication_to_entry_jump"
+        ],
+        "stock_active_value": "absolute_decayed_contribution_weighted_mean_of_first_executable_price_minus_last_tradable_price_before_each_publication_divided_by_that_prepublication_price",
+        "etf_active_value": "point_in_time_holdings_weighted_mean_of_active_constituent_stock_jump_values_using_the_same_signal_snapshot",
+        "neutral_value": "indicator_zero_and_jump_zero_by_structural_definition",
+        "missing_active_intraday_price": "named_refusal_never_impute",
+        "role": "outcome_regression_only"
+      },
+      "market_beta_252d": "ols_beta_to_spy_over_252_completed_sessions_ending_prior_session_full_window_required",
+      "realized_volatility_60d": "annualized_sample_standard_deviation_over_60_completed_sessions",
+      "value_growth_size": "latest_point_in_time_provider_fields_available_strictly_before_eligible_open_plus_prior_close_market_cap",
+      "liquidity_dollar_volume_60d": "natural_log_median_dollar_volume_trailing_60_completed_sessions",
+      "turnover_60d": "median_daily_share_volume_divided_by_point_in_time_shares_over_60_completed_sessions",
+      "holdings_concentration": "sum_squared_point_in_time_long_equity_weights_after_cash_and_derivative_reconciliation",
+      "analyst_coverage_60d": "unique_admitted_analysts_with_events_in_prior_60_sessions",
+      "event_intensity_20d": "count_of_admitted_institution_stock_session_deduplicated_analyst_events_in_prior_20_sessions",
+      "event_diversity_20d": "count_of_distinct_admitted_underlying_common_event_ids_in_prior_20_sessions_kept_separate_from_intensity"
+    },
+    "availability": "every_signal_value_strictly_before_eligible_open_immediate_jump_outcome_only_no_provider_backfill",
+    "missing_control": "refuse_row_before_cross_section_no_imputation",
+    "minimum_rows": "strictly_more_than_fitted_parameters_plus_20",
+    "zero_mad": "refuse_affected_date_cross_section",
+    "rank_deficiency": "refuse_training_fold_fit",
+    "structural_zero": "remain_exact_zero_and_excluded_from_residualization_fit",
+    "final_paper_fit": "deferred_to_reviewed_ARV2_6_etf_contract",
+    "outcomes_used_for_signal_adjustment": false
+  },
+  "stock_event_study_contract": {
+    "evaluation_id": "arv2-eval-stock-historical-qc-001",
+    "role": "development_stop_go_not_prospective_confirmation",
+    "contamination_disclosure": "2019-07-16_through_2026-07-23_is_discovery_only_all_historical_inference_is_descriptive",
+    "primary_horizon_sessions": 20,
+    "secondary_horizon_sessions": [
+      1,
+      5,
+      60
+    ],
+    "secondary_horizons_can_rescue": false,
+    "reporting_classification": {
+      "PRIMARY": [
+        "bullish_20_session_fama_macbeth",
+        "net_20_session_sleeve"
+      ],
+      "SECONDARY": [
+        "bullish_1_5_60_session_fama_macbeth",
+        "bearish_1_5_20_60_session_fama_macbeth",
+        "predeclared_common_event_cohorts"
+      ],
+      "EXPLORATORY": [
+        "all_unregistered_subgroups",
+        "all_unregistered_parameter_or_portfolio_variants"
+      ],
+      "secondary_multiple_testing": "benjamini_hochberg_fdr_within_the_pre_outcome_registered_secondary_family_reporting_only_never_rescues_primary",
+      "secondary_hypothesis_registry_sha256": null,
+      "secondary_registry_required_fields": [
+        "ordered_hypothesis_ids",
+        "direction_horizon_cohort_metric_mapping",
+        "stock_event_returns_by_rating_action",
+        "event_time_cumulative_abnormal_return_by_rating_action",
+        "benjamini_hochberg_q_value",
+        "p_value_tie_and_order_rule"
+      ],
+      "strategy_battery_bias_report": "deflated_sharpe_for_every_pre_outcome_registered_portfolio_and_baseline_variant_reporting_only_never_rescues_primary",
+      "deflated_sharpe_trial_registry_sha256": null,
+      "reporting_registry_state": "must_be_hashed_and_reviewed_before_ARV2_4",
+      "exploratory_claim": "hypothesis_generation_only_no_promotion"
+    },
+    "entry": "eligible_session_open",
+    "exit": "h_session_open",
+    "dependent_variable": "gross_security_open_to_open_total_return_minus_matching_spy_open_to_open_total_return",
+    "regressors_of_interest": {
+      "bullish_primary": "maximum_final_control_adjusted_score_and_zero",
+      "bearish_secondary": "minimum_final_control_adjusted_score_and_zero",
+      "symmetry_assumed": false,
+      "bearish_can_rescue_bullish": false
+    },
+    "outcome_controls": [
+      "momentum_20d",
+      "momentum_60d",
+      "momentum_12_1",
+      "sector_momentum_20d",
+      "sector_momentum_60d",
+      "sector_momentum_12_1",
+      "industry_momentum_20d",
+      "industry_momentum_60d",
+      "industry_momentum_12_1",
+      "earnings_guidance_proximity_vector",
+      "event_price_jump_vector",
+      "market_beta_252d",
+      "realized_volatility_60d",
+      "value_book_to_market",
+      "growth_trailing_revenue",
+      "size_market_cap",
+      "liquidity_dollar_volume_60d",
+      "turnover_60d",
+      "analyst_coverage_60d",
+      "event_intensity_20d",
+      "event_diversity_20d"
+    ],
+    "primary_estimator": {
+      "method": "date_level_fama_macbeth",
+      "cross_section": "excess_return_equals_intercept_plus_beta_bullish_score_plus_beta_bearish_score_plus_controls_plus_industry_fixed_effects",
+      "intercept": true,
+      "peer_fixed_effects": [
+        "industry"
+      ],
+      "eligible_census": "all_point_in_time_eligible_stocks_including_structural_zero_neutral_rows",
+      "refusal_accounting": "exhaustive_before_model_fit_no_signal_based_filter",
+      "row_weighting": "equal_common_event_component_weight_within_date_each_row_weight_one_over_component_row_count_then_normalize_component_weights",
+      "common_event_handling": {
+        "membership": "build_a_bipartite_graph_of_security_decision_rows_and_all_admitted_common_event_ids_then_take_deterministic_connected_components",
+        "multi_event_row": "belongs_to_exactly_one_connected_component",
+        "neutral_row": "singleton_component",
+        "outcome_duplication": false,
+        "cross_date_component": "name_refuse_every_row_in_the_component_before_fold_assignment_and_report_coverage",
+        "within_date_component": "component_total_weight_one_rows_fractional_by_component_size",
+        "resampling": "complete_nyse_date_blocks_after_cross_date_components_refuse_so_no_component_can_be_split"
+      },
+      "invalid_date": "refuse_if_underidentified_or_rank_deficient",
+      "fold_aggregation": "concatenate_test_date_betas_equal_weight_by_date",
+      "primary_statistic": "mean_beta_bullish_across_test_dates",
+      "bearish_statistic": "secondary_non_rescuing_mean_beta_bearish",
+      "hac_lag_sessions_by_horizon": {
+        "1": 1,
+        "5": 5,
+        "20": 20,
+        "60": 60
+      }
+    },
+    "information_coefficient": {
+      "method": "date_level_unweighted_spearman_rank_correlation",
+      "score": "signed_final_stock_control_adjusted_score",
+      "outcome": "matching_horizon_gross_spy_excess_open_to_open_total_return",
+      "eligible_census": "all_point_in_time_eligible_security_rows_including_structural_zeros_after_exhaustive_named_refusal_accounting",
+      "row_multiplicity": "each_security_decision_outcome_exactly_once",
+      "tie_rule": "average_ranks_for_both_score_and_outcome",
+      "date_refusal": "fewer_than_20_rows_or_constant_score_or_constant_outcome",
+      "fold_scope": "walk_forward_test_dates_only",
+      "date_aggregation": "equal_weight_over_valid_dates",
+      "common_event_policy": "same_connected_component_and_cross_date_refusal_policy_as_primary_estimator",
+      "missing_policy": "no_pairwise_imputation_named_row_or_date_refusal",
+      "hac_session_axis": "same_actual_nyse_session_distance_contract_as_fama_macbeth"
+    },
+    "required_ic_reports_by_horizon": {
+      "1": [
+        "mean",
+        "median",
+        "icir",
+        "positive_date_share",
+        "hac_t_lag_1",
+        "year_by_year_ic"
+      ],
+      "5": [
+        "mean",
+        "median",
+        "icir",
+        "positive_date_share",
+        "hac_t_lag_5",
+        "year_by_year_ic"
+      ],
+      "20": [
+        "mean",
+        "median",
+        "icir",
+        "positive_date_share",
+        "hac_t_lag_20",
+        "year_by_year_ic"
+      ],
+      "60": [
+        "mean",
+        "median",
+        "icir",
+        "positive_date_share",
+        "hac_t_lag_60",
+        "year_by_year_ic"
+      ]
+    },
+    "common_event_cohorts": [
+      "all",
+      "exact_earnings_day",
+      "1_to_2_days_after",
+      "3_to_5_days_after",
+      "over_5_days_after",
+      "pre_earnings"
+    ],
+    "cohort_outputs": "non_rescuing_robustness_diagnostics",
+    "earnings_exclusion_robustness_sessions": [
+      2,
+      5
+    ],
+    "earnings_exclusion_role": "SECONDARY_non_rescuing_summary_robustness",
+    "fit_sample": "walk_forward_test_folds_only",
+    "walk_forward": {
+      "train_years": 5,
+      "validation_years": 2,
+      "test_years": 1,
+      "step_years": 1,
+      "fold_manifest_sha256": null,
+      "fold_manifest_required_fields": [
+        "ordered_fold_ids",
+        "half_open_train_validation_test_session_intervals",
+        "rolling_or_expanding_rule",
+        "calendar_anchor",
+        "partial_2026_disposition",
+        "per_horizon_purge_and_embargo_intervals",
+        "cross_boundary_common_event_component_refusals"
+      ],
+      "fold_manifest_state": "must_be_hashed_and_reviewed_before_ARV2_4",
+      "current_execution_authorized": false,
+      "purge_group": "decision_date_and_connected_common_event_component_cross_boundary_components_refused_from_all_adjacent_samples",
+      "embargo_sessions_by_horizon": {
+        "1": 1,
+        "5": 5,
+        "20": 20,
+        "60": 60
+      }
+    },
+    "inference": {
+      "primary": "hac_on_date_level_fama_macbeth_coefficients",
+      "hac_session_axis": "complete_nyse_session_index_never_compress_refused_or_missing_dates_bartlett_weight_uses_actual_session_distance_and_only_observed_pairs",
+      "hac_pair_normalization": "divide_each_lag_cross_product_sum_by_total_valid_coefficient_dates_and_report_observed_pair_count_by_lag",
+      "robustness": "centered_moving_block_bootstrap_complete_nyse_dates",
+      "block_length_sessions_by_horizon": {
+        "1": 1,
+        "5": 5,
+        "20": 20,
+        "60": 60
+      },
+      "resamples": 19999,
+      "seed": "sha256_plan_hash_plus_evaluation_id",
+      "common_event_groups_split": false,
+      "bootstrap_null": "subtract_the_observed_equal_date_mean_beta_from_each_valid_date_coefficient_then_resample_centered_complete_date_blocks",
+      "bootstrap_test_statistic": "absolute_equal_date_mean_beta",
+      "bootstrap_two_sided_p_value": "one_plus_resampled_absolute_statistics_gte_observed_absolute_statistic_divided_by_resamples_plus_one",
+      "primary_decision_p_value": "centered_moving_block_bootstrap_only",
+      "hac_role": "descriptive_effect_uncertainty_not_a_separate_pass_gate",
+      "minimum_valid_decision_dates_floor": 50,
+      "pre_outcome_power_plan_sha256": null,
+      "power_plan_required_fields": [
+        "primary_effect_size_bps_per_adjusted_score_unit",
+        "variance_source_without_evaluation_outcomes",
+        "target_power",
+        "two_sided_size",
+        "required_valid_dates",
+        "required_connected_components",
+        "minimum_row_and_component_coverage",
+        "underfill_disposition"
+      ],
+      "power_plan_state": "must_be_content_addressed_and_reviewed_before_launch",
+      "underfill": "inconclusive_evaluation_locked_no_blind_extension"
+    },
+    "economic_gate": {
+      "economic_gate_spec_sha256": null,
+      "economic_gate_state": "incomplete_must_be_hashed_and_reviewed_before_ARV2_4",
+      "required_definition_fields": [
+        "net_excess_daily_total_return_and_benchmark",
+        "eligible_ranking_universe_ties_and_minimum_sleeve_size",
+        "test_fold_only_sample_and_terminal_liquidation",
+        "daily_return_hac_and_centered_block_statistic",
+        "coverage_turnover_and_overlap_denominators"
+      ],
+      "current_execution_authorized": false,
+      "position_mapping": "twenty_overlapping_daily_sleeves_each_allocated_one_twentieth_nav_equal_weight_top_positive_score_quintile_held_twenty_sessions",
+      "no_positive_or_underfilled_sleeve": "leave_that_sleeve_in_cash",
+      "daily_targets": "sum_active_sleeves_then_compute_net_delta_positions",
+      "leverage": false,
+      "primary_cost_bps_per_side": 10,
+      "diagnostic_cost_bps_per_side": [
+        0,
+        5,
+        20
+      ],
+      "primary_cost_gate": "fixed_10_bps_per_side_only",
+      "liquidity_impact": {
+        "role": "capacity_bound_diagnostic_not_promotion_gate",
+        "current_state": "unbound_not_computable",
+        "required_pre_run_bindings": [
+          "impact_coefficient",
+          "portfolio_dollar_nav_capacity_grid",
+          "adv_window_and_point_in_time_convention"
+        ],
+        "missing_binding": "omit_diagnostic_and_name_refuse_never_infer_zero"
+      },
+      "primary_requirement": "after_exact_economic_gate_spec_binding_positive_mean_net_excess_daily_return_and_centered_block_p_below_0.05_hac_descriptive_only"
+    },
+    "direction": "positive",
+    "development_pass_rule": {
+      "effect": "mean_bullish_20_session_fama_macbeth_beta_strictly_positive",
+      "decision_p_value": "centered_moving_block_bootstrap_two_sided",
+      "p_value_threshold": {
+        "numerator": 1,
+        "denominator": 20
+      },
+      "hac": "descriptive_only_not_a_second_gate",
+      "economic": "exact_bound_primary_net_economic_gate_must_pass",
+      "conjunction": "all_named_primary_conditions_required"
+    },
+    "confirmatory_claim_permitted": false,
+    "invalid_run": "evaluation_locked_no_blind_retry_requires_owner_disposition",
+    "screen_failure": "closes_family_and_blocks_all_downstream_stages"
+  },
+  "qc_historical_contract": {
+    "engine": "quantconnect_cloud",
+    "history_start": "2013-01-02",
+    "outcome_data_cutoff_session": "2026-08-28",
+    "last_eligible_decision_session_by_horizon": {
+      "1": "2026-08-27",
+      "5": "2026-08-21",
+      "20": "2026-07-31",
+      "60": "2026-06-03"
+    },
+    "tail_policy": "later_decisions_are_named_immature_refusals_never_dropped_filled_or_matured_with_post_cutoff_data",
+    "cutoff_policy": "fixed_last_completed_session_at_owner_decision_no_rolling_latest",
+    "stock_stage": {
+      "evaluation_id": "arv2-eval-stock-historical-qc-001",
+      "algorithm_scope": "event_study_no_order_emission",
+      "pass_unlocks": "ARV2-5_only",
+      "screen_failure": "closes_family",
+      "confirmatory_alpha_spent": false
+    },
+    "etf_stage": {
+      "evaluation_id": "arv2-eval-etf-historical-qc-001",
+      "eligibility": "after_ARV2-4_pass_and_ARV2-5_complete",
+      "algorithm_scope": "portfolio_backtest_research_only",
+      "estimand_state": "must_freeze_and_review_before_outcome_access",
+      "pass_unlocks": "ARV2-7_only",
+      "screen_failure": "closes_family",
+      "confirmatory_alpha_spent": false
+    },
+    "legacy_v1_preregistration": "retired_migration_only_never_authorizes_either_historical_evaluation",
+    "historical_evaluation_permit": "separate_content_addressed_v2_schema_must_bind_history_cutoff_horizon_maturity_and_evaluation_id_before_outcome_access",
+    "custom_data": "immutable_normalized_versioned_records_or_daily_signals",
+    "vendor_to_qc_processing_rights": "required_before_any_upload",
+    "authority_phase_order": [
+      {
+        "phase": "source_capture",
+        "requires": [
+          "data_entitlement_audit_id",
+          "vendor_to_qc_processing_rights_receipt_id",
+          "owner_source_capture_authority_id"
+        ],
+        "produces": [
+          "immutable_snapshot_id",
+          "raw_inventory_sha256"
+        ]
+      },
+      {
+        "phase": "normalization",
+        "requires": [
+          "immutable_snapshot_id",
+          "reviewed_source_ontology_identity_contracts",
+          "owner_normalization_authority_id"
+        ],
+        "produces": [
+          "dataset_id",
+          "normalization_receipt_id"
+        ]
+      },
+      {
+        "phase": "qc_upload",
+        "requires": [
+          "dataset_id",
+          "normalization_receipt_id",
+          "vendor_to_qc_processing_rights_receipt_id",
+          "owner_qc_upload_authority_id"
+        ],
+        "produces": [
+          "qc_project_id",
+          "custom_data_sha256",
+          "upload_receipt_id"
+        ]
+      },
+      {
+        "phase": "qc_compile",
+        "requires": [
+          "qc_project_id",
+          "upload_receipt_id",
+          "algorithm_sha256",
+          "config_sha256",
+          "owner_qc_compile_authority_id"
+        ],
+        "produces": [
+          "qc_compile_id",
+          "compile_receipt_id"
+        ]
+      },
+      {
+        "phase": "authority_phase_lineage_freeze",
+        "requires": [
+          "immutable_snapshot_id",
+          "raw_inventory_sha256",
+          "normalization_receipt_id",
+          "upload_receipt_id",
+          "compile_receipt_id",
+          "vendor_to_qc_processing_rights_receipt_id",
+          "owner_source_capture_authority_id",
+          "owner_normalization_authority_id",
+          "owner_qc_upload_authority_id",
+          "owner_qc_compile_authority_id"
+        ],
+        "produces": [
+          "authority_phase_lineage_sha256"
+        ]
+      },
+      {
+        "phase": "run_plan_freeze",
+        "requires": [
+          "qc_compile_id",
+          "authority_phase_lineage_sha256",
+          "complete_reviewed_v2_spec_and_all_definition_hashes",
+          "review_commit",
+          "counter_review_commit"
+        ],
+        "produces": [
+          "qc_plan_sha256"
+        ]
+      },
+      {
+        "phase": "evaluation_reservation",
+        "requires": [
+          "qc_plan_sha256",
+          "owner_backtest_launch_authority_id",
+          "external_evaluation_authority_id"
+        ],
+        "produces": [
+          "atomic_evaluation_receipt_id",
+          "evaluation_claimed_at"
+        ]
+      },
+      {
+        "phase": "backtest_launch",
+        "requires": [
+          "atomic_evaluation_receipt_id",
+          "evaluation_claimed_at",
+          "owner_qc_launch_authority_id"
+        ],
+        "produces": [
+          "qc_backtest_id_or_ambiguous_submission_lock"
+        ]
+      }
+    ],
+    "phase_rule": "strict_order_no_phase_may_infer_or_substitute_an_authority",
+    "authority_bindings": {
+      "owner_source_capture_authority_id": null,
+      "owner_normalization_authority_id": null,
+      "owner_qc_upload_authority_id": null,
+      "owner_qc_compile_authority_id": null,
+      "owner_backtest_launch_authority_id": null,
+      "owner_qc_launch_authority_id": null,
+      "external_evaluation_authority_id": null,
+      "authority_phase_lineage_sha256": null
+    },
+    "required_run_bindings": [
+      "reviewed_spec_hash",
+      "qc_first_plan_hash",
+      "review_commit",
+      "counter_review_commit",
+      "owner_backtest_launch_authority_id",
+      "owner_qc_launch_authority_id",
+      "data_entitlement_audit_id",
+      "vendor_to_qc_processing_rights_receipt_id",
+      "immutable_snapshot_id",
+      "raw_inventory_sha256",
+      "normalization_receipt_id",
+      "upload_receipt_id",
+      "compile_receipt_id",
+      "owner_source_capture_authority_id",
+      "owner_normalization_authority_id",
+      "owner_qc_upload_authority_id",
+      "owner_qc_compile_authority_id",
+      "authority_phase_lineage_sha256",
+      "external_evaluation_authority_id",
+      "atomic_evaluation_receipt_id",
+      "evaluation_claimed_at",
+      "evaluation_id",
+      "dataset_id",
+      "code_identity",
+      "algorithm_sha256",
+      "config_sha256",
+      "custom_data_sha256",
+      "qc_project_id",
+      "qc_compile_id",
+      "deterministic_backtest_name",
+      "lean_engine_version",
+      "qc_data_version_disclosures",
+      "period",
+      "controls",
+      "costs",
+      "pre_outcome_power_plan_sha256"
+    ],
+    "qc_plan_sha256": null,
+    "binding_state": "pending_exact_reviewed_run_plan",
+    "upload_authorized": false,
+    "compile_authorized": false,
+    "launch_authorized": false,
+    "deployment_authorized": false,
+    "ambiguous_submission": "lock_evaluation_mark_submission_unknown_reconcile_exact_identity_no_blind_retry",
+    "local_lean_role": "synthetic_parity_and_compile_checks_only",
+    "credentials_are_authority": false
+  },
+  "prospective_paper_contract": {
+    "look_id": "arv2-look-etf-paper-prospective-001",
+    "role": "untouched_etf_confirmation_collected_in_qc_paper",
+    "vehicle": "quantconnect_paper_trading",
+    "period_state": "deferred_not_backfillable",
+    "start": null,
+    "end": null,
+    "duration_nyse_sessions": 252,
+    "duration_role": "target_only_not_a_power_claim",
+    "exact_estimand_sha256": null,
+    "pre_observation_power_plan_sha256": null,
+    "power_plan_required_fields": [
+      "primary_net_etf_return_estimand",
+      "minimum_economic_effect",
+      "variance_source_using_pre_paper_history_only",
+      "target_power",
+      "two_sided_alpha_one_over_60",
+      "required_eligible_sessions_and_independent_clusters",
+      "minimum_data_and_execution_coverage",
+      "underfill_disposition"
+    ],
+    "evidence_epoch_id": null,
+    "freeze_timing": "after_ARV2-7_code_config_and_data_freeze_and_independent_review_before_first_paper_observation",
+    "start_preconditions": [
+      "ARV2-4_stock_historical_pass",
+      "ARV2-5_etf_topology_complete",
+      "ARV2-6_etf_historical_pass",
+      "ARV2-7_qc_parity_complete",
+      "ARV2-8_paper_ready_independent_review_complete",
+      "codex_counter_review_acceptance_of_the_exact_paper_ready_snapshot",
+      "exact_future_period_and_evidence_epoch_frozen",
+      "exact_estimand_and_power_plan_hashes_frozen_and_reviewed",
+      "shared_holdout_nonoverlap_or_atomic_owner_refreeze",
+      "current_data_entitlements_and_vendor_to_qc_processing_rights",
+      "external_append_only_look_registered_collecting_blinded",
+      "available_qc_live_node_and_live_data_provider",
+      "explicit_qc_paper_deployment_authority"
+    ],
+    "look_state_machine": {
+      "initial": "registered_unspent",
+      "pre_observation": "collecting_blinded",
+      "active": "collecting_blinded_irrevocably_committed",
+      "terminal": [
+        "spent_at_atomic_final_unseal",
+        "retired_invalid_uninspected",
+        "retired_underfilled_uninspected"
+      ],
+      "allowed_transitions": [
+        "registered_unspent_to_collecting_blinded_before_deployment",
+        "collecting_blinded_to_registered_unspent_only_with_external_zero_accepted_observations_proof_and_cancellation_receipt",
+        "collecting_blinded_to_retired_invalid_uninspected_on_monitoring_safety_or_epoch_violation_before_first_observation",
+        "collecting_blinded_to_committed_on_first_accepted_observation",
+        "committed_to_exactly_one_terminal_state"
+      ]
+    },
+    "pre_observation_cancellation": "same_look_may_be_redeployed_only_after_external_authority_proves_zero_accepted_observations_records_cancellation_and_reauthenticates_every_start_precondition_and_only_when_no_monitoring_safety_or_epoch_violation_occurred",
+    "alpha_commitment_timing": "sole_one_over_60_allocation_becomes_irrevocably_nonreusable_at_first_accepted_observation",
+    "alpha_spend_timing": "only_atomic_final_unseal_never_at_deployment",
+    "replacement_policy": "no_replacement_look_or_alpha_reuse_within_this_family_after_first_accepted_observation",
+    "efficacy_output_policy": "write_once_sealed_in_external_authority_no_pnl_return_ic_sharpe_drawdown_or_signal_quality_visibility_before_final_unseal",
+    "operational_monitoring_whitelist": [
+      "algorithm_process_alive",
+      "clock_and_data_freshness",
+      "schema_ontology_and_duplicate_event_refusals",
+      "simulated_order_submission_acceptance_or_rejection_counts",
+      "holdings_cash_and_order_reconciliation_status",
+      "gross_net_and_single_position_limit_breach_flags_without_pnl",
+      "emergency_halt_state"
+    ],
+    "monitoring_violation": "retire_look_invalid_uninspected_close_family_no_efficacy_inspection",
+    "stopping_rule": "stop_at_the_pre_frozen_end_after_252_eligible_nyse_sessions_or_close_invalid_on_safety_halt_never_extend_blindly",
+    "underfill_rule": "retire_look_underfilled_uninspected_close_family_no_blind_extension_or_replacement",
+    "permitted_epoch_appends": {
+      "rule": "only_timely_publicly_available_in_epoch_records_under_the_frozen_schema_ontology_provider_and_availability_contract",
+      "sequence": "strict_monotone_sequence_number_no_gap_or_reorder",
+      "hash_chain": "each_append_binds_prior_chain_hash_and_new_record_hash",
+      "immutability": "accepted_prior_bytes_never_rewritten",
+      "pit_reference_additions": "timely_corporate_action_security_master_and_fixed_lag_etf_holdings_facts_may_append_under_frozen_mapping_methods_and_the_same_hash_chain",
+      "late_or_retroactive_data": "named_refusal_not_append"
+    },
+    "epoch_invalidating_changes": [
+      "provider_or_entitlement",
+      "historical_dataset_replacement_correction_backfill_or_reorder",
+      "source_schema_ontology_or_availability_contract",
+      "retroactive_security_master_or_holdings_replacement_correction_backfill_reorder_or_mapping_method_change",
+      "economic_or_safety_code",
+      "algorithm_or_custom_data_adapter_bytes",
+      "configuration",
+      "execution_fee_slippage_or_fill_model",
+      "qc_engine_or_runtime_version"
+    ],
+    "epoch_change_disposition": "retire_look_invalid_uninspected_close_family_no_replacement_or_alpha_reuse",
+    "paper_capital": "fictional_only",
+    "real_brokerage_credentials_required": false,
+    "deployment_authorized": false,
+    "final_valid_null": "closes_family_and_blocks_funded_pilot"
+  },
+  "funded_pilot_contract": {
+    "stage": "optional_after_successful_prospective_paper_confirmation",
+    "current_authority": "none",
+    "paper_permit_convertible": false,
+    "separate_exact_owner_live_authority_required": true,
+    "required_preconditions": [
+      "successful_atomic_paper_final_receipt_sha256",
+      "paper_look_spent_at_and_positive_confirmatory_disposition",
+      "independent_review_commit",
+      "codex_counter_review_acceptance_commit",
+      "current_data_broker_and_vendor_processing_rights",
+      "exact_qc_project_algorithm_config_custom_data_and_runtime_hashes",
+      "exact_broker_account_and_maximum_capital_binding",
+      "reviewed_risk_envelope_and_loss_position_exposure_limits",
+      "tested_external_kill_switch_receipt",
+      "tested_order_position_cash_and_broker_reconciliation_contract",
+      "separate_owner_live_deployment_and_order_authority"
+    ],
+    "required_receipt_bindings": {
+      "successful_atomic_paper_final_receipt_sha256": null,
+      "paper_look_id": "arv2-look-etf-paper-prospective-001",
+      "paper_terminal_state": "spent_at_atomic_final_unseal",
+      "paper_disposition": "positive_confirmatory_pass",
+      "independent_review_commit": null,
+      "counter_review_commit": null,
+      "data_and_broker_rights_receipt_id": null,
+      "qc_live_run_plan_sha256": null,
+      "kill_switch_test_receipt_id": null,
+      "reconciliation_test_receipt_id": null,
+      "owner_live_authority_id": null
+    },
+    "paper_receipt_reauthentication": "receipt_must_cryptographically_bind_exact_look_id_spent_unsealed_terminal_state_positive_disposition_and_complete_paper_epoch_hash",
+    "broker_account_binding": null,
+    "maximum_funded_capital": null,
+    "risk_envelope": null,
+    "leverage": false,
+    "short_sales": false,
+    "options": false,
+    "credentials_stored_in_plan": false,
+    "live_deployment_authorized": false,
+    "orders_authorized": false
+  }
+}

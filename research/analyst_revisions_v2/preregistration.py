@@ -188,6 +188,20 @@ ZERO_ACCESS_AUTHORITY_ID = "arv2-zero-access-no-external-authority"
 OWNER_DECISION_CANDIDATE_STATUS = (
     "owner_decisions_frozen_pending_external_bindings_and_review"
 )
+PRIMARY_OUTCOME_LOOK_ID = "arv2-look-legacy-v1-migration-only"
+SUPERSEDED_LOOK_IDS = frozenset({"arv2-look-stock-primary-001"})
+SUPERSEDED_VALIDATION_PERIODS = frozenset(
+    {
+        (
+            "2026-09-01",
+            "2027-08-31",
+        )
+    }
+)
+LEGACY_V1_OUTCOME_AUTHORITY_RETIRED_REASON = (
+    "legacy v1 outcome authority was superseded unspent; a complete reviewed "
+    "QC-first v2 evaluation specification is required"
+)
 _PENDING_SOURCE_CELL_IDS = frozenset(
     {"corporate_action_contract", "universe_contract"}
 )
@@ -505,6 +519,17 @@ def _parse_root(path: Path) -> dict[str, object]:
     return raw
 
 
+def _refuse_superseded_look_id(raw: Mapping[str, object]) -> None:
+    looks = raw.get("looks")
+    if not isinstance(looks, list):
+        return
+    for item in looks:
+        if isinstance(item, dict) and item.get("look_id") in SUPERSEDED_LOOK_IDS:
+            raise PreregistrationError(
+                "look identity was superseded unspent and cannot be revived"
+            )
+
+
 def _git(root: Path, *arguments: str, binary: bool = False) -> str | bytes:
     try:
         if binary:
@@ -686,6 +711,7 @@ def load_draft_preregistration(path: Path) -> DraftPreregistration:
         raise PreregistrationError("owner-decision candidate content hash mismatch")
     if raw["spec_id"] != f"arv2-round0-candidate-{spec_hash[:16]}":
         raise PreregistrationError("candidate spec_id is not content-derived")
+    _refuse_superseded_look_id(raw)
     if any(
         raw[field] is not None
         for field in ("producing_commit", "reviewed_by", "reviewed_at")
@@ -732,6 +758,10 @@ def load_draft_preregistration(path: Path) -> DraftPreregistration:
             or look_id in planned_look_ids
         ):
             raise PreregistrationError("planned look_id is invalid or duplicated")
+        if look_id in SUPERSEDED_LOOK_IDS:
+            raise PreregistrationError(
+                "planned look identity was superseded unspent and cannot be revived"
+            )
         planned_look_ids.append(look_id)
         if (
             item["state"] != "planned_unbound"
@@ -1135,6 +1165,11 @@ def _validate_semantics(
     )
     validation_start = _session(validation["start"], "lane validation start")
     validation_end = _session(validation["end"], "lane validation end")
+    if (validation["start"], validation["end"]) in SUPERSEDED_VALIDATION_PERIODS:
+        raise PreregistrationError(
+            "lane validation period was superseded unspent by the owner QC-first "
+            "sequence and cannot be backfilled or reviewed"
+        )
     if validation["one_shot"] is not True or not validation_start <= validation_end <= cutoff:
         raise PreregistrationError("lane validation is not one-shot and holdout-excluded")
     if development_end >= validation_start:
@@ -1169,7 +1204,7 @@ def _validate_semantics(
         raise PreregistrationError("multiplicity alpha must remain 0.05")
     if permanent_cells != ("arv2-stock-primary-20d",):
         raise PreregistrationError("multiplicity family does not cover every stock cell")
-    if permanent_looks != ("arv2-look-stock-primary-001",):
+    if permanent_looks != (PRIMARY_OUTCOME_LOOK_ID,):
         raise PreregistrationError(
             "multiplicity family permanent-look budget must remain one named look"
         )
@@ -1191,6 +1226,7 @@ def load_reviewed_preregistration(path: Path) -> ReviewedPreregistration:
         raise PreregistrationError("preregistration content hash mismatch")
     if raw["spec_id"] != f"arv2-round0-{spec_hash[:16]}":
         raise PreregistrationError("spec_id is not derived from the complete spec hash")
+    _refuse_superseded_look_id(raw)
     producing_commit = _sha256(raw["producing_commit"], "producing_commit", 40)
     if not isinstance(raw["reviewed_by"], str) or not raw["reviewed_by"].strip():
         raise PreregistrationError("reviewed_by must name the independent reviewer")
@@ -1231,6 +1267,10 @@ def load_reviewed_preregistration(path: Path) -> ReviewedPreregistration:
         look_id = item["look_id"]
         if not isinstance(look_id, str) or not look_id.startswith("arv2-look-") or look_id in seen:
             raise PreregistrationError("look_id is invalid or duplicated")
+        if look_id in SUPERSEDED_LOOK_IDS:
+            raise PreregistrationError(
+                "registered look identity was superseded unspent and cannot be revived"
+            )
         seen.add(look_id)
         if item["state"] != "registered_unspent":
             raise PreregistrationError("immutable preregistration may contain only unspent looks")
@@ -1467,13 +1507,9 @@ def authorize_outcome_access(
     spec: ReviewedPreregistration,
     request: OutcomeAccessRequest,
 ) -> OutcomeAccessPermit:
-    """Compatibility entry point that cannot mint a local-authority permit."""
+    """Refuse the retired v1 authority after validating the requested slice."""
     _validate_outcome_request(spec, request)
-    _require_zero_access_authority()
-    raise PreregistrationError(
-        "no externally pinned append-only permanent-look authority is configured; "
-        "outcome access is zero-access"
-    )
+    raise PreregistrationError(LEGACY_V1_OUTCOME_AUTHORITY_RETIRED_REASON)
 
 
 def assert_outcome_access_permit(

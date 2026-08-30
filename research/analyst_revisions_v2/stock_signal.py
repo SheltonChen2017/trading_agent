@@ -4,8 +4,8 @@ This module implements the PDF's pre-control stock equations from revalidated
 ARV2-2 identity/ontology evidence.  It deliberately cannot publish a
 production stock-score artifact: institution, catalyst, sector and measured
 quality inputs are structural evidence only, every production registry remains
-zero-access, and the frozen mandatory-control residualization rule lacks an
-executable estimator contract.
+zero-access, and the owner-frozen QC-first control contract remains pending
+independent review and implementation.
 """
 from __future__ import annotations
 
@@ -72,7 +72,9 @@ STRUCTURAL_STOCK_EVIDENCE_SCHEMA = "arv2-structural-stock-score-evidence-v1"
 STRUCTURAL_STOCK_SCORE_SCHEMA = "arv2-structural-stock-score-candidate-v1"
 STRUCTURAL_STOCK_DIAGNOSTICS_SCHEMA = "arv2-structural-stock-diagnostics-v1"
 STRUCTURAL_ONLY_AUTHORITY = "structural_fixture_only_zero_production_authority"
-RESIDUALIZATION_BLOCK = "blocked_unspecified_mandatory_controls_cross_sectional"
+RESIDUALIZATION_BLOCK = (
+    "blocked_owner_frozen_control_contract_pending_review_and_implementation"
+)
 ELIGIBLE_HISTORY_FIRST_YEAR = 2013
 PROVEN_INELIGIBLE_IDENTITY_REFUSAL_REASONS = frozenset(
     {

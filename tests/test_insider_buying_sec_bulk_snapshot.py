@@ -11,6 +11,7 @@ import warnings
 import zipfile
 import zlib
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
@@ -492,16 +493,58 @@ def test_resource_limits_refuse_before_publication(monkeypatch, tmp_path):
         inspect_sec_bulk_archive(archive, _source())
 
 
-def test_missing_commit_marker_and_partial_snapshot_refuse(tmp_path):
+@pytest.mark.parametrize(
+    "residue",
+    [
+        ("archive.zip",),
+        ("archive.zip", "manifest.json"),
+        ("archive.zip", ".manifest.json.hard-stop.tmp"),
+    ],
+)
+def test_hard_restart_recovers_only_byte_exact_uncommitted_residue(
+    tmp_path, residue
+):
+    archive = _archive()
+    identity = inspect_sec_bulk_archive(archive, _source())
+    target = tmp_path / identity.snapshot_id
+    target.mkdir()
+    manifest = (canonical_json(identity.to_payload()) + "\n").encode("utf-8")
+    exact = {
+        "archive.zip": archive,
+        "manifest.json": manifest,
+        ".manifest.json.hard-stop.tmp": manifest,
+    }
+    for name in residue:
+        (target / name).write_bytes(exact[name])
+
+    with pytest.raises(SecBulkSnapshotError, match="commit marker"):
+        load_sec_bulk_snapshot(target)
+
+    recovered = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    assert recovered == identity
+    assert {path.name for path in target.iterdir()} == {
+        "archive.zip",
+        "manifest.json",
+        "snapshot.commit.json",
+    }
+    assert load_sec_bulk_snapshot(target).archive_bytes == archive
+
+
+@pytest.mark.parametrize("bad_name", ["manifest.json", "foreign.bin"])
+def test_hard_restart_refuses_and_preserves_entire_unverified_residue(
+    tmp_path, bad_name
+):
     archive = _archive()
     identity = inspect_sec_bulk_archive(archive, _source())
     target = tmp_path / identity.snapshot_id
     target.mkdir()
     (target / "archive.zip").write_bytes(archive)
-    with pytest.raises(SecBulkSnapshotError, match="commit marker"):
-        load_sec_bulk_snapshot(target)
-    with pytest.raises(SecBulkSnapshotError, match="incomplete"):
+    (target / bad_name).write_bytes(b"unverified")
+
+    before = {path.name: path.read_bytes() for path in target.iterdir()}
+    with pytest.raises(SecBulkSnapshotError, match="unverified files"):
         write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    assert {path.name: path.read_bytes() for path in target.iterdir()} == before
 
 
 def test_corrupt_committed_member_is_never_overwritten_by_retry(tmp_path):
@@ -797,6 +840,19 @@ def test_windows_reparse_attribute_is_recognized_without_link_privileges(
     assert not snapshot_module._status_is_redirect(normal)
     assert snapshot_module._status_is_redirect(redirected)
     assert snapshot_module._status_is_redirect(symlink)
+
+
+def test_publication_lock_acquisition_failure_maps_to_snapshot_error(
+    monkeypatch, tmp_path
+):
+    @contextmanager
+    def fail_lock(_path):
+        raise OSError("synthetic lock denial")
+        yield
+
+    monkeypatch.setattr(snapshot_module, "exclusive_file_lock", fail_lock)
+    with pytest.raises(SecBulkSnapshotError, match="lock could not be acquired"):
+        write_sec_bulk_snapshot(_archive(), _source(), tmp_path)
 
 
 @pytest.mark.parametrize("fail_call", [1, 2, 3])

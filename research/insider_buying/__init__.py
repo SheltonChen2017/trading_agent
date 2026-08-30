@@ -3,7 +3,7 @@
 This package deliberately has no network collection, outcome, portfolio,
 broker, or scheduler surface. It contains immutable in-memory Form 4
 structure, a fixture parser, and a caller-supplied SEC quarterly ZIP integrity
-and raw-snapshot boundary.
+boundary plus an explicit-profile, offline parsed-snapshot boundary.
 """
 
 from research.insider_buying.contracts import (
@@ -31,6 +31,20 @@ from research.insider_buying.sec_bulk_snapshot import (
     load_sec_bulk_snapshot,
     write_sec_bulk_snapshot,
 )
+from research.insider_buying.sec_bulk_parsed_snapshot import (
+    LoadedSecBulkParsedSnapshot,
+    ParsedSecBulkAccession,
+    ParsedSecBulkRow,
+    ParsedSecBulkTableIdentity,
+    PARSED_SNAPSHOT_CONTRACT_VERSION,
+    SEC_TSV_PARSER_VERSION,
+    SecBulkParsedSnapshotError,
+    SecBulkParsedSnapshotIdentity,
+    SecTsvSchemaProfile,
+    SecTsvSchemaVariant,
+    build_sec_bulk_parsed_snapshot,
+    load_sec_bulk_parsed_snapshot,
+)
 
 __all__ = [
     "ALLOWED_SEC_TABLES",
@@ -40,19 +54,31 @@ __all__ = [
     "FilingEnvelope",
     "Form4ParseError",
     "LoadedSecBulkSnapshot",
+    "LoadedSecBulkParsedSnapshot",
+    "PARSED_SNAPSHOT_CONTRACT_VERSION",
     "ParsedFiling",
+    "ParsedSecBulkAccession",
+    "ParsedSecBulkRow",
+    "ParsedSecBulkTableIdentity",
     "ParsedTransaction",
     "PublicAvailability",
     "ReportingOwner",
     "REQUIRED_SEC_TABLES",
     "SecBulkMember",
+    "SecBulkParsedSnapshotError",
+    "SecBulkParsedSnapshotIdentity",
     "SecBulkSnapshotError",
     "SecBulkSnapshotIdentity",
     "SecBulkSource",
+    "SecTsvSchemaProfile",
+    "SecTsvSchemaVariant",
+    "SEC_TSV_PARSER_VERSION",
     "TransactionDiagnostic",
     "build_filing_corpus",
+    "build_sec_bulk_parsed_snapshot",
     "inspect_sec_bulk_archive",
     "load_sec_bulk_snapshot",
+    "load_sec_bulk_parsed_snapshot",
     "parse_form4_xml",
     "write_sec_bulk_snapshot",
 ]

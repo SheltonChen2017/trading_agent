@@ -100,6 +100,29 @@ class SecBulkSnapshotError(ValueError):
     """The raw SEC archive or immutable snapshot failed closed."""
 
 
+class _SnapshotPublicationLock:
+    """Translate only lock entry/exit failures into the domain contract."""
+
+    def __init__(self, lock_path: Path) -> None:
+        self._manager = exclusive_file_lock(lock_path)
+
+    def __enter__(self):
+        try:
+            return self._manager.__enter__()
+        except OSError as exc:
+            raise SecBulkSnapshotError(
+                "REFUSED: snapshot publication lock could not be acquired"
+            ) from exc
+
+    def __exit__(self, exc_type, exc, traceback):
+        try:
+            return self._manager.__exit__(exc_type, exc, traceback)
+        except OSError as lock_exc:
+            raise SecBulkSnapshotError(
+                "REFUSED: snapshot publication lock could not be released"
+            ) from lock_exc
+
+
 @dataclass(frozen=True)
 class SecBulkSource:
     """Caller-supplied provenance for one already-retrieved quarterly ZIP."""
@@ -635,7 +658,16 @@ def _require_regular_lock_slot(lock_path: Path) -> None:
 def _clean_publisher_temporaries(
     target: Path, expected_files: tuple[tuple[str, bytes], ...]
 ) -> None:
+    """Remove only a wholly verified set of publisher temporaries.
+
+    Verification is deliberately two-phase: no exact residue is removed until
+    every directory entry has been classified.  An unexpected or mismatched
+    entry therefore cannot cause a partially cleaned state that hides evidence
+    from the caller.
+    """
+
     failures: list[str] = []
+    verified_temporaries: list[Path] = []
     try:
         leftovers = tuple(target.iterdir())
     except OSError:
@@ -670,7 +702,7 @@ def _clean_publisher_temporaries(
             ):
                 failures.append(path.name)
                 continue
-            path.unlink()
+            verified_temporaries.append(path)
         except (OSError, SecBulkSnapshotError):
             failures.append(path.name)
     if failures:
@@ -678,43 +710,82 @@ def _clean_publisher_temporaries(
             "REFUSED: failed publication left unverified files: "
             + ", ".join(sorted(set(failures)))
         )
+    unlink_failures: list[str] = []
+    for path in verified_temporaries:
+        try:
+            path.unlink()
+        except OSError:
+            unlink_failures.append(path.name)
+    if unlink_failures:
+        raise SecBulkSnapshotError(
+            "REFUSED: failed publication left unverified files: "
+            + ", ".join(sorted(set(unlink_failures)))
+        )
 
 
 def _rollback_uncommitted_publication(
     target: Path, expected_files: tuple[tuple[str, bytes], ...]
 ) -> None:
+    """Remove an exact uncommitted set after verifying the entire residue."""
+
+    expected_by_name = dict(expected_files)
     failures: list[str] = []
-    for name, expected in reversed(expected_files):
-        path = target / name
+    verified_paths: list[Path] = []
+    try:
+        leftovers = tuple(target.iterdir())
+    except OSError:
+        failures.append(str(target))
+        leftovers = ()
+    for path in leftovers:
+        expected = expected_by_name.get(path.name)
+        if expected is None:
+            matched_name = next(
+                (
+                    name
+                    for name in expected_by_name
+                    if path.name.startswith(f".{name}.")
+                    and path.name.endswith(".tmp")
+                ),
+                None,
+            )
+            if matched_name is None:
+                failures.append(path.name)
+                continue
+            expected = expected_by_name[matched_name]
         try:
             status = path.lstat()
-        except FileNotFoundError:
-            continue
         except OSError:
-            failures.append(name)
+            failures.append(path.name)
             continue
         try:
             if (
                 _status_is_redirect(status)
                 or not stat.S_ISREG(status.st_mode)
                 or _read_regular_bytes(
-                    path, label=f"partial {name}", max_bytes=len(expected)
+                    path, label=f"partial {path.name}", max_bytes=len(expected)
                 )
                 != expected
             ):
-                failures.append(name)
+                failures.append(path.name)
                 continue
-            path.unlink()
+            verified_paths.append(path)
         except (OSError, SecBulkSnapshotError):
-            failures.append(name)
-    try:
-        _clean_publisher_temporaries(target, expected_files)
-    except SecBulkSnapshotError as exc:
-        failures.append(str(exc))
+            failures.append(path.name)
     if failures:
         raise SecBulkSnapshotError(
             "REFUSED: failed publication left unverified files: "
             + ", ".join(sorted(set(failures)))
+        )
+    unlink_failures: list[str] = []
+    for path in reversed(verified_paths):
+        try:
+            path.unlink()
+        except OSError:
+            unlink_failures.append(path.name)
+    if unlink_failures:
+        raise SecBulkSnapshotError(
+            "REFUSED: failed publication left unverified files: "
+            + ", ".join(sorted(set(unlink_failures)))
         )
 
 
@@ -782,7 +853,7 @@ def write_sec_bulk_snapshot(
     publication = tuple(payloads.items()) + ((_COMMIT_NAME, commit_bytes),)
     lock_path = root / f".{identity.snapshot_id}{_LOCK_SUFFIX}"
     _require_regular_lock_slot(lock_path)
-    with exclusive_file_lock(lock_path):
+    with _SnapshotPublicationLock(lock_path):
         _require_regular_directory(root, label="snapshot output root")
         _require_regular_lock_slot(lock_path)
         if not _require_regular_directory(
@@ -795,7 +866,12 @@ def write_sec_bulk_snapshot(
                     "REFUSED: snapshot target could not be created"
                 ) from exc
             _require_regular_directory(target, label="snapshot target")
-        existing = {path.name for path in target.iterdir()}
+        try:
+            existing = {path.name for path in target.iterdir()}
+        except OSError as exc:
+            raise SecBulkSnapshotError(
+                "REFUSED: snapshot target is unreadable"
+            ) from exc
         if _COMMIT_NAME in existing:
             loaded = _recover_committed_publication(
                 target, publication, identity, zip_bytes
@@ -806,9 +882,7 @@ def write_sec_bulk_snapshot(
                 )
             return loaded.identity
         if existing:
-            raise SecBulkSnapshotError(
-                "REFUSED: immutable snapshot is incomplete; commit marker is missing"
-            )
+            _rollback_uncommitted_publication(target, publication)
         try:
             for name, data in payloads.items():
                 publish_immutable_bytes(target / name, data)

@@ -251,3 +251,39 @@ def test_shared_family_alpha_allocation_is_exact_and_unrecycled() -> None:
     )
     assert multiplicity["look_budget"] == len(allocations) == 1
     assert multiplicity["external_append_only_authority_required"] is True
+
+
+def _record_section(heading: str) -> str:
+    """The text of one numbered record section, up to the next `## ` heading."""
+    text = (STRATEGY_DIR / RECORD).read_text(encoding="utf-8")
+    start = text.index(heading)
+    nxt = text.find("\n## ", start + len(heading))
+    return text[start:] if nxt == -1 else text[start:nxt]
+
+
+def test_exact_next_step_names_the_current_artifacts() -> None:
+    """TPR-CR3-001. The record's current-state section must not pin superseded
+    content addresses.
+
+    Section 8 is where a reader goes for the present state, and it kept
+    describing the superseded 28-page v2.1 blueprint and the previous
+    candidate triple in the present tense, in the very commit range that
+    replaced them. In a lane whose discipline is content addressing, naming an
+    old digest as current is worse than naming none: it sends a verifier to
+    the wrong artifact.
+
+    Positive assertions only, so no list of superseded values has to be
+    maintained: whenever the blueprint or candidate is amended again, this
+    fails until section 8 is brought forward with it.
+    """
+    section = _record_section("## 8. Exact next step")
+
+    assert BLUEPRINT_CONTENT_SHA256 in section.lower(), (
+        "section 8 must name the current blueprint digest"
+    )
+    assert EXPECTED_CANDIDATE_ID in section, (
+        "section 8 must name the current candidate spec id"
+    )
+    assert EXPECTED_CANDIDATE_ARTIFACT_SHA256 in section.lower(), (
+        "section 8 must name the current candidate artifact digest"
+    )

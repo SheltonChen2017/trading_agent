@@ -9,8 +9,10 @@ import pytest
 
 import research.analyst_revisions_v2.qc_first_plan as plan_module
 from research.analyst_revisions_v2.qc_first_plan import (
+    AuthorityPhaseValidation,
     QcFirstPlanError,
     load_qc_first_study_plan,
+    validate_authority_phase_state,
 )
 
 
@@ -91,6 +93,85 @@ def test_repository_plan_is_exactly_outcome_free_and_stage_separated() -> None:
         plan_module._ROOT_KEYS.add("launch_authorized")
 
 
+def test_authority_phase_validator_enforces_order_but_never_grants_action() -> None:
+    plan = load_qc_first_study_plan(PLAN)
+    empty = validate_authority_phase_state(
+        plan,
+        claimed_completed_phases=(),
+        bindings=plan.qc_historical_contract["authority_bindings"],
+    )
+    assert empty.completed_phases == ()
+    assert empty.next_phase == "source_capture"
+    assert set(empty.missing_next_requirements) == {
+        "data_entitlement_audit_id",
+        "vendor_to_qc_processing_rights_receipt_id",
+        "owner_source_capture_authority_id",
+    }
+    assert empty.binding_shape_complete is False
+    assert empty.evidence_authentication_performed is False
+    assert empty.grants_action_authority is False
+
+    phases = plan.qc_historical_contract["authority_phase_order"]
+    names = {
+        name
+        for phase in phases
+        for category in ("requires", "produces")
+        for name in phase[category]
+    }
+    synthetic = {name: f"synthetic-{name}" for name in names}
+    complete = validate_authority_phase_state(
+        plan,
+        claimed_completed_phases=tuple(phase["phase"] for phase in phases),
+        bindings=synthetic,
+    )
+    assert complete.binding_shape_complete is True
+    assert complete.next_phase is None
+    assert complete.evidence_authentication_performed is False
+    assert complete.grants_action_authority is False
+    assert plan.upload_available is False
+    assert plan.historical_launch_available is False
+    assert plan.paper_deployment_available is False
+    assert plan.funded_live_available is False
+    direct = AuthorityPhaseValidation(
+        completed_phases=(),
+        next_phase="source_capture",
+        missing_next_requirements=(),
+        binding_shape_complete=False,
+    )
+    assert direct.evidence_authentication_performed is False
+    assert direct.grants_action_authority is False
+    with pytest.raises(TypeError):
+        AuthorityPhaseValidation(
+            completed_phases=(),
+            next_phase=None,
+            missing_next_requirements=(),
+            binding_shape_complete=True,
+            grants_action_authority=True,
+        )
+
+
+def test_authority_phase_validator_refuses_underfilled_or_out_of_order_claims() -> None:
+    plan = load_qc_first_study_plan(PLAN)
+    with pytest.raises(QcFirstPlanError, match="ordered prefix"):
+        validate_authority_phase_state(
+            plan,
+            claimed_completed_phases=("normalization",),
+            bindings={},
+        )
+    with pytest.raises(QcFirstPlanError, match="missing required bindings"):
+        validate_authority_phase_state(
+            plan,
+            claimed_completed_phases=("source_capture",),
+            bindings={},
+        )
+    with pytest.raises(QcFirstPlanError, match="premature outputs"):
+        validate_authority_phase_state(
+            plan,
+            claimed_completed_phases=(),
+            bindings={"dataset_id": "synthetic-dataset"},
+        )
+
+
 def test_amendment_hash_binds_the_exact_superseded_base_artifact() -> None:
     plan = load_qc_first_study_plan(PLAN)
     legacy_path = PLAN.with_name("arv2_round0.draft.json")
@@ -123,6 +204,92 @@ def test_missing_or_content_substituted_superseded_base_refuses(
         load_qc_first_study_plan(path)
 
 
+@pytest.mark.parametrize(
+    ("replacement", "match"),
+    [
+        (
+            '"schema": "forged",\n  "schema":',
+            "duplicate JSON key",
+        ),
+        (
+            '"horizon_sessions": NaN',
+            "floating-point",
+        ),
+    ],
+)
+def test_superseded_base_rejects_ambiguous_or_nonfinite_json(
+    tmp_path: Path,
+    replacement: str,
+    match: str,
+) -> None:
+    """The authenticated predecessor must use the same strict parser."""
+    raw = json.loads(PLAN.read_text(encoding="utf-8"))
+    path = _write(tmp_path, raw)
+    legacy_path = tmp_path / "arv2_round0.draft.json"
+    legacy_text = legacy_path.read_text(encoding="utf-8")
+    if replacement.startswith('"schema"'):
+        legacy_text = legacy_text.replace('"schema":', replacement, 1)
+    else:
+        legacy_text = legacy_text.replace(
+            '"horizon_sessions": 20', replacement, 1
+        )
+    legacy_path.write_text(legacy_text, encoding="utf-8")
+
+    with pytest.raises(QcFirstPlanError, match=match):
+        load_qc_first_study_plan(path)
+
+
+def test_maturity_dates_are_recomputed_not_merely_session_checked(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    raw = json.loads(PLAN.read_text(encoding="utf-8"))
+    raw["qc_historical_contract"][
+        "last_eligible_decision_session_by_horizon"
+    ]["20"] = "2026-07-30"
+    monkeypatch.setattr(
+        plan_module,
+        "QC_HISTORICAL_POLICY",
+        plan_module._freeze_template(raw["qc_historical_contract"]),
+    )
+    _rehash(raw)
+    with pytest.raises(QcFirstPlanError, match="does not mature at cutoff"):
+        load_qc_first_study_plan(_write(tmp_path, raw))
+
+
+def test_plan_loader_refuses_symlink_and_unstable_payload(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    raw = json.loads(PLAN.read_text(encoding="utf-8"))
+    path = _write(tmp_path, raw)
+    linked = tmp_path / "linked-plan.json"
+    try:
+        linked.symlink_to(path)
+    except OSError:
+        pass
+    else:
+        with pytest.raises(QcFirstPlanError, match="symlink"):
+            load_qc_first_study_plan(linked)
+
+    original_read_bytes = Path.read_bytes
+    resolved = path.resolve(strict=True)
+    calls = 0
+
+    def unstable_read_bytes(candidate: Path) -> bytes:
+        nonlocal calls
+        payload = original_read_bytes(candidate)
+        if candidate.resolve(strict=False) == resolved:
+            calls += 1
+            if calls == 2:
+                return payload + b" "
+        return payload
+
+    monkeypatch.setattr(Path, "read_bytes", unstable_read_bytes)
+    with pytest.raises(QcFirstPlanError, match="changed while it was being read"):
+        load_qc_first_study_plan(path)
+
+
 def test_historical_development_and_future_paper_contracts_cannot_blur() -> None:
     plan = load_qc_first_study_plan(PLAN)
     multiplicity = plan.multiplicity_contract
@@ -138,7 +305,15 @@ def test_historical_development_and_future_paper_contracts_cannot_blur() -> None
         "arv2-look-etf-paper-prospective-001",
     )
     assert historical["stock_stage"]["confirmatory_alpha_spent"] is False
-    assert historical["etf_stage"]["confirmatory_alpha_spent"] is False
+    assert historical["topology_stage"]["confirmatory_alpha_spent"] is False
+    assert historical["industry_topology_stage"][
+        "current_execution_authorized"
+    ] is False
+    assert historical["topology_stage"]["topology_hierarchy"] == (
+        "stock",
+        "industry",
+        "etf",
+    )
     assert "migration_only" in historical["legacy_v1_preregistration"]
     assert controls["stock_residualization"]["fit_population"] == (
         "active_rating_signal_stock_rows_in_training_fold_only"
@@ -158,6 +333,12 @@ def test_historical_development_and_future_paper_contracts_cannot_blur() -> None
     assert study["economic_gate"]["primary_cost_gate"] == (
         "fixed_10_bps_per_side_only"
     )
+    benchmark = study["global_map_benchmark"]
+    assert benchmark["primary_metric"].endswith(
+        "spearman_ic_on_identical_rows"
+    )
+    assert benchmark["global_rating_map_definition_sha256"] is None
+    assert benchmark["current_execution_authorized"] is False
     assert study["economic_gate"]["liquidity_impact"]["role"] == (
         "capacity_bound_diagnostic_not_promotion_gate"
     )
@@ -211,7 +392,7 @@ def test_plan_hash_covers_every_stage_and_policy_choice(tmp_path: Path) -> None:
             lambda raw: raw["control_contract"].update(
                 stock_control_execution_authorized=0
             ),
-            "changed from the owner-frozen contract",
+            "changed from the implementation-frozen contract",
         ),
         # Unknown-field rejection was pinned only at the root, so a nested
         # contract could grow a field the frozen template never declared.
@@ -219,7 +400,7 @@ def test_plan_hash_covers_every_stage_and_policy_choice(tmp_path: Path) -> None:
             lambda raw: raw["control_contract"].update(
                 claude_review_injected_field=True
             ),
-            "changed from the owner-frozen contract",
+            "changed from the implementation-frozen contract",
         ),
 
         # The authority, schema and status strings are the plan's own
@@ -230,15 +411,15 @@ def test_plan_hash_covers_every_stage_and_policy_choice(tmp_path: Path) -> None:
             lambda raw: raw.update(
                 authority="full_qc_action_and_deployment_authority"
             ),
-            "authority changed from the owner-frozen contract",
+            "authority changed from the implementation-frozen contract",
         ),
         (
             lambda raw: raw.update(schema="arv2-qc-first-plan-v2"),
-            "schema changed from the owner-frozen contract",
+            "schema changed from the implementation-frozen contract",
         ),
         (
             lambda raw: raw.update(status="reviewed_frozen"),
-            "status changed from the owner-frozen contract",
+            "status changed from the implementation-frozen contract",
         ),
         (
             lambda raw: raw["multiplicity_contract"].update(

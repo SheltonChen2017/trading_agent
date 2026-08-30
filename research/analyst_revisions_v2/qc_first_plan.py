@@ -14,7 +14,11 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
 
-from data.exchange_calendar import ExchangeCalendarError, is_trading_session
+from data.exchange_calendar import (
+    ExchangeCalendarError,
+    is_trading_session,
+    resolve_nth_session_after,
+)
 
 
 class QcFirstPlanError(ValueError):
@@ -23,7 +27,7 @@ class QcFirstPlanError(ValueError):
 
 PLAN_SCHEMA = "arv2-qc-first-study-plan-v1"
 PLAN_STATUS = (
-    "owner_frozen_outcome_free_pending_independent_review_and_external_bindings"
+    "implementer_frozen_outcome_free_pending_independent_review_and_external_bindings"
 )
 PLANNING_AUTHORITY = (
     "planning_only_no_data_no_outcome_no_qc_action_no_deployment"
@@ -96,7 +100,7 @@ MULTIPLICITY_POLICY = {
     "three_lane_correction_factor": 3,
     "development_evaluation_ids": [
         "arv2-eval-stock-historical-qc-001",
-        "arv2-eval-etf-historical-qc-001",
+        "arv2-eval-stock-industry-etf-historical-qc-001",
     ],
     "development_evidence_role": (
         "selection_and_engineering_only_no_confirmatory_alpha_claim"
@@ -107,7 +111,8 @@ MULTIPLICITY_POLICY = {
     "prospective_permanent_look_alpha": {"numerator": 1, "denominator": 60},
     "gatekeeping_order": [
         "stock_historical_qc",
-        "etf_historical_qc",
+        "industry_and_etf_topology_construction",
+        "stock_industry_etf_historical_qc",
         "etf_paper_prospective",
     ],
     "correction": "bonferroni_three_lanes_for_one_prospective_lane_look",
@@ -313,7 +318,11 @@ STOCK_EVENT_STUDY_POLICY = {
     "secondary_horizon_sessions": [1, 5, 60],
     "secondary_horizons_can_rescue": False,
     "reporting_classification": {
-        "PRIMARY": ["bullish_20_session_fama_macbeth", "net_20_session_sleeve"],
+        "PRIMARY": [
+            "bullish_20_session_fama_macbeth",
+            "net_20_session_sleeve",
+            "firm_specific_vs_global_map_paired_20_session_ic",
+        ],
         "SECONDARY": [
             "bullish_1_5_60_session_fama_macbeth",
             "bearish_1_5_20_60_session_fama_macbeth",
@@ -355,6 +364,43 @@ STOCK_EVENT_STUDY_POLICY = {
         "bearish_secondary": "minimum_final_control_adjusted_score_and_zero",
         "symmetry_assumed": False,
         "bearish_can_rescue_bullish": False,
+    },
+    "global_map_benchmark": {
+        "role": "mandatory_non_rescuing_firm_specific_normalization_gate",
+        "global_rating_map_definition_sha256": None,
+        "paired_comparison_definition_sha256": None,
+        "definition_state": (
+            "must_be_content_addressed_and_reviewed_before_ARV2_4_execution"
+        ),
+        "required_global_map_definition_fields": [
+            "ordered_global_rating_vocabulary_and_exact_scores",
+            "time_validity_unseen_label_and_ambiguity_refusals",
+            "upgrade_downgrade_and_structural_zero_semantics",
+            "source_lineage_and_review_identity",
+        ],
+        "required_parity": [
+            "identical_point_in_time_observation_rows_and_refusals",
+            "identical_universe_controls_costs_and_walk_forward_folds",
+            "identical_horizon_common_event_and_inference_rules",
+        ],
+        "primary_metric": (
+            "paired_walk_forward_test_date_20_session_spearman_ic_on_identical_rows"
+        ),
+        "comparison": "firm_specific_minus_global_map",
+        "noninferiority_margin": {"numerator": 0, "denominator": 1},
+        "uncertainty": (
+            "paired_centered_moving_block_bootstrap_on_common_test_dates_"
+            "using_the_primary_20_session_block_and_resample_contract"
+        ),
+        "pass_rule": (
+            "observed_difference_nonnegative_and_one_sided_95pct_lower_"
+            "confidence_bound_nonnegative_strict_no_worse_with_confidence_gate"
+        ),
+        "secondary_metrics": (
+            "pre_outcome_registered_reporting_only_fdr_adjusted_never_rescue"
+        ),
+        "failure": "closes_family_and_blocks_all_downstream_topologies",
+        "current_execution_authorized": False,
     },
     "outcome_controls": [
         "momentum_20d",
@@ -598,6 +644,10 @@ STOCK_EVENT_STUDY_POLICY = {
         "p_value_threshold": {"numerator": 1, "denominator": 20},
         "hac": "descriptive_only_not_a_second_gate",
         "economic": "exact_bound_primary_net_economic_gate_must_pass",
+        "global_map": (
+            "firm_specific_normalization_must_pass_the_frozen_paired_"
+            "20_session_IC_strict_no_worse_with_confidence_gate"
+        ),
         "conjunction": "all_named_primary_conditions_required",
     },
     "confirmatory_claim_permitted": False,
@@ -607,6 +657,9 @@ STOCK_EVENT_STUDY_POLICY = {
 
 QC_HISTORICAL_POLICY = {
     "engine": "quantconnect_cloud",
+    "sequencing_source": (
+        "owner_direction_2026_08_30_historical_qc_before_prospective_epoch"
+    ),
     "history_start": "2013-01-02",
     "outcome_data_cutoff_session": "2026-08-28",
     "last_eligible_decision_session_by_horizon": {
@@ -627,10 +680,51 @@ QC_HISTORICAL_POLICY = {
         "screen_failure": "closes_family",
         "confirmatory_alpha_spent": False,
     },
-    "etf_stage": {
-        "evaluation_id": "arv2-eval-etf-historical-qc-001",
+    "industry_topology_stage": {
+        "role": "outcome_free_required_comparator_construction",
+        "eligibility": "after_ARV2_4_pass_before_ARV2_6_outcome_access",
+        "construction_contract_sha256": None,
+        "direct_stock_portfolio_variants": [
+            "equal_weight",
+            "inverse_volatility_weight",
+            "score_weight",
+        ],
+        "construction_state": (
+            "must_be_content_addressed_and_reviewed_before_ARV2_6"
+        ),
+        "current_execution_authorized": False,
+    },
+    "topology_stage": {
+        "evaluation_id": "arv2-eval-stock-industry-etf-historical-qc-001",
         "eligibility": "after_ARV2-4_pass_and_ARV2-5_complete",
-        "algorithm_scope": "portfolio_backtest_research_only",
+        "algorithm_scope": (
+            "joint_direct_stock_industry_and_etf_portfolio_backtest_research_only"
+        ),
+        "topology_hierarchy": ["stock", "industry", "etf"],
+        "primary_comparison_definition_sha256": None,
+        "primary_comparison_metric": (
+            "mean_net_excess_daily_total_return_at_10_bps_per_side"
+        ),
+        "primary_comparison_pairs": [
+            "etf_minus_direct_stock_equal_weight",
+            "etf_minus_industry_aggregation",
+        ],
+        "matched_observation_rule": (
+            "identical_test_sessions_eligible_census_folds_and_costs_for_all_topologies"
+        ),
+        "comparison_margin": {"numerator": 0, "denominator": 1},
+        "comparison_uncertainty": (
+            "paired_centered_complete_session_block_bootstrap_length_20"
+        ),
+        "promotion_rule": (
+            "both_primary_paired_differences_and_one_sided_95pct_lower_"
+            "bounds_must_be_strictly_positive"
+        ),
+        "secondary_comparisons": (
+            "pre_outcome_registered_fdr_adjusted_reporting_only_never_rescue"
+        ),
+        "holdings_lag_sensitivity_sessions": [0, 1, 5],
+        "conservative_lag_failure": "blocks_etf_promotion",
         "estimand_state": "must_freeze_and_review_before_outcome_access",
         "pass_unlocks": "ARV2-7_only",
         "screen_failure": "closes_family",
@@ -1048,13 +1142,59 @@ def _canonical_payload(raw: Mapping[str, Any]) -> bytes:
     ).encode("utf-8")
 
 
-def _verify_superseded_base(plan_path: Path) -> None:
+def _read_regular_payload(path: Path, name: str) -> tuple[Path, bytes]:
+    """Read a non-symlink regular file twice and retain its stable bytes."""
+    candidate = Path(path)
+    absolute = candidate.absolute()
+    if any(item.is_symlink() for item in (absolute, *absolute.parents)):
+        raise QcFirstPlanError(f"{name} must not traverse a symlink")
+    try:
+        resolved = candidate.resolve(strict=True)
+    except OSError as exc:
+        raise QcFirstPlanError(f"{name} is unavailable") from exc
+    if not resolved.is_file() or resolved.is_symlink():
+        raise QcFirstPlanError(f"{name} must be a regular file")
+    try:
+        before = resolved.stat()
+        first = resolved.read_bytes()
+        second = resolved.read_bytes()
+        after = resolved.stat()
+    except OSError as exc:
+        raise QcFirstPlanError(f"{name} is unavailable") from exc
+    before_identity = (
+        before.st_dev,
+        before.st_ino,
+        before.st_size,
+        before.st_mtime_ns,
+    )
+    after_identity = (
+        after.st_dev,
+        after.st_ino,
+        after.st_size,
+        after.st_mtime_ns,
+    )
+    if before_identity != after_identity or first != second:
+        raise QcFirstPlanError(f"{name} changed while it was being read")
+    return resolved, first
+
+
+def _revalidate_regular_payload(path: Path, payload: bytes, name: str) -> None:
+    if path.is_symlink() or not path.is_file():
+        raise QcFirstPlanError(f"{name} changed or disappeared")
+    try:
+        current = path.read_bytes()
+    except OSError as exc:
+        raise QcFirstPlanError(f"{name} changed or disappeared") from exc
+    if current != payload:
+        raise QcFirstPlanError(f"{name} changed after authentication")
+
+
+def _verify_superseded_base(plan_path: Path) -> tuple[Path, bytes]:
     """Authenticate the exact retired predecessor without reviving authority."""
     base_path = plan_path.with_name("arv2_round0.draft.json")
-    try:
-        base_bytes = base_path.read_bytes()
-    except OSError as exc:
-        raise QcFirstPlanError("superseded base artifact is unavailable") from exc
+    resolved_base, base_bytes = _read_regular_payload(
+        base_path, "superseded base artifact"
+    )
     try:
         raw = json.loads(
             base_bytes,
@@ -1103,25 +1243,35 @@ def _verify_superseded_base(plan_path: Path) -> None:
         != SUPERSESSION_POLICY["legacy_state_at_supersession"]
     ):
         raise QcFirstPlanError("superseded base look tombstone changed")
+    _revalidate_regular_payload(
+        resolved_base, base_bytes, "superseded base artifact"
+    )
+    return resolved_base, base_bytes
 
 
 def _require_exact(actual: object, expected: object, name: str) -> None:
     if isinstance(expected, Mapping):
         if type(actual) is not dict or set(actual) != set(expected):
-            raise QcFirstPlanError(f"{name} changed from the owner-frozen contract")
+            raise QcFirstPlanError(
+                f"{name} changed from the implementation-frozen contract"
+            )
         for key, expected_value in expected.items():
             _require_exact(actual[key], expected_value, f"{name}.{key}")
         return
     if type(expected) is tuple:
         if type(actual) is not list or len(actual) != len(expected):
-            raise QcFirstPlanError(f"{name} changed from the owner-frozen contract")
+            raise QcFirstPlanError(
+                f"{name} changed from the implementation-frozen contract"
+            )
         for index, (actual_value, expected_value) in enumerate(
             zip(actual, expected, strict=True)
         ):
             _require_exact(actual_value, expected_value, f"{name}[{index}]")
         return
     if type(actual) is not type(expected) or actual != expected:
-        raise QcFirstPlanError(f"{name} changed from the owner-frozen contract")
+        raise QcFirstPlanError(
+            f"{name} changed from the implementation-frozen contract"
+        )
 
 
 def _require_session(value: str, name: str) -> None:
@@ -1173,12 +1323,111 @@ class QcFirstStudyPlan:
         return False
 
 
+@dataclasses.dataclass(frozen=True)
+class AuthorityPhaseValidation:
+    """Structural phase-order result that never authenticates action authority."""
+
+    completed_phases: tuple[str, ...]
+    next_phase: str | None
+    missing_next_requirements: tuple[str, ...]
+    binding_shape_complete: bool
+
+    @property
+    def evidence_authentication_performed(self) -> bool:
+        return False
+
+    @property
+    def grants_action_authority(self) -> bool:
+        return False
+
+
+def validate_authority_phase_state(
+    plan: QcFirstStudyPlan,
+    *,
+    claimed_completed_phases: tuple[str, ...],
+    bindings: Mapping[str, str | None],
+) -> AuthorityPhaseValidation:
+    """Enforce the frozen phase prefix without treating strings as authority.
+
+    This validator makes out-of-order or underfilled phase claims executable
+    refusals.  It deliberately performs no receipt, signature, entitlement or
+    owner-authority authentication; a structurally complete result therefore
+    still grants no upload, compile, launch, deployment or trading capability.
+    """
+    if type(plan) is not QcFirstStudyPlan:
+        raise QcFirstPlanError("phase validation requires an authenticated plan")
+    if type(claimed_completed_phases) is not tuple or any(
+        type(item) is not str or not item
+        for item in claimed_completed_phases
+    ):
+        raise QcFirstPlanError("claimed phases must be a tuple of phase names")
+    if not isinstance(bindings, Mapping):
+        raise QcFirstPlanError("phase bindings must be a mapping")
+
+    phases = plan.qc_historical_contract["authority_phase_order"]
+    expected_order = tuple(item["phase"] for item in phases)
+    if claimed_completed_phases != expected_order[: len(claimed_completed_phases)]:
+        raise QcFirstPlanError("completed phases must be an exact ordered prefix")
+
+    allowed_names = frozenset(
+        name
+        for phase in phases
+        for category in ("requires", "produces")
+        for name in phase[category]
+    )
+    unknown = set(bindings) - allowed_names
+    if unknown:
+        raise QcFirstPlanError("phase bindings contain unknown fields")
+    normalized: dict[str, str | None] = {name: None for name in allowed_names}
+    for name, value in bindings.items():
+        if value is not None and (
+            type(value) is not str or not value or value != value.strip()
+        ):
+            raise QcFirstPlanError("phase binding values must be non-empty strings")
+        normalized[name] = value
+
+    completed_count = len(claimed_completed_phases)
+    for index, phase in enumerate(phases):
+        required = tuple(phase["requires"])
+        produced = tuple(phase["produces"])
+        if index < completed_count:
+            missing = tuple(
+                name for name in (*required, *produced) if normalized[name] is None
+            )
+            if missing:
+                raise QcFirstPlanError(
+                    f"completed phase {phase['phase']} is missing required bindings"
+                )
+        else:
+            premature = tuple(name for name in produced if normalized[name] is not None)
+            if premature:
+                raise QcFirstPlanError(
+                    f"uncompleted phase {phase['phase']} has premature outputs"
+                )
+
+    next_phase = (
+        None if completed_count == len(phases) else phases[completed_count]["phase"]
+    )
+    missing_next = (
+        ()
+        if next_phase is None
+        else tuple(
+            name
+            for name in phases[completed_count]["requires"]
+            if normalized[name] is None
+        )
+    )
+    return AuthorityPhaseValidation(
+        completed_phases=claimed_completed_phases,
+        next_phase=next_phase,
+        missing_next_requirements=missing_next,
+        binding_shape_complete=next_phase is None,
+    )
+
+
 def load_qc_first_study_plan(path: Path) -> QcFirstStudyPlan:
-    """Load the exact owner-frozen, still non-executable QC-first plan."""
-    try:
-        raw_bytes = path.read_bytes()
-    except OSError as exc:
-        raise QcFirstPlanError("QC-first study plan is unavailable") from exc
+    """Load the exact implementation-frozen, non-executable QC-first plan."""
+    resolved_plan, raw_bytes = _read_regular_payload(path, "QC-first study plan")
     try:
         raw = json.loads(
             raw_bytes,
@@ -1216,7 +1465,7 @@ def load_qc_first_study_plan(path: Path) -> QcFirstStudyPlan:
     for name, expected in frozen_sections:
         _require_exact(raw[name], expected, name)
 
-    _verify_superseded_base(path)
+    resolved_base, base_bytes = _verify_superseded_base(resolved_plan)
 
     _require_session(QC_HISTORICAL_POLICY["history_start"], "history_start")
     _require_session(
@@ -1227,11 +1476,28 @@ def load_qc_first_study_plan(path: Path) -> QcFirstStudyPlan:
         "last_eligible_decision_session_by_horizon"
     ].items():
         _require_session(session, f"last_eligible_decision_session[{horizon}]")
+        try:
+            maturity_session = resolve_nth_session_after(session, int(horizon))
+        except (ExchangeCalendarError, ValueError) as exc:
+            raise QcFirstPlanError(
+                f"last_eligible_decision_session[{horizon}] cannot be matured"
+            ) from exc
+        if maturity_session != QC_HISTORICAL_POLICY["outcome_data_cutoff_session"]:
+            raise QcFirstPlanError(
+                f"last_eligible_decision_session[{horizon}] does not mature at cutoff"
+            )
     if (
         QC_HISTORICAL_POLICY["history_start"]
         >= QC_HISTORICAL_POLICY["outcome_data_cutoff_session"]
     ):
         raise QcFirstPlanError("historical QC period is reversed")
+
+    _revalidate_regular_payload(
+        resolved_base, base_bytes, "superseded base artifact"
+    )
+    _revalidate_regular_payload(
+        resolved_plan, raw_bytes, "QC-first study plan"
+    )
 
     return QcFirstStudyPlan(
         plan_id=raw["plan_id"],

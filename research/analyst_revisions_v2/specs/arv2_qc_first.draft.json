@@ -1,8 +1,8 @@
 {
   "schema": "arv2-qc-first-study-plan-v1",
-  "status": "owner_frozen_outcome_free_pending_independent_review_and_external_bindings",
-  "plan_id": "arv2-qc-first-plan-9574bf824e9b9735",
-  "plan_hash": "9574bf824e9b9735d3c40d0a09b50a48a452fdf7533ccb56061f788510e706e7",
+  "status": "implementer_frozen_outcome_free_pending_independent_review_and_external_bindings",
+  "plan_id": "arv2-qc-first-plan-36e455e72b8750fe",
+  "plan_hash": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc",
   "authority": "planning_only_no_data_no_outcome_no_qc_action_no_deployment",
   "supersession": {
     "legacy_spec_id": "arv2-round0-candidate-8d13a0a4577df322",
@@ -67,7 +67,7 @@
     "three_lane_correction_factor": 3,
     "development_evaluation_ids": [
       "arv2-eval-stock-historical-qc-001",
-      "arv2-eval-etf-historical-qc-001"
+      "arv2-eval-stock-industry-etf-historical-qc-001"
     ],
     "development_evidence_role": "selection_and_engineering_only_no_confirmatory_alpha_claim",
     "prospective_permanent_look_ids": [
@@ -79,7 +79,8 @@
     },
     "gatekeeping_order": [
       "stock_historical_qc",
-      "etf_historical_qc",
+      "industry_and_etf_topology_construction",
+      "stock_industry_etf_historical_qc",
       "etf_paper_prospective"
     ],
     "correction": "bonferroni_three_lanes_for_one_prospective_lane_look",
@@ -246,7 +247,8 @@
     "reporting_classification": {
       "PRIMARY": [
         "bullish_20_session_fama_macbeth",
-        "net_20_session_sleeve"
+        "net_20_session_sleeve",
+        "firm_specific_vs_global_map_paired_20_session_ic"
       ],
       "SECONDARY": [
         "bullish_1_5_60_session_fama_macbeth",
@@ -280,6 +282,34 @@
       "bearish_secondary": "minimum_final_control_adjusted_score_and_zero",
       "symmetry_assumed": false,
       "bearish_can_rescue_bullish": false
+    },
+    "global_map_benchmark": {
+      "role": "mandatory_non_rescuing_firm_specific_normalization_gate",
+      "global_rating_map_definition_sha256": null,
+      "paired_comparison_definition_sha256": null,
+      "definition_state": "must_be_content_addressed_and_reviewed_before_ARV2_4_execution",
+      "required_global_map_definition_fields": [
+        "ordered_global_rating_vocabulary_and_exact_scores",
+        "time_validity_unseen_label_and_ambiguity_refusals",
+        "upgrade_downgrade_and_structural_zero_semantics",
+        "source_lineage_and_review_identity"
+      ],
+      "required_parity": [
+        "identical_point_in_time_observation_rows_and_refusals",
+        "identical_universe_controls_costs_and_walk_forward_folds",
+        "identical_horizon_common_event_and_inference_rules"
+      ],
+      "primary_metric": "paired_walk_forward_test_date_20_session_spearman_ic_on_identical_rows",
+      "comparison": "firm_specific_minus_global_map",
+      "noninferiority_margin": {
+        "numerator": 0,
+        "denominator": 1
+      },
+      "uncertainty": "paired_centered_moving_block_bootstrap_on_common_test_dates_using_the_primary_20_session_block_and_resample_contract",
+      "pass_rule": "observed_difference_nonnegative_and_one_sided_95pct_lower_confidence_bound_nonnegative_strict_no_worse_with_confidence_gate",
+      "secondary_metrics": "pre_outcome_registered_reporting_only_fdr_adjusted_never_rescue",
+      "failure": "closes_family_and_blocks_all_downstream_topologies",
+      "current_execution_authorized": false
     },
     "outcome_controls": [
       "momentum_20d",
@@ -500,6 +530,7 @@
       },
       "hac": "descriptive_only_not_a_second_gate",
       "economic": "exact_bound_primary_net_economic_gate_must_pass",
+      "global_map": "firm_specific_normalization_must_pass_the_frozen_paired_20_session_IC_strict_no_worse_with_confidence_gate",
       "conjunction": "all_named_primary_conditions_required"
     },
     "confirmatory_claim_permitted": false,
@@ -508,6 +539,7 @@
   },
   "qc_historical_contract": {
     "engine": "quantconnect_cloud",
+    "sequencing_source": "owner_direction_2026_08_30_historical_qc_before_prospective_epoch",
     "history_start": "2013-01-02",
     "outcome_data_cutoff_session": "2026-08-28",
     "last_eligible_decision_session_by_horizon": {
@@ -525,10 +557,47 @@
       "screen_failure": "closes_family",
       "confirmatory_alpha_spent": false
     },
-    "etf_stage": {
-      "evaluation_id": "arv2-eval-etf-historical-qc-001",
+    "industry_topology_stage": {
+      "role": "outcome_free_required_comparator_construction",
+      "eligibility": "after_ARV2_4_pass_before_ARV2_6_outcome_access",
+      "construction_contract_sha256": null,
+      "direct_stock_portfolio_variants": [
+        "equal_weight",
+        "inverse_volatility_weight",
+        "score_weight"
+      ],
+      "construction_state": "must_be_content_addressed_and_reviewed_before_ARV2_6",
+      "current_execution_authorized": false
+    },
+    "topology_stage": {
+      "evaluation_id": "arv2-eval-stock-industry-etf-historical-qc-001",
       "eligibility": "after_ARV2-4_pass_and_ARV2-5_complete",
-      "algorithm_scope": "portfolio_backtest_research_only",
+      "algorithm_scope": "joint_direct_stock_industry_and_etf_portfolio_backtest_research_only",
+      "topology_hierarchy": [
+        "stock",
+        "industry",
+        "etf"
+      ],
+      "primary_comparison_definition_sha256": null,
+      "primary_comparison_metric": "mean_net_excess_daily_total_return_at_10_bps_per_side",
+      "primary_comparison_pairs": [
+        "etf_minus_direct_stock_equal_weight",
+        "etf_minus_industry_aggregation"
+      ],
+      "matched_observation_rule": "identical_test_sessions_eligible_census_folds_and_costs_for_all_topologies",
+      "comparison_margin": {
+        "numerator": 0,
+        "denominator": 1
+      },
+      "comparison_uncertainty": "paired_centered_complete_session_block_bootstrap_length_20",
+      "promotion_rule": "both_primary_paired_differences_and_one_sided_95pct_lower_bounds_must_be_strictly_positive",
+      "secondary_comparisons": "pre_outcome_registered_fdr_adjusted_reporting_only_never_rescue",
+      "holdings_lag_sensitivity_sessions": [
+        0,
+        1,
+        5
+      ],
+      "conservative_lag_failure": "blocks_etf_promotion",
       "estimand_state": "must_freeze_and_review_before_outcome_access",
       "pass_unlocks": "ARV2-7_only",
       "screen_failure": "closes_family",

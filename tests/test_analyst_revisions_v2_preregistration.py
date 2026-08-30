@@ -342,6 +342,26 @@ def test_repository_draft_is_complete_but_non_executable() -> None:
         load_reviewed_preregistration(DRAFT)
 
 
+def test_preregistration_and_review_registry_duplicate_keys_refuse(
+    tmp_path: Path,
+) -> None:
+    """A displayed first value cannot disagree with the authenticated last one."""
+    draft_text = DRAFT.read_text(encoding="utf-8").replace(
+        '"status":', '"status": "forged_reviewed",\n  "status":', 1
+    )
+    duplicate_draft = tmp_path / "duplicate-draft.json"
+    duplicate_draft.write_text(draft_text, encoding="utf-8")
+    with pytest.raises(PreregistrationError, match="duplicate JSON key"):
+        load_draft_preregistration(duplicate_draft)
+
+    duplicate_registry = (
+        b'{"schema":"forged","schema":"arv2-reviewed-spec-registry-v1",'
+        b'"entries":[]}'
+    )
+    with pytest.raises(PreregistrationError, match="duplicate JSON key"):
+        preregistration._json_object(duplicate_registry, "review registry")
+
+
 def test_superseded_look_identity_cannot_be_revived_by_date_edit(
     tmp_path: Path,
 ) -> None:

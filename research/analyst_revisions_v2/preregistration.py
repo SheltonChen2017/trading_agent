@@ -329,6 +329,18 @@ def _strict_json(value: object, path: str = "value") -> None:
     raise PreregistrationError(f"{path} contains a non-JSON value")
 
 
+def _reject_duplicate_keys(
+    pairs: list[tuple[str, object]],
+) -> dict[str, object]:
+    """Build a JSON object while refusing ambiguous duplicate names."""
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise PreregistrationError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
 def _deep_freeze(value: object) -> object:
     """Detach loaded authority from caller-owned mutable JSON containers."""
     if isinstance(value, dict):
@@ -508,7 +520,7 @@ class DraftPreregistration:
 def _parse_root(path: Path) -> dict[str, object]:
     try:
         raw_bytes = path.read_bytes()
-        raw = json.loads(raw_bytes)
+        raw = json.loads(raw_bytes, object_pairs_hook=_reject_duplicate_keys)
     except (OSError, json.JSONDecodeError) as exc:
         raise PreregistrationError("preregistration is unreadable") from exc
     if not isinstance(raw, dict) or set(raw) != _TOP_KEYS:
@@ -541,7 +553,7 @@ def _git(root: Path, *arguments: str, binary: bool = False) -> str | bytes:
 
 def _json_object(payload: bytes, name: str) -> dict[str, object]:
     try:
-        value = json.loads(payload)
+        value = json.loads(payload, object_pairs_hook=_reject_duplicate_keys)
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise PreregistrationError(f"{name} is not strict JSON") from exc
     if not isinstance(value, dict):

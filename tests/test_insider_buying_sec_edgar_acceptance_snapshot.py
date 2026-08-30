@@ -2930,9 +2930,10 @@ def test_reconciliation_wrapper_refuses_source_inventory_hash_drift(tmp_path):
     )[3]
     inventory = reconciled.identity.source_inventory
     assert len(inventory) == 1
-    drifted = replace(reconciled.identity, source_inventory=(
-        replace(inventory[0], xml_sha256="c" * 64),
-    ))
+    drifted = _reconciliation_identity_with_inventory(
+        reconciled,
+        (replace(inventory[0], xml_sha256="c" * 64),),
+    )
     assert len(drifted.source_inventory) == len(inventory)
 
     with pytest.raises(
@@ -2943,6 +2944,257 @@ def test_reconciliation_wrapper_refuses_source_inventory_hash_drift(tmp_path):
             identity=drifted,
             as_filed_corpus=reconciled.as_filed_corpus,
             lineages=reconciled.lineages,
+        )
+
+
+@pytest.mark.parametrize(
+    ("field_name", "forged_value"),
+    (
+        ("source_inventory_hash", "d" * 64),
+        ("reconciliation_id", "form4-amendment-reconciliation-forged"),
+        ("parser_git_commit", "not-a-full-git-commit"),
+        ("acceptance_snapshot_id", "forged-snapshot"),
+        ("acceptance_lineage_hash", "e" * 64),
+    ),
+)
+def test_reconciliation_identity_refuses_aggregate_hash_or_id_drift(
+    tmp_path, field_name, forged_value
+):
+    """Aggregate identity hashes cannot be asserted independently of content."""
+
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(_xml_source(ACCESSION_A, "form4_original.xml"),),
+    )[3]
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="identity is not self-consistent",
+    ):
+        replace(reconciled.identity, **{field_name: forged_value})
+
+
+def _reconciliation_identity_with_inventory(reconciled, inventory):
+    identity = reconciled.identity
+    inventory_hash = hash_payload([item.to_payload() for item in inventory])
+    identity_payload = {
+        "contract_version": identity.contract_version,
+        "parser_git_commit": identity.parser_git_commit,
+        "acceptance_snapshot_id": identity.acceptance_snapshot_id,
+        "acceptance_lineage_hash": identity.acceptance_lineage_hash,
+        "source_inventory_hash": inventory_hash,
+        "filing_count": identity.filing_count,
+        "amendment_count": identity.amendment_count,
+        "lineage_count": identity.lineage_count,
+        "complete_amendment_coverage_verified": False,
+        "canonical_filter_authorized": False,
+    }
+    prefix = identity.reconciliation_id.rsplit("-", 1)[0]
+    return type(identity)(
+        contract_version=identity.contract_version,
+        parser_git_commit=identity.parser_git_commit,
+        acceptance_snapshot_id=identity.acceptance_snapshot_id,
+        acceptance_lineage_hash=identity.acceptance_lineage_hash,
+        source_inventory=inventory,
+        source_inventory_hash=inventory_hash,
+        filing_count=identity.filing_count,
+        amendment_count=identity.amendment_count,
+        lineage_count=identity.lineage_count,
+        complete_amendment_coverage_verified=False,
+        canonical_filter_authorized=False,
+        reconciliation_id=(
+            f"{prefix}-{hash_payload(identity_payload)[:16]}"
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("field_name", "forged_value"),
+    (
+        (
+            "primary_document_url",
+            _primary_document_url(ACCESSION_A).replace(
+                "synthetic-primary.xml", "other.xml"
+            ),
+        ),
+        ("amends_accession", ACCESSION_C),
+    ),
+)
+def test_reconciliation_wrapper_cross_binds_source_inventory_metadata(
+    tmp_path, field_name, forged_value
+):
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(_xml_source(ACCESSION_A, "form4_original.xml"),),
+    )[3]
+    forged_item = replace(
+        reconciled.identity.source_inventory[0],
+        **{field_name: forged_value},
+    )
+    forged_identity = _reconciliation_identity_with_inventory(
+        reconciled, (forged_item,)
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="sources disagree with parsed filings",
+    ):
+        reconciliation_module.ReconciledForm4Amendments(
+            identity=forged_identity,
+            as_filed_corpus=reconciled.as_filed_corpus,
+            lineages=reconciled.lineages,
+        )
+
+
+def test_reconciliation_identity_requires_an_immutable_source_inventory(tmp_path):
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(_xml_source(ACCESSION_A, "form4_original.xml"),),
+    )[3]
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="identity is not self-consistent",
+    ):
+        replace(
+            reconciled.identity,
+            source_inventory=list(reconciled.identity.source_inventory),
+        )
+
+
+@pytest.mark.parametrize(
+    ("field_name", "forged_value"),
+    (
+        ("xml_size_bytes", 0),
+        ("primary_document_url", "https://example.com/not-sec.xml"),
+        ("retrieved_at_utc", "not-a-time"),
+        ("capture_git_commit", "not-a-full-git-commit"),
+        ("amends_accession", ACCESSION_A),
+    ),
+)
+def test_xml_source_identity_refuses_invalid_asserted_provenance(
+    tmp_path, field_name, forged_value
+):
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(_xml_source(ACCESSION_A, "form4_original.xml"),),
+    )[3]
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="XML source identity is invalid"
+    ):
+        replace(
+            reconciled.identity.source_inventory[0],
+            **{field_name: forged_value},
+        )
+
+
+def test_reconciliation_wrapper_refuses_forged_corpus_lineage(tmp_path):
+    """The result must rebuild corpus edges, not trust a forged public wrapper."""
+
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(
+            _xml_source(ACCESSION_A, "form4_original.xml"),
+            _xml_source(
+                ACCESSION_B,
+                "form4_amendment.xml",
+                amends_accession=ACCESSION_A,
+            ),
+        ),
+    )[3]
+    forged_corpus = replace(reconciled.as_filed_corpus, superseded_by=())
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="disagrees with its identity"
+    ):
+        reconciliation_module.ReconciledForm4Amendments(
+            identity=reconciled.identity,
+            as_filed_corpus=forged_corpus,
+            lineages=reconciled.lineages,
+        )
+
+
+def test_reconciliation_wrapper_rechecks_amendment_row_exclusion(tmp_path):
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(
+            _xml_source(ACCESSION_A, "form4_original.xml"),
+            _xml_source(
+                ACCESSION_B,
+                "form4_amendment.xml",
+                amends_accession=ACCESSION_A,
+            ),
+        ),
+    )[3]
+    amendment = reconciled.as_filed_corpus.filing(ACCESSION_B)
+    assert amendment.transactions
+    forged_amendment = replace(
+        amendment,
+        transactions=(
+            replace(
+                amendment.transactions[0],
+                outcomes=(ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,),
+            ),
+            *amendment.transactions[1:],
+        ),
+    )
+    forged_corpus = reconciliation_module.build_filing_corpus(
+        [
+            forged_amendment if filing is amendment else filing
+            for filing in reconciled.as_filed_corpus.filings
+        ]
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="Form 4/A rows must remain explicitly excluded",
+    ):
+        reconciliation_module.ReconciledForm4Amendments(
+            identity=reconciled.identity,
+            as_filed_corpus=forged_corpus,
+            lineages=reconciled.lineages,
+        )
+
+
+@pytest.mark.parametrize(
+    "field_name", ("reporting_owners", "footnotes", "transactions")
+)
+def test_reconciliation_wrapper_refuses_mutable_nested_filing_collections(
+    tmp_path, field_name
+):
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(_xml_source(ACCESSION_A, "form4_original.xml"),),
+    )[3]
+    filing = reconciled.as_filed_corpus.filings[0]
+    forged_filing = replace(filing, **{field_name: list(getattr(filing, field_name))})
+    forged_corpus = reconciliation_module.build_filing_corpus([forged_filing])
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="filing structure is not deeply immutable",
+    ):
+        reconciliation_module.ReconciledForm4Amendments(
+            identity=reconciled.identity,
+            as_filed_corpus=forged_corpus,
+            lineages=reconciled.lineages,
+        )
+
+
+def test_observed_state_refuses_an_original_role_for_an_amendment():
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="only the original filing may have original-observation state",
+    ):
+        reconciliation_module.Form4ObservedState(
+            accession_number=ACCESSION_B,
+            original_accession=ACCESSION_A,
+            accepted_at=datetime(2026, 5, 2, 21, 30, tzinfo=timezone.utc),
+            disposition=(
+                Form4VersionDisposition.ORIGINAL_OBSERVED_IN_SUPPLIED_SAMPLE
+            ),
+            source_sha256="a" * 64,
         )
 
 

@@ -34,8 +34,12 @@ from data.hashing import hash_bytes, hash_payload
 from research.insider_buying.contracts import (
     ClassificationOutcome,
     ContractError,
+    FilingEnvelope,
     FilingCorpus,
     ParsedFiling,
+    ParsedTransaction,
+    ReportingOwner,
+    TransactionDiagnostic,
     build_filing_corpus,
 )
 from research.insider_buying.form4_xml import MAX_XML_BYTES, parse_form4_xml
@@ -62,6 +66,9 @@ MAX_TOTAL_TRANSACTIONS = 100_000
 _ACCESSION_RE = re.compile(r"^[0-9]{10}-[0-9]{2}-[0-9]{6}$")
 _GIT_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_ACCEPTANCE_SNAPSHOT_ID_RE = re.compile(
+    r"^sec-edgar-acceptance-([0-9]{4})q([1-4])-([0-9a-f]{16})$"
+)
 
 
 class Form4AmendmentReconciliationError(ContractError):
@@ -171,6 +178,52 @@ class SecForm4XmlSourceIdentity:
     retrieved_at_utc: str
     capture_git_commit: str
     amends_accession: str | None
+
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.accession_number, str)
+            or _ACCESSION_RE.fullmatch(self.accession_number) is None
+            or not isinstance(self.xml_sha256, str)
+            or _SHA256_RE.fullmatch(self.xml_sha256) is None
+            or type(self.xml_size_bytes) is not int
+            or not 0 < self.xml_size_bytes <= MAX_XML_BYTES
+            or not isinstance(self.primary_document_url, str)
+            or not self.primary_document_url
+            or self.primary_document_url != self.primary_document_url.strip()
+            or len(self.primary_document_url)
+            > MAX_PRIMARY_DOCUMENT_URL_CHARACTERS
+            or any(character.isspace() for character in self.primary_document_url)
+            or not isinstance(self.capture_git_commit, str)
+            or _GIT_COMMIT_RE.fullmatch(self.capture_git_commit) is None
+            or (
+                self.amends_accession is not None
+                and (
+                    not isinstance(self.amends_accession, str)
+                    or _ACCESSION_RE.fullmatch(self.amends_accession) is None
+                    or self.amends_accession == self.accession_number
+                )
+            )
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: XML source identity is invalid"
+            )
+        try:
+            retrieved_at = datetime.fromisoformat(self.retrieved_at_utc)
+            canonical_retrieval = _canonical_utc(
+                retrieved_at, label="XML source identity retrieval time"
+            ).isoformat(timespec="seconds")
+            _issuer_cik_from_verified_primary_url(
+                self.primary_document_url,
+                accession_number=self.accession_number,
+            )
+        except (TypeError, ValueError) as exc:
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: XML source identity is invalid"
+            ) from exc
+        if canonical_retrieval != self.retrieved_at_utc:
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: XML source identity is invalid"
+            )
 
     def to_payload(self) -> dict[str, object]:
         return {
@@ -294,6 +347,13 @@ class Form4ObservedState:
             "accepted_at",
             _canonical_utc(self.accepted_at, label="observed acceptance time"),
         )
+        if (
+            self.disposition
+            is Form4VersionDisposition.ORIGINAL_OBSERVED_IN_SUPPLIED_SAMPLE
+        ) != (self.accession_number == self.original_accession):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: only the original filing may have original-observation state"
+            )
 
 
 @dataclass(frozen=True)
@@ -378,6 +438,82 @@ class Form4AmendmentReconciliationIdentity:
             raise Form4AmendmentReconciliationError(
                 "REFUSED: bounded supplied samples cannot authorize canonical filtering"
             )
+        snapshot_match = (
+            _ACCEPTANCE_SNAPSHOT_ID_RE.fullmatch(self.acceptance_snapshot_id)
+            if isinstance(self.acceptance_snapshot_id, str)
+            else None
+        )
+        if (
+            self.contract_version != FORM4_AMENDMENT_RECONCILIATION_VERSION
+            or not isinstance(self.parser_git_commit, str)
+            or _GIT_COMMIT_RE.fullmatch(self.parser_git_commit) is None
+            or snapshot_match is None
+            or not isinstance(self.acceptance_lineage_hash, str)
+            or _SHA256_RE.fullmatch(self.acceptance_lineage_hash) is None
+            or snapshot_match.group(3) != self.acceptance_lineage_hash[:16]
+            or type(self.source_inventory) is not tuple
+            or not self.source_inventory
+            or len(self.source_inventory) > MAX_FORM4_XML_SOURCES
+            or any(
+                type(item) is not SecForm4XmlSourceIdentity
+                for item in self.source_inventory
+            )
+            or tuple(
+                sorted(
+                    self.source_inventory,
+                    key=lambda item: item.accession_number,
+                )
+            )
+            != self.source_inventory
+            or len(
+                {item.accession_number for item in self.source_inventory}
+            )
+            != len(self.source_inventory)
+            or not isinstance(self.source_inventory_hash, str)
+            or _SHA256_RE.fullmatch(self.source_inventory_hash) is None
+            or type(self.filing_count) is not int
+            or self.filing_count != len(self.source_inventory)
+            or type(self.amendment_count) is not int
+            or not 0 <= self.amendment_count < self.filing_count
+            or type(self.lineage_count) is not int
+            or not 0 < self.lineage_count <= self.filing_count
+            or self.lineage_count + self.amendment_count != self.filing_count
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: reconciliation identity is not self-consistent"
+            )
+        expected_inventory_hash = hash_payload(
+            [item.to_payload() for item in self.source_inventory]
+        )
+        expected_reconciliation_hash = hash_payload(self.hash_payload())
+        expected_reconciliation_id = (
+            "form4-amendment-reconciliation-"
+            f"{snapshot_match.group(1)}q{snapshot_match.group(2)}-"
+            f"{expected_reconciliation_hash[:16]}"
+        )
+        if (
+            self.source_inventory_hash != expected_inventory_hash
+            or self.reconciliation_id != expected_reconciliation_id
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: reconciliation identity is not self-consistent"
+            )
+
+    def hash_payload(self) -> dict[str, object]:
+        return {
+            "contract_version": self.contract_version,
+            "parser_git_commit": self.parser_git_commit,
+            "acceptance_snapshot_id": self.acceptance_snapshot_id,
+            "acceptance_lineage_hash": self.acceptance_lineage_hash,
+            "source_inventory_hash": self.source_inventory_hash,
+            "filing_count": self.filing_count,
+            "amendment_count": self.amendment_count,
+            "lineage_count": self.lineage_count,
+            "complete_amendment_coverage_verified": (
+                self.complete_amendment_coverage_verified
+            ),
+            "canonical_filter_authorized": self.canonical_filter_authorized,
+        }
 
     def to_payload(self) -> dict[str, object]:
         return {
@@ -427,6 +563,7 @@ class ReconciledForm4Amendments:
             raise Form4AmendmentReconciliationError(
                 "REFUSED: reconciliation result boundary is invalid"
             )
+        _validate_immutable_filing_corpus(self.as_filed_corpus)
         try:
             rebuilt_corpus = build_filing_corpus(
                 list(self.as_filed_corpus.filings)
@@ -464,6 +601,14 @@ class ReconciledForm4Amendments:
                     filing.envelope.accession_number
                 ].xml_sha256
                 != filing.envelope.source_sha256
+                or inventory_by_accession[
+                    filing.envelope.accession_number
+                ].primary_document_url
+                != filing.envelope.source_name
+                or inventory_by_accession[
+                    filing.envelope.accession_number
+                ].amends_accession
+                != filing.envelope.amends_accession
                 for filing in self.as_filed_corpus.filings
             )
         ):
@@ -501,6 +646,84 @@ def _source_identity(source: SecForm4XmlSource) -> SecForm4XmlSourceIdentity:
         capture_git_commit=source.capture_git_commit,
         amends_accession=source.amends_accession,
     )
+
+
+def _validate_immutable_filing_corpus(corpus: FilingCorpus) -> None:
+    if (
+        type(corpus) is not FilingCorpus
+        or type(corpus.filings) is not tuple
+        or type(corpus.superseded_by) is not tuple
+    ):
+        raise Form4AmendmentReconciliationError(
+            "REFUSED: filing structure is not deeply immutable"
+        )
+    for edge in corpus.superseded_by:
+        if (
+            type(edge) is not tuple
+            or len(edge) != 2
+            or not isinstance(edge[0], str)
+            or type(edge[1]) is not tuple
+            or any(not isinstance(accession, str) for accession in edge[1])
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: filing structure is not deeply immutable"
+            )
+    for filing in corpus.filings:
+        if (
+            type(filing) is not ParsedFiling
+            or type(filing.envelope) is not FilingEnvelope
+            or type(filing.reporting_owners) is not tuple
+            or any(
+                type(owner) is not ReportingOwner
+                for owner in filing.reporting_owners
+            )
+            or type(filing.footnotes) is not tuple
+            or any(
+                type(item) is not tuple
+                or len(item) != 2
+                or any(not isinstance(value, str) for value in item)
+                for item in filing.footnotes
+            )
+            or type(filing.transactions) is not tuple
+            or any(
+                type(transaction) is not ParsedTransaction
+                or transaction.accession_number
+                != filing.envelope.accession_number
+                or transaction.source_sha256 != filing.envelope.source_sha256
+                or type(transaction.footnote_ids) is not tuple
+                or any(
+                    not isinstance(value, str)
+                    for value in transaction.footnote_ids
+                )
+                or type(transaction.footnote_texts) is not tuple
+                or any(
+                    not isinstance(value, str)
+                    for value in transaction.footnote_texts
+                )
+                or type(transaction.outcomes) is not tuple
+                or any(
+                    not isinstance(value, ClassificationOutcome)
+                    for value in transaction.outcomes
+                )
+                or type(transaction.diagnostics) is not tuple
+                or any(
+                    not isinstance(value, TransactionDiagnostic)
+                    for value in transaction.diagnostics
+                )
+                for transaction in filing.transactions
+            )
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: filing structure is not deeply immutable"
+            )
+        if filing.envelope.form_type == "4/A" and any(
+            transaction.outcomes
+            != (ClassificationOutcome.EXCLUDE_AMENDED_FILING,)
+            for transaction in filing.transactions
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: Form 4/A rows must remain explicitly excluded"
+            )
 
 
 def _issuer_cik_from_verified_primary_url(

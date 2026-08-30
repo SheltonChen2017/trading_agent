@@ -30,6 +30,7 @@ _ANALYST_DECIMAL_CONTEXT = Context(
     rounding=ROUND_HALF_EVEN,
 )
 NUMERICAL_ZERO = Decimal("1e-18")
+STOCK_RELIABILITY_N0 = Decimal("3")
 MINIMUM_TOTAL_NAMES = 20
 MINIMUM_ACTIVE_NAMES = 5
 MAXIMUM_HOLDINGS_LAG_SESSIONS = 1
@@ -525,6 +526,94 @@ def independent_evidence_breadth(
         )
 
 
+def rating_decay_weight(
+    age_sessions: object,
+    *,
+    policy: VerifiedAnalystPolicy,
+) -> Decimal:
+    """Return the frozen 20-session exponential rating-decay weight.
+
+    ``age_sessions`` is deliberately an integer supplied only after an
+    exchange-calendar derivation.  This primitive never accepts calendar-day
+    durations and never truncates old or tiny-but-nonzero contributions.
+    """
+    verified_policy = require_verified_analyst_policy(policy)
+    if (
+        isinstance(age_sessions, bool)
+        or not isinstance(age_sessions, int)
+        or age_sessions < 0
+    ):
+        raise FormulaError("age_sessions must be a nonnegative exact integer")
+    with analyst_decimal_context():
+        whole_half_lives, remainder = divmod(
+            age_sessions, verified_policy.half_life_sessions
+        )
+        weight = Decimal("0.5") ** whole_half_lives
+        if remainder:
+            exponent = -Decimal(remainder) / Decimal(
+                verified_policy.half_life_sessions
+            )
+            weight *= (exponent * Decimal("2").ln()).exp()
+        return +weight
+
+
+def stock_reliability(
+    *, independent_effective_n: object, quality: object
+) -> Decimal:
+    """Return the PDF's stock reliability ``N_eff/(N_eff+3) * q_data``.
+
+    This is intentionally distinct from :func:`analyst_reliability`, which is
+    the later ETF coverage/breadth heuristic.  Missing quality must be refused
+    by the caller; it is never defaulted to one here.
+    """
+    with analyst_decimal_context():
+        n_eff = _decimal(independent_effective_n, "independent_effective_n")
+        quality_d = _decimal(quality, "quality")
+        if n_eff < 0 or not Decimal("0") <= quality_d <= Decimal("1"):
+            raise FormulaError(
+                "stock N_eff must be nonnegative and q_data must be in [0,1]"
+            )
+        return (n_eff / (n_eff + STOCK_RELIABILITY_N0)) * quality_d
+
+
+class ActivityObservationState(str, Enum):
+    """Raw-score state that preserves event-active exact cancellation."""
+
+    ACTIVE = "active"
+    STRUCTURAL_ZERO = "structural_zero"
+    MISSING = "missing"
+    INVALID = "invalid"
+
+
+@dataclasses.dataclass(frozen=True)
+class ActivityAwareObservation:
+    """Normalization input whose active value may legitimately equal zero."""
+
+    security_id: str
+    state: ActivityObservationState
+    value: Decimal | str | int | float | None
+
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.security_id, str)
+            or not self.security_id
+            or self.security_id != self.security_id.strip()
+        ):
+            raise FormulaError("security_id must be non-empty")
+        if not isinstance(self.state, ActivityObservationState):
+            raise FormulaError("state must be an ActivityObservationState")
+        if self.state is ActivityObservationState.ACTIVE:
+            if self.value is None:
+                raise FormulaError("active observations require a finite value")
+            object.__setattr__(self, "value", _decimal(self.value, "value"))
+        elif self.state is ActivityObservationState.STRUCTURAL_ZERO:
+            if self.value is not None and _decimal(self.value, "value") != 0:
+                raise FormulaError("structural_zero cannot carry a nonzero value")
+            object.__setattr__(self, "value", Decimal("0"))
+        elif self.value is not None:
+            raise FormulaError("missing/invalid observations cannot carry a value")
+
+
 class ObservationState(str, Enum):
     SIGNAL = "signal"
     STRUCTURAL_ZERO = "structural_zero"
@@ -577,6 +666,67 @@ class RobustNormalization:
     mad: Decimal | None
 
 
+def _normalize_usable_group(
+    usable: Mapping[str, Decimal],
+    *,
+    active_names: int,
+    policy: VerifiedAnalystPolicy,
+) -> RobustNormalization:
+    """Shared MAD core after the caller has classified every observation."""
+    minimum_total_names = policy.minimum_total_names
+    minimum_active_names = policy.minimum_active_names
+    clip = policy.score_clip
+    if len(usable) < minimum_total_names:
+        return RobustNormalization(
+            False,
+            MappingProxyType({}),
+            "insufficient_total_names",
+            len(usable),
+            active_names,
+            None,
+            None,
+        )
+    if active_names < minimum_active_names:
+        return RobustNormalization(
+            False,
+            MappingProxyType({}),
+            "insufficient_active_names",
+            len(usable),
+            active_names,
+            None,
+            None,
+        )
+    # All usable values are already finite Decimals. Preserve that exact type
+    # through statistics.median instead of reparsing a derived value.
+    median = statistics.median(usable.values())
+    absolute_deviations = [abs(value - median) for value in usable.values()]
+    mad = statistics.median(absolute_deviations)
+    if mad == 0:
+        return RobustNormalization(
+            False,
+            MappingProxyType({}),
+            "zero_mad",
+            len(usable),
+            active_names,
+            median,
+            mad,
+        )
+    scale = Decimal("1.4826") * mad
+    standardized = {
+        security_id: max(-clip, min(clip, (value - median) / scale))
+        for security_id, value in sorted(usable.items())
+    }
+    return RobustNormalization(
+        True,
+        MappingProxyType(standardized),
+        None,
+        len(usable),
+        active_names,
+        median,
+        mad,
+    )
+
+
 def robust_group_normalize(
     observations: Iterable[SignalObservation],
     *,
@@ -591,9 +741,6 @@ def robust_group_normalize(
     winsorization.
     """
     verified_policy = require_verified_analyst_policy(policy)
-    minimum_total_names = verified_policy.minimum_total_names
-    minimum_active_names = verified_policy.minimum_active_names
-    clip = verified_policy.score_clip
     with analyst_decimal_context():
         materialized = tuple(observations)
         if any(not isinstance(row, SignalObservation) for row in materialized):
@@ -613,43 +760,51 @@ def robust_group_normalize(
                 active += 1
             elif row.state is ObservationState.STRUCTURAL_ZERO:
                 usable[row.security_id] = Decimal("0")
-        if len(usable) < minimum_total_names:
-            return RobustNormalization(
-                False,
-                MappingProxyType({}),
-                "insufficient_total_names",
-                len(usable),
-                active,
-                None,
-                None,
+        return _normalize_usable_group(
+            usable,
+            active_names=active,
+            policy=verified_policy,
+        )
+
+
+def robust_activity_group_normalize(
+    observations: Iterable[ActivityAwareObservation],
+    *,
+    policy: VerifiedAnalystPolicy,
+) -> RobustNormalization:
+    """MAD-normalize while counting an event-active exact zero as active.
+
+    The distinction is economically material: opposing admitted rating events
+    may cancel exactly, but that stock still contributes to the minimum-active
+    guard and to evidence breadth. A proven no-event stock remains the separate
+    structural-zero state.
+    """
+    verified_policy = require_verified_analyst_policy(policy)
+    with analyst_decimal_context():
+        materialized = tuple(observations)
+        if any(type(row) is not ActivityAwareObservation for row in materialized):
+            raise FormulaError(
+                "observations must contain exact ActivityAwareObservation records"
             )
-        if active < minimum_active_names:
-            return RobustNormalization(
-                False,
-                MappingProxyType({}),
-                "insufficient_active_names",
-                len(usable),
-                active,
-                None,
-                None,
+        ids = [row.security_id for row in materialized]
+        if len(ids) != len(set(ids)):
+            raise FormulaError("peer group contains duplicate security_id")
+        if any(row.state is ActivityObservationState.INVALID for row in materialized):
+            raise FormulaError(
+                "invalid observations refuse the complete peer-group calculation"
             )
-        # All usable values are already finite Decimals.  Preserve that exact
-        # internal type through statistics.median instead of reparsing a
-        # derived value as though it were untrusted ingress.
-        median = statistics.median(usable.values())
-        absolute_deviations = [abs(value - median) for value in usable.values()]
-        mad = statistics.median(absolute_deviations)
-        if mad == 0:
-            return RobustNormalization(
-                False, MappingProxyType({}), "zero_mad", len(usable), active, median, mad
-            )
-        scale = Decimal("1.4826") * mad
-        standardized = {
-            security_id: max(-clip, min(clip, (value - median) / scale))
-            for security_id, value in sorted(usable.items())
-        }
-        return RobustNormalization(
-            True, MappingProxyType(standardized), None, len(usable), active, median, mad
+        usable: dict[str, Decimal] = {}
+        active = 0
+        for row in materialized:
+            if row.state is ActivityObservationState.ACTIVE:
+                usable[row.security_id] = _decimal(row.value, "value")
+                active += 1
+            elif row.state is ActivityObservationState.STRUCTURAL_ZERO:
+                usable[row.security_id] = Decimal("0")
+        return _normalize_usable_group(
+            usable,
+            active_names=active,
+            policy=verified_policy,
         )
 
 
@@ -662,6 +817,8 @@ def analyst_reliability(
         n_eff = _decimal(independent_effective_n, "independent_effective_n")
         quality_d = _decimal(quality, "quality")
         if not 0 <= coverage_d <= 1 or n_eff < 0 or not 0 <= quality_d <= 1:
-            raise FormulaError("coverage/quality must be in [0,1] and N_eff nonnegative")
+            raise FormulaError(
+                "coverage/quality must be in [0,1] and N_eff nonnegative"
+            )
         breadth = min(Decimal("1"), (n_eff / Decimal("5")).sqrt())
         return coverage_d.sqrt() * breadth * quality_d

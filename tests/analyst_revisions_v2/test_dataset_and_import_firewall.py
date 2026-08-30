@@ -496,6 +496,7 @@ def test_publication_revalidates_result_instead_of_trusting_frozen_shell(tmp_pat
 def test_current_v2_package_transitive_import_closure_is_outcome_free():
     reached = validate_transitive_import_closure(WORKSPACE_ROOT)
     assert "research.analyst_revisions_v2.dataset" in reached
+    assert "research.analyst_revisions_v2.stock_signal" in reached
     assert "data.exchange_calendar" in reached
     assert "execution" not in reached
     assert "research.acer" not in reached

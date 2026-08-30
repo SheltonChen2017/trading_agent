@@ -231,13 +231,56 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     cohort_calls = []
     execution_calls = []
     reference_calls = []
+    source_sweeps = []
+    lifecycle_row_passes = []
+    classification_row_passes = []
     real_cohort_builder = dataset_module.snapshot_execution_cohort
+    real_source_sweep = dataset_module._SourceVisibilitySweep
     real_execution_builder = (
         pit_eligibility_module._snapshot_execution_selection_index
     )
     real_reference_builder = (
         pit_eligibility_module._build_reference_selection_index
     )
+    real_lifecycle_index = pit_eligibility_module._index_lifecycle_selections
+    real_classification_index = (
+        pit_eligibility_module._index_classification_selections
+    )
+
+    class CountedSourceSweep(real_source_sweep):
+        def __init__(self, vintage):
+            super().__init__(vintage)
+            self.advance_calls = []
+            self.logical_calls = []
+            self.identity_calls = []
+            source_sweeps.append(self)
+
+        def advance(self, cutoff):
+            self.advance_calls.append(cutoff)
+            return super().advance(cutoff)
+
+        def selected_for_logical(self, logical_id):
+            self.logical_calls.append(logical_id)
+            return super().selected_for_logical(logical_id)
+
+        def selected_for_identity(self, security_id, settlement_date):
+            self.identity_calls.append((security_id, settlement_date))
+            return super().selected_for_identity(security_id, settlement_date)
+
+    class CountingSequence:
+        def __init__(self, rows):
+            self.rows = tuple(rows)
+            self.passes = 0
+
+        def __iter__(self):
+            self.passes += 1
+            return iter(self.rows)
+
+        def __len__(self):
+            return len(self.rows)
+
+        def __getitem__(self, index):
+            return self.rows[index]
 
     def counted_cohort_builder(snapshot, release):
         cohort_calls.append((snapshot, release))
@@ -251,6 +294,18 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         reference_calls.append((vintage, references, execution_index))
         return real_reference_builder(vintage, references, execution_index)
 
+    def counted_lifecycle_index(rows, queries):
+        counted_rows = CountingSequence(rows)
+        result = real_lifecycle_index(counted_rows, queries)
+        lifecycle_row_passes.append(counted_rows.passes)
+        return result
+
+    def counted_classification_index(rows, queries):
+        counted_rows = CountingSequence(rows)
+        result = real_classification_index(counted_rows, queries)
+        classification_row_passes.append(counted_rows.passes)
+        return result
+
     def forbidden_legacy_scan(*_args, **_kwargs):
         raise AssertionError("legacy per-cutoff source scan was called")
 
@@ -258,6 +313,11 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         dataset_module,
         "snapshot_execution_cohort",
         counted_cohort_builder,
+    )
+    monkeypatch.setattr(
+        dataset_module,
+        "_SourceVisibilitySweep",
+        CountedSourceSweep,
     )
     monkeypatch.setattr(
         pit_eligibility_module,
@@ -268,6 +328,16 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         pit_eligibility_module,
         "_build_reference_selection_index",
         counted_reference_builder,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "_index_lifecycle_selections",
+        counted_lifecycle_index,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "_index_classification_selections",
+        counted_classification_index,
     )
     monkeypatch.setattr(
         dataset_module,
@@ -313,12 +383,18 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     assert {item[0].event_id for item in cohort_calls} == {
         item.event_id for item in vintage.snapshots
     }
+    assert len(source_sweeps) == 1
+    assert len(source_sweeps[0].advance_calls) == len(vintage.snapshots)
+    assert len(source_sweeps[0].logical_calls) == len(vintage.snapshots)
+    assert len(source_sweeps[0].identity_calls) == len(vintage.snapshots)
     assert execution_calls == [vintage]
     assert len(reference_calls) == 1
     assert reference_calls[0][:2] == (vintage, references)
     assert set(reference_calls[0][2]) == {
         item.event_id for item in vintage.snapshots
     }
+    assert lifecycle_row_passes == [1]
+    assert classification_row_passes == [1]
 
 
 def test_reference_indices_include_exact_open_and_valid_to_boundaries():

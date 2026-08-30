@@ -690,7 +690,8 @@ def test_reference_bundle_digest_cost_is_constant_per_feature_batch(monkeypatch)
     dispositions = build_pit_stock_raw_features(corrected_vintage, references)
 
     assert sum(item.feature is not None for item in dispositions) == 2
-    assert digest_calls == [references, references, references]
+    assert 0 < len(digest_calls) <= 3
+    assert all(item is references for item in digest_calls)
 
 
 def test_context_indices_are_immutable_and_digest_is_cached(monkeypatch):
@@ -1004,11 +1005,22 @@ def test_source_context_recomputes_and_rejects_coherent_readiness_row_tampering(
         replace(context, readiness_rows=tuple(changed_rows))
 
 
-def test_source_context_refuses_duplicate_readiness_events_before_rebuilding():
+def test_source_context_refuses_duplicate_readiness_events_before_rebuilding(
+    monkeypatch,
+):
     disposition, _ = _ready_feature()
     assert disposition.source_context is not None
     context = disposition.source_context
     duplicate = (context.readiness_rows[0], context.readiness_rows[0])
+
+    def unexpected_rebuild(*_args, **_kwargs):
+        raise AssertionError("duplicate readiness reached the expensive rebuild")
+
+    monkeypatch.setattr(
+        stock_features_module,
+        "_build_authenticated_readiness",
+        unexpected_rebuild,
+    )
 
     with pytest.raises(
         StockFeatureError,

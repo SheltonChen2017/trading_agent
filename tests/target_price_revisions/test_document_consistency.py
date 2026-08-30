@@ -321,7 +321,21 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in routing_row
     assert BLUEPRINT_CONTENT_SHA256 in routing_row.lower()
 
-    for name in ("ACTION_PLAN_2026-08-20.md", "SESSION_HANDOFF.md"):
-        document = _doc(name)
-        assert CLAUDE_V22_REVIEW_HEAD in document
-        assert "No next implementation milestone is authorized" in document
+    action_current = _doc("ACTION_PLAN_2026-08-20.md").split(
+        "**Current bounded status, 2026-08-30:**", 1
+    )[1].split("**Owner multiplicity amendment, 2026-08-30", 1)[0]
+    handoff_current = _doc("SESSION_HANDOFF.md").split(
+        "## 0. Target-Price Revision fourth-lane planning addition", 1
+    )[1].split("\n## ", 1)[0]
+    for current_pointer in (action_current, handoff_current):
+        assert CLAUDE_V22_REVIEW_HEAD in current_pointer
+        assert "No next implementation milestone is authorized" in current_pointer
+        normalized_pointer = " ".join(current_pointer.lower().split())
+        stale_current_claims = (
+            "pending claude review of this codex round",
+            "receive one last narrow identity/document guard run",
+            "before commit and the single push",
+            "after this counter-review correction round's single push",
+        )
+        for stale_claim in stale_current_claims:
+            assert stale_claim not in normalized_pointer

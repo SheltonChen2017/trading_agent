@@ -49,9 +49,9 @@ their lane-owned artifacts.
   document suite passed with **188 passed, 3 skipped in 12.56 seconds**. The
   29-page PDF passed strict-open, hash,
   unchanged-first-28-page, render, and visual checks. The final documentation-
-  only bytes receive one last narrow identity/document guard run immediately
-  before commit and the single push; exact evidence is appended to the target
-  record rather than overwriting history.
+  only bytes were committed and pushed at `fe056be` after the narrow identity/
+  document guard passed; exact evidence is retained in the target record rather
+  than overwriting history.
 - The reviewed Claude range is `6aae73b..2ec0fad`. Codex accepted all six
   commits after correction: the review/validation evidence is credible, while
   the confirmed defects were stale identities/next-state prose, a duplicate
@@ -94,9 +94,9 @@ their lane-owned artifacts.
   No next implementation milestone is authorized: TPR-1 remains blocked on
   an exact separately reviewed source-rights artifact, TPR-0B remains blocked
   on reviewed TPR-1/TPR-2 structural manifests, and the three sibling-lane
-  re-freezes under `TPR-OOL-006` still gate every lane's outcome access. After
-  this counter-review correction round's single push, Claude reviews only its
-  exact target-only correction range on the same branch.
+  re-freezes under `TPR-OOL-006` still gate every lane's outcome access. The
+  exact target-only correction range from this counter-review round is next for
+  Claude review on the same branch.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (29 pages; raw binary SHA-256

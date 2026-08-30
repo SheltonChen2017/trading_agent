@@ -1113,6 +1113,14 @@ def _verify_publication_residue(
     *,
     include_final_files: bool,
 ) -> tuple[Path, ...]:
+    """Classify residue before cleanup without weakening committed evidence.
+
+    During an uncommitted rollback, a recognized publisher temporary may be
+    an exact prefix of its expected bytes because a hard stop can interrupt
+    the sequential write.  Final-name files always remain exact-only, as do
+    all temporaries once a commit marker has been observed.
+    """
+
     expected_by_name = dict(expected_files)
     try:
         leftovers = tuple(target.iterdir())
@@ -1151,7 +1159,14 @@ def _verify_publication_residue(
             if (
                 _status_is_redirect(status)
                 or not stat.S_ISREG(status.st_mode)
-                or actual != expected
+                or (
+                    actual != expected
+                    and (
+                        is_final
+                        or not include_final_files
+                        or not expected.startswith(actual)
+                    )
+                )
             ):
                 failures.append(path.name)
                 continue

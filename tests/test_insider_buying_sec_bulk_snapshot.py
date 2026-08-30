@@ -93,6 +93,28 @@ def _archive(
     return stream.getvalue()
 
 
+def _expected_raw_publication(archive: bytes):
+    identity = inspect_sec_bulk_archive(archive, _source())
+    manifest_bytes = (canonical_json(identity.to_payload()) + "\n").encode("utf-8")
+    payloads = {
+        "archive.zip": archive,
+        "manifest.json": manifest_bytes,
+    }
+    commit_bytes = (
+        canonical_json(
+            {
+                "kind": f"{snapshot_module.SNAPSHOT_KIND}-commit",
+                "snapshot_id": identity.snapshot_id,
+                "members": {
+                    name: hash_bytes(data) for name, data in sorted(payloads.items())
+                },
+            }
+        )
+        + "\n"
+    ).encode("utf-8")
+    return identity, {**payloads, "snapshot.commit.json": commit_bytes}
+
+
 def _set_first_member_encrypted(payload: bytes) -> bytes:
     mutated = bytearray(payload)
     local = mutated.find(b"PK\x03\x04")
@@ -528,6 +550,105 @@ def test_hard_restart_recovers_only_byte_exact_uncommitted_residue(
         "snapshot.commit.json",
     }
     assert load_sec_bulk_snapshot(target).archive_bytes == archive
+
+
+@pytest.mark.parametrize(
+    "member_name", ("archive.zip", "manifest.json", "snapshot.commit.json")
+)
+@pytest.mark.parametrize("prefix_case", ("empty", "one-byte", "all-but-last"))
+def test_hard_restart_recovers_interrupted_temp_prefix_for_every_member(
+    tmp_path, member_name, prefix_case
+):
+    archive = _archive()
+    identity, expected = _expected_raw_publication(archive)
+    target = tmp_path / identity.snapshot_id
+    target.mkdir()
+    member_bytes = expected[member_name]
+    prefix_length = {
+        "empty": 0,
+        "one-byte": 1,
+        "all-but-last": len(member_bytes) - 1,
+    }[prefix_case]
+    abandoned = target / f".{member_name}.{prefix_case}.tmp"
+    abandoned.write_bytes(member_bytes[:prefix_length])
+
+    recovered = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+
+    assert recovered == identity
+    assert not abandoned.exists()
+    assert load_sec_bulk_snapshot(target).archive_bytes == archive
+    assert write_sec_bulk_snapshot(archive, _source(), tmp_path) == identity
+
+
+@pytest.mark.parametrize(
+    "member_name", ("archive.zip", "manifest.json", "snapshot.commit.json")
+)
+def test_committed_retry_refuses_interrupted_temp_prefix_for_every_member(
+    tmp_path, member_name
+):
+    archive = _archive()
+    identity, expected = _expected_raw_publication(archive)
+    assert write_sec_bulk_snapshot(archive, _source(), tmp_path) == identity
+    target = tmp_path / identity.snapshot_id
+    abandoned = target / f".{member_name}.committed-crash.tmp"
+    partial = expected[member_name][:-1]
+    abandoned.write_bytes(partial)
+
+    with pytest.raises(SecBulkSnapshotError, match="unverified files"):
+        write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    assert abandoned.read_bytes() == partial
+    with pytest.raises(SecBulkSnapshotError, match="unexpected files"):
+        load_sec_bulk_snapshot(target)
+    assert (target / "archive.zip").read_bytes() == archive
+
+
+@pytest.mark.parametrize(
+    "member_name", ("archive.zip", "manifest.json", "snapshot.commit.json")
+)
+def test_hard_restart_refuses_and_preserves_nonprefix_member_temp(
+    tmp_path, member_name
+):
+    archive = _archive()
+    identity, _ = _expected_raw_publication(archive)
+    target = tmp_path / identity.snapshot_id
+    target.mkdir()
+    abandoned = target / f".{member_name}.wrong-prefix.tmp"
+    abandoned.write_bytes(b"\xff")
+
+    with pytest.raises(SecBulkSnapshotError, match="unverified files"):
+        write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    assert abandoned.read_bytes() == b"\xff"
+
+
+def test_hard_restart_never_treats_a_truncated_final_member_as_a_temp(tmp_path):
+    archive = _archive()
+    identity, expected = _expected_raw_publication(archive)
+    target = tmp_path / identity.snapshot_id
+    target.mkdir()
+    partial = expected["archive.zip"][:-1]
+    (target / "archive.zip").write_bytes(partial)
+
+    with pytest.raises(SecBulkSnapshotError, match="unverified files"):
+        write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    assert (target / "archive.zip").read_bytes() == partial
+
+
+def test_hard_restart_preserves_valid_prefix_when_any_residue_is_unverified(
+    tmp_path,
+):
+    archive = _archive()
+    identity, expected = _expected_raw_publication(archive)
+    target = tmp_path / identity.snapshot_id
+    target.mkdir()
+    prefix = target / ".manifest.json.interrupted.tmp"
+    foreign = target / "foreign.bin"
+    prefix.write_bytes(expected["manifest.json"][:-1])
+    foreign.write_bytes(b"foreign")
+    before = {path.name: path.read_bytes() for path in target.iterdir()}
+
+    with pytest.raises(SecBulkSnapshotError, match="unverified files"):
+        write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    assert {path.name: path.read_bytes() for path in target.iterdir()} == before
 
 
 @pytest.mark.parametrize("bad_name", ["manifest.json", "foreign.bin"])

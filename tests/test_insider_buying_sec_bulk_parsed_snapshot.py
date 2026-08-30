@@ -1176,6 +1176,149 @@ def test_parsed_hard_restart_recovers_only_byte_exact_uncommitted_residue(
     ).identity == identity
 
 
+@pytest.mark.parametrize(
+    "member_name",
+    ("rows.jsonl", "accessions.jsonl", "manifest.json", "snapshot.commit.json"),
+)
+@pytest.mark.parametrize("prefix_case", ("empty", "one-byte", "all-but-last"))
+def test_parsed_hard_restart_recovers_interrupted_temp_prefix_for_every_member(
+    tmp_path, member_name, prefix_case
+):
+    raw = _raw_snapshot(tmp_path)
+    identity, _, _, expected = _expected_parsed_publication(raw)
+    parsed_root = tmp_path / "parsed"
+    target = parsed_root / identity.snapshot_id
+    target.mkdir(parents=True)
+    member_bytes = expected[member_name]
+    prefix_length = {
+        "empty": 0,
+        "one-byte": 1,
+        "all-but-last": len(member_bytes) - 1,
+    }[prefix_case]
+    abandoned = target / f".{member_name}.{prefix_case}.tmp"
+    abandoned.write_bytes(member_bytes[:prefix_length])
+
+    recovered = build_sec_bulk_parsed_snapshot(
+        raw,
+        parsed_root,
+        schema_profile=_profile(),
+        parser_git_commit=PARSER_COMMIT,
+    )
+
+    assert recovered == identity
+    assert not abandoned.exists()
+    assert load_sec_bulk_parsed_snapshot(
+        target, raw_snapshot_directory=raw
+    ).identity == identity
+    assert (
+        build_sec_bulk_parsed_snapshot(
+            raw,
+            parsed_root,
+            schema_profile=_profile(),
+            parser_git_commit=PARSER_COMMIT,
+        )
+        == identity
+    )
+
+
+@pytest.mark.parametrize(
+    "member_name",
+    ("rows.jsonl", "accessions.jsonl", "manifest.json", "snapshot.commit.json"),
+)
+def test_parsed_committed_retry_refuses_interrupted_temp_prefix_for_every_member(
+    tmp_path, member_name
+):
+    raw, target, identity = _publish(tmp_path)
+    _, _, _, expected = _expected_parsed_publication(raw)
+    abandoned = target / f".{member_name}.committed-crash.tmp"
+    partial = expected[member_name][:-1]
+    abandoned.write_bytes(partial)
+
+    with pytest.raises(SecBulkParsedSnapshotError, match="unverified files"):
+        build_sec_bulk_parsed_snapshot(
+            raw,
+            target.parent,
+            schema_profile=_profile(),
+            parser_git_commit=PARSER_COMMIT,
+        )
+    assert abandoned.read_bytes() == partial
+    with pytest.raises(SecBulkParsedSnapshotError, match="unexpected files"):
+        load_sec_bulk_parsed_snapshot(target, raw_snapshot_directory=raw)
+    assert (target / "snapshot.commit.json").read_bytes() == expected[
+        "snapshot.commit.json"
+    ]
+
+
+@pytest.mark.parametrize(
+    "member_name",
+    ("rows.jsonl", "accessions.jsonl", "manifest.json", "snapshot.commit.json"),
+)
+def test_parsed_hard_restart_refuses_and_preserves_nonprefix_member_temp(
+    tmp_path, member_name
+):
+    raw = _raw_snapshot(tmp_path)
+    identity, _, _, _ = _expected_parsed_publication(raw)
+    parsed_root = tmp_path / "parsed"
+    target = parsed_root / identity.snapshot_id
+    target.mkdir(parents=True)
+    abandoned = target / f".{member_name}.wrong-prefix.tmp"
+    abandoned.write_bytes(b"\xff")
+
+    with pytest.raises(SecBulkParsedSnapshotError, match="unverified files"):
+        build_sec_bulk_parsed_snapshot(
+            raw,
+            parsed_root,
+            schema_profile=_profile(),
+            parser_git_commit=PARSER_COMMIT,
+        )
+    assert abandoned.read_bytes() == b"\xff"
+
+
+def test_parsed_hard_restart_never_treats_truncated_final_member_as_temp(
+    tmp_path,
+):
+    raw = _raw_snapshot(tmp_path)
+    identity, _, _, expected = _expected_parsed_publication(raw)
+    parsed_root = tmp_path / "parsed"
+    target = parsed_root / identity.snapshot_id
+    target.mkdir(parents=True)
+    partial = expected["rows.jsonl"][:-1]
+    (target / "rows.jsonl").write_bytes(partial)
+
+    with pytest.raises(SecBulkParsedSnapshotError, match="unverified files"):
+        build_sec_bulk_parsed_snapshot(
+            raw,
+            parsed_root,
+            schema_profile=_profile(),
+            parser_git_commit=PARSER_COMMIT,
+        )
+    assert (target / "rows.jsonl").read_bytes() == partial
+
+
+def test_parsed_hard_restart_preserves_valid_prefix_with_unverified_residue(
+    tmp_path,
+):
+    raw = _raw_snapshot(tmp_path)
+    identity, _, _, expected = _expected_parsed_publication(raw)
+    parsed_root = tmp_path / "parsed"
+    target = parsed_root / identity.snapshot_id
+    target.mkdir(parents=True)
+    prefix = target / ".manifest.json.interrupted.tmp"
+    foreign = target / "foreign.bin"
+    prefix.write_bytes(expected["manifest.json"][:-1])
+    foreign.write_bytes(b"foreign")
+    before = {path.name: path.read_bytes() for path in target.iterdir()}
+
+    with pytest.raises(SecBulkParsedSnapshotError, match="unverified files"):
+        build_sec_bulk_parsed_snapshot(
+            raw,
+            parsed_root,
+            schema_profile=_profile(),
+            parser_git_commit=PARSER_COMMIT,
+        )
+    assert {path.name: path.read_bytes() for path in target.iterdir()} == before
+
+
 @pytest.mark.parametrize("bad_name", ["manifest.json", "foreign.bin"])
 def test_parsed_hard_restart_preserves_whole_unverified_residue(
     tmp_path, bad_name

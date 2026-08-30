@@ -726,7 +726,13 @@ def _clean_publisher_temporaries(
 def _rollback_uncommitted_publication(
     target: Path, expected_files: tuple[tuple[str, bytes], ...]
 ) -> None:
-    """Remove an exact uncommitted set after verifying the entire residue."""
+    """Remove a verified interrupted set after classifying all residue.
+
+    Final-name members must be byte-exact.  A recognized publisher temporary
+    may be an exact prefix because process death can occur after ``mkstemp``
+    or during its sequential write, before the create-exclusive link.  This
+    relaxation is deliberately unavailable once a commit marker exists.
+    """
 
     expected_by_name = dict(expected_files)
     failures: list[str] = []
@@ -738,6 +744,7 @@ def _rollback_uncommitted_publication(
         leftovers = ()
     for path in leftovers:
         expected = expected_by_name.get(path.name)
+        is_final = expected is not None
         if expected is None:
             matched_name = next(
                 (
@@ -758,13 +765,16 @@ def _rollback_uncommitted_publication(
             failures.append(path.name)
             continue
         try:
+            actual = _read_regular_bytes(
+                path, label=f"partial {path.name}", max_bytes=len(expected)
+            )
             if (
                 _status_is_redirect(status)
                 or not stat.S_ISREG(status.st_mode)
-                or _read_regular_bytes(
-                    path, label=f"partial {path.name}", max_bytes=len(expected)
+                or (
+                    actual != expected
+                    and (is_final or not expected.startswith(actual))
                 )
-                != expected
             ):
                 failures.append(path.name)
                 continue

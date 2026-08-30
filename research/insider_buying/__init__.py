@@ -3,8 +3,8 @@
 This package deliberately has no network collection, outcome, portfolio,
 broker, or scheduler surface. It contains immutable in-memory Form 4
 structure, a fixture parser, and a caller-supplied SEC quarterly ZIP integrity
-boundary plus explicit-profile, offline parsed and EDGAR acceptance-evidence
-snapshot boundaries.
+boundary plus explicit-profile, offline parsed, EDGAR acceptance-evidence, and
+observation-only Form 4/A chronology boundaries.
 """
 
 from research.insider_buying.contracts import (
@@ -20,6 +20,19 @@ from research.insider_buying.contracts import (
     build_filing_corpus,
 )
 from research.insider_buying.form4_xml import Form4ParseError, parse_form4_xml
+from research.insider_buying.form4_amendment_reconciliation import (
+    FORM4_AMENDMENT_RECONCILIATION_VERSION,
+    Form4AmendmentLineage,
+    Form4AmendmentReconciliationError,
+    Form4AmendmentReconciliationIdentity,
+    Form4ObservedState,
+    Form4VersionDisposition,
+    Form4VersionInterval,
+    ReconciledForm4Amendments,
+    SecForm4XmlSource,
+    SecForm4XmlSourceIdentity,
+    reconcile_sec_form4_amendments,
+)
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
     LoadedSecBulkSnapshot,
@@ -69,9 +82,16 @@ __all__ = [
     "ClassificationOutcome",
     "EDGAR_ACCEPTANCE_SNAPSHOT_CONTRACT_VERSION",
     "EDGAR_ACCEPTANCE_SNAPSHOT_KIND",
+    "FORM4_AMENDMENT_RECONCILIATION_VERSION",
     "FilingCorpus",
     "FilingEnvelope",
+    "Form4AmendmentLineage",
+    "Form4AmendmentReconciliationError",
+    "Form4AmendmentReconciliationIdentity",
+    "Form4ObservedState",
     "Form4ParseError",
+    "Form4VersionDisposition",
+    "Form4VersionInterval",
     "LoadedSecBulkSnapshot",
     "LoadedSecBulkParsedSnapshot",
     "LoadedSecEdgarAcceptanceSnapshot",
@@ -82,6 +102,7 @@ __all__ = [
     "ParsedSecBulkTableIdentity",
     "ParsedTransaction",
     "PublicAvailability",
+    "ReconciledForm4Amendments",
     "ReportingOwner",
     "REQUIRED_SEC_TABLES",
     "SecBulkMember",
@@ -102,6 +123,8 @@ __all__ = [
     "SecEdgarMetadataSchemaProfile",
     "SecEdgarMetadataSource",
     "SecEdgarMetadataSourceIdentity",
+    "SecForm4XmlSource",
+    "SecForm4XmlSourceIdentity",
     "TransactionDiagnostic",
     "build_filing_corpus",
     "build_sec_bulk_parsed_snapshot",
@@ -111,5 +134,6 @@ __all__ = [
     "load_sec_bulk_parsed_snapshot",
     "load_sec_edgar_acceptance_snapshot",
     "parse_form4_xml",
+    "reconcile_sec_form4_amendments",
     "write_sec_bulk_snapshot",
 ]

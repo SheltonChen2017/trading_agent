@@ -1,4 +1,4 @@
-"""IB-1C tests for offline SEC acceptance-metadata snapshots.
+"""IB-1C/IB-1D tests for offline SEC availability and Form 4/A lineage.
 
 All evidence in this module is synthetic.  These tests make no network call,
 read no market outcome, and do not claim compatibility with an official SEC
@@ -17,6 +17,7 @@ import warnings
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
+from dataclasses import replace
 from datetime import date, datetime, timedelta, timezone, tzinfo
 from pathlib import Path
 from types import SimpleNamespace
@@ -27,6 +28,9 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying import (
     ALLOWED_SEC_TABLES,
+    ClassificationOutcome,
+    Form4AmendmentReconciliationError,
+    Form4VersionDisposition,
     SecBulkSource,
     SecEdgarAcceptanceSnapshotError,
     SecEdgarAvailabilityRecord,
@@ -34,15 +38,20 @@ from research.insider_buying import (
     SecEdgarAvailabilityTier,
     SecEdgarMetadataSchemaProfile,
     SecEdgarMetadataSource,
+    SecForm4XmlSource,
     SecTsvSchemaProfile,
     SecTsvSchemaVariant,
     build_sec_bulk_parsed_snapshot,
     build_sec_edgar_acceptance_snapshot,
     load_sec_bulk_parsed_snapshot,
     load_sec_edgar_acceptance_snapshot,
+    reconcile_sec_form4_amendments,
     write_sec_bulk_snapshot,
 )
 from research.insider_buying import sec_edgar_acceptance_snapshot as acceptance_module
+from research.insider_buying import (
+    form4_amendment_reconciliation as reconciliation_module,
+)
 
 
 RAW_RETRIEVED = datetime(2026, 8, 20, 18, 0, tzinfo=timezone.utc)
@@ -51,6 +60,7 @@ RAW_COMMIT = "a" * 40
 PARSED_COMMIT = "b" * 40
 METADATA_COMMIT = "c" * 40
 ACCEPTANCE_COMMIT = "d" * 40
+RECONCILIATION_COMMIT = "e" * 40
 RAW_SOURCE_URL = (
     "https://www.sec.gov/files/dera/data/insider-transactions-data-sets/"
     "2026q2_form345.zip"
@@ -114,7 +124,9 @@ FORM_TYPES = {
 }
 ACCEPTED_AT = {
     ACCESSION_A: "2026-05-01T17:30:00-04:00",
+    ACCESSION_B: "2026-05-02T17:30:00-04:00",
     ACCESSION_C: "2026-05-03T21:15:00+00:00",
+    ACCESSION_D: "2026-05-04T17:30:00-04:00",
 }
 METADATA_FIELDS = (
     "accession",
@@ -123,6 +135,7 @@ METADATA_FIELDS = (
     "accepted",
     "primary_url",
 )
+FORM4_FIXTURES = Path(__file__).resolve().parent / "fixtures" / "insider_buying"
 
 
 def _tsv(headers: tuple[str, ...], rows: tuple[tuple[str, ...], ...]) -> bytes:
@@ -348,6 +361,77 @@ def _load(bundle_path: Path, parsed_path: Path, raw_path: Path):
         parsed_snapshot_directory=parsed_path,
         raw_snapshot_directory=raw_path,
     )
+
+
+def _primary_document_url(
+    accession: str, *, issuer_cik: str = "123456"
+) -> str:
+    return (
+        f"https://www.sec.gov/Archives/edgar/data/{issuer_cik}/"
+        f"{accession.replace('-', '')}/synthetic-primary.xml"
+    )
+
+
+def _form4_fixture(name: str) -> bytes:
+    return (FORM4_FIXTURES / name).read_bytes()
+
+
+def _xml_source(
+    accession: str,
+    fixture_name: str,
+    *,
+    amends_accession: str | None = None,
+    primary_document_url: str | None = None,
+    retrieved_at: datetime = METADATA_RETRIEVED,
+    capture_git_commit: str = RECONCILIATION_COMMIT,
+    xml_bytes: bytes | None = None,
+) -> SecForm4XmlSource:
+    return SecForm4XmlSource(
+        accession_number=accession,
+        xml_bytes=(
+            _form4_fixture(fixture_name) if xml_bytes is None else xml_bytes
+        ),
+        primary_document_url=(
+            primary_document_url or _primary_document_url(accession)
+        ),
+        retrieved_at=retrieved_at,
+        capture_git_commit=capture_git_commit,
+        amends_accession=amends_accession,
+    )
+
+
+def _build_reconciliation(
+    tmp_path: Path,
+    *,
+    sources: tuple[SecForm4XmlSource, ...],
+    tables: dict[str, bytes] | None = None,
+    metadata_sources: tuple[SecEdgarMetadataSource, ...] | None = None,
+    output_name: str = "acceptance-reconciliation",
+):
+    raw_path, parsed_path = _upstream(tmp_path, tables=tables)
+    if metadata_sources is None:
+        metadata_sources = tuple(
+            _metadata_source(
+                source.accession_number,
+                primary_url=source.primary_document_url,
+            )
+            for source in sources
+        )
+    raw_path, parsed_path, bundle_path, _ = _build(
+        tmp_path,
+        raw_path=raw_path,
+        parsed_path=parsed_path,
+        sources=metadata_sources,
+        output_name=output_name,
+    )
+    reconciled = reconcile_sec_form4_amendments(
+        bundle_path,
+        parsed_snapshot_directory=parsed_path,
+        raw_snapshot_directory=raw_path,
+        sources=sources,
+        parser_git_commit=RECONCILIATION_COMMIT,
+    )
+    return raw_path, parsed_path, bundle_path, reconciled
 
 
 def _build_with_source_bytes(
@@ -862,6 +946,88 @@ def test_public_availability_record_enforces_the_sec_filing_day_window():
         SecEdgarAvailabilityRecord(
             **values,
             accepted_at=datetime.fromisoformat("2026-05-02T05:00:00+00:00"),
+        )
+
+
+@pytest.mark.parametrize(
+    "accepted",
+    (
+        "2026-05-01T18:00:00-04:00",
+        "2026-05-01T21:59:59-04:00",
+    ),
+)
+def test_ownership_form_after_hours_acceptance_keeps_same_filing_date(
+    tmp_path, accepted
+):
+    """Forms 4/4-A keep the receipt date through the ownership-form cutoff."""
+
+    raw_path, parsed_path = _upstream(tmp_path)
+    _, _, bundle_path, _ = _build(
+        tmp_path,
+        raw_path=raw_path,
+        parsed_path=parsed_path,
+        sources=(
+            _metadata_source(ACCESSION_A, accepted=accepted),
+            _metadata_source(ACCESSION_C),
+        ),
+    )
+
+    loaded = _load(bundle_path, parsed_path, raw_path)
+    record = next(
+        item for item in loaded.records if item.accession_number == ACCESSION_A
+    )
+    assert record.document_type == "4"
+    assert record.filing_date == date(2026, 5, 1)
+    assert record.accepted_at == datetime.fromisoformat(accepted).astimezone(
+        timezone.utc
+    )
+
+
+def test_ownership_form_after_hours_acceptance_rejects_false_rollover_date():
+    """The general 17:30 rollover must not be applied to an ownership form."""
+
+    with pytest.raises(
+        SecEdgarAcceptanceSnapshotError, match="exact|accept|filing"
+    ):
+        SecEdgarAvailabilityRecord(
+            accession_number=ACCESSION_A,
+            document_type="4",
+            submission_row_id="a" * 64,
+            filing_date=date(2026, 5, 4),
+            availability_tier=(
+                SecEdgarAvailabilityTier.EXACT_ACCEPTANCE_TIMESTAMP
+            ),
+            next_open_rule=SecEdgarAvailabilityRule.NEXT_OPEN_AFTER_ACCEPTANCE,
+            accepted_at=datetime.fromisoformat("2026-05-01T18:00:00-04:00"),
+            primary_document_url=(
+                "https://www.sec.gov/Archives/edgar/data/123456/"
+                f"{ACCESSION_A.replace('-', '')}/synthetic-primary.xml"
+            ),
+            metadata_source_sha256="a" * 64,
+        )
+
+
+def test_ownership_form_after_operating_cutoff_cannot_claim_earlier_date():
+    """A post-22:00 receipt cannot be backdated to an earlier filing day."""
+
+    with pytest.raises(
+        SecEdgarAcceptanceSnapshotError, match="exact|accept|filing"
+    ):
+        SecEdgarAvailabilityRecord(
+            accession_number=ACCESSION_A,
+            document_type="4",
+            submission_row_id="a" * 64,
+            filing_date=date(2026, 5, 4),
+            availability_tier=(
+                SecEdgarAvailabilityTier.EXACT_ACCEPTANCE_TIMESTAMP
+            ),
+            next_open_rule=SecEdgarAvailabilityRule.NEXT_OPEN_AFTER_ACCEPTANCE,
+            accepted_at=datetime.fromisoformat("2026-05-01T22:00:01-04:00"),
+            primary_document_url=(
+                "https://www.sec.gov/Archives/edgar/data/123456/"
+                f"{ACCESSION_A.replace('-', '')}/synthetic-primary.xml"
+            ),
+            metadata_source_sha256="a" * 64,
         )
 
 
@@ -2384,3 +2550,886 @@ def test_acceptance_module_has_no_network_outcome_execution_or_ui_imports():
         or node.module == "urllib.parse"
         for node in ast.walk(tree)
     )
+
+
+def test_original_only_sample_is_observed_but_never_authorizes_filtering(
+    tmp_path,
+):
+    source = _xml_source(ACCESSION_A, "form4_original.xml")
+    _, _, _, reconciled = _build_reconciliation(
+        tmp_path, sources=(source,)
+    )
+
+    lineage = reconciled.lineage(ACCESSION_A)
+    assert len(lineage.versions) == 1
+    version = lineage.versions[0]
+    assert version.accession_number == ACCESSION_A
+    assert version.next_supplied_acceptance_at is None
+    assert (
+        version.disposition
+        is Form4VersionDisposition.ORIGINAL_OBSERVED_IN_SUPPLIED_SAMPLE
+    )
+    accepted_at = datetime.fromisoformat(ACCEPTED_AT[ACCESSION_A]).astimezone(
+        timezone.utc
+    )
+    assert (
+        reconciled.observed_state_at(
+            ACCESSION_A, accepted_at - timedelta(seconds=1)
+        )
+        is None
+    )
+    assert (
+        reconciled.observed_state_at(
+            ACCESSION_A, accepted_at + timedelta(days=30)
+        ).accession_number
+        == ACCESSION_A
+    )
+    assert not reconciled.complete_amendment_coverage_verified
+    assert not reconciled.canonical_filter_authorized
+    assert not reconciled.identity.complete_amendment_coverage_verified
+    assert not reconciled.identity.canonical_filter_authorized
+    assert reconciled.identity.filing_count == 1
+    assert reconciled.identity.amendment_count == 0
+    assert reconciled.identity.lineage_count == 1
+
+
+def test_amendment_boundary_is_half_open_and_quarantines_future_rows(tmp_path):
+    original = _xml_source(ACCESSION_A, "form4_original.xml")
+    amendment = _xml_source(
+        ACCESSION_B,
+        "form4_amendment.xml",
+        amends_accession=ACCESSION_A,
+    )
+    _, _, _, reconciled = _build_reconciliation(
+        tmp_path, sources=(amendment, original)
+    )
+
+    lineage = reconciled.lineage(ACCESSION_A)
+    assert [version.accession_number for version in lineage.versions] == [
+        ACCESSION_A,
+        ACCESSION_B,
+    ]
+    original_version, amended_version = lineage.versions
+    amendment_time = datetime.fromisoformat(ACCEPTED_AT[ACCESSION_B]).astimezone(
+        timezone.utc
+    )
+    assert original_version.next_supplied_acceptance_at == amendment_time
+    assert original_version.contains_observed_instant(
+        amendment_time - timedelta(seconds=1)
+    )
+    assert not original_version.contains_observed_instant(amendment_time)
+    assert amended_version.contains_observed_instant(amendment_time)
+    assert (
+        amended_version.disposition
+        is Form4VersionDisposition.QUARANTINED_UNRESOLVED_AMENDMENT
+    )
+    assert (
+        reconciled.observed_state_at(
+            ACCESSION_A, amendment_time - timedelta(seconds=1)
+        ).accession_number
+        == ACCESSION_A
+    )
+    assert not hasattr(
+        reconciled.observed_state_at(
+            ACCESSION_A, amendment_time - timedelta(seconds=1)
+        ),
+        "next_supplied_acceptance_at",
+    )
+    assert (
+        reconciled.observed_state_at(
+            ACCESSION_A, amendment_time
+        ).accession_number
+        == ACCESSION_B
+    )
+    assert (
+        reconciled.observed_state_at(
+            ACCESSION_A, amendment_time + timedelta(days=30)
+        ).accession_number
+        == ACCESSION_B
+    )
+    assert not reconciled.canonical_filter_authorized
+
+    assert len(reconciled.as_filed_corpus.filings) == 2
+    original_filing = reconciled.as_filed_corpus.filing(ACCESSION_A)
+    assert len(original_filing.transactions) == 1
+    assert original_filing.transactions[0].eligible_for_lot_aggregation
+    assert not reconciled.canonical_filter_authorized
+    amended_filing = reconciled.as_filed_corpus.filing(ACCESSION_B)
+    assert len(amended_filing.transactions) == 1
+    assert amended_filing.transactions[0].outcomes == (
+        ClassificationOutcome.EXCLUDE_AMENDED_FILING,
+    )
+    assert reconciled.as_filed_corpus.superseded_by == (
+        (ACCESSION_A, (ACCESSION_B,)),
+    )
+
+
+@pytest.mark.parametrize(
+    "activated_outcomes",
+    (
+        (ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,),
+        (
+            ClassificationOutcome.EXCLUDE_AMENDED_FILING,
+            ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,
+        ),
+    ),
+)
+def test_reconciliation_refuses_parser_that_activates_amendment_rows(
+    tmp_path, monkeypatch, activated_outcomes
+):
+    real_parse = reconciliation_module.parse_form4_xml
+
+    def parse_with_activated_amendment(*args, **kwargs):
+        filing = real_parse(*args, **kwargs)
+        if filing.envelope.form_type != "4/A":
+            return filing
+        activated = replace(
+            filing.transactions[0],
+            outcomes=activated_outcomes,
+        )
+        return replace(filing, transactions=(activated,))
+
+    monkeypatch.setattr(
+        reconciliation_module,
+        "parse_form4_xml",
+        parse_with_activated_amendment,
+    )
+    sources = (
+        _xml_source(ACCESSION_A, "form4_original.xml"),
+        _xml_source(
+            ACCESSION_B,
+            "form4_amendment.xml",
+            amends_accession=ACCESSION_A,
+        ),
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="4/A.*excluded"
+    ):
+        _build_reconciliation(tmp_path, sources=sources)
+
+
+def test_reconciliation_identity_is_input_order_independent(tmp_path):
+    original = _xml_source(ACCESSION_A, "form4_original.xml")
+    amendment = _xml_source(
+        ACCESSION_B,
+        "form4_amendment.xml",
+        amends_accession=ACCESSION_A,
+    )
+    first = _build_reconciliation(
+        tmp_path,
+        sources=(original, amendment),
+        output_name="acceptance-first-order",
+    )[3]
+    second = _build_reconciliation(
+        tmp_path,
+        sources=(amendment, original),
+        output_name="acceptance-second-order",
+    )[3]
+
+    assert first == second
+    assert [
+        item.accession_number for item in first.identity.source_inventory
+    ] == [ACCESSION_A, ACCESSION_B]
+    assert first.identity.reconciliation_id.startswith(
+        "form4-amendment-reconciliation-2026q2-"
+    )
+
+
+def test_reconciliation_identity_binds_exact_sources_lineage_and_parser(
+    tmp_path,
+):
+    filing_dates = dict(FILING_DATES)
+    filing_dates[ACCESSION_C] = "2026-05-01"
+    form_types = dict(FORM_TYPES)
+    form_types[ACCESSION_C] = "4"
+    tables = _tables(filing_dates=filing_dates, form_types=form_types)
+    original_a = _xml_source(ACCESSION_A, "form4_original.xml")
+    original_c = _xml_source(ACCESSION_C, "form4_original.xml")
+    amendment_a = _xml_source(
+        ACCESSION_B,
+        "form4_amendment.xml",
+        amends_accession=ACCESSION_A,
+    )
+    amendment_c = replace(amendment_a, amends_accession=ACCESSION_C)
+    metadata_sources = (
+        _metadata_source(ACCESSION_A),
+        _metadata_source(ACCESSION_B),
+        _metadata_source(
+            ACCESSION_C,
+            form="4",
+            filed="2026-05-01",
+            accepted="2026-05-01T18:30:00-04:00",
+        ),
+    )
+    first_raw, first_parsed, first_bundle, first = _build_reconciliation(
+        tmp_path,
+        sources=(original_a, original_c, amendment_a),
+        tables=tables,
+        metadata_sources=metadata_sources,
+        output_name="identity-first-target",
+    )
+    second = _build_reconciliation(
+        tmp_path,
+        sources=(original_a, original_c, amendment_c),
+        tables=tables,
+        metadata_sources=metadata_sources,
+        output_name="identity-second-target",
+    )[3]
+
+    expected_inventory = [
+        {
+            "accession_number": source.accession_number,
+            "xml_sha256": hash_bytes(source.xml_bytes),
+            "xml_size_bytes": len(source.xml_bytes),
+            "primary_document_url": source.primary_document_url,
+            "retrieved_at_utc": source.retrieved_at.astimezone(
+                timezone.utc
+            ).isoformat(timespec="seconds"),
+            "capture_git_commit": source.capture_git_commit,
+            "amends_accession": source.amends_accession,
+        }
+        for source in sorted(
+            (original_a, original_c, amendment_a),
+            key=lambda item: item.accession_number,
+        )
+    ]
+    assert first.identity.source_inventory_hash == hash_payload(
+        expected_inventory
+    )
+    expected_reconciliation_hash = hash_payload(
+        {
+            "contract_version": first.identity.contract_version,
+            "parser_git_commit": first.identity.parser_git_commit,
+            "acceptance_snapshot_id": first.identity.acceptance_snapshot_id,
+            "acceptance_lineage_hash": first.identity.acceptance_lineage_hash,
+            "source_inventory_hash": first.identity.source_inventory_hash,
+            "filing_count": first.identity.filing_count,
+            "amendment_count": first.identity.amendment_count,
+            "lineage_count": first.identity.lineage_count,
+            "complete_amendment_coverage_verified": False,
+            "canonical_filter_authorized": False,
+        }
+    )
+    assert first.identity.reconciliation_id.endswith(
+        expected_reconciliation_hash[:16]
+    )
+    assert (
+        first.identity.source_inventory_hash
+        != second.identity.source_inventory_hash
+    )
+    assert first.identity.reconciliation_id != second.identity.reconciliation_id
+    assert not first.canonical_filter_authorized
+    assert not second.canonical_filter_authorized
+
+    alternate_parser = reconcile_sec_form4_amendments(
+        first_bundle,
+        parsed_snapshot_directory=first_parsed,
+        raw_snapshot_directory=first_raw,
+        sources=(original_a, original_c, amendment_a),
+        parser_git_commit="f" * 40,
+    )
+    assert (
+        alternate_parser.identity.source_inventory_hash
+        == first.identity.source_inventory_hash
+    )
+    assert (
+        alternate_parser.identity.reconciliation_id
+        != first.identity.reconciliation_id
+    )
+
+
+@pytest.mark.parametrize(
+    "flag_name",
+    (
+        "complete_amendment_coverage_verified",
+        "canonical_filter_authorized",
+    ),
+)
+def test_bounded_reconciliation_identity_cannot_enable_authority(
+    tmp_path, flag_name
+):
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(_xml_source(ACCESSION_A, "form4_original.xml"),),
+    )[3]
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="cannot authorize"
+    ):
+        replace(reconciled.identity, **{flag_name: True})
+
+
+def test_reconciliation_wrapper_refuses_forged_authority_identity():
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="result boundary"
+    ):
+        reconciliation_module.ReconciledForm4Amendments(
+            identity=SimpleNamespace(
+                complete_amendment_coverage_verified=True,
+                canonical_filter_authorized=True,
+            ),
+            as_filed_corpus=None,
+            lineages=(),
+        )
+
+
+def test_source_count_and_byte_caps_precede_snapshot_loading(
+    tmp_path, monkeypatch
+):
+    original = _xml_source(ACCESSION_A, "form4_original.xml")
+    amendment = _xml_source(
+        ACCESSION_B,
+        "form4_amendment.xml",
+        amends_accession=ACCESSION_A,
+    )
+
+    def forbidden_loader(*args, **kwargs):
+        pytest.fail("source caps must run before acceptance loading")
+
+    monkeypatch.setattr(
+        reconciliation_module,
+        "load_sec_edgar_acceptance_snapshot",
+        forbidden_loader,
+    )
+    monkeypatch.setattr(reconciliation_module, "MAX_FORM4_XML_SOURCES", 1)
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="bounded immutable tuple"
+    ):
+        reconcile_sec_form4_amendments(
+            tmp_path / "absent-acceptance.json",
+            parsed_snapshot_directory=tmp_path / "absent-parsed",
+            raw_snapshot_directory=tmp_path / "absent-raw",
+            sources=(original, amendment),
+            parser_git_commit=RECONCILIATION_COMMIT,
+        )
+
+    monkeypatch.setattr(reconciliation_module, "MAX_FORM4_XML_SOURCES", 64)
+    monkeypatch.setattr(
+        reconciliation_module,
+        "MAX_TOTAL_FORM4_XML_BYTES",
+        len(original.xml_bytes) - 1,
+    )
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="bounded immutable tuple"
+    ):
+        reconcile_sec_form4_amendments(
+            tmp_path / "absent-acceptance.json",
+            parsed_snapshot_directory=tmp_path / "absent-parsed",
+            raw_snapshot_directory=tmp_path / "absent-raw",
+            sources=(original,),
+            parser_git_commit=RECONCILIATION_COMMIT,
+        )
+
+
+def test_reconciliation_refuses_duplicate_lineage_inventory(
+    tmp_path, monkeypatch
+):
+    form_types = dict(FORM_TYPES)
+    form_types[ACCESSION_C] = "4"
+    tables = _tables(form_types=form_types)
+    sources = (
+        _xml_source(ACCESSION_A, "form4_original.xml"),
+        _xml_source(ACCESSION_C, "form4_original.xml"),
+    )
+    metadata_sources = (
+        _metadata_source(ACCESSION_A),
+        _metadata_source(ACCESSION_C, form="4"),
+    )
+    real_builder = reconciliation_module._build_lineages
+
+    def duplicate_first_lineage(corpus):
+        lineages = real_builder(corpus)
+        return (lineages[0], lineages[0])
+
+    monkeypatch.setattr(
+        reconciliation_module,
+        "_build_lineages",
+        duplicate_first_lineage,
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="corpus and observed amendment lineage disagree",
+    ):
+        _build_reconciliation(
+            tmp_path,
+            sources=sources,
+            tables=tables,
+            metadata_sources=metadata_sources,
+        )
+
+
+@pytest.mark.parametrize(
+    "cap_name",
+    (
+        "MAX_REPORTING_OWNERS_PER_FILING",
+        "MAX_FOOTNOTES_PER_FILING",
+        "MAX_TRANSACTIONS_PER_FILING",
+    ),
+)
+def test_per_filing_parsed_resource_caps_refuse(
+    tmp_path, monkeypatch, cap_name
+):
+    monkeypatch.setattr(reconciliation_module, cap_name, 0)
+    xml_bytes = _form4_fixture("form4_original.xml")
+    if cap_name == "MAX_FOOTNOTES_PER_FILING":
+        xml_bytes = xml_bytes.replace(
+            b"</ownershipDocument>",
+            b'<footnotes><footnote id="F1">Synthetic note</footnote>'
+            b"</footnotes></ownershipDocument>",
+        )
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="per-filing resource cap"
+    ):
+        _build_reconciliation(
+            tmp_path,
+            sources=(
+                _xml_source(
+                    ACCESSION_A,
+                    "form4_original.xml",
+                    xml_bytes=xml_bytes,
+                ),
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    "cap_name",
+    (
+        "MAX_TOTAL_REPORTING_OWNERS",
+        "MAX_TOTAL_FOOTNOTES",
+        "MAX_TOTAL_TRANSACTIONS",
+    ),
+)
+def test_aggregate_parsed_resource_caps_refuse(
+    tmp_path, monkeypatch, cap_name
+):
+    monkeypatch.setattr(reconciliation_module, cap_name, 0)
+    xml_bytes = _form4_fixture("form4_original.xml")
+    if cap_name == "MAX_TOTAL_FOOTNOTES":
+        xml_bytes = xml_bytes.replace(
+            b"</ownershipDocument>",
+            b'<footnotes><footnote id="F1">Synthetic note</footnote>'
+            b"</footnotes></ownershipDocument>",
+        )
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="aggregate resource cap"
+    ):
+        _build_reconciliation(
+            tmp_path,
+            sources=(
+                _xml_source(
+                    ACCESSION_A,
+                    "form4_original.xml",
+                    xml_bytes=xml_bytes,
+                ),
+            ),
+        )
+
+
+def test_multiple_amendments_are_ordered_by_acceptance_not_accession(tmp_path):
+    filing_dates = dict(FILING_DATES)
+    filing_dates[ACCESSION_B] = "2026-05-04"
+    filing_dates[ACCESSION_D] = "2026-05-02"
+    form_types = dict(FORM_TYPES)
+    form_types[ACCESSION_D] = "4/A"
+    tables = _tables(filing_dates=filing_dates, form_types=form_types)
+    original = _xml_source(ACCESSION_A, "form4_original.xml")
+    later_lexically_earlier = _xml_source(
+        ACCESSION_B,
+        "form4_amendment.xml",
+        amends_accession=ACCESSION_A,
+    )
+    earlier_lexically_later = _xml_source(
+        ACCESSION_D,
+        "form4_amendment.xml",
+        amends_accession=ACCESSION_A,
+    )
+    metadata_sources = (
+        _metadata_source(ACCESSION_A),
+        _metadata_source(
+            ACCESSION_B,
+            form="4/A",
+            filed="2026-05-04",
+            accepted="2026-05-04T18:00:00-04:00",
+        ),
+        _metadata_source(
+            ACCESSION_D,
+            form="4/A",
+            filed="2026-05-02",
+            accepted="2026-05-02T18:00:00-04:00",
+        ),
+    )
+
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(later_lexically_earlier, original, earlier_lexically_later),
+        tables=tables,
+        metadata_sources=metadata_sources,
+    )[3]
+    assert [
+        version.accession_number
+        for version in reconciled.lineage(ACCESSION_A).versions
+    ] == [ACCESSION_A, ACCESSION_D, ACCESSION_B]
+    assert all(
+        version.disposition
+        is Form4VersionDisposition.QUARANTINED_UNRESOLVED_AMENDMENT
+        for version in reconciled.lineage(ACCESSION_A).versions[1:]
+    )
+
+
+def test_equal_amendment_acceptance_instants_refuse_ambiguous_order(tmp_path):
+    filing_dates = dict(FILING_DATES)
+    filing_dates[ACCESSION_D] = "2026-05-02"
+    form_types = dict(FORM_TYPES)
+    form_types[ACCESSION_D] = "4/A"
+    tables = _tables(filing_dates=filing_dates, form_types=form_types)
+    sources = (
+        _xml_source(ACCESSION_A, "form4_original.xml"),
+        _xml_source(
+            ACCESSION_B,
+            "form4_amendment.xml",
+            amends_accession=ACCESSION_A,
+        ),
+        _xml_source(
+            ACCESSION_D,
+            "form4_amendment.xml",
+            amends_accession=ACCESSION_A,
+        ),
+    )
+    metadata_sources = (
+        _metadata_source(ACCESSION_A),
+        _metadata_source(
+            ACCESSION_B, accepted="2026-05-02T18:00:00-04:00"
+        ),
+        _metadata_source(
+            ACCESSION_D,
+            form="4/A",
+            filed="2026-05-02",
+            accepted="2026-05-02T18:00:00-04:00",
+        ),
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="ambiguous|order"
+    ):
+        _build_reconciliation(
+            tmp_path,
+            sources=sources,
+            tables=tables,
+            metadata_sources=metadata_sources,
+        )
+
+
+def test_amendment_cannot_precede_original_exact_acceptance(tmp_path):
+    filing_dates = dict(FILING_DATES)
+    filing_dates[ACCESSION_B] = "2026-05-01"
+    tables = _tables(filing_dates=filing_dates)
+    sources = (
+        _xml_source(ACCESSION_A, "form4_original.xml"),
+        _xml_source(
+            ACCESSION_B,
+            "form4_amendment.xml",
+            amends_accession=ACCESSION_A,
+        ),
+    )
+    metadata_sources = (
+        _metadata_source(ACCESSION_A),
+        _metadata_source(
+            ACCESSION_B,
+            filed="2026-05-01",
+            accepted="2026-05-01T16:00:00-04:00",
+        ),
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="lineage|invalid"
+    ):
+        _build_reconciliation(
+            tmp_path,
+            sources=sources,
+            tables=tables,
+            metadata_sources=metadata_sources,
+        )
+
+
+def test_date_only_amendment_evidence_refuses_before_xml_parsing(tmp_path):
+    raw_path, parsed_path, bundle_path, _ = _build(
+        tmp_path,
+        sources=(_metadata_source(ACCESSION_A),),
+        output_name="fallback-amendment",
+    )
+    amendment = _xml_source(
+        ACCESSION_B,
+        "form4_amendment.xml",
+        amends_accession=ACCESSION_A,
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="exact acceptance"
+    ):
+        reconcile_sec_form4_amendments(
+            bundle_path,
+            parsed_snapshot_directory=parsed_path,
+            raw_snapshot_directory=raw_path,
+            sources=(amendment,),
+            parser_git_commit=RECONCILIATION_COMMIT,
+        )
+
+
+def test_amendment_target_must_be_present_in_the_xml_sample(tmp_path):
+    amendment = _xml_source(
+        ACCESSION_B,
+        "form4_amendment.xml",
+        amends_accession=ACCESSION_A,
+    )
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="lineage|invalid"
+    ):
+        _build_reconciliation(tmp_path, sources=(amendment,))
+
+
+def test_amendment_target_cannot_be_another_amendment(tmp_path):
+    form_types = dict(FORM_TYPES)
+    form_types[ACCESSION_D] = "4/A"
+    tables = _tables(form_types=form_types)
+    sources = (
+        _xml_source(ACCESSION_A, "form4_original.xml"),
+        _xml_source(
+            ACCESSION_B,
+            "form4_amendment.xml",
+            amends_accession=ACCESSION_A,
+        ),
+        _xml_source(
+            ACCESSION_D,
+            "form4_amendment.xml",
+            amends_accession=ACCESSION_B,
+        ),
+    )
+    metadata_sources = (
+        _metadata_source(ACCESSION_A),
+        _metadata_source(ACCESSION_B),
+        _metadata_source(ACCESSION_D, form="4/A"),
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="lineage|invalid"
+    ):
+        _build_reconciliation(
+            tmp_path,
+            sources=sources,
+            tables=tables,
+            metadata_sources=metadata_sources,
+        )
+
+
+def test_cross_issuer_amendment_link_refuses(tmp_path):
+    issuer_ciks = {accession: "0000123456" for accession in ACCESSIONS}
+    issuer_ciks[ACCESSION_B] = "0000654321"
+    tables = _tables(issuer_ciks=issuer_ciks)
+    amendment_url = _primary_document_url(
+        ACCESSION_B, issuer_cik="654321"
+    )
+    amendment_bytes = _form4_fixture("form4_amendment.xml").replace(
+        b"<issuerCik>123456</issuerCik>",
+        b"<issuerCik>654321</issuerCik>",
+    )
+    sources = (
+        _xml_source(ACCESSION_A, "form4_original.xml"),
+        _xml_source(
+            ACCESSION_B,
+            "form4_amendment.xml",
+            amends_accession=ACCESSION_A,
+            primary_document_url=amendment_url,
+            xml_bytes=amendment_bytes,
+        ),
+    )
+    metadata_sources = (
+        _metadata_source(ACCESSION_A),
+        _metadata_source(
+            ACCESSION_B,
+            primary_url=amendment_url,
+            source_url=(
+                "https://www.sec.gov/Archives/edgar/data/654321/"
+                f"{ACCESSION_B.replace('-', '')}/synthetic-metadata.json"
+            ),
+        ),
+    )
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="lineage|invalid"
+    ):
+        _build_reconciliation(
+            tmp_path,
+            sources=sources,
+            tables=tables,
+            metadata_sources=metadata_sources,
+        )
+
+
+def test_duplicate_or_unknown_xml_accession_refuses(tmp_path):
+    original = _xml_source(ACCESSION_A, "form4_original.xml")
+    raw_path, parsed_path, bundle_path, _ = _build(
+        tmp_path,
+        sources=(_metadata_source(ACCESSION_A),),
+        output_name="duplicate-or-unknown",
+    )
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="duplicate XML accession"
+    ):
+        reconcile_sec_form4_amendments(
+            bundle_path,
+            parsed_snapshot_directory=parsed_path,
+            raw_snapshot_directory=raw_path,
+            sources=(original, original),
+            parser_git_commit=RECONCILIATION_COMMIT,
+        )
+
+    unknown_accession = "0000123456-26-999999"
+    unknown = _xml_source(
+        unknown_accession,
+        "form4_original.xml",
+        primary_document_url=_primary_document_url(unknown_accession),
+    )
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="absent"
+    ):
+        reconcile_sec_form4_amendments(
+            bundle_path,
+            parsed_snapshot_directory=parsed_path,
+            raw_snapshot_directory=raw_path,
+            sources=(unknown,),
+            parser_git_commit=RECONCILIATION_COMMIT,
+        )
+
+
+@pytest.mark.parametrize(
+    ("source_factory", "message"),
+    (
+        (
+            lambda: _xml_source(
+                ACCESSION_A,
+                "form4_original.xml",
+                primary_document_url=_primary_document_url(ACCESSION_B),
+            ),
+            "URL disagrees",
+        ),
+        (
+            lambda: _xml_source(
+                ACCESSION_A,
+                "form4_original.xml",
+                retrieved_at=datetime(
+                    2026, 5, 1, 20, 0, tzinfo=timezone.utc
+                ),
+            ),
+            "retrieval time precedes",
+        ),
+        (
+            lambda: _xml_source(
+                ACCESSION_A,
+                "form4_amendment.xml",
+                amends_accession=ACCESSION_B,
+            ),
+            "form type disagrees",
+        ),
+        (
+            lambda: _xml_source(
+                ACCESSION_A,
+                "form4_original.xml",
+                xml_bytes=_form4_fixture("form4_original.xml").replace(
+                    b"<issuerCik>123456</issuerCik>",
+                    b"<issuerCik>654321</issuerCik>",
+                ),
+            ),
+            "issuer CIK disagrees",
+        ),
+    ),
+)
+def test_xml_must_bind_to_exact_acceptance_record(
+    tmp_path, source_factory, message
+):
+    source = source_factory()
+    with pytest.raises(Form4AmendmentReconciliationError, match=message):
+        _build_reconciliation(
+            tmp_path,
+            sources=(source,),
+            metadata_sources=(_metadata_source(ACCESSION_A),),
+        )
+
+
+def test_self_amendment_and_mutable_retrieval_timezone_refuse_or_freeze():
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="different canonical"
+    ):
+        _xml_source(
+            ACCESSION_B,
+            "form4_amendment.xml",
+            amends_accession=ACCESSION_B,
+        )
+
+    mutable_timezone = _MutableOffsetTimezone(-4)
+    source = _xml_source(
+        ACCESSION_A,
+        "form4_original.xml",
+        retrieved_at=datetime(2026, 5, 5, 14, 0, tzinfo=mutable_timezone),
+    )
+    frozen_payload = (
+        source.retrieved_at,
+        source.retrieved_at_utc,
+        source.xml_sha256,
+    )
+    mutable_timezone.offset = timedelta(hours=14)
+    assert source.retrieved_at.tzinfo is timezone.utc
+    assert (
+        source.retrieved_at,
+        source.retrieved_at_utc,
+        source.xml_sha256,
+    ) == frozen_payload
+
+
+def test_reconciliation_as_of_requires_aware_second_resolution(tmp_path):
+    source = _xml_source(ACCESSION_A, "form4_original.xml")
+    reconciled = _build_reconciliation(tmp_path, sources=(source,))[3]
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="aware"
+    ):
+        reconciled.observed_state_at(
+            ACCESSION_A, datetime(2026, 5, 2, 9, 30)
+        )
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="second-resolution"
+    ):
+        reconciled.observed_state_at(
+            ACCESSION_A,
+            datetime(2026, 5, 2, 9, 30, 0, 1, tzinfo=timezone.utc),
+        )
+
+
+def test_reconciliation_module_has_no_network_outcome_execution_or_ui_imports():
+    module_path = Path(reconciliation_module.__file__)
+    tree = ast.parse(module_path.read_text(encoding="utf-8"), filename=str(module_path))
+    imported: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name.split(".", 1)[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module.split(".", 1)[0])
+
+    forbidden = {
+        "assistant",
+        "backtest",
+        "execution",
+        "httpx",
+        "outcomes",
+        "quantconnect",
+        "requests",
+        "risk",
+        "signals",
+        "socket",
+        "strategies",
+        "streamlit",
+        "urllib",
+        "yfinance",
+    }
+    assert imported.isdisjoint(forbidden), imported & forbidden

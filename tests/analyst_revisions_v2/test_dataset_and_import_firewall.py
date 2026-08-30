@@ -724,7 +724,21 @@ def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
     )
     artifacts = {path.name: path for path in specs.glob("*.json")}
     assert artifacts, "the ARV2 spec directory must contain committed artifacts"
-    # Only these production-bound artifacts are consumed through
+    # `*.json -text` covers this whole directory, so CRLF is not only a
+    # loader problem: Git then reports the file as permanently modified. That
+    # breaks the reviewed-spec anchor's committed-and-clean precondition and
+    # risks committing CRLF bytes into a content-addressed artifact, even for
+    # the files whose loaders parse tolerantly.
+    for name, path in sorted(artifacts.items()):
+        assert CRLF not in path.read_bytes(), (
+            f"{name} differs from its committed LF blob. A checkout made "
+            "before `*.json -text` existed keeps its CRLF bytes, and the stat "
+            "cache can hide that from `git status`. Restore it from the blob "
+            "with: rm research/analyst_revisions_v2/specs/*.json && "
+            "git checkout -- research/analyst_revisions_v2/specs -- never by "
+            "committing the CRLF bytes."
+        )
+    # Only these production-bound artifacts are additionally consumed through
     # require_canonical_json_bytes. Other JSON in this directory is parsed
     # tolerantly or compared after semantic canonicalization, so calling every
     # artifact byte-canonical would overstate its real loader contract.

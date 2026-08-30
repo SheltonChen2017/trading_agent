@@ -1539,3 +1539,92 @@ def test_diagnostics_refuse_partial_candidate_evidence(tmp_path, policy):
     assert candidate.refusals
     with pytest.raises(StockSignalError, match="unavailable for a refusing"):
         _diagnostics(candidate, arguments, policy)
+
+
+# --- Independent review regressions (Claude, 2026-08-29) --------------------
+# Each pins a property the implementation already satisfies but that survived
+# a reverse mutation of its guard, so a later refactor could silently drop it.
+
+
+def test_decay_has_no_hard_cutoff_beyond_the_pinned_short_horizon(policy):
+    """Pin the whole frozen history span, not only age 120.
+
+    ``rating_decay_weight`` promises it "never truncates old or
+    tiny-but-nonzero contributions", and the frozen 2013-2026 history is
+    roughly 3,400 sessions. The existing no-cutoff regression stops at age
+    120, so a truncation introduced anywhere beyond that would silently drop
+    the oldest events from every raw sum while every test stayed green.
+    """
+    from decimal import Context, ROUND_HALF_EVEN
+
+    wide = Context(prec=60, rounding=ROUND_HALF_EVEN)
+    previous = rating_decay_weight(120, policy=policy)
+    for age in (251, 400, 1000, 2000, 3400):
+        weight = rating_decay_weight(age, policy=policy)
+        assert weight > 0, f"age {age} truncated to a hard zero"
+        assert weight < previous, f"decay is not strictly decreasing at {age}"
+        expected = wide.power(
+            Decimal("0.5"), wide.divide(Decimal(age), Decimal(20))
+        )
+        assert abs(weight - expected) < Decimal("1e-40"), (age, weight, expected)
+        previous = weight
+
+
+def test_non_exempt_identity_refusal_still_blocks_the_cross_section(
+    tmp_path, policy
+):
+    """Only the four proven-ineligible reasons may be exempted.
+
+    ``PROVEN_INELIGIBLE_IDENTITY_REFUSAL_REASONS`` is pinned as a constant,
+    but nothing exercised an identity-stage refusal outside that set, so the
+    filter could stop consulting it and stay green. An unmapped ticker means
+    the issuer is unknown, not proven ineligible, and must keep blocking.
+    """
+    rows = [
+        *[_rating_row(f"event-{index:03d}", index, age=index) for index in range(20)],
+        _rating_row("event-unmapped", 999, age=0),
+    ]
+    arguments = _chain(tmp_path, rows=rows)
+    identity_refusals = [
+        item
+        for item in arguments["upstream"].refusals
+        if item.stage.value == "identity"
+    ]
+    assert identity_refusals, "fixture must produce an identity-stage refusal"
+    assert all(
+        item.reason not in PROVEN_INELIGIBLE_IDENTITY_REFUSAL_REASONS
+        for item in identity_refusals
+    ), "this regression requires a refusal outside the exempt set"
+    candidate = _build(arguments, policy)
+    assert not candidate.scores
+    assert not candidate.pdf_formula_available
+    assert StockScoreRefusalReason.UPSTREAM_IDENTITY_OR_ONTOLOGY_REFUSAL in {
+        item.reason for item in candidate.refusals
+    }
+
+
+def test_frozen_candidate_contract_rejects_weakened_records(tmp_path, policy):
+    """The record-level guards are the last line if a builder path regresses.
+
+    The builder clears partial output itself, so the frozen dataclass checks
+    are only reachable by direct construction - which is exactly how a later
+    consumer or fixture would assemble one.
+    """
+    scoring = _build(_chain(tmp_path / "scoring"), policy)
+    assert scoring.pdf_formula_available and not scoring.refusals
+    with pytest.raises(StockSignalError, match="production authority"):
+        dataclasses.replace(scoring, authority="production-authority")
+    with pytest.raises(StockSignalError, match="residualization"):
+        dataclasses.replace(scoring, residualization_state="ready")
+    assert scoring.residualization_state == RESIDUALIZATION_BLOCK
+    assert scoring.authority == STRUCTURAL_ONLY_AUTHORITY
+    assert scoring.final_executable_available is False
+
+    refusing_rows = [
+        *[_rating_row(f"event-{index:03d}", index, age=index) for index in range(20)],
+        _rating_row("event-unmapped", 999, age=0),
+    ]
+    refusing = _build(_chain(tmp_path / "refusing", rows=refusing_rows), policy)
+    assert refusing.refusals and not refusing.scores
+    with pytest.raises(StockSignalError, match="partial score artifact"):
+        dataclasses.replace(refusing, scores=scoring.scores)

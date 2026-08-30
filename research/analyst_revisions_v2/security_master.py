@@ -50,7 +50,7 @@ PIT_SECURITY_MASTER_SCHEMA = "arv2-pit-security-master-v1"
 SECURITY_IDENTITY_AUDIT_SCHEMA = "arv2-security-identity-audit-v1"
 IDENTITY_RESOLVED_FIRM_RESULT_SCHEMA = "arv2-identity-firm-result-v1"
 TERMINAL_OUTCOME_REQUIREMENT_SCHEMA = "arv2-terminal-outcome-requirement-v1"
-SECURITY_MASTER_REGISTRY_SCHEMA = "arv2-security-master-registry-v1"
+SECURITY_MASTER_REGISTRY_SCHEMA = "arv2-security-master-registry-v2"
 SECURITY_MASTER_REGISTRY_PATH = (
     Path(__file__).resolve().parent / "specs" / "security_master_registry.json"
 )

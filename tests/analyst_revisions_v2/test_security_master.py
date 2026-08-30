@@ -1069,7 +1069,7 @@ def test_production_registry_is_checked_before_symlink_resolution(
     registry = tmp_path / "registry.json"
     registry.write_bytes(
         canonical_json_bytes(
-            {"schema": "arv2-security-master-registry-v1", "entries": []}
+            {"schema": "arv2-security-master-registry-v2", "entries": []}
         )
     )
     monkeypatch.setattr(
@@ -1097,7 +1097,7 @@ def test_positive_registry_path_binds_reviewed_blob_and_rejects_later_substituti
     artifact_path.write_bytes(canonical_json_bytes(_master_payload()))
     registry_path.write_bytes(
         canonical_json_bytes(
-            {"schema": "arv2-security-master-registry-v1", "entries": []}
+            {"schema": "arv2-security-master-registry-v2", "entries": []}
         )
     )
     _git(repo, "init", "-q")
@@ -1121,7 +1121,7 @@ def test_positive_registry_path_binds_reviewed_blob_and_rejects_later_substituti
     registry_path.write_bytes(
         canonical_json_bytes(
             {
-                "schema": "arv2-security-master-registry-v1",
+                "schema": "arv2-security-master-registry-v2",
                 "entries": [entry],
             }
         )
@@ -1141,7 +1141,7 @@ def test_positive_registry_path_binds_reviewed_blob_and_rejects_later_substituti
     registry_path.write_bytes(
         canonical_json_bytes(
             {
-                "schema": "arv2-security-master-registry-v1",
+                "schema": "arv2-security-master-registry-v2",
                 "entries": [entry],
             }
         )

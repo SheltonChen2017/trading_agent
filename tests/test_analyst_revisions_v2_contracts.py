@@ -516,7 +516,7 @@ def test_checked_in_source_authority_is_canonical_zero_access_and_not_rebindable
     authority.write_bytes(
         canonical_json_bytes(
             {
-                "schema": "arv2-research-source-authority-v1",
+                "schema": "arv2-research-source-authority-v2",
                 "authority_mode": "append_only",
                 "authority_id": "caller-controlled",
                 "entries": [hashlib.sha256(b"synthetic").hexdigest()],

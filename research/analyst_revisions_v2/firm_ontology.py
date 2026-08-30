@@ -34,7 +34,7 @@ from .production_registry import require_production_registry_entry
 
 
 FIRM_ONTOLOGY_SCHEMA = "arv2-firm-rating-ontology-v1"
-FIRM_ONTOLOGY_REGISTRY_SCHEMA = "arv2-firm-ontology-registry-v1"
+FIRM_ONTOLOGY_REGISTRY_SCHEMA = "arv2-firm-ontology-registry-v2"
 FIRM_ONTOLOGY_REGISTRY_PATH = (
     Path(__file__).resolve().parent / "specs" / "firm_ontology_registry.json"
 )

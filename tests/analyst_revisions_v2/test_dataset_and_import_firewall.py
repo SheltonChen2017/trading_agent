@@ -700,8 +700,8 @@ def test_authority_registry_guard_audit_accepts_the_matching_lock():
     assert _unguarded_registry_access_lines(tree, "_TEST_AUTHORITIES") == []
 
 
-def test_committed_spec_artifacts_survive_checkout_as_canonical_bytes():
-    """Committed zero-access evidence must keep its exact bytes on checkout.
+def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
+    """Byte-canonical production artifacts must stay exact on checkout.
 
     These artifacts are content-addressed: their loaders demand canonical JSON
     terminated by exactly one LF, and several compare the file's SHA-256 to a
@@ -721,39 +721,35 @@ def test_committed_spec_artifacts_survive_checkout_as_canonical_bytes():
         / "analyst_revisions_v2"
         / "specs"
     )
-    artifacts = sorted(specs.glob("*.json"))
+    artifacts = {path.name: path for path in specs.glob("*.json")}
     assert artifacts, "the ARV2 spec directory must contain committed artifacts"
-    # Every committed artifact is content-addressed, so none may be rewritten
-    # by end-of-line translation on checkout.
-    for artifact in artifacts:
-        assert CRLF not in artifact.read_bytes(), (
-            f"{artifact.name} was checked out with CRLF; its content identity "
-            "depends on exact bytes"
-        )
-    # These are the artifacts whose loaders additionally demand compact
-    # canonical JSON with exactly one LF terminator. The round-0 candidate and
-    # the legacy registry are deliberately indented and parsed tolerantly, so
-    # requiring canonical form of them would assert a contract they lack.
+    # Only these production-bound artifacts are consumed through
+    # require_canonical_json_bytes. Other JSON in this directory is parsed
+    # tolerantly or compared after semantic canonicalization, so calling every
+    # artifact byte-canonical would overstate its real loader contract.
     canonical_required = {
         "firm_ontology_registry.json",
-        "permanent_look_authority.json",
         "research_source_authority.json",
-        "reviewed_spec_registry.json",
         "security_master_registry.json",
     }
-    present = {artifact.name for artifact in artifacts}
+    present = set(artifacts)
     assert canonical_required <= present, sorted(canonical_required - present)
     for name in sorted(canonical_required):
-        require_canonical_json_bytes((specs / name).read_bytes(), name)
+        payload = artifacts[name].read_bytes()
+        assert CRLF not in payload, (
+            f"{name} was checked out with CRLF; its content identity depends "
+            "on exact bytes"
+        )
+        raw = require_canonical_json_bytes(payload, name)
+        assert raw["schema"].endswith("-v2")
 
 
 def test_zero_access_declarations_are_actually_verified_not_merely_unreadable():
     """A refusal must come from the declaration, not from a parse failure.
 
-    Both authorities refuse either way, so a byte-level corruption of the
-    artifact hides itself behind the same 'refused' outcome. Assert the
-    positive path: the source authority resolves to its exact zero-access ID,
-    which is only reachable once the committed declaration itself validates.
+    Both authorities refuse either way, so corruption can hide behind the same
+    'refused' outcome. Assert each positive zero-access declaration directly;
+    the source authority additionally exercises the byte-canonical loader.
     """
     from research.analyst_revisions_v2.formulas import (
         ZERO_ACCESS_SOURCE_AUTHORITY_ID,

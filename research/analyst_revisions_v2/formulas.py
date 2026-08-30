@@ -61,7 +61,7 @@ class ResearchSourceKind(str, Enum):
     TRADE_COST = "trade_cost"
 
 
-RESEARCH_SOURCE_AUTHORITY_SCHEMA = "arv2-research-source-authority-v1"
+RESEARCH_SOURCE_AUTHORITY_SCHEMA = "arv2-research-source-authority-v2"
 ZERO_ACCESS_SOURCE_AUTHORITY_ID = "arv2-zero-access-no-external-source-authority"
 
 

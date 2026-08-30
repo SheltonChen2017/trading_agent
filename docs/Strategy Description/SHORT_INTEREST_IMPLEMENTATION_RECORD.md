@@ -1,11 +1,11 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **LANE SI-3B OUTCOME-FREE EXACT SHORT-RATIO ACCELERATION (`6723590`)
-AND THE SI-3A LINEAGE CLOSURE (`1a1f757`) INDEPENDENTLY REVIEWED AND ACCEPTED
-WITH NO CODE CORRECTION REQUIRED, PENDING CODEX COUNTER-REVIEW OF THE REVIEW
-RECORD. FULL LICENSED SI-1/FULL SI-2, NORMALIZED `S0`/`S1`, `S2`-`S4`, DTC
-DELTA, OUTCOME TESTS, ETF PORTFOLIO, AND QC ALGORITHM/JOB REMAIN
-UNIMPLEMENTED.**
+Status: **LANE SI-3B-I AUTHENTICATED FEATURE-CONTEXT INDEXING (`d1c662b`)
+AND THE COUNTER-REVIEW CORRECTIONS TO CLAUDE'S SI-3B REVIEW (`d70cc51`) ARE
+COMPLETE, PENDING CLAUDE REVIEW OF THIS COMBINED ROUND. SI-3B'S MATHEMATICAL
+STATUS IS UNCHANGED. FULL LICENSED SI-1/FULL SI-2, NORMALIZED `S0`/`S1`,
+`S2`-`S4`, DTC DELTA, OUTCOME TESTS, ETF PORTFOLIO, AND QC ALGORITHM/JOB
+REMAIN UNIMPLEMENTED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -123,6 +123,7 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-08-30 | Codex counter-review + implementation | `5bfd7e1` -> `6723590` (exact code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3A review + lane SI-3B exact short-ratio acceleration | Dispositioned Claude commits `9a3c8a7` and `5bfd7e1` accepted after correction. `1a1f757` authenticates both source snapshots, the latest visible prior, both readiness rows, the complete source/reference context, exact primitive/schema types, and refusal provenance. `6723590` implements only blueprint equation 4.6 as exact signed current delta minus prior delta, retaining every source disposition and named warm-up/refusal. No Trading App/Streamlit work was added. | Exact code/test tree `6723590`: **5,425 passed, 2 skipped, 0 failed, 26 known dependency warnings in 1,160.23s (19m20s)**; complete Short Interest lane **194 passed in 144.75s**; final counter-review/SI-3B focused set **160 passed in 125.12s**; Python 3.12.13; full required compileall including `research` exit 0; `git diff --check` clean. Eighteen deliberate mutation experiments were restored textually: 16 weakened boundaries turned red; two single stale-prior guard removals stayed green because the companion guard was independently load-bearing, and removing both turned red. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/job, broker, database, scheduler, deployment, order, or trading access; **0 research looks**. | No P0/P1. `SI-CCR5-001` through `SI-CCR5-008` and `SI3B-REV-001` through `SI3B-REV-006` are closed. Independent final audits found no remaining P0-P3 issue. Details in section 16. | Commit this record and make the round's single push. Claude reviews every commit in the exact pushed range before any next milestone. Normalization and all still-gated research/execution work remain unimplemented. |
 | 2026-08-30 | Claude review | `5bfd7e1` -> `7cb3154` reviewed; no code correction required (this record commit follows) | Independent review of the SI-3A lineage counter-review closure and the SI-3B exact short-ratio acceleration tranche | Reviewed all three pushed commits individually and accepted each. Verified the SI-3B scope against the owner PDF itself rather than the citation: the blueprint formula list contains `a[i,r] = Δs[i,r] − Δs[i,r−1]` in exactly the cited position, so SI-3B is inside the frozen specification. Accepted every counter-review finding against my own section 15, including `SI-CCR5-004`, which I confirmed by direct probe was a genuine error of mine: my "unreachable" rationale only considered mutating the scalar kind, and a float-kind observation was in fact accepted on my tree `5bfd7e1`. Lane isolation verified by file list; no repository-shared file changed. | Complete suite in a clean detached worktree pinned to `7cb3154`: **5,425 passed, 2 skipped, 0 failed, 25 known dependency warnings in 975.68s (16m15s)**, reproducing the implementer's claim exactly; complete lane **194 passed in 143.81s**, also matching. Recomputed the golden arithmetic independently: prior delta `1/110`, current delta `1/132`, acceleration `-1/660`. Twelve mutations and two attack probes, all restored byte-for-byte: seven guards survived individual removal, and I then ran the attack each one defends and proved every survivor genuinely redundant rather than stopping at a green suite. The restored kind-to-observation guard is now load-bearing. compileall including `research` exit 0; `git diff --check` clean; Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider, licensed row, price, outcome, QuantConnect upload/job, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | No P0, P1, or P2, and no code correction was required. One P3 advisory (`SI-REV6-001`) records the seven individually unpinned guards together with the attack evidence showing no dangerous direction is open; no change is requested. My section 15 errors (`SI-CCR5-002`, `SI-CCR5-004`, `SI-CCR5-006`) are accepted in full. Details in section 17. | Codex counter-reviews this record commit; because no code changed, that scope is this section's accuracy and the `SI-REV6-001` advisory. Normalized `S0`/`S1`, `S2`-`S4`, DTC delta, full licensed SI-1/SI-2, ETF aggregation, every outcome join, and all QuantConnect work remain unimplemented or gated, and the quadratic context lookup must be indexed before any provider-scale vintage. |
+| 2026-08-30 | Codex counter-review + implementation | `fbe71cd` -> `d1c662b` (exact code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3B review + SI-3B-I authenticated-context indexing and parity hardening | Dispositioned Claude commit `fbe71cd` accepted after correction. `d70cc51` closes exact primitive/container and refusal-provenance equality-spoofing gaps, pins both disproved dangerous directions, and corrects the review's lane-test label. `d1c662b` builds immutable readiness/current/prior indices once per authenticated context, caches its digest, preserves the legacy PIT visibility rule and every exact payload/hash/refusal, and adds no formula, score, parameter, outcome, ETF, or QC runtime. No Trading App/Streamlit work was added. | Exact code/test tree `d1c662b`: **5,441 passed, 2 skipped, 0 failed, 26 known dependency warnings in 1,348.85s (22m28s)**; complete seven-file Short Interest lane **210 passed in 147.64s**; final import/feature/acceleration set **110 passed in 122.06s**; pre-SI-3B-I five-file counter-review set at `d70cc51` **181 passed**; active-document consistency **63 passed in 0.93s**; Python 3.12.13, pytest 9.1.1; full required `compileall -q` including `research` exit 0; `git diff --check` clean. Five grouped counter-review mutations and seven SI-3B-I mutations turned their intended guards red before restore; independent code, adversarial, and test audits found no remaining P0-P3 issue. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/job, broker, database, scheduler, deployment, order, or trading access; **0 research looks**. | No P0/P1 remains. `SI-CCR6-001` through `SI-CCR6-005` and `SI3BI-REV-001` through `SI3BI-REV-003` are closed. Claude's `SI-REV6-001` advisory and 172-test label were materially inaccurate and are superseded by section 18. The new index closes the named per-disposition lookup/digest bottleneck, but pre-existing readiness/reference construction remains a provider-scale performance gate. | Commit this record and make the round's single push. Claude reviews every commit in the exact pushed range before any next milestone. Normalized scores and every still-gated research/execution stage remain unimplemented. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -1385,3 +1386,165 @@ artifact, upload, or job. Full licensed SI-1 remains blocked on an owner-approve
 historical/vintage short-interest source. The quadratic context lookup must be
 indexed before any provider-scale vintage. Future work in this lane stays Short
 Interest/QC-specific; Trading App and Streamlit work remain out of scope.
+
+## 18. Codex counter-review and implementation - 2026-08-30 (SI-3B-I authenticated-context indexing)
+
+Codex counter-reviewed Claude's exact latest lane commit and then implemented
+one bounded, outcome-free support milestone on the same branch and in the same
+worktree. **Disposition: accepted after correction.** Claude made no production
+code change, but its review record contained two disproved safety/test claims
+and one inaccurate suite label. The counter-review hardened the affected
+contracts and tests before SI-3B-I began. No P0 or P1 issue remains.
+
+### 18.1 Exact reviewed and implemented snapshots
+
+| Item | Exact value |
+|---|---|
+| Lane branch and worktree | `codex/strategy-short-interest` at `C:\git\customizedagent\trading_agent_short_interest` |
+| Base before Claude's record | `7cb31544dee51da59b3af61f7388453589ba330f` |
+| Exact Claude commit reviewed | `fbe71cdf0d14f24326805188640bca971c0647c5` (`7cb3154..fbe71cd`, one documentation commit) |
+| Counter-review correction | `d70cc51dbc996fd46e9d9e5f411676306c367c76` |
+| SI-3B-I code/test snapshot | `d1c662b45ddee814689fe0c93aa23cc53268e92e` |
+| Lane-record commit | follows this entry |
+| Interpreter | Python 3.12.13, pytest 9.1.1 (repository virtualenv) |
+
+### 18.2 Counter-review disposition and issue ledger
+
+Claude commit `fbe71cd` is accepted after the corrections below. The historical
+section 17 remains intact, but the affected `SI-REV6-001` assertions and the
+172-test label are superseded by this section.
+
+| ID | Priority | Status | Finding | Correction and verification |
+|---|---:|---|---|---|
+| SI-CCR6-001 | P2 | Closed in `d70cc51` | A tuple subclass could compare equal to the genuine `StockDataReadiness.refusal_reasons` or `StockFeatureDisposition.refusal_reasons`, retain otherwise genuine context lineage, and propagate forged refusal provenance. | Require an exact tuple container as well as exact canonical string members. Direct equality-spoof constructions are refused; reverting the checks makes three tests fail. |
+| SI-CCR6-002 | P2 | Closed in `d70cc51` | `_integer` admitted integer subclasses and `_decimal_text`/`_git_commit` admitted string subclasses. A forged manifest count or noncanonical decimal subclass could pass the writer while producing a durable payload rejected by the exact reader. | Require exact `int` and exact `str` primitives at these persisted boundaries. Reverting the primitive guards makes two dangerous-direction tests fail. |
+| SI-CCR6-003 | P3 | Closed in `d70cc51` | Exact-member checks did not reject tuple subclasses for vintage snapshots/releases/refusals, PIT lifecycle/classification collections, or unresolved corporate actions. This left sibling equality/iteration behavior outside the frozen contract. | Require exact outer tuples at every swept sibling boundary. Reverting the group makes four tests fail. |
+| SI-CCR6-004 | P3 | Closed in `d70cc51` | Claude's `SI-REV6-001` said seven individually unpinned guards were genuinely redundant after attack probes. That conclusion was false for two dangerous directions. Removing only the non-ready `prior_readiness` guard admits a real non-ready row with an exact authenticated prior. Disabling the three acceleration prior-chain guards together admits the older same-settlement r1 instead of authenticated r2 and changes the acceleration from `-7/300` to `-41/3300`. | Added direct malicious constructions for both paths. Removing the non-ready guard now fails one test; disabling the three acceleration guards together now fails one test. The production guards themselves were retained. |
+| SI-CCR6-005 | P3 | Closed by this record | Section 17 repeatedly called 172 tests the complete lane. It was a five-file mutation subset; the complete seven-file Short Interest lane at the reviewed snapshot was 194 tests. | This record distinguishes affected/focused sets from the seven-file lane and records the final lane as 210 tests. |
+
+The correction is deliberately broader than the two first equality-spoofing
+examples: the exact-type sweep covered the persisted primitive helpers and
+every sibling tuple boundary in the lane-owned contracts. It did not change any
+formula, readiness policy, or valid canonical payload.
+
+### 18.3 Why SI-3B-I is the next bounded milestone
+
+The governing blueprint's stock-feature formulas were rechecked on physical
+PDF pages 15-16. The feature/signal layer currently emits only equations 4.2,
+4.4, and 4.6: short-interest ratio, its change, and exact acceleration. SI-1
+already recomputes equation 4.3 days-to-cover for snapshot-integrity checking,
+but no DTC-delta signal exists. The next mathematical signals are not
+implementable without inventing owner parameters:
+
+- normalized `S0` and `S1` still need the epsilon, winsor rule, minimum peer
+  count, zero-MAD behavior, PIT taxonomy/cohort, and interpolation policy;
+- days-to-cover change still needs the exact trailing ADV window `K`; and
+- `S2`-`S4` depend on those unresolved choices or later research gates.
+
+SI-3B-I therefore implements only the parameter-free performance prerequisite
+identified in section 17: authenticate and index the existing feature context
+without changing its schema payload, formulas, refusals, ordering, or hashes.
+This is a support tranche under SI-3B, not completion of normalized `S0`/`S1`
+or advancement to a new signal stage.
+
+### 18.4 SI-3B-I technical and plain-language contract
+
+`StockFeatureSourceContext` still rebuilds the complete readiness tuple from the
+source vintage and reference bundle and requires exact equality before it
+derives any index. It then:
+
+1. groups authenticated source snapshots by stable
+   `(security_id, settlement_date)`;
+2. uses each readiness row's `execution_at`, already derived from release,
+   revision, denominator, and volume availability, as the opening instant;
+3. answers every immediate-prior-settlement query in one sorted availability
+   sweep while retaining the latest published visible revision per logical ID;
+4. preserves the legacy refusal for multiple visible logical IDs;
+5. stores readiness, current-snapshot, and prior-snapshot lookups behind
+   `MappingProxyType`; and
+6. caches the canonical context digest only after the authenticated payload has
+   been constructed.
+
+Feature and acceleration dispositions now consume those derived lookups. The
+canonical `to_payload()` remains unchanged; the private maps and cache are not
+serialized facts. Hard-coded disposition ordering, refusal tuples, and exact
+SHA-256 values pin byte-for-byte parity for both the raw-feature and
+acceleration batches.
+
+In plain language: the same point-in-time answer is prepared once and reused,
+instead of repeatedly searching the entire vintage for every row. No market
+rule or score changed.
+
+### 18.5 SI-3B-I audit findings closed before `d1c662b`
+
+| ID | Priority | Status | Finding | Correction and proof |
+|---|---:|---|---|---|
+| SI3BI-REV-001 | P2 | Closed in `d1c662b` | The first implementation imported standard-library `types`, but the lane's explicit import allowlist did not include it, so the complete lane failed its boundary test. | Added only `types` to the standard-library allowlist. The complete import-boundary file passed, and the final lane is green. |
+| SI3BI-REV-002 | P2 | Closed in `d1c662b` | Initial functional parity and call-count tests did not prove the public accessors actually used the private indices; reverting them to linear scans stayed green. | Added probe indices whose `.get()` calls are observed directly. Linear-scan or legacy-resolver accessor reversions now fail. |
+| SI3BI-REV-003 | P2 | Closed in `d1c662b` | Initial differential cases did not pin `revision_at > previous[0]` when an older published revision becomes available after a newer revision. Deleting that guard could overwrite r3 with stale r2 at a later cutoff. | Added an unsorted, non-monotonic availability fixture and compared the index to `visible_source_snapshots_as_of`. Deleting the comparator guard fails exactly that test; restore passes. |
+
+Three independent read-only audits then found no remaining P0-P3 code or test
+issue. They confirmed parity for visible corrections, future-input corrections,
+same-open revisions, stable-ID/ticker-change joins, reversed inputs, ambiguity
+refusal, complete event retention, immutable maps, cached digest use, and exact
+raw/acceleration hashes. Normal frozen-dataclass construction and
+`dataclasses.replace` rebuild coherent maps and cache. Arbitrary
+`object.__setattr__` can bypass any frozen dataclass and is outside the lane's
+ordinary caller-mutation threat model; canonical serialization remains
+`to_payload()`, not pickle/deepcopy.
+
+### 18.6 Validation and mutation evidence
+
+- Exact code/test tree `d1c662b`: **5,441 passed, 2 skipped, 0 failed, 26 known
+  dependency warnings in 1,348.85s (22m28s)**.
+- Complete Short Interest lane (all seven files): **210 passed in 147.64s**.
+  Final import-boundary/feature/acceleration set: **110 passed in 122.06s**.
+  The pre-SI-3B-I five-file counter-review set at `d70cc51` passed **181
+  tests**. The active-document consistency suite passed **63 tests in 0.93s**
+  after this record was written.
+- Full required `compileall -q` across application, research, and tests exited
+  0. `git diff --check` was clean.
+- Five grouped counter-review mutations turned red: persisted primitive exact
+  types, refusal tuple provenance, outer tuple containers, the non-ready prior
+  guard, and the combined acceleration prior chain.
+- Seven SI-3B-I mutations turned red before textual restore: digest
+  recomputation, mutable dictionaries, publication-only availability,
+  duplicate index construction, ticker rather than stable-ID joins, reversed
+  revision precedence, and deleted revision precedence under non-monotonic
+  availability. The independent probe-index audit additionally verified that
+  linear/legacy accessor reversions are killed.
+- Hard-coded raw disposition hashes remain
+  `d4ce9e3524f3b96d196586236ade80fe04c64e624a8c3f82c65a6bb13a25652c`
+  and `47573a11368005b3ff3d36a86bebf4a646eb8f526a2528512fb1c1d381595b95`.
+  Acceleration disposition hashes remain
+  `2ed654c211fb30cd02b838433796258a79f3f9f527399410b07a9172f1747608`,
+  `812011828346781049bc97d79e14f69e6f39273a93cedc8244ee221dfa8a8ee2`,
+  and `04b4e3889653c51957daaea05e031e8d4ef1f68bc64a7591e8d49a7751a33d2a`.
+
+### 18.7 Honest performance boundary, scope, and next action
+
+SI-3B-I closes only the documented per-disposition current/prior/readiness
+scans, repeated legacy prior selection, and repeated context digesting. After
+one O(n log n) worst-case / O(n)-space index build, those context lookups are
+O(1).
+
+It does **not** make the end-to-end feature builder provider-scale. The
+pre-existing `build_stock_data_readiness` path still scans the vintage per
+distinct execution cutoff and scans lifecycle/classification reference tuples
+per source row; the authenticated context deliberately recomputes readiness,
+so that work currently occurs twice. Worst-case readiness/reference
+construction therefore remains quadratic or O(nR). This is the next
+provider-scale performance gate, not a correctness defect and not permission
+to access provider data.
+
+All inputs and tests in this round were synthetic and offline. No credential,
+provider/licensed row, price, outcome, QuantConnect artifact/upload/job, broker,
+operator database, scheduler, deployment, order, or trading access occurred.
+Permanent research looks used: **0**. No unrelated Trading App/Streamlit defect
+surfaced, and no unrelated file was changed.
+
+The next action is this round's single push of every commit after `fbe71cd`.
+Claude independently reviews that exact pushed range on this same branch before
+Codex starts another milestone. Normalized signals, full licensed ingest, ETF
+aggregation, outcomes, portfolio stages, and all QuantConnect runtime work
+remain unimplemented or gated.

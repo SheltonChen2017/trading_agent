@@ -11,18 +11,26 @@ by this documentation task.
 ## 0. Target-Price Revision fourth-lane planning addition
 
 - The owner directed a new sibling worktree at
-  `C:\git\customizedAgent\trading_agent_TargetPriceRevision` on branch
+  `C:\git\customizedagent\trading_agent_target_price` on branch
   `codex/strategy-target-price-revisions`, based on exact `main` commit
-  `086b782e43a5ff889e71ec8e26334bb791ccac74`. The branch was local-only when
-  this documentation snapshot was prepared; no push or merge was performed.
+  `086b782e43a5ff889e71ec8e26334bb791ccac74`. The documentation round is
+  **pushed and merged**: lane head `70c4b9fea1ac119f86901e95b9108820aa80e028`
+  is published and reachable from `origin/main` through PR #324 merge
+  `1a5264e6b1de3caf5477477d1312a762b2d42419`. Another computer can retrieve
+  it with `git fetch`. Note that the merge preceded the mandated independent
+  review recorded below, which was performed afterwards against the same
+  published range.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (26 pages; SHA-256
   `9f00dd56bf7bec79b3f5362bba61fe71768d1f25e6e4350631dafd1253682633`).
   Its authoritative lane state is
   `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
-  The submitted source PDF remains proposal content only; its SHA-256 is
-  `53c549aef18aa1a63e6db8deb184bd654eb8ec637bb4ff3ae03f29abc4a2df0`.
+  The submitted source PDF remains proposal content only. The SHA-256
+  transcribed for it, `53c549ae...4a2df0`, is 63 hexadecimal characters and
+  therefore malformed; the file is not in the repository, so it cannot be
+  recomputed. That pin establishes no provenance until the owner re-supplies
+  the source or its exact digest.
 - The revised plan treats target-price revisions as a separate family from the
   rating-only Analyst Revisions V2 lane. It adopts stock-first null closure,
   cutoff-safe corrections, institution/catalyst independence, binary validity,
@@ -49,10 +57,15 @@ by this documentation task.
   permanent look budget and null disposition. The owner must also amend the
   common multiplicity/final-holdout contract to four families or explicitly
   exclude TPR. Local configuration cannot grant that authority.
-- The exact next step is to complete the current Codex documentation round and
-  make its one end-of-round push when publication is requested. Claude then
-  independently reviews the exact pushed range on this same branch/worktree.
-  TPR-0 is not started by creating the worktree. Provider/data access, outcome
+- Claude's independent review of the published range `c179801..70c4b9f` is
+  complete: both commits are **accepted after correction**, with no P0 or P1
+  finding, three P2 and three P3 findings, and corrections committed on this
+  same lane branch. The lane's P0-P3 ledger and commit dispositions are in
+  section 11 of the lane record. The exact next step is Codex's counter-review
+  of every Claude commit; TPR-0 may follow only if the snapshot is accepted
+  and no owner decision is outstanding. Two findings need owner decisions
+  before they can close: the blueprint's line-ending storage defect and the
+  malformed source pin. TPR-0 is not started by creating the worktree. Provider/data access, outcome
   research, ETF work, QC execution, shadow, paper, live and unattended
   operation remain separately gated.
 - `docs/ACTION_PLAN_2026-08-20.md` receives only the concise sequencing and

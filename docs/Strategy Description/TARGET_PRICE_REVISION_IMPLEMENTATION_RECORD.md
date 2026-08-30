@@ -9,7 +9,7 @@ BROKER CONNECTION, OR LIVE-TRADING AUTHORITY EXISTS.**
 Branch: `codex/strategy-target-price-revisions`
 
 Worktree:
-`C:\git\customizedAgent\trading_agent_TargetPriceRevision`
+`C:\git\customizedagent\trading_agent_target_price`
 
 Base commit:
 `086b782e43a5ff889e71ec8e26334bb791ccac74`
@@ -22,8 +22,16 @@ Governing plan SHA-256:
 
 Governing plan page count: **26**.
 
-Submitted source-plan SHA-256:
-`53c549aef18aa1a63e6db8deb184bd654eb8ec637bb4ff3ae03f29abc4a2df0`
+Submitted source-plan SHA-256: **MALFORMED AND UNVERIFIABLE.** The value
+transcribed into this record and the governing PDF, `53c549ae...4a2df0`,
+is 63 hexadecimal characters and therefore cannot be a SHA-256 digest.
+The submitted proposal is not stored in this repository, so the value
+cannot be recomputed here. This pin establishes no provenance until the
+owner re-supplies the source file or its exact 64-character digest.
+
+Sequencing index: `docs/ACTION_PLAN_2026-08-20.md`. Canonical cross-computer
+state: `docs/SESSION_HANDOFF.md`. Both receive only concise coordination and
+status references for this lane; this record owns the lane's detail.
 
 The governing PDF and this record are specifications, not research evidence,
 deployment approval, or trading authority. Codex is the primary implementer
@@ -33,7 +41,7 @@ and Claude is the independent reviewer.
 serialized same-branch lane workflow to Target-Price Revisions. All Codex
 implementation, Claude review, Codex counter-review/correction, and the next
 bounded milestone remain on `codex/strategy-target-price-revisions` in
-`C:\git\customizedAgent\trading_agent_TargetPriceRevision`. A role may create
+`C:\git\customizedagent\trading_agent_target_price`. A role may create
 several commits during its round, but makes only one push at the end of that
 round. No review, counter-review, checkpoint, handoff, or feature branch is
 created. This decision supersedes only the governing PDF's generic
@@ -308,12 +316,18 @@ paper deployment, or live deployment is authorized merely by this workflow.
 
 ## 8. Exact next step
 
-The exact next step is to finish the current Codex documentation round, then
-make its single end-of-round push when the owner requests publication. Claude
-then independently reviews the complete pushed documentation range on this
-same branch and worktree. After that review, Codex counter-reviews every Claude
-commit. Only if the planning snapshot is accepted or accepted-after-correction
-and no owner/gate blocker remains may the same Codex round implement TPR-0.
+The Codex documentation round was pushed and merged to `main` through PR #324
+(`1a5264e6b1de3caf5477477d1312a762b2d42419`). Claude's independent review of
+the exact published range `c179801..70c4b9f` is complete and recorded in
+section 11: both commits are accepted after correction, with no P0 or P1
+finding.
+
+The exact next step is Codex's counter-review of every Claude commit in this
+review round. Two findings cannot close without an owner decision: the
+blueprint's line-ending storage defect (`TPR-CR1-001`) and the malformed
+submitted-source pin (`TPR-CR1-004`). Only if the snapshot is accepted or
+accepted-after-correction and no owner/gate blocker remains may the same Codex
+round implement TPR-0.
 
 If scheduled, TPR-0 is limited to the content-addressed preregistration and
 zero-outcome structural controls named above. It grants no provider purchase
@@ -327,9 +341,15 @@ row with sufficient evidence for later owner routing. `None` is the current
 measured state; it is not a claim that the rest of the repository is defect
 free.
 
+The owner's standing session rule, 2026-08-29, restates this boundary in a
+second form: this session is dedicated to trading strategies, not the general
+health of the trading application. An issue outside trading strategy is
+documented here and deliberately not fixed.
+
 | ID | Severity | External area / paths | Evidence and lane impact | Disposition / future route |
 |---|---|---|---|---|
-| None | - | - | No out-of-lane finding was established during the documentation-only planning work. | No action. |
+| `TPR-OOL-001` | P2 | Repository-wide Git plumbing: no `.gitattributes` exists at any level, and `core.autocrlf=true` is set in the system Git configuration | Git finds no NUL byte in the target-price blueprint, so it classifies the PDF as text and rewrites its 557 LF bytes to CRLF on checkout. The working file is 78,082 bytes and hashes to `6ee7ea5e...4330`, while the committed blob is 77,525 bytes and hashes to the pinned `9f00dd56...2633`. `pdftotext` reports a damaged xref table on the working copy. The other four PDFs contain NUL bytes early and check out byte-identically. Lane impact is `TPR-CR1-001`. | A `*.pdf binary` attribute is repository-wide plumbing rather than trading-strategy work, and `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 2 requires a shared-file change to stop for one owner-coordinated common-baseline amendment. Documented, not fixed. Owner decision required. |
+| `TPR-OOL-002` | P3 | `docs/Strategy Description/README.md` | The lane table and the surrounding prose describe a three-strategy program and omit Target-Price Revisions entirely, so a reader who starts at the directory README does not discover this lane, its branch, or its record. | That README is named in the parallel-workflow frozen-file list, so it needs the same owner-coordinated common-baseline amendment rather than a fourth competing edit. Documented, not fixed. |
 
 ## 10. Session / commit ledger
 
@@ -341,4 +361,98 @@ known.
 |---|---|---|---|---|---|---|---|---|
 | 2026-08-29 | Codex planning | `086b782e43a5ff889e71ec8e26334bb791ccac74` -> documentation candidate | Documentation only | Created the dedicated branch/worktree, corrected the target-price research/QC plan, added separately gated shadow, paper, restricted-live, and bounded-unattended stages, and recorded lane governance; no code or data. | PDF generated with ReportLab; `pdfinfo` reports 26 letter-size pages and no encryption, JavaScript, forms, or suspect state; all 26 rendered pages visually inspected; extracted text contains every part and final gate; 67 active-document tests passed; the three Markdown staged paths pass `git diff --check`; the staged PDF blob is byte-identical to the visually reviewed file and pinned SHA-256; 0 outcome accesses; 0 looks. | Target-price revisions require a separate family, provider normalizer, timing/basis audit, four-family multiplicity decision, permanent look authority, and independent review. | None; all production, outcome, QC, broker, paper, and live authority remains zero. | Claude independently reviews the exact documentation snapshot; implementation waits for Action Plan scheduling. |
 | 2026-08-29 | Codex documentation | `c1798013d911ef54dba82157326c826ac7763ec3` -> workflow-override candidate | Owner workflow direction | Recorded the explicit same-branch/same-worktree serialized loop, several-commits/one-push-per-role-round rule, target-only branch boundary, and document-but-do-not-fix rule for external findings. The override supersedes only the PDF's prior separate-review-branch wording. | 67 active-document tests passed; Markdown `git diff --check` clean; 0 provider/outcome/QC/broker accesses; 0 looks. | No out-of-lane finding established. | Workflow topology only; no implementation, source, outcome, QC, paper, live, deployment, or capital authority added. | Keep the cumulative Codex round local until its single end-of-round push is requested; Claude then reviews the exact pushed range on this branch/worktree. |
+| 2026-08-29 | Claude review | `c1798013d911ef54dba82157326c826ac7763ec3` -> `70c4b9fea1ac119f86901e95b9108820aa80e028` reviewed; corrections on this same lane branch | Independent review of the documentation planning snapshot | Reviewed both published commits individually with complete diffs, read the governing blueprint end to end, and verified the record against it. Corrected the worktree path, the stale local-only/unmerged push state, the malformed submitted-source pin, and the missing Action Plan and Session Handoff coordination pointers. Added the lane's first three documentation guards. | Active-document suite 67 -> **70 passed**; five reverse mutations each turned exactly one new guard red with green restore; `compileall` exit 0; blueprint content digest re-verified as `9f00dd56...2633` over LF-normalized bytes. Repository-wide `git diff --check` is **red** on the blueprint alone, which is finding `TPR-CR1-001`, not a new regression. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | Both commits accepted after correction. No P0/P1. `TPR-CR1-002`, `TPR-CR1-003`, `TPR-CR1-005` and `TPR-CR1-006` closed; `TPR-CR1-001` open on an owner decision; `TPR-CR1-004` closed in Markdown with two blueprint instances open. `TPR-OOL-001` and `TPR-OOL-002` documented and deliberately not fixed. Details in section 11. | None; all production, outcome, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. TPR-0 remains unscheduled and additionally blocked on the two owner decisions. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
+
+## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
+
+**Disposition: accepted after correction.** No P0 or P1 issue exists. The
+planning content itself is sound: the separate-family boundary, stock-first
+null closure, four clocks, cutoff-safe corrections, binary validity versus
+measured reliability, the three coverage concepts, the hard 99% mapping gate,
+raw ETF exposure without covered-weight renormalization, immutable QC packets,
+and the four separately authorized promotion stages are internally consistent
+and materially stronger than the submitted proposal they replace. Every defect
+below is in the lane's provenance, governance and status records rather than
+in its research design.
+
+### 11.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch | `codex/strategy-target-price-revisions` |
+| Reviewed range | `c1798013d911ef54dba82157326c826ac7763ec3..70c4b9fea1ac119f86901e95b9108820aa80e028` |
+| Base | `086b782e43a5ff889e71ec8e26334bb791ccac74` |
+| Remote head at review | `70c4b9fea1ac119f86901e95b9108820aa80e028`, matching local |
+| Published state | merged to `origin/main` by PR #324 merge `1a5264e6b1de3caf5477477d1312a762b2d42419` |
+| Corrections | committed on this same lane branch, per the owner's same-branch topology |
+| Environment | Windows 11, Python 3.14, pytest 9.1.1 |
+
+The owner's same-branch override was followed instead of
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` section 1, which would
+otherwise require a separate review branch. Review independence here rests on
+role separation, the exact published commit range, and explicit dispositions.
+
+### 11.2 Commit dispositions
+
+Every commit in the range was read individually with its complete diff. No
+combined diff was substituted.
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `c1798013d911ef54dba82157326c826ac7763ec3` | **accepted after correction** | Introduced the blueprint, the lane record, and the Action Plan and Session Handoff references. Carries `TPR-CR1-001`, `TPR-CR1-002`, `TPR-CR1-004`, `TPR-CR1-005` and `TPR-CR1-006`. The research content is accepted as written. |
+| `70c4b9fea1ac119f86901e95b9108820aa80e028` | **accepted after correction** | Recorded the owner's same-branch workflow override and correctly scoped it to supersede only the blueprint's separate-review-branch wording on physical pages 3, 21, 23 and 26. Carries `TPR-CR1-003` and repeats `TPR-CR1-005`. |
+
+### 11.3 P0-P3 issue ledger
+
+Resolved items are retained. There is no P0 or P1 finding.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR1-001` | P2 | **Open - owner decision** | `c179801` | `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf` | The governing blueprint is stored as a Git *text* blob, so a Windows checkout rewrites its line endings. Three consequences: the working PDF is damaged and reports a broken xref table, the record's pinned SHA-256 cannot be reproduced by hashing the checked-out file, and `git diff --check` is now permanently red for the whole repository, which conflicts with the `CLAUDE.md` section 10 validation this project runs before every handoff. | Committed blob 77,525 bytes hashing `9f00dd56...2633`; working file 78,082 bytes hashing `6ee7ea5e...4330`; the 557-byte delta equals the 557 lone LF bytes in the blob; the file contains no NUL byte at any offset, while the analyst blueprint's first NUL is at offset 2,739; `git diff --check 086b782..HEAD` reports trailing-whitespace errors on this file alone. The section 10 ledger row claims only that "the three Markdown staged paths pass `git diff --check`", which is literally true and silently excludes the one path that fails. | A governing specification whose pinned digest cannot be verified from a checkout is not a content-addressed artifact, and a permanently red `git diff --check` trains every future round to ignore a mandated check. | Not fixed here. Both remedies fall outside this session's trading-strategy scope or the frozen-file rule: a `*.pdf binary` attribute is repository-wide plumbing (`TPR-OOL-001`), and regenerating the blueprint would change the identity of a governing artifact during a review round. Partially mitigated: the new guard pins the blueprint by LF-normalized content digest, which is stable on every platform and keeps passing after either remedy. | `test_target_price_lane_blueprint_is_pinned_to_its_record` passes; replacing the normalization with the raw bytes turns it red on this host (`1 failed`), independently reproducing the corruption. |
+| `TPR-CR1-002` | P2 | Closed | `c179801` | `tests/` (no file) | The lane shipped with **zero** test coverage. All three sibling lanes are bound record-to-blueprint by digest in `test_three_strategy_parallel_baseline_is_exact_and_fail_closed`; the fourth lane was never added to it or to any other guard, so nothing checked its pin, its provenance values, or its coordination references. This is the root cause that let `TPR-CR1-001`, `TPR-CR1-004` and `TPR-CR1-006` reach `main` with a green suite. | `grep -rn` for `target.price`, `TARGET_PRICE` and the lane branch across `tests/` matched only stale `__pycache__` binaries and no source file. The 67-test active-document suite passed on the uncorrected tree. | The repository's documentation-governance guards are the only mechanism that makes a lane record's provenance claims checkable; a lane exempt from them is unverified by construction, and the exemption was silent rather than declared. | Added three guards to `tests/test_active_document_consistency.py`: `test_target_price_lane_blueprint_is_pinned_to_its_record`, `test_target_price_lane_documents_agree_on_one_worktree`, and `test_no_active_document_pins_a_malformed_sha256`. | Suite grows 67 to 70 passed. Five mutations each turn exactly one new guard red and restore returns green: digest pin altered, normalization removed, record digest removed, worktree drift reintroduced, malformed pin reintroduced. |
+| `TPR-CR1-003` | P2 | Closed | `70c4b9f` | `docs/SESSION_HANDOFF.md:16-17`, section 8 of this record | The canonical cross-computer handoff stated the branch "was local-only" with "no push or merge was performed", and section 8 said the next step was to push when publication is requested. The branch was in fact published and merged into `origin/main` seven minutes after the second commit. A reader resuming on another machine would conclude the work is unfetchable. The merge also preceded the independent review these same documents name as mandatory. | `git merge-base --is-ancestor 70c4b9f origin/main` returns 0; PR #324 merge `1a5264e` is dated 2026-08-29 16:53:03 -0700 against commit timestamps 16:32:48 and 16:46:37. | This is the fourth recorded instance of the class documented in `test_no_document_calls_a_merged_commit_unreachable` (CCR-005, CCX-004): a push or merge claim written inside the commit being pushed is false by construction the moment it lands, and the handoff is the one document another computer relies on. | The handoff now records the published head, the PR #324 merge commit, that `git fetch` retrieves it, and that the merge preceded this review. Section 8 and the Action Plan row now carry the same state. | The active-document suite passes on the corrected tree, including the existing reachability guards. |
+| `TPR-CR1-004` | P3 | Closed in Markdown; blueprint instances **open** | `c179801` | This record, `docs/SESSION_HANDOFF.md`, blueprint pages 1 and 25 | The pinned SHA-256 of the owner's submitted source proposal is 63 hexadecimal characters and therefore cannot be a SHA-256 at all. The submitted PDF is not stored in the repository, so the digest cannot be recomputed and the provenance of the document this lane was derived from is unestablished. | Length measured at all four sites. A repository-wide scan of every non-archived Markdown document for hex runs of 55 to 80 characters found exactly these two Markdown instances and no other malformed pin, so the defect does not generalize beyond this lane. | An unverifiable pin presented as a digest reads as provenance evidence while providing none. | Both Markdown sites now state plainly that the value is malformed and unverifiable, and show it truncated so it can no longer be mistaken for a usable pin. The two instances inside the blueprint cannot be corrected without regenerating that PDF, which is deferred with `TPR-CR1-001`. | `test_no_active_document_pins_a_malformed_sha256` was red against the uncorrected documents and is green after correction; reintroducing the full 63-character value turns it red again. |
+| `TPR-CR1-005` | P3 | Closed | `c179801`, `70c4b9f` | This record, `docs/ACTION_PLAN_2026-08-20.md:34`, `docs/SESSION_HANDOFF.md:14` | All three documents pinned a worktree whose directory name ended in `TargetPriceRevision`. No such directory exists. The registered worktree is `C:\git\customizedagent\trading_agent_target_price`. Because the workflow binds the lane to one named branch *and* one dedicated worktree, the resume instructions pointed at nothing. | `git worktree list` shows five registered worktrees; the target lane's is `C:/git/customizedagent/trading_agent_target_price`. | The lane record replaces the root handoff for lane resumption, so a wrong path defeats the cross-computer purpose the topology exists to serve. | All three documents now name the real directory. | `test_target_price_lane_documents_agree_on_one_worktree` passes; reintroducing the old name in the handoff alone turns it red, so future drift between the three documents fails rather than passing silently. |
+| `TPR-CR1-006` | P3 | Closed | `c179801` | This record, header block | The record carried neither `docs/ACTION_PLAN_2026-08-20.md` nor `docs/SESSION_HANDOFF.md` as an explicit pointer, although the sibling-lane guard requires exactly those two references in every other lane record. A reader holding only this record could not locate the sequencing index or the canonical handoff. | The new guard's assertion failed on the uncorrected record before any other change was made. | The lane record is the lane's sole status and handoff ledger; without the two coordination pointers it is not self-sufficient for resumption. | The header block now names both documents and states that each receives only concise coordination and status references. | Covered by `test_target_price_lane_blueprint_is_pinned_to_its_record`; removing either reference turns it red. |
+
+### 11.4 What was verified rather than accepted
+
+- The blueprint's 26-page count was confirmed independently from its own
+  `/Count 26` page-tree object and its rendered page-26 footer, not from the
+  ledger's `pdfinfo` claim. Its metadata records
+  `/Producer (ReportLab PDF Library)` and
+  `/Author (OpenAI Codex, prepared for Shelton Chen)`, so this blueprint is an
+  agent-authored artifact rather than an owner-supplied immutable input. The
+  `docs/Strategy Description/README.md` rule that "the PDF governs" was written
+  for owner-supplied PDFs and should not be read as protecting this one from
+  correction.
+- The complete blueprint text was read end to end and cross-checked against
+  this record. The record's summary is faithful; no gate is softened, renamed,
+  or dropped between the two documents.
+- The claimed 67-passing active-document suite was reproduced exactly.
+- The base commit, remote head, ancestry, and merge state were resolved from
+  Git rather than from the records.
+- The record's statement that the override supersedes only the
+  separate-review-branch wording was checked against the blueprint's actual
+  pages 3, 21, 23 and 26 (governance correction, section 36, section 40, and
+  correction `C18`). It is accurate, and no research or safety gate is
+  weakened by the override.
+
+### 11.5 Scope not exhaustively audited
+
+- The blueprint's 26 rendered pages were not visually inspected; the complete
+  text layer was read instead, and the working copy cannot currently be
+  rendered on this host because of `TPR-CR1-001`.
+- The economic literature cited in appendix A4 was not re-verified.
+- No provider documentation, entitlement, or endpoint behavior was checked.
+  The source-capability statements in the blueprint's section 7 remain
+  unmeasured assumptions, which that section itself declares.
+
+### 11.6 Authority state after this review
+
+Unchanged and zero. This review accessed no provider, credential, licensed
+row, outcome, evidence epoch, QuantConnect project, broker, operator database,
+scheduler, paper surface, or live surface, and spent **0 research looks**. No
+live-assistant behavior can change: the only executable change is three
+additional documentation guards inside an existing test module.

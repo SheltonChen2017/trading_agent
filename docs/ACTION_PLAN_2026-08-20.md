@@ -31,7 +31,7 @@ review. **Later owner workflow decision, 2026-08-29:** this target lane uses
 the serialized Codex-write -> Claude-review -> Codex-counter-review plus next
 milestone -> Claude-review loop on the one long-lived
 `codex/strategy-target-price-revisions` branch and dedicated
-`trading_agent_TargetPriceRevision` worktree. Each role may make several
+`trading_agent_target_price` worktree. Each role may make several
 commits in its round but pushes exactly once at the end; no review,
 counter-review, checkpoint, handoff, or feature branch is created. The branch
 and worktree are target-price-only. Findings outside this feature are recorded
@@ -193,7 +193,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
 | Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
-| Target-Price Revisions (TPR) | Separate fourth planning lane, documentation-only and unaccepted. The revised PDF and implementation record define a stock-first target-price family and a later, independently gated QC/autopilot ladder. The owner-directed serialized same-branch, one-push-per-role-round workflow applies in the dedicated target worktree. No authenticated source, event, signal, outcome access, look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
+| Target-Price Revisions (TPR) | Separate fourth planning lane, documentation-only. The published range `c179801..70c4b9f` is merged to `main` (PR #324) and **accepted after correction** by independent review; Codex counter-review is the next step and TPR-0 is unscheduled. The revised PDF and implementation record define a stock-first target-price family and a later, independently gated QC/autopilot ladder. The owner-directed serialized same-branch, one-push-per-role-round workflow applies in the dedicated target worktree. No authenticated source, event, signal, outcome access, look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0

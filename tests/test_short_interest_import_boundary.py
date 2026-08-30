@@ -140,6 +140,7 @@ def test_lane_package_has_no_provider_outcome_or_authority_imports():
         "json",
         "pathlib",
         "re",
+        "types",
         "typing",
         "zoneinfo",
         "data.exchange_calendar",

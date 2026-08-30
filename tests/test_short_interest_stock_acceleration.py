@@ -191,6 +191,21 @@ def test_three_cycles_retain_two_warmups_and_exact_negative_acceleration():
     assert feature.acceleration_short_ratio == ExactRational(-1, 660)
 
 
+def test_indexed_context_preserves_exact_acceleration_batch_payload_hashes():
+    dispositions = _acceleration_dispositions()
+
+    assert [item.refusal_reasons for item in dispositions] == [
+        (REFUSAL_MISSING_PRIOR,),
+        (REFUSAL_INSUFFICIENT_PRIOR_DELTA_HISTORY,),
+        (),
+    ]
+    assert [item.sha256 for item in dispositions] == [
+        "2ed654c211fb30cd02b838433796258a79f3f9f527399410b07a9172f1747608",
+        "812011828346781049bc97d79e14f69e6f39273a93cedc8244ee221dfa8a8ee2",
+        "04b4e3889653c51957daaea05e031e8d4ef1f68bc64a7591e8d49a7751a33d2a",
+    ]
+
+
 def test_acceleration_payload_hashes_every_exact_fact_without_floats():
     disposition, feature = _completed_acceleration()
 

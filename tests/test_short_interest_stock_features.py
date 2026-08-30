@@ -8,16 +8,22 @@ from pathlib import Path
 
 import pytest
 
+import research.short_interest_etf.stock_features as stock_features_module
 from data.hashing import hash_payload
 from research.short_interest_etf.contracts import (
     DenominatorKind,
+    parse_utc_timestamp,
     recompute_days_to_cover,
 )
 from research.short_interest_etf.daily_short_volume import (
     DailyShortSaleVolumeRecord,
     DailyVolumeSemantic,
 )
-from research.short_interest_etf.dataset import build_vintage, load_synthetic_fixture
+from research.short_interest_etf.dataset import (
+    build_vintage,
+    load_synthetic_fixture,
+    visible_source_snapshots_as_of,
+)
 from research.short_interest_etf.pit_eligibility import (
     PitReferenceBundle,
     REFUSAL_MISSING_PRIOR,
@@ -435,6 +441,229 @@ def test_feature_payload_and_disposition_hash_bind_every_exact_fact_without_floa
     assert context.to_payload()["readiness_rows"] == [
         item.to_payload() for item in context.readiness_rows
     ]
+
+
+def test_indexed_context_preserves_exact_raw_batch_payload_hashes_and_order():
+    dispositions = _dispositions()
+
+    assert [item.readiness.settlement_date for item in dispositions] == [
+        "2024-01-12",
+        "2024-01-31",
+    ]
+    assert [item.refusal_reasons for item in dispositions] == [
+        (REFUSAL_MISSING_PRIOR,),
+        (),
+    ]
+    assert [item.sha256 for item in dispositions] == [
+        "d4ce9e3524f3b96d196586236ade80fe04c64e624a8c3f82c65a6bb13a25652c",
+        "47573a11368005b3ff3d36a86bebf4a646eb8f526a2528512fb1c1d381595b95",
+    ]
+
+
+def test_context_indices_match_the_complete_legacy_visibility_rule():
+    prior, _ = _vintage().snapshots
+    visible_correction = _prior_correction(
+        prior,
+        published_at="2024-02-13T13:00:00Z",
+        denominator_available_at="2024-02-13T13:00:00Z",
+    )
+    future_input_correction = _prior_correction(
+        prior,
+        published_at="2024-02-12T21:00:00Z",
+        denominator_available_at="2024-02-14T13:00:00Z",
+    )
+    vintages = (
+        _vintage(),
+        _vintage_with_prior_correction(visible_correction),
+        _vintage_with_prior_correction(future_input_correction),
+    )
+
+    for vintage in vintages:
+        dispositions = build_pit_stock_raw_features(vintage, _references())
+        context = dispositions[0].source_context
+        assert context is not None
+        for readiness in context.readiness_rows:
+            current = next(
+                item
+                for item in vintage.snapshots
+                if item.event_id == readiness.event_id
+            )
+            visible = visible_source_snapshots_as_of(
+                vintage,
+                parse_utc_timestamp(
+                    readiness.execution_at,
+                    "readiness.execution_at",
+                ),
+            )
+            candidates = [
+                item
+                for item in visible
+                if item.security.security_id == current.security.security_id
+                and item.settlement_date == current.previous_settlement_date
+            ]
+            assert len(candidates) <= 1
+            expected_prior = candidates[0] if candidates else None
+
+            assert context.readiness_for_event(readiness.event_id) == readiness
+            assert context.snapshot_for_event(readiness.event_id) == current
+            assert context.prior_snapshot_for_event(
+                readiness.event_id
+            ) == expected_prior
+
+
+def test_context_index_keeps_latest_revision_when_older_revision_opens_later():
+    vintage = _vintage()
+    prior, current = vintage.snapshots
+    delayed_r2 = _prior_correction(
+        prior,
+        published_at="2024-02-12T20:00:00Z",
+        denominator_available_at="2024-02-14T13:00:00Z",
+    )
+    early_r3_denominator = replace(
+        delayed_r2.denominator,
+        value="8000",
+        available_at="2024-02-13T13:00:00Z",
+        observed_at="2024-02-13T13:00:00Z",
+        raw_record_sha256="d" * 64,
+    )
+    early_r3 = replace(
+        delayed_r2,
+        source_record_id="synthetic-si-2024-01-12-r3",
+        denominator=early_r3_denominator,
+        revision_id="r3",
+        revision_published_at="2024-02-12T21:00:00Z",
+        observed_at="2024-02-13T13:00:00Z",
+        supersedes_event_id=delayed_r2.event_id,
+        raw_record_sha256="c" * 64,
+    )
+    delayed_current_denominator = replace(
+        current.denominator,
+        available_at="2024-02-14T13:00:00Z",
+        observed_at="2024-02-14T13:00:00Z",
+        raw_record_sha256="a" * 64,
+    )
+    delayed_current_volume = replace(
+        current.volume_basis,
+        available_at="2024-02-14T13:00:00Z",
+        observed_at="2024-02-14T13:00:00Z",
+        raw_record_sha256="9" * 64,
+    )
+    delayed_current = replace(
+        current,
+        denominator=delayed_current_denominator,
+        volume_basis=delayed_current_volume,
+        observed_at="2024-02-14T13:00:00Z",
+        raw_record_sha256="8" * 64,
+    )
+    indexed_vintage = build_vintage(
+        replace(
+            vintage.manifest,
+            requested_record_count=4,
+            input_row_count=4,
+            accepted_record_count=4,
+        ),
+        vintage.release_calendar,
+        (delayed_current, early_r3, prior, delayed_r2),
+    )
+
+    dispositions = build_pit_stock_raw_features(indexed_vintage, _references())
+    context = dispositions[0].source_context
+    assert context is not None
+    readiness = next(
+        item
+        for item in context.readiness_rows
+        if item.event_id == delayed_current.event_id
+    )
+    visible = visible_source_snapshots_as_of(
+        indexed_vintage,
+        parse_utc_timestamp(readiness.execution_at, "readiness.execution_at"),
+    )
+    candidates = [
+        item
+        for item in visible
+        if item.security.security_id == delayed_current.security.security_id
+        and item.settlement_date == delayed_current.previous_settlement_date
+    ]
+
+    assert candidates == [early_r3]
+    assert context.prior_snapshot_for_event(delayed_current.event_id) == early_r3
+
+
+def test_context_builds_one_prior_index_per_batch(monkeypatch):
+    index_calls = []
+    real_builder = stock_features_module._build_prior_snapshot_index
+
+    def counted_builder(vintage, readiness_rows):
+        index_calls.append((vintage, readiness_rows))
+        return real_builder(vintage, readiness_rows)
+
+    monkeypatch.setattr(
+        stock_features_module,
+        "_build_prior_snapshot_index",
+        counted_builder,
+    )
+    vintage = _vintage()
+    dispositions = build_pit_stock_raw_features(vintage, _references())
+
+    assert len(index_calls) == 1
+    assert index_calls[0][1] == tuple(
+        item.readiness for item in dispositions
+    )
+
+
+def test_context_indices_are_immutable_and_digest_is_cached(monkeypatch):
+    context = _dispositions()[0].source_context
+    assert context is not None
+    expected_sha256 = hash_payload(context.to_payload())
+    readiness = context.readiness_rows[0]
+
+    with pytest.raises(TypeError):
+        context._readiness_by_event[readiness.event_id] = readiness
+    with pytest.raises(TypeError):
+        context._snapshot_by_event[
+            readiness.event_id
+        ] = context.source_vintage.snapshots[0]
+    with pytest.raises(TypeError):
+        context._prior_by_event[readiness.event_id] = None
+
+    def unexpected_rehash(_payload):
+        raise AssertionError("validated context digest was recomputed")
+
+    monkeypatch.setattr(stock_features_module, "hash_payload", unexpected_rehash)
+    assert context.sha256 == expected_sha256
+    assert context.sha256 == expected_sha256
+
+
+def test_context_accessors_consume_the_derived_indices():
+    context = _dispositions()[0].source_context
+    assert context is not None
+    event_id = context.readiness_rows[-1].event_id
+    expected_readiness = context.readiness_for_event(event_id)
+    expected_snapshot = context.snapshot_for_event(event_id)
+    expected_prior = context.prior_snapshot_for_event(event_id)
+
+    class ProbeIndex:
+        def __init__(self, value):
+            self.value = value
+            self.calls = []
+
+        def get(self, key):
+            self.calls.append(key)
+            return self.value
+
+    readiness_index = ProbeIndex(expected_readiness)
+    snapshot_index = ProbeIndex(expected_snapshot)
+    prior_index = ProbeIndex(expected_prior)
+    object.__setattr__(context, "_readiness_by_event", readiness_index)
+    object.__setattr__(context, "_snapshot_by_event", snapshot_index)
+    object.__setattr__(context, "_prior_by_event", prior_index)
+
+    assert context.readiness_for_event(event_id) == expected_readiness
+    assert context.snapshot_for_event(event_id) == expected_snapshot
+    assert context.prior_snapshot_for_event(event_id) == expected_prior
+    assert readiness_index.calls == [event_id]
+    assert snapshot_index.calls == [event_id]
+    assert prior_index.calls == [event_id]
 
 
 def test_exact_rational_contract_reduces_inputs_and_rejects_noncanonical_values():

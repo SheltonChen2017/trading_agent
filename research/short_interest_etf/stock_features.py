@@ -9,8 +9,10 @@ boundary introduces no binary floating-point or undocumented rounding rule.
 from __future__ import annotations
 
 import dataclasses
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from fractions import Fraction
+from types import MappingProxyType
 from typing import Any
 
 from data.exchange_calendar import ExchangeCalendarError, session_open_instant
@@ -31,7 +33,6 @@ from research.short_interest_etf.contracts import (
 from research.short_interest_etf.dataset import (
     ShortInterestVintage,
     build_identity,
-    visible_source_snapshots_as_of,
 )
 from research.short_interest_etf.pit_eligibility import (
     PitReferenceBundle,
@@ -124,6 +125,93 @@ def _whole_positive_shares(value: str, name: str) -> int:
     return int(parsed)
 
 
+def _build_prior_snapshot_index(
+    vintage: ShortInterestVintage,
+    readiness_rows: tuple[StockDataReadiness, ...],
+) -> dict[str, ShortInterestSnapshot | None]:
+    """Resolve every execution-visible prior in one availability sweep."""
+    readiness_by_event = {item.event_id: item for item in readiness_rows}
+    events_by_key: dict[
+        tuple[str, str],
+        list[tuple[datetime, datetime, str, str, ShortInterestSnapshot]],
+    ] = {}
+    for snapshot in vintage.snapshots:
+        readiness = readiness_by_event[snapshot.event_id]
+        events_by_key.setdefault(
+            (
+                snapshot.security.security_id,
+                snapshot.settlement_date,
+            ),
+            [],
+        ).append(
+            (
+                parse_utc_timestamp(
+                    readiness.execution_at,
+                    "readiness.execution_at",
+                ),
+                parse_utc_timestamp(
+                    snapshot.revision_published_at,
+                    "snapshot.revision_published_at",
+                ),
+                snapshot.logical_id,
+                snapshot.event_id,
+                snapshot,
+            )
+        )
+
+    snapshot_by_event = {item.event_id: item for item in vintage.snapshots}
+    queries_by_key: dict[
+        tuple[str, str],
+        list[tuple[datetime, str]],
+    ] = {}
+    for readiness in readiness_rows:
+        current = snapshot_by_event[readiness.event_id]
+        queries_by_key.setdefault(
+            (
+                current.security.security_id,
+                current.previous_settlement_date,
+            ),
+            [],
+        ).append(
+            (
+                parse_utc_timestamp(
+                    readiness.execution_at,
+                    "readiness.execution_at",
+                ),
+                readiness.event_id,
+            )
+        )
+
+    prior_by_event: dict[str, ShortInterestSnapshot | None] = {}
+    for key, queries in queries_by_key.items():
+        events = sorted(
+            events_by_key.get(key, ()),
+            key=lambda item: (item[0], item[1], item[2], item[3]),
+        )
+        latest_by_logical: dict[
+            str,
+            tuple[datetime, ShortInterestSnapshot],
+        ] = {}
+        event_index = 0
+        for cutoff, current_event_id in sorted(queries):
+            while event_index < len(events) and events[event_index][0] <= cutoff:
+                _, revision_at, logical_id, _, snapshot = events[event_index]
+                previous = latest_by_logical.get(logical_id)
+                if previous is None or revision_at > previous[0]:
+                    latest_by_logical[logical_id] = (revision_at, snapshot)
+                event_index += 1
+            if len(latest_by_logical) > 1:
+                raise _refuse("execution-visible prior snapshot is ambiguous")
+            prior_by_event[current_event_id] = (
+                next(iter(latest_by_logical.values()))[1]
+                if latest_by_logical
+                else None
+            )
+    if len(prior_by_event) != len(readiness_rows):
+        raise _refuse("prior index does not cover every readiness event")
+    return prior_by_event
+
+
 @dataclasses.dataclass(frozen=True)
 class StockFeatureSourceContext:
     """One authenticated source/reference batch and its exact readiness rows."""
@@ -169,15 +257,51 @@ class StockFeatureSourceContext:
                 f"{self.schema_version!r}"
             )
 
+        readiness_by_event = {
+            item.event_id: item for item in self.readiness_rows
+        }
+        snapshot_by_event = {
+            item.event_id: item for item in self.source_vintage.snapshots
+        }
+        if len(snapshot_by_event) != len(self.source_vintage.snapshots):
+            raise _refuse("context source_vintage contains duplicate event_id")
+        if set(readiness_by_event) != set(snapshot_by_event):
+            raise _refuse(
+                "context readiness event set does not exactly match source_vintage"
+            )
+
+        prior_by_event = _build_prior_snapshot_index(
+            self.source_vintage,
+            self.readiness_rows,
+        )
+
+        object.__setattr__(
+            self,
+            "_readiness_by_event",
+            MappingProxyType(readiness_by_event),
+        )
+        object.__setattr__(
+            self,
+            "_snapshot_by_event",
+            MappingProxyType(snapshot_by_event),
+        )
+        object.__setattr__(
+            self,
+            "_prior_by_event",
+            MappingProxyType(prior_by_event),
+        )
+        object.__setattr__(self, "_sha256_cache", hash_payload(self.to_payload()))
+
     def readiness_for_event(self, event_id: str) -> StockDataReadiness | None:
-        matches = [
-            item for item in self.readiness_rows if item.event_id == event_id
-        ]
-        if not matches:
-            return None
-        if len(matches) != 1:
-            raise _refuse("context event_id lookup is ambiguous")
-        return matches[0]
+        return self._readiness_by_event.get(event_id)
+
+    def snapshot_for_event(self, event_id: str) -> ShortInterestSnapshot | None:
+        return self._snapshot_by_event.get(event_id)
+
+    def prior_snapshot_for_event(
+        self, event_id: str
+    ) -> ShortInterestSnapshot | None:
+        return self._prior_by_event.get(event_id)
 
     def to_payload(self) -> dict[str, Any]:
         return {
@@ -196,7 +320,7 @@ class StockFeatureSourceContext:
 
     @property
     def sha256(self) -> str:
-        return hash_payload(self.to_payload())
+        return self._sha256_cache
 
 
 @dataclasses.dataclass(frozen=True)
@@ -695,21 +819,15 @@ class StockFeatureDisposition:
             raise _refuse(
                 "source_context must be the exact StockFeatureSourceContext type"
             )
-        vintage = self.source_context.source_vintage
-        matches = [
-            item
-            for item in vintage.snapshots
-            if item.event_id == self.readiness.event_id
-        ]
-        if len(matches) != 1:
+        current = self.source_context.snapshot_for_event(
+            self.readiness.event_id
+        )
+        if current is None:
             raise _refuse(
                 "readiness event_id is not one exact source_vintage event"
             )
-        current = matches[0]
-        prior = _select_authenticated_prior(
-            vintage,
-            current,
-            self.readiness.execution_at,
+        prior = self.source_context.prior_snapshot_for_event(
+            self.readiness.event_id
         )
         if self.prior_readiness is not None:
             if prior is None:
@@ -738,28 +856,6 @@ class StockFeatureDisposition:
         return hash_payload(self.to_payload())
 
 
-def _select_authenticated_prior(
-    vintage: ShortInterestVintage,
-    current: ShortInterestSnapshot,
-    execution_at: str,
-) -> ShortInterestSnapshot | None:
-    visible = visible_source_snapshots_as_of(
-        vintage,
-        parse_utc_timestamp(execution_at, "readiness.execution_at"),
-    )
-    candidates = [
-        item
-        for item in visible
-        if item.security.security_id == current.security.security_id
-        and item.settlement_date == current.previous_settlement_date
-    ]
-    if not candidates:
-        return None
-    if len(candidates) != 1:
-        raise _refuse("execution-visible prior snapshot is ambiguous")
-    return candidates[0]
-
-
 def build_pit_stock_raw_features(
     vintage: ShortInterestVintage,
     references: PitReferenceBundle,
@@ -777,8 +873,6 @@ def build_pit_stock_raw_features(
         reference_bundle=references,
         readiness_rows=readiness_rows,
     )
-    readiness_by_event = {item.event_id: item for item in readiness_rows}
-    snapshot_by_event = {item.event_id: item for item in vintage.snapshots}
     dispositions: list[StockFeatureDisposition] = []
 
     for readiness in readiness_rows:
@@ -793,13 +887,11 @@ def build_pit_stock_raw_features(
             )
             continue
 
-        current = snapshot_by_event.get(readiness.event_id)
+        current = source_context.snapshot_for_event(readiness.event_id)
         if current is None:
             raise _refuse("ready event is absent from the authenticated vintage")
-        prior = _select_authenticated_prior(
-            vintage,
-            current,
-            readiness.execution_at,
+        prior = source_context.prior_snapshot_for_event(
+            readiness.event_id
         )
         if prior is None:
             dispositions.append(
@@ -846,7 +938,7 @@ def build_pit_stock_raw_features(
             raise _refuse(
                 "current previous_short_shares does not match authenticated prior"
             )
-        prior_readiness = readiness_by_event.get(prior.event_id)
+        prior_readiness = source_context.readiness_for_event(prior.event_id)
         if prior_readiness is None:
             raise _refuse("authenticated prior event has no readiness row")
 

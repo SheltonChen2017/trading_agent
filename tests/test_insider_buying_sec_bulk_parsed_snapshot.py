@@ -857,6 +857,110 @@ def test_fully_rehashed_cross_linked_accession_index_still_refuses_semantically(
         load_sec_bulk_parsed_snapshot(forged, raw_snapshot_directory=raw)
 
 
+def _two_transaction_tables() -> dict[str, bytes]:
+    tables = _default_tables()
+    tables["NONDERIV_TRANS.tsv"] = _tsv(
+        TRANS_HEADERS,
+        (
+            (ACCESSION_A, "0000007", "10", "20", "first"),
+            (ACCESSION_A, "0000008", "11", "21", "second"),
+        ),
+    )
+    return tables
+
+
+def _forge_rows_artifact(parsed: Path, transform) -> Path:
+    """Rewrite ``rows.jsonl`` and recompute every ordinary hash and identity.
+
+    The per-table row-id lineage, artifact hash, manifest lineage hash,
+    snapshot id, and commit marker are all rebuilt so that none of the
+    content-addressed guards can be what refuses.  Only the loader's
+    row-level semantic rebuild is left to detect the forgery.
+    """
+
+    rows_path = parsed / "rows.jsonl"
+    records = transform(
+        [json.loads(line) for line in rows_path.read_bytes().splitlines()]
+    )
+    forged = b"".join(
+        (canonical_json(record) + "\n").encode("utf-8") for record in records
+    )
+    rows_path.write_bytes(forged)
+
+    manifest_path = parsed / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    artifact = next(
+        item for item in manifest["artifacts"] if item["name"] == "rows.jsonl"
+    )
+    artifact["sha256"] = hash_bytes(forged)
+    artifact["size_bytes"] = len(forged)
+    artifact["record_count"] = len(records)
+    for table in manifest["tables"]:
+        table_row_ids = [
+            record["row_id"]
+            for record in records
+            if record["table_name"] == table["table_name"]
+        ]
+        table["row_count"] = len(table_row_ids)
+        table["row_ids_hash"] = hash_payload(table_row_ids)
+    manifest_path.write_bytes((canonical_json(manifest) + "\n").encode("utf-8"))
+    return _readdress_parsed_snapshot(parsed)
+
+
+def _transaction_rows(records):
+    return [
+        record for record in records if record["table_name"] == "NONDERIV_TRANS.tsv"
+    ]
+
+
+def _swap_row_ids(records):
+    first, second = _transaction_rows(records)
+    first["row_id"], second["row_id"] = second["row_id"], first["row_id"]
+    return records
+
+
+def _forge_schema_id(records):
+    _transaction_rows(records)[0]["schema_id"] = "synthetic-trans-2026q1"
+    return records
+
+
+def _reverse_source_ordinals(records):
+    others = [
+        record for record in records if record["table_name"] != "NONDERIV_TRANS.tsv"
+    ]
+    return others + list(reversed(_transaction_rows(records)))
+
+
+def _forge_accession_projection(records):
+    _transaction_rows(records)[0]["accession_number"] = ACCESSION_B
+    return records
+
+
+@pytest.mark.parametrize(
+    "transform, expected",
+    [
+        (_swap_row_ids, "row lineage identity is invalid"),
+        (_forge_schema_id, "parsed row is invalid"),
+        (_reverse_source_ordinals, "parsed row is invalid"),
+        (_forge_accession_projection, "accession projection is invalid"),
+    ],
+)
+def test_fully_rehashed_forged_row_artifact_still_refuses_semantically(
+    tmp_path, transform, expected
+):
+    """The row artifact needs the same semantic defence as the accession index.
+
+    Each forgery below rebuilds every hash, the manifest lineage, the snapshot
+    id, and the commit marker, so a loader that trusted its own content
+    addressing would accept all of them.
+    """
+
+    raw, parsed, _ = _publish(tmp_path, tables=_two_transaction_tables())
+    forged = _forge_rows_artifact(parsed, transform)
+    with pytest.raises(SecBulkParsedSnapshotError, match=expected):
+        load_sec_bulk_parsed_snapshot(forged, raw_snapshot_directory=raw)
+
+
 def test_malformed_unhashable_manifest_and_row_values_map_to_domain_error(tmp_path):
     first_raw, first, _ = _publish(
         tmp_path, parsed_root_name="parsed-manifest"
@@ -972,6 +1076,30 @@ def test_resource_caps_refuse_before_any_parsed_publication(monkeypatch, tmp_pat
             parser_git_commit=PARSER_COMMIT,
         )
     assert not (tmp_path / "parsed-output").exists()
+
+
+@pytest.mark.parametrize(
+    "constant, limit, expected",
+    [
+        ("MAX_ROWS_PER_TABLE", 1, "per-table row limit"),
+        ("MAX_TOTAL_ROWS", 2, "total row limit"),
+    ],
+)
+def test_row_count_caps_refuse_before_any_parsed_publication(
+    monkeypatch, tmp_path, constant, limit, expected
+):
+    """The row caps bound memory, so removing one must not stay silent."""
+
+    raw = _raw_snapshot(tmp_path, tables=_two_transaction_tables())
+    monkeypatch.setattr(parsed_module, constant, limit)
+    with pytest.raises(SecBulkParsedSnapshotError, match=expected):
+        build_sec_bulk_parsed_snapshot(
+            raw,
+            tmp_path / "parsed-rows",
+            schema_profile=_profile(),
+            parser_git_commit=PARSER_COMMIT,
+        )
+    assert not (tmp_path / "parsed-rows").exists()
 
 
 def test_parsed_output_cannot_mutate_the_raw_snapshot_directory(tmp_path):

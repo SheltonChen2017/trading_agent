@@ -80,10 +80,19 @@ their lane-owned artifacts.
   artifacts: the root `*.pdf binary` attribute, blueprint v2.1 at raw SHA-256
   `55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14`, and the
   A21 TPR-0A/TPR-0B phase split. The confirmation adds no other authority.
-- The next external gate, after this Codex round's single push, is Claude's
-  independent commit-by-commit review of the exact v2.2 snapshot. Codex must
-  then counter-review every Claude commit. TPR-0B and TPR-1 remain blocked on
-  their own gates.
+- Claude's independent review of the pushed range `2ec0fad..fe056be` is
+  complete: all three commits are **accepted** or **accepted after
+  correction**, with no P0 or P1. An independent complete run on the exact
+  pushed tree reproduced **5,842 passed, 5 skipped, 0 failed, 25 warnings in
+  1,080.30s**, matching the recorded count on the actual pushed head. All
+  seven counter-review findings against the prior Claude round are accepted.
+  One P2 (`TPR-CR3-001`) and one P3 (`TPR-CR3-002`) were found and closed:
+  the record's current-state section still pinned the superseded v2.1
+  blueprint and candidate identities, which a new guard now prevents.
+- The next external gate is Codex's counter-review of every Claude commit in
+  this round. TPR-0B and TPR-1 remain blocked on their own gates, and the
+  three sibling-lane re-freezes under `TPR-OOL-006` still gate every lane's
+  outcome access.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (29 pages; raw binary SHA-256

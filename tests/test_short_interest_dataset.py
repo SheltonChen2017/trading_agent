@@ -443,6 +443,8 @@ def test_vintage_subclass_cannot_cross_the_storage_or_as_of_boundary(tmp_path):
     assert type(impostor) is not type(vintage)
 
     with pytest.raises(ShortInterestDatasetError, match="exact ShortInterestVintage"):
+        build_identity(impostor)
+    with pytest.raises(ShortInterestDatasetError, match="exact ShortInterestVintage"):
         write_vintage(impostor, tmp_path / "vintage-out")
     with pytest.raises(ShortInterestDatasetError, match="exact ShortInterestVintage"):
         visible_source_snapshots_as_of(

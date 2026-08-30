@@ -363,6 +363,8 @@ def build_vintage(
 
 
 def _content(vintage: ShortInterestVintage) -> tuple[dict[str, Any], dict[str, bytes]]:
+    if type(vintage) is not ShortInterestVintage:
+        raise _refuse("vintage must be the exact ShortInterestVintage type")
     blobs = {
         "source_manifest.json": _manifest_bytes(vintage.manifest),
         "release_calendar.jsonl": _jsonl_bytes(

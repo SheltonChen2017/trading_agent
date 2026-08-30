@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
+from decimal import Decimal
 import json
 import subprocess
 from pathlib import Path
@@ -16,6 +18,10 @@ LANE_BRANCH = "codex/strategy-target-price-revisions"
 BLUEPRINT = "TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf"
 RECORD = "TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md"
 EXPECTED_WORKTREE = "trading_agent_target_price"
+SPEC_PATH = (
+    ROOT / "research" / "target_price_revisions" / "specs"
+    / "tpr_round0a.candidate.json"
+)
 OBSOLETE_WORKTREE = "trading_agent_TargetPriceRevision"
 BLUEPRINT_CONTENT_SHA256 = (
     "55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14"
@@ -191,3 +197,44 @@ def test_tpr0a_candidate_identity_and_zero_authority_handoff_are_exact() -> None
         assert "planned_unbound" in document
         assert "no look is authorized or spent" in document
         assert "pending claude" in document
+
+
+def test_shared_family_alpha_allocation_is_exact_and_unrecycled() -> None:
+    """Owner directive, 2026-08-30: one shared family, total two-sided FWER
+    0.05, an equal 1/80 to each of four lanes, no recycling of unused alpha,
+    and any within-lane multiplicity must subdivide the lane's 0.0125.
+
+    Pinned as exact arithmetic rather than as the literal 0.0125 so the
+    relationship survives a legitimate change in family size: if a lane is
+    ever added or withdrawn, this fails until the per-lane share is
+    recomputed, which is precisely what "no recycling" forbids doing silently.
+
+    The within-lane half is enforced by tying the look budget to the frozen
+    look and primary-cell inventories. A second inferential look added at the
+    full lane alpha -- rather than subdividing it -- fails here.
+    """
+    spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
+    cells = {cell["cell_id"]: cell for cell in spec["cells"]}
+    multiplicity = cells["family_multiplicity"]["value"]
+
+    family_count = multiplicity["shared_family_count"]
+    shared = Decimal(multiplicity["shared_family_wise_alpha"])
+    assigned = Decimal(multiplicity["assigned_family_alpha"])
+
+    assert family_count == 4, "the shared selection family has four attempts"
+    assert shared == Decimal("0.05"), "total two-sided FWER is 0.05"
+    assert assigned * family_count == shared, (
+        f"unrecycled equal allocation requires {assigned} x {family_count} "
+        f"== {shared}; unused alpha may not be redistributed"
+    )
+    assert assigned == Decimal("0.0125")
+
+    # Within-lane multiplicity must subdivide, never duplicate, the share.
+    assert multiplicity["look_budget"] == 1
+    assert len(multiplicity["permanent_look_ids"]) == 1
+    assert len(multiplicity["permanent_primary_cell_ids"]) == 1
+    assert len(spec["looks"]) == 1, (
+        "a second look must subdivide the lane's assigned alpha under a "
+        "reviewed amendment, not consume it a second time"
+    )
+    assert multiplicity["external_append_only_authority_required"] is True

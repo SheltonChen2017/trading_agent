@@ -1,0 +1,3 @@
+# TPR authority artifacts are content-addressed exact bytes.  Disable Git's
+# newline translation so canonical one-LF JSON remains identical on Windows.
+*.json -text

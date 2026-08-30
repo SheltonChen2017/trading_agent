@@ -1,12 +1,15 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE'S DOCUMENTATION REVIEW IS COMPLETE. CODEX'S COUNTER-REVIEW
-CORRECTION SERIES BEGINS AT
-`24283fa3b79b1a86cceb65fbd5d3d2af5fa20292` AND REMAINS LOCAL AND UNPUSHED.
-TPR-0 HAS NOT STARTED AND IS BLOCKED ON OWNER DECISIONS. NO AUTHENTICATED TARGET-PRICE
-SOURCE, INGEST, CANONICAL EVENT, SIGNAL, OUTCOME ACCESS, RESEARCH LOOK, ETF
-TOPOLOGY, PORTFOLIO, QUANTCONNECT JOB OR RESULT, SHADOW OR PAPER DEPLOYMENT,
-BROKER CONNECTION, OR LIVE-TRADING AUTHORITY EXISTS.**
+Status: **CLAUDE'S DOCUMENTATION REVIEW IS COMPLETE. CODEX COUNTER-REVIEWED
+EVERY CLAUDE COMMIT, APPLIED THE OWNER-APPROVED V2.1 GOVERNANCE AMENDMENT, AND
+IMPLEMENTED THE BOUNDED TPR-0A ALGORITHM/POLICY CANDIDATE IN THE SAME LOCAL
+ROUND. THE CANDIDATE IS NOT ACCEPTED UNTIL CLAUDE REVIEWS THE EXACT PUSHED
+SNAPSHOT AND CODEX COUNTER-REVIEWS THAT REVIEW. TPR-0B'S EMPIRICAL STRUCTURAL
+BINDINGS, TPR-1 SOURCE RIGHTS, AND EVERY OUTCOME/LOOK GATE REMAIN UNAVAILABLE.
+NO AUTHENTICATED TARGET-PRICE SOURCE, INGEST, CANONICAL EVENT, SIGNAL, OUTCOME
+ACCESS, RESEARCH LOOK, ETF TOPOLOGY, PORTFOLIO, QUANTCONNECT JOB OR RESULT,
+SHADOW OR PAPER DEPLOYMENT, BROKER CONNECTION, OR LIVE-TRADING AUTHORITY
+EXISTS.**
 
 Branch: `codex/strategy-target-price-revisions`
 
@@ -20,22 +23,25 @@ Governing plan:
 `TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
 
 Governing plan SHA-256:
-`9f00dd56bf7bec79b3f5362bba61fe71768d1f25e6e4350631dafd1253682633`
+`55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14`
 
-Governing plan page count: **26**.
+Governing plan page count: **28**.
 
-Submitted source-plan SHA-256: **MALFORMED AND UNVERIFIABLE.** The value
-transcribed into this record and the governing PDF, `53c549ae...4a2df0`,
-is 63 hexadecimal characters and therefore cannot be a SHA-256 digest.
-The submitted proposal is not stored in this repository, so the value
-cannot be recomputed here. This pin establishes no provenance until the
-owner re-supplies the source file or its exact 64-character digest.
+Submitted source-plan SHA-256: **MALFORMED, UNVERIFIABLE, HISTORICAL, AND
+NON-AUTHORITATIVE.** The value transcribed into superseded historical pages,
+`53c549ae...4a2df0`, is 63 hexadecimal characters and therefore cannot be a
+SHA-256 digest. The submitted proposal is unavailable and is not a second
+authority. By owner decision on 2026-08-29, the version-2 blueprint including
+its addendum is the sole normative Target-Price Revisions specification; the
+old value cannot satisfy or block any implementation gate.
 
 Sequencing index: `docs/ACTION_PLAN_2026-08-20.md`. Canonical cross-computer
 state: `docs/SESSION_HANDOFF.md`. Both receive only concise coordination and
 status references for this lane; this record owns the lane's detail.
 
-The governing PDF and this record are specifications, not research evidence,
+The governing PDF is the sole normative strategy specification. This record is
+a non-normative implementation, review, validation, and handoff log; any
+summary here yields to the PDF. Neither artifact is research evidence,
 deployment approval, or trading authority. Codex is the primary implementer
 and Claude is the independent reviewer.
 
@@ -46,8 +52,9 @@ bounded milestone remain on `codex/strategy-target-price-revisions` in
 `C:\git\customizedagent\trading_agent_target_price`. A role may create
 several commits during its round, but makes only one push at the end of that
 round. No review, counter-review, checkpoint, handoff, or feature branch is
-created. This decision supersedes only the governing PDF's generic
-separate-review-branch statements on physical pages 3, 21, 23, and 26; every
+created. This decision supersedes only the governing PDF's old-worktree or
+generic separate-review-branch statements on physical pages 3, 21, 23, 25,
+and 26; every
 research, evidence, safety, outcome, QC, paper, and live gate remains intact.
 
 ## 1. Decision and canonical strategy boundary
@@ -153,13 +160,15 @@ Revisions candidate at `56d6fe0eff32d00b1692b3b17a3838649eeba56b`.
 Any later synchronization must name the exact accepted source commit, preserve
 provenance, receive target-lane review, and update this record.
 
-Before target-price outcome access, the project-wide multiplicity authority
-must either add this fourth selection family to the frozen correction and look
-budget or explicitly exclude it from the shared family. The common final
-holdout must likewise be amended or explicitly remain unreachable. Silence or
-a local configuration value grants no authority.
+The owner has added Target-Price Revisions as the fourth canonical family and
+fourth attempt in the common selection accounting. Its assigned family alpha
+is `0.0125` (`0.05 / 4`), its one-shot validation period is 2026-09-01 through
+2027-08-31, the shared cutoff is 2027-08-31, and the untouched common final
+holdout is 2027-09-01 through 2029-08-31. The holdout remains unreachable to
+all four lanes. This resolves coordination only; silence, dates, a local look
+object, or a local configuration value grants no source or outcome authority.
 
-## 3. Normative version-2 corrections
+## 3. Version-2 correction summary (the PDF governs)
 
 1. Separate target and rating families, evidence epochs, looks, results, nulls,
    and later integration.
@@ -205,9 +214,10 @@ a local configuration value grants no authority.
 
 | Milestone | Scope | Exit gate |
 |---|---|---|
-| TPR-0 | Freeze coordination, family identifiers, source contract, event taxonomy, four clocks, cutoff, formula, split/FX/ADR/horizon rules, corrections, independent unit, primary stock cell, controls, periods, purge/embargo, costs, practical-effect threshold, sample/power rule, multiplicity, look budget, null disposition, and final-holdout boundary. | Reviewed, content-addressed executable preregistration; every owner decision resolved; outcome access remains impossible. |
+| TPR-0A | Freeze coordination, family identifiers, exact source candidate, event taxonomy, four clocks, cutoff, formula, split/FX/ADR/horizon algorithms, corrections, independent unit, primary stock cell, controls, estimator, period and purge/embargo rules, cost formula, empirical-binding algorithms, four-family multiplicity, planned-unbound primary look, null disposition, and final-holdout boundary. Numeric structural values remain explicitly unbound. | Content-addressed algorithmic preregistration candidate with exact zero-access source/look declarations and a transitive import firewall; independent review and Codex counter-review are still required; outcome access remains impossible. |
 | TPR-1 | Implement immutable provider-specific target-price ingest, exhaustive normalization/refusal, raw-page inventory, corrections, supersession, and stable institution/analyst provenance. | Every raw locator has exactly one accepted or refused disposition; schema, duplicate, missing, non-finite, action, time, and correction mutations pass; structural data only. |
 | TPR-2 | Implement point-in-time issuer/security/share-class identity, historical ticker validity, split/target-basis reconciliation, currency and FX vintage, ADR ratios, target horizons, pre-event price, ADV/cost inputs, controls, delisting, and terminal-return prerequisites. | Ticker reuse, share-class, corporate-action, FX, horizon, delisting, stale-price, and ambiguous-basis mutations fail closed; no outcome look. |
+| TPR-0B | After reviewed TPR-1/TPR-2 structural manifests exist, bind the exact clip, cost/capacity, practical-effect, sample/power, universe/group, reliability, and complete-PIT-history values under the frozen TPR-0A algorithms in a new immutable child artifact. Target-aligned returns, formula performance rankings, and the shared holdout are prohibited inputs. | Child binds the reviewed TPR-0A parent hash, exact reviewed structural inputs, and every required value; independent review and counter-review complete before TPR-3 publication or any outcome/look request. |
 | TPR-3 | Implement the canonical stock score, institution/security/session/catalyst aggregation, decay, robust sector normalization, independent breadth, validity, and measured reliability. Keep target upside, paired consensus, unexpected residual, rating action, and target level in separate channels. | Golden equations, sparse/zero-MAD behavior, cutoff slicing, correction lineage, and import-boundary tests pass; no outcome imports. |
 | TPR-4 | Register and run the one-shot stock-first study using the frozen primary cell, controls, costs, purged grouped walk-forward design, clustered/block inference, exact multiplicity, and external append-only look spend. | Permanent look receipt recorded. A valid null closes the family. A pass must clear both statistical and frozen practical-effect gates without touching the shared final holdout. |
 | TPR-5 | Only after a TPR-4 pass, build the point-in-time ETF reverse index, universe, peer taxonomy, holdings availability, mapping, and reliability-aware aggregation. | At least 99% mapped candidate holdings weight; fixed lag, stale/incomplete holdings, category lineage, unmapped weight, concentration, and bypass tests pass. |
@@ -336,29 +346,43 @@ the target-owned test package. The record qualification and exact active-pointer
 refinement follow in the current local candidate. No push has occurred in this
 Codex round.
 
-The owner's request to start the loop makes TPR-0 the next requested bounded
-milestone, but it does not supply or waive the prerequisites that the blueprint
-itself requires. TPR-0 is therefore blocked on all of the following:
+The owner's 2026-08-29 decisions resolve those prerequisites without inventing
+empirical evidence. The repaired 28-page v2.1 blueprint is the sole normative
+strategy authority and is stored as binary at raw SHA-256
+`55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14`;
+the malformed unavailable proposal pin is historical and non-blocking. TPR is
+the fourth common family at alpha `0.0125`, with validation 2026-09-01 through
+2027-08-31 and the shared 2027-09-01 through 2029-08-31 holdout prohibited.
+TPR-0 is split honestly: TPR-0A freezes algorithms now, while TPR-0B binds
+empirical structural values only after reviewed TPR-1/TPR-2 manifests and
+before TPR-3 or any outcome access.
 
-- the durable remedy for the blueprint's checkout corruption
-  (`TPR-CR1-001`);
-- the missing source proposal or corrected 64-character source digest, or an
-  explicit decision that the reviewed v2 blueprint is the sole authority
-  (`TPR-CR1-004`);
-- the dependency-order decision in `TPR-CCR1-004`: TPR-0 requires numeric
-  clip, economic-effect, cost/capacity, and sample/power values derived from
-  structural evidence that the blueprint schedules only in TPR-1 and TPR-2;
-- the shared-fourth-family and final-holdout treatment, exact validation and
-  holdout dates, and the remaining `FREEZE_AT_TPR0` source, universe, timing,
-  statistical, and cost choices.
+The bounded TPR-0A candidate is
+`research/target_price_revisions/specs/tpr_round0a.candidate.json`, spec ID
+`tpr-round0a-candidate-f595992a3f5b8396`, semantic spec hash
+`f595992a3f5b8396e5f26ba5a3b0a3f32649eec3fd581071b349a5e12203af86`,
+and artifact SHA-256
+`99aae28d5b055aa24b84ce153467dfdbe7ee65f8ee2cef2a870efe1e68b2ea49`.
+It contains 24 frozen cells, one `planned_unbound` primary look, 39 null empirical
+TPR-0B child fields, and 48 total pending bindings including
+review, source, identity/basis/cost, look-identity, and external-authority
+prerequisites. Empty reviewed-spec, research-source, and permanent-look
+authorities plus the target-owned transitive import firewall keep every
+provider and outcome surface unreachable. The exact estimator mechanics are a
+Codex implementation proposal under the owner-approved v2.1 phase split, not
+owner-supplied empirical evidence; they remain subject to Claude review.
+The planned look records identity and period only; no look is authorized or
+spent.
 
-No value may be guessed and no later milestone may be pulled forward silently.
-The one end-of-round push is withheld so the counter-review and the eventual
-TPR-0 milestone can remain in one Codex round as directed. TPR-0 remains limited
-to a content-addressed preregistration and zero-outcome structural controls; it
-grants no provider purchase or credential use, real-data normalization,
-outcome access, research look, ETF construction, QC processing, broker action,
-paper operation, or live trading.
+The exact next role action after this Codex round's single push is Claude's
+independent commit-by-commit review of the full pushed range and cumulative
+tree on this same branch/worktree. The v2.1 blueprint and TPR-0A artifact are
+candidates until that review and Codex counter-review complete. TPR-1 source
+implementation remains blocked until a separately reviewed artifact proves
+entitlement, public-time semantics, correction completeness, target-horizon
+consistency, storage/processing rights, and QC-transfer rights. No provider
+request, credential use, target row, outcome access, research look, ETF work,
+QC processing, broker action, paper operation, or live trading is authorized.
 
 ## 9. Out-of-lane findings ledger
 
@@ -376,6 +400,9 @@ documented here and deliberately not fixed.
 |---|---|---|---|---|
 | `TPR-OOL-001` | P2 | Repository-wide Git plumbing: no `.gitattributes` exists at any level, and `core.autocrlf=true` is set in the system Git configuration | Git finds no NUL byte in the target-price blueprint, so it classifies the PDF as text and rewrites its 557 LF bytes to CRLF on checkout. The working file is 78,082 bytes and hashes to `6ee7ea5e...4330`, while the committed blob is 77,525 bytes and hashes to the pinned `9f00dd56...2633`. `pdftotext` reports a damaged xref table on the working copy. The other four PDFs contain NUL bytes early and check out byte-identically. Lane impact is `TPR-CR1-001`. | A `*.pdf binary` attribute is repository-wide plumbing rather than trading-strategy work, and `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 2 requires a shared-file change to stop for one owner-coordinated common-baseline amendment. Documented, not fixed. Owner decision required. |
 | `TPR-OOL-002` | P3 | `docs/Strategy Description/README.md` | The lane table and the surrounding prose describe a three-strategy program and omit Target-Price Revisions entirely, so a reader who starts at the directory README does not discover this lane, its branch, or its record. | That README is named in the parallel-workflow frozen-file list, so it needs the same owner-coordinated common-baseline amendment rather than a fourth competing edit. Documented, not fixed. |
+| `TPR-OOL-001-R1` | P2 resolution | Owner-coordinated repository Git plumbing | The owner approved the common fix. Root `.gitattributes` now declares `*.pdf binary`; Git resolves the blueprint as binary with text/diff/merge unset. The PDF was rebuilt from the intact Git blob plus the two-page owner addendum and now reopens strictly as 28 pages at raw SHA-256 `55ce6703...ba14`. | Resolved under the explicit one-time owner coordination; this does not authorize later shared-file edits by inference. Raw-byte and resolved-attribute guards are target-owned. |
+| `TPR-OOL-003` | P2 | Analyst Revisions V2 preregistration loader: `research/analyst_revisions_v2/preregistration.py:465,487` | Both persisted JSON paths use ordinary `json.loads`, which accepts duplicate object keys with last-key-wins behavior. A content-addressed authority artifact can therefore have ambiguous human/parser meaning. TPR's strict loader rejects duplicate keys, but this external accepted lane remains unchanged. | Documented only. Route to the Analyst Revisions V2 lane before any outcome authority; add duplicate-key mutations there. |
+| `TPR-OOL-004` | P2 | Analyst Revisions V2 family contract: `research/analyst_revisions_v2/preregistration.py:56,931` and its draft/tests | The accepted draft/loader still names `three_lane_selection_correction` and requires value 3, while the owner has added TPR as the fourth shared family/attempt. The Analyst lane remains fail-closed and zero-access, so no current look is affected. | Documented only. Synchronize that lane's content-addressed artifact and tests to four before any Analyst outcome access; do not edit it from TPR. |
 
 ## 10. Session / commit ledger
 
@@ -391,6 +418,7 @@ known.
 | 2026-08-29 | Claude validation / push | `b8413606ee70b4bae86db5f1a7cefe6a0523b360` -> `c0ba616a40f628519a071d0642fadf596982919a` | Review validation record | Recorded the complete-suite result obtained on exact correction tree `b841360` and pushed the cumulative three-commit Claude range ending at `c0ba616`. This appended row repairs the prior row's conflation of review and later validation; published Git history retains the original edit trail. | Claude reported **5,724 passed, 2 skipped, 0 failed, 25 warnings in 858.06s** on Windows with Python recorded only as 3.14 and pytest 9.1.1. Codex independently confirmed collection of 5,726 tests but did not rerun the 14-minute suite during counter-review. No provider or outcome access; **0 research looks**. | Exact pushed Claude range is `70c4b9f..c0ba616`. The environment claim lacks the Python patch version and executable. | None; all authority remains zero. | Codex counter-reviews all three Claude commits before TPR-0. |
 | 2026-08-29 | Codex counter-review correction | `c0ba616a40f628519a071d0642fadf596982919a` -> `24283fa3b79b1a86cceb65fbd5d3d2af5fa20292` | Counter-review only; TPR-0 blocked | Restored `tests/test_active_document_consistency.py` exactly to the reviewed Codex state and moved narrowed target documentation guards into `tests/target_price_revisions/`. The worktree guard requires the registered target worktree in every active coordination pointer, so substituting the obsolete path fails while historical issue evidence remains documentable; the malformed-source guard is explicitly target-scoped and case-insensitive. | Shared plus target documentation suites: **70 passed in 1.11s** on `C:\git\customizedagent\trading_agent\.venv\Scripts\python.exe` (Python 3.12.13, pytest 9.1.1); three green baselines plus three reverse mutations passed; two target test files syntax-compiled without bytecode writes; staged `git diff --check` clean; **0 provider/outcome accesses and 0 looks**. | `0f05f3d` rejected as a correct standalone snapshot but its intent is accepted after this correction; `b841360` and `c0ba616` accepted after record qualification. Open owner/gate blockers: `TPR-CR1-001`, `TPR-CR1-004`, `TPR-CCR1-004`, and unresolved TPR-0 freeze decisions. | None. No implementation, source, outcome, QC, broker, paper, live, deployment, or capital authority added. | Keep this Codex round local and unpushed; obtain owner decisions, then implement and validate TPR-0 in the same round before its single push. |
 | 2026-08-29 | Codex counter-review record | `24283fa3b79b1a86cceb65fbd5d3d2af5fa20292` -> local record candidate | Counter-review record; TPR-0 blocked | Added the exact three-commit Claude dispositions, repaired current status and range semantics, split Claude's validation/push into its own append-only ledger event, qualified the PDF-render and `git diff --check` overstatements, documented the TPR-0 dependency-order contradiction, and refined the worktree test to inspect exact active pointers rather than historical issue text. | Shared plus target documentation suites: **70 passed in 1.15s**; Markdown and target-test `git diff --check` clean; no provider, source, outcome, QC, broker, paper, or live access; **0 looks**. | Open owner/gate blockers are enumerated in section 12. No TPR-0 artifact was created. | None. | Preserve the one-push rule; wait for owner decisions, implement TPR-0 locally, then update this candidate to its exact committed/pushed range. |
+| 2026-08-30 | Codex counter-review + implementation | `2708c06e394f927356aeffa3af781be1ce5d2090` -> local TPR-0A candidate | Owner-approved v2.1 amendment and bounded TPR-0A | Closed the prior review blockers under the approved TPR-0A/0B phase split; repaired and binary-pinned the 28-page sole-authority blueprint; implemented strict canonical artifacts, deterministic policy construction, exact zero-access declarations, Git/code-map review anchoring, fixed-boundary transitive import protection, and the complete frozen TPR-0A policy/algorithm parent. The checked-in candidate is unreviewed and non-executable. | PDF raw SHA-256 `55ce6703...ba14`, 28 pages, strict-open and visual QA complete. Focused TPR code/spec/document suite: **108 passed, 3 skipped** on Python 3.12.13 / pytest 9.1.1; skips are host symlink-privilege cases and the Windows junction regression passed. Provider accesses **0**; outcome accesses **0**; authorized/spent looks **0**. | No P0/P1/P2 remains after counter-audit. `TPR-CCR2-011` is the deferred P3 signed-review-identity strengthening item. | None. One `planned_unbound` look identity exists, but no look is authorized or spent; source/look registries remain zero-access and reviewed-spec registry remains empty. | Complete full-project validation, commit the exact candidate, append the final validation/push row, and make this round's single push for Claude review. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -535,3 +563,62 @@ individually and inspected the cumulative state. The local correction commit is
 The local round stops at the owner gate. It does not branch, does not push, and
 does not implement a partial preregistration that pretends unresolved choices
 are frozen.
+
+## 13. Codex counter-review completion and TPR-0A implementation - 2026-08-30
+
+**Disposition: the prior Claude documentation range is accepted after the
+counter-review corrections at `24283fa` and `2708c06`; the owner-decision
+blockers are resolved for the bounded TPR-0A phase; and the new TPR-0A tree is
+an implementation candidate pending Claude's next independent review.** No P0
+or P1 finding exists. This is not acceptance of the candidate and grants no
+source, outcome, look, QC, broker, paper, live, deployment, or capital
+authority.
+
+### 13.1 Owner-decision and historical-blocker dispositions
+
+| Prior item | Current disposition | Exact basis |
+|---|---|---|
+| `TPR-CR1-001` / `TPR-OOL-001` | **Closed under the one-time owner-coordinated common fix** | Root `*.pdf binary`, a rebuilt strict 28-page v2.1 PDF, raw SHA-256 `55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14`, resolved Git text/diff/merge attributes unset, and raw-byte/document guards repair cross-platform checkout identity. |
+| `TPR-CR1-004` / `TPR-CCR1-006` | **Closed for active authority; retained as historical evidence** | Addendum A19/A26 makes the reviewed v2.0 pages plus owner-approved v2.1 addendum the sole normative specification, explicitly leaves the combined artifact pending Claude review, and makes the unavailable malformed 63-character proposal value unable to satisfy or block a gate. Addendum A20 records the real worktree and same-branch loop. |
+| `TPR-CCR1-004` | **Closed by the owner-approved phase split** | TPR-0A freezes policy, formulas, estimator mechanics, required child inventory, and binding procedures without inventing empirical results. TPR-0B may bind the exact clip, cost/capacity, power/sample, universe/group, reliability, and history values only from reviewed zero-outcome TPR-1/TPR-2 manifests before TPR-3 or any outcome access. |
+| `TPR-CCR1-005` | **Closed as a TPR-0A-start blocker; downstream gates remain explicitly pending** | A22 fixes Massive/Benzinga `GET /benzinga/v1/ratings` v1 as the source candidate while every right/access flag stays false. A23 fixes the four-family dates/alpha/look identity. A24/A25 fix the formula and binding boundaries. The exact 48-item pending inventory prevents missing TPR-0B, source-rights, identity/basis/cost, look-identity, or external-authority prerequisites from being misreported as complete. |
+
+### 13.2 TPR-0A implementation and counter-review issue ledger
+
+| ID | Priority | Status | Finding and correction |
+|---|---|---|---|
+| `TPR-CCR2-001` | P2 | **Closed** | Simultaneous industry and sector one-hot controls with an intercept were rank-deficient, the rating-no-event state contradicted generic missing-control refusal, and an eligible-open gap control had no frozen endpoint. The candidate now uses exactly one cutoff-valid hierarchical industry-or-sector group, an explicit `NO_ACCEPTED_RATING_EVENT` state only after complete inventory proof, no gap control, exact per-session robust scaling, deterministic column order, and exact-rational fraction-free Gaussian elimination that refuses an exact singular design without tolerance, regularization, or pseudoinverse. |
+| `TPR-CCR2-002` | P2 | **Closed** | The first power draft made the practical-effect floor depend circularly on the realized eligible sample. Planning event frequency, calendar count, design effect, effective count, unconditional 20-session variance, and MDE are now structural child bindings computed before target outcomes; the actual prospective independent-date count is a separate sufficiency comparison. Alpha remains two-sided `0.0125`, power `0.80`, and the economic gate remains the larger of twice measured P95 round-trip cost and the planning MDE. |
+| `TPR-CCR2-003` | P2 | **Closed** | PASS/NULL was underdetermined. The candidate now pins the null/alternative, sign, average-tie quintile membership, equal leg weights, 10,000-draw null-centered four-week circular moving-block bootstrap, two-way date/security cluster cross-check, child-bound chronological fold rule, economic gate, edge cases, and disposition precedence. Every valid non-pass is `VALID_NULL` and closes the family. |
+| `TPR-CCR2-004` | P2 | **Closed** | The original pending list and review anchor did not cover every empirical field or prove that the producing commit contained the same candidate policy. The loader now derives 39 empirical pending names exactly from 39 null required child keys; records 48 total prerequisites; validates every registry entry before duplicate detection; binds candidate path, ID, semantic hash, artifact hash, producing commit, and the reviewed policy-code map including `research/__init__.py`; requires a strict descendant independent-review commit; and permits only the reviewed-status/identity transition over the same policy bytes. |
+| `TPR-CCR2-005` | P2 | **Closed** | Source capture/schema, secret-bearing metadata, institution identity, pre-event price, and raw-versus-adjusted target lineage were incomplete. The zero-access source contract now freezes all-history pagination through a reviewed high-water mark, credential-redacted raw page/request/response hashes and inventory, strict Decimal and optional/null/action handling, secret scanning, unknown-field refusal, a non-authoritative provider history claim, and required source-history/schema and institution-master child audits. Basis rules require the immediately preceding completed official close and one unmixed cutoff-valid raw or adjusted target pair under separately reviewed basis and vendor-adjustment/restatement audits. No request occurred. |
+| `TPR-CCR2-006` | P2 | **Closed after correction** | An audit draft introduced convenient but unapproved research constants (`$5`, q20 ADV, `.99`/`.95` coverage, `1.25` stability, `1%` participation, fixed observation counts, reliability quantiles, and KS `.10`). They were removed. Exact resolution, coverage, stability, screen, cost, reliability, fold, and power rules remain null TPR-0B child bindings under A24 rather than being falsely attributed to owner approval. Publicly documented endpoint maximum `50000` remains retrieval plumbing only; `2011-12-08` remains an audit claim, never accepted coverage. |
+| `TPR-CCR2-007` | P2 | **Closed after correction** | Static import checks could be bypassed through aliased import/evaluation primitives and unreviewed parent-package code. The fixed-boundary transitive guard now rejects forbidden local/provider/outcome/QC/execution imports, dynamic aliases, dangerous/nonliteral reflection, namespace/eval/exec/compile indirection, source substitution, and symlinked or junctioned closure paths while allowing the narrow literal `_authority` lookup required by the loader. `research/__init__.py` is part of the reviewed code map. The guard remains a dependency guard, not an operating-system I/O sandbox. |
+| `TPR-CCR2-008` | P3 | **Closed** | Canonical review instants and decimal values accepted multiple equivalent spellings; unrelated malformed registry entries could raise raw type errors; and redirected authority paths were checked too late. Instants now require exact `YYYY-MM-DDTHH:MM:SSZ`, decimal text uses one finite plain spelling, every registry entry is typed before matching/duplicate logic, and original spec/registry/authority paths and ancestors are checked for symlinks or junctions before resolution. |
+| `TPR-CCR2-009` | P3 | **Closed** | Decay expiry was mislabeled as raw event state `VALID_ZERO`. Age above 80 now means zero signal weight while preserving the event's original disposition. |
+| `TPR-CCR2-010` | P2 | **Closed before handoff** | A one-off regeneration path accidentally serialized frozen mappings as arrays of key/value pairs. Focused validation caught the malformed semantic shape. Candidate construction now lives beside the frozen pins, materializes mappings as JSON objects, derives identity from those exact bytes, and is regression-pinned to reproduce the checked-in artifact byte for byte. |
+| `TPR-CCR2-011` | P3 | **Open, non-authorizing** | Git ancestry plus the `reviewed_by` field can prove the reviewed lineage and exact bytes but not cryptographic control of reviewer identity. The current artifact is unreviewed and zero-access, so this cannot enable anything. Before any future positive authority relies on reviewer identity, require a separately controlled signed review receipt or trusted commit-signature policy. |
+
+### 13.3 Exact candidate and remaining boundary
+
+The canonical candidate is
+`research/target_price_revisions/specs/tpr_round0a.candidate.json`:
+
+- spec ID `tpr-round0a-candidate-f595992a3f5b8396`;
+- semantic hash
+  `f595992a3f5b8396e5f26ba5a3b0a3f32649eec3fd581071b349a5e12203af86`;
+- raw artifact SHA-256
+  `99aae28d5b055aa24b84ce153467dfdbe7ee65f8ee2cef2a870efe1e68b2ea49`;
+- 24 frozen cells, one `planned_unbound` look, 39 null empirical child
+  bindings, and 48 total pending prerequisites; and
+- empty reviewed-spec, research-source, and permanent-look registries.
+
+The planned look is identity-only and unbound: no look is authorized or spent.
+
+The exact next role action after the one Codex push is Claude's independent
+commit-by-commit and cumulative review of the pushed range on this branch and
+worktree. TPR-1 remains blocked on a separately reviewed source-rights
+artifact. TPR-0B remains blocked on reviewed TPR-1/TPR-2 structural manifests.
+TPR-3 and every outcome/lookup path remain blocked on the reviewed parent and
+child identities plus external source and permanent-look authority. Provider
+accesses: **0**. Outcome accesses: **0**. Research looks: **0**.

@@ -26,8 +26,8 @@ planning candidate and status record are
 `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
 and
 `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
-This addition authorizes only the documentation baseline and its independent
-review. **Later owner workflow decision, 2026-08-29:** this target lane uses
+The initial addition authorized only the documentation baseline and its
+independent review. **Later owner workflow decision, 2026-08-29:** this target lane uses
 the serialized Codex-write -> Claude-review -> Codex-counter-review plus next
 milestone -> Claude-review loop on the one long-lived
 `codex/strategy-target-price-revisions` branch and dedicated
@@ -40,10 +40,25 @@ limited to Target-Price Revisions and does not reorder, merge, or modify the
 three existing lanes. It does not schedule provider, outcome, research-look,
 ETF, QC, broker, shadow, paper, live, deployment, or capital authority. Before
 any target-price outcome access, an owner-directed TPR-0 must freeze its
-separate family/look contract and either add the fourth family to the common
-multiplicity/final-holdout design or explicitly exclude it. Shadow, paper,
-restricted-live canary, and bounded unattended operation are separate future
-promotion decisions; no stage authorizes the next.
+separate family/look contract. **Owner-coordinated schedule decision,
+2026-08-29:** Target-Price Revisions is included as the fourth attempt in the
+common selection accounting; the common cutoff is 2027-08-31, the untouched
+shared final holdout is 2027-09-01 through 2029-08-31, and the target lane's
+one-shot validation period is 2026-09-01 through 2027-08-31. This resolves the
+shared-family/date input to the current bounded TPR-0 contract round; the
+authoritative decision-provenance chain and unchanged zero-authority boundary are recorded
+in `docs/THREE_STRATEGY_PROJECT_DIRECTION.md` and the target implementation
+record. Shadow, paper, restricted-live canary, and bounded unattended
+operation are separate future promotion decisions; no stage authorizes the
+next.
+
+**Current bounded status, 2026-08-30:** under the owner's approval of the
+recorded proposals, Codex has implemented the local TPR-0A algorithm/policy
+candidate with every empirical child field unbound and source/look authority
+at zero. It awaits the round's single exact-snapshot push and Claude review;
+TPR-1, TPR-0B, all outcome access, and every operational stage remain blocked.
+Exact artifact identity, validation, and next action live only in the target
+implementation record and Session Handoff.
 
 **Post-integration review/remediation gate, owner direction 2026-08-28:** only
 after all three feature branches complete their lane review loops and the owner
@@ -193,7 +208,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
 | Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
-| Target-Price Revisions (TPR) | Separate fourth planning lane, documentation-only. The published range `c179801..70c4b9f` is merged to `main` (PR #324) and **accepted after correction** by independent review; Codex counter-review is the next step and TPR-0 is unscheduled. The revised PDF and implementation record define a stock-first target-price family and a later, independently gated QC/autopilot ladder. The owner-directed serialized same-branch, one-push-per-role-round workflow applies in the dedicated target worktree. No authenticated source, event, signal, outcome access, look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
+| Target-Price Revisions (TPR) | Separate fourth lane. The published documentation range is merged to `main` (PR #324) and accepted after Codex correction through local `2708c06`. The owner-approved bounded TPR-0A algorithm/policy candidate is implemented locally with empirical bindings still null and source/look authority still zero; it awaits the exact end-of-round push and Claude review on the same branch/worktree. TPR is the fourth shared selection attempt under the frozen 2026-09-01 through 2027-08-31 target validation period and untouched 2027-09-01 through 2029-08-31 common holdout. The revised PDF and implementation record govern lane detail. No authenticated source, event, signal, outcome access, authorized/spent look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0

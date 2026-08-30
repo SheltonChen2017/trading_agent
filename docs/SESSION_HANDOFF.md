@@ -1,12 +1,13 @@
 # Session handoff — current project state
 
 Prepared: 2026-08-29 by Codex after the owner directed a separate
-Target-Price Revision planning lane and a revised research/QC plan that can
-evolve through later gates into bounded QuantConnect autopilot. This remains
-the canonical generic-workflow handoff for the root project and preserves the
-2026-08-28 deferred-remediation state below. The three existing strategy lanes
-remain independent and were not inspected, modified, synchronized, or reviewed
-by this documentation task.
+Target-Price Revision planning lane and revised research/QC plan; amended by
+the owner-coordinated shared-family/final-holdout decision and the approved
+TPR-0A implementation round through 2026-08-30. This remains the canonical
+generic-workflow handoff for the root project and preserves the 2026-08-28
+deferred-remediation state below. The original three strategy lanes remain
+independent; this amendment changes shared coordination only and does not edit
+their lane-owned artifacts.
 
 ## 0. Target-Price Revision fourth-lane planning addition
 
@@ -20,17 +21,33 @@ by this documentation task.
   it with `git fetch`. Note that the merge preceded the mandated independent
   review recorded below, which was performed afterwards against the same
   published range.
+- Before the current owner-coordinated round began, the dedicated target
+  worktree was clean at local head `2708c06`, exactly two local commits ahead
+  of published `c0ba616`. Those commits complete the Codex counter-review and
+  remain unpushed; this round's single lane push has not occurred.
+- The current local TPR-0A implementation candidate is
+  `research/target_price_revisions/specs/tpr_round0a.candidate.json`: spec ID
+  `tpr-round0a-candidate-f595992a3f5b8396`, semantic hash
+  `f595992a3f5b8396e5f26ba5a3b0a3f32649eec3fd581071b349a5e12203af86`,
+  and artifact SHA-256
+  `99aae28d5b055aa24b84ce153467dfdbe7ee65f8ee2cef2a870efe1e68b2ea49`.
+  It has 24 frozen cells, 39 null empirical child bindings, and 48 total
+  pending prerequisites. The reviewed-spec registry is empty; research-source
+  and permanent-look declarations are exact zero-access artifacts. One
+  `planned_unbound` primary look identity records the family and period, but
+  no look is authorized or spent. The candidate is pending Claude review of
+  the exact single-push snapshot and subsequent Codex counter-review.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
-  (26 pages; SHA-256
-  `9f00dd56bf7bec79b3f5362bba61fe71768d1f25e6e4350631dafd1253682633`).
+  (28 pages; raw binary SHA-256
+  `55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14`).
   Its authoritative lane state is
   `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
-  The submitted source PDF remains proposal content only. The SHA-256
-  transcribed for it, `53c549ae...4a2df0`, is 63 hexadecimal characters and
-  therefore malformed; the file is not in the repository, so it cannot be
-  recomputed. That pin establishes no provenance until the owner re-supplies
-  the source or its exact digest.
+  The owner declared the version-2 blueprint, including its owner-decision
+  addendum, the sole normative target-price strategy authority. The unavailable
+  submitted proposal is not a second authority. Its transcribed 63-character
+  value is historical evidence of unavailable provenance only; it cannot be a
+  SHA-256 digest and cannot satisfy or block an implementation gate.
 - The revised plan treats target-price revisions as a separate family from the
   rating-only Analyst Revisions V2 lane. It adopts stock-first null closure,
   cutoff-safe corrections, institution/catalyst independence, binary validity,
@@ -52,27 +69,35 @@ by this documentation task.
   end. No review, counter-review, checkpoint, handoff, or feature branch is
   created. The worktree is target-price-only; external findings are recorded
   for later owner routing and are not fixed from this lane.
-- Before any target-price outcome access, TPR-0 must freeze its exact source,
-  timing, formula, split/FX/horizon, primary cell, power/economic gates,
-  permanent look budget and null disposition. The owner must also amend the
-  common multiplicity/final-holdout contract to four families or explicitly
-  exclude TPR. Local configuration cannot grant that authority.
-- Claude's independent review of the published range `c179801..70c4b9f` is
-  complete: both commits are **accepted after correction**, with no P0 or P1
-  finding, three P2 and three P3 findings, and corrections committed on this
-  same lane branch. The lane's P0-P3 ledger and commit dispositions are in
-  section 11 of the lane record. The exact next step is Codex's counter-review
-  of every Claude commit; TPR-0 may follow only if the snapshot is accepted
-  and no owner decision is outstanding. Two findings need owner decisions
-  before they can close: the blueprint's line-ending storage defect and the
-  malformed source pin. TPR-0 is not started by creating the worktree. Provider/data access, outcome
-  research, ETF work, QC execution, shadow, paper, live and unattended
-  operation remain separately gated.
+- The owner now includes Target-Price Revisions as the separately governed
+  fourth canonical family and fourth attempt in the common selection
+  accounting. The common cutoff session is **2027-08-31**, the untouched
+  shared final holdout is **2027-09-01 through 2029-08-31**, and the target
+  one-shot validation period is **2026-09-01 through 2027-08-31**. The date
+  design originated in the owner-directed ARV2 freeze `b912459`, was accepted
+  by independent review at `1507777`, accepted by Codex counter-review at
+  `31c313e`, and is expressly extended to TPR by the current owner approval.
+  All four families must leave the reserve unconsumed.
+- Claude's documentation review is accepted after correction, and Codex has
+  counter-reviewed all three Claude commits locally through `2708c06`. The
+  owner-approved bounded TPR-0A algorithm/policy candidate is now implemented
+  locally under the lane record and approved shared schedule; it remains
+  unaccepted pending Claude's review of the exact pushed range. This decision
+  does not supply or authorize provider credentials,
+  schemas, licensed rows, source evidence, outcome access, a permanent-look
+  spend authority, ETF work, QC processing, shadow, paper, live, unattended,
+  deployment, broker, or capital authority; all remain zero or separately
+  gated.
+- Known synchronization debt, deliberately not corrected from the target
+  lane: the Analyst V2 draft/loader still names
+  `three_lane_selection_correction` and pins value 3. Analyst V2 remains
+  fail-closed and zero-access, but that lane-owned contract and its tests must
+  be synchronized to four before any Analyst outcome access.
 - `docs/ACTION_PLAN_2026-08-20.md` receives only the concise sequencing and
-  authority reference above. The existing three-lane direction, records and
-  data-source register remain unchanged. The same-branch exception is now
-  explicitly extended only to Target-Price Revisions; no shared-file or other
-  lane exception is extended by inference.
+  authority reference above. The original three-lane operating topology,
+  records, workflow, and data-source register remain unchanged. The target
+  same-branch exception and this one-time owner-coordinated shared amendment do
+  not extend any later shared-file or other-lane exception by inference.
 
 ## 0A. Deferred P2/P3 remediation handoff
 
@@ -342,19 +367,26 @@ short-interest source is the clearest missing paid input.
 
 ### Target-Price Revisions
 
-The documentation-only record is
+The active lane record is
 `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
 It is a separate fourth planning lane under the owner-directed serialized
 same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. No
-provider-specific target normalizer, authenticated target event, permanent
-target look authority, stock score, ETF topology, portfolio, QC algorithm,
-prospective shadow/paper evidence, or live authority exists. The submitted
-plan is replaced by a corrected stock-first blueprint whose later QC/autopilot
-stages remain individually owner-gated. The exact next action is the single
-end-of-round Codex push followed by Claude review of that exact range on the
-same branch, not implementation or data access.
+provider-specific target reader/normalizer, authenticated target event,
+permanent target look authority, stock score, ETF topology, portfolio, QC
+algorithm, prospective shadow/paper evidence, or live authority exists. The
+unreviewed TPR-0A candidate is
+`tpr-round0a-candidate-f595992a3f5b8396`, semantic hash
+`f595992a3f5b8396e5f26ba5a3b0a3f32649eec3fd581071b349a5e12203af86`,
+artifact SHA-256
+`99aae28d5b055aa24b84ce153467dfdbe7ee65f8ee2cef2a870efe1e68b2ea49`,
+with 39 null empirical child bindings and 48 total pending prerequisites. One
+`planned_unbound` look identity exists, but no look is authorized or spent.
+The submitted plan is replaced by the sole-normative corrected stock-first
+blueprint whose later QC/autopilot stages remain individually owner-gated.
+The exact next action is the single end-of-round Codex push followed by Claude
+review of that exact range on the same branch, not TPR-1 or data access.
 
 ## 5. Data acquisitions and confirmations
 
@@ -418,18 +450,21 @@ budgets, combined costs/turnover/capacity, untouched final holdout, QC parity,
 paper deployment, monitoring, reconciliation, kill switch, and explicit
 promotion. No leverage is planned for the canonical strategies.
 
-Before any lane performs its first real-outcome study, the owner must freeze
-one common final-holdout cutoff and reserved period that all three lanes leave
-unconsumed. The combined evidence threshold must treat the three lanes as one
-selection family. A valid canonical null closes its family; it is not tuned or
-rerun to pass. Any later hypothesis needs a separately preregistered family
-and a new owner-authorized permanent look budget.
+The owner has frozen one common final-holdout cutoff for all four canonical
+families: cutoff session **2027-08-31**, with **2027-09-01 through 2029-08-31**
+reserved and inaccessible to every lane. Target-Price Revisions has the
+distinct one-shot validation period **2026-09-01 through 2027-08-31**. The
+combined evidence threshold treats the four families as one selection family
+and accounts for selection from four attempts, while each lane retains its own
+family ID, look budget, evidence epoch, and valid-null closure. A valid
+canonical null is not tuned or rerun to pass; any later hypothesis needs a
+separately preregistered family and a new owner-authorized permanent look
+budget.
 
-Target-Price Revisions does not silently change that three-family contract.
-Before its first outcome access, the owner must either amend the combined
-evidence threshold and common holdout to four families or explicitly exclude
-TPR and assign it a separate permanent look/holdout contract. Until then its
-outcome authority is zero.
+This shared schedule and multiplicity decision grants no outcome access. TPR
+and every other lane remain unable to consume the holdout, and TPR has no
+provider, source, permanent-look, or QC authority merely because its dates are
+now frozen.
 
 ## 8. Resume prompt
 

@@ -1,11 +1,26 @@
 # Project direction — three strategies developed in parallel
 
-Status: **OWNER-DIRECTED MAIN-LINE COORDINATION RECORD, 2026-08-26.**
+Status: **OWNER-DIRECTED MAIN-LINE COORDINATION RECORD, 2026-08-26;
+OWNER-COORDINATED FOURTH-FAMILY AMENDMENT, 2026-08-29.**
 
 This document states the direction of the project while the strategy-research
 work is split across three long-lived branches. It coordinates the lanes; it
 does not authorize a research outcome run, vendor access, QuantConnect job,
 paper/live deployment, broker action, or autonomous trading.
+
+**Owner-coordinated shared-family amendment, 2026-08-29:** the original
+three-lane operating topology below remains unchanged. Target-Price Revisions,
+which has its own separately governed branch and workflow, is now the fourth
+canonical family and the fourth attempt in the shared selection accounting.
+The common cutoff session is **2027-08-31**; the untouched shared final holdout
+is **2027-09-01 through 2029-08-31**; and the Target-Price Revisions one-shot
+lane-validation period is **2026-09-01 through 2027-08-31**. This schedule
+originated in the owner-directed Analyst Revisions V2 freeze at `b912459`, was
+independently accepted at `1507777`, was accepted by Codex counter-review at
+`31c313e`, and is expressly extended to the fourth family by the owner's
+current approval. It grants no credential, provider, licensed-row, outcome,
+research-look, QuantConnect, QC-processing, broker, paper/live, deployment, or
+trading authority.
 
 The exact shared baseline is
 `c9dcdb647914acbfcefce187a138f52fcdad0c68`, descended from `origin/main` at
@@ -168,21 +183,29 @@ separately characterize, the same shared account.
 
 ## 5. Main-line integration direction
 
-Parallel development ends only after each canonical strategy has completed
-its independent review/counter-review chain and has an honest disposition:
-accepted, accepted-after-correction, rejected, or valid null. A valid null
-closes that lane's canonical family; the lane must not tune or rerun that
-family to make it pass. Any later hypothesis must be a separately
-preregistered family with a new owner-authorized permanent look budget, and
-it cannot retroactively rescue the canonical result.
+Parallel development of the original three lanes ends only after each of those
+three canonical strategies has completed its independent
+review/counter-review chain and has an honest disposition: accepted,
+accepted-after-correction, rejected, or valid null. Target-Price Revisions is
+separately governed and does not block the original three-codebase integration
+mechanics below. A valid null closes its lane's canonical family; the lane must
+not tune or rerun that family to make it pass. Any later hypothesis must be a
+separately preregistered family with a new owner-authorized permanent look
+budget, and it cannot retroactively rescue the canonical result.
 
-Because the combined evaluation must be untouched by all three lanes, the
-owner freezes one shared final-holdout boundary — a common cutoff date and
-reserved period — before any lane performs its first real-outcome study, and
-every lane's preregistered splits must leave that shared period unconsumed.
-The combined evaluation also treats the three lanes as one selection family:
-its evidence thresholds must account for the fact that the surviving
-strategies were selected from three parallel attempts.
+Because the common outcome evaluation must be untouched by all four families, the
+one shared final-holdout boundary is frozen at cutoff session **2027-08-31** with
+reserved period **2027-09-01 through 2029-08-31**. Every family's
+preregistered split must leave that shared period unconsumed. Target-Price
+Revisions uses the distinct one-shot validation period **2026-09-01 through
+2027-08-31** and may not use the holdout. The common evaluation treats the
+four canonical families as one selection family: its evidence thresholds must
+account for the fact that surviving strategies were selected from four
+attempts. This shared selection accounting does not merge their lane-level
+family IDs, permanent look budgets, or evidence epochs. The common four-family
+outcome evaluation remains prohibited until Target-Price Revisions also has an
+independently reviewed honest disposition and the owner separately schedules
+that evaluation.
 
 The owner then schedules a separate integration milestone. That milestone
 must:
@@ -193,7 +216,9 @@ must:
 3. freeze late-fusion rules, signal correlations, capital/risk budgets,
    turnover, overlap, concentration, and failure behavior without consulting
    the final holdout;
-4. run an untouched combined out-of-sample evaluation with realistic costs;
+4. build the deterministic combined-evaluation harness with realistic costs,
+   while leaving the common four-family outcome evaluation disabled until the
+   prerequisite above is satisfied;
 5. implement and independently verify one QuantConnect algorithm whose
    research inputs cannot acquire execution authority; and
 6. require separate owner approval for paper deployment, evidence collection,
@@ -216,7 +241,7 @@ any SEP-3 blocker. SEP may resume only by a later owner instruction.
 current assistant's human-approval, paper-only, policy, exposure,
 reconciliation, or execution-gate boundaries.
 
-## 7. Current next step
+## 7. Historical 2026-08-26 completion and current shared amendment
 
 Claude may independently review this main-line coordination record and the
 common branch baseline. After that review, each Codex strategy session starts
@@ -245,3 +270,12 @@ carries the final coordination documents — precedes the creation of the three
 Claude lane review sessions. After finalization, each Codex strategy session
 starts only the first contract/fixture milestone named in its own
 implementation record.
+
+**Current amendment step, 2026-08-30:** the historical three-lane
+finalization above is complete and remains unchanged. The separately governed
+Target-Price Revisions lane has a local owner-approved TPR-0A candidate; its
+next action is one exact-snapshot push followed by Claude review and Codex
+counter-review on that lane's same branch/worktree. This shared record freezes
+only four-family selection accounting and the common final-holdout boundary;
+it grants no source, outcome, look, QuantConnect, broker, deployment, paper,
+live, or integration authority.

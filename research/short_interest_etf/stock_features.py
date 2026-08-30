@@ -18,6 +18,7 @@ from data.financial_primitives import decimal_text
 from data.hashing import hash_payload
 from research.short_interest_etf.contracts import (
     DenominatorKind,
+    DenominatorObservation,
     ShortInterestContractError,
     ShortInterestSnapshot,
     _canonical_date,
@@ -151,6 +152,8 @@ class PitStockRawFeature:
     prior_denominator_kind: DenominatorKind
     prior_denominator_value: str
     prior_denominator_sha256: str
+    current_denominator: DenominatorObservation
+    prior_denominator: DenominatorObservation
     current_short_shares: int
     prior_short_shares: int
     current_short_ratio: ExactRational
@@ -239,6 +242,28 @@ class PitStockRawFeature:
             ):
                 raise _refuse("SI-3A accepts PIT shares-outstanding ratios only")
 
+        for side in ("current", "prior"):
+            observation = getattr(self, f"{side}_denominator")
+            if type(observation) is not DenominatorObservation:
+                raise _refuse(
+                    f"feature.{side}_denominator must be the exact "
+                    "DenominatorObservation type"
+                )
+            if hash_payload(observation.to_payload()) != getattr(
+                self, f"{side}_denominator_sha256"
+            ):
+                raise _refuse(
+                    f"feature.{side}_denominator_sha256 does not digest "
+                    f"feature.{side}_denominator"
+                )
+            if decimal_text(Decimal(observation.value)) != getattr(
+                self, f"{side}_denominator_value"
+            ):
+                raise _refuse(
+                    f"feature.{side}_denominator_value does not match "
+                    f"feature.{side}_denominator"
+                )
+
         current_denominator = _whole_positive_shares(
             self.current_denominator_value,
             "feature.current_denominator_value",
@@ -280,6 +305,7 @@ class PitStockRawFeature:
     def to_payload(self) -> dict[str, Any]:
         return {
             "classification_record_id": self.classification_record_id,
+            "current_denominator": self.current_denominator.to_payload(),
             "current_denominator_kind": self.current_denominator_kind.value,
             "current_denominator_sha256": self.current_denominator_sha256,
             "current_denominator_value": self.current_denominator_value,
@@ -293,6 +319,7 @@ class PitStockRawFeature:
             "lifecycle_record_id": self.lifecycle_record_id,
             "preregistration_sha256": self.preregistration_sha256,
             "previous_settlement_date": self.previous_settlement_date,
+            "prior_denominator": self.prior_denominator.to_payload(),
             "prior_denominator_kind": self.prior_denominator_kind.value,
             "prior_denominator_sha256": self.prior_denominator_sha256,
             "prior_denominator_value": self.prior_denominator_value,
@@ -513,9 +540,11 @@ def build_pit_stock_raw_features(
             current_denominator_kind=current.denominator.kind,
             current_denominator_value=current_denominator_value,
             current_denominator_sha256=readiness.denominator_sha256,
+            current_denominator=current.denominator,
             prior_denominator_kind=prior.denominator.kind,
             prior_denominator_value=prior_denominator_value,
             prior_denominator_sha256=hash_payload(prior.denominator.to_payload()),
+            prior_denominator=prior.denominator,
             current_short_shares=current.current_short_shares,
             prior_short_shares=prior.current_short_shares,
             current_short_ratio=current_ratio,

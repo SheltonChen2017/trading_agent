@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from dataclasses import fields, replace
+from decimal import Decimal
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -374,6 +376,88 @@ def test_feature_contract_recomputes_all_three_ratios(
         replace(feature, **{field_name: replacement})
 
 
+def test_denominator_values_must_agree_with_their_recorded_lineage_digests():
+    """A substituted denominator value must not survive behind a genuine digest.
+
+    ``current_denominator_sha256`` is anchored to the readiness row, and the
+    three ratios are recomputed from the carried denominator *values*.  Without
+    a value-to-digest binding the two halves never meet: a caller could restate
+    the denominator, recompute internally consistent ratios, and keep the
+    genuine readiness-anchored digest, so the lineage chain would certify a
+    ratio that was never derived from the authenticated PIT fact.
+    """
+    _, feature = _ready_feature()
+
+    tampered_current = Fraction(feature.current_short_shares, 2_000_000)
+    with pytest.raises(StockFeatureError, match="current_denominator_value"):
+        replace(
+            feature,
+            current_denominator_value="2000000",
+            current_short_ratio=ExactRational.from_fraction(tampered_current),
+            delta_short_ratio=ExactRational.from_fraction(
+                tampered_current - feature.prior_short_ratio.to_fraction()
+            ),
+        )
+
+    tampered_prior = Fraction(feature.prior_short_shares, 2_000_000)
+    with pytest.raises(StockFeatureError, match="prior_denominator_value"):
+        replace(
+            feature,
+            prior_denominator_value="2000000",
+            prior_short_ratio=ExactRational.from_fraction(tampered_prior),
+            delta_short_ratio=ExactRational.from_fraction(
+                feature.current_short_ratio.to_fraction() - tampered_prior
+            ),
+        )
+
+    assert hash_payload(feature.current_denominator.to_payload()) == (
+        feature.current_denominator_sha256
+    )
+    assert hash_payload(feature.prior_denominator.to_payload()) == (
+        feature.prior_denominator_sha256
+    )
+
+
+def test_disposition_still_binds_the_current_denominator_digest_to_its_readiness():
+    """The readiness anchor must keep working behind the new feature-level check.
+
+    Binding each digest to its observation means a plainly corrupt digest now
+    fails inside the feature.  This case slips past that check with an
+    internally consistent feature that simply describes the *prior* denominator
+    as its current one, so only the disposition's readiness binding is left to
+    catch it.
+    """
+    disposition, feature = _ready_feature()
+    swapped = Fraction(
+        feature.current_short_shares,
+        int(Decimal(feature.prior_denominator_value)),
+    )
+    substituted = replace(
+        feature,
+        current_denominator=feature.prior_denominator,
+        current_denominator_sha256=feature.prior_denominator_sha256,
+        current_denominator_value=feature.prior_denominator_value,
+        current_denominator_kind=feature.prior_denominator_kind,
+        current_short_ratio=ExactRational.from_fraction(swapped),
+        delta_short_ratio=ExactRational.from_fraction(
+            swapped - feature.prior_short_ratio.to_fraction()
+        ),
+    )
+    with pytest.raises(StockFeatureError, match="current_denominator_sha256"):
+        replace(disposition, feature=substituted)
+
+
+def test_denominator_digest_covers_the_whole_observation_not_only_its_value():
+    """Provenance is part of the denominator fact, not just the share count."""
+    _, feature = _ready_feature()
+    restamped = replace(feature.current_denominator, raw_record_sha256="c" * 64)
+    assert restamped.value == feature.current_denominator.value
+    assert restamped.kind is feature.current_denominator.kind
+
+    with pytest.raises(StockFeatureError, match="current_denominator_sha256"):
+        replace(feature, current_denominator=restamped)
+
+
 @pytest.mark.parametrize(
     ("field_name", "replacement"),
     [
@@ -396,9 +480,13 @@ def test_feature_lineage_must_match_the_exact_readiness_row(
     field_name, replacement
 ):
     disposition, feature = _ready_feature()
-    mismatched = replace(feature, **{field_name: replacement})
+    # The tampered field must be named and rejected somewhere in the
+    # construction chain.  Binding each denominator digest to the exact
+    # observation it was taken over moved the current-denominator case from the
+    # disposition boundary to the feature contract itself; both boundaries are
+    # still exercised, and every case still proves the field cannot drift.
     with pytest.raises(StockFeatureError, match=field_name):
-        replace(disposition, feature=mismatched)
+        replace(disposition, feature=replace(feature, **{field_name: replacement}))
 
 
 def test_feature_execution_lineage_must_match_as_one_valid_temporal_pair():

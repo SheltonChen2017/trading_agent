@@ -3,7 +3,8 @@
 This package deliberately has no network collection, outcome, portfolio,
 broker, or scheduler surface. It contains immutable in-memory Form 4
 structure, a fixture parser, and a caller-supplied SEC quarterly ZIP integrity
-boundary plus an explicit-profile, offline parsed-snapshot boundary.
+boundary plus explicit-profile, offline parsed and EDGAR acceptance-evidence
+snapshot boundaries.
 """
 
 from research.insider_buying.contracts import (
@@ -45,16 +46,35 @@ from research.insider_buying.sec_bulk_parsed_snapshot import (
     build_sec_bulk_parsed_snapshot,
     load_sec_bulk_parsed_snapshot,
 )
+from research.insider_buying.sec_edgar_acceptance_snapshot import (
+    EDGAR_ACCEPTANCE_SNAPSHOT_CONTRACT_VERSION,
+    EDGAR_ACCEPTANCE_SNAPSHOT_KIND,
+    LoadedSecEdgarAcceptanceSnapshot,
+    SEC_EDGAR_METADATA_PARSER_VERSION,
+    SecEdgarAcceptanceSnapshotError,
+    SecEdgarAcceptanceSnapshotIdentity,
+    SecEdgarAvailabilityRecord,
+    SecEdgarAvailabilityRule,
+    SecEdgarAvailabilityTier,
+    SecEdgarMetadataSchemaProfile,
+    SecEdgarMetadataSource,
+    SecEdgarMetadataSourceIdentity,
+    build_sec_edgar_acceptance_snapshot,
+    load_sec_edgar_acceptance_snapshot,
+)
 
 __all__ = [
     "ALLOWED_SEC_TABLES",
     "CANONICAL_SPEC",
     "ClassificationOutcome",
+    "EDGAR_ACCEPTANCE_SNAPSHOT_CONTRACT_VERSION",
+    "EDGAR_ACCEPTANCE_SNAPSHOT_KIND",
     "FilingCorpus",
     "FilingEnvelope",
     "Form4ParseError",
     "LoadedSecBulkSnapshot",
     "LoadedSecBulkParsedSnapshot",
+    "LoadedSecEdgarAcceptanceSnapshot",
     "PARSED_SNAPSHOT_CONTRACT_VERSION",
     "ParsedFiling",
     "ParsedSecBulkAccession",
@@ -73,12 +93,23 @@ __all__ = [
     "SecTsvSchemaProfile",
     "SecTsvSchemaVariant",
     "SEC_TSV_PARSER_VERSION",
+    "SEC_EDGAR_METADATA_PARSER_VERSION",
+    "SecEdgarAcceptanceSnapshotError",
+    "SecEdgarAcceptanceSnapshotIdentity",
+    "SecEdgarAvailabilityRecord",
+    "SecEdgarAvailabilityRule",
+    "SecEdgarAvailabilityTier",
+    "SecEdgarMetadataSchemaProfile",
+    "SecEdgarMetadataSource",
+    "SecEdgarMetadataSourceIdentity",
     "TransactionDiagnostic",
     "build_filing_corpus",
     "build_sec_bulk_parsed_snapshot",
+    "build_sec_edgar_acceptance_snapshot",
     "inspect_sec_bulk_archive",
     "load_sec_bulk_snapshot",
     "load_sec_bulk_parsed_snapshot",
+    "load_sec_edgar_acceptance_snapshot",
     "parse_form4_xml",
     "write_sec_bulk_snapshot",
 ]

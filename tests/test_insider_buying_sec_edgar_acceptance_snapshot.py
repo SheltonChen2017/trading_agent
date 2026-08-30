@@ -2874,6 +2874,78 @@ def test_reconciliation_wrapper_refuses_forged_authority_identity():
         )
 
 
+def test_reconciliation_wrapper_refuses_chronology_pointing_at_other_bytes(
+    tmp_path,
+):
+    """A hand-built chronology cannot point a supplied version at other bytes.
+
+    Roles, contiguity and every count stay valid here, so only the semantic
+    rebuild of the chronology from the corpus can refuse this.
+    """
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(
+            _xml_source(ACCESSION_A, "form4_original.xml"),
+            _xml_source(
+                ACCESSION_B,
+                "form4_amendment.xml",
+                amends_accession=ACCESSION_A,
+            ),
+        ),
+    )[3]
+    lineage = reconciled.lineages[0]
+    amendment = lineage.versions[1]
+    assert (
+        amendment.disposition
+        is reconciliation_module.Form4VersionDisposition.QUARANTINED_UNRESOLVED_AMENDMENT
+    )
+    forged_lineage = replace(
+        lineage,
+        versions=(
+            lineage.versions[0],
+            replace(amendment, source_sha256="b" * 64),
+        ),
+    )
+    assert len(forged_lineage.versions) == len(lineage.versions)
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError, match="disagrees with its identity"
+    ):
+        reconciliation_module.ReconciledForm4Amendments(
+            identity=reconciled.identity,
+            as_filed_corpus=reconciled.as_filed_corpus,
+            lineages=(forged_lineage,),
+        )
+
+
+def test_reconciliation_wrapper_refuses_source_inventory_hash_drift(tmp_path):
+    """Inventory hashes must stay bound to the exact parsed filing bytes.
+
+    The identity keeps its valid type, flags and counts, so the inventory-to-
+    filing hash comparison is the only guard that can refuse this.
+    """
+    reconciled = _build_reconciliation(
+        tmp_path,
+        sources=(_xml_source(ACCESSION_A, "form4_original.xml"),),
+    )[3]
+    inventory = reconciled.identity.source_inventory
+    assert len(inventory) == 1
+    drifted = replace(reconciled.identity, source_inventory=(
+        replace(inventory[0], xml_sha256="c" * 64),
+    ))
+    assert len(drifted.source_inventory) == len(inventory)
+
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="sources disagree with parsed filings",
+    ):
+        reconciliation_module.ReconciledForm4Amendments(
+            identity=drifted,
+            as_filed_corpus=reconciled.as_filed_corpus,
+            lineages=reconciled.lineages,
+        )
+
+
 def test_source_count_and_byte_caps_precede_snapshot_loading(
     tmp_path, monkeypatch
 ):

@@ -37,6 +37,17 @@ their lane-owned artifacts.
   `planned_unbound` primary look identity records the family and period, but
   no look is authorized or spent. The candidate is pending Claude review of
   the exact single-push snapshot and subsequent Codex counter-review.
+- The stable implementation snapshot is
+  `ba01e98f9d3c8746c70182818a27a2d49a9c0fe7`. On its exact tree, all
+  target/shared tests pass (**176 passed, 3 host symlink-permission skips**),
+  compilation and diff/identity checks pass, and the full repository run had
+  **5,829 passed, 5 skipped, 1 out-of-lane failure, 26 warnings**. The sole
+  failure was an out-of-lane Briefing smoke-fixture isolation gap: unpatched
+  direct yfinance paths timed out with cache errors, while the exact test
+  passed immediately alone in 14.42 seconds. It is recorded as `TPR-OOL-005`
+  and was not fixed from this target-only lane. No TPR P0/P1/P2 remains; the
+  only TPR P3 is future cryptographic reviewer-identity strengthening before
+  any positive authority.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (28 pages; raw binary SHA-256

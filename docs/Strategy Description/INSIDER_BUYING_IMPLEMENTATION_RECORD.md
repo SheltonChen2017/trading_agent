@@ -1,12 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
 Status: **THE IB-0/IB-1 STRUCTURAL SLICE, BOUNDED IB-1A RAW-SNAPSHOT
-BOUNDARY, AND BOUNDED IB-1B OFFLINE EXPLICIT-PROFILE PARSER ARE IMPLEMENTED
-AND HAVE COMPLETED INDEPENDENT CLAUDE REVIEW FOR THE 2026-08-29 ROUND
-(ACCEPTED AFTER CORRECTION; SEE SECTION 13). NO OFFICIAL SEC SCHEMA PROFILE
-OR REAL SEC PACKAGE HAS BEEN INGESTED. NORMALIZATION, SIGNAL CONSTRUCTION,
-OUTCOME TESTING, ETF PORTFOLIO WORK, AND QC IMPLEMENTATION REMAIN
-UNSTARTED.**
+BOUNDARY, AND BOUNDED IB-1B OFFLINE EXPLICIT-PROFILE PARSER HAVE COMPLETED
+INDEPENDENT CLAUDE REVIEW. THE BOUNDED IB-1C OFFLINE EDGAR
+ACCEPTANCE-EVIDENCE SNAPSHOT IS IMPLEMENTED AT `892218d` AND AWAITS CLAUDE
+REVIEW (SEE SECTION 14). IB-1 AND BLUEPRINT SECTION 19.4 STEP 3 ARE NOT
+COMPLETE: NO OFFICIAL SEC PROFILE OR REAL PACKAGE HAS BEEN USED, AND XML
+VALIDATION PLUS FORM 4/A AMENDMENT RECONCILIATION REMAIN DEFERRED.
+NORMALIZATION, SIGNAL CONSTRUCTION, OUTCOME TESTING, ETF PORTFOLIO WORK, AND
+QC IMPLEMENTATION REMAIN UNSTARTED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -116,9 +118,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-29 | Codex validation | `82d048c` -> `82d048c` (exact tested snapshot; this validation-record commit follows) | IB-1A final exact-tree validation | Revalidated the committed code plus counter-review record without changing product files. The later validation-record commit changes this lane document only. | Combined Insider/import-boundary/entry-point/active-document suite: **266 passed, 4 skipped in 20.91s**; complete exact-tree suite: **5,390 passed, 6 skipped, 0 failed, 26 warnings in 1,053.88s (17m33s)**; whole-repository compileall exit 0. Post-suite read-only runtime resolver: file absent, inactive, generation 0, 0 incidents. No external/provider/outcome/QC/broker/operator/scheduler access; **0 research looks**. | No new P0-P3 finding. The skips are platform-conditional; the warnings are dependency/runtime notices retained in section 10. The tested snapshot stayed clean. | Commit this validation record, run the record-sensitive final checks, and make the single push. Claude independently reviews every pushed commit before any IB-1B work. |
 | 2026-08-29 | Codex counter-review + implementation | `df1b7d4..8d9e70b` reviewed; `8d9e70b` -> this implementation snapshot | Claude counter-review plus bounded IB-1B offline parsed snapshot | Fast-forwarded the same worktree/branch, dispositioned both Claude commits and the omitted prior-commit verdicts, corrected the reproduced hard-process-restart gap in IB-1A, and implemented a mandatory-profile offline TSV parser plus immutable parsed snapshot. Only `research/insider_buying`, its tests, and this lane record changed; no Trading App or Streamlit work. | Exact-current Insider/import-boundary/entry-point/module-hygiene suite: **269 passed, 5 platform symlink skips in 48.78s**. Raw plus parsed boundary subset: **135 passed, 5 skips**; exact hard-restart, mixed-residue, source-key, raw-bound reload, semantic-forgery, resource-cap, concurrent-writer, and lock-domain regressions are included. No SEC/EDGAR/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | `76f0c21` accepted after current corrections; `8d9e70b` accepted only as validation of its prior tree. IB1B-CR-01 through IB1B-R08 are fixed or dispositioned in section 12. R-22 is host-local process evidence only; R-23 remains deferred integration debt. No official/live SEC schema compatibility is claimed. | Commit the implementation and lane record, validate the exact committed tree including the complete suite and compileall, append a validation row, then make one push. Claude reviews every pushed commit before further Insider work. |
 | 2026-08-29 | Codex validation | `9cbc962` -> `9cbc962` (exact tested snapshot; this validation-record commit follows) | IB-1B final exact-tree validation | Revalidated the committed counter-review, IB-1A restart correction, IB-1B code, tests, and lane record without changing product files. The later validation-record commit changes this lane document only. | Complete exact-tree suite: **5,450 passed, 7 skipped, 0 failed, 26 warnings in 1,022.22s (17m02s)**; whole-repository compileall exit 0; focused exact-tree suite **269 passed, 5 skipped in 48.78s**; active-document checks **63 passed**; `git diff HEAD^ HEAD --check` clean. No SEC/EDGAR/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, UI, or order access; **0 research looks**. | No new P0-P3 finding. The skips are platform-conditional and the warnings are dependency/runtime notices; the exact tested snapshot stayed clean. | Commit this validation record, run record-sensitive final checks, and make the single push. Claude independently reviews every pushed commit before further Insider work. |
-| 2026-08-29 | Claude review | `8d9e70b` -> this review snapshot | Independent review of the IB-1B parsed snapshot boundary and of the counter-review of the prior Claude round (`8d9e70b..03820d3`, 2 commits) | Verified frozen-file isolation and ancestry, accepted all four counter-review findings raised against this reviewer, independently reproduced the IB-1A restart correction by direct probe, and paired-mutation-swept the new module's semantic guarantees instead of counting single refusal sites. Added six regression cases for the loader's row-level rebuild and the row caps. Full dispositions are in section 13. | Focused Insider/import-boundary/hygiene/separation suite **278 passed, 5 skipped in 41.74s**; IB-1B module **61 passed, 1 skipped** after the additions (55 before); independent complete suite on the exact pushed tree `03820d3`: **5,450 passed, 7 skipped, 0 failed, 25 warnings in 867.42s**, reproducing the recorded Codex pass/skip figures; paired mutation sweep of seven semantic invariants **2 caught / 5 survived before, 7 caught / 0 survived after**, module restored byte-identical to `HEAD`; twelve direct restart probes across both modules; complete suite on the exact final review
-tree after correction commit `61b0bec`: **5,456 passed, 7 skipped, 0 failed,
-25 warnings in 830.27s**; active-document suite 63 passed; compileall exit 0. No SEC/EDGAR, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | IB1B-R10 (P2) fixed here: the loader's row-level semantic rebuild was undefended by tests, so `row_id` lineage, `schema_id` binding, ordinal sequence, accession projection, and both row caps could each be deleted with the suite green. IB1B-R09 (P2, OPEN) records that a partial-write hard restart still permanently blocks retry in both modules; deliberately not fixed because loosening a fail-closed check is an implementer decision. IB1B-R11 and IB1B-R12 (P3) recorded. No test weakening found. | Codex counter-reviews these Claude commits, then may continue the bounded IB ladder. Shared-surface P1 set unchanged and uncorrected on this lane under the owner's 2026-08-29 strategy-scope rule. |
+| 2026-08-29 | Claude review | `8d9e70b` -> this review snapshot | Independent review of the IB-1B parsed snapshot boundary and of the counter-review of the prior Claude round (`8d9e70b..03820d3`, 2 commits) | Verified frozen-file isolation and ancestry, accepted all four counter-review findings raised against this reviewer, independently reproduced the IB-1A restart correction by direct probe, and paired-mutation-swept the new module's semantic guarantees instead of counting single refusal sites. Added six regression cases for the loader's row-level rebuild and the row caps. Full dispositions are in section 13. | Focused Insider/import-boundary/hygiene/separation suite **278 passed, 5 skipped in 41.74s**; IB-1B module **61 passed, 1 skipped** after the additions (55 before); independent complete suite on the exact pushed tree `03820d3`: **5,450 passed, 7 skipped, 0 failed, 25 warnings in 867.42s**, reproducing the recorded Codex pass/skip figures; paired mutation sweep of seven semantic invariants **2 caught / 5 survived before, 7 caught / 0 survived after**, module restored byte-identical to `HEAD`; twelve direct restart probes across both modules; complete suite on the exact final review tree after correction commit `61b0bec`: **5,456 passed, 7 skipped, 0 failed, 25 warnings in 830.27s**; active-document suite 63 passed; compileall exit 0. No SEC/EDGAR, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | IB1B-R10 (P2) fixed here: the loader's row-level semantic rebuild was undefended by tests, so `row_id` lineage, `schema_id` binding, ordinal sequence, accession projection, and both row caps could each be deleted with the suite green. IB1B-R09 (P2, OPEN) records that a partial-write hard restart still permanently blocks retry in both modules; deliberately not fixed because loosening a fail-closed check is an implementer decision. IB1B-R11 and IB1B-R12 (P3) recorded. No test weakening found. | Codex counter-reviews these Claude commits, then may continue the bounded IB ladder. Shared-surface P1 set unchanged and uncorrected on this lane under the owner's 2026-08-29 strategy-scope rule. |
+| 2026-08-30 | Codex counter-review + implementation | `61b0bec..60c2f29` reviewed; `60c2f29` -> `7b3377b` counter-review correction -> `892218d` implementation snapshot (this lane-record commit follows) | Claude counter-review plus bounded IB-1C offline EDGAR acceptance-evidence snapshot | Accepted both Claude commits after two record corrections, closed the confirmed IB-1A/IB-1B partial-write restart gap, and added a caller-supplied, explicit-profile acceptance-evidence boundary that covers every verified IB-1B accession with exact evidence or an explicit date-only fallback. It performs no download, discovery, XML validation, amendment reconciliation, normalization, outcome access, ETF work, QC job, broker action, or UI change. | Exact current nine-file Insider/import-boundary/hygiene/separation suite: **477 passed, 7 platform skips in 130.14s**; final IB-1C module: **153 passed, 2 skips in 98.03s**; independent IB-1C plus record review: **154 passed, 2 skips**; compileall exit 0; `git diff --check` clean apart from line-ending notices. No SEC/EDGAR/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, UI, or order access; **0 research looks**. | `61b0bec` accepted; `60c2f29` accepted after current record correction. IB1B-R09 is fixed in `7b3377b`; IB1B-R10 is accepted; IB1B-R11 remains deferred neutral-I/O integration debt; IB1B-R12 is rejected as a false positive. IB1C-R01 through IB1C-R14 are fixed in section 14; two independent final audits report no remaining P0-P3 finding. | Commit this lane record, validate the exact committed tree with the complete suite and whole-repository compileall, append a validation row, then make the round's single push. Claude reviews every pushed commit before any amendment-reconciliation milestone. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -1147,7 +1148,7 @@ why single-site mutation counts are not a coverage measure here.
 ordinals, and uses `type(ordinal) is not int`, which correctly rejects `bool`
 where `isinstance` would not.
 
-Two prior tests were replaced in this range and both replacements were checked
+One prior test was replaced in this range and that replacement was checked
 for weakening. `test_missing_commit_marker_and_partial_snapshot_refuse` encoded
 the behaviour IB1B-CR-01 deliberately changed, and its replacement is strictly
 broader - three recovery cases plus two refusal cases that assert the entire
@@ -1206,3 +1207,156 @@ integration-time consolidation debt.
 Next authorized step: Codex counter-reviews these Claude commits, then may
 continue the bounded IB ladder. No SEC ingest, outcome join, ETF construction,
 QuantConnect job, or broker action is authorized.
+
+## 14. Codex counter-review and bounded IB-1C acceptance evidence (2026-08-30)
+
+Implementer and counter-reviewer: Codex, in the same long-lived Insider Buying
+worktree and branch. Claude range reviewed: `61b0bec..60c2f29`, two commits.
+Codex correction: `7b3377b`. Bounded IB-1C implementation snapshot: `892218d`.
+No branch, worktree, or lane was created or switched.
+
+The owner scope remains strategy-only. No Trading App, Streamlit, shared
+execution, provider, outcome, QuantConnect, broker, operator-database, or
+scheduler surface was changed. Shared-surface findings from earlier rounds stay
+documented and uncorrected on this lane.
+
+### 14.1 Claude commit dispositions
+
+Every Claude commit since the prior Codex push is dispositioned separately.
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `61b0bec` | **Accepted.** | The six IB-1B row-level rebuild and cap regressions are valid, materially strengthen mutation sensitivity, and do not weaken or replace production behavior. |
+| `60c2f29` | **Accepted after current record correction.** | The review record accurately preserves the prior validation and IB1B-R09 through IB1B-R11. Two prose/structure defects were corrected here: its long ledger row had been physically split into prose, and section 13.6 said two prior tests were replaced when exactly one was. |
+
+### 14.2 Counter-review findings and dispositions
+
+| ID | Sev | Disposition | Evidence and resolution |
+|---|---|---|---|
+| IB1C-CR-01 / IB1B-R09 | P2 | **Confirmed and fixed in `7b3377b`.** | A strict prefix left in a publisher temporary after process loss permanently blocked the same content-addressed snapshot. Both IB-1A and IB-1B now recover an exact verified prefix only when no final commit exists. Classification remains two-phase: any foreign, oversize, mixed, redirected, or committed partial residue refuses before any deletion, and a committed final accepts only byte-exact temporary residue. |
+| IB1C-CR-02 / IB1B-R10 | P2 | **Accepted.** | Claude's six tests make the row-id, schema, ordinal, accession-projection, and row-cap rebuild guarantees load-bearing. No production correction or test weakening was found. |
+| IB1C-CR-03 / IB1B-R11 | P3 | **Confirmed, deferred.** | The raw and parsed boundaries still duplicate immutable-I/O helpers. Consolidation belongs in a neutral shared-module integration round, not this strategy-only milestone. No unsafe current behavior was reproduced. |
+| IB1C-CR-04 / IB1B-R12 | P3 | **Rejected as a false positive.** | On exact tree `9cbc962`, the files actually named by the prior row collect 274 cases and produce the recorded 269 passed plus 5 skips. Claude's later inclusion of `test_project_separation_boundary.py` plus its six new tests produces the later 278 result. The original count is reproducible; future rows nevertheless name all nine files explicitly. |
+| IB1C-CR-05 | P3 | **Fixed.** | The Claude session-ledger row was physically wrapped across three lines, so Markdown rendered two fragments as prose despite the append-only table contract. It is restored to one row, and a lane-local structural test now rejects wrapped or blank-separated ledger rows. |
+| IB1C-CR-06 | P3 | **Fixed.** | Section 13.6 said two prior tests were replaced, but inspection found one replacement. The statement now matches the diff. |
+
+### 14.3 Implemented IB-1C boundary
+
+`research/insider_buying/sec_edgar_acceptance_snapshot.py` is an offline,
+bounded acceptance-evidence layer over the public raw-bound IB-1B loader. It
+accepts only an explicit immutable schema profile and a tuple of caller-supplied
+flat JSON byte images. The repository provides no default or "official SEC"
+profile and performs no discovery or network access.
+
+For every verified upstream accession, the canonical bundle emits exactly one
+availability record:
+
+- a supplied, valid, upstream-matching metadata image produces
+  `EXACT_ACCEPTANCE_TIMESTAMP` plus `NEXT_OPEN_AFTER_ACCEPTANCE`; or
+- absence of a source produces `FILING_DATE_FALLBACK` plus
+  `NEXT_OPEN_AFTER_FILING_DATE`.
+
+Supplied-but-invalid evidence never degrades to fallback. The entire build
+refuses on malformed or duplicate JSON, duplicate or unknown accessions,
+upstream form/date/quarter/accession-year disagreement, invalid issuer CIK,
+transaction-shaped availability mappings, noncanonical URLs, source/primary
+URL accession or issuer disagreement, pre-acceptance retrieval, or acceptance
+outside the deterministic half-open filing-day window `[05:00Z, next-day
+05:00Z)`. This UTC window deliberately avoids an unpinned timezone database,
+can conservatively refuse the first EDT hour, and keeps date-only next-open
+fallback from preceding supplied exact evidence.
+
+The one canonical content-addressed JSON bundle retains reversible source bytes
+as canonical base64 plus exact hashes, sizes, URLs, UTC retrieval times, capture
+commit assertions, the explicit profile, upstream raw/parsed lineage, every
+record, and all counts. Load revalidates canonical encoding, declared sizes,
+source inventory and order, records and order, reparses every source, rebuilds
+the complete snapshot against the verified raw-bound upstream, rereads the
+bundle, and requires byte-for-byte equality. Caller URL, retrieval time, and
+Git provenance are syntax- and internal-consistency assertions only; they are
+not authenticated SEC, transport, clock, or repository evidence.
+
+The in-memory layer is explicitly capped for source count, per-source and total
+source bytes, record count, profile fields/names/values, URL characters, JSON
+nesting, final bundle bytes, and publisher-temporary count. Declared source
+sizes and aggregate size are checked before base64 decoding. Publication is
+locked, immutable, content-addressed, two-phase for residue classification, and
+requires the final bundle to remain a single-link regular file before and after
+the upstream rebuild. Exact-prefix recovery is permitted only before a final
+commit; committed evidence remains exact-only.
+
+Form 4/A rows remain represented because IB-1B supplies them, but IB-1C does
+not infer original/amendment relationships, supersession, or correction
+semantics. It retains primary-document URLs as evidence strings but does not
+fetch or validate XML. Therefore blueprint section 19.4 step 3 and IB-1 are
+still incomplete.
+
+### 14.4 IB-1C implementation and audit findings
+
+The issue ledger retains every finding even though all are resolved in the
+implementation snapshot.
+
+| ID | Sev | Status | Issue, evidence, and resolution |
+|---|---|---|---|
+| IB1C-R01 | P1 | **FIXED** | Comparing an acceptance timestamp's source wall date allowed `2026-05-01T00:00:00+14:00`, an April 30 UTC instant, to qualify for a May 1 filing. Both direct record construction and assembly now use the fixed UTC filing-day window; inverse and exact-boundary cases are pinned. |
+| IB1C-R02 | P2 | **FIXED** | Deep source or bundle JSON could surface a raw recursive-decoder failure. Quote/escape-aware depth preflight now runs before `json.loads`, and decoder-sentinel regressions prove ordering. Decoder recursion is also mapped to the public refusal. |
+| IB1C-R03 | P2 | **FIXED** | Loader source caps originally ran after base64 decoding. Exact keys, positive declared size, canonical encoded length, per-source cap, and aggregate cap now run before any decode; direct sentinel tests make both orderings load-bearing. |
+| IB1C-R04 | P1 | **FIXED** | A syntactically valid filing date from another year or quarter could contaminate date-only availability, and the accession's two-digit year was unbound. Each filing now matches the verified snapshot year/quarter and accession year before any record is emitted. |
+| IB1C-R05 | P2 | **FIXED** | A source or primary-document Archive URL could name the right accession under the wrong host or issuer CIK. Canonical Archive paths now bind `www.sec.gov`, issuer CIK, compact accession, and filename to upstream lineage. |
+| IB1C-R06 | P2 | **FIXED** | A preexisting hardlinked publication-lock slot could mutate an external peer when the lock primitive wrote its sentinel byte. Lock slots must be single-link regular files before and after acquisition; the external peer remains unchanged in regression. |
+| IB1C-R07 | P3 | **FIXED** | Publisher temporary discovery materialized the entire output directory. Matching residue is now streamed and capped before deletion; exceeding the cap refuses with all residue preserved. |
+| IB1C-R08 | P3 | **FIXED** | Using host timezone data for the SEC-day boundary would make future rebuilds depend on unversioned tzdata. A documented fixed 05:00Z boundary covers EST/EDT conservatively and is pinned at both edges. |
+| IB1C-R09 | P2 | **FIXED** | Ambiguous clock-fold and caller-mutable timezone objects could canonicalize to one persisted UTC instant but compare or behave as another during recovery. Retrieval and exact-acceptance datetimes are now frozen to fixed UTC at construction, and exact bytes plus canonical provenance drive recovery equality. Fold, mutable-offset, inverse, retry, and loader round trips are pinned. |
+| IB1C-R10 | P2 | **FIXED** | Unknown-upstream accession, issuer CIK, primary-document CIK, base64 canonicality, record/source ordering, and availability-tier guards initially lacked isolated mutation-sensitive tests. Self-consistent forgeries and direct private/public boundary tests now reach the intended guards rather than failing an earlier hash, URL, or length check. |
+| IB1C-R11 | P1 | **FIXED** | Exact acceptance was allowed arbitrarily after `FILING_DATE`, while omitted evidence used next-open-after-date fallback. That could make fallback precede known public availability. Exact evidence is now restricted to `[filing-date 05:00Z, next-date 05:00Z)`; next-boundary and multi-day-late timestamps refuse before publication. |
+| IB1C-R12 | P2 | **FIXED** | A final content-addressed bundle hardlinked outside the output root could later be mutated through its peer. Final reads require `st_nlink == 1`; a link present initially or introduced during the potentially long upstream rebuild is refused. Pre-cleanup recovery reads remain permissive only so a verified publisher-temporary hardlink can be removed first. |
+| IB1C-R13 | P3 | **FIXED** | Direct exact-record construction could retain mutable or second-offset timezone state whose payload later changed or failed its own loader. Exact records canonicalize to fixed UTC and round-trip through `_record_from_payload`; the public tier/rule/evidence XOR is directly pinned. |
+| IB1C-R14 | P3 | **FIXED** | The first lane-record table guard discarded blank lines before checking shape, so a blank line could terminate the Markdown table while the test stayed green. The raw slice now preserves lines and rejects every blank or whitespace-only line between the header and final row. |
+
+Two independent final read-only audits report **no remaining P0, P1, P2, or P3
+finding** in the IB-1C module, exports, tests, or lane-record guard. No valid
+existing test was weakened or removed.
+
+### 14.5 Verification and isolation
+
+- Exact current nine-file suite: `test_insider_buying_form4.py`,
+  `test_insider_buying_sec_bulk_snapshot.py`,
+  `test_insider_buying_sec_bulk_parsed_snapshot.py`,
+  `test_insider_buying_sec_edgar_acceptance_snapshot.py`,
+  `test_insider_buying_implementation_record.py`,
+  `test_ml_import_boundary.py`, `test_project_separation_entrypoints.py`,
+  `test_module_hygiene.py`, and `test_project_separation_boundary.py`:
+  **477 passed, 7 skipped in 130.14s**.
+- Final IB-1C module: **153 passed, 2 skipped in 98.03s**. Independent final
+  audit of IB-1C plus the record guard: **154 passed, 2 skipped in 93.79s**.
+- Focused correction slices included 29 timezone/lineage/base64/tier/CIK cases,
+  14 filing-window/recovery/hardlink cases, and 11 hardlink/recovery cases; all
+  passed on their respective latest trees before the final module run.
+- Compileall over the four implementation Python files and later over the
+  complete Insider package: exit 0. `git diff --check` is clean apart from the
+  repository's line-ending notices.
+- Blueprint pages 28-29 and section 19.4 were rechecked. This implementation is
+  only the acceptance-evidence portion of step 3, not completion of step 3.
+- There was no SEC/EDGAR/provider, credential, licensed row, outcome,
+  QuantConnect, broker, operator-database, scheduler, UI, or order access.
+  **0 research looks.**
+
+### 14.6 Residual gates and next authorized step
+
+IB-1C proves fixture-level software behavior only. It does not establish an
+official SEC metadata schema, fair-access downloader, real-package
+compatibility, capacity, authenticated capture provenance, XML validity,
+original/amendment links, Form 4/A supersession, normalized transactions,
+joint-owner handling, point-in-time security mapping, the post-aggregation
+$50,000 rule, a signal, an outcome, an ETF portfolio, or a QC algorithm.
+
+IB1B-R11 and the earlier R-23 neutral immutable-I/O consolidation remain
+integration debt. The shared execution-surface P1 set remains outside this
+strategy-only lane and was not changed.
+
+Next step for this round: commit this record, validate the exact committed tree
+with the complete suite and whole-repository compileall, append the immutable
+validation row, and make one push. Claude must review every pushed commit before
+Codex begins any bounded amendment-reconciliation milestone. No live SEC ingest,
+research look, outcome join, QuantConnect job, broker action, or UI work is
+authorized.

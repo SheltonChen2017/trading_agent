@@ -31,6 +31,7 @@ from .canonical import (
     require_aware_instant,
     require_canonical_json_bytes,
     require_date,
+    require_decimal_text,
     require_exact_keys,
     require_git_commit,
     require_sha256,
@@ -51,9 +52,19 @@ PERMANENT_LOOK_AUTHORITY_SCHEMA = "tpr-permanent-look-authority-v1"
 ZERO_ACCESS_SOURCE_AUTHORITY_ID = "tpr-zero-access-no-source-authority"
 ZERO_ACCESS_LOOK_AUTHORITY_ID = "tpr-zero-access-no-permanent-look-authority"
 CELL_SOURCE = (
-    "Codex TPR-0A implementation candidate 2026-08-29 under the owner-approved "
-    "target-price blueprint v2.1 phase split; pending Claude independent review"
+    "Codex TPR-0A amendment candidate 2026-08-30 under the owner-approved "
+    "target-price blueprint v2.2 fixed four-slot contract; pending Claude "
+    "independent review"
 )
+FIXED_LANE_IDS = (
+    "analyst-revisions-v2",
+    "insider-buying",
+    "short-interest",
+    "target-price-revisions",
+)
+ASSIGNED_LANE_ID = "target-price-revisions"
+SHARED_FAMILY_WISE_ALPHA = Decimal("0.05")
+WITHIN_LANE_ALPHA_CEILING = Decimal("0.0125")
 CANDIDATE_REPO_PATH = (
     "research/target_price_revisions/specs/tpr_round0a.candidate.json"
 )
@@ -189,8 +200,9 @@ _EXPECTED_VALUES = deep_freeze(
                 "TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf"
             ),
             "blueprint_sha256": (
-                "55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14"
+                "f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b"
             ),
+            "blueprint_version": "2.2",
             "blueprint_role": "sole_governing_target_price_strategy_authority",
             "submitted_source_pin_disposition": (
                 "historical_malformed_unavailable_not_authority"
@@ -230,10 +242,26 @@ _EXPECTED_VALUES = deep_freeze(
         },
         "family_multiplicity": {
             "family_id": FAMILY_ID,
+            "fixed_lane_ids": list(FIXED_LANE_IDS),
+            "assigned_lane_id": ASSIGNED_LANE_ID,
             "shared_family_count": 4,
             "shared_family_wise_alpha": "0.05",
-            "allocation": "equal_bonferroni_across_four_shared_families",
+            "allocation": "fixed_equal_bonferroni_across_four_lane_slots",
             "assigned_family_alpha": "0.0125",
+            "within_lane_confirmatory_alpha_ceiling": "0.0125",
+            "slot_reallocation": {
+                "transferable": False,
+                "unused": "EXPIRES",
+                "withdrawn": "EXPIRES",
+                "redistribution": "PROHIBITED",
+            },
+            "confirmatory_alpha_allocations": [
+                {
+                    "look_id": PRIMARY_LOOK_ID,
+                    "primary_cell_id": PRIMARY_CELL_ID,
+                    "two_sided_alpha": "0.0125",
+                }
+            ],
             "permanent_primary_cell_ids": [PRIMARY_CELL_ID],
             "permanent_look_ids": [PRIMARY_LOOK_ID],
             "look_budget": 1,
@@ -1600,11 +1628,141 @@ def _validate_dates_and_alpha(cells: tuple[PreregistrationCell, ...]) -> None:
         raise _translate(exc) from exc
     if not validation_start <= validation_end == cutoff < reserved_start <= reserved_end:
         raise PreregistrationError("validation and shared-holdout schedule is inconsistent")
+
     family = by_id["family_multiplicity"]
-    if Decimal(family["shared_family_wise_alpha"]) / family["shared_family_count"] != Decimal(
-        family["assigned_family_alpha"]
+    fixed_lane_ids = tuple(family["fixed_lane_ids"])
+    if (
+        fixed_lane_ids != FIXED_LANE_IDS
+        or len(set(fixed_lane_ids)) != len(FIXED_LANE_IDS)
+        or family["assigned_lane_id"] != ASSIGNED_LANE_ID
+        or family["shared_family_count"] != len(FIXED_LANE_IDS)
+        or holdout["shared_family_count"] != len(FIXED_LANE_IDS)
     ):
-        raise PreregistrationError("four-family alpha allocation is arithmetically inconsistent")
+        raise PreregistrationError(
+            "selection-family membership must retain the four permanent lane slots"
+        )
+
+    try:
+        shared_alpha = require_decimal_text(
+            family["shared_family_wise_alpha"],
+            "shared family-wise alpha",
+            minimum=Decimal("0"),
+        )
+        assigned_alpha = require_decimal_text(
+            family["assigned_family_alpha"],
+            "assigned family alpha",
+            minimum=Decimal("0"),
+        )
+        within_lane_ceiling = require_decimal_text(
+            family["within_lane_confirmatory_alpha_ceiling"],
+            "within-lane confirmatory alpha ceiling",
+            minimum=Decimal("0"),
+        )
+    except CanonicalContractError as exc:
+        raise _translate(exc) from exc
+    if (
+        shared_alpha != SHARED_FAMILY_WISE_ALPHA
+        or assigned_alpha != WITHIN_LANE_ALPHA_CEILING
+        or within_lane_ceiling != WITHIN_LANE_ALPHA_CEILING
+        or assigned_alpha * len(FIXED_LANE_IDS) != shared_alpha
+    ):
+        raise PreregistrationError(
+            "the fixed four-slot family must retain 1/80 per lane within total 1/20"
+        )
+
+    reallocation = family["slot_reallocation"]
+    try:
+        require_exact_keys(
+            reallocation,
+            frozenset({"transferable", "unused", "withdrawn", "redistribution"}),
+            "slot reallocation policy",
+        )
+    except CanonicalContractError as exc:
+        raise _translate(exc) from exc
+    if (
+        reallocation["transferable"] is not False
+        or reallocation["unused"] != "EXPIRES"
+        or reallocation["withdrawn"] != "EXPIRES"
+        or reallocation["redistribution"] != "PROHIBITED"
+    ):
+        raise PreregistrationError(
+            "unused or withdrawn lane alpha must expire without redistribution"
+        )
+
+    allocations = family["confirmatory_alpha_allocations"]
+    if not isinstance(allocations, tuple) or not allocations:
+        raise PreregistrationError(
+            "every confirmatory TPR cell/look must have an explicit alpha allocation"
+        )
+    allocation_pairs: set[tuple[str, str]] = set()
+    allocated_alpha = Decimal("0")
+    for index, allocation in enumerate(allocations):
+        try:
+            require_exact_keys(
+                allocation,
+                frozenset({"look_id", "primary_cell_id", "two_sided_alpha"}),
+                f"confirmatory alpha allocation {index}",
+            )
+            look_id = require_text(
+                allocation["look_id"], f"confirmatory alpha allocation {index} look_id"
+            )
+            cell_id = require_text(
+                allocation["primary_cell_id"],
+                f"confirmatory alpha allocation {index} primary_cell_id",
+            )
+            alpha = require_decimal_text(
+                allocation["two_sided_alpha"],
+                f"confirmatory alpha allocation {index}",
+                minimum=Decimal("0"),
+                maximum=within_lane_ceiling,
+            )
+        except CanonicalContractError as exc:
+            raise _translate(exc) from exc
+        pair = (look_id, cell_id)
+        if pair in allocation_pairs or alpha <= 0:
+            raise PreregistrationError(
+                "confirmatory alpha allocations must be unique and strictly positive"
+            )
+        allocation_pairs.add(pair)
+        allocated_alpha += alpha
+
+    permanent_look_ids = tuple(family["permanent_look_ids"])
+    permanent_cell_ids = tuple(family["permanent_primary_cell_ids"])
+    if len(permanent_look_ids) != len(permanent_cell_ids):
+        raise PreregistrationError(
+            "permanent look and primary-cell inventories must pair exactly"
+        )
+    permanent_pairs = set(zip(permanent_look_ids, permanent_cell_ids, strict=True))
+    if (
+        allocation_pairs != permanent_pairs
+        or family["look_budget"] != len(allocations)
+        or allocated_alpha > within_lane_ceiling
+    ):
+        raise PreregistrationError(
+            "confirmatory allocations must cover the permanent inventory within 1/80"
+        )
+
+    empirical_alpha = by_id["empirical_binding_contract"]["assigned_alpha"]
+    acceptance_alpha = by_id["trial_and_null_contract"][
+        "primary_acceptance_contract"
+    ]["two_sided_alpha"]
+    try:
+        empirical_alpha_value = require_decimal_text(
+            empirical_alpha, "empirical binding assigned alpha"
+        )
+        acceptance_alpha_value = require_decimal_text(
+            acceptance_alpha, "primary acceptance alpha"
+        )
+    except CanonicalContractError as exc:
+        raise _translate(exc) from exc
+    if (
+        allocated_alpha != assigned_alpha
+        or empirical_alpha_value != allocated_alpha
+        or acceptance_alpha_value != allocated_alpha
+    ):
+        raise PreregistrationError(
+            "family, structural-binding, allocation, and acceptance alpha must agree"
+        )
 
 
 def load_algorithm_candidate(path: Path) -> AlgorithmCandidate:

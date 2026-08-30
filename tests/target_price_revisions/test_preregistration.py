@@ -39,12 +39,12 @@ SPEC_DIR = ROOT / "research" / "target_price_revisions" / "specs"
 CANDIDATE = SPEC_DIR / "tpr_round0a.candidate.json"
 HASH_A = "a" * 64
 HASH_B = "b" * 64
-EXPECTED_SPEC_ID = "tpr-round0a-candidate-f595992a3f5b8396"
+EXPECTED_SPEC_ID = "tpr-round0a-candidate-74b096af24c8d481"
 EXPECTED_SPEC_HASH = (
-    "f595992a3f5b8396e5f26ba5a3b0a3f32649eec3fd581071b349a5e12203af86"
+    "74b096af24c8d48196054f56deb562924380884c1b14b747ba432cc57658df2c"
 )
 EXPECTED_ARTIFACT_SHA256 = (
-    "99aae28d5b055aa24b84ce153467dfdbe7ee65f8ee2cef2a870efe1e68b2ea49"
+    "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
 
 
@@ -268,14 +268,36 @@ def test_repository_candidate_freezes_the_approved_tpr0a_contract() -> None:
 
     governance = candidate.cell("governance_contract")
     assert governance["blueprint_sha256"] == (
-        "55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14"
+        "f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b"
     )
+    assert governance["blueprint_version"] == "2.2"
     assert governance["blueprint_role"] == (
         "sole_governing_target_price_strategy_authority"
     )
     family = candidate.cell("family_multiplicity")
+    assert family["fixed_lane_ids"] == (
+        "analyst-revisions-v2",
+        "insider-buying",
+        "short-interest",
+        "target-price-revisions",
+    )
+    assert family["assigned_lane_id"] == "target-price-revisions"
     assert family["shared_family_count"] == 4
     assert family["assigned_family_alpha"] == "0.0125"
+    assert family["within_lane_confirmatory_alpha_ceiling"] == "0.0125"
+    assert family["slot_reallocation"] == {
+        "transferable": False,
+        "unused": "EXPIRES",
+        "withdrawn": "EXPIRES",
+        "redistribution": "PROHIBITED",
+    }
+    assert family["confirmatory_alpha_allocations"] == (
+        {
+            "look_id": PRIMARY_LOOK_ID,
+            "primary_cell_id": PRIMARY_CELL_ID,
+            "two_sided_alpha": "0.0125",
+        },
+    )
     assert family["permanent_look_ids"] == (PRIMARY_LOOK_ID,)
     holdout = candidate.cell("shared_holdout")
     assert holdout["validation_start"] == "2026-09-01"
@@ -495,6 +517,48 @@ def test_noncanonical_or_ambiguous_json_refuses(tmp_path: Path, variant: str) ->
         lambda raw: _cell(raw, "family_multiplicity")["value"].update(
             shared_family_count=3, assigned_family_alpha="0.0166666667"
         ),
+        lambda raw: _cell(raw, "family_multiplicity")["value"].update(
+            fixed_lane_ids=[
+                "analyst-revisions-v2",
+                "insider-buying",
+                "short-interest",
+            ]
+        ),
+        lambda raw: _cell(raw, "family_multiplicity")["value"].update(
+            fixed_lane_ids=[
+                "analyst-revisions-v2",
+                "insider-buying",
+                "short-interest",
+                "short-interest",
+            ]
+        ),
+        lambda raw: _cell(raw, "family_multiplicity")["value"].update(
+            assigned_lane_id="insider-buying"
+        ),
+        lambda raw: _cell(raw, "family_multiplicity")["value"][
+            "slot_reallocation"
+        ].update(transferable=True),
+        lambda raw: _cell(raw, "family_multiplicity")["value"][
+            "slot_reallocation"
+        ].update(unused="REDISTRIBUTE"),
+        lambda raw: _cell(raw, "family_multiplicity")["value"][
+            "confirmatory_alpha_allocations"
+        ][0].update(two_sided_alpha="0.0126"),
+        lambda raw: _cell(raw, "family_multiplicity")["value"][
+            "confirmatory_alpha_allocations"
+        ].append(
+            {
+                "look_id": "tpr-look-stock-primary-002",
+                "primary_cell_id": "tpr-stock-primary-20d-second-look",
+                "two_sided_alpha": "0.0125",
+            }
+        ),
+        lambda raw: _cell(raw, "family_multiplicity")["value"][
+            "confirmatory_alpha_allocations"
+        ][0].update(look_id="tpr-look-stock-primary-substituted"),
+        lambda raw: _cell(raw, "family_multiplicity")["value"][
+            "confirmatory_alpha_allocations"
+        ][0].update(two_sided_alpha="1.25e-2"),
         lambda raw: _cell(raw, "shared_holdout")["value"].update(
             reserved_start="2027-08-31"
         ),

@@ -5,10 +5,10 @@ import hashlib
 import json
 import re
 from decimal import Decimal
-import json
 import subprocess
 from pathlib import Path
 
+from research.target_price_revisions import PRIMARY_CELL_ID, PRIMARY_LOOK_ID
 from research.target_price_revisions.preregistration import load_algorithm_candidate
 
 
@@ -24,7 +24,7 @@ SPEC_PATH = (
 )
 OBSOLETE_WORKTREE = "trading_agent_TargetPriceRevision"
 BLUEPRINT_CONTENT_SHA256 = (
-    "55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14"
+    "f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b"
 )
 MALFORMED_SUBMITTED_SOURCE_PIN = (
     "53c549aef18aa1a63e6db8deb184bd654eb8ec637bb4ff3ae03f29abc4a2df0"
@@ -32,12 +32,12 @@ MALFORMED_SUBMITTED_SOURCE_PIN = (
 CANDIDATE_RELATIVE = Path(
     "research/target_price_revisions/specs/tpr_round0a.candidate.json"
 )
-EXPECTED_CANDIDATE_ID = "tpr-round0a-candidate-f595992a3f5b8396"
+EXPECTED_CANDIDATE_ID = "tpr-round0a-candidate-74b096af24c8d481"
 EXPECTED_CANDIDATE_HASH = (
-    "f595992a3f5b8396e5f26ba5a3b0a3f32649eec3fd581071b349a5e12203af86"
+    "74b096af24c8d48196054f56deb562924380884c1b14b747ba432cc57658df2c"
 )
 EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
-    "99aae28d5b055aa24b84ce153467dfdbe7ee65f8ee2cef2a870efe1e68b2ea49"
+    "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
 
 
@@ -53,7 +53,7 @@ def test_blueprint_is_pinned_to_the_lane_record() -> None:
 
     assert digest == BLUEPRINT_CONTENT_SHA256
     assert digest in record.lower()
-    assert "Governing plan page count: **28**." in record
+    assert "Governing plan page count: **29**." in record
     assert LANE_BRANCH in record
     assert "docs/ACTION_PLAN_2026-08-20.md" in record
     assert "docs/SESSION_HANDOFF.md" in record
@@ -200,41 +200,54 @@ def test_tpr0a_candidate_identity_and_zero_authority_handoff_are_exact() -> None
 
 
 def test_shared_family_alpha_allocation_is_exact_and_unrecycled() -> None:
-    """Owner directive, 2026-08-30: one shared family, total two-sided FWER
-    0.05, an equal 1/80 to each of four lanes, no recycling of unused alpha,
-    and any within-lane multiplicity must subdivide the lane's 0.0125.
+    """Bind the document-level guard to the authenticated v2.2 candidate.
 
-    Pinned as exact arithmetic rather than as the literal 0.0125 so the
-    relationship survives a legitimate change in family size: if a lane is
-    ever added or withdrawn, this fails until the per-lane share is
-    recomputed, which is precisely what "no recycling" forbids doing silently.
-
-    The within-lane half is enforced by tying the look budget to the frozen
-    look and primary-cell inventories. A second inferential look added at the
-    full lane alpha -- rather than subdividing it -- fails here.
+    The four named slots remain fixed even if a lane is unused or withdrawn;
+    its 1/80 expires rather than being recomputed or redistributed.  Explicit
+    per-cell/look allocations make the within-lane ceiling summable instead of
+    inferring it from inventory length.
     """
-    spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
-    cells = {cell["cell_id"]: cell for cell in spec["cells"]}
-    multiplicity = cells["family_multiplicity"]["value"]
+    candidate = load_algorithm_candidate(SPEC_PATH)
+    multiplicity = candidate.cell("family_multiplicity")
 
     family_count = multiplicity["shared_family_count"]
     shared = Decimal(multiplicity["shared_family_wise_alpha"])
     assigned = Decimal(multiplicity["assigned_family_alpha"])
+    ceiling = Decimal(multiplicity["within_lane_confirmatory_alpha_ceiling"])
+    allocations = multiplicity["confirmatory_alpha_allocations"]
 
+    assert multiplicity["fixed_lane_ids"] == (
+        "analyst-revisions-v2",
+        "insider-buying",
+        "short-interest",
+        "target-price-revisions",
+    )
+    assert multiplicity["assigned_lane_id"] == "target-price-revisions"
     assert family_count == 4, "the shared selection family has four attempts"
     assert shared == Decimal("0.05"), "total two-sided FWER is 0.05"
     assert assigned * family_count == shared, (
-        f"unrecycled equal allocation requires {assigned} x {family_count} "
+        f"fixed-slot equal allocation requires {assigned} x {family_count} "
         f"== {shared}; unused alpha may not be redistributed"
     )
-    assert assigned == Decimal("0.0125")
+    assert assigned == ceiling == Decimal("0.0125")
+    assert multiplicity["slot_reallocation"] == {
+        "transferable": False,
+        "unused": "EXPIRES",
+        "withdrawn": "EXPIRES",
+        "redistribution": "PROHIBITED",
+    }
 
-    # Within-lane multiplicity must subdivide, never duplicate, the share.
-    assert multiplicity["look_budget"] == 1
-    assert len(multiplicity["permanent_look_ids"]) == 1
-    assert len(multiplicity["permanent_primary_cell_ids"]) == 1
-    assert len(spec["looks"]) == 1, (
-        "a second look must subdivide the lane's assigned alpha under a "
-        "reviewed amendment, not consume it a second time"
+    allocated = sum(
+        (Decimal(entry["two_sided_alpha"]) for entry in allocations),
+        start=Decimal("0"),
     )
+    assert allocated <= ceiling
+    assert allocated == assigned
+    assert tuple(entry["look_id"] for entry in allocations) == (
+        PRIMARY_LOOK_ID,
+    )
+    assert tuple(entry["primary_cell_id"] for entry in allocations) == (
+        PRIMARY_CELL_ID,
+    )
+    assert multiplicity["look_budget"] == len(allocations) == 1
     assert multiplicity["external_append_only_authority_required"] is True

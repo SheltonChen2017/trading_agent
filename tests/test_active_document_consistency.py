@@ -1921,6 +1921,23 @@ def test_every_separation_review_finding_appears_in_the_current_handoff():
     )
 
 
+_SHA256_SHAPED_TOKEN = re.compile(r"\b[0-9a-f]{55,80}\b", flags=re.IGNORECASE)
+
+
+def _malformed_sha256_tokens(text: str) -> tuple[str, ...]:
+    return tuple(
+        match.group()
+        for match in _SHA256_SHAPED_TOKEN.finditer(text)
+        if len(match.group()) != 64
+    )
+
+
+def test_malformed_sha256_detector_is_case_insensitive() -> None:
+    malformed_upper = "A" * 63
+    assert _malformed_sha256_tokens(malformed_upper) == (malformed_upper,)
+    assert _malformed_sha256_tokens("A" * 64) == ()
+
+
 def test_no_active_document_pins_a_malformed_sha256() -> None:
     """TPR-CR2-001. A digest-shaped pin that cannot be a digest must fail.
 
@@ -1939,12 +1956,9 @@ def test_no_active_document_pins_a_malformed_sha256() -> None:
     for path in (ROOT / "docs").rglob("*.md"):
         if "Archive" in path.parts:
             continue
-        for match in re.finditer(
-            r"\b[0-9a-f]{55,80}\b", path.read_text(encoding="utf-8")
-        ):
-            if len(match.group()) != 64:
-                malformed.append(
-                    f"{path.relative_to(ROOT)} pins a {len(match.group())}-"
-                    f"character digest: {match.group()}"
-                )
+        for token in _malformed_sha256_tokens(path.read_text(encoding="utf-8")):
+            malformed.append(
+                f"{path.relative_to(ROOT)} pins a {len(token)}-"
+                f"character digest: {token}"
+            )
     assert not malformed, "; ".join(malformed)

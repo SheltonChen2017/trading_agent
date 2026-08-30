@@ -216,6 +216,107 @@ def test_three_strategy_parallel_baseline_is_exact_and_fail_closed() -> None:
     assert not (ROOT / "docs" / "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md").exists()
 
 
+_TARGET_PRICE_LANE_BRANCH = "codex/strategy-target-price-revisions"
+_TARGET_PRICE_PDF = (
+    "TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf"
+)
+_TARGET_PRICE_RECORD = "TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md"
+_CRLF = bytes((13, 10))
+_LF = bytes((10,))
+# The canonical content digest of the blueprint, taken over LF-normalized
+# bytes. TPR-CR1-001: this blueprint is the only PDF in the repository with no
+# NUL byte anywhere, so Git's binary heuristic classifies it as text and a
+# checkout under `core.autocrlf=true` rewrites every LF to CRLF. Pinning the
+# raw on-disk digest would therefore pass on one platform and fail on the
+# other. Normalizing first pins the same content identity Git stores, on every
+# platform, and keeps passing unchanged once the storage defect is remedied.
+_TARGET_PRICE_PDF_CONTENT_DIGEST = (
+    "9f00dd56bf7bec79b3f5362bba61fe71768d1f25e6e4350631dafd1253682633"
+)
+
+
+def test_target_price_lane_blueprint_is_pinned_to_its_record() -> None:
+    """TPR-CR1-002. The fourth lane must be pinned like its three siblings.
+
+    Every other strategy lane binds record to blueprint by digest in
+    ``test_three_strategy_parallel_baseline_is_exact_and_fail_closed``. The
+    target-price lane shipped with no guard of any kind, so nothing compared
+    its record's pinned SHA-256 against the file the record claims to pin --
+    which is how a blueprint whose working copy does not match its own pin
+    reached `main` with a green suite.
+    """
+    strategy_dir = ROOT / "docs" / "Strategy Description"
+    record = (strategy_dir / _TARGET_PRICE_RECORD).read_text(encoding="utf-8")
+    raw = (strategy_dir / _TARGET_PRICE_PDF).read_bytes()
+
+    digest = hashlib.sha256(raw.replace(_CRLF, _LF)).hexdigest()
+    assert digest == _TARGET_PRICE_PDF_CONTENT_DIGEST, (
+        "the target-price blueprint's content no longer matches its pinned "
+        "digest; regenerating the blueprint requires updating its record"
+    )
+    assert digest in record.lower(), (
+        "the lane record must pin the digest of the blueprint it governs"
+    )
+    assert _TARGET_PRICE_LANE_BRANCH in record
+    assert "docs/ACTION_PLAN_2026-08-20.md" in record
+    assert "docs/SESSION_HANDOFF.md" in record
+
+    for name in ("ACTION_PLAN_2026-08-20.md", "SESSION_HANDOFF.md"):
+        assert _TARGET_PRICE_LANE_BRANCH in _text(name), (
+            f"{name} must name the lane branch it sequences"
+        )
+
+
+def test_target_price_lane_documents_agree_on_one_worktree() -> None:
+    """TPR-CR1-005. Three documents named a worktree directory that does not
+    exist, so the lane's own resume instructions pointed at nothing.
+
+    The durable rule is agreement, not a literal path: the checkout may live
+    anywhere, but the record, the Action Plan and the handoff must not name
+    different directories for the one dedicated worktree.
+    """
+    named: dict[str, set[str]] = {}
+    for name in (
+        "ACTION_PLAN_2026-08-20.md",
+        "SESSION_HANDOFF.md",
+        f"Strategy Description/{_TARGET_PRICE_RECORD}",
+    ):
+        found = set(
+            re.findall(r"trading_agent[A-Za-z0-9_]*", _text(name))
+        ) - {"trading_agent"}
+        if found:
+            named[name] = found
+
+    assert named, "no document names the target-price worktree at all"
+    distinct = set().union(*named.values())
+    assert len(distinct) == 1, (
+        f"documents disagree about the target-price worktree: {named}"
+    )
+
+
+def test_no_active_document_pins_a_malformed_sha256() -> None:
+    """TPR-CR1-004. A 63-character "SHA-256" is not a checkable pin.
+
+    Provenance pins are the only thing standing between an immutable-artifact
+    claim and an unverifiable one, so a pin that cannot be a digest at all
+    must fail rather than read as evidence. Forty-character Git object names
+    stay legal; only strings long enough to be claiming a SHA-256 are checked.
+    """
+    malformed: list[str] = []
+    for path in (ROOT / "docs").rglob("*.md"):
+        if "Archive" in path.parts:
+            continue
+        for match in re.finditer(
+            r"\b[0-9a-f]{55,80}\b", path.read_text(encoding="utf-8")
+        ):
+            if len(match.group()) != 64:
+                malformed.append(
+                    f"{path.relative_to(ROOT)} pins a {len(match.group())}-"
+                    f"character digest: {match.group()}"
+                )
+    assert not malformed, "; ".join(malformed)
+
+
 _THREE_STRATEGY_LANES = (
     "codex/strategy-analyst-revisions-v2",
     "codex/strategy-insider-buying",

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import json
 import subprocess
 from pathlib import Path
@@ -94,6 +95,27 @@ def test_lane_documents_agree_on_one_worktree() -> None:
         assert pointer in _doc(name), (
             f"{name} must carry the registered target-price worktree pointer"
         )
+
+    # TPR-CR2-003: the exact-pointer checks above prove the right name is
+    # present, but not that a wrong one is absent.  A third spelling could be
+    # introduced anywhere and every assertion above would still pass, which is
+    # the same hole that let one nonexistent directory sit in three documents.
+    # The two pure coordination documents must carry no other worktree name at
+    # all; the lane record may name the obsolete directory only as historical
+    # finding evidence, never as an additional active pointer.
+    active: set[str] = set()
+    for name in expected_pointers:
+        names = set(re.findall(r"\w*trading_agent\w*", _doc(name))) - {"trading_agent"}
+        if name != f"Strategy Description/{RECORD}":
+            assert OBSOLETE_WORKTREE not in names, (
+                f"{name} is a current-state pointer and must not name the "
+                f"obsolete worktree at all"
+            )
+        active |= names - {OBSOLETE_WORKTREE}
+
+    assert active == {EXPECTED_WORKTREE}, (
+        f"lane documents name more than one active worktree: {sorted(active)}"
+    )
 
 
 def test_target_documents_do_not_present_the_malformed_source_pin_as_valid() -> None:

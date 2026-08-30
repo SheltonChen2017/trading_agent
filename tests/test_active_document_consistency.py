@@ -1919,3 +1919,32 @@ def test_every_separation_review_finding_appears_in_the_current_handoff():
         "a separation review report raises findings the current handoff never "
         f"mentions: {missing!r}"
     )
+
+
+def test_no_active_document_pins_a_malformed_sha256() -> None:
+    """TPR-CR2-001. A digest-shaped pin that cannot be a digest must fail.
+
+    This invariant is repository-wide, not lane-specific: any active record may
+    pin an artifact, and a pin that is the wrong length establishes nothing
+    while reading exactly like provenance evidence. It first fired on a
+    63-character value carried in a lane record and the canonical handoff.
+
+    The lane-scoped successor in ``tests/target_price_revisions`` checks that
+    one known value is not presented as valid. It cannot see a *new* malformed
+    pin, in that lane or any other, which is what this guard exists to catch.
+    Forty-character Git object names stay legal; only strings long enough to be
+    claiming a SHA-256 are checked.
+    """
+    malformed: list[str] = []
+    for path in (ROOT / "docs").rglob("*.md"):
+        if "Archive" in path.parts:
+            continue
+        for match in re.finditer(
+            r"\b[0-9a-f]{55,80}\b", path.read_text(encoding="utf-8")
+        ):
+            if len(match.group()) != 64:
+                malformed.append(
+                    f"{path.relative_to(ROOT)} pins a {len(match.group())}-"
+                    f"character digest: {match.group()}"
+                )
+    assert not malformed, "; ".join(malformed)

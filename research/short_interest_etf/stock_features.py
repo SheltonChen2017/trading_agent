@@ -40,7 +40,8 @@ from research.short_interest_etf.pit_eligibility import (
 )
 from research.short_interest_etf.preregistration import PREREGISTRATION
 
-RAW_FEATURE_SCHEMA_VERSION = "1.0"
+RAW_FEATURE_SCHEMA_VERSION = "2.0"
+SOURCE_CONTEXT_SCHEMA_VERSION = "1.0"
 
 REFUSAL_PRIOR_DENOMINATOR_UNAUDITED_FLOAT = (
     "prior_float_denominator_not_yet_audited"
@@ -124,6 +125,81 @@ def _whole_positive_shares(value: str, name: str) -> int:
 
 
 @dataclasses.dataclass(frozen=True)
+class StockFeatureSourceContext:
+    """One authenticated source/reference batch and its exact readiness rows."""
+
+    source_vintage: ShortInterestVintage
+    reference_bundle: PitReferenceBundle
+    readiness_rows: tuple[StockDataReadiness, ...]
+    schema_version: str = SOURCE_CONTEXT_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if type(self.source_vintage) is not ShortInterestVintage:
+            raise _refuse(
+                "context source_vintage must be the exact ShortInterestVintage type"
+            )
+        if type(self.reference_bundle) is not PitReferenceBundle:
+            raise _refuse(
+                "context reference_bundle must be the exact PitReferenceBundle type"
+            )
+        if type(self.readiness_rows) is not tuple or not all(
+            type(item) is StockDataReadiness for item in self.readiness_rows
+        ):
+            raise _refuse(
+                "context readiness_rows must be an exact tuple of exact "
+                "StockDataReadiness values"
+            )
+        event_ids = [item.event_id for item in self.readiness_rows]
+        if len(event_ids) != len(set(event_ids)):
+            raise _refuse("context readiness_rows contain duplicate event_id")
+        expected = build_stock_data_readiness(
+            self.source_vintage,
+            self.reference_bundle,
+        )
+        if self.readiness_rows != expected:
+            raise _refuse(
+                "context readiness_rows do not exactly match source/reference data"
+            )
+        if (
+            type(self.schema_version) is not str
+            or self.schema_version != SOURCE_CONTEXT_SCHEMA_VERSION
+        ):
+            raise _refuse(
+                "unsupported source context schema_version "
+                f"{self.schema_version!r}"
+            )
+
+    def readiness_for_event(self, event_id: str) -> StockDataReadiness | None:
+        matches = [
+            item for item in self.readiness_rows if item.event_id == event_id
+        ]
+        if not matches:
+            return None
+        if len(matches) != 1:
+            raise _refuse("context event_id lookup is ambiguous")
+        return matches[0]
+
+    def to_payload(self) -> dict[str, Any]:
+        return {
+            "readiness_rows": [
+                item.to_payload() for item in self.readiness_rows
+            ],
+            "reference_bundle_identity": {
+                "reference_bundle_sha256": self.reference_bundle.sha256,
+                "reference_dataset_id": (
+                    self.reference_bundle.manifest.reference_dataset_id
+                ),
+            },
+            "schema_version": self.schema_version,
+            "source_vintage_identity": build_identity(self.source_vintage),
+        }
+
+    @property
+    def sha256(self) -> str:
+        return hash_payload(self.to_payload())
+
+
+@dataclasses.dataclass(frozen=True)
 class PitStockRawFeature:
     """One exact PIT stock-ratio feature with complete upstream lineage."""
 
@@ -133,6 +209,7 @@ class PitStockRawFeature:
     reference_bundle_sha256: str
     preregistration_sha256: str
     readiness_sha256: str
+    prior_readiness_sha256: str
     event_id: str
     prior_event_id: str
     security_id: str
@@ -154,6 +231,8 @@ class PitStockRawFeature:
     prior_denominator_sha256: str
     current_denominator: DenominatorObservation
     prior_denominator: DenominatorObservation
+    current_snapshot: ShortInterestSnapshot
+    prior_snapshot: ShortInterestSnapshot
     current_short_shares: int
     prior_short_shares: int
     current_short_ratio: ExactRational
@@ -192,6 +271,7 @@ class PitStockRawFeature:
             "reference_bundle_sha256",
             "preregistration_sha256",
             "readiness_sha256",
+            "prior_readiness_sha256",
             "event_id",
             "prior_event_id",
             "security_identity_sha256",
@@ -263,6 +343,95 @@ class PitStockRawFeature:
                     f"feature.{side}_denominator_value does not match "
                     f"feature.{side}_denominator"
                 )
+            if observation.kind is not getattr(
+                self, f"{side}_denominator_kind"
+            ):
+                raise _refuse(
+                    f"feature.{side}_denominator_kind does not match "
+                    f"feature.{side}_denominator.kind"
+                )
+            if observation.security_id != self.security_id:
+                raise _refuse(
+                    f"feature.{side}_denominator.security_id does not match "
+                    "feature.security_id"
+                )
+
+        execution_at = parse_utc_timestamp(
+            self.execution_at, "feature.execution_at"
+        )
+        for side in ("current", "prior"):
+            snapshot = getattr(self, f"{side}_snapshot")
+            if type(snapshot) is not ShortInterestSnapshot:
+                raise _refuse(
+                    f"feature.{side}_snapshot must be the exact "
+                    "ShortInterestSnapshot type"
+                )
+            for timestamp_name, timestamp_text in (
+                ("revision_published_at", snapshot.revision_published_at),
+                ("denominator.available_at", snapshot.denominator.available_at),
+                ("volume_basis.available_at", snapshot.volume_basis.available_at),
+            ):
+                if parse_utc_timestamp(
+                    timestamp_text,
+                    f"feature.{side}_snapshot.{timestamp_name}",
+                ) > execution_at:
+                    raise _refuse(
+                        f"feature.{side}_snapshot.{timestamp_name} is after "
+                        "feature.execution_at"
+                    )
+
+        current_snapshot = self.current_snapshot
+        prior_snapshot = self.prior_snapshot
+        current_witness = {
+            "event_id": current_snapshot.event_id,
+            "security_id": current_snapshot.security.security_id,
+            "settlement_date": current_snapshot.settlement_date,
+            "previous_settlement_date": current_snapshot.previous_settlement_date,
+            "current_short_shares": current_snapshot.current_short_shares,
+            "prior_short_shares": current_snapshot.previous_short_shares,
+            "current_denominator": current_snapshot.denominator,
+            "current_denominator_kind": current_snapshot.denominator.kind,
+            "current_denominator_sha256": hash_payload(
+                current_snapshot.denominator.to_payload()
+            ),
+            "current_denominator_value": decimal_text(
+                Decimal(current_snapshot.denominator.value)
+            ),
+            "security_identity_sha256": hash_payload(
+                current_snapshot.security.to_payload()
+            ),
+        }
+        prior_witness = {
+            "prior_event_id": prior_snapshot.event_id,
+            "security_id": prior_snapshot.security.security_id,
+            "previous_settlement_date": prior_snapshot.settlement_date,
+            "prior_short_shares": prior_snapshot.current_short_shares,
+            "prior_denominator": prior_snapshot.denominator,
+            "prior_denominator_kind": prior_snapshot.denominator.kind,
+            "prior_denominator_sha256": hash_payload(
+                prior_snapshot.denominator.to_payload()
+            ),
+            "prior_denominator_value": decimal_text(
+                Decimal(prior_snapshot.denominator.value)
+            ),
+        }
+        for expected in (current_witness, prior_witness):
+            for name, value in expected.items():
+                if getattr(self, name) != value:
+                    raise _refuse(
+                        f"feature.{name} does not match its exact source snapshot"
+                    )
+        if current_snapshot.source_id != prior_snapshot.source_id:
+            raise _refuse("current and prior snapshots must share source_id")
+        if current_snapshot.source_version != prior_snapshot.source_version:
+            raise _refuse("current and prior snapshots must share source_version")
+        if (
+            current_snapshot.previous_short_shares
+            != prior_snapshot.current_short_shares
+        ):
+            raise _refuse(
+                "current snapshot previous_short_shares does not match prior snapshot"
+            )
 
         current_denominator = _whole_positive_shares(
             self.current_denominator_value,
@@ -297,7 +466,10 @@ class PitStockRawFeature:
             raise _refuse("prior_short_ratio does not match prior PIT facts")
         if self.delta_short_ratio != expected_delta:
             raise _refuse("delta_short_ratio does not match exact ratio difference")
-        if self.schema_version != RAW_FEATURE_SCHEMA_VERSION:
+        if (
+            type(self.schema_version) is not str
+            or self.schema_version != RAW_FEATURE_SCHEMA_VERSION
+        ):
             raise _refuse(
                 f"unsupported raw feature schema_version {self.schema_version!r}"
             )
@@ -311,6 +483,7 @@ class PitStockRawFeature:
             "current_denominator_value": self.current_denominator_value,
             "current_short_ratio": self.current_short_ratio.to_payload(),
             "current_short_shares": self.current_short_shares,
+            "current_snapshot": self.current_snapshot.to_payload(),
             "delta_short_ratio": self.delta_short_ratio.to_payload(),
             "event_id": self.event_id,
             "execution_at": self.execution_at,
@@ -324,8 +497,10 @@ class PitStockRawFeature:
             "prior_denominator_sha256": self.prior_denominator_sha256,
             "prior_denominator_value": self.prior_denominator_value,
             "prior_event_id": self.prior_event_id,
+            "prior_readiness_sha256": self.prior_readiness_sha256,
             "prior_short_ratio": self.prior_short_ratio.to_payload(),
             "prior_short_shares": self.prior_short_shares,
+            "prior_snapshot": self.prior_snapshot.to_payload(),
             "readiness_sha256": self.readiness_sha256,
             "reference_bundle_sha256": self.reference_bundle_sha256,
             "reference_dataset_id": self.reference_dataset_id,
@@ -351,12 +526,20 @@ class StockFeatureDisposition:
     readiness: StockDataReadiness
     feature: PitStockRawFeature | None
     refusal_reasons: tuple[str, ...]
+    prior_readiness: StockDataReadiness | None = None
+    source_context: StockFeatureSourceContext | None = None
 
     def __post_init__(self) -> None:
         if type(self.readiness) is not StockDataReadiness:
             raise _refuse("readiness must be the exact StockDataReadiness type")
         if self.feature is not None and type(self.feature) is not PitStockRawFeature:
             raise _refuse("feature must be the exact PitStockRawFeature type")
+        if self.prior_readiness is not None and type(
+            self.prior_readiness
+        ) is not StockDataReadiness:
+            raise _refuse(
+                "prior_readiness must be the exact StockDataReadiness type"
+            )
         if not isinstance(self.refusal_reasons, tuple) or not all(
             type(item) is str and item and item == item.strip()
             for item in self.refusal_reasons
@@ -370,6 +553,10 @@ class StockFeatureDisposition:
                 raise _refuse("non-ready source data cannot carry a stock feature")
             if self.refusal_reasons != self.readiness.refusal_reasons:
                 raise _refuse("source readiness refusals must be preserved exactly")
+            if self.prior_readiness is not None:
+                raise _refuse("non-ready source data cannot carry prior_readiness")
+            self._validate_source_context()
+            self._validate_source_vintage_context()
             return
 
         if self.feature is None:
@@ -377,10 +564,41 @@ class StockFeatureDisposition:
                 self.refusal_reasons
             ).issubset(_FEATURE_REFUSALS):
                 raise _refuse("ready source without a feature needs one named refusal")
+            if self.prior_readiness is not None:
+                raise _refuse("feature-stage refusal cannot carry prior_readiness")
+            self._validate_source_context()
+            current, prior = self._validate_source_vintage_context()
+            if self.refusal_reasons == (
+                REFUSAL_PRIOR_SNAPSHOT_NOT_AUTHENTICATED,
+            ) and prior is not None:
+                raise _refuse(
+                    "prior-snapshot refusal conflicts with authenticated prior"
+                )
+            if self.refusal_reasons == (
+                REFUSAL_PRIOR_DENOMINATOR_UNAUDITED_FLOAT,
+            ) and (
+                prior is None
+                or prior.denominator.kind is not DenominatorKind.POINT_IN_TIME_FLOAT
+            ):
+                raise _refuse(
+                    "prior-float refusal requires an authenticated float prior"
+                )
             return
         if self.refusal_reasons:
             raise _refuse("a completed stock feature cannot carry refusal reasons")
+        if self.prior_readiness is None:
+            raise _refuse("a completed stock feature requires prior_readiness")
 
+        self._validate_source_context()
+        current_snapshot, selected_prior = self._validate_source_vintage_context()
+        if self.feature.current_snapshot != current_snapshot:
+            raise _refuse(
+                "feature.current_snapshot is not the authenticated vintage event"
+            )
+        if selected_prior is None or self.feature.prior_snapshot != selected_prior:
+            raise _refuse(
+                "feature.prior_snapshot is not the latest execution-visible prior"
+            )
         feature = self.feature
         expected = {
             "classification_record_id": self.readiness.classification_record_id,
@@ -405,11 +623,111 @@ class StockFeatureDisposition:
             if getattr(feature, name) != value:
                 raise _refuse(f"feature.{name} does not match its readiness row")
 
+        prior_expected = {
+            "prior_denominator_sha256": self.prior_readiness.denominator_sha256,
+            "prior_event_id": self.prior_readiness.event_id,
+            "prior_readiness_sha256": self.prior_readiness.sha256,
+            "previous_settlement_date": self.prior_readiness.settlement_date,
+            "reference_bundle_sha256": (
+                self.prior_readiness.reference_bundle_sha256
+            ),
+            "reference_dataset_id": self.prior_readiness.reference_dataset_id,
+            "security_id": self.prior_readiness.security_id,
+            "source_dataset_id": self.prior_readiness.source_dataset_id,
+            "source_vintage_sha256": self.prior_readiness.source_vintage_sha256,
+        }
+        for name, value in prior_expected.items():
+            if getattr(feature, name) != value:
+                raise _refuse(
+                    f"feature.{name} does not match its prior_readiness row"
+                )
+        if parse_utc_timestamp(
+            self.prior_readiness.execution_at,
+            "prior_readiness.execution_at",
+        ) > parse_utc_timestamp(self.readiness.execution_at, "readiness.execution_at"):
+            raise _refuse("prior_readiness cannot execute after current readiness")
+
+    def _validate_source_context(self) -> None:
+        if type(self.source_context) is not StockFeatureSourceContext:
+            raise _refuse(
+                "source_context must be the exact StockFeatureSourceContext type"
+            )
+        expected_readiness = self.source_context.readiness_for_event(
+            self.readiness.event_id
+        )
+        if self.readiness != expected_readiness:
+            if expected_readiness is not None:
+                for field in dataclasses.fields(self.readiness):
+                    if getattr(self.readiness, field.name) != getattr(
+                        expected_readiness, field.name
+                    ):
+                        raise _refuse(
+                            f"readiness.{field.name} does not match source_context"
+                        )
+            raise _refuse(
+                "readiness does not exactly match source_context"
+            )
+        if self.prior_readiness is not None:
+            expected_prior = self.source_context.readiness_for_event(
+                self.prior_readiness.event_id
+            )
+            if self.prior_readiness != expected_prior:
+                if expected_prior is not None:
+                    for field in dataclasses.fields(self.prior_readiness):
+                        if getattr(self.prior_readiness, field.name) != getattr(
+                            expected_prior, field.name
+                        ):
+                            raise _refuse(
+                                "prior_readiness."
+                                f"{field.name} does not match source_context"
+                            )
+                raise _refuse(
+                    "prior_readiness does not exactly match source_context"
+                )
+
+    def _validate_source_vintage_context(
+        self,
+    ) -> tuple[ShortInterestSnapshot, ShortInterestSnapshot | None]:
+        if type(self.source_context) is not StockFeatureSourceContext:
+            raise _refuse(
+                "source_context must be the exact StockFeatureSourceContext type"
+            )
+        vintage = self.source_context.source_vintage
+        matches = [
+            item
+            for item in vintage.snapshots
+            if item.event_id == self.readiness.event_id
+        ]
+        if len(matches) != 1:
+            raise _refuse(
+                "readiness event_id is not one exact source_vintage event"
+            )
+        current = matches[0]
+        prior = _select_authenticated_prior(
+            vintage,
+            current,
+            self.readiness.execution_at,
+        )
+        if self.prior_readiness is not None:
+            if prior is None:
+                raise _refuse("prior_readiness has no authenticated prior event")
+            if self.prior_readiness.event_id != prior.event_id:
+                raise _refuse(
+                    "prior_readiness is not the latest execution-visible prior"
+                )
+        return current, prior
+
     def to_payload(self) -> dict[str, Any]:
         return {
             "feature": self.feature.to_payload() if self.feature is not None else None,
+            "prior_readiness": (
+                self.prior_readiness.to_payload()
+                if self.prior_readiness is not None
+                else None
+            ),
             "readiness": self.readiness.to_payload(),
             "refusal_reasons": list(self.refusal_reasons),
+            "source_context_sha256": self.source_context.sha256,
         }
 
     @property
@@ -451,6 +769,12 @@ def build_pit_stock_raw_features(
 
     source_identity = build_identity(vintage)
     readiness_rows = build_stock_data_readiness(vintage, references)
+    source_context = StockFeatureSourceContext(
+        source_vintage=vintage,
+        reference_bundle=references,
+        readiness_rows=readiness_rows,
+    )
+    readiness_by_event = {item.event_id: item for item in readiness_rows}
     snapshot_by_event = {item.event_id: item for item in vintage.snapshots}
     dispositions: list[StockFeatureDisposition] = []
 
@@ -461,6 +785,7 @@ def build_pit_stock_raw_features(
                     readiness=readiness,
                     feature=None,
                     refusal_reasons=readiness.refusal_reasons,
+                    source_context=source_context,
                 )
             )
             continue
@@ -479,6 +804,7 @@ def build_pit_stock_raw_features(
                     readiness=readiness,
                     feature=None,
                     refusal_reasons=(REFUSAL_PRIOR_SNAPSHOT_NOT_AUTHENTICATED,),
+                    source_context=source_context,
                 )
             )
             continue
@@ -491,6 +817,7 @@ def build_pit_stock_raw_features(
                     readiness=readiness,
                     feature=None,
                     refusal_reasons=(REFUSAL_PRIOR_DENOMINATOR_UNAUDITED_FLOAT,),
+                    source_context=source_context,
                 )
             )
             continue
@@ -516,6 +843,9 @@ def build_pit_stock_raw_features(
             raise _refuse(
                 "current previous_short_shares does not match authenticated prior"
             )
+        prior_readiness = readiness_by_event.get(prior.event_id)
+        if prior_readiness is None:
+            raise _refuse("authenticated prior event has no readiness row")
 
         feature = PitStockRawFeature(
             source_dataset_id=source_identity["dataset_id"],
@@ -524,6 +854,7 @@ def build_pit_stock_raw_features(
             reference_bundle_sha256=references.sha256,
             preregistration_sha256=PREREGISTRATION.sha256,
             readiness_sha256=readiness.sha256,
+            prior_readiness_sha256=prior_readiness.sha256,
             event_id=current.event_id,
             prior_event_id=prior.event_id,
             security_id=current.security.security_id,
@@ -541,10 +872,12 @@ def build_pit_stock_raw_features(
             current_denominator_value=current_denominator_value,
             current_denominator_sha256=readiness.denominator_sha256,
             current_denominator=current.denominator,
+            current_snapshot=current,
             prior_denominator_kind=prior.denominator.kind,
             prior_denominator_value=prior_denominator_value,
             prior_denominator_sha256=hash_payload(prior.denominator.to_payload()),
             prior_denominator=prior.denominator,
+            prior_snapshot=prior,
             current_short_shares=current.current_short_shares,
             prior_short_shares=prior.current_short_shares,
             current_short_ratio=current_ratio,
@@ -556,6 +889,8 @@ def build_pit_stock_raw_features(
                 readiness=readiness,
                 feature=feature,
                 refusal_reasons=(),
+                prior_readiness=prior_readiness,
+                source_context=source_context,
             )
         )
 

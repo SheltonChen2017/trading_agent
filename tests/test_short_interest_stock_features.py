@@ -21,11 +21,13 @@ from research.short_interest_etf.dataset import build_vintage, load_synthetic_fi
 from research.short_interest_etf.pit_eligibility import (
     PitReferenceBundle,
     REFUSAL_MISSING_PRIOR,
+    REFUSAL_SUPERSEDED,
     REFUSAL_UNAUDITED_FLOAT,
     load_synthetic_pit_reference,
 )
 from research.short_interest_etf.stock_features import (
     REFUSAL_PRIOR_DENOMINATOR_UNAUDITED_FLOAT,
+    REFUSAL_PRIOR_SNAPSHOT_NOT_AUTHENTICATED,
     ExactRational,
     PitStockRawFeature,
     StockFeatureDisposition,
@@ -165,6 +167,11 @@ def test_golden_current_prior_and_delta_ratios_are_exact_and_use_each_denominato
     assert feature.prior_denominator_sha256 == hash_payload(
         prior.denominator.to_payload()
     )
+    assert feature.current_snapshot == current
+    assert feature.prior_snapshot == prior
+    assert disposition.prior_readiness is not None
+    assert disposition.prior_readiness.event_id == prior.event_id
+    assert feature.prior_readiness_sha256 == disposition.prior_readiness.sha256
 
 
 def test_falling_short_ratio_keeps_its_exact_negative_delta():
@@ -234,6 +241,53 @@ def test_prior_revision_fully_visible_by_execution_replaces_stale_revision():
     assert disposition.feature is not None
     assert disposition.feature.prior_event_id == correction.event_id
     assert disposition.feature.prior_denominator_value == "9000"
+
+
+def test_coherent_stale_prior_revision_cannot_replace_latest_visible_correction():
+    prior, current = _vintage().snapshots
+    correction = _prior_correction(
+        prior,
+        published_at="2024-02-13T13:00:00Z",
+        denominator_available_at="2024-02-13T13:00:00Z",
+    )
+    changed = _vintage_with_prior_correction(correction)
+    dispositions = build_pit_stock_raw_features(changed, _references())
+    current_disposition = next(
+        item
+        for item in dispositions
+        if item.readiness.event_id == current.event_id
+    )
+    stale_disposition = next(
+        item for item in dispositions if item.readiness.event_id == prior.event_id
+    )
+    assert current_disposition.feature is not None
+    stale_prior_ratio = ExactRational.from_values(
+        prior.current_short_shares,
+        int(Decimal(prior.denominator.value)),
+    )
+    stale_feature = replace(
+        current_disposition.feature,
+        prior_readiness_sha256=stale_disposition.readiness.sha256,
+        prior_event_id=prior.event_id,
+        prior_denominator=prior.denominator,
+        prior_denominator_kind=prior.denominator.kind,
+        prior_denominator_sha256=hash_payload(prior.denominator.to_payload()),
+        prior_denominator_value=prior.denominator.value,
+        prior_snapshot=prior,
+        prior_short_shares=prior.current_short_shares,
+        prior_short_ratio=stale_prior_ratio,
+        delta_short_ratio=ExactRational.from_fraction(
+            current_disposition.feature.current_short_ratio.to_fraction()
+            - stale_prior_ratio.to_fraction()
+        ),
+    )
+
+    with pytest.raises(StockFeatureError, match="latest execution-visible prior"):
+        replace(
+            current_disposition,
+            feature=stale_feature,
+            prior_readiness=stale_disposition.readiness,
+        )
 
 
 def test_prior_join_uses_stable_security_id_across_a_ticker_change():
@@ -328,11 +382,15 @@ def test_prior_join_cannot_cross_security_ids_on_the_same_settlement():
 
 def test_feature_payload_and_disposition_hash_bind_every_exact_fact_without_floats():
     disposition, feature = _ready_feature()
+    assert disposition.source_context is not None
+    context = disposition.source_context
 
     assert feature.sha256 == hash_payload(feature.to_payload())
     assert disposition.sha256 == hash_payload(disposition.to_payload())
+    assert context.sha256 == hash_payload(context.to_payload())
     assert not _contains_float(feature.to_payload())
     assert not _contains_float(disposition.to_payload())
+    assert not _contains_float(context.to_payload())
     assert set(feature.to_payload()) == {
         field.name for field in fields(feature)
     }
@@ -343,6 +401,23 @@ def test_feature_payload_and_disposition_hash_bind_every_exact_fact_without_floa
     assert feature.to_payload()["prior_denominator_sha256"] == (
         feature.prior_denominator_sha256
     )
+    assert set(disposition.to_payload()) == {
+        "feature",
+        "prior_readiness",
+        "readiness",
+        "refusal_reasons",
+        "source_context_sha256",
+    }
+    assert disposition.to_payload()["source_context_sha256"] == context.sha256
+    assert set(context.to_payload()) == {
+        "readiness_rows",
+        "reference_bundle_identity",
+        "schema_version",
+        "source_vintage_identity",
+    }
+    assert context.to_payload()["readiness_rows"] == [
+        item.to_payload() for item in context.readiness_rows
+    ]
 
 
 def test_exact_rational_contract_reduces_inputs_and_rejects_noncanonical_values():
@@ -419,32 +494,21 @@ def test_denominator_values_must_agree_with_their_recorded_lineage_digests():
 
 
 def test_disposition_still_binds_the_current_denominator_digest_to_its_readiness():
-    """The readiness anchor must keep working behind the new feature-level check.
-
-    Binding each digest to its observation means a plainly corrupt digest now
-    fails inside the feature.  This case slips past that check with an
-    internally consistent feature that simply describes the *prior* denominator
-    as its current one, so only the disposition's readiness binding is left to
-    catch it.
-    """
+    """The authenticated source context pins the exact readiness denominator."""
     disposition, feature = _ready_feature()
-    swapped = Fraction(
-        feature.current_short_shares,
-        int(Decimal(feature.prior_denominator_value)),
+    substituted_readiness = replace(
+        disposition.readiness,
+        denominator_sha256=feature.prior_denominator_sha256,
     )
-    substituted = replace(
-        feature,
-        current_denominator=feature.prior_denominator,
-        current_denominator_sha256=feature.prior_denominator_sha256,
-        current_denominator_value=feature.prior_denominator_value,
-        current_denominator_kind=feature.prior_denominator_kind,
-        current_short_ratio=ExactRational.from_fraction(swapped),
-        delta_short_ratio=ExactRational.from_fraction(
-            swapped - feature.prior_short_ratio.to_fraction()
-        ),
-    )
-    with pytest.raises(StockFeatureError, match="current_denominator_sha256"):
-        replace(disposition, feature=substituted)
+    with pytest.raises(StockFeatureError, match="readiness.denominator_sha256"):
+        replace(
+            disposition,
+            readiness=substituted_readiness,
+            feature=replace(
+                feature,
+                readiness_sha256=substituted_readiness.sha256,
+            ),
+        )
 
 
 def test_denominator_digest_covers_the_whole_observation_not_only_its_value():
@@ -456,6 +520,320 @@ def test_denominator_digest_covers_the_whole_observation_not_only_its_value():
 
     with pytest.raises(StockFeatureError, match="current_denominator_sha256"):
         replace(feature, current_denominator=restamped)
+
+
+def test_current_short_shares_are_bound_to_the_authenticated_source_event():
+    _, feature = _ready_feature()
+    substituted_ratio = ExactRational.from_values(
+        999_999,
+        int(Decimal(feature.current_denominator_value)),
+    )
+    with pytest.raises(StockFeatureError, match="current_short_shares"):
+        replace(
+            feature,
+            current_short_shares=999_999,
+            current_short_ratio=substituted_ratio,
+            delta_short_ratio=ExactRational.from_fraction(
+                substituted_ratio.to_fraction()
+                - feature.prior_short_ratio.to_fraction()
+            ),
+        )
+
+
+def test_prior_source_facts_cannot_be_fabricated_behind_current_readiness():
+    _, feature = _ready_feature()
+    with pytest.raises(StockFeatureError, match="prior_event_id"):
+        replace(feature, prior_event_id="f" * 64)
+
+    substituted_prior = ExactRational.from_values(
+        500,
+        int(Decimal(feature.prior_denominator_value)),
+    )
+    with pytest.raises(StockFeatureError, match="prior_short_shares"):
+        replace(
+            feature,
+            prior_short_shares=500,
+            prior_short_ratio=substituted_prior,
+            delta_short_ratio=ExactRational.from_fraction(
+                feature.current_short_ratio.to_fraction()
+                - substituted_prior.to_fraction()
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    ("side", "changes", "error_pattern"),
+    [
+        (
+            "prior",
+            {"kind": DenominatorKind.POINT_IN_TIME_FLOAT},
+            "prior_denominator_kind",
+        ),
+        ("prior", {"security_id": "sec-other"}, "prior_denominator.security_id"),
+        (
+            "prior",
+            {
+                "effective_date": "2025-01-02",
+                "available_at": "2025-01-03T14:00:00Z",
+                "observed_at": "2025-01-03T14:00:00Z",
+            },
+            "prior_denominator",
+        ),
+    ],
+)
+def test_denominator_witness_semantics_are_bound_to_feature_lineage(
+    side, changes, error_pattern
+):
+    _, feature = _ready_feature()
+    observation = replace(getattr(feature, f"{side}_denominator"), **changes)
+    with pytest.raises(StockFeatureError, match=error_pattern):
+        replace(
+            feature,
+            **{
+                f"{side}_denominator": observation,
+                f"{side}_denominator_sha256": hash_payload(
+                    observation.to_payload()
+                ),
+            },
+        )
+
+
+def test_future_prior_snapshot_inputs_cannot_be_recast_as_execution_visible():
+    _, feature = _ready_feature()
+    future_denominator = replace(
+        feature.prior_snapshot.denominator,
+        available_at="2025-01-03T14:00:00Z",
+        observed_at="2025-01-03T14:00:00Z",
+    )
+    future_snapshot = replace(
+        feature.prior_snapshot,
+        denominator=future_denominator,
+    )
+
+    with pytest.raises(
+        StockFeatureError,
+        match="prior_snapshot.denominator.available_at",
+    ):
+        replace(
+            feature,
+            prior_snapshot=future_snapshot,
+            prior_event_id=future_snapshot.event_id,
+            prior_denominator=future_denominator,
+            prior_denominator_sha256=hash_payload(
+                future_denominator.to_payload()
+            ),
+        )
+
+
+def test_raw_feature_schema_version_tracks_the_snapshot_witness_payload_shape():
+    _, feature = _ready_feature()
+    assert feature.schema_version == "2.0"
+    with pytest.raises(StockFeatureError, match="raw feature schema_version"):
+        replace(feature, schema_version="1.0")
+
+    class ForgedSchema(str):
+        def __eq__(self, other):
+            return True
+
+        def __ne__(self, other):
+            return False
+
+    with pytest.raises(StockFeatureError, match="raw feature schema_version"):
+        replace(feature, schema_version=ForgedSchema("9.9"))
+
+
+def test_source_context_schema_version_is_load_bearing():
+    disposition, _ = _ready_feature()
+    assert disposition.source_context is not None
+    context = disposition.source_context
+
+    assert context.schema_version == "1.0"
+    with pytest.raises(StockFeatureError, match="source context schema_version"):
+        replace(context, schema_version="0.9")
+
+    class ForgedSchema(str):
+        def __eq__(self, other):
+            return True
+
+        def __ne__(self, other):
+            return False
+
+    with pytest.raises(StockFeatureError, match="source context schema_version"):
+        replace(context, schema_version=ForgedSchema("9.9"))
+
+
+def test_source_context_recomputes_and_rejects_coherent_readiness_row_tampering():
+    disposition, _ = _ready_feature()
+    assert disposition.source_context is not None
+    context = disposition.source_context
+    changed_rows = list(context.readiness_rows)
+    changed_rows[-1] = replace(changed_rows[-1], taxonomy_id="FAKE")
+
+    with pytest.raises(
+        StockFeatureError,
+        match="readiness_rows do not exactly match",
+    ):
+        replace(context, readiness_rows=tuple(changed_rows))
+
+
+@pytest.mark.parametrize(
+    ("field_name", "replacement", "error_pattern"),
+    [
+        (
+            "denominator_sha256",
+            "a" * 64,
+            "prior_readiness.denominator_sha256",
+        ),
+        ("event_id", "a" * 64, "prior_readiness"),
+        ("security_id", "sec-other", "prior_readiness.security_id"),
+        (
+            "settlement_date",
+            "2024-01-11",
+            "prior_readiness.settlement_date",
+        ),
+        (
+            "reference_dataset_id",
+            "synthetic-different-reference",
+            "prior_readiness.reference_dataset_id",
+        ),
+    ],
+)
+def test_prior_readiness_is_an_independent_external_lineage_anchor(
+    field_name, replacement, error_pattern
+):
+    disposition, feature = _ready_feature()
+    assert disposition.prior_readiness is not None
+    substituted_readiness = replace(
+        disposition.prior_readiness,
+        **{field_name: replacement},
+    )
+    substituted_feature = replace(
+        feature,
+        prior_readiness_sha256=substituted_readiness.sha256,
+    )
+
+    with pytest.raises(StockFeatureError, match=error_pattern):
+        replace(
+            disposition,
+            feature=substituted_feature,
+            prior_readiness=substituted_readiness,
+        )
+
+
+def test_disposition_binds_the_complete_prior_readiness_digest():
+    disposition, feature = _ready_feature()
+    with pytest.raises(StockFeatureError, match="prior_readiness_sha256"):
+        replace(
+            disposition,
+            feature=replace(feature, prior_readiness_sha256="a" * 64),
+        )
+
+
+@pytest.mark.parametrize(
+    ("side", "field_name", "error_pattern"),
+    [
+        ("current", "volume_basis_sha256", "readiness.volume_basis_sha256"),
+        ("prior", "volume_basis_sha256", "prior_readiness.volume_basis_sha256"),
+        (
+            "prior",
+            "security_identity_sha256",
+            "prior_readiness.security_identity_sha256",
+        ),
+    ],
+)
+def test_readiness_snapshot_digests_are_bound_on_both_sides(
+    side, field_name, error_pattern
+):
+    disposition, feature = _ready_feature()
+    readiness = (
+        disposition.readiness
+        if side == "current"
+        else disposition.prior_readiness
+    )
+    assert readiness is not None
+    substituted_readiness = replace(
+        readiness,
+        **{field_name: "a" * 64},
+    )
+    if side == "current":
+        changes = {
+            "readiness": substituted_readiness,
+            "feature": replace(
+                feature,
+                readiness_sha256=substituted_readiness.sha256,
+            ),
+        }
+    else:
+        changes = {
+            "prior_readiness": substituted_readiness,
+            "feature": replace(
+                feature,
+                prior_readiness_sha256=substituted_readiness.sha256,
+            ),
+        }
+
+    with pytest.raises(StockFeatureError, match=error_pattern):
+        replace(disposition, **changes)
+
+
+def test_readiness_execution_cohorts_are_recomputed_from_the_source_vintage():
+    disposition, feature = _ready_feature()
+    delayed_readiness = replace(
+        disposition.readiness,
+        execution_session="2024-02-14",
+        execution_at="2024-02-14T14:30:00Z",
+    )
+    delayed_feature = replace(
+        feature,
+        readiness_sha256=delayed_readiness.sha256,
+        execution_session=delayed_readiness.execution_session,
+        execution_at=delayed_readiness.execution_at,
+    )
+    with pytest.raises(StockFeatureError, match="readiness.execution_session"):
+        replace(
+            disposition,
+            readiness=delayed_readiness,
+            feature=delayed_feature,
+        )
+
+
+def test_sector_and_industry_cannot_be_recast_behind_genuine_reference_hashes():
+    disposition, feature = _ready_feature()
+    substituted_readiness = replace(
+        disposition.readiness,
+        taxonomy_id="FAKE",
+        sector_code="FAKE",
+        industry_code="FAKE",
+    )
+    substituted_feature = replace(
+        feature,
+        readiness_sha256=substituted_readiness.sha256,
+        taxonomy_id="FAKE",
+        sector_code="FAKE",
+        industry_code="FAKE",
+    )
+
+    with pytest.raises(StockFeatureError, match="readiness.taxonomy_id"):
+        replace(
+            disposition,
+            readiness=substituted_readiness,
+            feature=substituted_feature,
+        )
+
+
+def test_non_ready_refusal_is_recomputed_by_the_authenticated_source_context():
+    non_ready = next(item for item in _dispositions() if not item.readiness.ready)
+    substituted_readiness = replace(
+        non_ready.readiness,
+        refusal_reasons=(REFUSAL_SUPERSEDED,),
+    )
+
+    with pytest.raises(StockFeatureError, match="readiness.refusal_reasons"):
+        replace(
+            non_ready,
+            readiness=substituted_readiness,
+            refusal_reasons=substituted_readiness.refusal_reasons,
+        )
 
 
 @pytest.mark.parametrize(
@@ -583,6 +961,14 @@ def test_prior_float_gets_a_separate_named_feature_refusal():
     assert current_disposition.refusal_reasons == (
         REFUSAL_PRIOR_DENOMINATOR_UNAUDITED_FLOAT,
     )
+    with pytest.raises(
+        StockFeatureError,
+        match="prior-snapshot refusal conflicts",
+    ):
+        replace(
+            current_disposition,
+            refusal_reasons=(REFUSAL_PRIOR_SNAPSHOT_NOT_AUTHENTICATED,),
+        )
 
 
 def test_input_reordering_cannot_change_dispositions_or_hashes():
@@ -627,6 +1013,12 @@ def test_exact_input_and_output_types_cannot_be_replaced_by_subclasses():
     )
     with pytest.raises(StockFeatureError, match="exact ShortInterestVintage"):
         build_pit_stock_raw_features(vintage_impostor, references)
+    assert disposition.source_context is not None
+    with pytest.raises(StockFeatureError, match="context source_vintage.*exact"):
+        replace(
+            disposition.source_context,
+            source_vintage=vintage_impostor,
+        )
 
     class ReferenceSubclass(type(references)):
         def __post_init__(self):
@@ -660,6 +1052,18 @@ def test_exact_input_and_output_types_cannot_be_replaced_by_subclasses():
     with pytest.raises(StockFeatureError, match="exact ExactRational"):
         replace(feature, current_short_ratio=rational_impostor)
 
+    class TextSubclass(str):
+        def __eq__(self, other):
+            return True
+
+        def __ne__(self, other):
+            return False
+
+    with pytest.raises(StockFeatureError, match="invalid PIT stock raw feature"):
+        replace(feature, source_dataset_id=TextSubclass(feature.source_dataset_id))
+    with pytest.raises(StockFeatureError, match="invalid PIT stock raw feature"):
+        replace(feature, event_id=TextSubclass(feature.event_id))
+
     class ReadinessSubclass(type(disposition.readiness)):
         def __post_init__(self):
             return None
@@ -676,6 +1080,42 @@ def test_exact_input_and_output_types_cannot_be_replaced_by_subclasses():
     )
     with pytest.raises(StockFeatureError, match="exact StockDataReadiness"):
         replace(disposition, readiness=readiness_impostor)
+
+    assert disposition.prior_readiness is not None
+    prior_readiness_impostor = ReadinessSubclass(
+        **{
+            field.name: getattr(disposition.prior_readiness, field.name)
+            for field in fields(disposition.prior_readiness)
+        }
+    )
+    with pytest.raises(StockFeatureError, match="prior_readiness.*exact"):
+        replace(disposition, prior_readiness=prior_readiness_impostor)
+
+    class SnapshotSubclass(type(feature.current_snapshot)):
+        pass
+
+    snapshot_impostor = SnapshotSubclass(
+        **{
+            field.name: getattr(feature.current_snapshot, field.name)
+            for field in fields(feature.current_snapshot)
+        }
+    )
+    with pytest.raises(StockFeatureError, match="current_snapshot.*exact"):
+        replace(feature, current_snapshot=snapshot_impostor)
+
+    assert disposition.source_context is not None
+
+    class SourceContextSubclass(type(disposition.source_context)):
+        pass
+
+    context_impostor = SourceContextSubclass(
+        **{
+            field.name: getattr(disposition.source_context, field.name)
+            for field in fields(disposition.source_context)
+        }
+    )
+    with pytest.raises(StockFeatureError, match="source_context.*exact"):
+        replace(disposition, source_context=context_impostor)
 
     daily = DailyShortSaleVolumeRecord(
         semantic=DailyVolumeSemantic.DAILY_SHORT_SALE_VOLUME,

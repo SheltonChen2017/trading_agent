@@ -97,6 +97,34 @@ def test_nested_source_payload_mutation_cannot_change_validated_snapshot():
     assert snapshot.denominator.value == "10000"
 
 
+def test_required_text_and_sha256_reject_string_subclass_equality_spoofing():
+    snapshot = ShortInterestSnapshot.from_payload(_snapshot_payload())
+
+    class ForgedText(str):
+        def __eq__(self, other):
+            return True
+
+        def __ne__(self, other):
+            return False
+
+    with pytest.raises(ShortInterestContractError, match="canonical string"):
+        replace(
+            snapshot,
+            source_record_id=ForgedText(snapshot.source_record_id),
+        )
+    with pytest.raises(ShortInterestContractError, match="sha256 digest"):
+        replace(
+            snapshot,
+            raw_record_sha256=ForgedText(snapshot.raw_record_sha256),
+        )
+    with pytest.raises(ShortInterestContractError, match="schema_version"):
+        replace(snapshot, schema_version=ForgedText("9.9"))
+
+    manifest = CollectionManifest.from_payload(_fixture_payload()["manifest"])
+    with pytest.raises(ShortInterestContractError, match="schema_version"):
+        replace(manifest, schema_version=ForgedText("9.9"))
+
+
 def test_event_id_binds_normalized_facts_not_only_caller_supplied_raw_hash():
     snapshot = ShortInterestSnapshot.from_payload(_snapshot_payload())
     changed_position = replace(

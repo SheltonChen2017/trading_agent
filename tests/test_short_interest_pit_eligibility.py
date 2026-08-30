@@ -58,6 +58,20 @@ def _references():
     return load_synthetic_pit_reference(REFERENCE_FIXTURE)
 
 
+def test_reference_manifest_schema_rejects_string_subclass_equality_spoofing():
+    manifest = _references().manifest
+
+    class ForgedSchema(str):
+        def __eq__(self, other):
+            return True
+
+        def __ne__(self, other):
+            return False
+
+    with pytest.raises(PitReferenceError, match="schema_version"):
+        replace(manifest, schema_version=ForgedSchema("9.9"))
+
+
 def _reference_bundle(bundle, *, lifecycles=None, classifications=None):
     lifecycle_rows = tuple(
         bundle.lifecycles if lifecycles is None else lifecycles

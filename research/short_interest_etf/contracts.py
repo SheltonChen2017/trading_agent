@@ -47,7 +47,7 @@ class DenominatorKind(str, Enum):
 
 
 def _required_text(value: Any, name: str) -> str:
-    if not isinstance(value, str) or not value or value != value.strip():
+    if type(value) is not str or not value or value != value.strip():
         raise ShortInterestContractError(
             f"{name} must be a non-empty canonical string"
         )
@@ -103,7 +103,7 @@ def format_utc_timestamp(value: datetime) -> str:
 
 
 def _sha256(value: Any, name: str) -> str:
-    if not isinstance(value, str) or _SHA256_RE.fullmatch(value) is None:
+    if type(value) is not str or _SHA256_RE.fullmatch(value) is None:
         raise ShortInterestContractError(
             f"{name} must be one lowercase 64-character sha256 digest"
         )
@@ -210,7 +210,7 @@ class CollectionManifest:
             "endpoint_schema_version",
         ):
             _required_text(getattr(self, name), name)
-        if self.schema_version != SCHEMA_VERSION:
+        if type(self.schema_version) is not str or self.schema_version != SCHEMA_VERSION:
             raise ShortInterestContractError(
                 f"unsupported CollectionManifest schema_version {self.schema_version!r}"
             )
@@ -562,7 +562,7 @@ class ShortInterestSnapshot:
     schema_version: str = SCHEMA_VERSION
 
     def __post_init__(self) -> None:
-        if self.schema_version != SCHEMA_VERSION:
+        if type(self.schema_version) is not str or self.schema_version != SCHEMA_VERSION:
             raise ShortInterestContractError(
                 f"unsupported ShortInterestSnapshot schema_version {self.schema_version!r}"
             )

@@ -140,7 +140,10 @@ class PitReferenceManifest:
         _integer(self.classification_record_count, "classification_record_count")
         _sha256(self.source_body_sha256, "source_body_sha256")
         _git_commit(self.collector_git_commit, "collector_git_commit")
-        if self.schema_version != REFERENCE_SCHEMA_VERSION:
+        if (
+            type(self.schema_version) is not str
+            or self.schema_version != REFERENCE_SCHEMA_VERSION
+        ):
             raise _refuse(
                 f"unsupported PIT reference schema_version {self.schema_version!r}"
             )

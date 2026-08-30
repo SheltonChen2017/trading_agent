@@ -48,6 +48,31 @@ their lane-owned artifacts.
   and was not fixed from this target-only lane. No TPR P0/P1/P2 remains; the
   only TPR P3 is future cryptographic reviewer-identity strengthening before
   any positive authority.
+- Claude's independent review of the pushed range `c0ba616..6aae73b` is
+  complete: all four commits are **accepted after correction** or accepted,
+  with no P0 or P1. An independent complete run on the exact pushed tree gave
+  **5,830 passed, 5 skipped, 0 failed, 25 warnings in 997.26s**, corroborating
+  the recorded counts and failing to reproduce `TPR-OOL-005`, which supports
+  the flake diagnosis. Two guard regressions from the counter-review were
+  corrected and mutation-verified: the repository-wide malformed-digest
+  invariant was restored to the shared module, and the lane worktree guard
+  again rejects a third spelling and the obsolete directory name.
+- One P2 is **open and owner-routed**: `TPR-CR2-002` / `TPR-OOL-006`. The
+  owner-approved addendum makes the shared selection family four members with
+  target alpha `0.0125`, but Analyst Revisions V2 still freezes `0.05 / 3 =
+  0.0167` and no document records a propagation obligation. At their current
+  frozen alphas the four lanes would spend `0.0625` against an intended
+  `0.05`. Nothing is executable and no lane has spent a look, so no result is
+  affected, but this must be settled by one owner-coordinated common-baseline
+  amendment before any lane's first outcome study. It was deliberately not
+  fixed from this branch because the remedy is in sibling lanes' frozen files.
+- The owner confirmed on 2026-08-30 that the three approvals recorded in
+  section 13.1 were genuinely given. Section 14.5 binds them to the exact
+  artifacts: the root `*.pdf binary` attribute, blueprint v2.1 at raw SHA-256
+  `55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14`, and the
+  A21 TPR-0A/TPR-0B phase split. The confirmation adds no other authority.
+- The next step is Codex's counter-review of every Claude commit in this
+  round. TPR-0B and TPR-1 remain blocked on their own gates.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (28 pages; raw binary SHA-256

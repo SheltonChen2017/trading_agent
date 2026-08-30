@@ -399,6 +399,7 @@ documented here and deliberately not fixed.
 | ID | Severity | External area / paths | Evidence and lane impact | Disposition / future route |
 |---|---|---|---|---|
 | `TPR-OOL-001` | P2 | Repository-wide Git plumbing: no `.gitattributes` exists at any level, and `core.autocrlf=true` is set in the system Git configuration | Git finds no NUL byte in the target-price blueprint, so it classifies the PDF as text and rewrites its 557 LF bytes to CRLF on checkout. The working file is 78,082 bytes and hashes to `6ee7ea5e...4330`, while the committed blob is 77,525 bytes and hashes to the pinned `9f00dd56...2633`. `pdftotext` reports a damaged xref table on the working copy. The other four PDFs contain NUL bytes early and check out byte-identically. Lane impact is `TPR-CR1-001`. | A `*.pdf binary` attribute is repository-wide plumbing rather than trading-strategy work, and `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 2 requires a shared-file change to stop for one owner-coordinated common-baseline amendment. Documented, not fixed. Owner decision required. |
+| `TPR-OOL-006` | P2 | Sibling lane frozen preregistrations, principally `codex/strategy-analyst-revisions-v2` | That lane still freezes its selection-family alpha at `0.05 / 3 = 0.0167` while this lane's owner-approved addendum A23 makes the shared family four members at `0.0125`. Lane impact is `TPR-CR2-002`: the four lanes would together spend `0.0625` against an intended `0.05`. | Requires one owner-coordinated common-baseline amendment across all four lanes. Another lane's frozen preregistration must not be edited from this branch. Documented, not fixed; **must be settled before any lane's first outcome study**. |
 | `TPR-OOL-002` | P3 | `docs/Strategy Description/README.md` | The lane table and the surrounding prose describe a three-strategy program and omit Target-Price Revisions entirely, so a reader who starts at the directory README does not discover this lane, its branch, or its record. | That README is named in the parallel-workflow frozen-file list, so it needs the same owner-coordinated common-baseline amendment rather than a fourth competing edit. Documented, not fixed. |
 | `TPR-OOL-001-R1` | P2 resolution | Owner-coordinated repository Git plumbing | The owner approved the common fix. Root `.gitattributes` now declares `*.pdf binary`; Git resolves the blueprint as binary with text/diff/merge unset. The PDF was rebuilt from the intact Git blob plus the two-page owner addendum and now reopens strictly as 28 pages at raw SHA-256 `55ce6703...ba14`. | Resolved under the explicit one-time owner coordination; this does not authorize later shared-file edits by inference. Raw-byte and resolved-attribute guards are target-owned. |
 | `TPR-OOL-003` | P2 | Analyst Revisions V2 preregistration loader: `research/analyst_revisions_v2/preregistration.py:465,487` | Both persisted JSON paths use ordinary `json.loads`, which accepts duplicate object keys with last-key-wins behavior. A content-addressed authority artifact can therefore have ambiguous human/parser meaning. TPR's strict loader rejects duplicate keys, but this external accepted lane remains unchanged. | Documented only. Route to the Analyst Revisions V2 lane before any outcome authority; add duplicate-key mutations there. |
@@ -421,6 +422,7 @@ known.
 | 2026-08-29 | Codex counter-review record | `24283fa3b79b1a86cceb65fbd5d3d2af5fa20292` -> local record candidate | Counter-review record; TPR-0 blocked | Added the exact three-commit Claude dispositions, repaired current status and range semantics, split Claude's validation/push into its own append-only ledger event, qualified the PDF-render and `git diff --check` overstatements, documented the TPR-0 dependency-order contradiction, and refined the worktree test to inspect exact active pointers rather than historical issue text. | Shared plus target documentation suites: **70 passed in 1.15s**; Markdown and target-test `git diff --check` clean; no provider, source, outcome, QC, broker, paper, or live access; **0 looks**. | Open owner/gate blockers are enumerated in section 12. No TPR-0 artifact was created. | None. | Preserve the one-push rule; wait for owner decisions, implement TPR-0 locally, then update this candidate to its exact committed/pushed range. |
 | 2026-08-30 | Codex counter-review + implementation | `2708c06e394f927356aeffa3af781be1ce5d2090` -> local TPR-0A candidate | Owner-approved v2.1 amendment and bounded TPR-0A | Closed the prior review blockers under the approved TPR-0A/0B phase split; repaired and binary-pinned the 28-page sole-authority blueprint; implemented strict canonical artifacts, deterministic policy construction, exact zero-access declarations, Git/code-map review anchoring, fixed-boundary transitive import protection, and the complete frozen TPR-0A policy/algorithm parent. The checked-in candidate is unreviewed and non-executable. | PDF raw SHA-256 `55ce6703...ba14`, 28 pages, strict-open and visual QA complete. Focused TPR code/spec/document suite: **108 passed, 3 skipped** on Python 3.12.13 / pytest 9.1.1; skips are host symlink-privilege cases and the Windows junction regression passed. Provider accesses **0**; outcome accesses **0**; authorized/spent looks **0**. | No P0/P1/P2 remains after counter-audit. `TPR-CCR2-011` is the deferred P3 signed-review-identity strengthening item. | None. One `planned_unbound` look identity exists, but no look is authorized or spent; source/look registries remain zero-access and reviewed-spec registry remains empty. | Complete full-project validation, commit the exact candidate, append the final validation/push row, and make this round's single push for Claude review. |
 | 2026-08-30 | Codex validation / handoff | `ba01e98f9d3c8746c70182818a27a2d49a9c0fe7` -> local record candidate | Exact TPR-0A implementation snapshot | Reverified the committed candidate/PDF hashes and attributes, deterministic regeneration, zero-access artifacts, import closure, compilation, diff hygiene, and credential-shape boundary. The implementation commit contains no TPR provider reader and no outcome, QC, broker, or deployment path. | Exact-tree target/shared suite: **176 passed, 3 skipped**; compilation and staged diff checks passed. Exact-tree full run: **5,829 passed, 5 skipped, 1 failed, 26 warnings**; the sole failure was out-of-lane `TPR-OOL-005`, which passed alone immediately afterward (**1 passed in 14.42s**). A prior full run before two trailing-blank-line-only cleanups was **5,830 passed, 5 skipped, 26 warnings in 962.18s**. Python 3.12.13; pytest 9.1.1. Provider accesses **0**; outcome accesses **0**; authorized/spent looks **0**. | No TPR P0/P1/P2. `TPR-CCR2-011` remains deferred P3; transient out-of-lane UI test item `TPR-OOL-005` documented and deliberately not fixed. | None. Candidate remains unreviewed; reviewed registry empty; source/look declarations zero-access; one planned-unbound identity but no authorized or spent look. | Commit this record-only handoff, make the round's one push, and hand the exact pushed range to Claude for same-branch independent review. |
+| 2026-08-30 | Claude review | `c0ba616a40f628519a071d0642fadf596982919a` -> `6aae73bb381733c5239cb141e77cf1b7be6438d2` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review and the TPR-0A candidate | Reviewed all four pushed commits individually. Accepted every counter-review finding against the prior Claude round, including two confirmed errors of my own. Verified rather than accepted: the storage remedy, that the v2.1 rebuild appended the addendum without altering any reviewed v2.0 line, the ARV2 schedule reuse, the zero-access registries, the artifact hashes, and the outcome-gate and reviewed-authority code paths. Restored the generalized malformed-digest invariant and closed the worktree guard's agreement and obsolete-name holes. | Independent complete run on the exact pushed tree `6aae73b`: **5,830 passed, 5 skipped, 0 failed, 25 warnings in 997.26s**, corroborating the recorded 5,829/5/1 and failing to reproduce `TPR-OOL-005`. Focused target/shared suite 187 passed, 3 skipped. Three mutations each turned exactly one guard red with green restore, including direct proof that a new malformed pin passes the lane guard while failing the restored shared guard. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | All four commits accepted after correction or accepted. No P0/P1. `TPR-CR2-001` and `TPR-CR2-003` closed; `TPR-CR2-002` open on an owner decision and mirrored as `TPR-OOL-006`. Owner confirmed the three section 13.1 approvals on 2026-08-30; bound in section 14.5. Details in section 14. | None; all source, outcome, look, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. TPR-0B and TPR-1 remain blocked; `TPR-CR2-002` must be settled before any lane's first outcome study. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -627,3 +629,148 @@ artifact. TPR-0B remains blocked on reviewed TPR-1/TPR-2 structural manifests.
 TPR-3 and every outcome/lookup path remain blocked on the reviewed parent and
 child identities plus external source and permanent-look authority. Provider
 accesses: **0**. Outcome accesses: **0**. Research looks: **0**.
+
+## 14. Claude independent review - 2026-08-30 (counter-review and TPR-0A)
+
+**Disposition: all four commits accepted after correction.** No P0 or P1 issue
+exists. The TPR-0A authority path is the strongest part of this round and was
+probed rather than accepted: it fails closed, authenticates its own negative
+declarations, and closes the verify-then-mutate window. Two guard regressions
+introduced by the counter-review are corrected here, and one cross-lane
+multiplicity inconsistency is escalated to the owner because its remedy is in
+the three sibling lanes' frozen files.
+
+### 14.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Reviewed range | `c0ba616..6aae73b` (four commits; `c0ba616` was reviewed in section 11 and is correctly excluded) |
+| Review head | `6aae73bb381733c5239cb141e77cf1b7be6438d2` |
+| Remote head at review | identical; ancestry from `c0ba616` verified, no history rewrite |
+| Implementation snapshot | `ba01e98f9d3c8746c70182818a27a2d49a9c0fe7` |
+| Corrections | committed on this same lane branch |
+| Environment | Windows 11, Python 3.14, pytest 9.1.1 |
+
+Section 11.1 named the range `c179801..70c4b9f`, which in Git excludes
+`c179801` even though that commit was reviewed. Codex was right; the notation
+above is correct and the historical row stands as written.
+
+### 14.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `24283fa3b79b1a86cceb65fbd5d3d2af5fa20292` | **accepted after correction** | Relocating the two lane-specific guards into a target-owned package is correct under the blueprint's target-owned-namespace rule. Narrowing the repository-wide malformed-digest invariant to a lane literal was not; see `TPR-CR2-001`. |
+| `2708c06e394f927356aeffa3af781be1ce5d2090` | **accepted** | Records the counter-review blockers honestly. `TPR-CCR1-004`, the circularity in TPR-0's own definition of done, is a genuine defect in the governing blueprint and refusing to invent constants was the correct response. No issue found. |
+| `ba01e98f9d3c8746c70182818a27a2d49a9c0fe7` | **accepted after correction** | The TPR-0A tree, the storage remedy, the v2.1 addendum and the shared-family amendment. Carries `TPR-CR2-002` and `TPR-CR2-003`. |
+| `6aae73bb381733c5239cb141e77cf1b7be6438d2` | **accepted** | Record-only validation handoff. Its counts are corroborated below. No issue found. |
+
+### 14.3 Codex findings against the prior Claude round: all accepted
+
+Every counter-review finding in section 12 is accepted, including the two that
+were straightforward errors of mine.
+
+| Codex finding | Assessment |
+|---|---|
+| `c179801..70c4b9f` excludes its own first commit | **Confirmed error.** Corrected in 14.1. |
+| "the working copy cannot currently be rendered" overstates the defect | **Confirmed error.** Poppler reconstructs the xref and renders all 26 pages; the complete text layer had already been read that way in the same review, so my own evidence contradicted the claim. |
+| "`git diff --check` is permanently red for the whole repository" overstates | **Confirmed error.** A clean-worktree check and `70c4b9f..c0ba616` both pass; only historical ranges spanning the blueprint's addition fail. |
+| `0f05f3d` is red as a standalone object | **Confirmed.** Splitting guards before document corrections satisfied the separate-commit rule at the cost of per-commit greenness. Documents first, then guards, would have satisfied both. |
+| The agreement-only worktree guard passed on the original dangerous state | **Confirmed**, and stated in the original report. Codex's exact-pointer replacement fixes that direction; `TPR-CR2-003` restores the direction it lost. |
+| Lane guards belonged in a target-owned module | **Accepted** for the two lane-specific guards. Disputed for the repository-wide invariant; see `TPR-CR2-001`. |
+
+### 14.4 P0-P3 issue ledger
+
+Resolved items are retained. There is no P0 or P1 finding.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR2-001` | P2 | Closed | `24283fa` | `tests/test_active_document_consistency.py`, `tests/target_price_revisions/test_document_consistency.py` | The malformed-digest guard was removed from the shared module and replaced by a lane check that only asserts one known 63-character literal is absent from two named files. The generalized invariant -- no active document may pin a hex run long enough to be claiming a SHA-256 yet not 64 characters -- was left unimplemented anywhere, so a *new* malformed pin in any active record now passes. The removed invariant was not lane-specific; it had already caught a live defect, and `CLAUDE.md` section 9 requires the generalized instance rather than the single instance. | A repository-wide grep of `tests/` for the length predicate returned no source file. Mutation `M1` below reproduces the gap directly. | A provenance pin that cannot be a digest reads as evidence while providing none; scoping the check to one known string means it can only ever re-detect a defect that is already fixed. | Restored the generalized guard in the shared module, with a docstring stating why it is repository-wide and how it relates to the lane-scoped successor, which is retained. | `M1`: inserting a new 63-character pin into the Action Plan turns the restored shared guard **red** while the lane module stays green at 5 passed -- the coverage gap demonstrated exactly. Restore returns both green. |
+| `TPR-CR2-002` | P2 | **Open - owner decision** | `ba01e98` | Addendum A23, `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`, sibling lane preregistrations | The shared selection family was amended to four members and Target-Price Revisions took alpha `0.0125` (`0.05 / 4`), but the Analyst Revisions V2 preregistration still freezes its family alpha at `0.05 / 3 = 0.0167`, and no document records that the three existing lanes must be re-frozen. If each lane tests at its own currently frozen alpha the family-wise budget spent is `0.0167 x 3 + 0.0125 = 0.0625`, above the intended `0.05`. | The ARV2 lane states **`0.05 / 3 = 0.0167`** for its family alpha. The target lane states `0.0125` in its record and twice in `preregistration.py`. A search of the amended direction document and the lane record for any re-freeze or propagation obligation returns nothing. | Multiplicity is the control that makes a four-family selection claim honest. A half-applied amendment that lowers only the new family's alpha understates the true family-wise error, and it is far cheaper to reconcile now than after a look is spent. | Not fixed. The remedy is in the three sibling lanes' frozen preregistrations, which both the lane boundary and the owner's trading-strategy scope rule place outside this branch. Escalated for one owner-coordinated common-baseline amendment. | Not applicable; no test is added for another lane's frozen contract. Nothing is executable and **0 looks are spent in any lane**, so no result is affected today. |
+| `TPR-CR2-003` | P3 | Closed | `ba01e98` | `tests/target_price_revisions/test_document_consistency.py` | `24283fa` added an obsolete-worktree rejection and cited it in section 12.2 as the correction; `ba01e98` then replaced the body with exact per-document pointer strings and left `OBSOLETE_WORKTREE` defined but unreferenced. The guard named `..._agree_on_one_worktree` therefore asserted neither agreement nor rejection: a third spelling introduced anywhere passed, and the obsolete name could return to a pure coordination document. | `OBSOLETE_WORKTREE` is defined at line 18 and referenced nowhere else. Mutations `M2` and `M3` below both passed against the uncorrected guard's intent. | This is the exact hole that let one nonexistent directory sit unnoticed in three documents, and a dead constant advertises a check that is not running. | Extended the existing guard: the two pure coordination documents may name no other worktree at all, the record may carry the obsolete name only as historical finding evidence, and the union of active names across all three must be exactly one. | `M2`: a third spelling in the handoff turns exactly one assertion red (1 failed, 4 passed). `M3`: the obsolete name in the Action Plan turns exactly one assertion red (1 failed, 4 passed). Restore returns 5 passed. |
+| `TPR-CR2-004` | P3 | Closed | `ba01e98` | `docs/ACTION_PLAN_2026-08-20.md` TPR row | The rewritten row said the TPR-0A candidate "awaits the exact end-of-round push and Claude review". It was pushed at `6aae73b` and reviewed here, so the sentence was false by the time anyone could read it on the branch. | `git merge-base --is-ancestor ba01e98 origin/codex/strategy-target-price-revisions` returns 0. | This is the fifth recorded instance of the push-state class (CCR-005, CCX-004, `TPR-CR1-003`, and the prior Action Plan row). The existing repository guard only matches commit hashes asserted unreachable, so an "awaits push" phrasing with no hash attached passes it. | The row now records the pushed head, the review disposition, the next role action, and the open multiplicity gate. | The active-document and lane suites pass on the corrected tree. A durable phrase-level guard for this shape is deliberately not added here: it belongs with the existing repository-wide reachability guard family, which is shared-surface work outside this lane's trading-strategy scope. |
+
+### 14.5 Owner authorization, bound to exact artifacts
+
+Section 13.1 recorded three owner approvals whose only evidence was the
+implementing agent's own record. The blueprint's section 34 requires that
+approval bind exact artifacts and states that silence is not authorization, so
+the claim was put to the owner directly rather than accepted.
+
+**The owner confirmed on 2026-08-30 that all three were approved.** They bind:
+
+1. the repository-root `*.pdf binary` attribute and the resulting resolved
+   `text`/`diff`/`merge` unset state for the blueprint;
+2. blueprint version 2.1 as the reviewed v2.0 pages plus the appended Owner
+   Decision Addendum, raw SHA-256
+   `55ce6703c9b07580db9d09c22154dff86001765f8ec93391ed5f0b763314ba14`; and
+3. the A21 TPR-0A / TPR-0B phase split, including that TPR-0B may bind
+   empirical values only from reviewed zero-outcome TPR-1/TPR-2 manifests.
+
+This confirmation grants no source, outcome, look, QC, broker, paper, live,
+deployment, or capital authority. It closes the provenance question only.
+
+### 14.6 Verified rather than accepted
+
+- **The storage remedy is real.** Root `*.pdf binary` is set; the blueprint's
+  committed blob, its working-tree bytes, and the record's pinned raw digest
+  are all `55ce6703...ba14`. Cross-platform checkout identity is restored, and
+  `TPR-CR1-001` is genuinely closed rather than declared closed.
+- **The rebuild did not alter the reviewed specification.** The v2.0 and v2.1
+  extracted text layers were diffed line by line: exactly one opcode, a pure
+  append of the addendum at the end. All 842 non-blank lines of reviewed v2.0
+  content are unchanged. Amending a governing artifact by appendix rather than
+  by rewrite is the correct method and is what makes A19's supersession
+  language safe.
+- **The addendum's schedule claim is faithful.** The shared cutoff
+  `2027-08-31`, reserved holdout `2027-09-01` through `2029-08-31`, and lane
+  validation `2026-09-01` through `2027-08-31` match the Analyst Revisions V2
+  frozen values exactly, and the three cited ARV2 commits all resolve.
+- **Zero access is enforced, not merely declared.** All three registries carry
+  `authority_mode: zero_access` with empty entries; the candidate artifact
+  hashes to `99aae28d...ea49` exactly as recorded; `authorize_outcome_access`
+  is typed `NoReturn` with every path raising, and it authenticates both
+  negative declarations so that a missing or substituted authority file raises
+  instead of reading as safe.
+- **The reviewed-authority path resists the attacks it should.**
+  `require_reviewed_algorithm_spec` chains exact-type identity, a private
+  authority token, weakref registry identity that defeats `id()` reuse, a
+  fingerprint comparison that detects post-construction mutation, and a reload
+  from the original path that closes the verify-then-mutate window. The
+  weakref finalizer checks reference identity before evicting.
+- **Import discipline holds.** The package imports only the standard library
+  and its own submodules; no `assistant`, `execution`, `ml`, provider, or
+  network import appears. `subprocess` use is confined to read-only Git
+  commands with explicit argument arrays and `shell=False`. No binary float
+  arithmetic; `canonical.py` carries an explicit `_reject_binary_float`.
+- **The implementer's counts are corroborated.** An independent complete run
+  on the exact pushed tree gave **5,830 passed, 5 skipped, 0 failed, 25
+  warnings in 997.26s**, against the recorded 5,829 passed / 5 skipped / 1
+  failed. The one recorded failure did **not** reproduce, which independently
+  supports the `TPR-OOL-005` diagnosis that the Briefing smoke test is a
+  host-load and cache flake rather than a regression. The focused target and
+  shared suite gave 187 passed / 3 skipped against a recorded 176 / 3; the
+  difference is scope, not disagreement.
+
+### 14.7 Scope not exhaustively audited
+
+- `preregistration.py` is 2,163 lines. The authority, outcome-gate, identity,
+  registry and canonical-value paths were read closely; the statistical
+  binding procedures, estimator mechanics and power arithmetic were read for
+  contract shape and fail-closed direction but **not** independently
+  re-derived. Their numeric correctness rests on the module's own 889 lines of
+  tests, which pass, and on future TPR-0B review.
+- The import firewall was read and its forbidden-prefix set inspected. Its
+  own docstring correctly limits it to a dependency guard rather than an
+  operating-system sandbox; that limitation was not separately probed.
+- No provider documentation, endpoint, entitlement, or licensed row was
+  touched, so every source-capability statement in A22 remains an unmeasured
+  assumption, exactly as A22 itself declares.
+
+### 14.8 Authority state after this review
+
+Unchanged and zero. No provider, credential, licensed row, source request,
+outcome, evidence epoch, QuantConnect project, broker, operator database,
+scheduler, paper surface, or live surface was accessed, and **0 research looks**
+were spent. No live-assistant behavior can change: the only executable changes
+are two documentation guards. The TPR-0A candidate remains unreviewed for the
+purpose of its own registry, which stays empty.

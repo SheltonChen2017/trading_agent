@@ -39,12 +39,18 @@ their lane-owned artifacts.
   `planned_unbound` primary confirmatory look/cell allocation is `1/80`, but
   no look is authorized or spent. The candidate is pending Claude review of
   the exact single-push snapshot and subsequent Codex counter-review.
-- The current implementation snapshot `bb8dfb6` has passed the focused
-  implementation/import suite (**113 passed, 3 skipped**) and the focused
-  case-insensitive malformed-digest regression (**2 passed**). The 29-page PDF
-  passed strict-open, hash, unchanged-first-28-page, render, and visual checks.
-  Full-project validation is the remaining local handoff step; its exact result
-  is appended to the target record rather than overwriting prior evidence.
+- The cumulative committed validation tree `6b12102` passed the full suite:
+  **5,842 passed, 5 skipped, 25 warnings in 1,065.11 seconds**. Full compilation
+  including `research` passed. The focused implementation/import suite passed
+  with **113 passed, 3 skipped**, the case-insensitive malformed-digest
+  regression passed with **2 passed**, and the final pre-validation document
+  suite passed with **75 passed**. The final complete target-price plus active-
+  document suite passed with **188 passed, 3 skipped in 12.56 seconds**. The
+  29-page PDF passed strict-open, hash,
+  unchanged-first-28-page, render, and visual checks. The final documentation-
+  only bytes receive one last narrow identity/document guard run immediately
+  before commit and the single push; exact evidence is appended to the target
+  record rather than overwriting history.
 - The reviewed Claude range is `6aae73b..2ec0fad`. Codex accepted all six
   commits after correction: the review/validation evidence is credible, while
   the confirmed defects were stale identities/next-state prose, a duplicate

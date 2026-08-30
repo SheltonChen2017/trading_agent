@@ -143,6 +143,23 @@ def test_non_ready_disposition_cannot_carry_an_otherwise_valid_feature():
         )
 
 
+def test_feature_disposition_refusals_reject_tuple_subclass_equality_spoofing():
+    non_ready = next(item for item in _dispositions() if not item.readiness.ready)
+
+    class ForgedReasons(tuple):
+        def __eq__(self, other):
+            return True
+
+        def __ne__(self, other):
+            return False
+
+    with pytest.raises(StockFeatureError, match="exact tuple"):
+        replace(
+            non_ready,
+            refusal_reasons=ForgedReasons((REFUSAL_SUPERSEDED,)),
+        )
+
+
 def test_golden_current_prior_and_delta_ratios_are_exact_and_use_each_denominator():
     disposition, feature = _ready_feature()
     vintage = _vintage()

@@ -11,6 +11,7 @@ import pytest
 from research.short_interest_etf.contracts import recompute_days_to_cover
 from research.short_interest_etf.dataset import (
     ShortInterestDatasetError,
+    ShortInterestVintage,
     build_identity,
     build_vintage,
     load_synthetic_fixture,
@@ -147,6 +148,37 @@ def test_release_and_refusal_subclasses_cannot_cross_vintage_boundary():
             vintage.release_calendar,
             vintage.snapshots,
             (refusal_impostor,),
+        )
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    ["release_calendar", "snapshots", "refusals"],
+)
+def test_vintage_container_must_be_an_exact_tuple(field_name):
+    vintage = _vintage()
+
+    class TupleSubclass(tuple):
+        pass
+
+    with pytest.raises(ShortInterestDatasetError, match=field_name):
+        ShortInterestVintage(
+            manifest=vintage.manifest,
+            release_calendar=(
+                TupleSubclass(vintage.release_calendar)
+                if field_name == "release_calendar"
+                else vintage.release_calendar
+            ),
+            snapshots=(
+                TupleSubclass(vintage.snapshots)
+                if field_name == "snapshots"
+                else vintage.snapshots
+            ),
+            refusals=(
+                TupleSubclass(vintage.refusals)
+                if field_name == "refusals"
+                else vintage.refusals
+            ),
         )
 
 

@@ -100,21 +100,27 @@ class ShortInterestVintage:
     def __post_init__(self) -> None:
         if type(self.manifest) is not CollectionManifest:
             raise _refuse("manifest must be the exact CollectionManifest type")
-        if not isinstance(self.release_calendar, tuple) or not all(
+        if type(self.release_calendar) is not tuple or not all(
             type(item) is ReleaseCalendarEntry for item in self.release_calendar
         ):
-            raise _refuse("release_calendar must contain exact ReleaseCalendarEntry types")
-        if not isinstance(self.snapshots, tuple) or not all(
+            raise _refuse(
+                "release_calendar must be an exact tuple of exact "
+                "ReleaseCalendarEntry values"
+            )
+        if type(self.snapshots) is not tuple or not all(
             type(item) is ShortInterestSnapshot for item in self.snapshots
         ):
             raise _refuse(
-                "snapshots must contain exact ShortInterestSnapshot types; "
+                "snapshots must be an exact tuple of exact "
+                "ShortInterestSnapshot values; "
                 "daily short-sale volume is forbidden"
             )
-        if not isinstance(self.refusals, tuple) or not all(
+        if type(self.refusals) is not tuple or not all(
             type(item) is SnapshotRefusal for item in self.refusals
         ):
-            raise _refuse("refusals must contain exact SnapshotRefusal types")
+            raise _refuse(
+                "refusals must be an exact tuple of exact SnapshotRefusal values"
+            )
 
         releases = tuple(
             sorted(self.release_calendar, key=lambda item: item.key)

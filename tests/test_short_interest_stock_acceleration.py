@@ -30,6 +30,7 @@ from research.short_interest_etf.stock_acceleration import (
 )
 from research.short_interest_etf.stock_features import (
     ExactRational,
+    StockFeatureError,
     build_pit_stock_raw_features,
 )
 
@@ -343,6 +344,34 @@ def test_non_history_prior_failure_is_not_mislabeled_as_normal_warmup():
     )
 
 
+def test_non_ready_raw_disposition_cannot_carry_authenticated_prior_readiness():
+    raw = _three_cycle_raw_dispositions(stale_middle=True)
+    non_ready = next(
+        item
+        for item in raw
+        if item.readiness.settlement_date == "2024-01-31"
+    )
+    context = non_ready.source_context
+    assert context is not None
+    current_snapshot = next(
+        item
+        for item in context.source_vintage.snapshots
+        if item.event_id == non_ready.readiness.event_id
+    )
+    prior_readiness = next(
+        item
+        for item in context.readiness_rows
+        if item.security_id == current_snapshot.security.security_id
+        and item.settlement_date == current_snapshot.previous_settlement_date
+    )
+
+    with pytest.raises(
+        StockFeatureError,
+        match="non-ready source data cannot carry prior_readiness",
+    ):
+        replace(non_ready, prior_readiness=prior_readiness)
+
+
 def test_same_next_open_prior_correction_can_feed_current_acceleration():
     raw = _three_cycle_raw_dispositions(
         same_open_middle_correction=True,
@@ -361,6 +390,44 @@ def test_same_next_open_prior_correction_can_feed_current_acceleration():
         third.feature.prior_feature.execution_at
     )
     assert third.feature.current_feature.execution_at == "2024-03-01T14:30:00Z"
+
+
+def test_older_same_settlement_revision_cannot_replace_authenticated_prior():
+    raw = _three_cycle_raw_dispositions(
+        same_open_middle_correction=True,
+    )
+    results = build_pit_stock_accelerations(raw)
+    current = next(
+        item
+        for item in results
+        if item.current.readiness.settlement_date == "2024-02-15"
+    )
+    assert current.feature is not None
+    wrong_prior = next(
+        item.feature
+        for item in raw
+        if item.feature is not None
+        and item.readiness.settlement_date == "2024-01-31"
+        and item.readiness.event_id != current.feature.prior_event_id
+    )
+    wrong_acceleration = ExactRational.from_fraction(
+        current.feature.current_delta_short_ratio.to_fraction()
+        - wrong_prior.delta_short_ratio.to_fraction()
+    )
+
+    with pytest.raises(
+        StockAccelerationError,
+        match="current prior_snapshot must equal prior current_snapshot",
+    ):
+        replace(
+            current.feature,
+            prior_feature=wrong_prior,
+            prior_raw_feature_sha256=wrong_prior.sha256,
+            prior_prior_event_id=wrong_prior.prior_event_id,
+            prior_previous_settlement_date=wrong_prior.previous_settlement_date,
+            prior_delta_short_ratio=wrong_prior.delta_short_ratio,
+            acceleration_short_ratio=wrong_acceleration,
+        )
 
 
 def test_prior_feature_that_executes_strictly_later_is_rejected():

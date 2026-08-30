@@ -540,11 +540,14 @@ class StockFeatureDisposition:
             raise _refuse(
                 "prior_readiness must be the exact StockDataReadiness type"
             )
-        if not isinstance(self.refusal_reasons, tuple) or not all(
+        if type(self.refusal_reasons) is not tuple or not all(
             type(item) is str and item and item == item.strip()
             for item in self.refusal_reasons
         ):
-            raise _refuse("feature refusal_reasons must be canonical strings")
+            raise _refuse(
+                "feature refusal_reasons must be an exact tuple of "
+                "canonical strings"
+            )
         if self.refusal_reasons != tuple(sorted(set(self.refusal_reasons))):
             raise _refuse("feature refusal_reasons must be unique and sorted")
 

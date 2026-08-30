@@ -194,11 +194,12 @@ class SecurityLifecycleObservation:
         observed = parse_utc_timestamp(self.observed_at, "lifecycle.observed_at")
         if observed < available:
             raise _refuse("lifecycle.observed_at must not precede available_at")
-        if not isinstance(self.unresolved_actions, tuple) or not all(
+        if type(self.unresolved_actions) is not tuple or not all(
             type(item) is CorporateActionIssue for item in self.unresolved_actions
         ):
             raise _refuse(
-                "unresolved_actions must contain exact CorporateActionIssue values"
+                "unresolved_actions must be an exact tuple of exact "
+                "CorporateActionIssue values"
             )
         canonical_actions = tuple(
             sorted(set(self.unresolved_actions), key=lambda item: item.value)
@@ -325,19 +326,20 @@ class PitReferenceBundle:
     def __post_init__(self) -> None:
         if type(self.manifest) is not PitReferenceManifest:
             raise _refuse("manifest must be the exact PitReferenceManifest type")
-        if not isinstance(self.lifecycles, tuple) or not all(
+        if type(self.lifecycles) is not tuple or not all(
             type(item) is SecurityLifecycleObservation for item in self.lifecycles
         ):
             raise _refuse(
-                "lifecycles must contain exact SecurityLifecycleObservation types"
+                "lifecycles must be an exact tuple of exact "
+                "SecurityLifecycleObservation values"
             )
-        if not isinstance(self.classifications, tuple) or not all(
+        if type(self.classifications) is not tuple or not all(
             type(item) is SectorClassificationObservation
             for item in self.classifications
         ):
             raise _refuse(
-                "classifications must contain exact "
-                "SectorClassificationObservation types"
+                "classifications must be an exact tuple of exact "
+                "SectorClassificationObservation values"
             )
         lifecycles = tuple(
             sorted(
@@ -500,11 +502,14 @@ class StockDataReadiness:
             raise _refuse(
                 "readiness classification_record_id requires sector and industry"
             )
-        if not isinstance(self.refusal_reasons, tuple) or not all(
+        if type(self.refusal_reasons) is not tuple or not all(
             type(item) is str and item and item == item.strip()
             for item in self.refusal_reasons
         ):
-            raise _refuse("readiness refusal_reasons must be canonical strings")
+            raise _refuse(
+                "readiness refusal_reasons must be an exact tuple of "
+                "canonical strings"
+            )
         if self.refusal_reasons != tuple(sorted(set(self.refusal_reasons))):
             raise _refuse("readiness refusal_reasons must be unique and sorted")
         unknown_reasons = set(self.refusal_reasons) - _READINESS_REFUSALS

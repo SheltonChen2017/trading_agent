@@ -123,6 +123,35 @@ def test_required_text_and_sha256_reject_string_subclass_equality_spoofing():
     manifest = CollectionManifest.from_payload(_fixture_payload()["manifest"])
     with pytest.raises(ShortInterestContractError, match="schema_version"):
         replace(manifest, schema_version=ForgedText("9.9"))
+    with pytest.raises(ShortInterestContractError, match="exact canonical decimal"):
+        replace(
+            snapshot.denominator,
+            value=ForgedText("1E+4"),
+        )
+    with pytest.raises(ShortInterestContractError, match="git commit"):
+        replace(
+            manifest,
+            collector_git_commit=ForgedText(manifest.collector_git_commit),
+        )
+
+
+def test_manifest_counts_reject_integer_subclass_equality_spoofing():
+    manifest = CollectionManifest.from_payload(_fixture_payload()["manifest"])
+
+    class ForgedCount(int):
+        def __eq__(self, other):
+            return True
+
+        def __ne__(self, other):
+            return False
+
+    with pytest.raises(ShortInterestContractError, match="exact integer"):
+        replace(
+            manifest,
+            requested_record_count=ForgedCount(999),
+            input_row_count=ForgedCount(999),
+            accepted_record_count=ForgedCount(998),
+        )
 
 
 def test_event_id_binds_normalized_facts_not_only_caller_supplied_raw_hash():

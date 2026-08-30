@@ -219,6 +219,45 @@ def test_every_source_snapshot_receives_an_explicit_readiness_disposition():
     assert all(item.sha256 == hash_payload(item.to_payload()) for item in readiness)
 
 
+def test_readiness_refusals_reject_tuple_subclass_equality_spoofing():
+    readiness = build_stock_data_readiness(_vintage(), _references())[0]
+
+    class ForgedReasons(tuple):
+        def __eq__(self, other):
+            return True
+
+        def __ne__(self, other):
+            return False
+
+    with pytest.raises(PitReferenceError, match="exact tuple"):
+        replace(
+            readiness,
+            refusal_reasons=ForgedReasons((REFUSAL_SUPERSEDED,)),
+        )
+
+
+def test_pit_reference_containers_must_be_exact_tuples():
+    bundle = _references()
+
+    class TupleSubclass(tuple):
+        pass
+
+    with pytest.raises(PitReferenceError, match="unresolved_actions"):
+        replace(
+            bundle.lifecycles[0],
+            unresolved_actions=TupleSubclass(
+                bundle.lifecycles[0].unresolved_actions
+            ),
+        )
+    with pytest.raises(PitReferenceError, match="lifecycles"):
+        replace(bundle, lifecycles=TupleSubclass(bundle.lifecycles))
+    with pytest.raises(PitReferenceError, match="classifications"):
+        replace(
+            bundle,
+            classifications=TupleSubclass(bundle.classifications),
+        )
+
+
 def test_revision_superseded_before_first_open_has_a_distinct_disposition():
     vintage = _vintage()
     original = vintage.snapshots[1]

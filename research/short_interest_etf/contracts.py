@@ -111,7 +111,7 @@ def _sha256(value: Any, name: str) -> str:
 
 
 def _git_commit(value: Any, name: str) -> str:
-    if not isinstance(value, str) or _GIT_COMMIT_RE.fullmatch(value) is None:
+    if type(value) is not str or _GIT_COMMIT_RE.fullmatch(value) is None:
         raise ShortInterestContractError(
             f"{name} must be one lowercase 40- or 64-character git commit"
         )
@@ -119,15 +119,18 @@ def _git_commit(value: Any, name: str) -> str:
 
 
 def _integer(value: Any, name: str, *, minimum: int = 0) -> int:
-    if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
-        raise ShortInterestContractError(f"{name} must be an integer >= {minimum}")
+    if type(value) is not int or value < minimum:
+        raise ShortInterestContractError(
+            f"{name} must be an exact integer >= {minimum}"
+        )
     return value
 
 
 def _decimal_text(value: Any, name: str, *, positive: bool) -> str:
-    if not isinstance(value, str):
+    if type(value) is not str:
         raise ShortInterestContractError(
-            f"{name} must be a canonical decimal string; JSON numbers are refused"
+            f"{name} must be an exact canonical decimal string; "
+            "JSON numbers are refused"
         )
     try:
         parsed = Decimal(value)

@@ -41,17 +41,20 @@ def test_blueprint_is_pinned_to_the_lane_record() -> None:
 
 def test_lane_documents_agree_on_one_worktree() -> None:
     """TPR-CR1-005: every coordination pointer names the real worktree."""
-    for name in (
-        "ACTION_PLAN_2026-08-20.md",
-        "SESSION_HANDOFF.md",
-        f"Strategy Description/{RECORD}",
-    ):
-        text = _doc(name)
-        assert EXPECTED_WORKTREE in text, (
-            f"{name} must name the registered target-price worktree"
-        )
-        assert OBSOLETE_WORKTREE not in text, (
-            f"{name} still names the nonexistent target-price worktree"
+    expected_pointers = {
+        "ACTION_PLAN_2026-08-20.md": (
+            f"`{EXPECTED_WORKTREE}` worktree"
+        ),
+        "SESSION_HANDOFF.md": (
+            rf"`C:\git\customizedagent\{EXPECTED_WORKTREE}` on branch"
+        ),
+        f"Strategy Description/{RECORD}": (
+            f"Worktree:\n`C:\\git\\customizedagent\\{EXPECTED_WORKTREE}`"
+        ),
+    }
+    for name, pointer in expected_pointers.items():
+        assert pointer in _doc(name), (
+            f"{name} must carry the registered target-price worktree pointer"
         )
 
 

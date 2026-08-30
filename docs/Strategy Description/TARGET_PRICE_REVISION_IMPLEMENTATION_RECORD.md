@@ -1,7 +1,9 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **DOCUMENTATION-ONLY PLANNING BASELINE; NOT YET INDEPENDENTLY
-REVIEWED OR SCHEDULED FOR IMPLEMENTATION. NO AUTHENTICATED TARGET-PRICE
+Status: **CLAUDE'S DOCUMENTATION REVIEW IS COMPLETE. CODEX'S COUNTER-REVIEW
+CORRECTION SERIES BEGINS AT
+`24283fa3b79b1a86cceb65fbd5d3d2af5fa20292` AND REMAINS LOCAL AND UNPUSHED.
+TPR-0 HAS NOT STARTED AND IS BLOCKED ON OWNER DECISIONS. NO AUTHENTICATED TARGET-PRICE
 SOURCE, INGEST, CANONICAL EVENT, SIGNAL, OUTCOME ACCESS, RESEARCH LOOK, ETF
 TOPOLOGY, PORTFOLIO, QUANTCONNECT JOB OR RESULT, SHADOW OR PAPER DEPLOYMENT,
 BROKER CONNECTION, OR LIVE-TRADING AUTHORITY EXISTS.**
@@ -317,22 +319,46 @@ paper deployment, or live deployment is authorized merely by this workflow.
 ## 8. Exact next step
 
 The Codex documentation round was pushed and merged to `main` through PR #324
-(`1a5264e6b1de3caf5477477d1312a762b2d42419`). Claude's independent review of
-the exact published range `c179801..70c4b9f` is complete and recorded in
-section 11: both commits are accepted after correction, with no P0 or P1
-finding.
+(`1a5264e6b1de3caf5477477d1312a762b2d42419`). Claude independently reviewed
+the exact two-commit set
+`{c1798013d911ef54dba82157326c826ac7763ec3,
+70c4b9fea1ac119f86901e95b9108820aa80e028}`, equivalently the Git range
+`086b782e43a5ff889e71ec8e26334bb791ccac74..70c4b9fea1ac119f86901e95b9108820aa80e028`.
+Claude then committed the exact correction and validation range
+`70c4b9fea1ac119f86901e95b9108820aa80e028..c0ba616a40f628519a071d0642fadf596982919a`
+on this lane. Section 11 preserves Claude's report; section 12 records Codex's
+commit-by-commit counter-review and qualifications.
 
-The exact next step is Codex's counter-review of every Claude commit in this
-review round. Two findings cannot close without an owner decision: the
-blueprint's line-ending storage defect (`TPR-CR1-001`) and the malformed
-submitted-source pin (`TPR-CR1-004`). Only if the snapshot is accepted or
-accepted-after-correction and no owner/gate blocker remains may the same Codex
-round implement TPR-0.
+The counter-review correction is local commit
+`24283fa3b79b1a86cceb65fbd5d3d2af5fa20292`. It restores the shared active-
+document test module to the reviewed Codex tree and moves narrowed guards into
+the target-owned test package. The record qualification and exact active-pointer
+refinement follow in the current local candidate. No push has occurred in this
+Codex round.
 
-If scheduled, TPR-0 is limited to the content-addressed preregistration and
-zero-outcome structural controls named above. It grants no provider purchase
-or credential use, real-data normalization, outcome access, research look, ETF
-construction, QC processing, broker action, paper operation, or live trading.
+The owner's request to start the loop makes TPR-0 the next requested bounded
+milestone, but it does not supply or waive the prerequisites that the blueprint
+itself requires. TPR-0 is therefore blocked on all of the following:
+
+- the durable remedy for the blueprint's checkout corruption
+  (`TPR-CR1-001`);
+- the missing source proposal or corrected 64-character source digest, or an
+  explicit decision that the reviewed v2 blueprint is the sole authority
+  (`TPR-CR1-004`);
+- the dependency-order decision in `TPR-CCR1-004`: TPR-0 requires numeric
+  clip, economic-effect, cost/capacity, and sample/power values derived from
+  structural evidence that the blueprint schedules only in TPR-1 and TPR-2;
+- the shared-fourth-family and final-holdout treatment, exact validation and
+  holdout dates, and the remaining `FREEZE_AT_TPR0` source, universe, timing,
+  statistical, and cost choices.
+
+No value may be guessed and no later milestone may be pulled forward silently.
+The one end-of-round push is withheld so the counter-review and the eventual
+TPR-0 milestone can remain in one Codex round as directed. TPR-0 remains limited
+to a content-addressed preregistration and zero-outcome structural controls; it
+grants no provider purchase or credential use, real-data normalization,
+outcome access, research look, ETF construction, QC processing, broker action,
+paper operation, or live trading.
 
 ## 9. Out-of-lane findings ledger
 
@@ -362,6 +388,9 @@ known.
 | 2026-08-29 | Codex planning | `086b782e43a5ff889e71ec8e26334bb791ccac74` -> documentation candidate | Documentation only | Created the dedicated branch/worktree, corrected the target-price research/QC plan, added separately gated shadow, paper, restricted-live, and bounded-unattended stages, and recorded lane governance; no code or data. | PDF generated with ReportLab; `pdfinfo` reports 26 letter-size pages and no encryption, JavaScript, forms, or suspect state; all 26 rendered pages visually inspected; extracted text contains every part and final gate; 67 active-document tests passed; the three Markdown staged paths pass `git diff --check`; the staged PDF blob is byte-identical to the visually reviewed file and pinned SHA-256; 0 outcome accesses; 0 looks. | Target-price revisions require a separate family, provider normalizer, timing/basis audit, four-family multiplicity decision, permanent look authority, and independent review. | None; all production, outcome, QC, broker, paper, and live authority remains zero. | Claude independently reviews the exact documentation snapshot; implementation waits for Action Plan scheduling. |
 | 2026-08-29 | Codex documentation | `c1798013d911ef54dba82157326c826ac7763ec3` -> workflow-override candidate | Owner workflow direction | Recorded the explicit same-branch/same-worktree serialized loop, several-commits/one-push-per-role-round rule, target-only branch boundary, and document-but-do-not-fix rule for external findings. The override supersedes only the PDF's prior separate-review-branch wording. | 67 active-document tests passed; Markdown `git diff --check` clean; 0 provider/outcome/QC/broker accesses; 0 looks. | No out-of-lane finding established. | Workflow topology only; no implementation, source, outcome, QC, paper, live, deployment, or capital authority added. | Keep the cumulative Codex round local until its single end-of-round push is requested; Claude then reviews the exact pushed range on this branch/worktree. |
 | 2026-08-29 | Claude review | `c1798013d911ef54dba82157326c826ac7763ec3` -> `70c4b9fea1ac119f86901e95b9108820aa80e028` reviewed; corrections on this same lane branch | Independent review of the documentation planning snapshot | Reviewed both published commits individually with complete diffs, read the governing blueprint end to end, and verified the record against it. Corrected the worktree path, the stale local-only/unmerged push state, the malformed submitted-source pin, and the missing Action Plan and Session Handoff coordination pointers. Added the lane's first three documentation guards. | Complete suite on the exact committed tree `b841360`: **5,724 passed, 2 skipped, 0 failed, 25 known dependency warnings in 858.06s (14m18s)**, which is the 5,721-test baseline plus exactly the three guards added here. Active-document suite 67 -> **70 passed**; five reverse mutations each turned exactly one new guard red with green restore; `compileall` exit 0; blueprint content digest re-verified as `9f00dd56...2633` over LF-normalized bytes. Repository-wide `git diff --check` is **red** on the blueprint alone, which is finding `TPR-CR1-001`, not a new regression. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | Both commits accepted after correction. No P0/P1. `TPR-CR1-002`, `TPR-CR1-003`, `TPR-CR1-005` and `TPR-CR1-006` closed; `TPR-CR1-001` open on an owner decision; `TPR-CR1-004` closed in Markdown with two blueprint instances open. `TPR-OOL-001` and `TPR-OOL-002` documented and deliberately not fixed. Details in section 11. | None; all production, outcome, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. TPR-0 remains unscheduled and additionally blocked on the two owner decisions. |
+| 2026-08-29 | Claude validation / push | `b8413606ee70b4bae86db5f1a7cefe6a0523b360` -> `c0ba616a40f628519a071d0642fadf596982919a` | Review validation record | Recorded the complete-suite result obtained on exact correction tree `b841360` and pushed the cumulative three-commit Claude range ending at `c0ba616`. This appended row repairs the prior row's conflation of review and later validation; published Git history retains the original edit trail. | Claude reported **5,724 passed, 2 skipped, 0 failed, 25 warnings in 858.06s** on Windows with Python recorded only as 3.14 and pytest 9.1.1. Codex independently confirmed collection of 5,726 tests but did not rerun the 14-minute suite during counter-review. No provider or outcome access; **0 research looks**. | Exact pushed Claude range is `70c4b9f..c0ba616`. The environment claim lacks the Python patch version and executable. | None; all authority remains zero. | Codex counter-reviews all three Claude commits before TPR-0. |
+| 2026-08-29 | Codex counter-review correction | `c0ba616a40f628519a071d0642fadf596982919a` -> `24283fa3b79b1a86cceb65fbd5d3d2af5fa20292` | Counter-review only; TPR-0 blocked | Restored `tests/test_active_document_consistency.py` exactly to the reviewed Codex state and moved narrowed target documentation guards into `tests/target_price_revisions/`. The worktree guard requires the registered target worktree in every active coordination pointer, so substituting the obsolete path fails while historical issue evidence remains documentable; the malformed-source guard is explicitly target-scoped and case-insensitive. | Shared plus target documentation suites: **70 passed in 1.11s** on `C:\git\customizedagent\trading_agent\.venv\Scripts\python.exe` (Python 3.12.13, pytest 9.1.1); three green baselines plus three reverse mutations passed; two target test files syntax-compiled without bytecode writes; staged `git diff --check` clean; **0 provider/outcome accesses and 0 looks**. | `0f05f3d` rejected as a correct standalone snapshot but its intent is accepted after this correction; `b841360` and `c0ba616` accepted after record qualification. Open owner/gate blockers: `TPR-CR1-001`, `TPR-CR1-004`, `TPR-CCR1-004`, and unresolved TPR-0 freeze decisions. | None. No implementation, source, outcome, QC, broker, paper, live, deployment, or capital authority added. | Keep this Codex round local and unpushed; obtain owner decisions, then implement and validate TPR-0 in the same round before its single push. |
+| 2026-08-29 | Codex counter-review record | `24283fa3b79b1a86cceb65fbd5d3d2af5fa20292` -> local record candidate | Counter-review record; TPR-0 blocked | Added the exact three-commit Claude dispositions, repaired current status and range semantics, split Claude's validation/push into its own append-only ledger event, qualified the PDF-render and `git diff --check` overstatements, documented the TPR-0 dependency-order contradiction, and refined the worktree test to inspect exact active pointers rather than historical issue text. | Shared plus target documentation suites: **70 passed in 1.15s**; Markdown and target-test `git diff --check` clean; no provider, source, outcome, QC, broker, paper, or live access; **0 looks**. | Open owner/gate blockers are enumerated in section 12. No TPR-0 artifact was created. | None. | Preserve the one-push rule; wait for owner decisions, implement TPR-0 locally, then update this candidate to its exact committed/pushed range. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -457,3 +486,52 @@ row, outcome, evidence epoch, QuantConnect project, broker, operator database,
 scheduler, paper surface, or live surface, and spent **0 research looks**. No
 live-assistant behavior can change: the only executable change is three
 additional documentation guards inside an existing test module.
+
+## 12. Codex counter-review - 2026-08-29
+
+**Disposition: Claude's cumulative correction intent is accepted after Codex
+correction, but TPR-0 is blocked and this Codex round is not pushed.** There is
+no P0 or P1 finding. Codex reviewed every commit in the exact Claude range
+`70c4b9fea1ac119f86901e95b9108820aa80e028..c0ba616a40f628519a071d0642fadf596982919a`
+individually and inspected the cumulative state. The local correction commit is
+`24283fa3b79b1a86cceb65fbd5d3d2af5fa20292`.
+
+### 12.1 Commit dispositions
+
+| Commit | Counter-review disposition | Basis |
+|---|---|---|
+| `0f05f3ded6b59bfcd301ac6ee70363d5604d5057` | **Rejected as a correct standalone snapshot; intent accepted after `24283fa`** | At this exact object, two of its three new tests fail because the document corrections arrive only in the later commit. The sole passing worktree test accepts the original dangerous state because all documents agree on the same nonexistent path. The commit also places target-lane tests in the shared active-document module and scans every active Markdown file for a target-specific provenance defect. Codex restored the shared module and added narrower target-owned guards that require the real worktree and reject the obsolete one. |
+| `b8413606ee70b4bae86db5f1a7cefe6a0523b360` | **Accepted after correction and qualification** | The documentation corrections are useful and authority-neutral. The resulting record nevertheless retains a stale header, an excluding Git range, an overstatement that the working PDF cannot render, an overstatement that `git diff --check` is permanently red, an inconsistent partly-open provenance status, and no exact durable ledger for the later validation/push. This section and the current-state sections correct or explicitly qualify those claims without changing Claude's historical report. |
+| `c0ba616a40f628519a071d0642fadf596982919a` | **Accepted after correction and qualification** | The complete-suite evidence is credible as Claude-run evidence and its 5,726-test collection count is structurally consistent with 5,724 passed plus 2 skipped. Codex did not rerun the 14-minute suite. This commit rewrote the existing review-ledger row instead of appending a separate validation/push row; section 10 now appends the missing event and preserves the published Git audit trail. |
+
+### 12.2 Counter-review issue ledger
+
+| ID | Priority | Status | Location | Finding and correction / required decision |
+|---|---|---|---|---|
+| `TPR-CCR1-001` | P2 | **Closed by the local correction series** | `tests/test_active_document_consistency.py`; `tests/target_price_revisions/` | Claude's target-specific guards were added to a shared test surface despite the lane's target-owned-file rule. The malformed-digest scan also ranged over unrelated active Markdown, and the agreement-only worktree guard passed when all documents named the same nonexistent directory. Codex restored the shared module exactly to `70c4b9f`, moved the guards to the target package, scoped the known provenance defect to target documents, made the match case-insensitive, and required the exact registered active worktree pointers while permitting the record to retain historical issue evidence. |
+| `TPR-CCR1-002` | P2 | **Closed in the current record** | Header, sections 8, 10, 11.1 and 11.5 | The record said the snapshot was not independently reviewed, used `c179801..70c4b9f` even though that Git range excludes `c179801`, omitted the exact three-commit Claude range and push head, and conflated review with later validation in one ledger row. Current-state text now names the exact commit set, exact Git ranges, local correction commit, and a separate validation/push ledger event. Section 11 remains Claude's historical report; this section is the authoritative counter-review qualification. |
+| `TPR-CCR1-003` | P3 | **Closed by qualification; artifact defect remains open under `TPR-CR1-001`** | Blueprint and sections 11.3, 11.5 | Poppler can render the malformed working PDF: all 26 pages rendered and were visually inspected, although xref/font warnings remain. A clean-worktree `git diff --check` and `git diff --check 70c4b9f..c0ba616` both pass; only historical ranges that include the original PDF addition, such as `086b782..c0ba616`, fail. The checked-out bytes and pinned blob digest still differ, so the core storage defect remains real and owner-routed. |
+| `TPR-CCR1-004` | P2 | **Open - owner decision; blocks TPR-0** | Blueprint physical pages 5, 6 and 9; milestone ladder | TPR-0 must freeze a numeric practical-effect threshold from capacity/cost/power, an independent sample floor from observed event frequency/overlap, and `CLIP_TPR0` from a zero-outcome structural distribution and source-error audit. The first structural source sample is assigned to TPR-1, while TPR-2 supplies the price, ADV and cost prerequisites. Exact numeric TPR-0 completion is therefore circular. The owner must choose: freeze algorithms/formulas at TPR-0 and bind numeric outputs after reviewed TPR-1/2 structural evidence but before outcomes; authorize a bounded zero-outcome structural pilot inside TPR-0 and amend the ladder; or supply defensible numeric constants now. Codex will not guess. |
+| `TPR-CCR1-005` | P2 | **Open - owner decisions; blocks TPR-0** | Blueprint `FREEZE_AT_TPR0` items and section 2 of this record | The provider/endpoint/schema and rights state, exact batch cutoff, source-error policy, universe/minimum-group/fallback rules, split/FX/ADR/horizon sources, catalyst-unknown policy, estimator/partitions, exact cost model, shared-fourth-family treatment, permanent-look authority, and exact validation/final-holdout dates remain unbound. Starting executable preregistration without them would falsely claim TPR-0's definition of done. |
+| `TPR-CCR1-006` | P3 | **Open with `TPR-CR1-004` / `TPR-CR1-005`; no artifact rewrite authorized** | Blueprint physical page 25 | The governing PDF still names nonexistent worktree `trading_agent_TargetPriceRevision` and still contains the malformed 63-character source pin on physical pages 1 and 25. Correcting the Markdown does not close the artifact instances. Regenerating the governing PDF changes its identity and must wait for the owner's storage/provenance decision. |
+
+### 12.3 Independent verification and scope
+
+- `tests/test_active_document_consistency.py` plus
+  `tests/target_price_revisions/test_document_consistency.py`: **70 passed in
+  1.15 seconds** with Python 3.12.13 and pytest 9.1.1 from the repository's
+  existing virtual environment.
+- Three isolated green baselines and three reverse mutations passed: changed
+  blueprint bytes, the obsolete worktree, and a case-changed full malformed
+  source pin each tripped its intended target guard.
+- The two target test modules syntax-compiled without bytecode writes;
+  `git diff --check` was clean for the counter-review correction.
+- Codex read the governing blueprint end to end and compared TPR-0's definition
+  of done with the milestone ordering. No provider documentation, credential,
+  licensed row, source row, market outcome, evidence epoch, QuantConnect job,
+  broker, operator database, scheduler, paper surface, or live surface was
+  accessed. **Outcome accesses: 0. Research looks: 0.**
+
+The local round stops at the owner gate. It does not branch, does not push, and
+does not implement a partial preregistration that pretends unresolved choices
+are frozen.

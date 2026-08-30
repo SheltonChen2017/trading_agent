@@ -727,6 +727,28 @@ def _candidate_rehash(raw: dict[str, object]) -> None:
     raw["spec_id"] = f"arv2-round0-candidate-{raw['spec_hash'][:16]}"
 
 
+def test_migration_only_candidate_still_loads_for_structural_validation(
+    tmp_path: Path,
+) -> None:
+    """The retired v1 loader keeps its documented migration-only use.
+
+    f724bf9 removed the last positive draft-loader assertions, so every
+    remaining case expected a refusal and nothing demonstrated that a
+    migration-only candidate still parses and reports its pending external
+    bindings. The lane record states this structural-validation capability is
+    retained, so it needs one test that would notice if the loader began
+    refusing everything or returned a wrong shape.
+    """
+    raw = _migration_only_candidate_raw()
+    draft = load_draft_preregistration(_write(tmp_path, raw))
+    assert draft.unresolved_owner_decisions == ()
+    assert draft.planned_look_ids == (LOOK_ID,)
+    assert "corporate_action_contract.source_id" in draft.pending_external_bindings
+    assert "independent_review_anchor" in draft.pending_external_bindings
+    with pytest.raises(PreregistrationError, match="reviewed_frozen"):
+        load_reviewed_preregistration(_write(tmp_path, raw))
+
+
 def _migration_only_candidate_raw() -> dict[str, object]:
     raw = json.loads(DRAFT.read_text(encoding="utf-8"))
     _cell(raw, "lane_validation_period")["value"].update(
@@ -752,6 +774,22 @@ def _migration_only_candidate_raw() -> dict[str, object]:
         # loader guard turns its case red. The earlier bundled test combined a
         # source violation with a look violation, which let the look guard be
         # deleted while the source guard kept the test green.
+        # The retired prospective window is half of the ARV2Q-001
+        # remediation: a migration-only look id must not be able to carry the
+        # superseded 2026-09-01..2027-08-31 period back in. Every other
+        # fixture moves the start date, so without this case the period guard
+        # can be deleted with the whole suite green.
+        (
+            lambda raw: (
+                _cell(raw, "lane_validation_period")["value"].update(
+                    start="2026-09-01", end="2027-08-31"
+                ),
+                raw["looks"][0].update(
+                    validation_start="2026-09-01", validation_end="2027-08-31"
+                ),
+            ),
+            "superseded unspent by the owner QC-first sequence",
+        ),
         (
             lambda raw: raw["looks"][0].update(dataset_id=DATASET_ID),
             "unbound and non-executable",

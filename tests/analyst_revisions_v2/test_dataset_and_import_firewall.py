@@ -705,8 +705,10 @@ def test_authority_registry_guard_audit_accepts_the_matching_lock():
 def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
     """Production artifacts must stay LF-only and unconverted on checkout.
 
-    All seven artifacts participate in committed-and-clean review boundaries;
-    three are additionally consumed by exact-byte canonical JSON loaders. A
+    Every artifact in this directory participates in committed-and-clean
+    review boundaries; three are additionally consumed by exact-byte canonical
+    JSON loaders. The count is deliberately not fixed here: the set grows, and
+    f724bf9 already added an eighth artifact. A
     Windows checkout with core.autocrlf=true can rewrite LF bytes to CRLF,
     leaving a stale clean stat cache even though the next review-anchor check
     will refuse. The directory-level ``-text`` rule and the checked-out bytes

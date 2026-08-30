@@ -1017,6 +1017,16 @@ def _reject_float(value: str) -> None:
     raise QcFirstPlanError(f"binary floating-point is forbidden: {value}")
 
 
+def _reject_constant(value: str) -> None:
+    """Refuse NaN/Infinity tokens, which never reach ``parse_float``.
+
+    ``json.loads`` routes the bare ``NaN``, ``Infinity`` and ``-Infinity``
+    tokens through ``parse_constant``, so a ``parse_float`` hook alone leaves
+    a hole in the no-binary-float contract this loader advertises.
+    """
+    raise QcFirstPlanError(f"binary floating-point is forbidden: {value}")
+
+
 def _object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for key, value in pairs:
@@ -1049,6 +1059,7 @@ def _verify_superseded_base(plan_path: Path) -> None:
         raw = json.loads(
             base_bytes,
             parse_float=_reject_float,
+            parse_constant=_reject_constant,
             object_pairs_hook=_object,
         )
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -1172,6 +1183,7 @@ def load_qc_first_study_plan(path: Path) -> QcFirstStudyPlan:
         raw = json.loads(
             raw_bytes,
             parse_float=_reject_float,
+            parse_constant=_reject_constant,
             object_pairs_hook=_object,
         )
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:

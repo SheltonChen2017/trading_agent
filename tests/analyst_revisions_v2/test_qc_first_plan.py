@@ -204,6 +204,42 @@ def test_plan_hash_covers_every_stage_and_policy_choice(tmp_path: Path) -> None:
             lambda raw: raw["supersession"].update(looks_consumed=1),
             "supersession",
         ),
+        # ARV2Q-005 claims type-aware exact comparison defeats Python's
+        # True == 1 equivalence. Nothing exercised it: relaxing the scalar
+        # check to a plain != left the suite green.
+        (
+            lambda raw: raw["control_contract"].update(
+                stock_control_execution_authorized=0
+            ),
+            "changed from the owner-frozen contract",
+        ),
+        # Unknown-field rejection was pinned only at the root, so a nested
+        # contract could grow a field the frozen template never declared.
+        (
+            lambda raw: raw["control_contract"].update(
+                claude_review_injected_field=True
+            ),
+            "changed from the owner-frozen contract",
+        ),
+
+        # The authority, schema and status strings are the plan's own
+        # boundary markers. A correctly re-hashed file asserting action
+        # authority must refuse; without these cases the loader could stop
+        # comparing them and every test would stay green.
+        (
+            lambda raw: raw.update(
+                authority="full_qc_action_and_deployment_authority"
+            ),
+            "authority changed from the owner-frozen contract",
+        ),
+        (
+            lambda raw: raw.update(schema="arv2-qc-first-plan-v2"),
+            "schema changed from the owner-frozen contract",
+        ),
+        (
+            lambda raw: raw.update(status="reviewed_frozen"),
+            "status changed from the owner-frozen contract",
+        ),
         (
             lambda raw: raw["multiplicity_contract"].update(
                 three_lane_correction_factor=1
@@ -301,6 +337,38 @@ def test_correctly_rehashed_dangerous_plan_changes_refuse(
         load_qc_first_study_plan(_write(tmp_path, raw))
 
 
+def test_declared_plan_identity_must_be_content_derived(tmp_path: Path) -> None:
+    """plan_id is nulled out of the hashed payload before hashing.
+
+    Only the explicit derivation check ties the declared identity back to the
+    content, so a file can otherwise carry a correct plan_hash beside a
+    plan_id naming a different plan. Deleting that check left the suite green.
+    """
+    raw = json.loads(PLAN.read_text(encoding="utf-8"))
+    _rehash(raw)
+    raw["plan_id"] = "arv2-qc-first-plan-0000000000000000"
+    with pytest.raises(QcFirstPlanError, match="plan_id is not content-derived"):
+        load_qc_first_study_plan(_write(tmp_path, raw))
+
+
+def test_duplicate_json_keys_refuse(tmp_path: Path) -> None:
+    """object_pairs_hook is the only defence against a duplicated key.
+
+    Python keeps the last occurrence silently, so a duplicated authority or
+    capability key would authenticate while a reader saw the first value.
+    Removing the hook left the suite green.
+    """
+    text = PLAN.read_text(encoding="utf-8")
+    index = text.index('"authority"')
+    duplicated = text[:index] + '"authority": "planning_only", ' + text[index:]
+    path = tmp_path / "duplicate.json"
+    path.write_text(duplicated, encoding="utf-8")
+    legacy = PLAN.with_name("arv2_round0.draft.json")
+    (tmp_path / legacy.name).write_bytes(legacy.read_bytes())
+    with pytest.raises(QcFirstPlanError, match="duplicate JSON key"):
+        load_qc_first_study_plan(path)
+
+
 def test_unknown_root_field_and_binary_float_refuse(tmp_path: Path) -> None:
     unknown = json.loads(PLAN.read_text(encoding="utf-8"))
     unknown["launch"] = True
@@ -316,3 +384,15 @@ def test_unknown_root_field_and_binary_float_refuse(tmp_path: Path) -> None:
     path.write_text(floating, encoding="utf-8")
     with pytest.raises(QcFirstPlanError, match="floating-point"):
         load_qc_first_study_plan(path)
+
+    # json.loads routes bare NaN/Infinity through parse_constant, not
+    # parse_float, so these tokens bypassed the no-binary-float contract.
+    for token in ("NaN", "Infinity", "-Infinity"):
+        nonfinite = PLAN.read_text(encoding="utf-8").replace(
+            '"duration_nyse_sessions": 252',
+            f'"duration_nyse_sessions": {token}',
+        )
+        nonfinite_path = tmp_path / f"nonfinite_{token.strip('-')}.json"
+        nonfinite_path.write_text(nonfinite, encoding="utf-8")
+        with pytest.raises(QcFirstPlanError, match="floating-point"):
+            load_qc_first_study_plan(nonfinite_path)

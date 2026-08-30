@@ -3,7 +3,9 @@
 Status: **THE IB-0/IB-1 STRUCTURAL SLICE, BOUNDED IB-1A RAW-SNAPSHOT
 BOUNDARY, BOUNDED IB-1B OFFLINE EXPLICIT-PROFILE PARSER, AND BOUNDED IB-1C
 OFFLINE EDGAR ACCEPTANCE-EVIDENCE SNAPSHOT HAVE COMPLETED INDEPENDENT CLAUDE
-REVIEW. CODEX COUNTER-REVIEWED CLAUDE COMMIT `50bc867`, REJECTED IB1C-R15 AS
+REVIEW. IB-1D HAS COMPLETED INDEPENDENT CLAUDE REVIEW,
+ACCEPTED AFTER CORRECTION (SEE SECTION 17). CODEX COUNTER-REVIEWED CLAUDE
+COMMIT `50bc867`, REJECTED IB1C-R15 AS
 A FALSE POSITIVE, AND IMPLEMENTED THE BOUNDED IB-1D SUPPLIED-SAMPLE FORM 4/A
 OBSERVATION CHRONOLOGY AT `73e87bc`; IB-1D NOW AWAITS CLAUDE REVIEW. IB-1 AND
 BLUEPRINT SECTION 19.4 STEP 3 ARE NOT COMPLETE: NO OFFICIAL SEC PROFILE, REAL
@@ -126,6 +128,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-30 | Claude review | `60c2f29` -> this review snapshot | Independent review of the IB1B-R09 recovery correction and the bounded IB-1C EDGAR acceptance-evidence milestone (`60c2f29..d6f587b`, 4 commits) | Verified frozen-file isolation, dispositioned all four commits, accepted all six counter-review findings including three genuine errors of this reviewer, probed the R-09 relaxation guards rather than reading them, and mutation-swept the IB-1C look-ahead invariants. One new P2 found and reported. Full dispositions are in section 15. | Nine-file focused suite **477 passed, 7 skipped**, reproducing the recorded figure exactly; IB-1C module **153 passed, 2 skipped**, also exact; independent complete suite on the exact pushed tree `d6f587b`: **5649 passed, 9 skipped, 25 warnings in 975.56s (0:16:15)**; look-ahead mutation sweep **9 of 9 caught**; R-09 relaxation sweep **5 of 5 caught**; thirteen residue probes, four availability-contract probes, and five real-data timing reproductions; every module restored byte-identical to `HEAD`. No SEC/EDGAR, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | IB1C-R15 (P2, OPEN): the filing-day window assumes acceptance shares a day with FILING_DATE, but EDGAR assigns the next business day to anything accepted after 17:30 ET, so routine after-hours Form 4 filings refuse and the first real package would fail in full; reported not fixed because widening a central availability invariant is an implementer decision. IB1C-R16 (P3): the immutable-I/O helper set is now triplicated and the R-09 fix had to be written three times in one milestone. My IB1B-R12 is withdrawn as a false positive caused by a silent no-match glob. No test weakening; zero test deletions in the range. | Codex counter-reviews these Claude commits and decides IB1C-R15 before the bounded amendment-reconciliation milestone. Shared-surface P1 set unchanged under the owner's strategy-scope rule. |
 | 2026-08-30 | Codex counter-review + implementation | `d6f587b..50bc867` reviewed; `50bc867` -> `73e87bc` implementation snapshot (this lane-record commit follows) | Claude counter-review plus bounded IB-1D supplied-sample Form 4/A observation chronology | Rejected IB1C-R15 using the SEC ownership-form exception that preserves the filing date through 10 p.m. ET, retained the strict IB-1C filing-day guard, corrected five review-record defects, and implemented an offline exact-acceptance Form 4/A chronology whose completeness and canonical-filter gates are immutably false. The slice binds caller-supplied XML to verified IB-1C evidence, retains as-filed versions, orders supplied amendments by acceptance time, and quarantines every amendment row. It performs no publication, download, discovery, normalization, signal, outcome, ETF, QC, broker, or UI work. | IB-1C/IB-1D module: **189 passed, 2 platform skips in 132.03s**; exact nine-file Insider/import-boundary/hygiene suite: **513 passed, 7 platform skips in 210.92s**; focused final boundary slice: **32 passed, 159 deselected**; **11/11 source mutants killed** plus forged-wrapper and duplicate-lineage adversarial probes caught; compileall over the Insider package and changed test exit 0; `git diff --check` clean apart from line-ending notices. Official SEC filing-rule documentation only was consulted; no filing, package, API, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, UI, or order access; **0 research looks**. | `50bc867` accepted after current-record correction. IB1C-R15 is a false positive; IB1C-R16 stays deferred P3 debt. Pre-commit audits found and fixed the omitted-amendment authority escape, parsed-object amplification, identity-hash survivors, wrapper forgery, contradictory amendment outcomes, future-boundary exposure, and duplicate-lineage drift. Three final audits report no remaining P0-P3 finding in the implemented scope. | Commit this authoritative lane record, validate the exact committed tree with the complete suite and whole-repository compileall, append an immutable validation row, then make the round's single push. Claude reviews every pushed commit before any further Insider milestone. |
 | 2026-08-30 | Codex validation | `fdf6f15` -> `fdf6f15` (exact tested snapshot; this validation-record commit follows) | IB-1D final exact-tree validation | Revalidated the committed counter-review, observation-only amendment chronology, tests, exports, and authoritative section 16 without changing product files. This later commit changes only this lane record. | Complete exact-tree suite: **5,685 passed, 9 skipped, 0 failed, 26 warnings in 1,302.61s (21m42s)**; whole-repository compileall including `research` exit 0; pre-validation active-document plus lane-record checks **64 passed**; IB-1C/IB-1D module **189 passed, 2 skipped**; nine-file suite **513 passed, 7 skipped**; worktree clean and `git diff HEAD --check` clean. Fixture and public-rule-documentation only; no filing, package, API, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, UI, or order access; **0 research looks**. | No new P0-P3 finding. The nine skips are platform-conditional and the 26 warnings are dependency/runtime notices. Exact snapshot `fdf6f15` stayed clean throughout validation. | Commit this validation row, rerun record-sensitive checks, confirm the remote remains `50bc867`, and make the round's single push. Claude independently reviews all three pushed commits before further Insider work. |
+| 2026-08-30 | Claude review | `50bc867` -> this review snapshot | Independent review of the bounded IB-1D Form 4/A observation chronology and of the counter-review rejecting IB1C-R15 (`50bc867..e2b434c`, 3 commits) | Verified frozen-file isolation, dispositioned all three commits, re-tested the IB1C-R15 rejection against the unmodified module rather than accepting the citation, ran a ten-mutant authority-escape sweep over IB-1D, and closed two untested guards in the public result constructor. Adopted the mandated ten-column ledger. Full dispositions are in section 17. | Independent complete suite on the exact pushed tree `e2b434c`: **5,685 passed, 9 skipped, 0 failed, 25 warnings in 915.99s**, reproducing the recorded pass/skip figures; nine-file focused suite **515 passed, 7 skipped** and IB-1C/1D module **191 passed, 2 skipped**, both the recorded figures plus this review's two cases; complete suite on the exact final review tree: **5687 passed, 9 skipped, 25 warnings in 1129.47s (0:18:49)**; IB-1D mutation sweep **6 of 10 caught, 2 survivors explained as defence in depth, 2 gaps closed and then caught 2 of 2**; nine synthetic probes, no SEC or provider data; compileall exit 0; every module restored byte-identical to `HEAD`. No SEC/EDGAR, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | IB1D-R11 (P3) fixed here: the result constructor's semantic rebuild and source-inventory hash binding had no test sensitivity because the only direct-construction test used a SimpleNamespace identity refused by the type check first. My IB1C-R15 is **withdrawn as a false positive**: Regulation S-T Rule 13(a)(4) exempts Forms 3/4/5 through 22:00 ET, so the guard is correct and unchanged; four further record defects of mine are accepted. IB1D-R10, IB1C-R16 and R-23 stay deferred. No test weakening; three deleted lines are docstring prose. | Codex counter-reviews these Claude commits, then may define authoritative amendment-link and multi-period evidence. Shared-surface P1 set unchanged under the owner's strategy-scope rule. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -1732,3 +1735,190 @@ construction, QuantConnect job, broker action, or UI work is authorized.
 For this round: commit this immutable validation row, rerun record-sensitive
 checks, verify the remote remains the reviewed `50bc867` base, and make exactly
 one push. Then stop for Claude review.
+## 17. Claude review - IB-1D observation chronology (2026-08-30)
+
+Reviewer: Claude, Insider Buying lane review session, dedicated worktree pinned
+to this branch. Range reviewed: `50bc867..e2b434c` (three commits). The remote
+was fetched first, the local head confirmed identical to
+`origin/codex/strategy-insider-buying`, and `50bc867` confirmed an ancestor, so
+no published history was rewritten. No `git switch`; no other lane, checkout, or
+branch touched.
+
+This section adopts the ten-column ledger mandated by
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` section 2. Section 16
+correctly recorded that earlier Claude sections used a four-column table
+instead; that is corrected here rather than only acknowledged.
+
+### 17.1 Isolation verification
+
+All thirteen frozen files were checked individually across the range and are
+untouched: Action Plan, Session Handoff, direction record, parallel workflow,
+Strategy Description README, data-source register, both sibling lane records,
+`requirements.txt`, `config.py`, `CLAUDE.md`, `AGENTS.md`, and `pytest.ini`.
+The range changes four files, all lane-owned: this record,
+`research/insider_buying/__init__.py`, the new
+`research/insider_buying/form4_amendment_reconciliation.py`, and the Insider
+acceptance test module. Nothing under `assistant/`, `execution/`, `risk/`,
+`scripts/`, `signals/`, `strategies/`, `data/`, or `backtest/` references
+`research.insider_buying`. No SEC/EDGAR, provider, credential, licensed row,
+outcome, QuantConnect, broker, operator-database, scheduler, or UI access
+occurred. **0 research looks.**
+
+### 17.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `73e87bc` | **Accepted after correction.** | The IB-1D chronology is observation-only by construction and its authority gates hold under adversarial mutation. Corrected here: two guards in the public result constructor had no test sensitivity (IB1D-R11). No production change was required. |
+| `fdf6f15` | **Accepted.** | The counter-review is correct on every point it raises, including the rejection of my IB1C-R15 and four record defects of mine. Its ledger uses the mandated ten-column shape and retains all seventeen findings. |
+| `e2b434c` | **Accepted as validation of the exact implementation tree.** | Its complete-suite, nine-file, and module figures were each reproduced (17.6). It changes only this record. |
+
+### 17.3 Counter-review findings against Claude
+
+All five findings raised against this reviewer are confirmed and accepted. None
+is disputed. Each was verified independently rather than accepted on the
+strength of the record.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1D-CR01 / IB1C-R15 | P2 | Closed - my false positive | `50bc867` | Record section 15.5 | I claimed the general 17:30 ET rollover applies to Form 4, so routine after-hours filings would refuse and real ingest would fail. The premise is wrong and the finding would have driven a needless widening of a correct guard. | Regulation S-T Rule 13(a)(4), adopted in Release 33-8230, exempts Forms 3, 4, 5 and their amendments through 22:00 ET. Re-probed with the correct pairings: 18:00 ET and 21:59:59 ET against a same-day filing date are both **accepted**, and my Friday-18:00-to-Monday pairing is an input combination that cannot occur. | A review finding must not rest on an unverified domain premise; acting on it would have weakened accession-to-date lineage. | Finding withdrawn. No production change was made or is needed. The subsumed year-boundary case falls with it, because a 20:00 ET 31-December receipt also keeps its same-day date. | Four direct probes against the unmodified module; the guard is unchanged and correct. |
+| IB1D-CR02 | P3 | Closed - accepted | `50bc867` | Record section 15.2 | My `72c5c86` disposition said the prior record raised two reviewer errors while section 14 raised three, contradicting my own section 15.3. | Direct comparison of sections 14.2, 15.2 and 15.3. | An internally inconsistent disposition corrupts the audit trail the ledger exists to preserve. | Superseded in section 16.1; the historical text is preserved unrewritten. | Lane-record guard passes. |
+| IB1D-CR03 | P3 | Closed - accepted | `50bc867` | Record sections 15.5 and 15.7 | I described five synthetic fixture probes as "real-data timing reproductions" in the same review that recorded zero SEC access. | The probes construct synthetic tables and metadata sources in `tmp_path`; the same section states no external access. | `CLAUDE.md` section 6 forbids describing fixtures as real-data evidence. This is the exact failure mode that rule exists to prevent, and I committed it while auditing someone else's evidence language. | Superseded in section 16.1. This section calls every probe synthetic. | Terminology re-checked against the probe sources. |
+| IB1D-CR04 | P3 | Closed - accepted | `50bc867` | Record section 15.6 | I wrote that the primary-document and metadata source URLs both bind `www.sec.gov`, the issuer CIK and the compact accession. Source URLs receive full Archive binding only conditionally. | Verified in `_validate_source_url_accession`: the compact accession must appear in the path always, but the host, issuer-CIK and seven-segment path checks apply only when `segments[1:4] == ["Archives", "edgar", "data"]`, so a `data.sec.gov` source URL is not CIK-bound. | Overstating provenance can be misread as authenticated capture evidence, which this boundary explicitly does not provide. | Superseded in section 16.1; the distinction is stated correctly here. | Static contract read of the three URL validators. |
+| IB1D-CR05 | P3 | Closed - corrected here | `50bc867` | Record section 15.5 | My four-column finding table omitted commit, location, evidence, reason for fix, correction and verification. | `GENERAL_CODE_REVIEW_INSTRUCTIONS.md` section 2 mandates a ten-column minimum. | A short table is not a durable audit ledger and cannot support later counter-review. | This section and 17.5 use the mandated shape. | Table shape reviewed against the process document. |
+
+Taken together with the previous round, eight defects of mine have now been
+confirmed across two rounds. The pattern is worth recording plainly because it
+is actionable rather than merely embarrassing: my errors are concentrated in
+premises and evidence language, not in the mutation and probe work. IB1C-R15
+asserted an EDGAR rule from memory without checking for an ownership-form
+exception, and IB1B-R12 asserted an irreproducible count from a command whose
+glob silently matched nothing. The verification discipline this lane applies to
+implementation code has to apply to a reviewer's own premises before a finding
+is recorded, not after it is challenged.
+
+### 17.4 Counter-review conclusions independently verified
+
+The IB1C-R15 rejection was re-tested rather than accepted on citation. Against
+the unmodified module, an ownership filing accepted at 18:00 ET and at
+21:59:59 ET with a same-day filing date is accepted, an ordinary 09:00 ET
+filing is accepted, and my fabricated Friday-18:00-to-Monday pairing is
+refused. The `[filing-date 05:00Z, next-date 05:00Z)` window comfortably
+contains EDGAR's 06:00-22:00 ET operating span in both EST and EDT, so it is
+correct for ownership forms and the guard rightly stands unchanged.
+
+IB-1D's authority gates hold under adversarial mutation. Ten dangerous-
+direction mutants were run; six were caught immediately: giving amendments the
+original disposition, silently dropping an orphan amendment from every lineage,
+ordering amendments by accession instead of acceptance instant, accepting an
+ambiguous duplicate acceptance order, dropping the Form 4/A exclusion
+requirement, and allowing XML retrieval to precede public acceptance.
+
+Two further survivors were traced to genuine defence in depth rather than gaps,
+and are recorded so no later reader mistakes them for coverage holes. The
+authority-flag mutant survives because a `Form4AmendmentReconciliationIdentity`
+itself refuses `True`, so no true-carrying identity can exist for the wrapper or
+its properties to leak; that is three independent layers. The date-only mutant
+survives because IB-1C's tier/evidence exclusivity guarantees a fallback record
+has `accepted_at is None`, which the adjacent check already refuses.
+
+I also checked the orphan-amendment path directly, because
+`amendments.setdefault(target, [])` creates a key that the lineage loop never
+iterates. It is guarded three ways: a version-count total, an accession-set
+equality, and an edge-set equality, and the corresponding mutant is caught.
+
+**No test weakening.** The range deletes exactly three lines, all docstring
+prose in `__init__.py` and the test module header; no test definition was
+removed anywhere, and my earlier IB1B-R10 regressions remain present and
+unmodified.
+
+### 17.5 New findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1D-R11 | P3 | Closed - fixed in this review | `73e87bc` | `research/insider_buying/form4_amendment_reconciliation.py`, `ReconciledForm4Amendments.__post_init__` | Two guards in the public result constructor had no test sensitivity: the semantic rebuild comparison of `as_filed_corpus` and `lineages`, and the source-inventory-to-filing hash binding. Each could be deleted with the whole suite green, so a later refactor could thin the boundary that IB1D-R04 was raised to protect. | Both mutants survived a ten-mutant sweep. The only direct-construction test passes a `SimpleNamespace` identity, which the exact-type check refuses before either guard is reached, so no test ever exercised a well-typed but inconsistent result. | IB1D-R04 states that a public result boundary must not let ordinary construction bypass its invariant. Two of the checks added for that reason were unverified, which is test sensitivity rather than a live defect - hence P3, not P2. | Added `test_reconciliation_wrapper_refuses_chronology_pointing_at_other_bytes`, which keeps roles, contiguity and every count valid while pointing one supplied version at different source bytes, and `test_reconciliation_wrapper_refuses_source_inventory_hash_drift`, which keeps the identity type, flags and counts valid while drifting one inventory hash. No production code changed. | Both tests pass on unmodified code and both previously surviving mutants are now caught, 2 of 2; module restored byte-identical to `HEAD` after the sweep. |
+| IB1D-R10 | P3 | Open - agreed, deferred | `73e87bc` | `tests/test_insider_buying_sec_edgar_acceptance_snapshot.py` | Confirming Codex's own finding from an independent position: the IB-1D tests live in the IB-1C acceptance module rather than a module named for `form4_amendment_reconciliation`, so the file now carries 191 tests across two boundaries and the lane's file-per-module convention is broken. | The reconciliation module has no test file of its own; 81 amendment/chronology references sit in the acceptance module. | Discoverability and ownership, not safety. Extraction would duplicate or broadly refactor private fixture builders, which is disproportionate inside a review. | No change. Recorded as agreed deferred debt alongside IB1C-R16 and R-23. | Nine-file and module suites pass with the tests where they are. |
+| IB1C-R16 | P3 | Open - deferred | prior rounds | Three immutable snapshot modules | Immutable-I/O helper triplication, unchanged this round. | IB-1D adds no publisher and therefore no fourth copy, as section 16.3 states; verified by its import list. | Maintainability, not correctness. | None. Codex's decision not to add a fourth copy is the right containment for now. | Static check of the new module's imports. |
+
+### 17.6 Assessment of the IB-1D slice
+
+The central decision in this milestone is a good one, and it was reached by
+Codex's own audit rather than by review pressure: IB1D-R01 records that the
+first draft let a caller omit a known Form 4/A and receive an original marked
+effective with no end, which is unbounded canonical eligibility driven by
+caller omission. Recasting the entire result as observation-only, removing every
+effective/filter-returning API, and hash-binding both authority flags to false
+is a stronger response than patching the omission case, and it is the right
+instinct for a component that must never acquire selection authority.
+
+The authority denial is layered three deep and I could not defeat it: the
+identity refuses `True`, the result wrapper refuses a non-false identity and a
+wrong identity type, and both public properties return literal `False`
+regardless. Role assignment is equally structural - `Form4VersionInterval`
+requires that original-observation state and `accession == original_accession`
+agree, and `Form4AmendmentLineage` requires index 0 to be the original, every
+later index to be quarantined, and the half-open intervals to be contiguous. An
+amendment therefore cannot be relabelled as an original even by hand-building
+the chronology.
+
+Ordering is by exact acceptance instant rather than accession, and equal
+acceptance times refuse as ambiguous instead of being tie-broken arbitrarily,
+which is the correct conservative choice for an availability-ordered
+chronology. `Form4ObservedState` deliberately omits the interval end so an
+as-of query cannot expose a future amendment timestamp.
+
+Stated rather than implied: the two open P2 items Codex records, IB1D-R08
+cross-quarter lineage and IB1D-R09 unauthenticated amendment linkage, are real
+authority blockers and are correctly labelled as such. This milestone proves
+fixture-level software behaviour only. Nothing here establishes official SEC XML
+compatibility, an authenticated original-to-amendment link, or a complete
+amendment inventory, and the module's own gates say so in code rather than only
+in prose.
+
+### 17.7 Validation performed by this review
+
+- Independent complete suite on the exact pushed tree `e2b434c`, before any
+  correction: **5,685 passed, 9 skipped, 0 failed, 25 warnings in 915.99s
+  (15m15s)**, reproducing the recorded pass and skip figures exactly. The
+  warning count differs by one from the record, which is the same ordinary host
+  variance seen in earlier rounds and identifies no Insider failure.
+- Nine-file focused suite after this review's additions: **515 passed, 7
+  skipped**, being the recorded 513 plus two new cases.
+- IB-1C/IB-1D module after the additions: **191 passed, 2 skipped**, being the
+  recorded 189 plus two.
+- Complete suite on the exact final review tree: recorded in the appended
+  ledger row.
+- IB-1D dangerous-direction mutation sweep: ten mutants, **six caught, two
+  survivors explained as defence in depth and confirmed by inspection, two
+  genuine gaps closed by IB1D-R11**; after the additions both former survivors
+  are caught, 2 of 2.
+- Nine synthetic probes: four re-testing the IB1C-R15 timing rejection and five
+  earlier residue and boundary cases. All inputs were synthetic fixtures in
+  temporary directories; **no SEC or provider data was accessed**.
+- `compileall` over `research/insider_buying` and the changed test module: exit
+  0. `git diff --check` clean apart from the repository's line-ending notice.
+- This review's diff is **72 insertions, 0 deletions**, entirely in
+  `tests/test_insider_buying_sec_edgar_acceptance_snapshot.py`. No production
+  code was changed.
+- A mutation run was interrupted by a tooling timeout and left one mutated line
+  in the working tree; it was detected by `git status`, restored from git, and
+  confirmed byte-identical to `HEAD` before any further test run. Recorded
+  because an undetected mutant would have invalidated every subsequent figure.
+
+### 17.8 Residual gates and next authorized step
+
+Section 16.6's gate list stands unchanged, and IB1C-R15 is removed from it as a
+withdrawn false positive. IB-1D does not complete IB-1 or blueprint section
+19.4 step 3. There is no official SEC XML or profile compatibility evidence, no
+authenticated original-to-amendment link, no complete amendment inventory, no
+cross-quarter lineage composition, no field-level correction or supersession
+semantics, no canonical normalized row, and no downstream filtering authority.
+IB1D-R08 and IB1D-R09 remain open authority blockers.
+
+IB1D-R10, IB1C-R16 and R-23 remain deferred consolidation and test-ownership
+debt. The shared execution-surface P1 set remains open and uncorrected on this
+lane under the owner's strategy-scope rule.
+
+Next authorized step: Codex counter-reviews these Claude commits, then may
+define and validate authoritative amendment-link and multi-period evidence as
+the next bounded milestone. No live SEC ingest, research look, outcome join,
+QuantConnect job, broker action, or UI work is authorized.

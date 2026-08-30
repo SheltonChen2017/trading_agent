@@ -1566,7 +1566,15 @@ def test_decay_has_no_hard_cutoff_beyond_the_pinned_short_horizon(policy):
         expected = wide.power(
             Decimal("0.5"), wide.divide(Decimal(age), Decimal(20))
         )
-        assert abs(weight - expected) < Decimal("1e-40"), (age, weight, expected)
+        relative_error = wide.divide(
+            wide.copy_abs(wide.subtract(weight, expected)), expected
+        )
+        assert relative_error < Decimal("1e-48"), (
+            age,
+            weight,
+            expected,
+            relative_error,
+        )
         previous = weight
 
 
@@ -1626,5 +1634,11 @@ def test_frozen_candidate_contract_rejects_weakened_records(tmp_path, policy):
     ]
     refusing = _build(_chain(tmp_path / "refusing", rows=refusing_rows), policy)
     assert refusing.refusals and not refusing.scores
+    assert scoring.sector_normalizations
     with pytest.raises(StockSignalError, match="partial score artifact"):
         dataclasses.replace(refusing, scores=scoring.scores)
+    with pytest.raises(StockSignalError, match="partial score artifact"):
+        dataclasses.replace(
+            refusing,
+            sector_normalizations=scoring.sector_normalizations,
+        )

@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import dataclasses
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -702,15 +703,14 @@ def test_authority_registry_guard_audit_accepts_the_matching_lock():
 
 
 def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
-    """Byte-canonical production artifacts must stay exact on checkout.
+    """Production artifacts must stay LF-only and unconverted on checkout.
 
-    These artifacts are content-addressed: their loaders demand canonical JSON
-    terminated by exactly one LF, and several compare the file's SHA-256 to a
-    registered or independently reviewed blob. A Windows checkout with
-    core.autocrlf=true rewrites the terminator to CRLF, which made every such
-    artifact unreadable on the owner's own host. The failure was fail-closed,
-    but it meant the declaration each file exists to prove was never actually
-    verified, and a legitimately registered artifact could never be accepted.
+    All seven artifacts participate in committed-and-clean review boundaries;
+    three are additionally consumed by exact-byte canonical JSON loaders. A
+    Windows checkout with core.autocrlf=true can rewrite LF bytes to CRLF,
+    leaving a stale clean stat cache even though the next review-anchor check
+    will refuse. The directory-level ``-text`` rule and the checked-out bytes
+    are therefore both part of this regression.
     """
     from research.analyst_revisions_v2.canonical import require_canonical_json_bytes
 
@@ -724,6 +724,21 @@ def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
     )
     artifacts = {path.name: path for path in specs.glob("*.json")}
     assert artifacts, "the ARV2 spec directory must contain committed artifacts"
+    repository = Path(__file__).resolve().parents[2]
+    relative_artifacts = tuple(
+        path.relative_to(repository).as_posix()
+        for path in sorted(artifacts.values())
+    )
+    attributes = subprocess.run(
+        ["git", "check-attr", "text", "--", *relative_artifacts],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert set(attributes.stdout.splitlines()) == {
+        f"{path}: text: unset" for path in relative_artifacts
+    }, attributes.stdout
     # `*.json -text` covers this whole directory, so CRLF is not only a
     # loader problem: Git then reports the file as permanently modified. That
     # breaks the reviewed-spec anchor's committed-and-clean precondition and
@@ -733,10 +748,10 @@ def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
         assert CRLF not in path.read_bytes(), (
             f"{name} differs from its committed LF blob. A checkout made "
             "before `*.json -text` existed keeps its CRLF bytes, and the stat "
-            "cache can hide that from `git status`. Restore it from the blob "
-            "with: rm research/analyst_revisions_v2/specs/*.json && "
-            "git checkout -- research/analyst_revisions_v2/specs -- never by "
-            "committing the CRLF bytes."
+            "cache can hide that from `git status`. Preserve any intended "
+            "edits, then restore only this named artifact's unintended EOL "
+            "conversion from its committed blob; never delete the directory "
+            "or commit CRLF bytes."
         )
     # Only these production-bound artifacts are additionally consumed through
     # require_canonical_json_bytes. Other JSON in this directory is parsed

@@ -53,28 +53,30 @@ operation are separate future promotion decisions; no stage authorizes the
 next.
 
 **Current bounded status, 2026-08-30:** under the owner's approval of the
-recorded proposals, Codex has implemented the local TPR-0A algorithm/policy
-candidate with every empirical child field unbound and source/look authority
-at zero. It awaits the round's single exact-snapshot push and Claude review;
-TPR-1, TPR-0B, all outcome access, and every operational stage remain blocked.
-Exact artifact identity, validation, and next action live only in the target
-implementation record and Session Handoff.
+recorded proposals, Codex counter-reviewed Claude's complete six-commit range
+through `2ec0fad` and implemented the owner-approved fixed-slot v2.2 PDF and
+authenticated TPR-0A candidate at `bb8dfb6`. Every empirical child field
+remains unbound and source/look authority remains zero. The candidate is
+unaccepted pending Claude's review of this round's exact single-push snapshot
+and Codex's later counter-review. TPR-1, TPR-0B, all outcome access, and every
+operational stage remain blocked. Exact identity, evidence, and next action
+live in section 16 of the target implementation record and Session Handoff.
 
 **Owner multiplicity amendment, 2026-08-30 — affects all four strategy lanes:**
-the four strategy-selection attempts are one shared family with total two-sided
-FWER `0.05`, allocated equally as `1/80 = 0.0125` per lane with **no recycling**
-of unused alpha; any within-lane multiplicity must subdivide that `0.0125`.
-Analyst Revisions V2 re-freezes from `3 / 1/60` to `4 / 1/80`; Insider Buying
-and Short Interest must freeze `4 / 1/80` before receiving outcome authority;
-Target-Price Revisions remains at `1/80` and is measured compliant. **Every
-outcome gate in every lane stays closed until this amendment is independently
-reviewed and counter-reviewed in each affected lane.** The directive and its
-measured target-lane compliance are recorded in section 15 of
+the four named strategy-selection lanes are one fixed family with total
+two-sided FWER `1/20 = 0.05`. Each lane has a permanent maximum allocation of
+`1/80 = 0.0125`; the named slots remain fixed, while an unused or withdrawn
+allocation expires and is never transferred, redistributed, or used to
+recompute the denominator. All confirmatory cells
+and looks within one lane must together consume no more than `1/80`.
+Target-Price Revisions encodes this contract in v2.2 and its authenticated
+TPR-0A candidate. Sibling-lane changes and their independent reviews remain
+on their respective branches. **Every outcome gate remains closed.** The
+directive and exact target-lane implementation are recorded in section 16 of
 `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
-This entry is a sequencing reference only: it does not itself re-freeze the
-three sibling lanes, which are separate branches that must each run their own
-round. Zero looks are spent in any lane, which is what makes the Analyst V2
-re-freeze a legitimate tightening rather than a post-hoc alpha change.
+This entry is a sequencing reference only and grants no provider, outcome,
+research-look, QC, broker, paper, live, deployment, capital, or trading
+authority.
 
 **Post-integration review/remediation gate, owner direction 2026-08-28:** only
 after all three feature branches complete their lane review loops and the owner
@@ -224,7 +226,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
 | Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
-| Target-Price Revisions (TPR) | Separate fourth lane. The published documentation range is merged to `main` (PR #324) and accepted after Codex correction through local `2708c06`. The owner-approved bounded TPR-0A algorithm/policy candidate is implemented locally with empirical bindings still null and source/look authority still zero; it was pushed at `6aae73b` and **accepted after correction** by independent Claude review on the same branch/worktree; Codex counter-review is next. One P2 gate is open and owner-routed: the shared family was amended to four members at alpha `0.05/4` while the sibling lanes still freeze `0.05/3`, and that gap was resolved by the owner's 2026-08-30 amendment above; TPR needed no change, and the three sibling re-freezes plus their per-lane reviews are now the gate on every lane's outcome access (`TPR-CR2-002`, `TPR-OOL-006`). TPR is the fourth shared selection attempt under the frozen 2026-09-01 through 2027-08-31 target validation period and untouched 2027-09-01 through 2029-08-31 common holdout. The revised PDF and implementation record govern lane detail. No authenticated source, event, signal, outcome access, authorized/spent look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
+| Target-Price Revisions (TPR) | Separate fourth lane. Claude's six commits through `2ec0fad` were counter-reviewed, and the owner-approved permanent-four-slot contract is implemented in the sole-authority v2.2 PDF and authenticated TPR-0A candidate at `bb8dfb6`. The zero-access candidate is unaccepted pending Claude's review of this round's exact single-push snapshot and Codex's later counter-review. The fixed family has total two-sided FWER `0.05`, permanent maximum `1/80` per named lane, expiration without redistribution for unused/withdrawn allocations, and a within-lane confirmatory sum ceiling of `1/80`; sibling changes remain on sibling branches (`TPR-OOL-006`). TPR-1, TPR-0B, all outcome access, and every operational/trading stage remain blocked. Exact identities and evidence are in section 16 of the lane record. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0

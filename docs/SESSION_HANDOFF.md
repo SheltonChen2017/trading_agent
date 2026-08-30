@@ -57,7 +57,19 @@ their lane-owned artifacts.
   corrected and mutation-verified: the repository-wide malformed-digest
   invariant was restored to the shared module, and the lane worktree guard
   again rejects a third spelling and the obsolete directory name.
-- One P2 is **open and owner-routed**: `TPR-CR2-002` / `TPR-OOL-006`. The
+- **Owner multiplicity amendment, 2026-08-30.** One shared family of four
+  attempts, total two-sided FWER `0.05`, an equal unrecycled `1/80 = 0.0125`
+  per lane, and any within-lane multiplicity must subdivide that share.
+  Analyst V2 re-freezes `3 / 1/60` -> `4 / 1/80`; Insider Buying and Short
+  Interest freeze `4 / 1/80` before outcome authority; TPR stays at `1/80`
+  and was measured compliant against its frozen candidate. **All outcome
+  gates in all lanes stay closed until the amendment is reviewed and
+  counter-reviewed in every affected lane.** Recorded in section 15 of the
+  lane record and pinned by an exact-arithmetic guard. This handoff does not
+  propagate it: the three sibling lanes are separate branches and each must
+  run its own round.
+- The superseded statement of that gap follows for history: `TPR-CR2-002` /
+  `TPR-OOL-006`. The
   owner-approved addendum makes the shared selection family four members with
   target alpha `0.0125`, but Analyst Revisions V2 still freezes `0.05 / 3 =
   0.0167` and no document records a propagation obligation. At their current

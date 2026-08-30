@@ -1,11 +1,12 @@
 # Short Interest ETF Strategy — implementation and session record
 
 Status: **LANE SI-3B-I AUTHENTICATED FEATURE-CONTEXT INDEXING (`d1c662b`)
-AND THE COUNTER-REVIEW CORRECTIONS TO CLAUDE'S SI-3B REVIEW (`d70cc51`) ARE
-COMPLETE, PENDING CLAUDE REVIEW OF THIS COMBINED ROUND. SI-3B'S MATHEMATICAL
-STATUS IS UNCHANGED. FULL LICENSED SI-1/FULL SI-2, NORMALIZED `S0`/`S1`,
-`S2`-`S4`, DTC DELTA, OUTCOME TESTS, ETF PORTFOLIO, AND QC ALGORITHM/JOB
-REMAIN UNIMPLEMENTED.**
+AND THE COUNTER-REVIEW CONTRACT HARDENING (`d70cc51`) INDEPENDENTLY REVIEWED
+AND ACCEPTED WITH NO CODE CORRECTION REQUIRED, PENDING CODEX COUNTER-REVIEW OF
+THE REVIEW RECORD. INDEXING WAS VERIFIED BEHAVIOUR-PRESERVING BY DIFFERENTIAL
+HASH COMPARISON; SI-3B'S MATHEMATICAL STATUS IS UNCHANGED. FULL LICENSED
+SI-1/FULL SI-2, NORMALIZED `S0`/`S1`, `S2`-`S4`, DTC DELTA, OUTCOME TESTS, ETF
+PORTFOLIO, AND QC ALGORITHM/JOB REMAIN UNIMPLEMENTED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -124,6 +125,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-30 | Codex counter-review + implementation | `5bfd7e1` -> `6723590` (exact code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3A review + lane SI-3B exact short-ratio acceleration | Dispositioned Claude commits `9a3c8a7` and `5bfd7e1` accepted after correction. `1a1f757` authenticates both source snapshots, the latest visible prior, both readiness rows, the complete source/reference context, exact primitive/schema types, and refusal provenance. `6723590` implements only blueprint equation 4.6 as exact signed current delta minus prior delta, retaining every source disposition and named warm-up/refusal. No Trading App/Streamlit work was added. | Exact code/test tree `6723590`: **5,425 passed, 2 skipped, 0 failed, 26 known dependency warnings in 1,160.23s (19m20s)**; complete Short Interest lane **194 passed in 144.75s**; final counter-review/SI-3B focused set **160 passed in 125.12s**; Python 3.12.13; full required compileall including `research` exit 0; `git diff --check` clean. Eighteen deliberate mutation experiments were restored textually: 16 weakened boundaries turned red; two single stale-prior guard removals stayed green because the companion guard was independently load-bearing, and removing both turned red. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/job, broker, database, scheduler, deployment, order, or trading access; **0 research looks**. | No P0/P1. `SI-CCR5-001` through `SI-CCR5-008` and `SI3B-REV-001` through `SI3B-REV-006` are closed. Independent final audits found no remaining P0-P3 issue. Details in section 16. | Commit this record and make the round's single push. Claude reviews every commit in the exact pushed range before any next milestone. Normalization and all still-gated research/execution work remain unimplemented. |
 | 2026-08-30 | Claude review | `5bfd7e1` -> `7cb3154` reviewed; no code correction required (this record commit follows) | Independent review of the SI-3A lineage counter-review closure and the SI-3B exact short-ratio acceleration tranche | Reviewed all three pushed commits individually and accepted each. Verified the SI-3B scope against the owner PDF itself rather than the citation: the blueprint formula list contains `a[i,r] = Δs[i,r] − Δs[i,r−1]` in exactly the cited position, so SI-3B is inside the frozen specification. Accepted every counter-review finding against my own section 15, including `SI-CCR5-004`, which I confirmed by direct probe was a genuine error of mine: my "unreachable" rationale only considered mutating the scalar kind, and a float-kind observation was in fact accepted on my tree `5bfd7e1`. Lane isolation verified by file list; no repository-shared file changed. | Complete suite in a clean detached worktree pinned to `7cb3154`: **5,425 passed, 2 skipped, 0 failed, 25 known dependency warnings in 975.68s (16m15s)**, reproducing the implementer's claim exactly; complete lane **194 passed in 143.81s**, also matching. Recomputed the golden arithmetic independently: prior delta `1/110`, current delta `1/132`, acceleration `-1/660`. Twelve mutations and two attack probes, all restored byte-for-byte: seven guards survived individual removal, and I then ran the attack each one defends and proved every survivor genuinely redundant rather than stopping at a green suite. The restored kind-to-observation guard is now load-bearing. compileall including `research` exit 0; `git diff --check` clean; Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider, licensed row, price, outcome, QuantConnect upload/job, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | No P0, P1, or P2, and no code correction was required. One P3 advisory (`SI-REV6-001`) records the seven individually unpinned guards together with the attack evidence showing no dangerous direction is open; no change is requested. My section 15 errors (`SI-CCR5-002`, `SI-CCR5-004`, `SI-CCR5-006`) are accepted in full. Details in section 17. | Codex counter-reviews this record commit; because no code changed, that scope is this section's accuracy and the `SI-REV6-001` advisory. Normalized `S0`/`S1`, `S2`-`S4`, DTC delta, full licensed SI-1/SI-2, ETF aggregation, every outcome join, and all QuantConnect work remain unimplemented or gated, and the quadratic context lookup must be indexed before any provider-scale vintage. |
 | 2026-08-30 | Codex counter-review + implementation | `fbe71cd` -> `d1c662b` (exact code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3B review + SI-3B-I authenticated-context indexing and parity hardening | Dispositioned Claude commit `fbe71cd` accepted after correction. `d70cc51` closes exact primitive/container and refusal-provenance equality-spoofing gaps, pins both disproved dangerous directions, and corrects the review's lane-test label. `d1c662b` builds immutable readiness/current/prior indices once per authenticated context, caches its digest, preserves the legacy PIT visibility rule and every exact payload/hash/refusal, and adds no formula, score, parameter, outcome, ETF, or QC runtime. No Trading App/Streamlit work was added. | Exact code/test tree `d1c662b`: **5,441 passed, 2 skipped, 0 failed, 26 known dependency warnings in 1,348.85s (22m28s)**; complete seven-file Short Interest lane **210 passed in 147.64s**; final import/feature/acceleration set **110 passed in 122.06s**; pre-SI-3B-I five-file counter-review set at `d70cc51` **181 passed**; active-document consistency **63 passed in 0.93s**; Python 3.12.13, pytest 9.1.1; full required `compileall -q` including `research` exit 0; `git diff --check` clean. Five grouped counter-review mutations and seven SI-3B-I mutations turned their intended guards red before restore; independent code, adversarial, and test audits found no remaining P0-P3 issue. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/job, broker, database, scheduler, deployment, order, or trading access; **0 research looks**. | No P0/P1 remains. `SI-CCR6-001` through `SI-CCR6-005` and `SI3BI-REV-001` through `SI3BI-REV-003` are closed. Claude's `SI-REV6-001` advisory and 172-test label were materially inaccurate and are superseded by section 18. The new index closes the named per-disposition lookup/digest bottleneck, but pre-existing readiness/reference construction remains a provider-scale performance gate. | Commit this record and make the round's single push. Claude reviews every commit in the exact pushed range before any next milestone. Normalized scores and every still-gated research/execution stage remain unimplemented. |
+| 2026-08-30 | Claude review | `fbe71cd` -> `5bee48f` reviewed; no code correction required (this record commit follows) | Independent review of the counter-review contract hardening and the SI-3B-I authenticated-context indexing tranche | Reviewed all three pushed commits individually and accepted each. Confirmed both counter-review findings against my section 17, reproducing `SI-CCR6-004` against my own tree `fbe71cd` rather than conceding it: removing only the non-ready guard admitted a genuinely non-ready row carrying its real authenticated prior, and removing the three acceleration chain guards admitted the older same-settlement `r1`, changing the acceleration from the authentic `-7/300` to `-41/3300`. Both values match the counter-review exactly. Named the methodological fault as mine: I had generalised a redundancy claim across seven guards from two probes that each happened to be caught by an unrelated guard. Lane isolation verified by file list; no repository-shared file changed. | Complete suite in a clean detached worktree pinned to `5bee48f`: **5,441 passed, 2 skipped, 0 failed, 25 known dependency warnings in 1,150.45s (19m10s)**, reproducing the implementer's claim; complete seven-file lane **210 passed in 137.90s**, also matching. Verified the indexing refactor is behaviour-preserving by differential execution across two worktrees: all twelve disposition hashes, every refusal tuple, and both acceleration values (`-1/660`, `-7/300`) are identical at `fbe71cd` and `5bee48f`, and the five hard-coded hashes in section 18.6 were recomputed independently. Checked the index tie-break against the contract and found the divergence unreachable because `dataset.py:263-267` refuses same-time revisions. Probed two legacy-resolver drifts: the visibility boundary drift is caught by 91 failures, the revision-precedence drift is provably inert. Four mutations/probes total, every file restored byte-for-byte. compileall including `research` exit 0; `git diff --check` clean; Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider, licensed row, price, outcome, QuantConnect upload/job, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | No P0, P1, P2, or P3 defect found in this range and no code correction required. `SI-CCR6-004` and `SI-CCR6-005` are accepted in full, the first after independent reproduction. One non-severity observation (`SI-REV7-001`) records that latest-visible-revision semantics now exist in two implementations, with the bounded drift evidence and no requested change. Details in section 19. | Codex counter-reviews this record commit; because no code changed, that scope is section 19's accuracy and the `SI-REV7-001` observation. Section 18.7's remaining readiness/reference performance gate is confirmed as the honest next boundary. Normalized `S0`/`S1`, `S2`-`S4`, DTC delta and its window `K`, full licensed SI-1/SI-2, ETF aggregation, every outcome join, and all QuantConnect work remain unimplemented or gated. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -1548,3 +1550,161 @@ Claude independently reviews that exact pushed range on this same branch before
 Codex starts another milestone. Normalized signals, full licensed ingest, ETF
 aggregation, outcomes, portfolio stages, and all QuantConnect runtime work
 remain unimplemented or gated.
+
+## 19. Claude independent review - 2026-08-30 (contract hardening and SI-3B-I context indexing)
+
+Reviewer: Claude, dedicated Short Interest lane session, isolated worktree
+`C:\git\customizedagent\trading_agent_short_interest`. Governing documents:
+`CLAUDE.md`, `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, and
+`THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
+
+**Disposition: accepted.** No P0, P1, P2, or P3 defect was found in this range
+and I made no code correction. Both counter-review findings against my
+section 17 are confirmed and accepted; one of them was a substantive error of
+mine that I reproduced rather than conceded.
+
+### 19.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Base (my previous review head) | `fbe71cdf0d14f24326805188640bca971c0647c5` |
+| Reviewed remote head | `5bee48f5b4d3ebd66127bffc96a5ddf88cbfc8d9` |
+| Ordered reviewed range | `fbe71cd..5bee48f` (3 commits, no merge commit) |
+| Ancestry | `fbe71cd` is an ancestor of `5bee48f`; clean fast-forward, no rebase or rewrite |
+| Claude correction commit | none required this round |
+| Interpreter | Python 3.12.13, pytest 9.1.1 (repository virtualenv) |
+
+### 19.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `d70cc51` | Harden Short Interest counter-review contracts | accepted |
+| 2 | `d1c662b` | Index authenticated Short Interest feature context | accepted |
+| 3 | `5bee48f` | Record the counter-review and context indexing | accepted |
+
+### 19.3 My section 17 was wrong, and I reproduced the proof
+
+`SI-CCR6-004` is correct on both directions. Section 17 claimed that after
+attack probes, "every survivor proved genuinely redundant." I reran both
+attacks against **my own tree `fbe71cd`**, removing only the guards in
+question:
+
+- Removing the non-ready `prior_readiness` guard and attaching the **real
+  authenticated prior** of a genuinely non-ready row (the stale-ADV middle
+  cycle) was **accepted**. My original probe attached a foreign readiness row
+  to the warm-up cycle, which has no prior at all, so a different guard
+  rejected it and I never reached the reachable case.
+- Removing the three acceleration chain guards and substituting the older
+  same-settlement `r1` for the authenticated `r2` was **accepted**, changing
+  the acceleration from the authentic `-7/300` to `-41/3300`. My original
+  probe self-paired one feature, which breaks the strict three-cycle
+  settlement chain, so the settlement check rejected it. The `r1`/`r2`
+  substitution keeps a valid settlement chain, so only the chain guards can
+  catch it.
+
+Both replacement values match section 18.2 exactly. The methodological fault
+was mine and is worth naming: I ran two probes, each of which happened to be
+caught by an unrelated guard, and generalised a redundancy claim across seven
+guards. A probe that is refused only shows that *that* probe is refused. The
+production guards were correctly retained and are now pinned by
+`test_non_ready_raw_disposition_cannot_carry_authenticated_prior_readiness`
+and `test_older_same_settlement_revision_cannot_replace_authenticated_prior`.
+
+`SI-CCR6-005` is also correct: section 17 called 172 tests "the entire lane"
+when that was a five-file mutation subset, while the seven-file lane at that
+snapshot was 194. I did report the 194 figure separately in the same section,
+but the 172 label was wrong and is superseded.
+
+### 19.4 P0-P3 issue ledger
+
+No P0, P1, P2, or P3 defect was found in `fbe71cd..5bee48f`, and no code
+correction was made. The observation below is recorded for routing only and
+requests no change.
+
+| ID | Priority | Status | Location | Observation | Evidence | Requested action |
+|---|---|---|---|---|---|---|
+| SI-REV7-001 | none (observation) | Open | `research/short_interest_etf/dataset.py::visible_source_snapshots_as_of` and `research/short_interest_etf/stock_features.py::_build_prior_snapshot_index` | Latest-execution-visible-revision semantics now exist in two implementations. The legacy resolver still drives `build_stock_data_readiness` visible/eligible sets; the index drives prior selection. They must stay in agreement. | I probed two drifts in the legacy resolver. Changing the visibility boundary from `>` to `>=` is caught loudly (91 failures). Changing revision precedence from `>` to `>=` leaves the lane green, but that drift is **provably inert**, not undetected: `dataset.py:263-267` refuses same-time revisions inside a logical group, so strict and non-strict comparison are identical for any constructible vintage. I did not attempt to characterise the whole drift space, and I am explicitly not repeating section 17's mistake of generalising from a small probe set. | None. `test_context_index_keeps_latest_revision_when_older_revision_opens_later` already compares the index against the legacy resolver on the hardest known case (non-monotonic availability). Recorded so a future change to either implementation knows the other exists. |
+
+### 19.5 Independent reproduction rather than accepted claims
+
+- **The indexing refactor is behaviour-preserving, verified by differential
+  execution rather than by reading the diff.** I built a worktree at the
+  pre-indexing head `fbe71cd` and one at `5bee48f`, and compared canonical
+  hashes across four scenarios: the two-cycle raw batch and the three-cycle
+  acceleration batch in its plain, `stale_middle`, and
+  `same_open_middle_correction` forms. All twelve disposition hashes, every
+  refusal tuple, and both acceleration values (`-1/660` and `-7/300`) are
+  identical before and after. The five hard-coded hashes quoted in section
+  18.6 match what I computed independently.
+- **The index's tie-break was checked against the contract, not assumed.** The
+  legacy resolver keeps the first maximal revision in vintage order while the
+  index sweeps in `(opens_at, revision_at, logical_id, event_id)` order, so a
+  logical group holding two revisions with an identical
+  `revision_published_at` would resolve differently. That vintage cannot be
+  built: `dataset.py:263-267` refuses "conflicting same-time revisions". The
+  divergence is unreachable rather than merely untested.
+- **The visibility instant is the same quantity.** The index uses each
+  readiness row's `execution_at`, and `build_stock_data_readiness` sets that
+  field from `snapshot_execution_cohort(...).opens_at`, which is exactly what
+  the removed `_select_authenticated_prior` passed to the legacy resolver.
+- **Counts reproduce.** Complete lane (seven files): **210 passed**, matching
+  section 18.6. The full-suite figure is in section 19.6.
+- **The exact-type sweep in `d70cc51` is uniform and fails closed.** The
+  `_integer` rewrite to `type(value) is not int` also subsumes the previous
+  explicit bool exclusion, and additionally rejects integer subclasses at a
+  persisted boundary, which is the safe direction for this lane.
+
+### 19.6 Validation
+
+- Complete suite in a clean detached worktree pinned to `5bee48f`:
+  **5,441 passed, 2 skipped, 0 failed, 25 known dependency warnings in
+  1,150.45s (19m10s)**. This reproduces the recorded 5,441 / 2 / 0 at `d1c662b`. My run reports
+  25 warnings against the recorded 26; the pass, skip and fail counts agree
+  exactly and the warning delta is immaterial environment variance, as in the
+  previous round.
+- Complete Short Interest lane (all seven files): **210 passed in 137.90s**.
+- The required full `compileall`, extended to include `research`, exited 0.
+  `git diff --check` clean. Worktree clean and synced with the reviewed head.
+- Mutation and probe work this round: two attack reproductions against
+  `fbe71cd`, and two legacy-resolver drift mutations against `5bee48f`. Every
+  mutated file was restored byte-for-byte and the tree verified clean
+  afterwards.
+- Synthetic fixtures only. No credential, provider, licensed row, price,
+  outcome, QuantConnect upload or job, broker, operator database, scheduler,
+  deployment, order, or trading access occurred. Permanent research looks used:
+  **0**.
+
+### 19.7 Scope discipline
+
+Owner rule, 2026-08-29: this session is dedicated to trading strategies, not to
+the general health of the Trading App. A defect found outside the strategy scope
+is documented and left unfixed.
+
+No such defect surfaced. Every file inspected for defects is lane-owned
+(`research/short_interest_etf/`, `tests/test_short_interest_*`) or this record.
+Nothing in the shared execution, assistant, risk, UI, or installer surfaces was
+reviewed or modified, and the round changed no repository-shared file.
+
+### 19.8 Remaining gates and next authorized step
+
+Codex counter-reviews this record commit. Because no code changed, that scope is
+this section's accuracy and the `SI-REV7-001` observation.
+
+Accepting SI-3B-I is software evidence on synthetic fixtures. It is a
+performance and lookup change that provably did not alter a single canonical
+hash, refusal, or ratio; it is not evidence of market efficacy, it consumes no
+research look, and it confers no trading authority.
+
+Section 18.7's remaining performance boundary is accurate and I confirm it as
+the honest next gate: `build_stock_data_readiness` still scans the vintage per
+distinct execution cutoff and scans the lifecycle/classification reference
+tuples per source row, and the authenticated context deliberately recomputes
+readiness, so that work happens twice per batch. Still unimplemented or gated:
+normalized `S0`, canonical normalized `S1`, `S2`-`S4`, days-to-cover delta and
+its trailing ADV window `K`, full licensed SI-1 ingest, full SI-2, the PIT ETF
+reverse index and aggregation, every outcome join, the portfolio stages, and
+every QuantConnect algorithm, artifact, upload, or job. Full licensed SI-1
+remains blocked on an owner-approved historical/vintage short-interest source.
+Future work in this lane stays Short Interest/QC-specific; Trading App and
+Streamlit work remain out of scope.

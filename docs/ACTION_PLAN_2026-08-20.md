@@ -53,14 +53,18 @@ operation are separate future promotion decisions; no stage authorizes the
 next.
 
 **Current bounded status, 2026-08-30:** under the owner's approval of the
-recorded proposals, Codex counter-reviewed Claude's complete six-commit range
-through `2ec0fad` and implemented the owner-approved fixed-slot v2.2 PDF and
-authenticated TPR-0A candidate at `bb8dfb6`. Every empirical child field
-remains unbound and source/look authority remains zero. The candidate is
-unaccepted pending Claude's review of this round's exact single-push snapshot
-and Codex's later counter-review. TPR-1, TPR-0B, all outcome access, and every
-operational stage remain blocked. Exact identity, evidence, and next action
-live in section 16 of the target implementation record and Session Handoff.
+recorded proposals, the fixed-slot v2.2 PDF and TPR-0A snapshot at `bb8dfb6`
+have completed Claude's independent review and Codex's commit-by-commit
+counter-review through exact Claude head
+`db6a721d45eb47e1a133744387bf43a1aa1f310c`. The human review loop is complete
+for that zero-access frozen candidate, but the reviewed-spec registry remains
+empty, the candidate remains unreviewed for its own registry, and every
+empirical child field and source/look authority remains unbound or zero.
+No next implementation milestone is authorized: TPR-1 is blocked on a
+separately reviewed exact source-rights artifact, while TPR-0B waits for
+reviewed TPR-1/TPR-2 structural manifests. All outcome access and every
+operational stage remain blocked. Exact dispositions, identities, evidence,
+and gates live in sections 17 and 18 of the target implementation record.
 
 **Owner multiplicity amendment, 2026-08-30 — affects all four strategy lanes:**
 the four named strategy-selection lanes are one fixed family with total
@@ -226,7 +230,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
 | Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
-| Target-Price Revisions (TPR) | Separate fourth lane. Claude's six commits through `2ec0fad` were counter-reviewed, and the owner-approved permanent-four-slot contract is implemented in the sole-authority v2.2 PDF and authenticated TPR-0A candidate at `bb8dfb6`. The zero-access candidate is unaccepted pending Claude's review of this round's exact single-push snapshot and Codex's later counter-review. The fixed family has total two-sided FWER `0.05`, permanent maximum `1/80` per named lane, expiration without redistribution for unused/withdrawn allocations, and a within-lane confirmatory sum ceiling of `1/80`; sibling changes remain on sibling branches (`TPR-OOL-006`). TPR-1, TPR-0B, all outcome access, and every operational/trading stage remain blocked. Exact identities and evidence are in section 16 of the lane record. |
+| Target-Price Revisions (TPR) | Separate fourth lane. The sole-authority v2.2 PDF and TPR-0A snapshot at `bb8dfb6` encode the permanent-four-slot contract and have completed Claude independent review plus Codex counter-review through Claude head `db6a721d45eb47e1a133744387bf43a1aa1f310c`. The candidate remains unreviewed for its own empty reviewed-spec registry and grants zero authority. The fixed family has total two-sided FWER `0.05`, permanent maximum `1/80` per named lane, expiration without redistribution for unused/withdrawn allocations, and a within-lane confirmatory sum ceiling of `1/80`; sibling changes remain on sibling branches (`TPR-OOL-006`). No next implementation milestone is authorized: TPR-1 is blocked on exact reviewed source rights; TPR-0B, all outcome access, and every operational/trading stage remain blocked. Exact dispositions and evidence are in sections 17 and 18 of the lane record. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0

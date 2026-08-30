@@ -1,11 +1,14 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED ALL SIX CLAUDE COMMITS THROUGH `2ec0fad`,
-CORRECTED THE CONFIRMED FINDINGS, AND IMPLEMENTED THE OWNER-APPROVED V2.2
-FIXED FOUR-SLOT MULTIPLICITY AMENDMENT AT `bb8dfb6`. THE NEW TPR-0A CANDIDATE
-IS NOT ACCEPTED UNTIL CLAUDE REVIEWS THE EXACT PUSHED SNAPSHOT AND CODEX
-COUNTER-REVIEWS THAT REVIEW. TPR-0B'S EMPIRICAL STRUCTURAL BINDINGS, TPR-1
-SOURCE RIGHTS, AND EVERY OUTCOME/LOOK GATE REMAIN UNAVAILABLE.
+Status: **CLAUDE'S THREE-COMMIT V2.2 REVIEW ROUND IS COMPLETE THROUGH
+`db6a721`, AND CODEX HAS COUNTER-REVIEWED EVERY COMMIT, CORRECTED THE CURRENT-
+STATE AND GUARD DEFECTS, AND QUALIFIED THE VALIDATION EVIDENCE. THE EXACT
+TPR-0A V2.2 SNAPSHOT AT `bb8dfb6` HAS COMPLETED THE HUMAN INDEPENDENT-REVIEW
+AND COUNTER-REVIEW LOOP AS A ZERO-ACCESS FROZEN CANDIDATE. THE REVIEWED-SPEC
+REGISTRY REMAINS EMPTY, THE CANDIDATE REMAINS UNREVIEWED FOR ITS OWN REGISTRY,
+AND NO POSITIVE ALGORITHM AUTHORITY EXISTS. TPR-1 IS BLOCKED ON AN EXACT
+SEPARATELY REVIEWED SOURCE-RIGHTS ARTIFACT; TPR-0B IS BLOCKED ON REVIEWED
+TPR-1/TPR-2 STRUCTURAL MANIFESTS; EVERY OUTCOME/LOOK GATE REMAINS UNAVAILABLE.
 NO AUTHENTICATED TARGET-PRICE SOURCE, INGEST, CANONICAL EVENT, SIGNAL, OUTCOME
 ACCESS, RESEARCH LOOK, ETF TOPOLOGY, PORTFOLIO, QUANTCONNECT JOB OR RESULT,
 SHADOW OR PAPER DEPLOYMENT, BROKER CONNECTION, OR LIVE-TRADING AUTHORITY
@@ -328,18 +331,39 @@ paper deployment, or live deployment is authorized merely by this workflow.
 
 ## 8. Exact next step
 
-**Current qualification, 2026-08-30:** section 16 supersedes the historical
-round-state prose below. Codex has counter-reviewed the complete six-commit
-Claude range `6aae73b..2ec0fad` and implemented the owner-approved v2.2
-fixed-four-slot amendment at `bb8dfb6`. The current candidate is
+**Current qualification, 2026-08-30:** Claude's exact three-commit correction
+range `fe056be6800ea11d6559f817019d1c2902f61620..db6a721d45eb47e1a133744387bf43a1aa1f310c`
+has been pushed, and Claude's independent review is complete. Codex has
+counter-reviewed `da6f7ea`, `5eecce5`, and `db6a721` individually. Sections
+17 and 18 contain the review and counter-review dispositions. The reviewed
+implementation snapshot remains `bb8dfb6e8d718f9371bbbd85b30f5f9a769f396e`.
+The sole-authority blueprint is the 29-page v2.2 artifact at raw SHA-256
+`f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`.
+The current candidate has spec ID
 `tpr-round0a-candidate-74b096af24c8d481`, semantic hash
 `74b096af24c8d48196054f56deb562924380884c1b14b747ba432cc57658df2c`,
-artifact SHA-256
+and artifact SHA-256
 `17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a`.
-It remains zero-access and pending Claude review of this Codex round's exact
-single-push snapshot. TPR-1, TPR-0B, every outcome look, and every operational
-stage remain blocked. The remainder of this section preserves how the prior
-v2.1 candidate reached review; it is not the current resume instruction.
+
+The TPR-0A snapshot has completed this human review/counter-review loop only
+as a zero-access frozen candidate. The reviewed-spec registry remains empty,
+the candidate remains unreviewed for its own registry, and `TPR-CCR2-011`
+still requires a separately controlled signed review receipt or trusted
+commit-signature policy before any positive authority can rely on reviewer
+identity. No next implementation milestone is authorized. TPR-1 remains
+blocked until a separately reviewed source-rights artifact proves entitlement,
+public-time semantics, correction completeness, target-horizon consistency,
+raw retention, derived processing, and QC-transfer rights. TPR-0B remains
+blocked until reviewed TPR-1 and TPR-2 structural manifests exist. After this
+counter-review round's single push, Claude reviews only the exact correction
+range on this branch; that loop step grants no source, outcome, look, QC,
+broker, paper, live, deployment, capital, or trading authority.
+
+### Historical progression (not the current resume instruction)
+
+The remainder of this section preserves how the earlier v2.1 and v2.2
+candidates reached their reviews. Its role-next statements are historical,
+not current instructions.
 
 The Codex documentation round was pushed and merged to `main` through PR #324
 (`1a5264e6b1de3caf5477477d1312a762b2d42419`). Claude independently reviewed
@@ -419,7 +443,7 @@ documented here and deliberately not fixed.
 | `TPR-OOL-006` | P2 | Sibling lane frozen preregistrations, principally `codex/strategy-analyst-revisions-v2` | That lane still freezes its selection-family alpha at `0.05 / 3 = 1/60` while the fixed family now has four permanent `1/80` slots. Under the pre-amendment sibling allocations, exact arithmetic is `3 * (1/60) + 1/80 = 1/16 = 0.0625`, above the family ceiling `1/20 = 0.05`; the displayed `0.0167` is only a rounded rendering of `1/60`. | The owner froze the four named slots permanently on 2026-08-30 (section 16): each lane's maximum is `1/80`; the named slot remains fixed while an unused or withdrawn allocation expires and is never redistributed or used to recompute the denominator. Sibling-lane corrections and their independent reviews/counter-reviews remain on their own long-lived branches. This target branch does not edit them, and no lane receives outcome authority from this directive. |
 | `TPR-OOL-007` | P3 | `docs/THREE_STRATEGY_PROJECT_DIRECTION.md:274-278` | The shared coordination pointer still presents a local TPR-0A candidate whose next action is one push/review; it omits the completed initial review, the six Claude commits through `2ec0fad`, their Codex counter-review, and the current v2.2 candidate at `bb8dfb6`. | Documented, not fixed. The file is shared coordination surface outside this target-only lane; route a concise current-state correction through the appropriate owner-coordinated shared-document round. |
 | `TPR-OOL-002` | P3 | `docs/Strategy Description/README.md` | The lane table and the surrounding prose describe a three-strategy program and omit Target-Price Revisions entirely, so a reader who starts at the directory README does not discover this lane, its branch, or its record. | That README is named in the parallel-workflow frozen-file list, so it needs the same owner-coordinated common-baseline amendment rather than a fourth competing edit. Documented, not fixed. |
-| `TPR-OOL-001-R1` | P2 resolution | Owner-coordinated repository Git plumbing | The owner approved the common fix. Root `.gitattributes` now declares `*.pdf binary`; Git resolves the blueprint as binary with text/diff/merge unset. The PDF was rebuilt from the intact Git blob plus the two-page owner addendum and reopened strictly as 28 pages at raw SHA-256 `55ce6703...ba14` at that time; the current artifact is the 29-page v2.2 blueprint at `f6e98eef...ec30b`, which supersedes that historical resolution state without reopening the finding. | Resolved under the explicit one-time owner coordination; this does not authorize later shared-file edits by inference. Raw-byte and resolved-attribute guards are target-owned. |
+| `TPR-OOL-001-R1` | P2 resolution | Owner-coordinated repository Git plumbing | The owner approved the common fix. Root `.gitattributes` now declares `*.pdf binary`; Git resolves the blueprint as binary with text/diff/merge unset. The PDF was rebuilt from the intact Git blob plus the two-page owner addendum and reopened strictly as 28 pages at raw SHA-256 `55ce6703...ba14` at that time; the current artifact is the 29-page v2.2 blueprint at raw SHA-256 `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`, which supersedes that historical resolution state without reopening the finding. | Resolved under the explicit one-time owner coordination; this does not authorize later shared-file edits by inference. Raw-byte and resolved-attribute guards are target-owned. |
 | `TPR-OOL-003` | P2 | Analyst Revisions V2 preregistration loader: `research/analyst_revisions_v2/preregistration.py:465,487` | Both persisted JSON paths use ordinary `json.loads`, which accepts duplicate object keys with last-key-wins behavior. A content-addressed authority artifact can therefore have ambiguous human/parser meaning. TPR's strict loader rejects duplicate keys, but this external accepted lane remains unchanged. | Documented only. Route to the Analyst Revisions V2 lane before any outcome authority; add duplicate-key mutations there. |
 | `TPR-OOL-004` | P2 | Analyst Revisions V2 family contract: `research/analyst_revisions_v2/preregistration.py:56,931` and its draft/tests | The accepted draft/loader still names `three_lane_selection_correction` and requires value 3, while the owner has added TPR as the fourth shared family/attempt. The Analyst lane remains fail-closed and zero-access, so no current look is affected. | Documented only. Synchronize that lane's content-addressed artifact and tests to four before any Analyst outcome access; do not edit it from TPR. |
 | `TPR-OOL-005` | P3 | Trading App Briefing smoke fixture and yfinance cache/provider path | The exact `ba01e98` complete-suite run timed out after 180 seconds in `test_ui_pages_smoke.py::test_page_renders_without_exception[Briefing]`; captured yfinance logs reported `OperationalError('unable to open database file')` for QQQ, SPY, NVDA, and AMD. The fixture patches only one recorded-bar seam, while Briefing still reaches direct benchmark and sample-holding yfinance paths. `c0ba616..ba01e98` changes none of the UI, fixture, provider, configuration, or dependency paths; the page imports no TPR module. The same exact test passed immediately in isolation in 14.42 seconds. | Confirmed pre-existing out-of-lane test-isolation/reliability gap exposed by host cache/load conditions. Documented, not fixed, under the owner's target-only rule; route to the Trading App test lane. Keep the exact full-suite result explicitly red. Focused TPR validation is unaffected and no provider authority is granted. |
@@ -1138,3 +1162,89 @@ skipped, 0 failed, 25 warnings in 952.86s**. That is the 5,842 baseline plus
 exactly the one guard added in this round, with skips unchanged. Full
 `compileall -q` including `research` exited 0 and `git diff --check` was clean.
 The lane and shared documentation suites passed with **189 passed, 3 skipped**.
+
+## 18. Codex counter-review of Claude's v2.2 review - 2026-08-30
+
+**Disposition: accepted after correction and qualification.** Codex reviewed
+all three Claude commits individually and the cumulative `db6a721` tree. No P0
+or P1 exists. The artifact-identity corrections and validation event are
+credible, but the final durable state still contradicted itself about whether
+Claude's review had finished, and the new guard could pass with stale current
+claims beside the new values. Those defects are corrected in this round. No
+next implementation milestone is authorized by the governing PDF or Action
+Plan.
+
+### 18.1 Exact counter-reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch / worktree | `codex/strategy-target-price-revisions` / `C:\git\customizedagent\trading_agent_target_price` |
+| Previously processed Codex head | `fe056be6800ea11d6559f817019d1c2902f61620` |
+| Claude range | `fe056be6800ea11d6559f817019d1c2902f61620..db6a721d45eb47e1a133744387bf43a1aa1f310c` |
+| Claude commits, ordered | `da6f7ea7261b63d294134a704792fbc8413e4c55`, `5eecce57789d2b2702085145d09b357d826d65fa`, `db6a721d45eb47e1a133744387bf43a1aa1f310c` |
+| Remote / local head at counter-review start | `db6a721d45eb47e1a133744387bf43a1aa1f310c`; identical and clean after a branch-only fetch |
+| Implementation snapshot under review | `bb8dfb6e8d718f9371bbbd85b30f5f9a769f396e` |
+
+### 18.2 Commit-by-commit dispositions
+
+| Claude commit | Disposition | Counter-review basis |
+|---|---|---|
+| `da6f7ea7261b63d294134a704792fbc8413e4c55` | **Accepted after correction** | Adding a target-owned guard for section 8 was correct. At this exact standalone object, the guard is intentionally red until the next commit changes the record: the current candidate ID and artifact hash assertions already pass, while the current full blueprint digest assertion fails. The guard also checked only positive token occurrence across all of section 8, so a stale labeled candidate could coexist with the current one and pass; it could not verify the section-9 routing row that section 17 credited to it. `TPR-CCR4-002` strengthens the guard around an explicit current block and exact labeled-value sets. `TPR-CCR4-005` records the standalone-red sequencing qualification. |
+| `5eecce57789d2b2702085145d09b357d826d65fa` | **Accepted after correction** | The v2.2 identity corrections, independent-review report, and closed `TPR-CR3-001` / `TPR-CR3-002` findings are substantively sound. The same final tree nevertheless retained `pending Claude review` as the current state in the record header/section 8, Action Plan, Session Handoff, and a target guard, while section 17 said review was complete and Codex was next. It also retained a present-tense v2.1 candidate statement. `TPR-CCR4-001` makes every active resume pointer consistent. |
+| `db6a721d45eb47e1a133744387bf43a1aa1f310c` | **Accepted after qualification** | Appending a distinct validation event instead of rewriting the prior row correctly follows `TPR-CCR3-006`; its diff is record-only and clean. The 5,843/5/25 result remains credible Claude-run evidence. The record names only Python 3.14, not its patch version or executable, so `TPR-CCR4-003` qualifies reproducibility without altering Claude's historical report. No new behavioral defect was introduced. |
+
+### 18.3 Counter-review issue ledger
+
+| ID | Priority | Status | Commit / location | Finding, reason, correction, and verification |
+|---|---|---|---|---|
+| `TPR-CCR4-001` | P2 | **Closed by current correction** | `5eecce5`; record header/section 8, Action Plan TPR status, Session Handoff TPR pointers, target documentation guard | The current-state surfaces simultaneously said Claude's review was pending and complete, misrouting the next role and leaving a present-tense v2.1-candidate statement in the exact-next-step section. Durable sequencing must have one current truth. The header, explicit section-8 current block, Action Plan, handoff, and guard now identify the completed Claude range through `db6a721`, this Codex counter-review, the empty reviewed-spec registry, and the blocked TPR-1/TPR-0B gates. Historical role-next prose is bounded beneath a non-current heading. |
+| `TPR-CCR4-002` | P3 | **Closed by current correction** | `da6f7ea`; `tests/target_price_revisions/test_document_consistency.py` | The new guard's positive-occurrence assertions did not distinguish current from historical text: two of three already passed before the document correction, and a stale labeled artifact could coexist with current values. Its section-8 slice also could not verify `TPR-OOL-001-R1` in section 9 despite the review report saying it did. The guard now parses an explicit current block, requires exact singleton blueprint/candidate identity claims, pins review completion and blocked-next-state text, and separately checks the routing row's full current PDF identity. |
+| `TPR-CCR4-003` | P3 | **Closed by qualification** | `db6a721`; sections 17.1/17.8 | Claude's final evidence gives Python 3.14 and pytest 9.1.1 but omits the Python patch version and executable required for exact reproducibility. The counts/duration are retained as credible Claude evidence; this section does not invent the missing metadata. Codex's own final validation records its exact interpreter separately. |
+| `TPR-CCR4-004` | P3 | **Closed by qualification** | Section 17.2 versus 17.4; `TPR-CR3-002` | Section 17.2 says `fe056be` carries `TPR-CR3-002`, section 17.4 attributes it to `6b12102`, while Git blame shows the stale `TPR-OOL-001-R1` row was introduced by `ba01e98` and merely remained in later record-touching commits. Section 17 also says one P2 `remains` although its final ledger closes it. Claude's historical report is retained; the exact origin/carry qualification here controls the counter-review disposition. |
+| `TPR-CCR4-005` | P3 | **Closed by successor `5eecce5`** | `da6f7ea` exact standalone tree | The guard-first commit is red by construction until its document correction arrives in the next commit. Static evaluation of the exact parent section shows the candidate ID and artifact assertions true and the current blueprint-digest assertion false. The cumulative pushed tree is green, but future correction series should keep each durable commit green or explicitly mark a red-test checkpoint. |
+
+### 18.4 Milestone and authority decision
+
+The exact v2.2 snapshot at `bb8dfb6` has completed the human independent-review
+and Codex counter-review loop required by A27 as a zero-access frozen TPR-0A
+candidate. That does **not** create a loader-accepted reviewed algorithm
+artifact: the reviewed-spec registry remains empty, the candidate remains
+unreviewed for its own registry, and the signed-review-identity strengthening
+item `TPR-CCR2-011` remains unresolved before any positive authority relies on
+reviewer identity.
+
+No implementation follows this counter-review. A22 keeps entitlement,
+earliest-public-time semantics, correction completeness, target-horizon
+consistency, raw retention, derived processing, and QC-transfer rights
+unestablished, so TPR-1 cannot start. TPR-0B additionally waits for reviewed
+TPR-1 and TPR-2 zero-outcome structural manifests. The Action Plan schedules
+no bypass or alternate milestone. Provider accesses: **0**. Outcome accesses:
+**0**. Authorized or spent research looks: **0**. The reviewed, source, and
+look authority surfaces remain empty or zero-access.
+
+### 18.5 Validation
+
+Codex used
+`C:\git\customizedagent\trading_agent\.venv\Scripts\python.exe`, Python
+3.12.13 and pytest 9.1.1. The complete Target-Price Revisions plus shared
+active-document suite passed with **189 passed, 3 skipped in 14.54 seconds**.
+The narrower two-document-module run passed with **76 passed in 1.22 seconds**.
+An in-memory reverse mutation that retained the current candidate while adding
+a second stale labeled candidate was rejected by the exact-singleton guard.
+
+The network-restricted full suite completed with **5,838 passed, 5 failed, 5
+skipped, and 26 warnings in 1,282.03 seconds**. All five failures were test-
+harness effects of that deliberately isolated run: four temporary Git fixture
+paths exceeded Windows path handling under the long sandbox-owned base path,
+and one temporary Git subprocess was denied by the sandbox. The exact five
+nodes then passed with a short outside-repository base path (**5 passed in
+11.05 seconds**). Thus all 5,843 collected passing-test nodes are covered, but
+this record does not misstate the first run as a single green full-suite run.
+
+Full `compileall -q` including `research` exited 0. `git diff --check` is clean.
+The first focused attempt without an explicit writable base directory failed
+only at pytest setup with host-temp permission errors; a repository-local base
+was also rejected for changing the intended outside-repository premise of one
+Git-boundary test. Both environment deviations were corrected before the
+results above. Provider accesses: **0**. Outcome accesses: **0**. Authorized or
+spent research looks: **0**.

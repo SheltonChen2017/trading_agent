@@ -39,6 +39,7 @@ EXPECTED_CANDIDATE_HASH = (
 EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
     "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
+CLAUDE_V22_REVIEW_HEAD = "db6a721d45eb47e1a133744387bf43a1aa1f310c"
 
 
 def _doc(name: str) -> str:
@@ -196,7 +197,8 @@ def test_tpr0a_candidate_identity_and_zero_authority_handoff_are_exact() -> None
         assert "48 total pending" in document
         assert "planned_unbound" in document
         assert "no look is authorized or spent" in document
-        assert "pending claude" in document
+        assert "reviewed-spec registry remains empty" in document
+        assert "candidate remains unreviewed for its own registry" in document
 
 
 def test_shared_family_alpha_allocation_is_exact_and_unrecycled() -> None:
@@ -261,29 +263,65 @@ def _record_section(heading: str) -> str:
     return text[start:] if nxt == -1 else text[start:nxt]
 
 
+def _current_qualification(section: str) -> str:
+    """Return only section 8's explicitly current block, not its history."""
+    start = section.index("**Current qualification")
+    end = section.index("\n### Historical progression", start)
+    return section[start:end]
+
+
 def test_exact_next_step_names_the_current_artifacts() -> None:
-    """TPR-CR3-001. The record's current-state section must not pin superseded
-    content addresses.
+    """TPR-CCR4-001/002: bind exact current identities and resume state.
 
-    Section 8 is where a reader goes for the present state, and it kept
-    describing the superseded 28-page v2.1 blueprint and the previous
-    candidate triple in the present tense, in the very commit range that
-    replaced them. In a lane whose discipline is content addressing, naming an
-    old digest as current is worse than naming none: it sends a verifier to
-    the wrong artifact.
-
-    Positive assertions only, so no list of superseded values has to be
-    maintained: whenever the blueprint or candidate is amended again, this
-    fails until section 8 is brought forward with it.
+    Exact labeled-value sets reject a stale candidate that coexists with the
+    current one, while the explicit block boundary lets section 8 retain its
+    clearly marked historical progression.
     """
     section = _record_section("## 8. Exact next step")
+    current = _current_qualification(section)
+    normalized_current = " ".join(current.split())
 
-    assert BLUEPRINT_CONTENT_SHA256 in section.lower(), (
-        "section 8 must name the current blueprint digest"
+    assert re.findall(
+        r"raw SHA-256\s+`([0-9a-f]{64})`", current, flags=re.IGNORECASE
+    ) == [BLUEPRINT_CONTENT_SHA256], (
+        "the current block must name exactly one current blueprint digest"
     )
-    assert EXPECTED_CANDIDATE_ID in section, (
-        "section 8 must name the current candidate spec id"
+    assert re.findall(
+        r"spec ID\s+`(tpr-round0a-candidate-[0-9a-f]{16})`",
+        current,
+        flags=re.IGNORECASE,
+    ) == [EXPECTED_CANDIDATE_ID], (
+        "the current block must name exactly one current candidate spec id"
     )
-    assert EXPECTED_CANDIDATE_ARTIFACT_SHA256 in section.lower(), (
-        "section 8 must name the current candidate artifact digest"
+    assert re.findall(
+        r"semantic hash\s+`([0-9a-f]{64})`", current, flags=re.IGNORECASE
+    ) == [EXPECTED_CANDIDATE_HASH], (
+        "the current block must name exactly one current candidate semantic hash"
     )
+    assert re.findall(
+        r"artifact SHA-256\s+`([0-9a-f]{64})`",
+        current,
+        flags=re.IGNORECASE,
+    ) == [EXPECTED_CANDIDATE_ARTIFACT_SHA256], (
+        "the current block must name exactly one current candidate artifact digest"
+    )
+    assert "29-page v2.2" in normalized_current
+    assert CLAUDE_V22_REVIEW_HEAD in normalized_current
+    assert "Claude's independent review is complete" in normalized_current
+    assert "No next implementation milestone is authorized" in normalized_current
+    assert "TPR-1 remains blocked" in normalized_current
+    assert "reviewed-spec registry remains empty" in normalized_current
+    assert "pending Claude review of this Codex round" not in normalized_current
+
+    routing_row = next(
+        line
+        for line in _record_section("## 9. Out-of-lane findings ledger").splitlines()
+        if "`TPR-OOL-001-R1`" in line
+    )
+    assert "29-page v2.2" in routing_row
+    assert BLUEPRINT_CONTENT_SHA256 in routing_row.lower()
+
+    for name in ("ACTION_PLAN_2026-08-20.md", "SESSION_HANDOFF.md"):
+        document = _doc(name)
+        assert CLAUDE_V22_REVIEW_HEAD in document
+        assert "No next implementation milestone is authorized" in document

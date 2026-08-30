@@ -21,12 +21,12 @@ their lane-owned artifacts.
   it with `git fetch`. Note that the merge preceded the mandated independent
   review recorded below, which was performed afterwards against the same
   published range.
-- The current Codex round counter-reviewed all six Claude commits through
-  `2ec0fad` and implemented the owner-approved v2.2 fixed-slot amendment at
-  `bb8dfb6`. All six commits are accepted after correction; no P0/P1 was
-  found. The new cumulative tree is unaccepted pending Claude's independent
-  review of this round's exact single-push snapshot and Codex's later
-  counter-review.
+- The owner-approved v2.2 fixed-slot amendment at `bb8dfb6` has completed
+  Claude's independent review and Codex's commit-by-commit counter-review.
+  Claude's exact correction range is `fe056be..db6a721`, with full review head
+  `db6a721d45eb47e1a133744387bf43a1aa1f310c`; all three commits are accepted
+  after correction or qualification, with no P0/P1. Sections 17 and 18 of the
+  lane record contain the exact dispositions.
 - The current zero-access TPR-0A implementation candidate is
   `research/target_price_revisions/specs/tpr_round0a.candidate.json`: spec ID
   `tpr-round0a-candidate-74b096af24c8d481`, semantic hash
@@ -37,8 +37,9 @@ their lane-owned artifacts.
   pending prerequisites. The reviewed-spec registry is empty; research-source
   and permanent-look declarations are exact zero-access artifacts. One
   `planned_unbound` primary confirmatory look/cell allocation is `1/80`, but
-  no look is authorized or spent. The candidate is pending Claude review of
-  the exact single-push snapshot and subsequent Codex counter-review.
+  no look is authorized or spent. The reviewed-spec registry remains empty,
+  and the candidate remains unreviewed for its own registry; completing the
+  human review loop grants no positive algorithm authority.
 - The cumulative committed validation tree `6b12102` passed the full suite:
   **5,842 passed, 5 skipped, 25 warnings in 1,065.11 seconds**. Full compilation
   including `research` passed. The focused implementation/import suite passed
@@ -89,10 +90,13 @@ their lane-owned artifacts.
   One P2 (`TPR-CR3-001`) and one P3 (`TPR-CR3-002`) were found and closed:
   the record's current-state section still pinned the superseded v2.1
   blueprint and candidate identities, which a new guard now prevents.
-- The next external gate is Codex's counter-review of every Claude commit in
-  this round. TPR-0B and TPR-1 remain blocked on their own gates, and the
-  three sibling-lane re-freezes under `TPR-OOL-006` still gate every lane's
-  outcome access.
+- Codex's counter-review of every Claude commit in this round is complete.
+  No next implementation milestone is authorized: TPR-1 remains blocked on
+  an exact separately reviewed source-rights artifact, TPR-0B remains blocked
+  on reviewed TPR-1/TPR-2 structural manifests, and the three sibling-lane
+  re-freezes under `TPR-OOL-006` still gate every lane's outcome access. After
+  this counter-review correction round's single push, Claude reviews only its
+  exact target-only correction range on the same branch.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (29 pages; raw binary SHA-256
@@ -135,10 +139,11 @@ their lane-owned artifacts.
   `31c313e`, and is expressly extended to TPR by the current owner approval.
   All four families must leave the reserve unconsumed.
 - Claude's complete six-commit range through `2ec0fad` is accepted after Codex
-  correction, and the owner-approved v2.2 fixed-slot TPR-0A candidate is
-  implemented at `bb8dfb6`. It remains unaccepted pending Claude's review of
-  this round's exact single-push snapshot and Codex's counter-review. This
-  decision does not supply or authorize provider credentials,
+  correction, and the owner-approved v2.2 fixed-slot TPR-0A snapshot at
+  `bb8dfb6` has now also completed Claude review and Codex counter-review
+  through `db6a721d45eb47e1a133744387bf43a1aa1f310c`. It remains an unreviewed
+  candidate for its own empty reviewed-spec registry. This decision does not
+  supply or authorize provider credentials,
   schemas, licensed rows, source evidence, outcome access, a permanent-look
   spend authority, ETF work, QC processing, shadow, paper, live, unattended,
   deployment, broker, or capital authority; all remain zero or separately
@@ -427,8 +432,9 @@ It is a separate fourth planning lane under the owner-directed serialized
 same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. The
-v2.2 implementation snapshot is `bb8dfb6`; it is pending Claude review of this
-round's exact single-push snapshot and later Codex counter-review. No
+v2.2 implementation snapshot is `bb8dfb6`; Claude's review is complete through
+`db6a721d45eb47e1a133744387bf43a1aa1f310c`, and Codex's counter-review is
+recorded in section 18 of the lane record. No
 provider-specific target reader/normalizer, authenticated target event,
 permanent target look authority, stock score, ETF topology, portfolio, QC
 algorithm, prospective shadow/paper evidence, or live authority exists. The
@@ -437,13 +443,18 @@ unreviewed TPR-0A candidate is
 `74b096af24c8d48196054f56deb562924380884c1b14b747ba432cc57658df2c`,
 artifact SHA-256
 `17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a`,
-with 39 null empirical child bindings and 48 total pending prerequisites. One
+with 39 null empirical child bindings and 48 total pending prerequisites. The
+reviewed-spec registry remains empty, and the candidate remains unreviewed for
+its own registry. One
 `planned_unbound` confirmatory look/cell allocation exists at `1/80`, but no
 look is authorized or spent.
 The submitted plan is replaced by the sole-normative corrected stock-first
 29-page v2.2 blueprint whose later QC/autopilot stages remain individually
-owner-gated. The exact next external action is Claude review of the single-
-push v2.2 range on the same branch, not TPR-1 or data access.
+owner-gated. No next implementation milestone is authorized: TPR-1 remains
+blocked on exact reviewed source rights and TPR-0B remains blocked on reviewed
+TPR-1/TPR-2 structural manifests. After Codex's single counter-review push,
+Claude reviews only that correction range on the same branch, not TPR-1 or
+data access.
 
 ## 5. Data acquisitions and confirmations
 

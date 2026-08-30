@@ -15,7 +15,10 @@ from zoneinfo import ZoneInfo
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from ml.immutable_io import ImmutableFileConflictError, publish_immutable_bytes
-from research.short_interest_etf.availability import snapshot_execution_cohort
+from research.short_interest_etf.availability import (
+    ExecutionCohort,
+    snapshot_execution_cohort,
+)
 from research.short_interest_etf.contracts import (
     CollectionManifest,
     ReleaseCalendarEntry,
@@ -611,6 +614,159 @@ def load_synthetic_fixture(path: str | Path) -> ShortInterestVintage:
     return build_vintage(manifest, releases, snapshots, refusals)
 
 
+@dataclass(frozen=True)
+class _SnapshotExecutionSelection:
+    """Canonical source selection at one snapshot's authenticated open."""
+
+    cohort: ExecutionCohort
+    is_visible: bool
+    is_delta_eligible: bool
+    prior_snapshot: ShortInterestSnapshot | None
+
+
+class _SourceVisibilitySweep:
+    """One canonical latest-visible-revision sweep over an immutable vintage."""
+
+    def __init__(self, vintage: ShortInterestVintage) -> None:
+        release_by_key = {item.key: item for item in vintage.release_calendar}
+        events: list[
+            tuple[datetime, datetime, str, str, ShortInterestSnapshot]
+        ] = []
+        cohort_by_event: dict[str, ExecutionCohort] = {}
+        for snapshot in vintage.snapshots:
+            cohort = snapshot_execution_cohort(
+                snapshot,
+                release_by_key[snapshot.release_calendar_key],
+            )
+            cohort_by_event[snapshot.event_id] = cohort
+            events.append(
+                (
+                    parse_utc_timestamp(cohort.opens_at, "cohort.opens_at"),
+                    parse_utc_timestamp(
+                        snapshot.revision_published_at,
+                        "snapshot.revision_published_at",
+                    ),
+                    snapshot.logical_id,
+                    snapshot.event_id,
+                    snapshot,
+                )
+            )
+        self.cohort_by_event: dict[str, ExecutionCohort] = cohort_by_event
+        self._events = sorted(events)
+        self._event_index = 0
+        self._cutoff: datetime | None = None
+        self._selected_by_logical: dict[
+            str,
+            tuple[datetime, ShortInterestSnapshot],
+        ] = {}
+        self._selected_by_identity: dict[
+            tuple[str, str],
+            tuple[str, ShortInterestSnapshot],
+        ] = {}
+
+    @staticmethod
+    def _identity(snapshot: ShortInterestSnapshot) -> tuple[str, str]:
+        return snapshot.security.security_id, snapshot.settlement_date
+
+    def advance(self, cutoff: datetime) -> None:
+        if self._cutoff is not None and cutoff < self._cutoff:
+            raise _refuse("source visibility sweep cutoffs must be nondecreasing")
+        self._cutoff = cutoff
+        while (
+            self._event_index < len(self._events)
+            and self._events[self._event_index][0] <= cutoff
+        ):
+            _, revision_at, logical_id, _, snapshot = self._events[
+                self._event_index
+            ]
+            previous = self._selected_by_logical.get(logical_id)
+            if previous is None or revision_at > previous[0]:
+                if previous is not None:
+                    previous_identity = self._identity(previous[1])
+                    selected = self._selected_by_identity.get(previous_identity)
+                    if selected is not None and selected[0] == logical_id:
+                        self._selected_by_identity.pop(previous_identity)
+                identity = self._identity(snapshot)
+                conflict = self._selected_by_identity.get(identity)
+                if conflict is not None and conflict[0] != logical_id:
+                    raise _refuse(
+                        "execution-visible source snapshot identity is ambiguous"
+                    )
+                self._selected_by_logical[logical_id] = (
+                    revision_at,
+                    snapshot,
+                )
+                self._selected_by_identity[identity] = (logical_id, snapshot)
+            self._event_index += 1
+
+    def selected_for_logical(
+        self, logical_id: str
+    ) -> ShortInterestSnapshot | None:
+        selected = self._selected_by_logical.get(logical_id)
+        return selected[1] if selected is not None else None
+
+    def selected_for_identity(
+        self, security_id: str, settlement_date: str
+    ) -> ShortInterestSnapshot | None:
+        selected = self._selected_by_identity.get(
+            (security_id, settlement_date)
+        )
+        return selected[1] if selected is not None else None
+
+    def visible_snapshots(self) -> tuple[ShortInterestSnapshot, ...]:
+        return tuple(
+            sorted(
+                (item[1] for item in self._selected_by_logical.values()),
+                key=lambda item: (
+                    item.settlement_date,
+                    item.security.security_id,
+                ),
+            )
+        )
+
+
+def _snapshot_execution_selection_index(
+    vintage: ShortInterestVintage,
+) -> dict[str, _SnapshotExecutionSelection]:
+    """Index visibility, immediate prior, and delta eligibility for all rows."""
+    if type(vintage) is not ShortInterestVintage:
+        raise _refuse("vintage must be the exact ShortInterestVintage type")
+    sweep = _SourceVisibilitySweep(vintage)
+    queries = sorted(
+        (
+            parse_utc_timestamp(
+                sweep.cohort_by_event[snapshot.event_id].opens_at,
+                "cohort.opens_at",
+            ),
+            snapshot.event_id,
+            snapshot,
+        )
+        for snapshot in vintage.snapshots
+    )
+    selections: dict[str, _SnapshotExecutionSelection] = {}
+    for execution_at, event_id, snapshot in queries:
+        sweep.advance(execution_at)
+        visible = sweep.selected_for_logical(snapshot.logical_id)
+        prior = sweep.selected_for_identity(
+            snapshot.security.security_id,
+            snapshot.previous_settlement_date,
+        )
+        is_visible = visible is not None and visible.event_id == event_id
+        selections[event_id] = _SnapshotExecutionSelection(
+            cohort=sweep.cohort_by_event[event_id],
+            is_visible=is_visible,
+            is_delta_eligible=(
+                is_visible
+                and prior is not None
+                and prior.current_short_shares == snapshot.previous_short_shares
+            ),
+            prior_snapshot=prior,
+        )
+    if len(selections) != len(vintage.snapshots):
+        raise _refuse("execution selection index does not cover every source event")
+    return selections
+
+
 def visible_source_snapshots_as_of(
     vintage: ShortInterestVintage,
     cutoff: datetime,
@@ -628,32 +784,9 @@ def visible_source_snapshots_as_of(
         or cutoff.utcoffset() is None
     ):
         raise _refuse("cutoff must be a timezone-aware datetime")
-    cutoff_utc = cutoff.astimezone(timezone.utc)
-    release_by_key = {item.key: item for item in vintage.release_calendar}
-    selected: dict[str, ShortInterestSnapshot] = {}
-    for snapshot in vintage.snapshots:
-        cohort = snapshot_execution_cohort(
-            snapshot, release_by_key[snapshot.release_calendar_key]
-        )
-        opens_at = parse_utc_timestamp(cohort.opens_at, "cohort.opens_at")
-        if opens_at > cutoff_utc:
-            continue
-        previous = selected.get(snapshot.logical_id)
-        if previous is None or (
-            parse_utc_timestamp(
-                snapshot.revision_published_at, "snapshot.revision_published_at"
-            )
-            > parse_utc_timestamp(
-                previous.revision_published_at, "previous.revision_published_at"
-            )
-        ):
-            selected[snapshot.logical_id] = snapshot
-    return tuple(
-        sorted(
-            selected.values(),
-            key=lambda item: (item.settlement_date, item.security.security_id),
-        )
-    )
+    sweep = _SourceVisibilitySweep(vintage)
+    sweep.advance(cutoff.astimezone(timezone.utc))
+    return sweep.visible_snapshots()
 
 
 def delta_eligible_snapshots_as_of(

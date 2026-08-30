@@ -8,8 +8,10 @@ from pathlib import Path
 
 import pytest
 
+import research.short_interest_etf.pit_eligibility as pit_eligibility_module
 import research.short_interest_etf.stock_features as stock_features_module
 from data.hashing import hash_payload
+from research.short_interest_etf.availability import snapshot_execution_cohort
 from research.short_interest_etf.contracts import (
     DenominatorKind,
     parse_utc_timestamp,
@@ -114,6 +116,37 @@ def _contains_float(value) -> bool:
     if isinstance(value, list):
         return any(_contains_float(item) for item in value)
     return False
+
+
+def _legacy_visible_source_snapshots_as_of(vintage, cutoff):
+    """Frozen pre-index oracle for differential visibility checks."""
+    release_by_key = {item.key: item for item in vintage.release_calendar}
+    selected = {}
+    for snapshot in vintage.snapshots:
+        cohort = snapshot_execution_cohort(
+            snapshot,
+            release_by_key[snapshot.release_calendar_key],
+        )
+        if parse_utc_timestamp(cohort.opens_at, "cohort.opens_at") > cutoff:
+            continue
+        previous = selected.get(snapshot.logical_id)
+        if previous is None or parse_utc_timestamp(
+            snapshot.revision_published_at,
+            "snapshot.revision_published_at",
+        ) > parse_utc_timestamp(
+            previous.revision_published_at,
+            "previous.revision_published_at",
+        ):
+            selected[snapshot.logical_id] = snapshot
+    return tuple(
+        sorted(
+            selected.values(),
+            key=lambda item: (
+                item.settlement_date,
+                item.security.security_id,
+            ),
+        )
+    )
 
 
 def test_every_source_event_keeps_a_feature_or_its_exact_readiness_refusal():
@@ -488,7 +521,7 @@ def test_context_indices_match_the_complete_legacy_visibility_rule():
                 for item in vintage.snapshots
                 if item.event_id == readiness.event_id
             )
-            visible = visible_source_snapshots_as_of(
+            visible = _legacy_visible_source_snapshots_as_of(
                 vintage,
                 parse_utc_timestamp(
                     readiness.execution_at,
@@ -574,7 +607,7 @@ def test_context_index_keeps_latest_revision_when_older_revision_opens_later():
         for item in context.readiness_rows
         if item.event_id == delayed_current.event_id
     )
-    visible = visible_source_snapshots_as_of(
+    visible = _legacy_visible_source_snapshots_as_of(
         indexed_vintage,
         parse_utc_timestamp(readiness.execution_at, "readiness.execution_at"),
     )
@@ -589,26 +622,75 @@ def test_context_index_keeps_latest_revision_when_older_revision_opens_later():
     assert context.prior_snapshot_for_event(delayed_current.event_id) == early_r3
 
 
-def test_context_builds_one_prior_index_per_batch(monkeypatch):
-    index_calls = []
-    real_builder = stock_features_module._build_prior_snapshot_index
+def test_context_builds_authenticated_readiness_once_per_batch(monkeypatch):
+    build_calls = []
+    real_builder = stock_features_module._build_authenticated_readiness
 
-    def counted_builder(vintage, readiness_rows):
-        index_calls.append((vintage, readiness_rows))
-        return real_builder(vintage, readiness_rows)
+    def counted_builder(vintage, references):
+        build_calls.append((vintage, references))
+        return real_builder(vintage, references)
 
     monkeypatch.setattr(
         stock_features_module,
-        "_build_prior_snapshot_index",
+        "_build_authenticated_readiness",
+        counted_builder,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "_build_authenticated_readiness",
         counted_builder,
     )
     vintage = _vintage()
-    dispositions = build_pit_stock_raw_features(vintage, _references())
+    references = _references()
+    dispositions = build_pit_stock_raw_features(vintage, references)
 
-    assert len(index_calls) == 1
-    assert index_calls[0][1] == tuple(
+    assert build_calls == [(vintage, references)]
+    assert dispositions[0].source_context.readiness_rows == tuple(
         item.readiness for item in dispositions
     )
+
+
+def test_reference_bundle_digest_cost_is_constant_per_feature_batch(monkeypatch):
+    vintage = _vintage()
+    current = vintage.snapshots[1]
+    correction = replace(
+        current,
+        source_record_id="synthetic-si-2024-01-31-r2-digest-count",
+        revision_id="r2",
+        revision_published_at=vintage.manifest.retrieved_at,
+        observed_at=vintage.manifest.retrieved_at,
+        supersedes_event_id=current.event_id,
+        raw_record_sha256="66" * 32,
+    )
+    corrected_vintage = build_vintage(
+        replace(
+            vintage.manifest,
+            requested_record_count=3,
+            input_row_count=3,
+            accepted_record_count=3,
+        ),
+        vintage.release_calendar,
+        (*vintage.snapshots, correction),
+    )
+    references = _references()
+    digest_calls = []
+    real_digest = PitReferenceBundle.sha256.fget
+    assert real_digest is not None
+
+    def counted_digest(bundle):
+        digest_calls.append(bundle)
+        return real_digest(bundle)
+
+    monkeypatch.setattr(
+        PitReferenceBundle,
+        "sha256",
+        property(counted_digest),
+    )
+
+    dispositions = build_pit_stock_raw_features(corrected_vintage, references)
+
+    assert sum(item.feature is not None for item in dispositions) == 2
+    assert digest_calls == [references, references, references]
 
 
 def test_context_indices_are_immutable_and_digest_is_cached(monkeypatch):
@@ -920,6 +1002,19 @@ def test_source_context_recomputes_and_rejects_coherent_readiness_row_tampering(
         match="readiness_rows do not exactly match",
     ):
         replace(context, readiness_rows=tuple(changed_rows))
+
+
+def test_source_context_refuses_duplicate_readiness_events_before_rebuilding():
+    disposition, _ = _ready_feature()
+    assert disposition.source_context is not None
+    context = disposition.source_context
+    duplicate = (context.readiness_rows[0], context.readiness_rows[0])
+
+    with pytest.raises(
+        StockFeatureError,
+        match="readiness_rows contain duplicate event_id",
+    ):
+        replace(context, readiness_rows=duplicate)
 
 
 @pytest.mark.parametrize(

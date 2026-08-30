@@ -9,14 +9,14 @@ from __future__ import annotations
 
 import dataclasses
 import json
-from datetime import datetime
+from bisect import bisect_left, bisect_right
+from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from data.exchange_calendar import ExchangeCalendarError, session_open_instant
 from data.hashing import hash_payload
-from research.short_interest_etf.availability import snapshot_execution_cohort
 from research.short_interest_etf.contracts import (
     DenominatorKind,
     SourceEntitlement,
@@ -32,9 +32,9 @@ from research.short_interest_etf.contracts import (
 )
 from research.short_interest_etf.dataset import (
     ShortInterestVintage,
+    _SnapshotExecutionSelection,
+    _snapshot_execution_selection_index,
     build_identity,
-    delta_eligible_snapshots_as_of,
-    visible_source_snapshots_as_of,
 )
 
 REFERENCE_SCHEMA_VERSION = "1.0"
@@ -623,98 +623,249 @@ def load_synthetic_pit_reference(path: str | Path) -> PitReferenceBundle:
     )
 
 
-def _select_lifecycle(
-    bundle: PitReferenceBundle,
-    security_id: str,
-    execution_session: str,
-    execution_at: datetime,
-) -> tuple[SecurityLifecycleObservation | None, str | None]:
-    candidates = [
-        item
-        for item in bundle.lifecycles
-        if item.security_id == security_id
-        and _canonical_date(item.effective_date, "lifecycle.effective_date")
-        <= _canonical_date(execution_session, "execution_session")
-        and parse_utc_timestamp(item.available_at, "lifecycle.available_at")
-        <= execution_at
-    ]
-    if not candidates:
-        return None, REFUSAL_MISSING_LIFECYCLE
-    latest_date = max(item.effective_date for item in candidates)
-    latest = [item for item in candidates if item.effective_date == latest_date]
-    if len(latest) != 1:
-        return None, REFUSAL_AMBIGUOUS_LIFECYCLE
-    return latest[0], None
+@dataclasses.dataclass(frozen=True)
+class _ReadinessQuery:
+    event_id: str
+    security_id: str
+    execution_session: str
+    execution_date: date
+    execution_at: datetime
 
 
-def _select_classification(
-    bundle: PitReferenceBundle,
-    security_id: str,
-    execution_session: str,
-    execution_at: datetime,
-) -> tuple[SectorClassificationObservation | None, str | None]:
-    candidates = [
-        item
-        for item in bundle.classifications
-        if item.security_id == security_id
-        and item.valid_on(execution_session)
-        and parse_utc_timestamp(item.available_at, "classification.available_at")
-        <= execution_at
-    ]
-    if not candidates:
-        return None, REFUSAL_MISSING_CLASSIFICATION
-    if len(candidates) != 1:
-        return None, REFUSAL_AMBIGUOUS_CLASSIFICATION
-    return candidates[0], None
+@dataclasses.dataclass(frozen=True)
+class _ReferenceSelection:
+    lifecycle: SecurityLifecycleObservation | None
+    lifecycle_error: str | None
+    classification: SectorClassificationObservation | None
+    classification_error: str | None
 
 
-def build_stock_data_readiness(
+def _query_axes(
+    queries: Sequence[_ReadinessQuery],
+) -> tuple[list[datetime], list[date]]:
+    execution_times = [item.execution_at for item in queries]
+    execution_dates = [item.execution_date for item in queries]
+    if execution_times != sorted(execution_times):
+        raise _refuse("reference queries must be ordered by execution_at")
+    if execution_dates != sorted(execution_dates):
+        raise _refuse("reference query sessions must be nondecreasing")
+    return execution_times, execution_dates
+
+
+def _index_lifecycle_selections(
+    rows: Sequence[SecurityLifecycleObservation],
+    queries: Sequence[_ReadinessQuery],
+) -> dict[str, tuple[SecurityLifecycleObservation | None, str | None]]:
+    execution_times, execution_dates = _query_axes(queries)
+    additions: dict[int, list[SecurityLifecycleObservation]] = {}
+    for row in rows:
+        start = max(
+            bisect_left(
+                execution_times,
+                parse_utc_timestamp(row.available_at, "lifecycle.available_at"),
+            ),
+            bisect_left(
+                execution_dates,
+                _canonical_date(row.effective_date, "lifecycle.effective_date"),
+            ),
+        )
+        if start < len(queries):
+            additions.setdefault(start, []).append(row)
+
+    active_by_date: dict[int, list[SecurityLifecycleObservation]] = {}
+    latest_effective_ordinal: int | None = None
+    selections: dict[
+        str,
+        tuple[SecurityLifecycleObservation | None, str | None],
+    ] = {}
+    for index, query in enumerate(queries):
+        for row in additions.get(index, ()):
+            effective_ordinal = _canonical_date(
+                row.effective_date,
+                "lifecycle.effective_date",
+            ).toordinal()
+            active_by_date.setdefault(effective_ordinal, []).append(row)
+            if (
+                latest_effective_ordinal is None
+                or effective_ordinal > latest_effective_ordinal
+            ):
+                latest_effective_ordinal = effective_ordinal
+        if latest_effective_ordinal is None:
+            selections[query.event_id] = (None, REFUSAL_MISSING_LIFECYCLE)
+            continue
+        candidates = active_by_date[latest_effective_ordinal]
+        if len(candidates) != 1:
+            selections[query.event_id] = (None, REFUSAL_AMBIGUOUS_LIFECYCLE)
+            continue
+        selections[query.event_id] = (candidates[0], None)
+    return selections
+
+
+def _index_classification_selections(
+    rows: Sequence[SectorClassificationObservation],
+    queries: Sequence[_ReadinessQuery],
+) -> dict[str, tuple[SectorClassificationObservation | None, str | None]]:
+    execution_times, execution_dates = _query_axes(queries)
+    additions: dict[int, list[SectorClassificationObservation]] = {}
+    removals: dict[int, list[str]] = {}
+    for row in rows:
+        start = max(
+            bisect_left(
+                execution_times,
+                parse_utc_timestamp(
+                    row.available_at,
+                    "classification.available_at",
+                ),
+            ),
+            bisect_left(
+                execution_dates,
+                _canonical_date(row.valid_from, "classification.valid_from"),
+            ),
+        )
+        end = len(queries) - 1
+        if row.valid_to is not None:
+            end = bisect_right(
+                execution_dates,
+                _canonical_date(row.valid_to, "classification.valid_to"),
+            ) - 1
+        if start <= end and start < len(queries):
+            additions.setdefault(start, []).append(row)
+            removals.setdefault(end + 1, []).append(row.record_id)
+
+    active: dict[str, SectorClassificationObservation] = {}
+    selections: dict[
+        str,
+        tuple[SectorClassificationObservation | None, str | None],
+    ] = {}
+    for index, query in enumerate(queries):
+        for record_id in removals.get(index, ()):
+            active.pop(record_id, None)
+        for row in additions.get(index, ()):
+            active[row.record_id] = row
+        if not active:
+            selections[query.event_id] = (
+                None,
+                REFUSAL_MISSING_CLASSIFICATION,
+            )
+            continue
+        if len(active) != 1:
+            selections[query.event_id] = (
+                None,
+                REFUSAL_AMBIGUOUS_CLASSIFICATION,
+            )
+            continue
+        selections[query.event_id] = (next(iter(active.values())), None)
+    return selections
+
+
+def _build_reference_selection_index(
     vintage: ShortInterestVintage,
     references: PitReferenceBundle,
-) -> tuple[StockDataReadiness, ...]:
-    """Disposition every source snapshot without reading any market outcome."""
+    execution_index: Mapping[str, _SnapshotExecutionSelection],
+) -> dict[str, _ReferenceSelection]:
+    queries_by_security: dict[str, list[_ReadinessQuery]] = {}
+    for snapshot in vintage.snapshots:
+        selection = execution_index[snapshot.event_id]
+        query = _ReadinessQuery(
+            event_id=snapshot.event_id,
+            security_id=snapshot.security.security_id,
+            execution_session=selection.cohort.session,
+            execution_date=_canonical_date(
+                selection.cohort.session,
+                "execution_session",
+            ),
+            execution_at=parse_utc_timestamp(
+                selection.cohort.opens_at,
+                "execution_at",
+            ),
+        )
+        queries_by_security.setdefault(query.security_id, []).append(query)
+
+    lifecycles_by_security: dict[
+        str,
+        list[SecurityLifecycleObservation],
+    ] = {}
+    for row in references.lifecycles:
+        lifecycles_by_security.setdefault(row.security_id, []).append(row)
+    classifications_by_security: dict[
+        str,
+        list[SectorClassificationObservation],
+    ] = {}
+    for row in references.classifications:
+        classifications_by_security.setdefault(row.security_id, []).append(row)
+
+    selections: dict[str, _ReferenceSelection] = {}
+    for security_id, unsorted_queries in queries_by_security.items():
+        queries = tuple(
+            sorted(
+                unsorted_queries,
+                key=lambda item: (
+                    item.execution_at,
+                    item.execution_session,
+                    item.event_id,
+                ),
+            )
+        )
+        lifecycle = _index_lifecycle_selections(
+            lifecycles_by_security.get(security_id, ()),
+            queries,
+        )
+        classification = _index_classification_selections(
+            classifications_by_security.get(security_id, ()),
+            queries,
+        )
+        for query in queries:
+            lifecycle_row, lifecycle_error = lifecycle[query.event_id]
+            classification_row, classification_error = classification[
+                query.event_id
+            ]
+            selections[query.event_id] = _ReferenceSelection(
+                lifecycle=lifecycle_row,
+                lifecycle_error=lifecycle_error,
+                classification=classification_row,
+                classification_error=classification_error,
+            )
+    if len(selections) != len(vintage.snapshots):
+        raise _refuse("reference selection index does not cover every source event")
+    return selections
+
+
+def _build_authenticated_readiness(
+    vintage: ShortInterestVintage,
+    references: PitReferenceBundle,
+) -> tuple[
+    tuple[StockDataReadiness, ...],
+    dict[str, _SnapshotExecutionSelection],
+]:
+    """Build canonical readiness plus its authenticated execution index."""
     if type(vintage) is not ShortInterestVintage:
         raise _refuse("vintage must be the exact ShortInterestVintage type")
     if type(references) is not PitReferenceBundle:
         raise _refuse("references must be the exact PitReferenceBundle type")
+    execution_index = _snapshot_execution_selection_index(vintage)
+    reference_index = _build_reference_selection_index(
+        vintage,
+        references,
+        execution_index,
+    )
     source_identity = build_identity(vintage)
     source_dataset_id = source_identity["dataset_id"]
     reference_bundle_sha256 = references.sha256
-    release_by_key = {item.key: item for item in vintage.release_calendar}
-    availability_cache: dict[datetime, tuple[set[str], set[str]]] = {}
     results: list[StockDataReadiness] = []
 
     for snapshot in vintage.snapshots:
-        cohort = snapshot_execution_cohort(
-            snapshot, release_by_key[snapshot.release_calendar_key]
-        )
-        execution_at = parse_utc_timestamp(cohort.opens_at, "execution_at")
+        execution = execution_index[snapshot.event_id]
+        cohort = execution.cohort
+        reference = reference_index[snapshot.event_id]
         reasons: list[str] = []
-        cached_availability = availability_cache.get(execution_at)
-        if cached_availability is None:
-            visible_ids = {
-                item.event_id
-                for item in visible_source_snapshots_as_of(vintage, execution_at)
-            }
-            eligible_ids = {
-                item.event_id
-                for item in delta_eligible_snapshots_as_of(vintage, execution_at)
-            }
-            availability_cache[execution_at] = (visible_ids, eligible_ids)
-        else:
-            visible_ids, eligible_ids = cached_availability
-        if snapshot.event_id not in visible_ids:
+        if not execution.is_visible:
             reasons.append(REFUSAL_SUPERSEDED)
-        elif snapshot.event_id not in eligible_ids:
+        elif not execution.is_delta_eligible:
             reasons.append(REFUSAL_MISSING_PRIOR)
         if not snapshot.security.valid_on(cohort.session):
             reasons.append(REFUSAL_IDENTITY_NOT_VALID)
-        lifecycle, lifecycle_error = _select_lifecycle(
-            references,
-            snapshot.security.security_id,
-            cohort.session,
-            execution_at,
-        )
+        lifecycle = reference.lifecycle
+        lifecycle_error = reference.lifecycle_error
         if lifecycle_error is not None:
             reasons.append(lifecycle_error)
         elif lifecycle is not None:
@@ -725,12 +876,8 @@ def build_stock_data_readiness(
                 for item in lifecycle.unresolved_actions
             )
 
-        classification, classification_error = _select_classification(
-            references,
-            snapshot.security.security_id,
-            cohort.session,
-            execution_at,
-        )
+        classification = reference.classification
+        classification_error = reference.classification_error
         if classification_error is not None:
             reasons.append(classification_error)
 
@@ -781,13 +928,25 @@ def build_stock_data_readiness(
             )
         )
 
-    return tuple(
-        sorted(
-            results,
-            key=lambda item: (
-                item.settlement_date,
-                item.security_id,
-                item.event_id,
-            ),
-        )
+    return (
+        tuple(
+            sorted(
+                results,
+                key=lambda item: (
+                    item.settlement_date,
+                    item.security_id,
+                    item.event_id,
+                ),
+            )
+        ),
+        execution_index,
     )
+
+
+def build_stock_data_readiness(
+    vintage: ShortInterestVintage,
+    references: PitReferenceBundle,
+) -> tuple[StockDataReadiness, ...]:
+    """Disposition every source snapshot without reading any market outcome."""
+    readiness, _ = _build_authenticated_readiness(vintage, references)
+    return readiness

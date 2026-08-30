@@ -9,7 +9,6 @@ boundary introduces no binary floating-point or undocumented rounding rule.
 from __future__ import annotations
 
 import dataclasses
-from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from fractions import Fraction
 from types import MappingProxyType
@@ -37,7 +36,7 @@ from research.short_interest_etf.dataset import (
 from research.short_interest_etf.pit_eligibility import (
     PitReferenceBundle,
     StockDataReadiness,
-    build_stock_data_readiness,
+    _build_authenticated_readiness,
 )
 from research.short_interest_etf.preregistration import PREREGISTRATION
 
@@ -125,100 +124,13 @@ def _whole_positive_shares(value: str, name: str) -> int:
     return int(parsed)
 
 
-def _build_prior_snapshot_index(
-    vintage: ShortInterestVintage,
-    readiness_rows: tuple[StockDataReadiness, ...],
-) -> dict[str, ShortInterestSnapshot | None]:
-    """Resolve every execution-visible prior in one availability sweep."""
-    readiness_by_event = {item.event_id: item for item in readiness_rows}
-    events_by_key: dict[
-        tuple[str, str],
-        list[tuple[datetime, datetime, str, str, ShortInterestSnapshot]],
-    ] = {}
-    for snapshot in vintage.snapshots:
-        readiness = readiness_by_event[snapshot.event_id]
-        events_by_key.setdefault(
-            (
-                snapshot.security.security_id,
-                snapshot.settlement_date,
-            ),
-            [],
-        ).append(
-            (
-                parse_utc_timestamp(
-                    readiness.execution_at,
-                    "readiness.execution_at",
-                ),
-                parse_utc_timestamp(
-                    snapshot.revision_published_at,
-                    "snapshot.revision_published_at",
-                ),
-                snapshot.logical_id,
-                snapshot.event_id,
-                snapshot,
-            )
-        )
-
-    snapshot_by_event = {item.event_id: item for item in vintage.snapshots}
-    queries_by_key: dict[
-        tuple[str, str],
-        list[tuple[datetime, str]],
-    ] = {}
-    for readiness in readiness_rows:
-        current = snapshot_by_event[readiness.event_id]
-        queries_by_key.setdefault(
-            (
-                current.security.security_id,
-                current.previous_settlement_date,
-            ),
-            [],
-        ).append(
-            (
-                parse_utc_timestamp(
-                    readiness.execution_at,
-                    "readiness.execution_at",
-                ),
-                readiness.event_id,
-            )
-        )
-
-    prior_by_event: dict[str, ShortInterestSnapshot | None] = {}
-    for key, queries in queries_by_key.items():
-        events = sorted(
-            events_by_key.get(key, ()),
-            key=lambda item: (item[0], item[1], item[2], item[3]),
-        )
-        latest_by_logical: dict[
-            str,
-            tuple[datetime, ShortInterestSnapshot],
-        ] = {}
-        event_index = 0
-        for cutoff, current_event_id in sorted(queries):
-            while event_index < len(events) and events[event_index][0] <= cutoff:
-                _, revision_at, logical_id, _, snapshot = events[event_index]
-                previous = latest_by_logical.get(logical_id)
-                if previous is None or revision_at > previous[0]:
-                    latest_by_logical[logical_id] = (revision_at, snapshot)
-                event_index += 1
-            if len(latest_by_logical) > 1:
-                raise _refuse("execution-visible prior snapshot is ambiguous")
-            prior_by_event[current_event_id] = (
-                next(iter(latest_by_logical.values()))[1]
-                if latest_by_logical
-                else None
-            )
-    if len(prior_by_event) != len(readiness_rows):
-        raise _refuse("prior index does not cover every readiness event")
-    return prior_by_event
-
-
 @dataclasses.dataclass(frozen=True)
 class StockFeatureSourceContext:
     """One authenticated source/reference batch and its exact readiness rows."""
 
     source_vintage: ShortInterestVintage
     reference_bundle: PitReferenceBundle
-    readiness_rows: tuple[StockDataReadiness, ...]
+    readiness_rows: tuple[StockDataReadiness, ...] | None = None
     schema_version: str = SOURCE_CONTEXT_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -230,24 +142,37 @@ class StockFeatureSourceContext:
             raise _refuse(
                 "context reference_bundle must be the exact PitReferenceBundle type"
             )
-        if type(self.readiness_rows) is not tuple or not all(
-            type(item) is StockDataReadiness for item in self.readiness_rows
-        ):
-            raise _refuse(
-                "context readiness_rows must be an exact tuple of exact "
-                "StockDataReadiness values"
-            )
-        event_ids = [item.event_id for item in self.readiness_rows]
-        if len(event_ids) != len(set(event_ids)):
-            raise _refuse("context readiness_rows contain duplicate event_id")
-        expected = build_stock_data_readiness(
+        provided_readiness = self.readiness_rows
+        if provided_readiness is not None:
+            if type(provided_readiness) is not tuple or not all(
+                type(item) is StockDataReadiness for item in provided_readiness
+            ):
+                raise _refuse(
+                    "context readiness_rows must be an exact tuple of exact "
+                    "StockDataReadiness values"
+                )
+            provided_event_ids = [
+                item.event_id for item in provided_readiness
+            ]
+            if len(provided_event_ids) != len(set(provided_event_ids)):
+                raise _refuse(
+                    "context readiness_rows contain duplicate event_id"
+                )
+        expected, execution_index = _build_authenticated_readiness(
             self.source_vintage,
             self.reference_bundle,
         )
-        if self.readiness_rows != expected:
-            raise _refuse(
-                "context readiness_rows do not exactly match source/reference data"
-            )
+        if provided_readiness is None:
+            object.__setattr__(self, "readiness_rows", expected)
+        else:
+            if provided_readiness != expected:
+                raise _refuse(
+                    "context readiness_rows do not exactly match "
+                    "source/reference data"
+                )
+        readiness_rows = self.readiness_rows
+        if type(readiness_rows) is not tuple:
+            raise _refuse("context readiness_rows were not authenticated")
         if (
             type(self.schema_version) is not str
             or self.schema_version != SOURCE_CONTEXT_SCHEMA_VERSION
@@ -258,7 +183,7 @@ class StockFeatureSourceContext:
             )
 
         readiness_by_event = {
-            item.event_id: item for item in self.readiness_rows
+            item.event_id: item for item in readiness_rows
         }
         snapshot_by_event = {
             item.event_id: item for item in self.source_vintage.snapshots
@@ -270,10 +195,10 @@ class StockFeatureSourceContext:
                 "context readiness event set does not exactly match source_vintage"
             )
 
-        prior_by_event = _build_prior_snapshot_index(
-            self.source_vintage,
-            self.readiness_rows,
-        )
+        prior_by_event = {
+            event_id: selection.prior_snapshot
+            for event_id, selection in execution_index.items()
+        }
 
         object.__setattr__(
             self,
@@ -867,12 +792,15 @@ def build_pit_stock_raw_features(
         raise _refuse("references must be the exact PitReferenceBundle type")
 
     source_identity = build_identity(vintage)
-    readiness_rows = build_stock_data_readiness(vintage, references)
+    reference_bundle_sha256 = references.sha256
+    preregistration_sha256 = PREREGISTRATION.sha256
     source_context = StockFeatureSourceContext(
         source_vintage=vintage,
         reference_bundle=references,
-        readiness_rows=readiness_rows,
     )
+    readiness_rows = source_context.readiness_rows
+    if type(readiness_rows) is not tuple:
+        raise _refuse("source context did not authenticate readiness rows")
     dispositions: list[StockFeatureDisposition] = []
 
     for readiness in readiness_rows:
@@ -946,8 +874,8 @@ def build_pit_stock_raw_features(
             source_dataset_id=source_identity["dataset_id"],
             source_vintage_sha256=source_identity["content_hash"],
             reference_dataset_id=references.manifest.reference_dataset_id,
-            reference_bundle_sha256=references.sha256,
-            preregistration_sha256=PREREGISTRATION.sha256,
+            reference_bundle_sha256=reference_bundle_sha256,
+            preregistration_sha256=preregistration_sha256,
             readiness_sha256=readiness.sha256,
             prior_readiness_sha256=prior_readiness.sha256,
             event_id=current.event_id,

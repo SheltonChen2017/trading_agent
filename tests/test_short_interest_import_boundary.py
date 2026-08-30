@@ -131,6 +131,7 @@ def test_daily_volume_refusal_is_bound_into_immutable_identity():
 def test_lane_package_has_no_provider_outcome_or_authority_imports():
     allowed_modules = {
         "__future__",
+        "bisect",
         "collections",
         "dataclasses",
         "datetime",

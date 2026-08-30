@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pytest
 
+import research.short_interest_etf.dataset as dataset_module
+import research.short_interest_etf.pit_eligibility as pit_eligibility_module
 from data.hashing import hash_payload
 from research.short_interest_etf.contracts import DenominatorKind
 from research.short_interest_etf.dataset import (
@@ -187,6 +189,10 @@ def test_every_source_snapshot_receives_an_explicit_readiness_disposition():
     assert readiness[1].sector_code == "TECHNOLOGY"
     assert readiness[1].industry_code == "SOFTWARE"
     assert len({item.sha256 for item in readiness}) == 2
+    assert [item.sha256 for item in readiness] == [
+        "de3f033099330258e7b29b58c49092fe4e2094d719da453ef027fa96a5c756ee",
+        "9a7bb2278cc49b7354a8808c6589075ed09893605227e2a21e1de947106dd272",
+    ]
     assert [item.event_id for item in readiness] == [
         item.event_id for item in vintage.snapshots
     ]
@@ -217,6 +223,134 @@ def test_every_source_snapshot_receives_an_explicit_readiness_disposition():
             == references.classifications[0].record_id
         )
     assert all(item.sha256 == hash_payload(item.to_payload()) for item in readiness)
+
+
+def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
+    monkeypatch,
+):
+    cohort_calls = []
+    execution_calls = []
+    reference_calls = []
+    real_cohort_builder = dataset_module.snapshot_execution_cohort
+    real_execution_builder = (
+        pit_eligibility_module._snapshot_execution_selection_index
+    )
+    real_reference_builder = (
+        pit_eligibility_module._build_reference_selection_index
+    )
+
+    def counted_cohort_builder(snapshot, release):
+        cohort_calls.append((snapshot, release))
+        return real_cohort_builder(snapshot, release)
+
+    def counted_execution_builder(vintage):
+        execution_calls.append(vintage)
+        return real_execution_builder(vintage)
+
+    def counted_reference_builder(vintage, references, execution_index):
+        reference_calls.append((vintage, references, execution_index))
+        return real_reference_builder(vintage, references, execution_index)
+
+    def forbidden_legacy_scan(*_args, **_kwargs):
+        raise AssertionError("legacy per-cutoff source scan was called")
+
+    monkeypatch.setattr(
+        dataset_module,
+        "snapshot_execution_cohort",
+        counted_cohort_builder,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "_snapshot_execution_selection_index",
+        counted_execution_builder,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "_build_reference_selection_index",
+        counted_reference_builder,
+    )
+    monkeypatch.setattr(
+        dataset_module,
+        "visible_source_snapshots_as_of",
+        forbidden_legacy_scan,
+    )
+    monkeypatch.setattr(
+        dataset_module,
+        "delta_eligible_snapshots_as_of",
+        forbidden_legacy_scan,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "visible_source_snapshots_as_of",
+        forbidden_legacy_scan,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "delta_eligible_snapshots_as_of",
+        forbidden_legacy_scan,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "_select_lifecycle",
+        forbidden_legacy_scan,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "_select_classification",
+        forbidden_legacy_scan,
+        raising=False,
+    )
+
+    vintage = _vintage()
+    references = _references()
+    readiness = build_stock_data_readiness(vintage, references)
+
+    assert len(readiness) == len(vintage.snapshots)
+    assert len(cohort_calls) == len(vintage.snapshots)
+    assert {item[0].event_id for item in cohort_calls} == {
+        item.event_id for item in vintage.snapshots
+    }
+    assert execution_calls == [vintage]
+    assert len(reference_calls) == 1
+    assert reference_calls[0][:2] == (vintage, references)
+    assert set(reference_calls[0][2]) == {
+        item.event_id for item in vintage.snapshots
+    }
+
+
+def test_reference_indices_include_exact_open_and_valid_to_boundaries():
+    bundle = _references()
+    execution_open = "2024-02-13T14:30:00Z"
+    lifecycle = replace(
+        bundle.lifecycles[0],
+        effective_date="2024-02-13",
+        available_at=execution_open,
+        observed_at=execution_open,
+        raw_record_sha256="62" * 32,
+    )
+    classification = replace(
+        bundle.classifications[0],
+        valid_from="2024-02-13",
+        valid_to="2024-02-13",
+        available_at=execution_open,
+        observed_at=execution_open,
+        raw_record_sha256="63" * 32,
+    )
+    boundary_bundle = _reference_bundle(
+        bundle,
+        lifecycles=(lifecycle,),
+        classifications=(classification,),
+    )
+
+    result = build_stock_data_readiness(_vintage(), boundary_bundle)[1]
+
+    assert result.execution_at == execution_open
+    assert result.ready is True
+    assert result.lifecycle_record_id == lifecycle.record_id
+    assert result.classification_record_id == classification.record_id
 
 
 def test_readiness_refusals_reject_tuple_subclass_equality_spoofing():
@@ -393,6 +527,33 @@ def test_conflicting_lifecycle_events_are_ambiguous():
     assert result.ready is False
     assert REFUSAL_AMBIGUOUS_LIFECYCLE in result.refusal_reasons
     assert result.lifecycle_record_id is None
+
+
+def test_lifecycle_precedence_uses_effective_date_not_latest_availability():
+    bundle = _references()
+    newer_effective = replace(
+        bundle.lifecycles[0],
+        effective_date="2024-02-01",
+        available_at="2024-02-01T22:00:00Z",
+        observed_at="2024-02-01T22:00:00Z",
+        raw_record_sha256="64" * 32,
+    )
+    older_effective_but_later_available = replace(
+        bundle.lifecycles[0],
+        effective_date="2024-01-15",
+        available_at="2024-02-12T22:00:00Z",
+        observed_at="2024-02-12T22:00:00Z",
+        raw_record_sha256="65" * 32,
+    )
+    changed = _reference_bundle(
+        bundle,
+        lifecycles=(newer_effective, older_effective_but_later_available),
+    )
+
+    result = build_stock_data_readiness(_vintage(), changed)[1]
+
+    assert result.ready is True
+    assert result.lifecycle_record_id == newer_effective.record_id
 
 
 def test_future_or_wrong_identity_classification_cannot_backfill_sector():

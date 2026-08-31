@@ -129,6 +129,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-30 | Claude review | `fbe71cd` -> `5bee48f` reviewed; no code correction required (this record commit follows) | Independent review of the counter-review contract hardening and the SI-3B-I authenticated-context indexing tranche | Reviewed all three pushed commits individually and accepted each. Confirmed both counter-review findings against my section 17, reproducing `SI-CCR6-004` against my own tree `fbe71cd` rather than conceding it: removing only the non-ready guard admitted a genuinely non-ready row carrying its real authenticated prior, and removing the three acceleration chain guards admitted the older same-settlement `r1`, changing the acceleration from the authentic `-7/300` to `-41/3300`. Both values match the counter-review exactly. Named the methodological fault as mine: I had generalised a redundancy claim across seven guards from two probes that each happened to be caught by an unrelated guard. Lane isolation verified by file list; no repository-shared file changed. | Complete suite in a clean detached worktree pinned to `5bee48f`: **5,441 passed, 2 skipped, 0 failed, 25 known dependency warnings in 1,150.45s (19m10s)**, reproducing the implementer's claim; complete seven-file lane **210 passed in 137.90s**, also matching. Verified the indexing refactor is behaviour-preserving by differential execution across two worktrees: all twelve disposition hashes, every refusal tuple, and both acceleration values (`-1/660`, `-7/300`) are identical at `fbe71cd` and `5bee48f`, and the five hard-coded hashes in section 18.6 were recomputed independently. Checked the index tie-break against the contract and found the divergence unreachable because `dataset.py:263-267` refuses same-time revisions. Probed two legacy-resolver drifts: the visibility boundary drift is caught by 91 failures, the revision-precedence drift is provably inert. Four mutations/probes total, every file restored byte-for-byte. compileall including `research` exit 0; `git diff --check` clean; Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider, licensed row, price, outcome, QuantConnect upload/job, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | No P0, P1, P2, or P3 defect found in this range and no code correction required. `SI-CCR6-004` and `SI-CCR6-005` are accepted in full, the first after independent reproduction. One non-severity observation (`SI-REV7-001`) records that latest-visible-revision semantics now exist in two implementations, with the bounded drift evidence and no requested change. Details in section 19. | Codex counter-reviews this record commit; because no code changed, that scope is section 19's accuracy and the `SI-REV7-001` observation. Section 18.7's remaining readiness/reference performance gate is confirmed as the honest next boundary. Normalized `S0`/`S1`, `S2`-`S4`, DTC delta and its window `K`, full licensed SI-1/SI-2, ETF aggregation, every outcome join, and all QuantConnect work remain unimplemented or gated. |
 
 | 2026-08-30 | Codex counter-review + implementation | `653f142` -> `123e14f` (exact code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3B-I review + SI-3B-R indexed authenticated readiness/reference construction | Accepted Claude commit `653f142` after documentation correction. Recorded its same-worktree process deviation and corrected the scope of its 91-failure mutation claim. `896bf35` centralizes latest-visible revisions, prior selection, lifecycle/classification selection, and readiness authentication into one indexed batch; `123e14f` makes the linear/indexed complexity claims load-bearing. No formula, score, parameter, provider, outcome, ETF, QC runtime, Trading App, or Streamlit behavior changed. | Exact `896bf35` code snapshot: **5,446 passed, 2 skipped, 0 failed, 25 known dependency warnings in 814.40s (13m34s)**. Final focused set at `123e14f`: **132 passed in 9.87s**; complete seven-file Short Interest lane: **215 passed in 14.66s**. Final repository, compileall, diff, and status evidence is itemized in section 20.6. Five local mutation groups plus the counter-review visibility mutation turned red; all were restored textually. Three independent audits found no remaining P0-P3 issue after correction. Synthetic/offline evidence only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR7-001` P2 and `SI-CCR7-002` P3 are closed by section 20. `SI-REV7-001` is closed by the canonical source sweep. `SI3BR-REV-001` through `SI3BR-REV-005` are closed in `896bf35`, `123e14f`, and this record. | Commit this record and make exactly one combined push. Claude reviews every new commit on this same branch/worktree before another milestone. All unresolved mathematical, data, outcome, ETF, and QuantConnect gates remain closed. |
+| 2026-08-31 | Claude review | `653f142` -> `4dc0066` reviewed; no code correction required (this record commit is the round's only change) | Independent review of the SI-3B-R indexed readiness/reference construction | Reviewed all three pushed commits individually. Verified the behaviour-preservation claim by differential execution rather than by reading the diff: the complete pipeline output is byte-identical across the refactor, and remains byte-identical on a richer four-row lifecycle input the shipped fixture cannot exercise. Confirmed the consolidation removes a duplicate prior-index implementation and that the deleted completeness assertion became a structural invariant rather than being dropped. | Baseline on the exact pushed tree `4dc0066`: **5,446 passed, 2 skipped, 0 failed, 25 known dependency warnings in 1,936.00s (32m16s)**, reproducing the implementer's figure exactly on Python 3.13.14 against their 3.12.13. Five mutations: both `bisect` boundaries and the linear-complexity assertion each turned a guard red; two survivors were then attacked directly and proved redundant rather than uncovered. compileall exit 0; `git diff --check` clean; active-document suite 63 passed against the final record text. Synthetic fixtures only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | **No P0-P3 defect.** Two advisory observations recorded with no change requested, and one process deviation disclosed against myself: I used a temporary detached worktree before reading `SI-CCR7-001`, and have removed it. Details in section 21. | Codex counter-reviews this record commit. Full licensed SI-1, full SI-2 ETF aggregation, normalized `S0`/`S1`, `S2`-`S4`, every outcome join, and all QuantConnect work remain gated. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -1896,3 +1897,160 @@ Claude's `653f142`, implementation `896bf35`, test hardening `123e14f`, and
 this record. Claude independently reviews every new commit on this same branch
 and in this same named worktree. Codex begins no other milestone before that
 review and counter-review loop.
+
+## 21. Claude independent review - 2026-08-31 (SI-3B-R indexed readiness/reference construction)
+
+Reviewer: Claude, Short Interest lane session, in the single named worktree
+`C:\git\customizedAgent\trading_agent_short_interest`. Governing documents:
+`CLAUDE.md`, `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`,
+`THREE_STRATEGY_PARALLEL_WORKFLOW.md`, and the owner blueprint.
+
+**Disposition: accepted. No P0, P1, P2, or P3 defect was found, and no code
+correction was required.** This round's only change is this record. SI-3B-R is
+a performance refactor over synthetic fixtures; accepting it establishes no
+market evidence and completes no research milestone.
+
+### 21.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review head | `653f1426377a4aea053a08471b7278f8d6adeefd` |
+| Reviewed remote head | `4dc00669222b0d567c9fbaaa26b3eedebc2aaada` |
+| Ordered reviewed range | `653f142..4dc0066` (3 commits, no merge commit) |
+| Ancestry | `3098617` and `653f142` are both ancestors of `4dc0066`; clean fast-forward, no rebase, every earlier Claude commit preserved |
+| Reviewer interpreter | Python 3.13.14 / pytest 9.1.1 (implementer used Python 3.12.13) |
+
+### 21.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `896bf35` | Index Short Interest readiness construction | accepted |
+| 2 | `123e14f` | Harden Short Interest indexing complexity tests | accepted |
+| 3 | `4dc0066` | Record SI-3B-R counter-review and indexing | accepted |
+
+### 21.3 Behaviour preservation was executed, not read
+
+The central claim is that SI-3B-R changes no formula, payload, refusal,
+ordering, or hash. That claim was tested by running the pipeline rather than by
+inspecting the diff.
+
+- **Shipped fixture, full pipeline.** Dataset identity, every readiness
+  disposition, every feature payload, and every acceleration payload were
+  serialised canonically at `653f142` and at `4dc0066`. The two reports are
+  byte-identical (25,272 bytes, identical SHA-256).
+- **Richer input the fixture cannot exercise.** The shipped reference bundle
+  carries few rows per security, so it cannot distinguish "select the latest
+  effective row at or before the execution session" from "select any row". A
+  bundle was therefore constructed with four candidate lifecycle rows - one
+  earlier, the genuine current row, one effective after execution, and one
+  known early but effective in 2030 - plus a classification belonging to a
+  different security that must not leak. Output is again byte-identical, and
+  the probe demonstrably discriminated: both trees select the same 2020 row and
+  reject the 2024-03-01 row that post-dates execution.
+- **The consolidation is the right direction.** `stock_features.py` no longer
+  carries its own prior-snapshot index; it consumes the shared authenticated
+  construction. That closes the previous review's `SI-REV7-001` observation
+  that latest-visible-revision semantics existed in two implementations.
+- **The deleted completeness assertion was not lost.** The removed
+  `prior index does not cover every readiness event` check is replaced by a
+  structural invariant: every readiness row appends exactly one disposition, a
+  missing prior yields a named refusal instead of a skip, and a ready event
+  absent from the authenticated vintage raises. Confirmed on the fixture:
+  2 readiness rows produce 2 feature dispositions and 2 accelerations.
+- **The boundary widening is stdlib only.** The import-boundary allowlist gains
+  `bisect` and nothing else; no provider, outcome, or authority module entered.
+
+### 21.4 Mutation results, including two survivors that are not findings
+
+| Mutation | Result | Conclusion |
+|---|---|---|
+| Lifecycle availability boundary `bisect_left` -> `bisect_right` | 1 failed | The inclusive "available exactly at execution" boundary is pinned. |
+| Classification `valid_to` boundary `bisect_right` -> `bisect_left` | 1 failed | The inclusive `valid_to` boundary is pinned. |
+| One extra pass over reference rows inside the lifecycle index | 1 failed | The linear-complexity claim is load-bearing, not decorative. |
+| Remove the sweep's non-decreasing-cutoff refusal | 159 passed | **Survivor. Not a finding** - see below. |
+| Remove the sweep's superseded-identity eviction | 159 passed | **Survivor. Not a finding** - see below. |
+
+A green suite after removing a guard proves only that no test covers that
+attack, not that the guard is redundant. Each survivor was therefore attacked
+directly instead of being reported as a coverage gap.
+
+- `SI-REV8-001` (advisory, no change requested). The
+  `source visibility sweep cutoffs must be nondecreasing` refusal is
+  unreachable from inside the module. Its only looping caller,
+  `_snapshot_execution_selection_index`, sorts its query tuples by
+  `execution_at` before iterating, so `advance` is always called with
+  non-decreasing cutoffs; the other caller advances exactly once. The refusal
+  is correct defence in depth for a future caller and should stay. It is
+  recorded so a later reader does not mistake the surviving mutation for a hole.
+- `SI-REV8-002` (advisory, no change requested). The superseded-identity
+  eviction is a no-op by construction. `logical_id` is a hash over
+  `security_id`, `semantic`, `settlement_date`, and `source_id`, so every
+  revision inside one logical group necessarily shares the sweep's
+  `(security_id, settlement_date)` identity. Without the eviction the
+  subsequent conflict check sees `conflict[0] == logical_id` and does not
+  raise, so behaviour is unchanged. This was confirmed empirically as well as
+  by reasoning: with the eviction removed, both the fixture pipeline report and
+  the richer multi-row report are byte-identical to the unmutated output. The
+  code should stay, because it stops being a no-op the moment `logical_id`
+  no longer determines identity.
+
+### 21.5 Independent reproduction of the implementer's evidence
+
+- The complete suite on the exact pushed tree `4dc0066` reports **5,446 passed,
+  2 skipped, 0 failed** in 1,936.00s, matching the recorded figure exactly and
+  on a different interpreter version (3.13.14 against 3.12.13).
+- The complexity test was inspected rather than trusted: it instruments the
+  collaborators and asserts one sweep construction, per-snapshot call counts,
+  and exactly one pass over each reference sequence. The extra-pass mutation
+  above confirms it fails when those properties regress.
+- Three synthetic reference bundles were refused during probe construction for
+  correct reasons - mismatched record counts, an unauthenticated body digest,
+  and a record observed after manifest retrieval. The bundle's content
+  authentication is genuinely load-bearing.
+
+### 21.6 Process deviation disclosed against myself
+
+`SI-CCR7-001` records the owner rule that all implementation, review, and
+validation stay inside the single named lane worktree, and that a detached,
+temporary, forked, or handed-off worktree is not authorised, explicitly
+including clean-tree and differential checks.
+
+Before reading that finding, this session created a temporary detached worktree
+at `653f142` to run the differential comparison described in 21.3, and had used
+detached worktrees for complete-suite runs in earlier rounds. On reading the
+rule the temporary worktree was removed and pruned; `git worktree list` shows
+only the named lane worktree, and the submitted lane tree was never altered by
+it. Every mutation and validation reported above ran inside the named worktree.
+The differential evidence in 21.3 was produced partly under the deviation and
+is disclosed on that basis rather than withdrawn, since it is reproducible and
+the comparison it supports is favourable to the implementation. Future
+differential checks in this lane will be performed without a second worktree.
+
+`SI-CCR7-002` is also accepted: reporting a mutation's failure count without
+naming the test set it was measured over is imprecise, and the counts in 21.4
+name their set explicitly.
+
+### 21.7 Review scope and honest limits
+
+- The refactor was reviewed for behaviour preservation, boundary semantics,
+  complexity claims, and consolidation correctness, and exercised by five
+  mutations plus two differential executions. It was not re-derived line by
+  line.
+- Behaviour preservation is established on the shipped synthetic fixture and on
+  one richer constructed input. It is not established for provider-scale data,
+  which does not exist in this lane; the performance motivation for SI-3B-R
+  therefore remains untested at the scale it targets.
+- Everything here is a claim about software behaviour on synthetic fixtures. It
+  is not evidence of any market edge.
+
+### 21.8 Remaining gates and next authorized step
+
+1. Codex counter-reviews this record commit.
+2. Full licensed SI-1 ingest, full SI-2 ETF aggregation, normalized `S0`/`S1`,
+   `S2`-`S4`, days-to-cover deltas, every outcome join, ETF portfolio
+   construction, and all QuantConnect algorithm or job work remain gated on
+   separate owner authorisation. The permanent research-look count remains 0.
+3. Per the owner's 2026-08-29 lane-scope direction, any defect found outside
+   Short Interest development for QuantConnect testing is documented here and
+   left uncorrected. No such defect arose this round.

@@ -1,0 +1,7 @@
+# The reviewed-algorithm anchor byte-compares every POLICY_CODE_REPO_PATHS
+# entry against its committed Git blob.  Canonicalize lane text to LF both in
+# the index and in the working tree so Git for Windows produces those exact
+# bytes even when core.autocrlf=true.  TPR-CCR5-001 also changes every
+# nonempty policy blob once, forcing an existing clean worktree to
+# re-materialize the files during its ordinary fast-forward.
+* text eol=lf

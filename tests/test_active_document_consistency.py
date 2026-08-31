@@ -374,8 +374,56 @@ def test_main_strategy_direction_preserves_integration_and_authority_gates() -> 
 
 
 def test_main_strategy_direction_pins_reviewed_parallel_coordination_gates() -> None:
-    """Claude's accepted amendments must remain explicit and fail closed."""
+    """Reviewed gates plus the owner-coordinated fourth-family amendment persist."""
     direction = _text("THREE_STRATEGY_PROJECT_DIRECTION.md").lower()
+    normalized = " ".join(direction.split())
+    shared_schedule_documents = {
+        "direction": normalized,
+        "action plan": " ".join(
+            _text("ACTION_PLAN_2026-08-20.md").lower().split()
+        ),
+        "session handoff": " ".join(_text("SESSION_HANDOFF.md").lower().split()),
+    }
+
+    for label, document in shared_schedule_documents.items():
+        assert "target-price revisions" in document, f"{label} omits TPR"
+        assert "fourth" in document, f"{label} omits fourth-family accounting"
+        for session in (
+            "2026-09-01",
+            "2027-08-31",
+            "2027-09-01",
+            "2029-08-31",
+        ):
+            assert session in document, f"{label} omits shared schedule date {session}"
+
+    exact_schedule_roles = {
+        "direction": (
+            "common cutoff session is **2027-08-31**",
+            "untouched shared final holdout is **2027-09-01 through 2029-08-31**",
+            "one-shot lane-validation period is **2026-09-01 through 2027-08-31**",
+        ),
+        "action plan": (
+            "common cutoff is 2027-08-31",
+            "untouched shared final holdout is 2027-09-01 through 2029-08-31",
+            "one-shot validation period is 2026-09-01 through 2027-08-31",
+        ),
+        "session handoff": (
+            "common cutoff session is **2027-08-31**",
+            "untouched shared final holdout is **2027-09-01 through 2029-08-31**",
+            "one-shot validation period is **2026-09-01 through 2027-08-31**",
+        ),
+    }
+    for label, phrases in exact_schedule_roles.items():
+        for phrase in phrases:
+            assert phrase in shared_schedule_documents[label]
+
+    zero_authority_guards = {
+        "direction": "it grants no credential, provider, licensed-row, outcome",
+        "action plan": "it does not schedule provider, outcome, research-look",
+        "session handoff": "this decision does not supply or authorize provider credentials",
+    }
+    for label, phrase in zero_authority_guards.items():
+        assert phrase in shared_schedule_documents[label]
 
     for phrase in (
         "own clone or worktree",
@@ -387,15 +435,22 @@ def test_main_strategy_direction_pins_reviewed_parallel_coordination_gates() -> 
         "common-baseline amendment",
         "one shared final-holdout boundary",
         "shared period unconsumed",
+        "original three lanes",
+        "does not block the original three-codebase integration mechanics",
+        "fourth canonical family and the fourth attempt",
+        "common four-family outcome evaluation remains prohibited",
+        "cutoff session **2027-08-31**",
+        "reserved period **2027-09-01 through 2029-08-31**",
+        "one-shot validation period **2026-09-01 through 2027-08-31**",
         "one selection family",
-        "selected from three parallel attempts",
+        "selected from four attempts",
     ):
-        assert phrase in direction
+        assert phrase in normalized
 
-    assert "must not tune or rerun that family to make it pass" in direction
-    assert "separately preregistered family" in direction
-    assert "new owner-authorized permanent look budget" in direction
-    assert "cannot retroactively rescue the canonical result" in direction
+    assert "must not tune or rerun that family to make it pass" in normalized
+    assert "separately preregistered family" in normalized
+    assert "new owner-authorized permanent look budget" in normalized
+    assert "cannot retroactively rescue the canonical result" in normalized
 
 
 def test_sep3_freeze_record_pins_the_reviewed_pause_without_authorizing_extraction():
@@ -1864,3 +1919,46 @@ def test_every_separation_review_finding_appears_in_the_current_handoff():
         "a separation review report raises findings the current handoff never "
         f"mentions: {missing!r}"
     )
+
+
+_SHA256_SHAPED_TOKEN = re.compile(r"\b[0-9a-f]{55,80}\b", flags=re.IGNORECASE)
+
+
+def _malformed_sha256_tokens(text: str) -> tuple[str, ...]:
+    return tuple(
+        match.group()
+        for match in _SHA256_SHAPED_TOKEN.finditer(text)
+        if len(match.group()) != 64
+    )
+
+
+def test_malformed_sha256_detector_is_case_insensitive() -> None:
+    malformed_upper = "A" * 63
+    assert _malformed_sha256_tokens(malformed_upper) == (malformed_upper,)
+    assert _malformed_sha256_tokens("A" * 64) == ()
+
+
+def test_no_active_document_pins_a_malformed_sha256() -> None:
+    """TPR-CR2-001. A digest-shaped pin that cannot be a digest must fail.
+
+    This invariant is repository-wide, not lane-specific: any active record may
+    pin an artifact, and a pin that is the wrong length establishes nothing
+    while reading exactly like provenance evidence. It first fired on a
+    63-character value carried in a lane record and the canonical handoff.
+
+    The lane-scoped successor in ``tests/target_price_revisions`` checks that
+    one known value is not presented as valid. It cannot see a *new* malformed
+    pin, in that lane or any other, which is what this guard exists to catch.
+    Forty-character Git object names stay legal; only strings long enough to be
+    claiming a SHA-256 are checked.
+    """
+    malformed: list[str] = []
+    for path in (ROOT / "docs").rglob("*.md"):
+        if "Archive" in path.parts:
+            continue
+        for token in _malformed_sha256_tokens(path.read_text(encoding="utf-8")):
+            malformed.append(
+                f"{path.relative_to(ROOT)} pins a {len(token)}-"
+                f"character digest: {token}"
+            )
+    assert not malformed, "; ".join(malformed)

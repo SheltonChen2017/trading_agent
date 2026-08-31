@@ -9,7 +9,10 @@ import subprocess
 from pathlib import Path
 
 from research.target_price_revisions import PRIMARY_CELL_ID, PRIMARY_LOOK_ID
-from research.target_price_revisions.preregistration import load_algorithm_candidate
+from research.target_price_revisions.preregistration import (
+    POLICY_CODE_REPO_PATHS,
+    load_algorithm_candidate,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -83,6 +86,52 @@ def test_blueprint_resolves_as_binary_in_git() -> None:
         "merge": "unset",
         "text": "unset",
     }
+
+
+SHARED_POLICY_PATH = "research/__init__.py"
+
+
+def test_policy_code_is_checked_out_as_exact_bytes() -> None:
+    """TPR-CR4-001: keep the reviewed-algorithm anchor reachable on Windows.
+
+    `_review_anchor` compares every `POLICY_CODE_REPO_PATHS` entry's working
+    bytes against its committed blob.  Git for Windows enables
+    `core.autocrlf` by default, which is the platform this project supports,
+    so an unpinned checkout writes CRLF against LF blobs and the anchor
+    refuses forever.  That refusal is the safe direction, but it makes the
+    reviewed-algorithm authority unreachable, and a later `git add` of a
+    translated working copy would rewrite the very bytes the frozen
+    candidate's `policy_code_sha256` map pins.
+
+    `research/__init__.py` is shared surface outside this lane's attribute
+    scope, so it is covered only while it stays empty.  This guard turns red
+    rather than passing silently if that stops being true.
+    """
+    crlf = bytes((13, 10))
+    for policy_path in POLICY_CODE_REPO_PATHS:
+        working = (ROOT / policy_path).read_bytes()
+        assert crlf not in working, (
+            f"{policy_path} is checked out with CRLF, so the reviewed-algorithm "
+            f"anchor can never match its LF blob"
+        )
+        if policy_path == SHARED_POLICY_PATH:
+            assert working == b"", (
+                f"{policy_path} is outside this lane's attribute scope and is "
+                f"safe only while empty; route a shared .gitattributes change "
+                f"to the owner before giving it content"
+            )
+            continue
+        completed = subprocess.run(
+            ["git", "check-attr", "text", "--", policy_path],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        assert completed.stdout.strip().rsplit(": ", 1)[-1] == "unset", (
+            f"{policy_path} must resolve text as unset so every checkout writes "
+            f"exact bytes regardless of host core.autocrlf"
+        )
 
 
 def test_lane_documents_agree_on_one_worktree() -> None:

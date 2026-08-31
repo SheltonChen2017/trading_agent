@@ -2057,3 +2057,26 @@ failure. The complete suite must be rerun on the exact merge commit before the
 corrective push. No provider, outcome, QuantConnect, broker, deployment,
 order, or trading authority was accessed or granted, and ARV2-4 remains
 blocked.
+
+### 6.6 Exact committed-tree validation and corrective handoff
+
+The corrective merge is committed as
+`d9b05eb6c5911cd78c7f608b795d417e8878f3a1`, with parents exact prior pushed
+Analyst head `7a7757a299adf2a7c5a85c989a75e8f0440043bc` and exact advanced
+`main@19ae3f9f97e088c2e418c4a488bbbaa07303da48`. The previously failing
+Target Price exact-byte guard passed directly on this committed state.
+
+The exact committed repository tree then passed **6,790 tests with 13 skips,
+0 failures, and 26 dependency/runtime warnings in 1,362.48 seconds
+(22m42s)**. The conflict file remained independently green at **57 passed**.
+Repository compileall passed with bytecode redirected to a dedicated temporary
+cache because this sandbox cannot write existing worktree `__pycache__`
+directories. Changed-file diff checking, unmerged-path checking, ancestry, and
+worktree status are clean.
+
+No new P0-P3 finding remains. This documentation-only handoff commit follows
+the fully tested merge. A fresh fetch must still show `19ae3f9f` and prior
+Analyst head `7a7757a2` as ancestors before the one corrective push. The exact
+new pushed snapshot then requires independent review; all research, source,
+outcome, QuantConnect, deployment, broker, order, and trading gates remain
+unchanged.

@@ -7,6 +7,7 @@ research look. Every correction remains a distinct event in immutable storage.
 from __future__ import annotations
 
 import json
+from bisect import bisect_right
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -91,6 +92,77 @@ def fixture_source_payload_sha256(
             "snapshot_rows": list(snapshot_rows),
         }
     )
+
+
+@dataclass(frozen=True)
+class _PriorRevisionSeries:
+    revision_times: tuple[datetime, ...]
+    snapshots: tuple[ShortInterestSnapshot, ...]
+
+
+def _snapshot_prior_identity(
+    snapshot: ShortInterestSnapshot,
+) -> tuple[str, str]:
+    return snapshot.security.security_id, snapshot.settlement_date
+
+
+def _group_prior_revisions(
+    snapshots: Sequence[ShortInterestSnapshot],
+) -> dict[
+    tuple[str, str],
+    list[tuple[datetime, ShortInterestSnapshot]],
+]:
+    grouped: dict[
+        tuple[str, str],
+        list[tuple[datetime, ShortInterestSnapshot]],
+    ] = {}
+    for snapshot in snapshots:
+        grouped.setdefault(_snapshot_prior_identity(snapshot), []).append(
+            (
+                parse_utc_timestamp(
+                    snapshot.revision_published_at,
+                    "snapshot.revision_published_at",
+                ),
+                snapshot,
+            )
+        )
+    return grouped
+
+
+def _build_prior_revision_index(
+    snapshots: Sequence[ShortInterestSnapshot],
+) -> dict[tuple[str, str], _PriorRevisionSeries]:
+    grouped = _group_prior_revisions(snapshots)
+
+    index: dict[tuple[str, str], _PriorRevisionSeries] = {}
+    for identity, versions in grouped.items():
+        ordered = sorted(versions, key=lambda item: (item[0], item[1].event_id))
+        index[identity] = _PriorRevisionSeries(
+            revision_times=tuple(item[0] for item in ordered),
+            snapshots=tuple(item[1] for item in ordered),
+        )
+    return index
+
+
+def _latest_visible_prior(
+    series: _PriorRevisionSeries | None,
+    cutoff: datetime,
+) -> ShortInterestSnapshot | None:
+    if series is None:
+        return None
+    visible_index = bisect_right(series.revision_times, cutoff) - 1
+    if visible_index < 0:
+        return None
+    return series.snapshots[visible_index]
+
+
+def _build_settlement_ordinal(
+    release_settlements: Sequence[str],
+) -> dict[str, int]:
+    return {
+        settlement: index
+        for index, settlement in enumerate(release_settlements)
+    }
 
 
 @dataclass(frozen=True)
@@ -296,19 +368,18 @@ class ShortInterestVintage:
         range_start: Any,
         release_settlements: Sequence[str],
     ) -> None:
-        by_security_settlement: dict[
-            tuple[str, str], list[ShortInterestSnapshot]
-        ] = {}
-        for snapshot in self.snapshots:
-            by_security_settlement.setdefault(
-                (snapshot.security.security_id, snapshot.settlement_date), []
-            ).append(snapshot)
+        settlement_ordinal = _build_settlement_ordinal(release_settlements)
+        prior_revision_index = _build_prior_revision_index(self.snapshots)
 
         for snapshot in self.snapshots:
             previous_date = _canonical_date(
                 snapshot.previous_settlement_date, "previous_settlement_date"
             )
-            current_index = release_settlements.index(snapshot.settlement_date)
+            current_index = settlement_ordinal.get(snapshot.settlement_date)
+            if current_index is None:
+                raise _refuse(
+                    "snapshot settlement is absent from the release calendar"
+                )
             if current_index == 0 and previous_date < range_start:
                 if _canonical_date(
                     snapshot.settlement_date, "settlement_date"
@@ -325,31 +396,24 @@ class ShortInterestVintage:
                         "later snapshot must link to the immediately preceding "
                         "release-calendar settlement for the same stable security_id"
                     )
-            candidates = by_security_settlement.get(
-                (snapshot.security.security_id, snapshot.previous_settlement_date), ()
+            previous = _latest_visible_prior(
+                prior_revision_index.get(
+                    (
+                        snapshot.security.security_id,
+                        snapshot.previous_settlement_date,
+                    )
+                ),
+                parse_utc_timestamp(
+                    snapshot.revision_published_at,
+                    "snapshot.revision_published_at",
+                ),
             )
-            visible_candidates = [
-                candidate
-                for candidate in candidates
-                if parse_utc_timestamp(
-                    candidate.revision_published_at, "candidate.revision_published_at"
-                )
-                <= parse_utc_timestamp(
-                    snapshot.revision_published_at, "snapshot.revision_published_at"
-                )
-            ]
-            if not visible_candidates:
+            if previous is None:
                 raise _refuse(
                     "missing prior snapshot for stable security_id "
                     f"{snapshot.security.security_id!r} at "
                     f"{snapshot.previous_settlement_date}; ticker is not a join key"
                 )
-            previous = max(
-                visible_candidates,
-                key=lambda item: parse_utc_timestamp(
-                    item.revision_published_at, "revision_published_at"
-                ),
-            )
             if snapshot.previous_short_shares != previous.current_short_shares:
                 raise _refuse(
                     "previous_short_shares does not match the latest prior revision "
@@ -664,9 +728,29 @@ class _SourceVisibilitySweep:
             tuple[str, ShortInterestSnapshot],
         ] = {}
 
-    @staticmethod
-    def _identity(snapshot: ShortInterestSnapshot) -> tuple[str, str]:
-        return snapshot.security.security_id, snapshot.settlement_date
+    def _apply_visible_event(
+        self,
+        event: tuple[datetime, datetime, str, str, ShortInterestSnapshot],
+    ) -> None:
+        _, revision_at, logical_id, _, snapshot = event
+        previous = self._selected_by_logical.get(logical_id)
+        if previous is None or revision_at > previous[0]:
+            if previous is not None:
+                previous_identity = _snapshot_prior_identity(previous[1])
+                selected = self._selected_by_identity.get(previous_identity)
+                if selected is not None and selected[0] == logical_id:
+                    self._selected_by_identity.pop(previous_identity)
+            identity = _snapshot_prior_identity(snapshot)
+            conflict = self._selected_by_identity.get(identity)
+            if conflict is not None and conflict[0] != logical_id:
+                raise _refuse(
+                    "execution-visible source snapshot identity is ambiguous"
+                )
+            self._selected_by_logical[logical_id] = (
+                revision_at,
+                snapshot,
+            )
+            self._selected_by_identity[identity] = (logical_id, snapshot)
 
     def advance(self, cutoff: datetime) -> None:
         if self._cutoff is not None and cutoff < self._cutoff:
@@ -676,27 +760,7 @@ class _SourceVisibilitySweep:
             self._event_index < len(self._events)
             and self._events[self._event_index][0] <= cutoff
         ):
-            _, revision_at, logical_id, _, snapshot = self._events[
-                self._event_index
-            ]
-            previous = self._selected_by_logical.get(logical_id)
-            if previous is None or revision_at > previous[0]:
-                if previous is not None:
-                    previous_identity = self._identity(previous[1])
-                    selected = self._selected_by_identity.get(previous_identity)
-                    if selected is not None and selected[0] == logical_id:
-                        self._selected_by_identity.pop(previous_identity)
-                identity = self._identity(snapshot)
-                conflict = self._selected_by_identity.get(identity)
-                if conflict is not None and conflict[0] != logical_id:
-                    raise _refuse(
-                        "execution-visible source snapshot identity is ambiguous"
-                    )
-                self._selected_by_logical[logical_id] = (
-                    revision_at,
-                    snapshot,
-                )
-                self._selected_by_identity[identity] = (logical_id, snapshot)
+            self._apply_visible_event(self._events[self._event_index])
             self._event_index += 1
 
     def selected_for_logical(

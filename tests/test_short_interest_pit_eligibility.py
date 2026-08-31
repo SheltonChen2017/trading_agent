@@ -303,10 +303,14 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     execution_calls = []
     reference_calls = []
     source_sweeps = []
-    lifecycle_row_passes = []
-    classification_row_passes = []
+    source_identity_calls = []
+    lifecycle_row_work = []
+    classification_row_work = []
+    partition_work = []
+    partition_security_ids = []
     real_cohort_builder = dataset_module.snapshot_execution_cohort
     real_source_sweep = dataset_module._SourceVisibilitySweep
+    real_source_identity = dataset_module._snapshot_prior_identity
     real_execution_builder = (
         pit_eligibility_module._snapshot_execution_selection_index
     )
@@ -317,6 +321,7 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     real_classification_index = (
         pit_eligibility_module._index_classification_selections
     )
+    real_partition = pit_eligibility_module._partition_reference_rows
 
     class CountingSequence:
         def __init__(self, rows):
@@ -338,15 +343,51 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
             self.item_reads += len(result) if isinstance(index, slice) else 1
             return result
 
+    class OpaqueSecurityId:
+        hash_calls = 0
+        equality_calls = 0
+
+        def __init__(self, value):
+            self.value = value
+
+        def __hash__(self):
+            type(self).hash_calls += 1
+            return hash(self.value)
+
+        def __eq__(self, other):
+            type(self).equality_calls += 1
+            if isinstance(other, OpaqueSecurityId):
+                other = other.value
+            return self.value == other
+
+        def __str__(self):
+            raise AssertionError(
+                "reference security IDs were laundered to base strings"
+            )
+
+    class CountingReferenceProxy:
+        def __init__(self, row):
+            self.row = row
+            self.security_id = OpaqueSecurityId(row.security_id)
+            partition_security_ids.append(self.security_id)
+
+        def __getattr__(self, name):
+            return getattr(self.row, name)
+
     class CountedSourceSweep(real_source_sweep):
         def __init__(self, vintage):
             super().__init__(vintage)
             self.event_rows = CountingSequence(self._events)
             self._events = self.event_rows
             self.advance_calls = []
+            self.applied_event_ids = []
             self.logical_calls = []
             self.identity_calls = []
             source_sweeps.append(self)
+
+        def _apply_visible_event(self, event):
+            self.applied_event_ids.append(event[3])
+            return super()._apply_visible_event(event)
 
         def advance(self, cutoff):
             self.advance_calls.append(cutoff)
@@ -364,6 +405,10 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         cohort_calls.append((snapshot, release))
         return real_cohort_builder(snapshot, release)
 
+    def counted_source_identity(snapshot):
+        source_identity_calls.append(snapshot.event_id)
+        return real_source_identity(snapshot)
+
     def counted_execution_builder(vintage):
         execution_calls.append(vintage)
         return real_execution_builder(vintage)
@@ -375,13 +420,26 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     def counted_lifecycle_index(rows, queries):
         counted_rows = CountingSequence(rows)
         result = real_lifecycle_index(counted_rows, queries)
-        lifecycle_row_passes.append(counted_rows.passes)
+        lifecycle_row_work.append(
+            (counted_rows.passes, counted_rows.item_reads, len(counted_rows))
+        )
         return result
 
     def counted_classification_index(rows, queries):
         counted_rows = CountingSequence(rows)
         result = real_classification_index(counted_rows, queries)
-        classification_row_passes.append(counted_rows.passes)
+        classification_row_work.append(
+            (counted_rows.passes, counted_rows.item_reads, len(counted_rows))
+        )
+        return result
+
+    def counted_partition(rows):
+        counted_rows = CountingSequence(rows)
+        proxies = tuple(CountingReferenceProxy(row) for row in counted_rows)
+        result = real_partition(proxies)
+        partition_work.append(
+            (rows, counted_rows.passes, counted_rows.item_reads, result)
+        )
         return result
 
     def forbidden_legacy_scan(*_args, **_kwargs):
@@ -396,6 +454,11 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         dataset_module,
         "_SourceVisibilitySweep",
         CountedSourceSweep,
+    )
+    monkeypatch.setattr(
+        dataset_module,
+        "_snapshot_prior_identity",
+        counted_source_identity,
     )
     monkeypatch.setattr(
         pit_eligibility_module,
@@ -416,6 +479,11 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         pit_eligibility_module,
         "_index_classification_selections",
         counted_classification_index,
+    )
+    monkeypatch.setattr(
+        pit_eligibility_module,
+        "_partition_reference_rows",
+        counted_partition,
     )
     monkeypatch.setattr(
         dataset_module,
@@ -453,6 +521,10 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     )
 
     vintage, references = _vintage_and_references_with_second_security()
+    expected_reference_ids = {
+        *(row.record_id for row in references.lifecycles),
+        *(row.record_id for row in references.classifications),
+    }
     lifecycle_source_rows = CountingSequence(references.lifecycles)
     classification_source_rows = CountingSequence(references.classifications)
     object.__setattr__(references, "lifecycles", lifecycle_source_rows)
@@ -466,6 +538,14 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     }
     assert len(source_sweeps) == 1
     assert len(source_sweeps[0].advance_calls) == len(vintage.snapshots)
+    assert len(source_sweeps[0].applied_event_ids) == len(vintage.snapshots)
+    assert set(source_sweeps[0].applied_event_ids) == {
+        item.event_id for item in vintage.snapshots
+    }
+    assert len(source_identity_calls) <= 3 * len(vintage.snapshots)
+    assert set(source_identity_calls) == {
+        item.event_id for item in vintage.snapshots
+    }
     assert len(source_sweeps[0].logical_calls) == len(vintage.snapshots)
     assert len(source_sweeps[0].identity_calls) == len(vintage.snapshots)
     assert source_sweeps[0].event_rows.item_reads <= 3 * len(vintage.snapshots)
@@ -475,14 +555,64 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     assert set(reference_calls[0][2]) == {
         item.event_id for item in vintage.snapshots
     }
-    assert lifecycle_source_rows.passes == 2
-    assert classification_source_rows.passes == 2
-    assert lifecycle_source_rows.item_reads == 2 * len(lifecycle_source_rows)
-    assert classification_source_rows.item_reads == 2 * len(
+    assert 0 < lifecycle_source_rows.passes <= 2
+    assert 0 < classification_source_rows.passes <= 2
+    assert lifecycle_source_rows.item_reads <= 2 * len(lifecycle_source_rows)
+    assert classification_source_rows.item_reads <= 2 * len(
         classification_source_rows
     )
-    assert lifecycle_row_passes == [1, 1]
-    assert classification_row_passes == [1, 1]
+    assert len(partition_work) == 2
+    assert partition_work[0][0] is lifecycle_source_rows
+    assert partition_work[1][0] is classification_source_rows
+    assert all(
+        passes == 1 and item_reads == len(rows)
+        for rows, passes, item_reads, _result in partition_work
+    )
+    assert {
+        row.record_id
+        for _rows, _passes, _reads, partition in partition_work
+        for grouped_rows in partition.values()
+        for row in grouped_rows
+    } == expected_reference_ids
+    assert OpaqueSecurityId.hash_calls <= len(partition_security_ids)
+    assert OpaqueSecurityId.equality_calls <= len(partition_security_ids)
+    assert len(lifecycle_row_work) == 2
+    assert len(classification_row_work) == 2
+    assert all(
+        passes <= 1 and item_reads <= row_count
+        for passes, item_reads, row_count in lifecycle_row_work
+    )
+    assert all(
+        passes <= 1 and item_reads <= row_count
+        for passes, item_reads, row_count in classification_row_work
+    )
+
+
+def test_source_visibility_event_application_cannot_replay_hidden_history():
+    vintage, _references = _vintage_and_references_with_second_security()
+    source = dataset_module._SourceVisibilitySweep(vintage)
+    event = source._events[0]
+
+    class ForbiddenHistory:
+        def __iter__(self):
+            raise AssertionError("event application replayed source history")
+
+        def __len__(self):
+            raise AssertionError("event application measured source history")
+
+        def __getitem__(self, _index):
+            raise AssertionError("event application indexed source history")
+
+    isolated = object.__new__(dataset_module._SourceVisibilitySweep)
+    isolated._events = ForbiddenHistory()
+    isolated._selected_by_logical = {}
+    isolated._selected_by_identity = {}
+    isolated._apply_visible_event(event)
+
+    assert isolated._selected_by_logical[event[2]][1] is event[4]
+    assert isolated._selected_by_identity[
+        dataset_module._snapshot_prior_identity(event[4])
+    ][1] is event[4]
 
 
 def test_reference_indices_include_exact_open_and_valid_to_boundaries():

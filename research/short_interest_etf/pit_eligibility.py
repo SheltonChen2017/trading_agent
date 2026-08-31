@@ -13,7 +13,7 @@ from bisect import bisect_left, bisect_right
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, TypeVar
 
 from data.exchange_calendar import ExchangeCalendarError, session_open_instant
 from data.hashing import hash_payload
@@ -640,6 +640,22 @@ class _ReferenceSelection:
     classification_error: str | None
 
 
+_ReferenceRow = TypeVar(
+    "_ReferenceRow",
+    SecurityLifecycleObservation,
+    SectorClassificationObservation,
+)
+
+
+def _partition_reference_rows(
+    rows: Sequence[_ReferenceRow],
+) -> dict[str, list[_ReferenceRow]]:
+    by_security: dict[str, list[_ReferenceRow]] = {}
+    for row in rows:
+        by_security.setdefault(row.security_id, []).append(row)
+    return by_security
+
+
 def _query_axes(
     queries: Sequence[_ReadinessQuery],
 ) -> tuple[list[datetime], list[date]]:
@@ -781,18 +797,10 @@ def _build_reference_selection_index(
         )
         queries_by_security.setdefault(query.security_id, []).append(query)
 
-    lifecycles_by_security: dict[
-        str,
-        list[SecurityLifecycleObservation],
-    ] = {}
-    for row in references.lifecycles:
-        lifecycles_by_security.setdefault(row.security_id, []).append(row)
-    classifications_by_security: dict[
-        str,
-        list[SectorClassificationObservation],
-    ] = {}
-    for row in references.classifications:
-        classifications_by_security.setdefault(row.security_id, []).append(row)
+    lifecycles_by_security = _partition_reference_rows(references.lifecycles)
+    classifications_by_security = _partition_reference_rows(
+        references.classifications
+    )
 
     selections: dict[str, _ReferenceSelection] = {}
     for security_id, unsorted_queries in queries_by_security.items():

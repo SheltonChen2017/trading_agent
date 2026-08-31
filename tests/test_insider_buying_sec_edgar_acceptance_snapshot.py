@@ -3032,6 +3032,22 @@ def test_reconciliation_wrapper_refuses_silent_parsed_transaction_loss(tmp_path)
         )
 
 
+def test_observed_state_refuses_an_original_role_for_an_amendment():
+    with pytest.raises(
+        Form4AmendmentReconciliationError,
+        match="only the original filing may have original-observation state",
+    ):
+        reconciliation_module.Form4ObservedState(
+            accession_number=ACCESSION_B,
+            original_accession=ACCESSION_A,
+            accepted_at=datetime(2026, 5, 2, 21, 30, tzinfo=timezone.utc),
+            disposition=(
+                Form4VersionDisposition.ORIGINAL_OBSERVED_IN_SUPPLIED_SAMPLE
+            ),
+            source_sha256="a" * 64,
+        )
+
+
 def test_source_count_and_byte_caps_precede_snapshot_loading(
     tmp_path, monkeypatch
 ):

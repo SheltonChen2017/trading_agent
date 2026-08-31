@@ -379,6 +379,13 @@ class Form4ObservedState:
             "accepted_at",
             _canonical_utc(self.accepted_at, label="observed acceptance time"),
         )
+        if (
+            self.disposition
+            is Form4VersionDisposition.ORIGINAL_OBSERVED_IN_SUPPLIED_SAMPLE
+        ) != (self.accession_number == self.original_accession):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: only the original filing may have original-observation state"
+            )
 
 
 @dataclass(frozen=True)

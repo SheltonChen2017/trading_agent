@@ -2227,3 +2227,26 @@ deployment, or trading authority was accessed or granted. The next authorized
 step is to transfer this exact local-only history to the clean lane only after
 re-verifying its head, then obtain independent review of the exact pushed
 snapshot before any further Insider milestone.
+
+## 22. Local application of the reconciled history (2026-08-31)
+
+Codex completed that transfer under the owner's direction. Immediately before
+application, a fresh fetch confirmed exact `origin/main` at
+`1a5264e6b1de3caf5477477d1312a762b2d42419` and the pushed Insider lane at
+`6e38fa1cded33cb0a0f8867ff490680f90cbe0ae`; the live worktree was clean at
+exact local commit `43d6d6ae208875e8b64106a3324f1819fdc3a67b`.
+Codex verified the complete-history reconciliation bundle and fast-forwarded
+the one long-lived local lane branch to record commit
+`466af8a7597f2549a54fcc3e2b87e6f31c0947ab`.
+
+The tested reconciliation merge `d6d26e09b806e24de865d237f59674ad952c4df6`
+is now reachable from this local branch and retains `43d6d6a` as its exact
+second parent. Neither the local hardening commit nor the pushed IB-1D/IB-1E
+history was dropped, rebased, squashed, duplicated, or rewritten. The
+application itself introduced no new tree content beyond the already reviewed
+candidate; this section is the only subsequent documentation change.
+
+No remote ref was moved and nothing was pushed. Independent review of the
+eventual exact pushed snapshot remains required before another Insider
+milestone. `IB1D-R09` and every provider, outcome, QuantConnect, broker,
+deployment, order, and trading authority gate remain unchanged.

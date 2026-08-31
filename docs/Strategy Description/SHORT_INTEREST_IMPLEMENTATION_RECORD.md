@@ -2215,3 +2215,21 @@ trading authority was accessed or granted. Before this artifact can be
 applied, the lane must still be at its recorded head and the owner must direct
 the local-only merge to be placed on the long-lived lane branch; it must not be
 pushed silently while development continues.
+
+### 2026-08-31 local application
+
+The owner subsequently directed Codex to begin that reconciliation work.
+Codex re-fetched all remotes, verified that this worktree was clean and still
+at exact local head `3429083865552928d5a9ce151a9cee5f16a7907f`, verified the
+complete-history bundle, and fast-forwarded the long-lived local branch to
+reviewed bundle tip `266cd258cf9e6c198d0ab7acaa37b5dcad862fe9`.
+The merge commit `5a4a772621a124a493df8b960c8ee15d7fb86bad` now has both
+`3429083` and exact main `1a5264e` as parents. Consequently local commits
+`bf7cf0c` and `3429083` remain unchanged ancestors rather than being dropped,
+rewritten, or duplicated.
+
+This local application does not promote those two advisory commits to an
+independently accepted pushed snapshot. No remote ref was moved and no push,
+provider/outcome access, QuantConnect action, deployment, broker action,
+order, or trading authority occurred. A later push still requires separate
+owner authorization and a fresh exact remote-tip check.

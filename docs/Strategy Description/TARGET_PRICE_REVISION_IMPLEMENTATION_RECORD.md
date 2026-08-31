@@ -1,6 +1,10 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE'S THREE-COMMIT V2.2 REVIEW ROUND IS COMPLETE THROUGH
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED CODEX'S COUNTER-REVIEW ROUND
+`0af1ca8`..`c8c7470`. BOTH COMMITS ARE ACCEPTED; ONE P1 (`TPR-CR4-001`) AND
+ONE P3 (`TPR-CR4-004`) WERE FOUND, THE P1 IS CORRECTED IN LANE, AND ONE P2
+(`TPR-CR4-002`) IS OPEN AND NEEDS AN OWNER DECISION.
+CLAUDE'S THREE-COMMIT V2.2 REVIEW ROUND IS COMPLETE THROUGH
 `db6a721`, AND CODEX HAS COUNTER-REVIEWED EVERY COMMIT, CORRECTED THE CURRENT-
 STATE AND GUARD DEFECTS, AND QUALIFIED THE VALIDATION EVIDENCE. THE EXACT
 TPR-0A V2.2 SNAPSHOT AT `bb8dfb6` HAS COMPLETED THE HUMAN INDEPENDENT-REVIEW
@@ -359,6 +363,16 @@ counter-review round's single push, Claude reviews only the exact correction
 range on this branch; that loop step grants no source, outcome, look, QC,
 broker, paper, live, deployment, capital, or trading authority.
 
+**Claude review of that correction range, 2026-08-30:** Claude has now
+reviewed `0af1ca8`..`c8c7470` and accepted both commits. One P1
+(`TPR-CR4-001`) is corrected in this lane: on the supported Windows checkout,
+Git's default `core.autocrlf` translation made every reviewed policy-code
+file differ from its committed blob, so `_review_anchor` refused
+unconditionally and three lane tests failed on the lane's registered
+worktree. `TPR-CR4-002` (P2) is open and needs an owner decision: the pinned
+lane worktree directory does not exist on this host. Section 19 holds the
+evidence, dispositions, and validation.
+
 ### Historical progression (not the current resume instruction)
 
 The remainder of this section preserves how the earlier v2.1 and v2.2
@@ -446,6 +460,7 @@ documented here and deliberately not fixed.
 | `TPR-OOL-001-R1` | P2 resolution | Owner-coordinated repository Git plumbing | The owner approved the common fix. Root `.gitattributes` now declares `*.pdf binary`; Git resolves the blueprint as binary with text/diff/merge unset. The PDF was rebuilt from the intact Git blob plus the two-page owner addendum and reopened strictly as 28 pages at raw SHA-256 `55ce6703...ba14` at that time; the current artifact is the 29-page v2.2 blueprint at raw SHA-256 `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`, which supersedes that historical resolution state without reopening the finding. | Resolved under the explicit one-time owner coordination; this does not authorize later shared-file edits by inference. Raw-byte and resolved-attribute guards are target-owned. |
 | `TPR-OOL-003` | P2 | Analyst Revisions V2 preregistration loader: `research/analyst_revisions_v2/preregistration.py:465,487` | Both persisted JSON paths use ordinary `json.loads`, which accepts duplicate object keys with last-key-wins behavior. A content-addressed authority artifact can therefore have ambiguous human/parser meaning. TPR's strict loader rejects duplicate keys, but this external accepted lane remains unchanged. | Documented only. Route to the Analyst Revisions V2 lane before any outcome authority; add duplicate-key mutations there. |
 | `TPR-OOL-004` | P2 | Analyst Revisions V2 family contract: `research/analyst_revisions_v2/preregistration.py:56,931` and its draft/tests | The accepted draft/loader still names `three_lane_selection_correction` and requires value 3, while the owner has added TPR as the fourth shared family/attempt. The Analyst lane remains fail-closed and zero-access, so no current look is affected. | Documented only. Synchronize that lane's content-addressed artifact and tests to four before any Analyst outcome access; do not edit it from TPR. |
+| `TPR-OOL-008` | P3 | `research/__init__.py`, shared with the Analyst Revisions V2 lane | `POLICY_CODE_REPO_PATHS` includes `research/__init__.py`, but this lane's new `research/target_price_revisions/.gitattributes` cannot pin a file outside its own subtree. The file is empty today, so newline translation cannot change its bytes and the anchor is unaffected. The moment it gains content on a `core.autocrlf` checkout it would break the reviewed-algorithm anchor exactly as `TPR-CR4-001` did. | Documented, not fixed. `test_policy_code_is_checked_out_as_exact_bytes` asserts the file is still empty and turns red rather than passing silently, which routes a shared `.gitattributes` amendment to the owner at the moment it is actually needed. |
 | `TPR-OOL-005` | P3 | Trading App Briefing smoke fixture and yfinance cache/provider path | The exact `ba01e98` complete-suite run timed out after 180 seconds in `test_ui_pages_smoke.py::test_page_renders_without_exception[Briefing]`; captured yfinance logs reported `OperationalError('unable to open database file')` for QQQ, SPY, NVDA, and AMD. The fixture patches only one recorded-bar seam, while Briefing still reaches direct benchmark and sample-holding yfinance paths. `c0ba616..ba01e98` changes none of the UI, fixture, provider, configuration, or dependency paths; the page imports no TPR module. The same exact test passed immediately in isolation in 14.42 seconds. | Confirmed pre-existing out-of-lane test-isolation/reliability gap exposed by host cache/load conditions. Documented, not fixed, under the owner's target-only rule; route to the Trading App test lane. Keep the exact full-suite result explicitly red. Focused TPR validation is unaffected and no provider authority is granted. |
 
 ## 10. Session / commit ledger
@@ -471,6 +486,7 @@ known.
 | 2026-08-30 | Claude review | `2ec0fad4578c5a408a79740f0e89444922d05346` -> `fe056be6800ea11d6559f817019d1c2902f61620` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review and the v2.2 fixed-slot amendment | Reviewed all three pushed commits individually. Accepted all seven counter-review findings against the prior Claude round, five of which were defects in that round's own work, including a guard docstring that invited the recomputation the owner's directive prohibits. Verified rather than accepted: the second blueprint rebuild is again append-only, the fixed-slot contract matches the directive exactly, the loader enforces it at load time, and no look can exist outside the alpha accounting. Corrected the record's current-state section, which still pinned the superseded v2.1 blueprint and candidate identities. | Independent complete run on the exact pushed tree `fe056be`: **5,842 passed, 5 skipped, 0 failed, 25 warnings in 1,080.30s**, reproducing the recorded count exactly on the actual pushed head rather than its code-tree predecessor. Three mutations on the new guard each turned it red with a text-identical restore returning it green. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | All three commits accepted or accepted after correction. No P0/P1. `TPR-CR3-001` (P2) and `TPR-CR3-002` (P3) closed. Details in section 17. | None; all source, outcome, look, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. TPR-0B and TPR-1 remain blocked, and the three sibling-lane re-freezes under `TPR-OOL-006` still gate every lane's outcome access. |
 | 2026-08-30 | Claude validation | `5eecce5` -> `5eecce5` (exact tested tree; this validation-record commit follows) | v2.2 review round final validation | Revalidated the complete tree after the review corrections and the new current-artifact guard. No product file changed during the run. Recorded as a distinct appended event rather than by rewriting the review row, which is the correction accepted as `TPR-CCR3-006`. | Complete suite: **5,843 passed, 5 skipped, 0 failed, 25 warnings in 952.86s** — the 5,842 baseline plus exactly the one added guard, skips unchanged. Lane and shared documentation suites **189 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. No provider, credential, licensed row, outcome, QuantConnect, broker, scheduler, paper or live access; **0 research looks**. | No new finding. `TPR-CR3-001` and `TPR-CR3-002` remain closed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. |
 | 2026-08-30 | Codex counter-review correction | `db6a721d45eb47e1a133744387bf43a1aa1f310c` -> `0af1ca8c9165841373262bff4d173edc48aa1a74` plus final record/handoff correction | Counter-review only; next milestone blocked | Counter-reviewed `da6f7ea`, `5eecce5`, and `db6a721` individually; corrected the contradictory active state, hardened exact-current identity and routing guards, qualified review provenance and validation metadata, and removed the last stale pre-push handoff claim. No product, source, provider, or outcome code changed. | Exact post-guard target plus active-document suite **189 passed, 3 skipped in 13.20s**; preceding narrow document modules **76 passed in 3.71s**; network-restricted full run **5,838 passed, 5 failed, 5 skipped, 26 warnings in 1,282.03s**, with the exact five environment-affected nodes then **5 passed in 11.05s**; full compilation exit 0; mutations rejected; `git diff --check` clean. Python 3.12.13 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | No P0/P1. `TPR-CCR4-001` through `TPR-CCR4-006` are closed or qualified in section 18. | None; registries and zero-access declarations are unchanged. | Commit the final validation handoff and make this round's one push. Claude then reviews the exact correction range; TPR-1 and TPR-0B remain blocked. |
+| 2026-08-30 | Claude review | `c8c74704bb9bbda5a756d90afa33666371125a89` reviewed; corrections on this same lane branch | Independent review of Codex's counter-review correction range | Reviewed `0af1ca8` and `c8c7470` individually and the cumulative `c8c7470` tree. Reproduced rather than accepted Codex's two historical claims. Found and corrected a P1 that made the reviewed-algorithm anchor unreachable on the supported Windows checkout, added a lane-scoped `.gitattributes` and a regression guard, and refreshed the working tree to exact blob bytes. No product, provider, source, or outcome code changed. | At the reviewed tip the lane suite was **186 passed, 3 failed, 3 skipped**; after the correction **120 passed, 3 skipped** with the three anchor tests green. Five mutations on Codex's hardened current-state guard and two on the new byte guard each turned red with byte-identical restores returning green. Complete suite on the exact final tree **5,844 passed, 5 skipped, 0 failed, 25 warnings in 2,186.28s**, the 5,843 baseline plus exactly the one added guard; `compileall` exit 0; `git diff --check` clean. Provider/outcome accesses **0**; authorized/spent looks **0**. | Both Codex commits accepted. `TPR-CR4-001` (P1) closed by correction; `TPR-CR4-002` (P2) **open, owner decision required**; `TPR-CR4-003` and `TPR-CR4-004` (P3) closed by qualification. `TPR-OOL-008` documented, not fixed. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews this range. `TPR-CR4-002` needs the owner to say which worktree path is real before any resume pointer is trusted; TPR-1 and TPR-0B remain blocked. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -1261,3 +1277,103 @@ was also rejected for changing the intended outside-repository premise of one
 Git-boundary test. Both environment deviations were corrected before the
 results above. Provider accesses: **0**. Outcome accesses: **0**. Authorized or
 spent research looks: **0**.
+
+## 19. Claude independent review - 2026-08-30 (counter-review correction range)
+
+**Disposition: both commits accepted.** Codex's counter-review of the v2.2
+Claude round is substantively correct, and its two historical claims reproduce
+exactly rather than merely reading plausibly. The hardened guard is real: four
+independent mutations turn it red and byte-identical restores return it green.
+
+The round nevertheless shipped a tree that fails three of its own tests on the
+lane's registered worktree, because the reviewed-algorithm anchor compares
+working bytes against Git blobs while Git for Windows translates newlines by
+default. That P1 is corrected here. A separate P2 is left open because it
+cannot be resolved without the owner: the lane pins an absolute worktree
+directory that does not exist on this machine.
+
+### 19.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch | `codex/strategy-target-price-revisions` |
+| Worktree used for this review | `C:\git\customizedAgent\trading_agent_TargetPriceRevision` (see `TPR-CR4-002`) |
+| Previously reviewed Claude head | `db6a721d45eb47e1a133744387bf43a1aa1f310c` |
+| Codex range reviewed | `db6a721d45eb47e1a133744387bf43a1aa1f310c..c8c74704bb9bbda5a756d90afa33666371125a89` |
+| Codex commits, ordered | `0af1ca8c9165841373262bff4d173edc48aa1a74`, `c8c74704bb9bbda5a756d90afa33666371125a89` |
+| Local head at review start | `c8c74704bb9bbda5a756d90afa33666371125a89`, fast-forward only, clean tree |
+| Ancestry check | `70c4b9f` is an ancestor of the fetched head; no published history was rewritten |
+| Interpreter | `C:\git\customizedAgent\trading_agent\.venv\Scripts\python.exe`, Python 3.13.14, pytest 9.1.1 |
+| Checkout newline configuration | `core.autocrlf=true`, inherited from Git's system config (see `TPR-CR4-001`) |
+
+### 19.2 Commit-by-commit dispositions
+
+| Codex commit | Disposition | Review basis |
+|---|---|---|
+| `0af1ca8c9165841373262bff4d173edc48aa1a74` | **Accepted** | The single-current-truth correction is right, and the guard hardening it claims is verified rather than assumed. Reintroducing a second labeled candidate spec ID, a second labeled blueprint digest, or the stale pre-push handoff sentence, and dropping the reviewed Claude head from the Action Plan current block, each turn `test_exact_next_step_names_the_current_artifacts` red, and byte-identical restores return it green. Residual scope is recorded as `TPR-CR4-004`. |
+| `c8c74704bb9bbda5a756d90afa33666371125a89` | **Accepted** | The `TPR-CCR4-006` handoff correction removes the last stale pre-push claim, and the whitespace-normalized current-block scoping does what it says: the mutation that reintroduces the original capitalized, line-wrapped sentence is rejected. The record-only diff is clean and adds no authority. |
+
+### 19.3 Reproduced Codex claims
+
+Both historical claims were re-derived from the repository rather than accepted
+from the report.
+
+- `TPR-CCR4-004` attributes the stale `TPR-OOL-001-R1` row to `ba01e98`, not to
+  `fe056be` or `6b12102`. A pickaxe search of that string over the record
+  returns `ba01e98`, `5eecce5`, and `0af1ca8`, so `ba01e98` is the introducing
+  commit. **Confirmed.**
+- `TPR-CCR4-005` says the guard-first commit `da6f7ea` is red standalone, with
+  the candidate ID and artifact assertions already passing and the blueprint
+  digest assertion failing. Checking `da6f7ea` out in a throwaway clone
+  reproduces exactly that: the run fails on
+  `section 8 must name the current blueprint digest`, and a direct read of that
+  commit's section 8 shows the candidate ID present, the artifact digest
+  present, and the blueprint digest absent. **Confirmed.**
+
+### 19.4 Issue ledger
+
+| ID | Priority | Status | Location | Finding, evidence, and disposition |
+|---|---|---|---|---|
+| `TPR-CR4-001` | P1 | **Closed by correction** | `research/target_price_revisions/` policy code; `POLICY_CODE_REPO_PATHS` in `research/target_price_revisions/preregistration.py:71-78`; `_review_anchor` | `_review_anchor` requires the working bytes of every policy-code path to equal the reviewed and HEAD blobs. Git for Windows sets `core.autocrlf=true` in its system config, which this host inherits, so five of the six policy paths were checked out with CRLF against LF blobs and the loader refused unconditionally. At the reviewed tip `c8c7470`, `tests/target_price_revisions` plus the shared active-document module reported **186 passed, 3 failed, 3 skipped**, all three failures raising `current policy code differs from the independently reviewed map`. The mechanism was proven, not inferred: a `core.autocrlf=false` clone of the same commit ran `test_preregistration.py` **83 passed, 2 skipped**. The refusal direction is safe, but the reviewed-algorithm authority is unreachable on the supported platform, and a later `git add` of a translated working copy would have rewritten the very bytes the frozen candidate's `policy_code_sha256` map pins. Corrected with a lane-scoped `research/target_price_revisions/.gitattributes` declaring `* -text`, a working-tree refresh so all six paths are byte-identical to their blobs, and the new guard `test_policy_code_is_checked_out_as_exact_bytes`. The fix pins exact bytes; it does not relax the byte-identity control. |
+| `TPR-CR4-002` | P2 | **Open; owner decision required** | Record header and section 7, `docs/ACTION_PLAN_2026-08-20.md`, `docs/SESSION_HANDOFF.md`, `test_lane_documents_agree_on_one_worktree` | Every lane resume pointer names `C:\git\customizedagent\trading_agent_target_price`, and the guard additionally forbids the two coordination documents from naming `trading_agent_TargetPriceRevision` at all. On this machine that is inverted. `git worktree list` registers the lane branch at `C:/git/customizedAgent/trading_agent_TargetPriceRevision`; the common repository holds `.git/worktrees/trading_agent_TargetPriceRevision`; that worktree's `.git` file points back to it; six worktrees are registered, not the five `TPR-CR1-005` reports; and no case form of `trading_agent_target_price` exists under `C:/git/customizedAgent/` even though the filesystem resolves the other names case-insensitively. The owner's own session instruction also named the `TargetPriceRevision` directory. Deliberately not fixed: a single hard-coded absolute path cannot be true on two machines, so flipping the literal would only move the breakage. The owner should say which host is canonical, or direct that the pointer stop being a machine-specific literal. Until then the durable resume instruction points at nothing on this host. |
+| `TPR-CR4-003` | P3 | **Closed by qualification** | Section 18.5 | Codex records **189 passed, 3 skipped** for the target plus active-document suite on the exact tree this round pushed. That does not reproduce on the lane's registered worktree, where the same commit and pytest version give **186 passed, 3 failed, 3 skipped**. The cause is `TPR-CR4-001`, so this qualifies the environment rather than the arithmetic: Codex's numbers are consistent with a checkout that does not translate newlines. Validation records in this lane should name the checkout's newline configuration alongside the interpreter, because that setting alone decides whether the reviewed-algorithm tests can pass. |
+| `TPR-CR4-004` | P3 | **Closed by qualification** | `tests/target_price_revisions/test_document_consistency.py`, `test_exact_next_step_names_the_current_artifacts` | The hardened singleton assertions are label-bound. They reject a second digest introduced under the same `raw SHA-256`, `spec ID`, `semantic hash`, or `artifact SHA-256` label, which is the realistic drift, but a superseded digest written under a different label inside the current block still passes: a probe inserting a superseded digest as `SHA-256` rather than `raw SHA-256` left the guard green. This is a scope statement, not a defect claim; the guard does close the failure mode `TPR-CCR4-002` names. Widening it to every 64-hex literal in the current block would be the next strengthening if the owner wants it. |
+
+### 19.5 Validation
+
+All runs used the interpreter in section 19.1 on this worktree.
+
+- Reviewed tip `c8c7470`, before correction: `tests/target_price_revisions`
+  plus `tests/test_active_document_consistency.py` gave **186 passed, 3 failed,
+  3 skipped in 91.60s**.
+- Same commit in a `core.autocrlf=false` throwaway clone:
+  `tests/target_price_revisions/test_preregistration.py` gave **83 passed, 2
+  skipped in 25.49s**, isolating the cause to checkout newline translation.
+- After the correction: `tests/target_price_revisions` gave **120 passed, 3
+  skipped in 32.26s**, with the three anchor tests green.
+- Mutations on Codex's hardened guard, each applied and reverted with a
+  byte-identical restore: a second labeled candidate spec ID, a second labeled
+  blueprint digest, the reintroduced stale pre-push handoff sentence, and a
+  dropped reviewed Claude head in the Action Plan current block all turned it
+  **red**; the baseline and every restore were **green**. A superseded digest
+  under a different label stayed green and is recorded as `TPR-CR4-004`.
+- Mutations on the new guard: fully removing
+  `research/target_price_revisions/.gitattributes` turned it **red**, and a CRLF
+  working copy of `canonical.py` turned it **red**; both restores returned
+  **green**. Deleting that file while leaving it staged did not turn it red,
+  because `git check-attr` resolves attributes from the index; the guard
+  therefore detects a committed removal and a translated checkout, which are the
+  states that actually reach another machine.
+- Complete suite on the exact final tree: **5,844 passed, 5 skipped, 0 failed,
+  25 warnings in 2,186.28s**. That is the 5,843 baseline plus exactly the one
+  guard added here, with skips unchanged, and it includes the three
+  reviewed-algorithm anchor tests that were red at the reviewed tip.
+- `compileall -q` over `assistant backtest data execution ml research risk
+  scripts signals strategies tests baskets.py config.py market_analytics.py`
+  exited 0, and `git diff --check` is clean.
+
+No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect,
+broker, operator-database, scheduler, paper or live surface was accessed or
+changed. Provider accesses: **0**. Outcome accesses: **0**. Authorized or spent
+research looks: **0**. No registry, source-authority, or look-authority artifact
+was modified, and no milestone was implemented.

@@ -2162,5 +2162,56 @@ behavior, PIT taxonomy/version and peer-cohort rule, delayed-release/correction
 handling, and whether `S0` and `S1` share one cohort and winsor policy. Codex
 must not choose these outcome-sensitive degrees of freedom by inference.
 
-This record commit is local-only until the owner authorizes the next bounded
-milestone or separately directs a counter-review-only push.
+The review-record commit `f3d1906bf7369643a541d3780a96c1db1864f80e`
+is pushed at `origin/codex/strategy-short-interest`. The subsequent Codex
+follow-ups `bf7cf0c64ab9935945662ea8b58f79534cc95fc2` and
+`3429083865552928d5a9ce151a9cee5f16a7907f` remain local-only and are not a
+formal review snapshot.
+
+## 2026-08-31 project-wide main-sync conflict review (local-only artifact)
+
+Codex reviewed the pushed delta `653f1426377a4aea053a08471b7278f8d6adeefd`
+through `f3d1906bf7369643a541d3780a96c1db1864f80e`, preserved the two later
+local-only commits without treating them as accepted, and merged exact main
+`1a5264e6b1de3caf5477477d1312a762b2d42419` into the detached local head
+`3429083865552928d5a9ce151a9cee5f16a7907f`. The resulting merge commit is
+`5a4a772621a124a493df8b960c8ee15d7fb86bad`. It exists only in the isolated
+conflict-resolution clone; no live lane ref or remote was updated.
+
+All 23 textual conflicts were resolved without replacing lane-owned work.
+Twenty-two stale shared production/test blobs were restored exactly from
+main. `tests/test_ml_evidence_operations.py` retained main plus the lane's 192
+lines of reviewed Windows interpreter/installer coverage. Every Short Interest
+record, source, fixture, and test path remained byte-identical to local head
+`3429083`. Relative to main, the candidate changes only Short Interest-owned
+paths and that shared test; it changes no existing `strategies/` production
+code.
+
+| Commit | Disposition | Reason |
+|---|---|---|
+| `896bf35` | accepted | Indexed readiness construction remains deterministic and fail-closed. |
+| `123e14f` | accepted | Complexity regressions are load-bearing and synthetic-only. |
+| `4dc0066` | accepted | Counter-review and indexing record accurately preserve the lane gates. |
+| `fd272f4` | accepted after correction | Its review findings are corrected by `f3d1906`. |
+| `f3d1906` | accepted | The correction disposition is accurate apart from the publication sentence corrected above. |
+
+The conflict-review ledger has no open P0-P2 item. `SI-MRG-001` (P3) is
+resolved by correcting the stale statement that pushed `f3d1906` was
+local-only. Historical SI findings remain closed exactly as already recorded.
+The local-only `bf7cf0c` and `3429083` remain advisory pending a pushed exact
+snapshot and independent review.
+
+Validation used Python 3.12.13 and pytest 9.1.1. Focused suites passed 976
+tests with one skip; the exact resolved tree passed 5,947 tests with two skips
+and 26 dependency warnings in 1,093.51 seconds. Compileall including
+`research` passed, conflict-marker and unmerged-path scans were empty, and
+candidate-relative/non-PDF diff checks were clean. Raw staged diff checking
+reports whitespace inside main's already-committed target-price PDF; that is
+not a Short Interest delta.
+
+No provider, credential, licensed row, market outcome, permanent research
+look, QuantConnect job, broker, operator database, scheduler, deployment, or
+trading authority was accessed or granted. Before this artifact can be
+applied, the lane must still be at its recorded head and the owner must direct
+the local-only merge to be placed on the long-lived lane branch; it must not be
+pushed silently while development continues.

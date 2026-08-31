@@ -1,11 +1,7 @@
 # The reviewed-algorithm anchor byte-compares every POLICY_CODE_REPO_PATHS
-# entry against its committed Git blob.  Git for Windows sets
-# core.autocrlf=true by default, which checks these files out with CRLF while
-# the blobs hold LF, so the anchor refuses on the supported platform and the
-# reviewed-authority path becomes unreachable.  Store and check out exact
-# bytes instead of normalizing them.
-#
-# This also protects the blobs: with translation on, a later `git add` of a
-# CRLF working copy would rewrite the policy bytes and invalidate the frozen
-# candidate's policy_code_sha256 map.
-* -text
+# entry against its committed Git blob.  Canonicalize lane text to LF both in
+# the index and in the working tree so Git for Windows produces those exact
+# bytes even when core.autocrlf=true.  TPR-CCR5-001 also changes every
+# nonempty policy blob once, forcing an existing clean worktree to
+# re-materialize the files during its ordinary fast-forward.
+* text eol=lf

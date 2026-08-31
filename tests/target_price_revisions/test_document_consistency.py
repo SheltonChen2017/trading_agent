@@ -32,11 +32,6 @@ BLUEPRINT_CONTENT_SHA256 = (
 MALFORMED_SUBMITTED_SOURCE_PIN = (
     "53c549aef18aa1a63e6db8deb184bd654eb8ec637bb4ff3ae03f29abc4a2df0"
 )
-LANE_DOCUMENTS = (
-    "ACTION_PLAN_2026-08-20.md",
-    "SESSION_HANDOFF.md",
-    f"Strategy Description/{RECORD}",
-)
 CANDIDATE_RELATIVE = Path(
     "research/target_price_revisions/specs/tpr_round0a.candidate.json"
 )
@@ -47,11 +42,36 @@ EXPECTED_CANDIDATE_HASH = (
 EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
     "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
-CLAUDE_V22_REVIEW_HEAD = "db6a721d45eb47e1a133744387bf43a1aa1f310c"
+LATEST_CLAUDE_REVIEW_HEAD = "f21d70851d5e1790be0c308e13e8837a7cd1d008"
+EXPECTED_POLICY_CODE_REPO_PATHS = (
+    "research/__init__.py",
+    "research/target_price_revisions/__init__.py",
+    "research/target_price_revisions/canonical.py",
+    "research/target_price_revisions/import_firewall.py",
+    "research/target_price_revisions/preregistration.py",
+    "research/target_price_revisions/specs/.gitattributes",
+)
 
 
 def _doc(name: str) -> str:
     return (ROOT / "docs" / name).read_text(encoding="utf-8")
+
+
+def _action_current() -> str:
+    return _doc("ACTION_PLAN_2026-08-20.md").split(
+        "**Current bounded status, 2026-08-30:**", 1
+    )[1].split("**Owner multiplicity amendment, 2026-08-30", 1)[0]
+
+
+def _handoff_current() -> str:
+    return _doc("SESSION_HANDOFF.md").split(
+        "## 0. Target-Price Revision fourth-lane planning addition", 1
+    )[1].split("\n## ", 1)[0]
+
+
+def _record_preamble() -> str:
+    record = _doc(f"Strategy Description/{RECORD}")
+    return record[: record.index("## 1. Decision and canonical strategy boundary")]
 
 
 def test_blueprint_is_pinned_to_the_lane_record() -> None:
@@ -97,27 +117,32 @@ SHARED_POLICY_PATH = "research/__init__.py"
 
 
 def test_policy_code_is_checked_out_as_exact_bytes() -> None:
-    """TPR-CR4-001: keep the reviewed-algorithm anchor reachable on Windows.
+    """TPR-CR4-001/TPR-CCR5-001: keep the anchor exact on Windows.
 
     `_review_anchor` compares every `POLICY_CODE_REPO_PATHS` entry's working
-    bytes against its committed blob.  Git for Windows enables
-    `core.autocrlf` by default, which is the platform this project supports,
-    so an unpinned checkout writes CRLF against LF blobs and the anchor
-    refuses forever.  That refusal is the safe direction, but it makes the
-    reviewed-algorithm authority unreachable, and a later `git add` of a
-    translated working copy would rewrite the very bytes the frozen
-    candidate's `policy_code_sha256` map pins.
+    bytes against its committed blob.  The inventory here is intentionally
+    independent of the runtime tuple so a path cannot disappear from both the
+    loader and this guard in one edit.  Direct blob comparison catches every
+    byte difference, not only CRLF translation.  Lane text is normalized to
+    LF on checkout and add; the tracked migration markers force ordinary
+    fast-forwards from the defective tree to rewrite the five nonempty files.
 
     `research/__init__.py` is shared surface outside this lane's attribute
     scope, so it is covered only while it stays empty.  This guard turns red
     rather than passing silently if that stops being true.
     """
-    crlf = bytes((13, 10))
-    for policy_path in POLICY_CODE_REPO_PATHS:
+    assert POLICY_CODE_REPO_PATHS == EXPECTED_POLICY_CODE_REPO_PATHS
+    for policy_path in EXPECTED_POLICY_CODE_REPO_PATHS:
         working = (ROOT / policy_path).read_bytes()
-        assert crlf not in working, (
-            f"{policy_path} is checked out with CRLF, so the reviewed-algorithm "
-            f"anchor can never match its LF blob"
+        committed = subprocess.run(
+            ["git", "show", f"HEAD:{policy_path}"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        ).stdout
+        assert working == committed, (
+            f"{policy_path} differs from its HEAD blob, so the reviewed-"
+            "algorithm anchor cannot accept this checkout"
         )
         if policy_path == SHARED_POLICY_PATH:
             assert working == b"", (
@@ -127,15 +152,19 @@ def test_policy_code_is_checked_out_as_exact_bytes() -> None:
             )
             continue
         completed = subprocess.run(
-            ["git", "check-attr", "text", "--", policy_path],
+            ["git", "check-attr", "text", "eol", "--", policy_path],
             cwd=ROOT,
             check=True,
             capture_output=True,
             text=True,
         )
-        assert completed.stdout.strip().rsplit(": ", 1)[-1] == "unset", (
-            f"{policy_path} must resolve text as unset so every checkout writes "
-            f"exact bytes regardless of host core.autocrlf"
+        resolved = {
+            line.rsplit(": ", 2)[-2]: line.rsplit(": ", 1)[-1]
+            for line in completed.stdout.splitlines()
+        }
+        assert resolved == {"text": "set", "eol": "lf"}, (
+            f"{policy_path} must normalize to LF on checkout and add; got "
+            f"{resolved}"
         )
 
 
@@ -170,48 +199,51 @@ def test_lane_documents_resolve_the_worktree_from_git() -> None:
     owner directed that the worktree be resolved from `git worktree list`
     instead.
 
-    So the invariant is now machine-independent: the coordination documents
-    must carry the resolution instruction and must pin no directory name,
-    and the instruction must actually resolve here.  A future agent that
-    reintroduces any hardcoded lane directory turns this red on every host
-    rather than on all but one.
+    So the invariant is machine-independent and target-scoped: each current
+    target block must carry the resolution instruction and pin no directory
+    name, while sibling-lane text elsewhere in shared documents remains out of
+    this guard's scope.  The instruction must actually resolve when this
+    checkout is on the lane branch.
     """
-    for name in LANE_DOCUMENTS:
-        assert WORKTREE_RESOLUTION in _doc(name), (
+    current_surfaces = {
+        "ACTION_PLAN_2026-08-20.md target block": _action_current(),
+        "SESSION_HANDOFF.md target section": _handoff_current(),
+        f"Strategy Description/{RECORD} preamble": _record_preamble(),
+    }
+    for name, content in current_surfaces.items():
+        assert WORKTREE_RESOLUTION in content, (
             f"{name} must tell the reader to resolve the lane worktree with "
             f"`{WORKTREE_RESOLUTION}` instead of naming a directory"
         )
 
-    # The two pure coordination documents, and the record's own current-state
-    # preamble, must name no lane directory at all.  The bare repository name
-    # is not a worktree pin, and the record may still name past directories
-    # below its preamble as historical finding evidence.
-    record = _doc(f"Strategy Description/{RECORD}")
-    preamble = record[: record.index("## 1. Decision and canonical strategy boundary")]
-    pinned = {
-        "ACTION_PLAN_2026-08-20.md": _doc("ACTION_PLAN_2026-08-20.md"),
-        "SESSION_HANDOFF.md": _doc("SESSION_HANDOFF.md"),
-        f"Strategy Description/{RECORD} preamble": preamble,
-    }
-    for name, content in pinned.items():
+    for name, content in current_surfaces.items():
         directories = set(re.findall(r"trading_agent_[A-Za-z0-9_]+", content))
         assert not directories, (
             f"{name} pins a machine-specific lane worktree {sorted(directories)}; "
             f"resolve it with `{WORKTREE_RESOLUTION}` instead"
         )
 
-    # The instruction has to work, not merely be written down.
+    # The instruction has to work, not merely be written down.  A detached
+    # historical clone may have no registered lane branch, but an active lane
+    # checkout must always resolve itself.
+    on_lane = _git_lines("rev-parse", "--abbrev-ref", "HEAD") == [LANE_BRANCH]
     registered = _registered_lane_worktree()
-    if registered is not None:
-        assert registered.is_dir(), (
-            f"`{WORKTREE_RESOLUTION}` registers {registered} for {LANE_BRANCH}, "
-            f"but that directory does not exist"
+    if on_lane:
+        assert registered is not None, (
+            f"this checkout is on {LANE_BRANCH}, but `{WORKTREE_RESOLUTION}` "
+            "does not register that branch"
         )
-        if _git_lines("rev-parse", "--abbrev-ref", "HEAD") == [LANE_BRANCH]:
-            assert registered.resolve() == ROOT.resolve(), (
-                f"this checkout is on {LANE_BRANCH} but Git registers the lane "
-                f"worktree at {registered}, not {ROOT}"
-            )
+    if registered is None:
+        return
+    assert registered.is_dir(), (
+        f"`{WORKTREE_RESOLUTION}` registers {registered} for {LANE_BRANCH}, "
+        f"but that directory does not exist"
+    )
+    if on_lane:
+        assert registered.resolve() == ROOT.resolve(), (
+            f"this checkout is on {LANE_BRANCH} but Git registers the lane "
+            f"worktree at {registered}, not {ROOT}"
+        )
 
 
 def test_target_documents_do_not_present_the_malformed_source_pin_as_valid() -> None:
@@ -395,8 +427,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         "the current block must name exactly one current candidate artifact digest"
     )
     assert "29-page v2.2" in normalized_current
-    assert CLAUDE_V22_REVIEW_HEAD in normalized_current
-    assert "Claude's independent review is complete" in normalized_current
+    assert LATEST_CLAUDE_REVIEW_HEAD in normalized_current
+    assert "Codex has counter-reviewed every Claude commit" in normalized_current
     assert "No next implementation milestone is authorized" in normalized_current
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
@@ -410,21 +442,18 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in routing_row
     assert BLUEPRINT_CONTENT_SHA256 in routing_row.lower()
 
-    action_current = _doc("ACTION_PLAN_2026-08-20.md").split(
-        "**Current bounded status, 2026-08-30:**", 1
-    )[1].split("**Owner multiplicity amendment, 2026-08-30", 1)[0]
-    handoff_current = _doc("SESSION_HANDOFF.md").split(
-        "## 0. Target-Price Revision fourth-lane planning addition", 1
-    )[1].split("\n## ", 1)[0]
-    for current_pointer in (action_current, handoff_current):
-        assert CLAUDE_V22_REVIEW_HEAD in current_pointer
-        assert "No next implementation milestone is authorized" in current_pointer
-        normalized_pointer = " ".join(current_pointer.lower().split())
+    for current_pointer in (_action_current(), _handoff_current()):
+        normalized_pointer = " ".join(current_pointer.split())
+        assert LATEST_CLAUDE_REVIEW_HEAD in normalized_pointer
+        assert "Codex has counter-reviewed every Claude commit" in normalized_pointer
+        assert "No next implementation milestone is authorized" in normalized_pointer
+        normalized_pointer_lower = normalized_pointer.lower()
         stale_current_claims = (
             "pending claude review of this codex round",
             "receive one last narrow identity/document guard run",
             "before commit and the single push",
             "after this counter-review correction round's single push",
+            "after this counter-review round's single push",
         )
         for stale_claim in stale_current_claims:
-            assert stale_claim not in normalized_pointer
+            assert stale_claim not in normalized_pointer_lower

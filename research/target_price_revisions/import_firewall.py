@@ -6,6 +6,8 @@ modules such as :mod:`pathlib` and :mod:`subprocess` remain capable of I/O if
 called. Their presence grants no provider, outcome, QC, broker, or trading
 authority; those capabilities remain separately absent and authorization-gated.
 """
+
+# TPR-CCR5-001: tracked LF migration marker for existing Windows worktrees.
 from __future__ import annotations
 
 import ast

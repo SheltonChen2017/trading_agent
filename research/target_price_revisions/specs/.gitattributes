@@ -1,3 +1,4 @@
-# TPR authority artifacts are content-addressed exact bytes.  Disable Git's
-# newline translation so canonical one-LF JSON remains identical on Windows.
+# TPR authority artifacts are content-addressed exact bytes.  Disable checkout
+# translation so canonical one-LF JSON remains identical on Windows.
+# TPR-CCR5-001: this tracked comment also migrates the policy attribute file.
 *.json -text

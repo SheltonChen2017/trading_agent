@@ -1,18 +1,16 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED CODEX'S COUNTER-REVIEW ROUND
-`0af1ca8`..`c8c7470`. BOTH COMMITS ARE ACCEPTED; ONE P1 (`TPR-CR4-001`) AND
-ONE P3 (`TPR-CR4-004`) WERE FOUND AND CORRECTED IN LANE. THE OWNER RESOLVED
-`TPR-CR4-002` BY DIRECTING THAT THE LANE WORKTREE BE RESOLVED FROM
-`git worktree list` INSTEAD OF A HARDCODED PATH; SECTION 20 RECORDS THAT
-CORRECTION. NO P0, P1, OR P2 REMAINS OPEN.
-CLAUDE'S THREE-COMMIT V2.2 REVIEW ROUND IS COMPLETE THROUGH
-`db6a721`, AND CODEX HAS COUNTER-REVIEWED EVERY COMMIT, CORRECTED THE CURRENT-
-STATE AND GUARD DEFECTS, AND QUALIFIED THE VALIDATION EVIDENCE. THE EXACT
-TPR-0A V2.2 SNAPSHOT AT `bb8dfb6` HAS COMPLETED THE HUMAN INDEPENDENT-REVIEW
-AND COUNTER-REVIEW LOOP AS A ZERO-ACCESS FROZEN CANDIDATE. THE REVIEWED-SPEC
-REGISTRY REMAINS EMPTY, THE CANDIDATE REMAINS UNREVIEWED FOR ITS OWN REGISTRY,
-AND NO POSITIVE ALGORITHM AUTHORITY EXISTS. TPR-1 IS BLOCKED ON AN EXACT
+Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN THE FOUR-COMMIT
+RANGE `c8c7470`..`f21d708`. THE WINDOWS POLICY-BYTE MIGRATION, CURRENT-ROLE,
+TARGET-SCOPED WORKTREE-GUARD, RANGE-NOTATION, AND REVIEW-REPORT DEFECTS ARE
+CORRECTED OR QUALIFIED IN SECTION 21. NO P0 OR P1 REMAINS. ONE PRE-EXISTING
+TARGET P2 (`TPR-CCR5-004`) IS OPEN: THE REVIEWED-ALGORITHM LOADER'S POLICY-PATH
+INVENTORY IS SELF-MUTABLE AND MUST RECEIVE A SEPARATELY REVIEWED IMMUTABLE
+TRUST-ROOT DESIGN BEFORE ANY POSITIVE REVIEWED-ALGORITHM AUTHORITY CAN EXIST.
+THE TPR-0A V2.2 PDF AND CANDIDATE ARTIFACT BYTES ARE UNCHANGED; THE
+REVIEWED-SPEC REGISTRY REMAINS EMPTY, THE CANDIDATE REMAINS UNREVIEWED FOR ITS
+OWN REGISTRY, AND NO POSITIVE ALGORITHM AUTHORITY EXISTS. NO NEXT
+IMPLEMENTATION MILESTONE IS AUTHORIZED. TPR-1 IS BLOCKED ON AN EXACT
 SEPARATELY REVIEWED SOURCE-RIGHTS ARTIFACT; TPR-0B IS BLOCKED ON REVIEWED
 TPR-1/TPR-2 STRUCTURAL MANIFESTS; EVERY OUTCOME/LOOK GATE REMAINS UNAVAILABLE.
 NO AUTHENTICATED TARGET-PRICE SOURCE, INGEST, CANONICAL EVENT, SIGNAL, OUTCOME
@@ -352,30 +350,37 @@ The current candidate has spec ID
 and artifact SHA-256
 `17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a`.
 
-The TPR-0A snapshot has completed this human review/counter-review loop only
-as a zero-access frozen candidate. The reviewed-spec registry remains empty,
-the candidate remains unreviewed for its own registry, and `TPR-CCR2-011`
-still requires a separately controlled signed review receipt or trusted
-commit-signature policy before any positive authority can rely on reviewer
+The TPR-0A snapshot remains a zero-access frozen candidate. The reviewed-spec
+registry remains empty, the candidate is unreviewed for its own registry, and
+`TPR-CCR2-011` still requires a separately controlled signed review receipt or
+trusted commit-signature policy before positive authority can rely on reviewer
 identity. No next implementation milestone is authorized. TPR-1 remains
 blocked until a separately reviewed source-rights artifact proves entitlement,
 public-time semantics, correction completeness, target-horizon consistency,
 raw retention, derived processing, and QC-transfer rights. TPR-0B remains
-blocked until reviewed TPR-1 and TPR-2 structural manifests exist. After this
-counter-review round's single push, Claude reviews only the exact correction
-range on this branch; that loop step grants no source, outcome, look, QC,
-broker, paper, live, deployment, capital, or trading authority.
+blocked until reviewed TPR-1 and TPR-2 structural manifests exist.
 
-**Claude review of that correction range, 2026-08-30:** Claude has now
-reviewed `0af1ca8`..`c8c7470` and accepted both commits. One P1
-(`TPR-CR4-001`) is corrected in this lane: on the supported Windows checkout,
-Git's default `core.autocrlf` translation made every reviewed policy-code
-file differ from its committed blob, so `_review_anchor` refused
-unconditionally and three lane tests failed on the lane's registered
-worktree. `TPR-CR4-002` (P2) is closed: the owner directed that the lane
-worktree be resolved from `git worktree list` rather than pinned as an
-absolute path, and the documents and guard now do that. Sections 19 and 20
-hold the evidence, dispositions, and validation.
+**Current counter-review state, 2026-08-31:** Codex has counter-reviewed every
+Claude commit in
+`c8c74704bb9bbda5a756d90afa33666371125a89..f21d70851d5e1790be0c308e13e8837a7cd1d008`.
+The newline diagnosis was sound but the first correction did not migrate an
+existing clean fast-forward and used backwards blob-protection reasoning;
+the corrected lane attributes now canonicalize LF on checkout and add, while
+tracked no-behavior policy comments force the five affected nonempty files to
+re-materialize. The owner-directed dynamic worktree resolution is retained,
+but its guard is narrowed to current target blocks and now refuses a missing
+registration when this checkout is on the lane branch. Section 21 contains
+all four dispositions, exact findings, and validation.
+
+One pre-existing target P2, `TPR-CCR5-004`, remains open: the runtime policy-
+path inventory can remove its own defining file and another policy path while
+a matching registry map still passes. The registry is empty today, so this
+mints no present authority; an independently reviewed immutable inventory or
+equivalent external trust root is required before any positive reviewed-
+algorithm authority. After this Codex round's single push, Claude reviews only
+the exact correction range beginning after `f21d708`; that loop step grants no
+source, outcome, look, QC, broker, paper, live, deployment, capital, or trading
+authority.
 
 ### Historical progression (not the current resume instruction)
 
@@ -1450,3 +1455,91 @@ No provider, credential, licensed row, outcome, QuantConnect, broker,
 operator-database, scheduler, paper or live surface was accessed or changed.
 Provider accesses: **0**. Outcome accesses: **0**. Authorized or spent research
 looks: **0**. No milestone was implemented and no authority changed.
+
+## 21. Codex counter-review of Claude's CR4 round - 2026-08-31
+
+**Disposition: accepted after correction and qualification.** Codex reviewed
+all four Claude commits individually. The newline diagnosis and the owner's
+dynamic-worktree resolution are valid, but the cumulative tree did not meet
+its ordinary-fast-forward, current-state, or target-only guard claims. Those
+defects are corrected here. One pre-existing target authority-anchor defect is
+recorded as an open P2 rather than papered over with an invented trust root.
+No next implementation milestone is authorized.
+
+Counter-reviewed round quality: **6/10**. The review found a real Windows
+compatibility defect and supplied strong full-suite evidence, but its first
+fix did not migrate existing worktrees, used backwards Git-clean-filter
+reasoning, overreached into sibling text, retained contradictory routing, and
+left several report/range inaccuracies.
+
+### 21.1 Exact counter-reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch | `codex/strategy-target-price-revisions` |
+| Worktree | The checkout `git worktree list` registers for that branch; no directory is pinned |
+| Previously processed Codex head | `c8c74704bb9bbda5a756d90afa33666371125a89` |
+| Claude range | `c8c74704bb9bbda5a756d90afa33666371125a89..f21d70851d5e1790be0c308e13e8837a7cd1d008` |
+| Claude commits, ordered | `ea9d890beb478f5a881caaef757a8b15e8d5c0db`, `ce74e72b59d759c447f52d5a6c0ec9fff0846f67`, `50da9d07a46bcd0770fc3c9219b3d0a187494383`, `f21d70851d5e1790be0c308e13e8837a7cd1d008` |
+| Synchronization | Branch-only fetch; local clean; fast-forward only; remote and local both `f21d708` before correction |
+| Governing PDF | 29-page v2.2, raw SHA-256 `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b` |
+| Local review environment | `C:\git\customizedagent\trading_agent\.venv\Scripts\python.exe`; Python 3.12.13; pytest 9.1.1; system `core.autocrlf=true` |
+
+### 21.2 Commit-by-commit dispositions
+
+| Claude commit | Disposition | Counter-review basis |
+|---|---|---|
+| `ea9d890beb478f5a881caaef757a8b15e8d5c0db` | **Accepted after correction** | Pinning target policy checkout bytes is required and fresh checkouts become exact. An ordinary clean fast-forward from `c8c7470`, however, leaves the unchanged CRLF policy files in place, so the new guard remains red. `* -text` also makes a later CRLF add persist raw CRLF rather than protecting the LF blob. `TPR-CCR5-001` replaces it with LF text normalization, changes each affected policy blob once, and compares working bytes directly with HEAD. |
+| `ce74e72b59d759c447f52d5a6c0ec9fff0846f67` | **Accepted after correction and qualification** | The two Codex commits in `db6a721..c8c7470` are reasonably accepted and the commit is record-only/zero-authority. At this standalone commit, the record says review is complete while the Action Plan and handoff still route it as next; successor `50da9d0` closes that P2. The P1 label, mutation count, affected-file count, Git-add rationale, correction identity, and missing quality score need the qualifications in `TPR-CCR5-005`. |
+| `50da9d07a46bcd0770fc3c9219b3d0a187494383` | **Accepted after correction and qualification** | Moving the current coordination surfaces to completed-review state is correct. Its `0af1ca8..c8c7470` two-commit notation excludes `0af1ca8` under Git semantics; `db6a721..c8c7470` is exact. `TPR-CCR5-006` corrects current handoff text and preserves the historical row with an explicit qualification. |
+| `f21d70851d5e1790be0c308e13e8837a7cd1d008` | **Accepted after correction** | Resolving the lane with Git rather than a host-specific directory follows the owner direction and works in this checkout. The guard scans entire shared documents and rejects legitimate sibling worktree names, skips resolution entirely when an active lane returns no registration, and accepts a record whose current preamble lost the instruction because historical section 20 still contains it. It also leaves section 8 routing the already-reviewed prior range back to Claude. `TPR-CCR5-002`, `003`, and `007` close those defects. |
+
+### 21.3 Counter-review issue ledger
+
+| ID | Priority | Status | Commit / location | Finding, reason, correction, and verification |
+|---|---|---|---|---|
+| `TPR-CCR5-001` | P2 | **Closed by current correction** | `ea9d890`; lane `.gitattributes`, five nonempty `POLICY_CODE_REPO_PATHS`, target document guard | The attributes-only change repairs a fresh checkout but does not rewrite unchanged CRLF files during the lane monitor's required clean fast-forward. That leaves the reviewed-authority path fail-closed and the new guard red. The `-text` blob-protection rationale is also backwards: normal text cleaning maps CRLF back to LF, while `-text` can persist raw CRLF. The lane now uses `text eol=lf`; all five nonempty policy blobs carry a no-behavior migration marker so a fast-forward must rewrite them; the shared empty file is untouched; and the guard freezes an independent expected inventory, compares every working file with `git show HEAD:<path>`, and checks `text=set, eol=lf`. Candidate, reviewed-registry, source-authority, and look-authority JSON bytes are unchanged. |
+| `TPR-CCR5-002` | P2 | **Closed by current correction** | `f21d708`; record section 8 and current coordination blocks | Section 8 says the prior correction goes to Claude immediately before saying Claude already reviewed it. That is incorrect durable state and misroutes the next role. All current blocks now identify the complete `c8c7470..f21d708` Claude range, this Codex counter-review, the blocked milestone, and the new post-push Claude step. The guard rejects the stale phrase that previously evaded it. |
+| `TPR-CCR5-003` | P2 | **Closed by current correction** | `f21d708`; `test_lane_documents_resolve_the_worktree_from_git` | The target-owned guard searches the entire shared Action Plan and Session Handoff for every `trading_agent_*` name. A legitimate sibling-lane pointer therefore turns the TPR guard red, violating the lane boundary. It now scopes assertions to the Action Plan's current target block, handoff section 0, and record preamble; only those target surfaces must omit pinned directories. |
+| `TPR-CCR5-004` | P2 | **Open; owner-approved trust-root design required before positive authority** | Pre-existing `_review_anchor`; `POLICY_CODE_REPO_PATHS` and the reviewed registry map | The loader's policy inventory is defined by the same mutable code it is meant to anchor. A controlled fixture removed `preregistration.py` itself plus `canonical.py` from that tuple and from a matching registry map; later changes to both omitted files still allowed `load_reviewed_algorithm_spec` to return reviewed authority. The current registry is empty, so no present authority is minted and all source/outcome/look gates remain closed. A separately frozen immutable inventory, signed manifest, or equivalent external trust root must be designed and independently reviewed before any positive registry entry; inventing that authority design is outside this blocked counter-review round. |
+| `TPR-CCR5-005` | P3 | **Closed by correction and qualification** | `ea9d890` / `ce74e72`; section 19 and current header | `TPR-CR4-001` is a P2 meaningful fail-closed compatibility defect under the binding severity table, not P1 unsafe execution. Five of six policy files differed, not every file. The report's hardened-guard evidence contains four red mutations plus one deliberately green limitation, not five red mutations; it has two P3 qualifications, not one; and it omits correction commit `ea9d890` and the required quality rating. Historical text is retained; this section supplies the controlling classification, exact counts, correction identity, and rating. |
+| `TPR-CCR5-006` | P3 | **Closed by current correction/qualification** | `50da9d0`; current handoff and appended session row | Git ranges exclude the left endpoint. `0af1ca8..c8c7470` denotes only `c8c7470`, and `ea9d890..f21d708` omits `ea9d890`. Current text uses `db6a721..c8c7470` for the two Codex commits and `c8c7470..f21d708` for all four Claude commits. The earlier append-only session row remains as historical evidence and is explicitly qualified here. |
+| `TPR-CCR5-007` | P3 | **Closed by current correction** | `f21d708`; worktree-resolution guard | The guard passes when the active lane branch has no registered worktree, and it searches the whole record for the resolution phrase so historical section 20 can mask a missing current instruction. It now requires a non-null registration whenever HEAD is the lane branch and scopes the record wording to its current preamble. Detached historical probes may still lack a registered lane, but all document assertions continue to run. |
+
+### 21.4 Authority and milestone decision
+
+The sole-authority PDF and TPR-0A candidate artifact are unchanged. The policy
+comments and Git attributes change only checkout/anchor mechanics and remain
+pending Claude review after this round's one push. The reviewed-spec registry
+is empty; source and permanent-look authority artifacts remain exact zero-
+access declarations; the candidate remains unreviewed for its own registry;
+and no permanent look is authorized or spent. `TPR-CCR5-004` is an additional
+gate before positive reviewed-algorithm authority, not permission to build or
+populate a registry.
+
+TPR-1 is still blocked on a separately reviewed exact source-rights artifact,
+and TPR-0B still waits for reviewed TPR-1/TPR-2 structural manifests. No
+provider, credential, licensed row, source sample, outcome, research look,
+QuantConnect upload/compile/job, broker, operator database, scheduler, shadow,
+paper, live, deployment, capital, or trading authority was accessed or added.
+No next implementation milestone was implemented.
+
+### 21.5 Baseline and correction verification
+
+- Exact synchronized `f21d708` baseline: target-price plus active-document
+  suites **190 passed, 3 skipped in 14.08s** on the interpreter in section
+  21.1.
+- Git-range proofs: `db6a721..c8c7470` returns the two intended Codex commits;
+  `c8c7470..f21d708` returns all four intended Claude commits. The shorter
+  left-endpoint forms omit their first named commit.
+- Before correction, an active-lane/no-registration function probe passed the
+  worktree test, and the whole-document regex selected a hypothetical
+  `trading_agent_insider` sibling pointer. Both are refused or ignored in the
+  correct target-scoped direction after correction.
+- Final focused/full validation and exact committed-tree evidence follow in
+  the append-only session row and section 21.6.
+
+### 21.6 Final validation
+
+Pending on the complete corrected tree; this subsection will be completed
+without rewriting the baseline evidence above.

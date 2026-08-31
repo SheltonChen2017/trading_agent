@@ -91,23 +91,29 @@ their lane-owned artifacts.
   One P2 (`TPR-CR3-001`) and one P3 (`TPR-CR3-002`) were found and closed:
   the record's current-state section still pinned the superseded v2.1
   blueprint and candidate identities, which a new guard now prevents.
-- Codex's counter-review of every Claude commit in this round is complete.
-  No next implementation milestone is authorized: TPR-1 remains blocked on
-  an exact separately reviewed source-rights artifact, TPR-0B remains blocked
-  on reviewed TPR-1/TPR-2 structural manifests, and the three sibling-lane
-  re-freezes under `TPR-OOL-006` still gate every lane's outcome access.
-- Claude has independently reviewed that counter-review correction range
-  `0af1ca8..c8c7470` and accepted both commits. One P1 (`TPR-CR4-001`) is
-  corrected in lane: Git for Windows newline translation made every reviewed
-  policy-code file differ from its committed blob, so the reviewed-algorithm
-  anchor refused unconditionally and three lane tests failed on the lane's
-  registered worktree. One P2 (`TPR-CR4-002`) is closed by owner direction:
-  all three lane documents pinned one absolute worktree directory that does
-  not exist on the reviewing host, and a guard enforced it, so the owner
-  directed that the lane worktree be resolved from `git worktree list`
-  instead. The documents now name no directory and the guard parses Git's
-  own registration. Sections 19 and 20 of the lane record hold the
-  dispositions, evidence, and validation.
+- Claude independently reviewed both Codex commits in the exact Git range
+  `db6a721..c8c7470`, then made four commits in
+  `c8c7470..f21d70851d5e1790be0c308e13e8837a7cd1d008`. Codex has
+  counter-reviewed every Claude commit in that four-commit range. The newline
+  defect is a P2 fail-closed compatibility defect, not a P1 execution escape:
+  five nonempty policy files differed from their blobs on the reviewing
+  Windows checkout, while shared `research/__init__.py` was empty and exact.
+  The first attributes-only correction fixed fresh checkouts but not an
+  ordinary clean fast-forward; section 21 records the LF-normalizing tracked-
+  blob migration that closes that gap without changing candidate or authority
+  JSON bytes.
+- The owner-directed worktree rule remains to resolve this lane from
+  `git worktree list`, never from a pinned directory. The corrected guard is
+  scoped to current target blocks, accepts sibling-lane text elsewhere, and
+  refuses a missing registration when this checkout is on the lane branch.
+  No P0 or P1 is open. One pre-existing target P2 (`TPR-CCR5-004`) blocks any
+  future positive reviewed-algorithm authority until an independently reviewed
+  immutable policy-inventory trust root exists; the reviewed registry is empty
+  today. No next implementation milestone is authorized: TPR-1 remains blocked
+  on an exact separately reviewed source-rights artifact, TPR-0B remains
+  blocked on reviewed TPR-1/TPR-2 structural manifests, and the sibling-lane
+  re-freezes under `TPR-OOL-006` still gate outcome access. After this Codex
+  round's single push, Claude reviews only its exact correction range.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (29 pages; raw binary SHA-256
@@ -443,9 +449,9 @@ It is a separate fourth planning lane under the owner-directed serialized
 same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. The
-v2.2 implementation snapshot is `bb8dfb6`; Claude's review is complete through
-`db6a721d45eb47e1a133744387bf43a1aa1f310c`, and Codex's counter-review is
-recorded in section 18 of the lane record. No
+v2.2 implementation snapshot is `bb8dfb6`; the latest Claude review head is
+`f21d70851d5e1790be0c308e13e8837a7cd1d008`, and Codex's four-commit
+counter-review/corrections are recorded in section 21 of the lane record. No
 provider-specific target reader/normalizer, authenticated target event,
 permanent target look authority, stock score, ETF topology, portfolio, QC
 algorithm, prospective shadow/paper evidence, or live authority exists. The
@@ -463,10 +469,12 @@ The submitted plan is replaced by the sole-normative corrected stock-first
 29-page v2.2 blueprint whose later QC/autopilot stages remain individually
 owner-gated. No next implementation milestone is authorized: TPR-1 remains
 blocked on exact reviewed source rights and TPR-0B remains blocked on reviewed
-TPR-1/TPR-2 structural manifests. Claude reviewed Codex's counter-review
-correction range on the same branch and accepted both commits; Codex
-counter-reviews that review next. `TPR-CR4-002` is closed: the lane worktree
-is now resolved from `git worktree list` rather than a pinned path.
+TPR-1/TPR-2 structural manifests. `TPR-CR4-002` is closed: the lane worktree
+is resolved from `git worktree list` rather than a pinned path. One target P2,
+`TPR-CCR5-004`, remains open and blocks positive reviewed-algorithm authority
+until an immutable policy-inventory trust root is independently reviewed; it
+does not open TPR-1 or any source/outcome/look gate. Claude reviews the exact
+Codex correction range after this round's single push.
 
 ## 5. Data acquisitions and confirmations
 

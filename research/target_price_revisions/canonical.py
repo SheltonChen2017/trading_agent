@@ -1,4 +1,6 @@
 """Strict canonical JSON and immutable-value helpers for TPR evidence."""
+
+# TPR-CCR5-001: tracked LF migration marker for existing Windows worktrees.
 from __future__ import annotations
 
 import hashlib

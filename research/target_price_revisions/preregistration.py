@@ -6,6 +6,8 @@ evidence.  Those values must arrive in a separately content-addressed,
 independently reviewed ``tpr-structural-bindings-v1`` child that binds this
 parent's complete hash.  No provider or outcome reader exists in this module.
 """
+
+# TPR-CCR5-001: tracked LF migration marker for existing Windows worktrees.
 from __future__ import annotations
 
 import dataclasses

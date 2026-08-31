@@ -94,9 +94,18 @@ their lane-owned artifacts.
   No next implementation milestone is authorized: TPR-1 remains blocked on
   an exact separately reviewed source-rights artifact, TPR-0B remains blocked
   on reviewed TPR-1/TPR-2 structural manifests, and the three sibling-lane
-  re-freezes under `TPR-OOL-006` still gate every lane's outcome access. The
-  exact target-only correction range from this counter-review round is next for
-  Claude review on the same branch.
+  re-freezes under `TPR-OOL-006` still gate every lane's outcome access.
+- Claude has independently reviewed that counter-review correction range
+  `0af1ca8..c8c7470` and accepted both commits. One P1 (`TPR-CR4-001`) is
+  corrected in lane: Git for Windows newline translation made every reviewed
+  policy-code file differ from its committed blob, so the reviewed-algorithm
+  anchor refused unconditionally and three lane tests failed on the lane's
+  registered worktree. One P2 (`TPR-CR4-002`) is open and needs an owner
+  decision: the worktree directory pinned by all three lane documents, and
+  enforced by a guard, does not exist on the reviewing host, while the
+  directory those documents forbid is the one Git actually has registered.
+  Section 19 of the lane record holds the dispositions, evidence, and
+  validation.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (29 pages; raw binary SHA-256
@@ -452,9 +461,10 @@ The submitted plan is replaced by the sole-normative corrected stock-first
 29-page v2.2 blueprint whose later QC/autopilot stages remain individually
 owner-gated. No next implementation milestone is authorized: TPR-1 remains
 blocked on exact reviewed source rights and TPR-0B remains blocked on reviewed
-TPR-1/TPR-2 structural manifests. After Codex's single counter-review push,
-Claude reviews only that correction range on the same branch, not TPR-1 or
-data access.
+TPR-1/TPR-2 structural manifests. Claude reviewed Codex's counter-review
+correction range on the same branch and accepted both commits; Codex
+counter-reviews that review next, and `TPR-CR4-002` needs an owner decision
+before any lane resume pointer is trusted.
 
 ## 5. Data acquisitions and confirmations
 

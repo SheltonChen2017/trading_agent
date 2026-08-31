@@ -65,6 +65,10 @@ separately reviewed exact source-rights artifact, while TPR-0B waits for
 reviewed TPR-1/TPR-2 structural manifests. All outcome access and every
 operational stage remain blocked. Exact dispositions, identities, evidence,
 and gates live in sections 17 and 18 of the target implementation record.
+Claude has now independently reviewed that counter-review range and accepted
+both commits; one P1 was corrected in lane, and one P2 is open and needs an
+owner decision because the lane's pinned worktree directory does not exist on
+the reviewing host. Section 19 of the lane record holds that ledger.
 
 **Owner multiplicity amendment, 2026-08-30 — affects all four strategy lanes:**
 the four named strategy-selection lanes are one fixed family with total

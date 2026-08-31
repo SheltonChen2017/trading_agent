@@ -1947,3 +1947,65 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-30 | Codex implementation | `e53ba26` -> this commit | ARV2-4A outcome-free structural evaluation prerequisite | Added the canonical child stock-evaluation contract, exact PDF/parent analysis and reporting structure, strict canonical/provenance loader, fixture-only same-date control transforms, training-only Decimal QR, exact per-horizon fold gaps, policy/fold/model lineage, named refusals/coverage, held-out application goldens, and a result-free report plan. Stayed on the dedicated Analyst branch/worktree; no UI, Streamlit, another strategy, shared/frozen project document, source, or executor work. | Focused ARV2-4A **27 passed**; combined counter-review/ARV2-4A **146 passed**; complete Analyst V2 **396 passed, 1 host skip**; exact repository tree **5,669 passed, 3 skipped, 0 failed, 25 known warnings in 893.21 s**; two independent audits end at 0 P0-P2. Compile, document, diff, status, and exact commit-range gates rerun before the one push. No credential, provider row, licensed artifact, price, return, outcome, QC upload/compile/job, deployment, broker, scheduler, or order; **0 research looks and 0 development evaluations**. | All implementation-audit P0-P2 findings corrected; none unresolved. Source/global-map/fold/power/economic/registry/result/QC/deployment bindings remain null and capabilities false. ARV2-4A is a structural candidate, not an evaluation. | Commit separately from `e53ba26`, validate the exact combined tree, then push exactly once. Claude independently reviews both commits; Codex counter-reviews before any next milestone. |
 | 2026-08-30 | Claude review | `c334571` -> this commit | Independent review of ARV2-3, ARV2-3Q and ARV2-4A | Reviewed all ten commits in `f592334..c334571` with an explicit disposition each (section 4R). **Accepted with no correction required** - the first round in this lane where I found nothing to fix; no code or test was changed, only this record. Read `stock_signal.py`, `qc_first_plan.py`, `stock_controls.py` and `stock_evaluation_contract.py`, and verified the QC-first resequencing in detail: the superseded ARV2-0 look was genuinely unbound and unspent and its loader now refuses revival, the multiplicity model applies 1/60 to the single prospective look under three-lane Bonferroni, historical QC work is explicitly non-confirmatory, stock-first survives in the frozen gatekeeping order, and the underpowered-paper-confirmation critique is pre-empted by `target_only_not_a_power_claim` plus a mandatory pre-observation power plan and uninspected retirement of an insufficient look. | As-received `c334571`: **5,668 passed, 4 skipped, 0 failed, 25 known warnings in 2,227.73s**; because this review changes no code, that run is also the final-tree code validation. Focused: ARV2 directory 292 passed/1 skipped; QC-first 34 passed; evaluation+controls 27 passed; stock signal 58 passed; active-document gate rerun before commit. Adversarial probe: all six source kinds refuse, outcome loader never fires, both zero-access declarations verify positively, QC-first capabilities stay constant false even with every authority phase claimed complete and fully bound, out-of-order/premature/tampered plans refuse, import closure 29 modules with zero forbidden roots. Mutation matrix killed 5 of 7; the 2 survivors are proven unreachable. `git diff --check` clean. No provider, credential, licensed row, price, return, outcome, broker, operator-database, QuantConnect or scheduler access. **0 research looks.** | 0 P0, 0 P1, 0 P2, 0 P3. Two observations recorded, neither a defect: ARV2R5-001 shows two `stock_controls._require_contract` guards are unreachable rather than untested, demonstrated by showing the loader refuses both violations at load, so no fabricated regression was added; ARV2R5-002 notes that two different Claude sessions are now reviewing this lane (Opus 5 produced 4L/4O, this Fable 5 session produced 4I and 4R), which commit trailers distinguish cleanly, but the workflow specifies one dedicated Claude review session per lane. | Codex counter-reviews this exact pushed head. ARV2-4 remains blocked by the source, rights, review, run-identity and one-use authority gates; every executable definition hash is null, so stock execution, upload, QC launch, paper deployment and funded live are all constant false. The two-reviewer coordination question in ARV2R5-002 is for the owner. |
 | 2026-08-31 | Codex counter-review push authorization | `37dc424` -> `3aedfff` (counter-review series; this authorization-record commit follows) | Accept Claude's review after correction; owner-authorized counter-review-only push | Counter-reviewed Claude commit `37dc424` commit-by-commit and cumulatively, corrected the inherited production-registration authority gap and ARV2-4A clock, contract-lineage, fold-lineage, and reporting defects, added dangerous-direction regressions, reconciled the historical review ledger, and committed code/tests as `33d40f1` plus the counter-review record as `3aedfff`. After Codex reported that no next bounded milestone or push was authorized, the owner explicitly instructed `push`; this row records that narrow exception only. | Exact corrected code/test tree on Python 3.13.14: **5,670 passed, 3 skipped, 0 failed, 25 known dependency warnings in 2,228.09 s (37m08s)**; final focused battery **70 passed, 1 skipped**; active-document gate **63 passed**; compileall exit 0; final diff/status and remote-head gates clean. No credential, provider row, licensed artifact, price, return, outcome, QC upload/compile/job, deployment, broker, operator database, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | 0 P0, 0 P1, 5 P2, 5 P3; ARV2CR8-001 through ARV2CR8-010 all corrected. Three independent final audits found no remaining P0-P3 issue. The corrected ARV2-4A hash remains pending the next independent review; every production/QC/action capability remains false. | Commit this authorization record and push the exact three-commit range once. Claude independently reviews the pushed correction series on this same branch. Do not start ARV2-4 or the recommended fold-manifest-only candidate without separate owner authorization. |
+
+## 6. Project-wide `main` synchronization conflict review, 2026-08-31
+
+This review froze the pushed Analyst lane at
+`c16f7f40c844cc70c387c3270c03a01209a5015b` and `origin/main` at
+`1a5264e6b1de3caf5477477d1312a762b2d42419`.  The merge was resolved only in
+a detached disposable clone and recorded by local merge commit
+`4ef736b`; the live long-lived branch, its worktree, and its remote ref were
+not moved.  Applying or pushing this artifact requires a fresh exact-tip check
+and separate owner direction.
+
+### 6.1 Commit-by-commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `e53ba26` | Accepted | ARV2-3Q counter-review corrections remain fail-closed and consistent. |
+| `c334571` | Accepted after correction | ARV2-4A defects ARV2CR8-006 through ARV2CR8-010 were corrected by `33d40f1`. |
+| `37dc424` | Accepted after correction | Its independent verification remains useful; ARV2CR8-001 through ARV2CR8-004 were corrected. |
+| `33d40f1` | Accepted | Correctly closes registration self-promotion, decision-clock and lineage relabeling, and report-contract gaps. |
+| `3aedfff` | Accepted | Accurate documentation-only counter-review ledger. |
+| `c16f7f4` | Accepted | Accurately records the narrow push authorization without granting later authority. |
+
+The earlier `a4f58e6..f2c15d8` history retains the dispositions already recorded
+above.  No new open P0-P3 finding remains in the reviewed pushed delta.
+
+### 6.2 Conflict choices and finding
+
+All 37 textual conflicts were resolved without weakening either side's owned
+contract.  Shared safety and execution production files use the exact newer
+`main` versions.  Analyst-owned source, specifications, fixtures, and closest
+tests use the exact lane versions.  Four manual test unions retain
+non-superseded coverage for real-process crash durability, malformed
+read-only open-order books, fork-child reset behavior, and Store-alias
+installer-preview skipping.  Three older lane-only portfolio-ledger tests were
+not retained because two asserted behavior incompatible with `main`'s newer
+exact-money/provenance contract and the remaining behavior is covered by the
+stronger shared suite.
+
+`ARV2-MRG-001` (P2) was found and corrected during integration: a wholesale
+lane choice for this record omitted `main`'s exact active-document requirement
+that a valid null closes the canonical family.  The reconciled ARV2-4 gate now
+states that a screen failure or valid null closes the canonical family, while
+only a pass unlocks ARV2-5.  No executable strategy behavior was changed by
+that documentation correction.
+
+### 6.3 Verification and authority
+
+- Analyst-focused: **408 passed, 1 skipped**.
+- Reconciliation-focused: **103 passed**.
+- Active-document consistency after the gate union: **67 passed**.
+- Exact final resolved tree: **5,953 passed, 3 skipped, 0 failed, 26 warnings**
+  in 993.96 seconds; repository `compileall` exited 0.
+- Non-PDF staged `git diff --check` passed.  The standard check reports only
+  whitespace-like bytes in the exact `main`-owned target-price PDF; its blob
+  equals the second parent and was not rewritten.
+- The initial long-temporary-path failures were Windows path-length artifacts;
+  the identical selection passed with a short temporary base.
+
+No provider, credential, licensed row, price, return, outcome, QuantConnect
+upload/compile/job, deployment, broker, operator database, scheduler, order,
+UI, or trading authority was used or granted.  ARV2-4 remains blocked, and
+this merge-resolution record does not authorize a later milestone.

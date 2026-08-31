@@ -1,0 +1,481 @@
+{
+  "schema": "arv2-stock-historical-evaluation-structural-v1",
+  "status": "implementation_frozen_outcome_free_structural_candidate_pending_independent_review",
+  "authority": "structural_definition_only_no_source_data_outcome_qc_or_deployment_authority",
+  "spec_id": "arv2-stock-historical-c5ff2a6a0dcf341e",
+  "spec_hash": "c5ff2a6a0dcf341e3c7bad4ea56e4a3c00f20faab5896c0fcd3bd7c291835a0b",
+  "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193",
+  "parent_plan_id": "arv2-qc-first-plan-36e455e72b8750fe",
+  "parent_plan_hash": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc",
+  "evaluation_id": "arv2-eval-stock-historical-qc-001",
+  "control_definition": {
+    "source_score": "pdf_reliable_score",
+    "continuous_columns": [
+      "momentum_20d",
+      "momentum_60d",
+      "momentum_12_1",
+      "sector_momentum_20d",
+      "sector_momentum_60d",
+      "sector_momentum_12_1",
+      "industry_momentum_20d",
+      "industry_momentum_60d",
+      "industry_momentum_12_1",
+      "market_beta_252d",
+      "realized_volatility_60d",
+      "value_book_to_market",
+      "growth_trailing_revenue",
+      "size_market_cap",
+      "liquidity_dollar_volume_60d",
+      "turnover_60d",
+      "analyst_coverage_60d",
+      "event_intensity_20d",
+      "event_diversity_20d"
+    ],
+    "binary_columns": [
+      "exact_earnings_day",
+      "one_to_two_days_after_earnings",
+      "three_to_five_days_after_earnings",
+      "over_five_days_after_earnings",
+      "pre_earnings",
+      "public_guidance_proximity"
+    ],
+    "forbidden_pretrade_columns": [
+      "active_event_indicator",
+      "absolute_contribution_weighted_publication_to_entry_jump"
+    ],
+    "outcome_only_price_jump_vector": [
+      "active_event_indicator",
+      "absolute_contribution_weighted_publication_to_entry_jump"
+    ],
+    "detailed_control_source_definition_sha256": null,
+    "transform": "same_date_accepted_preopen_control_rows_after_named_refusals_median_mad_times_1_4826_no_epsilon",
+    "binary_transform": "unchanged_exact_zero_or_one",
+    "zero_mad": "refuse_complete_date_cross_section",
+    "missing_stale_or_post_open": "refuse_row_before_fit_or_apply",
+    "minimum_accepted_control_coverage": {
+      "numerator": 19,
+      "denominator": 20
+    },
+    "minimum_accepted_rows_per_cross_section": 20,
+    "coverage_denominators": [
+      "eligible_candidate_census_rows",
+      "accepted_preopen_control_rows",
+      "named_preopen_control_refusals",
+      "adjusted_output_rows",
+      "named_application_refusals"
+    ],
+    "fit_population": "active_rating_signal_training_rows_only",
+    "census_population": "enumerate_all_eligible_rows_including_structural_zeros_and_named_refusals",
+    "estimator": "pooled_equal_weight_training_ols",
+    "design": "intercept_then_continuous_then_binary_then_industry_dummies",
+    "industry_reference": "lexicographically_first_training_level",
+    "unseen_industry": "refuse_active_row_structural_zero_remains_exact_zero",
+    "minimum_rows": "strictly_more_than_parameter_count_plus_20",
+    "solver": "decimal_modified_gram_schmidt_qr",
+    "decimal_precision": 50,
+    "decimal_rounding": "ROUND_HALF_EVEN",
+    "decimal_emin": -999999,
+    "decimal_emax": 999999,
+    "rank_relative_threshold": "1e-20",
+    "validation_test_application": "freeze_training_coefficients_columns_and_industry_levels_apply_unchanged",
+    "structural_zero": "excluded_from_fit_and_remains_exact_zero",
+    "active_residual_clip": [
+      "-4",
+      "4"
+    ],
+    "outcomes_used": false
+  },
+  "global_benchmark_definition": {
+    "role": "mandatory_non_rescuing_firm_specific_normalization_gate",
+    "global_rating_map_definition_sha256": null,
+    "matched_row_contract_sha256": null,
+    "required_parity": [
+      "same_admitted_raw_events_and_named_refusals",
+      "same_point_in_time_universe_controls_costs_and_walk_forward_folds",
+      "same_common_event_components_horizon_and_inference"
+    ],
+    "fit_rule": "fit_each_signal_separately_on_the_same_training_census",
+    "primary_metric": "paired_walk_forward_test_date_20_session_spearman_ic_on_identical_rows",
+    "fold_scope": "walk_forward_test_dates_only",
+    "comparison": "firm_specific_minus_global_map",
+    "margin": {
+      "numerator": 0,
+      "denominator": 1
+    },
+    "uncertainty": "paired_centered_moving_block_bootstrap_on_common_test_dates_length_20_19999_resamples",
+    "pass_rule": "observed_difference_nonnegative_and_one_sided_95pct_lower_bound_nonnegative_strict_no_worse_with_confidence",
+    "minimum_paired_coverage_definition_sha256": null,
+    "secondary_metrics": "registered_BH_FDR_reporting_only_never_rescue",
+    "failure": "closes_family",
+    "current_execution_authorized": false
+  },
+  "history_definition": {
+    "history_start": "2013-01-02",
+    "outcome_cutoff_session": "2026-08-28",
+    "horizons_sessions": [
+      1,
+      5,
+      20,
+      60
+    ],
+    "primary_horizon_sessions": 20,
+    "last_mature_decision_session": {
+      "1": "2026-08-27",
+      "5": "2026-08-21",
+      "20": "2026-07-31",
+      "60": "2026-06-03"
+    },
+    "tail": "later_decisions_are_named_immature_refusals",
+    "walk_forward": {
+      "train_years": 5,
+      "validation_years": 2,
+      "test_years": 1,
+      "step_years": 1,
+      "mode": "rolling",
+      "intervals": "half_open_nyse_session_intervals",
+      "calendar_anchor": "calendar_year_boundaries",
+      "partial_2026": "exclude_from_test_fold_until_full_test_interval_exists",
+      "purge_sessions_by_horizon": {
+        "1": 1,
+        "5": 5,
+        "20": 20,
+        "60": 60
+      },
+      "embargo_sessions_by_horizon": {
+        "1": 1,
+        "5": 5,
+        "20": 20,
+        "60": 60
+      },
+      "cross_boundary_common_event_components": "refuse_from_adjacent_samples",
+      "fold_manifest_sha256": null
+    }
+  },
+  "analysis_definition": {
+    "role": "development_stop_go_not_prospective_confirmation",
+    "contamination_disclosure": "2019-07-16_through_2026-07-23_is_discovery_only_all_historical_inference_is_descriptive",
+    "confirmatory_claim_permitted": false,
+    "primary_gate_ids": [
+      "bullish_20_session_fama_macbeth",
+      "net_20_session_sleeve",
+      "firm_specific_vs_global_map_paired_20_session_ic"
+    ],
+    "primary_gate_logic": "intersection_union_conjunction_each_gate_must_pass_none_can_rescue_another",
+    "primary_development_size": {
+      "numerator": 1,
+      "denominator": 20
+    },
+    "prospective_alpha_spent": false,
+    "fama_macbeth": {
+      "regressors_of_interest": {
+        "bullish_primary": "maximum_final_control_adjusted_score_and_zero",
+        "bearish_secondary": "minimum_final_control_adjusted_score_and_zero",
+        "symmetry_assumed": false,
+        "bearish_can_rescue_bullish": false
+      },
+      "outcome_controls": [
+        "momentum_20d",
+        "momentum_60d",
+        "momentum_12_1",
+        "sector_momentum_20d",
+        "sector_momentum_60d",
+        "sector_momentum_12_1",
+        "industry_momentum_20d",
+        "industry_momentum_60d",
+        "industry_momentum_12_1",
+        "market_beta_252d",
+        "realized_volatility_60d",
+        "value_book_to_market",
+        "growth_trailing_revenue",
+        "size_market_cap",
+        "liquidity_dollar_volume_60d",
+        "turnover_60d",
+        "analyst_coverage_60d",
+        "event_intensity_20d",
+        "event_diversity_20d",
+        "exact_earnings_day",
+        "one_to_two_days_after_earnings",
+        "three_to_five_days_after_earnings",
+        "over_five_days_after_earnings",
+        "pre_earnings",
+        "public_guidance_proximity",
+        "active_event_indicator",
+        "absolute_contribution_weighted_publication_to_entry_jump"
+      ],
+      "dependent_variable": "gross_security_total_return_minus_matching_SPY_total_return",
+      "outcome_clock": "eligible_decision_session_open_to_horizon_session_open",
+      "date_cross_section": "intercept_scores_controls_and_industry_fixed_effects",
+      "eligible_census": "all_point_in_time_eligible_stocks_including_structural_zero_neutral_rows",
+      "refusal_accounting": "exhaustive_before_model_fit_no_signal_filter",
+      "invalid_date": "refuse_if_underidentified_or_rank_deficient",
+      "date_weighting": "equal_weight_valid_test_dates",
+      "common_event_weighting": "equal_common_event_component_weight_within_date_each_row_weight_one_over_component_row_count_then_normalize_component_weights",
+      "common_event_handling": {
+        "membership": "build_a_bipartite_graph_of_security_decision_rows_and_all_admitted_common_event_ids_then_take_deterministic_connected_components",
+        "multi_event_row": "belongs_to_exactly_one_connected_component",
+        "neutral_row": "singleton_component",
+        "outcome_duplication": false,
+        "cross_date_component": "name_refuse_every_row_in_the_component_before_fold_assignment_and_report_coverage",
+        "within_date_component": "component_total_weight_one_rows_fractional_by_component_size",
+        "resampling": "complete_nyse_date_blocks_after_cross_date_components_refuse_so_no_component_can_be_split"
+      },
+      "outcome_duplication": false,
+      "hac_lag_sessions_by_horizon": {
+        "1": 1,
+        "5": 5,
+        "20": 20,
+        "60": 60
+      },
+      "hac_axis": "actual_nyse_session_distance_never_compressed",
+      "hac_kernel": "bartlett",
+      "hac_pair_normalization": "divide_lag_cross_product_sum_by_total_valid_coefficient_dates",
+      "hac_required_report": "observed_pair_count_by_lag",
+      "hac_role": "descriptive_effect_uncertainty_not_separate_pass_gate",
+      "development_pass_rule": "bullish_20_session_mean_beta_strictly_positive_and_centered_two_sided_complete_session_block_bootstrap_p_below_0.05"
+    },
+    "information_coefficient": {
+      "method": "date_level_unweighted_spearman_average_ranks",
+      "score": "signed_final_stock_control_adjusted_score",
+      "outcome": "matching_horizon_gross_SPY_excess_open_to_open_total_return",
+      "eligible_census": "all_point_in_time_eligible_rows_including_structural_zeros_after_exhaustive_named_refusal_accounting",
+      "row_multiplicity": "each_security_decision_outcome_exactly_once",
+      "tie_rule": "average_ranks_for_score_and_outcome",
+      "date_refusal": "fewer_than_20_rows_or_constant_score_or_constant_outcome",
+      "fold_scope": "walk_forward_test_dates_only",
+      "date_aggregation": "equal_weight_over_valid_dates",
+      "common_event_policy": "same_connected_component_and_cross_date_refusal_as_FM",
+      "missing_policy": "no_pairwise_imputation_named_row_or_date_refusal",
+      "hac_session_axis": "actual_nyse_session_distance_never_compressed",
+      "hac_lag_sessions_by_horizon": {
+        "1": 1,
+        "5": 5,
+        "20": 20,
+        "60": 60
+      },
+      "hac_kernel": "bartlett",
+      "hac_pair_normalization": "divide_each_lag_cross_product_sum_by_total_valid_dates",
+      "hac_required_report": "observed_pair_count_by_lag",
+      "required_reports_by_horizon": {
+        "1": [
+          "mean",
+          "median",
+          "icir",
+          "positive_date_share",
+          "hac_t_lag_1",
+          "year_by_year_ic"
+        ],
+        "5": [
+          "mean",
+          "median",
+          "icir",
+          "positive_date_share",
+          "hac_t_lag_5",
+          "year_by_year_ic"
+        ],
+        "20": [
+          "mean",
+          "median",
+          "icir",
+          "positive_date_share",
+          "hac_t_lag_20",
+          "year_by_year_ic"
+        ],
+        "60": [
+          "mean",
+          "median",
+          "icir",
+          "positive_date_share",
+          "hac_t_lag_60",
+          "year_by_year_ic"
+        ]
+      },
+      "reports": [
+        "mean",
+        "median",
+        "icir",
+        "positive_date_share",
+        "hac_t",
+        "by_year"
+      ]
+    },
+    "bootstrap": {
+      "method": "centered_moving_complete_session_blocks",
+      "block_sessions_by_horizon": {
+        "1": 1,
+        "5": 5,
+        "20": 20,
+        "60": 60
+      },
+      "resamples": 19999,
+      "seed": "sha256_plan_hash_plus_evaluation_id",
+      "null_centering": "subtract_the_observed_equal_date_mean_beta_from_each_valid_date_coefficient_then_resample_centered_complete_date_blocks",
+      "test_statistic": "absolute_equal_date_mean_beta",
+      "p_value": "one_plus_resampled_absolute_statistics_gte_observed_absolute_statistic_divided_by_resamples_plus_one"
+    },
+    "minimum_valid_test_dates": 50,
+    "invalid_or_underfilled": "locked_inconclusive_no_blind_extension"
+  },
+  "power_definition": {
+    "calibration_source_sha256": null,
+    "required_fields": [
+      "primary_effect_size_bps_per_adjusted_score_unit",
+      "variance_source_without_evaluation_outcomes",
+      "target_power",
+      "two_sided_size",
+      "required_valid_dates",
+      "required_connected_components",
+      "minimum_row_and_component_coverage",
+      "underfill_disposition"
+    ],
+    "underfill": "INCONCLUSIVE_locked_no_extension",
+    "current_execution_authorized": false
+  },
+  "economic_definition": {
+    "economic_gate_execution_definition_sha256": null,
+    "required_definition_fields": [
+      "net_excess_daily_total_return_and_benchmark",
+      "eligible_ranking_universe_ties_and_minimum_sleeve_size",
+      "test_fold_only_sample_and_terminal_liquidation",
+      "daily_return_hac_and_centered_block_statistic",
+      "coverage_turnover_and_overlap_denominators"
+    ],
+    "portfolio": "twenty_overlapping_daily_sleeves_equal_weight_top_positive_score_quintile",
+    "primary_variant": "direct_stock_equal_weight",
+    "ties": "deterministic_security_id_order_at_exact_score_ties",
+    "minimum_sleeve_size": "must_be_frozen_in_execution_definition",
+    "no_positive_or_underfilled_sleeve": "leave_sleeve_in_cash",
+    "leverage": false,
+    "test_folds_only": true,
+    "primary_cost_bps_per_side": 10,
+    "diagnostic_cost_bps_per_side": [
+      0,
+      5,
+      20
+    ],
+    "benchmark": "matching_SPY_total_return",
+    "primary_statistic": "mean_net_excess_daily_total_return",
+    "uncertainty": "centered_complete_session_block_bootstrap_length_20",
+    "turnover": "net_security_target_change_once_per_session",
+    "terminal_liquidation": "included_at_primary_cost",
+    "liquidity_impact_binding_sha256": null,
+    "liquidity_impact_role": "capacity_diagnostic_only_never_promotion_gate",
+    "primary_pass_rule": "positive_mean_net_excess_daily_return_and_centered_block_p_below_0.05",
+    "current_execution_authorized": false
+  },
+  "report_definition": {
+    "PRIMARY": [
+      "bullish_20_session_fama_macbeth",
+      "net_20_session_sleeve",
+      "firm_specific_vs_global_map_paired_20_session_ic"
+    ],
+    "SECONDARY": [
+      "bullish_1_5_60_session_fama_macbeth",
+      "bearish_1_5_20_60_session_fama_macbeth",
+      "six_earnings_guidance_timing_cohorts",
+      "earnings_exclusion_plus_minus_2_and_5_sessions",
+      "direct_stock_inverse_volatility_and_score_weight_variants",
+      "cost_0_5_20_bps_per_side"
+    ],
+    "EXPLORATORY": [
+      "all_unregistered_subgroups_or_parameter_variants"
+    ],
+    "required_reports": [
+      "event_returns_by_rating_action_horizon_and_cohort",
+      "event_time_cumulative_abnormal_returns_by_rating_action",
+      "information_coefficient_summary_by_horizon_and_year",
+      "fama_macbeth_coefficients_hac_and_pair_counts",
+      "firm_vs_global_paired_comparison_and_coverage",
+      "direct_stock_gross_net_turnover_and_overlap",
+      "refusal_coverage_component_and_power_accounting",
+      "plot_data_percentile_vs_future_return",
+      "plot_data_rolling_ic_and_sharpe",
+      "plot_data_year_by_year_out_of_sample_alpha",
+      "plot_data_signal_decay",
+      "plot_data_turnover_vs_net_return",
+      "plot_data_drawdown_and_time_underwater"
+    ],
+    "etf_only_plot_data": "deferred_until_ARV2_5_and_ARV2_6",
+    "secondary_hypothesis_registry_sha256": null,
+    "benjamini_hochberg": "fixed_order_tie_rule_and_family_required",
+    "deflated_sharpe_trial_registry_sha256": null,
+    "secondary_can_rescue": false,
+    "contains_results": false,
+    "result_sha256": null
+  },
+  "disposition_definition": {
+    "allowed": [
+      "PASS",
+      "FAIL",
+      "INCONCLUSIVE",
+      "INVALID_DATA"
+    ],
+    "PASS": "unlocks_ARV2_5_structural_work_only",
+    "FAIL": "closes_family",
+    "INCONCLUSIVE": "locked_no_blind_extension",
+    "INVALID_DATA": "no_retry_without_documented_content_addressed_correction_and_fresh_authority",
+    "result_disposition_available": false
+  },
+  "downstream_definition": {
+    "topology_hierarchy": [
+      "stock",
+      "industry",
+      "etf"
+    ],
+    "industry_aggregation_definition_sha256": null,
+    "topology_comparison_definition_sha256": null,
+    "direct_stock_variants": [
+      "equal_weight",
+      "inverse_volatility",
+      "score_weight"
+    ],
+    "holdings_lag_sensitivity_sessions": [
+      0,
+      1,
+      5
+    ],
+    "etf_must_beat": [
+      "direct_stock",
+      "industry"
+    ],
+    "conservative_lag_failure": "blocks_etf_promotion",
+    "etf_promotion_available": false
+  },
+  "section_hashes": {
+    "control_definition": "c731afd772abc19502b0cf6d0ff6a1dba5b430200a724d7bab239c58320aa624",
+    "global_benchmark_definition": "001c83c621c787cb35007b9c53fb608f325c4b89725831bdf5507c0dda329e10",
+    "history_definition": "5db2a1bc09d7ecd2e8cb7e5044f0abc7f97b3eefb71803002d00f6b33cf984ca",
+    "analysis_definition": "4759fda92bfc12bc09b5b6b539aa04eed799eafa9a3f6f1c6d6054273efa5aa6",
+    "power_definition": "18fcd8a801bfe528c00072d2e9aa7698057e1d8b00e09138d5ff222086562360",
+    "economic_definition": "3b98c40dd7b470658f08a8812d816aa0eeff9f765282917e478dfe378dcc95bd",
+    "report_definition": "19095bcf2070bf1d45e4734f3521c12f25e825cc15fc6533ccbac110775e434a",
+    "disposition_definition": "9568ebf050248245395aa7e1d450f2bd627d9110c30b0c5d41df96ac1b930ef8",
+    "downstream_definition": "6c509178ca3dc5abebaca3c7b5347f820a5680e7ed8606d92f6c5884e8e9225f"
+  },
+  "external_bindings": {
+    "review_commit": null,
+    "counter_review_commit": null,
+    "control_source_definition_sha256": null,
+    "global_rating_map_definition_sha256": null,
+    "matched_global_comparison_definition_sha256": null,
+    "fold_manifest_sha256": null,
+    "power_calibration_source_sha256": null,
+    "secondary_hypothesis_registry_sha256": null,
+    "deflated_sharpe_trial_registry_sha256": null,
+    "liquidity_impact_binding_sha256": null,
+    "dataset_id": null,
+    "code_identity": null,
+    "qc_plan_sha256": null,
+    "evaluation_receipt_id": null
+  },
+  "capabilities": {
+    "source_access": false,
+    "outcome_access": false,
+    "qc_upload": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "result_disposition": false,
+    "paper_deployment": false,
+    "funded_deployment": false,
+    "orders": false
+  }
+}

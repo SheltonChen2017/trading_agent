@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import ast
 import dataclasses
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -495,6 +497,7 @@ def test_publication_revalidates_result_instead_of_trusting_frozen_shell(tmp_pat
 def test_current_v2_package_transitive_import_closure_is_outcome_free():
     reached = validate_transitive_import_closure(WORKSPACE_ROOT)
     assert "research.analyst_revisions_v2.dataset" in reached
+    assert "research.analyst_revisions_v2.stock_signal" in reached
     assert "data.exchange_calendar" in reached
     assert "execution" not in reached
     assert "research.acer" not in reached
@@ -545,3 +548,251 @@ def test_dynamic_imports_cannot_bypass_the_firewall(tmp_path, source):
     (package / "__init__.py").write_text(source, encoding="utf-8")
     with pytest.raises(ImportBoundaryError):
         validate_transitive_import_closure(tmp_path, package_name="guarded")
+
+
+def _authority_registry_names(tree: ast.Module) -> set[str]:
+    """Module-level names bound to an out-of-band authority registry dict."""
+    names: set[str] = set()
+    for node in tree.body:
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for target in targets:
+            if (
+                isinstance(target, ast.Name)
+                and target.id.endswith("_AUTHORITIES")
+                and isinstance(node.value, ast.Dict)
+            ):
+                names.add(target.id)
+    return names
+
+
+def _module_assignment_value(tree: ast.Module, name: str) -> ast.expr | None:
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            if any(isinstance(target, ast.Name) and target.id == name for target in node.targets):
+                return node.value
+        elif isinstance(node, ast.AnnAssign):
+            if isinstance(node.target, ast.Name) and node.target.id == name:
+                return node.value
+    return None
+
+
+def _unguarded_registry_access_lines(tree: ast.Module, registry: str) -> list[int]:
+    """Return non-declaration registry accesses outside its matching lock."""
+    parents = {
+        child: parent
+        for parent in ast.walk(tree)
+        for child in ast.iter_child_nodes(parent)
+    }
+    declaration_targets = {
+        target
+        for node in tree.body
+        if isinstance(node, (ast.Assign, ast.AnnAssign))
+        for target in (
+            node.targets if isinstance(node, ast.Assign) else [node.target]
+        )
+        if isinstance(target, ast.Name) and target.id == registry
+    }
+    lock_name = f"{registry}_LOCK"
+    violations: list[int] = []
+    for access in ast.walk(tree):
+        if (
+            not isinstance(access, ast.Name)
+            or access.id != registry
+            or access in declaration_targets
+        ):
+            continue
+        ancestor = parents.get(access)
+        guarded = False
+        while ancestor is not None:
+            if isinstance(ancestor, (ast.With, ast.AsyncWith)) and any(
+                isinstance(item.context_expr, ast.Name)
+                and item.context_expr.id == lock_name
+                for item in ancestor.items
+            ):
+                guarded = True
+                break
+            ancestor = parents.get(ancestor)
+        if not guarded:
+            violations.append(access.lineno)
+    return sorted(violations)
+
+
+def test_every_authority_registry_is_guarded_by_its_own_lock():
+    """Authority registries are the mechanism that defeats forged objects.
+
+    Their concurrency discipline must be uniform rather than accidental: a
+    weakref callback can fire on any thread during collection, and identity
+    keys are reused memory addresses. CPython's GIL makes the individual dict
+    operations atomic, so no runtime test can observe a missing lock; the
+    invariant is therefore pinned at the source level.
+    """
+    package = Path(__file__).resolve().parents[2] / "research" / "analyst_revisions_v2"
+    expected = {
+        "dataset.py": {"_DATASET_AUTHORITIES"},
+        "firm_ontology.py": {"_ONTOLOGY_AUTHORITIES"},
+        "formulas.py": {"_POLICY_AUTHORITIES"},
+        "holdings.py": {"_STOCK_SCORE_AUTHORITIES"},
+        "preregistration.py": {"_REVIEWED_AUTHORITIES"},
+        "security_master.py": {"_SECURITY_MASTER_AUTHORITIES"},
+        "snapshot.py": {"_SNAPSHOT_AUTHORITIES"},
+        "stock_controls.py": {"_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES"},
+        "stock_evaluation_contract.py": {"_CONTRACT_AUTHORITIES"},
+    }
+    checked: dict[str, set[str]] = {}
+    for path in sorted(package.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        registries = _authority_registry_names(tree)
+        if not registries:
+            continue
+        checked[path.name] = registries
+        for registry in registries:
+            lock_name = f"{registry}_LOCK"
+            lock_value = _module_assignment_value(tree, lock_name)
+            assert (
+                isinstance(lock_value, ast.Call)
+                and isinstance(lock_value.func, ast.Attribute)
+                and isinstance(lock_value.func.value, ast.Name)
+                and lock_value.func.value.id == "threading"
+                and lock_value.func.attr == "RLock"
+                and not lock_value.args
+                and not lock_value.keywords
+            ), (
+                f"{path.name} must define {lock_name} as threading.RLock()"
+            )
+            assert not _unguarded_registry_access_lines(tree, registry), (
+                f"{path.name} accesses {registry} outside with {lock_name}: "
+                f"lines {_unguarded_registry_access_lines(tree, registry)}"
+            )
+    # Pin the inventory so a renamed/deleted registry cannot make the audit
+    # silently cover less authority than it did before.
+    assert checked == expected
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        "return _TEST_AUTHORITIES.get(1)",
+        "_TEST_AUTHORITIES[1] = object()",
+        "_TEST_AUTHORITIES.pop(1, None)",
+        "with _OTHER_LOCK:\n        return _TEST_AUTHORITIES.get(1)",
+    ],
+)
+def test_authority_registry_guard_audit_rejects_unguarded_mutations(body):
+    indented = "\n".join(f"    {line}" for line in body.splitlines())
+    tree = ast.parse(
+        "import threading\n"
+        "_TEST_AUTHORITIES = {}\n"
+        "_TEST_AUTHORITIES_LOCK = threading.RLock()\n"
+        "_OTHER_LOCK = threading.RLock()\n"
+        "def mutate():\n"
+        f"{indented}\n"
+    )
+    assert _unguarded_registry_access_lines(tree, "_TEST_AUTHORITIES")
+
+
+def test_authority_registry_guard_audit_accepts_the_matching_lock():
+    tree = ast.parse(
+        "import threading\n"
+        "_TEST_AUTHORITIES = {}\n"
+        "_TEST_AUTHORITIES_LOCK = threading.RLock()\n"
+        "def read():\n"
+        "    with _TEST_AUTHORITIES_LOCK:\n"
+        "        return _TEST_AUTHORITIES.get(1)\n"
+    )
+    assert _unguarded_registry_access_lines(tree, "_TEST_AUTHORITIES") == []
+
+
+def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
+    """Production artifacts must stay LF-only and unconverted on checkout.
+
+    Every artifact in this directory participates in committed-and-clean
+    review boundaries; three are additionally consumed by exact-byte canonical
+    JSON loaders. The count is deliberately not fixed here: the set grows, and
+    f724bf9 already added an eighth artifact. A
+    Windows checkout with core.autocrlf=true can rewrite LF bytes to CRLF,
+    leaving a stale clean stat cache even though the next review-anchor check
+    will refuse. The directory-level ``-text`` rule and the checked-out bytes
+    are therefore both part of this regression.
+    """
+    from research.analyst_revisions_v2.canonical import require_canonical_json_bytes
+
+    CRLF = bytes((13, 10))  # carriage return + line feed
+
+    specs = (
+        Path(__file__).resolve().parents[2]
+        / "research"
+        / "analyst_revisions_v2"
+        / "specs"
+    )
+    artifacts = {path.name: path for path in specs.glob("*.json")}
+    assert artifacts, "the ARV2 spec directory must contain committed artifacts"
+    repository = Path(__file__).resolve().parents[2]
+    relative_artifacts = tuple(
+        path.relative_to(repository).as_posix()
+        for path in sorted(artifacts.values())
+    )
+    attributes = subprocess.run(
+        ["git", "check-attr", "text", "--", *relative_artifacts],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert set(attributes.stdout.splitlines()) == {
+        f"{path}: text: unset" for path in relative_artifacts
+    }, attributes.stdout
+    # `*.json -text` covers this whole directory, so CRLF is not only a
+    # loader problem: Git then reports the file as permanently modified. That
+    # breaks the reviewed-spec anchor's committed-and-clean precondition and
+    # risks committing CRLF bytes into a content-addressed artifact, even for
+    # the files whose loaders parse tolerantly.
+    for name, path in sorted(artifacts.items()):
+        assert CRLF not in path.read_bytes(), (
+            f"{name} differs from its committed LF blob. A checkout made "
+            "before `*.json -text` existed keeps its CRLF bytes, and the stat "
+            "cache can hide that from `git status`. Preserve any intended "
+            "edits, then restore only this named artifact's unintended EOL "
+            "conversion from its committed blob; never delete the directory "
+            "or commit CRLF bytes."
+        )
+    # Only these production-bound artifacts are additionally consumed through
+    # require_canonical_json_bytes. Other JSON in this directory is parsed
+    # tolerantly or compared after semantic canonicalization, so calling every
+    # artifact byte-canonical would overstate its real loader contract.
+    canonical_required = {
+        "firm_ontology_registry.json",
+        "research_source_authority.json",
+        "security_master_registry.json",
+    }
+    present = set(artifacts)
+    assert canonical_required <= present, sorted(canonical_required - present)
+    for name in sorted(canonical_required):
+        payload = artifacts[name].read_bytes()
+        assert CRLF not in payload, (
+            f"{name} was checked out with CRLF; its content identity depends "
+            "on exact bytes"
+        )
+        raw = require_canonical_json_bytes(payload, name)
+        assert raw["schema"].endswith("-v2")
+
+
+def test_zero_access_declarations_are_actually_verified_not_merely_unreadable():
+    """A refusal must come from the declaration, not from a parse failure.
+
+    Both authorities refuse either way, so corruption can hide behind the same
+    'refused' outcome. Assert each positive zero-access declaration directly;
+    the source authority additionally exercises the byte-canonical loader.
+    """
+    from research.analyst_revisions_v2.formulas import (
+        ZERO_ACCESS_SOURCE_AUTHORITY_ID,
+        _require_zero_access_source_authority,
+    )
+    from research.analyst_revisions_v2.preregistration import (
+        ZERO_ACCESS_AUTHORITY_ID,
+        _require_zero_access_authority,
+    )
+
+    assert _require_zero_access_source_authority() == ZERO_ACCESS_SOURCE_AUTHORITY_ID
+    assert _require_zero_access_authority() == ZERO_ACCESS_AUTHORITY_ID

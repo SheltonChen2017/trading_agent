@@ -1,23 +1,35 @@
 {
   "schema": "arv2-round0-preregistration-v1",
-  "status": "blocked_owner_decisions",
-  "spec_id": "arv2-round0-draft-unexecutable",
-  "spec_hash": null,
+  "status": "owner_decisions_frozen_pending_external_bindings_and_review",
+  "spec_id": "arv2-round0-candidate-8d13a0a4577df322",
+  "spec_hash": "8d13a0a4577df3223c96c4c11722457e059b4ade63f578ab860ce7364494e847",
   "producing_commit": null,
   "reviewed_by": null,
   "reviewed_at": null,
   "cells": [
     {
       "cell_id": "shared_holdout",
-      "state": "owner_decision_required",
-      "value": null,
-      "source": "THREE_STRATEGY_PROJECT_DIRECTION.md requires one owner-frozen common cutoff and reserved period"
+      "state": "frozen",
+      "value": {
+        "cutoff_session": "2027-08-31",
+        "reserved_start": "2027-09-01",
+        "reserved_end": "2029-08-31",
+        "lane_access_prohibited": true
+      },
+      "source": "owner direction 2026-08-28 adopting Codex risk-balanced date recommendation"
     },
     {
       "cell_id": "contaminated_legacy_periods",
-      "state": "owner_decision_required",
-      "value": null,
-      "source": "legacy analyst outcome history must be classified before a new look"
+      "state": "frozen",
+      "value": [
+        {
+          "start": "2019-07-16",
+          "end": "2026-07-23",
+          "disposition": "discovery_only",
+          "reason": "legacy pre-V2 analyst outcome inspection; never valid as untouched confirmation evidence"
+        }
+      ],
+      "source": "repository lineage audit plus owner direction 2026-08-28 adopting Codex contamination recommendation"
     },
     {
       "cell_id": "canonical_family",
@@ -58,9 +70,17 @@
     },
     {
       "cell_id": "corporate_action_contract",
-      "state": "owner_decision_required",
-      "value": null,
-      "source": "PIT split dividend delisting and terminal-return source is not yet authorized"
+      "state": "frozen_policy_external_binding_required",
+      "value": {
+        "source_id": null,
+        "source_sha256": null,
+        "point_in_time": true,
+        "split_policy": "effective_session_point_in_time",
+        "cash_dividend_policy": "ex_date_point_in_time_total_return",
+        "delisting_policy": "terminal_return_required",
+        "missing_terminal_return": "named_refusal_never_drop"
+      },
+      "source": "owner direction 2026-08-28 adopting Codex policy recommendation; exact audited source remains externally unbound"
     },
     {
       "cell_id": "walk_forward_contract",
@@ -107,21 +127,70 @@
     },
     {
       "cell_id": "universe_contract",
-      "state": "owner_decision_required",
-      "value": null,
-      "source": "PIT security-master source and exact listing filters remain unauthorized"
+      "state": "frozen_policy_external_binding_required",
+      "value": {
+        "security_master_id": null,
+        "security_master_sha256": null,
+        "point_in_time": true,
+        "listing_venues": ["XASE", "XNAS", "XNYS"],
+        "issuer_incorporation": "united_states",
+        "instrument_types": ["common_stock"],
+        "excluded_instrument_types": [
+          "adr",
+          "bdc",
+          "closed_end_fund",
+          "etf",
+          "foreign_ordinary",
+          "limited_partnership",
+          "preferred_stock",
+          "reit",
+          "right",
+          "trust",
+          "unit",
+          "warrant"
+        ],
+        "share_class_policy": "separate_security_with_point_in_time_issuer_link",
+        "include_delisted": true,
+        "current_ticker_joins": false,
+        "unknown_identity": "refuse"
+      },
+      "source": "owner direction 2026-08-28 adopting Codex survivorship-safe universe recommendation; exact audited security master remains externally unbound"
     },
     {
       "cell_id": "normalization_contract",
-      "state": "owner_decision_required",
-      "value": null,
-      "source": "peer fallback and population require owner freeze before outcomes"
+      "state": "frozen",
+      "value": {
+        "population": "eligible_point_in_time_cross_section",
+        "method": "sector_median_mad",
+        "peer_hierarchy": ["sector", "refuse"],
+        "minimum_total_names": 20,
+        "minimum_active_names": 5,
+        "structural_zero": "valid_no_event_only",
+        "clipping": "frozen_cell_specific",
+        "residualization": "mandatory_controls_cross_sectional",
+        "degenerate_group": "named_refusal"
+      },
+      "source": "owner direction 2026-08-28 adopting Codex robust fail-closed normalization recommendation"
     },
     {
       "cell_id": "stock_topology",
-      "state": "owner_decision_required",
-      "value": null,
-      "source": "exact primary stock cell IDs and signs require owner freeze"
+      "state": "frozen",
+      "value": {
+        "topology_id": "stock_primary",
+        "primary_cell_id": "arv2-stock-primary-20d",
+        "cells": [
+          {
+            "cell_id": "arv2-stock-primary-20d",
+            "signal": "rating_change",
+            "sign": "upgrade_positive_downgrade_negative",
+            "half_life_sessions": 20,
+            "threshold": "0",
+            "clip": "4",
+            "residualization": "mandatory_controls_cross_sectional"
+          }
+        ]
+      },
+      "source": "owner direction 2026-08-28 adopting Codex single-cell stock-first recommendation"
     },
     {
       "cell_id": "topology_comparison_hierarchy",
@@ -169,15 +238,63 @@
     },
     {
       "cell_id": "multiplicity_family",
-      "state": "owner_decision_required",
-      "value": null,
-      "source": "permanent cell and look IDs require owner approval"
+      "state": "frozen",
+      "value": {
+        "family_id": "arv2-rating-only-v1",
+        "alpha": "0.05",
+        "correction": "bonferroni_all_registered_cells_and_looks",
+        "permanent_cell_ids": ["arv2-stock-primary-20d"],
+        "permanent_look_ids": ["arv2-look-stock-primary-001"]
+      },
+      "source": "owner direction 2026-08-28 adopting Codex one-cell one-look multiplicity recommendation"
+    },
+    {
+      "cell_id": "historical_evaluation_contract",
+      "state": "frozen",
+      "value": {
+        "eligible_history_start": "2013-01-02",
+        "development_end": "2026-08-31",
+        "history_extension_policy": "earlier_only_after_independent_source_coverage_and_semantics_review",
+        "market_benchmark": "SPY_total_return",
+        "regime_signal_timing": "prior_session_close_only",
+        "stress_rule": "trailing_252_session_drawdown_lte_-0.20",
+        "boom_rule": "trailing_252_session_total_return_gte_0.20_and_not_stress",
+        "ordinary_rule": "neither_boom_nor_stress",
+        "formal_selection_policy": "all_periods_walk_forward_only",
+        "regime_output_policy": "descriptive_non_rescuing",
+        "named_episode_policy": "descriptive_non_rescuing_no_model_selection",
+        "named_episodes": [
+          {
+            "episode_id": "covid_crash_2020",
+            "start": "2020-02-19",
+            "end": "2020-03-23",
+            "label": "stress"
+          },
+          {
+            "episode_id": "rate_shock_bear_2022",
+            "start": "2022-01-03",
+            "end": "2022-10-12",
+            "label": "stress"
+          },
+          {
+            "episode_id": "ai_boom_2023_2026",
+            "start": "2023-01-03",
+            "end": "2026-08-31",
+            "label": "boom"
+          }
+        ]
+      },
+      "source": "owner direction 2026-08-28: all available history plus ordinary, boom, and stress reporting; Codex recommendation makes regimes descriptive and non-rescuing"
     },
     {
       "cell_id": "lane_validation_period",
-      "state": "owner_decision_required",
-      "value": null,
-      "source": "must be chosen relative to the unresolved shared final holdout"
+      "state": "frozen",
+      "value": {
+        "start": "2026-09-01",
+        "end": "2027-08-31",
+        "one_shot": true
+      },
+      "source": "owner direction 2026-08-28 adopting Codex one-year prospective validation recommendation"
     },
     {
       "cell_id": "three_lane_selection_correction",
@@ -198,5 +315,17 @@
       "source": "AR-P2-005 quarantine decision"
     }
   ],
-  "looks": []
+  "looks": [
+    {
+      "look_id": "arv2-look-stock-primary-001",
+      "family_id": "arv2-rating-only-v1",
+      "state": "planned_unbound",
+      "validation_start": "2026-09-01",
+      "validation_end": "2027-08-31",
+      "dataset_id": null,
+      "code_identity": null,
+      "cost_cell_hash": "c16e62d9a538316c324af2ba1f37542a7eb72c0cc600e4c31b13ea20161be5e7",
+      "topology_id": "stock_primary"
+    }
+  ]
 }

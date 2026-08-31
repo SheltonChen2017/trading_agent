@@ -43,7 +43,7 @@ DRAFT = (
 HASH_A = "a" * 64
 HASH_B = "b" * 64
 DATASET_ID = "arv2_ds_" + HASH_A
-LOOK_ID = "arv2-look-stock-primary-001"
+LOOK_ID = "arv2-look-legacy-v1-migration-only"
 CELL_ID = "arv2-stock-primary-20d"
 
 
@@ -100,15 +100,36 @@ def _reviewed_raw(producing_commit: str = "d" * 40) -> dict[str, object]:
             "security_master_id": "pit-security-master-v1",
             "security_master_sha256": "2" * 64,
             "point_in_time": True,
-            "listing_venues": ["XNAS", "XNYS"],
+            "listing_venues": ["XASE", "XNAS", "XNYS"],
+            "issuer_incorporation": "united_states",
             "instrument_types": ["common_stock"],
+            "excluded_instrument_types": [
+                "adr",
+                "bdc",
+                "closed_end_fund",
+                "etf",
+                "foreign_ordinary",
+                "limited_partnership",
+                "preferred_stock",
+                "reit",
+                "right",
+                "trust",
+                "unit",
+                "warrant",
+            ],
+            "share_class_policy": (
+                "separate_security_with_point_in_time_issuer_link"
+            ),
             "include_delisted": True,
             "current_ticker_joins": False,
             "unknown_identity": "refuse",
         },
         "normalization_contract": {
             "population": "eligible_point_in_time_cross_section",
-            "peer_fallback": "predeclared_hierarchy_only",
+            "method": "sector_median_mad",
+            "peer_hierarchy": ["sector", "refuse"],
+            "minimum_total_names": 20,
+            "minimum_active_names": 5,
             "structural_zero": "valid_no_event_only",
             "clipping": "frozen_cell_specific",
             "residualization": "mandatory_controls_cross_sectional",
@@ -135,6 +156,39 @@ def _reviewed_raw(producing_commit: str = "d" * 40) -> dict[str, object]:
             "correction": "bonferroni_all_registered_cells_and_looks",
             "permanent_cell_ids": [CELL_ID],
             "permanent_look_ids": [LOOK_ID],
+        },
+        "historical_evaluation_contract": {
+            "eligible_history_start": "2013-01-02",
+            "development_end": "2022-12-30",
+            "history_extension_policy": (
+                "earlier_only_after_independent_source_coverage_and_semantics_review"
+            ),
+            "market_benchmark": "SPY_total_return",
+            "regime_signal_timing": "prior_session_close_only",
+            "stress_rule": "trailing_252_session_drawdown_lte_-0.20",
+            "boom_rule": (
+                "trailing_252_session_total_return_gte_0.20_and_not_stress"
+            ),
+            "ordinary_rule": "neither_boom_nor_stress",
+            "formal_selection_policy": "all_periods_walk_forward_only",
+            "regime_output_policy": "descriptive_non_rescuing",
+            "named_episode_policy": (
+                "descriptive_non_rescuing_no_model_selection"
+            ),
+            "named_episodes": [
+                {
+                    "episode_id": "covid_crash_2020",
+                    "start": "2020-02-19",
+                    "end": "2020-03-23",
+                    "label": "stress",
+                },
+                {
+                    "episode_id": "post_covid_boom_2020_2021",
+                    "start": "2020-03-24",
+                    "end": "2021-12-31",
+                    "label": "boom",
+                },
+            ],
         },
         "lane_validation_period": {
             "start": "2023-01-03",
@@ -282,19 +336,71 @@ def _request(raw: dict[str, object] | None = None) -> OutcomeAccessRequest:
 
 
 def test_repository_draft_is_complete_but_non_executable() -> None:
-    draft = load_draft_preregistration(DRAFT)
-    assert "shared_holdout" in draft.unresolved_cells
-    assert "lane_validation_period" in draft.unresolved_cells
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
+        load_draft_preregistration(DRAFT)
     with pytest.raises(PreregistrationError, match="reviewed_frozen"):
         load_reviewed_preregistration(DRAFT)
 
 
-def test_reviewed_spec_round_trip_is_zero_access_without_external_authority(
+def test_preregistration_and_review_registry_duplicate_keys_refuse(
+    tmp_path: Path,
+) -> None:
+    """A displayed first value cannot disagree with the authenticated last one."""
+    draft_text = DRAFT.read_text(encoding="utf-8").replace(
+        '"status":', '"status": "forged_reviewed",\n  "status":', 1
+    )
+    duplicate_draft = tmp_path / "duplicate-draft.json"
+    duplicate_draft.write_text(draft_text, encoding="utf-8")
+    with pytest.raises(PreregistrationError, match="duplicate JSON key"):
+        load_draft_preregistration(duplicate_draft)
+
+    duplicate_registry = (
+        b'{"schema":"forged","schema":"arv2-reviewed-spec-registry-v1",'
+        b'"entries":[]}'
+    )
+    with pytest.raises(PreregistrationError, match="duplicate JSON key"):
+        preregistration._json_object(duplicate_registry, "review registry")
+
+
+def test_superseded_look_identity_cannot_be_revived_by_date_edit(
+    tmp_path: Path,
+) -> None:
+    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    _cell(raw, "lane_validation_period")["value"]["start"] = "2026-09-02"
+    raw["looks"][0]["validation_start"] = "2026-09-02"
+    _candidate_rehash(raw)
+
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
+        load_draft_preregistration(_write(tmp_path, raw))
+
+
+def test_owner_decision_candidate_cannot_claim_unreviewed_source_or_look_bindings(
+    tmp_path: Path,
+) -> None:
+    raw = _migration_only_candidate_raw()
+    _cell(raw, "corporate_action_contract")["value"]["source_id"] = "invented"
+    raw["looks"][0]["dataset_id"] = DATASET_ID
+    _rehash(raw)
+    raw["spec_id"] = f"arv2-round0-candidate-{raw['spec_hash'][:16]}"
+    with pytest.raises(PreregistrationError, match="explicitly unbound"):
+        load_draft_preregistration(_write(tmp_path, raw))
+
+
+def test_owner_decision_candidate_hash_covers_every_policy_choice(
+    tmp_path: Path,
+) -> None:
+    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    _cell(raw, "normalization_contract")["value"]["minimum_active_names"] = 4
+    with pytest.raises(PreregistrationError, match="content hash"):
+        load_draft_preregistration(_write(tmp_path, raw))
+
+
+def test_reviewed_legacy_spec_is_retired_even_without_external_authority(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     path, raw = _anchored_spec(tmp_path, monkeypatch)
     spec = load_reviewed_preregistration(path)
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
 
 
@@ -378,7 +484,7 @@ def test_dangerous_outcome_request_mutations_refuse_without_spending(
     request = replace(_request(raw), **mutation)
     with pytest.raises(PreregistrationError, match=message):
         authorize_outcome_access(spec, request)
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
 
 
@@ -390,13 +496,13 @@ def test_deleting_or_substituting_a_local_ledger_cannot_reset_access(
     legacy = tmp_path / "permanent-look-ledger.sqlite3"
     legacy.write_bytes(b"forged local state")
     monkeypatch.setattr(preregistration, "LEGACY_LOCAL_LOOK_LEDGER_PATH", legacy)
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
     legacy.unlink()
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
     legacy.write_bytes(b"substituted unspent database")
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
 
 
@@ -407,7 +513,7 @@ def test_no_local_concurrent_caller_can_win_a_permanent_look(
     spec = load_reviewed_preregistration(path)
 
     for _ in range(2):
-        with pytest.raises(PreregistrationError, match="zero-access"):
+        with pytest.raises(PreregistrationError, match="superseded unspent"):
             authorize_outcome_access(spec, _request(raw))
 
 
@@ -430,7 +536,7 @@ def test_substituted_repository_authority_cannot_enable_access(
     monkeypatch.setattr(
         preregistration, "PERMANENT_LOOK_AUTHORITY_PATH", substituted
     )
-    with pytest.raises(PreregistrationError, match="externally pinned"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         authorize_outcome_access(spec, _request(raw))
 
 
@@ -516,7 +622,7 @@ def test_single_runner_reauthenticates_inputs_but_never_invokes_outcome_loader(
         invoked = True
         return b"forbidden outcome bytes"
 
-    with pytest.raises(PreregistrationError, match="zero-access"):
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
         run_authorized_outcome_slice(
             preregistration_path=spec_path,
             snapshot_root=snapshot_root,
@@ -550,8 +656,20 @@ def test_single_runner_reauthenticates_inputs_but_never_invokes_outcome_loader(
             "universe",
         ),
         (
+            lambda raw: _cell(raw, "universe_contract")["value"].update(
+                issuer_incorporation="all"
+            ),
+            "universe",
+        ),
+        (
             lambda raw: _cell(raw, "normalization_contract")["value"].update(
                 degenerate_group="drop"
+            ),
+            "normalization",
+        ),
+        (
+            lambda raw: _cell(raw, "normalization_contract")["value"].update(
+                peer_hierarchy=["sector", "market"]
             ),
             "normalization",
         ),
@@ -570,6 +688,18 @@ def test_single_runner_reauthenticates_inputs_but_never_invokes_outcome_loader(
                 permanent_look_ids=["arv2-look-unregistered"]
             ),
             "multiplicity family",
+        ),
+        (
+            lambda raw: _cell(raw, "historical_evaluation_contract")[
+                "value"
+            ].update(formal_selection_policy="best_regime_result"),
+            "historical and regime",
+        ),
+        (
+            lambda raw: _cell(raw, "historical_evaluation_contract")[
+                "value"
+            ].update(development_end="2023-01-03"),
+            "before prospective validation",
         ),
         (
             lambda raw: _cell(raw, "lane_validation_period")["value"].update(
@@ -610,3 +740,126 @@ def test_unknown_float_and_unprefixed_dataset_id_refuse(tmp_path: Path) -> None:
     _rehash(unprefixed)
     with pytest.raises(PreregistrationError, match="arv2_ds"):
         load_reviewed_preregistration(_write(tmp_path, unprefixed))
+
+
+def _candidate_rehash(raw: dict[str, object]) -> None:
+    _rehash(raw)
+    raw["spec_id"] = f"arv2-round0-candidate-{raw['spec_hash'][:16]}"
+
+
+def test_migration_only_candidate_still_loads_for_structural_validation(
+    tmp_path: Path,
+) -> None:
+    """The retired v1 loader keeps its documented migration-only use.
+
+    f724bf9 removed the last positive draft-loader assertions, so every
+    remaining case expected a refusal and nothing demonstrated that a
+    migration-only candidate still parses and reports its pending external
+    bindings. The lane record states this structural-validation capability is
+    retained, so it needs one test that would notice if the loader began
+    refusing everything or returned a wrong shape.
+    """
+    raw = _migration_only_candidate_raw()
+    draft = load_draft_preregistration(_write(tmp_path, raw))
+    assert draft.unresolved_owner_decisions == ()
+    assert draft.planned_look_ids == (LOOK_ID,)
+    assert "corporate_action_contract.source_id" in draft.pending_external_bindings
+    assert "independent_review_anchor" in draft.pending_external_bindings
+    with pytest.raises(PreregistrationError, match="reviewed_frozen"):
+        load_reviewed_preregistration(_write(tmp_path, raw))
+
+
+def _migration_only_candidate_raw() -> dict[str, object]:
+    raw = json.loads(DRAFT.read_text(encoding="utf-8"))
+    _cell(raw, "lane_validation_period")["value"].update(
+        start="2026-09-02",
+        end="2027-08-31",
+    )
+    raw["looks"][0].update(
+        look_id=LOOK_ID,
+        validation_start="2026-09-02",
+        validation_end="2027-08-31",
+    )
+    _cell(raw, "multiplicity_family")["value"]["permanent_look_ids"] = [
+        LOOK_ID
+    ]
+    _candidate_rehash(raw)
+    return raw
+
+
+@pytest.mark.parametrize(
+    ("mutate", "match"),
+    [
+        # Each case carries EXACTLY ONE violation, so removing any single
+        # loader guard turns its case red. The earlier bundled test combined a
+        # source violation with a look violation, which let the look guard be
+        # deleted while the source guard kept the test green.
+        # The retired prospective window is half of the ARV2Q-001
+        # remediation: a migration-only look id must not be able to carry the
+        # superseded 2026-09-01..2027-08-31 period back in. Every other
+        # fixture moves the start date, so without this case the period guard
+        # can be deleted with the whole suite green.
+        (
+            lambda raw: (
+                _cell(raw, "lane_validation_period")["value"].update(
+                    start="2026-09-01", end="2027-08-31"
+                ),
+                raw["looks"][0].update(
+                    validation_start="2026-09-01", validation_end="2027-08-31"
+                ),
+            ),
+            "superseded unspent by the owner QC-first sequence",
+        ),
+        (
+            lambda raw: raw["looks"][0].update(dataset_id=DATASET_ID),
+            "unbound and non-executable",
+        ),
+        (
+            lambda raw: raw["looks"][0].update(code_identity=HASH_A),
+            "unbound and non-executable",
+        ),
+        (
+            lambda raw: _cell(raw, "corporate_action_contract")["value"].update(
+                source_id="invented"
+            ),
+            "explicitly unbound",
+        ),
+        (
+            lambda raw: _cell(raw, "universe_contract")["value"].update(
+                security_master_sha256=HASH_A
+            ),
+            "explicitly unbound",
+        ),
+        (
+            lambda raw: _cell(raw, "multiplicity_family")["value"].update(
+                alpha="0.5"
+            ),
+            "alpha must remain 0.05",
+        ),
+        (
+            lambda raw: _cell(raw, "walk_forward_contract")["value"].update(
+                embargo_sessions=5
+            ),
+            "embargo",
+        ),
+        (
+            lambda raw: _cell(raw, "portfolio_contract")["value"].update(
+                leverage=True
+            ),
+            "hard caps",
+        ),
+    ],
+)
+def test_candidate_refuses_each_single_violation_alone(tmp_path, mutate, match):
+    """One violation per case, correctly re-hashed, must refuse on semantics.
+
+    A correctly recomputed content hash and spec_id must never launder a
+    weakened policy value or a premature evidence binding, and each guard must
+    carry its own regression rather than hiding behind a sibling violation in
+    the same fixture.
+    """
+    raw = _migration_only_candidate_raw()
+    mutate(raw)
+    _candidate_rehash(raw)
+    with pytest.raises(PreregistrationError, match=match):
+        load_draft_preregistration(_write(tmp_path, raw))

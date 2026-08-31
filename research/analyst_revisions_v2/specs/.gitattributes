@@ -1,0 +1,10 @@
+# This directory contains content-addressed evidence, including production
+# registries whose loaders require canonical JSON terminated by exactly one
+# LF. Any end-of-line translation changes those bytes, so on a Windows host
+# with core.autocrlf=true a zero-access declaration or production registry can
+# become unreadable before the authority check it exists to perform is reached.
+#
+# -text disables conversion in both directions. Schema-v2 versions of the
+# canonical production artifacts provide the one-time tracked blob change that
+# also refreshes pre-existing worktrees when this rule is first introduced.
+*.json -text

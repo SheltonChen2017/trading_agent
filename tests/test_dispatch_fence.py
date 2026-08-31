@@ -559,3 +559,42 @@ def test_dispatch_attempt_ledger_rejects_unknown_fields_and_contains(tmp_path):
     with pytest.raises(RuntimeDispatchAttemptConflictError, match="unknown fields"):
         list_runtime_dispatch_attempts(database)
     assert get_runtime_emergency_stop(database)["active"] is True
+
+
+def test_fork_child_reset_discards_inherited_ownership_on_every_platform():
+    """Exercise the fork-child hardening even where ``os.fork`` is absent."""
+    inherited_path = Path("inherited-fence.lock")
+    original_states = dispatch_fence_module._STATES
+    original_states_guard = dispatch_fence_module._STATES_GUARD
+    original_permits = dispatch_fence_module._DISPATCH_PERMITS
+    original_permits_guard = dispatch_fence_module._DISPATCH_PERMITS_GUARD
+
+    class _InheritedHandle:
+        def __init__(self) -> None:
+            self.closed = False
+
+        def close(self) -> None:
+            self.closed = True
+
+    handle = _InheritedHandle()
+    try:
+        inherited_state = dispatch_fence_module._ProcessFenceState(
+            depth=3, handle=handle, owner_thread_id=threading.get_ident()
+        )
+        dispatch_fence_module._STATES = {inherited_path: inherited_state}
+        dispatch_fence_module._DISPATCH_PERMITS = {"inherited-permit": object()}
+
+        dispatch_fence_module._reset_after_fork()
+
+        assert handle.closed is True
+        assert dispatch_fence_module._STATES == {}
+        assert dispatch_fence_module._DISPATCH_PERMITS == {}
+        assert dispatch_fence_module._STATES_GUARD is not original_states_guard
+        assert dispatch_fence_module._DISPATCH_PERMITS_GUARD is not original_permits_guard
+        assert dispatch_fence_module._STATES_GUARD.acquire(blocking=False) is True
+        dispatch_fence_module._STATES_GUARD.release()
+    finally:
+        dispatch_fence_module._STATES = original_states
+        dispatch_fence_module._STATES_GUARD = original_states_guard
+        dispatch_fence_module._DISPATCH_PERMITS = original_permits
+        dispatch_fence_module._DISPATCH_PERMITS_GUARD = original_permits_guard

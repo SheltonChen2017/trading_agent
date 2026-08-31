@@ -380,3 +380,57 @@ def test_anomaly_containment_requires_an_aware_timestamp(tmp_path, bad_timestamp
 
     assert store.get_proposal("p-anomaly")["status"] == SUBMITTING
     assert store.get_kill_switch().get("active") is not True
+
+
+def test_real_process_crash_mid_transaction_leaves_no_anomaly_without_halt(tmp_path):
+    """Kill the process inside the transaction and reopen the database."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path as _Path
+
+    database = tmp_path / "assistant.db"
+    store = AssistantStore(database)
+    _seed(store)
+    assert store.get_proposal("p-anomaly")["status"] == SUBMITTING
+
+    repository_root = _Path(__file__).resolve().parents[1]
+    child = f'''
+import os, sys
+sys.path.insert(0, {str(repository_root)!r})
+from assistant.storage import AssistantStore
+from assistant.proposal_status import SUBMITTING, SUBMISSION_UNKNOWN
+
+def _die(*_args, **_kwargs):
+    # Inside BEGIN IMMEDIATE, after the proposal park and kill-switch write
+    # and before commit. os._exit skips every finally/except path.
+    os._exit(70)
+
+AssistantStore._upsert_operational_alert_in_connection = _die
+store = AssistantStore({str(database)!r})
+store.park_reconciliation_anomaly_and_halt(
+    "p-anomaly",
+    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN),
+    reason="broker order identity mismatch",
+    reconciled_at="2026-08-26T15:01:00+00:00",
+    details={{"path": "crash", "mismatch": "ticker"}},
+    anomaly_key="test_identity_mismatch",
+)
+os._exit(0)
+'''
+    completed = subprocess.run(
+        [sys.executable, "-c", child], capture_output=True, text=True, timeout=120
+    )
+    assert completed.returncode == 70, (completed.returncode, completed.stderr)
+
+    reopened = AssistantStore(database)
+    proposal = reopened.get_proposal("p-anomaly")
+    alerts = reopened.list_operational_alerts()
+    kill_switch = reopened.get_kill_switch()
+
+    parked = proposal["status"] != SUBMITTING
+    halted = bool(kill_switch.get("active")) and bool(alerts)
+    assert not (parked and not halted), (proposal["status"], kill_switch, alerts)
+    assert proposal["status"] == SUBMITTING
+    assert kill_switch.get("active") in (False, None)
+    assert alerts == []

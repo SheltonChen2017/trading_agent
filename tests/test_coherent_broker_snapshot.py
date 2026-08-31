@@ -2759,3 +2759,24 @@ def test_coherence_retry_bound_rejects_ambiguous_values(bad_attempts):
             require_execution_coherence=True,
             max_coherence_attempts=bad_attempts,
         )
+
+
+def test_non_strict_snapshot_marks_a_malformed_open_order_book_unavailable():
+    """Transport success must not make an invalid order book available."""
+    malformed = _order()
+    malformed["ticker"] = None
+    degraded = build_portfolio_snapshot_from_alpaca(
+        broker_session=_ScriptedSession(
+            accounts=[_account()], order_books=[[malformed]], positions=[[]]
+        )
+    )
+    assert degraded.open_orders_available is False
+    assert list(degraded.open_orders) == []
+
+    healthy = build_portfolio_snapshot_from_alpaca(
+        broker_session=_ScriptedSession(
+            accounts=[_account()], order_books=[[_order()]], positions=[[]]
+        )
+    )
+    assert healthy.open_orders_available is True
+    assert len(list(healthy.open_orders)) == 1

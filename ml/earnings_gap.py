@@ -29,13 +29,15 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
-import pandas_market_calendars as mcal
 
-_NYSE = mcal.get_calendar("NYSE")
+from data.exchange_calendar import ExchangeCalendarError, session_close_instant
+
 _EASTERN = ZoneInfo("America/New_York")
 
-# data/earnings_data.py already uses 16:00 as the after-close boundary;
-# reuse that constant rather than defining a second, drifting one.
+# Fallback for a date that is not a trading session at all. The authoritative
+# boundary is the exchange calendar's own close for the release's session:
+# roughly nine sessions a year close early at 13:00 ET, and a 14:30 ET release
+# on one of those days is genuinely after_close rather than intraday.
 from data.earnings_data import MARKET_CLOSE_HOUR
 
 MARKET_OPEN_HOUR = 9  # 9:30 ET; a release at/after this and before close is intraday
@@ -65,6 +67,15 @@ class GapWindow:
         return dataclasses.asdict(self)
 
 
+def _session_close_local(local: pd.Timestamp) -> pd.Timestamp | None:
+    """Actual Eastern close of the release's own session, or None if it is not one."""
+    try:
+        close_utc = session_close_instant(local.date().isoformat())
+    except ExchangeCalendarError:
+        return None
+    return pd.Timestamp(close_utc).tz_convert(_EASTERN)
+
+
 def classify_release_timing(announced_at: pd.Timestamp) -> str:
     """"after_close", "before_open", or "intraday" from a release timestamp."""
     announced_at = pd.Timestamp(announced_at)
@@ -75,7 +86,13 @@ def classify_release_timing(announced_at: pd.Timestamp) -> str:
         )
     local = announced_at.tz_convert(_EASTERN)
     hour, minute = local.hour, local.minute
-    if hour >= MARKET_CLOSE_HOUR:
+    close_local = _session_close_local(local)
+    if close_local is not None:
+        if local >= close_local:
+            return "after_close"
+    elif hour >= MARKET_CLOSE_HOUR:
+        # The release date is not a trading session, so there is no real close
+        # to compare against; keep the historical fixed-hour behavior.
         return "after_close"
     if (hour, minute) < (MARKET_OPEN_HOUR, MARKET_OPEN_MINUTE):
         return "before_open"

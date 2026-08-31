@@ -4,7 +4,8 @@ This package deliberately has no network collection, outcome, portfolio,
 broker, or scheduler surface. It contains immutable in-memory Form 4
 structure, a fixture parser, and a caller-supplied SEC quarterly ZIP integrity
 boundary plus explicit-profile, offline parsed, EDGAR acceptance-evidence, and
-observation-only Form 4/A chronology boundaries.
+observation-only Form 4/A chronology and multi-period supplied-link-evidence
+boundaries.
 """
 
 from research.insider_buying.contracts import (
@@ -32,6 +33,17 @@ from research.insider_buying.form4_amendment_reconciliation import (
     SecForm4XmlSource,
     SecForm4XmlSourceIdentity,
     reconcile_sec_form4_amendments,
+)
+from research.insider_buying.form4_multi_period_amendment_evidence import (
+    FORM4_MULTI_PERIOD_EVIDENCE_VERSION,
+    Form4MultiPeriodEvidenceError,
+    Form4MultiPeriodEvidenceIdentity,
+    ProfileBoundForm4AmendmentEvidence,
+    SecEdgarAcceptancePeriodIdentity,
+    SecEdgarAcceptancePeriodInput,
+    SecForm4AmendmentEvidenceProfile,
+    SuppliedForm4AmendmentLinkEvidence,
+    assemble_sec_form4_multi_period_evidence,
 )
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
@@ -83,11 +95,14 @@ __all__ = [
     "EDGAR_ACCEPTANCE_SNAPSHOT_CONTRACT_VERSION",
     "EDGAR_ACCEPTANCE_SNAPSHOT_KIND",
     "FORM4_AMENDMENT_RECONCILIATION_VERSION",
+    "FORM4_MULTI_PERIOD_EVIDENCE_VERSION",
     "FilingCorpus",
     "FilingEnvelope",
     "Form4AmendmentLineage",
     "Form4AmendmentReconciliationError",
     "Form4AmendmentReconciliationIdentity",
+    "Form4MultiPeriodEvidenceError",
+    "Form4MultiPeriodEvidenceIdentity",
     "Form4ObservedState",
     "Form4ParseError",
     "Form4VersionDisposition",
@@ -102,6 +117,7 @@ __all__ = [
     "ParsedSecBulkTableIdentity",
     "ParsedTransaction",
     "PublicAvailability",
+    "ProfileBoundForm4AmendmentEvidence",
     "ReconciledForm4Amendments",
     "ReportingOwner",
     "REQUIRED_SEC_TABLES",
@@ -117,6 +133,8 @@ __all__ = [
     "SEC_EDGAR_METADATA_PARSER_VERSION",
     "SecEdgarAcceptanceSnapshotError",
     "SecEdgarAcceptanceSnapshotIdentity",
+    "SecEdgarAcceptancePeriodIdentity",
+    "SecEdgarAcceptancePeriodInput",
     "SecEdgarAvailabilityRecord",
     "SecEdgarAvailabilityRule",
     "SecEdgarAvailabilityTier",
@@ -125,8 +143,11 @@ __all__ = [
     "SecEdgarMetadataSourceIdentity",
     "SecForm4XmlSource",
     "SecForm4XmlSourceIdentity",
+    "SecForm4AmendmentEvidenceProfile",
+    "SuppliedForm4AmendmentLinkEvidence",
     "TransactionDiagnostic",
     "build_filing_corpus",
+    "assemble_sec_form4_multi_period_evidence",
     "build_sec_bulk_parsed_snapshot",
     "build_sec_edgar_acceptance_snapshot",
     "inspect_sec_bulk_archive",

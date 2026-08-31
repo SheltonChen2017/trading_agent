@@ -748,16 +748,45 @@ def _require_bounded_json_nesting(
             depth -= 1
 
 
-def _parse_source_json(
-    source: SecEdgarMetadataSource,
-    profile: SecEdgarMetadataSchemaProfile,
-) -> _ParsedMetadataSource:
+def _parse_exact_metadata_object(
+    metadata_bytes: bytes,
+    exact_fields: tuple[str, ...],
+    *,
+    label: str = "metadata source",
+) -> dict[str, str]:
+    """Parse one strict, flat JSON object against an exact field vector.
+
+    The helper is package-private so downstream offline contracts can inspect
+    extra fields already retained inside an IB-1C-verified byte image without
+    creating another evidence source or weakening duplicate-key, UTF-8,
+    nesting, and field-size checks.
+    """
+
+    if (
+        type(metadata_bytes) is not bytes
+        or not metadata_bytes
+        or len(metadata_bytes) > MAX_METADATA_SOURCE_BYTES
+        or type(exact_fields) is not tuple
+        or not exact_fields
+        or len(exact_fields) > MAX_METADATA_FIELDS
+        or any(
+            not isinstance(name, str)
+            or len(name) > MAX_METADATA_FIELD_NAME_CHARACTERS
+            or _FIELD_NAME_RE.fullmatch(name) is None
+            for name in exact_fields
+        )
+        or len(exact_fields) != len(set(exact_fields))
+        or len(exact_fields) != len({name.casefold() for name in exact_fields})
+    ):
+        raise SecEdgarAcceptanceSnapshotError(
+            f"REFUSED: {label} exact-field contract is invalid"
+        )
     try:
-        text = source.metadata_bytes.decode("utf-8", errors="strict")
+        text = metadata_bytes.decode("utf-8", errors="strict")
         _require_bounded_json_nesting(
             text,
             max_depth=MAX_SOURCE_JSON_NESTING_DEPTH,
-            label="metadata source",
+            label=label,
         )
         payload = json.loads(
             text,
@@ -766,19 +795,30 @@ def _parse_source_json(
         )
     except (RecursionError, UnicodeDecodeError, ValueError) as exc:
         raise SecEdgarAcceptanceSnapshotError(
-            "REFUSED: metadata source is not strict duplicate-free UTF-8 JSON"
+            f"REFUSED: {label} is not strict duplicate-free UTF-8 JSON"
         ) from exc
-    if not isinstance(payload, dict) or set(payload) != set(profile.exact_fields):
+    if not isinstance(payload, dict) or set(payload) != set(exact_fields):
         raise SecEdgarAcceptanceSnapshotError(
-            "REFUSED: metadata source fields do not match the exact profile"
+            f"REFUSED: {label} fields do not match the exact profile"
         )
     if any(
         not isinstance(value, str) or len(value) > MAX_METADATA_FIELD_CHARACTERS
         for value in payload.values()
     ):
         raise SecEdgarAcceptanceSnapshotError(
-            "REFUSED: metadata source field exceeds its character limit"
+            f"REFUSED: {label} field exceeds its character limit"
         )
+    return payload
+
+
+def _parse_source_json(
+    source: SecEdgarMetadataSource,
+    profile: SecEdgarMetadataSchemaProfile,
+) -> _ParsedMetadataSource:
+    payload = _parse_exact_metadata_object(
+        source.metadata_bytes,
+        profile.exact_fields,
+    )
 
     accession_number = payload[profile.accession_number_field]
     document_type = payload[profile.form_type_field]

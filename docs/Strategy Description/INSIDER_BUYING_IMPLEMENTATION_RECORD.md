@@ -7,11 +7,13 @@ REVIEW. IB-1D HAS COMPLETED INDEPENDENT CLAUDE REVIEW,
 ACCEPTED AFTER CORRECTION (SEE SECTION 17), AND CODEX HAS COUNTER-REVIEWED
 CLAUDE COMMITS `dceff74` AND `3f2024b`, CORRECTING THREE CONFIRMED P2
 DATA-INTEGRITY DEFECTS (SEE SECTION 18). IB-1D REVIEW IS COMPLETE. IB-1 AND
-BLUEPRINT SECTION 19.4 STEP 3 ARE NOT COMPLETE: NO OFFICIAL SEC PROFILE, REAL
-PACKAGE, AUTHENTICATED AMENDMENT LINK, COMPLETE OR CROSS-QUARTER AMENDMENT
-COVERAGE, OR CANONICAL FILTER AUTHORITY EXISTS. NORMALIZATION, SIGNAL
-CONSTRUCTION, OUTCOME TESTING, ETF PORTFOLIO WORK, AND QC IMPLEMENTATION
-REMAIN UNSTARTED.**
+THE BOUNDED IB-1E OFFLINE MULTI-PERIOD SUPPLIED-LINK-EVIDENCE CONTRACT IS
+IMPLEMENTED AND AWAITS INDEPENDENT CLAUDE REVIEW (SEE SECTION 19). IB-1 AND
+BLUEPRINT SECTION 19.4 STEP 3 ARE NOT COMPLETE: STRUCTURAL CROSS-QUARTER
+COMPOSITION NOW EXISTS, BUT NO OFFICIAL SEC PROFILE, REAL PACKAGE,
+AUTHENTICATED AMENDMENT LINK, COMPLETE AMENDMENT COVERAGE, OR CANONICAL FILTER
+AUTHORITY EXISTS. NORMALIZATION, SIGNAL CONSTRUCTION, OUTCOME TESTING, ETF
+PORTFOLIO WORK, AND QC IMPLEMENTATION REMAIN UNSTARTED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -1977,6 +1979,130 @@ operator database, scheduler, UI, or order was accessed. **0 research looks.**
 
 Next bounded step: commit this counter-review checkpoint, then define an
 offline, profile-bound multi-period amendment-evidence contract. It must retain
-all as-filed versions, refuse period gaps/overlaps and unauthenticated links,
-and keep complete-amendment-coverage and canonical-filter authority false. No
-canonical row replacement or external acquisition is authorized.
+all supplied as-filed versions, refuse period gaps/overlaps and malformed,
+unbound, or internally conflicting supplied links, and keep complete-amendment-
+coverage and canonical-filter authority false. No canonical row replacement or
+external acquisition is authorized.
+
+## 19. Codex IB-1E offline multi-period supplied-link evidence (2026-08-30)
+
+Implementer and self-reviewer: Codex, on the existing
+`codex/strategy-insider-buying` branch and dedicated Insider worktree. The
+counter-review checkpoint is `ad86df0`; the bounded IB-1E implementation
+snapshot is recorded after its exact-tree commit below. No branch or worktree
+was created or switched, and no sibling strategy, shared execution surface, or
+project-wide coordination file changed.
+
+This milestone is deliberately named **offline multi-period supplied-link
+evidence**, not authoritative amendment reconciliation. It makes no SEC or
+provider request and introduces no downloader, credential, licensed row,
+outcome, QuantConnect, broker, operator-database, scheduler, UI, order, or
+publication path. All inputs in validation are synthetic. **0 research
+looks.**
+
+### 19.1 Bounded implementation
+
+`form4_multi_period_amendment_evidence.py` composes two through sixteen
+contiguous IB-1C acceptance periods, loaded at call time through the verified
+IB-1C loader. Caller period and XML order do not affect the result. Duplicate
+quarters, gaps including a broken Q4-to-Q1 transition, mixed metadata profiles,
+global duplicate accessions, aggregate resource amplification, date-only
+availability, missing targets, amendment targets, issuer conflicts, and
+non-increasing acceptance chronology all refuse before a result is returned.
+
+No fourth evidence source was added. The caller-defined, explicitly
+non-official IB-1E profile maps `amends_accession` and
+`primary_document_sha256` fields already present inside the exact metadata JSON
+bytes retained and hash-bound by IB-1C. IB-1E reparses those bytes with the same
+strict duplicate-free UTF-8, exact-field, flat-object, and field-size helper as
+IB-1C. The profile-derived link must equal the XML-source assertion and the
+profile-derived document hash must equal the exact supplied XML bytes. The top
+identity binds every period receipt, the evidence profile, supplied-link
+inventory, XML-source inventory, parsed corpus, counts, and parser commit.
+Both the identity and result require private verified factory paths.
+
+Every **supplied** as-filed version is retained. Same-quarter and cross-quarter
+Form 4/A versions join only to a supplied original Form 4 with the same issuer
+and a strictly earlier exact acceptance instant. Original purchase rows keep
+their named provisional include outcome; amended rows keep the single named
+`EXCLUDE_AMENDED_FILING` outcome. Amendments remain quarantined in the
+observation-only chronology, and as-of views expose no future supplied
+boundary.
+
+Three authority statements are literal, identity-bound false values and
+literal-false result properties:
+
+- `official_amendment_link_verified = False`
+- `complete_amendment_coverage_verified = False`
+- `canonical_filter_authorized = False`
+
+A verified period may contain another Form 4/A that the caller did not supply;
+the result retains no row for it and still cannot claim complete coverage. A
+caller and non-official profile may also agree coherently on one of two
+same-issuer originals; structural consistency can accept that supplied edge,
+but it still cannot make the edge official. These negative cases are pinned in
+tests so later documentation cannot mistake fixture consistency for SEC
+authentication.
+
+### 19.2 Implementation review and retained ledger
+
+Two independent read-only subreviews examined contract design, test design,
+fail-open directions, identity forgery, resource caps, and scope language. The
+findings below include their material issues and the retained prior blockers.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1E-R01 | P2 | Closed - fixed | IB-1E implementation | Multi-period load loop | The first draft loaded every period and only then applied aggregate record and metadata-byte caps, allowing up to sixteen individually valid bundles to amplify memory and I/O before refusal. | Read-only adversarial review traced cap evaluation after the complete load list and period-identity hashing. | A resource cap that runs after amplification is not an effective boundary. | Each loaded period is now type/hash/count validated and accumulated before it is retained or the next loader call occurs; over-cap input stops the sequence immediately. | A low-cap three-period regression proves only the first two loaders run, XML parsing is never reached, and the third period is not loaded. |
+| IB1E-R02 | P2 | Closed - fixed | IB-1E implementation | `Form4MultiPeriodEvidenceIdentity` | The first identity draft hash-bound link and XML inventories separately but did not semantically cross-bind URL, amendment target, and document hash. A coordinated direct identity with recomputed hashes could disagree across inventories. | A reviewer constructed the coordinated-tamper direction rather than changing only one stale hash. | Separate correct hashes do not prove that two inventories describe the same bytes and edge. | Identity construction now compares each supplied-link item with its XML-source identity, and the top identity itself is factory-only. | The regression recomputes the tampered evidence hash and evidence ID yet is refused on the semantic XML-source binding; a no-change `replace(identity)` is refused by the factory token. |
+| IB1E-R03 | P3 | Closed - fixed | IB-1E implementation | Module and record scope prose | “Every as-filed version” overstated a supplied-sample boundary because a verified period can contain an unsupplied amendment. | An omitted Form 4/A remains visible in the period receipt but intentionally has no supplied XML row or lineage version. | Evidence language must not imply complete coverage that the code permanently denies. | Prose now says every **supplied** as-filed version; the omitted-amendment negative case is explicit here and in tests. | The result excludes the omitted accession and both complete-coverage and canonical-filter properties remain literal false. |
+| IB1D-R08 | P2 | Closed for structural composition only | IB-1E implementation | Multi-period period and lineage inventories | IB-1D could compose only one acceptance quarter, so a Q4 original and Q1 amendment could not share one observation chronology. | The new synthetic Q4-to-Q1 case produces one ordered lineage under a contiguous two-period identity. | Multi-period structure is required before any later real amendment evidence can be assessed. | Added deterministic contiguous-period composition with cross-year quarter arithmetic and global accession uniqueness. | Forward and reversed caller order produce the same result; gap and overlap sentinels refuse before XML parsing. This does not prove complete coverage. |
+| IB1D-R09 | P2 | Open - authority blocker | Prior round and IB-1E | Supplied amendment target | IB-1E validates a link field inside bytes already verified by IB-1C, but the profile and bytes are still caller-supplied and non-official. Internal agreement cannot prove that SEC named the asserted original. | A coherent alternate same-issuer target is structurally accepted while `official_amendment_link_verified` remains false. No official SEC profile, authenticated capture, or real filing was accessed. | Treating internal consistency as authenticated provenance could let the wrong original drive canonical filtering. | No authority change. The new contract explicitly names supplied-link evidence and preserves the false authority gates. | Negative-scope tests pin the alternate-target and omitted-amendment cases. Official link, completeness, and filtering authority remain false. |
+| IB1E-R04 | P3 | Open - deferred | IB-1E implementation | IB-1E integration tests | The focused IB-1E tests use actual Form 4 XML fixtures but replace the call-time IB-1C loader with logically consistent verified-boundary objects; there is not yet one persisted two-period IB-1A/B/C-to-IB-1E fixture. | Existing IB-1C/IB-1D tests exercise real local publication and loader rebuilds, while the new fifteen-test module isolates multi-period logic. | A persisted two-period integration would improve wiring confidence but requires generalized multi-quarter raw/parsed fixture builders outside this bounded contract slice. | No broad fixture refactor in this milestone. | Retained for the real-package/profile compatibility phase or a dedicated test-infrastructure milestone. |
+| IB1E-R05 | P3 | Open - deferred | IB-1E implementation | Private IB-1D chronology helpers and test ownership | IB-1E reuses package-private IB-1D chronology/hash/source helpers, while some source-to-filing validation remains similar across the two boundaries. | Static dependency review; no fourth publisher or immutable-I/O copy was added. | Consolidation now would broaden the diff and couple two separately reviewed public contracts. | No change; retain alongside IB1D-R10, IB1C-R16, IB1B-R11, and R-23 consolidation debt. | Import-surface regression confirms no network, outcome, execution, strategy, risk, broker, scheduler, or UI dependency entered the module. |
+
+No review finding outside the Insider Buying QC/autopilot development purpose
+required a code change. The project-wide shared execution findings remain
+document-only on this lane under the owner's strategy-scope rule.
+
+### 19.3 Validation
+
+- Red phase: the new test module failed collection because the IB-1E contract
+  did not exist.
+- Focused IB-1E suite: **15 passed**. It covers cross-year and same-quarter
+  lineages, input-order determinism, genuine gap/overlap refusal, global
+  duplicate accessions, caller/profile link disagreement, missing target,
+  issuer and chronology conflicts, exact XML-hash binding, profile drift,
+  date-only refusal, pre-load and sequential aggregate caps, named include and
+  amendment-exclude outcomes, omitted-amendment and coherent-alternate-target
+  negative scope, factory-only identity/result construction, coordinated
+  identity tampering, and the forbidden-import boundary.
+- Existing IB-1C/IB-1D module after the shared strict-JSON helper extraction:
+  **195 passed, 2 skipped in 166.20 seconds**.
+- Independent latest-tree review slice for IB-1C/IB-1D plus IB-1E:
+  **210 passed, 2 skipped**; the reviewer reported no remaining P0-P3 finding
+  after the sequential-cap correction.
+- Ten-file Insider, active-record, import-boundary, hygiene, and project-
+  separation suite: **539 passed, 7 skipped in 275.10 seconds**.
+- A direct temporary mutation of the live period-gap guard was rejected by the
+  execution safety boundary before any file changed. The gap test was then
+  strengthened with a genuinely valid Q2 identity, a profile covering Q2, and
+  an XML-parser sentinel, so weakening the adjacency guard necessarily reaches
+  the forbidden parser path.
+- Focused/full-suite, whole-repository compile, exact-tree, and final remote
+  evidence are appended after the implementation commit.
+
+### 19.4 Residual gates and handoff
+
+IB-1E closes only the structural cross-period portion of IB1D-R08. IB1D-R09
+remains open. This milestone does not establish an official SEC metadata or
+XML profile, authenticated transport/capture provenance, complete amendment
+inventory, official original-to-amendment link, real-package compatibility,
+field-level correction/supersession semantics, canonical normalized row,
+joint-owner treatment, point-in-time security mapping, post-aggregation
+$50,000 rule, signal, outcome, ETF portfolio, QuantConnect algorithm, broker
+integration, or paper/live authority.
+
+Next step: validate and commit the exact IB-1E tree, then push the separate
+counter-review and implementation commits together for Claude's independent
+review on this same lane branch. No next implementation milestone begins until
+that review is counter-reviewed under the serialized lane workflow.

@@ -2250,3 +2250,23 @@ No remote ref was moved and nothing was pushed. Independent review of the
 eventual exact pushed snapshot remains required before another Insider
 milestone. `IB1D-R09` and every provider, outcome, QuantConnect, broker,
 deployment, order, and trading authority gate remain unchanged.
+
+## 23. Owner push authorization (2026-08-31)
+
+After Codex reported the exact clean local head
+`607b5a3e39e11e637fa10e5522a2d0f01adc81d0`, confirmed that original local
+commit `43d6d6a` and the pushed IB-1D/IB-1E history remain reachable parents,
+and stated that nothing had been pushed, the owner explicitly instructed
+`push`. This authorizes one push of the completed main-sync and local-history
+reconciliation plus this required authorization record to the existing
+long-lived Insider lane. It does not authorize another implementation
+milestone or any provider, outcome, QuantConnect, deployment, broker, order,
+or trading action.
+
+The exact reconciled code tree passed **6,209 tests with 9 skips and 0
+failures**; affected IB-1D/IB-1E validation passed **211 tests with 2 skips**;
+compileall, diff, marker, and repository-integrity checks passed. Before the
+push, Codex must re-fetch, require exact `origin/main@1a5264e`, pushed lane head
+`6e38fa1`, and original local commit `43d6d6a` to remain ancestors of the clean
+local head, commit this record, and push only this one lane branch. Independent
+review of the exact pushed snapshot follows; `IB1D-R09` remains blocked.

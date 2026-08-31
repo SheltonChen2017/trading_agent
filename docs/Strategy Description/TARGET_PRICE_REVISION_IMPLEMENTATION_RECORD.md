@@ -1785,10 +1785,39 @@ documented for correction within each sibling lane, not from this branch.
   9.1.1. `git diff --check` is clean apart from Git's informational future-EOL
   warnings. The sole-authority PDF still hashes to
   `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`.
-- The complete repository suite was not repeated for a record/current-pointer
-  and documentation-guard-only correction. Claude's exact `0e911189` full-suite
-  result remains recorded in section 22.8; the proportionate regression surface
-  above is green.
-- Exact correction commit identity, full-suite and compilation evidence, and
-  the final one-push handoff are appended after the correction commit so the
-  evidence does not claim a commit identity before it exists.
+- The complete repository suite and compilation were deliberately deferred
+  until the correction commit had an exact identity. Section 23.6 records those
+  exact-commit gates rather than attributing them to an uncommitted tree.
+
+### 23.6 Exact committed correction validation and blocked handoff
+
+Correction commit:
+`84a6fda1e3e4f32aec4d312a1fe0d706fa13da0d`.
+The worktree was clean before both required validation gates.
+
+- Network-restricted complete suite on that exact commit, Python 3.12.13 /
+  pytest 9.1.1: **6,791 passed, 13 skipped, 0 failed, 26 warnings in 2,802.47
+  seconds (46:42)**. The command used an isolated pytest base temporary
+  directory and disabled the repository cache provider.
+- Full `python -m compileall -q .`, including `research`, exited **0**. The first
+  sandboxed invocation exited 1 solely because the sandbox denied writes to
+  existing `__pycache__` directories; the identical command rerun with
+  worktree write permission exited 0. No source file changed during either
+  invocation.
+- `git status --short` was clean after validation, and `git diff --check`
+  exited 0. The sole-authority PDF remains byte-identical at raw SHA-256
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`.
+- On the validation-record successor, the document-consistency module passed
+  with **9 passed in 1.01 seconds**, and the complete target-price plus shared
+  active-document suite passed with **191 passed, 3 skipped in 16.72 seconds**.
+  `git diff --check` remained clean apart from Git's informational future-EOL
+  warning.
+
+The validation-record successor changes only this lane record. Its focused
+documentation guards are green before that record-only commit. No provider,
+credential, licensed row, source sample, outcome, research look, QuantConnect
+surface, broker, operator database, scheduler, shadow, paper, live, deployment,
+capital, or trading authority was accessed or added; authorized/spent looks
+remain **0**. No next implementation milestone is authorized. After the one
+combined push, Claude reviews exactly the Codex range beginning after
+`cd23f7c8` and ending at the new pushed head.

@@ -125,6 +125,77 @@ def _vintage_with_second(second):
     )
 
 
+def _vintage_and_references_with_second_security():
+    vintage = _vintage()
+    second_security_id = "sec-synth-002"
+    second_snapshots = []
+    for snapshot in vintage.snapshots:
+        second_security = replace(
+            snapshot.security,
+            security_id=second_security_id,
+            vendor_security_id="vendor-synth-002",
+            ticker="SYN2",
+            raw_record_sha256="0a" * 32,
+        )
+        second_snapshots.append(
+            replace(
+                snapshot,
+                source_record_id=f"{snapshot.source_record_id}-sec2",
+                security=second_security,
+                volume_basis=replace(
+                    snapshot.volume_basis,
+                    security_id=second_security_id,
+                    raw_record_sha256="0b" * 32,
+                ),
+                denominator=replace(
+                    snapshot.denominator,
+                    security_id=second_security_id,
+                    raw_record_sha256="0c" * 32,
+                ),
+                raw_record_sha256="0d" * 32,
+            )
+        )
+    snapshots = (*vintage.snapshots, *second_snapshots)
+    vintage = build_vintage(
+        replace(
+            vintage.manifest,
+            requested_record_count=len(snapshots),
+            input_row_count=len(snapshots),
+            accepted_record_count=len(snapshots),
+        ),
+        vintage.release_calendar,
+        snapshots,
+        vintage.refusals,
+    )
+
+    references = _references()
+    second_lifecycles = tuple(
+        replace(
+            row,
+            security_id=second_security_id,
+            raw_record_sha256="0e" * 32,
+        )
+        for row in references.lifecycles
+    )
+    second_classifications = tuple(
+        replace(
+            row,
+            security_id=second_security_id,
+            raw_record_sha256="0f" * 32,
+        )
+        for row in references.classifications
+    )
+    references = _reference_bundle(
+        references,
+        lifecycles=(*references.lifecycles, *second_lifecycles),
+        classifications=(
+            *references.classifications,
+            *second_classifications,
+        ),
+    )
+    return vintage, references
+
+
 def test_synthetic_pit_fixture_is_authenticated_and_order_invariant(tmp_path):
     bundle = _references()
     assert bundle.manifest.reference_dataset_id == (
@@ -247,9 +318,31 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         pit_eligibility_module._index_classification_selections
     )
 
+    class CountingSequence:
+        def __init__(self, rows):
+            self.rows = tuple(rows)
+            self.passes = 0
+            self.item_reads = 0
+
+        def __iter__(self):
+            self.passes += 1
+            for row in self.rows:
+                self.item_reads += 1
+                yield row
+
+        def __len__(self):
+            return len(self.rows)
+
+        def __getitem__(self, index):
+            result = self.rows[index]
+            self.item_reads += len(result) if isinstance(index, slice) else 1
+            return result
+
     class CountedSourceSweep(real_source_sweep):
         def __init__(self, vintage):
             super().__init__(vintage)
+            self.event_rows = CountingSequence(self._events)
+            self._events = self.event_rows
             self.advance_calls = []
             self.logical_calls = []
             self.identity_calls = []
@@ -266,21 +359,6 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         def selected_for_identity(self, security_id, settlement_date):
             self.identity_calls.append((security_id, settlement_date))
             return super().selected_for_identity(security_id, settlement_date)
-
-    class CountingSequence:
-        def __init__(self, rows):
-            self.rows = tuple(rows)
-            self.passes = 0
-
-        def __iter__(self):
-            self.passes += 1
-            return iter(self.rows)
-
-        def __len__(self):
-            return len(self.rows)
-
-        def __getitem__(self, index):
-            return self.rows[index]
 
     def counted_cohort_builder(snapshot, release):
         cohort_calls.append((snapshot, release))
@@ -374,8 +452,11 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
         raising=False,
     )
 
-    vintage = _vintage()
-    references = _references()
+    vintage, references = _vintage_and_references_with_second_security()
+    lifecycle_source_rows = CountingSequence(references.lifecycles)
+    classification_source_rows = CountingSequence(references.classifications)
+    object.__setattr__(references, "lifecycles", lifecycle_source_rows)
+    object.__setattr__(references, "classifications", classification_source_rows)
     readiness = build_stock_data_readiness(vintage, references)
 
     assert len(readiness) == len(vintage.snapshots)
@@ -387,14 +468,21 @@ def test_readiness_builds_each_canonical_index_once_and_uses_no_legacy_scans(
     assert len(source_sweeps[0].advance_calls) == len(vintage.snapshots)
     assert len(source_sweeps[0].logical_calls) == len(vintage.snapshots)
     assert len(source_sweeps[0].identity_calls) == len(vintage.snapshots)
+    assert source_sweeps[0].event_rows.item_reads <= 3 * len(vintage.snapshots)
     assert execution_calls == [vintage]
     assert len(reference_calls) == 1
     assert reference_calls[0][:2] == (vintage, references)
     assert set(reference_calls[0][2]) == {
         item.event_id for item in vintage.snapshots
     }
-    assert lifecycle_row_passes == [1]
-    assert classification_row_passes == [1]
+    assert lifecycle_source_rows.passes == 2
+    assert classification_source_rows.passes == 2
+    assert lifecycle_source_rows.item_reads == 2 * len(lifecycle_source_rows)
+    assert classification_source_rows.item_reads == 2 * len(
+        classification_source_rows
+    )
+    assert lifecycle_row_passes == [1, 1]
+    assert classification_row_passes == [1, 1]
 
 
 def test_reference_indices_include_exact_open_and_valid_to_boundaries():

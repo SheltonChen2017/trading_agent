@@ -819,6 +819,51 @@ def test_malformed_profile_document_hash_refuses(monkeypatch, baseline):
         _assemble(original, amendment, profile)
 
 
+def test_supplied_xml_issuer_must_agree_with_verified_acceptance_evidence(
+    monkeypatch,
+):
+    """Bind the parsed XML issuer to the CIK the verified IB-1C URL anchors.
+
+    Both supplied filings declare the same foreign issuer, so the corpus-level
+    original-versus-amendment issuer comparison stays satisfied and only the
+    XML-to-acceptance-evidence binding can refuse. Without it a caller could
+    file one issuer's XML under another issuer's verified accession and corrupt
+    the audit lineage that later QC evidence rests on.
+    """
+    foreign = b"<issuerCik>999999</issuerCik>"
+    original = _Spec(
+        ORIGINAL,
+        "4",
+        datetime(2026, 12, 29, 18, 0, tzinfo=timezone.utc),
+        _fixture("form4_original.xml").replace(
+            b"<issuerCik>123456</issuerCik>", foreign
+        ),
+    )
+    amendment = _Spec(
+        AMENDMENT,
+        "4/A",
+        datetime(2027, 1, 4, 18, 0, tzinfo=timezone.utc),
+        _fixture("form4_amendment.xml").replace(
+            b"<issuerCik>123456</issuerCik>", foreign
+        ),
+        ORIGINAL,
+    )
+    profile = _profile()
+    _install_loader(
+        monkeypatch,
+        (
+            _loaded_period(2026, 4, (original,), profile=profile),
+            _loaded_period(2027, 1, (amendment,), profile=profile),
+        ),
+    )
+
+    with pytest.raises(
+        Form4MultiPeriodEvidenceError,
+        match="XML issuer CIK disagrees with acceptance evidence",
+    ):
+        _assemble(original, amendment, profile)
+
+
 def test_ib1e_module_has_no_network_outcome_execution_or_ui_imports():
     module_path = Path(evidence_module.__file__)
     tree = ast.parse(

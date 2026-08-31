@@ -2009,3 +2009,19 @@ No provider, credential, licensed row, price, return, outcome, QuantConnect
 upload/compile/job, deployment, broker, operator database, scheduler, order,
 UI, or trading authority was used or granted.  ARV2-4 remains blocked, and
 this merge-resolution record does not authorize a later milestone.
+
+### 6.4 Local application, 2026-08-31
+
+After the owner directed Codex to begin the reconciliation work, Codex
+re-fetched all remotes, verified that the live worktree was clean and still at
+exact recorded lane head `c16f7f40c844cc70c387c3270c03a01209a5015b`,
+verified the complete-history bundle, and fast-forwarded this long-lived local
+branch to reviewed bundle tip
+`d9de03d3ecfb745b3267ac96025847e373de52de`.  The tested merge commit
+`4ef736be060bf4311b718a2778d230d0fa45a594` is therefore now in this local
+branch's ancestry.  No commit was rewritten and no remote ref was moved.
+
+This application changes the earlier artifact-only state; it does not change
+the conflict choices, test evidence, review disposition, or authority gates
+above.  The branch remains local-only and must not be pushed without separate
+owner authorization and a fresh exact remote-tip check.

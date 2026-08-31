@@ -113,7 +113,7 @@ def _fold() -> StructuralFoldBoundary:
 
 def test_repository_stock_evaluation_contract_is_complete_but_powerless() -> None:
     spec = _load()
-    assert spec.spec_id == "arv2-stock-historical-dcc30556b6fb582b"
+    assert spec.spec_id == "arv2-stock-historical-c5ff2a6a0dcf341e"
     assert spec.parent_plan_id == "arv2-qc-first-plan-36e455e72b8750fe"
     assert spec.sections["history_definition"]["horizons_sessions"] == (
         1,
@@ -132,7 +132,13 @@ def test_repository_stock_evaluation_contract_is_complete_but_powerless() -> Non
     )
     assert spec.sections["report_definition"]["secondary_can_rescue"] is False
     analysis = spec.sections["analysis_definition"]
+    control = spec.sections["control_definition"]
     report_definition = spec.sections["report_definition"]
+    assert control["unseen_industry"] == (
+        "refuse_active_row_structural_zero_remains_exact_zero"
+    )
+    assert "positive_date_share" in analysis["information_coefficient"]["reports"]
+    assert "positive_share" not in analysis["information_coefficient"]["reports"]
     assert analysis["primary_gate_ids"] == report_definition["PRIMARY"]
     assert analysis["role"] == "development_stop_go_not_prospective_confirmation"
     assert analysis["confirmatory_claim_permitted"] is False
@@ -475,6 +481,100 @@ def test_train_only_control_fit_and_frozen_apply_are_structural() -> None:
     assert all(Decimal("-4") <= value <= Decimal("4") for value in active_values)
     assert result.final_executable_available is False
     assert len(result.batch_sha256) == 64
+
+
+def test_cross_section_reauthentication_binds_exact_open_and_contract() -> None:
+    contract = _load()
+    candidate, evidence = _candidate_and_evidence(session="2020-01-02")
+    training = build_preopen_control_cross_section(contract, candidate, evidence)
+    assert training.spec_hash == contract.spec_hash
+
+    with pytest.raises(StockControlError, match="must equal the NYSE open"):
+        dataclasses.replace(
+            training,
+            decision_at="2020-01-02T15:00:00.000000Z",
+        )
+
+    unregistered_copy = dataclasses.replace(training)
+    with pytest.raises(
+        StockControlError, match="identity is not builder-authenticated"
+    ):
+        fit_structural_stock_control_model(
+            contract,
+            _fold(),
+            (unregistered_copy,),
+        )
+
+    relabeled_session = "2019-12-31"
+    relabeled = dataclasses.replace(
+        training,
+        decision_session=relabeled_session,
+        decision_at=session_open_instant(relabeled_session).isoformat(
+            timespec="microseconds"
+        ).replace("+00:00", "Z"),
+    )
+    with pytest.raises(
+        StockControlError, match="identity is not builder-authenticated"
+    ):
+        fit_structural_stock_control_model(
+            contract,
+            _fold(),
+            (relabeled,),
+        )
+
+    tampered_registered = build_preopen_control_cross_section(
+        contract, candidate, evidence
+    )
+    object.__setattr__(tampered_registered, "decision_session", relabeled_session)
+    object.__setattr__(
+        tampered_registered,
+        "decision_at",
+        session_open_instant(relabeled_session).isoformat(
+            timespec="microseconds"
+        ).replace("+00:00", "Z"),
+    )
+    with pytest.raises(
+        StockControlError, match="identity is not builder-authenticated"
+    ):
+        fit_structural_stock_control_model(
+            contract,
+            _fold(),
+            (tampered_registered,),
+        )
+
+    wrong_contract_training = dataclasses.replace(training, spec_hash="f" * 64)
+    with pytest.raises(
+        StockControlError, match="identity is not builder-authenticated"
+    ):
+        fit_structural_stock_control_model(
+            contract,
+            _fold(),
+            (wrong_contract_training,),
+        )
+
+    model = fit_structural_stock_control_model(contract, _fold(), (training,))
+    validation_candidate, validation_evidence = _candidate_and_evidence(
+        session="2020-02-03"
+    )
+    validation = build_preopen_control_cross_section(
+        contract,
+        validation_candidate,
+        validation_evidence,
+    )
+    wrong_contract_validation = dataclasses.replace(
+        validation,
+        spec_hash="f" * 64,
+    )
+    with pytest.raises(
+        StockControlError, match="identity is not builder-authenticated"
+    ):
+        apply_structural_stock_control_model(
+            contract,
+            model,
+            _fold(),
+            "validation",
+            (wrong_contract_validation,),
+        )
 
 
 def test_structural_zero_is_excluded_and_must_arrive_as_exact_zero() -> None:

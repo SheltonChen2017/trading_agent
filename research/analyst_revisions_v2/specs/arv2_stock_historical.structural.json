@@ -2,8 +2,8 @@
   "schema": "arv2-stock-historical-evaluation-structural-v1",
   "status": "implementation_frozen_outcome_free_structural_candidate_pending_independent_review",
   "authority": "structural_definition_only_no_source_data_outcome_qc_or_deployment_authority",
-  "spec_id": "arv2-stock-historical-dcc30556b6fb582b",
-  "spec_hash": "dcc30556b6fb582b249d6fa2945e4e23161035502a014ba645c521c743251629",
+  "spec_id": "arv2-stock-historical-c5ff2a6a0dcf341e",
+  "spec_hash": "c5ff2a6a0dcf341e3c7bad4ea56e4a3c00f20faab5896c0fcd3bd7c291835a0b",
   "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193",
   "parent_plan_id": "arv2-qc-first-plan-36e455e72b8750fe",
   "parent_plan_hash": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc",
@@ -69,7 +69,7 @@
     "estimator": "pooled_equal_weight_training_ols",
     "design": "intercept_then_continuous_then_binary_then_industry_dummies",
     "industry_reference": "lexicographically_first_training_level",
-    "unseen_industry": "refuse_row",
+    "unseen_industry": "refuse_active_row_structural_zero_remains_exact_zero",
     "minimum_rows": "strictly_more_than_parameter_count_plus_20",
     "solver": "decimal_modified_gram_schmidt_qr",
     "decimal_precision": 50,
@@ -293,7 +293,7 @@
         "mean",
         "median",
         "icir",
-        "positive_share",
+        "positive_date_share",
         "hac_t",
         "by_year"
       ]
@@ -441,10 +441,10 @@
     "etf_promotion_available": false
   },
   "section_hashes": {
-    "control_definition": "b5b0a7d5d60bb6ed650983aa732f8bc8d698076314a05c3fcbc637587e0ccbd9",
+    "control_definition": "c731afd772abc19502b0cf6d0ff6a1dba5b430200a724d7bab239c58320aa624",
     "global_benchmark_definition": "001c83c621c787cb35007b9c53fb608f325c4b89725831bdf5507c0dda329e10",
     "history_definition": "5db2a1bc09d7ecd2e8cb7e5044f0abc7f97b3eefb71803002d00f6b33cf984ca",
-    "analysis_definition": "9260defee55d0c92ad93a56f4a9cec11fabbc32fcdbc58acec4d874b0707d442",
+    "analysis_definition": "4759fda92bfc12bc09b5b6b539aa04eed799eafa9a3f6f1c6d6054273efa5aa6",
     "power_definition": "18fcd8a801bfe528c00072d2e9aa7698057e1d8b00e09138d5ff222086562360",
     "economic_definition": "3b98c40dd7b470658f08a8812d816aa0eeff9f765282917e478dfe378dcc95bd",
     "report_definition": "19095bcf2070bf1d45e4734f3521c12f25e825cc15fc6533ccbac110775e434a",

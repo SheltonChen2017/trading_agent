@@ -1086,7 +1086,7 @@ def test_production_registry_is_checked_before_symlink_resolution(
         require_registered_production_security_master(master)
 
 
-def test_positive_registry_path_binds_reviewed_blob_and_rejects_later_substitution(
+def test_registry_entry_cannot_self_promote_and_rejects_later_substitution(
     tmp_path, monkeypatch
 ):
     repo = tmp_path / "reference-repo"
@@ -1132,7 +1132,8 @@ def test_positive_registry_path_binds_reviewed_blob_and_rejects_later_substituti
     monkeypatch.setattr(
         security_master_module, "SECURITY_MASTER_REGISTRY_PATH", registry_path
     )
-    assert require_registered_production_security_master(master) is master
+    with pytest.raises(ProductionRegistryError, match="approval authority is absent"):
+        require_registered_production_security_master(master)
 
     substituted = _master_payload()
     substituted["version"] = "version-substituted"

@@ -130,7 +130,7 @@ CONTROL_DEFINITION = {
     "estimator": "pooled_equal_weight_training_ols",
     "design": "intercept_then_continuous_then_binary_then_industry_dummies",
     "industry_reference": "lexicographically_first_training_level",
-    "unseen_industry": "refuse_row",
+    "unseen_industry": "refuse_active_row_structural_zero_remains_exact_zero",
     "minimum_rows": "strictly_more_than_parameter_count_plus_20",
     "solver": "decimal_modified_gram_schmidt_qr",
     "decimal_precision": 50,
@@ -309,7 +309,7 @@ ANALYSIS_DEFINITION = {
             "20": ["mean", "median", "icir", "positive_date_share", "hac_t_lag_20", "year_by_year_ic"],
             "60": ["mean", "median", "icir", "positive_date_share", "hac_t_lag_60", "year_by_year_ic"],
         },
-        "reports": ["mean", "median", "icir", "positive_share", "hac_t", "by_year"],
+        "reports": ["mean", "median", "icir", "positive_date_share", "hac_t", "by_year"],
     },
     "bootstrap": {
         "method": "centered_moving_complete_session_blocks",

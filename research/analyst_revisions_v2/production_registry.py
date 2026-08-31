@@ -262,4 +262,12 @@ def require_production_registry_entry(
         raise ProductionRegistryError(
             f"{artifact_kind} artifact or registry changed during authentication"
         )
-    return entry
+    # The entry's review_commit authenticates the artifact blob, but it cannot
+    # authenticate the registry entry that names that same commit: embedding a
+    # commit's own hash in its contents is circular.  Until a separately pinned,
+    # non-self-referential approval receipt exists, a checked-in entry must stay
+    # structural and fail closed rather than promote itself to production.
+    raise ProductionRegistryError(
+        f"{artifact_kind} production registration approval authority is absent; "
+        "the committed registry remains zero-access"
+    )

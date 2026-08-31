@@ -637,6 +637,7 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
         "preregistration.py": {"_REVIEWED_AUTHORITIES"},
         "security_master.py": {"_SECURITY_MASTER_AUTHORITIES"},
         "snapshot.py": {"_SNAPSHOT_AUTHORITIES"},
+        "stock_controls.py": {"_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES"},
         "stock_evaluation_contract.py": {"_CONTRACT_AUTHORITIES"},
     }
     checked: dict[str, set[str]] = {}

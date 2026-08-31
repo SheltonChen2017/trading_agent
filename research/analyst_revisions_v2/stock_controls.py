@@ -8,6 +8,8 @@ authority.
 from __future__ import annotations
 
 import dataclasses
+import threading
+import weakref
 from decimal import Context, Decimal, InvalidOperation, ROUND_HALF_EVEN, localcontext
 from typing import Any, Iterable
 
@@ -84,6 +86,11 @@ _APPLICATION_REFUSAL_REASONS = frozenset(
         "unseen_training_industry",
     }
 )
+_PREOPEN_CONTROL_CROSS_SECTION_TOKEN = object()
+_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES: dict[
+    int, tuple[weakref.ReferenceType["PreopenControlCrossSection"], str]
+] = {}
+_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES_LOCK = threading.RLock()
 
 
 def _frozen_decimal_context() -> Context:
@@ -280,6 +287,7 @@ class ControlRowRefusal:
 class PreopenControlCrossSection:
     decision_session: str
     decision_at: str
+    spec_hash: str
     candidate_sha256: str
     candidate_policy_sha256: str
     evidence_sha256: str
@@ -287,10 +295,22 @@ class PreopenControlCrossSection:
     accepted_control_count: int
     rows: tuple[TransformedControlRow, ...]
     refusals: tuple[ControlRowRefusal, ...]
+    _token: object = dataclasses.field(repr=False, compare=False)
 
     def __post_init__(self) -> None:
         parse_date(self.decision_session, "decision_session")
-        parse_utc_timestamp(self.decision_at, "decision_at")
+        decision_at = parse_utc_timestamp(self.decision_at, "decision_at")
+        try:
+            expected_open = session_open_instant(self.decision_session)
+        except ExchangeCalendarError as exc:
+            raise StockControlError(
+                "cross-section decision session has no NYSE open"
+            ) from exc
+        if decision_at != expected_open:
+            raise StockControlError(
+                "cross-section decision instant must equal the NYSE open"
+            )
+        require_sha256(self.spec_hash, "spec_hash")
         require_sha256(self.candidate_sha256, "candidate_sha256")
         require_sha256(self.candidate_policy_sha256, "candidate_policy_sha256")
         require_sha256(self.evidence_sha256, "evidence_sha256")
@@ -339,6 +359,7 @@ class PreopenControlCrossSection:
         record = {
             "decision_session": self.decision_session,
             "decision_at": self.decision_at,
+            "spec_hash": self.spec_hash,
             "candidate_sha256": self.candidate_sha256,
             "candidate_policy_sha256": self.candidate_policy_sha256,
             "evidence_sha256": self.evidence_sha256,
@@ -350,13 +371,55 @@ class PreopenControlCrossSection:
         return sha256_bytes(canonical_json_bytes(record))
 
 
+def _forget_preopen_control_cross_section_authority(
+    identity: int,
+    reference: weakref.ReferenceType[PreopenControlCrossSection],
+) -> None:
+    with _PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES_LOCK:
+        registered = _PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES.get(identity)
+        if registered is not None and registered[0] is reference:
+            _PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES.pop(identity, None)
+
+
+def _register_preopen_control_cross_section_authority(
+    value: PreopenControlCrossSection,
+) -> None:
+    identity = id(value)
+    reference = weakref.ref(
+        value,
+        lambda ref, key=identity: _forget_preopen_control_cross_section_authority(
+            key, ref
+        ),
+    )
+    with _PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES_LOCK:
+        _PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES[identity] = (
+            reference,
+            value.cross_section_sha256,
+        )
+
+
 def require_preopen_control_cross_section(
     value: PreopenControlCrossSection,
 ) -> PreopenControlCrossSection:
     """Recompute coverage and every nested row invariant before consumption."""
-    if type(value) is not PreopenControlCrossSection:
-        raise StockControlError("cross-section must use the exact structural type")
+    if (
+        type(value) is not PreopenControlCrossSection
+        or getattr(value, "_token", None) is not _PREOPEN_CONTROL_CROSS_SECTION_TOKEN
+    ):
+        raise StockControlError(
+            "cross-section must be builder-authenticated structural evidence"
+        )
     value.__post_init__()
+    with _PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES_LOCK:
+        authority = _PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES.get(id(value))
+    if (
+        authority is None
+        or authority[0]() is not value
+        or authority[1] != value.cross_section_sha256
+    ):
+        raise StockControlError(
+            "cross-section identity is not builder-authenticated"
+        )
     return value
 
 
@@ -632,9 +695,10 @@ def build_preopen_control_cross_section(
     evidence_hash = sha256_bytes(
         canonical_json_bytes([item.to_record() for item in evidence_rows])
     )
-    return PreopenControlCrossSection(
+    cross_section = PreopenControlCrossSection(
         decision_session=candidate.decision_session,
         decision_at=candidate.decision_at,
+        spec_hash=contract.spec_hash,
         candidate_sha256=candidate.candidate_sha256,
         candidate_policy_sha256=candidate.policy_sha256,
         evidence_sha256=evidence_hash,
@@ -642,7 +706,10 @@ def build_preopen_control_cross_section(
         accepted_control_count=accepted_count,
         rows=tuple(transformed),
         refusals=tuple(refusals),
+        _token=_PREOPEN_CONTROL_CROSS_SECTION_TOKEN,
     )
+    _register_preopen_control_cross_section_authority(cross_section)
+    return require_preopen_control_cross_section(cross_section)
 
 
 def _solve_ols(
@@ -877,6 +944,12 @@ def fit_structural_stock_control_model(
         raise StockControlError("training cross-sections must be a nonempty typed tuple")
     for item in training_cross_sections:
         require_preopen_control_cross_section(item)
+    if any(
+        item.spec_hash != contract.spec_hash for item in training_cross_sections
+    ):
+        raise StockControlError(
+            "training cross-section does not bind the loaded evaluation contract"
+        )
     sessions = tuple(item.decision_session for item in training_cross_sections)
     if sessions != tuple(sorted(set(sessions))):
         raise StockControlError("training cross-sections must be unique and chronological")
@@ -1156,6 +1229,10 @@ def apply_structural_stock_control_model(
         raise StockControlError("application cross-sections must be a typed tuple")
     for item in cross_sections:
         require_preopen_control_cross_section(item)
+    if any(item.spec_hash != contract.spec_hash for item in cross_sections):
+        raise StockControlError(
+            "application cross-section does not bind the loaded evaluation contract"
+        )
     sessions = tuple(item.decision_session for item in cross_sections)
     if sessions != tuple(sorted(set(sessions))):
         raise StockControlError("application cross-sections must be unique and chronological")

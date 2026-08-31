@@ -9,14 +9,28 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, DecimalException, InvalidOperation
 from typing import Any
 
 from config import LEVERAGED_ETF_TICKERS
-from assistant.money import decimal_text, to_decimal
+from assistant.money import (
+    decimal_text,
+    deterministic_decimal_divide,
+    deterministic_decimal_quantize,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    exact_decimal_sum,
+    to_decimal,
+)
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
+from data.security_identity import (
+    canonical_equity_ticker,
+    is_canonical_equity_ticker,
+)
 
 
 POSITION_VALUE_TOLERANCE = Decimal("0.01")
@@ -24,6 +38,88 @@ POSITION_VALUE_TOLERANCE = Decimal("0.01")
 
 class PortfolioSnapshotIntegrityError(ValueError):
     """A snapshot cannot represent this project's long-only cash account."""
+
+
+def _portfolio_exact_add(name: str, left: Decimal, right: Decimal) -> Decimal:
+    try:
+        return exact_decimal_add(left, right, name=name)
+    except ValueError as exc:
+        raise PortfolioSnapshotIntegrityError(
+            f"{name} exact decimal arithmetic is not representable"
+        ) from exc
+
+
+def _portfolio_exact_subtract(name: str, left: Decimal, right: Decimal) -> Decimal:
+    try:
+        return exact_decimal_subtract(left, right, name=name)
+    except ValueError as exc:
+        raise PortfolioSnapshotIntegrityError(
+            f"{name} exact decimal arithmetic is not representable"
+        ) from exc
+
+
+def _portfolio_exact_multiply(name: str, left: Decimal, right: Decimal) -> Decimal:
+    try:
+        return exact_decimal_multiply(left, right, name=name)
+    except ValueError as exc:
+        raise PortfolioSnapshotIntegrityError(
+            f"{name} exact decimal arithmetic is not representable"
+        ) from exc
+
+
+def _portfolio_exact_sum(name: str, values: Sequence[Decimal]) -> Decimal:
+    try:
+        return exact_decimal_sum(values, name=name)
+    except ValueError as exc:
+        raise PortfolioSnapshotIntegrityError(
+            f"{name} exact decimal arithmetic is not representable"
+        ) from exc
+
+
+def _portfolio_deterministic_divide(
+    name: str, numerator: Decimal, denominator: Decimal
+) -> Decimal:
+    try:
+        return deterministic_decimal_divide(numerator, denominator, name=name)
+    except ValueError as exc:
+        raise PortfolioSnapshotIntegrityError(
+            f"{name} decimal division is not representable"
+        ) from exc
+
+
+def _display_float(
+    value: Decimal,
+    *,
+    name: str,
+    rounded: bool,
+) -> float:
+    """Project exact evidence into a finite display float or fail closed.
+
+    ``round(Decimal, 2)`` can raise ``decimal.InvalidOperation`` for a finite
+    value whose exponent exceeds the active Decimal context.  InvalidOperation
+    is an ArithmeticError, not a ValueError, so every display/evidence guard
+    must normalize it explicitly instead of leaking an unhandled traceback.
+    """
+    try:
+        projected = (
+            deterministic_decimal_quantize(
+                value,
+                Decimal("0.01"),
+                name=f"{name} display",
+            )
+            if rounded
+            else value
+        )
+        display = float(projected)
+    except (DecimalException, OverflowError, ValueError) as exc:
+        raise PortfolioSnapshotIntegrityError(
+            f"{name} exact evidence cannot be represented for display"
+        ) from exc
+    if not math.isfinite(display):
+        raise PortfolioSnapshotIntegrityError(
+            f"{name} exact evidence cannot be represented for display"
+        )
+    return display
 
 
 def _evidence_decimal(
@@ -43,12 +139,11 @@ def _evidence_decimal(
     except ValueError as exc:
         raise PortfolioSnapshotIntegrityError(str(exc)) from exc
     if exact_text is not None:
-        try:
-            expected_display = float(round(exact, 2)) if rounded_display else float(exact)
-        except (OverflowError, ValueError) as exc:
-            raise PortfolioSnapshotIntegrityError(
-                f"{name} exact evidence cannot be represented for display"
-            ) from exc
+        expected_display = _display_float(
+            exact,
+            name=name,
+            rounded=rounded_display,
+        )
         if display_value != expected_display:
             raise PortfolioSnapshotIntegrityError(
                 f"{name} display value {display_value!r} disagrees with exact "
@@ -82,6 +177,11 @@ def validate_long_only_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
         name="portfolio.total_equity",
         rounded_display=True,
     )
+    if snapshot.buying_power is None and snapshot.buying_power_exact is not None:
+        raise PortfolioSnapshotIntegrityError(
+            "portfolio.buying_power_exact cannot exist without "
+            "portfolio.buying_power"
+        )
     buying_power = None
     if snapshot.buying_power is not None:
         buying_power = _evidence_decimal(
@@ -107,11 +207,7 @@ def validate_long_only_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
     component_value = cash
     for position in snapshot.positions:
         ticker = position.ticker
-        if (
-            not isinstance(ticker, str)
-            or not ticker
-            or ticker != ticker.strip().upper()
-        ):
+        if not is_canonical_equity_ticker(ticker):
             raise PortfolioSnapshotIntegrityError(
                 f"position ticker {ticker!r} is not canonical"
             )
@@ -156,19 +252,37 @@ def validate_long_only_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
             raise PortfolioSnapshotIntegrityError(
                 f"{ticker}.market_value must be positive for a nonzero holding"
             )
-        expected_value = shares * current_price
-        if abs(market_value - expected_value) > POSITION_VALUE_TOLERANCE:
+        expected_value = _portfolio_exact_multiply(
+            f"{ticker}.market_value",
+            shares,
+            current_price,
+        )
+        value_delta = _portfolio_exact_subtract(
+            f"{ticker}.market_value delta",
+            market_value,
+            expected_value,
+        ).copy_abs()
+        if value_delta > POSITION_VALUE_TOLERANCE:
             raise PortfolioSnapshotIntegrityError(
                 f"{ticker}.market_value {decimal_text(market_value)} disagrees with "
                 f"shares*current_price {decimal_text(expected_value)} by more than "
                 f"{decimal_text(POSITION_VALUE_TOLERANCE)}"
             )
-        component_value += market_value
+        component_value = _portfolio_exact_add(
+            "portfolio component equity",
+            component_value,
+            market_value,
+        )
 
-    if abs(component_value - equity) > POSITION_VALUE_TOLERANCE:
+    component_delta = _portfolio_exact_subtract(
+        "portfolio component equity delta",
+        component_value,
+        equity,
+    ).copy_abs()
+    if component_delta > POSITION_VALUE_TOLERANCE:
         raise PortfolioSnapshotIntegrityError(
             "portfolio.total_equity disagrees with exact cash plus position values "
-            f"by {decimal_text(abs(component_value - equity))}"
+            f"by {decimal_text(component_delta)}"
         )
 
 
@@ -272,7 +386,11 @@ def build_portfolio_snapshot(
         market_value_decimal = (
             to_decimal(position["market_value"], name=f"{ticker}.market_value")
             if "market_value" in position
-            else shares_decimal * current_price_decimal
+            else _portfolio_exact_multiply(
+                f"{ticker}.market_value",
+                shares_decimal,
+                current_price_decimal,
+            )
         )
         if shares_decimal < 0:
             raise PortfolioSnapshotIntegrityError(
@@ -299,11 +417,17 @@ def build_portfolio_snapshot(
             raise PortfolioSnapshotIntegrityError(
                 f"Position {ticker!r} must have positive market_value."
             )
-        expected_market_value = shares_decimal * current_price_decimal
-        if (
-            abs(market_value_decimal - expected_market_value)
-            > POSITION_VALUE_TOLERANCE
-        ):
+        expected_market_value = _portfolio_exact_multiply(
+            f"{ticker}.market_value",
+            shares_decimal,
+            current_price_decimal,
+        )
+        market_value_delta = _portfolio_exact_subtract(
+            f"{ticker}.market_value delta",
+            market_value_decimal,
+            expected_market_value,
+        ).copy_abs()
+        if market_value_delta > POSITION_VALUE_TOLERANCE:
             raise PortfolioSnapshotIntegrityError(
                 f"Position {ticker!r} market_value disagrees with shares*current_price "
                 f"by more than {decimal_text(POSITION_VALUE_TOLERANCE)}."
@@ -322,9 +446,26 @@ def build_portfolio_snapshot(
                 f"values ({grouped[ticker]['current_price']} vs {position['current_price']}) -- "
                 "refusing to silently aggregate inconsistent prices."
             )
-        grouped[ticker]["shares"] += shares_decimal
-        grouped[ticker]["cost"] += shares_decimal * entry_price_decimal
-        grouped[ticker]["market_value"] += market_value_decimal
+        grouped[ticker]["shares"] = _portfolio_exact_add(
+            f"{ticker}.aggregate shares",
+            grouped[ticker]["shares"],
+            shares_decimal,
+        )
+        row_cost = _portfolio_exact_multiply(
+            f"{ticker}.row cost",
+            shares_decimal,
+            entry_price_decimal,
+        )
+        grouped[ticker]["cost"] = _portfolio_exact_add(
+            f"{ticker}.aggregate cost",
+            grouped[ticker]["cost"],
+            row_cost,
+        )
+        grouped[ticker]["market_value"] = _portfolio_exact_add(
+            f"{ticker}.aggregate market value",
+            grouped[ticker]["market_value"],
+            market_value_decimal,
+        )
 
     built: list[PortfolioPosition] = []
     for ticker in order:
@@ -333,20 +474,60 @@ def build_portfolio_snapshot(
         current_price = aggregate["current_price"]
         cost = aggregate["cost"]
         market_value = aggregate["market_value"]
-        entry_price = cost / shares if shares else Decimal("0")
+        entry_price = (
+            _portfolio_deterministic_divide(
+                f"{ticker}.entry_price",
+                cost,
+                shares,
+            )
+            if shares
+            else Decimal("0")
+        )
         unrealized_pnl_pct = (
-            (market_value - cost) / cost * Decimal("100")
+            _portfolio_exact_multiply(
+                f"{ticker}.unrealized_pnl_pct",
+                _portfolio_deterministic_divide(
+                    f"{ticker}.unrealized_pnl_ratio",
+                    _portfolio_exact_subtract(
+                        f"{ticker}.unrealized_pnl",
+                        market_value,
+                        cost,
+                    ),
+                    cost,
+                ),
+                Decimal("100"),
+            )
             if cost
             else Decimal("0")
         )
         built.append(
             PortfolioPosition(
                 ticker=ticker,
-                shares=float(shares),
-                entry_price=float(entry_price),
-                current_price=float(current_price),
-                market_value=float(round(market_value, 2)),
-                unrealized_pnl_pct=float(round(unrealized_pnl_pct, 2)),
+                shares=_display_float(
+                    shares,
+                    name=f"{ticker}.shares",
+                    rounded=False,
+                ),
+                entry_price=_display_float(
+                    entry_price,
+                    name=f"{ticker}.entry_price",
+                    rounded=False,
+                ),
+                current_price=_display_float(
+                    current_price,
+                    name=f"{ticker}.current_price",
+                    rounded=False,
+                ),
+                market_value=_display_float(
+                    market_value,
+                    name=f"{ticker}.market_value",
+                    rounded=True,
+                ),
+                unrealized_pnl_pct=_display_float(
+                    unrealized_pnl_pct,
+                    name=f"{ticker}.unrealized_pnl_pct",
+                    rounded=True,
+                ),
                 is_leveraged_etf=_classify_leveraged(ticker),
                 shares_exact=decimal_text(shares),
                 entry_price_exact=decimal_text(entry_price),
@@ -355,17 +536,23 @@ def build_portfolio_snapshot(
             )
         )
 
-    exact_total_equity = cash_decimal + sum(
-        (position.exact_field("market_value") for position in built), Decimal("0")
+    exact_total_equity = _portfolio_exact_sum(
+        "portfolio.total_equity",
+        [cash_decimal]
+        + [position.exact_field("market_value") for position in built],
     )
     snapshot = PortfolioSnapshot(
         positions=built,
-        cash=float(round(cash_decimal, 2)),
+        cash=_display_float(cash_decimal, name="portfolio.cash", rounded=True),
         # Aggregate authoritative values before rounding. Summing each
         # position's already-rounded display value can accumulate multiple
         # cents of drift and create a display/exact pair that fails its own
         # integrity contract.
-        total_equity=float(round(exact_total_equity, 2)),
+        total_equity=_display_float(
+            exact_total_equity,
+            name="portfolio.total_equity",
+            rounded=True,
+        ),
         cash_exact=decimal_text(cash_decimal),
         total_equity_exact=decimal_text(exact_total_equity),
         buying_power_exact=(
@@ -375,7 +562,11 @@ def build_portfolio_snapshot(
         ),
         as_of=datetime.now(timezone.utc).date().isoformat(),
         buying_power=(
-            float(round(buying_power_decimal, 2))
+            _display_float(
+                buying_power_decimal,
+                name="portfolio.buying_power",
+                rounded=True,
+            )
             if buying_power_decimal is not None
             else None
         ),
@@ -404,6 +595,42 @@ _UNUSABLE_ACCOUNT_IDS = frozenset({"", "none", "null", "unknown"})
 
 class BrokerSnapshotCoherenceError(RuntimeError):
     """Broker observations cannot form one account-bound execution snapshot."""
+
+
+def _broker_exact_add(name: str, left: Decimal, right: Decimal) -> Decimal:
+    try:
+        return exact_decimal_add(left, right, name=name)
+    except ValueError as exc:
+        raise BrokerSnapshotCoherenceError(
+            f"{name} exact decimal arithmetic is not representable"
+        ) from exc
+
+
+def _broker_exact_subtract(name: str, left: Decimal, right: Decimal) -> Decimal:
+    try:
+        return exact_decimal_subtract(left, right, name=name)
+    except ValueError as exc:
+        raise BrokerSnapshotCoherenceError(
+            f"{name} exact decimal arithmetic is not representable"
+        ) from exc
+
+
+def _broker_exact_multiply(name: str, left: Decimal, right: Decimal) -> Decimal:
+    try:
+        return exact_decimal_multiply(left, right, name=name)
+    except ValueError as exc:
+        raise BrokerSnapshotCoherenceError(
+            f"{name} exact decimal arithmetic is not representable"
+        ) from exc
+
+
+def _broker_exact_sum(name: str, values: Sequence[Decimal]) -> Decimal:
+    try:
+        return exact_decimal_sum(values, name=name)
+    except ValueError as exc:
+        raise BrokerSnapshotCoherenceError(
+            f"{name} exact decimal arithmetic is not representable"
+        ) from exc
 
 
 class _TransientBrokerSnapshotMutation(BrokerSnapshotCoherenceError):
@@ -506,7 +733,9 @@ def _strict_account_record(
         "equity": _required_exact_decimal(
             account, "equity_decimal", positive=True
         ),
-        "cash": _required_exact_decimal(account, "cash_decimal"),
+        "cash": _required_exact_decimal(
+            account, "cash_decimal", nonnegative=True
+        ),
         "buying_power": _required_exact_decimal(
             account, "buying_power_decimal", nonnegative=True
         ),
@@ -529,34 +758,51 @@ def _strict_position_records(
             raise BrokerSnapshotCoherenceError(
                 f"broker position row {index} must be a mapping"
             )
-        ticker = position.get("ticker")
-        if not isinstance(ticker, str) or not ticker.strip():
-            raise BrokerSnapshotCoherenceError(
-                f"broker position row {index} has no usable ticker"
+        try:
+            ticker = canonical_equity_ticker(
+                position.get("ticker"),
+                name=f"broker position row {index} ticker",
             )
-        ticker = ticker.strip().upper()
+        except ValueError as exc:
+            raise BrokerSnapshotCoherenceError(str(exc)) from exc
         if ticker in seen:
             raise BrokerSnapshotCoherenceError(
                 f"broker returned duplicate position rows for {ticker}"
             )
         seen.add(ticker)
         shares = _required_exact_decimal(position, "shares_decimal")
-        if shares == 0:
+        if shares <= 0:
             raise BrokerSnapshotCoherenceError(
-                f"broker position {ticker} has a zero share quantity"
+                f"broker position {ticker} must have a positive share quantity"
             )
         entry_price = _required_exact_decimal(
-            position, "avg_entry_price_decimal", nonnegative=True
+            position, "avg_entry_price_decimal", positive=True
         )
         current_price = _required_exact_decimal(
             position, "current_price_decimal", positive=True
         )
         market_value = _required_exact_decimal(position, "market_value_decimal")
-        if (shares > 0 and market_value < 0) or (
-            shares < 0 and market_value > 0
-        ):
+        if market_value <= 0:
             raise BrokerSnapshotCoherenceError(
-                f"broker position {ticker} has inconsistent quantity/value signs"
+                f"broker position {ticker} must have a positive market value"
+            )
+        expected_market_value = _broker_exact_multiply(
+            f"broker position {ticker} market value",
+            shares,
+            current_price,
+        )
+        market_value_delta = _broker_exact_subtract(
+            f"broker position {ticker} market value delta",
+            market_value,
+            expected_market_value,
+        ).copy_abs()
+        if market_value_delta > POSITION_VALUE_TOLERANCE:
+            # Alpaca's component fields are not atomically bracketed.  Unlike
+            # a negative account balance or non-positive holding input, an
+            # internally mismatched position can be a transient observation;
+            # authorize only this precise condition for the bounded recapture.
+            raise _TransientBrokerSnapshotMutation(
+                f"broker position {ticker} market value changed during capture"
             )
         row = {
             "ticker": ticker,
@@ -596,6 +842,43 @@ def _require_exact_active_order_numerics(
                 )
 
 
+def _has_preserved_decimal_text(value: object) -> bool:
+    """Return whether a broker companion is preserved exact decimal text."""
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _validated_read_only_open_orders(
+    account: Mapping[str, Any],
+    raw_orders: object,
+) -> list[dict[str, Any]]:
+    """Accept only one complete order list bound to the observed account."""
+    if not isinstance(raw_orders, list):
+        raise BrokerSnapshotCoherenceError(
+            "read-only active-order observation must be a concrete list"
+        )
+    paper = account.get("paper")
+    if type(paper) is not bool:
+        raise BrokerSnapshotCoherenceError(
+            "read-only broker account mode must be an actual bool"
+        )
+    from execution.broker_contract import (
+        BrokerAccountIdentity,
+        validate_active_order_set,
+    )
+
+    identity = BrokerAccountIdentity(
+        account_id=account.get("account_id"),
+        account_mode="paper" if paper else "live",
+    )
+    validated = validate_active_order_set(
+        raw_orders,
+        expected_account=identity,
+        observed_account=identity,
+    )
+    _require_exact_active_order_numerics(raw_orders, validated)
+    return [dict(order) for order in raw_orders]
+
+
 def _canonical_snapshot_material_json(payload: Mapping[str, Any]) -> str:
     return json.dumps(
         payload,
@@ -610,7 +893,7 @@ def _canonical_snapshot_id(payload: Mapping[str, Any]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
+def _verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
     """Recompute strict snapshot evidence and reject any post-capture mutation.
 
     ``broker_snapshot_id`` is not trusted as an opaque label.  The canonical
@@ -621,6 +904,7 @@ def verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
     """
     if not isinstance(snapshot, PortfolioSnapshot):
         raise BrokerSnapshotCoherenceError("execution snapshot has the wrong type")
+    validate_long_only_portfolio_snapshot(snapshot)
     material_json = snapshot.broker_snapshot_material_json
     if not isinstance(material_json, str) or not material_json:
         raise BrokerSnapshotCoherenceError(
@@ -712,9 +996,16 @@ def verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
             "execution snapshot account numerics changed after capture"
         )
     if (
-        snapshot.cash != float(round(cash, 2))
-        or snapshot.total_equity != float(round(equity, 2))
-        or snapshot.buying_power != float(round(buying_power, 2))
+        snapshot.cash
+        != _display_float(cash, name="portfolio.cash", rounded=True)
+        or snapshot.total_equity
+        != _display_float(equity, name="portfolio.total_equity", rounded=True)
+        or snapshot.buying_power
+        != _display_float(
+            buying_power,
+            name="portfolio.buying_power",
+            rounded=True,
+        )
     ):
         raise BrokerSnapshotCoherenceError(
             "execution snapshot rounded account fields disagree with exact evidence"
@@ -730,11 +1021,30 @@ def verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
             "market_value": decimal_text(position.exact_field("market_value")),
         }
         if (
-            position.shares != float(position.exact_field("shares"))
-            or position.entry_price != float(position.exact_field("entry_price"))
-            or position.current_price != float(position.exact_field("current_price"))
+            position.shares
+            != _display_float(
+                position.exact_field("shares"),
+                name=f"{position.ticker}.shares",
+                rounded=False,
+            )
+            or position.entry_price
+            != _display_float(
+                position.exact_field("entry_price"),
+                name=f"{position.ticker}.entry_price",
+                rounded=False,
+            )
+            or position.current_price
+            != _display_float(
+                position.exact_field("current_price"),
+                name=f"{position.ticker}.current_price",
+                rounded=False,
+            )
             or position.market_value
-            != float(round(position.exact_field("market_value"), 2))
+            != _display_float(
+                position.exact_field("market_value"),
+                name=f"{position.ticker}.market_value",
+                rounded=True,
+            )
             or position.is_leveraged_etf != _classify_leveraged(position.ticker)
         ):
             raise BrokerSnapshotCoherenceError(
@@ -771,12 +1081,20 @@ def verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
             "execution snapshot active orders changed after capture"
         )
 
-    component_equity = cash + sum(
-        (position.exact_field("market_value") for position in snapshot.positions),
-        Decimal("0"),
+    component_equity = _broker_exact_sum(
+        "execution snapshot component equity",
+        [cash]
+        + [
+            position.exact_field("market_value")
+            for position in snapshot.positions
+        ],
     )
-    component_delta = component_equity - equity
-    if abs(component_delta) > EXECUTION_COMPONENT_EQUITY_TOLERANCE:
+    component_delta = _broker_exact_subtract(
+        "execution snapshot component equity delta",
+        component_equity,
+        equity,
+    )
+    if component_delta.copy_abs() > EXECUTION_COMPONENT_EQUITY_TOLERANCE:
         raise BrokerSnapshotCoherenceError(
             "execution snapshot component equity exceeds the allowed tolerance"
         )
@@ -789,6 +1107,24 @@ def verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
         raise BrokerSnapshotCoherenceError(
             "execution snapshot component evidence changed after capture"
         )
+
+
+def verify_execution_portfolio_snapshot(snapshot: PortfolioSnapshot) -> None:
+    """Verify strict evidence while preserving one public coherence contract."""
+    try:
+        _verify_execution_portfolio_snapshot(snapshot)
+    except BrokerSnapshotCoherenceError:
+        raise
+    except (
+        PortfolioSnapshotIntegrityError,
+        DecimalException,
+        OverflowError,
+        TypeError,
+        ValueError,
+    ) as exc:
+        raise BrokerSnapshotCoherenceError(
+            f"execution snapshot integrity verification failed: {exc}"
+        ) from exc
 
 
 def _capture_strict_alpaca_snapshot_once(
@@ -862,8 +1198,12 @@ def _capture_strict_alpaca_snapshot_once(
     )
     component_equity = snapshot.total_equity_exact_decimal
     broker_equity = account_a["equity"]
-    component_delta = component_equity - broker_equity
-    if abs(component_delta) > EXECUTION_COMPONENT_EQUITY_TOLERANCE:
+    component_delta = _broker_exact_subtract(
+        "broker component equity delta",
+        component_equity,
+        broker_equity,
+    )
+    if component_delta.copy_abs() > EXECUTION_COMPONENT_EQUITY_TOLERANCE:
         raise _TransientBrokerSnapshotMutation(
             "broker equity disagrees with exact cash-plus-position components "
             f"by {component_delta} (tolerance "
@@ -893,7 +1233,11 @@ def _capture_strict_alpaca_snapshot_once(
 
     # The broker's account equity is authoritative; the component sum and
     # signed delta remain explicit evidence instead of silently replacing it.
-    snapshot.total_equity = float(round(broker_equity, 2))
+    snapshot.total_equity = _display_float(
+        broker_equity,
+        name="portfolio.total_equity",
+        rounded=True,
+    )
     snapshot.total_equity_exact = decimal_text(broker_equity)
     snapshot.captured_at = captured_at
     snapshot.broker_snapshot_id = snapshot_id
@@ -963,11 +1307,13 @@ def build_portfolio_snapshot_from_alpaca(
                 last_mutation = exc
                 continue
             except PortfolioSnapshotIntegrityError as exc:
-                # A provider position can change between the account/order
-                # brackets just as balances can. Retry a bounded number of
-                # times, but never publish the malformed intermediate row.
-                last_mutation = _TransientBrokerSnapshotMutation(str(exc))
-                continue
+                # Only an explicit _TransientBrokerSnapshotMutation authorizes
+                # retry: account/order bracket changes, internally inconsistent
+                # position components, or account/component disagreement.
+                # Deterministic contract and display failures refuse now.
+                raise BrokerSnapshotCoherenceError(
+                    f"broker snapshot violates the long-only portfolio contract: {exc}"
+                ) from exc
             if (
                 snapshot.source != "alpaca"
                 or snapshot.account_mode != "paper"
@@ -998,31 +1344,86 @@ def build_portfolio_snapshot_from_alpaca(
 
     account = get_account()
     try:
-        open_orders = get_open_orders()
+        open_orders = _validated_read_only_open_orders(
+            account,
+            get_open_orders(),
+        )
         open_orders_available = True
     except Exception:
         # A read-only briefing can still expose positions and cash, but order
         # availability must remain explicitly unknown so execution fails closed.
         open_orders = []
         open_orders_available = False
-    positions = [
-        {
-            "ticker": position["ticker"],
-            "shares": position.get("shares_decimal", position["shares"]),
-            "entry_price": position.get(
-                "avg_entry_price_decimal", position["avg_entry_price"]
-            ),
-            "current_price": position.get(
-                "current_price_decimal", position["current_price"]
-            ),
-        }
-        for position in get_open_positions()
-    ]
-    return build_portfolio_snapshot(
+    positions: list[dict[str, Any]] = []
+    position_exactness: dict[str, dict[str, bool]] = {}
+    for position in get_open_positions():
+        try:
+            ticker = canonical_equity_ticker(
+                position["ticker"],
+                name="position ticker",
+            )
+        except ValueError as exc:
+            raise PortfolioSnapshotIntegrityError(str(exc)) from exc
+        shares_exact = _has_preserved_decimal_text(
+            position.get("shares_decimal")
+        )
+        entry_exact = _has_preserved_decimal_text(
+            position.get("avg_entry_price_decimal")
+        )
+        current_exact = _has_preserved_decimal_text(
+            position.get("current_price_decimal")
+        )
+        exactness = position_exactness.setdefault(
+            ticker,
+            {
+                "shares": True,
+                "entry_price": True,
+                "current_price": True,
+                "market_value": True,
+            },
+        )
+        exactness["shares"] &= shares_exact
+        # Duplicate rows are share-weighted by the builder, so a preserved
+        # aggregate entry price requires exact quantity and entry companions.
+        exactness["entry_price"] &= shares_exact and entry_exact
+        exactness["current_price"] &= current_exact
+        exactness["market_value"] &= shares_exact and current_exact
+        positions.append(
+            {
+                "ticker": position["ticker"],
+                "shares": (
+                    position["shares_decimal"]
+                    if position.get("shares_decimal") is not None
+                    else position["shares"]
+                ),
+                "entry_price": (
+                    position["avg_entry_price_decimal"]
+                    if position.get("avg_entry_price_decimal") is not None
+                    else position["avg_entry_price"]
+                ),
+                "current_price": (
+                    position["current_price_decimal"]
+                    if position.get("current_price_decimal") is not None
+                    else position["current_price"]
+                ),
+            }
+        )
+
+    cash_exact = _has_preserved_decimal_text(account.get("cash_decimal"))
+    buying_power_exact = _has_preserved_decimal_text(
+        account.get("buying_power_decimal")
+    )
+    snapshot = build_portfolio_snapshot(
         positions,
-        cash=account.get("cash_decimal", account["cash"]),
-        buying_power=account.get(
-            "buying_power_decimal", account["buying_power"]
+        cash=(
+            account["cash_decimal"]
+            if account.get("cash_decimal") is not None
+            else account["cash"]
+        ),
+        buying_power=(
+            account["buying_power_decimal"]
+            if account.get("buying_power_decimal") is not None
+            else account["buying_power"]
         ),
         source="alpaca",
         account_mode="paper" if account["paper"] else "live",
@@ -1030,3 +1431,22 @@ def build_portfolio_snapshot_from_alpaca(
         open_orders=open_orders,
         open_orders_available=open_orders_available,
     )
+    all_market_components_exact = True
+    for position in snapshot.positions:
+        exactness = position_exactness[position.ticker]
+        if not exactness["shares"]:
+            position.shares_exact = None
+        if not exactness["entry_price"]:
+            position.entry_price_exact = None
+        if not exactness["current_price"]:
+            position.current_price_exact = None
+        if not exactness["market_value"]:
+            position.market_value_exact = None
+            all_market_components_exact = False
+    if not cash_exact:
+        snapshot.cash_exact = None
+    if snapshot.buying_power is not None and not buying_power_exact:
+        snapshot.buying_power_exact = None
+    if not cash_exact or not all_market_components_exact:
+        snapshot.total_equity_exact = None
+    return snapshot

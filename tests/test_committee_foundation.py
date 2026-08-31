@@ -72,6 +72,7 @@ def _packet(*, warnings=(), signals=()) -> DecisionPacket:
         warnings=list(warnings),
         policy_version="paper-v1",
         analytics={
+            "available": True,
             "position_count": 1,
             "invested_value": 2_000.0,
             "invested_pct": 50.0,

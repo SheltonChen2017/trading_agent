@@ -1030,6 +1030,7 @@ def test_licensed_research_surfaces_cannot_enter_execution_products():
         path.removesuffix(".py").replace("/", ".")
         for path in manifest["licensed_research_surfaces"]
     }
+    assert "research.analyst_revisions_v2" in licensed_modules
     for root_name in ("assistant", "execution", "risk"):
         for path in _source_files(ROOT / root_name, "*.py"):
             imported = _imported_modules(path)

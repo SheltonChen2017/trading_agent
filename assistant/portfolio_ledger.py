@@ -12,12 +12,25 @@ import dataclasses
 import hashlib
 import json
 import uuid
+from collections.abc import Iterable
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 
+from assistant.money import (
+    decimal_text,
+    deterministic_decimal_divide,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    exact_decimal_sum,
+)
+from assistant.portfolio_snapshot import (
+    PortfolioSnapshotIntegrityError,
+    validate_long_only_portfolio_snapshot,
+)
 from assistant.schemas import PortfolioSnapshot
 # One definition, imported rather than restated (FCS-016). The zone that
 # decides an activity date's tax year and return interval must be the same
@@ -33,6 +46,13 @@ USD = "USD"
 BALANCE_TOLERANCE = Decimal("0.000001")
 CASH_TOLERANCE = Decimal("0.01")
 SHARE_TOLERANCE = Decimal("0.00000001")
+_KNOWN_FILL_NUMERIC_EVIDENCE_STATUSES = frozenset(
+    {
+        "provider_exact",
+        "legacy_rounded_unrecoverable",
+        "derived_rounded",
+    }
+)
 
 # Sign convention (standard credit-normal double-entry accounting, applied
 # consistently everywhere in this module -- independent review, 2026-07-30):
@@ -84,10 +104,97 @@ def _decimal(value: Any, field: str) -> Decimal:
     return parsed
 
 
+def _exact_add(left: Decimal, right: Decimal, field: str) -> Decimal:
+    try:
+        return exact_decimal_add(left, right, name=field)
+    except ValueError as exc:
+        raise LedgerError(str(exc)) from exc
+
+
+def _exact_subtract(left: Decimal, right: Decimal, field: str) -> Decimal:
+    try:
+        return exact_decimal_subtract(left, right, name=field)
+    except ValueError as exc:
+        raise LedgerError(str(exc)) from exc
+
+
+def _exact_multiply(left: Decimal, right: Decimal, field: str) -> Decimal:
+    try:
+        return exact_decimal_multiply(left, right, name=field)
+    except ValueError as exc:
+        raise LedgerError(str(exc)) from exc
+
+
+def _exact_sum(values: Iterable[Decimal], field: str) -> Decimal:
+    try:
+        return exact_decimal_sum(values, name=field)
+    except ValueError as exc:
+        raise LedgerError(str(exc)) from exc
+
+
+def _deterministic_divide(
+    numerator: Decimal, denominator: Decimal, field: str
+) -> Decimal:
+    try:
+        return deterministic_decimal_divide(
+            numerator,
+            denominator,
+            name=field,
+        )
+    except ValueError as exc:
+        raise LedgerError(str(exc)) from exc
+
+
 def _decimal_text(value: Decimal) -> str:
-    if value == 0:
-        return "0"
-    return format(value.normalize(), "f")
+    # Decimal.normalize(), unary plus/minus, and even abs() obey the caller's
+    # ambient Decimal context.  Canonical persisted evidence must not.
+    try:
+        return decimal_text(value)
+    except ValueError as exc:
+        raise LedgerError(str(exc)) from exc
+
+
+def _snapshot_has_exact_evidence(snapshot: PortfolioSnapshot) -> bool:
+    if any(
+        value is not None
+        for value in (
+            snapshot.cash_exact,
+            snapshot.total_equity_exact,
+            snapshot.buying_power_exact,
+        )
+    ):
+        return True
+    return any(
+        value is not None
+        for position in snapshot.positions
+        for value in (
+            position.shares_exact,
+            position.entry_price_exact,
+            position.current_price_exact,
+            position.market_value_exact,
+        )
+    )
+
+
+def _validate_snapshot_exact_evidence(snapshot: PortfolioSnapshot) -> None:
+    """Validate modern exact companions; preserve explicit legacy snapshots."""
+    if not _snapshot_has_exact_evidence(snapshot):
+        return
+    try:
+        validate_long_only_portfolio_snapshot(snapshot)
+    except PortfolioSnapshotIntegrityError as exc:
+        raise LedgerError(str(exc)) from exc
+
+
+def _snapshot_decimal(
+    exact_text: str | None,
+    display_value: Any,
+    field: str,
+) -> Decimal:
+    return _decimal(
+        exact_text if exact_text is not None else display_value,
+        field,
+    )
 
 
 def _parse_at(value: str | datetime, field: str = "occurred_at") -> datetime:
@@ -180,11 +287,26 @@ class JournalTransaction:
             raise LedgerError("a journal transaction requires at least one posting")
         totals: dict[str, Decimal] = {}
         for posting in self.postings:
-            totals[posting.asset] = totals.get(posting.asset, Decimal("0")) + posting.amount
+            amount = _exact_add(
+                Decimal("0"),
+                posting.amount,
+                f"posting amount for account {posting.account}",
+            )
+            if posting.quantity is not None:
+                _exact_add(
+                    Decimal("0"),
+                    posting.quantity,
+                    f"posting quantity for account {posting.account}",
+                )
+            totals[posting.asset] = _exact_add(
+                totals.get(posting.asset, Decimal("0")),
+                amount,
+                f"journal balance for asset {posting.asset}",
+            )
         unbalanced = {
             asset: total
             for asset, total in totals.items()
-            if abs(total) > BALANCE_TOLERANCE
+            if total.copy_abs() > BALANCE_TOLERANCE
         }
         if unbalanced:
             raise LedgerError(f"journal transaction is not balanced: {unbalanced}")
@@ -220,24 +342,32 @@ def ledger_balances(store: AssistantStore) -> dict[str, Any]:
         transaction_ids.add(row["transaction_id"])
         amount = _decimal(row["amount"], "stored posting amount")
         asset = row["asset"]
-        trial_balance[asset] = trial_balance.get(asset, Decimal("0")) + amount
+        trial_balance[asset] = _exact_add(
+            trial_balance.get(asset, Decimal("0")),
+            amount,
+            f"stored journal trial balance for asset {asset}",
+        )
         account = row["account"]
         if account == ACCOUNT_CASH:
-            cash += amount
+            cash = _exact_add(cash, amount, "stored journal cash balance")
         if account.startswith(SECURITY_ACCOUNT_PREFIX):
             ticker = account[len(SECURITY_ACCOUNT_PREFIX) :]
-            security_book_value[ticker] = (
-                security_book_value.get(ticker, Decimal("0")) + amount
+            security_book_value[ticker] = _exact_add(
+                security_book_value.get(ticker, Decimal("0")),
+                amount,
+                f"stored journal book value for {ticker}",
             )
             if row["quantity"] is not None:
-                shares[ticker] = shares.get(ticker, Decimal("0")) + _decimal(
-                    row["quantity"], "stored posting quantity"
+                shares[ticker] = _exact_add(
+                    shares.get(ticker, Decimal("0")),
+                    _decimal(row["quantity"], "stored posting quantity"),
+                    f"stored journal share balance for {ticker}",
                 )
 
     unbalanced = {
         asset: _decimal_text(total)
         for asset, total in trial_balance.items()
-        if abs(total) > BALANCE_TOLERANCE
+        if total.copy_abs() > BALANCE_TOLERANCE
     }
     if unbalanced:
         raise LedgerError(f"stored journal trial balance is not zero: {unbalanced}")
@@ -274,19 +404,40 @@ def bootstrap_opening_snapshot(
         raise LedgerError(
             "Alpaca ledger bootstrap requires the connected broker account ID"
         )
+    _validate_snapshot_exact_evidence(snapshot)
 
     postings: list[Posting] = []
-    total_opening_value = _decimal(snapshot.cash, "snapshot.cash")
-    postings.append(Posting(ACCOUNT_CASH, total_opening_value))
+    opening_cash = _snapshot_decimal(
+        snapshot.cash_exact,
+        snapshot.cash,
+        "snapshot.cash",
+    )
+    total_opening_value = opening_cash
+    postings.append(Posting(ACCOUNT_CASH, opening_cash))
+    journal_positions: list[dict[str, str]] = []
     for position in snapshot.positions:
-        qty = _decimal(position.shares, f"{position.ticker}.shares")
-        entry_price = _decimal(
-            position.entry_price, f"{position.ticker}.entry_price"
+        qty = _snapshot_decimal(
+            position.shares_exact,
+            position.shares,
+            f"{position.ticker}.shares",
+        )
+        entry_price = _snapshot_decimal(
+            position.entry_price_exact,
+            position.entry_price,
+            f"{position.ticker}.entry_price",
         )
         if qty < 0 or entry_price < 0:
             raise LedgerError("opening positions cannot have negative shares or basis")
-        book_value = qty * entry_price
-        total_opening_value += book_value
+        book_value = _exact_multiply(
+            qty,
+            entry_price,
+            f"opening book value for {position.ticker}",
+        )
+        total_opening_value = _exact_add(
+            total_opening_value,
+            book_value,
+            "total opening portfolio value",
+        )
         postings.append(
             Posting(
                 _security_account(position.ticker),
@@ -295,7 +446,23 @@ def bootstrap_opening_snapshot(
                 metadata={"opening_average_cost": _decimal_text(entry_price)},
             )
         )
-    postings.append(Posting(ACCOUNT_OPENING_EQUITY, -total_opening_value))
+        journal_positions.append(
+            {
+                "ticker": position.ticker,
+                "shares": _decimal_text(qty),
+                "entry_price": _decimal_text(entry_price),
+            }
+        )
+    postings.append(
+        Posting(
+            ACCOUNT_OPENING_EQUITY,
+            _exact_subtract(
+                Decimal("0"),
+                total_opening_value,
+                "opening equity credit",
+            ),
+        )
+    )
 
     snapshot_material = {
         "as_of": snapshot.as_of,
@@ -311,6 +478,12 @@ def bootstrap_opening_snapshot(
             }
             for position in snapshot.positions
         ],
+        # Bind the exact values actually consumed by the journal. Historical
+        # display fields remain above for compatibility and human inspection.
+        "journal_values_exact": {
+            "cash": _decimal_text(opening_cash),
+            "positions": journal_positions,
+        },
     }
     digest = hashlib.sha256(
         json.dumps(snapshot_material, sort_keys=True).encode("utf-8")
@@ -354,6 +527,60 @@ def _transaction_id(external_id: str) -> str:
     return "journal-" + digest[:24]
 
 
+def _fill_numeric_evidence(
+    fill: dict[str, Any],
+) -> tuple[Decimal, Decimal, str | None]:
+    """Resolve authoritative fill numerics without discarding exact text.
+
+    ``AssistantStore.list_fills`` keeps provider Decimal text beside legacy
+    floats.  The float is a compatibility/display projection only: parsing it
+    back into the accounting journal can lose shares and cost basis even while
+    the row claims ``provider_exact`` evidence.  Prefer each exact companion,
+    prove that its compatibility value agrees, and require both companions
+    whenever that strongest provenance is claimed.
+    """
+    status = fill.get("numeric_evidence_status")
+    if status is not None and status not in _KNOWN_FILL_NUMERIC_EVIDENCE_STATUSES:
+        raise LedgerError(
+            f"fill numeric_evidence_status is unsupported: {status!r}"
+        )
+
+    def resolve(field: str) -> Decimal:
+        legacy = fill.get(field)
+        exact_field = f"{field}_decimal"
+        exact = fill.get(exact_field)
+        if status == "provider_exact" and (
+            not isinstance(exact, str)
+            or not exact
+            or exact != exact.strip()
+        ):
+            raise LedgerError(
+                f"provider-exact fill is missing canonical {exact_field} evidence"
+            )
+        if exact is None:
+            if legacy is None:
+                raise LedgerError(f"fill.{field} is missing")
+            return _decimal(legacy, f"fill.{field}")
+        if isinstance(exact, (bool, float)):
+            raise LedgerError(
+                f"fill.{exact_field} must preserve exact decimal text"
+            )
+        exact_value = _decimal(exact, f"fill.{exact_field}")
+        if legacy is not None:
+            legacy_value = _decimal(legacy, f"fill.{field}")
+            try:
+                compatible = float(legacy_value) == float(exact_value)
+            except (OverflowError, ValueError):
+                compatible = False
+            if not compatible:
+                raise LedgerError(
+                    f"fill.{exact_field} disagrees with fill.{field}"
+                )
+        return exact_value
+
+    return resolve("qty"), resolve("price"), status
+
+
 def _fill_transaction(
     *,
     fill: dict[str, Any],
@@ -361,42 +588,76 @@ def _fill_transaction(
 ) -> JournalTransaction:
     ticker = str(fill["ticker"]).upper()
     side = str(fill["side"]).lower()
-    qty = _decimal(fill["qty"], "fill.qty")
-    price = _decimal(fill["price"], "fill.price")
+    qty, price, numeric_evidence_status = _fill_numeric_evidence(fill)
     if side not in ("buy", "sell") or qty <= 0 or price <= 0:
         raise LedgerError(f"invalid fill: {fill!r}")
     occurred_at = _parse_at(fill["at"], "fill.at").isoformat()
-    gross = qty * price
+    gross = _exact_multiply(qty, price, f"{ticker} fill gross value")
     security_account = _security_account(ticker)
 
     if side == "buy":
         postings = (
             Posting(security_account, gross, quantity=qty),
-            Posting(ACCOUNT_CASH, -gross),
+            Posting(
+                ACCOUNT_CASH,
+                _exact_subtract(Decimal("0"), gross, f"{ticker} buy cash debit"),
+            ),
         )
     else:
         held = balances["shares"].get(ticker, Decimal("0"))
         book_value = balances["security_book_value"].get(
             ticker, Decimal("0")
         )
-        if held + SHARE_TOLERANCE < qty or held <= 0:
+        held_with_tolerance = _exact_add(
+            held,
+            SHARE_TOLERANCE,
+            f"{ticker} sale share tolerance",
+        )
+        if held_with_tolerance < qty or held <= 0:
             raise LedgerError(
                 f"cannot journal sale of {qty} {ticker}; ledger holds {held}"
             )
-        average_book_cost = book_value / held
-        basis_removed = average_book_cost * qty
+        average_book_cost = _deterministic_divide(
+            book_value,
+            held,
+            f"{ticker} moving-average book cost",
+        )
+        basis_removed = (
+            book_value
+            if qty == held
+            else _exact_multiply(
+                average_book_cost,
+                qty,
+                f"{ticker} basis removed by sale",
+            )
+        )
         postings = (
             Posting(ACCOUNT_CASH, gross),
             Posting(
                 security_account,
-                -basis_removed,
-                quantity=-qty,
+                _exact_subtract(
+                    Decimal("0"),
+                    basis_removed,
+                    f"{ticker} security book-value credit",
+                ),
+                quantity=_exact_subtract(
+                    Decimal("0"),
+                    qty,
+                    f"{ticker} sold share quantity",
+                ),
                 metadata={
                     "book_basis_method": "moving_average",
                     "book_cost_per_share": _decimal_text(average_book_cost),
                 },
             ),
-            Posting(ACCOUNT_REALIZED_PNL, basis_removed - gross),
+            Posting(
+                ACCOUNT_REALIZED_PNL,
+                _exact_subtract(
+                    basis_removed,
+                    gross,
+                    f"{ticker} realized profit or loss",
+                ),
+            ),
         )
 
     fill_id = str(fill["fill_id"])
@@ -417,6 +678,11 @@ def _fill_transaction(
             "qty": _decimal_text(qty),
             "price": _decimal_text(price),
             "fees_included": False,
+            **(
+                {"numeric_evidence_status": numeric_evidence_status}
+                if numeric_evidence_status is not None
+                else {}
+            ),
         },
     )
 
@@ -442,8 +708,7 @@ def sync_app_fills(store: AssistantStore) -> dict[str, Any]:
             existing = store.get_journal_transaction_by_external_id(external_id)
             ticker = str(fill["ticker"]).upper()
             side = str(fill["side"]).lower()
-            qty = _decimal(fill["qty"], "fill.qty")
-            price = _decimal(fill["price"], "fill.price")
+            qty, price, numeric_evidence_status = _fill_numeric_evidence(fill)
             expected_metadata = {
                 "fill_id": str(fill["fill_id"]),
                 "order_id": fill.get("order_id"),
@@ -453,6 +718,11 @@ def sync_app_fills(store: AssistantStore) -> dict[str, Any]:
                 "qty": _decimal_text(qty),
                 "price": _decimal_text(price),
                 "fees_included": False,
+                **(
+                    {"numeric_evidence_status": numeric_evidence_status}
+                    if numeric_evidence_status is not None
+                    else {}
+                ),
             }
             expected_header = (
                 _transaction_id(external_id),
@@ -511,7 +781,12 @@ def record_cash_transfer(
         description=description,
         postings=(
             Posting(ACCOUNT_CASH, value),
-            Posting(ACCOUNT_CONTRIBUTED_CAPITAL, -value),
+            Posting(
+                ACCOUNT_CONTRIBUTED_CAPITAL,
+                _exact_subtract(
+                    Decimal("0"), value, "cash-transfer capital credit"
+                ),
+            ),
         ),
     )
     return post_transaction(store, transaction)
@@ -560,8 +835,17 @@ def record_dividend(
             raise LedgerError("shares_entitled must be positive")
         metadata["shares_entitled"] = _decimal_text(entitled)
     if amount_per_share is not None and shares_entitled is not None:
-        expected_gross = per_share * entitled
-        if abs(expected_gross - amount) > CASH_TOLERANCE:
+        expected_gross = _exact_multiply(
+            per_share,
+            entitled,
+            "dividend expected gross amount",
+        )
+        gross_difference = _exact_subtract(
+            expected_gross,
+            amount,
+            "dividend gross amount difference",
+        )
+        if gross_difference.copy_abs() > CASH_TOLERANCE:
             raise LedgerError(
                 "gross_amount does not match amount_per_share multiplied by "
                 f"shares_entitled ({amount} vs {expected_gross})"
@@ -576,7 +860,9 @@ def record_dividend(
             Posting(ACCOUNT_CASH, amount),
             Posting(
                 ACCOUNT_DIVIDEND_INCOME,
-                -amount,
+                _exact_subtract(
+                    Decimal("0"), amount, "dividend income credit"
+                ),
                 metadata=metadata,
             ),
         ),
@@ -625,7 +911,11 @@ def record_split(
                 f"journal external_id {expected_external_id!r} already exists "
                 "with different content"
             ) from exc
-        post_split = pre_split * split_ratio
+        post_split = _exact_multiply(
+            pre_split,
+            split_ratio,
+            f"{normalized_ticker} split retry share quantity",
+        )
         retry_metadata = {
             "ticker": normalized_ticker,
             "corporate_action": "split",
@@ -646,7 +936,11 @@ def record_split(
                 Posting(
                     _security_account(normalized_ticker),
                     Decimal("0"),
-                    quantity=post_split - pre_split,
+                    quantity=_exact_subtract(
+                        post_split,
+                        pre_split,
+                        f"{normalized_ticker} split retry share adjustment",
+                    ),
                     metadata=retry_metadata,
                 ),
             ),
@@ -688,7 +982,7 @@ def record_split(
             f"{len(unsynced_pre_split_fills)} pre-split fill(s) have not "
             "been journaled yet -- run ledger-sync before ledger-split"
         )
-    held_at_effective = sum(
+    held_at_effective = _exact_sum(
         (
             _decimal(posting["quantity"], "stored posting quantity")
             for posting in postings
@@ -696,14 +990,18 @@ def record_split(
             and posting["quantity"] is not None
             and _parse_at(posting["occurred_at"]) <= effective_at
         ),
-        Decimal("0"),
+        f"{normalized_ticker} shares held at split effective time",
     )
     if held_at_effective <= 0:
         raise LedgerError(
             f"cannot apply split for {normalized_ticker}; journal held "
             f"{held_at_effective} shares at the effective time"
         )
-    post_split = held_at_effective * split_ratio
+    post_split = _exact_multiply(
+        held_at_effective,
+        split_ratio,
+        f"{normalized_ticker} post-split share quantity",
+    )
     metadata = {
         "ticker": normalized_ticker,
         "corporate_action": "split",
@@ -724,7 +1022,11 @@ def record_split(
             Posting(
                 _security_account(normalized_ticker),
                 Decimal("0"),
-                quantity=post_split - held_at_effective,
+                quantity=_exact_subtract(
+                    post_split,
+                    held_at_effective,
+                    f"{normalized_ticker} split share adjustment",
+                ),
                 metadata=metadata,
             ),
         ),
@@ -752,7 +1054,10 @@ def record_fee(
         description=description,
         postings=(
             Posting(ACCOUNT_FEES, fee),
-            Posting(ACCOUNT_CASH, -fee),
+            Posting(
+                ACCOUNT_CASH,
+                _exact_subtract(Decimal("0"), fee, "fee cash credit"),
+            ),
         ),
     )
     return post_transaction(store, transaction)
@@ -939,7 +1244,9 @@ def _post_broker_activity(
         return record_fee(
             store,
             external_id=activity_id,
-            amount=-net_amount,
+            amount=_exact_subtract(
+                Decimal("0"), net_amount, "broker fee amount"
+            ),
             occurred_at=occurred_at,
             description=description or f"Broker {sub_type or 'FEE'} fee",
         )
@@ -1208,7 +1515,9 @@ def _apply_acknowledged_treatment(
         return ("fee", record_fee(
             store,
             external_id=activity_id,
-            amount=-amount,
+            amount=_exact_subtract(
+                Decimal("0"), amount, "acknowledged broker fee amount"
+            ),
             occurred_at=occurred_at,
             description=description,
         ))
@@ -1514,6 +1823,7 @@ def reconcile_snapshot(
     reconciled_at = now or datetime.now(timezone.utc)
     if reconciled_at.tzinfo is None:
         raise LedgerError("reconciliation time must be timezone-aware")
+    _validate_snapshot_exact_evidence(snapshot)
     binding_block = alpaca_account_binding_block_reason(
         store, snapshot, allow_unbound_alpaca=_allow_unbound_alpaca
     )
@@ -1521,10 +1831,18 @@ def reconcile_snapshot(
         raise LedgerError(_BINDING_LEDGER_ERRORS[binding_block])
     balances = ledger_balances(store)
     ledger_cash = balances["cash"]
-    broker_cash = _decimal(snapshot.cash, "snapshot.cash")
+    broker_cash = _snapshot_decimal(
+        snapshot.cash_exact,
+        snapshot.cash,
+        "snapshot.cash",
+    )
     mismatches: list[dict[str, Any]] = []
-    cash_difference = ledger_cash - broker_cash
-    if abs(cash_difference) > CASH_TOLERANCE:
+    cash_difference = _exact_subtract(
+        ledger_cash,
+        broker_cash,
+        "ledger-to-broker cash difference",
+    )
+    if cash_difference.copy_abs() > CASH_TOLERANCE:
         mismatches.append(
             {
                 "kind": "cash",
@@ -1535,8 +1853,10 @@ def reconcile_snapshot(
         )
 
     broker_shares = {
-        position.ticker.upper(): _decimal(
-            position.shares, f"{position.ticker}.shares"
+        position.ticker.upper(): _snapshot_decimal(
+            position.shares_exact,
+            position.shares,
+            f"{position.ticker}.shares",
         )
         for position in snapshot.positions
     }
@@ -1544,8 +1864,12 @@ def reconcile_snapshot(
     for ticker in sorted(set(broker_shares) | set(ledger_shares)):
         ledger_qty = ledger_shares.get(ticker, Decimal("0"))
         broker_qty = broker_shares.get(ticker, Decimal("0"))
-        difference = ledger_qty - broker_qty
-        if abs(difference) > SHARE_TOLERANCE:
+        difference = _exact_subtract(
+            ledger_qty,
+            broker_qty,
+            f"{ticker} ledger-to-broker share difference",
+        )
+        if difference.copy_abs() > SHARE_TOLERANCE:
             mismatch: dict[str, Any] = {
                 "kind": "position",
                 "ticker": ticker,
@@ -1580,7 +1904,7 @@ def reconcile_snapshot(
             "shares": {
                 ticker: _decimal_text(qty)
                 for ticker, qty in sorted(ledger_shares.items())
-                if abs(qty) > SHARE_TOLERANCE
+                if qty.copy_abs() > SHARE_TOLERANCE
             },
             "transaction_count": balances["transaction_count"],
             "posting_count": balances["posting_count"],
@@ -1590,7 +1914,7 @@ def reconcile_snapshot(
             "shares": {
                 ticker: _decimal_text(qty)
                 for ticker, qty in sorted(broker_shares.items())
-                if abs(qty) > SHARE_TOLERANCE
+                if qty.copy_abs() > SHARE_TOLERANCE
             },
             "snapshot_as_of": snapshot.as_of,
             "account_mode": snapshot.account_mode,

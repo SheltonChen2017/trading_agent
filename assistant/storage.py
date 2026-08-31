@@ -33,7 +33,15 @@ from assistant.proposal_status import (
     SUBMISSION_UNKNOWN,
     UNRESOLVED_BROKER_STATE_STATUSES,
 )
-from assistant.money import decimal_text, to_decimal
+from assistant.money import (
+    decimal_text,
+    deterministic_decimal_divide,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    exact_decimal_sum,
+    to_decimal,
+)
 from assistant.dispatch_fence import (
     _latch_runtime_emergency_stop_failure,
     activate_runtime_emergency_stop,
@@ -387,7 +395,24 @@ def _assert_broker_event_integrity(row: sqlite3.Row) -> None:
         raise JournalTransactionConflictError(error)
 
 
-def _containment_incident_id(category: str, material: str) -> str:
+def _containment_incident_id(
+    category: str,
+    material: str,
+    *,
+    reason: str,
+) -> str:
+    """Derive a runtime incident ID only from material containing its reason.
+
+    Runtime stop publication treats an incident ID as immutable identity. If
+    two materially different reasons reuse one ID, the second publication is
+    rejected and the process-wide persistence latch fails closed. Requiring
+    the varying reason in every preimage prevents that collision while
+    retaining the historical IDs of call sites that already did this.
+    """
+    if not isinstance(reason, str) or not reason or reason not in material:
+        raise ValueError(
+            "runtime containment incident identity must include its reason"
+        )
     return f"{category}:{_hash_payload(material)[:40]}"
 
 
@@ -700,8 +725,17 @@ class DuplicateIntentConflict(Exception):
 
 class AssistantStore:
     def __init__(self, path: str | Path | None = None, *, read_only: bool = False):
+        """Open the operator database.
+
+        A damaged broker-event ledger always refuses this general-purpose
+        store. Emergency account-wide cancellation uses the separate,
+        capability-limited ``open_contained_cancel_all_store`` factory below;
+        callers cannot opt a full ``AssistantStore`` into operating past failed
+        journal authentication.
+        """
         self.path = Path(path) if path is not None else configured_db_path()
         self.read_only = bool(read_only)
+        self.broker_event_integrity_error: str | None = None
         if self.read_only:
             if not self.path.is_file():
                 raise FileNotFoundError(
@@ -738,13 +772,35 @@ class AssistantStore:
         connection.execute("PRAGMA busy_timeout=30000")
         return connection
 
+    def _require_writable(self) -> None:
+        if self.read_only:
+            raise PermissionError("AssistantStore is read-only; mutation refused")
+
+    def _open_writable_database(self) -> sqlite3.Connection:
+        """Open this store for mutation, refusing before database contact."""
+        self._require_writable()
+        return self._open_database(self.path)
+
     @contextmanager
     def _connect(self):
-        connection = (
-            self._open_database_read_only(self.path)
-            if self.read_only
-            else self._open_database(self.path)
-        )
+        """Open the source database for reads only.
+
+        Mutation must use ``_connect_writable`` (or the lower-level
+        ``_open_writable_database`` transaction helper).  Keeping the ordinary
+        connection read-only even for a writable store makes an accidentally
+        misrouted INSERT/UPDATE/DELETE fail instead of silently bypassing the
+        pre-contact read-only guard.
+        """
+        connection = self._open_database_read_only(self.path)
+        try:
+            yield connection
+        finally:
+            connection.close()
+
+    @contextmanager
+    def _connect_writable(self):
+        """Open a committing mutation transaction after the central guard."""
+        connection = self._open_writable_database()
         try:
             yield connection
             connection.commit()
@@ -755,7 +811,7 @@ class AssistantStore:
             connection.close()
 
     def _initialize(self) -> None:
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.executescript(
                 """
                 PRAGMA journal_mode=WAL;
@@ -1776,7 +1832,7 @@ class AssistantStore:
         returning the ORIGINAL row's id rather than inserting a duplicate."""
         payload = json.dumps(packet.to_dict(), sort_keys=True)
         payload_hash = _hash_payload(payload)
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 "INSERT INTO decision_packets(generated_at, schema_version, payload_json, payload_hash) "
                 "VALUES (?, ?, ?, ?) ON CONFLICT(generated_at, payload_hash) DO NOTHING",
@@ -1799,7 +1855,7 @@ class AssistantStore:
         )
         payload_hash = _hash_payload(payload_json)
         snapshot_id = "equity-" + payload_hash[:24]
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 """
                 INSERT INTO portfolio_equity_snapshots(
@@ -1898,7 +1954,7 @@ class AssistantStore:
         is a no-op rather than a duplicate row.
         """
         written: list[dict[str, Any]] = []
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             for snapshot in snapshots:
                 required = {
                     "account_key", "session_date", "captured_at", "ticker",
@@ -2140,7 +2196,7 @@ class AssistantStore:
         }
         payload_json = _canonical_ml_json(canonical, "portfolio capture")
         payload_hash = _hash_payload(payload_json)
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             observation = connection.execute(
@@ -2316,7 +2372,7 @@ class AssistantStore:
         manifest_hash = _hash_payload(manifest_json)
         timestamp = registered_at or datetime.now(timezone.utc).isoformat()
         _parse_aware_timestamp(timestamp, "registered_at")
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 """
                 INSERT INTO ml_model_registrations(
@@ -2393,7 +2449,7 @@ class AssistantStore:
             started_at or datetime.now(timezone.utc).isoformat(), "started_at"
         ).astimezone(timezone.utc).isoformat()
 
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             existing = connection.execute(
                 "SELECT * FROM ml_evidence_epochs WHERE evidence_epoch = ?",
                 (evidence_epoch,),
@@ -2447,7 +2503,7 @@ class AssistantStore:
             closed_at or datetime.now(timezone.utc).isoformat(), "closed_at"
         ).astimezone(timezone.utc)
         timestamp = closed_timestamp.isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
                 "SELECT * FROM ml_evidence_epochs WHERE evidence_epoch = ?",
@@ -2583,7 +2639,7 @@ class AssistantStore:
             )
         )[:24]
 
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute("BEGIN IMMEDIATE")
             # An exact retry remains idempotent even after its epoch closes.
             # It cannot add or alter evidence, so epoch status is relevant
@@ -2713,7 +2769,7 @@ class AssistantStore:
         error_json = (
             _canonical_ml_json(error, "error") if error is not None else None
         )
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             # Lock writers before counting predictions so a late prediction
             # cannot slip in between the count and the close transition.
             connection.execute("BEGIN IMMEDIATE")
@@ -2889,7 +2945,7 @@ class AssistantStore:
         placeholders = ", ".join("?" for _ in (*identity, *extra_columns, payload_json, payload_hash))
         columns = (*identity_columns, *extra_columns.keys(), json_column, hash_column)
         where = " AND ".join(f"{column} = ?" for column in identity_columns)
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             existing = connection.execute(
                 f"SELECT * FROM {table} WHERE {where}", identity
             ).fetchone()
@@ -2993,7 +3049,7 @@ class AssistantStore:
         )
         matured_at = outcome["matured_at"]
         available = outcome["available"]
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             observation = connection.execute(
                 """
                 SELECT available FROM overlay_observations
@@ -3232,7 +3288,7 @@ class AssistantStore:
             )
         if available and refusal_reasons:
             raise ValueError("an available prediction cannot carry refusal reasons")
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             # Serialize prediction writes against run completion. Otherwise a
             # completion could count rows and close the run while this method
             # was still between its lineage checks and INSERT.
@@ -3440,7 +3496,7 @@ class AssistantStore:
         the prediction's immutable target-availability timestamp, so a
         caller cannot attach an outcome early.
         """
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             prediction = connection.execute(
                 "SELECT * FROM ml_predictions WHERE prediction_id = ?", (prediction_id,)
             ).fetchone()
@@ -3554,14 +3610,14 @@ class AssistantStore:
         if days <= 0:
             raise ValueError(f"days must be positive, got {days!r}.")
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute("DELETE FROM decision_packets WHERE generated_at < ?", (cutoff,))
             return cursor.rowcount
 
     def save_proposal(self, proposal: dict[str, Any]) -> None:
         now = datetime.now(timezone.utc).isoformat()
         payload = json.dumps(proposal, sort_keys=True)
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 """
                 INSERT INTO trade_proposals(
@@ -3623,13 +3679,17 @@ class AssistantStore:
         return proposal
 
     def update_proposal_status(self, proposal_id: str, status: str, **updates: Any) -> dict[str, Any]:
+        # This legacy read-then-write method must refuse before its initial
+        # lookup; reaching the later writable connection would be too late for
+        # the read-only pre-contact contract.
+        self._require_writable()
         proposal = self.get_proposal(proposal_id)
         if proposal is None:
             raise KeyError(f"Unknown proposal_id: {proposal_id}")
         proposal.update(updates)
         proposal["status"] = status
         now = datetime.now(timezone.utc).isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 "UPDATE trade_proposals SET status = ?, payload_json = ?, updated_at = ? WHERE proposal_id = ?",
                 (status, json.dumps(proposal, sort_keys=True), now, proposal_id),
@@ -3657,7 +3717,7 @@ class AssistantStore:
         could never age enough to resolve (found 2026-07-30 while reviewing
         the reconciliation-hardening round).
         """
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -3766,7 +3826,7 @@ class AssistantStore:
         # duplicate check would be a plain snapshot read and two DIFFERENT
         # proposals for the same ticker/side could both observe "no duplicate"
         # before either became visible at the broker.
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             target_before = connection.execute(
@@ -3937,7 +3997,7 @@ class AssistantStore:
             timestamp_value = validated_stale_updated_at
 
         now = datetime.now(timezone.utc).isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             row = connection.execute(
                 "SELECT payload_json FROM trade_proposals WHERE proposal_id = ? "
                 f"AND status = ? AND {timestamp_predicate}",
@@ -4146,7 +4206,7 @@ class AssistantStore:
         if not isinstance(reason, str) or not reason.strip():
             raise ValueError("A non-empty dismissal reason is required.")
 
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             records = self._dismissal_records(connection, ids)
@@ -4498,7 +4558,7 @@ class AssistantStore:
             ),
             fill_price_text=incremental_price_text,
         )
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         containment_pending = False
         containment_reason: str | None = None
         containment_incident_id: str | None = None
@@ -4648,7 +4708,8 @@ class AssistantStore:
                 containment_reason = reason
                 containment_incident_id = _containment_incident_id(
                     "broker-event-integrity",
-                    f"{self.path.resolve()}:{event_scope}:{event_id}",
+                    f"{self.path.resolve()}:{event_scope}:{event_id}:{reason}",
+                    reason=reason,
                 )
                 try:
                     activate_runtime_emergency_stop(
@@ -4953,7 +5014,8 @@ class AssistantStore:
                 containment_incident_id = _containment_incident_id(
                     "broker-order-binding",
                     f"{self.path.resolve()}:{proposal_id}:{order_id}:"
-                    f"{effective_root_id}",
+                    f"{effective_root_id}:{reason}",
+                    reason=reason,
                 )
                 try:
                     activate_runtime_emergency_stop(
@@ -5255,6 +5317,7 @@ class AssistantStore:
                 containment_incident_id = _containment_incident_id(
                     "broker-event-integrity",
                     f"{self.path.resolve()}:{event_scope}:{event_id}:{exc}",
+                    reason=str(exc),
                 )
                 try:
                     activate_runtime_emergency_stop(
@@ -5431,7 +5494,7 @@ class AssistantStore:
             payload_json,
             payload_hash,
         )
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 """
                 INSERT INTO execution_telemetry_events(
@@ -5537,7 +5600,7 @@ class AssistantStore:
         if isinstance(max_daily_orders, bool) or not isinstance(max_daily_orders, int) or max_daily_orders <= 0:
             raise ValueError("max_daily_orders must be a positive integer.")
         now = datetime.now(timezone.utc).isoformat()
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             existing = connection.execute(
@@ -5564,7 +5627,7 @@ class AssistantStore:
                 "FROM execution_reservations WHERE trading_day = ?",
                 (trading_day,),
             ).fetchall()
-            reserved_total = sum(
+            reserved_total = exact_decimal_sum(
                 (
                     to_decimal(
                         row["reserved_notional_text"]
@@ -5574,10 +5637,14 @@ class AssistantStore:
                     )
                     for row in reservations
                 ),
-                Decimal("0"),
+                name="daily reserved notional",
             )
             next_count = len(reservations) + 1
-            next_notional = reserved_total + notional_decimal
+            next_notional = exact_decimal_add(
+                reserved_total,
+                notional_decimal,
+                name="next daily reserved notional",
+            )
             if next_count > max_daily_orders:
                 raise ValueError(
                     f"Daily order-count budget would be {next_count}, exceeding {max_daily_orders}."
@@ -5643,7 +5710,7 @@ class AssistantStore:
                 requested_day = None
             rows = connection.execute("SELECT * FROM broker_order_events").fetchall()
 
-        submitted_notional = sum(
+        submitted_notional = exact_decimal_sum(
             (
                 to_decimal(
                     row["reserved_notional_text"]
@@ -5653,7 +5720,7 @@ class AssistantStore:
                 )
                 for row in reservations
             ),
-            Decimal("0"),
+            name="submitted notional usage",
         )
         filled_notional = Decimal("0")
         integrity_errors: list[dict[str, str]] = []
@@ -5702,7 +5769,21 @@ class AssistantStore:
                 or parsed.astimezone(_EASTERN).date() != requested_day
             ):
                 continue
-            filled_notional += abs(qty_decimal * price_decimal)
+            try:
+                incremental_notional = exact_decimal_multiply(
+                    qty_decimal,
+                    price_decimal,
+                    name=f"broker event {row['event_id']} filled notional",
+                ).copy_abs()
+                filled_notional = exact_decimal_add(
+                    filled_notional,
+                    incremental_notional,
+                    name="filled notional usage",
+                )
+            except ValueError as exc:
+                integrity_errors.append(
+                    {"event_id": str(row["event_id"]), "error": str(exc)}
+                )
 
         if integrity_errors:
             evidence_status = "integrity_error"
@@ -5739,7 +5820,7 @@ class AssistantStore:
         those still represent possible exposure and must continue consuming
         the daily submission budget until reconciliation proves otherwise.
         """
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 "DELETE FROM execution_reservations WHERE proposal_id = ?",
                 (proposal_id,),
@@ -5763,7 +5844,7 @@ class AssistantStore:
         """
         if not expected_statuses:
             raise ValueError("expected_statuses must not be empty")
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -5818,7 +5899,7 @@ class AssistantStore:
         one transaction: a poller that read an old row cannot release the
         reservation after another worker has just claimed/refreshed it.
         """
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -5865,7 +5946,7 @@ class AssistantStore:
 
     def set_system_state(self, key: str, value: Any) -> None:
         now = datetime.now(timezone.utc).isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 "INSERT INTO system_state(state_key, value_json, updated_at) VALUES (?, ?, ?) "
                 "ON CONFLICT(state_key) DO UPDATE SET "
@@ -5885,6 +5966,7 @@ class AssistantStore:
         incident_id = _containment_incident_id(
             category,
             f"{self.path.resolve()}:{event_id}:{reason}",
+            reason=reason,
         )
         runtime_state: dict[str, Any] | None = None
         activation_error: Exception | None = None
@@ -5954,17 +6036,21 @@ class AssistantStore:
             for item in runtime_state.get("open_incidents", [])
         ):
             return
+        effective_reason = local_stop["reason"] or (
+            "pre-runtime database-local kill switch was active"
+        )
         material = (
-            f"{origin_database}:{raw_material}"
+            f"{origin_database}:{raw_material}:{effective_reason}"
             if malformed_error is not None
             else (
                 f"{origin_database}:{local_stop['changed_at']}:"
-                f"{local_stop['reason']}"
+                f"{effective_reason}"
             )
         )
-        incident_id = _containment_incident_id("legacy-local-stop", material)
-        effective_reason = local_stop["reason"] or (
-            "pre-runtime database-local kill switch was active"
+        incident_id = _containment_incident_id(
+            "legacy-local-stop",
+            material,
+            reason=effective_reason,
         )
         activation_error: Exception | None = None
         try:
@@ -6008,6 +6094,10 @@ class AssistantStore:
         A runtime incident can be cleared only by naming that incident and the
         exact generation observed by the operator.
         """
+        # Read-only covers the runtime-wide state as well as SQLite. Refuse
+        # before clearing or publishing an incident so a later database write
+        # failure cannot leave cross-worktree authority changed.
+        self._require_writable()
         if type(active) is not bool:
             raise TypeError("kill-switch active must be an actual bool")
         if not isinstance(reason, str):
@@ -6113,6 +6203,9 @@ class AssistantStore:
         Writing the alert and halt in one transaction prevents either record
         from claiming the other safety action occurred when it did not.
         """
+        # Runtime publication is a mutation too, so refuse before it can add a
+        # process-wide incident and only then fail on the local SQLite write.
+        self._require_writable()
         now = seen_at or datetime.now(timezone.utc).isoformat()
         fingerprint = f"broker_reconciliation:{proposal_id}"
         alert_details = {"proposal_id": proposal_id, **(details or {})}
@@ -6124,6 +6217,7 @@ class AssistantStore:
         incident_id = _containment_incident_id(
             "broker-reconciliation",
             f"{self.path.resolve()}:{proposal_id}:{reason}",
+            reason=reason,
         )
         runtime_activation_error: Exception | None = None
         try:
@@ -6136,7 +6230,7 @@ class AssistantStore:
         except Exception as exc:
             runtime_activation_error = exc
         try:
-            with self._connect() as connection:
+            with self._connect_writable() as connection:
                 connection.execute(
                     "INSERT INTO system_state(state_key, value_json, updated_at) "
                     "VALUES (?, ?, ?) ON CONFLICT(state_key) DO UPDATE SET "
@@ -6225,6 +6319,7 @@ class AssistantStore:
         execution reservation is deliberately untouched: ambiguity must
         continue consuming the submission budget and duplicate-intent slot.
         """
+        self._require_writable()
         if not isinstance(proposal_id, str) or not proposal_id.strip():
             raise ValueError("proposal_id must be a non-empty string")
         if not isinstance(reason, str) or not reason.strip():
@@ -6250,7 +6345,8 @@ class AssistantStore:
         }
         incident_id = _containment_incident_id(
             "broker-reconciliation",
-            f"{self.path.resolve()}:{proposal_id}:{anomaly_key}",
+            f"{self.path.resolve()}:{proposal_id}:{anomaly_key}:{reason}",
+            reason=reason,
         )
         runtime_activation_error: Exception | None = None
         try:
@@ -6262,7 +6358,7 @@ class AssistantStore:
             )
         except Exception as exc:
             runtime_activation_error = exc
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             proposal_row = connection.execute(
@@ -6273,7 +6369,8 @@ class AssistantStore:
                 raise KeyError(f"Unknown proposal: {proposal_id}")
 
             existing_alert = connection.execute(
-                "SELECT status FROM operational_alerts WHERE fingerprint = ?",
+                "SELECT status, severity, category, message, details_json "
+                "FROM operational_alerts WHERE fingerprint = ?",
                 (fingerprint,),
             ).fetchone()
             proposal = json.loads(proposal_row["payload_json"])
@@ -6317,7 +6414,18 @@ class AssistantStore:
                     reconciled_at,
                 ),
             )
-            if existing_alert is None or existing_alert["status"] != "open":
+            alert_details_json = json.dumps(
+                alert_details, sort_keys=True, default=str
+            )
+            identical_open_alert = (
+                existing_alert is not None
+                and existing_alert["status"] == "open"
+                and existing_alert["severity"] == "critical"
+                and existing_alert["category"] == "broker_reconciliation"
+                and existing_alert["message"] == reason
+                and existing_alert["details_json"] == alert_details_json
+            )
+            if not identical_open_alert:
                 self._upsert_operational_alert_in_connection(
                     connection,
                     fingerprint=fingerprint,
@@ -6491,6 +6599,7 @@ class AssistantStore:
         return results or ["ok"]
 
     def backup_to(self, destination: str | Path) -> Path:
+        self._require_writable()
         target = self.snapshot_to(destination)
         self.set_system_state(
             "last_database_backup",
@@ -6572,7 +6681,7 @@ class AssistantStore:
             )
             for posting in postings
         ]
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             cursor = connection.execute(
@@ -6696,7 +6805,7 @@ class AssistantStore:
             )
             for posting in postings
         ]
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             has_state = connection.execute(
@@ -6837,7 +6946,7 @@ class AssistantStore:
             or datetime.now(timezone.utc).isoformat()
         )
         mismatch_count = int(report.get("mismatch_count", 0))
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 """
                 INSERT INTO ledger_reconciliation_runs(
@@ -6910,7 +7019,7 @@ class AssistantStore:
         if amount <= 0:
             return {"created": False, "reason": "earmark amount must be positive"}
         payload = json.dumps(proposal, sort_keys=True)
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             income_rows = connection.execute(
@@ -6923,10 +7032,14 @@ class AssistantStore:
                   AND p.account = 'INCOME:DIVIDENDS'
                 """
             ).fetchall()
-            confirmed_income = Decimal(0)
+            confirmed_income = Decimal("0")
             for row in income_rows:
-                income = -to_decimal(
-                    row["amount"], name="stored dividend posting amount"
+                income = exact_decimal_subtract(
+                    Decimal("0"),
+                    to_decimal(
+                        row["amount"], name="stored dividend posting amount"
+                    ),
+                    name="confirmed dividend income",
                 )
                 if income < 0:
                     connection.rollback()
@@ -6938,14 +7051,18 @@ class AssistantStore:
                             "to create a dividend-funded proposal"
                         ),
                     }
-                confirmed_income += income
+                confirmed_income = exact_decimal_add(
+                    confirmed_income,
+                    income,
+                    name="confirmed dividend income total",
+                )
             rows = connection.execute(
                 """
                 SELECT amount_text FROM sleeve_dividend_earmarks
                 WHERE status != 'released'
                 """
             ).fetchall()
-            earmarked = Decimal(0)
+            earmarked = Decimal("0")
             for row in rows:
                 stored_amount = to_decimal(
                     row["amount_text"], name="stored earmark amount"
@@ -6959,8 +7076,16 @@ class AssistantStore:
                             "refusing to create another dividend-funded proposal"
                         ),
                     }
-                earmarked += stored_amount
-            available = confirmed_income - earmarked
+                earmarked = exact_decimal_add(
+                    earmarked,
+                    stored_amount,
+                    name="dividend earmark total",
+                )
+            available = exact_decimal_subtract(
+                confirmed_income,
+                earmarked,
+                name="available confirmed dividend pool",
+            )
             if amount > available:
                 connection.rollback()
                 return {
@@ -6972,6 +7097,11 @@ class AssistantStore:
                         f"{decimal_text(earmarked)} already earmarked or consumed)"
                     ),
                 }
+            available_after = exact_decimal_subtract(
+                available,
+                amount,
+                name="remaining confirmed dividend pool",
+            )
             inserted = connection.execute(
                 """
                 INSERT INTO trade_proposals(
@@ -7016,7 +7146,7 @@ class AssistantStore:
             connection.commit()
             return {
                 "created": True,
-                "available_text": decimal_text(available - amount),
+                "available_text": decimal_text(available_after),
             }
         except Exception:
             connection.rollback()
@@ -7043,7 +7173,7 @@ class AssistantStore:
             raise ValueError(
                 f"earmark resolution must be 'released' or 'consumed', got {new_status!r}"
             )
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 """
                 UPDATE sleeve_dividend_earmarks
@@ -7101,7 +7231,7 @@ class AssistantStore:
             )
             for row in rows
         ]
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute("DELETE FROM sleeve_watch_states")
             connection.executemany(
                 """
@@ -7143,7 +7273,7 @@ class AssistantStore:
             )
             for row in states
         ]
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             for alert in alerts:
                 self._upsert_operational_alert_in_connection(
                     connection,
@@ -7219,7 +7349,7 @@ class AssistantStore:
         seen_at: str | None = None,
     ) -> dict[str, Any]:
         now = seen_at or datetime.now(timezone.utc).isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             row = self._upsert_operational_alert_in_connection(
                 connection,
                 fingerprint=fingerprint,
@@ -7279,7 +7409,7 @@ class AssistantStore:
                 f"outcome must be delivered/failed/suppressed, got {outcome!r}"
             )
         attempted = attempted_at or datetime.now(timezone.utc).isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 """
                 INSERT INTO alert_deliveries(
@@ -7369,7 +7499,7 @@ class AssistantStore:
 
     def acknowledge_operational_alert(self, alert_id: int) -> bool:
         now = datetime.now(timezone.utc).isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 """
                 UPDATE operational_alerts
@@ -7393,7 +7523,7 @@ class AssistantStore:
         )
         lineage_hash = _hash_payload(lineage_json)
         now = datetime.now(timezone.utc).isoformat()
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             existing = connection.execute(
@@ -7458,7 +7588,7 @@ class AssistantStore:
     def close_paper_evidence_epoch(
         self, evidence_epoch: str, *, ended_at: str
     ) -> dict[str, Any]:
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 """
                 UPDATE paper_evidence_epochs
@@ -7516,7 +7646,7 @@ class AssistantStore:
         observation_id = "paperobs-" + payload_hash[:24]
         evidence_epoch = str(observation["evidence_epoch"])
         session_date = str(observation["session_date"])
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             epoch = connection.execute(
@@ -7655,7 +7785,7 @@ class AssistantStore:
         drill_id = "drill-" + _hash_payload(
             json.dumps(material, sort_keys=True, default=str)
         )[:24]
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 """
                 INSERT INTO operational_drill_runs(
@@ -7747,7 +7877,7 @@ class AssistantStore:
         canonical_seen_at = _parse_aware_timestamp(
             seen_at, "research-look seen_at"
         ).astimezone(timezone.utc).isoformat()
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 """
                 INSERT INTO research_looks(
@@ -7900,7 +8030,7 @@ class AssistantStore:
         details_json = json.dumps(
             details, sort_keys=True, separators=(",", ":"), default=str
         )
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             cursor = connection.execute(
                 """
                 INSERT INTO broker_activity_acknowledgements(
@@ -8176,8 +8306,20 @@ class AssistantStore:
                     and row["fill_price_text"] not in (None, "")
                 )
                 incremental_totals[row["order_id"]] = (
-                    prior_qty + qty_decimal,
-                    prior_notional + qty_decimal * price_decimal,
+                    exact_decimal_add(
+                        prior_qty,
+                        qty_decimal,
+                        name=f"{row['order_id']} incremental fill quantity",
+                    ),
+                    exact_decimal_add(
+                        prior_notional,
+                        exact_decimal_multiply(
+                            qty_decimal,
+                            price_decimal,
+                            name=f"{row['order_id']} incremental fill notional",
+                        ),
+                        name=f"{row['order_id']} total incremental fill notional",
+                    ),
                     prior_exact and provider_exact,
                 )
                 fills.append({
@@ -8277,34 +8419,67 @@ class AssistantStore:
             )
             if cumulative_qty < incremental_qty:
                 continue
-            cumulative_notional = cumulative_qty * cumulative_price
+            cumulative_notional = exact_decimal_multiply(
+                cumulative_qty,
+                cumulative_price,
+                name=f"{order_id} cumulative fill notional",
+            )
             if cumulative_qty == incremental_qty:
-                if abs(cumulative_notional - incremental_notional) > Decimal("0.01"):
+                if exact_decimal_subtract(
+                    cumulative_notional,
+                    incremental_notional,
+                    name=f"{order_id} cumulative fill basis delta",
+                ).copy_abs() > Decimal("0.01"):
                     raise ValueError(
                         f"cannot reconcile cumulative fill basis for order {order_id}"
                     )
                 continue
-            remainder_qty = cumulative_qty - incremental_qty
-            remainder_notional = cumulative_notional - incremental_notional
+            remainder_qty = exact_decimal_subtract(
+                cumulative_qty,
+                incremental_qty,
+                name=f"{order_id} cumulative remainder quantity",
+            )
+            remainder_notional = exact_decimal_subtract(
+                cumulative_notional,
+                incremental_notional,
+                name=f"{order_id} cumulative remainder notional",
+            )
             if remainder_notional <= 0:
                 raise ValueError(
                     f"cannot reconcile cumulative fill basis for order {order_id}"
                 )
+            remainder_price = deterministic_decimal_divide(
+                remainder_notional,
+                remainder_qty,
+                name=f"{order_id} cumulative remainder price",
+            )
+            remainder_price_is_exact = (
+                exact_decimal_multiply(
+                    remainder_price,
+                    remainder_qty,
+                    name=f"{order_id} reconstructed cumulative remainder notional",
+                )
+                == remainder_notional
+            )
             fills.append(
                 {
                     "ticker": fill["ticker"],
                     "side": fill["side"],
                     "qty": float(remainder_qty),
-                    "price": float(remainder_notional / remainder_qty),
+                    "price": float(remainder_price),
                     "qty_decimal": decimal_text(remainder_qty),
-                    "price_decimal": decimal_text(
-                        remainder_notional / remainder_qty
-                    ),
+                    "price_decimal": decimal_text(remainder_price),
                     "numeric_evidence_status": (
                         "provider_exact"
                         if incremental_exact
                         and fill["numeric_evidence_status"] == "provider_exact"
-                        else "legacy_rounded_unrecoverable"
+                        and remainder_price_is_exact
+                        else (
+                            "derived_rounded"
+                            if incremental_exact
+                            and fill["numeric_evidence_status"] == "provider_exact"
+                            else "legacy_rounded_unrecoverable"
+                        )
                     ),
                     "at": fill["at"],
                     "fill_id": f"{order_id}-cumulative-remainder",
@@ -8339,7 +8514,7 @@ class AssistantStore:
             "proposal_ids": list(proposal_ids),
             "legs": {pid: {"state": "unattempted", "order": None, "error": None} for pid in proposal_ids},
         }
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 "INSERT INTO allocation_batches(batch_id, created_at, status, payload_json, updated_at) "
                 "VALUES (?, ?, ?, ?, ?)",
@@ -8378,7 +8553,7 @@ class AssistantStore:
         # Read-modify-write inside a single BEGIN IMMEDIATE transaction, same
         # pattern as project_broker_order_event() above.
         now = datetime.now(timezone.utc).isoformat()
-        connection = self._open_database(self.path)
+        connection = self._open_writable_database()
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -8490,7 +8665,7 @@ class AssistantStore:
         equivalent memory of when it was last evaluated. Overwrites the
         previous row for the same strategy_key -- only the most recent
         evaluation is kept, this is not an audit log."""
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 "INSERT INTO strategy_evaluations(strategy_key, last_evaluated_at, last_result_json) "
                 "VALUES (?, ?, ?) ON CONFLICT(strategy_key) DO UPDATE SET "
@@ -8587,7 +8762,7 @@ class AssistantStore:
             )
         if latest_session is not None:
             _parse_session_date(latest_session, "latest_session")
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 "INSERT INTO data_provider_fetches("
                 "provider_id, data_class, fetched_at, requested_count, "
@@ -8693,7 +8868,7 @@ class AssistantStore:
         identical calls are visibly identical without storing raw PII/
         portfolio data twice if the caller chooses to hash rather than
         store the full input."""
-        with self._connect() as connection:
+        with self._connect_writable() as connection:
             connection.execute(
                 "INSERT INTO ai_runs(called_at, function_name, model, prompt_version, input_hash, "
                 "latency_ms, success, response_json, error) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -8738,6 +8913,232 @@ class AssistantStore:
         ]
 
 
+def _invoke_contained_cancel_all_primitive(
+    path: Path,
+    *,
+    integrity_error: str,
+    operation: str,
+    payload: dict[str, Any],
+) -> Any:
+    """Invoke one closed-set cancel-all primitive on a short-lived delegate.
+
+    The ordinary constructor must continue to authenticate the broker-event
+    journal and refuse corruption. Emergency cancel-all still needs a handful
+    of journal-independent storage primitives. This dispatcher hard-codes that
+    closed set and the safety-bearing arguments (active-only stop, account-wide
+    halt, one result key, one critical alert); it neither accepts an arbitrary
+    method nor yields the unrestricted delegate to its caller.
+    """
+    delegate = AssistantStore.__new__(AssistantStore)
+    delegate.path = path
+    delegate.read_only = False
+    delegate.broker_event_integrity_error = integrity_error
+    try:
+        if operation == "activate_kill_switch":
+            if set(payload) != {"reason", "incident_id", "changed_at"}:
+                raise TypeError("contained kill-switch payload is malformed")
+            return AssistantStore.set_kill_switch(
+                delegate,
+                True,
+                reason=payload["reason"],
+                incident_id=payload["incident_id"],
+                changed_at=payload["changed_at"],
+            )
+        if operation == "get_kill_switch":
+            if payload:
+                raise TypeError("contained kill-switch read takes no payload")
+            return AssistantStore.get_kill_switch(delegate)
+        if operation == "record_cancel_all_result":
+            if set(payload) != {"value"}:
+                raise TypeError("contained cancel-all result payload is malformed")
+            return AssistantStore.set_system_state(
+                delegate,
+                "last_cancel_all_open_orders",
+                payload["value"],
+            )
+        if operation == "list_unresolved_dispatches":
+            if payload:
+                raise TypeError("contained unresolved-dispatch read takes no payload")
+            return AssistantStore.list_proposals_by_statuses(
+                delegate,
+                UNRESOLVED_BROKER_STATE_STATUSES,
+            )
+        if operation == "record_incomplete_halt":
+            if set(payload) != {"reason", "seen_at", "details"}:
+                raise TypeError("contained reconciliation-halt payload is malformed")
+            return AssistantStore.activate_reconciliation_halt(
+                delegate,
+                proposal_id="emergency-cancel-all",
+                reason=payload["reason"],
+                seen_at=payload["seen_at"],
+                details=payload["details"],
+            )
+        if operation == "record_incomplete_alert":
+            if set(payload) != {"message", "details", "seen_at"}:
+                raise TypeError("contained critical-alert payload is malformed")
+            return AssistantStore.upsert_operational_alert(
+                delegate,
+                fingerprint="emergency_cancel_all:incomplete",
+                severity="critical",
+                category="broker_reconciliation",
+                message=payload["message"],
+                details=payload["details"],
+                seen_at=payload["seen_at"],
+            )
+        raise PermissionError("operation is outside contained cancel-all storage")
+    finally:
+        # Make accidental use-after-scope fail closed even if future
+        # instrumentation retains a reference while observing this helper.
+        delegate.read_only = True
+
+
+class _ContainedCancelAllStore:
+    """Capability-limited store for emergency account-wide cancellation.
+
+    A corrupt broker-event journal makes general reconciliation and selective
+    attribution unsafe. Cancel-all deliberately avoids that journal and needs
+    only the explicit proposal, containment, and alert operations forwarded
+    here. Do not widen this surface to general storage or event APIs.
+    """
+
+    __slots__ = ("__path", "__integrity_error")
+
+    def __init__(self, path: Path, *, integrity_error: str):
+        self.__path = path
+        self.__integrity_error = integrity_error
+
+    @property
+    def path(self) -> Path:
+        return self.__path
+
+    @property
+    def broker_event_integrity_error(self) -> str | None:
+        return self.__integrity_error
+
+    def set_kill_switch(
+        self,
+        active: bool,
+        *,
+        reason: str,
+        incident_id: str,
+        changed_at: str,
+    ) -> dict[str, Any]:
+        if active is not True:
+            raise PermissionError(
+                "contained cancel-all storage can only activate the kill switch"
+            )
+        return _invoke_contained_cancel_all_primitive(
+            self.__path,
+            integrity_error=self.__integrity_error,
+            operation="activate_kill_switch",
+            payload={
+                "reason": reason,
+                "incident_id": incident_id,
+                "changed_at": changed_at,
+            },
+        )
+
+    def get_kill_switch(self) -> dict[str, Any]:
+        return _invoke_contained_cancel_all_primitive(
+            self.__path,
+            integrity_error=self.__integrity_error,
+            operation="get_kill_switch",
+            payload={},
+        )
+
+    def set_system_state(self, key: str, value: Any) -> None:
+        if key != "last_cancel_all_open_orders":
+            raise PermissionError(
+                "contained cancel-all storage cannot write general system state"
+            )
+        _invoke_contained_cancel_all_primitive(
+            self.__path,
+            integrity_error=self.__integrity_error,
+            operation="record_cancel_all_result",
+            payload={"value": value},
+        )
+
+    def list_proposals_by_statuses(
+        self, statuses: tuple[str, ...] | list[str]
+    ) -> list[dict[str, Any]]:
+        if tuple(statuses) != tuple(UNRESOLVED_BROKER_STATE_STATUSES):
+            raise PermissionError(
+                "contained cancel-all storage can only inspect unresolved dispatches"
+            )
+        return _invoke_contained_cancel_all_primitive(
+            self.__path,
+            integrity_error=self.__integrity_error,
+            operation="list_unresolved_dispatches",
+            payload={},
+        )
+
+    def activate_reconciliation_halt(
+        self,
+        *,
+        proposal_id: str,
+        reason: str,
+        seen_at: str | None = None,
+        details: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if proposal_id != "emergency-cancel-all":
+            raise PermissionError(
+                "contained cancel-all storage cannot halt a selective proposal"
+            )
+        return _invoke_contained_cancel_all_primitive(
+            self.__path,
+            integrity_error=self.__integrity_error,
+            operation="record_incomplete_halt",
+            payload={"reason": reason, "seen_at": seen_at, "details": details},
+        )
+
+    def upsert_operational_alert(
+        self,
+        *,
+        fingerprint: str,
+        severity: str,
+        category: str,
+        message: str,
+        details: dict[str, Any] | None = None,
+        seen_at: str | None = None,
+    ) -> dict[str, Any]:
+        if (
+            fingerprint != "emergency_cancel_all:incomplete"
+            or severity != "critical"
+            or category != "broker_reconciliation"
+        ):
+            raise PermissionError(
+                "contained cancel-all storage can only record its critical alert"
+            )
+        return _invoke_contained_cancel_all_primitive(
+            self.__path,
+            integrity_error=self.__integrity_error,
+            operation="record_incomplete_alert",
+            payload={"message": message, "details": details, "seen_at": seen_at},
+        )
+
+
+def open_contained_cancel_all_store(
+    path: str | Path | None = None,
+) -> _ContainedCancelAllStore:
+    """Open only the emergency capability that may cross journal corruption.
+
+    Detection still goes through the strict constructor. Only that exact
+    authenticated-journal refusal can mint the wrapper; a healthy database or
+    any unrelated initialization failure never receives contained access.
+    """
+    resolved_path = Path(path) if path is not None else configured_db_path()
+    try:
+        AssistantStore(resolved_path)
+    except JournalTransactionConflictError as exc:
+        return _ContainedCancelAllStore(
+            resolved_path,
+            integrity_error=str(exc),
+        )
+    raise RuntimeError(
+        "contained cancel-all storage requires a broker-event integrity failure"
+    )
+
+
 # --- Schema verification (AP-1, ACTION_PLAN 2026-08-02) --------------------
 #
 # AssistantStore.__init__ applies additive schema changes idempotently
@@ -8753,14 +9154,15 @@ class SchemaVerificationResult:
     """Outcome of comparing a database against the currently declared schema.
 
     ``matches`` is True only when every declared table and column exists with
-    its declared type/affinity, ordinal, nullability, default, primary-key
-    ordinal, and generated-column disposition; foreign keys, table-level SQL
-    constraints, indexes (including implicit autoindexes), and triggers must
-    also match. Enforcement objects are not labels: a same-named weaker
-    object must fail the check. ``extra_tables`` is informational only:
-    legacy or operator-local tables never fail verification, because the
-    contract is "current code's compatible schema is present", not "nothing
-    else is".
+    its declared type/affinity, nullability, default, primary-key ordinal, and
+    generated-column disposition. Ordinal must also match except for the one
+    exact ``broker_order_events`` layout produced by the declared additive
+    integrity migration. Foreign keys, table-level SQL constraints, indexes
+    (including implicit autoindexes), and triggers must also match.
+    Enforcement objects are not labels: a same-named weaker object must fail
+    the check. ``extra_tables`` is informational only: legacy or
+    operator-local tables never fail verification, because the contract is
+    "current code's compatible schema is present", not "nothing else is".
     """
 
     matches: bool
@@ -8811,6 +9213,19 @@ class _ColumnSchema:
     default_sql: str | None
     primary_key_ordinal: int
     hidden: int
+
+
+_BROKER_EVENT_INTEGRITY_APPEND_ORDER = (
+    "filled_qty_text",
+    "filled_avg_price_text",
+    "fill_qty_text",
+    "fill_price_text",
+    "numeric_evidence_status",
+    "event_scope",
+    "event_content_hash",
+    "event_content_json",
+    "event_hash_version",
+)
 
 
 @dataclass(frozen=True)
@@ -9114,6 +9529,56 @@ def _all_indexes(schema: _SchemaObjects) -> dict[str, _IndexSchema]:
     }
 
 
+def _column_order(table: _TableSchema) -> tuple[str, ...]:
+    return tuple(
+        name
+        for name, _column in sorted(
+            table.columns.items(), key=lambda item: item[1].ordinal
+        )
+    )
+
+
+def _known_broker_event_migration_layout(
+    expected: _TableSchema,
+    actual: _TableSchema,
+) -> bool:
+    """Recognize only the historical ALTER-TABLE append layout.
+
+    SQLite cannot insert an added column at its current declarative position.
+    The integrity migration therefore preserves every old column in its exact
+    historical order and appends the nine new columns in the migration's exact
+    declaration order. No other reordered table or broker-event permutation
+    is semantically waived.
+    """
+    expected_order = _column_order(expected)
+    append_set = frozenset(_BROKER_EVENT_INTEGRITY_APPEND_ORDER)
+    if not append_set <= frozenset(expected_order):
+        return False
+    historical_order = tuple(
+        name for name in expected_order if name not in append_set
+    )
+    return _column_order(actual) == (
+        historical_order + _BROKER_EVENT_INTEGRITY_APPEND_ORDER
+    )
+
+
+def _column_schema_matches(
+    expected: _ColumnSchema,
+    actual: _ColumnSchema,
+    *,
+    ignore_ordinal: bool,
+) -> bool:
+    return (
+        (ignore_ordinal or expected.ordinal == actual.ordinal)
+        and expected.declared_type == actual.declared_type
+        and expected.affinity == actual.affinity
+        and expected.not_null == actual.not_null
+        and expected.default_sql == actual.default_sql
+        and expected.primary_key_ordinal == actual.primary_key_ordinal
+        and expected.hidden == actual.hidden
+    )
+
+
 def _compare_schema_objects(
     expected: _SchemaObjects,
     actual: _SchemaObjects,
@@ -9127,12 +9592,26 @@ def _compare_schema_objects(
         if table in actual_tables
         for column in set(expected_table.columns) - set(actual_tables[table].columns)
     )
+    migrated_broker_event_layout = (
+        "broker_order_events" in expected_tables
+        and "broker_order_events" in actual_tables
+        and _known_broker_event_migration_layout(
+            expected_tables["broker_order_events"],
+            actual_tables["broker_order_events"],
+        )
+    )
     mismatched_columns = sorted(
         f"{table}.{column}"
         for table, expected_table in expected_tables.items()
         if table in actual_tables
         for column in set(expected_table.columns) & set(actual_tables[table].columns)
-        if expected_table.columns[column] != actual_tables[table].columns[column]
+        if not _column_schema_matches(
+            expected_table.columns[column],
+            actual_tables[table].columns[column],
+            ignore_ordinal=(
+                table == "broker_order_events" and migrated_broker_event_layout
+            ),
+        )
     )
     mismatched_foreign_keys = sorted(
         table

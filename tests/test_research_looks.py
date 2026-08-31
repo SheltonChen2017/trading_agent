@@ -189,7 +189,7 @@ def test_the_registry_table_migrates_onto_a_pre_migration_database(tmp_path):
     path = tmp_path / "assistant.db"
     store = AssistantStore(path)
     _record(store)
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute("DROP TABLE research_looks")
         connection.execute(
             """

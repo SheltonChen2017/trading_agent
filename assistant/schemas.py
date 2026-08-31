@@ -162,7 +162,7 @@ class PortfolioSnapshot:
         """
         if self.cash_exact is None or self.total_equity_exact is None:
             return False
-        if self.buying_power is not None and self.buying_power_exact is None:
+        if (self.buying_power is None) != (self.buying_power_exact is None):
             return False
         return all(position.has_exact_numerics for position in self.positions)
 
@@ -206,6 +206,10 @@ class RiskExposure:
     cash_pct: float
     largest_single_position_pct: float
     concentration_warnings: list[str]
+    # Numeric display fields stay backward-compatible, but consumers must not
+    # interpret their zero placeholders when integrity prevented computation.
+    available: bool = True
+    unavailable_reason: str | None = None
 
 
 @dataclasses.dataclass

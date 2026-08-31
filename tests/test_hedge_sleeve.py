@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import math
 import sys
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -642,22 +642,58 @@ def test_an_all_or_nothing_refusal_names_the_authorized_remedy():
 
 
 def test_the_equal_weight_split_stays_exact_decimal():
-    """HEDGER-005 removed float weights from the sizing path, but nothing
-    pinned it: reverting the fix left all fifty tests green, because the
-    representation error (~7e-14 dollars) is far below the share-flooring
-    threshold that could make it observable at runtime. `CLAUDE.md` allows a
-    source-level test exactly when the invariant cannot be observed
-    behaviorally, which is the case here.
+    """Equal weighting and proposal identity ignore ambient Decimal context.
+
+    Each name receives just over $333.30 under the exact one-third split, so
+    one share fits. A low-context ``100 / 3 == 33`` implementation budgets
+    only $330 and changes every proposed quantity to zero.
     """
-    source = (
-        Path(__file__).resolve().parent.parent / "assistant" / "hedge_sleeve.py"
-    ).read_text(encoding="utf-8")
-    weight_lines = [
-        line.strip() for line in source.splitlines()
-        if line.strip().startswith("weight = ")
-    ]
-    assert weight_lines, "the equal-weight split moved; re-pin this guard"
-    for line in weight_lines:
-        assert "Decimal(" in line, (
-            f"the equal-weight split reintroduced binary float: {line}"
+    packet = _packet()
+    prices = {ticker: "333.3" for ticker in ("GLD", "TLT", "BTAL")}
+    kwargs = {
+        "target_pct": 10,
+        "tickers": ["GLD", "TLT", "BTAL"],
+    }
+    baseline = generate_hedge_buy_proposals(
+        packet, _policy(), prices, **kwargs
+    )
+    with localcontext() as context:
+        context.prec = 2
+        constrained = generate_hedge_buy_proposals(
+            packet, _policy(), prices, **kwargs
         )
+
+    assert baseline["created"] and constrained["created"]
+    assert [p.intent.shares for p in baseline["proposals"]] == [1, 1, 1]
+    assert [
+        p.intent.shares for p in constrained["proposals"]
+    ] == [1, 1, 1]
+    assert [
+        p.proposal_id for p in constrained["proposals"]
+    ] == [p.proposal_id for p in baseline["proposals"]]
+
+
+def test_low_decimal_context_cannot_overstate_the_hedge_shortfall():
+    packet = _packet(
+        [_held("GLD", "4.00005", "100")],
+        cash="9599.995",
+    )
+    kwargs = {"target_pct": 10, "tickers": ["GLD"]}
+    baseline = generate_hedge_buy_proposals(
+        packet, _policy(), {"GLD": "200"}, **kwargs
+    )
+    with localcontext() as context:
+        context.prec = 3
+        constrained = generate_hedge_buy_proposals(
+            packet, _policy(), {"GLD": "200"}, **kwargs
+        )
+
+    for result in (baseline, constrained):
+        assert result["created"], result.get("reason")
+        assert result["report"].hedge_value_exact == "400.005"
+        assert result["report"].shortfall_dollars_exact == "599.995"
+        assert [p.intent.shares for p in result["proposals"]] == [2]
+    assert (
+        constrained["proposals"][0].proposal_id
+        == baseline["proposals"][0].proposal_id
+    )

@@ -431,6 +431,120 @@ def test_print_briefing_surfaces_underfilled_dataset_warning():
     assert "1764" in out
 
 
+def test_print_briefing_does_not_turn_an_unavailable_order_book_into_zero():
+    packet = _packet_with_unreproduced_confirmed_finding()
+    packet.portfolio.open_orders_available = False
+    packet.analytics["open_order_count"] = None
+
+    out = _captured_stdout(_print_briefing, packet)
+
+    assert "open orders=unavailable" in out
+    assert "open orders=0" not in out
+
+
+def test_print_briefing_withholds_portfolio_values_when_risk_is_unavailable():
+    packet = _packet_with_unreproduced_confirmed_finding()
+    packet.risk.available = False
+    packet.risk.unavailable_reason = "Portfolio integrity unavailable"
+    packet.analytics["invested_pct"] = 99.9
+    packet.analytics["unrealized_pnl"] = 12345.67
+
+    out = _captured_stdout(_print_briefing, packet)
+
+    assert "equity=unavailable" in out
+    assert "cash=unavailable" in out
+    assert "invested=unavailable" in out
+    assert "unrealized P&L=unavailable" in out
+    assert "99.9%" not in out
+    assert "$12,345.67" not in out
+
+
+def test_print_briefing_withholds_portfolio_values_when_analytics_are_unavailable():
+    packet = _packet_with_unreproduced_confirmed_finding()
+    packet.analytics.update(
+        available=False,
+        unavailable_reason="Portfolio analytics unavailable",
+        position_count=None,
+        invested_pct=None,
+        unrealized_pnl=None,
+    )
+
+    out = _captured_stdout(_print_briefing, packet)
+
+    assert "equity=unavailable" in out
+    assert "cash=unavailable" in out
+    assert "Positions=unavailable" in out
+    assert "invested=unavailable" in out
+    assert "unrealized P&L=unavailable" in out
+
+
+def test_command_briefing_skips_portfolio_side_effects_when_evidence_unavailable(
+    monkeypatch,
+    capsys,
+    tmp_path,
+):
+    import assistant.sleeve_notifications as sleeve_notifications
+    import assistant.sleeve_reinvest as sleeve_reinvest
+
+    packet = _packet_with_unreproduced_confirmed_finding()
+    packet.risk.available = False
+    packet.risk.unavailable_reason = "Portfolio integrity unavailable"
+    packet.analytics.update(
+        available=False,
+        unavailable_reason="Portfolio analytics unavailable",
+        position_count=None,
+        invested_pct=None,
+        unrealized_pnl=None,
+    )
+    calls = []
+
+    class FakeStore:
+        path = tmp_path / "assistant.db"
+
+        def save_decision_packet(self, actual_packet):
+            calls.append(("decision_packet", actual_packet))
+            return 7
+
+    monkeypatch.setattr(personal_assistant_cli, "_print_batched_warnings", lambda store: None)
+    monkeypatch.setattr(personal_assistant_cli, "_packet", lambda **kwargs: packet)
+    monkeypatch.setattr(
+        sleeve_notifications,
+        "run_sleeve_notification_cycle",
+        lambda *args, **kwargs: calls.append(("sleeve", args, kwargs)),
+    )
+    monkeypatch.setattr(
+        sleeve_reinvest,
+        "reconcile_dividend_earmarks",
+        lambda store: [],
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "capture_briefing_equity_snapshot",
+        lambda *args, **kwargs: calls.append(("history_capture", args, kwargs)),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "portfolio_performance_report",
+        lambda *args, **kwargs: calls.append(("history_report", args, kwargs)),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "build_descriptive_macro_context",
+        lambda: {"available": False, "reason": "test fixture"},
+    )
+
+    personal_assistant_cli.command_briefing(
+        SimpleNamespace(no_events=True),
+        FakeStore(),
+    )
+
+    assert [call[0] for call in calls] == ["decision_packet"]
+    output = capsys.readouterr().out
+    assert "Sleeve engine notifications unavailable" in output
+    assert "Portfolio history unavailable" in output
+    assert "Persisted decision packet #7" in output
+
+
 # --- risk-check subcommand (assistant/risk_copilot.py wiring)
 
 def test_risk_check_parses_basket_only():
@@ -477,6 +591,46 @@ def test_command_risk_check_rejects_move_pct_without_benchmark():
         assert False, "expected SystemExit"
     except SystemExit:
         pass
+
+
+def test_command_risk_check_suppresses_derived_facts_when_risk_unavailable(
+    monkeypatch,
+    capsys,
+):
+    packet = _packet_with_unreproduced_confirmed_finding()
+    packet.risk.available = False
+    packet.risk.unavailable_reason = "Portfolio integrity unavailable"
+    prohibited = []
+
+    monkeypatch.setattr(personal_assistant_cli, "_packet", lambda **kwargs: packet)
+    monkeypatch.setattr(personal_assistant_cli, "load_policy", lambda path: object())
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "check_policy_compliance",
+        lambda portfolio, policy: ["Portfolio integrity unavailable"],
+    )
+    for name in (
+        "check_concentration",
+        "find_correlated_clusters",
+        "portfolio_risk_decomposition",
+        "estimate_stress_impact",
+    ):
+        monkeypatch.setattr(
+            personal_assistant_cli,
+            name,
+            lambda *args, _name=name, **kwargs: prohibited.append(_name),
+        )
+
+    command_risk_check(
+        _StubArgs(benchmark="SPY", move_pct=-10.0),
+        store=object(),
+    )
+
+    assert prohibited == []
+    output = capsys.readouterr().out
+    assert "POLICY VIOLATION: Portfolio integrity unavailable" in output
+    assert "Portfolio risk analyses unavailable" in output
+    assert "Estimated impact" not in output
 
 
 if __name__ == "__main__":

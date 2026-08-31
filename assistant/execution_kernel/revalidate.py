@@ -11,7 +11,13 @@ import hashlib
 import json
 from decimal import Decimal
 
-from assistant.money import decimal_or_none, to_decimal
+from assistant.money import (
+    decimal_or_none,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    to_decimal,
+)
 from risk.execution_gate import TradeIntent, intent_fingerprint
 
 
@@ -198,7 +204,15 @@ def _pending_buy_value_by_ticker(
             if fill_price is not None and fill_price > 0:
                 value = max(
                     Decimal("0"),
-                    value - filled_qty * fill_price,
+                    exact_decimal_subtract(
+                        value,
+                        exact_decimal_multiply(
+                            filled_qty,
+                            fill_price,
+                            name=f"{ticker} filled pending notional",
+                        ),
+                        name=f"{ticker} remaining pending notional",
+                    ),
                 )
         else:
             shares = order.get("shares_decimal")
@@ -206,9 +220,10 @@ def _pending_buy_value_by_ticker(
                 shares = order.get("shares")
             if not shares:
                 continue
-            remaining_shares = (
-                to_decimal(shares, name=f"{ticker} pending shares")
-                - filled_qty
+            remaining_shares = exact_decimal_subtract(
+                to_decimal(shares, name=f"{ticker} pending shares"),
+                filled_qty,
+                name=f"{ticker} remaining pending shares",
             )
             if remaining_shares <= 0:
                 continue
@@ -216,19 +231,28 @@ def _pending_buy_value_by_ticker(
             if limit_price is None:
                 limit_price = order.get("limit_price")
             if limit_price:
-                value = remaining_shares * to_decimal(
-                    limit_price, name=f"{ticker} pending limit_price"
+                value = exact_decimal_multiply(
+                    remaining_shares,
+                    to_decimal(
+                        limit_price,
+                        name=f"{ticker} pending limit_price",
+                    ),
+                    name=f"{ticker} pending limit-order value",
                 )
             else:
                 quote = broker_module.get_latest_quote(ticker)
                 quote_price = quote.get("price_decimal")
                 if quote_price is None:
                     quote_price = quote["price"]
-                value = remaining_shares * to_decimal(
-                    quote_price, name=f"{ticker} quote price"
+                value = exact_decimal_multiply(
+                    remaining_shares,
+                    to_decimal(quote_price, name=f"{ticker} quote price"),
+                    name=f"{ticker} pending market-order value",
                 )
-        totals[ticker.upper()] = (
-            totals.get(ticker.upper(), Decimal("0")) + value
+        totals[ticker.upper()] = exact_decimal_add(
+            totals.get(ticker.upper(), Decimal("0")),
+            value,
+            name=f"{ticker} total pending buy value",
         )
     return totals
 

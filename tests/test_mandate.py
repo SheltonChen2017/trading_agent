@@ -63,6 +63,85 @@ def test_approved_mandate_is_bound_to_its_behavior_fields(tmp_path):
         load_mandate(path)
 
 
+@pytest.mark.parametrize("token", ("NaN", "Infinity", "-Infinity"))
+def test_mandate_rejects_nonstandard_nonfinite_json_at_parse_boundary(
+    tmp_path, token
+):
+    raw = load_mandate().to_dict()
+    payload = json.dumps(raw).replace(
+        '"max_drawdown_pct": 25.0',
+        f'"max_drawdown_pct": {token}',
+    )
+    path = tmp_path / "nonfinite-mandate.json"
+    path.write_text(payload, encoding="utf-8")
+
+    with pytest.raises(ValueError, match="non-finite JSON constant"):
+        load_portfolio_mandate(path)
+
+
+def test_mandate_normalizes_a_huge_json_integer_to_contract_value_error(tmp_path):
+    raw = load_mandate().to_dict()
+    raw.update(
+        status="proposed",
+        approved_at=None,
+        approved_by=None,
+        approved_fingerprint=None,
+        max_drawdown_pct=10**1000,
+    )
+    path = tmp_path / "huge-integer-mandate.json"
+    path.write_text(json.dumps(raw), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="non-negative finite number"):
+        load_portfolio_mandate(path)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("approved_by", True, "approved_by"),
+        ("approved_by", " ", "approved_by"),
+        ("approved_by", " owner", "approved_by"),
+        ("approved_by", "owner ", "approved_by"),
+        ("approved_at", True, "approved_at"),
+        ("approved_at", "2026-07-29T12:00:00", "approved_at"),
+        ("approved_at", "2026-07-29T12:00:00Z", "approved_at"),
+        ("approved_at", "0001-01-01T00:00:00+14:00", "approved_at"),
+        ("approved_fingerprint", True, "approved_fingerprint"),
+    ),
+)
+def test_approved_mandate_requires_canonical_approval_metadata(
+    tmp_path,
+    field,
+    value,
+    message,
+):
+    raw = load_mandate().to_dict()
+    raw[field] = value
+    path = tmp_path / f"invalid-{field}.json"
+    path.write_text(json.dumps(raw), encoding="utf-8")
+
+    with pytest.raises(ValueError, match=message):
+        load_portfolio_mandate(path)
+
+
+def test_approved_mandate_rejects_equality_trap_metadata_subclasses():
+    class EqualText(str):
+        def __eq__(self, _other):
+            return True
+
+        def __ne__(self, _other):
+            return False
+
+    mandate = load_mandate()
+    with pytest.raises(ValueError, match="approved_by"):
+        dataclasses.replace(mandate, approved_by=EqualText("attacker")).validate()
+    with pytest.raises(ValueError, match="approved_fingerprint"):
+        dataclasses.replace(
+            mandate,
+            approved_fingerprint=EqualText("not-the-fingerprint"),
+        ).validate()
+
+
 def test_mandate_metric_scorecard_fails_closed_on_missing_metric():
     mandate = load_mandate()
     result = evaluate_mandate_metrics(
@@ -96,6 +175,26 @@ def test_mandate_metric_scorecard_rejects_a_stray_boolean_metric():
             "max_time_under_water_sessions": 100,
             "downside_capture_pct": 60,
             "upside_capture_pct": 90,
+        },
+    )
+    drawdown = next(
+        check for check in result["checks"] if check["name"] == "max_drawdown_pct"
+    )
+    assert drawdown["available"] is False
+    assert drawdown["actual"] is None
+    assert drawdown["passed"] is False
+
+
+def test_mandate_metric_scorecard_contains_integer_overflow():
+    mandate = load_mandate()
+    result = evaluate_mandate_metrics(
+        mandate,
+        {
+            "annualized_volatility_pct": 15,
+            "max_drawdown_pct": 10**10_000,
+            "max_time_under_water_sessions": 100,
+            "downside_capture_pct": 60,
+            "upside_capture_pct": 80,
         },
     )
     drawdown = next(

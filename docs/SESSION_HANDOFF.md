@@ -1,15 +1,167 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-26 by Codex after counter-reviewing Claude's amendments to
-the owner-directed main-line coordination of the three-strategy parallel
-development program. Corrected the same day under explicit owner clarification:
-the instruction removing Codex counter-review was accidental and is
-superseded. The standing lane loop remains Codex implementation, Claude
-independent review, then Codex counter-review plus the next bounded milestone
-before one combined Codex push.
+Prepared: 2026-08-29 by Codex after the owner directed a separate
+Target-Price Revision planning lane and a revised research/QC plan that can
+evolve through later gates into bounded QuantConnect autopilot. This remains
+the canonical generic-workflow handoff for the root project and preserves the
+2026-08-28 deferred-remediation state below. The three existing strategy lanes
+remain independent and were not inspected, modified, synchronized, or reviewed
+by this documentation task.
 
-This concise handoff replaces the SEP-3 pause-transition snapshot. Historical
-detail remains at
+## 0. Target-Price Revision fourth-lane planning addition
+
+- The owner directed a new sibling worktree at
+  `C:\git\customizedAgent\trading_agent_TargetPriceRevision` on branch
+  `codex/strategy-target-price-revisions`, based on exact `main` commit
+  `086b782e43a5ff889e71ec8e26334bb791ccac74`. The branch was local-only when
+  this documentation snapshot was prepared; no push or merge was performed.
+- The governing planning candidate is
+  `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
+  (26 pages; SHA-256
+  `9f00dd56bf7bec79b3f5362bba61fe71768d1f25e6e4350631dafd1253682633`).
+  Its authoritative lane state is
+  `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
+  The submitted source PDF remains proposal content only; its SHA-256 is
+  `53c549aef18aa1a63e6db8deb184bd654eb8ec637bb4ff3ae03f29abc4a2df0`.
+- The revised plan treats target-price revisions as a separate family from the
+  rating-only Analyst Revisions V2 lane. It adopts stock-first null closure,
+  cutoff-safe corrections, institution/catalyst independence, binary validity,
+  separate mapping/feature/active-signal coverage, immutable QC packets, and
+  separately gated shadow, paper, restricted-live, and bounded-unattended
+  stages. A valid target-price stock null cannot be rescued by ETF aggregation,
+  rating fusion, or a secondary cell.
+- The lane has zero authenticated production target events, accepted target
+  signals, outcome permits, permanent looks, ETF topologies, nonempty
+  portfolios, QC uploads/jobs/results, broker connections, shadow sessions,
+  paper/live intents, or promotion approvals. No credential, licensed row,
+  provider, outcome, QC, broker, operator database, scheduler, deployment,
+  evidence epoch, paper order, live order, or capital surface was accessed.
+- Later owner workflow decision, 2026-08-29: Target-Price Revisions uses the
+  serialized Codex-write -> Claude-review -> Codex-counter-review plus next
+  milestone -> Claude-review loop on the same
+  `codex/strategy-target-price-revisions` branch and dedicated worktree. Each
+  role may make several commits in its round but pushes exactly once at the
+  end. No review, counter-review, checkpoint, handoff, or feature branch is
+  created. The worktree is target-price-only; external findings are recorded
+  for later owner routing and are not fixed from this lane.
+- Before any target-price outcome access, TPR-0 must freeze its exact source,
+  timing, formula, split/FX/horizon, primary cell, power/economic gates,
+  permanent look budget and null disposition. The owner must also amend the
+  common multiplicity/final-holdout contract to four families or explicitly
+  exclude TPR. Local configuration cannot grant that authority.
+- The exact next step is to complete the current Codex documentation round and
+  make its one end-of-round push when publication is requested. Claude then
+  independently reviews the exact pushed range on this same branch/worktree.
+  TPR-0 is not started by creating the worktree. Provider/data access, outcome
+  research, ETF work, QC execution, shadow, paper, live and unattended
+  operation remain separately gated.
+- `docs/ACTION_PLAN_2026-08-20.md` receives only the concise sequencing and
+  authority reference above. The existing three-lane direction, records and
+  data-source register remain unchanged. The same-branch exception is now
+  explicitly extended only to Target-Price Revisions; no shared-file or other
+  lane exception is extended by inference.
+
+## 0A. Deferred P2/P3 remediation handoff
+
+- Current documentation branch:
+  `codex/document-deferred-p2-p3-remediation-20260828`, created from exact
+  integrated root-review baseline
+  `da7e0d8b63aeb48a19dca86f0811777c8c74078c`.
+- Published `origin/main` at audit time:
+  `da7e0d8b63aeb48a19dca86f0811777c8c74078c`. Local `main` matched it before
+  this documentation branch was created. This is PR #319's merge of the
+  accepted root-remediation counter-review; it does not contain the three
+  still-independent strategy lanes.
+- Queued-plan record commit:
+  `3c55b3c3d522f83201f45c22b9f11bed956cd6e1`. Its authoritative HOW/WHERE,
+  sequencing, acceptance and authority record is
+  `docs/Plan/POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md`.
+- Accepted-after-correction implementation commit:
+  `242f8eb7ef5022ed17e86502896ae19e7621e55c` (parent `6a50734`, tree
+  `b97cccb5be0a2f19fe96ffc5a194bdfa411a83f3`).
+- Authoritative counter-review record commit:
+  `699f6bc970f1ab5978c9a994d803b5dc09fc1fbd`. The full P0–P3 ledger,
+  six-commit disposition table, corrected historical count, implementation
+  record, validation evidence, and open HOW/WHERE plans are in
+  `docs/Archive/Review/COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md`.
+- All six Claude commits are **accepted after correction**:
+  `4fc2c60e41c49056b4c3babf35af3acc56c6e6fe`,
+  `0eaf420293733b7a31b4b62e07fe3eb0c2dfdad8`,
+  `ae55d865f184d513448e571ebe3e1e8bd863aa34`,
+  `eeeab1370923ec0c2bf6f06c643f5d63ec6019c9`,
+  `76139b4efb751de8f7fd863a7a5dfc6f2f92da9d`, and
+  `6a507341896850076c13050da080f888d6eb31aa`. Merge-tree identity was accepted
+  separately from inherited content correctness.
+- No P0 remains. The historical Claude report has 45 unique finding IDs, not
+  46: P1=2, P2=13, P3=20, and ten invalidly classified P4 rows. `BRK-003` has
+  no finding row. Claude's claimed explicit dispositions for 27 earlier
+  implementation commits were not present and were not invented here.
+- Final implementation validation on the exact code tree: changed/new tests
+  **1,681 passed, 0 failed, 1 warning**; complete suite **5,720 passed, 2
+  skipped, 0 failed, 25 warnings in 1,843.55 seconds**; repository-wide
+  `compileall` exited 0; `git diff --check` was clean; and no likely added
+  credential/private-key shape was found. The 70 documentation and remediation
+  ledger guards passed after the report update and again after this handoff
+  replacement.
+- Validation of this documentation change: the 71 active-document/remediation
+  guards passed; deleting one queued finding made the new relational guard fail
+  and restoration returned it green; and repository-wide `compileall` exited
+  0. `git diff --check` was clean and the changed paths contained no recognized
+  credential/private-key shape. The complete 5,723-test run reported **5,720
+  passed, 2 skipped, 1 failed, 25 warnings in 4,259.71 seconds**. The sole
+  failure was a host-load timeout:
+  the exact Windows operational-contract verifier exceeded its hard-coded
+  30-second PowerShell subprocess limit. It passed both in its complete
+  50-test module (**50 passed in 237.75 seconds**) and again alone after the
+  full run (**1 passed in 20.19 seconds**). No product assertion failed; the
+  complete-suite result is nevertheless recorded as red, not called green.
+- The seven carried findings remain open and mandatory: `RCR-014` and
+  `RCR-015` are P2; `RCR-016` through `RCR-020` are P3. Their source evidence
+  remains unchanged in the archived counter-review. The queued plan refines
+  how and where they must be corrected, how each closes, and how the final
+  integrated tree must be reviewed.
+- These findings principally belong to the trading assistant / paper-live
+  product, broker/event storage, reporting and process boundary. Only the
+  provider-neutral Decimal primitive tranche of `RCR-019` belongs to the
+  temporary shared kernel. None of the seven is a research/QC strategy defect,
+  although the future Full Project Review must independently review the merged
+  research/QC product and the integration seam.
+- Current row hashes are unkeyed consistency evidence, not cryptographic
+  authentication. The future recovery and checkpoint work must share one
+  explicit threat model and must not claim deletion, reorder, rollback or
+  hostile-rewrite resistance without an ordered prefix and an appropriate
+  authority outside the mutable database.
+- `ARV-001` through `ARV-014` remain delegated to the Analyst Revisions V2
+  lane. They are not accepted, closed, or implemented by this root review.
+  Insider Buying and Short Interest were likewise untouched. No feature-lane
+  record was changed.
+- Analyst identity semantics remain explicit: the measured `768` diagnostic
+  count is a **lower bound**, never an **allowlist**; **current-ticker joins are
+  prohibited**. **Normative strategy design** and **observed provider**
+  availability/history remain separate evidence categories.
+- No provider, credential, licensed row, outcome, QuantConnect job, broker,
+  operator database, live scheduler, deployment, evidence epoch, paper order,
+  live order, or research look was accessed or changed.
+- This documentation is not a feature milestone, so
+  `docs/FEATURE_MILESTONE_RECORD.md` remains unchanged. The owner-directed
+  future gate was added concisely to `docs/ACTION_PLAN_2026-08-20.md`; the
+  implementation detail stays in the queued plan.
+- The root counter-review remains **DONE**. This documentation task does not
+  reopen it and grants no remediation authority now. The next Full Project
+  Review may begin only after all three feature branches complete their lane
+  review loops, the owner merges those exact heads into `main`, and the owner
+  explicitly starts the review/correction work from that integrated commit.
+- Until that explicit activation, do not implement `RCR-014` through
+  `RCR-020`, start a new whole-project audit, edit a strategy lane, unfreeze
+  SEP-3, or infer provider, research-look, QC, broker, operator-database,
+  deployment, paper-order, live-order or trading authority.
+
+The owner clarification remains binding: the standing strategy-lane loop is
+Codex implementation, Claude independent review, then Codex counter-review
+plus the next bounded milestone before one combined push. That lane-specific
+workflow did not authorize edits from this generic root review.
+
+Historical coordination detail remains at
 `docs/Archive/Session/SESSION_HANDOFF_THROUGH_2026-08-25_SEP3_EIGHTH_DRY_RUN.md`
 and in `docs/Archive/Review/`.
 
@@ -17,20 +169,22 @@ and in `docs/Archive/Review/`.
 
 1. `CLAUDE.md` and `AGENTS.md`.
 2. `docs/ACTION_PLAN_2026-08-20.md`.
-3. `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`.
-4. `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`.
-5. `docs/Strategy Description/README.md`.
-6. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
-7. The selected lane's PDF and implementation record.
-8. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
-9. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
+3. `docs/Plan/POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md`.
+4. `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`.
+5. `docs/Archive/Review/COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md`.
+6. `docs/Archive/Review/COUNTER_REVIEW_2026-08-26_THREE_STRATEGY_DIRECTION.md`.
+7. `docs/Strategy Description/README.md`.
+8. `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md`.
+9. The selected lane's PDF and implementation record.
+10. `docs/Strategy Description/THREE_STRATEGY_DATA_SOURCE_REGISTER.md`.
+11. `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md` before any separation
    discussion and `docs/operations/OPERATIONAL_FACTS.md` before operational
    work.
 
 ## 2. Exact baseline and branches
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Published `origin/main` at audit time:
+- Historical three-lane baseline `origin/main`:
   `6156ef9b92737c9b390a96d286b0fbde4ff4b19c`.
 - The owner directed deletion of merged branches; after cleanup only `main`
   and `origin/main` remained.
@@ -88,11 +242,23 @@ failures and 25 known warnings in 1,644.79 seconds**. No provider, outcome,
 QuantConnect job, broker, operator store, deployment, or strategy runtime was
 accessed or changed.
 
+One-time common-remediation synchronization, 2026-08-27: the owner-authorized
+exception was completed from `codex/full-review-p1-remediation-20260826` and
+published at the three exact heads in section 0. Shared patches are identical;
+Analyst-only code is present only on the Analyst lane. This synchronization did
+not accept a strategy or authorize the next milestone, and the exception is now
+exhausted.
+
 ## 3. Parallel-work exception and handoff rule
 
 During the three-lane phase, agents must not edit this handoff or the Action
-Plan on any lane. This common baseline is the one authorized update before the
-branches diverge. The relevant lane implementation record becomes that
+Plan on any of the three named lanes. The completed owner-directed one-time
+remediation synchronization was their sole implementation exception; it is
+exhausted. The owner's 2026-08-29 direction created a separate fourth planning
+lane and later explicitly assigned that target lane the same serialized
+same-branch review loop. This coordination update does not edit an existing
+lane record, revive the exhausted synchronization exception, or grant a
+shared-file exception. Each named lane's implementation record remains that
 branch's status, review ledger, validation record, and resume prompt.
 
 The owner-directed main-line coordination surface is
@@ -110,11 +276,12 @@ Codex then implements the next bounded milestone, validates both stages,
 updates the lane record, and makes exactly one combined push. Never
 force-push or rewrite published lane history.
 
-Lane agents also leave repository-shared merge surfaces unchanged, including
-`requirements.txt`, `config.py`, CI/tooling configuration, and shared test or
-classification manifests. New code, tests, and fixtures use lane-owned
-strategy namespaces. A true shared-file or dependency need stops for one
-owner-directed common-baseline amendment.
+After the exhausted one-time exception, lane agents again leave repository-
+shared merge surfaces unchanged, including `requirements.txt`, `config.py`,
+CI/tooling configuration, and shared test or classification manifests. New
+code, tests, and fixtures use lane-owned strategy namespaces. A later true
+shared-file or dependency need stops for a new owner-directed common-baseline
+amendment; the completed synchronization grants no continuing inference.
 
 ## 4. Strategy state
 
@@ -122,11 +289,18 @@ owner-directed common-baseline amendment.
 
 The active V2 record is
 `docs/Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md`.
-Existing `research/acer/` code supplies a reviewed immutable ratings-event
-backbone only. It does not implement the V2 firm-specific rating ontology,
-institution-stock-day dedupe, 20-session signal, sector standardization,
-reliability shrinkage, consensus/novelty diagnostics, ETF mapping, portfolio,
-walk-forward study, or QC algorithm. No V2 outcome look exists.
+The synchronized candidate now implements a strict zero-access safety and
+contract layer for immutable snapshots/datasets, canonical event/refusal and
+revision lineage, availability timing, permanent identities, rating ontology,
+stock-score primitives, sector validity, holdings/topology evidence, decimal
+costs, constrained all-cash-safe portfolio construction, preregistration, and
+outcome authorization refusal. The checked-in production source authority and
+all production source/classification/cost/rank catalogs remain empty; no
+provider-specific accepted-row normalizer, authenticated production event,
+real stock score, nonempty research portfolio, outcome study, walk-forward
+result, or QC algorithm exists. The candidate is unaccepted until Claude
+reviews the exact pushed range and Codex counter-reviews every Claude commit.
+No V2 outcome look exists.
 
 The V1 identity scan's 768 interleavings remain a lower-bound warning; an
 unflagged ticker means `no_name_based_ambiguity_evidence`, never a safety
@@ -152,6 +326,22 @@ new lane. No ingest, signal, ETF score, portfolio, or QC algorithm exists.
 Canonical V1 requires official-style twice-monthly short-interest snapshots;
 daily short-sale volume is prohibited as a proxy. A licensed historical/vintage
 short-interest source is the clearest missing paid input.
+
+### Target-Price Revisions
+
+The documentation-only record is
+`docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
+It is a separate fourth planning lane under the owner-directed serialized
+same-branch, one-push-per-role-round workflow. All feature implementation,
+review, counter-review, and next-milestone work stays on
+`codex/strategy-target-price-revisions` in the dedicated target worktree. No
+provider-specific target normalizer, authenticated target event, permanent
+target look authority, stock score, ETF topology, portfolio, QC algorithm,
+prospective shadow/paper evidence, or live authority exists. The submitted
+plan is replaced by a corrected stock-first blueprint whose later QC/autopilot
+stages remain individually owner-gated. The exact next action is the single
+end-of-round Codex push followed by Claude review of that exact range on the
+same branch, not implementation or data access.
 
 ## 5. Data acquisitions and confirmations
 
@@ -206,12 +396,14 @@ Separation finding identifiers retained for audit routing:
 ## 7. Integration boundary
 
 The ultimate target is one autopiloted QuantConnect trading agent, but the
-three lanes must not build it independently. After canonical strategies are
-independently validated, the owner must schedule a separate integration
-milestone for merge order, common schemas, late fusion, cross-signal
-correlation, risk budgets, combined costs/turnover/capacity, untouched final
-holdout, QC parity, paper deployment, monitoring, reconciliation, kill switch,
-and explicit promotion. No leverage is planned for the canonical strategies.
+three existing lanes and the separately planned Target-Price Revision lane
+must not build the combined agent independently. The target lane may prove
+standalone QC parity and later bounded operations under its own gates, but
+multi-signal fusion remains a separate owner-scheduled integration milestone
+for merge order, common schemas, late fusion, cross-signal correlation, risk
+budgets, combined costs/turnover/capacity, untouched final holdout, QC parity,
+paper deployment, monitoring, reconciliation, kill switch, and explicit
+promotion. No leverage is planned for the canonical strategies.
 
 Before any lane performs its first real-outcome study, the owner must freeze
 one common final-holdout cutoff and reserved period that all three lanes leave
@@ -220,23 +412,36 @@ selection family. A valid canonical null closes its family; it is not tuned or
 rerun to pass. Any later hypothesis needs a separately preregistered family
 and a new owner-authorized permanent look budget.
 
+Target-Price Revisions does not silently change that three-family contract.
+Before its first outcome access, the owner must either amend the combined
+evidence threshold and common holdout to four families or explicitly exclude
+TPR and assign it a separate permanent look/holdout contract. Until then its
+outcome authority is zero.
+
 ## 8. Resume prompt
 
 ```text
-Select exactly one strategy lane and use its long-lived codex/strategy-*
-branch in its own dedicated clone or worktree. Read CLAUDE.md, AGENTS.md, the
-main-line direction, shared workflow, that lane's owner PDF, implementation
-record, and the data-source register. Verify exact branch, HEAD, upstream, and
-clean status. Do not edit the Action Plan, Session Handoff, shared
-workflow/data register, another lane, SEP-3, requirements.txt, config.py,
-CI/tooling configuration, or shared test/classification manifests. Codex
-implements one bounded milestone in lane-owned files and updates the lane
-record before pushing; Claude reviews the exact pushed commits on the same
-branch from a separate checkout; Codex then counter-reviews every Claude
-commit, corrects confirmed defects, and, only when accepted and unblocked,
-implements the next bounded milestone before one combined push. Access no
-outcomes or providers unless that exact action is separately authorized and
-preregistered; provider access remains an open owner decision. Before any
-real-outcome study, freeze the one shared final holdout and three-attempt
-selection contract. Preserve paper-epoch-006.
+The root counter-review is complete. Do not start another whole-project review
+until the Analyst Revisions V2, Insider Buying, and Short Interest lanes have
+each completed their implementation/review/counter-review chain, the owner has
+merged their exact final heads into main, and the owner explicitly activates
+the post-integration Full Project Review and correction program. Then begin
+from the exact fetched main head and read CLAUDE.md, AGENTS.md,
+ACTION_PLAN_2026-08-20.md,
+POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md,
+THREE_STRATEGY_PROJECT_DIRECTION.md, all three final lane records,
+COUNTER_REVIEW_2026-08-27_ROOT_REMEDIATION.md, and the SEP-3 freeze record.
+Review every commit and merge since da7e0d8 plus the cumulative tree. Apply
+authorized corrections for every newly confirmed P0-P3 finding and close all
+seven carried findings RCR-014 through RCR-020. Report research/QC,
+paper-live, shared-kernel, architecture and integration conclusions
+separately; do not treat the seven assistant/shared findings as research
+defects. Use the generic independent-review workflow and preserve exact commit
+dispositions. Access no provider, credential, licensed row, outcome,
+QuantConnect job, broker, operator database, live scheduler, deployment,
+paper-order, live-order, evidence-epoch or SEP-3 surface by inference.
+Provider/outcome access remains an open owner decision; obtain that
+authorization before any such audit or run. Preserve zero looks,
+paper-epoch-006, the untouched shared final holdout, and the frozen SEP-3
+manifest.
 ```

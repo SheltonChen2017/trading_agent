@@ -13,9 +13,28 @@ risk and reservation layers retain every supplied decimal digit.
 """
 from data.financial_primitives import (
     MoneyInput,
+    decimal_effective_scale,
     decimal_or_none,
     decimal_text,
+    deterministic_decimal_divide,
+    deterministic_decimal_quantize,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    exact_decimal_sum,
     to_decimal,
 )
 
-__all__ = ["MoneyInput", "decimal_or_none", "decimal_text", "to_decimal"]
+__all__ = [
+    "MoneyInput",
+    "decimal_effective_scale",
+    "decimal_or_none",
+    "decimal_text",
+    "deterministic_decimal_divide",
+    "deterministic_decimal_quantize",
+    "exact_decimal_add",
+    "exact_decimal_multiply",
+    "exact_decimal_subtract",
+    "exact_decimal_sum",
+    "to_decimal",
+]

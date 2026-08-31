@@ -9,12 +9,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
 import pandas as pd
+import pytest
 
+from data.price_target_data import PriceTargetContractError
 from signals.analyst_target import scan_analyst_target_gap
 
 
 def _price_df(close: float, days: int = 30) -> pd.DataFrame:
-    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days)
+    dates = pd.bdate_range(end=pd.Timestamp("2024-01-31"), periods=days)
     closes = np.full(days, close)
     return pd.DataFrame(
         {"open": closes, "high": closes * 1.001, "low": closes * 0.999, "close": closes, "volume": 1_000_000.0},
@@ -26,7 +28,7 @@ def _history(entries: list[tuple[str, float]]) -> pd.DataFrame:
     dates = pd.to_datetime([e[0] for e in entries])
     return pd.DataFrame(
         {"firm": [f"firm_{i}" for i in range(len(entries))], "price_target": [e[1] for e in entries]},
-        index=dates,
+        index=pd.DatetimeIndex(dates, name="effective_session"),
     ).sort_index()
 
 
@@ -93,6 +95,53 @@ def test_returns_empty_when_as_of_is_none():
     price_df = _price_df(close=100.0)
     result = scan_analyst_target_gap({"AAA": price_df}, price_target_history={"AAA": pd.DataFrame()}, as_of=None)
     assert result.empty
+
+
+@pytest.mark.parametrize(
+    "close", [float("nan"), float("inf"), float("-inf"), 0.0, -1.0]
+)
+def test_signal_refuses_nonfinite_or_nonpositive_close(close):
+    price_df = _price_df(close=close)
+    as_of = price_df.index[-1]
+    recent_dates = pd.bdate_range(end=as_of, periods=6)[:5]
+    history = {
+        "AAA": _history(
+            [
+                (date.strftime("%Y-%m-%d"), target)
+                for date, target in zip(
+                    recent_dates, [120.0, 125.0, 130.0, 135.0, 140.0]
+                )
+            ]
+        )
+    }
+    with pytest.raises(PriceTargetContractError, match="finite positive"):
+        scan_analyst_target_gap(
+            {"AAA": price_df},
+            price_target_history=history,
+            as_of=as_of,
+        )
+
+
+@pytest.mark.parametrize("threshold", [float("nan"), float("inf"), -1.0, 0.0, True])
+def test_signal_refuses_invalid_gap_threshold(threshold):
+    price_df = _price_df(close=100.0)
+    with pytest.raises(PriceTargetContractError, match="gap_threshold_pct"):
+        scan_analyst_target_gap(
+            {"AAA": price_df},
+            price_target_history={},
+            as_of=price_df.index[-1],
+            gap_threshold_pct=threshold,
+        )
+
+
+def test_signal_refuses_timezone_instant_where_session_label_is_required():
+    price_df = _price_df(close=100.0)
+    with pytest.raises(PriceTargetContractError, match="session label"):
+        scan_analyst_target_gap(
+            {"AAA": price_df},
+            price_target_history={},
+            as_of=pd.Timestamp("2024-01-31T16:00:00-05:00"),
+        )
 
 
 if __name__ == "__main__":

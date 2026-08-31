@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 from scripts.audit_benzinga_ratings import (
+    _get,
     _last_updated_date_facts,
     _load_rows,
     _strip_key,
@@ -127,13 +128,50 @@ def test_analysis_refuses_an_incomplete_snapshot_without_override(tmp_path):
     assert _load_rows(snap, allow_incomplete=True)
 
 
-def test_recorded_urls_never_carry_a_credential():
-    for url in (
+@pytest.mark.parametrize(
+    "url",
+    [
         "https://api.example.com/x?apiKey=SECRET&cursor=abc",
-        "https://api.example.com/x?cursor=abc&api_key=SECRET",
-        "https://api.example.com/x?token=SECRET",
-    ):
-        assert "SECRET" not in _strip_key(url)
+        "https://api.example.com/x?APIKEY=SECRET",
+        "https://api.example.com/x?Api_Key=SECRET",
+        "https://api.example.com/x?access_token=SECRET",
+        "https://api.example.com/x?Api%5FKey=SECRET",
+        "https://api.example.com/x?token=SECRET&token=SECRET",
+        "https://api.example.com/x?cursor=ok#access_token=SECRET",
+        "https://user:SECRET@api.example.com/x?cursor=ok",
+    ],
+)
+def test_recorded_urls_never_carry_a_credential(url):
+    sanitized = _strip_key(url)
+    assert "SECRET" not in sanitized
+    assert "#" not in sanitized
+
+
+def test_url_redaction_preserves_repeated_noncredential_fields_in_order():
+    sanitized = _strip_key(
+        "https://api.example.com/x?cursor=one&APIKEY=first&cursor=two&apikey=second"
+    )
+    assert sanitized == (
+        "https://api.example.com/x?cursor=one&APIKEY=REDACTED&"
+        "cursor=two&apikey=REDACTED"
+    )
+
+
+def test_provider_exception_text_cannot_reintroduce_url_credentials():
+    class _ExplodingSession:
+        @staticmethod
+        def get(url, params, timeout):
+            raise RuntimeError(
+                "GET failed at https://api.example.com/x?"
+                "Api%5FKey=EXCEPTION_SECRET&cursor=ok#access_token=FRAGMENT_SECRET"
+            )
+
+    with pytest.raises(RuntimeError) as raised:
+        _get(_ExplodingSession(), "https://api.example.com/x")
+    message = str(raised.value)
+    assert "EXCEPTION_SECRET" not in message
+    assert "FRAGMENT_SECRET" not in message
+    assert message == "RuntimeError: provider request failed"
 
 
 @pytest.mark.parametrize(

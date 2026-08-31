@@ -158,6 +158,29 @@ def test_later_same_client_id_cannot_replace_the_durable_root(tmp_path):
     assert store.get_kill_switch()["active"] is True
 
 
+def test_missing_stream_event_is_not_projected_from_order_status(tmp_path):
+    store = _store(tmp_path)
+    _journal_root(store)
+    before = store.get_proposal("proposal-1")
+
+    result = handle_trade_update(
+        store,
+        {
+            "event": None,
+            "event_available": False,
+            "event_id": None,
+            "order": _order("order-1"),
+        },
+        observed_account=_ACCOUNT,
+    )
+
+    assert result is None
+    assert store.get_proposal("proposal-1") == before
+    heartbeat = store.get_system_state("trade_stream_heartbeat")
+    assert heartbeat["event_available"] is False
+    assert "unavailable" in heartbeat["error"].lower()
+
+
 def test_explicit_replacement_transition_preserves_the_root(tmp_path):
     store = _store(tmp_path)
     _journal_root(store)

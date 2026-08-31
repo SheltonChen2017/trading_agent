@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import pytest
 
+from research.acer.dataset import build_identity, validate_identity_record
+
 from research.acer.identity import (
     REASON_INTERLEAVED_NAMES,
     REASON_LIKELY_RENAME,
@@ -39,6 +41,34 @@ class _Event:
 
 def _by_ticker(identities):
     return {item.ticker: item for item in identities}
+
+
+def _validated_dataset_identity(event_count: int):
+    rows = [
+        {
+            "benzinga_id": f"event-{index}",
+            "date": "2024-03-14",
+            "time": "14:30:00",
+            "last_updated": "2024-03-14T18:31:00Z",
+            "ticker": f"T{index}",
+            "company_name": f"Company {index}",
+            "firm": "Example Securities",
+            "rating": "Buy",
+        }
+        for index in range(event_count)
+    ]
+    events, refusals = normalize_rows(rows)
+    identity, events_bytes, refusals_bytes = build_identity(
+        events,
+        refusals,
+        source_snapshot_name="snapshot-a",
+        source_manifest_sha256="b" * 64,
+    )
+    return validate_identity_record(
+        identity,
+        events_bytes=events_bytes,
+        refusals_bytes=refusals_bytes,
+    )
 
 
 # --------------------------------------------------------------------------
@@ -308,20 +338,18 @@ def test_absence_of_name_evidence_is_never_labelled_proof_of_unambiguity():
 
 def test_diagnostic_report_binds_source_dataset_code_and_assessment_content():
     identities = assess_identities([_Event("AAPL", "2024-01-02", "Apple Inc")])
+    dataset_identity = _validated_dataset_identity(1)
     report = build_diagnostic_report(
         identities,
         code_commit="a" * 40,
-        normalized_dataset_identity={
-            "dataset_id": "acer-analyst-events-0123456789abcdef",
-            "contract_version": 2,
-            "source_snapshot_name": "snapshot-a",
-            "source_manifest_sha256": "b" * 64,
-            "event_count": 1,
-        },
+        normalized_dataset_identity=dataset_identity,
     )
     assert report["code_commit"] == "a" * 40
-    assert report["normalized_dataset_id"] == "acer-analyst-events-0123456789abcdef"
+    assert report["normalized_dataset_id"] == dataset_identity.dataset_id
     assert report["source_manifest_sha256"] == "b" * 64
+    assert report["normalized_content_hash"] == dataset_identity.content_hash
+    assert report["normalized_events_sha256"] == dataset_identity.events_sha256
+    assert report["normalized_refusals_sha256"] == dataset_identity.refusals_sha256
     assert len(report["identity_assessments_sha256"]) == 64
     assert "not established as unambiguous" in report["warning"]
 
@@ -332,13 +360,29 @@ def test_diagnostic_report_refuses_lineage_that_does_not_cover_all_events():
         build_diagnostic_report(
             identities,
             code_commit="a" * 40,
-            normalized_dataset_identity={
-                "dataset_id": "acer-analyst-events-0123456789abcdef",
-                "contract_version": 2,
-                "source_snapshot_name": "snapshot-a",
-                "source_manifest_sha256": "b" * 64,
-                "event_count": 2,
-            },
+            normalized_dataset_identity=_validated_dataset_identity(2),
+        )
+
+
+@pytest.mark.parametrize(
+    "forged",
+    [
+        {"dataset_id": "acer-analyst-events-deadbeefdeadbeef"},
+        {"dataset_id": "acer-analyst-events-deadbeefdeadbeef", "event_count": 1},
+        {
+            "dataset_id": "acer-analyst-events-deadbeefdeadbeef",
+            "content_hash": "f" * 64,
+            "event_count": 1,
+        },
+    ],
+)
+def test_diagnostic_report_refuses_dataset_shaped_dictionaries(forged):
+    identities = assess_identities([_Event("AAPL", "2024-01-02", "Apple Inc")])
+    with pytest.raises(ValueError, match="strict typed loader"):
+        build_diagnostic_report(
+            identities,
+            code_commit="a" * 40,
+            normalized_dataset_identity=forged,
         )
 
 

@@ -3,6 +3,7 @@ Sanity tests for assistant/risk_copilot.py. Run with:
 python tests/test_assistant_risk_copilot.py
 """
 import sys
+from decimal import localcontext
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -135,6 +136,102 @@ def test_direct_malformed_snapshot_is_degraded_in_reports_and_blocked_by_gate():
     assert exposure.concentration_warnings
     assert "integrity unavailable" in exposure.concentration_warnings[0].lower()
     assert ViolationCode.INVALID_POSITION_DATA.value in gate.violation_codes
+
+
+def test_coherent_extreme_exact_evidence_remains_available():
+    extreme = PortfolioSnapshot(
+        positions=[],
+        cash=1e308,
+        total_equity=1e308,
+        cash_exact="1e308",
+        total_equity_exact="1e308",
+        as_of="2026-08-27",
+    )
+    policy = TradingPolicy(version="integrity-test", name="integrity-test")
+
+    compliance = check_policy_compliance(extreme, policy)
+    exposure = build_risk_exposure(extreme)
+    gate = validate_trade_intent(
+        TradeIntent(ticker="AAPL", side="sell", shares=1),
+        extreme,
+        reference_price=10,
+    )
+
+    assert compliance == []
+    assert exposure.available is True
+    assert exposure.cash_pct == 100.0
+    assert ViolationCode.INVALID_POSITION_DATA.value not in gate.violation_codes
+    assert ViolationCode.SELL_EXCEEDS_HELD.value in gate.violation_codes
+
+
+def test_policy_compliance_boundary_ignores_lowered_decimal_precision():
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "AAPL",
+                "shares": "1",
+                "entry_price": "5.004",
+                "current_price": "5.004",
+            }
+        ],
+        cash="94.996",
+    )
+    policy = TradingPolicy(
+        version="precision-test",
+        name="precision-test",
+        max_position_pct=0.05,
+        max_total_exposure_pct=0.05,
+        max_basket_pct=0.05,
+        max_leveraged_etf_pct=1.0,
+        min_cash_reserve_pct=0.95,
+    )
+
+    with localcontext() as context:
+        context.prec = 2
+        violations = check_policy_compliance(snapshot, policy)
+
+    assert any("AAPL is 5.00%" in violation for violation in violations)
+    assert any("Basket 'tech' is 5.00%" in violation for violation in violations)
+    assert any("Total invested exposure is 5.00%" in violation for violation in violations)
+    assert any("Cash reserve is 95.00%" in violation for violation in violations)
+
+
+def test_execution_gate_uses_canonical_duplicate_ticker_integrity_contract():
+    duplicate = PortfolioSnapshot(
+        positions=[
+            PortfolioPosition(
+                ticker="AAPL",
+                shares=1,
+                entry_price=10,
+                current_price=10,
+                market_value=10,
+                unrealized_pnl_pct=0,
+                is_leveraged_etf=False,
+            ),
+            PortfolioPosition(
+                ticker="AAPL",
+                shares=1,
+                entry_price=10,
+                current_price=10,
+                market_value=10,
+                unrealized_pnl_pct=0,
+                is_leveraged_etf=False,
+            ),
+        ],
+        cash=100,
+        total_equity=120,
+        as_of="2026-08-27",
+    )
+
+    gate = validate_trade_intent(
+        TradeIntent(ticker="AAPL", side="sell", shares=1),
+        duplicate,
+        reference_price=10,
+    )
+
+    assert gate.approved is False
+    assert ViolationCode.INVALID_POSITION_DATA.value in gate.violation_codes
+    assert any("duplicate position row" in item for item in gate.violations)
 
 
 def test_check_concentration_general_summary_when_no_basket_given():

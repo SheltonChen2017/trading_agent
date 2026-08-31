@@ -261,6 +261,17 @@ def test_trailing_and_leading_zeros_are_formatting_only():
     assert _unsupported_numbers("value 0", "value 0.0") == []
 
 
+def test_numeric_grounding_is_independent_of_ambient_decimal_precision():
+    """A caller's low Decimal precision must not round two source figures
+    into the same canonical identity or reject equivalent trailing zeros."""
+    from decimal import localcontext
+
+    with localcontext() as context:
+        context.prec = 3
+        assert _unsupported_numbers("value 1.2345", "value 1.2344") == ["1.2345"]
+        assert _unsupported_numbers("value 1.2344000", "value 1.2344") == []
+
+
 def test_sign_is_significant():
     assert _unsupported_numbers("fell -3.05", "rose 3.05") == ["-3.05"]
     assert _unsupported_numbers("fell -3.05", "fell -3.05") == []

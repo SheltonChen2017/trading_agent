@@ -74,7 +74,7 @@ def _metric_check(
                 f"metric {name!r} must be a number, got bool {actual!r}"
             )
         value = float(actual)
-    except (TypeError, ValueError):
+    except (OverflowError, TypeError, ValueError):
         value = math.nan
     valid = math.isfinite(value)
     return {

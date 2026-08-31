@@ -1,6 +1,8 @@
 """Tests for assistant/allocation_proposals.py -- the Watchlist
 "Create purchase proposals using this split" proposal generator."""
+import dataclasses
 import sys
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -10,18 +12,32 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from assistant.allocation_proposals import (
     DISCRETE_EVIDENCE_STATUS,
     EVIDENCE_STATUS,
+    allocation_plan_entry_notional_display,
     build_allocation_plan,
+    buy_proposal_refusal_reason,
     estimate_pending_buy_value_by_ticker,
     generate_allocation_buy_proposals,
     generate_discrete_buy_proposal,
+    summarize_allocation_plan,
 )
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy
 from assistant.schemas import DecisionPacket, MarketRegime
 
 
-def _packet(cash=10_000.0, positions=None, open_orders=None):
-    snapshot = build_portfolio_snapshot(positions or [], cash=cash, open_orders=open_orders)
+def _packet(
+    cash=10_000.0,
+    positions=None,
+    open_orders=None,
+    *,
+    open_orders_available=True,
+):
+    snapshot = build_portfolio_snapshot(
+        positions or [],
+        cash=cash,
+        open_orders=open_orders,
+        open_orders_available=open_orders_available,
+    )
     return DecisionPacket(
         generated_at="2026-07-27T12:00:00+00:00",
         portfolio=snapshot,
@@ -115,6 +131,184 @@ def test_evidence_status_is_user_directed_never_confirmed():
     for p in proposals:
         assert p.evidence_status == EVIDENCE_STATUS == "user_directed_allocation"
         assert p.evidence_status not in ("confirmed", "promising_unconfirmed")
+
+
+@pytest.mark.parametrize("unavailable_evidence", ("open_orders", "risk"))
+def test_every_allocation_buy_path_refuses_unavailable_evidence(
+    unavailable_evidence,
+):
+    packet = _packet(
+        open_orders_available=unavailable_evidence != "open_orders"
+    )
+    if unavailable_evidence == "risk":
+        packet.risk = dataclasses.replace(
+            packet.risk,
+            available=False,
+            unavailable_reason="portfolio integrity was not proved",
+        )
+
+    reason = buy_proposal_refusal_reason(packet)
+
+    assert reason is not None
+    assert "No buy proposal was created" in reason
+    assert build_allocation_plan(
+        packet,
+        _policy(),
+        {"NVDA": 100.0},
+        {"NVDA": 100.0},
+        100.0,
+    ) == []
+    assert generate_allocation_buy_proposals(
+        packet,
+        _policy(),
+        {"NVDA": 100.0},
+        {"NVDA": 100.0},
+        100.0,
+    ) == []
+    discrete = generate_discrete_buy_proposal(
+        packet,
+        _policy(),
+        ticker="NVDA",
+        shares=1,
+        price=100.0,
+    )
+    assert discrete["created"] is False
+    assert discrete["reason"] == reason
+
+
+def test_buy_paths_revalidate_snapshot_after_risk_was_computed():
+    packet = _packet(
+        positions=[
+            {
+                "ticker": "NVDA",
+                "shares": 1,
+                "entry_price": 100,
+                "current_price": 100,
+            }
+        ]
+    )
+    assert packet.risk.available is True
+    # Simulate mutation after the risk object was computed. The exact
+    # companion still says one share, so canonical revalidation must catch it.
+    packet.portfolio.positions[0].shares = 2
+
+    reason = buy_proposal_refusal_reason(packet)
+
+    assert reason is not None
+    assert "snapshot integrity" in reason.lower()
+    assert generate_allocation_buy_proposals(
+        packet,
+        _policy(),
+        {"NVDA": 100.0},
+        {"NVDA": 100.0},
+        100.0,
+    ) == []
+    assert generate_discrete_buy_proposal(
+        packet,
+        _policy(),
+        ticker="NVDA",
+        shares=1,
+        price=100.0,
+    )["created"] is False
+
+
+def test_allocation_sizing_is_independent_of_ambient_decimal_precision():
+    packet = _packet()
+    policy = _policy(whole_shares_only=False)
+    arguments = (
+        packet,
+        policy,
+        {"NVDA": Decimal("33.333")},
+        {"NVDA": Decimal("7.89")},
+        Decimal("1234.56"),
+    )
+    expected = build_allocation_plan(*arguments)
+
+    with localcontext() as context:
+        context.prec = 2
+        actual = build_allocation_plan(*arguments)
+
+    assert actual == expected
+    assert actual[0].shares == "52.156639391"
+
+
+def test_allocation_summary_uses_exact_plan_evidence_at_half_cent_boundaries():
+    plan = build_allocation_plan(
+        _packet(),
+        _policy(),
+        {"NVDA": Decimal("100")},
+        {"NVDA": Decimal("0.005")},
+        Decimal("2.675"),
+    )
+
+    with localcontext() as context:
+        context.prec = 2
+        summary = summarize_allocation_plan(
+            plan,
+            dollar_amount=Decimal("2.675"),
+            available_cash=Decimal("10"),
+        )
+
+    assert plan[0].planned_notional_exact == "2.675"
+    assert allocation_plan_entry_notional_display(plan[0]) == "2.68"
+    assert summary == {
+        "budget_exact": "2.675",
+        "budget_display": "2.68",
+        "planned_spend_exact": "2.675",
+        "planned_spend_display": "2.68",
+        "unallocated_exact": "0",
+        "unallocated_display": "0.00",
+        "remaining_cash_exact": "7.325",
+        "remaining_cash_display": "7.32",
+    }
+
+
+def test_allocation_summary_refuses_a_display_rounded_cash_overspend():
+    plan = build_allocation_plan(
+        _packet(cash="9.995"),
+        _policy(),
+        {"NVDA": Decimal("100")},
+        {"NVDA": Decimal("1")},
+        Decimal("10"),
+    )
+
+    with pytest.raises(ValueError, match="exceeds exact available cash"):
+        summarize_allocation_plan(
+            plan,
+            dollar_amount=Decimal("10"),
+            available_cash=Decimal("9.995"),
+        )
+
+
+def test_whole_share_floor_never_rounds_a_just_under_boundary_upward():
+    plan = build_allocation_plan(
+        _packet(),
+        _policy(),
+        {"NVDA": Decimal("100")},
+        {"NVDA": Decimal("1")},
+        Decimal("2.9999999999999999999999999999"),
+    )
+
+    assert plan[0].shares == 2
+    assert plan[0].planned_notional == 2.0
+
+
+def test_discrete_buy_notional_limit_is_exact_under_low_decimal_precision():
+    policy = _policy(max_order_value=Decimal("123300"))
+
+    with localcontext() as context:
+        context.prec = 2
+        result = generate_discrete_buy_proposal(
+            _packet(),
+            policy,
+            ticker="NVDA",
+            shares=999,
+            price=Decimal("123.45"),
+        )
+
+    assert result["created"] is False
+    assert "$123,326.55" in result["reason"]
+    assert "above your policy" in result["reason"]
 
 
 def test_discrete_buy_preserves_an_exact_share_request_at_the_policy_boundary():

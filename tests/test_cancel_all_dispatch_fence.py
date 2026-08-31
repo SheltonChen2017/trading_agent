@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from threading import Event, Lock, Thread
 from types import SimpleNamespace
 from uuid import uuid4
@@ -19,7 +19,12 @@ from assistant.dispatch_fence import (
     runtime_dispatch_attempts_path,
 )
 from assistant.order_reconciler import cancel_all_open_orders
-from assistant.proposal_status import SUBMITTING
+from assistant.proposal_status import (
+    BROKER_ABSENCE_GRACE_SECONDS,
+    EXECUTED,
+    SUBMISSION_UNKNOWN,
+    SUBMITTING,
+)
 from assistant.storage import AssistantStore
 
 
@@ -309,15 +314,21 @@ def test_real_alpaca_session_emergency_enumeration_cancels_valid_uuid_sibling(
             canceled.append(order_id)
 
     client = FakeTradingClient()
+    emergency_client = FakeTradingClient()
     monkeypatch.setattr(
         alpaca_broker_module,
         "_capture_connection_settings",
         lambda: ("test-key", "test-secret", True),
     )
+    def fake_factory(*_args, raw_data=False, **_kwargs):
+        selected = emergency_client if raw_data else client
+        selected._use_raw_data = raw_data
+        return selected
+
     monkeypatch.setattr(
         alpaca_broker_module,
         "_new_trading_client",
-        lambda *_args, **_kwargs: client,
+        fake_factory,
     )
     session = alpaca_broker_module.AlpacaBrokerSession()
 
@@ -419,6 +430,354 @@ def test_cancel_all_uses_durable_attempt_lookup_until_late_order_is_visible(tmp_
     assert canceled == ["late-indexed-order"]
     assert result["book_stable"] is True
     assert result["unresolved_attempt_count"] == 0
+
+
+def _save_cancel_all_absence_proposal(
+    store: AssistantStore,
+    *,
+    status: str,
+    updated_at: datetime,
+    durable_order_id: str | None = None,
+) -> None:
+    proposal = {
+        "proposal_id": f"absence-{status}",
+        "created_at": "2026-08-26T15:00:00+00:00",
+        "expires_at": "2026-08-27T15:00:00+00:00",
+        "status": status,
+        "idempotency_key": f"absence-{status}-client-id",
+        "intent": {
+            "ticker": "AAPL",
+            "side": "buy",
+            "shares": 1,
+            "order_type": "market",
+            "limit_price": None,
+        },
+    }
+    if durable_order_id is not None:
+        # This is the historical production shape: the old execution service
+        # stored the accepted broker response before setting `executed`.
+        proposal["broker_order"] = {
+            "order_id": durable_order_id,
+            "ticker": "AAPL",
+            "shares": 1,
+            "side": "buy",
+            "status": "accepted",
+        }
+    store.save_proposal(proposal)
+    with store._connect_writable() as connection:
+        connection.execute(
+            "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
+            (updated_at.isoformat(), f"absence-{status}"),
+        )
+
+
+def test_cancel_all_accepts_confirmed_absence_for_old_legacy_executed_row(
+    tmp_path,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    as_of = datetime(2026, 8, 27, 16, 0, tzinfo=timezone.utc)
+    _save_cancel_all_absence_proposal(
+        store,
+        status=EXECUTED,
+        updated_at=as_of
+        - timedelta(seconds=BROKER_ABSENCE_GRACE_SECONDS + 1),
+    )
+    lookups = 0
+
+    class Broker:
+        @staticmethod
+        def get_open_orders():
+            return []
+
+        @staticmethod
+        def find_order_by_client_id(client_order_id):
+            nonlocal lookups
+            assert client_order_id == "absence-executed-client-id"
+            lookups += 1
+            return None
+
+    result = cancel_all_open_orders(
+        store,
+        broker_module=Broker,
+        reason="old legacy executed absence",
+        now=as_of,
+    )
+
+    assert lookups == 3
+    assert result["book_stable"] is True
+    assert result["unresolved_attempt_count"] == 0
+    assert result["open_order_count"] == 0
+    assert result["final_open_order_count"] == 0
+
+
+def test_cancel_all_accepts_complete_book_absence_for_historical_executed_payload(
+    tmp_path,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    as_of = datetime(2026, 8, 27, 16, 0, tzinfo=timezone.utc)
+    _save_cancel_all_absence_proposal(
+        store,
+        status=EXECUTED,
+        updated_at=as_of
+        - timedelta(seconds=BROKER_ABSENCE_GRACE_SECONDS + 1),
+        durable_order_id="legacy-accepted-order",
+    )
+    cancel_attempts: list[str] = []
+
+    class Broker:
+        @staticmethod
+        def get_open_orders():
+            return []
+
+        @staticmethod
+        def cancel_order(order_id):
+            cancel_attempts.append(order_id)
+            raise RuntimeError("aged-out broker order was not found")
+
+    result = cancel_all_open_orders(
+        store,
+        broker_module=Broker,
+        reason="historical accepted-order absence",
+        now=as_of,
+    )
+
+    assert cancel_attempts == []
+    assert result["book_stable"] is True
+    assert result["unresolved_attempt_count"] == 0
+    assert result["open_order_count"] == 0
+    assert result["final_open_order_count"] == 0
+
+
+def test_cancel_all_malformed_legacy_timestamp_cannot_interrupt_visible_cancellation(
+    tmp_path,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    as_of = datetime(2026, 8, 27, 16, 0, tzinfo=timezone.utc)
+    _save_cancel_all_absence_proposal(
+        store,
+        status=EXECUTED,
+        updated_at=as_of,
+        durable_order_id="malformed-legacy-order",
+    )
+    with store._connect_writable() as connection:
+        connection.execute(
+            "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
+            ("0001-01-01T00:00:00+14:00", "absence-executed"),
+        )
+
+    canceled: list[str] = []
+
+    class Broker:
+        @staticmethod
+        def cancel_all_orders():
+            raise RuntimeError("bulk cancellation unavailable")
+
+        @staticmethod
+        def get_open_orders():
+            return [{"order_id": "visible-order"}]
+
+        @staticmethod
+        def cancel_order(order_id):
+            canceled.append(order_id)
+            return {"order_id": order_id, "status": "pending_cancel"}
+
+    result = cancel_all_open_orders(
+        store,
+        broker_module=Broker,
+        reason="malformed legacy timestamp",
+        now=as_of,
+    )
+
+    assert "visible-order" in canceled
+    assert set(canceled) == {"visible-order", "malformed-legacy-order"}
+    assert result["cancel_requested_count"] == 2
+    assert result["book_stable"] is True
+    assert any(
+        "bulk cancellation unavailable" in item["error"]
+        for item in result["errors"]
+    )
+
+
+@pytest.mark.parametrize(
+    ("status", "age_seconds"),
+    [
+        (EXECUTED, BROKER_ABSENCE_GRACE_SECONDS - 1),
+        (SUBMISSION_UNKNOWN, BROKER_ABSENCE_GRACE_SECONDS + 1),
+    ],
+)
+def test_cancel_all_does_not_suppress_durable_id_for_recent_or_ambiguous_row(
+    tmp_path,
+    status,
+    age_seconds,
+):
+    store = AssistantStore(tmp_path / f"durable-{status}.db")
+    as_of = datetime(2026, 8, 27, 16, 0, tzinfo=timezone.utc)
+    _save_cancel_all_absence_proposal(
+        store,
+        status=status,
+        updated_at=as_of - timedelta(seconds=age_seconds),
+        durable_order_id=f"durable-{status}-order",
+    )
+    cancel_attempts: list[str] = []
+
+    class Broker:
+        @staticmethod
+        def get_open_orders():
+            return []
+
+        @staticmethod
+        def cancel_order(order_id):
+            cancel_attempts.append(order_id)
+            raise RuntimeError("current absence is not sufficient")
+
+    result = cancel_all_open_orders(
+        store,
+        broker_module=Broker,
+        reason="durable identity remains conservative",
+        now=as_of,
+    )
+
+    assert cancel_attempts
+    assert set(cancel_attempts) == {f"durable-{status}-order"}
+    assert result["book_stable"] is False
+
+
+@pytest.mark.parametrize(
+    ("status", "age_seconds"),
+    [
+        (EXECUTED, BROKER_ABSENCE_GRACE_SECONDS - 1),
+        (SUBMISSION_UNKNOWN, BROKER_ABSENCE_GRACE_SECONDS + 1),
+    ],
+)
+def test_cancel_all_keeps_recent_or_ambiguous_absence_conservative(
+    tmp_path,
+    status,
+    age_seconds,
+):
+    store = AssistantStore(tmp_path / f"{status}.db")
+    as_of = datetime(2026, 8, 27, 16, 0, tzinfo=timezone.utc)
+    _save_cancel_all_absence_proposal(
+        store,
+        status=status,
+        updated_at=as_of - timedelta(seconds=age_seconds),
+    )
+
+    class Broker:
+        @staticmethod
+        def get_open_orders():
+            return []
+
+        @staticmethod
+        def find_order_by_client_id(_client_order_id):
+            return None
+
+    result = cancel_all_open_orders(
+        store,
+        broker_module=Broker,
+        reason="absence remains conservative",
+        now=as_of,
+    )
+
+    assert result["book_stable"] is False
+    assert result["unresolved_attempt_count"] == 1
+    assert any(
+        item.get("proposal_id") == f"absence-{status}"
+        and "absence is not sufficient" in item["error"]
+        for item in result["errors"]
+    )
+
+
+def test_cancel_all_records_use_one_explicit_schema_on_success_and_early_return(
+    tmp_path,
+):
+    expected_keys = {
+        "requested_at",
+        "reason",
+        "kill_switch_requested",
+        "kill_switch_active",
+        "local_stop_confirmed",
+        "runtime_stop_requested",
+        "runtime_stop_active",
+        "runtime_stop_confirmed",
+        "runtime_stop_error",
+        "local_stop_error",
+        "open_order_count",
+        "cancel_requested_count",
+        "managed_order_count",
+        "unmanaged_order_count",
+        "canceled",
+        "errors",
+        "book_scan_count",
+        "book_stable",
+        "final_open_order_count",
+        "unresolved_attempt_count",
+        "bulk_cancel_requested",
+        "dispatch_fence_acquired",
+        "dispatch_fence_error",
+        "scan_book_stable",
+    }
+
+    class EmptyBroker:
+        @staticmethod
+        def get_open_orders():
+            return []
+
+    class BrokenFacade:
+        @staticmethod
+        def open_alpaca_broker_session():
+            raise RuntimeError("session unavailable")
+
+    completed = cancel_all_open_orders(
+        AssistantStore(tmp_path / "completed.db"),
+        broker_module=EmptyBroker,
+        reason="completed schema",
+    )
+    early = cancel_all_open_orders(
+        AssistantStore(tmp_path / "early.db"),
+        broker_module=BrokenFacade,
+        reason="early schema",
+    )
+
+    assert set(completed) == expected_keys
+    assert set(early) == expected_keys
+    assert completed["managed_order_count"] == 0
+    assert early["open_order_count"] is None
+
+
+def test_cancel_all_primary_enumeration_failure_never_records_zero_initial_count(
+    tmp_path,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    canceled: list[str] = []
+
+    class Broker:
+        @staticmethod
+        def get_open_orders():
+            raise RuntimeError("strict open book unavailable")
+
+        @staticmethod
+        def get_open_order_ids_for_emergency():
+            return {
+                "order_ids": ["emergency-order"],
+                "complete": True,
+                "errors": [],
+            }
+
+        @staticmethod
+        def cancel_order(order_id):
+            canceled.append(order_id)
+            return {"order_id": order_id, "status": "pending_cancel"}
+
+    result = cancel_all_open_orders(
+        store,
+        broker_module=Broker,
+        reason="strict enumeration outage",
+    )
+
+    assert canceled == ["emergency-order"]
+    assert result["book_stable"] is True
+    assert result["open_order_count"] is None
+    assert result["final_open_order_count"] == 1
 
 
 def test_cancel_all_retries_a_transient_cancellation_failure_before_stable(tmp_path):

@@ -1,13 +1,13 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEW COMMIT `653f142` COUNTER-REVIEWED AND ACCEPTED AFTER
-DOCUMENTATION CORRECTION. SI-3B-R INDEXED AUTHENTICATED READINESS/REFERENCE
-CONSTRUCTION IS IMPLEMENTED AT `896bf35`, WITH LOAD-BEARING COMPLEXITY TESTS
-AT `123e14f`, AND IS PENDING CLAUDE REVIEW. CANONICAL PAYLOADS, REFUSALS,
-ORDERING, RATIOS, ACCELERATION, AND SHA-256 VALUES ARE UNCHANGED. SI-3B'S
-MATHEMATICAL STATUS IS UNCHANGED. FULL LICENSED SI-1/FULL SI-2, NORMALIZED
-`S0`/`S1`, `S2`-`S4`, DTC DELTA, OUTCOME TESTS, ETF PORTFOLIO, AND QC
-ALGORITHM/JOB REMAIN UNIMPLEMENTED OR GATED.**
+Status: **SI-3B-R INDEXED AUTHENTICATED READINESS/REFERENCE CONSTRUCTION AT
+`896bf35`, WITH LOAD-BEARING COMPLEXITY TESTS AT `123e14f`, WAS INDEPENDENTLY
+REVIEWED AT `fd272f4` AND IS COUNTER-REVIEWED AS ACCEPTED AFTER DOCUMENTATION
+CORRECTION. NO CODE CORRECTION WAS REQUIRED. CANONICAL PAYLOADS, REFUSALS,
+ORDERING, RATIOS, ACCELERATION, AND SHA-256 VALUES ARE UNCHANGED. NO NEXT CODE
+MILESTONE IS AUTHORIZED: FULL LICENSED SI-1/FULL SI-2, NORMALIZED `S0`/`S1`,
+`S2`-`S4`, DTC DELTA, SI-4 ETF AGGREGATION, OUTCOME TESTS, ETF PORTFOLIO, AND
+QC ALGORITHM/JOB REMAIN UNIMPLEMENTED OR GATED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -21,12 +21,14 @@ agents work serially on this same branch and follow
 agent may edit `docs/ACTION_PLAN_2026-08-20.md` or
 `docs/SESSION_HANDOFF.md`; this record is the lane's status and handoff.
 
-Owner direction, 2026-08-29: this lane is used only for QuantConnect testing
-of the Short Interest strategy. Future code and documentation in this lane
-must remain Short Interest/QC-specific; Trading App and Streamlit work are out
-of scope. This direction does not itself authorize an external QuantConnect
-upload or job run, licensed/provider access, outcome access, deployment, or
-trading.
+Owner direction, 2026-08-29, clarified again after the prior lane push: this
+lane is used solely for Short Interest development for QuantConnect testing
+and, eventually, autopiloted live trading. Future code and documentation in
+this lane must remain Short Interest/QC-specific; Trading App and Streamlit
+work are out of scope. The eventual destination is not present authority:
+this direction does not itself authorize an external QuantConnect upload or
+job run, licensed/provider or outcome access, paper/live deployment, broker or
+operator-database action, order submission, or trading.
 
 ## 1. Canonical V1 contract
 
@@ -130,6 +132,7 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-08-30 | Codex counter-review + implementation | `653f142` -> `123e14f` (exact code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3B-I review + SI-3B-R indexed authenticated readiness/reference construction | Accepted Claude commit `653f142` after documentation correction. Recorded its same-worktree process deviation and corrected the scope of its 91-failure mutation claim. `896bf35` centralizes latest-visible revisions, prior selection, lifecycle/classification selection, and readiness authentication into one indexed batch; `123e14f` makes the linear/indexed complexity claims load-bearing. No formula, score, parameter, provider, outcome, ETF, QC runtime, Trading App, or Streamlit behavior changed. | Exact `896bf35` code snapshot: **5,446 passed, 2 skipped, 0 failed, 25 known dependency warnings in 814.40s (13m34s)**. Final focused set at `123e14f`: **132 passed in 9.87s**; complete seven-file Short Interest lane: **215 passed in 14.66s**. Final repository, compileall, diff, and status evidence is itemized in section 20.6. Five local mutation groups plus the counter-review visibility mutation turned red; all were restored textually. Three independent audits found no remaining P0-P3 issue after correction. Synthetic/offline evidence only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR7-001` P2 and `SI-CCR7-002` P3 are closed by section 20. `SI-REV7-001` is closed by the canonical source sweep. `SI3BR-REV-001` through `SI3BR-REV-005` are closed in `896bf35`, `123e14f`, and this record. | Commit this record and make exactly one combined push. Claude reviews every new commit on this same branch/worktree before another milestone. All unresolved mathematical, data, outcome, ETF, and QuantConnect gates remain closed. |
 | 2026-08-31 | Claude review | `653f142` -> `4dc0066` reviewed; no code correction required (this record commit is the round's only change) | Independent review of the SI-3B-R indexed readiness/reference construction | Reviewed all three pushed commits individually. Verified the behaviour-preservation claim by differential execution rather than by reading the diff: the complete pipeline output is byte-identical across the refactor, and remains byte-identical on a richer four-row lifecycle input the shipped fixture cannot exercise. Confirmed the consolidation removes a duplicate prior-index implementation and that the deleted completeness assertion became a structural invariant rather than being dropped. | Baseline on the exact pushed tree `4dc0066`: **5,446 passed, 2 skipped, 0 failed, 25 known dependency warnings in 1,936.00s (32m16s)**, reproducing the implementer's figure exactly on Python 3.13.14 against their 3.12.13. Five mutations: both `bisect` boundaries and the linear-complexity assertion each turned a guard red; two survivors were then attacked directly and proved redundant rather than uncovered. compileall exit 0; `git diff --check` clean; active-document suite 63 passed against the final record text. Synthetic fixtures only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | **No P0-P3 defect.** Two advisory observations recorded with no change requested, and one process deviation disclosed against myself: I used a temporary detached worktree before reading `SI-CCR7-001`, and have removed it. Details in section 21. | Codex counter-reviews this record commit. Full licensed SI-1, full SI-2 ETF aggregation, normalized `S0`/`S1`, `S2`-`S4`, every outcome join, and all QuantConnect work remain gated. |
+| 2026-08-31 | Codex counter-review | `4dc0066` -> `fd272f4` reviewed (this lane-record commit follows) | Counter-review of Claude's SI-3B-R review record | Accepted the one documentation commit after correction. Verified its exact one-file scope, ancestry and three commit dispositions; independently inspected the indexed source/reference construction and found no Short Interest code P0-P3. Retained Claude's useful semantic evidence while correcting the repeated prohibited-worktree process disposition, unnamed 159-test mutation scope, SI-2/SI-4 milestone conflation, stale top status, and durable owner-scope wording. | Complete repository candidate: **5,446 passed, 2 skipped, 25 known dependency warnings in 2,250.00s (37m29s)**. Complete seven-file lane: **215 passed in 35.77s**. The four-file mutation scope collects **159 tests in 1.46s**. Replacing the inclusive lifecycle availability `bisect_left` with `bisect_right` made the exact-open guard fail (**1 failed in 3.18s**); exact Git-blob restore returned it green (**1 passed in 4.30s**). Three independent read-only audits found no code P0-P3; one also matched 5,000 deterministic randomized lifecycle/classification index cases to the legacy scan semantics. Python 3.13.14 / pytest 9.1.1. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR8-001` P2 and `SI-CCR8-002` through `SI-CCR8-004` P3 are closed by section 22. One provider-scale vintage-construction complexity observation is retained without a code change because that milestone is separately gated. | Commit this counter-review record locally, then stop before another milestone and before push. The owner must authorize one exact next milestone and its unresolved parameters; current lane authority does not permit Codex to choose them. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -2054,3 +2057,110 @@ name their set explicitly.
 3. Per the owner's 2026-08-29 lane-scope direction, any defect found outside
    Short Interest development for QuantConnect testing is documented here and
    left uncorrected. No such defect arose this round.
+
+## 22. Codex counter-review - 2026-08-31 (Claude SI-3B-R review record)
+
+Codex fetched only `origin/codex/strategy-short-interest`, remained in the
+single named worktree, and counter-reviewed Claude's one new commit. **Final
+disposition: `fd272f4` is accepted after documentation correction.** No
+Short Interest production-code correction was required and no unrelated
+application defect was fixed.
+
+### 22.1 Exact snapshot and commit disposition
+
+| Item | Exact value |
+|---|---|
+| Sole lane/worktree | `codex/strategy-short-interest` at `C:\git\customizedAgent\trading_agent_short_interest` |
+| Pre-review Codex head | `4dc00669222b0d567c9fbaaa26b3eedebc2aaada` |
+| Exact pushed Claude head | `fd272f46186f18616dc17fcfb8ca8e0ce7a497e0` |
+| Ordered Claude range | `4dc0066..fd272f4` (one ordinary commit, no merge) |
+| Changed path | `docs/Strategy Description/SHORT_INTEREST_IMPLEMENTATION_RECORD.md` only |
+| Disposition | `fd272f4`: accepted after documentation correction |
+| Counter-review interpreter | Python 3.13.14 / pytest 9.1.1 |
+
+Claude's three underlying dispositions for `896bf35`, `123e14f`, and
+`4dc0066` are accepted. The canonical source sweep uses inclusive authenticated
+open availability, latest visible revisions, stable-security immediate priors,
+and exact current/prior share linkage. The lifecycle/classification indices
+preserve inclusive availability and validity boundaries, deterministic
+ambiguity refusals, and one-pass reference construction. The context consumes
+the shared authenticated readiness/prior construction rather than retaining a
+second semantic implementation. No provider, outcome, execution, or authority
+dependency entered the lane.
+
+### 22.2 P0-P3 counter-review ledger
+
+| ID | Priority | Status | Location | Finding and impact | Correction / disposition |
+|---|---:|---|---|---|---|
+| SI-CCR8-001 | P2 | Closed by this record | Section 21.6 | Claude again created and used a detached temporary worktree even though the immediately preceding counter-review, `SI-CCR7-001`, explicitly prohibited detached, temporary, forked, or handed-off worktrees for this lane. The required reading order would have exposed that rule before validation began. Cleanup is confirmed and the submitted tree was unaffected, but section 21's blanket “No P0-P3” disposition cannot erase a repeated process violation previously ranked P2. | Retain the evidence with its disclosed limitation, classify the repeated deviation here, and keep all future implementation, review, mutation, differential, and validation work inside the one named worktree. No product-code fix applies. |
+| SI-CCR8-002 | P3 | Closed by this record | Sections 21.4 and 21.6 | Section 21 says mutation counts name their test set explicitly, but its table gives only `1 failed` or `159 passed` and names no files. A reader cannot audit the scope from those counts alone. | The set is now explicit: `test_short_interest_dataset.py` (24), `test_short_interest_pit_eligibility.py` (32), `test_short_interest_stock_features.py` (67), and `test_short_interest_stock_acceleration.py` (36), for **159 collected**. The earlier text remains historical; this entry supplies the missing scope. |
+| SI-CCR8-003 | P3 | Closed by this record | Section 21.8 and its push-ledger row | “Full SI-2 ETF aggregation” conflates two ladder milestones. SI-2 is PIT security/eligibility/denominator/classification readiness; PIT ETF reverse indexing and aggregation are SI-4. | Remaining gates are stated separately below as full licensed SI-1, full SI-2, and SI-4 ETF reverse indexing/aggregation. |
+| SI-CCR8-004 | P3 | Closed by this record | Record status and owner-direction header | The top status still called SI-3B-R pending Claude review after `fd272f4` accepted it. It also retained the earlier QC-only destination wording after the owner's later clarification added eventual autopiloted live trading as a lane purpose. | The header now records the completed Claude review and Codex disposition. The scope wording records the eventual destination without converting it into present QC, broker, deployment, order, or trading authority. |
+
+No P0 or P1 issue was found. No Short Interest/QC code P2 or P3 remains from
+this reviewed commit.
+
+### 22.3 Independent verification
+
+- Exact history verification found one documentation-only Claude commit,
+  correct fast-forward ancestry, the stated three-commit reviewed range, and
+  only lane-owned paths in the underlying SI-3B-R range.
+- The complete repository suite passed **5,446 tests**, skipped **2**, and
+  emitted **25 known dependency-deprecation warnings** in **2,250.00 seconds
+  (37m29s)**.
+- The full required `compileall` command, including `research`, exited 0. The
+  finalized active-document consistency suite passed all **63 tests**.
+- The complete seven-file Short Interest lane passed **215 tests in 35.77
+  seconds**. The four-file scope omitted from section 21 collected exactly
+  **159 tests in 1.46 seconds**.
+- A direct dangerous-direction reproduction changed lifecycle availability
+  insertion from inclusive `bisect_left` to exclusive `bisect_right`. The
+  exact-open boundary test failed as intended (**1 failed in 3.18 seconds**).
+  Restoring the exact tracked Git blob returned it green (**1 passed in 4.30
+  seconds**) and left no code diff.
+- Three independent read-only audits found no remaining P0-P3 code issue. One
+  ran **132** focused tests; another ran **168** focused tests and compared
+  **5,000** deterministic randomized lifecycle/classification cases against
+  the legacy scan semantics with no mismatch.
+- `git worktree list` contains only the named lane worktree. No temporary,
+  detached, forked, or handed-off worktree was created by this counter-review.
+
+All evidence was synthetic and offline. No credential, provider/licensed row,
+price or outcome, QuantConnect artifact/upload/compile/job, broker, operator
+database, scheduler, deployment, order, or trading surface was accessed.
+Permanent research looks used: **0**.
+
+One non-severity future observation is retained rather than fixed:
+`ShortInterestVintage` construction still performs repeated prior-link lookup
+work that can become quadratic at provider scale. SI-3B-R's indexed-readiness
+claim is accurate for a preconstructed authenticated vintage; it does not
+claim provider-scale ingest construction. That concern belongs to a separately
+authorized licensed-ingest milestone.
+
+### 22.4 Owner scope reconciliation and stop condition
+
+The owner's later 2026-08-29 instruction supersedes section 13.3 only as to
+the lane's eventual destination: this lane is solely for Short Interest
+development for QuantConnect testing and, eventually, autopiloted live
+trading. It does **not** authorize a QC upload or job, provider or outcome
+access, paper/live deployment, broker access, an order, or trading. Findings
+outside that strategy/QC destination are documented and left unfixed.
+
+There is no authorized next code milestone after this counter-review. Full
+licensed SI-1, full SI-2, normalized `S0`/`S1`, `S2`-`S4`, days-to-cover delta,
+SI-4 ETF reverse indexing/aggregation, every outcome join, portfolio stages,
+and all QuantConnect algorithm/job work remain behind explicit owner, data, or
+design gates. Under the binding same-lane workflow, this owner-decision blocker
+stops the loop before another implementation milestone and before push.
+
+The recommended next owner-authorizable bounded tranche is synthetic-only
+**SI-3C normalized `S0`/`S1` stock scores**, with no DTC extension, rank/seed,
+ETF, outcome, QC runtime, portfolio, or trading code. Before that tranche can
+start, the owner must freeze and authorize the exact epsilon and units,
+winsor bounds and cohort, quantile interpolation, minimum peer count, zero-MAD
+behavior, PIT taxonomy/version and peer-cohort rule, delayed-release/correction
+handling, and whether `S0` and `S1` share one cohort and winsor policy. Codex
+must not choose these outcome-sensitive degrees of freedom by inference.
+
+This record commit is local-only until the owner authorizes the next bounded
+milestone or separately directs a counter-review-only push.

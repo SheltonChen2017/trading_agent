@@ -1,0 +1,55 @@
+{
+  "fixture_kind": "synthetic-short-interest-pit-reference-v1",
+  "manifest": {
+    "reference_dataset_id": "synthetic-si-pit-reference-2024-03-02",
+    "source_id": "synthetic-pit-security-reference",
+    "source_version": "2026-08-29.v1",
+    "semantic": "pit_security_lifecycle_and_sector_reference",
+    "entitlement": "synthetic_fixture_only",
+    "retrieved_at": "2024-03-02T22:00:00Z",
+    "lifecycle_record_count": 2,
+    "classification_record_count": 1,
+    "source_body_sha256": "6992d76e0c0f1a41d352984748e83ce70f25742cbecdcfdcf266be113887916b",
+    "collector_git_commit": "48fa344858015c4bb5ce95697a9ce6c3e0eed365",
+    "schema_version": "1.0"
+  },
+  "lifecycle_rows": [
+    {
+      "security_id": "sec-synth-001",
+      "status": "listed",
+      "effective_date": "2020-01-01",
+      "available_at": "2020-01-01T14:30:00Z",
+      "observed_at": "2020-01-01T14:30:00Z",
+      "unresolved_actions": [],
+      "source_id": "synthetic-security-master",
+      "source_version": "2024.v1",
+      "raw_record_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "security_id": "sec-synth-001",
+      "status": "delisted",
+      "effective_date": "2024-03-01",
+      "available_at": "2024-03-01T22:00:00Z",
+      "observed_at": "2024-03-01T22:00:00Z",
+      "unresolved_actions": [],
+      "source_id": "synthetic-security-master",
+      "source_version": "2024.v1",
+      "raw_record_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "classification_rows": [
+    {
+      "security_id": "sec-synth-001",
+      "taxonomy_id": "SYNTHETIC_SECTOR_V1",
+      "sector_code": "TECHNOLOGY",
+      "industry_code": "SOFTWARE",
+      "valid_from": "2020-01-01",
+      "valid_to": null,
+      "available_at": "2020-01-01T14:30:00Z",
+      "observed_at": "2020-01-01T14:30:00Z",
+      "source_id": "synthetic-sector-master",
+      "source_version": "2024.v1",
+      "raw_record_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  ]
+}

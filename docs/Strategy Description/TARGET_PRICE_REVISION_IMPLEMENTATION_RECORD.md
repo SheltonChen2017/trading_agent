@@ -497,6 +497,7 @@ known.
 | 2026-08-30 | Codex counter-review correction | `db6a721d45eb47e1a133744387bf43a1aa1f310c` -> `0af1ca8c9165841373262bff4d173edc48aa1a74` plus final record/handoff correction | Counter-review only; next milestone blocked | Counter-reviewed `da6f7ea`, `5eecce5`, and `db6a721` individually; corrected the contradictory active state, hardened exact-current identity and routing guards, qualified review provenance and validation metadata, and removed the last stale pre-push handoff claim. No product, source, provider, or outcome code changed. | Exact post-guard target plus active-document suite **189 passed, 3 skipped in 13.20s**; preceding narrow document modules **76 passed in 3.71s**; network-restricted full run **5,838 passed, 5 failed, 5 skipped, 26 warnings in 1,282.03s**, with the exact five environment-affected nodes then **5 passed in 11.05s**; full compilation exit 0; mutations rejected; `git diff --check` clean. Python 3.12.13 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | No P0/P1. `TPR-CCR4-001` through `TPR-CCR4-006` are closed or qualified in section 18. | None; registries and zero-access declarations are unchanged. | Commit the final validation handoff and make this round's one push. Claude then reviews the exact correction range; TPR-1 and TPR-0B remain blocked. |
 | 2026-08-30 | Claude review | `c8c74704bb9bbda5a756d90afa33666371125a89` reviewed; corrections on this same lane branch | Independent review of Codex's counter-review correction range | Reviewed `0af1ca8` and `c8c7470` individually and the cumulative `c8c7470` tree. Reproduced rather than accepted Codex's two historical claims. Found and corrected a P1 that made the reviewed-algorithm anchor unreachable on the supported Windows checkout, added a lane-scoped `.gitattributes` and a regression guard, and refreshed the working tree to exact blob bytes. No product, provider, source, or outcome code changed. | At the reviewed tip the lane suite was **186 passed, 3 failed, 3 skipped**; after the correction **120 passed, 3 skipped** with the three anchor tests green. Five mutations on Codex's hardened current-state guard and two on the new byte guard each turned red with byte-identical restores returning green. Complete suite on the exact final tree **5,844 passed, 5 skipped, 0 failed, 25 warnings in 2,186.28s**, the 5,843 baseline plus exactly the one added guard; `compileall` exit 0; `git diff --check` clean. Provider/outcome accesses **0**; authorized/spent looks **0**. | Both Codex commits accepted. `TPR-CR4-001` (P1) closed by correction; `TPR-CR4-002` (P2) **open, owner decision required**; `TPR-CR4-003` and `TPR-CR4-004` (P3) closed by qualification. `TPR-OOL-008` documented, not fixed. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews this range. `TPR-CR4-002` needs the owner to say which worktree path is real before any resume pointer is trusted; TPR-1 and TPR-0B remain blocked. |
 | 2026-08-30 | Claude correction under owner direction | `50da9d07a46bcd0770fc3c9219b3d0a187494383` -> this round's head | Owner-directed worktree resolution; closes `TPR-CR4-002` | Replaced the hardcoded lane worktree in the Action Plan, Session Handoff, and record preamble with a `git worktree list` resolution instruction, and rewrote the guard to parse `git worktree list --porcelain` for this branch instead of comparing against a literal. The guard now also forbids any lane directory name in those three current-state surfaces. No product, provider, source, or outcome code changed. | Lane plus shared document suites **190 passed, 3 skipped**; complete suite on the exact final code tree **5,844 passed, 5 skipped, 0 failed, 25 warnings in 2,278.61s**, unchanged in count because the rewritten guard replaces a test rather than adding one; `compileall` exit 0; `git diff --check` clean. Four mutations (repinning a directory in each of the three surfaces, and removing the resolution instruction) each turned the guard red with byte-identical restores returning it green, and the porcelain parser was exercised directly and resolved this checkout. Provider/outcome accesses **0**; authorized/spent looks **0**. | `TPR-CR4-002` closed by owner direction. No P0, P1, or P2 remains open. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews `ea9d890`..this head. TPR-1 and TPR-0B remain blocked. |
+| 2026-08-31 | Codex counter-review + correction | `f21d70851d5e1790be0c308e13e8837a7cd1d008` -> `943edf77ca61cae475e4986b985baab3097adfbc` plus final record candidate | Counter-review only; no next milestone authorized | Counter-reviewed `ea9d890`, `ce74e72`, `50da9d0`, and `f21d708` individually. Corrected ordinary-fast-forward LF migration, exact-byte and worktree-guard sensitivity/scope, current-role routing, and current range/report defects. Candidate/PDF and all authority JSON artifacts are unchanged. | Exact committed correction tree: target plus active-document suite **190 passed, 3 skipped in 13.88s**; network-restricted complete suite **5,844 passed, 5 skipped, 0 failed, 26 warnings in 1,030.57s**; full `compileall -q` exit 0. Exact-byte reverse mutation failed as required and its byte-identical restore passed; active-lane/no-registration and missing-current-instruction probes refused, while sibling text outside target blocks passed. Python 3.12.13 / pytest 9.1.1; system `core.autocrlf=true`. Provider/outcome accesses **0**; authorized/spent looks **0**. | No P0/P1. `TPR-CCR5-001` through `003` and `005` through `007` closed; `TPR-CCR5-004` (P2) open before any positive reviewed-algorithm authority. | None; registries remain empty/zero-access and no look is authorized or spent. | Commit the final record-only evidence, run the exact document guards/diff checks, make this round's single push, and have Claude review only the range beginning after `f21d708` and ending at the new pushed head. TPR-1 and TPR-0B remain blocked. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -1541,5 +1542,34 @@ No next implementation milestone was implemented.
 
 ### 21.6 Final validation
 
-Pending on the complete corrected tree; this subsection will be completed
-without rewriting the baseline evidence above.
+- Correction commit: `943edf77ca61cae475e4986b985baab3097adfbc`.
+- Target-price plus active-document suites on that exact commit: **190 passed,
+  3 skipped in 13.88s**.
+- Network-restricted complete suite on that exact commit: **5,844 passed, 5
+  skipped, 0 failed, 26 warnings in 1,030.57s**. The warning difference from
+  Claude's 25-warning run is environment output, not a test or behavior count.
+- Full `compileall -q` over `assistant backtest data execution ml research risk
+  scripts signals strategies tests baskets.py config.py market_analytics.py`
+  exited 0.
+- A real working-byte mutation in `canonical.py` turned the exact-byte guard
+  red; the byte-identical restore returned it green. Function probes proved
+  that an active lane with no registered worktree and a missing resolution
+  instruction in the current record preamble are refused, while a sibling
+  worktree name outside the Action Plan's target block is ignored.
+- All six policy paths matched their HEAD blobs after restore. The five
+  nonempty target policy paths resolve `text=set, eol=lf`; shared empty
+  `research/__init__.py` remains byte-empty and outside the lane attribute.
+- PDF raw SHA-256 remains
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`;
+  candidate raw SHA-256 remains
+  `17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a`.
+  Reviewed registry, source authority, and look authority artifacts have no
+  diff and remain empty/zero-access.
+- Final record-only successor: target and active-document guards **77 passed**;
+  `git diff --check` and clean status verification complete before
+  the one push.
+
+The full suite ran without external network permission and no provider,
+credential, licensed row, source sample, outcome, QuantConnect, broker,
+operator-database, scheduler, paper, live, deployment, or capital surface was
+accessed. Authorized or spent research looks: **0**. No authority changed.

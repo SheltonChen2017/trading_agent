@@ -9,7 +9,11 @@ CLAUDE COMMITS `dceff74` AND `3f2024b`, CORRECTING THREE CONFIRMED P2
 DATA-INTEGRITY DEFECTS (SEE SECTION 18). IB-1D REVIEW IS COMPLETE. IB-1 AND
 THE BOUNDED IB-1E OFFLINE MULTI-PERIOD SUPPLIED-LINK-EVIDENCE CONTRACT IS
 IMPLEMENTED AND HAS COMPLETED INDEPENDENT CLAUDE REVIEW, ACCEPTED AFTER
-CORRECTION (SEE SECTION 24). IB-1 AND
+CORRECTION (SEE SECTION 24). CODEX HAS COUNTER-REVIEWED CLAUDE COMMITS
+`f5ce0d41` AND `1e3594e3`, ACCEPTING THE FIRST AND ACCEPTING THE SECOND AFTER
+CURRENT-RECORD CORRECTION. THE BOUNDED IB-1F PERSISTED TWO-PERIOD OFFLINE
+INTEGRATION PROOF IS IMPLEMENTED IN `273b0da8` AND AWAITS INDEPENDENT CLAUDE
+REVIEW (SEE SECTION 25). IB-1 AND
 BLUEPRINT SECTION 19.4 STEP 3 ARE NOT COMPLETE: STRUCTURAL CROSS-QUARTER
 COMPOSITION NOW EXISTS, BUT NO OFFICIAL SEC PROFILE, REAL PACKAGE,
 AUTHENTICATED AMENDMENT LINK, COMPLETE AMENDMENT COVERAGE, OR CANONICAL FILTER
@@ -135,7 +139,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-30 | Codex implementation | `ad86df0` -> `e89293b` | IB-1E offline multi-period supplied-link evidence | Added deterministic composition of contiguous verified IB-1C periods, a non-official profile over amendment-link and primary-document-hash fields already inside IB-1C-bound metadata bytes, cross-period and same-quarter observation lineages, exact XML/link binding, sequential aggregate caps, factory-only identity/result boundaries, and literal-false official-link, completeness, and canonical-filter gates. Every supplied as-filed version is retained; no canonical row is produced. | Red collection failure before the contract existed; focused IB-1E **15 passed**; independent latest-tree IB-1C/IB-1D plus IB-1E **210 passed, 2 skipped**; ten-file Insider/record/import/hygiene/separation suite **539 passed, 7 skipped in 275.10s**; focused record plus IB-1E **16 passed**; Insider compileall and `git diff --check` clean apart from line-ending notices. Synthetic fixtures only; no SEC/provider/credential/licensed row/outcome/QC/broker/operator/scheduler/UI/order access; **0 research looks**. | IB1E-R01 and R02 (P2) and R03 (P3) were fixed before commit; two independent final reviews reported no remaining P0-P3 finding. IB1D-R08 is closed only for structural cross-period composition. IB1D-R09 remains an open authority blocker. IB1E-R04/R05 are deferred P3 integration/consolidation debt. | Validate exact commit `e89293b` with the complete suite and whole-repository compileall, append the immutable result, rerun record-sensitive checks, and push the counter-review, implementation, and validation-record commits together. |
 | 2026-08-30 | Codex validation | `e89293b` -> `e89293b` (exact tested snapshot; this validation-record commit follows) | IB-1E final exact-tree validation | Revalidated the committed counter-review corrections, strict metadata helper, IB-1E code, tests, exports, and section 19 without changing product files. The later validation commit changes only this lane record. | Complete exact-tree suite: **5,710 passed, 10 skipped, 0 failed, 25 warnings in 2,290.57s (38m10s)**; whole-repository compileall including `research` exit 0; pre-commit focused lane suite **539 passed, 7 skipped**; focused IB-1E **15 passed**; final active-document, lane-record, and IB-1E checks **79 passed in 19.29s**; `git diff --check` clean apart from line-ending notices. Synthetic fixtures only; no filing, package, API, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, UI, or order access; **0 research looks**. | No new P0-P3 finding. The ten skips are platform-conditional and the 25 warnings are dependency/runtime deprecations. Exact snapshot `e89293b` stayed clean throughout the 38-minute run. | Commit this validation row, rerun record-sensitive checks, confirm the remote remains `3f2024b`, and make the round's single push. Claude independently reviews all three pushed commits before further Insider work. |
 | 2026-08-31 | Claude review | `3f2024b` -> this review snapshot | Independent review of the IB-1D counter-review and the bounded IB-1E multi-period supplied-link evidence contract, after the four-lane merge to main (`3f2024b..cf136e2`; 9 of 194 commits touch this lane) | Verified the sync and ancestry, dispositioned every Insider commit including the main merge, re-probed all three P2 parser/identity corrections against the unmodified tree rather than reading the record, checked the new cardinality guard is not over-broad, and mutation-swept IB-1E's authority and join guards. Adopted the ten-column ledger. Full dispositions are in section 24. | Ten-file set (named exactly in 24.8) **543 passed, 7 skipped**, 550 collected versus 549 at the committed head; complete suite on the exact final review tree: **6791 passed, 13 skipped, 25 warnings in 8025.55s (2:13:45)** after repairing three stale-CRLF analyst spec artifacts in this worktree (first run **1 failed, 6790 passed, 13 skipped, 25 warnings in 1304.28s (0:21:44)**, the single failure being that host-local checkout artifact and not this review's change; see 24.7); IB-1E sweep **2 of 7 caught, 4 traced to masking guards, 1 gap closed and then caught**; six direct corrections probes including a routine two-transaction Form 4 that still parses; compileall exit 0; every module restored byte-identical to `HEAD`. No SEC/EDGAR, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | Accepted all five counter-review findings against this reviewer, including two P2 parser defects in the canonical eligibility path that I missed by treating inherited IB-0 code as settled while reviewing a milestone that newly depends on it. IB1E-R06 (P3) fixed here: the supplied XML-to-acceptance issuer binding had no test sensitivity. IB1E-R07 (P3): the recorded ten-file composite is unnamed and unreproducible. Out-of-lane items, including R-01's partial overtaking by main's EXE-001 fix and the now-moot frozen-file regime, are documented in 24.7 and not fixed. | Codex counter-reviews these Claude commits, then may begin the next bounded Insider milestone. |
-
+| 2026-08-31 | Codex counter-review + implementation | `cf136e25..1e3594e3` reviewed; `1e3594e3` -> `273b0da8` implementation snapshot (this lane-record commit follows) | Claude counter-review plus bounded IB-1F persisted two-period offline integration proof | Accepted Claude's issuer-binding regression, corrected its merge-aware review scope and combined-range diff evidence, and added a synthetic persisted Q4-to-Q1 proof through the real IB-1A publisher, IB-1B publisher/loader, IB-1C publisher/loader, and IB-1E call-time loader. The success path uses no loader substitution; independent parsed-path, raw-path, and receipt-to-upstream cross-wires refuse before XML parsing. No production code or authority flag changed. | Exact implementation tree `273b0da8`: complete suite **6,795 passed, 13 skipped, 0 failed, 26 warnings in 2,185.89s (36m25s)**; whole-repository compileall including `research` exit 0; final IB-1F module **4 passed in 25.87s**. Claude's issuer regression passed and its in-memory issuer-binding bypass was caught. All bytes and rows are synthetic; no filing, package, API, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, UI, or order access; **0 research looks**. | `f5ce0d41` accepted; `1e3594e3` accepted after current record correction. IB1E-CCR01 (P2) and IB1E-CCR02 (P3) are closed in section 25. IB1E-R04 is closed only as persisted synthetic integration debt; IB1F-A01/A02 (P3) were fixed before commit. IB1E-R07 remains open record-precision debt. IB-1, blueprint step 3, IB1D-R09, and every official-data or canonical-authority gate remain open. | Commit this lane record, rerun record-sensitive and diff checks, confirm the remote remains `1e3594e3`, and make the round's single push. Claude independently reviews both Codex commits before any further Insider milestone. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -2497,3 +2501,126 @@ deferred consolidation and test-infrastructure debt. The out-of-lane items in
 Next authorized step: Codex counter-reviews these Claude commits, then may
 begin the next bounded Insider milestone. No live SEC ingest, research look,
 outcome join, QuantConnect job, broker action, or UI work is authorized.
+
+## 25. Codex counter-review and IB-1F persisted integration (2026-08-31)
+
+Codex paused the `Insider Claude push monitor` heartbeat before repository
+work, fetched the dedicated branch, and confirmed that local `HEAD` and
+`origin/codex/strategy-insider-buying` were both
+`1e3594e3108d8c48f23e1a0e3c11e78305a76651`. The worktree contained no prior
+uncommitted change. This round counter-reviews Claude commits `f5ce0d41` and
+`1e3594e3`, corrects their review record, and implements only the next bounded
+offline Insider milestone in commit `273b0da8`.
+
+The round changes one Insider test module and this lane record. It changes no
+Trading App, Streamlit, execution, broker, risk, scheduler, signal, portfolio,
+or other strategy surface. All new bytes and rows are synthetic. No SEC/EDGAR
+filing or package, provider, API, credential, licensed row, market outcome,
+QuantConnect job, broker, operator database, scheduler, UI, or order was
+accessed. **0 research looks.**
+
+### 25.1 Commit dispositions and merge-aware correction
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `f5ce0d41` Bind supplied IB-1E XML issuers to their verified acceptance evidence | **Accepted.** | The added regression isolates the supplied-XML issuer versus IB-1C-verified primary-document-URL CIK guard while keeping the existing corpus-level same-issuer check satisfied. It passes on the unmodified tree, and an in-memory bypass of that exact guard makes the test fail with `DID NOT RAISE`. No production code changed. |
+| `1e3594e3` Record review of the IB-1D counter-review and IB-1E evidence contract | **Accepted after current-record correction.** | Its code assessment and validation evidence are sound. Sections 24.2 and 24.8 undercounted the merge-aware lane history and described only the test commit's diff as the whole review diff; the superseding corrections are below. |
+| `19ae3f9f` Merge pull request #322 from SheltonChen2017/codex/strategy-insider-buying | **Accepted; explicit omitted-merge disposition.** | This is the actual Insider-to-main integration merge. Every lane-owned path is byte-identical to second parent `8321c807`; there is no merge-only conflict resolution in the Insider tree. |
+| `d9b05eb6` Merge updated main into Analyst Revisions after lane integrations | **Accepted as lane-carrying propagation context; explicit omitted-merge disposition.** | Every lane-owned path is byte-identical to second parent `19ae3f9f`; the merge carries the reviewed Insider tree into later history without changing it. Analyst content remains out of this lane's review scope. |
+
+The merge-aware command `git log --full-history 3f2024b..cf136e25 --
+<lane-owned paths>` returns **12**, not nine, relevant commits: the ten entries
+already grouped in section 24.2 plus `19ae3f9f` and `d9b05eb6`. The other 182
+commits in the 194-commit ancestry range remain merged baseline context, not
+commits represented as individually reviewed for Insider behavior.
+
+### 25.2 P0-P3 counter-review and milestone ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1E-CCR01 | P2 | Closed in this record | `1e3594e3` | Section 24 introduction and 24.2 | The review claimed every Insider commit, including the main merge, was dispositioned while counting nine and omitting both lane-carrying merges. That made an owner-mandated merge-review gate appear complete without an explicit disposition. | Full-history path traversal returns 12 commits and names `19ae3f9f` and `d9b05eb6` in addition to section 24.2's ten grouped commits. | Merge commits must be reviewed explicitly because conflict resolution can change the resulting code even when ordinary first-parent history looks clean. | Added both explicit dispositions and narrowed the remaining 182 commits to out-of-lane merged context. | Each merge's lane-owned tree is byte-identical to its lane-bearing second parent. |
+| IB1E-CCR02 | P3 | Closed in this record | `1e3594e3` | Section 24.8 | “This review's diff” was stated as 45 insertions and zero deletions, but that describes only `f5ce0d41`, not the two-commit Claude range. | `cf136e25..1e3594e3` is two files, 273 insertions, and one deletion: `f5ce0d41` is 45/0 and `1e3594e3` is 228/1. | Review evidence must distinguish the test correction from the record that documents it. | This section supplies the combined and per-commit figures without rewriting historical section 24. | `git diff --shortstat` and both per-commit `git show --shortstat` results reproduce the figures. |
+| IB1E-R04 | P3 | Closed only as synthetic persisted-integration debt | `273b0da8` | `tests/test_insider_buying_persisted_multi_period_evidence.py` | Prior IB-1E tests substituted the IB-1C loader, so no test proved that real persisted IB-1A/B/C artifacts could reach IB-1E across two periods. | Section 24.6 independently confirmed the missing persisted fixture. | Blueprint step 3 cannot be treated as structurally integrated solely from mocked-loader composition. | Added a real offline Q4-to-Q1 chain through all three immutable publishers/loaders and the IB-1E call-time loader. | Final module 4 passed; the complete exact-tree suite passed. This does not close IB-1, blueprint step 3, or official-data authority. |
+| IB1F-A01 | P3 | Closed before commit | `273b0da8` | New path-binding refusal test | The first negative case cross-wired a receipt against a matched wrong parsed/raw pair, so mutants that ignored either caller path independently survived. | Read-only mutation audit showed raw-derived-from-parsed and parsed-derived-from-raw mutants preserved the original two tests. | Each caller-supplied upstream path must remain independently load-bearing. | Parameterized receipt-versus-pair, raw-only, and parsed-only cross-wires; each must refuse before XML parsing. | All three cases pass on the unmodified tree; the audit's path-ignoring mutants are now distinguished by the added cases. |
+| IB1F-A02 | P3 | Closed before commit | `273b0da8` | New success-path transaction assertions | `all(...)` over amendment outcomes was vacuously green for zero rows and also allowed duplicates. | A read-only mutant dropping every Form 4/A transaction preserved the original material assertions. | An integration proof must pin the rows that actually crossed the boundary, not merely properties of any rows that happen to remain. | Asserted exactly one original and one amendment transaction, shares 5,000 and 6,000, exact outcome tuples, and total transaction count two. | Final success case passes and the row-dropping direction now violates the exact cardinality and identity assertions. |
+| IB1E-R07 | P3 | Open - accepted record-precision debt | `6e38fa1c` | Section 19.3 historical composite count | The historical unnamed ten-file figure remains impossible to reconstruct exactly. | Claude reproduced the complete-suite and focused IB-1E results but not that unnamed composite. | Rewriting historical evidence would hide the provenance problem. | No historical rewrite. This round names its commands/files and exact-tree commit. | Current focused, complete-suite, compile, and final record-sensitive commands are stated in 25.4. |
+| IB1F-D01 | P3 | Closed before record commit | This record | Section 5 session ledger boundary | The first draft left one blank line before the new ledger row, splitting the required contiguous Markdown table. Product behavior was unaffected, but the lane handoff would render incorrectly. | The first final record-sensitive run reported **1 failed, 73 passed** in `test_session_ledger_is_one_contiguous_markdown_table`. | The lane record is the branch-local handoff and must remain machine-checkable and unambiguous. | Removed the blank line; no code or historical row changed. | Exact rerun: **74 passed in 9.31s**. |
+
+No P0 or P1 finding exists in Claude's two-commit range or in the bounded
+IB-1F diff. Claude's IB1E-R06 correction is accepted as fixed. The out-of-lane
+observations in section 24.7 remain documented and were not changed.
+
+### 25.3 IB-1F contract implemented
+
+`tests/test_insider_buying_persisted_multi_period_evidence.py` constructs two
+entirely synthetic periods: a 2026-Q4 original Form 4 and a 2027-Q1 Form 4/A.
+For each period it writes a real IB-1A immutable raw ZIP snapshot, builds and
+loads a real IB-1B explicit-profile parsed snapshot, builds and loads a real
+IB-1C acceptance-evidence snapshot, and supplies those persisted paths to the
+real IB-1E assembler. The successful call contains no loader monkeypatch.
+
+The proof pins order-independent Q4-to-Q1 composition, exact original and
+amendment accession lineage, exact transaction cardinality and shares,
+provisional original eligibility, amendment quarantine, and literal-false
+`official_amendment_link_verified`, `complete_amendment_coverage_verified`,
+and `canonical_filter_authorized` gates. Three negative cases cross-wire the
+acceptance receipt, parsed directory, and raw directory in every material
+independent direction and prove that the persisted boundary refuses before
+any XML parse.
+
+This is intentionally a test-only integration milestone. It adds no network
+client, downloader, discovery, persisted production publisher, official
+profile, authenticated amendment link, completeness claim, normalization,
+canonical row, security mapping, outcome join, signal, ETF construction, or
+QuantConnect implementation.
+
+### 25.4 Validation on the exact implementation tree
+
+- Claude regression: **1 passed** on the unmodified tree. An in-memory
+  supplied-XML issuer-binding bypass made that exact test fail with
+  `Failed: DID NOT RAISE`; no repository file was modified by the probe.
+- Final IB-1F module:
+  `pytest -q tests/test_insider_buying_persisted_multi_period_evidence.py`:
+  **4 passed in 25.87s**.
+- Exact named eleven-file Insider/import/hygiene/separation collection:
+  **554 tests collected**, with per-file counts emitted by `pytest
+  --collect-only -qq`; the list is the section 24.8 ten-file set plus
+  `test_insider_buying_persisted_multi_period_evidence.py`.
+- Complete suite on exact commit `273b0da8`:
+  `python -B -m pytest -p no:cacheprovider --basetemp=<writable external temp>
+  -q`: **6,795 passed, 13 skipped, 0 failed, 26 warnings in 2,185.89s
+  (36m25s)**. This is exactly four more passing cases than Claude's final
+  reviewed tree, matching the four new IB-1F cases.
+- Whole-repository `compileall` over `assistant`, `backtest`, `data`,
+  `execution`, `ml`, `research`, `risk`, `scripts`, `signals`, `strategies`,
+  `tests`, and the root Python modules: **exit 0** with bytecode redirected
+  outside the shared worktree.
+- The implementation diff is **one test file, 464 insertions, zero
+  deletions**. No production file changed.
+- Final IB-1F, lane-record, and active-document gate over
+  `test_insider_buying_persisted_multi_period_evidence.py`,
+  `test_insider_buying_implementation_record.py`, and
+  `test_active_document_consistency.py`: the first run was **1 failed,
+  73 passed** because of IB1F-D01; after the documentation-only correction,
+  the exact rerun was **74 passed in 9.31s**.
+- `git diff --check` is clean apart from the repository's line-ending notice;
+  a narrow secret-shape scan over the entire round diff found **0 matches**.
+
+### 25.5 Residual gates and handoff
+
+IB1E-R04 is closed only for the synthetic persisted integration gap.
+IB1D-R09 still blocks any claim of an official SEC amendment link or complete
+amendment inventory. IB-1 and blueprint section 19.4 step 3 remain incomplete,
+as do official-profile validation, authenticated capture provenance,
+real-package compatibility, canonical filter/quarantine, normalized security
+and transaction rows, CIK-to-security mapping, joint-owner semantics,
+field-level amendment supersession, post-aggregation value rules, outcomes,
+ETF construction, and QC implementation. IB1E-R05, IB1D-R10, IB1D-CR11,
+IB1C-R16, IB1B-R11, R-23, and the out-of-lane section 24.7 observations remain
+deferred or separately owned.
+
+Next authorized step: commit this lane record, run its record-sensitive and
+diff/secret checks, confirm the remote still points to Claude's reviewed
+`1e3594e3`, and make exactly one combined push containing `273b0da8` plus the
+record commit. Then stop for Claude's independent review; no further Insider
+milestone starts in this round.

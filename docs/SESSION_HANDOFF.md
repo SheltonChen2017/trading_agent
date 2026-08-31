@@ -11,9 +11,10 @@ their lane-owned artifacts.
 
 ## 0. Target-Price Revision fourth-lane planning addition
 
-- The owner directed a new sibling worktree at
-  `C:\git\customizedagent\trading_agent_target_price` on branch
-  `codex/strategy-target-price-revisions`, based on exact `main` commit
+- The owner directed a new sibling worktree for branch
+  `codex/strategy-target-price-revisions`, resolved with
+  `git worktree list` rather than a pinned directory, based on exact
+  `main` commit
   `086b782e43a5ff889e71ec8e26334bb791ccac74`. The documentation round is
   **pushed and merged**: lane head `70c4b9fea1ac119f86901e95b9108820aa80e028`
   is published and reachable from `origin/main` through PR #324 merge
@@ -100,12 +101,13 @@ their lane-owned artifacts.
   corrected in lane: Git for Windows newline translation made every reviewed
   policy-code file differ from its committed blob, so the reviewed-algorithm
   anchor refused unconditionally and three lane tests failed on the lane's
-  registered worktree. One P2 (`TPR-CR4-002`) is open and needs an owner
-  decision: the worktree directory pinned by all three lane documents, and
-  enforced by a guard, does not exist on the reviewing host, while the
-  directory those documents forbid is the one Git actually has registered.
-  Section 19 of the lane record holds the dispositions, evidence, and
-  validation.
+  registered worktree. One P2 (`TPR-CR4-002`) is closed by owner direction:
+  all three lane documents pinned one absolute worktree directory that does
+  not exist on the reviewing host, and a guard enforced it, so the owner
+  directed that the lane worktree be resolved from `git worktree list`
+  instead. The documents now name no directory and the guard parses Git's
+  own registration. Sections 19 and 20 of the lane record hold the
+  dispositions, evidence, and validation.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (29 pages; raw binary SHA-256
@@ -463,8 +465,8 @@ owner-gated. No next implementation milestone is authorized: TPR-1 remains
 blocked on exact reviewed source rights and TPR-0B remains blocked on reviewed
 TPR-1/TPR-2 structural manifests. Claude reviewed Codex's counter-review
 correction range on the same branch and accepted both commits; Codex
-counter-reviews that review next, and `TPR-CR4-002` needs an owner decision
-before any lane resume pointer is trusted.
+counter-reviews that review next. `TPR-CR4-002` is closed: the lane worktree
+is now resolved from `git worktree list` rather than a pinned path.
 
 ## 5. Data acquisitions and confirmations
 

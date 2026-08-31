@@ -2,8 +2,10 @@
 
 Status: **CLAUDE HAS INDEPENDENTLY REVIEWED CODEX'S COUNTER-REVIEW ROUND
 `0af1ca8`..`c8c7470`. BOTH COMMITS ARE ACCEPTED; ONE P1 (`TPR-CR4-001`) AND
-ONE P3 (`TPR-CR4-004`) WERE FOUND, THE P1 IS CORRECTED IN LANE, AND ONE P2
-(`TPR-CR4-002`) IS OPEN AND NEEDS AN OWNER DECISION.
+ONE P3 (`TPR-CR4-004`) WERE FOUND AND CORRECTED IN LANE. THE OWNER RESOLVED
+`TPR-CR4-002` BY DIRECTING THAT THE LANE WORKTREE BE RESOLVED FROM
+`git worktree list` INSTEAD OF A HARDCODED PATH; SECTION 20 RECORDS THAT
+CORRECTION. NO P0, P1, OR P2 REMAINS OPEN.
 CLAUDE'S THREE-COMMIT V2.2 REVIEW ROUND IS COMPLETE THROUGH
 `db6a721`, AND CODEX HAS COUNTER-REVIEWED EVERY COMMIT, CORRECTED THE CURRENT-
 STATE AND GUARD DEFECTS, AND QUALIFIED THE VALIDATION EVIDENCE. THE EXACT
@@ -20,8 +22,9 @@ EXISTS.**
 
 Branch: `codex/strategy-target-price-revisions`
 
-Worktree:
-`C:\git\customizedagent\trading_agent_target_price`
+Worktree: the checkout `git worktree list` registers for this branch.
+This lane is developed from more than one host, so no absolute directory
+is pinned; see `TPR-CR4-002`.
 
 Base commit:
 `086b782e43a5ff889e71ec8e26334bb791ccac74`
@@ -55,8 +58,8 @@ and Claude is the independent reviewer.
 **Owner workflow override, 2026-08-29:** the owner explicitly extended the
 serialized same-branch lane workflow to Target-Price Revisions. All Codex
 implementation, Claude review, Codex counter-review/correction, and the next
-bounded milestone remain on `codex/strategy-target-price-revisions` in
-`C:\git\customizedagent\trading_agent_target_price`. A role may create
+bounded milestone remain on `codex/strategy-target-price-revisions` in the
+worktree `git worktree list` registers for it. A role may create
 several commits during its round, but makes only one push at the end of that
 round. No review, counter-review, checkpoint, handoff, or feature branch is
 created. This decision supersedes only the governing PDF's old-worktree or
@@ -369,9 +372,10 @@ reviewed `0af1ca8`..`c8c7470` and accepted both commits. One P1
 Git's default `core.autocrlf` translation made every reviewed policy-code
 file differ from its committed blob, so `_review_anchor` refused
 unconditionally and three lane tests failed on the lane's registered
-worktree. `TPR-CR4-002` (P2) is open and needs an owner decision: the pinned
-lane worktree directory does not exist on this host. Section 19 holds the
-evidence, dispositions, and validation.
+worktree. `TPR-CR4-002` (P2) is closed: the owner directed that the lane
+worktree be resolved from `git worktree list` rather than pinned as an
+absolute path, and the documents and guard now do that. Sections 19 and 20
+hold the evidence, dispositions, and validation.
 
 ### Historical progression (not the current resume instruction)
 
@@ -487,6 +491,7 @@ known.
 | 2026-08-30 | Claude validation | `5eecce5` -> `5eecce5` (exact tested tree; this validation-record commit follows) | v2.2 review round final validation | Revalidated the complete tree after the review corrections and the new current-artifact guard. No product file changed during the run. Recorded as a distinct appended event rather than by rewriting the review row, which is the correction accepted as `TPR-CCR3-006`. | Complete suite: **5,843 passed, 5 skipped, 0 failed, 25 warnings in 952.86s** — the 5,842 baseline plus exactly the one added guard, skips unchanged. Lane and shared documentation suites **189 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. No provider, credential, licensed row, outcome, QuantConnect, broker, scheduler, paper or live access; **0 research looks**. | No new finding. `TPR-CR3-001` and `TPR-CR3-002` remain closed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. |
 | 2026-08-30 | Codex counter-review correction | `db6a721d45eb47e1a133744387bf43a1aa1f310c` -> `0af1ca8c9165841373262bff4d173edc48aa1a74` plus final record/handoff correction | Counter-review only; next milestone blocked | Counter-reviewed `da6f7ea`, `5eecce5`, and `db6a721` individually; corrected the contradictory active state, hardened exact-current identity and routing guards, qualified review provenance and validation metadata, and removed the last stale pre-push handoff claim. No product, source, provider, or outcome code changed. | Exact post-guard target plus active-document suite **189 passed, 3 skipped in 13.20s**; preceding narrow document modules **76 passed in 3.71s**; network-restricted full run **5,838 passed, 5 failed, 5 skipped, 26 warnings in 1,282.03s**, with the exact five environment-affected nodes then **5 passed in 11.05s**; full compilation exit 0; mutations rejected; `git diff --check` clean. Python 3.12.13 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | No P0/P1. `TPR-CCR4-001` through `TPR-CCR4-006` are closed or qualified in section 18. | None; registries and zero-access declarations are unchanged. | Commit the final validation handoff and make this round's one push. Claude then reviews the exact correction range; TPR-1 and TPR-0B remain blocked. |
 | 2026-08-30 | Claude review | `c8c74704bb9bbda5a756d90afa33666371125a89` reviewed; corrections on this same lane branch | Independent review of Codex's counter-review correction range | Reviewed `0af1ca8` and `c8c7470` individually and the cumulative `c8c7470` tree. Reproduced rather than accepted Codex's two historical claims. Found and corrected a P1 that made the reviewed-algorithm anchor unreachable on the supported Windows checkout, added a lane-scoped `.gitattributes` and a regression guard, and refreshed the working tree to exact blob bytes. No product, provider, source, or outcome code changed. | At the reviewed tip the lane suite was **186 passed, 3 failed, 3 skipped**; after the correction **120 passed, 3 skipped** with the three anchor tests green. Five mutations on Codex's hardened current-state guard and two on the new byte guard each turned red with byte-identical restores returning green. Complete suite on the exact final tree **5,844 passed, 5 skipped, 0 failed, 25 warnings in 2,186.28s**, the 5,843 baseline plus exactly the one added guard; `compileall` exit 0; `git diff --check` clean. Provider/outcome accesses **0**; authorized/spent looks **0**. | Both Codex commits accepted. `TPR-CR4-001` (P1) closed by correction; `TPR-CR4-002` (P2) **open, owner decision required**; `TPR-CR4-003` and `TPR-CR4-004` (P3) closed by qualification. `TPR-OOL-008` documented, not fixed. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews this range. `TPR-CR4-002` needs the owner to say which worktree path is real before any resume pointer is trusted; TPR-1 and TPR-0B remain blocked. |
+| 2026-08-30 | Claude correction under owner direction | `50da9d07a46bcd0770fc3c9219b3d0a187494383` -> this round's head | Owner-directed worktree resolution; closes `TPR-CR4-002` | Replaced the hardcoded lane worktree in the Action Plan, Session Handoff, and record preamble with a `git worktree list` resolution instruction, and rewrote the guard to parse `git worktree list --porcelain` for this branch instead of comparing against a literal. The guard now also forbids any lane directory name in those three current-state surfaces. No product, provider, source, or outcome code changed. | Lane plus shared document suites **190 passed, 3 skipped**; complete suite on the exact final code tree **5,844 passed, 5 skipped, 0 failed, 25 warnings in 2,278.61s**, unchanged in count because the rewritten guard replaces a test rather than adding one; `compileall` exit 0; `git diff --check` clean. Four mutations (repinning a directory in each of the three surfaces, and removing the resolution instruction) each turned the guard red with byte-identical restores returning it green, and the porcelain parser was exercised directly and resolved this checkout. Provider/outcome accesses **0**; authorized/spent looks **0**. | `TPR-CR4-002` closed by owner direction. No P0, P1, or P2 remains open. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews `ea9d890`..this head. TPR-1 and TPR-0B remain blocked. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -1335,7 +1340,7 @@ from the report.
 | ID | Priority | Status | Location | Finding, evidence, and disposition |
 |---|---|---|---|---|
 | `TPR-CR4-001` | P1 | **Closed by correction** | `research/target_price_revisions/` policy code; `POLICY_CODE_REPO_PATHS` in `research/target_price_revisions/preregistration.py:71-78`; `_review_anchor` | `_review_anchor` requires the working bytes of every policy-code path to equal the reviewed and HEAD blobs. Git for Windows sets `core.autocrlf=true` in its system config, which this host inherits, so five of the six policy paths were checked out with CRLF against LF blobs and the loader refused unconditionally. At the reviewed tip `c8c7470`, `tests/target_price_revisions` plus the shared active-document module reported **186 passed, 3 failed, 3 skipped**, all three failures raising `current policy code differs from the independently reviewed map`. The mechanism was proven, not inferred: a `core.autocrlf=false` clone of the same commit ran `test_preregistration.py` **83 passed, 2 skipped**. The refusal direction is safe, but the reviewed-algorithm authority is unreachable on the supported platform, and a later `git add` of a translated working copy would have rewritten the very bytes the frozen candidate's `policy_code_sha256` map pins. Corrected with a lane-scoped `research/target_price_revisions/.gitattributes` declaring `* -text`, a working-tree refresh so all six paths are byte-identical to their blobs, and the new guard `test_policy_code_is_checked_out_as_exact_bytes`. The fix pins exact bytes; it does not relax the byte-identity control. |
-| `TPR-CR4-002` | P2 | **Open; owner decision required** | Record header and section 7, `docs/ACTION_PLAN_2026-08-20.md`, `docs/SESSION_HANDOFF.md`, `test_lane_documents_agree_on_one_worktree` | Every lane resume pointer names `C:\git\customizedagent\trading_agent_target_price`, and the guard additionally forbids the two coordination documents from naming `trading_agent_TargetPriceRevision` at all. On this machine that is inverted. `git worktree list` registers the lane branch at `C:/git/customizedAgent/trading_agent_TargetPriceRevision`; the common repository holds `.git/worktrees/trading_agent_TargetPriceRevision`; that worktree's `.git` file points back to it; six worktrees are registered, not the five `TPR-CR1-005` reports; and no case form of `trading_agent_target_price` exists under `C:/git/customizedAgent/` even though the filesystem resolves the other names case-insensitively. The owner's own session instruction also named the `TargetPriceRevision` directory. Deliberately not fixed: a single hard-coded absolute path cannot be true on two machines, so flipping the literal would only move the breakage. The owner should say which host is canonical, or direct that the pointer stop being a machine-specific literal. Until then the durable resume instruction points at nothing on this host. |
+| `TPR-CR4-002` | P2 | **Closed by owner direction; see section 20** | Record header and section 7, `docs/ACTION_PLAN_2026-08-20.md`, `docs/SESSION_HANDOFF.md`, `test_lane_documents_agree_on_one_worktree` | Every lane resume pointer names `C:\git\customizedagent\trading_agent_target_price`, and the guard additionally forbids the two coordination documents from naming `trading_agent_TargetPriceRevision` at all. On this machine that is inverted. `git worktree list` registers the lane branch at `C:/git/customizedAgent/trading_agent_TargetPriceRevision`; the common repository holds `.git/worktrees/trading_agent_TargetPriceRevision`; that worktree's `.git` file points back to it; six worktrees are registered, not the five `TPR-CR1-005` reports; and no case form of `trading_agent_target_price` exists under `C:/git/customizedAgent/` even though the filesystem resolves the other names case-insensitively. The owner's own session instruction also named the `TargetPriceRevision` directory. Deliberately not fixed: a single hard-coded absolute path cannot be true on two machines, so flipping the literal would only move the breakage. The owner should say which host is canonical, or direct that the pointer stop being a machine-specific literal. Until then the durable resume instruction points at nothing on this host. |
 | `TPR-CR4-003` | P3 | **Closed by qualification** | Section 18.5 | Codex records **189 passed, 3 skipped** for the target plus active-document suite on the exact tree this round pushed. That does not reproduce on the lane's registered worktree, where the same commit and pytest version give **186 passed, 3 failed, 3 skipped**. The cause is `TPR-CR4-001`, so this qualifies the environment rather than the arithmetic: Codex's numbers are consistent with a checkout that does not translate newlines. Validation records in this lane should name the checkout's newline configuration alongside the interpreter, because that setting alone decides whether the reviewed-algorithm tests can pass. |
 | `TPR-CR4-004` | P3 | **Closed by qualification** | `tests/target_price_revisions/test_document_consistency.py`, `test_exact_next_step_names_the_current_artifacts` | The hardened singleton assertions are label-bound. They reject a second digest introduced under the same `raw SHA-256`, `spec ID`, `semantic hash`, or `artifact SHA-256` label, which is the realistic drift, but a superseded digest written under a different label inside the current block still passes: a probe inserting a superseded digest as `SHA-256` rather than `raw SHA-256` left the guard green. This is a scope statement, not a defect claim; the guard does close the failure mode `TPR-CCR4-002` names. Widening it to every 64-hex literal in the current block would be the next strengthening if the owner wants it. |
 
@@ -1377,3 +1382,71 @@ broker, operator-database, scheduler, paper or live surface was accessed or
 changed. Provider accesses: **0**. Outcome accesses: **0**. Authorized or spent
 research looks: **0**. No registry, source-authority, or look-authority artifact
 was modified, and no milestone was implemented.
+
+## 20. Owner-directed worktree resolution - 2026-08-30
+
+**Owner direction: use `git worktree list` instead of a hardcoded path.**
+This closes `TPR-CR4-002`. The finding's evidence in section 19.4 is
+unchanged; only its status cell moved to closed, so the record keeps one
+current truth without deleting how the defect was found.
+
+### 20.1 What was wrong with pinning a path
+
+Three lane documents named one absolute directory as the worktree, and the
+guard both required that literal and forbade the alternative spelling. The
+lane is developed from more than one host, so the pin was wrong on every host
+except the one that wrote it, and the guard enforced the wrong name here
+rather than catching it. Flipping the literal would have moved the same
+breakage onto the other host.
+
+### 20.2 What the documents and guard do now
+
+- The Action Plan, Session Handoff, and record preamble name no directory.
+  They say the lane worktree is the checkout `git worktree list` registers
+  for `codex/strategy-target-price-revisions`.
+- `test_lane_documents_resolve_the_worktree_from_git` replaces
+  `test_lane_documents_agree_on_one_worktree`. It requires the resolution
+  instruction in all three lane documents, rejects any `trading_agent_*`
+  directory name in the two coordination documents and in the record's
+  preamble, and then checks that the instruction actually resolves: it parses
+  `git worktree list --porcelain`, requires the registered directory to exist,
+  and requires it to be this checkout whenever `HEAD` is on the lane branch.
+- The record may still name past directories below its preamble, because
+  `TPR-CR1-005`, `TPR-CCR1-006`, section 18.1, and section 19 are historical
+  evidence rather than resume pointers.
+- The old guard's anti-drift intent is preserved and widened. `TPR-CR2-003`
+  asked that a second worktree spelling never sit unnoticed beside the first;
+  the rule is now that no spelling may appear in a current-state surface at
+  all, which fails on every host instead of all but one.
+
+### 20.3 Residual limits
+
+The registered-directory check is skipped when the lane branch is not checked
+out anywhere in the repository, which is the case when a historical commit is
+reviewed in a detached probe clone. The document assertions still run there,
+so the machine-independent half of the invariant is never skipped. The
+governing PDF still names the old directory on its physical pages; that
+remains `TPR-CCR1-006`, unchanged here, because regenerating the artifact
+would change its identity and needs the owner's provenance decision.
+
+### 20.4 Validation
+
+- Lane plus shared document suites: **190 passed, 3 skipped**.
+- Complete suite on the exact final code tree: **5,844 passed, 5 skipped,
+  0 failed, 25 warnings in 2,278.61s**. The count is unchanged from the
+  preceding round because the rewritten guard replaces
+  `test_lane_documents_agree_on_one_worktree` rather than adding a test. Only
+  this validation text and the ledger row follow that run.
+- `compileall -q` over the same paths exited 0 and `git diff --check` is clean.
+- Mutations, each applied and reverted with a byte-identical restore:
+  repinning a directory in the Action Plan, in the Session Handoff, and in the
+  record preamble, and removing the resolution instruction from the Action
+  Plan, all turned the guard **red**; the baseline and every restore were
+  **green**.
+- The porcelain parser was exercised directly rather than only through the
+  assertions, and resolved the lane branch to this checkout.
+
+No provider, credential, licensed row, outcome, QuantConnect, broker,
+operator-database, scheduler, paper or live surface was accessed or changed.
+Provider accesses: **0**. Outcome accesses: **0**. Authorized or spent research
+looks: **0**. No milestone was implemented and no authority changed.

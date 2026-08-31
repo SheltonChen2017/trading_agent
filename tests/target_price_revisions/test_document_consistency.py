@@ -20,17 +20,22 @@ STRATEGY_DIR = ROOT / "docs" / "Strategy Description"
 LANE_BRANCH = "codex/strategy-target-price-revisions"
 BLUEPRINT = "TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf"
 RECORD = "TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md"
-EXPECTED_WORKTREE = "trading_agent_target_price"
+LANE_BRANCH_REF = "refs/heads/" + LANE_BRANCH
+WORKTREE_RESOLUTION = "git worktree list"
 SPEC_PATH = (
     ROOT / "research" / "target_price_revisions" / "specs"
     / "tpr_round0a.candidate.json"
 )
-OBSOLETE_WORKTREE = "trading_agent_TargetPriceRevision"
 BLUEPRINT_CONTENT_SHA256 = (
     "f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b"
 )
 MALFORMED_SUBMITTED_SOURCE_PIN = (
     "53c549aef18aa1a63e6db8deb184bd654eb8ec637bb4ff3ae03f29abc4a2df0"
+)
+LANE_DOCUMENTS = (
+    "ACTION_PLAN_2026-08-20.md",
+    "SESSION_HANDOFF.md",
+    f"Strategy Description/{RECORD}",
 )
 CANDIDATE_RELATIVE = Path(
     "research/target_price_revisions/specs/tpr_round0a.candidate.json"
@@ -134,44 +139,79 @@ def test_policy_code_is_checked_out_as_exact_bytes() -> None:
         )
 
 
-def test_lane_documents_agree_on_one_worktree() -> None:
-    """TPR-CR1-005: every coordination pointer names the real worktree."""
-    expected_pointers = {
-        "ACTION_PLAN_2026-08-20.md": (
-            f"`{EXPECTED_WORKTREE}` worktree"
-        ),
-        "SESSION_HANDOFF.md": (
-            rf"`C:\git\customizedagent\{EXPECTED_WORKTREE}` on branch"
-        ),
-        f"Strategy Description/{RECORD}": (
-            f"Worktree:\n`C:\\git\\customizedagent\\{EXPECTED_WORKTREE}`"
-        ),
-    }
-    for name, pointer in expected_pointers.items():
-        assert pointer in _doc(name), (
-            f"{name} must carry the registered target-price worktree pointer"
+def _git_lines(*args: str) -> list[str]:
+    completed = subprocess.run(
+        ["git", *args],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return completed.stdout.splitlines()
+
+
+def _registered_lane_worktree() -> Path | None:
+    """Return the worktree Git registers for the lane branch, or None."""
+    path: str | None = None
+    for line in _git_lines("worktree", "list", "--porcelain"):
+        if line.startswith("worktree "):
+            path = line[len("worktree "):]
+        elif line.strip() == "branch " + LANE_BRANCH_REF and path is not None:
+            return Path(path)
+    return None
+
+
+def test_lane_documents_resolve_the_worktree_from_git() -> None:
+    """TPR-CR4-002, superseding TPR-CR1-005 and TPR-CR2-003.
+
+    The lane is developed from more than one host, so pinning one absolute
+    directory made the resume instruction wrong everywhere except the host
+    that wrote it, and this guard previously enforced that wrong name.  The
+    owner directed that the worktree be resolved from `git worktree list`
+    instead.
+
+    So the invariant is now machine-independent: the coordination documents
+    must carry the resolution instruction and must pin no directory name,
+    and the instruction must actually resolve here.  A future agent that
+    reintroduces any hardcoded lane directory turns this red on every host
+    rather than on all but one.
+    """
+    for name in LANE_DOCUMENTS:
+        assert WORKTREE_RESOLUTION in _doc(name), (
+            f"{name} must tell the reader to resolve the lane worktree with "
+            f"`{WORKTREE_RESOLUTION}` instead of naming a directory"
         )
 
-    # TPR-CR2-003: the exact-pointer checks above prove the right name is
-    # present, but not that a wrong one is absent.  A third spelling could be
-    # introduced anywhere and every assertion above would still pass, which is
-    # the same hole that let one nonexistent directory sit in three documents.
-    # The two pure coordination documents must carry no other worktree name at
-    # all; the lane record may name the obsolete directory only as historical
-    # finding evidence, never as an additional active pointer.
-    active: set[str] = set()
-    for name in expected_pointers:
-        names = set(re.findall(r"\w*trading_agent\w*", _doc(name))) - {"trading_agent"}
-        if name != f"Strategy Description/{RECORD}":
-            assert OBSOLETE_WORKTREE not in names, (
-                f"{name} is a current-state pointer and must not name the "
-                f"obsolete worktree at all"
-            )
-        active |= names - {OBSOLETE_WORKTREE}
+    # The two pure coordination documents, and the record's own current-state
+    # preamble, must name no lane directory at all.  The bare repository name
+    # is not a worktree pin, and the record may still name past directories
+    # below its preamble as historical finding evidence.
+    record = _doc(f"Strategy Description/{RECORD}")
+    preamble = record[: record.index("## 1. Decision and canonical strategy boundary")]
+    pinned = {
+        "ACTION_PLAN_2026-08-20.md": _doc("ACTION_PLAN_2026-08-20.md"),
+        "SESSION_HANDOFF.md": _doc("SESSION_HANDOFF.md"),
+        f"Strategy Description/{RECORD} preamble": preamble,
+    }
+    for name, content in pinned.items():
+        directories = set(re.findall(r"trading_agent_[A-Za-z0-9_]+", content))
+        assert not directories, (
+            f"{name} pins a machine-specific lane worktree {sorted(directories)}; "
+            f"resolve it with `{WORKTREE_RESOLUTION}` instead"
+        )
 
-    assert active == {EXPECTED_WORKTREE}, (
-        f"lane documents name more than one active worktree: {sorted(active)}"
-    )
+    # The instruction has to work, not merely be written down.
+    registered = _registered_lane_worktree()
+    if registered is not None:
+        assert registered.is_dir(), (
+            f"`{WORKTREE_RESOLUTION}` registers {registered} for {LANE_BRANCH}, "
+            f"but that directory does not exist"
+        )
+        if _git_lines("rev-parse", "--abbrev-ref", "HEAD") == [LANE_BRANCH]:
+            assert registered.resolve() == ROOT.resolve(), (
+                f"this checkout is on {LANE_BRANCH} but Git registers the lane "
+                f"worktree at {registered}, not {ROOT}"
+            )
 
 
 def test_target_documents_do_not_present_the_malformed_source_pin_as_valid() -> None:

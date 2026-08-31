@@ -30,8 +30,8 @@ The initial addition authorized only the documentation baseline and its
 independent review. **Later owner workflow decision, 2026-08-29:** this target lane uses
 the serialized Codex-write -> Claude-review -> Codex-counter-review plus next
 milestone -> Claude-review loop on the one long-lived
-`codex/strategy-target-price-revisions` branch and dedicated
-`trading_agent_target_price` worktree. Each role may make several
+`codex/strategy-target-price-revisions` branch and the dedicated worktree
+that `git worktree list` registers for it. Each role may make several
 commits in its round but pushes exactly once at the end; no review,
 counter-review, checkpoint, handoff, or feature branch is created. The branch
 and worktree are target-price-only. Findings outside this feature are recorded
@@ -66,9 +66,10 @@ reviewed TPR-1/TPR-2 structural manifests. All outcome access and every
 operational stage remain blocked. Exact dispositions, identities, evidence,
 and gates live in sections 17 and 18 of the target implementation record.
 Claude has now independently reviewed that counter-review range and accepted
-both commits; one P1 was corrected in lane, and one P2 is open and needs an
-owner decision because the lane's pinned worktree directory does not exist on
-the reviewing host. Section 19 of the lane record holds that ledger.
+both commits; one P1 was corrected in lane, and the owner resolved the one P2
+by directing that the lane worktree be resolved from `git worktree list`
+rather than pinned as an absolute path. Sections 19 and 20 of the lane record
+hold that ledger. No P0, P1, or P2 remains open.
 
 **Owner multiplicity amendment, 2026-08-30 — affects all four strategy lanes:**
 the four named strategy-selection lanes are one fixed family with total

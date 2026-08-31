@@ -2119,3 +2119,59 @@ counter-review, implementation, and validation-record commits together for
 Claude's independent review on this same lane branch. No next implementation
 milestone begins until that review is counter-reviewed under the serialized
 lane workflow.
+
+## 20. Project-wide main-sync conflict review (2026-08-31, local-only artifact)
+
+Codex reviewed pushed range `e2b434c205a5e5d62f2f17e0de939ca1ab1ad6bf`
+through `6e38fa1cded33cb0a0f8867ff490680f90cbe0ae` and merged exact main
+`1a5264e6b1de3caf5477477d1312a762b2d42419` into that pushed lane head in an
+isolated detached clone. The resulting merge commit is
+`dd2cae8202a89e7ac2fb23a5b647d9a716b7f8e7`. It is a local-only artifact;
+no live lane ref, dirty worktree, or remote was updated. This section
+supersedes section 19.4's now-completed instruction to push `6e38fa1` but does
+not claim that the later local development is published or reviewed.
+
+All 23 textual conflicts were resolved without changing current shared
+production behavior. Twenty-two stale shared production/test blobs were
+restored byte-for-byte from main. `tests/test_ml_evidence_operations.py`
+retains all main content plus the reviewed Store-alias interpreter skip and
+matches the pushed Insider head. Relative to main, the merge candidate changes
+only 19 Insider-owned record/source/fixture/test paths plus that shared test;
+it changes no other strategy implementation.
+
+| Commit | Disposition | Reason |
+|---|---|---|
+| `dceff74` | accepted | Adds load-bearing IB-1D result-constructor regressions. |
+| `3f2024b` | accepted after correction | Its review omissions are corrected by `ad86df0`. |
+| `ad86df0` | accepted | Restores stronger identity, corpus, factory, and XML structure checks. |
+| `e89293b` | accepted | IB-1E remains explicitly offline, non-authoritative, and gate-preserving. |
+| `6e38fa1` | accepted | Records validation of the exact pushed IB-1E tree. |
+
+`INS-MRG-001` remains open at P3. The exported `Form4ObservedState` at the
+pushed head accepts an amendment accession with `ORIGINAL` disposition, which
+can create an internally inconsistent observation-only value. Local-only
+commit `43d6d6ae208875e8b64106a3324f1819fdc3a67b` contains a guard and test, but
+it is a sibling of the remote correction chain and must not be cherry-picked
+wholesale. No new P0-P2 defect was found in the pushed delta; the previously
+recorded IB1D-R09 future-authority debt remains open and correctly keeps
+official-link, completeness, and filter authority false.
+
+Validation used Python 3.12.13 and pytest 9.1.1. Focused suites passed 927
+tests with two skips and one warning. The exact resolved tree passed 6,208
+tests with nine skips and 26 dependency warnings in 1,211.54 seconds.
+Compileall passed, the unmerged-path and conflict-marker scans were empty,
+and candidate-relative/non-PDF diff checks were clean. Raw staged diff
+checking reports whitespace inside main's already-committed target-price PDF;
+that is not an Insider delta.
+
+The live Insider worktree remains intentionally untouched and is not ready to
+accept this artifact: its local branch is at `43d6d6a`, one commit ahead and
+three commits behind the pushed lane, and it also contains substantial
+uncommitted development plus two untracked source/test files. Preserve that
+work in an owner-approved snapshot, reconcile the sibling histories and the
+unique role-consistency guard, then regenerate or replay this main sync. Do
+not reset, overwrite, fast-forward, or push the live lane from this artifact.
+
+No provider, credential, licensed row, market outcome, permanent research
+look, QuantConnect job, broker, operator database, scheduler, deployment, or
+trading authority was accessed or granted.

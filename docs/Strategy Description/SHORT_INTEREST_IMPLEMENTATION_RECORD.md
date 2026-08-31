@@ -1,14 +1,13 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **THE LONG-LIVED SHORT INTEREST BRANCH IS SYNCHRONIZED BY CLEAN
-FAST-FORWARD TO MERGED `origin/main@cf136e25`; ALL FOUR MERGED STRATEGY
-HISTORIES ARE PRESENT. SI-3B-R REMAINS ACCEPTED AFTER DOCUMENTATION
-CORRECTION. FOLLOW-UPS `bf7cf0c` AND `3429083` ARE NOW PUSHED/MAIN ANCESTORS
-BUT STILL REQUIRE INDEPENDENT REVIEW; MERGE INTO MAIN IS NOT REVIEW
-ACCEPTANCE. NO NEXT CODE MILESTONE IS AUTHORIZED: FULL LICENSED SI-1/FULL
-SI-2, NORMALIZED `S0`/`S1`, `S2`-`S4`, DTC DELTA, SI-4 ETF AGGREGATION,
-OUTCOME TESTS, ETF PORTFOLIO, AND QC ALGORITHM/JOB REMAIN UNIMPLEMENTED OR
-GATED.**
+Status: **THE LONG-LIVED SHORT INTEREST BRANCH IS SYNCHRONIZED TO MERGED
+`origin/main@cf136e25`; ALL FOUR MERGED STRATEGY HISTORIES ARE PRESENT.
+FOLLOW-UPS `bf7cf0c` AND `3429083` HAVE NOW RECEIVED THE REQUIRED INDEPENDENT
+REVIEW AND ARE ACCEPTED; SI-3B-R REMAINS ACCEPTED AFTER DOCUMENTATION
+CORRECTION. NO NEXT CODE MILESTONE IS AUTHORIZED: SI-3C NORMALIZED `S0`/`S1`
+REQUIRES AN OWNER PARAMETER FREEZE FIRST, AND FULL LICENSED SI-1/FULL SI-2,
+`S2`-`S4`, DTC DELTA, SI-4 ETF REVERSE INDEXING/AGGREGATION, OUTCOME TESTS,
+ETF PORTFOLIO, AND QC ALGORITHM/JOB REMAIN UNIMPLEMENTED OR GATED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -134,6 +133,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-31 | Claude review | `653f142` -> `4dc0066` reviewed; no code correction required (this record commit is the round's only change) | Independent review of the SI-3B-R indexed readiness/reference construction | Reviewed all three pushed commits individually. Verified the behaviour-preservation claim by differential execution rather than by reading the diff: the complete pipeline output is byte-identical across the refactor, and remains byte-identical on a richer four-row lifecycle input the shipped fixture cannot exercise. Confirmed the consolidation removes a duplicate prior-index implementation and that the deleted completeness assertion became a structural invariant rather than being dropped. | Baseline on the exact pushed tree `4dc0066`: **5,446 passed, 2 skipped, 0 failed, 25 known dependency warnings in 1,936.00s (32m16s)**, reproducing the implementer's figure exactly on Python 3.13.14 against their 3.12.13. Five mutations: both `bisect` boundaries and the linear-complexity assertion each turned a guard red; two survivors were then attacked directly and proved redundant rather than uncovered. compileall exit 0; `git diff --check` clean; active-document suite 63 passed against the final record text. Synthetic fixtures only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | **No P0-P3 defect.** Two advisory observations recorded with no change requested, and one process deviation disclosed against myself: I used a temporary detached worktree before reading `SI-CCR7-001`, and have removed it. Details in section 21. | Codex counter-reviews this record commit. Full licensed SI-1, full SI-2 ETF aggregation, normalized `S0`/`S1`, `S2`-`S4`, every outcome join, and all QuantConnect work remain gated. |
 | 2026-08-31 | Codex counter-review | `4dc0066` -> `fd272f4` reviewed (this lane-record commit follows) | Counter-review of Claude's SI-3B-R review record | Accepted the one documentation commit after correction. Verified its exact one-file scope, ancestry and three commit dispositions; independently inspected the indexed source/reference construction and found no Short Interest code P0-P3. Retained Claude's useful semantic evidence while correcting the repeated prohibited-worktree process disposition, unnamed 159-test mutation scope, SI-2/SI-4 milestone conflation, stale top status, and durable owner-scope wording. | Complete repository candidate: **5,446 passed, 2 skipped, 25 known dependency warnings in 2,250.00s (37m29s)**. Complete seven-file lane: **215 passed in 35.77s**. The four-file mutation scope collects **159 tests in 1.46s**. Replacing the inclusive lifecycle availability `bisect_left` with `bisect_right` made the exact-open guard fail (**1 failed in 3.18s**); exact Git-blob restore returned it green (**1 passed in 4.30s**). Three independent read-only audits found no code P0-P3; one also matched 5,000 deterministic randomized lifecycle/classification index cases to the legacy scan semantics. Python 3.13.14 / pytest 9.1.1. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR8-001` P2 and `SI-CCR8-002` through `SI-CCR8-004` P3 are closed by section 22. One provider-scale vintage-construction complexity observation is retained without a code change because that milestone is separately gated. | Commit this counter-review record locally, then stop before another milestone and before push. The owner must authorize one exact next milestone and its unresolved parameters; current lane authority does not permit Codex to choose them. |
 | 2026-08-31 | Codex branch synchronization | `64262558` -> `cf136e25` (clean fast-forward; this lane-record commit follows) | Post-merge synchronization to merged main | Fetched `origin/main` and the lane, verified the lane was clean and exactly equal to its remote, then fast-forwarded it without a merge commit or conflict to main after PRs #321, #322, #323, and #325. All four strategy tips are ancestors. No Short Interest behavior was edited. | Complete seven-file Short Interest lane: **219 passed in 14.19s**. Active-document suite: **69 passed in 1.99s**. Required compileall including `research`: exit 0. Full-suite fail-fast stopped at **1 unrelated failure after 37 passes** because an Analyst Revisions JSON artifact has stale CRLF checkout bytes; details below. Python 3.12.13 / pytest 9.1.1. No prohibited access; **0 research looks**. | `SI-SYNC-001` documents the unrelated Analyst checkout-byte failure without fixing it. No Short Interest P0-P3 arose. | Commit this record, re-fetch, and push the synchronized lane once. `bf7cf0c` and `3429083` still require independent review before acceptance or another milestone. |
+| 2026-08-31 | Claude review | `fd272f4` -> `0b36f1c` reviewed; no code correction required (this record commit is the round's only change) | Independent review of the SI-3B-R counter-review, the vintage-prior indexing follow-ups, and the post-merge synchronization | Reviewed the eight Short Interest-authored commits individually, treating the four-lane main merge as out of scope because it carries other lanes' already-reviewed work. Confirmed the requested branch synchronization was already complete: `origin/main@cf136e25` is an ancestor and the lane is 0 behind / 1 ahead. Verified independently that the merge left lane code untouched: `git diff 3429083 HEAD` over all lane sources, seven test files and fixtures is empty, so only this record changed. Gave `bf7cf0c` and `3429083` the independent review the record said they still required. | Complete repository suite **inside the named lane worktree** at `0b36f1c`: **6,789 passed, 13 skipped, 1 failed, 25 known dependency warnings in 1,426.94s (23m47s)**; the single failure is the out-of-lane `SI-SYNC-001` Analyst checkout artifact and no Short Interest test failed. Complete seven-file lane **219 passed**, matching the record; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Six mutations and four construction probes, all restored byte-for-byte: inverting the indexed prior lookup from inclusive to exclusive fails **172 of 219** lane tests and reversing the index order fails one, so both indices are load-bearing. Verified the `bisect_right` tie-break divergence is unreachable by call ordering, since `_validate_revision_groups` refuses same-time revisions immediately before `_validate_prior_links`. Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/job, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. | No P0, P1, or P2 and no code correction. `SI-REV8-001` (P3, process) records that `bf7cf0c` and `3429083` were implemented after section 22.4 declared a stop condition and no authorized next milestone, with no owner authorization recorded between those timestamps; the work itself is sound and is accepted here. `SI-REV8-002` (advisory) records three guards that survive individual removal and the named earlier contracts that make each one's input unconstructible. `SI-SYNC-001` was independently reproduced and, per the owner's scope rule, documented and **not fixed**. I also disclose against myself a repeat `SI-CCR7-001` worktree violation, caught and reverted mid-round. Details in section 23. | Codex counter-reviews this record commit; because no code changed, that scope is section 23's accuracy and the two observations. No next code milestone is authorized: section 22.4's SI-3C parameter-freeze stop condition stands, and full licensed SI-1, full SI-2, `S2`-`S4`, DTC delta, SI-4 ETF reverse indexing/aggregation, every outcome join, and all QuantConnect work remain gated. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -2302,3 +2302,163 @@ was accessed. Permanent research looks remain **0**. The owner's current sync
 instruction authorizes one push of this recorded synchronization to the
 existing lane; it grants no implementation, research, QC-job, deployment, or
 trading authority.
+
+## 23. Claude independent review - 2026-08-31 (SI vintage-prior indexing and post-merge synchronization)
+
+Reviewer: Claude, in the single named lane worktree
+`C:\git\customizedagent\trading_agent_short_interest`. Governing documents:
+`CLAUDE.md`, `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`,
+`THREE_STRATEGY_PARALLEL_WORKFLOW.md`, and the lane's own `SI-CCR7-001`
+worktree rule.
+
+**Disposition: accepted.** No P0, P1, or P2 defect was found and no Short
+Interest code correction was required. One P3 process finding and one advisory
+observation are recorded. The counter-review `f3d1906` is accepted in full.
+
+### 23.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Base (last Claude review head) | `fd272f46186f18616dc17fcfb8ca8e0ce7a497e0` |
+| Reviewed head | `0b36f1cf86c9832681e11bf8762b29a3bf4d0bbd` |
+| Lane-authored commits reviewed | `f3d1906`, `bf7cf0c`, `3429083`, `266cd25`, `449999d`, `6426255`, `0b36f1c`, plus lane merge `5a4a772` |
+| Merged main contained | `origin/main@cf136e259cf628aabdc4220865fccdb5c7204306` |
+| Sync state | `origin/main` is an ancestor of the lane head; the lane is 0 behind / 1 ahead. The requested synchronization was already complete and needed no action. |
+| Claude correction commit | none required this round |
+| Interpreter | Python 3.12.13, pytest 9.1.1 |
+
+The four-lane merge of PRs #321, #322, #323 and #325 brings 212 files and
+roughly 78,000 insertions of Analyst, Insider and Target Price work into this
+branch. That content is out of this lane's review scope: it was reviewed in its
+own lanes and merged by its own pull requests. This review covers the Short
+Interest-authored commits above and the effect of the merge on lane-owned
+paths.
+
+**Scope discipline applied per the owner's standing rule:** corrections are
+limited to Short Interest strategy code for the QuantConnect backtest path.
+Issues in `trading_app` or in project structure are documented and left
+unfixed.
+
+### 23.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `f3d1906` | Counter-review of the Claude SI-3B-R review record | accepted |
+| 2 | `bf7cf0c` | Harden Short Interest indexing complexity guards | accepted |
+| 3 | `3429083` | Index Short Interest vintage prior validation | accepted |
+| 4 | `5a4a772` | Merge main into Short Interest without weakening shared safety | accepted |
+| 5 | `266cd25` | Record the conflict-resolution review | accepted |
+| 6 | `449999d` | Record the local conflict-resolution application | accepted |
+| 7 | `6426255` | Record owner push authorization | accepted |
+| 8 | `0b36f1c` | Record post-merge synchronization | accepted |
+
+`bf7cf0c` deserves credit: the previous complexity guard counted only
+iteration passes over a single-security fixture, which cannot distinguish
+linear from quadratic behaviour. It adds per-item read counting and a genuine
+second security, so the claim is now testable rather than merely asserted.
+
+`3429083` replaces the per-snapshot prior-link scan with a grouped, sorted
+index and a `bisect_right` lookup, and de-duplicates the reference partitioning
+behind one generic helper. It changes no formula, refusal, score, or payload.
+
+### 23.3 P0-P3 issue ledger
+
+No P0, P1, or P2 finding. No code correction was made.
+
+| ID | Priority | Status | Location | Finding and impact | Evidence | Requested action |
+|---|---|---|---|---|---|---|
+| SI-REV8-001 | P3 | Open — process, documented | Section 22.4 and commits `bf7cf0c`, `3429083` | Section 22.4 states "this owner-decision blocker stops the loop before another implementation milestone and before push" and that there is no authorized next code milestone. `bf7cf0c` (22:40) and `3429083` (23:07) were then committed the same evening, after `f3d1906` (19:30). `3429083` is an implementation change to `dataset.py` and `pit_eligibility.py`, and it implements exactly the provider-scale vintage-construction concern that section 22.3 had just assigned to "a separately authorized licensed-ingest milestone". No owner authorization is recorded between those timestamps; the recorded authorization on 2026-08-31 covers the merge and the push, not the implementation. | Commit timestamps and section 22.3/22.4 text. The mitigation is real and was self-disclosed: both commits are repeatedly marked advisory and "still require independent review", and merge into main was explicitly stated not to be acceptance. | None to the code. The work itself is sound and is accepted here, which resolves the outstanding review requirement. Recorded so the lane's stop-condition discipline stays auditable, and so a future round states the authorization basis before implementing past a declared stop. |
+| SI-REV8-002 | none (advisory) | Open | `research/short_interest_etf/dataset.py` | Three guards added by `3429083` survive individual removal with the complete 219-test lane green: the missing-settlement refusal, the visibility identity-ambiguity refusal, and the superseded-identity eviction. | I did **not** stop at the green suite. For each, I tried to construct the input it defends and recorded which contract refuses first. Displacing a snapshot settlement out of the release calendar is refused by "release settlement does not match snapshot settlement", so `settlement_ordinal.get(...)` cannot return `None` for a constructible vintage. Adding a second `source_id` for one (security, settlement) is refused by "snapshot source_id does not match manifest", and `SourceSemantic` has exactly one member, so two logical ids cannot share one identity. | None. These are unreachable defensive depth for a future multi-source vintage, not uncovered holes. I claim only what I constructed: two routes to each guard, each refused by a named earlier contract. I am deliberately not repeating the section 17 error of generalising a redundancy verdict beyond the probes actually run. |
+
+### 23.4 Out-of-lane findings: documented, not fixed
+
+| ID | Priority | Status | Location | Finding | Action |
+|---|---|---|---|---|---|
+| SI-SYNC-001 | out-of-lane | Confirmed, not fixed | `research/analyst_revisions_v2/specs/legacy_reproduction_registry.json` | Independently reproduced rather than accepted from the record. The worktree object hashes to `22583862e05ea1fc4c4ed13656859dbc31665f9c` against committed blob `e70230fe07290964c9ad687d2850661d2e24ac93`; the file holds 4 CR bytes while its directory attribute is `text: unset`, and `git status` still reports the path clean from a stale stat cache. This fails `tests/analyst_revisions_v2/test_dataset_and_import_firewall.py::test_canonical_production_artifacts_survive_checkout_as_exact_bytes` and is the **only** failure in my complete-suite run. | Not fixed. It is an Analyst-lane checkout artifact on this machine, outside Short Interest strategy/QC scope. The committed content is correct; only this checkout is stale. Routing note for the owner: a re-checkout or renormalisation of that one path clears it, and it needs no code change. |
+
+### 23.5 Process deviation disclosed against myself
+
+`SI-CCR7-001` and `SI-CCR8-001` record that a detached, temporary, forked or
+handed-off worktree is not authorised for this lane, explicitly including
+clean-tree and full-suite runs. **I violated that rule again at the start of
+this round**, creating a scratch worktree at `0b36f1c` for the baseline suite
+before reading those sections. On reading `SI-CCR8-001` I stopped that run,
+removed and pruned the worktree, and re-ran the complete suite inside the named
+lane worktree. `git worktree list` shows no worktree created by me; the only
+other detached entry belongs to a different session's Analyst lane and was left
+untouched. The submitted lane tree was never affected.
+
+This is the third consecutive round in which a Claude session has made this
+exact mistake, so the fault is a reading-order one: the lane's binding process
+rules live in counter-review sections that I was reaching only after starting
+validation. I have recorded the rule in my own durable session memory so the
+next round reads it before any run begins.
+
+### 23.6 Independent verification rather than accepted claims
+
+- **The merge did not touch lane code.** `git diff 3429083 HEAD` restricted to
+  `research/short_interest_etf/`, all seven lane test files and the lane
+  fixtures is **empty**. Every Short Interest source, test and fixture path is
+  byte-identical across the conflict resolution, the merge and the
+  fast-forward; only this record changed. That confirms the record's claim
+  without relying on it.
+- **The indexed prior lookup preserves the previous semantics.** The old code
+  filtered prior-settlement snapshots to `revision_published_at <=` the
+  current snapshot's and took the `max`. The new code takes
+  `bisect_right(revision_times, cutoff) - 1` over a list sorted by
+  `(revision_time, event_id)`. These differ only on ties at the same revision
+  time, where `max` keeps the first in vintage order and `bisect_right` keeps
+  the last. That tie is unreachable: `_validate_revision_groups`, which refuses
+  "conflicting same-time revisions" within a logical group, runs at line 323
+  immediately before `_validate_prior_links` at line 324, and a single-source
+  vintage makes the logical-id partition identical to the
+  (security_id, settlement_date) partition. Verified by call ordering, not
+  assumed.
+- **Mutation evidence.** Inverting the lookup from inclusive to exclusive
+  (`bisect_right` to `bisect_left`) fails **172 of 219** lane tests, and
+  reversing the prior-revision index order fails one. Both new indices are
+  load-bearing.
+- **Counts reproduce.** The complete seven-file lane passes **219 tests**,
+  matching the recorded figure, and the active-document suite passes **69**.
+
+### 23.7 Validation
+
+- Complete repository suite, run **inside the named lane worktree** at
+  `0b36f1c`: **6,789 passed, 13 skipped, 1 failed, 25 known dependency warnings
+  in 1,426.94s (23m47s)**. The single failure is `SI-SYNC-001` above, an
+  out-of-lane Analyst checkout artifact; no Short Interest test failed.
+- Complete seven-file Short Interest lane: **219 passed**.
+- Active-document consistency: **69 passed**. Required full `compileall`
+  including `research`: exit 0. `git diff --check` clean. Worktree clean and
+  equal to its remote.
+- Six mutations and four construction probes were run; every mutated file was
+  restored byte-for-byte and the tree verified clean afterwards. Note for
+  future tooling: `research/short_interest_etf/dataset.py` carries mixed
+  CRLF and LF line terminators in this checkout, so naive byte-pattern patching
+  silently fails to match. Its committed blob is canonical and its worktree
+  hash matches, so this is cosmetic, not a defect.
+- Synthetic fixtures only. No credential, provider, licensed row, price,
+  outcome, QuantConnect artifact/upload/compile/job, broker, operator database,
+  scheduler, deployment, order, or trading access occurred. Permanent research
+  looks used: **0**.
+
+### 23.8 Remaining gates and next authorized step
+
+Codex counter-reviews this record commit. Because no code changed, that scope
+is this section's accuracy, `SI-REV8-001`, and the `SI-REV8-002` advisory.
+
+`bf7cf0c` and `3429083` now have the independent review the record said they
+still required; being merged into `main` never conferred that.
+
+No next code milestone is authorized. Section 22.4's stop condition stands: the
+recommended next tranche is synthetic-only **SI-3C normalized `S0`/`S1`**, and
+before it can start the owner must freeze the exact epsilon and units, winsor
+bounds and cohort, quantile interpolation, minimum peer count, zero-MAD
+behaviour, PIT taxonomy/version and peer-cohort rule, delayed-release and
+correction handling, and whether `S0` and `S1` share one cohort and winsor
+policy. Those are outcome-sensitive degrees of freedom and must not be chosen
+by inference. Full licensed SI-1, full SI-2, `S2`-`S4`, days-to-cover delta and
+its window `K`, SI-4 ETF reverse indexing and aggregation, every outcome join,
+the portfolio stages, and all QuantConnect algorithm, artifact, upload or job
+work remain gated.

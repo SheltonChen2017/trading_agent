@@ -529,6 +529,62 @@ def test_all_transaction_rows_are_retained_including_derivatives():
     assert ClassificationOutcome.EXCLUDE_DERIVATIVE in filing.transactions[1].outcomes
 
 
+@pytest.mark.parametrize(
+    ("field_name", "existing", "conflicting"),
+    (
+        (
+            "documentType",
+            b"<documentType>4</documentType>",
+            b"<documentType>4</documentType><documentType>5</documentType>",
+        ),
+        (
+            "transactionCode",
+            b"<transactionCode>P</transactionCode>",
+            b"<transactionCode>P</transactionCode>"
+            b"<transactionCode>S</transactionCode>",
+        ),
+    ),
+)
+def test_conflicting_schema_singletons_are_refused(
+    field_name, existing, conflicting
+):
+    payload = _replace_once(
+        _fixture("form4_original.xml"), existing, conflicting
+    )
+
+    with pytest.raises(Form4ParseError, match=field_name):
+        _parse_original(payload)
+
+
+@pytest.mark.parametrize("placement", ("nested", "orphan", "wrong-table"))
+def test_structurally_misplaced_transaction_rows_are_refused(placement):
+    payload = _fixture("form4_original.xml")
+    if placement == "nested":
+        payload = _replace_once(
+            payload,
+            b"<nonDerivativeTransaction>",
+            b"<wrapper><nonDerivativeTransaction>",
+        )
+        payload = _replace_once(
+            payload,
+            b"</nonDerivativeTransaction>",
+            b"</nonDerivativeTransaction></wrapper>",
+        )
+    elif placement == "orphan":
+        payload = _replace_once(payload, b"<nonDerivativeTable>", b"")
+        payload = _replace_once(payload, b"</nonDerivativeTable>", b"")
+    else:
+        payload = _replace_once(
+            payload, b"<nonDerivativeTable>", b"<derivativeTable>"
+        )
+        payload = _replace_once(
+            payload, b"</nonDerivativeTable>", b"</derivativeTable>"
+        )
+
+    with pytest.raises(Form4ParseError, match="transaction.*structure"):
+        _parse_original(payload)
+
+
 def test_ambiguous_footnote_semantics_are_named_not_suppressed():
     payload = _replace_once(
         _fixture("form4_original.xml"),

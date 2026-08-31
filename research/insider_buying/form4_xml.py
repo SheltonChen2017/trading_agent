@@ -66,6 +66,10 @@ def _descendants(element: ElementTree.Element, name: str):
 
 def _first(element: ElementTree.Element, name: str):
     matches = _descendants(element, name)
+    if len(matches) > 1:
+        raise Form4ParseError(
+            f"REFUSED: XML schema field appears more than once: {name}"
+        )
     return matches[0] if matches else None
 
 
@@ -421,6 +425,14 @@ def parse_form4_xml(
     )
 
     transaction_nodes: list[tuple[ElementTree.Element, bool]] = []
+    raw_transaction_nodes = {
+        id(row): derivative
+        for row_name, derivative in (
+            ("nonDerivativeTransaction", False),
+            ("derivativeTransaction", True),
+        )
+        for row in _descendants(root, row_name)
+    }
     for table_name, row_name, derivative in (
         ("nonDerivativeTable", "nonDerivativeTransaction", False),
         ("derivativeTable", "derivativeTransaction", True),
@@ -429,6 +441,16 @@ def parse_form4_xml(
             transaction_nodes.extend(
                 (row, derivative) for row in _children(table, row_name)
             )
+    collected_transaction_nodes = {
+        id(row): derivative for row, derivative in transaction_nodes
+    }
+    if (
+        len(collected_transaction_nodes) != len(transaction_nodes)
+        or collected_transaction_nodes != raw_transaction_nodes
+    ):
+        raise Form4ParseError(
+            "REFUSED: transaction XML structure is incomplete or ambiguous"
+        )
 
     transactions: list[ParsedTransaction] = []
     for row_index, (row, derivative) in enumerate(transaction_nodes):

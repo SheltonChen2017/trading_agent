@@ -4,10 +4,9 @@ Status: **THE IB-0/IB-1 STRUCTURAL SLICE, BOUNDED IB-1A RAW-SNAPSHOT
 BOUNDARY, BOUNDED IB-1B OFFLINE EXPLICIT-PROFILE PARSER, AND BOUNDED IB-1C
 OFFLINE EDGAR ACCEPTANCE-EVIDENCE SNAPSHOT HAVE COMPLETED INDEPENDENT CLAUDE
 REVIEW. IB-1D HAS COMPLETED INDEPENDENT CLAUDE REVIEW,
-ACCEPTED AFTER CORRECTION (SEE SECTION 17). CODEX COUNTER-REVIEWED CLAUDE
-COMMIT `50bc867`, REJECTED IB1C-R15 AS
-A FALSE POSITIVE, AND IMPLEMENTED THE BOUNDED IB-1D SUPPLIED-SAMPLE FORM 4/A
-OBSERVATION CHRONOLOGY AT `73e87bc`; IB-1D NOW AWAITS CLAUDE REVIEW. IB-1 AND
+ACCEPTED AFTER CORRECTION (SEE SECTION 17), AND CODEX HAS COUNTER-REVIEWED
+CLAUDE COMMITS `dceff74` AND `3f2024b`, CORRECTING THREE CONFIRMED P2
+DATA-INTEGRITY DEFECTS (SEE SECTION 18). IB-1D REVIEW IS COMPLETE. IB-1 AND
 BLUEPRINT SECTION 19.4 STEP 3 ARE NOT COMPLETE: NO OFFICIAL SEC PROFILE, REAL
 PACKAGE, AUTHENTICATED AMENDMENT LINK, COMPLETE OR CROSS-QUARTER AMENDMENT
 COVERAGE, OR CANONICAL FILTER AUTHORITY EXISTS. NORMALIZATION, SIGNAL
@@ -129,6 +128,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-30 | Codex counter-review + implementation | `d6f587b..50bc867` reviewed; `50bc867` -> `73e87bc` implementation snapshot (this lane-record commit follows) | Claude counter-review plus bounded IB-1D supplied-sample Form 4/A observation chronology | Rejected IB1C-R15 using the SEC ownership-form exception that preserves the filing date through 10 p.m. ET, retained the strict IB-1C filing-day guard, corrected five review-record defects, and implemented an offline exact-acceptance Form 4/A chronology whose completeness and canonical-filter gates are immutably false. The slice binds caller-supplied XML to verified IB-1C evidence, retains as-filed versions, orders supplied amendments by acceptance time, and quarantines every amendment row. It performs no publication, download, discovery, normalization, signal, outcome, ETF, QC, broker, or UI work. | IB-1C/IB-1D module: **189 passed, 2 platform skips in 132.03s**; exact nine-file Insider/import-boundary/hygiene suite: **513 passed, 7 platform skips in 210.92s**; focused final boundary slice: **32 passed, 159 deselected**; **11/11 source mutants killed** plus forged-wrapper and duplicate-lineage adversarial probes caught; compileall over the Insider package and changed test exit 0; `git diff --check` clean apart from line-ending notices. Official SEC filing-rule documentation only was consulted; no filing, package, API, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, UI, or order access; **0 research looks**. | `50bc867` accepted after current-record correction. IB1C-R15 is a false positive; IB1C-R16 stays deferred P3 debt. Pre-commit audits found and fixed the omitted-amendment authority escape, parsed-object amplification, identity-hash survivors, wrapper forgery, contradictory amendment outcomes, future-boundary exposure, and duplicate-lineage drift. Three final audits report no remaining P0-P3 finding in the implemented scope. | Commit this authoritative lane record, validate the exact committed tree with the complete suite and whole-repository compileall, append an immutable validation row, then make the round's single push. Claude reviews every pushed commit before any further Insider milestone. |
 | 2026-08-30 | Codex validation | `fdf6f15` -> `fdf6f15` (exact tested snapshot; this validation-record commit follows) | IB-1D final exact-tree validation | Revalidated the committed counter-review, observation-only amendment chronology, tests, exports, and authoritative section 16 without changing product files. This later commit changes only this lane record. | Complete exact-tree suite: **5,685 passed, 9 skipped, 0 failed, 26 warnings in 1,302.61s (21m42s)**; whole-repository compileall including `research` exit 0; pre-validation active-document plus lane-record checks **64 passed**; IB-1C/IB-1D module **189 passed, 2 skipped**; nine-file suite **513 passed, 7 skipped**; worktree clean and `git diff HEAD --check` clean. Fixture and public-rule-documentation only; no filing, package, API, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, UI, or order access; **0 research looks**. | No new P0-P3 finding. The nine skips are platform-conditional and the 26 warnings are dependency/runtime notices. Exact snapshot `fdf6f15` stayed clean throughout validation. | Commit this validation row, rerun record-sensitive checks, confirm the remote remains `50bc867`, and make the round's single push. Claude independently reviews all three pushed commits before further Insider work. |
 | 2026-08-30 | Claude review | `50bc867` -> this review snapshot | Independent review of the bounded IB-1D Form 4/A observation chronology and of the counter-review rejecting IB1C-R15 (`50bc867..e2b434c`, 3 commits) | Verified frozen-file isolation, dispositioned all three commits, re-tested the IB1C-R15 rejection against the unmodified module rather than accepting the citation, ran a ten-mutant authority-escape sweep over IB-1D, and closed two untested guards in the public result constructor. Adopted the mandated ten-column ledger. Full dispositions are in section 17. | Independent complete suite on the exact pushed tree `e2b434c`: **5,685 passed, 9 skipped, 0 failed, 25 warnings in 915.99s**, reproducing the recorded pass/skip figures; nine-file focused suite **515 passed, 7 skipped** and IB-1C/1D module **191 passed, 2 skipped**, both the recorded figures plus this review's two cases; complete suite on the exact final review tree: **5687 passed, 9 skipped, 25 warnings in 1129.47s (0:18:49)**; IB-1D mutation sweep **6 of 10 caught, 2 survivors explained as defence in depth, 2 gaps closed and then caught 2 of 2**; nine synthetic probes, no SEC or provider data; compileall exit 0; every module restored byte-identical to `HEAD`. No SEC/EDGAR, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | IB1D-R11 (P3) fixed here: the result constructor's semantic rebuild and source-inventory hash binding had no test sensitivity because the only direct-construction test used a SimpleNamespace identity refused by the type check first. My IB1C-R15 is **withdrawn as a false positive**: Regulation S-T Rule 13(a)(4) exempts Forms 3/4/5 through 22:00 ET, so the guard is correct and unchanged; four further record defects of mine are accepted. IB1D-R10, IB1C-R16 and R-23 stay deferred. No test weakening; three deleted lines are docstring prose. | Codex counter-reviews these Claude commits, then may define authoritative amendment-link and multi-period evidence. Shared-surface P1 set unchanged under the owner's strategy-scope rule. |
+| 2026-08-30 | Codex counter-review | `e2b434c..3f2024b` reviewed; `3f2024b` -> this counter-review snapshot | Counter-review of Claude's IB-1D result-constructor regressions and review record | Reproduced both new tests, independently rechecked the Rule 13(a)(4) timing premise, generalized the constructor audit into the XML/parser and public-result boundaries, and corrected three confirmed P2 data-integrity defects plus two P3 record defects. Changes remain limited to lane-owned Insider code, tests, and this record. | Red phase: **9 failed** across conflicting singleton fields, three misplaced-row shapes, forged identity/inventory, direct constructor, and parsed-row loss. Corrected targeted slice: **15 passed**; affected parser plus IB-1C/IB-1D modules: **291 passed, 2 platform skips in 162.19s**. Four reverse mutations were killed: singleton cardinality (2 failures), row inventory (3), parsed-corpus binding (1), and factory-only construction (1); every mutation was restored. No SEC/EDGAR/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, UI, or order access; **0 research looks**. | `dceff74` accepted; `3f2024b` accepted after current correction. IB1D-CR06 through IB1D-CR08 (P2) and IB1D-CR09/10 (P3) are closed in section 18. The analogous IB-1A/B/C direct-dataclass pattern remains documented P3 debt because those public loaders already revalidate persisted state and a broad refactor is outside this counter-review. IB1D-R08/R09 remain authority blockers. | Commit the counter-review checkpoint. Then implement only the bounded offline multi-period/amendment-evidence contract; keep completeness and canonical-filter authority false and perform no external access or canonical row replacement. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -1826,10 +1826,11 @@ I also checked the orphan-amendment path directly, because
 iterates. It is guarded three ways: a version-count total, an accession-set
 equality, and an edge-set equality, and the corresponding mutant is caught.
 
-**No test weakening.** The range deletes exactly three lines, all docstring
-prose in `__init__.py` and the test module header; no test definition was
-removed anywhere, and my earlier IB1B-R10 regressions remain present and
-unmodified.
+**No test weakening.** Across production and test source, the range deletes
+exactly three lines, all docstring prose in `__init__.py` and the test module
+header. The lane-record rewrite deletes a further nine documentation lines.
+No test definition was removed anywhere, and my earlier IB1B-R10 regressions
+remain present and unmodified.
 
 ### 17.5 New findings
 
@@ -1922,3 +1923,60 @@ Next authorized step: Codex counter-reviews these Claude commits, then may
 define and validate authoritative amendment-link and multi-period evidence as
 the next bounded milestone. No live SEC ingest, research look, outcome join,
 QuantConnect job, broker action, or UI work is authorized.
+
+## 18. Codex counter-review of the IB-1D Claude review (2026-08-30)
+
+Counter-reviewer: Codex, on the existing
+`codex/strategy-insider-buying` branch and dedicated Insider worktree. Exact
+Claude range reviewed in chronological order: `e2b434c..3f2024b`
+(`dceff74`, `3f2024b`). Local `HEAD`, the fetched remote head, and the tracked
+branch were all `3f2024bf5726443d7d277a10412951523cf27754` before edits. No
+branch switch, rebase, force operation, provider request, or external data
+access occurred.
+
+### 18.1 Claude commit dispositions
+
+| Commit | Disposition | Counter-review basis |
+|---|---|---|
+| `dceff74` | **Accepted.** | Both tests reproduce their stated narrow gaps. The chronology-byte case is load-bearing for the semantic rebuild, and the inventory-entry hash case remains load-bearing after the stronger correction moved that equation into the identity boundary. The tests were adjusted to use the private verified-result factory where a white-box semantic mutation is intentional; the exported constructor is now factory-only. |
+| `3f2024b` | **Accepted after correction.** | The Rule 13(a)(4) ownership-form exception and the withdrawal of IB1C-R15 are correct. Its overall IB-1D acceptance missed three generalized P2 data-integrity defects and contained two P3 record errors. All five are corrected or superseded below without erasing the historical review. |
+
+### 18.2 Counter-review findings and retained ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1D-CR06 | P2 | Closed - fixed | `3f2024b` | `research/insider_buying/form4_xml.py`, singleton lookup | Schema-singleton XML fields used the first descendant and ignored conflicting duplicates. A filing carrying both code `P` and code `S` could enter `eligible_for_lot_aggregation` as `P`; the same fail-open direction applied to form type, issuer, owner flags, shares, price, direction, and ownership fields. | Synthetic duplicate `documentType` and `transactionCode` regressions both failed red because no exception was raised. Generalized call-site inspection confirmed repeated structures use explicit descendant loops, while `_first` is reserved for singleton reads. | First-value-wins parsing contaminates the canonical candidate set and violates the blueprint's fail-closed rule. | `_first` now refuses cardinality greater than one. Added conflicting form-type and transaction-code regressions. | Both red cases pass after correction. Neutralizing the cardinality guard makes both fail again; mutation restored. |
+| IB1D-CR07 | P2 | Closed - fixed | `3f2024b` | `research/insider_buying/form4_xml.py`, transaction collection | A transaction element nested under a wrapper, orphaned outside a table, or placed under the wrong table was silently omitted while the filing parsed successfully, including as a zero-transaction filing. | Three synthetic structural mutations each parsed without refusal before correction. A full descendant inventory contained the row while the direct-child collection did not. | Silent row loss breaks as-filed retention, amendment reconciliation, and later QC traceability. | The parser now inventories every derivative and non-derivative transaction element and requires exact identity/type equality with the direct children collected from their proper tables. | All three red shapes pass after correction. Neutralizing the inventory equality makes all three fail again; mutation restored. |
+| IB1D-CR08 | P2 | Closed - fixed | `3f2024b` | `research/insider_buying/form4_amendment_reconciliation.py`, source identity, reconciliation identity, and result constructor | Exact-type identities accepted invalid contract/hash/count/source provenance, and an ordinary caller could reassemble a public result after deleting parsed transactions. A malformed inventory object was accepted and later crashed serialization. Claude's two tests covered only chronology bytes and one per-source XML hash. | Direct probes accepted negative XML size, invalid URLs/times/commits, invalid aggregate hashes and IDs, and a corpus with its only transaction removed. The public result constructor accepted valid components without proof they came from the verified parser path. | This is durable-state/provenance corruption at the boundary intended to support future QC evidence. Literal false authority flags prevent immediate signal escape but do not make corrupted audit state acceptable. | Source identities and reconciliation identities now validate exact types, syntax, ordering, uniqueness, aggregate hashes, counts, acceptance-snapshot linkage, and the reconciliation-ID equation. The identity binds transaction count and a deterministic hash of the full parsed corpus. Result construction requires a private factory token, and reconstructible source fields are rebound to filing envelopes. | Nine counter-review red directions became green; the focused correction slice is 15 passed. Jointly neutralizing transaction-count/corpus-hash binding exposes parsed-row loss, and neutralizing the factory token exposes direct reassembly; both mutations were killed and restored. |
+| IB1D-CR09 | P3 | Closed - fixed | `3f2024b` | Record status header | The header simultaneously said IB-1D had completed Claude review and still awaited Claude review. | Direct comparison of lines 3-10 at the reviewed head. | A contradictory lane handoff can start the wrong workflow step. | Header now records completed Claude review and completed Codex counter-review. | Lane-record and active-document checks plus visual read. |
+| IB1D-CR10 | P3 | Closed - fixed | `3f2024b` | Section 17.4 | The review said the range deleted exactly three lines, but `git diff --numstat 50bc867..e2b434c` shows twelve deletions: three production/test docstring lines and nine lane-record lines. | Commit-range numstat and file-level diff. | Evidence language must distinguish source-code/test weakening from documentation replacement. | Section 17.4 now scopes the three-line statement to production/test source and states the nine record deletions separately. | Rechecked the exact range and corrected prose. |
+| IB1D-CR11 | P3 | Open - deferred | Prior IB-1A/B/C rounds | IB-1A/B/C identity/result dataclasses | Several earlier snapshot dataclasses rely on strict public loader validation rather than making ordinary direct construction self-validating. No loader bypass or corrupted persisted snapshot was reproduced in this counter-review. | Generalized constructor search across the three upstream modules. Their loaders rebuild hashes, row counts, schemas, ordinals, and lineage before returning loaded state. | A broad constructor/API refactor is outside the current IB-1D correction and risks duplicating deferred immutable-I/O work. | No change. Retained for an owner-scheduled lane consolidation or when a public direct-construction path is proposed. | Existing IB-1A/B/C loader and mutation suites remain in the later focused and complete validation sets. |
+
+### 18.3 Verification and conclusion
+
+The original Claude additions passed independently: **2 passed**. The
+counter-review red phase produced **9 failed** tests across the three P2
+directions. After correction, the targeted set passed **15**, and the complete
+affected Form 4 plus IB-1C/IB-1D modules passed **291 with 2
+platform-conditional skips in 162.19 seconds**. Four targeted reverse
+mutations were killed and restored: singleton cardinality, transaction-node
+inventory, paired transaction-count/parsed-corpus binding, and factory-only
+result construction. The official ownership-form timing premise remains
+accepted; no production timing rule changed.
+
+Counter-review disposition: **accepted after correction**. There is no open P0,
+P1, or P2 finding in this counter-review scope. IB1D-CR11, IB1D-R10,
+IB1C-R16, and R-23 remain P3 debt. IB1D-R08 and IB1D-R09 remain future
+authority blockers: this correction does not establish complete cross-quarter
+coverage or authenticate an amendment target.
+
+Only `research/insider_buying`, Insider tests, and this record changed. The
+project-wide coordination files remain frozen. No filing, package, API,
+provider, credential, licensed row, market outcome, QuantConnect job, broker,
+operator database, scheduler, UI, or order was accessed. **0 research looks.**
+
+Next bounded step: commit this counter-review checkpoint, then define an
+offline, profile-bound multi-period amendment-evidence contract. It must retain
+all as-filed versions, refuse period gaps/overlaps and unauthenticated links,
+and keep complete-amendment-coverage and canonical-filter authority false. No
+canonical row replacement or external acquisition is authorized.

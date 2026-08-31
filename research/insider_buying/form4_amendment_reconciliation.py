@@ -25,8 +25,9 @@ records that coverage is incomplete and canonical filtering is unauthorized.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import InitVar, dataclass, field, fields, is_dataclass
+from datetime import date, datetime, timezone
+from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 
@@ -62,6 +63,15 @@ MAX_TOTAL_TRANSACTIONS = 100_000
 _ACCESSION_RE = re.compile(r"^[0-9]{10}-[0-9]{2}-[0-9]{6}$")
 _GIT_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_ACCEPTANCE_SNAPSHOT_ID_RE = re.compile(
+    r"^sec-edgar-acceptance-(?P<year>[0-9]{4})q(?P<quarter>[1-4])-"
+    r"(?P<hash_prefix>[0-9a-f]{16})$"
+)
+_RECONCILIATION_ID_RE = re.compile(
+    r"^form4-amendment-reconciliation-(?P<year>[0-9]{4})q"
+    r"(?P<quarter>[1-4])-(?P<hash_prefix>[0-9a-f]{16})$"
+)
+_VERIFIED_RECONCILIATION_FACTORY_TOKEN = object()
 
 
 class Form4AmendmentReconciliationError(ContractError):
@@ -85,6 +95,39 @@ def _canonical_utc(value: datetime, *, label: str) -> datetime:
             f"REFUSED: {label} must be offset-aware and second-resolution"
         )
     return result
+
+
+def _contract_payload(value: object) -> object:
+    """Return a deterministic JSON-safe projection of frozen parser state."""
+
+    if isinstance(value, Enum):
+        return value.value
+    if type(value) is datetime:
+        return value.isoformat(timespec="seconds")
+    if type(value) is date:
+        return value.isoformat()
+    if type(value) is Decimal:
+        return str(value)
+    if value is None or type(value) in {str, bool, int}:
+        return value
+    if type(value) is tuple:
+        return [_contract_payload(item) for item in value]
+    if is_dataclass(value):
+        return {
+            item.name: _contract_payload(getattr(value, item.name))
+            for item in fields(value)
+        }
+    raise Form4AmendmentReconciliationError(
+        "REFUSED: parsed corpus contains unsupported state"
+    )
+
+
+def _parsed_corpus_hash(corpus: FilingCorpus) -> str:
+    if type(corpus) is not FilingCorpus:
+        raise Form4AmendmentReconciliationError(
+            "REFUSED: parsed corpus type is invalid"
+        )
+    return hash_payload(_contract_payload(corpus))
 
 
 @dataclass(frozen=True)
@@ -171,6 +214,48 @@ class SecForm4XmlSourceIdentity:
     retrieved_at_utc: str
     capture_git_commit: str
     amends_accession: str | None
+
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.accession_number, str)
+            or _ACCESSION_RE.fullmatch(self.accession_number) is None
+            or not isinstance(self.xml_sha256, str)
+            or _SHA256_RE.fullmatch(self.xml_sha256) is None
+            or type(self.xml_size_bytes) is not int
+            or not 0 < self.xml_size_bytes <= MAX_XML_BYTES
+            or not isinstance(self.primary_document_url, str)
+            or not isinstance(self.retrieved_at_utc, str)
+            or not isinstance(self.capture_git_commit, str)
+            or _GIT_COMMIT_RE.fullmatch(self.capture_git_commit) is None
+            or (
+                self.amends_accession is not None
+                and (
+                    not isinstance(self.amends_accession, str)
+                    or _ACCESSION_RE.fullmatch(self.amends_accession) is None
+                    or self.amends_accession == self.accession_number
+                )
+            )
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: XML source identity is invalid"
+            )
+        try:
+            _issuer_cik_from_verified_primary_url(
+                self.primary_document_url,
+                accession_number=self.accession_number,
+            )
+            retrieved_at = datetime.fromisoformat(self.retrieved_at_utc)
+            canonical_retrieved_at = _canonical_utc(
+                retrieved_at, label="XML source identity retrieval time"
+            ).isoformat(timespec="seconds")
+        except (Form4AmendmentReconciliationError, ValueError) as exc:
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: XML source identity is invalid"
+            ) from exc
+        if canonical_retrieved_at != self.retrieved_at_utc:
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: XML source identity is invalid"
+            )
 
     def to_payload(self) -> dict[str, object]:
         return {
@@ -366,18 +451,117 @@ class Form4AmendmentReconciliationIdentity:
     filing_count: int
     amendment_count: int
     lineage_count: int
+    transaction_count: int
+    parsed_corpus_hash: str
     complete_amendment_coverage_verified: bool
     canonical_filter_authorized: bool
     reconciliation_id: str
 
     def __post_init__(self) -> None:
         if (
-            self.complete_amendment_coverage_verified is not False
+            self.contract_version != FORM4_AMENDMENT_RECONCILIATION_VERSION
+            or not isinstance(self.parser_git_commit, str)
+            or _GIT_COMMIT_RE.fullmatch(self.parser_git_commit) is None
+            or not isinstance(self.acceptance_snapshot_id, str)
+            or not isinstance(self.acceptance_lineage_hash, str)
+            or _SHA256_RE.fullmatch(self.acceptance_lineage_hash) is None
+            or type(self.source_inventory) is not tuple
+            or not self.source_inventory
+            or len(self.source_inventory) > MAX_FORM4_XML_SOURCES
+            or not isinstance(self.source_inventory_hash, str)
+            or _SHA256_RE.fullmatch(self.source_inventory_hash) is None
+            or type(self.filing_count) is not int
+            or self.filing_count != len(self.source_inventory)
+            or type(self.amendment_count) is not int
+            or not 0 <= self.amendment_count <= self.filing_count
+            or type(self.lineage_count) is not int
+            or not 0 < self.lineage_count <= self.filing_count
+            or self.amendment_count != self.filing_count - self.lineage_count
+            or type(self.transaction_count) is not int
+            or not 0 <= self.transaction_count <= MAX_TOTAL_TRANSACTIONS
+            or not isinstance(self.parsed_corpus_hash, str)
+            or _SHA256_RE.fullmatch(self.parsed_corpus_hash) is None
+            or self.complete_amendment_coverage_verified is not False
             or self.canonical_filter_authorized is not False
+            or not isinstance(self.reconciliation_id, str)
         ):
             raise Form4AmendmentReconciliationError(
-                "REFUSED: bounded supplied samples cannot authorize canonical filtering"
+                "REFUSED: amendment reconciliation identity is invalid and "
+                "cannot authorize canonical filtering"
             )
+
+        if any(
+            type(item) is not SecForm4XmlSourceIdentity
+            for item in self.source_inventory
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: amendment reconciliation source inventory is invalid"
+            )
+        if (
+            tuple(
+                sorted(
+                    self.source_inventory,
+                    key=lambda item: item.accession_number,
+                )
+            )
+            != self.source_inventory
+            or len(
+                {item.accession_number for item in self.source_inventory}
+            )
+            != len(self.source_inventory)
+            or hash_payload(
+                [item.to_payload() for item in self.source_inventory]
+            )
+            != self.source_inventory_hash
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: amendment reconciliation source inventory is invalid"
+            )
+
+        acceptance_match = _ACCEPTANCE_SNAPSHOT_ID_RE.fullmatch(
+            self.acceptance_snapshot_id
+        )
+        reconciliation_match = _RECONCILIATION_ID_RE.fullmatch(
+            self.reconciliation_id
+        )
+        if (
+            acceptance_match is None
+            or acceptance_match.group("hash_prefix")
+            != self.acceptance_lineage_hash[:16]
+            or reconciliation_match is None
+            or reconciliation_match.group("year")
+            != acceptance_match.group("year")
+            or reconciliation_match.group("quarter")
+            != acceptance_match.group("quarter")
+            or self.reconciliation_id
+            != (
+                "form4-amendment-reconciliation-"
+                f"{acceptance_match.group('year')}q"
+                f"{acceptance_match.group('quarter')}-"
+                f"{hash_payload(self.lineage_payload())[:16]}"
+            )
+        ):
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: amendment reconciliation identity is invalid"
+            )
+
+    def lineage_payload(self) -> dict[str, object]:
+        return {
+            "contract_version": self.contract_version,
+            "parser_git_commit": self.parser_git_commit,
+            "acceptance_snapshot_id": self.acceptance_snapshot_id,
+            "acceptance_lineage_hash": self.acceptance_lineage_hash,
+            "source_inventory_hash": self.source_inventory_hash,
+            "filing_count": self.filing_count,
+            "amendment_count": self.amendment_count,
+            "lineage_count": self.lineage_count,
+            "transaction_count": self.transaction_count,
+            "parsed_corpus_hash": self.parsed_corpus_hash,
+            "complete_amendment_coverage_verified": (
+                self.complete_amendment_coverage_verified
+            ),
+            "canonical_filter_authorized": self.canonical_filter_authorized,
+        }
 
     def to_payload(self) -> dict[str, object]:
         return {
@@ -392,6 +576,8 @@ class Form4AmendmentReconciliationIdentity:
             "filing_count": self.filing_count,
             "amendment_count": self.amendment_count,
             "lineage_count": self.lineage_count,
+            "transaction_count": self.transaction_count,
+            "parsed_corpus_hash": self.parsed_corpus_hash,
             "complete_amendment_coverage_verified": (
                 self.complete_amendment_coverage_verified
             ),
@@ -414,8 +600,13 @@ class ReconciledForm4Amendments:
     identity: Form4AmendmentReconciliationIdentity
     as_filed_corpus: FilingCorpus
     lineages: tuple[Form4AmendmentLineage, ...]
+    _verified_factory_token: InitVar[object] = None
 
-    def __post_init__(self) -> None:
+    def __post_init__(self, _verified_factory_token: object) -> None:
+        if _verified_factory_token is not _VERIFIED_RECONCILIATION_FACTORY_TOKEN:
+            raise Form4AmendmentReconciliationError(
+                "REFUSED: reconciliation result boundary must be factory-created"
+            )
         if (
             type(self.identity) is not Form4AmendmentReconciliationIdentity
             or type(self.as_filed_corpus) is not FilingCorpus
@@ -444,9 +635,16 @@ class ReconciledForm4Amendments:
             or self.identity.lineage_count != len(self.lineages)
             or self.identity.amendment_count
             != sum(len(lineage.versions) - 1 for lineage in self.lineages)
+            or self.identity.transaction_count
+            != sum(
+                len(filing.transactions)
+                for filing in self.as_filed_corpus.filings
+            )
+            or _parsed_corpus_hash(self.as_filed_corpus)
+            != self.identity.parsed_corpus_hash
         ):
             raise Form4AmendmentReconciliationError(
-                "REFUSED: reconciliation result disagrees with its identity"
+                "REFUSED: reconciliation parsed corpus disagrees with its identity"
             )
         inventory_by_accession = {
             item.accession_number: item
@@ -464,6 +662,14 @@ class ReconciledForm4Amendments:
                     filing.envelope.accession_number
                 ].xml_sha256
                 != filing.envelope.source_sha256
+                or inventory_by_accession[
+                    filing.envelope.accession_number
+                ].primary_document_url
+                != filing.envelope.source_name
+                or inventory_by_accession[
+                    filing.envelope.accession_number
+                ].amends_accession
+                != filing.envelope.amends_accession
                 for filing in self.as_filed_corpus.filings
             )
         ):
@@ -489,6 +695,22 @@ class ReconciledForm4Amendments:
         self, original_accession: str, as_of: datetime
     ) -> Form4ObservedState | None:
         return self.lineage(original_accession).observed_state_at(as_of)
+
+
+def _build_verified_reconciliation_result(
+    *,
+    identity: Form4AmendmentReconciliationIdentity,
+    as_filed_corpus: FilingCorpus,
+    lineages: tuple[Form4AmendmentLineage, ...],
+) -> ReconciledForm4Amendments:
+    """Create a result only from the module's verified parsing path."""
+
+    return ReconciledForm4Amendments(
+        identity=identity,
+        as_filed_corpus=as_filed_corpus,
+        lineages=lineages,
+        _verified_factory_token=_VERIFIED_RECONCILIATION_FACTORY_TOKEN,
+    )
 
 
 def _source_identity(source: SecForm4XmlSource) -> SecForm4XmlSourceIdentity:
@@ -777,6 +999,7 @@ def reconcile_sec_form4_amendments(
     amendment_count = sum(
         len(lineage.versions) - 1 for lineage in lineages
     )
+    parsed_corpus_hash = _parsed_corpus_hash(corpus)
     identity_payload = {
         "contract_version": FORM4_AMENDMENT_RECONCILIATION_VERSION,
         "parser_git_commit": parser_git_commit,
@@ -786,6 +1009,8 @@ def reconcile_sec_form4_amendments(
         "filing_count": len(corpus.filings),
         "amendment_count": amendment_count,
         "lineage_count": len(lineages),
+        "transaction_count": total_transactions,
+        "parsed_corpus_hash": parsed_corpus_hash,
         "complete_amendment_coverage_verified": False,
         "canonical_filter_authorized": False,
     }
@@ -800,6 +1025,8 @@ def reconcile_sec_form4_amendments(
         filing_count=len(corpus.filings),
         amendment_count=amendment_count,
         lineage_count=len(lineages),
+        transaction_count=total_transactions,
+        parsed_corpus_hash=parsed_corpus_hash,
         complete_amendment_coverage_verified=False,
         canonical_filter_authorized=False,
         reconciliation_id=(
@@ -807,7 +1034,7 @@ def reconcile_sec_form4_amendments(
             f"q{loaded.identity.quarter}-{reconciliation_hash[:16]}"
         ),
     )
-    return ReconciledForm4Amendments(
+    return _build_verified_reconciliation_result(
         identity=identity,
         as_filed_corpus=corpus,
         lineages=lineages,

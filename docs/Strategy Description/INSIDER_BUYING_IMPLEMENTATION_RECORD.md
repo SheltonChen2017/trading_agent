@@ -2175,3 +2175,55 @@ not reset, overwrite, fast-forward, or push the live lane from this artifact.
 No provider, credential, licensed row, market outcome, permanent research
 look, QuantConnect job, broker, operator database, scheduler, deployment, or
 trading authority was accessed or granted.
+
+## 21. Local-history reconciliation after main sync (2026-08-31, local-only artifact)
+
+At the owner's direction, Codex reconciled the lane's exact local-only commit
+`43d6d6ae208875e8b64106a3324f1819fdc3a67b` into the already reviewed local
+main-sync artifact `1ffb6c556517610bb84c0b3b506748a65aab990e`. The resulting true merge
+commit is `d6d26e09b806e24de865d237f59674ad952c4df6`, with those two commits as its
+first and second parents respectively. This preserves the original local
+commit as reachable ancestry; it was not cherry-picked, rebased, squashed, or
+rewritten. The live lane worktree was clean at `43d6d6a` when checked and was
+not modified, and no branch ref or remote was updated.
+
+The merge produced two textual conflicts, both in lane-owned IB-1D files:
+`research/insider_buying/form4_amendment_reconciliation.py` and
+`tests/test_insider_buying_sec_edgar_acceptance_snapshot.py`. The resolution
+keeps the later `ad86df0` factory-only constructor, parsed-corpus binding,
+expanded identity, source-inventory validation, and its stronger regressions.
+It adds only the local commit's non-superseded role-consistency invariant and
+regression: an amendment accession cannot claim the original-filing
+observation disposition, and the original accession cannot claim an amendment
+disposition. No IB-1E source, test, fixture, export, or authority gate changed.
+Relative to `1ffb6c5`, the resulting tree adds 23 lines in those two files.
+
+| Commit | Disposition | Reason |
+|---|---|---|
+| `43d6d6a` | accepted after reconciliation | Its unique observed-state role invariant and regression are correct and retained. Its overlapping public-result and identity hardening was superseded by the later, stronger `ad86df0` factory-only and parsed-corpus design, so those older tree forms were not reintroduced. |
+| `d6d26e0` | accepted as a local conflict-resolution candidate | It preserves both histories as parents, retains the later IB-1D/IB-1E tree, closes `INS-MRG-001`, and has no change outside the two lane-owned files. It remains local-only and still requires the ordinary exact-pushed-snapshot review before later lane development. |
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `INS-MRG-001` | P3 | Closed - fixed | `d6d26e0` | `Form4ObservedState.__post_init__` | A directly constructed amendment observation could claim the original-filing role, producing an internally inconsistent exported value. | The pre-reconciliation `1ffb6c5` constructor checked syntax and enum type but did not bind role to accession identity; `43d6d6a` contained the missing invariant. | Exported observation values should not encode mutually contradictory filing identity and chronology role even though this boundary has no trading authority. | Retained the equivalence check from `43d6d6a` on top of the later remote implementation and retained its dangerous-direction regression. | Targeted regression **1 passed, 197 deselected**; affected IB-1D/IB-1E tests **211 passed, 2 skipped**; complete suite **6,209 passed, 9 skipped**. |
+
+Validation used Python 3.12.13 and pytest 9.1.1. The targeted role regression
+passed with 197 deselections in 0.74 seconds. The complete IB-1D acceptance-
+snapshot and IB-1E multi-period suite passed **211 tests with 2 skips in
+122.60 seconds**. The exact reconciliation code commit `d6d26e0` passed the
+complete repository suite with **6,209 passed, 9 skipped, 0 failed, and 26
+dependency/runtime warnings in 1,130.16 seconds (18m50s)**. Whole-repository
+compileall including `research` exited 0, `git diff --check` was clean, and
+the candidate remained detached from all live refs. The final active-document
+and Insider lane-record checks passed **68 tests**; this documentation-only
+commit changes no product behavior.
+
+No new P0-P2 finding was introduced by this reconciliation. `IB1D-R09`
+remains the open future-authority blocker: the supplied, non-official
+amendment link still cannot authorize canonical filtering. No SEC/EDGAR or
+other provider request, credential, licensed row, market outcome, permanent
+research look, QuantConnect job, broker, operator database, scheduler,
+deployment, or trading authority was accessed or granted. The next authorized
+step is to transfer this exact local-only history to the clean lane only after
+re-verifying its head, then obtain independent review of the exact pushed
+snapshot before any further Insider milestone.

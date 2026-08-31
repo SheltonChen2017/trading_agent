@@ -6,8 +6,10 @@ OUTCOME-FREE STRUCTURAL STOCK-SCORE CANDIDATE ACCEPTED AFTER INDEPENDENT
 CLAUDE REVIEW AND CODEX COUNTER-REVIEW CORRECTION. THE OWNER-DIRECTED QC-FIRST
 OUTCOME-FREE PLAN (ARV2-3Q) IS ACCEPTED AFTER INDEPENDENT CLAUDE REVIEW AND
 CODEX COUNTER-REVIEW CORRECTION. ARV2-4A OUTCOME-FREE STRUCTURAL PREREQUISITES
-ARE ACCEPTED AT CODEX COUNTER-REVIEW AFTER INDEPENDENT CLAUDE REVIEW; THE
-CORRECTED SNAPSHOT AWAITS THE NEXT INDEPENDENTLY REVIEWED PUSH. THE ARV2-4
+ARE ACCEPTED AT CODEX COUNTER-REVIEW AFTER INDEPENDENT CLAUDE REVIEW. THE
+COUNTER-REVIEW CORRECTIONS AND THE PROJECT-WIDE MAIN SYNCHRONIZATION ARE
+ACCEPTED AFTER INDEPENDENT CLAUDE REVIEW (SECTION 7); CODEX COUNTER-REVIEW
+OF THAT REVIEW IS NEXT. THE ARV2-4
 EVALUATION AND EVERY DATA, OUTCOME,
 UPLOAD, COMPILE, QC-RUN, PAPER, OR FUNDED ACTION REMAIN BLOCKED BY THE
 RECORDED SOURCE, RIGHTS, REVIEW, RUN-IDENTITY, AND ONE-USE AUTHORITY GATES.
@@ -1950,6 +1952,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-31 | Codex main-sync integration and push authorization | `c16f7f4` -> `43224495` (reviewed integration and local-application records; this authorization record follows) | Resolve project-wide `main` conflicts without weakening Analyst ownership | Integrated exact `origin/main@1a5264e` through reviewed merge `4ef736b`, preserved lane-owned ARV2 work and compatible regression unions, corrected `ARV2-MRG-001`, and fast-forwarded the clean long-lived local lane. After Codex reported the exact clean local head and that nothing had been pushed, the owner explicitly instructed `push`; this row records that authorization for this completed integration only. | Exact resolved tree: **5,953 passed, 3 skipped, 0 failed, 26 warnings**; Analyst-focused **408 passed, 1 skipped**; reconciliation-focused **103 passed**; active-document gate after local application **67 passed**; compileall and applicable diff/status gates passed. No provider, outcome, QC, broker, deployment, order, or trading access; **0 research looks**. | `ARV2-MRG-001` P2 corrected; no open P0-P3 in the reviewed integration. ARV2-4 and all source/outcome/action gates remain blocked. | Commit this authorization record, re-fetch and require the recorded remote tips to remain exact ancestors, then push this one long-lived lane once. Independent review of the exact pushed snapshot follows before any later milestone. |
 | 2026-08-31 | Codex corrective post-push main sync | `7a7757a2` -> this merge | Remove the remaining PR conflict after `main` advanced | After the atomic lane push, `main` advanced from `1a5264e6` to `19ae3f9f` by merging the Insider, Short Interest, and Target Price PRs. The owner reported that one conflict remained. A four-lane merge simulation found only this Analyst lane conflicted, in shared `tests/test_ml_evidence_operations.py`; the exact stronger `main` blob was selected because it supersedes the lane's older skip-only Store-alias workaround. This corrective merge completes the previously authorized conflict-free PR outcome; it grants no new milestone or action authority. | Conflict file **57 passed**. Pre-commit full tree reached **6,789 passed, 13 skipped** with one expected commit-state failure: a Target Price exact-byte test reads `HEAD`, where newly staged merge files cannot exist until the merge commit is created. The exact committed-tree rerun follows this record. No provider, outcome, QC, broker, deployment, order, or trading access; **0 research looks**. | No new P0-P3 code finding. Main's resolver preserves a real virtual-environment launcher, resolves only an invalid Store alias to the running process image, and directly tests zero-byte and reparse-only refusals. | Commit this merge, rerun the complete exact committed tree and document gates, re-fetch, then push the corrective Analyst update once if green. Independent review of the new exact pushed head remains required. |
 | 2026-08-31 | Owner corrective-push authorization | `d9b05eb6` -> `64ccf252` (tested merge plus validation record; this authorization record follows) | Publish the conflict-free Analyst follow-up | After Codex reported the exact local and remote heads, complete-suite evidence, clean worktree, and conflict-free merge simulation, the owner explicitly instructed `push`. This authorizes one corrective push to the existing Analyst lane only. | Exact committed tree **6,790 passed, 13 skipped, 0 failed**; conflict file **57 passed**; active-document gate **69 passed**; compileall, diff, ancestry, clean-status, and merge-tree gates passed. No provider, outcome, QC, broker, deployment, order, or trading access; **0 research looks**. | No open P0-P3 finding in the corrective merge. ARV2-4 remains blocked. | Commit this authorization record, re-fetch and require exact `main@19ae3f9f` and remote Analyst head `7a7757a2`, then push once. Independent review of the exact pushed snapshot follows. |
+| 2026-08-31 | Claude review | `cf136e25` -> this commit | Independent review of the ARV2-4A counter-review corrections and the project-wide main synchronization | Reviewed all eleven commits in `37dc424f..cf136e25` with an explicit disposition each (section 7). Verified by bytes that the analyst research tree is identical from pre-merge lane head `c16f7f40` to final `cf136e25`, that the single corrective-merge conflict resolved to exact main blob `be5ad791`, and that every earlier review regression survives. Mutation-verified three section 4S guards red/green; the fourth survivor is unreachable defense-in-depth (ARV2R8-001), documented not forced. No code or test change was required; this record is the only change. | Exact final tree `cf136e25`: **6790 passed, 13 skipped, 25 warnings in 1455.60s (0:24:15)**. Strict analyst battery **382 passed, 1 skipped in 128.61 s** (section 6.3's 408 is a wider selection); active-document **69 passed**; `git diff --check` clean. Python 3.12.13. No provider, credential, licensed row, price, return, outcome, QC job, upload, deployment, broker, scheduler or order access; **0 research looks and 0 development evaluations.** | 0 P0, 0 P1, 0 P2, 0 corrected; 3 P3 observations documented (ARV2R8-001 unreachable fit-level spec binding, ARV2R8-002 shared-scope dropped ledger tests, ARV2R8-003 two-session review coordination). Cumulative dispositions of the pre-`37dc424` commits remain as recorded in sections 4L-4S. | Codex counter-reviews this exact pushed head. The next bounded milestone (fold-manifest structural binding) requires owner authorization before it begins; ARV2-4 and every data/outcome/QC/paper/funded authority remain blocked. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -2093,3 +2096,83 @@ instructed `push`. This authorizes one corrective remote update of the
 existing Analyst lane after one final exact-tip and clean-worktree check. It
 does not authorize a new milestone or any provider, outcome, QuantConnect,
 deployment, broker, order, or trading action.
+
+## 7. Independent Claude review of the ARV2-4A counter-review and the main synchronization, 2026-08-31
+
+**Range reviewed:** `37dc424f..cf136e25`, eleven commits, each disposed below.
+**Disposition: ACCEPTED.** 0 P0, 0 P1, 0 P2; **no correction was required.**
+Three P3 observations are documented in 7.4; none is a defect in the reviewed
+range. **Zero research looks and zero development evaluations.** No provider,
+credential, licensed row, price, return, outcome, broker, operator-database,
+QuantConnect, upload, scheduler, order, UI or Streamlit access occurred.
+
+**Reviewing session:** the same Claude session (personal Git identity) that
+produced sections 4L and 4O, addressing the coordination point in ARV2R7-002
+by identifying itself explicitly. Sections 4I and 4R were produced by the
+work-identity session. The commits `e53ba26`, `c334571` and `37dc424` inside
+the wider ledger history were reviewed by section 4R and counter-reviewed by
+section 4S; this review spot-verified their material claims rather than
+re-reviewing them, and its own range begins after `37dc424`.
+
+### 7.1 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `33d40f1e` | Accepted | The section 4S code corrections. Verified strengthening throughout: `require_production_registry_entry` now ends in an unconditional fail-closed raise so a checked-in registry entry cannot self-promote (ARV2CR8-005); the exact NYSE-open equality moved into the frozen cross-section invariant (ARV2CR8-006); and the process-local weak-reference identity registry mirrors the established `_POLICY_AUTHORITIES` pattern - RLock, id-reuse-safe purge callback, digest re-pin - so a `dataclasses.replace` copy carries the token but lands unregistered and refuses, and a low-level mutation of a registered object breaks its pinned digest (ARV2CR8-010). The new registry is covered by the authority-lock inventory test. Mutation-verified: removing the open-equality check, skipping the registry authentication, and reverting the approval raise each turn the new tests red; restored green. |
+| `3aedfffc` | Accepted | Record-only section 4S ledger. Its cumulative-disposition reconciliation of section 4R (ARV2CR8-002) is correct, and its ARV2CR8-003 ID-collision repair leaves exactly one definition per observation. Touches only this lane record. |
+| `c16f7f40` | Accepted | Records the narrow owner push authorization without granting later authority. Record-only. |
+| `4ef736be` | Accepted | First main merge. Independently verified: the analyst research tree (`research/analyst_revisions_v2/`, `tests/analyst_revisions_v2/`, both sibling test files) is **byte-identical** from pre-merge lane head `c16f7f40` to final `cf136e25` - an empty diff - so no conflict choice touched lane-owned strategy code. |
+| `d9de03d3` | Accepted | Section 6 conflict-review record, including the self-found and corrected `ARV2-MRG-001`. Record-only. |
+| `43224495` | Accepted | Local-application record (fast-forward of the reviewed bundle; no rewrite). Record-only. |
+| `7a7757a2` | Accepted | Owner push-authorization record. Record-only. |
+| `d9b05eb6` | Accepted | Second (corrective) main merge after `main` advanced. Its single conflict file `tests/test_ml_evidence_operations.py` resolves to exactly `main`'s blob `be5ad791...`, verified by blob-hash equality at both `19ae3f9f` and `cf136e25`, matching the section 6.5 claim. |
+| `64ccf252` | Accepted | Validation record for the corrective merge. Record-only. |
+| `ef1a5251` | Accepted | Owner corrective-push authorization record. Record-only. |
+| `cf136e25` | Accepted | The PR #321 merge by the owner. The lane branch, its remote, and `main` now share this head. |
+
+### 7.2 Independent verification
+
+- **Lane isolation across both merges, proved by bytes.** `git diff c16f7f40
+  cf136e25` over the analyst research and test tree is empty. Every one of
+  this lane's review regressions - the superseded-period case, the
+  authority/schema/status pins, the plan-id derivation, duplicate-key
+  refusal, the no-hard-cutoff decay pin - is present at the final tree.
+- **The one merge conflict resolved to the stronger side.** The final
+  `tests/test_ml_evidence_operations.py` blob equals `main`'s, which carries
+  the real virtual-environment launcher and reparse-point coverage rather
+  than the lane's smaller Store-alias helper.
+- **Fail-closed production registration re-verified.** The former positive
+  registration test now expects `approval authority is absent`, and later
+  artifact substitution still fails against the reviewed blob. Reverting the
+  unconditional raise turns the renamed test red.
+- **Validation on the exact final tree `cf136e25`:** full suite
+  **6790 passed, 13 skipped, 25 warnings in 1455.60s (0:24:15)** in a pinned detached worktree. The growth from section 6.3's 5,953 reflects the four merged lanes' suites now sharing one tree, and the extra skips are other lanes' host-capability skips; nothing failed. Strict analyst battery (analyst directory plus the
+  contracts and preregistration files): **382 passed, 1 host symlink skip in
+  128.61 s** - section 6.3's 408 uses a wider reconciliation selection, the
+  same selection-variance class recorded in 4O.5. Active-document gate:
+  **69 passed** (grew from section 6.3's 67 as `main`'s later merges added
+  assertions). `git diff --check` clean; no frozen shared file touched.
+
+### 7.3 Mutation matrix
+
+Four reverse mutations against the section 4S guards in a detached scratch
+worktree at `cf136e25`: open-equality removal, registry-authentication skip,
+and approval-raise revert each **bit**; the fit-level `spec_hash` binding
+survived and became observation ARV2R8-001 below rather than a correction.
+
+### 7.4 Observations (documented, deliberately not corrected)
+
+| ID | Kind | Observation |
+|---|---|---|
+| ARV2R8-001 | Unreachable redundancy, verified | The fit/apply check `item.spec_hash != contract.spec_hash` (ARV2CR8-007) survived mutation, and analysis shows it is **unreachable through authentic objects today**, not merely untested: the contract loader's exact frozen-template match makes a second valid `spec_hash` unconstructible in-process (any content change refuses at load; a byte-identical copy has the same hash), and a tampered registered cross-section breaks its pinned registry digest before the comparison runs. This is the same defense-in-depth pattern as ARV2R7-001 and ARV2R4-005. It becomes the load-bearing guard the moment a future milestone introduces contract versioning or a reviewed persistence loader - that refactor must add the regression this review deliberately did not force. |
+| ARV2R8-002 | Shared-scope, out of lane | Section 6.2 records three lane-only portfolio-ledger test functions not retained through the merge because they asserted behavior incompatible with `main`'s newer exact-money/provenance contract. No test *file* was deleted (verified: the lane-to-final diff has no deletions), and the justification names the stronger shared coverage. Portfolio-ledger behavior is Trading-App scope, so under the owner's lane rule this is documented for the shared-remediation owners rather than re-litigated here. |
+| ARV2R8-003 | Session coordination | Three review sections in this lane now come from two Claude sessions (4I/4R work identity; 4L/4O/this section personal identity). Attribution stays clean through Git identity and the explicit session statements each section now carries, but ARV2R7-002's point stands: the parallel workflow names one review session per lane, and consolidation is an owner decision. |
+
+### 7.5 Next step
+
+Codex counter-reviews this exact pushed head. The recommended next bounded
+milestone remains the fold-manifest-only structural binding named in section
+4S, which requires owner authorization before it begins. ARV2-4 stays blocked
+on the recorded source, rights, review, run-identity and one-use authority
+gates; every executable definition hash is still null, and upload, historical
+launch, paper deployment and funded live remain constant false.

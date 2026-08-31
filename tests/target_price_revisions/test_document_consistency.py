@@ -457,3 +457,39 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         )
         for stale_claim in stale_current_claims:
             assert stale_claim not in normalized_pointer_lower
+
+
+def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:
+    """TPR-CR5-001. All four strategy lanes are merged into `main`.
+
+    "Deliberately unmerged" was true when the propagation routing was written
+    and is now false, so it is exactly the shape this module's docstring calls
+    durable: a phrase that should never be true again, rather than one that
+    must stay true. A reader acting on it would still believe the sibling
+    re-freezes need four separate branches.
+
+    Scoped to the current-state surfaces only. Historical sections keep their
+    original wording under an explicit supersession note, which is how this
+    record retains evidence without misrouting the next role.
+    """
+    record = (STRATEGY_DIR / RECORD).read_text(encoding="utf-8")
+    stale = "deliberately unmerged"
+
+    preamble = record[: record.index("\n## 1.")]
+    next_step = _record_section("## 8. Exact next step")
+    for name, block in (("record preamble", preamble), ("section 8", next_step)):
+        assert stale not in block.lower(), (
+            f"{name} still calls this lane unmerged; all four lanes are in main"
+        )
+
+    for name in ("SESSION_HANDOFF.md", "ACTION_PLAN_2026-08-20.md"):
+        assert stale not in _doc(name).lower(), (
+            f"{name} still calls the target lane unmerged"
+        )
+
+    # The historical block must not silently lose its supersession marker.
+    propagation = record[record.index("### 15.4"):]
+    if stale in propagation[: propagation.index("\n### ") if "\n### " in propagation else len(propagation)].lower():
+        assert "superseded in part" in propagation.lower(), (
+            "section 15.4 keeps the stale branch premise without marking it superseded"
+        )

@@ -42,7 +42,14 @@ EXPECTED_CANDIDATE_HASH = (
 EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
     "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
-LATEST_CLAUDE_REVIEW_HEAD = "f21d70851d5e1790be0c308e13e8837a7cd1d008"
+LATEST_CLAUDE_REVIEW_BASE = "cf136e259cf628aabdc4220865fccdb5c7204306"
+LATEST_CLAUDE_REVIEW_HEAD = "cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a"
+LATEST_CLAUDE_REVIEW_RANGE = (
+    f"{LATEST_CLAUDE_REVIEW_BASE}..{LATEST_CLAUDE_REVIEW_HEAD}"
+)
+LATEST_CLAUDE_REVIEW_SHORT_RANGE = "cf136e25..cd23f7c8"
+PREVIOUS_CLAUDE_REVIEW_HEAD = "f21d70851d5e1790be0c308e13e8837a7cd1d008"
+PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD = "f21d708"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -59,13 +66,34 @@ def _doc(name: str) -> str:
 
 def _action_current() -> str:
     return _doc("ACTION_PLAN_2026-08-20.md").split(
-        "**Current bounded status, 2026-08-30:**", 1
+        "**Current bounded status, 2026-08-31:**", 1
     )[1].split("**Owner multiplicity amendment, 2026-08-30", 1)[0]
+
+
+def _action_tpr_row() -> str:
+    return next(
+        line
+        for line in _doc("ACTION_PLAN_2026-08-20.md").splitlines()
+        if line.startswith("| Target-Price Revisions (TPR) |")
+    )
 
 
 def _handoff_current() -> str:
     return _doc("SESSION_HANDOFF.md").split(
         "## 0. Target-Price Revision fourth-lane planning addition", 1
+    )[1].split("\n## ", 1)[0]
+
+
+def _handoff_current_review() -> str:
+    section = _handoff_current()
+    return section.split("- **Current review state, 2026-08-31.**", 1)[1].split(
+        "\n- ", 1
+    )[0]
+
+
+def _handoff_target_summary() -> str:
+    return _doc("SESSION_HANDOFF.md").split(
+        "### Target-Price Revisions", 1
     )[1].split("\n## ", 1)[0]
 
 
@@ -427,7 +455,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         "the current block must name exactly one current candidate artifact digest"
     )
     assert "29-page v2.2" in normalized_current
-    assert LATEST_CLAUDE_REVIEW_HEAD in normalized_current
+    assert re.findall(
+        r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
+    ) == [LATEST_CLAUDE_REVIEW_RANGE]
+    assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_current
+    assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_current
     assert "Codex has counter-reviewed every Claude commit" in normalized_current
     assert "No next implementation milestone is authorized" in normalized_current
     assert "TPR-1 remains blocked" in normalized_current
@@ -442,9 +474,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in routing_row
     assert BLUEPRINT_CONTENT_SHA256 in routing_row.lower()
 
-    for current_pointer in (_action_current(), _handoff_current()):
+    for current_pointer in (_action_current(), _handoff_current_review()):
         normalized_pointer = " ".join(current_pointer.split())
-        assert LATEST_CLAUDE_REVIEW_HEAD in normalized_pointer
+        assert re.findall(
+            r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_pointer
+        ) == [LATEST_CLAUDE_REVIEW_RANGE]
+        assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_pointer
+        assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_pointer
         assert "Codex has counter-reviewed every Claude commit" in normalized_pointer
         assert "No next implementation milestone is authorized" in normalized_pointer
         normalized_pointer_lower = normalized_pointer.lower()
@@ -458,15 +494,28 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         for stale_claim in stale_current_claims:
             assert stale_claim not in normalized_pointer_lower
 
+    for summary_pointer in (
+        _record_preamble(),
+        _action_tpr_row(),
+        _handoff_target_summary(),
+    ):
+        normalized_summary = " ".join(summary_pointer.split())
+        normalized_summary_lower = normalized_summary.lower()
+        assert re.findall(
+            r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
+        ) == [LATEST_CLAUDE_REVIEW_SHORT_RANGE]
+        assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_summary
+        assert "section 23" in normalized_summary_lower
+        assert "no next implementation milestone is authorized" in normalized_summary_lower
+
 
 def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:
-    """TPR-CR5-001. All four strategy lanes are merged into `main`.
+    """TPR-CR5-001/TPR-CCR6-002/004: keep current routing truthful.
 
     "Deliberately unmerged" was true when the propagation routing was written
     and is now false, so it is exactly the shape this module's docstring calls
-    durable: a phrase that should never be true again, rather than one that
-    must stay true. A reader acting on it would still believe the sibling
-    re-freezes need four separate branches.
+    durable: a phrase that should never be true again in current state. Merge
+    visibility does not supersede the owner's per-lane branch/review rule.
 
     Scoped to the current-state surfaces only. Historical sections keep their
     original wording under an explicit supersession note, which is how this
@@ -474,22 +523,44 @@ def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:
     """
     record = (STRATEGY_DIR / RECORD).read_text(encoding="utf-8")
     stale = "deliberately unmerged"
+    branch_rule = (
+        "sibling-lane changes and their independent reviews remain on their "
+        "respective branches"
+    )
+    unauthorized_routing = (
+        "one coordinated change instead of four isolated branch rounds"
+    )
 
     preamble = record[: record.index("\n## 1.")]
-    next_step = _record_section("## 8. Exact next step")
-    for name, block in (("record preamble", preamble), ("section 8", next_step)):
+    next_step = _current_qualification(_record_section("## 8. Exact next step"))
+    current_surfaces = {
+        "record preamble": preamble,
+        "record section 8 current qualification": next_step,
+        "SESSION_HANDOFF.md target section": _handoff_current(),
+        "SESSION_HANDOFF.md target summary": _handoff_target_summary(),
+        "ACTION_PLAN_2026-08-20.md target block": _action_current(),
+        "ACTION_PLAN_2026-08-20.md target row": _action_tpr_row(),
+    }
+    for name, block in current_surfaces.items():
         assert stale not in block.lower(), (
             f"{name} still calls this lane unmerged; all four lanes are in main"
         )
-
-    for name in ("SESSION_HANDOFF.md", "ACTION_PLAN_2026-08-20.md"):
-        assert stale not in _doc(name).lower(), (
-            f"{name} still calls the target lane unmerged"
+        assert branch_rule in " ".join(block.lower().split()), (
+            f"{name} must preserve the owner-directed per-lane correction rule"
+        )
+        assert unauthorized_routing not in " ".join(block.lower().split()), (
+            f"{name} must not infer cross-lane edit authority from integration"
         )
 
     # The historical block must not silently lose its supersession marker.
-    propagation = record[record.index("### 15.4"):]
-    if stale in propagation[: propagation.index("\n### ") if "\n### " in propagation else len(propagation)].lower():
+    propagation_tail = record[record.index("### 15.4"):]
+    next_subsection = propagation_tail.find("\n### ", len("### 15.4"))
+    propagation = (
+        propagation_tail
+        if next_subsection == -1
+        else propagation_tail[:next_subsection]
+    )
+    if stale in propagation.lower():
         assert "superseded in part" in propagation.lower(), (
             "section 15.4 keeps the stale branch premise without marking it superseded"
         )

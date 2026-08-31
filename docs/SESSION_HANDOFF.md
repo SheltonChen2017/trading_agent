@@ -3,7 +3,7 @@
 Prepared: 2026-08-29 by Codex after the owner directed a separate
 Target-Price Revision planning lane and revised research/QC plan; amended by
 the owner-coordinated shared-family/final-holdout decision and the approved
-TPR-0A implementation round through 2026-08-30. This remains the canonical
+TPR-0A implementation and review rounds through 2026-08-31. This remains the canonical
 generic-workflow handoff for the root project and preserves the 2026-08-28
 deferred-remediation state below. The original three strategy lanes remain
 independent; this amendment changes shared coordination only and does not edit
@@ -15,7 +15,18 @@ their lane-owned artifacts.
   `main` (PRs #321, #322, #323, #325) and this lane branch is synchronized to
   the integrated `main` by fast-forward. The earlier statements that the lane
   is developed apart from `main` are superseded. The shared four-slot
-  multiplicity amendment is still unpropagated (`TPR-OOL-006`).
+  multiplicity amendment is still unpropagated (`TPR-OOL-006`). Sibling-lane
+  changes and their independent reviews remain on their respective branches;
+  merge visibility grants no target-branch authority over sibling artifacts.
+
+- **Current review state, 2026-08-31.** Claude's latest independent review is
+  the exact three-commit range
+  `cf136e259cf628aabdc4220865fccdb5c7204306..cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a`.
+  Codex has counter-reviewed every Claude commit individually; all three are
+  accepted after correction, with two P2 and four P3 findings recorded in
+  section 23 of the target lane record. No P0/P1 exists. No next implementation
+  milestone is authorized. After this Codex round's single push, Claude reviews
+  only the exact Codex range beginning after `cd23f7c8`.
 
 - The owner directed a new sibling worktree for branch
   `codex/strategy-target-price-revisions`, resolved with
@@ -112,14 +123,15 @@ their lane-owned artifacts.
   `git worktree list`, never from a pinned directory. The corrected guard is
   scoped to current target blocks, accepts sibling-lane text elsewhere, and
   refuses a missing registration when this checkout is on the lane branch.
-  No P0 or P1 is open. One pre-existing target P2 (`TPR-CCR5-004`) blocks any
-  future positive reviewed-algorithm authority until an independently reviewed
-  immutable policy-inventory trust root exists; the reviewed registry is empty
-  today. No next implementation milestone is authorized: TPR-1 remains blocked
-  on an exact separately reviewed source-rights artifact, TPR-0B remains
-  blocked on reviewed TPR-1/TPR-2 structural manifests, and the sibling-lane
-  re-freezes under `TPR-OOL-006` still gate outcome access. After this Codex
-  round's single push, Claude reviews only its exact correction range.
+  That preceding `c8c7470..f21d708` round is historical; section 23 of the lane
+  record controls the current `cf136e25..cd23f7c8` counter-review. One
+  pre-existing target P2 (`TPR-CCR5-004`) blocks any future positive reviewed-
+  algorithm authority until an independently reviewed immutable policy-
+  inventory trust root exists; the reviewed registry is empty today. No next
+  implementation milestone is authorized: TPR-1 remains blocked on an exact
+  separately reviewed source-rights artifact, TPR-0B remains blocked on
+  reviewed TPR-1/TPR-2 structural manifests, and the sibling-lane re-freezes
+  under `TPR-OOL-006` still gate outcome access.
 - The governing planning candidate is
   `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
   (29 pages; raw binary SHA-256
@@ -455,10 +467,12 @@ It is a separate fourth planning lane under the owner-directed serialized
 same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. The
-v2.2 implementation snapshot is `bb8dfb6`; the latest Claude review head is
-`f21d70851d5e1790be0c308e13e8837a7cd1d008`, and Codex's four-commit
-counter-review/corrections are recorded in section 21 of the lane record. No
-provider-specific target reader/normalizer, authenticated target event,
+v2.2 implementation snapshot is `bb8dfb6`; the latest Claude review is the
+exact three-commit range `cf136e25..cd23f7c8`, and Codex has counter-reviewed
+every Claude commit individually. All three are accepted after correction;
+the two P2 and four P3 findings are recorded in section 23 of the lane record.
+Sibling-lane changes and their independent reviews remain on their respective
+branches. No provider-specific target reader/normalizer, authenticated target event,
 permanent target look authority, stock score, ETF topology, portfolio, QC
 algorithm, prospective shadow/paper evidence, or live authority exists. The
 unreviewed TPR-0A candidate is
@@ -480,7 +494,7 @@ is resolved from `git worktree list` rather than a pinned path. One target P2,
 `TPR-CCR5-004`, remains open and blocks positive reviewed-algorithm authority
 until an immutable policy-inventory trust root is independently reviewed; it
 does not open TPR-1 or any source/outcome/look gate. Claude reviews the exact
-Codex correction range after this round's single push.
+Codex correction range beginning after `cd23f7c8` once this round is pushed.
 
 ## 5. Data acquisitions and confirmations
 

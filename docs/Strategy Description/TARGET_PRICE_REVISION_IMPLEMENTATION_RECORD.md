@@ -1,9 +1,9 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN THE FOUR-COMMIT
-RANGE `c8c7470`..`f21d708`. THE WINDOWS POLICY-BYTE MIGRATION, CURRENT-ROLE,
-TARGET-SCOPED WORKTREE-GUARD, RANGE-NOTATION, AND REVIEW-REPORT DEFECTS ARE
-CORRECTED OR QUALIFIED IN SECTION 21. NO P0 OR P1 REMAINS. ONE PRE-EXISTING
+Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN THE EXACT
+THREE-COMMIT RANGE `cf136e25..cd23f7c8`. ALL THREE COMMITS ARE ACCEPTED
+AFTER CORRECTION. THE TWO P2 AND FOUR P3 FINDINGS ARE CORRECTED OR QUALIFIED
+IN SECTION 23; NO P0 OR P1 EXISTS. ONE PRE-EXISTING
 TARGET P2 (`TPR-CCR5-004`) IS OPEN: THE REVIEWED-ALGORITHM LOADER'S POLICY-PATH
 INVENTORY IS SELF-MUTABLE AND MUST RECEIVE A SEPARATELY REVIEWED IMMUTABLE
 TRUST-ROOT DESIGN BEFORE ANY POSITIVE REVIEWED-ALGORITHM AUTHORITY CAN EXIST.
@@ -17,6 +17,10 @@ NO AUTHENTICATED TARGET-PRICE SOURCE, INGEST, CANONICAL EVENT, SIGNAL, OUTCOME
 ACCESS, RESEARCH LOOK, ETF TOPOLOGY, PORTFOLIO, QUANTCONNECT JOB OR RESULT,
 SHADOW OR PAPER DEPLOYMENT, BROKER CONNECTION, OR LIVE-TRADING AUTHORITY
 EXISTS.**
+
+Sibling-lane changes and their independent reviews remain on their respective
+branches. Their integration into `main` grants this target branch visibility,
+not authority to alter sibling-owned artifacts.
 
 Branch: `codex/strategy-target-price-revisions`
 
@@ -343,12 +347,14 @@ every sibling lane's work; the lane is no longer a branch developed apart
 from `main`. The four-slot multiplicity amendment nevertheless remains
 unpropagated: see `TPR-OOL-006`.
 
-**Current qualification, 2026-08-30:** Claude's exact three-commit correction
-range `fe056be6800ea11d6559f817019d1c2902f61620..db6a721d45eb47e1a133744387bf43a1aa1f310c`
-has been pushed, and Claude's independent review is complete. Codex has
-counter-reviewed `da6f7ea`, `5eecce5`, and `db6a721` individually. Sections
-17 and 18 contain the review and counter-review dispositions. The reviewed
-implementation snapshot remains `bb8dfb6e8d718f9371bbbd85b30f5f9a769f396e`.
+**Current qualification, 2026-08-31:** Claude's latest independent review is
+the exact three-commit range
+`cf136e259cf628aabdc4220865fccdb5c7204306..cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a`.
+Codex has counter-reviewed every Claude commit individually: `d9c4a450`,
+`0e911189`, and `cd23f7c8`. All three are accepted after correction; section
+23 contains the two P2 and four P3 findings, exact dispositions, corrections,
+qualifications, and validation. The reviewed implementation snapshot remains
+`bb8dfb6e8d718f9371bbbd85b30f5f9a769f396e`.
 The sole-authority blueprint is the 29-page v2.2 artifact at raw SHA-256
 `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`.
 The current candidate has spec ID
@@ -361,33 +367,23 @@ The TPR-0A snapshot remains a zero-access frozen candidate. The reviewed-spec
 registry remains empty, the candidate is unreviewed for its own registry, and
 `TPR-CCR2-011` still requires a separately controlled signed review receipt or
 trusted commit-signature policy before positive authority can rely on reviewer
-identity. No next implementation milestone is authorized. TPR-1 remains
-blocked until a separately reviewed source-rights artifact proves entitlement,
-public-time semantics, correction completeness, target-horizon consistency,
-raw retention, derived processing, and QC-transfer rights. TPR-0B remains
-blocked until reviewed TPR-1 and TPR-2 structural manifests exist.
+identity. One pre-existing target P2, `TPR-CCR5-004`, remains open: the runtime
+policy-path inventory can remove its own defining file and another policy path
+while a matching registry map still passes. The registry is empty today, so
+this mints no present authority; an independently reviewed immutable inventory
+or equivalent external trust-root design must be separately owner-approved and
+independently reviewed before any positive reviewed-algorithm authority.
 
-**Current counter-review state, 2026-08-31:** Codex has counter-reviewed every
-Claude commit in
-`c8c74704bb9bbda5a756d90afa33666371125a89..f21d70851d5e1790be0c308e13e8837a7cd1d008`.
-The newline diagnosis was sound but the first correction did not migrate an
-existing clean fast-forward and used backwards blob-protection reasoning;
-the corrected lane attributes now canonicalize LF on checkout and add, while
-tracked no-behavior policy comments force the five affected nonempty files to
-re-materialize. The owner-directed dynamic worktree resolution is retained,
-but its guard is narrowed to current target blocks and now refuses a missing
-registration when this checkout is on the lane branch. Section 21 contains
-all four dispositions, exact findings, and validation.
-
-One pre-existing target P2, `TPR-CCR5-004`, remains open: the runtime policy-
-path inventory can remove its own defining file and another policy path while
-a matching registry map still passes. The registry is empty today, so this
-mints no present authority; an independently reviewed immutable inventory or
-equivalent external trust root is required before any positive reviewed-
-algorithm authority. After this Codex round's single push, Claude reviews only
-the exact correction range beginning after `f21d708`; that loop step grants no
-source, outcome, look, QC, broker, paper, live, deployment, capital, or trading
-authority.
+Sibling-lane changes and their independent reviews remain on their respective
+branches. Integration into `main` does not authorize a coordinated edit from
+this target lane. No next implementation milestone is authorized. TPR-1
+remains blocked until a separately reviewed source-rights artifact proves
+entitlement, public-time semantics, correction completeness, target-horizon
+consistency, raw retention, derived processing, and QC-transfer rights. TPR-0B
+remains blocked until reviewed TPR-1 and TPR-2 structural manifests exist.
+After this Codex round's single push, Claude reviews only the exact Codex range
+beginning after `cd23f7c8`; that loop step grants no source, outcome, look, QC,
+broker, paper, live, deployment, capital, or trading authority.
 
 ### Historical progression (not the current resume instruction)
 
@@ -1713,3 +1709,86 @@ lane-owned files; `git diff` against the merge point over
 `research/analyst_revisions_v2`, `research/ml_specs` and
 `research/short_interest_etf` is empty, so no sibling-lane content was
 committed.
+
+## 23. Codex counter-review - 2026-08-31 (Claude integration-review round)
+
+### 23.1 Exact range and commit dispositions
+
+The synchronized, clean baseline was
+`cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a`. The exact Claude range is
+`cf136e259cf628aabdc4220865fccdb5c7204306..cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a`:
+exactly three commits. The much earlier `3f33eea..cd23f7c8` range is not the
+review range because it includes the integrated sibling/main history. Codex
+reviewed each Claude commit individually under the standing process.
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `d9c4a450` | **Accepted after correction** | A guard against stale unmerged-lane claims is useful, but this guard-first commit is red by itself and its claimed current-state scope is broader and weaker than implemented. `TPR-CCR6-003` and `TPR-CCR6-004` control. |
+| `0e911189` | **Accepted after correction** | The eight-commit review and integration evidence are substantively useful, but active role/head pointers remained at `f21d708`, and section 22.4 inferred cross-lane edit routing that the owner did not grant. `TPR-CCR6-001` and `TPR-CCR6-002` control. |
+| `cd23f7c8` | **Accepted after correction** | The reported validation arithmetic is internally consistent. The cumulative tree retains the two P2s, omits the required quality rating, and inaccurately calls the shared handoff lane-owned. `TPR-CCR6-001`, `002`, `005`, and `006` control. |
+
+No P0 or P1 exists. The 168 inherited integration commits are not part of this
+three-commit review. The combined Claude diff changes only the target document
+guard, this target record, and the shared root Session Handoff; it changes no
+PDF, candidate, target production code, authority JSON, or sibling strategy
+artifact.
+
+### 23.2 P0-P3 issue ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Concrete reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CCR6-001` | P2 | **Closed by current correction** | `0e911189`; cumulative `cd23f7c8` | Record preamble/section 8; Action Plan current block/row; Session Handoff current bullet/summary; document guard | Section 22 completed the latest review, but every active pointer still pinned `f21d708`, described the preceding four-commit counter-review, and routed Claude next. A resuming agent would review the wrong range or skip this counter-review. | Exact diff inspection shows section 22 appended while those pointers and `LATEST_CLAUDE_REVIEW_HEAD` remained unchanged. The as-received document guard passed **9 tests** despite that contradiction. | Current coordination state is a safety boundary in the same-branch loop; the wrong role/head can cause a review to be missed or repeated. This repeats the class section 22 itself criticizes. | All six active surfaces now identify the directed `cf136e25..cd23f7c8` Claude range, section 23, this counter-review, and the post-push range beginning after `cd23f7c8`. The guard binds the exact full range in detailed blocks, the exact short range in summary pointers, and rejects both forms of `f21d708`. | The final document-consistency module and 191-test lane/shared-document suite pass; exact full/short directed-range assertions cover every corrected active pointer. Full-suite/compile evidence is appended below. |
+| `TPR-CCR6-002` | P2 | **Closed by controlling qualification and current routing** | `0e911189` | Section 22.4; current record, Action Plan, and handoff | The sentence saying merge permits one coordinated change instead of four isolated branch rounds exceeds owner authority and could route sibling edits through this target branch. | Section 22.4 contains the sentence; the sole-authority PDF page 29 and the standing owner rule require each sibling correction/review on its respective branch. Merge ancestry changes visibility, not edit authority. | Cross-lane mutation without an explicit owner exception would violate the target-only worktree/branch boundary and bypass each sibling's serialized review. | Section 23 rejects and supersedes that sentence. Every active target surface now says sibling-lane changes and their independent reviews remain on their respective branches; no sibling artifact is edited. | The corrected guard requires the branch rule and rejects the unauthorized coordinated-change phrase across the record, Action Plan, and both handoff pointers. `git diff --name-only` contains no sibling strategy artifact. |
+| `TPR-CCR6-003` | P3 | **Accepted after successor; qualified** | `d9c4a450` | Guard commit before successor `0e911189` | The guard landed before the section-15.4 supersession marker it requires, so the commit is red as a standalone reviewed object. | `git show d9c4a450` contains the new marker assertion but not the marker; `git show 0e911189` introduces the required document text. This is the same guard-first sequencing class as `TPR-CCR4-005`. | Every reviewed commit should be a coherent snapshot; knowingly red intermediate objects impair bisectability and commit-by-commit review. | History is preserved. The commit is accepted only after its successor and this exact qualification; future document/guard pairs must place prerequisite document state first. | Static per-commit inspection proves the dependency; the cumulative corrected guard passes on the final tree. |
+| `TPR-CCR6-004` | P3 | **Closed by current correction** | `d9c4a450` | `test_current_state_blocks_do_not_call_the_lane_unmerged` | The guard claimed current-state scope but scanned whole shared documents and all of section 8, while accepting a section-15.4 marker anywhere in the remaining record. Historical/sibling prose could create false failures and an unrelated later marker could mask loss of the local qualification. | Exact source inspection shows whole-document `_doc(...)` calls, an unsliced section 8, and `propagation.lower()` over the entire tail. | A governance guard that over- and under-scopes its evidence can both block legitimate sibling history and miss the target defect it claims to prevent. | The guard now uses the explicit Action Plan current block/TPR row, handoff current bullet/target summary, record preamble/section-8 current qualification, and the exact section-15.4 subsection. | The final 9-test module and 191-test lane/shared-document suite pass. The exact subsection extraction stops at the next H3 marker and all active routing surfaces are asserted. |
+| `TPR-CCR6-005` | P3 | **Closed by controlling qualification** | `0e911189`; confirmed at `cd23f7c8` | Section 22 | Claude's review omits the binding process's honest 1-10 implementation-quality rating, leaving review completion evidence incomplete. | Section 22 contains dispositions, scope, authority, and validation but no numeric quality rating. | The rating is a mandatory review output and gives the owner a concise signal about correction burden and repeat-defect quality. | Section 23.3 supplies Codex's honest **6/10** counter-review rating without rewriting Claude's historical report. | The rating and its concrete rationale are present in the controlling counter-review section. |
+| `TPR-CCR6-006` | P3 | **Closed by controlling qualification** | `cd23f7c8` (claim); `0e911189` (shared-file edit) | Section 22.8 | “The two review commits touch only lane-owned files” is inaccurate because the review changes the shared root Session Handoff. It overstates scope even though no sibling artifact changed. | `git show --name-only 0e911189` includes `docs/SESSION_HANDOFF.md`; the three-commit combined diff also includes only that shared pointer plus the target guard/record. | Accurate scope reporting is required to distinguish an authorized coordination pointer from prohibited sibling strategy edits. | Section 23 records the correct scope: target-owned guard/record plus one owner-relevant shared coordination pointer; no sibling strategy artifact. | Current `git diff --name-only` and the reviewed-range diff contain no sibling strategy path; the shared handoff is explicitly named rather than called lane-owned. |
+
+### 23.3 Honest implementation-quality rating
+
+**6/10.** Claude's review is substantive, candid about the unreviewed inherited
+history, and backed by a complete-suite result. It nevertheless repeats the P2
+current-state consistency class it criticizes, overstates what integration
+authorizes across lane boundaries, repeats the guard-first sequencing defect,
+mis-scopes the guard, omits the required rating, and overstates lane-only file
+scope. The accepted-after-correction disposition reflects that mix.
+
+### 23.4 Authority and milestone decision
+
+The sole-authority 29-page v2.2 PDF and authenticated TPR-0A candidate are
+unchanged. The reviewed-spec registry remains empty. Authorized/spent research
+looks remain **0**. No provider, credential, licensed row, source sample,
+outcome, research look, QuantConnect upload/compile/job, broker, operator
+database, scheduler, shadow, paper, live, deployment, capital, or trading
+surface was accessed or authorized.
+
+No next implementation milestone is authorized. `TPR-CCR5-004` requires an
+exact, separately approved and independently reviewed immutable trust-root
+design before positive reviewed-algorithm authority. `TPR-CCR2-011` still
+requires separately controlled reviewer-identity trust. TPR-1 remains blocked
+on a separately reviewed exact source-rights artifact, and TPR-0B remains
+blocked on reviewed TPR-1/TPR-2 structural manifests. `TPR-OOL-006` remains
+documented for correction within each sibling lane, not from this branch.
+
+### 23.5 As-received and correction verification
+
+- On the exact clean `cd23f7c8` baseline, the document-consistency module
+  passed with **9 passed in 1.81 seconds**. That result confirms the prior guard
+  did not detect its own stale role/head surfaces.
+- Static commit inspection proves `d9c4a450` requires the section-15.4
+  supersession marker introduced only by successor `0e911189`; the first commit
+  is therefore red standalone even though the cumulative tree is green.
+- On the pre-commit correction tree before the final ledger/guard hardening,
+  the document-consistency module passed with **9 passed in 2.07 seconds**. The
+  target-price plus shared active-document suite passed with **191 passed, 3
+  skipped in 133.96 seconds**. Python 3.12.13 / pytest
+  9.1.1. `git diff --check` is clean apart from Git's informational future-EOL
+  warnings. The sole-authority PDF still hashes to
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`.
+- The complete repository suite was not repeated for a record/current-pointer
+  and documentation-guard-only correction. Claude's exact `0e911189` full-suite
+  result remains recorded in section 22.8; the proportionate regression surface
+  above is green.
+- Exact correction commit identity, full-suite and compilation evidence, and
+  the final one-push handoff are appended after the correction commit so the
+  evidence does not claim a commit identity before it exists.

@@ -12,6 +12,7 @@ The dangerous directions these tests exist for:
 """
 import sys
 from datetime import datetime, timedelta, timezone
+from decimal import localcontext
 from pathlib import Path
 
 import pytest
@@ -180,6 +181,73 @@ def test_confirmed_income_counts_only_corporate_action_dividends(tmp_path):
     assert confirmed_dividend_income_text(store.list_journal_postings()) == "123.45"
 
 
+def test_low_decimal_context_cannot_overstate_confirmed_dividend_funds(tmp_path):
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="999", external_id="div-large")
+    _seed_dividend(store, amount="0.9", external_id="div-small")
+
+    baseline = dividend_reinvest_status(store)
+    with localcontext() as context:
+        context.prec = 3
+        constrained = dividend_reinvest_status(store)
+
+    assert baseline["confirmed_income_total"] == "999.9"
+    assert baseline["available_total"] == "999.9"
+    assert constrained["confirmed_income_total"] == "999.9"
+    assert constrained["available_total"] == "999.9"
+
+
+def test_low_decimal_context_preserves_reinvest_quantity_and_identity(tmp_path):
+    baseline_store = AssistantStore(tmp_path / "baseline.db")
+    constrained_store = AssistantStore(tmp_path / "constrained.db")
+    for store in (baseline_store, constrained_store):
+        _seed_dividend(store, amount="1000")
+
+    kwargs = {
+        "ticker": "NVDL",
+        "amount": "999",
+        "price": "0.001",
+        "now": _NOW,
+    }
+    baseline = generate_dividend_reinvest_proposal(
+        _packet(), _policy(), baseline_store, **kwargs
+    )
+    with localcontext() as context:
+        context.prec = 3
+        constrained = generate_dividend_reinvest_proposal(
+            _packet(), _policy(), constrained_store, **kwargs
+        )
+
+    for result in (baseline, constrained):
+        assert result["created"], result.get("reason")
+        assert result["proposal"].intent.shares == 999_000
+        assert result["earmark_amount_text"] == "999"
+    assert (
+        constrained["proposal"].proposal_id
+        == baseline["proposal"].proposal_id
+    )
+
+
+def test_reinvest_refuses_a_reference_price_that_legacy_schema_would_round(
+    tmp_path,
+):
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="1000")
+    result = generate_dividend_reinvest_proposal(
+        _packet(),
+        _policy(),
+        store,
+        ticker="NVDL",
+        amount="500",
+        price="123.456789012345678901",
+        now=_NOW,
+    )
+
+    assert not result["created"]
+    assert "cannot be preserved" in result["reason"]
+    assert store.list_dividend_earmarks() == []
+
+
 def test_confirmed_income_is_zero_on_an_empty_journal(tmp_path):
     store = _store(tmp_path)
     assert confirmed_dividend_income_text(store.list_journal_postings()) == "0"
@@ -299,7 +367,7 @@ def test_ambiguous_and_unknown_states_hold(status):
 
 def test_migration_adds_the_earmark_table_to_a_pre_existing_database(tmp_path):
     store = _store(tmp_path)
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute("DROP TABLE sleeve_dividend_earmarks")
     reopened = AssistantStore(tmp_path / "assistant.db")
     assert reopened.list_dividend_earmarks() == []
@@ -404,6 +472,58 @@ def test_the_storage_transaction_itself_enforces_the_pool(tmp_path):
     )
 
 
+def test_storage_dividend_pool_refuses_low_precision_overstatement(tmp_path):
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="12.16")
+    proposal = {
+        "proposal_id": "tp_low_precision_over",
+        "created_at": _NOW.isoformat(),
+        "expires_at": (_NOW + timedelta(minutes=15)).isoformat(),
+        "status": "proposed",
+        "idempotency_key": "tp_low_precision_over-2026-08-13",
+    }
+
+    with localcontext() as context:
+        context.prec = 3
+        result = store.create_dividend_earmark_with_proposal(
+            proposal,
+            amount_text="12.18",
+            route=ROUTE_REINVEST,
+            ticker="NVDL",
+            now=_NOW.isoformat(),
+        )
+
+    assert result["created"] is False
+    assert "exceeds the available dividend pool" in result["reason"]
+    assert store.list_dividend_earmarks() == []
+    assert store.get_proposal(proposal["proposal_id"]) is None
+
+
+def test_storage_dividend_pool_reports_exact_remainder_at_low_precision(tmp_path):
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="12.16")
+    proposal = {
+        "proposal_id": "tp_low_precision_within",
+        "created_at": _NOW.isoformat(),
+        "expires_at": (_NOW + timedelta(minutes=15)).isoformat(),
+        "status": "proposed",
+        "idempotency_key": "tp_low_precision_within-2026-08-13",
+    }
+
+    with localcontext() as context:
+        context.prec = 3
+        result = store.create_dividend_earmark_with_proposal(
+            proposal,
+            amount_text="12.14",
+            route=ROUTE_REINVEST,
+            ticker="NVDL",
+            now=_NOW.isoformat(),
+        )
+
+    assert result == {"created": True, "available_text": "0.02"}
+    assert store.list_dividend_earmarks()[0]["amount_text"] == "12.14"
+
+
 def test_the_fence_and_the_module_measure_the_same_dividend_pool(tmp_path):
     """Counter-review M3CR-002: two implementations of one authoritative rule.
 
@@ -478,7 +598,7 @@ def test_unknown_earmark_status_holds_dollars_in_the_read_view(tmp_path):
     store = _store(tmp_path)
     _seed_dividend(store, amount="500")
     proposal_id = _create(store)["proposal"].proposal_id
-    with store._connect() as connection:  # simulate corrupt/future durable state
+    with store._connect_writable() as connection:  # simulate corrupt/future durable state
         connection.execute(
             "UPDATE sleeve_dividend_earmarks SET status = 'future_state' "
             "WHERE proposal_id = ?", (proposal_id,),
@@ -494,7 +614,7 @@ def test_storage_fence_counts_unknown_earmark_status_as_unavailable(tmp_path):
     store = _store(tmp_path)
     _seed_dividend(store, amount="500")
     proposal_id = _create(store)["proposal"].proposal_id
-    with store._connect() as connection:  # simulate corrupt/future durable state
+    with store._connect_writable() as connection:  # simulate corrupt/future durable state
         connection.execute(
             "UPDATE sleeve_dividend_earmarks SET status = 'future_state' "
             "WHERE proposal_id = ?", (proposal_id,),
@@ -520,7 +640,7 @@ def test_nonpositive_stored_earmark_amount_fails_closed(tmp_path):
     store = _store(tmp_path)
     _seed_dividend(store, amount="500")
     proposal_id = _create(store)["proposal"].proposal_id
-    with store._connect() as connection:  # simulate corrupt durable money
+    with store._connect_writable() as connection:  # simulate corrupt durable money
         connection.execute(
             "UPDATE sleeve_dividend_earmarks SET amount_text = '-300' "
             "WHERE proposal_id = ?", (proposal_id,),
@@ -694,7 +814,7 @@ def test_reconcile_holds_and_names_an_earmark_whose_proposal_vanished(tmp_path):
     store = _store(tmp_path)
     _seed_dividend(store, amount="500")
     proposal_id = _create(store)["proposal"].proposal_id
-    with store._connect() as connection:  # simulate corruption
+    with store._connect_writable() as connection:  # simulate corruption
         connection.execute(
             "DELETE FROM trade_proposals WHERE proposal_id = ?", (proposal_id,)
         )

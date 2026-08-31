@@ -13,6 +13,7 @@ The dangerous directions this pins:
 """
 import sys
 from datetime import datetime, timezone
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -317,6 +318,94 @@ def test_decimal_exact_maximum_order_boundary_is_allowed():
         policy=_policy(max_order_value=0.3),
     )
     assert result["created"] is True
+
+
+def test_low_decimal_context_cannot_round_an_over_cap_sell_onto_the_boundary():
+    packet = _packet([
+        _position(shares="10", price="123.45", entry="100")
+    ])
+    kwargs = {
+        "ticker": "NVDA",
+        "shares": 3,
+        "now": _NOW,
+    }
+    baseline = generate_user_directed_sell_proposal(
+        packet, _policy(max_order_value=370), **kwargs
+    )
+    with localcontext() as context:
+        context.prec = 2
+        constrained = generate_user_directed_sell_proposal(
+            packet, _policy(max_order_value=370), **kwargs
+        )
+
+    for result in (baseline, constrained):
+        assert not result["created"]
+        assert "$370.35" in result["reason"]
+        assert "maximum order value" in result["reason"]
+
+
+def test_low_decimal_context_preserves_user_sell_proposal_identity():
+    packet = _packet([
+        _position(shares="10", price="123.45", entry="100")
+    ])
+    kwargs = {"ticker": "NVDA", "shares": 3, "now": _NOW}
+    baseline = generate_user_directed_sell_proposal(
+        packet, _policy(max_order_value=500), **kwargs
+    )
+    with localcontext() as context:
+        context.prec = 2
+        constrained = generate_user_directed_sell_proposal(
+            packet, _policy(max_order_value=500), **kwargs
+        )
+
+    assert baseline["created"] and constrained["created"]
+    assert (
+        constrained["proposal"].proposal_id
+        == baseline["proposal"].proposal_id
+    )
+    assert (
+        constrained["proposal"].expected_impact
+        == baseline["proposal"].expected_impact
+    )
+
+
+def test_fractional_max_order_remedy_uses_an_exact_nine_decimal_floor():
+    packet = _packet([
+        _position(shares="10", price="0.3", entry="0.2")
+    ])
+    kwargs = {"ticker": "NVDA", "shares": "4", "now": _NOW}
+    baseline = generate_user_directed_sell_proposal(
+        packet,
+        _policy(max_order_value=1, whole_shares_only=False),
+        **kwargs,
+    )
+    with localcontext() as context:
+        context.prec = 2
+        constrained = generate_user_directed_sell_proposal(
+            packet,
+            _policy(max_order_value=1, whole_shares_only=False),
+            **kwargs,
+        )
+
+    for result in (baseline, constrained):
+        assert not result["created"]
+        assert "up to 3.333333333 share(s) fit" in result["reason"]
+
+
+def test_sell_refuses_when_legacy_price_field_would_round_exact_evidence():
+    result = _sell(
+        shares=1,
+        positions=[
+            _position(
+                shares="10",
+                price="123.456789012345678901",
+                entry="100",
+            )
+        ],
+    )
+    assert not result["created"]
+    assert "cannot be preserved" in result["reason"]
+    assert "rounded proposal" in result["reason"]
 
 
 # --- tax disclosure --------------------------------------------------------

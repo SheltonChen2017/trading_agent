@@ -379,14 +379,7 @@ REAL_INTERPRETER_REASON = (
 
 
 def _interpreter_is_store_alias() -> bool:
-    """Report whether ``sys.executable`` is a Store app execution alias.
-
-    Such an alias is a zero-byte reparse point, not an executable. The
-    installer refuses it deliberately, because a scheduled task pointed at one
-    can fail to launch while the task still looks healthy. A test that feeds
-    ``sys.executable`` to the installer therefore depends on how the developer
-    installed Python, so it must skip rather than report a product failure.
-    """
+    """Return whether ``sys.executable`` is a Store app execution alias."""
     if os.name != "nt":
         return False
     try:

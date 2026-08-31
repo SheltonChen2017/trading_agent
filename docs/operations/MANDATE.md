@@ -114,13 +114,15 @@ and doesn't compete for this project's roadmap priority:
   one exception — the wide-rebalance-band idea — shows the bar is
   passable, just rarely cleared, which argues for skepticism rather
   than for scaling up ambition here.
-- **Individual-stock signal-hunting: stays as-is, off the roadmap.**
-  The 7+ signals tested against `research_findings.json` (0 confirmed
-  so far) reflect deliberate methodology practice, not a belief in
-  exploitable alpha — the user has been explicit about this. This work
-  doesn't need to justify itself against the numeric targets in §2 the
-  way a proposed allocation sleeve would, and doesn't compete with the
-  defensive-carry/risk-governor work below for priority.
+- **Ad-hoc individual-stock signal hunting remains off the roadmap; the
+  owner-directed three-strategy stock-first program is active.** The 7+
+  legacy signals in `research_findings.json` (0 confirmed) remain closed or
+  exploratory methodology history. They do not authorize opportunistic
+  reruns. Separately, `docs/THREE_STRATEGY_PROJECT_DIRECTION.md` now requires
+  bounded, preregistered stock-level validation for Analyst Revisions V2,
+  Insider Buying, and Short Interest before any ETF aggregation can proceed.
+  That stock-first work is research-only, must satisfy this mandate's evidence
+  standards, and grants no execution or deployment authority.
 
 ## 5. Four-sleeve blueprint disposition
 

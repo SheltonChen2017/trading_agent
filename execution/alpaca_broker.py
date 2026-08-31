@@ -31,7 +31,7 @@ import re
 import urllib.request
 import weakref
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from decimal import (
     Context,
@@ -47,6 +47,7 @@ from typing import Any, Callable
 from uuid import UUID
 
 from config import PAPER_TRADING
+from data.security_identity import canonical_equity_ticker
 from risk.execution_gate import (
     ExecutionAuthorization,
     TradeIntent,
@@ -137,10 +138,37 @@ def _capture_connection_settings() -> tuple[str, str, bool]:
     )
 
 
-def _new_trading_client(key: str, secret: str, *, paper: bool):
+def _new_trading_client(
+    key: str,
+    secret: str,
+    *,
+    paper: bool,
+    raw_data: bool = False,
+):
     from alpaca.trading.client import TradingClient  # lazy import — package optional until used
 
-    return TradingClient(key, secret, paper=paper)
+    return TradingClient(key, secret, paper=paper, raw_data=raw_data)
+
+
+def _new_emergency_trading_client(
+    key: str,
+    secret: str,
+    *,
+    paper: bool,
+    client_factory: Callable[..., Any] | None = None,
+):
+    """Open the SDK's public raw-data surface for cancellation containment.
+
+    Emergency order enumeration must see each response row before alpaca-py's
+    Pydantic model construction so one malformed sibling cannot hide otherwise
+    usable order IDs.  A dedicated client built from the session's independently
+    registered connection tuple also keeps cancellation available if an SDK
+    release renames private attributes used by the stricter execution identity
+    probe. The session may cache that client, but revalidates every observable
+    identity field before each use.
+    """
+    factory = _new_trading_client if client_factory is None else client_factory
+    return factory(key, secret, paper=paper, raw_data=True)
 
 
 def _new_stock_data_client(key: str, secret: str):
@@ -162,34 +190,105 @@ def _assert_sdk_client_identity(
     expected_sandbox: bool,
     expected_base_url: str,
     label: str,
-) -> None:
-    """Prove the SDK object still carries the captured connection tuple."""
-    try:
-        observed_key = object.__getattribute__(client, "_api_key")
-        observed_secret = object.__getattribute__(client, "_secret_key")
-        observed_sandbox = object.__getattribute__(client, "_sandbox")
-        observed_base_url = object.__getattribute__(client, "_base_url")
-        observed_oauth_token = object.__getattribute__(client, "_oauth_token")
-        observed_basic_auth = object.__getattribute__(client, "_use_basic_auth")
-    except (AttributeError, TypeError) as exc:
-        raise BrokerPreflightError(
-            f"{label} does not expose verifiable SDK connection identity."
-        ) from exc
+    allow_unverifiable: bool = False,
+    expected_raw_data: bool | None = None,
+) -> bool:
+    """Verify every observable SDK-private identity field.
+
+    The pinned SDK exposes no public credential/endpoint introspection API.
+    Private fields therefore remain a defense-in-depth check for account and
+    execution reads, but their absence may not make emergency cancellation
+    unreachable. Callers that explicitly allow an unverifiable SDK receive
+    ``False`` if one or more expected fields are absent. Every field that is
+    still observable is nevertheless checked, so a partial SDK rename cannot
+    conceal a mismatch in a remaining credential, endpoint, mode, or raw-data
+    field. Any observable mismatch refuses loudly.
+    """
     if (
-        not isinstance(observed_key, str)
-        or not isinstance(observed_secret, str)
-        or observed_key != key
-        or observed_secret != secret
-        or type(observed_sandbox) is not bool
-        or observed_sandbox is not expected_sandbox
-        or observed_base_url != expected_base_url
-        or observed_oauth_token is not None
-        or observed_basic_auth is not False
+        type(key) is not str
+        or not key
+        or type(secret) is not str
+        or not secret
+        or type(expected_sandbox) is not bool
+        or type(expected_base_url) is not str
+        or not expected_base_url
+        or (
+            expected_raw_data is not None
+            and type(expected_raw_data) is not bool
+        )
     ):
         raise BrokerPreflightError(
-            f"{label} credential, endpoint, or authentication identity changed "
-            "after session open."
+            f"{label} expected connection identity is not canonical."
         )
+
+    def matches_base_url(value: Any) -> bool:
+        # alpaca-py stores either its public BaseURL enum or a raw string when
+        # url_override is used. Never trust an arbitrary object's `.value` or
+        # a str subclass's equality: either could claim the expected endpoint
+        # while the REST client later concatenates and contacts another URL.
+        if type(value) is str:
+            return value == expected_base_url
+        try:
+            from alpaca.common.enums import BaseURL
+        except ImportError:
+            return False
+        return (
+            type(value) is BaseURL
+            and type(value.value) is str
+            and value.value == expected_base_url
+        )
+
+    expected_fields: list[tuple[str, Callable[[Any], bool]]] = [
+        ("_api_key", lambda value: type(value) is str and value == key),
+        (
+            "_secret_key",
+            lambda value: type(value) is str and value == secret,
+        ),
+        (
+            "_sandbox",
+            lambda value: type(value) is bool and value is expected_sandbox,
+        ),
+        (
+            "_base_url",
+            matches_base_url,
+        ),
+        ("_oauth_token", lambda value: value is None),
+        ("_use_basic_auth", lambda value: value is False),
+    ]
+    if expected_raw_data is not None:
+        expected_fields.append(
+            (
+                "_use_raw_data",
+                lambda value: type(value) is bool and value is expected_raw_data,
+            )
+        )
+
+    missing_fields: list[str] = []
+    mismatched_fields: list[str] = []
+    for field, matches in expected_fields:
+        try:
+            observed = object.__getattribute__(client, field)
+        except (AttributeError, TypeError):
+            missing_fields.append(field)
+            continue
+        if not matches(observed):
+            mismatched_fields.append(field)
+
+    if mismatched_fields:
+        raise BrokerPreflightError(
+            f"{label} credential, endpoint, or authentication identity changed "
+            "after session open (mismatched fields: "
+            + ", ".join(mismatched_fields)
+            + ")."
+        )
+    if missing_fields:
+        if allow_unverifiable:
+            return False
+        raise BrokerPreflightError(
+            f"{label} does not expose verifiable SDK connection identity "
+            f"(missing fields: {', '.join(missing_fields)})."
+        )
+    return True
 
 
 def _get_client():
@@ -206,7 +305,7 @@ def _optional_float(value: Any) -> float | None:
         return None
     try:
         parsed = float(value)
-    except (TypeError, ValueError):
+    except (OverflowError, TypeError, ValueError):
         return None
     return parsed if math.isfinite(parsed) else None
 
@@ -388,8 +487,26 @@ def _normalized_trade_update_numbers(
     }
 
 
+def _normalized_trade_update_event(value: Any) -> str | None:
+    """Preserve only explicit, canonical SDK trade-event evidence."""
+    event = _enum_value(value)
+    if (
+        type(event) is not str
+        or not event
+        or event != event.strip()
+        or not event.isascii()
+        or not event.isprintable()
+    ):
+        return None
+    return event
+
+
 def _normalize_account(account: Any, *, paper: bool) -> dict:
     account_id = getattr(account, "id", None)
+    equity = getattr(account, "equity", None)
+    cash = getattr(account, "cash", None)
+    buying_power = getattr(account, "buying_power", None)
+
     def broker_bool(field: str) -> bool | None:
         # Missing provider evidence is unknown, never an implicit safe False.
         value = getattr(account, field, None)
@@ -398,12 +515,15 @@ def _normalize_account(account: Any, *, paper: bool) -> dict:
     return {
         "account_id": str(account_id) if account_id is not None else None,
         "status": str(_enum_value(getattr(account, "status", "unknown"))),
-        "equity": float(account.equity),
-        "equity_decimal": _optional_decimal_text(account.equity),
-        "cash": float(account.cash),
-        "cash_decimal": _optional_decimal_text(account.cash),
-        "buying_power": float(account.buying_power),
-        "buying_power_decimal": _optional_decimal_text(account.buying_power),
+        # alpaca-py declares all three fields Optional. Preserve unavailable or
+        # malformed provider evidence as explicit unknown; strict consumers
+        # decide whether their contract can proceed without it.
+        "equity": _optional_float(equity),
+        "equity_decimal": _optional_decimal_text(equity),
+        "cash": _optional_float(cash),
+        "cash_decimal": _optional_decimal_text(cash),
+        "buying_power": _optional_float(buying_power),
+        "buying_power_decimal": _optional_decimal_text(buying_power),
         "trading_blocked": broker_bool("trading_blocked"),
         "account_blocked": broker_bool("account_blocked"),
         "trade_suspended_by_user": broker_bool("trade_suspended_by_user"),
@@ -466,6 +586,8 @@ def _assert_asset_evidence(asset: Mapping[str, Any], ticker: str) -> None:
 
 
 def _normalize_position(position: Any) -> dict:
+    current_price = getattr(position, "current_price", None)
+    unrealized_pl = getattr(position, "unrealized_pl", None)
     normalized = {
         "ticker": position.symbol,
         "shares": float(position.qty),
@@ -474,13 +596,16 @@ def _normalize_position(position: Any) -> dict:
         "avg_entry_price_decimal": _optional_decimal_text(
             position.avg_entry_price
         ),
-        "current_price": float(position.current_price),
-        "current_price_decimal": _optional_decimal_text(position.current_price),
-        "unrealized_pl": float(position.unrealized_pl),
+        # Both fields are Optional in alpaca-py. Unknown evidence remains None
+        # rather than escaping as a bare float(None) TypeError.
+        "current_price": _optional_float(current_price),
+        "current_price_decimal": _optional_decimal_text(current_price),
+        "unrealized_pl": _optional_float(unrealized_pl),
     }
     market_value = getattr(position, "market_value", None)
-    if market_value is not None:
-        normalized["market_value"] = float(market_value)
+    normalized_market_value = _optional_float(market_value)
+    if normalized_market_value is not None:
+        normalized["market_value"] = normalized_market_value
         normalized["market_value_decimal"] = _optional_decimal_text(market_value)
     return normalized
 
@@ -489,12 +614,17 @@ def _get_raw_open_orders_for_client(client: Any) -> list[Any]:
     from alpaca.trading.enums import QueryOrderStatus
     from alpaca.trading.requests import GetOrdersRequest
 
-    return list(client.get_orders(
+    rows = client.get_orders(
         filter=GetOrdersRequest(
             status=QueryOrderStatus.OPEN,
             limit=500,
         )
-    ))
+    )
+    if not isinstance(rows, list):
+        raise BrokerPreflightError(
+            "Alpaca open-order response must be a list before emergency isolation."
+        )
+    return rows
 
 
 def _get_orders_for_client(client: Any) -> list[dict]:
@@ -515,6 +645,39 @@ _BROKER_SESSIONS_GUARD = Lock()
 _REGISTERED_BROKER_SESSIONS: weakref.WeakValueDictionary[int, object] = (
     weakref.WeakValueDictionary()
 )
+_REGISTERED_BROKER_IDENTITIES: weakref.WeakKeyDictionary[object, object] = (
+    weakref.WeakKeyDictionary()
+)
+
+
+@dataclass(frozen=True, slots=True)
+class _BrokerSessionIdentity:
+    owner_pid: int
+    key: str
+    secret: str
+    paper: bool
+    trading_base_url: str
+    data_base_url: str
+    client: Any
+    data_capability: _DataClientCapability
+    emergency_capability: _EmergencyClientCapability
+
+
+@dataclass(slots=True)
+class _EmergencyClientCapability:
+    """Lazy raw-client state retained outside caller-mutable session slots."""
+
+    factory: Callable[..., Any]
+    client: Any | None = None
+
+
+@dataclass(slots=True)
+class _DataClientCapability:
+    """Constructor-owned lazy market-data client retained outside session slots."""
+
+    factory: Callable[..., Any]
+    client: Any | None = None
+    guard: Lock = field(default_factory=Lock, repr=False)
 
 
 @dataclass(frozen=True, slots=True)
@@ -538,11 +701,14 @@ class AlpacaBrokerSession:
     """One account-scoped Alpaca connection used across an execution attempt.
 
     Credentials and paper/live mode are captured at construction and are never
-    read from the mutable process environment again.  All trading account,
-    asset, position, order, lookup, cancellation, and SDK submission calls use
-    the same ``TradingClient`` instance.  Quote data and exact fractional REST
-    submissions necessarily use Alpaca's separate APIs, but they use the same
-    frozen credentials and endpoint mode retained by this session.
+    read from the mutable process environment again. Trading account, asset,
+    position, modeled-order lookup, and SDK submission calls use one strict
+    ``TradingClient`` instance. Risk-reducing cancellation and emergency order
+    ID enumeration use a separately constructed raw-data client so SDK model
+    failures cannot suppress cancellation; its observable connection identity
+    is revalidated before every use. Quote data and exact fractional REST
+    submissions necessarily use Alpaca's separate APIs, but every client is
+    bound to the frozen credentials and endpoint mode retained by this session.
     """
 
     __slots__ = (
@@ -583,9 +749,9 @@ class AlpacaBrokerSession:
         else:
             raise TypeError("AlpacaBrokerSession cannot be reinitialized")
         key, secret, paper = _capture_connection_settings()
-        if not isinstance(key, str) or not key:
+        if type(key) is not str or not key:
             raise AlpacaNotConfigured("Alpaca key must be a non-empty string.")
-        if not isinstance(secret, str) or not secret:
+        if type(secret) is not str or not secret:
             raise AlpacaNotConfigured("Alpaca secret must be a non-empty string.")
         if type(paper) is not bool:
             raise BrokerPreflightError("paper must be an actual bool.")
@@ -595,9 +761,15 @@ class AlpacaBrokerSession:
             else "https://api.alpaca.markets"
         )
         data_base_url = "https://data.alpaca.markets"
-        client = _new_trading_client(key, secret, paper=paper)
+        client_factory = _new_trading_client
+        data_client_factory = _new_stock_data_client
+        client = client_factory(key, secret, paper=paper)
         if client is None:
             raise TypeError("TradingClient construction returned None")
+        # The factory call above is the public authority for the captured
+        # connection tuple. Private SDK introspection is defense in depth: a
+        # mismatch refuses construction, while an SDK release that removes the
+        # private surface leaves only emergency risk reduction available.
         _assert_sdk_client_identity(
             client,
             key=key,
@@ -605,6 +777,8 @@ class AlpacaBrokerSession:
             expected_sandbox=paper,
             expected_base_url=trading_base_url,
             label="TradingClient",
+            allow_unverifiable=True,
+            expected_raw_data=False,
         )
         object.__setattr__(self, "_key", key)
         object.__setattr__(self, "_secret", secret)
@@ -626,6 +800,21 @@ class AlpacaBrokerSession:
             if prior is not None and prior is not self:
                 raise RuntimeError("broker session identity collision")
             _REGISTERED_BROKER_SESSIONS[id(self)] = self
+            _REGISTERED_BROKER_IDENTITIES[self] = _BrokerSessionIdentity(
+                owner_pid=os.getpid(),
+                key=key,
+                secret=secret,
+                paper=paper,
+                trading_base_url=trading_base_url,
+                data_base_url=data_base_url,
+                client=client,
+                data_capability=_DataClientCapability(
+                    factory=data_client_factory,
+                ),
+                emergency_capability=_EmergencyClientCapability(
+                    factory=client_factory,
+                ),
+            )
 
     def __copy__(self):
         raise TypeError("AlpacaBrokerSession cannot be copied")
@@ -639,43 +828,164 @@ class AlpacaBrokerSession:
     def __reduce_ex__(self, _protocol):
         raise TypeError("AlpacaBrokerSession cannot be serialized")
 
-    def _assert_process_owner(self) -> None:
-        """Reject a session inherited by a forked child process.
+    def _assert_process_registration(self) -> _BrokerSessionIdentity:
+        """Return the constructor-owned connection tuple or refuse forgery.
 
-        The SDK client, private snapshot registry, and cached account identity
-        are one process-local capability.  Letting a forked child reuse them
-        would clone a nominally single-use snapshot and authorization boundary
-        while also inheriting sockets and locks in an undefined state.
+        This registry is independent of mutable SDK-private field names and is
+        therefore the minimum authority used by emergency cancellation.
         """
         with _BROKER_SESSIONS_GUARD:
             registered = _REGISTERED_BROKER_SESSIONS.get(id(self))
-        if registered is not self:
+            identity = _REGISTERED_BROKER_IDENTITIES.get(self)
+        if registered is not self or not isinstance(
+            identity, _BrokerSessionIdentity
+        ):
             raise PermissionError(
                 "This broker session was not opened by the production constructor."
             )
-        if os.getpid() != self._owner_pid:
+        if (
+            identity.client is not self._client
+            or type(self._owner_pid) is not int
+            or identity.owner_pid != self._owner_pid
+            or type(self._key) is not str
+            or identity.key != self._key
+            or type(self._secret) is not str
+            or identity.secret != self._secret
+            or identity.paper is not self._paper
+            or type(self._trading_base_url) is not str
+            or identity.trading_base_url != self._trading_base_url
+            or type(self._data_base_url) is not str
+            or identity.data_base_url != self._data_base_url
+            or (
+                identity.data_capability.client is None
+                and self._data_client is not None
+            )
+            or (
+                identity.data_capability.client is not None
+                and self._data_client is not identity.data_capability.client
+            )
+        ):
+            raise PermissionError(
+                "This broker session's registered connection identity changed."
+            )
+        if os.getpid() != identity.owner_pid:
             raise PermissionError(
                 "This broker session belongs to a different process; open a "
                 "fresh account-scoped session and capture a new snapshot."
             )
+        return identity
+
+    def _assert_process_owner(self) -> None:
+        """Reject cloned sessions and require verifiable execution identity.
+
+        The SDK client, private snapshot registry, and cached account identity
+        are one process-local capability. Letting a forked child reuse them
+        would clone a nominally single-use snapshot and authorization boundary
+        while also inheriting sockets and locks in an undefined state.
+        """
+        identity = self._assert_process_registration()
         _assert_sdk_client_identity(
             self._client,
-            key=self._key,
-            secret=self._secret,
-            expected_sandbox=self._paper,
-            expected_base_url=self._trading_base_url,
+            key=identity.key,
+            secret=identity.secret,
+            expected_sandbox=identity.paper,
+            expected_base_url=identity.trading_base_url,
             label="TradingClient",
+            expected_raw_data=False,
         )
+
+    def _open_emergency_client(self) -> Any:
+        """Return a revalidated raw client for the registered session tuple."""
+        identity = self._assert_process_registration()
+        capability = identity.emergency_capability
+        if capability.client is not None:
+            _assert_sdk_client_identity(
+                capability.client,
+                key=identity.key,
+                secret=identity.secret,
+                expected_sandbox=identity.paper,
+                expected_base_url=identity.trading_base_url,
+                label="Emergency TradingClient",
+                allow_unverifiable=True,
+                expected_raw_data=True,
+            )
+            return capability.client
+        client = _new_emergency_trading_client(
+            identity.key,
+            identity.secret,
+            paper=identity.paper,
+            client_factory=capability.factory,
+        )
+        if client is None:
+            raise BrokerPreflightError(
+                "Emergency TradingClient construction returned None."
+            )
+        _assert_sdk_client_identity(
+            client,
+            key=identity.key,
+            secret=identity.secret,
+            expected_sandbox=identity.paper,
+            expected_base_url=identity.trading_base_url,
+            label="Emergency TradingClient",
+            allow_unverifiable=True,
+            expected_raw_data=True,
+        )
+        capability.client = client
+        return client
+
+    def _open_data_client(self) -> Any:
+        """Return the registered strict market-data client or refuse mutation."""
+        identity = self._assert_process_registration()
+        capability = identity.data_capability
+        with capability.guard:
+            # Recheck after acquiring the capability-local lock so concurrent
+            # construction or session-slot mutation cannot replace the client
+            # between registration validation and use.
+            current_identity = self._assert_process_registration()
+            if current_identity is not identity:
+                raise PermissionError("This broker session identity changed.")
+            if capability.client is None:
+                client = capability.factory(identity.key, identity.secret)
+                if client is None:
+                    raise BrokerPreflightError(
+                        "StockHistoricalDataClient construction returned None."
+                    )
+                _assert_sdk_client_identity(
+                    client,
+                    key=identity.key,
+                    secret=identity.secret,
+                    expected_sandbox=False,
+                    expected_base_url=identity.data_base_url,
+                    label="StockHistoricalDataClient",
+                    expected_raw_data=False,
+                )
+                capability.client = client
+                object.__setattr__(self, "_data_client", client)
+            client = capability.client
+            if self._data_client is not client:
+                raise PermissionError(
+                    "This broker session's registered market-data client changed."
+                )
+            _assert_sdk_client_identity(
+                client,
+                key=identity.key,
+                secret=identity.secret,
+                expected_sandbox=False,
+                expected_base_url=identity.data_base_url,
+                label="StockHistoricalDataClient",
+                expected_raw_data=False,
+            )
+            return client
 
     @property
     def PAPER_TRADING(self) -> bool:
         """Read-only compatibility view of the captured endpoint mode."""
-        self._assert_process_owner()
+        self._assert_process_registration()
         return self._paper
 
     @property
     def account_mode(self) -> str:
-        self._assert_process_owner()
+        self._assert_process_registration()
         return "paper" if self._paper else "live"
 
     def is_configured(self) -> bool:
@@ -1054,12 +1364,12 @@ class AlpacaBrokerSession:
         """Best-effort ID isolation for emergency cancellation only.
 
         Normal portfolio/risk reads remain atomic and strict.  This narrower
-        surface exists solely so one malformed sibling cannot hide otherwise
-        usable order IDs after bulk cancellation has failed.  ``complete`` is
-        false whenever any row or endpoint-capacity condition is ambiguous.
+        surface uses alpaca-py's public raw-data mode so model construction for
+        one malformed sibling cannot hide otherwise usable order IDs after
+        bulk cancellation has failed. ``complete`` is false whenever any row
+        or endpoint-capacity condition is ambiguous.
         """
-        self._assert_process_owner()
-        rows = _get_raw_open_orders_for_client(self._client)
+        rows = _get_raw_open_orders_for_client(self._open_emergency_client())
         complete = len(rows) < 500
         errors: list[dict[str, Any]] = []
         if not complete:
@@ -1150,50 +1460,31 @@ class AlpacaBrokerSession:
         return None if order is None else _normalize_order(order)
 
     def cancel_order(self, order_id: str) -> dict:
-        self._assert_process_owner()
-        self._client.cancel_order_by_id(order_id)
+        self._open_emergency_client().cancel_order_by_id(order_id)
         return {"order_id": str(order_id), "status": "pending_cancel"}
 
     def cancel_all_orders(self):
         """Use Alpaca's account-wide bulk cancellation as emergency coverage."""
-        self._assert_process_owner()
-        return self._client.cancel_orders()
+        return self._open_emergency_client().cancel_orders()
 
     @staticmethod
     def _canonical_quote_ticker(ticker: object) -> str:
         if not isinstance(ticker, str) or ticker != ticker.strip():
             raise QuoteUnavailable("quote ticker must be a canonical string")
-        canonical = ticker.upper()
-        if re.fullmatch(r"[A-Z][A-Z0-9.\-]{0,31}", canonical) is None:
-            raise QuoteUnavailable(f"quote ticker is malformed: {ticker!r}")
-        return canonical
+        try:
+            return canonical_equity_ticker(ticker, name="quote ticker")
+        except ValueError as exc:
+            raise QuoteUnavailable(
+                f"quote ticker is malformed: {ticker!r}"
+            ) from exc
 
     def _fetch_latest_quote(self, ticker: str) -> dict:
         self._assert_process_owner()
         from alpaca.data.requests import StockLatestQuoteRequest
 
         ticker = self._canonical_quote_ticker(ticker)
-        if self._data_client is None:
-            data_client = _new_stock_data_client(self._key, self._secret)
-            _assert_sdk_client_identity(
-                data_client,
-                key=self._key,
-                secret=self._secret,
-                expected_sandbox=False,
-                expected_base_url=self._data_base_url,
-                label="StockHistoricalDataClient",
-            )
-            object.__setattr__(self, "_data_client", data_client)
-        assert self._data_client is not None
-        _assert_sdk_client_identity(
-            self._data_client,
-            key=self._key,
-            secret=self._secret,
-            expected_sandbox=False,
-            expected_base_url=self._data_base_url,
-            label="StockHistoricalDataClient",
-        )
-        quotes = self._data_client.get_stock_latest_quote(
+        data_client = self._open_data_client()
+        quotes = data_client.get_stock_latest_quote(
             StockLatestQuoteRequest(symbol_or_symbols=[ticker])
         )
         if not isinstance(quotes, Mapping) or ticker not in quotes:
@@ -1960,12 +2251,18 @@ def _run_trade_update_stream_with_credentials(
 
     async def handle_update(update) -> None:
         order = _normalize_order(update.order)
+        event = _normalized_trade_update_event(getattr(update, "event", None))
         fill_numbers = _normalized_trade_update_numbers(
             fill_qty=getattr(update, "qty", None),
             fill_price=getattr(update, "price", None),
         )
         normalized = {
-            "event": str(_enum_value(getattr(update, "event", order["status"]))),
+            # A missing stream event is unavailable evidence, not permission
+            # to manufacture an event from the order's independently reported
+            # status. The polling reconciler remains the authoritative
+            # fallback for such an incomplete update.
+            "event": event,
+            "event_available": event is not None,
             "event_id": getattr(update, "execution_id", None),
             "event_at": _optional_iso(getattr(update, "timestamp", None)),
             **fill_numbers,

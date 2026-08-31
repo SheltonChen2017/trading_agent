@@ -17,7 +17,7 @@ The dangerous directions:
   solvency floor must still hold.
 """
 import sys
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -102,6 +102,23 @@ def test_float_stays_rejected_even_in_fractional_mode(value):
 def test_fractional_quantity_is_limited_to_alpacas_nine_decimal_places():
     assert is_valid_order_quantity("0.123456789", whole_shares_only=False)
     assert not is_valid_order_quantity("0.1234567891", whole_shares_only=False)
+
+
+def test_fractional_quantity_precision_is_independent_of_ambient_context():
+    from risk.execution_gate import canonical_order_quantity
+
+    with localcontext() as context:
+        context.prec = 3
+        assert not is_valid_order_quantity(
+            "0.1234567891", whole_shares_only=False
+        )
+        # Trailing zeroes are representation, not material decimal places.
+        assert canonical_order_quantity(
+            "0.1234567890000", whole_shares_only=False
+        ) == "0.123456789"
+        assert canonical_order_quantity(
+            "1.0000000000", whole_shares_only=False
+        ) == 1
 
 
 def test_the_real_gate_obeys_the_policy_granularity_without_weakening_money_checks():

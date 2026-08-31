@@ -51,7 +51,13 @@ import json
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
-from assistant.money import decimal_or_none, decimal_text
+from assistant.money import (
+    decimal_or_none,
+    decimal_text,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.portfolio_rebalance import (
@@ -84,6 +90,7 @@ from risk.execution_gate import (
 )
 
 EVIDENCE_STATUS = "user_directed_rebalance_trim"
+_ONE_PERCENT = Decimal("0.01")
 
 #: Sleeves that can never be trimmed by this workflow. Cash is not a holding.
 #: The residual is the set of positions the profile does not describe, so a
@@ -208,11 +215,44 @@ def _band_amounts(
     pending_value = decimal_or_none(row.pending_value_exact)
     if market_value is None or pending_value is None:
         return None
-    projected_value = market_value + pending_value
     _, upper = profile.band_edges(sleeve)
     target = profile.target_decimal(sleeve)
-    excess = projected_value - equity * upper / Decimal("100")
-    restoration = projected_value - equity * target / Decimal("100")
+    try:
+        projected_value = exact_decimal_add(
+            market_value,
+            pending_value,
+            name=f"{sleeve} projected value",
+        )
+        upper_value = exact_decimal_multiply(
+            exact_decimal_multiply(
+                equity,
+                upper,
+                name=f"{sleeve} upper-band scaled value",
+            ),
+            _ONE_PERCENT,
+            name=f"{sleeve} upper-band value",
+        )
+        target_value = exact_decimal_multiply(
+            exact_decimal_multiply(
+                equity,
+                target,
+                name=f"{sleeve} target scaled value",
+            ),
+            _ONE_PERCENT,
+            name=f"{sleeve} target value",
+        )
+        excess = exact_decimal_subtract(
+            projected_value,
+            upper_value,
+            name=f"{sleeve} excess above band",
+        )
+        restoration = exact_decimal_subtract(
+            projected_value,
+            target_value,
+            name=f"{sleeve} restoration amount",
+        )
+    except ValueError:
+        return None
     return (
         excess if excess > 0 else Decimal("0"),
         restoration if restoration > 0 else Decimal("0"),
@@ -228,7 +268,7 @@ def _position(packet: DecisionPacket, ticker: str):
 
 def _working_sell_value(
     packet: DecisionPacket, sleeve: str, membership: dict[str, str]
-) -> Decimal:
+) -> Decimal | None:
     """Gross priced sell orders in this sleeve, always as a positive value.
 
     The rebalance report deliberately stores *signed net* pending exposure so
@@ -253,9 +293,23 @@ def _working_sell_value(
             quantity = decimal_or_none(order.get("qty") or order.get("shares"))
             price = decimal_or_none(order.get("limit_price"))
             if quantity is not None and price is not None:
-                value = quantity * price
+                try:
+                    value = exact_decimal_multiply(
+                        quantity,
+                        price,
+                        name=f"{ticker} pending sell value",
+                    )
+                except ValueError:
+                    return None
         if value is not None and value > 0:
-            total += value
+            try:
+                total = exact_decimal_add(
+                    total,
+                    value,
+                    name=f"{sleeve} pending sell total",
+                )
+            except ValueError:
+                return None
     return total
 
 
@@ -375,7 +429,16 @@ def plan_trim(
             f"{canonical} would short the position, which this app never does."
         ])
 
-    proceeds = quantity * price
+    try:
+        proceeds = exact_decimal_multiply(
+            quantity,
+            price,
+            name=f"{name} trim proceeds",
+        )
+    except ValueError as exc:
+        return _empty([
+            f"{name}'s trim proceeds cannot be computed exactly ({exc})."
+        ])
     if proceeds > restoration:
         return _empty([
             f"Selling {canonical} share(s) raises "
@@ -420,9 +483,26 @@ def plan_trim(
         ])
 
     try:
+        price_float = float(price)
+        quantity_float = float(quantity)
+    except (OverflowError, ValueError) as exc:
+        return _empty([
+            f"{name}'s exact price or quantity cannot be preserved by the "
+            f"tax-lot/proposal schema ({exc})."
+        ])
+    if (
+        decimal_or_none(price_float) != price
+        or decimal_or_none(quantity_float) != quantity
+    ):
+        return _empty([
+            f"{name}'s exact price or quantity cannot be preserved by the "
+            "tax-lot/proposal schema; refusing a rounded trim."
+        ])
+
+    try:
         open_lots = tax_lot_ledger.open_for(name)
         chosen = select_lots(
-            open_lots, float(quantity),
+            open_lots, quantity_float,
             method=str(lot_strategy), lot_ids=lot_ids,
         )
     except TaxLotError as exc:
@@ -436,23 +516,67 @@ def plan_trim(
     detail_by_id = {
         d["lot_id"]: d
         for d in unrealized_by_lot(
-            tax_lot_ledger, name, float(price), now=sold_at
+            tax_lot_ledger, name, price_float, now=sold_at
         )
     }
+    selected_quantity = Decimal("0")
     for lot, taken in chosen:
-        taken_decimal = decimal_or_none(str(taken)) or Decimal("0")
-        basis = decimal_or_none(str(lot.cost_per_share)) or Decimal("0")
-        gain = (price - basis) * taken_decimal
-        realized += gain
-        if is_long_term(lot.acquired_at, sold_at):
-            long_term += gain
-        else:
-            short_term += gain
+        taken_decimal = decimal_or_none(str(taken))
+        basis = decimal_or_none(str(lot.cost_per_share))
+        lot_quantity = decimal_or_none(str(lot.qty))
+        if (
+            taken_decimal is None
+            or taken_decimal <= 0
+            or basis is None
+            or basis <= 0
+            or lot_quantity is None
+            or lot_quantity <= 0
+        ):
+            return _empty([
+                f"Tax lot {lot.lot_id!r} has an unusable quantity, selected "
+                "amount, or cost basis; refusing to publish tax consequences."
+            ])
+        try:
+            selected_quantity = exact_decimal_add(
+                selected_quantity,
+                taken_decimal,
+                name=f"{name} selected tax-lot quantity",
+            )
+            gain = exact_decimal_multiply(
+                exact_decimal_subtract(
+                    price,
+                    basis,
+                    name=f"{name} per-share realized gain",
+                ),
+                taken_decimal,
+                name=f"{name} lot realized gain",
+            )
+            realized = exact_decimal_add(
+                realized,
+                gain,
+                name=f"{name} total realized gain",
+            )
+            if is_long_term(lot.acquired_at, sold_at):
+                long_term = exact_decimal_add(
+                    long_term,
+                    gain,
+                    name=f"{name} long-term realized gain",
+                )
+            else:
+                short_term = exact_decimal_add(
+                    short_term,
+                    gain,
+                    name=f"{name} short-term realized gain",
+                )
+        except ValueError as exc:
+            return _empty([
+                f"{name}'s realized gain cannot be computed exactly ({exc})."
+            ])
         detail = detail_by_id.get(lot.lot_id, {})
         lots.append(
             TrimLot(
                 lot_id=lot.lot_id,
-                quantity=decimal_text(decimal_or_none(str(lot.qty)) or Decimal("0")),
+                quantity=decimal_text(lot_quantity),
                 cost_per_share=decimal_text(basis),
                 acquired_at=lot.acquired_at.isoformat(),
                 term_if_sold_now=str(detail.get("term_if_sold_now", "")),
@@ -461,6 +585,13 @@ def plan_trim(
                 realized_gain_exact=decimal_text(gain),
             )
         )
+
+    if selected_quantity != quantity:
+        return _empty([
+            f"The selected {name} tax lots cover {decimal_text(selected_quantity)} "
+            f"share(s), not the requested {decimal_text(quantity)}; refusing "
+            "to publish partial tax consequences."
+        ])
 
     if coverage.get("portfolio_complete") is False:
         # Stated rather than enforced: the rest of the book being uncovered
@@ -480,7 +611,16 @@ def plan_trim(
             "can never realize a short-term gain."
         )
 
-    remaining = held - quantity
+    try:
+        remaining = exact_decimal_subtract(
+            held,
+            quantity,
+            name=f"{name} remaining shares",
+        )
+    except ValueError as exc:
+        return _empty([
+            f"{name}'s remaining quantity cannot be computed exactly ({exc})."
+        ])
     if remaining > 0 and remaining < 1:
         disclosures.append(
             f"{decimal_text(remaining)} share(s) of {name} remain after this "
@@ -490,6 +630,11 @@ def plan_trim(
         )
 
     pending = _working_sell_value(packet, sleeve, membership)
+    if pending is None:
+        return _empty([
+            f"Working sells in {label} cannot be summed exactly, so this "
+            "trim cannot publish an exact pending-sell amount."
+        ])
     return TrimPlan(
         sleeve=sleeve, ticker=name,
         profile_version=report.profile_version,

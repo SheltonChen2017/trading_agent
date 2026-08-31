@@ -201,13 +201,37 @@ def verify_operational_policy_heartbeats(
 
 
 def _parse_timestamp(value: Any) -> datetime | None:
-    if not value:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        parsed = value
+    elif isinstance(value, str):
+        if value == "":
+            return None
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    else:
+        return None
+    if parsed.tzinfo is None:
         return None
     try:
-        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-    except ValueError:
+        if parsed.utcoffset() is None:
+            return None
+        return parsed.astimezone(timezone.utc)
+    except (OSError, OverflowError, TypeError, ValueError):
         return None
-    return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed
+
+
+def _require_positive_finite_number(name: str, value: Any) -> None:
+    valid_type = isinstance(value, (int, float)) and not isinstance(value, bool)
+    try:
+        finite = valid_type and math.isfinite(value)
+    except (OverflowError, TypeError, ValueError):
+        finite = False
+    if not finite or value <= 0:
+        raise OperationsError(f"{name} must be positive and finite")
 
 
 def _check(
@@ -258,13 +282,7 @@ def operational_health(
         ),
         ("max_restore_drill_age_days", max_restore_drill_age_days),
     ):
-        if (
-            not isinstance(value, (int, float))
-            or isinstance(value, bool)
-            or not math.isfinite(value)
-            or value <= 0
-        ):
-            raise OperationsError(f"{name} must be positive and finite")
+        _require_positive_finite_number(name, value)
 
     readiness = transaction_readiness(
         store,
@@ -503,13 +521,7 @@ def ensure_recent_database_backup(
     current = now or datetime.now(timezone.utc)
     if current.tzinfo is None:
         raise OperationsError("now must be timezone-aware")
-    if (
-        not isinstance(max_age_hours, (int, float))
-        or isinstance(max_age_hours, bool)
-        or not math.isfinite(max_age_hours)
-        or max_age_hours <= 0
-    ):
-        raise OperationsError("max_age_hours must be positive and finite")
+    _require_positive_finite_number("max_age_hours", max_age_hours)
     previous = store.get_system_state("last_database_backup", default={})
     previous_at = _parse_timestamp(
         previous.get("completed_at") if isinstance(previous, dict) else None

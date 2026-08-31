@@ -33,9 +33,14 @@ from __future__ import annotations
 
 import hashlib
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal, ROUND_FLOOR
+from decimal import Decimal
 
-from assistant.money import decimal_or_none, decimal_text
+from assistant.money import (
+    decimal_or_none,
+    decimal_text,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.proposals import (
@@ -53,6 +58,29 @@ from risk.execution_gate import (
 )
 
 EVIDENCE_STATUS = "user_directed_sell"
+_FRACTIONAL_QUANTITY_SCALE = 10**9
+
+
+def _quantity_not_exceeding(
+    amount: Decimal,
+    price: Decimal,
+    *,
+    whole_shares_only: bool,
+) -> int | Decimal:
+    """Exact floor of ``amount / price`` at the broker quantity precision."""
+    amount_numerator, amount_denominator = amount.as_integer_ratio()
+    price_numerator, price_denominator = price.as_integer_ratio()
+    if whole_shares_only:
+        return (
+            amount_numerator * price_denominator
+            // (amount_denominator * price_numerator)
+        )
+    scaled_units = (
+        amount_numerator * price_denominator * _FRACTIONAL_QUANTITY_SCALE
+        // (amount_denominator * price_numerator)
+    )
+    whole, fractional = divmod(scaled_units, _FRACTIONAL_QUANTITY_SCALE)
+    return Decimal(f"{whole}.{fractional:09d}")
 
 
 def remaining_shares_after_sale(
@@ -73,7 +101,14 @@ def remaining_shares_after_sale(
     )
     if held is None or held <= 0 or sold is None:
         return None
-    remainder = held - sold
+    try:
+        remainder = exact_decimal_subtract(
+            held,
+            sold,
+            name="remaining shares after sale",
+        )
+    except ValueError:
+        return None
     return remainder if remainder >= 0 else None
 
 
@@ -214,7 +249,20 @@ def generate_user_directed_sell_proposal(
             ),
         }
 
-    notional = quantity * price_decimal
+    try:
+        notional = exact_decimal_multiply(
+            quantity,
+            price_decimal,
+            name=f"{normalized} sell notional",
+        )
+    except ValueError as exc:
+        return {
+            "created": False,
+            "reason": (
+                f"The exact {normalized} order value cannot be computed "
+                f"({exc})."
+            ),
+        }
     max_order_value = decimal_or_none(policy.max_order_value)
     if max_order_value is None or max_order_value <= 0:
         return {
@@ -225,11 +273,10 @@ def generate_user_directed_sell_proposal(
             ),
         }
     if notional > max_order_value:
-        fits_raw = max_order_value / price_decimal
-        fits_sized = (
-            fits_raw.to_integral_value(rounding=ROUND_FLOOR)
-            if policy.whole_shares_only
-            else fits_raw.quantize(Decimal("0.000000001"), rounding=ROUND_FLOOR)
+        fits_sized = _quantity_not_exceeding(
+            max_order_value,
+            price_decimal,
+            whole_shares_only=policy.whole_shares_only,
         )
         fits = canonical_order_quantity(
             int(fits_sized) if policy.whole_shares_only else fits_sized,
@@ -268,7 +315,24 @@ def generate_user_directed_sell_proposal(
             "reason": f"The exact {normalized} share quantity is unavailable.",
         }
     closes_position = remaining_shares == 0
-    price = float(price_decimal)
+    try:
+        price = float(price_decimal)
+    except (OverflowError, ValueError) as exc:
+        return {
+            "created": False,
+            "reason": (
+                f"{normalized}'s exact reference price cannot be preserved "
+                f"by the proposal schema ({exc})."
+            ),
+        }
+    if decimal_or_none(price) != price_decimal:
+        return {
+            "created": False,
+            "reason": (
+                f"{normalized}'s exact reference price cannot be preserved "
+                "by the proposal schema; refusing a rounded proposal."
+            ),
+        }
     intent = TradeIntent(
         ticker=normalized,
         side="sell",
@@ -318,7 +382,12 @@ def generate_user_directed_sell_proposal(
         )
     elif (
         not policy.whole_shares_only
-        or remaining_shares != Decimal(held_whole) - quantity
+        or remaining_shares
+        != remaining_shares_after_sale(
+            Decimal(held_whole),
+            shares,
+            whole_shares_only=policy.whole_shares_only,
+        )
     ):
         # A fractional remainder is easy to miss, especially in whole-share
         # mode. Name it explicitly instead of describing the sale of every

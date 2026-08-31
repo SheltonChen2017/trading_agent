@@ -126,7 +126,9 @@ from assistant.risk_copilot import (
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import (
     AssistantStore,
+    JournalTransactionConflictError,
     configured_db_path,
+    open_contained_cancel_all_store,
     verify_database_schema,
 )
 from assistant.temporal_integrity import (
@@ -323,16 +325,58 @@ def _packet(include_events: bool = True, store: AssistantStore | None = None):
 
 
 def _print_briefing(packet) -> None:
+    portfolio_values_available = (
+        packet.risk.available is True
+        and packet.analytics.get("available") is True
+    )
+    equity_display = (
+        f"${packet.portfolio.total_equity:,.2f}"
+        if portfolio_values_available
+        else "unavailable"
+    )
+    cash_display = (
+        f"${packet.portfolio.cash:,.2f}"
+        if portfolio_values_available
+        else "unavailable"
+    )
+    invested_display = (
+        f"{packet.analytics['invested_pct']:.1f}%"
+        if portfolio_values_available
+        else "unavailable"
+    )
+    unrealized_display = (
+        f"${packet.analytics['unrealized_pnl']:,.2f}"
+        if portfolio_values_available
+        else "unavailable"
+    )
+    position_count = packet.analytics.get("position_count")
+    position_count_display = (
+        str(position_count)
+        if portfolio_values_available
+        and isinstance(position_count, int)
+        and not isinstance(position_count, bool)
+        and position_count >= 0
+        else "unavailable"
+    )
+    open_order_count = packet.analytics.get("open_order_count")
+    open_order_display = (
+        str(open_order_count)
+        if packet.portfolio.open_orders_available is True
+        and isinstance(open_order_count, int)
+        and not isinstance(open_order_count, bool)
+        and open_order_count >= 0
+        else "unavailable"
+    )
     print(f"Decision packet {packet.schema_version} â€” {packet.generated_at}")
     print(
         f"Portfolio source={packet.portfolio.source} mode={packet.portfolio.account_mode} "
-        f"equity=${packet.portfolio.total_equity:,.2f} cash=${packet.portfolio.cash:,.2f}"
+        f"equity={equity_display} cash={cash_display}"
     )
     print(
-        f"Positions={packet.analytics['position_count']} "
-        f"invested={packet.analytics['invested_pct']:.1f}% "
-        f"unrealized P&L=${packet.analytics['unrealized_pnl']:,.2f} "
-        f"open orders={packet.analytics['open_order_count']}"
+        f"Positions={position_count_display} "
+        f"invested={invested_display} "
+        f"unrealized P&L={unrealized_display} "
+        f"open orders={open_order_display}"
     )
     print(
         f"Regime {packet.regime.benchmark_ticker}: "
@@ -368,27 +412,37 @@ def command_briefing(args, store: AssistantStore) -> None:
     _print_batched_warnings(store)
     packet = _packet(include_events=not args.no_events, store=store)
     packet_id = store.save_decision_packet(packet)
+    portfolio_evidence_available = (
+        packet.risk.available is True
+        and packet.analytics.get("available") is True
+    )
     # Three-sleeve M2: evaluate threshold watches once per briefing. New
     # crossings become batched WARNING alerts (visible in the block above on
     # the NEXT briefing; printed inline below for this one). Isolation is
     # the contract: this feature failing must never suppress the briefing,
     # its warnings, or anything else -- note the failure and move on.
-    try:
-        from assistant.sleeve_notifications import run_sleeve_notification_cycle
-
-        sleeve_cycle = run_sleeve_notification_cycle(
-            store, snapshot=packet.portfolio
-        )
-    except Exception as exc:
+    if not portfolio_evidence_available:
         print(
-            f"  Sleeve engine notifications unavailable "
-            f"({type(exc).__name__}: {exc}) -- briefing unaffected."
+            "  Sleeve engine notifications unavailable because current "
+            "portfolio evidence is unavailable -- briefing unaffected."
         )
     else:
-        for activation in sleeve_cycle["activations"]:
-            print(f"  Sleeve watch NEW: {activation['message']}")
-        for note in sleeve_cycle["notes"]:
-            print(f"  Sleeve watch note: {note}")
+        try:
+            from assistant.sleeve_notifications import run_sleeve_notification_cycle
+
+            sleeve_cycle = run_sleeve_notification_cycle(
+                store, snapshot=packet.portfolio
+            )
+        except Exception as exc:
+            print(
+                f"  Sleeve engine notifications unavailable "
+                f"({type(exc).__name__}: {exc}) -- briefing unaffected."
+            )
+        else:
+            for activation in sleeve_cycle["activations"]:
+                print(f"  Sleeve watch NEW: {activation['message']}")
+            for note in sleeve_cycle["notes"]:
+                print(f"  Sleeve watch note: {note}")
     # Three-sleeve M3: durably release/consume earmarks whose proposals have
     # terminated, so dividend dollars from expired or rejected proposals
     # return to the pool without waiting for the next propose action. Same
@@ -407,24 +461,30 @@ def command_briefing(args, store: AssistantStore) -> None:
             f"({type(exc).__name__}: {exc}) -- briefing unaffected."
         )
     history_note = None
-    try:
-        captured = capture_briefing_equity_snapshot(
-            store,
-            packet.portfolio,
-            captured_at=packet.generated_at,
+    if not portfolio_evidence_available:
+        history_note = (
+            "Portfolio history unavailable: current portfolio evidence "
+            "is unavailable."
         )
-        report = portfolio_performance_report(
-            store, captured["account_key"]
-        )
-        if report.get("available"):
-            history_note = (
-                f"Portfolio total return {report['total_return_pct']:+.2f}% "
-                f"since {report['start_session']}; "
-                f"max drawdown {report['max_drawdown_pct']:.2f}%."
+    else:
+        try:
+            captured = capture_briefing_equity_snapshot(
+                store,
+                packet.portfolio,
+                captured_at=packet.generated_at,
             )
-    except Exception as exc:
-        # History is observability, never a prerequisite for a briefing.
-        history_note = f"Portfolio history capture unavailable: {exc}"
+            report = portfolio_performance_report(
+                store, captured["account_key"]
+            )
+            if report.get("available"):
+                history_note = (
+                    f"Portfolio total return {report['total_return_pct']:+.2f}% "
+                    f"since {report['start_session']}; "
+                    f"max drawdown {report['max_drawdown_pct']:.2f}%."
+                )
+        except Exception as exc:
+            # History is observability, never a prerequisite for a briefing.
+            history_note = f"Portfolio history capture unavailable: {exc}"
     _print_briefing(packet)
     macro_context = build_descriptive_macro_context()
     if macro_context.get("available"):
@@ -475,6 +535,15 @@ def command_risk_check(args, store: AssistantStore) -> None:
     for violation in violations:
         print(f"  POLICY VIOLATION: {violation}")
     print("Informational summary (not a policy-compliance check -- see any POLICY VIOLATION lines above):")
+    if packet.risk.available is not True:
+        print(
+            "  ! Portfolio risk analyses unavailable: "
+            + str(
+                packet.risk.unavailable_reason
+                or "portfolio exposure evidence is unavailable"
+            )
+        )
+        return
     print(check_concentration(packet.risk, args.basket))
     for cluster_warning in find_correlated_clusters(packet.portfolio):
         print(f"  ! {cluster_warning}")
@@ -1010,8 +1079,21 @@ def command_cancel_all_orders(args, store: AssistantStore) -> None:
         )
     result = cancel_all_open_orders(store, reason=args.reason)
     print(json.dumps(result, indent=2, sort_keys=True))
-    if result["errors"]:
+    if result.get("book_stable") is not True:
+        print(
+            "ERROR: cancel-all could not prove a stable, fully covered broker "
+            "book and confirmed stop boundary; keep the kill switch active "
+            "and verify Alpaca directly.",
+            file=sys.stderr,
+        )
         raise SystemExit(2)
+    if result.get("errors"):
+        print(
+            "WARNING: cancel-all proved stable cancellation coverage, but "
+            "recorded diagnostic errors; review the JSON result while keeping "
+            "the kill switch active as appropriate.",
+            file=sys.stderr,
+        )
 
 
 def _committee_unavailable(code: str, message: str) -> None:
@@ -2742,7 +2824,13 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Operator incident reason stored with the durable kill switch.",
     )
-    cancel_all.set_defaults(handler=command_cancel_all_orders)
+    # Emergency cancellation must remain reachable even when the broker-event
+    # ledger fails its integrity sweep: this command reads no event evidence,
+    # and containment has already engaged the kill switch by that point.
+    cancel_all.set_defaults(
+        handler=command_cancel_all_orders,
+        uses_contained_cancel_all_store=True,
+    )
 
     readiness = commands.add_parser(
         "readiness",
@@ -3352,10 +3440,16 @@ def main() -> None:
     if not getattr(args, "needs_store", True):
         args.handler(args)
         return
-    store = AssistantStore(
-        args.database,
-        read_only=getattr(args, "read_only_store", False),
-    )
+    if getattr(args, "uses_contained_cancel_all_store", False):
+        try:
+            store = AssistantStore(args.database)
+        except JournalTransactionConflictError:
+            store = open_contained_cancel_all_store(args.database)
+    else:
+        store = AssistantStore(
+            args.database,
+            read_only=getattr(args, "read_only_store", False),
+        )
     args.handler(args, store)
 
 

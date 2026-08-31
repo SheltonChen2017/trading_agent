@@ -42,12 +42,20 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import math
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import config
 from assistant.allocation_proposals import build_allocation_plan
-from assistant.money import decimal_or_none, decimal_text
+from assistant.money import (
+    decimal_or_none,
+    decimal_text,
+    deterministic_decimal_divide,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import (
     estimate_pending_buy_value_by_ticker,
@@ -58,6 +66,8 @@ from assistant.schemas import DecisionPacket, PortfolioSnapshot
 from risk.execution_gate import TradeIntent, is_valid_order_quantity
 
 EVIDENCE_STATUS = "user_directed_hedge"
+_ONE_HUNDRED = Decimal("100")
+_ONE_PERCENT = Decimal("0.01")
 
 #: The standing honesty disclosure. It is attached to every report and every
 #: proposal, in both directions: the app has not measured protection, and the
@@ -172,6 +182,43 @@ def _position_value(position: object) -> Decimal | None:
     return decimal_or_none(getattr(position, "market_value", None))
 
 
+def _percentage(value: Decimal, total: Decimal, *, name: str) -> Decimal:
+    ratio = deterministic_decimal_divide(value, total, name=f"{name} ratio")
+    return exact_decimal_multiply(ratio, _ONE_HUNDRED, name=name)
+
+
+def _percentage_float(value: Decimal, total: Decimal, *, name: str) -> float:
+    result = float(_percentage(value, total, name=name))
+    if not math.isfinite(result):
+        raise ValueError(f"{name} cannot be represented for display")
+    return result
+
+
+def _conservative_equal_weight(count: int) -> Decimal:
+    """Deterministic equal weight that can never sum above 100 percent."""
+    weight = deterministic_decimal_divide(
+        _ONE_HUNDRED,
+        Decimal(count),
+        name="equal hedge weight",
+    )
+    combined = exact_decimal_multiply(
+        weight,
+        Decimal(count),
+        name="combined equal hedge weights",
+    )
+    if combined > _ONE_HUNDRED:
+        # Recurring decimal division can round up at its final digit. One ULP
+        # off each equal leg lowers the combined allocation by `count` ULPs,
+        # more than the at-most-half-ULP quotient rounding error times count.
+        unit = Decimal((0, (1,), int(weight.as_tuple().exponent)))
+        weight = exact_decimal_subtract(
+            weight,
+            unit,
+            name="conservative equal hedge weight",
+        )
+    return weight
+
+
 def evaluate_hedge_sleeve(
     snapshot: PortfolioSnapshot,
     *,
@@ -253,6 +300,7 @@ def evaluate_hedge_sleeve(
             )
 
     pending_hedge_value = Decimal("0")
+    pending_values_readable = True
     for raw_ticker, raw_value in pending_buy_value_by_ticker.items():
         name = str(raw_ticker).strip().upper()
         if name not in selected_set:
@@ -264,7 +312,17 @@ def evaluate_hedge_sleeve(
                 f"non-negative amount ({raw_value!r})."
             )
             continue
-        pending_hedge_value += value
+        try:
+            pending_hedge_value = exact_decimal_add(
+                pending_hedge_value,
+                value,
+                name="pending hedge-buy value",
+            )
+        except ValueError as exc:
+            pending_values_readable = False
+            refusals.append(
+                f"Pending hedge-buy values cannot be combined exactly ({exc})."
+            )
 
     equity_input = (
         snapshot.total_equity_exact
@@ -282,7 +340,7 @@ def evaluate_hedge_sleeve(
     by_ticker = {p.ticker.upper(): p for p in snapshot.positions}
     rows: list[HedgeSleeveRow] = []
     hedge_value = Decimal("0")
-    values_readable = True
+    values_readable = pending_values_readable
     for name in selected:
         position = by_ticker.get(name)
         daily_reset = name in config.DAILY_RESET_HEDGE_ETFS
@@ -341,15 +399,30 @@ def evaluate_hedge_sleeve(
                 )
             )
             continue
-        hedge_value += value
+        try:
+            hedge_value = exact_decimal_add(
+                hedge_value,
+                value,
+                name="hedge sleeve value",
+            )
+            row_pct = (
+                _percentage_float(value, equity, name=f"{name} hedge weight")
+                if equity is not None
+                else 0.0
+            )
+        except (OverflowError, ValueError) as exc:
+            values_readable = False
+            refusals.append(
+                f"{name} hedge arithmetic is unavailable ({exc}); refusing "
+                "to size from a rounded or partial value."
+            )
+            row_pct = 0.0
         rows.append(
             HedgeSleeveRow(
                 ticker=name, held=True,
                 shares_exact=decimal_text(shares) if shares is not None else "0",
                 market_value_exact=decimal_text(value),
-                pct_of_equity=(
-                    float(value / equity * 100) if equity is not None else 0.0
-                ),
+                pct_of_equity=row_pct,
                 value_available=True, daily_reset=daily_reset,
             )
         )
@@ -369,20 +442,58 @@ def evaluate_hedge_sleeve(
     # hedge value displayed as the whole one is the reading that oversizes a
     # purchase.
     if equity is not None and values_readable:
-        current_pct = float(hedge_value / equity * 100)
-        projected_pct = float(
-            (hedge_value + pending_hedge_value) / equity * 100
-        )
-        if target is not None:
-            difference = (
-                equity * target / Decimal("100")
-                - hedge_value
-                - pending_hedge_value
+        try:
+            projected_value = exact_decimal_add(
+                hedge_value,
+                pending_hedge_value,
+                name="projected hedge sleeve value",
             )
-            if difference > 0:
-                shortfall = difference
-            else:
-                surplus = -difference
+            current_pct = _percentage_float(
+                hedge_value,
+                equity,
+                name="current hedge weight",
+            )
+            projected_pct = _percentage_float(
+                projected_value,
+                equity,
+                name="projected hedge weight",
+            )
+            if target is not None:
+                target_value = exact_decimal_multiply(
+                    exact_decimal_multiply(
+                        equity,
+                        target,
+                        name="hedge target scaled value",
+                    ),
+                    _ONE_PERCENT,
+                    name="hedge target value",
+                )
+                difference = exact_decimal_subtract(
+                    exact_decimal_subtract(
+                        target_value,
+                        hedge_value,
+                        name="hedge target less holdings",
+                    ),
+                    pending_hedge_value,
+                    name="hedge shortfall after pending buys",
+                )
+                if difference > 0:
+                    shortfall = difference
+                else:
+                    surplus = exact_decimal_subtract(
+                        Decimal("0"),
+                        difference,
+                        name="hedge surplus",
+                    )
+        except (OverflowError, ValueError) as exc:
+            current_pct = 0.0
+            projected_pct = 0.0
+            shortfall = Decimal("0")
+            surplus = Decimal("0")
+            refusals.append(
+                f"Hedge sleeve arithmetic is unavailable ({exc}); refusing "
+                "to publish or size a rounded gap."
+            )
 
     return HedgeSleeveReport(
         as_of=snapshot.as_of,
@@ -515,7 +626,7 @@ def generate_hedge_buy_proposals(
     # Equal weight, computed once and stated. The remainder from an
     # indivisible split is left unallocated rather than being pushed onto an
     # arbitrary instrument, which would silently overweight it.
-    weight = Decimal("100") / Decimal(len(usable_prices))
+    weight = _conservative_equal_weight(len(usable_prices))
     weights_pct = {ticker: weight for ticker in usable_prices}
     shortfall = Decimal(report.shortfall_dollars_exact)
 

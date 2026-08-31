@@ -285,7 +285,12 @@ from assistant.order_lifecycle import (
 # began, and the facade's importable surface is a compatibility contract
 # (independent review, 2026-08-02: dropping DuplicateIntentConflict during
 # GR-1B was rejected on exactly this ground).
-from assistant.money import MoneyInput, to_decimal
+from assistant.money import (
+    MoneyInput,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    to_decimal,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
@@ -392,6 +397,11 @@ def _build_execution_owned_portfolio_snapshot(
     return snapshot
 
 
+# Only the one canonical long-only risk-reduction side may bypass the
+# ambiguity guard below. Unknown or malformed sides stay fail-closed here,
+# before any broker session or snapshot read.
+_SIDE_SELL = "sell"
+
 _AMBIGUOUS_ACCOUNT_DISPATCH_STATUSES = (
     SUBMITTING,
     SUBMISSION_UNKNOWN,
@@ -428,8 +438,24 @@ def _refuse_while_prior_dispatch_is_ambiguous(
     store: AssistantStore,
     *,
     proposal_id: str,
+    side: object,
 ) -> None:
-    """Do not add account exposure while an earlier contact is unresolved."""
+    """Do not add account exposure while an earlier contact is unresolved.
+
+    Exposure-INCREASING dispatch only.  CLAUDE.md section 5 makes obstructing a
+    legitimate risk-reducing sell a safety defect in its own right, and an
+    ambiguous prior contact is exactly the state a broker outage produces --
+    the moment an operator most needs to reduce exposure. Only an exact
+    canonical sell bypasses this guard; the independent sell-exceeds-held
+    check, the ticker/side duplicate guard, and the execution gate still apply
+    to it. Unknown or malformed sides are not presumed to reduce risk and stay
+    fenced before broker contact.
+
+    This mirrors the earnings blackout, which the risk registry scopes to buys
+    for the same stated reason.
+    """
+    if type(side) is str and side == _SIDE_SELL:
+        return
     ambiguous = [
         proposal
         for proposal in store.list_proposals_by_statuses(
@@ -692,6 +718,8 @@ def validate_proposal_for_execution(
             decimal_factory=Decimal,
             trade_intent_factory=TradeIntent,
             to_decimal=to_decimal,
+            exact_decimal_add=exact_decimal_add,
+            exact_decimal_multiply=exact_decimal_multiply,
             env_kill_switch_active=env_kill_switch_active,
             compute_policy_fingerprint=compute_policy_fingerprint,
             validate_proposal_context=_validate_proposal_context,
@@ -841,6 +869,7 @@ def _execute_approved_paper_proposal_under_dispatch_fence(
         _refuse_while_prior_dispatch_is_ambiguous(
             store,
             proposal_id=proposal_id,
+            side=proposal.get("intent", {}).get("side"),
         )
         broker = _import_execution_broker()
         broker_session = broker.open_alpaca_broker_session()

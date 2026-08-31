@@ -34,10 +34,12 @@ from scripts.personal_assistant_ui import (
     _clear_confirmation_state_if_digest_changed,
     _committee_result_for_input,
     _load_packet,
+    _open_order_metric_value,
     _portfolio_context_payload,
     _proposal_content_digest,
     _proposal_status_category,
     _preserve_page_widget_state,
+    _render_cancel_all_result,
     _sync_policy_editor_state,
 )
 
@@ -72,6 +74,63 @@ def test_page_state_persistence_excludes_every_sensitive_confirmation():
         "dismiss_confirmation",
     ):
         assert sensitive_key not in _PERSISTENT_PAGE_WIDGET_KEYS
+
+
+def test_open_order_metric_never_turns_unavailable_evidence_into_zero():
+    packet = _packet([])
+    unavailable = dataclasses.replace(
+        packet.portfolio,
+        open_orders=[],
+        open_orders_available=False,
+    )
+
+    assert _open_order_metric_value(unavailable, {"open_order_count": None}) == (
+        "Unavailable"
+    )
+    assert _open_order_metric_value(
+        packet.portfolio, {"open_order_count": 0}
+    ) == 0
+
+
+@pytest.mark.parametrize(
+    ("result", "expected_channel"),
+    (
+        ({"book_stable": False, "errors": []}, "error"),
+        (
+            {
+                "book_stable": True,
+                "errors": [{"error": "strict path degraded"}],
+            },
+            "warning",
+        ),
+        (
+            {
+                "book_stable": True,
+                "errors": [],
+                "cancel_requested_count": 2,
+            },
+            "success",
+        ),
+    ),
+)
+def test_cancel_all_ui_uses_book_stability_as_authoritative_outcome(
+    monkeypatch, result, expected_channel
+):
+    rendered = {"error": [], "warning": [], "success": [], "json": []}
+    for channel in ("error", "warning", "success", "json"):
+        monkeypatch.setattr(
+            ui.st,
+            channel,
+            lambda value, channel=channel: rendered[channel].append(value),
+        )
+
+    _render_cancel_all_result(result)
+
+    assert len(rendered[expected_channel]) == 1
+    for channel in ("error", "warning", "success"):
+        if channel != expected_channel:
+            assert rendered[channel] == []
+    assert rendered["json"] == [result]
 
 
 def _policy(version: str = "test", max_order_value: float = 5_000.0) -> TradingPolicy:

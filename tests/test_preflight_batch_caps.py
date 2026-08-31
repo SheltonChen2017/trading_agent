@@ -20,6 +20,7 @@ from __future__ import annotations
 import sys
 import tempfile
 from datetime import datetime, timezone
+from decimal import localcontext
 from pathlib import Path
 
 import pytest
@@ -177,6 +178,82 @@ def test_daily_notional_decimal_boundary_does_not_reject_final_leg():
     )
 
     assert _approvals(results, proposals) == [True, True, True]
+
+
+def test_daily_notional_budget_does_not_round_below_cap_at_low_precision():
+    packet = _packet(cash=100.0)
+    policy = _policy(
+        max_daily_submitted_notional=12.12,
+        max_open_orders=99,
+        max_daily_order_count=99,
+    )
+    proposal = _buy_proposal(packet, policy, "AAA", 123, 0.0987)
+
+    with localcontext() as context:
+        context.prec = 3
+        results = _run_preflight(
+            [proposal], policy, packet, quote_price=0.0987
+        )
+
+    result = results[proposal.proposal_id]
+    assert result.approved is False
+    assert result.violation_codes == ("daily_execution_budget",)
+
+
+def test_unrepresentable_budget_math_returns_a_typed_preflight_refusal(
+    monkeypatch,
+):
+    packet = _packet(cash=100.0)
+    policy = _policy(max_open_orders=99, max_daily_order_count=99)
+    proposal = _buy_proposal(packet, policy, "AAA", 1, 1.0)
+
+    def refuse_budget_math(*_args, **_kwargs):
+        raise ValueError("simulated exact-arithmetic refusal")
+
+    monkeypatch.setattr(
+        "assistant.allocation_batch._execution_budget_notional",
+        refuse_budget_math,
+    )
+    results = _run_preflight([proposal], policy, packet, quote_price=1.0)
+
+    result = results[proposal.proposal_id]
+    assert result.approved is False
+    assert result.violation_codes == ("daily_execution_budget",)
+    assert "could not be proved exactly" in result.violations[0]
+
+
+def test_unreadable_persistent_budget_returns_typed_refusals_for_every_leg():
+    packet = _packet(cash=100.0)
+    policy = _policy(max_open_orders=99, max_daily_order_count=99)
+    proposals = [
+        _buy_proposal(packet, policy, "AAA", 1, 1.0),
+        _buy_proposal(packet, policy, "BBB", 1, 1.0),
+    ]
+
+    def seed(store):
+        def unreadable_usage(_trading_day):
+            raise ValueError("simulated corrupt exact budget evidence")
+
+        store.get_execution_budget_usage = unreadable_usage
+
+    results = _run_preflight(
+        proposals,
+        policy,
+        packet,
+        seed_store=seed,
+        quote_price=1.0,
+    )
+
+    assert set(results) == {proposal.proposal_id for proposal in proposals}
+    assert all(result.approved is False for result in results.values())
+    assert all(
+        result.violation_codes == ("preflight_error",)
+        for result in results.values()
+    )
+    assert all(
+        "persistent daily execution budget" in result.violations[0]
+        for result in results.values()
+    )
 
 
 def test_budget_already_consumed_today_reduces_the_headroom():

@@ -346,9 +346,9 @@ def test_client_cannot_reach_execution_authority():
 
 def test_the_unverified_success_assumption_is_documented_where_it_will_bite():
     """CQC-001. The `success is True` requirement is fail-closed and correct,
-    but no live call has ever been made from this project, so whether every
-    endpoint sets that field is an assumption rather than a verified
-    contract.
+    and historical calls verified it for the endpoints they exercised.
+    Whether every future or unexercised endpoint sets that field remains an
+    endpoint-specific assumption rather than a universal contract.
 
     An undocumented assumption of this kind costs a debugging session: a
     valid response refused as "no reason given" reads as a credential

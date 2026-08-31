@@ -98,7 +98,7 @@ def test_alert_failure_rolls_back_proposal_but_preserves_independent_containment
     store = AssistantStore(tmp_path / "assistant.db")
     _seed(store)
     store.set_kill_switch(False, reason="baseline")
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             """
             CREATE TRIGGER inject_atomic_anomaly_alert_failure
@@ -135,7 +135,7 @@ def test_runtime_and_alert_failure_falls_back_to_separate_local_stop(
     monkeypatch.setattr(
         storage_module, "activate_runtime_emergency_stop", fail_runtime
     )
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             "CREATE TRIGGER inject_dual_alert_failure "
             "BEFORE INSERT ON operational_alerts BEGIN "
@@ -170,6 +170,55 @@ def test_same_anomaly_key_is_idempotent(tmp_path):
     assert store.get_proposal("p-anomaly")["reconciled_at"] == (
         "2026-08-26T15:01:00+00:00"
     )
+
+
+def test_changed_recurring_anomaly_updates_alert_and_has_distinct_runtime_identity(
+    tmp_path,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    _seed(store)
+    first = _contain(store)
+
+    changed = _contain(
+        store,
+        reason="broker order identity mismatch: quantity changed",
+        details={"path": "test", "mismatch": "quantity"},
+        reconciled_at="2026-08-26T15:02:00+00:00",
+    )
+    identical_replay = _contain(
+        store,
+        reason="broker order identity mismatch: quantity changed",
+        details={"path": "test", "mismatch": "quantity"},
+        reconciled_at="2026-08-26T15:02:00+00:00",
+    )
+
+    assert first["alert"]["occurrences"] == 1
+    assert changed["alert"]["occurrences"] == 2
+    assert changed["alert"]["message"] == (
+        "broker order identity mismatch: quantity changed"
+    )
+    assert changed["alert"]["details"] == {
+        "anomaly_key": "test_identity_mismatch",
+        "mismatch": "quantity",
+        "path": "test",
+        "proposal_id": "p-anomaly",
+    }
+    assert changed["alert"]["last_seen_at"] == "2026-08-26T15:02:00+00:00"
+    assert identical_replay["alert"] == changed["alert"]
+
+    runtime = get_runtime_emergency_stop(store.path)
+    assert runtime.get("integrity_error") is None
+    matching = [
+        incident
+        for incident in runtime["open_incidents"]
+        if incident["reason"].startswith("broker order identity mismatch")
+    ]
+    assert len(matching) == 2
+    assert len({incident["incident_id"] for incident in matching}) == 2
+    assert {incident["reason"] for incident in matching} == {
+        "broker order identity mismatch",
+        "broker order identity mismatch: quantity changed",
+    }
 
 
 def test_acknowledged_anomaly_replay_reopens_alert_and_reparks_proposal_drift(
@@ -211,7 +260,7 @@ def test_anomaly_replay_alert_failure_keeps_independent_containment(tmp_path):
     assert store.acknowledge_operational_alert(first["alert"]["alert_id"]) is True
     store.update_proposal_status("p-anomaly", RECONCILING)
     store.set_kill_switch(False, reason="baseline")
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             """
             CREATE TRIGGER inject_atomic_anomaly_reopen_failure
@@ -334,16 +383,7 @@ def test_anomaly_containment_requires_an_aware_timestamp(tmp_path, bad_timestamp
 
 
 def test_real_process_crash_mid_transaction_leaves_no_anomaly_without_halt(tmp_path):
-    """Kill the process inside the transaction and reopen the database.
-
-    The other containment tests simulate a crash with an aborting trigger or a
-    patched exception and then assert against the same live store, so they
-    prove rollback but never process death. This one really terminates the
-    interpreter with os._exit between the proposal park and the commit, so no
-    exception handler, no rollback path and no fallback kill-switch write can
-    run. Reopening the file then proves the invariant that matters: there is
-    never a committed anomaly without its halt and alert.
-    """
+    """Kill the process inside the transaction and reopen the database."""
     import os
     import subprocess
     import sys
@@ -383,8 +423,6 @@ os._exit(0)
     )
     assert completed.returncode == 70, (completed.returncode, completed.stderr)
 
-    # Reopen the database from scratch: this is a different connection and a
-    # different process's view of the file.
     reopened = AssistantStore(database)
     proposal = reopened.get_proposal("p-anomaly")
     alerts = reopened.list_operational_alerts()
@@ -392,10 +430,7 @@ os._exit(0)
 
     parked = proposal["status"] != SUBMITTING
     halted = bool(kill_switch.get("active")) and bool(alerts)
-    # The whole point: a committed park without its halt would be an
-    # acknowledged broker anomaly with no kill switch.
     assert not (parked and not halted), (proposal["status"], kill_switch, alerts)
-    # This crash point is before commit, so nothing at all should be durable.
     assert proposal["status"] == SUBMITTING
     assert kill_switch.get("active") in (False, None)
     assert alerts == []

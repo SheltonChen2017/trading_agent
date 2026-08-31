@@ -56,20 +56,27 @@ def _check(name: str, ok: bool, detail: str) -> dict[str, Any]:
 
 
 def _parse_timestamp(value: Any) -> datetime | None:
-    if value is None or value == "":
+    if value is None:
         return None
     if isinstance(value, _DATETIME_TYPE):
         parsed = value
     elif isinstance(value, str):
+        if value == "":
+            return None
         try:
             parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
         except ValueError:
             return None
     else:
         return None
-    if parsed.tzinfo is None or parsed.utcoffset() is None:
+    if parsed.tzinfo is None:
         return None
-    return parsed.astimezone(timezone.utc)
+    try:
+        if parsed.utcoffset() is None:
+            return None
+        return parsed.astimezone(timezone.utc)
+    except (OSError, OverflowError, TypeError, ValueError):
+        return None
 
 
 def _bounded_readiness_number(name: str, value: Any, *, maximum: float) -> float:

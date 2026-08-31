@@ -25,7 +25,7 @@ import dataclasses
 import json
 import sys
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -403,6 +403,61 @@ def test_the_restoration_cap_prevents_gutting_a_sleeves_only_holding():
     plan = _plan(shares=899)  # the 900-share single-name fixture
     assert not plan.usable
     assert any("restores" in r for r in plan.refusals)
+
+
+def test_low_decimal_context_cannot_round_a_trim_under_the_restoration_cap():
+    packet = _packet(
+        [{
+            "ticker": "MSFT", "shares": "900",
+            "entry_price": "8", "current_price": "10.005",
+        }],
+        cash="1001",
+    )
+    baseline = _plan(packet=packet, shares=500)
+    with localcontext() as context:
+        context.prec = 3
+        constrained = _plan(packet=packet, shares=500)
+
+    assert not baseline.usable
+    assert not constrained.usable
+    assert any("more than" in reason for reason in baseline.refusals)
+    assert constrained.refusals == baseline.refusals
+
+
+def test_low_decimal_context_preserves_trim_exact_fields_and_identity():
+    packet = _packet(
+        [{
+            "ticker": "MSFT", "shares": "900",
+            "entry_price": "8", "current_price": "10.005",
+        }],
+        cash="1001",
+    )
+    kwargs = {
+        "sleeve": SLEEVE_GROWTH,
+        "ticker": "MSFT",
+        "shares": 499,
+        "lot_strategy": "fifo",
+        "tax_lot_ledger": _ledger(),
+        "tax_lot_coverage": COVERAGE,
+        "now": datetime(2026, 8, 15, 12, tzinfo=timezone.utc),
+    }
+    baseline = generate_trim_proposal(
+        packet, OWNER_APPROVED_PROFILE, _policy(), **kwargs
+    )
+    with localcontext() as context:
+        context.prec = 3
+        constrained = generate_trim_proposal(
+            packet, OWNER_APPROVED_PROFILE, _policy(), **kwargs
+        )
+
+    for result in (baseline, constrained):
+        assert result["created"], result.get("reason")
+        assert result["plan"].proceeds_exact == "4992.495"
+        assert result["plan"].restoration_to_target_exact == "5002.3"
+    assert (
+        constrained["proposal"].proposal_id
+        == baseline["proposal"].proposal_id
+    )
 
 
 # --- proposals --------------------------------------------------------------

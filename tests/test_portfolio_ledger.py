@@ -2,7 +2,7 @@ import sys
 import sqlite3
 import threading
 from datetime import date, datetime, timedelta, timezone
-from decimal import Decimal
+from decimal import Context, Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -69,6 +69,42 @@ def _snapshot(cash=1000.0, shares=1.0):
     )
 
 
+def _authoritative_exact_snapshot(
+    *, cash_exact: str = "1000.0045"
+) -> PortfolioSnapshot:
+    cash = Decimal(cash_exact)
+    shares = Decimal("1.000000001")
+    entry_price = Decimal("100.123456789")
+    current_price = Decimal("110")
+    market_value = Decimal("110.000000110")
+    total_equity = cash + market_value
+    return PortfolioSnapshot(
+        positions=[
+            PortfolioPosition(
+                ticker="AAPL",
+                shares=float(shares),
+                entry_price=float(entry_price),
+                current_price=float(current_price),
+                market_value=float(market_value.quantize(Decimal("0.01"))),
+                unrealized_pnl_pct=0.0,
+                is_leveraged_etf=False,
+                shares_exact=str(shares),
+                entry_price_exact=str(entry_price),
+                current_price_exact=str(current_price),
+                market_value_exact=str(market_value),
+            )
+        ],
+        cash=float(cash.quantize(Decimal("0.01"))),
+        total_equity=float(total_equity.quantize(Decimal("0.01"))),
+        as_of="2026-07-29",
+        source="alpaca",
+        account_mode="paper",
+        account_id="paper-account-1",
+        cash_exact=str(cash),
+        total_equity_exact=str(total_equity),
+    )
+
+
 def test_unbalanced_transaction_is_rejected(tmp_path):
     store = AssistantStore(tmp_path / "assistant.db")
     transaction = JournalTransaction(
@@ -81,6 +117,412 @@ def test_unbalanced_transaction_is_rejected(tmp_path):
     )
     with pytest.raises(LedgerError, match="not balanced"):
         post_transaction(store, transaction)
+
+
+def test_low_decimal_precision_cannot_round_an_imbalance_to_zero(tmp_path):
+    """Validation must inspect the exact postings before durable mutation."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    transaction = JournalTransaction(
+        transaction_id="ambient-context-imbalance",
+        occurred_at="2026-07-29T12:00:00+00:00",
+        source="test",
+        external_id="ambient-context-imbalance",
+        description="exactly one dollar out of balance",
+        postings=(
+            Posting(ACCOUNT_CASH, Decimal("100000000")),
+            Posting(ACCOUNT_FEES, Decimal("1")),
+            Posting(ACCOUNT_CONTRIBUTED_CAPITAL, Decimal("-100000000")),
+        ),
+    )
+
+    # Under ambient precision 4, the old accumulator evaluated
+    # 100000000 + 1 - 100000000 as zero and persisted the bad transaction.
+    with localcontext(Context(prec=4)):
+        with pytest.raises(LedgerError, match="not balanced"):
+            post_transaction(store, transaction)
+
+    assert store.list_journal_postings() == []
+
+
+def test_ledger_reconstruction_is_independent_of_decimal_context(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    occurred_at = "2026-07-29T12:00:00+00:00"
+    for suffix, amount, quantity in (
+        ("large", Decimal("100000000"), Decimal("100000000")),
+        ("fraction", Decimal("0.01"), Decimal("0.01")),
+    ):
+        post_transaction(
+            store,
+            JournalTransaction(
+                transaction_id=f"reconstruction-{suffix}",
+                occurred_at=occurred_at,
+                source="test",
+                external_id=f"reconstruction-{suffix}",
+                description="exact reconstruction fixture",
+                postings=(
+                    Posting(
+                        f"{SECURITY_ACCOUNT_PREFIX}AAPL",
+                        amount,
+                        quantity=quantity,
+                    ),
+                    Posting(ACCOUNT_CASH, -amount),
+                ),
+            ),
+        )
+
+    with localcontext(Context(prec=4)):
+        balances = ledger_balances(store)
+
+    assert balances["cash"] == Decimal("-100000000.01")
+    assert balances["security_book_value"]["AAPL"] == Decimal("100000000.01")
+    assert balances["shares"]["AAPL"] == Decimal("100000000.01")
+    assert balances["trial_balance"]["USD"] == Decimal("0")
+
+
+def test_low_decimal_precision_preserves_fill_cash_shares_and_book_value(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 7, 29, 10, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(
+        store,
+        _snapshot(cash=100000000.0, shares=0.0),
+        confirmation="bootstrap",
+        now=boot_at,
+    )
+    quantity = Decimal("1.23456789")
+    price = Decimal("12.3456789")
+    exact_gross = Decimal("15.241578750190521")
+    store.list_fills = lambda: [
+        {
+            "ticker": "AAPL",
+            "side": "buy",
+            "qty": str(quantity),
+            "price": str(price),
+            "at": (boot_at + timedelta(hours=1)).isoformat(),
+            "fill_id": "ambient-context-buy",
+        }
+    ]
+
+    with localcontext(Context(prec=4)):
+        assert sync_app_fills(store)["inserted"] == 1
+
+    balances = ledger_balances(store)
+    assert balances["cash"] == Decimal("100000000") - exact_gross
+    assert balances["security_book_value"]["AAPL"] == exact_gross
+    assert balances["shares"]["AAPL"] == quantity
+
+
+@pytest.mark.parametrize(
+    "mutation, message",
+    (
+        ({"qty_decimal": None}, "missing canonical qty_decimal"),
+        ({"qty_decimal": "2"}, "qty_decimal disagrees"),
+        ({"price_decimal": None}, "missing canonical price_decimal"),
+        ({"price_decimal": "200"}, "price_decimal disagrees"),
+    ),
+)
+def test_claimed_provider_exact_fill_refuses_missing_or_mismatched_companions_before_mutation(
+    tmp_path, mutation, message
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 7, 29, 10, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(
+        store,
+        _snapshot(cash=1000.0, shares=0.0),
+        confirmation="bootstrap",
+        now=boot_at,
+    )
+    fill = {
+        "ticker": "AAPL",
+        "side": "buy",
+        "qty": 1.0,
+        "qty_decimal": "1",
+        "price": 100.0,
+        "price_decimal": "100",
+        "numeric_evidence_status": "provider_exact",
+        "at": (boot_at + timedelta(hours=1)).isoformat(),
+        "fill_id": "invalid-provider-exact",
+        "order_id": "order-invalid",
+        "proposal_id": "proposal-invalid",
+        **mutation,
+    }
+    store.list_fills = lambda: [fill]
+    before = store.list_journal_postings()
+
+    with pytest.raises(LedgerError, match=message):
+        sync_app_fills(store)
+
+    assert store.list_journal_postings() == before
+
+
+def test_low_decimal_precision_preserves_opening_snapshot_basis(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    snapshot = _snapshot(cash=100000000.0, shares=1.23456789)
+
+    with localcontext(Context(prec=4)):
+        bootstrap_opening_snapshot(
+            store,
+            snapshot,
+            confirmation="bootstrap",
+            now=datetime(2026, 7, 29, 10, tzinfo=timezone.utc),
+        )
+
+    balances = ledger_balances(store)
+    assert balances["cash"] == Decimal("100000000")
+    assert balances["security_book_value"]["AAPL"] == Decimal("123.456789")
+    assert balances["shares"]["AAPL"] == Decimal("1.23456789")
+
+
+def test_low_decimal_precision_preserves_sell_basis_and_realized_pnl():
+    quantity = Decimal("1.23456789")
+    exact_value = Decimal("15.241578750190521")
+    with localcontext(Context(prec=4)):
+        transaction = _fill_transaction(
+            fill={
+                "ticker": "AAPL",
+                "side": "sell",
+                "qty": str(quantity),
+                "price": "12.3456789",
+                "at": "2026-07-29T12:00:00+00:00",
+                "fill_id": "ambient-context-sell",
+            },
+            balances={
+                "shares": {"AAPL": Decimal("10")},
+                "security_book_value": {"AAPL": Decimal("123.456789")},
+            },
+        )
+
+    assert transaction.postings[0].amount == exact_value
+    assert transaction.postings[1].amount == -exact_value
+    assert transaction.postings[1].quantity == -quantity
+    assert transaction.postings[2].amount == Decimal("0")
+
+
+def test_low_decimal_precision_preserves_confirmed_split_quantity(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    for suffix, quantity in (
+        ("large", Decimal("100000000")),
+        ("fraction", Decimal("0.01")),
+    ):
+        post_transaction(
+            store,
+            JournalTransaction(
+                transaction_id=f"split-holding-{suffix}",
+                occurred_at="2026-07-29T10:00:00+00:00",
+                source="test",
+                external_id=f"split-holding-{suffix}",
+                description="pre-split quantity fixture",
+                postings=(
+                    Posting(
+                        f"{SECURITY_ACCOUNT_PREFIX}AAPL",
+                        Decimal("0"),
+                        quantity=quantity,
+                    ),
+                ),
+            ),
+        )
+
+    with localcontext(Context(prec=4)):
+        assert record_split(
+            store,
+            external_id="ambient-context-split",
+            ticker="AAPL",
+            ratio="2",
+            occurred_at="2026-07-30T10:00:00+00:00",
+        ) is True
+
+    assert ledger_balances(store)["shares"]["AAPL"] == Decimal("200000000.02")
+
+
+def test_low_decimal_precision_cannot_accept_inconsistent_dividend_evidence(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    with localcontext(Context(prec=4)):
+        with pytest.raises(LedgerError, match="does not match"):
+            record_dividend(
+                store,
+                external_id="ambient-context-dividend",
+                ticker="AAPL",
+                gross_amount="100000000",
+                occurred_at="2026-07-29T12:00:00+00:00",
+                amount_per_share="100000000.0100001",
+                shares_entitled="1",
+            )
+
+    assert store.list_journal_postings() == []
+
+
+def test_low_decimal_precision_cannot_mask_a_reconciliation_mismatch(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    record_cash_transfer(
+        store,
+        external_id="ambient-context-cash",
+        amount="100000000.0100001",
+        occurred_at="2026-07-29T10:00:00+00:00",
+        description="exact cash fixture",
+    )
+
+    with localcontext(Context(prec=4)):
+        report = reconcile_snapshot(
+            store,
+            _snapshot(cash=100000000.0, shares=0.0),
+            now=datetime(2026, 7, 29, 12, tzinfo=timezone.utc),
+        )
+
+    assert report["matched"] is False
+    assert report["mismatches"] == [
+        {
+            "kind": "cash",
+            "ledger": "100000000.0100001",
+            "broker": "100000000",
+            "difference": "0.0100001",
+        }
+    ]
+
+
+def test_exact_arithmetic_bound_failure_is_a_ledger_error_before_write(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    digits = "9" * 4097
+    transaction = JournalTransaction(
+        transaction_id="oversized-coefficient",
+        occurred_at="2026-07-29T12:00:00+00:00",
+        source="test",
+        external_id="oversized-coefficient",
+        description="outside the exact arithmetic safety bound",
+        postings=(
+            Posting(ACCOUNT_CASH, Decimal(digits)),
+            Posting(ACCOUNT_CONTRIBUTED_CAPITAL, Decimal("-" + digits)),
+        ),
+    )
+
+    with pytest.raises(LedgerError, match="precision bound"):
+        post_transaction(store, transaction)
+    assert store.list_journal_postings() == []
+
+
+def test_exact_arithmetic_bound_applies_to_quantity_before_write(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    transaction = JournalTransaction(
+        transaction_id="oversized-quantity",
+        occurred_at="2026-07-29T12:00:00+00:00",
+        source="test",
+        external_id="oversized-quantity",
+        description="quantity outside the exact arithmetic safety bound",
+        postings=(
+            Posting(
+                f"{SECURITY_ACCOUNT_PREFIX}AAPL",
+                Decimal("0"),
+                quantity=Decimal("9" * 4097),
+            ),
+        ),
+    )
+
+    with pytest.raises(LedgerError, match="precision bound"):
+        post_transaction(store, transaction)
+    assert store.list_journal_postings() == []
+
+
+def test_bootstrap_consumes_and_hashes_authoritative_exact_snapshot_values(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    snapshot = _authoritative_exact_snapshot()
+    state = bootstrap_opening_snapshot(
+        store,
+        snapshot,
+        confirmation="bootstrap",
+        now=datetime(2026, 7, 29, 10, tzinfo=timezone.utc),
+    )
+
+    balances = ledger_balances(store)
+    assert balances["cash"] == Decimal("1000.0045")
+    assert balances["shares"]["AAPL"] == Decimal("1.000000001")
+    assert balances["security_book_value"]["AAPL"] == Decimal(
+        "100.123456889123456789"
+    )
+    transaction = store.get_journal_transaction_by_external_id(
+        f"opening_snapshot:{state['snapshot_hash']}"
+    )
+    assert transaction["metadata"]["journal_values_exact"] == {
+        "cash": "1000.0045",
+        "positions": [
+            {
+                "ticker": "AAPL",
+                "shares": "1.000000001",
+                "entry_price": "100.123456789",
+            }
+        ],
+    }
+
+
+def test_reconciliation_uses_exact_snapshot_cash_beyond_display_precision(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    bootstrap_opening_snapshot(
+        store,
+        _authoritative_exact_snapshot(),
+        confirmation="bootstrap",
+        now=datetime(2026, 7, 29, 10, tzinfo=timezone.utc),
+    )
+
+    report = reconcile_snapshot(
+        store,
+        _authoritative_exact_snapshot(cash_exact="1000.0146"),
+        now=datetime(2026, 7, 29, 12, tzinfo=timezone.utc),
+    )
+
+    assert report["matched"] is False
+    assert report["mismatches"] == [
+        {
+            "kind": "cash",
+            "ledger": "1000.0045",
+            "broker": "1000.0146",
+            "difference": "-0.0101",
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    ("exact_value", "display_value", "message"),
+    [
+        ("not-a-decimal", 1000.0, "finite decimal number"),
+        ("1000.0045", 999.99, "disagrees with exact evidence"),
+    ],
+)
+def test_bootstrap_refuses_invalid_exact_snapshot_evidence_before_mutation(
+    tmp_path, exact_value, display_value, message
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    snapshot = _authoritative_exact_snapshot()
+    snapshot.cash_exact = exact_value
+    snapshot.cash = display_value
+
+    with pytest.raises(LedgerError, match=message):
+        bootstrap_opening_snapshot(
+            store,
+            snapshot,
+            confirmation="bootstrap",
+            now=datetime(2026, 7, 29, 10, tzinfo=timezone.utc),
+        )
+
+    assert store.list_journal_postings() == []
+    assert store.get_system_state("ledger_bootstrap") is None
+
+
+def test_reconciliation_refuses_invalid_exact_evidence_without_recording(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    bootstrap_opening_snapshot(
+        store,
+        _authoritative_exact_snapshot(),
+        confirmation="bootstrap",
+        now=datetime(2026, 7, 29, 10, tzinfo=timezone.utc),
+    )
+    contradictory = _authoritative_exact_snapshot()
+    contradictory.positions[0].shares = 2.0
+
+    with pytest.raises(LedgerError, match="disagrees with exact evidence"):
+        reconcile_snapshot(
+            store,
+            contradictory,
+            now=datetime(2026, 7, 29, 12, tzinfo=timezone.utc),
+        )
+
+    assert store.get_latest_ledger_reconciliation() is None
 
 
 def test_bootstrap_sync_and_reconcile_are_idempotent(tmp_path):
@@ -146,7 +588,7 @@ def test_bootstrap_sync_and_reconcile_are_idempotent(tmp_path):
 
 def test_bootstrap_rolls_back_journal_when_state_write_fails(tmp_path):
     store = AssistantStore(tmp_path / "assistant.db")
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             """
             CREATE TRIGGER reject_ledger_bootstrap_state
@@ -297,7 +739,7 @@ def test_legacy_account_binding_refuses_a_mismatch_without_binding(tmp_path):
 
 def test_store_enables_foreign_keys_and_rejects_orphan_postings(tmp_path):
     store = AssistantStore(tmp_path / "assistant.db")
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         assert connection.execute("PRAGMA foreign_keys").fetchone()[0] == 1
         with pytest.raises(sqlite3.IntegrityError):
             connection.execute(
@@ -328,7 +770,7 @@ def test_store_rejects_orphan_broker_order_updates(tmp_path):
             },
         }
     )
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             """
             INSERT INTO broker_orders(
@@ -1732,7 +2174,7 @@ def test_acknowledgement_table_migrates_onto_a_pre_migration_database(tmp_path):
     store, _ = _bootstrapped_store(tmp_path)
     balances_before = ledger_balances(store)["cash"]
 
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute("DROP TABLE broker_activity_acknowledgements")
         remaining = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND "
@@ -1850,71 +2292,3 @@ def test_acknowledgement_timestamp_must_be_timezone_aware(tmp_path):
             ticker="AEP",
             now=datetime(2026, 8, 11, 12, 0),
         )
-
-
-def _fractional_exact_fill(boot_at):
-    exact_qty = "0.123456789012345678"
-    exact_price = "412.335000000000000001"
-    return {
-        "ticker": "AAPL",
-        "side": "buy",
-        "qty": float(exact_qty),
-        "price": float(exact_price),
-        "qty_decimal": exact_qty,
-        "price_decimal": exact_price,
-        "at": (boot_at + timedelta(hours=1)).isoformat(),
-        "fill_id": "f-exact",
-        "order_id": "o-exact",
-        "proposal_id": "p-exact",
-    }
-
-
-def test_exact_fill_sync_is_idempotent_and_preserves_provider_digits(tmp_path):
-    store = AssistantStore(tmp_path / "assistant.db")
-    boot_at = datetime(2026, 1, 5, 14, tzinfo=timezone.utc)
-    bootstrap_opening_snapshot(store, _snapshot(), confirmation="bootstrap", now=boot_at)
-    fill = _fractional_exact_fill(boot_at)
-    store.list_fills = lambda: [fill]
-
-    assert sync_app_fills(store)["inserted"] == 1
-    assert sync_app_fills(store)["duplicates"] == 1
-
-    transaction = store.get_journal_transaction_by_external_id("app_fill:f-exact")
-    assert transaction["metadata"]["qty"] == fill["qty_decimal"]
-    assert transaction["metadata"]["price"] == fill["price_decimal"]
-    assert fill["qty_decimal"] in transaction["description"]
-    assert fill["price_decimal"] in transaction["description"]
-    balances = ledger_balances(store)
-    exact_gross = Decimal(fill["qty_decimal"]) * Decimal(fill["price_decimal"])
-    assert balances["cash"] == Decimal("1000") - exact_gross
-
-
-def test_legacy_float_fill_remains_idempotent_when_exact_companions_appear(tmp_path):
-    store = AssistantStore(tmp_path / "assistant.db")
-    boot_at = datetime(2026, 1, 5, 14, tzinfo=timezone.utc)
-    bootstrap_opening_snapshot(store, _snapshot(), confirmation="bootstrap", now=boot_at)
-    exact_fill = _fractional_exact_fill(boot_at)
-    legacy_fill = {
-        key: value for key, value in exact_fill.items() if not key.endswith("_decimal")
-    }
-    store.list_fills = lambda: [legacy_fill]
-    assert sync_app_fills(store)["inserted"] == 1
-    stored = store.get_journal_transaction_by_external_id("app_fill:f-exact")
-
-    store.list_fills = lambda: [exact_fill]
-    assert sync_app_fills(store)["duplicates"] == 1
-    assert store.get_journal_transaction_by_external_id("app_fill:f-exact") == stored
-
-
-def test_exact_fill_companion_change_is_still_a_content_conflict(tmp_path):
-    store = AssistantStore(tmp_path / "assistant.db")
-    boot_at = datetime(2026, 1, 5, 14, tzinfo=timezone.utc)
-    bootstrap_opening_snapshot(store, _snapshot(), confirmation="bootstrap", now=boot_at)
-    fill = _fractional_exact_fill(boot_at)
-    store.list_fills = lambda: [fill]
-    assert sync_app_fills(store)["inserted"] == 1
-
-    changed = dict(fill, qty_decimal="0.123456789012345679")
-    store.list_fills = lambda: [changed]
-    with pytest.raises(LedgerError, match="different content"):
-        sync_app_fills(store)

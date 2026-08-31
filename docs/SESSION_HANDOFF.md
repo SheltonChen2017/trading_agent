@@ -11,6 +11,12 @@ their lane-owned artifacts.
 
 ## 0. Target-Price Revision fourth-lane planning addition
 
+- **Integration state, 2026-08-31.** All four strategy lanes are merged into
+  `main` (PRs #321, #322, #323, #325) and this lane branch is synchronized to
+  the integrated `main` by fast-forward. The earlier statements that the lane
+  is developed apart from `main` are superseded. The shared four-slot
+  multiplicity amendment is still unpropagated (`TPR-OOL-006`).
+
 - The owner directed a new sibling worktree for branch
   `codex/strategy-target-price-revisions`, resolved with
   `git worktree list` rather than a pinned directory, based on exact

@@ -336,6 +336,13 @@ paper deployment, or live deployment is authorized merely by this workflow.
 
 ## 8. Exact next step
 
+**Integration state, 2026-08-31.** All four strategy lanes are merged into
+`main` (PRs #321, #322, #323 and #325). This lane branch has been
+synchronized to the integrated `main` by fast-forward, so it now contains
+every sibling lane's work; the lane is no longer a branch developed apart
+from `main`. The four-slot multiplicity amendment nevertheless remains
+unpropagated: see `TPR-OOL-006`.
+
 **Current qualification, 2026-08-30:** Claude's exact three-commit correction
 range `fe056be6800ea11d6559f817019d1c2902f61620..db6a721d45eb47e1a133744387bf43a1aa1f310c`
 has been pushed, and Claude's independent review is complete. Codex has
@@ -463,7 +470,8 @@ documented here and deliberately not fixed.
 | ID | Severity | External area / paths | Evidence and lane impact | Disposition / future route |
 |---|---|---|---|---|
 | `TPR-OOL-001` | P2 | Repository-wide Git plumbing: no `.gitattributes` exists at any level, and `core.autocrlf=true` is set in the system Git configuration | Git finds no NUL byte in the target-price blueprint, so it classifies the PDF as text and rewrites its 557 LF bytes to CRLF on checkout. The working file is 78,082 bytes and hashes to `6ee7ea5e...4330`, while the committed blob is 77,525 bytes and hashes to the pinned `9f00dd56...2633`. `pdftotext` reports a damaged xref table on the working copy. The other four PDFs contain NUL bytes early and check out byte-identically. Lane impact is `TPR-CR1-001`. | A `*.pdf binary` attribute is repository-wide plumbing rather than trading-strategy work, and `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 2 requires a shared-file change to stop for one owner-coordinated common-baseline amendment. Documented, not fixed. Owner decision required. |
-| `TPR-OOL-006` | P2 | Sibling lane frozen preregistrations, principally `codex/strategy-analyst-revisions-v2` | That lane still freezes its selection-family alpha at `0.05 / 3 = 1/60` while the fixed family now has four permanent `1/80` slots. Under the pre-amendment sibling allocations, exact arithmetic is `3 * (1/60) + 1/80 = 1/16 = 0.0625`, above the family ceiling `1/20 = 0.05`; the displayed `0.0167` is only a rounded rendering of `1/60`. | The owner froze the four named slots permanently on 2026-08-30 (section 16): each lane's maximum is `1/80`; the named slot remains fixed while an unused or withdrawn allocation expires and is never redistributed or used to recompute the denominator. Sibling-lane corrections and their independent reviews/counter-reviews remain on their own long-lived branches. This target branch does not edit them, and no lane receives outcome authority from this directive. |
+| `TPR-OOL-006` | P2 | Sibling lane frozen preregistrations, principally `codex/strategy-analyst-revisions-v2` | That lane still freezes its selection-family alpha at `0.05 / 3 = 1/60` while the fixed family now has four permanent `1/80` slots. Under the pre-amendment sibling allocations, exact arithmetic is `3 * (1/60) + 1/80 = 1/16 = 0.0625`, above the family ceiling `1/20 = 0.05`; the displayed `0.0167` is only a rounded rendering of `1/60`. | **Escalated 2026-08-31: this is now a contradiction inside one integrated tree.** With all four lanes merged into `main`, that single tree simultaneously states the analyst lane's "three-lane correction remains 3" with its prospective look carrying `1/60`, no alpha freeze at all in Insider Buying or Short Interest, and this lane's fixed four-slot family at `1/80` naming `analyst-revisions-v2` as one of its slots. Measured directly from the integrated tree, not inferred. The owner froze the four named slots permanently on 2026-08-30 (section 16): each lane's maximum is `1/80`; the named slot remains fixed while an unused or withdrawn allocation expires and is never redistributed or used to recompute the denominator. Sibling-lane corrections and their independent reviews/counter-reviews remain on their own long-lived branches. This target branch does not edit them, and no lane receives outcome authority from this directive. |
+| `TPR-OOL-008` | P2 | `research/analyst_revisions_v2/specs/*.json`; `research/ml_specs/*.json` | On the integrated tree the analyst lane's checkout-bytes guard (`test_canonical_production_artifacts_survive_checkout_as_exact_bytes`) **failed on this Windows host**: `legacy_reproduction_registry.json` held CRLF bytes while its committed blob is LF, and `git status` reported clean because the stat cache hid it. Five artifacts were affected. The repository content is correct; only the checkout was stale, and restoring each file from its committed blob turned the test green with `git diff HEAD` empty. The root cause is an attribute strategy difference: the analyst lane protects those files with `*.json -text` only (`text: unset, eol: unspecified`), which lets a pre-existing CRLF working copy persist, whereas this lane now uses `text eol=lf` (`text: unset, eol: lf`) and does not drift. `research/ml_specs/*.json` carry no attribute at all (`text: unspecified`) and Git warns they will be re-converted to CRLF on the next checkout, so their restoration here is temporary and no test currently covers them. | Documented, not fixed. The remedy is to adopt `text eol=lf` in the sibling lanes and give `research/ml_specs` equivalent protection, which touches another lane's and the ML surface's owned files. Route as one owner-coordinated change. The local checkout repair performed during this review changed no committed content. |
 | `TPR-OOL-007` | P3 | `docs/THREE_STRATEGY_PROJECT_DIRECTION.md:274-278` | The shared coordination pointer still presents a local TPR-0A candidate whose next action is one push/review; it omits the completed initial review, the six Claude commits through `2ec0fad`, their Codex counter-review, and the current v2.2 candidate at `bb8dfb6`. | Documented, not fixed. The file is shared coordination surface outside this target-only lane; route a concise current-state correction through the appropriate owner-coordinated shared-document round. |
 | `TPR-OOL-002` | P3 | `docs/Strategy Description/README.md` | The lane table and the surrounding prose describe a three-strategy program and omit Target-Price Revisions entirely, so a reader who starts at the directory README does not discover this lane, its branch, or its record. | That README is named in the parallel-workflow frozen-file list, so it needs the same owner-coordinated common-baseline amendment rather than a fourth competing edit. Documented, not fixed. |
 | `TPR-OOL-001-R1` | P2 resolution | Owner-coordinated repository Git plumbing | The owner approved the common fix. Root `.gitattributes` now declares `*.pdf binary`; Git resolves the blueprint as binary with text/diff/merge unset. The PDF was rebuilt from the intact Git blob plus the two-page owner addendum and reopened strictly as 28 pages at raw SHA-256 `55ce6703...ba14` at that time; the current artifact is the 29-page v2.2 blueprint at raw SHA-256 `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`, which supersedes that historical resolution state without reopening the finding. | Resolved under the explicit one-time owner coordination; this does not authorize later shared-file edits by inference. Raw-byte and resolved-attribute guards are target-owned. |
@@ -498,6 +506,7 @@ known.
 | 2026-08-30 | Claude review | `c8c74704bb9bbda5a756d90afa33666371125a89` reviewed; corrections on this same lane branch | Independent review of Codex's counter-review correction range | Reviewed `0af1ca8` and `c8c7470` individually and the cumulative `c8c7470` tree. Reproduced rather than accepted Codex's two historical claims. Found and corrected a P1 that made the reviewed-algorithm anchor unreachable on the supported Windows checkout, added a lane-scoped `.gitattributes` and a regression guard, and refreshed the working tree to exact blob bytes. No product, provider, source, or outcome code changed. | At the reviewed tip the lane suite was **186 passed, 3 failed, 3 skipped**; after the correction **120 passed, 3 skipped** with the three anchor tests green. Five mutations on Codex's hardened current-state guard and two on the new byte guard each turned red with byte-identical restores returning green. Complete suite on the exact final tree **5,844 passed, 5 skipped, 0 failed, 25 warnings in 2,186.28s**, the 5,843 baseline plus exactly the one added guard; `compileall` exit 0; `git diff --check` clean. Provider/outcome accesses **0**; authorized/spent looks **0**. | Both Codex commits accepted. `TPR-CR4-001` (P1) closed by correction; `TPR-CR4-002` (P2) **open, owner decision required**; `TPR-CR4-003` and `TPR-CR4-004` (P3) closed by qualification. `TPR-OOL-008` documented, not fixed. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews this range. `TPR-CR4-002` needs the owner to say which worktree path is real before any resume pointer is trusted; TPR-1 and TPR-0B remain blocked. |
 | 2026-08-30 | Claude correction under owner direction | `50da9d07a46bcd0770fc3c9219b3d0a187494383` -> this round's head | Owner-directed worktree resolution; closes `TPR-CR4-002` | Replaced the hardcoded lane worktree in the Action Plan, Session Handoff, and record preamble with a `git worktree list` resolution instruction, and rewrote the guard to parse `git worktree list --porcelain` for this branch instead of comparing against a literal. The guard now also forbids any lane directory name in those three current-state surfaces. No product, provider, source, or outcome code changed. | Lane plus shared document suites **190 passed, 3 skipped**; complete suite on the exact final code tree **5,844 passed, 5 skipped, 0 failed, 25 warnings in 2,278.61s**, unchanged in count because the rewritten guard replaces a test rather than adding one; `compileall` exit 0; `git diff --check` clean. Four mutations (repinning a directory in each of the three surfaces, and removing the resolution instruction) each turned the guard red with byte-identical restores returning it green, and the porcelain parser was exercised directly and resolved this checkout. Provider/outcome accesses **0**; authorized/spent looks **0**. | `TPR-CR4-002` closed by owner direction. No P0, P1, or P2 remains open. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews `ea9d890`..this head. TPR-1 and TPR-0B remain blocked. |
 | 2026-08-31 | Codex counter-review + correction | `f21d70851d5e1790be0c308e13e8837a7cd1d008` -> `943edf77ca61cae475e4986b985baab3097adfbc` plus final record candidate | Counter-review only; no next milestone authorized | Counter-reviewed `ea9d890`, `ce74e72`, `50da9d0`, and `f21d708` individually. Corrected ordinary-fast-forward LF migration, exact-byte and worktree-guard sensitivity/scope, current-role routing, and current range/report defects. Candidate/PDF and all authority JSON artifacts are unchanged. | Exact committed correction tree: target plus active-document suite **190 passed, 3 skipped in 13.88s**; network-restricted complete suite **5,844 passed, 5 skipped, 0 failed, 26 warnings in 1,030.57s**; full `compileall -q` exit 0. Exact-byte reverse mutation failed as required and its byte-identical restore passed; active-lane/no-registration and missing-current-instruction probes refused, while sibling text outside target blocks passed. Python 3.12.13 / pytest 9.1.1; system `core.autocrlf=true`. Provider/outcome accesses **0**; authorized/spent looks **0**. | No P0/P1. `TPR-CCR5-001` through `003` and `005` through `007` closed; `TPR-CCR5-004` (P2) open before any positive reviewed-algorithm authority. | None; registries remain empty/zero-access and no look is authorized or spent. | Commit the final record-only evidence, run the exact document guards/diff checks, make this round's single push, and have Claude review only the range beginning after `f21d708` and ending at the new pushed head. TPR-1 and TPR-0B remain blocked. |
+| 2026-08-31 | Claude review + main sync | `db6a721d45eb47e1a133744387bf43a1aa1f310c` -> `3f33eea09aedbb8c386ebc355a6c875b76c80f83` reviewed; synchronized to `main` `cf136e259cf628aabdc4220865fccdb5c7204306`; corrections on this same lane branch | Independent review of two Codex counter-reviews and the CR4 round; no new milestone in range | Reviewed all eight pushed commits individually. Accepted all four counter-review findings against the prior Claude round, two of which repeat classes that round had already been corrected on. Fast-forwarded the lane onto the integrated `main` now that all four lanes are merged (PRs #321/#322/#323/#325); the merge-base equalled the lane head so no merge commit or conflict resolution was involved. Corrected the propagation routing whose branch premise the merge invalidated. | Baseline complete run on the synchronized tree: **6,789 passed, 13 skipped, 1 failed, 25 warnings in 1,314.44s**. The single failure was the analyst lane's checkout-bytes guard, diagnosed as a stale working tree rather than a repository defect (`TPR-OOL-008`): five artifacts held CRLF against LF blobs while `git status` reported clean. Restoring each from its committed blob turned the guard green with `git diff HEAD` empty, changing no committed content. Final complete run recorded separately. Adversarial probe of the reviewed-authority path: registry empty, both authority entry points refuse. Three mutations on the new guard each turned it red with text-identical restore. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | All eight commits accepted or accepted after correction. No P0/P1. `TPR-CR5-001` closed. `TPR-CCR5-004` remains open as Codex recorded it, independently reproduced here and confirmed inert. `TPR-OOL-006` escalated to a single-tree contradiction; `TPR-OOL-008` opened. Details in section 22. | None; all source, outcome, look, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. No milestone is authorized: TPR-1 is blocked on source rights, TPR-0B on reviewed TPR-1/TPR-2 manifests, and `TPR-CCR5-004` gates any positive reviewed-algorithm authority. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -931,6 +940,14 @@ Complete-suite validation on the committed tree `b2dbe89`: **5,832 passed, 5 ski
 0 failed, 25 warnings in 973.79s**.
 
 ### 15.4 Propagation is not performed by this record
+
+> **Superseded in part on 2026-08-31; see section 22.** The branch premise
+> below is no longer true: all four strategy lanes were merged into `main`
+> (PRs #321, #322, #323, #325), and this lane is now synchronized to the
+> integrated `main`. The per-lane review and counter-review requirement, the
+> required actions, and the measured frozen states in the table all still
+> stand. The original text is retained unaltered as the record of what was
+> true when the directive was recorded.
 
 Recording the directive here does **not** deliver it to the other three lanes.
 They are separate long-lived branches, this branch is deliberately unmerged,
@@ -1573,3 +1590,101 @@ The full suite ran without external network permission and no provider,
 credential, licensed row, source sample, outcome, QuantConnect, broker,
 operator-database, scheduler, paper, live, deployment, or capital surface was
 accessed. Authorized or spent research looks: **0**. No authority changed.
+
+## 22. Claude independent review - 2026-08-31 (two counter-reviews, CR4 round, and main synchronization)
+
+**Disposition: all eight commits accepted or accepted after correction.** No P0
+or P1 exists. There is **no new implementation milestone in this range** —
+section 21.4 states none was implemented, and that is accurate. The range is
+two Codex counter-reviews, one Claude round run on another machine, and its
+correction.
+
+### 22.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Reviewed range | `db6a721..3f33eea` (eight commits) |
+| Review head at start | `3f33eea09aedbb8c386ebc355a6c875b76c80f83` |
+| Ancestry | `db6a721` is still an ancestor; no history rewrite |
+| Synchronization | Fast-forwarded to integrated `origin/main` `cf136e259cf628aabdc4220865fccdb5c7204306`; merge-base equalled the lane head, so no merge commit and no conflicts |
+| Integration | All four strategy lanes merged into `main` (PRs #321, #322, #323, #325) |
+| Environment | Windows 11; `python` 3.14.6; pytest 9.1.1; system `core.autocrlf=true` |
+
+### 22.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `0af1ca8c` | **accepted** | Codex counter-review of the prior Claude round. Its three findings against that round are valid; see 22.3. |
+| `c8c74704` | **accepted** | Blocked-round handoff. Record-only, zero authority. No issue found. |
+| `ea9d890b` | **accepted after correction** | The Windows anchor diagnosis was right and the defect real, but `* -text` does not rewrite unchanged CRLF files during an ordinary fast-forward. `TPR-CCR5-001` correctly replaced it; the final state is verified working in 22.5. |
+| `ce74e72b` | **accepted after correction** | CR4 review record; qualified by `TPR-CCR5-005` on severity, counts and correction identity. |
+| `50da9d07` | **accepted after correction** | Current-state routing; range notation corrected by `TPR-CCR5-006`. |
+| `f21d7085` | **accepted after correction** | Resolving the worktree from `git worktree list` follows the owner's direction, but the guard scanned entire shared documents and rejected legitimate sibling names. `TPR-CCR5-002`/`003`/`007` close it. |
+| `943edf77` | **accepted** | Codex CR5 counter-review and corrections. Independently verified in 22.5, including the anchor fix and the open `TPR-CCR5-004`. |
+| `3f33eea0` | **accepted** | CR5 validation record. No issue found. |
+
+The cumulative tree carries `TPR-CR5-001`, which no single commit in this range
+introduced: it became false when the four lanes were merged.
+
+### 22.3 Codex findings against the prior Claude round: all accepted
+
+All three are confirmed, and two are repeats of classes that round had already
+been corrected on.
+
+| Finding | Assessment |
+|---|---|
+| `TPR-CCR4-002` | **Confirmed, including the part that is a verification error rather than a code defect.** The section-8 guard sliced only section 8, so it could not verify the section-9 routing row — yet the review report's `TPR-CR3-002` line claimed that row was "covered by the same guard". Claiming coverage a test does not provide is worse than the missing coverage itself, because it stops anyone looking again. |
+| `TPR-CCR4-005` | **Confirmed, and a repeat.** The guard was committed before the document correction, so `da6f7ea` is red as a standalone object. The identical ordering mistake was made in the first round at `0f05f3d` and accepted then. Knowing the rule and repeating it is worse than not knowing it; documents first, then the guard. |
+| `TPR-CCR4-001` | **Confirmed, and also a repeat in kind.** The final tree said "pending Claude review" in the header, section 8, Action Plan and handoff while section 17 said the review was complete. That is precisely the current-state-consistency defect that round had just reported in someone else's work. |
+| `TPR-CCR4-003` | **Confirmed.** "Python 3.14" without the patch version or executable is not reproducible metadata. This section records `3.14.6`. |
+
+### 22.4 P0-P3 issue ledger
+
+| ID | Priority | Status | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|
+| `TPR-CR5-001` | P2 | Closed | Section 15.4; record and handoff current-state blocks | Section 15.4 routes the shared multiplicity propagation on the premise that the lanes are "separate long-lived branches" and that "this branch is deliberately unmerged". All four lanes are now merged into `main`, so the premise is false and the routing understates what is possible: the four lane records now sit in one tree, where the amendment can be prepared as one coordinated change instead of four isolated branch rounds. The required per-lane review and counter-review are unaffected. | `git merge-base --is-ancestor` confirms `main` contains the lane; PRs #321, #322, #323 and #325 are all present in `origin/main`. | A routing instruction an owner reads to schedule cross-lane work must not rest on a branch topology that no longer exists. | The historical text is retained unaltered beneath an explicit supersession note; the record's section 8 and the handoff now carry the integration and synchronization state. | New guard `test_current_state_blocks_do_not_call_the_lane_unmerged`. Three mutations — the stale phrase in section 8, in the handoff, and the supersession marker stripped from 15.4 — each turn it red; restore returns it green with text identical. |
+
+### 22.5 Verified rather than accepted
+
+- **The anchor fix works.** All five nonempty `POLICY_CODE_REPO_PATHS` files
+  have working bytes identical to their committed blobs on this Windows host
+  with `core.autocrlf=true`. The `* text eol=lf` replacement plus the one-time
+  blob touch was the correct remedy, and Codex's reasoning that `-text` can
+  persist raw CRLF rather than protect the LF blob is empirically right — see
+  `TPR-OOL-008`, where the sibling lane's `-text`-only strategy failed on this
+  host in exactly that way.
+- **`TPR-CCR5-004` is real and I reproduced its mechanism.**
+  `POLICY_CODE_REPO_PATHS` is defined inside `preregistration.py`, and that
+  module is itself in the inventory it defines, so the anchor can prove only
+  *working tree equals HEAD* — never that the inventory was not reduced in the
+  same commit. Recording it as open, and refusing to invent a trust root
+  inside a blocked round, are both the right calls.
+- **It is currently inert.** Adversarial probe: the reviewed registry has zero
+  entries, `load_reviewed_algorithm_spec` refuses with "outcome access requires
+  an independently reviewed algorithm parent", and `authorize_outcome_access`
+  refuses the candidate. No positive authority exists or can be minted today.
+- **The synchronization is a true fast-forward.** The merge-base equalled the
+  lane head, so `main` already contained every lane commit; no merge commit and
+  no conflict resolution were involved, and nothing in the lane's history was
+  rewritten.
+- **The sibling multiplicity state is measured, not assumed.** See
+  `TPR-OOL-006`.
+
+### 22.6 Scope not exhaustively audited
+
+- The 168 commits this lane inherited from the other three lanes were **not**
+  reviewed. They arrived through their own lane reviews and owner merges; this
+  review covers the eight target-lane commits and the integrated tree's effect
+  on target-lane claims.
+- The estimator, power and statistical binding procedures were again read for
+  contract shape only, not re-derived.
+- No provider, endpoint, entitlement or licensed row was touched.
+
+### 22.7 Authority state after this review
+
+Unchanged and zero. No provider, credential, licensed row, outcome, evidence
+epoch, QuantConnect project, broker, operator database, scheduler, paper or
+live surface was accessed, and **0 research looks** were spent. The reviewed
+registry remains empty. No milestone was implemented and none is authorized;
+TPR-1 remains blocked on source rights and TPR-0B on reviewed TPR-1/TPR-2
+manifests.

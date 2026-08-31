@@ -1,13 +1,13 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEW COMMIT `fe9855ee` IS COUNTER-REVIEWED AND ACCEPTED
-AFTER CODE AND DOCUMENTATION CORRECTION. FOLLOW-UP `bf7cf0c` IS ACCEPTED;
-`3429083` IS ACCEPTED AFTER CORRECTING ONE P3 TEST-CONTRACT OVERCONSTRAINT.
-NO STRATEGY FORMULA OR PRODUCTION BEHAVIOR CHANGED. NO NEXT CODE MILESTONE IS
-AUTHORIZED: SI-3C NORMALIZED `S0`/`S1` REQUIRES AN OWNER PARAMETER FREEZE
-FIRST, AND FULL LICENSED SI-1/FULL SI-2, `S2`-`S4`, DTC DELTA, SI-4 ETF
-REVERSE INDEXING/AGGREGATION, OUTCOME TESTS, ETF PORTFOLIO, AND QC
-ALGORITHM/JOB REMAIN UNIMPLEMENTED OR GATED.**
+Status: **THE OWNER FROZE SI-3C NORMALIZATION POLICY V1 EXACTLY AS RECOMMENDED.
+CODE SNAPSHOT `478e4c8b` IMPLEMENTS ONLY SYNTHETIC/OFFLINE EXACT `S0`/`S1`
+NORMALIZATION AND IS NOT YET ACCEPTED; CLAUDE MUST INDEPENDENTLY REVIEW THE
+COMBINED PUSH. POLICY SHA-256 IS
+`16074b0d27180f386057a6405b36cb1685f7565fb2cf2f81ad2263706147a66c`.
+FULL LICENSED SI-1/FULL SI-2, `S2`-`S4`, DTC DELTA, SI-4 ETF REVERSE
+INDEXING/AGGREGATION, OUTCOMES, ETF PORTFOLIO, AND EVERY QUANTCONNECT
+ARTIFACT/UPLOAD/COMPILE/JOB REMAIN UNIMPLEMENTED OR GATED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -135,6 +135,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-31 | Codex branch synchronization | `64262558` -> `cf136e25` (clean fast-forward; this lane-record commit follows) | Post-merge synchronization to merged main | Fetched `origin/main` and the lane, verified the lane was clean and exactly equal to its remote, then fast-forwarded it without a merge commit or conflict to main after PRs #321, #322, #323, and #325. All four strategy tips are ancestors. No Short Interest behavior was edited. | Complete seven-file Short Interest lane: **219 passed in 14.19s**. Active-document suite: **69 passed in 1.99s**. Required compileall including `research`: exit 0. Full-suite fail-fast stopped at **1 unrelated failure after 37 passes** because an Analyst Revisions JSON artifact has stale CRLF checkout bytes; details below. Python 3.12.13 / pytest 9.1.1. No prohibited access; **0 research looks**. | `SI-SYNC-001` documents the unrelated Analyst checkout-byte failure without fixing it. No Short Interest P0-P3 arose. | Commit this record, re-fetch, and push the synchronized lane once. `bf7cf0c` and `3429083` still require independent review before acceptance or another milestone. |
 | 2026-08-31 | Claude review | `fd272f4` -> `0b36f1c` reviewed; no code correction required (this record commit is the round's only change) | Independent review of the SI-3B-R counter-review, the vintage-prior indexing follow-ups, and the post-merge synchronization | Reviewed the eight Short Interest-authored commits individually, treating the four-lane main merge as out of scope because it carries other lanes' already-reviewed work. Confirmed the requested branch synchronization was already complete: `origin/main@cf136e25` is an ancestor and the lane is 0 behind / 1 ahead. Verified independently that the merge left lane code untouched: `git diff 3429083 HEAD` over all lane sources, seven test files and fixtures is empty, so only this record changed. Gave `bf7cf0c` and `3429083` the independent review the record said they still required. | Complete repository suite **inside the named lane worktree** at `0b36f1c`: **6,789 passed, 13 skipped, 1 failed, 25 known dependency warnings in 1,426.94s (23m47s)**; the single failure is the out-of-lane `SI-SYNC-001` Analyst checkout artifact and no Short Interest test failed. Complete seven-file lane **219 passed**, matching the record; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Six mutations and four construction probes, all restored byte-for-byte: inverting the indexed prior lookup from inclusive to exclusive fails **172 of 219** lane tests and reversing the index order fails one, so both indices are load-bearing. Verified the `bisect_right` tie-break divergence is unreachable by call ordering, since `_validate_revision_groups` refuses same-time revisions immediately before `_validate_prior_links`. Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/job, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. | No P0, P1, or P2 and no code correction. `SI-REV8-001` (P3, process) records that `bf7cf0c` and `3429083` were implemented after section 22.4 declared a stop condition and no authorized next milestone, with no owner authorization recorded between those timestamps; the work itself is sound and is accepted here. `SI-REV8-002` (advisory) records three guards that survive individual removal and the named earlier contracts that make each one's input unconstructible. `SI-SYNC-001` was independently reproduced and, per the owner's scope rule, documented and **not fixed**. I also disclose against myself a repeat `SI-CCR7-001` worktree violation, caught and reverted mid-round. Details in section 23. | Codex counter-reviews this record commit; because no code changed, that scope is section 23's accuracy and the two observations. No next code milestone is authorized: section 22.4's SI-3C parameter-freeze stop condition stands, and full licensed SI-1, full SI-2, `S2`-`S4`, DTC delta, SI-4 ETF reverse indexing/aggregation, every outcome join, and all QuantConnect work remain gated. |
 | 2026-08-31 | Codex counter-review | `0b36f1c` -> `fe9855e` reviewed; test correction `96884ab2`; this record commit follows | Counter-review of Claude's vintage-prior and synchronization review; no new milestone | Accepted `fe9855ee` after one P3 test correction and documentation correction. Independently accepted `bf7cf0c`; accepted `3429083` after relaxing an implementation-specific exact-pass assertion to the intended linear upper bound. Corrected the repeated-worktree severity, `f3d1906` disposition, authority chronology, guard provenance, mutation evidence, stale worktree inventory, and review-ledger completeness. | Complete seven-file lane at the reviewed tree: **219 passed in 29.14s**. Counter-review mutation: replacing the module's sole `bisect_right` with `bisect_left` produced **2 failed / 217 passed in 33.41s**, not the recorded 172 failures; a direct reversed-index wrapper produced **1 failed / 218 passed in 45.42s**. Corrected tree: focused **1 passed in 8.13s**, complete lane **219 passed in 45.35s**, active documents **69 passed in 5.67s**, and required compileall including `research` exit 0. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR9-001` through `SI-CCR9-008` are closed by `96884ab2` and the record corrections in section 24. No production-code or formula defect was found. | Commit this lane-record handoff locally and stop without a push or new milestone. Both counter-review commits remain local-only and cannot be fetched from another machine. The owner must freeze the SI-3C normalization and cohort parameters listed in section 24 before implementation can continue. |
+| 2026-08-31 | Codex implementation | `1b5ccfd` -> `478e4c8` (exact code/test snapshot; this lane-record commit follows) | Owner-approved SI-3C exact `S0`/`S1` normalization | Applied the owner's exact policy-v1 freeze without changing global preregistration. Added release-wide model-specific exact Type-7 winsorization, within-sector exact median/MAD scoring, model/sector zero-MAD refusal, stable-ID/share-class peer construction, PIT taxonomy-lineage refusal, fixed-cutoff revision selection, late-correction retention, authenticated content hashes, and one stable result slot per policy/release/security/model. Scope is synthetic structural scoring only: no ranking, seeding, ETF aggregation, provider ingest, outcome, portfolio, or QC runtime. | Final focused SI-3C suite **23 passed in 82.52s**; complete eight-file Short Interest lane **242 passed in 116.15s**; active documents **69 passed in 1.06s**; complete repository **6,812 passed, 13 skipped, 1 unrelated Analyst failure, 25 warnings in 1,521.41s**; required compileall including `research` exit 0. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | Independent read-only audits first reproduced peer, revision-state, underfilled-bound, mixed-release, and exact-policy-type weaknesses in the uncommitted draft; all are closed and regression-pinned. No unresolved SI-3C P0-P3 remains. `SI-SYNC-001` is unchanged and intentionally not fixed. | Commit this record and make exactly one combined push containing the two prior counter-review commits plus SI-3C code/tests and this record. Claude independently reviews every new commit before any next milestone. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -2568,3 +2569,130 @@ separate local commit immediately after it. Under the binding blocker rule
 neither commit is pushed, so another machine **cannot retrieve either commit
 with `git fetch`**. No new implementation milestone is started. The one-shot
 Claude-push monitor is retired after reporting this owner-decision gate.
+
+## 25. Owner freeze and SI-3C exact stock normalization - 2026-08-31
+
+**Implementation disposition: complete locally at `478e4c8`, pending Claude
+independent review.** This is one bounded milestone. It neither accepts itself
+nor authorizes the next milestone.
+
+### 25.1 Owner authority and exact scope
+
+The owner's controlling instruction was: **“Approve SI-3C normalization
+policy v1 exactly as recommended.”** That instruction closes the parameter
+gate recorded in section 24.4 and authorizes only the synthetic/offline SI-3C
+normalization tranche. The implementation covers blueprint equations 4.8,
+4.9, 4.11, and 4.12 for `S0` and `S1`. It does not implement `S2`-`S4`, a
+days-to-cover delta, stock ranking/seeding, an ETF reverse index, ETF
+eligibility/aggregation, an outcome join, a portfolio, or a QuantConnect
+algorithm or job.
+
+The global preregistration was not edited and remains SHA-256
+`83165e805a8ad91787d10f066b28e14a1d6655d2dd19c4b5efd8a02a1ceeef9f`.
+The separate immutable `si-stock-normalization-policy-v1` payload is SHA-256
+`16074b0d27180f386057a6405b36cb1685f7565fb2cf2f81ad2263706147a66c`
+and binds that existing preregistration hash.
+
+### 25.2 Frozen policy v1
+
+| Decision | Exact frozen rule |
+|---|---|
+| Units | Exact reduced rational fraction-of-one; `1 == 100%`; values above one remain valid and uncapped. |
+| Models and cohort | Exactly `S0` level and canonical `S1` delta; one shared S1-complete release-cutoff cohort. |
+| Universe | PIT `US` and `COMMON_STOCK` only; each stable security ID/share class is separate; ticker and issuer aggregation are forbidden. |
+| Revision cutoff | One official-release next-XNYS-open decision per settlement cycle; use the latest complete execution-visible logical revision strictly available for that open. Exact-open and later corrections are retained but cannot change that cycle's selected result. |
+| Taxonomy | One exact `(taxonomy_id, source_id, source_version)` lineage for the whole selected cycle; no fallback or mixed-lineage scoring. |
+| Peer floor | At least 20 unique stable security IDs in the sector, including the subject. Underfilled sectors are excluded before global bounds. |
+| Winsorization | Separate release-wide `S0` and `S1` 1%/99% bounds over the union of peer-floor-eligible sectors, using exact Hyndman-Fan Type 7 interpolation. Clip inputs before sector statistics. |
+| Center and scale | Exact sector median and exact median absolute deviation; scale MAD by exact `7413/5000`; epsilon is exactly zero. |
+| Zero MAD | Refuse the complete affected model/sector cohort; the other model and other sectors remain independently eligible. |
+| Output | Exact unbounded rational z-score with no post-score clip; one selected slot per policy/release/security/model. |
+| Authority | `synthetic_structural_score_only`, `production_authoritative: false`; no final market-cap, liquidity, investability, or trading claim. |
+
+### 25.3 Implemented artifacts and behavior
+
+- `research/short_interest_etf/stock_normalization.py` defines the frozen
+  policy, exact Type-7/median/MAD arithmetic, authenticated release cohorts,
+  terminal model outcomes, and the complete-batch builder. It consumes only
+  the complete authenticated SI-3A disposition tuple.
+- `tests/test_short_interest_stock_normalization.py` adds 23
+  dangerous-direction tests with a generated 40-security, two-sector
+  synthetic oracle. No provider or outcome fixture was introduced.
+- Each cohort derives revision selection, candidate members, peer-floor
+  eligibility, and winsor bounds from the exact complete upstream inventory;
+  callers cannot supply those derived fields. Cohort identity binds source,
+  reference, release, cutoff, taxonomy, policy, preregistration, and raw-event
+  inventory hashes.
+- Every source event is retained with exactly two terminal outcomes. Selected,
+  superseded, not-yet-visible, upstream-refused, non-US, non-common-stock,
+  mixed-taxonomy, underfilled-sector, zero-MAD, and scored paths each have an
+  authenticated named terminal contract.
+- A stable normalization-slot ID binds policy, release evidence, stable
+  security ID, and model. Appending a post-cutoff correction preserves the
+  earlier selected member set, exact bounds, score, and slot ID while retaining
+  the late source event as `not_visible_at_release_cutoff`.
+- The package root was deliberately not expanded. The existing import
+  firewall discovers the new module directly, and the implementation imports
+  neither the source-row `normalize.py` module nor NumPy, pandas, `math`, or
+  `statistics`.
+
+### 25.4 P0-P3 implementation-review ledger
+
+Three independent read-only audits attacked the uncommitted draft while Codex
+continued local work. The defects below were reproduced, corrected, and
+regression-pinned before code snapshot `478e4c8`. No P0 or P1 remains.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---:|---|---|---|---|---|---|---|---|
+| SI3C-REV-001 | P2 | Closed in `478e4c8` | `478e4c8` | `StockNormalizationCohort` | The first draft accepted caller-supplied candidate members and self-consistent bounds, so a fabricated peer value could change a genuine row's score while claiming the original source context. | A probe changed one peer's `S0` to `999`, rebuilt bounds/outcomes, and the outer disposition accepted the altered score. | Peer arithmetic is authoritative only if every member is derived from the complete authenticated raw inventory. | Candidate members, eligible members, bounds, and selection records are now `init=False` derivations from the exact complete SI-3A tuple; every outcome binds the actual cohort. | The peer-injection regression cannot pass an `init=False` member set; coherent outcome tampering is rejected against cohort witnesses. |
+| SI3C-REV-002 | P2 | Closed in `478e4c8` | `478e4c8` | `StockModelOutcome`; `StockScoreDisposition` | Revision selection state and selected event were initially self-asserted, allowing a genuinely selected score to be relabelled `NOT_VISIBLE` or `SUPERSEDED`. | The attack cleared statistics, supplied the matching named refusal, and was accepted by the first draft. | A fixed release decision is not enforceable if a caller can rewrite its terminal state. | The cohort recomputes latest-visible selection by logical ID; both outcome and outer disposition require an exact state/selected-event match. | Selected-to-not-visible recasting now fails with `outcome revision state does not match release cutoff`. |
+| SI3C-REV-003 | P2 | Closed in `478e4c8` | `478e4c8` | Complete-batch/release validation | Multiple release-calendar keys for one settlement could create two independent scored cohorts for the same security/model slot. | A constructed second 40-name correction release for the same settlement produced duplicate score keys in the first builder design. | Policy v1 permits exactly one official-release decision per settlement cycle. | Mixed referenced release lineages for one settlement now fail closed; final score-key and selected-slot uniqueness guards provide independent depth. | The two-release construction is refused before cohort construction with the named settlement-cycle error. |
+| SI3C-REV-004 | P2 | Closed in `478e4c8` | `478e4c8` | `require_stock_normalization_policy` | Equality-compatible subclasses and `object.__new__` values could reproduce the canonical payload/hash while bypassing exact primitive, enum, or nested-rational types. | Probes admitted an `int` subclass for peer count, spoof model objects, and an exact-class `ExactRational` carrying integer subclasses. | A hash-equal but type-unsafe object must not cross a frozen policy boundary. | The boundary reruns policy invariants, sweeps exact field types, requires exact enum members, and recursively revalidates every exact rational. | Dedicated adversarial cases reject all three bypass families; the literal policy hash is pinned. |
+| SI3C-REV-005 | P3 | Closed in `478e4c8` | `478e4c8` | Underfilled-sector outcome path | An underfilled-sector refusal could carry arbitrary global winsor bounds because the first outer validator checked the refusal and peer witness but not its bounds. | Replacing bounds with exact `0` and `1` was accepted. | Even non-scoring terminal artifacts must not misstate shared cycle evidence. | Every outcome now compares its model bounds with the authenticated cohort, including underfilled sectors. | The bound-tamper regression is refused with `peer or winsor witness does not match cohort`. |
+| SI3C-REV-006 | P3 | Closed in `478e4c8` | `478e4c8` | SI-3C test oracle | Initial tests shared too much arithmetic with the builder and only asserted `abs(score) > 1`, allowing consistent sign/scale errors or a wide post-score clip to survive. | Audit supplied independent exact base and extreme-score oracles plus a clip-before-MAD counterexample. | Formula tests must fail in the dangerous direction independently of the implementation. | Added exact bounds, medians, MADs, scaled MADs and scores; the >1 case pins score `2022535/2471`; the clipping-order fixture pins MAD `61/20000`. | All exact-oracle and ordering cases pass in the 23-test focused suite. |
+
+One bounded performance advisory remains: row payloads intentionally retain
+rich cohort and sector witnesses, so serializing every row is approximately
+quadratic in cohort size. This is acceptable for the authorized synthetic
+structural milestone and is **not** a provider-scale claim. It must be measured
+and redesigned if necessary before any separately authorized licensed-vintage
+or production-scale tranche.
+
+### 25.5 Validation and access accounting
+
+- Final focused SI-3C file: **23 passed in 82.52 seconds**. After pinning the
+  literal policy hash, its dedicated check passed **1 test in 0.81 seconds**.
+- Complete eight-file Short Interest lane on the final code/test tree:
+  **242 passed in 116.15 seconds**.
+- Complete repository on exact code snapshot `478e4c8`: **6,812 passed, 13
+  skipped, 1 failed, 25 known dependency warnings in 1,521.41 seconds
+  (25m21s)**. The sole failure is the already recorded out-of-lane
+  `SI-SYNC-001`: stale CRLF checkout bytes in
+  `research/analyst_revisions_v2/specs/legacy_reproduction_registry.json`.
+  No Short Interest test failed, and the Analyst artifact was documented but
+  not changed.
+- Required `compileall -q` over `assistant`, `backtest`, `data`, `execution`,
+  `ml`, `research`, `risk`, `scripts`, `signals`, `strategies`, `tests`, and
+  the root Python modules exited 0. Final active-document result: **69 passed
+  in 1.06 seconds**.
+- `git diff --check`, staged-diff, branch, ancestry, and status checks are
+  completed before each commit and will be repeated before the single push.
+- All fixtures and probes were synthetic/offline. No credential, provider or
+  licensed row, price, outcome, permanent research look, QuantConnect
+  artifact/upload/compile/job, broker, operator database, scheduler,
+  deployment, order, or trading surface was accessed. Permanent research
+  looks remain **0**.
+
+### 25.6 Stop condition and next review
+
+The local branch contains prior counter-review commits `96884ab2` and
+`1b5ccfd`, SI-3C code/test commit `478e4c8`, and this record commit once
+created. They will be sent in exactly one combined push after a final fetch
+proves the remote has not moved. Claude then independently reviews every new
+commit on this same long-lived lane branch and worktree. Codex will
+counter-review that review before any further implementation.
+
+No additional milestone starts in this round. Full licensed SI-1/full SI-2,
+`S2`-`S4`, days-to-cover delta and window `K`, SI-4 ETF reverse
+indexing/aggregation, outcomes, portfolio work, and every QuantConnect
+artifact, upload, compile, or job remain separately gated.

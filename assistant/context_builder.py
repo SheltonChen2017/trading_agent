@@ -16,11 +16,19 @@ from __future__ import annotations
 
 import math
 from datetime import datetime, timezone
+from decimal import Decimal
 
 import pandas as pd
 
 from config import BASKETS, REGIME_VOLATILITY_LOOKBACK_DAYS
 from data.market_data import fetch_historical
+from assistant.money import (
+    deterministic_decimal_divide,
+    exact_decimal_multiply,
+    exact_decimal_sum,
+    deterministic_decimal_quantize,
+    to_decimal,
+)
 from assistant.market_analytics import (
     calibrate_volatility_threshold,
     classify_trend,
@@ -39,6 +47,7 @@ from assistant.schemas import (
 from assistant.policy import TradingPolicy, load_policy
 from assistant.portfolio_analytics import compute_portfolio_analytics
 from assistant.portfolio_snapshot import (
+    PortfolioSnapshotIntegrityError,
     build_portfolio_snapshot,
     build_portfolio_snapshot_from_alpaca,
 )
@@ -47,6 +56,46 @@ from assistant.research_registry import load_research_findings, registry_version
 # Backward-compatible import used by explanations.py and existing tests.
 # The source of truth is now assistant/research_findings.json.
 KNOWN_FINDINGS: list[SignalEvidence] = load_research_findings()
+
+
+def _unavailable_risk_exposure(reason: str) -> RiskExposure:
+    return RiskExposure(
+        basket_exposure_pct={},
+        leveraged_etf_exposure_pct=0.0,
+        cash_pct=0.0,
+        largest_single_position_pct=0.0,
+        concentration_warnings=[reason],
+        available=False,
+        unavailable_reason=reason,
+    )
+
+
+def _risk_display_percentage(value: Decimal, *, name: str) -> float:
+    """Project one exact percentage to a finite one-decimal display value."""
+    if not value.is_finite() or value < 0 or value > Decimal("100"):
+        raise ValueError(
+            f"{name} falls outside the long-only percentage range 0..100"
+        )
+    try:
+        display = float(
+            deterministic_decimal_quantize(
+                value,
+                Decimal("0.1"),
+                name=f"{name} display",
+            )
+        )
+    except (ArithmeticError, OverflowError, ValueError) as exc:
+        raise ValueError(f"{name} cannot be represented as a finite percentage") from exc
+    if not math.isfinite(display):
+        raise ValueError(f"{name} cannot be represented as a finite percentage")
+    return display
+
+
+def _deterministic_risk_percentage(
+    value: Decimal, total: Decimal, *, name: str
+) -> Decimal:
+    ratio = deterministic_decimal_divide(value, total, name=f"{name} ratio")
+    return exact_decimal_multiply(ratio, Decimal("100"), name=name)
 
 
 def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct: float = 40.0) -> RiskExposure:
@@ -62,15 +111,11 @@ def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct
     try:
         validate_long_only_portfolio_snapshot(snapshot)
     except PortfolioSnapshotIntegrityError as exc:
-        return RiskExposure(
-            basket_exposure_pct={},
-            leveraged_etf_exposure_pct=0.0,
-            cash_pct=0.0,
-            largest_single_position_pct=0.0,
-            concentration_warnings=[f"Portfolio integrity unavailable: {exc}"],
-        )
+        reason = f"Portfolio integrity unavailable: {exc}"
+        return _unavailable_risk_exposure(reason)
 
-    total = snapshot.total_equity
+    total_exact = snapshot.total_equity_exact_decimal
+    total = float(total_exact)
     # isfinite first, not just `<= 0`: NaN loses every ordered comparison, so a
     # corrupt total silently produced NaN percentages and ZERO concentration
     # warnings on a portfolio that was 100% in one name. build_portfolio_snapshot()
@@ -79,39 +124,111 @@ def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct
     # re-check anyway, and risk_copilot.py was hardened on 2026-07-30 while these
     # siblings were left inconsistent with it.
     if not math.isfinite(total) or total <= 0:
-        return RiskExposure(
-            basket_exposure_pct={}, leveraged_etf_exposure_pct=0.0, cash_pct=0.0,
-            largest_single_position_pct=0.0,
-            concentration_warnings=[
-                f"Portfolio total equity is not a usable number ({total!r}); "
-                "exposure percentages cannot be computed."
-                if not math.isfinite(total)
-                else "Portfolio has zero or negative total equity."
-            ],
+        reason = (
+            f"Portfolio total equity is not a usable number ({total!r}); "
+            "exposure percentages cannot be computed."
+            if not math.isfinite(total)
+            else "Portfolio has zero or negative total equity."
         )
+        return _unavailable_risk_exposure(reason)
 
-    basket_exposure_pct = {}
-    for basket_name, tickers in BASKETS.items():
-        basket_value = sum(p.market_value for p in snapshot.positions if p.ticker.upper() in tickers)
-        if basket_value > 0:
-            basket_exposure_pct[basket_name] = round(basket_value / total * 100, 1)
-
-    leveraged_value = sum(p.market_value for p in snapshot.positions if p.is_leveraged_etf)
-    leveraged_etf_exposure_pct = round(leveraged_value / total * 100, 1)
-    cash_pct = round(snapshot.cash / total * 100, 1)
-    largest_single_position_pct = (
-        round(max((p.market_value for p in snapshot.positions), default=0.0) / total * 100, 1)
+    threshold = to_decimal(
+        concentration_threshold_pct,
+        name="concentration_threshold_pct",
     )
+    if threshold < 0 or threshold > Decimal("100"):
+        raise ValueError(
+            "concentration_threshold_pct must be between 0 and 100"
+        )
+    basket_exposure_pct = {}
+    exact_basket_scaled_values: dict[str, Decimal] = {}
+    try:
+        for basket_name, tickers in BASKETS.items():
+            basket_value = exact_decimal_sum(
+                [
+                    p.exact_field("market_value")
+                    for p in snapshot.positions
+                    if p.ticker.upper() in tickers
+                ],
+                name=f"{basket_name} basket value",
+            )
+            if basket_value > 0:
+                exact_pct = _deterministic_risk_percentage(
+                    basket_value,
+                    total_exact,
+                    name=f"{basket_name} exposure",
+                )
+                exact_basket_scaled_values[basket_name] = exact_decimal_multiply(
+                    basket_value,
+                    Decimal("100"),
+                    name=f"{basket_name} scaled basket value",
+                )
+                basket_exposure_pct[basket_name] = _risk_display_percentage(
+                    exact_pct,
+                    name=f"{basket_name} exposure",
+                )
+
+        leveraged_value = exact_decimal_sum(
+            [
+                p.exact_field("market_value")
+                for p in snapshot.positions
+                if p.is_leveraged_etf
+            ],
+            name="leveraged ETF value",
+        )
+        leveraged_exact_pct = _deterministic_risk_percentage(
+            leveraged_value,
+            total_exact,
+            name="leveraged ETF exposure",
+        )
+        leveraged_etf_exposure_pct = _risk_display_percentage(
+            leveraged_exact_pct,
+            name="leveraged ETF exposure",
+        )
+        cash_pct = _risk_display_percentage(
+            _deterministic_risk_percentage(
+                snapshot.cash_exact_decimal,
+                total_exact,
+                name="cash exposure",
+            ),
+            name="cash exposure",
+        )
+        largest_value = max(
+            (p.exact_field("market_value") for p in snapshot.positions),
+            default=Decimal("0"),
+        )
+        largest_single_position_pct = _risk_display_percentage(
+            _deterministic_risk_percentage(
+                largest_value,
+                total_exact,
+                name="largest single-position exposure",
+            ),
+            name="largest single-position exposure",
+        )
+        threshold_scaled_value = exact_decimal_multiply(
+            threshold,
+            total_exact,
+            name="concentration threshold scaled value",
+        )
+        leveraged_threshold_value = exact_decimal_multiply(
+            Decimal("0.20"),
+            total_exact,
+            name="leveraged ETF threshold value",
+        )
+    except (ArithmeticError, OverflowError, ValueError) as exc:
+        return _unavailable_risk_exposure(
+            f"Portfolio exposure unavailable: {exc}"
+        )
 
     warnings = []
     for basket_name, pct in basket_exposure_pct.items():
-        if pct > concentration_threshold_pct:
+        if exact_basket_scaled_values[basket_name] > threshold_scaled_value:
             tickers_held = [p.ticker for p in snapshot.positions if p.ticker.upper() in BASKETS[basket_name]]
             warnings.append(
                 f"{basket_name} exposure is {pct}% of total equity (via {', '.join(tickers_held)}) — "
                 f"above the {concentration_threshold_pct}% concentration threshold."
             )
-    if leveraged_etf_exposure_pct > 20.0:
+    if leveraged_value > leveraged_threshold_value:
         warnings.append(f"Leveraged ETF exposure is {leveraged_etf_exposure_pct}% of total equity.")
 
     return RiskExposure(
@@ -313,7 +430,11 @@ def build_decision_packet(
                 "Alpaca requested but not configured (APCA_API_KEY_ID / APCA_API_SECRET_KEY not set) — "
                 "falling back to the manually-supplied portfolio."
             )
-            snapshot = build_portfolio_snapshot(positions or [], cash or 0.0)
+            snapshot = build_portfolio_snapshot(
+                positions or [],
+                cash or 0.0,
+                open_orders_available=False,
+            )
     else:
         snapshot = build_portfolio_snapshot(positions or [], cash or 0.0)
 
@@ -323,9 +444,45 @@ def build_decision_packet(
     signals = get_relevant_signal_evidence(tickers)
     events = get_upcoming_events(tickers, fetch_live=include_live_events)
     active_policy = policy or load_policy()
-    analytics = compute_portfolio_analytics(snapshot)
+    try:
+        analytics = compute_portfolio_analytics(snapshot)
+    except PortfolioSnapshotIntegrityError as exc:
+        integrity_detail = str(exc)
+        analytics_reason = (
+            integrity_detail
+            if integrity_detail.startswith("Portfolio analytics unavailable:")
+            else f"Portfolio analytics unavailable: {integrity_detail}"
+        )
+        analytics = {
+            "available": False,
+            "unavailable_reason": analytics_reason,
+            "position_count": None,
+            "invested_value": None,
+            "invested_pct": None,
+            "cash_value": None,
+            "unrealized_pnl": None,
+            "unrealized_pnl_pct": None,
+            "position_weights_pct": {},
+            "open_order_count": (
+                len(snapshot.open_orders)
+                if snapshot.open_orders_available is True
+                else None
+            ),
+        }
 
     warnings = list(risk.concentration_warnings) + extra_warnings
+    if analytics.get("available") is not True:
+        analytics_warning = str(
+            analytics.get("unavailable_reason")
+            or "Portfolio analytics unavailable."
+        )
+        if analytics_warning not in warnings:
+            warnings.append(analytics_warning)
+    if snapshot.open_orders_available is not True:
+        warnings.append(
+            "BROKER DATA UNAVAILABLE: the active-order book and open-order "
+            "count could not be verified; no zero-order claim is available."
+        )
     if regime.trend is None or regime.volatility_regime is None:
         warnings.append(
             f"Market regime for {benchmark_ticker} could not be fully "

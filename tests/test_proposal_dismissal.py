@@ -157,7 +157,7 @@ def test_child_rows_refuse_dismissal(store):
     _seed(store, "p-event", status="proposed")
     _seed(store, "p-reservation", status="proposed")
     now = _BASE_TIME.isoformat()
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             "INSERT INTO broker_orders(order_id, proposal_id, submitted_at, "
             "status, payload_json) VALUES ('o1', 'p-order', ?, 'accepted', '{}')",
@@ -231,7 +231,7 @@ def test_unreadable_allocation_batch_payload_fails_closed(store):
     proven, so every candidate refuses rather than guessing."""
     _seed(store, "p-any", status="proposed")
     now = _BASE_TIME.isoformat()
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             "INSERT INTO allocation_batches(batch_id, created_at, status, "
             "payload_json, updated_at) VALUES ('bad-batch', ?, 'created', "
@@ -252,7 +252,7 @@ def test_structurally_invalid_allocation_batch_payload_fails_closed(store):
     _seed(store, "p-any", status="proposed")
     now = _BASE_TIME.isoformat()
     malformed = json.dumps({"proposal_ids": "p-any", "legs": {}})
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         connection.execute(
             "INSERT INTO allocation_batches(batch_id, created_at, status, "
             "payload_json, updated_at) VALUES ('bad-shape', ?, 'created', ?, ?)",
@@ -339,7 +339,7 @@ def test_preview_hash_covers_complete_proposal_state(store):
     """
     _seed(store, "p-identity", status="proposed")
     preview = store.proposal_dismissal_eligibility(["p-identity"])
-    with store._connect() as connection:
+    with store._connect_writable() as connection:
         row = connection.execute(
             "SELECT payload_json FROM trade_proposals WHERE proposal_id = ?",
             ("p-identity",),

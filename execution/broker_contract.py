@@ -21,7 +21,11 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Literal
 
-from data.financial_primitives import to_decimal
+from data.financial_primitives import (
+    decimal_effective_scale,
+    decimal_text,
+    to_decimal,
+)
 
 
 AccountMode = Literal["paper", "live"]
@@ -388,15 +392,35 @@ def _aware_timestamp(
             text = f"{text[:-1]}+00:00"
         try:
             parsed = datetime.fromisoformat(text)
-        except ValueError as exc:
+        except (OverflowError, ValueError) as exc:
             raise BrokerOrderIntegrityError(
                 code, f"{field} is not ISO-8601: {value!r}", field=field
             ) from exc
     else:
         _fail(code, f"{field} must be an ISO-8601 timestamp", field=field)
-    if parsed.tzinfo is None or parsed.utcoffset() is None:
+    if parsed.tzinfo is None:
         _fail(code, f"{field} must include a timezone offset", field=field)
-    return parsed.astimezone(timezone.utc)
+    try:
+        offset = parsed.utcoffset()
+    except (OSError, OverflowError, TypeError, ValueError) as exc:
+        raise BrokerOrderIntegrityError(
+            code,
+            f"{field} is not a representable timezone-aware ISO-8601 "
+            f"timestamp: {value!r}",
+            field=field,
+        ) from exc
+    if offset is None:
+        _fail(code, f"{field} must include a timezone offset", field=field)
+    try:
+        normalized = parsed.astimezone(timezone.utc)
+    except (OSError, OverflowError, TypeError, ValueError) as exc:
+        raise BrokerOrderIntegrityError(
+            code,
+            f"{field} is not a representable timezone-aware ISO-8601 "
+            f"timestamp: {value!r}",
+            field=field,
+        ) from exc
+    return normalized
 
 
 def _expected_decimal(value: object, *, field: str) -> Decimal:
@@ -748,9 +772,7 @@ def validate_broker_order(
             field="shares_decimal",
         )
     if quantity is not None:
-        normalized_quantity = quantity.normalize()
-        decimal_places = max(0, -normalized_quantity.as_tuple().exponent)
-        if decimal_places > 9:
+        if decimal_effective_scale(quantity, name="broker share quantity") > 9:
             _fail(
                 "invalid_quantity",
                 "share quantity has more than nine decimal places",
@@ -985,10 +1007,7 @@ def validate_active_order_set(
 def _decimal_text(value: Decimal | None) -> str | None:
     if value is None:
         return None
-    normalized = value.normalize()
-    if normalized == 0:
-        return "0"
-    return format(normalized, "f")
+    return decimal_text(value)
 
 
 def _timestamp_text(value: datetime | None) -> str | None:

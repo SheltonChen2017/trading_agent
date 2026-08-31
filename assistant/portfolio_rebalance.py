@@ -25,9 +25,18 @@ must never let "not in a sleeve" read as "should not be held".
 from __future__ import annotations
 
 import dataclasses
+import math
 from decimal import Decimal
 
-from assistant.money import decimal_or_none, decimal_text
+from assistant.money import (
+    decimal_or_none,
+    decimal_text,
+    deterministic_decimal_divide,
+    exact_decimal_add,
+    exact_decimal_multiply,
+    exact_decimal_subtract,
+    exact_decimal_sum,
+)
 from assistant.rebalance_profile import (
     SLEEVE_CASH,
     SLEEVE_ORDER,
@@ -47,6 +56,8 @@ STATUS_UNASSIGNED = "unassigned_holdings"
 STATUS_PENDING_UNKNOWN = "pending_value_unknown"
 STATUS_DATA_UNAVAILABLE = "data_unavailable"
 STATUS_POLICY_CONFLICT = "policy_conflict"
+_ONE_HUNDRED = Decimal("100")
+_ONE_PERCENT = Decimal("0.01")
 
 ROW_STATUSES = (
     STATUS_INSIDE,
@@ -142,6 +153,35 @@ def _position_value(position: object) -> Decimal | None:
     return decimal_or_none(getattr(position, "market_value", None))
 
 
+def _percentage(value: Decimal, equity: Decimal, *, name: str) -> Decimal:
+    return exact_decimal_multiply(
+        deterministic_decimal_divide(value, equity, name=f"{name} ratio"),
+        _ONE_HUNDRED,
+        name=name,
+    )
+
+
+def _percentage_float(value: Decimal, equity: Decimal, *, name: str) -> float:
+    result = float(_percentage(value, equity, name=name))
+    if not math.isfinite(result):
+        raise ValueError(f"{name} cannot be represented for display")
+    return result
+
+
+def _value_at_percentage(
+    equity: Decimal, percentage: Decimal, *, name: str
+) -> Decimal:
+    return exact_decimal_multiply(
+        exact_decimal_multiply(
+            equity,
+            percentage,
+            name=f"{name} scaled value",
+        ),
+        _ONE_PERCENT,
+        name=name,
+    )
+
+
 def _aggregate_positions(
     snapshot: PortfolioSnapshot,
 ) -> tuple[dict[str, Decimal], list[str]]:
@@ -185,7 +225,18 @@ def _aggregate_positions(
             )
             totals.setdefault(ticker, Decimal("0"))
             continue
-        totals[ticker] = totals.get(ticker, Decimal("0")) + value
+        try:
+            totals[ticker] = exact_decimal_add(
+                totals.get(ticker, Decimal("0")),
+                value,
+                name=f"{ticker} aggregate market value",
+            )
+        except ValueError as exc:
+            refusals.append(
+                f"{ticker}'s position rows cannot be summed exactly ({exc}); "
+                "refusing to measure drift from a rounded total."
+            )
+            totals.setdefault(ticker, Decimal("0"))
     return totals, refusals
 
 
@@ -235,15 +286,46 @@ def _pending_by_ticker(
         if notional is None and quantity is not None and limit_price is not None:
             price = decimal_or_none(limit_price)
             if price is not None and price > 0 and quantity > 0:
-                value = quantity * price
+                try:
+                    value = exact_decimal_multiply(
+                        quantity,
+                        price,
+                        name=f"{ticker} pending order value",
+                    )
+                except ValueError as exc:
+                    refusals.append(
+                        f"{ticker}'s pending order value cannot be computed "
+                        f"exactly ({exc})."
+                    )
+                    unknown.add(ticker)
+                    continue
         if value is None or value <= 0:
             # A plain market order carries no determinable value here, and a
             # live quote call per rerun is exactly what this surface must not
             # do. Name it instead of guessing.
             unknown.add(ticker)
             continue
-        signed = value if side == "buy" else -value
-        values[ticker] = values.get(ticker, Decimal("0")) + signed
+        try:
+            signed = (
+                value
+                if side == "buy"
+                else exact_decimal_subtract(
+                    Decimal("0"),
+                    value,
+                    name=f"{ticker} signed pending sell value",
+                )
+            )
+            values[ticker] = exact_decimal_add(
+                values.get(ticker, Decimal("0")),
+                signed,
+                name=f"{ticker} net pending value",
+            )
+        except ValueError as exc:
+            refusals.append(
+                f"{ticker}'s pending orders cannot be combined exactly "
+                f"({exc})."
+            )
+            unknown.add(ticker)
     return values, unknown, refusals
 
 
@@ -266,7 +348,9 @@ def _policy_conflicts(
 
     leveraged_cap = decimal_or_none(getattr(policy, "max_leveraged_etf_pct", None))
     if leveraged_cap is not None:
-        cap_pct = leveraged_cap * 100
+        cap_pct = exact_decimal_multiply(
+            leveraged_cap, _ONE_HUNDRED, name="leveraged ETF policy cap"
+        )
         target = profile.target_decimal("leveraged_reinvestment")
         if target > cap_pct:
             add("leveraged_reinvestment", (
@@ -275,7 +359,9 @@ def _policy_conflicts(
             ))
     cash_floor = decimal_or_none(getattr(policy, "min_cash_reserve_pct", None))
     if cash_floor is not None:
-        floor_pct = cash_floor * 100
+        floor_pct = exact_decimal_multiply(
+            cash_floor, _ONE_HUNDRED, name="cash reserve policy floor"
+        )
         target = profile.target_decimal(SLEEVE_CASH)
         if target < floor_pct:
             add(SLEEVE_CASH, (
@@ -285,10 +371,12 @@ def _policy_conflicts(
 
     total_cap = decimal_or_none(getattr(policy, "max_total_exposure_pct", None))
     if total_cap is not None:
-        cap_pct = total_cap * 100
-        invested_target = sum(
+        cap_pct = exact_decimal_multiply(
+            total_cap, _ONE_HUNDRED, name="total exposure policy cap"
+        )
+        invested_target = exact_decimal_sum(
             (profile.target_decimal(s) for s in SLEEVE_ORDER if s != SLEEVE_CASH),
-            Decimal("0"),
+            name="invested sleeve target",
         )
         if invested_target > cap_pct:
             reason = (
@@ -306,7 +394,15 @@ def _policy_conflicts(
             tickers = {t for t, assigned in membership.items() if assigned == sleeve}
             if not tickers:
                 continue
-            capacity = position_cap * Decimal(len(tickers)) * 100
+            capacity = exact_decimal_multiply(
+                exact_decimal_multiply(
+                    position_cap,
+                    Decimal(len(tickers)),
+                    name=f"{sleeve} position-cap count",
+                ),
+                _ONE_HUNDRED,
+                name=f"{sleeve} position-cap capacity",
+            )
             target = profile.target_decimal(sleeve)
             if target > capacity:
                 add(
@@ -362,7 +458,15 @@ def evaluate_portfolio_rebalance(
     pending, pending_unknown, pending_refusals = _pending_by_ticker(snapshot)
     refusals.extend(pending_refusals)
 
-    conflicts = _policy_conflicts(profile, policy) if not refusals else {}
+    conflicts: dict[str, str] = {}
+    if not refusals:
+        try:
+            conflicts = _policy_conflicts(profile, policy)
+        except ValueError as exc:
+            refusals.append(
+                f"Policy/profile limits cannot be compared exactly ({exc}); "
+                "refusing to measure drift against an uncertain boundary."
+            )
 
     sleeve_values: dict[str, Decimal] = {s: Decimal("0") for s in SLEEVE_ORDER}
     sleeve_pending: dict[str, Decimal] = {s: Decimal("0") for s in SLEEVE_ORDER}
@@ -372,20 +476,50 @@ def evaluate_portfolio_rebalance(
 
     for ticker, value in sorted(values.items()):
         sleeve = membership.get(ticker, SLEEVE_OTHER)
-        sleeve_values[sleeve] += value
+        try:
+            sleeve_values[sleeve] = exact_decimal_add(
+                sleeve_values[sleeve],
+                value,
+                name=f"{sleeve} market value",
+            )
+        except ValueError as exc:
+            refusals.append(
+                f"{sleeve}'s holdings cannot be summed exactly ({exc}); "
+                "refusing to publish a rounded sleeve value."
+            )
         sleeve_tickers[sleeve].append(ticker)
         if sleeve == SLEEVE_OTHER:
             unassigned.append(ticker)
     for ticker, value in sorted(pending.items()):
         sleeve = membership.get(ticker, SLEEVE_OTHER)
-        sleeve_pending[sleeve] += value
+        try:
+            sleeve_pending[sleeve] = exact_decimal_add(
+                sleeve_pending[sleeve],
+                value,
+                name=f"{sleeve} pending value",
+            )
+        except ValueError as exc:
+            refusals.append(
+                f"{sleeve}'s pending orders cannot be summed exactly ({exc}); "
+                "refusing to publish a rounded projected value."
+            )
         if ticker not in sleeve_tickers[sleeve]:
             sleeve_tickers[sleeve].append(ticker)
         if sleeve == SLEEVE_OTHER and ticker not in unassigned:
             unassigned.append(ticker)
         # A working buy consumes cash and a working sell produces it. Keeping
         # this opposite leg makes projected sleeve weights conserve equity.
-        sleeve_pending[SLEEVE_CASH] -= value
+        try:
+            sleeve_pending[SLEEVE_CASH] = exact_decimal_subtract(
+                sleeve_pending[SLEEVE_CASH],
+                value,
+                name="cash pending value",
+            )
+        except ValueError as exc:
+            refusals.append(
+                f"Cash pending exposure cannot be combined exactly ({exc}); "
+                "refusing to publish a rounded projected cash value."
+            )
     for ticker in sorted(pending_unknown):
         sleeve = membership.get(ticker, SLEEVE_OTHER)
         unknown_sleeves.add(sleeve)
@@ -401,6 +535,7 @@ def evaluate_portfolio_rebalance(
     computable = not refusals and equity is not None
     rows: list[SleeveRow] = []
     breached: list[str] = []
+    calculation_failed = False
     for sleeve in SLEEVE_ORDER:
         value = sleeve_values[sleeve]
         pending_value = sleeve_pending[sleeve]
@@ -422,9 +557,61 @@ def evaluate_portfolio_rebalance(
 
         target = profile.target_decimal(sleeve)
         lower, upper = profile.band_edges(sleeve)
-        current = value / equity * Decimal("100")
-        projected = (value + pending_value) / equity * Decimal("100")
-        gap = equity * target / Decimal("100") - (value + pending_value)
+        try:
+            projected_value = exact_decimal_add(
+                value,
+                pending_value,
+                name=f"{sleeve} projected value",
+            )
+            current_pct = _percentage_float(
+                value,
+                equity,
+                name=f"{sleeve} current percentage",
+            )
+            projected_pct = _percentage_float(
+                projected_value,
+                equity,
+                name=f"{sleeve} projected percentage",
+            )
+            lower_value = _value_at_percentage(
+                equity,
+                lower,
+                name=f"{sleeve} lower-band value",
+            )
+            upper_value = _value_at_percentage(
+                equity,
+                upper,
+                name=f"{sleeve} upper-band value",
+            )
+            target_value = _value_at_percentage(
+                equity,
+                target,
+                name=f"{sleeve} target value",
+            )
+            gap = exact_decimal_subtract(
+                target_value,
+                projected_value,
+                name=f"{sleeve} gap to target",
+            )
+        except (OverflowError, ValueError) as exc:
+            refusals.append(
+                f"{sleeve}'s weights cannot be computed deterministically "
+                f"({exc}); refusing to publish rounded drift."
+            )
+            computable = False
+            calculation_failed = True
+            rows.append(
+                SleeveRow(
+                    sleeve=sleeve, target_pct=0.0, lower_edge_pct=0.0,
+                    upper_edge_pct=0.0, current_pct=0.0, projected_pct=0.0,
+                    market_value_exact=decimal_text(value),
+                    pending_value_exact=decimal_text(pending_value),
+                    gap_to_target_exact="0", status=STATUS_DATA_UNAVAILABLE,
+                    policy_conflict_reason="", band_state="",
+                    tickers=tuple(sleeve_tickers[sleeve]),
+                )
+            )
+            continue
 
         # REBAL1CR-001: a policy conflict is a property of the TARGET, not
         # a drift state, so it no longer occupies `status`. Letting it do so
@@ -436,9 +623,9 @@ def evaluate_portfolio_rebalance(
         # Judged first and kept whatever label `status` ends up carrying.
         if sleeve in unknown_sleeves:
             band_state = ""
-        elif projected < lower:
+        elif projected_value < lower_value:
             band_state = STATUS_UNDERWEIGHT
-        elif projected > upper:
+        elif projected_value > upper_value:
             band_state = STATUS_OVERWEIGHT
         else:
             band_state = STATUS_INSIDE
@@ -449,9 +636,9 @@ def evaluate_portfolio_rebalance(
             # so a reader is never invited to treat it as a tidy sleeve that
             # merely drifted.
             status = STATUS_UNASSIGNED
-        elif projected < lower:
+        elif projected_value < lower_value:
             status = STATUS_UNDERWEIGHT
-        elif projected > upper:
+        elif projected_value > upper_value:
             status = STATUS_OVERWEIGHT
         else:
             status = STATUS_INSIDE
@@ -462,7 +649,7 @@ def evaluate_portfolio_rebalance(
             SleeveRow(
                 sleeve=sleeve, target_pct=float(target),
                 lower_edge_pct=float(lower), upper_edge_pct=float(upper),
-                current_pct=float(current), projected_pct=float(projected),
+                current_pct=current_pct, projected_pct=projected_pct,
                 market_value_exact=decimal_text(value),
                 pending_value_exact=decimal_text(pending_value),
                 gap_to_target_exact=decimal_text(gap),
@@ -473,15 +660,49 @@ def evaluate_portfolio_rebalance(
             )
         )
 
+    if calculation_failed:
+        rows = [
+            dataclasses.replace(
+                row,
+                target_pct=0.0,
+                lower_edge_pct=0.0,
+                upper_edge_pct=0.0,
+                current_pct=0.0,
+                projected_pct=0.0,
+                gap_to_target_exact="0",
+                status=STATUS_DATA_UNAVAILABLE,
+                policy_conflict_reason="",
+                band_state="",
+            )
+            for row in rows
+        ]
+        breached = []
+
     invested_pct = 0.0
     cash_pct = 0.0
     if computable:
-        invested = sum(
-            (sleeve_values[s] for s in SLEEVE_ORDER if s != SLEEVE_CASH),
-            Decimal("0"),
-        )
-        invested_pct = float(invested / equity * 100)
-        cash_pct = float(sleeve_values[SLEEVE_CASH] / equity * 100)
+        try:
+            invested = exact_decimal_sum(
+                (sleeve_values[s] for s in SLEEVE_ORDER if s != SLEEVE_CASH),
+                name="invested portfolio value",
+            )
+            invested_pct = _percentage_float(
+                invested,
+                equity,
+                name="invested portfolio percentage",
+            )
+            cash_pct = _percentage_float(
+                sleeve_values[SLEEVE_CASH],
+                equity,
+                name="cash portfolio percentage",
+            )
+        except (OverflowError, ValueError) as exc:
+            refusals.append(
+                f"Portfolio percentages cannot be computed deterministically "
+                f"({exc}); refusing to publish rounded totals."
+            )
+            invested_pct = 0.0
+            cash_pct = 0.0
 
     disclosures = [BAND_MECHANISM_DISCLOSURE, UNASSIGNED_DISCLOSURE]
     for sleeve, reason in sorted(conflicts.items()):

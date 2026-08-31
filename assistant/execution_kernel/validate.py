@@ -189,6 +189,8 @@ class ProposalValidationDeps:
     decimal_factory: Callable[[str], Decimal]
     trade_intent_factory: Callable[..., TradeIntent]
     to_decimal: Callable[..., Decimal]
+    exact_decimal_add: Callable[..., Decimal]
+    exact_decimal_multiply: Callable[..., Decimal]
     env_kill_switch_active: Callable[[], bool]
     compute_policy_fingerprint: Callable[[TradingPolicy], str]
     validate_proposal_context: Callable[
@@ -379,14 +381,14 @@ def run_proposal_validation(
                 expected_impact["position_shares_before"],
                 name="proposal.expected_impact.position_shares_before",
             )
-            current_shares = sum(
-                (
-                    position.exact_field("shares")
-                    for position in current_portfolio.positions
-                    if position.ticker.upper() == intent.ticker.upper()
-                ),
-                deps.decimal_factory("0"),
-            )
+            current_shares = deps.decimal_factory("0")
+            for position in current_portfolio.positions:
+                if position.ticker.upper() == intent.ticker.upper():
+                    current_shares = deps.exact_decimal_add(
+                        current_shares,
+                        position.exact_field("shares"),
+                        name=f"current {intent.ticker.upper()} shares",
+                    )
             split_suspicion = deps.detect_split_like_share_mismatch(
                 proposal_shares,
                 current_shares,
@@ -641,14 +643,36 @@ def run_proposal_validation(
                 quote_received_at=quote_received_at,
                 failure_class=deps.failure_infrastructure,
             )
-        for ticker, extra_value in (extra_pending_buy_value_by_ticker or {}).items():
-            key = ticker.upper()
-            pending_buy_value_by_ticker[key] = (
-                pending_buy_value_by_ticker.get(key, deps.decimal_factory("0"))
-                + deps.to_decimal(
-                    extra_value,
-                    name=f"extra pending buy value for {key}",
+        try:
+            for ticker, extra_value in (
+                extra_pending_buy_value_by_ticker or {}
+            ).items():
+                key = ticker.upper()
+                pending_buy_value_by_ticker[key] = deps.exact_decimal_add(
+                    pending_buy_value_by_ticker.get(
+                        key,
+                        deps.decimal_factory("0"),
+                    ),
+                    deps.to_decimal(
+                        extra_value,
+                        name=f"extra pending buy value for {key}",
+                    ),
+                    name=f"combined pending buy value for {key}",
                 )
+        except (ArithmeticError, OverflowError, TypeError, ValueError) as exc:
+            return deps.outcome_factory(
+                proposal=proposal,
+                intent=intent,
+                validation=None,
+                error=(
+                    "Could not combine pending buy exposure exactly: "
+                    f"{exc}"
+                ),
+                reference_price=reference_price,
+                broker_preflight=broker_preflight,
+                quote=quote,
+                quote_received_at=quote_received_at,
+                failure_class=deps.failure_infrastructure,
             )
 
     resolved_earnings_days_away = deps.resolve_earnings_days_away(
@@ -675,6 +699,30 @@ def run_proposal_validation(
             failure_class=deps.failure_infrastructure,
         )
 
+    try:
+        max_basket_pct = deps.exact_decimal_multiply(
+            policy.max_basket_pct,
+            deps.decimal_factory("100"),
+            name="policy max_basket_pct percent conversion",
+        )
+        max_leveraged_etf_pct = deps.exact_decimal_multiply(
+            policy.max_leveraged_etf_pct,
+            deps.decimal_factory("100"),
+            name="policy max_leveraged_etf_pct percent conversion",
+        )
+    except (ArithmeticError, OverflowError, TypeError, ValueError) as exc:
+        return deps.outcome_factory(
+            proposal=proposal,
+            intent=intent,
+            validation=None,
+            error=f"Could not convert signed policy exposure caps exactly: {exc}",
+            reference_price=reference_price,
+            broker_preflight=broker_preflight,
+            quote=quote,
+            quote_received_at=quote_received_at,
+            failure_class=deps.failure_data_integrity,
+        )
+
     validation = deps.validate_trade_intent(
         intent,
         current_portfolio,
@@ -688,8 +736,8 @@ def run_proposal_validation(
         ask_price=ask_price,
         max_position_pct=policy.max_position_pct,
         max_total_exposure_pct=policy.max_total_exposure_pct,
-        max_basket_pct=policy.max_basket_pct * 100,
-        max_leveraged_etf_pct=policy.max_leveraged_etf_pct * 100,
+        max_basket_pct=max_basket_pct,
+        max_leveraged_etf_pct=max_leveraged_etf_pct,
         max_stale_price_minutes=policy.max_stale_price_minutes,
         max_slippage_pct=policy.max_slippage_pct,
         max_spread_pct=policy.max_spread_pct,

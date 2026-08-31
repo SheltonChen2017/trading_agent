@@ -46,6 +46,7 @@ from dataclasses import dataclass
 from typing import Any, Iterable
 
 from ml.hashing import hash_payload
+from research.acer.dataset import ValidatedDatasetIdentity
 
 # A symbol freed by delisting is not normally reassigned quickly. A year of
 # silence between two different company names under one ticker is the BBBY
@@ -326,40 +327,20 @@ def build_diagnostic_report(
     identities: list[TickerIdentity],
     *,
     code_commit: str,
-    normalized_dataset_identity: dict[str, Any],
+    normalized_dataset_identity: ValidatedDatasetIdentity,
 ) -> dict[str, Any]:
     """Bind a diagnostic measurement to exact source and code lineage."""
     if not isinstance(code_commit, str) or not _COMMIT_RE.fullmatch(code_commit):
         raise ValueError("code_commit must be one canonical Git commit hash")
-    if not isinstance(normalized_dataset_identity, dict):
-        raise ValueError("normalized_dataset_identity must be an object")
-
-    dataset_id = normalized_dataset_identity.get("dataset_id")
-    contract_version = normalized_dataset_identity.get("contract_version")
-    snapshot_name = normalized_dataset_identity.get("source_snapshot_name")
-    manifest_hash = normalized_dataset_identity.get("source_manifest_sha256")
-    event_count = normalized_dataset_identity.get("event_count")
-    if not isinstance(dataset_id, str) or not dataset_id.startswith(
-        "acer-analyst-events-"
-    ):
-        raise ValueError("normalized dataset id is missing or unsupported")
-    if (
-        not isinstance(contract_version, int)
-        or isinstance(contract_version, bool)
-        or contract_version < 1
-    ):
-        raise ValueError("normalization contract version is invalid")
-    if not isinstance(snapshot_name, str) or not snapshot_name.strip():
-        raise ValueError("source snapshot name is missing")
-    if not isinstance(manifest_hash, str) or not _SHA256_RE.fullmatch(manifest_hash):
-        raise ValueError("source manifest hash is invalid")
-
-    if (
-        not isinstance(event_count, int)
-        or isinstance(event_count, bool)
-        or event_count < 0
-    ):
-        raise ValueError("normalized dataset event count is invalid")
+    if type(normalized_dataset_identity) is not ValidatedDatasetIdentity:
+        raise ValueError(
+            "normalized_dataset_identity must come from the strict typed loader"
+        )
+    dataset_id = normalized_dataset_identity.dataset_id
+    contract_version = normalized_dataset_identity.contract_version
+    snapshot_name = normalized_dataset_identity.source_snapshot_name
+    manifest_hash = normalized_dataset_identity.source_manifest_sha256
+    event_count = normalized_dataset_identity.event_count
     ordered_identities = sorted(identities, key=lambda item: item.ticker)
     tickers = [item.ticker for item in ordered_identities]
     if len(tickers) != len(set(tickers)):
@@ -374,8 +355,11 @@ def build_diagnostic_report(
         "code_commit": code_commit,
         "normalized_dataset_id": dataset_id,
         "normalization_contract_version": contract_version,
-        "source_snapshot_name": snapshot_name.strip(),
+        "source_snapshot_name": snapshot_name,
         "source_manifest_sha256": manifest_hash,
+        "normalized_content_hash": normalized_dataset_identity.content_hash,
+        "normalized_events_sha256": normalized_dataset_identity.events_sha256,
+        "normalized_refusals_sha256": normalized_dataset_identity.refusals_sha256,
         "identity_assessments_sha256": hash_payload(assessment_payloads),
         "warning": IDENTITY_DIAGNOSTIC_WARNING,
         "summary": summary,

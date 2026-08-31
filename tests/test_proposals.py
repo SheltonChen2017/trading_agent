@@ -2,6 +2,7 @@
 and its total-exposure remediation (GPT review, 2026-07-31)."""
 import sys
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -155,6 +156,78 @@ def test_position_cap_breach_still_produces_a_proposal():
     proposals = generate_risk_reduction_proposals(packet, policy)
     assert proposals
     assert any("position exceeds" in r.lower() for p in proposals for r in p.reasons)
+
+
+def test_max_order_value_cap_uses_exact_price_not_rounded_display_float():
+    # This exact price is just above one third of the $100 cap, while its
+    # binary-float display companion makes 100 / display_price equal 3.0.
+    # Authoritative sizing must therefore floor the exact quotient to two.
+    price = "33.333333333333333334"
+    packet = _packet(
+        [
+            {
+                "ticker": "AAA",
+                "shares": "10",
+                "entry_price": price,
+                "current_price": price,
+            }
+        ],
+        cash=0,
+    )
+    policy = _permissive_policy(max_position_pct=0.50, max_order_value=100.0)
+
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    exact_price = packet.portfolio.positions[0].exact_field("current_price")
+
+    assert proposal.intent.shares == 2
+    assert exact_price * proposal.intent.shares <= Decimal("100")
+
+
+def test_max_order_cap_retains_digits_past_default_decimal_precision():
+    price = "33.33333333333333333333333334"
+    packet = _packet(
+        [
+            {
+                "ticker": "AAA",
+                "shares": "10",
+                "entry_price": price,
+                "current_price": price,
+            }
+        ],
+        cash=0,
+    )
+    policy = _permissive_policy(max_position_pct=0.50, max_order_value=100.0)
+
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    exact_price = packet.portfolio.positions[0].exact_field("current_price")
+
+    assert proposal.intent.shares == 2
+    assert exact_price * proposal.intent.shares <= Decimal("100")
+
+
+def test_max_order_cap_ignores_lowered_ambient_decimal_precision():
+    with localcontext() as context:
+        context.prec = 2
+        packet = _packet(
+            [
+                {
+                    "ticker": "AAA",
+                    "shares": "10",
+                    "entry_price": "33.34",
+                    "current_price": "33.34",
+                }
+            ],
+            cash=0,
+        )
+        policy = _permissive_policy(
+            max_position_pct=0.50,
+            max_order_value=100.0,
+        )
+        proposal = generate_risk_reduction_proposals(packet, policy)[0]
+
+    assert proposal.intent.shares == 2
+    exact_price = packet.portfolio.positions[0].exact_field("current_price")
+    assert exact_price * proposal.intent.shares <= Decimal("100")
 
 
 def test_sell_proposal_includes_advisory_lot_method_comparison():

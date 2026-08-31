@@ -400,10 +400,14 @@ Verify without running a backtest:
 python -c "from research.quantconnect import QuantConnectClient; print(QuantConnectClient().authenticate())"
 ```
 
-**Known caveat on first real use (CQC-001).** The client refuses any
-response lacking `success: true`. That is deliberate — QuantConnect reports
-failure in-band with HTTP 200 — but no live call has ever been made from
-this project, so it is an unverified assumption. If a call fails with
+**Endpoint-compatibility caveat (CQC-001).** The client refuses any response
+lacking `success: true`. That is deliberate — QuantConnect reports failure
+in-band with HTTP 200. Historical authenticated research calls and cloud
+backtests are permanently recorded in `docs/research/alpha-result.md`; the
+2026-08-16 smoke round observed `success: true` on the authenticate,
+project/file, compile, and backtest create/read endpoints it exercised. That
+does not prove the response contract for every future or unexercised endpoint.
+If a later call fails with
 `failed (HTTP 200): no reason given` on a body that looks fine, suspect that
 check rather than your credentials, and see
 `docs/operations/OPERATIONAL_FACTS.md`. A clean `authenticate()` does not prove it
@@ -1151,6 +1155,8 @@ python scripts/run_baseline_comparison.py
 python scripts/run_out_of_sample_check.py
 python scripts/run_significance_check.py
 python scripts/run_macro_signals_significance_check.py
+# Quarantined rejected-family reproductions; default invocation refuses.
+# See research/analyst_revisions_v2/specs/legacy_reproduction_registry.json.
 python scripts/run_analyst_target_significance_check.py
 python scripts/run_momentum_block_significance.py
 python scripts/run_execution_timing_revalidation.py

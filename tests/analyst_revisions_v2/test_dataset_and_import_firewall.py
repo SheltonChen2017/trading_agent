@@ -1,0 +1,547 @@
+from __future__ import annotations
+
+import dataclasses
+import json
+from pathlib import Path
+
+import pytest
+
+from research.analyst_revisions_v2.canonical import (
+    CanonicalEvidenceError,
+    canonical_json_bytes,
+    sha256_bytes,
+)
+from research.analyst_revisions_v2.dataset import (
+    DATASET_MANIFEST_FILENAME,
+    EVENTS_FILENAME,
+    REFUSALS_FILENAME,
+    DatasetVerificationError,
+    capture_clean_git_lineage,
+    compute_package_source_sha256,
+    load_normalized_dataset,
+    publish_normalized_dataset,
+    revalidate_normalized_dataset,
+)
+from research.analyst_revisions_v2.contracts import EventState, RevisionKind
+from research.analyst_revisions_v2.import_firewall import (
+    ImportBoundaryError,
+    validate_transitive_import_closure,
+)
+from research.analyst_revisions_v2.normalization import (
+    NormalizationContractError,
+    NormalizationProvenance,
+    NormalizationResult,
+    RefusalReason,
+)
+
+from ._helpers import (
+    clean_source_repository,
+    event_for,
+    historical_event_for,
+    refusal_for,
+    result_for,
+    verified_snapshot,
+)
+
+
+WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _derive_dataset_id(manifest: dict) -> str:
+    payload = dict(manifest)
+    payload.pop("dataset_id", None)
+    return "arv2_ds_" + sha256_bytes(canonical_json_bytes(payload))
+
+
+def _rewrite_manifest(dataset_root: Path, manifest: dict) -> None:
+    manifest["dataset_id"] = _derive_dataset_id(manifest)
+    (dataset_root / DATASET_MANIFEST_FILENAME).write_bytes(
+        canonical_json_bytes(manifest)
+    )
+
+
+def _published_fixture(tmp_path: Path, *, event_count: int = 2):
+    repository, lineage, code_hash = clean_source_repository(tmp_path, WORKSPACE_ROOT)
+    snapshot = verified_snapshot(
+        tmp_path / "snapshot",
+        row_count=event_count,
+        refusal_row_indices=frozenset(range(event_count)),
+    )
+    refusals = tuple(
+        refusal_for(
+            locator,
+            code_hash=code_hash,
+            producing_commit=lineage.producing_commit,
+        )
+        for locator in snapshot.source_locators
+    )
+    result = result_for(
+        snapshot,
+        events=(),
+        refusals=refusals,
+        code_hash=code_hash,
+        producing_commit=lineage.producing_commit,
+    )
+    dataset_root = tmp_path / "dataset"
+    manifest = publish_normalized_dataset(
+        dataset_root, result=result, lineage=lineage
+    )
+    return repository, lineage, snapshot, result, dataset_root, manifest
+
+
+def test_dataset_publication_and_typed_round_trip(tmp_path):
+    _, lineage, snapshot, result, dataset_root, manifest = _published_fixture(tmp_path)
+    loaded = load_normalized_dataset(dataset_root, snapshot=snapshot)
+
+    assert loaded.manifest == manifest
+    assert loaded.events == result.events
+    assert loaded.refusals == result.refusals
+    assert loaded.manifest.producing_commit == lineage.producing_commit
+    assert loaded.manifest.producing_tree == lineage.producing_tree
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        loaded.manifest.event_count = 0
+
+
+def test_refusal_only_dataset_is_complete_and_round_trips(tmp_path):
+    repository, lineage, code_hash = clean_source_repository(tmp_path, WORKSPACE_ROOT)
+    snapshot = verified_snapshot(
+        tmp_path / "snapshot", refusal_row_indices=frozenset({0})
+    )
+    refusal = refusal_for(
+        snapshot.source_locators[0],
+        code_hash=code_hash,
+        producing_commit=lineage.producing_commit,
+    )
+    result = result_for(
+        snapshot,
+        events=(),
+        refusals=(refusal,),
+        code_hash=code_hash,
+        producing_commit=lineage.producing_commit,
+    )
+    dataset_root = tmp_path / "refusal-dataset"
+    publish_normalized_dataset(dataset_root, result=result, lineage=lineage)
+    loaded = load_normalized_dataset(dataset_root, snapshot=snapshot)
+    assert loaded.events == ()
+    assert loaded.refusals == (refusal,)
+    assert repository.is_dir()
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ("ids", "times", "mapping", "rating", "analyst", "revision"),
+)
+def test_publication_rejects_arbitrary_canonical_event_substitution(
+    tmp_path, mutation
+):
+    _, lineage, code_hash = clean_source_repository(tmp_path, WORKSPACE_ROOT)
+    snapshot = verified_snapshot(tmp_path / "snapshot")
+    locator = snapshot.source_locators[0]
+    common = {
+        "code_hash": code_hash,
+        "producing_commit": lineage.producing_commit,
+    }
+    if mutation == "ids":
+        event = event_for(
+            locator, provider_event_id="caller-selected-event", **common
+        )
+    elif mutation == "times":
+        event = event_for(
+            locator, effective_at="2020-01-01T14:00:00.000000Z", **common
+        )
+    elif mutation == "mapping":
+        event = event_for(locator, issuer_id="caller-selected-issuer", **common)
+    elif mutation == "rating":
+        event = event_for(locator, raw_rating="Caller Selected Rating", **common)
+    elif mutation == "analyst":
+        event = dataclasses.replace(
+            event_for(locator, **common),
+            provider_analyst_id="caller-provider-analyst",
+            analyst_id="caller-analyst",
+        )
+    else:
+        event = event_for(
+            locator,
+            event_version_id="caller-version-1",
+            revision_sequence=1,
+            supersedes_event_version_id="caller-version-0",
+            revision_kind=RevisionKind.CORRECTION,
+            event_state=EventState.ACTIVE_CORRECTED,
+            **common,
+        )
+    provenance = NormalizationProvenance.create(
+        snapshot=snapshot,
+        normalizer_config_sha256="1" * 64,
+        normalizer_code_sha256=code_hash,
+        evidence_epoch_id="evidence-epoch-1",
+        build_recipe_id="normalizer-recipe-1",
+        producing_commit=lineage.producing_commit,
+    )
+    forged = object.__new__(NormalizationResult)
+    object.__setattr__(forged, "snapshot", snapshot)
+    object.__setattr__(forged, "events", (event,))
+    object.__setattr__(forged, "refusals", ())
+    object.__setattr__(forged, "provenance", provenance)
+    target = tmp_path / f"forged-{mutation}"
+    with pytest.raises(NormalizationContractError, match="zero-access"):
+        publish_normalized_dataset(target, result=forged, lineage=lineage)
+    assert not target.exists()
+
+
+def test_pre_2013_named_refusal_round_trips_but_event_artifact_is_rejected(
+    tmp_path,
+):
+    _, lineage, code_hash = clean_source_repository(tmp_path, WORKSPACE_ROOT)
+    snapshot = verified_snapshot(
+        tmp_path / "pre-2013-snapshot", event_year=2012
+    )
+    refusal = refusal_for(
+        snapshot.source_locators[0],
+        reason=(
+            RefusalReason.PROVIDER_BACKFILL_SEMANTICS_UNVERIFIED_PRE_2013
+        ),
+        code_hash=code_hash,
+        producing_commit=lineage.producing_commit,
+    )
+    result = result_for(
+        snapshot,
+        events=(),
+        refusals=(refusal,),
+        code_hash=code_hash,
+        producing_commit=lineage.producing_commit,
+    )
+    dataset_root = tmp_path / "pre-2013-dataset"
+    publish_normalized_dataset(dataset_root, result=result, lineage=lineage)
+    assert load_normalized_dataset(
+        dataset_root, snapshot=snapshot
+    ).refusals == (refusal,)
+
+    forbidden_event = historical_event_for(
+        snapshot.source_locators[0],
+        event_year=2012,
+        code_hash=code_hash,
+        producing_commit=lineage.producing_commit,
+    )
+    event_payload = canonical_json_bytes(forbidden_event.to_record())
+    refusal_payload = b""
+    (dataset_root / EVENTS_FILENAME).write_bytes(event_payload)
+    (dataset_root / REFUSALS_FILENAME).write_bytes(refusal_payload)
+    manifest = json.loads(
+        (dataset_root / DATASET_MANIFEST_FILENAME).read_text(encoding="utf-8")
+    )
+    manifest["events_sha256"] = sha256_bytes(event_payload)
+    manifest["event_count"] = 1
+    manifest["refusals_sha256"] = sha256_bytes(refusal_payload)
+    manifest["refusal_count"] = 0
+    _rewrite_manifest(dataset_root, manifest)
+
+    with pytest.raises(NormalizationContractError, match="zero-access"):
+        load_normalized_dataset(dataset_root, snapshot=snapshot)
+
+
+def test_publication_refuses_dirty_or_changed_git_lineage(tmp_path):
+    repository, lineage, snapshot, result, _, _ = _published_fixture(tmp_path)
+    (repository / "untracked-after-capture.txt").write_text("dirty", encoding="utf-8")
+
+    with pytest.raises(DatasetVerificationError, match="not clean"):
+        publish_normalized_dataset(
+            tmp_path / "second-dataset", result=result, lineage=lineage
+        )
+    assert not (tmp_path / "second-dataset").exists()
+    assert snapshot.source_row_count == 2
+
+
+def test_ignored_python_source_cannot_hide_outside_the_producing_commit(tmp_path):
+    repository, _, _ = clean_source_repository(tmp_path, WORKSPACE_ROOT)
+    info_exclude = repository / ".git" / "info" / "exclude"
+    info_exclude.write_text(
+        info_exclude.read_text(encoding="utf-8") + "\nignored_source.py\n",
+        encoding="utf-8",
+    )
+    ignored = repository / "research" / "analyst_revisions_v2" / "ignored_source.py"
+    ignored.write_text("VALUE = 1\n", encoding="utf-8")
+    capture_clean_git_lineage(repository)
+    with pytest.raises(DatasetVerificationError, match="untracked_or_ignored"):
+        compute_package_source_sha256(repository)
+
+
+def test_publication_refuses_code_hash_or_commit_not_bound_to_clean_source(tmp_path):
+    _, lineage, code_hash = clean_source_repository(tmp_path, WORKSPACE_ROOT)
+    wrong_code = "9" * 64
+    snapshot = verified_snapshot(
+        tmp_path / "snapshot",
+        refusal_row_indices=frozenset({0}),
+    )
+    refusal = refusal_for(
+        snapshot.source_locators[0],
+        code_hash=wrong_code,
+        producing_commit=lineage.producing_commit,
+    )
+    result = result_for(
+        snapshot,
+        events=(),
+        refusals=(refusal,),
+        code_hash=wrong_code,
+        producing_commit=lineage.producing_commit,
+    )
+    assert code_hash != wrong_code
+    with pytest.raises(DatasetVerificationError, match="package source"):
+        publish_normalized_dataset(tmp_path / "dataset", result=result, lineage=lineage)
+
+    wrong_commit = "b" * 40
+    refusal = refusal_for(
+        snapshot.source_locators[0],
+        code_hash=code_hash,
+        producing_commit=wrong_commit,
+    )
+    result = result_for(
+        snapshot,
+        events=(),
+        refusals=(refusal,),
+        code_hash=code_hash,
+        producing_commit=wrong_commit,
+    )
+    with pytest.raises(DatasetVerificationError, match="commit"):
+        publish_normalized_dataset(tmp_path / "dataset", result=result, lineage=lineage)
+
+
+def test_publication_never_overwrites_an_existing_dataset(tmp_path):
+    _, lineage, _, result, dataset_root, _ = _published_fixture(tmp_path)
+    original_manifest = (dataset_root / DATASET_MANIFEST_FILENAME).read_bytes()
+    with pytest.raises(DatasetVerificationError, match="already exists"):
+        publish_normalized_dataset(dataset_root, result=result, lineage=lineage)
+    assert (dataset_root / DATASET_MANIFEST_FILENAME).read_bytes() == original_manifest
+
+
+def test_config_hash_changes_build_recipe_result_and_dataset_identity(tmp_path):
+    _, lineage, snapshot, result, _, first_manifest = _published_fixture(tmp_path)
+    changed_config = "8" * 64
+    changed_refusals = tuple(
+        refusal_for(
+            locator,
+            config_hash=changed_config,
+            code_hash=result.provenance.normalizer_code_sha256,
+            producing_commit=lineage.producing_commit,
+        )
+        for locator in snapshot.source_locators
+    )
+    changed_result = result_for(
+        snapshot,
+        events=(),
+        refusals=changed_refusals,
+        config_hash=changed_config,
+        code_hash=result.provenance.normalizer_code_sha256,
+        producing_commit=lineage.producing_commit,
+    )
+    second_manifest = publish_normalized_dataset(
+        tmp_path / "changed-config-dataset",
+        result=changed_result,
+        lineage=lineage,
+    )
+    assert changed_result.provenance.build_recipe_sha256 != result.provenance.build_recipe_sha256
+    assert changed_result.result_sha256 != result.result_sha256
+    assert second_manifest.dataset_id != first_manifest.dataset_id
+
+
+def test_failed_publication_has_no_visible_partial_dataset(tmp_path, monkeypatch):
+    import research.analyst_revisions_v2.dataset as dataset_module
+
+    _, lineage, code_hash = clean_source_repository(tmp_path, WORKSPACE_ROOT)
+    snapshot = verified_snapshot(
+        tmp_path / "snapshot", refusal_row_indices=frozenset({0})
+    )
+    refusal = refusal_for(
+        snapshot.source_locators[0],
+        code_hash=code_hash,
+        producing_commit=lineage.producing_commit,
+    )
+    result = result_for(
+        snapshot,
+        events=(),
+        refusals=(refusal,),
+        code_hash=code_hash,
+        producing_commit=lineage.producing_commit,
+    )
+    real_write = dataset_module._write_new_file
+    calls = 0
+
+    def fail_second_write(path, payload):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("simulated persistence failure")
+        return real_write(path, payload)
+
+    monkeypatch.setattr(dataset_module, "_write_new_file", fail_second_write)
+    target = tmp_path / "atomic-dataset"
+    with pytest.raises(OSError, match="simulated"):
+        publish_normalized_dataset(target, result=result, lineage=lineage)
+    assert not target.exists()
+    assert list(tmp_path.glob(".atomic-dataset.tmp-*")) == []
+
+
+@pytest.mark.parametrize(
+    "mutation,match",
+    [
+        ("unknown_manifest_key", "keys are not exact"),
+        ("wrong_snapshot", "supplied snapshot"),
+        ("wrong_result_hash", "result hash"),
+        ("old_schema", "unsupported"),
+    ],
+)
+def test_manifest_schema_snapshot_and_result_bindings_are_strict(
+    tmp_path, mutation, match
+):
+    _, _, snapshot, _, dataset_root, _ = _published_fixture(tmp_path)
+    manifest = json.loads(
+        (dataset_root / DATASET_MANIFEST_FILENAME).read_text(encoding="utf-8")
+    )
+    if mutation == "unknown_manifest_key":
+        manifest["legacy_field"] = "forbidden"
+    elif mutation == "wrong_snapshot":
+        manifest["snapshot_id"] = "another-snapshot"
+    elif mutation == "wrong_result_hash":
+        manifest["normalization_result_sha256"] = "f" * 64
+    else:
+        manifest["schema"] = "arv2-event-dataset-v0"
+    _rewrite_manifest(dataset_root, manifest)
+
+    with pytest.raises(CanonicalEvidenceError, match=match):
+        load_normalized_dataset(dataset_root, snapshot=snapshot)
+
+
+@pytest.mark.parametrize(
+    "mutation,match",
+    [
+        ("unknown_refusal_key", "keys are not exact"),
+        ("noncanonical_json", "canonical"),
+        ("out_of_order", "source-sorted"),
+        ("duplicate_refusal", "more than one terminal disposition"),
+    ],
+)
+def test_jsonl_rows_are_exact_canonical_sorted_and_unique(tmp_path, mutation, match):
+    _, _, snapshot, _, dataset_root, _ = _published_fixture(tmp_path)
+    event_path = dataset_root / REFUSALS_FILENAME
+    rows = [
+        json.loads(line)
+        for line in event_path.read_text(encoding="utf-8").splitlines()
+    ]
+    if mutation == "unknown_refusal_key":
+        rows[0]["legacy_reason"] = rows[0]["reason"]
+        payload = b"".join(canonical_json_bytes(row) for row in rows)
+    elif mutation == "noncanonical_json":
+        payload = b"".join(
+            (json.dumps(row, sort_keys=True) + "\n").encode("utf-8") for row in rows
+        )
+    elif mutation == "out_of_order":
+        payload = b"".join(canonical_json_bytes(row) for row in reversed(rows))
+    else:
+        payload = canonical_json_bytes(rows[0]) + canonical_json_bytes(rows[0])
+    event_path.write_bytes(payload)
+    manifest = json.loads(
+        (dataset_root / DATASET_MANIFEST_FILENAME).read_text(encoding="utf-8")
+    )
+    manifest["refusals_sha256"] = sha256_bytes(payload)
+    _rewrite_manifest(dataset_root, manifest)
+
+    with pytest.raises(CanonicalEvidenceError, match=match):
+        load_normalized_dataset(dataset_root, snapshot=snapshot)
+
+
+def test_loader_hashes_before_parsing_and_rejects_unreferenced_files(tmp_path):
+    _, _, snapshot, _, dataset_root, _ = _published_fixture(tmp_path)
+    event_path = dataset_root / EVENTS_FILENAME
+    event_path.write_bytes(b"not-json\n")
+    with pytest.raises(DatasetVerificationError, match="hash mismatch"):
+        load_normalized_dataset(dataset_root, snapshot=snapshot)
+
+    _, _, snapshot, _, dataset_root, _ = _published_fixture(
+        tmp_path / "second"
+    )
+    (dataset_root / "unreferenced.jsonl").write_bytes(b"")
+    with pytest.raises(DatasetVerificationError, match="inventory"):
+        load_normalized_dataset(dataset_root, snapshot=snapshot)
+
+
+def test_normalized_dataset_is_loader_only_and_revalidates_all_content(tmp_path):
+    _, _, snapshot, _, dataset_root, _ = _published_fixture(tmp_path)
+    dataset = load_normalized_dataset(dataset_root, snapshot=snapshot)
+    with pytest.raises(TypeError):
+        dataclasses.replace(dataset, events=())
+
+    clone = object.__new__(type(dataset))
+    for field in dataclasses.fields(dataset):
+        object.__setattr__(clone, field.name, getattr(dataset, field.name))
+    with pytest.raises(DatasetVerificationError, match="loader-authenticated"):
+        revalidate_normalized_dataset(clone)
+
+    event_path = dataset_root / EVENTS_FILENAME
+    event_path.write_bytes(event_path.read_bytes() + b"{}\n")
+    with pytest.raises(DatasetVerificationError, match="hash mismatch|changed"):
+        revalidate_normalized_dataset(dataset)
+
+
+def test_publication_revalidates_result_instead_of_trusting_frozen_shell(tmp_path):
+    _, lineage, _, result, _, _ = _published_fixture(tmp_path)
+    object.__setattr__(result, "refusals", ())
+    with pytest.raises(NormalizationContractError, match="exactly cover"):
+        _ = result.result_sha256
+    with pytest.raises(NormalizationContractError, match="exactly cover"):
+        publish_normalized_dataset(
+            tmp_path / "forged-erasure-dataset", result=result, lineage=lineage
+        )
+
+
+def test_current_v2_package_transitive_import_closure_is_outcome_free():
+    reached = validate_transitive_import_closure(WORKSPACE_ROOT)
+    assert "research.analyst_revisions_v2.dataset" in reached
+    assert "data.exchange_calendar" in reached
+    assert "execution" not in reached
+    assert "research.acer" not in reached
+
+
+def test_safe_looking_facade_cannot_hide_a_forbidden_transitive_import(tmp_path):
+    package = tmp_path / "guarded"
+    package.mkdir()
+    (package / "__init__.py").write_text("from . import facade\n", encoding="utf-8")
+    (package / "facade.py").write_text("from . import safe_helper\n", encoding="utf-8")
+    (package / "safe_helper.py").write_text("import execution.orders\n", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError) as captured:
+        validate_transitive_import_closure(tmp_path, package_name="guarded")
+    message = str(captured.value)
+    assert "guarded.facade" in message
+    assert "guarded.safe_helper" in message
+    assert "execution.orders" in message
+
+
+def test_imported_parent_package_initializer_is_part_of_the_closure(tmp_path):
+    guarded = tmp_path / "guarded"
+    guarded.mkdir()
+    (guarded / "__init__.py").write_text(
+        "import facade_package.safe\n", encoding="utf-8"
+    )
+    facade = tmp_path / "facade_package"
+    facade.mkdir()
+    (facade / "__init__.py").write_text("import http.client\n", encoding="utf-8")
+    (facade / "safe.py").write_text("VALUE = 1\n", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError) as captured:
+        validate_transitive_import_closure(tmp_path, package_name="guarded")
+    assert "facade_package" in str(captured.value)
+    assert "http.client" in str(captured.value)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "import importlib\nimportlib.import_module('requests.sessions')\n",
+        "from importlib import import_module\nname = 'requests'\nimport_module(name)\n",
+    ],
+)
+def test_dynamic_imports_cannot_bypass_the_firewall(tmp_path, source):
+    package = tmp_path / "guarded"
+    package.mkdir()
+    (package / "__init__.py").write_text(source, encoding="utf-8")
+    with pytest.raises(ImportBoundaryError):
+        validate_transitive_import_closure(tmp_path, package_name="guarded")

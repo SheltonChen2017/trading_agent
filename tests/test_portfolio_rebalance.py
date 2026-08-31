@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import dataclasses
 import sys
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -80,6 +80,27 @@ def _profile(**overrides):
     targets = dict(OWNER_APPROVED_PROFILE.targets)
     targets.update(overrides.pop("targets", {}))
     return dataclasses.replace(OWNER_APPROVED_PROFILE, targets=targets, **overrides)
+
+
+def test_low_decimal_context_cannot_round_exact_sleeve_drift():
+    snapshot = _snapshot(
+        [_held("MSFT", "100", "50.00005")],
+        cash="4999.995",
+    )
+    baseline = _report(snapshot)
+    with localcontext() as context:
+        context.prec = 3
+        constrained = _report(snapshot)
+
+    for report in (baseline, constrained):
+        assert report.usable, report.refusals
+        row = _row(report, SLEEVE_GROWTH)
+        assert row.market_value_exact == "5000.005"
+        assert row.gap_to_target_exact == "-1000.005"
+        assert row.status == STATUS_OVERWEIGHT
+        assert row.band_state == STATUS_OVERWEIGHT
+        assert row.projected_pct == pytest.approx(50.00005)
+    assert constrained.profile_fingerprint == baseline.profile_fingerprint
 
 
 # --- the profile ------------------------------------------------------------

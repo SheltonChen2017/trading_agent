@@ -67,6 +67,32 @@ MIN_ABSENCE_AGE_SECONDS = BROKER_ABSENCE_GRACE_SECONDS
 _CANCEL_ALL_MAX_BOOK_SCANS = 5
 _CANCEL_ALL_REQUIRED_STABLE_SCANS = 3
 _CANCEL_ALL_SCAN_INTERVAL_SECONDS = 0.05
+_CANCEL_ALL_RESULT_KEYS = (
+    "requested_at",
+    "reason",
+    "kill_switch_requested",
+    "kill_switch_active",
+    "local_stop_confirmed",
+    "runtime_stop_requested",
+    "runtime_stop_active",
+    "runtime_stop_confirmed",
+    "runtime_stop_error",
+    "local_stop_error",
+    "open_order_count",
+    "cancel_requested_count",
+    "managed_order_count",
+    "unmanaged_order_count",
+    "canceled",
+    "errors",
+    "book_scan_count",
+    "book_stable",
+    "final_open_order_count",
+    "unresolved_attempt_count",
+    "bulk_cancel_requested",
+    "dispatch_fence_acquired",
+    "dispatch_fence_error",
+    "scan_book_stable",
+)
 
 
 def _enter_best_effort_emergency_fence(
@@ -106,6 +132,61 @@ def _record_cancel_all_incomplete(
         details={"proposal_id": "emergency-cancel-all", **details},
         seen_at=seen_at,
     )
+
+
+def _cancel_all_result(
+    *,
+    requested_at: datetime,
+    reason: str,
+    containment_evidence: dict[str, Any],
+    open_order_count: int | None,
+    canceled: list[dict[str, Any]],
+    unmanaged_order_count: int,
+    errors: list[dict[str, Any]],
+    book_scan_count: int,
+    book_stable: bool,
+    final_open_order_count: int | None,
+    unresolved_attempt_count: int,
+    bulk_cancel_requested: bool,
+    dispatch_fence_acquired: bool,
+    dispatch_fence_error: Exception | None,
+    scan_book_stable: bool,
+) -> dict[str, Any]:
+    """Build every durable cancel-all record from one explicit schema."""
+    managed_order_count = len(canceled) - unmanaged_order_count
+    if managed_order_count < 0:
+        raise RuntimeError("cancel-all unmanaged count exceeds canceled count")
+    result = {
+        "requested_at": requested_at.isoformat(),
+        "reason": reason,
+        "kill_switch_requested": containment_evidence["kill_switch_requested"],
+        "kill_switch_active": containment_evidence["kill_switch_active"],
+        "local_stop_confirmed": containment_evidence["local_stop_confirmed"],
+        "runtime_stop_requested": containment_evidence["runtime_stop_requested"],
+        "runtime_stop_active": containment_evidence["runtime_stop_active"],
+        "runtime_stop_confirmed": containment_evidence["runtime_stop_confirmed"],
+        "runtime_stop_error": containment_evidence["runtime_stop_error"],
+        "local_stop_error": containment_evidence["local_stop_error"],
+        "open_order_count": open_order_count,
+        "cancel_requested_count": len(canceled),
+        "managed_order_count": managed_order_count,
+        "unmanaged_order_count": unmanaged_order_count,
+        "canceled": canceled,
+        "errors": errors,
+        "book_scan_count": book_scan_count,
+        "book_stable": book_stable,
+        "final_open_order_count": final_open_order_count,
+        "unresolved_attempt_count": unresolved_attempt_count,
+        "bulk_cancel_requested": bulk_cancel_requested,
+        "dispatch_fence_acquired": dispatch_fence_acquired,
+        "dispatch_fence_error": (
+            None if dispatch_fence_error is None else str(dispatch_fence_error)
+        ),
+        "scan_book_stable": scan_book_stable,
+    }
+    if tuple(result) != _CANCEL_ALL_RESULT_KEYS:
+        raise RuntimeError("cancel-all result schema drifted")
+    return result
 
 
 def _bounded_timing_number(
@@ -482,6 +563,26 @@ def handle_trade_update(
     as before -- the backward `replaces` match in _proposal_for_update() still
     attaches a replacement event to the right proposal either way.
     """
+    event = update.get("event")
+    if (
+        type(event) is not str
+        or not event
+        or event != event.strip()
+        or not event.isascii()
+        or not event.isprintable()
+    ):
+        # Do not infer the stream event from order.status. The periodic broker
+        # poll will observe the authoritative order lifecycle; projecting an
+        # event the stream never supplied would create false ledger evidence.
+        store.set_system_state(
+            "trade_stream_heartbeat",
+            {
+                "at": datetime.now(timezone.utc).isoformat(),
+                "event_available": False,
+                "error": "Broker trade-update event evidence is unavailable.",
+            },
+        )
+        return None
     order = update["order"]
     proposal = _proposal_for_update(store, order)
     if proposal is None:
@@ -521,7 +622,7 @@ def handle_trade_update(
         store,
         proposal,
         projected,
-        event_type=str(update.get("event") or order.get("status") or "trade_update"),
+        event_type=event,
         event_at=update.get("event_at"),
         external_event_id=update.get("event_id"),
         fill_qty=update.get("fill_qty"),
@@ -537,7 +638,8 @@ def handle_trade_update(
         {
             "at": datetime.now(timezone.utc).isoformat(),
             "proposal_id": proposal["proposal_id"],
-            "event": update.get("event"),
+            "event": event,
+            "event_available": True,
         },
     )
     return result
@@ -552,13 +654,24 @@ def _parse_datetime(value: Any) -> datetime | None:
     elif isinstance(value, str):
         try:
             parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-        except ValueError:
+        except (OverflowError, ValueError):
             return None
     else:
         return None
-    if parsed.tzinfo is None or parsed.utcoffset() is None:
+    if parsed.tzinfo is None:
         return None
-    return parsed.astimezone(timezone.utc)
+    try:
+        if parsed.utcoffset() is None:
+            return None
+        return parsed.astimezone(timezone.utc)
+    except (OSError, OverflowError, TypeError, ValueError):
+        # Extreme offset-bearing values can parse but overflow while being
+        # normalized to UTC (for example year 1 at +14:00).  Every caller of
+        # this best-effort parser treats None conservatively; leaking the raw
+        # exception is especially dangerous during emergency cancel-all,
+        # where one malformed legacy row must not interrupt cancellation of
+        # unrelated visible broker orders.
+        return None
 
 
 def _order_timestamp_disposition(value: Any, *, now: datetime) -> dict[str, Any]:
@@ -1058,27 +1171,23 @@ def cancel_all_open_orders(
                     details={"reason": normalized_reason, "error": str(exc)},
                     fence_acquired=fence_acquired,
                 )
-                result = {
-                    "requested_at": requested_at.isoformat(),
-                    "reason": normalized_reason,
-                    **containment_evidence,
-                    "initial_open_order_count": None,
-                    "cancel_requested_count": 0,
-                    "managed_order_count": 0,
-                    "unmanaged_order_count": 0,
-                    "canceled": [],
-                    "errors": errors,
-                    "book_scan_count": 0,
-                    "book_stable": False,
-                    "final_open_order_count": None,
-                    "unresolved_attempt_count": 0,
-                    "bulk_cancel_requested": False,
-                    "dispatch_fence_acquired": fence_acquired,
-                    "dispatch_fence_error": (
-                        None if fence_error is None else str(fence_error)
-                    ),
-                    "scan_book_stable": False,
-                }
+                result = _cancel_all_result(
+                    requested_at=requested_at,
+                    reason=normalized_reason,
+                    containment_evidence=containment_evidence,
+                    open_order_count=None,
+                    canceled=[],
+                    unmanaged_order_count=0,
+                    errors=errors,
+                    book_scan_count=0,
+                    book_stable=False,
+                    final_open_order_count=None,
+                    unresolved_attempt_count=0,
+                    bulk_cancel_requested=False,
+                    dispatch_fence_acquired=fence_acquired,
+                    dispatch_fence_error=fence_error,
+                    scan_book_stable=False,
+                )
                 store.set_system_state("last_cancel_all_open_orders", result)
                 return result
         else:
@@ -1105,27 +1214,23 @@ def cancel_all_open_orders(
                         details={"reason": normalized_reason, "error": str(exc)},
                         fence_acquired=fence_acquired,
                     )
-                    result = {
-                        "requested_at": requested_at.isoformat(),
-                        "reason": normalized_reason,
-                        **containment_evidence,
-                        "initial_open_order_count": None,
-                        "cancel_requested_count": 0,
-                        "managed_order_count": 0,
-                        "unmanaged_order_count": 0,
-                        "canceled": [],
-                        "errors": errors,
-                        "book_scan_count": 0,
-                        "book_stable": False,
-                        "final_open_order_count": None,
-                        "unresolved_attempt_count": 0,
-                        "bulk_cancel_requested": False,
-                        "dispatch_fence_acquired": fence_acquired,
-                        "dispatch_fence_error": (
-                            None if fence_error is None else str(fence_error)
-                        ),
-                        "scan_book_stable": False,
-                    }
+                    result = _cancel_all_result(
+                        requested_at=requested_at,
+                        reason=normalized_reason,
+                        containment_evidence=containment_evidence,
+                        open_order_count=None,
+                        canceled=[],
+                        unmanaged_order_count=0,
+                        errors=errors,
+                        book_scan_count=0,
+                        book_stable=False,
+                        final_open_order_count=None,
+                        unresolved_attempt_count=0,
+                        bulk_cancel_requested=False,
+                        dispatch_fence_acquired=fence_acquired,
+                        dispatch_fence_error=fence_error,
+                        scan_book_stable=False,
+                    )
                     store.set_system_state("last_cancel_all_open_orders", result)
                     return result
         emergency_observed_account = None
@@ -1174,10 +1279,12 @@ def cancel_all_open_orders(
             ] = {}
 
             emergency_enumeration_needed = False
+            primary_enumeration_complete = True
             try:
                 orders = broker_module.get_open_orders()
             except Exception as exc:
                 orders = []
+                primary_enumeration_complete = False
                 scan_incomplete = True
                 emergency_enumeration_needed = True
                 errors.append(
@@ -1188,6 +1295,7 @@ def cancel_all_open_orders(
                 )
             if not isinstance(orders, (list, tuple)):
                 orders = []
+                primary_enumeration_complete = False
                 scan_incomplete = True
                 emergency_enumeration_needed = True
                 errors.append(
@@ -1204,6 +1312,7 @@ def cancel_all_open_orders(
                 for strict_order in orders:
                     strict_order_id, _ = _emergency_order_id(strict_order)
                     if strict_order_id is None or strict_order_id in strict_ids:
+                        primary_enumeration_complete = False
                         emergency_enumeration_needed = True
                         break
                     strict_ids.add(strict_order_id)
@@ -1272,8 +1381,10 @@ def cancel_all_open_orders(
                                 ),
                             }
                         )
-            if initial_order_count is None and not scan_incomplete:
-                initial_order_count = len(orders)
+            if scan_index == 1:
+                initial_order_count = (
+                    len(orders) if primary_enumeration_complete else None
+                )
 
             for order in orders:
                 order_id, normalized_order = _emergency_order_id(order)
@@ -1326,6 +1437,26 @@ def cancel_all_open_orders(
                 order_id: str | None = None
                 if order is not None:
                     order_id, order = _emergency_order_id(order)
+                if (
+                    order_id is not None
+                    and proposal.get("status") == EXECUTED
+                    and order_id not in candidates
+                    and open_book_complete
+                    and _absence_is_believable(
+                        proposal,
+                        now=requested_at,
+                        min_absence_age_seconds=BROKER_ABSENCE_GRACE_SECONDS,
+                    )
+                ):
+                    # Historical `executed` rows normally retained the
+                    # accepted broker response, including its order ID. A
+                    # complete open-book scan that no longer contains that ID
+                    # is credible after the same indexing grace as an exact
+                    # client-ID miss. Do not keep issuing cancellation against
+                    # an aged-out terminal order forever. Recent legacy rows
+                    # and every genuinely ambiguous lifecycle state remain
+                    # conservative below.
+                    continue
                 if order_id is None:
                     idempotency_key = proposal.get("idempotency_key")
                     lookup = getattr(broker_module, "find_order_by_client_id", None)
@@ -1358,11 +1489,36 @@ def cancel_all_open_orders(
                         )
                         continue
                     if found is None:
-                        # Broker absence is not credible during this short
-                        # emergency drain; normal reconciliation owns the
-                        # documented absence-grace proof.
+                        if (
+                            proposal.get("status") == EXECUTED
+                            and _absence_is_believable(
+                                proposal,
+                                now=requested_at,
+                                min_absence_age_seconds=(
+                                    BROKER_ABSENCE_GRACE_SECONDS
+                                ),
+                            )
+                        ):
+                            # Legacy executed rows predate fill-aware lifecycle
+                            # states and may remain indefinitely after the
+                            # broker ages them out. Exact absence is credible
+                            # only after the same grace used by reconciliation.
+                            # Recent executed rows and every genuinely
+                            # ambiguous submission state remain conservative.
+                            continue
                         scan_incomplete = True
                         unresolved_attempt_count += 1
+                        errors.append(
+                            {
+                                "order_id": None,
+                                "proposal_id": proposal.get("proposal_id"),
+                                "error": (
+                                    "unresolved submission exact lookup returned "
+                                    "no broker order, but absence is not sufficient "
+                                    "to prove cancellation completeness"
+                                ),
+                            }
+                        )
                         continue
                     order_id, order = _emergency_order_id(found)
                 if order_id is None or order is None:
@@ -1687,26 +1843,23 @@ def cancel_all_open_orders(
                 fence_acquired=fence_acquired,
             )
 
-        result = {
-            "requested_at": requested_at.isoformat(),
-            "reason": normalized_reason,
-            **containment_evidence,
-            "open_order_count": initial_order_count,
-            "cancel_requested_count": len(canceled),
-            "unmanaged_order_count": unmanaged,
-            "canceled": canceled,
-            "errors": errors,
-            "book_scan_count": scans,
-            "book_stable": book_stable,
-            "final_open_order_count": final_open_order_count,
-            "unresolved_attempt_count": unresolved_attempt_count,
-            "bulk_cancel_requested": bulk_cancel_requested,
-            "dispatch_fence_acquired": fence_acquired,
-            "dispatch_fence_error": (
-                None if fence_error is None else str(fence_error)
-            ),
-            "scan_book_stable": scan_book_stable,
-        }
+        result = _cancel_all_result(
+            requested_at=requested_at,
+            reason=normalized_reason,
+            containment_evidence=containment_evidence,
+            open_order_count=initial_order_count,
+            canceled=canceled,
+            unmanaged_order_count=unmanaged,
+            errors=errors,
+            book_scan_count=scans,
+            book_stable=book_stable,
+            final_open_order_count=final_open_order_count,
+            unresolved_attempt_count=unresolved_attempt_count,
+            bulk_cancel_requested=bulk_cancel_requested,
+            dispatch_fence_acquired=fence_acquired,
+            dispatch_fence_error=fence_error,
+            scan_book_stable=scan_book_stable,
+        )
         store.set_system_state("last_cancel_all_open_orders", result)
         return result
 

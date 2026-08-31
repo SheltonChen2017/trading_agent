@@ -18,6 +18,43 @@ run, QuantConnect launch, paper/live deployment, or combined autopilot is
 authorized by this sequencing change. SEP-3's exact paused state remains in
 `docs/architecture/SEP3_FREEZE_STATE_2026-08-25.md`.
 
+**Owner-directed Target-Price Revision planning lane, 2026-08-29:** the owner
+directed a separate fourth worktree and branch for the target-price-revision
+hypothesis and requested a corrected research/QC plan capable of evolving,
+through later gates, into bounded QuantConnect autopilot. The authoritative
+planning candidate and status record are
+`docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf`
+and
+`docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
+This addition authorizes only the documentation baseline and its independent
+review. **Later owner workflow decision, 2026-08-29:** this target lane uses
+the serialized Codex-write -> Claude-review -> Codex-counter-review plus next
+milestone -> Claude-review loop on the one long-lived
+`codex/strategy-target-price-revisions` branch and dedicated
+`trading_agent_TargetPriceRevision` worktree. Each role may make several
+commits in its round but pushes exactly once at the end; no review,
+counter-review, checkpoint, handoff, or feature branch is created. The branch
+and worktree are target-price-only. Findings outside this feature are recorded
+for later owner routing and are not corrected here. This explicit exception is
+limited to Target-Price Revisions and does not reorder, merge, or modify the
+three existing lanes. It does not schedule provider, outcome, research-look,
+ETF, QC, broker, shadow, paper, live, deployment, or capital authority. Before
+any target-price outcome access, an owner-directed TPR-0 must freeze its
+separate family/look contract and either add the fourth family to the common
+multiplicity/final-holdout design or explicitly exclude it. Shadow, paper,
+restricted-live canary, and bounded unattended operation are separate future
+promotion decisions; no stage authorizes the next.
+
+**Post-integration review/remediation gate, owner direction 2026-08-28:** only
+after all three feature branches complete their lane review loops and the owner
+merges them into `main`, the owner will explicitly initiate a new Full Project
+Review. That future work must correct newly confirmed findings and close all
+seven carried root findings (`RCR-014` through `RCR-020`) under
+`docs/Plan/POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md`.
+The plan is queued and grants no implementation authority before that explicit
+activation. It does not unfreeze SEP-3 or authorize provider/outcome access,
+QuantConnect work, broker/operator-database action, deployment or trading.
+
 This document decides **what happens next**. It does not restate per-milestone
 internals. The active implementation plan is at the root of `docs/`, queued
 plans are in `docs/Plan/`, and completed or superseded plans are in
@@ -48,9 +85,17 @@ Current branch availability and later documentation commits belong in
 
 **Current owner assignment, amended 2026-08-25:** Codex implements and Claude
 independently reviews each strategy serially on that strategy's one long-lived
-`codex/strategy-*` branch. No review/counter-review branches are created
-during this parallel phase. The Action Plan and Session Handoff are frozen
-after the common baseline; every push updates the lane implementation record.
+`codex/strategy-*` branch. The required loop is: Codex implements a bounded
+candidate and pushes its exact snapshot; Claude independently reviews that
+exact push and pushes the review disposition/corrections; Codex then
+counter-reviews every Claude commit. If the review is accepted or
+accepted-after-correction and no owner decision blocks progress, Codex
+implements the next bounded lane milestone, validates both stages, updates the
+lane record, and makes one combined push. A rejection or owner-decision blocker
+stops before that next milestone and push. No review/counter-review branches
+are created during this parallel phase. Outside an explicit owner-directed
+common reconciliation, the Action Plan and Session Handoff remain frozen after
+the common baseline; every push updates the lane implementation record.
 The current Codex process can see the
 Massive-Benzinga and QuantConnect credential variables, but their values are
 never recorded and credential presence is not dataset entitlement. The local
@@ -147,7 +192,8 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | Defensive carry (SHW) | Prospective only; no result exists or may be inferred before sufficiency |
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
-| ACER (Analyst-Consensus ETF Rotation) | Priority 1. Ratings history purchased and structurally audited; event backbone reviewed. **ACER-0A owner decisions partially frozen but executable preregistration incomplete; no real-outcome run and no result.** |
+| Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
+| Target-Price Revisions (TPR) | Separate fourth planning lane, documentation-only and unaccepted. The revised PDF and implementation record define a stock-first target-price family and a later, independently gated QC/autopilot ladder. The owner-directed serialized same-branch, one-push-per-role-round workflow applies in the dedicated target worktree. No authenticated source, event, signal, outcome access, look, ETF topology, QC job/result, paper/live deployment, or trading authority exists. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0
@@ -181,6 +227,37 @@ former plan is preserved at
 and supporting freeze/audits in the corresponding Archive directories. The
 remainder of this section is retained as the historical V1 rationale and does
 not override V2.
+
+**V2 contract/safety candidate, 2026-08-26:** strict typed snapshot, lineage,
+availability, preregistration, formula, holdings, cost, and portfolio safety
+primitives now exist under `research/analyst_revisions_v2/`, but the candidate
+is not accepted. It awaits Claude's independent review of the exact pushed
+lane snapshot followed by Codex's counter-review of Claude's exact reviewed
+push. The canonical checked-in research-source authority admits no positive
+production source, and accepted normalization rows refuse until a deterministic
+provider-specific raw-to-canonical normalizer exists. The draft round-0
+inventory still lacks named owner decisions, an independent reviewed-spec
+anchor, and an external append-only permanent-look authority. Consequently no
+authenticated production event, signal/score, cross-section, nonempty
+portfolio, real-outcome run, or QC result exists; zero research looks were
+consumed. The executable order remains contracts and immutable data -> stock
+signal -> registered stock-first event study -> stop on a valid null -> ETF
+topology only after a pass -> ETF walk-forward/QC -> a lane dossier that does
+not open the shared integration holdout. Detailed findings, fixes, and residual
+gates are maintained in
+`docs/Archive/Review/REMEDIATION_2026-08-26_ANALYST_AND_FULL_PROJECT.md`.
+Nothing in this candidate authorizes provider access, outcome access,
+QuantConnect launch, portfolio/QC research, deployment, or trading.
+
+**Separate target-price family, 2026-08-29:** the owner-directed Target-Price
+Revision lane does not replace this rating-only V2 contract and cannot use ETF
+aggregation or a rating blend to rescue a valid stock-level null. Its own
+documentation-only baseline is governed by
+`docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`.
+Any later reuse of analyst-lane infrastructure requires an exact accepted
+source snapshot and a deliberate reviewed synchronization; unaccepted
+analyst-lane work, rating evidence epochs, results, look receipts, and rating
+semantics are not target-price authority.
 
 **Owner decision, 2026-08-20: ACER replaces the Strong-Buy portfolio program.**
 The strategy converts stock-level analyst *revisions* into ETF-level signals:
@@ -380,9 +457,10 @@ corrections themselves were corrected, and the round is closed.
 Snapshot A still yields 584,916 canonical events at 99.64%
 retention from 587,046 rows, with 2,130 named refusals; the corrections do
 not change those counts. They do replace the derived dataset contract and
-identity, fully authenticate lineage/count metadata, refuse every occurrence
-of a duplicated vendor id, prevent incomplete snapshots from publishing a
-canonical dataset, bind rows and lineage to one verified manifest read, and
+identity, authenticate the legacy byte hashes and recorded count metadata,
+refuse every occurrence of a duplicated vendor id, prevent the known CLI path
+from publishing an incomplete snapshot, bind rows and lineage to one verified
+manifest read, and
 rename the 2017+ era so it no longer overstates vendor-confirmed clock
 semantics. The counter-review corrected the refusal-detail wording, which
 moves the identity once more: the current v2 identity is
@@ -392,6 +470,13 @@ yet been materialized. This is still data plumbing: no price join, signal,
 rating scale, or research look. It sizes the unresolved issuer-identity
 problem — 9,677 distinct tickers with zero ISIN and zero exchange — and
 ambiguity-refusing mapping is the next ACER-1 step.
+
+That completed V1 review did **not** prove V2 semantic source completeness,
+exactly-once disposition of every raw locator, strict persisted row schemas,
+correction lineage, clean producing-code/config identity, or the absence of
+unreferenced raw pages. The V2 typed snapshot/dataset boundary supplies those
+requirements separately; no loose ACER tuple/dictionary is publishable V2
+evidence.
 
 **Update 2026-08-21: the mapping step is BLOCKED, and the blocker is
 load-bearing** (`docs/Archive/Research/ACER_V1/ACER_2026-08-21_ISSUER_IDENTITY_MEASUREMENT.md`).
@@ -423,6 +508,12 @@ master and other required inputs. Audit Databento or nominate another source
 only for requirements the cloud audit cannot close. Do not buy or download
 local QC datasets unless the owner separately reverses the cloud-engine
 decision.
+
+The 768 diagnostic count is explicitly a **lower bound, never an allowlist**;
+current-ticker joins are prohibited in V2. Normative strategy design and
+observed provider availability/history are separate evidence categories: a
+normative 2013 design statement cannot erase measured 2011–2012 bytes, and
+measured bytes cannot establish their own backfill semantics.
 
 **Update 2026-08-21: engine amendment and control-data rulings.** QuantConnect
 Cloud is the authoritative ACER historical/outcome backtest engine. Local LEAN

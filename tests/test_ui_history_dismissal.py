@@ -57,7 +57,7 @@ def seeded(request):
     finally:
         # Shared session DB: an approvable leftover would leak an approval
         # card into unrelated Propose & Approve tests.
-        with store._connect() as connection:
+        with store._connect_writable() as connection:
             connection.execute(
                 "DELETE FROM trade_proposals WHERE proposal_id IN "
                 f"({','.join('?' for _ in _SEED_IDS)})",

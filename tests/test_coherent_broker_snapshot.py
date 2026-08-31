@@ -1,9 +1,13 @@
 """Account-scoped broker session and executable portfolio evidence barriers."""
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from copy import deepcopy
+from dataclasses import replace
 from datetime import datetime, timezone
+from decimal import Decimal, localcontext
 from pathlib import Path
 from types import SimpleNamespace
 from uuid import UUID
@@ -20,7 +24,11 @@ from assistant.dispatch_fence import (
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_snapshot import (
     BrokerSnapshotCoherenceError,
+    PortfolioSnapshotIntegrityError,
+    build_portfolio_snapshot,
     build_portfolio_snapshot_from_alpaca,
+    validate_long_only_portfolio_snapshot,
+    verify_execution_portfolio_snapshot,
 )
 from execution.broker_contract import BrokerOrderIntegrityError
 from risk.execution_gate import (
@@ -50,10 +58,34 @@ def _open_test_session(
     )
     client._oauth_token = None
     client._use_basic_auth = False
+    client._use_raw_data = False
+
+    class EmergencyRawClient:
+        """Raw-mode facade that preserves the primary fake's scripted state."""
+
+        _api_key = key
+        _secret_key = secret
+        _sandbox = paper
+        _base_url = (
+            broker._TRADING_PAPER_BASE_URL
+            if paper
+            else broker._TRADING_LIVE_BASE_URL
+        )
+        _oauth_token = None
+        _use_basic_auth = False
+        _use_raw_data = True
+
+        def __getattr__(self, name):
+            return getattr(client, name)
+
     original_capture = broker._capture_connection_settings
     original_factory = broker._new_trading_client
     broker._capture_connection_settings = lambda: (key, secret, paper)
-    broker._new_trading_client = lambda *_args, **_kwargs: client
+    broker._new_trading_client = (
+        lambda *_args, raw_data=False, **_kwargs: (
+            EmergencyRawClient() if raw_data else client
+        )
+    )
     try:
         return broker.AlpacaBrokerSession()
     finally:
@@ -258,30 +290,32 @@ def _bind_test_quote(
         _base_url = broker._MARKET_DATA_BASE_URL
         _oauth_token = None
         _use_basic_auth = False
+        _use_raw_data = False
 
         def __init__(self):
             self.quotes = {}
+            self.quote_reads = 0
 
         def get_stock_latest_quote(self, _request):
+            self.quote_reads += 1
             return dict(self.quotes)
 
-    original_data_factory = broker._new_stock_data_client
-    quote_client = session._data_client
+    with broker._BROKER_SESSIONS_GUARD:
+        identity = broker._REGISTERED_BROKER_IDENTITIES[session]
+    capability = identity.data_capability
+    quote_client = capability.client
     if quote_client is None:
         quote_client = QuoteClient()
+        capability.factory = lambda *_args, **_kwargs: quote_client
     quote_client.quotes[ticker.upper()] = SimpleNamespace(
         bid_price=exact_price,
         ask_price=exact_price,
         timestamp=quote_timestamp,
     )
-    broker._new_stock_data_client = lambda *_args, **_kwargs: quote_client
-    try:
-        return session.get_execution_validation_quote(
-            ticker,
-            expected_snapshot_id=snapshot_id,
-        )
-    finally:
-        broker._new_stock_data_client = original_data_factory
+    return session.get_execution_validation_quote(
+        ticker,
+        expected_snapshot_id=snapshot_id,
+    )
 
 
 def _bound_authorization_for_session(
@@ -378,6 +412,52 @@ def test_strict_capture_returns_account_bound_sha256_evidence_in_exact_sequence(
     assert captured.utcoffset() is not None
 
 
+@pytest.mark.parametrize(
+    "captured_at",
+    [
+        "0001-01-01T00:00:00+14:00",
+        "9999-12-31T23:59:59-14:00",
+    ],
+)
+def test_execution_gate_normalizes_unrepresentable_capture_offsets(captured_at):
+    snapshot = build_portfolio_snapshot_from_alpaca(
+        broker_session=_one_attempt_session(),
+        require_execution_coherence=True,
+    )
+    material = json.loads(snapshot.broker_snapshot_material_json or "")
+    material["captured_at"] = captured_at
+    material_json = json.dumps(
+        material,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    )
+    snapshot.captured_at = captured_at
+    snapshot.broker_snapshot_material_json = material_json
+    snapshot.broker_snapshot_id = hashlib.sha256(
+        material_json.encode("utf-8")
+    ).hexdigest()
+    context = ExecutionValidationContext(
+        account_id=snapshot.account_id or "",
+        account_mode=snapshot.account_mode,
+        snapshot_id=snapshot.broker_snapshot_id,
+        policy_fingerprint="a" * 64,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="representable timezone-aware captured_at timestamp",
+    ) as caught:
+        validate_trade_intent(
+            TradeIntent(ticker="AAA", side="sell", shares=1),
+            snapshot,
+            reference_price=Decimal("50"),
+            execution_context=context,
+        )
+
+    assert isinstance(caught.value.__cause__, OverflowError)
+
+
 def test_fill_mutation_retries_then_returns_only_the_stable_order_book():
     partially_filled = _order(
         status="partially_filled", filled_qty="1", filled_avg_price="50"
@@ -450,6 +530,393 @@ def test_account_balance_mutation_retries_and_then_refuses():
         )
 
     assert session.submit_count == 0
+
+
+def test_deterministic_long_only_failure_refuses_without_retrying():
+    invalid = _account(equity="100", cash="-1", buying_power="100")
+    session = _ScriptedSession(
+        accounts=[invalid, invalid],
+        order_books=[[_order()], [_order()]],
+        positions=[[_position()]],
+    )
+
+    with pytest.raises(
+        BrokerSnapshotCoherenceError,
+        match="cash_decimal.*nonnegative",
+    ):
+        build_portfolio_snapshot_from_alpaca(
+            broker_session=session,
+            require_execution_coherence=True,
+            max_coherence_attempts=3,
+        )
+
+    assert session.calls == ["account", "orders", "positions", "orders", "account"]
+    assert session.submit_count == 0
+
+
+def test_strict_capture_rejects_malformed_position_ticker_without_retrying():
+    malformed = _position()
+    malformed["ticker"] = "AAP L"
+    session = _one_attempt_session(positions=[malformed])
+
+    with pytest.raises(
+        BrokerSnapshotCoherenceError,
+        match="supported canonical equity ticker",
+    ):
+        build_portfolio_snapshot_from_alpaca(
+            broker_session=session,
+            require_execution_coherence=True,
+            max_coherence_attempts=3,
+        )
+
+    assert session.calls == ["account", "orders", "positions", "orders", "account"]
+    assert session.submit_count == 0
+
+
+@pytest.mark.parametrize("ticker", ["BRK.B", "BF-B"])
+def test_snapshot_builder_preserves_supported_dotted_and_hyphenated_tickers(ticker):
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": ticker.lower(),
+                "shares": "1",
+                "entry_price": "10",
+                "current_price": "10",
+            }
+        ],
+        cash="0",
+    )
+
+    assert snapshot.positions[0].ticker == ticker
+
+
+def test_huge_finite_display_failure_is_reclassified_without_retrying():
+    huge_account = _account(
+        equity="1e309",
+        cash="1e309",
+        buying_power="1e309",
+    )
+    session = _one_attempt_session(
+        account_a=huge_account,
+        account_b=huge_account,
+        orders_a=[],
+        orders_b=[],
+        positions=[],
+    )
+
+    with pytest.raises(
+        BrokerSnapshotCoherenceError,
+        match="cannot be represented for display",
+    ):
+        build_portfolio_snapshot_from_alpaca(
+            broker_session=session,
+            require_execution_coherence=True,
+            max_coherence_attempts=3,
+        )
+
+    assert session.calls == ["account", "orders", "positions", "orders", "account"]
+    assert session.submit_count == 0
+
+
+def test_snapshot_exact_product_retains_digits_past_default_context_precision():
+    price = "33.33333333333333333333333334"
+
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "AAA",
+                "shares": "3",
+                "entry_price": price,
+                "current_price": price,
+            }
+        ],
+        cash="0",
+    )
+
+    expected = "100.00000000000000000000000002"
+    assert snapshot.positions[0].market_value_exact == expected
+    assert snapshot.total_equity_exact == expected
+
+
+def test_snapshot_arithmetic_and_validation_ignore_lowered_ambient_precision():
+    with localcontext() as context:
+        context.prec = 2
+        snapshot = build_portfolio_snapshot(
+            [
+                {
+                    "ticker": "AAA",
+                    "shares": "3",
+                    "entry_price": "33.34",
+                    "current_price": "33.34",
+                }
+            ],
+            cash="0",
+        )
+        validate_long_only_portfolio_snapshot(snapshot)
+
+    assert snapshot.positions[0].market_value_exact == "100.02"
+    assert snapshot.total_equity_exact == "100.02"
+    assert snapshot.positions[0].market_value == 100.02
+    assert snapshot.total_equity == 100.02
+
+
+def test_position_value_tolerance_ignores_lowered_ambient_precision():
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "AAA",
+                "shares": "1",
+                "entry_price": "100",
+                "current_price": "100",
+            }
+        ],
+        cash="0",
+    )
+    # Keep each display/exact pair internally coherent while placing the exact
+    # market-value delta just beyond the one-cent integrity tolerance. Decimal
+    # unary abs() rounds under the ambient context and would turn 0.0101 into
+    # 0.010 at precision 2; copy_abs() must preserve the authoritative delta.
+    snapshot.positions[0].market_value = 100.01
+    snapshot.positions[0].market_value_exact = "100.0101"
+    snapshot.total_equity = 100.01
+    snapshot.total_equity_exact = "100.0101"
+
+    with localcontext() as context:
+        context.prec = 2
+        with pytest.raises(
+            PortfolioSnapshotIntegrityError,
+            match=r"market_value .* disagrees with shares\*current_price",
+        ):
+            validate_long_only_portfolio_snapshot(snapshot)
+
+
+def test_component_equity_tolerance_ignores_lowered_ambient_precision():
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "AAA",
+                "shares": "1",
+                "entry_price": "100",
+                "current_price": "100",
+            }
+        ],
+        cash="0",
+    )
+    # The position remains exact and valid. Only total equity is 0.0101 below
+    # the exact cash-plus-position sum, which must remain over tolerance even
+    # when a caller lowers the process-local Decimal precision.
+    snapshot.total_equity = 99.99
+    snapshot.total_equity_exact = "99.9899"
+
+    with localcontext() as context:
+        context.prec = 2
+        with pytest.raises(
+            PortfolioSnapshotIntegrityError,
+            match="total_equity disagrees with exact cash plus position values",
+        ):
+            validate_long_only_portfolio_snapshot(snapshot)
+
+
+def test_nonterminating_snapshot_ratios_are_deterministic_across_contexts():
+    positions = [
+        {
+            "ticker": "AAA",
+            "shares": "1",
+            "entry_price": "1",
+            "current_price": "2",
+        },
+        {
+            "ticker": "AAA",
+            "shares": "2",
+            "entry_price": "2",
+            "current_price": "2",
+        },
+    ]
+    baseline = build_portfolio_snapshot(positions, cash="0")
+
+    with localcontext() as context:
+        context.prec = 2
+        lowered = build_portfolio_snapshot(positions, cash="0")
+
+    assert lowered.positions[0].entry_price_exact == baseline.positions[0].entry_price_exact
+    assert lowered.positions[0].unrealized_pnl_pct == baseline.positions[0].unrealized_pnl_pct
+    assert Decimal(lowered.total_equity_exact) == Decimal("6")
+
+
+def test_builder_normalizes_decimal_arithmetic_overflow():
+    with pytest.raises(
+        PortfolioSnapshotIntegrityError,
+        match="exact decimal arithmetic is not representable",
+    ):
+        build_portfolio_snapshot(
+            [
+                {
+                    "ticker": "AAA",
+                    "shares": "1e999999",
+                    "entry_price": "1",
+                    "current_price": "1e999999",
+                }
+            ],
+            cash=0,
+        )
+
+
+def test_strict_position_arithmetic_overflow_uses_coherence_contract_once():
+    position = {
+        "ticker": "AAA",
+        "shares_decimal": "1e999999",
+        "avg_entry_price_decimal": "1",
+        "current_price_decimal": "1e999999",
+        "market_value_decimal": "1",
+    }
+    session = _one_attempt_session(
+        orders_a=[],
+        orders_b=[],
+        positions=[position],
+    )
+
+    with pytest.raises(
+        BrokerSnapshotCoherenceError,
+        match="exact decimal arithmetic is not representable",
+    ):
+        build_portfolio_snapshot_from_alpaca(
+            broker_session=session,
+            require_execution_coherence=True,
+            max_coherence_attempts=3,
+        )
+
+    assert session.calls == ["account", "orders", "positions", "orders", "account"]
+
+
+def test_signed_policy_percent_contract_rejects_binary_float_looseness():
+    policy = replace(
+        _paper_policy(),
+        max_basket_pct=0.07,
+        max_leveraged_etf_pct=0.07,
+    )
+    policy.validate()
+    snapshot = build_portfolio_snapshot_from_alpaca(
+        broker_session=_one_attempt_session(orders_a=[], orders_b=[]),
+        require_execution_coherence=True,
+    )
+    context = ExecutionValidationContext(
+        account_id=snapshot.account_id or "",
+        account_mode=snapshot.account_mode,
+        snapshot_id=snapshot.broker_snapshot_id or "",
+        policy_fingerprint=compute_policy_fingerprint(policy),
+    )
+    exact_arguments = {
+        **_policy_gate_arguments(policy),
+        "max_basket_pct": Decimal("7"),
+        "max_leveraged_etf_pct": Decimal("7"),
+    }
+    intent = TradeIntent(ticker="AAA", side="sell", shares=1)
+
+    # Exact fraction-to-percent conversion satisfies the signed contract.
+    validate_trade_intent(
+        intent,
+        snapshot,
+        reference_price=Decimal("50"),
+        price_timestamp=datetime(2026, 7, 27, 14, 0, tzinfo=timezone.utc),
+        bid_price=Decimal("50"),
+        ask_price=Decimal("50"),
+        now=datetime(2026, 7, 27, 10, 0),
+        execution_context=context,
+        execution_policy=policy,
+        **exact_arguments,
+    )
+
+    loosened_arguments = {
+        **exact_arguments,
+        "max_basket_pct": policy.max_basket_pct * 100,
+        "max_leveraged_etf_pct": policy.max_leveraged_etf_pct * 100,
+    }
+    assert Decimal(str(loosened_arguments["max_basket_pct"])) > Decimal("7")
+    with pytest.raises(ValueError, match="does not match the signed policy"):
+        validate_trade_intent(
+            intent,
+            snapshot,
+            reference_price=Decimal("50"),
+            price_timestamp=datetime(2026, 7, 27, 14, 0, tzinfo=timezone.utc),
+            bid_price=Decimal("50"),
+            ask_price=Decimal("50"),
+            now=datetime(2026, 7, 27, 10, 0),
+            execution_context=context,
+            execution_policy=policy,
+            **loosened_arguments,
+        )
+
+
+def test_bound_validation_cannot_inflate_snapshot_available_capital():
+    account = _account(equity="1000", cash="1000", buying_power="1000")
+    snapshot = build_portfolio_snapshot_from_alpaca(
+        broker_session=_one_attempt_session(
+            account_a=account,
+            account_b=account,
+            orders_a=[],
+            orders_b=[],
+            positions=[],
+        ),
+        require_execution_coherence=True,
+    )
+    policy = replace(
+        _paper_policy(),
+        max_position_pct=1.0,
+        max_total_exposure_pct=1.0,
+        max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0,
+        min_cash_reserve_pct=0.10,
+    )
+    policy.validate()
+    context = ExecutionValidationContext(
+        account_id=snapshot.account_id or "",
+        account_mode=snapshot.account_mode,
+        snapshot_id=snapshot.broker_snapshot_id or "",
+        policy_fingerprint=compute_policy_fingerprint(policy),
+    )
+
+    result = validate_trade_intent(
+        TradeIntent(ticker="BBB", side="buy", shares=20),
+        snapshot,
+        reference_price=Decimal("50"),
+        price_timestamp=datetime(2026, 8, 27, 14, 0, tzinfo=timezone.utc),
+        bid_price=Decimal("50"),
+        ask_price=Decimal("50"),
+        now=datetime(2026, 8, 27, 10, 0),
+        available_cash_override=Decimal("5000"),
+        available_buying_power_override=Decimal("5000"),
+        execution_context=context,
+        execution_policy=policy,
+        **_policy_gate_arguments(policy),
+    )
+
+    assert result.approved is False
+    assert "min_cash_reserve" in result.violation_codes
+
+
+@pytest.mark.parametrize(
+    ("entry_price", "entry_price_exact"),
+    [
+        (float("inf"), "45"),
+        (float("inf"), "1e309"),
+    ],
+)
+def test_execution_snapshot_verifier_normalizes_invalid_position_displays(
+    entry_price,
+    entry_price_exact,
+):
+    snapshot = build_portfolio_snapshot_from_alpaca(
+        broker_session=_one_attempt_session(),
+        require_execution_coherence=True,
+    )
+    snapshot.positions[0].entry_price = entry_price
+    snapshot.positions[0].entry_price_exact = entry_price_exact
+
+    with pytest.raises(
+        BrokerSnapshotCoherenceError,
+        match="execution snapshot integrity verification failed",
+    ):
+        verify_execution_portfolio_snapshot(snapshot)
 
 
 def test_position_component_mutation_retries_before_accepting_consistent_values():
@@ -652,7 +1119,7 @@ def test_session_freezes_credentials_mode_and_trading_client_through_lookup_and_
     client = FakeTradingClient()
     factory_calls = []
 
-    def fake_factory(key, secret, *, paper):
+    def fake_factory(key, secret, *, paper, raw_data=False):
         factory_calls.append((key, secret, paper))
         client._api_key = key
         client._secret_key = secret
@@ -664,6 +1131,7 @@ def test_session_freezes_credentials_mode_and_trading_client_through_lookup_and_
         )
         client._oauth_token = None
         client._use_basic_auth = False
+        client._use_raw_data = raw_data
         return client
 
     monkeypatch.setenv("APCA_API_KEY_ID", "credential-a")
@@ -1414,6 +1882,24 @@ def test_session_refuses_sdk_identity_mutation_before_safety_read(field, value):
     assert client.submit_count == 0
 
 
+def test_session_refuses_strict_raw_mode_mutation_before_safety_read():
+    client = _ExecutableClient()
+    session = _open_test_session(
+        client,
+        key="captured-key",
+        secret="captured-secret",
+    )
+    client._use_raw_data = True
+
+    with pytest.raises(
+        broker.BrokerPreflightError,
+        match=r"mismatched fields: _use_raw_data",
+    ):
+        session.get_account()
+    assert client.account_reads == 0
+    assert client.submit_count == 0
+
+
 def test_session_refuses_market_data_endpoint_mutation_before_quote_read():
     client = _ExecutableClient()
     session = _open_test_session(client)
@@ -1424,11 +1910,147 @@ def test_session_refuses_market_data_endpoint_mutation_before_quote_read():
             reference_price=60,
         )
     )
+    quote_reads = session._data_client.quote_reads
     session._data_client._base_url = "https://attacker.invalid"
 
     with pytest.raises(broker.BrokerPreflightError, match="identity changed"):
         session.get_latest_quote("KO")
+    assert session._data_client.quote_reads == quote_reads
     assert client.submit_count == 0
+
+
+def test_session_refuses_market_data_raw_mode_mutation_before_quote_read():
+    client = _ExecutableClient()
+    session = _open_test_session(client)
+    _authorization, _snapshot, _policy, _context = (
+        _bound_authorization_for_session(
+            session,
+            TradeIntent(ticker="KO", side="buy", shares=1),
+            reference_price=60,
+        )
+    )
+    quote_reads = session._data_client.quote_reads
+    session._data_client._use_raw_data = True
+
+    with pytest.raises(
+        broker.BrokerPreflightError,
+        match=r"mismatched fields: _use_raw_data",
+    ):
+        session.get_latest_quote("KO")
+    assert session._data_client.quote_reads == quote_reads
+    assert client.submit_count == 0
+
+
+def test_session_refuses_market_data_endpoint_slot_mutation_before_quote_read():
+    client = _ExecutableClient()
+    session = _open_test_session(client)
+    _authorization, _snapshot, _policy, _context = (
+        _bound_authorization_for_session(
+            session,
+            TradeIntent(ticker="KO", side="buy", shares=1),
+            reference_price=60,
+        )
+    )
+    registered_client = session._data_client
+    quote_reads = registered_client.quote_reads
+    object.__setattr__(session, "_data_base_url", "https://attacker.invalid")
+
+    with pytest.raises(
+        PermissionError,
+        match="registered connection identity changed",
+    ):
+        session.get_latest_quote("KO")
+    assert registered_client.quote_reads == quote_reads
+    assert client.submit_count == 0
+
+
+def test_session_refuses_market_data_client_replacement_before_quote_read():
+    client = _ExecutableClient()
+    session = _open_test_session(client)
+    _authorization, _snapshot, _policy, _context = (
+        _bound_authorization_for_session(
+            session,
+            TradeIntent(ticker="KO", side="buy", shares=1),
+            reference_price=60,
+        )
+    )
+    registered_client = session._data_client
+    registered_reads = registered_client.quote_reads
+
+    class ReplacementDataClient:
+        _api_key = session._key
+        _secret_key = session._secret
+        _sandbox = False
+        _base_url = session._data_base_url
+        _oauth_token = None
+        _use_basic_auth = False
+        _use_raw_data = False
+
+        def __init__(self):
+            self.quote_reads = 0
+
+        def get_stock_latest_quote(self, _request):
+            self.quote_reads += 1
+            raise AssertionError("replacement data client reached the endpoint")
+
+    replacement = ReplacementDataClient()
+    object.__setattr__(session, "_data_client", replacement)
+
+    with pytest.raises(
+        PermissionError,
+        match="registered connection identity changed",
+    ):
+        session.get_latest_quote("KO")
+    assert replacement.quote_reads == 0
+    assert registered_client.quote_reads == registered_reads
+    assert client.submit_count == 0
+
+
+def test_session_market_data_factory_is_bound_at_construction(monkeypatch):
+    client = _ExecutableClient()
+
+    class RegisteredDataClient:
+        _api_key = "key"
+        _secret_key = "secret"
+        _sandbox = False
+        _base_url = broker._MARKET_DATA_BASE_URL
+        _oauth_token = None
+        _use_basic_auth = False
+        _use_raw_data = False
+
+        def __init__(self):
+            self.quote_reads = 0
+
+        def get_stock_latest_quote(self, _request):
+            self.quote_reads += 1
+            return {
+                "KO": SimpleNamespace(
+                    bid_price="60",
+                    ask_price="60",
+                    timestamp=datetime(2026, 7, 27, 14, 0, tzinfo=timezone.utc),
+                )
+            }
+
+    registered = RegisteredDataClient()
+    monkeypatch.setattr(
+        broker,
+        "_new_stock_data_client",
+        lambda *_args, **_kwargs: registered,
+    )
+    session = _open_test_session(client)
+
+    redirected_calls: list[object] = []
+    monkeypatch.setattr(
+        broker,
+        "_new_stock_data_client",
+        lambda *_args, **_kwargs: redirected_calls.append(object()),
+    )
+
+    quote = session.get_latest_quote("KO")
+
+    assert quote["price_decimal"] == "60"
+    assert registered.quote_reads == 1
+    assert redirected_calls == []
 
 
 def test_session_endpoint_identity_does_not_follow_mutated_module_constants(
@@ -1990,6 +2612,143 @@ def test_legacy_read_only_session_path_keeps_incomplete_order_availability_hones
     assert snapshot.broker_snapshot_id is None
     assert snapshot.captured_at is None
     assert snapshot.total_equity == 1100.0
+
+
+@pytest.mark.parametrize(
+    "order_payload",
+    [
+        None,
+        "malformed",
+        {"not": "a complete list"},
+        [42],
+        [_order(status="filled")],
+    ],
+)
+def test_read_only_snapshot_marks_malformed_order_books_unavailable(order_payload):
+    class ReadOnlySession:
+        def get_account(self):
+            return {
+                "account_id": "paper-account-1",
+                "equity": 1000.0,
+                "equity_decimal": "1000",
+                "cash": 1000.0,
+                "cash_decimal": "1000",
+                "buying_power": 1000.0,
+                "buying_power_decimal": "1000",
+                "paper": True,
+            }
+
+        def get_open_orders(self):
+            return deepcopy(order_payload)
+
+        def get_open_positions(self):
+            return []
+
+    snapshot = build_portfolio_snapshot_from_alpaca(
+        broker_session=ReadOnlySession(),
+        require_execution_coherence=False,
+    )
+
+    assert snapshot.open_orders == []
+    assert snapshot.open_orders_available is False
+
+
+def test_read_only_snapshot_falls_back_when_exact_companions_are_unavailable():
+    class RoundedOnlySession:
+        def get_account(self):
+            return {
+                "account_id": "paper-account-1",
+                "equity": 1100.0,
+                "equity_decimal": None,
+                "cash": 1000.0,
+                "cash_decimal": None,
+                "buying_power": 1000.0,
+                "buying_power_decimal": None,
+                "paper": True,
+            }
+
+        def get_open_orders(self):
+            return []
+
+        def get_open_positions(self):
+            return [
+                {
+                    "ticker": "AAA",
+                    "shares": 2.0,
+                    "shares_decimal": None,
+                    "avg_entry_price": 45.0,
+                    "avg_entry_price_decimal": None,
+                    "current_price": 50.0,
+                    "current_price_decimal": None,
+                }
+            ]
+
+    snapshot = build_portfolio_snapshot_from_alpaca(
+        broker_session=RoundedOnlySession(), require_execution_coherence=False
+    )
+
+    assert snapshot.cash == 1000.0
+    assert snapshot.buying_power == 1000.0
+    assert snapshot.total_equity == 1100.0
+    assert snapshot.positions[0].shares == 2.0
+    assert snapshot.positions[0].current_price == 50.0
+    assert snapshot.cash_exact is None
+    assert snapshot.buying_power_exact is None
+    assert snapshot.total_equity_exact is None
+    assert snapshot.positions[0].shares_exact is None
+    assert snapshot.positions[0].entry_price_exact is None
+    assert snapshot.positions[0].current_price_exact is None
+    assert snapshot.positions[0].market_value_exact is None
+    assert snapshot.has_exact_numerics is False
+    assert snapshot.open_orders_available is True
+
+
+def test_read_only_snapshot_preserves_only_supplied_exact_companions():
+    class PartiallyExactSession:
+        def get_account(self):
+            return {
+                "account_id": "paper-account-1",
+                "equity": 1100.0,
+                "equity_decimal": "1100",
+                "cash": 1000.0,
+                "cash_decimal": "1000",
+                "buying_power": 1000.0,
+                "buying_power_decimal": "1000",
+                "paper": True,
+            }
+
+        def get_open_orders(self):
+            return [_order()]
+
+        def get_open_positions(self):
+            return [
+                {
+                    "ticker": "AAA",
+                    "shares": 2.0,
+                    "shares_decimal": "2",
+                    "avg_entry_price": 45.0,
+                    "avg_entry_price_decimal": "45",
+                    "current_price": 50.0,
+                    "current_price_decimal": None,
+                }
+            ]
+
+    snapshot = build_portfolio_snapshot_from_alpaca(
+        broker_session=PartiallyExactSession(),
+        require_execution_coherence=False,
+    )
+
+    position = snapshot.positions[0]
+    assert position.shares_exact == "2"
+    assert position.entry_price_exact == "45"
+    assert position.current_price_exact is None
+    assert position.market_value_exact is None
+    assert snapshot.cash_exact == "1000"
+    assert snapshot.total_equity_exact is None
+    assert snapshot.buying_power_exact == "1000"
+    assert snapshot.has_exact_numerics is False
+    assert snapshot.open_orders == [_order()]
+    assert snapshot.open_orders_available is True
 
 
 @pytest.mark.parametrize("bad_attempts", [True, 0, 6, 1.5])

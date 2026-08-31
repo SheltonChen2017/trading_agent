@@ -17,8 +17,10 @@ import pytest
 
 from research.acer.dataset import (
     DatasetConflictError,
+    ValidatedDatasetIdentity,
     build_identity,
     load_identity,
+    load_validated_identity,
     summarize,
     write_dataset,
 )
@@ -425,6 +427,26 @@ def test_writing_the_same_dataset_twice_is_idempotent(tmp_path):
     second = write_dataset(events, refusals, tmp_path, **kwargs)
     assert first == second
     assert load_identity(tmp_path / first["dataset_id"]) == first
+    typed = load_validated_identity(tmp_path / first["dataset_id"])
+    assert type(typed) is ValidatedDatasetIdentity
+    assert typed.to_record() == first
+
+
+def test_typed_dataset_identity_rejects_unknown_safety_shaped_fields(tmp_path):
+    events, refusals = normalize_rows([_row()])
+    identity = write_dataset(
+        events,
+        refusals,
+        tmp_path,
+        source_snapshot_name="snap",
+        source_manifest_sha256="0" * 64,
+    )
+    target = tmp_path / identity["dataset_id"] / "dataset.json"
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload["v2_ready"] = True
+    target.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(DatasetConflictError, match="unknown fields"):
+        load_validated_identity(tmp_path / identity["dataset_id"])
 
 
 def test_a_tampered_dataset_file_refuses_to_load(tmp_path):

@@ -22,9 +22,9 @@ from __future__ import annotations
 import dataclasses
 import re
 from datetime import datetime
-from decimal import Decimal, InvalidOperation
 from typing import Any, Sequence
 
+from data.financial_primitives import decimal_text
 from data.hashing import hash_payload
 
 PROMPT_VERSION = "filing_extraction.v1"
@@ -240,12 +240,9 @@ def _normalize_number(token: str) -> str:
     if match is None:
         return compact
     try:
-        number = Decimal(match.group("number"))
-    except InvalidOperation:
+        canonical_number = decimal_text(match.group("number"))
+    except ValueError:
         return compact
-    canonical_number = format(number.normalize(), "f")
-    if canonical_number == "-0":
-        canonical_number = "0"
     return f"{match.group('currency') or ''}{canonical_number}{match.group('unit') or ''}"
 
 

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import sqlite3
-from decimal import Decimal
+from decimal import Decimal, localcontext
 
 import pytest
 
@@ -70,6 +70,47 @@ def test_daily_reservation_accepts_exact_float_boundary(tmp_path):
             max_daily_notional="0.3",
             max_daily_orders=10,
         )
+
+
+def test_daily_reservation_refuses_exact_overage_under_low_ambient_precision(
+    tmp_path,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    _save_budget_proposal(store, "p-over")
+
+    with localcontext() as context:
+        context.prec = 3
+        with pytest.raises(ValueError, match="Daily submitted notional"):
+            store.reserve_execution_budget(
+                "p-over",
+                trading_day="2026-07-30",
+                notional="12.1401",
+                max_daily_notional="12.12",
+                max_daily_orders=10,
+            )
+
+    usage = store.get_execution_budget_usage("2026-07-30")
+    assert usage["submitted_order_count"] == 0
+    assert usage["submitted_notional_decimal"] == "0"
+
+
+def test_budget_usage_sum_ignores_lowered_ambient_decimal_precision(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    for proposal_id, notional in (("p-1", "12.1401"), ("p-2", "0.0009")):
+        _save_budget_proposal(store, proposal_id)
+        store.reserve_execution_budget(
+            proposal_id,
+            trading_day="2026-07-30",
+            notional=notional,
+            max_daily_notional="100",
+            max_daily_orders=10,
+        )
+
+    with localcontext() as context:
+        context.prec = 3
+        usage = store.get_execution_budget_usage("2026-07-30")
+
+    assert usage["submitted_notional_decimal"] == "12.141"
 
 
 def test_legacy_real_reservations_are_backfilled_to_exact_text(tmp_path):

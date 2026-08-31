@@ -55,7 +55,7 @@ def seeded_history():
         # The session database is shared by every UI test in this process:
         # leaking an approvable "proposed" row would surface an approval
         # card inside unrelated Propose & Approve tests.
-        with store._connect() as connection:
+        with store._connect_writable() as connection:
             connection.execute(
                 "DELETE FROM trade_proposals WHERE proposal_id IN "
                 f"({','.join('?' for _ in _SEEDS)})",
@@ -187,7 +187,7 @@ def test_outcome_filter_applies_before_the_history_row_limit(seeded_history):
         assert not app.exception
         assert "ui2b-filled" in _seeded_ids(_proposal_rows(app))
     finally:
-        with seeded_history._connect() as connection:
+        with seeded_history._connect_writable() as connection:
             connection.execute(
                 "DELETE FROM trade_proposals WHERE proposal_id IN "
                 f"({','.join('?' for _ in extra_ids)})",

@@ -2233,3 +2233,22 @@ independently accepted pushed snapshot. No remote ref was moved and no push,
 provider/outcome access, QuantConnect action, deployment, broker action,
 order, or trading authority occurred. A later push still requires separate
 owner authorization and a fresh exact remote-tip check.
+
+### 2026-08-31 owner push authorization
+
+After Codex reported the exact clean local head
+`449999d5556a67a0879aaf88a44b269d1ebac18d`, confirmed that both local-only
+commits remain unchanged ancestors, and stated that nothing had been pushed,
+the owner explicitly instructed `push`. This authorizes one push of the
+completed reviewed main-sync range plus this required authorization record to
+the existing long-lived Short Interest lane. It does not authorize another
+implementation milestone or any provider, outcome, QuantConnect, deployment,
+broker, order, or trading action.
+
+The resolved code tree passed **5,947 tests with 2 skips and 0 failures**;
+focused Short Interest validation passed **219 tests**, and the post-
+application active-document/import-boundary gate passed **76 tests**. Before
+the push, Codex must re-fetch, require exact `origin/main@1a5264e` and pushed
+lane head `f3d1906` to remain ancestors of the clean local head, commit this
+record, and push only this one lane branch. The exact pushed snapshot then
+requires independent review before any later Short Interest milestone.

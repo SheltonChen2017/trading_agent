@@ -12,7 +12,9 @@ ACCEPTED AFTER INDEPENDENT CLAUDE REVIEW AND CODEX COUNTER-REVIEW CORRECTION
 (SECTIONS 7-8). THE OWNER-AUTHORIZED OUTCOME-FREE, CONTENT-ADDRESSED
 FOLD-MANIFEST-ONLY STRUCTURAL CANDIDATE (ARV2-4B) IS ACCEPTED AFTER
 INDEPENDENT CLAUDE REVIEW AND CODEX COUNTER-REVIEW CORRECTION (SECTIONS
-9-11). THE NEXT BOUNDED OUTCOME-FREE DEFINITION MILESTONE REQUIRES THE
+9-11). A COMPLETE INDEPENDENT WHOLE-LANE RE-REVIEW (SECTION 13) ACCEPTED
+THE CUMULATIVE TREE AFTER CORRECTING THREE P2 FAIL-OPEN/CONSISTENCY
+DEFECTS; CODEX COUNTER-REVIEW OF THAT REVIEW IS NEXT. THE NEXT BOUNDED OUTCOME-FREE DEFINITION MILESTONE REQUIRES THE
 OWNER CHOICE RECORDED IN SECTIONS 4 AND 11. THE ARV2-4 EVALUATION AND EVERY
 DATA, OUTCOME,
 UPLOAD, COMPILE, QC-RUN, PAPER, OR FUNDED ACTION REMAIN BLOCKED BY THE
@@ -2593,3 +2595,213 @@ executed no product assertions. The successful run used the repository's
 existing sibling-worktree virtual environment with an explicit writable
 base-temp directory. No broader code suite or compile step was warranted for
 unchanged code. No research look or development evaluation was consumed.
+
+## 13. Complete independent whole-lane re-review, 2026-09-01
+
+**Scope:** the entire Analyst Revisions V2 lane, superseding the milestone-only
+reviews in sections 4L-12. Every prior acceptance, count, hash, and recorded
+correction was treated as a claim to verify, not evidence to trust.
+
+**Review base / head:** lane parallel baseline
+`c9dcdb647914acbfcefce187a138f52fcdad0c68` (parent
+`6156ef9b92737c9b390a96d286b0fbde4ff4b19c`) through the exact fetched pushed
+head `e4d7f4396e9d8fe7b601339f53f587bed1d63d6a`
+(`origin/codex/strategy-analyst-revisions-v2`). The remote did not move during
+the review. The two commits after the last milestone review, `9f8377cf`
+(Codex counter-review of ARV2-4B) and `e4d7f439` (Codex advisory
+counter-review of the ARV2-4C proposal), are now part of the reviewed
+snapshot.
+
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, **3 P2 corrected**,
+4 P3 corrected, and 10 findings documented and deliberately not fixed (2 P2,
+8 P3). **Zero research looks and zero development evaluations.** No provider,
+credential, licensed row, price, return, outcome, broker, operator-database,
+QuantConnect, upload, scheduler, order, UI or Streamlit access occurred at any
+point in the review, and none was reachable: every production authority is
+empty or zero-access and every action capability is literal false.
+
+**Lane quality rating: 8.5/10.** The fail-closed architecture is genuinely
+strong - content-addressed everything, out-of-band weakref authority
+registries, exact Decimal/Fraction arithmetic, exhaustive refusal taxonomies,
+and a real transitive import firewall. Points off for three latent
+fail-open/consistency defects that had passed nine prior review rounds
+(a whole-census ingest crash, an unenforced "read-only" git boundary, and an
+evadable dynamic-import walker), and for a large block of dormant ETF/portfolio
+arithmetic that is verified-correct but has no behavioral regression net for
+the day its zero-access gate is lifted.
+
+### 13.1 Method
+
+Six independent audit lenses read every file under
+`research/analyst_revisions_v2/` and `tests/analyst_revisions_v2/` line by
+line, plus the shared-boundary dependencies, and executed forge, GC-id-reuse,
+NaN, timing, and arithmetic probes against the exact committed bytes. I
+personally re-derived every authority hash, the PDF hash, the full
+PDF-to-code deviation table, and each material finding before correcting it,
+and mutation-verified every correction red then green. The PDF SHA-256 is
+`eae7b995...c616193` (matches the governing record; 271,570 bytes, 57 pages
+read in full via `pdftotext`).
+
+### 13.2 Commit-disposition table
+
+The lane history from the baseline to the review head contains **51 commits
+that touch Analyst V2 implementation, specification, test, or lane-record
+paths** (the ordinary two-dot count to `main` is larger only because the two
+`main`-sync merges import unrelated commits; those are excluded here as
+imported, not lane work). Four commits are **exact patch-id duplicates** of
+earlier lane commits, re-applied during the 2026-08-26/27 shared-remediation
+synchronization; each is confirmed byte-identical via `git patch-id --stable`.
+The reviewed disposition of every commit is **accepted or accepted-after-
+correction**; the per-milestone corrections are recorded in sections 4L-12 and
+the three additional lane-wide corrections below apply to the cumulative tree.
+
+| Commit range | Milestone | Disposition | Where reviewed |
+|---|---|---|---|
+| `e13baa1`, `ee17967`, `905c781` + patch-id twins `49fe8e8`/`130af4c`/`7029acb` | Fail-closed authority layer + remediation sync (duplicate pair) | Accepted | 4A-4B; twins verified patch-identical |
+| `66168ed` + twin `653a9c0`, `d8d0ad6`, `c167574`, `5a5c7ab`, `bd3393d`, `7f493d1`, `c83782d` | Decimal-contract hardening, portfolio-rounding sync, remediation review/counter-review | Accepted | 4A-4B; twin patch-identical |
+| `b912459`, `1507777`, `31c313e` | ARV2-0 owner-decision freeze + review/counter-review | Accepted | 4C-4D |
+| `6f23244`, `31a2b64`, `0fb7998` | ARV2-1 ingest/ontology + review/counter-review | Accepted | 4E-4G |
+| `56d6fe0`, `f592334`, `a597ac3` | ARV2-2 PIT identity + review/counter-review | Accepted after correction | 4H-4J |
+| `8701880`, `6e8edab`, `12157dd`, `9309de3` | ARV2-3 stock scoring + review/counter-review | Accepted after correction | 4K-4M |
+| `f724bf9`, `39104f6`, `f2c15d8`, `e53ba26` | ARV2-3Q QC-first + review/counter-review | Accepted after correction | 4N-4P, 8 |
+| `c334571`, `37dc424`, `33d40f1`, `3aedfff`, `c16f7f4` | ARV2-4A prerequisites + review/counter-review/records | Accepted after correction | 4Q-4S |
+| `4ef736b`, `d9de03d`, `43224495`, `7a7757a`, `d9b05eb`, `64ccf25`, `ef1a525` | Two `main`-sync merges + conflict-review records | Accepted | 6, 7 |
+| `c09d8e4`, `a961230` | ARV2-4A/sync review + counter-review | Accepted | 7, 8 |
+| `a6887004`, `12b9e61`, `0052df9`, `ba4b3bc9`, `9f8377cf` | ARV2-4B fold manifest + review/counter-review | Accepted after correction | 9-11; 13.4 below |
+| `e4d7f439` | ARV2-4C proposal advisory counter-review | Accepted | 12; record-only |
+
+### 13.3 Authority chain, recomputed independently
+
+Every hash in the chain PDF -> QC-first plan -> stock-evaluation spec ->
+fold manifest was recomputed from the committed bytes without using the
+production serializer as the oracle, and every one matched:
+
+- QC-first plan `arv2-qc-first-plan-36e455e72b8750fe` - content hash and
+  content-derived id both exact.
+- Stock-evaluation spec `arv2-stock-historical-c5ff2a6a0dcf341e` - content
+  hash exact; its `history_definition` section hash exact; its
+  `fold_manifest_sha256` is **null**, so the lineage is acyclic.
+- Fold manifest `arv2-stock-folds-1002155dbe8e3e87` - content hash exact; both
+  parent artifact-byte pins (`8339238d...`, `34d1e715...`) match the committed
+  parent bytes.
+- Round-0 predecessor `arv2-round0-candidate-8d13a0a4577df322` - exact.
+- All committed registries (`firm_ontology`, `security_master`,
+  `research_source_authority`, and the rest) are **LF-only and empty**; every
+  external binding is null and every capability literal false. Forge probes
+  (pickle, subclass, `object.__new__`, deepcopy, caller-supplied hash,
+  in-place mutation, GC id-reuse over 200k attempts) were all refused, and
+  every authority-registry access sits under its `RLock`.
+
+### 13.4 The ARV2-4B counter-review (`9f8377cf`), independently verified
+
+`9f8377cf` was not covered by any prior section. It **strengthened** every
+guard it touched: it normalized a raw `OSError` on QC-plan disappearance into
+the typed `StockEvaluationContractError` refusal, and it rewrote my
+`0052df9` in-load TOCTOU regression from two mutation targets to a three-way
+parametrization (QC parent, stock parent, and now the manifest itself). I
+confirmed from the code that each parametrized case remains caught
+**exclusively** by its corresponding final `_revalidate` line, so the
+strengthened test is still fully sensitive to deleting that trio. No guard or
+test was weakened. Accepted.
+
+### 13.5 Corrections (this review)
+
+All seven are inside `research/analyst_revisions_v2/` or its tests; no other
+lane, shared execution/assistant/risk path, or frozen document was touched.
+
+| ID | Pri | Status | Location | Issue and impact | Correction | Verification |
+|---|---|---|---|---|---|---|
+| ARV2WL-001 | **P2** | **Corrected** | `ratings_ingest.py` `_parse_source_row` | The per-row provider-field length screen used 2048 (8192 for `notes`) while `BenzingaRatingRecord.__post_init__` re-checks the same text at the canonical 256-char bound. A firm/analyst/rating/target value of 257-2048 characters therefore passed per-row screening and then raised a `CanonicalEvidenceError` during record construction **outside** the `_RowRefusal` handler, halting the entire snapshot census - one malformed provider row denies the whole ingest. This violates the lane's own "exactly one accepted row or named refusal per source row" contract. Fail-closed (no leak), hence P2 not P1. | Bounded the five affected parse sites (`firm`, `analyst`, `rating`, `previous_rating`, `price_target_action`) at 256 to match the record contract, so an over-long value becomes one `INVALID_PROVIDER_FIELD` refusal. | Added `overlong_firm`/`overlong_rating` cases to the one-named-refusal-per-defect battery; both **red** on the unbounded screen (whole-audit crash), green after. |
+| ARV2WL-002 | **P2** | **Corrected** | `dataset.py` `read_git_text`/`read_git_bytes` | The helpers' docstrings claim "read-only Git query" but nothing enforced it: caller-controlled `arguments` flowed straight into `subprocess.run(["git","-C",root,*arguments])`, so a caller could reach mutating subcommands (`push`, `update-ref`) or inject configuration/executables via `-c alias.x=!cmd` or `--exec-path`. Every current in-repo caller uses fixed read-only subcommands, so this is a latent boundary-not-enforced-by-code defect, exactly the "comments claiming guarantees not enforced by code" hazard CLAUDE.md forbids. | Added a six-member read-only subcommand allowlist (`cat-file`, `ls-files`, `merge-base`, `rev-parse`, `show`, `status`) enforced at both runners; the first token must be an allowlisted subcommand, which also blocks global-option injection because Git parses those only before the subcommand. | New regression drives `push`/`update-ref`/`-c alias`/`gc`/empty; all **red** before (they ran), refused after. Every existing git-dependent battery (security master, preregistration, dataset) still green. |
+| ARV2WL-003 | **P2** | **Corrected** | `import_firewall.py` dynamic-import walker | The transitive-closure walker detected only the two friendly dynamic-import spellings (`importlib.import_module`, bare `__import__`). It was evadable six ways proven by execution: `builtins.__import__(...)`, a rebound `il = importlib`, `getattr(importlib,'import_module')(...)`, `getattr`-result assigned to a variable, and the builtins equivalents. A future execution-capable module could reach `execution`/`requests`/`socket` through any of these while the closure reported clean - a false green on the very evasion the walker's docstring claims to stop. No current module uses any dynamic import, so latent. | Hardened the walker: track `builtins` aliases and `__import__` attribute access; detect `getattr(<importlib|builtins>, "import_module"|"__import__")` both as a direct call and when its result is assigned to a variable; and follow simple rebinding of the import machinery to a local name. | Added all six evasion forms to `test_dynamic_imports_cannot_bypass_the_firewall`; all **red** before the fix, all refused after; reverting the walker reddens four. The 30-module closure is unchanged and still reaches no execution/ML/network/legacy-ACER root. |
+| ARV2WL-004 | P3 | **Corrected** | `formulas.py` `NUMERICAL_ZERO` | The single 1e-18 use site (the inverse-Herfindahl 0/0 guard in `effective_contributors`) had its boundary untested; the nearest test probed only 1e-12, so the threshold could be widened anywhere below that - a genuine hidden epsilon - with the suite green. | Pinned the exact inclusive boundary: at 1e-18 -> 0, just above -> counts, and the gate is on the summed mass not per-value. | New regression passes; matches my own probe. |
+| ARV2WL-005 | P3 | **Corrected** | `stock_signal.py` `_stable_sum` | A verbatim second copy of `formulas._stable_decimal_sum` (the authoritative permutation-invariance rule for raw-score summation); two copies can drift (CLAUDE.md consolidation rule). | Delegated `_stable_sum` to the formulas module. | Full stock-signal file (58 tests) green after consolidation. |
+| ARV2WL-006 | P3 | **Corrected** | `test_stock_evaluation_and_controls.py` | The ambient-Decimal-context regression covered `build_preopen_control_cross_section` only; a future edit dropping a `localcontext` inside `_solve_ols` or the frozen application would not have been caught. | Added a regression running the full fit + apply pipeline under hostile low/high-precision ambient contexts and asserting identical model and batch hashes. | Passes; inputs are built once under the normal context so only the production path runs under the hostile contexts. |
+| ARV2WL-007 | P3 | **Corrected** | `availability.py` timing guards / `test_analyst_revisions_v2_contracts.py` | Two safety-critical PIT guards were untested: `derive_event_availability`'s "provide exactly one of public_at or public_date" mutual-exclusivity (no test anywhere) and two of the three `prove_timing_order` ordering branches (only `effective>published` was covered). | Added regressions for both-clocks/neither-clock refusal and for the `published>available` and `available>ingested` branches. | All three new cases green; each targets a previously uncovered guard. |
+
+### 13.6 Documented, deliberately not fixed
+
+| ID | Pri | Location | Observation and why not fixed here |
+|---|---|---|---|
+| ARV2WL-D01 | **P2** | `holdings.py`, `costs.py`, `portfolio.py` | **Dormant ETF/portfolio arithmetic has essentially no behavioral test coverage.** `portfolio_transaction_cost`, `mapped_candidate_coverage`, the `weighted_stock_score` success path, `_allocate` (the 20/40/30 caps and water-filling), and `construct_portfolio`'s hysteresis/eviction are all verified correct by independent execution against hand arithmetic, but only their zero-access refusals and low-level parsers are tested in-tree. When the ARV2-5 milestone lifts the zero-access gate (a one-file registry change), this arithmetic goes live with no regression net. Not fixed here because a clean behavioral test requires source-registry-bypass infrastructure that does not exist and would effectively pre-build the ARV2-5 harness - broadening this review. **The ARV2-5 milestone must build that harness and add coverage before any nonempty portfolio can be produced.** |
+| ARV2WL-D02 | **P2** | `docs/Archive/Review/REMEDIATION_2026-08-26_ANALYST_AND_FULL_PROJECT.md:822,925` | The archived remediation record's "Regression evidence" names three tests (`test_weighted_score_requires_loader_authenticated_exact_score_artifact` and two others) that exist in **zero files** in any local ref - I confirmed with a repository-wide search. Partial parser-level analogues exist, but the named weighted-score-level regressions do not. Not fixed because the archived report is frozen history and outside this review's correction scope; flagged for the owner as a record-integrity gap that may be a rename/other-machine-branch artifact. |
+| ARV2WL-D03 | P3 | `holdings.py:703` | The 99% mapped-coverage gate divides `mapped/denominator` (rounding at precision 50) before `coverage >= threshold` rather than comparing exactly. With ~50-significant-digit weights (which `_source_decimal` admits) this fails open by up to ~1e-50. Unreachable with realistic weights and behind the zero-access gate. The exact fix for ARV2-5 is to decide eligibility on `Fraction(mapped)` vs `Fraction(threshold)*Fraction(denominator)`; documented rather than applied unregressed to dormant code. |
+| ARV2WL-D04 | P3 | `portfolio.py:928-968` | An evicted incumbent or a coverage-refused entrant is dropped from the decision with no `ForcedExit`/underfill record, so downstream research must diff `previous_holdings` to reconstruct implied exits. Conflicts with the "record refusals and underfill" discipline; a decision-artifact design point for ARV2-5. |
+| ARV2WL-D05 | P3 | `portfolio.py:716` | `_allocate` uses a local `1e-18` tolerance that also grants a permissive `weight <= cap + 1e-18` slack on the hard caps. Negligible (1e-18 of NAV) but is not a named policy constant and could drift from the policy hash; fold into a named constant at ARV2-5. |
+| ARV2WL-D06 | P2 | `import_firewall.py` | Beyond the dynamic-import evasions closed in ARV2WL-003, the Analyst firewall is a **denylist**: `os.system`, `eval`/`exec` reassignment, and stdlib modules such as `ctypes` are not caught, whereas the Target Price lane's sibling firewall is an allowlist that catches all of them. Closing the import-machinery half was in scope; converting the whole firewall to the allowlist model is a lane-architecture change (it would alter the closure computation) that should be an owner-scheduled consolidation, ideally adopting the Target Price implementation to remove the two-implementation drift. |
+| ARV2WL-D07 | P3 | `ratings_ingest.py:1009` | `FirmRatingNormalizationResult.__post_init__` does not verify `events + refusals == source census` (its `source_audit_sha256` is format-checked only), unlike its sibling result types. The only in-repo consumer revalidates first, so latent; add the census invariant when the ontology production catalog is populated. |
+| ARV2WL-D08 | P3 | `snapshot.py:504` | `load_snapshot` reconciles only the `pages/` inventory; unauthenticated sidecar files elsewhere in the snapshot root are admitted into a `VerifiedSnapshot`. No data flows from them today; tighten to an exact-root inventory like `load_normalized_dataset` when production capture is authorized. |
+| ARV2WL-D09 | P3 | `stock_signal.py:1300`, refusal scopes | Initiation events (`rating_change is None`) and out-of-universe securities are skipped with no refusal/diagnostic record, so an initiation-only stock is presented as `STRUCTURAL_ZERO` (whose contract meaning is "proven no-event"); and per-security sector-classification failures are labeled `RefusalScope.GLOBAL` while data-quality failures use `RefusalScope.SECURITY`. Both are audit-trail/label issues with no correctness impact (the cross-section still fails closed). |
+| ARV2WL-D11 | P3, out of lane | `tests/test_sleeve_report.py:246` | Two three-sleeve-engine (Trading App) tests fail on today's date (2026-09-01): a fixture lot's `days_to_long_term` computes to 0, breaking `assert 0 < days_to_long_term <= 30`. A time-relative fixture with no fixed clock; imports nothing in the Analyst lane and fails identically with this review's changes stashed. Documented per the owner lane-scope rule; belongs to whoever owns the three-sleeve engine. |
+| ARV2WL-D10 | P3 | `stock_evaluation_contract.py:839`, `data/exchange_calendar.py` | The standalone contract loader's canonical-bytes check omits `sort_keys`, so a root-key-reordered file shares one `spec_id` with different bytes (mitigated in the composed path by the manifest's byte pin); and `exchange_calendar.py` has no dedicated behavioral test (DST/half-day opens are pinned only indirectly). Shared/consumer-safety items for a future coordinated change, not lane-blocking. |
+
+### 13.7 Point-in-time, leakage, and refusal-accounting verdict
+
+Verified sound across all lenses and my own probes: the exact-open rule is
+strictly-after (an event published at 09:30 ET is eligible only next session,
+tested at the exact instant); date-only evidence takes the second session
+strictly after, tested across weekends and holidays; the two evidence forms
+are mutually exclusive (now regression-pinned, ARV2WL-007); `session_open_instant`
+is DST-correct (14:30Z EST vs 13:30Z EDT verified at both 2021 transitions);
+pre-2013 rows are quarantined with an exact named refusal that cannot be
+laundered through a later partition; ticker reuse and cross-exchange ambiguity
+refuse rather than first-wins; no current-ticker or successor joins exist;
+future interval-closure knowledge is redacted; and terminal-return
+requirements raise rather than silently omit. The firm normalization formula
+is exactly `2*(rank-1)/(K-1)-1` in `Fraction` arithmetic (verified for K=2,3,5
+including endpoints); the decay, `N_eff/(N_eff+3)*q_data` reliability, the
+1.4826 MAD scale, the `sqrt(C)*min(1,sqrt(N_eff/5))` ETF factor, and the
+conservative-minimum breadth all match hand computation, with `q_data` applied
+exactly once. The event taxonomy is closed - non-change actions can never
+carry a rating change and initiations receive no invented neutral prior. The
+global map is **not implemented** at this head (only null-hash slots in the
+stock spec and the ARV2-4C proposal reviewed in section 12); I did not invent
+or implement it.
+
+### 13.8 Milestone definition-of-done assessment
+
+- **ARV2-0** (owner-decision freeze): satisfied - all eight cells frozen,
+  content-addressed, reviewed.
+- **ARV2-1** (ingest + firm ontology): satisfied for its structural scope;
+  production ontology registry committed empty by design.
+- **ARV2-2** (PIT security identity): satisfied; production security-master
+  registry empty; ARV2WL-D07 is a latent hardening for when it is populated.
+- **ARV2-3 / ARV2-3Q** (stock score + QC-first resequencing): satisfied as
+  outcome-free structural candidates; residualization deliberately blocked.
+- **ARV2-4A** (evaluation prerequisites): satisfied structurally; the control
+  fit/apply path is sound and now more fully ambient-context-pinned.
+- **ARV2-4B** (fold manifest): satisfied; acyclic, content-addressed,
+  strongly fail-closed.
+- **ARV2-4C** (global map): **proposal only, unimplemented and unapproved**
+  (section 12). Later milestones (ETF reverse index, ETF aggregation,
+  walk-forward, QC parity, paper) remain structural or unbuilt.
+
+No milestone claims market edge; every "evidence" is fixture behavior only;
+the sole prospective paper look is unspent; the retired historical look
+refuses as superseded-unspent.
+
+### 13.9 Validation
+
+- Focused, all changed subsystems on the final tree (ratings ingest, dataset/
+  firewall, stock evaluation/controls, stock signal, contracts):
+  **219 passed in 93.70 s**.
+- Complete repository suite on the exact final tree: **2 failed, 6838 passed, 13 skipped, 25 warnings in 1197.08s (0:19:57)** in a pinned base-temp. The only failures are the two out-of-lane
+  `tests/test_sleeve_report.py` cases in ARV2WL-D11 below; every Analyst
+  test passes. Both fail identically with my changes stashed, confirming
+  they are pre-existing and unrelated to this review.
+- Every one of the seven corrections mutation-verified red then green.
+- `compileall` over the Analyst package and tests exit 0; `git diff --check`
+  clean; Python 3.12.13. No frozen or shared document touched; the only changes
+  are four Analyst production modules and four Analyst test files.
+
+### 13.10 Next step
+
+Codex counter-reviews this exact pushed head. The dormant-coverage gap
+(ARV2WL-D01), the denylist-to-allowlist firewall consolidation (ARV2WL-D06),
+and the archived-record integrity gap (ARV2WL-D02) are the three items most
+worth an owner decision; the remaining documented items are hardening notes
+tied to the milestone that first activates each path. ARV2-4C stays
+unapproved pending the corrected proposal (section 12). ARV2-4 execution
+remains blocked on the recorded source, rights, review, run-identity and
+one-use authority gates; every production authority is empty or zero-access
+and every action capability is literal false.

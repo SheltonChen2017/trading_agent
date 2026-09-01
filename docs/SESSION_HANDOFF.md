@@ -503,8 +503,10 @@ TPR-1/TPR-2 structural manifests. `TPR-CR4-002` is closed: the lane worktree
 is resolved from `git worktree list` rather than a pinned path. One target P2,
 `TPR-CCR5-004`, remains open and blocks positive reviewed-algorithm authority
 until the signed-registry-anchor design is implemented and independently
-reviewed; `TPR-CCR2-011` also remains open until the exact trusted signature
-identity is verified. Neither opens TPR-1 or any source/outcome/look gate.
+reviewed; `TPR-CCR2-011` also remains open until reviewer-controlled signing or
+a separately signed review receipt proves the independent reviewer's identity;
+the owner-attestation principal alone cannot close it. Neither opens TPR-1 or
+any source/outcome/look gate.
 Claude reviews the exact Codex range beginning after `8078ce48` once this
 round is pushed.
 

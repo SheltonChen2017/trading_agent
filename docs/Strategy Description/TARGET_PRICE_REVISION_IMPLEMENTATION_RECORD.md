@@ -3,15 +3,20 @@
 Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN THE EXACT
 TWO-COMMIT RANGE `b4e6b88c..8078ce48`. BOTH COMMITS ARE ACCEPTED AFTER
 CORRECTION. FIVE P3 FINDINGS AND THEIR CORRECTIONS ARE RECORDED IN SECTION 25;
-NO P0, P1 OR P2 WAS FOUND. THE OWNER HAS APPROVED THE RECOMMENDED TPR TRUST-ROOT
+NO P0, P1 OR P2 WAS FOUND IN THE CLAUDE RANGE. A PRE-PUSH AUDIT FOUND FOUR
+DESIGN P2S AND TWO P3S IN CODEX COMMIT `DFAEE5DE`; THE CURRENT CORRECTION CLOSES
+ALL SIX BEFORE PUSH. THE OWNER
+HAS APPROVED THE RECOMMENDED TPR TRUST-ROOT
 IDENTITY, EXTERNAL PATH, CUSTODY/ROTATION POLICY, AND NORMAL REVIEWED-CODE
 THREAT MODEL. SECTION 25 FREEZES THE BOUNDED TPR-TR0 DESIGN CANDIDATE FOR
 CLAUDE'S INDEPENDENT REVIEW. NO DEDICATED TPR SIGNING KEY OR EXTERNAL
 ALLOWED-SIGNERS FILE HAS BEEN PROVISIONED, NO SIGNED REGISTRY-ANCHOR COMMIT
 EXISTS, AND THE DESIGN
-GRANTS NO POSITIVE AUTHORITY. `TPR-CCR5-004` AND `TPR-CCR2-011` REMAIN OPEN
-UNTIL THE REVIEWED DESIGN IS IMPLEMENTED, PROVISIONED, AND SATISFIED BY EXACT
-SIGNED ARTIFACTS. THE TPR-0A V2.2 PDF AND CANDIDATE ARTIFACT BYTES ARE
+GRANTS NO POSITIVE AUTHORITY. `TPR-CCR5-004` REMAINS OPEN UNTIL THE REVIEWED
+DESIGN IS IMPLEMENTED, PROVISIONED, AND SATISFIED BY AN EXACT SIGNED REGISTRY
+ANCHOR. `TPR-CCR2-011` SEPARATELY REMAINS OPEN UNTIL REVIEWER-CONTROLLED SIGNING
+OR A SEPARATELY SIGNED REVIEW RECEIPT PROVES THE INDEPENDENT REVIEWER'S
+IDENTITY. THE TPR-0A V2.2 PDF AND CANDIDATE ARTIFACT BYTES ARE
 UNCHANGED; THE REVIEWED-SPEC REGISTRY REMAINS EMPTY, THE CANDIDATE REMAINS
 UNREVIEWED FOR ITS OWN REGISTRY, AND NO POSITIVE ALGORITHM AUTHORITY EXISTS.
 NO IMPLEMENTATION OR PROVISIONING MILESTONE IS AUTHORIZED BEYOND THIS DESIGN
@@ -372,9 +377,9 @@ and artifact SHA-256
 
 The TPR-0A snapshot remains a zero-access frozen candidate. The reviewed-spec
 registry remains empty, the candidate is unreviewed for its own registry, and
-`TPR-CCR2-011` still requires the separately controlled signed registry-anchor
-commit described in section 25 before positive authority can rely on reviewer
-identity. One pre-existing
+`TPR-CCR2-011` still requires reviewer-controlled signing or a separately
+signed review receipt before positive authority can rely on reviewer identity;
+the owner-attestation anchor in section 25 does not close it. One pre-existing
 target P2, `TPR-CCR5-004`, remains open: the runtime policy-path inventory can
 remove its own defining file and another policy path while a matching registry
 map still passes. The registry is empty today, so this mints no present
@@ -523,7 +528,7 @@ known.
 | 2026-08-31 | Claude validation | `0e911189` -> `0e911189` (exact tested tree; this validation-record commit follows) | v2.2 review round final validation | Revalidated the complete synchronized tree after the review corrections and the new guard. No product file changed during the run, and all work stayed inside the single named lane worktree. | Complete suite: **6,791 passed, 13 skipped, 0 failed, 25 warnings in 4,093.39s**. Reconciles exactly against the 6,789/13/1 baseline: 6,803 collected before and 6,804 after, with passed rising by two — the repaired analyst checkout guard plus this round's one new guard — and skips unchanged. Lane and shared documentation suites **191 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, QuantConnect, broker, scheduler, paper or live access; **0 research looks**. | No new finding. `TPR-CR5-001` remains closed; `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. |
 | 2026-08-31 | Claude review | `cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a` -> `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review round; no milestone in range | Reviewed both pushed commits individually. Accepted all six counter-review findings against the prior Claude round, three of them repeats of classes already corrected. Verified the guard rework is stronger and that all seven new extractors fail closed. Advanced every current-state pointer to this round and corrected a stale present-tense synchronization claim. Did not re-sync to `main`: a fast-forward is no longer possible and a merge was not requested. | Baseline on the exact pushed tree `b4e6b88c`: **6,791 passed, 13 skipped, 0 failed, 25 warnings in 1,386.58s**, reproducing the recorded 6,791/13/0; the recorded 26-warning count is not reconciled. Final complete run recorded separately. Lane and shared documentation suites **192 passed, 3 skipped**. Two mutations on the new sync guard each turned it red with text-identical restore. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | Both commits accepted. No P0/P1/P2 in range; one P3 (`TPR-CR6-001`) found in the cumulative tree and closed. Counter-reviewed round quality **8/10**. `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. Details in section 24. | None; all source, outcome, look, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. No milestone is authorized; the lane also remains 2 commits behind `origin/main`. |
 | 2026-08-31 | Claude validation | `433b2679` -> `433b2679` (exact tested tree; this validation-record commit follows) | Counter-review round final validation | Revalidated the complete tree after the review corrections and the new conditional sync guard. No product file changed during the run, and all work stayed inside the single named lane worktree. | Complete suite: **6,792 passed, 13 skipped, 0 failed, 25 warnings in 1,178.99s** — the 6,791 baseline plus exactly the one added guard, skips unchanged. Lane and shared documentation suites **192 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, QuantConnect, broker, scheduler, paper or live access; **0 research looks**. | No new finding. `TPR-CR6-001` remains closed; `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. The lane remains 2 commits behind `origin/main` and can no longer fast-forward. |
-| 2026-08-31 | Codex counter-review + TPR-TR0 design freeze | `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` -> current correction candidate | Counter-review two Claude commits; freeze only the owner-approved signed-registry-anchor design | Accepted `433b2679` and `8078ce48` after correction. Closed five P3 document/guard findings and froze exact principal, external allowed-signers path, signed registry-anchor lineage, custody/rotation policy, and normal reviewed-code threat model for independent review. No runtime trust verifier or authority artifact was implemented. | Fetched local/remote head `8078ce48`; red regression proved the stale current topology. Exact focused/final validation is recorded in section 25 after the correction commit receives an identity. No dedicated TPR signing key, external trust file, signature, provider row, outcome, QC surface, broker surface, or order was created; **0 research looks**. | No P0/P1/P2. `TPR-CCR7-001` through `005` closed by correction/verification. `TPR-CCR5-004` and `TPR-CCR2-011` remain open pending reviewed implementation and a trusted signed registry anchor. | None. TPR-TR0 is a non-authorizing design candidate. | Commit and validate the exact correction tree, append its identity/evidence, make one push, then Claude independently reviews the Codex range beginning after `8078ce48`. |
+| 2026-08-31 | Codex counter-review + TPR-TR0 design freeze | `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` -> current correction candidate | Counter-review two Claude commits; freeze only the owner-approved signed-registry-anchor design | Accepted `433b2679` and `8078ce48` after correction. Closed five P3 document/guard findings and froze exact principal, external allowed-signers path, signed registry-anchor lineage, custody/rotation policy, and normal reviewed-code threat model for independent review. A pre-push audit found four design P2s and two P3s in first Codex commit `dfaee5de`; the current correction closes all six. No runtime trust verifier or authority artifact was implemented. | Fetched local/remote head `8078ce48`; red regression proved the stale current topology. Exact focused/final validation is recorded in section 25 after the correction commit receives an identity. No dedicated TPR signing key, external trust file, signature, provider row, outcome, QC surface, broker surface, or order was created; **0 research looks**. | No P0/P1/P2 in the Claude range. `TPR-CCR7-001` through `011` closed by correction/verification. `TPR-CCR5-004` remains open pending reviewed implementation and a trusted signed registry anchor; `TPR-CCR2-011` separately remains open pending reviewer-controlled signing or a signed review receipt. | None. TPR-TR0 is a non-authorizing design candidate. | Commit and validate the exact correction tree, append its identity/evidence, make one push, then Claude independently reviews the Codex range beginning after `8078ce48`. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -2004,20 +2009,95 @@ mint authority.
 
 | Design field | Frozen candidate |
 |---|---|
-| Signer principal | `shelton-tpr-reviewer`. It is an owner-controlled attestation principal; the name alone does not prove that Claude controls the key or that an independent review occurred. |
+| Signer principal | `shelton-tpr-reviewer`. It is an owner-controlled **approval/registry-attestation** principal. It authenticates owner approval of the anchor; it does not prove that Claude controls the key or performed the independent review and therefore cannot by itself close `TPR-CCR2-011`. |
 | Key type | Dedicated Ed25519 OpenSSH signing key, generated outside every repository/worktree. The private key must be passphrase-protected, owner-controlled, and available only to owner-interactive Git signing - never to the runtime, CI, Codex, fixtures, or logs. No private-key bytes, passphrase, or secret locator may enter repository evidence. |
 | External trust file | Exact Windows path `C:\ProgramData\CustomizedAgent\trust\tpr_allowed_signers`; no environment, CLI, repository, or caller override. It is machine-local and is never copied through Git. |
 | Signature namespace | Exactly OpenSSH/Git namespace `git`. Namespace substitution refuses. The allowed-signers line names only `shelton-tpr-reviewer`, constrains the namespace to `git`, and uses an `ssh-ed25519` public key. |
 | Signed trust object | The trust object is the **registry-anchor Git commit**, not a detached repository manifest and not the earlier `review_commit`. It is derived as the last commit that changed exact path `research/target_price_revisions/specs/reviewed_spec_registry.json`, avoiding a self-referential commit hash inside that registry. |
-| Commit lineage | `producing_commit` -> independent `review_commit` -> signed registry-anchor commit -> optional later documentation-only descendants. The registry anchor must be a strict descendant of `review_commit`, an ancestor of `HEAD`, a normal commit, and the source of registry bytes identical to `HEAD` and the working file. |
+| Commit lineage | `producing_commit` -> independent `review_commit` -> signed registry-anchor commit -> optional later documentation-only descendants. The repository must be non-shallow with local complete history and lazy object fetching disabled. The registry anchor must be a strict descendant of `review_commit`, an ancestor of `HEAD`, a single-parent non-merge commit, and the source of registry bytes identical to `HEAD` and the working file. Its parent and anchor registry bytes must differ, proving that the derived anchor actually changed the registry. |
 | Registry v2 policy | A future still-empty v2 registry freezes non-secret signature format `ssh`, namespace `git`, principal `shelton-tpr-reviewer`, key type `ssh-ed25519`, and an external-path identifier for the exact allowed-signers location. No registry entry is added by this design round. |
 | Runtime verification | Before reading any positive registry entry, run Git with `--no-replace-objects` and command-scoped `gpg.format=ssh`, `gpg.ssh.allowedSignersFile`, `gpg.ssh.program=C:/Windows/System32/OpenSSH/ssh-keygen.exe`, and `gpg.minTrustLevel=fully`. Require signature status `G`, trust `fully`, exact principal `shelton-tpr-reviewer`, and an Ed25519 fingerprint present in the validated external file. Repository Git configuration, author/committer names, email, messages, and trailers are never identity evidence. |
 | Policy inventory binding | The exact policy-path set remains independently frozen in tests and must equal the registry map in the signed registry-anchor commit. Hash policy/spec blobs from that signed commit, not merely from the earlier `review_commit`; require those signed-anchor, `HEAD`, and working bytes to match. The verifier itself joins the policy-path set. A missing tool/file, malformed or duplicate signer entry, symlink/junction, bad signature/trust/principal/key type, ancestry failure, set mismatch, or byte/hash mismatch refuses. There is no repository trust-file fallback or path override. |
 | Persisted lineage | A successfully loaded reviewed algorithm must retain the registry-anchor commit and signing-key SHA-256 fingerprint in its authenticated fingerprint. Reload must reproduce both before any downstream gate can inspect it. |
-| Custody and ACL | The owner, `SYSTEM`, and Windows Administrators are the only writers; the runtime receives read-only access to the allowed-signers file. The trust directory/file and parent chain must be canonical non-reparse paths, and write-capable ACLs outside that set refuse. The private key remains owner-only and passphrase-protected. ACL verification and non-sensitive fingerprints/hashes are recorded, never secret content. |
-| Rotation/revocation | Add the replacement public key with explicit validity bounds, record old/new SHA-256 fingerprints and approval date, sign and verify the next registry-anchor commit under the new key, then retire the old key with a historical `valid-before` bound. No silent replacement or grandfathering after compromise; positive authority remains blocked until re-review and re-anchoring. |
+| Custody and ACL | The directory/file owner is `BUILTIN\Administrators` (`S-1-5-32-544`) and each DACL is protected from inheritance. `SYSTEM` (`S-1-5-18`) and Administrators have full control; `BUILTIN\Users` (`S-1-5-32-545`) has read/execute only; no other ACE exists. Only SYSTEM/Administrators may write, delete, take ownership, or change ACLs; owner provisioning occurs through an elevated administrator context, never a non-admin owner ACE. The canonical trust path and parent chain must be non-reparse paths, and any other write/owner/ACL-control path refuses. The private key remains owner-only and passphrase-protected. ACL evidence records only non-sensitive SIDs, rights, fingerprints, and hashes. |
+| Rotation/revocation | Runtime steady state contains exactly one trusted key. For routine rotation, prepare the replacement outside runtime trust, record old/new SHA-256 fingerprints and approval date, sign the next registry anchor under the new key, block positive authority, atomically replace the one-line runtime signer file with the new one-line file, and verify before restoration. For suspected compromise, remove the signer file immediately, remain blocked, require re-review where integrity is uncertain, and install/re-anchor under a new key before restoration. Old keys/fingerprints may remain only in non-runtime audit evidence; runtime trust never retains a compromised key or relies on backdatable `valid-before` history. |
 | Threat model | Normal reviewed-code model: the host OS, administrators, Python runtime, OpenSSH executable, and dependencies are trusted. The boundary protects against unauthorized repository changes and self-mutable inventory/registry substitution. A compromised host/runtime is out of scope and would require a separate pre-import verifier outside the repository. |
 | Cross-host rule | Every host must receive the externally custodied allowed-signers file and ACL independently. Missing local provisioning is `UNAUTHORIZED`, never a reason to trust a repository copy. |
+
+#### 25.3.1 Exact non-secret file and command contract
+
+The allowed-signers file has exactly one LF-terminated, comment-free line in
+every authorized runtime steady state. Rotation occurs only while authority is
+blocked and replaces that file atomically; a multi-key runtime file refuses.
+`<BASE64_PUBLIC_KEY>` is a design placeholder and must be replaced
+by the public half of the dedicated key before the file can exist:
+
+```text
+shelton-tpr-reviewer namespaces="git" ssh-ed25519 <BASE64_PUBLIC_KEY>
+```
+
+The future verifier invokes Git directly with an argument vector, never through
+a shell, from a canonical repository root. It constructs a scrubbed environment
+that rejects caller-controlled `GIT_CONFIG*`, object-directory, alternate-object,
+replacement-ref, worktree, and repository overrides and sets
+`GIT_NO_LAZY_FETCH=1`. These are the literal
+logical commands; `<ROOT>` and `<ANCHOR>` are validated absolute-root and
+40-lowercase-hex arguments, not interpolated shell text:
+
+```text
+git -C <ROOT> rev-parse --is-shallow-repository
+git -C <ROOT> --no-replace-objects log -1 --format=%H -- research/target_price_revisions/specs/reviewed_spec_registry.json
+git -C <ROOT> --no-replace-objects rev-list --parents -n 1 <ANCHOR>
+git -C <ROOT> --no-replace-objects diff-tree --no-commit-id --name-only -r <ANCHOR>^ <ANCHOR>
+git -C <ROOT> --no-replace-objects show <ANCHOR>^:research/target_price_revisions/specs/reviewed_spec_registry.json
+git -C <ROOT> --no-replace-objects show <ANCHOR>:research/target_price_revisions/specs/reviewed_spec_registry.json
+git -C <ROOT> --no-replace-objects -c gpg.format=ssh -c gpg.ssh.allowedSignersFile=C:/ProgramData/CustomizedAgent/trust/tpr_allowed_signers -c gpg.ssh.program=C:/Windows/System32/OpenSSH/ssh-keygen.exe -c gpg.minTrustLevel=fully verify-commit --raw <ANCHOR>
+git -C <ROOT> --no-replace-objects -c gpg.format=ssh -c gpg.ssh.allowedSignersFile=C:/ProgramData/CustomizedAgent/trust/tpr_allowed_signers -c gpg.ssh.program=C:/Windows/System32/OpenSSH/ssh-keygen.exe -c gpg.minTrustLevel=fully show -s --format=%G?%x00%GT%x00%GS%x00%GK%x00%GF <ANCHOR>
+```
+
+The shallow-repository probe must return exactly `false`. Anchor derivation must
+return exactly one lowercase 40-hex object name; `rev-list` must return exactly
+that anchor plus one parent; `diff-tree` must return exactly the registry path;
+and the two direct blob reads must be unequal. The
+verification command must exit zero. The NUL-delimited status record must have
+exactly five nonempty fields: `G`, `fully`, `shelton-tpr-reviewer`, the signing
+key identifier, and its `SHA256:` fingerprint. The identifier/fingerprint must
+normalize to the same Ed25519 public key in the already ACL-validated external
+file. Any extra/missing output, warning, fallback, ambiguous signer line, or
+unrecognized trust value refuses before the registry is parsed.
+
+The signed Git commit is deliberately preferred over a detached manifest. A
+commit signature binds Git's canonical commit object, including its exact tree
+and parent lineage, so ancestry and registry bytes share one object identity.
+A separately signed detached inventory could also avoid self-reference, but it
+would add a second canonicalization, lookup, rollback, pairing, and lifecycle
+surface. The signed-commit design is selected because Git already supplies the
+canonical object and ancestry machinery this repository uses.
+
+#### 25.3.2 Required implementation test matrix
+
+The later implementation is incomplete unless it covers at least: valid anchor;
+missing/unreadable/malformed/duplicate external signer file; repository fallback
+or path/config/environment override; wrong namespace, principal, key type,
+fingerprint, trust, or signature; unsigned/replaced/non-commit anchor; anchor not
+a strict descendant of `review_commit` or not an ancestor of `HEAD`; registry or
+policy bytes differing among anchor, `HEAD`, and worktree; missing/extra policy
+path including omission of the verifier; shallow/incomplete history, lazy-fetch
+dependency, merge anchor, unchanged parent/anchor registry bytes;
+symlink/junction or unsafe ACL anywhere
+in the trust-path chain; malformed/extra Git status output; routine rotation;
+immediate compromised-key removal and refusal; and an unprovisioned second host.
+
+#### 25.3.3 Pre-push design-audit dispositions
+
+| ID | Priority | Status | First seen | Finding | Correction |
+|---|---|---|---|---|---|
+| `TPR-CCR7-006` | P2 | **Closed before push** | `dfaee5de` | Allowing an unspecified owner ACE could give a non-admin account write or ACL-control authority over the trust root. | The protected-DACL rule now permits only `SYSTEM` and `BUILTIN\Administrators`; owner provisioning requires elevation. |
+| `TPR-CCR7-007` | P2 | **Closed before push** | `dfaee5de` | Retaining a compromised key behind `valid-before` permits a signer-controlled historical timestamp to be backdated. | Runtime trust removes a compromised key immediately and remains blocked until re-review/re-anchoring; old material is audit-only. |
+| `TPR-CCR7-008` | P2 | **Closed before push** | `dfaee5de` | An owner-signed anchor authenticates owner approval, not Claude's reviewer identity, so it cannot close `TPR-CCR2-011`. | The identity boundary is explicit throughout; reviewer-controlled signing or a separately signed review receipt remains required. |
+| `TPR-CCR7-009` | P3 | **Closed before push** | `dfaee5de` | The ancestry guard checked only whether the lane contained `main` while current documents also claimed neither tip contained the other. | The guard now checks both ancestry directions before permitting a divergence claim. |
+| `TPR-CCR7-010` | P3 | **Closed before push** | `dfaee5de` | The frozen design lacked literal signer-line/command/output contracts, an adversarial matrix, and an explicit commit-versus-detached-manifest decision. | Sections 25.3.1 and 25.3.2 now freeze each item without provisioning or authority. |
+| `TPR-CCR7-011` | P2 | **Closed before push** | `dfaee5de` | Path-limited `git log -1` alone can mistake a shallow-history boundary for the registry-changing anchor. | Runtime requires non-shallow complete local history, no lazy fetch, a single parent, a full commit diff containing only the registry path, and unequal parent/anchor registry bytes. |
 
 ### 25.4 Authority and milestone decision
 
@@ -2030,8 +2110,10 @@ round. Key generation is deliberately deferred to an owner-interactive,
 passphrase-protected step so no agent receives or logs the passphrase.
 
 Accordingly, `TPR-CCR5-004` remains open until the reviewed design is
-implemented and independently reviewed. `TPR-CCR2-011` remains open until an
-exact trusted signed registry-anchor commit is verified. The reviewed-spec registry remains
+implemented and independently reviewed. The owner-signed registry anchor does
+not prove the independent reviewer's identity; `TPR-CCR2-011` remains open until
+reviewer-controlled signing or a separately signed review receipt is verified.
+The reviewed-spec registry remains
 empty; provider accesses, outcome accesses, and authorized/spent research looks
 remain **0**. TPR-1, TPR-0B, every QuantConnect stage, and all broker, paper,
 live, deployment, capital, and trading authority remain blocked.
@@ -2044,6 +2126,16 @@ live, deployment, capital, and trading authority remain blocked.
   missing-open and missing-close probes passed, while the ancestry/current-
   surface test failed on the stale `2 behind` preamble text. This is the
   required red evidence for `TPR-CCR7-001` through `003`.
+- Exact first Codex commit `dfaee5dee73e2210aa42d05b308d40581b27ef4b`
+  received a complete baseline run: **6,792 passed, 13 skipped, 2 failed, 25
+  warnings in 1,270.49s**. Both failures are out of this lane and are retained
+  as `TPR-OOL-009`: `tests/test_sleeve_report.py` fixes its lot/snapshot clock
+  at 2026-08-07 while `unrealized_by_lot` reads the live UTC clock. Near the
+  one-year boundary, both failing cases therefore report
+  `term_if_sold_now = "short"` with `days_to_long_term = 0`. This is a P2
+  tax-countdown consistency
+  defect outside Target-Price Revisions; it is documented and deliberately not
+  fixed here.
 - No dedicated TPR signing key, external trust file, signed registry-anchor commit,
   registry entry, source row, outcome, look, QC surface, broker surface, or
   order was created or accessed.

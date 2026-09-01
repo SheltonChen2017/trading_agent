@@ -664,6 +664,10 @@ def test_a_present_tense_sync_claim_matches_real_ancestry() -> None:
         ["git", "merge-base", "--is-ancestor", mainline, lane_ref],
         cwd=ROOT, capture_output=True,
     ).returncode == 0
+    main_contains_lane = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", lane_ref, mainline],
+        cwd=ROOT, capture_output=True,
+    ).returncode == 0
 
     claims = (
         "is now synchronized to",
@@ -679,6 +683,7 @@ def test_a_present_tense_sync_claim_matches_real_ancestry() -> None:
             _record_section("## 8. Exact next step")
         ),
         "SESSION_HANDOFF.md target section": _handoff_current(),
+        "SESSION_HANDOFF.md target summary": _handoff_target_summary(),
         "ACTION_PLAN_2026-08-20.md target block": _action_current(),
     }
     for name, block in surfaces.items():
@@ -686,6 +691,11 @@ def test_a_present_tense_sync_claim_matches_real_ancestry() -> None:
         assert not re.search(r"\b\d+\s+(?:commits?\s+)?(?:ahead|behind)\b", normalized), (
             f"{name} contains a self-invalidating live topology count"
         )
+        if "neither contains the other" in normalized or "have diverged" in normalized:
+            assert not contains_main and not main_contains_lane, (
+                f"{name} claims divergence, but {lane_ref} and {mainline} are "
+                "now in an ancestor relationship"
+            )
         if not contains_main:
             for claim in claims:
                 assert claim not in normalized, (

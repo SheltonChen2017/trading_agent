@@ -3,11 +3,13 @@ from __future__ import annotations
 import ast
 import dataclasses
 import json
+import os
 import subprocess
 from pathlib import Path
 
 import pytest
 
+import research.analyst_revisions_v2.dataset as dataset_module
 from research.analyst_revisions_v2.canonical import (
     CanonicalEvidenceError,
     canonical_json_bytes,
@@ -18,15 +20,20 @@ from research.analyst_revisions_v2.dataset import (
     EVENTS_FILENAME,
     REFUSALS_FILENAME,
     DatasetVerificationError,
+    git_commit_is_ancestor,
     capture_clean_git_lineage,
     compute_package_source_sha256,
     load_normalized_dataset,
     publish_normalized_dataset,
     revalidate_normalized_dataset,
+    read_git_bytes,
+    read_git_text,
 )
 from research.analyst_revisions_v2.contracts import EventState, RevisionKind
 from research.analyst_revisions_v2.import_firewall import (
+    DEFAULT_ALLOWED_STDLIB_ROOTS,
     ImportBoundaryError,
+    _validate_import_closure,
     validate_transitive_import_closure,
 )
 from research.analyst_revisions_v2.normalization import (
@@ -42,11 +49,44 @@ from ._helpers import (
     historical_event_for,
     refusal_for,
     result_for,
+    run_git,
     verified_snapshot,
 )
 
 
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
+EXPECTED_ARV2_IMPORT_CLOSURE = (
+    "data",
+    "data.exchange_calendar",
+    "data.financial_primitives",
+    "research",
+    "research.analyst_revisions_v2",
+    "research.analyst_revisions_v2.availability",
+    "research.analyst_revisions_v2.canonical",
+    "research.analyst_revisions_v2.contracts",
+    "research.analyst_revisions_v2.costs",
+    "research.analyst_revisions_v2.dataset",
+    "research.analyst_revisions_v2.evidence",
+    "research.analyst_revisions_v2.firm_ontology",
+    "research.analyst_revisions_v2.fold_manifest",
+    "research.analyst_revisions_v2.formulas",
+    "research.analyst_revisions_v2.holdings",
+    "research.analyst_revisions_v2.import_firewall",
+    "research.analyst_revisions_v2.legacy_reproduction",
+    "research.analyst_revisions_v2.normalization",
+    "research.analyst_revisions_v2.portfolio",
+    "research.analyst_revisions_v2.preregistration",
+    "research.analyst_revisions_v2.production_registry",
+    "research.analyst_revisions_v2.provider_history",
+    "research.analyst_revisions_v2.qc_first_plan",
+    "research.analyst_revisions_v2.ratings_ingest",
+    "research.analyst_revisions_v2.security_master",
+    "research.analyst_revisions_v2.snapshot",
+    "research.analyst_revisions_v2.statistics",
+    "research.analyst_revisions_v2.stock_controls",
+    "research.analyst_revisions_v2.stock_evaluation_contract",
+    "research.analyst_revisions_v2.stock_signal",
+)
 
 
 def _derive_dataset_id(manifest: dict) -> str:
@@ -496,6 +536,7 @@ def test_publication_revalidates_result_instead_of_trusting_frozen_shell(tmp_pat
 
 def test_current_v2_package_transitive_import_closure_is_outcome_free():
     reached = validate_transitive_import_closure(WORKSPACE_ROOT)
+    assert reached == EXPECTED_ARV2_IMPORT_CLOSURE
     assert "research.analyst_revisions_v2.dataset" in reached
     assert "research.analyst_revisions_v2.stock_signal" in reached
     assert "data.exchange_calendar" in reached
@@ -511,7 +552,7 @@ def test_safe_looking_facade_cannot_hide_a_forbidden_transitive_import(tmp_path)
     (package / "safe_helper.py").write_text("import execution.orders\n", encoding="utf-8")
 
     with pytest.raises(ImportBoundaryError) as captured:
-        validate_transitive_import_closure(tmp_path, package_name="guarded")
+        _validate_import_closure(tmp_path, package_name="guarded")
     message = str(captured.value)
     assert "guarded.facade" in message
     assert "guarded.safe_helper" in message
@@ -530,7 +571,7 @@ def test_imported_parent_package_initializer_is_part_of_the_closure(tmp_path):
     (facade / "safe.py").write_text("VALUE = 1\n", encoding="utf-8")
 
     with pytest.raises(ImportBoundaryError) as captured:
-        validate_transitive_import_closure(tmp_path, package_name="guarded")
+        _validate_import_closure(tmp_path, package_name="guarded")
     assert "facade_package" in str(captured.value)
     assert "http.client" in str(captured.value)
 
@@ -548,6 +589,110 @@ def test_imported_parent_package_initializer_is_part_of_the_closure(tmp_path):
         "import importlib\nil = importlib\nil.import_module('requests')\n",
         "import importlib\ngetattr(importlib, 'import_module')('requests')\n",
         "import builtins\nloader = getattr(builtins, '__import__')\nloader('requests')\n",
+        "from builtins import __import__ as load\nload('requests')\n",
+        "exec(\"import requests\")\n",
+        "eval(\"__import__('requests')\")\n",
+        "import builtins\nbuiltins.__dict__['__import__']('requests')\n",
+        "import importlib\nloader: object = importlib.import_module\nloader('requests')\n",
+        (
+            "import importlib\n"
+            "loader = (lambda candidate=importlib.import_module: candidate)()\n"
+            "loader('requests')\n"
+        ),
+        (
+            "def helper():\n    pass\n"
+            "getattr(helper, '__builtins__')['__import__']('requests')\n"
+        ),
+        (
+            "def helper():\n    pass\n"
+            "helper.__builtins__['__import__']('requests')\n"
+        ),
+        (
+            "def helper():\n    pass\n"
+            "helper.__globals__['__builtins__']['__import__']('requests')\n"
+        ),
+        "print.__self__.eval(\"__import__('requests')\")\n",
+        (
+            "def helper():\n    pass\n"
+            "lookup = getattr\n"
+            "lookup(helper, '__builtins__')['__import__']('requests')\n"
+        ),
+        "import ast\nast.__builtins__['__import__']('requests')\n",
+        (
+            "def load(b):\n"
+            "    return b.compile(\"import requests\", '<guard>', 'exec')\n"
+        ),
+        "def load(b):\n    return b.getattr(b, '__import__')('requests')\n",
+        "def load(b):\n    return b.eval(\"__import__('requests')\")\n",
+        "from dataclasses import sys as safe\n",
+        (
+            "import re\n"
+            "def load(re):\n"
+            "    return re.compile(\"import requests\", '<guard>', 'exec')\n"
+        ),
+        (
+            "import re as regex, types\n"
+            "def load(value):\n"
+            "    match value:\n"
+            "        case regex:\n"
+            "            code = regex.compile(\"import requests\", '<guard>', 'exec')\n"
+            "            return types.FunctionType(code, {})()\n"
+        ),
+        (
+            "def helper():\n    pass\n"
+            "builtins_name = '__builtins__'\n"
+            "import_name = '__import__'\n"
+            "b = getattr(helper, builtins_name)\n"
+            "getattr(b, import_name)('requests')\n"
+        ),
+        (
+            "def helper():\n    pass\n"
+            "builtins_name: str = '__' + 'builtins__'\n"
+            "import_name = '__import__'\n"
+            "b = getattr(helper, builtins_name)\n"
+            "b[import_name]('requests')\n"
+        ),
+        (
+            "import dataclasses\n"
+            "dataclasses._create_fn('load', (), ('import requests',))()\n"
+        ),
+        (
+            "import typing\n"
+            "typing.ForwardRef(\"__import__('requests')\")._evaluate({}, {}, set())\n"
+        ),
+        (
+            "import typing\n"
+            "class C:\n    value: \"__import__('requests')\"\n"
+            "typing.get_type_hints(C)\n"
+        ),
+        (
+            "def helper():\n    pass\n"
+            "def load(bn='__' + 'builtins__', im='__' + 'import__'):\n"
+            "    b = getattr(helper, bn)\n"
+            "    return b[im]('requests')\n"
+        ),
+        (
+            "def helper():\n    pass\n"
+            "def load(*, bn='__' + 'builtins__', im='__' + 'import__'):\n"
+            "    b = getattr(helper, bn)\n"
+            "    return b[im]('requests')\n"
+        ),
+        (
+            "def helper():\n    pass\n"
+            "load = lambda bn='__' + 'builtins__', im='__' + 'import__': "
+            "getattr(helper, bn)[im]('requests')\n"
+        ),
+        (
+            "import dataclasses, types\n"
+            "b = dataclasses.sys.modules.get('builtins')\n"
+            "code = b.compile(\"import requests\", '<guard>', 'exec')\n"
+            "types.FunctionType(code, {})()\n"
+        ),
+        (
+            "import dataclasses\n"
+            "b = dataclasses.sys.modules.get('builtins')\n"
+            "b.getattr(b, '__import__')('requests')\n"
+        ),
     ],
 )
 def test_dynamic_imports_cannot_bypass_the_firewall(tmp_path, source):
@@ -555,7 +700,191 @@ def test_dynamic_imports_cannot_bypass_the_firewall(tmp_path, source):
     package.mkdir()
     (package / "__init__.py").write_text(source, encoding="utf-8")
     with pytest.raises(ImportBoundaryError):
-        validate_transitive_import_closure(tmp_path, package_name="guarded")
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_relative_dynamic_import_cannot_hide_forbidden_lane(tmp_path):
+    research = tmp_path / "research"
+    package = research / "analyst_revisions_v2"
+    forbidden = research / "acer"
+    package.mkdir(parents=True)
+    forbidden.mkdir()
+    (research / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text(
+        "__import__('acer', globals(), locals(), (), 2)\n", encoding="utf-8"
+    )
+    (forbidden / "__init__.py").write_text("VALUE = 1\n", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="import/reflection primitive"):
+        _validate_import_closure(
+            tmp_path, package_name="research.analyst_revisions_v2"
+        )
+
+
+def test_dynamic_import_fromlist_cannot_hide_unvisited_submodule(tmp_path):
+    guarded = tmp_path / "guarded"
+    facade = tmp_path / "facade_package"
+    guarded.mkdir()
+    facade.mkdir()
+    (guarded / "__init__.py").write_text(
+        "__import__('facade_package', globals(), locals(), ('danger',), 0)\n",
+        encoding="utf-8",
+    )
+    (facade / "__init__.py").write_text("", encoding="utf-8")
+    (facade / "danger.py").write_text("import requests\n", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="import/reflection primitive"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+@pytest.mark.parametrize(
+    "source",
+    (
+        "import ctypes\n",
+        "import os\nos.system('not-executed-by-static-review')\n",
+    ),
+)
+def test_unapproved_runtime_and_standard_library_capabilities_refuse(
+    tmp_path, source
+):
+    guarded = tmp_path / "guarded"
+    guarded.mkdir()
+    (guarded / "__init__.py").write_text(source, encoding="utf-8")
+    with pytest.raises(ImportBoundaryError):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_literal_domain_getattr_remains_available(tmp_path):
+    guarded = tmp_path / "guarded"
+    guarded.mkdir()
+    (guarded / "__init__.py").write_text(
+        "field = '_authority'\nvalue = object()\ngetattr(value, field, None)\n",
+        encoding="utf-8",
+    )
+    assert _validate_import_closure(
+        tmp_path, package_name="guarded"
+    ) == ("guarded",)
+
+
+def test_regular_expression_compile_remains_available(tmp_path):
+    guarded = tmp_path / "guarded"
+    guarded.mkdir()
+    (guarded / "__init__.py").write_text(
+        "import re as regex\nPATTERN = regex.compile('safe')\n",
+        encoding="utf-8",
+    )
+    assert _validate_import_closure(
+        tmp_path, package_name="guarded"
+    ) == ("guarded",)
+
+
+@pytest.mark.parametrize(
+    "shadow_name",
+    (
+        "ast.pyw",
+        "ast.cp312-win_amd64.pyd",
+        "ast.cpython-312-x86_64-linux-gnu.so",
+    ),
+)
+def test_repository_local_unreviewed_import_forms_cannot_shadow_stdlib(
+    tmp_path: Path, shadow_name: str
+) -> None:
+    guarded = tmp_path / "guarded"
+    guarded.mkdir()
+    (guarded / "__init__.py").write_text("import ast\n", encoding="utf-8")
+    (tmp_path / shadow_name).write_bytes(b"not a reviewed Python source")
+
+    with pytest.raises(ImportBoundaryError, match="extension or \\.pyw"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_authoritative_firewall_exposes_no_policy_overrides(tmp_path):
+    with pytest.raises(TypeError):
+        validate_transitive_import_closure(
+            tmp_path,
+            package_name="caller.chosen",  # type: ignore[call-arg]
+        )
+
+
+def test_authoritative_standard_library_allowlist_excludes_capability_modules():
+    assert {"os", "shutil", "subprocess", "uuid", "ctypes"}.isdisjoint(
+        DEFAULT_ALLOWED_STDLIB_ROOTS
+    )
+
+
+def test_authoritative_firewall_rejects_unlisted_local_modules(tmp_path):
+    research = tmp_path / "research"
+    package = research / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (research / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text(
+        "import research.unlisted_strategy\n", encoding="utf-8"
+    )
+    (research / "unlisted_strategy.py").write_text("VALUE = 1\n", encoding="utf-8")
+    with pytest.raises(ImportBoundaryError, match="unapproved repository-local"):
+        validate_transitive_import_closure(tmp_path)
+
+
+def test_dataset_capability_exception_does_not_admit_reexported_sys(tmp_path):
+    research = tmp_path / "research"
+    package = research / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (research / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "dataset.py").write_text(
+        "from dataclasses import sys as safe\nVALUE = safe.modules\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ImportBoundaryError, match="runtime import/reflection primitive"):
+        validate_transitive_import_closure(tmp_path)
+
+
+def test_dataset_retains_only_its_four_reviewed_capability_imports(tmp_path):
+    research = tmp_path / "research"
+    package = research / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (research / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "dataset.py").write_text(
+        "import os\nimport shutil\nimport subprocess\nimport uuid\n",
+        encoding="utf-8",
+    )
+
+    assert validate_transitive_import_closure(tmp_path) == (
+        "research",
+        "research.analyst_revisions_v2",
+        "research.analyst_revisions_v2.dataset",
+    )
+
+
+@pytest.mark.parametrize(
+    "guarded_source",
+    (
+        "from data.exchange_calendar import pd\npd.read_pickle('outcome.pkl')\n",
+        (
+            "import data.exchange_calendar as calendar\n"
+            "calendar.pd.read_pickle('outcome.pkl')\n"
+        ),
+        "from data.exchange_calendar import *\n",
+    ),
+)
+def test_exchange_calendar_facade_cannot_reexport_dataframe_capabilities(
+    tmp_path: Path, guarded_source: str
+) -> None:
+    guarded = tmp_path / "guarded"
+    data = tmp_path / "data"
+    guarded.mkdir()
+    data.mkdir()
+    (guarded / "__init__.py").write_text(guarded_source, encoding="utf-8")
+    (data / "__init__.py").write_text("", encoding="utf-8")
+    (data / "exchange_calendar.py").write_text(
+        "import pandas as pd\nimport pandas_market_calendars as mcal\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ImportBoundaryError, match="import/reflection primitive"):
+        _validate_import_closure(tmp_path, package_name="guarded")
 
 
 def _authority_registry_names(tree: ast.Module) -> set[str]:
@@ -813,16 +1142,10 @@ def test_git_boundary_refuses_non_read_only_subcommands(tmp_path: Path) -> None:
     read_git_text/read_git_bytes accept caller-controlled argv; before this
     guard a caller could reach mutating subcommands (push, update-ref) or
     inject configuration (-c alias.x=!cmd) because nothing constrained the
-    first token. The allowlist forces the first token to be one of the six
+    first token. The allowlist forces the first token to be one of the five
     read-only subcommands the lane actually uses, which also neutralizes
     global-option injection since Git parses those only before the subcommand.
     """
-    from research.analyst_revisions_v2.dataset import (
-        DatasetVerificationError,
-        read_git_bytes,
-        read_git_text,
-    )
-
     for arguments in (
         ("push", "origin", "HEAD"),
         ("update-ref", "refs/heads/x", "HEAD"),
@@ -834,3 +1157,425 @@ def test_git_boundary_refuses_non_read_only_subcommands(tmp_path: Path) -> None:
             read_git_text(tmp_path, arguments)
         with pytest.raises(DatasetVerificationError, match="read-only allowlist"):
             read_git_bytes(tmp_path, arguments)
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    (
+        ("show", "--output={target}", "--no-patch", "HEAD"),
+        ("show", "--ext-diff", "--format=", "HEAD"),
+        ("show", "--textconv", "--format=", "HEAD"),
+        ("cat-file", "--filters", "HEAD:README.md"),
+    ),
+)
+def test_allowlisted_git_subcommands_reject_side_effect_options(
+    tmp_path: Path, arguments: tuple[str, ...]
+) -> None:
+    for runner_name, runner in (("text", read_git_text), ("bytes", read_git_bytes)):
+        target = tmp_path / f"{runner_name}.txt"
+        rendered = tuple(
+            token.format(target=target.as_posix()) for token in arguments
+        )
+        with pytest.raises(DatasetVerificationError, match="read-only argument shape"):
+            runner(WORKSPACE_ROOT, rendered)
+        assert not target.exists()
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    (
+        ("show", "HEAD:../README.md"),
+        ("show", "HEAD::(attr:filter)README.md"),
+        ("ls-files", "-z", "--", ":(glob)**/*.py"),
+        ("status", "--porcelain=v1", "--untracked-files=all", "--", "../outside"),
+        ("cat-file", "-e", "HEAD^{commit}"),
+    ),
+)
+def test_git_boundary_refuses_noncanonical_objects_and_pathspecs(
+    arguments: tuple[str, ...]
+) -> None:
+    with pytest.raises(DatasetVerificationError, match="read-only argument shape"):
+        read_git_text(WORKSPACE_ROOT, arguments)
+
+
+class _AlternatingGitArguments:
+    def __init__(self) -> None:
+        self.iterations = 0
+
+    def __iter__(self):
+        self.iterations += 1
+        if self.iterations == 1:
+            return iter(("show", "HEAD:README.md"))
+        return iter(("push", "origin", "HEAD"))
+
+
+@pytest.mark.parametrize("runner", (read_git_text, read_git_bytes))
+def test_git_runner_executes_the_same_argument_snapshot_it_validates(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, runner
+) -> None:
+    captured: list[tuple[list[str], dict[str, str]]] = []
+
+    def fake_run(command, **kwargs):
+        captured.append((list(command), dict(kwargs["env"])))
+        binary = not kwargs.get("text", False)
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            stdout=b"reviewed\n" if binary else "reviewed\n",
+            stderr=b"" if binary else "",
+        )
+
+    monkeypatch.setattr(
+        dataset_module,
+        "_read_only_git_global_options",
+        lambda *_args, **_kwargs: [],
+    )
+    monkeypatch.setattr(dataset_module.subprocess, "run", fake_run)
+    arguments = _AlternatingGitArguments()
+
+    assert runner(tmp_path, arguments) in ("reviewed\n", b"reviewed\n")
+    assert arguments.iterations == 1
+    assert captured[0][0][-2:] == ["show", "HEAD:README.md"]
+    assert captured[0][1]["GIT_NO_LAZY_FETCH"] == "1"
+    assert captured[0][1]["GIT_NO_REPLACE_OBJECTS"] == "1"
+
+
+def test_status_commands_pin_validated_checkout_conversion_settings(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    observed: list[str] = []
+
+    def conversion_value(_root, key, **_kwargs):
+        observed.append(key)
+        return {"core.autocrlf": "true", "core.eol": "crlf"}[key]
+
+    monkeypatch.setattr(
+        dataset_module, "_effective_git_conversion_value", conversion_value
+    )
+    options = dataset_module._read_only_git_global_options(
+        tmp_path, include_conversion=True
+    )
+
+    assert observed == ["core.autocrlf", "core.eol"]
+    assert options[-4:] == [
+        "-c",
+        "core.autocrlf=true",
+        "-c",
+        "core.eol=crlf",
+    ]
+
+
+def test_status_preserves_global_checkout_conversion_after_config_isolation(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    isolated_home = tmp_path / "git-home"
+    isolated_home.mkdir()
+    (isolated_home / ".gitconfig").write_text(
+        "[core]\n\tautocrlf = true\n\teol = crlf\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("HOME", str(isolated_home))
+    monkeypatch.setenv("USERPROFILE", str(isolated_home))
+    monkeypatch.delenv("XDG_CONFIG_HOME", raising=False)
+
+    repository = tmp_path / "global-conversion-repository"
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    payload = repository / "payload.txt"
+    payload.write_bytes(b"line\n")
+    run_git(repository, "add", "payload.txt")
+    run_git(repository, "commit", "--quiet", "-m", "global conversion fixture")
+    payload.unlink()
+    run_git(repository, "checkout", "--", "payload.txt")
+
+    assert payload.read_bytes() == b"line\r\n"
+    assert run_git(
+        repository, "status", "--porcelain=v1", "--untracked-files=all"
+    ) == ""
+    assert read_git_text(
+        repository,
+        ("status", "--porcelain=v1", "--untracked-files=all"),
+    ) == ""
+
+
+def test_git_show_ignores_replace_refs(tmp_path: Path) -> None:
+    repository = tmp_path / "replace-repository"
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    protected = repository / "protected.txt"
+    protected.write_text("reviewed\n", encoding="utf-8")
+    reviewed_bytes = protected.read_bytes()
+    run_git(repository, "add", "protected.txt")
+    run_git(repository, "commit", "--quiet", "-m", "reviewed")
+    reviewed_commit = run_git(repository, "rev-parse", "HEAD")
+
+    protected.write_text("replacement\n", encoding="utf-8")
+    run_git(repository, "add", "protected.txt")
+    run_git(repository, "commit", "--quiet", "-m", "replacement")
+    replacement_commit = run_git(repository, "rev-parse", "HEAD")
+    run_git(repository, "replace", reviewed_commit, replacement_commit)
+
+    assert run_git(
+        repository, "show", f"{reviewed_commit}:protected.txt"
+    ) == "replacement"
+    assert read_git_bytes(
+        repository, ("show", f"{reviewed_commit}:protected.txt")
+    ) == reviewed_bytes
+
+
+def test_git_ancestry_refuses_legacy_grafts(tmp_path: Path) -> None:
+    repository = tmp_path / "grafts-repository"
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    payload = repository / "payload.txt"
+    payload.write_text("first\n", encoding="utf-8")
+    run_git(repository, "add", "payload.txt")
+    run_git(repository, "commit", "--quiet", "-m", "first root")
+    first = run_git(repository, "rev-parse", "HEAD")
+    tree = run_git(repository, "rev-parse", "HEAD^{tree}")
+    second = run_git(repository, "commit-tree", tree, "-m", "second root")
+    assert not git_commit_is_ancestor(repository, first, second)
+
+    git_dir = Path(run_git(repository, "rev-parse", "--git-dir"))
+    if not git_dir.is_absolute():
+        git_dir = repository / git_dir
+    grafts = git_dir / "info" / "grafts"
+    grafts.write_text(f"{second} {first}\n", encoding="ascii")
+    raw = subprocess.run(
+        [
+            "git",
+            "--no-replace-objects",
+            "-C",
+            str(repository),
+            "merge-base",
+            "--is-ancestor",
+            first,
+            second,
+        ],
+        check=False,
+        capture_output=True,
+        shell=False,
+    )
+    assert raw.returncode == 0
+
+    with pytest.raises(DatasetVerificationError, match="graft metadata"):
+        git_commit_is_ancestor(repository, first, second)
+
+
+@pytest.mark.parametrize("scope", ("--local", "--worktree"))
+def test_git_status_refuses_executable_local_filter_driver(
+    tmp_path: Path, scope: str
+) -> None:
+    repository = tmp_path / "filter-repository"
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    (repository / ".gitattributes").write_text(
+        "payload.txt filter=evil\n", encoding="utf-8"
+    )
+    payload = repository / "payload.txt"
+    payload.write_text("safe\n", encoding="utf-8")
+    run_git(repository, "add", ".gitattributes", "payload.txt")
+    run_git(repository, "commit", "--quiet", "-m", "safe fixture")
+
+    marker = tmp_path / "filter-executed.txt"
+    if scope == "--worktree":
+        run_git(repository, "config", "extensions.worktreeConfig", "true")
+    run_git(
+        repository,
+        "config",
+        scope,
+        "filter.evil.clean",
+        f"echo invoked > {marker.as_posix()}; cat",
+    )
+    payload.write_text("risk\n", encoding="utf-8")
+
+    with pytest.raises(DatasetVerificationError, match="filter driver"):
+        read_git_text(
+            repository,
+            ("status", "--porcelain=v1", "--untracked-files=all"),
+        )
+    assert not marker.exists()
+
+
+@pytest.mark.parametrize("flag", ("--assume-unchanged", "--skip-worktree"))
+def test_git_status_refuses_index_flags_that_hide_worktree_changes(
+    tmp_path: Path, flag: str
+) -> None:
+    repository = tmp_path / flag.removeprefix("--")
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    payload = repository / "payload.txt"
+    payload.write_text("safe\n", encoding="utf-8")
+    run_git(repository, "add", "payload.txt")
+    run_git(repository, "commit", "--quiet", "-m", "safe fixture")
+    run_git(repository, "update-index", flag, "payload.txt")
+    payload.write_text("risk\n", encoding="utf-8")
+    assert run_git(
+        repository, "status", "--porcelain=v1", "--untracked-files=all"
+    ) == ""
+
+    with pytest.raises(DatasetVerificationError, match="index flag"):
+        read_git_text(
+            repository,
+            ("status", "--porcelain=v1", "--untracked-files=all"),
+        )
+
+
+def test_git_status_hashes_content_despite_a_false_clean_stat_cache(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "stat-cache-repository"
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    payload = repository / "payload.txt"
+    payload.write_bytes(b"safe\n")
+    old_timestamp = 946_684_800_000_000_000
+    os.utime(payload, ns=(old_timestamp, old_timestamp))
+    run_git(repository, "add", "payload.txt")
+    run_git(repository, "commit", "--quiet", "-m", "safe fixture")
+
+    payload.write_bytes(b"risk\n")
+    os.utime(payload, ns=(old_timestamp, old_timestamp))
+    assert run_git(
+        repository, "status", "--porcelain=v1", "--untracked-files=all"
+    ) == ""
+
+    with pytest.raises(DatasetVerificationError, match="working content differs"):
+        read_git_text(
+            repository,
+            ("status", "--porcelain=v1", "--untracked-files=all"),
+        )
+
+
+def test_git_status_hashes_all_tracked_paths_in_one_batch(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    repository = tmp_path / "batched-hash-repository"
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    (repository / "first.txt").write_text("first\n", encoding="utf-8")
+    (repository / "second.txt").write_text("second\n", encoding="utf-8")
+    run_git(repository, "add", "first.txt", "second.txt")
+    run_git(repository, "commit", "--quiet", "-m", "batch fixture")
+
+    real_run = subprocess.run
+    hash_commands: list[list[str]] = []
+
+    def recording_run(command, **kwargs):
+        if "hash-object" in command:
+            hash_commands.append(list(command))
+        return real_run(command, **kwargs)
+
+    monkeypatch.setattr(dataset_module.subprocess, "run", recording_run)
+    assert read_git_text(
+        repository,
+        ("status", "--porcelain=v1", "--untracked-files=all"),
+    ) == ""
+    assert len(hash_commands) == 1
+    assert hash_commands[0][-2:] == ["hash-object", "--stdin-paths"]
+
+
+def test_git_status_refuses_non_regular_tracked_working_path(tmp_path: Path) -> None:
+    repository = tmp_path / "non-regular-repository"
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    payload = repository / "payload.txt"
+    payload.write_text("regular\n", encoding="utf-8")
+    run_git(repository, "add", "payload.txt")
+    run_git(repository, "commit", "--quiet", "-m", "regular fixture")
+    payload.unlink()
+    payload.mkdir()
+
+    with pytest.raises(DatasetVerificationError, match="not a regular file"):
+        read_git_text(
+            repository,
+            ("status", "--porcelain=v1", "--untracked-files=all"),
+        )
+
+
+def test_git_status_refuses_ident_attribute_semantic_false_clean(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "ident-repository"
+    repository.mkdir()
+    run_git(repository, "init", "--quiet")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    (repository / ".gitattributes").write_text(
+        "payload.py ident\n", encoding="utf-8"
+    )
+    payload = repository / "payload.py"
+    payload.write_text("VALUE = '$Id$'\n", encoding="utf-8")
+    run_git(repository, "add", ".gitattributes", "payload.py")
+    run_git(repository, "commit", "--quiet", "-m", "ident fixture")
+    payload.unlink()
+    run_git(repository, "checkout", "--", "payload.py")
+    expanded = payload.read_text(encoding="utf-8")
+    assert "$Id: " in expanded and " $" in expanded
+    prefix, separator, remainder = expanded.partition("$Id: ")
+    actual_identifier, suffix_separator, suffix = remainder.partition(" $")
+    assert separator == "$Id: " and suffix_separator == " $"
+    assert len(actual_identifier) == 40
+    payload.write_text(
+        prefix + "$Id: " + ("f" * 40) + " $" + suffix,
+        encoding="utf-8",
+    )
+    assert run_git(
+        repository, "status", "--porcelain=v1", "--untracked-files=all"
+    ) == ""
+
+    with pytest.raises(DatasetVerificationError, match="ident expansion"):
+        read_git_text(
+            repository,
+            ("status", "--porcelain=v1", "--untracked-files=all"),
+        )
+
+
+def test_git_boundary_accepts_sha256_object_ids_when_supported(tmp_path: Path) -> None:
+    repository = tmp_path / "sha256-repository"
+    initialized = subprocess.run(
+        ["git", "init", "--quiet", "--object-format=sha256", str(repository)],
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        shell=False,
+    )
+    if initialized.returncode != 0:
+        pytest.skip("installed Git does not support SHA-256 repositories")
+    run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
+    run_git(repository, "config", "core.autocrlf", "false")
+    (repository / "object.txt").write_text("sha256\n", encoding="utf-8")
+    object_bytes = (repository / "object.txt").read_bytes()
+    run_git(repository, "add", "object.txt")
+    run_git(repository, "commit", "--quiet", "-m", "sha256 object")
+    commit = run_git(repository, "rev-parse", "HEAD")
+
+    assert len(commit) == 64
+    assert read_git_bytes(repository, ("show", f"{commit}:object.txt")) == object_bytes
+    read_git_text(repository, ("cat-file", "-e", f"{commit}^{{commit}}"))

@@ -248,6 +248,7 @@ def _anchored_spec(
     repository = tmp_path / "review-repository"
     repository.mkdir()
     _git(repository, "init", "--quiet")
+    _git(repository, "config", "core.autocrlf", "false")
     (repository / "bootstrap.txt").write_text("bootstrap\n", encoding="utf-8")
     _git(repository, "add", "bootstrap.txt")
     _git(

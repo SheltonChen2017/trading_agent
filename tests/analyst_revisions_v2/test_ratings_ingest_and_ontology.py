@@ -230,10 +230,16 @@ def test_documented_sample_shape_maps_action_and_conservative_clock(tmp_path):
         # A provider field longer than the canonical 256-character record
         # bound must be a per-row named refusal, never a whole-audit crash:
         # the screening bound (2048) previously disagreed with the record
-        # bound (256), so a 300-character firm name escaped the _RowRefusal
+        # bound (256), so a 257-character firm name escaped the _RowRefusal
         # handler as a CanonicalEvidenceError and halted the entire census.
         ("overlong_firm", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
+        ("overlong_analyst", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
         ("overlong_rating", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
+        ("overlong_previous", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
+        (
+            "overlong_price_target_action",
+            RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD,
+        ),
     ],
 )
 def test_every_structural_defect_has_one_named_refusal(tmp_path, mutation, reason):
@@ -267,9 +273,15 @@ def test_every_structural_defect_has_one_named_refusal(tmp_path, mutation, reaso
     elif mutation == "self_transition":
         row["rating"] = row["previous_rating"]
     elif mutation == "overlong_firm":
-        row["firm"] = "F" * 300
+        row["firm"] = "F" * 257
+    elif mutation == "overlong_analyst":
+        row["analyst"] = "A" * 257
     elif mutation == "overlong_rating":
-        row["rating"] = "R" * 300
+        row["rating"] = "R" * 257
+    elif mutation == "overlong_previous":
+        row["previous_rating"] = "P" * 257
+    elif mutation == "overlong_price_target_action":
+        row["price_target_action"] = "T" * 257
     else:
         row["importance"] = True
     audit = audit_benzinga_snapshot(
@@ -278,6 +290,22 @@ def test_every_structural_defect_has_one_named_refusal(tmp_path, mutation, reaso
     assert not audit.records
     assert len(audit.refusals) == 1
     assert audit.refusals[0].reason is reason
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("firm", "analyst", "rating", "previous_rating", "price_target_action"),
+)
+def test_canonical_provider_text_fields_accept_exact_256_boundary(
+    tmp_path, field
+):
+    row = _rating_row("event-1")
+    row[field] = field[0].upper() * 256
+    audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(tmp_path / field, [row])
+    )
+    assert len(audit.records) == 1
+    assert not audit.refusals
 
 
 def test_target_only_is_separate_and_pre_2013_is_quarantined(tmp_path):

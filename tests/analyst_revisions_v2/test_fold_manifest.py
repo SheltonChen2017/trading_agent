@@ -536,3 +536,62 @@ def test_fold_manifest_is_inside_the_outcome_free_import_closure() -> None:
     assert "research.analyst_revisions_v2.fold_manifest" in reached
     assert "execution" not in reached
     assert "research.acer" not in reached
+
+
+def test_parent_mutation_inside_the_load_window_refuses(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The in-load TOCTOU window ARV2FMI-001 closed must stay closed.
+
+    Both parents are byte-read, then their own loaders run, then the final
+    ``_revalidate`` calls re-read every file. A parent rewritten after its
+    loader returns is only caught by that final trio - deleting those three
+    lines left this file green, so the correction had no revert-detecting
+    regression. The wrapper mutates the parent immediately after its real
+    loader returns, which lands inside the exact window.
+    """
+    local_manifest, local_stock, local_qc = _copy_source_graph(tmp_path)
+
+    real_plan_loader = manifest_module.load_qc_first_study_plan
+
+    def mutate_after_load(path: Path):
+        plan = real_plan_loader(path)
+        Path(local_qc).write_bytes(local_qc.read_bytes() + b"\n")
+        return plan
+
+    monkeypatch.setattr(
+        manifest_module, "load_qc_first_study_plan", mutate_after_load
+    )
+    with pytest.raises(
+        StockFoldManifestError, match="QC-first parent changed after authentication"
+    ):
+        load_stock_fold_manifest(
+            local_manifest,
+            stock_evaluation_path=local_stock,
+            qc_first_plan_path=local_qc,
+        )
+    monkeypatch.undo()
+
+    stock_window = tmp_path / "stock-window"
+    stock_window.mkdir()
+    local_manifest, local_stock, local_qc = _copy_source_graph(stock_window)
+    real_stock_loader = manifest_module.load_stock_evaluation_contract
+
+    def mutate_stock_after_load(path: Path, *, qc_first_plan_path: Path):
+        contract = real_stock_loader(path, qc_first_plan_path=qc_first_plan_path)
+        Path(local_stock).write_bytes(local_stock.read_bytes() + b"\n")
+        return contract
+
+    monkeypatch.setattr(
+        manifest_module, "load_stock_evaluation_contract", mutate_stock_after_load
+    )
+    with pytest.raises(
+        StockFoldManifestError,
+        match="stock-evaluation parent changed after authentication",
+    ):
+        load_stock_fold_manifest(
+            local_manifest,
+            stock_evaluation_path=local_stock,
+            qc_first_plan_path=local_qc,
+        )

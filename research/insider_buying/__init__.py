@@ -5,7 +5,7 @@ broker, or scheduler surface. It contains immutable in-memory Form 4
 structure, a fixture parser, and a caller-supplied SEC quarterly ZIP integrity
 boundary plus explicit-profile, offline parsed, EDGAR acceptance-evidence, and
 observation-only Form 4/A chronology and multi-period supplied-link-evidence
-boundaries.
+boundaries, plus an evidence-bound provisional disposition/quarantine report.
 """
 
 from research.insider_buying.contracts import (
@@ -44,6 +44,15 @@ from research.insider_buying.form4_multi_period_amendment_evidence import (
     SecForm4AmendmentEvidenceProfile,
     SuppliedForm4AmendmentLinkEvidence,
     assemble_sec_form4_multi_period_evidence,
+)
+from research.insider_buying.form4_provisional_disposition_report import (
+    FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION,
+    Form4ProvisionalDisposition,
+    Form4ProvisionalDispositionReport,
+    Form4ProvisionalDispositionReportError,
+    Form4ProvisionalDispositionReportIdentity,
+    Form4ProvisionalDispositionRow,
+    build_form4_provisional_disposition_report,
 )
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
@@ -96,6 +105,7 @@ __all__ = [
     "EDGAR_ACCEPTANCE_SNAPSHOT_KIND",
     "FORM4_AMENDMENT_RECONCILIATION_VERSION",
     "FORM4_MULTI_PERIOD_EVIDENCE_VERSION",
+    "FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION",
     "FilingCorpus",
     "FilingEnvelope",
     "Form4AmendmentLineage",
@@ -103,6 +113,11 @@ __all__ = [
     "Form4AmendmentReconciliationIdentity",
     "Form4MultiPeriodEvidenceError",
     "Form4MultiPeriodEvidenceIdentity",
+    "Form4ProvisionalDisposition",
+    "Form4ProvisionalDispositionReport",
+    "Form4ProvisionalDispositionReportError",
+    "Form4ProvisionalDispositionReportIdentity",
+    "Form4ProvisionalDispositionRow",
     "Form4ObservedState",
     "Form4ParseError",
     "Form4VersionDisposition",
@@ -147,6 +162,7 @@ __all__ = [
     "SuppliedForm4AmendmentLinkEvidence",
     "TransactionDiagnostic",
     "build_filing_corpus",
+    "build_form4_provisional_disposition_report",
     "assemble_sec_form4_multi_period_evidence",
     "build_sec_bulk_parsed_snapshot",
     "build_sec_edgar_acceptance_snapshot",

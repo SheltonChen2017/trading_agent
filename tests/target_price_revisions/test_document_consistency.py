@@ -6,6 +6,8 @@ import json
 import re
 from decimal import Decimal
 import subprocess
+
+import pytest
 from pathlib import Path
 
 from research.target_price_revisions import PRIMARY_CELL_ID, PRIMARY_LOOK_ID
@@ -42,14 +44,20 @@ EXPECTED_CANDIDATE_HASH = (
 EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
     "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
-LATEST_CLAUDE_REVIEW_BASE = "cf136e259cf628aabdc4220865fccdb5c7204306"
-LATEST_CLAUDE_REVIEW_HEAD = "cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a"
+# Convention, clarified TPR-CR6-002: each role's pointer names the range of
+# the OTHER role's completed commits. A round cannot name its own final
+# commit -- that hash does not exist until the commit is written -- so the
+# pointer records the range just reviewed. Codex rounds therefore pin
+# Claude's completed commits and Claude rounds pin Codex's.
+LATEST_CLAUDE_REVIEW_BASE = "cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a"
+LATEST_CLAUDE_REVIEW_HEAD = "b4e6b88ccf8a17a60cad91cda94205f61c1b7f90"
 LATEST_CLAUDE_REVIEW_RANGE = (
     f"{LATEST_CLAUDE_REVIEW_BASE}..{LATEST_CLAUDE_REVIEW_HEAD}"
 )
-LATEST_CLAUDE_REVIEW_SHORT_RANGE = "cf136e25..cd23f7c8"
-PREVIOUS_CLAUDE_REVIEW_HEAD = "f21d70851d5e1790be0c308e13e8837a7cd1d008"
-PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD = "f21d708"
+LATEST_CLAUDE_REVIEW_SHORT_RANGE = "cd23f7c8..b4e6b88c"
+# The superseded pointer token that must no longer appear in current blocks.
+PREVIOUS_CLAUDE_REVIEW_HEAD = "cf136e259cf628aabdc4220865fccdb5c7204306"
+PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD = "cf136e25"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -460,7 +468,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     ) == [LATEST_CLAUDE_REVIEW_RANGE]
     assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_current
     assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_current
-    assert "Codex has counter-reviewed every Claude commit" in normalized_current
+    assert "Claude has independently reviewed every Codex commit" in normalized_current
     assert "No next implementation milestone is authorized" in normalized_current
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
@@ -481,7 +489,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         ) == [LATEST_CLAUDE_REVIEW_RANGE]
         assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_pointer
         assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_pointer
-        assert "Codex has counter-reviewed every Claude commit" in normalized_pointer
+        assert "Claude has independently reviewed every Codex commit" in normalized_pointer
         assert "No next implementation milestone is authorized" in normalized_pointer
         normalized_pointer_lower = normalized_pointer.lower()
         stale_current_claims = (
@@ -505,7 +513,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
         ) == [LATEST_CLAUDE_REVIEW_SHORT_RANGE]
         assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_summary
-        assert "section 23" in normalized_summary_lower
+        assert "section 24" in normalized_summary_lower
         assert "no next implementation milestone is authorized" in normalized_summary_lower
 
 
@@ -564,3 +572,57 @@ def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:
         assert "superseded in part" in propagation.lower(), (
             "section 15.4 keeps the stale branch premise without marking it superseded"
         )
+
+
+def test_a_present_tense_sync_claim_matches_real_ancestry() -> None:
+    """TPR-CR6-001. Being behind `main` is normal; claiming otherwise is not.
+
+    An absolute "the lane must contain main" assertion would be wrong: a lane
+    is routinely behind `main` mid-round, and such a guard would be red for
+    ordinary reasons and get weakened. The durable rule is conditional -- a
+    current surface may say the lane is synchronized only while it actually
+    contains `origin/main`.
+
+    This caught a claim written by the reviewer who added the surrounding
+    guards: the lane was fast-forwarded onto `main`, `main` then advanced, and
+    the present-tense sentence survived the divergence.
+    """
+    mainline = None
+    for ref in ("origin/main", "main"):
+        probe = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"],
+            cwd=ROOT, capture_output=True,
+        )
+        if probe.returncode == 0:
+            mainline = ref
+            break
+    if mainline is None:  # pragma: no cover - export or detached checkout
+        pytest.skip("no mainline ref available")
+
+    contains_main = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", mainline, "HEAD"],
+        cwd=ROOT, capture_output=True,
+    ).returncode == 0
+    if contains_main:
+        return  # a synchronization claim would be true; nothing to police
+
+    claims = (
+        "is now synchronized to",
+        "is synchronized to the integrated",
+        "now contains every sibling lane",
+    )
+    surfaces = {
+        "record preamble": _record_preamble(),
+        "record section 8 current qualification": _current_qualification(
+            _record_section("## 8. Exact next step")
+        ),
+        "SESSION_HANDOFF.md target section": _handoff_current(),
+        "ACTION_PLAN_2026-08-20.md target block": _action_current(),
+    }
+    for name, block in surfaces.items():
+        normalized = " ".join(block.lower().split())
+        for claim in claims:
+            assert claim not in normalized, (
+                f"{name} claims present-tense synchronization with {mainline}, "
+                f"but HEAD does not contain it"
+            )

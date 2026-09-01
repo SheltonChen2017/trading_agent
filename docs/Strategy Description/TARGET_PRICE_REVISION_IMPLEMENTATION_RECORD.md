@@ -1,9 +1,10 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN THE EXACT
-THREE-COMMIT RANGE `cf136e25..cd23f7c8`. ALL THREE COMMITS ARE ACCEPTED
-AFTER CORRECTION. THE TWO P2 AND FOUR P3 FINDINGS ARE CORRECTED OR QUALIFIED
-IN SECTION 23; NO P0 OR P1 EXISTS. ONE PRE-EXISTING
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN THE EXACT
+TWO-COMMIT RANGE `cd23f7c8..b4e6b88c`. BOTH COMMITS ARE ACCEPTED. THE ONE P3
+CORRECTION AND THE ACCEPTED COUNTER-REVIEW FINDINGS ARE IN SECTION 24; NO P0,
+P1 OR P2 WAS FOUND IN THE RANGE. THE LANE AND `ORIGIN/MAIN` HAVE DIVERGED:
+2 BEHIND, 5 AHEAD. CODEX COUNTER-REVIEW OF THIS CLAUDE ROUND IS NEXT. ONE PRE-EXISTING
 TARGET P2 (`TPR-CCR5-004`) IS OPEN: THE REVIEWED-ALGORITHM LOADER'S POLICY-PATH
 INVENTORY IS SELF-MUTABLE AND MUST RECEIVE A SEPARATELY REVIEWED IMMUTABLE
 TRUST-ROOT DESIGN BEFORE ANY POSITIVE REVIEWED-ALGORITHM AUTHORITY CAN EXIST.
@@ -348,12 +349,13 @@ from `main`. The four-slot multiplicity amendment nevertheless remains
 unpropagated: see `TPR-OOL-006`.
 
 **Current qualification, 2026-08-31:** Claude's latest independent review is
-the exact three-commit range
-`cf136e259cf628aabdc4220865fccdb5c7204306..cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a`.
-Codex has counter-reviewed every Claude commit individually: `d9c4a450`,
-`0e911189`, and `cd23f7c8`. All three are accepted after correction; section
-23 contains the two P2 and four P3 findings, exact dispositions, corrections,
-qualifications, and validation. The reviewed implementation snapshot remains
+the exact two-commit Codex range
+`cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a..b4e6b88ccf8a17a60cad91cda94205f61c1b7f90`.
+Claude has independently reviewed every Codex commit individually:
+`84a6fda1` and `b4e6b88c`. Both are accepted; section 24 contains the
+dispositions, the accepted counter-review findings, the one P3 correction,
+the quality rating, and validation. Codex counter-review of this Claude
+round is next. The reviewed implementation snapshot remains
 `bb8dfb6e8d718f9371bbbd85b30f5f9a769f396e`.
 The sole-authority blueprint is the 29-page v2.2 artifact at raw SHA-256
 `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`.
@@ -374,6 +376,13 @@ this mints no present authority; an independently reviewed immutable inventory
 or equivalent external trust-root design must be separately owner-approved and
 independently reviewed before any positive reviewed-algorithm authority.
 
+**Integration state, measured 2026-08-31:** the lane and `origin/main` have
+since **diverged**. `origin/main` is `aefa0ecc` and the lane is 2 commits
+behind and 5 ahead; neither contains the other. The earlier synchronization
+statement was accurate when the lane was fast-forwarded earlier on
+2026-08-31 and is no longer current; the exact sync point is recorded in the
+section 10 ledger row for that round.
+
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Integration into `main` does not authorize a coordinated edit from
 this target lane. No next implementation milestone is authorized. TPR-1
@@ -381,8 +390,8 @@ remains blocked until a separately reviewed source-rights artifact proves
 entitlement, public-time semantics, correction completeness, target-horizon
 consistency, raw retention, derived processing, and QC-transfer rights. TPR-0B
 remains blocked until reviewed TPR-1 and TPR-2 structural manifests exist.
-After this Codex round's single push, Claude reviews only the exact Codex range
-beginning after `cd23f7c8`; that loop step grants no source, outcome, look, QC,
+After this Claude round's single push, Codex counter-reviews every Claude
+commit in the range beginning after `b4e6b88c`; that loop step grants no source, outcome, look, QC,
 broker, paper, live, deployment, capital, or trading authority.
 
 ### Historical progression (not the current resume instruction)
@@ -504,6 +513,7 @@ known.
 | 2026-08-31 | Codex counter-review + correction | `f21d70851d5e1790be0c308e13e8837a7cd1d008` -> `943edf77ca61cae475e4986b985baab3097adfbc` plus final record candidate | Counter-review only; no next milestone authorized | Counter-reviewed `ea9d890`, `ce74e72`, `50da9d0`, and `f21d708` individually. Corrected ordinary-fast-forward LF migration, exact-byte and worktree-guard sensitivity/scope, current-role routing, and current range/report defects. Candidate/PDF and all authority JSON artifacts are unchanged. | Exact committed correction tree: target plus active-document suite **190 passed, 3 skipped in 13.88s**; network-restricted complete suite **5,844 passed, 5 skipped, 0 failed, 26 warnings in 1,030.57s**; full `compileall -q` exit 0. Exact-byte reverse mutation failed as required and its byte-identical restore passed; active-lane/no-registration and missing-current-instruction probes refused, while sibling text outside target blocks passed. Python 3.12.13 / pytest 9.1.1; system `core.autocrlf=true`. Provider/outcome accesses **0**; authorized/spent looks **0**. | No P0/P1. `TPR-CCR5-001` through `003` and `005` through `007` closed; `TPR-CCR5-004` (P2) open before any positive reviewed-algorithm authority. | None; registries remain empty/zero-access and no look is authorized or spent. | Commit the final record-only evidence, run the exact document guards/diff checks, make this round's single push, and have Claude review only the range beginning after `f21d708` and ending at the new pushed head. TPR-1 and TPR-0B remain blocked. |
 | 2026-08-31 | Claude review + main sync | `db6a721d45eb47e1a133744387bf43a1aa1f310c` -> `3f33eea09aedbb8c386ebc355a6c875b76c80f83` reviewed; synchronized to `main` `cf136e259cf628aabdc4220865fccdb5c7204306`; corrections on this same lane branch | Independent review of two Codex counter-reviews and the CR4 round; no new milestone in range | Reviewed all eight pushed commits individually. Accepted all four counter-review findings against the prior Claude round, two of which repeat classes that round had already been corrected on. Fast-forwarded the lane onto the integrated `main` now that all four lanes are merged (PRs #321/#322/#323/#325); the merge-base equalled the lane head so no merge commit or conflict resolution was involved. Corrected the propagation routing whose branch premise the merge invalidated. | Baseline complete run on the synchronized tree: **6,789 passed, 13 skipped, 1 failed, 25 warnings in 1,314.44s**. The single failure was the analyst lane's checkout-bytes guard, diagnosed as a stale working tree rather than a repository defect (`TPR-OOL-008`): five artifacts held CRLF against LF blobs while `git status` reported clean. Restoring each from its committed blob turned the guard green with `git diff HEAD` empty, changing no committed content. Final complete run recorded separately. Adversarial probe of the reviewed-authority path: registry empty, both authority entry points refuse. Three mutations on the new guard each turned it red with text-identical restore. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | All eight commits accepted or accepted after correction. No P0/P1. `TPR-CR5-001` closed. `TPR-CCR5-004` remains open as Codex recorded it, independently reproduced here and confirmed inert. `TPR-OOL-006` escalated to a single-tree contradiction; `TPR-OOL-008` opened. Details in section 22. | None; all source, outcome, look, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. No milestone is authorized: TPR-1 is blocked on source rights, TPR-0B on reviewed TPR-1/TPR-2 manifests, and `TPR-CCR5-004` gates any positive reviewed-algorithm authority. |
 | 2026-08-31 | Claude validation | `0e911189` -> `0e911189` (exact tested tree; this validation-record commit follows) | v2.2 review round final validation | Revalidated the complete synchronized tree after the review corrections and the new guard. No product file changed during the run, and all work stayed inside the single named lane worktree. | Complete suite: **6,791 passed, 13 skipped, 0 failed, 25 warnings in 4,093.39s**. Reconciles exactly against the 6,789/13/1 baseline: 6,803 collected before and 6,804 after, with passed rising by two — the repaired analyst checkout guard plus this round's one new guard — and skips unchanged. Lane and shared documentation suites **191 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, QuantConnect, broker, scheduler, paper or live access; **0 research looks**. | No new finding. `TPR-CR5-001` remains closed; `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. |
+| 2026-08-31 | Claude review | `cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a` -> `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review round; no milestone in range | Reviewed both pushed commits individually. Accepted all six counter-review findings against the prior Claude round, three of them repeats of classes already corrected. Verified the guard rework is stronger and that all seven new extractors fail closed. Advanced every current-state pointer to this round and corrected a stale present-tense synchronization claim. Did not re-sync to `main`: a fast-forward is no longer possible and a merge was not requested. | Baseline on the exact pushed tree `b4e6b88c`: **6,791 passed, 13 skipped, 0 failed, 25 warnings in 1,386.58s**, reproducing the recorded 6,791/13/0; the recorded 26-warning count is not reconciled. Final complete run recorded separately. Lane and shared documentation suites **192 passed, 3 skipped**. Two mutations on the new sync guard each turned it red with text-identical restore. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | Both commits accepted. No P0/P1/P2 in range; one P3 (`TPR-CR6-001`) found in the cumulative tree and closed. Counter-reviewed round quality **8/10**. `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. Details in section 24. | None; all source, outcome, look, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. No milestone is authorized; the lane also remains 2 commits behind `origin/main`. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -940,8 +950,9 @@ Complete-suite validation on the committed tree `b2dbe89`: **5,832 passed, 5 ski
 
 > **Superseded in part on 2026-08-31; see section 22.** The branch premise
 > below is no longer true: all four strategy lanes were merged into `main`
-> (PRs #321, #322, #323, #325), and this lane is now synchronized to the
-> integrated `main`. The per-lane review and counter-review requirement, the
+> (PRs #321, #322, #323, #325), and this lane was synchronized to the
+> integrated `main` at that time. It has since diverged from `main`; the
+> measured state is in section 8. The per-lane review and counter-review requirement, the
 > required actions, and the measured frozen states in the table all still
 > stand. The original text is retained unaltered as the record of what was
 > true when the directive was recorded.
@@ -1821,3 +1832,103 @@ capital, or trading authority was accessed or added; authorized/spent looks
 remain **0**. No next implementation milestone is authorized. After the one
 combined push, Claude reviews exactly the Codex range beginning after
 `cd23f7c8` and ending at the new pushed head.
+
+## 24. Claude independent review - 2026-08-31 (Codex counter-review round)
+
+**Disposition: both commits accepted.** No P0, P1 or P2 was found in the
+range. One P3 was found in the cumulative tree and corrected. **There is no new
+implementation milestone in this range** — `git diff --name-only
+cd23f7c8..b4e6b88c` over `research/` is empty, and section 23 says none was
+authorized. That is the second consecutive round described on handoff as
+containing a milestone that contains none.
+
+**Counter-reviewed round quality: 8/10.** The counter-review is accurate and
+specific: six real defects in the prior Claude round, three of them repeats,
+each with exact evidence. The guard rework is materially better than what it
+replaced — six explicitly scoped current surfaces instead of whole-document
+scans, and seven extractors that all fail closed on a missing anchor. Two
+deductions: while correcting the current-state blocks it left a stale
+present-tense synchronization claim inside those same blocks (`TPR-CR6-001`),
+which is the class the round was fixing; and its validation logged 26 warnings
+against the 25 this reviewer measures on the same tree without reconciling the
+difference.
+
+### 24.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Reviewed range | `cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a..b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` (two commits) |
+| Ancestry | `cd23f7c8` is still an ancestor; no history rewrite |
+| `research/` changes in range | none |
+| Integration | lane and `origin/main` (`aefa0ecc`) have **diverged**: 2 behind, 5 ahead, neither containing the other |
+| Environment | Windows 11; Python 3.14.6; pytest 9.1.1; `core.autocrlf=true` |
+
+The lane was **not** re-synchronized this round. A fast-forward is no longer
+possible, and merging `main` would add a merge commit to a review round that
+was not asked for; the divergence is two sibling-lane record commits with no
+bearing on this review. It is recorded here and in section 8 for the owner to
+schedule.
+
+### 24.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `84a6fda1` | **accepted** | Counter-review of the prior Claude round plus guard and pointer corrections. All six findings verified valid; the guard rework verified stronger and fail-closed. |
+| `b4e6b88c` | **accepted** | Record-only validation. Its 6,791 passed / 13 skipped / 0 failed is reproduced exactly below; only the warning count differs. |
+
+### 24.3 Codex findings against the prior Claude round: all six accepted
+
+| Finding | Assessment |
+|---|---|
+| `TPR-CCR6-001` (P2) | **Confirmed.** Section 22 completed the review while every active pointer still named `f21d708` and routed Claude next. This is the same current-state contradiction section 22 criticized in Codex's own work, and the third occurrence for this reviewer. |
+| `TPR-CCR6-002` (P2) | **Confirmed.** "One coordinated change instead of four isolated branch rounds" reads as inferring cross-lane edit authority from merge ancestry. The ledger row did carry the per-lane caveat, but the sentence should not have implied it either way; merge changes visibility, not authority. |
+| `TPR-CCR6-003` (P3) | **Confirmed, third occurrence.** Guard committed before the document state it asserts, so `d9c4a450` is red standalone — after `0f05f3d` and `da6f7ea`. This round pairs each document change with its guard in one commit instead. |
+| `TPR-CCR6-004` (P3) | **Confirmed.** The guard scanned whole shared documents and all of section 8 while accepting the 15.4 marker anywhere in the tail — over- and under-scoped at once, and the same over-broad-scan defect flagged one round earlier in the CR4 guard. |
+| `TPR-CCR6-005` (P3) | **Confirmed and verified against the source.** The 1-10 rating is binding at `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md:377`. It has been omitted for several rounds; this section supplies it. |
+| `TPR-CCR6-006` (P3) | **Confirmed.** "Touch only lane-owned files" was wrong: `docs/SESSION_HANDOFF.md` is a shared root document. The verification command checked only that no sibling *strategy* content was committed, and the claim then overstated it. |
+
+### 24.4 P0-P3 issue ledger
+
+| ID | Priority | Status | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|
+| `TPR-CR6-001` | P3 | Closed | Record section 8 and 15.4 note; handoff integration bullet | The current-state blocks stated the lane "is synchronized to the integrated `main`" and "now contains every sibling lane's work". Both were true at the fast-forward and became false when `main` advanced. A reader would believe the lane carries the latest sibling work and that no sync is outstanding. | `git merge-base --is-ancestor` fails in both directions; the lane is 2 behind and 5 ahead of `aefa0ecc`. | The same current-state-truthfulness rule the counter-review had just enforced on the review pointers. The claim also hides an outstanding sync from whoever schedules the next round. | All three surfaces now state the measured divergence with its counts, and the historical statements are marked as accurate at the time rather than deleted. | New guard `test_a_present_tense_sync_claim_matches_real_ancestry`; two mutations, one per surface, each turn it red with a text-identical restore. |
+
+### 24.5 Verified rather than accepted
+
+- **The guard rework is stronger, not merely different.** All seven new
+  extractors (`_current_qualification`, `_action_current`, `_action_tpr_row`,
+  `_handoff_current`, `_handoff_current_review`, `_handoff_target_summary`,
+  `_record_preamble`) raise on a missing anchor rather than returning an empty
+  string, so a deleted section fails the guard instead of vacuously passing.
+  That was checked explicitly, not assumed from the diff.
+- **The pointer guard works against its author.** Advancing the round tripped
+  it four separate times on surfaces that had not been advanced — the record
+  preamble, the Action Plan TPR row, a handoff line and the handoff summary.
+  Each was a genuine stale pointer, and it caught a superseded hash this
+  reviewer reintroduced while writing the correction.
+- **The baseline is reproduced exactly**: 6,791 passed, 13 skipped, 0 failed in
+  1,386.58s against the recorded 6,791/13/0. The warning count differs, 25
+  here against 26 recorded, which is not reconciled and is noted rather than
+  explained away.
+- **The analyst checkout guard stayed green** this round without intervention:
+  the `-text` files restored last round persist, though `research/ml_specs`
+  remains unprotected and will re-convert. `TPR-OOL-008` is unchanged.
+
+### 24.6 Scope not exhaustively audited
+
+- The new sync guard's `contains_main` early-return branch is **not**
+  exercised today, because the lane does not currently contain `main`. It is
+  reachable only after a future sync and is stated here rather than counted as
+  covered.
+- The estimator, power and statistical binding procedures were again read for
+  contract shape only.
+- The 168 commits inherited from sibling lanes remain unreviewed here.
+
+### 24.7 Authority state after this review
+
+Unchanged and zero. No provider, credential, licensed row, outcome, evidence
+epoch, QuantConnect project, broker, operator database, scheduler, paper or
+live surface was accessed, and **0 research looks** were spent. The
+reviewed-spec registry remains empty and `TPR-CCR5-004` still gates any
+positive reviewed-algorithm authority. No milestone was implemented and none
+is authorized.

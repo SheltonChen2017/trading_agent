@@ -11,22 +11,25 @@ their lane-owned artifacts.
 
 ## 0. Target-Price Revision fourth-lane planning addition
 
-- **Integration state, 2026-08-31.** All four strategy lanes are merged into
-  `main` (PRs #321, #322, #323, #325) and this lane branch is synchronized to
-  the integrated `main` by fast-forward. The earlier statements that the lane
-  is developed apart from `main` are superseded. The shared four-slot
+- **Integration state, measured 2026-08-31.** All four strategy lanes are
+  merged into `main` (PRs #321, #322, #323, #325). This lane branch was
+  fast-forwarded onto the integrated `main` earlier that day, but `main` has
+  since advanced and the two have **diverged**: the lane is 2 commits behind
+  and 5 ahead, and neither contains the other. The earlier statements that
+  the lane is developed apart from `main` are superseded. The shared four-slot
   multiplicity amendment is still unpropagated (`TPR-OOL-006`). Sibling-lane
   changes and their independent reviews remain on their respective branches;
   merge visibility grants no target-branch authority over sibling artifacts.
 
 - **Current review state, 2026-08-31.** Claude's latest independent review is
-  the exact three-commit range
-  `cf136e259cf628aabdc4220865fccdb5c7204306..cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a`.
-  Codex has counter-reviewed every Claude commit individually; all three are
-  accepted after correction, with two P2 and four P3 findings recorded in
-  section 23 of the target lane record. No P0/P1 exists. No next implementation
-  milestone is authorized. After this Codex round's single push, Claude reviews
-  only the exact Codex range beginning after `cd23f7c8`.
+  the exact two-commit Codex range
+  `cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a..b4e6b88ccf8a17a60cad91cda94205f61c1b7f90`.
+  Claude has independently reviewed every Codex commit individually; both are
+  accepted, with one P3 correction recorded in section 24 of the target lane
+  record. No P0, P1 or P2 was found in the range. No next implementation
+  milestone is authorized. The lane and `origin/main` have diverged: 2 behind,
+  5 ahead. After this Claude round's single push, Codex counter-reviews every
+  Claude commit in the range beginning after `b4e6b88c`.
 
 - The owner directed a new sibling worktree for branch
   `codex/strategy-target-price-revisions`, resolved with
@@ -124,7 +127,7 @@ their lane-owned artifacts.
   scoped to current target blocks, accepts sibling-lane text elsewhere, and
   refuses a missing registration when this checkout is on the lane branch.
   That preceding `c8c7470..f21d708` round is historical; section 23 of the lane
-  record controls the current `cf136e25..cd23f7c8` counter-review. One
+  record controls the current `cd23f7c8..b4e6b88c` Claude review round. One
   pre-existing target P2 (`TPR-CCR5-004`) blocks any future positive reviewed-
   algorithm authority until an independently reviewed immutable policy-
   inventory trust root exists; the reviewed registry is empty today. No next
@@ -468,9 +471,11 @@ same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. The
 v2.2 implementation snapshot is `bb8dfb6`; the latest Claude review is the
-exact three-commit range `cf136e25..cd23f7c8`, and Codex has counter-reviewed
-every Claude commit individually. All three are accepted after correction;
-the two P2 and four P3 findings are recorded in section 23 of the lane record.
+exact two-commit Codex range `cd23f7c8..b4e6b88c`, and Claude has
+independently reviewed every Codex commit individually. Both are accepted;
+the one P3 correction and the accepted counter-review findings are recorded
+in section 24 of the lane record. Codex counter-review of this Claude round
+is next. The lane and `origin/main` have diverged: 2 behind, 5 ahead.
 Sibling-lane changes and their independent reviews remain on their respective
 branches. No provider-specific target reader/normalizer, authenticated target event,
 permanent target look authority, stock score, ETF topology, portfolio, QC

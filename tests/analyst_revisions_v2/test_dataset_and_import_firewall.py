@@ -887,6 +887,38 @@ def test_exchange_calendar_facade_cannot_reexport_dataframe_capabilities(
         _validate_import_closure(tmp_path, package_name="guarded")
 
 
+@pytest.mark.parametrize(
+    "guarded_source",
+    (
+        (
+            "import data.exchange_calendar as calendar\n"
+            "getattr(calendar, 'p' + chr(100)).read_pickle('outcome.pkl')\n"
+        ),
+        (
+            "from data import exchange_calendar as calendar\n"
+            "facade = calendar\n"
+            "getattr(facade, 'p' + chr(100)).read_pickle('outcome.pkl')\n"
+        ),
+    ),
+)
+def test_exchange_calendar_facade_refuses_computed_dynamic_access(
+    tmp_path: Path, guarded_source: str
+) -> None:
+    guarded = tmp_path / "guarded"
+    data = tmp_path / "data"
+    guarded.mkdir()
+    data.mkdir()
+    (guarded / "__init__.py").write_text(guarded_source, encoding="utf-8")
+    (data / "__init__.py").write_text("", encoding="utf-8")
+    (data / "exchange_calendar.py").write_text(
+        "import pandas as pd\nimport pandas_market_calendars as mcal\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ImportBoundaryError, match="dynamic facade access"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
 def _authority_registry_names(tree: ast.Module) -> set[str]:
     """Module-level names bound to an out-of-band authority registry dict."""
     names: set[str] = set()
@@ -1368,6 +1400,28 @@ def test_git_ancestry_refuses_legacy_grafts(tmp_path: Path) -> None:
 
     with pytest.raises(DatasetVerificationError, match="graft metadata"):
         git_commit_is_ancestor(repository, first, second)
+
+
+def test_git_ancestry_disables_commit_graph_acceleration(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    captured: list[list[str]] = []
+
+    def fake_run(command, **_kwargs):
+        captured.append(list(command))
+        return subprocess.CompletedProcess(command, 1, stdout=b"", stderr=b"")
+
+    monkeypatch.setattr(dataset_module, "_refuse_git_grafts", lambda _root: None)
+    monkeypatch.setattr(dataset_module.subprocess, "run", fake_run)
+
+    assert not git_commit_is_ancestor(tmp_path, "a" * 40, "HEAD")
+    assert len(captured) == 1
+    command = captured[0]
+    assert any(
+        command[index : index + 2] == ["-c", "core.commitGraph=false"]
+        for index in range(len(command) - 1)
+    )
+    assert command[-4:] == ["merge-base", "--is-ancestor", "a" * 40, "HEAD"]
 
 
 @pytest.mark.parametrize("scope", ("--local", "--worktree"))

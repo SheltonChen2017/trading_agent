@@ -404,6 +404,73 @@ def _from_import_candidates(
 def _reject_runtime_import_indirection(
     tree: ast.AST, module: _LocalModule
 ) -> None:
+    def attribute_path(node: ast.AST) -> tuple[str, ...] | None:
+        if isinstance(node, ast.Name):
+            return (node.id,)
+        if isinstance(node, ast.Attribute):
+            prefix = attribute_path(node.value)
+            if prefix is not None:
+                return (*prefix, node.attr)
+        return None
+
+    facade_paths: set[tuple[str, ...]] = set()
+    facade_aliases: set[str] = set()
+    for candidate in ast.walk(tree):
+        if isinstance(candidate, ast.Import):
+            for alias in candidate.names:
+                if alias.name not in _SAFE_LOCAL_FACADE_EXPORTS:
+                    continue
+                if alias.asname:
+                    facade_aliases.add(alias.asname)
+                else:
+                    facade_paths.add(tuple(alias.name.split(".")))
+        elif (
+            isinstance(candidate, ast.ImportFrom)
+            and candidate.level == 0
+            and candidate.module
+        ):
+            for alias in candidate.names:
+                imported = f"{candidate.module}.{alias.name}"
+                if imported in _SAFE_LOCAL_FACADE_EXPORTS:
+                    facade_aliases.add(alias.asname or alias.name)
+
+    def is_facade_expression(node: ast.AST) -> bool:
+        path = attribute_path(node)
+        return path is not None and (
+            path in facade_paths
+            or (len(path) == 1 and path[0] in facade_aliases)
+        )
+
+    facade_assignments: list[tuple[tuple[str, ...], ast.AST]] = []
+    for candidate in ast.walk(tree):
+        if isinstance(candidate, ast.Assign):
+            names = tuple(
+                target.id for target in candidate.targets if isinstance(target, ast.Name)
+            )
+            if names:
+                facade_assignments.append((names, candidate.value))
+        elif (
+            isinstance(candidate, ast.AnnAssign)
+            and isinstance(candidate.target, ast.Name)
+            and candidate.value is not None
+        ):
+            facade_assignments.append(((candidate.target.id,), candidate.value))
+        elif isinstance(candidate, ast.NamedExpr) and isinstance(
+            candidate.target, ast.Name
+        ):
+            facade_assignments.append(((candidate.target.id,), candidate.value))
+    for _iteration in range(len(facade_assignments) + 1):
+        changed = False
+        for names, value_node in facade_assignments:
+            if not is_facade_expression(value_node):
+                continue
+            before = len(facade_aliases)
+            facade_aliases.update(names)
+            if len(facade_aliases) != before:
+                changed = True
+        if not changed:
+            break
+
     string_aliases: dict[str, set[str]] = {}
     string_assignments: list[tuple[tuple[str, ...], ast.AST]] = []
     for candidate in ast.walk(tree):
@@ -621,6 +688,14 @@ def _reject_runtime_import_indirection(
             and node.attr in _RESTRICTED_CAPABILITY_NAMES
         ):
             primitive = node.attr
+        elif (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "getattr"
+            and node.args
+            and is_facade_expression(node.args[0])
+        ):
+            primitive = "dynamic facade access"
         elif (
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Name)

@@ -575,6 +575,8 @@ def _read_only_git_global_options(
         "--no-optional-locks",
         "--no-replace-objects",
         "-c",
+        "core.commitGraph=false",
+        "-c",
         "core.fsmonitor=false",
         "-c",
         "core.ignoreStat=false",

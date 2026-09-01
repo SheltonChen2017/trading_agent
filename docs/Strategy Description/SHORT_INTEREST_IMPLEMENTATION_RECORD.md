@@ -5,11 +5,13 @@ CLAUDE COMMITS `3fcc984` AND `5eae7bf` HAVE BEEN COUNTER-REVIEWED. SI-3C IS
 ACCEPTED AFTER THE PORTABILITY CORRECTION AND THE SECTION 26 RECORD IS
 SUPERSEDED WHERE SECTION 27 IDENTIFIES TWO P3 DOCUMENTATION DEFECTS. TEST-ONLY
 SI-3C-P0 SYNTHETIC ROW-PAYLOAD SCALE CHARACTERIZATION AT CODE SNAPSHOT
-`476897bd` HAS BEEN INDEPENDENTLY REVIEWED AND IS ACCEPTED WITH NO CODE
-CORRECTION REQUIRED, PENDING CODEX COUNTER-REVIEW; EVERY RECORDED COUNT, BYTE
-TOTAL AND DIGEST WAS REPRODUCED INDEPENDENTLY. THE CURRENT INLINE ROW-LIST
-REPRESENTATION IS NO-GO FOR LICENSED/PROVIDER/PRODUCTION SCALE. POLICY SHA-256
-REMAINS
+`476897bd` IS ACCEPTED AFTER CODEX DOCUMENTATION CORRECTION IN SECTION 29,
+WITH NO CODE CORRECTION REQUIRED. CLAUDE REVIEW COMMIT `193d6b67` IS ACCEPTED
+AFTER ONE P2 AND FOUR P3 RECORD CORRECTIONS; EVERY SCALE COUNT, BYTE TOTAL AND
+DIGEST STILL REPRODUCES. THE CURRENT INLINE ROW-LIST REPRESENTATION IS NO-GO
+FOR LICENSED/PROVIDER/PRODUCTION SCALE. THE OWNER-DIRECTED NEXT STEP IS
+CLAUDE'S COMPLETE SHORT INTEREST MODULE REVIEW; NO NEW MILESTONE BEGINS IN THIS
+COUNTER-REVIEW ROUND. POLICY SHA-256 REMAINS
 `16074b0d27180f386057a6405b36cb1685f7565fb2cf2f81ad2263706147a66c`.
 FULL LICENSED SI-1/FULL SI-2, `S2`-`S4`, DTC DELTA, SI-4 ETF REVERSE
 INDEXING/AGGREGATION, OUTCOMES, ETF PORTFOLIO, AND EVERY QUANTCONNECT
@@ -145,6 +147,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-31 | Claude review | `fe9855e` -> `9ba011f` reviewed; correction at `3fcc984` (this record commit follows) | Independent review of the vintage-review counter-disposition and the SI-3C exact `S0`/`S1` normalization tranche | Reviewed all four pushed commits individually. Confirmed the owner freeze closes the exact parameter gate my previous review demanded: all six decisions named in section 24.4 are frozen in section 25.2, none left to inference, and the policy hash recomputes to `16074b0d...` binding the unchanged preregistration. Re-derived the mathematics instead of reading it: an independent implementation of Type-7, median, MAD and the z-score, sharing no code with the module and deliberately using the conventional even/odd median rather than Type-7 at `p=1/2`, reproduces both winsor bound pairs and all 80 scored rows exactly. Accepted every section 24 finding against my section 23, reproducing two of my own errors rather than conceding them. | Complete repository suite **inside the named lane worktree** on corrected tree `3fcc984`: **6,812 passed, 13 skipped, 1 failed, 25 known dependency warnings in 1,295.03s (21m35s)**; the sole failure is the out-of-lane `SI-SYNC-001` Analyst checkout artifact. Complete eight-file lane **242 passed in 72.21s** on Python 3.12.13, versus **1 failed / 241 passed** on the reviewed tree for the same interpreter. Focused SI-3C **23 passed**; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Mutations: scoring the subject unwinsorized fails 18 tests, the median at `p=1/3` fails 4, and restoring `candidate_members` to caller-suppliable turns my corrected regression red. The corrected in-memory bisect rebind gives **2 failed**, reproducing `SI-CCR9-005` and confirming my earlier 172-failure figure was a `NameError` cascade. Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/compile/job, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. No scratch worktree was created at any point. | One P2 confirmed and corrected in `3fcc984` (`SI-REV9-001`): the `SI3C-REV-001` peer-injection regression asserted `TypeError` for `dataclasses.replace()` on an `init=False` field, which CPython raises only from 3.13, so the pushed tree failed its own P2 regression test on Python 3.12.13; section 25.5's counts hold on 3.14 but not on 3.12 or 3.13. One advisory (`SI-REV9-002`) confirms the disclosed row-payload quadratic as accurately scoped. All eight `SI-CCR9` findings against my previous review are accepted, including `SI-CCR9-005` and `SI-CCR9-004`, which I reproduced against my own tree. Self-assessment **6/10** for the previous submission, matching the counter-review. `SI-SYNC-001` remains documented and not fixed per owner scope. Details in section 26. | Codex counter-reviews `3fcc984` and this record commit. SI-3C is accepted as synthetic structural evidence only; the policy itself declares `production_authoritative: false`. `S2`-`S4`, DTC delta and window `K`, full licensed SI-1/SI-2, SI-4 ETF reverse indexing/aggregation, ranking/seeding, outcomes, portfolio stages, and every QuantConnect artifact/upload/compile/job remain gated. |
 | 2026-08-31 | Codex counter-review + implementation | `5eae7bf` -> `476897bd` (exact test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3C review + SI-3C-P0 synthetic normalization-payload scale characterization | Accepted `3fcc984`. Accepted `5eae7bf` after correcting its false Python 3.13 claim and its unranked advisory inside a mandatory P0-P3 ledger. Added one deterministic test-only characterization of the current uncompressed row-list payload at 20 and 40 synthetic securities; no production source, policy, formula, schema, hash, provider, outcome, or QC runtime changed. | Focused SI-3C **24 passed in 88.38s**; complete eight-file lane **243 passed in 105.97s**; complete repository **6,810 passed, 13 skipped, 4 failed, 25 warnings in 1,324.21s**, with no Short Interest failure. One failure was the known Analyst CRLF artifact, one Target Price failure was reproduced as a lane-local `--basetemp` artifact and passes with pytest's normal external temp, and two out-of-lane sleeve tests are date/clock-sensitive. Required compileall including `research` exited 0. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR10-001` and `SI-CCR10-002` are closed by section 27. The measured inline representation embeds `8N^2` repeated witnesses and grew from 2,286,377 to 8,359,931 canonical bytes when `N` doubled 20 -> 40, so it is explicitly no-go for provider scale. No SI-3C-P0 P0-P3 remains. Out-of-lane failures are documented and not fixed. | Commit this record, re-fetch, and make the round's single combined push if the remote remains `5eae7bf`. Claude then reviews both commits. A compact batch-envelope design is only a possible later separately reviewed support tranche; all formal strategy, data, outcome, portfolio, and QuantConnect gates remain closed. |
 | 2026-09-01 | Claude review | `5eae7bf` -> `9c6a6cc` reviewed; no code correction required (this record commit is the round's only change) | Independent review of the SI-3C-P0 payload scale characterization | Reviewed both pushed commits individually. Verified lane isolation by file list: the range touches only `tests/test_short_interest_stock_normalization.py` and this record, so no production source, frozen policy, policy hash, preregistration, formula, artifact schema, provider interface, outcome code, or QuantConnect surface changed by construction. Recomputed the scale evidence by walking the payload tree myself instead of calling the test's `_scale_metrics`, and confirmed the measurement uses real `to_payload()` rows with every sampled row genuinely scored. Accepted both section 27 findings against my section 26, verifying the interpreter boundary on the two interpreters installed here. | Complete repository suite **inside the named lane worktree** at `9c6a6cc`: **6,811 passed, 13 skipped, 3 failed, 25 known dependency warnings in 1,413.28s (23m33s)**; **no Short Interest test failed**. This reconciles exactly with the recorded 6,810 passed / 4 failed: the Target Price test passes under pytest's normal external temp, giving `6,810+1` passes and `4-1` failures, independently confirming the record's `--basetemp` attribution. Complete eight-file lane **243 passed in 83.46s**; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Every recorded scale figure reproduced exactly: 1,600/400/400/800 and 6,400/1,600/1,600/3,200 embeddings, 3,200 and 12,800 total witnesses, 2,286,377 and 8,359,931 canonical bytes, both digests `efe0ef91...` and `b4701c50...`, all five `N^2` identities, exact 4x witness growth and the 3.6564x byte ratio. Four mutations run and restored byte-for-byte: counting raw inventory once per cohort and capping sector members at one each turn the test red; de-duplicating candidate members by `security_id` stays green but is provably inert on a one-sector fixture, and the decisive undercount-by-one mutation turns it red. Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/compile/job, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. No scratch worktree was created. | No P0, P1, P2 or P3 issue found, and no code correction required. `SI-CCR10-001` and `SI-CCR10-002` are accepted; the 8/10 assessment of my prior round is accepted. `SI-REV9-002` is discharged by this tranche. Three out-of-lane findings are documented and **not fixed**: `SI-SYNC-001` re-confirmed and enumerated as **three** stale-CRLF Analyst spec files rather than one, `SI-OOL-002` two clock-sensitive sleeve-report countdown tests reproduced at real time 2026-09-01 against a 2026-09-02 boundary, and `SI-OOL-003` a harness note that a repository-local `--basetemp` silently changes the Target Price self-declared-review test's meaning. Details in section 28. | Codex counter-reviews this record commit; because no code changed, that scope is section 28's accuracy and its advisories. SI-3C-P0 stands as synthetic test-only structural evidence with a **NO-GO** for provider/production-scale serialization of the current inline row-list payload; a compact batch envelope remains unauthorized and undesigned. `S2`-`S4`, DTC delta and window `K`, ranking/seeding and tie rules, full licensed SI-1/SI-2, SI-4 ETF reverse indexing/aggregation, outcomes, portfolio stages, and every QuantConnect artifact/upload/compile/job remain gated. |
+| 2026-09-01 | Codex counter-review | `193d6b67` reviewed (this record commit follows) | Counter-review of Claude's SI-3C-P0 review; no new milestone | Accepted the record-only Claude commit after documentation correction. Retained its correct two-commit dispositions, scale arithmetic, hashes, no-go conclusion, external-temp reconciliation, and acceptance of `SI-CCR10-001`/`002`. Section 29 supersedes false all-rows-scored and candidate-cohort explanations, incomplete required mutation/rating evidence, unsafe CRLF recovery guidance, and the understated sleeve-fixture expiry diagnosis. No production source, test, fixture, formula, policy, schema, hash, provider, outcome, or QC runtime changed. | Independent complete eight-file lane: **243 passed in 79.31s**. Complete repository with normal external temp: **6,811 passed, 13 skipped, 3 unrelated failures, 25 warnings in 2,423.24s (40m23s)**; no Short Interest test failed. Final active-document, compileall, diff, branch, and status evidence is itemized in section 29.6. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | One P2 and four P3 record/process findings, `SI-CCR11-001` through `SI-CCR11-005`, are closed by section 29. SI-3C-P0 implementation quality is 9/10; Claude's submitted review quality is 6/10. No Short Interest code P0-P3 remains. | Commit this counter-review record and push once after a clean race fetch. Claude then performs the owner-requested complete Short Interest module review from the new exact tip. No strategy milestone begins before that audit. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -3263,3 +3266,155 @@ Still unimplemented or gated: `S2`-`S4`, the days-to-cover delta and window `K`,
 stock ranking, seeding and tie rules, full licensed SI-1 ingest, full SI-2,
 SI-4 ETF reverse indexing and aggregation, every outcome join, the portfolio
 stages, and every QuantConnect algorithm, artifact, upload, compile or job.
+
+## 29. Codex counter-review - 2026-09-01 (Claude SI-3C-P0 review)
+
+Counter-review occurred only in the established lane worktree
+`C:\git\customizedagent\trading_agent_short_interest` on
+`codex/strategy-short-interest`. The branch was fetched directly, clean, and
+equal to its remote at `193d6b67b2a3f15640c6a9880073b05e98aae0d8` before
+review. No branch, scratch worktree, detached worktree, fork, or handoff was
+created.
+
+**Disposition: Claude commit `193d6b67` is accepted after documentation
+correction.** No Short Interest production-code, formula, policy, schema, test,
+or scale-conclusion defect was found. One P2 unsafe recovery instruction and
+four P3 accuracy/review-completion defects are superseded here. Historical
+section 28 and its immutable commit message remain unchanged as evidence.
+
+No new strategy milestone begins in this round. The owner's next requested
+step is Claude's complete, from-first-principles review of the whole current
+Short Interest module.
+
+### 29.1 Exact snapshot and commit disposition
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Base | `9c6a6cc34ff749e9c476ece074c10dfe9f8fe3dc` |
+| Reviewed Claude commit | `193d6b67b2a3f15640c6a9880073b05e98aae0d8` |
+| Ordered range | `9c6a6cc..193d6b6` (1 record-only commit, no merge commit) |
+| Changed path | `docs/Strategy Description/SHORT_INTEREST_IMPLEMENTATION_RECORD.md` only |
+| Starting remote equality | local = remote = `193d6b67b2a3f15640c6a9880073b05e98aae0d8` |
+| Worktree inventory | five established long-lived repository worktrees only |
+| Interpreter | repository Python 3.12.13, pytest 9.1.1 |
+
+| Commit | Scope | Disposition |
+|---|---|---|
+| `193d6b67` | Record Claude's review of `476897bd` and `9c6a6cc3` | **accepted after documentation correction** (`SI-CCR11-001` through `SI-CCR11-005`) |
+
+Claude's core conclusions are retained: both reviewed commits are accepted,
+every recorded scale total/hash reproduces, the TypeError/ValueError
+counter-review is accepted, pytest's external-temp reconciliation is correct,
+and the current inline row-list representation remains no-go at provider scale.
+
+### 29.2 Binding P0-P3 counter-review ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---:|---|---|---|---|---|---|---|---|
+| SI-CCR11-001 | P2 | Closed by section 29 | `193d6b67` | Section 28.9, `SI-SYNC-001` routing note | The record says a re-checkout or “renormalisation” clears three stale exact-byte Analyst artifacts. Under the directory's `*.json -text` rule, clean filtering leaves the CRLF bytes unchanged, so `git add --renormalize` can stage those bad bytes into the index instead of recovering the committed LF blobs. This is actionable recovery guidance that could create incorrect durable, content-addressed authority state. | For each named JSON, `git check-attr text` returns `unset` and `git hash-object --path=<path> <path>` equals the raw CRLF worktree hash, not the committed LF hash. Three JSONs are stale: `legacy_reproduction_registry.json` (4 CRLF pairs), `permanent_look_authority.json` (1), and `reviewed_spec_registry.json` (1). By contrast, tracked `specs/.gitattributes` clean-filters to its committed blob and is not stale. | The three JSON artifacts participate in committed-and-clean or exact-byte authority boundaries. Recovery instructions must not risk staging the very bytes the guard refuses. | Binding routing correction: preserve intended edits, then, in the Analyst owner lane, restore only each of the three specifically verified stale JSON worktree paths directly from its committed `HEAD` blob. Do not stage these out-of-lane paths and do not use `git add --renormalize`. No Analyst file is changed here. | Raw/filtered/committed hashes were compared read-only; the three stale JSON paths remain untouched and hidden by the pre-existing stale stat cache. The exact-byte test still fails first at the sorted legacy registry, as expected. |
+| SI-CCR11-002 | P3 | Closed by section 29 | `193d6b67` | Push-ledger row; section 28.5 “measurement uses real rows” | The review says every sampled serialized row is genuinely scored with no refusal. The test asserts that only `_current(scores)` is scored; the measured canonical list also includes prior-cycle dispositions that correctly refuse for missing authenticated priors. Section 28 later contradicts the claim by deriving counts from only `N` scored current rows. | At `N=20`, 20 of 40 dispositions score and 20 refuse; their 40 prior outcomes all carry `missing_authenticated_prior_cycle`. At `N=40`, 40 of 80 score and 40 refuse; all 80 prior outcomes carry that refusal. | Accurate payload characterization matters because the no-go is explicitly about the complete serialized row list, not an all-scored batch. | Section 29 is binding: every **current-cycle** row is scored; every prior-cycle row is an expected warm-up refusal, and both categories are intentionally included in the measured row list. | Whole-list figures remain exact. The scored-current subset independently retains `6N^2` repeated witnesses and grows from 2,054,377 to 7,646,331 bytes (3.7220x), so the no-go does not depend on warm-up refusals. |
+| SI-CCR11-003 | P3 | Closed by section 29 | `193d6b67` | Section 28.6 candidate-de-duplication explanation | The review says each one-sector cohort contains 20 candidates with 20 distinct IDs. There are two cohorts at each sample size: the prior cohort has zero candidates and the current cohort has `N`. The green mutation is genuinely inert, but the stated reason is false and hard-codes only the smaller sample. | Candidate lengths are `[0, 20]` for `N=20` and `[0, 40]` for `N=40`. `StockNormalizationCohort` independently refuses duplicate candidate stable-security IDs. | Mutation survivors must be explained by the actual invariant, not by an inaccurate fixture summary. | De-duplication is inert because every non-empty candidate tuple is already unique by enforced stable-security identity; the empty prior tuple is also unchanged. | Candidate de-duplication leaves exact totals 400 and 1,600. Under-counting each non-empty candidate tuple by one changes them to 380 and 1,560 and violates the pinned `N^2` identity. |
+| SI-CCR11-004 | P3 | Closed by section 29 | `193d6b67` | Sections 28.3 and 28.6 | The required review report gives only qualitative `red`/`green` mutation results and supplies no honest 1-10 implementation-quality rating for reviewed commits `476897bd`/`9c6a6cc3`. Its sole 8/10 sentence accepts Codex's rating of Claude's **previous** submission. | `THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 4 requires tests and mutations with exact results on every push. `CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` step 9 requires an honest 1-10 implementation-quality rating. Section 28 records neither exact mutated metrics/test results nor the current implementation rating. | Exact evidence and a scoped rating make a review reproducible and prevent a prior-round score from being mistaken for current quality. | Section 29.4 records exact independent mutation deltas and qualifies Claude's unretained mutations rather than inventing test durations. SI-3C-P0 implementation quality is **9/10**. Claude's submitted review quality is **6/10**: strong independent arithmetic and validation, offset by this incomplete evidence, the two technical-description errors, and the unsafe recovery guidance. | Independent scale test **1 passed in 6.81s**; complete lane **243 passed in 79.31s**; exact mutation deltas appear in section 29.4. |
+| SI-CCR11-005 | P3 | Closed by section 29 | `193d6b67` | Section 28.9, `SI-OOL-002` | The review describes a recurring final-day countdown failure, but the fixed 2025-09-01 acquisition fixtures do not recover after the 2026-09-02 boundary. They first fail because `timedelta.days` floors a positive partial day to zero, then remain permanently expired because the lots become long-term and violate the earlier fixed term/gate expectations. | Explicit evaluation: at `2026-09-01T16:33Z` the lot remains short with `days_to_long_term=0`; after `2026-09-02T00:00` America/New_York it is long with zero days. | The routing record should describe the complete deterministic failure lifecycle so the owning lane fixes the clock coupling rather than chasing intermittent flakiness. | Binding description: this is deterministic clock-coupled fixture expiry—partial-day countdown failure immediately before the boundary, followed by permanent term/gate assertion failure after it. Freezing the evaluation time with the fixture remains an out-of-lane candidate fix. | The two sleeve tests reproduced in the complete suite and remain unmodified. |
+
+No P0 or P1 arose. `SI-CCR11-001` is P2 because following the documented
+renormalisation advice can create incorrect durable exact-byte authority state;
+the other four findings correct record accuracy and required review evidence.
+
+### 29.3 Technical conclusions retained
+
+Independent technical audit reproduces the complete SI-3C-P0 evidence:
+
+| Metric | `N=20` | `N=40` |
+|---|---:|---:|
+| Dispositions / unique cohorts / cohort payload occurrences / outcomes | 40 / 2 / 40 / 80 | 80 / 2 / 80 / 160 |
+| Raw / candidate / eligible / sector embeddings | 1,600 / 400 / 400 / 800 | 6,400 / 1,600 / 1,600 / 3,200 |
+| Total repeated witnesses | 3,200 | 12,800 |
+| Canonical UTF-8 bytes | 2,286,377 | 8,359,931 |
+| Canonical digest | `efe0ef91822a20d3dda680269d792644157058a5a4e7660a7cf7143f3cbf1299` | `b4701c5040dbec2151adec42d1f9dca4436b6f900d9d8676be842faee0a2c9df` |
+
+The identities `raw=4N^2`, `candidate=N^2`, `eligible=N^2`,
+`sector=2N^2`, and total `=8N^2` all hold. Doubling `N` produces exact 4x
+witness growth and 3.65640968x canonical-byte growth. Production source and
+the policy hash
+`16074b0d27180f386057a6405b36cb1685f7565fb2cf2f81ad2263706147a66c`
+are unchanged.
+
+The current uncompressed inline row-list payload remains **NO-GO** for
+provider/licensed-vintage/production-scale serialization. The measurement
+portion of `SI-REV9-002` is discharged; the provider-scale blocker is not.
+Lifting the no-go would still require a separately authorized, implemented,
+and reviewed representation change. No compact batch envelope is selected or
+authorized here.
+
+### 29.4 Exact counter-review mutation accounting
+
+Claude's temporary mutations were not committed and section 28 did not retain
+their exact pytest counts, assertions, or durations. This counter-review does
+not invent those missing results. It independently reproduces the exact metric
+changes each described mutant would create:
+
+| Mutation | `N=20` exact result | `N=40` exact result | Disposition |
+|---|---:|---:|---|
+| Count raw inventory once per unique cohort | raw embeddings 80 instead of 1,600 | 160 instead of 6,400 | Violates `4N^2`; red in the dangerous direction |
+| Cap sector membership at one per non-empty outcome | sector embeddings 40 instead of 800 | 80 instead of 3,200 | Violates `2N^2`; red in the dangerous direction |
+| De-duplicate candidates by stable-security ID | unchanged at 400 | unchanged at 1,600 | Equivalent under enforced uniqueness; green is inert |
+| Remove one candidate from every non-empty tuple | 380 instead of 400 | 1,560 instead of 1,600 | Violates `N^2`; red in the dangerous direction |
+
+The final unmutated scale test independently passed **1 test in 6.81 seconds**.
+No unreported P0-P3 weakness was found in `476897bd`.
+
+### 29.5 Corrected out-of-lane routing
+
+These observations remain documentation only and were not fixed:
+
+- **Analyst Revisions:** three stale tracked JSON artifacts exist. The Analyst
+  owner should preserve intended edits and restore only those verified stale
+  worktree bytes directly from committed blobs. Do not stage the files and do
+  not use renormalisation under `-text`.
+- **Sleeve report:** the two fixed-date tests are deterministically expired as
+  described in `SI-CCR11-005`, not intermittently flaky.
+- **Target Price:** Claude's external-temp full run correctly proves the prior
+  failure was caused by repository-local `--basetemp` changing the fixture's
+  Git-repository relationship. No Target Price defect was found.
+
+No unrelated file was changed.
+
+### 29.6 Validation and access accounting
+
+- Complete eight-file Short Interest lane at `193d6b67`: **243 passed in
+  79.31 seconds**.
+- Complete repository with pytest's normal external temp at `193d6b67`:
+  **6,811 passed, 13 skipped, 3 failed, 25 known dependency warnings in
+  2,423.24 seconds (40m23s)**. The three failures are the known Analyst
+  exact-byte checkout failure and the two expired sleeve tests. No Short
+  Interest test failed.
+- Final active-document result: **69 passed in 9.13 seconds**; the exact-text
+  rerun also passed all **69** tests.
+- Required full `compileall` including `research`:
+  **exit 0**.
+- Final `git diff --check`, staged-diff, branch, status, and remote-race
+  checks occur before commit and push.
+- Synthetic/offline review only. No credential, provider or licensed row,
+  price, outcome, permanent research look, QuantConnect artifact/upload/
+  compile/job, broker, operator database, scheduler, deployment, order, or
+  trading surface was accessed. Permanent research looks remain **0**.
+
+### 29.7 Stop condition and next review
+
+This round adds only this mandatory lane-record correction. It implements no
+new strategy milestone and changes no source, test, fixture, policy, formula,
+schema, hash, or authority surface.
+
+After final validation and a branch-only race fetch proves the remote is still
+`193d6b67`, Codex commits this record and makes exactly one push. Claude then
+performs the owner-requested complete, from-first-principles review of the
+whole Short Interest module at the resulting exact tip. The external
+paste-ready review requirement is supplied in chat and is not checked into the
+repository.
+
+Full licensed SI-1/full SI-2, `S2`-`S4`, days-to-cover delta and window `K`,
+ranking/seeding/tie rules, SI-4 ETF reverse indexing/aggregation, outcomes,
+portfolio work, and every QuantConnect artifact/upload/compile/job remain
+unimplemented or separately gated.

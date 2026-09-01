@@ -44,20 +44,26 @@ EXPECTED_CANDIDATE_HASH = (
 EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
     "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
-# Convention, clarified TPR-CR6-002: each role's pointer names the range of
-# the OTHER role's completed commits. A round cannot name its own final
-# commit -- that hash does not exist until the commit is written -- so the
-# pointer records the range just reviewed. Codex rounds therefore pin
-# Claude's completed commits and Claude rounds pin Codex's.
-LATEST_CLAUDE_REVIEW_BASE = "8078ce4877613adf5f9378cc11258841ac38f76d"
-LATEST_CLAUDE_REVIEW_HEAD = "5b84a72805073b406034f5d1a83ad5d3072d192e"
-LATEST_CLAUDE_REVIEW_RANGE = (
-    f"{LATEST_CLAUDE_REVIEW_BASE}..{LATEST_CLAUDE_REVIEW_HEAD}"
+# Convention, clarified TPR-CR6-002: each role's pointer names the other
+# role's completed commits. A round cannot name its own final commit -- that
+# hash does not exist until the commit is written -- so a Codex counter-review
+# pins the exact Claude range it just reviewed.
+LATEST_COUNTERREVIEWED_CLAUDE_BASE = (
+    "5b84a72805073b406034f5d1a83ad5d3072d192e"
 )
-LATEST_CLAUDE_REVIEW_SHORT_RANGE = "8078ce48..5b84a728"
+LATEST_COUNTERREVIEWED_CLAUDE_HEAD = (
+    "9269339ee4ee8e0dc0dc87c419fd51bef6a7b306"
+)
+LATEST_COUNTERREVIEWED_CLAUDE_RANGE = (
+    f"{LATEST_COUNTERREVIEWED_CLAUDE_BASE}.."
+    f"{LATEST_COUNTERREVIEWED_CLAUDE_HEAD}"
+)
+LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE = "5b84a728..9269339e"
 # The superseded pointer token that must no longer appear in current blocks.
-PREVIOUS_CLAUDE_REVIEW_HEAD = "b4e6b88ccf8a17a60cad91cda94205f61c1b7f90"
-PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD = "b4e6b88c"
+PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
+    "8078ce4877613adf5f9378cc11258841ac38f76d"
+)
+PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "8078ce48"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -85,7 +91,7 @@ def _bounded(text: str, start: str, end: str, name: str) -> str:
 def _action_current() -> str:
     return _bounded(
         _doc("ACTION_PLAN_2026-08-20.md"),
-        "**Current bounded status, 2026-08-31:**",
+        "**Current bounded status,",
         "**Owner multiplicity amendment, 2026-08-30",
         "Action Plan current target block",
     )
@@ -112,7 +118,7 @@ def _handoff_current_review() -> str:
     section = _handoff_current()
     return _bounded(
         section,
-        "- **Current review state, 2026-08-31.**",
+        "- **Current review state,",
         "\n- ",
         "Session Handoff current review bullet",
     )
@@ -512,10 +518,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [LATEST_CLAUDE_REVIEW_RANGE]
-    assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_current
-    assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_current
-    assert "Claude has independently reviewed Codex's exact three-commit range" in normalized_current
+    ) == [LATEST_COUNTERREVIEWED_CLAUDE_RANGE]
+    assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
+    assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
+    assert (
+        "Codex has counter-reviewed Claude's exact two-commit range"
+        in normalized_current
+    )
     assert (
         "no implementation or provisioning milestone is authorized"
         in normalized_current.lower()
@@ -524,6 +533,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "pending Claude review of this Codex round" not in normalized_current
+    assert "comprehensive whole-lane audit" in normalized_current.lower()
+    assert "beginning after `9269339e`" in normalized_current
 
     routing_row = next(
         line
@@ -537,12 +548,17 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_pointer = " ".join(current_pointer.split())
         assert re.findall(
             r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_pointer
-        ) == [LATEST_CLAUDE_REVIEW_RANGE]
-        assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_pointer
-        assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_pointer
-        assert "Codex" in normalized_pointer and "counter-reviewed" in normalized_pointer
+        ) == [LATEST_COUNTERREVIEWED_CLAUDE_RANGE]
+        assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_pointer
+        assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_pointer
+        assert (
+            "Codex has counter-reviewed Claude's exact two-commit range"
+            in normalized_pointer
+        )
         assert "No implementation or provisioning milestone is authorized" in normalized_pointer
         assert "TPR-TR0" in normalized_pointer
+        assert "comprehensive whole-lane audit" in normalized_pointer.lower()
+        assert "beginning after `9269339e`" in normalized_pointer
         normalized_pointer_lower = normalized_pointer.lower()
         stale_current_claims = (
             "pending claude review of this codex round",
@@ -550,6 +566,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             "before commit and the single push",
             "after this counter-review correction round's single push",
             "after this counter-review round's single push",
+            "claude has independently reviewed codex's exact three-commit range",
         )
         for stale_claim in stale_current_claims:
             assert stale_claim not in normalized_pointer_lower
@@ -563,10 +580,49 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [LATEST_CLAUDE_REVIEW_SHORT_RANGE]
-        assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_summary
-        assert "section 25" in normalized_summary_lower
+        ) == [LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE]
+        assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
+        assert "codex counter-reviewed both claude commits" in normalized_summary_lower
+        assert "section 27" in normalized_summary_lower
         assert "no implementation or provisioning milestone is authorized" in normalized_summary_lower
+        assert "comprehensive claude whole-lane audit" in normalized_summary_lower
+
+
+def test_out_of_lane_ledger_has_unique_well_formed_ids() -> None:
+    """TPR-CCR8-003/004: keep the owner-routing ledger unambiguous."""
+    section = _record_section("## 9. Out-of-lane findings ledger")
+    rows = [
+        line
+        for line in section.splitlines()
+        if line.startswith("| `TPR-OOL-")
+    ]
+    assert rows
+    for row in rows:
+        assert row.count("|") == 6, (
+            "each out-of-lane ledger row must have exactly five columns: "
+            f"{row}"
+        )
+    identifiers = [row.split("|")[1].strip().strip("`") for row in rows]
+    assert len(identifiers) == len(set(identifiers)), (
+        "out-of-lane ledger identifiers must be unique"
+    )
+    for identifier in identifiers:
+        assert re.fullmatch(r"TPR-OOL-\d{3}(?:-R\d+)?", identifier), (
+            f"malformed out-of-lane identifier: {identifier}"
+        )
+    assert "TPR-OOL-009" in identifiers
+    assert "TPR-OOL-009-C" not in _doc(
+        "Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md"
+    )
+
+
+def test_closed_cr7_findings_are_not_described_as_current_residuals() -> None:
+    """TPR-CCR8-005: a closed design finding is not an open blocker."""
+    section = _record_section(
+        "## 26. Claude independent review - 2026-09-01 "
+        "(TPR-TR0 trust-root design freeze)"
+    )
+    assert "The residual is exactly `TPR-CR7-001`" not in section
 
 
 def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:

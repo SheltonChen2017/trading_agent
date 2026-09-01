@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from data.hashing import hash_payload
+from data.hashing import canonical_json, hash_payload
 from research.short_interest_etf.contracts import (
     ReleasePrecision,
     recompute_days_to_cover,
@@ -35,6 +35,7 @@ from research.short_interest_etf.stock_normalization import (
     REFUSAL_SUPERSEDED_AT_RELEASE_CUTOFF,
     REFUSAL_ZERO_SECTOR_MAD,
     STOCK_NORMALIZATION_POLICY,
+    STRUCTURAL_SCORE_AUTHORITY,
     RevisionSelectionState,
     StockNormalizationError,
     StockScoreDisposition,
@@ -69,6 +70,21 @@ class _Spec:
     share_class: str = "A"
 
 
+@dataclass(frozen=True)
+class _ScaleMetrics:
+    disposition_count: int
+    unique_cohort_count: int
+    cohort_payload_occurrences: int
+    outcome_count: int
+    raw_inventory_embeddings: int
+    candidate_member_embeddings: int
+    eligible_member_embeddings: int
+    sector_member_embeddings: int
+    total_repeated_witnesses: int
+    canonical_payload_bytes: int
+    payload_sha256: str
+
+
 def _base_specs() -> tuple[_Spec, ...]:
     return tuple(
         _Spec(
@@ -78,6 +94,18 @@ def _base_specs() -> tuple[_Spec, ...]:
             prior_shares=130 - index,
         )
         for index in range(40)
+    )
+
+
+def _single_sector_specs(count: int) -> tuple[_Spec, ...]:
+    return tuple(
+        _Spec(
+            index=index,
+            sector="TECHNOLOGY",
+            current_shares=100 + index,
+            prior_shares=130 - index,
+        )
+        for index in range(count)
     )
 
 
@@ -335,6 +363,48 @@ def _contains_float(value) -> bool:
     if isinstance(value, list):
         return any(_contains_float(item) for item in value)
     return False
+
+
+def _scale_metrics(
+    scores: tuple[StockScoreDisposition, ...],
+) -> _ScaleMetrics:
+    payloads = [item.to_payload() for item in scores]
+    raw_inventory_embeddings = sum(
+        len(payload["cohort"]["raw_disposition_inventory"])
+        for payload in payloads
+    )
+    candidate_member_embeddings = sum(
+        len(payload["cohort"]["candidate_members"])
+        for payload in payloads
+    )
+    eligible_member_embeddings = sum(
+        len(payload["cohort"]["eligible_members"])
+        for payload in payloads
+    )
+    sector_member_embeddings = sum(
+        len(outcome["sector_members"])
+        for payload in payloads
+        for outcome in payload["outcomes"]
+    )
+    total_repeated_witnesses = (
+        raw_inventory_embeddings
+        + candidate_member_embeddings
+        + eligible_member_embeddings
+        + sector_member_embeddings
+    )
+    return _ScaleMetrics(
+        disposition_count=len(payloads),
+        unique_cohort_count=len({item.cohort.sha256 for item in scores}),
+        cohort_payload_occurrences=sum("cohort" in payload for payload in payloads),
+        outcome_count=sum(len(payload["outcomes"]) for payload in payloads),
+        raw_inventory_embeddings=raw_inventory_embeddings,
+        candidate_member_embeddings=candidate_member_embeddings,
+        eligible_member_embeddings=eligible_member_embeddings,
+        sector_member_embeddings=sector_member_embeddings,
+        total_repeated_witnesses=total_repeated_witnesses,
+        canonical_payload_bytes=len(canonical_json(payloads).encode("utf-8")),
+        payload_sha256=hash_payload(payloads),
+    )
 
 
 def test_policy_v1_is_exact_hash_bound_without_changing_preregistration():
@@ -980,3 +1050,54 @@ def test_payloads_are_content_hashed_immutable_and_import_firewall_stays_local()
     }
     assert "research.short_interest_etf.normalize" not in imported
     assert not {"numpy", "pandas", "statistics", "math"} & imported
+
+
+def test_current_row_payload_scale_is_no_go_for_provider_scale():
+    """Measure current row-list witness growth without a wall-clock benchmark."""
+    samples = {}
+    for count in (20, 40):
+        scores = _scores(_single_sector_specs(count))
+        current = _current(scores)
+        assert len(current) == count
+        assert all(
+            outcome.score is not None and not outcome.refusal_reasons
+            for disposition in current
+            for outcome in disposition.outcomes
+        )
+        assert {
+            disposition.cohort.normalization_policy_sha256
+            for disposition in scores
+        } == {STOCK_NORMALIZATION_POLICY.sha256}
+        assert all(
+            outcome.to_payload()["authority"] == STRUCTURAL_SCORE_AUTHORITY
+            and outcome.to_payload()["production_authoritative"] is False
+            for disposition in scores
+            for outcome in disposition.outcomes
+        )
+
+        metrics = _scale_metrics(scores)
+        assert metrics.disposition_count == 2 * count
+        assert metrics.unique_cohort_count == 2
+        assert metrics.cohort_payload_occurrences == 2 * count
+        assert metrics.outcome_count == 4 * count
+        assert metrics.raw_inventory_embeddings == 4 * count**2
+        assert metrics.candidate_member_embeddings == count**2
+        assert metrics.eligible_member_embeddings == count**2
+        assert metrics.sector_member_embeddings == 2 * count**2
+        assert metrics.total_repeated_witnesses == 8 * count**2
+        assert metrics.canonical_payload_bytes > 0
+        assert len(metrics.payload_sha256) == 64
+        samples[count] = metrics
+
+    small = samples[20]
+    large = samples[40]
+    for field in (
+        "raw_inventory_embeddings",
+        "candidate_member_embeddings",
+        "eligible_member_embeddings",
+        "sector_member_embeddings",
+        "total_repeated_witnesses",
+    ):
+        assert getattr(large, field) == 4 * getattr(small, field)
+    assert large.unique_cohort_count == small.unique_cohort_count
+    assert large.canonical_payload_bytes > 3 * small.canonical_payload_bytes

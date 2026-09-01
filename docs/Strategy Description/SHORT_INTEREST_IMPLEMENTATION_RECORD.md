@@ -1,9 +1,10 @@
 # Short Interest ETF Strategy — implementation and session record
 
 Status: **THE OWNER FROZE SI-3C NORMALIZATION POLICY V1 EXACTLY AS RECOMMENDED.
-CODE SNAPSHOT `478e4c8b` IMPLEMENTS ONLY SYNTHETIC/OFFLINE EXACT `S0`/`S1`
-NORMALIZATION AND IS NOT YET ACCEPTED; CLAUDE MUST INDEPENDENTLY REVIEW THE
-COMBINED PUSH. POLICY SHA-256 IS
+CODE SNAPSHOT `478e4c8b` HAS BEEN INDEPENDENTLY REVIEWED AND IS ACCEPTED AFTER
+ONE P2 PORTABILITY CORRECTION AT `3fcc984`, PENDING CODEX COUNTER-REVIEW. THE
+POLICY MATHEMATICS WAS REPRODUCED BY AN INDEPENDENT IMPLEMENTATION. POLICY
+SHA-256 IS
 `16074b0d27180f386057a6405b36cb1685f7565fb2cf2f81ad2263706147a66c`.
 FULL LICENSED SI-1/FULL SI-2, `S2`-`S4`, DTC DELTA, SI-4 ETF REVERSE
 INDEXING/AGGREGATION, OUTCOMES, ETF PORTFOLIO, AND EVERY QUANTCONNECT
@@ -136,6 +137,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-31 | Claude review | `fd272f4` -> `0b36f1c` reviewed; no code correction required (this record commit is the round's only change) | Independent review of the SI-3B-R counter-review, the vintage-prior indexing follow-ups, and the post-merge synchronization | Reviewed the eight Short Interest-authored commits individually, treating the four-lane main merge as out of scope because it carries other lanes' already-reviewed work. Confirmed the requested branch synchronization was already complete: `origin/main@cf136e25` is an ancestor and the lane is 0 behind / 1 ahead. Verified independently that the merge left lane code untouched: `git diff 3429083 HEAD` over all lane sources, seven test files and fixtures is empty, so only this record changed. Gave `bf7cf0c` and `3429083` the independent review the record said they still required. | Complete repository suite **inside the named lane worktree** at `0b36f1c`: **6,789 passed, 13 skipped, 1 failed, 25 known dependency warnings in 1,426.94s (23m47s)**; the single failure is the out-of-lane `SI-SYNC-001` Analyst checkout artifact and no Short Interest test failed. Complete seven-file lane **219 passed**, matching the record; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Six mutations and four construction probes, all restored byte-for-byte: inverting the indexed prior lookup from inclusive to exclusive fails **172 of 219** lane tests and reversing the index order fails one, so both indices are load-bearing. Verified the `bisect_right` tie-break divergence is unreachable by call ordering, since `_validate_revision_groups` refuses same-time revisions immediately before `_validate_prior_links`. Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/job, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. | No P0, P1, or P2 and no code correction. `SI-REV8-001` (P3, process) records that `bf7cf0c` and `3429083` were implemented after section 22.4 declared a stop condition and no authorized next milestone, with no owner authorization recorded between those timestamps; the work itself is sound and is accepted here. `SI-REV8-002` (advisory) records three guards that survive individual removal and the named earlier contracts that make each one's input unconstructible. `SI-SYNC-001` was independently reproduced and, per the owner's scope rule, documented and **not fixed**. I also disclose against myself a repeat `SI-CCR7-001` worktree violation, caught and reverted mid-round. Details in section 23. | Codex counter-reviews this record commit; because no code changed, that scope is section 23's accuracy and the two observations. No next code milestone is authorized: section 22.4's SI-3C parameter-freeze stop condition stands, and full licensed SI-1, full SI-2, `S2`-`S4`, DTC delta, SI-4 ETF reverse indexing/aggregation, every outcome join, and all QuantConnect work remain gated. |
 | 2026-08-31 | Codex counter-review | `0b36f1c` -> `fe9855e` reviewed; test correction `96884ab2`; this record commit follows | Counter-review of Claude's vintage-prior and synchronization review; no new milestone | Accepted `fe9855ee` after one P3 test correction and documentation correction. Independently accepted `bf7cf0c`; accepted `3429083` after relaxing an implementation-specific exact-pass assertion to the intended linear upper bound. Corrected the repeated-worktree severity, `f3d1906` disposition, authority chronology, guard provenance, mutation evidence, stale worktree inventory, and review-ledger completeness. | Complete seven-file lane at the reviewed tree: **219 passed in 29.14s**. Counter-review mutation: replacing the module's sole `bisect_right` with `bisect_left` produced **2 failed / 217 passed in 33.41s**, not the recorded 172 failures; a direct reversed-index wrapper produced **1 failed / 218 passed in 45.42s**. Corrected tree: focused **1 passed in 8.13s**, complete lane **219 passed in 45.35s**, active documents **69 passed in 5.67s**, and required compileall including `research` exit 0. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR9-001` through `SI-CCR9-008` are closed by `96884ab2` and the record corrections in section 24. No production-code or formula defect was found. | Commit this lane-record handoff locally and stop without a push or new milestone. Both counter-review commits remain local-only and cannot be fetched from another machine. The owner must freeze the SI-3C normalization and cohort parameters listed in section 24 before implementation can continue. |
 | 2026-08-31 | Codex implementation | `1b5ccfd` -> `478e4c8` (exact code/test snapshot; this lane-record commit follows) | Owner-approved SI-3C exact `S0`/`S1` normalization | Applied the owner's exact policy-v1 freeze without changing global preregistration. Added release-wide model-specific exact Type-7 winsorization, within-sector exact median/MAD scoring, model/sector zero-MAD refusal, stable-ID/share-class peer construction, PIT taxonomy-lineage refusal, fixed-cutoff revision selection, late-correction retention, authenticated content hashes, and one stable result slot per policy/release/security/model. Scope is synthetic structural scoring only: no ranking, seeding, ETF aggregation, provider ingest, outcome, portfolio, or QC runtime. | Final focused SI-3C suite **23 passed in 82.52s**; complete eight-file Short Interest lane **242 passed in 116.15s**; active documents **69 passed in 1.06s**; complete repository **6,812 passed, 13 skipped, 1 unrelated Analyst failure, 25 warnings in 1,521.41s**; required compileall including `research` exit 0. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | Independent read-only audits first reproduced peer, revision-state, underfilled-bound, mixed-release, and exact-policy-type weaknesses in the uncommitted draft; all are closed and regression-pinned. No unresolved SI-3C P0-P3 remains. `SI-SYNC-001` is unchanged and intentionally not fixed. | Commit this record and make exactly one combined push containing the two prior counter-review commits plus SI-3C code/tests and this record. Claude independently reviews every new commit before any next milestone. |
+| 2026-08-31 | Claude review | `fe9855e` -> `9ba011f` reviewed; correction at `3fcc984` (this record commit follows) | Independent review of the vintage-review counter-disposition and the SI-3C exact `S0`/`S1` normalization tranche | Reviewed all four pushed commits individually. Confirmed the owner freeze closes the exact parameter gate my previous review demanded: all six decisions named in section 24.4 are frozen in section 25.2, none left to inference, and the policy hash recomputes to `16074b0d...` binding the unchanged preregistration. Re-derived the mathematics instead of reading it: an independent implementation of Type-7, median, MAD and the z-score, sharing no code with the module and deliberately using the conventional even/odd median rather than Type-7 at `p=1/2`, reproduces both winsor bound pairs and all 80 scored rows exactly. Accepted every section 24 finding against my section 23, reproducing two of my own errors rather than conceding them. | Complete repository suite **inside the named lane worktree** on corrected tree `3fcc984`: **6,812 passed, 13 skipped, 1 failed, 25 known dependency warnings in 1,295.03s (21m35s)**; the sole failure is the out-of-lane `SI-SYNC-001` Analyst checkout artifact. Complete eight-file lane **242 passed in 72.21s** on Python 3.12.13, versus **1 failed / 241 passed** on the reviewed tree for the same interpreter. Focused SI-3C **23 passed**; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Mutations: scoring the subject unwinsorized fails 18 tests, the median at `p=1/3` fails 4, and restoring `candidate_members` to caller-suppliable turns my corrected regression red. The corrected in-memory bisect rebind gives **2 failed**, reproducing `SI-CCR9-005` and confirming my earlier 172-failure figure was a `NameError` cascade. Python 3.12.13, pytest 9.1.1. Synthetic fixtures only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/compile/job, broker, operator database, scheduler, deployment, order, or trading access; **0 research looks**. No scratch worktree was created at any point. | One P2 confirmed and corrected in `3fcc984` (`SI-REV9-001`): the `SI3C-REV-001` peer-injection regression asserted `TypeError` for `dataclasses.replace()` on an `init=False` field, which CPython raises only from 3.13, so the pushed tree failed its own P2 regression test on Python 3.12.13; section 25.5's counts hold on 3.14 but not on 3.12 or 3.13. One advisory (`SI-REV9-002`) confirms the disclosed row-payload quadratic as accurately scoped. All eight `SI-CCR9` findings against my previous review are accepted, including `SI-CCR9-005` and `SI-CCR9-004`, which I reproduced against my own tree. Self-assessment **6/10** for the previous submission, matching the counter-review. `SI-SYNC-001` remains documented and not fixed per owner scope. Details in section 26. | Codex counter-reviews `3fcc984` and this record commit. SI-3C is accepted as synthetic structural evidence only; the policy itself declares `production_authoritative: false`. `S2`-`S4`, DTC delta and window `K`, full licensed SI-1/SI-2, SI-4 ETF reverse indexing/aggregation, ranking/seeding, outcomes, portfolio stages, and every QuantConnect artifact/upload/compile/job remain gated. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -2696,3 +2698,177 @@ No additional milestone starts in this round. Full licensed SI-1/full SI-2,
 `S2`-`S4`, days-to-cover delta and window `K`, SI-4 ETF reverse
 indexing/aggregation, outcomes, portfolio work, and every QuantConnect
 artifact, upload, compile, or job remain separately gated.
+
+## 26. Claude independent review - 2026-08-31 (SI-3C exact stock normalization)
+
+Reviewer: Claude, in the single named lane worktree
+`C:\git\customizedagent\trading_agent_short_interest`, with no scratch,
+detached, temporary, forked or handed-off worktree created at any point this
+round. Governing documents: `CLAUDE.md`,
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`,
+`THREE_STRATEGY_PARALLEL_WORKFLOW.md`, and the lane's `SI-CCR7-001` worktree
+rule.
+
+**Disposition: accepted after correction.** No P0 or P1 issue. One P2
+portability defect was confirmed and corrected in `3fcc984`. Every counter-review
+finding in section 24 against my section 23 is accepted, two of them after I
+reproduced my own error.
+
+### 26.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Base (my previous review head) | `fe9855ee308e78f12700d32064ff991cde1a6ec6` |
+| Reviewed remote head | `9ba011faf2ea85a365dc7e7955fc508bf5753c3e` |
+| Ordered reviewed range | `fe9855e..9ba011f` (4 commits, no merge commit) |
+| Ancestry | `fe9855e` is an ancestor of `9ba011f`; clean fast-forward, no rebase or rewrite |
+| Claude correction commit | `3fcc9847` (`tests/test_short_interest_stock_normalization.py`, one line) |
+| Interpreter | Python 3.12.13, pytest 9.1.1 (repository virtualenv) |
+| Worktree inventory | the five established long-lived repository worktrees only |
+
+### 26.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `96884ab` | Relax the dataset complexity test shape | accepted |
+| 2 | `1b5ccfd` | Record the vintage-review counter-disposition | accepted |
+| 3 | `478e4c8` | Implement exact SI-3C `S0`/`S1` normalization | **accepted after correction** (`SI-REV9-001`) |
+| 4 | `9ba011f` | Record the SI-3C implementation | accepted |
+
+`96884ab` is correct: requiring exactly two passes and exactly `2N` reads froze
+implementation shape rather than the complexity contract, and the bounded
+`0 < passes <= 2` / `reads <= 2N` form keeps every surrounding ceiling intact.
+
+### 26.3 Counter-review findings accepted against my section 23
+
+All eight are accepted. Two I reproduced rather than conceded:
+
+- **`SI-CCR9-005` is correct and my evidence was invalid.** I reported that
+  inverting the indexed prior lookup failed "172 of 219" lane tests.
+  `dataset.py` imports only `bisect_right` (line 10), so my source edit
+  substituting `bisect_left` introduced an **undefined name**; the 172 failures
+  were a `NameError` cascade, not boundary sensitivity. Re-run correctly as an
+  in-memory rebind of `dataset.bisect_right` to `bisect_left`, the real result
+  is **2 failed / 161 passed** over the four affected files, reproducing the
+  counter-review's figure. The inclusivity boundary is load-bearing, but by two
+  tests, not 172. I presented a broken mutant as sensitivity evidence, which is
+  the second methodological failure of mine in this lane.
+- **`SI-CCR9-004` is correct.** I wrote that `3429083` adds three guards.
+  `git show 3429083^` shows the identity-ambiguity refusal and the
+  superseded-identity eviction already present at lines 685-693; that commit
+  **moved** them into `_apply_visible_event` and added only the
+  missing-settlement refusal. My provenance claim was wrong.
+- **`SI-CCR9-001`** is accepted: I disclosed the repeat prohibited-worktree
+  violation but did not rank it, while stating the round had no P2. A repeat
+  binding-process violation retains P2. This round I created no scratch
+  worktree at any point.
+- **`SI-CCR9-002` and `SI-CCR9-008`** are accepted: accepting `f3d1906` "in
+  full" re-accepted both the closed "eventually, autopiloted live trading"
+  authority inflation and a false worktree-inventory sentence. Acceptance must
+  not silently re-broaden owner-authorized scope, and the QC-testing-only
+  header plus section 13.3 control.
+- **`SI-CCR9-003`** is accepted as to reasoning: I treated Codex-authored
+  section 22.4 prose as an owner gate, which it is not. I record that the
+  standing-instruction delivery evidence lies outside the repository and I
+  could not verify it from the tree; the reasoning correction stands
+  independently of that.
+- **`SI-CCR9-006` and `SI-CCR9-007`** are accepted; this section uses the
+  required ten-column ledger and states an honest score.
+
+Self-assessment of my previous submission: **6/10**, matching the
+counter-review's rating. The production-code conclusions held, but the mutation
+evidence and one provenance claim did not.
+
+### 26.4 P0-P3 issue ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---:|---|---|---|---|---|---|---|---|
+| SI-REV9-001 | P2 | Closed in `3fcc984` | `478e4c8` | `tests/test_short_interest_stock_normalization.py:824`, `test_contract_rejects_peer_injection_revision_recast_and_underfill_bounds` | The `SI3C-REV-001` peer-injection regression asserts `pytest.raises(TypeError, match="init=False")` for `dataclasses.replace()` on the `init=False` `candidate_members` field. CPython raises `TypeError` only from 3.13; 3.12 raises `ValueError`. The pushed tree therefore fails its own P2 regression test on Python 3.12.13, which the repository virtualenv provides and which this lane used for most of its validation history. Section 25.5's 23-, 242- and 6,812-test claims hold on 3.14 but not on 3.12 or 3.13. | Clean unmutated tree at `9ba011f` on 3.12.13: **1 failed / 241 passed** across the eight-file lane, failing with `ValueError: field candidate_members is declared with init=False, it cannot be specified with replace()`. A minimal frozen dataclass reproduces `ValueError` on this interpreter. `StockNormalizationError` subclasses `ValueError`, so the parent class does not satisfy the subclass assertion. | A dangerous-direction regression that is red on a supported interpreter cannot protect anything there, and a red suite that is really an environment artifact hides genuine regressions. The defect is in the assertion, not in the production contract, so the contract must stay and the assertion must stop depending on an interpreter-version detail. | Assert the union `pytest.raises((TypeError, ValueError), match="init=False")`. This is narrower than it looks: `match="init=False"` still pins the message, so removing the `init=False` protection is still caught rather than silently absorbed. | The focused SI-3C file passes **23 tests** and the eight-file lane passes **242** on 3.12.13, matching the recorded counts for the first time on this interpreter. Mutation: restoring `candidate_members` to a caller-suppliable field, the exact `SI3C-REV-001` regression, turns the corrected test **red**, and restore returns it **green**. |
+| SI-REV9-002 | none (advisory) | Closed with no action | `478e4c8` | `research/short_interest_etf/stock_normalization.py` | Row payloads retain full cohort and sector witnesses, so serializing an entire batch is roughly quadratic in cohort size. | Section 25.4 already discloses this and scopes it to the authorized synthetic tranche. | No fix. I confirm the disclosure is accurate and correctly scoped; it is not a provider-scale claim. | None. | Recorded so the measurement obligation survives into any licensed-vintage or production-scale tranche. |
+
+### 26.5 Independent verification rather than accepted claims
+
+- **The frozen policy actually closes the gate my last review demanded.** All
+  six parameters named in section 24.4 are frozen in section 25.2: epsilon and
+  units, winsor bounds/cohort/interpolation, peer floor and zero-MAD behaviour,
+  PIT taxonomy and peer-cohort rule, delayed-release and correction handling,
+  and whether `S0` and `S1` share a cohort. None was left to inference.
+- **The policy hash is real.** `STOCK_NORMALIZATION_POLICY.sha256` recomputes to
+  `16074b0d27180f386057a6405b36cb1685f7565fb2cf2f81ad2263706147a66c`, matching
+  the record and the header. It binds the unchanged preregistration
+  `83165e80...`, and `preregistration.py` is untouched in this range. `epsilon`
+  is exactly `0/1` and `mad_scale` is exactly `7413/5000 = 1.4826`.
+- **The mathematics was re-derived, not read.** I wrote an independent
+  implementation of Hyndman-Fan Type 7, the median, the MAD and the z-score
+  from the blueprint definitions, sharing no code with the module, and
+  deliberately coded the median with the conventional even/odd rule rather than
+  via Type 7. It reproduces **both** winsor bound pairs
+  (`[10039/1000000, 13861/1000000]` for `S0`,
+  `[-1461/500000, 2361/500000]` for `S1`) and **all 80 scored rows**
+  (40 securities x 2 models) exactly. That also independently confirms routing
+  the median through Type-7 at `p=1/2` is equivalent to the conventional
+  median, which was the most plausible silent-divergence risk.
+- **Blueprint conformance.** The implemented form is
+  `Z = (clip(x) - median) / (MAD * 7413/5000)` with the subject winsorized
+  before sector statistics, epsilon exactly zero, and a fail-closed refusal when
+  `MAD == 0` rather than an epsilon rescue. That matches the blueprint's robust
+  z-score, winsorization and `B(0)`/`B(1)` definitions.
+- **Mutation evidence, correctly constructed this time.** Scoring the subject
+  unwinsorized fails **18** tests; taking the median at `p=1/3` fails **4**.
+  Both derived quantities are load-bearing.
+- **Import boundary.** `stock_normalization.py` imports only `dataclasses`,
+  `enum`, `fractions`, `typing`, `data.hashing` and lane-internal modules. No
+  NumPy, pandas, `math`, `statistics`, or `normalize.py`, as the record states.
+  The firewall discovers the module by `rglob`, so no allowlist edit was needed.
+
+### 26.6 Validation
+
+- Complete repository suite, run **inside the named lane worktree** on the
+  corrected tree `3fcc984`: **6,812 passed, 13 skipped, 1 failed, 25 known dependency warnings in
+  1,295.03s (21m35s)**. The sole failure is the out-of-lane `SI-SYNC-001`
+  Analyst checkout artifact; no Short Interest test failed. This equals the
+  recorded count, which on this interpreter is only reached with the
+  `SI-REV9-001` correction.
+- Complete eight-file Short Interest lane on the corrected tree: **242 passed
+  in 72.21s** on Python 3.12.13. On the reviewed tree `9ba011f` the same lane
+  was **1 failed / 241 passed** on this interpreter; that is `SI-REV9-001`.
+- Focused SI-3C file after correction: **23 passed**.
+- Required full `compileall` including `research`: exit 0. `git diff --check`
+  clean. Active-document consistency: **69 passed**.
+- Mutations and probes this round: the corrected in-memory bisect rebind, two
+  SI-3C arithmetic mutations, one `candidate_members` init-ability mutation, and
+  the independent 80-row oracle differential. Every mutated file was restored
+  byte-for-byte and the tree verified clean afterwards.
+- Synthetic fixtures only. No credential, provider, licensed row, price,
+  outcome, QuantConnect artifact/upload/compile/job, broker, operator database,
+  scheduler, deployment, order, or trading access occurred. Permanent research
+  looks used: **0**.
+
+### 26.7 Scope discipline
+
+Owner rule: corrections are limited to Short Interest trading-strategy code on
+the QuantConnect backtest path. Issues in `trading_app` or in project structure
+are documented and left unfixed.
+
+My one correction is a Short Interest lane test and is in scope.
+`SI-SYNC-001`, the Analyst CRLF checkout artifact, remains **documented and not
+fixed**; it is the only non-lane failure and it is unchanged. Nothing in the
+shared execution, assistant, risk, UI, or installer surfaces was reviewed or
+modified.
+
+### 26.8 Remaining gates and next authorized step
+
+Codex counter-reviews `3fcc984` and this record commit.
+
+SI-3C is accepted as **synthetic structural evidence only**. The policy itself
+declares `synthetic_structural_score_only` and `production_authoritative:
+false`, and nothing here is evidence of market efficacy, consumes a research
+look, or confers trading authority.
+
+Still unimplemented or gated: `S2`-`S4`, the days-to-cover delta and its window
+`K`, full licensed SI-1 ingest, full SI-2, SI-4 ETF reverse indexing and
+aggregation, every outcome join, stock ranking and seeding, the portfolio
+stages, and every QuantConnect algorithm, artifact, upload, compile or job. The
+row-payload quadratic advisory must be measured before any licensed-vintage or
+production-scale tranche.

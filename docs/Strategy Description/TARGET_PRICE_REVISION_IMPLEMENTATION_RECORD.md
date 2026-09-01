@@ -4,8 +4,8 @@ Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN THE EXACT
 TWO-COMMIT RANGE `b4e6b88c..8078ce48`. BOTH COMMITS ARE ACCEPTED AFTER
 CORRECTION. FIVE P3 FINDINGS AND THEIR CORRECTIONS ARE RECORDED IN SECTION 25;
 NO P0, P1 OR P2 WAS FOUND IN THE CLAUDE RANGE. A PRE-PUSH AUDIT FOUND FOUR
-DESIGN P2S AND TWO P3S IN CODEX COMMIT `DFAEE5DE`; THE CURRENT CORRECTION CLOSES
-ALL SIX BEFORE PUSH. THE OWNER
+DESIGN P2S AND TWO P3S IN CODEX COMMIT `DFAEE5DE`; SECOND CODEX COMMIT
+`15CE7F04` CLOSES ALL SIX BEFORE PUSH. THE OWNER
 HAS APPROVED THE RECOMMENDED TPR TRUST-ROOT
 IDENTITY, EXTERNAL PATH, CUSTODY/ROTATION POLICY, AND NORMAL REVIEWED-CODE
 THREAT MODEL. SECTION 25 FREEZES THE BOUNDED TPR-TR0 DESIGN CANDIDATE FOR
@@ -528,7 +528,8 @@ known.
 | 2026-08-31 | Claude validation | `0e911189` -> `0e911189` (exact tested tree; this validation-record commit follows) | v2.2 review round final validation | Revalidated the complete synchronized tree after the review corrections and the new guard. No product file changed during the run, and all work stayed inside the single named lane worktree. | Complete suite: **6,791 passed, 13 skipped, 0 failed, 25 warnings in 4,093.39s**. Reconciles exactly against the 6,789/13/1 baseline: 6,803 collected before and 6,804 after, with passed rising by two — the repaired analyst checkout guard plus this round's one new guard — and skips unchanged. Lane and shared documentation suites **191 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, QuantConnect, broker, scheduler, paper or live access; **0 research looks**. | No new finding. `TPR-CR5-001` remains closed; `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. |
 | 2026-08-31 | Claude review | `cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a` -> `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review round; no milestone in range | Reviewed both pushed commits individually. Accepted all six counter-review findings against the prior Claude round, three of them repeats of classes already corrected. Verified the guard rework is stronger and that all seven new extractors fail closed. Advanced every current-state pointer to this round and corrected a stale present-tense synchronization claim. Did not re-sync to `main`: a fast-forward is no longer possible and a merge was not requested. | Baseline on the exact pushed tree `b4e6b88c`: **6,791 passed, 13 skipped, 0 failed, 25 warnings in 1,386.58s**, reproducing the recorded 6,791/13/0; the recorded 26-warning count is not reconciled. Final complete run recorded separately. Lane and shared documentation suites **192 passed, 3 skipped**. Two mutations on the new sync guard each turned it red with text-identical restore. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect, broker, operator-database, scheduler, paper or live access; **0 research looks**. | Both commits accepted. No P0/P1/P2 in range; one P3 (`TPR-CR6-001`) found in the cumulative tree and closed. Counter-reviewed round quality **8/10**. `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. Details in section 24. | None; all source, outcome, look, QC, broker, paper and live authority remains zero. | Codex counter-reviews every Claude commit in this round. No milestone is authorized; the lane also remains 2 commits behind `origin/main`. |
 | 2026-08-31 | Claude validation | `433b2679` -> `433b2679` (exact tested tree; this validation-record commit follows) | Counter-review round final validation | Revalidated the complete tree after the review corrections and the new conditional sync guard. No product file changed during the run, and all work stayed inside the single named lane worktree. | Complete suite: **6,792 passed, 13 skipped, 0 failed, 25 warnings in 1,178.99s** — the 6,791 baseline plus exactly the one added guard, skips unchanged. Lane and shared documentation suites **192 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, QuantConnect, broker, scheduler, paper or live access; **0 research looks**. | No new finding. `TPR-CR6-001` remains closed; `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. The lane remains 2 commits behind `origin/main` and can no longer fast-forward. |
-| 2026-08-31 | Codex counter-review + TPR-TR0 design freeze | `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` -> current correction candidate | Counter-review two Claude commits; freeze only the owner-approved signed-registry-anchor design | Accepted `433b2679` and `8078ce48` after correction. Closed five P3 document/guard findings and froze exact principal, external allowed-signers path, signed registry-anchor lineage, custody/rotation policy, and normal reviewed-code threat model for independent review. A pre-push audit found four design P2s and two P3s in first Codex commit `dfaee5de`; the current correction closes all six. No runtime trust verifier or authority artifact was implemented. | Fetched local/remote head `8078ce48`; red regression proved the stale current topology. Exact focused/final validation is recorded in section 25 after the correction commit receives an identity. No dedicated TPR signing key, external trust file, signature, provider row, outcome, QC surface, broker surface, or order was created; **0 research looks**. | No P0/P1/P2 in the Claude range. `TPR-CCR7-001` through `011` closed by correction/verification. `TPR-CCR5-004` remains open pending reviewed implementation and a trusted signed registry anchor; `TPR-CCR2-011` separately remains open pending reviewer-controlled signing or a signed review receipt. | None. TPR-TR0 is a non-authorizing design candidate. | Commit and validate the exact correction tree, append its identity/evidence, make one push, then Claude independently reviews the Codex range beginning after `8078ce48`. |
+| 2026-08-31 | Codex counter-review + TPR-TR0 design freeze | `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` -> `15ce7f0475ca2dd91258905fe001782848952ffb` | Counter-review two Claude commits; freeze only the owner-approved signed-registry-anchor design | Accepted `433b2679` and `8078ce48` after correction. Closed five P3 document/guard findings and froze exact principal, external allowed-signers path, signed registry-anchor lineage, custody/rotation policy, and normal reviewed-code threat model for independent review. A pre-push audit found four design P2s and two P3s in first Codex commit `dfaee5de`; second commit `15ce7f04` closes all six. No runtime trust verifier or authority artifact was implemented. | Fetched local/remote head `8078ce48`; red regression proved the stale current topology. Active-document plus target-price suites ended **194 passed, 3 skipped**; exact complete evidence is in section 25.6 and the validation row below. No dedicated TPR signing key, external trust file, signature, provider row, outcome, QC surface, broker surface, or order was created; **0 research looks**. | No P0/P1/P2 in the Claude range. `TPR-CCR7-001` through `011` closed by correction/verification. `TPR-CCR5-004` remains open pending reviewed implementation and a trusted signed registry anchor; `TPR-CCR2-011` separately remains open pending reviewer-controlled signing or a signed review receipt. | None. TPR-TR0 is a non-authorizing design candidate. | Append exact final validation evidence, make one push, then Claude independently reviews every Codex commit beginning after `8078ce48`. |
+| 2026-09-01 | Codex validation / handoff | `15ce7f0475ca2dd91258905fe001782848952ffb` -> `15ce7f0475ca2dd91258905fe001782848952ffb` (exact tested tree; this record commit follows) | TPR-TR0 design-round final validation | Revalidated the full repository after all counter-review and pre-push security corrections. No product/runtime file changed, and all work stayed in the named target-price branch/worktree. | Complete suite **6,792 passed, 13 skipped, 2 failed, 25 warnings in 1,278.97s**. Both failures exactly reproduce out-of-lane `TPR-OOL-009`; no TPR test failed. Active-document plus target-price suites **194 passed, 3 skipped in 14.18s**; target document module **12 passed in 1.06s**; `compileall` exit 0 including `research`; `git diff --check` and exact-commit status clean. Python 3.12.13, pytest 9.1.1. Trust directory/file absent; provider/outcome accesses and authorized/spent looks **0**. | `TPR-OOL-009` remains open and documented, not fixed. `TPR-CCR5-004` and `TPR-CCR2-011` remain blocked. No new TPR finding. | None. No source, outcome, look, QC, broker, paper, live, deployment, capital, or trading authority. | Commit this record-only handoff, run final document/diff checks, make the round's one push, then Claude reviews `8078ce48..pushed-head` commit by commit. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -2142,6 +2143,39 @@ live, deployment, capital, and trading authority remain blocked.
 
 ### 25.6 Exact correction and final validation
 
-To be appended after the correction commit has an exact identity. The next
-role after this round's one push is Claude, reviewing only the Codex range
-beginning after `8078ce48` and ending at the pushed head.
+The exact Codex correction/design commits are:
+
+1. `dfaee5dee73e2210aa42d05b308d40581b27ef4b` - counter-review corrections and
+   the first non-authorizing TPR-TR0 design freeze;
+2. `15ce7f0475ca2dd91258905fe001782848952ffb` - pre-push security refinements,
+   exact command/test contract, and the two-direction current-ancestry guard.
+
+Validation on exact commit `15ce7f0475ca2dd91258905fe001782848952ffb`:
+
+- Active-document plus complete target-price suite: **194 passed, 3 skipped in
+  14.18s**. The target document module alone: **12 passed in 1.06s**.
+- After this evidence was appended, the final record-candidate active-document
+  plus target document suites were **81 passed in 1.59s**; `git diff --check`
+  remained clean. The same focused checks are repeated after the record-only
+  commit before push.
+- Complete repository suite: **6,792 passed, 13 skipped, 2 failed, 25 warnings
+  in 1,278.97s**. The only failures were the two exactly reproduced
+  `TPR-OOL-009` sleeve-report countdown assertions; no Target-Price Revisions
+  test failed. The same two failures occurred on first commit `dfaee5de`
+  (**6,792 passed, 13 skipped, 2 failed, 25 warnings in 1,270.49s**), proving
+  the security refinement added no failure.
+- `compileall` exited 0 across `assistant`, `backtest`, `data`, `execution`,
+  `ml`, `risk`, `scripts`, `signals`, `strategies`, `tests`, `research`, and
+  the root Python modules. `git diff --check` was clean and the worktree was
+  clean at exact commit `15ce7f04`.
+- Environment: Python 3.12.13, pytest 9.1.1, Windows. The external
+  `C:\ProgramData\CustomizedAgent\trust` directory and exact
+  `tpr_allowed_signers` file were both absent after validation.
+- Provider accesses **0**; source rows **0**; outcome accesses **0**;
+  authorized/spent research looks **0**; QuantConnect, broker, paper, live,
+  deployment, capital, and trading actions **0**.
+
+The next role after this round's one push is Claude, independently reviewing
+every Codex commit in `8078ce48..pushed-head` one by one. This design review
+grants no provisioning or positive authority. `TPR-CCR5-004`, `TPR-CCR2-011`,
+TPR-1, and TPR-0B remain blocked exactly as stated above.

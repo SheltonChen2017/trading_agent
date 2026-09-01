@@ -819,3 +819,36 @@ def test_policy_inventory_equals_the_verifier_import_closure() -> None:
     assert NON_MODULE_POLICY_PATHS <= declared, (
         "a declared non-module policy path left the inventory"
     )
+
+
+def test_session_ledger_rows_have_exact_column_count() -> None:
+    """TPR-CR10-001. The out-of-lane ledger is guarded; the session ledger was not.
+
+    A row that drops a column does not fail loudly -- Markdown simply renders
+    every later cell under the wrong header, so validation evidence appears as
+    findings and the final column silently disappears. That is how a row lost
+    its entire `Validation / looks` cell, with the evidence absorbed into the
+    summary cell by a later append and nobody noticing.
+
+    Derives the expected width from the table's own header rather than pinning
+    a constant, so adding a column to the ledger updates the guard with it.
+    """
+    record = (STRATEGY_DIR / RECORD).read_text(encoding="utf-8").splitlines()
+
+    headers = [line for line in record if line.startswith("| UTC date |")]
+    assert len(headers) == 1, "expected exactly one session-ledger header row"
+    expected = headers[0].count("|") - 1
+
+    rows = [line for line in record if line.startswith("| 20") or line.startswith("| YYYY-")]
+    assert rows, "session ledger has no data rows"
+
+    malformed = [
+        f"{line.split('|')[1].strip()} / {line.split('|')[2].strip()}: "
+        f"{line.count('|') - 1} columns"
+        for line in rows
+        if line.count("|") - 1 != expected
+    ]
+    assert not malformed, (
+        f"session-ledger rows must have exactly {expected} columns; "
+        f"malformed: {malformed}"
+    )

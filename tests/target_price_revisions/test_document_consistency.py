@@ -49,15 +49,15 @@ EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
 # commit -- that hash does not exist until the commit is written -- so the
 # pointer records the range just reviewed. Codex rounds therefore pin
 # Claude's completed commits and Claude rounds pin Codex's.
-LATEST_CLAUDE_REVIEW_BASE = "cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a"
-LATEST_CLAUDE_REVIEW_HEAD = "b4e6b88ccf8a17a60cad91cda94205f61c1b7f90"
+LATEST_CLAUDE_REVIEW_BASE = "b4e6b88ccf8a17a60cad91cda94205f61c1b7f90"
+LATEST_CLAUDE_REVIEW_HEAD = "8078ce4877613adf5f9378cc11258841ac38f76d"
 LATEST_CLAUDE_REVIEW_RANGE = (
     f"{LATEST_CLAUDE_REVIEW_BASE}..{LATEST_CLAUDE_REVIEW_HEAD}"
 )
-LATEST_CLAUDE_REVIEW_SHORT_RANGE = "cd23f7c8..b4e6b88c"
+LATEST_CLAUDE_REVIEW_SHORT_RANGE = "b4e6b88c..8078ce48"
 # The superseded pointer token that must no longer appear in current blocks.
-PREVIOUS_CLAUDE_REVIEW_HEAD = "cf136e259cf628aabdc4220865fccdb5c7204306"
-PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD = "cf136e25"
+PREVIOUS_CLAUDE_REVIEW_HEAD = "cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a"
+PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD = "cd23f7c8"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -72,10 +72,23 @@ def _doc(name: str) -> str:
     return (ROOT / "docs" / name).read_text(encoding="utf-8")
 
 
+def _bounded(text: str, start: str, end: str, name: str) -> str:
+    """Return one explicitly bounded block and fail if either anchor is absent."""
+    if text.count(start) != 1:
+        raise AssertionError(f"{name} must contain exactly one opening anchor")
+    tail = text.partition(start)[2]
+    if end not in tail:
+        raise AssertionError(f"{name} is missing its closing anchor")
+    return tail.partition(end)[0]
+
+
 def _action_current() -> str:
-    return _doc("ACTION_PLAN_2026-08-20.md").split(
-        "**Current bounded status, 2026-08-31:**", 1
-    )[1].split("**Owner multiplicity amendment, 2026-08-30", 1)[0]
+    return _bounded(
+        _doc("ACTION_PLAN_2026-08-20.md"),
+        "**Current bounded status, 2026-08-31:**",
+        "**Owner multiplicity amendment, 2026-08-30",
+        "Action Plan current target block",
+    )
 
 
 def _action_tpr_row() -> str:
@@ -87,22 +100,31 @@ def _action_tpr_row() -> str:
 
 
 def _handoff_current() -> str:
-    return _doc("SESSION_HANDOFF.md").split(
-        "## 0. Target-Price Revision fourth-lane planning addition", 1
-    )[1].split("\n## ", 1)[0]
+    return _bounded(
+        _doc("SESSION_HANDOFF.md"),
+        "## 0. Target-Price Revision fourth-lane planning addition",
+        "\n## ",
+        "Session Handoff target section",
+    )
 
 
 def _handoff_current_review() -> str:
     section = _handoff_current()
-    return section.split("- **Current review state, 2026-08-31.**", 1)[1].split(
-        "\n- ", 1
-    )[0]
+    return _bounded(
+        section,
+        "- **Current review state, 2026-08-31.**",
+        "\n- ",
+        "Session Handoff current review bullet",
+    )
 
 
 def _handoff_target_summary() -> str:
-    return _doc("SESSION_HANDOFF.md").split(
-        "### Target-Price Revisions", 1
-    )[1].split("\n## ", 1)[0]
+    return _bounded(
+        _doc("SESSION_HANDOFF.md"),
+        "### Target-Price Revisions",
+        "\n## ",
+        "Session Handoff target summary",
+    )
 
 
 def _record_preamble() -> str:
@@ -427,6 +449,28 @@ def _current_qualification(section: str) -> str:
     return section[start:end]
 
 
+def _current_integration_state(section: str) -> str:
+    """Return section 8's current topology block, including both hard anchors."""
+    return _bounded(
+        section,
+        "**Integration state, 2026-08-31.**",
+        "**Current qualification, 2026-08-31:**",
+        "record current integration state",
+    )
+
+
+@pytest.mark.parametrize("missing", ["opening", "closing"])
+def test_current_document_extractors_fail_closed_on_missing_anchor(missing: str) -> None:
+    """TPR-CCR7-003: an absent boundary cannot silently widen a current block."""
+    text = "before <start> current <end> after"
+    if missing == "opening":
+        text = text.replace("<start>", "")
+    else:
+        text = text.replace("<end>", "")
+    with pytest.raises(AssertionError):
+        _bounded(text, "<start>", "<end>", "probe")
+
+
 def test_exact_next_step_names_the_current_artifacts() -> None:
     """TPR-CCR4-001/002: bind exact current identities and resume state.
 
@@ -468,8 +512,12 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     ) == [LATEST_CLAUDE_REVIEW_RANGE]
     assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_current
     assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_current
-    assert "Claude has independently reviewed every Codex commit" in normalized_current
-    assert "No next implementation milestone is authorized" in normalized_current
+    assert "Codex has counter-reviewed Claude's exact two-commit range" in normalized_current
+    assert (
+        "no implementation or provisioning milestone is authorized"
+        in normalized_current.lower()
+    )
+    assert "TPR-TR0" in normalized_current
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "pending Claude review of this Codex round" not in normalized_current
@@ -489,8 +537,9 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         ) == [LATEST_CLAUDE_REVIEW_RANGE]
         assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_pointer
         assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_pointer
-        assert "Claude has independently reviewed every Codex commit" in normalized_pointer
-        assert "No next implementation milestone is authorized" in normalized_pointer
+        assert "Codex" in normalized_pointer and "counter-reviewed" in normalized_pointer
+        assert "No implementation or provisioning milestone is authorized" in normalized_pointer
+        assert "TPR-TR0" in normalized_pointer
         normalized_pointer_lower = normalized_pointer.lower()
         stale_current_claims = (
             "pending claude review of this codex round",
@@ -513,8 +562,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
         ) == [LATEST_CLAUDE_REVIEW_SHORT_RANGE]
         assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_summary
-        assert "section 24" in normalized_summary_lower
-        assert "no next implementation milestone is authorized" in normalized_summary_lower
+        assert "section 25" in normalized_summary_lower
+        assert "no implementation or provisioning milestone is authorized" in normalized_summary_lower
 
 
 def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:
@@ -599,12 +648,22 @@ def test_a_present_tense_sync_claim_matches_real_ancestry() -> None:
     if mainline is None:  # pragma: no cover - export or detached checkout
         pytest.skip("no mainline ref available")
 
+    lane_ref = None
+    for ref in (LANE_BRANCH_REF, f"origin/{LANE_BRANCH}"):
+        probe = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"],
+            cwd=ROOT, capture_output=True,
+        )
+        if probe.returncode == 0:
+            lane_ref = ref
+            break
+    if lane_ref is None:  # pragma: no cover - export without lane refs
+        pytest.skip("no target-price lane ref available")
+
     contains_main = subprocess.run(
-        ["git", "merge-base", "--is-ancestor", mainline, "HEAD"],
+        ["git", "merge-base", "--is-ancestor", mainline, lane_ref],
         cwd=ROOT, capture_output=True,
     ).returncode == 0
-    if contains_main:
-        return  # a synchronization claim would be true; nothing to police
 
     claims = (
         "is now synchronized to",
@@ -613,6 +672,9 @@ def test_a_present_tense_sync_claim_matches_real_ancestry() -> None:
     )
     surfaces = {
         "record preamble": _record_preamble(),
+        "record section 8 integration state": _current_integration_state(
+            _record_section("## 8. Exact next step")
+        ),
         "record section 8 current qualification": _current_qualification(
             _record_section("## 8. Exact next step")
         ),
@@ -621,8 +683,12 @@ def test_a_present_tense_sync_claim_matches_real_ancestry() -> None:
     }
     for name, block in surfaces.items():
         normalized = " ".join(block.lower().split())
-        for claim in claims:
-            assert claim not in normalized, (
-                f"{name} claims present-tense synchronization with {mainline}, "
-                f"but HEAD does not contain it"
-            )
+        assert not re.search(r"\b\d+\s+(?:commits?\s+)?(?:ahead|behind)\b", normalized), (
+            f"{name} contains a self-invalidating live topology count"
+        )
+        if not contains_main:
+            for claim in claims:
+                assert claim not in normalized, (
+                    f"{name} claims present-tense synchronization with {mainline}, "
+                    f"but {lane_ref} does not contain it"
+                )

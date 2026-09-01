@@ -540,6 +540,7 @@ known.
 | 2026-09-01 | Codex counter-review / validation | `9269339ee4ee8e0dc0dc87c419fd51bef6a7b306` -> `09aafaff111a0342bbca25721f1e862c6516e670` | Counter-review both Claude commits; no new implementation milestone | Accepted `d99089b0` after correction and `9269339e` after correction and qualification. Closed one P2 coordination defect and five correctable P3 defects; retained one P3 historical-evidence qualification. Verified Claude's substantive policy-closure and trust-root design corrections against the tree. | Exact correction commit: active-document plus target suites **197 passed, 3 skipped in 100.48s**; target document module **15 passed in 1.11s**; full suite **6,795 passed, 13 skipped, 2 failed, 26 warnings in 1,484.05s**. The two failures exactly reproduce out-of-lane `TPR-OOL-009`; no TPR test failed. Full `compileall -q .` exit 0; Git diff/index clean and worktree clean. Python 3.12.13, pytest 9.1.1. PDF and candidate hashes remained exact; external trust directory/file absent; **0 research looks**. | `TPR-CCR8-001` through `005` and `007` closed; `TPR-CCR8-006` is a historical validation-metadata qualification, not an authority blocker. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked. | None. No source, outcome, look, QC, broker, paper, live, deployment, capital, or trading authority. | Commit this evidence-only record update, run final document/diff/status checks, make the round's one push, then Claude performs the owner-directed comprehensive whole-lane audit. |
 | 2026-09-01 | Claude full-lane clean-room review | `8078ce4877613adf5f9378cc11258841ac38f76d` -> `bb20e8d057ecd976b4ddfbd558ec38d31b02d54e` (actual tip; the instruction's named head `5b84a728` was stale by four commits) | Whole-module audit, not limited to one range | Audited every current file, artifact and document in the lane against the 29-page v2.2 blueprint. Gave dispositions for all five commits above the named head, including the two unreviewed Codex commits. Verified all five artifact/PDF hashes, ran adversarial mutations against the authority surface, both zero-access declarations and the frozen candidate, and confirmed all seven Codex findings against the prior Claude round. | All five expected hashes matched. Twenty-one adversarial probes across three surfaces all refused, each with byte-identical restore. Focused and complete-suite results recorded in 28.10. `compileall` exit 0; `git diff --check` clean; worktree clean and local/remote tips identical. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface; **0 research looks**. | Current module accepted with no P0/P1/P2. One P3 (`TPR-CR8-001`) recorded **open and deliberately uncorrected**: the loader requires the confirmatory sum to equal `1/80` where A27 says at most `1/80`. Closing it either way is an owner decision; the exact question is in 28.7. Details in section 28. | None; TPR-TR0 remains a non-authorizing design candidate and all authority remains zero. | Owner answers the 28.7 question; Codex counter-reviews this round. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked. |
 | 2026-09-01 | Claude validation | `95a3e597` -> `95a3e597` (exact tested tree; this validation-record commit follows) | Full-lane review validation | Recorded complete-suite, focused, compile and hygiene evidence with the exact interpreter and commands. No executable file changed in this round. | Complete suite **6,795 passed, 13 skipped, 2 failed, 25 warnings in 1,612.12s**; the two failures are the documented out-of-lane `TPR-OOL-009` sleeve-report cases, reproduced and not fixed, with no TPR test failing. Focused lane and shared documentation suites **197 passed, 3 skipped**. `compileall` exit 0; `git diff --check` clean; worktree clean, local and remote tips identical. Python 3.14.6, pytest 9.1.1. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface; **0 research looks**. | No new finding. `TPR-CR8-001` remains open pending the owner's 28.7 decision; `TPR-CCR5-004`, `TPR-CCR2-011`, `TPR-OOL-006`, `TPR-OOL-009` and `TPR-OOL-010` remain open and owner-routed. | None. | Make this Claude round's single push, then rerun the focused guards and status on the pushed head; Codex counter-reviews this round. |
+| 2026-09-01 | Claude whole-lane line-level review | `bb20e8d057ecd976b4ddfbd558ec38d31b02d54e` -> record candidate | Completes section 28's coverage after the owner asked whether the whole lane was reviewed | Read the files section 28 had left unopened: `canonical.py` and `test_import_firewall.py` in full, the contract/weakening/forgery blocks of `test_preregistration.py`, the firewall's AST indirection and closure validator, and `AGENTS.md` plus step 9 of the review process. Traced 18 further candidate cells clause-by-clause to the blueprint. Corrected section 28's overstated coverage claim and its candidate-tamper evidence. | Re-ran the five multiplicity/decay mutations **with `spec_hash` re-derived** so the hash check passes; all five still refuse on the semantic path, which is the evidence section 28 lacked. Secret-shape scan: no match. Lane-record structural check: headings spaced, out-of-lane rows exactly five columns. Focused and complete-suite results in 29.6 and the validation row below. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface; **0 research looks**. | Module accepted; no P0/P1/P2 and **no code or artifact defect found** in the line-level pass. Two P3s against this reviewer's own prior section: `TPR-CR9-001` overstated coverage, `TPR-CR9-002` tamper evidence that could not distinguish hash refusal from semantic refusal. `TPR-CR8-001` remains open on the owner. Module quality **9/10**; section 28 as a review artifact **5/10**. | None; all authority remains zero and no milestone beyond TPR-0A is complete. | Owner answers the `TPR-CR8-001` question in 28.7; Codex counter-reviews this round. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -2653,3 +2654,155 @@ record — so the complete run covers the identical executable tree as the
 reviewed tip, and the documentation guards were rerun green against this
 section's final text after it was written. A post-push focused rerun and status
 check close the repeated final-record verification gap rather than repeating it.
+
+## 29. Claude whole-lane line-level review - 2026-09-01 (completes section 28)
+
+**Why this section exists: section 28 overstated its own coverage.** It is
+titled a "full-lane clean-room review" and its section 28.8 discloses several
+limitations, but it does **not** disclose that entire files on the owner's
+required-scope list were never opened. The owner asked whether the whole lane
+had actually been reviewed; it had not. This section records the pass that was
+missing, and corrects the earlier claim rather than leaving it standing.
+
+**Disposition: the module is accepted.** No P0, P1 or P2 exists. Two P3s are
+recorded, both against this reviewer's own prior section. The single normative
+question `TPR-CR8-001` from section 28 remains open and uncorrected.
+
+**Implementation-quality rating for the Target-Price module: 9/10.** After
+reading the code rather than probing around it, the module is the strongest
+work in this repository: exact-rational statistics with float, epsilon-ridge
+and pseudoinverse prohibited by contract; canonical JSON that rejects binary
+floats, duplicate keys and BOMs at parse time; an AST firewall that closes
+aliasing, reflection, extension-module substitution, symlinks and junctions;
+and an authority path that fails closed against forgery, cloning,
+post-verification mutation and reload drift. The point off is for
+`TPR-CR8-001` plus the still-open `TPR-CCR5-004`/`TPR-CCR2-011` trust-root
+prerequisites, which are acknowledged and gated rather than hidden.
+
+### 29.1 What section 28 actually covered, measured
+
+| File | Lines | Read in section 28 | Read now |
+|---|---:|---|---|
+| `preregistration.py` | 2,323 | ~350 | structure mapped in full; all authority, validation, alpha and lineage paths read |
+| `import_firewall.py` | 541 | ~40 | AST indirection, from-import resolution and closure validator read |
+| `canonical.py` | 281 | ~10 | **read in full** |
+| `test_preregistration.py` | 953 | **0** | test map plus the contract, weakening and forgery blocks read |
+| `test_import_firewall.py` | 239 | **0** | **read in full** |
+| `test_document_consistency.py` | 821 | ~200 | extractors and guards read |
+| Candidate cells | 24 | 6 | 18 traced clause-by-clause |
+| `AGENTS.md` | — | not read | **read** |
+| `CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` | — | one grep | step 9 read |
+
+Section 28's substantive conclusions survive this pass unchanged. What was
+wrong was the **evidence base**, not the verdict.
+
+### 29.2 P0-P3 ledger
+
+| ID | Priority | Status | Location | Issue and impact | Evidence | Reason | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|
+| `TPR-CR9-001` | P3 | Closed | Section 28 title and 28.8 | Section 28 presents itself as a full-lane clean-room review while roughly 15-20% of the required-scope lines were read; two listed test files were never opened, and dimension 6 — review every target-price test for weak assertions and self-fulfilling fixtures — was answered with a `grep -c` density count reported as though it addressed the question. 28.8 discloses other limitations but not this one, so the disclosure understates the gap. | The per-file table in 29.1, measured against `wc -l`. | This is the same defect class this reviewer raised as `TPR-CCR4-002` and accepted as `TPR-CCR7-003`: claiming coverage that was never exercised. An overstated review is worse than a narrow one, because it stops anyone looking again. | Section 28 is left intact as the historical record; this section states the true coverage, and 29.1 quantifies it. The missing pass is performed in 29.3 and 29.4. | The lane and shared documentation suites pass; the structural and secret-shape checks in 29.5 pass. |
+| `TPR-CR9-002` | P3 | Closed | Section 28.3 candidate-tamper evidence | Section 28.3 lists seven frozen-candidate mutations as "refused" and presents that as evidence the semantic guards hold. Those probes did **not** re-derive `spec_hash`, so every one of them could have been refused by the artifact hash check before any semantic validation ran. The conclusion was right; the evidence did not establish it. | The repository's own `test_rehashed_policy_weakenings_still_refuse` re-hashes each mutation precisely to defeat that shortcut — a stronger design than the probe used in section 28. | A tamper that fails a hash check proves hash binding, not semantic validation. Reporting it as the latter overstates what was tested. | Re-ran the five multiplicity and decay mutations **with `spec_hash` re-derived** so the hash check passes. All five still refuse on the semantic path: `shared_family_count` 4→3, `assigned_family_alpha`→`0.025`, `unused`→`RECYCLES`, `transferable`→`true`, decay half-life→`40`. | Recorded in 29.3. The semantic layer is now independently established rather than inferred. |
+
+### 29.3 Line-level module findings: none
+
+Read for defects, not for confirmation. No P0/P1/P2 found.
+
+- **`canonical.py`** — `strict_json_loads` rejects duplicate keys via
+  `object_pairs_hook`, NaN/Infinity via `parse_constant`, and **every binary
+  float** via `parse_float`, so decimals must be strings. `decode_utf8` rejects
+  BOMs and non-strict UTF-8. `require_canonical_json_bytes` re-serialises and
+  byte-compares, which is why non-canonical whitespace refuses. `require_int`
+  and `require_exact_bool` use `type(x) is`, so `True` cannot pass as an
+  integer. `require_decimal_text` enforces one canonical plain spelling, so
+  `0.01250` refuses. All regexes use `fullmatch`.
+- **`import_firewall.py`** — `getattr` survives only as a direct call whose
+  second argument is a string literal outside the forbidden set; every aliased,
+  reflected or non-literal form is rejected, which is the narrow `_authority`
+  exception and nothing wider. Relative-import escape, extension-module
+  substitution, ancestor fallback, symlinks and junctions all refuse. The
+  docstring correctly scopes the guard as a dependency check rather than an
+  OS-level I/O sandbox, which is the boundary the review asked about.
+- **`preregistration.py`** — the alpha cross-check compares three
+  independently stored values as exact `Decimal`; `_validate_looks` admits
+  exactly one look with the exact frozen identity, so no look can exist outside
+  the alpha accounting; the reviewed-authority path chains exact-type identity,
+  a private token, weakref registry identity, a fingerprint comparison and a
+  disk reload.
+- **Tests** — `test_import_firewall.py` is 14 tests, essentially all
+  adversarial, built on synthetic packages in `tmp_path`. `test_preregistration.py`
+  re-derives `spec_hash` on every weakening so mutations must be caught
+  semantically, and separately covers caller mutation, forgery, cloning,
+  post-verification mutation, symlinked ancestors and registry substitution.
+  Neither file is tautological: the frozen expectations are hard-coded
+  independently and the artifact is additionally required to be byte-reproducible
+  from `build_algorithm_candidate_bytes()`.
+
+### 29.4 Clause-by-clause traceability: 18 further cells, no divergence
+
+| Cell | PDF clause | Result |
+|---|---|---|
+| `clock_contract` | §8 four clocks | exact, including `same_day_premarket_canonical: false` and the second-open date-only rule |
+| `cutoff_contract` | §6, §8 | weekly first eligible session, prior-session 18:00 America/New_York, holiday roll |
+| `correction_contract` | §8 cutoff-safe reconciliation | latest version not after cutoff; final-state backfill prohibited; absence is not withdrawal |
+| `event_taxonomy` | §9 action taxonomy | five states; withdrawal is MISSING and "never numeric zero"; initiation without a positive prior is a level diagnostic, never a revision |
+| `basis_contract` | §10 | raw and adjusted preserved; FX/ADR/horizon ambiguity REFUSED; **intraday, current-ticker and vendor-adjusted history fallbacks prohibited** |
+| `controls_contract` | §11 | prior 5/20-session total return, log PIT ADV, log PIT market cap, catalyst state with an explicit no-catalyst value, all as-of `S[-1]`/cutoff |
+| `independence_contract` | §13 | `N_eff = (Σ|v|)²/Σv²`; breadth is `min(N_inst, N_cat)`; zero denominator yields a named zero, never NaN or epsilon; reliability is not confidence |
+| `normalization_contract` | §14 | median and 1.4826×MAD; `epsilon_denominator: false`; sparse or zero-MAD REFUSED; group minimums correctly left null for TPR-0B |
+| `estimator_contract` | §17 | exact rationals for OLS and ranks; float, approximate ties, epsilon ridge and pseudoinverse PROHIBITED; two-way clustering; seed derived from the spec hash |
+| `walk_forward_contract` | §17 | expanding window, non-overlapping chronological folds, purge groups session/security/catalyst, 20-session embargo matching the horizon, shared holdout PROHIBITED |
+| `decision_outcome_contract` | §17 | next eligible open to open after 20 sessions; `missing_terminal_return: REFUSED_never_drop` |
+| `trial_and_null_contract` | §18 | all six dispositions with an explicit precedence; VALID_NULL as the default |
+| `primary_event_formula`, `decay_contract`, `family_multiplicity`, `governance_contract`, `phase_split_contract`, `shared_holdout` | §12, A21, A23, A27 | traced in section 28.6 and re-confirmed |
+
+Empirical values that the PDF leaves to TPR-0B — `CLIP_TPR0`, group minimums,
+`development_start` — are `null` with a binding **algorithm** recorded instead
+of a guessed constant. No unapproved constant was found.
+
+### 29.5 Validation for this pass
+
+Focused lane and shared documentation suites, complete-suite result, compile,
+diff and hygiene evidence are recorded in 29.6. Additionally run here:
+
+- **Secret-shape scan** over the lane's code, tests and record for value
+  shapes — OpenSSH public-key bodies, PEM private-key headers, `sk-`/`AKIA`/
+  `xox*` tokens and long base64 tails: **no match**.
+- **Lane-record structural check**: every `## ` heading is preceded by a blank
+  line and every out-of-lane ledger row has exactly five data columns.
+
+### 29.6 Step 9 report items
+
+- **Outcome:** accepted. No P0/P1/P2; two P3s, both against this reviewer's
+  prior section; one open normative question (`TPR-CR8-001`).
+- **What was fixed:** nothing in the module — no code or artifact defect was
+  found in the line-level pass. The corrections are to the review record.
+- **Rating:** module 9/10; section 28 as a review artifact 5/10, because its
+  verdict was sound but its stated coverage was not earned.
+- **Commits:** review `95a3e597`, validation `0fc90fab`, this pass appended
+  below.
+- **Branch and push state:** `codex/strategy-target-price-revisions`, one push
+  per round, local and remote identical after each; no branch or worktree
+  created, switched, merged, rebased or forked.
+- **Is the roadmap milestone genuinely complete?** **No.** TPR-0A is a frozen
+  algorithm-policy candidate only. 39 empirical child bindings are null, the
+  reviewed-spec registry is empty, TPR-TR0 is an unprovisioned design, and
+  `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B are all blocked. Nothing
+  beyond TPR-0A is complete and no outcome work is reachable.
+- **Exact next step:** the owner answers the `TPR-CR8-001` question in 28.7;
+  Codex counter-reviews this round.
+
+### 29.7 Scope still not covered
+
+- The blueprint was again read as its **complete extracted text layer, not as
+  rendered images** — `pdftoppm` is unavailable here, so a purely visual defect
+  would still not be seen. This has been true of every round in this lane.
+- `preregistration.py`'s `_EXPECTED_VALUES` literal was audited **through the
+  artifact it generates** — the two are bound by
+  `payload == build_algorithm_candidate_bytes()` — rather than by reading all
+  ~1,100 lines of the literal directly. That binding makes the artifact audit
+  equivalent for content, but a defect expressible only in the literal's
+  construction code would not have been seen.
+- Six of 24 cells (`universe_contract`, `cost_contract`, `source_contract`,
+  `source_authority`, `legacy_separation_contract`, `empirical_binding_contract`)
+  were read partially rather than clause-by-clause.
+- Sibling-lane commits inherited through `main` remain outside this lane.

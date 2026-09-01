@@ -2915,3 +2915,42 @@ Two stand, both structural rather than skipped work:
   construction until the owner authorises provisioning.
 
 Nothing else on the owner's required-scope list remains unread.
+
+## 31. Coverage correction to section 30 - 2026-09-01
+
+Section 30.5 states that "nothing else on the owner's required-scope list
+remains unread". That was itself overstated — the fourth consecutive coverage
+claim in this lane to exceed what was done. This section replaces it with a
+measured position and makes no completion claim.
+
+### 31.1 Measured coverage of the module scope
+
+| File | Lines | Coverage |
+|---|---:|---|
+| `research/target_price_revisions/__init__.py` | 16 | full |
+| `canonical.py` | 281 | full |
+| `preregistration.py` | 2,323 | policy literal, all validation, authority, anchor, Git and dataclass regions read; a small number of narrow helper bodies not read line-by-line |
+| `import_firewall.py` | 541 | constants, allowlists, path/redirect handling, AST analysis and closure validator read |
+| `test_import_firewall.py` | 239 | full |
+| `test_preregistration.py` | 953 | helpers, contract, weakening, forgery, registry, policy-code and authority blocks read; a minority of bodies skimmed |
+| `test_document_consistency.py` | 854 | extractors, policy-byte, worktree, pointer and ledger guards read |
+| Four JSON artifacts | — | hashes verified; all 24 cells traced |
+| `AGENTS.md` | 100 | full |
+| `CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` | 464 | section map plus steps 3, 5 and 9 |
+| `ACTION_PLAN`, `SESSION_HANDOFF` | 844 / 628 | every current Target-Price statement read; non-TPR content not read |
+| Lane record | 2,808 | contradiction scan across all lines plus targeted section reads |
+| Blueprint | 29 pages | complete text layer; never rendered images |
+
+### 31.2 Effect on the findings
+
+None. Every conclusion in sections 28, 29 and 30 rests on regions that were
+read or on probes that were run, and the additional reading in this pass found
+no further defect. The corrections are to coverage statements, not to results.
+
+### 31.3 Import-time invariants confirmed in this pass
+
+`preregistration.py` refuses to import unless the pending-binding list exactly
+covers the required child keys and every TPR-0A empirical child value is
+`None`. `ReviewedAlgorithmSpec` is declared `frozen=True, init=False`, so it
+cannot be constructed by a caller at all and exists only through the private
+minting path. Both are structural guarantees that no test needs to assert.

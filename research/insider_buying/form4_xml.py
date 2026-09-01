@@ -338,6 +338,63 @@ def _footnote_features(text: str) -> tuple[bool, bool, bool]:
     return price_range_mentioned, private_purchase_mentioned, plan_mentioned
 
 
+def _flat_footnote_definitions(
+    root: ElementTree.Element,
+) -> tuple[ElementTree.Element, ...]:
+    """Return one flat, root-level footnote inventory or refuse the XML.
+
+    ``Element.itertext()`` on nested ``footnote`` elements repeats every
+    descendant's prose in each ancestor.  Besides crossing footnote lineage,
+    that permits quadratic retained text and regex work inside a bounded raw
+    XML envelope.  The provisional parser therefore accepts only one plain
+    root-level ``footnotes`` container whose children are flat definitions.
+    """
+
+    containers = _descendants(root, "footnotes")
+    definitions = _descendants(root, "footnote")
+    if not containers:
+        if definitions:
+            raise Form4ParseError(
+                "REFUSED: footnote XML structure is incomplete or ambiguous"
+            )
+        return ()
+
+    direct_containers = _children(root, "footnotes")
+    if len(containers) != 1 or len(direct_containers) != 1:
+        raise Form4ParseError(
+            "REFUSED: footnote XML structure is incomplete or ambiguous"
+        )
+    container = containers[0]
+    if direct_containers[0] is not container:
+        raise Form4ParseError(
+            "REFUSED: footnote XML structure is incomplete or ambiguous"
+        )
+
+    direct_definitions = _children(container, "footnote")
+    if (
+        container.attrib
+        or (container.text is not None and container.text.strip())
+        or (container.tail is not None and container.tail.strip())
+        or len(direct_definitions) != len(container)
+        or tuple(id(node) for node in direct_definitions)
+        != tuple(id(node) for node in definitions)
+    ):
+        raise Form4ParseError(
+            "REFUSED: footnote XML structure is incomplete or ambiguous"
+        )
+
+    for node in direct_definitions:
+        if (
+            set(node.attrib) != {"id"}
+            or list(node)
+            or (node.tail is not None and node.tail.strip())
+        ):
+            raise Form4ParseError(
+                "REFUSED: footnote XML structure is incomplete or ambiguous"
+            )
+    return tuple(direct_definitions)
+
+
 def _footnote_references(element: ElementTree.Element) -> tuple[str, ...]:
     ids: set[str] = set()
     for node in element.iter():
@@ -539,9 +596,9 @@ def parse_form4_xml(
 
     footnote_map: dict[str, str] = {}
     footnote_feature_map: dict[str, tuple[bool, bool, bool]] = {}
-    for node in _descendants(root, "footnote"):
+    for node in _flat_footnote_definitions(root):
         footnote_id = node.attrib.get("id", "").strip()
-        text = " ".join(part.strip() for part in node.itertext() if part.strip())
+        text = (node.text or "").strip()
         if not footnote_id or not text:
             raise Form4ParseError("REFUSED: footnote id/text is incomplete")
         if footnote_id in footnote_map:

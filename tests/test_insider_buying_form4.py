@@ -782,6 +782,98 @@ def test_unreferenced_footnote_features_cannot_contaminate_a_transaction():
     assert transaction.diagnostics == ()
 
 
+def test_nested_footnote_definition_cannot_leak_into_referenced_parent(
+    monkeypatch,
+):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<transactionPricePerShare><value>12.50</value></transactionPricePerShare>",
+        b'<transactionPricePerShare><value>12.50</value><footnoteId id="F2"/>'
+        b"</transactionPricePerShare>",
+    )
+    payload = _replace_once(
+        payload,
+        b"</ownershipDocument>",
+        b'<footnotes><footnote id="F2">Fixed purchase price.'
+        b'<footnote id="F1">Price range from 10 to 15.</footnote>'
+        b"</footnote></footnotes></ownershipDocument>",
+    )
+
+    calls = 0
+    original = form4_module._footnote_features
+
+    def counting_features(text):
+        nonlocal calls
+        calls += 1
+        return original(text)
+
+    monkeypatch.setattr(form4_module, "_footnote_features", counting_features)
+    with pytest.raises(Form4ParseError, match="footnote XML structure"):
+        _parse_original(payload)
+    assert calls == 0
+
+
+@pytest.mark.parametrize(
+    "footnote_block",
+    [
+        b'<footnote id="F1">Text outside a footnotes container.</footnote>',
+        (
+            b"<wrapper><footnotes><footnote id=\"F1\">Wrapped container.</footnote>"
+            b"</footnotes></wrapper>"
+        ),
+        (
+            b"<footnotes><wrapper><footnote id=\"F1\">Nested definition.</footnote>"
+            b"</wrapper></footnotes>"
+        ),
+        (
+            b'<footnotes><footnote id="F1">One.</footnote></footnotes>'
+            b'<footnotes><footnote id="F2">Two.</footnote></footnotes>'
+        ),
+        (
+            b'<footnotes source="unexpected"><footnote id="F1">Text.</footnote>'
+            b"</footnotes>"
+        ),
+        b'<footnotes>prefix<footnote id="F1">Text.</footnote></footnotes>',
+        (
+            b'<footnotes><footnote id="F1" extra="unexpected">Text.</footnote>'
+            b"</footnotes>"
+        ),
+        (
+            b'<footnotes><footnote id="F1">Text <em>with markup</em>.</footnote>'
+            b"</footnotes>"
+        ),
+        b'<footnotes><footnote id="F1">Text.</footnote>tail</footnotes>',
+    ],
+)
+def test_footnote_definitions_require_one_flat_root_container(footnote_block):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"</ownershipDocument>",
+        footnote_block + b"</ownershipDocument>",
+    )
+    with pytest.raises(Form4ParseError, match="footnote XML structure"):
+        _parse_original(payload)
+
+
+def test_nested_footnote_depth_cannot_amplify_retained_text():
+    depth = 16
+    opens = b"".join(
+        b'<footnote id="N' + str(index).encode() + b'">'
+        for index in range(depth)
+    )
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"</ownershipDocument>",
+        b"<footnotes>"
+        + opens
+        + b"9" * 4096
+        + b"</footnote>" * depth
+        + b"</footnotes></ownershipDocument>",
+    )
+    with pytest.raises(Form4ParseError, match="footnote XML structure"):
+        _parse_original(payload)
+
+
 def test_reused_footnote_features_are_computed_once_per_filing(monkeypatch):
     payload = _with_footnote("Privately negotiated purchase.")
     row_start = payload.index(b"<nonDerivativeTransaction>")

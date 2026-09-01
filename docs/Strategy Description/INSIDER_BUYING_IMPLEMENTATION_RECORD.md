@@ -1,22 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE IB-0/IB-1 STRUCTURAL SLICE, BOUNDED IB-1A RAW-SNAPSHOT
-BOUNDARY, BOUNDED IB-1B OFFLINE EXPLICIT-PROFILE PARSER, AND BOUNDED IB-1C
-OFFLINE EDGAR ACCEPTANCE-EVIDENCE SNAPSHOT HAVE COMPLETED INDEPENDENT CLAUDE
-REVIEW. IB-1D HAS COMPLETED INDEPENDENT CLAUDE REVIEW,
-ACCEPTED AFTER CORRECTION (SEE SECTION 17), AND CODEX HAS COUNTER-REVIEWED
-CLAUDE COMMITS `dceff74` AND `3f2024b`, CORRECTING THREE CONFIRMED P2
-DATA-INTEGRITY DEFECTS (SEE SECTION 18). IB-1D REVIEW IS COMPLETE. IB-1 AND
-THE BOUNDED IB-1E OFFLINE MULTI-PERIOD SUPPLIED-LINK-EVIDENCE CONTRACT IS
-IMPLEMENTED AND HAS COMPLETED INDEPENDENT CLAUDE REVIEW, ACCEPTED AFTER
-CORRECTION (SEE SECTION 24). CODEX HAS COUNTER-REVIEWED CLAUDE COMMITS
-`f5ce0d41` AND `1e3594e3`, ACCEPTING THE FIRST AND ACCEPTING THE SECOND AFTER
-CURRENT-RECORD CORRECTION. THE BOUNDED IB-1F PERSISTED TWO-PERIOD OFFLINE
-INTEGRATION PROOF IS IMPLEMENTED IN `273b0da8` AND AWAITS INDEPENDENT CLAUDE
-REVIEW (SEE SECTION 25). IB-1 AND
-BLUEPRINT SECTION 19.4 STEP 3 ARE NOT COMPLETE: STRUCTURAL CROSS-QUARTER
-COMPOSITION NOW EXISTS, BUT NO OFFICIAL SEC PROFILE, REAL PACKAGE,
-AUTHENTICATED AMENDMENT LINK, COMPLETE AMENDMENT COVERAGE, OR CANONICAL FILTER
+Status: **THE IB-0/IB-1 STRUCTURAL SLICE AND BOUNDED IB-1A THROUGH IB-1F
+OFFLINE EVIDENCE CONTRACTS HAVE COMPLETED INDEPENDENT CLAUDE REVIEW. CODEX HAS
+COUNTER-REVIEWED CLAUDE COMMIT `e8756630`, ACCEPTING IT AFTER CURRENT-RECORD
+CORRECTION (SEE SECTION 27). THE BOUNDED PROVISIONAL IB-0 FORM 4
+CLASSIFICATION-HARDENING SNAPSHOT IS IMPLEMENTED IN `dbe7c14f` AND AWAITS
+INDEPENDENT CLAUDE REVIEW (SEE SECTION 27). IB-1 AND BLUEPRINT SECTION 19.4
+STEP 3 ARE NOT COMPLETE: STRUCTURAL CROSS-QUARTER COMPOSITION EXISTS, BUT NO
+OFFICIAL SEC PROFILE, REAL PACKAGE, AUTHENTICATED AMENDMENT LINK, COMPLETE
+AMENDMENT COVERAGE, POINT-IN-TIME SECURITY IDENTITY, OR CANONICAL FILTER
 AUTHORITY EXISTS. NORMALIZATION, SIGNAL CONSTRUCTION, OUTCOME TESTING, ETF
 PORTFOLIO WORK, AND QC IMPLEMENTATION REMAIN UNSTARTED.**
 
@@ -141,6 +133,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-31 | Claude review | `3f2024b` -> this review snapshot | Independent review of the IB-1D counter-review and the bounded IB-1E multi-period supplied-link evidence contract, after the four-lane merge to main (`3f2024b..cf136e2`; 9 of 194 commits touch this lane) | Verified the sync and ancestry, dispositioned every Insider commit including the main merge, re-probed all three P2 parser/identity corrections against the unmodified tree rather than reading the record, checked the new cardinality guard is not over-broad, and mutation-swept IB-1E's authority and join guards. Adopted the ten-column ledger. Full dispositions are in section 24. | Ten-file set (named exactly in 24.8) **543 passed, 7 skipped**, 550 collected versus 549 at the committed head; complete suite on the exact final review tree: **6791 passed, 13 skipped, 25 warnings in 8025.55s (2:13:45)** after repairing three stale-CRLF analyst spec artifacts in this worktree (first run **1 failed, 6790 passed, 13 skipped, 25 warnings in 1304.28s (0:21:44)**, the single failure being that host-local checkout artifact and not this review's change; see 24.7); IB-1E sweep **2 of 7 caught, 4 traced to masking guards, 1 gap closed and then caught**; six direct corrections probes including a routine two-transaction Form 4 that still parses; compileall exit 0; every module restored byte-identical to `HEAD`. No SEC/EDGAR, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | Accepted all five counter-review findings against this reviewer, including two P2 parser defects in the canonical eligibility path that I missed by treating inherited IB-0 code as settled while reviewing a milestone that newly depends on it. IB1E-R06 (P3) fixed here: the supplied XML-to-acceptance issuer binding had no test sensitivity. IB1E-R07 (P3): the recorded ten-file composite is unnamed and unreproducible. Out-of-lane items, including R-01's partial overtaking by main's EXE-001 fix and the now-moot frozen-file regime, are documented in 24.7 and not fixed. | Codex counter-reviews these Claude commits, then may begin the next bounded Insider milestone. |
 | 2026-08-31 | Codex counter-review + implementation | `cf136e25..1e3594e3` reviewed; `1e3594e3` -> `273b0da8` implementation snapshot (this lane-record commit follows) | Claude counter-review plus bounded IB-1F persisted two-period offline integration proof | Accepted Claude's issuer-binding regression, corrected its merge-aware review scope and combined-range diff evidence, and added a synthetic persisted Q4-to-Q1 proof through the real IB-1A publisher, IB-1B publisher/loader, IB-1C publisher/loader, and IB-1E call-time loader. The success path uses no loader substitution; independent parsed-path, raw-path, and receipt-to-upstream cross-wires refuse before XML parsing. No production code or authority flag changed. | Exact implementation tree `273b0da8`: complete suite **6,795 passed, 13 skipped, 0 failed, 26 warnings in 2,185.89s (36m25s)**; whole-repository compileall including `research` exit 0; final IB-1F module **4 passed in 25.87s**. Claude's issuer regression passed and its in-memory issuer-binding bypass was caught. All bytes and rows are synthetic; no filing, package, API, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, UI, or order access; **0 research looks**. | `f5ce0d41` accepted; `1e3594e3` accepted after current record correction. IB1E-CCR01 (P2) and IB1E-CCR02 (P3) are closed in section 25. IB1E-R04 is closed only as persisted synthetic integration debt; IB1F-A01/A02 (P3) were fixed before commit. IB1E-R07 remains open record-precision debt. IB-1, blueprint step 3, IB1D-R09, and every official-data or canonical-authority gate remain open. | Commit this lane record, rerun record-sensitive and diff checks, confirm the remote remains `1e3594e3`, and make the round's single push. Claude independently reviews both Codex commits before any further Insider milestone. |
 | 2026-08-31 | Claude review | `1e3594e3` -> this review snapshot | Independent review of the IB-1E counter-review and the bounded IB-1F persisted multi-period integration proof (`1e3594e3..f3749ff3`, 2 commits) | Verified the sync and ancestry, dispositioned both commits, reproduced both counter-review findings against this reviewer by running the methods myself, and ran a differential mutation study to test whether the new integration proof earns its place rather than duplicating mocked coverage. **No correction was required and none was applied.** Full dispositions are in section 26. | IB-1F module **4 passed** and eleven-file collection **554 tests collected**, both reproducing the recorded figures exactly; complete suite on the exact reviewed tree: **6795 passed, 13 skipped, 25 warnings in 1257.15s (0:20:57)**; differential: a swapped parsed/raw upstream at the call-time loader **survives** the mocked-loader IB-1E module but is **caught** by IB-1F, confirming it closes the IB1E-R04 blind spot; merge-review re-verified with `--full-history` and second/first-parent lane-path comparisons; compileall exit 0; every module restored byte-identical to `HEAD`. All fixtures synthetic. No SEC/EDGAR, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | Accepted both findings against this reviewer: IB1E-CCR01 (P2), where default history simplification hid two lane-carrying merges from my scoping command, and IB1E-CCR02 (P3) on diff-size scope. A sharper root cause is recorded in 26.3: a silently non-matching pathspec sat inside that command, the second such case in this lane, so scoping commands feeding a completeness claim must now be asserted non-empty and merge gates must use `--full-history`. One candidate IB-1F gap was verified as duplicate coverage and deliberately left unwritten (26.5). No test weakening; the range deletes no test. | Codex counter-reviews this review commit, then may begin the next bounded Insider milestone. |
+| 2026-09-01 | Codex counter-review + implementation | `f3749ff3..e8756630` reviewed; `e8756630` -> `dbe7c14f` implementation snapshot (this lane-record commit follows) | Claude counter-review plus bounded provisional IB-0 Form 4 classification hardening | Accepted Claude's no-code review after correcting four current-record defects, then narrowed provisional common-stock recognition, expanded bounded price-range quarantine, made scalar/value XML grammar fail closed, and classified each referenced immutable footnote once without cross-footnote synthesis or unreferenced-footnote contamination. No official profile, canonical filter, security mapping, data ingest, signal, ETF, QC, or UI authority was added. | Form 4 module **182 passed**; exact named Insider/import-boundary PTY set **633 passed, 7 skipped**; three independent reviews found no remaining P0-P3 in scope, killed every requested dangerous mutation, and measured flat per-filing footnote classification with linear 2 MiB near-miss behavior. Required complete suite on exact `dbe7c14f`: **3 failed, 6,878 passed, 13 skipped, 25 warnings in 1,320.92s (22m00s)**; isolated PTY rerun made the Windows `git ls-files` handle failure pass and reproduced only two unchanged, out-of-lane sleeve fixed-clock assertions at the September 1 countdown boundary. Whole-repository compileall exit 0. Synthetic fixtures only; no filing, package, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, deployment, UI, or order access; **0 research looks**. | `e8756630` accepted after documentation correction; IB1F-CR01 through IB1F-CR04 close in section 27. IB0H-R01 through IB0H-R05 close five inherited dangerous-direction gaps in the bounded parser. IB0H-R06 remains open P3 future-boundary debt: a caller can forge the public transaction dataclass, so any future filter must consume only factory-created evidence and revalidate. Two out-of-lane, real-time-dependent sleeve test failures are documented and not fixed. Official/XSD compatibility and exhaustive natural-language interpretation are not claimed. | Commit this lane record, run final record/diff/secret checks, confirm the remote remains `e8756630`, and make exactly one combined push containing `dbe7c14f` plus the record commit. Then stop for Claude's independent review before another Insider milestone. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -2625,6 +2618,7 @@ diff/secret checks, confirm the remote still points to Claude's reviewed
 `1e3594e3`, and make exactly one combined push containing `273b0da8` plus the
 record commit. Then stop for Claude's independent review; no further Insider
 milestone starts in this round.
+
 ## 26. Claude review - IB-1E counter-review and IB-1F persisted integration (2026-08-31)
 
 Reviewer: Claude, Insider Buying lane review session, in the named lane
@@ -2780,3 +2774,158 @@ the stale-CRLF artifact risk - remain documented and separately owned.
 Next authorized step: Codex counter-reviews this review commit, then may begin
 the next bounded Insider milestone. No live SEC ingest, research look, outcome
 join, QuantConnect job, broker action, or UI work is authorized.
+
+## 27. Codex counter-review and provisional Form 4 classification hardening (2026-09-01)
+
+Codex worked only in the dedicated long-lived worktree
+`C:\git\customizedagent\trading_agent_insider` on
+`codex/strategy-insider-buying`. At the start of repository work, local
+`HEAD` and `origin/codex/strategy-insider-buying` were both
+`e8756630ce3558440e6d495a302928a347ce5160`; the worktree was clean and
+Claude's reviewed base `f3749ff3` was an ancestor. The review range is the
+sole commit `e8756630`. No branch, worktree, handoff, package, or external
+service was created.
+
+This round counter-reviews that commit, corrects its current handoff, and
+implements one bounded prerequisite milestone in `dbe7c14f`: hardening the
+existing provisional Form 4 classification boundary before any IB-2
+disposition/filter layer is allowed to depend on it. The round changes only
+`research/insider_buying/form4_xml.py`,
+`tests/test_insider_buying_form4.py`, and this lane record. No Trading App,
+Streamlit, execution, broker, risk, portfolio, scheduler, sibling strategy,
+or frozen project-wide document changed.
+
+### 27.1 Counter-review disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `e8756630` Record review of the IB-1E counter-review and IB-1F integration proof | **Accepted after current-record correction.** | Claude's code/test disposition is supported: the review commit changes only this record, its history and diff figures reproduce, the persisted IB-1F proof catches a call-time parsed/raw upstream swap that the mocked IB-1E loader cannot observe, and no production or test defect exists in the reviewed range. Four defects in the resulting current handoff are corrected by this section and the status/format edits above. |
+
+Independent reproduction, rather than reliance on prose, established the
+following:
+
+- the relevant history command returns 9 commits under default simplification
+  and 12 under `--full-history`; the literal pathspec fragment
+  `tests/test_insider_buying_` matches zero paths;
+- the two previously omitted lane-carrying merges preserve every lane-owned
+  path byte-identically to their lane-bearing parents;
+- the two-commit earlier review range is 273 insertions and one deletion,
+  while its test correction alone is 45 insertions and zero deletions;
+- a call-time loader with parsed and raw upstream directories swapped makes
+  persisted IB-1F refuse with `REFUSED: period is not a verified IB-1C
+  boundary`, while the mocked-loader side survives and the module is restored;
+  and
+- the reviewed tree's 4-case IB-1F module, 554-case collection, and complete
+  suite claims are internally consistent with Claude's recorded evidence.
+
+The counter-review quality rating for the reviewed IB-1F snapshot is
+**9/10**. It is a strong, mutation-sensitive synthetic integration proof with
+precise authority limits. It is not 10/10 because it intentionally cannot
+establish official-package compatibility, authenticated amendment linkage,
+or complete coverage, and its review record omitted the four handoff controls
+below.
+
+### 27.2 P0-P3 ledger
+
+Resolved items are retained. “Closed” below means only the stated bounded
+defect is closed; it does not promote any false authority gate.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for correction | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1F-CR01 | P3 | Closed in this record | `e8756630` | Section 26 assessment | The mandatory numeric 1-10 quality rating was absent, leaving the review handoff incomplete. | Section 26 contains no numeric review rating. | The standing review process requires a reproducible quality assessment rather than only an accepted/rejected label. | Added the bounded 9/10 rating and its deductions in 27.1. | Direct record inspection and the final record-sensitive gate. |
+| IB1F-CR02 | P3 | Closed in this record | `e8756630` | Section 26.7 | Claude recorded diff checking but no post-edit lane-record structural check or narrow secret-shape scan for the final record-only commit. | The validation list names neither control. | The branch-local handoff is machine-checked and can itself introduce broken Markdown or credential-shaped text. | Run both controls over the final round diff and record the exact results in 27.4. | Final record-sensitive tests, `git diff --check`, and narrow diff scan below. |
+| IB1F-CR03 | P3 | Closed in this record | `e8756630` | Current status header | The current status still said IB-1F awaited independent Claude review after Claude had completed and committed that review. | The pre-correction header pointed only to section 25 and called the review pending. | This file is the lane handoff; a stale top status directs the next agent to repeat completed work. | Replaced the current status with completed-review, counter-review, and new-milestone state. | Current header names section 27 and `dbe7c14f`. |
+| IB1F-CR04 | P3 | Closed in this record | `e8756630` | Boundary between sections 25 and 26 | Section 26 immediately followed section 25's final paragraph without the required blank line. | Raw Markdown contained `round.` followed directly by `## 26`. | Headings require a separating blank line for stable rendering and parsing. | Inserted the blank line without rewriting either historical section. | Raw record inspection and final record-sensitive gate. |
+| IB0H-R01 | P2 | Closed in `dbe7c14f` | inherited parser | `_common_stock` | Substring recognition could provisionally accept compound or semantically different instruments such as common-stock purchase rights. | Dangerous-direction title probes reproduced the fail-open. | Blueprint section 3 allows only non-derivative common equity; ambiguity must quarantine rather than become eligible. | Replaced substring/denylist behavior with a narrow positive grammar for explicit common stock, optional simple class, and optional par-value suffix. | Focused tests and common-title guard deletion mutant; independent hardening review accepted. |
+| IB0H-R02 | P2 | Closed in `dbe7c14f` | inherited parser | `_footnote_features` price-range detection | Bounded range prose and numeric price-range forms could evade the prior three literal phrases and remain provisionally eligible. | Currency, comma, decimal, leading-dot, en/em dash, `through`, and `and` adversarial forms reproduced missed dangerous directions. | The blueprint explicitly quarantines price ranges; failing open changes economic value and eligibility. | Added bounded word and numeric grammars while preserving harmless private, 10b5-1, date, `from`, and `between` prose as non-range where appropriate. | Every requested token/connector deletion mutant was killed; 2 MiB near-miss probes remained linear. |
+| IB0H-R03 | P2 | Closed in `dbe7c14f` | inherited parser | `_text` and `_value` | XML scalar/value containers accepted mixed content, unknown siblings, or unsupported attributes that could hide alternate economic text. | Child/tail, container text/tail/attribute, value attribute, unsupported child, and malformed footnote-reference probes reached the parser. | An offline provisional parser must refuse ambiguous structure rather than select one convenient descendant. | Enforced a strict scalar and value-container grammar with only one plain `value` plus validated empty `footnoteId` references; retained the established missing-ID refusal. | Each individual grammar-guard deletion mutant was killed and 182 Form 4 cases pass. |
+| IB0H-R04 | P2 | Closed in `dbe7c14f` | inherited parser | referenced-footnote classification | Concatenating referenced footnotes could synthesize a range phrase across two unrelated notes, all filing footnotes could contaminate a row, and repeated row-level rescans amplified large-footnote cost. | Separate-footnote, unreferenced-footnote, and shared-footnote probes reproduced all three dangerous directions. | Diagnostics and exclusions must derive only from each row's immutable referenced lineage and remain bounded per filing. | Compute immutable features once per footnote ID, combine only booleans from referenced IDs, and continue preserving raw referenced prose in `ParsedTransaction.footnote_texts`. | Cache-bypass, cross-footnote-concatenation, and all-footnotes mutants were killed; 300 KB timing was effectively flat from 1 to 32 rows. |
+| IB0H-R05 | P3 | Closed in `dbe7c14f` | inherited tests | Form 4 classification matrix | Several frozen directions lacked direct sensitivity: non-`A` acquired/disposed codes, nonpositive shares/price, title compounds, and the broader range grammar. | Independent read-only mutation audit showed the pre-hardening gaps and then exercised each guard independently. | These are canonical dangerous directions even though this parser remains provisional. | Added exact parameterized classification and refusal tests without deleting or loosening an existing test. | Non-`A`, shares, price, common-title, and price-range mutants all fail the final module. |
+| IB0H-R06 | P3 | **Open - future boundary debt** | existing contract | public `ParsedTransaction` construction | A caller can construct or replace the public dataclass with changed economic fields while retaining an eligibility outcome. Current IB-1D/IB-1E factory and hash boundaries contain this within implemented flows, but a future filter could trust the forged object directly. | Read-only adversarial construction preserved a superficially eligible outcome with altered fields. | Fixing object provenance or redesigning the public contract would exceed this parser-hardening milestone; no current canonical filter exists. | No product change in this round. Any future disposition/filter layer must consume factory-created `ProfileBoundForm4AmendmentEvidence`, account for every transaction once, and revalidate rather than trust a caller-supplied outcome. | Remains open and must be mutation-tested at the future consumer boundary. |
+| IB0H-OOL01 | P3 | **Open - documented, not fixed in this lane** | unchanged shared code | `tests/test_sleeve_report.py` fixed-clock countdown assertions | Two sleeve tests construct acquisitions from fixed `_NOW = 2026-08-07` but let production evaluate against the real clock. On 2026-09-01 the lot remains short-term while the sub-day countdown truncates to `0`, contradicting `0 < days_to_long_term`. | Both assertions failed in the complete run and isolated PTY rerun; the decimal guard passed alone. Only the two Insider parser/test files differ from `e8756630`, so sleeve production and tests are byte-identical to the reviewed base. | The owner restricted this lane to Insider strategy/QC work and requires unrelated findings to be documented, not fixed. | No sleeve, UI, or shared-code edit. | Isolated result: **2 failed, 1 passed**; exact failing values were `days_to_long_term == 0` while `term_if_sold_now == "short"`. |
+
+No P0 or P1 finding exists in Claude's commit or the bounded implementation
+diff. The P2 items are inherited parser fail-opens corrected before allowing a
+new consumer to depend on them. IB0H-R06 and IB0H-OOL01 remain explicit P3
+debt. Exhaustive natural-language interpretation and official SEC/XSD profile
+compatibility are not claimed.
+
+### 27.3 Bounded implementation contract
+
+Commit `dbe7c14f` changes two files: 434 insertions and 16 deletions. The
+classification remains provisional. It still emits a named outcome for every
+parsed transaction, retains raw referenced footnote prose and accession
+lineage, and keeps every authority gate false. It adds no normalized canonical
+row, point-in-time security/share-class identity, reporting-owner resolution,
+joint-owner semantics, post-aggregation value decision, authenticated
+amendment link, completeness claim, downloader, signal, outcome, ETF map, or
+QuantConnect surface.
+
+Three independent read-only audits accepted the final bounded diff:
+
+- implementation review: **182 passed**, no remaining P0-P3 in scope;
+- mutation audit: every requested title, range-token, acquired/disposed,
+  nonpositive-number, mixed-content, cache, cross-footnote, and contamination
+  mutant was killed; and
+- regex/performance audit: all adversarial cases classified correctly,
+  300 KB shared-footnote work stayed effectively flat from 1 to 32 rows, and
+  2 MiB near-miss inputs remained linear at 0.18-0.25 seconds.
+
+The implementation quality rating is **9/10** for its bounded provisional
+scope. The deduction is deliberate: no official profile/XSD or point-in-time
+security identity has been authorized or proved, and IB0H-R06 remains for the
+future consumer boundary.
+
+### 27.4 Validation and access accounting
+
+- Final Form 4 module:
+  `python -m pytest -q tests/test_insider_buying_form4.py`:
+  **182 passed**.
+- Exact named eleven-file Insider/import/hygiene/separation set from sections
+  24.8 and 25.4: first plain-pipe run **632 passed, 7 skipped, 1 failed** only
+  because Windows `DuplicateHandle` rejected a subprocess handle in
+  `test_assistant_private_runtime_identity_matches_research_behavior`; that
+  case passed alone under PTY, and the exact named PTY rerun was
+  **633 passed, 7 skipped in 179.07s**.
+- Required complete suite on exact code commit `dbe7c14f`:
+  **3 failed, 6,878 passed, 13 skipped, 25 warnings in 1,320.92s
+  (22m00s)**. One failure was a Windows `git ls-files` subprocess-handle
+  `WinError 50` in the decimal-conversion guard and passed in the fresh PTY
+  isolation. The other two are IB0H-OOL01, reproduced unchanged and not fixed.
+  Thus every Insider test and every other completed test in the run passed,
+  but this record does not misstate the complete suite as zero-failure.
+- Fresh isolated PTY run of the three failures: decimal-conversion guard
+  **passed**; the two out-of-lane sleeve assertions **failed** with the same
+  clock-boundary value.
+- Whole-repository `compileall` over `assistant`, `backtest`, `data`,
+  `execution`, `ml`, `research`, `risk`, `scripts`, `signals`, `strategies`,
+  `tests`, and the root Python modules: **exit 0**.
+- Final focused Form 4, lane-record, and active-document gate:
+  **252 passed** on both post-edit runs. `git diff --check` exited 0 apart from the
+  repository's LF-to-CRLF notice, and a narrow secret-shape scan over the
+  entire `e8756630..` round diff found **0 matches**.
+
+All tests used synthetic local fixtures. This round accessed no filing, real
+package, API, provider data, credential, licensed row, outcome, QuantConnect
+job, broker, operator database, scheduler, deployment, UI, or order.
+**Research looks: 0.**
+
+### 27.5 Residual gates and handoff
+
+IB-1, blueprint section 19.4 step 3, IB1D-R09, official-profile validation,
+authenticated capture provenance, real-package compatibility, complete
+amendment coverage, point-in-time CIK/reporting-owner/security identity,
+canonical filtering, field-level amendment supersession, aggregation,
+post-aggregation value rules, outcomes, ETF construction, and QC remain
+incomplete and unauthorized.
+
+After the record commit, Codex must confirm the remote still points to
+`e8756630`, make exactly one combined push containing `dbe7c14f` and the
+record commit, and stop for Claude's independent review. If that review is
+accepted and no owner gate intervenes, the next candidate bounded milestone
+is an evidence-bound provisional V1 disposition/quarantine audit that consumes
+only factory-created `ProfileBoundForm4AmendmentEvidence`, accounts for every
+transaction exactly once, revalidates its inputs, and leaves
+`canonical_filter_authorized` literally false. It must not claim to close
+IB-1, blueprint step 3, IB1D-R09, mapping, aggregation, outcomes, ETF work, or
+QuantConnect authority.

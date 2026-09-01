@@ -930,6 +930,40 @@ def test_contract_rejects_peer_injection_revision_recast_and_underfill_bounds():
         )
 
 
+@pytest.mark.parametrize(
+    "case",
+    ["duplicate_s0", "duplicate_s1", "missing_s1", "reversed_order", "empty"],
+)
+def test_disposition_requires_exactly_one_s0_then_one_s1_outcome(case):
+    """Policy v1 allows one result per policy/release/security/model.
+
+    The builder always emits S0 then S1, so only a hand-constructed or
+    rehydrated disposition can violate this. Nothing downstream re-derives the
+    model tuple: removing this guard admits a duplicated S0 that double-counts
+    one model while silently dropping S1.
+    """
+    disposition = _current(_scores())[0]
+    s0, s1 = disposition.outcomes
+    assert (s0.model, s1.model) == (
+        StockScoreModel.S0_LEVEL,
+        StockScoreModel.S1_DELTA,
+    )
+    outcomes = {
+        "duplicate_s0": (s0, s0),
+        "duplicate_s1": (s1, s1),
+        "missing_s1": (s0,),
+        "reversed_order": (s1, s0),
+        "empty": (),
+    }[case]
+
+    with pytest.raises(StockNormalizationError, match="exactly S0 then S1"):
+        StockScoreDisposition(
+            current=disposition.current,
+            cohort=disposition.cohort,
+            outcomes=outcomes,
+        )
+
+
 def test_mixed_release_calendar_lineages_for_one_settlement_fail_closed():
     with pytest.raises(StockNormalizationError, match="settlement cycle mixes"):
         build_pit_stock_normalized_scores(

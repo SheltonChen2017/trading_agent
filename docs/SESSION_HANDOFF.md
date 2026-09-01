@@ -24,9 +24,9 @@ their lane-owned artifacts.
 
 - **Current review state, 2026-08-31.** Codex counter-reviewed Claude's exact
   two-commit range
-  `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90..8078ce4877613adf5f9378cc11258841ac38f76d`.
+  `8078ce4877613adf5f9378cc11258841ac38f76d..5b84a72805073b406034f5d1a83ad5d3072d192e`.
   Both commits are accepted after correction. Five P3 findings and no P0/P1/P2
-  are recorded in section 25 of the target lane record. The same bounded round
+  are recorded in section 26 of the target lane record. The same bounded round
   freezes the owner-approved TPR-TR0 signed-registry-anchor design candidate for
   Claude's independent review. No dedicated TPR signing key, external trust
   file, signature, positive registry entry, source right, outcome, or look authority
@@ -475,7 +475,7 @@ same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. The
 v2.2 implementation snapshot is `bb8dfb6`. Codex counter-reviewed both Claude
-commits in `b4e6b88c..8078ce48`; both are accepted after correction, with five
+commits in `8078ce48..5b84a728`; both are accepted after correction, with five
 P3 findings and the owner-approved TPR-TR0 signed-registry-anchor design
 candidate recorded in section 25. That design is pending Claude's independent
 review and grants no authority. The lane and `origin/main` have diverged;

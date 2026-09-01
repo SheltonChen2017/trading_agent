@@ -49,15 +49,15 @@ EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
 # commit -- that hash does not exist until the commit is written -- so the
 # pointer records the range just reviewed. Codex rounds therefore pin
 # Claude's completed commits and Claude rounds pin Codex's.
-LATEST_CLAUDE_REVIEW_BASE = "b4e6b88ccf8a17a60cad91cda94205f61c1b7f90"
-LATEST_CLAUDE_REVIEW_HEAD = "8078ce4877613adf5f9378cc11258841ac38f76d"
+LATEST_CLAUDE_REVIEW_BASE = "8078ce4877613adf5f9378cc11258841ac38f76d"
+LATEST_CLAUDE_REVIEW_HEAD = "5b84a72805073b406034f5d1a83ad5d3072d192e"
 LATEST_CLAUDE_REVIEW_RANGE = (
     f"{LATEST_CLAUDE_REVIEW_BASE}..{LATEST_CLAUDE_REVIEW_HEAD}"
 )
-LATEST_CLAUDE_REVIEW_SHORT_RANGE = "b4e6b88c..8078ce48"
+LATEST_CLAUDE_REVIEW_SHORT_RANGE = "8078ce48..5b84a728"
 # The superseded pointer token that must no longer appear in current blocks.
-PREVIOUS_CLAUDE_REVIEW_HEAD = "cd23f7c8ea893f40b601d4ea791e1d9a14a72e7a"
-PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD = "cd23f7c8"
+PREVIOUS_CLAUDE_REVIEW_HEAD = "b4e6b88ccf8a17a60cad91cda94205f61c1b7f90"
+PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD = "b4e6b88c"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -444,7 +444,7 @@ def _record_section(heading: str) -> str:
 
 def _current_qualification(section: str) -> str:
     """Return only section 8's explicitly current block, not its history."""
-    start = section.index("**Current qualification")
+    start = section.index("**Current qualification,")
     end = section.index("\n### Historical progression", start)
     return section[start:end]
 
@@ -454,7 +454,10 @@ def _current_integration_state(section: str) -> str:
     return _bounded(
         section,
         "**Integration state, 2026-08-31.**",
-        "**Current qualification, 2026-08-31:**",
+        # Date-independent: this heading carries the review date and moved
+        # every round, so pinning it re-broke the extractor each time. The
+        # opening anchor keeps its date because it names a fixed merge event.
+        "**Current qualification,",
         "record current integration state",
     )
 
@@ -512,7 +515,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     ) == [LATEST_CLAUDE_REVIEW_RANGE]
     assert PREVIOUS_CLAUDE_REVIEW_HEAD not in normalized_current
     assert PREVIOUS_CLAUDE_REVIEW_SHORT_HEAD not in normalized_current
-    assert "Codex has counter-reviewed Claude's exact two-commit range" in normalized_current
+    assert "Claude has independently reviewed Codex's exact three-commit range" in normalized_current
     assert (
         "no implementation or provisioning milestone is authorized"
         in normalized_current.lower()
@@ -702,3 +705,61 @@ def test_a_present_tense_sync_claim_matches_real_ancestry() -> None:
                     f"{name} claims present-tense synchronization with {mainline}, "
                     f"but {lane_ref} does not contain it"
                 )
+
+
+def test_policy_inventory_equals_the_verifier_import_closure() -> None:
+    """TPR-CR7-001. The signed policy set must be import-closed, not enumerated.
+
+    TPR-TR0 binds an *enumerated* policy-path set to the signed registry
+    anchor, and its test matrix checks only that the set matches and includes
+    the verifier. Nothing requires the set to cover everything the verifier
+    actually imports. A future internal module that the verifier depends on but
+    that nobody adds to the tuple would stay mutable after the signed anchor --
+    reintroducing the self-mutable-inventory class `TPR-CCR5-004` exists to
+    close, one level out.
+
+    The closure machinery already exists, so the requirement is enforceable
+    today rather than left as design prose. This test is deliberately two-way:
+    an unlisted internal dependency and a stale listed module both fail.
+    """
+    from research.target_price_revisions.import_firewall import (
+        validate_transitive_import_closure,
+    )
+    from research.target_price_revisions.preregistration import (
+        POLICY_CODE_REPO_PATHS,
+    )
+
+    # Non-module policy members are declared, not inferred, so adding one
+    # silently is a deliberate act rather than an accident of this comparison.
+    NON_MODULE_POLICY_PATHS = frozenset(
+        {"research/target_price_revisions/specs/.gitattributes"}
+    )
+
+    closure_paths: set[str] = set()
+    for module in validate_transitive_import_closure(ROOT):
+        relative = Path(*module.split("."))
+        for candidate in (
+            relative.with_suffix(".py"),
+            relative / "__init__.py",
+        ):
+            if (ROOT / candidate).is_file():
+                closure_paths.add(candidate.as_posix())
+                break
+        else:  # pragma: no cover - a closure module must exist on disk
+            raise AssertionError(f"closure module {module} has no source file")
+
+    declared = set(POLICY_CODE_REPO_PATHS)
+    module_members = declared - NON_MODULE_POLICY_PATHS
+
+    assert closure_paths <= declared, (
+        "the verifier imports internal modules that the signed policy inventory "
+        f"does not bind: {sorted(closure_paths - declared)}"
+    )
+    assert module_members == closure_paths, (
+        "the policy inventory's module members must equal the verifier's import "
+        f"closure exactly; extra={sorted(module_members - closure_paths)} "
+        f"missing={sorted(closure_paths - module_members)}"
+    )
+    assert NON_MODULE_POLICY_PATHS <= declared, (
+        "a declared non-module policy path left the inventory"
+    )

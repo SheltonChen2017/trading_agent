@@ -1,11 +1,11 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN THE EXACT
-TWO-COMMIT RANGE `b4e6b88c..8078ce48`. BOTH COMMITS ARE ACCEPTED AFTER
-CORRECTION. FIVE P3 FINDINGS AND THEIR CORRECTIONS ARE RECORDED IN SECTION 25;
-NO P0, P1 OR P2 WAS FOUND IN THE CLAUDE RANGE. A PRE-PUSH AUDIT FOUND FOUR
-DESIGN P2S AND TWO P3S IN CODEX COMMIT `DFAEE5DE`; SECOND CODEX COMMIT
-`15CE7F04` CLOSES ALL SIX BEFORE PUSH. THE OWNER
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED CODEX'S EXACT THREE-COMMIT RANGE
+`8078ce48..5b84a728`. ALL THREE COMMITS ARE ACCEPTED AFTER CORRECTION. THE SIX
+PRE-PUSH DESIGN CORRECTIONS IN `15CE7F04` WERE INDEPENDENTLY VERIFIED PRESENT,
+NOT ACCEPTED ON DISPOSITION. TWO NEW DESIGN DEFECTS (`TPR-CR7-001` P2,
+`TPR-CR7-002` P3) WERE FOUND AND CORRECTED IN SECTION 26; NO P0 OR P1 EXISTS.
+CODEX COUNTER-REVIEW OF THIS CLAUDE ROUND IS NEXT. THE OWNER
 HAS APPROVED THE RECOMMENDED TPR TRUST-ROOT
 IDENTITY, EXTERNAL PATH, CUSTODY/ROTATION POLICY, AND NORMAL REVIEWED-CODE
 THREAT MODEL. SECTION 25 FREEZES THE BOUNDED TPR-TR0 DESIGN CANDIDATE FOR
@@ -358,12 +358,13 @@ neither current tip contains the other. Live ahead/behind counts are omitted
 because every new lane commit invalidates them. The four-slot multiplicity
 amendment nevertheless remains unpropagated: see `TPR-OOL-006`.
 
-**Current qualification, 2026-08-31:** Codex has counter-reviewed Claude's
-exact two-commit range
-`b4e6b88ccf8a17a60cad91cda94205f61c1b7f90..8078ce4877613adf5f9378cc11258841ac38f76d`.
-Both `433b2679` and `8078ce48` are accepted after correction. Section 25
-contains their exact dispositions, five P3 findings, corrections, quality
-rating, and validation. In the same bounded round, the owner-approved TPR-TR0
+**Current qualification, 2026-09-01:** Claude has independently reviewed Codex's
+exact three-commit range
+`8078ce4877613adf5f9378cc11258841ac38f76d..5b84a72805073b406034f5d1a83ad5d3072d192e`.
+`dfaee5de`, `15ce7f04` and `5b84a728` are accepted after correction. Section 26
+contains their exact dispositions, the independent verification of the six
+pre-push design corrections, two new design findings, the quality rating, and
+validation. Codex counter-review of this Claude round is next. In the same bounded round, the owner-approved TPR-TR0
 trust-root design candidate is frozen for Claude's independent review. The
 reviewed implementation snapshot remains
 `bb8dfb6e8d718f9371bbbd85b30f5f9a769f396e`.
@@ -490,12 +491,13 @@ documented here and deliberately not fixed.
 | `TPR-OOL-001` | P2 | Repository-wide Git plumbing: no `.gitattributes` exists at any level, and `core.autocrlf=true` is set in the system Git configuration | Git finds no NUL byte in the target-price blueprint, so it classifies the PDF as text and rewrites its 557 LF bytes to CRLF on checkout. The working file is 78,082 bytes and hashes to `6ee7ea5e...4330`, while the committed blob is 77,525 bytes and hashes to the pinned `9f00dd56...2633`. `pdftotext` reports a damaged xref table on the working copy. The other four PDFs contain NUL bytes early and check out byte-identically. Lane impact is `TPR-CR1-001`. | A `*.pdf binary` attribute is repository-wide plumbing rather than trading-strategy work, and `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 2 requires a shared-file change to stop for one owner-coordinated common-baseline amendment. Documented, not fixed. Owner decision required. |
 | `TPR-OOL-006` | P2 | Sibling lane frozen preregistrations, principally `codex/strategy-analyst-revisions-v2` | That lane still freezes its selection-family alpha at `0.05 / 3 = 1/60` while the fixed family now has four permanent `1/80` slots. Under the pre-amendment sibling allocations, exact arithmetic is `3 * (1/60) + 1/80 = 1/16 = 0.0625`, above the family ceiling `1/20 = 0.05`; the displayed `0.0167` is only a rounded rendering of `1/60`. | **Escalated 2026-08-31: this is now a contradiction inside one integrated tree.** With all four lanes merged into `main`, that single tree simultaneously states the analyst lane's "three-lane correction remains 3" with its prospective look carrying `1/60`, no alpha freeze at all in Insider Buying or Short Interest, and this lane's fixed four-slot family at `1/80` naming `analyst-revisions-v2` as one of its slots. Measured directly from the integrated tree, not inferred. The owner froze the four named slots permanently on 2026-08-30 (section 16): each lane's maximum is `1/80`; the named slot remains fixed while an unused or withdrawn allocation expires and is never redistributed or used to recompute the denominator. Sibling-lane corrections and their independent reviews/counter-reviews remain on their own long-lived branches. This target branch does not edit them, and no lane receives outcome authority from this directive. |
 | `TPR-OOL-008` | P2 | `research/analyst_revisions_v2/specs/*.json`; `research/ml_specs/*.json` | On the integrated tree the analyst lane's checkout-bytes guard (`test_canonical_production_artifacts_survive_checkout_as_exact_bytes`) **failed on this Windows host**: `legacy_reproduction_registry.json` held CRLF bytes while its committed blob is LF, and `git status` reported clean because the stat cache hid it. Five artifacts were affected. The repository content is correct; only the checkout was stale, and restoring each file from its committed blob turned the test green with `git diff HEAD` empty. The root cause is an attribute strategy difference: the analyst lane protects those files with `*.json -text` only (`text: unset, eol: unspecified`), which lets a pre-existing CRLF working copy persist, whereas this lane now uses `text eol=lf` (`text: unset, eol: lf`) and does not drift. `research/ml_specs/*.json` carry no attribute at all (`text: unspecified`) and Git warns they will be re-converted to CRLF on the next checkout, so their restoration here is temporary and no test currently covers them. | Documented, not fixed. The remedy is to adopt `text eol=lf` in the sibling lanes and give `research/ml_specs` equivalent protection, which touches another lane's and the ML surface's owned files. Route as one owner-coordinated change. The local checkout repair performed during this review changed no committed content. |
+| `TPR-OOL-009-C` | P2 | `tests/test_sleeve_report.py`; `assistant` lot tax-mechanism path | **Claude corroboration, 2026-09-01, not a new finding.** Both failures reproduce in isolation (`2 failed, 54 passed`), and the recorded diagnosis is exact: the test fixes its lot/snapshot clock at 2026-08-07 while the implementation reads the live UTC clock. A lot created with `days_ago=340` is therefore acquired 2025-09-01, which is exactly 365 days before the live date 2026-09-01 — precisely the one-year boundary, so `term_if_sold_now` stays `short` while the countdown collapses to `0`, failing `0 < days_to_long_term <= 30`. The failure is genuinely date-triggered and began when the live clock crossed that boundary; it is a real test/implementation clock mismatch, not a flake that will pass on retry. | **Not fixed** — out-of-lane under the owner's scope rule and explicitly excluded from this branch. Route to the Trading App lane; the durable fix is to give the implementation the same injected clock the test fixes, not to loosen the assertion. |
 | `TPR-OOL-007` | P3 | `docs/THREE_STRATEGY_PROJECT_DIRECTION.md:274-278` | The shared coordination pointer still presents a local TPR-0A candidate whose next action is one push/review; it omits the completed initial review, the six Claude commits through `2ec0fad`, their Codex counter-review, and the current v2.2 candidate at `bb8dfb6`. | Documented, not fixed. The file is shared coordination surface outside this target-only lane; route a concise current-state correction through the appropriate owner-coordinated shared-document round. |
 | `TPR-OOL-002` | P3 | `docs/Strategy Description/README.md` | The lane table and the surrounding prose describe a three-strategy program and omit Target-Price Revisions entirely, so a reader who starts at the directory README does not discover this lane, its branch, or its record. | That README is named in the parallel-workflow frozen-file list, so it needs the same owner-coordinated common-baseline amendment rather than a fourth competing edit. Documented, not fixed. |
 | `TPR-OOL-001-R1` | P2 resolution | Owner-coordinated repository Git plumbing | The owner approved the common fix. Root `.gitattributes` now declares `*.pdf binary`; Git resolves the blueprint as binary with text/diff/merge unset. The PDF was rebuilt from the intact Git blob plus the two-page owner addendum and reopened strictly as 28 pages at raw SHA-256 `55ce6703...ba14` at that time; the current artifact is the 29-page v2.2 blueprint at raw SHA-256 `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`, which supersedes that historical resolution state without reopening the finding. | Resolved under the explicit one-time owner coordination; this does not authorize later shared-file edits by inference. Raw-byte and resolved-attribute guards are target-owned. |
 | `TPR-OOL-003` | P2 | Analyst Revisions V2 preregistration loader: `research/analyst_revisions_v2/preregistration.py:465,487` | Both persisted JSON paths use ordinary `json.loads`, which accepts duplicate object keys with last-key-wins behavior. A content-addressed authority artifact can therefore have ambiguous human/parser meaning. TPR's strict loader rejects duplicate keys, but this external accepted lane remains unchanged. | Documented only. Route to the Analyst Revisions V2 lane before any outcome authority; add duplicate-key mutations there. |
 | `TPR-OOL-004` | P2 | Analyst Revisions V2 family contract: `research/analyst_revisions_v2/preregistration.py:56,931` and its draft/tests | The accepted draft/loader still names `three_lane_selection_correction` and requires value 3, while the owner has added TPR as the fourth shared family/attempt. The Analyst lane remains fail-closed and zero-access, so no current look is affected. | Documented only. Synchronize that lane's content-addressed artifact and tests to four before any Analyst outcome access; do not edit it from TPR. |
-| `TPR-OOL-008` | P3 | `research/__init__.py`, shared with the Analyst Revisions V2 lane | `POLICY_CODE_REPO_PATHS` includes `research/__init__.py`, but this lane's new `research/target_price_revisions/.gitattributes` cannot pin a file outside its own subtree. The file is empty today, so newline translation cannot change its bytes and the anchor is unaffected. The moment it gains content on a `core.autocrlf` checkout it would break the reviewed-algorithm anchor exactly as `TPR-CR4-001` did. | Documented, not fixed. `test_policy_code_is_checked_out_as_exact_bytes` asserts the file is still empty and turns red rather than passing silently, which routes a shared `.gitattributes` amendment to the owner at the moment it is actually needed. |
+| `TPR-OOL-010` | P3 | `research/__init__.py`, shared with the Analyst Revisions V2 lane | **Renumbered from a duplicate `TPR-OOL-008` by Claude review `TPR-CR7-004`, 2026-09-01.** Two different findings carried that identifier; every narrative reference in this record resolves to the P2 EOL-attribute finding, and this row had none, so this later row was renumbered rather than the referenced one. Original finding follows. | `POLICY_CODE_REPO_PATHS` includes `research/__init__.py`, but this lane's new `research/target_price_revisions/.gitattributes` cannot pin a file outside its own subtree. The file is empty today, so newline translation cannot change its bytes and the anchor is unaffected. The moment it gains content on a `core.autocrlf` checkout it would break the reviewed-algorithm anchor exactly as `TPR-CR4-001` did. | Documented, not fixed. `test_policy_code_is_checked_out_as_exact_bytes` asserts the file is still empty and turns red rather than passing silently, which routes a shared `.gitattributes` amendment to the owner at the moment it is actually needed. |
 | `TPR-OOL-005` | P3 | Trading App Briefing smoke fixture and yfinance cache/provider path | The exact `ba01e98` complete-suite run timed out after 180 seconds in `test_ui_pages_smoke.py::test_page_renders_without_exception[Briefing]`; captured yfinance logs reported `OperationalError('unable to open database file')` for QQQ, SPY, NVDA, and AMD. The fixture patches only one recorded-bar seam, while Briefing still reaches direct benchmark and sample-holding yfinance paths. `c0ba616..ba01e98` changes none of the UI, fixture, provider, configuration, or dependency paths; the page imports no TPR module. The same exact test passed immediately in isolation in 14.42 seconds. | Confirmed pre-existing out-of-lane test-isolation/reliability gap exposed by host cache/load conditions. Documented, not fixed, under the owner's target-only rule; route to the Trading App test lane. Keep the exact full-suite result explicitly red. Focused TPR validation is unaffected and no provider authority is granted. |
 
 ## 10. Session / commit ledger
@@ -530,6 +532,7 @@ known.
 | 2026-08-31 | Claude validation | `433b2679` -> `433b2679` (exact tested tree; this validation-record commit follows) | Counter-review round final validation | Revalidated the complete tree after the review corrections and the new conditional sync guard. No product file changed during the run, and all work stayed inside the single named lane worktree. | Complete suite: **6,792 passed, 13 skipped, 0 failed, 25 warnings in 1,178.99s** — the 6,791 baseline plus exactly the one added guard, skips unchanged. Lane and shared documentation suites **192 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. Python 3.14.6, pytest 9.1.1. No provider, credential, licensed row, outcome, QuantConnect, broker, scheduler, paper or live access; **0 research looks**. | No new finding. `TPR-CR6-001` remains closed; `TPR-CCR5-004`, `TPR-OOL-006` and `TPR-OOL-008` remain open and owner-routed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. The lane remains 2 commits behind `origin/main` and can no longer fast-forward. |
 | 2026-08-31 | Codex counter-review + TPR-TR0 design freeze | `b4e6b88ccf8a17a60cad91cda94205f61c1b7f90` -> `15ce7f0475ca2dd91258905fe001782848952ffb` | Counter-review two Claude commits; freeze only the owner-approved signed-registry-anchor design | Accepted `433b2679` and `8078ce48` after correction. Closed five P3 document/guard findings and froze exact principal, external allowed-signers path, signed registry-anchor lineage, custody/rotation policy, and normal reviewed-code threat model for independent review. A pre-push audit found four design P2s and two P3s in first Codex commit `dfaee5de`; second commit `15ce7f04` closes all six. No runtime trust verifier or authority artifact was implemented. | Fetched local/remote head `8078ce48`; red regression proved the stale current topology. Active-document plus target-price suites ended **194 passed, 3 skipped**; exact complete evidence is in section 25.6 and the validation row below. No dedicated TPR signing key, external trust file, signature, provider row, outcome, QC surface, broker surface, or order was created; **0 research looks**. | No P0/P1/P2 in the Claude range. `TPR-CCR7-001` through `011` closed by correction/verification. `TPR-CCR5-004` remains open pending reviewed implementation and a trusted signed registry anchor; `TPR-CCR2-011` separately remains open pending reviewer-controlled signing or a signed review receipt. | None. TPR-TR0 is a non-authorizing design candidate. | Append exact final validation evidence, make one push, then Claude independently reviews every Codex commit beginning after `8078ce48`. |
 | 2026-09-01 | Codex validation / handoff | `15ce7f0475ca2dd91258905fe001782848952ffb` -> `15ce7f0475ca2dd91258905fe001782848952ffb` (exact tested tree; this record commit follows) | TPR-TR0 design-round final validation | Revalidated the full repository after all counter-review and pre-push security corrections. No product/runtime file changed, and all work stayed in the named target-price branch/worktree. | Complete suite **6,792 passed, 13 skipped, 2 failed, 25 warnings in 1,278.97s**. Both failures exactly reproduce out-of-lane `TPR-OOL-009`; no TPR test failed. Active-document plus target-price suites **194 passed, 3 skipped in 14.18s**; target document module **12 passed in 1.06s**; `compileall` exit 0 including `research`; `git diff --check` and exact-commit status clean. Python 3.12.13, pytest 9.1.1. Trust directory/file absent; provider/outcome accesses and authorized/spent looks **0**. | `TPR-OOL-009` remains open and documented, not fixed. `TPR-CCR5-004` and `TPR-CCR2-011` remain blocked. No new TPR finding. | None. No source, outcome, look, QC, broker, paper, live, deployment, capital, or trading authority. | Commit this record-only handoff, run final document/diff checks, make the round's one push, then Claude reviews `8078ce48..pushed-head` commit by commit. |
+| 2026-09-01 | Claude review | `8078ce4877613adf5f9378cc11258841ac38f76d` -> `5b84a72805073b406034f5d1a83ad5d3072d192e` reviewed; corrections on this same lane branch | Independent review of the TPR-TR0 trust-root design freeze | Reviewed all three pushed commits individually. Accepted all five counter-review findings against the prior Claude round. Independently verified all six pre-push design corrections present in the tree rather than accepting their disposition. Corrected a P2 closure gap in the policy-inventory binding, a P3 gap in the blob-read contract, a P3 date-coupled guard anchor, and a duplicate out-of-lane identifier. | Focused verification on the received tree before any edit: active-document plus target-price suites **194 passed, 3 skipped**, reproducing the recorded counts, and the two out-of-lane sleeve-report failures reproduced in isolation. Final focused suites after correction **195 passed, 3 skipped**. Four mutations on the new closure test each turned it red with byte-identical restore. Complete-suite result recorded separately. Python 3.14.6, pytest 9.1.1. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface was created; **0 research looks**. | All three commits accepted after correction. No P0/P1. `TPR-CR7-001` (P2), `TPR-CR7-002` (P3), `TPR-CR7-003` (P3) and `TPR-CR7-004` (P3) closed. Counter-reviewed round quality **8/10**. `TPR-OOL-009-C` corroborates the recorded out-of-lane diagnosis; `TPR-OOL-010` resolves a duplicate identifier. Details in section 26. | None; TPR-TR0 remains a non-authorizing design candidate and all authority remains zero. | Codex counter-reviews every Claude commit in this round. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked; no key provisioning is authorized. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -2018,7 +2021,7 @@ mint authority.
 | Commit lineage | `producing_commit` -> independent `review_commit` -> signed registry-anchor commit -> optional later documentation-only descendants. The repository must be non-shallow with local complete history and lazy object fetching disabled. The registry anchor must be a strict descendant of `review_commit`, an ancestor of `HEAD`, a single-parent non-merge commit, and the source of registry bytes identical to `HEAD` and the working file. Its parent and anchor registry bytes must differ, proving that the derived anchor actually changed the registry. |
 | Registry v2 policy | A future still-empty v2 registry freezes non-secret signature format `ssh`, namespace `git`, principal `shelton-tpr-reviewer`, key type `ssh-ed25519`, and an external-path identifier for the exact allowed-signers location. No registry entry is added by this design round. |
 | Runtime verification | Before reading any positive registry entry, run Git with `--no-replace-objects` and command-scoped `gpg.format=ssh`, `gpg.ssh.allowedSignersFile`, `gpg.ssh.program=C:/Windows/System32/OpenSSH/ssh-keygen.exe`, and `gpg.minTrustLevel=fully`. Require signature status `G`, trust `fully`, exact principal `shelton-tpr-reviewer`, and an Ed25519 fingerprint present in the validated external file. Repository Git configuration, author/committer names, email, messages, and trailers are never identity evidence. |
-| Policy inventory binding | The exact policy-path set remains independently frozen in tests and must equal the registry map in the signed registry-anchor commit. Hash policy/spec blobs from that signed commit, not merely from the earlier `review_commit`; require those signed-anchor, `HEAD`, and working bytes to match. The verifier itself joins the policy-path set. A missing tool/file, malformed or duplicate signer entry, symlink/junction, bad signature/trust/principal/key type, ancestry failure, set mismatch, or byte/hash mismatch refuses. There is no repository trust-file fallback or path override. |
+| Policy inventory binding | The exact policy-path set remains independently frozen in tests and must equal the registry map in the signed registry-anchor commit. **Claude review correction `TPR-CR7-001`: the set must additionally equal the verifier's internal import closure, computed rather than enumerated, with declared non-module members named explicitly. An enumerated-only set leaves any future internal dependency of the verifier mutable after the signed anchor, which is `TPR-CCR5-004` one level out.** Hash policy/spec blobs from that signed commit, not merely from the earlier `review_commit`; require those signed-anchor, `HEAD`, and working bytes to match. The verifier itself joins the policy-path set. A missing tool/file, malformed or duplicate signer entry, symlink/junction, bad signature/trust/principal/key type, ancestry failure, set mismatch, or byte/hash mismatch refuses. There is no repository trust-file fallback or path override. |
 | Persisted lineage | A successfully loaded reviewed algorithm must retain the registry-anchor commit and signing-key SHA-256 fingerprint in its authenticated fingerprint. Reload must reproduce both before any downstream gate can inspect it. |
 | Custody and ACL | The directory/file owner is `BUILTIN\Administrators` (`S-1-5-32-544`) and each DACL is protected from inheritance. `SYSTEM` (`S-1-5-18`) and Administrators have full control; `BUILTIN\Users` (`S-1-5-32-545`) has read/execute only; no other ACE exists. Only SYSTEM/Administrators may write, delete, take ownership, or change ACLs; owner provisioning occurs through an elevated administrator context, never a non-admin owner ACE. The canonical trust path and parent chain must be non-reparse paths, and any other write/owner/ACL-control path refuses. The private key remains owner-only and passphrase-protected. ACL evidence records only non-sensitive SIDs, rights, fingerprints, and hashes. |
 | Rotation/revocation | Runtime steady state contains exactly one trusted key. For routine rotation, prepare the replacement outside runtime trust, record old/new SHA-256 fingerprints and approval date, sign the next registry anchor under the new key, block positive authority, atomically replace the one-line runtime signer file with the new one-line file, and verify before restoration. For suspected compromise, remove the signer file immediately, remain blocked, require re-review where integrity is uncertain, and install/re-anchor under a new key before restoration. Old keys/fingerprints may remain only in non-runtime audit evidence; runtime trust never retains a compromised key or relies on backdatable `valid-before` history. |
@@ -2059,8 +2062,11 @@ git -C <ROOT> --no-replace-objects -c gpg.format=ssh -c gpg.ssh.allowedSignersFi
 The shallow-repository probe must return exactly `false`. Anchor derivation must
 return exactly one lowercase 40-hex object name; `rev-list` must return exactly
 that anchor plus one parent; `diff-tree` must return exactly the registry path;
-and the two direct blob reads must be unequal. The
-verification command must exit zero. The NUL-delimited status record must have
+and the two direct blob reads must both succeed and be unequal. **Claude review
+correction `TPR-CR7-002`: a parent read that fails because the registry path is
+absent at `<ANCHOR>^` — an anchor that adds rather than modifies the registry —
+refuses, and a non-zero exit from either blob read is never read as "unequal".**
+The verification command must exit zero. The NUL-delimited status record must have
 exactly five nonempty fields: `G`, `fully`, `shelton-tpr-reviewer`, the signing
 key identifier, and its `SHA256:` fingerprint. The identifier/fingerprint must
 normalize to the same Ed25519 public key in the already ACL-validated external
@@ -2083,7 +2089,9 @@ or path/config/environment override; wrong namespace, principal, key type,
 fingerprint, trust, or signature; unsigned/replaced/non-commit anchor; anchor not
 a strict descendant of `review_commit` or not an ancestor of `HEAD`; registry or
 policy bytes differing among anchor, `HEAD`, and worktree; missing/extra policy
-path including omission of the verifier; shallow/incomplete history, lazy-fetch
+path including omission of the verifier; a policy set unequal to the verifier's
+computed internal import closure (`TPR-CR7-001`); a registry path absent at the
+anchor's parent (`TPR-CR7-002`); shallow/incomplete history, lazy-fetch
 dependency, merge anchor, unchanged parent/anchor registry bytes;
 symlink/junction or unsafe ACL anywhere
 in the trust-path chain; malformed/extra Git status output; routine rotation;
@@ -2179,3 +2187,118 @@ The next role after this round's one push is Claude, independently reviewing
 every Codex commit in `8078ce48..pushed-head` one by one. This design review
 grants no provisioning or positive authority. `TPR-CCR5-004`, `TPR-CCR2-011`,
 TPR-1, and TPR-0B remain blocked exactly as stated above.
+
+## 26. Claude independent review - 2026-09-01 (TPR-TR0 trust-root design freeze)
+
+**Disposition: all three commits accepted after correction.** No P0 or P1
+exists. The six pre-push design corrections in `15ce7f04` were **independently
+verified present in the tree**, not accepted on their recorded disposition.
+Four defects were found and corrected here: one P2 design gap, one P3 gap in
+the command contract, one P3 date-coupled guard anchor, and one P3 duplicate
+out-of-lane identifier.
+
+**Counter-reviewed round quality: 8/10.** The TPR-TR0 design is unusually
+thorough for a first freeze — anchor derivation that avoids self-reference,
+shallow-history and single-parent proofs, a scrubbed argument-vector command
+contract, an explicit NUL-delimited status contract, protected-DACL custody,
+single-key atomic rotation, and an honest normal-reviewed-code threat model
+that names host compromise as out of scope. The pre-push self-audit that found
+four P2s and two P3s in Codex's own first commit is exactly the behaviour this
+loop is supposed to produce. Deductions: the policy-inventory binding — the
+very control that exists to close `TPR-CCR5-004` — binds an enumerated set with
+no closure requirement (`TPR-CR7-001`), and the blob-read contract does not say
+what happens when the parent lacks the registry path (`TPR-CR7-002`).
+
+### 26.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Reviewed range | `8078ce4877613adf5f9378cc11258841ac38f76d..5b84a72805073b406034f5d1a83ad5d3072d192e` (three commits) |
+| Ancestry | `8078ce48` is still an ancestor; no history rewrite |
+| `research/`, `execution/`, `assistant/` changes in range | none — documentation and lane guards only |
+| Provisioning state | no signing key, no `C:\ProgramData\CustomizedAgent\trust\tpr_allowed_signers`, no signed anchor, empty registry |
+| Environment | Windows 11; Python 3.14.6; pytest 9.1.1 |
+
+### 26.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `dfaee5de` | **accepted after correction** | Counter-review of the prior Claude round plus the first TPR-TR0 freeze. Its five findings against that round are all valid. It carried the six defects its own pre-push audit then found, closed in `15ce7f04`, and it also carries `TPR-CR7-001` and `TPR-CR7-002`, which that audit did not catch. |
+| `15ce7f04` | **accepted after correction** | Closes all six audited defects; each verified present below. Carries the residual `TPR-CR7-001`/`002` and the date-coupled anchor `TPR-CR7-003`. |
+| `5b84a728` | **accepted** | Record-only validation. Focused counts reproduced exactly. |
+
+### 26.3 Codex findings against the prior Claude round: all five accepted
+
+| Finding | Assessment |
+|---|---|
+| `TPR-CCR7-001` | **Confirmed.** Section 8 still claimed the lane "now contains every sibling lane's work" after divergence, and the new guard inspected checkout `HEAD` rather than the named lane ref — a lane guard should govern its lane, not whichever checkout runs it. |
+| `TPR-CCR7-002` | **Confirmed, and the sharpest of the five.** The live `2 behind, 5 ahead` count described the reviewed parent, not the commit that wrote it: `b4e6b88c...origin/main` is `5 2` but `433b2679...origin/main` is `6 2`. A live count is false by construction the moment its own commit lands — the same class this reviewer had been criticising. Banning ahead/behind counts from current surfaces is the right fix. |
+| `TPR-CCR7-003` | **Confirmed, and a repeated verification error.** Four of seven extractors used `split(end, 1)[0]`, which *succeeds* when the closing anchor is absent and silently widens scope, while section 24.5 asserted all seven fail closed. Only the opening-anchor behaviour had been checked. This is the same shape as `TPR-CCR4-002`: claiming coverage that was never exercised. |
+| `TPR-CCR7-004` | **Confirmed.** The round had two commits, not one. |
+| `TPR-CCR7-005` | **Confirmed.** All validation ran on `433b2679`; nothing was run after the final record-only `8078ce48`. |
+
+### 26.4 Independent verification of the six pre-push corrections
+
+Verified against the tree, not against the ledger.
+
+| ID | Verified | Evidence |
+|---|---|---|
+| `TPR-CCR7-006` | **present** | The custody row names owner `BUILTIN\\Administrators` (`S-1-5-32-544`), protected DACLs, SYSTEM/Administrators full control, `BUILTIN\\Users` read/execute, no other ACE, and elevation for provisioning "never a non-admin owner ACE". |
+| `TPR-CCR7-007` | **present** | The rotation row states runtime trust "never retains a compromised key or relies on backdatable `valid-before` history", with immediate removal and re-anchoring. Correct: SSH validity windows compare against a signer-controlled signature timestamp. |
+| `TPR-CCR7-008` | **present** | The signer-principal row states the principal authenticates owner approval only and "cannot by itself close `TPR-CCR2-011`", and the preamble and section 8 carry the same boundary. Matches the owner's 2026-09-01 decision. |
+| `TPR-CCR7-009` | **present** | The ancestry guard now resolves the named lane ref and evaluates both directions, and additionally rejects live ahead/behind counts. |
+| `TPR-CCR7-010` | **present** | Sections 25.3.1 and 25.3.2 add the literal signer line, the eight-command contract, the five-field status contract, the adversarial matrix, and the explicit signed-commit-versus-detached-manifest rationale. |
+| `TPR-CCR7-011` | **present** | The lineage row requires non-shallow complete history, disabled lazy fetch, a single parent, a full commit diff containing only the registry path, and unequal parent/anchor registry bytes. |
+
+### 26.5 P0-P3 issue ledger
+
+| ID | Priority | Status | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|
+| `TPR-CR7-001` | P2 | Closed | 25.3 policy-inventory row; 25.3.2 matrix | The policy-inventory binding — the control that exists to close `TPR-CCR5-004` — binds an **enumerated** path set. Nothing requires that set to cover what the verifier actually imports, and the matrix tests only that the set matches and includes the verifier. A future internal module the verifier depends on but nobody adds to the tuple would remain mutable after the signed anchor, reintroducing the self-mutable-inventory class one level out. | The record contains no closure requirement for the policy set; every "transitive/closure" mention refers to the import *firewall*, a different control. The closure machinery already exists at `research/target_price_revisions/import_firewall.py:525`. | The whole point of signing the inventory is that it cannot be silently reduced; an enumerated set can be silently *incomplete*, which is the same failure reached by a different route. | The design now requires the set to equal the verifier's computed internal import closure with declared non-module members named explicitly, and the matrix adds that case. Enforced today by `test_policy_inventory_equals_the_verifier_import_closure`, which computes the closure instead of trusting the tuple. | Four mutations, each red with a byte-identical restore: dropping `canonical.py` and dropping `import_firewall.py` (the `TPR-CCR5-004` attack shape), adding a stale unlisted module, and dropping the declared non-module member. |
+| `TPR-CR7-002` | P3 | Closed | 25.3.1 command contract; 25.3.2 matrix | The contract says the two direct blob reads "must be unequal" but never says what happens when the parent read *fails* because the registry path does not exist at `<ANCHOR>^` — an anchor that adds rather than modifies the registry. The general refuse-on-anomaly sentence covers the status record, not the blob reads, so an implementer could treat a failed read as satisfying "unequal". | Sections 25.3.1 and 25.3.2 as received contain no absent-at-parent case. | In a fail-closed contract the error path must be named, not inferred; "unequal" is not the same predicate as "both read successfully and differ". | The contract now requires both reads to succeed and differ, states that a non-zero exit is never read as "unequal", and the matrix adds the absent-at-parent case. | Design-level correction; no runtime exists to test. Recorded as specification, not as verified behaviour. |
+| `TPR-CR7-003` | P3 | Closed | `_current_integration_state` closing anchor | The extractor's closing anchor was the literal `**Current qualification, 2026-08-31:**`. That heading carries the review date and moves every round, so the extractor fails closed on the correct document each time the round advances — a maintenance trap that invites weakening the guard rather than the text. | The guard failed with "missing its closing anchor" the moment this round's heading became `2026-09-01`. | A governance guard that must be edited every round to stay green trains its maintainers to edit guards. | The closing anchor is now the date-independent prefix `**Current qualification,`, verified unique within section 8. The opening anchor keeps its date because it names a fixed merge event. | The full lane and shared documentation suites pass; the existing parametrized missing-opening/missing-closing probes still pass, so fail-closed behaviour is unchanged. |
+| `TPR-CR7-004` | P3 | Closed | Section 9 out-of-lane ledger | Two different findings both carried the identifier `TPR-OOL-008`: a P2 about sibling EOL attributes and a P3 about the shared `research/__init__.py` policy path. A duplicated identifier makes every later reference ambiguous and lets one finding be closed while the other silently stays open. | `grep -c '^| \`TPR-OOL-008\`'` returns 2; all nine narrative references resolve to the P2. | Out-of-lane findings are the routing surface the owner works from, so an ambiguous identifier directly risks mis-routing or premature closure. | The later, unreferenced P3 row is renumbered `TPR-OOL-010` with an explicit provenance note; the referenced P2 keeps its identifier so no existing reference breaks. | The renumbered row is unique, the P2 row is unchanged, and every prior reference still resolves; the lane and shared documentation suites pass. |
+
+### 26.6 Observations recorded without change
+
+- Section 8 now contains **two** blocks labelled `**Integration state, ...**`.
+  That duplicate label is why the extractor needed a date to disambiguate in
+  the first place. Consolidating them would rewrite counter-review text
+  mid-round, so it is recorded rather than restructured; a future round should
+  merge them under one current heading.
+- During this review a mutation harness written by this reviewer wrote
+  `preregistration.py` through text-mode newline translation and left CRLF
+  bytes in the working copy. `test_policy_code_is_checked_out_as_exact_bytes`
+  caught it immediately; the files were restored from `HEAD` and
+  `git diff HEAD -- research/` is empty, so no repository content changed. It
+  is recorded because it is direct evidence that the exact-byte guard added in
+  the previous Codex round works, and because mutation harnesses in this lane
+  must write bytes, not text.
+
+### 26.7 Design assessment beyond the ledger
+
+Points examined and found sound, recorded so a later round need not redo them:
+
+- **Anchor derivation avoids self-reference correctly.** A registry cannot
+  contain the hash of the commit that creates it; deriving the anchor as the
+  last commit touching the registry path sidesteps that, and the signature
+  still binds the whole tree because a Git commit signature covers the tree and
+  parent lineage.
+- **Restricting the anchor's diff to the registry path alone does not weaken
+  the binding.** The signature covers the entire tree regardless, so the
+  narrow diff constrains the *approval act* without narrowing what is signed.
+- **Post-anchor tampering is closed for the paths that matter.** Any later
+  commit touching the registry becomes the new derived anchor and must itself
+  be signed; any later change to a policy path breaks the anchor/`HEAD`/worktree
+  byte equality. The residual is exactly `TPR-CR7-001`.
+- **Identity boundary is stated consistently** in the principal row, the
+  preamble and section 8: owner approval is authenticated, reviewer identity is
+  not, so `TPR-CCR2-011` stays open. This matches the owner's decision that a
+  receipt or reviewer-controlled signing is required.
+
+### 26.8 Authority state after this review
+
+Unchanged and zero. No signing key, trust file, registry entry, provider row,
+outcome, research look, QC action, broker action, or trading authority was
+created or authorized. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain
+blocked. TPR-TR0 remains a non-authorizing design candidate.

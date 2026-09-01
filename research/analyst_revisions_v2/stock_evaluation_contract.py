@@ -876,6 +876,12 @@ def load_stock_evaluation_contract(
     parent: QcFirstStudyPlan = load_qc_first_study_plan(qc_first_plan_path)
     if parent.plan_id != PARENT_PLAN_ID or parent.plan_hash != PARENT_PLAN_HASH:
         raise StockEvaluationContractError("QC-first parent identity changed")
+    try:
+        resolved_qc_first_plan = Path(qc_first_plan_path).resolve(strict=True)
+    except OSError as exc:
+        raise StockEvaluationContractError(
+            "QC-first parent changed or disappeared"
+        ) from exc
     history = raw["history_definition"]
     cutoff = history["outcome_cutoff_session"]
     for horizon, decision in history["last_mature_decision_session"].items():
@@ -897,5 +903,5 @@ def load_stock_evaluation_contract(
         section_hashes=_freeze(raw["section_hashes"]),
         external_bindings=_freeze(raw["external_bindings"]),
         source_path=resolved,
-        qc_first_plan_path=Path(qc_first_plan_path).resolve(strict=True),
+        qc_first_plan_path=resolved_qc_first_plan,
     )

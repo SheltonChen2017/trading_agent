@@ -289,6 +289,33 @@ def test_contract_rejects_duplicate_float_nonfinite_and_unstable_bytes(
         )
 
 
+def test_contract_normalizes_parent_disappearance_after_nested_load(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = _write_spec(
+        tmp_path, json.loads(SPEC.read_text(encoding="utf-8"))
+    )
+    qc_plan = path.with_name("arv2_qc_first.draft.json")
+    real_loader = contract_module.load_qc_first_study_plan
+
+    def delete_after_load(parent_path: Path):
+        plan = real_loader(parent_path)
+        Path(parent_path).unlink()
+        return plan
+
+    monkeypatch.setattr(
+        contract_module,
+        "load_qc_first_study_plan",
+        delete_after_load,
+    )
+    with pytest.raises(
+        StockEvaluationContractError,
+        match="QC-first parent changed or disappeared",
+    ):
+        load_stock_evaluation_contract(path, qc_first_plan_path=qc_plan)
+
+
 def test_contract_recomputes_horizon_maturity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

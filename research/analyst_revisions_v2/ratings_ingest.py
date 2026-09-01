@@ -403,7 +403,11 @@ def _parse_source_row(source_row: VerifiedSourceRow) -> BenzingaRatingRecord:
         "benzinga_firm_id",
         RatingsIngestRefusalReason.MISSING_PROVIDER_FIRM_ID,
     )
-    firm_name = _optional_text(record, "firm")
+    # The canonical record enforces a 256-character bound on these text
+    # fields, so the per-row screen must use the same bound: a wider
+    # screen let an over-long provider value escape the _RowRefusal
+    # handler during record construction and halt the whole census.
+    firm_name = _optional_text(record, "firm", maximum_length=256)
     if firm_name is None:
         raise _RowRefusal(RatingsIngestRefusalReason.MISSING_FIRM_NAME)
     analyst_id = _optional_text(record, "benzinga_analyst_id")
@@ -432,7 +436,9 @@ def _parse_source_row(source_row: VerifiedSourceRow) -> BenzingaRatingRecord:
         raise _RowRefusal(RatingsIngestRefusalReason.INVALID_TICKER) from exc
 
     raw_action = _optional_text(record, "rating_action")
-    price_target_action = _optional_text(record, "price_target_action")
+    price_target_action = _optional_text(
+        record, "price_target_action", maximum_length=256
+    )
     if raw_action is None:
         if price_target_action is None:
             raise _RowRefusal(RatingsIngestRefusalReason.MISSING_RATING_ACTION)
@@ -447,8 +453,8 @@ def _parse_source_row(source_row: VerifiedSourceRow) -> BenzingaRatingRecord:
                 RatingsIngestRefusalReason.UNSUPPORTED_RATING_ACTION
             ) from exc
 
-    current = _optional_text(record, "rating")
-    previous = _optional_text(record, "previous_rating")
+    current = _optional_text(record, "rating", maximum_length=256)
+    previous = _optional_text(record, "previous_rating", maximum_length=256)
     if action in {
         RatingAction.UPGRADE,
         RatingAction.DOWNGRADE,
@@ -473,7 +479,7 @@ def _parse_source_row(source_row: VerifiedSourceRow) -> BenzingaRatingRecord:
         provider_firm_id=firm_id,
         provider_analyst_id=analyst_id,
         raw_firm_name=firm_name,
-        raw_analyst_name=_optional_text(record, "analyst"),
+        raw_analyst_name=_optional_text(record, "analyst", maximum_length=256),
         action=action,
         action_date=action_date.isoformat(),
         raw_event_time=_optional_text(record, "time"),

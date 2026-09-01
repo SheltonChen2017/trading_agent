@@ -157,6 +157,7 @@ def _parsed_imports(module: _LocalModule) -> tuple[str, ...]:
 
     candidates: list[str] = []
     importlib_aliases: set[str] = set()
+    builtins_aliases: set[str] = set()
     import_module_names: set[str] = {"__import__"}
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -164,6 +165,8 @@ def _parsed_imports(module: _LocalModule) -> tuple[str, ...]:
                 candidates.append(alias.name)
                 if alias.name == "importlib":
                     importlib_aliases.add(alias.asname or alias.name)
+                if alias.name == "builtins":
+                    builtins_aliases.add(alias.asname or alias.name)
         elif isinstance(node, ast.ImportFrom):
             candidates.extend(_from_import_candidates(node, module))
             if node.level == 0 and node.module == "importlib":
@@ -171,20 +174,80 @@ def _parsed_imports(module: _LocalModule) -> tuple[str, ...]:
                     if alias.name == "import_module":
                         import_module_names.add(alias.asname or alias.name)
 
+    # Track simple rebinding of the import machinery so indirection through a
+    # local variable is caught too: ``il = importlib``, ``ld = builtins``, and
+    # ``fn = getattr(builtins, "__import__")`` / ``fn = importlib.import_module``
+    # all reach the same machinery as the direct spellings below. A fixed
+    # point is unnecessary because these references are only ever bound
+    # forward from an already-known module or callable.
+    def _target_names(assign: ast.Assign) -> tuple[str, ...]:
+        return tuple(
+            target.id for target in assign.targets if isinstance(target, ast.Name)
+        )
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        value = node.value
+        if isinstance(value, ast.Name):
+            if value.id in importlib_aliases:
+                importlib_aliases.update(_target_names(node))
+            if value.id in builtins_aliases:
+                builtins_aliases.update(_target_names(node))
+            if value.id in import_module_names:
+                import_module_names.update(_target_names(node))
+        elif (
+            isinstance(value, ast.Attribute)
+            and isinstance(value.value, ast.Name)
+            and (
+                (value.attr == "import_module" and value.value.id in importlib_aliases)
+                or (value.attr == "__import__" and value.value.id in builtins_aliases)
+            )
+        ):
+            import_module_names.update(_target_names(node))
+        elif (
+            isinstance(value, ast.Call)
+            and isinstance(value.func, ast.Name)
+            and value.func.id == "getattr"
+            and len(value.args) >= 2
+            and isinstance(value.args[0], ast.Name)
+            and value.args[0].id in (importlib_aliases | builtins_aliases)
+            and isinstance(value.args[1], ast.Constant)
+            and value.args[1].value in ("import_module", "__import__")
+        ):
+            import_module_names.update(_target_names(node))
+
+    # A call reaches the interpreter's import machinery through several
+    # spellings the friendly importlib.import_module/__import__ forms do not
+    # exhaust: builtins.__import__, a rebound importlib/builtins variable, and
+    # getattr(<module>, "import_module"|"__import__")(...). A dynamic import
+    # that cannot be resolved to an absolute literal module name is refused
+    # rather than silently reported as a clean closure.
+    def _is_dynamic_import_callable(func: ast.expr) -> bool:
+        if isinstance(func, ast.Name):
+            return func.id in import_module_names
+        if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name):
+            if func.attr == "import_module":
+                return func.value.id in importlib_aliases
+            if func.attr == "__import__":
+                return func.value.id in builtins_aliases
+        if (
+            isinstance(func, ast.Call)
+            and isinstance(func.func, ast.Name)
+            and func.func.id == "getattr"
+            and len(func.args) >= 2
+            and isinstance(func.args[0], ast.Name)
+            and func.args[0].id in (importlib_aliases | builtins_aliases)
+            and isinstance(func.args[1], ast.Constant)
+            and func.args[1].value in ("import_module", "__import__")
+        ):
+            return True
+        return False
+
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
-        dynamic_import = False
-        if isinstance(node.func, ast.Name) and node.func.id in import_module_names:
-            dynamic_import = True
-        elif (
-            isinstance(node.func, ast.Attribute)
-            and node.func.attr == "import_module"
-            and isinstance(node.func.value, ast.Name)
-            and node.func.value.id in importlib_aliases
-        ):
-            dynamic_import = True
-        if not dynamic_import:
+        if not _is_dynamic_import_callable(node.func):
             continue
         if not node.args or not isinstance(node.args[0], ast.Constant) or not isinstance(
             node.args[0].value, str

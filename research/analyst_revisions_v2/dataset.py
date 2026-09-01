@@ -105,7 +105,29 @@ class CleanGitLineage:
         require_git_object(self.producing_tree, "producing_tree")
 
 
+_READ_ONLY_GIT_SUBCOMMANDS = frozenset(
+    {"cat-file", "ls-files", "merge-base", "rev-parse", "show", "status"}
+)
+
+
+def _require_read_only_git_arguments(arguments: Sequence[str]) -> None:
+    """Enforce, not merely document, the read-only Git boundary.
+
+    The first token must be an allowlisted read-only subcommand. Because Git
+    parses global options such as ``-c alias.x=!cmd`` or ``--exec-path`` only
+    before the subcommand, forcing the first token to be a plain allowlisted
+    subcommand also blocks configuration and executable injection, and every
+    later token is interpreted as that subcommand's own argument.
+    """
+    if not arguments or arguments[0] not in _READ_ONLY_GIT_SUBCOMMANDS:
+        raise DatasetVerificationError(
+            "Git subcommand is not on the read-only allowlist: "
+            f"{arguments[0] if arguments else '<empty>'}"
+        )
+
+
 def _run_git(repository_root: Path, arguments: Sequence[str]) -> str:
+    _require_read_only_git_arguments(arguments)
     command = ["git", "-C", str(repository_root), *arguments]
     try:
         completed = subprocess.run(
@@ -126,6 +148,7 @@ def _run_git(repository_root: Path, arguments: Sequence[str]) -> str:
 
 
 def _run_git_bytes(repository_root: Path, arguments: Sequence[str]) -> bytes:
+    _require_read_only_git_arguments(arguments)
     command = ["git", "-C", str(repository_root), *arguments]
     try:
         completed = subprocess.run(

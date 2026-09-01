@@ -1049,3 +1049,49 @@ def test_adjusted_batch_rejects_forged_interval_and_out_of_range_rows() -> None:
     forged_rows = (forged_first, *result.rows[1:])
     with pytest.raises(StockControlError):
         dataclasses.replace(result, rows=forged_rows)
+
+
+def test_fit_and_apply_are_independent_of_ambient_decimal_context() -> None:
+    """Extend the ambient-context pin from build to the full fit/apply path.
+
+    The existing regression covers build_preopen_control_cross_section only;
+    a future edit dropping a localcontext inside _solve_ols or the frozen
+    application would not have been caught. Inputs are constructed once under
+    the normal context so only the production path runs under the hostile
+    contexts; identical model and batch hashes pin the whole pipeline.
+    """
+    contract = _load()
+    candidate, evidence = _candidate_and_evidence(session="2020-01-02")
+    validation_candidate, validation_evidence = _candidate_and_evidence(
+        session="2020-02-03"
+    )
+    fold = _fold()
+    original_context = getcontext().copy()
+    results = {}
+    try:
+        for label, (prec, rounding) in {
+            "low": (9, ROUND_DOWN),
+            "high": (85, ROUND_UP),
+        }.items():
+            getcontext().prec = prec
+            getcontext().rounding = rounding
+            training = build_preopen_control_cross_section(
+                contract, candidate, evidence
+            )
+            model = fit_structural_stock_control_model(
+                contract, fold, (training,)
+            )
+            validation = build_preopen_control_cross_section(
+                contract, validation_candidate, validation_evidence
+            )
+            applied = apply_structural_stock_control_model(
+                contract, model, fold, "validation", (validation,)
+            )
+            results[label] = (
+                model.model_hash,
+                tuple(model.coefficients),
+                applied.batch_sha256,
+            )
+    finally:
+        setcontext(original_context)
+    assert results["low"] == results["high"]

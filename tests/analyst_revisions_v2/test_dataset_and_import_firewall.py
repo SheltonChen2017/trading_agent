@@ -540,6 +540,14 @@ def test_imported_parent_package_initializer_is_part_of_the_closure(tmp_path):
     [
         "import importlib\nimportlib.import_module('requests.sessions')\n",
         "from importlib import import_module\nname = 'requests'\nimport_module(name)\n",
+        # Evasion forms the walker previously missed: the builtins spelling,
+        # a rebound importlib variable, and getattr indirection all reached
+        # the interpreter's import machinery while the walker saw only
+        # 'builtins' or 'importlib' and reported the closure clean.
+        "import builtins\nbuiltins.__import__('requests')\n",
+        "import importlib\nil = importlib\nil.import_module('requests')\n",
+        "import importlib\ngetattr(importlib, 'import_module')('requests')\n",
+        "import builtins\nloader = getattr(builtins, '__import__')\nloader('requests')\n",
     ],
 )
 def test_dynamic_imports_cannot_bypass_the_firewall(tmp_path, source):
@@ -797,3 +805,32 @@ def test_zero_access_declarations_are_actually_verified_not_merely_unreadable():
 
     assert _require_zero_access_source_authority() == ZERO_ACCESS_SOURCE_AUTHORITY_ID
     assert _require_zero_access_authority() == ZERO_ACCESS_AUTHORITY_ID
+
+
+def test_git_boundary_refuses_non_read_only_subcommands(tmp_path: Path) -> None:
+    """The read-only Git boundary must be code, not a docstring.
+
+    read_git_text/read_git_bytes accept caller-controlled argv; before this
+    guard a caller could reach mutating subcommands (push, update-ref) or
+    inject configuration (-c alias.x=!cmd) because nothing constrained the
+    first token. The allowlist forces the first token to be one of the six
+    read-only subcommands the lane actually uses, which also neutralizes
+    global-option injection since Git parses those only before the subcommand.
+    """
+    from research.analyst_revisions_v2.dataset import (
+        DatasetVerificationError,
+        read_git_bytes,
+        read_git_text,
+    )
+
+    for arguments in (
+        ("push", "origin", "HEAD"),
+        ("update-ref", "refs/heads/x", "HEAD"),
+        ("-c", "alias.x=!echo", "x"),
+        ("gc",),
+        (),
+    ):
+        with pytest.raises(DatasetVerificationError, match="read-only allowlist"):
+            read_git_text(tmp_path, arguments)
+        with pytest.raises(DatasetVerificationError, match="read-only allowlist"):
+            read_git_bytes(tmp_path, arguments)

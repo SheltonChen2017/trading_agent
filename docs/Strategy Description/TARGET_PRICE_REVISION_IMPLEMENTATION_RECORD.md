@@ -537,6 +537,7 @@ known.
 | 2026-09-01 | Codex validation / handoff | `15ce7f0475ca2dd91258905fe001782848952ffb` -> `15ce7f0475ca2dd91258905fe001782848952ffb` (exact tested tree; this record commit follows) | TPR-TR0 design-round final validation | Revalidated the full repository after all counter-review and pre-push security corrections. No product/runtime file changed, and all work stayed in the named target-price branch/worktree. | Complete suite **6,792 passed, 13 skipped, 2 failed, 25 warnings in 1,278.97s**. Both failures exactly reproduce out-of-lane `TPR-OOL-009`; no TPR test failed. Active-document plus target-price suites **194 passed, 3 skipped in 14.18s**; target document module **12 passed in 1.06s**; `compileall` exit 0 including `research`; `git diff --check` and exact-commit status clean. Python 3.12.13, pytest 9.1.1. Trust directory/file absent; provider/outcome accesses and authorized/spent looks **0**. | `TPR-OOL-009` remains open and documented, not fixed. `TPR-CCR5-004` and `TPR-CCR2-011` remain blocked. No new TPR finding. | None. No source, outcome, look, QC, broker, paper, live, deployment, capital, or trading authority. | Commit this record-only handoff, run final document/diff checks, make the round's one push, then Claude reviews `8078ce48..pushed-head` commit by commit. |
 | 2026-09-01 | Claude review | `8078ce4877613adf5f9378cc11258841ac38f76d` -> `5b84a72805073b406034f5d1a83ad5d3072d192e` reviewed; corrections on this same lane branch | Independent review of the TPR-TR0 trust-root design freeze | Reviewed all three pushed commits individually. Accepted all five counter-review findings against the prior Claude round. Independently verified all six pre-push design corrections present in the tree rather than accepting their disposition. Corrected a P2 closure gap in the policy-inventory binding, a P3 gap in the blob-read contract, a P3 date-coupled guard anchor, and a duplicate out-of-lane identifier. | Focused verification on the received tree before any edit: active-document plus target-price suites **194 passed, 3 skipped**, reproducing the recorded counts, and the two out-of-lane sleeve-report failures reproduced in isolation. Final focused suites after correction **195 passed, 3 skipped**. Four mutations on the new closure test each turned it red with byte-identical restore. Complete-suite result recorded separately. Python 3.14.6, pytest 9.1.1. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface was created; **0 research looks**. | All three commits accepted after correction. No P0/P1. `TPR-CR7-001` (P2), `TPR-CR7-002` (P3), `TPR-CR7-003` (P3) and `TPR-CR7-004` (P3) closed. Counter-reviewed round quality **8/10**. Claude's corroboration is retained under canonical `TPR-OOL-009`; `TPR-OOL-010` resolves a duplicate identifier. Details in section 26. | None; TPR-TR0 remains a non-authorizing design candidate and all authority remains zero. | Codex counter-reviews every Claude commit in this round. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked; no key provisioning is authorized. |
 | 2026-09-01 | Claude validation | `d99089b0` -> `d99089b0` (exact tested tree; this validation-record commit follows) | TPR-TR0 review round final validation | Revalidated the complete tree after the review corrections and the new closure test. No product file changed during the run; all work stayed inside the single named lane worktree and no additional worktree was created. | Complete suite: **6,793 passed, 13 skipped, 2 failed, 25 warnings in 1,132.47s** — the received tree's 6,792 plus exactly the one added closure test, with the two documented out-of-lane sleeve-report failures unchanged and no TPR test failing. Lane and shared documentation suites **195 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean. Python 3.14.6, pytest 9.1.1. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface; **0 research looks**. | No new finding. `TPR-CR7-001` through `004` remain closed; `TPR-CCR5-004`, `TPR-CCR2-011`, `TPR-OOL-006`, `TPR-OOL-009` and `TPR-OOL-010` remain open and owner-routed. | None. | Make this Claude round's single push; Codex then counter-reviews every Claude commit. |
+| 2026-09-01 | Codex counter-review / validation | `9269339ee4ee8e0dc0dc87c419fd51bef6a7b306` -> `09aafaff111a0342bbca25721f1e862c6516e670` | Counter-review both Claude commits; no new implementation milestone | Accepted `d99089b0` after correction and `9269339e` after correction and qualification. Closed one P2 coordination defect and five correctable P3 defects; retained one P3 historical-evidence qualification. Verified Claude's substantive policy-closure and trust-root design corrections against the tree. | Exact correction commit: active-document plus target suites **197 passed, 3 skipped in 100.48s**; target document module **15 passed in 1.11s**; full suite **6,795 passed, 13 skipped, 2 failed, 26 warnings in 1,484.05s**. The two failures exactly reproduce out-of-lane `TPR-OOL-009`; no TPR test failed. Full `compileall -q .` exit 0; Git diff/index clean and worktree clean. Python 3.12.13, pytest 9.1.1. PDF and candidate hashes remained exact; external trust directory/file absent; **0 research looks**. | `TPR-CCR8-001` through `005` and `007` closed; `TPR-CCR8-006` is a historical validation-metadata qualification, not an authority blocker. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked. | None. No source, outcome, look, QC, broker, paper, live, deployment, capital, or trading authority. | Commit this evidence-only record update, run final document/diff/status checks, make the round's one push, then Claude performs the owner-directed comprehensive whole-lane audit. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -2420,13 +2421,41 @@ Pre-correction evidence on exact received head `9269339e`:
   `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`;
   rendered pages 27-29 were visually inspected without a layout defect.
 
-Exact final committed-tree commands, counts, commit identity, diff/status
-checks, and the round's single push are appended after the correction commit
-exists. No new strategy milestone was implemented. `TPR-CCR5-004`,
-`TPR-CCR2-011`, TPR-1, and TPR-0B remain blocked. No provider, credential,
-licensed row, source, outcome, research look, QuantConnect upload/compile/job,
-QC process, broker, operator database, scheduler, shadow, paper, live,
-deployment, capital, or trading authority was created or exercised. At the
-owner's direction, the next role action is Claude's comprehensive review of the
-entire pushed Target-Price Revisions lane, not a new implementation or
-provisioning milestone.
+Final validation ran against exact correction commit
+`09aafaff111a0342bbca25721f1e862c6516e670` with a clean index and worktree:
+
+- `C:\git\customizedagent\trading_agent\.venv\Scripts\python.exe -m pytest -q
+  -p no:cacheprovider --basetemp
+  C:\Users\shelt\AppData\Local\Temp\tpr-cr8-focused-09aafaff
+  tests\test_active_document_consistency.py tests\target_price_revisions`:
+  **197 passed, 3 skipped in 100.48s**;
+- the same interpreter and pytest flags with basetemp
+  `C:\Users\shelt\AppData\Local\Temp\tpr-cr8-doc-09aafaff` and target
+  `tests\target_price_revisions\test_document_consistency.py`: **15 passed in
+  1.11s**;
+- the same interpreter and pytest flags with basetemp
+  `C:\Users\shelt\AppData\Local\Temp\tpr-cr8-full-09aafaff` and no path
+  restriction: **6,795 passed, 13 skipped, 2 failed, 26 warnings in 1,484.05s**.
+  The two failures are exactly the documented out-of-lane `TPR-OOL-009`
+  assertions; no Target-Price Revisions test failed. The pass count reconciles
+  as Claude's 6,793 plus this round's two new governance tests, with skips and
+  failures unchanged;
+- `C:\git\customizedagent\trading_agent\.venv\Scripts\python.exe -m compileall
+  -q .` exited 0;
+- `git diff --check`, `git diff --exit-code`, and
+  `git diff --cached --exit-code` all exited 0, and `git status --short --branch`
+  showed exact commit `09aafaff` ahead of the remote by only this correction;
+- Python **3.12.13** and pytest **9.1.1**; PDF SHA-256
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b` and
+  candidate artifact SHA-256
+  `17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a`
+  remained exact; the external trust directory and allowed-signers file were
+  absent.
+
+No new strategy milestone was implemented. `TPR-CCR5-004`, `TPR-CCR2-011`,
+TPR-1, and TPR-0B remain blocked. No provider, credential, licensed row,
+source, outcome, research look, QuantConnect upload/compile/job, QC process,
+broker, operator database, scheduler, shadow, paper, live, deployment, capital,
+or trading authority was created or exercised. At the owner's direction, the
+next role action is Claude's comprehensive review of the entire pushed Target-
+Price Revisions lane, not a new implementation or provisioning milestone.

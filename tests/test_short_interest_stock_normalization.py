@@ -38,6 +38,7 @@ from research.short_interest_etf.stock_normalization import (
     STRUCTURAL_SCORE_AUTHORITY,
     RevisionSelectionState,
     StockNormalizationError,
+    StockModelOutcome,
     StockScoreDisposition,
     StockScoreModel,
     build_pit_stock_normalized_scores,
@@ -932,7 +933,16 @@ def test_contract_rejects_peer_injection_revision_recast_and_underfill_bounds():
 
 @pytest.mark.parametrize(
     "case",
-    ["duplicate_s0", "duplicate_s1", "missing_s1", "reversed_order", "empty"],
+    [
+        "duplicate_s0",
+        "duplicate_s1",
+        "missing_s0",
+        "missing_s1",
+        "reversed_order",
+        "extra_s0",
+        "extra_s1",
+        "empty",
+    ],
 )
 def test_disposition_requires_exactly_one_s0_then_one_s1_outcome(case):
     """Policy v1 allows one result per policy/release/security/model.
@@ -951,12 +961,47 @@ def test_disposition_requires_exactly_one_s0_then_one_s1_outcome(case):
     outcomes = {
         "duplicate_s0": (s0, s0),
         "duplicate_s1": (s1, s1),
+        "missing_s0": (s1,),
         "missing_s1": (s0,),
         "reversed_order": (s1, s0),
+        "extra_s0": (s0, s1, s0),
+        "extra_s1": (s0, s1, s1),
         "empty": (),
     }[case]
 
     with pytest.raises(StockNormalizationError, match="exactly S0 then S1"):
+        StockScoreDisposition(
+            current=disposition.current,
+            cohort=disposition.cohort,
+            outcomes=outcomes,
+        )
+
+
+@pytest.mark.parametrize("case", ["list", "tuple_subclass", "outcome_subclass"])
+def test_disposition_requires_exact_tuple_of_exact_outcome_types(case):
+    disposition = _current(_scores())[0]
+    s0, s1 = disposition.outcomes
+
+    if case == "list":
+        outcomes = [s0, s1]
+    elif case == "tuple_subclass":
+        class TupleSubclass(tuple):
+            pass
+
+        outcomes = TupleSubclass((s0, s1))
+    else:
+        class OutcomeSubclass(StockModelOutcome):
+            pass
+
+        forged_s0 = object.__new__(OutcomeSubclass)
+        for field_name in s0.__dataclass_fields__:
+            object.__setattr__(forged_s0, field_name, getattr(s0, field_name))
+        outcomes = (forged_s0, s1)
+
+    with pytest.raises(
+        StockNormalizationError,
+        match="exact tuple of exact model outcomes",
+    ):
         StockScoreDisposition(
             current=disposition.current,
             cohort=disposition.cohort,

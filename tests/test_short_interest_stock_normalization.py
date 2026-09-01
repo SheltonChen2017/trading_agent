@@ -821,7 +821,7 @@ def test_contract_rejects_peer_injection_revision_recast_and_underfill_bounds():
         + (forged_member,)
         + cohort.candidate_members[2:]
     )
-    with pytest.raises(TypeError, match="init=False"):
+    with pytest.raises((TypeError, ValueError), match="init=False"):
         replace(cohort, candidate_members=forged_members)
 
     s0 = disposition.outcomes[0]

@@ -326,25 +326,31 @@ claims. Neither category is permitted to overwrite the other.
 ## 4. Exact next step
 
 ARV2-4B is accepted after the independent Claude review in section 10 and the
-Codex counter-review corrections in section 11. The next bounded work remains
-outcome-free, but it is not uniquely determined by the reviewed blueprint or
-the current artifacts. Before implementation and before the loop's combined
-push, the owner must choose one substantive definition milestone:
+Codex counter-review corrections in section 11. The owner selected the
+global-map/matched-row definition as the next policy path and requested an
+exact proposal, but did not approve implementation. Claude's proposal-only
+advisory review made no commit or repository change. Section 12 accepts that
+advisory review after correction and records why the submitted proposal still
+is not safe to freeze.
 
-1. **Recommended first:** authorize the global-map/matched-row comparison
-   binding and approve an exact global benchmark rating vocabulary and numeric
-   score map; or
-2. authorize the power-plan definition and approve its exact minimum effect,
-   target power, required dates/components, coverage rule, and underfill
-   disposition.
+The owner has now directed Claude to perform a complete cumulative Analyst V2
+lane review before the global-map definition returns for approval. Formal
+review must start from an exact clean pushed lane snapshot; the local
+counter-review commit and this record must not be described as remotely
+reviewed until the owner authorizes their publication. Claude must review the
+whole current module and lane history, not implement ARV2-4C or another
+milestone.
 
-The blueprint requires the firm-specific normalization to compare at least as
-strongly as the global map, but it does not supply the exact global vocabulary
-or scores. The only exact five-level map found elsewhere is an archived ACER V1
-proposal explicitly marked as not being an owner decision, so it is not safe to
-silently promote. The power-plan fields likewise encode strategy policy rather
-than a mechanical implementation choice. A null-only scaffold would not count
-as completing either milestone.
+After that full review and Codex counter-review, the revised ARV2-4C proposal
+must at minimum freeze an acyclic successor contract that binds the existing
+reviewed fold child without re-parenting it; a deliberate full-versus-core
+global vocabulary policy; exact paired-only constant-score and exact-range-zero
+rules; per-arm breadth/reliability semantics; outcome-free coverage predicates;
+post-join power underfill; and a dependency-independent complete-session
+bootstrap sampler. The archived ACER V1 aggregate vocabulary measurements are
+historical risk context, not a V2 paired-coverage artifact or authority to
+access licensed rows. A null scaffold or abbreviated prose pointer does not
+complete the milestone.
 
 No QC credential, Massive/Benzinga key, licensed row, price, return, or outcome
 is needed for either structural choice. Do not paste credentials into this
@@ -1944,6 +1950,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-31 | Codex implementation | `c09d8e4c` -> this record (`a961230a` counter-review; `a6887004` ARV2-4B candidate) | ARV2-4B content-addressed stock fold manifest | Added the exact six-fold 2020-2025 NYSE walk-forward child manifest, four horizon-specific purge/embargo boundaries per fold, immutable authenticated loader authority, exact parent-byte and semantic lineage, partial-2026 exclusion, and cross-date/cross-boundary common-event refusals. The parent stock contract remains unchanged and unbound, every external binding is null, and every data/outcome/QC/result/deployment/order capability remains false. | Focused manifest/registry **36 passed in 13.31 s**; complete Analyst V2 **432 passed, 1 skipped in 1,163.86 s**; repository remainder **6,824 passed, 13 skipped, 1 precisely deselected, 25 warnings in 3,539.17 s** after the deselected out-of-scope Target Price assertion was reproduced directly as **1 failed in 0.68 s**; compileall exit 0; active-document gate **69 passed in 1.20 s** before final record stabilization. Synthetic and structural inputs only; no credential, provider row, licensed artifact, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | ARV2FMI-001/002/003 P2 and ARV2FMI-004/005 P3 corrected; two independent audits found no remaining ARV2 P0-P3. ARV2-UNRELATED-001 is a reproducible P3 stale Target Price error-message assertion, documented and not fixed. Candidate quality 8/10. | Commit this record, re-run the exact document/diff/status gates, re-fetch and require the remote not to have moved, then make exactly one combined push. Claude independently reviews both commits and this record before any ARV2-4 or external-authority step. |
 | 2026-08-31 | Claude review | `12b9e61c` -> this commit | Independent review of the section-8 counter-review and the ARV2-4B fold-manifest candidate | Reviewed all three commits in `c09d8e4c..12b9e61c` with an explicit disposition each (section 10). Accepted every section-8 finding against my own section 7 after reproducing the 11/196 counts. Independently recomputed the manifest identity, the 3,435-session axis and hash, all fourteen year-first fold anchors, the horizon-20 purge/embargo construction, and both parent byte pins; probed all six constant-false capabilities, the 30-module import closure, and the lock-inventory coverage. Six reverse mutations: four bit, one corrected (ARV2R9-001), one documented unreachable (ARV2R9-002). One test-only correction; no production module changed. | As received `12b9e61c`: **6825 passed, 13 skipped, 25 warnings in 1451.51s (0:24:11)**, zero failures - ARV2-UNRELATED-001 did not reproduce on this host. Final tree: fold-manifest file **36 passed**; strict analyst battery **418 passed, 1 skipped**; active-document **69 passed**; compileall exit 0; `git diff --check` clean. Python 3.12.13. No provider, credential, licensed row, outcome, QC, upload, deployment, broker, scheduler or order access; **0 research looks and 0 development evaluations.** | 0 P0, 0 P1, 0 P2, 1 P3 corrected, 1 P3 documented. ARV2R9-001: the ARV2FMI-001 in-load revalidation trio had no revert-detecting regression - deleting all three lines left the suite green; a monkeypatched parent loader that mutates its file after returning now pins both parents red/green. ARV2R9-002: the non-circularity clause is unreachable today behind the parent byte pin and becomes load-bearing at the future successor - that review must add the regression. Candidate quality 9/10; counter-review record 8/10. | Codex counter-reviews this exact pushed head. The next bounded milestone requires explicit owner authorization; ARV2-4 execution and every data/outcome/QC/paper/funded authority remain blocked. |
 | 2026-08-31 | Codex counter-review | `ba4b3bc9` -> this commit | Accept Claude's ARV2-4B review after correction; stop at the next owner-definition gate | Counter-reviewed both Claude commits in `12b9e61c..ba4b3bc9` commit-by-commit and cumulatively. Completed the claimed final three-file revalidation regression, removed the mid-test fixture-wide undo, normalized a related authenticated-parent disappearance race into the Analyst domain error, and reconciled every canonical current-state passage. Stayed on the dedicated Analyst branch/worktree; no other strategy, UI, Streamlit, source, outcome, or executor work. | Focused corrected loader regressions **39 passed in 10.11 s**; complete `tests/analyst_revisions_v2` **332 passed, 1 skipped in 102.77 s**; active-document gate **69 passed in 0.99 s**; changed-path compileall exit 0; `git diff --check` clean. No credential, provider row, licensed artifact, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | `0052df9` and `ba4b3bc9` accepted after correction: 0 P0, 0 P1, 1 P2, and 3 P3; ARV2CR10-001 through ARV2CR10-004 corrected. Claude review artifact 7/10; underlying ARV2-4B candidate 9/10. | Commit this counter-review locally and stop before both the next milestone and push. Owner chooses and approves either the exact global-map/matched-row definition (recommended first) or the exact power-plan definition. No credentials are needed. |
+| 2026-09-01 | Codex advisory counter-review | `9f8377cf` -> this record commit | Counter-review Claude's proposal-only ARV2-4C advisory | Verified all eight supplied findings against the PDF, exact frozen stock contract, fold-manifest lineage, formulas, tests, and retained archived V1 evidence. Accepted the advisory after correction: retained the successor, exact bootstrap, per-arm derivation, staged coverage, semantic-disclosure, and diagnostic requirements; rejected a fold-manifest re-pin, a blanket zero-MAD-to-zero override, and any claim that an uncommitted per-string V1 count table is already available as V2 evidence. No ARV2-4C artifact or implementation was created. | Record-only validation is reported in section 12.6. No provider row, licensed artifact, price, return, outcome, QC, broker, deployment, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | Claude's eight findings: four confirmed, four partially correct after scope/evidence correction. Counter-review found 4 P2 and 1 P3 defects/omissions in the advisory itself; all are corrected in the recorded disposition, with no product change. Advisory quality **6/10**. | Commit locally and stop before push. After owner-authorized publication of an exact clean snapshot, Claude performs the requested full-module review. ARV2-4C remains unapproved and unimplemented. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -2466,3 +2473,123 @@ milestone and before push. The owner must choose one path and approve its exact
 substantive definition; a null scaffold is not completion. Neither choice needs
 QC credentials or a Massive/Benzinga API key. All later data, rights, outcome,
 QC job, paper, funded, and trading gates remain separate.
+
+## 12. Codex counter-review of Claude's ARV2-4C proposal advisory, 2026-09-01
+
+Claude reviewed the owner-visible `ARV2-4C-GLOBAL-v1` proposal rather than a
+commit. The supplied review summary identifies lane head `ba4b3bc9`, reports no
+repository change, and disposes the proposal **ACCEPT AFTER CORRECTION** with
+six P2 and two P3 findings. Codex independently checked every finding against
+the visually inspected relevant PDF sections, the exact frozen JSON and Python
+contracts, the fold-manifest loader, stock formulas and tests, and the retained
+archived V1 proposal/review evidence. No provider or outcome source was opened.
+
+**Counter-review disposition: ACCEPTED AFTER CORRECTION.** The advisory found
+several real underspecifications, but four of its corrections were incomplete
+or unsafe as written. The proposal remains unapproved and unimplemented.
+
+### 12.1 Claude finding dispositions
+
+| Finding | Counter-review disposition | Basis and required correction |
+|---|---|---|
+| `ARV2P-001` P2 | **Partially correct** | The paired constant-arm convention cannot override the frozen single-arm `constant_score` refusal, and the paired bootstrap axis needs an explicit successor contract. However, the existing fold manifest must not be re-pinned: the recorded DAG is PDF -> QC plan -> stock spec v1 -> reviewed fold manifest. Stock spec v2 may bind its predecessor and that existing child. Re-parenting the child to v2 while v2 binds it would create a cycle. `ARV2R9-002` becomes reachable only if the fold loader's parent pins change; the v2 loader instead needs its own acyclic-ancestry regression. Common valid differences and an uncompressed complete-session resampling axis are compatible once stated separately. |
+| `ARV2P-002` P2 | **Partially correct** | Preserve the already frozen exact zero margin. Call the rule a **zero-margin no-worse-with-confidence gate, operationally equivalent to a one-sided superiority boundary in nondegenerate samples**. It is not literally strict superiority because the registered `>= 0` comparisons permit exact equality. The margin cannot be relaxed after outcomes. |
+| `ARV2P-003` P2 | **Partially correct** | The full owner proposal enumerated all 38 quarantined strings; only the abbreviated Claude-review message used “remaining aliases.” The retained archive verifies only aggregates: 584,916 V1 events, a 54-string union, and 99.567% top-19 current-label coverage. No committed per-string count table exists, and that all-event/current-label statistic is not the V2 denominator for firm-admitted directional endpoint pairs. The map must enumerate every string and disposition, but exact V2 counts require a separately authorized, content-addressed, outcome-free source census. They must not be invented or imported as already available authority. |
+| `ARV2P-004` P2 | **Confirmed** | Freeze each fold's complete ordered test-session axis; all noncircular 20-session starts; draws per fold; final-block truncation; missing markers; equal-occurrence mean over available centered differences with sampling multiplicity; an empty-resample locked refusal with no redraw; Type-7 quantile; and a dependency-independent hash-counter sampler including rejection sampling rather than an unspecified PRNG/modulo conversion. |
+| `ARV2P-005` P2 | **Partially correct** | Mapped delta, decayed mass, raw score, institution/catalyst breadth, conservative `N_eff`, reliability, sector normalization, fit coefficients, and residuals are per-arm; identities, activity evidence, `q_data`, ages, controls, folds, and outcomes are shared. A collapse-zero event stays active but has zero mass and cannot increase `N_eff`. The proposed blanket zero-MAD-sector override is rejected: MAD can be zero for a nonconstant vector such as `0,0,1`. Only an exact zero-range arm (`min == max`) may totalize to paired-only zero scores. Zero MAD with nonzero range remains a joint refusal charged to coverage; shared-control zero MAD still refuses. |
+| `ARV2P-006` P2 | **Confirmed after staging clarification** | Pre-outcome event, active-row, component, and score-capable-date coverage may use no outcome availability, value, or dispersion. Post-join validity separately requires exact outcome identity, at least 20 identical rows, the paired constant-score rule, and `max(50, bound power-plan required dates/components)`. Outcome mismatch is `INVALID_DATA`; honest post-join underfill is `INCONCLUSIVE_locked_no_extension`; an adequate-sample gate failure is `FAIL_closes_family`. No outcome-informed map, fold, period, seed, or retry change is permitted. |
+| `ARV2P-007` P3 | **Partially correct** | The PDF explicitly names `sector perform` as ambiguous, so it may differ deliberately from `market perform`, but the owner-visible basis must be stated; `in-line` likewise remains a conservative refusal unless separately approved. Printable-ASCII-only handling and exact refusal of `equal weight` were already deterministic in the full proposal. Dividing legacy tiers by two is a positive affine range alignment and is Spearman-inert for fixed membership/ties; the successor must document and regression-test that property through the full homogeneous path. |
+| `ARV2P-008` P3 | **Confirmed** | Bind non-rescuing counts and exact denominators for tier-collapse events, per-arm totalized-zero dates, both-arm constant refusals, unmapped/quarantined pairs, and empty bootstrap replicates. The seed record must transitively or directly bind the successor stock spec, map, matched-row contract, fold manifest, evaluation ID, and sampler version. |
+
+### 12.2 Counter-review findings against the advisory
+
+| ID | Pri | Status | Issue and impact | Correction | Verification |
+|---|---|---|---|---|---|
+| `ARV2CRP-001` | P2 | **Corrected in disposition** | Claude required a fold-manifest re-pin and said `ARV2R9-002` automatically becomes reachable. Re-parenting a content-addressed child to the successor that binds it risks the exact hash cycle ARV2-4B prevents. | Preserve the reviewed child unchanged. Stock spec v2 binds both stock spec v1 and the existing fold manifest; add a v2 acyclic-ancestry regression. Retain `ARV2R9-002` for an actual future fold-loader parent change. | Lane-record lineage at section 9.1 and direct inspection of `fold_manifest.py`'s exact old-parent pins and null-parent guard. |
+| `ARV2CRP-002` | P2 | **Corrected in disposition** | The advisory called a 54-string per-label count census “already reviewed,” but the repository retains only aggregate V1 claims and the 39 mapped/15 refused vocabulary. Treating unavailable per-string counts as bound V2 evidence would weaken provenance and could smuggle licensed legacy measurements into a new authority artifact. | Separate exact policy dispositions from measurements. Record the aggregate archive only as historical risk context; require separate source authority and a content-addressed V2 pre-outcome census before claiming counts or paired coverage. | Repository-wide searches find the aggregate review evidence and vocabulary but no committed per-string count table or reproducible census artifact. |
+| `ARV2CRP-003` | P2 | **Corrected in disposition** | “Zero MAD -> all-zero z” is unsafe because MAD zero does not imply a constant signal. It can erase genuine minority variation and bias the global arm downward. | Totalize only exact zero range. Preserve fail-closed zero-MAD handling when range is nonzero, with symmetric paired refusal and coverage charge. | Hand example `0,0,1`; production formula returns `zero_mad` whenever MAD is zero, and the existing regression pins refusal without epsilon or market fallback. |
+| `ARV2CRP-004` | P2 | **Open owner-design issue; blocks freeze** | The advisory did not challenge the central selection risk in the proposed 16-label core map. It quarantines 23 aliases that the archived 39-label coarse baseline mapped. Joint exclusion can censor exactly the firm-idiosyncratic cases the firm ontology is intended to improve; a 95% volume gate does not eliminate composition bias. | The revised proposal must make an explicit owner choice between faithfully reproducing the full 39-alias legacy global comparator and using a new conservative-core comparator. Codex recommends the full legacy comparator, clearly labeled a naive benchmark policy rather than firm semantics, plus label/pair/fold composition diagnostics. No choice is inferred here. | Mechanical comparison of the full proposal's 16 allowed labels with the archived 39 mapped aliases; PDF section 7.3 retains the original global map as the comparison baseline. |
+| `ARV2CRP-005` | P3 | **Corrected in disposition** | The advisory overstated two labels: common valid dates and complete-session blocks are not inherently contradictory, and a zero-margin inclusive lower-bound gate is not literally strict superiority in the degenerate equality case. | Separate estimand dates from the resampling axis and use exact zero-margin terminology without reopening the frozen margin. | Direct comparison of the parent strings and the registered inclusive inequalities. |
+
+Totals against the advisory: **0 P0, 0 P1, 4 P2, 1 P3**. Four are
+corrected in this counter-review record; `ARV2CRP-004` remains a substantive
+owner-design blocker. The advisory rates **6/10**: it correctly stopped an
+underdefined freeze and found the most important bootstrap/coverage seams, but
+its lineage cascade, zero-MAD remedy, census provenance, and comparator-sample
+selection analysis were not reliable enough to implement directly.
+
+### 12.3 Revised statistical and coverage conclusions
+
+The existing single-arm IC inventory keeps its current refusal rule. The
+successor may add only this paired estimand:
+
+- fewer than 20 identical rows or a constant shared outcome: joint refusal;
+- neither score constant: ordinary average-rank Spearman for both arms;
+- exactly one score constant: that arm's paired association is exact zero and
+  the other arm receives ordinary Spearman;
+- both scores constant: joint `both_arms_constant_score` refusal;
+- no pairwise imputation or one-arm row removal.
+
+The zero is a registered paired association, not a valid single-arm Spearman
+observation. At the sector-score stage, exact zero range may analogously emit
+paired-only active zero scores; nonconstant zero-MAD vectors still refuse.
+
+Bootstrap centering uses the observed equal-valid-date mean
+`D = mean(IC_firm,t - IC_global,t)`. Resampling operates on each fold's full
+NYSE test-session axis, preserves missing/refused markers, uses noncircular
+20-session blocks wholly inside the fold, and takes the equal-occurrence mean
+of available centered differences after sampling. Missing positions add
+neither zero nor denominator. An empty replicate is a locked refusal, never a
+redraw. The Type-7 95th percentile defines `LCB95 = D - q95`; passing still
+requires `D >= 0` and `LCB95 >= 0`. A canonical hash-counter sampler must pin
+digest inputs, fixed-width indices, rejection counter, unbiased start-index
+conversion, and the sampler domain/version.
+
+Coverage has two non-interchangeable stages. Outcome-free readiness measures
+events, active rows, components/member incidence, and pre-outcome candidate
+dates using authenticated signal inputs only. It gates whether an outcome run
+may launch. After the single authenticated outcome join, exact identity parity
+is mandatory and the valid-date/component floor becomes
+`max(current frozen floor, bound power-plan floor)`. Post-join underfill cannot
+be repaired by a mapping, fold, period, seed, or retry change.
+
+### 12.4 Vocabulary and evidence conclusion
+
+The retained archive establishes a 54-string V1 union and a proposed
+case-insensitive/whitespace-collapsed 39-mapped/15-refused global table. Its
+99.567% figure covers the top 19 **current-rating strings over all V1 events**;
+it does not measure V2 firm-admitted upgrade/downgrade endpoint-pair coverage,
+fold coverage, identity coverage, or direction consistency. The new global
+resolver's canonicalization is itself a policy and must state collision groups.
+
+The original 16-label proposal is deterministic, but it is not demonstrated
+to be the least biased comparator. Before approval, the owner must explicitly
+choose whether the benchmark reproduces all 39 legacy aliases or uses the
+narrow core despite its selective-exclusion risk. Codex recommends the full
+39-alias baseline for the comparison only, with ambiguous labels marked as
+naive benchmark policy rather than production firm semantics. Future exact V2
+counts and the 19/20 paired-coverage decision require separately authorized
+source-only evidence; no counts are inferred here.
+
+### 12.5 Authority and next step
+
+No map, matched-row contract, successor stock spec, fold-manifest modification,
+bootstrap implementation, source census, or outcome result was created. The
+owner's requested complete Claude module review now precedes a revised ARV2-4C
+approval. That review must use the exact pushed same-lane snapshot and must not
+implement ARV2-4C, access credentials/provider rows/outcomes, run QC, or begin
+paper/funded execution. After its push, Codex counter-reviews every Claude
+commit. Only then should the corrected global-map proposal return for owner
+approval.
+
+### 12.6 Validation
+
+This was a record-only counter-review; no production or test code changed. The
+final active-document gate passed **all 69 tests**, and `git diff
+--check` was clean. Runner discovery first confirmed that this lane checkout
+has no local virtual environment, the bundled document Python has no `pytest`,
+and the default sandbox temp root was inaccessible; those preflight attempts
+executed no product assertions. The successful run used the repository's
+existing sibling-worktree virtual environment with an explicit writable
+base-temp directory. No broader code suite or compile step was warranted for
+unchanged code. No research look or development evaluation was consumed.

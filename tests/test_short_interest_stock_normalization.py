@@ -14,6 +14,7 @@ from data.hashing import canonical_json, hash_payload
 import research.short_interest_etf.stock_score_batch as stock_score_batch_module
 from research.short_interest_etf.contracts import (
     ReleasePrecision,
+    parse_utc_timestamp,
     recompute_days_to_cover,
 )
 from research.short_interest_etf.dataset import build_vintage, load_synthetic_fixture
@@ -288,6 +289,165 @@ def _scores(
 @lru_cache(maxsize=None)
 def _single_sector_scores(count: int) -> tuple[StockScoreDisposition, ...]:
     return _scores(_single_sector_specs(count))
+
+
+@lru_cache(maxsize=None)
+def _multi_cycle_scores(
+    cycle_count: int,
+    security_count: int = 20,
+) -> tuple[StockScoreDisposition, ...]:
+    """Extend the tracked two-cycle fixture deterministically in memory."""
+    if cycle_count not in (2, 4):
+        raise ValueError("synthetic scale characterization supports 2 or 4 cycles")
+
+    specs = _single_sector_specs(security_count)
+    base = _raw_batch(specs)
+    if cycle_count == 2:
+        return build_pit_stock_normalized_scores(base)
+
+    source_context = base[0].source_context
+    vintage = source_context.source_vintage
+    exact_release_template = next(
+        item
+        for item in vintage.release_calendar
+        if item.precision is ReleasePrecision.EXACT_TIMESTAMP
+    )
+    appended_cycle_specs = (
+        (
+            "2024-02-15",
+            "2024-01-16",
+            "2024-02-22",
+            "2024-02-27",
+            "2024-02-27T20:00:00Z",
+            "2024-02-27T21:00:00Z",
+            "2024-02-27T22:00:00Z",
+        ),
+        (
+            "2024-02-29",
+            "2024-01-30",
+            "2024-03-07",
+            "2024-03-11",
+            "2024-03-11T20:00:00Z",
+            "2024-03-11T21:00:00Z",
+            "2024-03-11T22:00:00Z",
+        ),
+    )
+    snapshots = list(vintage.snapshots)
+    releases = list(vintage.release_calendar)
+    previous_by_security = {
+        item.security.security_id: item
+        for item in vintage.snapshots
+        if item.settlement_date == CURRENT_SETTLEMENT
+    }
+
+    for cycle_offset, (
+        settlement_date,
+        volume_window_start,
+        filing_deadline_date,
+        public_release_date,
+        available_at,
+        published_at,
+        observed_at,
+    ) in enumerate(appended_cycle_specs, start=2):
+        release = replace(
+            exact_release_template,
+            settlement_date=settlement_date,
+            filing_deadline_date=filing_deadline_date,
+            public_release_date=public_release_date,
+            public_release_at=published_at,
+            precision=ReleasePrecision.EXACT_TIMESTAMP,
+            evidence_sha256=_sha(f"multi-cycle-release-{settlement_date}"),
+            observed_at=observed_at,
+        )
+        releases.append(release)
+
+        for spec in specs:
+            security_id = f"sec-si3c-{spec.index:03d}"
+            previous = previous_by_security[security_id]
+            current_shares = (
+                previous.current_short_shares + cycle_offset + spec.index + 3
+            )
+            volume = replace(
+                previous.volume_basis,
+                window_start_date=volume_window_start,
+                window_end_date=settlement_date,
+                available_at=available_at,
+                observed_at=observed_at,
+                raw_record_sha256=_sha(
+                    f"multi-cycle-volume-{settlement_date}-{security_id}"
+                ),
+            )
+            denominator = replace(
+                previous.denominator,
+                effective_date=settlement_date,
+                available_at=available_at,
+                observed_at=observed_at,
+                raw_record_sha256=_sha(
+                    f"multi-cycle-denominator-{settlement_date}-{security_id}"
+                ),
+            )
+            days_to_cover = recompute_days_to_cover(
+                current_shares,
+                volume.average_daily_share_volume,
+            )
+            current = replace(
+                previous,
+                source_record_id=(
+                    f"synthetic-si3c-{spec.index:03d}-{settlement_date}-r1"
+                ),
+                settlement_date=settlement_date,
+                current_short_shares=current_shares,
+                previous_settlement_date=previous.settlement_date,
+                previous_short_shares=previous.current_short_shares,
+                release_calendar_key=release.key,
+                volume_basis=volume,
+                reported_days_to_cover=days_to_cover,
+                recomputed_days_to_cover=days_to_cover,
+                denominator=denominator,
+                revision_id="r1",
+                revision_published_at=published_at,
+                observed_at=observed_at,
+                supersedes_event_id=None,
+                raw_record_sha256=_sha(
+                    f"multi-cycle-snapshot-{settlement_date}-{security_id}"
+                ),
+            )
+            snapshots.append(current)
+            previous_by_security[security_id] = current
+
+    manifest = replace(
+        vintage.manifest,
+        source_dataset_id="synthetic-si3c-normalization-4-cycle-v1",
+        snapshot_name="synthetic-si3c-four-cycle-scale-characterization",
+        retrieved_at=appended_cycle_specs[-1][-1],
+        settlement_end=appended_cycle_specs[-1][0],
+        requested_record_count=len(snapshots),
+        input_row_count=len(snapshots),
+        accepted_record_count=len(snapshots),
+        raw_artifact_sha256=hash_payload(
+            [item.to_payload() for item in snapshots]
+        ),
+    )
+    extended_vintage = build_vintage(
+        manifest,
+        tuple(releases),
+        tuple(snapshots),
+    )
+    reference_bundle = source_context.reference_bundle
+    extended_references = PitReferenceBundle(
+        manifest=replace(
+            reference_bundle.manifest,
+            reference_dataset_id="synthetic-si3c-pit-reference-4-cycle-v1",
+            retrieved_at="2024-03-12T22:00:00Z",
+        ),
+        lifecycles=reference_bundle.lifecycles,
+        classifications=reference_bundle.classifications,
+    )
+    raw_features = build_pit_stock_raw_features(
+        extended_vintage,
+        extended_references,
+    )
+    return build_pit_stock_normalized_scores(raw_features)
 
 
 @lru_cache(maxsize=None)
@@ -1789,6 +1949,100 @@ def test_compact_score_batch_stores_repeated_witnesses_linearly():
     large_witnesses, large_bytes = samples[40]
     assert large_witnesses == 2 * small_witnesses
     assert large_bytes < 3 * small_bytes
+
+
+def test_compact_score_batch_characterizes_multi_cycle_inventory_growth():
+    """Pin the remaining C-squared inventory term without timing thresholds."""
+    security_count = 20
+    samples = {}
+    for cycle_count in (2, 4):
+        scores = _multi_cycle_scores(cycle_count, security_count)
+        expected_security_ids = {
+            f"sec-si3c-{index:03d}" for index in range(security_count)
+        }
+        security_ids_by_settlement = {}
+        for disposition in scores:
+            readiness = disposition.current.readiness
+            security_ids_by_settlement.setdefault(
+                readiness.settlement_date,
+                set(),
+            ).add(readiness.security_id)
+        envelope = build_stock_score_batch_envelope(scores)
+        payload = envelope.to_payload()
+        inventories = [
+            record["cohort"]["raw_disposition_inventory"]
+            for record in payload["cohorts"]
+        ]
+        inventory_digests = {
+            record["cohort"]["raw_dispositions_sha256"]
+            for record in payload["cohorts"]
+        }
+        stored_inventory_entries = sum(len(items) for items in inventories)
+        unique_inventory_entries = len(inventories[0])
+        member_entries = sum(
+            len(record["members"]) for record in payload["member_sets"]
+        )
+
+        assert len(scores) == cycle_count * security_count
+        assert len(security_ids_by_settlement) == cycle_count
+        assert all(
+            security_ids == expected_security_ids
+            for security_ids in security_ids_by_settlement.values()
+        )
+        reference_retrieved_at = parse_utc_timestamp(
+            scores[0].current.source_context.reference_bundle.manifest.retrieved_at,
+            "reference_manifest.retrieved_at",
+        )
+        assert all(
+            parse_utc_timestamp(
+                disposition.cohort.decision_at,
+                "cohort.decision_at",
+            )
+            <= reference_retrieved_at
+            for disposition in scores
+        )
+        assert payload["row_count"] == cycle_count * security_count
+        assert payload["cohort_count"] == cycle_count
+        assert payload["member_set_count"] == cycle_count
+        assert len(inventories) == cycle_count
+        assert all(
+            len(items) == cycle_count * security_count
+            for items in inventories
+        )
+        assert len(inventory_digests) == 1
+        assert all(
+            hash_payload(items) in inventory_digests for items in inventories
+        )
+        assert stored_inventory_entries == cycle_count**2 * security_count
+        assert unique_inventory_entries == cycle_count * security_count
+        assert stored_inventory_entries // unique_inventory_entries == cycle_count
+        assert member_entries == (cycle_count - 1) * security_count
+        assert payload["normalization_policy_sha256"] == (
+            STOCK_NORMALIZATION_POLICY.sha256
+        )
+        assert payload["preregistration_sha256"] == (
+            STOCK_NORMALIZATION_POLICY.preregistration_sha256
+        )
+        assert payload["authority"] == STOCK_SCORE_BATCH_AUTHORITY
+        assert payload["production_authoritative"] is False
+
+        receipt = verify_compact_stock_score_batch_payload(
+            payload,
+            dispositions=scores,
+        )
+        assert receipt.row_count == cycle_count * security_count
+        assert receipt.canonical_row_list_sha256 == (
+            envelope.canonical_row_list_sha256
+        )
+        assert receipt.envelope_sha256 == envelope.sha256
+        samples[cycle_count] = (
+            stored_inventory_entries,
+            len(canonical_json(payload).encode("utf-8")),
+            envelope.canonical_row_list_sha256,
+            envelope.sha256,
+        )
+
+    assert samples[4][0] == 4 * samples[2][0]
 
 
 def test_compact_score_batch_stays_out_of_the_canonical_package_exports():

@@ -1,0 +1,199 @@
+{
+  "authority": "global_comparator_policy_only_no_provider_data_outcome_qc_or_deployment_authority",
+  "canonicalization": {
+    "case": "ASCII_lowercase",
+    "character_set": "printable_ASCII_U+0020_through_U+007E_only",
+    "input": "exact_python_str_max_256_code_points",
+    "punctuation_rewrite": "none",
+    "unicode_normalization": "none_non_ASCII_refuses",
+    "unknown_label": "named_unknown_future_label_refusal_no_default",
+    "whitespace": "trim_and_collapse_runs_of_U+0020_only"
+  },
+  "capabilities": {
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "collision_contract": {
+    "artifact_post_canonicalization_collision": "INVALID_ARTIFACT",
+    "equal_score_directional_pair": "global_tier_collapse_zero_active_event_zero_score_and_breadth_mass",
+    "map_refusal_overlap": "INVALID_ARTIFACT",
+    "observed_raw_forms_same_canonical_key": "same_policy_disposition_plus_non_rescuing_collision_diagnostic"
+  },
+  "diagnostics_contract": {
+    "required": [
+      "exact_raw_and_canonical_label_disposition_counts",
+      "mapped_refused_unknown_invalid_endpoint_counts_with_denominators",
+      "endpoint_pair_disposition_counts_with_denominators",
+      "raw_form_collision_counts_with_denominators"
+    ],
+    "role": "reporting_and_coverage_only_never_changes_mapping_or_rescues_gate",
+    "stage": "future_authenticated_pre_outcome_census_only"
+  },
+  "external_bindings": {
+    "counter_review_commit": null,
+    "dataset_id": null,
+    "evaluation_receipt_id": null,
+    "independent_review_commit": null,
+    "outcome_artifact_sha256": null,
+    "power_plan_sha256": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "source_rights_receipt_id": null
+  },
+  "inventory_contract": {
+    "mapped_alias_count": 39,
+    "mapped_counts_by_level_descending": [
+      4,
+      12,
+      11,
+      10,
+      2
+    ],
+    "measured_refusal_count": 15,
+    "per_string_event_counts_available": false,
+    "union_count": 54
+  },
+  "map_hash": "aaf5830c3c3fb403b0e84f5ad22d1f20fa3f91df41cf3bd64f33695875d2e3d9",
+  "map_id": "arv2-global-rating-map-aaf5830c3c3fb403",
+  "ordered_mappings": [
+    {
+      "aliases": [
+        "strong buy",
+        "conviction buy",
+        "top pick",
+        "action list buy"
+      ],
+      "legacy_level": 5,
+      "score": {
+        "denominator": 1,
+        "numerator": 1
+      }
+    },
+    {
+      "aliases": [
+        "buy",
+        "outperform",
+        "overweight",
+        "market outperform",
+        "sector outperform",
+        "positive",
+        "accumulate",
+        "add",
+        "speculative buy",
+        "long-term buy",
+        "outperformer",
+        "above average"
+      ],
+      "legacy_level": 4,
+      "score": {
+        "denominator": 2,
+        "numerator": 1
+      }
+    },
+    {
+      "aliases": [
+        "neutral",
+        "hold",
+        "equal-weight",
+        "market perform",
+        "sector perform",
+        "in-line",
+        "sector weight",
+        "perform",
+        "peer perform",
+        "market weight",
+        "average"
+      ],
+      "legacy_level": 3,
+      "score": {
+        "denominator": 1,
+        "numerator": 0
+      }
+    },
+    {
+      "aliases": [
+        "underweight",
+        "underperform",
+        "sector underperform",
+        "market underperform",
+        "reduce",
+        "negative",
+        "underperformer",
+        "below average",
+        "trim",
+        "cautious"
+      ],
+      "legacy_level": 2,
+      "score": {
+        "denominator": 2,
+        "numerator": -1
+      }
+    },
+    {
+      "aliases": [
+        "sell",
+        "strong sell"
+      ],
+      "legacy_level": 1,
+      "score": {
+        "denominator": 1,
+        "numerator": -1
+      }
+    }
+  ],
+  "ordered_refusals": [
+    "developing",
+    "equalweight",
+    "fair value",
+    "gradually accumulate",
+    "hold neutral",
+    "mixed",
+    "not rated",
+    "performer",
+    "sector overweight",
+    "sector performer",
+    "sector underweight",
+    "speculative hold",
+    "tender",
+    "trading buy",
+    "trading sell"
+  ],
+  "policy_provenance": {
+    "PDF_named_ambiguous_aliases_retained_as_naive_policy": [
+      "positive",
+      "accumulate",
+      "sector perform",
+      "top pick"
+    ],
+    "complete_inventory_origin_commit": "1eb3649048225f023c2950bf0a9379a7fef818cf",
+    "complete_inventory_origin_git_blob_sha1": "98e29337afba34e5a5f6abbac3fb0ced1442d917",
+    "complete_inventory_origin_path": "docs/research/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md",
+    "measurement_status": "historical_aggregate_context_only_no_per_string_counts_and_no_v2_data_authority",
+    "owner_decision": "2026-09-01_full_39_alias_comparator_approved",
+    "retained_v1_policy_git_blob_sha1": "ce3a9b12eb9e1d5abaabc9ec439d5eaebfd25ca7",
+    "retained_v1_policy_path": "docs/Archive/Research/ACER_V1/ACER_2026-08-21_ACER0A_COMPLETION_PROPOSALS.md",
+    "retained_v1_policy_repository_blob_sha256": "e3290c2a9d7a833049e1b739efc542e1e8bdc355c61e8580a78f44bf208e984b",
+    "role": "naive_global_benchmark_only_not_firm_semantics",
+    "semantic_disclosure": "all_39_aliases_are_comparator_policy_only_and_never_firm_specific_semantics"
+  },
+  "schema": "arv2-global-rating-map-structural-v1",
+  "score_definition": {
+    "exact_type": "reduced_rational_numerator_denominator",
+    "formula": "score=(legacy_level-3)/2",
+    "legacy_alignment": "divide_legacy_minus2_to_plus2_scores_by_2",
+    "range": [
+      -1,
+      1
+    ],
+    "rank_effect": "positive_affine_rescaling_is_Spearman_inert_for_fixed_membership_and_ties"
+  },
+  "status": "owner_approved_implementation_frozen_outcome_free_pending_independent_review",
+  "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193"
+}

@@ -31,6 +31,7 @@ DEFAULT_ALLOWED_STDLIB_ROOTS = frozenset(
         "fractions",
         "hashlib",
         "json",
+        "math",
         "pathlib",
         "re",
         "statistics",

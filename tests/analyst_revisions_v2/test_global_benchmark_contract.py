@@ -925,6 +925,44 @@ def test_each_predecessor_child_slot_must_remain_null(
         _load(root)
 
 
+def test_predecessor_single_arm_ic_refusal_must_remain_unchanged(
+    tmp_path, monkeypatch
+):
+    """The paired rule is additive to the predecessor single-arm refusal.
+
+    The loader pins the parent's IC date_refusal to the exact frozen string
+    so a future edit that weakened the single-arm rule (e.g. dropping the
+    constant-score/constant-outcome clause) is caught. The parent is
+    byte-pinned, so the only way to reach a weakened refusal is a parent
+    loader that returns one - which is exactly the erosion this guards.
+    """
+    root = _clone(tmp_path)
+    original = module.load_stock_evaluation_contract
+
+    def parent_with_weakened_refusal(*args, **kwargs):
+        parent = original(*args, **kwargs)
+        sections = dict(parent.sections)
+        analysis = dict(sections["analysis_definition"])
+        ic = dict(analysis["information_coefficient"])
+        ic["date_refusal"] = "fewer_than_20_rows_only"
+        analysis["information_coefficient"] = ic
+        sections["analysis_definition"] = analysis
+        return SimpleNamespace(
+            spec_id=parent.spec_id,
+            spec_hash=parent.spec_hash,
+            sections=sections,
+            external_bindings=dict(parent.external_bindings),
+        )
+
+    monkeypatch.setattr(
+        module, "load_stock_evaluation_contract", parent_with_weakened_refusal
+    )
+    with pytest.raises(
+        GlobalBenchmarkContractError, match="single-arm IC refusal changed"
+    ):
+        _load(root)
+
+
 def test_qc_plan_error_is_normalized_to_global_contract_error(tmp_path, monkeypatch):
     from research.analyst_revisions_v2.qc_first_plan import QcFirstPlanError
 

@@ -24,8 +24,12 @@ RECORD-ONLY DAG-WORDING CORRECTION (SECTION 17). THE OWNER APPROVED THE
 RECOMMENDED ARV2-4D-A POWER POLICY. THE OUTCOME-FREE, CONTENT-ADDRESSED
 CALIBRATION-PROTOCOL CANDIDATE IS ACCEPTED AFTER INDEPENDENT CLAUDE REVIEW
 AND CODEX COUNTER-REVIEW CORRECTION (SECTIONS 18-20); ITS NUMERIC
-CALIBRATION RECEIPT AND EVERY
-OUTCOME-BEARING ACTION REMAIN SEPARATELY GATED.
+CALIBRATION RECEIPT AND EVERY OUTCOME-BEARING ACTION REMAIN SEPARATELY
+GATED. THE OWNER-DIRECTED FOUR-FAMILY MULTIPLICITY RE-FREEZE (ARV2-3Q-F)
+IS IMPLEMENTED AS AN OUTCOME-FREE, CONTENT-ADDRESSED CANDIDATE PENDING
+INDEPENDENT CLAUDE REVIEW (SECTION 21). IT MAKES THE EFFECTIVE ANALYST
+ALLOCATION `1/80`, REFUSES FALLBACK TO THE SUPERSEDED-UNSPENT `1/60`, AND
+GRANTS NO DATA, OUTCOME, QC, DEPLOYMENT, OR TRADING AUTHORITY.
 THE ARV2-4 EVALUATION AND EVERY
 DATA, OUTCOME,
 UPLOAD, COMPILE, QC-RUN, PAPER, OR FUNDED ACTION REMAIN BLOCKED BY THE
@@ -110,8 +114,8 @@ completion.
 | Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. ARV2-2 now derives a revalidatable, fail-closed inventory of in-range merger/delisting terminal-return requirements and never silently omits an unavailable terminal name. No event has been joined to a later price or return; Databento remains unmeasured. | Production split/dividend, cost/ADV, and terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. | Outcome prerequisites implemented structurally; no outcome I/O and zero looks. |
 | ETF holdings/topology | PIT holdings, declared-versus-summed weight reconciliation, stale/incomplete refusal, fixed lag, 99% coverage, eligibility, and stock-score lineage primitives exist. | No authenticated production holdings or stock-score artifact exists, so no production reverse index, ETF score, or peer topology exists. | Consumer safety implemented; production topology remains zero-access. |
 | Cross-section and portfolio | Deterministic rank/hysteresis/tie/eviction/cap/overlap/cash allocator primitives and verified policy bindings exist. | No reviewed simultaneous rank/volatility derivation or authenticated rank/classification/cost source exists. The public boundary therefore refuses every nonempty portfolio and can return only the safe empty/all-cash result. | Dormant safety algorithm implemented; no research portfolio or QC result. |
-| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. | Later executable-spec integration remains required. The reviewed-spec registry and ARV2-4D-B numeric receipt are empty; no source/run binding, external review anchor, upload/compile/launch authority, evaluation authority, paper look, or deployment authority exists. | Old prospective candidate retired with zero looks; ARV2-3Q and corrected ARV2-4A/4B/4C/4D-A accepted; every outcome/QC authorization refuses. |
-| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. ARV2-3, the accepted QC-first parent, corrected ARV2-4A/4B/4C modules, and the corrected ARV2-4D-A loader are in the transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. | Production source, ontology, security-master, institution, common-event, classification, quality, outcome, look, QC, and execution authorities remain absent or zero-access. | ARV2-3Q and corrected ARV2-4A/4B/4C/4D-A accepted; no production authority. |
+| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. The ARV2-3Q-F candidate adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. | Later executable-spec integration remains required. The reviewed-spec registry and ARV2-4D-B numeric receipt are empty; no source/run binding, external review anchor, upload/compile/launch authority, evaluation authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves. | Old prospective candidate retired with zero looks; ARV2-3Q and corrected ARV2-4A/4B/4C/4D-A accepted; ARV2-3Q-F pending independent review; every outcome/QC authorization refuses. |
+| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. ARV2-3, the accepted QC-first parent, corrected ARV2-4A/4B/4C modules, the corrected ARV2-4D-A loader, and the ARV2-3Q-F candidate are in the 33-module transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. | Production source, ontology, security-master, institution, common-event, classification, quality, outcome, look, QC, and execution authorities remain absent or zero-access. | ARV2-3Q and corrected ARV2-4A/4B/4C/4D-A accepted; ARV2-3Q-F pending independent review; no production authority. |
 
 The production source, firm-ontology, security-master, classification, cost,
 and rank catalogs remain empty. The canonical source authority permits no
@@ -130,6 +134,7 @@ and this implementation consumed **zero looks**.
 | ARV2-2 | Build PIT issuer/security master and outcome prerequisites. | Ticker reuse/share-class/delisting mutations fail; coverage and ambiguity reported. |
 | ARV2-3 | Implement the canonical stock score and separate diagnostic channels. | Golden equations, sparse-sector behavior, no outcome imports, no leakage. |
 | ARV2-3Q | Freeze the outcome-free control, stock-event-study, QC-first, multiplicity, paper-confirmation, and funded-pilot separation contract. | Content-addressed candidate independently reviewed; old period proved superseded unspent; zero data/outcome/QC/deployment authority. |
+| ARV2-3Q-F | Apply the owner-directed four-lane selection-family re-freeze as an additive outcome-free overlay without rewriting accepted ancestors. | Exact `1/20` family and four permanent `1/80` maxima, unused/withdrawn slots expire without transfer or denominator change, old `1/60` authenticated only as superseded-unspent, absence/clone/substitution refuses, every action capability false, and independent Claude review plus Codex counter-review required. |
 | ARV2-4A | Materialize the content-addressed stock historical-evaluation structure and fixture-only mandatory-control transform/fit/apply boundary without sources or outcomes. | Exact parent/PDF binding, training-only fold/policy lineage, named row refusals and coverage, immutable report inventory, all external bindings null, all action capabilities false, independent Claude review and Codex counter-review required. |
 | ARV2-4B | Freeze the exact outcome-free stock walk-forward fold manifest as an acyclic child of the reviewed QC-first plan and stock-evaluation history definition. | Six rolling 5/2/1 folds, exact 1/5/20/60-session purge and embargo boundaries, NYSE-axis and parent-artifact hashes, partial-2026 exclusion and common-event refusals; all external bindings null and all action capabilities false; independent Claude review and Codex counter-review required. |
 | ARV2-4C | Freeze the owner-approved 39-alias naive global comparator and the corrected matched-row comparison as an outcome-free successor of the reviewed stock/fold authorities. | Exact 39 mapped and 15 measured-refusal aliases, symmetric paired-only zero-range handling, five 19/20 structural coverage ledgers pooled and per fold, complete-session deterministic bootstrap, unchanged predecessor/fold bytes, complete acyclic lineage, all action capabilities false, independent Claude review and Codex counter-review required. |
@@ -374,17 +379,24 @@ in that review commit.
 ARV2-4D-B is still not authorized by the ARV2-4D-A approval. It requires a
 separately reviewed input-manifest schema and exact authority for the
 calibration inputs, rights, lineage, and permitted nuisance-only computation.
-The next authorized data-free step instead comes from the owner's 2026-08-30
-four-family multiplicity amendment: add an authenticated sibling overlay that
-preserves the accepted QC-first bytes, tombstones the unspent `1/60` Analyst
+Section 21 implements the owner's separately authorized 2026-08-30
+four-family multiplicity amendment as the outcome-free ARV2-3Q-F candidate.
+It is an authenticated child overlay of the immutable QC-first plan and an
+independent parallel leaf alongside the separately authenticated power
+protocol. It preserves accepted bytes, tombstones the unspent `1/60` Analyst
 allocation, and makes the effective permanent allocation `1/80` inside the
-fixed four-lane `1/20` family. It must not alter ARV2-4D-A's non-confirmatory
-development power-planning size. Every outcome-bearing successor must later
-authenticate both independently reviewed leaves. No reviewed ARV2-4C artifact
-or fold manifest may be edited, re-pinned, or re-parented.
+fixed four-lane `1/20` family. Neither parallel leaf is an ancestor or
+descendant of the other. ARV2-4D-A's non-confirmatory development
+power-planning size remains unchanged. Every outcome-bearing successor must
+later authenticate both independently reviewed leaves.
+
+ARV2-3Q-F is pending Claude's independent review. No later bounded
+implementation milestone is currently authorized. No reviewed ARV2-4C
+artifact, fold manifest, or other accepted ancestor was edited, re-pinned, or
+re-parented.
 
 No credential, Massive/Benzinga key, provider row, return, outcome, or QC
-resource was needed or used for ARV2-4D-A. All later provider, licensed-row,
+resource was needed or used for ARV2-4D-A or ARV2-3Q-F. All later provider, licensed-row,
 outcome, QC upload/compile/launch, paper, funded, and trading actions retain
 their separate exact authority gates. ARV2-4 must not run while the numeric
 receipt, source/right, review, run-identity, and one-use authorities are absent.
@@ -3562,11 +3574,117 @@ section 19.4. `ARV2WL-D06` is already closed as corrected above.
 
 ARV2-4D-B remains unauthorized. The owner-directed 2026-08-30 four-family
 multiplicity correction is the next safe data-free milestone. Introduced here
-as branch-local label **ARV2-3Q-F**, it must be an additive authenticated
-sibling of the immutable QC-first plan: four exact permanent lane slots share
-two-sided FWER `1/20`, Analyst receives at most `1/80`, unused or withdrawn
+as branch-local label **ARV2-3Q-F**, it must be an additive authenticated child
+of the immutable QC-first plan and an independent parallel leaf alongside the
+separately authenticated power-protocol leaf: four exact permanent lane slots
+share two-sided FWER `1/20`, Analyst receives at most `1/80`, unused or withdrawn
 slots expire without transfer, redistribution, or denominator recomputation,
 and all within-lane confirmatory allocations sum to no more than `1/80`. The
 old `1/60` bytes remain unchanged as an authenticated superseded-unspent
 ancestor. ARV2-4D-A's separate non-confirmatory `1/20` development
 power-planning size remains unchanged. No outcome or action authority follows.
+
+## 21. ARV2-3Q-F four-family multiplicity candidate, 2026-09-02
+
+**Disposition:** implemented and self-reviewed as an outcome-free structural
+candidate; pending Claude's independent review and Codex counter-review.
+ARV2-4D-B remains unauthorized, and no later milestone is inferred from this
+work.
+
+### 21.1 Frozen policy and exact identity
+
+The owner-directed selection family has exactly four permanent lane slots:
+`analyst-revisions-v2`, `insider-buying`, `short-interest`, and
+`target-price-revisions`. Their total two-sided family-wise alpha is exactly
+`1/20`; each permanent lane maximum is exactly `1/80`. Unused or withdrawn
+slots expire. Transfer, redistribution, and denominator recomputation are
+prohibited. All Analyst confirmatory allocations must sum to at most `1/80`;
+the sole currently planned, still-unbound Analyst look is allocated exactly
+`1/80`.
+
+The previously accepted three-lane `1/60` bytes remain unchanged and are
+authenticated only as a superseded-unspent, nonrevivable predecessor. Missing,
+copied, reconstructed, mutated, substituted, or foreign overlay objects refuse;
+there is no fallback to `1/60`. ARV2-4D-A's separate non-confirmatory `1/20`
+development planning size is unchanged and does not consume confirmatory
+alpha.
+
+The canonical candidate identities are:
+
+- overlay ID:
+  `arv2-four-family-multiplicity-54ab0bb69fb6fa16`;
+- semantic SHA-256:
+  `54ab0bb69fb6fa162ca3ba6764864b230136c68c017f1e6b669034dda75b806e`;
+- exact artifact-byte SHA-256:
+  `2e9f390ec54f01e6635b67972711c38212a5f853489e16c1de2a508212278648`.
+
+### 21.2 Additive lineage and authority boundary
+
+No accepted ancestor was changed. The overlay is an additive child of the
+strategy PDF, superseded QC base, and accepted QC-first plan. It is a separate
+parallel leaf from the ARV2-4D-A power protocol: the power protocol is not in
+this artifact's parent set, and this artifact does not claim to authenticate
+their relationship. A future outcome-bearing composition must authenticate
+both independently reviewed leaves.
+
+The loader stable-double-reads and exact-byte-pins the overlay, QC-first plan,
+superseded QC base, and zero-access look authority; validates their semantic
+state and exact acyclic parent set; retains all four payloads in a private
+weak-reference authority registry guarded by its own lock; and revalidates all
+four before exposing any positive alpha value. The canonical JSON boundary
+refuses alternate byte forms, duplicate keys, binary floating point,
+non-finite constants, invalid UTF-8, and link traversal.
+
+All 12 source, outcome, look, QC, result, deployment, and order capabilities
+are literal `false`. All 14 external bindings are `null`. Repository evidence
+records zero authorized/accepted observations, but explicitly does not claim
+proof of unobserved external activity because no external zero-observation
+receipt exists. No source, outcome, QC, deployment, or trading permission is
+created.
+
+### 21.3 Implementation self-review findings
+
+| ID | Pri | Disposition | Finding and correction |
+|---|---|---|---|
+| `ARV2QF-001` | P2 | **Corrected** | The first loader draft authenticated the transitive superseded QC base only inside the nested parent loader and did not retain or revalidate its bytes under the overlay authority. The final loader binds its exact ID, semantic hash, raw SHA-256, path, and payload; revalidates it before publication and on every authority use; and has substitution, in-load mutation, and post-load mutation regressions. |
+| `ARV2QF-002` | P3 | **Corrected** | The first zero-look wording could be read as proof of all external inactivity. The artifact now limits the assertion to repository gate state, records the exact evidence provenance, and leaves the external zero-observation receipt null. |
+| `ARV2QF-003` | P3 | **Corrected** | Early parser tests used malformed fragments and the capability/binding checks derived their expected inventories from the artifact under test, so they could miss a coordinated weakening. The final tests mutate an otherwise valid artifact and carry independent literal inventories for all 12 capabilities and 14 bindings. |
+| `ARV2QF-004` | P3 | **Corrected** | The first battery did not independently cover every positive getter, valid-type fingerprint mutations, parent/ancestor links, byte-versus-stat stable-read branches, the within-lane ceiling guard, or all post-load parent mutations. Dedicated regressions now cover each boundary; deleting superseded-base post-load revalidation makes the exact guard test red. |
+| `ARV2QF-005` | P3 | **Record/artifact correction** | Initial wording incorrectly called the overlay a sibling of the QC-first plan and then overclaimed a bound sibling relationship to the power protocol. The final DAG makes the overlay a child of the immutable QC-first plan, excludes the power protocol from its parent set, and leaves their relationship for separately authenticated future composition. |
+
+There are no unresolved P0-P3 findings in this milestone scope. The standing
+out-of-lane `ARV2WL-D11` Trading App failures remain documented and were not
+fixed. No unrelated production file or project-wide document was changed.
+
+### 21.4 Validation completed before the implementation commit
+
+- Canonical renderer equality, semantic ID/hash recomputation, and raw SHA-256
+  reproduction pass for the exact checked-in artifact.
+- ARV2-3Q-F file: **96 passed, 5 host symlink skips**.
+- ARV2-3Q-F plus import-firewall/authority-registry battery: **212 passed, 5
+  host symlink skips in 269.30 s**.
+- Complete `tests/analyst_revisions_v2`: **782 passed, 8 host skips in
+  608.13 s**.
+- Active-document consistency on the stabilized section 21: **69 passed in
+  2.32 s**.
+- Reverse mutation: deleting only the post-load superseded-base revalidation
+  makes the exact four-artifact regression fail; restoring it passes.
+- Package/test `compileall` exits 0 and `git diff --check` is clean apart from
+  informational Windows line-ending notices.
+- Three independent read-only audits examined production/artifact integrity,
+  test sensitivity, and the milestone/authority gate. All three return
+  **ACCEPT after correction with 0 remaining P0-P3** on the stabilized tree.
+
+No credential, provider or licensed row, price, return, outcome, QuantConnect
+resource, broker, operator database, scheduler, deployment, or order was
+accessed. **Zero research looks and zero development evaluations.** The exact
+repository-wide result and final static/document gates are recorded in a
+validation-only follow-up commit before the single push.
+
+### 21.5 Next gate
+
+Claude independently reviews the exact pushed counter-review and ARV2-3Q-F
+commits. Codex then counter-reviews every Claude commit. ARV2-4D-B still needs
+a separately reviewed input-manifest schema plus exact calibration-input,
+rights, lineage, and nuisance-only computation authority. No data, outcome,
+QC, paper, funded, deployment, or trading action may occur from this candidate.

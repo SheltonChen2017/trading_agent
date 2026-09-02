@@ -70,6 +70,7 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "research.analyst_revisions_v2.firm_ontology",
     "research.analyst_revisions_v2.fold_manifest",
     "research.analyst_revisions_v2.formulas",
+    "research.analyst_revisions_v2.four_family_multiplicity",
     "research.analyst_revisions_v2.global_benchmark_contract",
     "research.analyst_revisions_v2.holdings",
     "research.analyst_revisions_v2.import_firewall",
@@ -1005,6 +1006,9 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
         "fold_manifest.py": {"_FOLD_MANIFEST_AUTHORITIES"},
         "firm_ontology.py": {"_ONTOLOGY_AUTHORITIES"},
         "formulas.py": {"_POLICY_AUTHORITIES"},
+        "four_family_multiplicity.py": {
+            "_FOUR_FAMILY_MULTIPLICITY_AUTHORITIES"
+        },
         "global_benchmark_contract.py": {"_GLOBAL_BENCHMARK_AUTHORITIES"},
         "holdings.py": {"_STOCK_SCORE_AUTHORITIES"},
         "power_calibration_protocol.py": {

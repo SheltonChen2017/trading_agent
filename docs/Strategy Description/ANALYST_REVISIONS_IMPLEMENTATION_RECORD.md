@@ -17,8 +17,9 @@ THE CUMULATIVE TREE AFTER CORRECTING THREE P2 FAIL-OPEN/CONSISTENCY
 DEFECTS. CODEX COUNTER-REVIEW ACCEPTS BOTH CLAUDE COMMITS AFTER ADDITIONAL
 MATERIAL SAFETY AND RECORD CORRECTIONS (SECTION 14). THE OWNER APPROVED THE
 FULL 39-ALIAS LEGACY COMPARATOR AND CORRECTED MATCHED-ROW RULES. THE
-OUTCOME-FREE, CONTENT-ADDRESSED ARV2-4C STRUCTURAL CANDIDATE IS IMPLEMENTED
-AND AWAITS INDEPENDENT CLAUDE REVIEW AND CODEX COUNTER-REVIEW (SECTION 15).
+OUTCOME-FREE, CONTENT-ADDRESSED ARV2-4C STRUCTURAL CANDIDATE IS ACCEPTED
+AFTER INDEPENDENT CLAUDE REVIEW AND ONE TEST-COVERAGE CORRECTION (SECTIONS
+15-16); CODEX COUNTER-REVIEW IS NEXT.
 THE ARV2-4 EVALUATION AND EVERY
 DATA, OUTCOME,
 UPLOAD, COMPILE, QC-RUN, PAPER, OR FUNDED ACTION REMAIN BLOCKED BY THE
@@ -3068,3 +3069,131 @@ branch. Codex then counter-reviews every Claude commit. Only after acceptance
 may the next bounded outcome-free power-plan milestone begin. Production
 sources/rights, outcomes, QuantConnect upload/compile/run, result disposition,
 paper/funded deployment, and orders each remain separately gated and false.
+
+## 16. Independent Claude review of the whole-lane counter-review and the ARV2-4C milestone, 2026-09-01
+
+**Range reviewed:** `67ae5c11..aa6d1d00`, five commits, each disposed below.
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, 0 P2, **1 P3
+corrected**, 2 P3 documented. **Zero research looks and zero development
+evaluations.** No provider, credential, licensed row, price, return, outcome,
+broker, operator-database, QuantConnect, upload, scheduler, order, UI or
+Streamlit access occurred, and none was reachable: every production authority
+is empty or zero-access and every action capability is literal false.
+
+**Quality: ARV2-4C candidate 9.5/10** - the most disciplined artifact in the
+lane; a faithful, complete implementation of the corrected proposal with a
+textbook-correct unbiased bootstrap and an acyclic successor that touches no
+reviewed byte. **Codex's whole-lane counter-review (section 14) 9/10** - it
+found real residual fail-opens my prior fixes left and corrected three genuine
+accuracy errors in my section 13.
+
+### 16.1 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `06f08b56` | Accepted | Codex's counter-review hardening of the Git boundary and import firewall. Independently audited line by line against the base: it **only strengthens** - no guard removed or loosened, my ARV2WL-001/002/003 fixes preserved. 19/19 mutating/injection git argv rejected (`-c`, `--exec-path`, `-C` escape, push/update-ref/gc/fetch, pathspec magic) with all six real caller shapes accepted; the firewall is now an import allowlist plus a reflection denylist that catches all six dynamic-import evasions plus `os.system`/`eval`/`exec`/`ctypes`. Closes my own ARV2WL-D06 recommendation. |
+| `a371724a` | Accepted | Codex's follow-up closing two self-found gaps from its first pass: a computed-key `getattr` on the calendar facade reaching `pd`, and `core.commitGraph=false` not applied to the ancestry call. Both correct and regression-pinned. |
+| `4c686a55` | Accepted | Section 14, Codex's counter-review of my whole-lane commits `d72c8057`/`67ae5c11`. Its findings are fair and I verified the material one myself: my section 13 undercounted the documented findings (10 -> 11; 2 -> 3 P2, because D06 is P2), overstated "all seven mutation red/green" (the stable-sum consolidation is behavior-equivalent), and cited 57 body pages versus 64 physical. All three are genuine; ARV2CR11-001/002 (the `.git/info/grafts` ancestry forge and subcommand-only allowlist gaps) are real residual fail-opens my fixes left. Record-only. |
+| `63bd04b0` | Accepted after correction | The ARV2-4C global comparator milestone: `global_benchmark_contract.py` (1,807 lines) plus three content-addressed artifacts. One P3 test-coverage gap corrected (ARV2R10-001). |
+| `aa6d1d00` | Accepted | The milestone record (sections 15). Its claims match my independent verification. Record-only. |
+
+### 16.2 Independent verification of ARV2-4C
+
+Every item on the owner's verification list was reproduced first-hand from the
+committed bytes:
+
+- **Rating map:** exactly 39 mapped aliases across five levels (4+12+11+10+2),
+  exact reduced-rational operational scores +1, +1/2, 0, -1/2, -1 =
+  `(legacy_level-3)/2`; exactly 15 measured refusals matching the archived
+  vocabulary; **zero map/refusal collision**; every label canonical ASCII
+  lowercase, trimmed, single-spaced; non-ASCII refuses; unknown labels refuse
+  with no default. Map hash `aaf5830c...` recomputed exact.
+- **Event semantics:** an exact-zero global delta becomes an **active**
+  `global_tier_collapse_zero` (not structural zero, not dropped); expected-sign
+  transitions stay active contributions; opposite-sign conflicts **jointly
+  refuse and are charged to structural coverage** (`opposite_sign_is_
+  denominator_only`), not silently dropped.
+- **Predecessor single-arm refusal unchanged:** the loader pins the parent's
+  IC `date_refusal` to `fewer_than_20_rows_or_constant_score_or_constant_
+  outcome`, and the paired rule is explicitly additive
+  (`firm_specific_vs_global_paired_gate_only`).
+- **Paired rules:** <20 identical rows, constant shared outcome, and both arms
+  constant all jointly refuse; exactly one constant arm gives that arm exact
+  IC=0 and the other ordinary Spearman; exact one-to-one row parity;
+  imputation and one-arm removal both forbidden.
+- **Sector totalization (the key ARV2CRP-003 correction):** only an
+  **exact-zero range** (`min==max`) totalizes to paired-only all-zero
+  standardized scores preserving ACTIVE vs STRUCTURAL_ZERO; a **nonzero-range
+  zero-MAD** sector **refuses** and is charged to coverage; shared-control
+  zero-MAD refuses; no epsilon/market fallback.
+- **Per-arm derivation:** mapped delta, decayed mass, raw score, breadth,
+  conservative `N_eff`, sector normalization, reliability, coefficients and
+  residuals are per arm; identities, activity, `q_data`, ages, controls, folds
+  and outcomes are shared; a collapse-zero event stays active with zero mass
+  and cannot raise `N_eff`.
+- **Coverage:** five 19/20 ledgers (endpoint-pair, active-row, component,
+  member-incidence, date), each required both pooled and independently in
+  every nonempty fold, by exact integer cross-multiplication, with a zero
+  denominator as underfill and no outcome dependence.
+- **Post-join:** identity mismatch -> INVALID_DATA; honest shortfall ->
+  INCONCLUSIVE locked, no extension; adequate-sample failure -> FAIL closes the
+  family; any outcome-informed map/fold/period/seed/retry change forbidden.
+- **Bootstrap:** complete-session noncircular 20-session moving blocks
+  contained in each fold (the 2020 fold's 233 sessions give exactly 214
+  allowed starts), Type-7 quantile computed as `0.9*x[18999]+0.1*x[19000]`,
+  fixed 19,999 resamples, and a **dependency-independent unbiased SHA-256
+  hash-counter sampler** whose rejection band `reject u >= 2^256-(2^256 mod m)`
+  eliminates modulo bias, with fail-closed overflow.
+- **Half-scale invariance:** two regressions pin that dividing legacy tiers by
+  two is Spearman-inert through the full contribution-to-final-score path
+  (ranks and ties preserved).
+- **Lineage:** the successor stock spec binds an eight-node DAG (PDF ->
+  qc_base -> qc_plan -> stock_v1 -> fold_manifest -> global_map ->
+  matched_contract -> stock_v2); I confirmed by topological check it is
+  **acyclic** and the successor is a leaf. The fold manifest, predecessor
+  stock spec, and `fold_manifest.py` are **byte-identical** to the base -
+  no edit, re-pin, or reparent - and the fold manifest's parents remain
+  `{pdf, qc_plan, stock_v1}`, never the successor. All three new-artifact
+  hashes (map, matched, successor) recomputed exact.
+- **Authority surface:** loading the contract through its six-artifact loader,
+  all six capability accessors return `False`; `copy.copy`, `object.__new__`,
+  and pickle all fail reauthentication; the transitive closure is 31 modules
+  with no execution/ML/network/legacy-ACER root.
+
+### 16.3 Findings
+
+| ID | Pri | Status | Location | Issue and impact | Correction | Verification |
+|---|---|---|---|---|---|---|
+| ARV2R10-001 | P3 | **Corrected** | `global_benchmark_contract.py:1448` / `tests/analyst_revisions_v2/test_global_benchmark_contract.py` | The loader pins the predecessor's single-arm IC `date_refusal` string so a future edit that weakened the single-arm rule (dropping the constant-score/constant-outcome clause the paired rule builds on) would be caught - but no regression exercised that specific guard. The neighbouring null-slot battery covers the child-slot guards, not the refusal string. The guard fires (verified by a weakened-parent probe); it was simply unpinned. | Added a monkeypatch regression that returns a parent with `date_refusal="fewer_than_20_rows_only"` and asserts the loader refuses with `single-arm IC refusal changed`, mirroring the existing null-slot test pattern. Test-only; no production module changed. | Removing the guard reddens the new test; restored green. |
+
+### 16.4 Documented, not fixed
+
+| ID | Pri | Location | Observation |
+|---|---|---|---|
+| ARV2R10-D01 | P3 | `global_benchmark_contract.py` numerical contract | The Decimal numerical contract (prec 50, HALF_EVEN, fresh-context-per-calculation, exact-zero comparison) is present only as frozen specification text; the module imports no `decimal` and performs no Decimal arithmetic, because the Spearman/bootstrap statistic consumes outcomes and is correctly deferred. Its ambient-context-isolation guarantee is therefore a **future obligation** on the milestone that builds the statistic, not something this outcome-free module can honor or that can be pinned today. Recorded so that implementer creates a fresh local context per calculation rather than inheriting `getcontext()`. |
+| ARV2R10-D02 | P3 | `import_firewall.py:692-714` | Codex's allowlist firewall catches every dynamic-import evasion, `os.system`, `eval`/`exec` reassignment, `ctypes`, and string-concatenated dunder names, but a `getattr(obj, <fully-runtime-string>)` where the attribute name is a genuine runtime value (a function parameter, or `chr(115)+'ystem'`) is not flagged - the documented boundary of a static guard. Exploitation would require **both** a dangerous object root (os/subprocess/importlib/builtins, all already blocked at import/name level) **and** a fully-computed name, so it is not reachable today. The module docstring already disclaims this; no change recommended, recorded for completeness. |
+
+### 16.5 Validation
+
+- ARV2-4C focused file `test_global_benchmark_contract.py` on the final tree:
+  **151 passed, 1 host symlink skip** (150 as received plus the new
+  ARV2R10-001 regression); the item-9 half-scale invariance regression in
+  `test_stock_signal.py` passes.
+- Git-boundary/firewall and ratings batteries: **165 passed**; my prior
+  ARV2WL-001/002/003 fixes confirmed present and strengthened.
+- Complete repository suite, exact as-received tree `aa6d1d00`: **3 failed, 7068 passed, 14 skipped, 25 warnings in 1714.03s (0:28:34)** in a pinned base-temp. All three failures are in `tests/test_sleeve_report.py` (Trading App three-sleeve engine, out of lane) and reproduce on the pristine base; **zero Analyst tests failed**. Composition differs from the record's host - three sleeve-report cases here versus one Target Price plus two sleeve there - which is the known date/interpreter sensitivity of those standing out-of-lane assertions (ARV2WL-D11, ARV2-UNRELATED-001), not a regression.
+- The ARV2R10-001 regression mutation-verified red then green.
+- `compileall` over the Analyst package exit 0; `git diff --check` clean;
+  Python 3.12.13. No frozen or shared document touched; the only change is one
+  Analyst test file.
+
+### 16.6 Next step
+
+Codex counter-reviews this exact pushed head. The next milestone is the
+power-plan definition, which is a separate owner-authorized step and must not
+begin by inference; ARV2R10-D01's Decimal-context obligation lands on the
+milestone that builds the outcome-bearing statistic. ARV2-4 execution remains
+blocked on the recorded source, rights, review, run-identity and one-use
+authority gates; every production authority is empty or zero-access and every
+action capability is literal false. No credential, provider, outcome, QC,
+deployment, or trading access is authorized.

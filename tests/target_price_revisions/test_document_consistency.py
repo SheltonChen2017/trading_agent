@@ -852,3 +852,66 @@ def test_session_ledger_rows_have_exact_column_count() -> None:
         f"session-ledger rows must have exactly {expected} columns; "
         f"malformed: {malformed}"
     )
+
+ISSUE_ROW = r"^\| `(TPR-[A-Z0-9-]+)` \| (P[0-3]) \| ([^|]*)\|"
+REGISTER_ID = r"^\| `(TPR-[A-Z0-9-]+)` \|"
+
+
+def _open_issue_register() -> str:
+    """Return section 8's register of every still-open lane finding."""
+    return _bounded(
+        _record_section("## 8. Exact next step"),
+        "### Open-issue register",
+        "### Historical progression",
+        "open-issue register",
+    )
+
+
+def test_open_issue_register_matches_every_issue_row() -> None:
+    """One current answer to what is still open.
+
+    Three findings were carried as open long after they had actually been
+    resolved: `TPR-CR1-001` after the owner-approved `*.pdf binary` fix,
+    `TPR-CR8-001` after the alpha relaxation, and `TPR-CR11-002` after both
+    sides of its dispute turned out to be host-scoped.  Nothing detected the
+    drift, because a status cell is prose in a table nobody re-reads.
+
+    The register makes the open set explicit, and this guard makes it
+    checkable in both directions: closing a finding without delisting it
+    fails, and delisting one without closing its row fails too.  Out-of-lane
+    findings live in section 9 and are excluded by construction, since their
+    third column is an area rather than a status.
+    """
+    record = (STRATEGY_DIR / RECORD).read_text(encoding="utf-8")
+    register = _open_issue_register()
+    outside = record.replace(register, "", 1)
+    assert register not in outside, "the register block must appear once"
+
+    rows = re.findall(ISSUE_ROW, outside, re.MULTILINE)
+    assert len(rows) > 50, (
+        f"only {len(rows)} issue rows parsed; the row shape changed and this "
+        f"guard would silently stop covering the ledgers"
+    )
+    identifiers = [identifier for identifier, _priority, _status in rows]
+    assert len(identifiers) == len(set(identifiers)), (
+        "each finding must have exactly one row so its status cannot fork"
+    )
+
+    open_ids = {
+        identifier
+        for identifier, _priority, status in rows
+        if status.replace("**", "").strip().lower().startswith("open")
+    }
+    registered = set(re.findall(REGISTER_ID, register, re.MULTILINE))
+    assert registered == open_ids, (
+        f"the open-issue register and the finding rows disagree; listed but not open: {sorted(registered - open_ids)}; open but unlisted: {sorted(open_ids - registered)}"
+    )
+
+    for line in register.splitlines():
+        if not line.startswith("| `TPR-"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        assert len(cells) == 4 and all(cells), (
+            f"register row {cells[0]} must name a priority, what it blocks, and "
+            f"why it cannot be closed in lane"
+        )

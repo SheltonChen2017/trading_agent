@@ -392,6 +392,27 @@ Codex correction range beginning after `45f45aa3`. That review grants no
 source, outcome, look, QC, broker, paper, live, deployment, capital, or trading
 authority.
 
+### Open-issue register
+
+Every lane finding that is still open, and nothing else. A finding's own row
+keeps its evidence and disposition; this register is the single current
+answer to "what is still open", so a row status can no longer drift out of
+agreement with it unnoticed.
+`test_open_issue_register_matches_every_issue_row` fails if the two disagree
+in either direction. Out-of-lane findings are tracked separately in section 9
+and are deliberately not listed here.
+
+| ID | Priority | Blocks | Why it cannot be closed in lane |
+|---|---|---|---|
+| `TPR-CCR1-004` | P2 | TPR-0 | The numeric practical-effect threshold, the independent-unit rule and the power/sample basis are owner freezes. A reviewer cannot choose them. |
+| `TPR-CCR1-005` | P2 | TPR-0 | The provider, endpoint, schema, rights state, exact batch cutoff and source-error policy are owner decisions that no local configuration can supply. |
+| `TPR-CCR1-006` | P3 | Nothing today | The defects are inside the governing PDF. Regenerating it changes the identity of a content-addressed artifact, which needs the owner's storage/provenance decision. Evidence re-measured 2026-09-02; see section 34. |
+| `TPR-CCR2-011` | P3 | Positive reliance on reviewer identity | Cryptographic control of reviewer identity needs a provisioned signing key or a separately signed review receipt. Superseded in design by TPR-TR0, which is reviewed but not implemented or provisioned. |
+| `TPR-CCR5-004` | P2 | Positive algorithm authority | The reviewed TPR-TR0 trust-root design must be implemented, provisioned and satisfied by an exact signed registry anchor. That implementation is not authorized in any round so far. |
+
+No open finding is P0 or P1, and none of the five can be closed by a reviewer
+acting alone: each needs an owner decision, an owner-authorized artifact
+rewrite, or an authorized implementation milestone.
 ### Historical progression (not the current resume instruction)
 
 The remainder of this section preserves how the earlier v2.1 and v2.2
@@ -474,7 +495,7 @@ documented here and deliberately not fixed.
 |---|---|---|---|---|
 | `TPR-OOL-001` | P2 | Repository-wide Git plumbing: no `.gitattributes` exists at any level, and `core.autocrlf=true` is set in the system Git configuration | Git finds no NUL byte in the target-price blueprint, so it classifies the PDF as text and rewrites its 557 LF bytes to CRLF on checkout. The working file is 78,082 bytes and hashes to `6ee7ea5e...4330`, while the committed blob is 77,525 bytes and hashes to the pinned `9f00dd56...2633`. `pdftotext` reports a damaged xref table on the working copy. The other four PDFs contain NUL bytes early and check out byte-identically. Lane impact is `TPR-CR1-001`. | A `*.pdf binary` attribute is repository-wide plumbing rather than trading-strategy work, and `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 2 requires a shared-file change to stop for one owner-coordinated common-baseline amendment. Documented, not fixed. Owner decision required. |
 | `TPR-OOL-006` | P2 | Sibling lane frozen preregistrations, principally `codex/strategy-analyst-revisions-v2` | That lane still freezes its selection-family alpha at `0.05 / 3 = 1/60` while the fixed family now has four permanent `1/80` slots. Under the pre-amendment sibling allocations, exact arithmetic is `3 * (1/60) + 1/80 = 1/16 = 0.0625`, above the family ceiling `1/20 = 0.05`; the displayed `0.0167` is only a rounded rendering of `1/60`. | **Escalated 2026-08-31: this is now a contradiction inside one integrated tree.** With all four lanes merged into `main`, that single tree simultaneously states the analyst lane's "three-lane correction remains 3" with its prospective look carrying `1/60`, no alpha freeze at all in Insider Buying or Short Interest, and this lane's fixed four-slot family at `1/80` naming `analyst-revisions-v2` as one of its slots. Measured directly from the integrated tree, not inferred. The owner froze the four named slots permanently on 2026-08-30 (section 16): each lane's maximum is `1/80`; the named slot remains fixed while an unused or withdrawn allocation expires and is never redistributed or used to recompute the denominator. Sibling-lane corrections and their independent reviews/counter-reviews remain on their own long-lived branches. This target branch does not edit them, and no lane receives outcome authority from this directive. |
-| `TPR-OOL-008` | P2 | `research/analyst_revisions_v2/specs/*.json`; `research/ml_specs/*.json` | On the integrated tree the analyst lane's checkout-bytes guard (`test_canonical_production_artifacts_survive_checkout_as_exact_bytes`) **failed on this Windows host**: `legacy_reproduction_registry.json` held CRLF bytes while its committed blob is LF, and `git status` reported clean because the stat cache hid it. Five artifacts were affected. The repository content is correct; only the checkout was stale, and restoring each file from its committed blob turned the test green with `git diff HEAD` empty. The root cause is an attribute strategy difference: the analyst lane protects those files with `*.json -text` only (`text: unset, eol: unspecified`), which lets a pre-existing CRLF working copy persist, whereas this lane now uses `text eol=lf` (`text: unset, eol: lf`) and does not drift. `research/ml_specs/*.json` carry no attribute at all (`text: unspecified`) and Git warns they will be re-converted to CRLF on the next checkout, so their restoration here is temporary and no test currently covers them. | Documented, not fixed. The remedy is to adopt `text eol=lf` in the sibling lanes and give `research/ml_specs` equivalent protection, which touches another lane's and the ML surface's owned files. Route as one owner-coordinated change. The local checkout repair performed during this review changed no committed content. |
+| `TPR-OOL-008` | P2 | `research/analyst_revisions_v2/specs/*.json`; `research/ml_specs/*.json` | On the integrated tree the analyst lane's checkout-bytes guard (`test_canonical_production_artifacts_survive_checkout_as_exact_bytes`) **failed on this Windows host**: `legacy_reproduction_registry.json` held CRLF bytes while its committed blob is LF, and `git status` reported clean because the stat cache hid it. Five artifacts were affected. The repository content is correct; only the checkout was stale, and restoring each file from its committed blob turned the test green with `git diff HEAD` empty. The root cause is an attribute strategy difference: the analyst lane protects those files with `*.json -text` only (`text: unset, eol: unspecified`), which lets a pre-existing CRLF working copy persist, whereas this lane now uses `text eol=lf` (`text: unset, eol: lf`) and does not drift. `research/ml_specs/*.json` carry no attribute at all (`text: unspecified`) and Git warns they will be re-converted to CRLF on the next checkout, so their restoration here is temporary and no test currently covers them. | Documented, not fixed. The remedy is to adopt `text eol=lf` in the sibling lanes and give `research/ml_specs` equivalent protection, which touches another lane's and the ML surface's owned files. Route as one owner-coordinated change. The local checkout repair performed during this review changed no committed content. **Recurrence measured 2026-09-02:** the same guard failed again in this worktree after the lane was fast-forwarded. A repo-wide sweep, rather than the test's first-offender report, found that of 909 tracked files 18 require exact bytes and 3 were stale: `legacy_reproduction_registry.json`, `permanent_look_authority.json` and `reviewed_spec_registry.json`. Restoring each from its committed blob left 0 stale and the module green at 39 passed. This is the second local repair of the same drift, which is the evidence that `*.json -text` alone does not converge an existing CRLF working copy; the routed remedy is unchanged and still belongs to an owner-coordinated change. |
 | `TPR-OOL-009` | P2 | `tests/test_sleeve_report.py`; `assistant` lot tax-mechanism path | **Claude corroboration of the existing finding, 2026-09-01, not a new identifier.** Both failures reproduce in isolation (`2 failed, 54 passed`), and the recorded diagnosis is exact: the test fixes its lot/snapshot clock at 2026-08-07 while the implementation reads the live UTC clock. A lot created with `days_ago=340` is therefore acquired 2025-09-01, which is exactly 365 days before the live date 2026-09-01 — precisely the one-year boundary, so `term_if_sold_now` stays `short` while the countdown collapses to `0`, failing `0 < days_to_long_term <= 30`. The failure is genuinely date-triggered and began when the live clock crossed that boundary; it is a real test/implementation clock mismatch, not a flake that will pass on retry. **Claude expansion evidence, 2026-09-01: this finding widens with the calendar and is not a fixed pair.** The counter-review measured two failures; this review measures three, the new one being `test_report_carries_no_action_shaped_field` failing `assert 2 == 1` on `lots_at_gain_review`. The module fixes `_NOW = datetime(2026, 8, 7, 15, 30, tzinfo=utc)` and builds lots at `_NOW - days_ago` while the implementation reads the live clock, now 25 days past the fixture, so every lot whose `days_ago` lies in the 340-365 window has since crossed the one-year boundary and that window widens by one day per day. The failure count is therefore a function of when the suite runs, which is why two reviewers on the same tree report different totals. | **Not fixed** — out-of-lane under the owner's scope rule and explicitly excluded from this branch. Route to the Trading App lane; the durable fix is to give the implementation the same injected clock the test fixes, not to loosen the assertion. Routing urgency is higher than a static pair implies: untouched assertions keep converting to failures. The durable fix injects the fixture clock into the implementation rather than loosening assertions. |
 | `TPR-OOL-007` | P3 | `docs/THREE_STRATEGY_PROJECT_DIRECTION.md:274-278` | The shared coordination pointer still presents a local TPR-0A candidate whose next action is one push/review; it omits the completed initial review, the six Claude commits through `2ec0fad`, their Codex counter-review, and the current v2.2 candidate at `bb8dfb6`. | Documented, not fixed. The file is shared coordination surface outside this target-only lane; route a concise current-state correction through the appropriate owner-coordinated shared-document round. |
 | `TPR-OOL-002` | P3 | `docs/Strategy Description/README.md` | The lane table and the surrounding prose describe a three-strategy program and omit Target-Price Revisions entirely, so a reader who starts at the directory README does not discover this lane, its branch, or its record. | That README is named in the parallel-workflow frozen-file list, so it needs the same owner-coordinated common-baseline amendment rather than a fourth competing edit. Documented, not fixed. |
@@ -527,6 +548,7 @@ known.
 | 2026-09-01 | Codex counter-review / correction validation | `45f45aa36f6493d8bd9669bcdba48d08d8c9c57e` -> `1ff76faa39f47de4899dcace937398b2718f4c3a` exact tested correction tree; this evidence-record commit follows | Counter-review all six Claude whole-lane review commits; no new milestone | Recorded every commit disposition. Closed the already-decided under-allocation contract defect, advanced all current workflow pointers, bounded the session-ledger guard, and corrected review-evidence claims. The frozen candidate and authority artifacts are unchanged. | Exact correction tree: lane/shared-document suites **199 passed, 3 skipped in 14.42s**; complete suite **6,797 passed, 13 skipped, 2 failed, 25 warnings in 1,179.25s**, with both failures exactly out-of-lane `TPR-OOL-009` and no TPR failure; `compileall -q .` exit 0; diff/status clean; PDF and candidate hashes exact; **0 research looks**. | No P0/P1. `TPR-CCR9-001` through `010` are closed or qualified in section 32. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1, and TPR-0B remain blocked. | None. No source, outcome, look, QC, broker, paper/live, capital, or trading authority. | Commit this record-only evidence, run the focused guards/diff/status on the exact final tip, make the round's one combined push, then Claude reviews the new Codex range beginning after `45f45aa3`. |
 | 2026-09-01 | Claude review | `45f45aa36f6493d8bd9669bcdba48d08d8c9c57e` -> `a63335d38bfd6dd3b584d7a91ba0b454e97a6df4` reviewed; corrections on this same lane branch | Independent review of the Codex whole-lane counter-review round; no milestone in range | Reviewed both pushed commits individually and the cumulative tree. Accepted nine of ten counter-review findings, including `TPR-CCR9-001`: the prior `TPR-CR8-001` was a misclassification, since A27 already fixes `1/80` as a ceiling rather than an entitlement. Disputed `TPR-CCR9-008` with search evidence. Added a composed-path regression pinning what the alpha relaxation does and does not reach. | Adversarial probe with `spec_hash` re-derived across seven alpha cases: over-cap, two-look overspend, disagreeing structural-binding and acceptance alpha, and zero allocation all refuse; the full-cap candidate loads. An under-cap candidate is refused by the frozen-policy pin while the isolated validator accepts it, which is `TPR-CR11-001`. Artifact and PDF hashes unchanged. Mutation on the new test: restoring the removed equality condition turns it red, byte-identical restore returns it green. Focused and complete-suite results in 33.9. No provider, credential, licensed row, outcome, QC, broker, scheduler, paper or live access; **0 research looks**. | Both commits accepted after correction or accepted. No P0/P1/P2. `TPR-CR11-001` (P3) closed; `TPR-CR11-002` (P3) open and disputed. Counter-reviewed round quality **8/10**. Details in section 33. | None; all authority remains zero and no milestone beyond TPR-0A is complete. | Codex counter-reviews this round. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked; `TPR-CR11-002` needs an exact renderer path or withdrawal. |
 | 2026-09-01 | Claude validation | `4c19ec16` -> `4c19ec16` (exact tested tree; this validation-record commit follows) | Counter-review round final validation | Revalidated the complete tree after the composed-path regression and the out-of-lane expansion record. All work stayed inside the single named lane worktree. | Complete suite on the exact committed tree: **6,797 passed, 13 skipped, 3 failed, 25 warnings in 1,262.78s** - the 6,796 baseline plus exactly the one composed-path test added here. All three failures are the out-of-lane sleeve-report cases now recorded as widening with the calendar under `TPR-OOL-009`; **no Target-Price Revisions test fails**. Focused lane and shared documentation suites **200 passed, 3 skipped**; `compileall` exit 0 including `research`; `git diff --check` clean; artifact and PDF hashes unchanged. Python 3.14.6, pytest 9.1.1. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface; **0 research looks**. | No new finding. `TPR-CR11-001` closed; `TPR-CR11-002` open and disputed pending an exact renderer path. `TPR-CCR5-004`, `TPR-CCR2-011`, `TPR-OOL-006`, `TPR-OOL-009` and `TPR-OOL-010` remain open and owner-routed. | None; TPR-0A remains the only frozen phase. | Codex counter-reviews this round; TPR-1 and TPR-0B remain blocked. |
+| 2026-09-02 | Claude lane-issue closure under owner request | `87384c09c32b3515931597ded12c961491676639` -> this round's head | Close the actionable open lane findings; no milestone | Censused all 109 finding rows and found 8 open. Closed three that were stale rather than unresolved (`TPR-CR1-001` after the owner-approved `*.pdf binary` fix, `TPR-CR8-001` after the alpha relaxation, `TPR-CR11-002` because both sides of its dispute were host-scoped). Corrected and widened `TPR-CCR1-006`'s evidence while leaving it open, adding the previously unrecorded page-27 canonical-worktree pin. Added an open-issue register to section 8 and a guard binding it to the finding rows in both directions. No product, provider, source, or outcome code changed. | Lane plus shared document suites and the complete-suite, compile and hygiene evidence are in section 34.7. Four mutations on the new guard each turned it red with byte-identical restores returning it green. Closures verified against the tree: blueprint digest, Git attributes, `git diff --check` and text extraction; the two surviving alpha conditions read directly; and a renderer census showing the bundled `pdftotext` is Xpdf 4.06 rather than poppler. Provider/outcome accesses **0**; authorized/spent looks **0**. | Five findings remain open and are now listed in one place: `TPR-CCR1-004`, `TPR-CCR1-005`, `TPR-CCR1-006`, `TPR-CCR2-011`, `TPR-CCR5-004`. None is P0 or P1 and none can be closed by a reviewer acting alone. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews this round. The five open findings need owner decisions, an authorized artifact rewrite, or an authorized trust-root implementation; TPR-1 and TPR-0B remain blocked. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -575,7 +597,7 @@ Resolved items are retained. There is no P0 or P1 finding.
 
 | ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
 |---|---|---|---|---|---|---|---|---|---|
-| `TPR-CR1-001` | P2 | **Open - owner decision** | `c179801` | `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf` | The governing blueprint is stored as a Git *text* blob, so a Windows checkout rewrites its line endings. Three consequences: the working PDF is damaged and reports a broken xref table, the record's pinned SHA-256 cannot be reproduced by hashing the checked-out file, and `git diff --check` is now permanently red for the whole repository, which conflicts with the `CLAUDE.md` section 10 validation this project runs before every handoff. | Committed blob 77,525 bytes hashing `9f00dd56...2633`; working file 78,082 bytes hashing `6ee7ea5e...4330`; the 557-byte delta equals the 557 lone LF bytes in the blob; the file contains no NUL byte at any offset, while the analyst blueprint's first NUL is at offset 2,739; `git diff --check 086b782..HEAD` reports trailing-whitespace errors on this file alone. The section 10 ledger row claims only that "the three Markdown staged paths pass `git diff --check`", which is literally true and silently excludes the one path that fails. | A governing specification whose pinned digest cannot be verified from a checkout is not a content-addressed artifact, and a permanently red `git diff --check` trains every future round to ignore a mandated check. | Not fixed here. Both remedies fall outside this session's trading-strategy scope or the frozen-file rule: a `*.pdf binary` attribute is repository-wide plumbing (`TPR-OOL-001`), and regenerating the blueprint would change the identity of a governing artifact during a review round. Partially mitigated: the new guard pins the blueprint by LF-normalized content digest, which is stable on every platform and keeps passing after either remedy. | `test_target_price_lane_blueprint_is_pinned_to_its_record` passes; replacing the normalization with the raw bytes turns it red on this host (`1 failed`), independently reproducing the corruption. |
+| `TPR-CR1-001` | P2 | **Closed by the owner-approved plumbing fix; verified 2026-09-02 in section 34** | `c179801` | `docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf` | The governing blueprint is stored as a Git *text* blob, so a Windows checkout rewrites its line endings. Three consequences: the working PDF is damaged and reports a broken xref table, the record's pinned SHA-256 cannot be reproduced by hashing the checked-out file, and `git diff --check` is now permanently red for the whole repository, which conflicts with the `CLAUDE.md` section 10 validation this project runs before every handoff. | Committed blob 77,525 bytes hashing `9f00dd56...2633`; working file 78,082 bytes hashing `6ee7ea5e...4330`; the 557-byte delta equals the 557 lone LF bytes in the blob; the file contains no NUL byte at any offset, while the analyst blueprint's first NUL is at offset 2,739; `git diff --check 086b782..HEAD` reports trailing-whitespace errors on this file alone. The section 10 ledger row claims only that "the three Markdown staged paths pass `git diff --check`", which is literally true and silently excludes the one path that fails. | A governing specification whose pinned digest cannot be verified from a checkout is not a content-addressed artifact, and a permanently red `git diff --check` trains every future round to ignore a mandated check. | Not fixed here. Both remedies fall outside this session's trading-strategy scope or the frozen-file rule: a `*.pdf binary` attribute is repository-wide plumbing (`TPR-OOL-001`), and regenerating the blueprint would change the identity of a governing artifact during a review round. Partially mitigated: the new guard pins the blueprint by LF-normalized content digest, which is stable on every platform and keeps passing after either remedy. | `test_target_price_lane_blueprint_is_pinned_to_its_record` passes; replacing the normalization with the raw bytes turns it red on this host (`1 failed`), independently reproducing the corruption. |
 | `TPR-CR1-002` | P2 | Closed | `c179801` | `tests/` (no file) | The lane shipped with **zero** test coverage. All three sibling lanes are bound record-to-blueprint by digest in `test_three_strategy_parallel_baseline_is_exact_and_fail_closed`; the fourth lane was never added to it or to any other guard, so nothing checked its pin, its provenance values, or its coordination references. This is the root cause that let `TPR-CR1-001`, `TPR-CR1-004` and `TPR-CR1-006` reach `main` with a green suite. | `grep -rn` for `target.price`, `TARGET_PRICE` and the lane branch across `tests/` matched only stale `__pycache__` binaries and no source file. The 67-test active-document suite passed on the uncorrected tree. | The repository's documentation-governance guards are the only mechanism that makes a lane record's provenance claims checkable; a lane exempt from them is unverified by construction, and the exemption was silent rather than declared. | Added three guards to `tests/test_active_document_consistency.py`: `test_target_price_lane_blueprint_is_pinned_to_its_record`, `test_target_price_lane_documents_agree_on_one_worktree`, and `test_no_active_document_pins_a_malformed_sha256`. | Suite grows 67 to 70 passed. Five mutations each turn exactly one new guard red and restore returns green: digest pin altered, normalization removed, record digest removed, worktree drift reintroduced, malformed pin reintroduced. |
 | `TPR-CR1-003` | P2 | Closed | `70c4b9f` | `docs/SESSION_HANDOFF.md:16-17`, section 8 of this record | The canonical cross-computer handoff stated the branch "was local-only" with "no push or merge was performed", and section 8 said the next step was to push when publication is requested. The branch was in fact published and merged into `origin/main` seven minutes after the second commit. A reader resuming on another machine would conclude the work is unfetchable. The merge also preceded the independent review these same documents name as mandatory. | `git merge-base --is-ancestor 70c4b9f origin/main` returns 0; PR #324 merge `1a5264e` is dated 2026-08-29 16:53:03 -0700 against commit timestamps 16:32:48 and 16:46:37. | This is the fourth recorded instance of the class documented in `test_no_document_calls_a_merged_commit_unreachable` (CCR-005, CCX-004): a push or merge claim written inside the commit being pushed is false by construction the moment it lands, and the handoff is the one document another computer relies on. | The handoff now records the published head, the PR #324 merge commit, that `git fetch` retrieves it, and that the merge preceded this review. Section 8 and the Action Plan row now carry the same state. | The active-document suite passes on the corrected tree, including the existing reachability guards. |
 | `TPR-CR1-004` | P3 | Closed in Markdown; blueprint instances **open** | `c179801` | This record, `docs/SESSION_HANDOFF.md`, blueprint pages 1 and 25 | The pinned SHA-256 of the owner's submitted source proposal is 63 hexadecimal characters and therefore cannot be a SHA-256 at all. The submitted PDF is not stored in the repository, so the digest cannot be recomputed and the provenance of the document this lane was derived from is unestablished. | Length measured at all four sites. A repository-wide scan of every non-archived Markdown document for hex runs of 55 to 80 characters found exactly these two Markdown instances and no other malformed pin, so the defect does not generalize beyond this lane. | An unverifiable pin presented as a digest reads as provenance evidence while providing none. | Both Markdown sites now state plainly that the value is malformed and unverifiable, and show it truncated so it can no longer be mistaken for a usable pin. The two instances inside the blueprint cannot be corrected without regenerating that PDF, which is deferred with `TPR-CR1-001`. | `test_no_active_document_pins_a_malformed_sha256` was red against the uncorrected documents and is green after correction; reintroducing the full 63-character value turns it red again. |
@@ -649,7 +671,7 @@ individually and inspected the cumulative state. The local correction commit is
 | `TPR-CCR1-003` | P3 | **Closed by qualification; artifact defect remains open under `TPR-CR1-001`** | Blueprint and sections 11.3, 11.5 | Poppler can render the malformed working PDF: all 26 pages rendered and were visually inspected, although xref/font warnings remain. A clean-worktree `git diff --check` and `git diff --check 70c4b9f..c0ba616` both pass; only historical ranges that include the original PDF addition, such as `086b782..c0ba616`, fail. The checked-out bytes and pinned blob digest still differ, so the core storage defect remains real and owner-routed. |
 | `TPR-CCR1-004` | P2 | **Open - owner decision; blocks TPR-0** | Blueprint physical pages 5, 6 and 9; milestone ladder | TPR-0 must freeze a numeric practical-effect threshold from capacity/cost/power, an independent sample floor from observed event frequency/overlap, and `CLIP_TPR0` from a zero-outcome structural distribution and source-error audit. The first structural source sample is assigned to TPR-1, while TPR-2 supplies the price, ADV and cost prerequisites. Exact numeric TPR-0 completion is therefore circular. The owner must choose: freeze algorithms/formulas at TPR-0 and bind numeric outputs after reviewed TPR-1/2 structural evidence but before outcomes; authorize a bounded zero-outcome structural pilot inside TPR-0 and amend the ladder; or supply defensible numeric constants now. Codex will not guess. |
 | `TPR-CCR1-005` | P2 | **Open - owner decisions; blocks TPR-0** | Blueprint `FREEZE_AT_TPR0` items and section 2 of this record | The provider/endpoint/schema and rights state, exact batch cutoff, source-error policy, universe/minimum-group/fallback rules, split/FX/ADR/horizon sources, catalyst-unknown policy, estimator/partitions, exact cost model, shared-fourth-family treatment, permanent-look authority, and exact validation/final-holdout dates remain unbound. Starting executable preregistration without them would falsely claim TPR-0's definition of done. |
-| `TPR-CCR1-006` | P3 | **Open with `TPR-CR1-004` / `TPR-CR1-005`; no artifact rewrite authorized** | Blueprint physical page 25 | The governing PDF still names nonexistent worktree `trading_agent_TargetPriceRevision` and still contains the malformed 63-character source pin on physical pages 1 and 25. Correcting the Markdown does not close the artifact instances. Regenerating the governing PDF changes its identity and must wait for the owner's storage/provenance decision. |
+| `TPR-CCR1-006` | P3 | **Open; no artifact rewrite authorized. Evidence corrected and widened 2026-09-02, section 34** | Blueprint physical pages 1, 25 and 27 | Re-measured from the 29-page v2.2 text on 2026-09-02. The malformed 63-character source pin is present on physical pages 1 and 25, confirming that half of the original finding. Two corrections. First, page 25 does name `trading_agent_TargetPriceRevision`, but calling that directory *nonexistent* was wrong: it exists and is the worktree Git registers for this branch (`TPR-CR4-002`). Second, and not previously recorded, physical page 27 states that the canonical worktree is `C:\git\customizedagent\trading_agent_target_price`, so the governing artifact now pins the very path the owner directed the lane to stop pinning. Correcting the Markdown does not close the artifact instances. Regenerating the governing PDF changes its identity and must wait for the owner's storage/provenance decision. |
 
 ### 12.3 Independent verification and scope
 
@@ -2555,7 +2577,7 @@ closure, enforced by the closure test added in the previous round.
 
 | ID | Priority | Status | Location | Issue and impact | Evidence | Reason | Correction | Verification |
 |---|---|---|---|---|---|---|---|---|
-| `TPR-CR8-001` | P3 | **Open — owner/Codex decision required; deliberately not changed** | `research/target_price_revisions/preregistration.py` alpha cross-check (`allocated_alpha != assigned_alpha`) versus blueprint page 29, A27 | The loader enforces that the confirmatory allocations sum **exactly** to the lane's `assigned_family_alpha`, which the constant check pins to `0.0125`. A27 states the sum "must not exceed" `1/80` and that a slot is "a ceiling, not an entitlement to spend alpha", so a deliberately conservative under-allocation is normatively legitimate and would be refused by the loader. | The `allocated_alpha > within_lane_ceiling` test is subsumed by the later `allocated_alpha != assigned_alpha` test, making equality the effective rule. Verified by reading both conditions on the current tree. | The code is **stricter** than the normative document, so there is no safety hole and nothing is blocked today under the one-cell, one-look design. It is recorded because the review brief asks for requirements implemented differently from the PDF. | **None applied.** Relaxing equality to `≤` would loosen a multiplicity control, which a reviewer must not do unilaterally; amending the PDF to match the code is likewise not a reviewer's act. The exact question is in 28.7. | Not applicable — no change made. The divergence is reproducible by reading the two conditions. |
+| `TPR-CR8-001` | P3 | **Closed by the alpha relaxation; verified 2026-09-02 in section 34** | `research/target_price_revisions/preregistration.py` alpha cross-check (`allocated_alpha != assigned_alpha`) versus blueprint page 29, A27 | The loader enforces that the confirmatory allocations sum **exactly** to the lane's `assigned_family_alpha`, which the constant check pins to `0.0125`. A27 states the sum "must not exceed" `1/80` and that a slot is "a ceiling, not an entitlement to spend alpha", so a deliberately conservative under-allocation is normatively legitimate and would be refused by the loader. | The `allocated_alpha > within_lane_ceiling` test is subsumed by the later `allocated_alpha != assigned_alpha` test, making equality the effective rule. Verified by reading both conditions on the current tree. | The code is **stricter** than the normative document, so there is no safety hole and nothing is blocked today under the one-cell, one-look design. It is recorded because the review brief asks for requirements implemented differently from the PDF. | **None applied.** Relaxing equality to `≤` would loosen a multiplicity control, which a reviewer must not do unilaterally; amending the PDF to match the code is likewise not a reviewer's act. The exact question is in 28.7. | Not applicable — no change made. The divergence is reproducible by reading the two conditions. |
 
 ### 28.6 Traceability spot-checks against the PDF
 
@@ -3127,7 +3149,7 @@ document divergence and fix the code. That misclassification cost a round.
 | ID | Priority | Status | Location | Issue and impact | Evidence | Reason | Correction | Verification |
 |---|---|---|---|---|---|---|---|---|
 | `TPR-CR11-001` | P3 | Closed | `1ff76faa`; section 32 ledger and commit message; `tests/target_price_revisions/test_preregistration.py` | The record states `preregistration.py` "now permits a positive conservative allocation below the permanent cap". That holds for `_validate_dates_and_alpha` in isolation but **not through the public loader**: `load_algorithm_candidate` still refuses an under-cap candidate because every cell value must equal the frozen `_EXPECTED_VALUES` while TPR-0A is frozen. The new regression calls the private validator directly and never composes the public path, so it cannot observe the difference. A later round could read the relaxation as end-to-end support and omit the matching `_EXPECTED_VALUES` amendment. | A rehashed under-cap candidate (`0.01` across allocation, structural binding and acceptance) refuses through `load_algorithm_candidate` with `family_multiplicity changed the frozen TPR-0A policy`, while `_validate_dates_and_alpha` accepts the same cells. No test calls `load_algorithm_candidate` on an under-cap candidate. | The refusal the record implies is removed is still there on the path the lane actually uses. Both facts are true and only one is written down; the freezing behaviour is correct and should be pinned rather than left to inference. | Added `test_under_cap_allocation_still_refuses_through_the_public_loader`, asserting the composed-path refusal *and* the isolated-validator acceptance in one test, so the two layers stay distinguishable. Section 33.5 records the precise scope of the relaxation. | Mutation: restoring the removed equality condition turns the test red (the isolated half breaks); byte-identical restore returns it green. Removing the aggregate ceiling refusal leaves it green, correctly — overspend is covered by the counter-review's own regression, not this one. |
-| `TPR-CR11-002` | P3 | **Open — disputed, evidence below** | `TPR-CCR9-008` | The finding states the prior limitation was wrong because "the bundled executable existed". A renderer cannot be located from either interpreter available in this checkout, so the correction as written is not reproducible. | `command -v` finds `pdftotext` at `/mingw64/bin/pdftotext` but reports `pdftoppm`, `pdfinfo` and `pdftocairo` missing. `Program Files/Git/mingw64/bin` and `Git/usr/bin` contain only `pdftotext.exe`. A search of the Python install roots, `/mingw64`, `/usr` and the `trading_agent/.venv` tree finds no `pdftoppm` or `pdftocairo`. Neither this session's Python 3.14.6 nor `.venv` Python 3.12.13 can import `fitz`, `pypdfium2`, `pdf2image` or `pdfplumber`. | An environment claim that cannot be reproduced should not silently replace a limitation in the durable record; if a renderer does exist, its exact path belongs in the record so any later round can use it. | **Not corrected either way.** The fair part of `TPR-CCR9-008` is accepted: the prior wording asserted a host-wide absence when what had been verified was absence from this session's PATH and tooling. Section 33.6 restates the limitation in those precise terms. The claim that the executable existed is left open pending an exact path. | Search commands and their results are reproduced above; no code or document assertion about renderer availability is changed beyond the precision fix. |
+| `TPR-CR11-002` | P3 | **Closed 2026-09-02; both claims were host-scoped, see section 34** | `TPR-CCR9-008` | The finding states the prior limitation was wrong because "the bundled executable existed". A renderer cannot be located from either interpreter available in this checkout, so the correction as written is not reproducible. | `command -v` finds `pdftotext` at `/mingw64/bin/pdftotext` but reports `pdftoppm`, `pdfinfo` and `pdftocairo` missing. `Program Files/Git/mingw64/bin` and `Git/usr/bin` contain only `pdftotext.exe`. A search of the Python install roots, `/mingw64`, `/usr` and the `trading_agent/.venv` tree finds no `pdftoppm` or `pdftocairo`. Neither this session's Python 3.14.6 nor `.venv` Python 3.12.13 can import `fitz`, `pypdfium2`, `pdf2image` or `pdfplumber`. | An environment claim that cannot be reproduced should not silently replace a limitation in the durable record; if a renderer does exist, its exact path belongs in the record so any later round can use it. | **Not corrected either way.** The fair part of `TPR-CCR9-008` is accepted: the prior wording asserted a host-wide absence when what had been verified was absence from this session's PATH and tooling. Section 33.6 restates the limitation in those precise terms. The claim that the executable existed is left open pending an exact path. | Search commands and their results are reproduced above; no code or document assertion about renderer availability is changed beyond the precision fix. |
 
 ### 33.5 Precise scope of the alpha relaxation
 
@@ -3205,3 +3227,167 @@ scripts signals strategies tests baskets.py config.py market_analytics.py`.
 
 The complete-suite result for the exact committed correction tree is recorded
 in the validation row that follows this section.
+
+## 34. Claude lane-issue closure round - 2026-09-02
+
+**Owner request: fix the lane-specific unresolved issues.** A census of every
+finding row in this record found 109 rows, all with unique identifiers, of
+which 8 were still marked open. Four were actionable in lane and are handled
+here. Five need an owner decision, an owner-authorized artifact rewrite, or an
+authorized implementation milestone, and were deliberately left open rather
+than closed by a reviewer acting alone.
+
+Three of the four turned out to be **stale rather than unresolved**: the work
+that closes them had already landed in earlier rounds and nothing updated the
+status cell. That is the same contradictory-current-state defect as
+`TPR-CCR4-001` and `TPR-CR4-002`, so this round also adds the structural fix in
+34.5 rather than only correcting the three instances.
+
+### 34.1 `TPR-CR1-001` (P2) - closed, verified
+
+The finding was that the blueprint was stored as a Git *text* blob, with three
+consequences: a damaged working PDF with a broken xref table, a pinned SHA-256
+that could not be reproduced from a checkout, and a permanently red
+`git diff --check`. The owner-approved repository fix under `TPR-OOL-001-R1`
+landed, and all three consequences are measurably gone on this host:
+
+- hashing the checked-out file gives
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`, exactly
+  the pinned digest, so the artifact is content-addressable from a checkout;
+- `git check-attr` resolves `binary: set` with `diff`, `merge` and `text` all
+  unset; and
+- `git diff --check 086b782..HEAD` is clean, so the mandated section 10 check
+  is no longer permanently red.
+
+The PDF also parses: text extraction returns its title page rather than an
+xref error. The owner decision this row was waiting for was given and applied
+under `TPR-OOL-001-R1`; only the status cell was left behind.
+
+### 34.2 `TPR-CR8-001` (P3) - closed, verified
+
+The finding was that the loader required confirmatory allocations to equal the
+lane's assigned alpha exactly, which is stricter than A27's "must not exceed"
+and would refuse a deliberately conservative under-allocation. The equality
+condition is gone from the current tree: the enforcement is now
+`allocated_alpha > within_lane_ceiling`, a ceiling rather than an entitlement,
+and the structural-binding and acceptance alphas are required to equal the
+*allocated* total rather than the assigned slot. Section 8 already recorded
+this closure; the row did not.
+
+### 34.3 `TPR-CR11-002` (P3) - closed; both sides were host-scoped
+
+The dispute was whether a PDF renderer exists on the host. It resolves without
+either side being wrong, because the two roles measured different machines,
+which is exactly the class `TPR-CR4-002` established for paths.
+
+Measured here on 2026-09-02: the `pdftotext` that Git for Windows bundles is
+**Xpdf 4.06 (Glyph & Cog)**, not poppler. Xpdf ships that one binary, so no
+`pdftoppm`, `pdftocairo` or `pdfinfo` accompanies it; the Git installation
+contains exactly one `pdf*` executable and no poppler DLL. No Ghostscript,
+`mutool`, or ImageMagick is present, and the lane venv has no `fitz`,
+`pypdfium2`, `pdf2image` or `pdfplumber`. Pillow 12.3.0 is installed but
+cannot rasterize PDF without an external renderer.
+
+So `TPR-CCR9-008` is right that a bundled executable exists, and the earlier
+limitation is right that no renderer is reachable here: the bundled binary
+extracts text and cannot render pages. Both statements are true of their own
+host and neither is true universally. The durable rule is the one the owner
+already endorsed for worktrees: renderer-dependent evidence must name the host
+and tool that produced it, never assert a host-wide fact. Page-render evidence
+recorded by a role on another machine stays that role's evidence and is not
+reproducible here; text-extraction evidence is reproducible on both.
+
+### 34.4 `TPR-CCR1-006` (P3) - stays open, evidence corrected and widened
+
+Re-measured from the 29-page v2.2 blueprint text. One sub-claim confirmed, one
+corrected, one previously unrecorded instance added:
+
+- **Confirmed.** The malformed 63-character source pin is on physical pages 1
+  and 25. It is 63 hex characters where a SHA-256 needs 64.
+- **Corrected.** Page 25 does name `trading_agent_TargetPriceRevision`, but
+  the row called that directory *nonexistent*. It exists, and is the worktree
+  Git registers for this branch. That was the inverted premise
+  `TPR-CR4-002` closed.
+- **Added.** Physical page 27 states that the canonical worktree is
+  `C:\git\customizedagent\trading_agent_target_price`. The governing artifact therefore pins the
+  exact path the owner directed this lane to stop pinning, and it is the one
+  remaining place where the superseded pin is still normative.
+
+The disposition is unchanged: regenerating the PDF changes the identity of a
+content-addressed governing artifact and needs the owner's storage/provenance
+decision. Correcting the Markdown does not close an artifact instance. What
+changed is that the row now describes the artifact accurately, so the owner's
+eventual decision is made against real evidence.
+
+### 34.5 Structural fix: the open-issue register
+
+Three stale rows in one census is a detection failure, not three accidents. A
+status cell is prose inside a table nobody re-reads, and nothing bound it to
+the record's current-state narrative.
+
+Section 8 now carries an **open-issue register**: every open lane finding, and
+nothing else, with its priority, what it blocks, and why it cannot be closed
+in lane. `test_open_issue_register_matches_every_issue_row` parses every
+finding row outside the register, derives the open set, and requires the two
+to agree in both directions. Closing a row without delisting it fails;
+delisting a finding whose row is still open fails; reopening a row without
+listing it fails; and a register entry with an empty reason fails. The guard
+also asserts that identifiers are unique, so a finding's status cannot fork
+across two rows, and refuses to run on fewer than 50 parsed rows so that a
+change to the row shape fails loudly instead of quietly covering nothing.
+
+Out-of-lane findings stay in section 9 and are excluded by construction: their
+third column is an area rather than a status, so none of them can ever satisfy
+the open test.
+
+### 34.6 What was deliberately not done
+
+`TPR-CCR1-004`, `TPR-CCR1-005`, `TPR-CCR2-011`, `TPR-CCR5-004` and
+`TPR-CCR1-006` remain open. Closing them would mean choosing owner freezes,
+regenerating a governing artifact, or implementing and provisioning the
+TPR-TR0 trust root, none of which is a reviewer's act and none of which is
+authorized. They are now listed in one place with the reason each is stuck, so
+the owner can act on them without re-deriving the state. No out-of-lane
+finding was fixed, no milestone was implemented, and no authority changed.
+
+### 34.7 Validation
+
+- Lane plus shared document suites: **201 passed, 3 skipped in 24.14s**.
+- Complete suite on the exact final code tree: **6,797 passed, 4 failed, 13
+  skipped, 25 warnings in 2,738.66s**. This run is recorded **red**, not
+  called green, and every failure is accounted for below. None is caused by
+  this round: the only files it changes are this record and the target
+  documentation guard.
+- Three failures are `TPR-OOL-009`, the known date-triggered clock mismatch
+  in `tests/test_sleeve_report.py`. They reproduce standalone (**3 failed, 53
+  passed**), which confirms the recorded diagnosis rather than a flake. The
+  finding widens with the calendar and is out of lane.
+- The fourth was `TPR-OOL-008` recurring:
+  `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` failed
+  because three analyst-lane spec artifacts sat in this worktree with CRLF
+  bytes against LF blobs. That is stale checkout state, not repository
+  content: `git status` was clean because the stat cache hid it. The test
+  stops at the first offender, so a repo-wide sweep was run instead: of 909
+  tracked files, 18 require exact bytes and 3 were stale. Restoring each from
+  its committed blob left **0 stale** and turned the module green (**39
+  passed**), changing no committed content. The underlying attribute
+  difference stays out of lane under `TPR-OOL-008`.
+- Because the repair altered only the working tree, the complete run above
+  did validate the exact committed tree; no second complete run was made, and
+  the two affected modules were re-run directly instead.
+- `compileall -q` over `assistant backtest data execution ml research risk
+  scripts signals strategies tests baskets.py config.py market_analytics.py`
+  exited 0, and `git diff --check` is clean.
+- Mutations on the new guard, each applied and reverted with a byte-identical
+  restore: closing a listed row, delisting a still-open finding, reopening an
+  unlisted row, and emptying a register reason all turned it **red**; the
+  baseline and every restore were **green**.
+- The three closures were verified against the tree rather than the narrative:
+  the blueprint digest, Git attributes, `git diff --check` and text extraction
+  for 34.1; the two surviving alpha conditions read directly for 34.2; and the
+  renderer census reproduced above for 34.3.
+
+No provider, credential, licensed row, outcome, evidence-epoch, QuantConnect,
+broker, operator-database, scheduler, paper or live surface was accessed or
+changed. Provider accesses: **0**. Outcome accesses: **0**. Authorized or spent
+research looks: **0**.

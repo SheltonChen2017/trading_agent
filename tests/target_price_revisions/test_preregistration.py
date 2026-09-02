@@ -984,3 +984,46 @@ def test_candidate_type_itself_never_authenticates_as_reviewed() -> None:
     assert type(candidate) is AlgorithmCandidate
     with pytest.raises(PreregistrationError, match="loader-authenticated"):
         require_reviewed_algorithm_spec(candidate)
+
+
+def test_under_cap_allocation_still_refuses_through_the_public_loader(
+    tmp_path: Path,
+) -> None:
+    """TPR-CR11-001. The alpha relaxation does not reach the composed path.
+
+    `_validate_dates_and_alpha` now accepts a conservative under-cap
+    allocation, which matches A27. The public loader still refuses one,
+    because every cell value must equal the frozen `_EXPECTED_VALUES` while
+    TPR-0A is frozen. That is correct and intended, but it means the recorded
+    claim that the module "permits a positive conservative allocation below
+    the permanent cap" holds only for the private validator, not end to end.
+
+    Pinned here so a future round does not read the relaxation as end-to-end
+    support and omit the matching `_EXPECTED_VALUES` amendment. A future
+    under-allocation needs a new frozen candidate *and* an updated expectation;
+    this test turns red at exactly that point, which is when the claim becomes
+    true and this expectation should be revisited.
+    """
+    raw = _raw_candidate()
+    for alpha_path in (
+        lambda r: _cell(r, "family_multiplicity")["value"][
+            "confirmatory_alpha_allocations"
+        ][0].__setitem__("two_sided_alpha", "0.01"),
+        lambda r: _cell(r, "empirical_binding_contract")["value"].__setitem__(
+            "assigned_alpha", "0.01"
+        ),
+        lambda r: _cell(r, "trial_and_null_contract")["value"][
+            "primary_acceptance_contract"
+        ].__setitem__("two_sided_alpha", "0.01"),
+    ):
+        alpha_path(raw)
+    _rehash(raw)
+
+    with pytest.raises(PreregistrationError, match="frozen TPR-0A policy"):
+        load_algorithm_candidate(_write(tmp_path, raw))
+
+    # The isolated validator accepts the same allocation, so the refusal above
+    # is the frozen-policy pin and not the alpha rule.
+    preregistration._validate_dates_and_alpha(
+        _cells_with_confirmatory_alpha("0.01")
+    )

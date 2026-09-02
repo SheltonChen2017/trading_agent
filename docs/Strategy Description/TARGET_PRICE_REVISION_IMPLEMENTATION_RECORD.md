@@ -525,6 +525,7 @@ known.
 | 2026-09-01 | Claude whole-lane completion | `bb20e8d057ecd976b4ddfbd558ec38d31b02d54e` -> record candidate | Closes the coverage sections 28 and 29 each left short | Read the `_EXPECTED_VALUES` policy literal in full, the remaining `test_preregistration.py` blocks, `AGENTS.md`, the review-process steps 3/5/9, every current TPR statement in both shared documents, and ran a record-wide contradiction scan. Found and corrected a session-ledger row that had lost its entire validation column. | Record-wide scan: no malformed digest pin, no unresolved current identifier-status contradiction, no superseded identity in section 8's current block, out-of-lane rows all five columns, session-ledger rows all nine after the fix. Two mutations on the new ledger guard each turned it red with byte-identical restore. Focused and complete-suite results are in section 31.4 and the following validation row. Real artifacts verified byte-pristine after a full suite run. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface; **0 research looks**. | Module accepted. No P0/P1/P2. `TPR-CR10-001` (P3) found and closed. `TPR-CR8-001` remains the one open owner question. No defect found in any newly read region. | None; all authority remains zero and no milestone beyond TPR-0A is complete. | Owner answers `TPR-CR8-001` in 28.7; Codex counter-reviews this round. |
 | 2026-09-01 | Claude validation | `4ab5f418` -> `4ab5f418` (exact tested tree; this validation-record commit follows) | Whole-lane completion validation | Recorded the complete-suite, focused, compile and hygiene evidence for the line-level completion passes. | Complete suite **6,796 passed, 13 skipped, 2 failed, 25 warnings in 1,144.24s**; the two failures are the documented out-of-lane `TPR-OOL-009` cases and no TPR test fails. Focused lane and shared documentation suites **198 passed, 3 skipped**; `compileall` exit 0; `git diff --check` clean. Python 3.14.6, pytest 9.1.1. No signing key, trust file, registry entry, provider row, outcome, QC, broker or order surface; **0 research looks**. | No new finding. `TPR-CR8-001` remains the one open owner question; `TPR-CCR5-004`, `TPR-CCR2-011`, `TPR-OOL-006`, `TPR-OOL-009` and `TPR-OOL-010` remain open and owner-routed. | None; TPR-0A remains the only frozen phase and no milestone beyond it is complete. | Owner answers `TPR-CR8-001` in 28.7; Codex counter-reviews this round. |
 | 2026-09-01 | Codex counter-review / correction validation | `45f45aa36f6493d8bd9669bcdba48d08d8c9c57e` -> `1ff76faa39f47de4899dcace937398b2718f4c3a` exact tested correction tree; this evidence-record commit follows | Counter-review all six Claude whole-lane review commits; no new milestone | Recorded every commit disposition. Closed the already-decided under-allocation contract defect, advanced all current workflow pointers, bounded the session-ledger guard, and corrected review-evidence claims. The frozen candidate and authority artifacts are unchanged. | Exact correction tree: lane/shared-document suites **199 passed, 3 skipped in 14.42s**; complete suite **6,797 passed, 13 skipped, 2 failed, 25 warnings in 1,179.25s**, with both failures exactly out-of-lane `TPR-OOL-009` and no TPR failure; `compileall -q .` exit 0; diff/status clean; PDF and candidate hashes exact; **0 research looks**. | No P0/P1. `TPR-CCR9-001` through `010` are closed or qualified in section 32. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1, and TPR-0B remain blocked. | None. No source, outcome, look, QC, broker, paper/live, capital, or trading authority. | Commit this record-only evidence, run the focused guards/diff/status on the exact final tip, make the round's one combined push, then Claude reviews the new Codex range beginning after `45f45aa3`. |
+| 2026-09-01 | Claude review | `45f45aa36f6493d8bd9669bcdba48d08d8c9c57e` -> `a63335d38bfd6dd3b584d7a91ba0b454e97a6df4` reviewed; corrections on this same lane branch | Independent review of the Codex whole-lane counter-review round; no milestone in range | Reviewed both pushed commits individually and the cumulative tree. Accepted nine of ten counter-review findings, including `TPR-CCR9-001`: the prior `TPR-CR8-001` was a misclassification, since A27 already fixes `1/80` as a ceiling rather than an entitlement. Disputed `TPR-CCR9-008` with search evidence. Added a composed-path regression pinning what the alpha relaxation does and does not reach. | Adversarial probe with `spec_hash` re-derived across seven alpha cases: over-cap, two-look overspend, disagreeing structural-binding and acceptance alpha, and zero allocation all refuse; the full-cap candidate loads. An under-cap candidate is refused by the frozen-policy pin while the isolated validator accepts it, which is `TPR-CR11-001`. Artifact and PDF hashes unchanged. Mutation on the new test: restoring the removed equality condition turns it red, byte-identical restore returns it green. Focused and complete-suite results in 33.9. No provider, credential, licensed row, outcome, QC, broker, scheduler, paper or live access; **0 research looks**. | Both commits accepted after correction or accepted. No P0/P1/P2. `TPR-CR11-001` (P3) closed; `TPR-CR11-002` (P3) open and disputed. Counter-reviewed round quality **8/10**. Details in section 33. | None; all authority remains zero and no milestone beyond TPR-0A is complete. | Codex counter-reviews this round. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked; `TPR-CR11-002` needs an exact renderer path or withdrawal. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -3069,3 +3070,114 @@ The evidence-only record commit that contains this subsection is not described
 as the full-suite tree. After it is committed, the focused lane/shared-document
 suite, `git diff --check`, and clean status are rerun on that exact final tip
 before the round's one push.
+
+## 33. Claude independent review - 2026-09-01 (Codex whole-lane counter-review round)
+
+**Disposition: both commits accepted after correction.** No P0, P1 or P2. Nine
+of the ten counter-review findings against the prior Claude rounds are
+confirmed and accepted, including the one that matters most: `TPR-CR8-001` was
+a misclassification by this reviewer. One finding (`TPR-CCR9-008`) is **not
+reproducible** and is disputed with evidence. Two new P3s are recorded, one
+corrected here.
+
+**Counter-reviewed round quality: 8/10.** The alpha correction is right in
+direction and the evidence discipline is good. Two deductions: the recorded
+claim about what the alpha change permits is broader than what the code does
+end to end (`TPR-CR11-001`), and `TPR-CCR9-008` asserts an environment fact
+that cannot be reproduced from either interpreter in this checkout
+(`TPR-CR11-002`).
+
+### 33.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Reviewed range | `45f45aa36f6493d8bd9669bcdba48d08d8c9c57e..a63335d38bfd6dd3b584d7a91ba0b454e97a6df4` |
+| Commits | `1ff76faa`, `a63335d3` |
+| Ancestry | `45f45aa3` still an ancestor; no history rewrite |
+| Worktree | the checkout `git worktree list` registers for the lane branch; no branch or worktree created, switched, merged, rebased or forked |
+| Artifacts | candidate `17a2a902…`, registry `ea53315f…`, source authority `9d926482…`, look authority `0354c96d…` — all unchanged |
+| Milestone | none implemented; `research/` change is one validation condition, not new milestone code |
+
+### 33.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `1ff76faa` | **accepted after correction** | Counter-review, the alpha-rule relaxation, the bounded ledger guard and the pointer advance. Carries `TPR-CR11-001` and `TPR-CR11-002`. |
+| `a63335d3` | **accepted** | Record-only validation. Counts reconcile against this reviewer's independent runs. No issue found. |
+
+### 33.3 The central correction: `TPR-CR8-001` was mine, and it was wrong
+
+`TPR-CCR9-001` is **confirmed**. Blueprint A27 already settles the question:
+"a ceiling, not an entitlement to spend alpha", and "their sum must not exceed
+1/80". The loader's equality-to-cap condition therefore contradicted a frozen
+normative rule — a code defect against a decided contract, not an open owner
+choice.
+
+The prior review framed it as "either the loader relaxes to `≤` or the
+blueprint is amended; both are owner decisions". That was a false alternative:
+amending the blueprint was never available, because the blueprint already said
+the right thing. Declining to act on the ground that a change "loosens a
+control" was misplaced when the control was stricter than the governing
+document it implements. The correct reviewer action was to state the code/
+document divergence and fix the code. That misclassification cost a round.
+
+### 33.4 P0-P3 ledger
+
+| ID | Priority | Status | Location | Issue and impact | Evidence | Reason | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|
+| `TPR-CR11-001` | P3 | Closed | `1ff76faa`; section 32 ledger and commit message; `tests/target_price_revisions/test_preregistration.py` | The record states `preregistration.py` "now permits a positive conservative allocation below the permanent cap". That holds for `_validate_dates_and_alpha` in isolation but **not through the public loader**: `load_algorithm_candidate` still refuses an under-cap candidate because every cell value must equal the frozen `_EXPECTED_VALUES` while TPR-0A is frozen. The new regression calls the private validator directly and never composes the public path, so it cannot observe the difference. A later round could read the relaxation as end-to-end support and omit the matching `_EXPECTED_VALUES` amendment. | A rehashed under-cap candidate (`0.01` across allocation, structural binding and acceptance) refuses through `load_algorithm_candidate` with `family_multiplicity changed the frozen TPR-0A policy`, while `_validate_dates_and_alpha` accepts the same cells. No test calls `load_algorithm_candidate` on an under-cap candidate. | The refusal the record implies is removed is still there on the path the lane actually uses. Both facts are true and only one is written down; the freezing behaviour is correct and should be pinned rather than left to inference. | Added `test_under_cap_allocation_still_refuses_through_the_public_loader`, asserting the composed-path refusal *and* the isolated-validator acceptance in one test, so the two layers stay distinguishable. Section 33.5 records the precise scope of the relaxation. | Mutation: restoring the removed equality condition turns the test red (the isolated half breaks); byte-identical restore returns it green. Removing the aggregate ceiling refusal leaves it green, correctly — overspend is covered by the counter-review's own regression, not this one. |
+| `TPR-CR11-002` | P3 | **Open — disputed, evidence below** | `TPR-CCR9-008` | The finding states the prior limitation was wrong because "the bundled executable existed". A renderer cannot be located from either interpreter available in this checkout, so the correction as written is not reproducible. | `command -v` finds `pdftotext` at `/mingw64/bin/pdftotext` but reports `pdftoppm`, `pdfinfo` and `pdftocairo` missing. `Program Files/Git/mingw64/bin` and `Git/usr/bin` contain only `pdftotext.exe`. A search of the Python install roots, `/mingw64`, `/usr` and the `trading_agent/.venv` tree finds no `pdftoppm` or `pdftocairo`. Neither this session's Python 3.14.6 nor `.venv` Python 3.12.13 can import `fitz`, `pypdfium2`, `pdf2image` or `pdfplumber`. | An environment claim that cannot be reproduced should not silently replace a limitation in the durable record; if a renderer does exist, its exact path belongs in the record so any later round can use it. | **Not corrected either way.** The fair part of `TPR-CCR9-008` is accepted: the prior wording asserted a host-wide absence when what had been verified was absence from this session's PATH and tooling. Section 33.6 restates the limitation in those precise terms. The claim that the executable existed is left open pending an exact path. | Search commands and their results are reproduced above; no code or document assertion about renderer availability is changed beyond the precision fix. |
+
+### 33.5 Precise scope of the alpha relaxation
+
+Verified by adversarial probe with `spec_hash` re-derived so the hash check
+cannot mask the semantic layer:
+
+| Case | Result |
+|---|---|
+| Full-cap `0.0125` (the frozen candidate) | accepted |
+| Over-cap single allocation `0.0126` | refused |
+| Two looks overspending (`0.0125 + 0.0125`) | refused |
+| Under-cap with structural-binding alpha disagreeing | refused |
+| Under-cap with acceptance alpha disagreeing | refused |
+| Zero (non-positive) allocation | refused |
+| **Under-cap `0.01`, all three values agreeing** | **refused by the frozen-policy pin, accepted by the alpha validator** |
+
+The aggregate ceiling, per-allocation positivity, inventory coverage and the
+three-way alpha agreement all survive the change. The relaxation is real but
+scoped to the alpha validator; TPR-0A's content freeze governs the composed
+path, by design.
+
+### 33.6 Restated renderer limitation
+
+The blueprint is read as its complete extracted text layer. No PDF **renderer**
+is reachable from this session: `pdftoppm`, `pdftocairo` and `pdfinfo` are
+absent from PATH and from the Git-bundled `mingw64`/`usr` bin directories, and
+no Python rendering package is importable from either interpreter in this
+checkout. `pdftotext` is present and is what every text read in this lane has
+used. Whether a renderer exists elsewhere on the machine is unresolved —
+see `TPR-CR11-002`.
+
+### 33.7 Counter-review findings against the prior Claude rounds
+
+| Finding | Assessment |
+|---|---|
+| `TPR-CCR9-001` | **Confirmed.** See 33.3. |
+| `TPR-CCR9-002` | **Confirmed.** Sections were appended while every current pointer still routed the whole-lane audit as the next action. |
+| `TPR-CCR9-003` | **Confirmed.** Four commits sit above `5b84a728` (`d99089b0`, `9269339e`, `09aafaff`, `bb20e8d0`); the record said five. |
+| `TPR-CCR9-004` | **Accepted as qualification.** The compile command was described as exact without preserving its literal path arguments. |
+| `TPR-CCR9-005` | **Confirmed.** A ledger row pointed to a section 30.6 that does not exist. |
+| `TPR-CCR9-006` | **Confirmed.** "No identifier recorded both open and closed" is not a meaningful invariant over an append-only history, and the line-count measurement was stale when written. |
+| `TPR-CCR9-007` | **Confirmed.** The session-ledger width guard scanned every date-led row in the record; bounding it to section 10 is correct and strictly better. |
+| `TPR-CCR9-008` | **Partially accepted; disputed.** See `TPR-CR11-002`. |
+| `TPR-CCR9-009` | **Confirmed.** `init=False` removes `__init__` only; `object.__new__` still produces an unauthenticated shape, as this lane's own forgery tests rely on. The prior wording overstated the guarantee. |
+| `TPR-CCR9-010` | **Confirmed.** The final validation commit was again not the exact tested tree. |
+
+### 33.8 Authority state
+
+Unchanged and zero. No signing key, trust file, registry entry, provider row,
+source request, outcome, research look, QuantConnect job, broker action,
+paper/live deployment or capital authority exists or was created. The reviewed
+registry is empty and both authority declarations remain exact zero-access
+artifacts. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked. No
+milestone was implemented and none is authorized.

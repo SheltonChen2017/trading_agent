@@ -1038,8 +1038,13 @@ def _read_regular_bytes(
             raw = handle.read(max_bytes + 1)
             after_read = os.fstat(handle.fileno())
         after_path = path.lstat()
-        if not _same_file_version(opened, after_read) or not _same_file_version(
-            after_read, after_path
+        if (
+            not _same_file_version(opened, after_read)
+            or not _same_file_version(after_read, after_path)
+            or (
+                require_single_link
+                and (after_read.st_nlink != 1 or after_path.st_nlink != 1)
+            )
         ):
             raise SecBulkParsedSnapshotError(
                 f"REFUSED: {label} changed while it was read"
@@ -1073,10 +1078,19 @@ def _canonical_object(raw: bytes, *, label: str) -> dict[str, object]:
 
 
 def _read_canonical_object(
-    path: Path, *, label: str, max_bytes: int
+    path: Path,
+    *,
+    label: str,
+    max_bytes: int,
+    require_single_link: bool = False,
 ) -> dict[str, object]:
     return _canonical_object(
-        _read_regular_bytes(path, label=label, max_bytes=max_bytes),
+        _read_regular_bytes(
+            path,
+            label=label,
+            max_bytes=max_bytes,
+            require_single_link=require_single_link,
+        ),
         label=label,
     )
 
@@ -1639,6 +1653,7 @@ def _load_self_consistent_sec_bulk_parsed_snapshot(
         directory / _COMMIT_NAME,
         label="parsed commit marker",
         max_bytes=MAX_PARSED_COMMIT_BYTES,
+        require_single_link=True,
     )
     if set(commit) != {"kind", "snapshot_id", "members"}:
         raise SecBulkParsedSnapshotError(

@@ -133,6 +133,7 @@ def test_lane_package_has_no_provider_outcome_or_authority_imports():
         "__future__",
         "bisect",
         "collections",
+        "copy",
         "dataclasses",
         "datetime",
         "decimal",

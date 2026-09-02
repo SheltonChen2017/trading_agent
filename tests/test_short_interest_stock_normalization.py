@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+from copy import deepcopy
 from dataclasses import dataclass, replace
 from functools import lru_cache
 from fractions import Fraction
@@ -43,6 +44,14 @@ from research.short_interest_etf.stock_normalization import (
     StockScoreModel,
     build_pit_stock_normalized_scores,
     require_stock_normalization_policy,
+)
+from research.short_interest_etf.stock_score_batch import (
+    STOCK_SCORE_BATCH_AUTHORITY,
+    STOCK_SCORE_BATCH_SCHEMA_VERSION,
+    StockScoreBatchEnvelope,
+    StockScoreBatchError,
+    build_stock_score_batch_envelope,
+    verify_stock_score_batch_payload,
 )
 
 
@@ -273,6 +282,11 @@ def _scores(
 
 
 @lru_cache(maxsize=None)
+def _single_sector_scores(count: int) -> tuple[StockScoreDisposition, ...]:
+    return _scores(_single_sector_specs(count))
+
+
+@lru_cache(maxsize=None)
 def _raw_batch_with_two_release_keys_for_one_settlement():
     raw = _raw_batch(_base_specs())
     source_context = raw[0].source_context
@@ -406,6 +420,46 @@ def _scale_metrics(
         canonical_payload_bytes=len(canonical_json(payloads).encode("utf-8")),
         payload_sha256=hash_payload(payloads),
     )
+
+
+def _compact_witness_count(payload: dict) -> int:
+    return sum(
+        len(record["cohort"]["raw_disposition_inventory"])
+        for record in payload["cohorts"]
+    ) + sum(len(record["members"]) for record in payload["member_sets"])
+
+
+def _tamper_score_batch(payload: dict, case: str) -> dict:
+    tampered = deepcopy(payload)
+    if case == "unknown_envelope_field":
+        tampered["unexpected"] = True
+    elif case == "missing_cohort":
+        tampered["cohorts"].pop()
+        tampered["cohort_count"] -= 1
+    elif case == "substituted_member_reference":
+        outcome = tampered["rows"][0]["outcomes"][0]
+        original = outcome["sector_members_sha256"]
+        outcome["sector_members_sha256"] = next(
+            record["members_sha256"]
+            for record in tampered["member_sets"]
+            if record["members_sha256"] != original
+        )
+    elif case == "omitted_row":
+        tampered["rows"].pop()
+        tampered["row_count"] -= 1
+    elif case == "duplicate_member_record":
+        tampered["member_sets"].append(deepcopy(tampered["member_sets"][0]))
+        tampered["member_set_count"] += 1
+    elif case == "orphan_member_record":
+        members = [{"synthetic_orphan": True}]
+        tampered["member_sets"].append(
+            {"members": members, "members_sha256": hash_payload(members)}
+        )
+        tampered["member_sets"].sort(key=lambda item: item["members_sha256"])
+        tampered["member_set_count"] += 1
+    else:
+        raise AssertionError(f"unknown tamper case: {case}")
+    return tampered
 
 
 def test_policy_v1_is_exact_hash_bound_without_changing_preregistration():
@@ -1180,3 +1234,299 @@ def test_current_row_payload_scale_is_no_go_for_provider_scale():
         assert getattr(large, field) == 4 * getattr(small, field)
     assert large.unique_cohort_count == small.unique_cohort_count
     assert large.canonical_payload_bytes > 3 * small.canonical_payload_bytes
+
+
+@pytest.mark.parametrize(
+    ("count", "legacy_digest"),
+    [
+        (20, "efe0ef91822a20d3dda680269d792644157058a5a4e7660a7cf7143f3cbf1299"),
+        (40, "b4701c5040dbec2151adec42d1f9dca4436b6f900d9d8676be842faee0a2c9df"),
+    ],
+)
+def test_compact_score_batch_is_lossless_canonical_and_non_authoritative(
+    count,
+    legacy_digest,
+):
+    scores = _single_sector_scores(count)
+    envelope = build_stock_score_batch_envelope(scores)
+    payload = envelope.to_payload()
+    legacy_rows = tuple(item.to_payload() for item in scores)
+
+    assert type(envelope) is StockScoreBatchEnvelope
+    assert payload["schema_version"] == STOCK_SCORE_BATCH_SCHEMA_VERSION
+    assert payload["authority"] == STOCK_SCORE_BATCH_AUTHORITY
+    assert payload["production_authoritative"] is False
+    assert payload["normalization_policy_sha256"] == STOCK_NORMALIZATION_POLICY.sha256
+    assert payload["preregistration_sha256"] == (
+        STOCK_NORMALIZATION_POLICY.preregistration_sha256
+    )
+    assert payload["row_count"] == 2 * count
+    assert payload["cohort_count"] == 2
+    assert payload["canonical_row_list_sha256"] == legacy_digest
+    assert envelope.canonical_row_list_sha256 == legacy_digest
+    assert envelope.expanded_row_payloads() == legacy_rows
+    assert verify_stock_score_batch_payload(
+        payload,
+        dispositions=scores,
+    ) == legacy_rows
+    assert not _contains_float(payload)
+    assert any(
+        outcome["refusal_reasons"]
+        for row in legacy_rows
+        for outcome in row["outcomes"]
+    )
+    assert any(
+        not outcome["refusal_reasons"]
+        for row in legacy_rows
+        for outcome in row["outcomes"]
+    )
+    assert all(
+        "candidate_members" not in record["cohort"]
+        and "eligible_members" not in record["cohort"]
+        for record in payload["cohorts"]
+    )
+    assert all(
+        "sector_members" not in outcome
+        for row in payload["rows"]
+        for outcome in row["outcomes"]
+    )
+
+    before = envelope.sha256
+    payload["rows"][0]["current"]["refusal_reasons"].append("caller_mutation")
+    assert envelope.sha256 == before
+    assert "caller_mutation" not in envelope.to_payload()["rows"][0]["current"][
+        "refusal_reasons"
+    ]
+
+
+def test_compact_score_batch_is_input_order_independent_and_strictly_typed():
+    scores = _single_sector_scores(20)
+    expected = build_stock_score_batch_envelope(scores)
+    reordered = build_stock_score_batch_envelope(tuple(reversed(scores)))
+    assert reordered.to_payload() == expected.to_payload()
+    assert reordered.sha256 == expected.sha256
+
+    class TupleSubclass(tuple):
+        pass
+
+    class DispositionSubclass(StockScoreDisposition):
+        pass
+
+    forged = object.__new__(DispositionSubclass)
+    for field_name in scores[0].__dataclass_fields__:
+        object.__setattr__(forged, field_name, getattr(scores[0], field_name))
+
+    for invalid in (list(scores), TupleSubclass(scores), (forged,)):
+        with pytest.raises(StockScoreBatchError, match="exact tuple of exact"):
+            build_stock_score_batch_envelope(invalid)
+    with pytest.raises(StockScoreBatchError, match="cannot be empty"):
+        build_stock_score_batch_envelope(())
+    with pytest.raises(StockScoreBatchError, match="incomplete"):
+        build_stock_score_batch_envelope(scores[:-1])
+    with pytest.raises(StockScoreBatchError, match="duplicate disposition"):
+        build_stock_score_batch_envelope(scores + (scores[0],))
+
+    alternate_specs = tuple(
+        _Spec(
+            index=100 + index,
+            sector="TECHNOLOGY",
+            current_shares=200 + index,
+            prior_shares=230 - index,
+        )
+        for index in range(20)
+    )
+    alternate = _scores(alternate_specs)
+    with pytest.raises(StockScoreBatchError, match="mixes authenticated lineage"):
+        build_stock_score_batch_envelope(scores + alternate)
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "unknown_envelope_field",
+        "missing_cohort",
+        "substituted_member_reference",
+        "omitted_row",
+        "duplicate_member_record",
+        "orphan_member_record",
+    ],
+)
+def test_compact_score_batch_refuses_tampering(case):
+    scores = _single_sector_scores(20)
+    payload = build_stock_score_batch_envelope(scores).to_payload()
+    with pytest.raises(StockScoreBatchError):
+        verify_stock_score_batch_payload(
+            _tamper_score_batch(payload, case),
+            dispositions=scores,
+        )
+
+
+def test_compact_score_batch_refuses_subclassed_payload_containers():
+    scores = _single_sector_scores(20)
+    canonical = build_stock_score_batch_envelope(scores).to_payload()
+
+    class DictSubclass(dict):
+        pass
+
+    class ListSubclass(list):
+        pass
+
+    class StrSubclass(str):
+        pass
+
+    class IntSubclass(int):
+        pass
+
+    with pytest.raises(StockScoreBatchError, match="exact dict"):
+        verify_stock_score_batch_payload(
+            DictSubclass(canonical),
+            dispositions=scores,
+        )
+    payload = deepcopy(canonical)
+    payload["rows"] = ListSubclass(payload["rows"])
+    with pytest.raises(StockScoreBatchError, match="exact non-float JSON"):
+        verify_stock_score_batch_payload(payload, dispositions=scores)
+
+    nested_attacks = []
+    payload = deepcopy(canonical)
+    payload["schema_version"] = StrSubclass(payload["schema_version"])
+    nested_attacks.append(payload)
+    payload = deepcopy(canonical)
+    payload["rows"][0]["schema_version"] = StrSubclass(
+        payload["rows"][0]["schema_version"]
+    )
+    nested_attacks.append(payload)
+    payload = deepcopy(canonical)
+    payload["rows"][0]["current"]["refusal_reasons"] = ListSubclass(
+        payload["rows"][0]["current"]["refusal_reasons"]
+    )
+    nested_attacks.append(payload)
+    payload = deepcopy(canonical)
+    payload["rows"][0]["outcomes"][0]["authority"] = StrSubclass(
+        payload["rows"][0]["outcomes"][0]["authority"]
+    )
+    nested_attacks.append(payload)
+    payload = deepcopy(canonical)
+    payload["rows"][0]["outcomes"][0]["peer_count"] = IntSubclass(
+        payload["rows"][0]["outcomes"][0]["peer_count"]
+    )
+    nested_attacks.append(payload)
+    payload = deepcopy(canonical)
+    nonempty = next(
+        record for record in payload["member_sets"] if record["members"]
+    )
+    nonempty["members"][0] = DictSubclass(nonempty["members"][0])
+    nested_attacks.append(payload)
+    payload = deepcopy(canonical)
+    outcome = payload["rows"][0]["outcomes"][0]
+    authority = outcome.pop("authority")
+    outcome[StrSubclass("authority")] = authority
+    nested_attacks.append(payload)
+
+    for payload in nested_attacks:
+        with pytest.raises(
+            StockScoreBatchError,
+            match="exact non-float JSON|keys must be exact str",
+        ):
+            verify_stock_score_batch_payload(payload, dispositions=scores)
+
+
+def test_compact_score_batch_refuses_recursive_payload_containers():
+    scores = _single_sector_scores(20)
+    payload = build_stock_score_batch_envelope(scores).to_payload()
+    reasons = payload["rows"][0]["current"]["refusal_reasons"]
+    reasons.append(reasons)
+    with pytest.raises(StockScoreBatchError, match="recursive container"):
+        verify_stock_score_batch_payload(payload, dispositions=scores)
+
+
+def test_compact_score_batch_requires_the_exact_authenticated_rows():
+    scores = _single_sector_scores(20)
+    alternate = _single_sector_scores(40)
+    payload = build_stock_score_batch_envelope(alternate).to_payload()
+    with pytest.raises(StockScoreBatchError, match="authenticated dispositions"):
+        verify_stock_score_batch_payload(payload, dispositions=scores)
+
+
+def test_compact_score_batch_preserves_role_specific_multisector_witnesses():
+    scores = _scores()
+    envelope = build_stock_score_batch_envelope(scores)
+    payload = envelope.to_payload()
+    assert envelope.expanded_row_payloads() == tuple(
+        item.to_payload() for item in scores
+    )
+    assert payload["row_count"] == 80
+    assert payload["cohort_count"] == 2
+    assert payload["member_set_count"] == 4
+
+    member_sizes = {
+        record["members_sha256"]: len(record["members"])
+        for record in payload["member_sets"]
+    }
+    assert sorted(member_sizes.values()) == [0, 20, 20, 40]
+    cohorts = {
+        record["cohort_sha256"]: record["cohort"]
+        for record in payload["cohorts"]
+    }
+    scored_rows = [
+        row
+        for row in payload["rows"]
+        if all(outcome["score"] is not None for outcome in row["outcomes"])
+    ]
+    assert len(scored_rows) == 40
+    candidate_digests = {
+        cohorts[row["cohort_sha256"]]["candidate_members_sha256"]
+        for row in scored_rows
+    }
+    sector_digests = {
+        outcome["sector_members_sha256"]
+        for row in scored_rows
+        for outcome in row["outcomes"]
+    }
+    assert len(candidate_digests) == 1
+    assert {member_sizes[digest] for digest in candidate_digests} == {40}
+    assert len(sector_digests) == 2
+    assert {member_sizes[digest] for digest in sector_digests} == {20}
+    assert candidate_digests.isdisjoint(sector_digests)
+
+
+def test_compact_score_batch_stores_repeated_witnesses_linearly():
+    samples = {}
+    for count in (20, 40):
+        scores = _single_sector_scores(count)
+        legacy = _scale_metrics(scores)
+        payload = build_stock_score_batch_envelope(scores).to_payload()
+        compact_bytes = len(canonical_json(payload).encode("utf-8"))
+        compact_witnesses = _compact_witness_count(payload)
+        assert compact_witnesses > 0
+        assert compact_bytes < legacy.canonical_payload_bytes
+        assert payload["cohort_count"] == 2
+        assert payload["member_set_count"] == len(payload["member_sets"])
+        assert [record["cohort_sha256"] for record in payload["cohorts"]] == sorted(
+            record["cohort_sha256"] for record in payload["cohorts"]
+        )
+        assert [
+            record["members_sha256"] for record in payload["member_sets"]
+        ] == sorted(record["members_sha256"] for record in payload["member_sets"])
+        samples[count] = (compact_witnesses, compact_bytes)
+
+    small_witnesses, small_bytes = samples[20]
+    large_witnesses, large_bytes = samples[40]
+    assert large_witnesses == 2 * small_witnesses
+    assert large_bytes < 3 * small_bytes
+
+
+def test_compact_score_batch_stays_out_of_the_canonical_package_exports():
+    package_path = (
+        Path(__file__).parents[1]
+        / "research"
+        / "short_interest_etf"
+        / "__init__.py"
+    )
+    tree = ast.parse(package_path.read_text(encoding="utf-8"))
+    imported = {
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module is not None
+    }
+    assert "research.short_interest_etf.stock_score_batch" not in imported

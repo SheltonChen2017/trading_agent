@@ -1758,12 +1758,12 @@ def _validate_dates_and_alpha(cells: tuple[PreregistrationCell, ...]) -> None:
     except CanonicalContractError as exc:
         raise _translate(exc) from exc
     if (
-        allocated_alpha != assigned_alpha
-        or empirical_alpha_value != allocated_alpha
+        empirical_alpha_value != allocated_alpha
         or acceptance_alpha_value != allocated_alpha
     ):
         raise PreregistrationError(
-            "family, structural-binding, allocation, and acceptance alpha must agree"
+            "structural-binding and acceptance alpha must equal the allocated "
+            "confirmatory alpha within the permanent family ceiling"
         )
 
 

@@ -49,21 +49,21 @@ EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
 # hash does not exist until the commit is written -- so a Codex counter-review
 # pins the exact Claude range it just reviewed.
 LATEST_COUNTERREVIEWED_CLAUDE_BASE = (
-    "5b84a72805073b406034f5d1a83ad5d3072d192e"
+    "bb20e8d057ecd976b4ddfbd558ec38d31b02d54e"
 )
 LATEST_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "9269339ee4ee8e0dc0dc87c419fd51bef6a7b306"
+    "45f45aa36f6493d8bd9669bcdba48d08d8c9c57e"
 )
 LATEST_COUNTERREVIEWED_CLAUDE_RANGE = (
     f"{LATEST_COUNTERREVIEWED_CLAUDE_BASE}.."
     f"{LATEST_COUNTERREVIEWED_CLAUDE_HEAD}"
 )
-LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE = "5b84a728..9269339e"
+LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE = "bb20e8d0..45f45aa3"
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "8078ce4877613adf5f9378cc11258841ac38f76d"
+    "9269339ee4ee8e0dc0dc87c419fd51bef6a7b306"
 )
-PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "8078ce48"
+PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "9269339e"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -522,7 +522,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed Claude's exact two-commit range"
+        "Codex has counter-reviewed Claude's exact six-commit range"
         in normalized_current
     )
     assert (
@@ -533,8 +533,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "pending Claude review of this Codex round" not in normalized_current
-    assert "comprehensive whole-lane audit" in normalized_current.lower()
-    assert "beginning after `9269339e`" in normalized_current
+    assert "comprehensive whole-lane audit is complete" in normalized_current.lower()
+    assert "beginning after `45f45aa3`" in normalized_current
 
     routing_row = next(
         line
@@ -552,13 +552,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_pointer
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_pointer
         assert (
-            "Codex has counter-reviewed Claude's exact two-commit range"
+            "Codex has counter-reviewed Claude's exact six-commit range"
             in normalized_pointer
         )
         assert "No implementation or provisioning milestone is authorized" in normalized_pointer
         assert "TPR-TR0" in normalized_pointer
-        assert "comprehensive whole-lane audit" in normalized_pointer.lower()
-        assert "beginning after `9269339e`" in normalized_pointer
+        assert "comprehensive whole-lane audit is complete" in normalized_pointer.lower()
+        assert "beginning after `45f45aa3`" in normalized_pointer
         normalized_pointer_lower = normalized_pointer.lower()
         stale_current_claims = (
             "pending claude review of this codex round",
@@ -582,10 +582,10 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
         ) == [LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex counter-reviewed both claude commits" in normalized_summary_lower
-        assert "section 27" in normalized_summary_lower
+        assert "codex counter-reviewed all six claude commits" in normalized_summary_lower
+        assert "section 32" in normalized_summary_lower
         assert "no implementation or provisioning milestone is authorized" in normalized_summary_lower
-        assert "comprehensive claude whole-lane audit" in normalized_summary_lower
+        assert "comprehensive claude whole-lane audit is complete" in normalized_summary_lower
 
 
 def test_out_of_lane_ledger_has_unique_well_formed_ids() -> None:
@@ -833,7 +833,7 @@ def test_session_ledger_rows_have_exact_column_count() -> None:
     Derives the expected width from the table's own header rather than pinning
     a constant, so adding a column to the ledger updates the guard with it.
     """
-    record = (STRATEGY_DIR / RECORD).read_text(encoding="utf-8").splitlines()
+    record = _record_section("## 10. Session / commit ledger").splitlines()
 
     headers = [line for line in record if line.startswith("| UTC date |")]
     assert len(headers) == 1, "expected exactly one session-ledger header row"

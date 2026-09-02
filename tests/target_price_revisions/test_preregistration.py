@@ -86,6 +86,27 @@ def _write(tmp_path: Path, raw: dict[str, object], name: str = "spec.json") -> P
     return path
 
 
+def _cells_with_confirmatory_alpha(alpha: str) -> tuple[object, ...]:
+    """Build a semantic-validation fixture without changing the frozen candidate."""
+    raw = _raw_candidate()
+    _cell(raw, "family_multiplicity")["value"][
+        "confirmatory_alpha_allocations"
+    ][0]["two_sided_alpha"] = alpha
+    _cell(raw, "empirical_binding_contract")["value"]["assigned_alpha"] = alpha
+    _cell(raw, "trial_and_null_contract")["value"][
+        "primary_acceptance_contract"
+    ]["two_sided_alpha"] = alpha
+    return tuple(
+        preregistration.PreregistrationCell(
+            cell_id=cell["cell_id"],
+            state=cell["state"],
+            value=preregistration.deep_freeze(cell["value"]),
+            source=cell["source"],
+        )
+        for cell in raw["cells"]
+    )
+
+
 def _request() -> OutcomeAccessRequest:
     return OutcomeAccessRequest(
         family_id=FAMILY_ID,
@@ -658,6 +679,18 @@ def test_candidate_values_are_detached_and_recursively_immutable() -> None:
         family["permanent_look_ids"][0] = "replacement"
     with pytest.raises(TypeError):
         controls["continuous_controls"] += ("future_return",)
+
+
+def test_alpha_accounting_allows_underallocation_but_refuses_overspend() -> None:
+    """The permanent 1/80 slot is a ceiling, not an entitlement to spend it."""
+    preregistration._validate_dates_and_alpha(
+        _cells_with_confirmatory_alpha("0.00625")
+    )
+
+    with pytest.raises(PreregistrationError):
+        preregistration._validate_dates_and_alpha(
+            _cells_with_confirmatory_alpha("0.0126")
+        )
 
 
 def test_git_anchored_reviewed_parent_still_cannot_reach_outcomes(

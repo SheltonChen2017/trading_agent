@@ -23,19 +23,20 @@ their lane-owned artifacts.
   merge visibility grants no target-branch authority over sibling artifacts.
 
 - **Current review state, 2026-09-01.** Codex has counter-reviewed Claude's exact
-  two-commit range
-  `5b84a72805073b406034f5d1a83ad5d3072d192e..9269339ee4ee8e0dc0dc87c419fd51bef6a7b306`.
-  `d99089b0` is accepted after correction; `9269339e` is accepted after
-  correction and qualification. One P2 and six P3 findings, with no P0/P1, are
-  recorded in section 27 of the target lane record. The owner-approved TPR-TR0
-  signed-registry-anchor design candidate has completed Claude's independent
-  review and Codex's counter-review, but remains non-authorizing. No dedicated
-  TPR signing key, external trust file, signature, positive registry entry,
-  source right, outcome, or look authority was provisioned. No implementation
-  or provisioning milestone is authorized. At the owner's
-  direction, the next role action is Claude's comprehensive whole-lane audit
-  of the pushed Target-Price Revisions tree and the exact new Codex range
-  beginning after `9269339e`.
+  six-commit range
+  `bb20e8d057ecd976b4ddfbd558ec38d31b02d54e..45f45aa36f6493d8bd9669bcdba48d08d8c9c57e`.
+  The comprehensive whole-lane audit is complete; section 32 of the target
+  record contains the six dispositions, two P2 and eight P3 findings, and
+  their corrections or qualifications. `TPR-CR8-001` is closed under the
+  owner's existing ceiling directive: a conservative confirmatory total below
+  `1/80` is valid, while any overspend still refuses. The frozen candidate
+  itself remains byte-identical and chooses the full `1/80`. The
+  owner-approved TPR-TR0 signed-registry-anchor design remains
+  non-authorizing. No dedicated TPR signing key, external trust file,
+  signature, positive registry entry, source right, outcome, or look authority
+  was provisioned. No implementation or provisioning milestone is authorized.
+  After this round's single push, Claude independently reviews the exact new
+  Codex correction range beginning after `45f45aa3`.
 
 - The owner directed a new sibling worktree for branch
   `codex/strategy-target-price-revisions`, resolved with
@@ -476,11 +477,11 @@ It is a separate fourth planning lane under the owner-directed serialized
 same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. The
-v2.2 implementation snapshot is `bb8dfb6`. Codex counter-reviewed both Claude
-commits in `5b84a728..9269339e`; `d99089b0` is accepted after correction and
-`9269339e` after correction and qualification, with one P2 and six P3 findings
-recorded in section 27. The owner-approved TPR-TR0 signed-registry-anchor design
-has completed independent review and counter-review but grants no authority.
+v2.2 implementation snapshot is `bb8dfb6`. Codex counter-reviewed all six
+Claude commits in `bb20e8d0..45f45aa3`; the comprehensive Claude whole-lane
+audit is complete, with two P2 and eight P3 counter-review findings recorded in
+section 32. The owner-approved TPR-TR0 signed-registry-anchor design has
+completed independent review and counter-review but grants no authority.
 The lane and `origin/main` have diverged;
 neither contains the other.
 Sibling-lane changes and their independent reviews remain on their respective
@@ -499,9 +500,8 @@ its own registry. One
 look is authorized or spent.
 The submitted plan is replaced by the sole-normative corrected stock-first
 29-page v2.2 blueprint whose later QC/autopilot stages remain individually
-owner-gated. No implementation or provisioning milestone is authorized. At the
-owner's direction, a comprehensive Claude whole-lane audit is next. TPR-1
-remains blocked on exact reviewed source rights
+owner-gated. No implementation or provisioning milestone is authorized. TPR-1 remains blocked
+on exact reviewed source rights
 and TPR-0B remains blocked on reviewed
 TPR-1/TPR-2 structural manifests. `TPR-CR4-002` is closed: the lane worktree
 is resolved from `git worktree list` rather than a pinned path. One target P2,
@@ -511,8 +511,8 @@ reviewed; `TPR-CCR2-011` also remains open until reviewer-controlled signing or
 a separately signed review receipt proves the independent reviewer's identity;
 the owner-attestation principal alone cannot close it. Neither opens TPR-1 or
 any source/outcome/look gate.
-The next role action is Claude's audit of the full pushed Target-Price
-Revisions lane and the exact new Codex range beginning after `9269339e`.
+The next role action is Claude's review of this Codex correction round
+beginning after `45f45aa3`.
 
 ## 5. Data acquisitions and confirmations
 

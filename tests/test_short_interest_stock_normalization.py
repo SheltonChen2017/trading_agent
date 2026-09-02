@@ -1490,6 +1490,86 @@ def test_compact_score_batch_preserves_role_specific_multisector_witnesses():
     assert candidate_digests.isdisjoint(sector_digests)
 
 
+def test_compact_score_batch_distinguishes_candidate_eligible_and_sector_roles(
+    monkeypatch,
+):
+    import research.short_interest_etf.stock_score_batch as score_batch_module
+
+    sectors = (
+        ("TECHNOLOGY", 20),
+        ("HEALTHCARE", 20),
+        ("ENERGY", 19),
+    )
+    specs = []
+    for sector, count in sectors:
+        for _ in range(count):
+            index = len(specs)
+            specs.append(
+                _Spec(
+                    index=index,
+                    sector=sector,
+                    current_shares=200 + index,
+                    prior_shares=300 - index,
+                )
+            )
+
+    scores = _scores(tuple(specs))
+    envelope = build_stock_score_batch_envelope(scores)
+    payload = envelope.to_payload()
+    member_sizes = {
+        record["members_sha256"]: len(record["members"])
+        for record in payload["member_sets"]
+    }
+    cohorts = [record["cohort"] for record in payload["cohorts"]]
+    candidate_digests = {
+        cohort["candidate_members_sha256"] for cohort in cohorts
+        if member_sizes[cohort["candidate_members_sha256"]] > 0
+    }
+    eligible_digests = {
+        cohort["eligible_members_sha256"] for cohort in cohorts
+        if member_sizes[cohort["eligible_members_sha256"]] > 0
+    }
+    sector_digests = {
+        outcome["sector_members_sha256"]
+        for row in payload["rows"]
+        for outcome in row["outcomes"]
+        if outcome["score"] is not None
+    }
+
+    assert {member_sizes[digest] for digest in candidate_digests} == {59}
+    assert {member_sizes[digest] for digest in eligible_digests} == {40}
+    assert {member_sizes[digest] for digest in sector_digests} == {20}
+    assert candidate_digests.isdisjoint(eligible_digests)
+    assert candidate_digests.isdisjoint(sector_digests)
+    assert eligible_digests.isdisjoint(sector_digests)
+    assert envelope.expanded_row_payloads() == tuple(
+        item.to_payload() for item in scores
+    )
+
+    original_build_payload = score_batch_module._build_payload
+
+    def alias_candidate_as_eligible(dispositions):
+        mutated = original_build_payload(dispositions)
+        for record in mutated["cohorts"]:
+            cohort = record["cohort"]
+            if (
+                cohort["candidate_members_sha256"]
+                != cohort["eligible_members_sha256"]
+            ):
+                cohort["eligible_members_sha256"] = cohort[
+                    "candidate_members_sha256"
+                ]
+        return mutated
+
+    monkeypatch.setattr(
+        score_batch_module,
+        "_build_payload",
+        alias_candidate_as_eligible,
+    )
+    with pytest.raises(StockScoreBatchError, match="expanded cohort"):
+        build_stock_score_batch_envelope(scores)
+
+
 def test_compact_score_batch_stores_repeated_witnesses_linearly():
     samples = {}
     for count in (20, 40):

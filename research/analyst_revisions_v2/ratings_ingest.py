@@ -1011,10 +1011,10 @@ class FirmRatingNormalizationResult:
     ontology_sha256: str
     events: tuple[FirmNormalizedRatingEvent, ...]
     refusals: tuple[FirmNormalizationRefusal, ...]
-    # Optional so existing callers are unchanged; when supplied it makes this
-    # result exhaustive over its source audit the way its sibling result types
-    # already are, instead of only format-checking source_audit_sha256.
-    source_census: int | None = None
+    # Required so every value states its disposition census.  Source derivation
+    # is still proved by revalidate_firm_rating_normalization rebuilding from
+    # the authenticated audit; this local invariant does not self-authenticate.
+    source_census: int
 
     def __post_init__(self) -> None:
         if self.schema != FIRM_NORMALIZATION_SCHEMA:
@@ -1039,12 +1039,11 @@ class FirmRatingNormalizationResult:
             raise RatingsIngestError(
                 "firm normalization has more than one disposition per event"
             )
-        if self.source_census is not None:
-            require_int(self.source_census, "source_census", minimum=0)
-            if len(ids) != self.source_census:
-                raise RatingsIngestError(
-                    "firm normalization is not exhaustive over its source census"
-                )
+        require_int(self.source_census, "source_census", minimum=0)
+        if len(ids) != self.source_census:
+            raise RatingsIngestError(
+                "firm normalization is not exhaustive over its source census"
+            )
 
 
 def _transition_reason(mapping: RatingMappingRefusal) -> TransitionRefusalReason:
@@ -1162,8 +1161,8 @@ def normalize_firm_rating_audit(
         ontology_sha256=ontology.payload_sha256,
         events=tuple(events),
         refusals=tuple(refusals),
-        # Bind the exact accepted-row census so the result is provably
-        # exhaustive over the audit it claims to normalize.
+        # State the exact accepted-row census; revalidation against ``audit``
+        # is the authority that proves the value is source-derived.
         source_census=len(audit.records),
     )
 

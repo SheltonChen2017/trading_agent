@@ -681,6 +681,20 @@ def mapped_candidate_coverage(
         )
     by_id = {row.position_id: row for row in snapshot.holdings}
     selected = [by_id[value] for value in candidate_ids]
+    # Keep the eligibility decision on the exact accepted source values.
+    # Decimal accumulation below is intentionally rounded for the diagnostic
+    # result, but must not decide whether a book passes the 99% gate.
+    exact_denominator = sum(
+        (Fraction(row.weight) for row in selected), Fraction(0)
+    )
+    exact_mapped = sum(
+        (
+            Fraction(row.weight)
+            for row in selected
+            if row.mapping_state is MappingState.MAPPED
+        ),
+        Fraction(0),
+    )
     with analyst_decimal_context():
         denominator = sum(
             (_decimal(row.weight, "weight") for row in selected), Decimal("0")
@@ -701,13 +715,7 @@ def mapped_candidate_coverage(
         coverage = mapped / denominator
         if not 0 <= coverage <= 1:
             raise HoldingsError("coverage escaped [0,1]")
-        # Decide eligibility exactly. ``mapped / denominator`` rounds at the
-        # 50-digit context, so a book whose true coverage is just under the
-        # threshold can round up to it and pass the 99% gate. Comparing
-        # ``mapped`` against ``threshold * denominator`` as exact rationals
-        # removes that fail-open direction entirely; ``coverage`` is still
-        # reported as the rounded Decimal for diagnostics.
-        eligible = Fraction(mapped) >= Fraction(threshold) * Fraction(denominator)
+        eligible = exact_mapped >= Fraction(threshold) * exact_denominator
         return CoverageResult(
             mapped_weight=mapped,
             denominator_weight=denominator,

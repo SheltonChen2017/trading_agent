@@ -832,6 +832,16 @@ def test_firm_normalization_must_be_exhaustive_over_its_source_census(tmp_path):
     result = normalize_firm_rating_audit(audit, ontology)
     assert result.source_census == len(audit.records) == 2
 
+    with pytest.raises(TypeError):
+        FirmRatingNormalizationResult(
+            schema=result.schema,
+            source_audit_sha256=result.source_audit_sha256,
+            ontology_id=result.ontology_id,
+            ontology_sha256=result.ontology_sha256,
+            events=result.events,
+            refusals=result.refusals,
+        )
+
     # Dropping one disposition must now refuse rather than look complete.
     with pytest.raises(RatingsIngestError, match="exhaustive over its source census"):
         FirmRatingNormalizationResult(

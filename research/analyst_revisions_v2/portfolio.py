@@ -710,14 +710,14 @@ class PortfolioDecision:
     underfill_reasons: tuple[str, ...]
 
 
-# Named so this epsilon cannot drift silently and is visible alongside the
-# policy it accompanies. It serves two roles: the water-filling convergence
-# bound, and the slack in the post-allocation cap verification below
-# (`weight > cap + tolerance`). It is therefore deliberately NOT a
-# no-op for the hard caps - it admits an overshoot of at most 1e-18 of NAV,
-# which absorbs benign 50-digit Decimal rounding rather than widening policy.
-# Tightening the verification to an exact comparison is an ARV2-5 decision:
-# it would require proving the water-filling residual is exactly zero.
+# Named and regression-pinned so this epsilon cannot drift silently in code.
+# It serves two roles: the water-filling convergence bound, and the slack in
+# the post-allocation cap verification below (`weight > cap + tolerance`). It
+# is therefore deliberately NOT a no-op for the hard caps: it admits an
+# overshoot of at most 1e-18 of NAV to absorb benign 50-digit Decimal rounding.
+# It is not yet bound into VerifiedAnalystPolicy or that policy's hash.  That
+# policy-lineage decision remains part of ARV2-5, which must either bind this
+# exact value or prove exact-zero water-filling residuals before activation.
 ALLOCATION_CONVERGENCE_TOLERANCE = Decimal("1e-18")
 
 

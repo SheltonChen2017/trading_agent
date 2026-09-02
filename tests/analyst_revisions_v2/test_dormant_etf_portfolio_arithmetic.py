@@ -63,6 +63,11 @@ def _weights(allocations: tuple[Allocation, ...]) -> dict[str, Decimal]:
     return {item.etf_security_id: item.weight for item in allocations}
 
 
+def test_allocation_tolerance_is_pinned_until_the_arv2_5_policy_successor():
+    """A code/test co-edit cannot silently widen the dormant cap slack."""
+    assert ALLOCATION_CONVERGENCE_TOLERANCE == Decimal("1e-18")
+
+
 def test_five_equal_names_fill_to_the_etf_cap_and_leave_exact_cash():
     """Five names at the 20% cap invest the whole NAV with no residual."""
     selected = tuple(
@@ -136,11 +141,10 @@ def test_inverse_volatility_sets_the_proportions_then_the_cap_redistributes():
     allocations, cash, _ = _allocate(selected, _policy())
     weights = _weights(allocations)
     assert weights["etf-hot"] == Decimal("0.20")
-    # The two remaining equal-vol names share what is left, still under cap.
-    assert weights["etf-mid"] == weights["etf-low"]
-    assert weights["etf-mid"] <= Decimal("0.20")
-    invested = sum(weights.values())
-    assert invested + cash == Decimal("1")
+    # Round one leaves mid/low at 0.025 each.  The allocator must continue
+    # after the hot name binds and redistribute until both also hit 0.20.
+    assert weights["etf-mid"] == weights["etf-low"] == Decimal("0.20")
+    assert cash == Decimal("0.40")
 
 
 def test_no_allocation_may_exceed_a_hard_cap_beyond_the_named_tolerance():
@@ -172,6 +176,125 @@ def test_zero_inverse_volatility_mass_refuses_rather_than_dividing_by_zero():
         _allocate(selected, _policy())
 
 
+def _selection_candidate(etf, rank, cross_section, policy):
+    value = object.__new__(portfolio_module.PortfolioCandidate)
+    for name, item in {
+        "etf_security_id": etf,
+        "holdings_evidence": SimpleNamespace(eligible=True, refusal_reason=None),
+        "classification_evidence": SimpleNamespace(
+            sector_exposures=(LookThroughExposure(f"sector-{etf}", "1"),),
+            overlap_clusters=(LookThroughExposure(f"cluster-{etf}", "1"),),
+        ),
+        "cross_section_evidence": cross_section,
+        "policy": policy,
+    }.items():
+        object.__setattr__(value, name, item)
+    return value
+
+
+def _selection_cross_section(rows, policy):
+    return SimpleNamespace(
+        source_sha256="a" * 64,
+        source_id="selection-harness",
+        evidence_epoch_id=EPOCH,
+        decision_at=DECISION,
+        policy_sha256=policy.evidence_sha256,
+        candidates=tuple(
+            portfolio_module.CrossSectionCandidate(etf, Decimal(rank), Decimal("1"))
+            for etf, rank in sorted(rows)
+        ),
+    )
+
+
+def test_construct_portfolio_hysteresis_stronger_eviction_and_incumbent_tie(
+    policy, monkeypatch
+):
+    """Exercise the dormant selection state machine without granting authority."""
+    monkeypatch.setattr(portfolio_module.PortfolioCandidate, "__post_init__", lambda self: None)
+    monkeypatch.setattr(
+        portfolio_module,
+        "require_verified_cross_section_evidence",
+        lambda value, *, policy: value,
+    )
+    monkeypatch.setattr(
+        portfolio_module,
+        "require_verified_holdings_evidence",
+        lambda value, *, policy: value,
+    )
+    monkeypatch.setattr(
+        portfolio_module,
+        "require_verified_classification_evidence",
+        lambda value: value,
+    )
+    selected_rounds = []
+
+    def capture_allocate(selected, _policy):
+        selected_rounds.append(tuple(row.etf_security_id for row in selected))
+        return (), Decimal("1"), ()
+
+    monkeypatch.setattr(portfolio_module, "_allocate", capture_allocate)
+
+    stronger_rows = (
+        ("entrant-strong", "96"),
+        ("entrant-under-entry", "89"),
+        ("incumbent-1", "100"),
+        ("incumbent-2", "95"),
+        ("incumbent-3", "90"),
+        ("incumbent-4", "80"),
+        ("incumbent-5", "70"),
+    )
+    cross_section = _selection_cross_section(stronger_rows, policy)
+    candidates = tuple(
+        _selection_candidate(etf, rank, cross_section, policy)
+        for etf, rank in stronger_rows
+    )
+    decision = portfolio_module.construct_portfolio(
+        candidates,
+        policy=policy,
+        previous_holdings=tuple(f"incumbent-{index}" for index in range(1, 6)),
+    )
+    assert "entrant-under-entry" not in decision.eligible_order
+    assert selected_rounds[-1] == (
+        "incumbent-1",
+        "entrant-strong",
+        "incumbent-2",
+        "incumbent-3",
+        "incumbent-4",
+    )
+
+    tie_rows = (
+        ("entrant-tied", "90"),
+        ("incumbent-a", "100"),
+        ("incumbent-b", "99"),
+        ("incumbent-c", "98"),
+        ("incumbent-d", "97"),
+        ("incumbent-tied", "90"),
+    )
+    cross_section = _selection_cross_section(tie_rows, policy)
+    candidates = tuple(
+        _selection_candidate(etf, rank, cross_section, policy)
+        for etf, rank in tie_rows
+    )
+    portfolio_module.construct_portfolio(
+        candidates,
+        policy=policy,
+        previous_holdings=(
+            "incumbent-a",
+            "incumbent-b",
+            "incumbent-c",
+            "incumbent-d",
+            "incumbent-tied",
+        ),
+    )
+    assert selected_rounds[-1] == (
+        "incumbent-a",
+        "incumbent-b",
+        "incumbent-c",
+        "incumbent-d",
+        "incumbent-tied",
+    )
+
+
 # --------------------------------------------------------------------------
 # Gated arithmetic. The zero-access source gate is bypassed LOCALLY so the
 # numbers behind it can be exercised. The gate's own refusals keep their
@@ -184,6 +307,7 @@ import hashlib
 
 import research.analyst_revisions_v2.costs as cost_module
 import research.analyst_revisions_v2.holdings as holdings_module
+import research.analyst_revisions_v2.portfolio as portfolio_module
 from research.analyst_revisions_v2.costs import (
     TradeCostInput,
     portfolio_transaction_cost,
@@ -283,13 +407,11 @@ def test_coverage_eligibility_is_exact_at_the_threshold_boundary(
 ):
     """The 99% gate is decided exactly, and its boundary is inclusive.
 
-    ARV2WL-D03 observed that eligibility compared a rounded
-    ``mapped / denominator`` rather than exact rationals. The comparison is now
-    ``Fraction(mapped) >= Fraction(threshold) * Fraction(denominator)``. That
-    is strictly more correct, but it is hardening rather than a reachable bug
-    fix: ``mapped`` is accumulated under the same 50-digit context, so a weight
-    carrying more digits is already rounded before the comparison sees it, and
-    both forms then agree. This pins the boundary the gate actually decides.
+    ARV2WL-D03 observed that eligibility compared a rounded quotient rather
+    than exact accepted source values.  The implementation now aggregates each
+    selected row as a Fraction before Decimal diagnostic arithmetic.  This
+    test pins the inclusive boundary; the following regression proves the
+    reachable fail-open that occurs beyond the 50-digit Decimal context.
     """
     exactly_at = _snapshot(_holding("a", "0.99"), _holding("b", "0.01", mapped=False))
     at_threshold = mapped_candidate_coverage(
@@ -318,6 +440,51 @@ def test_coverage_eligibility_is_exact_at_the_threshold_boundary(
     )
     assert below.eligible is False
     assert below.refusal_reason == "insufficient_mapped_candidate_weight"
+
+
+def test_coverage_decision_uses_exact_unrounded_weight_aggregates(
+    policy, admit_sources
+):
+    """Input precision beyond the arithmetic context cannot round into eligibility."""
+    snapshot = _snapshot(
+        _holding(
+            "a",
+            "0.9899999999999999999999999999999999999999999999999999",
+        ),
+        _holding(
+            "b",
+            "0.0100000000000000000000000000000000000000000000000001",
+            mapped=False,
+        ),
+    )
+    result = mapped_candidate_coverage(
+        snapshot,
+        candidate_position_ids=("a", "b"),
+        decision_at=DECISION,
+        policy=policy,
+    )
+    assert result.coverage == Decimal("0.99")
+    assert result.eligible is False
+    assert result.refusal_reason == "insufficient_mapped_candidate_weight"
+
+
+def test_coverage_denominator_is_load_bearing(policy, admit_sources):
+    """A tolerance-valid overweight book cannot compare mapped mass directly."""
+    snapshot = _snapshot(
+        _holding("a", "0.9909"),
+        _holding("b", "0.0101", mapped=False),
+        declared="1.001",
+    )
+    result = mapped_candidate_coverage(
+        snapshot,
+        candidate_position_ids=("a", "b"),
+        decision_at=DECISION,
+        policy=policy,
+    )
+    assert result.mapped_weight == Decimal("0.9909")
+    assert result.denominator_weight == Decimal("1.001")
+    assert result.coverage < Decimal("0.99")
+    assert result.eligible is False
 
 
 def test_weighted_score_requires_loader_authenticated_exact_score_artifact(
@@ -351,6 +518,14 @@ def test_weighted_score_requires_loader_authenticated_exact_score_artifact(
         object.__setattr__(forged, field.name, getattr(scores, field.name))
     with pytest.raises(HoldingsError):
         weighted_stock_score(evidence, stock_score_evidence=forged, policy=policy)
+
+    # Untyped mappings cannot substitute for loader-authenticated evidence.
+    with pytest.raises(HoldingsError):
+        weighted_stock_score(
+            evidence,
+            stock_score_evidence={"sec-a": "2", "sec-b": "-2"},
+            policy=policy,
+        )
 
 
 def test_stock_score_artifact_refuses_missing_extra_duplicate_and_invalid_rows(
@@ -388,6 +563,18 @@ def test_stock_score_artifact_refuses_missing_extra_duplicate_and_invalid_rows(
         )
     with pytest.raises(HoldingsError, match="nonzero"):
         scored([{"security_id": "sec-a", "state": "signal", "value": "0"}])
+    for state in ("missing", "invalid"):
+        with pytest.raises(HoldingsError, match="refuse"):
+            scored([{"security_id": "sec-a", "state": state, "value": None}])
+    with pytest.raises(HoldingsError, match="clip"):
+        scored([{"security_id": "sec-a", "state": "signal", "value": "4.1"}])
+    with pytest.raises(HoldingsError, match="canonically security-sorted"):
+        scored(
+            [
+                {"security_id": "sec-b", "state": "signal", "value": "1"},
+                {"security_id": "sec-a", "state": "signal", "value": "1"},
+            ]
+        )
 
 
 def test_stock_score_authority_refuses_clone_mutation_substitution_and_foreign_context(
@@ -406,10 +593,75 @@ def test_stock_score_authority_refuses_clone_mutation_substitution_and_foreign_c
         evidence, stock_score_evidence=scores, policy=policy
     ) == Decimal("1")
 
-    # Mutating the authenticated artifact after the fact must be detected.
-    object.__setattr__(scores, "score_artifact_id", "substituted-artifact")
+    clone = object.__new__(type(scores))
+    for field in dataclasses.fields(scores):
+        object.__setattr__(clone, field.name, getattr(scores, field.name))
     with pytest.raises(HoldingsError):
-        weighted_stock_score(evidence, stock_score_evidence=scores, policy=policy)
+        weighted_stock_score(evidence, stock_score_evidence=clone, policy=policy)
+
+    mutated = build_verified_stock_score_evidence(
+        source_bytes=_stock_score_source(
+            [{"security_id": "sec-a", "state": "signal", "value": "1"}],
+            policy=policy,
+        ),
+        policy=policy,
+    )
+    object.__setattr__(mutated, "score_artifact_id", "substituted-artifact")
+    with pytest.raises(HoldingsError):
+        weighted_stock_score(evidence, stock_score_evidence=mutated, policy=policy)
+
+    substituted = build_verified_stock_score_evidence(
+        source_bytes=_stock_score_source(
+            [{"security_id": "sec-a", "state": "signal", "value": "1"}],
+            policy=policy,
+        ),
+        policy=policy,
+    )
+    object.__setattr__(
+        substituted,
+        "source_bytes",
+        _stock_score_source(
+            [{"security_id": "sec-a", "state": "signal", "value": "2"}],
+            policy=policy,
+            source_id="substituted-score-source",
+        ),
+    )
+    with pytest.raises(HoldingsError):
+        weighted_stock_score(evidence, stock_score_evidence=substituted, policy=policy)
+
+    with pytest.raises(HoldingsError, match="another policy"):
+        build_verified_stock_score_evidence(
+            source_bytes=_stock_score_source(
+                [{"security_id": "sec-a", "state": "signal", "value": "1"}],
+                policy=policy,
+                policy_sha256="f" * 64,
+            ),
+            policy=policy,
+        )
+    with pytest.raises(HoldingsError, match="not authorized"):
+        build_verified_stock_score_evidence(
+            source_bytes=_stock_score_source(
+                [{"security_id": "sec-a", "state": "signal", "value": "1"}],
+                policy=policy,
+                dataset_id="arv2-ds-foreign",
+            ),
+            policy=policy,
+        )
+
+    for overrides in (
+        {"epoch": "foreign-evidence-epoch"},
+        {"decision_at": "2026-08-26T13:30:00+00:00"},
+    ):
+        foreign = build_verified_stock_score_evidence(
+            source_bytes=_stock_score_source(
+                [{"security_id": "sec-a", "state": "signal", "value": "1"}],
+                policy=policy,
+                **overrides,
+            ),
+            policy=policy,
+        )
+        with pytest.raises(HoldingsError, match="share policy, decision, and epoch"):
+            weighted_stock_score(evidence, stock_score_evidence=foreign, policy=policy)
 
 
 def test_portfolio_transaction_cost_matches_hand_arithmetic(policy, admit_sources):

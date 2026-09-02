@@ -15,8 +15,10 @@ INDEPENDENT CLAUDE REVIEW AND CODEX COUNTER-REVIEW CORRECTION (SECTIONS
 9-11). A COMPLETE INDEPENDENT WHOLE-LANE RE-REVIEW (SECTION 13) ACCEPTED
 THE CUMULATIVE TREE AFTER CORRECTING THREE P2 FAIL-OPEN/CONSISTENCY
 DEFECTS. CODEX COUNTER-REVIEW ACCEPTS BOTH CLAUDE COMMITS AFTER ADDITIONAL
-MATERIAL SAFETY AND RECORD CORRECTIONS (SECTION 14). ARV2-4C REMAINS
-UNAPPROVED PENDING THE EXACT OWNER CHOICE RECORDED IN SECTIONS 4, 12, AND 14.
+MATERIAL SAFETY AND RECORD CORRECTIONS (SECTION 14). THE OWNER APPROVED THE
+FULL 39-ALIAS LEGACY COMPARATOR AND CORRECTED MATCHED-ROW RULES. THE
+OUTCOME-FREE, CONTENT-ADDRESSED ARV2-4C STRUCTURAL CANDIDATE IS IMPLEMENTED
+AND AWAITS INDEPENDENT CLAUDE REVIEW AND CODEX COUNTER-REVIEW (SECTION 15).
 THE ARV2-4 EVALUATION AND EVERY
 DATA, OUTCOME,
 UPLOAD, COMPILE, QC-RUN, PAPER, OR FUNDED ACTION REMAIN BLOCKED BY THE
@@ -93,7 +95,7 @@ completion.
 | Event normalization | In addition to the zero-access canonical-event/refusal/result contracts, V2 now has a content-addressed Massive/Benzinga provider contract, exact documented field/action parsing, one source-derived ingest disposition per raw row, duplicate-ID refusal, immutable raw-hash version IDs, two-snapshot correction/addition/disappearance lineage, and an exhaustive structural binding of accepted rows to PIT permanent identity or a named refusal. The firm/identity join retains the exact ARV2-1 rational mapping. Legacy `research/acer/` rows remain legacy evidence. | The production source, security-master, and firm-ontology registries are empty. The older zero-access `CanonicalSourceEvent` representation is not yet a publishable rational firm-score event, and no real event has passed production registration. | ARV2-1 accepted; ARV2-2 structural identity candidate implemented; accepted production events remain prohibited. |
 | Time semantics | Exchange-session availability rules, strict UTC instants, next-open handling, and the conservative date-only delay are implemented as deterministic contracts. | Provider clock semantics and actual timestamp completeness have not been authenticated for a production V2 snapshot. | Safety rule implemented; no production event admitted. |
 | Firm identity and rating ontology | A loader-authenticated, content-addressed mapping now requires firm ID/name, half-open valid date range, exact raw label, complete ordered rank/scale size, company/sector/absolute scope, mapping quality, reviewer, source evidence, and ontology version. It implements the blueprint score as an exact rational number, refuses unreviewed labels and periods, inventories observed labels without ordering them, admits only direction-consistent upgrades/downgrades, and keeps initiations, target-only actions, and terminations out of the rating-change channel. The committed production registry remains empty, and positive registration now also refuses until a separate non-self-referential approval receipt exists. | No production firm-specific ordered vocabulary, reviewed policy artifact, authenticated permanent firm/analyst identity mapping, or external registration-approval authority exists. No label is inferred from the public sample or legacy ACER map; documented `assumes` remains quarantined pending semantic review. | ARV2-1 accepted; production ontology access refuses. |
-| Canonical stock formula | ARV2-3 adds exact 20-session exponential decay without a hard cutoff, NYSE-session age derived inside the assembler, institution-stock-session dedupe, rational rating deltas, stable raw summation, absolute-mass institution/catalyst breadth, activity-aware sector median/MAD normalization with the frozen 1.4826 scale and symmetric ±4 clip, and the stock-specific `N_eff / (N_eff + 3) * q_data` reliability. ARV2-4A adds an authenticated structural stock-evaluation contract and fixture-only same-date robust control transform, training-only Decimal QR fit, and unchanged validation/test application with exact contract/fold/policy/refusal lineage, reauthenticated NYSE-open decision clocks, and process-local builder identity/digest authentication that refuses copied, reconstructed, or relabeled cross-sections. ARV2-4B adds the exact content-addressed six-fold NYSE walk-forward child manifest without wiring it into fit/apply. | No authenticated production events, controls, institution/common-event mappings, PIT sector classifications, measured quality, global map, reviewed/executable fold binding, power/economic definition, outcomes, or production score artifact exists. The parent stock contract deliberately retains a null fold binding pending a future non-circular successor; all action capabilities remain false. | ARV2-3 and ARV2-3Q accepted; corrected ARV2-4A and ARV2-4B accepted after independent review and Codex counter-review correction; no executable score exists. |
+| Canonical stock formula | ARV2-3 adds exact 20-session exponential decay without a hard cutoff, NYSE-session age derived inside the assembler, institution-stock-session dedupe, rational rating deltas, stable raw summation, absolute-mass institution/catalyst breadth, activity-aware sector median/MAD normalization with the frozen 1.4826 scale and symmetric ±4 clip, and the stock-specific `N_eff / (N_eff + 3) * q_data` reliability. ARV2-4A adds an authenticated structural stock-evaluation contract and fixture-only same-date robust control transform, training-only Decimal QR fit, and unchanged validation/test application with exact contract/fold/policy/refusal lineage, reauthenticated NYSE-open decision clocks, and process-local builder identity/digest authentication that refuses copied, reconstructed, or relabeled cross-sections. ARV2-4B adds the exact content-addressed six-fold NYSE walk-forward child manifest without wiring it into fit/apply. ARV2-4C adds the owner-approved, exact 39-alias naive global comparator, matched-row/coverage/bootstrap contract, and acyclic stock-contract successor while preserving the reviewed fold bytes and the predecessor's single-arm refusal rules. | No authenticated production events, controls, institution/common-event mappings, PIT sector classifications, measured quality, reviewed/executable fold integration, power/economic definition, outcomes, or production score artifact exists. ARV2-4C is an outcome-free structural candidate pending independent review; every action capability remains false. | ARV2-3 and ARV2-3Q accepted; corrected ARV2-4A and ARV2-4B accepted after independent review and Codex counter-review correction; ARV2-4C implemented pending independent review; no executable score exists. |
 | Consensus, novelty, targets, and EPS | Canonical-versus-diagnostic separation is contract-pinned; legacy target/timing runners are quarantined from V2 and from new outcome access. | No production historical active-rating state, novelty series, or decision-grade target/EPS extension has been built or authorized. | Deferred diagnostics/extensions; they cannot alter the canonical score. |
 | Provider-history boundary | Measured pre-2013 source rows retain the exact dominant quarantine even when another defect is present and cannot be laundered through a later partition. Chronologically captured snapshots compare stable IDs/raw hashes as unchanged, added, corrected, or missing-from-later-without-invented-withdrawal. | Provider coverage, backfill, correction, and deletion semantics remain unauthenticated for V2 production use; no current licensed snapshot was accessed in this milestone. | Structural lineage implemented; factual provider audit still requires exact owner authorization. |
 | Issuer/security identity | A canonical, content-addressed, loader-reauthenticated PIT master now separates issuers, securities, share classes, vendor/standard identifiers, listings, and lineage. It binds base and interval-closure availability, redacts future endpoints, resolves historical tickers by event date/cutoff, preserves ticker reuse and share classes, represents symbol/listing changes, mergers and delistings, refuses ambiguity/ineligibility/late evidence, and reports exhaustive integer coverage. The legacy name/ticker diagnostic's 768 deterministic interleavings remain a lower bound, not an allowlist; current-ticker joins are prohibited. | The committed production security-master registry is empty. No real source, rights/entitlement evidence, production vintage/correction builder, accepted mapping, or external registration-approval authority exists; structural fixtures cannot self-promote. | ARV2-2 structural identity work accepted; production identity access refuses. |
@@ -123,6 +125,7 @@ and this implementation consumed **zero looks**.
 | ARV2-3Q | Freeze the outcome-free control, stock-event-study, QC-first, multiplicity, paper-confirmation, and funded-pilot separation contract. | Content-addressed candidate independently reviewed; old period proved superseded unspent; zero data/outcome/QC/deployment authority. |
 | ARV2-4A | Materialize the content-addressed stock historical-evaluation structure and fixture-only mandatory-control transform/fit/apply boundary without sources or outcomes. | Exact parent/PDF binding, training-only fold/policy lineage, named row refusals and coverage, immutable report inventory, all external bindings null, all action capabilities false, independent Claude review and Codex counter-review required. |
 | ARV2-4B | Freeze the exact outcome-free stock walk-forward fold manifest as an acyclic child of the reviewed QC-first plan and stock-evaluation history definition. | Six rolling 5/2/1 folds, exact 1/5/20/60-session purge and embargo boundaries, NYSE-axis and parent-artifact hashes, partial-2026 exclusion and common-event refusals; all external bindings null and all action capabilities false; independent Claude review and Codex counter-review required. |
+| ARV2-4C | Freeze the owner-approved 39-alias naive global comparator and the corrected matched-row comparison as an outcome-free successor of the reviewed stock/fold authorities. | Exact 39 mapped and 15 measured-refusal aliases, symmetric paired-only zero-range handling, five 19/20 structural coverage ledgers pooled and per fold, complete-session deterministic bootstrap, unchanged predecessor/fold bytes, complete acyclic lineage, all action capabilities false, independent Claude review and Codex counter-review required. |
 | ARV2-4 | Materialize the full V2 historical-evaluation schema, implement the frozen stock control adjustment, bind the exact QC run and power plans, and run the one-shot historical stock event study in QC Cloud. | Immutable development-evaluation receipt logged with no confirmatory alpha; a screen failure or valid null closes the canonical family, while a pass unlocks ARV2-5 only. |
 | ARV2-5 | Only after an ARV2-4 pass, build the PIT ETF reverse index, eligibility, mapping, and ETF aggregation. | >=99% mapped candidate weight; stale/dynamic/transitive bypasses fail. |
 | ARV2-6 | Freeze the ETF-specific residualization, estimand, power, and cost contracts, then run the one-shot walk-forward ETF historical backtest in QC Cloud. | Immutable development-evaluation receipt logged with no confirmatory alpha; OOS/robustness/capacity/turnover/overlap screen; failure closes the family. |
@@ -274,6 +277,21 @@ value/growth/size, liquidity/turnover, holdings concentration, analyst coverage,
 event-intensity, and event-diversity families. Immediate event jump is
 outcome-regression-only and missing active-event intraday evidence refuses.
 
+ARV2-4C leaves that predecessor and the reviewed fold manifest byte-for-byte
+unchanged. Its three new canonical artifacts are the global map
+`arv2-global-rating-map-aaf5830c3c3fb403` / SHA-256
+`aaf5830c3c3fb403b0e84f5ad22d1f20fa3f91df41cf3bd64f33695875d2e3d9`,
+the matched comparison
+`arv2-global-matched-b94a3457b848c4dc` / SHA-256
+`b94a3457b848c4dc1f6dee77ef366002362573431eb9cc2fc3b8f530ec7f89c9`,
+and the stock successor
+`arv2-stock-historical-successor-a9a2210b8f6582bc` / SHA-256
+`a9a2210b8f6582bc3ce9e533ce33e9b51ffc0a0b3203b62ad21d9d373ce06f95`.
+They authenticate the PDF, QC-first amendment and its exact superseded base,
+the predecessor stock contract, and the unchanged fold manifest in a complete
+acyclic graph. Every source, outcome, QC, result, deployment, and order
+capability remains false.
+
 The stock development screen reports 1/5/20/60-session date-level Spearman IC
 summaries and Fama-MacBeth coefficients, with 20 sessions primary, bullish and
 bearish effects separate, horizon-specific embargo/block/HAC distances measured
@@ -330,12 +348,11 @@ claims. Neither category is permitted to overwrite the other.
 ## 4. Exact next step
 
 ARV2-4B is accepted after the independent Claude review in section 10 and the
-Codex counter-review corrections in section 11. The owner selected the
-global-map/matched-row definition as the next policy path and requested an
-exact proposal, but did not approve implementation. Claude's proposal-only
-advisory review made no commit or repository change. Section 12 accepts that
-advisory review after correction and records why the submitted proposal still
-is not safe to freeze.
+Codex counter-review corrections in section 11. Sections 12 and 14 record the
+proposal and whole-lane counter-review stop point. The owner has now explicitly
+approved the recommended **full 39-alias legacy comparator** and the corrected
+matched-row rules. Section 15 records their outcome-free, content-addressed
+ARV2-4C implementation.
 
 Claude completed that cumulative review in commits `d72c8057` and `67ae5c11`.
 Section 14 counter-reviews both commits, accepts them after correction, and
@@ -344,16 +361,13 @@ implementation through `06f08b56` and the final follow-up `a371724a`. It also
 corrects the review record's counts, PDF pagination, mutation claim,
 archived-test identification, and initiation/refusal-scope finding.
 
-The next bounded action remains the corrected, content-addressed ARV2-4C
-proposal, not implementation. The owner must explicitly choose between the
-recommended **full 39-alias legacy comparator** and the narrower **16-label
-core comparator**, then approve the exact matched-row, paired constant-arm,
-coverage, bootstrap, per-arm reliability, post-join underfill, and acyclic
-successor rules. The earlier instruction to proceed with the normal loop does
-not resolve those materially different comparator populations. The archived
-ACER V1 aggregate vocabulary measurements remain historical risk context, not
-a V2 paired-coverage artifact or authority to access licensed rows. A null
-scaffold or abbreviated prose pointer does not complete the milestone.
+The next bounded action is one combined push of the already-completed section
+14 counter-review corrections and the section 15 ARV2-4C candidate. Claude
+then independently reviews that exact pushed range on this same branch, and
+Codex counter-reviews every Claude commit before the power-plan milestone or
+any ARV2-4 evaluation work. The archived ACER V1 aggregate vocabulary
+measurements remain historical policy provenance, not a V2 paired-coverage
+artifact or authority to access licensed rows.
 
 No QC credential, Massive/Benzinga key, licensed row, price, return, or outcome
 is needed for either structural choice. Do not paste credentials into this
@@ -1955,6 +1969,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-08-31 | Codex counter-review | `ba4b3bc9` -> this commit | Accept Claude's ARV2-4B review after correction; stop at the next owner-definition gate | Counter-reviewed both Claude commits in `12b9e61c..ba4b3bc9` commit-by-commit and cumulatively. Completed the claimed final three-file revalidation regression, removed the mid-test fixture-wide undo, normalized a related authenticated-parent disappearance race into the Analyst domain error, and reconciled every canonical current-state passage. Stayed on the dedicated Analyst branch/worktree; no other strategy, UI, Streamlit, source, outcome, or executor work. | Focused corrected loader regressions **39 passed in 10.11 s**; complete `tests/analyst_revisions_v2` **332 passed, 1 skipped in 102.77 s**; active-document gate **69 passed in 0.99 s**; changed-path compileall exit 0; `git diff --check` clean. No credential, provider row, licensed artifact, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | `0052df9` and `ba4b3bc9` accepted after correction: 0 P0, 0 P1, 1 P2, and 3 P3; ARV2CR10-001 through ARV2CR10-004 corrected. Claude review artifact 7/10; underlying ARV2-4B candidate 9/10. | Commit this counter-review locally and stop before both the next milestone and push. Owner chooses and approves either the exact global-map/matched-row definition (recommended first) or the exact power-plan definition. No credentials are needed. |
 | 2026-09-01 | Codex advisory counter-review | `9f8377cf` -> this record commit | Counter-review Claude's proposal-only ARV2-4C advisory | Verified all eight supplied findings against the PDF, exact frozen stock contract, fold-manifest lineage, formulas, tests, and retained archived V1 evidence. Accepted the advisory after correction: retained the successor, exact bootstrap, per-arm derivation, staged coverage, semantic-disclosure, and diagnostic requirements; rejected a fold-manifest re-pin, a blanket zero-MAD-to-zero override, and any claim that an uncommitted per-string V1 count table is already available as V2 evidence. No ARV2-4C artifact or implementation was created. | Record-only validation is reported in section 12.6. No provider row, licensed artifact, price, return, outcome, QC, broker, deployment, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | Claude's eight findings: four confirmed, four partially correct after scope/evidence correction. Counter-review found 4 P2 and 1 P3 defects/omissions in the advisory itself; all are corrected in the recorded disposition, with no product change. Advisory quality **6/10**. | Commit locally and stop before push. After owner-authorized publication of an exact clean snapshot, Claude performs the requested full-module review. ARV2-4C remains unapproved and unimplemented. |
 | 2026-09-01 | Codex counter-review | `67ae5c11` -> `06f08b56` + `a371724a` (code corrections; this record commit follows) | Counter-review Claude's complete whole-lane review; no next milestone | Counter-reviewed `d72c8057` and `67ae5c11` independently and cumulatively. Accepted Claude's ingest, numerical, stable-sum, timing, and fit/apply corrections, then closed the residual Git attestation/ancestry and import-firewall/facade fail-opens, completed the five-field ingest-boundary tests, and corrected the whole-lane review record. A final adversarial pass then closed computed-name calendar-facade access and pinned commit-graph disabling on the ancestry query. Stayed in the dedicated Analyst worktree and branch. | Exact corrected tree: `tests/analyst_revisions_v2` **420 passed, 1 skipped in 139.59 s**; root preregistration **46 passed in 39.67 s**; dataset/firewall **116 passed in 83.38 s**; ratings/ontology **49 passed**; active-document gate **69 passed**; compileall exit 0; `git diff --check` clean. No credential, provider row, licensed artifact, price, return, outcome, QC upload/compile/job, broker, deployment, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | 0 P0, 0 P1, 6 P2, and 6 P3; `ARV2CR11-001` through `ARV2CR11-012` corrected. Both Claude commits accepted after correction. Final current-tree audit and validation found no remaining P0-P2. | Commit this lane record locally and stop before both ARV2-4C implementation and push. The owner must explicitly approve the recommended full 39-alias comparator or choose the 16-label core; no credentials are needed for that decision. |
+| 2026-09-01 | Codex implementation | `4c686a55` -> this record commit | Owner-approved ARV2-4C full-39 global comparator and corrected matched-row structural candidate | Implemented three content-addressed outcome-free artifacts plus an authenticated loader/resolver/hash-counter boundary. Preserved predecessor and fold bytes, added the complete seven-source acyclic ancestry, exact 39-map/15-refusal policy, symmetric paired-only zero-range handling, five pooled/per-fold 19/20 coverage ledgers, staged post-join underfill, deterministic complete-session bootstrap, and full-path scale-invariance/adversarial tests. | Focused candidate **152 passed, 1 host skip**; complete Analyst suite **571 passed, 2 host skips in 132.60 s**; complete repository **7,068 passed, 14 skipped, 3 standing out-of-lane failures, 26 warnings in 1,254.63 s**; compileall exit 0; exact artifact render equality and diff checks green. The three failures are `ARV2-UNRELATED-001` plus the two `ARV2WL-D11` sleeve-report cases and were documented, not fixed. No credential, provider row, licensed artifact, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | `ARV2I4C-001` through `ARV2I4C-004` P2 and `ARV2I4C-005` through `ARV2I4C-007` P3 corrected. Three final independent read-only audits accepted with no remaining P0-P3. | Commit implementation and record, revalidate exact final tree, re-fetch and stop if remote moved, then make exactly one combined push. Claude independently reviews the complete pushed range on this branch; Codex counter-reviews before the power-plan milestone. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -2895,3 +2910,161 @@ acyclic-successor rules. No credential, provider row, outcome, QuantConnect
 job, deployment, or trading authority is needed or granted for that proposal.
 This counter-review is committed locally and stops before both ARV2-4C
 implementation and push.
+
+## 15. Owner-approved ARV2-4C structural candidate, 2026-09-01
+
+The owner explicitly approved the **full 39-alias legacy comparator** and the
+corrected matched-row rules after the section 14 stop. Codex implemented
+exactly that bounded, outcome-free milestone in the existing Analyst worktree
+and branch. No provider row, credential, licensed artifact, price, return,
+outcome, QuantConnect action, deployment, broker, scheduler, or order was
+used. The candidate is pending independent Claude review and subsequent Codex
+counter-review; implementation is not acceptance and grants no action
+authority.
+
+### 15.1 Content-addressed authority set
+
+| Artifact | Content identity | Artifact SHA-256 | Role |
+|---|---|---|---|
+| `arv2_global_rating_map.structural.json` | `arv2-global-rating-map-aaf5830c3c3fb403` / `aaf5830c3c3fb403b0e84f5ad22d1f20fa3f91df41cf3bd64f33695875d2e3d9` | `630cc822fa83d7aba15920cfb8f37863f6d6fffa262e26ac96074e8526391f4e` | Exact naive global rating map and refusal inventory. |
+| `arv2_global_matched_comparison.structural.json` | `arv2-global-matched-b94a3457b848c4dc` / `b94a3457b848c4dc1f6dee77ef366002362573431eb9cc2fc3b8f530ec7f89c9` | `40b164e3e2944053eaaaaf1a651e34dfb335a4cbc8aeca2ee3f67ecdc9e8dffa` | Paired rows, per-arm derivations, coverage, diagnostics, numerical rules, deterministic bootstrap, and zero-margin gate. |
+| `arv2_stock_historical_successor.structural.json` | `arv2-stock-historical-successor-a9a2210b8f6582bc` / `a9a2210b8f6582bc3ce9e533ce33e9b51ffc0a0b3203b62ad21d9d373ce06f95` | `51718ee5ae278d1254e8efb01b2acdd9c6cbe51741dd72d5b5969c3b48576647` | Successor that retains the predecessor's single-arm rules and binds the approved paired-only amendments. |
+
+`global_benchmark_contract.py` renders and authenticates all three artifacts,
+their content-derived IDs/hashes, and seven exact authority sources: the map,
+matched contract, successor, predecessor stock contract, unchanged fold
+manifest, QC-first plan, and superseded QC-plan base. It rejects noncanonical
+JSON, duplicate keys, floats/non-finite values, BOM/CRLF changes, links,
+unstable reads, post-read replacement, source mutation, forged objects,
+equality-spoofed fields, and incomplete or cyclic lineage. The successor adds
+no parent pin to the reviewed fold manifest and does not edit or reparent it.
+
+### 15.2 Approved 39-alias comparator
+
+The map is exact, printable-ASCII-only, and closed. Canonicalization lowercases
+ASCII and trims/collapses literal U+0020 spaces only; it performs no Unicode,
+punctuation, or semantic rewrite. Unknown labels refuse. Exact mapped levels
+and aligned scores are:
+
+| Level / score | Exact aliases |
+|---|---|
+| 5 / `+1` | `strong buy`, `conviction buy`, `top pick`, `action list buy` |
+| 4 / `+1/2` | `buy`, `outperform`, `overweight`, `market outperform`, `sector outperform`, `positive`, `accumulate`, `add`, `speculative buy`, `long-term buy`, `outperformer`, `above average` |
+| 3 / `0` | `neutral`, `hold`, `equal-weight`, `market perform`, `sector perform`, `in-line`, `sector weight`, `perform`, `peer perform`, `market weight`, `average` |
+| 2 / `-1/2` | `underweight`, `underperform`, `sector underperform`, `market underperform`, `reduce`, `negative`, `underperformer`, `below average`, `trim`, `cautious` |
+| 1 / `-1` | `sell`, `strong sell` |
+
+The 15 measured exact refusals are `developing`, `equalweight`, `fair value`,
+`gradually accumulate`, `hold neutral`, `mixed`, `not rated`, `performer`,
+`sector overweight`, `sector performer`, `sector underweight`, `speculative
+hold`, `tender`, `trading buy`, and `trading sell`. Thus `equal-weight` maps,
+while `equalweight` is a measured refusal and `equal weight` is an unknown
+future label. Halving the legacy range is a positive affine transformation:
+the full contribution-to-final-score regression proves rank and tie invariance
+through decay, absolute-mass breadth, conservative `N_eff`, sector MAD
+normalization, reliability, and final score.
+
+The archived V1 document is policy provenance only. No archived or licensed
+event count is promoted into V2 evidence. An admitted directional event whose
+mapped global endpoints have the expected sign remains active; an exact-zero
+global delta is the named active `global_tier_collapse_zero`; an opposite-sign
+global delta is a joint `global_direction_conflict` refusal. The latter stays
+in the structural coverage denominator and cannot make the comparator easier
+through uncharged censoring.
+
+### 15.3 Corrected paired comparison
+
+The predecessor single-arm IC inventory still refuses fewer than 20 rows, a
+constant score, or a constant outcome. Only the paired firm-versus-global gate
+uses the successor rule on identical rows and one shared outcome:
+
+- fewer than 20 identical rows or a constant shared outcome jointly refuses;
+- neither arm constant uses ordinary average-rank Spearman for both arms;
+- exactly one constant arm receives an exact paired-only association of zero,
+  while the other arm uses ordinary Spearman;
+- both arms constant jointly refuse with `both_arms_constant_score`; and
+- no imputation or one-arm row deletion is permitted. A paired totalized zero
+  is never admitted to a single-arm IC inventory.
+
+Event identity, activity evidence, `q_data`, NYSE-session ages/decay kernel,
+eligible census, graph, controls/folds, and later shared outcome are common.
+Mapped delta, contribution/absolute mass, raw score, institution/common-event
+breadth, conservative `N_eff`, sector normalization, reliability,
+coefficients, and residuals are derived separately per arm. A collapse event
+remains ACTIVE with zero score/breadth mass and cannot increase `N_eff`; a
+security-date containing only collapse events remains an ACTIVE zero row with
+zero reliability through the paired fit census.
+
+For either arm, an exact zero-range paired sector may totalize standardized
+scores to zero while preserving ACTIVE versus STRUCTURAL_ZERO state. A
+nonzero-range zero-MAD sector jointly refuses; shared-control zero MAD retains
+the parent refusal. There is no epsilon or market fallback. The numerical
+contract forbids binary floats, requires finite input, exact rational
+midranks, stable Decimal summation, precision 50 / `ROUND_HALF_EVEN`, exact
+Python Decimal exponent/clamp/trap settings, and exact-zero comparisons.
+
+Five outcome-free structural ledgers must each pass exact 19/20 cross
+multiplication both pooled and independently in every nonempty fold: endpoint
+pair mapping plus direction admissibility, active security-date rows, common
+event components, component-member incidence, and score-capable dates. A zero
+denominator is invalid. After the single later authorized outcome join, the
+valid-date and connected-component floors are each the stronger of 50 and the
+content-addressed power-plan requirement. Honest underfill is
+`INCONCLUSIVE_locked_no_extension`; identity corruption is `INVALID_DATA`;
+adequate-sample failure closes the family. None permits alias, fold, period,
+seed, or retry rescue.
+
+The bootstrap samples each fold's complete uncompressed horizon-20 NYSE test
+session axis with noncircular 20-session blocks, all starts `0..N_f-20`,
+`ceil(N_f/20)` draws, concatenation and fold-length truncation. Missing dates
+add neither value nor denominator; multiplicity remains; the replicate is the
+equal-occurrence pooled mean. A zero-available replicate locks underfill with
+no redraw. The dependency-independent SHA-256 hash-counter sampler has fixed
+seed fields, uint64 ordinals, unbiased rejection conversion, `B=19,999`, and
+the exact Type-7 95th percentile. The primary gate is the frozen zero-margin
+no-worse-with-confidence rule: after every readiness gate, pass requires both
+`D >= 0` and `LCB95 >= 0`; exact equality passes.
+
+### 15.4 Implementation counter-audit
+
+Three independent read-only audit threads reviewed policy/statistics, code,
+and adversarial tests while Codex implemented the candidate. All final
+dispositions are **ACCEPT**, with no remaining P0-P3 finding. Material issues
+found and corrected before freeze were:
+
+| ID | Pri | Status | Correction |
+|---|---|---|---|
+| `ARV2I4C-001` | P2 | Corrected | Opposite-sign mapped transitions now remain in the endpoint/direction coverage denominator, preventing uncharged comparator censoring. |
+| `ARV2I4C-002` | P2 | Corrected | Resolver mappings are reconstructed from trusted exact primitive fields; caller-controlled equality/score objects cannot forge a delta. |
+| `ARV2I4C-003` | P2 | Corrected | Loader-authority fingerprints validate exact runtime types and use trusted type-tagged immutable values, closing equality-spoofed hashes and nested entry mutation. |
+| `ARV2I4C-004` | P2 | Corrected | The complete acyclic graph and successor now include the exact superseded QC-plan base and every material parent edge. |
+| `ARV2I4C-005` | P3 | Corrected | Malformed lineage and QC-plan ancestry failures normalize to the ARV2-4C domain error; the cycle guard remains directly reachable. |
+| `ARV2I4C-006` | P3 | Corrected | Load-time and post-load mutation checks cover all seven sources, including unstable double reads and the superseded base. |
+| `ARV2I4C-007` | P3 | Corrected | Decimal exponent/context/flag/trap behavior, caller-nonoverrideable coverage/sampler bounds, and the complete homogeneous half-scale signal path are regression-pinned. |
+
+### 15.5 Validation, remaining gates, and next step
+
+- Exact ARV2-4C/final-path focus: **152 passed, 1 host symlink skip**.
+- Complete `tests/analyst_revisions_v2`: **571 passed, 2 host symlink skips in
+  132.60 s**.
+- Complete repository: **7,068 passed, 14 skipped, 3 failed, 26 warnings in
+  1,254.63 s (20m54s)**. The failures are exactly the standing out-of-lane
+  `ARV2-UNRELATED-001` Target Price error-message assertion and the two
+  date-relative Trading App sleeve-report assertions in `ARV2WL-D11`; no
+  Analyst test failed. They are documented and were not fixed under the
+  owner's lane boundary.
+- Import-firewall closure remains exact and outcome-free; the only new
+  standard-library capability is arithmetic-only `math` for reduced-rational
+  validation.
+- Changed-scope `compileall` exited 0 with its cache redirected outside this
+  worktree; `git diff --check` is clean apart from non-error Windows line-ending
+  notices.
+- Structural fixtures only: **0 research looks and 0 development
+  evaluations**.
+
+The next action is one combined push of the section 14 counter-review series
+and this ARV2-4C candidate for Claude's independent review on this same
+branch. Codex then counter-reviews every Claude commit. Only after acceptance
+may the next bounded outcome-free power-plan milestone begin. Production
+sources/rights, outcomes, QuantConnect upload/compile/run, result disposition,
+paper/funded deployment, and orders each remain separately gated and false.

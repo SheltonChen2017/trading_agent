@@ -1442,6 +1442,47 @@ def test_provisional_report_identity_refuses_every_authority_claim(
         )
 
 
+def test_provisional_report_refuses_eligible_mixed_with_quarantine_reasons():
+    """A transaction may never be eligible and quarantined at the same time.
+
+    ``_classify`` cannot currently emit that tuple, so the guard is unreachable
+    from the parser and no end-to-end test exercises it. It is nonetheless the
+    defence that keeps candidate routing a singleton-equality decision: if a
+    future parser ever attached a reason code alongside the eligible outcome,
+    an ``in`` test would silently promote a quarantined row to a candidate.
+    """
+    mixed = ParsedTransaction(
+        event_id="a" * 64,
+        accession_number=ORIGINAL,
+        source_sha256="b" * 64,
+        row_index=0,
+        derivative=False,
+        security_title_raw="Common Stock",
+        transaction_date=datetime(2026, 8, 18, tzinfo=timezone.utc).date(),
+        transaction_code="P",
+        acquired_disposed_code="A",
+        shares=Decimal("5000"),
+        price_per_share=Decimal("12.50"),
+        purchase_value_usd=Decimal("62500"),
+        shares_owned_after=Decimal("15000"),
+        direct_indirect="D",
+        aff10b5_one=None,
+        footnote_ids=(),
+        footnote_texts=(),
+        outcomes=(
+            ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,
+            ClassificationOutcome.EXCLUDE_PRICE_RANGE,
+        ),
+        diagnostics=(),
+    )
+
+    with pytest.raises(
+        disposition_module.Form4ProvisionalDispositionReportError,
+        match="eligible outcome cannot coexist with quarantine reasons",
+    ):
+        disposition_module._transaction_payload(mixed)
+
+
 def test_ib1g_module_has_no_network_outcome_execution_or_ui_imports():
     module_path = Path(disposition_module.__file__)
     tree = ast.parse(

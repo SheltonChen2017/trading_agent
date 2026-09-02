@@ -8,6 +8,7 @@ import threading
 import weakref
 from datetime import datetime, timezone
 from decimal import Decimal
+from fractions import Fraction
 from enum import Enum
 from typing import Iterable
 
@@ -700,7 +701,13 @@ def mapped_candidate_coverage(
         coverage = mapped / denominator
         if not 0 <= coverage <= 1:
             raise HoldingsError("coverage escaped [0,1]")
-        eligible = coverage >= threshold
+        # Decide eligibility exactly. ``mapped / denominator`` rounds at the
+        # 50-digit context, so a book whose true coverage is just under the
+        # threshold can round up to it and pass the 99% gate. Comparing
+        # ``mapped`` against ``threshold * denominator`` as exact rationals
+        # removes that fail-open direction entirely; ``coverage`` is still
+        # reported as the rounded Decimal for diagnostics.
+        eligible = Fraction(mapped) >= Fraction(threshold) * Fraction(denominator)
         return CoverageResult(
             mapped_weight=mapped,
             denominator_weight=denominator,

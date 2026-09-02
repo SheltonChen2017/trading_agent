@@ -1011,6 +1011,10 @@ class FirmRatingNormalizationResult:
     ontology_sha256: str
     events: tuple[FirmNormalizedRatingEvent, ...]
     refusals: tuple[FirmNormalizationRefusal, ...]
+    # Optional so existing callers are unchanged; when supplied it makes this
+    # result exhaustive over its source audit the way its sibling result types
+    # already are, instead of only format-checking source_audit_sha256.
+    source_census: int | None = None
 
     def __post_init__(self) -> None:
         if self.schema != FIRM_NORMALIZATION_SCHEMA:
@@ -1035,6 +1039,12 @@ class FirmRatingNormalizationResult:
             raise RatingsIngestError(
                 "firm normalization has more than one disposition per event"
             )
+        if self.source_census is not None:
+            require_int(self.source_census, "source_census", minimum=0)
+            if len(ids) != self.source_census:
+                raise RatingsIngestError(
+                    "firm normalization is not exhaustive over its source census"
+                )
 
 
 def _transition_reason(mapping: RatingMappingRefusal) -> TransitionRefusalReason:
@@ -1152,6 +1162,9 @@ def normalize_firm_rating_audit(
         ontology_sha256=ontology.payload_sha256,
         events=tuple(events),
         refusals=tuple(refusals),
+        # Bind the exact accepted-row census so the result is provably
+        # exhaustive over the audit it claims to normalize.
+        source_census=len(audit.records),
     )
 
 

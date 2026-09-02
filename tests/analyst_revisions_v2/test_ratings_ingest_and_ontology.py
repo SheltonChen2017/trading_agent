@@ -26,6 +26,7 @@ from research.analyst_revisions_v2.ratings_ingest import (
     FirmNormalizedRatingEvent,
     ProviderVersionChange,
     RatingAction,
+    FirmRatingNormalizationResult,
     RatingsIngestError,
     RatingsIngestRefusalReason,
     TransitionRefusalReason,
@@ -812,3 +813,33 @@ def test_upgrade_with_nonpositive_reviewed_change_is_direction_mismatch(tmp_path
     )
     assert isinstance(zero, FirmNormalizationRefusal)
     assert zero.reason is TransitionRefusalReason.ACTION_DIRECTION_MISMATCH
+
+
+def test_firm_normalization_must_be_exhaustive_over_its_source_census(tmp_path):
+    """The result must cover every accepted audit row, not just format-check its hash.
+
+    Sibling result types already enforce an exactly-once census. Without it a
+    silently truncated normalization carried a well-formed
+    ``source_audit_sha256`` and looked complete (ARV2WL-D07).
+    """
+    ontology = _write_ontology(tmp_path / "ontology.json", _three_level_entries())
+    audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(
+            tmp_path / "census",
+            [_rating_row("census-1"), _rating_row("census-2", ticker="BBB")],
+        )
+    )
+    result = normalize_firm_rating_audit(audit, ontology)
+    assert result.source_census == len(audit.records) == 2
+
+    # Dropping one disposition must now refuse rather than look complete.
+    with pytest.raises(RatingsIngestError, match="exhaustive over its source census"):
+        FirmRatingNormalizationResult(
+            schema=result.schema,
+            source_audit_sha256=result.source_audit_sha256,
+            ontology_id=result.ontology_id,
+            ontology_sha256=result.ontology_sha256,
+            events=result.events[:-1] if result.events else (),
+            refusals=result.refusals[:-1] if not result.events else result.refusals,
+            source_census=2,
+        )

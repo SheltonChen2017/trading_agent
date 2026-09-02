@@ -510,6 +510,21 @@ def load_snapshot(
                 raise SnapshotVerificationError("snapshot pages cannot contain symlinks")
             if path.is_file():
                 actual_files.add(path.relative_to(root_path).as_posix())
+    # Reconcile the ENTIRE root, not only pages/. Previously an unauthenticated
+    # sidecar beside the manifest was admitted into a VerifiedSnapshot, so the
+    # snapshot's identity did not cover everything the directory contained.
+    # The exact allowed inventory is the manifest plus its referenced pages.
+    for path in root_path.rglob("*"):
+        if path.is_symlink():
+            raise SnapshotVerificationError("snapshot root cannot contain symlinks")
+        if not path.is_file():
+            continue
+        relative = path.relative_to(root_path).as_posix()
+        if relative == MANIFEST_FILENAME or relative.startswith("pages/"):
+            continue
+        raise SnapshotVerificationError(
+            f"snapshot root contains an unauthenticated sidecar file: {relative}"
+        )
     if actual_files != referenced_files:
         raise SnapshotVerificationError(
             "raw page inventory mismatch; "

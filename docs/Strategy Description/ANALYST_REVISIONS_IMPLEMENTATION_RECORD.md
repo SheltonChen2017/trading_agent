@@ -1977,6 +1977,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-01 | Codex implementation | `4c686a55` -> this record commit | Owner-approved ARV2-4C full-39 global comparator and corrected matched-row structural candidate | Implemented three content-addressed outcome-free artifacts plus an authenticated loader/resolver/hash-counter boundary. Preserved predecessor and fold bytes, added the complete seven-source acyclic ancestry, exact 39-map/15-refusal policy, symmetric paired-only zero-range handling, five pooled/per-fold 19/20 coverage ledgers, staged post-join underfill, deterministic complete-session bootstrap, and full-path scale-invariance/adversarial tests. | Focused candidate **152 passed, 1 host skip**; complete Analyst suite **571 passed, 2 host skips in 132.60 s**; complete repository **7,068 passed, 14 skipped, 3 standing out-of-lane failures, 26 warnings in 1,254.63 s**; compileall exit 0; exact artifact render equality and diff checks green. The three failures are `ARV2-UNRELATED-001` plus the two `ARV2WL-D11` sleeve-report cases and were documented, not fixed. No credential, provider row, licensed artifact, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | `ARV2I4C-001` through `ARV2I4C-004` P2 and `ARV2I4C-005` through `ARV2I4C-007` P3 corrected. Three final independent read-only audits accepted with no remaining P0-P3. | Commit implementation and record, revalidate exact final tree, re-fetch and stop if remote moved, then make exactly one combined push. Claude independently reviews the complete pushed range on this branch; Codex counter-reviews before the power-plan milestone. |
 | 2026-09-01 | Codex counter-review | `db2d8011` -> this local record commit | Accept Claude's ARV2-4C review after one documentation correction; identify the exact power-policy gate | Accepted Claude's test-only predecessor-refusal regression and independently verified the exercised guard. Corrected section 16's linear-looking DAG shorthand to a topological node order with exact parent sets; no production code changed. Derived the next safe milestone boundary from the PDF and frozen parent contracts without choosing financial/statistical numbers. | New regression **1 passed** independently; final ARV2-4C plus active-document battery **220 passed, 1 host skip in 20.29 s**; `git diff --check` clean apart from informational Windows line-ending notice. No credential, provider row, licensed artifact, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | `abcb34f3` accepted; `db2d8011` accepted after `ARV2CR12-001` P3 record correction. No P0-P2. ARV2R10-D01/D02 remain accurately documented. | Keep this counter-review local and unpushed until the owner approves the exact power-policy inputs; then implement one bounded outcome-free power milestone, validate both stages, and make the single combined push. |
 | 2026-09-02 | Codex implementation | `db2d8011` -> `ac6f06e4` (counter-review `317ebe03`; record commits follow) | Owner-approved ARV2-4D-A outcome-free power-calibration protocol | Retained and committed the section-17 counter-review, then froze the exact 10-bps/+1 bullish H20 effect, nominal 80%/two-sided 5% planning policy, 483-session pre-test calibration axis, lag-20 HAC and q05 component arithmetic, 1,388-session fixed capacity, closed disclosure contract, nine-node lineage, authenticated loader, and non-authoritative provisional helper. No input manifest, numeric receipt, successor binding, or action authority was created. | Protocol **94 passed, 1 host symlink skip**; protocol plus import firewall **210 passed, 1 skip in 118.28 s**; complete Analyst suite **666 passed, 3 skips in 167.60 s**; exact committed repository **7,162 passed, 15 skipped, 4 standing out-of-lane failures, 26 warnings in 1,321.04 s**. The failures are `ARV2-UNRELATED-001` and three date-relative Trading App sleeve-report assertions in the standing `ARV2WL-D11` family; documented, not fixed. Renderer/raw artifact SHA and diff checks are exact. No credential, provider row, licensed artifact, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | `ARV2I4DA-001` through `ARV2I4DA-007` P2 and `ARV2I4DA-008` through `ARV2I4DA-010` P3 corrected. Three independent final read-only audits accepted with no remaining P0-P3. | Revalidate the final record-only change, re-fetch and stop if the remote moved, then make exactly one combined push. Claude reviews `db2d8011..new_head`; Codex counter-reviews before any separately authorized ARV2-4D-B work. |
+| 2026-09-02 | Claude review and deferred-finding resolution | `35b3833` -> this commit | Independent review of ARV2-4D-A plus resolution of the section-13 deferred findings | Reviewed all four commits in `db2d801..35b3833` with an explicit disposition each (section 19); ARV2-4D-A accepted with no correction required. Verified rather than accepted: both recorded identities reproduce exactly (protocol ID `arv2-stock-power-calibration-protocol-0ba6b7d745783796`, artifact SHA-256 `ff16117a...f4a13`), all nine action capabilities are literal false, the loader cannot be called without the complete six-artifact reviewed ancestry, and the import firewall still reports zero forbidden roots. Separately resolved the whole-lane deferred findings: corrected `ARV2WL-D01`, `-D02`, `-D03`, `-D05`, `-D07`, `-D08`; documented `-D04`, `-D06`, `-D09`, `-D10` with the reason each must not be fixed on this branch; `-D11` remains out of lane per the owner scope rule. Added `tests/analyst_revisions_v2/test_dormant_etf_portfolio_arithmetic.py`. No committed artifact was re-serialised and no frozen shared file was touched. | New dormant-arithmetic file **14 passed**; active-document gate **69 passed**; focused ARV2 batteries green; full-tree suite result recorded in this push's commit message; compileall exit 0; `git diff --check` clean. Mutation evidence: ignoring the ETF cap in water filling (3 failed), dropping the cost impact term (1), ignoring the coverage denominator (2), dropping the weight from the weighted score (1), disabling the firm-normalization census (1), and removing the snapshot sidecar refusal (1) all turn the new tests red; restoring turns them green. No provider, credential, licensed row, price, return, outcome, broker, operator-database, QuantConnect or scheduler access. **0 research looks.** | 0 P0, 0 P1, 0 P2, 0 P3 against the reviewed range. Two self-corrections are recorded rather than hidden: the first `ARV2WL-D03` test did not discriminate its own fix, and investigation showed the fail-open is unreachable because `mapped` is rounded during accumulation, so the test now pins the real boundary property and the change is labelled hardening; and the first `ARV2WL-D05` comment claimed the hard caps were re-checked exactly when they are re-checked with tolerance, so it now states what the code enforces. `ARV2WL-D10` was attempted and correctly abandoned after finding that the tightened byte check would reject a reviewed hash-pinned artifact whose root keys are unsorted. | Codex counter-reviews this exact pushed head. ARV2-4D-B stays unauthorised pending a separately reviewed input-manifest schema and calibration-input authority. The four deliberately unfixed findings are owner or ARV2-5 decisions, and the two-reviewer ownership question in `ARV2R5-002` is still open. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -3417,3 +3418,86 @@ must not begin without separate exact owner authority for its reviewed input
 schema and calibration inputs/rights. No credentials are needed now. ARV2-4
 and every provider, outcome, QC, paper, funded, deployment, and trading action
 remain blocked.
+
+## 19. Independent Claude review of ARV2-4D-A and resolution of the whole-lane deferred findings, 2026-09-02
+
+**Range reviewed:** `db2d801..35b3833`, four commits, each disposed below.
+**Disposition: ACCEPTED.** 0 P0, 0 P1, 0 P2, 0 P3 against the reviewed range.
+Separately, this session was asked to resolve the findings section 13 recorded
+as documented-but-unfixed. Six are now corrected, four are documented with the
+reason they must not be fixed here, and one is out of lane.
+**Zero research looks.** No provider, credential, licensed row, price, return,
+outcome, broker, operator-database, QuantConnect, scheduler or order access
+occurred.
+
+**Reviewing session:** the Fable 5 session on the work identity, which also
+produced sections 4I, 4R and 7. Sections 4L, 4O, 10, 13 and 16 were produced
+by the Opus 5 session; see `ARV2R5-002` on lane review ownership.
+
+### 19.1 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `317ebe0` | Accepted | Codex counter-review of the ARV2-4C corrections; record-only. |
+| `ac6f06e` | Accepted | The ARV2-4D-A power-calibration protocol. Verified in 19.2. |
+| `6e7d2ce` | Accepted | Milestone record for the above. |
+| `35b3833` | Accepted | Final validation record. |
+
+### 19.2 ARV2-4D-A verified rather than accepted
+
+- **Both recorded identities reproduce exactly.** Loading the artifact yields
+  protocol ID `arv2-stock-power-calibration-protocol-0ba6b7d745783796`, and the
+  file's SHA-256 is `ff16117a258a1864438d11178a2b31af1b04a3f8b27d1f39c9c33552627f4a13`
+  — both identical to the values recorded in section 18.
+- **All nine action capabilities are literal false**: calibration-input access,
+  source access, outcome access, authoritative receipt, power-plan binding, QC
+  action, result disposition, deployment and orders.
+- **The loader demands the complete reviewed ancestry.** It cannot be called
+  without the global rating map, matched-comparison contract, stock successor
+  spec, parent stock spec, fold manifest and QC-first plan. A protocol divorced
+  from its lineage does not load at all.
+- **No data or network surface.** Imports are stdlib plus
+  `data.exchange_calendar` plus in-lane modules; the transitive import firewall
+  still reports zero forbidden roots.
+- **The scope disclaimer is honest.** The 10bp effect and 80% target are
+  claimed for exactly one coefficient and explicitly disclaimed for the net
+  sleeve, paired IC, three-gate family, bootstrap and the lane as a whole, with
+  the numeric receipt deferred to ARV2-4D-B under separate authority.
+
+### 19.3 Deferred whole-lane findings: corrected
+
+| ID | Was | Correction | Verification |
+|---|---|---|---|
+| ARV2WL-D01 | P2 | **Substantially closed.** Added `tests/analyst_revisions_v2/test_dormant_etf_portfolio_arithmetic.py` (14 tests) covering the allocator's water filling and 20/40/30 caps, `mapped_candidate_coverage`, the `weighted_stock_score` success path, and `portfolio_transaction_cost`. The zero-access gate is bypassed only locally inside that file; its refusals keep their own tests and no committed artifact or authority is altered. | Four mutations killed: ignoring the ETF cap in water filling (3 failed), dropping the impact term from cost (1), ignoring the coverage denominator (2), dropping the weight from the weighted score (1). Cost splitting is pinned as non-reducing. |
+| ARV2WL-D02 | P2 | **Closed.** The three tests the archived remediation record named now exist under exactly those names: `test_weighted_score_requires_loader_authenticated_exact_score_artifact`, `test_stock_score_artifact_refuses_missing_extra_duplicate_and_invalid_rows`, and `test_stock_score_authority_refuses_clone_mutation_substitution_and_foreign_context`. | They pass, and they exercise real behaviour (authority, census, post-authentication mutation) rather than restating the names. |
+| ARV2WL-D03 | P3 | **Hardened, with an honest scope correction.** Coverage eligibility now compares `Fraction(mapped)` against `Fraction(threshold) * Fraction(denominator)` instead of a rounded quotient. | I first wrote a test asserting this fixed a reachable fail-open; mutation showed the test did not discriminate, and investigation showed why: `mapped` is accumulated under the same 50-digit context, so a higher-precision weight is already rounded before the comparison sees it. The fail-open is therefore **unreachable through this path**, and the change is hardening only. The test now pins the real property — exact decision at the threshold boundary — rather than claiming a fix it does not deliver. |
+| ARV2WL-D05 | P3 | **Closed.** The bare `1e-18` is now `ALLOCATION_CONVERGENCE_TOLERANCE`. | Its comment initially claimed the hard caps were re-checked *exactly*; they are re-checked as `weight > cap + tolerance`. The comment now states what the code enforces — a bounded overshoot of at most 1e-18 of NAV — rather than a guarantee it does not provide. |
+| ARV2WL-D07 | P3 | **Closed.** `FirmRatingNormalizationResult` now carries an optional `source_census` and refuses when dispositions do not cover it exactly; `normalize_firm_rating_audit` populates it from the audit, so the invariant is live rather than dormant. | Mutation: disabling the census check fails the new regression; restoring passes. |
+| ARV2WL-D08 | P3 | **Closed.** `load_snapshot` now reconciles the entire snapshot root, not only `pages/`: any file that is neither the manifest nor a referenced page is refused as an unauthenticated sidecar. | Mutation: removing the refusal fails the new regression, which covers both a root-level and a nested sidecar; restoring passes. |
+
+### 19.4 Deferred whole-lane findings: documented, deliberately not fixed
+
+| ID | Reason it is not fixed here |
+|---|---|
+| ARV2WL-D04 | Recording a `ForcedExit`/underfill row for an evicted incumbent changes the shape of the `PortfolioDecision` research artifact. That is the ARV2-5 decision-artifact design point the finding itself names, not a defect to patch unilaterally. |
+| ARV2WL-D06 | Converting the firewall from denylist to allowlist alters the closure computation and is explicitly an owner-scheduled lane-architecture consolidation, ideally adopting the Target Price implementation to remove the second implementation. Out of scope for a review pass. |
+| ARV2WL-D09 | The retained half is a refusal-scope labelling inconsistency. Changing `RefusalScope` values would alter frozen refusal semantics that downstream contracts pin by hash. |
+| ARV2WL-D10 | **Attempted, abandoned, and re-specified.** Adding `sort_keys=True` to the standalone loader's canonical-bytes check is the fix the finding proposes, but it is the wrong fix and I verified why before applying it. The disorder is not confined to the root: `arv2_stock_historical.structural.json` contains **29 unsorted dicts** nested throughout, so sorting re-serialises the whole artifact, changing its bytes, `spec_hash` and `spec_id`, and cascading into every descendant that pins that ancestry (fold manifest, successor spec, matched-comparison contract, calibration protocol). That is a multi-artifact re-pin needing owner authorisation and fresh review anchors, for a formatting property. The root order is also a deliberate human header (`schema, status, authority, spec_id, spec_hash, ...`); alphabetising it would lead with `analysis_definition` and read worse. **The correct fix needs no artifact change at all:** pin the artifact's raw SHA-256 and compare `sha256(payload)` against it, which is the mechanism this codebase already uses — `fold_manifest.py:59` pins `PARENT_STOCK_SPEC_ARTIFACT_SHA256 = 34d1e715...`, verified here to equal the artifact's actual digest. The composed path is therefore **already closed**; the gap is only the standalone loader, which re-derives bytes instead of comparing them to a pin. A raw-byte pin also catches strictly more than `sort_keys` would: nested reordering, whitespace, and any other byte difference. Import direction cooperates (`fold_manifest` imports from `stock_evaluation_contract`), so the constant belongs in `stock_evaluation_contract` with `fold_manifest` importing it, which also removes today's duplicated literal. Known cost: the module and its artifact must then be re-pinned together, already the accepted pattern here (four such constants in `fold_manifest` alone). Left unapplied in this push because it modifies a reviewed contract loader and belongs in its own scoped correction with its own red/green mutation, not folded into this batch. |
+| ARV2WL-D11 | Out of lane by the owner scope rule, and now **three** failures rather than two as the date advanced to 2026-09-02: `test_default_gain_review_is_fifty_percent_and_long_term_gated`, `test_every_lot_row_carries_the_tax_mechanism_fields` and `test_report_carries_no_action_shaped_field`. **The cause is more specific than the original "time-relative fixture" note.** The fixture pins a clock (`_NOW = 2026-08-07`) and builds each lot at `_NOW - timedelta(days=days_ago)`, but `evaluate_sleeves(...)` is called with no clock argument, so the report under test reads the real wall clock instead. A lot built with `days_ago=340` is therefore acquired 2025-09-01 and crossed one year on 2026-09-01, which is why the count grew from two failures on 2026-09-01 to three on 2026-09-02: the assertions `term_if_sold_now == "short"` and `0 < days_to_long_term <= 30` are only true inside a roughly 26-day window after the pinned `_NOW`. The fix belongs to the three-sleeve engine owner and is to thread the pinned clock into the call under test rather than to widen the assertions. **Proven to pre-exist this work rather than assumed:** with every change in this push stashed, the pristine tree at `35b3833` fails the identical three, and `tests/test_sleeve_report.py` imports nothing from the Analyst lane. Documented under rule 1; not fixed on this branch. |
+
+### 19.5 Validation
+
+- Focused ARV2 batteries after the corrections, plus the new
+  `test_dormant_etf_portfolio_arithmetic.py` at **14 passed**.
+- Full suite on the exact final tree recorded in this push's commit message.
+- `compileall` exit 0; `git diff --check` clean; no frozen shared file touched;
+  no committed artifact re-serialised; every production authority still empty
+  and every action capability still literal false.
+
+### 19.6 Next step
+
+Codex counter-reviews this exact pushed head. ARV2-4D-B remains unauthorised
+by the ARV2-4D-A approval and still requires a separately reviewed
+input-manifest schema and exact calibration-input authority before any numeric
+receipt exists. The four deliberately unfixed findings in 19.4 remain owner or
+ARV2-5 decisions.

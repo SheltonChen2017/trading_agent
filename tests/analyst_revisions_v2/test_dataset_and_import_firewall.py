@@ -76,6 +76,7 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "research.analyst_revisions_v2.legacy_reproduction",
     "research.analyst_revisions_v2.normalization",
     "research.analyst_revisions_v2.portfolio",
+    "research.analyst_revisions_v2.power_calibration_protocol",
     "research.analyst_revisions_v2.preregistration",
     "research.analyst_revisions_v2.production_registry",
     "research.analyst_revisions_v2.provider_history",
@@ -1006,6 +1007,9 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
         "formulas.py": {"_POLICY_AUTHORITIES"},
         "global_benchmark_contract.py": {"_GLOBAL_BENCHMARK_AUTHORITIES"},
         "holdings.py": {"_STOCK_SCORE_AUTHORITIES"},
+        "power_calibration_protocol.py": {
+            "_POWER_CALIBRATION_PROTOCOL_AUTHORITIES"
+        },
         "preregistration.py": {"_REVIEWED_AUTHORITIES"},
         "security_master.py": {"_SECURITY_MASTER_AUTHORITIES"},
         "snapshot.py": {"_SNAPSHOT_AUTHORITIES"},

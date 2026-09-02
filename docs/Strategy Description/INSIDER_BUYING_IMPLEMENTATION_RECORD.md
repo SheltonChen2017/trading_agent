@@ -1,24 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE IB-0/IB-1 STRUCTURAL SLICE AND BOUNDED IB-1A THROUGH IB-1G
+Status: **THE IB-0/IB-1 STRUCTURAL SLICE AND BOUNDED IB-1A THROUGH IB-1H
 OFFLINE EVIDENCE CONTRACTS ARE IMPLEMENTED. CODEX COUNTER-REVIEWED CLAUDE'S
-OWNER-DIRECTED FULL-LANE REVIEW COMMIT `4a9ca17f`: IT IS ACCEPTED AFTER
-CURRENT-RECORD CORRECTION, WITH NO PRODUCT-CODE DEFECT FOUND. SECTION 31
-CORRECTS CLAUDE'S INCOMPLETE COMMIT INVENTORY, LIVE CONTRACT WORDING, ROADMAP
-WORDING, VALIDATION TRACEABILITY, AND OPEN-FINDING CARRY-FORWARD. CLAUDE HAS
-NOW INDEPENDENTLY REVIEWED IB-1G (SECTION 32): BOTH COMMITS ACCEPTED, ONE
-BOUNDED TEST CORRECTION APPLIED FOR IB1G-R06, LANE RATED 9/10, AWAITING
-CODEX COUNTER-REVIEW. COMMIT
-`5ee2c040` ADDS THE BOUNDED IB-1G EVIDENCE-BOUND PROVISIONAL FORM 4
-DISPOSITION/QUARANTINE REPORT. IB-1 REMAINS INCOMPLETE: PACKAGE ACQUISITION
-AND FULL HISTORICAL POPULATION ARE UNSTARTED, WHILE CALLER-SUPPLIED ARCHIVE
-AND MEMBER HASHING, INVENTORY VALIDATION, AND IMMUTABLE RAW PUBLICATION ARE
-IMPLEMENTED OFFLINE. BLUEPRINT SECTION 19.4 STEP 4 IS ONLY PARTIALLY
-IMPLEMENTED BY AN IN-MEMORY PROVISIONAL REPORT; NO DURABLE REPORT PUBLISHER,
+IB-1G REVIEW COMMIT `2ef057d6`: ITS ADDITIVE TEST IS ACCEPTED AFTER THE
+CURRENT-RECORD CORRECTIONS IN SECTION 33, WITH NO PRODUCT-CODE DEFECT FOUND.
+COMMIT `43612324` ADDS IB-1H IMMUTABLE PUBLICATION AND EVIDENCE-BOUND RELOAD
+FOR THE PROVISIONAL FORM 4 DISPOSITION/QUARANTINE REPORT. IB-1 REMAINS
+INCOMPLETE: PACKAGE ACQUISITION AND FULL HISTORICAL POPULATION ARE UNSTARTED,
+WHILE CALLER-SUPPLIED ARCHIVE/MEMBER HASHING, INVENTORY VALIDATION, RAW
+PUBLICATION, AND PROVISIONAL-REPORT PUBLICATION ARE IMPLEMENTED OFFLINE.
+BLUEPRINT SECTION 19.4 STEP 4 STILL HAS NO CANONICAL FILTER AUTHORITY.
 OFFICIAL SEC PROFILE, REAL PACKAGE, AUTHENTICATED AMENDMENT LINK, COMPLETE
-AMENDMENT COVERAGE, POINT-IN-TIME SECURITY IDENTITY, OR CANONICAL FILTER
-AUTHORITY EXISTS. NORMALIZATION, SIGNAL CONSTRUCTION, OUTCOME TESTING, ETF
-PORTFOLIO WORK, AND QC IMPLEMENTATION REMAIN UNSTARTED.**
+AMENDMENT COVERAGE, POINT-IN-TIME SECURITY IDENTITY, NORMALIZATION,
+AGGREGATION, THE `$50,000` GATE, SIGNAL CONSTRUCTION, OUTCOME TESTING, ETF
+PORTFOLIO WORK, AND QC IMPLEMENTATION REMAIN UNPROVEN OR UNSTARTED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -155,6 +150,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-01 | Claude full-lane review | `864030a2` -> this review snapshot | Owner-directed first-principles review of the entire Insider Buying lane (20 lane files; merge-aware inventory of **55 commits, 5 merges** from `c9dcdb64` to `864030a2`), superseding the narrow latest-range review | Verified the actual synchronized head (the owner's expected `933378fb` was stale), asserted every pathspec non-empty, dispositioned all 55 commits including every merge, read the complete 33-page blueprint from the hash-verified PDF using a stdlib-only extractor (no dependency added), and audited the current tree from first principles rather than from prior conclusions. **No code correction was required**; `cb8a46a4` had already closed the one P2 defect in range. Full detail in section 30. | Interpreter **Python 3.14.6**; all seven Insider modules plus import-boundary, module-hygiene, both project-separation suites and active-document: **713 passed, 7 skipped in 263.89s**; complete repository suite: **2 failed, 6890 passed, 13 skipped, 25 warnings in 1499.20s (0:24:59)**; failures: tests/test_sleeve_report.py::test_default_gain_review_is_fifty_percent_and_long_term_gated, tests/test_sleeve_report.py::test_every_lot_row_carries_the_tax_mechanism_fields; **whole-repository compileall exit 0** (the control I omitted last round); record-sensitive gate **263 passed**; adversarial probes covering footnote structure, title grammar, 18 decimal inputs, joint owners, Form 5 and exact-product arithmetic; 4 mutants on the new footnote guard (2 caught, 2 provably redundant); every module restored byte-identical to `HEAD`. No filing, package, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | Reproduced and accepted the P2 I missed (IB0H-CCR01): on the tree I had accepted, a row referencing only `F2` inherited nested `F1` prose and was wrongly excluded - my isolation probes varied which footnote was referenced but never how footnotes were structured. Accepted CCR02/03/04/06/07; corrected one CCR05 sub-claim with evidence (each scaling series spans 16x; the quoted 32x compares different input shapes). New: **IBFL-01** (P3) the frozen contract narrows blueprint 2.1 item 2's "equivalent ordinary share class" and the grammar refuses `Ordinary Shares`/`Common Shares` - constructed strings, no filing inspected; **IBFL-02** (P3) section 1 says "30-day lookback" where blueprint 9.2 says 30 **trading** days; **IBFL-03** (P3) blueprint step 19.4.1 is unstarted and step 4's quarantine report does not exist. All prior open findings carried forward; IB0H-R08 withdrawn. Lane rated **8/10**. | Codex counter-reviews this review commit. No milestone started or authorized. |
 | 2026-09-01 | Codex counter-review + implementation | Reviewed `864030a2..4a9ca17f`; implemented `4a9ca17f` -> `5ee2c040` -> this record commit | Counter-review Claude's owner-directed full-lane review and implement bounded **IB-1G evidence-bound provisional Form 4 disposition/quarantine report** | Accepted Claude's product-code assessment but corrected seven current-record defects, including its incomplete merge/commit inventory and the live blueprint contract wording. Added an offline report that accepts only exact factory-created IB-1E evidence, pre-bounds and revalidates every nested inventory and identity, reparses every supplied XML byte image, and emits one deterministic reason-coded row per transaction. It preserves all parser outcomes/diagnostics and calls only the singleton eligible outcome a provisional pre-aggregation candidate. It performs no aggregation or `$50,000` gate. Full detail in section 31. | Red phase: missing public IB-1G API raised `ImportError`; focused final module: **40 passed in 1.24s**; intermediate affected suite: **248 passed in 15.81s**; complete repository on committed `5ee2c040`: **2 failed, 6914 passed, 13 skipped, 25 warnings in 1191.32s (0:19:51)**, solely the two unchanged out-of-lane `tests/test_sleeve_report.py` failures; whole-repository `compileall`: **exit 0**. Final named lane/boundary and record suite: **737 passed, 7 skipped in 190.34s (0:03:10)**. Python **3.14.6**, pytest **9.1.1**. No filing, package, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, deployment, order, or UI access; **0 research looks**. | `4a9ca17f` accepted after current-record correction. IBFL-CR01..07 closed. IB1G-R01..03 and R06 closed during self/audit review; IB1G-R04 and R05 remain P3 deferred provenance/coupling debt. IB01-R05 remains open out of lane. No open P0-P2 defect remains in the new product-code diff. | Commit this record, make exactly one combined push, and stop for Claude to review the exact pushed range. |
 | 2026-09-01 | Claude review | `4a9ca17f` -> this review snapshot | Independent review of the IB-1G provisional Form 4 disposition report and its counter-review handoff (`4a9ca17f..e2eca996`, 2 commits, 0 merges, 4 paths, 1,786 insertions / 24 deletions - every expected value matched) | Verified state and ancestry, dispositioned both commits, reproduced all seven counter-review findings against my section 30, and exercised every adversarial direction the owner named. One bounded correction applied. | Python **3.14.6**, pytest **9.1.1**; IB-1G module **40 passed** before and **41 passed** after the addition; named 12-file Insider/boundary suite (exact set in 32.8) **738 passed, 7 skipped in 349.53s**, the recorded 737 plus one; eleven dangerous-direction mutants across two batches; whole-repository compileall **exit 0**; complete suite: **3 failed, 6914 passed, 13 skipped, 25 warnings in 1445.00s (0:24:04)**; failures: tests/test_sleeve_report.py::test_default_gain_review_is_fifty_percent_and_long_term_gated, tests/test_sleeve_report.py::test_every_lot_row_carries_the_tax_mechanism_fields, tests/test_sleeve_report.py::test_report_carries_no_action_shaped_field; record gate **pending**; every module restored byte-identical to `HEAD`. Synthetic inputs only; no filing, package, provider, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, deployment, or order access; **0 research looks**. | Both commits **accepted**. IB-1G's guarantees are load-bearing: routing inversion, row duplication, non-deterministic ordering, candidate miscount, all four authority directions, and a future `ParsedTransaction` field escaping the fingerprint were each caught. **IB1G-R06 (P3) fixed here**: the eligible-plus-quarantine guard and the singleton routing decision had no test sensitivity - unreachable from today's parser, and verified correct when invoked directly - so a regression now pins them. All seven IBFL-CR findings against me confirmed, including that `d6d26e09` is a merge adding 23 lane lines over its first parent, which my section 30 wrongly described as a lane-identical carry; I add that its combined diff is empty, so the content came from the second parent rather than conflict resolution. IB1G-R04/R05 framings independently verified accurate. No test removed or weakened. Lane rating raised to **9/10** because the blueprint-fidelity deduction is closed. | Codex counter-reviews this review commit. No milestone started or authorized. |
+| 2026-09-02 | Codex counter-review + implementation | `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` -> `4361232412800286a78a189223f415fdd9a7f753` -> this record commit | Counter-review Claude's IB-1G review and implement bounded **IB-1H immutable provisional disposition-report snapshots** | Accepted Claude's additive eligible-coexistence regression after six append-only P3 record corrections. Added one canonical, immutable report snapshot per `report_id`; the loader requires exact IB-1E evidence, rebuilds through the public IB-1G builder, and accepts only canonical stored bytes equal to that rebuild. Added bounded JSON/resource validation and fail-closed filename, conflict, hard-link, redirect/reparse, coherent-forgery, authority, ordering, scalar, and detected-TOCTOU checks. No mapping, aggregation, `$50,000` gate, canonical filtering, outcome, ETF, QC, UI, or trading surface was added. Full detail is in section 33. | Python **3.14.6**, pytest **9.1.1**. Focused IB-1H: **45 passed, 1 skipped in 2.46s**; affected IB-1E/IB-1G/IB-1H/import boundary: **109 passed, 1 skipped in 17.09s**; named 13-file Insider/boundary suite: **783 passed, 8 skipped in 184.57s (0:03:04)**. Complete committed-tree suite: **3 failed, 6,959 passed, 14 skipped, 25 warnings in 1,209.15s (0:20:09)**; only the three unchanged out-of-lane sleeve fixed-clock failures reproduced. Whole-repository compileall including `research`: **exit 0**. Synthetic/local inputs only; no filing, real package, provider data, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, deployment, order, or UI access; **0 research looks**. | `2ef057d6` accepted after current-record correction; IB1G-CCR01..06 closed. IB1H-R01 P2 and IB1H-R04/R05 P3 closed before implementation commit. IB1H-R02/R03 remain open P3 filesystem/provenance limits; inherited IB1G-R04/R05 and IB1E-R05 debt remains open. No open P0-P2 defect remains in the new product-code diff. | Run the final record/diff/secret/remote gates, commit this record, make exactly one combined push, and stop for Claude to review the exact pushed range. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -4030,3 +4026,161 @@ synthetic. **Research looks: 0.**
 
 Next authorized step: Codex counter-reviews this review commit. No milestone
 was started and none is authorized here.
+
+## 33. Codex counter-review and IB-1H immutable provisional-report snapshots (2026-09-02)
+
+Codex worked only in
+`C:\git\customizedagent\trading_agent_insider` on
+`codex/strategy-insider-buying`. No branch, worktree, fork, merge, or handoff
+was created or used.
+
+The counter-review began from a clean worktree with local `HEAD` and
+`origin/codex/strategy-insider-buying` both exactly
+`2ef057d6294ef26afcd49542fdf7432bc4f0aa59`. Claude's review range was
+`e2eca9965d9c12c9cd136f60077d2e5552335b01..2ef057d6294ef26afcd49542fdf7432bc4f0aa59`:
+one commit, no merge, two changed paths, 253 insertions, and one deletion. The
+bounded IB-1H implementation is
+`4361232412800286a78a189223f415fdd9a7f753`.
+
+**Outcome:** Claude's `2ef057d6` test correction is accepted after the
+current-record corrections below. No product-code defect was found in Claude's
+commit. Under the owner's instruction to counter-review and then implement one
+next bounded milestone in the same round, IB-1H now adds an immutable,
+evidence-bound persistence/reload boundary for the IB-1G provisional Form 4
+disposition/quarantine report. This owner decision grants no real-data,
+outcome, canonical-filter, aggregation, QuantConnect, deployment, or trading
+authority.
+
+### 33.1 Claude commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` | **Accepted after current-record correction.** | The additive regression correctly pins the eligible-plus-quarantine coexistence refusal and no test was weakened. Independent mutation reproduced that neutralising this payload guard yields **1 failed, 40 passed**. The test does not independently execute the two later singleton-routing comparisons, which remain redundant and unreachable while the payload guard holds. Six P3 evidence/wording defects in section 32 are corrected append-only below; none is a production defect. |
+
+### 33.2 Counter-review findings - superseding, append-only corrections
+
+Historical section 32 is preserved. These rows supersede only the identified
+current-state claims.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1G-CCR01 | P3 | Closed in this record | `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` | sections 31.5 and 32.5 | Section 32 reused stable ID `IB1G-R06`, which section 31 had already assigned to future `ParsedTransaction` field-fingerprint coverage. Reuse makes the durable issue ledger ambiguous. | Direct record comparison finds two different findings under the same ID. | Stable IDs must identify exactly one finding across the lane history. | Preserve both historical rows; this section refers to Claude's eligible-coexistence test finding as **IB1G-R07**. | Record search now has an unambiguous superseding mapping without rewriting history. |
+| IB1G-CCR02 | P3 | Closed in this record | `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` | section 32.4/32.5 and the new coexistence regression | Claude said the new regression pins both the payload coexistence guard and singleton routing. It invokes only `_transaction_payload`; the two later equality-to-membership routing mutants remain green because the guard makes mixed outcomes unreachable. Claude also recorded the guard mutant as 1 failed / 39 passed rather than 1 failed / 40 passed. | Line-sensitive execution reaches the payload guard but not the later report routing. Replacing the routing equalities with membership tests leaves all 41 cases green; neutralising the payload guard produces **1 failed, 40 passed**. | Review evidence must distinguish the tested control from equivalent downstream logic and retain exact counts. | Accept the additive test as pinning the coexistence refusal only. Treat the later equality checks as redundant defence, not independently mutation-pinned controls. | Exact test and both mutation directions reproduced; every module was restored byte-identical afterward. |
+| IB1G-CCR03 | P3 | Closed in this record | `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` | section 32.4 mutation table and summary | The table contains **11** directions, while the prose says “eight of ten.” Before Claude's addition, nine listed directions were caught and two survived; afterward the coexistence guard is caught while the redundant routing mutant still survives. | Counted the table rows and reproduced the two survivor directions independently. | Mutation arithmetic must match the evidence table. | Correct total: **11 directions; 9 initially caught, 2 initially survived, and 1 of those 2 is now caught.** | Direct table recount and independent mutations. |
+| IB1G-CCR04 | P3 | Closed in this record | `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` | sections 32.2 and 32.4 | Claude repeatedly described “eight authority fields plus the zero look-count.” The identity has seven Boolean authority fields plus `authorized_outcome_looks`. | Runtime/dataclass inspection enumerated official profile, official amendment link, complete amendment coverage, PIT security identity, canonical filter, lot aggregation, and outcomes. | Authority accounting must not inflate or blur the actual contract. | Correct wording is **seven Boolean authority fields, all false, plus `authorized_outcome_looks == 0`**. | Structural inspection and focused assertions confirm all seven false values and zero looks. |
+| IB1G-CCR05 | P3 | Closed in this record | `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` | section 5 Claude ledger row and section 32.8 | Section 32.8 says the post-record gate and final pushed state are in the appended ledger row, but that row says `record gate pending` and does not record exact local/remote equality at `2ef057d6`. | Direct comparison of section 32.8 with the section 5 row. Counter-review began clean with local and remote both exactly `2ef057d6294ef26afcd49542fdf7432bc4f0aa59`. | The lane record must not claim evidence exists in a location where it is absent. | Preserve the historical row and durably record the exact observed post-review state here. Do not infer an unrecorded prior gate result. | Start-state fetch, status, and exact local/remote hash equality were independently verified. |
+| IB1G-CCR06 | P3 | Closed in this record | `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` | section 32.10 out-of-lane sleeve note | Claude correctly identified the fixed test clock versus real-clock mismatch, but “each real day” and “will keep growing” overstate the behavior. The failure set can change when lots cross relevant anniversary boundaries; it is not proved to grow daily or monotonically. | The three named sleeve failures were reproduced without any lane-owned file in their history range. Their outcomes depend on wall-clock-relative lot age. | An out-of-lane routing note should state the confirmed mechanism without forecasting unsupported monotonic behavior. | Retain the fixed-clock diagnosis and three observed failures; narrow the forecast to: **the failure set can drift as wall time crosses lot-age boundaries until the owning surface pins its clock.** | All three failures reproduced; no sleeve, Trading App, Streamlit, or shared production file was changed. |
+
+### 33.3 IB-1H bounded implementation
+
+Commit `4361232412800286a78a189223f415fdd9a7f753` adds
+`form4_provisional_disposition_snapshot.py`, its public package exports, and a
+dedicated synthetic test module.
+
+The writer accepts an exact-type IB-1G report, validates its complete current
+payload and seven false authority gates, serializes one canonical JSON byte
+image named from `report.identity.report_id`, and publishes it immutably.
+Identical retries are idempotent; different bytes at the same identity refuse.
+The report-only writer proves structural self-consistency, not historical
+factory origin.
+
+The loader requires exact supplied IB-1E evidence. It validates filename,
+schema, exact keys and types, hashes, row counts/order, canonical decimal text,
+UTF-8, and canonical JSON before invoking the public IB-1G builder. It then
+rebuilds the report from the supplied evidence and accepts the stored artifact
+only when its canonical bytes equal the rebuilt snapshot bytes. Serialized
+rows are never promoted directly into trusted Python evidence and no private
+factory token is used to reconstruct them.
+
+Byte, JSON-depth, row-count, and upstream resource limits are checked before
+expensive parsing or rebuilding. Duplicate/unknown keys, non-finite or
+noncanonical decimals, coherent readdressing, authority claims, row
+duplication/reordering, filename mismatch, hard links, redirects/reparse
+points, and detected read-time version changes fail closed.
+
+IB-1H is only durable publication/reload of the existing provisional report.
+It does not perform point-in-time security mapping, reporting-owner resolution,
+same-owner/security/date aggregation, the post-aggregation `$50,000` gate,
+canonical filtering, signal construction, outcome access, ETF construction,
+or QuantConnect work.
+
+### 33.4 IB-1H implementation findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1H-R01 | P2 | Closed before `43612324` | `4361232412800286a78a189223f415fdd9a7f753` | snapshot writer/loader path ancestry | An early draft could validate only the apparent leaf/root and then traverse a pre-existing nested symlink, junction, or Windows reparse ancestor while creating an output tree or opening a snapshot. That could redirect immutable publication or load outside the named lexical path. | An independent Windows junction probe made the weakened draft read and canonicalize through the redirect. | Immutable evidence must not cross an unchecked filesystem redirect. | Added lexical `lstat` validation of every existing path component before creation, after creation, under the publication lock, and before load/rebuild. Redirect, non-directory ancestor, leaf hard-link, and detected TOCTOU checks fail closed. | Simulated nested-redirect writer/loader regressions, real redirect tests where supported, hard-link tests, and version-change tests pass. |
+| IB1H-R02 | P3 | Open - shared/pathname hardening limit | `4361232412800286a78a189223f415fdd9a7f753` | path ancestry and `ml.immutable_io.exclusive_file_lock` | Checks remain pathname-anchored rather than descriptor-anchored. A privileged concurrent actor could swap an ancestor between checks, and the shared lock helper does not expose its open handle so the lock pathname cannot be compared with the acquired handle after entry. | Static audit of the check/open sequence and shared lock-helper API. | Complete closure requires descriptor-relative traversal and a shared lock-handle identity contract, which would broaden this lane milestone into shared infrastructure. | No shared change. Atomic create-exclusive publication, repeated ancestry/target checks, complete-byte reread, and evidence rebuild limit the impact; all authority remains false. | Redirect, hard-link, conflict, and detected-TOCTOU tests pass. The residual concurrent pathname-swap case remains explicitly unproved. |
+| IB1H-R03 | P3 | Open - provenance/attestation limit | `4361232412800286a78a189223f415fdd9a7f753` | stored `builder_git_commit` and evidence-bound reload | `builder_git_commit` is hashed structural metadata, not a signature or attestation. Rebuilding against exact supplied evidence proves current agreement, not authenticated historical origin, and the artifact is not independently usable without that evidence. | A coordinated alternate evidence graph can remain internally consistent; this is the existing `IB1G-R04` boundary. No official artifact or provenance authority was accessed. | Persistence must not be described as authenticated source provenance. | Carry `IB1G-R04` forward. The module and record describe a structural writer and evidence-bound loader, not historical attestation. | Tests refuse stored content that disagrees with unchanged evidence and accept no authority claim; authenticated historical origin remains intentionally unproved. |
+| IB1H-R04 | P3 | Closed before `43612324` | `4361232412800286a78a189223f415fdd9a7f753` | module contract and writer description | An early description called the report-only writer proof of “factory-built” origin. Exact type and internal tokens establish structural construction discipline but do not authenticate historical factory invocation or upstream origin. | Contract review compared the writer's available evidence with the stronger claim. | Integrity mechanics must not be promoted into provenance authority. | Reworded the contract: the writer proves structural self-consistency; the exact-evidence rebuild performed by the loader is the trust boundary. | Current module docstring, negative-scope tests, and all literal-false authority assertions use the corrected framing. |
+| IB1H-R05 | P3 | Closed before `43612324` | `4361232412800286a78a189223f415fdd9a7f753` | coherent-forgery and redundant-guard test sensitivity | Early coverage was not sensitive enough to a coherently rehashed/readdressed stored-row forgery or to removal of a local mixed-eligible/quarantine refusal before the upstream builder. | Adversarial probes recomputed dependent hashes and filenames; six redundant local guards survived the narrower draft suite. | The loader's defining guarantee is equality with a fresh upstream rebuild, and redundant fail-closed guards need direct sensitivity when they protect routing or bounded work. | Added coherent-forgery, alternate-evidence, mixed-outcome-before-builder, authority-readdressing, row-order/duplication, report-hash, resource-stage, scalar/canonical-encoding, and complete field-inventory regressions. | Focused final suite is **45 passed, 1 skipped**; the named hostile directions now refuse on the committed implementation. |
+
+The open IB-1H P3 items are `IB1H-R02` and `IB1H-R03`. Existing
+`IB1G-R05`/`IB1E-R05` private-helper and duplicated hardened immutable-I/O debt
+also remains open; IB-1H does not broaden into shared-helper consolidation.
+There is no open P0-P2 finding in the IB-1H commit.
+
+### 33.5 Validation and access accounting
+
+Environment: **Python 3.14.6**, pytest **9.1.1**.
+
+- Focused IB-1H module,
+  `tests/test_insider_buying_form4_provisional_disposition_snapshot.py`:
+  **45 passed, 1 skipped in 2.46s**.
+- Affected IB-1E/IB-1G/IB-1H and import/hygiene boundary set over the new
+  module, `test_insider_buying_form4_multi_period_amendment_evidence.py`,
+  `test_insider_buying_persisted_multi_period_evidence.py`,
+  `test_ml_import_boundary.py`, and `test_module_hygiene.py`:
+  **109 passed, 1 skipped in 17.09s**.
+- Exact final named 13-file Insider/boundary suite - all eight
+  `test_insider_buying*.py` modules plus `test_ml_import_boundary.py`,
+  `test_module_hygiene.py`, both project-separation suites, and
+  `test_active_document_consistency.py`: **783 passed, 8 skipped in 184.57s
+  (0:03:04)**.
+- Complete repository suite on clean committed implementation
+  `4361232412800286a78a189223f415fdd9a7f753`: **3 failed, 6,959 passed,
+  14 skipped, 25 warnings in 1,209.15s (0:20:09)**. The only failures are the
+  unchanged, out-of-lane
+  `tests/test_sleeve_report.py::test_default_gain_review_is_fifty_percent_and_long_term_gated`,
+  `tests/test_sleeve_report.py::test_every_lot_row_carries_the_tax_mechanism_fields`,
+  and
+  `tests/test_sleeve_report.py::test_report_carries_no_action_shaped_field`.
+  They observe the separately owned fixed-test-clock versus real-clock lot-age
+  drift and were documented, not fixed.
+- Whole-repository `python -m compileall -q` over `assistant`, `backtest`,
+  `data`, `execution`, `ml`, **`research`**, `risk`, `scripts`, `signals`,
+  `strategies`, `tests`, and the root modules: **exit 0**.
+- Post-record gate over `test_insider_buying_implementation_record.py` and
+  `test_active_document_consistency.py`: **70 passed in 1.04s**; the same gate
+  then passed **70 in 1.06s** after its evidence line was added.
+- `git diff --check`: **exit 0**. A narrow value-shaped secret scan over all
+  four changed paths found **0 matches**.
+- A fresh pre-push fetch left
+  `origin/codex/strategy-insider-buying` exactly at
+  `2ef057d6294ef26afcd49542fdf7432bc4f0aa59`; it is the direct ancestor of
+  local implementation `4361232412800286a78a189223f415fdd9a7f753`, with
+  only this lane-record edit uncommitted.
+
+All validation used synthetic/local inputs. No filing, real package, SEC or
+provider data, credential, licensed row, outcome, QuantConnect job, broker,
+operator database, scheduler, deployment, order, or UI was accessed.
+**Research looks: 0.** All seven Boolean authority fields remain literal
+`False`; `authorized_outcome_looks` remains exactly `0`.
+
+### 33.6 Residual gates and handoff
+
+IB-1 remains incomplete. IB-1H closes only the previously recorded absence of
+a durable provisional-report publisher/reloader. It does not close official
+profile compatibility, authenticated source or amendment provenance, complete
+coverage, point-in-time issuer/owner/security/share-class identity,
+deterministic ordinary-equity mapping, manual title exceptions, field-level
+amendment supersession, same-owner/security/date aggregation, the post-
+aggregation `$50,000` threshold, canonical filtering, normalized canonical
+rows, signals, outcomes, ETF construction, or QC implementation.
+
+By owner decision, after the final record/diff/secret/remote gates are
+recorded, Codex commits this record, verifies the remote has not advanced,
+makes exactly one combined push containing `43612324` and the record commit,
+then stops. Claude independently reviews that exact pushed range before
+another milestone begins. No live acquisition, real package, research look,
+outcome access, QuantConnect action, broker action, UI work, or trading action
+is authorized.

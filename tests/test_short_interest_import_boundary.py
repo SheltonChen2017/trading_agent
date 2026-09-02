@@ -139,6 +139,7 @@ def test_lane_package_has_no_provider_outcome_or_authority_imports():
         "decimal",
         "enum",
         "fractions",
+        "hashlib",
         "json",
         "pathlib",
         "re",

@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from data.hashing import canonical_json, hash_payload
+import research.short_interest_etf.stock_score_batch as stock_score_batch_module
 from research.short_interest_etf.contracts import (
     ReleasePrecision,
     recompute_days_to_cover,
@@ -48,9 +49,12 @@ from research.short_interest_etf.stock_normalization import (
 from research.short_interest_etf.stock_score_batch import (
     STOCK_SCORE_BATCH_AUTHORITY,
     STOCK_SCORE_BATCH_SCHEMA_VERSION,
+    STOCK_SCORE_BATCH_VERIFICATION_SCHEMA_VERSION,
     StockScoreBatchEnvelope,
     StockScoreBatchError,
+    StockScoreBatchVerification,
     build_stock_score_batch_envelope,
+    verify_compact_stock_score_batch_payload,
     verify_stock_score_batch_payload,
 )
 
@@ -1237,15 +1241,24 @@ def test_current_row_payload_scale_is_no_go_for_provider_scale():
 
 
 @pytest.mark.parametrize(
-    ("count", "legacy_digest"),
+    ("count", "legacy_digest", "envelope_digest"),
     [
-        (20, "efe0ef91822a20d3dda680269d792644157058a5a4e7660a7cf7143f3cbf1299"),
-        (40, "b4701c5040dbec2151adec42d1f9dca4436b6f900d9d8676be842faee0a2c9df"),
+        (
+            20,
+            "efe0ef91822a20d3dda680269d792644157058a5a4e7660a7cf7143f3cbf1299",
+            "82f579b6b91e9ed6917fb4da24509e4d7fd0a6fb0de18367c807b4242fc5637a",
+        ),
+        (
+            40,
+            "b4701c5040dbec2151adec42d1f9dca4436b6f900d9d8676be842faee0a2c9df",
+            "6eae0887c46daf401ae8a2b5acd0aa4bec1693da5c9625d4841c7649324a3f0d",
+        ),
     ],
 )
 def test_compact_score_batch_is_lossless_canonical_and_non_authoritative(
     count,
     legacy_digest,
+    envelope_digest,
 ):
     scores = _single_sector_scores(count)
     envelope = build_stock_score_batch_envelope(scores)
@@ -1264,6 +1277,7 @@ def test_compact_score_batch_is_lossless_canonical_and_non_authoritative(
     assert payload["cohort_count"] == 2
     assert payload["canonical_row_list_sha256"] == legacy_digest
     assert envelope.canonical_row_list_sha256 == legacy_digest
+    assert envelope.sha256 == envelope_digest
     assert envelope.expanded_row_payloads() == legacy_rows
     assert verify_stock_score_batch_payload(
         payload,
@@ -1297,6 +1311,181 @@ def test_compact_score_batch_is_lossless_canonical_and_non_authoritative(
     assert "caller_mutation" not in envelope.to_payload()["rows"][0]["current"][
         "refusal_reasons"
     ]
+
+
+def test_compact_score_batch_streams_legacy_digest_and_native_verification(
+    monkeypatch,
+):
+    scores = _single_sector_scores(20)
+    expected_legacy_digest = hash_payload([item.to_payload() for item in scores])
+    original_hash_payload = stock_score_batch_module.hash_payload
+    original_validate_payload = stock_score_batch_module._validate_payload
+    original_array_sha256 = stock_score_batch_module._canonical_json_array_sha256
+
+    def refuse_full_legacy_row_list(payload):
+        if (
+            type(payload) is list
+            and payload
+            and type(payload[0]) is dict
+            and frozenset(payload[0])
+            == frozenset({"cohort", "current", "outcomes", "schema_version"})
+        ):
+            raise AssertionError("full legacy row list must not be hashed at once")
+        return original_hash_payload(payload)
+
+    def refuse_legacy_expansion(_payload):
+        raise AssertionError("compact path must not call legacy expansion")
+
+    def require_non_materializing_validation(payload, *, materialize_rows):
+        if materialize_rows is not False:
+            raise AssertionError("compact path must validate without legacy rows")
+        return original_validate_payload(payload, materialize_rows=False)
+
+    def require_lazy_row_iterable(values):
+        if type(values) in (list, tuple):
+            raise AssertionError("legacy rows must enter the hasher lazily")
+        return original_array_sha256(values)
+
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "hash_payload",
+        refuse_full_legacy_row_list,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_expand_payload",
+        refuse_legacy_expansion,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_validate_payload",
+        require_non_materializing_validation,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_canonical_json_array_sha256",
+        require_lazy_row_iterable,
+    )
+
+    envelope = build_stock_score_batch_envelope(scores)
+    payload = envelope.to_payload()
+    receipt = verify_compact_stock_score_batch_payload(
+        payload,
+        dispositions=scores,
+    )
+
+    assert type(receipt) is StockScoreBatchVerification
+    assert receipt.schema_version == STOCK_SCORE_BATCH_VERIFICATION_SCHEMA_VERSION
+    assert receipt.authority == STOCK_SCORE_BATCH_AUTHORITY
+    assert receipt.production_authoritative is False
+    assert receipt.row_count == len(scores)
+    assert receipt.canonical_row_list_sha256 == expected_legacy_digest
+    assert receipt.envelope_sha256 == envelope.sha256
+    assert receipt.to_payload()["envelope_sha256"] == envelope.sha256
+    assert receipt.sha256 == hash_payload(receipt.to_payload())
+
+
+def test_compact_verification_receipt_is_exact_typed_and_non_authoritative():
+    scores = _single_sector_scores(20)
+    envelope = build_stock_score_batch_envelope(scores)
+    receipt = verify_compact_stock_score_batch_payload(
+        envelope.to_payload(),
+        dispositions=scores,
+    )
+
+    class StrSubclass(str):
+        pass
+
+    invalid_replacements = (
+        ({"row_count": True}, "positive exact int"),
+        (
+            {"canonical_row_list_sha256": StrSubclass("0" * 64)},
+            "exact str",
+        ),
+        ({"envelope_sha256": "not-a-digest"}, "SHA-256"),
+        (
+            {
+                "schema_version": StrSubclass(
+                    STOCK_SCORE_BATCH_VERIFICATION_SCHEMA_VERSION
+                )
+            },
+            "schema_version",
+        ),
+        ({"authority": StrSubclass(STOCK_SCORE_BATCH_AUTHORITY)}, "authority"),
+        ({"production_authoritative": 0}, "non-production"),
+    )
+    for changes, message in invalid_replacements:
+        with pytest.raises(StockScoreBatchError, match=message):
+            replace(receipt, **changes)
+
+
+def test_compact_verification_receipt_hashes_the_authenticated_snapshot(
+    monkeypatch,
+):
+    scores = _single_sector_scores(20)
+    envelope = build_stock_score_batch_envelope(scores)
+    payload = envelope.to_payload()
+    original_canonical_json = stock_score_batch_module.canonical_json
+    mutated = False
+
+    def mutate_caller_after_serialization(value):
+        nonlocal mutated
+        serialized = original_canonical_json(value)
+        if value is payload and not mutated:
+            payload["authority"] = "mutated-after-authentication"
+            mutated = True
+        return serialized
+
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "canonical_json",
+        mutate_caller_after_serialization,
+    )
+    receipt = verify_compact_stock_score_batch_payload(
+        payload,
+        dispositions=scores,
+    )
+
+    assert mutated is True
+    assert payload["authority"] == "mutated-after-authentication"
+    assert receipt.envelope_sha256 == envelope.sha256
+    assert receipt.envelope_sha256 != hash_payload(payload)
+
+
+def test_streamed_canonical_array_digest_matches_canonical_json_oracle(monkeypatch):
+    values = (
+        {"nested": [1, True, None, {"unicode": "雪"}]},
+        {"ordered_by_encoder": {"z": 0, "a": "é"}},
+    )
+    original_canonical_json = stock_score_batch_module.canonical_json
+    yielded_count = 0
+    encoded_count = 0
+
+    def one_at_a_time():
+        nonlocal yielded_count
+        for value in values:
+            if yielded_count != encoded_count:
+                raise AssertionError(
+                    "array helper consumed another item before encoding the prior item"
+                )
+            yielded_count += 1
+            yield value
+
+    def count_canonical_encoding(value):
+        nonlocal encoded_count
+        result = original_canonical_json(value)
+        encoded_count += 1
+        return result
+
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "canonical_json",
+        count_canonical_encoding,
+    )
+    assert stock_score_batch_module._canonical_json_array_sha256(one_at_a_time()) == (
+        hash_payload(list(values))
+    )
+    assert yielded_count == encoded_count == len(values)
 
 
 def test_compact_score_batch_is_input_order_independent_and_strictly_typed():
@@ -1354,9 +1543,15 @@ def test_compact_score_batch_is_input_order_independent_and_strictly_typed():
 def test_compact_score_batch_refuses_tampering(case):
     scores = _single_sector_scores(20)
     payload = build_stock_score_batch_envelope(scores).to_payload()
+    tampered = _tamper_score_batch(payload, case)
+    with pytest.raises(StockScoreBatchError):
+        verify_compact_stock_score_batch_payload(
+            tampered,
+            dispositions=scores,
+        )
     with pytest.raises(StockScoreBatchError):
         verify_stock_score_batch_payload(
-            _tamper_score_batch(payload, case),
+            tampered,
             dispositions=scores,
         )
 

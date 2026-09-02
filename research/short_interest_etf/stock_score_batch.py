@@ -11,8 +11,10 @@ without the exact authenticated row objects from which it was derived.
 from __future__ import annotations
 
 import dataclasses
+import hashlib
+import json
 from copy import deepcopy
-from typing import Any
+from typing import Any, Iterable
 
 from data.hashing import canonical_json, hash_payload
 from research.short_interest_etf.preregistration import PREREGISTRATION
@@ -30,6 +32,9 @@ from research.short_interest_etf.stock_normalization import (
 
 STOCK_SCORE_BATCH_SCHEMA_VERSION = "short-interest-stock-score-batch.v1"
 STOCK_SCORE_BATCH_AUTHORITY = "synthetic_structural_score_batch_only"
+STOCK_SCORE_BATCH_VERIFICATION_SCHEMA_VERSION = (
+    "short-interest-stock-score-batch-verification.v1"
+)
 
 
 class StockScoreBatchError(ValueError):
@@ -209,6 +214,18 @@ def _require_exact_json_tree(
                 stack.append((False, current[index], f"{path}[{index}]"))
 
 
+def _canonical_json_array_sha256(values: Iterable[Any]) -> str:
+    """Hash a canonical JSON array while retaining only one item at a time."""
+    digest = hashlib.sha256()
+    digest.update(b"[")
+    for index, value in enumerate(values):
+        if index:
+            digest.update(b",")
+        digest.update(canonical_json(value).encode("utf-8"))
+    digest.update(b"]")
+    return digest.hexdigest()
+
+
 def _disposition_order_key(disposition: StockScoreDisposition) -> tuple[str, ...]:
     readiness = disposition.current.readiness
     return (
@@ -311,8 +328,8 @@ def _build_payload(
 
     return {
         "authority": STOCK_SCORE_BATCH_AUTHORITY,
-        "canonical_row_list_sha256": hash_payload(
-            [item.to_payload() for item in dispositions]
+        "canonical_row_list_sha256": _canonical_json_array_sha256(
+            item.to_payload() for item in dispositions
         ),
         "cohort_count": len(cohorts),
         "cohorts": [
@@ -410,7 +427,18 @@ def _validate_dispositions(
     return ordered
 
 
-def _expand_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+@dataclasses.dataclass(frozen=True)
+class _ValidatedStockScoreBatchPayload:
+    row_count: int
+    canonical_row_list_sha256: str
+    expanded_rows: tuple[dict[str, Any], ...] | None
+
+
+def _validate_payload(
+    payload: dict[str, Any],
+    *,
+    materialize_rows: bool,
+) -> _ValidatedStockScoreBatchPayload:
     envelope = _require_exact_dict(payload, name="payload", keys=_ENVELOPE_KEYS)
     _require_exact_json_tree(envelope, name="payload")
     if envelope["schema_version"] != STOCK_SCORE_BATCH_SCHEMA_VERSION:
@@ -545,7 +573,9 @@ def _expand_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], ...]:
         row_records
     ):
         raise _refuse("row_count does not match the row table")
-    expanded_rows: list[dict[str, Any]] = []
+    expanded_rows: list[dict[str, Any]] | None = [] if materialize_rows else None
+    row_list_digest = hashlib.sha256()
+    row_list_digest.update(b"[")
     used_cohorts: set[str] = set()
     current_pairs: list[tuple[str, str]] = []
     disposition_hashes: set[str] = set()
@@ -634,12 +664,17 @@ def _expand_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], ...]:
         disposition_digest = _require_sha256(
             row["disposition_sha256"], name="disposition_sha256"
         )
-        if hash_payload(expanded_row) != disposition_digest:
+        expanded_row_json = canonical_json(expanded_row).encode("utf-8")
+        if hashlib.sha256(expanded_row_json).hexdigest() != disposition_digest:
             raise _refuse("expanded row does not match its disposition digest")
         if disposition_digest in disposition_hashes:
             raise _refuse("row table contains duplicate disposition content")
         disposition_hashes.add(disposition_digest)
-        expanded_rows.append(expanded_row)
+        if index:
+            row_list_digest.update(b",")
+        row_list_digest.update(expanded_row_json)
+        if expanded_rows is not None:
+            expanded_rows.append(expanded_row)
         row_order.append(_row_payload_order_key(row))
 
     if row_order != sorted(row_order) or len(row_order) != len(set(row_order)):
@@ -658,9 +693,80 @@ def _expand_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], ...]:
         raise _refuse("cohort table contains an orphan record")
     if used_member_sets != set(member_sets):
         raise _refuse("member set table contains an orphan record")
-    if hash_payload(expanded_rows) != envelope["canonical_row_list_sha256"]:
+    row_list_digest.update(b"]")
+    canonical_row_list_sha256 = row_list_digest.hexdigest()
+    if canonical_row_list_sha256 != envelope["canonical_row_list_sha256"]:
         raise _refuse("canonical row-list digest does not match expansion")
-    return tuple(expanded_rows)
+    return _ValidatedStockScoreBatchPayload(
+        row_count=len(row_records),
+        canonical_row_list_sha256=canonical_row_list_sha256,
+        expanded_rows=(tuple(expanded_rows) if expanded_rows is not None else None),
+    )
+
+
+def _expand_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+    validated = _validate_payload(payload, materialize_rows=True)
+    if validated.expanded_rows is None:  # pragma: no cover - invariant guard
+        raise _refuse("legacy score batch expansion was not materialized")
+    return validated.expanded_rows
+
+
+def _validate_compact_payload(
+    payload: dict[str, Any],
+) -> _ValidatedStockScoreBatchPayload:
+    validated = _validate_payload(payload, materialize_rows=False)
+    if validated.expanded_rows is not None:  # pragma: no cover - invariant guard
+        raise _refuse("compact score batch validation materialized legacy rows")
+    return validated
+
+
+@dataclasses.dataclass(frozen=True)
+class StockScoreBatchVerification:
+    """Small non-production receipt from compact, non-expanding verification."""
+
+    row_count: int
+    canonical_row_list_sha256: str
+    envelope_sha256: str
+    schema_version: str = STOCK_SCORE_BATCH_VERIFICATION_SCHEMA_VERSION
+    authority: str = STOCK_SCORE_BATCH_AUTHORITY
+    production_authoritative: bool = False
+
+    def __post_init__(self) -> None:
+        _require_count(self.row_count, name="verification.row_count", positive=True)
+        _require_sha256(
+            self.canonical_row_list_sha256,
+            name="verification.canonical_row_list_sha256",
+        )
+        _require_sha256(
+            self.envelope_sha256,
+            name="verification.envelope_sha256",
+        )
+        if type(self.schema_version) is not str or (
+            self.schema_version != STOCK_SCORE_BATCH_VERIFICATION_SCHEMA_VERSION
+        ):
+            raise _refuse("unsupported score batch verification schema_version")
+        if type(self.authority) is not str or (
+            self.authority != STOCK_SCORE_BATCH_AUTHORITY
+        ):
+            raise _refuse("score batch verification has wrong synthetic authority")
+        if type(self.production_authoritative) is not bool or (
+            self.production_authoritative
+        ):
+            raise _refuse("score batch verification must remain non-production")
+
+    def to_payload(self) -> dict[str, Any]:
+        return {
+            "authority": self.authority,
+            "canonical_row_list_sha256": self.canonical_row_list_sha256,
+            "envelope_sha256": self.envelope_sha256,
+            "production_authoritative": self.production_authoritative,
+            "row_count": self.row_count,
+            "schema_version": self.schema_version,
+        }
+
+    @property
+    def sha256(self) -> str:
+        return hash_payload(self.to_payload())
 
 
 @dataclasses.dataclass(frozen=True)
@@ -671,6 +777,17 @@ class StockScoreBatchEnvelope:
     schema_version: str = STOCK_SCORE_BATCH_SCHEMA_VERSION
     authority: str = STOCK_SCORE_BATCH_AUTHORITY
     production_authoritative: bool = False
+    _payload_json_cache: str = dataclasses.field(
+        init=False,
+        repr=False,
+        compare=False,
+    )
+    _canonical_row_list_sha256_cache: str = dataclasses.field(
+        init=False,
+        repr=False,
+        compare=False,
+    )
+    _sha256_cache: str = dataclasses.field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         if type(self.schema_version) is not str or (
@@ -687,25 +804,40 @@ class StockScoreBatchEnvelope:
             raise _refuse("score batch must remain explicitly non-production")
         ordered = _validate_dispositions(self.dispositions)
         object.__setattr__(self, "dispositions", ordered)
-        if _expand_payload(self.to_payload()) != tuple(
-            item.to_payload() for item in ordered
-        ):
-            raise _refuse("compact score batch does not losslessly expand")
+        payload = _build_payload(ordered)
+        validated = _validate_compact_payload(payload)
+        if validated.row_count != len(ordered):  # pragma: no cover - defensive
+            raise _refuse("compact score batch row count changed during validation")
+        payload_json = canonical_json(payload)
+        object.__setattr__(self, "_payload_json_cache", payload_json)
+        object.__setattr__(
+            self,
+            "_canonical_row_list_sha256_cache",
+            validated.canonical_row_list_sha256,
+        )
+        object.__setattr__(
+            self,
+            "_sha256_cache",
+            hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        )
 
     @property
     def canonical_row_list_sha256(self) -> str:
-        return hash_payload([item.to_payload() for item in self.dispositions])
+        return self._canonical_row_list_sha256_cache
 
     def expanded_row_payloads(self) -> tuple[dict[str, Any], ...]:
         """Return fresh legacy row payloads after structural verification."""
         return _expand_payload(self.to_payload())
 
     def to_payload(self) -> dict[str, Any]:
-        return _build_payload(self.dispositions)
+        payload = json.loads(self._payload_json_cache)
+        if type(payload) is not dict:  # pragma: no cover - invariant guard
+            raise _refuse("cached score batch payload is not an exact dict")
+        return payload
 
     @property
     def sha256(self) -> str:
-        return hash_payload(self.to_payload())
+        return self._sha256_cache
 
 
 def build_stock_score_batch_envelope(
@@ -727,11 +859,28 @@ def verify_stock_score_batch_payload(
     any unknown field, table/reference change, or rehashed alternate content is
     refused by canonical equality with the freshly derived envelope.
     """
-    expanded = _expand_payload(payload)
-    expected = build_stock_score_batch_envelope(dispositions)
-    if canonical_json(payload) != canonical_json(expected.to_payload()):
+    verify_compact_stock_score_batch_payload(payload, dispositions=dispositions)
+    return _expand_payload(payload)
+
+
+def verify_compact_stock_score_batch_payload(
+    payload: dict[str, Any],
+    *,
+    dispositions: tuple[StockScoreDisposition, ...],
+) -> StockScoreBatchVerification:
+    """Authenticate a compact payload without materializing the legacy row list.
+
+    The exact legacy row-list digest still processes every canonical legacy
+    byte, so this reduces peak memory rather than asymptotic hashing time.
+    """
+    validated = _validate_compact_payload(payload)
+    ordered = _validate_dispositions(dispositions)
+    expected_payload = _build_payload(ordered)
+    submitted_json = canonical_json(payload)
+    if submitted_json != canonical_json(expected_payload):
         raise _refuse("score batch payload does not match authenticated dispositions")
-    expected_rows = tuple(item.to_payload() for item in expected.dispositions)
-    if expanded != expected_rows:
-        raise _refuse("score batch expansion does not match authenticated dispositions")
-    return expanded
+    return StockScoreBatchVerification(
+        row_count=validated.row_count,
+        canonical_row_list_sha256=validated.canonical_row_list_sha256,
+        envelope_sha256=hashlib.sha256(submitted_json.encode("utf-8")).hexdigest(),
+    )

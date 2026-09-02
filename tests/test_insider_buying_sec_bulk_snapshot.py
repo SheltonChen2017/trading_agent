@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import io
 import json
 import stat
@@ -1183,3 +1184,50 @@ def test_retry_preserves_and_refuses_unverified_commit_temp(tmp_path):
     with pytest.raises(SecBulkSnapshotError, match="unverified files"):
         write_sec_bulk_snapshot(archive, _source(), tmp_path)
     assert abandoned.read_bytes() == b"different bytes"
+
+
+def test_committed_archive_with_a_hard_link_alias_refuses_load(tmp_path):
+    """A second name for a committed artifact means it is not uniquely owned.
+
+    IB-1C and IB-1H already refuse this; IB-1A did not, so the hardening that
+    later milestones adopted had not propagated back to the raw boundary.
+    """
+    archive = _archive()
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    directory = tmp_path / identity.snapshot_id
+
+    alias = tmp_path / "alias-archive"
+    try:
+        os.link(directory / "archive.zip", alias)
+    except (OSError, NotImplementedError, AttributeError):  # pragma: no cover
+        pytest.skip("hard links are unavailable on this filesystem")
+
+    with pytest.raises(
+        SecBulkSnapshotError, match="regular immutable file"
+    ):
+        load_sec_bulk_snapshot(directory)
+
+
+def test_committed_manifest_with_a_hard_link_alias_refuses_load(tmp_path):
+    archive = _archive()
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    directory = tmp_path / identity.snapshot_id
+
+    alias = tmp_path / "alias-manifest"
+    try:
+        os.link(directory / "manifest.json", alias)
+    except (OSError, NotImplementedError, AttributeError):  # pragma: no cover
+        pytest.skip("hard links are unavailable on this filesystem")
+
+    with pytest.raises(
+        SecBulkSnapshotError, match="regular immutable file"
+    ):
+        load_sec_bulk_snapshot(directory)
+
+
+def test_single_link_committed_snapshot_still_loads(tmp_path):
+    """The guard must refuse aliased artifacts without refusing ordinary ones."""
+    archive = _archive()
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    loaded = load_sec_bulk_snapshot(tmp_path / identity.snapshot_id)
+    assert loaded.identity == identity

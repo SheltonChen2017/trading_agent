@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import stat
 import warnings
 import zipfile
@@ -1445,3 +1446,35 @@ def test_parser_module_has_no_network_outcome_qc_or_execution_imports():
             "AlgorithmImports",
         }
     )
+
+
+@pytest.mark.parametrize(
+    "artifact", ("rows.jsonl", "accessions.jsonl", "manifest.json")
+)
+def test_committed_parsed_artifact_with_a_hard_link_alias_refuses_load(
+    tmp_path, artifact
+):
+    """A second name for a committed artifact means it is not uniquely owned.
+
+    IB-1C and IB-1H already refused this; IB-1B did not, so the hardening the
+    later milestones adopted had not propagated back to the parsed boundary.
+    """
+    raw, parsed, _identity = _publish(tmp_path)
+
+    alias = tmp_path / f"alias-{artifact}"
+    try:
+        os.link(parsed / artifact, alias)
+    except (OSError, NotImplementedError, AttributeError):  # pragma: no cover
+        pytest.skip("hard links are unavailable on this filesystem")
+
+    with pytest.raises(
+        SecBulkParsedSnapshotError, match="regular immutable file"
+    ):
+        load_sec_bulk_parsed_snapshot(parsed, raw_snapshot_directory=raw)
+
+
+def test_single_link_committed_parsed_snapshot_still_loads(tmp_path):
+    """The guard must refuse aliased artifacts without refusing ordinary ones."""
+    raw, parsed, identity = _publish(tmp_path)
+    loaded = load_sec_bulk_parsed_snapshot(parsed, raw_snapshot_directory=raw)
+    assert loaded.identity == identity

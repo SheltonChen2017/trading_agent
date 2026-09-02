@@ -6,7 +6,9 @@ structure, a fixture parser, and a caller-supplied SEC quarterly ZIP integrity
 boundary plus explicit-profile, offline parsed, EDGAR acceptance-evidence, and
 observation-only Form 4/A chronology and multi-period supplied-link-evidence
 boundaries, plus an evidence-bound provisional disposition/quarantine report
-and its immutable, upstream-rebuilt snapshot boundary.
+and its immutable, upstream-rebuilt snapshot boundary.  The package also
+exposes the zero-authority IB-1I four-family research gate without allocating
+a confirmatory cell or permanent look.
 """
 
 from research.insider_buying.contracts import (
@@ -104,6 +106,17 @@ from research.insider_buying.sec_edgar_acceptance_snapshot import (
     build_sec_edgar_acceptance_snapshot,
     load_sec_edgar_acceptance_snapshot,
 )
+from research.insider_buying.preregistration import (
+    FIXED_STRATEGY_LANE_IDS,
+    INSIDER_BUYING_BLUEPRINT_SHA256,
+    INSIDER_BUYING_RESEARCH_GATE,
+    INSIDER_BUYING_RESEARCH_GATE_SHA256,
+    INSIDER_BUYING_RESEARCH_GATE_VERSION,
+    InsiderBuyingAllocationState,
+    InsiderBuyingPreregistrationError,
+    InsiderBuyingResearchGate,
+    InsiderBuyingSlotDisposition,
+)
 
 __all__ = [
     "ALLOWED_SEC_TABLES",
@@ -116,6 +129,7 @@ __all__ = [
     "FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_KIND",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_VERSION",
+    "FIXED_STRATEGY_LANE_IDS",
     "FilingCorpus",
     "FilingEnvelope",
     "Form4AmendmentLineage",
@@ -133,6 +147,14 @@ __all__ = [
     "Form4ParseError",
     "Form4VersionDisposition",
     "Form4VersionInterval",
+    "INSIDER_BUYING_BLUEPRINT_SHA256",
+    "INSIDER_BUYING_RESEARCH_GATE",
+    "INSIDER_BUYING_RESEARCH_GATE_SHA256",
+    "INSIDER_BUYING_RESEARCH_GATE_VERSION",
+    "InsiderBuyingAllocationState",
+    "InsiderBuyingPreregistrationError",
+    "InsiderBuyingResearchGate",
+    "InsiderBuyingSlotDisposition",
     "LoadedSecBulkSnapshot",
     "LoadedSecBulkParsedSnapshot",
     "LoadedSecEdgarAcceptanceSnapshot",

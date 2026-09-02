@@ -1,15 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE IB-0/IB-1 STRUCTURAL SLICE AND BOUNDED IB-1A THROUGH IB-1H
-OFFLINE EVIDENCE CONTRACTS ARE IMPLEMENTED. CODEX COUNTER-REVIEWED CLAUDE'S
-IB-1G REVIEW COMMIT `2ef057d6`: ITS ADDITIVE TEST IS ACCEPTED AFTER THE
-CURRENT-RECORD CORRECTIONS IN SECTION 33, WITH NO PRODUCT-CODE DEFECT FOUND.
-COMMIT `43612324` ADDS IB-1H IMMUTABLE PUBLICATION AND EVIDENCE-BOUND RELOAD
-FOR THE PROVISIONAL FORM 4 DISPOSITION/QUARANTINE REPORT. IB-1 REMAINS
-INCOMPLETE: PACKAGE ACQUISITION AND FULL HISTORICAL POPULATION ARE UNSTARTED,
-WHILE CALLER-SUPPLIED ARCHIVE/MEMBER HASHING, INVENTORY VALIDATION, RAW
+Status: **THE IB-0/IB-1 STRUCTURAL SLICE, BOUNDED IB-1A THROUGH IB-1H
+OFFLINE EVIDENCE CONTRACTS, AND IB-1I ZERO-AUTHORITY FOUR-FAMILY RESEARCH
+GATE ARE IMPLEMENTED. CODEX COUNTER-REVIEWED CLAUDE COMMITS `5f880c5a` AND
+`3f6c2676`; BOTH ARE ACCEPTED AFTER THE LANE-SPECIFIC HARD-LINK CORRECTION
+`a615304d` AND THE APPEND-ONLY RECORD CORRECTION `322350a3` IN SECTION 35.
+COMMIT `b3b202d2` ADDS THE IB-1I CONTRACT AND DANGEROUS-DIRECTION TESTS; IT
+AWAITS CLAUDE'S INDEPENDENT REVIEW. NO CONFIRMATORY CELL OR PERMANENT LOOK IS
+ALLOCATED, AND OUTCOME, QC, INTEGRATION, CAPITAL, DEPLOYMENT, AND TRADING
+AUTHORITY REMAIN EXACTLY ZERO. IB-1 REMAINS INCOMPLETE: REAL PACKAGE
+ACQUISITION AND FULL HISTORICAL POPULATION ARE UNSTARTED, WHILE
+CALLER-SUPPLIED ARCHIVE/MEMBER HASHING, INVENTORY VALIDATION, RAW
 PUBLICATION, AND PROVISIONAL-REPORT PUBLICATION ARE IMPLEMENTED OFFLINE.
-BLUEPRINT SECTION 19.4 STEP 4 STILL HAS NO CANONICAL FILTER AUTHORITY.
 OFFICIAL SEC PROFILE, REAL PACKAGE, AUTHENTICATED AMENDMENT LINK, COMPLETE
 AMENDMENT COVERAGE, POINT-IN-TIME SECURITY IDENTITY, NORMALIZATION,
 AGGREGATION, THE `$50,000` GATE, SIGNAL CONSTRUCTION, OUTCOME TESTING, ETF
@@ -153,6 +155,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-02 | Codex counter-review + implementation | `2ef057d6294ef26afcd49542fdf7432bc4f0aa59` -> `4361232412800286a78a189223f415fdd9a7f753` -> this record commit | Counter-review Claude's IB-1G review and implement bounded **IB-1H immutable provisional disposition-report snapshots** | Accepted Claude's additive eligible-coexistence regression after six append-only P3 record corrections. Added one canonical, immutable report snapshot per `report_id`; the loader requires exact IB-1E evidence, rebuilds through the public IB-1G builder, and accepts only canonical stored bytes equal to that rebuild. Added bounded JSON/resource validation and fail-closed filename, conflict, hard-link, redirect/reparse, coherent-forgery, authority, ordering, scalar, and detected-TOCTOU checks. No mapping, aggregation, `$50,000` gate, canonical filtering, outcome, ETF, QC, UI, or trading surface was added. Full detail is in section 33. | Python **3.14.6**, pytest **9.1.1**. Focused IB-1H: **45 passed, 1 skipped in 2.46s**; affected IB-1E/IB-1G/IB-1H/import boundary: **109 passed, 1 skipped in 17.09s**; named 13-file Insider/boundary suite: **783 passed, 8 skipped in 184.57s (0:03:04)**. Complete committed-tree suite: **3 failed, 6,959 passed, 14 skipped, 25 warnings in 1,209.15s (0:20:09)**; only the three unchanged out-of-lane sleeve fixed-clock failures reproduced. Whole-repository compileall including `research`: **exit 0**. Synthetic/local inputs only; no filing, real package, provider data, credential, licensed row, outcome, QuantConnect job, broker, operator database, scheduler, deployment, order, or UI access; **0 research looks**. | `2ef057d6` accepted after current-record correction; IB1G-CCR01..06 closed. IB1H-R01 P2 and IB1H-R04/R05 P3 closed before implementation commit. IB1H-R02/R03 remain open P3 filesystem/provenance limits; inherited IB1G-R04/R05 and IB1E-R05 debt remains open. No open P0-P2 defect remains in the new product-code diff. | Run the final record/diff/secret/remote gates, commit this record, make exactly one combined push, and stop for Claude to review the exact pushed range. |
 | 2026-09-02 | Claude review | `8736b4a2` -> this review snapshot | Review of the IB-1H immutable provisional-report snapshots (`2ef057d6..8736b4a2`) and correction of one lane-specific drift defect | Verified isolation, authority-gate enforcement by direct inspection, and absence of network/float in the new module. Recomputed each finding's latest status rather than grepping for `Open`, correcting an earlier claim that `IB1E-R04` was stale. Compared every helper defined in more than one lane module and found the IB-1C/IB-1H hard-link guard missing from IB-1A and IB-1B. Full dispositions are in section 34. | Focused hard-link regressions IB-1A 3 passed and IB-1B 4 passed; combined lane and boundary suite **451 passed, 8 skipped in 302.98s**; record gates 70 passed; two mutation sweeps confirmed the new guards load-bearing in both directions with positive controls still passing, each module restored byte-exact; `git diff --check` clean; complete suite on code tree `5f880c5` **3 failed, 6,965 passed, 15 skipped in 47m03s**, the three failures being the unchanged out-of-lane sleeve-clock cases recorded as `IB0H-OOL01` and reproduced at `43612324` before these commits; `compileall` including `research/` exit 0. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, or UI access; **0 research looks**. | IB1H-R06 (P2) found and **fixed**: the `st_nlink != 1` guard adopted by IB-1C and IB-1H had never propagated to IB-1A and IB-1B, which had zero such checks while performing the same immutable publication and committed reload; 15 of 16 duplicated helpers already differ between copies and the duplication is fourfold, not the threefold recorded by `IB1C-R16`. Two process defects by this reviewer are recorded in 34.6. Out-of-lane and authorization-blocked findings documented, not fixed. | Codex counter-reviews these Claude commits, then may continue the bounded IB ladder. IB-1 remains incomplete; blueprint 19.4 step 1 unstarted. |
 | 2026-09-02 | Codex counter-review | `8736b4a2..3f6c2676` reviewed; `3f6c2676` -> `a615304d` correction | Counter-review Claude's IB-1H review and propagated hard-link correction | Dispositioned both Claude commits, reproduced the claimed guard, compared all four sampled link-count phases against IB-1C/IB-1H, and generalized the audit to both immutable commit markers. Corrected the missing post-read/final-path checks and commit-marker opt-ins in lane-owned IB-1A/IB-1B code. Full findings are in section 35. | Runtime red probe: both reviewed readers returned bytes with final `st_nlink == 2`; regression red phase **6 failed, 2 passed**; corrected hard-link slice **13 passed**; complete corrected IB-1A/IB-1B modules **195 passed, 5 skipped in 76.69s**; `git diff --check` clean before commit. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, UI, or order access; **0 research looks**. | `5f880c5a` and `3f6c2676` accepted after correction. `IB1H-CCR01` P2 is closed by `a615304d`; `IB1H-CCR02` through `IB1H-CCR06` are append-only record corrections. No out-of-lane code was changed. | Commit this counter-review record, then implement only the bounded zero-authority four-family gate in IB-1I. Permanent look/cell identities and their alpha split remain owner-decision-required. |
+| 2026-09-02 | Codex implementation | `3f6c2676` -> `a615304d` -> `322350a3` -> `b3b202d2` -> this record commit | Completed Claude counter-review and bounded **IB-1I zero-authority four-family/QC-first research gate** | Preserved the accepted-after-correction counter-review, then added one frozen lane-local contract that binds the governing blueprint, immutable 2026-08-29/30 owner-directive commits, fixed four-lane family, exact `1/20` total and `1/80` lane ceiling, expiry/no-reallocation rule, shared holdout, canonical-family null rule, future IB-7 immutable-input boundary, empty permanent allocation/look inventories, and exact-zero external/operational authority. Two independent implementation audits found and drove corrections before commit. Full detail is in section 36. | Python **3.13.14**, pytest **9.1.1**. IB-1I **120 passed in 2.41s**; named Insider/boundary suite **848 passed, 8 skipped in 393.03s**; complete committed code tree `b3b202d2`: **3 failed, 7,093 passed, 15 skipped, 25 warnings in 2,939.96s (48m59s)**, exactly the three unchanged out-of-lane sleeve-clock cases; whole-repository compileall exit 0. No SEC/provider, credential, licensed row, outcome, QuantConnect upload/processing/job/backtest, broker, operator database, scheduler, deployment, order, or UI access; **0 research looks**. | IB1I-R01 through IB1I-R08 closed before commit; final independent audit reports no remaining P0-P3 finding in scope. Analyst `qc_first_plan.py`, the shared Strategy Description README, sleeve-clock failures, and shared/platform debt are documented but untouched. | Commit this record, run record/diff/secret/remote gates, make the round's single push, and stop for Claude to review every pushed commit after `3f6c2676`. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -896,6 +899,170 @@ join, ETF construction, QuantConnect job, or broker action is authorized.
 
 Next authorized step: Codex counter-reviews these Claude commits, then may
 continue the bounded IB ladder.
+
+## 36. IB-1I zero-authority four-family research gate (2026-09-02)
+
+### 36.1 Scope, ancestry, and role sequence
+
+This round stayed exclusively in
+`C:\git\customizedAgent\trading_agent_insider` on the existing
+`codex/strategy-insider-buying` branch. It did not switch branches, create a
+worktree, merge, rebase, rewrite history, or edit a project-wide coordination
+file. The exact Claude range and counter-review disposition are in section 35.
+The local commits produced after Claude's reviewed head
+`3f6c2676291f4e162ddf0aadaf1738202b69efec` are:
+
+- `a615304d0148b8807549e9fc36c6a76c1516daf8` — complete the lane-specific
+  hard-link invariants confirmed by counter-review;
+- `322350a3` — record the commit-by-commit counter-review and retained ledger;
+  and
+- `b3b202d2a8bf0ecc8a3613dcbfdb3690483ad767` — implement the bounded IB-1I
+  gate and its dangerous-direction tests.
+
+The only IB-1I implementation paths are
+`research/insider_buying/preregistration.py`, the public exports and package
+description in `research/insider_buying/__init__.py`, and
+`tests/test_insider_buying_preregistration.py`. This record is the only
+documentation path changed. The action plan, three-strategy direction,
+shared Strategy Description README, root Session Handoff, sibling strategies,
+execution, UI, broker, and deployment surfaces remain unmodified.
+
+### 36.2 Implemented contract
+
+IB-1I is a structural gate, not a completed outcome preregistration and not a
+QC implementation. Its canonical payload has semantic SHA-256
+`f532eaf38fbdd6f3f00a4286a723ba1aa69c58f9862a596a840bd0e6d998c392`.
+It binds:
+
+- the 33-page Insider blueprint at SHA-256
+  `f8834e13bb22d63a1a5a055a24cc2638ecb2e535b733c1fdd1741a28c65db88c`;
+- the four-family multiplicity directive to immutable source commit
+  `6b12102b9710efb838e41cefd94cfcecd3ab592d`, path
+  `docs/ACTION_PLAN_2026-08-20.md`, effective 2026-08-30;
+- the shared-family, null, integration, and final-holdout direction to
+  immutable source commit `ba01e98f9d3c8746c70182818a27a2d49a9c0fe7`,
+  path `docs/THREE_STRATEGY_PROJECT_DIRECTION.md`, effective 2026-08-29;
+- the fixed lane IDs `analyst-revisions-v2`, `insider-buying`,
+  `short-interest`, and `target-price-revisions`, with exact rational
+  two-sided family FWER `1/20` and permanent per-lane maximum and within-lane
+  confirmatory ceiling `1/80`;
+- permanent expiry of an unused or withdrawn slot, with transfer,
+  redistribution, and denominator recomputation all false;
+- the blueprint's 5/20/60-trading-day primary horizons as **candidate values
+  only**. Confirmatory allocations and permanent look IDs remain empty and
+  `owner_decision_required`; authorized and consumed outcome looks are both
+  exact integer zero;
+- shared research cutoff 2027-08-31 and an inaccessible final holdout from
+  2027-09-01 through 2029-08-31;
+- a valid stock-level null closing this canonical family, with post-result
+  tuning/rerun and ETF/QC rescue prohibited. Any later hypothesis must be a
+  separately preregistered family with a new owner-authorized permanent look
+  budget and cannot retroactively rescue the canonical result; and
+- future QC work only at IB-7, consuming independently reviewed immutable
+  precomputed/custom signals whose research inputs cannot acquire execution
+  authority.
+
+All network, SEC, provider, credential, licensed-row, outcome, QC upload,
+QC processing, QC job, QC backtest, common four-family evaluation, broker,
+operator-database, scheduler, integration, capital, paper, live, deployment,
+and trading authority fields are exact booleans fixed to false. The IB-0
+contract version, candidate horizons, and zero-outcome authority are checked
+independently against local frozen values so upstream drift refuses rather
+than silently redefining this gate. No API, persistence writer, data loader,
+result runner, job launcher, or execution method was added.
+
+### 36.3 IB-1I implementation-review ledger
+
+| ID | Priority | Status | Location | Finding and impact | Correction and verification |
+|---|---|---|---|---|---|
+| IB1I-R01 | P2 | Closed before `b3b202d2` | canonical payload | The first draft serialized allocation and look inventories as hard-coded empty lists. If constructor validation weakened, unauthorized inventory could leave the semantic hash unchanged. | Serialize the actual instance inventories; forged validated-shape allocation and look mutations now change the semantic hash. |
+| IB1I-R02 | P2 | Closed before `b3b202d2` | stock-first/null contract | The first field name said a valid stock null closed the whole lane, overstating the owner direction, which closes only the canonical family and permits a separately preregistered later family. | Scope closure to the canonical family and separately freeze no tuning/rerun, no retroactive rescue, and the new-family plus new-owner-authorized-look-budget requirement. |
+| IB1I-R03 | P2 | Closed before `b3b202d2` | authority surface | The first draft omitted explicit false fields for QC processing, common four-family evaluation, integration, capital, and QC-input execution authority. | Add, validate, serialize, directly mutate, and semantic-hash-bind every omitted field. All remain false. |
+| IB1I-R04 | P3 | Closed before `b3b202d2` | governance provenance | The first draft bound only the older blueprint; an intermediate correction hashed whole mutable coordination files, which would fail on an unrelated future documentation edit. | Bind the two later directives by exact immutable source commit, path, identifier, and effective date. Tests verify the active documents still carry the named clauses without hashing unrelated bytes. |
+| IB1I-R05 | P2 | Closed before `b3b202d2` | dangerous-direction tests | The initial denylist missed direct network modules and the matrix omitted forged version/blueprint, withdrawn disposition, collection type confusion, and falsey non-boolean authority. | Replace the denylist with an exact import allowlist plus dynamic-import prohibition; add each omitted mutation. The final focused suite has 120 tests. |
+| IB1I-R06 | P2 | Closed before `b3b202d2` | nested types and IB-0 binding | Tuple equality alone admitted float horizons equal to integers and string subclasses; deriving both default and expectation from `CANONICAL_SPEC` let upstream horizon drift redefine the supposedly sealed gate. | Require exact member types, freeze 5/20/60 locally, and independently refuse IB-0 horizon drift. Regression mutates IB-0 and restores it in `finally`. |
+| IB1I-R07 | P3 | Closed before `b3b202d2` | import and diagnostics | A denylist could admit an unlisted authority surface, and one compound null-policy error message could misidentify a new-family or rerun violation as ETF/QC rescue. | Enforce the exact seven-root import set with no dynamic import call and use field-specific true/false refusal messages. |
+| IB1I-R08 | P2 | Closed before `b3b202d2` | upstream IB-0 authority | A later IB-0 version or outcome-authority mutation could contradict IB-1I while its local gate still claimed zero authority. | Freeze the IB-0 version locally and independently refuse upstream version, outcome-authorized, or nonzero-look drift. Three upstream mutations are restored in `finally` and pass. |
+
+Two independent final audit passes report no remaining P0-P3 finding in the
+bounded IB-1I diff. Implementation quality is **9/10** for the authorized
+structural scope: every identified dangerous direction was corrected before
+commit and the unresolved within-lane allocation is truthfully blocked rather
+than invented.
+
+### 36.4 Validation
+
+Environment: **Python 3.13.14**, pytest **9.1.1**.
+
+- Final IB-1I module: **120 passed in 2.41s**.
+- Named Insider and project-boundary suite covering all current Insider test
+  modules plus ML import, module hygiene, and both project-separation gates:
+  **848 passed, 8 platform skips in 393.03s (6m33s)**.
+- Complete repository suite on exact committed code tree
+  `b3b202d2a8bf0ecc8a3613dcbfdb3690483ad767`:
+  **3 failed, 7,093 passed, 15 skipped, 25 warnings in 2,939.96s (48m59s)**.
+  The failures are exactly the previously recorded out-of-lane cases:
+  `test_default_gain_review_is_fifty_percent_and_long_term_gated`,
+  `test_every_lot_row_carries_the_tax_mechanism_fields`, and
+  `test_report_carries_no_action_shaped_field` in
+  `tests/test_sleeve_report.py`. No Insider module imports that surface and no
+  file on that surface changed.
+- Whole-repository `compileall`, including `research/`, **exit 0**.
+- Post-record active-document and Insider implementation-record gate:
+  **70 passed in 12.40s**; the same gate reran after the evidence bullets were
+  added and passed **70 in 2.17s**.
+- Exact combined change inventory from Claude head `3f6c2676` contains eight
+  paths, all under the permitted Insider code/test prefixes or this record;
+  the out-of-lane path count is **0**.
+- `git diff --check`: **exit 0** apart from expected working-copy line-ending
+  notices. A narrow value-shaped secret scan over the complete combined diff
+  found **0 matches**.
+- The semantic payload and every authority field are mutation-bound; invalid
+  family size, `1/60` substitution, reallocation, look/cell creation, holdout
+  access, stock-null rescue, IB-0 drift, float/type confusion, and each false
+  authority direction refuse.
+
+Only local source files and synthetic structural values were used. No filing,
+real SEC package, provider/API, credential, licensed row, price, return,
+outcome, QuantConnect upload/processing/job/backtest, broker, operator
+database, scheduler, deployment, order, or UI was accessed. **Research looks:
+0.** No result was observed and no alpha was spent.
+
+### 36.5 Documented but not fixed because out of lane
+
+The following findings are deliberately retained without a code change:
+
+- `research/analyst_revisions_v2/qc_first_plan.py` still names a three-lane
+  correction factor and `1/60` prospective alpha. That is an Analyst-lane
+  correction, not Insider authority.
+- `docs/Strategy Description/README.md` still calls Insider Buying and Short
+  Interest "planning/baseline" and does not list the fourth Target-Price lane.
+  It is a shared coordination document and remains frozen here.
+- `IB0H-OOL01` and the three sleeve-clock failures above remain on their
+  separately owned shared surface.
+- Shared/pathname hardening `IB1H-R02`, fourfold immutable-I/O consolidation,
+  and all retained platform `R-*` findings remain documented and untouched.
+
+### 36.6 Residual gates and next review
+
+IB-1 remains incomplete. Real package acquisition/full population, official
+SEC/XSD compatibility, authenticated amendment linkage, complete amendment
+coverage, PIT issuer/owner/security/share-class identity, canonical filtering,
+amendment supersession, lot aggregation, the post-aggregation `$50,000` gate,
+signal construction, outcomes, ETF topology, portfolio research, QC
+implementation, deployment, and trading are not authorized or completed.
+
+The limited IB-1I structural gate is complete, but a full confirmatory
+preregistration is **owner-decision-blocked**. The owner has not selected one
+of the 5/20/60-session horizons, divided `1/80` among multiple stock cells,
+allocated any stock/ETF split, or reserved the slot for a later prospective/QC
+look. Codex did not invent a cell ID, permanent look ID, or alpha split.
+
+After the round's single push, Claude independently reviews every commit in
+`3f6c2676291f4e162ddf0aadaf1738202b69efec..` the pushed head, including the
+counter-review correction, counter-review record, IB-1I implementation, and
+this final record. Codex then counter-reviews every resulting Claude commit
+before any further Insider milestone.
 
 ## 35. Codex counter-review of Claude's IB-1H review (2026-09-02)
 

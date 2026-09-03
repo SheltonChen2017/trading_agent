@@ -1,16 +1,16 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED ALL FOUR CLAUDE COMMITS IN THE EXACT RANGE
-`a63335d3..25c1c378`; THE COMMIT DISPOSITIONS AND CORRECTIONS ARE IN SECTION
-35. THE COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT IS COMPLETE. THE
+Status: **CODEX COUNTER-REVIEWED ALL THREE CLAUDE COMMITS IN THE EXACT RANGE
+`5f98c3aa..19812334`; THE COMMIT DISPOSITIONS, QUALIFICATIONS, AND CORRECTIONS
+ARE IN SECTION 37. THE COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT IS COMPLETE. THE
 NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS CHECKPOINTED BUT REMAINS
 INCOMPLETE: ROLLBACK/REPLAY PROTECTION, PARENT-DIRECTORY CUSTODY, AND THE
 REQUIRED ADVERSARIAL VALIDATION MATRIX ARE OPEN. THE REVIEWED-SPEC REGISTRY IS
 THE CANONICAL EMPTY V2 REGISTRY. NO KEY PROVISIONING OR POSITIVE AUTHORITY IS
 AUTHORIZED. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1, AND TPR-0B REMAIN BLOCKED;
-NO EXTERNAL TRUST FILE, SIGNED ANCHOR, PROVIDER OR SOURCE RIGHT, OUTCOME
-ACCESS, RESEARCH LOOK, QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL,
-OR TRADING AUTHORITY EXISTS.**
+NO SIGNED ANCHOR, PROVIDER OR SOURCE RIGHT, OUTCOME ACCESS, RESEARCH LOOK, QC
+JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL, OR TRADING AUTHORITY EXISTS
+IN THE REPOSITORY. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
 
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Their integration into `main` grants this target branch visibility,
@@ -341,11 +341,13 @@ neither current tip contains the other. Live ahead/behind counts are omitted
 because every new lane commit invalidates them. The four-slot multiplicity
 amendment nevertheless remains unpropagated: see `TPR-OOL-006`.
 
-**Current qualification, 2026-09-02:** Codex has counter-reviewed Claude's exact
-four-commit range
-`a63335d38bfd6dd3b584d7a91ba0b454e97a6df4..25c1c378448bf41a60c31a81e11ca398354c36d0`.
-Section 35 contains every commit disposition and the counter-review/security
-ledger. Claude's comprehensive whole-lane audit is complete. The
+**Current qualification, 2026-09-03:** Codex has counter-reviewed Claude's exact
+three-commit range
+`5f98c3aa757f420efac13f682f4e210fa9688e5b..1981233424f25b48ebec2273fa4822c249e2a041`.
+Section 37 contains every commit disposition, the review qualifications, and
+this round's counter-review ledger; the authoritative current open-issue
+register remains below in section 8. Claude's comprehensive whole-lane audit
+is complete. The
 non-authorizing TPR-TR0-I implementation candidate is checkpointed but remains
 incomplete at exact code commit
 `20e20d7f68d39d17af84d6a5c65e22b78dc57eb1`. It freezes the executable Git,
@@ -392,9 +394,9 @@ entitlement, public-time semantics, correction completeness, target-horizon
 consistency, raw retention, derived processing, and QC-transfer rights. TPR-0B
 remains blocked until reviewed TPR-1 and TPR-2 structural manifests exist.
 After this round's single push, Claude independently reviews the exact new
-Codex correction/integration range beginning after `25c1c378`. That review grants no
-source, outcome, look, QC, broker, paper, live, deployment, capital, or trading
-authority.
+Codex counter-review correction range beginning after `19812334`. That review
+grants no source, outcome, look, QC, broker, paper, live, deployment, capital,
+or trading authority.
 
 ### Open-issue register
 
@@ -3587,3 +3589,120 @@ deployment or capital authority exists or was created. The reviewed-spec
 registry remains canonical empty v2. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and
 TPR-0B remain blocked, and TPR-TR0-I remains an incomplete, non-authorizing
 implementation checkpoint.
+
+## 37. Codex counter-review of Claude's TPR-TR0-I checkpoint review - 2026-09-03
+
+The fetched lane and `origin/codex/strategy-target-price-revisions` both
+resolved to Claude's published review head
+`1981233424f25b48ebec2273fa4822c249e2a041` before this counter-review began.
+The received tree was clean. Claude's production correction is sound, but the
+published range was not acceptable as a complete durable handoff because all
+six current pointers across three documents, plus their test, still routed the
+already-completed Claude review as the next action. This section is the
+controlling successor qualification; section 36 remains the as-written Claude
+review record.
+
+### 37.1 Exact review scope and output range
+
+| Item | Exact value |
+|---|---|
+| Codex range reviewed by Claude | `25c1c378448bf41a60c31a81e11ca398354c36d0..5f98c3aa757f420efac13f682f4e210fa9688e5b` |
+| Claude output range counter-reviewed by Codex | `5f98c3aa757f420efac13f682f4e210fa9688e5b..1981233424f25b48ebec2273fa4822c249e2a041` |
+| Claude commit 1 | `26a4fc6fb85af492ef34a3f5a93b84b9f037a665` - restore reachability of the empty-registry refusal |
+| Claude commit 2 | `34aa8eda2432d05a6a955fe3dbf4cf9a3fd98724` - append the independent review record |
+| Claude commit 3 / resulting review head | `1981233424f25b48ebec2273fa4822c249e2a041` - append the review session-ledger event |
+| Branch | `codex/strategy-target-price-revisions` |
+| Publication state at review start | local head and fetched remote head both exactly `1981233424f25b48ebec2273fa4822c249e2a041` |
+
+Authorship metadata was not used to infer role. Role and range came from the
+user-supplied Claude review notes, the committed section 36 review, the
+append-only session-ledger event, and the fetched graph, considered together.
+
+### 37.2 Commit-by-commit and cumulative dispositions
+
+| Commit | Disposition | Reason and successor correction |
+|---|---|---|
+| `26a4fc6fb85af492ef34a3f5a93b84b9f037a665` | **Accepted** | The one-line production change makes the exact empty-registry constant canonical and restores the intended early refusal. The regression proves canonicality, byte equality with the committed empty registry, and the specific no-anchor refusal. No success path or authority condition is relaxed. |
+| `34aa8eda2432d05a6a955fe3dbf4cf9a3fd98724` | **Accepted after correction** | Section 36 gives a substantive independent review and a valid P2 correction, but it did not advance the record preamble, section 8, Action Plan, Session Handoff, or their guard from the prior role state. This successor section and the corrected current pointers close that defect. |
+| `1981233424f25b48ebec2273fa4822c249e2a041` | **Accepted after correction** | The appended ledger event accurately summarizes the review but cannot name its own then-unknown object ID and does not repair the stale current pointers. This successor records the exact eventual output range, all three ordered commits, resulting head, and corrected next role. |
+
+**Cumulative disposition: accepted after correction.** The code correction is
+accepted without modification. The durable-state corrections are target-owned
+documentation and guard changes only. No next feature milestone is included.
+
+### 37.3 P0-P3 counter-review ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CCR12-001` | P2 | **Closed by current correction** | `34aa8eda`, `19812334` | record preamble and section 8; Action Plan current block and TPR row; Session Handoff current bullet and TPR summary; `tests/target_price_revisions/test_document_consistency.py` | Every durable current pointer, plus the guard intended to keep them synchronized, still said Claude must review the Codex range beginning after `25c1c378`, although section 36 and the ledger event prove that review complete. This hides the required Codex counter-review and can repeat the wrong role on another machine. | On received head `19812334`, all six current pointers across the three documents named `a63335d3..25c1c378`, section 35, and Claude-next; the green test explicitly required those stale values. Git instead shows Claude's three-commit output `5f98c3aa..19812334`. | Incorrect durable state is P2 under the repository rubric and the multi-host workflow depends on these surfaces as its resume instruction. | Advanced every current pointer to the exact three-commit Claude range and section 37; routed the next review after `19812334`; advanced the guard constants and assertions so restoring the old role, range, section, or base turns it red. | Focused and exact-final validation are recorded in 37.6 and the successor session-ledger event. |
+| `TPR-CCR12-002` | P3 | **Closed by successor qualification** | `34aa8eda` | section 36.1 | The heading "Exact reviewed snapshot" abbreviated the already-known reviewed Codex head as `5f98c3aa`. | The base was a full object ID, the head was only eight characters, and all four input commits were abbreviated even though Git held their full identities. | The reviewed state remained recoverable directly from the Git graph and no authority changed, so this is a minor precision issue, not a second material handoff defect. | Section 37.1 records the full reviewed input range, the normal exact Claude output range now available to the successor role, all three full ordered Claude hashes, and the exact resulting review head. | The document guard pins both full ranges; final diff and document tests are recorded in 37.6. |
+| `TPR-CCR12-003` | P3 | **Closed by successor qualification** | `34aa8eda` | section 36.6 | The scope statement says real Windows ACL and OpenSSH behavior is verified "only by their own test doubles", but section 35.6 already records a read-only native ACL smoke probe and a temporary real Git/OpenSSH signature probe. | Section 35.6 names both probes and states that the signature probe created no repository or external trust state. | Understating evidence is inaccurate documentation and obscures the narrower remaining gap: no production-provisioned, full end-to-end trust matrix exists. | The two real local probes remain valid evidence. They do not close `TPR-CCR10-016`, which still requires the complete rotation, rollback, ancestry, byte-mismatch, and local integration matrix. | Section 35.6 remains the exact evidence source; the target suite and final validation are recorded in 37.6. |
+| `TPR-CCR12-004` | P3 | **Closed by successor qualification** | `34aa8eda`, `19812334` | sections 36.1, 36.6, 36.7 and the Claude ledger event | Machine-local absence of the ProgramData trust directory, allowed-signers file, key, or rollback pin was written as a cross-host fact in a lane explicitly developed on several machines. | On this Codex host, `C:\ProgramData\CustomizedAgent\trust` and `tpr_allowed_signers` are absent; Claude's statement is evidence only for its review host. Repository absence of a positive registry entry is portable. | Unqualified host state can mislead provisioning and recovery on another machine, although the empty committed registry keeps current authority at zero. | Treat section 36's external-path absence claims as Claude-review-host observations. The current Session Handoff separately records the Codex-host observation and explicitly makes no claim about other hosts. | Read-only `Test-Path` checks on this host returned false for both exact paths; no key or trust artifact was created or read. |
+
+Claude's `TPR-CR12-001` priority remains **P2**. The old and corrected paths
+both refuse, so it is not P1; however, the unreachable early-empty control made
+the checkpoint fail the previously closed P2 `TPR-CCR10-015` definition of
+done. That is a material milestone-control failure under the repository rubric,
+not merely a wording or test-sensitivity issue. A candidate concern that
+section 36's "No P0 and no P1" was itself inaccurate is rejected: the sentence
+immediately scopes the claim to the four reviewed Codex commits and section
+36.5 separately preserves the two inherited open P1 findings.
+
+No new P0 or P1 was introduced by Claude's range. The pre-existing
+`TPR-CCR10-012` and `TPR-CCR10-013` P1 blockers remain open and inert while the
+committed registry is empty. The section 8 open register remains exactly six
+findings; this round does not re-rank `TPR-CCR2-011`, whose present zero-authority
+reviewer-identity strengthening remains P3.
+
+### 37.4 Independent technical verification
+
+- The received exact head's Target-Price suite passed **252 tests with 3
+  skipped in 79.84s**. The new empty-registry regression and adjacent trust
+  ordering checks are green.
+- `EMPTY_REVIEW_REGISTRY_BYTES` now uses `trailing_lf=True`, matches the
+  committed canonical empty-v2 registry, and causes `_review_anchor` to refuse
+  before external trust verification. Every non-identical payload still enters
+  signed-anchor verification before JSON parsing. No authority path widened.
+- `trust_root.py` and `windows_acl.py` are unchanged by Claude's range. The two
+  record-only successors do not weaken the production correction.
+- Section 35.6's read-only native ACL smoke and temporary real Git/OpenSSH
+  signature probe remain valid local evidence. They are not a
+  production-provisioned, full end-to-end matrix and therefore do not close
+  `TPR-CCR10-016`.
+- The governing PDF remains 29 unencrypted letter-size pages at raw SHA-256
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`.
+  Physical pages 27 and 29 were rendered with bundled Poppler and visually
+  inspected. They preserve the TPR-0A/TPR-0B dependency order, source-rights
+  gate, fixed `1/80` ceiling, and zero-authority boundary.
+- The fetched Claude range passed `git diff --check`. Full-suite evidence on
+  the exact committed correction tree follows in 37.6 and its append-only
+  validation event.
+
+### 37.5 Milestone and authority decision
+
+No next implementation milestone is authorized. TPR-TR0-I remains an
+incomplete, non-authorizing checkpoint: `TPR-CCR10-012` requires an approved
+external rollback/replay pin, `TPR-CCR10-013` requires an approved parent
+custody boundary, and `TPR-CCR10-016` requires the remaining adversarial and
+local integration matrix. `TPR-1` remains blocked on a separately reviewed
+exact source-rights artifact. `TPR-0B` still waits for reviewed TPR-1 and TPR-2
+structural manifests. Sibling multiplicity re-freezes and counter-reviews,
+exact source and look authority, and all downstream outcome gates remain
+unsatisfied.
+
+The committed reviewed-spec registry remains canonical empty v2. No key,
+allowed-signers file, signed anchor, positive registry entry, provider/source
+right, outcome access, authorized or spent research look, QuantConnect job,
+broker action, paper/live deployment, capital, or trading authority is created
+by this counter-review. External trust-path absence is host-scoped; repository
+zero-authority facts are portable.
+
+### 37.6 Final validation and handoff
+
+The correction commit contains only the three current-state documents and the
+target-owned document guard. The exact correction-tree complete suite,
+compilation, focused guard, diff, status, and artifact evidence is appended in
+the successor validation event before this Codex round's single push. After
+that push, Claude reviews the exact new Codex range beginning after
+`1981233424f25b48ebec2273fa4822c249e2a041`; no milestone or authority is
+implied.

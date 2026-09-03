@@ -49,21 +49,30 @@ EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
 # hash does not exist until the commit is written -- so a Codex counter-review
 # pins the exact Claude range it just reviewed.
 LATEST_COUNTERREVIEWED_CLAUDE_BASE = (
-    "a63335d38bfd6dd3b584d7a91ba0b454e97a6df4"
+    "5f98c3aa757f420efac13f682f4e210fa9688e5b"
 )
 LATEST_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "25c1c378448bf41a60c31a81e11ca398354c36d0"
+    "1981233424f25b48ebec2273fa4822c249e2a041"
 )
 LATEST_COUNTERREVIEWED_CLAUDE_RANGE = (
     f"{LATEST_COUNTERREVIEWED_CLAUDE_BASE}.."
     f"{LATEST_COUNTERREVIEWED_CLAUDE_HEAD}"
 )
-LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE = "a63335d3..25c1c378"
+LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE = "5f98c3aa..19812334"
+LATEST_CLAUDE_REVIEWED_CODEX_RANGE = (
+    "25c1c378448bf41a60c31a81e11ca398354c36d0.."
+    "5f98c3aa757f420efac13f682f4e210fa9688e5b"
+)
+LATEST_COUNTERREVIEWED_CLAUDE_COMMITS = (
+    "26a4fc6fb85af492ef34a3f5a93b84b9f037a665",
+    "34aa8eda2432d05a6a955fe3dbf4cf9a3fd98724",
+    "1981233424f25b48ebec2273fa4822c249e2a041",
+)
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "45f45aa36f6493d8bd9669bcdba48d08d8c9c57e"
+    "25c1c378448bf41a60c31a81e11ca398354c36d0"
 )
-PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "45f45aa3"
+PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "25c1c378"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -534,7 +543,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed Claude's exact four-commit range"
+        "Codex has counter-reviewed Claude's exact three-commit range"
         in normalized_current
     )
     assert (
@@ -549,7 +558,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "pending Claude review of this Codex round" not in normalized_current
     assert "comprehensive whole-lane audit is complete" in normalized_current.lower()
-    assert "beginning after `25c1c378`" in normalized_current
+    assert "beginning after `19812334`" in normalized_current
 
     routing_row = next(
         line
@@ -567,7 +576,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_pointer
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_pointer
         assert (
-            "Codex has counter-reviewed Claude's exact four-commit range"
+            "Codex has counter-reviewed Claude's exact three-commit range"
             in normalized_pointer
         )
         assert (
@@ -579,7 +588,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         )
         assert "TPR-TR0" in normalized_pointer
         assert "comprehensive whole-lane audit is complete" in normalized_pointer.lower()
-        assert "beginning after `25c1c378`" in normalized_pointer
+        assert "beginning after `19812334`" in normalized_pointer
         normalized_pointer_lower = normalized_pointer.lower()
         stale_current_claims = (
             "pending claude review of this codex round",
@@ -588,6 +597,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             "after this counter-review correction round's single push",
             "after this counter-review round's single push",
             "claude has independently reviewed codex's exact three-commit range",
+            "beginning after `25c1c378`",
         )
         for stale_claim in stale_current_claims:
             assert stale_claim not in normalized_pointer_lower
@@ -603,14 +613,31 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
         ) == [LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex counter-reviewed all four claude commits" in normalized_summary_lower
-        assert "section 35" in normalized_summary_lower
+        assert "codex counter-reviewed all three claude commits" in normalized_summary_lower
+        assert "section 37" in normalized_summary_lower
         assert (
             "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
             in normalized_summary_lower
         )
         assert "no key provisioning or positive authority is authorized" in normalized_summary_lower
         assert "comprehensive claude whole-lane audit is complete" in normalized_summary_lower
+
+
+def test_latest_counterreview_records_the_exact_claude_output() -> None:
+    """TPR-CCR12-001/002: preserve the exact multi-host review handoff."""
+    section = _record_section(
+        "## 37. Codex counter-review of Claude's TPR-TR0-I checkpoint review"
+    )
+    assert LATEST_CLAUDE_REVIEWED_CODEX_RANGE in section
+    assert LATEST_COUNTERREVIEWED_CLAUDE_RANGE in section
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if line.startswith("| Claude commit ")
+    )
+    assert ordered_commits == LATEST_COUNTERREVIEWED_CLAUDE_COMMITS
+    assert "Cumulative disposition: accepted after correction" in section
+    assert "No next implementation milestone is authorized" in section
 
 
 def test_out_of_lane_ledger_has_unique_well_formed_ids() -> None:

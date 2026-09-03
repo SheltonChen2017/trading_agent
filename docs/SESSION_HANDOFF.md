@@ -22,19 +22,23 @@ their lane-owned artifacts.
   changes and their independent reviews remain on their respective branches;
   merge visibility grants no target-branch authority over sibling artifacts.
 
-- **Current review state, 2026-09-02.** Codex has counter-reviewed Claude's exact
-  four-commit range
-  `a63335d38bfd6dd3b584d7a91ba0b454e97a6df4..25c1c378448bf41a60c31a81e11ca398354c36d0`.
-  The comprehensive whole-lane audit is complete; section 35 of the
-  target record contains the four dispositions, corrections, and current
-  security ledger. The non-authorizing TPR-TR0-I implementation candidate is
-  checkpointed but remains incomplete: rollback/replay protection,
-  parent-directory custody, and the remaining adversarial validation matrix
-  are open. The reviewed-spec registry is canonical empty v2. No key
-  provisioning or positive authority is authorized; no external trust file,
-  signature, positive registry entry, source right, outcome, or look authority
-  exists. After this round's single push, Claude independently reviews the
-  exact new Codex correction/integration range beginning after `25c1c378`.
+- **Current review state, 2026-09-03.** Codex has counter-reviewed Claude's exact
+  three-commit range
+  `5f98c3aa757f420efac13f682f4e210fa9688e5b..1981233424f25b48ebec2273fa4822c249e2a041`.
+  The comprehensive whole-lane audit is complete; section 37 of the target
+  record contains all three dispositions, review qualifications, and
+  corrections, while section 8 remains the authoritative current open-issue
+  register. The non-authorizing TPR-TR0-I
+  implementation candidate is checkpointed but remains incomplete:
+  rollback/replay protection, parent-directory custody, and the remaining
+  adversarial validation matrix are open. The reviewed-spec registry is
+  canonical empty v2. No key provisioning or positive authority is authorized;
+  no TPR signed anchor, positive registry entry, source right, outcome, or look
+  authority exists in the repository. On this Codex host, the external trust
+  directory and allowed-signers file are also absent; no claim is made about
+  another host's machine-local state. After this round's single push, Claude
+  independently reviews the exact new Codex counter-review correction range
+  beginning after `19812334`.
 
 - The owner directed a new sibling worktree for branch
   `codex/strategy-target-price-revisions`, resolved with
@@ -475,10 +479,10 @@ It is a separate fourth planning lane under the owner-directed serialized
 same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. The
-v2.2 implementation snapshot is `bb8dfb6`. Codex counter-reviewed all four
-Claude commits in `a63335d3..25c1c378`; the comprehensive Claude whole-lane
-audit is complete, with the dispositions and corrections recorded in
-section 35. The non-authorizing TPR-TR0-I implementation candidate is
+v2.2 implementation snapshot is `bb8dfb6`. Codex counter-reviewed all three
+Claude commits in `5f98c3aa..19812334`; the comprehensive Claude whole-lane
+audit is complete, with the dispositions, qualifications, and corrections
+recorded in section 37. The non-authorizing TPR-TR0-I implementation candidate is
 checkpointed but remains incomplete; no key provisioning or positive authority
 is authorized.
 The lane and `origin/main` have diverged;
@@ -511,8 +515,8 @@ reviewed; `TPR-CCR2-011` also remains open until reviewer-controlled signing or
 a separately signed review receipt proves the independent reviewer's identity;
 the owner-attestation principal alone cannot close it. Neither opens TPR-1 or
 any source/outcome/look gate.
-The next role action is Claude's review of this Codex correction/integration
-round beginning after `25c1c378`.
+The next role action is Claude's review of this Codex counter-review correction
+round beginning after `19812334`.
 
 ## 5. Data acquisitions and confirmations
 

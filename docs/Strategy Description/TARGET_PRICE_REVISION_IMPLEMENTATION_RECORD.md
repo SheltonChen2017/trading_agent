@@ -3498,3 +3498,91 @@ registry and absent external trust files.
   recorded in the section 10 checkpoint row after the documentation commit.
 - Provider accesses: **0**. Outcome accesses: **0**. Authorized or spent
   research looks: **0**.
+
+## 36. Claude independent review - 2026-09-02 (TPR-TR0-I integrated checkpoint)
+
+**Disposition: all four commits accepted after correction.** No P0 and no P1.
+One new P2 was found in the checkpoint's new code and is corrected here. The
+open register is verified to contain exactly the six findings the round
+declares, and the empty, non-authorizing registry state is preserved.
+
+**Counter-reviewed round quality: 9/10.** This is the strongest implementation
+work the lane has produced. The trust root is built the way a trust root should
+be: an allowlisted Git environment rather than a blocklist, a hard-coded
+executable with reparse-point checks on every ancestor, `--no-replace-objects`
+on every authority command, graft rejection through the resolved *common*
+directory, three-way anchor/HEAD/worktree byte equality, and a terminal HEAD
+re-check that closes the verification-window TOCTOU. The Windows ACL reader
+tiles the DACL exactly, and the round volunteers its own two P1 blockers rather
+than presenting the checkpoint as finished. The point off is `TPR-CR12-001`:
+a named control that never executes, in new and untested code.
+
+### 36.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Reviewed range | `25c1c378448bf41a60c31a81e11ca398354c36d0..5f98c3aa` (four commits) |
+| Commits | `20e20d7f` (code checkpoint), `70dc5025` (merge), `0ba9e54a` (record/routing), `5f98c3aa` (final corrections) |
+| Ancestry | the prior Claude head `87384c09` is still an ancestor; no history rewrite |
+| Worktree | the checkout `git worktree list` registers for the lane branch; no branch or worktree created, switched, merged, rebased or forked |
+| Registry | `tpr-reviewed-algorithm-registry-v2`, `entries: []`; no trust directory, no allowed-signers file, no key, no pin |
+
+### 36.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `20e20d7f` | **accepted after correction** | The TPR-TR0-I code checkpoint: `trust_root.py` (647), `windows_acl.py` (465) and the `preregistration.py` integration. Audited line by line below. Carries `TPR-CR12-001`. |
+| `70dc5025` | **accepted** | Cross-machine merge. Verified a clean union: the diff against each parent equals exactly what the other parent contributed, so no conflict-resolution edit entered through the merge. |
+| `0ba9e54a` | **accepted** | Record, routing and open-register correction. The strengthened register guard was mutation-tested here and holds in all four directions. |
+| `5f98c3aa` | **accepted** | Final corrections and validation record. Counts reproduce against this reviewer's independent runs. |
+
+### 36.3 P0-P3 ledger
+
+| ID | Priority | Status | Location | Issue and impact | Evidence | Reason | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|
+| `TPR-CR12-001` | P2 | Closed | `research/target_price_revisions/preregistration.py:77` constant and its only use at the `_review_anchor` empty-registry guard | `EMPTY_REVIEW_REGISTRY_BYTES` is built by `canonical_json_bytes(...)` **without** `trailing_lf=True`, while this lane's own canonical contract requires exactly one LF terminator. The constant is therefore non-canonical by the contract the same module enforces, and can never byte-equal any canonically stored registry. The empty-registry guard is unreachable dead code: the lane's current, expected, empty and non-authorizing state falls through to signature verification and reports `signed review-registry trust root is invalid` instead of the absent review anchor it actually is. Both paths refuse, so no authority boundary moved -- which is exactly why no authority test observed it. After provisioning, a genuine trust-root failure and a legitimately empty registry become indistinguishable, and the guard's stated purpose, refusing an empty registry *without* requiring trust infrastructure, does not exist at runtime. | `canonical_json_bytes` takes `trailing_lf: bool = False` (`canonical.py:242`); the constant omits it. `require_canonical_json_bytes` **refuses** the constant and **accepts** the stored registry. The constant and the stored bytes differ by exactly one trailing LF byte. Calling `_review_anchor` on the current tree returned `signed review-registry trust root is invalid`; after the fix it returns `reviewed algorithm has no unique external review anchor`. The constant had exactly two references in the repository, its definition and the guard, and **no test**. | A control the design names must actually run. An unreachable guard is not a conservative accident: it removes the one diagnostic that separates "no anchor approved yet" from "the trust root is broken", which is the distinction the operator needs at provisioning time. | Added `trailing_lf=True` to the constant so it is canonical under the lane's own contract and byte-equals the stored registry. No guard, threshold or authority condition was relaxed. | Added `test_empty_registry_guard_is_reachable_for_the_committed_registry`, asserting the constant is canonical, that it byte-equals the stored registry, and that the empty state produces the absent-anchor refusal. Mutation: removing `trailing_lf=True` turns the test red on the canonical assertion; a byte-identical restore returns it green. Focused lane suite 252 passed, 3 skipped. |
+
+### 36.4 Focus-area audit
+
+Each area the round asked to be examined, with what was actually checked.
+
+| Area | Result |
+|---|---|
+| Frozen Git executable and environment | **Sound.** `_secure_git_environment` **raises** on any caller `GIT_CONFIG*` or forbidden variable rather than dropping it, then rebuilds the environment from a five-name allowlist. `HOME`, `HOMEDRIVE`, `HOMEPATH` and `USERPROFILE` are all absent from that allowlist, so the global gitconfig is unreachable as well as the system one -- the gap this reviewer probed for specifically. `_canonical_frozen_git_program` checks `FILE_ATTRIBUTE_REPARSE_POINT` on the executable **and every ancestor**, then requires `resolved == original`. Invocation is an argument vector with `shell=False` and `text=False`. |
+| Commit-graph and graft rejection | **Sound.** `core.commitGraph=false` is prefixed to authority commands, so a poisoned commit-graph cannot mislead ancestry. `_reject_legacy_grafts` resolves `--git-common-dir` (correct for worktrees, not the per-worktree dir), requires it canonical, and refuses if `info/grafts` exists at all, using `lstat` so a symlink counts. Only `FileNotFoundError` returns; every other `OSError` refuses. |
+| Pinned HEAD and terminal byte checks | **Sound.** HEAD is resolved once, every later command is pinned to that commit, and a terminal `rev-parse HEAD^{commit}` must equal it or verification fails -- closing the window between derivation and signature check. Anchor, HEAD and working-tree registry bytes must all be equal. |
+| Signature parsing | **Sound.** `_parse_signature_status` requires an exact five-field NUL-delimited record, rejects carriage returns, rejects any empty field, decodes ASCII strictly, and binds `%GS`, `%GK` and `%GF` to the **externally loaded** signer. `_validate_verify_output` additionally requires the exact expected stderr and empty stdout. `gpg.format`, `allowedSignersFile`, `gpg.ssh.program` and `minTrustLevel` are passed as `-c` overrides, which beat any config file. |
+| Windows ACL/ACE/SID parsing bounds | **Sound; no out-of-bounds read found.** The DACL is required to tile *exactly*: `ace_count` is bounded by the available bytes, each ACE must begin precisely where the previous ended, `ace_size` must be at least the header, 4-byte aligned and within the ACL, an allow ACE must be large enough for the SID header, the SID size must equal the remaining ACE bytes exactly, and a terminal check rejects unaccounted trailing bytes. `_sid_text` calls `IsValidSid`, cross-checks `GetLengthSid` against the tiling-derived size, normalizes through `ConvertSidToStringSidW` rather than by hand, and frees in a `finally`. |
+| Authentication before JSON parsing | **Sound, and better than the obvious design.** Emptiness is decided by **byte equality against a frozen constant**, not by parsing, so there is no parse-to-decide-emptiness gap; every registry that is not byte-equal to the empty constant is authenticated by `verify_signed_registry_anchor` **before** `require_canonical_json_bytes` runs, and the verified payload is re-compared to the parsed bytes. This is the design `TPR-CR12-001` restored to working order rather than one it contradicts. |
+| Strengthened open-issue guard | **Verified by mutation, not by reading.** Four mutations of the record, each detected and each followed by a byte-identical restore: a duplicated register ID, a priority mapping flipped P1 to P3, a malformed bolded priority, and delisting an open finding. The guard holds in both directions. |
+| Semantic alpha validator vs immutable loader | **Correct and now pinned.** The distinction recorded as `TPR-CR11-001` still holds on this tree and is covered by the regression added in the prior round. |
+| Rollback/replay (`TPR-CCR10-012`), parent-directory custody (`TPR-CCR10-013`), incomplete matrix (`TPR-CCR10-016`) | **Honestly scoped; no correction attempted.** All three are correctly stated as owner-level or later-round work, and all three are listed in the open register as blocking positive registry authority. They are inert today because the registry is empty and no trust file exists, and this review confirms both facts on the tree rather than accepting them from the record. Closing them requires owner approval, which this round is explicitly forbidden to provision. |
+
+### 36.5 Open register verified
+
+The register contains exactly the six findings the round declares --
+`TPR-CCR1-006` (P3), `TPR-CCR2-011` (P3), `TPR-CCR5-004` (P2),
+`TPR-CCR10-012` (P1), `TPR-CCR10-013` (P1), `TPR-CCR10-016` (P2) -- with the
+priorities above. `TPR-CR12-001` is closed in this round and is therefore
+correctly **absent** from the register.
+
+### 36.6 Scope not covered
+
+- The blueprint is again read as its **text layer**; the renderer question
+  recorded as `TPR-CR11-002` is unchanged and no new evidence was sought.
+- `trust_root.py` and `windows_acl.py` remain **unexecutable in production**:
+  no key, allowed-signers file, trust directory or signed anchor exists, so
+  their runtime behaviour against real Windows ACLs and real OpenSSH signatures
+  is still verified only by their own test doubles. This is the substance of
+  `TPR-CCR10-016` and is why the checkpoint is correctly called incomplete.
+- Sibling-lane commits inherited through `main` remain outside this lane.
+
+### 36.7 Authority state
+
+Unchanged and zero. No key, allowed-signers file, trust directory, rollback
+pin, signed commit, positive registry entry, provider row, source access,
+outcome access, research look, QuantConnect job, broker action, paper/live
+deployment or capital authority exists or was created. The reviewed-spec
+registry remains canonical empty v2. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and
+TPR-0B remain blocked, and TPR-TR0-I remains an incomplete, non-authorizing
+implementation checkpoint.

@@ -1,23 +1,17 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE'S COMPLETE-LANE AUDIT THROUGH `f3e2999e` HAS BEEN
-COUNTER-REVIEWED COMMIT BY COMMIT AND IS ACCEPTED AFTER P3 TEST-EVIDENCE AND
-DOCUMENTATION CORRECTIONS. NO SHORT INTEREST SOURCE-CODE P0-P3 REMAINS FROM
-THAT AUDIT. THE IMPLEMENTED BLUEPRINT EQUATIONS NAMED IN SECTION 30.4 WERE
-REPRODUCED BY CLAUDE'S INDEPENDENT ORACLE, AND THE FROZEN POLICY DIGEST REMAINS
-`16074b0d27180f386057a6405b36cb1685f7565fb2cf2f81ad2263706147a66c`.
-THE SI-3C-P1 ENVELOPE AT `2bb257a2` AND CLAUDE'S REVIEW COMMIT `a726c9db`
-ARE NOW CODEX-COUNTER-REVIEWED AND ACCEPTED AFTER THE TEST/EVIDENCE
-CORRECTIONS IN SECTION 33. `a226ee74` DISTINGUISHES CANDIDATE, ELIGIBLE AND
-SECTOR WITNESS ROLES. CODEX-SELECTED SI-3C-P2 AT `591175ea` PRESERVES THE
-EXACT ACCEPTED V1 ENVELOPE AND LEGACY DIGESTS WHILE STREAMING THE LEGACY
-COMPATIBILITY DIGEST, ADDING A NON-EXPANDING COMPACT VERIFIER AND CACHING ONLY
-IMMUTABLE CANONICAL JSON/DIGEST STRINGS. THE COMPACT PATH NO LONGER RETAINS A
-FULL LEGACY ROW LIST, BUT IT STILL PROCESSES EVERY LEGACY BYTE; THE EXPLICIT
-LEGACY-EXPANSION APIS STILL MATERIALIZE ROWS, AND MULTI-CYCLE INVENTORY SCALE
-REMAINS UNPROVEN. THE CANDIDATE ENVELOPE REMAINS NO-GO FOR LICENSED/
-PROVIDER/PRODUCTION SCALE. FULL LICENSED SI-1/FULL SI-2, `S2`-`S4`, DTC
-DELTA, RANKING/SEEDING, SI-4 ETF REVERSE INDEXING/AGGREGATION, OUTCOMES, ETF
+Status: **CLAUDE'S RECORD-ONLY REVIEW COMMIT `f2fca4e` HAS BEEN
+COUNTER-REVIEWED COMMIT BY COMMIT AND IS ACCEPTED AFTER THE SIX P3
+DOCUMENTATION/EVIDENCE CORRECTIONS IN SECTION 35. NO SHORT INTEREST
+PRODUCTION-CODE P0-P3 REMAINS FROM THE REVIEWED SI-3C-P2 RANGE. TEST-ONLY
+SI-3C-P3 AT `a878b7a` NOW CHARACTERIZES THE REMAINING MULTI-CYCLE RAW-INVENTORY
+TERM AT EXACT SYNTHETIC `C=2` AND `C=4`, HOLDING `N=20` AND SECURITY MEMBERSHIP
+FIXED. DOUBLING `C` QUADRUPLES THAT STORED-INVENTORY SUBTERM, WHILE TOTAL
+COMPACT BYTES GROW 2.591X IN THIS BOUNDED SAMPLE. SI-3C-P3 IS INTERNALLY
+ACCEPTED AFTER PRE-COMMIT P2/P3 FIXTURE CORRECTIONS AND IS PENDING CLAUDE
+REVIEW. THE COMPACT ENVELOPE REMAINS NO-GO FOR LICENSED/PROVIDER/PRODUCTION
+SCALE. FULL LICENSED SI-1, FULL SI-2 PIT READINESS, `S2`-`S4`, DTC DELTA,
+RANKING/SEEDING, SI-4 ETF REVERSE INDEXING/AGGREGATION, OUTCOMES, ETF
 PORTFOLIO, AND EVERY QUANTCONNECT ARTIFACT/UPLOAD/COMPILE/JOB REMAIN
 UNIMPLEMENTED OR GATED.**
 
@@ -36,10 +30,11 @@ agent may edit `docs/ACTION_PLAN_2026-08-20.md` or
 Owner direction, 2026-08-29: this lane is used only for Short Interest
 strategy development and QuantConnect testing. Future code and documentation
 must remain Short Interest/QC-specific; Trading App and Streamlit work are out
-of scope. As section 13.3 already records, no live-trading objective was
-authorized. This direction does not authorize an external QuantConnect upload
-or job run, licensed/provider or outcome access, paper/live deployment,
-broker or operator-database action, order submission, or trading.
+of scope. The later owner clarification in section 22.4 adds eventual
+autopiloted live trading as a destination only; it grants no current external
+QuantConnect upload/job, licensed/provider or outcome access, paper/live
+deployment, broker or operator-database action, order submission, or trading
+authority.
 
 ## 1. Canonical V1 contract
 
@@ -157,6 +152,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-02 | Claude review | `f3e2999e` -> `80e0c3a3` reviewed; no correction to the reviewed code (this record commit carries a section 30 self-correction) | Independent review of the whole-lane counter-review and the SI-3C-P1 compact score batch | Reviewed all three pushed commits individually and accepted each. Verified strict additivity by file list: exactly one new production module, **no pre-existing production source changed**, `__init__.py` untouched so exports do not broaden, and policy, preregistration and both fixtures untouched; the only import-boundary delta is the single `copy` allowlist entry. Independently reproduced the compact evidence by recounting from the payload rather than calling the test helper, confirmed lossless expansion against the legacy rows and both SI-3C-P0 digests, and verified role-specific witnesses on a multi-sector cohort. Accepted all six `SI-CCR12` findings, reproducing three, and raised one further defect in my own section 30 that the counter-review did not reach. | Complete repository suite at `80e0c3a3` inside the named lane worktree with pytest's normal external temp: **6,836 passed, 13 skipped, 4 failed, 25 known dependency warnings in 1,795.69s (29m55s)**; no Short Interest test failed. This reconciles exactly with the recorded 6,837 / 3 at 6,840 non-skipped tests, the difference being one further sleeve-report assertion that has since expired. Complete eight-file lane **269 passed in 159.15s**, matching the record; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Compact evidence reproduced exactly: 40 and 80 rows, **100 and 200 stored witnesses** (unique cohort inventories plus member tables), 358,965 and 712,531 canonical bytes, envelope hashes `82f579b6...` and `6eae0887...`, legacy digests `efe0ef91...` and `b4701c50...`, compaction 6.37x and 11.73x with witnesses growing linearly where the legacy row list grew quadratically. Thirteen adversarial payloads all refused with specific diagnostics, covering floats, `str`/`int` subclasses, non-string keys, tuple-for-list, stale and orphan references, duplicate/dropped rows, unknown fields, a flipped production flag, reordering and a recursive container. Multi-sector member-set sizes `[0, 20, 20, 40]` with two distinct sector digests and a disjoint candidate digest. Sources: the two tracked synthetic fixtures with `entitlement: synthetic_fixture_only`; the N=20/N=40 cohorts are deterministic clones. Python 3.12.13, pytest 9.1.1. No credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/compile/job, broker, operator database, scheduler, deployment, order or trading access; **0 research looks**. No scratch worktree was created. | No P0, P1 or P2, and no defect in `4d9cc80c`, `2bb257a2` or `80e0c3a3`. All six `SI-CCR12` findings accepted; `SI-CCR12-003` confirmed by direct measurement (6,171 source and 5,922 tests, transposed by exactly 1,000 each; 15,740 including fixtures and record) and `SI-CCR12-001` reproduced exactly as 2 failed / 6 passed under a prefix-only comparison. For `SI-CCR12-005` I can now name the omitted eighth mutation: it changed only a refusal message and therefore tested nothing, so the honest count is seven load-bearing mutations plus one discarded no-op. One new P3 raised against myself (`SI-AUD2-001`): section 30.2's claim that all 12,093 in-scope lines "were reviewed" overstates reading depth, since that audit's coverage was behavioural and lane-wide with targeted and cumulative reading rather than a line-by-line pass. Section 32.4 is the durable correction; the historical text is retained. The 7/10 whole-lane assessment is accepted; SI-3C-P1 is rated 9/10. Details in section 32. | Codex counter-reviews this record commit; scope is section 32's accuracy, the `SI-AUD2-001` row and the section 32.4 self-correction. No milestone started and none authorized. The envelope is an additive structural candidate only, is not a provider interface, and its gain is serialized-output only because construction and verification still materialize the legacy quadratic rows; cohort inventories remain unproven beyond two cycles. `S2`-`S4`, DTC delta and window `K`, ranking/seeding and tie rules, full licensed SI-1/SI-2, SI-4 ETF reverse indexing/aggregation, outcomes, portfolio stages, and every QuantConnect artifact/upload/compile/job remain gated. Out of lane and unfixed: the Analyst CRLF artifacts, whose remedy is a forced re-checkout and **not** `renormalize`, and the sleeve-report clock expiry, now **three** assertions and empirically progressive. |
 | 2026-09-02 | Codex counter-review + implementation | `a726c9db` -> `591175ea` (exact code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3C-P1 review + SI-3C-P2 non-expanding compact verification | Accepted Claude's one record commit after four P3 evidence/test corrections. `a226ee74` adds a load-bearing candidate/eligible/sector role-separation regression. `591175ea` streams the exact legacy compatibility digest one row at a time, validates compact payloads without retaining expanded rows, returns an exact typed non-production receipt, caches immutable canonical strings, and leaves every v1 payload field/hash and legacy API intact. | Final focused: **21 passed in 75.99s**. Complete Short Interest lane: **274 passed in 153.57s**. Complete repository: **6,841 passed, 13 skipped, 4 unrelated failures, 25 warnings in 1,360.24s (22m40s); no Short Interest test failed**. Active documents: **69 passed in 1.19s**. Required compileall including `research`: **exit 0**. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR13-001` through `004` and `SI3CP2-REV-001` through `003` are closed in section 33. No P0/P1 remains. Compact verification no longer retains the full legacy row list, but exact-hash CPU, explicit legacy expansion and `O(C^2 N)` multi-cycle cohort inventories remain honest gates. | Commit this record, re-fetch, and make exactly one combined push if the remote has not moved. Claude reviews `a226ee74`, `591175ea` and the record commit individually before another milestone. |
 | 2026-09-02 | Claude review | `a726c9db` -> `e85d6a60` reviewed; no code correction required (this record commit is the round's only change) | Independent review of the compact witness role separation and the SI-3C-P2 streaming/compact verification | Reviewed all three pushed commits individually. Verified the milestone's central claims by attacking them rather than reading them: the envelope cache resists caller mutation, the compact receipt stays bound to the authenticated bytes, legacy and compact verification agree exactly at `N=20` and `N=40`, and the compact path genuinely avoids materialization at a measured **887,309 against 8,116,975 peak bytes (9.15x)** for an identical row-list digest. Also closed the stale `SI-REV5-002` ledger entry after confirming the prior side is now derived and cross-checked rather than self-asserted. | Baseline on the exact pushed tree `e85d6a60` in the single named worktree: **6,841 passed, 14 skipped, 3 failed, 25 warnings in 3,204.74s (53m24s)**; all three failures are the out-of-lane `tests/test_sleeve_report.py` clock-dependent assertions documented in section 34.5 and were not fixed. Short Interest lane subset 127 passed; compact/role subset 19 passed. Mutations: disabling the prior-readiness exact-match guard turns **6 tests red**; the streaming array digest matches the non-streaming canonical oracle on empty, single, multi, nested, unicode, key-order and generator inputs. Synthetic fixtures only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment or order access; **0 research looks**. | **No P0-P3 defect.** `SI-REV5-002` is closed with evidence. Two guard survivors were attacked and proved redundant rather than uncovered. One out-of-lane project defect is documented and deliberately not fixed. Details in section 34. | Codex counter-reviews this record commit. Full licensed SI-1, full SI-2 ETF aggregation, `S2`-`S4`, DTC delta, ranking/seeding, outcomes, portfolios and every QuantConnect artifact/upload/compile/job remain gated. |
+| 2026-09-02 | Codex counter-review + implementation | `e85d6a60` -> `a878b7a` (exact test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3C-P2 review + SI-3C-P3 four-cycle synthetic inventory characterization | Reviewed the sole new Claude commit `f2fca4e` against `e85d6a60` and accepted its production-code conclusions after six P3 documentation/evidence corrections. `a878b7a` adds one test-only four-cycle characterization through the real score/envelope/compact-verification path, pins the same 20 stable IDs in every cycle, and confirms the existing `C^2 N` stored-inventory term without changing production source, policy, preregistration, schema, provider, outcome, portfolio, or QuantConnect code. | Counter-review selector: **20 passed, 35 deselected in 256.05s**; targeted counter-review: **8 passed in 180.52s**; prior exact-match mutation: **6 failed / 61 passed**. SI-3C-P3 backdated-reference mutation: **1 failed in 36.84s**; restore: **1 passed in 47.08s**. Complete Short Interest lane: **275 passed in 627.60s**. Complete repository: **6,843 passed, 13 skipped, 3 out-of-lane failures, 25 warnings in 3,342.23s (55m42s); zero Short Interest failures**. Required compileall including `research`: **exit 0 in 22.944s**. Active documents before the final record: **69 passed in 4.61s**; final active documents: **69 passed in 2.15s**; `git diff --check` clean. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR14-001` through `006`, `SI3CP3-REV-001`/`002`, and `SI35-REV-001` through `005` are closed in section 35; no committed in-scope P0-P3 defect requiring correction remains. The bounded-memory conclusion stands, but the reproducible direct internal reduction is **8.82x**, the public-API comparison is **2.31x**, and four-cycle evidence confirms the stored-inventory subterm grows 4x when `C` doubles. Existing out-of-lane `SI-OOL-002` remains documented and unfixed. | Finalize the record, commit it, re-fetch, and make one combined push only if the lane remote remains `f2fca4e`. Claude then reviews `a878b7a` and the record commit individually; Codex counter-reviews every resulting Claude commit before another milestone. All licensed-data, signal-extension, ranking, ETF, outcome, portfolio, QuantConnect-job, deployment, and trading gates remain closed. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -4546,3 +4542,240 @@ sleeve-clock failures reproduce identically.
    QuantConnect artifact, upload, compile or job work remain gated on separate
    owner authorisation.
 3. The provider/production-scale no-go on the candidate envelope stands.
+
+## 35. Codex counter-review of Claude SI-3C-P2 review and SI-3C-P3 - 2026-09-02
+
+Role: Codex counter-review and implementation in the sole named worktree
+`C:\git\customizedAgent\trading_agent_short_interest` on
+`codex/strategy-short-interest`. The only new Claude commit was the record-only
+`f2fca4e91e0709bd8e6554acdb912b15747842e5`, reviewed against
+`e85d6a60c95ac5feff1933c73e0cdeeb8466dd4e`. No branch, detached, temporary,
+forked, or handed-off worktree was created.
+
+**Disposition: accepted after documentation correction.** Claude's
+production-code conclusions for `a226ee74`, `591175ea`, and `e85d6a60` are
+retained: exact v1 hashes remain stable, compact verification does not retain
+the legacy row list, the receipt binds the authenticated serialization, and
+the role-separation regression is load-bearing. Six P3 evidence, taxonomy,
+process, and milestone-label defects in section 34 are superseded below. No
+Short Interest production-code correction was required.
+
+The one next bounded test-only support tranche, SI-3C-P3, is internally
+accepted after one P2 synthetic-vintage correction and one P3 fixture-hardening
+correction. Its exact test snapshot is
+`a878b7a433a82b7b5fac32fe7298d09943c8dec1`. No committed in-scope P0-P3
+defect requiring correction remains, and SI-3C-P3 remains pending Claude
+review. Five P3 defects in the first section-35 record draft were also
+corrected before this record commit; they are `SI35-REV-001` through `005` in
+the ledger below.
+
+### 35.1 Exact range and commit dispositions
+
+| Item | Exact value |
+|---|---|
+| Lane branch/worktree | `codex/strategy-short-interest` at `C:\git\customizedAgent\trading_agent_short_interest` |
+| Prior Codex record | `e85d6a60c95ac5feff1933c73e0cdeeb8466dd4e` |
+| Claude commit reviewed | `f2fca4e91e0709bd8e6554acdb912b15747842e5` |
+| Ordered Claude range | `e85d6a60..f2fca4e` (one record-only commit, no merge commit) |
+| Claude changed path | `docs/Strategy Description/SHORT_INTEREST_IMPLEMENTATION_RECORD.md` only |
+| Codex production-code correction | none |
+| SI-3C-P3 test snapshot | `a878b7a433a82b7b5fac32fe7298d09943c8dec1` |
+| Lane-record commit | follows this entry |
+
+| Commit | Scope | Codex disposition |
+|---|---|---|
+| `a226ee74` | Candidate/eligible/sector witness role-separation regression | accepted; Claude's production conclusion retained |
+| `591175ea` | SI-3C-P2 streaming legacy digest and non-expanding compact verification | accepted; Claude's bounded-memory conclusion retained with corrected measurement scope |
+| `e85d6a60` | Record SI-3C-P1 counter-review and SI-3C-P2 | accepted |
+| `f2fca4e` | Claude SI-3C-P2 review record | accepted after the section-35 documentation/evidence corrections |
+| `a878b7a` | SI-3C-P3 four-cycle synthetic inventory characterization | internally accepted after correction; pending Claude review |
+
+### 35.2 Mandatory P0-P3 issue ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---:|---|---|---|---|---|---|---|---|
+| SI-CCR14-001 | P3 | Closed by section 35 | `f2fca4e` | section 34.4 and its push-ledger row | Section 34 says it newly closes `SI-REV5-002` as P3. That finding had already been upgraded to P2 and closed by `SI-CCR5-002` in section 16.2 through `1a1f757`, then accepted by Claude in section 17.3. Re-closing it at the older severity obscures the actual lineage and remedy. | Sections 16.1-16.2 bind the exact prior snapshot/readiness/source context in `1a1f757`; section 17.3 explicitly accepts the P2 upgrade. | Finding state and severity are sequencing evidence and must not regress when a later review re-verifies the same boundary. | Treat section 34's six-red mutation as fresh corroboration of the already-closed P2, not a new P3 closure. Historical text remains unchanged. | The prior exact-match mutation produced **6 failed / 61 passed**; restored targeted validation passed. |
+| SI-CCR14-002 | P3 | Closed by section 35 | `f2fca4e` | section 34 as a whole; 34.5-34.6 | The review omitted the mandatory P0-P3 ledger and 1-10 quality score, did not report compileall or active-document evidence, gave no durations for its 127- and 19-test subsets, and described the known sleeve defect without its existing `SI-OOL-002` identity/routing classification. | The binding review format requires ranked, traceable findings and an honest score; section 34 contains neither a ledger nor a score, and its subset bullets contain counts only. | The lane record is the cross-machine handoff; omitted evidence must not be silently inferred or reconstructed as though Claude recorded it. | This section supplies the ten-column ledger and ratings, identifies the sleeve issue as existing out-of-lane `SI-OOL-002`, and records Codex's independently timed subsets plus compileall/active-document evidence. Claude's untimed 127/19 counts remain historical and are not assigned invented durations. | Counter-review selector **20 passed / 35 deselected in 256.05s**; targeted **8 passed in 180.52s**; compileall **exit 0 in 22.944s**; pre-record active documents **69 passed in 4.61s**; final record checks are reported in 35.6. |
+| SI-CCR14-003 | P3 | Closed by section 35 | `f2fca4e` | sections 34.4, 34.6 and push-ledger findings | “Two guard survivors” is the wrong taxonomy. The section discusses one removed latest-visible-prior guard that survived because a sibling field cross-check refused the attack, one empty-array helper input that is unreachable through a valid non-empty envelope, and the pre-existing latent `SI-CR2-004` ISO-string-order advisory. | Direct recount of section 34.4; only the first item is a guard-removal mutation. | Mutation survivors, unreachable inputs, and latent advisories have different evidentiary meaning and must not be collapsed into one count. | Record exactly one green guard-removal survivor, one unreachable helper input, and one re-verified latent advisory. `SI-CR2-004` remains advisory-only because session opens still have microsecond zero. | The exact prior-readiness match guard separately turns six tests red; the narrower latest-visible-prior removal is still refused by the independent denominator/readiness binding. |
+| SI-CCR14-004 | P3 | Closed by section 35 | `f2fca4e` | section 34.3 | “Every claim was tested by executing the code; none rests on the diff” overstates the method, and “mutating the caller payload after verification” misstates the TOCTOU timing. The stdlib-only import widening and changed-path/additivity claims necessarily use static diff/import inspection; the payload mutates after the authenticated serialization is captured but while the verifier call is still executing, before receipt construction completes. | Section 34.3 itself cites the allowlist delta, while the regression hook mutates during canonical serialization rather than after the verifier has returned. | Review method and attack timing determine what evidence actually rules out. | Retain the successful behavioral attacks, but distinguish execution from static inspection and describe the mutation as after authentication snapshot / before verifier completion. | Targeted counter-review passes **8 tests in 180.52s**; receipt and digest conclusions remain unchanged. |
+| SI-CCR14-005 | P3 | Closed by section 35 | `f2fca4e` | section 34.8 and push-ledger next step | “Full SI-2 ETF aggregation” merges two distinct ladder stages. SI-2 is PIT stock identity/eligibility/denominator/classification readiness; ETF reverse indexing, eligibility, coverage and aggregation are SI-4. | Section 2 milestone ladder and every corrected later handoff distinguish full SI-2 from SI-4. | Gate labels control sequencing and must not suggest that stock readiness and ETF construction share one milestone. | State full licensed SI-2 and SI-4 ETF reverse indexing/aggregation as separate gates below. | The handoff list in section 35.7 uses the canonical milestone names. |
+| SI-CCR14-006 | P3 | Closed by section 35 | `f2fca4e` | sections 34.3 and 34.7; push-ledger validation | The exact `tracemalloc` claim of an **887,309 / 8,116,975 = 9.15x** compact-path reduction did not reproduce stably and was presented without distinguishing direct internal validation from full public-API overhead. The central non-materialization result remains correct. | Stable direct internal comparison measured **923,415 compact vs 8,141,191 legacy = 8.82x**. Public API comparison measured **4,036,858 vs 9,329,159 = 2.31x**. Both paths produced the identical row-list digest; compact returned `None`, legacy materialized 80 rows. | Allocator-sensitive exact peaks and API-scope differences must not be promoted to a portable contract. The structural return-mode and digest parity are the durable evidence. | Retain 9.15x only as Claude's historical one-run observation; bind the current conclusion to exact direct/public measurements, identical digest, and `None` versus 80 rows. Provider/production no-go remains. | Counter-review selector **20 passed / 35 deselected in 256.05s** and targeted **8 passed in 180.52s**; both measurement scopes preserve the bounded-memory direction. |
+| SI3CP3-REV-001 | P2 | Closed before `a878b7a` | uncommitted SI-3C-P3 draft | `_multi_cycle_scores` in `tests/test_short_interest_stock_normalization.py` | The first four-cycle fixture reused the two-cycle reference manifest whose collection/evidence horizon ended March 2 even though its fourth synthetic decision is March 12. For this bounded characterization, the declared reference-vintage horizon therefore stopped before the sampled date range ended. This is a fixture-evidence gap, not a production PIT-availability defect. | Direct fixture inspection found the last decision after the reused manifest retrieval. Backdating the corrected manifest reproduces the evidence-horizon gap. | A scale fixture must declare a reference-vintage horizon covering every sampled decision. Manifest `retrieved_at` authenticates the collection and bounds record `observed_at`; it does not grant fact availability at execution. | Clone the reference manifest under distinct ID `synthetic-si3c-pit-reference-4-cycle-v1`, set retrieval to `2024-03-12T22:00:00Z`, and assert every sampled decision is at or before that synthetic evidence horizon. Individual lifecycle/classification `available_at <= execution_at` still governs PIT selection. | Backdating mutation: **1 failed in 36.84s**; textual restore: **1 passed in 47.08s**. |
+| SI3CP3-REV-002 | P3 | Closed before `a878b7a` | uncommitted SI-3C-P3 draft | multi-cycle structural characterization test | Count-only assertions did not explicitly prove that every cycle contains the same 20 stable security IDs. Security churn could preserve row counts while changing the interpretation of growth in `C`. | The final test derives the ID set per settlement and compares each with the exact expected 20-ID set. | A `C`-scaling characterization must hold `N` and membership fixed, not merely keep total cardinality constant. | Require exact equality with `{sec-si3c-000, ..., sec-si3c-019}` in every cycle. | Final characterization and complete lane are green. No mutant is claimed for this P3 hardening. |
+| SI35-REV-001 | P3 | Closed before record commit | uncommitted section-35 draft | session/push ledger | A blank line separated the new Codex row from the existing Markdown table, so CommonMark rendered it as an unheaded standalone pipe row. | Independent final record audit inspected the exact line boundary. | The append-only ledger must remain one readable, self-describing table across machines. | Removed the single separating blank line without rewriting any historical row. | Final source inspection confirms the prior Claude row and new Codex row are contiguous. |
+| SI35-REV-002 | P3 | Closed before record commit | uncommitted section-35 draft | new push-ledger validation cell | The row still said final record validation “follows” after the result was known, leaving the durable push summary incomplete. | Section 35.6 already held the exact final result. | A pushed ledger row must be self-contained and final, not depend on stale pre-commit wording. | Recorded final active-document **69 passed in 2.15s** and clean `git diff --check` in the row. | Final ledger and detailed validation now agree exactly. |
+| SI35-REV-003 | P3 | Closed before record commit | uncommitted section-35 draft | live owner-purpose paragraph at the top of this record | The live header retained the earlier statement that no live-trading objective was authorized, contradicting the later owner clarification already recorded in section 22.4 and the current handoff. | Section 22.4 distinguishes eventual autopiloted-live purpose from any present execution authority. | The live branch handoff must reflect the latest owner direction while preserving historical entries. | Updated only the live paragraph: eventual autopiloted live trading is a destination, but it grants no current provider, QC-job, broker, deployment, order, or trading authority. | Top status and section 35.7 now use the same authority distinction; historical sections remain unchanged. |
+| SI35-REV-004 | P3 | Closed before record commit | uncommitted section-35 draft | `SI3CP3-REV-001`, sections 35.4 and 35.7 | The draft described reference-manifest `retrieved_at` as if it were the production PIT availability boundary. It is the collection/vintage evidence horizon and bounds record `observed_at`; record-level `available_at <= execution_at` governs PIT selection. | `PitReferenceBundle` validation and the readiness selector were re-read against the draft wording. | Conflating collection completeness with execution availability can create false confidence about look-ahead safety. | Recast the March-12 assertion as a synthetic characterization evidence-horizon check and explicitly retained record-level PIT availability as the operative rule. | Final wording no longer treats manifest retrieval as an availability grant. |
+| SI35-REV-005 | P3 | Closed before record commit | uncommitted section-35 draft | section 35 opening and new push-ledger findings | The draft said no in-scope P0-P3 “remains,” contradicting the deliberately retained `SI-CR2-003` through `005` P3 advisories. Those entries require no current correction but remain open constraints. | Independent re-audit compared the new summary with the historical mandatory ledger. | “No defect requiring correction” and “no advisory exists” are materially different handoff states. | Narrowed both live claims to no committed in-scope P0-P3 **defect requiring correction** remains; advisory-only constraints remain explicit. | The summary now coexists consistently with the open advisory ledger. |
+
+No P0 or P1 was found. No committed Short Interest production-code defect was
+found in Claude's range or introduced by SI-3C-P3.
+
+### 35.3 Why SI-3C-P3 is the one bounded next milestone
+
+Sections 31-34 repeatedly retain one quantified but unmeasured limitation: each
+compact cohort stores the complete authenticated raw-disposition inventory, so
+with `C` cycles and `N` securities that subterm is `O(C^2 N)`. The existing
+scale evidence varied only `N` at fixed `C=2`. Every next strategy stage remains
+blocked by a policy, source, outcome, ETF, or QuantConnect authority gate.
+
+The owner's current request authorizes one next bounded milestone in this
+serialized loop. SI-3C-P3 is therefore a parameter-free, test-only
+characterization. It varies only cycle count from two to four while holding the
+same 20 stable securities, sector, policy, preregistration, synthetic source
+semantics, and compact v1 schema fixed. It changes no production source and
+neither redesigns nor promotes the envelope. It confirms the existing no-go
+boundary; it does not solve it.
+
+### 35.4 SI-3C-P3 contract and exact synthetic evidence
+
+`a878b7a` changes only
+`tests/test_short_interest_stock_normalization.py`. The test extends the
+tracked two-cycle fixture deterministically in memory with settlement cycles
+`2024-02-15` and `2024-02-29`, official-style release dates `2024-02-27` and
+`2024-03-11`, source retrieval `2024-03-11T22:00:00Z`, settlement end
+`2024-02-29`, and a synthetic reference-vintage completeness/evidence horizon
+ending `2024-03-12T22:00:00Z`, after the sampled decisions. That collection
+horizon is not an execution-availability grant: each lifecycle/classification
+record remains selected by its own PIT `available_at <= execution_at`. The
+four-cycle source manifest is
+`synthetic-si3c-normalization-4-cycle-v1` /
+`synthetic-si3c-four-cycle-scale-characterization`; the distinct reference
+manifest is `synthetic-si3c-pit-reference-4-cycle-v1`.
+
+For fixed `N=20`, every cycle contains exactly the same stable IDs. The real
+PIT raw-feature builder, normalization builder, v1 compact-envelope builder,
+and compact verifier are used; the receipt must reproduce the envelope row
+count, legacy row-list digest, and envelope digest.
+
+| Metric | `C=2`, `N=20` | `C=4`, `N=20` | Growth |
+|---|---:|---:|---:|
+| Score rows | 40 | 80 | 2x |
+| Cohorts | 2 | 4 | 2x |
+| Member sets | 2 | 4 | 2x |
+| Stored raw-inventory entries | 80 | 320 | **4x** |
+| Unique raw-inventory entries | 40 | 80 | 2x |
+| Member entries | 20 | 60 | 3x |
+| Compact canonical UTF-8 bytes | 358,965 | 930,051 | **2.591x** |
+| Legacy row-list SHA-256 | `efe0ef91822a20d3dda680269d792644157058a5a4e7660a7cf7143f3cbf1299` | `19f3b85aa3c601ca6f66253042a64799592b946624b940ed83012d6218fb6fd0` | distinct authenticated vintages |
+| V1 envelope SHA-256 | `82f579b6b91e9ed6917fb4da24509e4d7fd0a6fb0de18367c807b4242fc5637a` | `cbf25e6f67a6e9e545644a3233876bf600ab996c2cbe842750d06620fb539901` | distinct authenticated envelopes |
+
+The pinned identities are `stored_inventory_entries = C^2 N`,
+`unique_inventory_entries = C N`, and `member_entries = (C - 1)N`. Doubling
+`C` therefore quadruples the stored-inventory subterm exactly. Total serialized
+bytes grow 2.591x in this bounded sample because other envelope components have
+different fixed/linear terms. This is structural evidence, not a time,
+capacity, provider, or production benchmark.
+
+### 35.5 Counter-review conclusions and bounded-memory evidence
+
+The accepted SI-3C-P2 facts remain:
+
+- the `N=20` legacy/envelope hashes are respectively
+  `efe0ef91822a20d3dda680269d792644157058a5a4e7660a7cf7143f3cbf1299`
+  and `82f579b6b91e9ed6917fb4da24509e4d7fd0a6fb0de18367c807b4242fc5637a`;
+- the `N=40` legacy/envelope hashes are respectively
+  `b4701c5040dbec2151adec42d1f9dca4436b6f900d9d8676be842faee0a2c9df`
+  and `6eae0887c46daf401ae8a2b5acd0aa4bec1693da5c9625d4841c7649324a3f0d`;
+- compact and legacy validation produce the same compatibility digest;
+  compact validation retains no expanded row tuple while legacy validation
+  returns 80 rows at `N=40`;
+- envelope caching uses immutable canonical strings and fresh decoding, and the
+  receipt hashes the same captured serialization that passed authentication;
+- `a226ee74` makes candidate, eligible, and sector role substitution
+  distinguishable and refuses the alias attack.
+
+The portable claim is bounded-memory direction, not one exact `tracemalloc`
+ratio. Direct internal validation measured 923,415 versus 8,141,191 peak bytes
+(8.82x); the public API, including its additional authenticated-envelope work,
+measured 4,036,858 versus 9,329,159 (2.31x). Exact allocations are
+run/environment sensitive, while digest equality and `None` versus 80 rows are
+structural and load-bearing.
+
+### 35.6 Sources, validation, out-of-lane routing, and access accounting
+
+Sources/vintages:
+
+- `tests/fixtures/short_interest_etf/official_style_v1.json`, source version
+  `2026-08-28.v1`, settlement cycles `2024-01-12` and `2024-01-31`, entitlement
+  `synthetic_fixture_only`;
+- `tests/fixtures/short_interest_etf/pit_reference_v1.json`, source version
+  `2026-08-29.v1`, entitlement `synthetic_fixture_only`;
+- deterministic in-memory extensions described in section 35.4, with distinct
+  synthetic source/reference IDs and the stated retrieval cutoffs.
+
+Validation on exact code/test commit `a878b7a` plus this record:
+
+- Counter-review selector: **20 passed, 35 deselected in 256.05 seconds**.
+- Targeted counter-review: **8 passed in 180.52 seconds**.
+- Prior exact-match mutation: **6 failed / 61 passed**; byte-exact restore
+  returned the targeted tree green.
+- SI-3C-P3 under-count mutation: **1 failed in 9.54 seconds**, with exact
+  `40 == 80`; textual restore returned the characterization green.
+- SI-3C-P3 backdated-reference mutation: **1 failed in 36.84 seconds**;
+  restore: **1 passed in 47.08 seconds**.
+- Complete Short Interest lane: **275 passed in 627.60 seconds (10m27s)**.
+- Complete repository using pytest's normal external temp: **6,843 passed,
+  13 skipped, 3 out-of-lane failures, 25 warnings in 3,342.23 seconds
+  (55m42s)**; zero Short Interest failures. The three failures are the exact
+  `SI-OOL-002` sleeve-clock tests named below. An earlier partial invocation
+  using a repository-local temp was stopped and excluded because the already
+  documented `SI-OOL-003` says that harness changes another test's meaning;
+  its exact abandoned temp directory was removed.
+- Required compileall including `research`: **exit 0 in 22.944 seconds**.
+- Active-document consistency before final record text: **69 passed in 4.61
+  seconds**. Final active-document and diff validation:
+  **69 passed in 2.15 seconds; `git diff --check` clean**.
+
+`SI-OOL-002` remains an **out-of-lane, confirmed, deliberately unfixed** sleeve
+report defect. The three exact failures are
+`test_default_gain_review_is_fifty_percent_and_long_term_gated`,
+`test_every_lot_row_carries_the_tax_mechanism_fields`, and
+`test_report_carries_no_action_shaped_field`. Their fixed acquisition fixtures
+are evaluated against the advancing real wall clock, so expected short-term
+lots have become long-term and the gain-review count changes. No assistant,
+sleeve, UI, Analyst, Target Price, Trading App, or Streamlit file was changed.
+
+All evidence is synthetic and offline. No credential, provider or licensed row,
+price, market outcome, QuantConnect artifact/upload/compile/job, broker,
+operator database, scheduler, deployment, order, or trading surface was
+accessed. Permanent research-look count remains **0**.
+
+### 35.7 Quality, limits, gates, and handoff
+
+**Claude section-34 review quality: 6/10.** Its core production conclusions are
+sound, it executed useful behavioral attacks, and it correctly confirmed
+non-materialization and hash parity. The deduction is for six P3 record/evidence
+defects: regressed finding lineage, missing mandatory review artifacts,
+incorrect survivor taxonomy, overbroad method/timing claims, SI-2/SI-4
+conflation, and a non-reproducible exact memory ratio without API-scope
+separation.
+
+**SI-3C-P3 implementation quality: 9/10.** The test uses the real authenticated
+pipeline, holds security membership exactly fixed, declares a synthetic
+reference-evidence horizon spanning both samples without substituting it for
+record-level PIT availability, and pins the predicted `C^2 N` term at both
+bounded samples without elapsed-time thresholds or production changes. The
+withheld point reflects its narrow evidence boundary: only synthetic `C=2` and
+`C=4` at `N=20` are measured, and the tranche characterizes rather than removes
+the quadratic inventory term.
+
+The compact envelope remains **NO-GO** for licensed/provider/production scale.
+SI-3C-P2 removed retained expanded rows from the compact verifier, but exact
+legacy compatibility still processes every legacy byte, explicit legacy APIs
+still materialize, and SI-3C-P3 now confirms the stored-inventory subterm grows
+as `C^2 N`.
+
+After final record validation, Codex commits this record, re-fetches only the
+lane branch, stops if the remote moved from `f2fca4e`, and otherwise makes one
+combined push containing `a878b7a` and the record commit.
+Claude then reviews both commits individually; Codex counter-reviews every
+resulting Claude commit before another milestone.
+
+No later milestone starts in this round. Still unimplemented or gated: full
+licensed SI-1, full SI-2 PIT readiness over real entitlements, `S2`-`S4`, the
+days-to-cover delta and window `K`, stock ranking/seeding/tie rules, SI-4 ETF
+reverse indexing/eligibility/aggregation, every outcome join, portfolio stages,
+and every QuantConnect artifact, upload, compile, or job. Eventual live-trading
+purpose grants no present provider, QC-job, broker, deployment, order, or
+trading authority.

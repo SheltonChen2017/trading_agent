@@ -2252,22 +2252,22 @@ def test_v1_and_v2_score_batch_schemas_are_strictly_separate():
     assert v1.sha256 == (
         "82f579b6b91e9ed6917fb4da24509e4d7fd0a6fb0de18367c807b4242fc5637a"
     )
-    with pytest.raises(StockScoreBatchError):
+    with pytest.raises(StockScoreBatchError, match="frozen schema"):
         verify_compact_stock_score_batch_payload(
             v2.to_payload(),
             dispositions=scores,
         )
-    with pytest.raises(StockScoreBatchError):
+    with pytest.raises(StockScoreBatchError, match="frozen schema"):
         verify_stock_score_batch_payload(
             v2.to_payload(),
             dispositions=scores,
         )
-    with pytest.raises(StockScoreBatchError):
+    with pytest.raises(StockScoreBatchError, match="frozen schema"):
         verify_compact_stock_score_batch_payload_v2(
             v1.to_payload(),
             dispositions=scores,
         )
-    with pytest.raises(StockScoreBatchError):
+    with pytest.raises(StockScoreBatchError, match="frozen schema"):
         verify_stock_score_batch_payload_v2(
             v1.to_payload(),
             dispositions=scores,

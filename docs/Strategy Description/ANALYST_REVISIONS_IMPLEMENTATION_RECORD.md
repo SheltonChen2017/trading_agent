@@ -2021,6 +2021,7 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-09-03 | Codex counter-review | `c83218c7` -> this local record commit (not pushed) | Accept Claude's ARV2-3Q-F review after record correction; stop at the owner-authority gate | Counter-reviewed `64edf355` and `c83218c7` commit-by-commit and cumulatively. Accepted Claude's 15-line semantic hardening and 20 new regressions; corrected the current alpha/status and DAG prose, and completed the parser-observation scope. No production code, test, artifact, authority, out-of-lane, or next-milestone change was made. | Focused overlay plus import-firewall battery **232 passed, 5 host symlink skips in 277.10 s**; overlay file **116 passed, 5 skips**; complete Analyst V2 battery **909 passed, 8 skips in 805.23 s**; exact full tree **3 failed, 7,299 passed, 20 skipped, 25 warnings in 3,428.89 s**, with only the standing out-of-lane `ARV2WL-D11` failures; active-document consistency **69 passed**; compileall and diff checks clean. No credential, provider/licensed row, price, return, outcome, QC resource, deployment, broker, scheduler, or order access; **0 research looks and 0 development evaluations**. | `64edf355` accepted; `c83218c7` accepted after correction: 0 P0, 0 P1, 2 P2 and 2 P3 (`ARV2CR14-001..004`), all corrected or fully documented in the lane record. `ARV2WL-D11` remains documented, out of lane, and unfixed. | Commit this counter-review record locally and do not push. No subsequent milestone is authorized. ARV2-4D-B and every data/outcome/QC/deployment/trading action remain blocked pending the exact owner authorities in section 23.5. |
 | 2026-09-03 | Codex implementation | `6baa13d2` -> this candidate commit | Owner-authorized ARV2-4D-B1 outcome-free calibration-input manifest schema | Pushed the completed counter-review first, then implemented only the later-authorized schema and caller-supplied synthetic-fixture validator. The content-addressed contract closes the 483-session axis, evidence epoch/cutoff, two input roles and censuses, rights, source/transformation/terminal lineage, hashes, and counts. It adds no production input loader, calibration, receipt, outcome, QC, deployment, or trading path; accepted 4D-A and 3Q-F artifacts are byte-identical. | B1 **252 passed, 2 skips**; B1 plus firewall **368 passed, 2 skips in 345.17 s**; complete Analyst and repository runs reached 79% and 9%, respectively, with zero failures before the owner's immediate-finalization instruction; compileall, exact identity/renderer reproduction, ancestor byte checks, and diff check pass. No restricted access; **0 research looks and 0 development evaluations**. | Two P2 and two P3 findings (`ARV2I4DB1-001..004`) corrected before freeze; final audit found 0 remaining P0-P3. | Commit once, fetch only the lane remote and require `6baa13d2`, then push once. Claude independently reviews this exact snapshot; full ARV2-4D-B remains gated. |
+| 2026-09-03 | Claude review | `42faec1` -> this commit | Independent review of the ARV2-4D-B1 calibration-input manifest schema candidate | Reviewed the single commit in `6baa13d..42faec1` with an explicit disposition (section 25); accepted with no correction, so this push is record-only and the candidate tree is unchanged. Verified rather than accepted: artifact 15,136 bytes at `e642d065...`, semantic hash `4032405d...` and schema ID recomputed from bytes, renderer output byte-identical; the 483-session axis, its SHA-256, the 2020-01-30 cutoff and 2020-01-31 first excluded session all reproduced from `data.exchange_calendar` and the h20 fold block; first nine lineage nodes identical to ARV2-4D-A; ARV2-4D-A and ARV2-3Q-F byte pins unchanged; 34-module firewall with zero forbidden roots; 14 capabilities, 14 bindings and 11 fixture authorities all false or null. Eighteen adversarial fixtures behaved correctly. The parent-bytes question is closed: a semantically identical, differently serialised ARV2-4D-A artifact is refused by the protocol loader's canonical-render check, so the semantic hash pins the parent bytes transitively. | B1 battery **252 passed, 2 skipped** in 87.9 s, reproducing section 24. Complete repository suite **3 failed, 7,550 passed, 23 skipped in 47:06**, the three being the out-of-lane `ARV2WL-D11` sleeve-report trio, completing the runs Codex stopped at 79% and 9%. Mutation matrix in a detached scratch worktree: six of seven guard removals turn the battery red; the seventh (`if not source_roots`) survives because it is unreachable by construction, documented rather than papered over with a test. Active-document gate green; compileall exit 0; `git diff --check` clean. No provider, credential, licensed row, price, return, outcome, broker, operator-database, QuantConnect, scheduler or order access. **0 research looks, 0 development evaluations.** | 0 P0, 0 P1, 0 P2, 0 P3. Two observations carried to ARV2-4D-B2 without priority: the capture instant has no upper bound and `post_cutoff_corrections_included` is an unverifiable self-declaration at schema level, which is correct for an outcome-free schema but will need vintage evidence in a production manifest; and the unreachable guard should stay as defense in depth. `ARV2WL-D11` remains the only repository failure and is out of lane. | Codex counter-reviews this exact pushed head. ARV2-4D-B2 and full ARV2-4D-B remain unauthorised; `ARV2R5-002` two-reviewer ownership still open. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -4075,3 +4076,132 @@ production manifest, exact input identities/access and rights, authenticated
 nuisance-only computation, a numeric receipt, successor binding, and separate
 outcome/QC/deployment/trading authorities. No B1 schema, synthetic fixture,
 rights metadata, hash, lineage, or summary can self-promote into those gates.
+
+## 25. Independent Claude review of ARV2-4D-B1, 2026-09-03
+
+**Range reviewed:** `6baa13d..42faec1`, one candidate commit.
+**Disposition: ACCEPTED.** 0 P0, 0 P1, 0 P2, 0 P3. No correction was
+required, so this push is record-only; the candidate tree at `42faec1` is
+unchanged.
+**Zero research looks and zero development evaluations.** No provider,
+credential, licensed row, price, return, outcome, broker, operator-database,
+QuantConnect, scheduler, deployment or order access occurred. Codex reported
+its complete Analyst and repository runs were stopped at 79% and 9%; both were
+completed here (25.6).
+
+**Reviewing session:** the Fable 5 session on the work identity (also
+sections 4I, 4R, 7 and 19). The other Claude session's ownership question in
+`ARV2R5-002` remains open.
+
+### 25.1 Commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `42faec1` | Accepted | Schema module, frozen artifact, 56-function battery (252 cases), firewall inventory entry, section 24. Verified in 25.2 to 25.4. |
+
+### 25.2 Verified rather than accepted
+
+Every identity and structural claim in section 24 was recomputed from bytes,
+not read from the record:
+
+- **Frozen identity reproduces exactly.** Artifact 15,136 bytes, SHA-256
+  `e642d06531b6ca024c3ee438ee88a113eef1483f2f6fca9d0e120afcfc5ed2f1`;
+  recomputed semantic hash `4032405d1773236e...` and derived schema ID match;
+  the module's renderer output is byte-identical to the checked-in file; LF
+  only, no BOM; `specs/.gitattributes` `-text` applies to the new file.
+- **The 483-session axis is real, not asserted.** `data.exchange_calendar`
+  yields exactly 483 XNYS sessions from 2018-01-31 through 2019-12-31
+  inclusive, and the canonical SHA-256 of that list equals
+  `CALIBRATION_AXIS_SHA256`. The 20th session after 2019-12-31 is
+  2020-01-30 (the cutoff) and the first session strictly after it is
+  2020-01-31 (first excluded). The `arv2-wf-test-2020-h20` fold block in the
+  fold manifest carries the same boundaries and structural hash
+  `9dcaa09e...`.
+- **Parent and parallel leaf unchanged.** The first nine lineage nodes are
+  identical to the ARV2-4D-A artifact's; B1 is the tenth, parented only on
+  `power_protocol`. ARV2-4D-A is byte-identical at `ff16117a...` and
+  ARV2-3Q-F at `2e9f390e...`; no reviewed artifact was edited, re-pinned or
+  re-parented.
+- **Closed authority surface.** 14 schema capabilities and 14 external
+  bindings, 11 fixture external authorities, 9 schema and 5 summary action
+  accessors: all literal false or null. The summary type cannot be
+  constructed directly. The module's only file access is the stable two-read
+  authentication of its own artifact; it has no environment, network,
+  process or write surface.
+- **Import firewall** closes at exactly 34 modules with zero forbidden roots.
+
+### 25.3 Adversarial probes beyond the battery
+
+Eighteen hand-built fixtures behaved correctly: pre-cutoff capture instant
+(`2020-01-30T23:59:59.999999Z`) refused and the exact boundary
+(`2020-01-31T00:00:00.000000Z`) accepted; `+00:00` offset, missing
+microseconds and an unreal `2020-02-30` refused; a fourth beta state, a
+boolean component count, extra root and nested keys, production mode, an
+asserted external authority, a `0`-for-`False` capability, a Saturday axis
+key and a swapped axis pair all refused; rights covering one role, a root
+with empty rights, and a second source root whose rights cover only the
+component role while feeding the beta terminal all refused with the intended
+reason. A valid fixture yields a frozen summary that refuses attribute
+assignment.
+
+**Parent-bytes question closed.** B1's loader checks the parent's semantic
+hash, not its artifact bytes, so I tested whether a semantically identical but
+differently serialised ARV2-4D-A artifact could be substituted. It cannot:
+the protocol loader's own canonical-render check refuses it, and because that
+render is sorted and deterministic, the semantic hash pins the bytes
+transitively. This is the property the standalone stock-spec loader lacks
+(`ARV2WL-D10`); it holds here. An identical-bytes clone at another path loads,
+confirming the pin is on content rather than location.
+
+### 25.4 Mutation matrix on the four corrected findings
+
+Run in a detached scratch worktree at `42faec1`; the lane tree was never
+modified.
+
+| Guard removed | Battery result |
+|---|---|
+| `ARV2I4DB1-003` root rights need not cover the terminal role | 1 failed |
+| `ARV2I4DB1-002` capture-instant not-before bound | 1 failed |
+| `ARV2I4DB1-001` orphan lineage nodes allowed | 1 failed |
+| `ARV2I4DB1-001` terminal may parent another node | 1 failed |
+| lineage-node evidence-epoch drift allowed | 1 failed |
+| production mode accepted | 1 failed |
+| `ARV2I4DB1-001` `if not source_roots` refusal | **252 passed (survived)** |
+
+The survivor is unreachable by construction rather than untested: the node
+list must be nonempty, the first ordered node cannot have parents because
+parents must precede children, and any parentless node must already be a
+rights-bound `source_artifact` or the loop refuses. The exact former exploit
+(a two-terminal lineage with no source ancestor) is refused by those earlier
+guards, so the correction stands; the line is defense in depth. No test was
+fabricated to cover a branch that cannot execute.
+
+### 25.5 Observations carried forward, not findings
+
+- The evidence-epoch capture instant has a lower bound but no upper bound, and
+  `post_cutoff_corrections_included: false` is a self-declaration the schema
+  cannot verify. That is correct for a schema-only, outcome-free milestone
+  and is declared as syntactic-only in the artifact, but the production
+  ARV2-4D-B2 manifest will need vintage evidence for that claim rather than a
+  flag.
+- The single survivor above should stay as written; converting it to a test
+  would assert an impossible state.
+- The standing out-of-lane `ARV2WL-D11` Trading App failures are unchanged
+  and are the only failures in the completed repository run (25.6).
+
+### 25.6 Validation on the exact candidate tree
+
+- B1 battery alone: **252 passed, 2 host symlink-privilege skips** in 87.9 s,
+  reproducing section 24 exactly.
+- Complete repository suite: **3 failed, 7,550 passed, 23 skipped, 25 warnings in 2,826.65 s (47:06)**. The three failures are `tests/test_sleeve_report.py::test_default_gain_review_is_fifty_percent_and_long_term_gated`, `::test_every_lot_row_carries_the_tax_mechanism_fields` and `::test_report_carries_no_action_shaped_field`, the standing out-of-lane `ARV2WL-D11` clock-threading defect diagnosed in section 19.4; nothing in this range touches that file and it imports nothing from this lane. Every Analyst V2 test passed.
+- Active-document consistency gate passes after this section was added;
+  `compileall` exit 0; `git diff --check` clean; no frozen shared file
+  touched; no committed artifact re-serialised.
+
+### 25.7 Next gate
+
+Codex counter-reviews this exact pushed head. ARV2-4D-B2 and the full
+ARV2-4D-B remain unauthorised: no production manifest loader, input access,
+rights authentication, nuisance computation, numeric receipt, successor
+binding, outcome, QC, deployment or trading action exists or is implied by
+this acceptance.

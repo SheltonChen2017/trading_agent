@@ -408,7 +408,7 @@ and are deliberately not listed here.
 
 | ID | Priority | Blocks | Why it cannot be closed in lane |
 |---|---|---|---|
-| `TPR-CCR1-006` | P3 | Nothing today | The defects are inside the governing PDF. Regenerating it changes the identity of a content-addressed artifact, which needs the owner's storage/provenance decision. Evidence re-measured 2026-09-02; see section 34. |
+| `TPR-CCR1-006` | P3 | Nothing today | The live residual is physical page 27's normative absolute-worktree pin. The malformed p1/p25 source pin is superseded historical non-authority, and page 25's old worktree-name evidence is host-scoped. Regenerating the PDF changes a content-addressed artifact and needs the owner's storage/provenance decision. See sections 34.4 and 35.3. |
 | `TPR-CCR2-011` | P3 | Positive reliance on reviewer identity | Cryptographic control of reviewer identity needs reviewer-controlled signing or a separately signed review receipt. The owner-attestation TPR-TR0 principal does not supersede or close this distinct identity requirement. |
 | `TPR-CCR5-004` | P2 | Positive algorithm authority | TPR-TR0-I is only an incomplete implementation checkpoint. It must close the open trust findings, complete independent review, be provisioned, and be satisfied by an exact signed registry anchor before positive authority. |
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
@@ -678,7 +678,7 @@ individually and inspected the cumulative state. The local correction commit is
 | `TPR-CCR1-003` | P3 | **Closed by qualification; artifact defect remains open under `TPR-CR1-001`** | Blueprint and sections 11.3, 11.5 | Poppler can render the malformed working PDF: all 26 pages rendered and were visually inspected, although xref/font warnings remain. A clean-worktree `git diff --check` and `git diff --check 70c4b9f..c0ba616` both pass; only historical ranges that include the original PDF addition, such as `086b782..c0ba616`, fail. The checked-out bytes and pinned blob digest still differ, so the core storage defect remains real and owner-routed. |
 | `TPR-CCR1-004` | P2 | **Closed by the owner-approved TPR-0A/TPR-0B phase split; see section 13.1** | Blueprint physical pages 5, 6 and 9; milestone ladder | TPR-0 must freeze a numeric practical-effect threshold from capacity/cost/power, an independent sample floor from observed event frequency/overlap, and `CLIP_TPR0` from a zero-outcome structural distribution and source-error audit. The first structural source sample is assigned to TPR-1, while TPR-2 supplies the price, ADV and cost prerequisites. Exact numeric TPR-0 completion is therefore circular. The owner chose the phase split recorded in section 13.1: TPR-0A freezes the algorithms and TPR-0B later binds reviewed structural values before outcome access. |
 | `TPR-CCR1-005` | P2 | **Closed as a TPR-0A-start blocker; downstream source and structural gates remain; see section 13.1** | Blueprint `FREEZE_AT_TPR0` items and section 2 of this record | The provider/endpoint/schema and rights state, exact batch cutoff, source-error policy, universe/minimum-group/fallback rules, split/FX/ADR/horizon sources, catalyst-unknown policy, estimator/partitions, exact cost model, shared-fourth-family treatment, permanent-look authority, and exact validation/final-holdout dates were separated into the frozen TPR-0A rules and explicit downstream bindings. Their empirical/source values remain unbound and continue to block TPR-1, TPR-0B, and outcome authority rather than reopening TPR-0A. |
-| `TPR-CCR1-006` | P3 | **Open; no artifact rewrite authorized. Evidence corrected and widened 2026-09-02, section 34** | Blueprint physical pages 1, 25 and 27 | Re-measured from the 29-page v2.2 text on 2026-09-02. The malformed 63-character source pin is present on physical pages 1 and 25, confirming that half of the original finding. Two corrections. First, page 25 does name `trading_agent_TargetPriceRevision`, but calling that directory *nonexistent* was wrong: it exists and is the worktree Git registers for this branch (`TPR-CR4-002`). Second, and not previously recorded, physical page 27 states that the canonical worktree is `C:\git\customizedagent\trading_agent_target_price`, so the governing artifact now pins the very path the owner directed the lane to stop pinning. Correcting the Markdown does not close the artifact instances. Regenerating the governing PDF changes its identity and must wait for the owner's storage/provenance decision. |
+| `TPR-CCR1-006` | P3 | **Open only for the live page-27 artifact residual; no rewrite authorized. Qualified 2026-09-02 in sections 34 and 35** | Blueprint physical pages 1, 25 and 27 | Re-measured from the 29-page v2.2 text. The malformed 63-character source pin remains on pages 1 and 25 but A19 already makes it historical non-authority. Page 25 names `trading_agent_TargetPriceRevision`; that directory existed and was Git-registered on Claude's review host but does not exist on this Codex host, where Git registers `trading_agent_target_price`, so existence is not a portable finding. Physical page 27 normatively pins `C:\git\customizedagent\trading_agent_target_price`; that is the live contradiction with the owner-directed path-independent rule. Correcting Markdown cannot repair the artifact. Regenerating the governing PDF changes its identity and needs the owner's storage/provenance decision. |
 
 ### 12.3 Independent verification and scope
 
@@ -3237,12 +3237,12 @@ in the validation row that follows this section.
 
 ## 34. Claude lane-issue closure round - 2026-09-02
 
-**Owner request: fix the lane-specific unresolved issues.** A census of every
-finding row in this record found 109 rows, all with unique identifiers, of
-which 8 were still marked open. Four were actionable in lane and are handled
-here. Five need an owner decision, an owner-authorized artifact rewrite, or an
-authorized implementation milestone, and were deliberately left open rather
-than closed by a reviewer acting alone.
+**As-received Claude report, qualified by Codex section 35:** a census of every
+finding row found 109 unique identifiers and eight rows marked open. Claude
+closed three stale rows and reported five remaining. Codex then established
+that two of those five, `TPR-CCR1-004` and `TPR-CCR1-005`, had already been
+closed by the owner-approved phase split; section 35 is the controlling
+counter-review and section 8 is the current register.
 
 Three of the four turned out to be **stale rather than unresolved**: the work
 that closes them had already landed in earlier rounds and nothing updated the
@@ -3272,14 +3272,15 @@ under `TPR-OOL-001-R1`; only the status cell was left behind.
 
 ### 34.2 `TPR-CR8-001` (P3) - closed, verified
 
-The finding was that the loader required confirmatory allocations to equal the
-lane's assigned alpha exactly, which is stricter than A27's "must not exceed"
-and would refuse a deliberately conservative under-allocation. The equality
-condition is gone from the current tree: the enforcement is now
-`allocated_alpha > within_lane_ceiling`, a ceiling rather than an entitlement,
-and the structural-binding and acceptance alphas are required to equal the
-*allocated* total rather than the assigned slot. Section 8 already recorded
-this closure; the row did not.
+The finding was that the semantic alpha validator required confirmatory
+allocations to equal the lane's assigned alpha exactly, which is stricter than
+A27's "must not exceed". That equality condition is gone: the validator now
+enforces `allocated_alpha > within_lane_ceiling`, a ceiling rather than an
+entitlement, and the structural-binding and acceptance alphas must equal the
+*allocated* total. The public frozen-policy loader still refuses an under-cap
+mutation of the current TPR-0A bytes through `_EXPECTED_VALUES`, as section
+33.5 records. Thus the normative validator defect is closed without claiming
+that the immutable candidate itself changed.
 
 ### 34.3 `TPR-CR11-002` (P3) - closed; both sides were host-scoped
 
@@ -3309,22 +3310,22 @@ reproducible here; text-extraction evidence is reproducible on both.
 Re-measured from the 29-page v2.2 blueprint text. One sub-claim confirmed, one
 corrected, one previously unrecorded instance added:
 
-- **Confirmed.** The malformed 63-character source pin is on physical pages 1
-  and 25. It is 63 hex characters where a SHA-256 needs 64.
-- **Corrected.** Page 25 does name `trading_agent_TargetPriceRevision`, but
-  the row called that directory *nonexistent*. It exists, and is the worktree
-  Git registers for this branch. That was the inverted premise
-  `TPR-CR4-002` closed.
-- **Added.** Physical page 27 states that the canonical worktree is
+- **Confirmed but historical.** The malformed 63-character source pin is on
+  physical pages 1 and 25, but A19 already supersedes it as unavailable
+  historical non-authority; it is not the live reason this finding stays open.
+- **Host-qualified.** Page 25 names `trading_agent_TargetPriceRevision`. That
+  directory existed and was Git-registered on this Claude review host. It does
+  not exist on the later Codex host, whose registered worktree is
+  `trading_agent_target_price`; neither host state is generalized.
+- **Live residual.** Physical page 27 states that the canonical worktree is
   `C:\git\customizedagent\trading_agent_target_price`. The governing artifact therefore pins the
   exact path the owner directed this lane to stop pinning, and it is the one
   remaining place where the superseded pin is still normative.
 
-The disposition is unchanged: regenerating the PDF changes the identity of a
-content-addressed governing artifact and needs the owner's storage/provenance
-decision. Correcting the Markdown does not close an artifact instance. What
-changed is that the row now describes the artifact accurately, so the owner's
-eventual decision is made against real evidence.
+The disposition is unchanged only for that page-27 residual: regenerating the
+PDF changes the identity of a content-addressed governing artifact and needs
+the owner's storage/provenance decision. Correcting Markdown does not close an
+artifact instance.
 
 ### 34.5 Structural fix: the open-issue register
 
@@ -3349,13 +3350,11 @@ the open test.
 
 ### 34.6 What was deliberately not done
 
-`TPR-CCR1-004`, `TPR-CCR1-005`, `TPR-CCR2-011`, `TPR-CCR5-004` and
-`TPR-CCR1-006` remain open. Closing them would mean choosing owner freezes,
-regenerating a governing artifact, or implementing and provisioning the
-TPR-TR0 trust root, none of which is a reviewer's act and none of which is
-authorized. They are now listed in one place with the reason each is stuck, so
-the owner can act on them without re-deriving the state. No out-of-lane
-finding was fixed, no milestone was implemented, and no authority changed.
+This Claude section listed `TPR-CCR1-004`, `TPR-CCR1-005`, `TPR-CCR2-011`,
+`TPR-CCR5-004`, and `TPR-CCR1-006` as open. Codex section 35 corrects the first
+two to their already-closed state and preserves the latter three as open. No
+out-of-lane finding was fixed, no milestone was completed, and no authority
+changed in the Claude round.
 
 ### 34.7 Validation
 
@@ -3428,21 +3427,22 @@ milestone. The registry remains empty and no external trust artifact exists.
 | `a9fba517` | **Accepted after qualification** | The composed-path alpha regression is useful and the validator/frozen-candidate distinction is correct. The durable description is narrowed by `TPR-CCR10-002`; the renderer dispute is resolved with host-specific evidence under `TPR-CCR10-003`. |
 | `4c19ec16` | **Accepted after qualification** | The sleeve-report clock mismatch is real, widening, and out of lane. Its failure count and elapsed-day wording are measurements at that commit, not durable current counts; `TPR-CCR10-005` records that limit without changing the external code. |
 | `87384c09` | **Accepted** | It truthfully records validation of exact code tree `4c19ec16` and explicitly says the evidence-record commit follows. No Target-Price Revisions defect is introduced. |
-| `25c1c378` | **Accepted after correction** | The open-register concept and three genuine stale closures are useful. It also reopened two already-resolved TPR-0A findings, contradicted the distinct reviewer-identity boundary, omitted priority/duplicate enforcement, overstated one checkout-dependent full run, and left active routing stale. Those defects are corrected or qualified below. |
+| `25c1c378` | **Accepted after correction** | The open-register concept and three genuine stale closures are useful. It also reopened two already-resolved TPR-0A findings, contradicted the distinct reviewer-identity boundary, omitted priority/duplicate/malformed-row enforcement, overstated one checkout-dependent full run, generalized one worktree path across hosts, blurred validator versus public-loader scope, and left active routing stale. Those defects are corrected or qualified below. |
 
 ### 35.3 Counter-review and implementation self-audit ledger
 
 | ID | Priority | Status | Finding, disposition, and evidence |
 |---|---|---|---|
 | `TPR-CCR10-001` | P2 | **Closed by current correction** | Sections 33 and 34 were appended without advancing the record preamble, section 8, Action Plan, Session Handoff, or their guard. All current pointers now bind the exact four-commit Claude range and route the next review after `25c1c378`. |
-| `TPR-CCR10-002` | P3 | **Closed by qualification** | `TPR-CR11-001` correctly pins the composed-path distinction, but the parent counter-review already scoped the relaxation to the semantic validator and a future separately frozen candidate. Current text preserves both facts and does not imply that the frozen TPR-0A bytes accept under-allocation. |
+| `TPR-CCR10-002` | P3 | **Closed by qualification** | `TPR-CR11-001` correctly pins the composed-path distinction, but the parent counter-review already scoped the relaxation to the semantic validator and a future separately frozen candidate. Section 34.2 now names `_validate_dates_and_alpha` rather than the public loader and states that `_EXPECTED_VALUES` still freezes the current TPR-0A bytes. |
 | `TPR-CCR10-003` | P3 | **Closed by host-specific evidence** | The other host measured an Xpdf text extractor without a renderer. This host has callable Poppler 26.05.0 at `C:\Users\shelt\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\poppler\Library\bin\pdftoppm.exe`, SHA-256 `742CBBD9A00931AD16C6618410BC40471375D639A45C61C1D86F3DCFC54B6388`, and used it to inspect physical pages 21, 27, and 29. Neither host's inventory is generalized to the other. |
 | `TPR-CCR10-004` | P3 | **Closed by successor evidence and qualification** | `a9fba517`'s validation handoff depended on the record-only successors. `4c19ec16` and `87384c09` supply that evidence; the disposition is on the complete four-commit range rather than pretending the first commit alone contained the final record. |
 | `TPR-CCR10-005` | P3 | **Closed by qualification; out-of-lane code unchanged** | `TPR-OOL-009` genuinely widens with the live clock, so an exact failure count or elapsed-day value is timestamp-specific. The three failures and 25-whole-day statement remain historical evidence for the `4c19ec16` run, not a promise about later runs. |
 | `TPR-CCR10-007` | P2 | **Closed by current correction** | `25c1c378` listed `TPR-CCR1-004` and `TPR-CCR1-005` as open even though section 13.1 records both closed under the owner-approved TPR-0A/TPR-0B phase split. Their canonical rows are corrected and they are removed from the current register; source/structural gates remain downstream blockers. |
 | `TPR-CCR10-008` | P3 | **Closed by current correction** | The new register called `TPR-CCR2-011` superseded by TPR-TR0, contradicting the frozen design: the owner-attestation principal cannot prove Claude's reviewer identity. The register now keeps this as a separate open requirement. |
 | `TPR-CCR10-009` | P3 | **Closed by validation qualification** | Section 34.7 called the full run an exact committed-tree run while three exact-byte artifacts were stale in the working tree during that run. The behavioral result remains evidence, but only the focused post-restore checks were exact-checkout evidence; this round does not relabel the red full run green. |
-| `TPR-CCR10-010` | P3 | **Closed by guard correction** | The new guard collapsed register IDs to a set and ignored priorities, so duplicate register rows and priority drift could pass. It now requires unique register IDs and exact ID-to-priority equality with every canonical open finding row. |
+| `TPR-CCR10-010` | P3 | **Closed by guard correction** | The new guard collapsed register IDs to a set and ignored priorities, so duplicate register rows and priority drift could pass; formatting a priority as `**P2**` also evaded its parser. It now requires unique register IDs, exact ID-to-priority equality with every canonical open finding row, and rejection of issue-looking malformed numeric priorities. |
+| `TPR-CCR10-020` | P3 | **Closed by host qualification** | Section 34.4 said `trading_agent_TargetPriceRevision` exists and is registered as though that were portable. It was true on Claude's host but is false on this host. The record now treats both worktree names as host evidence, recognizes A19's malformed source pin as historical non-authority, and keeps only physical page 27's normative absolute-path pin as the live `TPR-CCR1-006` residual. |
 | `TPR-CCR10-011` | P1 | **Closed in implementation checkpoint** | A caller-selected `git` from `PATH` could forge every authority read. Authority operations now freeze `C:\Program Files\Git\cmd\git.exe`, validate its canonical non-reparse path, and run with a minimal environment that omits caller Git configuration and command-search variables. |
 | `TPR-CCR10-012` | P1 | **Open; inert while registry is empty** | A previously valid signed positive registry can be replayed while its key remains trusted because the current anchor is derived from caller-controlled repository history. The recommended remedy is an external exact current-anchor pin at `C:\ProgramData\CustomizedAgent\trust\tpr_registry_anchor`, exactly 40 lowercase hexadecimal characters plus LF, updated atomically only while authority is blocked. Owner approval and implementation are required. |
 | `TPR-CCR10-013` | P1 | **Open; inert while registry is empty** | Validating the trust directory and files does not prevent replacement through a writable parent carrying `FILE_DELETE_CHILD`. The implementation must freeze and validate the protected custody of `C:\ProgramData\CustomizedAgent` as well, treating `C:\ProgramData` as the OS trust boundary. The exact custody/rotation policy needs owner approval. |

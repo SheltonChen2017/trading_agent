@@ -880,6 +880,10 @@ def test_session_ledger_rows_have_exact_column_count() -> None:
 
 ISSUE_ROW = r"^\| `(TPR-[A-Z0-9-]+)` \| (P[0-3]) \| ([^|]*)\|"
 REGISTER_ROW = r"^\| `(TPR-[A-Z0-9-]+)` \| (P[0-3]) \|"
+MALFORMED_PRIORITY_ROW = (
+    r"^\| `TPR-(?!OOL-)[A-Z0-9-]+` \| "
+    r"(?!P[0-3] \|)(?:\*+)?P[0-9](?:\*+)? \|"
+)
 
 
 def _open_issue_register() -> str:
@@ -913,6 +917,12 @@ def test_open_issue_register_matches_every_issue_row() -> None:
     assert register not in outside, "the register block must appear once"
 
     rows = re.findall(ISSUE_ROW, outside, re.MULTILINE)
+    malformed_priority_rows = re.findall(
+        MALFORMED_PRIORITY_ROW, outside, re.MULTILINE
+    )
+    assert not malformed_priority_rows, (
+        "issue-looking rows must use one exact unformatted P0-P3 priority"
+    )
     assert len(rows) > 50, (
         f"only {len(rows)} issue rows parsed; the row shape changed and this "
         f"guard would silently stop covering the ledgers"

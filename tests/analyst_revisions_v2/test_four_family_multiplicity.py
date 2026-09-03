@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import ast
 import copy
 import dataclasses
 import gc
 import hashlib
+import inspect
 import json
 import pickle
 import shutil
+import textwrap
 import weakref
+from collections.abc import Mapping
 from fractions import Fraction
 from pathlib import Path
 from types import SimpleNamespace
@@ -861,3 +865,228 @@ def test_weakref_callback_removes_overlay_authority():
     gc.collect()
     assert reference() is None
     assert identity not in module._FOUR_FAMILY_MULTIPLICITY_AUTHORITIES
+
+
+def _bypass_exact_contract(monkeypatch, root: Path, mutate) -> None:
+    """Rehash a mutated overlay and disable the byte pin and literal match.
+
+    This isolates the semantic validators that run after ``_require_exact`` so
+    each can be proved load-bearing on its own, exactly as
+    ``test_over_ceiling_guard_is_load_bearing_after_exact_contract_match`` does.
+    """
+    path = _paths(root)["overlay"]
+    payload = _rewrite_overlay(path, mutate)
+    expected = json.loads(payload)
+    monkeypatch.setattr(
+        module, "OVERLAY_ARTIFACT_SHA256", hashlib.sha256(payload).hexdigest()
+    )
+    monkeypatch.setattr(module, "_overlay_document", lambda: expected)
+
+
+def test_analyst_ceiling_is_bound_to_the_shared_lane_slot_after_exact_match(
+    tmp_path, monkeypatch
+):
+    """ARV2R12-001: the lane may not raise its own ceiling above 1/80."""
+    root = _clone(tmp_path)
+
+    def mutate(raw):
+        alpha = {"numerator": 1, "denominator": 79}
+        analyst = raw["analyst_lane_contract"]
+        analyst["within_lane_confirmatory_alpha_ceiling"] = alpha
+        analyst["confirmatory_alpha_allocations"][0]["two_sided_alpha"] = alpha
+        analyst["allocation_sum"] = alpha
+
+    _bypass_exact_contract(monkeypatch, root, mutate)
+    with pytest.raises(FourFamilyMultiplicityError, match="shared lane slot"):
+        _load(root)
+
+
+def test_analyst_look_budget_is_bound_to_its_look_inventory_after_exact_match(
+    tmp_path, monkeypatch
+):
+    """ARV2R12-001: a second look cannot be budgeted without an allocation."""
+    root = _clone(tmp_path)
+
+    def mutate(raw):
+        raw["analyst_lane_contract"]["look_budget"] = 2
+
+    _bypass_exact_contract(monkeypatch, root, mutate)
+    with pytest.raises(FourFamilyMultiplicityError, match="look budget"):
+        _load(root)
+
+
+def test_family_alpha_constants_are_load_bearing_after_exact_match(
+    tmp_path, monkeypatch
+):
+    """ARV2R12-002: a self-consistent 1/10 family with 1/40 lanes still refuses."""
+    root = _clone(tmp_path)
+
+    def mutate(raw):
+        shared = raw["shared_family_contract"]
+        shared["two_sided_family_wise_alpha"] = {"numerator": 1, "denominator": 10}
+        lane = {"numerator": 1, "denominator": 40}
+        shared["permanent_maximum_per_lane"] = lane
+        analyst = raw["analyst_lane_contract"]
+        analyst["within_lane_confirmatory_alpha_ceiling"] = lane
+        analyst["confirmatory_alpha_allocations"][0]["two_sided_alpha"] = lane
+        analyst["allocation_sum"] = lane
+
+    _bypass_exact_contract(monkeypatch, root, mutate)
+    with pytest.raises(FourFamilyMultiplicityError, match="alpha constants changed"):
+        _load(root)
+
+
+def _thaw(value):
+    if isinstance(value, Mapping):
+        return {key: _thaw(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_thaw(item) for item in value]
+    return value
+
+
+def _weakened_parent(weaken):
+    plan = load_qc_first_study_plan(SPEC_ROOT / FILENAMES["plan"])
+    fields = {
+        name: _thaw(getattr(plan, name))
+        for name in (
+            "supersession",
+            "inheritance_contract",
+            "multiplicity_contract",
+            "qc_historical_contract",
+            "prospective_paper_contract",
+        )
+    }
+    weaken(fields)
+    return SimpleNamespace(plan_id=plan.plan_id, plan_hash=plan.plan_hash, **fields)
+
+
+def _spent_stock_stage(fields):
+    fields["qc_historical_contract"]["stock_stage"]["confirmatory_alpha_spent"] = True
+
+
+def _revived_alpha(fields):
+    fields["multiplicity_contract"]["prospective_permanent_look_alpha"] = {
+        "numerator": 1,
+        "denominator": 40,
+    }
+
+
+def _started_paper(fields):
+    fields["prospective_paper_contract"]["start"] = "2026-10-01"
+
+
+def _deployed_paper(fields):
+    fields["prospective_paper_contract"]["deployment_authorized"] = True
+
+
+def _two_lane_factor(fields):
+    fields["multiplicity_contract"]["three_lane_correction_factor"] = 2
+
+
+@pytest.mark.parametrize(
+    "weaken",
+    (_spent_stock_stage, _revived_alpha, _started_paper, _deployed_paper, _two_lane_factor),
+    ids=("spent_stock_stage", "revived_alpha", "started_paper", "deployed_paper", "two_lane_factor"),
+)
+def test_superseded_parent_state_guard_is_load_bearing(monkeypatch, weaken):
+    """ARV2R12-002: the semantic tombstone check must refuse independently of the byte pin."""
+    parent = _weakened_parent(weaken)
+    monkeypatch.setattr(module, "load_qc_first_study_plan", lambda path: parent)
+    with pytest.raises(
+        FourFamilyMultiplicityError, match="parent state cannot be authenticated"
+    ):
+        _load()
+
+
+def test_zero_look_authority_semantic_guard_is_load_bearing(tmp_path, monkeypatch):
+    """ARV2R12-002: a re-pinned positive look authority still refuses semantically."""
+    root = _clone(tmp_path)
+    paths = _paths(root)
+    payload = (
+        '{"authority_id":"positive","authority_mode":"active",'
+        '"entries":[],"schema":"arv2-permanent-look-authority-v1"}\n'
+    ).encode("utf-8")
+    paths["look_authority"].write_bytes(payload)
+    monkeypatch.setattr(
+        module,
+        "ZERO_LOOK_AUTHORITY_ARTIFACT_SHA256",
+        hashlib.sha256(payload).hexdigest(),
+    )
+    # Keep the exact-contract match satisfied so the byte pin and literal match
+    # are not what refuses; only the semantic look-authority guard remains.
+    expected = json.loads(paths["overlay"].read_bytes())
+    monkeypatch.setattr(module, "_overlay_document", lambda: expected)
+    with pytest.raises(
+        FourFamilyMultiplicityError, match="zero-access look authority changed"
+    ):
+        _load(root)
+
+
+def _junction(link: Path, target: Path) -> None:
+    """Create a directory junction, the link form Windows allows without privilege."""
+    try:
+        import _winapi
+    except ImportError:
+        pytest.skip("directory junctions are Windows-only")
+    try:
+        _winapi.CreateJunction(str(target), str(link))
+    except OSError as exc:
+        pytest.skip(f"host cannot create junction: {exc}")
+    assert link.is_junction()
+
+
+def test_ancestor_directory_must_not_be_a_junction(tmp_path):
+    """ARV2R12-003: the link guard must execute on the supported Windows host."""
+    real_root = _clone(tmp_path / "real")
+    linked_root = tmp_path / "junction-specs"
+    _junction(linked_root, real_root)
+    with pytest.raises(FourFamilyMultiplicityError, match="link"):
+        _load(linked_root)
+
+
+@pytest.mark.parametrize("key", ("overlay", "plan", "look_authority"))
+def test_each_supplied_path_through_a_junction_is_refused(tmp_path, key):
+    """ARV2R12-003: one junction-traversing input refuses even when the rest are real."""
+    real_root = _clone(tmp_path / "real")
+    linked_root = tmp_path / "junction-specs"
+    _junction(linked_root, real_root)
+    paths = _paths(real_root)
+    paths[key] = _paths(linked_root)[key]
+    with pytest.raises(FourFamilyMultiplicityError, match="link"):
+        load_four_family_multiplicity_overlay(
+            paths["overlay"],
+            look_authority_path=paths["look_authority"],
+            qc_first_plan_path=paths["plan"],
+        )
+
+
+CONSTANT_FALSE_ACCESSORS = (
+    "grants_action_authority",
+    "source_access_available",
+    "outcome_access_available",
+    "look_spend_available",
+    "qc_action_available",
+    "deployment_available",
+    "orders_available",
+)
+
+
+@pytest.mark.parametrize("name", CONSTANT_FALSE_ACCESSORS)
+def test_each_action_accessor_is_a_literal_false_constant(name):
+    """ARV2R12-004: no accessor may become data-dependent while the data is false."""
+    accessor = getattr(FourFamilyMultiplicityOverlay, name)
+    assert isinstance(accessor, property)
+    tree = ast.parse(textwrap.dedent(inspect.getsource(accessor.fget)))
+    function = tree.body[0]
+    assert isinstance(function, ast.FunctionDef)
+    body = [
+        node
+        for node in function.body
+        if not (
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
+        )
+    ]
+    assert len(body) == 1 and isinstance(body[0], ast.Return)
+    assert isinstance(body[0].value, ast.Constant) and body[0].value.value is False

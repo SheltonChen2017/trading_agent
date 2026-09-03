@@ -469,6 +469,14 @@ def _validate_arithmetic(raw: Mapping[str, Any]) -> None:
         raise FourFamilyMultiplicityError("four-family alpha constants changed")
     if len(FIXED_LANE_IDS) * lane_alpha != family_alpha:
         raise FourFamilyMultiplicityError("four-family alpha arithmetic does not close")
+    # The lane may never define its own ceiling: it is the shared slot itself.
+    # Without this, a lane contract could raise its ceiling above 1/80 while
+    # the shared contract still reads 1/80 once the exact-literal match is
+    # relaxed by a reviewed successor.
+    if ceiling != lane_alpha:
+        raise FourFamilyMultiplicityError(
+            "Analyst ceiling is not the shared lane slot"
+        )
     allocations = analyst["confirmatory_alpha_allocations"]
     if type(allocations) is not list:
         raise FourFamilyMultiplicityError("Analyst allocations must be a list")
@@ -487,6 +495,13 @@ def _validate_arithmetic(raw: Mapping[str, Any]) -> None:
         analyst["permanent_look_ids"]
     ):
         raise FourFamilyMultiplicityError("Analyst allocation inventory changed")
+    look_budget = analyst["look_budget"]
+    if type(look_budget) is not int or look_budget != len(
+        analyst["permanent_look_ids"]
+    ):
+        raise FourFamilyMultiplicityError(
+            "Analyst look budget does not match its look inventory"
+        )
 
 
 def _validate_parent_state(plan: QcFirstStudyPlan) -> None:

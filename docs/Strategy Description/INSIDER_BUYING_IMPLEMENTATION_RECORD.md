@@ -2,20 +2,21 @@
 
 Status: **THE IB-0/IB-1 STRUCTURAL SLICE, BOUNDED IB-1A THROUGH IB-1H
 OFFLINE EVIDENCE CONTRACTS, AND IB-1I ZERO-AUTHORITY FOUR-FAMILY RESEARCH
-GATE ARE IMPLEMENTED. CODEX COUNTER-REVIEWED CLAUDE COMMITS `5f880c5a` AND
-`3f6c2676`; BOTH ARE ACCEPTED AFTER THE LANE-SPECIFIC HARD-LINK CORRECTION
-`a615304d` AND THE APPEND-ONLY RECORD CORRECTION `322350a3` IN SECTION 35.
-COMMIT `b3b202d2` ADDS THE IB-1I CONTRACT AND DANGEROUS-DIRECTION TESTS; IT
-AWAITS CLAUDE'S INDEPENDENT REVIEW. NO CONFIRMATORY CELL OR PERMANENT LOOK IS
-ALLOCATED, AND OUTCOME, QC, INTEGRATION, CAPITAL, DEPLOYMENT, AND TRADING
-AUTHORITY REMAIN EXACTLY ZERO. IB-1 REMAINS INCOMPLETE: REAL PACKAGE
-ACQUISITION AND FULL HISTORICAL POPULATION ARE UNSTARTED, WHILE
-CALLER-SUPPLIED ARCHIVE/MEMBER HASHING, INVENTORY VALIDATION, RAW
-PUBLICATION, AND PROVISIONAL-REPORT PUBLICATION ARE IMPLEMENTED OFFLINE.
-OFFICIAL SEC PROFILE, REAL PACKAGE, AUTHENTICATED AMENDMENT LINK, COMPLETE
-AMENDMENT COVERAGE, POINT-IN-TIME SECURITY IDENTITY, NORMALIZATION,
-AGGREGATION, THE `$50,000` GATE, SIGNAL CONSTRUCTION, OUTCOME TESTING, ETF
-PORTFOLIO WORK, AND QC IMPLEMENTATION REMAIN UNPROVEN OR UNSTARTED.**
+GATE ARE IMPLEMENTED. CLAUDE'S REVIEW COMMIT `2c392cd3` IS COUNTER-REVIEWED
+AND ACCEPTED AFTER THE LANE-RECORD CORRECTIONS IN SECTION 38. ITS TWO NEW
+CONSTANT-DRIFT REGRESSIONS ARE LOAD-BEARING; NO PRODUCT-CODE CORRECTION WAS
+REQUIRED. NO NEW IMPLEMENTATION MILESTONE IS AUTHORIZED. FULL CONFIRMATORY
+PREREGISTRATION REMAINS OWNER-DECISION-BLOCKED, NO CONFIRMATORY CELL OR
+PERMANENT LOOK IS ALLOCATED, AND OUTCOME, QC, INTEGRATION, CAPITAL,
+DEPLOYMENT, AND TRADING AUTHORITY REMAIN EXACTLY ZERO. IB-1 REMAINS
+INCOMPLETE: REAL PACKAGE ACQUISITION AND FULL HISTORICAL POPULATION ARE
+UNSTARTED, WHILE CALLER-SUPPLIED ARCHIVE/MEMBER HASHING, INVENTORY
+VALIDATION, RAW PUBLICATION, AND PROVISIONAL-REPORT PUBLICATION ARE
+IMPLEMENTED OFFLINE. OFFICIAL SEC PROFILE, REAL PACKAGE, AUTHENTICATED
+AMENDMENT LINK, COMPLETE AMENDMENT COVERAGE, POINT-IN-TIME SECURITY IDENTITY,
+NORMALIZATION, AGGREGATION, THE `$50,000` GATE, SIGNAL CONSTRUCTION, OUTCOME
+TESTING, ETF PORTFOLIO WORK, AND QC IMPLEMENTATION REMAIN UNPROVEN OR
+UNSTARTED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -4762,3 +4763,116 @@ bounded code-adjacent correction was authorized and made - two regression tests
 - plus one record-ordering correction. Next authorized step: Codex
 counter-reviews this review commit. No milestone was started and none is
 authorized.
+
+## 38. Codex counter-review of Claude's IB-1I review (2026-09-03)
+
+Reviewer: Codex, in the dedicated lane worktree
+`C:\git\customizedAgent\trading_agent_insider` on the existing
+`codex/strategy-insider-buying` branch. No branch or worktree was created or
+switched. The worktree was clean at `b21baf7c`; the live remote resolved to
+`2c392cd30ce4979d4f36d0b6e1b8b7323f8bc6ef`, and the lane was fast-forwarded
+only to that exact object.
+
+### 38.1 Exact review scope and disposition
+
+The complete ordered Claude range after the prior Codex head is one commit and
+zero merges:
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `2c392cd3` Pin the IB-1I constant-drift guards and record the review | **Accepted after documentation correction.** | The two tests are valid and load-bearing, the section relocation is byte-preserving, and the material IB-1I/hard-link claims reproduce. Five P3 defects in the review record are superseded below; no product-code correction is required. |
+
+The five underlying Codex commits reviewed by Claude require this superseding
+commit-by-commit disposition: `a615304d` is **accepted**; `322350a3`,
+`b3b202d2`, `cee97a8c`, and `b21baf7c` are each **accepted after correction**.
+This is four accepted-after-correction dispositions, not the two stated in
+section 37.9 or the three implied by section 37.2.
+
+### 38.2 Independent reproduction
+
+- The two added tests pass individually and in the complete IB-1I module. Each
+  patches the governing module constant and supplies the matching instance
+  value, so the earlier exact-field guard passes and the intended cross-field
+  invariant is actually reached. Reversible in-memory suppression of the
+  four-lane-alpha equation and cutoff/holdout-order guard makes its respective
+  test fail; **2 of 2 mutants caught**. `MonkeyPatch.undo()` restored both
+  constants.
+- The complete IB-1I module passes **122 tests**. The semantic hash recomputes
+  to `f532eaf38fbdd6f3f00a4286a723ba1aa69c58f9862a596a840bd0e6d998c392`;
+  four times `Fraction(1, 80)` equals `Fraction(1, 20)` exactly; authorized and
+  consumed look counts are integer zero; and both allocation inventories are
+  empty.
+- The local blueprint SHA-256 recomputes to
+  `f8834e13bb22d63a1a5a055a24cc2638ecb2e535b733c1fdd1741a28c65db88c`,
+  matching the gate constant and the governing-source identity in this record.
+- The current hard-link-focused IB-1A/IB-1B slice passes all **15 selected
+  cases**. The previously reviewed ten real-link outcomes and four
+  phase-suppression mutations remain consistent with the current code; no
+  hard-link logic changed in `2c392cd3`.
+- Range `3f6c2676..b21baf7c` independently reproduces as five commits, zero
+  merges, eight paths, 1,541 insertions, and 19 deletions. Sections 35 and 36
+  compare text-identical before and after relocation at 8,683 and 12,270
+  characters respectively; the current top-level section sequence is exactly
+  1 through 38.
+- Commit `2c392cd3` changes only this lane record and
+  `tests/test_insider_buying_preregistration.py`; it adds no production,
+  provider, outcome, QC, broker, scheduler, or execution surface and removes
+  no test definition.
+
+### 38.3 P0-P3 counter-review ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1I-CCR01 | P3 | **Closed - corrected in this record** | `2c392cd3` | section 37.2, section 37.5 `IBREC-01`, and section 37.9 | Claude marked `322350a3` accepted and attributed the misplaced-section defect only to `cee97a8c`/`b21baf7c`, so its per-commit disposition and summary count disagree with the history. | At `3f6c2676` headings are 1..34; `322350a3` first changes them to 1..11,35,12..34; `cee97a8c` changes them to 1..11,36,35,12..34. | The mandatory review protocol requires an exact disposition for every commit; an incorrect attribution makes the durable counter-review chain ambiguous. | Historical text is retained. Section 38.1 supersedes it with one accepted and four accepted-after-correction dispositions. | Header sequences were computed at every commit from `3f6c2676` through `2c392cd3`; final order is contiguous. |
+| IB1I-CCR02 | P3 | **Closed - fixed in current status** | `2c392cd3` | record status | The active status still said `b3b202d2` awaited Claude review after section 37 and the session ledger had already recorded that review. | The former status line 9 contradicted section 37 and the 2026-09-02 Claude-review ledger row. | This file is the branch-local handoff; stale current-state instructions can send the next agent backward in the workflow. | Updated the mutable top status to the completed review and current counter-review state without rewriting a historical ledger row. | Current status names `2c392cd3`, section 38, zero authority, and the owner-decision blocker. |
+| IB1I-CCR03 / IBREC-02 | P3 | **Closed - append-only correction recorded here** | `2c392cd3` | section 37.5 `IBREC-02` and the 2026-09-01 Claude-review ledger row | The underlying placeholder defect is real, but section 37 attributes it to `4a9ca17f` and says the result cannot be reconstructed. The row was actually introduced by `2ef057d6`, whose immutable commit message records `Record gate 70 passed`; exact command and duration remain absent. | `git blame` assigns the row to `2ef057d6`; the placeholder does not exist at `4a9ca17f` or `e2eca996`; `git show -s --format=%B 2ef057d6` contains the 70-pass result. | Provenance and evidence-availability claims must distinguish an omitted lane-row value from information preserved elsewhere in immutable history. | The historical row remains untouched. This entry supersedes the source as `2ef057d6` and records **70 passed**, while explicitly not inventing an unrecorded command or duration. | Exactly one historical placeholder remains; its corrected value and evidence source are now durable in this append-only section. |
+| IB1I-CCR04 | P3 | **Closed - corrected in this record** | `2c392cd3` | section 37.6 deletion inventory | The claimed 19-deletion explanation enumerates only 18 and mislabels the `research/insider_buying/__init__.py` deletion as an export line. | `git diff --numstat 3f6c2676..b21baf7c` gives 9 record, 1 package file, 4+4 reader, and 1 parsed-snapshot-test deletions. Diff inspection identifies one package-docstring replacement, eight reader-conditional replacements, and one test-parametrization replacement. | A no-test-weakening claim should reconcile exactly to the cited diff rather than leave an unexplained deletion. | Superseding breakdown: 9 record + 1 package-docstring + 8 reader-condition + 1 test-parametrization lines = 19. | The total now agrees with `--numstat`; no test definition was deleted or weakened. |
+| IB1I-CCR05 | P3 | **Closed - corrected in this record** | `2c392cd3` | section 37.6 named-suite description | The review calls 920 passed plus 8 skipped an exact 12-file suite containing “all seven” `test_insider_buying_*.py` modules, but nine files match that pattern at the reviewed head. With the five named boundary/document files, the actual command surface is 14 files. | Current and reviewed trees contain nine matching Insider modules; collection over those nine plus the five named files yields **14 files and 928 tests**, consistent with 920 passed plus 8 skipped. | Exact validation evidence must name a command surface another reviewer can reproduce. | This section records the actual inventory as nine Insider modules plus five boundary/document modules. | Collection is 928 tests; Claude's 920+8 result totals the same 928. |
+
+No P0, P1, or P2 defect was found in `2c392cd3`. No open lane-specific defect
+remains from this counter-review. The known `tests/test_sleeve_report.py`
+fixed-clock failures remain outside the Insider lane and were documented but
+not fixed.
+
+### 38.4 Validation and access accounting
+
+Codex used Python **3.13.14** and pytest **9.1.1**; Claude's reviewed host used
+Python 3.14.6. Focused IB-1I: **122 passed in 1.83s**. The two new exact nodes
+pass and catch **2 of 2** reversible guard-suppression mutations. The
+hard-link-focused selection passes **15 cases**. The 14-file named-suite
+collection is **928 tests**. The post-correction implementation-record,
+active-document, and IB-1I gate first passed **192 tests in 23.38s**; after
+that result was written, its exact-tree rerun passed **192 tests in 3.11s**.
+
+Complete repository suite on exact Claude head `2c392cd3`: **3 failed, 7,095
+passed, 15 skipped, 25 warnings in 3,129.90s (52m09s)**. The three failures are
+exactly the unchanged, out-of-lane sleeve-clock cases:
+`test_default_gain_review_is_fifty_percent_and_long_term_gated`,
+`test_every_lot_row_carries_the_tax_mechanism_fields`, and
+`test_report_carries_no_action_shaped_field`. The one-pass/one-skip difference
+from Claude's 3/7,096/14 result is consistent with the different
+interpreter/host; both runs collect 7,113 cases. No file in `2c392cd3` touches
+that surface.
+
+Only tracked local code, synthetic fixtures, and the local governing PDF bytes
+were read. No filing, real SEC package, network/provider endpoint, credential,
+licensed row, outcome, QuantConnect action, broker, operator database,
+scheduler, deployment, order, or UI was accessed. **Research looks: 0.**
+
+### 38.5 Authority and handoff
+
+No next implementation milestone is currently authorized. The latest
+authoritative handoff permits this counter-review only; no `IB-1J` is defined.
+Full confirmatory preregistration remains owner-decision-blocked until the
+owner selects one primary 5/20/60-session horizon, divides the permanent
+`1/80` ceiling among any stock confirmatory cells, decides any stock/ETF split,
+and decides whether to reserve allocation for a later prospective/QC look.
+Real-package acquisition, official-profile validation, authenticated amendment
+provenance, canonical aggregation, outcomes, ETF construction, and QC work are
+also not authorized by inference.
+
+Accordingly, this counter-review record is committed locally but the loop stops
+before a new milestone and before its single combined push. The owner must
+supply the missing bounded decision before implementation resumes. All
+provider, outcome, QC, operational, deployment, capital, and trading authority
+remains exact zero.

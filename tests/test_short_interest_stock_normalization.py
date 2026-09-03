@@ -50,13 +50,20 @@ from research.short_interest_etf.stock_normalization import (
 from research.short_interest_etf.stock_score_batch import (
     STOCK_SCORE_BATCH_AUTHORITY,
     STOCK_SCORE_BATCH_SCHEMA_VERSION,
+    STOCK_SCORE_BATCH_V2_SCHEMA_VERSION,
+    STOCK_SCORE_BATCH_V2_VERIFICATION_SCHEMA_VERSION,
     STOCK_SCORE_BATCH_VERIFICATION_SCHEMA_VERSION,
     StockScoreBatchEnvelope,
+    StockScoreBatchEnvelopeV2,
     StockScoreBatchError,
     StockScoreBatchVerification,
+    StockScoreBatchVerificationV2,
     build_stock_score_batch_envelope,
+    build_stock_score_batch_envelope_v2,
     verify_compact_stock_score_batch_payload,
+    verify_compact_stock_score_batch_payload_v2,
     verify_stock_score_batch_payload,
+    verify_stock_score_batch_payload_v2,
 )
 
 
@@ -623,6 +630,58 @@ def _tamper_score_batch(payload: dict, case: str) -> dict:
         tampered["member_set_count"] += 1
     else:
         raise AssertionError(f"unknown tamper case: {case}")
+    return tampered
+
+
+def _tamper_v2_score_batch(payload: dict, case: str) -> dict:
+    tampered = deepcopy(payload)
+    inventory_record = tampered["raw_inventory_sets"][0]
+    inventory = inventory_record["raw_disposition_inventory"]
+    if case == "unknown_envelope_field":
+        tampered["unexpected"] = True
+    elif case == "inventory_count_mismatch":
+        tampered["raw_inventory_set_count"] = 2
+    elif case == "stale_inventory_item":
+        inventory[0]["sha256"] = "0" * 64
+    elif case == "reordered_inventory":
+        inventory.reverse()
+    elif case == "missing_inventory_record":
+        tampered["raw_inventory_sets"].clear()
+        tampered["raw_inventory_set_count"] = 0
+    elif case == "missing_inventory_reference":
+        tampered["cohorts"][0]["cohort"]["raw_dispositions_sha256"] = "0" * 64
+    elif case == "duplicate_inventory_record":
+        tampered["raw_inventory_sets"].append(deepcopy(inventory_record))
+        tampered["raw_inventory_set_count"] = 2
+    elif case == "orphan_inventory_record":
+        orphan_inventory = [{"event_id": "synthetic-orphan", "sha256": "0" * 64}]
+        tampered["raw_inventory_sets"].append(
+            {
+                "raw_disposition_inventory": orphan_inventory,
+                "raw_dispositions_sha256": hash_payload(orphan_inventory),
+            }
+        )
+        tampered["raw_inventory_sets"].sort(
+            key=lambda item: item["raw_dispositions_sha256"]
+        )
+        tampered["raw_inventory_set_count"] = 2
+    elif case == "duplicate_inventory_pair":
+        inventory.append(deepcopy(inventory[0]))
+        replacement = hash_payload(inventory)
+        inventory_record["raw_dispositions_sha256"] = replacement
+        for record in tampered["cohorts"]:
+            record["cohort"]["raw_dispositions_sha256"] = replacement
+    elif case == "rehash_substituted_inventory":
+        inventory[0]["sha256"] = "0" * 64
+        replacement = hash_payload(inventory)
+        inventory_record["raw_dispositions_sha256"] = replacement
+        for record in tampered["cohorts"]:
+            record["cohort"]["raw_dispositions_sha256"] = replacement
+    elif case == "omitted_row":
+        tampered["rows"].pop()
+        tampered["row_count"] -= 1
+    else:
+        raise AssertionError(f"unknown V2 tamper case: {case}")
     return tampered
 
 
@@ -1845,8 +1904,18 @@ def test_compact_score_batch_preserves_role_specific_multisector_witnesses():
     assert candidate_digests.isdisjoint(sector_digests)
 
 
+@pytest.mark.parametrize(
+    ("builder", "builder_name"),
+    [
+        (build_stock_score_batch_envelope, "_build_payload"),
+        (build_stock_score_batch_envelope_v2, "_build_payload_v2"),
+    ],
+    ids=("v1", "v2"),
+)
 def test_compact_score_batch_distinguishes_candidate_eligible_and_sector_roles(
     monkeypatch,
+    builder,
+    builder_name,
 ):
     import research.short_interest_etf.stock_score_batch as score_batch_module
 
@@ -1869,7 +1938,7 @@ def test_compact_score_batch_distinguishes_candidate_eligible_and_sector_roles(
             )
 
     scores = _scores(tuple(specs))
-    envelope = build_stock_score_batch_envelope(scores)
+    envelope = builder(scores)
     payload = envelope.to_payload()
     member_sizes = {
         record["members_sha256"]: len(record["members"])
@@ -1901,7 +1970,7 @@ def test_compact_score_batch_distinguishes_candidate_eligible_and_sector_roles(
         item.to_payload() for item in scores
     )
 
-    original_build_payload = score_batch_module._build_payload
+    original_build_payload = getattr(score_batch_module, builder_name)
 
     def alias_candidate_as_eligible(dispositions):
         mutated = original_build_payload(dispositions)
@@ -1918,11 +1987,11 @@ def test_compact_score_batch_distinguishes_candidate_eligible_and_sector_roles(
 
     monkeypatch.setattr(
         score_batch_module,
-        "_build_payload",
+        builder_name,
         alias_candidate_as_eligible,
     )
-    with pytest.raises(StockScoreBatchError, match="expanded cohort"):
-        build_stock_score_batch_envelope(scores)
+    with pytest.raises(StockScoreBatchError, match="expanded.*cohort"):
+        builder(scores)
 
 
 def test_compact_score_batch_stores_repeated_witnesses_linearly():
@@ -2059,3 +2128,550 @@ def test_compact_score_batch_stays_out_of_the_canonical_package_exports():
         if isinstance(node, ast.ImportFrom) and node.module is not None
     }
     assert "research.short_interest_etf.stock_score_batch" not in imported
+
+
+@pytest.mark.parametrize(
+    (
+        "cycle_count",
+        "legacy_digest",
+        "v1_envelope_digest",
+        "v2_envelope_digest",
+        "v2_canonical_bytes",
+    ),
+    [
+        (
+            2,
+            "efe0ef91822a20d3dda680269d792644157058a5a4e7660a7cf7143f3cbf1299",
+            "82f579b6b91e9ed6917fb4da24509e4d7fd0a6fb0de18367c807b4242fc5637a",
+            "0089de9bf817ae8f37eb0d6c4ea79ccc4bdfa4ddc38015d06a08053546f9fb8b",
+            352841,
+        ),
+        (
+            4,
+            "19f3b85aa3c601ca6f66253042a64799592b946624b940ed83012d6218fb6fd0",
+            "cbf25e6f67a6e9e545644a3233876bf600ab996c2cbe842750d06620fb539901",
+            "de12ce1bf1c85cb63608a9b8ed99fc7e5666959dd2886d5bb836c1fd8da87678",
+            892667,
+        ),
+    ],
+)
+def test_v2_score_batch_is_lossless_content_addressed_and_non_authoritative(
+    cycle_count,
+    legacy_digest,
+    v1_envelope_digest,
+    v2_envelope_digest,
+    v2_canonical_bytes,
+):
+    security_count = 20
+    scores = _multi_cycle_scores(cycle_count, security_count)
+    legacy_rows = tuple(item.to_payload() for item in scores)
+    v1 = build_stock_score_batch_envelope(scores)
+    v2 = build_stock_score_batch_envelope_v2(scores)
+    payload = v2.to_payload()
+
+    assert type(v2) is StockScoreBatchEnvelopeV2
+    assert payload["schema_version"] == STOCK_SCORE_BATCH_V2_SCHEMA_VERSION
+    assert payload["authority"] == STOCK_SCORE_BATCH_AUTHORITY
+    assert payload["production_authoritative"] is False
+    assert payload["normalization_policy_sha256"] == STOCK_NORMALIZATION_POLICY.sha256
+    assert payload["preregistration_sha256"] == (
+        STOCK_NORMALIZATION_POLICY.preregistration_sha256
+    )
+    assert payload["row_count"] == cycle_count * security_count
+    assert payload["cohort_count"] == cycle_count
+    assert payload["raw_inventory_set_count"] == 1
+    assert len(payload["raw_inventory_sets"]) == 1
+    inventory_record = payload["raw_inventory_sets"][0]
+    inventory = inventory_record["raw_disposition_inventory"]
+    assert len(inventory) == cycle_count * security_count
+    assert hash_payload(inventory) == inventory_record["raw_dispositions_sha256"]
+    assert {
+        record["cohort"]["raw_dispositions_sha256"]
+        for record in payload["cohorts"]
+    } == {inventory_record["raw_dispositions_sha256"]}
+    assert all(
+        "raw_disposition_inventory" not in record["cohort"]
+        for record in payload["cohorts"]
+    )
+    assert payload["canonical_row_list_sha256"] == legacy_digest
+    assert v2.canonical_row_list_sha256 == legacy_digest
+    assert v1.canonical_row_list_sha256 == legacy_digest
+    assert v1.sha256 == v1_envelope_digest
+    assert v2.sha256 == v2_envelope_digest
+    assert len(canonical_json(payload).encode("utf-8")) == v2_canonical_bytes
+    assert v2_canonical_bytes < len(
+        canonical_json(v1.to_payload()).encode("utf-8")
+    )
+    assert v2.expanded_row_payloads() == legacy_rows
+    assert verify_stock_score_batch_payload_v2(
+        payload,
+        dispositions=scores,
+    ) == legacy_rows
+    receipt = verify_compact_stock_score_batch_payload_v2(
+        payload,
+        dispositions=scores,
+    )
+    assert type(receipt) is StockScoreBatchVerificationV2
+    assert receipt.schema_version == STOCK_SCORE_BATCH_V2_VERIFICATION_SCHEMA_VERSION
+    assert receipt.row_count == len(scores)
+    assert receipt.canonical_row_list_sha256 == legacy_digest
+    assert receipt.envelope_sha256 == v2.sha256
+    assert not _contains_float(payload)
+
+
+def test_v2_serialized_inventory_scales_with_rows_not_cohorts_times_rows():
+    samples = {}
+    for cycle_count in (2, 4):
+        scores = _multi_cycle_scores(cycle_count, 20)
+        v1_payload = build_stock_score_batch_envelope(scores).to_payload()
+        v2_payload = build_stock_score_batch_envelope_v2(scores).to_payload()
+        v1_entries = sum(
+            len(record["cohort"]["raw_disposition_inventory"])
+            for record in v1_payload["cohorts"]
+        )
+        v2_entries = sum(
+            len(record["raw_disposition_inventory"])
+            for record in v2_payload["raw_inventory_sets"]
+        )
+        assert v1_entries == cycle_count**2 * 20
+        assert v2_entries == cycle_count * 20
+        assert v2_payload["raw_inventory_set_count"] == 1
+        samples[cycle_count] = (v1_entries, v2_entries)
+
+    assert samples[4][0] == 4 * samples[2][0]
+    assert samples[4][1] == 2 * samples[2][1]
+
+
+def test_v1_and_v2_score_batch_schemas_are_strictly_separate():
+    scores = _single_sector_scores(20)
+    v1 = build_stock_score_batch_envelope(scores)
+    v2 = build_stock_score_batch_envelope_v2(scores)
+
+    assert v1.schema_version == STOCK_SCORE_BATCH_SCHEMA_VERSION
+    assert v2.schema_version == STOCK_SCORE_BATCH_V2_SCHEMA_VERSION
+    assert v1.sha256 == (
+        "82f579b6b91e9ed6917fb4da24509e4d7fd0a6fb0de18367c807b4242fc5637a"
+    )
+    with pytest.raises(StockScoreBatchError):
+        verify_compact_stock_score_batch_payload(
+            v2.to_payload(),
+            dispositions=scores,
+        )
+    with pytest.raises(StockScoreBatchError):
+        verify_stock_score_batch_payload(
+            v2.to_payload(),
+            dispositions=scores,
+        )
+    with pytest.raises(StockScoreBatchError):
+        verify_compact_stock_score_batch_payload_v2(
+            v1.to_payload(),
+            dispositions=scores,
+        )
+    with pytest.raises(StockScoreBatchError):
+        verify_stock_score_batch_payload_v2(
+            v1.to_payload(),
+            dispositions=scores,
+        )
+
+
+def test_v2_score_batch_is_input_order_independent_and_cache_is_immutable():
+    scores = _single_sector_scores(20)
+    expected = build_stock_score_batch_envelope_v2(scores)
+    reordered = build_stock_score_batch_envelope_v2(tuple(reversed(scores)))
+    assert reordered.to_payload() == expected.to_payload()
+    assert reordered.sha256 == expected.sha256
+
+    payload = expected.to_payload()
+    original_sha256 = expected.sha256
+    payload["raw_inventory_sets"][0]["raw_disposition_inventory"][0][
+        "sha256"
+    ] = "0" * 64
+    assert expected.sha256 == original_sha256
+    assert expected.to_payload()["raw_inventory_sets"][0][
+        "raw_disposition_inventory"
+    ][0]["sha256"] != "0" * 64
+
+    with pytest.raises(StockScoreBatchError, match="exact tuple of exact"):
+        build_stock_score_batch_envelope_v2(list(scores))
+    with pytest.raises(StockScoreBatchError, match="cannot be empty"):
+        build_stock_score_batch_envelope_v2(())
+    with pytest.raises(StockScoreBatchError, match="incomplete"):
+        build_stock_score_batch_envelope_v2(scores[:-1])
+    with pytest.raises(StockScoreBatchError, match="duplicate disposition"):
+        build_stock_score_batch_envelope_v2(scores + (scores[0],))
+
+
+@pytest.mark.parametrize(
+    ("case", "message"),
+    [
+        ("unknown_envelope_field", "frozen schema"),
+        ("inventory_count_mismatch", "count does not match"),
+        ("stale_inventory_item", "content digest"),
+        ("reordered_inventory", "content digest"),
+        ("missing_inventory_record", "positive exact int"),
+        ("missing_inventory_reference", "missing raw inventory set"),
+        ("duplicate_inventory_record", "duplicate digest"),
+        ("orphan_inventory_record", "orphan record"),
+        ("duplicate_inventory_pair", "duplicate references"),
+        ("rehash_substituted_inventory", "expanded V2 cohort"),
+        ("omitted_row", "incomplete for its shared raw inventory"),
+    ],
+)
+def test_v2_score_batch_refuses_inventory_and_envelope_tampering(case, message):
+    scores = _single_sector_scores(20)
+    payload = build_stock_score_batch_envelope_v2(scores).to_payload()
+    tampered = _tamper_v2_score_batch(payload, case)
+    with pytest.raises(StockScoreBatchError, match=message):
+        verify_compact_stock_score_batch_payload_v2(
+            tampered,
+            dispositions=scores,
+        )
+    with pytest.raises(StockScoreBatchError, match=message):
+        verify_stock_score_batch_payload_v2(
+            tampered,
+            dispositions=scores,
+        )
+
+
+def test_v2_score_batch_refuses_exact_type_and_recursive_payload_attacks():
+    scores = _single_sector_scores(20)
+    canonical = build_stock_score_batch_envelope_v2(scores).to_payload()
+
+    class DictSubclass(dict):
+        pass
+
+    class ListSubclass(list):
+        pass
+
+    class StrSubclass(str):
+        pass
+
+    class IntSubclass(int):
+        pass
+
+    with pytest.raises(StockScoreBatchError, match="exact dict"):
+        verify_compact_stock_score_batch_payload_v2(
+            DictSubclass(canonical),
+            dispositions=scores,
+        )
+
+    attacks = []
+    payload = deepcopy(canonical)
+    payload["raw_inventory_sets"] = ListSubclass(payload["raw_inventory_sets"])
+    attacks.append(payload)
+    payload = deepcopy(canonical)
+    payload["raw_inventory_set_count"] = IntSubclass(1)
+    attacks.append(payload)
+    payload = deepcopy(canonical)
+    payload["raw_inventory_sets"][0]["raw_dispositions_sha256"] = StrSubclass(
+        payload["raw_inventory_sets"][0]["raw_dispositions_sha256"]
+    )
+    attacks.append(payload)
+    payload = deepcopy(canonical)
+    payload["raw_inventory_sets"][0]["raw_disposition_inventory"][0][
+        "unexpected_float"
+    ] = 1.0
+    attacks.append(payload)
+    for payload in attacks:
+        with pytest.raises(StockScoreBatchError, match="exact non-float JSON"):
+            verify_compact_stock_score_batch_payload_v2(
+                payload,
+                dispositions=scores,
+            )
+
+    payload = deepcopy(canonical)
+    inventory = payload["raw_inventory_sets"][0]["raw_disposition_inventory"]
+    inventory.append(inventory)
+    with pytest.raises(StockScoreBatchError, match="recursive container"):
+        verify_compact_stock_score_batch_payload_v2(
+            payload,
+            dispositions=scores,
+        )
+
+
+def test_v2_compact_paths_stream_and_do_not_retain_legacy_expansions(monkeypatch):
+    scores = _single_sector_scores(20)
+    expected_legacy_digest = hash_payload([item.to_payload() for item in scores])
+    original_hash_payload = stock_score_batch_module.hash_payload
+    original_validate_v2 = stock_score_batch_module._validate_payload_v2
+    original_array_sha256 = stock_score_batch_module._canonical_json_array_sha256
+    original_deepcopy = stock_score_batch_module.deepcopy
+
+    def refuse_v1_builder(_dispositions):
+        raise AssertionError("V2 must be built directly rather than through V1")
+
+    def refuse_full_legacy_row_list(value):
+        if (
+            type(value) is list
+            and value
+            and type(value[0]) is dict
+            and frozenset(value[0])
+            == frozenset({"cohort", "current", "outcomes", "schema_version"})
+        ):
+            raise AssertionError("full legacy row list must not be hashed at once")
+        return original_hash_payload(value)
+
+    def refuse_legacy_expansion(_payload):
+        raise AssertionError("compact V2 path must not call legacy expansion")
+
+    def require_non_materializing_validation(payload, *, materialize_rows):
+        if materialize_rows is not False:
+            raise AssertionError("compact V2 validation must not retain legacy rows")
+        validated = original_validate_v2(payload, materialize_rows=False)
+        assert validated.expanded_rows is None
+        return validated
+
+    def require_lazy_row_iterable(values):
+        if type(values) in (list, tuple):
+            raise AssertionError("legacy V2 rows must enter the hasher lazily")
+        return original_array_sha256(values)
+
+    def refuse_raw_inventory_deepcopy(value, memo=None):
+        if (
+            type(value) is list
+            and value
+            and type(value[0]) is dict
+            and frozenset(value[0]) == frozenset({"event_id", "sha256"})
+        ):
+            raise AssertionError("compact V2 validation copied a raw inventory")
+        if memo is None:
+            return original_deepcopy(value)
+        return original_deepcopy(value, memo)
+
+    monkeypatch.setattr(stock_score_batch_module, "_build_payload", refuse_v1_builder)
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "hash_payload",
+        refuse_full_legacy_row_list,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_expand_payload_v2",
+        refuse_legacy_expansion,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_validate_payload_v2",
+        require_non_materializing_validation,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_canonical_json_array_sha256",
+        require_lazy_row_iterable,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "deepcopy",
+        refuse_raw_inventory_deepcopy,
+    )
+
+    envelope = build_stock_score_batch_envelope_v2(scores)
+    receipt = verify_compact_stock_score_batch_payload_v2(
+        envelope.to_payload(),
+        dispositions=scores,
+    )
+    assert receipt.canonical_row_list_sha256 == expected_legacy_digest
+    assert receipt.envelope_sha256 == envelope.sha256
+
+
+def test_v2_verification_receipt_is_exact_typed_and_non_authoritative():
+    scores = _single_sector_scores(20)
+    envelope = build_stock_score_batch_envelope_v2(scores)
+    receipt = verify_compact_stock_score_batch_payload_v2(
+        envelope.to_payload(),
+        dispositions=scores,
+    )
+    assert receipt.to_payload() == {
+        "authority": STOCK_SCORE_BATCH_AUTHORITY,
+        "canonical_row_list_sha256": envelope.canonical_row_list_sha256,
+        "envelope_sha256": envelope.sha256,
+        "production_authoritative": False,
+        "row_count": len(scores),
+        "schema_version": STOCK_SCORE_BATCH_V2_VERIFICATION_SCHEMA_VERSION,
+    }
+    assert receipt.sha256 == hash_payload(receipt.to_payload())
+
+    class StrSubclass(str):
+        pass
+
+    invalid_replacements = (
+        ({"row_count": True}, "positive exact int"),
+        (
+            {"canonical_row_list_sha256": StrSubclass("0" * 64)},
+            "exact str",
+        ),
+        ({"envelope_sha256": "not-a-digest"}, "SHA-256"),
+        (
+            {
+                "schema_version": StrSubclass(
+                    STOCK_SCORE_BATCH_V2_VERIFICATION_SCHEMA_VERSION
+                )
+            },
+            "schema_version",
+        ),
+        ({"schema_version": "wrong-schema"}, "schema_version"),
+        ({"authority": StrSubclass(STOCK_SCORE_BATCH_AUTHORITY)}, "authority"),
+        ({"authority": "wrong-authority"}, "authority"),
+        ({"production_authoritative": 0}, "non-production"),
+    )
+    for changes, message in invalid_replacements:
+        with pytest.raises(StockScoreBatchError, match=message):
+            replace(receipt, **changes)
+
+
+def test_v2_envelope_metadata_is_exact_typed_and_non_authoritative():
+    scores = _single_sector_scores(20)
+    envelope = build_stock_score_batch_envelope_v2(scores)
+
+    class StrSubclass(str):
+        pass
+
+    invalid_replacements = (
+        (
+            {"schema_version": StrSubclass(STOCK_SCORE_BATCH_V2_SCHEMA_VERSION)},
+            "schema_version",
+        ),
+        ({"schema_version": "wrong-schema"}, "schema_version"),
+        (
+            {"authority": StrSubclass(STOCK_SCORE_BATCH_AUTHORITY)},
+            "authority",
+        ),
+        ({"authority": "wrong-authority"}, "authority"),
+        ({"production_authoritative": 0}, "non-production"),
+        ({"production_authoritative": True}, "non-production"),
+    )
+    for changes, message in invalid_replacements:
+        with pytest.raises(StockScoreBatchError, match=message):
+            replace(envelope, **changes)
+
+
+def test_v2_verification_receipt_hashes_the_authenticated_snapshot(monkeypatch):
+    scores = _single_sector_scores(20)
+    envelope = build_stock_score_batch_envelope_v2(scores)
+    payload = envelope.to_payload()
+    original_canonical_json = stock_score_batch_module.canonical_json
+    mutated = False
+
+    def mutate_caller_after_serialization(value):
+        nonlocal mutated
+        serialized = original_canonical_json(value)
+        if value is payload and not mutated:
+            payload["authority"] = "mutated-after-authentication"
+            mutated = True
+        return serialized
+
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "canonical_json",
+        mutate_caller_after_serialization,
+    )
+    receipt = verify_compact_stock_score_batch_payload_v2(
+        payload,
+        dispositions=scores,
+    )
+
+    assert mutated is True
+    assert payload["authority"] == "mutated-after-authentication"
+    assert receipt.envelope_sha256 == envelope.sha256
+    assert receipt.envelope_sha256 != hash_payload(payload)
+
+
+def test_v2_score_batch_requires_the_exact_authenticated_rows():
+    scores = _single_sector_scores(20)
+    alternate = _single_sector_scores(40)
+    payload = build_stock_score_batch_envelope_v2(alternate).to_payload()
+    with pytest.raises(StockScoreBatchError, match="authenticated dispositions"):
+        verify_compact_stock_score_batch_payload_v2(
+            payload,
+            dispositions=scores,
+        )
+
+
+@pytest.mark.parametrize(
+    ("builder", "verifier"),
+    [
+        (build_stock_score_batch_envelope, verify_stock_score_batch_payload),
+        (build_stock_score_batch_envelope_v2, verify_stock_score_batch_payload_v2),
+    ],
+    ids=("v1", "v2"),
+)
+def test_expanding_score_batch_verifier_returns_only_authenticated_rows(
+    monkeypatch,
+    builder,
+    verifier,
+):
+    scores = _single_sector_scores(20)
+    alternate = _single_sector_scores(40)
+    expected_rows = tuple(item.to_payload() for item in scores)
+    payload = builder(scores).to_payload()
+    alternate_payload = builder(alternate).to_payload()
+    original_canonical_json = stock_score_batch_module.canonical_json
+    swapped = False
+
+    def swap_caller_after_authenticated_serialization(value):
+        nonlocal swapped
+        serialized = original_canonical_json(value)
+        if value is payload and not swapped:
+            payload.clear()
+            payload.update(deepcopy(alternate_payload))
+            swapped = True
+        return serialized
+
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "canonical_json",
+        swap_caller_after_authenticated_serialization,
+    )
+    returned_rows = verifier(payload, dispositions=scores)
+
+    assert swapped is True
+    assert payload == alternate_payload
+    assert returned_rows == expected_rows
+    assert len(returned_rows) == len(scores)
+
+
+@pytest.mark.parametrize(
+    ("builder", "verifier", "validator_name"),
+    [
+        (
+            build_stock_score_batch_envelope,
+            verify_compact_stock_score_batch_payload,
+            "_validate_compact_payload",
+        ),
+        (
+            build_stock_score_batch_envelope_v2,
+            verify_compact_stock_score_batch_payload_v2,
+            "_validate_compact_payload_v2",
+        ),
+    ],
+    ids=("v1", "v2"),
+)
+def test_compact_score_batch_receipt_uses_one_authenticated_snapshot(
+    monkeypatch,
+    builder,
+    verifier,
+    validator_name,
+):
+    scores = _single_sector_scores(20)
+    alternate = _single_sector_scores(40)
+    payload = builder(alternate).to_payload()
+    expected_payload = builder(scores).to_payload()
+    original_validator = getattr(stock_score_batch_module, validator_name)
+    swapped = False
+
+    def validate_then_swap(candidate):
+        nonlocal swapped
+        validated = original_validator(candidate)
+        payload.clear()
+        payload.update(deepcopy(expected_payload))
+        swapped = True
+        return validated
+
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        validator_name,
+        validate_then_swap,
+    )
+    with pytest.raises(StockScoreBatchError, match="authenticated dispositions"):
+        verifier(payload, dispositions=scores)
+    assert swapped is True

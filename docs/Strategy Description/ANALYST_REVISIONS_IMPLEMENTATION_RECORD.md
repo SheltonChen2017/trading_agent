@@ -26,9 +26,9 @@ CALIBRATION-PROTOCOL CANDIDATE IS ACCEPTED AFTER INDEPENDENT CLAUDE REVIEW
 AND CODEX COUNTER-REVIEW CORRECTION (SECTIONS 18-20); ITS NUMERIC
 CALIBRATION RECEIPT AND EVERY OUTCOME-BEARING ACTION REMAIN SEPARATELY
 GATED. THE OWNER-DIRECTED FOUR-FAMILY MULTIPLICITY RE-FREEZE (ARV2-3Q-F)
-IS IMPLEMENTED AS AN OUTCOME-FREE, CONTENT-ADDRESSED CANDIDATE PENDING
-INDEPENDENT CLAUDE REVIEW (SECTION 21). IT MAKES THE EFFECTIVE ANALYST
-ALLOCATION `1/80`, REFUSES FALLBACK TO THE SUPERSEDED-UNSPENT `1/60`, AND
+IS ACCEPTED AFTER INDEPENDENT CLAUDE REVIEW AND FOUR P3 HARDENING
+CORRECTIONS (SECTIONS 21-22); CODEX COUNTER-REVIEW IS NEXT. IT MAKES THE
+EFFECTIVE ANALYST ALLOCATION `1/80`, REFUSES FALLBACK TO THE SUPERSEDED-UNSPENT `1/60`, AND
 GRANTS NO DATA, OUTCOME, QC, DEPLOYMENT, OR TRADING AUTHORITY.
 THE ARV2-4 EVALUATION AND EVERY
 DATA, OUTCOME,
@@ -1998,6 +1998,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-02 | Codex implementation | `db2d8011` -> `ac6f06e4` (counter-review `317ebe03`; record commits follow) | Owner-approved ARV2-4D-A outcome-free power-calibration protocol | Retained and committed the section-17 counter-review, then froze the exact 10-bps/+1 bullish H20 effect, nominal 80%/two-sided 5% planning policy, 483-session pre-test calibration axis, lag-20 HAC and q05 component arithmetic, 1,388-session fixed capacity, closed disclosure contract, nine-node lineage, authenticated loader, and non-authoritative provisional helper. No input manifest, numeric receipt, successor binding, or action authority was created. | Protocol **94 passed, 1 host symlink skip**; protocol plus import firewall **210 passed, 1 skip in 118.28 s**; complete Analyst suite **666 passed, 3 skips in 167.60 s**; exact committed repository **7,162 passed, 15 skipped, 4 standing out-of-lane failures, 26 warnings in 1,321.04 s**. The failures are `ARV2-UNRELATED-001` and three date-relative Trading App sleeve-report assertions in the standing `ARV2WL-D11` family; documented, not fixed. Renderer/raw artifact SHA and diff checks are exact. No credential, provider row, licensed artifact, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | `ARV2I4DA-001` through `ARV2I4DA-007` P2 and `ARV2I4DA-008` through `ARV2I4DA-010` P3 corrected. Three independent final read-only audits accepted with no remaining P0-P3. | Revalidate the final record-only change, re-fetch and stop if the remote moved, then make exactly one combined push. Claude reviews `db2d8011..new_head`; Codex counter-reviews before any separately authorized ARV2-4D-B work. |
 | 2026-09-02 | Claude review and deferred-finding resolution | `35b3833` -> this commit | Independent review of ARV2-4D-A plus resolution of the section-13 deferred findings | Reviewed all four commits in `db2d801..35b3833` with an explicit disposition each (section 19); ARV2-4D-A accepted with no correction required. Verified rather than accepted: both recorded identities reproduce exactly (protocol ID `arv2-stock-power-calibration-protocol-0ba6b7d745783796`, artifact SHA-256 `ff16117a...f4a13`), all nine action capabilities are literal false, the loader cannot be called without the complete six-artifact reviewed ancestry, and the import firewall still reports zero forbidden roots. Separately resolved the whole-lane deferred findings: corrected `ARV2WL-D01`, `-D02`, `-D03`, `-D05`, `-D07`, `-D08`; documented `-D04`, `-D06`, `-D09`, `-D10` with the reason each must not be fixed on this branch; `-D11` remains out of lane per the owner scope rule. Added `tests/analyst_revisions_v2/test_dormant_etf_portfolio_arithmetic.py`. No committed artifact was re-serialised and no frozen shared file was touched. | New dormant-arithmetic file **14 passed**; active-document gate **69 passed**; focused ARV2 batteries green; full-tree suite result recorded in this push's commit message; compileall exit 0; `git diff --check` clean. Mutation evidence: ignoring the ETF cap in water filling (3 failed), dropping the cost impact term (1), ignoring the coverage denominator (2), dropping the weight from the weighted score (1), disabling the firm-normalization census (1), and removing the snapshot sidecar refusal (1) all turn the new tests red; restoring turns them green. No provider, credential, licensed row, price, return, outcome, broker, operator-database, QuantConnect or scheduler access. **0 research looks.** | 0 P0, 0 P1, 0 P2, 0 P3 against the reviewed range. Two self-corrections are recorded rather than hidden: the first `ARV2WL-D03` test did not discriminate its own fix, and investigation showed the fail-open is unreachable because `mapped` is rounded during accumulation, so the test now pins the real boundary property and the change is labelled hardening; and the first `ARV2WL-D05` comment claimed the hard caps were re-checked exactly when they are re-checked with tolerance, so it now states what the code enforces. `ARV2WL-D10` was attempted and correctly abandoned after finding that the tightened byte check would reject a reviewed hash-pinned artifact whose root keys are unsorted. | Codex counter-reviews this exact pushed head. ARV2-4D-B stays unauthorised pending a separately reviewed input-manifest schema and calibration-input authority. The four deliberately unfixed findings are owner or ARV2-5 decisions, and the two-reviewer ownership question in `ARV2R5-002` is still open. |
 | 2026-09-02 | Codex counter-review and implementation | `10ce9196` -> this validation commit (`7b804e7` counter-review; `89f385c` ARV2-3Q-F candidate) | Accept Claude's ARV2-4D-A/deferred-finding review after correction; implement the owner-directed four-family multiplicity overlay | Counter-reviewed Claude's sole commit commit-by-commit and cumulatively, corrected its exact-coverage, allocator, authority, census, test-sensitivity, and record defects, then implemented the additive four-lane `1/20` family overlay with a permanent `1/80` Analyst maximum, expiring/nontransferable slots, authenticated supersession of the old unspent `1/60`, immutable QC ancestry, and no fallback or action authority. No accepted ancestor or out-of-lane code was changed. | Counter-review battery **217 passed, 1 skip**; ARV2-3Q-F plus firewall **212 passed, 5 skips**; complete Analyst V2 **782 passed, 8 skips**; exact committed repository **7,279 passed, 20 skipped, 3 standing `ARV2WL-D11` out-of-lane failures, 25 warnings in 3,008.37 s**; active-document **69 passed**; compileall and diff checks clean. No provider, credential, licensed row, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | Counter-review: 0 P0, 0 P1, 3 P2 and 6 P3, all corrected (`ARV2CR13-001..009`). ARV2-3Q-F self-review: 0 P0, 0 P1, 1 P2 and 4 P3, all corrected (`ARV2QF-001..005`). Three independent final audits found no remaining P0-P3. The three unrelated Trading App failures were documented and not fixed. | Commit this exact validation record, fetch only the lane remote and require it still equals `10ce9196`, then push the complete local range exactly once. Claude independently reviews every pushed commit; Codex counter-reviews before any later milestone. ARV2-4D-B and every data/outcome/QC/deployment/trading action remain unauthorized. |
+| 2026-09-02 | Claude independent review | `d2aefe6f` -> `64edf355` (corrections) + this record commit | Independently review Codex counter-review `7b804e7b`, the ARV2-3Q-F four-family multiplicity candidate `89f385cd`, and its validation record `d2aefe6f` | Disposed all three commits individually and cumulatively; reproduced the semantic SHA-256 `54ab0bb6...`, artifact SHA-256 `2e9f390e...`, exact `1/20` / `1/80` rationals, expiry-without-transfer semantics, byte-unchanged `1/60` and ARV2-4D-A artifacts, no-fallback authority, constant-false capabilities, null bindings, and the additive acyclic leaf first-hand; confirmed `7b804e7b` only strengthens (the 52-digit coverage fail-open reproduced against `10ce9196`). Corrected four P3 hardening/test-sensitivity findings in the overlay module and its battery only (`ARV2R12-001..004`); documented five in-lane P3 observations (`ARV2R12-D01..D05`) and the standing out-of-lane `ARV2WL-D11` failures without fixing them. | As-received `d2aefe6f`: focused **280 passed, 5 skips**; complete repository **7,279 passed, 20 skipped, 3 standing `ARV2WL-D11` out-of-lane failures, 25 warnings**. Final tree `64edf355`: overlay **116 passed, 5 skips**; overlay plus firewall **232 passed, 5 skips**; complete Analyst V2 **894 passed, 8 skips**; complete repository **3 failed, 7299 passed, 20 skipped, 25 warnings in 1572.05s (0:26:12)** (same three out-of-lane failures); active-document **69 passed in 1.70s**; seven reverse mutations red then green; compileall and diff checks clean. No provider, credential, licensed row, price, return, outcome, QC action, deployment, broker, scheduler, order, UI, or Streamlit access; **0 research looks and 0 development evaluations**. | 0 P0, 0 P1, 0 P2, 4 P3 corrected, 5 P3 documented; Codex counter-review `7b804e7b` accepted, `89f385cd` accepted after correction, `d2aefe6f` accepted. | Commit this record, fetch only the lane remote and require it still equals `d2aefe6f`, then push exactly once. Codex counter-reviews every Claude commit. ARV2-4D-B and every data/outcome/QC/deployment/trading action remain unauthorized. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -3697,3 +3698,167 @@ commits. Codex then counter-reviews every Claude commit. ARV2-4D-B still needs
 a separately reviewed input-manifest schema plus exact calibration-input,
 rights, lineage, and nuisance-only computation authority. No data, outcome,
 QC, paper, funded, deployment, or trading action may occur from this candidate.
+
+## 22. Independent Claude review of Codex counter-review `7b804e7b` and the ARV2-3Q-F candidate, 2026-09-02
+
+**Range reviewed:** `10ce9196..d2aefe6f`, three commits, each disposed below.
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, 0 P2, **4 P3
+corrected** (`ARV2R12-001..004`), 5 P3 documented. The declared policy,
+identities, lineage, and authority surface were all reproduced first-hand and
+match the owner's verification list exactly; every correction is a
+defence-in-depth or test-sensitivity hardening of the overlay module and its
+battery, and the artifact bytes and all three identities are unchanged.
+**Zero research looks and zero development evaluations.** No provider,
+credential, licensed row, price, return, outcome, broker, operator-database,
+QuantConnect, upload, scheduler, order, UI or Streamlit access occurred, and
+none was reachable: every production authority is empty or zero-access and
+every action capability is literal false.
+
+**Quality: ARV2-3Q-F candidate 9/10** - a faithful, fail-closed encoding of
+the owner's four-lane decision with exact rationals, an additive acyclic leaf,
+and a loader that survived every forge, crafted-byte, TOCTOU and junction probe
+executed against it; the deductions are for semantic guards that were shadowed
+by the byte pin and therefore untested. **Codex's counter-review `7b804e7b`
+9.5/10** - it found a genuine residual fail-open in this reviewer's prior
+coverage fix (a 52-digit book strictly below 99% was still eligible because
+the aggregates were already context-rounded), reproduced here by executing the
+`10ce9196` implementation, and every other correction strictly strengthened.
+
+### 22.1 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `7b804e7b` | Accepted | Codex's counter-review of Claude commit `10ce9196`. Audited line by line against its base: it **only strengthens**. `mapped_candidate_coverage` now sums row weights as exact `Fraction` **before** any 50-digit Decimal arithmetic, so the eligibility decision no longer sees context-rounded aggregates (ARV2CR13-001, a genuine residual fail-open in the prior fix that this review missed); `FirmRatingNormalizationResult.source_census` is now required, integer-checked and count-checked (ARV2CR13-004); the water-filling test now demands a genuine second redistribution round (mid/low both reach exactly 0.20 with exact 0.40 cash) instead of the weaker "equal and under cap" assertion; the stock-score authority test now separately exercises clone, fresh-artifact mutation, source substitution, foreign policy and foreign dataset; the tolerance is regression-pinned at `1e-18` and its comment now states honestly that it is not yet bound into the policy hash (ARV2-5 decision). All 15 removed test lines were replaced by strictly stronger assertions; no guard was loosened and no public signature outside the lane changed. |
+| `89f385cd` | Accepted after correction | The ARV2-3Q-F four-family multiplicity overlay: `four_family_multiplicity.py` (780 lines), the content-addressed structural artifact, a 30-test battery, and the firewall closure/allowlist registration of the new module and its private authority registry. Independent verification in 22.2. |
+| `d2aefe6f` | Accepted | Record-only (section 21.4/21.5 and the final ledger row, 12 insertions, 3 deletions). Its validation claims match my independent reproduction below. |
+
+### 22.2 Independent verification of ARV2-3Q-F
+
+Every item on the owner's verification list was reproduced first-hand from the
+committed bytes, not from the record:
+
+- **Identity:** the artifact-byte SHA-256 is exactly
+  `2e9f390ec54f01e6635b67972711c38212a5f853489e16c1de2a508212278648`; the
+  semantic SHA-256 recomputed with the module's recipe (null `overlay_id` and
+  `overlay_hash`, `sort_keys`, `(",", ":")`, `ensure_ascii=False`,
+  `allow_nan=False`, UTF-8) is exactly
+  `54ab0bb69fb6fa162ca3ba6764864b230136c68c017f1e6b669034dda75b806e`, and the
+  ID is its 16-hex prefix under `arv2-four-family-multiplicity-`. The
+  checked-in bytes equal `render_expected_four_family_multiplicity_overlay()`
+  byte for byte, and the pretty renderer round-trips the parsed document to the
+  identical bytes.
+- **Policy values:** the loader, fed the real overlay, `permanent_look_authority.json`
+  and `arv2_qc_first.draft.json`, returns `shared_family_alpha = 1/20`,
+  `analyst_confirmatory_alpha_ceiling = 1/80`,
+  `analyst_prospective_look_alpha = 1/80` as exact `Fraction`s. The artifact
+  stores every alpha as a reduced `{numerator, denominator}` rational and
+  `_fraction` refuses unreduced, zero, negative, float or extra-key forms;
+  `_validate_arithmetic` requires `4 * (1/80) == 1/20`, the Analyst allocation
+  sum `<= 1/80`, equal to the declared `allocation_sum`, and the allocation
+  inventory equal to the permanent look inventory. The whole document is also
+  pinned to the module constant by `_require_exact`, so a single-field edit
+  refuses twice.
+- **Expiry, no transfer:** `slot_reallocation` is `transferable=false`,
+  `unused=EXPIRES`, `withdrawn=EXPIRES`, `redistribution=PROHIBITED`,
+  `denominator_recomputation=PROHIBITED`; the per-lane maximum is a constant
+  `1/80` with no lane-count-dependent recomputation anywhere in the module, and
+  the fixed four-lane inventory is pinned by ID and count.
+- **Supersession without fallback:** `arv2_qc_first.draft.json` and every other
+  pre-existing spec artifact are byte-identical across the range (`git diff
+  --stat 10ce9196 d2aefe6f -- specs/` shows only the new overlay file). The
+  loader authenticates the old plan through its own loader and then
+  `_validate_parent_state` requires the superseded `1/60`, three-lane factor,
+  Bonferroni label, the single look ID, null period/epoch/power-plan fields,
+  `deployment_authorized=false`, and `confirmatory_alpha_spent=false` on both
+  historical stages; any other state refuses. `require_loaded_four_family_
+  multiplicity_overlay(None)` and every unauthenticated object refuse with no
+  `1/60` path: the three positive getters exist only on the authenticated
+  overlay and return constants.
+- **ARV2-4D-A unchanged:** `arv2_stock_power_calibration_protocol.structural.json`
+  (SHA-256 `ff16117a…`) was last touched at `ac6f06e4`, before this range; its
+  `two_sided_size = 1/20` planning field is untouched, the overlay excludes the
+  power protocol from its parent set and records
+  `development_evaluations_consume_confirmatory_alpha=false`.
+- **Capabilities and bindings:** all 12 artifact capabilities are literal
+  `false`, all 14 external bindings `null`, and the seven runtime accessors
+  (`grants_action_authority` plus six `*_available`) are constant `False` with
+  no data-dependent path.
+- **Authority surface:** `copy.copy` refuses at the weak-reference registry,
+  `copy.deepcopy` and `pickle` refuse on the frozen mapping proxy, and
+  `require_…` rejects subclasses by exact type and stale IDs by identity plus
+  fingerprint; every authority use re-reads all four pinned files.
+- **Lineage:** the artifact's DAG is PDF -> qc_base -> qc_first_plan ->
+  overlay, child-to-parent, overlay a leaf; no reviewed node or edge changed,
+  and the overlay does not re-pin the fold manifest, stock specs, or 4D-A leaf.
+- **Firewall:** the new module is registered in the transitive closure and its
+  `_FOUR_FAMILY_MULTIPLICITY_AUTHORITIES` registry in the private-state
+  inventory; no execution, ML, network or legacy root is reachable.
+
+### 22.3 Findings
+
+| ID | Pri | Status | Location | Issue and impact | Correction | Verification |
+|---|---|---|---|---|---|---|
+| ARV2R12-001 | P3 | **Corrected** | `four_family_multiplicity.py` `_validate_arithmetic` | The Analyst `within_lane_confirmatory_alpha_ceiling` was never bound to the shared `permanent_maximum_per_lane`, and `look_budget` was never bound to the look inventory. With the exact-literal match bypassed (the pattern the existing over-ceiling regression uses), a `1/79` ceiling with a `1/79` allocation and a `look_budget` of 2 were accepted. On the checked-in tree both are refused twice (artifact SHA pin, `_require_exact`); the guard becomes load-bearing exactly when a reviewed successor relaxes the literal match under the artifact's own "bind or subdivide this allocation, never add alpha" policy. | Added `ceiling != lane_alpha` and `look_budget != len(permanent_look_ids)` refusals with a comment naming the failure direction; two bypass-exact regressions. The real artifact still loads and no identity changes. | Removing each guard reddens its regression (1/1); restored green. |
+| ARV2R12-002 | P3 | **Corrected** | `tests/analyst_revisions_v2/test_four_family_multiplicity.py` | The alpha-constant closure, `_validate_parent_state` (the superseded-unspent `1/60` tombstone) and `_validate_zero_look_authority` had no independent test sensitivity: neutralising each left the 96-test battery green, because the parent and look-authority byte pins shadow them. Two independent lens audits measured this; one rated the tombstone gap P2 because that check is the only guard the moment the parent constants are re-pinned to a re-frozen plan. Section 21.3 `ARV2QF-004`'s "load-bearing" wording was accurate only for the within-lane ceiling line. | Added a self-consistent `1/10` family / `1/40` lane refusal; five weakened-parent stubs (spent stock stage, revived `1/40` alpha, started paper period, deployment authorised, two-lane factor) delivered through a patched nested loader, all refusing `parent state cannot be authenticated`; and a re-pinned positive look authority refusing on the semantic guard alone. | Neutralising the three guards reddens 1 / 5 / 1 regressions; restored green. |
+| ARV2R12-003 | P3 | **Corrected** | `tests/analyst_revisions_v2/test_four_family_multiplicity.py` | Link refusal had zero executed coverage on the supported Windows host: all five symlink tests skip for lack of privilege (`WinError 1314`) and there was no junction case, although `_is_link_like` handles junctions and refuses them when exercised directly. | Added junction-based regressions via `_winapi.CreateJunction` (no privilege required) for a junctioned ancestor directory and for each supplied path individually; they skip outside Windows. | Removing the parent-chain link check reddens all 4; restored green. The 5 symlink skips remain and are now backed by executed junction coverage. |
+| ARV2R12-004 | P3 | **Corrected** | `tests/analyst_revisions_v2/test_four_family_multiplicity.py` | The seven action accessors are literal `return False`, but nothing pinned that: rewriting one to read the artifact's `capabilities` survived because the data is also false. | AST regression asserting each accessor body is exactly one literal `return False`. | Making `orders_available` data-dependent reddens it; restored green. |
+
+### 22.4 Documented, not fixed
+
+| ID | Pri | Location | Observation |
+|---|---|---|---|
+| ARV2R12-D01 | P3 | `holdings.py:715-726` | `CoverageResult.coverage` is still the 50-digit-rounded Decimal quotient, so a 52-digit book strictly below 99% now reports `coverage == minimum_coverage == 0.99` beside `eligible=False`. It fails closed and `require_verified_holdings_evidence` recomputes eligibility rather than deriving it from `coverage`; the only risk is a future presenter reading the rounded diagnostic as the decision. ARV2-5 may carry the exact rational or mark the field as rounded. Not introduced by `7b804e7b`; made observable by its correct fix. |
+| ARV2R12-D02 | P3 | `four_family_multiplicity.py:385-395` | `_parse_artifact` wraps only Unicode and JSON decode errors. With the byte pin bypassed in memory, a 5,000-digit integer raises the raw interpreter digit-limit `ValueError` and 100k-deep nesting raises `RecursionError`. Fail-closed, and the SHA pin refuses first in production; typed-error tidiness only. |
+| ARV2R12-D03 | P3 | `four_family_multiplicity.py` | Several layers (overlay artifact SHA pin, content-identity check, the type-plus-sentinel check and dead-weak-reference check in `require_…`) have no individual mutation sensitivity because a stronger neighbouring layer shadows each. This is deliberate defence in depth and is recorded so the redundancy stays a conscious choice. |
+| ARV2R12-D04 | P3 | `four_family_multiplicity.py:560-567, 693` | `overlay.definition` is readable without calling `require_…`, and the nested QC-first loader receives the caller's unresolved path rather than the resolved one. Both are harmless today (no consumer exists; post-nested byte revalidation and content-hash equality close the window); the composing milestone should state the "call `require_` first" convention. |
+| ARV2R12-D05 | P3 | future paper-ready freeze | The prospective look's power plan must be computed at two-sided `1/80` (`effective_power_plan_alpha_field`); the ARV2-4D-A `z_0.975` planning at `1/20` does not transfer. The overlay already encodes this; noted so the ARV2-8 freeze does not assume it. |
+
+**Out-of-lane, documented and not fixed:** the three standing `ARV2WL-D11`
+Trading App sleeve-report assertions (`tests/test_sleeve_report.py`) remain
+the only repository failures; no Trading App code or test was touched.
+
+### 22.5 Validation
+
+- Semantic identity, artifact identity, renderer equality, loader
+  acceptance, policy getters, capability accessors, and forge refusals were
+  reproduced first-hand from the committed bytes (section 22.2).
+- As-received focused batteries on the exact pushed tree `d2aefe6f` (overlay,
+  dormant arithmetic, ratings ingest, dataset/firewall): **280 passed, 5 host
+  symlink skips**.
+- Complete repository suite on the exact as-received tree `d2aefe6f`: **7,279
+  passed, 20 skipped, 3 failed, 25 warnings in 1,487.80 s** in a pinned
+  base-temp; the three failures are the standing out-of-lane `ARV2WL-D11`
+  Trading App sleeve-report assertions, identical to section 21.4. Every
+  Analyst test passed as received.
+- Corrected overlay file on the final tree: **116 passed, 5 host symlink
+  skips** (96 as received plus 20 `ARV2R12` regressions); overlay plus
+  dataset/import-firewall battery **232 passed, 5 skips**.
+- Complete Analyst V2 battery (`tests/analyst_revisions_v2`, contracts,
+  preregistration) on the final tree `64edf355`: **894 passed, 8 host skips
+  in 286.97 s**.
+- Complete repository suite on the exact final code tree `64edf355`: **3 failed, 7299 passed, 20 skipped, 25 warnings in 1572.05s (0:26:12)** in a pinned base-temp; the only failures are the same three standing out-of-lane `ARV2WL-D11` Trading App sleeve-report assertions, and every Analyst test passes.
+- Active-document consistency on the stabilised section 22:
+  **69 passed in 1.70s**
+- Reverse mutation on the final tree: removing the ceiling binding, the
+  look-budget binding, the alpha-constant check, the parent tombstone check,
+  the zero-look semantic guard, the parent-chain link check, and one literal
+  accessor reddens 1 / 1 / 1 / 5 / 1 / 4 / 1 regressions respectively; the
+  module was restored byte-exact after each and the battery is green.
+- `compileall` over the Analyst package and tests exits 0; `git diff --check`
+  clean; staged blobs verified LF; Python 3.12.13. The only production change
+  is fifteen added lines in `four_family_multiplicity.py`; the artifact bytes,
+  every spec artifact, and every frozen or shared document are untouched.
+- Independent lens audits (loader/forge, policy semantics, counter-review
+  corrections) were run read-only with pinned base-temps and left the
+  worktree clean; every finding above was verified by this reviewer before
+  disposition. **Zero research looks and zero development evaluations.**
+
+### 22.6 Next step
+
+Codex counter-reviews this exact pushed head. ARV2-4D-B remains unauthorized
+and needs a separately reviewed input-manifest schema plus exact
+calibration-input, rights, lineage, and nuisance-only computation authority.
+The four-family overlay is a candidate pending Codex counter-review; a future
+outcome-bearing composition must authenticate both the overlay and the 4D-A
+leaf independently. No credential, provider, outcome, QC, paper, funded,
+deployment, or trading access is authorized, and none was used here.

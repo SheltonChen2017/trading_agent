@@ -1,22 +1,16 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE IB-0/IB-1 STRUCTURAL SLICE, BOUNDED IB-1A THROUGH IB-1H
-OFFLINE EVIDENCE CONTRACTS, AND IB-1I ZERO-AUTHORITY FOUR-FAMILY RESEARCH
-GATE ARE IMPLEMENTED. CLAUDE'S REVIEW COMMIT `2c392cd3` IS COUNTER-REVIEWED
-AND ACCEPTED AFTER THE LANE-RECORD CORRECTIONS IN SECTION 38. ITS TWO NEW
-CONSTANT-DRIFT REGRESSIONS ARE LOAD-BEARING; NO PRODUCT-CODE CORRECTION WAS
-REQUIRED. NO NEW IMPLEMENTATION MILESTONE IS AUTHORIZED. FULL CONFIRMATORY
-PREREGISTRATION REMAINS OWNER-DECISION-BLOCKED, NO CONFIRMATORY CELL OR
-PERMANENT LOOK IS ALLOCATED, AND OUTCOME, QC, INTEGRATION, CAPITAL,
-DEPLOYMENT, AND TRADING AUTHORITY REMAIN EXACTLY ZERO. IB-1 REMAINS
-INCOMPLETE: REAL PACKAGE ACQUISITION AND FULL HISTORICAL POPULATION ARE
-UNSTARTED, WHILE CALLER-SUPPLIED ARCHIVE/MEMBER HASHING, INVENTORY
-VALIDATION, RAW PUBLICATION, AND PROVISIONAL-REPORT PUBLICATION ARE
-IMPLEMENTED OFFLINE. OFFICIAL SEC PROFILE, REAL PACKAGE, AUTHENTICATED
-AMENDMENT LINK, COMPLETE AMENDMENT COVERAGE, POINT-IN-TIME SECURITY IDENTITY,
-NORMALIZATION, AGGREGATION, THE `$50,000` GATE, SIGNAL CONSTRUCTION, OUTCOME
-TESTING, ETF PORTFOLIO WORK, AND QC IMPLEMENTATION REMAIN UNPROVEN OR
-UNSTARTED.**
+Status: **IB-2A OBSERVED IDENTITY INVENTORY IS IMPLEMENTED AT ZERO AUTHORITY
+IN `5c74bdee`, AFTER CODEX COUNTER-REVIEWED CLAUDE'S IB-1I REVIEW IN
+`726c4dcf`. THE NEW FACTORY-BOUND CONTRACT NORMALIZES OBSERVED FILING,
+REPORTING-OWNER, AND TRANSACTION ROWS, RETAINS JOINT OWNERS WITHOUT
+OWNER-BY-TRANSACTION FAN-OUT, QUARANTINES MISSING/MULTIPLE/INCOMPLETE OWNER
+SETS, AND PRESERVES ORIGINAL/AMENDED FILING LINEAGE. THIS IS NOT FULL IB-2:
+ISSUER/OWNER/SECURITY/TRANSACTION RESOLUTION, TICKER OR SHARE-CLASS MAPPING,
+DEDUPE/MERGE, AUTHENTICATED AMENDMENT AUTHORITY, CANONICAL FILTERING,
+AGGREGATION, THE `$50,000` GATE, OUTCOMES, ETF/QC WORK, DEPLOYMENT, CAPITAL,
+AND TRADING AUTHORITY REMAIN UNPROVEN OR EXACTLY ZERO. CLAUDE MUST REVIEW THE
+EXACT PUSHED RANGE BEGINNING AFTER `2c392cd3`.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -4876,3 +4870,88 @@ before a new milestone and before its single combined push. The owner must
 supply the missing bounded decision before implementation resumes. All
 provider, outcome, QC, operational, deployment, capital, and trading authority
 remains exact zero.
+
+## 39. Codex counter-review and IB-2A observed identity inventory (2026-09-03)
+
+### 39.1 Scope and commit disposition
+
+The owner's later instruction to implement the next milestone superseded the
+section 38.5 stop only for bounded, offline **IB-2A observed identity
+inventory** work. Codex stayed in
+`C:\git\customizedAgent\trading_agent_insider` on
+`codex/strategy-insider-buying` without switching branches. Claude commit
+`2c392cd3` is accepted after the append-only record corrections in `726c4dcf`;
+the implementation snapshot is `5c74bdee`. No project-wide coordination file
+was changed.
+
+One additional P3 record finding, **IB1I-CCR06**, is closed here without code
+change: section 37.8's claimed exhaustive carry-forward was stale. `IBFL-02`
+had already closed when the contract adopted 30 **trading** days; `IBFL-03`'s
+claim that all of blueprint step 19.4.1 was unstarted was superseded by IB-1G
+and IB-1H, although real acquisition, full population, and canonical filtering
+remain unstarted; and the list omitted active `IB0H-R07`, `IB1H-R02`,
+`IB1H-R03`, `IB1D-CR07A`, and out-of-lane `IB0H-OOL01`. Historical text is
+retained and this paragraph is the superseding disposition.
+
+### 39.2 Implemented contract
+
+`form4_observed_identity_inventory.py` exposes factory-created frozen filing,
+reporting-owner, and transaction inventories from retained IB-1E evidence and
+the public IB-1G rebuild. It independently reparses evidence, fingerprints
+inputs before and after use, binds report rows and payload hashes back to the
+retained transactions, validates accession and amendment lineage, and emits
+named single-owner, missing-owner, multiple-owner, and incomplete-owner-set
+outcomes. Joint owners are retained as owners of one filing and are never
+cross-multiplied into synthetic transaction rows. All point-in-time resolution,
+canonical-selection, aggregation, outcome, QC, deployment, and trading flags
+remain false; authorized and consumed research looks remain zero.
+
+This milestone deliberately does **not** perform identity resolution, ticker or
+share-class mapping, deduplication, amendment replacement, canonical filtering,
+lot aggregation, or the `$50,000` gate. It therefore does not satisfy full IB-2
+or blueprint section 19.4 step 5.
+
+### 39.3 P0-P3 implementation review ledger
+
+| ID | Priority | Status | Finding and correction |
+|---|---|---|---|
+| IB2A-R01 | P2 | **Closed in `5c74bdee`** | Evidence reads had a validation/use TOCTOU and incomplete observation fingerprint. Exact before/after fingerprints now bind all retained XML sources, supplied links, lineages, and timestamp precision. |
+| IB2A-R02 | P2 | **Closed in `5c74bdee`** | A forged public report could spoof upstream identity or row semantics. The builder now performs an independent upstream reparse and binds exact report state, source rows, payload hashes, and factory identity. |
+| IB2A-R03 | P2 | **Closed in `5c74bdee`** | Forged candidates could bypass amendment or non-single-owner quarantine. Candidate disposition is recomputed from retained evidence and named fail-closed owner-set outcomes. |
+| IB2A-R04 | P2 | **Closed in `5c74bdee`** | Amendment/accession and row-cardinality invariants were incomplete. Targets must be unique earlier originals for the same issuer, lineage times must be unique, and transaction indexes are contiguous. |
+| IB2A-R05 | P2 | **Closed in `5c74bdee`** | Callback-bearing or malformed structures could exploit projection, serializers, metaclasses, cycles, depth, or unbounded prehash work. Exact type/state allowlists and shared byte/text/node/depth/count budgets now fail closed. |
+| IB2A-R06 | P3 | **Closed in `5c74bdee`** | Public errors, exact integer/cardinality rules, zero-owner completeness, constructor gate order, exports, and mutation-test sensitivity were tightened. |
+
+Three independent final reviews accepted the corrected implementation with no
+remaining P0-P3 finding in scope. The known sleeve-clock failures are outside
+this lane and remain documented as `IB0H-OOL01`; they were not changed.
+
+### 39.4 Verification and authority accounting
+
+Python **3.13.14**, pytest **9.1.1**. Focused IB-2A: **97 passed**. Targeted
+adversarial artifact/callback mutations: **22 passed, 75 deselected**. Complete
+ten-file Insider suite: **894 passed, 8 skipped in 319.19s**. The implementation
+staged diff passed `git diff --check`; its value-shaped secret scan found **0
+matches**. No SEC/provider endpoint, credential, licensed row, real filing,
+outcome, QuantConnect action, broker, operator database, scheduler, deployment,
+order, or UI was accessed. **Research looks: 0.**
+
+Implementation quality is **9/10**: the boundary is strongly fail-closed and
+mutation-sensitive, while real authority and full IB-2 resolution remain
+intentionally absent and the offline implementation still couples to a private
+upstream reparse boundary.
+
+### 39.5 Copyable Claude review handoff
+
+> Review every commit in `2c392cd3..HEAD` on
+> `codex/strategy-insider-buying`, specifically Codex counter-review commit
+> `726c4dcf`, IB-2A implementation commit `5c74bdee`, and the following record
+> commit. Reproduce all material claims and mutation-test the dangerous
+> directions: evidence/report TOCTOU, forged factory identity, report semantic
+> or payload-hash drift, owner-set escalation, amendment-lineage confusion,
+> joint-owner fan-out, cycle/depth/resource bypass, and any authority becoming
+> true. Confirm observed-only filing/owner/transaction normalization and exact
+> zero looks/authority. Document findings in this record; fix only
+> Insider-lane defects. Do not access SEC/provider data, credentials, licensed
+> rows, outcomes, QuantConnect, broker, operator database, scheduler,
+> deployment, capital, or trading authority.

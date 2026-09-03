@@ -559,6 +559,7 @@ known.
 | 2026-09-02 | Claude lane-issue closure under owner request | `87384c09c32b3515931597ded12c961491676639` -> this round's head | Close the actionable open lane findings; no milestone | Censused all 109 finding rows and found 8 open. Closed three that were stale rather than unresolved (`TPR-CR1-001` after the owner-approved `*.pdf binary` fix, `TPR-CR8-001` after the alpha relaxation, `TPR-CR11-002` because both sides of its dispute were host-scoped). Corrected and widened `TPR-CCR1-006`'s evidence while leaving it open, adding the previously unrecorded page-27 canonical-worktree pin. Added an open-issue register to section 8 and a guard binding it to the finding rows in both directions. No product, provider, source, or outcome code changed. | Lane plus shared document suites and the complete-suite, compile and hygiene evidence are in section 34.7. Four mutations on the new guard each turned it red with byte-identical restores returning it green. Closures verified against the tree: blueprint digest, Git attributes, `git diff --check` and text extraction; the two surviving alpha conditions read directly; and a renderer census showing the bundled `pdftotext` is Xpdf 4.06 rather than poppler. Provider/outcome accesses **0**; authorized/spent looks **0**. | Five findings remain open and are now listed in one place: `TPR-CCR1-004`, `TPR-CCR1-005`, `TPR-CCR1-006`, `TPR-CCR2-011`, `TPR-CCR5-004`. None is P0 or P1 and none can be closed by a reviewer acting alone. | None; all source, outcome, look, QC, broker, paper, live and capital authority remains zero. | Codex counter-reviews this round. The five open findings need owner decisions, an authorized artifact rewrite, or an authorized trust-root implementation; TPR-1 and TPR-0B remain blocked. |
 | 2026-09-02 | Codex counter-review, cross-machine integration, and incomplete implementation checkpoint | `a63335d38bfd6dd3b584d7a91ba0b454e97a6df4..25c1c378448bf41a60c31a81e11ca398354c36d0` reviewed; code checkpoint `20e20d7f68d39d17af84d6a5c65e22b78dc57eb1`; integration `70dc50258a748a5d6d9577a548bff2f85dcff3b4` -> record candidate | Counter-review four Claude commits and integrate only a non-authorizing TPR-TR0-I candidate | Preserved both machine histories with a normal merge, corrected current routing and the open register, closed code-local trust hazards, and recorded two owner-level P1 blockers plus the incomplete validation matrix. The empty registry alone migrated to v2; no positive entry or external trust artifact was created. | Integrated Target Price plus active-document suite **320 passed, 3 skipped in 41.17s**; focused trust/ACL/preregistration/import suite **234 passed, 3 skipped in 26.44s**; document guard **17 passed in 2.33s**; target compile exited 0; `git diff --check` clean; PDF/candidate identities unchanged. Python 3.14.6 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | Section 35 records every disposition. Open lane findings are exactly the section 8 register: `TPR-CCR1-006`, `TPR-CCR2-011`, `TPR-CCR5-004`, `TPR-CCR10-012` (P1), `TPR-CCR10-013` (P1), and `TPR-CCR10-016` (P2). TPR-1 and TPR-0B remain blocked. | None. No key provisioning, positive reviewed-algorithm authority, source, outcome, look, QC, broker, paper/live, deployment, capital, or trading authority. | Commit the record/guard correction, rerun exact final guards and hygiene, make one combined push, then Claude reviews the range beginning after `25c1c378`. Another machine may continue only after the two owner-level trust decisions are approved. |
 | 2026-09-03 | Claude review | `25c1c378448bf41a60c31a81e11ca398354c36d0..5f98c3aa` reviewed; corrections `26a4fc6f` and `34aa8eda` on this same lane branch | Independent review of the incomplete TPR-TR0-I integrated checkpoint | Reviewed all four commits individually plus the cumulative tree. Audited `trust_root.py` and `windows_acl.py` line by line and every named focus area. Found and corrected one P2: `EMPTY_REVIEW_REGISTRY_BYTES` was built without the LF terminator this lane's canonical contract requires, so it could never byte-equal a stored registry and the empty-registry guard was unreachable dead code. Verified the merge a clean union against both parents, the open register exactly the six declared findings, and the empty non-authorizing registry state preserved on the tree. | Focused lane and document suites on the exact final tree **252 passed, 3 skipped in 26.93s**; document guards **17 passed in 6.99s**; `compileall` on `research/target_price_revisions` and `tests/target_price_revisions` exit 0; `git diff --check` clean; committed blobs verified pure LF (0 CRLF, 0 lone CR); candidate `17a2a902…`, source authority `9d926482…`, look authority `0354c96d…` and PDF `f6e98eef…` unchanged, registry `f7131a7c…` unchanged from the received v2 bytes. Four register-guard mutations each detected with byte-identical restore; the `TPR-CR12-001` regression verified red on a byte-identical revert. **The complete suite was deliberately not run on the final tree at the owner's direction for token budget**; the last complete run is the received pre-correction tree at **6,917 passed, 13 skipped, 3 failed in 1,360.49s**, whose three failures are the out-of-lane `TPR-OOL-009` sleeve-report cases with no Target-Price test failing. Python 3.14.6, pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | All four commits accepted after correction. No P0 and no P1. `TPR-CR12-001` (P2) closed. Counter-reviewed round quality **9/10**. Open lane findings remain exactly the section 8 register: `TPR-CCR1-006`, `TPR-CCR2-011`, `TPR-CCR5-004`, `TPR-CCR10-012` (P1), `TPR-CCR10-013` (P1), `TPR-CCR10-016` (P2). The three sleeve-report failures remain out-of-lane under `TPR-OOL-009` and were deliberately not fixed. Details in section 36. | None. No key, allowed-signers file, trust directory, rollback pin, signed commit, positive registry entry, source, outcome, look, QC, broker, paper/live, deployment, capital or trading authority. | Codex counter-reviews this round and reruns the complete suite on the final tree, since this round did not. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked; no key provisioning is authorized. |
+| 2026-09-03 | Codex counter-review + validation | Claude range `5f98c3aa757f420efac13f682f4e210fa9688e5b..1981233424f25b48ebec2273fa4822c249e2a041` reviewed; correction `7f55652403660b8fa8e8c5d57bd7b4669032a3c8`; this append-only validation-record commit follows | Counter-review correction only; no feature milestone | Accepted `26a4fc6f` unchanged and accepted `34aa8eda`/`19812334` after correcting six stale current pointers and their guard. Section 37 records all full hashes, dispositions, qualifications, and authority gates. | Exact correction tree: **6,919 passed, 13 skipped, 3 failed, 25 warnings in 3,657.75s**; the same three `TPR-OOL-009` sleeve-report failures and no target failure. Target suite **253 passed, 3 skipped**; shared plus target document guards **87 passed**; repository compile exit 0; `git diff --check` clean; 29-page PDF digest unchanged. Python 3.13.14 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | `TPR-CCR12-001` (P2) and `TPR-CCR12-002` through `004` (P3) closed by correction or successor qualification. Claude introduced no new P0/P1. The authoritative section 8 register remains exactly six open items, including inherited P1 `TPR-CCR10-012/013`; TPR-1 and TPR-0B remain blocked. | None. No key, signed anchor, positive registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority. | Make this Codex round's single push. Claude then reviews the exact new Codex range beginning after `1981233424f25b48ebec2273fa4822c249e2a041`; no next milestone is authorized. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -3699,10 +3700,41 @@ zero-authority facts are portable.
 
 ### 37.6 Final validation and handoff
 
-The correction commit contains only the three current-state documents and the
-target-owned document guard. The exact correction-tree complete suite,
-compilation, focused guard, diff, status, and artifact evidence is appended in
-the successor validation event before this Codex round's single push. After
-that push, Claude reviews the exact new Codex range beginning after
-`1981233424f25b48ebec2273fa4822c249e2a041`; no milestone or authority is
+The exact correction commit is
+`7f55652403660b8fa8e8c5d57bd7b4669032a3c8`. It contains only the three
+current-state documents and the target-owned document guard.
+
+- Complete repository suite on that exact clean commit: **6,919 passed, 13
+  skipped, 3 failed, 25 warnings in 3,657.75s (1:00:57)**. The three failures
+  are the already recorded out-of-lane `TPR-OOL-009` cases:
+  `test_default_gain_review_is_fifty_percent_and_long_term_gated`,
+  `test_every_lot_row_carries_the_tax_mechanism_fields`, and
+  `test_report_carries_no_action_shaped_field`, all in
+  `tests/test_sleeve_report.py`. No Target-Price Revisions test failed. Against
+  Claude's received pre-correction complete result, passed count rises by
+  exactly two -- Claude's empty-registry regression and this round's handoff
+  regression -- while skips and known failures are unchanged.
+- Corrected Target-Price suite: **253 passed, 3 skipped in 84.43s**. The
+  received Claude head independently reproduced **252 passed, 3 skipped in
+  79.84s** before this round added exactly one document guard.
+- Shared plus target documentation consistency suites on the final append-only
+  record candidate: **87 passed in 6.87s**. The target-only document guard passed
+  **18 tests in 3.98s** after its first correction.
+- Repository-wide `compileall` over `assistant`, `backtest`, `data`,
+  `execution`, `ml`, `research`, `risk`, `scripts`, `signals`, `strategies`,
+  `tests`, `baskets.py`, and `config.py` exited 0.
+- `git diff --check` is clean, and the worktree returned clean at exact
+  correction head after the full run and compilation. Validation used
+  `C:\git\customizedAgent\trading_agent\.venv\Scripts\python.exe`, Python
+  3.13.14, and pytest 9.1.1.
+- The PDF remains 29 pages at raw SHA-256
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`;
+  candidate, source-authority, look-authority, and empty-registry bytes are
+  unchanged. Provider accesses, outcome accesses, and authorized/spent looks
+  remain **0**.
+
+This append-only validation record is the only successor to the exact tested
+commit. It changes no code, test, artifact, gate, or authority. After this
+Codex round's single push, Claude reviews the exact new Codex range beginning
+after `1981233424f25b48ebec2273fa4822c249e2a041`; no milestone or authority is
 implied.

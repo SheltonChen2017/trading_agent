@@ -49,27 +49,29 @@ EXPECTED_CANDIDATE_ARTIFACT_SHA256 = (
 # hash does not exist until the commit is written -- so a Codex counter-review
 # pins the exact Claude range it just reviewed.
 LATEST_COUNTERREVIEWED_CLAUDE_BASE = (
-    "bb20e8d057ecd976b4ddfbd558ec38d31b02d54e"
+    "a63335d38bfd6dd3b584d7a91ba0b454e97a6df4"
 )
 LATEST_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "45f45aa36f6493d8bd9669bcdba48d08d8c9c57e"
+    "25c1c378448bf41a60c31a81e11ca398354c36d0"
 )
 LATEST_COUNTERREVIEWED_CLAUDE_RANGE = (
     f"{LATEST_COUNTERREVIEWED_CLAUDE_BASE}.."
     f"{LATEST_COUNTERREVIEWED_CLAUDE_HEAD}"
 )
-LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE = "bb20e8d0..45f45aa3"
+LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE = "a63335d3..25c1c378"
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "9269339ee4ee8e0dc0dc87c419fd51bef6a7b306"
+    "45f45aa36f6493d8bd9669bcdba48d08d8c9c57e"
 )
-PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "9269339e"
+PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "45f45aa3"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
     "research/target_price_revisions/canonical.py",
     "research/target_price_revisions/import_firewall.py",
     "research/target_price_revisions/preregistration.py",
+    "research/target_price_revisions/trust_root.py",
+    "research/target_price_revisions/windows_acl.py",
     "research/target_price_revisions/specs/.gitattributes",
 )
 
@@ -370,6 +372,16 @@ def test_tpr0a_candidate_identity_and_zero_authority_handoff_are_exact() -> None
     registry = json.loads(
         (candidate_path.parent / "reviewed_spec_registry.json").read_bytes()
     )
+    assert registry["schema"] == "tpr-reviewed-algorithm-registry-v2"
+    assert registry["signature_policy"] == {
+        "allowed_signers_path_id": (
+            "windows-programdata-customizedagent-trust-tpr-allowed-signers-v1"
+        ),
+        "format": "ssh",
+        "key_type": "ssh-ed25519",
+        "namespace": "git",
+        "principal": "shelton-tpr-reviewer",
+    }
     assert registry["entries"] == []
 
     record = (STRATEGY_DIR / RECORD).read_text(encoding="utf-8").lower()
@@ -522,19 +534,22 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed Claude's exact six-commit range"
+        "Codex has counter-reviewed Claude's exact four-commit range"
         in normalized_current
     )
     assert (
-        "no implementation or provisioning milestone is authorized"
+        "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
         in normalized_current.lower()
+    )
+    assert "no key provisioning or positive authority is authorized" in (
+        normalized_current.lower()
     )
     assert "TPR-TR0" in normalized_current
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "pending Claude review of this Codex round" not in normalized_current
     assert "comprehensive whole-lane audit is complete" in normalized_current.lower()
-    assert "beginning after `45f45aa3`" in normalized_current
+    assert "beginning after `25c1c378`" in normalized_current
 
     routing_row = next(
         line
@@ -552,13 +567,19 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_pointer
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_pointer
         assert (
-            "Codex has counter-reviewed Claude's exact six-commit range"
+            "Codex has counter-reviewed Claude's exact four-commit range"
             in normalized_pointer
         )
-        assert "No implementation or provisioning milestone is authorized" in normalized_pointer
+        assert (
+            "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
+            in normalized_pointer.lower()
+        )
+        assert "no key provisioning or positive authority is authorized" in (
+            normalized_pointer.lower()
+        )
         assert "TPR-TR0" in normalized_pointer
         assert "comprehensive whole-lane audit is complete" in normalized_pointer.lower()
-        assert "beginning after `45f45aa3`" in normalized_pointer
+        assert "beginning after `25c1c378`" in normalized_pointer
         normalized_pointer_lower = normalized_pointer.lower()
         stale_current_claims = (
             "pending claude review of this codex round",
@@ -582,9 +603,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
         ) == [LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex counter-reviewed all six claude commits" in normalized_summary_lower
-        assert "section 32" in normalized_summary_lower
-        assert "no implementation or provisioning milestone is authorized" in normalized_summary_lower
+        assert "codex counter-reviewed all four claude commits" in normalized_summary_lower
+        assert "section 35" in normalized_summary_lower
+        assert (
+            "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
+            in normalized_summary_lower
+        )
+        assert "no key provisioning or positive authority is authorized" in normalized_summary_lower
         assert "comprehensive claude whole-lane audit is complete" in normalized_summary_lower
 
 
@@ -854,7 +879,7 @@ def test_session_ledger_rows_have_exact_column_count() -> None:
     )
 
 ISSUE_ROW = r"^\| `(TPR-[A-Z0-9-]+)` \| (P[0-3]) \| ([^|]*)\|"
-REGISTER_ID = r"^\| `(TPR-[A-Z0-9-]+)` \|"
+REGISTER_ROW = r"^\| `(TPR-[A-Z0-9-]+)` \| (P[0-3]) \|"
 
 
 def _open_issue_register() -> str:
@@ -870,11 +895,11 @@ def _open_issue_register() -> str:
 def test_open_issue_register_matches_every_issue_row() -> None:
     """One current answer to what is still open.
 
-    Three findings were carried as open long after they had actually been
-    resolved: `TPR-CR1-001` after the owner-approved `*.pdf binary` fix,
-    `TPR-CR8-001` after the alpha relaxation, and `TPR-CR11-002` after both
-    sides of its dispute turned out to be host-scoped.  Nothing detected the
-    drift, because a status cell is prose in a table nobody re-reads.
+    The register prevents a canonical finding row and the current routing from
+    drifting apart.  The guard also pins that the owner-approved TPR-0A/0B
+    phase split closed `TPR-CCR1-004` and `TPR-CCR1-005`; a later census must
+    not reopen those historical blockers merely because their original rows
+    were stale.
 
     The register makes the open set explicit, and this guard makes it
     checkable in both directions: closing a finding without delisting it
@@ -897,15 +922,22 @@ def test_open_issue_register_matches_every_issue_row() -> None:
         "each finding must have exactly one row so its status cannot fork"
     )
 
-    open_ids = {
-        identifier
-        for identifier, _priority, status in rows
+    open_priorities = {
+        identifier: priority
+        for identifier, priority, status in rows
         if status.replace("**", "").strip().lower().startswith("open")
     }
-    registered = set(re.findall(REGISTER_ID, register, re.MULTILINE))
-    assert registered == open_ids, (
-        f"the open-issue register and the finding rows disagree; listed but not open: {sorted(registered - open_ids)}; open but unlisted: {sorted(open_ids - registered)}"
+    registered_rows = re.findall(REGISTER_ROW, register, re.MULTILINE)
+    registered_ids = [identifier for identifier, _priority in registered_rows]
+    assert len(registered_ids) == len(set(registered_ids)), (
+        "the open-issue register must not collapse duplicate identifiers"
     )
+    registered_priorities = dict(registered_rows)
+    assert registered_priorities == open_priorities, (
+        "the open-issue register and canonical finding rows disagree in id or "
+        f"priority; register={registered_priorities}, open={open_priorities}"
+    )
+    assert {"TPR-CCR1-004", "TPR-CCR1-005"}.isdisjoint(registered_priorities)
 
     for line in register.splitlines():
         if not line.startswith("| `TPR-"):

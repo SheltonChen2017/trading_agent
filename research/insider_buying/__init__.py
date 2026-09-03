@@ -8,7 +8,8 @@ observation-only Form 4/A chronology and multi-period supplied-link-evidence
 boundaries, plus an evidence-bound provisional disposition/quarantine report
 and its immutable, upstream-rebuilt snapshot boundary.  The package also
 exposes the zero-authority IB-1I four-family research gate without allocating
-a confirmatory cell or permanent look.
+a confirmatory cell or permanent look, plus the observed-only IB-2A normalized
+identity inventory that leaves every point-in-time resolution gate closed.
 """
 
 from research.insider_buying.contracts import (
@@ -63,6 +64,18 @@ from research.insider_buying.form4_provisional_disposition_snapshot import (
     Form4ProvisionalDispositionSnapshotError,
     load_form4_provisional_disposition_snapshot,
     write_form4_provisional_disposition_snapshot,
+)
+from research.insider_buying.form4_observed_identity_inventory import (
+    FORM4_OBSERVED_IDENTITY_INVENTORY_VERSION,
+    Form4ObservedFilingIdentityRow,
+    Form4ObservedIdentityDisposition,
+    Form4ObservedIdentityInventory,
+    Form4ObservedIdentityInventoryError,
+    Form4ObservedIdentityInventoryIdentity,
+    Form4ObservedOwnerSetOutcome,
+    Form4ObservedReportingOwnerIdentityRow,
+    Form4ObservedTransactionIdentityRow,
+    build_form4_observed_identity_inventory,
 )
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
@@ -126,6 +139,7 @@ __all__ = [
     "EDGAR_ACCEPTANCE_SNAPSHOT_KIND",
     "FORM4_AMENDMENT_RECONCILIATION_VERSION",
     "FORM4_MULTI_PERIOD_EVIDENCE_VERSION",
+    "FORM4_OBSERVED_IDENTITY_INVENTORY_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_KIND",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_VERSION",
@@ -137,6 +151,14 @@ __all__ = [
     "Form4AmendmentReconciliationIdentity",
     "Form4MultiPeriodEvidenceError",
     "Form4MultiPeriodEvidenceIdentity",
+    "Form4ObservedFilingIdentityRow",
+    "Form4ObservedIdentityDisposition",
+    "Form4ObservedIdentityInventory",
+    "Form4ObservedIdentityInventoryError",
+    "Form4ObservedIdentityInventoryIdentity",
+    "Form4ObservedOwnerSetOutcome",
+    "Form4ObservedReportingOwnerIdentityRow",
+    "Form4ObservedTransactionIdentityRow",
     "Form4ProvisionalDisposition",
     "Form4ProvisionalDispositionReport",
     "Form4ProvisionalDispositionReportError",
@@ -195,6 +217,7 @@ __all__ = [
     "SuppliedForm4AmendmentLinkEvidence",
     "TransactionDiagnostic",
     "build_filing_corpus",
+    "build_form4_observed_identity_inventory",
     "build_form4_provisional_disposition_report",
     "assemble_sec_form4_multi_period_evidence",
     "build_sec_bulk_parsed_snapshot",

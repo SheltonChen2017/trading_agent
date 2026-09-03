@@ -32,6 +32,7 @@ from research.target_price_revisions.preregistration import (
     require_zero_access_permanent_look_authority,
     require_zero_access_source_authority,
 )
+from research.target_price_revisions.trust_root import TrustedRegistrySnapshot
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -147,6 +148,19 @@ def _anchored_reviewed_spec(
     candidate_path.parent.mkdir(parents=True)
     candidate_payload = CANDIDATE.read_bytes()
     candidate_path.write_bytes(candidate_payload)
+    registry_relative = Path(
+        "research/target_price_revisions/specs/reviewed_spec_registry.json"
+    )
+    registry_path = repository / registry_relative
+    registry_path.write_bytes(
+        _canonical(
+            {
+                "schema": preregistration.REVIEW_REGISTRY_SCHEMA,
+                "signature_policy": dict(preregistration.SIGNATURE_POLICY),
+                "entries": [],
+            }
+        )
+    )
     for policy_relative_text in preregistration.POLICY_CODE_REPO_PATHS:
         policy_relative = Path(policy_relative_text)
         policy_path = repository / policy_relative
@@ -156,6 +170,7 @@ def _anchored_reviewed_spec(
         repository,
         "add",
         candidate_relative.as_posix(),
+        registry_relative.as_posix(),
         *preregistration.POLICY_CODE_REPO_PATHS,
     )
     _git(
@@ -198,12 +213,9 @@ def _anchored_reviewed_spec(
     )
     review_commit = _git(repository, "rev-parse", "HEAD")
 
-    registry_relative = Path(
-        "research/target_price_revisions/specs/reviewed_spec_registry.json"
-    )
-    registry_path = repository / registry_relative
     registry = {
         "schema": preregistration.REVIEW_REGISTRY_SCHEMA,
+        "signature_policy": dict(preregistration.SIGNATURE_POLICY),
         "entries": [
             {
                 "spec_id": raw["spec_id"],
@@ -240,6 +252,33 @@ def _anchored_reviewed_spec(
         "--quiet",
         "-m",
         "anchor reviewed algorithm",
+    )
+    signing_key_fingerprint = "SHA256:" + "A" * 43
+
+    def trusted_registry(
+        root: Path, payload: bytes
+    ) -> TrustedRegistrySnapshot:
+        assert root == repository.resolve()
+        anchor_commit = _git(
+            repository,
+            "log",
+            "-1",
+            "--format=%H",
+            "--",
+            registry_relative.as_posix(),
+        )
+        parent_commit = _git(repository, "rev-parse", f"{anchor_commit}^")
+        head_commit = _git(repository, "rev-parse", "HEAD")
+        return TrustedRegistrySnapshot(
+            anchor_commit=anchor_commit,
+            parent_commit=parent_commit,
+            head_commit=head_commit,
+            signing_key_fingerprint=signing_key_fingerprint,
+            registry_payload=payload,
+        )
+
+    monkeypatch.setattr(
+        preregistration, "verify_signed_registry_anchor", trusted_registry
     )
     monkeypatch.setattr(
         preregistration, "REVIEWED_SPEC_REGISTRY_PATH", registry_path
@@ -700,6 +739,10 @@ def test_git_anchored_reviewed_parent_still_cannot_reach_outcomes(
     reviewed = load_reviewed_algorithm_spec(spec_path)
 
     assert require_reviewed_algorithm_spec(reviewed) is reviewed
+    assert reviewed.registry_anchor_commit == _git(
+        spec_path.parents[3], "rev-parse", "HEAD"
+    )
+    assert reviewed.signing_key_fingerprint == "SHA256:" + "A" * 43
     with pytest.raises(PreregistrationError, match="no reviewed structural child"):
         authorize_outcome_access(reviewed, _request())
 
@@ -748,11 +791,114 @@ def test_self_declared_review_and_registry_substitution_refuse(
     registry = preregistration.REVIEWED_SPEC_REGISTRY_PATH
     registry.write_bytes(
         _canonical(
-            {"schema": preregistration.REVIEW_REGISTRY_SCHEMA, "entries": []}
+            {
+                "schema": preregistration.REVIEW_REGISTRY_SCHEMA,
+                "signature_policy": dict(preregistration.SIGNATURE_POLICY),
+                "entries": [],
+            }
         )
     )
     with pytest.raises(PreregistrationError):
         require_reviewed_algorithm_spec(reviewed)
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda registry: registry.pop("signature_policy"),
+        lambda registry: registry["signature_policy"].__setitem__(
+            "principal", "repository-controlled-principal"
+        ),
+        lambda registry: registry["signature_policy"].__setitem__(
+            "namespace", "file"
+        ),
+        lambda registry: registry["signature_policy"].__setitem__(
+            "extra", "not-authorized"
+        ),
+    ],
+)
+def test_review_registry_signature_policy_is_exact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutate: Callable[[dict[str, object]], object],
+) -> None:
+    spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+    repository = spec_path.parents[3]
+    registry_path = preregistration.REVIEWED_SPEC_REGISTRY_PATH
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    mutate(registry)
+    registry_path.write_bytes(_canonical(registry))
+    _git(repository, "add", registry_path.relative_to(repository).as_posix())
+    _git(
+        repository,
+        "-c",
+        "user.name=Registry Mutator",
+        "-c",
+        "user.email=mutator@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "mutate signature policy",
+    )
+
+    with pytest.raises(PreregistrationError, match="signature_policy|signature policy"):
+        load_reviewed_algorithm_spec(spec_path)
+
+
+def test_positive_registry_requires_the_external_signed_trust_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+
+    def refuse(root: Path, payload: bytes) -> TrustedRegistrySnapshot:
+        raise preregistration.TrustRootError("synthetic missing external trust")
+
+    monkeypatch.setattr(preregistration, "verify_signed_registry_anchor", refuse)
+    with pytest.raises(PreregistrationError, match="trust root"):
+        load_reviewed_algorithm_spec(spec_path)
+
+
+def test_nonempty_registry_is_authenticated_before_json_parsing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+    repository = spec_path.parents[3]
+    registry_path = preregistration.REVIEWED_SPEC_REGISTRY_PATH
+    registry_path.write_bytes(b"repository-controlled malformed payload\n")
+    _git(repository, "add", registry_path.relative_to(repository).as_posix())
+    _git(
+        repository,
+        "-c",
+        "user.name=Registry Mutator",
+        "-c",
+        "user.email=mutator@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "mutate registry bytes",
+    )
+
+    def refuse(root: Path, payload: bytes) -> TrustedRegistrySnapshot:
+        assert payload == b"repository-controlled malformed payload\n"
+        raise preregistration.TrustRootError("synthetic unauthenticated registry")
+
+    monkeypatch.setattr(preregistration, "verify_signed_registry_anchor", refuse)
+    with pytest.raises(PreregistrationError, match="trust root"):
+        load_reviewed_algorithm_spec(spec_path)
+
+
+def test_signed_policy_inventory_must_equal_the_computed_import_closure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+    monkeypatch.setattr(
+        preregistration,
+        "computed_policy_repo_paths",
+        lambda root: preregistration.POLICY_CODE_REPO_PATHS[:-1],
+    )
+
+    with pytest.raises(PreregistrationError, match="import closure"):
+        load_reviewed_algorithm_spec(spec_path)
 
 
 @pytest.mark.parametrize(

@@ -79,7 +79,8 @@ EMPTY_REVIEW_REGISTRY_BYTES = canonical_json_bytes(
         "entries": [],
         "schema": REVIEW_REGISTRY_SCHEMA,
         "signature_policy": SIGNATURE_POLICY,
-    }
+    },
+    trailing_lf=True,
 )
 CANDIDATE_REPO_PATH = (
     "research/target_price_revisions/specs/tpr_round0a.candidate.json"

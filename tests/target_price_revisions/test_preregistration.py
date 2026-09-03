@@ -14,6 +14,7 @@ import research.target_price_revisions.preregistration as preregistration
 from research.target_price_revisions import FAMILY_ID, PRIMARY_CELL_ID, PRIMARY_LOOK_ID
 from research.target_price_revisions.canonical import (
     CanonicalContractError,
+    require_canonical_json_bytes,
     require_aware_instant,
     require_decimal_text,
 )
@@ -1173,3 +1174,32 @@ def test_under_cap_allocation_still_refuses_through_the_public_loader(
     preregistration._validate_dates_and_alpha(
         _cells_with_confirmatory_alpha("0.01")
     )
+
+
+def test_empty_registry_guard_is_reachable_for_the_committed_registry() -> None:
+    """The empty-registry refusal must not be dead code.
+
+    `EMPTY_REVIEW_REGISTRY_BYTES` is compared byte-for-byte against the stored
+    registry, but this lane's canonical contract requires exactly one LF
+    terminator.  A constant built without that terminator can never equal any
+    canonically stored registry, so the guard silently stops running and the
+    empty, non-authorizing state reports a trust-root failure instead of the
+    absent review anchor it actually is.  Both paths refuse, so this is a
+    diagnostic and reachability defect rather than an authority hole -- which
+    is precisely why no authority test would catch it.
+    """
+    require_canonical_json_bytes(
+        preregistration.EMPTY_REVIEW_REGISTRY_BYTES, "empty review registry"
+    )
+    committed = preregistration.REVIEWED_SPEC_REGISTRY_PATH.read_bytes()
+    assert committed == preregistration.EMPTY_REVIEW_REGISTRY_BYTES, (
+        "the stored empty registry must be byte-equal to the constant the "
+        "guard compares against, or the guard is unreachable"
+    )
+
+    # Reaching the guard is the observable behaviour, so assert the message the
+    # empty state must produce while no trust root is provisioned.
+    with pytest.raises(PreregistrationError, match="no unique external review anchor"):
+        preregistration._review_anchor(
+            preregistration.REVIEWED_SPEC_REGISTRY_PATH.absolute(), {}, b""
+        )

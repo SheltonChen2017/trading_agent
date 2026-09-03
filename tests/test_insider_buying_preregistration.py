@@ -22,6 +22,7 @@ from research.insider_buying import (
     InsiderBuyingResearchGate,
     InsiderBuyingSlotDisposition,
 )
+from research.insider_buying import preregistration
 from research.insider_buying.preregistration import (
     CANDIDATE_PRIMARY_HORIZONS_TRADING_DAYS,
     IB0_CONTRACT_VERSION,
@@ -452,6 +453,48 @@ def test_semantic_hash_binds_every_authority_field(field_name: str) -> None:
 def test_falsey_non_boolean_authority_mutations_refuse(field_name: str) -> None:
     with pytest.raises(InsiderBuyingPreregistrationError, match=field_name):
         replace(INSIDER_BUYING_RESEARCH_GATE, **{field_name: 0})
+
+
+def test_lane_maxima_must_still_multiply_to_the_shared_fwer(monkeypatch) -> None:
+    """The 4 x 1/80 = 1/20 equation must fail closed if a constant drifts.
+
+    Every alpha field is pinned to its module constant, so the product
+    equation can only fire when a constant is edited inconsistently - exactly
+    the mistake it exists to catch. Patch the lane maximum and supply the
+    matching value so the per-field checks pass and the cross-check is reached.
+    """
+    drifted = Fraction(1, 40)
+    monkeypatch.setattr(
+        preregistration, "PERMANENT_LANE_ALPHA_MAXIMUM", drifted
+    )
+
+    with pytest.raises(
+        InsiderBuyingPreregistrationError,
+        match="four permanent lane maxima do not equal shared FWER",
+    ):
+        InsiderBuyingResearchGate(
+            permanent_lane_alpha_maximum=drifted,
+            within_lane_confirmatory_alpha_ceiling=drifted,
+        )
+
+
+def test_research_cutoff_must_still_precede_the_final_holdout(monkeypatch) -> None:
+    """A cutoff that reaches into the reserved holdout must fail closed.
+
+    The three dates are pinned to constants, so the ordering check is only
+    reachable through constant drift. A cutoff on or after the holdout start
+    would let this lane consume reserved evidence.
+    """
+    overlapping_start = date(2027, 8, 31)
+    monkeypatch.setattr(
+        preregistration, "SHARED_HOLDOUT_START", overlapping_start
+    )
+
+    with pytest.raises(
+        InsiderBuyingPreregistrationError,
+        match="shared research and final-holdout periods overlap",
+    ):
+        InsiderBuyingResearchGate(shared_holdout_start=overlapping_start)
 
 
 def test_module_has_no_float_or_forbidden_runtime_import_surface() -> None:

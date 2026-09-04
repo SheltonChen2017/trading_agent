@@ -1,1 +1,11 @@
 *.pdf binary
+
+# Content-addressed / exact-byte research artifacts outside any lane's own
+# attribute scope.  On a Windows host with core.autocrlf=true an unprotected
+# JSON artifact checks out CRLF and no longer matches its committed blob or
+# its recorded digest (TPR-OOL-008 / SI-SYNC-001 / Insider #27 / Analyst #4).
+# -text disables conversion in both directions; eol=lf additionally normalizes
+# the working copy so the reviewed-algorithm anchors that byte-compare the
+# shared research package root keep matching (TPR-OOL-010).
+research/ml_specs/*.json -text
+research/__init__.py text eol=lf

@@ -60,6 +60,13 @@ def _isolate_execution_runtime_authority(tmp_path, monkeypatch):
     _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
 
 
+# Bound once at import: this guard runs in EVERY test's teardown, including
+# tests that legitimately monkeypatch ``json.loads`` with a must-not-run
+# sentinel (the insider SEC nesting-cap tests).  A bound JSONDecoder.decode
+# never consults ``json.loads``, so the guard cannot trip those sentinels.
+_DECODE_RUNTIME_STOP_STATE = __import__("json").JSONDecoder().decode
+
+
 def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
     """Fail the test that leaked containment into the operator's runtime.
 
@@ -77,7 +84,6 @@ def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
     the real file and never mutates it: operator runtime state is not test
     cleanup.
     """
-    import json
     import os
 
     import assistant.dispatch_fence as dispatch_fence
@@ -94,7 +100,7 @@ def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
     if not stop_file.exists():
         return
     try:
-        state = json.loads(stop_file.read_text(encoding="utf-8"))
+        state = _DECODE_RUNTIME_STOP_STATE(stop_file.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return  # unreadable real state is the runtime's own fail-closed concern
     session_base = os.path.normcase(str(tmp_path.parent.resolve()))

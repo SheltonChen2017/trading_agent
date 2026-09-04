@@ -22,10 +22,24 @@ import pytest
 
 import config
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
-from assistant.sleeve_report import SleeveReportError, evaluate_sleeves
+from assistant.sleeve_report import SleeveReportError
+from assistant.sleeve_report import evaluate_sleeves as _evaluate_sleeves_at_clock
 from assistant.tax_lots import Fill, build_ledger
 
 _NOW = datetime(2026, 8, 7, 15, 30, tzinfo=timezone.utc)
+
+
+def evaluate_sleeves(*args, **kwargs):
+    """Evaluate at the fixture clock the lots were built against.
+
+    Every lot below is acquired relative to ``_NOW``, so the report must be
+    evaluated at ``_NOW`` too.  Reading the wall clock instead made three
+    tests drift red as real time crossed the one-year long-term boundary
+    (TPR-OOL-009 / SI-OOL-002 / IB0H-OOL01 / ARV2WL-D11); the fix is the
+    injected clock, never wider assertions.
+    """
+    kwargs.setdefault("now", _NOW)
+    return _evaluate_sleeves_at_clock(*args, **kwargs)
 
 
 def _position(
@@ -713,3 +727,40 @@ def test_single_stock_income_map_is_not_in_leveraged_accounting():
     for income_etf in config.SINGLE_STOCK_INCOME_ETF_UNDERLYING:
         assert income_etf not in config.LEVERAGED_ETF_TICKERS
         assert income_etf not in config.LEVERAGED_ETF_UNDERLYING
+
+
+def test_evaluate_sleeves_classifies_lot_age_at_the_injected_clock_not_wall_time():
+    """The term classification must follow the evaluation instant passed in.
+
+    A lot acquired 364 days before a 2020 clock is short-term at that clock
+    and long-term at any later wall clock.  Dropping the ``now`` pass-through
+    to ``unrealized_by_lot`` makes this red on every host whose date is past
+    2021, independent of when the suite runs.
+    """
+    clock = datetime(2020, 6, 1, 15, 30, tzinfo=timezone.utc)
+    ledger = build_ledger(
+        [
+            Fill(
+                ticker="NVDA",
+                qty=10.0,
+                price=100.0,
+                side="buy",
+                at=clock - timedelta(days=364),
+                fill_id="NVDA-clock",
+            )
+        ]
+    )
+    snapshot = _snapshot([_position("NVDA", 10, 155.0)])
+
+    at_clock = _evaluate_sleeves_at_clock(snapshot, ledger, [], now=clock)
+    lot = at_clock["growth_sleeve"]["positions"][0]["lots"][0]
+    assert lot["term_if_sold_now"] == "short"
+    assert lot["gain_threshold_met_awaiting_long_term"] is True
+    assert at_clock["growth_sleeve"]["lots_at_gain_review"] == 0
+
+    later = _evaluate_sleeves_at_clock(
+        snapshot, ledger, [], now=clock + timedelta(days=3)
+    )
+    lot = later["growth_sleeve"]["positions"][0]["lots"][0]
+    assert lot["term_if_sold_now"] == "long"
+    assert later["growth_sleeve"]["lots_at_gain_review"] == 1

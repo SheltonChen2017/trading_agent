@@ -3866,6 +3866,8 @@ them as cherry-picks; no lane-owned file changed.
 | `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` | `e0270c8bbf425f85af43b13eda6cb6bb59b252f4` | sleeve-report clock seam, runtime-stop leak redirect + conftest guard, shared EOL attributes, Briefing smoke isolation, characterization test rename |
 | `3114a1530f0afa400eb200e79ff218c174657e69` | `09c296ee14c3beb6f81d4f887040a4814e1dab3c` | notification cycle evaluates at its own clock; guard decoder bound at import |
 | docs commit | `1e3757c241948609edf598388dd64e711d925810` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, full disposition ledger, owner decisions) plus the four-lane README, the direction status paragraph, and the workflow exception paragraph |
+| `6ef66eed77f9b24ea3df8aa538f42de0c871c824` (F-8, owner direction, same day) | `636b8dd0467f7f068f0d4dd1546462e4afe18b5d` | `tests/target_price_revisions/test_preregistration.py::test_self_declared_review_and_registry_substitution_refuse` made deterministic across harness layouts (Analyst `ARV2-UNRELATED-001` / Short-interest `SI-OOL-003`); the loader is unchanged. **Lane variant, not a byte-identical cherry-pick:** this lane's loader authenticates the committed registry and refuses an unanchored spec before any status check, so the same-repository branch here is `no unique external review anchor` where `main`'s is `committed and clean` |
+| integration record update | `06f61dfa908f6bf43acfe0475f373fa548d63075` | F-8 recorded in `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, ledger rows, validation) |
 
 Items of this record closed by the application: TPR-OOL-009 (F-1); TPR-OOL-008 and TPR-OOL-010 (F-4); TPR-OOL-005 (F-5); TPR-OOL-002 and TPR-OOL-007 (F-6). Newly routed to this lane: `test_self_declared_review_and_registry_substitution_refuse` depends on where pytest's `tmp_path` lives (Analyst `ARV2-UNRELATED-001` / Short-interest `SI-OOL-003`; integration record sections 3 and 5.1). Every other
 out-of-lane item this record carries was examined; its disposition and reason
@@ -3876,3 +3878,21 @@ This application is not acceptance of any lane milestone and grants no
 provider, outcome, look, QuantConnect, broker, operator-database, deployment,
 paper, live, or trading authority. The lane's same-branch review loop resumes
 from this head. Validation on this lane's resulting head: focused set (sleeve report/notifications, leak guard, EOL attributes, crash-test redirect, Briefing smoke, reservation characterizations, active-document consistency): 174 passed in 33.71s.
+
+**Follow-up, same day (F-8).** After the integration record showed that
+`ARV2-UNRELATED-001` / `SI-OOL-003` were not a stale message but a
+harness-layout dependency — `_repository_root` walks up from the spec, so a
+spec written straight into pytest's `tmp_path` reaches the "not inside a Git
+repository" refusal under an external base temp and the "committed and clean"
+refusal under a repository-local `--basetemp` — the owner directed that the
+Target-price test be fixed as well. The test now asserts the exact refusal its
+own location must reach (`_bare_tmp_path_refusal` mirrors the loader's
+discovery order) and adds two layout-independent assertions that exercise the
+other branches explicitly (a self-declared review in a foreign repository →
+`share one repository`; an unanchored one inside the anchored repository →
+`no unique external review anchor`; on `main`, whose loader still reaches its
+status check first, that branch is `committed and clean`, which is why this
+lane carries an adapted commit rather than a byte-identical cherry-pick). `research/target_price_revisions/preregistration.py`
+is unchanged; this is a test-determinism correction and grants no authority. This lane owns that test, so the change is recorded
+here as this lane's own: the repository-local-basetemp failure the sibling
+lanes observed was real, reproduced on `main`, and is closed by this commit. Validation on this head: the F-8 test passes under an external and under a repository-local --basetemp (1 passed each); Target-price preregistration test file plus active-document consistency: 162 passed, 2 skipped in 49.83s.

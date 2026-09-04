@@ -3905,5 +3905,14 @@ On the owner's direction it is restored byte-for-byte to the integration
 branch's version (`c0a8aeb`: `main`'s handoff plus the 2026-09-04 integration
 section) in `16b3435bcf83a76ebee04679c4c266b6f2daeab4`. The lane state those bullets described is carried by
 sections 36-38 of this record, which remains this lane's sole handoff ledger;
-the superseded bullets stay in Git history. No lane-owned file changed.
+the superseded bullets stay in Git history. Two lane guards in
+`tests/target_price_revisions/test_document_consistency.py`
+(`test_exact_next_step_names_the_current_artifacts`,
+`test_current_state_blocks_do_not_call_the_lane_unmerged`) had bound the shared
+handoff's section 0 to this lane's current review range and routing sentence,
+which is what made the divergence self-perpetuating; they now read the record
+and the Action Plan target block only, and the shared handoff is not a lane
+pointer surface from here on. `docs/ACTION_PLAN_2026-08-20.md` carries the same
+class of per-round lane edits (nine commits since `main`); it was not changed
+here and is flagged for the owner in the integration record's follow-up.
 

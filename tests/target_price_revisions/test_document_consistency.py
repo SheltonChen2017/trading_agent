@@ -585,7 +585,10 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in routing_row
     assert BLUEPRINT_CONTENT_SHA256 in routing_row.lower()
 
-    for current_pointer in (_action_current(), _handoff_current_review()):
+    # The shared Session Handoff is frozen for lanes (owner direction
+    # 2026-09-04); the lane's current pointers live in this record and the
+    # Action Plan target block only.
+    for current_pointer in (_action_current(),):
         normalized_pointer = " ".join(current_pointer.split())
         assert re.findall(
             r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_pointer
@@ -624,7 +627,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     for summary_pointer in (
         _record_preamble(),
         _action_tpr_row(),
-        _handoff_target_summary(),
+        # the shared handoff summary is frozen for lanes (owner direction 2026-09-04)
     ):
         normalized_summary = " ".join(summary_pointer.split())
         normalized_summary_lower = normalized_summary.lower()
@@ -723,8 +726,9 @@ def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:
     current_surfaces = {
         "record preamble": preamble,
         "record section 8 current qualification": next_step,
-        "SESSION_HANDOFF.md target section": _handoff_current(),
-        "SESSION_HANDOFF.md target summary": _handoff_target_summary(),
+        # SESSION_HANDOFF.md is deliberately absent: the shared handoff is
+        # frozen for lanes (owner direction 2026-09-04) and carries no
+        # lane-current pointer.
         "ACTION_PLAN_2026-08-20.md target block": _action_current(),
         "ACTION_PLAN_2026-08-20.md target row": _action_tpr_row(),
     }

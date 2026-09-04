@@ -3914,5 +3914,6 @@ which is what made the divergence self-perpetuating; they now read the record
 and the Action Plan target block only, and the shared handoff is not a lane
 pointer surface from here on. `docs/ACTION_PLAN_2026-08-20.md` carries the same
 class of per-round lane edits (nine commits since `main`); it was not changed
-here and is flagged for the owner in the integration record's follow-up.
+here and is flagged for the owner in the shared handoff's 2026-09-04 section
+(section 0B), which this lane now carries byte-identically.
 

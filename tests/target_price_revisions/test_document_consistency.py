@@ -585,49 +585,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in routing_row
     assert BLUEPRINT_CONTENT_SHA256 in routing_row.lower()
 
-    # The shared Session Handoff is frozen for lanes (owner direction
-    # 2026-09-04); the lane's current pointers live in this record and the
-    # Action Plan target block only.
-    for current_pointer in (_action_current(),):
-        normalized_pointer = " ".join(current_pointer.split())
-        assert re.findall(
-            r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_pointer
-        ) == [LATEST_REVIEWED_CODEX_RANGE]
-        assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_pointer
-        assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_pointer
-        assert (
-            "Claude has independently reviewed Codex's exact two-commit range"
-            in normalized_pointer
-        )
-        assert (
-            "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
-            in normalized_pointer.lower()
-        )
-        assert "no key provisioning or positive authority is authorized" in (
-            normalized_pointer.lower()
-        )
-        assert "TPR-TR0" in normalized_pointer
-        assert "comprehensive whole-lane audit is complete" in normalized_pointer.lower()
-        assert "beginning after `49caa886`" in normalized_pointer
-        normalized_pointer_lower = normalized_pointer.lower()
-        stale_current_claims = (
-            "pending claude review of this codex round",
-            "receive one last narrow identity/document guard run",
-            "before commit and the single push",
-            "after this counter-review correction round's single push",
-            "after this counter-review round's single push",
-            "claude has independently reviewed codex's exact three-commit range",
-            "beginning after `25c1c378`",
-            "codex has counter-reviewed claude's exact three-commit range",
-            "beginning after `19812334`",
-        )
-        for stale_claim in stale_current_claims:
-            assert stale_claim not in normalized_pointer_lower
+    # The shared Session Handoff and Action Plan are frozen for lanes (owner
+    # direction 2026-09-04): section 8 of this record is the only per-round
+    # current-state pointer, and it is asserted above.
 
     for summary_pointer in (
         _record_preamble(),
-        _action_tpr_row(),
-        # the shared handoff summary is frozen for lanes (owner direction 2026-09-04)
+        # the shared handoff and Action Plan are frozen for lanes (owner direction 2026-09-04)
     ):
         normalized_summary = " ".join(summary_pointer.split())
         normalized_summary_lower = normalized_summary.lower()
@@ -726,11 +690,9 @@ def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:
     current_surfaces = {
         "record preamble": preamble,
         "record section 8 current qualification": next_step,
-        # SESSION_HANDOFF.md is deliberately absent: the shared handoff is
-        # frozen for lanes (owner direction 2026-09-04) and carries no
-        # lane-current pointer.
-        "ACTION_PLAN_2026-08-20.md target block": _action_current(),
-        "ACTION_PLAN_2026-08-20.md target row": _action_tpr_row(),
+        # SESSION_HANDOFF.md and ACTION_PLAN_2026-08-20.md are deliberately
+        # absent: both shared documents are frozen for lanes (owner direction
+        # 2026-09-04) and carry no lane-current pointer.
     }
     for name, block in current_surfaces.items():
         assert stale not in block.lower(), (

@@ -153,6 +153,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-02 | Codex counter-review + implementation | `e85d6a60` -> `a878b7a` (exact test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3C-P2 review + SI-3C-P3 four-cycle synthetic inventory characterization | Reviewed the sole new Claude commit `f2fca4e` against `e85d6a60` and accepted its production-code conclusions after six P3 documentation/evidence corrections. `a878b7a` adds one test-only four-cycle characterization through the real score/envelope/compact-verification path, pins the same 20 stable IDs in every cycle, and confirms the existing `C^2 N` stored-inventory term without changing production source, policy, preregistration, schema, provider, outcome, portfolio, or QuantConnect code. | Counter-review selector: **20 passed, 35 deselected in 256.05s**; targeted counter-review: **8 passed in 180.52s**; prior exact-match mutation: **6 failed / 61 passed**. SI-3C-P3 backdated-reference mutation: **1 failed in 36.84s**; restore: **1 passed in 47.08s**. Complete Short Interest lane: **275 passed in 627.60s**. Complete repository: **6,843 passed, 13 skipped, 3 out-of-lane failures, 25 warnings in 3,342.23s (55m42s); zero Short Interest failures**. Required compileall including `research`: **exit 0 in 22.944s**. Active documents before the final record: **69 passed in 4.61s**; final active documents: **69 passed in 2.15s**; `git diff --check` clean. Synthetic/offline only; prohibited surfaces untouched; **0 research looks**. | `SI-CCR14-001` through `006`, `SI3CP3-REV-001`/`002`, and `SI35-REV-001` through `005` are closed in section 35; no committed in-scope P0-P3 defect requiring correction remains. The bounded-memory conclusion stands, but the reproducible direct internal reduction is **8.82x**, the public-API comparison is **2.31x**, and four-cycle evidence confirms the stored-inventory subterm grows 4x when `C` doubles. Existing out-of-lane `SI-OOL-002` remains documented and unfixed. | Finalize the record, commit it, re-fetch, and make one combined push only if the lane remote remains `f2fca4e`. Claude then reviews `a878b7a` and the record commit individually; Codex counter-reviews every resulting Claude commit before another milestone. All licensed-data, signal-extension, ranking, ETF, outcome, portfolio, QuantConnect-job, deployment, and trading gates remain closed. |
 | 2026-09-02 | Claude review | `f2fca4e9` -> `6db112d5` reviewed; no correction required (this record commit is the round's only change) | Independent review of the SI-3C-P2 counter-review and the SI-3C-P3 multi-cycle inventory characterization | Reviewed both pushed commits individually and accepted each. Started 3 behind and 0 ahead with a clean worktree and fast-forwarded on the same branch; no rebase, rewrite or branch switch. Proved the test-only claim by file list rather than accepting it: the range changes exactly this record and `tests/test_short_interest_stock_normalization.py`, and `git diff --name-only` restricted to `research/` returns nothing, so no production source, schema, policy, preregistration, formula, provider interface, outcome, portfolio, package export or QuantConnect code changed. Confirmed the characterization drives the real PIT raw-feature, normalization, envelope and compact-verification pipeline with receipt digests checked against a freshly built envelope. | Complete repository suite at `6db112d5` inside the named lane worktree with pytest's normal external temp: **6,842 passed, 13 skipped, 4 failed, 25 known dependency warnings in 1,572.17s (26m12s)**; **no Short Interest test failed**. This reconciles exactly with the recorded 6,843 passed and 3 failures at **6,846** non-skipped tests either way; the one extra failure here is the Analyst `SI-SYNC-001` exact-byte test, whose absence from the implementer's sleeve-only failure set is direct evidence that it is a machine-local checkout artifact rather than a repository defect. Complete eight-file lane **275 passed in 193.83s**, matching the record; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Independently recomputed every scale figure from the payload: `C=2` gives 40 rows, 2 cohorts, 80 stored raw-inventory entries and 358,965 bytes; `C=4` gives 80 rows, 4 cohorts, 320 entries and 930,051 bytes; stored inventory grows exactly **4x** and total compact bytes **2.591x**. Derived and confirmed the identities stored `= C^2 x N`, unique per cohort `= C x N`, stored over unique `= C`, and member entries `= (C-1) x N`, and confirmed the `C=2` byte figure equals the SI-3C-P1 `N=20` envelope as expected. Verified both draft corrections directly: the four-cycle sample carries its own 2024-03-12 reference horizon with every `decision_at` at or before it, and exactly the same twenty stable security identifiers appear in every cycle. Also checked the record-level PIT rule itself rather than the horizon proxy: no lifecycle or classification observation valid on a row's execution session has `available_at` later than that row's `execution_at`. Python 3.12.13, pytest 9.1.1. Synthetic/offline only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/compile/job, broker, operator database, scheduler, deployment, order or trading access; **0 research looks**. No scratch worktree was created. | No P0, P1, P2 or P3 issue found and no correction required. One precise observation recorded rather than raised as a defect: all `C` cohort inventories hash to a single digest at both sample sizes, so the `C^2` term is pure duplication of one identical `C x N` table, and the envelope's existing content-addressed member-set mechanism is not applied to it. SI-3C-P3 is characterization only and explicitly neither designs nor authorizes that reduction. SI-3C-P3 quality **9/10**, the withheld point being that two `C` points at a single `N` confirm the identity on this fixture family rather than across `N`. Out of lane and unfixed: `SI-SYNC-001`, now shown machine-local, and the three permanently expired sleeve-clock assertions. Details in section 36. | Codex counter-reviews this record commit; because no code changed, that scope is section 36's accuracy. No milestone started and none authorized. The compact envelope remains **no-go for licensed/provider/production scale**: its gain is serialized output only, construction and verification still materialize the legacy rows, and the multi-cycle inventory term is now measured as quadratic in cycle count. `S2`-`S4`, DTC delta and window `K`, ranking/seeding and tie rules, full licensed SI-1/SI-2, SI-4 ETF reverse indexing/aggregation, outcomes, portfolio stages, and every QuantConnect artifact/upload/compile/job remain gated. |
 | 2026-09-03 | Codex counter-review + implementation | `702bde02` -> `4596dda` (code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3C-P3 review + SI-3C-P4 content-addressed serialized inventory | Accepted Claude's record-only commit after four P3 documentation corrections. Added strict, separate V2 envelope/receipt/build/verify APIs; each compact cohort references one top-level content-addressed complete raw inventory. V1 bytes, schema, hashes, call signatures, and valid outputs remain unchanged. Generalized a confirmed mutable-payload TOCTOU correction across V1/V2 so structural validation, authentication and receipt identity use one captured canonical snapshot and expanding APIs return only authenticated typed rows. | Exact eight-file lane: **302 passed in 926.88s**. Four TOCTOU regressions were red before correction; corrected selection **6 passed**. Re-inline mutation: **2 failed, 80 deselected**; restored. Final role/metadata selection **4 passed, 79 deselected**. compileall including `research` exit 0; `git diff --check` clean. Full repository run was owner-interrupted for immediate push after reaching **33% with no failure emitted** and is excluded as incomplete. Synthetic/offline only; prohibited surfaces untouched; **0 looks**. | No P0/P1. `SI-CCR15-001..004` (P3) and `SI3CP4-REV-001` (P2), `002..005` (P3) are closed. Three final independent audits found no remaining P0-P3. Details in section 37. | Commit this record and make the round's single push. Claude reviews `4596dda` and the record commit individually. V2 remains provider/production no-go; all licensed-data, outcome, ETF, QC-job, broker, deployment and trading gates remain closed. |
+| 2026-09-04 | Claude review | `702bde02` -> `cc8bcd7c` reviewed; test-only correction at `3ddf7bd` (this record commit follows) | Independent review of SI-3C-P4 content-addressed V2 serialized inventory | Reviewed both pushed commits individually. Every material claim was executed rather than read: all eight recorded scale figures reproduce exactly; V1 valid outputs are preserved against the retained pre-commit expansion path including reversed input; the pre-existing V1 golden digest `82f579b6...` is untouched; V2 cache and receipt resist caller mutation; dict/list subclass attacks and a fully re-addressed forgery are refused by exact-type and content rules. | Full repository on the exact pushed tree in the single lane worktree: **6,869 passed, 14 skipped, 3 failed, 25 warnings in 2,979.08s (49m39s)**; the three failures are the out-of-lane `tests/test_sleeve_report.py` clock-dependent assertions documented in section 34.5 and were not fixed. The count reconciles exactly against section 35's 6,843 / 13 / 3: the lane normalization file grew from 56 to 83 collected tests (+27, all from `4596dda1`), and one host-specific installer preview test passes on the implementer's host but skips here (6,843 + 27 - 1 = 6,869 passed; 13 + 1 = 14 skipped). Active-document consistency (which the implementer could not run): 69 passed. Exact eight-file lane after correction: **302 passed in 682.92s (11m22s)**, the same count the implementer recorded, since the correction adds no test. Mutations with byte-exact restore: M1 re-inline the authenticated snapshot: 2 of 8 selected cases red - the V1 and V2 receipt-hashes-the-authenticated-snapshot tests - while both expanding-verifier cases stay green because they return rows from typed dispositions; M2 disable the inventory-set content-digest check: 28 lane cases green (survivor; see `SI-CR4-003`); M3 disable the orphan-inventory check: 1 red; M4 disable the trailing `inventory_count != 1` refusal: 28 green (unreachable; `SI-CR4-002`); M5 disable the inventory-equals-row-currents completeness check: 1 red; M6 alter the shared schema-refusal message text: the pinned cross-feed test turns red (1 failed) and green on byte-exact restore; M7/M7b disable the outcome-to-cohort binding in V2 and in V1: 28 and 20 lane cases green, and the cohort-metadata forgery is still refused by `expanded row does not match its disposition digest` in both versions (survivors; see `SI-CR4-003`). Synthetic fixtures only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment or order access; **0 research looks**. | One test-sensitivity defect corrected in-lane (`SI-CR4-001`); advisories `SI-CR4-002` and `SI-CR4-003` recorded; no P0-P2. Accepts `SI-CCR15-001..004` against my prior record. Details in section 38. | Codex counter-reviews `3ddf7bd` and this record commit. V2 remains no-go for licensed/provider/production scale; all research and execution gates remain closed. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -5089,3 +5090,137 @@ Still unimplemented or gated: `S2`-`S4`, the days-to-cover delta and window `K`,
 stock ranking, seeding and tie rules, full licensed SI-1 ingest, full SI-2,
 SI-4 ETF reverse indexing and aggregation, every outcome join, the portfolio
 stages, and every QuantConnect algorithm, artifact, upload, compile or job.
+
+## 38. Claude independent review - 2026-09-04 (SI-3C-P4 content-addressed V2 inventory)
+
+Reviewer: Claude, in the single named lane worktree
+`C:\git\customizedAgent\trading_agent_short_interest` on
+`codex/strategy-short-interest`. `git worktree list` reported exactly one
+worktree throughout; no branch, detached, temporary, forked or handed-off
+worktree was created. Governing documents: `CLAUDE.md`,
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, the parallel-workflow
+contract and the owner blueprint.
+
+**Disposition: accepted after correction.** No P0, P1 or P2 defect was found.
+One test-sensitivity defect was corrected in the lane test file only; no
+production code changed. SI-3C-P4 is a serialization-only change on synthetic
+fixtures; accepting it establishes no market evidence, completes no research
+milestone, and does not lift the provider/production-scale no-go.
+
+### 38.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review head | `702bde02f8eab246db762f4c61f413adc1a5506f` |
+| Reviewed remote head | `cc8bcd7cda11bbb54e6e90a5dd583519580db3ac` |
+| Ordered reviewed range | `702bde02..cc8bcd7c` (2 commits, no merge commit) |
+| Ancestry | local `HEAD` equalled the fetched remote head; `702bde02` is an ancestor; clean fast-forward |
+| Claude correction commit | `3ddf7bd` (changes only `tests/test_short_interest_stock_normalization.py`) |
+| Reviewer interpreter | Python 3.13.14 / pytest 9.1.1 |
+
+### 38.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `4596dda1` | Add content-addressed SI score batch V2 (+ generalized V1/V2 authenticated-snapshot fix) | **accepted after correction** (test-only, `SI-CR4-001`) |
+| 2 | `cc8bcd7c` | Record SI-3C-P3 counter-review and SI-3C-P4 | accepted |
+
+### 38.3 Counter-review findings against my prior record are accepted
+
+`SI-CCR15-001` through `SI-CCR15-004` are correct and accepted without
+reservation: I overstated independent reproduction where memory figures were
+not rerun, misdescribed compact paths as materializing rows, treated my own
+choice not to start a milestone as an owner gate, and dated a push-ledger row
+in local rather than UTC time. None affected a code disposition. This row is
+dated in UTC.
+
+### 38.4 Claims executed rather than read
+
+- **Scale evidence reproduces exactly.** Rebuilding `C=2` and `C=4`, `N=20`
+  batches gives V1 358,965 / 930,051 canonical bytes and V2 352,841 / 892,667,
+  V1 inventory entries 80 / 320 and V2 entries 40 / 80 with one inventory set.
+  All eight recorded figures match to the byte. This is a serialized `C^2 N`
+  to `C N` inventory change only, exactly as the record scopes it.
+- **V1 is preserved, not merely asserted.** The expanding verifier now returns
+  rows from the authenticated typed dispositions instead of re-reading the
+  caller payload. Its output equals the retained pre-commit
+  `_expand_payload(payload)` on single-sector and multi-cycle batches, and when
+  the dispositions are supplied in reversed order. The V1 golden envelope
+  digest `82f579b6...` asserted by the new schema-separation test already
+  existed in the file at `702bde02`, so it is a genuine preservation proof; no
+  pre-existing 64-hex literal was removed by the commit.
+- **The generalized authenticated-snapshot fix (`SI3CP4-REV-001`) holds.**
+  `_capture_exact_payload_snapshot` serializes once and validates a freshly
+  parsed snapshot; both V1 and V2 receipts hash `submitted_json`. Beyond the
+  implementer's monkeypatch regressions, a non-monkeypatch attack was run: a
+  `dict` subclass with a mutating `items()`, a `list` subclass with a mutating
+  `__iter__` inside the inventory, and a `dict` subclass inside `cohorts` are
+  each refused at the exact-type boundary before serialization.
+- **V2 cache and receipt resist caller mutation**: `sha256` unchanged after
+  mutating a returned payload, fresh payloads unaffected, distinct objects per
+  call; the receipt digest equals the envelope digest and differs from a
+  post-verification mutated payload.
+- **A fully re-addressed forgery is refused by a content rule.** Tampering
+  one inventory `sha256`, then recomputing the set digest, every cohort's
+  reference and `cohort_sha256`, re-sorting the cohort table and remapping
+  every row's `cohort_sha256` - so that no ordering or count guard can trigger
+  - is refused structurally by `outcome cohort reference does not match row`,
+  and, when that rule is disabled, still by `expanded row does not match its
+  disposition digest` (see `SI-CR4-003`). Typed authentication refuses it too.
+- **Cross-feeding is refused at the schema-key boundary.** All four V1/V2
+  cross-feeds refuse with `payload fields are not exactly the frozen schema`,
+  emitted by the single shared `_require_exact_dict` helper.
+- **V2 builder and validator agree on a single inventory set.** The builder
+  refuses `!= 1` sets; the validator refuses duplicate digests, orphan sets,
+  missing references and content-digest mismatch, and requires the shared
+  inventory pairs to equal the row currents' `(event_id, sha256)` pairs.
+
+### 38.5 P0-P3 issue ledger
+
+Resolved items are retained. There are no P0, P1 or P2 findings.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR4-001 | P3 | Closed | `4596dda1` | `tests/test_short_interest_stock_normalization.py::test_v1_and_v2_score_batch_schemas_are_strictly_separate` | The four V1/V2 cross-feed assertions used bare `pytest.raises(StockScoreBatchError)` with no `match`, so they could pass at any guard and could not prove that cross-version confusion is refused at the schema boundary. This is the weakness class the implementer's own `SI3CP4-REV-003` closed for the eleven tamper attacks, but the cross-feed test was left generic. | The commit adds 14 `match=` refusal assertions and exactly these 4 bare ones. All four cross-feeds refuse with `payload fields are not exactly the frozen schema`; a future key-set drift letting one version's payload pass the schema check would fail later on a digest mismatch and the generic assertion would stay green. | `CLAUDE.md` requires a test to prove the dangerous direction it claims, and the implementer's own standard this round says each test must name the boundary it protects. | Added `match="frozen schema"` to all four assertions; line terminators in the mixed-ending file were left untouched. No production code changed. | M6 alter the shared schema-refusal message text: the pinned cross-feed test turns red (1 failed) and green on byte-exact restore |
+| SI-CR4-002 | P3 | Open (advisory, no change) | `4596dda1` | `_validate_payload_v2`, trailing `inventory_count != 1` refusal | The final `V2 score batch requires exactly one raw inventory set` check is unreachable through the validator: a duplicated identical set is refused earlier as a duplicate digest and a second distinct set is refused earlier as an orphan record. | Both two-set payloads were hand-crafted and refused at those earlier guards; M4 disable the trailing `inventory_count != 1` refusal: 28 green (unreachable; `SI-CR4-002`). | No change requested: correct defence in depth mirroring the builder's own `!= 1` refusal, recorded so a surviving mutation is not mistaken for a coverage hole. | None. | Crafted-payload probes and the mutation result. |
+| SI-CR4-003 | P3 | Open (advisory, no change) | `4596dda1` (V2 copies) and pre-existing V1 | `_validate_payload_v2` / `_validate_payload`: the raw-inventory-set content-digest check and the outcome-to-cohort binding `outcome["normalization_cohort_sha256"] != cohort_digest` | Three guards survive individual removal with the whole lane green: the V2 inventory-set content-digest check, and the outcome-to-cohort binding in both V1 and V2. Each was then attacked directly rather than reported as a coverage gap. A stale-set forgery (tamper one inventory entry, leave the set digest stale, re-address every cohort, remap every row and outcome reference) is refused on the pristine tree by the set-digest check and, with that check disabled, by `expanded row does not match its disposition digest`. A cohort-metadata forgery (change `winsor_bounds`, re-address the cohort, re-sort, remap rows but not outcomes) is refused on the pristine tree by the outcome binding in both versions and, with that binding disabled, by the same row disposition digest in both versions. | Mutations: set-digest check disabled - forgery still refused (`expanded row does not match its disposition digest`); V2 binding disabled - V2 forgery still refused by the row disposition digest, 28 lane tests green; V1 binding disabled - V1 forgery still refused by the row disposition digest, 20 lane tests green. | No change requested. All three are correct defence in depth subsumed by the row disposition digest, which binds the cohort digest into every row. A regression pinning any of them by message would assert which guard fires first, an ordering detail, and would turn red on a benign reordering. Recorded so a later reader does not mistake the surviving mutations for coverage holes. | None. | Direct attacks above; byte-exact restore verified after each mutation. |
+
+### 38.6 Validation
+
+- Full repository suite on the exact pushed tree `cc8bcd7c`, inside the single
+  lane worktree: ****6,869 passed, 14 skipped, 3 failed, 25 warnings in 2,979.08s (49m39s)**; the three failures are the out-of-lane `tests/test_sleeve_report.py` clock-dependent assertions documented in section 34.5 and were not fixed. The count reconciles exactly against section 35's 6,843 / 13 / 3: the lane normalization file grew from 56 to 83 collected tests (+27, all from `4596dda1`), and one host-specific installer preview test passes on the implementer's host but skips here (6,843 + 27 - 1 = 6,869 passed; 13 + 1 = 14 skipped)**. This is the complete run the implementer could
+  not finish (stopped at 33%). No Short Interest test failed.
+- Active-document consistency, which the implementer's host could not start:
+  **69 passed**.
+- Exact eight-file Short Interest lane on the corrected tree: ****302 passed in 682.92s (11m22s)**, the same count the implementer recorded, since the correction adds no test**.
+- Mutations (single lane worktree, byte-exact restore verified after each):
+  M1 re-inline the authenticated snapshot: 2 of 8 selected cases red - the V1 and V2 receipt-hashes-the-authenticated-snapshot tests - while both expanding-verifier cases stay green because they return rows from typed dispositions; M2 disable the inventory-set content-digest check: 28 lane cases green (survivor; see `SI-CR4-003`); M3 disable the orphan-inventory check: 1 red; M4 disable the trailing `inventory_count != 1` refusal: 28 green (unreachable; `SI-CR4-002`); M5 disable the inventory-equals-row-currents completeness check: 1 red; M6 alter the shared schema-refusal message text: the pinned cross-feed test turns red (1 failed) and green on byte-exact restore; M7/M7b disable the outcome-to-cohort binding in V2 and in V1: 28 and 20 lane cases green, and the cohort-metadata forgery is still refused by `expanded row does not match its disposition digest` in both versions (survivors; see `SI-CR4-003`).
+- `git diff --check` clean; compileall including `research` exit 0.
+- Sources: `official_style_v1.json` `2026-08-28.v1` (cycles `2024-01-12`,
+  `2024-01-31`) and `pit_reference_v1.json` `2026-08-29.v1`, both
+  `synthetic_fixture_only`; `C=2`/`C=4` cohorts are deterministic in-memory
+  clones. No credential, provider, licensed row, price, market outcome,
+  QuantConnect artifact/upload/compile/job, broker, operator database,
+  scheduler, deployment, order or trading surface was accessed. Permanent
+  research-look count remains **0**.
+
+### 38.7 Scope and limits
+
+- Reviewed the two pushed commits and the open advisory entries; not a fresh
+  whole-lane audit (section 30 remains the latest of that kind).
+- The improvement is serialized-output-only, as the record states. Typed
+  dispositions still carry `C^2 N` references, legacy hashing still processes
+  every legacy byte, and only `N=20` at `C=2`/`C=4` is characterized. V2 stays
+  **no-go** for licensed/provider/production scale.
+- Everything here is software behaviour on synthetic fixtures; it is not
+  evidence of any market edge.
+
+### 38.8 Remaining gates and next authorized step
+
+1. Codex counter-reviews `3ddf7bd` and this record commit.
+2. Licensed SI-1/SI-2, `S2`-`S4`, DTC delta/window `K`, ranking/seeding,
+   SI-4 ETF reverse index/eligibility/coverage/aggregation, outcomes,
+   portfolio stages and every QuantConnect artifact/upload/compile/job remain
+   gated on separate owner authorisation. No next milestone is implemented
+   here.

@@ -45,9 +45,10 @@ their lane-owned artifacts.
   owner decision; research-contract items (four-family `1/80` re-freeze,
   duplicate-key loader) route to their lanes; `ml.immutable_io` relocation is
   an integration-milestone item.
-- Owner decision pending: the real runtime stop file on this host is active
-  at generation 42 with 42 test-origin incidents; the documented clear path
-  cannot run (origin databases are gone). The session did not touch it.
+- Owner decision, since taken (follow-up 1 below): the real runtime stop file
+  on this host was active at generation 42 with 42 test-origin incidents and
+  the documented clear path could not run (origin databases are gone); the
+  owner directed it cleared.
 - Validation on the final integration tree: full suite on `3114a15` in an isolated detached worktree with an external `--basetemp`: 6799 passed, 13 skipped, 25 warnings, 0 failed (2124 s); compileall including `research` clean; `git diff --check` clean. Baseline `main` at `aefa0ec` in the same setup: 4 failed, 6786 passed, 13 skipped (the four wall-clock failures).
 - `main` still shows the four wall-clock failures until the integration PR is
   merged; every lane branch carries the same fix commits after this round.

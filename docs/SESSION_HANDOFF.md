@@ -23,8 +23,11 @@ their lane-owned artifacts.
 - Authoritative record: `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md`
   (fix table, consolidation map, full disposition ledger of every lane item,
   owner decisions requested, validation). Code commits on the integration
-  branch: `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` and
-  `3114a1530f0afa400eb200e79ff218c174657e69`. Per-lane cherry-pick hashes are recorded in each
+  branch: `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8`,
+  `3114a1530f0afa400eb200e79ff218c174657e69`, and
+  `6ef66eed77f9b24ea3df8aa538f42de0c871c824` (owner-directed F-8: the
+  Target-price self-declared-review test made deterministic across harness
+  layouts). Per-lane cherry-pick hashes are recorded in each
   lane record's pointer section, not here.
 - Fixed: the sleeve-report / notification-cycle wall-clock mismatch (four
   tests red on `main` since 2026-09-02; `evaluate_sleeves` gains an injected
@@ -33,7 +36,8 @@ their lane-owned artifacts.
   whose containment write reaches the real `%LOCALAPPDATA%` stop); missing
   EOL attributes for `research/ml_specs/*.json` and `research/__init__.py`;
   the Briefing smoke fixture's network reach; the stale lane README and
-  direction pointer; one overclaiming characterization test name.
+  direction pointer; one overclaiming characterization test name; the
+  layout-dependent Target-price self-declared-review test (F-8).
 - Not fixed, with reasons in the record: execution-semantics P1/P2 items
   (Insider R-01/R-10/R-12/R-13/R-15/R-16, Analyst CLR-002 residual, CLR-003)
   remain gated behind the queued

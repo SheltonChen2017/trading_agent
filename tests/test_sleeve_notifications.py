@@ -76,7 +76,8 @@ def _sell(ticker: str, qty: float, price: float, *, days_ago: int, fill_id: str)
 
 
 def _report(positions, fills):
-    return evaluate_sleeves(_snapshot(positions), build_ledger(fills), [])
+    # Lot ages are relative to _NOW, so the report is classified at _NOW too.
+    return evaluate_sleeves(_snapshot(positions), build_ledger(fills), [], now=_NOW)
 
 
 def _evaluate(report, prior=(), references=None, prices=None, now_iso=_NOW_ISO):
@@ -364,11 +365,11 @@ def test_missing_reentry_price_pauses_the_watch_never_clears_it():
 # ---------------------------------------------------------------------------
 
 
-def _seeded_store(tmp_path):
+def _seeded_store(tmp_path, *, days_ago: int = 400):
     from assistant.order_lifecycle import journal_broker_order_update
 
     store = AssistantStore(tmp_path / "m2.db")
-    at = _NOW - timedelta(days=400)
+    at = _NOW - timedelta(days=days_ago)
     proposal_id = "p-m2"
     store.save_proposal(
         {
@@ -469,6 +470,25 @@ def test_cycle_recross_reopens_the_same_fingerprint(tmp_path):
         len([a for a in store.list_operational_alerts(status="open")
              if a["category"] == ALERT_CATEGORY]) == 1
     )
+
+
+def test_cycle_classifies_lot_age_at_its_own_clock_not_wall_time(tmp_path):
+    """The cycle stamps `evaluated_at` from its injected `now`; the report it
+    evaluates must be classified at that same instant.  A lot one day short
+    of long-term at the cycle's clock is AWAITING, and only the cycle three
+    days later (lot now long-term) opens gain review.  Without the clock
+    pass-through the report would read the host's date and the term would
+    flip with the calendar (the 2026-09-02 wall-clock failures)."""
+    store = _seeded_store(tmp_path, days_ago=364)
+    snapshot = _snapshot([_position("NVDA", 10, 160.0)])
+
+    at_clock = run_sleeve_notification_cycle(store, snapshot=snapshot, now=_NOW)
+    assert [a["kind"] for a in at_clock["activations"]] == [AWAITING_LONG_TERM]
+
+    later = run_sleeve_notification_cycle(
+        store, snapshot=snapshot, now=_NOW + timedelta(days=3)
+    )
+    assert [a["kind"] for a in later["activations"]] == [GAIN_REVIEW]
 
 
 def test_cycle_does_not_create_reentry_watch_for_broker_held_ticker(

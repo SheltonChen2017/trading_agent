@@ -395,9 +395,19 @@ def test_real_process_crash_mid_transaction_leaves_no_anomaly_without_halt(tmp_p
     assert store.get_proposal("p-anomaly")["status"] == SUBMITTING
 
     repository_root = _Path(__file__).resolve().parents[1]
+    # The conftest autouse fixture redirects the runtime emergency-stop
+    # namespace for THIS process only.  A child interpreter starts from the
+    # real per-OS-user %LOCALAPPDATA% root, so a containment write there would
+    # latch a machine-global stop against the operator's live application and
+    # every sibling lane (R-09/R-18/R-22).  Point the child at the same
+    # isolated root before it imports any store code.
+    runtime_root = (tmp_path / "runtime").resolve()
     child = f'''
 import os, sys
 sys.path.insert(0, {str(repository_root)!r})
+from pathlib import Path as _P
+import assistant.dispatch_fence as _dispatch_fence
+_dispatch_fence._RUNTIME_FENCE_ROOT = _P({str(runtime_root)!r})
 from assistant.storage import AssistantStore
 from assistant.proposal_status import SUBMITTING, SUBMISSION_UNKNOWN
 

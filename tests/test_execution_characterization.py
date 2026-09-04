@@ -1987,13 +1987,19 @@ def test_submission_carries_the_proposals_exact_idempotency_key(store):
     )
 
 
-def test_an_unsupported_order_type_blocks_and_releases_its_reservation(store):
+def test_an_unsupported_order_type_fails_policy_revalidation_before_reserving(store):
     """A mutated policy cannot authorize an unsupported broker order type.
 
     The account-bound gate now revalidates the exact fingerprinted policy,
     closing the older layer disagreement before authorization or reservation.
     A hand-mutated ``TradingPolicy`` therefore fails as invalid policy state;
     it can never reach the broker dispatcher or be downgraded to market.
+
+    Named for what it proves (Insider lane R-17): the refusal happens BEFORE
+    any budget is reserved, so the empty-reservation assertion below cannot
+    protect the post-reservation release kernel. That release path is frozen
+    by ``test_pre_submit_telemetry_failure_releases_budget_without_broker_contact``,
+    which takes a real reservation and then observes it released.
 
     Reaching the branch requires a policy that permits "stop", which
     TradingPolicy.__post_init__ rejects. Constructing it through
@@ -2025,7 +2031,7 @@ def test_an_unsupported_order_type_blocks_and_releases_its_reservation(store):
     assert "order_types" in str(caught.value)
     state = observable_state(store, "p-1")
     assert state["reservations"] == [], (
-        "an unsupported order type left budget reserved with no order to release it"
+        "an unsupported order type must be refused before any budget is reserved"
     )
     assert "submit_market_order" not in recorder.call_names
     assert "submit_limit_order" not in recorder.call_names

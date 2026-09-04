@@ -5092,3 +5092,29 @@ share-class mapping, deduplication, canonical filtering, aggregation, or
 `$50,000` gate was added or authorized. IB-1 remains incomplete and blueprint
 19.4 step 1 unstarted. Next: Codex counter-reviews these Claude commits, then
 may continue the bounded ladder.
+
+## 41. Owner-directed cross-lane bug-fix integration applied (2026-09-04)
+
+The owner directed the dedicated Review lane session to fix, on the
+`main`-derived branch `Feature-bug-fix-integration-2026-09-04`, the shared
+trading-application / test-infrastructure / repository-tooling issues that this
+record and the sibling lane records had documented but, under the lane scope
+rule, deliberately not fixed, and to apply the identical commits to every lane
+branch so no lane carries a divergent copy of a shared file. This lane received
+them as cherry-picks; no lane-owned file changed.
+
+| Integration-branch commit | Cherry-pick on this lane | Content |
+|---|---|---|
+| `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` | `b8f49eeabf285627ef195adece04769dbb264223` | sleeve-report clock seam, runtime-stop leak redirect + conftest guard, shared EOL attributes, Briefing smoke isolation, characterization test rename |
+| `3114a1530f0afa400eb200e79ff218c174657e69` | `77055da4a2f4741af8d3a80e691090dbe63fa412` | notification cycle evaluates at its own clock; guard decoder bound at import |
+| docs commit | `e08f0c17a6694f8e4764d3edd992a484cbefeb3c` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, full disposition ledger, owner decisions) plus the four-lane README, the direction status paragraph, and the workflow exception paragraph |
+
+Items of this record closed by the application: IB0H-OOL01 (F-1); the R-09/R-18/R-20/R-22 test-origin leak mechanism (F-2/F-3 — the existing debris file on the host is an owner decision, integration record section 6); R-17 (F-7); item #27's stale-CRLF class for shared files (F-4); item #30 README (F-6). R-11 was already closed on `main` by EXE-001. Every other
+out-of-lane item this record carries was examined; its disposition and reason
+are in the integration record's section 5, and the items needing an owner
+decision are listed in its section 6.
+
+This application is not acceptance of any lane milestone and grants no
+provider, outcome, look, QuantConnect, broker, operator-database, deployment,
+paper, live, or trading authority. The lane's same-branch review loop resumes
+from this head. Validation on this lane's resulting head: focused set (sleeve report/notifications, leak guard, EOL attributes, crash-test redirect, Briefing smoke, reservation characterizations, active-document consistency): 174 passed in 22.79s.

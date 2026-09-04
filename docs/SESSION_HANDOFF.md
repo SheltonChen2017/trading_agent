@@ -63,10 +63,16 @@ their lane-owned artifacts.
   record and Action Plan (`16b3435`, `522da19`, `47103e4` on
   `codex/strategy-target-price-revisions`). (3) The analyst and
   short-interest clone directories were fast-forwarded to their pushed tips.
-- Open owner decision: `docs/ACTION_PLAN_2026-08-20.md` on the Target-price
-  lane carries the same class of per-round lane edits (nine commits since
-  `main`, target block and row); it was deliberately left as is and will need
-  the same restore-or-accept decision before that lane is re-merged.
+- (4) On the owner's further direction, the Target-price lane's
+  `docs/ACTION_PLAN_2026-08-20.md`, which carried the same class of per-round
+  lane edits (nine commits since `main`), was restored byte-for-byte to
+  `main`'s version (`e989872` on that branch) and the lane guards that read
+  its target block and row for per-round state were retargeted to the lane
+  record in the following commit. Both shared coordination documents are now
+  identical on that lane and this branch. Note for `main`: the Action Plan's
+  Target-price block still describes the 2026-08-30 state ("after this Codex
+  round's single push, Claude reviews only its exact correction range"); a
+  concise `main`-side status refresh is an owner call, not a lane edit.
 
 ## 0. Target-Price Revision fourth-lane planning addition
 

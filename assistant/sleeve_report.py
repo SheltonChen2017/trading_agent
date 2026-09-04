@@ -48,6 +48,7 @@ invite acting on it.
 from __future__ import annotations
 
 from decimal import Decimal
+from datetime import datetime
 from typing import Any, Iterable, Mapping
 
 import config
@@ -158,6 +159,7 @@ def _growth_positions(
     gain_threshold_pct: Decimal,
     decline_threshold_pct: Decimal,
     gain_requires_long_term: bool,
+    now: datetime | None,
 ) -> tuple[list[dict[str, Any]], int, int, int]:
     positions: list[dict[str, Any]] = []
     gain_crossings = 0
@@ -177,7 +179,9 @@ def _growth_positions(
         }
         try:
             exact_price = position.exact_field("current_price")
-            lots = unrealized_by_lot(ledger, ticker, float(exact_price))
+            lots = unrealized_by_lot(
+                ledger, ticker, float(exact_price), now=now
+            )
         except (TaxLotError, ValueError, TypeError) as exc:
             # A bad price must degrade THIS position's lot view loudly, not
             # crash the report or silently show the position lot-less.
@@ -313,6 +317,7 @@ def evaluate_sleeves(
     decline_threshold_pct: float = config.GROWTH_DECLINE_REVIEW_THRESHOLD_PCT,
     income_underlying: Mapping[str, str] | None = None,
     leveraged_underlying: Mapping[str, str] | None = None,
+    now: datetime | None = None,
 ) -> dict[str, Any]:
     """Measure the portfolio against the owner's three-sleeve preference.
 
@@ -320,6 +325,13 @@ def evaluate_sleeves(
     journal postings. Store access belongs to the caller (see the CLI),
     so this function can be tested exhaustively without a database and can
     never write anywhere.
+
+    ``now`` is the evaluation instant for every lot-age classification
+    (``term_if_sold_now``, ``days_to_long_term``, the long-term gate).  It
+    defaults to the live UTC clock for production callers.  It is an explicit
+    input rather than an ambient read so the report is a pure function of its
+    arguments: a fixed-clock fixture must not drift into a different tax term
+    as wall time advances (TPR-OOL-009 / SI-OOL-002 / IB0H-OOL01).
 
     Raises ``SleeveReportError`` when the inputs cannot support an honest
     report (non-finite or non-positive equity, corrupt income postings).
@@ -399,6 +411,7 @@ def evaluate_sleeves(
                 gain_threshold_pct=gain_threshold,
                 decline_threshold_pct=decline_threshold,
                 gain_requires_long_term=gain_requires_long_term,
+                now=now,
             )
         )
     except ValueError as exc:

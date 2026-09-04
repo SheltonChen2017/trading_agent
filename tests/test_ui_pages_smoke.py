@@ -56,6 +56,28 @@ def _isolated_app_environment(tmp_path, monkeypatch):
         event_data, "fetch_upcoming_earnings", lambda *a, **k: [], raising=False
     )
 
+    # TPR-OOL-005: the Briefing route also reaches yfinance through the
+    # names each consumer bound at import time (`from data.market_data import
+    # fetch_historical`), not only through the recorded-bar seam above.  Under
+    # host load that produced a 180 s timeout with a yfinance SQLite cache
+    # error.  Patch every bound name so this smoke test never leaves the
+    # process; it asserts render-without-exception, not market data.
+    import data.market_data as market_data
+
+    def _no_network_history(*_args, **_kwargs):
+        return {}
+
+    monkeypatch.setattr(market_data, "fetch_historical", _no_network_history)
+    for module_name in (
+        "assistant.context_builder",
+        "assistant.macro_context",
+        "scripts.personal_assistant_ui",
+    ):
+        module = __import__(module_name, fromlist=["fetch_historical"])
+        monkeypatch.setattr(
+            module, "fetch_historical", _no_network_history, raising=False
+        )
+
 
 @pytest.mark.parametrize("page", _PAGES)
 def test_page_renders_without_exception(page, _isolated_app_environment):

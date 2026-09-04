@@ -4205,3 +4205,29 @@ ARV2-4D-B remain unauthorised: no production manifest loader, input access,
 rights authentication, nuisance computation, numeric receipt, successor
 binding, outcome, QC, deployment or trading action exists or is implied by
 this acceptance.
+
+## 26. Owner-directed cross-lane bug-fix integration applied (2026-09-04)
+
+The owner directed the dedicated Review lane session to fix, on the
+`main`-derived branch `Feature-bug-fix-integration-2026-09-04`, the shared
+trading-application / test-infrastructure / repository-tooling issues that this
+record and the sibling lane records had documented but, under the lane scope
+rule, deliberately not fixed, and to apply the identical commits to every lane
+branch so no lane carries a divergent copy of a shared file. This lane received
+them as cherry-picks; no lane-owned file changed.
+
+| Integration-branch commit | Cherry-pick on this lane | Content |
+|---|---|---|
+| `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` | `bbf228c452cb83c53bec9ceb85d913cc693fc7d8` | sleeve-report clock seam, runtime-stop leak redirect + conftest guard, shared EOL attributes, Briefing smoke isolation, characterization test rename |
+| `3114a1530f0afa400eb200e79ff218c174657e69` | `d71f249b5f18d7bdfba7f3b68963ec557be8bc4e` | notification cycle evaluates at its own clock; guard decoder bound at import |
+| docs commit | `d1cbf82a1c610bdd4dc12636a947603bf650350d` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, full disposition ledger, owner decisions) plus the four-lane README, the direction status paragraph, and the workflow exception paragraph |
+
+Items of this record closed by the application: ARV2WL-D11 (F-1); the repository-wide root `.gitattributes` gap noted in section 4I.5 (F-4). `ARV2-UNRELATED-001` is not a stale message: it depends on where pytest's `tmp_path` lives and is routed to the Target-price lane, which owns that test. Every other
+out-of-lane item this record carries was examined; its disposition and reason
+are in the integration record's section 5, and the items needing an owner
+decision are listed in its section 6.
+
+This application is not acceptance of any lane milestone and grants no
+provider, outcome, look, QuantConnect, broker, operator-database, deployment,
+paper, live, or trading authority. The lane's same-branch review loop resumes
+from this head. Validation on this lane's resulting head: focused set (sleeve report/notifications, leak guard, EOL attributes, crash-test redirect, Briefing smoke, reservation characterizations, active-document consistency): 174 passed in 24.22s.

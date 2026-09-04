@@ -68,6 +68,29 @@ deployment; and no trading authority. It expires after the three directed
 synchronizations and lane-record updates. A later common-baseline or shared-
 file change again requires a separate owner decision.
 
+### Owner-directed cross-lane bug-fix integration (owner direction, 2026-09-04)
+
+The owner made that separate decision on 2026-09-04 for one bounded purpose:
+the shared trading-application, test-infrastructure, and repository-tooling
+defects that the four lane reviews had documented but, under the lane scope
+rule, deliberately not fixed. The dedicated review session confirmed each
+candidate on `main` first, fixed only the confirmed ones on the integration
+branch `Feature-bug-fix-integration-2026-09-04` (branched from `main`), and
+applied the identical commits to all four lane branches so no lane carries a
+divergent copy of a shared file. The complete item ledger, including every item
+examined and left unfixed with its reason, is
+`docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md`; each lane record gains
+one short pointer section and nothing else. The owner performs the merge.
+
+This exception covers only those recorded items. It grants no lane any
+authority to edit shared files afterwards, and it is not acceptance of any
+lane milestone: acceptance remains withheld until Claude reviews the exact
+pushed snapshot on each same lane branch and Codex counter-reviews every Claude
+commit. It grants no provider, outcome, look, QuantConnect (QC), broker,
+operator-database, deployment, paper, live, or trading authority, and it
+expires when the integration branch is merged. Any later shared-file change
+again requires a separate owner decision.
+
 ## 3. Same-branch Codex/Claude loop
 
 Each lane uses this serialized loop on its one branch:

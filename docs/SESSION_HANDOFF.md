@@ -9,6 +9,49 @@ deferred-remediation state below. The original three strategy lanes remain
 independent; this amendment changes shared coordination only and does not edit
 their lane-owned artifacts.
 
+## 0B. Owner-directed cross-lane bug-fix integration, 2026-09-04
+
+- The owner directed the dedicated Review lane session to scan all four lane
+  records for shared trading-application / test-infrastructure / tooling
+  issues that were documented but deliberately not fixed on the lanes,
+  confirm each on `main`, fix the confirmed ones on
+  `Feature-bug-fix-integration-2026-09-04` (branched from `main` at
+  `aefa0ec`), apply the identical commits to every lane branch, and push. The
+  owner performs the PR merges. This is the "separate owner decision" the
+  frozen-file rule requires; the parallel-workflow file carries the bounded
+  exception paragraph.
+- Authoritative record: `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md`
+  (fix table, consolidation map, full disposition ledger of every lane item,
+  owner decisions requested, validation). Code commits on the integration
+  branch: `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8`,
+  `3114a1530f0afa400eb200e79ff218c174657e69`, and
+  `6ef66eed77f9b24ea3df8aa538f42de0c871c824` (owner-directed F-8: the
+  Target-price self-declared-review test made deterministic across harness
+  layouts). Per-lane cherry-pick hashes are recorded in each
+  lane record's pointer section, not here.
+- Fixed: the sleeve-report / notification-cycle wall-clock mismatch (four
+  tests red on `main` since 2026-09-02; `evaluate_sleeves` gains an injected
+  `now`); the machine-global runtime emergency stop being latched by a
+  child-process test (redirected, plus a conftest guard that fails any test
+  whose containment write reaches the real `%LOCALAPPDATA%` stop); missing
+  EOL attributes for `research/ml_specs/*.json` and `research/__init__.py`;
+  the Briefing smoke fixture's network reach; the stale lane README and
+  direction pointer; one overclaiming characterization test name; the
+  layout-dependent Target-price self-declared-review test (F-8).
+- Not fixed, with reasons in the record: execution-semantics P1/P2 items
+  (Insider R-01/R-10/R-12/R-13/R-15/R-16, Analyst CLR-002 residual, CLR-003)
+  remain gated behind the queued
+  `POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md` plan or an
+  owner decision; research-contract items (four-family `1/80` re-freeze,
+  duplicate-key loader) route to their lanes; `ml.immutable_io` relocation is
+  an integration-milestone item.
+- Owner decision pending: the real runtime stop file on this host is active
+  at generation 42 with 42 test-origin incidents; the documented clear path
+  cannot run (origin databases are gone). The session did not touch it.
+- Validation on the final integration tree: full suite on `3114a15` in an isolated detached worktree with an external `--basetemp`: 6799 passed, 13 skipped, 25 warnings, 0 failed (2124 s); compileall including `research` clean; `git diff --check` clean. Baseline `main` at `aefa0ec` in the same setup: 4 failed, 6786 passed, 13 skipped (the four wall-clock failures).
+- `main` still shows the four wall-clock failures until the integration PR is
+  merged; every lane branch carries the same fix commits after this round.
+
 ## 0. Target-Price Revision fourth-lane planning addition
 
 - The owner directed a new sibling worktree for branch

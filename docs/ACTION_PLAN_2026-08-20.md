@@ -52,25 +52,34 @@ record. Shadow, paper, restricted-live canary, and bounded unattended
 operation are separate future promotion decisions; no stage authorizes the
 next.
 
-**Current bounded status, 2026-08-30:** under the owner's approval of the
+**Current bounded status, 2026-09-03:** under the owner's approval of the
 recorded proposals, the fixed-slot v2.2 PDF and TPR-0A snapshot at `bb8dfb6`
-remain the zero-access frozen candidate. The reviewed-spec registry is empty,
-the candidate is unreviewed for its own registry, and every empirical child
-field and source/look authority remains unbound or zero. Claude subsequently
-reviewed the two-commit Codex range and made four commits through exact head
-`f21d70851d5e1790be0c308e13e8837a7cd1d008`; Codex has counter-reviewed every
-Claude commit in `c8c7470..f21d708`. The Windows policy-byte migration,
-current-role, target-scoped worktree-guard, and record defects are corrected
-or qualified in section 21. The owner-directed worktree rule remains: resolve
-this lane from `git worktree list`, never from a pinned directory. No P0 or P1
-is open. One pre-existing target P2 (`TPR-CCR5-004`) blocks any future positive
-reviewed-algorithm authority until an independently reviewed immutable policy-
-inventory trust root exists; the registry is empty today.
-No next implementation milestone is authorized: TPR-1 is blocked on a
-separately reviewed exact source-rights artifact, while TPR-0B waits for
-reviewed TPR-1/TPR-2 structural manifests. All outcome access and every
-operational stage remain blocked. After this Codex round's single push, Claude
-reviews only its exact correction range.
+remain the zero-access frozen candidate. Claude has independently reviewed
+Codex's exact two-commit range
+`1981233424f25b48ebec2273fa4822c249e2a041..49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3`.
+The comprehensive whole-lane audit is complete; exact dispositions and the
+corrected complete-suite provenance are in section 38 of the lane record,
+section 37 is the counter-review it reviewed, and section 8 remains
+the authoritative current open-finding register. The non-authorizing
+TPR-TR0-I implementation candidate is
+checkpointed but remains incomplete. Rollback/replay protection,
+parent-directory custody, and the remaining adversarial validation matrix
+block completion. The reviewed-spec registry is the canonical empty v2
+registry; no key provisioning or positive authority is authorized. The frozen
+TPR-0A candidate still chooses the full `1/80`; its bytes and identities are
+unchanged. The lane and `origin/main` have diverged, and neither contains the
+other; volatile ahead/behind counts are deliberately not stored in current
+pointers. The owner-directed worktree rule remains: resolve this lane from
+`git worktree list`, never from a pinned directory. Sibling-lane changes and
+their independent reviews remain on their respective branches; integration
+into `main` grants this target branch no authority to edit those artifacts. No
+next implementation, provisioning, or positive-authority milestone is
+authorized. TPR-1 remains blocked on an exact reviewed source-rights artifact
+and TPR-0B waits for reviewed TPR-1/TPR-2 structural manifests. All outcome
+access and every operational stage remain blocked. After this round's single
+push, Codex counter-reviews the exact new Claude correction range
+beginning after `49caa886`; that counter-review grants no additional
+authority.
 
 **Owner multiplicity amendment, 2026-08-30 — affects all four strategy lanes:**
 the four named strategy-selection lanes are one fixed family with total
@@ -236,7 +245,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
 | Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
-| Target-Price Revisions (TPR) | Separate fourth lane. The sole-authority v2.2 PDF and TPR-0A snapshot at `bb8dfb6` encode the permanent-four-slot contract; the latest Claude review head is `f21d70851d5e1790be0c308e13e8837a7cd1d008`, and Codex's four-commit counter-review/corrections are in section 21. The candidate remains unreviewed for its own empty reviewed-spec registry and grants zero authority. One open target P2 (`TPR-CCR5-004`) blocks positive reviewed-algorithm authority until an immutable policy-inventory trust root is independently reviewed. The fixed family has total two-sided FWER `0.05`, permanent maximum `1/80` per named lane, expiration without redistribution for unused/withdrawn allocations, and a within-lane confirmatory sum ceiling of `1/80`; sibling changes remain on sibling branches (`TPR-OOL-006`). No next implementation milestone is authorized: TPR-1 is blocked on exact reviewed source rights; TPR-0B, all outcome access, and every operational/trading stage remain blocked. Exact dispositions and evidence are in sections 17 through 21 of the lane record. |
+| Target-Price Revisions (TPR) | Separate fourth lane. The sole-authority v2.2 PDF and unchanged TPR-0A snapshot at `bb8dfb6` encode the permanent-four-slot contract. Claude reviewed both Codex commits in `19812334..49caa886`; the comprehensive Claude whole-lane audit is complete, and section 38 records the dispositions, the P0-P3 ledger, and the corrected complete-suite provenance. The non-authorizing TPR-TR0-I implementation candidate is checkpointed but remains incomplete because rollback/replay protection, parent-directory custody, and its remaining validation matrix are open. The reviewed-spec registry is empty v2; no key provisioning or positive authority is authorized. The fixed family has total two-sided FWER `0.05`, permanent maximum `1/80` per named lane, expiration without redistribution for unused/withdrawn allocations, and a within-lane confirmatory sum ceiling of `1/80`; sibling-lane changes and their independent reviews remain on their respective branches (`TPR-OOL-006`). After the single push, Codex counter-reviews this Claude review round beginning after `49caa886`. TPR-1 is blocked on exact reviewed source rights, and TPR-0B, all outcome access, and every operational/trading stage remain blocked. Exact dispositions and evidence are in section 37 of the lane record. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0

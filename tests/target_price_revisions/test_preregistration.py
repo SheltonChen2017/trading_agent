@@ -14,6 +14,7 @@ import research.target_price_revisions.preregistration as preregistration
 from research.target_price_revisions import FAMILY_ID, PRIMARY_CELL_ID, PRIMARY_LOOK_ID
 from research.target_price_revisions.canonical import (
     CanonicalContractError,
+    require_canonical_json_bytes,
     require_aware_instant,
     require_decimal_text,
 )
@@ -32,6 +33,7 @@ from research.target_price_revisions.preregistration import (
     require_zero_access_permanent_look_authority,
     require_zero_access_source_authority,
 )
+from research.target_price_revisions.trust_root import TrustedRegistrySnapshot
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -86,6 +88,27 @@ def _write(tmp_path: Path, raw: dict[str, object], name: str = "spec.json") -> P
     return path
 
 
+def _cells_with_confirmatory_alpha(alpha: str) -> tuple[object, ...]:
+    """Build a semantic-validation fixture without changing the frozen candidate."""
+    raw = _raw_candidate()
+    _cell(raw, "family_multiplicity")["value"][
+        "confirmatory_alpha_allocations"
+    ][0]["two_sided_alpha"] = alpha
+    _cell(raw, "empirical_binding_contract")["value"]["assigned_alpha"] = alpha
+    _cell(raw, "trial_and_null_contract")["value"][
+        "primary_acceptance_contract"
+    ]["two_sided_alpha"] = alpha
+    return tuple(
+        preregistration.PreregistrationCell(
+            cell_id=cell["cell_id"],
+            state=cell["state"],
+            value=preregistration.deep_freeze(cell["value"]),
+            source=cell["source"],
+        )
+        for cell in raw["cells"]
+    )
+
+
 def _request() -> OutcomeAccessRequest:
     return OutcomeAccessRequest(
         family_id=FAMILY_ID,
@@ -126,6 +149,19 @@ def _anchored_reviewed_spec(
     candidate_path.parent.mkdir(parents=True)
     candidate_payload = CANDIDATE.read_bytes()
     candidate_path.write_bytes(candidate_payload)
+    registry_relative = Path(
+        "research/target_price_revisions/specs/reviewed_spec_registry.json"
+    )
+    registry_path = repository / registry_relative
+    registry_path.write_bytes(
+        _canonical(
+            {
+                "schema": preregistration.REVIEW_REGISTRY_SCHEMA,
+                "signature_policy": dict(preregistration.SIGNATURE_POLICY),
+                "entries": [],
+            }
+        )
+    )
     for policy_relative_text in preregistration.POLICY_CODE_REPO_PATHS:
         policy_relative = Path(policy_relative_text)
         policy_path = repository / policy_relative
@@ -135,6 +171,7 @@ def _anchored_reviewed_spec(
         repository,
         "add",
         candidate_relative.as_posix(),
+        registry_relative.as_posix(),
         *preregistration.POLICY_CODE_REPO_PATHS,
     )
     _git(
@@ -177,12 +214,9 @@ def _anchored_reviewed_spec(
     )
     review_commit = _git(repository, "rev-parse", "HEAD")
 
-    registry_relative = Path(
-        "research/target_price_revisions/specs/reviewed_spec_registry.json"
-    )
-    registry_path = repository / registry_relative
     registry = {
         "schema": preregistration.REVIEW_REGISTRY_SCHEMA,
+        "signature_policy": dict(preregistration.SIGNATURE_POLICY),
         "entries": [
             {
                 "spec_id": raw["spec_id"],
@@ -219,6 +253,33 @@ def _anchored_reviewed_spec(
         "--quiet",
         "-m",
         "anchor reviewed algorithm",
+    )
+    signing_key_fingerprint = "SHA256:" + "A" * 43
+
+    def trusted_registry(
+        root: Path, payload: bytes
+    ) -> TrustedRegistrySnapshot:
+        assert root == repository.resolve()
+        anchor_commit = _git(
+            repository,
+            "log",
+            "-1",
+            "--format=%H",
+            "--",
+            registry_relative.as_posix(),
+        )
+        parent_commit = _git(repository, "rev-parse", f"{anchor_commit}^")
+        head_commit = _git(repository, "rev-parse", "HEAD")
+        return TrustedRegistrySnapshot(
+            anchor_commit=anchor_commit,
+            parent_commit=parent_commit,
+            head_commit=head_commit,
+            signing_key_fingerprint=signing_key_fingerprint,
+            registry_payload=payload,
+        )
+
+    monkeypatch.setattr(
+        preregistration, "verify_signed_registry_anchor", trusted_registry
     )
     monkeypatch.setattr(
         preregistration, "REVIEWED_SPEC_REGISTRY_PATH", registry_path
@@ -660,6 +721,18 @@ def test_candidate_values_are_detached_and_recursively_immutable() -> None:
         controls["continuous_controls"] += ("future_return",)
 
 
+def test_alpha_accounting_allows_underallocation_but_refuses_overspend() -> None:
+    """The permanent 1/80 slot is a ceiling, not an entitlement to spend it."""
+    preregistration._validate_dates_and_alpha(
+        _cells_with_confirmatory_alpha("0.00625")
+    )
+
+    with pytest.raises(PreregistrationError):
+        preregistration._validate_dates_and_alpha(
+            _cells_with_confirmatory_alpha("0.0126")
+        )
+
+
 def test_git_anchored_reviewed_parent_still_cannot_reach_outcomes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -667,6 +740,10 @@ def test_git_anchored_reviewed_parent_still_cannot_reach_outcomes(
     reviewed = load_reviewed_algorithm_spec(spec_path)
 
     assert require_reviewed_algorithm_spec(reviewed) is reviewed
+    assert reviewed.registry_anchor_commit == _git(
+        spec_path.parents[3], "rev-parse", "HEAD"
+    )
+    assert reviewed.signing_key_fingerprint == "SHA256:" + "A" * 43
     with pytest.raises(PreregistrationError, match="no reviewed structural child"):
         authorize_outcome_access(reviewed, _request())
 
@@ -696,6 +773,35 @@ def test_reviewed_authority_cannot_be_forged_cloned_or_mutated(
         assert_outcome_access_permit(permit)
 
 
+def _bare_tmp_path_refusal(tmp_path: Path) -> str:
+    """Exact refusal a self-declared spec written straight into ``tmp_path`` earns.
+
+    Root discovery walks up from the spec, so the branch depends on the harness
+    layout, not on the spec: pytest's default external base temp has no
+    repository above it; a repository-local ``--basetemp`` sits inside this
+    worktree, whose committed registry is the canonical empty one, so the spec
+    has no external review anchor; any other repository above it cannot be the
+    registry's.  Mirrors the loader's discovery order so the
+    test asserts the exact branch instead of assuming one layout
+    (ARV2-UNRELATED-001 / SI-OOL-003).
+    """
+
+    def root_above(path: Path) -> Path | None:
+        resolved = path.resolve()
+        for candidate in (resolved, *resolved.parents):
+            if (candidate / ".git").exists():
+                return candidate
+        return None
+
+    spec_root = root_above(tmp_path)
+    if spec_root is None:
+        return "Git repository"
+    registry_root = root_above(preregistration.REVIEWED_SPEC_REGISTRY_PATH.parent)
+    if spec_root == registry_root:
+        return "no unique external review anchor"
+    return "share one repository"
+
+
 def test_self_declared_review_and_registry_substitution_refuse(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -707,19 +813,140 @@ def test_self_declared_review_and_registry_substitution_refuse(
         reviewed_at="2026-08-30T02:00:00Z",
     )
     _rehash(raw)
-    with pytest.raises(PreregistrationError, match="Git repository"):
+    # Whatever the harness layout, a bare self-declared review is refused; the
+    # exact branch follows this tmp_path's location (see the helper).
+    with pytest.raises(PreregistrationError, match=_bare_tmp_path_refusal(tmp_path)):
         load_reviewed_algorithm_spec(_write(tmp_path, raw, "self-reviewed.json"))
 
+    # Layout-independent: a self-declared review inside a repository that is
+    # not the registry's repository is refused before any status check.
+    foreign = tmp_path / "foreign-repository"
+    foreign.mkdir()
+    _git(foreign, "init", "--quiet")
+    with pytest.raises(PreregistrationError, match="share one repository"):
+        load_reviewed_algorithm_spec(_write(foreign, raw, "self-reviewed.json"))
+
     spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+    # Layout-independent: inside the anchored repository the same self-declared
+    # review has no external review anchor and is refused before any status or
+    # signature check.
+    unanchored = _write(spec_path.parent, raw, "self-reviewed.json")
+    with pytest.raises(PreregistrationError, match="no unique external review anchor"):
+        load_reviewed_algorithm_spec(unanchored)
+    unanchored.unlink()
+
     reviewed = load_reviewed_algorithm_spec(spec_path)
     registry = preregistration.REVIEWED_SPEC_REGISTRY_PATH
     registry.write_bytes(
         _canonical(
-            {"schema": preregistration.REVIEW_REGISTRY_SCHEMA, "entries": []}
+            {
+                "schema": preregistration.REVIEW_REGISTRY_SCHEMA,
+                "signature_policy": dict(preregistration.SIGNATURE_POLICY),
+                "entries": [],
+            }
         )
     )
     with pytest.raises(PreregistrationError):
         require_reviewed_algorithm_spec(reviewed)
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda registry: registry.pop("signature_policy"),
+        lambda registry: registry["signature_policy"].__setitem__(
+            "principal", "repository-controlled-principal"
+        ),
+        lambda registry: registry["signature_policy"].__setitem__(
+            "namespace", "file"
+        ),
+        lambda registry: registry["signature_policy"].__setitem__(
+            "extra", "not-authorized"
+        ),
+    ],
+)
+def test_review_registry_signature_policy_is_exact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutate: Callable[[dict[str, object]], object],
+) -> None:
+    spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+    repository = spec_path.parents[3]
+    registry_path = preregistration.REVIEWED_SPEC_REGISTRY_PATH
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    mutate(registry)
+    registry_path.write_bytes(_canonical(registry))
+    _git(repository, "add", registry_path.relative_to(repository).as_posix())
+    _git(
+        repository,
+        "-c",
+        "user.name=Registry Mutator",
+        "-c",
+        "user.email=mutator@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "mutate signature policy",
+    )
+
+    with pytest.raises(PreregistrationError, match="signature_policy|signature policy"):
+        load_reviewed_algorithm_spec(spec_path)
+
+
+def test_positive_registry_requires_the_external_signed_trust_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+
+    def refuse(root: Path, payload: bytes) -> TrustedRegistrySnapshot:
+        raise preregistration.TrustRootError("synthetic missing external trust")
+
+    monkeypatch.setattr(preregistration, "verify_signed_registry_anchor", refuse)
+    with pytest.raises(PreregistrationError, match="trust root"):
+        load_reviewed_algorithm_spec(spec_path)
+
+
+def test_nonempty_registry_is_authenticated_before_json_parsing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+    repository = spec_path.parents[3]
+    registry_path = preregistration.REVIEWED_SPEC_REGISTRY_PATH
+    registry_path.write_bytes(b"repository-controlled malformed payload\n")
+    _git(repository, "add", registry_path.relative_to(repository).as_posix())
+    _git(
+        repository,
+        "-c",
+        "user.name=Registry Mutator",
+        "-c",
+        "user.email=mutator@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "mutate registry bytes",
+    )
+
+    def refuse(root: Path, payload: bytes) -> TrustedRegistrySnapshot:
+        assert payload == b"repository-controlled malformed payload\n"
+        raise preregistration.TrustRootError("synthetic unauthenticated registry")
+
+    monkeypatch.setattr(preregistration, "verify_signed_registry_anchor", refuse)
+    with pytest.raises(PreregistrationError, match="trust root"):
+        load_reviewed_algorithm_spec(spec_path)
+
+
+def test_signed_policy_inventory_must_equal_the_computed_import_closure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+    monkeypatch.setattr(
+        preregistration,
+        "computed_policy_repo_paths",
+        lambda root: preregistration.POLICY_CODE_REPO_PATHS[:-1],
+    )
+
+    with pytest.raises(PreregistrationError, match="import closure"):
+        load_reviewed_algorithm_spec(spec_path)
 
 
 @pytest.mark.parametrize(
@@ -951,3 +1178,75 @@ def test_candidate_type_itself_never_authenticates_as_reviewed() -> None:
     assert type(candidate) is AlgorithmCandidate
     with pytest.raises(PreregistrationError, match="loader-authenticated"):
         require_reviewed_algorithm_spec(candidate)
+
+
+def test_under_cap_allocation_still_refuses_through_the_public_loader(
+    tmp_path: Path,
+) -> None:
+    """TPR-CR11-001. The alpha relaxation does not reach the composed path.
+
+    `_validate_dates_and_alpha` now accepts a conservative under-cap
+    allocation, which matches A27. The public loader still refuses one,
+    because every cell value must equal the frozen `_EXPECTED_VALUES` while
+    TPR-0A is frozen. That is correct and intended, but it means the recorded
+    claim that the module "permits a positive conservative allocation below
+    the permanent cap" holds only for the private validator, not end to end.
+
+    Pinned here so a future round does not read the relaxation as end-to-end
+    support and omit the matching `_EXPECTED_VALUES` amendment. A future
+    under-allocation needs a new frozen candidate *and* an updated expectation;
+    this test turns red at exactly that point, which is when the claim becomes
+    true and this expectation should be revisited.
+    """
+    raw = _raw_candidate()
+    for alpha_path in (
+        lambda r: _cell(r, "family_multiplicity")["value"][
+            "confirmatory_alpha_allocations"
+        ][0].__setitem__("two_sided_alpha", "0.01"),
+        lambda r: _cell(r, "empirical_binding_contract")["value"].__setitem__(
+            "assigned_alpha", "0.01"
+        ),
+        lambda r: _cell(r, "trial_and_null_contract")["value"][
+            "primary_acceptance_contract"
+        ].__setitem__("two_sided_alpha", "0.01"),
+    ):
+        alpha_path(raw)
+    _rehash(raw)
+
+    with pytest.raises(PreregistrationError, match="frozen TPR-0A policy"):
+        load_algorithm_candidate(_write(tmp_path, raw))
+
+    # The isolated validator accepts the same allocation, so the refusal above
+    # is the frozen-policy pin and not the alpha rule.
+    preregistration._validate_dates_and_alpha(
+        _cells_with_confirmatory_alpha("0.01")
+    )
+
+
+def test_empty_registry_guard_is_reachable_for_the_committed_registry() -> None:
+    """The empty-registry refusal must not be dead code.
+
+    `EMPTY_REVIEW_REGISTRY_BYTES` is compared byte-for-byte against the stored
+    registry, but this lane's canonical contract requires exactly one LF
+    terminator.  A constant built without that terminator can never equal any
+    canonically stored registry, so the guard silently stops running and the
+    empty, non-authorizing state reports a trust-root failure instead of the
+    absent review anchor it actually is.  Both paths refuse, so this is a
+    diagnostic and reachability defect rather than an authority hole -- which
+    is precisely why no authority test would catch it.
+    """
+    require_canonical_json_bytes(
+        preregistration.EMPTY_REVIEW_REGISTRY_BYTES, "empty review registry"
+    )
+    committed = preregistration.REVIEWED_SPEC_REGISTRY_PATH.read_bytes()
+    assert committed == preregistration.EMPTY_REVIEW_REGISTRY_BYTES, (
+        "the stored empty registry must be byte-equal to the constant the "
+        "guard compares against, or the guard is unreachable"
+    )
+
+    # Reaching the guard is the observable behaviour, so assert the message the
+    # empty state must produce while no trust root is provisioned.
+    with pytest.raises(PreregistrationError, match="no unique external review anchor"):
+        preregistration._review_anchor(
+            preregistration.REVIEWED_SPEC_REGISTRY_PATH.absolute(), {}, b""
+        )

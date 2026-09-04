@@ -57,6 +57,67 @@ def _isolate_execution_runtime_authority(tmp_path, monkeypatch):
         dispatch_fence._DISPATCH_PERMITS.clear()
     with execution_gate._consumed_authorization_tokens_lock:
         execution_gate._consumed_authorization_tokens.clear()
+    _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+
+
+# Bound once at import: this guard runs in EVERY test's teardown, including
+# tests that legitimately monkeypatch ``json.loads`` with a must-not-run
+# sentinel (the insider SEC nesting-cap tests).  A bound JSONDecoder.decode
+# never consults ``json.loads``, so the guard cannot trip those sentinels.
+_DECODE_RUNTIME_STOP_STATE = __import__("json").JSONDecoder().decode
+
+
+def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
+    """Fail the test that leaked containment into the operator's runtime.
+
+    The runtime emergency stop lives in one per-OS-user %LOCALAPPDATA% root
+    shared by every database on the host.  The autouse redirect above covers
+    this interpreter only; a child process a test spawns starts from the REAL
+    root, and one containment write there latches a machine-global stop that
+    refuses every proposal in the operator's live paper application and in
+    every sibling lane's checkout (Insider lane R-09/R-18/R-22: 42 debris
+    incidents were observed, all from pytest temp databases).
+
+    Only incidents whose origin database sits under THIS session's pytest
+    base temp are attributed here, so concurrent suites from other sessions
+    on the same host cannot make this guard fail spuriously.  The guard reads
+    the real file and never mutates it: operator runtime state is not test
+    cleanup.
+    """
+    import os
+
+    import assistant.dispatch_fence as dispatch_fence
+
+    try:
+        real_root = dispatch_fence._canonical_runtime_root()
+    except Exception:  # platform without a resolvable root: nothing to guard
+        return
+    stop_file = (
+        real_root
+        / dispatch_fence._STATE_DIRECTORY_NAME
+        / dispatch_fence._EMERGENCY_STOP_FILE_NAME
+    )
+    if not stop_file.exists():
+        return
+    try:
+        state = _DECODE_RUNTIME_STOP_STATE(stop_file.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return  # unreadable real state is the runtime's own fail-closed concern
+    session_base = os.path.normcase(str(tmp_path.parent.resolve()))
+    leaked = [
+        incident.get("origin_database")
+        for incident in state.get("open_incidents", []) or []
+        if isinstance(incident, dict)
+        and os.path.normcase(str(incident.get("origin_database", ""))).startswith(
+            session_base
+        )
+    ]
+    assert not leaked, (
+        "this test (or a child process it spawned) wrote a containment incident "
+        f"into the REAL runtime emergency stop at {stop_file}; redirect "
+        "assistant.dispatch_fence._RUNTIME_FENCE_ROOT in every process the test "
+        f"starts. Leaked origin databases: {leaked}"
+    )
 
 
 @atexit.register

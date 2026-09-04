@@ -3896,3 +3896,14 @@ lane carries an adapted commit rather than a byte-identical cherry-pick). `resea
 is unchanged; this is a test-determinism correction and grants no authority. This lane owns that test, so the change is recorded
 here as this lane's own: the repository-local-basetemp failure the sibling
 lanes observed was real, reproduced on `main`, and is closed by this commit. Validation on this head: the F-8 test passes under an external and under a repository-local --basetemp (1 passed each); Target-price preregistration test file plus active-document consistency: 162 passed, 2 skipped in 49.83s.
+
+**Shared handoff restored (owner direction, 2026-09-04).** `docs/SESSION_HANDOFF.md`
+on this branch had been edited in `0ba9e54`, `7f55652`, and `dff9b11`
+(section-0 integration-state and review-state bullets), diverging from `main`'s
+frozen copy so that re-merging this lane would conflict on the shared handoff.
+On the owner's direction it is restored byte-for-byte to the integration
+branch's version (`c0a8aeb`: `main`'s handoff plus the 2026-09-04 integration
+section) in `16b3435bcf83a76ebee04679c4c266b6f2daeab4`. The lane state those bullets described is carried by
+sections 36-38 of this record, which remains this lane's sole handoff ledger;
+the superseded bullets stay in Git history. No lane-owned file changed.
+

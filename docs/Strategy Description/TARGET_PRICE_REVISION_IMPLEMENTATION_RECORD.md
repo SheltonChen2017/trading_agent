@@ -3912,8 +3912,15 @@ the superseded bullets stay in Git history. Two lane guards in
 handoff's section 0 to this lane's current review range and routing sentence,
 which is what made the divergence self-perpetuating; they now read the record
 and the Action Plan target block only, and the shared handoff is not a lane
-pointer surface from here on. `docs/ACTION_PLAN_2026-08-20.md` carries the same
-class of per-round lane edits (nine commits since `main`); it was not changed
-here and is flagged for the owner in the shared handoff's 2026-09-04 section
-(section 0B), which this lane now carries byte-identically.
+pointer surface from here on. `docs/ACTION_PLAN_2026-08-20.md` carried the
+same class of per-round lane edits (nine commits since `main`); on the owner's
+further direction it was restored byte-for-byte to `main`'s version in
+`e989872988a943b476502bd5573abbc0e0406122`, and the guard surfaces that read
+its target block and row for per-round state were retargeted in `4e4840df4bb323a3a4dbe9854d5909996f754771`. Section
+8 of this record is now the lane's only per-round current-state pointer; the
+two shared coordination documents receive lane changes only through an
+owner-coordinated amendment. `main`'s Action Plan target block still describes
+the 2026-08-30 state (a stale next-action sentence of the TPR-OOL-007 class);
+refreshing it is a `main`-side concise status update for the owner, not a lane
+edit.
 

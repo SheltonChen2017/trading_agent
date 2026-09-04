@@ -68,11 +68,28 @@ LATEST_COUNTERREVIEWED_CLAUDE_COMMITS = (
     "34aa8eda2432d05a6a955fe3dbf4cf9a3fd98724",
     "1981233424f25b48ebec2273fa4822c249e2a041",
 )
+# A Claude round cannot pin its own head either, so it pins the Codex range
+# it just reviewed and routes the counter-review that follows it.
+LATEST_REVIEWED_CODEX_BASE = (
+    "1981233424f25b48ebec2273fa4822c249e2a041"
+)
+LATEST_REVIEWED_CODEX_HEAD = (
+    "49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3"
+)
+LATEST_REVIEWED_CODEX_RANGE = (
+    f"{LATEST_REVIEWED_CODEX_BASE}.."
+    f"{LATEST_REVIEWED_CODEX_HEAD}"
+)
+LATEST_REVIEWED_CODEX_SHORT_RANGE = "19812334..49caa886"
+LATEST_REVIEWED_CODEX_COMMITS = (
+    "7f55652403660b8fa8e8c5d57bd7b4669032a3c8",
+    "49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3",
+)
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "25c1c378448bf41a60c31a81e11ca398354c36d0"
+    "5f98c3aa757f420efac13f682f4e210fa9688e5b"
 )
-PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "25c1c378"
+PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "5f98c3aa"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -539,11 +556,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [LATEST_COUNTERREVIEWED_CLAUDE_RANGE]
+    ) == [LATEST_REVIEWED_CODEX_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed Claude's exact three-commit range"
+        "Claude has independently reviewed Codex's exact two-commit range"
         in normalized_current
     )
     assert (
@@ -558,7 +575,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "pending Claude review of this Codex round" not in normalized_current
     assert "comprehensive whole-lane audit is complete" in normalized_current.lower()
-    assert "beginning after `19812334`" in normalized_current
+    assert "beginning after `49caa886`" in normalized_current
 
     routing_row = next(
         line
@@ -572,11 +589,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_pointer = " ".join(current_pointer.split())
         assert re.findall(
             r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_pointer
-        ) == [LATEST_COUNTERREVIEWED_CLAUDE_RANGE]
+        ) == [LATEST_REVIEWED_CODEX_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_pointer
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_pointer
         assert (
-            "Codex has counter-reviewed Claude's exact three-commit range"
+            "Claude has independently reviewed Codex's exact two-commit range"
             in normalized_pointer
         )
         assert (
@@ -588,7 +605,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         )
         assert "TPR-TR0" in normalized_pointer
         assert "comprehensive whole-lane audit is complete" in normalized_pointer.lower()
-        assert "beginning after `19812334`" in normalized_pointer
+        assert "beginning after `49caa886`" in normalized_pointer
         normalized_pointer_lower = normalized_pointer.lower()
         stale_current_claims = (
             "pending claude review of this codex round",
@@ -598,6 +615,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             "after this counter-review round's single push",
             "claude has independently reviewed codex's exact three-commit range",
             "beginning after `25c1c378`",
+            "codex has counter-reviewed claude's exact three-commit range",
+            "beginning after `19812334`",
         )
         for stale_claim in stale_current_claims:
             assert stale_claim not in normalized_pointer_lower
@@ -611,10 +630,10 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [LATEST_COUNTERREVIEWED_CLAUDE_SHORT_RANGE]
+        ) == [LATEST_REVIEWED_CODEX_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex counter-reviewed all three claude commits" in normalized_summary_lower
-        assert "section 37" in normalized_summary_lower
+        assert "claude reviewed both codex commits" in normalized_summary_lower
+        assert "section 38" in normalized_summary_lower
         assert (
             "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
             in normalized_summary_lower
@@ -984,3 +1003,23 @@ def test_open_issue_register_matches_every_issue_row() -> None:
             f"register row {cells[0]} must name a priority, what it blocks, and "
             f"why it cannot be closed in lane"
         )
+
+def test_latest_claude_review_records_the_exact_codex_range() -> None:
+    """TPR-CR13-001/002: keep this round's handoff exact and reproducible.
+
+    The counter-review preceding this one was faulted for leaving every
+    current pointer on the completed round (`TPR-CCR12-001`).  A Claude round
+    can fail the same way, so its own review section is pinned here.
+    """
+    section = _record_section(
+        "## 38. Claude independent review of the Codex counter-review round"
+    )
+    assert LATEST_REVIEWED_CODEX_RANGE in section
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line)
+    )
+    assert ordered_commits == LATEST_REVIEWED_CODEX_COMMITS
+    assert "Cumulative disposition: accepted after correction" in section
+    assert "No next implementation milestone is authorized" in section

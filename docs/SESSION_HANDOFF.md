@@ -22,12 +22,13 @@ their lane-owned artifacts.
   changes and their independent reviews remain on their respective branches;
   merge visibility grants no target-branch authority over sibling artifacts.
 
-- **Current review state, 2026-09-03.** Codex has counter-reviewed Claude's exact
-  three-commit range
-  `5f98c3aa757f420efac13f682f4e210fa9688e5b..1981233424f25b48ebec2273fa4822c249e2a041`.
-  The comprehensive whole-lane audit is complete; section 37 of the target
-  record contains all three dispositions, review qualifications, and
-  corrections, while section 8 remains the authoritative current open-issue
+- **Current review state, 2026-09-03.** Claude has independently reviewed Codex's
+  exact two-commit range
+  `1981233424f25b48ebec2273fa4822c249e2a041..49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3`.
+  The comprehensive whole-lane audit is complete; section 38 of the target
+  record contains both dispositions, the P0-P3 ledger, and the correction to
+  that round's complete-suite provenance, section 37 is the counter-review it
+  reviewed, and section 8 remains the authoritative current open-issue
   register. The non-authorizing TPR-TR0-I
   implementation candidate is checkpointed but remains incomplete:
   rollback/replay protection, parent-directory custody, and the remaining
@@ -36,9 +37,9 @@ their lane-owned artifacts.
   no TPR signed anchor, positive registry entry, source right, outcome, or look
   authority exists in the repository. On this Codex host, the external trust
   directory and allowed-signers file are also absent; no claim is made about
-  another host's machine-local state. After this round's single push, Claude
-  independently reviews the exact new Codex counter-review correction range
-  beginning after `19812334`.
+  another host's machine-local state. After this round's single push, Codex
+  counter-reviews the exact new Claude correction range
+  beginning after `49caa886`.
 
 - The owner directed a new sibling worktree for branch
   `codex/strategy-target-price-revisions`, resolved with
@@ -479,10 +480,10 @@ It is a separate fourth planning lane under the owner-directed serialized
 same-branch, one-push-per-role-round workflow. All feature implementation,
 review, counter-review, and next-milestone work stays on
 `codex/strategy-target-price-revisions` in the dedicated target worktree. The
-v2.2 implementation snapshot is `bb8dfb6`. Codex counter-reviewed all three
-Claude commits in `5f98c3aa..19812334`; the comprehensive Claude whole-lane
-audit is complete, with the dispositions, qualifications, and corrections
-recorded in section 37. The non-authorizing TPR-TR0-I implementation candidate is
+v2.2 implementation snapshot is `bb8dfb6`. Claude reviewed both Codex
+commits in `19812334..49caa886`; the comprehensive Claude whole-lane
+audit is complete, with the dispositions, the P0-P3 ledger, and the corrected
+complete-suite provenance recorded in section 38. The non-authorizing TPR-TR0-I implementation candidate is
 checkpointed but remains incomplete; no key provisioning or positive authority
 is authorized.
 The lane and `origin/main` have diverged;

@@ -152,6 +152,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-02 | Codex counter-review | `8736b4a2..3f6c2676` reviewed; `3f6c2676` -> `a615304d` correction | Counter-review Claude's IB-1H review and propagated hard-link correction | Dispositioned both Claude commits, reproduced the claimed guard, compared all four sampled link-count phases against IB-1C/IB-1H, and generalized the audit to both immutable commit markers. Corrected the missing post-read/final-path checks and commit-marker opt-ins in lane-owned IB-1A/IB-1B code. Full findings are in section 35. | Runtime red probe: both reviewed readers returned bytes with final `st_nlink == 2`; regression red phase **6 failed, 2 passed**; corrected hard-link slice **13 passed**; complete corrected IB-1A/IB-1B modules **195 passed, 5 skipped in 76.69s**; `git diff --check` clean before commit. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator database, scheduler, UI, or order access; **0 research looks**. | `5f880c5a` and `3f6c2676` accepted after correction. `IB1H-CCR01` P2 is closed by `a615304d`; `IB1H-CCR02` through `IB1H-CCR06` are append-only record corrections. No out-of-lane code was changed. | Commit this counter-review record, then implement only the bounded zero-authority four-family gate in IB-1I. Permanent look/cell identities and their alpha split remain owner-decision-required. |
 | 2026-09-02 | Codex implementation | `3f6c2676` -> `a615304d` -> `322350a3` -> `b3b202d2` -> this record commit | Completed Claude counter-review and bounded **IB-1I zero-authority four-family/QC-first research gate** | Preserved the accepted-after-correction counter-review, then added one frozen lane-local contract that binds the governing blueprint, immutable 2026-08-29/30 owner-directive commits, fixed four-lane family, exact `1/20` total and `1/80` lane ceiling, expiry/no-reallocation rule, shared holdout, canonical-family null rule, future IB-7 immutable-input boundary, empty permanent allocation/look inventories, and exact-zero external/operational authority. Two independent implementation audits found and drove corrections before commit. Full detail is in section 36. | Python **3.13.14**, pytest **9.1.1**. IB-1I **120 passed in 2.41s**; named Insider/boundary suite **848 passed, 8 skipped in 393.03s**; complete committed code tree `b3b202d2`: **3 failed, 7,093 passed, 15 skipped, 25 warnings in 2,939.96s (48m59s)**, exactly the three unchanged out-of-lane sleeve-clock cases; whole-repository compileall exit 0. No SEC/provider, credential, licensed row, outcome, QuantConnect upload/processing/job/backtest, broker, operator database, scheduler, deployment, order, or UI access; **0 research looks**. | IB1I-R01 through IB1I-R09 closed; final independent code audit reports no remaining P0-P3 finding in scope. Analyst `qc_first_plan.py`, the shared Strategy Description README, sleeve-clock failures, and shared/platform debt are documented but untouched. | Commit this record, run record/diff/secret/remote gates, make the round's single push, and stop for Claude to review every pushed commit after `3f6c2676`. |
 | 2026-09-02 | Claude review | `3f6c2676` -> this review snapshot | Independent review of the completed hard-link invariants and the IB-1I zero-authority four-family research gate (`3f6c2676..b21baf7c`, 5 commits, 0 merges, 8 lane-owned paths) | Fast-forwarded the lane branch in place after finding the local checkout 7 behind and a strict ancestor - no branch switch or second worktree. Reproduced the hard-link P2 rather than reading it, recomputed every IB-1I headline claim, and mutation-swept both. Full dispositions in section 37. | IB-1I module **122 passed** (recorded 120 plus this review's two); exact named 12-file suite **920 passed, 8 skipped in 255.35s**; complete suite: **3 failed, 7096 passed, 14 skipped, 25 warnings in 1390.16s (0:23:10)**; failures: tests/test_sleeve_report.py::test_default_gain_review_is_fifty_percent_and_long_term_gated, tests/test_sleeve_report.py::test_every_lot_row_carries_the_tax_mechanism_fields, tests/test_sleeve_report.py::test_report_carries_no_action_shaped_field; whole-repository compileall **exit 0**; record gate over `test_insider_buying_implementation_record.py`, `test_active_document_consistency.py` and `test_insider_buying_preregistration.py` **192 passed**; hard-link phase mutants **4 of 4 caught**; IB-1I gate mutants **8 of 12 caught, 2 structurally masked, 2 fixed then caught**; ten hard-link probes across both boundaries; semantic hash recomputes to `f532eaf3...`; 4 x Fraction(1,80) == Fraction(1,20) exactly with no float in the module; the blueprint SHA-256 constant equals the actual PDF on disk; eight authority escalations refused. Python 3.14.6. No SEC/provider data, credential, licensed row, real package, outcome, QuantConnect, broker, operator database, scheduler, deployment, or order; **0 research looks**. | All five commits accepted, two after correction. **IB1I-R01** (P3) fixed here: the four-lane-maxima-equal-shared-FWER equation and the cutoff-precedes-holdout ordering had no test sensitivity because every field is pinned to its own constant, so both guards could be deleted with the module green; two constant-drift regressions added and mutation-verified. **IBREC-01** (P3) fixed here: sections 36 and 35 sat between sections 11 and 12, out of numerical and chronological order, and were moved after section 34 with byte-identity verified. **IB1I-N01** (P3) records two mutation survivors that are structurally masked, not gaps. No test removed or weakened. | Codex counter-reviews this review commit. No milestone started. |
+| 2026-09-03 | Claude review | `7c9e6f53` -> `1b836ff6` (test correction) -> this review record | Review of the IB-1I counter-review and the IB-2A observed identity inventory (`2c392cd3..7c9e6f53`), with mutation testing of the eight owner-named dangerous directions | Verified isolation, authority enforcement by direct inspection, and observed-only scope by keyword sweep and AST test. Reproduced the focused 97 and the ten-file 894 exactly. Ran twenty targeted mutants (13 caught, 7 survived), classified every survivor, and pinned the four genuinely untested guards with five additive tests, each mutation-verified. Full detail in section 40. | Focused IB-2A 101 passed; IB-1H file 46 passed, 1 skipped in 17.90s; complete ten-file Insider suite plus two boundary files 918 passed, 8 skipped in 278.70s (0:04:38) (913 - 11 - 8 = 894 reproduces Codex's figure); record-sensitive six-file gate 124 passed; complete repository suite 3 failed, 7,197 passed, 15 skipped, 25 warnings in 4,272.30s (1:11:12), the three failures being the out-of-lane sleeve-clock cases recorded as `IB0H-OOL01`; every mutated module restored byte-identical; `git diff --check` clean. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | IB2A-CR01 (P3) **fixed**: four guards on named directions - the post-reparse re-fingerprint, the constructor replay binding disposition to outcomes, the strict-order amendment binding, and all three owner-uniqueness clauses together - could be deleted with the suite green; now pinned. IB2A-CR02 (P3): the handoff's "289 passed" gate is not in the record and the six-file gate yields 124; "22 passed, 75 deselected" has no selector. IB2A-CR03 (P3): `IB1D-CR07A` is carried forward but has no ledger row. IB2A-CR04 (P3): one mid-call re-hash remains untested and is recorded. IB2A-CR05 (P3): the 2026-09-03 push added no section-5 row. No production module changed. | Codex counter-reviews these Claude commits, then may continue the bounded ladder. IB-2A stays observed-only; IB-1 remains incomplete. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -4955,3 +4956,139 @@ upstream reparse boundary.
 > Insider-lane defects. Do not access SEC/provider data, credentials, licensed
 > rows, outcomes, QuantConnect, broker, operator database, scheduler,
 > deployment, capital, or trading authority.
+
+## 40. Claude review - IB-2A observed identity inventory (2026-09-03)
+
+Reviewer: Claude, in the lane worktree
+`C:\git\customizedAgent\trading_agent_insider` on `codex/strategy-insider-buying`.
+No branch, worktree, fork, or handoff was created or switched to. Range
+reviewed in order: `726c4dcf` (counter-review record), `5c74bdee` (IB-2A
+implementation), `7c9e6f53` (record). `2c392cd3` confirmed an ancestor of
+`7c9e6f53`; no history rewritten. The owner noted that Codex did not run the
+complete repository suite this round; this review ran it independently.
+
+### 40.1 Isolation and scope
+
+The three commits touch only lane-owned paths: `research/insider_buying/`,
+`tests/test_insider_buying*`, and this record. Excluding those prefixes from
+the changed-path list leaves an empty set. `git worktree list` shows this lane
+in exactly one worktree; three `prunable` detached lane-sync worktrees from
+2026-08-26 remain on the host and are out of lane, recorded only.
+
+Under the owner's 2026-08-29 scope instruction, corrections here are
+lane-specific test additions only. No production module was changed.
+
+### 40.2 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `726c4dcf` counter-review of the IB-1I review | **Accepted after documentation correction.** | Documentation only. IB1I-CCR06 verified: `contracts.py` carries `lookback_trading_days=30`, so `IBFL-02` did close with the contract; `IB0H-R07`, `IB1H-R02`, `IB1H-R03`, and `IB0H-OOL01` are confirmed still open. One precision defect recorded as IB2A-CR03. |
+| `5c74bdee` IB-2A observed identity inventory | **Accepted after correction.** | Lane-owned only; focused module **97 passed** reproduces; no network, `float`, `subprocess`, `eval`, or `__import__` surface, pinned by an AST test. Four guards on the owner's named dangerous directions were untested and are pinned by additive tests (IB2A-CR01); no product-code defect found. |
+| `7c9e6f53` counter-review and implementation record | **Accepted after documentation correction.** | Two recorded validation figures are not reproducible as stated (IB2A-CR02), and the push carried no section-5 ledger row (IB2A-CR05). |
+
+### 40.3 Material claims reproduced
+
+- Focused IB-2A: **97 passed** at `7c9e6f53`, exactly as recorded.
+- Complete ten-file Insider suite: Codex recorded **894 passed, 8 skipped**.
+  This review ran the ten files plus `test_ml_import_boundary.py` (11) and
+  `test_module_hygiene.py` (8): **913 passed, 8 skipped in 316.52s**, and
+  913 - 11 - 8 = 894 exactly. The claim reproduces.
+- Observed-only scope: a keyword sweep of the module for ticker, share-class,
+  dedupe, aggregation, `$50,000`, resolution, ETF, QC, order, broker, or
+  deployment surface matches only negation text and the pre-aggregation
+  candidate enum. Confirmed: IB-2A emits observed filing, reporting-owner, and
+  transaction inventories with named owner-set quarantine outcomes and performs
+  none of the excluded work.
+- Authority: the inventory identity carries **fourteen** Boolean authority
+  fields and two look counters; construction refuses unless every Boolean
+  `is False` and both counters `== 0`. Verified by reading the enforcement
+  block and by the caught mutants below, not from the record.
+- Joint owners: the joint-owner fixture yields two owner rows and exactly one
+  transaction row, with the filing quarantined as a multiple-owner set. No
+  cross-multiplication.
+
+### 40.4 Mutation testing of the eight dangerous directions
+
+Twenty targeted mutants, one neutralised guard each, focused file run after
+each, module restored from a byte-exact in-memory copy in a `finally` block.
+**13 caught, 7 survived, 0 invalid** on the pushed tree. Each survivor was
+then classified rather than reported as a defect:
+
+| Direction | Guard | Result on `7c9e6f53` | Classification |
+|---|---|---|---|
+| 1 TOCTOU | post-validation evidence re-fingerprint | caught | pinned |
+| 1 TOCTOU | re-fingerprint immediately after reparse | survived | **untested; now pinned** |
+| 1 TOCTOU | rebuilt-report re-hash inside validation | survived | mid-call defence, reachable only by hooking inside one function; untested, recorded |
+| 2 forged factory | identity token, inventory token | caught, caught | pinned |
+| 3 drift | transaction payload hash | caught | pinned |
+| 3 drift | `disposition is not retained.disposition` | survived | **provably redundant**: disposition is bound to outcomes by the report row constructor, and IB-2A replays that constructor on every rebuilt row before this clause is reached |
+| 4 escalation | candidate contradicts filing quarantine; multi-owner promoted to single | caught, caught | pinned |
+| 5 lineage | amendment may target another issuer | caught | pinned |
+| 5 lineage | amendment accepted before its original | survived | **untested; now pinned** (only the equal-time case was exercised) |
+| 6 fan-out | duplicate owner observation ids; owner index and id binding | survived, survived | a **combined mutant neutralising all three owner-uniqueness clauses also survived**, so no test reached any of them; **now pinned** at the filing-level clause, the first line construction reaches |
+| 7 structural | cycle, depth, dict-subclass instance state | caught x3 | pinned |
+| 7 structural | projection node bound | survived | **provably unreachable**: preflight caps of 256 filings, 4,096 owners, and 100,000 transactions cannot produce 4,000,000 projection nodes |
+| 8 authority | any authority flag; authorized looks; consumed looks | caught x3 | pinned |
+
+Direction 3 needed one more step. The forged-report path first refused with
+`rebuilt upstream report row is invalid`, not with the retained-evidence
+comparison, because IB-2A replays `Form4ProvisionalDispositionRow.__post_init__`
+on each rebuilt row. That replay is the real first line for semantic drift and
+had no test either; removing it and running the new test yields a catch.
+
+### 40.5 Findings
+
+| ID | Sev | Status | Issue |
+|---|---|---|---|
+| IB2A-CR01 | P3 | **FIXED in `1b836ff6`** | Four guards on the owner's named dangerous directions could be deleted with the suite green: the re-fingerprint immediately after reparse (direction 1), the constructor replay that binds disposition to outcomes (direction 3), the strict-order half of the amendment-to-original binding (direction 5), and all three owner-uniqueness clauses together (direction 6). Five additive tests now pin them: `test_evidence_mutation_during_independent_revalidation_is_refused`, `test_forged_report_disposition_alone_cannot_drift_from_captured_evidence`, a `before_original` case on `test_self_consistent_amendment_requires_its_observed_original`, `test_filing_cannot_list_one_owner_observation_twice`, and, in the IB-1H file, `test_report_row_constructor_binds_disposition_to_outcomes` for the constructor itself. Every one was mutation-verified: the corresponding mutant is caught by that test and the test passes on the unmodified tree. No production module changed. |
+| IB2A-CR02 | P3 | OPEN - record precision | Two validation figures in the handoff do not reproduce as stated. "Record/boundary gate: 289 passed" appears **nowhere in this record**; the record-sensitive gate over `test_insider_buying_implementation_record.py`, `test_active_document_consistency.py`, `test_ml_import_boundary.py`, `test_module_hygiene.py`, and both project-separation suites yields **124 passed**. "22 passed, 75 deselected" names no `-k` selector, so the exact subset cannot be rerun; 22 + 75 = 97 shows it is a subset of the focused file, nothing more. |
+| IB2A-CR03 | P3 | OPEN - record precision | IB1I-CCR06 carries forward `IB1D-CR07A` as an active finding, but that identifier exists only in prose from an earlier disambiguation; **no ledger row** `| IB1D-CR07A |` exists, so it cannot be looked up or dispositioned as a stable ID. |
+| IB2A-CR05 | P3 | OPEN - record precision | The parallel workflow requires one section-5 ledger row before every push. The section-5 ledger ends with the 2026-09-02 Claude review row for `3f6c2676`; sections 38 and 39, covering the 2026-09-03 push of `726c4dcf`, `5c74bdee`, and `7c9e6f53`, added **no ledger row**, so the branch-local handoff ledger is silent on that push and its validation and look accounting live only in section 39.4. Recorded, not rewritten; this review's own row is appended in order. |
+| IB2A-CR04 | P3 | OPEN - stated, not fixed | The rebuilt-report re-hash inside `_validate_upstream_report` (the third direction-1 guard) is reachable only by mutating the frozen report between its rebuild and the comparison within one call. It is mid-call defence in depth; it remains untested and is recorded rather than given a hook-dependent test. |
+
+### 40.6 Process notes, recorded plainly
+
+- Two tests as first written **failed on the unmodified module**: `accepted_at_utc`
+  is canonical ISO text, not a `datetime`, and the disposition forgery was
+  refused by the constructor replay before the clause I had targeted. Their
+  early appearance in "caught" lists was therefore noise and was discarded;
+  both were rewritten and re-verified before anything was recorded.
+- One tool call that the harness reported as rejected had in fact written the
+  test file before the interrupt. The file was read directly to establish its
+  true state rather than trusting the reported status; the later anchor
+  failure on the same edit is explained by that, not by a second change.
+- `_reparse_profile_bound_evidence` is an import alias of
+  `form4_multi_period_amendment_evidence._reparse_evidence`; the TOCTOU
+  regression patches the alias on the inventory module, which the call site
+  resolves at call time. Confirmed by the caught mutant.
+
+### 40.7 Validation
+
+- Focused IB-2A after additions: **101 passed**.
+- IB-1H file after the constructor pin: **46 passed, 1 skipped in 17.90s**.
+- Complete ten-file Insider suite plus `test_ml_import_boundary.py` and
+  `test_module_hygiene.py`: **918 passed, 8 skipped in 278.70s (0:04:38)**.
+- Record-sensitive gate (six files): **124 passed** before the record edit;
+  rerun after it, recorded in the section 5 row.
+- Mutants: twenty on the pushed tree (13/7/0); the five pinning tests then
+  re-verified against their exact mutants, including the triple fan-out
+  mutant and the constructor-replay mutant, all **caught**; every module
+  restored byte-identical and confirmed with `git diff --quiet`.
+- Complete repository suite on the code tree: **3 failed, 7,197 passed, 15 skipped, 25 warnings in 4,272.30s (1:11:12)**. The three
+  `tests/test_sleeve_report.py` failures are the out-of-lane fixed-test-clock
+  drift already recorded as `IB0H-OOL01`; documented, not fixed.
+- `git diff --check` clean. Test correction committed as `1b836ff6`; changed
+  paths are two lane test files and this record.
+
+No SEC, EDGAR, vendor, QuantConnect, credential, licensed row, outcome,
+broker, operator-database, scheduler, deployment, capital, or trading access.
+**Research looks: 0.** All fourteen authority Booleans remain literal `False`;
+both look counters remain exactly `0`.
+
+### 40.8 Residual gates and next authorized step
+
+IB-2A is observed-only and stays that way: no identity resolution, ticker or
+share-class mapping, deduplication, canonical filtering, aggregation, or
+`$50,000` gate was added or authorized. IB-1 remains incomplete and blueprint
+19.4 step 1 unstarted. Next: Codex counter-reviews these Claude commits, then
+may continue the bounded ladder.

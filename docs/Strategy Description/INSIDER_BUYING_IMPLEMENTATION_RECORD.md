@@ -5108,6 +5108,8 @@ them as cherry-picks; no lane-owned file changed.
 | `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` | `b8f49eeabf285627ef195adece04769dbb264223` | sleeve-report clock seam, runtime-stop leak redirect + conftest guard, shared EOL attributes, Briefing smoke isolation, characterization test rename |
 | `3114a1530f0afa400eb200e79ff218c174657e69` | `77055da4a2f4741af8d3a80e691090dbe63fa412` | notification cycle evaluates at its own clock; guard decoder bound at import |
 | docs commit | `e08f0c17a6694f8e4764d3edd992a484cbefeb3c` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, full disposition ledger, owner decisions) plus the four-lane README, the direction status paragraph, and the workflow exception paragraph |
+| `6ef66eed77f9b24ea3df8aa538f42de0c871c824` (F-8, owner direction, same day) | `fb25d915de21b4c20873ec0dca1bb2e811137c05` | `tests/target_price_revisions/test_preregistration.py::test_self_declared_review_and_registry_substitution_refuse` made deterministic across harness layouts (Analyst `ARV2-UNRELATED-001` / Short-interest `SI-OOL-003`); the loader is unchanged |
+| integration record update | `cf591b73e95ff6720869f616cd46083b359210a0` | F-8 recorded in `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, ledger rows, validation) |
 
 Items of this record closed by the application: IB0H-OOL01 (F-1); the R-09/R-18/R-20/R-22 test-origin leak mechanism (F-2/F-3 — the existing debris file on the host is an owner decision, integration record section 6); R-17 (F-7); item #27's stale-CRLF class for shared files (F-4); item #30 README (F-6). R-11 was already closed on `main` by EXE-001. Every other
 out-of-lane item this record carries was examined; its disposition and reason
@@ -5118,3 +5120,17 @@ This application is not acceptance of any lane milestone and grants no
 provider, outcome, look, QuantConnect, broker, operator-database, deployment,
 paper, live, or trading authority. The lane's same-branch review loop resumes
 from this head. Validation on this lane's resulting head: focused set (sleeve report/notifications, leak guard, EOL attributes, crash-test redirect, Briefing smoke, reservation characterizations, active-document consistency): 174 passed in 22.79s.
+
+**Follow-up, same day (F-8).** After the integration record showed that
+`ARV2-UNRELATED-001` / `SI-OOL-003` were not a stale message but a
+harness-layout dependency — `_repository_root` walks up from the spec, so a
+spec written straight into pytest's `tmp_path` reaches the "not inside a Git
+repository" refusal under an external base temp and the "committed and clean"
+refusal under a repository-local `--basetemp` — the owner directed that the
+Target-price test be fixed as well. The test now asserts the exact refusal its
+own location must reach (`_bare_tmp_path_refusal` mirrors the loader's
+discovery order) and adds two layout-independent assertions that exercise the
+other branches explicitly (a self-declared review in a foreign repository →
+`share one repository`; an uncommitted one inside the anchored repository →
+`committed and clean`). `research/target_price_revisions/preregistration.py`
+is unchanged; this is a test-determinism correction and grants no authority. Validation on this head: Target-price preregistration test file plus active-document consistency: 152 passed, 2 skipped in 26.03s.

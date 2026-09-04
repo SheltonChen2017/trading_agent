@@ -773,6 +773,35 @@ def test_reviewed_authority_cannot_be_forged_cloned_or_mutated(
         assert_outcome_access_permit(permit)
 
 
+def _bare_tmp_path_refusal(tmp_path: Path) -> str:
+    """Exact refusal a self-declared spec written straight into ``tmp_path`` earns.
+
+    Root discovery walks up from the spec, so the branch depends on the harness
+    layout, not on the spec: pytest's default external base temp has no
+    repository above it; a repository-local ``--basetemp`` sits inside this
+    worktree, whose committed registry is the canonical empty one, so the spec
+    has no external review anchor; any other repository above it cannot be the
+    registry's.  Mirrors the loader's discovery order so the
+    test asserts the exact branch instead of assuming one layout
+    (ARV2-UNRELATED-001 / SI-OOL-003).
+    """
+
+    def root_above(path: Path) -> Path | None:
+        resolved = path.resolve()
+        for candidate in (resolved, *resolved.parents):
+            if (candidate / ".git").exists():
+                return candidate
+        return None
+
+    spec_root = root_above(tmp_path)
+    if spec_root is None:
+        return "Git repository"
+    registry_root = root_above(preregistration.REVIEWED_SPEC_REGISTRY_PATH.parent)
+    if spec_root == registry_root:
+        return "no unique external review anchor"
+    return "share one repository"
+
+
 def test_self_declared_review_and_registry_substitution_refuse(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -784,10 +813,28 @@ def test_self_declared_review_and_registry_substitution_refuse(
         reviewed_at="2026-08-30T02:00:00Z",
     )
     _rehash(raw)
-    with pytest.raises(PreregistrationError, match="Git repository"):
+    # Whatever the harness layout, a bare self-declared review is refused; the
+    # exact branch follows this tmp_path's location (see the helper).
+    with pytest.raises(PreregistrationError, match=_bare_tmp_path_refusal(tmp_path)):
         load_reviewed_algorithm_spec(_write(tmp_path, raw, "self-reviewed.json"))
 
+    # Layout-independent: a self-declared review inside a repository that is
+    # not the registry's repository is refused before any status check.
+    foreign = tmp_path / "foreign-repository"
+    foreign.mkdir()
+    _git(foreign, "init", "--quiet")
+    with pytest.raises(PreregistrationError, match="share one repository"):
+        load_reviewed_algorithm_spec(_write(foreign, raw, "self-reviewed.json"))
+
     spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
+    # Layout-independent: inside the anchored repository the same self-declared
+    # review has no external review anchor and is refused before any status or
+    # signature check.
+    unanchored = _write(spec_path.parent, raw, "self-reviewed.json")
+    with pytest.raises(PreregistrationError, match="no unique external review anchor"):
+        load_reviewed_algorithm_spec(unanchored)
+    unanchored.unlink()
+
     reviewed = load_reviewed_algorithm_spec(spec_path)
     registry = preregistration.REVIEWED_SPEC_REGISTRY_PATH
     registry.write_bytes(

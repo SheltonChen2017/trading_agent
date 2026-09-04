@@ -3850,3 +3850,29 @@ This round advances the six current pointers and the guard to route the next
 counter-review, so it does not repeat the `TPR-CCR12-001` defect it reviewed.
 Provider accesses: **0**. Outcome accesses: **0**. Authorized or spent research
 looks: **0**.
+
+## 39. Owner-directed cross-lane bug-fix integration applied (2026-09-04)
+
+The owner directed the dedicated Review lane session to fix, on the
+`main`-derived branch `Feature-bug-fix-integration-2026-09-04`, the shared
+trading-application / test-infrastructure / repository-tooling issues that this
+record and the sibling lane records had documented but, under the lane scope
+rule, deliberately not fixed, and to apply the identical commits to every lane
+branch so no lane carries a divergent copy of a shared file. This lane received
+them as cherry-picks; no lane-owned file changed.
+
+| Integration-branch commit | Cherry-pick on this lane | Content |
+|---|---|---|
+| `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` | `e0270c8bbf425f85af43b13eda6cb6bb59b252f4` | sleeve-report clock seam, runtime-stop leak redirect + conftest guard, shared EOL attributes, Briefing smoke isolation, characterization test rename |
+| `3114a1530f0afa400eb200e79ff218c174657e69` | `09c296ee14c3beb6f81d4f887040a4814e1dab3c` | notification cycle evaluates at its own clock; guard decoder bound at import |
+| docs commit | `1e3757c241948609edf598388dd64e711d925810` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, full disposition ledger, owner decisions) plus the four-lane README, the direction status paragraph, and the workflow exception paragraph |
+
+Items of this record closed by the application: TPR-OOL-009 (F-1); TPR-OOL-008 and TPR-OOL-010 (F-4); TPR-OOL-005 (F-5); TPR-OOL-002 and TPR-OOL-007 (F-6). Newly routed to this lane: `test_self_declared_review_and_registry_substitution_refuse` depends on where pytest's `tmp_path` lives (Analyst `ARV2-UNRELATED-001` / Short-interest `SI-OOL-003`; integration record sections 3 and 5.1). Every other
+out-of-lane item this record carries was examined; its disposition and reason
+are in the integration record's section 5, and the items needing an owner
+decision are listed in its section 6.
+
+This application is not acceptance of any lane milestone and grants no
+provider, outcome, look, QuantConnect, broker, operator-database, deployment,
+paper, live, or trading authority. The lane's same-branch review loop resumes
+from this head. Validation on this lane's resulting head: focused set (sleeve report/notifications, leak guard, EOL attributes, crash-test redirect, Briefing smoke, reservation characterizations, active-document consistency): 174 passed in 33.71s.

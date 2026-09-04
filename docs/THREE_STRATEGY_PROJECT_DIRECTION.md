@@ -279,3 +279,13 @@ counter-review on that lane's same branch/worktree. This shared record freezes
 only four-family selection accounting and the common final-holdout boundary;
 it grants no source, outcome, look, QuantConnect, broker, deployment, paper,
 live, or integration authority.
+
+**Status update, 2026-09-04 (owner-directed bug-fix integration):** the
+"one exact-snapshot push" named in the 2026-08-30 step above has happened. The
+Target-Price Revisions documentation round is merged through PR #324
+(`1a5264e6b1de3caf5477477d1312a762b2d42419`), and that lane has since
+completed further same-branch Claude review and Codex counter-review rounds
+recorded only in its lane record. This paragraph corrects the stale
+next-action sentence (`TPR-OOL-007`); it changes no allocation, gate, or
+authority. The owner-directed cross-lane bug-fix integration of 2026-09-04 is
+recorded in `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md`.

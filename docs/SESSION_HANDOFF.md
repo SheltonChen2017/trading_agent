@@ -69,10 +69,11 @@ their lane-owned artifacts.
   `main`'s version (`e989872` on that branch) and the lane guards that read
   its target block and row for per-round state were retargeted to the lane
   record in the following commit. Both shared coordination documents are now
-  identical on that lane and this branch. Note for `main`: the Action Plan's
-  Target-price block still describes the 2026-08-30 state ("after this Codex
-  round's single push, Claude reviews only its exact correction range"); a
-  concise `main`-side status refresh is an owner call, not a lane edit.
+  identical on that lane and this branch. (5) On owner direction the Action
+  Plan's Target-price block and table row were refreshed on this branch as a
+  concise 2026-09-04 reference to the lane record's section 8 (replacing the
+  2026-08-30 next-action sentence) and mirrored to that lane; they are no
+  longer per-round pointers.
 
 ## 0. Target-Price Revision fourth-lane planning addition
 

@@ -400,7 +400,11 @@ def run_sleeve_notification_cycle(
 
     fills = fills_with_confirmed_splits(store)
     ledger = build_ledger(fills)
-    report = evaluate_sleeves(snapshot, ledger, store.list_journal_postings())
+    # The report must be classified at the cycle's own instant so lot-age
+    # terms, the notification timestamps, and price freshness share one clock.
+    report = evaluate_sleeves(
+        snapshot, ledger, store.list_journal_postings(), now=at
+    )
 
     held_tickers = {position.ticker.upper() for position in snapshot.positions}
     flat_growth = [

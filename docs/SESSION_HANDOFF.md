@@ -51,6 +51,22 @@ their lane-owned artifacts.
 - Validation on the final integration tree: full suite on `3114a15` in an isolated detached worktree with an external `--basetemp`: 6799 passed, 13 skipped, 25 warnings, 0 failed (2124 s); compileall including `research` clean; `git diff --check` clean. Baseline `main` at `aefa0ec` in the same setup: 4 failed, 6786 passed, 13 skipped (the four wall-clock failures).
 - `main` still shows the four wall-clock failures until the integration PR is
   merged; every lane branch carries the same fix commits after this round.
+- Owner follow-ups executed the same day: (1) the real
+  `%LOCALAPPDATA%\trading_agent\runtime\state\execution-emergency-stop.json`
+  on this host (generation 42, 42 incidents, every origin a pytest/temp
+  database) was deleted under the runtime's own state fence after a
+  byte-identical backup was taken; the runtime now reads it as inactive,
+  generation 0, and recreates it on the next real activation. (2) The
+  Target-price lane's copy of this handoff, which that lane had been editing
+  per round, was restored byte-for-byte to this branch's version and the
+  three lane guards that bound it to lane state were retargeted to the lane
+  record and Action Plan (`16b3435`, `522da19`, `47103e4` on
+  `codex/strategy-target-price-revisions`). (3) The analyst and
+  short-interest clone directories were fast-forwarded to their pushed tips.
+- Open owner decision: `docs/ACTION_PLAN_2026-08-20.md` on the Target-price
+  lane carries the same class of per-round lane edits (nine commits since
+  `main`, target block and row); it was deliberately left as is and will need
+  the same restore-or-accept decision before that lane is re-merged.
 
 ## 0. Target-Price Revision fourth-lane planning addition
 

@@ -26,7 +26,7 @@ paper, live, or trading authority.
 |---|---|
 | Base | `main` at `aefa0ec` (PR #326 merge) |
 | Integration branch | `Feature-bug-fix-integration-2026-09-04` |
-| Code/test commits | `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` (fix set) and `3114a1530f0afa400eb200e79ff218c174657e69` (clock pass-through in the notification cycle; guard decoder) |
+| Code/test commits | `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` (fix set), `3114a1530f0afa400eb200e79ff218c174657e69` (clock pass-through in the notification cycle; guard decoder), `6ef66eed77f9b24ea3df8aa538f42de0c871c824` (F-8, owner-directed Target-price test fix) |
 | Lane records scanned (branch tips) | Analyst `6a157e9`, Insider `c7b9f2f`, Short interest `edc49f8`, Target-price `dff9b11` |
 | Lane application | The identical code commits are cherry-picked onto each of the four `codex/strategy-*` branches; each lane record's pointer section names its own resulting hashes. |
 | Merge | Owner performs the PR merges. |
@@ -46,7 +46,10 @@ paper, live, or trading authority.
 3. Fixes are confined to shared application, test-infrastructure, and
    repository-tooling files. No file under `research/<lane>/`,
    `tests/<lane>/`, or any lane blueprint/record was changed, and no
-   lane-owned `.gitattributes` was altered.
+   lane-owned `.gitattributes` was altered — with one owner-directed
+   exception: F-8 edits the Target-price lane's own test under
+   `tests/target_price_revisions/`, because the owner asked for that lane to
+   be fixed as well once the mechanism was shown.
 4. Items that are research-contract decisions, execution-semantics design
    questions, environment notes, or already queued under the owner-gated
    `docs/Plan/POST_INTEGRATION_FULL_PROJECT_REVIEW_AND_P2_P3_REMEDIATION.md`
@@ -63,6 +66,7 @@ paper, live, or trading authority.
 | **F-5 Briefing smoke isolation** | TPR-OOL-005 | Observed once by Codex as a 180 s timeout with yfinance `OperationalError('unable to open database file')`; not reproducible on demand (host-load flake). The fixture patched one recorded-bar seam only; Briefing still reached `fetch_historical` on `data.market_data`, `assistant.context_builder`, `assistant.macro_context`, and the UI module. | `tests/test_ui_pages_smoke.py::_isolated_app_environment` stubs `fetch_historical` on every importing module so the page cannot reach the network or the yfinance SQLite cache. | Briefing smoke passes under the hardened fixture; the failure mode is unreachable rather than merely rarer. |
 | **F-6 Stale shared coordination documents** | TPR-OOL-002, TPR-OOL-007, Insider #30, TPR unnamed README "PDF governs" note | Verified by reading: `docs/Strategy Description/README.md` described a three-strategy program with Insider/Short-interest at "planning/baseline" and omitted the fourth lane; `docs/THREE_STRATEGY_PROJECT_DIRECTION.md` still said the TPR-0A candidate's "next action is one exact-snapshot push" although PR #324 merged it. | README rewritten for four lanes with a directory-index posture (no per-round milestone identifiers); DIRECTION gains a dated status paragraph that corrects the stale sentence without altering any allocation or gate; the parallel-workflow file gains the 2026-09-04 exception paragraph. | `tests/test_active_document_consistency.py`: 69 passed. |
 | **F-7 Overclaiming test name** | Insider R-17 | `test_an_unsupported_order_type_blocks_and_releases_its_reservation` asserts an empty reservation set, but its refusal happens during policy revalidation before any reservation exists, so the assertion cannot protect the release kernel. The other test the finding named (`test_early_refusals_never_create_a_reservation`) had already been renamed on `main`. The post-reservation release path is behaviorally frozen by `test_pre_submit_telemetry_failure_releases_budget_without_broker_contact` (takes a real reservation, observes `submission_failed` with none left). | Renamed to `test_an_unsupported_order_type_fails_policy_revalidation_before_reserving`; docstring names the test that owns the release path; no assertion removed. | 3 characterization tests pass; no document referenced the old name. |
+| **F-8 Layout-deterministic Target-price self-declared-review test** (owner direction, same day) | Analyst ARV2-UNRELATED-001, Short-interest SI-OOL-003 | Reproduced on `main`: `1 passed` with an external `--basetemp`, `1 failed` with a repository-local one (expected `Git repository`, actual `reviewed spec and registry must be committed and clean`). `_repository_root` walks up from the spec, so the branch depended on where `tmp_path` lived, not on the spec. | `tests/target_price_revisions/test_preregistration.py`: the bare-`tmp_path` assertion expects the exact branch its own location must reach (`_bare_tmp_path_refusal` mirrors the loader's discovery order), and two layout-independent assertions exercise the other branches explicitly — a self-declared review in a foreign repository (`share one repository`) and an uncommitted one inside the anchored repository (`committed and clean`). The loader is unchanged. | `1 passed` under both layouts; whole file `83 passed, 2 skipped`. Test-only change: red-before is the repository-local failure. |
 
 `ARV2-UNRELATED-001` (the Target-price test
 `tests/target_price_revisions/test_preregistration.py::test_self_declared_review_and_registry_substitution_refuse`,
@@ -75,8 +79,9 @@ sandbox uses — `tmp_path` sits inside the Git worktree, the loader correctly
 reaches its "reviewed spec and registry must be committed and clean" refusal
 instead of the intended "not in a Git repository" refusal, and the regex fails
 (`1 failed`, reproduced here). This is the same mechanism the Short-interest
-lane recorded as `SI-OOL-003`. The test is lane-owned, so it is routed to the
-Target-price lane rather than edited here (section 5.1).
+lane recorded as `SI-OOL-003`. The test is lane-owned; on the owner's
+follow-up direction it was fixed as **F-8** below and documented in that
+lane's record.
 
 ## 4. Consolidation map
 
@@ -112,14 +117,14 @@ milestone), **ENVIRONMENT** (host/harness observation, no repository change).
 | Shared three-lane baseline test omits TPR | — | DESIGN | The fourth lane is bound by its own guards under `tests/target_price_revisions/`; duplicating them in the three-lane test adds no protection. |
 | Process doc vs same-branch override | — | OWNER-DECISION | The parallel-workflow file already records the owner's same-branch override; the general process document remains the default for non-lane work. |
 | Sandbox path length / `--basetemp` / mixed working-copy endings | — | ENVIRONMENT | Harness usage; no repository change. |
-| `test_self_declared_review_and_registry_substitution_refuse` depends on `tmp_path` location (ARV2-UNRELATED-001 / SI-OOL-003) | P3 | routed to this lane | Lane-owned test under `tests/target_price_revisions/`; reproduced on `main` with a repository-local `--basetemp`. Suggested fix: make the not-in-a-repository case independent of the harness temp location (`GIT_CEILING_DIRECTORIES` or an explicit outside-repository directory). |
+| `test_self_declared_review_and_registry_substitution_refuse` depends on `tmp_path` location (ARV2-UNRELATED-001 / SI-OOL-003) | P3 | **FIXED (F-8)** on owner direction | Lane-owned test under `tests/target_price_revisions/`; reproduced on `main` with a repository-local `--basetemp`, then made layout-deterministic (section 3). |
 
 ### 5.2 Short-interest lane
 
 | ID | Sev | Disposition | Reason |
 |---|---|---|---|
 | SI-SYNC-001 (stale CRLF Analyst spec copies) | out-of-lane | ENVIRONMENT (root-cause class closed by F-4) | The Analyst specs already carry `-text`; stale working copies are machine-local and are restored from the committed `HEAD` blob (never `git add --renormalize` under `-text`, per SI-CCR11-001). F-4 closes the remaining unprotected shared files. |
-| SI-OOL-003 (repo-local basetemp breaks a TPR test) | — | routed to the Target-price lane (same as ARV2-UNRELATED-001) | Reproduced here with a repository-local `--basetemp`. The refusal ordering is intended; the lane-owned test should stop depending on `tmp_path` being outside every Git worktree (e.g. `GIT_CEILING_DIRECTORIES`, or an explicit outside-repository directory). |
+| SI-OOL-003 (repo-local basetemp breaks a TPR test) | — | **FIXED (F-8)** | Reproduced here with a repository-local `--basetemp`; the refusal ordering is intended and the test now asserts the exact branch its location reaches. The harness note (prefer an external base temp) still stands for Windows path-length reasons. |
 | PDF whitespace under `git diff --check` | — | ENVIRONMENT | Historical ranges predating `*.pdf binary`; the current tree is clean. |
 | SI-CR2-005 (`ml.immutable_io` dependency) | P3 | INTEGRATION-ITEM | Same as Insider R-23 below. |
 | Section 6.5 spot-check disclosure | — | not a defect | Coverage-boundary statement; the fence-leak mechanism itself is closed by F-2/F-3. |
@@ -166,7 +171,7 @@ milestone), **ENVIRONMENT** (host/harness observation, no repository change).
 | ARV2ENV-001 / -002, #16 interpreter divergence, #14 PDF whitespace | — | ENVIRONMENT | |
 | ARV2R8-002 (three dropped lane tests) | — | OWNER-DECISION | Whether `main`'s suite supersedes them is an Analyst-lane record question. |
 | ARV2R7-002 / ARV2R8-003 (two Claude sessions on one lane) | — | OWNER-DECISION | Coordination, not code. |
-| ARV2-UNRELATED-001 | P3 | routed to the Target-price lane (lane-owned test) | Not a stale message: passes with an external basetemp, fails with a repository-local one (section 3). Same mechanism as SI-OOL-003. |
+| ARV2-UNRELATED-001 | P3 | **FIXED (F-8)** | Not a stale message: the outcome followed `tmp_path`'s location (section 3). Same mechanism as SI-OOL-003. |
 | ARV2WL-D11 | P3 | **FIXED (F-1)** | |
 | ARV2WL-D10 (calendar test gap) | P3 | not a defect | Test-inventory observation; calendar behavior was probe-verified by the lane. Candidate for a later coverage pass. |
 | ARV2WL-D02 | P2 | partially closed in-lane | Archived record stays frozen history. |
@@ -224,6 +229,13 @@ Focused evidence on the final tree:
   signals strategies tests research baskets.py config.py market_analytics.py`:
   clean.
 - `git diff --check`: clean.
+
+F-8 (`6ef66eed77f9b24ea3df8aa538f42de0c871c824`, test-only, one file):
+`1 passed` under an external and under a repository-local `--basetemp`;
+`tests/target_price_revisions/test_preregistration.py` `83 passed, 2
+skipped`; `git diff --check` clean. The full suite was not re-run for this
+test-only change: the last full run is the one on `3114a15` above, and every
+later commit is documentation or this single test file.
 
 Untested paths: the Briefing flake (F-5) cannot be reproduced on demand, so
 its closure rests on the seam census, not on a red-then-green run; the leak

@@ -1108,7 +1108,7 @@ def test_identity_factory_gate_precedes_hostile_version_comparison(monkeypatch):
 
 @pytest.mark.parametrize(
     "mutation",
-    ["absent_original", "cross_issuer", "not_after_original"],
+    ["absent_original", "cross_issuer", "not_after_original", "before_original"],
 )
 def test_self_consistent_amendment_requires_its_observed_original(
     monkeypatch,
@@ -1128,6 +1128,19 @@ def test_self_consistent_amendment_requires_its_observed_original(
         )
     elif mutation == "cross_issuer":
         replacements["issuer_cik"] = "0000000001"
+    elif mutation == "before_original":
+        # An amendment cannot be publicly accepted before the filing it
+        # amends. Only the equal-time case was previously exercised, so the
+        # strict-order half of the guard could be deleted unnoticed.
+        original = next(
+            row
+            for row in inventory.filings
+            if row.accession_number == ORIGINAL
+        )
+        replacements["accepted_at_utc"] = (
+            datetime.fromisoformat(original.accepted_at_utc)
+            - timedelta(seconds=1)
+        ).isoformat(timespec="seconds")
     else:
         original = next(
             row
@@ -2100,3 +2113,158 @@ def test_ib2a_module_has_no_float_network_outcome_qc_or_execution_surface():
         and node.func.id == "open"
         for node in ast.walk(tree)
     )
+
+
+# ---------------------------------------------------------------------------
+# Claude review regressions (2026-09-03). A targeted mutation sweep of the
+# eight IB-2A dangerous directions left several guards standing with the suite
+# green. Each test below pins one such guard so it can no longer be deleted
+# silently. Guards proven redundant behind an earlier check are recorded in
+# the lane record instead of being given a test that could only pass by
+# mutating the earlier check.
+# ---------------------------------------------------------------------------
+
+
+def test_evidence_mutation_during_independent_revalidation_is_refused(
+    monkeypatch,
+):
+    """Direction 1: the re-fingerprint immediately after reparse must fire.
+
+    The post-validation check is already pinned. This reaches the earlier
+    intermediate check by mutating the evidence as a side effect of the
+    reparse itself, which is the window that check exists to close.
+    """
+    evidence = _build_evidence(monkeypatch)
+    real_reparse = inventory_module._reparse_profile_bound_evidence
+
+    def mutating_reparse(*args, **kwargs):
+        result = real_reparse(*args, **kwargs)
+        object.__setattr__(evidence.identity, "canonical_filter_authorized", True)
+        return result
+
+    monkeypatch.setattr(
+        inventory_module, "_reparse_profile_bound_evidence", mutating_reparse
+    )
+    with pytest.raises(
+        Form4ObservedIdentityInventoryError,
+        match="changed during independent revalidation",
+    ):
+        build_form4_observed_identity_inventory(
+            evidence, builder_git_commit=BUILDER_COMMIT
+        )
+
+
+def test_forged_report_disposition_alone_cannot_drift_from_captured_evidence(
+    monkeypatch,
+):
+    """Direction 3: disposition is derived after the payload hash is taken, so
+    the hash does not bind it. IB-2A therefore replays every rebuilt row's
+    constructor, which re-applies the disposition-to-outcomes binding even
+    when a forgery bypassed that constructor. This pins the replay: a row
+    whose disposition drifts while outcomes and payload hash stay intact must
+    be refused there, before any comparison with retained evidence."""
+    evidence = _build_evidence(monkeypatch)
+    real_builder = inventory_module.build_form4_provisional_disposition_report
+
+    def forge_report(*args, **kwargs):
+        report = real_builder(*args, **kwargs)
+        target = next(
+            row
+            for row in report.rows
+            if row.disposition
+            is Form4ProvisionalDisposition.PROVISIONAL_PRE_AGGREGATION_CANDIDATE
+        )
+        row_payload = target.lineage_payload()
+        row_payload["disposition"] = (
+            Form4ProvisionalDisposition.PROVISIONAL_QUARANTINE.value
+        )
+        # The report row constructor already refuses this through replace()
+        # ("provisional disposition contradicts parser outcomes"), so the
+        # forgery deliberately bypasses the constructor, exactly as the
+        # identity forgeries above do, to reach the IB-2A binding itself.
+        forged_target = copy.copy(target)
+        object.__setattr__(
+            forged_target,
+            "disposition",
+            Form4ProvisionalDisposition.PROVISIONAL_QUARANTINE,
+        )
+        object.__setattr__(forged_target, "row_id", hash_payload(row_payload))
+        assert forged_target.outcomes == target.outcomes
+        assert (
+            forged_target.transaction_payload_hash
+            == target.transaction_payload_hash
+        )
+        rows = tuple(
+            forged_target if row is target else row for row in report.rows
+        )
+        identity = copy.copy(report.identity)
+        object.__setattr__(
+            identity, "candidate_count", report.identity.candidate_count - 1
+        )
+        object.__setattr__(
+            identity, "quarantine_count", report.identity.quarantine_count + 1
+        )
+        object.__setattr__(
+            identity,
+            "row_inventory_hash",
+            hash_payload([row.to_payload() for row in rows]),
+        )
+        object.__setattr__(
+            identity,
+            "report_id",
+            (
+                "form4-provisional-disposition-report-"
+                f"{hash_payload(identity.lineage_payload())[:16]}"
+            ),
+        )
+        forged = copy.copy(report)
+        object.__setattr__(forged, "identity", identity)
+        object.__setattr__(forged, "rows", rows)
+        return forged
+
+    monkeypatch.setattr(
+        inventory_module,
+        "build_form4_provisional_disposition_report",
+        forge_report,
+    )
+    with pytest.raises(
+        Form4ObservedIdentityInventoryError,
+        match="rebuilt upstream report row is invalid",
+    ):
+        build_form4_observed_identity_inventory(
+            evidence, builder_git_commit=BUILDER_COMMIT
+        )
+
+
+def test_filing_cannot_list_one_owner_observation_twice(monkeypatch):
+    """Direction 6: a filing whose owner set repeats one observation id would
+    let a single owner count twice. A combined mutant that neutralised all
+    three owner-uniqueness clauses left the suite green; this pins the
+    filing-level clause, the first line that construction actually reaches."""
+    _evidence, inventory = _inventory(monkeypatch)
+    filing = next(
+        row for row in inventory.filings if row.accession_number == ORIGINAL
+    )
+    assert filing.reporting_owner_count == 1
+    (owner_id,) = filing.reporting_owner_observation_ids
+
+    payload = filing.lineage_payload()
+    payload["reporting_owner_count"] = 2
+    payload["owner_set_outcomes"] = [
+        Form4ObservedOwnerSetOutcome.MULTIPLE_OWNER_SET_QUARANTINED.value
+    ]
+    payload["reporting_owner_observation_ids"] = [owner_id, owner_id]
+
+    with pytest.raises(
+        Form4ObservedIdentityInventoryError,
+        match="filing owner-set observation is inconsistent",
+    ):
+        replace(
+            filing,
+            reporting_owner_count=2,
+            owner_set_outcomes=(
+                Form4ObservedOwnerSetOutcome.MULTIPLE_OWNER_SET_QUARANTINED,
+            ),
+            reporting_owner_observation_ids=(owner_id, owner_id),
+            filing_observation_id=hash_payload(payload),
+        )

@@ -11,7 +11,7 @@ import copy
 import json
 import os
 import shutil
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -20,7 +20,9 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying import (
     ClassificationOutcome,
+    Form4ProvisionalDisposition,
     Form4ProvisionalDispositionReport,
+    Form4ProvisionalDispositionReportError,
     Form4ProvisionalDispositionReportIdentity,
     Form4ProvisionalDispositionRow,
     Form4ProvisionalDispositionSnapshotError,
@@ -966,3 +968,24 @@ def test_ib1h_module_has_no_network_outcome_execution_or_ui_imports():
     assert imported.isdisjoint(forbidden), imported & forbidden
     source = module_path.read_text(encoding="utf-8")
     assert "_VERIFIED_" not in source
+
+
+def test_report_row_constructor_binds_disposition_to_outcomes(report):
+    """Claude review regression (2026-09-03): disposition is derived from
+    outcomes after the payload hash is taken, so the constructor is the first
+    line that binds them. No test pinned it, and IB-2A replays this constructor
+    on every rebuilt row, so a silent deletion here would weaken both layers."""
+    target = next(
+        row
+        for row in report.rows
+        if row.disposition
+        is Form4ProvisionalDisposition.PROVISIONAL_PRE_AGGREGATION_CANDIDATE
+    )
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="contradicts parser outcomes",
+    ):
+        replace(
+            target,
+            disposition=Form4ProvisionalDisposition.PROVISIONAL_QUARANTINE,
+        )

@@ -5224,3 +5224,29 @@ Resolved items are retained. There are no P0, P1 or P2 findings.
    portfolio stages and every QuantConnect artifact/upload/compile/job remain
    gated on separate owner authorisation. No next milestone is implemented
    here.
+
+## 39. Owner-directed cross-lane bug-fix integration applied (2026-09-04)
+
+The owner directed the dedicated Review lane session to fix, on the
+`main`-derived branch `Feature-bug-fix-integration-2026-09-04`, the shared
+trading-application / test-infrastructure / repository-tooling issues that this
+record and the sibling lane records had documented but, under the lane scope
+rule, deliberately not fixed, and to apply the identical commits to every lane
+branch so no lane carries a divergent copy of a shared file. This lane received
+them as cherry-picks; no lane-owned file changed.
+
+| Integration-branch commit | Cherry-pick on this lane | Content |
+|---|---|---|
+| `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` | `13cd0f45eaebff6b850397b9a4c6b825f08961c0` | sleeve-report clock seam, runtime-stop leak redirect + conftest guard, shared EOL attributes, Briefing smoke isolation, characterization test rename |
+| `3114a1530f0afa400eb200e79ff218c174657e69` | `1c70179d9bf40d2ecd6d7c44c93580bf8a1d2258` | notification cycle evaluates at its own clock; guard decoder bound at import |
+| docs commit | `de8c9b1fedb2eba2fe322bb37cc4dd250f425f99` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, full disposition ledger, owner decisions) plus the four-lane README, the direction status paragraph, and the workflow exception paragraph |
+
+Items of this record closed by the application: SI-OOL-002 (F-1); the SI-SYNC-001 root-cause class for shared exact-byte files outside the Analyst attribute scope (F-4). SI-OOL-003 was reproduced on `main` and routed to the Target-price lane, which owns that test. Every other
+out-of-lane item this record carries was examined; its disposition and reason
+are in the integration record's section 5, and the items needing an owner
+decision are listed in its section 6.
+
+This application is not acceptance of any lane milestone and grants no
+provider, outcome, look, QuantConnect, broker, operator-database, deployment,
+paper, live, or trading authority. The lane's same-branch review loop resumes
+from this head. Validation on this lane's resulting head: focused set (sleeve report/notifications, leak guard, EOL attributes, crash-test redirect, Briefing smoke, reservation characterizations, active-document consistency): 174 passed in 26.46s.

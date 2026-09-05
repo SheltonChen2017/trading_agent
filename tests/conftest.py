@@ -66,6 +66,31 @@ def _isolate_execution_runtime_authority(tmp_path, monkeypatch):
 # never consults ``json.loads``, so the guard cannot trip those sentinels.
 _DECODE_RUNTIME_STOP_STATE = __import__("json").JSONDecoder().decode
 
+# Session start, for attributing runtime-stop incidents to THIS run.  Bound at
+# import so every teardown compares against the same instant.
+_SESSION_STARTED_AT = __import__("datetime").datetime.now(
+    __import__("datetime").timezone.utc
+)
+
+
+def _incident_predates_this_session(activated_at: object) -> bool:
+    """True only for an incident stamped strictly before this session began.
+
+    Anything unparseable or naive returns False so the incident stays
+    attributed by path: an unreadable timestamp must not hide a leak.
+    """
+    from datetime import datetime
+
+    if not isinstance(activated_at, str):
+        return False
+    try:
+        stamped = datetime.fromisoformat(activated_at.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    if stamped.tzinfo is None or stamped.utcoffset() is None:
+        return False
+    return stamped < _SESSION_STARTED_AT
+
 
 def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
     """Fail the test that leaked containment into the operator's runtime.
@@ -79,10 +104,18 @@ def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
     incidents were observed, all from pytest temp databases).
 
     Only incidents whose origin database sits under THIS session's pytest
-    base temp are attributed here, so concurrent suites from other sessions
-    on the same host cannot make this guard fail spuriously.  The guard reads
-    the real file and never mutates it: operator runtime state is not test
-    cleanup.
+    base temp AND whose ``activated_at`` is not before this session started
+    are attributed here.  The path test keeps concurrent suites from other
+    sessions on the same host from tripping the guard; the time test keeps a
+    stale incident left under a reused fixed ``--basetemp`` by an earlier run
+    from erroring every test of the next run.  An incident without a
+    parseable ``activated_at`` is attributed by path alone (fail closed).
+    The guard reads the real file and never mutates it: operator runtime
+    state is not test cleanup.
+
+    Because it runs in fixture teardown, a leak is reported by pytest as an
+    ERROR at teardown of the offending test, not as a FAIL: the test's own
+    assertions may still show passed.
     """
     import os
 
@@ -111,6 +144,7 @@ def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
         and os.path.normcase(str(incident.get("origin_database", ""))).startswith(
             session_base
         )
+        and not _incident_predates_this_session(incident.get("activated_at"))
     ]
     assert not leaked, (
         "this test (or a child process it spawned) wrote a containment incident "

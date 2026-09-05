@@ -334,10 +334,20 @@ def evaluate_sleeves(
     as wall time advances (TPR-OOL-009 / SI-OOL-002 / IB0H-OOL01).
 
     Raises ``SleeveReportError`` when the inputs cannot support an honest
-    report (non-finite or non-positive equity, corrupt income postings).
-    Failing loudly is correct: a sleeve report derived from broken inputs
-    would be read as fact.
+    report (non-finite or non-positive equity, corrupt income postings, a
+    naive ``now``).  Failing loudly is correct: a sleeve report derived from
+    broken inputs would be read as fact.
     """
+    # A naive clock is rejected HERE, before any position is examined.  Left
+    # to the per-position lot view it would surface as a TypeError inside
+    # ``unrealized_by_lot`` and be caught by the per-position degradation
+    # branch, so every growth position would read "per-lot view unavailable"
+    # and the report would look complete while carrying no lot at all.
+    if now is not None and (now.tzinfo is None or now.utcoffset() is None):
+        raise SleeveReportError(
+            "now must be a timezone-aware datetime; a naive evaluation clock "
+            f"cannot classify lot age, got {now!r}"
+        )
     try:
         floor = to_decimal(floor_pct, name="floor_pct")
         gain_threshold = to_decimal(

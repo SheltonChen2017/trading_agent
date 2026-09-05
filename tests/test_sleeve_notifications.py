@@ -678,3 +678,22 @@ def test_watch_state_round_trip_is_atomic_full_replacement(tmp_path):
     assert len(rows) == 1 and rows[0]["active"] is True
     store.save_sleeve_watch_states([])
     assert store.list_sleeve_watch_states() == []
+
+
+def test_cycle_with_a_naive_clock_raises_before_writing_any_state(tmp_path):
+    """The cycle threads its ``now`` into the sleeve report; a naive clock is
+    refused there, before the cycle commits watch states or alerts.  Nothing
+    may be persisted from an evaluation whose lot terms could not be
+    classified."""
+    from assistant.sleeve_report import SleeveReportError
+
+    store = _seeded_store(tmp_path, days_ago=364)
+    snapshot = _snapshot([_position("NVDA", 10, 160.0)])
+
+    with pytest.raises(SleeveReportError, match="timezone-aware"):
+        run_sleeve_notification_cycle(
+            store, snapshot=snapshot, now=_NOW.replace(tzinfo=None)
+        )
+
+    assert store.list_sleeve_watch_states() == []
+    assert store.list_operational_alerts(status=None) == []

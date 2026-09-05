@@ -764,3 +764,37 @@ def test_evaluate_sleeves_classifies_lot_age_at_the_injected_clock_not_wall_time
     lot = later["growth_sleeve"]["positions"][0]["lots"][0]
     assert lot["term_if_sold_now"] == "long"
     assert later["growth_sleeve"]["lots_at_gain_review"] == 1
+
+
+def test_evaluate_sleeves_rejects_a_naive_clock_instead_of_degrading_every_lot():
+    """A naive ``now`` must fail closed at the boundary.
+
+    Left to the per-position lot view, the aware-vs-naive comparison raises
+    TypeError inside ``unrealized_by_lot``, which the per-position branch
+    catches, so every growth position would read ``lot_coverage="unavailable"``
+    and the report would look complete while carrying no lot at all.
+    """
+    ledger = build_ledger(
+        [
+            Fill(
+                ticker="NVDA",
+                qty=10.0,
+                price=100.0,
+                side="buy",
+                at=_NOW - timedelta(days=400),
+                fill_id="NVDA-naive",
+            )
+        ]
+    )
+    snapshot = _snapshot([_position("NVDA", 10, 155.0)])
+    naive = _NOW.replace(tzinfo=None)
+
+    with pytest.raises(SleeveReportError, match="timezone-aware"):
+        _evaluate_sleeves_at_clock(snapshot, ledger, [], now=naive)
+
+    # The same inputs at the aware clock are a complete, lot-bearing report:
+    # the refusal above is about the clock, not the data.
+    report = _evaluate_sleeves_at_clock(snapshot, ledger, [], now=_NOW)
+    position = report["growth_sleeve"]["positions"][0]
+    assert position["lot_coverage"] != "unavailable"
+    assert len(position["lots"]) == 1

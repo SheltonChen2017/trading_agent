@@ -17,7 +17,17 @@ import assistant.dispatch_fence as dispatch_fence
 from tests.conftest import _assert_test_left_no_incident_in_the_real_runtime_stop
 
 
-def _write_stop(root: Path, origin_database: str) -> None:
+def _write_stop(
+    root: Path,
+    origin_database: str,
+    *,
+    activated_at: object = "2999-01-01T00:00:00+00:00",
+) -> None:
+    """Write a crafted stop whose one incident uses the runtime's own schema.
+
+    ``activated_at`` defaults to the far future so the crafted incident can
+    never predate the session that reads it.
+    """
     state_dir = root / dispatch_fence._STATE_DIRECTORY_NAME
     state_dir.mkdir(parents=True, exist_ok=True)
     (state_dir / dispatch_fence._EMERGENCY_STOP_FILE_NAME).write_text(
@@ -34,7 +44,7 @@ def _write_stop(root: Path, origin_database: str) -> None:
                         "incident_id": "crafted",
                         "origin_database": origin_database,
                         "reason": "test",
-                        "changed_at": "2026-09-04T00:00:00+00:00",
+                        "activated_at": activated_at,
                     }
                 ],
                 "last_clear": None,
@@ -76,6 +86,49 @@ def test_guard_ignores_incidents_from_other_sessions(tmp_path, monkeypatch):
     _write_stop(fake_real_root, r"C:\somewhere\else\pytest-9\assistant.db")
 
     _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+
+
+def test_guard_ignores_a_stale_incident_from_an_earlier_run_under_the_same_basetemp(
+    tmp_path, monkeypatch
+):
+    """A fixed ``--basetemp`` is reused across runs.  An incident an EARLIER
+    run left under it must not error every test of this run: only incidents
+    stamped at or after this session's start are attributed here."""
+    fake_real_root = tmp_path / "fake-localappdata"
+    monkeypatch.setattr(
+        dispatch_fence, "_canonical_runtime_root", lambda: fake_real_root
+    )
+    stale_db = tmp_path.parent / "earlier_run_test0" / "assistant.db"
+    _write_stop(
+        fake_real_root, str(stale_db), activated_at="2000-01-01T00:00:00+00:00"
+    )
+
+    _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "activated_at",
+    ["not-a-timestamp", "2000-01-01T00:00:00", None],
+    ids=["unparseable", "naive", "missing"],
+)
+def test_guard_attributes_by_path_when_the_incident_stamp_is_unusable(
+    tmp_path, monkeypatch, activated_at
+):
+    """An unreadable or naive stamp must not hide a leak under this base temp."""
+    fake_real_root = tmp_path / "fake-localappdata"
+    monkeypatch.setattr(
+        dispatch_fence, "_canonical_runtime_root", lambda: fake_real_root
+    )
+    leaked_db = tmp_path.parent / "some_other_test0" / "assistant.db"
+    _write_stop(fake_real_root, str(leaked_db), activated_at=activated_at)
+
+    with pytest.raises(AssertionError, match="REAL runtime emergency stop"):
+        _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+    (
+        fake_real_root
+        / dispatch_fence._STATE_DIRECTORY_NAME
+        / dispatch_fence._EMERGENCY_STOP_FILE_NAME
+    ).unlink()
 
 
 def test_guard_is_quiet_when_no_real_stop_file_exists(tmp_path, monkeypatch):

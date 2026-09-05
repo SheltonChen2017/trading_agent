@@ -240,3 +240,17 @@ later commit is documentation or this single test file.
 Untested paths: the Briefing flake (F-5) cannot be reproduced on demand, so
 its closure rests on the seam census, not on a red-then-green run; the leak
 guard's real-file read was exercised on this host only.
+
+## 8. Follow-up review, 2026-09-05
+
+Independent review of this range on `main` (`86417b89`):
+`REVIEW_2026-09-05_POST_INTEGRATION_MAIN.md`. Corrections landed in
+`f4764671`: F-1's injected `now` now refuses a naive clock; F-3's guard
+attributes incidents by session start as well as base temp and is documented
+as a teardown ERROR rather than a test FAIL; F-4's test also asserts the
+working-copy bytes, because the attribute alone left a checkout of this
+branch's merge at `w/crlf` on one host (the SI-SYNC-001 "restored" statement
+above did not hold there). The "Lane application" row above holds: the lane cherry-picks were pushed
+from the other host after the reviewing session's initial fetch (PIR-006 in
+the follow-up record, closed as a false alarm); `f4764671` was then
+cherry-picked onto each lane as well.

@@ -253,4 +253,3 @@ branch's merge at `w/crlf` on one host (the SI-SYNC-001 "restored" statement
 above did not hold there). The "Lane application" row above, stating the fix commits were
 cherry-picked onto every lane branch, was not borne out by `git branch -r --contains` at review
 time; see PIR-006 in the follow-up record.
-

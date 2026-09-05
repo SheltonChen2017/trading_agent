@@ -710,10 +710,21 @@ class PortfolioDecision:
     underfill_reasons: tuple[str, ...]
 
 
+# Named and regression-pinned so this epsilon cannot drift silently in code.
+# It serves two roles: the water-filling convergence bound, and the slack in
+# the post-allocation cap verification below (`weight > cap + tolerance`). It
+# is therefore deliberately NOT a no-op for the hard caps: it admits an
+# overshoot of at most 1e-18 of NAV to absorb benign 50-digit Decimal rounding.
+# It is not yet bound into VerifiedAnalystPolicy or that policy's hash.  That
+# policy-lineage decision remains part of ARV2-5, which must either bind this
+# exact value or prove exact-zero water-filling residuals before activation.
+ALLOCATION_CONVERGENCE_TOLERANCE = Decimal("1e-18")
+
+
 def _allocate_in_context(
     selected: tuple[PortfolioCandidate, ...], policy: VerifiedAnalystPolicy
 ) -> tuple[tuple[Allocation, ...], Decimal, tuple[str, ...]]:
-    tolerance = Decimal("1e-18")
+    tolerance = ALLOCATION_CONVERGENCE_TOLERANCE
     weights = {row.etf_security_id: Decimal("0") for row in selected}
     by_id = {row.etf_security_id: row for row in selected}
     sector_used: dict[str, Decimal] = {}

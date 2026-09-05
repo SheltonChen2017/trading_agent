@@ -322,6 +322,26 @@ def _stock_score_source(
     )
 
 
+def test_numerical_zero_boundary_is_exact_and_inclusive() -> None:
+    """Pin the single NUMERICAL_ZERO use site at its exact boundary.
+
+    The 1e-18 constant guards only the inverse-Herfindahl 0/0 in
+    effective_contributors: total absolute mass at or below the constant is
+    zero evidence, anything strictly above counts. Nothing previously probed
+    the boundary itself, so the threshold could be widened anywhere below the
+    tested 1e-12 - a genuine hidden epsilon - with the suite green.
+    """
+    from research.analyst_revisions_v2.formulas import NUMERICAL_ZERO
+
+    assert NUMERICAL_ZERO == Decimal("1e-18")
+    assert effective_contributors([NUMERICAL_ZERO]) == 0
+    assert effective_contributors([Decimal("1.000000000000000001e-18")]) == 1
+    assert effective_contributors([Decimal("2e-18")]) == 1
+    # The gate applies to the summed mass, not per-value.
+    assert effective_contributors([Decimal("6e-19"), Decimal("6e-19")]) == 2
+    assert effective_contributors([Decimal("5e-19"), Decimal("5e-19")]) == 0
+
+
 def test_effective_contributors_has_no_epsilon_or_ambient_context_pathology() -> None:
     assert effective_contributors([]) == 0
     assert effective_contributors(["1e-12"]) == 1
@@ -746,6 +766,40 @@ def test_inconsistent_clocks_are_hard_refusals() -> None:
             provider_published_at="2026-08-25T13:00:00+00:00",
             available_at="2026-08-25T13:30:00+00:00",
             ingested_at="2026-08-25T14:30:00+00:00",
+        )
+
+
+def test_availability_requires_exactly_one_evidence_clock() -> None:
+    """The two evidence forms are mutually exclusive, and that guard was
+    untested. Supplying both an instant and a date would let a caller silently
+    pick the less conservative rule; supplying neither reaches the calendar
+    with no clock. Both must refuse."""
+    with pytest.raises(AvailabilityError, match="exactly one"):
+        derive_event_availability(
+            evidence_id="clock-1",
+            public_at="2026-08-25T12:00:00+00:00",
+            public_date="2026-08-25",
+        )
+    with pytest.raises(AvailabilityError, match="exactly one"):
+        derive_event_availability(evidence_id="clock-1")
+
+
+def test_prove_timing_order_refuses_each_out_of_order_clock() -> None:
+    """The published>available and available>ingested branches were untested;
+    only the effective>published branch had coverage."""
+    with pytest.raises(AvailabilityError, match="provider_published_at cannot follow"):
+        prove_timing_order(
+            effective_at="2026-08-25T13:00:00+00:00",
+            provider_published_at="2026-08-25T14:00:00+00:00",
+            available_at="2026-08-25T13:30:00+00:00",
+            ingested_at="2026-08-25T14:30:00+00:00",
+        )
+    with pytest.raises(AvailabilityError, match="available_at cannot follow"):
+        prove_timing_order(
+            effective_at="2026-08-25T13:00:00+00:00",
+            provider_published_at="2026-08-25T13:15:00+00:00",
+            available_at="2026-08-25T14:30:00+00:00",
+            ingested_at="2026-08-25T14:00:00+00:00",
         )
 
 

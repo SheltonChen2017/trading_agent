@@ -26,6 +26,7 @@ from research.analyst_revisions_v2.ratings_ingest import (
     FirmNormalizedRatingEvent,
     ProviderVersionChange,
     RatingAction,
+    FirmRatingNormalizationResult,
     RatingsIngestError,
     RatingsIngestRefusalReason,
     TransitionRefusalReason,
@@ -227,6 +228,19 @@ def test_documented_sample_shape_maps_action_and_conservative_clock(tmp_path):
             RatingsIngestRefusalReason.INCONSISTENT_RATING_TRANSITION,
         ),
         ("bad_importance", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
+        # A provider field longer than the canonical 256-character record
+        # bound must be a per-row named refusal, never a whole-audit crash:
+        # the screening bound (2048) previously disagreed with the record
+        # bound (256), so a 257-character firm name escaped the _RowRefusal
+        # handler as a CanonicalEvidenceError and halted the entire census.
+        ("overlong_firm", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
+        ("overlong_analyst", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
+        ("overlong_rating", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
+        ("overlong_previous", RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD),
+        (
+            "overlong_price_target_action",
+            RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD,
+        ),
     ],
 )
 def test_every_structural_defect_has_one_named_refusal(tmp_path, mutation, reason):
@@ -259,6 +273,16 @@ def test_every_structural_defect_has_one_named_refusal(tmp_path, mutation, reaso
         row.pop("previous_rating")
     elif mutation == "self_transition":
         row["rating"] = row["previous_rating"]
+    elif mutation == "overlong_firm":
+        row["firm"] = "F" * 257
+    elif mutation == "overlong_analyst":
+        row["analyst"] = "A" * 257
+    elif mutation == "overlong_rating":
+        row["rating"] = "R" * 257
+    elif mutation == "overlong_previous":
+        row["previous_rating"] = "P" * 257
+    elif mutation == "overlong_price_target_action":
+        row["price_target_action"] = "T" * 257
     else:
         row["importance"] = True
     audit = audit_benzinga_snapshot(
@@ -267,6 +291,22 @@ def test_every_structural_defect_has_one_named_refusal(tmp_path, mutation, reaso
     assert not audit.records
     assert len(audit.refusals) == 1
     assert audit.refusals[0].reason is reason
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("firm", "analyst", "rating", "previous_rating", "price_target_action"),
+)
+def test_canonical_provider_text_fields_accept_exact_256_boundary(
+    tmp_path, field
+):
+    row = _rating_row("event-1")
+    row[field] = field[0].upper() * 256
+    audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(tmp_path / field, [row])
+    )
+    assert len(audit.records) == 1
+    assert not audit.refusals
 
 
 def test_target_only_is_separate_and_pre_2013_is_quarantined(tmp_path):
@@ -773,3 +813,43 @@ def test_upgrade_with_nonpositive_reviewed_change_is_direction_mismatch(tmp_path
     )
     assert isinstance(zero, FirmNormalizationRefusal)
     assert zero.reason is TransitionRefusalReason.ACTION_DIRECTION_MISMATCH
+
+
+def test_firm_normalization_must_be_exhaustive_over_its_source_census(tmp_path):
+    """The result must cover every accepted audit row, not just format-check its hash.
+
+    Sibling result types already enforce an exactly-once census. Without it a
+    silently truncated normalization carried a well-formed
+    ``source_audit_sha256`` and looked complete (ARV2WL-D07).
+    """
+    ontology = _write_ontology(tmp_path / "ontology.json", _three_level_entries())
+    audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(
+            tmp_path / "census",
+            [_rating_row("census-1"), _rating_row("census-2", ticker="BBB")],
+        )
+    )
+    result = normalize_firm_rating_audit(audit, ontology)
+    assert result.source_census == len(audit.records) == 2
+
+    with pytest.raises(TypeError):
+        FirmRatingNormalizationResult(
+            schema=result.schema,
+            source_audit_sha256=result.source_audit_sha256,
+            ontology_id=result.ontology_id,
+            ontology_sha256=result.ontology_sha256,
+            events=result.events,
+            refusals=result.refusals,
+        )
+
+    # Dropping one disposition must now refuse rather than look complete.
+    with pytest.raises(RatingsIngestError, match="exhaustive over its source census"):
+        FirmRatingNormalizationResult(
+            schema=result.schema,
+            source_audit_sha256=result.source_audit_sha256,
+            ontology_id=result.ontology_id,
+            ontology_sha256=result.ontology_sha256,
+            events=result.events[:-1] if result.events else (),
+            refusals=result.refusals[:-1] if not result.events else result.refusals,
+            source_census=2,
+        )

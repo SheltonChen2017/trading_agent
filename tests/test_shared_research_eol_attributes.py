@@ -8,9 +8,14 @@ matches its committed blob or any digest recorded against it, while
 lanes independently documented this class (TPR-OOL-008/-010, SI-SYNC-001,
 Insider #27, Analyst #4) after each lane could protect only its own subtree.
 
-This guard asserts the resolved attribute, not the working-copy bytes, so it
-is deterministic on a checkout that predates the attribute and cannot break
-a sibling session's suite; the attribute itself prevents new CRLF checkouts.
+The first guard asserts the resolved attribute, which prevents NEW CRLF
+checkouts.  The second asserts the working-copy bytes actually match the
+index blob: an attribute added after a file was checked out does not rewrite
+the working copy, and ``git status`` keeps reporting the tree clean through
+the stat cache, so a stale checkout carries the exact defect while the
+attribute test stays green (observed on 2026-09-05 on a checkout of the
+commit that added the attribute).  The failure message names the one-time
+heal step; a plain ``git checkout -- <path>`` is a no-op on a stat-clean file.
 """
 from __future__ import annotations
 
@@ -60,6 +65,29 @@ def test_shared_research_file_carries_its_eol_protection(path: str) -> None:
             f"expected {expected!r}; a CRLF checkout would silently break its "
             "committed-byte identity"
         )
+
+
+@pytest.mark.parametrize("path", sorted(EXPECTED_ATTRIBUTES))
+def test_shared_research_file_working_copy_matches_its_index_blob(path: str) -> None:
+    """A stale CRLF checkout is the defect itself, not a harness quirk."""
+    line = subprocess.run(
+        ["git", "ls-files", "--eol", "--", path],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    # format: i/<index eol>  w/<worktree eol>  attr/<attrs>  <path>
+    fields = dict(part.split("/", 1) for part in line.split()[:2])
+    assert fields.get("i") is not None and fields.get("w") is not None, line
+    if fields["i"] == "none":
+        return  # empty blob: no line endings to compare
+    assert fields["w"] == fields["i"], (
+        f"{path}: working copy is {fields['w']} but the index blob is "
+        f"{fields['i']}; the checkout predates its EOL attribute and its bytes "
+        "no longer match any recorded digest. Heal this checkout once with: "
+        f"rm {path} && git checkout -- {path}"
+    )
 
 
 def test_root_gitattributes_keeps_pdfs_binary() -> None:

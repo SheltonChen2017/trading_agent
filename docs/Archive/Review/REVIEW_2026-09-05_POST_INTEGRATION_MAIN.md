@@ -33,7 +33,7 @@ defect in the range.
 | `3114a153` | cycle passes `now=at`; guard decoder bound at import | Accept |
 | `6ef66eed` | F-8 layout-deterministic TPR self-declared-review test | Accept — `_bare_tmp_path_refusal` mirrors `_repository_root` (`preregistration.py:1802`) and the loader's refusal order (1807 → 1914 → 1936) exactly |
 | `149be1ce` | integration record + lane docs | Accept |
-| `0ebac7fc` | handoff | Accept; see PIR-006 for a claim that did not hold |
+| `0ebac7fc` | handoff | Accept (PIR-006 against its lane-application claim was a false alarm) |
 | `1955fdbc` | F-8 record | Accept |
 | `c0a8aeb2` | handoff F-8 hash | Accept |
 
@@ -51,7 +51,7 @@ Every symbol the new code references was confirmed to exist
 | PIR-003 | P2 | `assistant/sleeve_report.py::evaluate_sleeves`, `assistant/sleeve_notifications.py::run_sleeve_notification_cycle` | Injected `now` was not validated. A naive `datetime` reaches `is_long_term` (`tax_lots.py:318`), raises `TypeError`, and the per-position branch at `sleeve_report.py:185` converts it to `lot_coverage="unavailable"` for **every** growth position — a plausible, lot-less report instead of a refusal (CLAUDE.md §7/§8). No production caller passes `now` today. | Confirmed | **Fixed** in `f4764671`: refused with `SleeveReportError` at the boundary; the cycle inherits the refusal before any watch state or alert is committed. |
 | PIR-004 | P3 | `tests/conftest.py` leak guard | Attribution by `tmp_path.parent` alone: a stale incident left under a reused fixed `--basetemp` by an earlier run would error every test of the next run; under xdist (not installed) a sibling worker's leak would be missed. | Confirmed (a); (b) not exercisable here | **Fixed (a)** in `f4764671`: an incident is attributed only if its `activated_at` is not before session start; unparseable/naive stamps stay attributed by path. (b) documented only. |
 | PIR-005 | P3 | `tests/conftest.py`, integration record F-3 wording | The guard runs in fixture teardown, so a leak is a teardown ERROR; the leaking test's own assertions still show passed. Record says "fails any test". | Confirmed | **Fixed (wording)** in `f4764671` docstring; the mechanism is inherent to teardown-phase checks. |
-| PIR-006 | P2 | handoff §0B, lane branches | The handoff states the integration commits were applied to every lane branch and pushed. `git branch -r --contains` for `7f99f303`, `3114a153`, `6ef66eed` returns only `origin/main`; no lane checkout or lane doc references the round. The four lanes therefore still carry the wall-clock failures, the unguarded child-process leak, and no EOL attributes. | Confirmed | **Open — owner decision** on how the lanes receive the integration (cherry-pick the three commits plus `f4764671`, or merge `main`). |
+| PIR-006 | — | handoff §0B, lane branches | At this session's start `git branch -r --contains` for `7f99f303`, `3114a153`, `6ef66eed` returned only `origin/main`, so the handoff's lane-application statement looked unmet. **False alarm:** the lane cherry-picks were pushed from the other host after this session's initial fetch; after `git pull` every lane carries the integration as lane-local hashes (analyst `bbf228c4`/`d71f249b`/`7e38b93f`, insider `b8f49eea`/`77055da4`/`fb25d915`, short-interest `13cd0f45`/`1c70179d`/`4a2086df`, target-price adapted `636b8dd0`) with pointer rows in each lane record. | False alarm (stale fetch) | **Closed.** `f4764671` was then cherry-picked onto each lane with `-x`: analyst `5f99d5a5`, insider `62beb3fa`, short-interest `341e63af`, target-price `903a8574`; each lane's focused four files 97 passed; pointer rows added (`267d16e5`, `7eb3ccc2`, `c380bdb2`, `f67c6332`); all four pushed. The three stale lane checkouts on this host were healed of `w/crlf` spec copies (machine-local). |
 | PIR-007 | P3 | `tests/conftest.py` leak guard | Reads the operator's real stop file (`SHGetFolderPathW` + file read) at every test teardown. Read-only; harmless. | Confirmed | Noted, no change. |
 
 Cleared (checked, not issues): other `sys.executable` child tests
@@ -92,4 +92,5 @@ tax-lot alerts only if a caller ever wired a naive timestamp in.
 
 - PIR-004(b): xdist attribution is untested (not installed).
 - The leak guard's real-file read was exercised on this host only.
-- PIR-001 and PIR-006 await owner decisions; neither was touched.
+- PIR-001 awaits an owner decision for this host; the other host's stop was
+  cleared on owner direction (target-price lane handoff `6a673d0a`).

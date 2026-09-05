@@ -41,16 +41,16 @@ their lane-owned artifacts.
     26 with 26 pytest-origin incidents (the §0B "42 / 42" figure was the
     other host); every proposal here is refused, risk-reducing sells
     included.
-  - PIR-006: the §0B statement that the integration commits were applied to
-    every lane branch does not hold — `git branch -r --contains` for
-    `7f99f303`, `3114a153`, `6ef66eed` returns only `origin/main`, and no
-    lane checkout or lane record references the round. The four lanes still
-    carry the wall-clock failures, the unguarded child-process leak, and no
-    EOL attributes. Local lane state at review time: analyst ahead 1 of its
-    origin with uncommitted `stock_signal` work; insider in sync with
-    uncommitted `sec_bulk_parsed_snapshot` work; short-interest ahead 2,
-    clean; target-price in sync, clean. Options: cherry-pick the three
-    integration commits plus `f4764671` onto each lane, or merge `main`.
+  - PIR-006 was a false alarm (closed): the lane cherry-picks had been pushed
+    from the other host after this session's initial fetch. After `git pull`
+    all four lanes carry the integration; `f4764671` was cherry-picked onto
+    each with `-x` (analyst `5f99d5a5`, insider `62beb3fa`, short-interest
+    `341e63af`, target-price `903a8574`; focused four files 97 passed on
+    each), pointer rows were added to each lane record (`267d16e5`,
+    `7eb3ccc2`, `c380bdb2`, `f67c6332`), and all four lanes were pushed. The
+    review-record/handoff commits stay on `main` only (frozen lane handoff).
+    Machine-local: the three stale lane checkouts on this host were healed of
+    `w/crlf` spec copies.
 
 ## 0B. Owner-directed cross-lane bug-fix integration, 2026-09-04
 

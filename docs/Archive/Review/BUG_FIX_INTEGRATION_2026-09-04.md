@@ -250,6 +250,7 @@ attributes incidents by session start as well as base temp and is documented
 as a teardown ERROR rather than a test FAIL; F-4's test also asserts the
 working-copy bytes, because the attribute alone left a checkout of this
 branch's merge at `w/crlf` on one host (the SI-SYNC-001 "restored" statement
-above did not hold there). The "Lane application" row above, stating the fix commits were
-cherry-picked onto every lane branch, was not borne out by `git branch -r --contains` at review
-time; see PIR-006 in the follow-up record.
+above did not hold there). The "Lane application" row above holds: the lane cherry-picks were pushed
+from the other host after the reviewing session's initial fetch (PIR-006 in
+the follow-up record, closed as a false alarm); `f4764671` was then
+cherry-picked onto each lane as well.

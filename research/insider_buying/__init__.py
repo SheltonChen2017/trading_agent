@@ -5,7 +5,11 @@ broker, or scheduler surface. It contains immutable in-memory Form 4
 structure, a fixture parser, and a caller-supplied SEC quarterly ZIP integrity
 boundary plus explicit-profile, offline parsed, EDGAR acceptance-evidence, and
 observation-only Form 4/A chronology and multi-period supplied-link-evidence
-boundaries.
+boundaries, plus an evidence-bound provisional disposition/quarantine report
+and its immutable, upstream-rebuilt snapshot boundary.  The package also
+exposes the zero-authority IB-1I four-family research gate without allocating
+a confirmatory cell or permanent look, plus the observed-only IB-2A normalized
+identity inventory that leaves every point-in-time resolution gate closed.
 """
 
 from research.insider_buying.contracts import (
@@ -44,6 +48,34 @@ from research.insider_buying.form4_multi_period_amendment_evidence import (
     SecForm4AmendmentEvidenceProfile,
     SuppliedForm4AmendmentLinkEvidence,
     assemble_sec_form4_multi_period_evidence,
+)
+from research.insider_buying.form4_provisional_disposition_report import (
+    FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION,
+    Form4ProvisionalDisposition,
+    Form4ProvisionalDispositionReport,
+    Form4ProvisionalDispositionReportError,
+    Form4ProvisionalDispositionReportIdentity,
+    Form4ProvisionalDispositionRow,
+    build_form4_provisional_disposition_report,
+)
+from research.insider_buying.form4_provisional_disposition_snapshot import (
+    FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_KIND,
+    FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_VERSION,
+    Form4ProvisionalDispositionSnapshotError,
+    load_form4_provisional_disposition_snapshot,
+    write_form4_provisional_disposition_snapshot,
+)
+from research.insider_buying.form4_observed_identity_inventory import (
+    FORM4_OBSERVED_IDENTITY_INVENTORY_VERSION,
+    Form4ObservedFilingIdentityRow,
+    Form4ObservedIdentityDisposition,
+    Form4ObservedIdentityInventory,
+    Form4ObservedIdentityInventoryError,
+    Form4ObservedIdentityInventoryIdentity,
+    Form4ObservedOwnerSetOutcome,
+    Form4ObservedReportingOwnerIdentityRow,
+    Form4ObservedTransactionIdentityRow,
+    build_form4_observed_identity_inventory,
 )
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
@@ -87,6 +119,17 @@ from research.insider_buying.sec_edgar_acceptance_snapshot import (
     build_sec_edgar_acceptance_snapshot,
     load_sec_edgar_acceptance_snapshot,
 )
+from research.insider_buying.preregistration import (
+    FIXED_STRATEGY_LANE_IDS,
+    INSIDER_BUYING_BLUEPRINT_SHA256,
+    INSIDER_BUYING_RESEARCH_GATE,
+    INSIDER_BUYING_RESEARCH_GATE_SHA256,
+    INSIDER_BUYING_RESEARCH_GATE_VERSION,
+    InsiderBuyingAllocationState,
+    InsiderBuyingPreregistrationError,
+    InsiderBuyingResearchGate,
+    InsiderBuyingSlotDisposition,
+)
 
 __all__ = [
     "ALLOWED_SEC_TABLES",
@@ -96,6 +139,11 @@ __all__ = [
     "EDGAR_ACCEPTANCE_SNAPSHOT_KIND",
     "FORM4_AMENDMENT_RECONCILIATION_VERSION",
     "FORM4_MULTI_PERIOD_EVIDENCE_VERSION",
+    "FORM4_OBSERVED_IDENTITY_INVENTORY_VERSION",
+    "FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION",
+    "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_KIND",
+    "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_VERSION",
+    "FIXED_STRATEGY_LANE_IDS",
     "FilingCorpus",
     "FilingEnvelope",
     "Form4AmendmentLineage",
@@ -103,10 +151,32 @@ __all__ = [
     "Form4AmendmentReconciliationIdentity",
     "Form4MultiPeriodEvidenceError",
     "Form4MultiPeriodEvidenceIdentity",
+    "Form4ObservedFilingIdentityRow",
+    "Form4ObservedIdentityDisposition",
+    "Form4ObservedIdentityInventory",
+    "Form4ObservedIdentityInventoryError",
+    "Form4ObservedIdentityInventoryIdentity",
+    "Form4ObservedOwnerSetOutcome",
+    "Form4ObservedReportingOwnerIdentityRow",
+    "Form4ObservedTransactionIdentityRow",
+    "Form4ProvisionalDisposition",
+    "Form4ProvisionalDispositionReport",
+    "Form4ProvisionalDispositionReportError",
+    "Form4ProvisionalDispositionReportIdentity",
+    "Form4ProvisionalDispositionRow",
+    "Form4ProvisionalDispositionSnapshotError",
     "Form4ObservedState",
     "Form4ParseError",
     "Form4VersionDisposition",
     "Form4VersionInterval",
+    "INSIDER_BUYING_BLUEPRINT_SHA256",
+    "INSIDER_BUYING_RESEARCH_GATE",
+    "INSIDER_BUYING_RESEARCH_GATE_SHA256",
+    "INSIDER_BUYING_RESEARCH_GATE_VERSION",
+    "InsiderBuyingAllocationState",
+    "InsiderBuyingPreregistrationError",
+    "InsiderBuyingResearchGate",
+    "InsiderBuyingSlotDisposition",
     "LoadedSecBulkSnapshot",
     "LoadedSecBulkParsedSnapshot",
     "LoadedSecEdgarAcceptanceSnapshot",
@@ -147,6 +217,8 @@ __all__ = [
     "SuppliedForm4AmendmentLinkEvidence",
     "TransactionDiagnostic",
     "build_filing_corpus",
+    "build_form4_observed_identity_inventory",
+    "build_form4_provisional_disposition_report",
     "assemble_sec_form4_multi_period_evidence",
     "build_sec_bulk_parsed_snapshot",
     "build_sec_edgar_acceptance_snapshot",
@@ -154,7 +226,9 @@ __all__ = [
     "load_sec_bulk_snapshot",
     "load_sec_bulk_parsed_snapshot",
     "load_sec_edgar_acceptance_snapshot",
+    "load_form4_provisional_disposition_snapshot",
     "parse_form4_xml",
     "reconcile_sec_form4_amendments",
     "write_sec_bulk_snapshot",
+    "write_form4_provisional_disposition_snapshot",
 ]

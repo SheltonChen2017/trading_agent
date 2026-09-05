@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import stat
 import warnings
 import zipfile
@@ -11,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -69,6 +71,19 @@ FOOTNOTE_HEADERS = ("ACCESSION_NUMBER", "FOOTNOTE_ID", "FOOTNOTE")
 ACCESSION_A = "0000123456-26-000001"
 ACCESSION_B = "0000123456-26-000002"
 ACCESSION_C = "0000123456-26-000003"
+
+
+def _stat_like(status, **overrides):
+    values = {
+        "st_dev": status.st_dev,
+        "st_ino": status.st_ino,
+        "st_mode": status.st_mode,
+        "st_size": status.st_size,
+        "st_mtime_ns": status.st_mtime_ns,
+        "st_file_attributes": getattr(status, "st_file_attributes", 0),
+    }
+    values.update(overrides)
+    return SimpleNamespace(**values)
 
 
 def _source(**overrides) -> SecBulkSource:
@@ -1445,3 +1460,91 @@ def test_parser_module_has_no_network_outcome_qc_or_execution_imports():
             "AlgorithmImports",
         }
     )
+
+
+@pytest.mark.parametrize(
+    "artifact",
+    (
+        "rows.jsonl",
+        "accessions.jsonl",
+        "manifest.json",
+        "snapshot.commit.json",
+    ),
+)
+def test_committed_parsed_artifact_with_a_hard_link_alias_refuses_load(
+    tmp_path, artifact
+):
+    """A second name for a committed artifact means it is not uniquely owned.
+
+    IB-1C and IB-1H already refused this; IB-1B did not, so the hardening the
+    later milestones adopted had not propagated back to the parsed boundary.
+    """
+    raw, parsed, _identity = _publish(tmp_path)
+
+    alias = tmp_path / f"alias-{artifact}"
+    try:
+        os.link(parsed / artifact, alias)
+    except (OSError, NotImplementedError, AttributeError):  # pragma: no cover
+        pytest.skip("hard links are unavailable on this filesystem")
+
+    with pytest.raises(
+        SecBulkParsedSnapshotError, match="regular immutable file"
+    ):
+        load_sec_bulk_parsed_snapshot(parsed, raw_snapshot_directory=raw)
+
+
+@pytest.mark.parametrize(
+    ("observation", "error_pattern"),
+    (
+        ("opened", "changed while it was opened"),
+        ("after_read", "changed while it was read"),
+        ("after_path", "changed while it was read"),
+    ),
+)
+def test_single_link_parsed_reader_refuses_every_observed_link_count_change(
+    monkeypatch, tmp_path, observation, error_pattern
+):
+    """Every sampled link count is part of the immutable-read invariant."""
+
+    path = tmp_path / "member.bin"
+    path.write_bytes(b"bounded bytes")
+    real_fstat = parsed_module.os.fstat
+    real_lstat = Path.lstat
+    fstat_calls = 0
+    lstat_calls = 0
+
+    def observed_fstat(descriptor):
+        nonlocal fstat_calls
+        fstat_calls += 1
+        status = real_fstat(descriptor)
+        if observation == "opened" and fstat_calls == 1:
+            return _stat_like(status, st_nlink=2)
+        if observation == "after_read" and fstat_calls == 2:
+            return _stat_like(status, st_nlink=2)
+        return status
+
+    def observed_lstat(candidate):
+        nonlocal lstat_calls
+        status = real_lstat(candidate)
+        if candidate == path:
+            lstat_calls += 1
+            if observation == "after_path" and lstat_calls == 2:
+                return _stat_like(status, st_nlink=2)
+        return status
+
+    monkeypatch.setattr(parsed_module.os, "fstat", observed_fstat)
+    monkeypatch.setattr(Path, "lstat", observed_lstat)
+    with pytest.raises(SecBulkParsedSnapshotError, match=error_pattern):
+        parsed_module._read_regular_bytes(
+            path,
+            label="synthetic committed member",
+            max_bytes=100,
+            require_single_link=True,
+        )
+
+
+def test_single_link_committed_parsed_snapshot_still_loads(tmp_path):
+    """The guard must refuse aliased artifacts without refusing ordinary ones."""
+    raw, parsed, identity = _publish(tmp_path)
+    loaded = load_sec_bulk_parsed_snapshot(parsed, raw_snapshot_directory=raw)
+    assert loaded.identity == identity

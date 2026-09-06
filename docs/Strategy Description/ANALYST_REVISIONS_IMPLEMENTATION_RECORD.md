@@ -3552,7 +3552,7 @@ occurred.
 
 **Reviewing session:** the Fable 5 session on the work identity, which also
 produced sections 4I, 4R and 7. Sections 4L, 4O, 10, 13 and 16 were produced
-by the Opus 5 session; see `ARV2R5-002` on lane review ownership.
+by the Opus 5 session; see `ARV2R7-002` on lane review ownership.
 
 ### 19.1 Commit dispositions
 
@@ -4167,13 +4167,13 @@ completed here (25.6).
 
 **Reviewing session:** the Fable 5 session on the work identity (also
 sections 4I, 4R, 7 and 19). The other Claude session's ownership question in
-`ARV2R5-002` remains open.
+`ARV2R7-002` remains open.
 
 ### 25.1 Commit disposition
 
 | Commit | Disposition | Basis |
 |---|---|---|
-| `42faec1` | Accepted | Schema module, frozen artifact, 56-function battery (252 cases), firewall inventory entry, section 24. Verified in 25.2 to 25.4. |
+| `42faec1` | Accepted | Schema module, frozen artifact, 56-function battery (252 passes plus 2 host-dependent skips; 254 collected cases), firewall inventory entry, section 24. Verified in 25.2 to 25.4. |
 
 ### 25.2 Verified rather than accepted
 
@@ -4271,9 +4271,13 @@ fabricated to cover a branch that cannot execute.
 - B1 battery alone: **252 passed, 2 host symlink-privilege skips** in 87.9 s,
   reproducing section 24 exactly.
 - Complete repository suite: **3 failed, 7,550 passed, 23 skipped, 25 warnings in 2,826.65 s (47:06)**. The three failures are `tests/test_sleeve_report.py::test_default_gain_review_is_fifty_percent_and_long_term_gated`, `::test_every_lot_row_carries_the_tax_mechanism_fields` and `::test_report_carries_no_action_shaped_field`, the standing out-of-lane `ARV2WL-D11` clock-threading defect diagnosed in section 19.4; nothing in this range touches that file and it imports nothing from this lane. Every Analyst V2 test passed.
-- Active-document consistency gate passes after this section was added;
-  `compileall` exit 0; `git diff --check` clean; no frozen shared file
-  touched; no committed artifact re-serialised.
+- Active-document consistency gate: **69 passed** after this section was
+  added; `compileall` exit 0; `git diff --check` clean; no frozen shared file
+  touched; no committed artifact re-serialised. The reviewing session did not
+  record its Python version, so no historical runtime is inferred.
+- Required quality assessment: B1 implementation **9/10**; review record as
+  received **7/10**, reduced for the stale current-state text and evidence
+  inaccuracies later corrected in sections 27 and 35.
 
 ### 25.7 Next gate
 
@@ -4291,7 +4295,9 @@ trading-application / test-infrastructure / repository-tooling issues that this
 record and the sibling lane records had documented but, under the lane scope
 rule, deliberately not fixed, and to apply the identical commits to every lane
 branch so no lane carries a divergent copy of a shared file. This lane received
-them as cherry-picks; no lane-owned file changed.
+the initial shared set as cherry-picks; no Analyst-owned research, code, test,
+or artifact file changed. The later, separately directed F-8 follow-up changed
+one Target-price-owned test and is recorded explicitly below.
 
 | Integration-branch commit | Cherry-pick on this lane | Content |
 |---|---|---|
@@ -4300,12 +4306,19 @@ them as cherry-picks; no lane-owned file changed.
 | docs commit | `d1cbf82a1c610bdd4dc12636a947603bf650350d` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, full disposition ledger, owner decisions) plus the four-lane README, the direction status paragraph, and the workflow exception paragraph |
 | `6ef66eed77f9b24ea3df8aa538f42de0c871c824` (F-8, owner direction, same day) | `7e38b93fa8aed0e753b377ee636117e174b4b0bb` | `tests/target_price_revisions/test_preregistration.py::test_self_declared_review_and_registry_substitution_refuse` made deterministic across harness layouts (Analyst `ARV2-UNRELATED-001` / Short-interest `SI-OOL-003`); the loader is unchanged |
 | integration record update | `90f2cd06f35132535f866d5c2723cf2cc2ea2d4e` | F-8 recorded in `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, ledger rows, validation) |
-| `f4764671b9f3ee0de50ab36a7cf61854bca72c4f` (2026-09-05 post-integration review of `main`, PIR-002/003/004/005) | `5f99d5a583fd4f6c21a7e300df8635b03d954654` | `evaluate_sleeves` refuses a naive `now` with `SleeveReportError` instead of degrading every growth position; the conftest runtime-stop leak guard attributes an incident to the session only when it is under the base temp AND its `activated_at` is not before session start; `tests/test_shared_research_eol_attributes.py` also asserts working-copy bytes match the index blob and names the heal `rm <path> && git checkout -- <path>`. Review record `docs/Archive/Review/REVIEW_2026-09-05_POST_INTEGRATION_MAIN.md` lives on `main` (its handoff/record commits are not cherry-picked: the shared handoff is frozen on lanes). |
+| `f4764671b9f3ee0de50ab36a7cf61854bca72c4f` (2026-09-05 post-integration review of `main`, PIR-002/003/004/005) | `5f99d5a583fd4f6c21a7e300df8635b03d954654` | `evaluate_sleeves` refuses a naive `now` with `SleeveReportError` instead of degrading every growth position; the conftest runtime-stop leak guard attributes an incident to the session only when it is under the base temp AND its `activated_at` is not before session start; `tests/test_shared_research_eol_attributes.py` compares working-copy and index EOL classifications and emits recovery guidance qualified in section 35. Review record `docs/Archive/Review/REVIEW_2026-09-05_POST_INTEGRATION_MAIN.md` lives on `main` (its handoff/record commits are not cherry-picked: the shared handoff is frozen on lanes). |
 
-Items of this record closed by the application: ARV2WL-D11 (F-1); the repository-wide root `.gitattributes` gap noted in section 4I.5 (F-4). `ARV2-UNRELATED-001` is not a stale message: it depends on where pytest's `tmp_path` lives and is routed to the Target-price lane, which owns that test. Every other
+Items of this record closed by the application: ARV2WL-D11 (F-1); the repository-wide root `.gitattributes` gap noted in section 4I.5 (F-4). `ARV2-UNRELATED-001` was not a stale message: it depended on where pytest's `tmp_path` lived, was routed to the Target-price lane, and was then corrected by the owner-directed F-8 test change. Every other
 out-of-lane item this record carries was examined; its disposition and reason
 are in the integration record's section 5, and the items needing an owner
 decision are listed in its section 6.
+
+The active workflow says the one-time common-remediation exception expired
+after the owner-directed synchronization. The repository records the purpose
+of the later `5f99d5a` and `43d5a84` fail-closed shared follow-ups but does not
+quote a separate post-expiry owner authorization. They are retained and
+reviewed as received; neither is treated as precedent or authority for any
+future shared-file change.
 
 This application is not acceptance of any lane milestone and grants no
 provider, outcome, look, QuantConnect, broker, operator-database, deployment,
@@ -5849,3 +5862,44 @@ If accepted or accepted after lane-specific correction, commit on this same
 branch and push once. Codex then counter-reviews every Claude commit. Do not
 start the provider-specific opener until the external evidence in 34.4 exists,
 and do not infer ARV2-4 outcome authority.
+
+## 35. Cross-machine reconciliation of the unpublished 2026-09-06 lane record, 2026-09-08
+
+This machine fetched only
+`origin/codex/strategy-analyst-revisions-v2`. Before reconciliation, local
+`HEAD` was the unpublished documentation-only commit
+`5e21760889e6d8a14c13f48f53eb85b11ffa6e39`, one commit ahead and sixteen
+commits behind remote `d8f02a1b97f64641a4ed56e1923eef8aa1425455`, with
+common base `43d5a846e30025b292a3470255b07af1cb2070a2`. The remote lane record and
+history were treated as authoritative. The unpublished record was not replayed
+wholesale because its B1/B2 next-gate language had been superseded. Only the
+still-valid corrections and out-of-lane observations below were recovered on
+top of the exact remote tree.
+
+This is a synchronization/reconciliation note, not an independent review of
+the sixteen incoming commits. It does not change the section-34 handoff:
+`f6cd23b` plus `d8f02a1` remain the exact Codex correction snapshot awaiting
+Claude's independent commit-by-commit and cumulative review. No code, test,
+specification artifact, frozen shared document, credential, provider row,
+production input, outcome, QuantConnect resource, deployment surface, order,
+or trade was changed or accessed.
+
+### 35.1 Recovered findings and dispositions
+
+| ID | Pri | Scope and disposition | Finding and resolution |
+|---|---|---|---|
+| `ARV2SYNC-001` | P3 | Lane record; **corrected** | Sections 19 and 25 cited `ARV2R5-002` for the two-reviewer coordination observation, but that ID belongs to the decay-tail regression. The historical coordination ID is `ARV2R7-002`; both live references now use it. |
+| `ARV2SYNC-002` | P3 | Lane record; **corrected** | Section 25 called 252 passes plus 2 skips “252 cases,” omitted the exact 69-test active-document result, did not state that the review interpreter was unrecorded, and omitted the mandatory 1-10 assessment. The evidence now says 254 collected, 252 passed and 2 skipped, records 69 active-document passes without inventing a Python version, and rates B1 **9/10** and the as-received review record **7/10**. |
+| `ARV2SYNC-003` | P3 | Lane process; **documented, no authority inferred** | The common-remediation exception says it expired after synchronization, while the repository does not quote separate post-expiry owner authority for `5f99d5a` and `43d5a84`. Their fail-closed content is retained and reviewed as received, but cannot authorize another shared change by precedent. |
+| `ARV2SYNC-OOL-001` | P3 | Trading App/shared; **documented, not fixed** | A direct `evaluate_sleeves(now=None)` forwards `None` once per growth position, so the lot helper samples wall time separately for each position. A report crossing UTC midnight can mix tax-date classifications. The notification cycle is safe because it supplies one instant; a future Trading App correction should resolve the default once at the report boundary. |
+| `ARV2SYNC-OOL-002` | P3 | Target-price lane; **documented, not fixed** | Under repository-local `--basetemp`, the dynamic bare-temp preregistration assertion follows the committed/clean refusal and the explicit anchored case repeats that branch. The no-Git refusal is therefore not exercised in that harness even though the test remains deterministic and fail-closed. |
+| `ARV2SYNC-OOL-003` | P2 | Shared test/tooling; **documented, not fixed** | `tests/test_shared_research_eol_attributes.py` compares `git ls-files --eol` classifications, not working-copy bytes. A same-EOL byte change can pass despite the integration record's byte-equality claim. Its failure message also recommends destructive recovery that can erase a legitimate local edit. Shared remediation should authenticate bytes where byte identity is claimed and use preservation-first recovery guidance. |
+| `ARV2SYNC-ENV-001` | P3 | Machine-local/out of lane; **documented, not healed or staged** | On this machine, both `research/ml_specs/volatility-discovery-v1*.json` working copies report `i/lf w/crlf attr/-text` while Git status treats them as clean. This is an environment/EOL condition, not an Analyst code change. |
+
+The earlier unpublished validation totals belong to the pre-B2 tree and are
+not promoted as current evidence. Current lane evidence and gates remain those
+in sections 34.3 through 34.6: 1,689 Analyst tests passed, 5 skipped; all three
+production switches remain `None`/`False`/`None`; full ARV2-4D-B still needs
+the exact 2020 as-of source evidence, terminal shareholder-return source, and
+reviewed seven-role evidence package. ARV2-4 outcome evaluation/backtesting,
+result access, deployment, orders, and trading remain unauthorized.

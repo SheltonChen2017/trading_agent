@@ -37,10 +37,19 @@ their lane-owned artifacts.
 - Nothing in this round touches `strategies/`, `backtest/`, `signals/`, any
   lane package, or a QC backtest run.
 - Owner decisions pending (untouched):
-  - PIR-001: this host's real runtime emergency stop is active at generation
-    26 with 26 pytest-origin incidents (the §0B "42 / 42" figure was the
-    other host); every proposal here is refused, risk-reducing sells
-    included.
+  - PIR-001, closed 2026-09-06 on owner direction: this host's real runtime
+    emergency stop (active, generation 26, 26 pytest-origin incidents; every
+    proposal here refused) was cleared the same way as the other host's. A
+    byte-identical backup was written first
+    (`%LOCALAPPDATA%	rading_agent
+    (`%LOCALAPPDATA%/trading_agent/runtime/state-backup/execution-emergency-stop.20260906T070210Z.gen26.json`,
+    sha256 `b59ab811...3f2f6706`), the script refused unless every incident
+    origin was a pytest/temp path, and the file was deleted under the
+    runtime's own dispatch and state fences; the runtime then read
+    `active=False, generation=0, 0 incidents, no integrity error` and
+    recreates the file on the next real activation. Operator-run (the
+    session's own attempt was blocked by its permission policy); no
+    repository file changed.
   - PIR-006 was a false alarm (closed): the lane cherry-picks had been pushed
     from the other host after this session's initial fetch. After `git pull`
     all four lanes carry the integration; `f4764671` was cherry-picked onto

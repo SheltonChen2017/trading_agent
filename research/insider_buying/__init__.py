@@ -10,6 +10,8 @@ and its immutable, upstream-rebuilt snapshot boundary.  The package also
 exposes the zero-authority IB-1I four-family research gate without allocating
 a confirmatory cell or permanent look, plus the observed-only IB-2A normalized
 identity inventory that leaves every point-in-time resolution gate closed.
+It also exposes the IB-2B exact-SEC-CIK grouping boundary, which retains every
+issuer and reporting-owner observation and quarantines ambiguous attribution.
 """
 
 from research.insider_buying.contracts import (
@@ -77,6 +79,19 @@ from research.insider_buying.form4_observed_identity_inventory import (
     Form4ObservedTransactionIdentityRow,
     build_form4_observed_identity_inventory,
 )
+from research.insider_buying.form4_sec_entity_grouping import (
+    FORM4_SEC_ENTITY_GROUPING_VERSION,
+    Form4OwnerAttributionOutcome,
+    Form4SecEntityGrouping,
+    Form4SecEntityGroupingError,
+    Form4SecEntityGroupingIdentity,
+    Form4SecIssuerIdentityCandidate,
+    Form4SecIssuerObservation,
+    Form4SecReportingOwnerIdentityCandidate,
+    Form4SecReportingOwnerObservation,
+    Form4SecTransactionAttributionRow,
+    build_form4_sec_entity_grouping,
+)
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
     LoadedSecBulkSnapshot,
@@ -141,6 +156,7 @@ __all__ = [
     "FORM4_MULTI_PERIOD_EVIDENCE_VERSION",
     "FORM4_OBSERVED_IDENTITY_INVENTORY_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION",
+    "FORM4_SEC_ENTITY_GROUPING_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_KIND",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_VERSION",
     "FIXED_STRATEGY_LANE_IDS",
@@ -159,12 +175,21 @@ __all__ = [
     "Form4ObservedOwnerSetOutcome",
     "Form4ObservedReportingOwnerIdentityRow",
     "Form4ObservedTransactionIdentityRow",
+    "Form4OwnerAttributionOutcome",
     "Form4ProvisionalDisposition",
     "Form4ProvisionalDispositionReport",
     "Form4ProvisionalDispositionReportError",
     "Form4ProvisionalDispositionReportIdentity",
     "Form4ProvisionalDispositionRow",
     "Form4ProvisionalDispositionSnapshotError",
+    "Form4SecEntityGrouping",
+    "Form4SecEntityGroupingError",
+    "Form4SecEntityGroupingIdentity",
+    "Form4SecIssuerIdentityCandidate",
+    "Form4SecIssuerObservation",
+    "Form4SecReportingOwnerIdentityCandidate",
+    "Form4SecReportingOwnerObservation",
+    "Form4SecTransactionAttributionRow",
     "Form4ObservedState",
     "Form4ParseError",
     "Form4VersionDisposition",
@@ -219,6 +244,7 @@ __all__ = [
     "build_filing_corpus",
     "build_form4_observed_identity_inventory",
     "build_form4_provisional_disposition_report",
+    "build_form4_sec_entity_grouping",
     "assemble_sec_form4_multi_period_evidence",
     "build_sec_bulk_parsed_snapshot",
     "build_sec_edgar_acceptance_snapshot",

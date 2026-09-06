@@ -2091,6 +2091,8 @@ def test_ib2a_module_has_no_float_network_outcome_qc_or_execution_surface():
         "enum",
         "re",
         "research",
+        "threading",
+        "weakref",
     }
     assert imported <= allowed, imported - allowed
     assert not any(

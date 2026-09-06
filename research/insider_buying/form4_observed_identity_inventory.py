@@ -15,6 +15,8 @@ execution authority.  All such gates remain literal false values.
 from __future__ import annotations
 
 import re
+import threading
+import weakref
 from dataclasses import InitVar, dataclass, fields
 from datetime import date, datetime, timezone
 from decimal import Decimal
@@ -230,7 +232,10 @@ def _contract_payload(
             "REFUSED: observed contract graph exceeds a resource bound"
         )
     value_type = type(value)
-    if value_type in _OBSERVED_CONTRACT_ENUM_TYPES:
+    if any(
+        value_type is enum_type
+        for enum_type in _OBSERVED_CONTRACT_ENUM_TYPES
+    ):
         return _contract_payload(
             value.value,
             _budget=_budget,
@@ -284,7 +289,10 @@ def _contract_payload(
         }
     if value is None or value_type is bool or value_type is int:
         return value
-    if value_type is tuple or value_type in _OBSERVED_CONTRACT_DATACLASS_TYPES:
+    if value_type is tuple or any(
+        value_type is contract_type
+        for contract_type in _OBSERVED_CONTRACT_DATACLASS_TYPES
+    ):
         active_object_ids = _budget.active_object_ids
         assert active_object_ids is not None
         object_id = id(value)
@@ -1324,6 +1332,185 @@ class Form4ObservedIdentityInventory:
         }
 
 
+# IB-2A is deliberately an in-memory boundary, so downstream structural stages
+# can distinguish a factory result from a coherent ``object.__new__`` clone by
+# object identity.  The recorded callback-free fingerprint also rejects later
+# ``object.__setattr__`` mutation of a genuine result.  This is a trusted Python
+# runtime control, not a signature or cross-process/persisted attestation.
+_INVENTORY_PROVENANCE_DATACLASS_TYPES = (
+    Form4ObservedFilingIdentityRow,
+    Form4ObservedIdentityInventory,
+    Form4ObservedIdentityInventoryIdentity,
+    Form4ObservedReportingOwnerIdentityRow,
+    Form4ObservedTransactionIdentityRow,
+)
+_INVENTORY_PROVENANCE_ENUM_TYPES = (
+    Form4ObservedIdentityDisposition,
+    Form4ObservedOwnerSetOutcome,
+    Form4ProvisionalDisposition,
+    Form4VersionDisposition,
+)
+_FACTORY_CREATED_INVENTORIES: dict[
+    int,
+    tuple[weakref.ReferenceType[Form4ObservedIdentityInventory], str],
+] = {}
+_FACTORY_CREATED_INVENTORIES_LOCK = threading.RLock()
+
+
+def _inventory_provenance_payload(
+    value: object,
+    *,
+    _budget: _ProjectionBudget | None = None,
+    _depth: int = 0,
+) -> object:
+    """Project only IB-2A output state without widening evidence types."""
+
+    if _budget is None:
+        _budget = _ProjectionBudget()
+    if _depth > MAX_FORM4_OBSERVED_IDENTITY_PROJECTION_DEPTH:
+        raise Form4ObservedIdentityInventoryError(
+            "REFUSED: provenance graph exceeds the depth bound"
+        )
+    _budget.node_count += 1
+    if _budget.node_count > MAX_FORM4_OBSERVED_IDENTITY_PROJECTION_NODES:
+        raise Form4ObservedIdentityInventoryError(
+            "REFUSED: provenance graph exceeds a resource bound"
+        )
+    value_type = type(value)
+    if any(
+        value_type is enum_type
+        for enum_type in _INVENTORY_PROVENANCE_ENUM_TYPES
+    ):
+        return _inventory_provenance_payload(
+            value.value,
+            _budget=_budget,
+            _depth=_depth + 1,
+        )
+    if value_type is date:
+        return _inventory_provenance_payload(
+            value.isoformat(),
+            _budget=_budget,
+            _depth=_depth + 1,
+        )
+    if value_type is str:
+        _budget.text_characters += len(value)
+        if (
+            _budget.text_characters
+            > MAX_FORM4_OBSERVED_IDENTITY_TEXT_CHARACTERS
+        ):
+            raise Form4ObservedIdentityInventoryError(
+                "REFUSED: provenance text exceeds a resource bound"
+            )
+        return value
+    if value is None or value_type is bool or value_type is int:
+        return value
+    is_contract = any(
+        value_type is contract_type
+        for contract_type in _INVENTORY_PROVENANCE_DATACLASS_TYPES
+    )
+    if value_type is tuple or is_contract:
+        active_object_ids = _budget.active_object_ids
+        assert active_object_ids is not None
+        object_id = id(value)
+        if object_id in active_object_ids:
+            raise Form4ObservedIdentityInventoryError(
+                "REFUSED: provenance graph contains a cycle"
+            )
+        active_object_ids.add(object_id)
+        try:
+            if value_type is tuple:
+                return [
+                    _inventory_provenance_payload(
+                        item,
+                        _budget=_budget,
+                        _depth=_depth + 1,
+                    )
+                    for item in value
+                ]
+            declared_fields = {item.name for item in fields(value_type)}
+            instance_state = object.__getattribute__(value, "__dict__")
+            if (
+                type(instance_state) is not dict
+                or set(instance_state) != declared_fields
+            ):
+                raise Form4ObservedIdentityInventoryError(
+                    "REFUSED: provenance dataclass state is not exact"
+                )
+            return {
+                item.name: _inventory_provenance_payload(
+                    instance_state[item.name],
+                    _budget=_budget,
+                    _depth=_depth + 1,
+                )
+                for item in fields(value_type)
+            }
+        finally:
+            active_object_ids.remove(object_id)
+    raise Form4ObservedIdentityInventoryError(
+        "REFUSED: provenance state contains an unsupported value"
+    )
+
+
+def _inventory_provenance_fingerprint(
+    inventory: Form4ObservedIdentityInventory,
+) -> str:
+    if type(inventory) is not Form4ObservedIdentityInventory:
+        raise Form4ObservedIdentityInventoryError(
+            "REFUSED: provenance input must be an exact observed inventory"
+        )
+    return hash_payload(_inventory_provenance_payload(inventory))
+
+
+def _register_factory_created_inventory(
+    inventory: Form4ObservedIdentityInventory,
+) -> None:
+    """Seal one factory result for this process without retaining it strongly."""
+
+    fingerprint = _inventory_provenance_fingerprint(inventory)
+    object_id = id(inventory)
+
+    def _remove_if_current(
+        dead_reference: weakref.ReferenceType[Form4ObservedIdentityInventory],
+    ) -> None:
+        with _FACTORY_CREATED_INVENTORIES_LOCK:
+            current = _FACTORY_CREATED_INVENTORIES.get(object_id)
+            if current is not None and current[0] is dead_reference:
+                _FACTORY_CREATED_INVENTORIES.pop(object_id, None)
+
+    inventory_reference = weakref.ref(inventory, _remove_if_current)
+    with _FACTORY_CREATED_INVENTORIES_LOCK:
+        _FACTORY_CREATED_INVENTORIES[object_id] = (
+            inventory_reference,
+            fingerprint,
+        )
+
+
+def _is_factory_created_observed_identity_inventory(value: object) -> bool:
+    """Return true only for an unchanged IB-2A result from this process."""
+
+    try:
+        if type(value) is not Form4ObservedIdentityInventory:
+            return False
+        with _FACTORY_CREATED_INVENTORIES_LOCK:
+            current = _FACTORY_CREATED_INVENTORIES.get(id(value))
+            return (
+                current is not None
+                and current[0]() is value
+                and current[1] == _inventory_provenance_fingerprint(value)
+            )
+    except (
+        AttributeError,
+        Form4ObservedIdentityInventoryError,
+        KeyError,
+        OverflowError,
+        RecursionError,
+        RuntimeError,
+        TypeError,
+        ValueError,
+    ):
+        return False
+
+
 def _preflight_evidence(evidence: object) -> None:
     """Reject hostile shapes and resource excess before the upstream rebuild."""
 
@@ -2048,13 +2235,15 @@ def _build_form4_observed_identity_inventory(
         ),
         _verified_factory_token=_VERIFIED_IDENTITY_FACTORY_TOKEN,
     )
-    return Form4ObservedIdentityInventory(
+    inventory = Form4ObservedIdentityInventory(
         identity=identity,
         filings=sorted_filings,
         reporting_owners=sorted_owners,
         transactions=sorted_transactions,
         _verified_factory_token=_VERIFIED_INVENTORY_FACTORY_TOKEN,
     )
+    _register_factory_created_inventory(inventory)
+    return inventory
 
 
 def build_form4_observed_identity_inventory(

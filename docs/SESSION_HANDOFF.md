@@ -41,7 +41,8 @@ their lane-owned artifacts.
     emergency stop (active, generation 26, 26 pytest-origin incidents; every
     proposal here refused) was cleared the same way as the other host's. A
     byte-identical backup was written first
-    (`%LOCALAPPDATA%	rading_agentuntime\state-backup\execution-emergency-stop.20260906T070210Z.gen26.json`,
+    (`%LOCALAPPDATA%	rading_agent
+    (`%LOCALAPPDATA%/trading_agent/runtime/state-backup/execution-emergency-stop.20260906T070210Z.gen26.json`,
     sha256 `b59ab811...3f2f6706`), the script refused unless every incident
     origin was a pytest/temp path, and the file was deleted under the
     runtime's own dispatch and state fences; the runtime then read

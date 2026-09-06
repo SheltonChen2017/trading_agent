@@ -381,11 +381,13 @@ open until the trust-root implementation is complete, independently reviewed,
 provisioned, rollback-pinned, parent-custody protected, and satisfied by an
 exact signed registry anchor. Neither issue mints present authority.
 
-**Current branch relation, measured 2026-08-31:** the lane and `origin/main` have
-since **diverged**, and neither contains the other. The earlier synchronization
-statement was accurate when the lane was fast-forwarded earlier on 2026-08-31
-and is no longer current; the exact sync point is recorded in the section 10
-ledger row for that round.
+**Current branch relation, measured 2026-09-05:** the lane **contains**
+`origin/main` at `df388ce6` through the owner-directed merge `15bedb56`
+(section 39's pointer table names the two reconciled files); `main` does not
+yet contain this lane's commits, so a lane-to-main merge is conflict-free but
+has not happened. The 2026-08-31 fast-forward and the divergence measured
+afterwards are history; the exact points are in the section 10 ledger rows
+for those rounds.
 
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Integration into `main` does not authorize a coordinated edit from

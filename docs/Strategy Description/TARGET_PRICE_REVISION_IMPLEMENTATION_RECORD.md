@@ -1,9 +1,11 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE REVIEWED BOTH CODEX COMMITS IN THE EXACT RANGE
-`19812334..49caa886`; THE DISPOSITIONS, THE P0-P3 LEDGER, AND THE CORRECTED
-COMPLETE-SUITE PROVENANCE ARE IN SECTION 38. THE COUNTER-REVIEW IT REVIEWED IS
-SECTION 37. THE COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT IS COMPLETE. THE
+Status: **CODEX COUNTER-REVIEWED THE RECEIVED RANGE
+`49caa886..d54ce1b2`; THE MIXED-ROLE PROVENANCE, EVERY FIRST-PARENT AND
+MERGE-INHERITED COMMIT DISPOSITION, AND THE P0-P3 LEDGER ARE IN SECTION 40.
+CLAUDE'S EXACT CORRECTION IS `dff9b112`; THE LATER COMMITS ARE OWNER-DIRECTED
+INTEGRATION, HANDOFF, AND MAIN-MERGE WORK AND ARE NOT ATTRIBUTED BY AUTHOR
+METADATA. THE COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT REMAINS COMPLETE. THE
 NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS CHECKPOINTED BUT REMAINS
 INCOMPLETE: ROLLBACK/REPLAY PROTECTION, PARENT-DIRECTORY CUSTODY, AND THE
 REQUIRED ADVERSARIAL VALIDATION MATRIX ARE OPEN. THE REVIEWED-SPEC REGISTRY IS
@@ -342,14 +344,19 @@ neither current tip contains the other. Live ahead/behind counts are omitted
 because every new lane commit invalidates them. The four-slot multiplicity
 amendment nevertheless remains unpropagated: see `TPR-OOL-006`.
 
-**Current qualification, 2026-09-03:** Claude has independently reviewed Codex's
-exact two-commit range
-`1981233424f25b48ebec2273fa4822c249e2a041..49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3`.
-Section 38 contains both commit dispositions, the P0-P3 ledger, and the
-correction to that round's complete-suite provenance; section 37 is the
-counter-review it reviewed, and the authoritative current open-issue register
-remains below in section 8. Claude's comprehensive whole-lane audit
-is complete. The
+**Current qualification, 2026-09-06:** Codex has counter-reviewed the exact
+received cumulative range
+`49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3..d54ce1b2c6816532ef82906c49998a93574172fc`.
+Section 40 distinguishes Claude's one exact correction commit from the later
+owner-directed integration, frozen-document restoration, and main-merge work;
+it dispositions all 25 first-parent commits and all 16 commits inherited only
+through the merge. The cumulative disposition is rejected because the shared
+runtime-stop leak guard can miss a newly written incident that carries an old
+semantic `activated_at` value (`TPR-CCR13-002`, routed as `TPR-OOL-011`). That
+shared defect is documented, not fixed, under the target-only lane rule. The
+three correctable record defects are closed in this round. The authoritative
+current open-issue register remains below in section 8, and Claude's
+comprehensive whole-lane audit remains complete. The
 non-authorizing TPR-TR0-I implementation candidate is checkpointed but remains
 incomplete at exact code commit
 `20e20d7f68d39d17af84d6a5c65e22b78dc57eb1`. It freezes the executable Git,
@@ -397,8 +404,11 @@ until a separately reviewed source-rights artifact proves
 entitlement, public-time semantics, correction completeness, target-horizon
 consistency, raw retention, derived processing, and QC-transfer rights. TPR-0B
 remains blocked until reviewed TPR-1 and TPR-2 structural manifests exist.
-After this round's single push, Codex counter-reviews the exact new Claude
-correction range beginning after `49caa886`. That counter-review
+No next implementation milestone is authorized. The reviewed range is rejected
+on the shared P2 above, and independent of that rejection the two owner-level
+trust choices and the exact source-rights gate remain unresolved. After the
+counter-review record is published, Claude reviews the exact new Codex
+correction range beginning after `d54ce1b2`. That review
 grants no source, outcome, look, QC, broker, paper, live, deployment, capital,
 or trading authority.
 
@@ -516,6 +526,33 @@ documented here and deliberately not fixed.
 | `TPR-OOL-004` | P2 | Analyst Revisions V2 family contract: `research/analyst_revisions_v2/preregistration.py:56,931` and its draft/tests | The accepted draft/loader still names `three_lane_selection_correction` and requires value 3, while the owner has added TPR as the fourth shared family/attempt. The Analyst lane remains fail-closed and zero-access, so no current look is affected. | Documented only. Synchronize that lane's content-addressed artifact and tests to four before any Analyst outcome access; do not edit it from TPR. |
 | `TPR-OOL-010` | P3 | `research/__init__.py`, shared with the Analyst Revisions V2 lane | **Renumbered from a duplicate `TPR-OOL-008` by Claude review `TPR-CR7-004`, 2026-09-01.** Two different findings carried that identifier; every narrative reference in this record resolves to the P2 EOL-attribute finding, and this row had none, so this later row was renumbered rather than the referenced one. Original finding: `POLICY_CODE_REPO_PATHS` includes `research/__init__.py`, but this lane's new `research/target_price_revisions/.gitattributes` cannot pin a file outside its own subtree. The file is empty today, so newline translation cannot change its bytes and the anchor is unaffected. The moment it gains content on a `core.autocrlf` checkout it would break the reviewed-algorithm anchor exactly as `TPR-CR4-001` did. | Documented, not fixed. `test_policy_code_is_checked_out_as_exact_bytes` asserts the file is still empty and turns red rather than passing silently, which routes a shared `.gitattributes` amendment to the owner at the moment it is actually needed. |
 | `TPR-OOL-005` | P3 | Trading App Briefing smoke fixture and yfinance cache/provider path | The exact `ba01e98` complete-suite run timed out after 180 seconds in `test_ui_pages_smoke.py::test_page_renders_without_exception[Briefing]`; captured yfinance logs reported `OperationalError('unable to open database file')` for QQQ, SPY, NVDA, and AMD. The fixture patches only one recorded-bar seam, while Briefing still reaches direct benchmark and sample-holding yfinance paths. `c0ba616..ba01e98` changes none of the UI, fixture, provider, configuration, or dependency paths; the page imports no TPR module. The same exact test passed immediately in isolation in 14.42 seconds. | Confirmed pre-existing out-of-lane test-isolation/reliability gap exposed by host cache/load conditions. Documented, not fixed, under the owner's target-only rule; route to the Trading App test lane. Keep the exact full-suite result explicitly red. Focused TPR validation is unaffected and no provider authority is granted. |
+| `TPR-OOL-011` | P2 | Shared test infrastructure: `tests/conftest.py`, runtime-stop leak attribution | `903a857` excludes an incident when its caller-supplied semantic `activated_at` predates pytest's session start. A newly written containment state can legitimately preserve an older activation time, including promotion of an existing local kill switch, so a probe that wrote the file now under the current base temp with `activated_at=2000-01-01T00:00:00+00:00` returned without assertion. Raw normalized-string `startswith` also treats a sibling base such as `pytest-123` as inside `pytest-12`. The guard can therefore miss this session's machine-global stop leak or blame another concurrent suite. | **Open and owner-routed.** Rejected as `TPR-CCR13-002`; do not fix shared test infrastructure from this target-only lane. The shared owner should snapshot baseline incident identities at session start, flag newly appearing incidents, and use component-aware path containment, with both counterexamples as regressions. Production remains fail-closed; the risk is undetected test contamination and operator-runtime availability, not an authority escape. |
+| `TPR-OOL-012` | P3 | Shared `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` identity table | The shared record says every code commit is an identical four-lane cherry-pick, while its own method section and this lane's section 39 correctly identify F-8 as a Target-Price-owned variant: main expects the `committed and clean` refusal and this advanced lane expects `no unique external review anchor`. | **Open and owner-routed.** This lane corrects only its own section 39 under `TPR-CCR13-003`; qualify the shared archive in its next owner-coordinated documentation change. The mismatch changes no code or authority. |
+| `TPR-OOL-013` | P3 | Shared `tests/test_shared_research_eol_attributes.py` name and documentation | The test named `working_copy_matches_its_index_blob` compares only the `i/` and `w/` line-ending classifications from `git ls-files --eol`; arbitrary different LF content still passes. It correctly detected this host's two stale CRLF ML-spec copies and the documented remove-plus-checkout recovery restored their exact blob hashes, but the broader byte-equality claim is weak test sensitivity. | **Open and owner-routed.** Section 39 is qualified under `TPR-CCR13-005`. Strengthen or rename the shared guard in the shared owner lane; do not edit it here. |
+
+### Current disposition index (successor qualification, 2026-09-06)
+
+The detailed rows above preserve discovery-time evidence and therefore contain
+historical present-tense routing that became stale. This index is the current
+answer after section 39's owner-directed integration; its exact closed/open sets
+are target-guarded so the historical prose cannot reopen a resolved item or hide
+a newly routed one.
+
+| ID | Current disposition | Current basis |
+|---|---|---|
+| `TPR-OOL-001` | **Closed** | Owner-approved binary PDF storage; resolution row `TPR-OOL-001-R1`. |
+| `TPR-OOL-002` | **Closed** | Shared strategy README now includes the Target-Price lane; section 39. |
+| `TPR-OOL-003` | **Open** | Analyst loader duplicate-key handling remains owned by that lane. |
+| `TPR-OOL-004` | **Open** | Analyst four-slot preregistration re-freeze remains owned by that lane. |
+| `TPR-OOL-005` | **Closed** | Owner-directed Briefing smoke isolation; section 39. |
+| `TPR-OOL-006` | **Open** | Sibling multiplicity re-freezes and their reviews remain external gates. |
+| `TPR-OOL-007` | **Closed** | Shared coordination pointer updated under the owner-directed integration. |
+| `TPR-OOL-008` | **Closed** | Shared exact-byte attributes and stale-checkout regression added; this host's two recurring ML-spec copies were repaired from exact index blobs during section 40 validation. |
+| `TPR-OOL-009` | **Closed** | Sleeve evaluation clock is injected and the notification cycle passes its own instant; section 39. |
+| `TPR-OOL-010` | **Closed** | Root `research/__init__.py` now resolves `text eol=lf`; section 39. |
+| `TPR-OOL-011` | **Open** | Shared runtime-stop guard can miss a newly written old-timestamp incident and misclassify prefix-colliding bases. |
+| `TPR-OOL-012` | **Open** | Shared archive still overstates F-8 as an identical four-lane cherry-pick. |
+| `TPR-OOL-013` | **Open** | Shared EOL regression detects line-ending drift but overclaims arbitrary byte equality. |
 
 ## 10. Session / commit ledger
 
@@ -565,6 +602,7 @@ known.
 | 2026-09-03 | Claude review | `25c1c378448bf41a60c31a81e11ca398354c36d0..5f98c3aa` reviewed; corrections `26a4fc6f` and `34aa8eda` on this same lane branch | Independent review of the incomplete TPR-TR0-I integrated checkpoint | Reviewed all four commits individually plus the cumulative tree. Audited `trust_root.py` and `windows_acl.py` line by line and every named focus area. Found and corrected one P2: `EMPTY_REVIEW_REGISTRY_BYTES` was built without the LF terminator this lane's canonical contract requires, so it could never byte-equal a stored registry and the empty-registry guard was unreachable dead code. Verified the merge a clean union against both parents, the open register exactly the six declared findings, and the empty non-authorizing registry state preserved on the tree. | Focused lane and document suites on the exact final tree **252 passed, 3 skipped in 26.93s**; document guards **17 passed in 6.99s**; `compileall` on `research/target_price_revisions` and `tests/target_price_revisions` exit 0; `git diff --check` clean; committed blobs verified pure LF (0 CRLF, 0 lone CR); candidate `17a2a902…`, source authority `9d926482…`, look authority `0354c96d…` and PDF `f6e98eef…` unchanged, registry `f7131a7c…` unchanged from the received v2 bytes. Four register-guard mutations each detected with byte-identical restore; the `TPR-CR12-001` regression verified red on a byte-identical revert. **The complete suite was deliberately not run on the final tree at the owner's direction for token budget**; the last complete run is the received pre-correction tree at **6,917 passed, 13 skipped, 3 failed in 1,360.49s**, whose three failures are the out-of-lane `TPR-OOL-009` sleeve-report cases with no Target-Price test failing. Python 3.14.6, pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | All four commits accepted after correction. No P0 and no P1. `TPR-CR12-001` (P2) closed. Counter-reviewed round quality **9/10**. Open lane findings remain exactly the section 8 register: `TPR-CCR1-006`, `TPR-CCR2-011`, `TPR-CCR5-004`, `TPR-CCR10-012` (P1), `TPR-CCR10-013` (P1), `TPR-CCR10-016` (P2). The three sleeve-report failures remain out-of-lane under `TPR-OOL-009` and were deliberately not fixed. Details in section 36. | None. No key, allowed-signers file, trust directory, rollback pin, signed commit, positive registry entry, source, outcome, look, QC, broker, paper/live, deployment, capital or trading authority. | Codex counter-reviews this round and reruns the complete suite on the final tree, since this round did not. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1 and TPR-0B remain blocked; no key provisioning is authorized. |
 | 2026-09-03 | Codex counter-review + validation | Claude range `5f98c3aa757f420efac13f682f4e210fa9688e5b..1981233424f25b48ebec2273fa4822c249e2a041` reviewed; correction `7f55652403660b8fa8e8c5d57bd7b4669032a3c8`; this append-only validation-record commit follows | Counter-review correction only; no feature milestone | Accepted `26a4fc6f` unchanged and accepted `34aa8eda`/`19812334` after correcting six stale current pointers and their guard. Section 37 records all full hashes, dispositions, qualifications, and authority gates. | Exact correction tree: **6,919 passed, 13 skipped, 3 failed, 25 warnings in 3,657.75s**; the same three `TPR-OOL-009` sleeve-report failures and no target failure. Target suite **253 passed, 3 skipped**; shared plus target document guards **87 passed**; repository compile exit 0; `git diff --check` clean; 29-page PDF digest unchanged. Python 3.13.14 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | `TPR-CCR12-001` (P2) and `TPR-CCR12-002` through `004` (P3) closed by correction or successor qualification. Claude introduced no new P0/P1. The authoritative section 8 register remains exactly six open items, including inherited P1 `TPR-CCR10-012/013`; TPR-1 and TPR-0B remain blocked. | None. No key, signed anchor, positive registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority. | Make this Codex round's single push. Claude then reviews the exact new Codex range beginning after `1981233424f25b48ebec2273fa4822c249e2a041`; no next milestone is authorized. |
 | 2026-09-03 | Claude review | `1981233424f25b48ebec2273fa4822c249e2a041..49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review round; no milestone in range | Reviewed both commits individually and the cumulative tree, and verified all five stated claims. Found one P2 and one P3, both about evidence provenance rather than conclusions: the round recorded a complete-suite run it did not perform, and it asserted a bundled-Poppler page render as a host-independent fact. Advanced the six current pointers and the guard so this Claude round does not repeat the `TPR-CCR12-001` defect it reviewed. No product, spec, artifact, gate, or authority changed. | Independent complete suite on the exact reviewed tip `49caa886`: **6,919 passed, 13 skipped, 3 failed, 25 warnings in 4,208.43s**, reproducing the recorded counts exactly with the same three out-of-lane `TPR-OOL-009` failures and no target failure. Target suite **253 passed, 3 skipped**; shared plus target document guards **87 passed**; both reproduce the recorded counts. Final-tree evidence is in section 38.6. Four mutations on the advanced guard each turned it red with byte-identical restores returning it green. Committed blobs for all four changed files verified pure LF. Provider/outcome accesses **0**; authorized/spent looks **0**. | Both commits accepted, the second after correction. No P0 and no P1. `TPR-CR13-001` (P2) and `TPR-CR13-002` (P3) closed by correction and qualification. The open register remains exactly the six section 8 findings, including inherited P1 `TPR-CCR10-012`/`TPR-CCR10-013`. Details in section 38. | None. No key, signed anchor, positive registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority. | Codex counter-reviews the exact new Claude correction range beginning after `49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3`. No next milestone is authorized; TPR-TR0-I stays blocked by `TPR-CCR10-012`, `TPR-CCR10-013` and `TPR-CCR10-016`, and TPR-1 and TPR-0B remain blocked. |
+| 2026-09-06 | Codex counter-review | `49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3..d54ce1b2c6816532ef82906c49998a93574172fc` reviewed; this correction commit follows | Counter-review one Claude correction plus the subsequent owner-directed integration/main-merge interval; no feature milestone | Distinguished 25 first-parent lane commits from 16 commits inherited only through the main merge, reviewed and dispositioned every one, verified the merge resolution and stable patch identities, corrected the lane's current routing/OOL disposition state/integration wording/EOF hygiene, and added guards for the exact mixed-role range and current OOL index. This successor row closes the missing section-10 interval; section 39 retains its detailed integration evidence. | On the received tree, the changed focused set was **452 passed, 3 skipped, 2 failed in 150.29s**; both failures were the expected stale-CRLF ML-spec working copies. The documented bounded remove-plus-checkout repair restored exact index-blob hashes without a Git diff, after which the EOL module was **7 passed in 1.55s**. Exact correction-tree and complete-suite validation follows in section 40. Provider/outcome accesses **0**; authorized/spent looks **0**. | Cumulative range rejected because `903a857` / inherited twin `f476467` contains open shared P2 `TPR-CCR13-002` (`TPR-OOL-011`). `TPR-CCR13-001`, `003`, and `004` close in this record correction; `TPR-CCR13-005` routes shared P3 `TPR-OOL-013`. The six lane-open findings remain unchanged. | None. No trust provisioning, positive registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority. | Stop before a feature milestone: the reviewed range is rejected, and independently the Action Plan still withholds milestone authority pending the two exact trust decisions and source-rights artifact. After this record-only correction is published, Claude reviews the Codex range beginning after `d54ce1b2`. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -3859,9 +3897,12 @@ The owner directed the dedicated Review lane session to fix, on the
 `main`-derived branch `Feature-bug-fix-integration-2026-09-04`, the shared
 trading-application / test-infrastructure / repository-tooling issues that this
 record and the sibling lane records had documented but, under the lane scope
-rule, deliberately not fixed, and to apply the identical commits to every lane
-branch so no lane carries a divergent copy of a shared file. This lane received
-them as cherry-picks; no lane-owned file changed.
+rule, deliberately not fixed. The initial two shared code commits were applied
+with identical patches to every lane so no shared file diverged. This lane then
+received the separately owner-directed F-8 correction as the explicit
+lane-owned, lane-adapted exception in the table below; it is not a byte-identical
+cherry-pick and it changes one Target-Price test. `TPR-CCR13-003` closes the old
+blanket wording, which became false when the F-8 follow-up was appended.
 
 | Integration-branch commit | Cherry-pick on this lane | Content |
 |---|---|---|
@@ -3870,7 +3911,7 @@ them as cherry-picks; no lane-owned file changed.
 | docs commit | `1e3757c241948609edf598388dd64e711d925810` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, full disposition ledger, owner decisions) plus the four-lane README, the direction status paragraph, and the workflow exception paragraph |
 | `6ef66eed77f9b24ea3df8aa538f42de0c871c824` (F-8, owner direction, same day) | `636b8dd0467f7f068f0d4dd1546462e4afe18b5d` | `tests/target_price_revisions/test_preregistration.py::test_self_declared_review_and_registry_substitution_refuse` made deterministic across harness layouts (Analyst `ARV2-UNRELATED-001` / Short-interest `SI-OOL-003`); the loader is unchanged. **Lane variant, not a byte-identical cherry-pick:** this lane's loader authenticates the committed registry and refuses an unanchored spec before any status check, so the same-repository branch here is `no unique external review anchor` where `main`'s is `committed and clean` |
 | integration record update | `06f61dfa908f6bf43acfe0475f373fa548d63075` | F-8 recorded in `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` (fix table, ledger rows, validation) |
-| `f4764671b9f3ee0de50ab36a7cf61854bca72c4f` (2026-09-05 post-integration review of `main`, PIR-002/003/004/005) | `903a857455c4525097b60aa18d06c8e9ef8d2111` | `evaluate_sleeves` refuses a naive `now` with `SleeveReportError` instead of degrading every growth position; the conftest runtime-stop leak guard attributes an incident to the session only when it is under the base temp AND its `activated_at` is not before session start; `tests/test_shared_research_eol_attributes.py` also asserts working-copy bytes match the index blob and names the heal `rm <path> && git checkout -- <path>`. Review record `docs/Archive/Review/REVIEW_2026-09-05_POST_INTEGRATION_MAIN.md` lives on `main` (its handoff/record commits are not cherry-picked: the shared handoff is frozen on lanes). |
+| `f4764671b9f3ee0de50ab36a7cf61854bca72c4f` (2026-09-05 post-integration review of `main`, PIR-002/003/004/005) | `903a857455c4525097b60aa18d06c8e9ef8d2111` | `evaluate_sleeves` refuses a naive `now` with `SleeveReportError` instead of degrading every growth position; the conftest runtime-stop leak guard attempts to attribute incidents by base-temp path and `activated_at`, but section 40 rejects that guarantee under `TPR-CCR13-002` / `TPR-OOL-011`; `tests/test_shared_research_eol_attributes.py` compares working-copy and index **line-ending classifications**, correctly detects the observed stale-CRLF state, and names the heal `rm <path> && git checkout -- <path>`, but does not byte-compare arbitrary same-EOL content (`TPR-CCR13-005` / `TPR-OOL-013`). Review record `docs/Archive/Review/REVIEW_2026-09-05_POST_INTEGRATION_MAIN.md` lives on `main` (its handoff/record commits are not cherry-picked: the shared handoff is frozen on lanes). |
 | merge of `main` `df388ce6` (2026-09-05, owner-directed conflict resolution) | `15bedb56ad7238d70a2cbea78b8e30ba37b2aea0` | `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` aligned byte-for-byte with main (`7e1f18b6`; the add/add merge could not resolve after main gained its section 8); `tests/target_price_revisions/test_preregistration.py` keeps this lane's adapted F-8 branches (`no unique external review anchor`) because main's `committed and clean` branch is unreachable under this lane's loader; `docs/SESSION_HANDOFF.md` takes main's section 0C and keeps this lane's 0B follow-up bullets. 420 passed, 3 skipped on the merged tree. The lane-to-main merge is now conflict-free. |
 
 Items of this record closed by the application: TPR-OOL-009 (F-1); TPR-OOL-008 and TPR-OOL-010 (F-4); TPR-OOL-005 (F-5); TPR-OOL-002 and TPR-OOL-007 (F-6). Newly routed to this lane: `test_self_declared_review_and_registry_substitution_refuse` depends on where pytest's `tmp_path` lives (Analyst `ARV2-UNRELATED-001` / Short-interest `SI-OOL-003`; integration record sections 3 and 5.1). Every other
@@ -3928,3 +3969,144 @@ the 2026-08-30 state (a stale next-action sentence of the TPR-OOL-007 class);
 refreshing it is a `main`-side concise status update for the owner, not a lane
 edit.
 
+## 40. Codex counter-review of the recent mixed-role range - 2026-09-06
+
+### 40.1 Exact scope and provenance
+
+The branch was fetched first and fast-forwarded cleanly to remote head
+`d54ce1b2c6816532ef82906c49998a93574172fc`. The exact cumulative Git range is
+`49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3..d54ce1b2c6816532ef82906c49998a93574172fc`:
+41 ordinary reachable commits, comprising 25 first-parent lane commits and 16
+commits inherited only through merge `15bedb56` from `main`.
+
+Role is not inferred from author metadata. Section 38 and the commit's own
+review record identify exact Claude correction range `49caa886..dff9b112`, one
+commit ending at
+`dff9b11238f35c5c411669197bc078936fbf9c9a`. Section 39 and the owner-directed
+coordination records identify the later first-parent work as shared bug-fix
+application, frozen-document restoration, follow-up review fixes, and the
+`main` merge. The three shared patch pairs are stable-patch identical:
+`7f99f303` / `e0270c8b`, `3114a153` / `09c296ee`, and `f4764671` /
+`903a8574`. Against its first parent, merge `15bedb56` adds only the main-side
+review record, shared Session Handoff changes, and the Short-Interest record;
+the Target-Price F-8 test remains byte-identical to the lane parent. No conflict
+marker or hidden conflict-resolution code entered the cumulative tree.
+
+**Cumulative disposition: rejected.** The Target-Price implementation and the
+merge resolution have no discovered product-code defect, but shared commit
+`903a8574` and its inherited twin `f4764671` make a material guarantee their
+runtime-stop attribution does not meet (`TPR-CCR13-002`). The target-only rule
+forbids correcting that shared test infrastructure here, so it is routed as
+`TPR-OOL-011`. All other commits are accepted, accepted after the later
+correction named in their row, or accepted after the record qualifications in
+this section.
+
+### 40.2 First-parent commit dispositions
+
+| Commit | Disposition | Issue or no issue found |
+|---|---|---|
+| `dff9b11238f35c5c411669197bc078936fbf9c9a` | **accepted** | Claude's evidence-provenance review is correct; later owner-directed restoration of the two shared pointers supersedes, rather than falsifies, its then-current routing. |
+| `e0270c8bbf425f85af43b13eda6cb6bb59b252f4` | **accepted after correction** | Shared fixes reproduce and the stable patch matches `7f99f303`; `09c296ee` and `903a8574` close the observed clock/decoder/EOL follow-ups, while the latter's separate runtime-guard residual is rejected below. |
+| `09c296ee14c3beb6f81d4f887040a4814e1dab3c` | **accepted** | Notification evaluation now uses the cycle clock and the bound decoder avoids patched `json.loads`; no issue found in these changes. |
+| `1e3757c241948609edf598388dd64e711d925810` | **accepted** | Owner-directed shared integration documentation; no issue found in the files as introduced. |
+| `38ca96fefb38cc0fa859e51adb6d5914bd8ac5ee` | **accepted** | Initial lane integration record was accurate before the later F-8 exception; successor wording now makes that temporal boundary explicit. |
+| `636b8dd0467f7f068f0d4dd1546462e4afe18b5d` | **accepted** | F-8 is a deliberate lane variant matching this loader's earlier authenticated-anchor refusal; both repository-layout branches are deterministic. |
+| `06f61dfa908f6bf43acfe0475f373fa548d63075` | **accepted** | Shared integration-record F-8 entry is substantively correct; its remaining blanket identity sentence is separately routed as `TPR-OOL-012`. |
+| `55df4ebdb14b824e005e32706a09a3ef3fd4f8ac` | **accepted after correction** | Appending the lane-owned F-8 made section 39's blanket “no lane-owned file changed” sentence false; `TPR-CCR13-003` qualifies it. |
+| `16b3435bcf83a76ebee04679c4c266b6f2daeab4` | **accepted** | Restores the frozen shared Session Handoff on explicit owner direction; no issue found. |
+| `522da19881f03c1c80c216b1618ab2005612a5db` | **accepted after correction** | Record content is correct, but it introduced the blank line at EOF closed by `TPR-CCR13-004`. |
+| `47103e4a3299d0707725d75729fcd8da35e23831` | **accepted** | Correctly removes per-round dependency on the frozen shared handoff; no issue found. |
+| `c71dcd9b3c2eea26deb11c3ee0d3eaa2189705f1` | **accepted** | Owner-directed shared handoff follow-up later reconciled through `main`; no issue found. |
+| `ce5d355f9ce23b005f6a021e6330f346986ce31f` | **accepted** | Corrects an internal record reference to the actual shared-handoff section; no issue found. |
+| `e989872988a943b476502bd5573abbc0e0406122` | **accepted** | Restores the shared Action Plan to the owner-selected baseline; no issue found. |
+| `4e4840df4bb323a3a4dbe9854d5909996f754771` | **accepted** | Correctly stops target guards from requiring per-round edits in the frozen Action Plan; no issue found. |
+| `2f4e087cd29d635bbc2dad215dac05c4a0f490ca` | **accepted** | Accurately records the Action Plan restoration and lane-record ownership; no issue found. |
+| `c78f3451c569970b554a948606bfce063ee71ac0` | **accepted** | Owner-directed handoff note, later reconciled from `main`; no issue found. |
+| `f6ed271b0b67af1161f3cd2823dde53413e4cbb7` | **accepted** | Owner-coordinated concise Action Plan refresh, consistent with the lane record; no issue found. |
+| `6a673d0ab226e29d3ed1911aa38644599591557d` | **accepted** | Shared runtime-stop owner-decision handoff only; no Target-Price authority or code change. |
+| `903a857455c4525097b60aa18d06c8e9ef8d2111` | **rejected** | Naive-clock refusal is sound and EOL classification catches the observed CRLF case, but runtime-stop attribution can miss a newly written old-timestamp incident and raw prefix containment can blame a sibling base (`TPR-CCR13-002`); the EOL test also overclaims arbitrary byte equality (`TPR-CCR13-005`). |
+| `f67c633208d238b960919024ae910385065c3def` | **accepted after qualification** | The application record is accurate after section 39's explicit qualifications of the two shared-test limitations. |
+| `7e1f18b61b91774caf4b7bcf55df0f2d33495da3` | **accepted after qualification** | The shared integration-record blob is exactly main's; its remaining four-lane identity overstatement is routed, not silently accepted, as `TPR-OOL-012`. |
+| `15bedb56ad7238d70a2cbea78b8e30ba37b2aea0` | **accepted** | Merge union and conflict resolution verified against both parents; no hidden Target-Price or shared-code edit entered. |
+| `9ee3b3ed8a62b4533b44c038dbcdac16c3d899e0` | **accepted** | Accurately records the main merge and intentional F-8 lane variant; no issue found. |
+| `d54ce1b2c6816532ef82906c49998a93574172fc` | **accepted after correction** | Branch relation is correct, but section 8 and section 10 still omitted this entire mixed-role interval; `TPR-CCR13-001` advances the durable current state. |
+
+### 40.3 Merge-inherited commit dispositions
+
+These commits are reachable in the exact Git range only through `15bedb56`.
+They are still explicit review inputs; a duplicate shared patch receives the
+same disposition as its lane twin.
+
+| Commit | Disposition | Issue or no issue found |
+|---|---|---|
+| `0b36f1cf86c9832681e11bf8762b29a3bf4d0bbd` | **accepted** | Short-Interest synchronization inherited from main; no Target-Price effect or merge-resolution defect. |
+| `aefa0ecc9726044c38e6a37a5b437454b7808528` | **accepted** | Main's Short-Interest PR merge; no Target-Price effect found. |
+| `7f99f303d0b6f5a2a65aa5b5b49f9c52256716d8` | **accepted after correction** | Patch-identical source of `e0270c8b`; later shared follow-ups have the same qualifications as the lane twin. |
+| `3114a1530f0afa400eb200e79ff218c174657e69` | **accepted** | Patch-identical source of `09c296ee`; no issue found in the cycle-clock/decoder correction. |
+| `149be1ce08b9c421d0710c4e2996813b648a160b` | **accepted** | Shared integration documentation; no Target-Price defect found. |
+| `0ebac7fc6d9d05a41ea7e818f34d92cf8354e332` | **accepted** | Main handoff for owner-directed integration; no Target-Price effect found. |
+| `6ef66eed77f9b24ea3df8aa538f42de0c871c824` | **accepted after qualification** | Main's F-8 test is correct for main's loader; merge intentionally retains this lane's adapted `636b8dd0` blob. |
+| `1955fdbc5022bd12a70d393beeb9faf28c0237e0` | **accepted** | Shared F-8 record update; no code issue found. |
+| `c0a8aeb2233cc5ab7ae289f51571074f34444e23` | **accepted** | Main handoff update; no Target-Price effect found. |
+| `86417b8919acd24341c04bd1c4dabf674b92831b` | **accepted** | Main integration PR merge; no additional conflict-resolution issue found. |
+| `f4764671b9f3ee0de50ab36a7cf61854bca72c4f` | **rejected** | Patch-identical source of `903a8574`; carries the same material runtime-stop attribution defect (`TPR-CCR13-002`) and EOL-test overclaim (`TPR-CCR13-005`). |
+| `1b08b2ad5d598be8ed05cad591e46453a385a04d` | **accepted after qualification** | Main review record is preserved, but its two guarantees yield to the reproduced counterexamples in this section. |
+| `99b4b8c0613fec32b6b12e8a45a7858d1f9b64c4` | **accepted** | Removes a trailing blank line from the shared integration record; no issue found. |
+| `f7b4dd1dfd001e68c8a7edbf26146b20e19809f0` | **accepted** | Correctly closes the stale-fetch false alarm and records lane applications; no issue found. |
+| `5d05e51e9c59f86d2247ed4e6bbbef1403a8e572` | **accepted** | Main handoff/integration record update; no Target-Price effect found. |
+| `df388ce64cd705f2ed26fab3442a0229f52a447b` | **accepted** | Main post-integration review-fix merge; its cumulative shared defect is explicitly rejected through `f4764671`, not hidden by merge acceptance. |
+
+### 40.4 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CCR13-001` | P2 | **Closed by current correction** | `d54ce1b` cumulative tree | record preamble, sections 8-10; target document guard | The sole current pointer still routed a counter-review after `49caa886`, section 9's present-tense dispositions contradicted section 39's six closures, and section 10 omitted the durable Sep 4-5 interval. A different machine would resume from incorrect durable state. | The fetched head is `d54ce1b`; section 39 names the applied commits and closures, while the last real section-10 row ended at `49caa886`. | Incorrect durable state is P2 under the repository rubric and this lane is explicitly multi-host. | Advance the preamble/section 8 to the exact mixed-role range, add the guarded current OOL disposition index, add the missing successor ledger row, and pin every received first-parent commit in the target guard. | Target document guard and exact range/order assertions in 40.5. |
+| `TPR-CCR13-002` | P2 | **Owner-routed outside lane** | `903a857`, inherited `f476467` | `tests/conftest.py`; `TPR-OOL-011` | The runtime-stop guard can miss a containment file written by this session when the caller-supplied semantic activation time predates session start; raw prefix containment can also attribute a sibling pytest base. It therefore does not reliably catch the machine-global test leak it claims to guard. | A crafted state written now under this base with `activated_at=2000-01-01T00:00:00+00:00` returned without assertion. A component-relative probe shows `pytest-123` string-matches `pytest-12`. | This is a meaningful fail-open in shared test safety and can leave operator runtime availability contaminated without identifying the test. | None here: shared test infrastructure is outside Target-Price scope. Route the exact baseline-identity and component-aware-containment remedy to its owner. | Counterexamples reproduced; existing focused tests remain green because they encode the flawed semantic-time assumption. |
+| `TPR-CCR13-003` | P3 | **Closed by current correction** | `55df4ebd` cumulative record | section 39; `TPR-OOL-012` | The integration introduction says identical commits reached every lane and no lane-owned file changed, but the appended F-8 row explicitly names a lane-specific Target-Price test variant. The shared archive repeats part of the overstatement. | Stable patch IDs prove only the two initial shared pairs and the post-review shared pair identical; `636b8dd0` intentionally differs from `6ef66eed`. | Inaccurate provenance makes later merge auditing ambiguous. | Qualify this lane's section 39 as initial shared identical patches plus the explicit F-8 exception; route the shared archive wording. | Patch IDs, merge-parent blob comparisons, and current section text checked. |
+| `TPR-CCR13-004` | P3 | **Closed by current correction** | `522da198` | record EOF | One extra blank line at EOF makes cumulative `git diff --check 49caa886..d54ce1b` red. | `git diff-tree --check -r 522da198` identifies the introduction; blame points to its final line. | The lane requires diff hygiene and later reviews otherwise inherit a known red check. | Remove the extra blank line while preserving one terminal LF. | Final `git diff --check` and byte-tail check in 40.5. |
+| `TPR-CCR13-005` | P3 | **Owner-routed outside lane** | `903a857`, inherited `f476467` | `tests/test_shared_research_eol_attributes.py`; `TPR-OOL-013` | A test and its documentation claim working bytes equal the index blob, but the assertion compares only line-ending classifications. Different LF content passes. | The implementation reads `git ls-files --eol` and compares only `fields["w"] == fields["i"]`; no content digest is computed. | This is weak shared-test sensitivity and inaccurate documentation, although it correctly detects the observed CRLF upgrade state. | None here under the target-only rule; qualify this record and route a shared rename or byte comparison. | This host's actual CRLF state failed as intended, and exact blob hashes matched after bounded recovery; arbitrary same-EOL bytes remain outside the test. |
+
+No new P0 or P1 is introduced by the received range. The existing lane-open
+register remains exactly six items, including inert P1 `TPR-CCR10-012` and
+`TPR-CCR10-013`; the out-of-lane P2 does not enter that target-only register.
+
+### 40.5 Validation and artifact checks
+
+- Received-tree changed focused set: **452 passed, 3 skipped, 2 failed in
+  150.29s**. Both failures were the two shared ML-spec working copies at
+  `i/lf w/crlf attr/-text`, while Git status remained clean. After backing up
+  and applying the documented remove-plus-checkout recovery to only those two
+  tracked paths, both raw working hashes equal their exact index blobs and the
+  EOL module is **7 passed in 1.55s** with no Git diff.
+- Correction-tree changed surface (all Target-Price tests plus every changed
+  shared regression module): **456 passed, 3 skipped in 117.73s**. The target
+  document module alone is **21 passed in 2.44s**, including the two new exact
+  range/disposition guards. `git diff --check` is clean.
+- Target preregistration plus document-consistency evidence independently
+  measured **112 passed, 2 skipped**; sleeve report/notification plus runtime
+  leak-guard evidence measured **90 passed** on the received tree.
+- The three shared cherry-pick/source pairs have identical stable patch IDs.
+  The merge retains the lane F-8 blob, imports the main shared records, and has
+  no conflict marker.
+- On this Codex host, bundled Poppler reports the governing PDF as 29
+  unencrypted letter-size pages. Physical pages 27-29 were rendered and
+  visually inspected; the source-rights, TPR-0A/0B order, fixed four-slot
+  `1/80` ceiling, and zero-authority gates remain legible and unchanged. Raw
+  SHA-256 remains
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`.
+
+### 40.6 Milestone and authority decision
+
+**No next implementation milestone is authorized.** First, the cumulative
+review is rejected until shared owner `TPR-OOL-011` is corrected and reviewed.
+Independently, TPR-TR0-I still requires owner approval or replacement of the
+exact external rollback pin and protected parent-custody contract before
+`TPR-CCR10-012`, `TPR-CCR10-013`, and the remaining `TPR-CCR10-016` matrix can
+close. TPR-1 still requires a separately reviewed exact source-rights artifact,
+and TPR-0B still waits for reviewed TPR-1/TPR-2 structural manifests. The
+generic request to continue the next milestone does not select those security
+policies or admit provider rights.
+
+No key, allowed-signers file, trust directory, rollback pin, positive registry
+entry, provider row, outcome, research look, QuantConnect job, broker action,
+paper/live operation, deployment, capital, or trading authority was created.

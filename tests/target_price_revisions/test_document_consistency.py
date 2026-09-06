@@ -85,6 +85,51 @@ LATEST_REVIEWED_CODEX_COMMITS = (
     "7f55652403660b8fa8e8c5d57bd7b4669032a3c8",
     "49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3",
 )
+# The current Codex round received one exact Claude review commit followed by
+# an owner-directed integration/main-merge series.  Do not infer a reviewer
+# role from author metadata: section 40 records the two provenance classes and
+# dispositions every commit in the cumulative Git range.
+LATEST_COUNTERREVIEWED_RECEIVED_BASE = (
+    "49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3"
+)
+LATEST_COUNTERREVIEWED_RECEIVED_HEAD = (
+    "d54ce1b2c6816532ef82906c49998a93574172fc"
+)
+LATEST_COUNTERREVIEWED_RECEIVED_RANGE = (
+    f"{LATEST_COUNTERREVIEWED_RECEIVED_BASE}.."
+    f"{LATEST_COUNTERREVIEWED_RECEIVED_HEAD}"
+)
+LATEST_COUNTERREVIEWED_RECEIVED_SHORT_RANGE = "49caa886..d54ce1b2"
+LATEST_CLAUDE_CORRECTION_COMMIT = (
+    "dff9b11238f35c5c411669197bc078936fbf9c9a"
+)
+LATEST_RECEIVED_FIRST_PARENT_COMMITS = (
+    "dff9b11238f35c5c411669197bc078936fbf9c9a",
+    "e0270c8bbf425f85af43b13eda6cb6bb59b252f4",
+    "09c296ee14c3beb6f81d4f887040a4814e1dab3c",
+    "1e3757c241948609edf598388dd64e711d925810",
+    "38ca96fefb38cc0fa859e51adb6d5914bd8ac5ee",
+    "636b8dd0467f7f068f0d4dd1546462e4afe18b5d",
+    "06f61dfa908f6bf43acfe0475f373fa548d63075",
+    "55df4ebdb14b824e005e32706a09a3ef3fd4f8ac",
+    "16b3435bcf83a76ebee04679c4c266b6f2daeab4",
+    "522da19881f03c1c80c216b1618ab2005612a5db",
+    "47103e4a3299d0707725d75729fcd8da35e23831",
+    "c71dcd9b3c2eea26deb11c3ee0d3eaa2189705f1",
+    "ce5d355f9ce23b005f6a021e6330f346986ce31f",
+    "e989872988a943b476502bd5573abbc0e0406122",
+    "4e4840df4bb323a3a4dbe9854d5909996f754771",
+    "2f4e087cd29d635bbc2dad215dac05c4a0f490ca",
+    "c78f3451c569970b554a948606bfce063ee71ac0",
+    "f6ed271b0b67af1161f3cd2823dde53413e4cbb7",
+    "6a673d0ab226e29d3ed1911aa38644599591557d",
+    "903a857455c4525097b60aa18d06c8e9ef8d2111",
+    "f67c633208d238b960919024ae910385065c3def",
+    "7e1f18b61b91774caf4b7bcf55df0f2d33495da3",
+    "15bedb56ad7238d70a2cbea78b8e30ba37b2aea0",
+    "9ee3b3ed8a62b4533b44c038dbcdac16c3d899e0",
+    "d54ce1b2c6816532ef82906c49998a93574172fc",
+)
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
     "5f98c3aa757f420efac13f682f4e210fa9688e5b"
@@ -556,11 +601,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [LATEST_REVIEWED_CODEX_RANGE]
+    ) == [LATEST_COUNTERREVIEWED_RECEIVED_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed Codex's exact two-commit range"
+        "Codex has counter-reviewed the exact received cumulative range"
         in normalized_current
     )
     assert (
@@ -574,8 +619,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "pending Claude review of this Codex round" not in normalized_current
-    assert "comprehensive whole-lane audit is complete" in normalized_current.lower()
-    assert "beginning after `49caa886`" in normalized_current
+    assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
+    assert "beginning after `d54ce1b2`" in normalized_current
 
     routing_row = next(
         line
@@ -597,16 +642,18 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [LATEST_REVIEWED_CODEX_SHORT_RANGE]
+        ) == [LATEST_COUNTERREVIEWED_RECEIVED_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude reviewed both codex commits" in normalized_summary_lower
-        assert "section 38" in normalized_summary_lower
+        assert "codex counter-reviewed the received range" in normalized_summary_lower
+        assert "section 40" in normalized_summary_lower
         assert (
             "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
             in normalized_summary_lower
         )
         assert "no key provisioning or positive authority is authorized" in normalized_summary_lower
-        assert "comprehensive claude whole-lane audit is complete" in normalized_summary_lower
+        assert "comprehensive claude whole-lane audit remains complete" in (
+            normalized_summary_lower
+        )
 
 
 def test_latest_counterreview_records_the_exact_claude_output() -> None:
@@ -626,12 +673,82 @@ def test_latest_counterreview_records_the_exact_claude_output() -> None:
     assert "No next implementation milestone is authorized" in section
 
 
+def test_current_counterreview_records_every_received_commit_and_provenance() -> None:
+    """TPR-CCR13-001: pin the mixed-role range without author inference."""
+    section = _record_section(
+        "## 40. Codex counter-review of the recent mixed-role range"
+    )
+    assert LATEST_COUNTERREVIEWED_RECEIVED_RANGE in section
+    assert LATEST_CLAUDE_CORRECTION_COMMIT in section
+    first_parent = _bounded(
+        section,
+        "### 40.2 First-parent commit dispositions",
+        "### 40.3 Merge-inherited commit dispositions",
+        "section 40 first-parent dispositions",
+    )
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in first_parent.splitlines()
+        if line.startswith("| `")
+    )
+    assert ordered_commits == LATEST_RECEIVED_FIRST_PARENT_COMMITS
+    assert "Cumulative disposition: rejected" in section
+    assert "No next implementation milestone is authorized" in section
+
+
+def test_out_of_lane_current_disposition_index_matches_integration_closures() -> None:
+    """TPR-CCR13-001: historical rows cannot masquerade as current routing."""
+    section = _record_section("## 9. Out-of-lane findings ledger")
+    index_heading = (
+        "### Current disposition index (successor qualification, 2026-09-06)"
+    )
+    assert section.count(index_heading) == 1
+    index = section.partition(index_heading)[2]
+    dispositions = {
+        match.group(1): match.group(2).lower()
+        for line in index.splitlines()
+        if (
+            match := re.fullmatch(
+                r"\| `(TPR-OOL-[0-9]{3}(?:-R[0-9]+)?)` \| \*\*(Open|Closed)\*\* \|.*",
+                line,
+            )
+        )
+    }
+    assert set(dispositions) == {
+        "TPR-OOL-001",
+        "TPR-OOL-002",
+        "TPR-OOL-003",
+        "TPR-OOL-004",
+        "TPR-OOL-005",
+        "TPR-OOL-006",
+        "TPR-OOL-007",
+        "TPR-OOL-008",
+        "TPR-OOL-009",
+        "TPR-OOL-010",
+        "TPR-OOL-011",
+        "TPR-OOL-012",
+        "TPR-OOL-013",
+    }
+    assert {identifier for identifier, status in dispositions.items() if status == "closed"} == {
+        "TPR-OOL-001",
+        "TPR-OOL-002",
+        "TPR-OOL-005",
+        "TPR-OOL-007",
+        "TPR-OOL-008",
+        "TPR-OOL-009",
+        "TPR-OOL-010",
+    }
+
+
 def test_out_of_lane_ledger_has_unique_well_formed_ids() -> None:
     """TPR-CCR8-003/004: keep the owner-routing ledger unambiguous."""
     section = _record_section("## 9. Out-of-lane findings ledger")
+    details = section.partition(
+        "### Current disposition index (successor qualification, 2026-09-06)"
+    )[0]
     rows = [
         line
-        for line in section.splitlines()
+        for line in details.splitlines()
         if line.startswith("| `TPR-OOL-")
     ]
     assert rows

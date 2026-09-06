@@ -1,16 +1,15 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **IB-2A OBSERVED IDENTITY INVENTORY IS IMPLEMENTED AT ZERO AUTHORITY
-IN `5c74bdee`, AFTER CODEX COUNTER-REVIEWED CLAUDE'S IB-1I REVIEW IN
-`726c4dcf`. THE NEW FACTORY-BOUND CONTRACT NORMALIZES OBSERVED FILING,
-REPORTING-OWNER, AND TRANSACTION ROWS, RETAINS JOINT OWNERS WITHOUT
-OWNER-BY-TRANSACTION FAN-OUT, QUARANTINES MISSING/MULTIPLE/INCOMPLETE OWNER
-SETS, AND PRESERVES ORIGINAL/AMENDED FILING LINEAGE. THIS IS NOT FULL IB-2:
-ISSUER/OWNER/SECURITY/TRANSACTION RESOLUTION, TICKER OR SHARE-CLASS MAPPING,
-DEDUPE/MERGE, AUTHENTICATED AMENDMENT AUTHORITY, CANONICAL FILTERING,
-AGGREGATION, THE `$50,000` GATE, OUTCOMES, ETF/QC WORK, DEPLOYMENT, CAPITAL,
-AND TRADING AUTHORITY REMAIN UNPROVEN OR EXACTLY ZERO. CLAUDE MUST REVIEW THE
-EXACT PUSHED RANGE BEGINNING AFTER `2c392cd3`.**
+Status: **CLAUDE'S IB-2A REVIEW AND THE OWNER-DIRECTED SHARED-INTEGRATION
+COMMITS THROUGH `11d894b6` ARE COUNTER-REVIEWED AND ACCEPTED AFTER THE
+LANE-SPECIFIC TEST/RECORD CORRECTIONS IN SECTION 42. IB-2A REMAINS AN
+OBSERVED-ONLY, ZERO-AUTHORITY INVENTORY. THE NEXT BOUNDED STEP IS IB-2B:
+SEC-SCOPED ISSUER/REPORTING-OWNER GROUPING AND OWNER-ATTRIBUTION QUARANTINE
+FROM FACTORY-CREATED IB-2A INPUTS ONLY. THIS IS NOT POINT-IN-TIME MARKET-
+SECURITY RESOLUTION: TICKER/SHARE-CLASS/QC MAPPING, DEDUPE, AMENDMENT
+SUPERSESSION, CANONICAL FILTERING, AGGREGATION, THE `$50,000` GATE, OUTCOMES,
+ETF/QC WORK, DEPLOYMENT, CAPITAL, AND TRADING AUTHORITY REMAIN UNPROVEN OR
+EXACTLY ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -153,6 +152,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-02 | Codex implementation | `3f6c2676` -> `a615304d` -> `322350a3` -> `b3b202d2` -> this record commit | Completed Claude counter-review and bounded **IB-1I zero-authority four-family/QC-first research gate** | Preserved the accepted-after-correction counter-review, then added one frozen lane-local contract that binds the governing blueprint, immutable 2026-08-29/30 owner-directive commits, fixed four-lane family, exact `1/20` total and `1/80` lane ceiling, expiry/no-reallocation rule, shared holdout, canonical-family null rule, future IB-7 immutable-input boundary, empty permanent allocation/look inventories, and exact-zero external/operational authority. Two independent implementation audits found and drove corrections before commit. Full detail is in section 36. | Python **3.13.14**, pytest **9.1.1**. IB-1I **120 passed in 2.41s**; named Insider/boundary suite **848 passed, 8 skipped in 393.03s**; complete committed code tree `b3b202d2`: **3 failed, 7,093 passed, 15 skipped, 25 warnings in 2,939.96s (48m59s)**, exactly the three unchanged out-of-lane sleeve-clock cases; whole-repository compileall exit 0. No SEC/provider, credential, licensed row, outcome, QuantConnect upload/processing/job/backtest, broker, operator database, scheduler, deployment, order, or UI access; **0 research looks**. | IB1I-R01 through IB1I-R09 closed; final independent code audit reports no remaining P0-P3 finding in scope. Analyst `qc_first_plan.py`, the shared Strategy Description README, sleeve-clock failures, and shared/platform debt are documented but untouched. | Commit this record, run record/diff/secret/remote gates, make the round's single push, and stop for Claude to review every pushed commit after `3f6c2676`. |
 | 2026-09-02 | Claude review | `3f6c2676` -> this review snapshot | Independent review of the completed hard-link invariants and the IB-1I zero-authority four-family research gate (`3f6c2676..b21baf7c`, 5 commits, 0 merges, 8 lane-owned paths) | Fast-forwarded the lane branch in place after finding the local checkout 7 behind and a strict ancestor - no branch switch or second worktree. Reproduced the hard-link P2 rather than reading it, recomputed every IB-1I headline claim, and mutation-swept both. Full dispositions in section 37. | IB-1I module **122 passed** (recorded 120 plus this review's two); exact named 12-file suite **920 passed, 8 skipped in 255.35s**; complete suite: **3 failed, 7096 passed, 14 skipped, 25 warnings in 1390.16s (0:23:10)**; failures: tests/test_sleeve_report.py::test_default_gain_review_is_fifty_percent_and_long_term_gated, tests/test_sleeve_report.py::test_every_lot_row_carries_the_tax_mechanism_fields, tests/test_sleeve_report.py::test_report_carries_no_action_shaped_field; whole-repository compileall **exit 0**; record gate over `test_insider_buying_implementation_record.py`, `test_active_document_consistency.py` and `test_insider_buying_preregistration.py` **192 passed**; hard-link phase mutants **4 of 4 caught**; IB-1I gate mutants **8 of 12 caught, 2 structurally masked, 2 fixed then caught**; ten hard-link probes across both boundaries; semantic hash recomputes to `f532eaf3...`; 4 x Fraction(1,80) == Fraction(1,20) exactly with no float in the module; the blueprint SHA-256 constant equals the actual PDF on disk; eight authority escalations refused. Python 3.14.6. No SEC/provider data, credential, licensed row, real package, outcome, QuantConnect, broker, operator database, scheduler, deployment, or order; **0 research looks**. | All five commits accepted, two after correction. **IB1I-R01** (P3) fixed here: the four-lane-maxima-equal-shared-FWER equation and the cutoff-precedes-holdout ordering had no test sensitivity because every field is pinned to its own constant, so both guards could be deleted with the module green; two constant-drift regressions added and mutation-verified. **IBREC-01** (P3) fixed here: sections 36 and 35 sat between sections 11 and 12, out of numerical and chronological order, and were moved after section 34 with byte-identity verified. **IB1I-N01** (P3) records two mutation survivors that are structurally masked, not gaps. No test removed or weakened. | Codex counter-reviews this review commit. No milestone started. |
 | 2026-09-03 | Claude review | `7c9e6f53` -> `1b836ff6` (test correction) -> this review record | Review of the IB-1I counter-review and the IB-2A observed identity inventory (`2c392cd3..7c9e6f53`), with mutation testing of the eight owner-named dangerous directions | Verified isolation, authority enforcement by direct inspection, and observed-only scope by keyword sweep and AST test. Reproduced the focused 97 and the ten-file 894 exactly. Ran twenty targeted mutants (13 caught, 7 survived), classified every survivor, and pinned the four genuinely untested guards with five additive tests, each mutation-verified. Full detail in section 40. | Focused IB-2A 101 passed; IB-1H file 46 passed, 1 skipped in 17.90s; complete ten-file Insider suite plus two boundary files 918 passed, 8 skipped in 278.70s (0:04:38) (913 - 11 - 8 = 894 reproduces Codex's figure); record-sensitive six-file gate 124 passed; complete repository suite 3 failed, 7,197 passed, 15 skipped, 25 warnings in 4,272.30s (1:11:12), the three failures being the out-of-lane sleeve-clock cases recorded as `IB0H-OOL01`; every mutated module restored byte-identical; `git diff --check` clean. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | IB2A-CR01 (P3) **fixed**: four guards on named directions - the post-reparse re-fingerprint, the constructor replay binding disposition to outcomes, the strict-order amendment binding, and all three owner-uniqueness clauses together - could be deleted with the suite green; now pinned. IB2A-CR02 (P3): the handoff's "289 passed" gate is not in the record and the six-file gate yields 124; "22 passed, 75 deselected" has no selector. IB2A-CR03 (P3): `IB1D-CR07A` is carried forward but has no ledger row. IB2A-CR04 (P3): one mid-call re-hash remains untested and is recorded. IB2A-CR05 (P3): the 2026-09-03 push added no section-5 row. No production module changed. | Codex counter-reviews these Claude commits, then may continue the bounded ladder. IB-2A stays observed-only; IB-1 remains incomplete. |
+| 2026-09-06 | Codex counter-review | `7c9e6f53..11d894b6` reviewed; this counter-review snapshot follows | Counter-review Claude's IB-2A tests/record and the owner-directed shared bug-fix integrations | Dispositioned all 12 linear commits, independently reproduced the lane tests and shared provenance, closed the remaining IB-2A report-rehash test gap, corrected three review/record claims append-only, and documented shared residuals without changing shared code. | IB-2A **102 passed**; new re-hash regression passed green, failed under the exact one-line suppression, and passed after restoration. Eight-file focused review set: **394 passed, 3 skipped, 2 known shared-EOL checkout failures**. Four cherry-picks have exact source patch IDs; final integration-record blob matches main. No external/provider/outcome/QC/broker/operator/scheduler/deployment access; **0 looks**. | Accepted after correction. `IB2A-CCR01` closes the lane test gap. `IB2A-CCR02..05` correct/close record issues. `IBSH-CCR01..04` are shared/out-of-lane P3 observations documented only. | Commit the counter-review, then implement bounded zero-authority IB-2B before the round's one combined push. |
+
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -5135,3 +5136,75 @@ other branches explicitly (a self-declared review in a foreign repository →
 `share one repository`; an uncommitted one inside the anchored repository →
 `committed and clean`). `research/target_price_revisions/preregistration.py`
 is unchanged; this is a test-determinism correction and grants no authority. Validation on this head: Target-price preregistration test file plus active-document consistency: 152 passed, 2 skipped in 26.03s.
+
+## 42. Codex counter-review through the shared-integration alignment (2026-09-06)
+
+### 42.1 Exact scope and dispositions
+
+Codex fast-forwarded the clean existing worktree to exact remote head
+`11d894b6f1853c55984442b9e8b1aa097774919c` without switching branches. The
+range `7c9e6f53..11d894b6` is linear: twelve commits, zero merges.
+
+| Commit | Disposition | Counter-review basis |
+|---|---|---|
+| `1b836ff6` | **Accepted.** | Five additive lane tests pin four previously surviving IB-2A guard directions; no production code changed. |
+| `c7b9f2f2` | **Accepted after record correction.** | Claude's product/test conclusion is sound; `IB2A-CR02` is only partly correct and `IB2A-CR03` is a false alarm, superseded below. |
+| `b8f49eea` | **Accepted after later correction.** | Owner-authorized shared integration; `77055da4` and `62beb3fa` close its JSON-decoder, clock, and stale-session gaps. Patch-identical to source `7f99f303`. |
+| `77055da4` | **Accepted after later correction.** | Shared notification-clock and bound-decoder correction; its naive-clock gap is closed by `62beb3fa`. Patch-identical to source `3114a153`. |
+| `e08f0c17` | **Accepted.** | Owner-authorized shared integration record and coordination amendments; no authority change. |
+| `c96799ff` | **Accepted after record correction.** | Correct section 41 pointer, but the lane status and section-5 push history remained incomplete. |
+| `fb25d915` | **Accepted, out of lane.** | Target-price test-only harness-layout correction; its loader is unchanged. Patch-identical to source `6ef66eed`. |
+| `cf591b73` | **Accepted.** | Shared integration-record F-8 update only. |
+| `1f2e8136` | **Accepted after record correction.** | Correct section 41 F-8 pointer; the missing current status/push row is closed here. |
+| `62beb3fa` | **Accepted with shared residuals documented.** | Shared follow-up correctly refuses naive clocks, time-bounds leak attribution, and checks working-copy EOL. Patch-identical to source `f4764671`; `IBSH-CCR01..04` remain outside this lane. |
+| `7eb3ccc2` | **Accepted after record correction.** | One-line lane pointer is accurate but did not refresh current status or the push ledger. |
+| `11d894b6` | **Accepted.** | Shared record alignment only; its blob `d70e6cc497da44b81064e32c989ec831389525af` exactly equals main `df388ce6`. |
+
+Section 41's sentence that "no lane-owned file changed" is true only for its
+initial three-commit application. The later owner-directed F-8 commit changes a
+Target-price-owned test, but no Insider-owned production or test file changed
+in any shared-integration commit.
+
+### 42.2 Retained P0-P3 ledger
+
+| ID | Priority | Status | Finding, evidence, and disposition |
+|---|---|---|---|
+| IB2A-CCR01 / IB2A-CR04 | P3 | **Closed by the counter-review test commit.** | The final rebuilt-report fingerprint was correct but untested. A new regression mutates the report only between its captured and final complete projections. It passes on the real code, fails because no exception is raised when the guard is suppressed, and passes again after exact restoration. |
+| IB2A-CCR02 / IB2A-CR02 | P3 | **Partially correct; record corrected here.** | The missing selector for the historical **22 passed, 75 deselected** subset is a real reproducibility defect, so that exact subset must not be cited as independently rerunnable. However, the claimed **289-pass** defect concerns Codex's chat closeout, not section 39: the number never appeared in the committed record. Section 40's 124-pass six-file command is its own different gate. |
+| IB2A-CCR03 / IB2A-CR03 | P3 | **False alarm; closed without code.** | `IB1D-CR07A` is explicitly defined as the unambiguous name of the earlier acceptance-window evidence gate in ledger row `IB1H-CCR06`. It is searchable and dispositionable even though the historical collision prevents it from having a separately introduced table row. |
+| IB2A-CCR04 / IB2A-CR05 | P3 | **Closed in this record.** | The 2026-09-03 Codex push lacked its own section-5 row. Its validation and look accounting remained in section 39 and Claude's later row, so evidence was not lost; this section and the new ledger row restore the missing push-level handoff. |
+| IB2A-CCR05 | P3 | **Closed in this record.** | Top status still instructed Claude to review `7c9e6f53` after section 40 had completed that review and section 41 had applied later integration commits. The mutable status now names the current accepted-after-correction state and exact next bounded step. |
+| IBSH-CCR01 | P2, shared/out of lane | **Open; documented, not fixed.** | `tests/conftest.py` uses normalized-string `startswith` for base-temp containment. A sibling path whose text merely shares the prefix is falsely attributed to this pytest session, contradicting the concurrent-session isolation claim and making an unrelated concurrent suite fail. |
+| IBSH-CCR02 | P2, shared/out of lane | **Open; documented, not fixed.** | The non-mutating teardown guard rereads the same current-session incident after every test. One real leak can therefore error every later test rather than only the offending test, materially obscuring the responsible test and the suite result. |
+| IBSH-CCR03 | P3, shared/out of lane | **Open; documented, not fixed.** | Direct `evaluate_sleeves(now=None)` forwards `None` to each per-position lot evaluation, allowing separate wall-clock samples inside one purported evaluation instant. The notification cycle supplies one aware clock, so the operational path corrected in this range is not affected. |
+| IBSH-CCR04 | P3, shared/machine-local | **Open; documented, not fixed.** | On this checkout, two pre-attribute `research/ml_specs` files remain CRLF while their index blobs are LF, producing exactly two new EOL-guard failures. Healing shared working-copy bytes is outside the Insider lane and was not performed. |
+| IBSH-CCR05 | P3, shared/out of lane | **Open; documented, not fixed.** | `test_shared_research_file_working_copy_matches_its_index_blob` and the shared records say the working-copy bytes match the index blob, but `git ls-files --eol` proves only the classified EOL style. The guard detects the recorded CRLF/LF defect but not arbitrary non-EOL byte drift. |
+
+No P0, P1, or P2 defect remains in the reviewed Insider paths. Shared findings
+were not corrected under the owner's lane-specific rule.
+
+### 42.3 Independent verification and authority
+
+IB-2A now passes **102 tests**. The new test killed the exact final-fingerprint
+suppression mutation and the production module was restored byte-clean. The
+eight-file focused review command produced **394 passed, 3 skipped, 2 failed**;
+both failures are the documented machine-local shared-EOL condition, while the
+Insider and shared behavioral tests passed. Stable patch IDs independently
+match all four cited source commits. `git diff --check` is clean apart from
+line-ending notices.
+
+No SEC/EDGAR/provider endpoint, credential, licensed row, real filing,
+outcome, QuantConnect action, broker, operator database, scheduler,
+deployment, order, or UI was accessed. **Research looks: 0.** The execution
+safety checklist is out of scope for the lane correction; the shared changes
+grant no execution authority.
+
+### 42.4 Counter-review conclusion and next step
+
+The range is **accepted after lane-specific correction** and does not block the
+next structural milestone. IB-2B is limited to deterministic SEC-scoped issuer
+and reporting-owner grouping plus named owner-attribution quarantine over exact
+factory-created IB-2A inventories. Point-in-time market-security mapping,
+ticker/share-class resolution, authenticated amendments, canonical filtering,
+deduplication, lot aggregation, the `$50,000` gate, outcomes, ETF/QC, and all
+operational authority remain excluded.

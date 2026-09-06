@@ -23,6 +23,7 @@ from research.insider_buying import (
     Form4ObservedIdentityDisposition,
     Form4ObservedIdentityInventoryError,
     Form4ObservedOwnerSetOutcome,
+    Form4ProvisionalDispositionReport,
     Form4VersionDisposition,
     ProfileBoundForm4AmendmentEvidence,
     SecEdgarAcceptancePeriodInput,
@@ -2268,3 +2269,44 @@ def test_filing_cannot_list_one_owner_observation_twice(monkeypatch):
             reporting_owner_observation_ids=(owner_id, owner_id),
             filing_observation_id=hash_payload(payload),
         )
+
+
+def test_rebuilt_report_mutation_during_validation_is_refused(monkeypatch):
+    """Direction 1: the final report fingerprint must detect mid-call drift.
+
+    The public builder returns a frozen report, but a hostile collaborator can
+    still use ``object.__setattr__``.  Mutate it only when validation requests
+    the second complete report projection, after the captured fingerprint and
+    all semantic checks, so this test reaches the final defence directly.
+    """
+    evidence = _build_evidence(monkeypatch)
+    real_contract_payload = inventory_module._contract_payload
+    report_projection_count = 0
+
+    def mutating_contract_payload(value, *args, **kwargs):
+        nonlocal report_projection_count
+        if type(value) is Form4ProvisionalDispositionReport:
+            report_projection_count += 1
+            if report_projection_count == 2:
+                object.__setattr__(
+                    value.identity,
+                    "builder_git_commit",
+                    "a" * 40,
+                )
+        return real_contract_payload(value, *args, **kwargs)
+
+    monkeypatch.setattr(
+        inventory_module,
+        "_contract_payload",
+        mutating_contract_payload,
+    )
+    with pytest.raises(
+        Form4ObservedIdentityInventoryError,
+        match="rebuilt upstream report changed during validation",
+    ):
+        build_form4_observed_identity_inventory(
+            evidence,
+            builder_git_commit=BUILDER_COMMIT,
+        )
+
+    assert report_projection_count == 2

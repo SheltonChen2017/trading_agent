@@ -9,6 +9,49 @@ deferred-remediation state below. The original three strategy lanes remain
 independent; this amendment changes shared coordination only and does not edit
 their lane-owned artifacts.
 
+## 0C. Post-integration review of `main`, 2026-09-05
+
+- Owner-directed: sync `main`, review the seven commits of PR #331
+  (`aefa0ecc..86417b89`) with a per-commit disposition, then fix on a branch
+  off `main`. Record:
+  `docs/Archive/Review/REVIEW_2026-09-05_POST_INTEGRATION_MAIN.md` (ledger
+  PIR-001..PIR-007). Fix branch
+  `user/claude/post-integration-review-fixes-2026-09-05`, code commit
+  `f4764671`; the owner performs the PR merge.
+- Fixed (`f4764671`): `evaluate_sleeves` refuses a naive `now` with
+  `SleeveReportError` instead of degrading every growth position to
+  "per-lot view unavailable" (the notification cycle inherits the refusal
+  before any write); the conftest runtime-stop leak guard attributes an
+  incident to this session only when it is under this base temp AND
+  `activated_at` is not before session start, so a reused fixed `--basetemp`
+  cannot error a whole later run on a stale incident; the shared-research EOL
+  test now also asserts worktree bytes match the index blob (the attribute
+  alone left this host's checkout of `86417b89` at `w/crlf` while the test
+  was green) and names the heal `rm <path> && git checkout -- <path>`.
+  Machine-local: this host's `main` checkout was healed that way.
+- Validation on `f4764671`: focused four files 97 passed; four mutations each
+  detected (2 failed / 1 failed + 1 error / 1 failed / 1 failed); compileall
+  (including `research`) clean; `git diff --check` clean; staged blobs
+  `i/lf`. Broader focused run on the committed tree (twelve files: the four above plus `test_atomic_reconciliation_anomaly`, `test_ui_pages_smoke`, `target_price_revisions/test_preregistration`, `test_ml_experiment_contracts`, `test_ml_research_orchestration`, `test_active_document_consistency`, `test_insider_buying_sec_edgar_acceptance_snapshot`, `test_execution_characterization`): 618 passed, 4 skipped, 0 failed (245 s). Full suite not re-run (one boundary check
+  plus test infrastructure; last full run remains `3114a15`).
+- Nothing in this round touches `strategies/`, `backtest/`, `signals/`, any
+  lane package, or a QC backtest run.
+- Owner decisions pending (untouched):
+  - PIR-001: this host's real runtime emergency stop is active at generation
+    26 with 26 pytest-origin incidents (the §0B "42 / 42" figure was the
+    other host); every proposal here is refused, risk-reducing sells
+    included.
+  - PIR-006 was a false alarm (closed): the lane cherry-picks had been pushed
+    from the other host after this session's initial fetch. After `git pull`
+    all four lanes carry the integration; `f4764671` was cherry-picked onto
+    each with `-x` (analyst `5f99d5a5`, insider `62beb3fa`, short-interest
+    `341e63af`, target-price `903a8574`; focused four files 97 passed on
+    each), pointer rows were added to each lane record (`267d16e5`,
+    `7eb3ccc2`, `c380bdb2`, `f67c6332`), and all four lanes were pushed. The
+    review-record/handoff commits stay on `main` only (frozen lane handoff).
+    Machine-local: the three stale lane checkouts on this host were healed of
+    `w/crlf` spec copies.
+
 ## 0B. Owner-directed cross-lane bug-fix integration, 2026-09-04
 
 - The owner directed the dedicated Review lane session to scan all four lane

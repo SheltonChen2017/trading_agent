@@ -8,8 +8,11 @@ from __future__ import annotations
 
 import ast
 import copy
+import gc
 import io
+import threading
 import tokenize
+import weakref
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
@@ -2070,6 +2073,45 @@ def test_share_title_variants_remain_unresolved_quarantine(
         Form4ObservedIdentityDisposition.UNRESOLVED_QUARANTINE
     )
     assert row.resolved_security_identity is None
+
+
+def test_factory_provenance_registry_supports_concurrent_reads_and_gc_cleanup(
+    monkeypatch,
+):
+    _evidence, inventory = _inventory(monkeypatch)
+    registry_key = id(inventory)
+    inventory_reference = weakref.ref(inventory)
+    start = threading.Barrier(9)
+    results = [False] * 8
+
+    def verify_many(index: int) -> None:
+        start.wait()
+        results[index] = all(
+            inventory_module._is_factory_created_observed_identity_inventory(
+                inventory
+            )
+            for _ in range(32)
+        )
+
+    threads = [
+        threading.Thread(target=verify_many, args=(index,))
+        for index in range(len(results))
+    ]
+    for thread in threads:
+        thread.start()
+    start.wait()
+    for thread in threads:
+        thread.join(timeout=10)
+
+    assert all(not thread.is_alive() for thread in threads)
+    assert all(results)
+    assert registry_key in inventory_module._FACTORY_CREATED_INVENTORIES
+
+    del inventory
+    gc.collect()
+    gc.collect()
+    assert inventory_reference() is None
+    assert registry_key not in inventory_module._FACTORY_CREATED_INVENTORIES
 
 
 def test_ib2a_module_has_no_float_network_outcome_qc_or_execution_surface():

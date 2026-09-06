@@ -36,6 +36,7 @@ from research.insider_buying.form4_observed_identity_inventory import (
     Form4ObservedReportingOwnerIdentityRow,
     Form4ObservedTransactionIdentityRow,
     _is_factory_created_observed_identity_inventory,
+    _matches_factory_created_observed_identity_inventory_fingerprint,
 )
 from research.insider_buying.form4_provisional_disposition_report import (
     Form4ProvisionalDisposition,
@@ -1999,9 +2000,104 @@ def _validate_upstream_identity(
     return dict(state)
 
 
+def _project_validated_snapshot(
+    value: object,
+    *,
+    budget: _ProjectionBudget | None = None,
+    depth: int = 0,
+) -> object:
+    """Bound and copy an internally normalized validation snapshot."""
+
+    if budget is None:
+        budget = _ProjectionBudget()
+    if depth > MAX_FORM4_SEC_ENTITY_GROUPING_PROJECTION_DEPTH:
+        raise Form4SecEntityGroupingError(
+            "REFUSED: validated snapshot exceeds the depth bound"
+        )
+    budget.nodes += 1
+    if budget.nodes > MAX_FORM4_SEC_ENTITY_GROUPING_PROJECTION_NODES:
+        raise Form4SecEntityGroupingError(
+            "REFUSED: validated snapshot exceeds the node bound"
+        )
+    value_type = type(value)
+    if value_type is str:
+        budget.text_characters += len(value)
+        if budget.text_characters > MAX_FORM4_OBSERVED_IDENTITY_TEXT_CHARACTERS:
+            raise Form4SecEntityGroupingError(
+                "REFUSED: validated snapshot exceeds the text bound"
+            )
+        return value
+    if value is None or value_type is bool or value_type is int:
+        return value
+    if value_type is dict or value_type is list:
+        active_ids = budget.active_ids
+        assert active_ids is not None
+        value_id = id(value)
+        if value_id in active_ids:
+            raise Form4SecEntityGroupingError(
+                "REFUSED: validated snapshot contains a cycle"
+            )
+        active_ids.add(value_id)
+        try:
+            if value_type is list:
+                return [
+                    _project_validated_snapshot(
+                        item,
+                        budget=budget,
+                        depth=depth + 1,
+                    )
+                    for item in value
+                ]
+            if any(type(key) is not str for key in value):
+                raise Form4SecEntityGroupingError(
+                    "REFUSED: validated snapshot keys are not exact text"
+                )
+            return {
+                key: _project_validated_snapshot(
+                    item,
+                    budget=budget,
+                    depth=depth + 1,
+                )
+                for key, item in value.items()
+            }
+        finally:
+            active_ids.remove(value_id)
+    raise Form4SecEntityGroupingError(
+        "REFUSED: validated snapshot contains an unsupported value"
+    )
+
+
+def _validated_upstream_state_fingerprint(
+    identity: dict,
+    filings: tuple[dict, ...],
+    owners: tuple[dict, ...],
+    transactions: tuple[dict, ...],
+) -> str:
+    payload = {
+        "identity": dict(identity),
+        "filings": [
+            _upstream_filing_full_payload(item) for item in filings
+        ],
+        "reporting_owners": [
+            _upstream_owner_full_payload(item) for item in owners
+        ],
+        "transactions": [
+            _upstream_transaction_full_payload(item)
+            for item in transactions
+        ],
+    }
+    return hash_payload(_project_validated_snapshot(payload))
+
+
 def _validate_upstream_inventory(
     inventory: Form4ObservedIdentityInventory,
-) -> tuple[dict, tuple[dict, ...], tuple[dict, ...], tuple[dict, ...]]:
+) -> tuple[
+    dict,
+    tuple[dict, ...],
+    tuple[dict, ...],
+    tuple[dict, ...],
+    str,
+]:
     """Independently revalidate IB-2A without invoking upstream callbacks."""
 
     state = _exact_state(
@@ -2213,7 +2309,13 @@ def _validate_upstream_inventory(
         raise Form4SecEntityGroupingError(
             "REFUSED: upstream inventory counts or hashes are inconsistent"
         )
-    return identity, filings, owners, transactions
+    state_fingerprint = _validated_upstream_state_fingerprint(
+        identity,
+        filings,
+        owners,
+        transactions,
+    )
+    return identity, filings, owners, transactions, state_fingerprint
 
 
 def _attribution_outcomes_from_states(
@@ -2253,13 +2355,30 @@ def _build_form4_sec_entity_grouping(
             "REFUSED: builder Git commit must be a full lowercase SHA-1"
         )
     captured_fingerprint = _upstream_fingerprint(inventory)
-    if not _is_factory_created_observed_identity_inventory(inventory):
+    if not _matches_factory_created_observed_identity_inventory_fingerprint(
+        inventory,
+        captured_fingerprint,
+    ):
         raise Form4SecEntityGroupingError(
             "REFUSED: upstream inventory is not an unchanged factory-created result"
         )
-    identity_state, filings, owners, transactions = (
-        _validate_upstream_inventory(inventory)
-    )
+    (
+        identity_state,
+        filings,
+        owners,
+        transactions,
+        validated_state_fingerprint,
+    ) = _validate_upstream_inventory(inventory)
+    if (
+        validated_state_fingerprint != captured_fingerprint
+        or not _matches_factory_created_observed_identity_inventory_fingerprint(
+            inventory,
+            validated_state_fingerprint,
+        )
+    ):
+        raise Form4SecEntityGroupingError(
+            "REFUSED: validated snapshot does not match factory provenance"
+        )
 
     issuer_observations_by_cik: dict[
         str,
@@ -2520,7 +2639,7 @@ def _build_form4_sec_entity_grouping(
         "builder_git_commit": builder_git_commit,
         "upstream_inventory_id": identity_state["inventory_id"],
         "upstream_inventory_identity_hash": hash_payload(identity_state),
-        "upstream_inventory_observation_hash": captured_fingerprint,
+        "upstream_inventory_observation_hash": validated_state_fingerprint,
         "upstream_filing_inventory_hash": identity_state["filing_inventory_hash"],
         "upstream_reporting_owner_inventory_hash": (
             identity_state["reporting_owner_inventory_hash"]
@@ -2570,8 +2689,13 @@ def _build_form4_sec_entity_grouping(
         transaction_attributions=sorted_attributions,
         _verified_factory_token=_GROUPING_FACTORY_TOKEN,
     )
+    final_fingerprint = _upstream_fingerprint(inventory)
     if (
-        _upstream_fingerprint(inventory) != captured_fingerprint
+        final_fingerprint != validated_state_fingerprint
+        or not _matches_factory_created_observed_identity_inventory_fingerprint(
+            inventory,
+            final_fingerprint,
+        )
         or not _is_factory_created_observed_identity_inventory(inventory)
     ):
         raise Form4SecEntityGroupingError(

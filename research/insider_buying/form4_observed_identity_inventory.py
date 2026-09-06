@@ -1491,16 +1491,47 @@ def _is_factory_created_observed_identity_inventory(value: object) -> bool:
     try:
         if type(value) is not Form4ObservedIdentityInventory:
             return False
+        observed_fingerprint = _inventory_provenance_fingerprint(value)
+        return _matches_factory_created_observed_identity_inventory_fingerprint(
+            value,
+            observed_fingerprint,
+        )
+    except (
+        AttributeError,
+        Form4ObservedIdentityInventoryError,
+        KeyError,
+        OverflowError,
+        RecursionError,
+        RuntimeError,
+        TypeError,
+        ValueError,
+    ):
+        return False
+
+
+def _matches_factory_created_observed_identity_inventory_fingerprint(
+    value: object,
+    observed_fingerprint: object,
+) -> bool:
+    """Match one observed digest to its factory seal without rescanning state."""
+
+    try:
+        if (
+            type(value) is not Form4ObservedIdentityInventory
+            or type(observed_fingerprint) is not str
+            or len(observed_fingerprint) != 64
+            or _SHA256_RE.fullmatch(observed_fingerprint) is None
+        ):
+            return False
         with _FACTORY_CREATED_INVENTORIES_LOCK:
             current = _FACTORY_CREATED_INVENTORIES.get(id(value))
             return (
                 current is not None
                 and current[0]() is value
-                and current[1] == _inventory_provenance_fingerprint(value)
+                and current[1] == observed_fingerprint
             )
     except (
         AttributeError,
-        Form4ObservedIdentityInventoryError,
         KeyError,
         OverflowError,
         RecursionError,

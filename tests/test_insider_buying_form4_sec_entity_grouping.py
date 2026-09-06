@@ -831,6 +831,8 @@ def test_forged_upstream_identity_hash_and_row_semantics_fail_closed(monkeypatch
     )
     bad_inventory = _forge(inventory, identity=bad_identity)
     with pytest.raises(Form4SecEntityGroupingError):
+        grouping_module._validate_upstream_inventory(bad_inventory)
+    with pytest.raises(Form4SecEntityGroupingError):
         build_form4_sec_entity_grouping(
             bad_inventory,
             builder_git_commit=GROUPING_COMMIT,
@@ -844,6 +846,8 @@ def test_forged_upstream_identity_hash_and_row_semantics_fail_closed(monkeypatch
         inventory,
         filings=(bad_filing,) + inventory.filings[1:],
     )
+    with pytest.raises(Form4SecEntityGroupingError):
+        grouping_module._validate_upstream_inventory(bad_inventory)
     with pytest.raises(Form4SecEntityGroupingError):
         build_form4_sec_entity_grouping(
             bad_inventory,
@@ -896,7 +900,124 @@ def test_coherent_object_forgery_without_factory_provenance_is_refused(
         )
 
 
-def test_coherent_owner_observation_must_match_its_referenced_issuer(monkeypatch):
+def test_registered_inventory_rejects_coherent_pre_call_mutation(monkeypatch):
+    """Object identity alone cannot replace the factory's original digest."""
+
+    inventory = _inventory_for_specs(monkeypatch, (_spec(1),))
+    filing = _forge(inventory.filings[0], issuer_cik=OTHER_ISSUER_CIK)
+    filing = _forge(
+        filing,
+        filing_observation_id=hash_payload(filing.lineage_payload()),
+    )
+    transaction = _forge(
+        inventory.transactions[0],
+        filing_observation_id=filing.filing_observation_id,
+    )
+    transaction = _forge(
+        transaction,
+        transaction_observation_id=hash_payload(transaction.lineage_payload()),
+    )
+    identity = _forge(
+        inventory.identity,
+        filing_inventory_hash=hash_payload([filing.to_payload()]),
+        transaction_inventory_hash=hash_payload([transaction.to_payload()]),
+    )
+    identity = _forge(
+        identity,
+        inventory_id=(
+            "form4-observed-identity-inventory-"
+            f"{hash_payload(identity.lineage_payload())[:16]}"
+        ),
+    )
+    object.__setattr__(inventory, "identity", identity)
+    object.__setattr__(inventory, "filings", (filing,))
+    object.__setattr__(inventory, "transactions", (transaction,))
+
+    with pytest.raises(Form4SecEntityGroupingError, match="factory|provenance"):
+        build_form4_sec_entity_grouping(
+            inventory,
+            builder_git_commit=GROUPING_COMMIT,
+        )
+
+
+@pytest.mark.parametrize(
+    "observed_fingerprint",
+    (None, True, "A" * 64, "a" * 63, "g" * 64, "0" * 64),
+)
+def test_factory_registry_matcher_refuses_malformed_fingerprints(
+    monkeypatch,
+    observed_fingerprint,
+):
+    inventory = _inventory_for_specs(monkeypatch, (_spec(1),))
+    exact_fingerprint = grouping_module._upstream_fingerprint(inventory)
+
+    assert (
+        grouping_module
+        ._matches_factory_created_observed_identity_inventory_fingerprint(
+            inventory,
+            exact_fingerprint,
+        )
+    )
+    assert not (
+        grouping_module
+        ._matches_factory_created_observed_identity_inventory_fingerprint(
+            inventory,
+            observed_fingerprint,
+        )
+    )
+
+
+def test_transient_inventory_swap_cannot_change_the_consumed_snapshot(monkeypatch):
+    """An A-to-B-to-A swap during validation must never emit B as A."""
+
+    inventory_a = _inventory_for_specs(monkeypatch, (_spec(1),))
+    inventory_b = _inventory_for_specs(
+        monkeypatch,
+        (_spec(3, issuer_cik=OTHER_ISSUER_CIK),),
+    )
+    original_state = {
+        name: vars(inventory_a)[name]
+        for name in grouping_module._INVENTORY_FIELDS
+    }
+    replacement_state = {
+        name: vars(inventory_b)[name]
+        for name in grouping_module._INVENTORY_FIELDS
+    }
+    real_validate = grouping_module._validate_upstream_inventory
+
+    def validate_during_transient_swap(value):
+        for name, item in replacement_state.items():
+            object.__setattr__(inventory_a, name, item)
+        try:
+            return real_validate(value)
+        finally:
+            for name, item in original_state.items():
+                object.__setattr__(inventory_a, name, item)
+
+    monkeypatch.setattr(
+        grouping_module,
+        "_validate_upstream_inventory",
+        validate_during_transient_swap,
+    )
+    with pytest.raises(Form4SecEntityGroupingError, match="factory|provenance"):
+        build_form4_sec_entity_grouping(
+            inventory_a,
+            builder_git_commit=GROUPING_COMMIT,
+        )
+    assert all(
+        vars(inventory_a)[name] is item
+        for name, item in original_state.items()
+    )
+
+
+@pytest.mark.parametrize(
+    "mismatch_field",
+    ("accession_number", "source_sha256", "accepted_at_utc"),
+)
+def test_coherent_owner_observation_must_match_its_referenced_issuer(
+    monkeypatch,
+    mismatch_field,
+):
     specs = (
         _spec(1),
         _spec(
@@ -917,13 +1038,17 @@ def test_coherent_owner_observation_must_match_its_referenced_issuer(monkeypatch
         if item.owner_cik == OWNER_CIK
     )
     owner_observation = owner_candidate.observations[0]
-    changed_acceptance = (
-        datetime.fromisoformat(owner_observation.accepted_at_utc)
-        + timedelta(seconds=1)
-    ).isoformat(timespec="seconds")
+    mismatches = {
+        "accession_number": "0000123456-26-999997",
+        "source_sha256": "1" * 64,
+        "accepted_at_utc": (
+            datetime.fromisoformat(owner_observation.accepted_at_utc)
+            + timedelta(seconds=1)
+        ).isoformat(timespec="seconds"),
+    }
     changed_observation = _rehash_owner_observation(
         owner_observation,
-        accepted_at_utc=changed_acceptance,
+        **{mismatch_field: mismatches[mismatch_field]},
     )
     changed_candidate = _rehash_owner_candidate(
         owner_candidate,
@@ -952,12 +1077,23 @@ def test_coherent_owner_observation_must_match_its_referenced_issuer(monkeypatch
         _validate_forged_grouping(forged)
 
 
-def test_coherent_transaction_must_match_its_referenced_filing(monkeypatch):
+@pytest.mark.parametrize(
+    ("mismatch_field", "mismatch_value"),
+    (
+        ("accession_number", "0000123456-26-999998"),
+        ("source_sha256", "2" * 64),
+    ),
+)
+def test_coherent_transaction_must_match_its_referenced_filing(
+    monkeypatch,
+    mismatch_field,
+    mismatch_value,
+):
     _inventory, grouping = _group(monkeypatch, _pair())
     transaction = grouping.transaction_attributions[0]
     changed_transaction = _rehash_transaction_attribution(
         transaction,
-        accession_number="0000123456-26-999998",
+        **{mismatch_field: mismatch_value},
     )
     transactions = tuple(
         changed_transaction if item is transaction else item
@@ -1189,6 +1325,49 @@ def test_projection_resource_bound_fails_closed(monkeypatch):
         )
 
 
+@pytest.mark.parametrize(
+    ("value_factory", "constant_name", "expected_message"),
+    (
+        (
+            lambda: {"key": "value"},
+            "MAX_FORM4_SEC_ENTITY_GROUPING_PROJECTION_NODES",
+            "node bound",
+        ),
+        (
+            lambda: "value",
+            "MAX_FORM4_OBSERVED_IDENTITY_TEXT_CHARACTERS",
+            "text bound",
+        ),
+        (
+            lambda: [None],
+            "MAX_FORM4_SEC_ENTITY_GROUPING_PROJECTION_DEPTH",
+            "depth bound",
+        ),
+    ),
+)
+def test_validated_snapshot_resource_guards_fail_closed(
+    monkeypatch,
+    value_factory,
+    constant_name,
+    expected_message,
+):
+    monkeypatch.setattr(grouping_module, constant_name, 0)
+    with pytest.raises(Form4SecEntityGroupingError, match=expected_message):
+        grouping_module._project_validated_snapshot(value_factory())
+
+
+def test_validated_snapshot_shape_guards_fail_closed():
+    cyclic: list[object] = []
+    cyclic.append(cyclic)
+    for value, expected_message in (
+        (cyclic, "cycle"),
+        ({1: "value"}, "exact text"),
+        (object(), "unsupported value"),
+    ):
+        with pytest.raises(Form4SecEntityGroupingError, match=expected_message):
+            grouping_module._project_validated_snapshot(value)
+
+
 def test_projection_node_cap_covers_the_declared_upstream_maximum_envelope():
     filing_count = grouping_module.MAX_FORM4_OBSERVED_IDENTITY_FILINGS
     owner_count = (
@@ -1247,6 +1426,67 @@ def test_every_identity_and_transaction_authority_gate_is_zero(monkeypatch):
     assert grouping.consumed_outcome_looks == 0
 
 
+@pytest.mark.parametrize(
+    ("target_name", "field_name"),
+    (
+        ("identity", "official_profile_compatibility_verified"),
+        ("identity", "official_amendment_link_verified"),
+        ("identity", "complete_amendment_coverage_verified"),
+        ("identity", "point_in_time_issuer_identity_verified"),
+        ("identity", "point_in_time_reporting_owner_identity_verified"),
+        ("identity", "point_in_time_security_identity_verified"),
+        ("identity", "point_in_time_transaction_identity_verified"),
+        ("identity", "ordinary_equity_classification_verified"),
+        ("identity", "canonical_filter_authorized"),
+        ("identity", "lot_aggregation_authorized"),
+        ("identity", "outcomes_authorized"),
+        ("identity", "qc_execution_authorized"),
+        ("identity", "deployment_authorized"),
+        ("identity", "trading_authorized"),
+        ("identity", "authorized_outcome_looks"),
+        ("identity", "consumed_outcome_looks"),
+        ("issuer", "point_in_time_issuer_identity_verified"),
+        ("owner", "point_in_time_reporting_owner_identity_verified"),
+        ("transaction", "point_in_time_issuer_identity_verified"),
+        ("transaction", "point_in_time_reporting_owner_identity_verified"),
+        ("transaction", "point_in_time_security_identity_verified"),
+        ("transaction", "point_in_time_transaction_identity_verified"),
+        ("transaction", "canonical_filter_authorized"),
+        ("transaction", "lot_aggregation_authorized"),
+    ),
+)
+def test_every_output_authority_escalation_is_refused(
+    monkeypatch,
+    target_name,
+    field_name,
+):
+    _inventory, grouping = _group(monkeypatch, _pair())
+    targets = {
+        "identity": (
+            grouping.identity,
+            grouping_module._IDENTITY_FACTORY_TOKEN,
+        ),
+        "issuer": (
+            grouping.issuer_candidates[0],
+            grouping_module._CANDIDATE_FACTORY_TOKEN,
+        ),
+        "owner": (
+            grouping.reporting_owner_candidates[0],
+            grouping_module._CANDIDATE_FACTORY_TOKEN,
+        ),
+        "transaction": (
+            grouping.transaction_attributions[0],
+            grouping_module._ROW_FACTORY_TOKEN,
+        ),
+    }
+    target, token = targets[target_name]
+    escalated_value = 1 if field_name.endswith("_looks") else True
+    forged = _forge(target, **{field_name: escalated_value})
+
+    with pytest.raises(Form4SecEntityGroupingError, match="authority|identity"):
+        type(target).__post_init__(forged, token)
+
+
 def test_public_result_types_are_factory_gated(monkeypatch):
     _inventory, grouping = _group(monkeypatch, (_spec(1),))
 
@@ -1270,9 +1510,20 @@ def test_ib2b_module_has_no_float_network_provider_outcome_qc_or_execution_surfa
     imported: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
-            imported.update(alias.name.split(".", 1)[0] for alias in node.names)
+            imported.update(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module:
-            imported.add(node.module.split(".", 1)[0])
+            imported.add(node.module)
+    assert imported == {
+        "__future__",
+        "data.hashing",
+        "dataclasses",
+        "datetime",
+        "enum",
+        "re",
+        "research.insider_buying.form4_amendment_reconciliation",
+        "research.insider_buying.form4_observed_identity_inventory",
+        "research.insider_buying.form4_provisional_disposition_report",
+    }
     assert imported.isdisjoint(
         {
             "QuantConnect",

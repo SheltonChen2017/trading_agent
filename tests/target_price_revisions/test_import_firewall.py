@@ -31,6 +31,8 @@ def test_current_target_package_transitive_import_closure_is_safe():
     assert "research.target_price_revisions" in reached
     assert "research.target_price_revisions.canonical" in reached
     assert "research.target_price_revisions.import_firewall" in reached
+    assert "research.target_price_revisions.trust_root" in reached
+    assert "research.target_price_revisions.windows_acl" in reached
     assert "research.analyst_revisions_v2" not in reached
     assert "execution" not in reached
     assert "importlib" not in DEFAULT_ALLOWED_STDLIB_ROOTS
@@ -138,7 +140,7 @@ def test_literal_nondangerous_getattr_remains_available(tmp_path):
     ) == ("guarded",)
 
 
-@pytest.mark.parametrize("imported", ["third_party_facade", "os"])
+@pytest.mark.parametrize("imported", ["third_party_facade", "sys"])
 def test_only_explicitly_allowed_standard_library_roots_are_external(
     tmp_path, imported
 ):

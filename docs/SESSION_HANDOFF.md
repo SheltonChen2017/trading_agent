@@ -97,12 +97,36 @@ their lane-owned artifacts.
   owner decision; research-contract items (four-family `1/80` re-freeze,
   duplicate-key loader) route to their lanes; `ml.immutable_io` relocation is
   an integration-milestone item.
-- Owner decision pending: the real runtime stop file on this host is active
-  at generation 42 with 42 test-origin incidents; the documented clear path
-  cannot run (origin databases are gone). The session did not touch it.
+- Owner decision, since taken (follow-up 1 below): the real runtime stop file
+  on this host was active at generation 42 with 42 test-origin incidents and
+  the documented clear path could not run (origin databases are gone); the
+  owner directed it cleared.
 - Validation on the final integration tree: full suite on `3114a15` in an isolated detached worktree with an external `--basetemp`: 6799 passed, 13 skipped, 25 warnings, 0 failed (2124 s); compileall including `research` clean; `git diff --check` clean. Baseline `main` at `aefa0ec` in the same setup: 4 failed, 6786 passed, 13 skipped (the four wall-clock failures).
 - `main` still shows the four wall-clock failures until the integration PR is
   merged; every lane branch carries the same fix commits after this round.
+- Owner follow-ups executed the same day: (1) the real
+  `%LOCALAPPDATA%\trading_agent\runtime\state\execution-emergency-stop.json`
+  on this host (generation 42, 42 incidents, every origin a pytest/temp
+  database) was deleted under the runtime's own state fence after a
+  byte-identical backup was taken; the runtime now reads it as inactive,
+  generation 0, and recreates it on the next real activation. (2) The
+  Target-price lane's copy of this handoff, which that lane had been editing
+  per round, was restored byte-for-byte to this branch's version and the
+  three lane guards that bound it to lane state were retargeted to the lane
+  record and Action Plan (`16b3435`, `522da19`, `47103e4` on
+  `codex/strategy-target-price-revisions`). (3) The analyst and
+  short-interest clone directories were fast-forwarded to their pushed tips.
+- (4) On the owner's further direction, the Target-price lane's
+  `docs/ACTION_PLAN_2026-08-20.md`, which carried the same class of per-round
+  lane edits (nine commits since `main`), was restored byte-for-byte to
+  `main`'s version (`e989872` on that branch) and the lane guards that read
+  its target block and row for per-round state were retargeted to the lane
+  record in the following commit. Both shared coordination documents are now
+  identical on that lane and this branch. (5) On owner direction the Action
+  Plan's Target-price block and table row were refreshed on this branch as a
+  concise 2026-09-04 reference to the lane record's section 8 (replacing the
+  2026-08-30 next-action sentence) and mirrored to that lane; they are no
+  longer per-round pointers.
 
 ## 0. Target-Price Revision fourth-lane planning addition
 

@@ -1,1 +1,1 @@
-{"entries":[],"schema":"tpr-reviewed-algorithm-registry-v1"}
+{"entries":[],"schema":"tpr-reviewed-algorithm-registry-v2","signature_policy":{"allowed_signers_path_id":"windows-programdata-customizedagent-trust-tpr-allowed-signers-v1","format":"ssh","key_type":"ssh-ed25519","namespace":"git","principal":"shelton-tpr-reviewer"}}

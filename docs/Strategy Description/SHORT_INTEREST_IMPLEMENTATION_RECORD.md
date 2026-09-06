@@ -1,17 +1,19 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE'S SI-3C-P3 REVIEW COMMIT `702bde02` HAS BEEN
-COUNTER-REVIEWED AND IS ACCEPTED AFTER FOUR P3 RECORD CORRECTIONS IN SECTION
-37. ADDITIVE SI-3C-P4 AT `4596dda` PRESERVES V1 EXACTLY AND ADDS A STRICT V2
-ENVELOPE THAT SERIALIZES THE COMPLETE RAW-DISPOSITION INVENTORY ONCE AND
-REFERENCES IT FROM EVERY COHORT. AT SYNTHETIC `C=2`/`C=4`, `N=20`, V2 STORES
-40/80 INVENTORY ENTRIES INSTEAD OF V1'S 80/320 WHILE PRESERVING THE EXACT
-LEGACY ROW DIGESTS. A GENERALIZED V1/V2 MUTABLE-PAYLOAD AUTHENTICATION P2 AND
-FOUR P3 DRAFT FINDINGS WERE CLOSED BEFORE COMMIT; THREE INDEPENDENT RE-AUDITS
-FOUND NO REMAINING P0-P3. THE EXACT EIGHT-FILE LANE IS 302 PASSED. SI-3C-P4
-IS INTERNALLY ACCEPTED PENDING CLAUDE REVIEW AND REMAINS NO-GO FOR
-LICENSED/PROVIDER/PRODUCTION SCALE. ALL PROVIDER, OUTCOME, ETF, QUANTCONNECT,
-BROKER, DEPLOYMENT, ORDER, AND TRADING GATES REMAIN CLOSED.**
+Status: **THE TWELVE-COMMIT POST-SI-3C-P4 RANGE
+`cc8bcd7cda11bbb54e6e90a5dd583519580db3ac..13079d577ebdcbfe5c286c4cb4d4a9ece6634688`
+HAS BEEN COUNTER-REVIEWED COMMIT BY COMMIT. ONE LANE-SPECIFIC P3 TEST
+SENSITIVITY DEFECT WAS CORRECTED AT `f39a62c`; SHARED OUT-OF-LANE DEFECTS ARE
+DOCUMENTED IN SECTION 40 AND WERE NOT FIXED. ADDITIVE SI-0M AT `66f0fef`
+FREEZES THE OWNER-DIRECTED FOUR-FAMILY MULTIPLICITY, HOLDOUT, NULL-RESULT,
+FUTURE-QC, AND ZERO-AUTHORITY BOUNDARIES WITHOUT CHANGING THE LEGACY SI
+PREREGISTRATION OR ANY EXISTING PAYLOAD. ITS EXACT NINE-FILE SHORT INTEREST
+LANE IS 457 PASSED. SI-0M IS INTERNALLY ACCEPTED AFTER PRE-COMMIT CORRECTION
+AND PENDING CLAUDE REVIEW. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED;
+AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL PROVIDER,
+LICENSED-DATA, OUTCOME, HOLDOUT, ETF, QUANTCONNECT, BROKER,
+OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT, PAPER/LIVE, ORDER, AND TRADING GATES
+REMAIN CLOSED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -154,6 +156,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-02 | Claude review | `f2fca4e9` -> `6db112d5` reviewed; no correction required (this record commit is the round's only change) | Independent review of the SI-3C-P2 counter-review and the SI-3C-P3 multi-cycle inventory characterization | Reviewed both pushed commits individually and accepted each. Started 3 behind and 0 ahead with a clean worktree and fast-forwarded on the same branch; no rebase, rewrite or branch switch. Proved the test-only claim by file list rather than accepting it: the range changes exactly this record and `tests/test_short_interest_stock_normalization.py`, and `git diff --name-only` restricted to `research/` returns nothing, so no production source, schema, policy, preregistration, formula, provider interface, outcome, portfolio, package export or QuantConnect code changed. Confirmed the characterization drives the real PIT raw-feature, normalization, envelope and compact-verification pipeline with receipt digests checked against a freshly built envelope. | Complete repository suite at `6db112d5` inside the named lane worktree with pytest's normal external temp: **6,842 passed, 13 skipped, 4 failed, 25 known dependency warnings in 1,572.17s (26m12s)**; **no Short Interest test failed**. This reconciles exactly with the recorded 6,843 passed and 3 failures at **6,846** non-skipped tests either way; the one extra failure here is the Analyst `SI-SYNC-001` exact-byte test, whose absence from the implementer's sleeve-only failure set is direct evidence that it is a machine-local checkout artifact rather than a repository defect. Complete eight-file lane **275 passed in 193.83s**, matching the record; active-document **69 passed**; compileall including `research` exit 0; `git diff --check` clean. Independently recomputed every scale figure from the payload: `C=2` gives 40 rows, 2 cohorts, 80 stored raw-inventory entries and 358,965 bytes; `C=4` gives 80 rows, 4 cohorts, 320 entries and 930,051 bytes; stored inventory grows exactly **4x** and total compact bytes **2.591x**. Derived and confirmed the identities stored `= C^2 x N`, unique per cohort `= C x N`, stored over unique `= C`, and member entries `= (C-1) x N`, and confirmed the `C=2` byte figure equals the SI-3C-P1 `N=20` envelope as expected. Verified both draft corrections directly: the four-cycle sample carries its own 2024-03-12 reference horizon with every `decision_at` at or before it, and exactly the same twenty stable security identifiers appear in every cycle. Also checked the record-level PIT rule itself rather than the horizon proxy: no lifecycle or classification observation valid on a row's execution session has `available_at` later than that row's `execution_at`. Python 3.12.13, pytest 9.1.1. Synthetic/offline only; no credential, provider/licensed row, price/outcome, QuantConnect artifact/upload/compile/job, broker, operator database, scheduler, deployment, order or trading access; **0 research looks**. No scratch worktree was created. | No P0, P1, P2 or P3 issue found and no correction required. One precise observation recorded rather than raised as a defect: all `C` cohort inventories hash to a single digest at both sample sizes, so the `C^2` term is pure duplication of one identical `C x N` table, and the envelope's existing content-addressed member-set mechanism is not applied to it. SI-3C-P3 is characterization only and explicitly neither designs nor authorizes that reduction. SI-3C-P3 quality **9/10**, the withheld point being that two `C` points at a single `N` confirm the identity on this fixture family rather than across `N`. Out of lane and unfixed: `SI-SYNC-001`, now shown machine-local, and the three permanently expired sleeve-clock assertions. Details in section 36. | Codex counter-reviews this record commit; because no code changed, that scope is section 36's accuracy. No milestone started and none authorized. The compact envelope remains **no-go for licensed/provider/production scale**: its gain is serialized output only, construction and verification still materialize the legacy rows, and the multi-cycle inventory term is now measured as quadratic in cycle count. `S2`-`S4`, DTC delta and window `K`, ranking/seeding and tie rules, full licensed SI-1/SI-2, SI-4 ETF reverse indexing/aggregation, outcomes, portfolio stages, and every QuantConnect artifact/upload/compile/job remain gated. |
 | 2026-09-03 | Codex counter-review + implementation | `702bde02` -> `4596dda` (code/test snapshot; this lane-record commit follows) | Counter-review of Claude's SI-3C-P3 review + SI-3C-P4 content-addressed serialized inventory | Accepted Claude's record-only commit after four P3 documentation corrections. Added strict, separate V2 envelope/receipt/build/verify APIs; each compact cohort references one top-level content-addressed complete raw inventory. V1 bytes, schema, hashes, call signatures, and valid outputs remain unchanged. Generalized a confirmed mutable-payload TOCTOU correction across V1/V2 so structural validation, authentication and receipt identity use one captured canonical snapshot and expanding APIs return only authenticated typed rows. | Exact eight-file lane: **302 passed in 926.88s**. Four TOCTOU regressions were red before correction; corrected selection **6 passed**. Re-inline mutation: **2 failed, 80 deselected**; restored. Final role/metadata selection **4 passed, 79 deselected**. compileall including `research` exit 0; `git diff --check` clean. Full repository run was owner-interrupted for immediate push after reaching **33% with no failure emitted** and is excluded as incomplete. Synthetic/offline only; prohibited surfaces untouched; **0 looks**. | No P0/P1. `SI-CCR15-001..004` (P3) and `SI3CP4-REV-001` (P2), `002..005` (P3) are closed. Three final independent audits found no remaining P0-P3. Details in section 37. | Commit this record and make the round's single push. Claude reviews `4596dda` and the record commit individually. V2 remains provider/production no-go; all licensed-data, outcome, ETF, QC-job, broker, deployment and trading gates remain closed. |
 | 2026-09-04 | Claude review | `702bde02` -> `cc8bcd7c` reviewed; test-only correction at `3ddf7bd` (this record commit follows) | Independent review of SI-3C-P4 content-addressed V2 serialized inventory | Reviewed both pushed commits individually. Every material claim was executed rather than read: all eight recorded scale figures reproduce exactly; V1 valid outputs are preserved against the retained pre-commit expansion path including reversed input; the pre-existing V1 golden digest `82f579b6...` is untouched; V2 cache and receipt resist caller mutation; dict/list subclass attacks and a fully re-addressed forgery are refused by exact-type and content rules. | Full repository on the exact pushed tree in the single lane worktree: **6,869 passed, 14 skipped, 3 failed, 25 warnings in 2,979.08s (49m39s)**; the three failures are the out-of-lane `tests/test_sleeve_report.py` clock-dependent assertions documented in section 34.5 and were not fixed. The count reconciles exactly against section 35's 6,843 / 13 / 3: the lane normalization file grew from 56 to 83 collected tests (+27, all from `4596dda1`), and one host-specific installer preview test passes on the implementer's host but skips here (6,843 + 27 - 1 = 6,869 passed; 13 + 1 = 14 skipped). Active-document consistency (which the implementer could not run): 69 passed. Exact eight-file lane after correction: **302 passed in 682.92s (11m22s)**, the same count the implementer recorded, since the correction adds no test. Mutations with byte-exact restore: M1 re-inline the authenticated snapshot: 2 of 8 selected cases red - the V1 and V2 receipt-hashes-the-authenticated-snapshot tests - while both expanding-verifier cases stay green because they return rows from typed dispositions; M2 disable the inventory-set content-digest check: 28 lane cases green (survivor; see `SI-CR4-003`); M3 disable the orphan-inventory check: 1 red; M4 disable the trailing `inventory_count != 1` refusal: 28 green (unreachable; `SI-CR4-002`); M5 disable the inventory-equals-row-currents completeness check: 1 red; M6 alter the shared schema-refusal message text: the pinned cross-feed test turns red (1 failed) and green on byte-exact restore; M7/M7b disable the outcome-to-cohort binding in V2 and in V1: 28 and 20 lane cases green, and the cohort-metadata forgery is still refused by `expanded row does not match its disposition digest` in both versions (survivors; see `SI-CR4-003`). Synthetic fixtures only; no credential, provider, licensed row, outcome, QuantConnect, broker, operator database, scheduler, deployment or order access; **0 research looks**. | One test-sensitivity defect corrected in-lane (`SI-CR4-001`); advisories `SI-CR4-002` and `SI-CR4-003` recorded; no P0-P2. Accepts `SI-CCR15-001..004` against my prior record. Details in section 38. | Codex counter-reviews `3ddf7bd` and this record commit. V2 remains no-go for licensed/provider/production scale; all research and execution gates remain closed. |
+| 2026-09-06 | Codex counter-review + implementation | `13079d5` -> `66f0fef` (code/test snapshot; this lane-record commit follows) | Twelve-commit counter-review plus SI-0M zero-authority four-family research gate | Counter-reviewed every commit in `cc8bcd7c..13079d5`. Tightened four V1/V2 cross-schema regressions at `f39a62c` so they pin the exact top-level refusal. Documented but did not fix shared out-of-lane findings. Added immutable, content-addressed `SIETF-SI0M-RESEARCH-GATE-v1` at `66f0fef`, binding the four fixed strategy families, shared two-sided FWER `1/20`, permanent Short Interest maximum `1/80`, expiring unused/withdrawn allocations, owner-required within-lane allocation, common cutoff/holdout, stock-null closure, future SI-7 QC input boundary, and every empirical/operational authority false. The legacy preregistration payload and SHA-256 remain unchanged. | Exact nine-file Short Interest lane: **457 passed in 667.79s (11m07s)**. Gate/import/cross-schema selection at the committed snapshot: **165 passed, 82 deselected in 10.02s**; restored-source post-mutation selection: **167 passed, 80 deselected in 18.11s**. Full repository: **7,043 passed, 14 skipped, 2 failed, 25 warnings in 2,957.08s (49m17s)**; both failures are the out-of-lane stale-CRLF files named in section 40. Mutation proofs: immutable-receipt mutation **1 failed**, restored **1 passed**; legacy exact-tuple mutation **1 failed, 15 passed**, restored **16 passed**. compileall including `research` exit 0; `git diff --check` clean before this record. Synthetic/offline only; no prohibited access; **0 authorized looks, 0 consumed looks**. | `SI-CCR16-001` closed in-lane; record/process findings are corrected or explicitly superseded below. Six shared P2/P3 findings remain routed out of lane and deliberately unfixed. SI-0M closed five P2 and seven P3 draft findings before `66f0fef`; three independent final audits found no remaining P0-P3. | Commit this record, fetch only `origin/codex/strategy-short-interest`, and make the round's single combined push if the remote remains `13079d5`. Claude reviews `f39a62c`, `66f0fef`, and the record commit individually. No outcome look or later empirical/QC milestone may start without the still-missing owner allocation and applicable access authority. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -5189,11 +5192,11 @@ Resolved items are retained. There are no P0, P1 or P2 findings.
 ### 38.6 Validation
 
 - Full repository suite on the exact pushed tree `cc8bcd7c`, inside the single
-  lane worktree: ****6,869 passed, 14 skipped, 3 failed, 25 warnings in 2,979.08s (49m39s)**; the three failures are the out-of-lane `tests/test_sleeve_report.py` clock-dependent assertions documented in section 34.5 and were not fixed. The count reconciles exactly against section 35's 6,843 / 13 / 3: the lane normalization file grew from 56 to 83 collected tests (+27, all from `4596dda1`), and one host-specific installer preview test passes on the implementer's host but skips here (6,843 + 27 - 1 = 6,869 passed; 13 + 1 = 14 skipped)**. This is the complete run the implementer could
+  lane worktree: **6,869 passed, 14 skipped, 3 failed, 25 warnings in 2,979.08s (49m39s)**; the three failures are the out-of-lane `tests/test_sleeve_report.py` clock-dependent assertions documented in section 34.5 and were not fixed. The count reconciles exactly against section 35's 6,843 / 13 / 3: the lane normalization file grew from 56 to 83 collected tests (+27, all from `4596dda1`), and one host-specific installer preview test passes on the implementer's host but skips here (6,843 + 27 - 1 = 6,869 passed; 13 + 1 = 14 skipped). This is the complete run the implementer could
   not finish (stopped at 33%). No Short Interest test failed.
 - Active-document consistency, which the implementer's host could not start:
   **69 passed**.
-- Exact eight-file Short Interest lane on the corrected tree: ****302 passed in 682.92s (11m22s)**, the same count the implementer recorded, since the correction adds no test**.
+- Exact eight-file Short Interest lane on the corrected tree: **302 passed in 682.92s (11m22s)**, the same count the implementer recorded, since the correction adds no test.
 - Mutations (single lane worktree, byte-exact restore verified after each):
   M1 re-inline the authenticated snapshot: 2 of 8 selected cases red - the V1 and V2 receipt-hashes-the-authenticated-snapshot tests - while both expanding-verifier cases stay green because they return rows from typed dispositions; M2 disable the inventory-set content-digest check: 28 lane cases green (survivor; see `SI-CR4-003`); M3 disable the orphan-inventory check: 1 red; M4 disable the trailing `inventory_count != 1` refusal: 28 green (unreachable; `SI-CR4-002`); M5 disable the inventory-equals-row-currents completeness check: 1 red; M6 alter the shared schema-refusal message text: the pinned cross-feed test turns red (1 failed) and green on byte-exact restore; M7/M7b disable the outcome-to-cohort binding in V2 and in V1: 28 and 20 lane cases green, and the cohort-metadata forgery is still refused by `expanded row does not match its disposition digest` in both versions (survivors; see `SI-CR4-003`).
 - `git diff --check` clean; compileall including `research` exit 0.
@@ -5267,3 +5270,220 @@ other branches explicitly (a self-declared review in a foreign repository →
 `share one repository`; an uncommitted one inside the anchored repository →
 `committed and clean`). `research/target_price_revisions/preregistration.py`
 is unchanged; this is a test-determinism correction and grants no authority. Validation on this head: Target-price preregistration test file plus active-document consistency: 152 passed, 2 skipped in 26.62s.
+
+## 40. Codex twelve-commit counter-review and SI-0M research gate - 2026-09-06
+
+Role: Codex counter-review and implementation in the sole named worktree
+`C:\git\customizedAgent\trading_agent_short_interest` on
+`codex/strategy-short-interest`. The exact reviewed range is
+`cc8bcd7cda11bbb54e6e90a5dd583519580db3ac..13079d577ebdcbfe5c286c4cb4d4a9ece6634688`.
+It contains twelve commits and is linear from the last reviewed SI-3C-P4
+snapshot. The branch was fetched and fast-forwarded without switching branches,
+rebasing, or rewriting history.
+
+**Counter-review disposition: accepted after one lane correction and the
+record/process qualifications below.** The only lane-specific code/test defect
+is `SI-CCR16-001`, corrected at
+`f39a62ca19c8315b4f8e8d9f95979d2ff41648df`. Shared findings remain outside
+this lane's Short Interest/QC purpose and were documented but not fixed.
+
+**SI-0M disposition: internally accepted after pre-commit correction.**
+Commit `66f0fef4ac66f7d8f8805fa02ec0b918fbb10463` adds an immutable,
+zero-access research-governance gate. It changes no existing SI payload,
+formula, ranking, source, outcome, ETF, portfolio, or QuantConnect behavior.
+Claude review of `f39a62c`, `66f0fef`, and this record commit remains pending.
+
+### 40.1 Exact commit dispositions
+
+| Commit | Scope | Codex disposition |
+|---|---|---|
+| `3ddf7bd` | Pin V1/V2 cross-feed refusals | Accepted after the lane-specific test correction at `f39a62c`. |
+| `edc49f8` | Claude SI-3C-P4 review record | Accepted after the section-40 accuracy and formatting corrections. |
+| `13cd0f4` | Shared app/test defect integration | Accepted as a recorded lane incorporation; four shared P3 findings are documented out of lane and not fixed. |
+| `1c70179` | Notification clock and import-bound decoder | Accepted; focused behavior and regression coverage verified. |
+| `de8c9b1` | Shared integration record and lane-direction documents | Accepted after narrowing its absolute concurrent-session claim below. |
+| `fb81ec8` | Lane-local integration record | Accepted after correcting the missing-ledger and stale-status interpretation below. |
+| `4a2086d` | Deterministic Target Price self-review test | Accepted; the former `SI-OOL-003` was corrected here and is no longer merely routed. |
+| `a1281b7` | Shared F-8 integration record | Accepted after qualifying cross-lane identity: F1-F7 are identical; F-8 contains a lane-targeted adaptation. |
+| `e0cddcb` | Lane F-8 follow-up record | Accepted after the stale routing statement is superseded below. |
+| `341e63a` | Naive sleeve clock, runtime-leak attribution, and EOL assertion | Incorporation acknowledged, but shared code acceptance remains conditional because two P2 and two P3 defects are open outside this lane. |
+| `c380bdb` | Lane post-integration follow-up record | Accepted after the section-40 scope and evidence qualifications. |
+| `13079d5` | Align shared integration record with `main` | Content alignment accepted; process acceptance remains qualified by the missing durable owner-evidence finding below. |
+
+### 40.2 Mandatory P0-P3 counter-review ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---:|---|---|---|---|---|---|---|---|
+| SI-CCR16-001 | P3 | Closed at `f39a62c` | `3ddf7bd` | `tests/test_short_interest_stock_normalization.py`, four V1/V2 cross-feed assertions | `match="frozen schema"` could match a nested refusal and did not prove that cross-feeding stopped at the top-level schema boundary. | The intended diagnostic is exactly `payload fields are not exactly the frozen schema`; a later nested message containing the same fragment could leave the old assertions green. | A dangerous-direction regression must pin the boundary it claims. | Replaced all four expressions with `match=r"^payload fields are not exactly the frozen schema$"`. | Exact regression: **1 passed, 82 deselected in 8.17s**; final focused set and complete lane are green. |
+| SI-CCR16-002 | P3 | Closed by section 40 | `edc49f8` and later integrations | Top status | Status still described SI-3C-P4 as pending Claude review after that review and the subsequent shared integrations had landed. | Git ancestry and sections 38-39 contradict the old top block. | The lane record is the branch-local handoff. | Replaced the status with the exact reviewed range, correction, SI-0M snapshot, test state, and closed authorities. | Top block names `13079d5`, `f39a62c`, and `66f0fef`. |
+| SI-CCR16-003 | P3 | Closed by section 40 | `edc49f8` | Section 38.4, “fully re-addressed forgery” | The attack was not fully re-addressed: outcome cohort references and row disposition digests remained stale, so the wording overstated the attack's independence. | The reported refusals include `outcome cohort reference does not match row` and then `expanded row does not match its disposition digest`; typed equality/authentication is decisive. | Review prose must distinguish a partial structural re-address from a complete forgery. | Preserve section 38 as historical text but supersede “fully re-addressed” here with “partially re-addressed structural forgery”; no product conclusion changes. | The forgery remains refused; only the evidence description is narrowed. |
+| SI-CCR16-004 | P3 | Closed mechanically | `edc49f8` | Section 38.6 | Two validation totals began with four asterisks and two sentences ended with stray bold terminators. | Source inspection showed `****6,869`, `****302`, and two unmatched closing markers. | Malformed Markdown obscures validation evidence. | Corrected only the four bold markers without changing any historical number or claim. | CommonMark source is balanced after the substitutions. |
+| SI-CCR16-005 | P3 | Closed prospectively; historical gap retained | `edc49f8..13079d5` | Session/push ledger | No ledger row was appended for the post-2026-09-04 integration pushes, despite the standing “append one row before every push” rule. | The ledger ended at the 2026-09-04 Claude row while section 39 and Git history record later pushed changes. | Durable cross-machine handoff cannot depend on prose elsewhere in the file. | Preserve history; identify the omitted period here and append the current `13079d5 -> 66f0fef` row before this round's push. | The new row is contiguous with the existing table; future rounds remain bound to the rule. |
+| SI-CCR16-006 | P3 | Closed by section 40 | `a1281b7`, `e0cddcb` | Section 39 and shared integration wording | Section 39 still says `SI-OOL-003` was routed to Target Price after F-8 had already fixed it, and broad “identical commits to every lane” wording overreaches for the lane-targeted F-8 adaptation. | `4a2086d` contains the deterministic test correction. F1-F7 are the identical common integration; F-8's target adaptation differs by lane context. | Routing and patch-identity claims must describe the resulting history precisely. | Supersede the routing sentence: `SI-OOL-003` is closed by `4a2086d`. Qualify identity as F1-F7 identical and F-8 target-adapted. | File/commit comparison and the section-39 F-8 table identify the exact correction. |
+| SI-CCR16-007 | P2 | Open; owner evidence required | `341e63a`, `13079d5` | Shared integration authorization trail | The inspected durable records do not contain a separate owner decision authorizing these post-exception shared changes after the one-time common-remediation exception had expired. | The commits post-date the exception's documented completion, while the lane/shared records inspected provide no later owner-authority citation. This proves an evidence gap, not that no chat authorization occurred. | Shared-file changes on a frozen strategy lane require durable, reviewable authority. | No history or shared document changed from this lane. Record the gap and require an owner/source-lane citation before treating it as resolved. The 2026-09-06 request authorizes this current round, not retroactive integration history. | Open pending durable owner evidence. |
+| SI-CCR16-008 | P3 | Closed by qualification | `de8c9b1`, `341e63a` | Shared F-3 record and section 39 | The statement that concurrent suites cannot trip the leak guard is absolute, but the implementation is a base-temp-path plus timestamp heuristic. | Isolation depends on distinct base-temp roots and a timestamp that represents the current write; reused roots or preserved timestamps are outside that guarantee. | A test-harness heuristic must not be documented as a universal concurrency proof. | Preserve the shared record but narrow this lane's acceptance to the stated assumptions. | Direct source review of `tests/conftest.py` confirms both predicates. |
+
+No in-lane P0, P1, or remaining P2/P3 defect was found after `f39a62c`.
+The following findings are shared and outside the Short Interest/QC lane. They
+are documented as required and deliberately not fixed here.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---:|---|---|---|---|---|---|---|---|
+| SI-CCR16-OOL-001 | P2 | Open; routed out of lane | `341e63a` | `tests/conftest.py::_incident_predates_this_session` | A current runtime-stop write that preserves an older incident's `activated_at` is classified as pre-session and can evade the leak guard. | Attribution compares incident content time, not stop-file write time or a session nonce. | A current test leak can leave the machine-global stop latched without failing its source test. | Not fixed; shared test infrastructure is outside this lane. | Confirmed by source-path and timestamp analysis; route to the shared review/remediation lane. |
+| SI-CCR16-OOL-002 | P2 | Open; routed out of lane | `341e63a` | `tests/test_shared_research_eol_attributes.py` | Failure text recommends `rm <path> && git checkout -- <path>`, which can destroy uncommitted user changes. | The literal destructive recovery command is emitted by the assertion. | Test guidance must not prescribe irreversible cleanup without preserving user work. | Not fixed; shared repository tooling is outside this lane. | Direct source inspection. |
+| SI-CCR16-OOL-003 | P3 | Open; routed out of lane | `13cd0f4`, retained by `341e63a` | `tests/conftest.py` origin-path attribution | String `startswith` treats sibling names such as `pytest-1000` as descendants of `pytest-100`. | The guard normalizes strings and calls `.startswith(session_base)` without a path-component boundary. | False attribution can blame the wrong concurrent suite. | Not fixed; shared test infrastructure is outside this lane. | Direct boundary counterexample. |
+| SI-CCR16-OOL-004 | P3 | Open; routed out of lane | `13cd0f4`, retained by `341e63a` | `assistant/sleeve_report.py::_growth_positions` | When `now` is omitted, each ticker passes `None` to `unrealized_by_lot`, allowing separate wall-clock reads within one report. | `evaluate_sleeves` does not resolve a single live instant before the position loop. | One report should have one evaluation instant, especially across a tax-term boundary. | Not fixed; Trading App/report behavior is outside this lane. | Direct call-flow inspection. |
+| SI-CCR16-OOL-005 | P3 | Open; routed out of lane | `13cd0f4` | `tests/test_ui_pages_smoke.py` and `assistant/macro_context.py` | The smoke fixture patches module attributes, but `build_descriptive_macro_context(fetcher=fetch_historical)` retains the keyword-only object bound at function definition. | Monkeypatching `assistant.macro_context.fetch_historical` does not replace the default object retained in `build_descriptive_macro_context.__kwdefaults__`. | The purported no-network smoke isolation has a dormant escape path. | Not fixed; UI/macro code is outside this lane. | Static default-binding inspection. |
+| SI-CCR16-OOL-006 | P3 | Open; routed out of lane | `341e63a` | `tests/test_shared_research_eol_attributes.py` | The test/documentation claims exact byte equality but only compares Git's index/worktree EOL classifications. | Equal `i/<eol>` and `w/<eol>` values do not prove all bytes equal. This machine still reports two stale out-of-lane CRLF failures for `research/ml_specs/volatility-discovery-v1.json` and `research/ml_specs/volatility-discovery-v1.review-request.json`. | Evidence language and assertion strength must agree. | Not fixed and no checkout healing performed. | Full-suite failures and direct test inspection. |
+
+### 40.3 Historical statements superseded without rewriting history
+
+The following interpretations supersede, but do not erase, prior text:
+
+1. Section 38.4's “fully re-addressed forgery” means a **partially
+   re-addressed structural forgery**. Outcome cohort references and row
+   disposition digests remained stale; typed equality/content validation
+   still correctly refused it.
+2. Section 39's `SI-OOL-003` routing sentence is stale after `4a2086d`;
+   that deterministic Target Price test issue is closed.
+3. The common F1-F7 application is identical across lanes. F-8 is a
+   target-specific adaptation and must not be represented as one identical
+   cross-lane commit.
+4. Concurrent-suite isolation is conditional on distinct base-temp roots and
+   truthful current-write timestamps; it is not a universal guarantee.
+5. The missing durable authorization citation for `341e63a` and `13079d5`
+   remains open. No authority is inferred retroactively.
+6. Section 39 remains the narrative integration history, while the missing
+   push-ledger events are disclosed in `SI-CCR16-005`. The new ledger row
+   restores compliance prospectively.
+
+### 40.4 Why SI-0M is the next bounded milestone
+
+The owner multiplicity amendment in
+`docs/ACTION_PLAN_2026-08-20.md`, source commit
+`6b12102b9710efb838e41cefd94cfcecd3ab592d`, is the current sequencing
+authority. Together with the shared-family amendment in
+`docs/THREE_STRATEGY_PROJECT_DIRECTION.md`, source commit
+`ba01e98f9d3c8746c70182818a27a2d49a9c0fe7`, it supersedes any older
+implication that SI-3C-P5 or an outcome-bearing step should begin next.
+
+SI-0M freezes the prerequisite governance boundary without choosing a score,
+rank, seed, parameter, provider, confirmatory cell, alpha split, or permanent
+look. Both directive commits were verified as ancestors containing the exact
+owner language. No frozen project-wide document was changed.
+
+The new gate is additive:
+
+- version `SIETF-SI0M-RESEARCH-GATE-v1`;
+- blueprint SHA-256
+  `2f7ccff9bcd35810b11350314fd6e47c7c92e24ac35a866addb82ce66645b14c`;
+- unchanged legacy preregistration SHA-256
+  `83165e805a8ad91787d10f066b28e14a1d6655d2dd19c4b5efd8a02a1ceeef9f`;
+- new gate semantic SHA-256
+  `1d612d47369dbe642e10323a0154a5b5e1cd671e7e0d1a4f2631cb3f733f0f6e`;
+- fixed family IDs `analyst-revisions-v2`, `insider-buying`,
+  `short-interest`, and `target-price-revisions`;
+- exact shared two-sided FWER `1/20` and permanent lane maximum `1/80`;
+- unused and withdrawn allocations expire, with no transfer,
+  redistribution, or denominator recomputation;
+- empty `confirmatory_alpha_allocations` and `permanent_look_ids`,
+  `allocation_state=owner_decision_required`, and zero authorized/consumed
+  outcome looks;
+- common research cutoff `2027-08-31` and inaccessible holdout
+  `2027-09-01` through `2029-08-31`;
+- a valid stock-level null closes the canonical family and cannot be rescued
+  by industry, ETF, or QuantConnect work;
+- later hypotheses require a separately preregistered family and an
+  owner-authorized permanent look budget, with no post-result tuning, rerun,
+  or retroactive rescue;
+- future QuantConnect work is stage `SI-7` and may consume only independently
+  reviewed immutable precomputed or custom signals; and
+- every network, FINRA, provider, programmatic source-data request, credential,
+  licensed-row, outcome, holdout, QuantConnect, common-family evaluation,
+  integration, capital, broker, operator-database, scheduler, paper/live,
+  deployment, and trading authority is false.
+
+`source_data_request_authorized` means programmatic outbound acquisition; it
+does not prohibit asking the owner for a future decision. The package export is
+additive. The singleton is exact-type validated and admitted at module import,
+and `require_short_interest_research_gate()` returns only the immutable SHA-256
+receipt rather than a caller-owned object.
+
+### 40.5 SI-0M implementation-review findings
+
+| ID | Priority | Status | Draft issue | Correction |
+|---|---:|---|---|---|
+| SI0M-REV-001 | P3 | Closed before `66f0fef` | Stock-null rules omitted explicit industry rescue. | Added `industry_can_rescue_valid_stock_null=False` beside ETF and QC refusals. |
+| SI0M-REV-002 | P3 | Closed before `66f0fef` | The no-dynamic-import AST test missed some call shapes. | Generalized the AST scan across all calls. |
+| SI0M-REV-003 | P3 | Closed before `66f0fef` | Package docstring described only the legacy contract. | Updated it to describe the additive SI-0M gate. |
+| SI0M-REV-004 | P3 | Closed before `66f0fef` | Prospective allocation source used the overly specific key `look_id`. | Renamed the source template to `cell_or_look_id`; the inventory remains empty, so no populated allocation schema is claimed or hash-bound. |
+| SI0M-REV-005 | P3 | Closed before `66f0fef` | `source_requests_authorized` was ambiguous. | Renamed it to `source_data_request_authorized` and documented its acquisition meaning. |
+| SI0M-REV-006 | P2 | Closed before `66f0fef` | A subclass could forge payload/hash behavior. | Require the exact `ShortInterestResearchGate` class and call base implementations directly. |
+| SI0M-REV-007 | P2 | Closed before `66f0fef` | Same-value wrong runtime types or a stale legacy binding could pass semantic checks. | Added exact-class/type/value validation and legacy SHA binding before hashing. |
+| SI0M-REV-008 | P2 | Closed before `66f0fef` | A forged legacy preregistration subclass or noncanonical daily-volume identity could evade the intended boundary. | Validate the exact legacy object contract and prohibit the noncanonical feed from impersonating it. |
+| SI0M-REV-009 | P2 | Closed before `66f0fef` | Admission returned the caller-owned gate, creating a post-admission mutation/TOCTOU surface. | Return only the immutable pinned SHA-256 receipt. |
+| SI0M-REV-010 | P2 | Closed before `66f0fef` | Same-value legacy fields with wrong exact types or mutable list substitutes were accepted. | Added exhaustive exact-type and tuple-only validation. |
+| SI0M-REV-011 | P3 | Closed before `66f0fef` | Mutation coverage omitted several governance fields. | Extended mutation cases across directive, multiplicity, holdout, null, QC, and authority fields. |
+| SI0M-REV-012 | P3 | Closed before `66f0fef` | The import-time admission test accepted nested or dead-code calls. | Require exactly one top-level call immediately after the singleton assignment. |
+
+Five P2 and seven P3 draft findings were closed before commit. Three
+independent final read-only audits reported no remaining P0-P3.
+
+### 40.6 Validation and mutation evidence
+
+- Exact focused gate/import/cross-schema selection at `66f0fef`:
+  **165 passed, 82 deselected in 10.02s**.
+- Restored-source focused selection after the explicit mutations:
+  **167 passed, 80 deselected in 18.11s**.
+- Exact complete nine-file Short Interest lane at `66f0fef`:
+  **457 passed in 667.79s (11m07s)**.
+- Full repository suite at exact `66f0fef`:
+  **7,043 passed, 14 skipped, 2 failed, 25 warnings in 2,957.08s
+  (49m17s)**. Both failures are the out-of-lane stale-CRLF working copies
+  named in `SI-CCR16-OOL-006`; no Short Interest test failed.
+- Immutable-receipt mutation: returning the caller-owned gate made the exact
+  regression red, **1 failed in 1.37s**; textual restore returned it green,
+  **1 passed in 0.91s**.
+- Legacy exact-tuple mutation: accepting a tuple subclass made the parameter
+  set red, **1 failed, 15 passed in 1.12s**; textual restore returned it green,
+  **16 passed in 0.89s**.
+- Required compileall including `research`: **exit 0**.
+- Black and Ruff are not installed on this host; manual line-length inspection
+  found no new source line over 88 characters.
+- `git diff --check`: **clean after the final record update**.
+- Active-document consistency after this record: **69 passed**.
+- Validation host: **Python 3.13.14 / pytest 9.1.1**.
+
+All inputs were tracked documentation and synthetic/offline fixtures. No
+credential, FINRA/provider/network acquisition, licensed row, source-data
+request, price, market outcome, shared holdout, QuantConnect artifact/upload/
+processing/compile/job/backtest, common-family evaluation, integration,
+capital, broker, operator database, scheduler, deployment, paper/live, order,
+or trading surface was accessed. **Authorized outcome looks: 0. Consumed
+outcome looks: 0.**
+
+The two stale CRLF working-copy failures are out-of-lane checkout state. They
+are reported but not healed, because healing could overwrite user work and is
+outside this lane.
+
+### 40.7 Gates and next review
+
+SI-0M is governance infrastructure, not evidence of market edge and not
+authority to run a research look. No confirmatory cell, alpha allocation, or
+permanent look exists yet. Licensed SI-1/SI-2, `S2`-`S4`, DTC delta/window
+`K`, ranking/seeding/ties, SI-4 ETF work, every outcome join, portfolio stages,
+and all QuantConnect execution remain gated.
+
+Commit this record, fetch only
+`origin/codex/strategy-short-interest`, and make the round's single combined
+push only if the remote still resolves to `13079d5`. Claude then independently
+reviews, commit by commit:
+
+1. `f39a62ca19c8315b4f8e8d9f95979d2ff41648df`;
+2. `66f0fef4ac66f7d8f8805fa02ec0b918fbb10463`; and
+3. the following lane-record commit.
+
+Codex counter-reviews every resulting Claude commit before another milestone.
+No outcome-bearing or QuantConnect milestone may begin until the owner fixes
+the within-lane allocation and permanent look IDs and separately opens every
+applicable access gate.

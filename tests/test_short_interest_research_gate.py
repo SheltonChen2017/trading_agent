@@ -669,3 +669,57 @@ def test_module_admits_the_singleton_at_import_time() -> None:
     assert len(singleton_assignments) == 1
     assert len(admission_calls) == 1
     assert admission_calls[0] == singleton_assignments[0] + 1
+
+
+def test_direct_subclass_construction_is_refused_before_admission() -> None:
+    """The constructor, not only ``require_...``, is an exact-type boundary.
+
+    A subclass that overrides nothing inherits ``to_payload`` and so hashes to
+    the pinned identity; only the ``__post_init__`` exact-type check refuses it
+    at construction. Removing that check left every other test green, so this
+    pins the record's claim that the gate is exact-type validated when built,
+    not merely when admitted.
+    """
+
+    class InheritedGate(ShortInterestResearchGate):
+        pass
+
+    with pytest.raises(
+        ShortInterestPreregistrationError,
+        match="exact frozen contract type",
+    ):
+        InheritedGate()
+
+
+def test_legacy_payload_schema_extension_is_refused_by_the_bound_hash(
+    monkeypatch,
+) -> None:
+    """Field-by-field legacy checks cannot see a new payload key; the hash can.
+
+    Every existing legacy field is pinned individually, so the SHA-256 binding
+    is reachable only when the legacy payload gains a key none of those checks
+    name. Removing the binding left every other test green. Simulate the schema
+    drift at the exact class method the gate calls.
+    """
+    original_to_payload = preregistration.ShortInterestPreregistration.to_payload
+
+    def extended_to_payload(self):
+        payload = original_to_payload(self)
+        payload["extension_authorized"] = True
+        return payload
+
+    monkeypatch.setattr(
+        preregistration.ShortInterestPreregistration,
+        "to_payload",
+        extended_to_payload,
+    )
+    with pytest.raises(
+        ShortInterestPreregistrationError,
+        match="legacy SI-0 preregistration identity drifted",
+    ):
+        ShortInterestResearchGate()
+    with pytest.raises(
+        ShortInterestPreregistrationError,
+        match="legacy SI-0 preregistration identity drifted",
+    ):
+        _ = SHORT_INTEREST_RESEARCH_GATE.semantic_sha256

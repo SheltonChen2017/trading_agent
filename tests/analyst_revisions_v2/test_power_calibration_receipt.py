@@ -2378,3 +2378,120 @@ def test_input_authority_loader_uses_one_authenticated_parent_snapshot(
             module.require_loaded_power_calibration_input_authority(loaded)
     finally:
         object.__setattr__(candidate, "manifest_id", original_manifest_id)
+
+
+def test_input_authority_must_match_the_reviewed_pin_not_merely_its_parents(
+    tmp_path: Path, parents: _Parents
+):
+    # ARV2R17-001: a structurally valid, parent-bound authority rendered for a
+    # different owner triple must refuse on the pin alone.  Nothing else in the
+    # loader distinguishes it from the reviewed artifact.
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    with _fixture_only_truth_gate(inputs.truth_approval_path):
+        other = module.render_power_calibration_input_authority(
+            parents.content_contract,
+            inputs.candidate,
+            production_truth_approval_path=inputs.truth_approval_path,
+            owner_authorization_id="owner-other-authorization-20260907",
+            owner_authorization_evidence_sha256="f" * 64,
+            authorized_at_utc=AUTHORIZED_AT_UTC,
+        )
+    other_path = tmp_path / "other-input-authority.json"
+    other_path.write_bytes(other.encode("utf-8"))
+    reviewed_path = tmp_path / "input-authority.json"
+    assert other_path.read_bytes() != reviewed_path.read_bytes()
+    with _fixture_only_authority_gate(reviewed_path, inputs.truth_approval_path):
+        with pytest.raises(
+            module.PowerCalibrationReceiptError,
+            match="does not match the reviewed pin",
+        ):
+            module.load_power_calibration_input_authority(
+                other_path,
+                content_contract=parents.content_contract,
+                manifest_candidate=inputs.candidate,
+                production_truth_approval_path=inputs.truth_approval_path,
+            )
+
+
+def test_production_truth_approval_must_match_the_reviewed_pin_not_merely_its_candidate(
+    tmp_path: Path, parents: _Parents
+):
+    # ARV2R17-002: a self-consistent aggregate carrying a different review
+    # triple must refuse on the truth pin before the authority is even read.
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    other_truth_path = tmp_path / "other-truth-approval.json"
+    other_truth_path.write_bytes(
+        _render(
+            module._truth_approval_document(
+                inputs.candidate,
+                review_id="fixture-only-other-truth-review",
+                review_evidence_sha256="e" * 64,
+                reviewed_at_utc=FIXTURE_TRUTH_REVIEWED_AT_UTC,
+            )
+        )
+    )
+    assert other_truth_path.read_bytes() != inputs.truth_approval_path.read_bytes()
+    reviewed_path = tmp_path / "input-authority.json"
+    with _fixture_only_authority_gate(reviewed_path, inputs.truth_approval_path):
+        with pytest.raises(
+            module.PowerCalibrationReceiptError,
+            match="does not match the reviewed pin",
+        ):
+            module.load_power_calibration_input_authority(
+                reviewed_path,
+                content_contract=parents.content_contract,
+                manifest_candidate=inputs.candidate,
+                production_truth_approval_path=other_truth_path,
+            )
+
+
+def test_receipt_loader_refuses_rehashed_output_drift_at_load_not_only_downstream(
+    tmp_path: Path, parents: _Parents
+):
+    # ARV2R17-003: a receipt whose closed output was changed and whose identity
+    # and filename were recomputed to match is refused by the load-time
+    # recomputation comparison, not merely by a later persisted-reauthentication.
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    computed = _compute(parents, inputs)
+    raw = _thaw(computed.definition)
+    raw["required_receipt_fields"]["required_valid_dates"] += 1
+    raw = module._content_identity(
+        raw,
+        id_field="receipt_id",
+        hash_field="receipt_hash",
+        prefix=module.RECEIPT_ID_PREFIX,
+    )
+    path = tmp_path / f"{raw['receipt_id']}.{raw['receipt_hash']}.json"
+    path.write_bytes(_render(raw))
+    with pytest.raises(
+        module.PowerCalibrationReceiptError,
+        match="differs from recomputation",
+    ):
+        module.load_power_calibration_receipt(
+            path,
+            content_contract=parents.content_contract,
+            manifest_candidate=inputs.candidate,
+            input_authority=inputs.input_authority,
+            beta_series_path=inputs.beta_path,
+            component_count_path=inputs.component_path,
+        )
+
+
+def test_atomic_facade_preserves_different_payload_residue_in_reserved_namespace(
+    tmp_path: Path,
+):
+    # ARV2R17-004: the bounded recovery sweep may remove only exact same-payload
+    # or same-inode residue; a private same-owner temporary holding different
+    # bytes is foreign work in progress and must survive publication.
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    foreign = tmp_path / ".receipt.json.atomic-99999-0000.tmp"
+    foreign_payload = b"different in-progress bytes\n"
+    foreign.write_bytes(foreign_payload)
+    foreign.chmod(0o600)
+    assert artifact_io_module.create_new_regular_atomically(
+        destination, payload, name="fixture artifact", maximum_bytes=128
+    ) == destination.resolve()
+    assert destination.read_bytes() == payload
+    assert foreign.exists()
+    assert foreign.read_bytes() == foreign_payload

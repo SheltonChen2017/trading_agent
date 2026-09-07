@@ -568,6 +568,42 @@ def _validate_forged_grouping(grouping) -> None:
     )
 
 
+def test_owner_attribution_uses_one_primitive_rule_implementation():
+    """Pin CR04: constructor and builder must share one rule body."""
+
+    source = Path(grouping_module.__file__).read_text(encoding="utf-8")
+    function_names = tuple(
+        node.name
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    )
+    assert function_names.count("_owner_attribution_outcomes") == 1
+    assert "_outcomes_from_output_owners" not in function_names
+    assert "_attribution_outcomes_from_states" not in function_names
+
+    rule = grouping_module._owner_attribution_outcomes
+    single = Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED
+    missing = Form4OwnerAttributionOutcome.MISSING_OWNER_SET_QUARANTINED
+    multiple = Form4OwnerAttributionOutcome.MULTIPLE_OWNER_SET_QUARANTINED
+    duplicate = Form4OwnerAttributionOutcome.DUPLICATE_OWNER_CIK_QUARANTINED
+    incomplete = (
+        Form4OwnerAttributionOutcome.INCOMPLETE_OWNER_RELATIONSHIP_QUARANTINED
+    )
+    assert rule((), ()) == (missing,)
+    assert rule((OWNER_CIK,), (True,)) == (single,)
+    assert rule((OWNER_CIK,), (False,)) == (incomplete,)
+    assert rule((OWNER_CIK, OTHER_OWNER_CIK), (True, False)) == (
+        multiple,
+        incomplete,
+    )
+    assert rule((OWNER_CIK, OWNER_CIK), (True, True)) == (
+        multiple,
+        duplicate,
+    )
+    with pytest.raises(Form4SecEntityGroupingError, match="primitive owner state"):
+        rule((OWNER_CIK,), ())
+
+
 def test_same_cik_groups_aliases_and_keeps_amendment_observations_distinct(
     monkeypatch,
 ):

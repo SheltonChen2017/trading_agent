@@ -1147,24 +1147,34 @@ def _grouping_identity_payload(
     }
 
 
-def _outcomes_from_output_owners(
-    owners: tuple[Form4SecReportingOwnerObservation, ...],
+def _owner_attribution_outcomes(
+    owner_ciks: tuple[str, ...],
+    relationships_complete: tuple[bool, ...],
 ) -> tuple[Form4OwnerAttributionOutcome, ...]:
-    if len(owners) == 1 and owners[0].relationship_complete:
+    if (
+        type(owner_ciks) is not tuple
+        or type(relationships_complete) is not tuple
+        or len(owner_ciks) != len(relationships_complete)
+        or any(type(item) is not str for item in owner_ciks)
+        or any(type(item) is not bool for item in relationships_complete)
+    ):
+        raise Form4SecEntityGroupingError(
+            "REFUSED: primitive owner state is invalid"
+        )
+    if len(owner_ciks) == 1 and relationships_complete[0]:
         return (
             Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED,
         )
-    if not owners:
+    if not owner_ciks:
         return (Form4OwnerAttributionOutcome.MISSING_OWNER_SET_QUARANTINED,)
     outcomes = [
         Form4OwnerAttributionOutcome.MULTIPLE_OWNER_SET_QUARANTINED
-    ] if len(owners) > 1 else []
-    owner_ciks = tuple(item.owner_cik for item in owners)
+    ] if len(owner_ciks) > 1 else []
     if len(set(owner_ciks)) != len(owner_ciks):
         outcomes.append(
             Form4OwnerAttributionOutcome.DUPLICATE_OWNER_CIK_QUARANTINED
         )
-    if any(not item.relationship_complete for item in owners):
+    if any(not item for item in relationships_complete):
         outcomes.append(
             Form4OwnerAttributionOutcome.INCOMPLETE_OWNER_RELATIONSHIP_QUARANTINED
         )
@@ -1433,8 +1443,12 @@ class Form4SecEntityGrouping:
                 raise Form4SecEntityGroupingError(
                     "REFUSED: transaction-to-issuer candidate binding is invalid"
                 )
-            expected_outcomes = _outcomes_from_output_owners(
-                normalized_owners_by_filing[transaction.filing_observation_id]
+            filing_owners = normalized_owners_by_filing[
+                transaction.filing_observation_id
+            ]
+            expected_outcomes = _owner_attribution_outcomes(
+                tuple(item.owner_cik for item in filing_owners),
+                tuple(item.relationship_complete for item in filing_owners),
             )
             if transaction.owner_attribution_outcomes != expected_outcomes:
                 raise Form4SecEntityGroupingError(
@@ -2318,30 +2332,6 @@ def _validate_upstream_inventory(
     return identity, filings, owners, transactions, state_fingerprint
 
 
-def _attribution_outcomes_from_states(
-    owners: tuple[dict, ...],
-) -> tuple[Form4OwnerAttributionOutcome, ...]:
-    if len(owners) == 1 and owners[0]["relationship_complete"] is True:
-        return (
-            Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED,
-        )
-    if not owners:
-        return (Form4OwnerAttributionOutcome.MISSING_OWNER_SET_QUARANTINED,)
-    outcomes = [
-        Form4OwnerAttributionOutcome.MULTIPLE_OWNER_SET_QUARANTINED
-    ] if len(owners) > 1 else []
-    owner_ciks = tuple(owner["owner_cik"] for owner in owners)
-    if len(set(owner_ciks)) != len(owner_ciks):
-        outcomes.append(
-            Form4OwnerAttributionOutcome.DUPLICATE_OWNER_CIK_QUARANTINED
-        )
-    if any(owner["relationship_complete"] is not True for owner in owners):
-        outcomes.append(
-            Form4OwnerAttributionOutcome.INCOMPLETE_OWNER_RELATIONSHIP_QUARANTINED
-        )
-    return tuple(outcomes)
-
-
 def _build_form4_sec_entity_grouping(
     inventory: Form4ObservedIdentityInventory,
     *,
@@ -2549,7 +2539,13 @@ def _build_form4_sec_entity_grouping(
             )
         issuer_candidate = issuer_candidate_by_cik[issuer_observation.issuer_cik]
         filing_owner_states = tuple(owner_states_by_filing[filing_key])
-        outcomes = _attribution_outcomes_from_states(filing_owner_states)
+        outcomes = _owner_attribution_outcomes(
+            tuple(owner["owner_cik"] for owner in filing_owner_states),
+            tuple(
+                owner["relationship_complete"] is True
+                for owner in filing_owner_states
+            ),
+        )
         if outcomes == (
             Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED,
         ):

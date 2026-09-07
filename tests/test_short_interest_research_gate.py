@@ -284,19 +284,23 @@ def test_gate_is_bound_to_blueprint_and_immutable_directive_sources() -> None:
     )
     action_plan_text = action_plan.read_text(encoding="utf-8")
     direction_text = direction.read_text(encoding="utf-8")
+    action_plan_words = " ".join(action_plan_text.split())
+    direction_words = " ".join(direction_text.split())
     assert "the four named strategy-selection lanes are one fixed family" in (
-        action_plan_text
+        action_plan_words
     )
-    assert "permanent maximum allocation of\n`1/80 = 0.0125`" in action_plan_text
+    assert "permanent maximum allocation of `1/80 = 0.0125`" in (
+        action_plan_words
+    )
     assert "allocation expires and is never transferred, redistributed" in (
-        action_plan_text
+        action_plan_words
     )
     assert "Owner-coordinated shared-family amendment, 2026-08-29" in (
-        direction_text
+        direction_words
     )
-    assert "common cutoff session is **2027-08-31**" in direction_text
-    assert "untouched shared final holdout\nis **2027-09-01 through 2029-08-31**" in (
-        direction_text
+    assert "common cutoff session is **2027-08-31**" in direction_words
+    assert "untouched shared final holdout is **2027-09-01 through 2029-08-31**" in (
+        direction_words
     )
 
 
@@ -723,3 +727,26 @@ def test_legacy_payload_schema_extension_is_refused_by_the_bound_hash(
         match="legacy SI-0 preregistration identity drifted",
     ):
         _ = SHORT_INTEREST_RESEARCH_GATE.semantic_sha256
+
+
+def test_admission_refuses_gate_payload_extension_by_bound_hash(
+    monkeypatch,
+) -> None:
+    """Admission must authenticate the complete frozen gate payload."""
+    original_to_payload = ShortInterestResearchGate.to_payload
+
+    def extended_to_payload(self):
+        payload = original_to_payload(self)
+        payload["extension_authorized"] = True
+        return payload
+
+    monkeypatch.setattr(
+        ShortInterestResearchGate,
+        "to_payload",
+        extended_to_payload,
+    )
+    with pytest.raises(
+        ShortInterestPreregistrationError,
+        match="frozen semantic identity",
+    ):
+        require_short_interest_research_gate(SHORT_INTEREST_RESEARCH_GATE)

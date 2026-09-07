@@ -51,6 +51,7 @@ _FORBIDDEN_RUNTIME_NAMES = frozenset(
     {
         "__builtins__",
         "__import__",
+        "_create_artifact_atomically",
         "builtins",
         "compile",
         "delattr",
@@ -88,8 +89,12 @@ _FORBIDDEN_RUNTIME_ATTRIBUTES = frozenset(
         "_eval_type",
         "_evaluate",
         "_file_identity",
+        "_fsync_directory",
         "_is_link_like",
         "_read_regular_once",
+        "_recover_stale_atomic_links",
+        "_require_private_single_link",
+        "_write_descriptor_all",
         "builtins",
         "eval",
         "evaluate_forward_ref",
@@ -121,6 +126,9 @@ _RESTRICTED_CAPABILITY_NAMES = frozenset(
 )
 _CAPABILITY_IMPORTER = "research.analyst_revisions_v2.dataset"
 _ARTIFACT_IO_FACADE = "research.analyst_revisions_v2.artifact_io"
+_POWER_RECEIPT_FACADE = (
+    "research.analyst_revisions_v2.power_calibration_receipt"
+)
 _FIREWALL_MODULE = "research.analyst_revisions_v2.import_firewall"
 
 
@@ -238,7 +246,24 @@ _SAFE_LOCAL_FACADE_EXPORTS = {
         }
     )
 }
-_NO_MODULE_OBJECT_FACADES = frozenset(_SAFE_LOCAL_FACADE_EXPORTS)
+_RESTRICTED_LOCAL_FACADE_EXPORTS = {
+    _POWER_RECEIPT_FACADE: frozenset(
+        {
+            "PowerCalibrationReceipt",
+            "PowerCalibrationReceiptError",
+            "power_calibration_receipt_artifact_sha256",
+            "require_persisted_power_calibration_receipt",
+        }
+    )
+}
+_NO_MODULE_OBJECT_FACADES = frozenset(
+    _SAFE_LOCAL_FACADE_EXPORTS | _RESTRICTED_LOCAL_FACADE_EXPORTS
+)
+_IMPORTER_SCOPED_SAFE_LOCAL_FACADE_EXPORTS = {
+    "research.analyst_revisions_v2.power_calibration_receipt": {
+        _ARTIFACT_IO_FACADE: frozenset({"create_new_regular_atomically"})
+    }
+}
 
 
 class ImportBoundaryError(ValueError):
@@ -440,6 +465,17 @@ def _reject_runtime_import_indirection(
     facade_aliases: dict[str, frozenset[str]] = {}
     safe_facade_export_aliases: dict[str, str] = {}
 
+    def safe_facade_exports(facade: str) -> frozenset[str] | None:
+        general = _SAFE_LOCAL_FACADE_EXPORTS.get(facade)
+        scoped = _IMPORTER_SCOPED_SAFE_LOCAL_FACADE_EXPORTS.get(
+            module.name, {}
+        ).get(facade)
+        if general is None:
+            return scoped
+        if scoped is None:
+            return general
+        return general | scoped
+
     def remember_facade_alias(name: str, safe_exports: frozenset[str]) -> bool:
         existing = facade_aliases.get(name)
         narrowed = safe_exports if existing is None else existing & safe_exports
@@ -451,7 +487,7 @@ def _reject_runtime_import_indirection(
     for candidate in ast.walk(tree):
         if isinstance(candidate, ast.Import):
             for alias in candidate.names:
-                safe_exports = _SAFE_LOCAL_FACADE_EXPORTS.get(alias.name)
+                safe_exports = safe_facade_exports(alias.name)
                 if safe_exports is None:
                     continue
                 if alias.asname:
@@ -461,14 +497,14 @@ def _reject_runtime_import_indirection(
         elif isinstance(candidate, ast.ImportFrom):
             from_candidates = _from_import_candidates(candidate, module)
             imported_base = from_candidates[0] if from_candidates else ""
-            base_safe_exports = _SAFE_LOCAL_FACADE_EXPORTS.get(imported_base)
+            base_safe_exports = safe_facade_exports(imported_base)
             for alias in candidate.names:
                 imported = (
                     f"{imported_base}.{alias.name}"
                     if imported_base
                     else alias.name
                 )
-                safe_exports = _SAFE_LOCAL_FACADE_EXPORTS.get(imported)
+                safe_exports = safe_facade_exports(imported)
                 if safe_exports is not None:
                     remember_facade_alias(alias.asname or alias.name, safe_exports)
                 if base_safe_exports is not None and alias.name in base_safe_exports:
@@ -680,7 +716,10 @@ def _reject_runtime_import_indirection(
             imported_root = (node.module or "").partition(".")[0]
             from_candidates = _from_import_candidates(node, module)
             imported_base = from_candidates[0] if from_candidates else ""
-            safe_exports = _SAFE_LOCAL_FACADE_EXPORTS.get(imported_base)
+            safe_exports = safe_facade_exports(imported_base)
+            restricted_exports = _RESTRICTED_LOCAL_FACADE_EXPORTS.get(
+                imported_base
+            )
             imported_module_objects = {
                 f"{imported_base}.{alias.name}" if imported_base else alias.name
                 for alias in node.names
@@ -692,6 +731,10 @@ def _reject_runtime_import_indirection(
                 primitive = "facade module object"
             elif safe_exports is not None and any(
                 alias.name not in safe_exports for alias in node.names
+            ):
+                primitive = f"unsafe facade export from {imported_base}"
+            elif restricted_exports is not None and any(
+                alias.name not in restricted_exports for alias in node.names
             ):
                 primitive = f"unsafe facade export from {imported_base}"
             elif node.level == 0 and imported_root in {"builtins", "importlib"}:

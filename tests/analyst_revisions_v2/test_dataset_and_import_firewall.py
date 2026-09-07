@@ -81,6 +81,7 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "research.analyst_revisions_v2.power_calibration_input_manifest",
     "research.analyst_revisions_v2.power_calibration_input_schema",
     "research.analyst_revisions_v2.power_calibration_protocol",
+    "research.analyst_revisions_v2.power_calibration_receipt",
     "research.analyst_revisions_v2.preregistration",
     "research.analyst_revisions_v2.production_registry",
     "research.analyst_revisions_v2.provider_history",
@@ -91,6 +92,7 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "research.analyst_revisions_v2.statistics",
     "research.analyst_revisions_v2.stock_controls",
     "research.analyst_revisions_v2.stock_evaluation_contract",
+    "research.analyst_revisions_v2.stock_power_successor",
     "research.analyst_revisions_v2.stock_signal",
 )
 
@@ -991,6 +993,31 @@ def test_exchange_calendar_facade_refuses_computed_dynamic_access(
             "unsafe facade export",
         ),
         (
+            "from research.analyst_revisions_v2.artifact_io import "
+            "_write_descriptor_all\n",
+            "unsafe facade export",
+        ),
+        (
+            "from research.analyst_revisions_v2.artifact_io import "
+            "_fsync_directory\n",
+            "unsafe facade export",
+        ),
+        (
+            "from research.analyst_revisions_v2.artifact_io import "
+            "_require_private_single_link\n",
+            "unsafe facade export",
+        ),
+        (
+            "from research.analyst_revisions_v2.artifact_io import "
+            "_recover_stale_atomic_links\n",
+            "unsafe facade export",
+        ),
+        (
+            "from research.analyst_revisions_v2.artifact_io import "
+            "create_new_regular_atomically\n",
+            "unsafe facade export",
+        ),
+        (
             "import research.analyst_revisions_v2.artifact_io as artifact_io\n"
             "VALUE = artifact_io.os\n",
             "facade module object",
@@ -1061,6 +1088,36 @@ def test_artifact_io_facade_does_not_reexport_descriptor_capabilities(
     )
 
     with pytest.raises(ImportBoundaryError, match=refusal):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+@pytest.mark.parametrize(
+    "guarded_source",
+    (
+        "from research.analyst_revisions_v2.power_calibration_receipt "
+        "import _create_artifact_atomically as write\n"
+        "write('path', b'bytes')\n",
+        "from research.analyst_revisions_v2.power_calibration_receipt "
+        "import persist_power_calibration_receipt\n",
+    ),
+)
+def test_receipt_module_cannot_reexport_the_scoped_writer(
+    tmp_path: Path, guarded_source: str,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(guarded_source, encoding="utf-8")
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text(
+        "def _create_artifact_atomically(*args):\n"
+        "    return args\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ImportBoundaryError, match="import/reflection primitive"):
         _validate_import_closure(tmp_path, package_name="guarded")
 
 
@@ -1186,11 +1243,17 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
         "power_calibration_protocol.py": {
             "_POWER_CALIBRATION_PROTOCOL_AUTHORITIES"
         },
+        "power_calibration_receipt.py": {
+            "_CONTENT_CONTRACT_AUTHORITIES",
+            "_INPUT_AUTHORITIES",
+            "_POWER_RECEIPT_AUTHORITIES",
+        },
         "preregistration.py": {"_REVIEWED_AUTHORITIES"},
         "security_master.py": {"_SECURITY_MASTER_AUTHORITIES"},
         "snapshot.py": {"_SNAPSHOT_AUTHORITIES"},
         "stock_controls.py": {"_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES"},
         "stock_evaluation_contract.py": {"_CONTRACT_AUTHORITIES"},
+        "stock_power_successor.py": {"_STOCK_POWER_SUCCESSOR_AUTHORITIES"},
     }
     checked: dict[str, set[str]] = {}
     for path in sorted(package.rglob("*.py")):
@@ -1680,6 +1743,11 @@ def test_git_status_hashes_content_despite_a_false_clean_stat_cache(
     run_git(repository, "config", "user.name", "ARV2 Tests")
     run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
     run_git(repository, "config", "core.autocrlf", "false")
+    # Make the fixture deterministic on filesystems/Git builds that otherwise
+    # notice the content rewrite through ctime even after mtime and size are
+    # restored. The production assertion below is specifically about a
+    # falsely clean stat cache, so construct that state explicitly.
+    run_git(repository, "config", "core.trustctime", "false")
     payload = repository / "payload.txt"
     payload.write_bytes(b"safe\n")
     old_timestamp = 946_684_800_000_000_000

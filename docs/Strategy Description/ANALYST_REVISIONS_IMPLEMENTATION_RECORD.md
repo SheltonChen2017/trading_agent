@@ -42,11 +42,25 @@ COUNTER-REVIEW RECORD CORRECTIONS (SECTIONS 27-29). IT AUTHENTICATES THE EXACT
 B1 AND ARV2-3Q-F PARENTS AND VALIDATES ONLY CANONICAL MANIFEST, ENTITLEMENT,
 RIGHTS-ASSUMPTION, VINTAGE, AND LINEAGE METADATA. IT DOES NOT OPEN AN INPUT,
 COMPUTE A CALIBRATION, ISSUE A NUMERIC RECEIPT, ACCESS OUTCOMES OR QC, DEPLOY,
-ORDER, OR TRADE. THE FULL ARV2-4D-B MILESTONE REMAINS SEPARATELY GATED.
-THE ARV2-4 EVALUATION AND EVERY
-DATA, OUTCOME,
-UPLOAD, COMPILE, QC-RUN, PAPER, OR FUNDED ACTION REMAIN BLOCKED BY THE
-RECORDED SOURCE, RIGHTS, REVIEW, RUN-IDENTITY, AND ONE-USE AUTHORITY GATES.
+ORDER, OR TRADE. THE OWNER THEN CONFIRMED BOTH MASSIVE SUBSCRIPTIONS AND THE
+LOCAL MASSIVE/QUANTCONNECT CREDENTIAL CONFIGURATION, AND AUTHORIZED THEIR
+BOUNDED USE FOR ENTITLEMENT CHECKS, CALIBRATION-INPUT READS, NUISANCE-ONLY
+CLOSED-RECEIPT COMPUTATION, AND, ONLY IF REQUIRED TO CONSTRUCT THOSE INPUTS,
+A PRIVATE QC PROJECT/UPLOAD/COMPILE/RUN. SECTION 30 IMPLEMENTS THE PARTIAL
+ARV2-4D-B SCAFFOLD AFTER THE ENTITLEMENT PROBES BUT WITHOUT A CALIBRATION-
+INPUT READ, NUISANCE COMPUTATION, OR QC CONSTRUCTION ACTION: AN EXACT INPUT-
+CONTENT CONTRACT, PRODUCTION-GATED NUMERIC WORKER, CLOSED RECEIPT AND ATOMIC
+PERSISTENCE, AND AN ADDITIVE STOCK-V3 SUCCESSOR.
+THE PRODUCTION TRUTH-APPROVAL PIN, EVIDENCE OPENER, AND EXACT INPUT-OPERATION
+AUTHORITY PIN REMAIN NULL/FALSE, SO NO PRODUCTION INPUT WAS OPENED, NO REAL
+RECEIPT OR SUCCESSOR ARTIFACT WAS ISSUED, AND NO QC PROJECT WAS CREATED OR
+UPLOADED/COMPILED/RUN. AUTHORIZED ENTITLEMENT PROBES DID USE THE CONFIGURED
+CREDENTIALS: MASSIVE RATINGS, EARNINGS, AND GUIDANCE EACH RETURNED HTTP 200;
+ONE HISTORICAL RESPONSE ROW'S AVAILABILITY/FIELD SHAPE WAS INSPECTED WITHOUT
+RETAINING OR DISCLOSING VALUES; AND QC AUTHENTICATION/PROJECT-LIST RETURNED A
+COUNT OF 90 PROJECTS. THIS CANDIDATE AWAITS INDEPENDENT CLAUDE REVIEW. ARV2-4
+OUTCOME EVALUATION REMAINS EXPLICITLY UNAUTHORIZED, AS DO RESULT ACCESS/
+DISPOSITION, PAPER OR FUNDED DEPLOYMENT, ORDERS, AND TRADING.
 NO AUTHENTICATED PRODUCTION EVENT EXISTS. NO V2 SIGNAL/SCORE/CROSS-SECTION
 WITH PRODUCTION OR EXECUTABLE AUTHORITY, NONEMPTY PORTFOLIO, OUTCOME TEST,
 QC RESULT, OR DEPLOYMENT EXISTS.**
@@ -115,28 +129,32 @@ completion.
 
 | Area | Current repository state | Remaining production/evidence gate | Disposition |
 |---|---|---|---|
-| Snapshot and source authority | V2 snapshot manifest v2 now binds the exact capture instant as well as complete/diagnostic type, partition/page/raw inventory, locator/hash, and clean producing lineage. Capture chronology cannot postdate verification and is part of every downstream manifest identity. The checked-in research-source authority remains an exact immutable `zero_access` declaration with no positive entries. ARV2-4D-B2 now defines an outcome-free metadata shape for exact source-snapshot, correction-inventory, and reconstruction-attestation bindings without opening any such artifact. | A separately governed, append-only production-source authority must still admit an exact real artifact after source entitlement, semantics, completeness, retention, and separately authorized input access are established. The owner's provisional Massive/QuantConnect working assumption is recorded but is not vendor-written permission, an independently reproduced web audit, or authority to read or transfer an input. | ARV2-1 structural ingest accepted; B2 metadata admission is accepted after independent Claude review and Codex counter-review; production source access still refuses. |
+| Snapshot and source authority | V2 snapshot manifest v2 now binds the exact capture instant as well as complete/diagnostic type, partition/page/raw inventory, locator/hash, and clean producing lineage. Capture chronology cannot postdate verification and is part of every downstream manifest identity. The checked-in research-source authority remains an exact immutable `zero_access` declaration with no positive entries. ARV2-4D-B2 defines an outcome-free metadata shape for exact source-snapshot, correction-inventory, and reconstruction-attestation bindings without opening any such artifact. The owner has now confirmed both Massive subscriptions and locally configured Massive/QuantConnect credentials, and has authorized their narrowly stated calibration-input operations. Bounded checks returned HTTP 200 for Massive ratings, earnings, and guidance, while QC authentication/project-list succeeded and returned 90 projects; no credential or row value was retained/disclosed. | A separately governed, append-only production-source authority must still admit each exact real artifact after entitlement, semantics, completeness, retention, vintage, and lineage evidence are authenticated. Owner confirmation, endpoint reachability, and operation authorization do not substitute for the independently reviewed production-truth artifact, evidence opener, and exact input-authority artifact pins that remain null/false in section 30. | ARV2-1 structural ingest and accepted B2 metadata admission remain unchanged; the partial B scaffold is implemented, but production input access still refuses until its exact truth and authority gates are populated and reviewed. |
 | Event normalization | In addition to the zero-access canonical-event/refusal/result contracts, V2 now has a content-addressed Massive/Benzinga provider contract, exact documented field/action parsing, one source-derived ingest disposition per raw row, duplicate-ID refusal, immutable raw-hash version IDs, two-snapshot correction/addition/disappearance lineage, and an exhaustive structural binding of accepted rows to PIT permanent identity or a named refusal. The firm/identity join retains the exact ARV2-1 rational mapping. Legacy `research/acer/` rows remain legacy evidence. | The production source, security-master, and firm-ontology registries are empty. The older zero-access `CanonicalSourceEvent` representation is not yet a publishable rational firm-score event, and no real event has passed production registration. | ARV2-1 accepted; ARV2-2 structural identity candidate implemented; accepted production events remain prohibited. |
 | Time semantics | Exchange-session availability rules, strict UTC instants, next-open handling, and the conservative date-only delay are implemented as deterministic contracts. | Provider clock semantics and actual timestamp completeness have not been authenticated for a production V2 snapshot. | Safety rule implemented; no production event admitted. |
 | Firm identity and rating ontology | A loader-authenticated, content-addressed mapping now requires firm ID/name, half-open valid date range, exact raw label, complete ordered rank/scale size, company/sector/absolute scope, mapping quality, reviewer, source evidence, and ontology version. It implements the blueprint score as an exact rational number, refuses unreviewed labels and periods, inventories observed labels without ordering them, admits only direction-consistent upgrades/downgrades, and keeps initiations, target-only actions, and terminations out of the rating-change channel. The committed production registry remains empty, and positive registration now also refuses until a separate non-self-referential approval receipt exists. | No production firm-specific ordered vocabulary, reviewed policy artifact, authenticated permanent firm/analyst identity mapping, or external registration-approval authority exists. No label is inferred from the public sample or legacy ACER map; documented `assumes` remains quarantined pending semantic review. | ARV2-1 accepted; production ontology access refuses. |
-| Canonical stock formula | ARV2-3 adds exact 20-session exponential decay without a hard cutoff, NYSE-session age derived inside the assembler, institution-stock-session dedupe, rational rating deltas, stable raw summation, absolute-mass institution/catalyst breadth, activity-aware sector median/MAD normalization with the frozen 1.4826 scale and symmetric ±4 clip, and the stock-specific `N_eff / (N_eff + 3) * q_data` reliability. ARV2-4A adds an authenticated structural stock-evaluation contract and fixture-only same-date robust control transform, training-only Decimal QR fit, and unchanged validation/test application with exact contract/fold/policy/refusal lineage, reauthenticated NYSE-open decision clocks, and process-local builder identity/digest authentication that refuses copied, reconstructed, or relabeled cross-sections. ARV2-4B adds the exact content-addressed six-fold NYSE walk-forward child manifest without wiring it into fit/apply. ARV2-4C adds the owner-approved, exact 39-alias naive global comparator, matched-row/coverage/bootstrap contract, and acyclic stock-contract successor while preserving the reviewed fold bytes and the predecessor's single-arm refusal rules. ARV2-4D-A adds the owner-approved, outcome-free power-calibration policy and authenticated provisional planning arithmetic; accepted B1 freezes its input schema, while the B2 candidate authenticates production-shaped metadata only. | No authenticated production events, controls, institution/common-event mappings, PIT sector classifications, measured quality, executable fold integration, authenticated input artifacts, nuisance computation, numeric power receipt, outcomes, or production score artifact exists. ARV2-4C, corrected ARV2-4D-A, B1, and B2 are accepted after independent review and Codex counter-review, and every action capability remains false. | ARV2-3 and ARV2-3Q accepted; corrected ARV2-4A, ARV2-4B, ARV2-4C, ARV2-4D-A, B1, and the zero-action B2 metadata candidate are accepted after independent review and Codex counter-review; no executable score exists. |
+| Canonical stock formula | ARV2-3 adds exact 20-session exponential decay without a hard cutoff, NYSE-session age derived inside the assembler, institution-stock-session dedupe, rational rating deltas, stable raw summation, absolute-mass institution/catalyst breadth, activity-aware sector median/MAD normalization with the frozen 1.4826 scale and symmetric ±4 clip, and the stock-specific `N_eff / (N_eff + 3) * q_data` reliability. ARV2-4A adds an authenticated structural stock-evaluation contract and fixture-only same-date robust control transform, training-only Decimal QR fit, and unchanged validation/test application with exact contract/fold/policy/refusal lineage, reauthenticated NYSE-open decision clocks, and process-local builder identity/digest authentication that refuses copied, reconstructed, or relabeled cross-sections. ARV2-4B adds the exact content-addressed six-fold NYSE walk-forward child manifest without wiring it into fit/apply. ARV2-4C adds the owner-approved, exact 39-alias naive global comparator, matched-row/coverage/bootstrap contract, and acyclic stock-contract successor while preserving the reviewed fold bytes and the predecessor's single-arm refusal rules. ARV2-4D-A adds the owner-approved, outcome-free power-calibration policy and authenticated provisional planning arithmetic; accepted B1 freezes its input schema, accepted B2 authenticates production-shaped metadata, and section 30 adds a strict 483-session input-content contract, a gated exact-Decimal HAC/q05/power worker, a closed 13-field receipt with atomic persistence, and an additive four-parent/six-field stock-v3 successor. | No authenticated production events, controls, institution/common-event mappings, PIT sector classifications, measured quality, executable fold integration, authenticated production input artifacts, issued production numeric receipt, outcomes, or production score artifact exists. The scaffold's production truth approval, evidence opener, and operation-authority pins remain absent, and every adjacent action capability is false. | ARV2-3 and ARV2-3Q accepted; corrected ARV2-4A, ARV2-4B, ARV2-4C, ARV2-4D-A, B1, and B2 accepted after independent review and Codex counter-review; the partial B scaffold is a candidate pending Claude review and creates no executable score. |
 | Consensus, novelty, targets, and EPS | Canonical-versus-diagnostic separation is contract-pinned; legacy target/timing runners are quarantined from V2 and from new outcome access. | No production historical active-rating state, novelty series, or decision-grade target/EPS extension has been built or authorized. | Deferred diagnostics/extensions; they cannot alter the canonical score. |
-| Provider-history boundary | Measured pre-2013 source rows retain the exact dominant quarantine even when another defect is present and cannot be laundered through a later partition. Chronologically captured snapshots compare stable IDs/raw hashes as unchanged, added, corrected, or missing-from-later-without-invented-withdrawal. | Provider coverage, backfill, correction, and deletion semantics remain unauthenticated for V2 production use; no current licensed snapshot was accessed in this milestone. | Structural lineage implemented; factual provider audit still requires exact owner authorization. |
+| Provider-history boundary | Measured pre-2013 source rows retain the exact dominant quarantine even when another defect is present and cannot be laundered through a later partition. Chronologically captured snapshots compare stable IDs/raw hashes as unchanged, added, corrected, or missing-from-later-without-invented-withdrawal. In this round, owner-authorized credentialed entitlement probes returned HTTP 200 for Massive ratings, earnings, and guidance; one historical response row's availability/field shape was inspected without retaining or disclosing values. | These narrow reachability/shape observations do not authenticate provider coverage, backfill, correction, deletion, point-in-time completeness, or an immutable production snapshot. No production calibration input was admitted or read. | Structural lineage implemented; the exact authorized entitlement observations are recorded, while factual production-source/vintage admission still requires the reviewed artifacts and pins in section 30. |
 | Issuer/security identity | A canonical, content-addressed, loader-reauthenticated PIT master now separates issuers, securities, share classes, vendor/standard identifiers, listings, and lineage. It binds base and interval-closure availability, redacts future endpoints, resolves historical tickers by event date/cutoff, preserves ticker reuse and share classes, represents symbol/listing changes, mergers and delistings, refuses ambiguity/ineligibility/late evidence, and reports exhaustive integer coverage. The legacy name/ticker diagnostic's 768 deterministic interleavings remain a lower bound, not an allowlist; current-ticker joins are prohibited. | The committed production security-master registry is empty. No real source, rights/entitlement evidence, production vintage/correction builder, accepted mapping, or external registration-approval authority exists; structural fixtures cannot self-promote. | ARV2-2 structural identity work accepted; production identity access refuses. |
 | Sector/classification | Strict PIT classification evidence, freshness, content identity, and reauthentication boundaries exist. | The production classification source catalog is empty; no accepted PIT V2 taxonomy exists. | Consumer safety implemented; production classification access refuses. |
 | Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. ARV2-2 now derives a revalidatable, fail-closed inventory of in-range merger/delisting terminal-return requirements and never silently omits an unavailable terminal name. No event has been joined to a later price or return; Databento remains unmeasured. | Production split/dividend, cost/ADV, and terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. | Outcome prerequisites implemented structurally; no outcome I/O and zero looks. |
 | ETF holdings/topology | PIT holdings, declared-versus-summed weight reconciliation, stale/incomplete refusal, fixed lag, 99% coverage, eligibility, and stock-score lineage primitives exist. | No authenticated production holdings or stock-score artifact exists, so no production reverse index, ETF score, or peer topology exists. | Consumer safety implemented; production topology remains zero-access. |
 | Cross-section and portfolio | Deterministic rank/hysteresis/tie/eviction/cap/overlap/cash allocator primitives and verified policy bindings exist. | No reviewed simultaneous rank/volatility derivation or authenticated rank/classification/cost source exists. The public boundary therefore refuses every nonempty portfolio and can return only the safe empty/all-cash result. | Dormant safety algorithm implemented; no research portfolio or QC result. |
-| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds only the content-addressed calibration-input manifest schema and an in-memory canonical synthetic-metadata validator. B2 adds a production-shaped metadata loader that authenticates B1 and ARV2-3Q-F plus canonical entitlement, provisional-rights, vintage, input-identity, and lineage metadata without resolving an input path. | Later executable-spec integration remains required. The reviewed-spec registry and ARV2-4D-B numeric receipt are empty; no accepted production manifest, source/input access, authenticated rights/vintage truth, nuisance-computation authority, source/run binding, external review anchor, upload/compile/launch authority, evaluation authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves. | Old prospective candidate retired with zero looks; ARV2-3Q and corrected ARV2-4A/4B/4C/4D-A accepted; ARV2-3Q-F, B1, and B2 accepted after independent review and Codex counter-review; every outcome/QC authorization refuses. |
-| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. ARV2-3, the accepted QC-first parent, corrected ARV2-4A/4B/4C/4D-A modules, ARV2-3Q-F, accepted B1, the B2 candidate, and its narrow artifact-I/O facade are in the exact 36-module transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. | Production source, ontology, security-master, institution, common-event, classification, quality, outcome, look, QC, and execution authorities remain absent or zero-access. | ARV2-3Q and corrected ARV2-4A/4B/4C/4D-A accepted; ARV2-3Q-F, B1, and the zero-action B2 metadata candidate accepted after independent review and Codex counter-review. |
+| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. | Later executable-spec integration remains required. No accepted production manifest/input package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged; the partial B scaffold is pending review and all outcome/QC/result/deployment/order/trading authorizations refuse. |
+| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the new receipt and stock-v3 modules are in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The atomic writer is callable only through a function-local receipt import; it is not a package-global alias or receipt re-export, and the successor receives only the receipt facade's four reviewed exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. The static firewall is a reviewed-closure control, not an OS sandbox. | Accepted ancestry remains unchanged; the partial B scaffold and firewall expansion await Claude review. |
 
 The production source, firm-ontology, security-master, classification, cost,
 and rank catalogs remain empty. The canonical source authority permits no
 positive production source; accepted
 normalization and nonempty-portfolio boundaries both refuse. Accordingly there
 is no authenticated production event, score, cross-section, nonempty portfolio,
-outcome, or QC result. No real-outcome research look has been performed for V2,
-and this implementation consumed **zero looks**.
+outcome, or QC result. Section 30 adds only fail-closed machinery: its null
+production-truth and input-operation pins prevent a fixture or owner-supplied
+string from self-promoting into production authority. No production input was
+opened, no external job ran, no real-outcome research look was performed for
+V2, and this implementation consumed **zero research looks and zero development
+evaluations**.
 
 ## 3. Milestone ladder
 
@@ -372,8 +390,13 @@ spend receipt from an independently pinned cross-machine append-only authority
 for the final paper look. No local file or SQLite database can grant or reset
 either authority. The reviewed-spec registry and external integrations remain
 absent; every authorization attempt refuses before an outcome loader can run.
-No credential, provider row, price, return, outcome, QC job, or deployment was
-accessed; no look was consumed.
+This round used configured credentials only for the authorized entitlement
+checks recorded in section 30.1: Massive ratings, earnings, and guidance each
+returned HTTP 200, one historical response row's availability/field shape was
+inspected without retaining or disclosing values, and QC authentication/
+project-list returned a count of 90 projects. No production calibration input,
+price, return, outcome, QC project creation/upload/compile/run, or deployment
+was accessed; no research look or development evaluation was consumed.
 
 Source precedence is explicit: normative strategy design governs the intended
 formula, while observed provider availability/history governs factual data
@@ -395,11 +418,13 @@ after correcting the lane-specific implementation and evidence defects found
 in that review commit.
 
 The full input-bearing ARV2-4D-B milestone was not authorized by the
-ARV2-4D-A approval and remains unauthorized. It still requires an
-independently reviewed production input manifest, exact input identities and
-access, processing/storage rights, complete lineage, permitted nuisance-only
-computation, a closed numeric receipt, and a separately reviewed successor
-binding.
+ARV2-4D-A approval. That statement remains historical for the earlier rounds.
+The owner subsequently authorized only entitlement checks, the exact
+calibration-input reads, nuisance-only closed-receipt computation, and a
+private QC project/upload/compile/run only if required to construct those
+inputs. ARV2-4 outcome evaluation remained expressly unauthorized. Section 30
+implements the portion that can be completed offline while retaining separate
+reviewed production-truth and exact operation-authority gates.
 
 Section 21 implements the owner's separately authorized 2026-08-30
 four-family multiplicity amendment as the outcome-free ARV2-3Q-F candidate.
@@ -419,12 +444,23 @@ schema-only ARV2-4D-B1 synthetic-fixture milestone. Section 24 implements that
 candidate without editing, re-pinning, or re-parenting ARV2-4D-A, ARV2-3Q-F,
 the fold manifest, or any other accepted ancestor.
 
-No credential, Massive/Benzinga key, provider or licensed row, price, return,
-outcome, or QC resource was needed or used. Every production-input,
-nuisance-computation, numeric-receipt, outcome, QC upload/compile/launch,
-paper, funded, deployment, and trading action retains its separate exact
-authority gate. ARV2-4 must not run while its receipt, source/rights, review,
-run-identity, and one-use authorities are absent.
+The owner reports both Massive subscriptions purchased and the Massive and
+QuantConnect credentials configured on this computer. Those facts and the
+bounded authorization are recorded without credential values. They do not
+replace exact immutable inputs, independently reviewed entitlement/rights/
+vintage/lineage truth, or the pinned authority artifacts required by the new
+worker. The configured credentials were exercised only for owner-authorized
+entitlement checks: Massive ratings, earnings, and guidance each returned HTTP
+200; one historical response row's availability/field shape was inspected with
+no values retained or disclosed; and QC authentication/project-list returned a
+count of 90 projects. No production calibration input was admitted or read, no
+real nuisance receipt was computed or issued, and no QC project was created or
+uploaded/compiled/run.
+The immediate next step is independent Claude review of the exact section-30
+candidate. The numeric production path remains fail-closed until its reviewed
+truth approval, evidence opener, and operation-authority pin exist; outcome/
+result access, paper or funded deployment, orders, and trading remain
+unauthorized.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -2032,6 +2068,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-06 | Codex counter-review and implementation | `43d5a846` -> `67abd46` | Accept the exact B1/integration range after lane-record correction; implement owner-authorized ARV2-4D-B2 production-manifest metadata admission | Counter-reviewed all 12 incoming commits individually and cumulatively on the same Analyst branch, corrected three lane-record defects, documented three shared leak-guard defects without changing shared code, then implemented only the outcome-free B2 metadata candidate. The 15,126-byte content-addressed contract binds accepted B1 and ARV2-3Q-F, exact source-role/entitlement/owner-assumption/rights/vintage/lineage metadata, and a 4 MiB descriptor-read boundary. It never resolves or opens an input artifact and grants no production, rights, vintage, input, calibration, receipt, outcome, QC, deployment, order, or trading authority. | Dedicated B2 **346 passed**; B2 plus complete parent reauthentication chain **967 passed, 5 skipped**; firewall/registry **130 passed**; complete Analyst V2 **1,423 passed, 5 skipped in 100.07 s**; complete repository **7,915 passed, 43 skipped, 26 warnings in 487.98 s**; active-document **69 passed**; renderer/identity/parent hashes reproduce; compileall and diff checks clean. No provider, credential, licensed row, price, return, outcome, QC, broker, operator database, scheduler, deployment, or order access; **0 research looks and 0 development evaluations**. | Counter-review: 0 P0/P1, 1 P2 and 2 P3 lane-record findings corrected; three shared P2/P2/P3 findings documented only. B2 self-review: 0 P0/P1, 16 P2 and 14 P3, all 30 corrected, including red/green closure of the non-Massive scope bypass and capability-module laundering paths plus accurate documentation of the static guard's limit. | Commit and push this exact same-lane snapshot once after confirming the remote still equals `43d5a846`. Claude independently reviews every changed file and commit using section 27.7; Codex then counter-reviews every Claude commit before any later milestone. Full ARV2-4D-B and every input/outcome/QC/deployment/trading action remain gated. |
 | 2026-09-07 | Claude review | `67abd46` -> `4d7036c` (tests), `22d10cf` (record), and `ecf473e` (hash-naming record) | Independent review of the ARV2-4D-B2 production-manifest metadata-admission candidate | Reviewed the single commit `43d5a846..67abd46` with an explicit disposition (section 28); accepted with two P3 test-coverage corrections and three P3 observations documented only. Verified rather than accepted: the 15,126-byte artifact reproduces from the renderer and its artifact/semantic hashes and ID recompute from bytes; all six changed batteries pass on this Mac. The reviewer-reported 27-trial mutation aggregate was 18 caught, 7 equivalent, and 2 escaped; section 29 corrects the unreconciled itemized wording without inventing a command-level log. The two escaped guards (audit-derived processing scope and contemporaneous capture window) are now isolated by `4d7036c`. No shared code touched; `ARV2-SHARED-LEAK-001..003` remain documented only. | Six changed batteries **1,097 passed, 5 skipped in 70.17 s** at `67abd46`; B2 battery **350 passed** at `4d7036c`; complete repository suite on the final code/test tree `4d7036c` **7,919 passed, 43 skipped, 28 warnings in 463.50 s (7:43)**, the four additions being the new cases; active-document gate green on the later record-only head; compileall exit 0; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2, 2 P3 corrected with red/green regression tests, 3 P3 documented only. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access. | Codex counter-reviews every Claude commit in this round before any later milestone; full ARV2-4D-B, input reads, nuisance computation, numeric receipt, QC transfer, outcomes, deployment, orders, and trading remain gated. |
 | 2026-09-07 | Codex counter-review | `ecf473e` -> this record commit (not pushed) | Accept Claude's B2 review after lane-record correction and stop at the exact ARV2-4D-B external-action gate | Counter-reviewed all three Claude commits individually and cumulatively. Accepted `4d7036c`; accepted `22d10cf` and `ecf473e` after correcting five P3 record defects: metadata/parent file-open scope, code-tree versus pushed-tree attribution, irreconcilable mutation-list wording, self-referential hash naming, and the conflated firewall exceptions. No production code, test, artifact, shared file, or authority changed. The owner scheduled ARV2-4D-B, but the credentials, immutable inputs, and exact input-read/nuisance-compute authority evidence are absent. | B2 **350 passed in 3.63 s**; separate reviewer **350 passed in 6.59 s**; corrected active-document gate **69 passed**; `git diff --check` clean. No credential value, provider row, input, outcome, QC resource, deployment, broker, scheduler, order, or trading access; **0 research looks and 0 development evaluations**. | 0 P0/P1/P2; five P3 record findings (`ARV2CR16-001..005`) corrected. Underlying B2 production behavior is accepted, quality **8/10**. | Commit this counter-review record locally. Configure credentials or provide the exact immutable B2 input package, then explicitly authorize the first input read and nuisance-only computation; separately authorize any necessary private QC project/upload/compile/job. Do not infer ARV2-4 outcome evaluation, deployment, orders, or trading. |
+| 2026-09-07 | Codex implementation | `2bcb1bd` -> this candidate commit (not pushed) | Owner-authorized ARV2-4D-B partial nuisance-calibration scaffold | Recorded the later owner confirmation of both Massive subscriptions and locally configured Massive/QC credentials plus the exact limited operation authority. Authorized credential checks returned HTTP 200 for Massive ratings, earnings, and guidance; one historical response row's availability/field shape was inspected without retaining/disclosing values; QC authentication/project-list returned 90 projects. Added the 7,521-byte content-addressed input-content contract, production-gated exact-Decimal nuisance worker, closed 13-field numeric receipt, atomic create-if-absent persistence, and inert four-parent/six-field stock-v3 successor. Production truth/input-authority pins and the evidence opener remain null/false, so no production calibration input was opened, no real receipt/successor artifact was issued, and no QC project was created or uploaded/compiled/run. Accepted ancestors and project-wide records remain frozen. | Receipt plus firewall **265 passed in 46.50 s**; successor **51 passed**; final focused aggregate **316 passed in 88.19 s**; complete B2 parent chain **1,287 passed, 5 skipped in 124.54 s**; complete Analyst lane **1,613 passed, 5 skipped in 139.03 s**; complete repository **8,105 passed, 43 skipped, 26 unrelated warnings in 519.33 s (8:39)**; compileall exit 0 and `git diff --check` clean. No values or secrets retained/disclosed; **0 research looks and 0 development evaluations.** | `ARV2I4DB-001..024` are corrected, closed by an explicitly documented precision boundary, or rejected with the exact range reason recorded. Final independent audits report **0 open P0-P3**. | Commit and push this exact same-lane snapshot once, then Claude independently reviews every changed file and commit using section 30.7. No production computation can start before exact reviewed truth/input-authority pins exist; ARV2-4 outcome evaluation and every result/deployment/order/trading action remain unauthorized. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -4736,3 +4773,342 @@ The owner may instead provide the canonical B2 evidence bundle, production
 manifest, and two immutable input artifacts with their complete hashes and
 lineage. Neither route grants ARV2-4 outcome evaluation, a research result,
 paper/live deployment, orders, or trading authority.
+
+## 30. Owner-authorized ARV2-4D-B partial scaffold, 2026-09-07
+
+### 30.1 Exact scope, owner authority, and entitlement evidence
+
+This round starts from the same-lane `2bcb1bd4186c43a610862dd065c7798c04a396b9`
+head and changes only Analyst Revisions V2 code, its tests, one new structural
+artifact, and this lane record. Section 29 remains the exact historical account
+of the authority state at that earlier checkpoint; the later owner direction
+below supersedes its forward-looking credential/authorization request without
+rewriting that history.
+
+The owner confirmed that both required Massive subscriptions were purchased
+and that Massive and QuantConnect credentials are configured on this computer.
+The owner authorized use of those configured credentials for ARV2-4D-B
+entitlement checks, exact calibration-input reads, and nuisance-only closed-
+receipt computation. The owner also authorized creation/use of a private
+QuantConnect project and upload, compile, and run only if required to construct
+those inputs. The owner's earlier review of examples of Massive subscribers
+using QuantConnect is retained as the owner's working rights assumption, not
+represented as vendor legal advice or an independently reproduced entitlement
+audit. No secret or credential value is recorded here.
+
+| Boundary | This round's exact disposition |
+|---|---|
+| Entitlement/source checks | **Owner-authorized and exercised.** Massive ratings, earnings, and guidance each returned HTTP 200; one historical response row's availability/field shape was inspected without retaining or disclosing values. |
+| Exact production calibration-input reads, nuisance-only computation, closed receipt | **Owner-authorized**, but not exercised because the exact reviewed production artifacts/pins below do not yet exist. Synthetic fixture activity remains test-only. |
+| QC authentication/project list | **Exercised within the authorization**; authentication succeeded and the project-list response contained 90 projects. No project content was used. |
+| Private QC project, upload, compile, and run | **Owner-authorized only if required to construct the two inputs**; no project was created and no upload, compile, or run occurred. |
+| Production truth and operation authority inside the committed code | Still fail-closed: `PRODUCTION_TRUTH_APPROVAL_ARTIFACT_SHA256 = None`, `PRODUCTION_TRUTH_EVIDENCE_OPENER_IMPLEMENTED = False`, and `PRODUCTION_INPUT_AUTHORITY_ARTIFACT_SHA256 = None`. Fixture-only document renderers do not satisfy these gates. |
+| ARV2-4 outcome evaluation | **Explicitly unauthorized.** No outcome may be opened or evaluated. |
+| Research-result access or disposition, paper/funded deployment, orders, trading | **Unauthorized.** All corresponding receipt/successor capabilities remain literal false. |
+
+Accordingly this is a **partial ARV2-4D-B scaffold candidate**, not a completed
+production calibration. The credentialed activity was limited to the exact
+entitlement/reachability observations above; no value was retained or
+disclosed. It performed no production calibration-input read or real nuisance
+computation, QC project creation/upload/compile/run, outcome access, result
+access/disposition, deployment, order, or trade. No production truth or input-
+authority artifact was created, and no real numeric receipt or stock-v3
+artifact was issued. Synthetic fixture construction and persistence remained
+inside the test boundary. There were **zero research looks and zero development
+evaluations**.
+
+### 30.2 Frozen input contract and exact closed arithmetic
+
+The new canonical pretty-JSON content contract is:
+
+- path: `research/analyst_revisions_v2/specs/arv2_stock_power_calibration_input_content_contract.structural.json`;
+- exact size: **7,521 bytes**;
+- content-contract ID:
+  `arv2-stock-power-calibration-input-content-e9915c73d9e78a01`;
+- semantic/content SHA-256:
+  `e9915c73d9e78a01bdf114c1347621add0dd0cb1ada193bfb9a64dbe4b3df5a2`;
+- exact artifact SHA-256:
+  `12d2724ab657721ad889810c96ec92fdfca73c3ec5c759f41ecf23966da9270a`.
+
+The contract authenticates the accepted ARV2-4D-A protocol, B1 input schema,
+B2 production-manifest admission, and ARV2-3Q-F multiplicity overlay before it
+can load. It closes two separate canonical UTF-8 JSON artifacts, each bounded
+to 4 MiB and each covering the exact 483-session calibration axis:
+
+1. `date_beta_series`: one exact row per decision session with state
+   `valid`, `missing`, or `refused`; only a valid row carries one canonical,
+   finite Decimal string.
+2. `connected_component_count_census`: one exact nonnegative integer count per
+   decision session, including honest zero-component sessions.
+
+Duplicate keys, binary-float/nonfinite tokens, noncanonical serialization,
+extra or missing fields, wrong session order/count, invalid Decimal spelling,
+oversize data, and role/schema substitutions refuse. Both raw artifact lengths
+and SHA-256 identities are authenticated against the B2 manifest before either
+payload is parsed, so a rejected first or second identity cannot disclose a
+row/token or parser position from the other input.
+
+The nuisance worker uses a fresh Decimal context at precision 50 with
+`ROUND_HALF_EVEN`. It computes the mean over the valid-date count `N`, preserves
+missing/refused gaps on the original session axis, and requires at least one
+valid pair for every lag 0 through 20. Each lag covariance uses denominator
+`N`; the lag-20 HAC long-run variance is gamma-zero plus twice the stable sum
+of Bartlett-weighted gamma-one through gamma-twenty. Stable summation sorts by
+exact `Decimal.copy_abs()` magnitude and then signed value, preventing ambient
+context rounding from changing the order while retaining a deterministic
+signed tie break. The q05 component count is the nearest-rank 25th value
+(index 24) of all 483 sorted session counts, including zeros.
+
+The worker then delegates only to the accepted protocol's frozen planning
+arithmetic: the exact normal factor, 10-basis-point (`1/1000`) target effect,
+integer ceiling, absolute floor of 50 valid dates and 50 connected components,
+and fixed 1,388-session capacity boundary. A requirement above 1,388 is a hard
+no-launch disposition; there is no rescue, fallback, adaptive effect, or
+outcome access.
+
+The closed receipt's required-output dialect is exactly 13 fields: three
+ancestry fields—`protocol_id`, `protocol_hash`, and
+`calibration_input_manifest_sha256`—followed by exactly these ten allowed
+aggregates: `valid_beta_date_count`, `lag_pair_counts_0_through_20`,
+`long_run_variance`, `component_count_census_sha256`,
+`component_count_census_session_count`, `q05_components_per_date`,
+`raw_required_valid_dates`, `required_valid_dates`,
+`required_connected_components`, and `fixed_capacity_disposition`. It cannot
+contain beta rows, a mean, a centered series, individual covariances, component
+rows, prices, returns, outcomes, coefficients, p-values, or research results.
+
+### 30.3 Authentication, persistence, successor, and firewall boundaries
+
+`power_calibration_receipt.py` separates three authorities that cannot be
+self-asserted: a reviewed production-truth approval, its bounded evidence
+opener, and an exact owner-operation authority artifact. Contract, truth, and
+operation-authority document/load paths take complete immutable snapshots of
+all parents, bind the snapshot digest, authenticate each parent before and
+after use, and revalidate loaded artifact bytes. Caller-selected owner IDs,
+hash-looking strings, structural B2 objects, and fixture-only renderers do not
+populate a production pin.
+
+After an authorized computation, the process-local receipt registry retains a
+receipt weak reference and fingerprint, weak references to its three parent
+objects, the two input identities limited to path/SHA-256/byte count, and an
+optional persisted-receipt identity limited to the same three metadata fields.
+It retains no input bytes, parsed beta/component values, centered series,
+covariances, or outcomes. Full receipt reauthentication may reopen the two
+authorized calibration inputs; the distinct closed persisted-receipt boundary
+authenticates the receipt artifact and its content-contract/manifest/operation-
+authority metadata parents, compares the stored input identities, and never
+reopens either input. Ordinary parser and boundary errors are value-free and do
+not chain payload-bearing JSON/Unicode exceptions.
+
+Receipt persistence accepts only the content-versioned basename
+`<receipt_id>.<receipt_hash>.json`. One receipt object may bind to one normalized
+destination only, with the registry lock held across creation, binding, and
+closed reauthentication. The writer uses a same-parent 0600 temporary, a full
+write loop, file `fsync`, hard-link publication without replacement, temporary
+cleanup, POSIX directory `fsync`, exact reread, and regular/private-owner/
+single-link checks. Same-byte retry is idempotent; existing different bytes
+refuse. Link-like leaf or ancestor paths refuse before the parent is resolved,
+closing parent-symlink laundering. Exact same-owner residue in the reserved,
+bounded temporary namespace is recoverable both before link publication
+(`nlink == 1`) and after link publication (`nlink == 2` to the exact
+destination). Lexically different dot-segment retries normalize to the same
+resolved path.
+
+On Windows, descriptor reads/writes include `O_BINARY` when available,
+directory `fsync` is an explicit no-op because Windows cannot use the POSIX
+directory-descriptor barrier, and synthesized POSIX mode/UID bits are not used
+as ACL evidence. The regular-file and single-link requirements remain. This
+does not claim Windows ACL privacy or POSIX-equivalent directory durability.
+
+`stock_power_successor.py` is an additive stock-v3 child with exactly four
+direct parents: the unchanged stock-v2 successor, accepted power protocol,
+accepted four-family multiplicity overlay, and one authenticated persisted
+numeric receipt. Its direct-edge constant is immutable tuple data and each
+render receives fresh dictionaries. Its only amendment has exactly six fields:
+`calibration_input_manifest_sha256`, `numeric_power_receipt_sha256`,
+`power_plan_sha256` (the receipt semantic hash), `required_valid_dates`,
+`required_connected_components`, and `fixed_capacity_disposition`. The direct-
+parent projection is deliberately incomplete; each parent loader authenticates
+its complete subgraph. A feasible receipt remains pending independent review,
+Codex counter-review, and separate exact ARV2-4 outcome authority. An
+underpowered receipt is permanently no-launch. Every source/input/outcome/QC/
+result/deployment/order/trading capability on the successor is false.
+
+The firewall adds the receipt and successor to the exact reviewed closure. The
+atomic writer is available only to the receipt module through a function-local,
+importer-scoped facade grant; it is neither package-global nor re-exportable
+through the receipt. Successors receive only four reviewed receipt exports:
+`PowerCalibrationReceipt`, `PowerCalibrationReceiptError`,
+`power_calibration_receipt_artifact_sha256`, and
+`require_persisted_power_calibration_receipt`. Module-object, private-helper,
+function-global, alias/default/destructuring, and constant-built reflection
+paths to the writer remain refused.
+
+### 30.4 Closed implementation findings
+
+Every finding below is closed on the final code/test/document tree. IDs are contiguous;
+there are **0 open P0, P1, P2, or P3 findings**.
+
+| ID | Pri | Disposition | Finding and final correction |
+|---|---|---|---|
+| `ARV2I4DB-001` | P2 | **Corrected** | The first content-contract load could combine fields observed across a transiently changing accepted-parent object. The final loader captures the complete contract/protocol/schema/admission/overlay parent view, digests it, reauthenticates before and after construction/load, and refuses any snapshot change. |
+| `ARV2I4DB-002` | P2 | **Corrected** | The first production-truth document/load path did not snapshot every candidate definition, identity, capability, evidence, manifest, and review-binding field as one unit. The final truth path constructs and validates from one complete frozen snapshot and verifies the same digest after parent reauthentication. |
+| `ARV2I4DB-003` | P2 | **Corrected** | The operation-authority path likewise risked mixing contract, manifest-candidate, and truth-approval generations. It now takes and digests one complete three-parent snapshot for construction, loading, and reauthentication; owner strings alone never grant authority. |
+| `ARV2I4DB-004` | P2 | **Corrected** | Persistence originally resolved the parent before proving every lexical ancestor link-free, allowing an ancestor symlink to be laundered into a safe-looking resolved directory. The writer now rejects every absolute parent/ancestor link or junction before strict resolution and repeats exact destination checks. |
+| `ARV2I4DB-005` | P2 | **Corrected** | Exposing the new write primitive as a package-wide safe-facade export would have granted every reviewed module a filesystem write capability. It is now an importer-scoped export solely for the receipt module and is imported only inside the persistence function. |
+| `ARV2I4DB-006` | P2 | **Corrected** | A receipt-module private alias or public persistence re-export could have laundered the scoped writer into the successor/another package. The firewall restricts receipt consumers to four closed exports and rejects the private alias, persistence function, module object, and reflection paths. |
+| `ARV2I4DB-007` | P2 | **Corrected** | Persisted-receipt reload first accepted an arbitrary basename whose bytes happened to match. It now parses and preflights only the bounded receipt artifact needed to derive its identity, validates the sole `<receipt_id>.<receipt_hash>.json` name, and refuses before either calibration input can open. |
+| `ARV2I4DB-008` | P2 | **Corrected** | The one-receipt/one-path registry precheck originally sat outside the complete persistence transaction, so concurrent calls could publish the same receipt to two directories. One `RLock` now covers path precheck, create/retry, binding, and closed reauthentication; the cross-directory race regression admits one destination and refuses the other. |
+| `ARV2I4DB-009` | P2 | **Corrected** | The stock successor's direct-parent edge constant contained mutable dictionaries, so external/internal mutation could change future ancestry documents. It is now tuple-of-tuples and materializes fresh dictionaries for each render; mutation and copied-parent regressions pin the boundary. |
+| `ARV2I4DB-010` | P2 | **Corrected** | `abs(Decimal)` is context-sensitive and could round sort keys before stable summation, changing HAC arithmetic for values beyond precision 50. Exact `copy_abs()` plus the signed tie break preserves ordering; a 52-digit cancellation case is regression-pinned. |
+| `ARV2I4DB-011` | P2 | **Corrected** | Directly chaining malformed UTF-8/JSON decoder errors retained payload-bearing `.object`/`.doc` state in exception cause/context even though the displayed message was generic. Parser helpers now unwind first and the outer boundary raises value-free domain errors with neither payload-bearing cause nor context; token and duplicate-key regressions pin this. |
+| `ARV2I4DB-012` | P2 | **Corrected** | The POSIX writer logic would fail on Windows by attempting directory-descriptor `fsync`, interpreting synthesized `st_mode`/UID bits as privacy evidence, and omitting binary-mode descriptors. The final branch adds `O_BINARY`, explicitly skips Windows directory `fsync` and POSIX mode/owner checks, and retains regular-file and `st_nlink == 1` checks. |
+| `ARV2I4DB-013` | P2 | **Corrected** | A failure after hard-link publication but before temporary cleanup left an exact `nlink == 2` residue and made every retry fail the single-link check. Bounded recovery now recognizes the same destination inode, removes the private same-owner residue, syncs, and completes idempotently. |
+| `ARV2I4DB-014` | P2 | **Corrected** | A crash before link publication could consume a temporary slot indefinitely and had no true stale-orphan recovery. Bounded recovery now authenticates and removes only exact private same-owner `nlink == 1` payloads in the reserved namespace while preserving partial, foreign, differently linked, or different-byte entries. |
+| `ARV2I4DB-015` | P3 | **Corrected** | A same-destination retry containing `.`/`..` segments compared the registry's resolved path with a merely lexical absolute path and falsely reported a second destination. Retry identity now uses `resolve(strict=False)` consistently. |
+| `ARV2I4DB-016` | P3 | **Corrected** | The receipt-level wrong-name test refused before it could exercise the atomic writer's existing-destination/different-bytes branch. A direct facade regression now reaches that branch and proves no overwrite or truncation occurs. |
+| `ARV2I4DB-017` | P3 | **Corrected** | Repeated literals and overbroad draft comments obscured the exact field/edge and portability contracts. The final tree centralizes immutable required-field/parent inventories and makes POSIX, Windows, fixture-only, and deliberately incomplete-projection wording exact; behavior remains regression-pinned. |
+| `ARV2I4DB-018` | P3 | **Closed/documented** | The Windows branch is deterministically exercised on this POSIX host, but this round did not execute on Windows and cannot attest NTFS ACL privacy or a POSIX-equivalent directory durability barrier. The code makes neither claim and fails no lower than regular-file/single-link semantics. |
+| `ARV2I4DB-019` | P3 | **Closed/documented** | Recovery tests model genuine pre-link and post-link residue states and a post-link sync failure, but are not kill-and-restart integration tests. Recovery is intentionally bounded to 4,096 exact same-owner/private candidates in the writer's reserved namespace and is explicitly not an adversary-safe deletion facility. |
+| `ARV2I4DB-020` | P3 | **Closed/documented** | Descriptor identity, repeated byte validation, lexical ancestor checks, and the receipt transaction close the newly identified substitution/race paths. They do not turn the static import firewall or pathname operations into an OS sandbox; the previously documented hostile concurrent ancestor-directory replacement boundary remains a threat-model limit, not a new production authority. |
+| `ARV2I4DB-021` | P3 | **Corrected** | Late record review found that three external-action summaries said no calibration input, computation, or artifact existed without consistently distinguishing real/production activity from synthetic fixture tests. Current-status, section 2, section 4, the ledger, and section 30 now state the production/real boundary explicitly and acknowledge fixture construction/persistence. |
+| `ARV2I4DB-022` | P3 | **Corrected** | The first registry summary omitted the receipt weak reference/fingerprint and optional persisted-receipt identity, and said closed reauthentication authenticated only the receipt. The final text enumerates retained metadata exactly and records that the closed path authenticates the metadata parents while never reopening calibration inputs. |
+| `ARV2I4DB-023` | P3 | **Corrected** | The stale-cleaner precision note said `private-directory` even though the writer authenticates link-free ancestry and private/same-owner residue, not parent-directory privacy. The final note names the private-residue and reserved-namespace assumptions exactly. |
+| `ARV2I4DB-024` | P3 | **Rejected/nonfinding** | A late record audit proposed treating `2bcb1bd` as the excluded review base. That would omit the previously unpushed Codex counter-review from Claude's required review. The exact single-push range instead excludes the last remote head `ecf473e`, includes `2bcb1bd` as its first commit, and ends at the newly fetched pushed tip. Section 30.7 states this explicitly. |
+
+### 30.5 Independent audit dispositions and precision limits
+
+Two independent final-tree audits returned **ACCEPT** with **0 open P0-P3**.
+They specifically rechecked:
+
+- the exact 13-field dialect and absence of row-level/intermediate/outcome
+  material;
+- fresh-context Decimal arithmetic, valid-`N` covariance denominators,
+  gap-preserving lag pairs, exact-magnitude/signed stable summation, q05
+  nearest-rank handling including zeros, integer ceilings/floors, and the
+  inclusive 1,388-session capacity edge;
+- authenticate-both-before-parse sequencing and value-free UTF-8/JSON,
+  duplicate-key, float/nonfinite, and domain errors;
+- complete contract/truth/authority/successor parent snapshots and before/
+  after byte reauthentication;
+- exact content-version filenames, parent-link refusal, same-byte idempotence,
+  direct different-byte refusal, cross-thread/cross-directory binding,
+  pre-link/post-link stale recovery, file/directory sync ordering, POSIX
+  privacy/link rules, and the explicit Windows branch;
+- receipt fingerprint/weak-parent metadata, input-path/hash/size-only retention,
+  and the fact that closed persisted-receipt/successor reauthentication never
+  opens calibration inputs;
+  and
+- immutable successor edges, exact four-parent/six-amendment ancestry, scoped
+  writer access, receipt facade restrictions, and the complete import closure.
+
+One question is an explicit **nonfinding**: an authorized in-process compute
+caller supplies the two input paths, so Python traceback-frame locals are not
+a confidentiality boundary against that caller. Closed downstream receipt and
+successor reauthentication never opens the inputs. The required guarantee is
+therefore that ordinary exceptions, logs, and chained cause/context do not
+carry payload values; the final parser boundary provides that guarantee. No
+worker-process or traceback-local isolation claim is made or required.
+
+The stale-residue cleaner's same-owner/private-residue and reserved-namespace
+assumptions and the Windows durability/ACL qualifications in
+`ARV2I4DB-018..020` are recorded as precision limits, not open defects or
+authority. The static firewall continues to describe the exact reviewed Python
+closure, not hostile-process confinement.
+
+### 30.6 Validation on the final code/test tree
+
+- Receipt plus import-firewall hardening battery: **265 passed in 46.50 s**.
+- Stock-v3 successor battery: **51 passed**.
+- Reproduced focused aggregate of those batteries: **316 passed in 88.19 s**.
+- Complete B2 parent-reauthentication chain: **1,287 passed, 5 skipped in
+  124.54 s**.
+- Complete Analyst Revisions V2 lane: **1,613 passed, 5 skipped in 139.03 s**.
+- Complete repository: **8,105 passed, 43 skipped, 26 warnings in 519.33 s
+  (8:39), exit 0**. The warnings are unrelated: one websockets legacy
+  deprecation, one joblib physical-core fallback, and 24 joblib NumPy
+  shape-assignment deprecations.
+- Changed-scope `compileall` exit 0; `git diff --check` clean.
+- Two independent code audits plus an independent lane-record audit after the
+  documented corrections: **ACCEPT**, **0 open P0-P3**.
+- External/action evidence: configured credentials were used only for the
+  owner-authorized checks in section 30.1 (three Massive HTTP 200 responses,
+  one historical response row's availability/field-shape inspection with no
+  values retained/disclosed, and successful QC authentication/project-list
+  with 90 projects). No credential value was exposed; no production calibration
+  input or real nuisance compute, QC project creation/upload/compile/run,
+  outcome, result, broker, deployment, scheduler, order, or trading action
+  occurred; **0 research looks and 0 development evaluations**. Synthetic
+  fixture construction and persistence occurred only inside the test boundary.
+
+Exact final file identities for review:
+
+| File | SHA-256 |
+|---|---|
+| `research/analyst_revisions_v2/specs/arv2_stock_power_calibration_input_content_contract.structural.json` | `12d2724ab657721ad889810c96ec92fdfca73c3ec5c759f41ecf23966da9270a` |
+| `research/analyst_revisions_v2/artifact_io.py` | `cc4eb17a69a0028a8f65304cef282cd92d417bb1b8b8580d9bcccdd997824bd8` |
+| `research/analyst_revisions_v2/power_calibration_receipt.py` | `73df5db1945abc1a15d1f0188ad74d1dbb13cb866a5e72d934c89a48c5c4a2fd` |
+| `research/analyst_revisions_v2/stock_power_successor.py` | `831aa100c6cb086ac6719a75989a612a2f9da1b2c42c1bcb0cd022d68dd670fe` |
+| `research/analyst_revisions_v2/import_firewall.py` | `137facb4066bcc53fcea1198e37637d24b360a9d5b8ad9f96e4042c54936f473` |
+| `tests/analyst_revisions_v2/test_power_calibration_receipt.py` | `f944f0a7bc3908fd26e95d81a6fd5090accc9d02208ece7743df8ea0106a8266` |
+| `tests/analyst_revisions_v2/test_stock_power_successor.py` | `252b0a1a9123aab192c9fec1989dbd64ed9214ae1c17ada97894287e2de36854` |
+| `tests/analyst_revisions_v2/test_dataset_and_import_firewall.py` | `3733729a3c4d6f85593fc94a7614807f9612753b1d7bec3a0a78777d0fef1e8e` |
+
+### 30.7 Review notes for Claude and next gate
+
+Claude should fetch the lane, resolve the new remote tip, list every commit,
+and independently review the exact pushed range
+`ecf473eefc613f0e02cf28a2f784968843a34683..<pushed-head>`. The excluded base is
+the last remote head before this round; the range begins with the previously
+unpushed Codex counter-review commit
+`2bcb1bd4186c43a610862dd065c7798c04a396b9` and includes this candidate and its
+final lane-record commit. Claude should dispose every commit under the standing
+P0-P3 process and verify rather than accept the following claims:
+
+1. Re-render the 7,521-byte contract and independently recompute its artifact
+   SHA, semantic hash, ID, exact 483-session axis, two role schemas, canonical
+   JSON rules, and accepted parent pins.
+2. Prove the three production gates remain exactly null/false and that fixture
+   builders, a valid structural B2 candidate, owner-chosen IDs/evidence hashes,
+   copied objects, or forged dataclasses cannot populate authority.
+3. Trace the worker from both raw identity/length checks through strict parsing,
+   complete parent/input reauthentication, and the exact 13-field output. Check
+   that errors and their cause/context remain value-free.
+4. Independently recompute representative HAC/q05/power cases, including gaps,
+   exactly 50 valid dates, no-pair lags, zeros in q05, the 52-digit Decimal
+   cancellation/order case, the floor boundaries, and 1,388 versus 1,389.
+5. Inspect the registry for retention of only weak parents and input path/hash/
+   size identity; confirm full reauthentication reopens authorized inputs but
+   closed persisted-receipt and successor reauthentication never do.
+6. Exercise persistence's exact basename, same-byte retry, direct different-
+   byte refusal, concurrent same/different-directory calls, ancestor/leaf link
+   refusal, true pre-link/post-link residue recovery, dot-segment retry, sync
+   failure recovery, POSIX mode/owner/link checks, and explicit Windows
+   `O_BINARY`/directory-sync/mode behavior.
+7. Verify the successor has exactly four direct parents and only the six power
+   amendment fields, authenticates every parent's complete subgraph despite its
+   deliberately incomplete direct projection, does not mutate accepted
+   ancestors, and remains inert for both feasible and hard-no-launch receipts.
+8. Re-run the real transitive firewall and attempt package-global writer,
+   receipt re-export, module-object, private-helper, function-global, alias/
+   default/destructuring, and computed-reflection escapes.
+9. Reproduce the focused, parent-chain, complete-lane, and complete-repository
+   results above on the exact final code/test tree; recompute the listed file
+   identities after any correction and update this record in the same commit.
+10. Confirm the exact external-action ledger: only the authorized Massive
+    ratings/earnings/guidance HTTP 200 checks, one value-free historical-row
+    availability/shape inspection, and QC authentication/project-list count of
+    90 occurred. Confirm there is no production calibration input/truth/
+    authority/receipt/successor artifact, QC project creation/upload/compile/
+    run, outcome or result access, deployment, order, trade, research look, or
+    development evaluation, and no credential or provider-row value is
+    retained or disclosed.
+
+If accepted or accepted after lane-specific correction, Claude updates this
+same lane record and pushes on this same branch. Codex then counter-reviews
+every Claude commit before any further ARV2-4D-B work. A real nuisance
+calibration still requires exact independently reviewed production-truth and
+input-operation artifacts plus the implemented evidence opener; those gates
+must bind the owner's already limited authorization without broadening it.
+ARV2-4 outcome evaluation remains explicitly unauthorized, and no receipt can
+authorize result access/disposition, QC launch, deployment, orders, or trading.

@@ -1551,6 +1551,30 @@ def test_owner_working_assumption_cannot_be_removed_or_extended_to_other_sources
 
 
 @pytest.mark.parametrize(
+    ("index", "scope"),
+    [
+        (0, NO_SOURCE_PROCESSING_AUTHORITY_SCOPE_ID),
+        (1, MASSIVE_BENZINGA_ASSUMPTION_SCOPE_ID),
+    ],
+    ids=["massive-source-loses-scope", "reference-source-gains-massive-scope"],
+)
+def test_processing_scope_alone_cannot_drift_from_the_audit_derived_scope(
+    tmp_path, admission, index, scope
+):
+    # ARV2R16-001: the applicability flag stays truthful while only the scope
+    # identifier drifts, so the scope guard itself must refuse.  The manifest
+    # rights inherit the drifted scope, so no cross-binding check masks it.
+    def mutate(raw):
+        raw["processing_rights_evidence"]["source_assumption_bindings"][index][
+            "processing_scope_id"
+        ] = scope
+
+    paths = _write_candidate(tmp_path, admission, evidence_mutate=mutate)
+    with pytest.raises(PowerCalibrationInputManifestError, match="Massive/Benzinga-only"):
+        _load_candidate(admission, paths)
+
+
+@pytest.mark.parametrize(
     "roles",
     [
         [],
@@ -1704,6 +1728,29 @@ def test_entitlement_observation_cannot_postdate_the_vintage_record(tmp_path, ad
         ),
     )
     with pytest.raises(PowerCalibrationInputManifestError, match="chronology"):
+        _load_candidate(admission, paths)
+
+
+@pytest.mark.parametrize(
+    "capture",
+    [FIRST_TEST_SESSION_OPEN_UTC, "2020-01-31T14:30:00.000001Z"],
+    ids=["at-first-test-open", "after-first-test-open"],
+)
+def test_contemporaneous_capture_at_or_after_first_test_open_refuses_by_window(
+    tmp_path, admission, capture
+):
+    # ARV2R16-002: recording follows capture and the manifest inherits the same
+    # capture instant, so only the contemporaneous window guard can refuse.
+    def mutate(raw):
+        raw["vintage_evidence"]["source_snapshot_capture_instant_utc"] = capture
+        raw["vintage_evidence"]["evidence_recorded_instant_utc"] = (
+            "2020-01-31T14:30:00.000002Z"
+        )
+
+    paths = _write_candidate(tmp_path, admission, evidence_mutate=mutate)
+    with pytest.raises(
+        PowerCalibrationInputManifestError, match="outside its frozen window"
+    ):
         _load_candidate(admission, paths)
 
 

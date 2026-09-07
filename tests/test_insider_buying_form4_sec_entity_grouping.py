@@ -604,6 +604,30 @@ def test_owner_attribution_uses_one_primitive_rule_implementation():
         rule((OWNER_CIK,), ())
 
 
+def test_factory_created_grouping_has_an_identity_bound_provenance_seal(
+    monkeypatch,
+):
+    """Pin the IB-2C prerequisite: constructor replay is not provenance."""
+
+    _, grouping = _group(monkeypatch, (_spec(1),))
+    fingerprint = grouping_module._grouping_provenance_fingerprint(grouping)
+    assert grouping_module._is_factory_created_sec_entity_grouping(grouping)
+    assert grouping_module._matches_factory_created_sec_entity_grouping_fingerprint(
+        grouping,
+        fingerprint,
+    )
+
+    coherent_clone = _forge(grouping)
+    _validate_forged_grouping(coherent_clone)
+    assert not grouping_module._is_factory_created_sec_entity_grouping(
+        coherent_clone
+    )
+    assert not grouping_module._matches_factory_created_sec_entity_grouping_fingerprint(
+        coherent_clone,
+        fingerprint,
+    )
+
+
 def test_same_cik_groups_aliases_and_keeps_amendment_observations_distinct(
     monkeypatch,
 ):
@@ -1558,6 +1582,8 @@ def test_ib2b_module_has_no_float_network_provider_outcome_qc_or_execution_surfa
         "datetime",
         "enum",
         "re",
+        "threading",
+        "weakref",
         "research.insider_buying.form4_amendment_reconciliation",
         "research.insider_buying.form4_observed_identity_inventory",
         "research.insider_buying.form4_provisional_disposition_report",

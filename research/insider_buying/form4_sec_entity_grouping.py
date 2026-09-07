@@ -14,7 +14,9 @@ authority.  Ambiguous owner sets are named and quarantined without fan-out.
 from __future__ import annotations
 
 import re
-from dataclasses import InitVar, dataclass
+import threading
+import weakref
+from dataclasses import InitVar, dataclass, fields
 from datetime import date, datetime, timezone
 from enum import Enum
 
@@ -1596,6 +1598,202 @@ class Form4SecEntityGrouping:
         }
 
 
+# IB-2B is an in-memory boundary.  Downstream structural stages must be able
+# to distinguish the exact factory result from a coherent object.__new__ clone
+# or a later object.__setattr__ mutation.  This process-local weak seal is not
+# a signature or persisted/cross-process attestation.
+_GROUPING_PROVENANCE_DATACLASS_TYPES = (
+    Form4SecEntityGrouping,
+    Form4SecEntityGroupingIdentity,
+    Form4SecIssuerIdentityCandidate,
+    Form4SecIssuerObservation,
+    Form4SecReportingOwnerIdentityCandidate,
+    Form4SecReportingOwnerObservation,
+    Form4SecTransactionAttributionRow,
+)
+_GROUPING_PROVENANCE_ENUM_TYPES = (
+    Form4ObservedIdentityDisposition,
+    Form4OwnerAttributionOutcome,
+    Form4ProvisionalDisposition,
+)
+_FACTORY_CREATED_GROUPINGS: dict[
+    int,
+    tuple[weakref.ReferenceType[Form4SecEntityGrouping], str],
+] = {}
+_FACTORY_CREATED_GROUPINGS_LOCK = threading.RLock()
+
+
+def _grouping_provenance_payload(
+    value: object,
+    *,
+    _budget: _ProjectionBudget | None = None,
+    _depth: int = 0,
+) -> object:
+    """Project exact IB-2B output state without invoking object callbacks."""
+
+    if _budget is None:
+        _budget = _ProjectionBudget()
+    if _depth > MAX_FORM4_SEC_ENTITY_GROUPING_PROJECTION_DEPTH:
+        raise Form4SecEntityGroupingError(
+            "REFUSED: grouping provenance exceeds the depth bound"
+        )
+    _budget.nodes += 1
+    if _budget.nodes > MAX_FORM4_SEC_ENTITY_GROUPING_PROJECTION_NODES:
+        raise Form4SecEntityGroupingError(
+            "REFUSED: grouping provenance exceeds the node bound"
+        )
+    value_type = type(value)
+    if any(
+        value_type is enum_type
+        for enum_type in _GROUPING_PROVENANCE_ENUM_TYPES
+    ):
+        return _grouping_provenance_payload(
+            value.value,
+            _budget=_budget,
+            _depth=_depth + 1,
+        )
+    if value_type is date:
+        return value.isoformat()
+    if value_type is str:
+        _budget.text_characters += len(value)
+        if _budget.text_characters > MAX_FORM4_OBSERVED_IDENTITY_TEXT_CHARACTERS:
+            raise Form4SecEntityGroupingError(
+                "REFUSED: grouping provenance exceeds the text bound"
+            )
+        return value
+    if value is None or value_type is bool or value_type is int:
+        return value
+    is_contract = any(
+        value_type is contract_type
+        for contract_type in _GROUPING_PROVENANCE_DATACLASS_TYPES
+    )
+    if value_type is tuple or is_contract:
+        active_ids = _budget.active_ids
+        assert active_ids is not None
+        value_id = id(value)
+        if value_id in active_ids:
+            raise Form4SecEntityGroupingError(
+                "REFUSED: grouping provenance contains a cycle"
+            )
+        active_ids.add(value_id)
+        try:
+            if value_type is tuple:
+                return [
+                    _grouping_provenance_payload(
+                        item,
+                        _budget=_budget,
+                        _depth=_depth + 1,
+                    )
+                    for item in value
+                ]
+            declared_fields = {item.name for item in fields(value_type)}
+            instance_state = object.__getattribute__(value, "__dict__")
+            if (
+                type(instance_state) is not dict
+                or set(instance_state) != declared_fields
+            ):
+                raise Form4SecEntityGroupingError(
+                    "REFUSED: grouping provenance dataclass state is not exact"
+                )
+            return {
+                item.name: _grouping_provenance_payload(
+                    instance_state[item.name],
+                    _budget=_budget,
+                    _depth=_depth + 1,
+                )
+                for item in fields(value_type)
+            }
+        finally:
+            active_ids.remove(value_id)
+    raise Form4SecEntityGroupingError(
+        "REFUSED: grouping provenance contains an unsupported value"
+    )
+
+
+def _grouping_provenance_fingerprint(
+    grouping: Form4SecEntityGrouping,
+) -> str:
+    if type(grouping) is not Form4SecEntityGrouping:
+        raise Form4SecEntityGroupingError(
+            "REFUSED: provenance input must be an exact SEC entity grouping"
+        )
+    return hash_payload(_grouping_provenance_payload(grouping))
+
+
+def _register_factory_created_grouping(
+    grouping: Form4SecEntityGrouping,
+) -> None:
+    fingerprint = _grouping_provenance_fingerprint(grouping)
+    object_id = id(grouping)
+
+    def _remove_if_current(
+        dead_reference: weakref.ReferenceType[Form4SecEntityGrouping],
+    ) -> None:
+        with _FACTORY_CREATED_GROUPINGS_LOCK:
+            current = _FACTORY_CREATED_GROUPINGS.get(object_id)
+            if current is not None and current[0] is dead_reference:
+                _FACTORY_CREATED_GROUPINGS.pop(object_id, None)
+
+    grouping_reference = weakref.ref(grouping, _remove_if_current)
+    with _FACTORY_CREATED_GROUPINGS_LOCK:
+        _FACTORY_CREATED_GROUPINGS[object_id] = (
+            grouping_reference,
+            fingerprint,
+        )
+
+
+def _matches_factory_created_sec_entity_grouping_fingerprint(
+    value: object,
+    observed_fingerprint: object,
+) -> bool:
+    try:
+        if (
+            type(value) is not Form4SecEntityGrouping
+            or type(observed_fingerprint) is not str
+            or _SHA256_RE.fullmatch(observed_fingerprint) is None
+        ):
+            return False
+        with _FACTORY_CREATED_GROUPINGS_LOCK:
+            current = _FACTORY_CREATED_GROUPINGS.get(id(value))
+            return (
+                current is not None
+                and current[0]() is value
+                and current[1] == observed_fingerprint
+            )
+    except (
+        AttributeError,
+        KeyError,
+        OverflowError,
+        RecursionError,
+        RuntimeError,
+        TypeError,
+        ValueError,
+    ):
+        return False
+
+
+def _is_factory_created_sec_entity_grouping(value: object) -> bool:
+    try:
+        if type(value) is not Form4SecEntityGrouping:
+            return False
+        fingerprint = _grouping_provenance_fingerprint(value)
+        return _matches_factory_created_sec_entity_grouping_fingerprint(
+            value,
+            fingerprint,
+        )
+    except (
+        AttributeError,
+        Form4SecEntityGroupingError,
+        KeyError,
+        OverflowError,
+        RecursionError,
+        RuntimeError,
+        TypeError,
+        ValueError,
+    ):
+        return False
+
+
 def _upstream_owner_payload(state: dict) -> dict[str, object]:
     return {
         "accession_number": state["accession_number"],
@@ -2697,6 +2895,7 @@ def _build_form4_sec_entity_grouping(
         raise Form4SecEntityGroupingError(
             "REFUSED: upstream inventory changed during grouping"
         )
+    _register_factory_created_grouping(grouping)
     return grouping
 
 

@@ -12,6 +12,8 @@ a confirmatory cell or permanent look, plus the observed-only IB-2A normalized
 identity inventory that leaves every point-in-time resolution gate closed.
 It also exposes the IB-2B exact-SEC-CIK grouping boundary, which retains every
 issuer and reporting-owner observation and quarantines ambiguous attribution.
+The IB-2C boundary maps those exhaustive transactions against caller-supplied,
+dated security/title/ticker references while retaining zero external authority.
 """
 
 from research.insider_buying.contracts import (
@@ -92,6 +94,20 @@ from research.insider_buying.form4_sec_entity_grouping import (
     Form4SecTransactionAttributionRow,
     build_form4_sec_entity_grouping,
 )
+from research.insider_buying.form4_pit_security_mapping import (
+    FORM4_PIT_SECURITY_MAPPING_VERSION,
+    Form4PitSecurityMapping,
+    Form4PitSecurityMappingError,
+    Form4PitSecurityMappingIdentity,
+    Form4PitSecurityMappingOutcome,
+    Form4PitSecurityMappingRow,
+    Form4PitSecurityRecord,
+    Form4SecurityClass,
+    Form4SecurityTitleInterval,
+    Form4SecurityTitleMappingKind,
+    Form4TickerInterval,
+    build_form4_pit_security_mapping,
+)
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
     LoadedSecBulkSnapshot,
@@ -155,6 +171,7 @@ __all__ = [
     "FORM4_AMENDMENT_RECONCILIATION_VERSION",
     "FORM4_MULTI_PERIOD_EVIDENCE_VERSION",
     "FORM4_OBSERVED_IDENTITY_INVENTORY_VERSION",
+    "FORM4_PIT_SECURITY_MAPPING_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION",
     "FORM4_SEC_ENTITY_GROUPING_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_KIND",
@@ -176,6 +193,12 @@ __all__ = [
     "Form4ObservedReportingOwnerIdentityRow",
     "Form4ObservedTransactionIdentityRow",
     "Form4OwnerAttributionOutcome",
+    "Form4PitSecurityMapping",
+    "Form4PitSecurityMappingError",
+    "Form4PitSecurityMappingIdentity",
+    "Form4PitSecurityMappingOutcome",
+    "Form4PitSecurityMappingRow",
+    "Form4PitSecurityRecord",
     "Form4ProvisionalDisposition",
     "Form4ProvisionalDispositionReport",
     "Form4ProvisionalDispositionReportError",
@@ -190,6 +213,10 @@ __all__ = [
     "Form4SecReportingOwnerIdentityCandidate",
     "Form4SecReportingOwnerObservation",
     "Form4SecTransactionAttributionRow",
+    "Form4SecurityClass",
+    "Form4SecurityTitleInterval",
+    "Form4SecurityTitleMappingKind",
+    "Form4TickerInterval",
     "Form4ObservedState",
     "Form4ParseError",
     "Form4VersionDisposition",
@@ -243,6 +270,7 @@ __all__ = [
     "TransactionDiagnostic",
     "build_filing_corpus",
     "build_form4_observed_identity_inventory",
+    "build_form4_pit_security_mapping",
     "build_form4_provisional_disposition_report",
     "build_form4_sec_entity_grouping",
     "assemble_sec_form4_multi_period_evidence",

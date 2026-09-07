@@ -61,6 +61,7 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "data.financial_primitives",
     "research",
     "research.analyst_revisions_v2",
+    "research.analyst_revisions_v2.artifact_io",
     "research.analyst_revisions_v2.availability",
     "research.analyst_revisions_v2.canonical",
     "research.analyst_revisions_v2.contracts",
@@ -77,6 +78,7 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "research.analyst_revisions_v2.legacy_reproduction",
     "research.analyst_revisions_v2.normalization",
     "research.analyst_revisions_v2.portfolio",
+    "research.analyst_revisions_v2.power_calibration_input_manifest",
     "research.analyst_revisions_v2.power_calibration_input_schema",
     "research.analyst_revisions_v2.power_calibration_protocol",
     "research.analyst_revisions_v2.preregistration",
@@ -862,6 +864,57 @@ def test_dataset_retains_only_its_four_reviewed_capability_imports(tmp_path):
     )
 
 
+def test_dataset_capability_importer_cannot_be_laundered_as_module_object(
+    tmp_path: Path,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(
+        "import research.analyst_revisions_v2.dataset as dataset\n"
+        "def leak(alias=dataset):\n"
+        "    return getattr(alias, chr(111) + chr(115)).spawnv\n"
+        "VALUE = leak()\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "dataset.py").write_text("import os\n", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="facade module object"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_dataset_function_cannot_be_laundered_through_globals(
+    tmp_path: Path,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(
+        "from research.analyst_revisions_v2.dataset import read_git_text\n"
+        "def text(*values):\n"
+        "    return ''.join(chr(value) for value in values)\n"
+        "def leak(alias=read_git_text):\n"
+        "    namespace = getattr(alias, text(95, 95, 103, 108, 111, 98, 97, 108, 115, 95, 95))\n"
+        "    return namespace[text(111, 115)].spawnv\n"
+        "VALUE = leak()\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "dataset.py").write_text(
+        "def read_git_text(*args):\n"
+        "    return ''\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ImportBoundaryError, match="unsafe facade export value"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
 @pytest.mark.parametrize(
     "guarded_source",
     (
@@ -903,6 +956,12 @@ def test_exchange_calendar_facade_cannot_reexport_dataframe_capabilities(
             "facade = calendar\n"
             "getattr(facade, 'p' + chr(100)).read_pickle('outcome.pkl')\n"
         ),
+        (
+            "import data.exchange_calendar as calendar\n"
+            "def leak(alias=calendar):\n"
+            "    return getattr(alias, chr(112) + chr(100)).read_pickle\n"
+            "VALUE = leak()\n"
+        ),
     ),
 )
 def test_exchange_calendar_facade_refuses_computed_dynamic_access(
@@ -919,8 +978,113 @@ def test_exchange_calendar_facade_refuses_computed_dynamic_access(
         encoding="utf-8",
     )
 
-    with pytest.raises(ImportBoundaryError, match="dynamic facade access"):
+    with pytest.raises(ImportBoundaryError, match="facade module object"):
         _validate_import_closure(tmp_path, package_name="guarded")
+
+
+@pytest.mark.parametrize(
+    "guarded_source, refusal",
+    (
+        (
+            "from research.analyst_revisions_v2.artifact_io import "
+            "_read_regular_once\n",
+            "unsafe facade export",
+        ),
+        (
+            "import research.analyst_revisions_v2.artifact_io as artifact_io\n"
+            "VALUE = artifact_io.os\n",
+            "facade module object",
+        ),
+        (
+            "import research.analyst_revisions_v2.artifact_io as artifact_io\n"
+            "VALUE = getattr(artifact_io, 'read_' + 'stable_regular')\n",
+            "facade module object",
+        ),
+        (
+            "import research.analyst_revisions_v2.artifact_io as artifact_io\n"
+            "VALUE = artifact_io._read_regular_once\n",
+            "facade module object",
+        ),
+        (
+            "from research.analyst_revisions_v2 import artifact_io\n"
+            "VALUE = artifact_io._bounded_descriptor_read\n",
+            "facade module object",
+        ),
+        (
+            "import research.analyst_revisions_v2.artifact_io as artifact_io\n"
+            "first = second = artifact_io\n"
+            "VALUE = second._bounded_descriptor_read\n",
+            "facade module object",
+        ),
+        (
+            "import research.analyst_revisions_v2.artifact_io as artifact_io\n"
+            "def leak(value=artifact_io):\n"
+            "    return getattr(value, ''.join(('o', 's'))).spawnv\n"
+            "VALUE = leak()\n",
+            "facade module object",
+        ),
+        (
+            "import research.analyst_revisions_v2.artifact_io as artifact_io\n"
+            "[leaked] = [artifact_io]\n"
+            "VALUE = getattr(leaked, ''.join(('o', 's'))).spawnv\n",
+            "facade module object",
+        ),
+        (
+            "from research.analyst_revisions_v2.artifact_io import "
+            "read_stable_regular\n"
+            "namespace = getattr(read_stable_regular, "
+            "''.join(('__glo', 'bals__')))\n"
+            "VALUE = namespace[''.join(('o', 's'))].spawnv\n",
+            "getattr",
+        ),
+        (
+            "from research.analyst_revisions_v2.artifact_io import "
+            "read_stable_regular\n"
+            "leaked = read_stable_regular\n",
+            "unsafe facade export value",
+        ),
+    ),
+)
+def test_artifact_io_facade_does_not_reexport_descriptor_capabilities(
+    tmp_path: Path, guarded_source: str, refusal: str
+) -> None:
+    guarded = tmp_path / "guarded"
+    facade = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    facade.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(guarded_source, encoding="utf-8")
+    (facade.parent / "__init__.py").write_text("", encoding="utf-8")
+    (facade / "__init__.py").write_text("", encoding="utf-8")
+    (facade / "artifact_io.py").write_text(
+        "import os\nimport stat\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ImportBoundaryError, match=refusal):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_artifact_io_facade_relative_module_import_cannot_reach_private_helpers(
+    tmp_path: Path,
+) -> None:
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "artifact_io.py").write_text(
+        "import os\nimport stat\n",
+        encoding="utf-8",
+    )
+    (package / "consumer.py").write_text(
+        "from . import artifact_io\n"
+        "VALUE = artifact_io._bounded_descriptor_read\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ImportBoundaryError, match="facade module object"):
+        _validate_import_closure(
+            tmp_path, package_name="research.analyst_revisions_v2"
+        )
 
 
 def _authority_registry_names(tree: ast.Module) -> set[str]:
@@ -1012,6 +1176,10 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
         },
         "global_benchmark_contract.py": {"_GLOBAL_BENCHMARK_AUTHORITIES"},
         "holdings.py": {"_STOCK_SCORE_AUTHORITIES"},
+        "power_calibration_input_manifest.py": {
+            "_ADMISSION_AUTHORITIES",
+            "_CANDIDATE_AUTHORITIES",
+        },
         "power_calibration_input_schema.py": {
             "_POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES"
         },

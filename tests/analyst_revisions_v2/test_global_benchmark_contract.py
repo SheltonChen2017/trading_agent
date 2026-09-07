@@ -8,6 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
+import research.analyst_revisions_v2.artifact_io as artifact_io_module
 import research.analyst_revisions_v2.global_benchmark_contract as module
 from research.analyst_revisions_v2.global_benchmark_contract import (
     FOLD_MANIFEST_ARTIFACT_SHA256,
@@ -836,21 +837,28 @@ def test_private_expected_policy_constants_are_recursively_immutable():
 def test_unstable_double_read_refuses_before_authentication(tmp_path, monkeypatch):
     root = _clone(tmp_path)
     target = _paths(root)["map"].resolve()
-    original = Path.read_bytes
+    original = artifact_io_module._read_regular_once
     calls = 0
 
-    def unstable(path):
+    def unstable(path, *, name, maximum_bytes):
         nonlocal calls
-        payload = original(path)
+        payload, identity = original(path, name=name, maximum_bytes=maximum_bytes)
         if path.resolve() == target:
             calls += 1
             if calls == 2:
-                return payload + b" "
-        return payload
+                return payload + b" ", identity
+        return payload, identity
 
-    monkeypatch.setattr(Path, "read_bytes", unstable)
+    monkeypatch.setattr(artifact_io_module, "_read_regular_once", unstable)
     with pytest.raises(GlobalBenchmarkContractError, match="changed while being read"):
         _load(root)
+
+
+def test_global_reader_refuses_oversized_artifact_before_unbounded_read(tmp_path):
+    path = tmp_path / "oversized-global-contract.json"
+    path.write_bytes(b"x" * (module.MAX_AUTHENTICATED_ARTIFACT_BYTES + 1))
+    with pytest.raises(GlobalBenchmarkContractError, match="size limit"):
+        module._read_stable_regular(path, "global benchmark contract")
 
 
 @pytest.mark.parametrize("source", tuple(FILENAMES))

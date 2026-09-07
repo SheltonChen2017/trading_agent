@@ -24,6 +24,7 @@ from pathlib import Path
 
 import pytest
 
+import research.analyst_revisions_v2.artifact_io as artifact_io_module
 import research.analyst_revisions_v2.power_calibration_protocol as module
 from research.analyst_revisions_v2.power_calibration_protocol import (
     CALIBRATION_AXIS_SHA256,
@@ -738,21 +739,28 @@ def test_wrong_declared_identity_is_refused(tmp_path, field):
 def test_unstable_protocol_read_is_refused(tmp_path, monkeypatch):
     root = _clone(tmp_path)
     target = _paths(root)["protocol"].resolve()
-    original = Path.read_bytes
+    original = artifact_io_module._read_regular_once
     reads = 0
 
-    def unstable(path):
+    def unstable(path, *, name, maximum_bytes):
         nonlocal reads
-        payload = original(path)
+        payload, identity = original(path, name=name, maximum_bytes=maximum_bytes)
         if path.resolve() == target:
             reads += 1
             if reads == 2:
-                return payload + b" "
-        return payload
+                return payload + b" ", identity
+        return payload, identity
 
-    monkeypatch.setattr(Path, "read_bytes", unstable)
+    monkeypatch.setattr(artifact_io_module, "_read_regular_once", unstable)
     with pytest.raises(PowerCalibrationProtocolError, match="changed while being read"):
         _load(root)
+
+
+def test_protocol_reader_refuses_oversized_artifact_before_unbounded_read(tmp_path):
+    path = tmp_path / "oversized-protocol.json"
+    path.write_bytes(b"x" * (module.MAX_AUTHENTICATED_ARTIFACT_BYTES + 1))
+    with pytest.raises(PowerCalibrationProtocolError, match="size limit"):
+        module._read_stable_regular(path, "power protocol")
 
 
 def test_interior_complete_session_axis_drift_is_refused(tmp_path, monkeypatch):

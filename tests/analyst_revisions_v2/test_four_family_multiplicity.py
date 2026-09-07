@@ -18,6 +18,7 @@ from types import SimpleNamespace
 
 import pytest
 
+import research.analyst_revisions_v2.artifact_io as artifact_io_module
 import research.analyst_revisions_v2.four_family_multiplicity as module
 from research.analyst_revisions_v2.four_family_multiplicity import (
     ANALYST_FAMILY_ID,
@@ -655,19 +656,19 @@ def test_parent_and_zero_look_authority_substitution_refuse(tmp_path):
 def test_unstable_double_read_is_refused(tmp_path, monkeypatch):
     root = _clone(tmp_path)
     target = _paths(root)["overlay"].resolve()
-    original = Path.read_bytes
+    original = artifact_io_module._read_regular_once
     calls = 0
 
-    def unstable_read(path):
+    def unstable_read(path, *, name, maximum_bytes):
         nonlocal calls
-        payload = original(path)
+        payload, identity = original(path, name=name, maximum_bytes=maximum_bytes)
         if path.resolve() == target:
             calls += 1
             if calls == 2:
-                return payload + b" "
-        return payload
+                return payload + b" ", identity
+        return payload, identity
 
-    monkeypatch.setattr(Path, "read_bytes", unstable_read)
+    monkeypatch.setattr(artifact_io_module, "_read_regular_once", unstable_read)
     with pytest.raises(FourFamilyMultiplicityError, match="changed while being read"):
         _load(root)
 
@@ -675,32 +676,30 @@ def test_unstable_double_read_is_refused(tmp_path, monkeypatch):
 def test_stable_read_stat_identity_change_is_refused(tmp_path, monkeypatch):
     root = _clone(tmp_path)
     target = _paths(root)["overlay"].absolute()
-    original_read = Path.read_bytes
-    original_stat = Path.stat
+    original_read = artifact_io_module._read_regular_once
     reads = 0
 
-    def tracked_read(path):
+    def changed_identity(path, *, name, maximum_bytes):
         nonlocal reads
-        payload = original_read(path)
+        payload, identity = original_read(
+            path, name=name, maximum_bytes=maximum_bytes
+        )
         if path.absolute() == target:
             reads += 1
-        return payload
+            if reads >= 2:
+                return payload, (*identity[:-1], identity[-1] + 1)
+        return payload, identity
 
-    def changed_stat(path, *args, **kwargs):
-        value = original_stat(path, *args, **kwargs)
-        if path.absolute() == target and reads >= 2:
-            return SimpleNamespace(
-                st_dev=value.st_dev,
-                st_ino=value.st_ino,
-                st_size=value.st_size,
-                st_mtime_ns=value.st_mtime_ns + 1,
-            )
-        return value
-
-    monkeypatch.setattr(Path, "read_bytes", tracked_read)
-    monkeypatch.setattr(Path, "stat", changed_stat)
+    monkeypatch.setattr(artifact_io_module, "_read_regular_once", changed_identity)
     with pytest.raises(FourFamilyMultiplicityError, match="changed while being read"):
         _load(root)
+
+
+def test_overlay_reader_refuses_oversized_artifact_before_unbounded_read(tmp_path):
+    path = tmp_path / "oversized-overlay.json"
+    path.write_bytes(b"x" * (module.MAX_AUTHENTICATED_ARTIFACT_BYTES + 1))
+    with pytest.raises(FourFamilyMultiplicityError, match="size limit"):
+        module._read_stable_regular(path, "multiplicity overlay")
 
 
 @pytest.mark.parametrize("key", ("plan", "base"))

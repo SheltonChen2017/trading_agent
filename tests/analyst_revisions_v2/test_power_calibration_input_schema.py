@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pytest
 
+import research.analyst_revisions_v2.artifact_io as artifact_io_module
 import research.analyst_revisions_v2.power_calibration_input_schema as module
 from research.analyst_revisions_v2.power_calibration_input_schema import (
     CALIBRATION_AXIS_SHA256,
@@ -649,19 +650,21 @@ def test_schema_loader_refuses_unstable_bytes_and_stat_identity(tmp_path, monkey
     path = tmp_path / FILENAMES["schema"]
     path.write_bytes(_paths()["schema"].read_bytes())
     target = path.absolute()
-    original_read = Path.read_bytes
+    original_read = artifact_io_module._read_regular_once
     reads = 0
 
-    def unstable_read(candidate):
+    def unstable_read(candidate, *, name, maximum_bytes):
         nonlocal reads
-        payload = original_read(candidate)
+        payload, identity = original_read(
+            candidate, name=name, maximum_bytes=maximum_bytes
+        )
         if candidate.absolute() == target:
             reads += 1
             if reads == 2:
-                return payload + b" "
-        return payload
+                return payload + b" ", identity
+        return payload, identity
 
-    monkeypatch.setattr(Path, "read_bytes", unstable_read)
+    monkeypatch.setattr(artifact_io_module, "_read_regular_once", unstable_read)
     with pytest.raises(PowerCalibrationInputSchemaError, match="changed while"):
         load_power_calibration_input_schema(path, power_protocol=_load_protocol())
 
@@ -670,36 +673,30 @@ def test_schema_loader_refuses_stat_identity_change(tmp_path, monkeypatch):
     path = tmp_path / FILENAMES["schema"]
     path.write_bytes(_paths()["schema"].read_bytes())
     target = path.absolute()
-    original_read = Path.read_bytes
-    original_stat = Path.stat
+    original_read = artifact_io_module._read_regular_once
     reads = 0
 
-    def tracked_read(candidate):
+    def changed_identity(candidate, *, name, maximum_bytes):
         nonlocal reads
-        payload = original_read(candidate)
+        payload, identity = original_read(
+            candidate, name=name, maximum_bytes=maximum_bytes
+        )
         if candidate.absolute() == target:
             reads += 1
-        return payload
+            if reads >= 2:
+                return payload, (*identity[:-1], identity[-1] + 1)
+        return payload, identity
 
-    def changed_stat(candidate, *args, **kwargs):
-        value = original_stat(candidate, *args, **kwargs)
-        if candidate.absolute() == target and reads >= 2:
-            return type(
-                "ChangedStat",
-                (),
-                {
-                    "st_dev": value.st_dev,
-                    "st_ino": value.st_ino,
-                    "st_size": value.st_size,
-                    "st_mtime_ns": value.st_mtime_ns + 1,
-                },
-            )()
-        return value
-
-    monkeypatch.setattr(Path, "read_bytes", tracked_read)
-    monkeypatch.setattr(Path, "stat", changed_stat)
+    monkeypatch.setattr(artifact_io_module, "_read_regular_once", changed_identity)
     with pytest.raises(PowerCalibrationInputSchemaError, match="changed while"):
         load_power_calibration_input_schema(path, power_protocol=_load_protocol())
+
+
+def test_schema_reader_refuses_oversized_artifact_before_unbounded_read(tmp_path):
+    path = tmp_path / "oversized-schema.json"
+    path.write_bytes(b"x" * (module.MAX_AUTHENTICATED_ARTIFACT_BYTES + 1))
+    with pytest.raises(PowerCalibrationInputSchemaError, match="size limit"):
+        module._read_stable_regular(path, "calibration input schema")
 
 
 def _junction(link: Path, target: Path) -> None:

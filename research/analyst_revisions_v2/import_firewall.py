@@ -83,9 +83,13 @@ _FORBIDDEN_RUNTIME_ATTRIBUTES = frozenset(
         "__delattr__",
         "__spec__",
         "__subclasses__",
+        "_bounded_descriptor_read",
         "_create_fn",
         "_eval_type",
         "_evaluate",
+        "_file_identity",
+        "_is_link_like",
+        "_read_regular_once",
         "builtins",
         "eval",
         "evaluate_forward_ref",
@@ -116,6 +120,7 @@ _RESTRICTED_CAPABILITY_NAMES = frozenset(
     {"os", "shutil", "subprocess", "sys", "uuid"}
 )
 _CAPABILITY_IMPORTER = "research.analyst_revisions_v2.dataset"
+_ARTIFACT_IO_FACADE = "research.analyst_revisions_v2.artifact_io"
 _FIREWALL_MODULE = "research.analyst_revisions_v2.import_firewall"
 
 
@@ -202,10 +207,26 @@ DEFAULT_FORBIDDEN_IMPORT_PREFIXES = frozenset(
 # that need them. They are not part of the general standard-library allowlist.
 _ALLOWED_EXTERNAL_IMPORT_ROOTS = {
     _CAPABILITY_IMPORTER: frozenset({"os", "shutil", "subprocess", "uuid"}),
+    _ARTIFACT_IO_FACADE: frozenset({"os", "stat"}),
     "data.exchange_calendar": frozenset({"pandas", "pandas_market_calendars"}),
 }
 
 _SAFE_LOCAL_FACADE_EXPORTS = {
+    _CAPABILITY_IMPORTER: frozenset(
+        {
+            "DatasetVerificationError",
+            "capture_clean_git_lineage",
+            "compute_package_source_sha256",
+            "git_commit_is_ancestor",
+            "load_normalized_dataset",
+            "read_git_bytes",
+            "read_git_text",
+            "revalidate_normalized_dataset",
+        }
+    ),
+    _ARTIFACT_IO_FACADE: frozenset(
+        {"ArtifactIOError", "read_stable_regular", "revalidate_regular"}
+    ),
     "data.exchange_calendar": frozenset(
         {
             "ExchangeCalendarError",
@@ -217,6 +238,7 @@ _SAFE_LOCAL_FACADE_EXPORTS = {
         }
     )
 }
+_NO_MODULE_OBJECT_FACADES = frozenset(_SAFE_LOCAL_FACADE_EXPORTS)
 
 
 class ImportBoundaryError(ValueError):
@@ -414,33 +436,56 @@ def _reject_runtime_import_indirection(
                 return (*prefix, node.attr)
         return None
 
-    facade_paths: set[tuple[str, ...]] = set()
-    facade_aliases: set[str] = set()
+    facade_paths: dict[tuple[str, ...], frozenset[str]] = {}
+    facade_aliases: dict[str, frozenset[str]] = {}
+    safe_facade_export_aliases: dict[str, str] = {}
+
+    def remember_facade_alias(name: str, safe_exports: frozenset[str]) -> bool:
+        existing = facade_aliases.get(name)
+        narrowed = safe_exports if existing is None else existing & safe_exports
+        if existing == narrowed:
+            return False
+        facade_aliases[name] = narrowed
+        return True
+
     for candidate in ast.walk(tree):
         if isinstance(candidate, ast.Import):
             for alias in candidate.names:
-                if alias.name not in _SAFE_LOCAL_FACADE_EXPORTS:
+                safe_exports = _SAFE_LOCAL_FACADE_EXPORTS.get(alias.name)
+                if safe_exports is None:
                     continue
                 if alias.asname:
-                    facade_aliases.add(alias.asname)
+                    remember_facade_alias(alias.asname, safe_exports)
                 else:
-                    facade_paths.add(tuple(alias.name.split(".")))
-        elif (
-            isinstance(candidate, ast.ImportFrom)
-            and candidate.level == 0
-            and candidate.module
-        ):
+                    facade_paths[tuple(alias.name.split("."))] = safe_exports
+        elif isinstance(candidate, ast.ImportFrom):
+            from_candidates = _from_import_candidates(candidate, module)
+            imported_base = from_candidates[0] if from_candidates else ""
+            base_safe_exports = _SAFE_LOCAL_FACADE_EXPORTS.get(imported_base)
             for alias in candidate.names:
-                imported = f"{candidate.module}.{alias.name}"
-                if imported in _SAFE_LOCAL_FACADE_EXPORTS:
-                    facade_aliases.add(alias.asname or alias.name)
+                imported = (
+                    f"{imported_base}.{alias.name}"
+                    if imported_base
+                    else alias.name
+                )
+                safe_exports = _SAFE_LOCAL_FACADE_EXPORTS.get(imported)
+                if safe_exports is not None:
+                    remember_facade_alias(alias.asname or alias.name, safe_exports)
+                if base_safe_exports is not None and alias.name in base_safe_exports:
+                    safe_facade_export_aliases[alias.asname or alias.name] = alias.name
+
+    def facade_exports(node: ast.AST) -> frozenset[str] | None:
+        path = attribute_path(node)
+        if path is None:
+            return None
+        if path in facade_paths:
+            return facade_paths[path]
+        if len(path) == 1:
+            return facade_aliases.get(path[0])
+        return None
 
     def is_facade_expression(node: ast.AST) -> bool:
-        path = attribute_path(node)
-        return path is not None and (
-            path in facade_paths
-            or (len(path) == 1 and path[0] in facade_aliases)
-        )
+        return facade_exports(node) is not None
 
     facade_assignments: list[tuple[tuple[str, ...], ast.AST]] = []
     for candidate in ast.walk(tree):
@@ -463,12 +508,12 @@ def _reject_runtime_import_indirection(
     for _iteration in range(len(facade_assignments) + 1):
         changed = False
         for names, value_node in facade_assignments:
-            if not is_facade_expression(value_node):
+            safe_exports = facade_exports(value_node)
+            if safe_exports is None:
                 continue
-            before = len(facade_aliases)
-            facade_aliases.update(names)
-            if len(facade_aliases) != before:
-                changed = True
+            for name in names:
+                if remember_facade_alias(name, safe_exports):
+                    changed = True
         if not changed:
             break
 
@@ -522,6 +567,24 @@ def _reject_runtime_import_indirection(
             ]
             if len(parts) == len(node.values):
                 return frozenset({"".join(parts)})
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "join"
+            and len(node.args) == 1
+            and not node.keywords
+            and isinstance(node.args[0], (ast.List, ast.Tuple))
+        ):
+            separators = constant_strings(node.func.value)
+            components = [constant_strings(item) for item in node.args[0].elts]
+            if (
+                len(separators) == 1
+                and all(len(component) == 1 for component in components)
+            ):
+                separator = next(iter(separators))
+                result = separator.join(next(iter(component)) for component in components)
+                if len(result) <= 512:
+                    return frozenset({result})
         return frozenset()
 
     for _iteration in range(len(string_assignments) + 1):
@@ -596,6 +659,9 @@ def _reject_runtime_import_indirection(
         if isinstance(node, ast.Import):
             for alias in node.names:
                 imported_root = alias.name.partition(".")[0]
+                if alias.name in _NO_MODULE_OBJECT_FACADES:
+                    primitive = f"facade module object {alias.name}"
+                    break
                 if imported_root in {"builtins", "importlib"}:
                     primitive = alias.name
                     break
@@ -615,8 +681,15 @@ def _reject_runtime_import_indirection(
             from_candidates = _from_import_candidates(node, module)
             imported_base = from_candidates[0] if from_candidates else ""
             safe_exports = _SAFE_LOCAL_FACADE_EXPORTS.get(imported_base)
+            imported_module_objects = {
+                f"{imported_base}.{alias.name}" if imported_base else alias.name
+                for alias in node.names
+                if alias.name != "*"
+            }
             if any(alias.name == "*" for alias in node.names):
                 primitive = "wildcard import"
+            elif imported_module_objects & _NO_MODULE_OBJECT_FACADES:
+                primitive = "facade module object"
             elif safe_exports is not None and any(
                 alias.name not in safe_exports for alias in node.names
             ):
@@ -656,6 +729,25 @@ def _reject_runtime_import_indirection(
             primitive = node.id
         elif (
             isinstance(node, ast.Name)
+            and isinstance(node.ctx, ast.Load)
+            and node.id in safe_facade_export_aliases
+        ):
+            parent = parents.get(node)
+            if not (
+                (isinstance(parent, ast.Call) and parent.func is node)
+                or (isinstance(parent, ast.ExceptHandler) and parent.type is node)
+                or (
+                    isinstance(parent, ast.Tuple)
+                    and isinstance(parents.get(parent), ast.ExceptHandler)
+                    and parents[parent].type is parent
+                )
+            ):
+                primitive = (
+                    "unsafe facade export value "
+                    f"{safe_facade_export_aliases[node.id]!r}"
+                )
+        elif (
+            isinstance(node, ast.Name)
             and node.id in _RESTRICTED_CAPABILITY_NAMES
             and not _is_explicitly_allowed_external(module.name, node.id)
         ):
@@ -689,6 +781,12 @@ def _reject_runtime_import_indirection(
             and node.attr in _RESTRICTED_CAPABILITY_NAMES
         ):
             primitive = node.attr
+        elif (
+            isinstance(node, ast.Attribute)
+            and (safe_exports := facade_exports(node.value)) is not None
+            and node.attr not in safe_exports
+        ):
+            primitive = f"unsafe facade attribute {node.attr!r}"
         elif (
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Name)

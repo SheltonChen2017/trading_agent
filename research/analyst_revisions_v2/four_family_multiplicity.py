@@ -17,6 +17,12 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
 
+from .artifact_io import (
+    ArtifactIOError,
+    read_stable_regular as _read_artifact_stable_regular,
+    revalidate_regular as _revalidate_artifact_regular,
+)
+
 from .qc_first_plan import (
     QcFirstPlanError,
     QcFirstStudyPlan,
@@ -26,6 +32,9 @@ from .qc_first_plan import (
 
 class FourFamilyMultiplicityError(ValueError):
     """The overlay, its ancestry, or its claimed effective policy is invalid."""
+
+
+MAX_AUTHENTICATED_ARTIFACT_BYTES = 4 * 1024 * 1024
 
 
 SCHEMA = "arv2-four-family-multiplicity-overlay-structural-v1"
@@ -326,49 +335,27 @@ def _object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return result
 
 
-def _is_link_like(path: Path) -> bool:
-    try:
-        return path.is_symlink() or bool(
-            getattr(path, "is_junction", lambda: False)()
-        )
-    except OSError:
-        return True
-
-
 def _read_stable_regular(path: Path, name: str) -> tuple[Path, bytes]:
-    candidate = Path(path)
-    absolute = candidate.absolute()
-    if any(_is_link_like(item) for item in (absolute, *absolute.parents)):
-        raise FourFamilyMultiplicityError(f"{name} must not traverse a link")
     try:
-        resolved = candidate.resolve(strict=True)
-    except OSError as exc:
-        raise FourFamilyMultiplicityError(f"{name} is unavailable") from exc
-    if _is_link_like(resolved) or not resolved.is_file():
-        raise FourFamilyMultiplicityError(f"{name} must be a regular file")
-    try:
-        before = resolved.stat()
-        first = resolved.read_bytes()
-        second = resolved.read_bytes()
-        after = resolved.stat()
-    except OSError as exc:
-        raise FourFamilyMultiplicityError(f"{name} is unreadable") from exc
-    before_identity = (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns)
-    after_identity = (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns)
-    if before_identity != after_identity or first != second:
-        raise FourFamilyMultiplicityError(f"{name} changed while being read")
-    return resolved, first
+        return _read_artifact_stable_regular(
+            Path(path),
+            name=name,
+            maximum_bytes=MAX_AUTHENTICATED_ARTIFACT_BYTES,
+        )
+    except ArtifactIOError as exc:
+        raise FourFamilyMultiplicityError(str(exc)) from exc
 
 
 def _revalidate(path: Path, payload: bytes, name: str) -> None:
-    if _is_link_like(path) or not path.is_file():
-        raise FourFamilyMultiplicityError(f"{name} changed or disappeared")
     try:
-        current = path.read_bytes()
-    except OSError as exc:
-        raise FourFamilyMultiplicityError(f"{name} changed or disappeared") from exc
-    if current != payload:
-        raise FourFamilyMultiplicityError(f"{name} changed after authentication")
+        _revalidate_artifact_regular(
+            path,
+            payload,
+            name=name,
+            maximum_bytes=MAX_AUTHENTICATED_ARTIFACT_BYTES,
+        )
+    except ArtifactIOError as exc:
+        raise FourFamilyMultiplicityError(str(exc)) from exc
 
 
 def _parse_artifact(payload: bytes, name: str) -> dict[str, Any]:

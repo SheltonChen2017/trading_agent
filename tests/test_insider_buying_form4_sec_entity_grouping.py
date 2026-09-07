@@ -18,7 +18,9 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying import (
     FORM4_SEC_ENTITY_GROUPING_VERSION,
+    Form4ObservedIdentityDisposition,
     Form4OwnerAttributionOutcome,
+    Form4ProvisionalDisposition,
     Form4SecEntityGroupingError,
     SecEdgarAcceptancePeriodInput,
     SecEdgarAcceptanceSnapshotIdentity,
@@ -1554,3 +1556,457 @@ def test_ib2b_module_has_no_float_network_provider_outcome_qc_or_execution_surfa
         and any(marker in token.string.lower() for marker in (".", "e"))
         for token in tokenize.generate_tokens(io.StringIO(source).readline)
     )
+
+
+# --- Claude review, 2026-09-06: pins for guards that survived targeted mutation ---
+
+
+def _multiple_owner_grouping(monkeypatch):
+    owners = (
+        _Owner(),
+        _Owner(cik=OTHER_OWNER_CIK, name="Other Officer", title="Treasurer"),
+    )
+    return _group(monkeypatch, (_spec(1, owners=owners),))
+
+
+def test_forged_quarantined_transaction_cannot_be_escalated_to_single_owner(
+    monkeypatch,
+):
+    """Direction 8: a MULTIPLE-owner quarantine cannot be rewritten as attributed.
+
+    The forged row is internally coherent and passes its own constructor, so the
+    grouping-level replay of the filing's owner set is the only refusal.
+    """
+    _inventory, grouping = _multiple_owner_grouping(monkeypatch)
+    row = grouping.transaction_attributions[0]
+    assert row.owner_attribution_outcomes == (
+        Form4OwnerAttributionOutcome.MULTIPLE_OWNER_SET_QUARANTINED,
+    )
+    owner_candidate = next(
+        item
+        for item in grouping.reporting_owner_candidates
+        if item.owner_cik == OWNER_CIK
+    )
+    escalated = _rehash_transaction_attribution(
+        row,
+        owner_attribution_outcomes=(
+            Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED,
+        ),
+        attributed_owner_cik=OWNER_CIK,
+        attributed_owner_candidate_id=owner_candidate.owner_candidate_id,
+    )
+    grouping_module.Form4SecTransactionAttributionRow.__post_init__(
+        escalated,
+        grouping_module._ROW_FACTORY_TOKEN,
+    )
+    identity = _forge(
+        grouping.identity,
+        single_complete_owner_attribution_count=1,
+        quarantined_transaction_count=0,
+    )
+    forged = _rehash_grouping(
+        _forge(grouping, identity=identity),
+        transaction_attributions=(escalated,),
+    )
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="transaction owner attribution is inconsistent",
+    ):
+        _validate_forged_grouping(forged)
+
+
+@pytest.mark.parametrize(
+    "updates",
+    (
+        {"attributed_owner_cik": OWNER_CIK},
+        {"attributed_owner_candidate_id": "3" * 64},
+        {
+            "owner_attribution_outcomes": (
+                Form4OwnerAttributionOutcome.MULTIPLE_OWNER_SET_QUARANTINED,
+                Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED,
+            ),
+        },
+    ),
+    ids=("owner-cik", "owner-candidate", "mixed-outcomes"),
+)
+def test_quarantined_attribution_row_cannot_carry_an_owner(monkeypatch, updates):
+    """Direction 8, row level: quarantine and attribution are mutually exclusive."""
+    _inventory, grouping = _multiple_owner_grouping(monkeypatch)
+    row = grouping.transaction_attributions[0]
+    assert row.attributed_owner_cik is None
+    forged = _rehash_transaction_attribution(row, **updates)
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="quarantined transaction carries an owner attribution",
+    ):
+        grouping_module.Form4SecTransactionAttributionRow.__post_init__(
+            forged,
+            grouping_module._ROW_FACTORY_TOKEN,
+        )
+
+
+@pytest.mark.parametrize(
+    "swap",
+    ("cik-and-candidate", "candidate-only", "cik-only"),
+)
+def test_single_owner_attribution_must_name_the_filing_owner_and_candidate(
+    monkeypatch,
+    swap,
+):
+    """Direction 7/8: an attributed row must bind the filing's own owner."""
+    specs = (
+        _spec(1),
+        _spec(
+            3,
+            owners=(
+                _Owner(
+                    cik=OTHER_OWNER_CIK,
+                    name="Other Officer",
+                    title="Treasurer",
+                ),
+            ),
+        ),
+    )
+    _inventory, grouping = _group(monkeypatch, specs)
+    by_cik = {item.owner_cik: item for item in grouping.reporting_owner_candidates}
+    row = next(
+        item
+        for item in grouping.transaction_attributions
+        if item.attributed_owner_cik == OWNER_CIK
+    )
+    updates = {}
+    if swap in {"cik-and-candidate", "cik-only"}:
+        updates["attributed_owner_cik"] = OTHER_OWNER_CIK
+    if swap in {"cik-and-candidate", "candidate-only"}:
+        updates["attributed_owner_candidate_id"] = (
+            by_cik[OTHER_OWNER_CIK].owner_candidate_id
+        )
+    changed = _rehash_transaction_attribution(row, **updates)
+    transactions = tuple(
+        changed if item is row else item
+        for item in grouping.transaction_attributions
+    )
+    forged = _rehash_grouping(grouping, transaction_attributions=transactions)
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="single-owner candidate attribution is invalid",
+    ):
+        _validate_forged_grouping(forged)
+
+
+def test_transaction_must_reference_the_issuer_candidate_of_its_own_filing(
+    monkeypatch,
+):
+    """Direction 3: the issuer-candidate link is bound per filing."""
+    specs = (_spec(1), _spec(3, issuer_cik=OTHER_ISSUER_CIK))
+    _inventory, grouping = _group(monkeypatch, specs)
+    by_cik = {item.issuer_cik: item for item in grouping.issuer_candidates}
+    row = next(
+        item
+        for item in grouping.transaction_attributions
+        if item.issuer_candidate_id == by_cik[ISSUER_CIK].issuer_candidate_id
+    )
+    changed = _rehash_transaction_attribution(
+        row,
+        issuer_candidate_id=by_cik[OTHER_ISSUER_CIK].issuer_candidate_id,
+    )
+    transactions = tuple(
+        changed if item is row else item
+        for item in grouping.transaction_attributions
+    )
+    forged = _rehash_grouping(grouping, transaction_attributions=transactions)
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="transaction-to-issuer candidate binding is invalid",
+    ):
+        _validate_forged_grouping(forged)
+
+
+def test_amendment_observation_must_bind_an_original_present_in_the_grouping(
+    monkeypatch,
+):
+    """Direction 5: a coherent 4/A pointing at an absent original is refused."""
+    _inventory, grouping = _group(monkeypatch, _pair())
+    candidate = grouping.issuer_candidates[0]
+    amendment = next(
+        item for item in candidate.observations if item.document_type == "4/A"
+    )
+    missing = "0000123456-26-999999"
+    changed = _rehash_issuer_observation(
+        amendment,
+        amends_accession=missing,
+        original_accession=missing,
+    )
+    grouping_module.Form4SecIssuerObservation.__post_init__(
+        changed,
+        grouping_module._ROW_FACTORY_TOKEN,
+    )
+    observations = tuple(
+        changed if item is amendment else item for item in candidate.observations
+    )
+    changed_candidate = _rehash_issuer_candidate(candidate, observations)
+    transactions = tuple(
+        _rehash_transaction_attribution(
+            item,
+            issuer_candidate_id=changed_candidate.issuer_candidate_id,
+        )
+        for item in grouping.transaction_attributions
+    )
+    forged = _rehash_grouping(
+        grouping,
+        issuer_candidates=(changed_candidate,),
+        transaction_attributions=transactions,
+    )
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="issuer amendment-to-original binding is invalid",
+    ):
+        _validate_forged_grouping(forged)
+
+
+def _ownerless_lineage(monkeypatch, amendment_days=(4,)):
+    original = _spec(1, owners=(), include_transaction=False)
+    amendments = tuple(
+        _spec(
+            2 + index,
+            year=2027,
+            month=1,
+            day=day,
+            form="4/A",
+            owners=(),
+            include_transaction=False,
+            amends_accession=original.accession,
+        )
+        for index, day in enumerate(amendment_days)
+    )
+    return _group(monkeypatch, (original, *amendments))
+
+
+def _shift_issuer_observation_time(candidate, target, new_time):
+    changed = _rehash_issuer_observation(target, accepted_at_utc=new_time)
+    observations = tuple(
+        sorted(
+            (changed if item is target else item for item in candidate.observations),
+            key=lambda item: (
+                item.accepted_at_utc,
+                item.accession_number,
+                item.source_sha256,
+            ),
+        )
+    )
+    return _rehash_issuer_candidate(candidate, observations)
+
+
+def test_amendment_observation_cannot_precede_its_original(monkeypatch):
+    """Direction 5: as-filed order is bound in the grouping, not merely copied."""
+    _inventory, grouping = _ownerless_lineage(monkeypatch)
+    candidate = grouping.issuer_candidates[0]
+    original = next(
+        item for item in candidate.observations if item.document_type == "4"
+    )
+    amendment = next(
+        item for item in candidate.observations if item.document_type == "4/A"
+    )
+    earlier = (
+        datetime.fromisoformat(original.accepted_at_utc) - timedelta(days=1)
+    ).isoformat(timespec="seconds")
+    changed_candidate = _shift_issuer_observation_time(candidate, amendment, earlier)
+    forged = _rehash_grouping(grouping, issuer_candidates=(changed_candidate,))
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="issuer amendment-to-original binding is invalid",
+    ):
+        _validate_forged_grouping(forged)
+
+
+def test_lineage_acceptance_times_must_stay_unique_in_the_grouping(monkeypatch):
+    """Direction 5/6: two amendments of one original cannot share an instant."""
+    _inventory, grouping = _ownerless_lineage(monkeypatch, amendment_days=(4, 5))
+    candidate = grouping.issuer_candidates[0]
+    first, second = (
+        item for item in candidate.observations if item.document_type == "4/A"
+    )
+    changed_candidate = _shift_issuer_observation_time(
+        candidate,
+        second,
+        first.accepted_at_utc,
+    )
+    forged = _rehash_grouping(grouping, issuer_candidates=(changed_candidate,))
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="issuer lineage acceptance is ambiguous",
+    ):
+        _validate_forged_grouping(forged)
+
+
+def test_owner_observation_indexes_must_stay_contiguous_per_filing(monkeypatch):
+    """Direction 6/7: a re-indexed single owner cannot occupy a later slot."""
+    _inventory, grouping = _group(monkeypatch, (_spec(1),))
+    candidate = grouping.reporting_owner_candidates[0]
+    observation = candidate.observations[0]
+    changed_observation = _rehash_owner_observation(
+        observation,
+        reporting_owner_index=1,
+    )
+    changed_candidate = _rehash_owner_candidate(candidate, (changed_observation,))
+    transactions = tuple(
+        _rehash_transaction_attribution(
+            item,
+            attributed_owner_candidate_id=changed_candidate.owner_candidate_id,
+        )
+        for item in grouping.transaction_attributions
+    )
+    forged = _rehash_grouping(
+        grouping,
+        reporting_owner_candidates=(changed_candidate,),
+        transaction_attributions=transactions,
+    )
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="owner observations are not contiguous per filing",
+    ):
+        _validate_forged_grouping(forged)
+
+
+def test_transaction_row_indexes_must_stay_contiguous_per_filing(monkeypatch):
+    """Direction 7: one attribution row per retained transaction, in place."""
+    _inventory, grouping = _group(monkeypatch, (_spec(1),))
+    row = grouping.transaction_attributions[0]
+    changed = _rehash_transaction_attribution(row, row_index=1)
+    forged = _rehash_grouping(grouping, transaction_attributions=(changed,))
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="transaction rows are not contiguous per filing",
+    ):
+        _validate_forged_grouping(forged)
+
+
+@pytest.mark.parametrize(
+    ("single_count", "quarantined_count", "expected_message"),
+    (
+        (1, 1, "grouping counts or hashes are inconsistent"),
+        (3, 0, "grouping identity counts are invalid"),
+    ),
+    ids=("misstated-partition", "broken-partition"),
+)
+def test_identity_attribution_counts_are_bound_to_the_rows(
+    monkeypatch,
+    single_count,
+    quarantined_count,
+    expected_message,
+):
+    _inventory, grouping = _group(monkeypatch, _pair())
+    assert grouping.identity.single_complete_owner_attribution_count == 2
+    assert grouping.identity.quarantined_transaction_count == 0
+    identity = _forge(
+        grouping.identity,
+        single_complete_owner_attribution_count=single_count,
+        quarantined_transaction_count=quarantined_count,
+    )
+    forged = _rehash_grouping(_forge(grouping, identity=identity))
+
+    with pytest.raises(Form4SecEntityGroupingError, match=expected_message):
+        _validate_forged_grouping(forged)
+
+
+@pytest.mark.parametrize(
+    ("constant_name", "expected_message"),
+    (
+        (
+            "MAX_FORM4_SEC_ENTITY_GROUPING_PROJECTION_NODES",
+            "upstream inventory exceeds the node bound",
+        ),
+        (
+            "MAX_FORM4_OBSERVED_IDENTITY_TEXT_CHARACTERS",
+            "upstream inventory exceeds the text bound",
+        ),
+        (
+            "MAX_FORM4_SEC_ENTITY_GROUPING_PROJECTION_DEPTH",
+            "upstream inventory exceeds the depth bound",
+        ),
+    ),
+    ids=("nodes", "text", "depth"),
+)
+def test_upstream_projection_enforces_its_own_resource_bounds(
+    monkeypatch,
+    constant_name,
+    expected_message,
+):
+    """Direction 9: the upstream projection refuses first, by its own message."""
+    inventory = _inventory_for_specs(monkeypatch, (_spec(1),))
+    monkeypatch.setattr(grouping_module, constant_name, 0)
+    with pytest.raises(Form4SecEntityGroupingError, match=expected_message):
+        grouping_module._upstream_fingerprint(inventory)
+    with pytest.raises(Form4SecEntityGroupingError, match=expected_message):
+        build_form4_sec_entity_grouping(
+            inventory,
+            builder_git_commit=GROUPING_COMMIT,
+        )
+
+
+@pytest.mark.parametrize(
+    "escalation",
+    (
+        {"trading_authorized": True},
+        {"point_in_time_issuer_identity_verified": True},
+        {"authorized_outcome_looks": 1},
+        {"consumed_outcome_looks": 1},
+    ),
+    ids=("trading", "issuer-identity", "authorized-looks", "consumed-looks"),
+)
+def test_upstream_revalidation_refuses_an_inventory_claiming_authority(
+    monkeypatch,
+    escalation,
+):
+    """Direction 11, independent layer: authority is re-checked behind the seal."""
+    inventory = _inventory_for_specs(monkeypatch, (_spec(1),))
+    forged = _forge(inventory, identity=_forge(inventory.identity, **escalation))
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="upstream inventory claims downstream authority",
+    ):
+        grouping_module._validate_upstream_inventory(forged)
+
+
+def test_upstream_revalidation_refuses_a_candidate_inside_a_quarantined_filing(
+    monkeypatch,
+):
+    """Direction 8, independent layer: a coherent promoted row is refused."""
+    owners = (
+        _Owner(),
+        _Owner(cik=OTHER_OWNER_CIK, name="Other Officer", title="Treasurer"),
+    )
+    inventory = _inventory_for_specs(monkeypatch, (_spec(1, owners=owners),))
+    transaction = inventory.transactions[0]
+    assert transaction.identity_disposition is (
+        Form4ObservedIdentityDisposition.UNRESOLVED_QUARANTINE
+    )
+    promoted = _forge(
+        transaction,
+        upstream_disposition=(
+            Form4ProvisionalDisposition.PROVISIONAL_PRE_AGGREGATION_CANDIDATE
+        ),
+        identity_disposition=(
+            Form4ObservedIdentityDisposition.UNRESOLVED_PROVISIONAL_CANDIDATE
+        ),
+    )
+    promoted = _forge(
+        promoted,
+        transaction_observation_id=hash_payload(promoted.lineage_payload()),
+    )
+    forged = _forge(inventory, transactions=(promoted,))
+
+    with pytest.raises(
+        Form4SecEntityGroupingError,
+        match="upstream candidate contradicts filing quarantine",
+    ):
+        grouping_module._validate_upstream_inventory(forged)

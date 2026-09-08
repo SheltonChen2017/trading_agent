@@ -2097,6 +2097,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-07 | Codex counter-review, lane hardening, and source-readiness audit | `dd79731` -> `a96866e` (corrections) and `d3cbd48` (record) | Accept Claude's partial-B review after lane-specific correction; harden the closed receipt boundary; audit the next production-input gate without starting ARV2-4 outcomes | Counter-reviewed `c563972`, `aa8ab11`, and `dd79731` individually and cumulatively. Accepted the test and hash-naming commits; accepted the review record after correction. Closed restricted-object/module and authority-state escapes; made atomic persistence thread-, process-, fork-, mode-, durability-, slot-, and final-identity-safe within its documented cooperative/path threat boundary; regression-pinned the non-equivalent single-link guard; and repaired the current/history record. The source audit finds mechanical Massive/QC coverage but no documented exact 2020 as-of revision/deletion state or after-delisting shareholder-return equivalent, so no synthetic opener or truth claim was invented. | Initial historical red/green **6 failed/2 passed -> 8 passed**; final receipt/firewall/successor batteries **380 passed in 80.77 s**; complete Analyst suite **1,677 passed, 5 skipped in 160.75 s**; active-document gate **69 passed**. The owner cancelled the optional repository-wide run at 33% after **2,777 passed, 6 skipped, 1 warning in 207.22 s** and no failure; it is neither a pass nor a failure. Owner-authorized retry: three Massive HTTP 200 schema-only samples and QC authentication success; no value/secret retained or disclosed, no project listed/created/uploaded/compiled/run, and no production input, real receipt, backtest, outcome, broker, deployment, order, or trade. **Zero research looks and zero development evaluations.** | 0 P0/P1; **8 P2 and 11 P3** (`ARV2CR18-001..019`), all corrected. The generic non-facade computed-reflection limit remains an explicit static-trust boundary, not a runtime-sandbox claim. | Claude reviews the single pushed same-lane range. Separately obtain Massive/Benzinga as-of/correction/deletion evidence and CRSP `DLRET` or proven equivalent terminal-payoff access, then implement/review the provider-specific evidence opener; keep all three production gates null/false and do not begin ARV2-4 outcomes. |
 | 2026-09-07 | Claude review | `d3cbd48` -> `291e885` (correction), `65b906b` (record), and exact pushed head `9dbdac5` | Independent review of the Codex counter-review correction snapshot and source-readiness audit | Reviewed both commits in `dd79731..d3cbd48` with explicit dispositions (section 33); accepted after one P3 correction and one record reconciliation. Verified rather than accepted: the named adversarial firewall probes against the hardened rules (the former first-class-value escape, module-level restricted call, fork hook from a non-consumer, `research` ancestor object, traceback/context/closure reflection, authority-registry attribute and from-import, wrong-function restricted import, stock-v3 module object and export all refuse); all seven section 32.6 identities match `d3cbd48`; the three production gates remain null/false; frozen documents and accepted artifacts untouched; three source-audit claims confirmed against the official Massive, Massive changelog, and LEAN pages. The credential retry ledger remains consistent with the tree but not verifiable from it. | Four batteries **730 passed, 5 warnings** at `d3cbd48`; successor plus firewall **229 passed** at `291e885`; complete repository suite on `291e885` **8,171 passed, 43 skipped, 33 warnings in 570.73 s (9:30)**. That successful run is historical evidence but departed from the later machine-wide lane-only test instruction and is not a gate to repeat. Active-document gate green after the record; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2; 1 P3 code correction (`ARV2R19-001`, operator interrupts swallowed by the receipt-parent helper) with a red/green regression test; 1 P3 record reconciliation (`ARV2R19-002`, the exact 28+1 mutation accounting); 2 P3 observations documented at that stage. Section 34 supersedes the unsafe interrupt-argument handling. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews every Claude commit in this round before any provider-specific opener or production-input construction; all three production gates stay null/false. |
 | 2026-09-07/08 | Codex counter-review and lane hardening | `9dbdac5` -> `f6cd23b` (correction) and this record commit (push authorized) | Accept Claude's three commits after correction; stop at the external ARV2-4D-B evidence gate | Counter-reviewed `291e885`, `65b906b`, and `9dbdac5` individually and cumulatively. Preserved exact built-in operator-interrupt propagation while removing arbitrary argument/subtype export, constructor/attribute execution, and pre-cleanup finalizer visibility; aligned three fork-warning tests; reconciled the current state, mutation accounting, facade classification, probe count, provider-removal nuance, validation process, and public-vendor evidence. No next named milestone was implemented because the exact 2020 as-of package and CRSP-equivalent terminal payoff remain absent. | Uncorrected interrupt regressions **4 failed, 1 passed**; corrected affected selection **392 passed**; complete Analyst V2 **1,689 passed, 5 skipped in 144.27 s**; final active-document/compile/diff gates are recorded in section 34.5. The complete repository suite was not run. No credential/provider value, production input, outcome, QC resource, result, deployment, order, or trade; **0 research looks and 0 development evaluations**. | **1 P2 and 15 P3** (`ARV2CR20-001..016`), all corrected or explicitly documented. The Claude range is accepted after correction; current Codex bytes await independent Claude review. | The owner explicitly authorized this correction-only push on 2026-09-08. Fetch the lane remote, require it still equals `9dbdac5`, and push the exact two-commit range once. Keep all three production gates null/false; do not build the provider opener before the section-34.4 evidence or start ARV2-4 outcomes. |
+| 2026-09-08 | Claude review and lane test-portability corrections | `6ddc515` -> `bd7e0c6` (tests) and this record commit | Independent review of the Codex correction snapshot `f6cd23b` and its record commits `d8f02a1` and `6ddc515` | Synced the lane worktree by fast-forward only and reviewed `9dbdac5..6ddc515` commit by commit and cumulatively (section 36); the range is accepted with no change to any production module, artifact or frozen document. Verified rather than accepted: the hardened receipt-parent helper probed directly (fresh exact interrupts with null context and cause and no restricted local in the escaping frame; subclasses fail closed after exactly one construction; `SystemExit` status sanitised to exact `None`/`int`); the fork-warning filters scoped to exactly the three named receipt fork tests with the lane's single existing pattern; section 34.5's three file identities reproduced exactly against the committed LF blobs (this host's CRLF working copies do not, a checkout property rather than a record defect); all three production gates still `None`/`None`/`False`; firewall closure 38 modules, zero forbidden roots; three public vendor pages confirm the section 34.4 corrections. Separately corrected seven lane tests that fail only on a Windows host (`ARV2R21-004` to `-006`: POSIX-only refusal-message assertions, `write_text` CRLF translation, and symbolic links guarded by `hasattr` rather than `OSError`), plus one latent sibling of the same class; tests only. | Complete Analyst-lane suite on the corrected tree **1,772 passed, 29 skipped, 0 failed in 22:25** (pre-correction on this host: 7 failed, 1,768 passed, 26 skipped; the seven are exactly the corrected tests). Active-document gate **69 passed**; compileall exit 0; `git diff --check` clean. Mutation and red/green evidence in a detached scratch worktree: reverting the helper to `291e885` reproduces the restricted function inside `KeyboardInterrupt.args` and a session-terminating subclass escape while the head passes all 12 interrupt tests; five of six single-guard removals turn the successor battery red (M1 by aborting the pytest session), and the sixth (`from None`) is a proven equivalent mutant. Zero research looks and zero development evaluations; no provider, credential, licensed row, production input, price, return, outcome, broker, operator database, QuantConnect, scheduler, deployment, order or trading access. | 0 P0, 0 P1, 0 P2, 0 P3 against the reviewed range; three P3 lane-test portability defects found and corrected. Self-reported process note `ARV2R21-001`: the complete repository suite was started before section 34.6 and the owner's lane-suite instruction were read, then stopped unfinished with no result recorded. `ARV2R21-002` acknowledges that `ARV2SYNC-001` corrected this session's own wrong citation in sections 19 and 25. `ARV2R21-003` observes that `asyncio.CancelledError` returns `None` from the synchronous helper, harmless today, documented only. | Codex counter-reviews both commits and confirms the corrected tests on its POSIX host. The provider-specific evidence opener, truth and authority pins, production inputs, receipt, ARV2-4 outcome evaluation, deployment, orders and trading remain unauthorised pending the external evidence in 34.4; `ARV2R7-002` two-reviewer ownership still open. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -5903,3 +5904,158 @@ production switches remain `None`/`False`/`None`; full ARV2-4D-B still needs
 the exact 2020 as-of source evidence, terminal shareholder-return source, and
 reviewed seven-role evidence package. ARV2-4 outcome evaluation/backtesting,
 result access, deployment, orders, and trading remain unauthorized.
+
+## 36. Independent Claude review of the Codex correction snapshot `f6cd23b` and its records, 2026-09-08
+
+**Range reviewed:** `9dbdac5..6ddc515`, three commits, commit by commit and
+cumulatively, in the dedicated lane worktree synced by fast-forward only.
+**Disposition: ACCEPTED, with three lane-specific test-portability
+corrections applied by this review.** 0 P0, 0 P1, 0 P2 and 0 P3 against the
+reviewed helper and records; the corrections are P3 defects in lane tests
+that had only ever executed on POSIX hosts and are recorded in 36.4. No
+production module, artifact, frozen shared document or accepted ancestor
+changed.
+**Zero research looks and zero development evaluations.** No provider,
+credential, licensed row, production input, price, return, outcome, broker,
+operator database, QuantConnect resource, scheduler, deployment, order or
+trading surface was used. Three public vendor documentation pages were read
+to verify record claims (36.3); none is a data source.
+
+**Reviewing session:** the Fable 5 session on the work identity (sections
+4I, 4R, 7, 19, 25), on a Windows host with `core.autocrlf=true` and without
+the symbolic-link privilege. Its own earlier citation error is acknowledged in
+36.4.
+
+### 36.1 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `f6cd23b` | **Accepted** | `ARV2CR20-001`: replaces the `291e885` re-raise, which reconstructed `type(exc)(*exc.args)`, with exact-type checks, in-handler clearing of both restricted imports, and a fresh exact built-in raised `from None`. Verified in 36.2; red reproduced against `291e885` in 36.5. Also `ARV2CR20-008/009`: three exact fork-warning filters and the SystemExit regressions. |
+| `d8f02a1` | **Accepted** | Section 34 and the reconciliations `ARV2CR20-002` to `-016`. Claude-authored findings were reworded and retained, not deleted; the one edited Claude ledger row substitutes the exact head hash `9dbdac5` for "the hash-naming head", which is the lane's established hash-naming practice. |
+| `6ddc515` | **Accepted** | Section 35 cross-machine reconciliation. `ARV2SYNC-001` corrects a citation error in this session's own sections 19 and 25 (36.4). No code, artifact or frozen shared document changed. |
+| `bd7e0c6` | Claude correction | `ARV2R21-004` to `-006`: seven lane tests that fail on a Windows host for portability reasons, plus one latent sibling of the same class. Tests only; no production module changed. |
+| record commit | Claude record | This section and its ledger row; its own hash is the head Codex counter-reviews. |
+
+### 36.2 Verified rather than accepted
+
+- **Helper behaviour reproduced by direct probe**, with the receipt-module
+  authenticator monkeypatched to raise: exact `KeyboardInterrupt` propagates
+  as a fresh exact instance with `__context__` and `__cause__` both `None`,
+  a traceback containing only the caller and the helper frame, and no
+  receipt-module callable among the helper frame's locals; exact `SystemExit`
+  propagates with `None` and negative or large integers preserved and with a
+  string or `bool` status sanitised to exact integer `1`; a `KeyboardInterrupt`
+  subclass and a `SystemExit` subclass each return `None` after exactly one
+  construction; a domain error returns `None`.
+- **Every new regression exercises a distinct path**: restricted objects in
+  interrupt arguments, subclass reconstruction count, hostile `args` and
+  `code` accessors never read, exact-status policy, and a finaliser that
+  inspects the helper frame during release and finds neither restricted name.
+- **Fork-warning filters** are applied to exactly the three receipt fork tests
+  named in `ARV2CR20-008`, use the same single-warning pattern already carried
+  by two other receipt fork tests and the successor fork test, and no other
+  warning filter exists under `tests/analyst_revisions_v2`.
+- **Section 34.5 identities reproduce exactly** against the committed blobs:
+  `1ad6f01c...`, `513f9308...`, `e94f75ba...`. Hashing this host's working
+  copies does not reproduce them because `core.autocrlf=true` checks the
+  files out as CRLF (`i/lf w/crlf`); the record's identities are the
+  platform-independent LF blobs and are correct.
+- **Gates and frozen state.** `PRODUCTION_INPUT_AUTHORITY_ARTIFACT_SHA256`
+  and `PRODUCTION_TRUTH_APPROVAL_ARTIFACT_SHA256` are `None` and
+  `PRODUCTION_TRUTH_EVIDENCE_OPENER_IMPLEMENTED` is `False`; no byte under
+  `specs/`, the Action Plan or the Session Handoff changed across the range;
+  the transitive import firewall closes at 38 modules with zero forbidden
+  roots (the record last stated a count of 34 in section 25 and has not
+  stated one since; the four additions are `artifact_io`, the B2 manifest,
+  the receipt and the successor).
+- **Section 34.2 arithmetic** closes: one P2 plus fifteen P3 equals the
+  sixteen ledger rows.
+
+### 36.3 Vendor-documentation corrections checked
+
+- Benzinga's `calendar-removed` reference documents an endpoint returning
+  removed or cancelled events and lists ratings, earnings and guidance among
+  its types; it says nothing about retention depth, as-of versions or prior
+  payloads. Section 34.4's narrowing, and its refusal to treat this as
+  clearing the gate, are both correct.
+- The Morningstar Indexes article states the CRSP acquisition completed in
+  February 2026. That page does not itself name the research product; the
+  record's product-name claim rests on the separately linked product page,
+  which was not fetched here.
+- Norgate's FAQ states it provides neither delisting returns nor any
+  post-delisting information, supporting its rejection for the terminal-return
+  gate.
+
+### 36.4 Findings ledger and acknowledgements
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R21-001` | — | Self-report; **documented** | This session started the complete repository suite on `6ddc515` before reading section 34.6 and the owner's machine-wide instruction recorded in `ARV2CR20-006`. It was stopped on reading them, before completion; no result from it is recorded or relied on. The dedicated Analyst-lane suite was run instead (36.6). | No change; process note. |
+| `ARV2R21-002` | — | Acknowledgement | `ARV2SYNC-001` is correct: sections 19 and 25, written by this session, cited `ARV2R5-002` (the decay-tail finding) where the two-reviewer coordination item is `ARV2R7-002`. The error originated in this session's own compaction summary and was carried into both sections. | Correction accepted as made in `6ddc515`. |
+| `ARV2R21-003` | — | Observation; **documented only** | `asyncio.CancelledError` is a `BaseException` and is returned as `None` by the helper. The helper is synchronous and the lane has no asynchronous caller, so nothing is affected today; if an async caller is ever introduced, cancellation must be given the same fresh-propagation treatment as the two operator interrupts. | No change. |
+| `ARV2R21-004` | P3 | Lane test portability; **corrected** | Three tests asserted the POSIX-only refusal message for a directory supplied as an artifact path: `test_schema_loader_refuses_missing_directory_and_forged_parent` and both `test_missing_and_nonregular_variable_artifact_paths_refuse` cases. `artifact_io` opens before it `fstat`s, so where `os.open` of a directory fails (Windows) the refusal reads "unreadable" and where it succeeds (POSIX) it reads "must be a regular file". The refusal is fail-closed on both. The assertions now accept either message and still require the refusal; the loader's open-before-stat order is kept because reordering would reopen a TOCTOU window for a message. | Corrected in `bd7e0c6`. |
+| `ARV2R21-005` | P3 | Lane test portability; **corrected and swept** | `test_receipt_loader_requires_content_versioned_name_before_input_open` wrote a rendered receipt with `write_text`, which translates LF to CRLF on Windows, so the canonical-bytes refusal fired before the filename check under test. It now writes exact encoded bytes. The one sibling site of the same class, in `test_structural_candidate_and_owner_strings_refuse_before_input_open`, passed only because the authority-pin check happens to precede the byte check; it is corrected the same way so the test does not depend on that ordering. | Corrected in `bd7e0c6`. |
+| `ARV2R21-006` | P3 | Lane test portability; **corrected** | `test_input_paths_must_remain_regular_nonsymlink_files` and both `test_atomic_receipt_persistence_refuses_leaf_and_ancestor_links` cases created symbolic links behind only `hasattr(os, "symlink")`, which is true on Windows even when the privilege is absent (`WinError 1314`). Every other link-creating test in the lane skips on `OSError` with the host reason; these three now do the same, so they skip only where the host cannot create the link and assert the refusal everywhere else. | Corrected in `bd7e0c6`. |
+
+All three corrections change tests only. They were invisible until now because
+the B2, receipt and successor batteries had executed only on POSIX hosts
+(Codex's, and the other Claude session's); this review is their first Windows
+execution.
+
+### 36.5 Mutation and red/green evidence
+
+Run in detached scratch worktrees at `6ddc515`; the lane tree was never
+modified by mutation.
+
+| Trial | Result |
+|---|---|
+| Helper reverted to its `291e885` version, new tests kept | **3 failed, 1 passed of the first four; the fifth test's reconstructed `FixtureKeyboardInterrupt` escaped the old helper and terminated the pytest session itself.** The failure output shows the restricted `power_calibration_receipt_artifact_sha256` function carried inside `KeyboardInterrupt.args`, which is the exact escape `ARV2CR20-001` describes. |
+| Same selection on the real head | **12 passed**, 55 deselected |
+| M1 `isinstance` for `KeyboardInterrupt` (subclass admitted) | **Killed by session abort.** 56 passed, 3 skipped, then pytest itself terminated with `!!! KeyboardInterrupt !!!` raised from the helper: under `isinstance` the fixture subclass is admitted as an operator interrupt and the fresh `KeyboardInterrupt` escapes the test that requires `None`. The matrix driver's one-line summary hid this; a targeted rerun of the two subclass tests reproduced the abort. |
+| M2 `isinstance` for `SystemExit` (subclass admitted) | 1 failed (killed) |
+| M3 `SystemExit.code` copied without the type check | 1 failed (killed) |
+| M4 restricted names not cleared inside the handler | 1 failed (killed) |
+| M5 `KeyboardInterrupt` raised without `from None` | **Survived; proven equivalent.** All 67 pass. The fresh raise sits after the `except` suite, where no exception is being handled, so `__context__` is `None` with or without `from None`; the only observable difference is `__suppress_context__`, which is inert when there is no context. Verified with a standalone snippet. No test was added for a distinction that cannot be observed. |
+| M6 interrupt swallowed (the `ARV2R19-001` regression) | 1 failed (killed) |
+
+Five of six single-guard removals are killed, one of them by terminating the session, which is the same behaviour the `291e885` reproduction showed; the sixth is an equivalent mutant, documented rather than papered over with a test.
+
+Red/green for the portability corrections on this host: on the unmodified
+tree the seven tests fail with exactly the mechanisms in 36.4 (the manifest
+file alone: 2 failed, 341 passed, 7 skipped; the receipt file alone: 4 failed,
+143 passed, 6 skipped; the schema file: its one directory case); with the corrections the
+affected selection is **4 passed, 3 skipped** (the three link tests skipping
+with the `WinError 1314` reason) and the swept authority test passes.
+
+### 36.6 Validation on the exact final tree
+
+- Complete Analyst-lane suite (`tests/analyst_revisions_v2` plus the
+  `tests/test_analyst_revisions_v2_*` files) on the corrected tree:
+  **1,772 passed, 29 skipped, 0 failed in 1,345.91 s (22:25)**. Against the pre-correction run (7 failed, 1,768 passed, 26 skipped) the arithmetic closes exactly: the seven failures became four passes and three host-privilege skips. This collection (1,801 tests) is larger than the 1,694 Codex reports in section 34.5 because it also includes the root-level `tests/test_analyst_revisions_v2_*` files.
+- The same suite on the unmodified `6ddc515` tree on this host, run before
+  the corrections: 7 failed, 1,768 passed, 26 skipped in 19:51, the seven
+  being exactly the tests in 36.4.
+- Active-document consistency gate after this section was added:
+  **69 passed**
+- `compileall` on the lane package and tests exit 0; `git diff --check`
+  clean; the worktree was clean and in sync with the remote before the review.
+- The complete repository suite was not run to completion (36.4,
+  `ARV2R21-001`).
+
+### 36.7 Required quality assessment
+
+Correction `f6cd23b`: **9/10**. Records `d8f02a1` and `6ddc515` as received:
+**8/10**, held back because the record no longer states the firewall closure
+size after section 25 while the closure has grown, and because the 34.5
+identities need the LF-blob caveat to reproduce on a Windows checkout. Lane
+test batteries as received: **8/10**, for the seven POSIX-only assumptions.
+
+### 36.8 Next gate
+
+Codex counter-reviews the correction commit and this record commit, and
+should confirm on its POSIX host that the corrected tests still pass there
+(the message alternation and `OSError` skips are the patterns its sibling
+tests already use). Nothing in this acceptance starts the provider-specific
+evidence opener, populates a truth or authority pin, constructs a production
+input, or infers ARV2-4 outcome authority. The external evidence in 34.4
+remains the blocking prerequisite for full ARV2-4D-B.

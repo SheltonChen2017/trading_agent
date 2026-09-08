@@ -4168,3 +4168,30 @@ def test_covering_gate_receipt_and_package_boundary_fail_closed(monkeypatch):
     ):
         assert name not in canonical_short_interest_package.__all__
         assert not hasattr(canonical_short_interest_package, name)
+
+
+def test_covering_row_is_bound_to_normalization_policy_v1():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    unbound = _tampered_covering(
+        covering[0],
+        normalization_policy_sha256="0" * 64,
+    )
+    with pytest.raises(StockCoveringError, match="normalization policy v1"):
+        unbound.to_payload()
+
+
+def test_covering_batch_pins_gate_binding_count_and_frozen_scope_values():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    cases = (
+        ({"research_gate_sha256": "0" * 64}, "SI-0M gate"),
+        ({"projections": covering.projections[:-1]}, "does not match source rows"),
+        ({"schema_version": "2.0"}, "schema_version"),
+        ({"authority": "production_covering_batch"}, "structural authority"),
+        ({"production_authoritative": True}, "non-production"),
+    )
+    for changes, message in cases:
+        with pytest.raises(StockCoveringError, match=message):
+            _tampered_covering_batch(covering, **changes).to_payload()
+    wrong_row_version = _tampered_covering(covering[0], schema_version="2.0")
+    with pytest.raises(StockCoveringError, match="schema_version"):
+        wrong_row_version.to_payload()

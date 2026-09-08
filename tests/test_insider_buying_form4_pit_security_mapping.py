@@ -1615,3 +1615,124 @@ def test_closure_availability_cannot_precede_base_availability():
             available_at_utc="2020-01-01T00:00:00+00:00",
             valid_to_available_at_utc="2019-06-01T00:00:00+00:00",
         )
+
+
+def test_reference_hash_is_external_artifact_lineage_not_subset_hash(monkeypatch):
+    grouping, result = _build(monkeypatch)
+    alternate = build_form4_pit_security_mapping(
+        grouping,
+        security_records=result.security_records,
+        title_intervals=result.title_intervals,
+        ticker_intervals=result.ticker_intervals,
+        reference_id=result.identity.reference_id,
+        reference_version=result.identity.reference_version,
+        reference_sha256="8" * 64,
+        builder_git_commit=BUILDER_COMMIT,
+    )
+
+    assert result.identity.reference_sha256 == REFERENCE_SHA256
+    assert alternate.identity.reference_sha256 == "8" * 64
+    assert (
+        alternate.identity.security_record_inventory_hash
+        == result.identity.security_record_inventory_hash
+    )
+    assert (
+        alternate.identity.title_interval_inventory_hash
+        == result.identity.title_interval_inventory_hash
+    )
+    assert (
+        alternate.identity.ticker_interval_inventory_hash
+        == result.identity.ticker_interval_inventory_hash
+    )
+    assert alternate.identity.mapping_id != result.identity.mapping_id
+
+
+@pytest.mark.parametrize("spanning_child", ("title", "ticker"))
+def test_child_intervals_must_split_at_adjacent_parent_boundaries(
+    monkeypatch,
+    spanning_child,
+):
+    split = date(2026, 8, 1)
+    end = date(2027, 1, 1)
+    old_security = _security(
+        valid_to=split,
+        valid_to_available_at_utc="2026-07-01T00:00:00+00:00",
+        evidence_id="security-old-parent",
+    )
+    current_security = _security(
+        valid_from=split,
+        evidence_id="security-current-parent",
+    )
+    old_title = _title(
+        valid_to=split,
+        valid_to_available_at_utc="2026-07-01T00:00:00+00:00",
+        evidence_id="title-old-child",
+    )
+    current_title = _title(
+        valid_from=split,
+        evidence_id="title-current-child",
+    )
+    old_ticker = _ticker(
+        valid_to=split,
+        valid_to_available_at_utc="2026-07-01T00:00:00+00:00",
+        evidence_id="ticker-old-child",
+    )
+    current_ticker = _ticker(
+        valid_from=split,
+        evidence_id="ticker-current-child",
+    )
+    spanning_title = _title(
+        valid_to=end,
+        valid_to_available_at_utc="2026-07-01T00:00:00+00:00",
+        evidence_id="title-spanning-child",
+    )
+    spanning_ticker = _ticker(
+        valid_to=end,
+        valid_to_available_at_utc="2026-07-01T00:00:00+00:00",
+        evidence_id="ticker-spanning-child",
+    )
+
+    titles = (
+        (spanning_title,)
+        if spanning_child == "title"
+        else (old_title, current_title)
+    )
+    tickers = (
+        (old_ticker, current_ticker)
+        if spanning_child == "title"
+        else (spanning_ticker,)
+    )
+    with pytest.raises(
+        Form4PitSecurityMappingError,
+        match=f"{spanning_child} interval exceeds permanent-security validity",
+    ):
+        _build(
+            monkeypatch,
+            securities=(old_security, current_security),
+            titles=titles,
+            tickers=tickers,
+        )
+
+
+def test_ib2c_module_exports_are_explicit_and_exact():
+    assert mapping_module.__all__ == [
+        "FORM4_PIT_SECURITY_MAPPING_VERSION",
+        "Form4PitSecurityMapping",
+        "Form4PitSecurityMappingError",
+        "Form4PitSecurityMappingIdentity",
+        "Form4PitSecurityMappingOutcome",
+        "Form4PitSecurityMappingRow",
+        "Form4PitSecurityRecord",
+        "Form4SecurityClass",
+        "Form4SecurityTitleInterval",
+        "Form4SecurityTitleMappingKind",
+        "Form4TickerInterval",
+        "MAX_FORM4_PIT_SECURITY_MAPPING_PROJECTION_DEPTH",
+        "MAX_FORM4_PIT_SECURITY_MAPPING_PROJECTION_NODES",
+        "MAX_FORM4_PIT_SECURITY_MAPPING_RESOLUTION_OPERATIONS",
+        "MAX_FORM4_PIT_SECURITY_MAPPING_TEXT_CHARACTERS",
+        "MAX_FORM4_PIT_SECURITY_RECORDS",
+        "MAX_FORM4_SECURITY_TITLE_INTERVALS",
+        "MAX_FORM4_TICKER_INTERVALS",
+        "build_form4_pit_security_mapping",
+    ]

@@ -7,6 +7,11 @@ evaluated on the filing's America/New_York acceptance date.  Only facts and
 interval closures available by the exact filing-acceptance instant influence
 resolution; an unavailable closure is treated as still open at that cutoff.
 
+``reference_sha256`` is the caller-supplied digest of the complete external
+reference artifact identified by ``reference_id`` and ``reference_version``.
+It is lineage metadata, not a recomputed digest of the captured interval
+subset.  The three inventory hashes independently bind that exact subset.
+
 The output is exhaustive and structural.  It resolves no official security
 master, grants no canonical or ordinary-equity status, accesses no provider or
 outcome, and exposes no QC, execution, deployment, or trading authority.
@@ -765,7 +770,12 @@ def _mapping_row_payload(
 
 @dataclass(frozen=True)
 class Form4PitSecurityMappingIdentity:
-    """Hash-bound identity for one exhaustive IB-2C result."""
+    """Hash-bound identity for one exhaustive IB-2C result.
+
+    ``reference_sha256`` identifies the caller's complete external reference
+    artifact.  The security/title/ticker inventory hashes bind the exact
+    captured subset used by this result.
+    """
 
     contract_version: str
     builder_git_commit: str
@@ -828,7 +838,7 @@ class Form4PitSecurityMappingIdentity:
         for label, value in (
             ("upstream grouping identity hash", self.upstream_grouping_identity_hash),
             ("upstream grouping fingerprint", self.upstream_grouping_fingerprint),
-            ("reference hash", self.reference_sha256),
+            ("external reference artifact hash", self.reference_sha256),
             ("security record inventory hash", self.security_record_inventory_hash),
             ("title interval inventory hash", self.title_interval_inventory_hash),
             ("ticker interval inventory hash", self.ticker_interval_inventory_hash),
@@ -1549,6 +1559,9 @@ def _validate_reference_crosslinks(
             raise Form4PitSecurityMappingError(
                 "REFUSED: reference validation exceeds the operation bound"
             )
+        # Children are normalized to one parent interval.  Continuous coverage
+        # by a union of adjacent parent records is deliberately insufficient;
+        # suppliers must split the child at every parent boundary.
         if not any(
             _interval_contains(parent, item)
             for parent in parents
@@ -1570,6 +1583,7 @@ def _validate_reference_crosslinks(
             raise Form4PitSecurityMappingError(
                 "REFUSED: reference validation exceeds the operation bound"
             )
+        # Apply the same single-parent normalization rule to ticker intervals.
         if not any(
             _interval_contains(parent, item)
             for parent in parents
@@ -2373,7 +2387,10 @@ def _build_form4_pit_security_mapping(
         )
     _opaque_id(reference_id, label="reference ID")
     _opaque_id(reference_version, label="reference version")
-    _sha256(reference_sha256, label="reference hash")
+    _sha256(
+        reference_sha256,
+        label="external reference artifact hash",
+    )
     _preflight_reference_inputs(
         security_records,
         title_intervals,
@@ -2578,7 +2595,13 @@ def build_form4_pit_security_mapping(
     reference_sha256: str,
     builder_git_commit: str,
 ) -> Form4PitSecurityMapping:
-    """Build one exhaustive structural mapping and normalize malformed state."""
+    """Build one exhaustive structural mapping and normalize malformed state.
+
+    ``reference_sha256`` is the digest of the complete external reference
+    artifact named by ``reference_id`` and ``reference_version``.  It is not a
+    digest of the supplied subset; the result's inventory hashes bind that
+    subset independently.
+    """
 
     try:
         return _build_form4_pit_security_mapping(
@@ -2605,3 +2628,26 @@ def build_form4_pit_security_mapping(
         raise Form4PitSecurityMappingError(
             "REFUSED: malformed point-in-time security mapping input"
         ) from exc
+
+
+__all__ = [
+    "FORM4_PIT_SECURITY_MAPPING_VERSION",
+    "Form4PitSecurityMapping",
+    "Form4PitSecurityMappingError",
+    "Form4PitSecurityMappingIdentity",
+    "Form4PitSecurityMappingOutcome",
+    "Form4PitSecurityMappingRow",
+    "Form4PitSecurityRecord",
+    "Form4SecurityClass",
+    "Form4SecurityTitleInterval",
+    "Form4SecurityTitleMappingKind",
+    "Form4TickerInterval",
+    "MAX_FORM4_PIT_SECURITY_MAPPING_PROJECTION_DEPTH",
+    "MAX_FORM4_PIT_SECURITY_MAPPING_PROJECTION_NODES",
+    "MAX_FORM4_PIT_SECURITY_MAPPING_RESOLUTION_OPERATIONS",
+    "MAX_FORM4_PIT_SECURITY_MAPPING_TEXT_CHARACTERS",
+    "MAX_FORM4_PIT_SECURITY_RECORDS",
+    "MAX_FORM4_SECURITY_TITLE_INTERVALS",
+    "MAX_FORM4_TICKER_INTERVALS",
+    "build_form4_pit_security_mapping",
+]

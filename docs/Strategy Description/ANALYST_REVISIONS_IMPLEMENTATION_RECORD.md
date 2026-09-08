@@ -2088,7 +2088,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-07 | Codex counter-review | `ecf473e` -> this record commit (not pushed) | Accept Claude's B2 review after lane-record correction and stop at the exact ARV2-4D-B external-action gate | Counter-reviewed all three Claude commits individually and cumulatively. Accepted `4d7036c`; accepted `22d10cf` and `ecf473e` after correcting five P3 record defects: metadata/parent file-open scope, code-tree versus pushed-tree attribution, irreconcilable mutation-list wording, self-referential hash naming, and the conflated firewall exceptions. No production code, test, artifact, shared file, or authority changed. The owner scheduled ARV2-4D-B, but the credentials, immutable inputs, and exact input-read/nuisance-compute authority evidence are absent. | B2 **350 passed in 3.63 s**; separate reviewer **350 passed in 6.59 s**; corrected active-document gate **69 passed**; `git diff --check` clean. No credential value, provider row, input, outcome, QC resource, deployment, broker, scheduler, order, or trading access; **0 research looks and 0 development evaluations**. | 0 P0/P1/P2; five P3 record findings (`ARV2CR16-001..005`) corrected. Underlying B2 production behavior is accepted, quality **8/10**. | Commit this counter-review record locally. Configure credentials or provide the exact immutable B2 input package, then explicitly authorize the first input read and nuisance-only computation; separately authorize any necessary private QC project/upload/compile/job. Do not infer ARV2-4 outcome evaluation, deployment, orders, or trading. |
 | 2026-09-07 | Codex implementation | `2bcb1bd` -> `5aea690` | Owner-authorized ARV2-4D-B partial nuisance-calibration scaffold | Recorded the later owner confirmation of both Massive subscriptions and locally configured Massive/QC credentials plus the exact limited operation authority. Authorized credential checks returned HTTP 200 for Massive ratings, earnings, and guidance; one historical response row's availability/field shape was inspected without retaining/disclosing values; QC authentication/project-list returned 90 projects. Added the 7,521-byte content-addressed input-content contract, production-gated exact-Decimal nuisance worker, closed 13-field numeric receipt, atomic create-if-absent persistence, and inert four-parent/six-field stock-v3 successor. Production truth/input-authority pins and the evidence opener remain null/false, so no production calibration input was opened, no real receipt/successor artifact was issued, and no QC project was created or uploaded/compiled/run. Accepted ancestors and project-wide records remain frozen. | Receipt plus firewall **265 passed in 46.50 s**; successor **51 passed**; final focused aggregate **316 passed in 88.19 s**; complete B2 parent chain **1,287 passed, 5 skipped in 124.54 s**; complete Analyst lane **1,613 passed, 5 skipped in 139.03 s**; complete repository **8,105 passed, 43 skipped, 26 unrelated warnings in 519.33 s (8:39)**; compileall exit 0 and `git diff --check` clean. No values or secrets retained/disclosed; **0 research looks and 0 development evaluations.** | `ARV2I4DB-001..024` are corrected, closed by an explicitly documented precision boundary, or rejected with the exact range reason recorded. Final independent audits report **0 open P0-P3**. | Commit and push this exact same-lane snapshot once, then Claude independently reviews every changed file and commit using section 30.7. No production computation can start before exact reviewed truth/input-authority pins exist; ARV2-4 outcome evaluation and every result/deployment/order/trading action remain unauthorized. |
 | 2026-09-07 | Claude review | `5aea690` -> `c563972` (tests), `aa8ab11` (record), and exact pushed head `dd79731` | Independent review of the Codex B2 counter-review record and the ARV2-4D-B partial scaffold | Reviewed both commits in `ecf473e..5aea690` with explicit dispositions (section 31); accepted after four test-coverage corrections and three P3 observations documented at that stage. Verified rather than accepted: the 7,521-byte content contract reproduces from the renderer and its hashes/ID recompute; all eight section-30.6 identities match `5aea690`, while the receipt-test identity changes at `c563972`; an exact-fraction HAC recomputation agrees with the worker to 1e-49 relative on dense, gapped, and exactly-50-valid series; the three production gates are null/false; and twelve adversarial firewall probes. The reported 28-trial 15/9/4 mutation split is unreconciled because the caught list names 16 concepts and section 32 proves one claimed equivalent is not equivalent. The external-action ledger is Codex's self-report: the committed tree contains no network, environment, or credential code path and no secret value, but the credentialed probes themselves cannot be verified from the repository. | Four batteries **666 passed in 70.91 s** at `5aea690`; receipt battery **132 passed** at `c563972`; complete repository suite on `c563972` **8,109 passed, 43 skipped, 28 warnings in 544.28 s (9:04)**, the four additions being the new cases; active-document gate green after this record; `git diff --check` clean; Python 3.13.15. | Review as issued: 0 P0/P1, 2 P2 and 2 P3 test-coverage gaps corrected, 3 P3 observations documented. Section 32 reclassifies/corrects those observations. Zero research looks, zero development evaluations, no provider/credential/production-input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews every Claude commit in this round before further ARV2-4D-B work; production truth/authority pins stay null, and every production input read, nuisance computation, receipt, QC action, outcome, deployment, order, and trade remains gated. |
-| 2026-09-07 | Codex counter-review, lane hardening, and source-readiness audit | `dd79731` -> this correction snapshot | Accept Claude's partial-B review after lane-specific correction; harden the closed receipt boundary; audit the next production-input gate without starting ARV2-4 outcomes | Counter-reviewed `c563972`, `aa8ab11`, and `dd79731` individually and cumulatively. Accepted the test and hash-naming commits; accepted the review record after correction. Closed restricted-object/module and authority-state escapes; made atomic persistence thread-, process-, fork-, mode-, durability-, slot-, and final-identity-safe within its documented cooperative/path threat boundary; regression-pinned the non-equivalent single-link guard; and repaired the current/history record. The source audit finds mechanical Massive/QC coverage but no documented exact 2020 as-of revision/deletion state or after-delisting shareholder-return equivalent, so no synthetic opener or truth claim was invented. | Initial historical red/green **6 failed/2 passed -> 8 passed**; final receipt/firewall/successor batteries **380 passed in 80.77 s**; active-document gate **69 passed in 0.59 s**. Final Analyst/repository validation will be recorded in section 32.6 before the one combined push. Owner-authorized retry: three Massive HTTP 200 schema-only samples and QC authentication success; no value/secret retained or disclosed, no project listed/created/uploaded/compiled/run, and no production input, real receipt, backtest, outcome, broker, deployment, order, or trade. **Zero research looks and zero development evaluations.** | 0 P0/P1; **8 P2 and 11 P3** (`ARV2CR18-001..019`), all corrected. The generic non-facade computed-reflection limit remains an explicit static-trust boundary, not a runtime-sandbox claim. | Claude reviews the single pushed same-lane range. Separately obtain Massive/Benzinga as-of/correction/deletion evidence and CRSP `DLRET` or proven equivalent terminal-payoff access, then implement/review the provider-specific evidence opener; keep all three production gates null/false and do not begin ARV2-4 outcomes. |
+| 2026-09-07 | Codex counter-review, lane hardening, and source-readiness audit | `dd79731` -> this correction snapshot | Accept Claude's partial-B review after lane-specific correction; harden the closed receipt boundary; audit the next production-input gate without starting ARV2-4 outcomes | Counter-reviewed `c563972`, `aa8ab11`, and `dd79731` individually and cumulatively. Accepted the test and hash-naming commits; accepted the review record after correction. Closed restricted-object/module and authority-state escapes; made atomic persistence thread-, process-, fork-, mode-, durability-, slot-, and final-identity-safe within its documented cooperative/path threat boundary; regression-pinned the non-equivalent single-link guard; and repaired the current/history record. The source audit finds mechanical Massive/QC coverage but no documented exact 2020 as-of revision/deletion state or after-delisting shareholder-return equivalent, so no synthetic opener or truth claim was invented. | Initial historical red/green **6 failed/2 passed -> 8 passed**; final receipt/firewall/successor batteries **380 passed in 80.77 s**; complete Analyst suite **1,677 passed, 5 skipped in 160.75 s**; active-document gate **69 passed**. The owner cancelled the optional repository-wide run at 33% after **2,777 passed, 6 skipped, 1 warning in 207.22 s** and no failure; it is neither a pass nor a failure. Owner-authorized retry: three Massive HTTP 200 schema-only samples and QC authentication success; no value/secret retained or disclosed, no project listed/created/uploaded/compiled/run, and no production input, real receipt, backtest, outcome, broker, deployment, order, or trade. **Zero research looks and zero development evaluations.** | 0 P0/P1; **8 P2 and 11 P3** (`ARV2CR18-001..019`), all corrected. The generic non-facade computed-reflection limit remains an explicit static-trust boundary, not a runtime-sandbox claim. | Claude reviews the single pushed same-lane range. Separately obtain Massive/Benzinga as-of/correction/deletion evidence and CRSP `DLRET` or proven equivalent terminal-payoff access, then implement/review the provider-specific evidence opener; keep all three production gates null/false and do not begin ARV2-4 outcomes. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -5365,8 +5365,10 @@ firewall's claim.
   count **2**. Restored production code refuses that exact state and its new
   regression passes.
 - Independent final audits found no open P0-P3 in the corrected code/test
-  bytes. Changed-scope compilation and final repository/document validation
-  will be recorded in 32.6 on the committed correction snapshot.
+  bytes. Changed-scope compilation and final lane/document validation are
+  recorded in 32.6 on the committed correction snapshot. At the owner's
+  direction, the complete-repository run was cancelled and is not represented
+  as either a pass or a failure.
 
 ### 32.4 Outcome-free production-source readiness audit
 
@@ -5455,11 +5457,38 @@ started in this round.
 
 ### 32.6 Final validation
 
-Final validation is pending on the committed correction snapshot. It must
-include the exact corrected receipt/firewall batteries, complete Analyst V2
-suite, complete repository suite, active-document consistency, changed-scope
-compilation, identity checks, and `git diff --check` before the single combined
-push.
+The exact correction bytes are committed at `a96866e` on this lane. The final
+record-only commit does not change any production or test byte.
+
+- Exact corrected receipt/firewall/successor batteries: **380 passed in 80.77
+  s**.
+- Complete dedicated Analyst Revisions V2 suite: **1,677 passed, 5 skipped in
+  160.75 s**.
+- Active-document consistency: **69 passed** after the final record edit.
+- Changed scope: all seven changed Python files compile with built-in
+  `compile`; the import closure contains the expected **38** approved modules;
+  independent code/test and record audits report **0 open P0-P3**; and
+  `git diff --check` is clean.
+- The owner stopped the optional complete-repository run at 33%. Before the
+  cancellation it reported **2,777 passed, 6 skipped, 1 warning in 207.22 s**
+  with no failure. This interrupted run is neither a pass nor a failure and,
+  under the owner's dedicated-lane validation instruction, is not a completion
+  gate for this round.
+
+The exact changed Python-file SHA-256 identities are:
+
+| File | SHA-256 |
+|---|---|
+| `artifact_io.py` | `813dc69c4eafe9907b1201ee3d781ae7522aab6065cb6e39f5bbf08a773158fb` |
+| `import_firewall.py` | `bebb9ca8dff7f72de3ff4ad3c70b8549bce1ebcc87a4e09fa388e1e527246c5e` |
+| `power_calibration_receipt.py` | `2931d204cb9bacfd27df6becafa2f8d8c77bb8ca20031cb11bdbc9acb100453a` |
+| `stock_power_successor.py` | `11394cc96594cc3a773c061bc0e9302ab49f7f3ad511c7fbcb2fbfb485c9e487` |
+| `test_dataset_and_import_firewall.py` | `2a43c174bce4ae52158c09f680423b576ba4768c74a48b3845f819621b7eadf3` |
+| `test_power_calibration_receipt.py` | `8e23a993fa09663f1ba1f9bd42e037243c56acfa6fcfe1a856b432e611258059` |
+| `test_stock_power_successor.py` | `4fc59e5f653d51543cb0bab1e06397a6205f702cfe492a27ac2ade833b9977fc` |
+
+No production input, real nuisance receipt, QC project/job/backtest, outcome,
+result, deployment, order, or trade was created or opened during validation.
 
 ### 32.7 Review notes for Claude
 
@@ -5494,8 +5523,9 @@ commit by commit and cumulatively. In particular:
    ancestor/artifact or frozen shared document changed, and no production
    calibration input, real nuisance receipt, QC job/backtest, outcome, result,
    deployment, order, or trading action occurred; and
-8. rerun the focused, Analyst-lane, complete-repository, active-document,
-   compilation, and diff gates that will be recorded in 32.6.
+8. rerun the focused, complete Analyst-lane, active-document, changed-scope
+   compilation, identity, and diff gates recorded in 32.6, and verify the
+   owner-cancelled repository run is not described as a completed gate.
 
 If accepted or accepted after lane-specific correction, commit the review and
 any authorized correction on this same branch, update this lane record, and

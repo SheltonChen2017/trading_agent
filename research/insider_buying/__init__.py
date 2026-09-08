@@ -14,6 +14,8 @@ It also exposes the IB-2B exact-SEC-CIK grouping boundary, which retains every
 issuer and reporting-owner observation and quarantines ambiguous attribution.
 The IB-2C boundary maps those exhaustive transactions against caller-supplied,
 dated security/title/ticker references while retaining zero external authority.
+IB-2D adds exhaustive provisional lot diagnostics and an exact USD 50,000
+comparison while retaining every downstream authority gate as false.
 """
 
 from research.insider_buying.contracts import (
@@ -108,6 +110,19 @@ from research.insider_buying.form4_pit_security_mapping import (
     Form4TickerInterval,
     build_form4_pit_security_mapping,
 )
+from research.insider_buying.form4_provisional_lot_diagnostics import (
+    FORM4_PROVISIONAL_LOT_DIAGNOSTICS_VERSION,
+    FORM4_PROVISIONAL_LOT_THRESHOLD_USD,
+    Form4ProvisionalLotDiagnosticRow,
+    Form4ProvisionalLotDiagnostics,
+    Form4ProvisionalLotDiagnosticsError,
+    Form4ProvisionalLotDiagnosticsIdentity,
+    Form4ProvisionalLotDisposition,
+    Form4ProvisionalLotGroup,
+    Form4ProvisionalLotQuarantineReason,
+    Form4ProvisionalLotThresholdDiagnostic,
+    build_form4_provisional_lot_diagnostics,
+)
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
     LoadedSecBulkSnapshot,
@@ -173,6 +188,8 @@ __all__ = [
     "FORM4_OBSERVED_IDENTITY_INVENTORY_VERSION",
     "FORM4_PIT_SECURITY_MAPPING_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_REPORT_VERSION",
+    "FORM4_PROVISIONAL_LOT_DIAGNOSTICS_VERSION",
+    "FORM4_PROVISIONAL_LOT_THRESHOLD_USD",
     "FORM4_SEC_ENTITY_GROUPING_VERSION",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_KIND",
     "FORM4_PROVISIONAL_DISPOSITION_SNAPSHOT_VERSION",
@@ -205,6 +222,14 @@ __all__ = [
     "Form4ProvisionalDispositionReportIdentity",
     "Form4ProvisionalDispositionRow",
     "Form4ProvisionalDispositionSnapshotError",
+    "Form4ProvisionalLotDiagnosticRow",
+    "Form4ProvisionalLotDiagnostics",
+    "Form4ProvisionalLotDiagnosticsError",
+    "Form4ProvisionalLotDiagnosticsIdentity",
+    "Form4ProvisionalLotDisposition",
+    "Form4ProvisionalLotGroup",
+    "Form4ProvisionalLotQuarantineReason",
+    "Form4ProvisionalLotThresholdDiagnostic",
     "Form4SecEntityGrouping",
     "Form4SecEntityGroupingError",
     "Form4SecEntityGroupingIdentity",
@@ -272,6 +297,7 @@ __all__ = [
     "build_form4_observed_identity_inventory",
     "build_form4_pit_security_mapping",
     "build_form4_provisional_disposition_report",
+    "build_form4_provisional_lot_diagnostics",
     "build_form4_sec_entity_grouping",
     "assemble_sec_form4_multi_period_evidence",
     "build_sec_bulk_parsed_snapshot",

@@ -1020,3 +1020,42 @@ def test_deep_json_chain_is_normalized_without_recursive_projection_walk(
 def test_authority_bearing_successor_cannot_be_directly_constructed():
     with pytest.raises(TypeError):
         module.StockPowerSuccessor()
+
+
+@pytest.mark.parametrize("interrupt", (KeyboardInterrupt, SystemExit))
+def test_receipt_parent_operator_interrupt_propagates_without_restricted_frame_locals(
+    tmp_path: Path,
+    parents: _Parents,
+    monkeypatch: pytest.MonkeyPatch,
+    interrupt: type[BaseException],
+) -> None:
+    # ARV2R19-001: an operator interrupt during receipt-parent authentication
+    # must not be swallowed into a domain refusal.  It propagates as a fresh
+    # instance with no cause, no context, and no restricted local in any frame.
+    def interrupt_now(_value):
+        raise interrupt(7)
+
+    receipt = _persisted_receipt(tmp_path, parents)
+    monkeypatch.setattr(
+        receipt_module,
+        "require_persisted_power_calibration_receipt",
+        interrupt_now,
+    )
+    source = parents.receipt_parents
+    with pytest.raises(interrupt) as captured:
+        module._authenticate_parents(
+            parents.stock_contract, source.protocol, source.overlay, receipt.value
+        )
+    assert captured.value.args == (7,)
+    assert captured.value.__cause__ is None
+    assert captured.value.__context__ is None
+    forbidden_locals = {
+        "power_calibration_receipt_artifact_sha256",
+        "require_persisted_power_calibration_receipt",
+    }
+    traceback_cursor = captured.value.__traceback__
+    while traceback_cursor is not None:
+        assert forbidden_locals.isdisjoint(traceback_cursor.tb_frame.f_locals)
+        traceback_cursor = traceback_cursor.tb_next
+    assert not hasattr(module, "require_persisted_power_calibration_receipt")
+    assert not hasattr(module, "power_calibration_receipt_artifact_sha256")

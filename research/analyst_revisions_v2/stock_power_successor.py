@@ -379,6 +379,12 @@ def _authenticate_receipt_parent(power_receipt: Any) -> str | None:
     """Return only the closed artifact identity; never retain/raise the facade."""
     # Restricted Python objects remain in this synchronous frame only.  No
     # exception may carry the frame (and therefore its locals) to a caller.
+    # Operator interrupts are the one exception that must still propagate;
+    # they are re-raised as fresh instances outside the handler, after the
+    # restricted names are unbound, so the escaping traceback carries neither
+    # the original frames nor a context and this frame holds nothing restricted.
+    interrupt: type[BaseException] | None = None
+    interrupt_args: tuple[object, ...] = ()
     try:
         from .power_calibration_receipt import (
             power_calibration_receipt_artifact_sha256,
@@ -387,8 +393,16 @@ def _authenticate_receipt_parent(power_receipt: Any) -> str | None:
 
         require_persisted_power_calibration_receipt(power_receipt)
         return power_calibration_receipt_artifact_sha256(power_receipt)
+    except (KeyboardInterrupt, SystemExit) as exc:
+        interrupt = type(exc)
+        interrupt_args = tuple(exc.args)
     except BaseException:
         return None
+    power_calibration_receipt_artifact_sha256 = None
+    require_persisted_power_calibration_receipt = None
+    del power_calibration_receipt_artifact_sha256
+    del require_persisted_power_calibration_receipt
+    raise interrupt(*interrupt_args)
 
 
 def _authenticate_parents(

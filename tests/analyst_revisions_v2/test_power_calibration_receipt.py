@@ -1156,7 +1156,7 @@ def test_structural_candidate_and_owner_strings_refuse_before_input_open(
             authorized_at_utc=AUTHORIZED_AT_UTC,
         )
     authority_path = tmp_path / "caller-rendered-authority.json"
-    authority_path.write_text(rendered, encoding="utf-8")
+    authority_path.write_bytes(rendered.encode("utf-8"))  # exact LF bytes on every host
     with pytest.raises(
         module.PowerCalibrationReceiptError,
         match="operation authority is pinned",
@@ -1643,7 +1643,10 @@ def test_input_paths_must_remain_regular_nonsymlink_files(
     target = tmp_path / "real-beta.json"
     target.write_bytes(inputs.beta_path.read_bytes())
     inputs.beta_path.unlink()
-    inputs.beta_path.symlink_to(target)
+    try:
+        inputs.beta_path.symlink_to(target)
+    except OSError as exc:
+        pytest.skip(f"host cannot create a symlink: {exc}")
     with pytest.raises(module.PowerCalibrationReceiptError):
         _compute(parents, inputs)
 
@@ -1862,8 +1865,10 @@ def test_receipt_loader_requires_content_versioned_name_before_input_open(
     inputs = _write_authorized_inputs(tmp_path / "inputs", parents)
     receipt = _compute(parents, inputs)
     wrong_name = tmp_path / "numeric-receipt.json"
-    wrong_name.write_text(
-        module.render_power_calibration_receipt(receipt), encoding="utf-8"
+    # write_bytes: write_text would translate LF to CRLF on Windows and the
+    # canonical-bytes refusal would fire before the filename check under test.
+    wrong_name.write_bytes(
+        module.render_power_calibration_receipt(receipt).encode("utf-8")
     )
     opened: list[str] = []
     original = module._read_stable_regular
@@ -2806,10 +2811,16 @@ def test_atomic_receipt_persistence_refuses_leaf_and_ancestor_links(
         target = real_directory / "target.json"
         target.write_bytes(b"must remain unchanged")
         destination = real_directory / filename
-        destination.symlink_to(target)
+        try:
+            destination.symlink_to(target)
+        except OSError as exc:
+            pytest.skip(f"host cannot create a symlink: {exc}")
     else:
         linked_directory = tmp_path / "linked"
-        linked_directory.symlink_to(real_directory, target_is_directory=True)
+        try:
+            linked_directory.symlink_to(real_directory, target_is_directory=True)
+        except OSError as exc:
+            pytest.skip(f"host cannot create a directory symlink: {exc}")
         destination = linked_directory / filename
         target = real_directory / filename
     with pytest.raises(module.PowerCalibrationReceiptError):

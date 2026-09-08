@@ -796,7 +796,12 @@ def test_schema_loader_refuses_missing_directory_and_forged_parent(tmp_path):
         load_power_calibration_input_schema(
             tmp_path / "missing.json", power_protocol=parent
         )
-    with pytest.raises(PowerCalibrationInputSchemaError, match="regular file"):
+    # The loader opens before it fstats, so a directory is refused as
+    # "unreadable" where os.open fails (Windows) and as "regular file"
+    # where it succeeds (POSIX). Both are the same fail-closed refusal.
+    with pytest.raises(
+        PowerCalibrationInputSchemaError, match="regular file|unreadable"
+    ):
         load_power_calibration_input_schema(tmp_path, power_protocol=parent)
     with pytest.raises(PowerCalibrationInputSchemaError, match="not authenticated"):
         load_power_calibration_input_schema(

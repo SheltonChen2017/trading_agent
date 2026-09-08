@@ -2521,7 +2521,12 @@ def test_missing_and_nonregular_variable_artifact_paths_refuse(
     with pytest.raises(PowerCalibrationInputManifestError):
         _load_candidate(admission, tuple(supplied))
     supplied[index] = tmp_path
-    with pytest.raises(PowerCalibrationInputManifestError, match="regular file"):
+    # The loader opens before it fstats, so a directory is refused as
+    # "unreadable" where os.open fails (Windows) and as "regular file"
+    # where it succeeds (POSIX). Both are the same fail-closed refusal.
+    with pytest.raises(
+        PowerCalibrationInputManifestError, match="regular file|unreadable"
+    ):
         _load_candidate(admission, tuple(supplied))
 
 

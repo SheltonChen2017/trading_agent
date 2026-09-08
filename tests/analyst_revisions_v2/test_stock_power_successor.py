@@ -4,8 +4,11 @@ import copy
 import dataclasses
 import hashlib
 import json
+import os
 import pickle
+import signal
 import sys
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -556,21 +559,77 @@ def test_render_and_load_reauthenticate_each_direct_parent_before_and_after(
 ):
     receipt = _persisted_receipt(tmp_path, parents)
     expected = receipt.value if parent_getter is None else parent_getter(parents)
-    original = getattr(module, checker_name)
+    checker_module = receipt_module if parent_getter is None else module
+    original = getattr(checker_module, checker_name)
+    expected_calls = 4 if parent_getter is None else 2
     calls: list[object] = []
 
     def counted(value):
         calls.append(value)
         return original(value)
 
-    monkeypatch.setattr(module, checker_name, counted)
+    monkeypatch.setattr(checker_module, checker_name, counted)
     rendered = _render_successor(parents, receipt)
-    assert calls == [expected, expected]
+    assert calls == [expected] * expected_calls
     path = tmp_path / "successor.json"
     path.write_bytes(rendered.encode("utf-8"))
     calls.clear()
     _load_successor(path, parents, receipt)
-    assert calls == [expected, expected]
+    assert calls == [expected] * expected_calls
+
+
+@pytest.mark.parametrize(
+    "checker_name",
+    (
+        "require_persisted_power_calibration_receipt",
+        "power_calibration_receipt_artifact_sha256",
+    ),
+)
+def test_receipt_helper_never_exports_a_restricted_object_or_failure_frame(
+    tmp_path: Path,
+    parents: _Parents,
+    monkeypatch: pytest.MonkeyPatch,
+    checker_name: str,
+) -> None:
+    class FixtureFatal(BaseException):
+        pass
+
+    def fail_closed(_value):
+        raise FixtureFatal("fixture-only restricted-parent failure")
+
+    receipt = _persisted_receipt(tmp_path, parents)
+    monkeypatch.setattr(
+        receipt_module,
+        checker_name,
+        fail_closed,
+    )
+    assert module._authenticate_receipt_parent(receipt.value) is None
+    assert not hasattr(module, "require_persisted_power_calibration_receipt")
+    assert not hasattr(module, "power_calibration_receipt_artifact_sha256")
+    assert not hasattr(module, "PowerCalibrationReceiptError")
+
+
+def test_receipt_parent_refusal_traceback_contains_no_restricted_facade_local(
+    parents: _Parents,
+) -> None:
+    source = parents.receipt_parents
+    with pytest.raises(module.StockPowerSuccessorError) as captured:
+        module._authenticate_parents(
+            parents.stock_contract,
+            source.protocol,
+            source.overlay,
+            object(),
+        )
+
+    assert captured.value.__cause__ is None
+    forbidden_locals = {
+        "power_calibration_receipt_artifact_sha256",
+        "require_persisted_power_calibration_receipt",
+    }
+    traceback_cursor = captured.value.__traceback__
+    while traceback_cursor is not None:
+        assert forbidden_locals.isdisjoint(traceback_cursor.tb_frame.f_locals)
+        traceback_cursor = traceback_cursor.tb_next
 
 
 def test_render_uses_one_complete_snapshot_during_transient_parent_mutation(
@@ -679,6 +738,63 @@ def test_post_load_successor_or_receipt_byte_change_revokes_authority(
     second.receipt.path.write_bytes(second.receipt.path.read_bytes() + b"\n")
     with pytest.raises(module.StockPowerSuccessorError, match="direct-parent"):
         module.require_loaded_stock_power_successor(second.value)
+
+
+@pytest.mark.skipif(
+    not hasattr(os, "fork") or not hasattr(os, "register_at_fork"),
+    reason="POSIX process-local successor authority reset check",
+)
+@pytest.mark.filterwarnings(
+    "ignore:This process .* is multi-threaded, use of fork\\(\\) may lead to "
+    "deadlocks in the child.:DeprecationWarning"
+)
+def test_successor_authority_lock_and_registry_fail_closed_after_fork(
+    tmp_path: Path,
+    parents: _Parents,
+) -> None:
+    loaded = _loaded_successor(tmp_path, parents)
+    successor = loaded.value
+    lock_held = threading.Event()
+    release_holder = threading.Event()
+
+    def hold_successor_authority_lock() -> None:
+        with module._STOCK_POWER_SUCCESSOR_AUTHORITIES_LOCK:
+            lock_held.set()
+            assert release_holder.wait(timeout=8)
+
+    holder = threading.Thread(target=hold_successor_authority_lock)
+    holder.start()
+    assert lock_held.wait(timeout=5)
+    child_pid = os.fork()
+    if child_pid == 0:  # pragma: no cover - assertions run in the child
+        signal.alarm(4)
+        inherited = (
+            module._INHERITED_STOCK_POWER_SUCCESSOR_AUTHORITY_QUARANTINE[-1]
+        )
+        if (
+            id(successor) not in inherited
+            or module._STOCK_POWER_SUCCESSOR_AUTHORITIES
+        ):
+            os._exit(4)
+        try:
+            module.require_loaded_stock_power_successor(successor)
+        except module.StockPowerSuccessorError:
+            exit_code = 0
+        except BaseException:
+            exit_code = 2
+        else:
+            exit_code = 3
+        os._exit(exit_code)
+
+    try:
+        child_status = receipt_helpers._wait_child_bounded(child_pid)
+    finally:
+        release_holder.set()
+        holder.join(timeout=5)
+
+    assert not holder.is_alive()
+    assert os.waitstatus_to_exitcode(child_status) == 0
+    assert module.require_loaded_stock_power_successor(successor) is successor
 
 
 def test_parent_change_during_load_is_detected(

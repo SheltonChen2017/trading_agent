@@ -20,6 +20,7 @@ from typing import Any, Mapping
 
 from .artifact_io import (
     ArtifactIOError,
+    _register_process_local_after_fork,
     read_stable_regular as _read_artifact_stable_regular,
     revalidate_regular as _revalidate_artifact_regular,
 )
@@ -52,14 +53,6 @@ from .power_calibration_protocol import (
     ProvisionalPowerDisposition,
     require_loaded_power_calibration_protocol,
 )
-from .power_calibration_receipt import (
-    PowerCalibrationReceipt,
-    PowerCalibrationReceiptError,
-    power_calibration_receipt_artifact_sha256,
-    require_persisted_power_calibration_receipt,
-)
-
-
 class StockPowerSuccessorError(ValueError):
     """The stock-v3 successor or one of its exact parents is unauthentic."""
 
@@ -382,29 +375,45 @@ def _validate_power_amendment(value: object) -> None:
         raise StockPowerSuccessorError("power amendment value type changed")
 
 
+def _authenticate_receipt_parent(power_receipt: Any) -> str | None:
+    """Return only the closed artifact identity; never retain/raise the facade."""
+    # Restricted Python objects remain in this synchronous frame only.  No
+    # exception may carry the frame (and therefore its locals) to a caller.
+    try:
+        from .power_calibration_receipt import (
+            power_calibration_receipt_artifact_sha256,
+            require_persisted_power_calibration_receipt,
+        )
+
+        require_persisted_power_calibration_receipt(power_receipt)
+        return power_calibration_receipt_artifact_sha256(power_receipt)
+    except BaseException:
+        return None
+
+
 def _authenticate_parents(
     stock_contract: GlobalBenchmarkContract,
     power_protocol: PowerCalibrationProtocol,
     multiplicity_overlay: FourFamilyMultiplicityOverlay,
-    power_receipt: PowerCalibrationReceipt,
+    power_receipt: Any,
 ) -> Mapping[str, Any]:
     try:
         require_loaded_global_benchmark_contract(stock_contract)
         require_loaded_power_calibration_protocol(power_protocol)
         require_loaded_four_family_multiplicity_overlay(multiplicity_overlay)
-        require_persisted_power_calibration_receipt(power_receipt)
-        receipt_artifact_sha256 = power_calibration_receipt_artifact_sha256(
-            power_receipt
-        )
     except (
         GlobalBenchmarkContractError,
         PowerCalibrationProtocolError,
         FourFamilyMultiplicityError,
-        PowerCalibrationReceiptError,
     ) as exc:
         raise StockPowerSuccessorError(
             "stock-v3 direct-parent authentication failed"
         ) from exc
+    receipt_artifact_sha256 = _authenticate_receipt_parent(power_receipt)
+    if receipt_artifact_sha256 is None:
+        raise StockPowerSuccessorError(
+            "stock-v3 direct-parent authentication failed"
+        )
 
     # Capture every value that may influence emitted bytes or loaded fields once.
     # The caller compares two complete immutable snapshots, so document building
@@ -660,6 +669,23 @@ class StockPowerSuccessor:
 _LOADED_STOCK_POWER_SUCCESSOR_AUTHORITY = object()
 _STOCK_POWER_SUCCESSOR_AUTHORITIES: dict[int, tuple[Any, ...]] = {}
 _STOCK_POWER_SUCCESSOR_AUTHORITIES_LOCK = threading.RLock()
+_INHERITED_STOCK_POWER_SUCCESSOR_AUTHORITY_QUARANTINE: list[object] = []
+
+
+def _reset_process_local_stock_power_successor_authorities_after_fork() -> None:
+    """Invalidate inherited successor authorities without running finalizers."""
+    global _STOCK_POWER_SUCCESSOR_AUTHORITIES
+    global _STOCK_POWER_SUCCESSOR_AUTHORITIES_LOCK
+    inherited = _STOCK_POWER_SUCCESSOR_AUTHORITIES
+    _INHERITED_STOCK_POWER_SUCCESSOR_AUTHORITY_QUARANTINE.append(inherited)
+    _STOCK_POWER_SUCCESSOR_AUTHORITIES = {}
+    _STOCK_POWER_SUCCESSOR_AUTHORITIES_LOCK = threading.RLock()
+
+
+_register_process_local_after_fork(
+    _reset_process_local_stock_power_successor_authorities_after_fork
+)
+del _register_process_local_after_fork
 
 
 def _successor_fingerprint(value: StockPowerSuccessor) -> tuple[object, ...]:
@@ -713,7 +739,7 @@ def render_stock_power_successor(
     stock_contract: GlobalBenchmarkContract,
     power_protocol: PowerCalibrationProtocol,
     multiplicity_overlay: FourFamilyMultiplicityOverlay,
-    power_receipt: PowerCalibrationReceipt,
+    power_receipt: Any,
 ) -> str:
     """Build and render the exact stock-v3 child; rendering grants no action."""
     before = _authenticate_parents(
@@ -734,7 +760,7 @@ def load_stock_power_successor(
     stock_contract: GlobalBenchmarkContract,
     power_protocol: PowerCalibrationProtocol,
     multiplicity_overlay: FourFamilyMultiplicityOverlay,
-    power_receipt: PowerCalibrationReceipt,
+    power_receipt: Any,
 ) -> StockPowerSuccessor:
     """Authenticate exact successor bytes and all four direct parents twice."""
     before = _authenticate_parents(

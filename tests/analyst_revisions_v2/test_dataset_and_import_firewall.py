@@ -33,6 +33,7 @@ from research.analyst_revisions_v2.contracts import EventState, RevisionKind
 from research.analyst_revisions_v2.import_firewall import (
     DEFAULT_ALLOWED_STDLIB_ROOTS,
     ImportBoundaryError,
+    _FORBIDDEN_RUNTIME_ATTRIBUTES,
     _validate_import_closure,
     validate_transitive_import_closure,
 )
@@ -826,7 +827,8 @@ def test_authoritative_firewall_rejects_unlisted_local_modules(tmp_path):
     package.mkdir(parents=True)
     (research / "__init__.py").write_text("", encoding="utf-8")
     (package / "__init__.py").write_text(
-        "import research.unlisted_strategy\n", encoding="utf-8"
+        "import research.unlisted_strategy as unlisted_strategy\n",
+        encoding="utf-8",
     )
     (research / "unlisted_strategy.py").write_text("VALUE = 1\n", encoding="utf-8")
     with pytest.raises(ImportBoundaryError, match="unapproved repository-local"):
@@ -1014,6 +1016,11 @@ def test_exchange_calendar_facade_refuses_computed_dynamic_access(
         ),
         (
             "from research.analyst_revisions_v2.artifact_io import "
+            "_register_process_local_after_fork\n",
+            "unsafe facade export",
+        ),
+        (
+            "from research.analyst_revisions_v2.artifact_io import "
             "create_new_regular_atomically\n",
             "unsafe facade export",
         ),
@@ -1092,6 +1099,93 @@ def test_artifact_io_facade_does_not_reexport_descriptor_capabilities(
 
 
 @pytest.mark.parametrize(
+    "export_name",
+    (
+        "_INHERITED_RECEIPT_AUTHORITY_QUARANTINE",
+        "_reset_process_local_receipt_authorities_after_fork",
+        "_INHERITED_STOCK_POWER_SUCCESSOR_AUTHORITY_QUARANTINE",
+        "_reset_process_local_stock_power_successor_authorities_after_fork",
+    ),
+)
+def test_process_local_reset_state_cannot_be_directly_imported(
+    tmp_path: Path,
+    export_name: str,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    source_module = (
+        "power_calibration_receipt"
+        if "RECEIPT" in export_name or "receipt" in export_name
+        else "stock_power_successor"
+    )
+    (guarded / "__init__.py").write_text(
+        f"from research.analyst_revisions_v2.{source_module} "
+        f"import {export_name} as leaked\n"
+        "VALUE = leaked\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / f"{source_module}.py").write_text("", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="import/reflection primitive"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_stock_successor_module_object_cannot_compute_authority_state_access(
+    tmp_path: Path,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(
+        "import research.analyst_revisions_v2.stock_power_successor as successor\n"
+        "def chars(*values):\n"
+        "    return ''.join(chr(value) for value in values)\n"
+        "NAME = chars(95, 83, 84, 79, 67, 75, 95, 80, 79, 87, 69, 82, 95, "
+        "83, 85, 67, 67, 69, 83, 83, 79, 82, 95, 65, 85, 84, 72, 79, 82, "
+        "73, 84, 73, 69, 83)\n"
+        "VALUE = getattr(successor, NAME)\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "stock_power_successor.py").write_text("", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="facade module object"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+@pytest.mark.parametrize(
+    "guarded_source",
+    (
+        "import research.analyst_revisions_v2 as package\nVALUE = package\n",
+        "import research as root\nVALUE = root\n",
+        "from research import analyst_revisions_v2 as package\nVALUE = package\n",
+        "import research.analyst_revisions_v2.canonical\nVALUE = research\n",
+    ),
+)
+def test_protected_facade_ancestor_module_objects_are_forbidden(
+    tmp_path: Path,
+    guarded_source: str,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(guarded_source, encoding="utf-8")
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "canonical.py").write_text("", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="facade module object"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+@pytest.mark.parametrize(
     "guarded_source",
     (
         "from research.analyst_revisions_v2.power_calibration_receipt "
@@ -1119,6 +1213,335 @@ def test_receipt_module_cannot_reexport_the_scoped_writer(
 
     with pytest.raises(ImportBoundaryError, match="import/reflection primitive"):
         _validate_import_closure(tmp_path, package_name="guarded")
+
+
+@pytest.mark.parametrize(
+    "export_name",
+    (
+        "PowerCalibrationReceipt",
+        "PowerCalibrationReceiptError",
+        "power_calibration_receipt_artifact_sha256",
+        "require_persisted_power_calibration_receipt",
+    ),
+)
+def test_receipt_restricted_exports_cannot_escape_as_first_class_values(
+    tmp_path: Path, export_name: str,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(
+        "from research.analyst_revisions_v2.power_calibration_receipt "
+        f"import {export_name} as restricted\n"
+        "escaped = restricted\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="restricted facade"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_receipt_restricted_function_cannot_reflect_to_the_production_writer(
+    tmp_path: Path,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(
+        "from research.analyst_revisions_v2.power_calibration_receipt "
+        "import require_persisted_power_calibration_receipt as restricted\n"
+        "def chars(*values):\n"
+        "    return ''.join(chr(value) for value in values)\n"
+        "namespace = getattr(restricted, chars(95, 95, 103, 108, 111, 98, 97, "
+        "108, 115, 95, 95))\n"
+        "writer = namespace[chars(112, 101, 114, 115, 105, 115, 116, 95, 112, "
+        "111, 119, 101, 114, 95, 99, 97, 108, 105, 98, 114, 97, 116, 105, 111, "
+        "110, 95, 114, 101, 99, 101, 105, 112, 116)]\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="restricted facade"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_receipt_restricted_exports_admit_only_the_exact_successor_helper(
+    tmp_path: Path,
+) -> None:
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (package / "stock_power_successor.py").write_text(
+        "from __future__ import annotations\n"
+        "def _authenticate_receipt_parent(value):\n"
+        "    from research.analyst_revisions_v2.power_calibration_receipt import (\n"
+        "        power_calibration_receipt_artifact_sha256 as receipt_sha256,\n"
+        "        require_persisted_power_calibration_receipt as require_receipt,\n"
+        "    )\n"
+        "    require_receipt(value)\n"
+        "    return receipt_sha256(value)\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+
+    _validate_import_closure(
+        tmp_path, package_name="research.analyst_revisions_v2"
+    )
+
+
+@pytest.mark.parametrize(
+    ("export_name", "use_source"),
+    (
+        ("PowerCalibrationReceipt", "restricted()\n"),
+        ("PowerCalibrationReceiptError", "restricted()\n"),
+        (
+            "power_calibration_receipt_artifact_sha256",
+            "try:\n    pass\nexcept restricted:\n    pass\n",
+        ),
+        (
+            "require_persisted_power_calibration_receipt",
+            "def consume(value: restricted):\n    return value\n",
+        ),
+    ),
+)
+def test_receipt_restricted_export_contexts_are_symbol_specific(
+    tmp_path: Path, export_name: str, use_source: str,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    indented_use = "    " + use_source.replace("\n", "\n    ")
+    (guarded / "__init__.py").write_text(
+        "from __future__ import annotations\n"
+        "def misuse(value):\n"
+        "    from research.analyst_revisions_v2.power_calibration_receipt "
+        f"import {export_name} as restricted\n"
+        f"{indented_use}",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+
+    with pytest.raises(ImportBoundaryError, match="restricted facade"):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_receipt_restricted_exports_cannot_escape_through_a_local_bridge(
+    tmp_path: Path,
+) -> None:
+    guarded = tmp_path / "guarded"
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    guarded.mkdir()
+    package.mkdir(parents=True)
+    (guarded / "__init__.py").write_text(
+        "from .bridge import leaked\n"
+        "escaped = leaked\n",
+        encoding="utf-8",
+    )
+    (guarded / "bridge.py").write_text(
+        "from research.analyst_revisions_v2.power_calibration_receipt "
+        "import require_persisted_power_calibration_receipt as leaked\n"
+        "def authenticate(value):\n"
+        "    return leaked(value)\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+
+    with pytest.raises(
+        ImportBoundaryError,
+        match="restricted facade",
+    ):
+        _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_receipt_function_local_import_cannot_bind_a_module_global(
+    tmp_path: Path,
+) -> None:
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (package / "stock_power_successor.py").write_text(
+        "def _authenticate_receipt_parent(value):\n"
+        "    global leaked\n"
+        "    from research.analyst_revisions_v2.power_calibration_receipt "
+        "import require_persisted_power_calibration_receipt as leaked\n"
+        "    return leaked(value)\n",
+        encoding="utf-8",
+    )
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+
+    with pytest.raises(
+        ImportBoundaryError,
+        match="nonlocal restricted facade import binding",
+    ):
+        _validate_import_closure(
+            tmp_path, package_name="research.analyst_revisions_v2"
+        )
+
+
+@pytest.mark.parametrize(
+    "escape_body",
+    (
+        "    def wrapped(item):\n"
+        "        return restricted(item)\n"
+        "    return wrapped\n",
+        "    wrapped = lambda item: restricted(item)\n"
+        "    return wrapped\n",
+        "    return [restricted(item) for item in values]\n",
+        "    def wrapped(fn=restricted):\n"
+        "        return fn\n"
+        "    return wrapped\n",
+        "    @restricted\n"
+        "    def wrapped(item):\n"
+        "        return item\n"
+        "    return wrapped\n",
+    ),
+)
+def test_receipt_restricted_import_cannot_escape_its_exact_lexical_scope(
+    tmp_path: Path,
+    escape_body: str,
+) -> None:
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+    (package / "stock_power_successor.py").write_text(
+        "def _authenticate_receipt_parent(values):\n"
+        "    from research.analyst_revisions_v2.power_calibration_receipt "
+        "import require_persisted_power_calibration_receipt as restricted\n"
+        f"{escape_body}",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        ImportBoundaryError,
+        match="unsafe restricted facade export",
+    ):
+        _validate_import_closure(
+            tmp_path, package_name="research.analyst_revisions_v2"
+        )
+
+
+def test_receipt_restricted_function_must_be_the_exact_direct_call_target(
+    tmp_path: Path,
+) -> None:
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+    (package / "stock_power_successor.py").write_text(
+        "def identity(value):\n"
+        "    return value\n"
+        "def _authenticate_receipt_parent(value):\n"
+        "    from research.analyst_revisions_v2.power_calibration_receipt "
+        "import require_persisted_power_calibration_receipt as restricted\n"
+        "    return identity(restricted)\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        ImportBoundaryError,
+        match="unsafe restricted facade export",
+    ):
+        _validate_import_closure(
+            tmp_path, package_name="research.analyst_revisions_v2"
+        )
+
+
+@pytest.mark.parametrize(
+    ("export_name", "use_source"),
+    (
+        (
+            "require_persisted_power_calibration_receipt",
+            "    leaked = restricted(value)\n    return None\n",
+        ),
+        (
+            "require_persisted_power_calibration_receipt",
+            "    return str(restricted(value))\n",
+        ),
+        (
+            "power_calibration_receipt_artifact_sha256",
+            "    leaked = restricted(value)\n    return leaked\n",
+        ),
+        (
+            "power_calibration_receipt_artifact_sha256",
+            "    return str(restricted(value))\n",
+        ),
+    ),
+)
+def test_receipt_restricted_call_result_cannot_escape_exact_use_shape(
+    tmp_path: Path,
+    export_name: str,
+    use_source: str,
+) -> None:
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+    (package / "stock_power_successor.py").write_text(
+        "def _authenticate_receipt_parent(value):\n"
+        "    from research.analyst_revisions_v2.power_calibration_receipt "
+        f"import {export_name} as restricted\n"
+        f"{use_source}",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        ImportBoundaryError,
+        match="unsafe restricted facade export",
+    ):
+        _validate_import_closure(
+            tmp_path, package_name="research.analyst_revisions_v2"
+        )
+
+
+@pytest.mark.parametrize(
+    "function_source",
+    (
+        "def _authenticate_receipt_parent(value):\n"
+        "    from research.analyst_revisions_v2.power_calibration_receipt "
+        "import require_persisted_power_calibration_receipt as restricted\n"
+        "    yield restricted(value)\n",
+        "async def _authenticate_receipt_parent(value):\n"
+        "    from research.analyst_revisions_v2.power_calibration_receipt "
+        "import require_persisted_power_calibration_receipt as restricted\n"
+        "    return restricted(value)\n",
+    ),
+)
+def test_receipt_restricted_import_cannot_live_in_a_suspended_frame(
+    tmp_path: Path,
+    function_source: str,
+) -> None:
+    package = tmp_path / "research" / "analyst_revisions_v2"
+    package.mkdir(parents=True)
+    (package.parent / "__init__.py").write_text("", encoding="utf-8")
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "power_calibration_receipt.py").write_text("", encoding="utf-8")
+    (package / "stock_power_successor.py").write_text(
+        function_source,
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ImportBoundaryError, match="restricted facade import"):
+        _validate_import_closure(
+            tmp_path, package_name="research.analyst_revisions_v2"
+        )
 
 
 def test_artifact_io_facade_relative_module_import_cannot_reach_private_helpers(
@@ -1172,7 +1595,12 @@ def _module_assignment_value(tree: ast.Module, name: str) -> ast.expr | None:
     return None
 
 
-def _unguarded_registry_access_lines(tree: ast.Module, registry: str) -> list[int]:
+def _unguarded_registry_access_lines(
+    tree: ast.Module,
+    registry: str,
+    *,
+    reviewed_reset_function: str | None = None,
+) -> list[int]:
     """Return non-declaration registry accesses outside its matching lock."""
     parents = {
         child: parent
@@ -1200,6 +1628,13 @@ def _unguarded_registry_access_lines(tree: ast.Module, registry: str) -> list[in
         ancestor = parents.get(access)
         guarded = False
         while ancestor is not None:
+            if (
+                isinstance(ancestor, ast.FunctionDef)
+                and reviewed_reset_function is not None
+                and ancestor.name == reviewed_reset_function
+            ):
+                guarded = True
+                break
             if isinstance(ancestor, (ast.With, ast.AsyncWith)) and any(
                 isinstance(item.context_expr, ast.Name)
                 and item.context_expr.id == lock_name
@@ -1256,6 +1691,20 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
         "stock_power_successor.py": {"_STOCK_POWER_SUCCESSOR_AUTHORITIES"},
     }
     checked: dict[str, set[str]] = {}
+    reviewed_reset_scopes = {
+        "power_calibration_receipt.py": (
+            "_reset_process_local_receipt_authorities_after_fork",
+            {
+                "_CONTENT_CONTRACT_AUTHORITIES",
+                "_INPUT_AUTHORITIES",
+                "_POWER_RECEIPT_AUTHORITIES",
+            },
+        ),
+        "stock_power_successor.py": (
+            "_reset_process_local_stock_power_successor_authorities_after_fork",
+            {"_STOCK_POWER_SUCCESSOR_AUTHORITIES"},
+        ),
+    }
     for path in sorted(package.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         registries = _authority_registry_names(tree)
@@ -1264,6 +1713,12 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
         checked[path.name] = registries
         for registry in registries:
             lock_name = f"{registry}_LOCK"
+            assert {
+                registry,
+                lock_name,
+            } <= _FORBIDDEN_RUNTIME_ATTRIBUTES, (
+                f"{path.name} authority state is not sealed by the import firewall"
+            )
             lock_value = _module_assignment_value(tree, lock_name)
             assert (
                 isinstance(lock_value, ast.Call)
@@ -1276,9 +1731,20 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
             ), (
                 f"{path.name} must define {lock_name} as threading.RLock()"
             )
-            assert not _unguarded_registry_access_lines(tree, registry), (
+            reset_scope = reviewed_reset_scopes.get(path.name)
+            reset_function = (
+                reset_scope[0]
+                if reset_scope is not None and registry in reset_scope[1]
+                else None
+            )
+            violations = _unguarded_registry_access_lines(
+                tree,
+                registry,
+                reviewed_reset_function=reset_function,
+            )
+            assert not violations, (
                 f"{path.name} accesses {registry} outside with {lock_name}: "
-                f"lines {_unguarded_registry_access_lines(tree, registry)}"
+                f"lines {violations}"
             )
     # Pin the inventory so a renamed/deleted registry cannot make the audit
     # silently cover less authority than it did before.
@@ -1317,6 +1783,17 @@ def test_authority_registry_guard_audit_accepts_the_matching_lock():
         "        return _TEST_AUTHORITIES.get(1)\n"
     )
     assert _unguarded_registry_access_lines(tree, "_TEST_AUTHORITIES") == []
+
+
+def test_authority_registry_guard_audit_does_not_exempt_reset_name_globally():
+    tree = ast.parse(
+        "import threading\n"
+        "_TEST_AUTHORITIES = {}\n"
+        "_TEST_AUTHORITIES_LOCK = threading.RLock()\n"
+        "def _reset_process_local_receipt_authorities_after_fork():\n"
+        "    _TEST_AUTHORITIES.clear()\n"
+    )
+    assert _unguarded_registry_access_lines(tree, "_TEST_AUTHORITIES")
 
 
 def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():

@@ -8,6 +8,10 @@ import hashlib
 import json
 import os
 import pickle
+import signal
+import stat
+import threading
+import time
 import traceback
 import weakref
 from contextlib import contextmanager
@@ -60,6 +64,24 @@ SPEC_ROOT = (
 CONTENT_CONTRACT_FILENAME = (
     "arv2_stock_power_calibration_input_content_contract.structural.json"
 )
+
+
+def _wait_child_bounded(process_id: int, *, timeout_seconds: float = 8.0) -> int:
+    """Reap a forked test child without hanging on an after-fork regression."""
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        waited, status = os.waitpid(process_id, os.WNOHANG)
+        if waited == process_id:
+            return status
+        time.sleep(0.01)
+    try:
+        os.kill(process_id, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    _, status = os.waitpid(process_id, 0)
+    return status
+
+
 AUTHORIZATION_ID = "owner-arv2-4d-b-input-nuisance-authorization-20260907"
 AUTHORIZATION_EVIDENCE_SHA256 = hashlib.sha256(
     b"synthetic fixture standing in for the exact owner authorization evidence"
@@ -1916,6 +1938,494 @@ def test_atomic_receipt_persistence_same_bytes_is_concurrency_safe(
     )
 
 
+@pytest.mark.parametrize("pause_stage", ("pre_link", "post_link"))
+def test_atomic_facade_serializes_same_process_writer_transactions(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    pause_stage: str,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    first_thread: dict[str, int] = {}
+    second_thread: dict[str, int] = {}
+    first_paused = threading.Event()
+    release_first = threading.Event()
+    second_started = threading.Event()
+    second_reached_temporary_open = threading.Event()
+    original_open = artifact_io_module.os.open
+    original_link = artifact_io_module.os.link
+    original_unlink = artifact_io_module.os.unlink
+
+    def observed_open(path, *args, **kwargs):
+        if (
+            threading.get_ident() == second_thread.get("identity")
+            and Path(path).name.startswith(".receipt.json.atomic-")
+        ):
+            second_reached_temporary_open.set()
+        return original_open(path, *args, **kwargs)
+
+    def pause_before_link(*args, **kwargs):
+        if (
+            pause_stage == "pre_link"
+            and threading.get_ident() == first_thread.get("identity")
+        ):
+            first_paused.set()
+            assert release_first.wait(timeout=5)
+        return original_link(*args, **kwargs)
+
+    def pause_after_link(path, *args, **kwargs):
+        if (
+            pause_stage == "post_link"
+            and threading.get_ident() == first_thread.get("identity")
+            and Path(path).name.startswith(".receipt.json.atomic-")
+        ):
+            first_paused.set()
+            assert release_first.wait(timeout=5)
+        return original_unlink(path, *args, **kwargs)
+
+    monkeypatch.setattr(artifact_io_module.os, "open", observed_open)
+    monkeypatch.setattr(artifact_io_module.os, "link", pause_before_link)
+    monkeypatch.setattr(artifact_io_module.os, "unlink", pause_after_link)
+
+    def first_writer() -> Path:
+        first_thread["identity"] = threading.get_ident()
+        return artifact_io_module.create_new_regular_atomically(
+            destination,
+            payload,
+            name="fixture artifact",
+            maximum_bytes=128,
+        )
+
+    def second_writer() -> Path:
+        second_thread["identity"] = threading.get_ident()
+        second_started.set()
+        return artifact_io_module.create_new_regular_atomically(
+            destination,
+            payload,
+            name="fixture artifact",
+            maximum_bytes=128,
+        )
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(first_writer)
+        assert first_paused.wait(timeout=5)
+        second = executor.submit(second_writer)
+        assert second_started.wait(timeout=5)
+        try:
+            assert not second_reached_temporary_open.wait(timeout=0.25)
+        finally:
+            release_first.set()
+        assert first.result(timeout=5) == destination.resolve()
+        assert second.result(timeout=5) == destination.resolve()
+
+    assert destination.read_bytes() == payload
+    assert destination.stat().st_nlink == 1
+    assert tuple(tmp_path.glob(".receipt.json.atomic-*.tmp")) == ()
+
+
+@pytest.mark.skipif(
+    not hasattr(os, "fork") or not hasattr(os, "register_at_fork"),
+    reason="POSIX fork-lock reset check",
+)
+@pytest.mark.filterwarnings(
+    "ignore:This process .* is multi-threaded, use of fork\\(\\) may lead to "
+    "deadlocks in the child.:DeprecationWarning"
+)
+def test_atomic_facade_resets_an_inherited_process_lock_after_fork(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "forked-child.json"
+    payload = b"closed receipt fixture\n"
+    lock_held = threading.Event()
+    release_holder = threading.Event()
+
+    def hold_process_lock() -> None:
+        with artifact_io_module._ATOMIC_CREATE_LOCK:
+            lock_held.set()
+            assert release_holder.wait(timeout=8)
+
+    holder = threading.Thread(target=hold_process_lock)
+    holder.start()
+    assert lock_held.wait(timeout=5)
+    child_pid = os.fork()
+    if child_pid == 0:  # pragma: no cover - assertions run in the child
+        signal.alarm(3)
+        try:
+            result = artifact_io_module.create_new_regular_atomically(
+                destination,
+                payload,
+                name="fixture artifact",
+                maximum_bytes=128,
+            )
+            exit_code = int(result != destination.resolve())
+        except BaseException:
+            exit_code = 2
+        os._exit(exit_code)
+
+    try:
+        child_status = _wait_child_bounded(child_pid)
+    finally:
+        release_holder.set()
+        holder.join(timeout=5)
+
+    assert not holder.is_alive()
+    assert os.waitstatus_to_exitcode(child_status) == 0
+    assert destination.read_bytes() == payload
+
+
+@pytest.mark.skipif(
+    os.name == "nt" or not hasattr(os, "fork") or not hasattr(os, "fchmod"),
+    reason="POSIX exact-mode publication check",
+)
+def test_atomic_facade_enforces_exact_mode_despite_restrictive_umask(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "umask-independent.json"
+    payload = b"closed receipt fixture\n"
+    child_pid = os.fork()
+    if child_pid == 0:  # pragma: no cover - assertions run in the child
+        signal.alarm(5)
+        previous_umask = os.umask(0o777)
+        try:
+            first = artifact_io_module.create_new_regular_atomically(
+                destination,
+                payload,
+                name="fixture artifact",
+                maximum_bytes=128,
+            )
+            second = artifact_io_module.create_new_regular_atomically(
+                destination,
+                payload,
+                name="fixture artifact",
+                maximum_bytes=128,
+            )
+            exit_code = int(
+                first != destination.resolve()
+                or second != destination.resolve()
+                or stat.S_IMODE(destination.stat().st_mode) != 0o600
+            )
+        except BaseException:
+            exit_code = 2
+        finally:
+            os.umask(previous_umask)
+        os._exit(exit_code)
+
+    child_status = _wait_child_bounded(child_pid)
+    assert os.waitstatus_to_exitcode(child_status) == 0
+    assert destination.read_bytes() == payload
+    assert stat.S_IMODE(destination.stat().st_mode) == 0o600
+
+
+@pytest.mark.skipif(
+    not hasattr(os, "fork") or not hasattr(os, "register_at_fork"),
+    reason="POSIX process-local authority reset check",
+)
+@pytest.mark.filterwarnings(
+    "ignore:This process .* is multi-threaded, use of fork\\(\\) may lead to "
+    "deadlocks in the child.:DeprecationWarning"
+)
+def test_receipt_authority_locks_and_registries_fail_closed_after_fork(
+    tmp_path: Path,
+    parents: _Parents,
+) -> None:
+    inputs = _write_authorized_inputs(tmp_path / "inputs", parents)
+    receipt = _compute(parents, inputs)
+    destination = tmp_path / module.power_calibration_receipt_filename(receipt)
+    locks_held = threading.Event()
+    release_holder = threading.Event()
+
+    def hold_every_receipt_authority_lock() -> None:
+        with module._CONTENT_CONTRACT_AUTHORITIES_LOCK:
+            with module._INPUT_AUTHORITIES_LOCK:
+                with module._POWER_RECEIPT_AUTHORITIES_LOCK:
+                    locks_held.set()
+                    assert release_holder.wait(timeout=8)
+
+    holder = threading.Thread(target=hold_every_receipt_authority_lock)
+    holder.start()
+    assert locks_held.wait(timeout=5)
+    child_pid = os.fork()
+    if child_pid == 0:  # pragma: no cover - assertions run in the child
+        signal.alarm(4)
+        inherited = module._INHERITED_RECEIPT_AUTHORITY_QUARANTINE[-1]
+        if (
+            id(parents.content_contract) not in inherited[0]
+            or id(inputs.input_authority) not in inherited[1]
+            or id(receipt) not in inherited[2]
+            or module._CONTENT_CONTRACT_AUTHORITIES
+            or module._INPUT_AUTHORITIES
+            or module._POWER_RECEIPT_AUTHORITIES
+        ):
+            os._exit(4)
+        checks = (
+            lambda: module.require_loaded_power_calibration_input_content_contract(
+                parents.content_contract
+            ),
+            lambda: module.require_loaded_power_calibration_input_authority(
+                inputs.input_authority
+            ),
+            lambda: module.require_loaded_power_calibration_receipt(receipt),
+            lambda: module.persist_power_calibration_receipt(
+                receipt, destination
+            ),
+        )
+        exit_code = 0
+        for check in checks:
+            try:
+                check()
+            except module.PowerCalibrationReceiptError:
+                continue
+            except BaseException:
+                exit_code = 2
+                break
+            else:
+                exit_code = 3
+                break
+        os._exit(exit_code)
+
+    try:
+        child_status = _wait_child_bounded(child_pid)
+    finally:
+        release_holder.set()
+        holder.join(timeout=5)
+
+    assert not holder.is_alive()
+    assert os.waitstatus_to_exitcode(child_status) == 0
+    assert not destination.exists()
+    assert module.require_loaded_power_calibration_receipt(receipt) is receipt
+
+
+@pytest.mark.skipif(not hasattr(os, "fork"), reason="POSIX process interleaving")
+def test_atomic_facade_cooperatively_recovers_live_foreign_pre_link_temporary(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    paused_read, paused_write = os.pipe()
+    release_read, release_write = os.pipe()
+    first_pid = os.fork()
+    if first_pid == 0:  # pragma: no cover - assertions run in the child
+        os.close(paused_read)
+        os.close(release_write)
+        signal.alarm(6)
+        original_link = artifact_io_module.os.link
+        paused = False
+
+        def pause_before_link(source, *args, **kwargs):
+            nonlocal paused
+            if (
+                not paused
+                and Path(source).name.startswith(".receipt.json.atomic-")
+            ):
+                paused = True
+                os.write(paused_write, b"P")
+                os.read(release_read, 1)
+            return original_link(source, *args, **kwargs)
+
+        artifact_io_module.os.link = pause_before_link
+        try:
+            result = artifact_io_module.create_new_regular_atomically(
+                destination,
+                payload,
+                name="fixture artifact",
+                maximum_bytes=128,
+            )
+            exit_code = int(result != destination.resolve())
+        except BaseException:
+            exit_code = 2
+        os._exit(exit_code)
+
+    os.close(paused_write)
+    os.close(release_read)
+    second_pid: int | None = None
+    cleanup_read = -1
+    cleanup_write = -1
+    first_status = -1
+    second_status = -1
+    try:
+        assert os.read(paused_read, 1) == b"P"
+        os.close(paused_read)
+        paused_read = -1
+        cleanup_read, cleanup_write = os.pipe()
+        second_pid = os.fork()
+        if second_pid == 0:  # pragma: no cover - assertions run in the child
+            os.close(cleanup_read)
+            os.close(release_write)
+            signal.alarm(6)
+            original_unlink = artifact_io_module.os.unlink
+            reported_cleanup = False
+
+            def observe_foreign_cleanup(path, *args, **kwargs):
+                nonlocal reported_cleanup
+                result = original_unlink(path, *args, **kwargs)
+                if (
+                    not reported_cleanup
+                    and f".receipt.json.atomic-{first_pid}-" in Path(path).name
+                ):
+                    reported_cleanup = True
+                    os.write(cleanup_write, b"C")
+                return result
+
+            artifact_io_module.os.unlink = observe_foreign_cleanup
+            try:
+                result = artifact_io_module.create_new_regular_atomically(
+                    destination,
+                    payload,
+                    name="fixture artifact",
+                    maximum_bytes=128,
+                )
+                exit_code = int(result != destination.resolve())
+            except BaseException:
+                exit_code = 2
+            os._exit(exit_code)
+
+        os.close(cleanup_write)
+        cleanup_write = -1
+        assert os.read(cleanup_read, 1) == b"C"
+    finally:
+        try:
+            os.write(release_write, b"R")
+        except OSError:
+            pass
+        os.close(release_write)
+        if paused_read >= 0:
+            os.close(paused_read)
+        if cleanup_read >= 0:
+            os.close(cleanup_read)
+        if cleanup_write >= 0:
+            os.close(cleanup_write)
+        if second_pid is not None:
+            _, second_status = os.waitpid(second_pid, 0)
+        _, first_status = os.waitpid(first_pid, 0)
+
+    assert os.waitstatus_to_exitcode(first_status) == 0
+    assert os.waitstatus_to_exitcode(second_status) == 0
+    assert destination.read_bytes() == payload
+    assert destination.stat().st_nlink == 1
+    assert tuple(tmp_path.glob(".receipt.json.atomic-*.tmp")) == ()
+
+
+@pytest.mark.skipif(not hasattr(os, "fork"), reason="POSIX process interleaving")
+def test_atomic_facade_resyncs_after_live_foreign_post_link_cleanup(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    paused_read, paused_write = os.pipe()
+    release_read, release_write = os.pipe()
+    first_pid = os.fork()
+    if first_pid == 0:  # pragma: no cover - assertions run in the child
+        os.close(paused_read)
+        os.close(release_write)
+        signal.alarm(6)
+        original_unlink = artifact_io_module.os.unlink
+        paused = False
+
+        def pause_after_link(path, *args, **kwargs):
+            nonlocal paused
+            if (
+                not paused
+                and Path(path).name.startswith(".receipt.json.atomic-")
+            ):
+                paused = True
+                os.write(paused_write, b"P")
+                os.read(release_read, 1)
+            return original_unlink(path, *args, **kwargs)
+
+        artifact_io_module.os.unlink = pause_after_link
+        artifact_io_module._fsync_directory = lambda *_args, **_kwargs: os._exit(23)
+        try:
+            result = artifact_io_module.create_new_regular_atomically(
+                destination,
+                payload,
+                name="fixture artifact",
+                maximum_bytes=128,
+            )
+            exit_code = int(result != destination.resolve())
+        except BaseException:
+            exit_code = 2
+        os._exit(exit_code)
+
+    os.close(paused_write)
+    os.close(release_read)
+    second_pid: int | None = None
+    cleanup_read = -1
+    cleanup_write = -1
+    first_status = -1
+    second_status = -1
+    try:
+        assert os.read(paused_read, 1) == b"P"
+        os.close(paused_read)
+        paused_read = -1
+        cleanup_read, cleanup_write = os.pipe()
+        second_pid = os.fork()
+        if second_pid == 0:  # pragma: no cover - assertions run in the child
+            os.close(cleanup_read)
+            os.close(release_write)
+            signal.alarm(6)
+            original_unlink = artifact_io_module.os.unlink
+            original_sync = artifact_io_module._fsync_directory
+            reported_cleanup = False
+            sync_count = 0
+
+            def observe_foreign_cleanup(path, *args, **kwargs):
+                nonlocal reported_cleanup
+                result = original_unlink(path, *args, **kwargs)
+                if (
+                    not reported_cleanup
+                    and f".receipt.json.atomic-{first_pid}-" in Path(path).name
+                ):
+                    reported_cleanup = True
+                    os.write(cleanup_write, b"C")
+                return result
+
+            def count_directory_sync(*args, **kwargs) -> None:
+                nonlocal sync_count
+                sync_count += 1
+                original_sync(*args, **kwargs)
+
+            artifact_io_module.os.unlink = observe_foreign_cleanup
+            artifact_io_module._fsync_directory = count_directory_sync
+            try:
+                result = artifact_io_module.create_new_regular_atomically(
+                    destination,
+                    payload,
+                    name="fixture artifact",
+                    maximum_bytes=128,
+                )
+                exit_code = int(
+                    result != destination.resolve() or sync_count != 2
+                )
+            except BaseException:
+                exit_code = 2
+            os._exit(exit_code)
+
+        os.close(cleanup_write)
+        cleanup_write = -1
+        assert os.read(cleanup_read, 1) == b"C"
+    finally:
+        try:
+            os.write(release_write, b"R")
+        except OSError:
+            pass
+        os.close(release_write)
+        if paused_read >= 0:
+            os.close(paused_read)
+        if cleanup_read >= 0:
+            os.close(cleanup_read)
+        if cleanup_write >= 0:
+            os.close(cleanup_write)
+        if second_pid is not None:
+            _, second_status = os.waitpid(second_pid, 0)
+        _, first_status = os.waitpid(first_pid, 0)
+
+    assert os.waitstatus_to_exitcode(first_status) == 23
+    assert os.waitstatus_to_exitcode(second_status) == 0
+    assert destination.read_bytes() == payload
+    assert destination.stat().st_nlink == 1
+    assert tuple(tmp_path.glob(".receipt.json.atomic-*.tmp")) == ()
+
+
 def test_atomic_receipt_persistence_normalizes_dot_segments_for_retry(
     tmp_path: Path, parents: _Parents
 ):
@@ -1998,6 +2508,114 @@ def test_atomic_facade_refuses_existing_different_bytes_and_unsafe_mode(
                 name="fixture artifact",
                 maximum_bytes=64,
             )
+
+
+def test_atomic_facade_refuses_same_bytes_destination_with_external_hard_link(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    alias = tmp_path / "outside-reserved-namespace.json"
+    payload = b"closed receipt fixture\n"
+    destination.write_bytes(payload)
+    destination.chmod(0o600)
+    os.link(destination, alias)
+
+    with pytest.raises(
+        artifact_io_module.ArtifactIOError,
+        match="destination link count changed",
+    ):
+        artifact_io_module.create_new_regular_atomically(
+            destination,
+            payload,
+            name="fixture artifact",
+            maximum_bytes=128,
+        )
+    assert destination.read_bytes() == payload
+    assert alias.read_bytes() == payload
+    assert destination.stat().st_nlink == 2
+
+
+def test_atomic_facade_rechecks_bytes_after_link_count_settles(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    external_alias = tmp_path / "outside-reserved-namespace.json"
+    replacement = tmp_path / "replacement.json"
+    payload = b"closed receipt fixture\n"
+    different = b"different bytes\n"
+    destination.write_bytes(payload)
+    destination.chmod(0o600)
+    os.link(destination, external_alias)
+    replacement.write_bytes(different)
+    replacement.chmod(0o600)
+    original_sleep = artifact_io_module.time.sleep
+    replaced = False
+
+    def replace_during_settle(seconds: float) -> None:
+        nonlocal replaced
+        if not replaced:
+            replaced = True
+            os.replace(replacement, destination)
+        original_sleep(seconds)
+
+    monkeypatch.setattr(artifact_io_module.time, "sleep", replace_during_settle)
+    with pytest.raises(
+        artifact_io_module.ArtifactIOError,
+        match="changed after atomic creation",
+    ):
+        artifact_io_module.create_new_regular_atomically(
+            destination,
+            payload,
+            name="fixture artifact",
+            maximum_bytes=128,
+        )
+
+    assert replaced is True
+    assert destination.read_bytes() == different
+    assert external_alias.read_bytes() == payload
+    assert destination.stat().st_nlink == 1
+
+
+def test_atomic_facade_matches_final_custody_to_stable_read_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    replacement = tmp_path / "replacement.json"
+    payload = b"closed receipt fixture\n"
+    different = b"different receipt bytes\n"
+    replacement.write_bytes(different)
+    replacement.chmod(0o600)
+    original_custody = artifact_io_module._require_private_single_link
+    custody_calls = 0
+
+    def replace_before_final_custody(*args, **kwargs):
+        nonlocal custody_calls
+        custody_calls += 1
+        if custody_calls == 2:
+            os.replace(replacement, destination)
+        return original_custody(*args, **kwargs)
+
+    monkeypatch.setattr(
+        artifact_io_module,
+        "_require_private_single_link",
+        replace_before_final_custody,
+    )
+    with pytest.raises(
+        artifact_io_module.ArtifactIOError,
+        match="changed after atomic creation",
+    ):
+        artifact_io_module.create_new_regular_atomically(
+            destination,
+            payload,
+            name="fixture artifact",
+            maximum_bytes=128,
+        )
+
+    assert custody_calls == 2
+    assert destination.read_bytes() == different
+    assert destination.stat().st_nlink == 1
 
 
 def test_atomic_facade_recovers_exact_stale_post_link_temporary(
@@ -2084,6 +2702,31 @@ def test_atomic_facade_recovers_exact_stale_prelink_temporary(
         name="fixture artifact",
         maximum_bytes=128,
     ) == destination.resolve()
+    assert tuple(tmp_path.glob(".receipt.json.atomic-*.tmp")) == ()
+
+
+def test_atomic_facade_exact_retry_recovers_before_all_slots_are_exhausted(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    destination.write_bytes(payload)
+    destination.chmod(0o600)
+    for attempt in range(1024):
+        stale = tmp_path / (
+            f".receipt.json.atomic-{os.getpid()}-{attempt:04d}.tmp"
+        )
+        stale.write_bytes(payload)
+        stale.chmod(0o600)
+
+    assert artifact_io_module.create_new_regular_atomically(
+        destination,
+        payload,
+        name="fixture artifact",
+        maximum_bytes=128,
+    ) == destination.resolve()
+    assert destination.read_bytes() == payload
+    assert destination.stat().st_nlink == 1
     assert tuple(tmp_path.glob(".receipt.json.atomic-*.tmp")) == ()
 
 
@@ -2495,3 +3138,133 @@ def test_atomic_facade_preserves_different_payload_residue_in_reserved_namespace
     assert destination.read_bytes() == payload
     assert foreign.exists()
     assert foreign.read_bytes() == foreign_payload
+
+
+def test_atomic_facade_recovers_foreign_same_payload_without_liveness_probe(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    foreign_pid = os.getpid() + 1
+    foreign = tmp_path / f".receipt.json.atomic-{foreign_pid}-0000.tmp"
+    foreign.write_bytes(payload)
+    foreign.chmod(0o600)
+    def unexpected_liveness_probe(*args, **kwargs):
+        raise AssertionError("cooperative exact-payload recovery probed liveness")
+
+    monkeypatch.setattr(artifact_io_module.os, "kill", unexpected_liveness_probe)
+    assert artifact_io_module.create_new_regular_atomically(
+        destination,
+        payload,
+        name="fixture artifact",
+        maximum_bytes=128,
+    ) == destination.resolve()
+    assert destination.read_bytes() == payload
+    assert not foreign.exists()
+
+
+def test_atomic_facade_preserves_unlink_denied_single_link_orphan(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    foreign_pid = os.getpid() + 1
+    foreign = tmp_path / f".receipt.json.atomic-{foreign_pid}-0000.tmp"
+    foreign.write_bytes(payload)
+    foreign.chmod(0o600)
+    original_unlink = artifact_io_module.os.unlink
+
+    def deny_foreign_unlink(path, *args, **kwargs):
+        if Path(path) == foreign:
+            raise PermissionError("fixture-only open Windows writer")
+        return original_unlink(path, *args, **kwargs)
+
+    monkeypatch.setattr(artifact_io_module.os, "unlink", deny_foreign_unlink)
+    assert artifact_io_module.create_new_regular_atomically(
+        destination,
+        payload,
+        name="fixture artifact",
+        maximum_bytes=128,
+    ) == destination.resolve()
+    assert destination.read_bytes() == payload
+    assert destination.stat().st_nlink == 1
+    assert foreign.read_bytes() == payload
+
+
+def test_atomic_recovery_removes_foreign_post_link_destination_inode(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    destination.write_bytes(payload)
+    destination.chmod(0o600)
+    foreign_pid = os.getpid() + 1
+    foreign = tmp_path / f".receipt.json.atomic-{foreign_pid}-0000.tmp"
+    os.link(destination, foreign)
+    monkeypatch.setattr(artifact_io_module.os, "name", "nt")
+
+    artifact_io_module._recover_stale_atomic_links(
+        tmp_path,
+        destination,
+        payload,
+        candidate_name=destination.name,
+        name="fixture artifact",
+        maximum_bytes=128,
+    )
+
+    assert destination.read_bytes() == payload
+    assert destination.stat().st_nlink == 1
+    assert not foreign.exists()
+
+
+@pytest.mark.parametrize(
+    "malformed_name",
+    (
+        ".receipt.json.atomic-not-a-pid.tmp",
+        ".receipt.json.atomic-99999999999-0000.tmp",
+        ".receipt.json.atomic-99999-1024.tmp",
+        f".receipt.json.atomic-0{os.getpid()}-0000.tmp",
+    ),
+)
+def test_atomic_facade_preserves_malformed_reserved_namespace_residue(
+    tmp_path: Path,
+    malformed_name: str,
+) -> None:
+    destination = tmp_path / "receipt.json"
+    payload = b"closed receipt fixture\n"
+    malformed = tmp_path / malformed_name
+    malformed.write_bytes(payload)
+    malformed.chmod(0o600)
+
+    assert artifact_io_module.create_new_regular_atomically(
+        destination,
+        payload,
+        name="fixture artifact",
+        maximum_bytes=128,
+    ) == destination.resolve()
+    assert malformed.exists()
+    assert malformed.read_bytes() == payload
+
+
+@pytest.mark.parametrize(
+    ("pid_text", "expected"),
+    (
+        ("2147483648", 2_147_483_648),
+        ("4294967295", 4_294_967_295),
+        ("4294967296", None),
+    ),
+)
+def test_atomic_temporary_pid_parser_accepts_unsigned_windows_range(
+    pid_text: str,
+    expected: int | None,
+) -> None:
+    prefix = ".receipt.json.atomic-"
+    suffix = ".tmp"
+    assert artifact_io_module._reserved_temporary_owner_pid(
+        f"{prefix}{pid_text}-0000{suffix}",
+        prefix=prefix,
+        suffix=suffix,
+    ) == expected

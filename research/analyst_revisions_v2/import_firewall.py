@@ -36,6 +36,7 @@ DEFAULT_ALLOWED_STDLIB_ROOTS = frozenset(
         "re",
         "statistics",
         "threading",
+        "time",
         "types",
         "typing",
         "unicodedata",
@@ -66,12 +67,61 @@ _FORBIDDEN_RUNTIME_NAMES = frozenset(
         "vars",
     }
 )
+_AUTHORITY_PRIVATE_RUNTIME_ATTRIBUTES = frozenset(
+    {
+        "_ADMISSION_AUTHORITIES",
+        "_ADMISSION_AUTHORITIES_LOCK",
+        "_CANDIDATE_AUTHORITIES",
+        "_CANDIDATE_AUTHORITIES_LOCK",
+        "_CONTENT_CONTRACT_AUTHORITIES",
+        "_CONTENT_CONTRACT_AUTHORITIES_LOCK",
+        "_CONTRACT_AUTHORITIES",
+        "_CONTRACT_AUTHORITIES_LOCK",
+        "_DATASET_AUTHORITIES",
+        "_DATASET_AUTHORITIES_LOCK",
+        "_FIRM_ONTOLOGY_AUTHORITIES",
+        "_FIRM_ONTOLOGY_AUTHORITIES_LOCK",
+        "_FOLD_MANIFEST_AUTHORITIES",
+        "_FOLD_MANIFEST_AUTHORITIES_LOCK",
+        "_FOUR_FAMILY_MULTIPLICITY_AUTHORITIES",
+        "_FOUR_FAMILY_MULTIPLICITY_AUTHORITIES_LOCK",
+        "_GLOBAL_BENCHMARK_AUTHORITIES",
+        "_GLOBAL_BENCHMARK_AUTHORITIES_LOCK",
+        "_INPUT_AUTHORITIES",
+        "_INPUT_AUTHORITIES_LOCK",
+        "_ONTOLOGY_AUTHORITIES",
+        "_ONTOLOGY_AUTHORITIES_LOCK",
+        "_POLICY_AUTHORITIES",
+        "_POLICY_AUTHORITIES_LOCK",
+        "_POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES",
+        "_POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES_LOCK",
+        "_POWER_CALIBRATION_PROTOCOL_AUTHORITIES",
+        "_POWER_CALIBRATION_PROTOCOL_AUTHORITIES_LOCK",
+        "_POWER_RECEIPT_AUTHORITIES",
+        "_POWER_RECEIPT_AUTHORITIES_LOCK",
+        "_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES",
+        "_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES_LOCK",
+        "_REVIEWED_AUTHORITIES",
+        "_REVIEWED_AUTHORITIES_LOCK",
+        "_SECURITY_MASTER_AUTHORITIES",
+        "_SECURITY_MASTER_AUTHORITIES_LOCK",
+        "_SNAPSHOT_AUTHORITIES",
+        "_SNAPSHOT_AUTHORITIES_LOCK",
+        "_STOCK_POWER_SUCCESSOR_AUTHORITIES",
+        "_STOCK_POWER_SUCCESSOR_AUTHORITIES_LOCK",
+        "_STOCK_SCORE_AUTHORITIES",
+        "_STOCK_SCORE_AUTHORITIES_LOCK",
+    }
+)
 _FORBIDDEN_RUNTIME_ATTRIBUTES = frozenset(
     {
         "__builtins__",
         "__base__",
         "__bases__",
+        "__cause__",
         "__class__",
+        "__closure__",
+        "__context__",
         "__dict__",
         "__globals__",
         "__getattribute__",
@@ -84,25 +134,47 @@ _FORBIDDEN_RUNTIME_ATTRIBUTES = frozenset(
         "__delattr__",
         "__spec__",
         "__subclasses__",
+        "__traceback__",
         "_bounded_descriptor_read",
+        "_ATOMIC_LINK_SETTLE_ATTEMPTS",
+        "_ATOMIC_LINK_SETTLE_SECONDS",
+        "_ATOMIC_CREATE_LOCK",
         "_create_fn",
+        "_create_new_regular_atomically_unlocked",
         "_eval_type",
         "_evaluate",
         "_file_identity",
+        "_finalize_published_destination",
         "_fsync_directory",
         "_is_link_like",
+        "_process_may_be_live",
+        "_PROCESS_LOCAL_AFTER_FORK_RESETS",
         "_read_regular_once",
+        "_read_stable_regular_with_identity",
+        "_register_process_local_after_fork",
         "_recover_stale_atomic_links",
+        "_reset_atomic_create_lock_after_fork",
+        "_reset_process_local_stock_power_successor_authorities_after_fork",
+        "_reset_process_local_receipt_authorities_after_fork",
+        "_INHERITED_RECEIPT_AUTHORITY_QUARANTINE",
+        "_INHERITED_STOCK_POWER_SUCCESSOR_AUTHORITY_QUARANTINE",
+        "_reserved_temporary_owner_pid",
         "_require_private_single_link",
         "_write_descriptor_all",
         "builtins",
+        "cell_contents",
+        "cr_frame",
         "eval",
         "evaluate_forward_ref",
         "exec",
         "exec_module",
+        "f_globals",
+        "f_locals",
+        "gi_frame",
         "getattr",
         "get_type_hints",
         "globals",
+        "ag_frame",
         "import_module",
         "importlib",
         "load_module",
@@ -115,9 +187,10 @@ _FORBIDDEN_RUNTIME_ATTRIBUTES = frozenset(
         "startfile",
         "sys",
         "system",
+        "tb_frame",
         "vars",
     }
-)
+) | _AUTHORITY_PRIVATE_RUNTIME_ATTRIBUTES
 _FORBIDDEN_GETATTR_NAMES = _FORBIDDEN_RUNTIME_ATTRIBUTES | frozenset(
     {"compile", "eval", "exec"}
 )
@@ -129,6 +202,7 @@ _ARTIFACT_IO_FACADE = "research.analyst_revisions_v2.artifact_io"
 _POWER_RECEIPT_FACADE = (
     "research.analyst_revisions_v2.power_calibration_receipt"
 )
+_STOCK_POWER_SUCCESSOR = "research.analyst_revisions_v2.stock_power_successor"
 _FIREWALL_MODULE = "research.analyst_revisions_v2.import_firewall"
 
 
@@ -235,6 +309,7 @@ _SAFE_LOCAL_FACADE_EXPORTS = {
     _ARTIFACT_IO_FACADE: frozenset(
         {"ArtifactIOError", "read_stable_regular", "revalidate_regular"}
     ),
+    _STOCK_POWER_SUCCESSOR: frozenset(),
     "data.exchange_calendar": frozenset(
         {
             "ExchangeCalendarError",
@@ -256,13 +331,46 @@ _RESTRICTED_LOCAL_FACADE_EXPORTS = {
         }
     )
 }
+_IMPORTER_SCOPED_RESTRICTED_LOCAL_FACADE_EXPORTS = {
+    _STOCK_POWER_SUCCESSOR: {
+        _POWER_RECEIPT_FACADE: frozenset(
+            {
+                "power_calibration_receipt_artifact_sha256",
+                "require_persisted_power_calibration_receipt",
+            }
+        )
+    }
+}
+_RESTRICTED_IMPORT_FUNCTIONS = {
+    _STOCK_POWER_SUCCESSOR: frozenset({"_authenticate_receipt_parent"})
+}
 _NO_MODULE_OBJECT_FACADES = frozenset(
     _SAFE_LOCAL_FACADE_EXPORTS | _RESTRICTED_LOCAL_FACADE_EXPORTS
 )
+
+
+def _is_facade_module_or_ancestor(module_name: str) -> bool:
+    """Return whether one module object can expose a protected facade child."""
+    return any(
+        facade == module_name or facade.startswith(f"{module_name}.")
+        for facade in _NO_MODULE_OBJECT_FACADES
+    )
+
+
 _IMPORTER_SCOPED_SAFE_LOCAL_FACADE_EXPORTS = {
     "research.analyst_revisions_v2.power_calibration_receipt": {
-        _ARTIFACT_IO_FACADE: frozenset({"create_new_regular_atomically"})
-    }
+        _ARTIFACT_IO_FACADE: frozenset(
+            {
+                "create_new_regular_atomically",
+                "_register_process_local_after_fork",
+            }
+        )
+    },
+    _STOCK_POWER_SUCCESSOR: {
+        _ARTIFACT_IO_FACADE: frozenset(
+            {"_register_process_local_after_fork"}
+        )
+    },
 }
 
 
@@ -461,9 +569,58 @@ def _reject_runtime_import_indirection(
                 return (*prefix, node.attr)
         return None
 
+    parents = {
+        child: parent
+        for parent in ast.walk(tree)
+        for child in ast.iter_child_nodes(parent)
+    }
+
+    lexical_scope_types = (
+        ast.FunctionDef,
+        ast.AsyncFunctionDef,
+        ast.Lambda,
+        ast.ClassDef,
+        ast.ListComp,
+        ast.SetComp,
+        ast.DictComp,
+        ast.GeneratorExp,
+    )
+
+    def lexical_scope(node: ast.AST) -> ast.AST | None:
+        current = node
+        while current in parents:
+            parent = parents[current]
+            if isinstance(parent, lexical_scope_types):
+                return parent
+            current = parent
+        return None
+
+    def restricted_import_scope(
+        node: ast.ImportFrom, imported_names: frozenset[str]
+    ) -> tuple[ast.FunctionDef | None, str | None]:
+        scope = lexical_scope(node)
+        if not isinstance(scope, ast.FunctionDef):
+            return None, "non-synchronous-function-local restricted facade import"
+        if scope.name not in _RESTRICTED_IMPORT_FUNCTIONS.get(module.name, ()):
+            return None, "unauthorized restricted facade import function"
+        for candidate in ast.walk(scope):
+            if lexical_scope(candidate) is not scope:
+                continue
+            if isinstance(candidate, (ast.Global, ast.Nonlocal)) and (
+                set(candidate.names) & imported_names
+            ):
+                return None, "nonlocal restricted facade import binding"
+            if isinstance(candidate, (ast.Yield, ast.YieldFrom, ast.Await)):
+                return None, "suspending restricted facade import function"
+        return scope, None
+
     facade_paths: dict[tuple[str, ...], frozenset[str]] = {}
     facade_aliases: dict[str, frozenset[str]] = {}
     safe_facade_export_aliases: dict[str, str] = {}
+    restricted_facade_export_bindings: dict[
+        str, list[tuple[str, ast.FunctionDef]]
+    ] = {}
+    restricted_import_failures: dict[ast.ImportFrom, str] = {}
 
     def safe_facade_exports(facade: str) -> frozenset[str] | None:
         general = _SAFE_LOCAL_FACADE_EXPORTS.get(facade)
@@ -475,6 +632,13 @@ def _reject_runtime_import_indirection(
         if scoped is None:
             return general
         return general | scoped
+
+    def restricted_facade_exports(facade: str) -> frozenset[str] | None:
+        if facade not in _RESTRICTED_LOCAL_FACADE_EXPORTS:
+            return None
+        return _IMPORTER_SCOPED_RESTRICTED_LOCAL_FACADE_EXPORTS.get(
+            module.name, {}
+        ).get(facade, frozenset())
 
     def remember_facade_alias(name: str, safe_exports: frozenset[str]) -> bool:
         existing = facade_aliases.get(name)
@@ -498,6 +662,27 @@ def _reject_runtime_import_indirection(
             from_candidates = _from_import_candidates(candidate, module)
             imported_base = from_candidates[0] if from_candidates else ""
             base_safe_exports = safe_facade_exports(imported_base)
+            base_restricted_exports = restricted_facade_exports(imported_base)
+            imported_local_names = frozenset(
+                alias.asname or alias.name
+                for alias in candidate.names
+                if alias.name != "*"
+            )
+            restricted_scope: ast.FunctionDef | None = None
+            if base_restricted_exports is not None:
+                if any(
+                    alias.name not in base_restricted_exports
+                    for alias in candidate.names
+                ):
+                    restricted_import_failures[candidate] = (
+                        "unauthorized restricted facade export"
+                    )
+                else:
+                    restricted_scope, failure = restricted_import_scope(
+                        candidate, imported_local_names
+                    )
+                    if failure is not None:
+                        restricted_import_failures[candidate] = failure
             for alias in candidate.names:
                 imported = (
                     f"{imported_base}.{alias.name}"
@@ -509,6 +694,14 @@ def _reject_runtime_import_indirection(
                     remember_facade_alias(alias.asname or alias.name, safe_exports)
                 if base_safe_exports is not None and alias.name in base_safe_exports:
                     safe_facade_export_aliases[alias.asname or alias.name] = alias.name
+                if (
+                    base_restricted_exports is not None
+                    and alias.name in base_restricted_exports
+                    and restricted_scope is not None
+                ):
+                    restricted_facade_export_bindings.setdefault(
+                        alias.asname or alias.name, []
+                    ).append((alias.name, restricted_scope))
 
     def facade_exports(node: ast.AST) -> frozenset[str] | None:
         path = attribute_path(node)
@@ -685,17 +878,13 @@ def _reject_runtime_import_indirection(
     safe_regex_module_aliases = (
         frozenset() if has_wildcard_import else regex_module_aliases - rebound_names
     )
-    parents = {
-        child: parent
-        for parent in ast.walk(tree)
-        for child in ast.iter_child_nodes(parent)
-    }
     for node in ast.walk(tree):
         primitive: str | None = None
         if isinstance(node, ast.Import):
             for alias in node.names:
                 imported_root = alias.name.partition(".")[0]
-                if alias.name in _NO_MODULE_OBJECT_FACADES:
+                bound_module = alias.name if alias.asname else imported_root
+                if _is_facade_module_or_ancestor(bound_module):
                     primitive = f"facade module object {alias.name}"
                     break
                 if imported_root in {"builtins", "importlib"}:
@@ -717,17 +906,20 @@ def _reject_runtime_import_indirection(
             from_candidates = _from_import_candidates(node, module)
             imported_base = from_candidates[0] if from_candidates else ""
             safe_exports = safe_facade_exports(imported_base)
-            restricted_exports = _RESTRICTED_LOCAL_FACADE_EXPORTS.get(
-                imported_base
-            )
+            restricted_exports = restricted_facade_exports(imported_base)
             imported_module_objects = {
                 f"{imported_base}.{alias.name}" if imported_base else alias.name
                 for alias in node.names
                 if alias.name != "*"
             }
-            if any(alias.name == "*" for alias in node.names):
+            if node in restricted_import_failures:
+                primitive = restricted_import_failures[node]
+            elif any(alias.name == "*" for alias in node.names):
                 primitive = "wildcard import"
-            elif imported_module_objects & _NO_MODULE_OBJECT_FACADES:
+            elif any(
+                _is_facade_module_or_ancestor(imported)
+                for imported in imported_module_objects
+            ):
                 primitive = "facade module object"
             elif safe_exports is not None and any(
                 alias.name not in safe_exports for alias in node.names
@@ -749,9 +941,26 @@ def _reject_runtime_import_indirection(
                 primitive = imported_root
             else:
                 for alias in node.names:
+                    scoped_export = (
+                        safe_exports is not None and alias.name in safe_exports
+                    ) or (
+                        restricted_exports is not None
+                        and alias.name in restricted_exports
+                    )
                     if (
-                        alias.name in _FORBIDDEN_RUNTIME_NAMES
-                        or alias.asname in _FORBIDDEN_RUNTIME_NAMES
+                        (
+                            alias.name
+                            in (
+                                _FORBIDDEN_RUNTIME_NAMES
+                                | _FORBIDDEN_RUNTIME_ATTRIBUTES
+                            )
+                            and not scoped_export
+                        )
+                        or alias.asname
+                        in (
+                            _FORBIDDEN_RUNTIME_NAMES
+                            | _FORBIDDEN_RUNTIME_ATTRIBUTES
+                        )
                         or alias.name in _RESTRICTED_CAPABILITY_NAMES
                     ):
                         primitive = alias.asname or alias.name
@@ -789,6 +998,35 @@ def _reject_runtime_import_indirection(
                     "unsafe facade export value "
                     f"{safe_facade_export_aliases[node.id]!r}"
                 )
+        elif (
+            isinstance(node, ast.Name)
+            and isinstance(node.ctx, ast.Load)
+            and node.id in restricted_facade_export_bindings
+        ):
+            matching_bindings = tuple(
+                (export, scope)
+                for export, scope in restricted_facade_export_bindings[node.id]
+                if lexical_scope(node) is scope
+            )
+            parent = parents.get(node)
+            allowed = False
+            export = "ambiguous-or-out-of-scope"
+            if len(matching_bindings) == 1:
+                export, _ = matching_bindings[0]
+                if isinstance(parent, ast.Call) and parent.func is node:
+                    call_parent = parents.get(parent)
+                    if export == "require_persisted_power_calibration_receipt":
+                        allowed = (
+                            isinstance(call_parent, ast.Expr)
+                            and call_parent.value is parent
+                        )
+                    elif export == "power_calibration_receipt_artifact_sha256":
+                        allowed = (
+                            isinstance(call_parent, ast.Return)
+                            and call_parent.value is parent
+                        )
+            if not allowed:
+                primitive = f"unsafe restricted facade export {export!r}"
         elif (
             isinstance(node, ast.Name)
             and node.id in _RESTRICTED_CAPABILITY_NAMES

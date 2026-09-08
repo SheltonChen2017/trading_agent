@@ -2,21 +2,49 @@
 
 This is the only module in the B2 admission and parent-reauthentication chain
 allowed to import the restricted ``os`` surface for artifact reads and exact
-create-if-absent persistence.  The
-pre-existing dataset capability importer is separate.  This public facade
-exposes bytes and paths only; it exposes no descriptor, directory, process, or
-network capability.  Its sole write primitive creates one exact same-parent
-regular artifact atomically and never replaces existing bytes.
+create-if-absent persistence.  The pre-existing dataset capability importer is
+separate.  This facade exposes bytes and paths plus one importer-scoped,
+lane-internal child-reset registration hook; it exposes no descriptor,
+directory, process-control, or network capability.  Its sole write primitive
+creates one exact same-parent regular artifact atomically and never replaces
+existing bytes.
 """
 from __future__ import annotations
 
 import os
 import stat
+import threading
+import time
 from pathlib import Path
 
 
 class ArtifactIOError(ValueError):
     """An authenticated metadata artifact is unsafe, unstable, or unreadable."""
+
+
+_ATOMIC_CREATE_LOCK = threading.RLock()
+_ATOMIC_LINK_SETTLE_ATTEMPTS = 50
+_ATOMIC_LINK_SETTLE_SECONDS = 0.01
+_PROCESS_LOCAL_AFTER_FORK_RESETS: list[object] = []
+
+
+def _register_process_local_after_fork(callback: object) -> None:
+    """Register one internal child reset without exporting the ``os`` module."""
+    if not callable(callback) or callback in _PROCESS_LOCAL_AFTER_FORK_RESETS:
+        raise ArtifactIOError("process-local child reset registration is invalid")
+    _PROCESS_LOCAL_AFTER_FORK_RESETS.append(callback)
+
+
+def _reset_atomic_create_lock_after_fork() -> None:
+    """Discard locks and authorities whose owning process did not survive."""
+    global _ATOMIC_CREATE_LOCK
+    _ATOMIC_CREATE_LOCK = threading.RLock()
+    for callback in tuple(_PROCESS_LOCAL_AFTER_FORK_RESETS):
+        callback()
+
+
+if hasattr(os, "register_at_fork"):
+    os.register_at_fork(after_in_child=_reset_atomic_create_lock_after_fork)
 
 
 def _is_link_like(path: Path) -> bool:
@@ -93,10 +121,10 @@ def _read_regular_once(
     return payload, _file_identity(after)
 
 
-def read_stable_regular(
+def _read_stable_regular_with_identity(
     path: Path, *, name: str, maximum_bytes: int
-) -> tuple[Path, bytes]:
-    """Read one exact bounded regular file twice without following a leaf link."""
+) -> tuple[Path, bytes, tuple[int, int, int, int]]:
+    """Read one exact bounded regular file twice and retain its identity."""
     if type(maximum_bytes) is not int or maximum_bytes < 1:
         raise ArtifactIOError("artifact size limit must be a positive integer")
     candidate = Path(path)
@@ -117,7 +145,19 @@ def read_stable_regular(
     )
     if first_identity != second_identity or first != second:
         raise ArtifactIOError(f"{name} changed while being read")
-    return resolved, first
+    return resolved, first, second_identity
+
+
+def read_stable_regular(
+    path: Path, *, name: str, maximum_bytes: int
+) -> tuple[Path, bytes]:
+    """Read one exact bounded regular file twice without following a leaf link."""
+    resolved, payload, _ = _read_stable_regular_with_identity(
+        path,
+        name=name,
+        maximum_bytes=maximum_bytes,
+    )
+    return resolved, payload
 
 
 def revalidate_regular(
@@ -167,22 +207,62 @@ def _fsync_directory(path: Path, *, name: str) -> None:
         raise ArtifactIOError(f"{name} directory sync failed") from exc
 
 
-def _require_private_single_link(path: Path, *, name: str) -> None:
-    """Require a private regular destination owned by this POSIX process."""
-    try:
-        metadata = os.stat(path, follow_symlinks=False)
-    except OSError as exc:
-        raise ArtifactIOError(f"{name} destination metadata is unavailable") from exc
-    if not stat.S_ISREG(metadata.st_mode):
-        raise ArtifactIOError(f"{name} destination must be a regular file")
-    # Windows st_mode reports synthesized 0666/0444 permission bits rather
-    # than the file's ACL, so POSIX privacy bits are meaningful only off NT.
-    if os.name != "nt" and stat.S_IMODE(metadata.st_mode) & 0o077:
-        raise ArtifactIOError(f"{name} destination permissions are not private")
-    if os.name != "nt" and hasattr(os, "getuid") and metadata.st_uid != os.getuid():
-        raise ArtifactIOError(f"{name} destination owner changed")
-    if metadata.st_nlink != 1:
-        raise ArtifactIOError(f"{name} destination link count changed")
+def _require_private_single_link(
+    path: Path, *, name: str, settle_attempts: int = 0
+) -> tuple[int, int, int, int]:
+    """Require private single-link custody after a bounded writer-settle wait."""
+    for attempt in range(settle_attempts + 1):
+        try:
+            metadata = os.stat(path, follow_symlinks=False)
+        except OSError as exc:
+            raise ArtifactIOError(
+                f"{name} destination metadata is unavailable"
+            ) from exc
+        if not stat.S_ISREG(metadata.st_mode):
+            raise ArtifactIOError(f"{name} destination must be a regular file")
+        # Windows st_mode reports synthesized 0666/0444 permission bits rather
+        # than the file's ACL, so POSIX privacy bits are meaningful only off NT.
+        if os.name != "nt" and stat.S_IMODE(metadata.st_mode) & 0o077:
+            raise ArtifactIOError(f"{name} destination permissions are not private")
+        if (
+            os.name != "nt"
+            and hasattr(os, "getuid")
+            and metadata.st_uid != os.getuid()
+        ):
+            raise ArtifactIOError(f"{name} destination owner changed")
+        if metadata.st_nlink == 1:
+            return _file_identity(metadata)
+        if attempt < settle_attempts:
+            time.sleep(_ATOMIC_LINK_SETTLE_SECONDS)
+    raise ArtifactIOError(f"{name} destination link count changed")
+
+
+def _reserved_temporary_owner_pid(
+    entry_name: str, *, prefix: str, suffix: str
+) -> int | None:
+    body = entry_name[len(prefix) : -len(suffix)]
+    pid_text, separator, attempt_text = body.partition("-")
+    if (
+        not separator
+        or not pid_text.isascii()
+        or not pid_text.isdigit()
+        or len(pid_text) > 10
+        or not attempt_text.isascii()
+        or not attempt_text.isdigit()
+        or len(attempt_text) != 4
+    ):
+        return None
+    owner_pid = int(pid_text)
+    attempt = int(attempt_text)
+    return (
+        owner_pid
+        if (
+            0 < owner_pid <= 4_294_967_295
+            and pid_text == str(owner_pid)
+            and 0 <= attempt < 1024
+        )
+        else None
+    )
 
 
 def _recover_stale_atomic_links(
@@ -197,9 +277,17 @@ def _recover_stale_atomic_links(
     """Clean same-owner exact residue in the helper's reserved namespace.
 
     The directory is already link-free and this namespace is private to this
-    writer.  Partial, different, linked-to-other-inode, or non-private residue
-    is preserved.  This is bounded crash recovery, not an adversary-safe
-    general-purpose directory deletion primitive.
+    writer.  Canonical private residue that is already a second name for the
+    destination is safe to remove regardless of its originating PID.  Once
+    the exact destination exists, any canonical private same-payload
+    single-link orphan is also safe to remove: a concurrent writer treats its
+    missing temporary as an idempotent success only after authenticating that
+    destination.  An unlink-denied single-link orphan is harmless and remains
+    for its writer; post-link cleanup failure remains fatal because it blocks
+    single-link custody.  Partial, different, linked-to-other-inode,
+    non-private, and malformed residue is preserved.  This is bounded
+    cooperative crash recovery, not an adversary-safe general-purpose
+    directory deletion primitive.
     """
     try:
         destination_stat = os.stat(destination, follow_symlinks=False)
@@ -219,6 +307,11 @@ def _recover_stale_atomic_links(
                     raise ArtifactIOError(
                         f"{name} recovery inventory exceeds the bounded limit"
                     )
+                owner_pid = _reserved_temporary_owner_pid(
+                    entry.name, prefix=prefix, suffix=suffix
+                )
+                if owner_pid is None:
+                    continue
                 stale = parent / entry.name
                 try:
                     stale_stat = os.stat(stale, follow_symlinks=False)
@@ -241,6 +334,21 @@ def _recover_stale_atomic_links(
                     or not hasattr(os, "getuid")
                     or stale_stat.st_uid == os.getuid()
                 )
+                if (
+                    stat.S_ISREG(stale_stat.st_mode)
+                    and is_private
+                    and is_owned
+                    and is_destination_inode
+                ):
+                    try:
+                        os.unlink(stale)
+                    except FileNotFoundError:
+                        continue
+                    except OSError as exc:
+                        raise ArtifactIOError(
+                            f"{name} stale temporary cleanup failed"
+                        ) from exc
+                    continue
                 is_exact_orphan = False
                 if (
                     stat.S_ISREG(stale_stat.st_mode)
@@ -261,21 +369,61 @@ def _recover_stale_atomic_links(
                     stat.S_ISREG(stale_stat.st_mode)
                     and is_private
                     and is_owned
-                    and (is_destination_inode or is_exact_orphan)
+                    and is_exact_orphan
                 ):
                     try:
                         os.unlink(stale)
                     except FileNotFoundError:
                         continue
-                    except OSError as exc:
-                        raise ArtifactIOError(
-                            f"{name} stale temporary cleanup failed"
-                        ) from exc
+                    except OSError:
+                        # A live Windows writer may not have opened its temp
+                        # with delete sharing.  This nlink=1 orphan cannot
+                        # weaken the already published destination's custody.
+                        continue
     except OSError as exc:
         raise ArtifactIOError(f"{name} recovery inventory failed") from exc
 
 
-def create_new_regular_atomically(
+def _finalize_published_destination(
+    parent: Path,
+    destination: Path,
+    payload: bytes,
+    *,
+    candidate_name: str,
+    name: str,
+    maximum_bytes: int,
+) -> Path:
+    """Recover cooperative residue and authenticate final durable custody."""
+    _recover_stale_atomic_links(
+        parent,
+        destination,
+        payload,
+        candidate_name=candidate_name,
+        name=name,
+        maximum_bytes=maximum_bytes,
+    )
+    _fsync_directory(parent, name=name)
+    _require_private_single_link(
+        destination,
+        name=name,
+        settle_attempts=_ATOMIC_LINK_SETTLE_ATTEMPTS,
+    )
+    # A foreign writer may have removed the last temporary hard link while
+    # this process waited.  Persist that directory transition even if the
+    # foreign writer crashes before reaching its own sync barrier.
+    _fsync_directory(parent, name=name)
+    resolved, current, read_identity = _read_stable_regular_with_identity(
+        destination, name=name, maximum_bytes=maximum_bytes
+    )
+    if current != payload:
+        raise ArtifactIOError(f"{name} changed after atomic creation")
+    custody_identity = _require_private_single_link(resolved, name=name)
+    if custody_identity != read_identity:
+        raise ArtifactIOError(f"{name} changed after atomic creation")
+    return resolved
+
+
+def _create_new_regular_atomically_unlocked(
     path: Path,
     payload: bytes,
     *,
@@ -306,6 +454,30 @@ def create_new_regular_atomically(
     if not stat.S_ISDIR(parent_stat.st_mode):
         raise ArtifactIOError(f"{name} parent must be a directory")
     destination = parent / candidate.name
+    try:
+        os.stat(destination, follow_symlinks=False)
+    except FileNotFoundError:
+        pass
+    except OSError as exc:
+        raise ArtifactIOError(f"{name} destination metadata is unavailable") from exc
+    else:
+        _, existing = read_stable_regular(
+            destination,
+            name=name,
+            maximum_bytes=maximum_bytes,
+        )
+        if existing != payload:
+            raise ArtifactIOError(
+                f"{name} destination already contains different bytes"
+            )
+        return _finalize_published_destination(
+            parent,
+            destination,
+            payload,
+            candidate_name=candidate.name,
+            name=name,
+            maximum_bytes=maximum_bytes,
+        )
     flags = (
         os.O_WRONLY
         | os.O_CREAT
@@ -330,6 +502,24 @@ def create_new_regular_atomically(
         if temporary is None or descriptor < 0:
             raise ArtifactIOError(f"{name} has no available temporary slot")
         try:
+            if os.name != "nt":
+                if not hasattr(os, "fchmod"):
+                    raise ArtifactIOError(
+                        f"{name} cannot enforce private temporary permissions"
+                    )
+                try:
+                    os.fchmod(descriptor, 0o600)
+                except OSError as exc:
+                    raise ArtifactIOError(
+                        f"{name} temporary permissions could not be secured"
+                    ) from exc
+                secured = os.fstat(descriptor)
+                if stat.S_IMODE(secured.st_mode) != 0o600 or (
+                    hasattr(os, "getuid") and secured.st_uid != os.getuid()
+                ):
+                    raise ArtifactIOError(
+                        f"{name} temporary permissions are not private"
+                    )
             _write_descriptor_all(descriptor, payload, name=name)
             written = os.fstat(descriptor)
             if not stat.S_ISREG(written.st_mode) or written.st_size != len(payload):
@@ -348,12 +538,40 @@ def create_new_regular_atomically(
                 raise ArtifactIOError(
                     f"{name} destination already contains different bytes"
                 )
+        except FileNotFoundError:
+            # An exact same-payload writer may have cooperatively recovered
+            # this fully written orphan after publishing the destination.
+            try:
+                _, existing = read_stable_regular(
+                    destination, name=name, maximum_bytes=maximum_bytes
+                )
+            except ArtifactIOError as exc:
+                raise ArtifactIOError(
+                    f"{name} temporary disappeared before publication"
+                ) from exc
+            if existing != payload:
+                raise ArtifactIOError(
+                    f"{name} temporary disappeared before publication"
+                )
         try:
             os.unlink(temporary)
+        except FileNotFoundError:
+            try:
+                _, published = read_stable_regular(
+                    destination,
+                    name=name,
+                    maximum_bytes=maximum_bytes,
+                )
+            except ArtifactIOError as exc:
+                raise ArtifactIOError(
+                    f"{name} temporary cleanup failed"
+                ) from exc
+            if published != payload:
+                raise ArtifactIOError(f"{name} temporary cleanup failed")
         except OSError as exc:
             raise ArtifactIOError(f"{name} temporary cleanup failed") from exc
         temporary = None
-        _recover_stale_atomic_links(
+        return _finalize_published_destination(
             parent,
             destination,
             payload,
@@ -361,14 +579,6 @@ def create_new_regular_atomically(
             name=name,
             maximum_bytes=maximum_bytes,
         )
-        _fsync_directory(parent, name=name)
-        resolved, current = read_stable_regular(
-            destination, name=name, maximum_bytes=maximum_bytes
-        )
-        if current != payload:
-            raise ArtifactIOError(f"{name} changed after atomic creation")
-        _require_private_single_link(resolved, name=name)
-        return resolved
     except ArtifactIOError:
         raise
     except OSError as exc:
@@ -383,3 +593,20 @@ def create_new_regular_atomically(
                 pass
             except OSError:
                 pass
+
+
+def create_new_regular_atomically(
+    path: Path,
+    payload: bytes,
+    *,
+    name: str,
+    maximum_bytes: int,
+) -> Path:
+    """Serialize and create exact bytes without replacing existing content."""
+    with _ATOMIC_CREATE_LOCK:
+        return _create_new_regular_atomically_unlocked(
+            path,
+            payload,
+            name=name,
+            maximum_bytes=maximum_bytes,
+        )

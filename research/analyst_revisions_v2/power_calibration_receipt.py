@@ -32,6 +32,7 @@ from typing import Any, Iterable, Mapping
 from .artifact_io import (
     ArtifactIOError,
     read_stable_regular as _read_artifact_stable_regular,
+    _register_process_local_after_fork,
     revalidate_regular as _revalidate_artifact_regular,
 )
 from .four_family_multiplicity import (
@@ -797,6 +798,35 @@ _POWER_RECEIPT_AUTHORITIES: dict[int, _PowerReceiptAuthorityRecord] = {}
 _CONTENT_CONTRACT_AUTHORITIES_LOCK = threading.RLock()
 _INPUT_AUTHORITIES_LOCK = threading.RLock()
 _POWER_RECEIPT_AUTHORITIES_LOCK = threading.RLock()
+_INHERITED_RECEIPT_AUTHORITY_QUARANTINE: list[object] = []
+
+
+def _reset_process_local_receipt_authorities_after_fork() -> None:
+    """Invalidate inherited authorities without running finalizers in the child."""
+    global _CONTENT_CONTRACT_AUTHORITIES
+    global _CONTENT_CONTRACT_AUTHORITIES_LOCK
+    global _INPUT_AUTHORITIES
+    global _INPUT_AUTHORITIES_LOCK
+    global _POWER_RECEIPT_AUTHORITIES
+    global _POWER_RECEIPT_AUTHORITIES_LOCK
+    inherited = (
+        _CONTENT_CONTRACT_AUTHORITIES,
+        _INPUT_AUTHORITIES,
+        _POWER_RECEIPT_AUTHORITIES,
+    )
+    _INHERITED_RECEIPT_AUTHORITY_QUARANTINE.append(inherited)
+    _CONTENT_CONTRACT_AUTHORITIES = {}
+    _INPUT_AUTHORITIES = {}
+    _POWER_RECEIPT_AUTHORITIES = {}
+    _CONTENT_CONTRACT_AUTHORITIES_LOCK = threading.RLock()
+    _INPUT_AUTHORITIES_LOCK = threading.RLock()
+    _POWER_RECEIPT_AUTHORITIES_LOCK = threading.RLock()
+
+
+_register_process_local_after_fork(
+    _reset_process_local_receipt_authorities_after_fork
+)
+del _register_process_local_after_fork
 
 
 def _forget_content_contract_authority(key: int, ref: Any) -> None:

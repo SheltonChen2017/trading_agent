@@ -1408,3 +1408,210 @@ def test_ib2c_module_has_exact_offline_import_surface_and_no_float():
         and node.func.id in {"eval", "exec", "float", "__import__"}
         for node in ast.walk(tree)
     )
+
+
+# --- Claude review additions (2026-09-07): guards that survived targeted mutation ---
+
+
+def _rehash_row(row, **updates):
+    row = _forge(row, **updates)
+    return _forge(
+        row,
+        mapping_row_id=hash_payload(mapping_module._mapping_row_payload(row)),
+    )
+
+
+def _rehash_result_with_rows(result, rows):
+    rows = tuple(rows)
+    mapped = sum(row.point_in_time_mapping_structurally_resolved for row in rows)
+    manual = sum(
+        row.title_mapping_kind is Form4SecurityTitleMappingKind.MANUAL_EXCEPTION
+        for row in rows
+    )
+    identity = _forge(
+        result.identity,
+        mapping_row_inventory_hash=hash_payload([row.to_payload() for row in rows]),
+        mapping_row_count=len(rows),
+        structurally_mapped_count=mapped,
+        security_mapping_quarantined_count=len(rows) - mapped,
+        manual_exception_resolution_count=manual,
+    )
+    identity = _forge(
+        identity,
+        mapping_id=(
+            "form4-pit-security-mapping-"
+            f"{hash_payload(mapping_module._mapping_identity_payload(identity))[:16]}"
+        ),
+    )
+    return _forge(result, identity=identity, rows=rows)
+
+
+def _replay_row(row) -> None:
+    Form4PitSecurityMappingRow.__post_init__(row, mapping_module._ROW_FACTORY_TOKEN)
+
+
+def _replay_result(result) -> None:
+    Form4PitSecurityMapping.__post_init__(
+        result,
+        mapping_module._MAPPING_FACTORY_TOKEN,
+    )
+
+
+@pytest.mark.parametrize(
+    "updates",
+    (
+        {"document_type": "4", "amends_accession": "0000123456-26-000001"},
+        {"document_type": "4/A", "amends_accession": None},
+        {
+            "document_type": "4/A",
+            "amends_accession": "0000123456-26-000009",
+            "original_accession": "0000123456-26-000008",
+        },
+    ),
+    ids=("original-with-amends", "amendment-without-amends", "amendment-original-mismatch"),
+)
+def test_row_constructor_refuses_inconsistent_amendment_lineage(monkeypatch, updates):
+    """Original/amended lineage: a coherent row cannot carry a contradictory chain."""
+    _, result = _build(monkeypatch)
+    forged = _rehash_row(result.rows[0], **updates)
+    with pytest.raises(Form4PitSecurityMappingError, match="amendment lineage"):
+        _replay_row(forged)
+
+
+def test_row_constructor_refuses_partial_mappings_in_both_directions(monkeypatch):
+    """A mapped row must be complete; a quarantined row must carry nothing."""
+    _, mapped = _build(monkeypatch)
+    incomplete = _rehash_row(mapped.rows[0], ticker=None)
+    with pytest.raises(Form4PitSecurityMappingError, match="complete structural mapping"):
+        _replay_row(incomplete)
+    unresolved_flag = _rehash_row(
+        mapped.rows[0],
+        point_in_time_mapping_structurally_resolved=False,
+    )
+    with pytest.raises(Form4PitSecurityMappingError, match="complete structural mapping"):
+        _replay_row(unresolved_flag)
+
+    _, quarantined = _build(monkeypatch, tickers=())
+    assert quarantined.rows[0].resolution_outcomes == (
+        Form4PitSecurityMappingOutcome.NO_ACTIVE_TICKER_QUARANTINED,
+    )
+    leaked_security = _rehash_row(quarantined.rows[0], security_id="sec-fixture-common")
+    with pytest.raises(Form4PitSecurityMappingError, match="partial mapping"):
+        _replay_row(leaked_security)
+    resolved_flag = _rehash_row(
+        quarantined.rows[0],
+        point_in_time_mapping_structurally_resolved=True,
+    )
+    with pytest.raises(Form4PitSecurityMappingError, match="partial mapping"):
+        _replay_row(resolved_flag)
+    mixed_outcomes = _rehash_row(
+        quarantined.rows[0],
+        resolution_outcomes=(
+            Form4PitSecurityMappingOutcome.NO_ACTIVE_TICKER_QUARANTINED,
+            Form4PitSecurityMappingOutcome.MAPPED_STRUCTURALLY,
+        ),
+    )
+    with pytest.raises(Form4PitSecurityMappingError, match="partial mapping"):
+        _replay_row(mixed_outcomes)
+
+
+def test_row_constructor_refuses_owner_quarantine_promotion_shapes(monkeypatch):
+    """The row mirrors IB-2B: no owner on a quarantined row, no SINGLE beside a quarantine."""
+    joint = ib2b._spec(
+        1,
+        owners=(
+            ib2b._Owner(),
+            ib2b._Owner(cik=ib2b.OTHER_OWNER_CIK, name="Joint Owner"),
+        ),
+    )
+    _, result = _build(monkeypatch, (joint,))
+    row = result.rows[0]
+    assert row.attributed_owner_cik is None
+    with_owner = _rehash_row(row, attributed_owner_cik=ib2b.OWNER_CIK)
+    with pytest.raises(Form4PitSecurityMappingError, match="quarantine was promoted"):
+        _replay_row(with_owner)
+    with_candidate = _rehash_row(row, attributed_owner_candidate_id="a" * 64)
+    with pytest.raises(Form4PitSecurityMappingError, match="quarantine was promoted"):
+        _replay_row(with_candidate)
+    single_beside_quarantine = _rehash_row(
+        row,
+        owner_attribution_outcomes=(
+            Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED,
+            Form4OwnerAttributionOutcome.MULTIPLE_OWNER_SET_QUARANTINED,
+        ),
+    )
+    with pytest.raises(Form4PitSecurityMappingError, match="quarantine was promoted"):
+        _replay_row(single_beside_quarantine)
+
+
+def test_result_constructor_requires_canonical_row_order(monkeypatch):
+    _, result = _build(monkeypatch, ib2b._pair())
+    assert len(result.rows) == 2
+    reversed_rows = _rehash_result_with_rows(result, reversed(result.rows))
+    with pytest.raises(Form4PitSecurityMappingError, match="order is not canonical"):
+        _replay_result(reversed_rows)
+
+
+def test_result_constructor_refuses_duplicate_rows(monkeypatch):
+    _, result = _build(monkeypatch)
+    duplicated = _rehash_result_with_rows(result, (result.rows[0], result.rows[0]))
+    with pytest.raises(Form4PitSecurityMappingError, match="not exhaustive"):
+        _replay_result(duplicated)
+
+
+def test_identity_constructor_binds_manual_count_to_mapped_count(monkeypatch):
+    _, quarantined = _build(monkeypatch, tickers=())
+    assert quarantined.identity.structurally_mapped_count == 0
+    forged = _forge(quarantined.identity, manual_exception_resolution_count=1)
+    with pytest.raises(Form4PitSecurityMappingError, match="counts are invalid"):
+        Form4PitSecurityMappingIdentity.__post_init__(
+            forged,
+            mapping_module._IDENTITY_FACTORY_TOKEN,
+        )
+
+
+def test_reference_preflight_count_refuses_before_any_projection(monkeypatch):
+    """Resource ordering: the count preflight must refuse before projection work starts."""
+    monkeypatch.setattr(mapping_module, "MAX_FORM4_PIT_SECURITY_RECORDS", 0)
+
+    def projection_must_not_run(*_args, **_kwargs):
+        raise AssertionError("projection ran before the count preflight")
+
+    monkeypatch.setattr(mapping_module, "_capture_reference", projection_must_not_run)
+    with pytest.raises(Form4PitSecurityMappingError, match="preflight count exceeds"):
+        _build(monkeypatch)
+
+
+@pytest.mark.parametrize(
+    ("constant_name", "value", "expected_message"),
+    (
+        (
+            "MAX_FORM4_PIT_SECURITY_MAPPING_PROJECTION_NODES",
+            1,
+            "reference input exceeds the node bound",
+        ),
+        (
+            "MAX_FORM4_PIT_SECURITY_MAPPING_PROJECTION_DEPTH",
+            0,
+            "reference input exceeds the depth bound",
+        ),
+    ),
+)
+def test_reference_projection_node_and_depth_bounds_fail_closed(
+    monkeypatch,
+    constant_name,
+    value,
+    expected_message,
+):
+    monkeypatch.setattr(mapping_module, constant_name, value)
+    with pytest.raises(Form4PitSecurityMappingError, match=expected_message):
+        _build(monkeypatch)
+
+
+def test_closure_availability_cannot_precede_base_availability():
+    with pytest.raises(Form4PitSecurityMappingError, match="closure predates base"):
+        _security(
+            valid_to=date(2027, 1, 1),
+            available_at_utc="2020-01-01T00:00:00+00:00",
+            valid_to_available_at_utc="2019-06-01T00:00:00+00:00",
+        )

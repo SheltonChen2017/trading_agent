@@ -590,6 +590,8 @@ class Form4PitSecurityMappingRow:
         elif (
             self.attributed_owner_cik is not None
             or self.attributed_owner_candidate_id is not None
+            or Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED
+            in self.owner_attribution_outcomes
         ):
             raise Form4PitSecurityMappingError(
                 "REFUSED: upstream owner quarantine was promoted"

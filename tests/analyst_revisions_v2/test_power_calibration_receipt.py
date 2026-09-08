@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import concurrent.futures
 import dataclasses
+import errno
 import gc
 import hashlib
 import json
@@ -102,6 +103,43 @@ def _canonical(value: object) -> bytes:
         ensure_ascii=False,
         allow_nan=False,
     ).encode("utf-8")
+
+
+def _is_link_capability_error(exc: OSError) -> bool:
+    unsupported = {errno.EACCES, errno.EPERM, errno.ENOSYS}
+    for name in ("ENOTSUP", "EOPNOTSUPP"):
+        value = getattr(errno, name, None)
+        if value is not None:
+            unsupported.add(value)
+    return getattr(exc, "winerror", None) in {1, 5, 50, 1314} or (
+        exc.errno in unsupported
+    )
+
+
+def _symlink_or_skip(
+    link: Path, target: Path, *, target_is_directory: bool = False
+) -> None:
+    """Create a test symlink, skipping only for a known host capability limit."""
+    try:
+        link.symlink_to(target, target_is_directory=target_is_directory)
+    except OSError as exc:
+        if _is_link_capability_error(exc):
+            pytest.skip(f"host cannot create a symlink: {exc}")
+        raise
+
+
+def _junction_or_skip(link: Path, target: Path) -> None:
+    try:
+        import _winapi
+    except ImportError:
+        pytest.skip("directory junctions are Windows-only")
+    try:
+        _winapi.CreateJunction(str(target), str(link))
+    except OSError as exc:
+        if _is_link_capability_error(exc):
+            pytest.skip(f"host cannot create a junction: {exc}")
+        raise
+    assert link.is_junction()
 
 
 def _render(value: object) -> bytes:
@@ -1643,12 +1681,23 @@ def test_input_paths_must_remain_regular_nonsymlink_files(
     target = tmp_path / "real-beta.json"
     target.write_bytes(inputs.beta_path.read_bytes())
     inputs.beta_path.unlink()
-    try:
-        inputs.beta_path.symlink_to(target)
-    except OSError as exc:
-        pytest.skip(f"host cannot create a symlink: {exc}")
+    _symlink_or_skip(inputs.beta_path, target)
     with pytest.raises(module.PowerCalibrationReceiptError):
         _compute(parents, inputs)
+
+
+def test_input_path_through_a_junctioned_ancestor_refuses(
+    tmp_path: Path, parents: _Parents
+):
+    inputs = _write_authorized_inputs(tmp_path / "real", parents)
+    linked = tmp_path / "linked"
+    _junction_or_skip(linked, inputs.beta_path.parent)
+    junction_inputs = dataclasses.replace(
+        inputs,
+        beta_path=linked / inputs.beta_path.name,
+    )
+    with pytest.raises(module.PowerCalibrationReceiptError, match="link"):
+        _compute(parents, junction_inputs)
 
 
 def test_missing_directory_and_oversized_input_paths_refuse(
@@ -2811,16 +2860,14 @@ def test_atomic_receipt_persistence_refuses_leaf_and_ancestor_links(
         target = real_directory / "target.json"
         target.write_bytes(b"must remain unchanged")
         destination = real_directory / filename
-        try:
-            destination.symlink_to(target)
-        except OSError as exc:
-            pytest.skip(f"host cannot create a symlink: {exc}")
+        _symlink_or_skip(destination, target)
     else:
         linked_directory = tmp_path / "linked"
-        try:
-            linked_directory.symlink_to(real_directory, target_is_directory=True)
-        except OSError as exc:
-            pytest.skip(f"host cannot create a directory symlink: {exc}")
+        _symlink_or_skip(
+            linked_directory,
+            real_directory,
+            target_is_directory=True,
+        )
         destination = linked_directory / filename
         target = real_directory / filename
     with pytest.raises(module.PowerCalibrationReceiptError):
@@ -2829,6 +2876,24 @@ def test_atomic_receipt_persistence_refuses_leaf_and_ancestor_links(
         assert target.read_bytes() == b"must remain unchanged"
     else:
         assert not target.exists()
+
+
+def test_atomic_receipt_persistence_refuses_a_junctioned_destination_parent(
+    tmp_path: Path, parents: _Parents
+):
+    inputs = _write_authorized_inputs(tmp_path / "inputs", parents)
+    receipt = _compute(parents, inputs)
+    filename = module.power_calibration_receipt_filename(receipt)
+    real_directory = tmp_path / "real"
+    real_directory.mkdir()
+    linked_directory = tmp_path / "linked"
+    _junction_or_skip(linked_directory, real_directory)
+    destination = linked_directory / filename
+    with pytest.raises(module.PowerCalibrationReceiptError) as caught:
+        module.persist_power_calibration_receipt(receipt, destination)
+    assert caught.value.__cause__ is not None
+    assert "link" in str(caught.value.__cause__)
+    assert not (real_directory / filename).exists()
 
 
 def test_closed_persisted_receipt_reauth_never_opens_calibration_inputs(

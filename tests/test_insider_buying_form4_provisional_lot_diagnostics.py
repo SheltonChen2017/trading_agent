@@ -1841,3 +1841,303 @@ def test_ib2d_module_and_package_exports_are_explicit_and_exact():
         getattr(insider_package, name) is getattr(diagnostics_module, name)
         for name in package_exports
     )
+
+
+# --- Claude review additions (2026-09-08): guards that survived targeted mutation ---
+
+
+def _rehash_result_with_rows_and_groups(result, rows, groups, **identity_updates):
+    rows = tuple(rows)
+    groups = tuple(groups)
+    candidate_count = sum(
+        row.disposition
+        is diagnostics_module.Form4ProvisionalLotDisposition.PROVISIONAL_GROUPING_CANDIDATE
+        for row in rows
+    )
+    threshold_met = sum(group.meets_provisional_minimum_purchase_value for group in groups)
+    updates = {
+        "diagnostic_row_inventory_hash": hash_payload([row.to_payload() for row in rows]),
+        "provisional_group_inventory_hash": hash_payload(
+            [group.to_payload() for group in groups]
+        ),
+        "mapping_row_count": len(rows),
+        "provisional_candidate_row_count": candidate_count,
+        "quarantined_row_count": len(rows) - candidate_count,
+        "provisional_group_count": len(groups),
+        "threshold_met_group_count": threshold_met,
+        "below_threshold_group_count": len(groups) - threshold_met,
+        **identity_updates,
+    }
+    identity = _rehash_identity(result.identity, **updates)
+    return _forge(result, identity=identity, rows=rows, groups=groups)
+
+
+def _replay_row(row) -> None:
+    type(row).__post_init__(row, diagnostics_module._ROW_FACTORY_TOKEN)
+
+
+def _replay_group(group) -> None:
+    type(group).__post_init__(group, diagnostics_module._GROUP_FACTORY_TOKEN)
+
+
+def _replay_identity(identity) -> None:
+    type(identity).__post_init__(identity, diagnostics_module._IDENTITY_FACTORY_TOKEN)
+
+
+def _replay_result(result) -> None:
+    type(result).__post_init__(result, diagnostics_module._RESULT_FACTORY_TOKEN)
+
+
+def test_row_constructor_refuses_single_attribution_beside_quarantine_without_owner(
+    monkeypatch,
+):
+    """The SINGLE-beside-quarantine clause must fire even when both owner fields are None."""
+    *_upstream, result = _build(
+        monkeypatch,
+        (ib2b._spec(1, owners=(ib2b._Owner(), ib2b._Owner(cik=ib2b.OTHER_OWNER_CIK))),),
+    )
+    row = result.rows[0]
+    assert row.attributed_owner_cik is None and row.attributed_owner_candidate_id is None
+    forged = _rehash_diagnostic_row(
+        row,
+        owner_attribution_outcomes=(
+            ib2b.Form4OwnerAttributionOutcome.SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED,
+            ib2b.Form4OwnerAttributionOutcome.MULTIPLE_OWNER_SET_QUARANTINED,
+        ),
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="owner quarantine was promoted",
+    ):
+        _replay_row(forged)
+
+
+def test_row_constructor_binds_parser_and_identity_dispositions(monkeypatch):
+    *_upstream, result = _build(monkeypatch)
+    row = result.rows[0]
+    assert row.upstream_disposition is (
+        ib2c.mapping_module.Form4ProvisionalDisposition.PROVISIONAL_PRE_AGGREGATION_CANDIDATE
+    )
+    flipped_identity = _rehash_diagnostic_row(
+        row,
+        identity_disposition=(
+            inventory_module.Form4ObservedIdentityDisposition.UNRESOLVED_QUARANTINE
+        ),
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="parser and identity dispositions disagree",
+    ):
+        _replay_row(flipped_identity)
+    eligible_beside_other = _rehash_diagnostic_row(
+        row,
+        parser_outcomes=(
+            ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,
+            ClassificationOutcome.EXCLUDE_SALE,
+        ),
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="parser and identity dispositions disagree",
+    ):
+        _replay_row(eligible_beside_other)
+
+
+def test_row_constructor_binds_row_id_and_group_key(monkeypatch):
+    *_upstream, result = _build(monkeypatch)
+    row = result.rows[0]
+    bad_id = _forge(row, diagnostic_row_id="0" * 64)
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="row ID is invalid",
+    ):
+        _replay_row(bad_id)
+    bad_key = _rehash_diagnostic_row(row, provisional_group_key="1" * 64)
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="group key is inconsistent",
+    ):
+        _replay_row(bad_key)
+
+
+def test_group_constructor_refuses_non_positive_totals_and_unsorted_members(
+    monkeypatch,
+):
+    spec = _lot_spec(
+        1,
+        (
+            ("1", "10", "2026-08-18", "Common Stock"),
+            ("1", "10", "2026-08-18", "Common Stock"),
+        ),
+    )
+    *_upstream, result = _build(monkeypatch, (spec,))
+    group = result.groups[0]
+    assert group.member_count == 2
+    for field_name in ("total_shares", "total_purchase_value_usd"):
+        forged = _rehash_group(group, **{field_name: Decimal("0")})
+        with pytest.raises(
+            diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+            match="group economics are invalid",
+        ):
+            _replay_group(forged)
+    reversed_members = _rehash_group(
+        group,
+        member_row_ids=tuple(reversed(group.member_row_ids)),
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="member inventory is invalid",
+    ):
+        _replay_group(reversed_members)
+    duplicated_members = _rehash_group(
+        group,
+        member_row_ids=(group.member_row_ids[0], group.member_row_ids[0]),
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="member inventory is invalid",
+    ):
+        _replay_group(duplicated_members)
+
+
+def test_group_aggregation_refuses_one_key_spanning_two_issuers(monkeypatch):
+    """Forged rows sharing a group key but not an issuer must not silently merge."""
+    spec = _lot_spec(
+        1,
+        (
+            ("1", "10", "2026-08-18", "Common Stock"),
+            ("1", "10", "2026-08-18", "Common Stock"),
+        ),
+    )
+    *_upstream, result = _build(monkeypatch, (spec,))
+    first, second = result.rows
+    assert first.provisional_group_key == second.provisional_group_key
+    other_issuer = _rehash_diagnostic_row(second, issuer_cik=ib2b.OTHER_ISSUER_CIK)
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="inconsistent dimensions",
+    ):
+        diagnostics_module._aggregate_provisional_groups((first, other_issuer))
+
+
+def test_identity_constructor_binds_partition_and_group_count(monkeypatch):
+    *_upstream, result = _build(monkeypatch)
+    identity = result.identity
+    assert (identity.mapping_row_count, identity.provisional_group_count) == (1, 1)
+    broken_partition = _rehash_identity(
+        identity,
+        provisional_candidate_row_count=1,
+        quarantined_row_count=1,
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="identity counts are invalid",
+    ):
+        _replay_identity(broken_partition)
+    too_many_groups = _rehash_identity(
+        identity,
+        provisional_group_count=2,
+        threshold_met_group_count=2,
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="identity counts are invalid",
+    ):
+        _replay_identity(too_many_groups)
+
+
+def test_result_constructor_refuses_duplicate_rows_and_malformed_family_inventory(
+    monkeypatch,
+):
+    original = ib2b._spec(1)
+    amendment = ib2b._spec(
+        2,
+        year=2027,
+        month=1,
+        day=4,
+        form="4/A",
+        amends_accession=original.accession,
+    )
+    *_upstream, result = _build(monkeypatch, (original, amendment))
+    duplicated_rows = _rehash_result_with_rows_and_groups(
+        result,
+        (result.rows[0], result.rows[0]),
+        result.groups,
+        amendment_family_quarantined_row_count=2,
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="order or uniqueness is invalid",
+    ):
+        _replay_result(duplicated_rows)
+    shared_mapping_row_id = _rehash_diagnostic_row(
+        result.rows[0],
+        row_index=result.rows[0].row_index + 1,
+    )
+    assert shared_mapping_row_id.mapping_row_id == result.rows[0].mapping_row_id
+    assert shared_mapping_row_id.diagnostic_row_id != result.rows[0].diagnostic_row_id
+    shared_rows = _rehash_result_with_rows_and_groups(
+        result,
+        (result.rows[0], shared_mapping_row_id),
+        result.groups,
+        amendment_family_quarantined_row_count=2,
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="order or uniqueness is invalid",
+    ):
+        _replay_result(shared_rows)
+    duplicated_family = _forge(
+        result,
+        amendment_family_original_accessions=(original.accession, original.accession),
+    )
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="family quarantine inventory is invalid",
+    ):
+        _replay_result(duplicated_family)
+
+
+def test_decimal_digit_bound_and_non_text_projection_keys_fail_closed():
+    too_many_digits = Decimal("1" * 257)
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="Decimal bound",
+    ):
+        diagnostics_module._decimal(too_many_digits, label="adversarial digits")
+    with pytest.raises(
+        diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+        match="non-text key",
+    ):
+        diagnostics_module._project_output({1: "value"})
+
+
+def test_evidence_mutation_during_row_building_is_refused(monkeypatch):
+    """The final evidence rechecks must catch drift after the report was validated."""
+    evidence, inventory, grouping, mapping = _build_upstream(monkeypatch)
+    real_aggregate = diagnostics_module._aggregate_provisional_groups
+    original_hash = evidence.identity.parsed_corpus_hash
+
+    def mutate_during_grouping(rows):
+        object.__setattr__(evidence.identity, "parsed_corpus_hash", "0" * 64)
+        return real_aggregate(rows)
+
+    monkeypatch.setattr(
+        diagnostics_module,
+        "_aggregate_provisional_groups",
+        mutate_during_grouping,
+    )
+    try:
+        with pytest.raises(
+            diagnostics_module.Form4ProvisionalLotDiagnosticsError,
+            match="evidence changed during diagnostics|evidence runtime types changed",
+        ):
+            diagnostics_module.build_form4_provisional_lot_diagnostics(
+                mapping,
+                grouping,
+                inventory,
+                evidence,
+                builder_git_commit=BUILDER_COMMIT,
+            )
+    finally:
+        object.__setattr__(evidence.identity, "parsed_corpus_hash", original_hash)

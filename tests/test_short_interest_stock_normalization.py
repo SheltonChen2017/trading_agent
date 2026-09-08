@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import ast
 from copy import deepcopy
-from dataclasses import dataclass, replace
+from dataclasses import FrozenInstanceError, dataclass, replace
 from functools import lru_cache
 from fractions import Fraction
 from pathlib import Path
@@ -11,6 +11,8 @@ from pathlib import Path
 import pytest
 
 from data.hashing import canonical_json, hash_payload
+import research.short_interest_etf as canonical_short_interest_package
+import research.short_interest_etf.stock_covering as stock_covering_module
 import research.short_interest_etf.stock_score_batch as stock_score_batch_module
 from research.short_interest_etf.contracts import (
     ReleasePrecision,
@@ -26,7 +28,21 @@ from research.short_interest_etf.pit_eligibility import (
 )
 from research.short_interest_etf.stock_features import (
     ExactRational,
+    StockFeatureDisposition,
+    StockFeatureSourceContext,
     build_pit_stock_raw_features,
+)
+from research.short_interest_etf.stock_covering import (
+    COVERING_BATCH_SCHEMA_VERSION,
+    COVERING_EQUATION,
+    COVERING_PROJECTION_ID,
+    COVERING_SCHEMA_VERSION,
+    STRUCTURAL_COVERING_AUTHORITY,
+    STRUCTURAL_COVERING_BATCH_AUTHORITY,
+    StockCoveringBatch,
+    StockCoveringDisposition,
+    StockCoveringError,
+    build_pit_stock_covering_scores,
 )
 from research.short_interest_etf.stock_normalization import (
     NORMALIZATION_POLICY_ID,
@@ -42,6 +58,8 @@ from research.short_interest_etf.stock_normalization import (
     RevisionSelectionState,
     StockNormalizationError,
     StockModelOutcome,
+    StockNormalizationCohort,
+    StockNormalizationMember,
     StockScoreDisposition,
     StockScoreModel,
     build_pit_stock_normalized_scores,
@@ -2687,3 +2705,1466 @@ def test_compact_score_batch_receipt_uses_one_authenticated_snapshot(
     with pytest.raises(StockScoreBatchError, match="authenticated dispositions"):
         verifier(payload, dispositions=scores)
     assert swapped is True
+
+
+@lru_cache(maxsize=None)
+def _non_affine_scores() -> tuple[StockScoreDisposition, ...]:
+    specs = tuple(
+        replace(item, prior_shares=100) if item.index == 10 else item
+        for item in _base_specs()
+    )
+    return _scores(specs)
+
+
+def _fresh_non_affine_scores() -> tuple[StockScoreDisposition, ...]:
+    specs = tuple(
+        replace(item, prior_shares=100) if item.index == 10 else item
+        for item in _base_specs()
+    )
+    return build_pit_stock_normalized_scores(_raw_batch.__wrapped__(specs))
+
+
+@lru_cache(maxsize=None)
+def _s1_zero_mad_scores() -> tuple[StockScoreDisposition, ...]:
+    specs = tuple(
+        replace(item, current_shares=item.prior_shares + 10)
+        if item.sector == "TECHNOLOGY"
+        else item
+        for item in _base_specs()
+    )
+    return _scores(specs)
+
+
+@lru_cache(maxsize=None)
+def _s0_zero_mad_scores() -> tuple[StockScoreDisposition, ...]:
+    specs = tuple(
+        replace(item, current_shares=100)
+        if item.sector == "TECHNOLOGY"
+        else item
+        for item in _base_specs()
+    )
+    return _scores(specs)
+
+
+def _covering_by_security(covering, security_id: str):
+    return tuple(
+        item
+        for item in covering
+        if item.security_id == security_id
+        and item.settlement_date == CURRENT_SETTLEMENT
+    )
+
+
+def _tampered_covering(result, **changes):
+    tampered = object.__new__(StockCoveringDisposition)
+    for field_name in result.__dataclass_fields__:
+        object.__setattr__(tampered, field_name, getattr(result, field_name))
+    for field_name, value in changes.items():
+        object.__setattr__(tampered, field_name, value)
+    return tampered
+
+
+def _tampered_covering_batch(batch, **changes):
+    tampered = object.__new__(StockCoveringBatch)
+    for field_name in batch.__dataclass_fields__:
+        object.__setattr__(tampered, field_name, getattr(batch, field_name))
+    for field_name, value in changes.items():
+        if field_name == "projections":
+            field_name = "_projections"
+        object.__setattr__(tampered, field_name, value)
+    return tampered
+
+
+def test_covering_projection_is_exact_complete_and_content_bound():
+    scores = _non_affine_scores()
+    covering = build_pit_stock_covering_scores(scores)
+    ordered_sources = tuple(
+        sorted(
+            scores,
+            key=lambda item: (
+                item.current.readiness.settlement_date,
+                item.current.readiness.security_id,
+                item.current.readiness.event_id,
+            ),
+        )
+    )
+
+    assert type(covering) is StockCoveringBatch
+    assert len(covering) == len(scores) == 80
+    assert tuple(
+        item.source_s1_outcome_sha256 for item in covering
+    ) == tuple(
+        _model(item, StockScoreModel.S1_DELTA).sha256
+        for item in ordered_sources
+    )
+    assert len({item.covering_record_id for item in covering}) == len(covering)
+    for result, source in zip(covering, ordered_sources, strict=True):
+        assert type(result) is StockCoveringDisposition
+        readiness = source.current.readiness
+        assert result.sort_key == (
+            readiness.settlement_date,
+            readiness.security_id,
+            readiness.event_id,
+        )
+        source_s1 = _model(source, StockScoreModel.S1_DELTA)
+        assert result.source_disposition_sha256 == source.sha256
+        assert (
+            result.source_normalization_slot_id
+            == source_s1.normalization_slot_id
+        )
+        assert result.normalization_cohort_sha256 == source.cohort.sha256
+        assert result.source_s1_score == source_s1.score
+        if source_s1.score is not None:
+            assert result.source_s1_score is not source_s1.score
+        assert result.source_s1_outcome_sha256 == source_s1.sha256
+        assert result.refusal_reasons == source_s1.refusal_reasons
+        if source_s1.score is None:
+            assert result.covering_score is None
+        else:
+            assert result.covering_score == ExactRational.from_fraction(
+                -source_s1.score.to_fraction()
+            )
+        assert result.sha256 == hash_payload(result.to_payload())
+        assert not _contains_float(result.to_payload())
+
+    assert covering.sha256 == hash_payload(covering.to_payload())
+    assert covering.sha256 == (
+        "c610669cffb0462fe4b6b7af3e92d1d3dc1e3b3050b2b963b83601f25fa8e08e"
+    )
+
+
+def test_covering_projection_pins_s1_not_s0_sign_and_canonical_zero():
+    scores = _non_affine_scores()
+    covering = build_pit_stock_covering_scores(scores)
+    expected = {
+        "sec-si3c-000": ExactRational(98050, 66717),
+        "sec-si3c-010": ExactRational(0, 1),
+        "sec-si3c-038": ExactRational(-10000, 7413),
+    }
+    for security_id, covering_score in expected.items():
+        source = _by_security(scores, security_id)[0]
+        result = _covering_by_security(covering, security_id)[0]
+        s0 = _model(source, StockScoreModel.S0_LEVEL)
+        s1 = _model(source, StockScoreModel.S1_DELTA)
+        assert s0.score != s1.score
+        assert result.covering_score == covering_score
+        assert result.covering_score != s1.score or s1.score == ExactRational(0, 1)
+    zero = _covering_by_security(covering, "sec-si3c-010")[0]
+    assert zero.covering_score.to_payload() == {"denominator": 1, "numerator": 0}
+
+
+def test_covering_uses_only_s1_terminal_state_for_asymmetric_models():
+    s1_scores = _s1_zero_mad_scores()
+    s1_refused = build_pit_stock_covering_scores(s1_scores)
+    s1_row = _covering_by_security(s1_refused, "sec-si3c-000")[0]
+    s1_source = _by_security(s1_scores, "sec-si3c-000")[0]
+    assert _model(s1_source, StockScoreModel.S0_LEVEL).score is not None
+    assert s1_row.covering_score is None
+    assert s1_row.refusal_reasons == (REFUSAL_ZERO_SECTOR_MAD,)
+
+    s0_scores = _s0_zero_mad_scores()
+    s0_refused = build_pit_stock_covering_scores(s0_scores)
+    s0_row = _covering_by_security(s0_refused, "sec-si3c-000")[0]
+    s0_source = _by_security(s0_scores, "sec-si3c-000")[0]
+    assert _model(s0_source, StockScoreModel.S0_LEVEL).score is None
+    assert s0_row.covering_score == ExactRational(9110, 7413)
+    assert s0_row.refusal_reasons == ()
+
+
+@pytest.mark.parametrize(
+    ("published_at", "terminal_reason"),
+    (
+        ("2024-02-13T13:00:00Z", REFUSAL_SUPERSEDED_AT_RELEASE_CUTOFF),
+        ("2024-02-13T16:00:00Z", REFUSAL_NOT_VISIBLE_AT_RELEASE_CUTOFF),
+    ),
+)
+def test_covering_retains_corrections_without_a_second_selected_slot(
+    published_at,
+    terminal_reason,
+):
+    covering = build_pit_stock_covering_scores(
+        _scores(correction=(0, published_at))
+    )
+    rows = _covering_by_security(covering, "sec-si3c-000")
+    assert len(rows) == 2
+    assert len({item.covering_slot_id for item in rows}) == 1
+    assert len({item.covering_record_id for item in rows}) == 2
+    assert len({item.event_id for item in rows}) == 2
+    assert len({item.selected_event_id for item in rows}) == 1
+    for item in rows:
+        payload = item.to_payload()
+        assert payload["event_id"] == item.event_id
+        assert payload["selected_event_id"] == item.selected_event_id
+        assert payload["revision_selection_state"] == (
+            item.revision_selection_state.value
+        )
+    selected = tuple(item for item in rows if item.covering_score is not None)
+    refused = tuple(item for item in rows if item.covering_score is None)
+    assert len(selected) == len(refused) == 1
+    assert refused[0].refusal_reasons == (terminal_reason,)
+
+
+def test_covering_input_is_canonical_complete_and_exact_typed():
+    scores = _non_affine_scores()
+    expected = build_pit_stock_covering_scores(scores)
+    reordered = build_pit_stock_covering_scores(tuple(reversed(scores)))
+    assert [item.to_payload() for item in reordered] == [
+        item.to_payload() for item in expected
+    ]
+    assert [item.sha256 for item in reordered] == [
+        item.sha256 for item in expected
+    ]
+    empty = build_pit_stock_covering_scores(())
+    assert type(empty) is StockCoveringBatch
+    assert len(empty) == 0
+    assert empty.projections == ()
+    assert empty.to_payload()["source_score_batch"] is None
+
+    with pytest.raises(StockCoveringError, match="incomplete"):
+        build_pit_stock_covering_scores(scores[:-1])
+    with pytest.raises(StockCoveringError, match="duplicate"):
+        build_pit_stock_covering_scores(scores + (scores[0],))
+    with pytest.raises(StockCoveringError, match="mixes authenticated lineage"):
+        build_pit_stock_covering_scores(scores[:-1] + (_scores()[-1],))
+    with pytest.raises(StockCoveringError, match="exact tuple"):
+        build_pit_stock_covering_scores(list(scores))
+
+    class TupleSubclass(tuple):
+        pass
+
+    with pytest.raises(StockCoveringError, match="exact tuple"):
+        build_pit_stock_covering_scores(TupleSubclass(scores))
+
+    class ScoreSubclass(StockScoreDisposition):
+        pass
+
+    forged = object.__new__(ScoreSubclass)
+    for field_name in scores[0].__dataclass_fields__:
+        object.__setattr__(forged, field_name, getattr(scores[0], field_name))
+    with pytest.raises(StockCoveringError, match="exact score dispositions"):
+        build_pit_stock_covering_scores((forged,) + scores[1:])
+
+
+@pytest.mark.parametrize("case", ("stale_cache", "readdressed_raw_order"))
+def test_covering_input_recomputes_nested_cohort_identity(case):
+    scores = _fresh_non_affine_scores()
+    cohort = scores[0].cohort
+    if case == "stale_cache":
+        object.__setattr__(cohort, "_sha256_cache", "0" * 64)
+    else:
+        object.__setattr__(
+            cohort,
+            "raw_dispositions",
+            tuple(reversed(cohort.raw_dispositions)),
+        )
+        object.__setattr__(
+            cohort,
+            "_sha256_cache",
+            hash_payload(cohort.to_payload()),
+        )
+    with pytest.raises(StockCoveringError, match="canonical state"):
+        build_pit_stock_covering_scores(scores)
+
+
+def test_covering_input_recomputes_nested_source_context_identity():
+    scores = _fresh_non_affine_scores()
+    context = scores[0].current.source_context
+    object.__setattr__(
+        context,
+        "readiness_rows",
+        tuple(reversed(context.readiness_rows)),
+    )
+    with pytest.raises(StockCoveringError, match="readiness_rows"):
+        build_pit_stock_covering_scores(scores)
+
+
+def test_covering_input_rejects_noncanonical_context_cache_type():
+    scores = _fresh_non_affine_scores()
+    context = scores[0].current.source_context
+
+    class StrSubclass(str):
+        pass
+
+    object.__setattr__(
+        context,
+        "_sha256_cache",
+        StrSubclass(context.sha256),
+    )
+    with pytest.raises(StockCoveringError, match="non-canonical type"):
+        build_pit_stock_covering_scores(scores)
+
+
+def test_covering_input_rejects_noncanonical_cohort_cache_type():
+    scores = _fresh_non_affine_scores()
+    cohort = scores[0].cohort
+
+    class StrSubclass(str):
+        pass
+
+    object.__setattr__(
+        cohort,
+        "_sha256_cache",
+        StrSubclass(cohort.sha256),
+    )
+    with pytest.raises(StockCoveringError, match="non-canonical type"):
+        build_pit_stock_covering_scores(scores)
+
+
+@pytest.mark.parametrize(
+    "map_name",
+    ("_readiness_by_event", "_snapshot_by_event", "_prior_by_event"),
+)
+def test_covering_input_recomputes_source_context_lookup_maps(map_name):
+    scores = _fresh_non_affine_scores()
+    context = scores[0].current.source_context
+    lookup = getattr(context, map_name)
+    object.__setattr__(context, map_name, type(lookup)({}))
+    with pytest.raises(StockCoveringError, match="lookup maps"):
+        build_pit_stock_covering_scores(scores)
+
+
+@pytest.mark.parametrize(
+    "map_name",
+    ("_readiness_by_event", "_snapshot_by_event", "_prior_by_event"),
+)
+def test_covering_input_rejects_equality_compatible_lookup_subclasses(
+    map_name,
+):
+    scores = _fresh_non_affine_scores()
+    context = scores[0].current.source_context
+    lookup = getattr(context, map_name)
+    key, value = next(
+        (key, value) for key, value in lookup.items() if value is not None
+    )
+
+    class EqualityCompatibleSubclass(type(value)):
+        def __eq__(self, other):
+            return True
+
+    forged = object.__new__(EqualityCompatibleSubclass)
+    for field_name in value.__dataclass_fields__:
+        object.__setattr__(forged, field_name, getattr(value, field_name))
+    poisoned = dict(lookup)
+    poisoned[key] = forged
+    object.__setattr__(context, map_name, type(lookup)(poisoned))
+
+    with pytest.raises(StockCoveringError, match="non-canonical type"):
+        build_pit_stock_covering_scores(scores)
+
+
+@pytest.mark.parametrize("case", ("mutable_container", "string_subclass_key"))
+def test_covering_input_rejects_noncanonical_lookup_structure(case):
+    scores = _fresh_non_affine_scores()
+    context = scores[0].current.source_context
+    lookup = context._readiness_by_event
+    poisoned = dict(lookup)
+    if case == "mutable_container":
+        replacement = poisoned
+        message = "immutable mapping proxy"
+    else:
+        class StrSubclass(str):
+            pass
+
+        key = next(iter(poisoned))
+        value = poisoned.pop(key)
+        poisoned[StrSubclass(key)] = value
+        replacement = type(lookup)(poisoned)
+        message = "non-canonical type"
+    object.__setattr__(context, "_readiness_by_event", replacement)
+
+    with pytest.raises(StockCoveringError, match=message):
+        build_pit_stock_covering_scores(scores)
+
+
+def test_covering_input_rejects_dynamic_mapping_proxy_backing_without_callbacks():
+    scores = _fresh_non_affine_scores()
+    context = scores[0].current.source_context
+    lookup = context._readiness_by_event
+    calls = 0
+
+    class DynamicDict(dict):
+        def _called(self):
+            nonlocal calls
+            calls += 1
+
+        def __iter__(self):
+            self._called()
+            return super().__iter__()
+
+        def __getitem__(self, key):
+            self._called()
+            return super().__getitem__(key)
+
+        def keys(self):
+            self._called()
+            return super().keys()
+
+        def values(self):
+            self._called()
+            return super().values()
+
+    dynamic_backing = DynamicDict(dict(lookup))
+    object.__setattr__(
+        context,
+        "_readiness_by_event",
+        type(lookup)(dynamic_backing),
+    )
+
+    with pytest.raises(StockCoveringError, match="backing map"):
+        build_pit_stock_covering_scores(scores)
+    assert calls == 0
+
+
+def test_covering_input_rejects_dynamic_type_without_refusal_callbacks():
+    scores = _fresh_non_affine_scores()
+    context = scores[0].current.source_context
+    calls = 0
+
+    class CallbackMeta(type):
+        def __hash__(cls):
+            nonlocal calls
+            calls += 1
+            return type.__hash__(cls)
+
+        def __eq__(cls, other):
+            nonlocal calls
+            calls += 1
+            return type.__eq__(cls, other)
+
+        def __getattribute__(cls, name):
+            nonlocal calls
+            if name == "__qualname__":
+                calls += 1
+            return type.__getattribute__(cls, name)
+
+    class DynamicValue(metaclass=CallbackMeta):
+        pass
+
+    class CallbackName(str):
+        def __format__(self, format_spec):
+            nonlocal calls
+            calls += 1
+            return str.__format__(self, format_spec)
+
+    DynamicValue.__qualname__ = CallbackName("DynamicValue")
+    object.__setattr__(context, "_sha256_cache", DynamicValue())
+    calls = 0
+
+    with pytest.raises(StockCoveringError, match="non-canonical type"):
+        build_pit_stock_covering_scores(scores)
+    assert calls == 0
+
+
+def test_covering_input_recomputes_private_cohort_selection_records():
+    scores = _fresh_non_affine_scores()
+    cohort = scores[0].cohort
+    object.__setattr__(
+        cohort,
+        "_selection_records",
+        cohort._selection_records
+        + (("0" * 64, RevisionSelectionState.SELECTED, "0" * 64),),
+    )
+
+    with pytest.raises(StockCoveringError, match="selection records"):
+        build_pit_stock_covering_scores(scores)
+
+
+def test_covering_input_authenticates_every_raw_disposition_context():
+    scores = _fresh_non_affine_scores()
+    cohort = scores[0].cohort
+    original = cohort.raw_dispositions[0]
+    cloned_context = replace(original.source_context)
+    cloned = replace(original, source_context=cloned_context)
+    object.__setattr__(cloned_context, "_readiness_by_event", type(
+        cloned_context._readiness_by_event
+    )({}))
+    object.__setattr__(
+        cohort,
+        "raw_dispositions",
+        (cloned,) + cohort.raw_dispositions[1:],
+    )
+
+    with pytest.raises(StockCoveringError, match="lookup maps"):
+        build_pit_stock_covering_scores(scores)
+
+
+@pytest.mark.parametrize("case", ("raw_inventory", "outcome_cohort"))
+def test_covering_input_requires_exact_shared_authority_objects(case):
+    scores = _fresh_non_affine_scores()
+    source = scores[0]
+    cohort = source.cohort
+    if case == "raw_inventory":
+        replacement = replace(source.current)
+        object.__setattr__(
+            cohort,
+            "raw_dispositions",
+            tuple(
+                replacement if item is source.current else item
+                for item in cohort.raw_dispositions
+            ),
+        )
+        forged_scores = scores
+        message = "exact cohort inventory object"
+    else:
+        cloned_cohort = replace(cohort)
+        forged_outcome = replace(source.outcomes[0], cohort=cloned_cohort)
+        forged_source = replace(
+            source,
+            outcomes=(forged_outcome, source.outcomes[1]),
+        )
+        forged_scores = (forged_source,) + scores[1:]
+        message = "exact disposition cohort"
+
+    with pytest.raises(StockCoveringError, match=message):
+        build_pit_stock_covering_scores(forged_scores)
+
+
+@pytest.mark.parametrize(
+    ("field_name", "message"),
+    (
+        ("source_vintage", "source vintage"),
+        ("reference_bundle", "reference bundle"),
+    ),
+)
+def test_covering_input_recomputes_nested_source_collections(
+    field_name,
+    message,
+):
+    scores = _fresh_non_affine_scores()
+    context = scores[0].current.source_context
+    if field_name == "source_vintage":
+        vintage = context.source_vintage
+        object.__setattr__(
+            vintage,
+            "snapshots",
+            tuple(reversed(vintage.snapshots)),
+        )
+    else:
+        bundle = context.reference_bundle
+        object.__setattr__(
+            bundle,
+            "lifecycles",
+            tuple(reversed(bundle.lifecycles)),
+        )
+    with pytest.raises(StockCoveringError, match=message):
+        build_pit_stock_covering_scores(scores)
+
+
+def test_covering_disposition_rejects_wrong_sign_and_terminal_state():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    result = _covering_by_security(covering, "sec-si3c-000")[0]
+    wrong_sign = _tampered_covering(
+        result,
+        covering_score=result.source_s1_score,
+    )
+    with pytest.raises(StockCoveringError, match="exact negative S1"):
+        wrong_sign.to_payload()
+    completed_with_refusal = _tampered_covering(
+        result,
+        refusal_reasons=("invented_refusal",),
+    )
+    with pytest.raises(StockCoveringError, match="cannot carry refusal"):
+        completed_with_refusal.to_payload()
+    selected_cutoff_refusal = _tampered_covering(
+        result,
+        source_s1_score=None,
+        covering_score=None,
+        refusal_reasons=(RevisionSelectionState.NOT_VISIBLE.value,),
+    )
+    with pytest.raises(StockCoveringError, match="cutoff-only refusal"):
+        selected_cutoff_refusal.to_payload()
+    witness_mismatch = _tampered_covering(
+        result,
+        source_s1_score=ExactRational(1, 1),
+        covering_score=ExactRational(-1, 1),
+    )
+    source_mismatch = _tampered_covering_batch(
+        covering,
+        projections=tuple(
+            witness_mismatch if item is result else item
+            for item in covering.projections
+        ),
+    )
+    with pytest.raises(StockCoveringError, match="source S1 row"):
+        source_mismatch.to_payload()
+
+    refused = next(item for item in covering if item.source_s1_score is None)
+    refused_with_score = _tampered_covering(
+        refused,
+        covering_score=ExactRational(0, 1),
+    )
+    with pytest.raises(StockCoveringError, match="cannot produce"):
+        refused_with_score.to_payload()
+    refused_without_reason = _tampered_covering(refused, refusal_reasons=())
+    with pytest.raises(StockCoveringError, match="terminal reasons"):
+        refused_without_reason.to_payload()
+
+    class TupleSubclass(tuple):
+        pass
+
+    refused_tuple_subclass = _tampered_covering(
+        refused,
+        refusal_reasons=TupleSubclass(refused.refusal_reasons),
+    )
+    with pytest.raises(StockCoveringError, match="exact tuple"):
+        refused_tuple_subclass.to_payload()
+
+    corrected = build_pit_stock_covering_scores(
+        _scores(correction=(0, "2024-02-13T13:00:00Z"))
+    )
+    terminal = next(
+        item
+        for item in corrected
+        if item.revision_selection_state is not RevisionSelectionState.SELECTED
+    )
+    wrong_terminal_reason = _tampered_covering(
+        terminal,
+        refusal_reasons=("invented_refusal",),
+    )
+    with pytest.raises(StockCoveringError, match="revision refusal"):
+        wrong_terminal_reason.to_payload()
+    terminal_with_score = _tampered_covering(
+        terminal,
+        source_s1_score=ExactRational(1, 1),
+        covering_score=ExactRational(-1, 1),
+    )
+    with pytest.raises(StockCoveringError, match="cannot carry a score"):
+        terminal_with_score.to_payload()
+    terminal_self_selection = _tampered_covering(
+        terminal,
+        selected_event_id=terminal.event_id,
+    )
+    with pytest.raises(StockCoveringError, match="cannot select itself"):
+        terminal_self_selection.to_payload()
+    superseded_without_replacement = _tampered_covering(
+        terminal,
+        selected_event_id=None,
+    )
+    with pytest.raises(StockCoveringError, match="selected replacement"):
+        superseded_without_replacement.to_payload()
+
+
+def test_covering_disposition_revalidates_own_scalar_snapshot():
+    scores = _non_affine_scores()
+    source = _by_security(scores, "sec-si3c-000")[0]
+    result = _covering_by_security(
+        build_pit_stock_covering_scores(scores),
+        "sec-si3c-000",
+    )[0]
+    s1 = _model(source, StockScoreModel.S1_DELTA)
+    assert result.source_s1_score == s1.score
+    assert result.source_s1_score is not s1.score
+    tampered_score = object.__new__(StockCoveringDisposition)
+    for field_name in result.__dataclass_fields__:
+        object.__setattr__(tampered_score, field_name, getattr(result, field_name))
+    object.__setattr__(tampered_score, "covering_score", s1.score)
+    with pytest.raises(StockCoveringError, match="exact negative S1"):
+        tampered_score.to_payload()
+    tampered_gate = object.__new__(StockCoveringDisposition)
+    for field_name in result.__dataclass_fields__:
+        object.__setattr__(tampered_gate, field_name, getattr(result, field_name))
+    object.__setattr__(tampered_gate, "research_gate_sha256", "0" * 64)
+    with pytest.raises(StockCoveringError, match="SI-0M gate"):
+        tampered_gate.to_payload()
+
+    off_open = _tampered_covering(
+        result,
+        decision_at="2024-12-31T14:30:00Z",
+    )
+    with pytest.raises(StockCoveringError, match="XNYS session open"):
+        off_open.to_payload()
+    not_after_settlement = _tampered_covering(
+        result,
+        decision_session=result.settlement_date,
+    )
+    with pytest.raises(StockCoveringError, match="follow settlement_date"):
+        not_after_settlement.to_payload()
+    non_session = _tampered_covering(
+        result,
+        decision_session="2024-02-03",
+        decision_at="2024-02-03T14:30:00Z",
+    )
+    with pytest.raises(StockCoveringError, match="tradable XNYS session"):
+        non_session.to_payload()
+
+
+@pytest.mark.parametrize("target_kind", ("row", "batch"))
+def test_covering_serialization_validates_after_gate_callback(
+    monkeypatch,
+    target_kind,
+):
+    covering = build_pit_stock_covering_scores(_fresh_non_affine_scores())
+    result = next(
+        item
+        for item in covering
+        if item.source_s1_score is not None
+        and item.source_s1_score != ExactRational(0, 1)
+    )
+    calls = 0
+
+    def mutate_projection(gate):
+        nonlocal calls
+        calls += 1
+        object.__setattr__(result, "covering_score", result.source_s1_score)
+        return stock_covering_module.SHORT_INTEREST_RESEARCH_GATE_SHA256
+
+    monkeypatch.setattr(
+        stock_covering_module,
+        "require_short_interest_research_gate",
+        mutate_projection,
+    )
+    with pytest.raises(StockCoveringError, match="exact negative S1"):
+        if target_kind == "row":
+            result.to_payload()
+        else:
+            covering.to_payload()
+    assert calls == 1
+
+
+def test_covering_capture_bypasses_public_live_tuple_seam(monkeypatch):
+    scores = _fresh_non_affine_scores()
+    target = next(
+        item
+        for item in scores
+        if _model(item, StockScoreModel.S1_DELTA).score is not None
+        and _model(item, StockScoreModel.S1_DELTA).score
+        != ExactRational(1, 1)
+    )
+    target_s1 = _model(target, StockScoreModel.S1_DELTA)
+    valid_score = target_s1.score
+    invalid_score = ExactRational(1, 1)
+    object.__setattr__(target_s1, "score", invalid_score)
+    public_authenticator = (
+        stock_score_batch_module.require_complete_stock_score_dispositions
+    )
+    calls = 0
+
+    def hide_invalid_state_during_public_authentication(dispositions):
+        nonlocal calls
+        calls += 1
+        object.__setattr__(target_s1, "score", valid_score)
+        try:
+            return public_authenticator(dispositions)
+        finally:
+            object.__setattr__(target_s1, "score", invalid_score)
+
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "require_complete_stock_score_dispositions",
+        hide_invalid_state_during_public_authentication,
+    )
+    with pytest.raises(StockCoveringError, match="normalized score"):
+        build_pit_stock_covering_scores(scores)
+    assert calls == 0
+
+
+@pytest.mark.parametrize(
+    ("mutation_call", "message"),
+    (
+        (1, "normalized score"),
+        (2, "changed during V2 evidence"),
+    ),
+)
+def test_covering_authentication_and_source_snapshot_are_atomic(
+    monkeypatch,
+    mutation_call,
+    message,
+):
+    scores = _fresh_non_affine_scores()
+    target_s1 = next(
+        outcome
+        for disposition in scores
+        for outcome in disposition.outcomes
+        if outcome.model is StockScoreModel.S1_DELTA
+        and outcome.score is not None
+        and outcome.score != ExactRational(1, 1)
+    )
+    original_authenticator = (
+        stock_score_batch_module._authenticate_and_order_stock_score_dispositions
+    )
+    calls = 0
+
+    def mutate_after_authentication(dispositions):
+        nonlocal calls
+        ordered = original_authenticator(dispositions)
+        calls += 1
+        if calls == mutation_call:
+            object.__setattr__(target_s1, "score", ExactRational(1, 1))
+        return ordered
+
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_authenticate_and_order_stock_score_dispositions",
+        mutate_after_authentication,
+    )
+    with pytest.raises(StockCoveringError, match=message):
+        build_pit_stock_covering_scores(scores)
+    assert calls == mutation_call
+
+
+@pytest.mark.parametrize("case", ("cohort", "context", "member", "current"))
+def test_covering_preflight_rejects_dynamic_nodes_before_callbacks(case):
+    scores = _fresh_non_affine_scores()
+    calls = 0
+
+    if case == "cohort":
+        original = scores[0].cohort
+
+        class CallbackCohort(StockNormalizationCohort):
+            def to_payload(self):
+                nonlocal calls
+                calls += 1
+                return StockNormalizationCohort.to_payload(self)
+
+        forged = object.__new__(CallbackCohort)
+        for field_name in original.__dataclass_fields__:
+            object.__setattr__(forged, field_name, getattr(original, field_name))
+        disposition = object.__new__(StockScoreDisposition)
+        for field_name in scores[0].__dataclass_fields__:
+            object.__setattr__(
+                disposition,
+                field_name,
+                getattr(scores[0], field_name),
+            )
+        object.__setattr__(disposition, "cohort", forged)
+        candidate = (disposition,) + scores[1:]
+    elif case == "context":
+        original = scores[0].current.source_context
+
+        class CallbackContext(StockFeatureSourceContext):
+            @property
+            def sha256(self):
+                nonlocal calls
+                calls += 1
+                return original.sha256
+
+        forged = object.__new__(CallbackContext)
+        for field_name in original.__dataclass_fields__:
+            object.__setattr__(forged, field_name, getattr(original, field_name))
+        current = object.__new__(StockFeatureDisposition)
+        for field_name in scores[0].current.__dataclass_fields__:
+            object.__setattr__(
+                current,
+                field_name,
+                getattr(scores[0].current, field_name),
+            )
+        object.__setattr__(current, "source_context", forged)
+        disposition = object.__new__(StockScoreDisposition)
+        for field_name in scores[0].__dataclass_fields__:
+            object.__setattr__(
+                disposition,
+                field_name,
+                getattr(scores[0], field_name),
+            )
+        object.__setattr__(disposition, "current", current)
+        candidate = (disposition,) + scores[1:]
+    elif case == "member":
+        cohort = next(
+            disposition.cohort
+            for disposition in scores
+            if disposition.cohort.candidate_members
+        )
+        original = cohort.candidate_members[0]
+
+        class CallbackMember(StockNormalizationMember):
+            def to_payload(self):
+                nonlocal calls
+                calls += 1
+                return StockNormalizationMember.to_payload(self)
+
+        forged = object.__new__(CallbackMember)
+        for field_name in original.__dataclass_fields__:
+            object.__setattr__(forged, field_name, getattr(original, field_name))
+        object.__setattr__(
+            cohort,
+            "candidate_members",
+            (forged,) + cohort.candidate_members[1:],
+        )
+        candidate = scores
+    else:
+        original = scores[0].current
+
+        class CallbackCurrent(StockFeatureDisposition):
+            def to_payload(self):
+                nonlocal calls
+                calls += 1
+                return StockFeatureDisposition.to_payload(self)
+
+        forged = object.__new__(CallbackCurrent)
+        for field_name in original.__dataclass_fields__:
+            object.__setattr__(forged, field_name, getattr(original, field_name))
+        disposition = object.__new__(StockScoreDisposition)
+        for field_name in scores[0].__dataclass_fields__:
+            object.__setattr__(
+                disposition,
+                field_name,
+                getattr(scores[0], field_name),
+            )
+        object.__setattr__(disposition, "current", forged)
+        candidate = (disposition,) + scores[1:]
+
+    with pytest.raises(StockCoveringError, match="non-canonical type"):
+        build_pit_stock_covering_scores(candidate)
+    assert calls == 0
+
+
+def test_covering_atomic_capture_stays_compact(monkeypatch):
+    original_validate_payload_v2 = stock_score_batch_module._validate_payload_v2
+
+    def forbid_legacy_expansion(self):
+        raise AssertionError("atomic capture must compare compact V2 snapshots")
+
+    def forbid_payload_expansion(payload):
+        raise AssertionError("covering must not materialize expanded V2 rows")
+
+    def require_compact_validation(payload, *, materialize_rows):
+        assert materialize_rows is False
+        return original_validate_payload_v2(
+            payload,
+            materialize_rows=materialize_rows,
+        )
+
+    monkeypatch.setattr(
+        StockScoreBatchEnvelopeV2,
+        "expanded_row_payloads",
+        forbid_legacy_expansion,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_expand_payload_v2",
+        forbid_payload_expansion,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "expand_stock_score_batch_payload_v2",
+        forbid_payload_expansion,
+    )
+    monkeypatch.setattr(
+        stock_covering_module,
+        "expand_stock_score_batch_payload_v2",
+        forbid_payload_expansion,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        stock_score_batch_module,
+        "_validate_payload_v2",
+        require_compact_validation,
+    )
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    assert len(covering) == len(_non_affine_scores())
+    assert len(covering.to_payload()["projections"]) == len(_non_affine_scores())
+
+
+@pytest.mark.parametrize("case", ("cohort_inventory", "context_lookup"))
+def test_covering_disposition_detaches_from_caller_owned_source_state(case):
+    scores = _fresh_non_affine_scores()
+    covering = build_pit_stock_covering_scores(scores)
+    result = covering[0]
+    before_payload = covering.to_payload()
+    before_sha256 = covering.sha256
+    source = scores[0]
+    if case == "cohort_inventory":
+        object.__setattr__(
+            source.cohort,
+            "raw_dispositions",
+            tuple(reversed(source.cohort.raw_dispositions)),
+        )
+    else:
+        context = source.current.source_context
+        object.__setattr__(
+            context,
+            "_readiness_by_event",
+            type(context._readiness_by_event)({}),
+        )
+
+    assert not hasattr(result, "source")
+    assert covering.to_payload() == before_payload
+    assert covering.sha256 == before_sha256
+
+
+def test_covering_contract_is_frozen_exact_typed_and_strictly_versioned():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    result = _covering_by_security(
+        covering,
+        "sec-si3c-000",
+    )[0]
+    with pytest.raises(FrozenInstanceError):
+        result.covering_score = ExactRational(0, 1)
+
+    class CoveringSubclass(StockCoveringDisposition):
+        pass
+
+    with pytest.raises(TypeError, match="constructed only"):
+        StockCoveringDisposition()
+    with pytest.raises(TypeError, match="constructed only"):
+        StockCoveringBatch()
+    with pytest.raises(FrozenInstanceError):
+        covering.projections = ()
+
+    forged_subclass = object.__new__(CoveringSubclass)
+    for field_name in result.__dataclass_fields__:
+        object.__setattr__(
+            forged_subclass,
+            field_name,
+            getattr(result, field_name),
+        )
+    with pytest.raises(StockCoveringError, match="exact frozen contract"):
+        forged_subclass.to_payload()
+
+    class StrSubclass(str):
+        pass
+
+    wrong_version = _tampered_covering(
+        result,
+        schema_version=StrSubclass(COVERING_SCHEMA_VERSION),
+    )
+    with pytest.raises(StockCoveringError, match="schema_version"):
+        wrong_version.to_payload()
+    subclass_digest = _tampered_covering(
+        result,
+        source_s1_outcome_sha256=StrSubclass(
+            result.source_s1_outcome_sha256
+        ),
+    )
+    with pytest.raises(StockCoveringError, match="SHA-256"):
+        subclass_digest.to_payload()
+
+    invalid_slot = _tampered_covering(
+        result,
+        source_normalization_slot_id="not-a-sha",
+    )
+    with pytest.raises(StockCoveringError, match="SHA-256"):
+        _ = invalid_slot.covering_slot_id
+    with pytest.raises(StockCoveringError, match="SHA-256"):
+        _ = invalid_slot.covering_record_id
+    invalid_sort_key = _tampered_covering(
+        result,
+        settlement_date="not-a-date",
+    )
+    with pytest.raises(StockCoveringError, match="ISO calendar date"):
+        _ = invalid_sort_key.sort_key
+
+    class RationalSubclass(ExactRational):
+        pass
+
+    forged_score = object.__new__(RationalSubclass)
+    object.__setattr__(forged_score, "numerator", result.covering_score.numerator)
+    object.__setattr__(
+        forged_score,
+        "denominator",
+        result.covering_score.denominator,
+    )
+    subclass_score = _tampered_covering(result, covering_score=forged_score)
+    with pytest.raises(StockCoveringError, match="exact ExactRational"):
+        subclass_score.to_payload()
+
+
+def test_covering_payload_freezes_authority_lineage_and_scope():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    result = _covering_by_security(
+        covering,
+        "sec-si3c-000",
+    )[0]
+    payload = result.to_payload()
+    assert set(payload) == {
+        "authority",
+        "blueprint_equation",
+        "covering_projection_id",
+        "covering_record_id",
+        "covering_score",
+        "covering_slot_id",
+        "decision_at",
+        "decision_session",
+        "event_id",
+        "independent_return_evaluation_required",
+        "normalization_cohort_sha256",
+        "normalization_policy_sha256",
+        "outcome_access_authorized",
+        "preregistration_sha256",
+        "production_authoritative",
+        "refusal_reasons",
+        "research_gate_sha256",
+        "return_effect_symmetry_assumed",
+        "revision_selection_state",
+        "schema_version",
+        "security_id",
+        "selected_event_id",
+        "settlement_date",
+        "source_batch_verification_required",
+        "source_disposition_sha256",
+        "source_model",
+        "source_normalization_slot_id",
+        "source_s1_outcome_sha256",
+        "source_s1_score",
+        "source_score_batch_sha256",
+        "standalone_source_authenticated",
+    }
+    assert payload["authority"] == STRUCTURAL_COVERING_AUTHORITY
+    assert payload["blueprint_equation"] == COVERING_EQUATION
+    assert payload["covering_projection_id"] == COVERING_PROJECTION_ID
+    assert payload["schema_version"] == COVERING_SCHEMA_VERSION
+    assert payload["source_model"] == StockScoreModel.S1_DELTA.value
+    assert payload["source_score_batch_sha256"] == covering.source_score_batch_sha256
+    assert payload["source_batch_verification_required"] is True
+    assert payload["standalone_source_authenticated"] is False
+    assert payload["production_authoritative"] is False
+    assert payload["outcome_access_authorized"] is False
+    assert payload["return_effect_symmetry_assumed"] is False
+    assert payload["independent_return_evaluation_required"] is True
+
+
+def test_covering_batch_embeds_one_compact_source_and_freezes_scope():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    payload = covering.to_payload()
+    assert set(payload) == {
+        "authority",
+        "covering_projection_id",
+        "independent_return_evaluation_required",
+        "outcome_access_authorized",
+        "production_authoritative",
+        "projection_count",
+        "projections",
+        "research_gate_sha256",
+        "return_effect_symmetry_assumed",
+        "schema_version",
+        "source_batch_verification_required",
+        "source_canonical_row_list_sha256",
+        "source_score_batch",
+        "source_score_batch_sha256",
+        "standalone_source_authenticated",
+    }
+    assert payload["authority"] == STRUCTURAL_COVERING_BATCH_AUTHORITY
+    assert payload["schema_version"] == COVERING_BATCH_SCHEMA_VERSION
+    assert payload["projection_count"] == len(covering)
+    assert payload["projections"] == [
+        item.to_payload() for item in covering
+    ]
+    assert hash_payload(payload["source_score_batch"]) == (
+        payload["source_score_batch_sha256"]
+    )
+    assert payload["source_score_batch"]["canonical_row_list_sha256"] == (
+        payload["source_canonical_row_list_sha256"]
+    )
+    assert payload["source_score_batch"]["schema_version"] == (
+        STOCK_SCORE_BATCH_V2_SCHEMA_VERSION
+    )
+    assert payload["source_batch_verification_required"] is True
+    assert payload["standalone_source_authenticated"] is False
+    assert payload["production_authoritative"] is False
+    assert payload["outcome_access_authorized"] is False
+    assert payload["return_effect_symmetry_assumed"] is False
+    assert payload["independent_return_evaluation_required"] is True
+    assert canonical_json(payload).count('"source_score_batch":') == 1
+
+
+def test_covering_batch_payload_size_scales_with_rows():
+    small = build_pit_stock_covering_scores(_single_sector_scores(20))
+    large = build_pit_stock_covering_scores(_single_sector_scores(40))
+    small_bytes = len(canonical_json(small.to_payload()).encode("utf-8"))
+    large_bytes = len(canonical_json(large.to_payload()).encode("utf-8"))
+
+    assert len(large) == 2 * len(small)
+    assert large_bytes < 5 * small_bytes // 2
+
+
+@pytest.mark.parametrize(
+    "case",
+    (
+        "source_content",
+        "rehashed_source_structure",
+        "source_disposition",
+        "source_batch_reference",
+        "source_s1_outcome",
+        "source_row_list",
+        "projection_order",
+    ),
+)
+def test_covering_batch_rejects_tampered_shared_evidence(case):
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    if case == "source_content":
+        source_payload = deepcopy(covering.to_payload()["source_score_batch"])
+        source_payload["rows"][0]["current"]["readiness"]["security_id"] = (
+            "invented-security"
+        )
+        tampered = _tampered_covering_batch(
+            covering,
+            _source_score_batch_payload_json=canonical_json(source_payload),
+        )
+        message = "content hash"
+    elif case == "rehashed_source_structure":
+        source_payload = deepcopy(covering.to_payload()["source_score_batch"])
+        source_payload["rows"][0]["current"]["readiness"]["security_id"] = (
+            "invented-security"
+        )
+        source_sha256 = hash_payload(source_payload)
+        tampered_projections = tuple(
+            _tampered_covering(
+                item,
+                source_score_batch_sha256=source_sha256,
+            )
+            for item in covering
+        )
+        tampered = _tampered_covering_batch(
+            covering,
+            projections=tampered_projections,
+            source_score_batch_sha256=source_sha256,
+            _source_score_batch_payload_json=canonical_json(source_payload),
+        )
+        message = "failed verification"
+    elif case == "source_disposition":
+        first = _tampered_covering(
+            covering[0],
+            source_disposition_sha256="0" * 64,
+        )
+        tampered = _tampered_covering_batch(
+            covering,
+            projections=(first,) + covering.projections[1:],
+        )
+        message = "source disposition"
+    elif case == "source_batch_reference":
+        first = _tampered_covering(
+            covering[0],
+            source_score_batch_sha256="0" * 64,
+        )
+        tampered = _tampered_covering_batch(
+            covering,
+            projections=(first,) + covering.projections[1:],
+        )
+        message = "different source batch"
+    elif case == "source_s1_outcome":
+        first = _tampered_covering(
+            covering[0],
+            source_s1_outcome_sha256="0" * 64,
+        )
+        tampered = _tampered_covering_batch(
+            covering,
+            projections=(first,) + covering.projections[1:],
+        )
+        message = "content hash"
+    elif case == "source_row_list":
+        tampered = _tampered_covering_batch(
+            covering,
+            source_canonical_row_list_sha256="0" * 64,
+        )
+        message = "row-list digest"
+    else:
+        tampered = _tampered_covering_batch(
+            covering,
+            projections=tuple(reversed(covering.projections)),
+        )
+        message = "source disposition"
+
+    with pytest.raises(StockCoveringError, match=message):
+        tampered.to_payload()
+
+
+@pytest.mark.parametrize(
+    ("field_name", "value"),
+    (
+        ("normalization_cohort_sha256", "0" * 64),
+        ("source_normalization_slot_id", "0" * 64),
+        ("security_id", "invented-security"),
+        ("settlement_date", "2023-12-28"),
+    ),
+)
+def test_covering_batch_rejects_valid_scalar_source_drift(field_name, value):
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    first = _tampered_covering(covering[0], **{field_name: value})
+    tampered = _tampered_covering_batch(
+        covering,
+        projections=(first,) + covering.projections[1:],
+    )
+
+    with pytest.raises(StockCoveringError, match=f"mismatched {field_name}"):
+        tampered.to_payload()
+
+
+def test_covering_batch_contract_is_exact_typed_and_fail_closed():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+
+    class BatchSubclass(StockCoveringBatch):
+        pass
+
+    forged_subclass = object.__new__(BatchSubclass)
+    for field_name in covering.__dataclass_fields__:
+        object.__setattr__(
+            forged_subclass,
+            field_name,
+            getattr(covering, field_name),
+        )
+    with pytest.raises(StockCoveringError, match="exact frozen contract"):
+        forged_subclass.to_payload()
+
+    class StrSubclass(str):
+        pass
+
+    cases = (
+        (
+            {"projections": list(covering.projections)},
+            "exact tuple",
+        ),
+        (
+            {"schema_version": StrSubclass(COVERING_BATCH_SCHEMA_VERSION)},
+            "schema_version",
+        ),
+        (
+            {"authority": StrSubclass(STRUCTURAL_COVERING_BATCH_AUTHORITY)},
+            "structural authority",
+        ),
+        (
+            {"production_authoritative": 1},
+            "non-production",
+        ),
+        (
+            {"source_score_batch_sha256": StrSubclass(
+                covering.source_score_batch_sha256
+            )},
+            "SHA-256",
+        ),
+        (
+            {"_source_score_batch_payload_json": None},
+            "canonical JSON",
+        ),
+    )
+    for changes, message in cases:
+        with pytest.raises(StockCoveringError, match=message):
+            _tampered_covering_batch(covering, **changes).to_payload()
+
+    empty = build_pit_stock_covering_scores(())
+    empty_with_evidence = _tampered_covering_batch(
+        empty,
+        source_score_batch_sha256="0" * 64,
+    )
+    with pytest.raises(StockCoveringError, match="cannot carry source evidence"):
+        empty_with_evidence.to_payload()
+
+
+@pytest.mark.parametrize(
+    "accessor",
+    (
+        lambda batch: len(batch),
+        lambda batch: iter(batch),
+        lambda batch: batch[0],
+        lambda batch: batch.projections,
+    ),
+)
+def test_covering_batch_public_reads_validate_shared_evidence(accessor):
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    first = next(
+        item
+        for item in covering
+        if item.source_s1_score is not None
+        and item.source_s1_score != ExactRational(0, 1)
+    )
+    wrong_sign = _tampered_covering(
+        first,
+        covering_score=first.source_s1_score,
+    )
+    tampered = _tampered_covering_batch(
+        covering,
+        projections=tuple(
+            wrong_sign if item is first else item
+            for item in covering.projections
+        ),
+    )
+
+    with pytest.raises(StockCoveringError, match="exact negative S1"):
+        accessor(tampered)
+
+
+def test_covering_batch_iterator_revalidates_before_each_yield():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    iterator = iter(covering)
+    first = next(
+        item
+        for item in covering._projections
+        if item.source_s1_score is not None
+        and item.source_s1_score != ExactRational(0, 1)
+    )
+    object.__setattr__(
+        first,
+        "covering_score",
+        first.source_s1_score,
+    )
+
+    with pytest.raises(StockCoveringError, match="exact negative S1"):
+        next(iterator)
+
+
+def test_covering_batch_iterator_pins_rows_and_shared_evidence():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+
+    cloned_first = _tampered_covering(covering._projections[0])
+    row_drift = _tampered_covering_batch(
+        covering,
+        projections=(cloned_first,) + covering._projections[1:],
+    )
+    row_iterator = iter(row_drift)
+    object.__setattr__(cloned_first, "security_id", "invented-security")
+    with pytest.raises(StockCoveringError, match="covering row changed"):
+        next(row_iterator)
+
+    evidence_drift = _tampered_covering_batch(covering)
+    evidence_iterator = iter(evidence_drift)
+    object.__setattr__(
+        evidence_drift,
+        "source_score_batch_sha256",
+        "0" * 64,
+    )
+    with pytest.raises(
+        StockCoveringError,
+        match="source_score_batch_sha256 changed",
+    ):
+        next(evidence_iterator)
+
+    tuple_drift = _tampered_covering_batch(covering)
+    tuple_iterator = iter(tuple_drift)
+    object.__setattr__(
+        tuple_drift,
+        "_projections",
+        tuple(list(tuple_drift._projections)),
+    )
+    with pytest.raises(StockCoveringError, match="batch changed"):
+        next(tuple_iterator)
+
+
+def test_covering_batch_payload_returns_detached_source_tree():
+    covering = build_pit_stock_covering_scores(_non_affine_scores())
+    expected = covering.to_payload()
+    returned = covering.to_payload()
+    returned["source_score_batch"]["rows"].clear()
+    returned["projections"].clear()
+
+    assert covering.to_payload() == expected
+
+
+def test_covering_gate_receipt_and_package_boundary_fail_closed(monkeypatch):
+    monkeypatch.setattr(
+        stock_covering_module,
+        "require_short_interest_research_gate",
+        lambda gate: "0" * 64,
+    )
+    with pytest.raises(StockCoveringError, match="unexpected receipt"):
+        build_pit_stock_covering_scores(_non_affine_scores())
+
+    class StrSubclass(str):
+        pass
+
+    monkeypatch.setattr(
+        stock_covering_module,
+        "require_short_interest_research_gate",
+        lambda gate: StrSubclass(
+            stock_covering_module.SHORT_INTEREST_RESEARCH_GATE_SHA256
+        ),
+    )
+    with pytest.raises(StockCoveringError, match="unexpected receipt"):
+        build_pit_stock_covering_scores(())
+
+    for name in (
+        "StockCoveringBatch",
+        "StockCoveringDisposition",
+        "StockCoveringError",
+        "build_pit_stock_covering_scores",
+    ):
+        assert name not in canonical_short_interest_package.__all__
+        assert not hasattr(canonical_short_interest_package, name)

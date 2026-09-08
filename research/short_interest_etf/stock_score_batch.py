@@ -13,22 +13,55 @@ verified without the exact authenticated row objects from which it was derived.
 from __future__ import annotations
 
 import dataclasses
+import gc
 import hashlib
 import json
 from copy import deepcopy
+from types import MappingProxyType
 from typing import Any, Iterable
 
 from data.hashing import canonical_json, hash_payload
+from research.short_interest_etf.contracts import (
+    CollectionManifest,
+    DenominatorKind,
+    DenominatorObservation,
+    ReleaseCalendarEntry,
+    ReleasePrecision,
+    SecurityIdentity,
+    ShortInterestSnapshot,
+    SourceEntitlement,
+    SourceSemantic,
+    VolumeBasis,
+)
+from research.short_interest_etf.dataset import ShortInterestVintage, build_identity
+from research.short_interest_etf.normalize import SnapshotRefusal
+from research.short_interest_etf.pit_eligibility import (
+    CorporateActionIssue,
+    ListingStatus,
+    PitReferenceBundle,
+    PitReferenceManifest,
+    SectorClassificationObservation,
+    SecurityLifecycleObservation,
+    StockDataReadiness,
+)
 from research.short_interest_etf.preregistration import PREREGISTRATION
+from research.short_interest_etf.stock_features import (
+    ExactRational,
+    PitStockRawFeature,
+    StockFeatureDisposition,
+    StockFeatureSourceContext,
+)
 from research.short_interest_etf.stock_normalization import (
     NORMALIZATION_DISPOSITION_SCHEMA_VERSION,
     STOCK_NORMALIZATION_POLICY,
     STRUCTURAL_SCORE_AUTHORITY,
+    RevisionSelectionState,
     StockModelOutcome,
     StockNormalizationCohort,
     StockNormalizationMember,
     StockScoreDisposition,
     StockScoreModel,
+    StockWinsorBounds,
 )
 
 
@@ -596,6 +629,366 @@ def _validate_dispositions(
                 "score batch is incomplete for its authenticated raw inventory"
             )
     return ordered
+
+
+_EXACT_SCORE_GRAPH_DATACLASS_TYPES = (
+    CollectionManifest,
+    DenominatorObservation,
+    ExactRational,
+    PitReferenceBundle,
+    PitReferenceManifest,
+    PitStockRawFeature,
+    ReleaseCalendarEntry,
+    SectorClassificationObservation,
+    SecurityIdentity,
+    SecurityLifecycleObservation,
+    ShortInterestSnapshot,
+    ShortInterestVintage,
+    SnapshotRefusal,
+    StockDataReadiness,
+    StockFeatureDisposition,
+    StockFeatureSourceContext,
+    StockModelOutcome,
+    StockNormalizationCohort,
+    StockNormalizationMember,
+    StockScoreDisposition,
+    StockWinsorBounds,
+    VolumeBasis,
+)
+_EXACT_SCORE_GRAPH_ENUM_TYPES = (
+    CorporateActionIssue,
+    DenominatorKind,
+    ListingStatus,
+    ReleasePrecision,
+    RevisionSelectionState,
+    SourceEntitlement,
+    SourceSemantic,
+    StockScoreModel,
+)
+
+
+def _is_one_exact_type(candidate: type, allowed: tuple[type, ...]) -> bool:
+    return any(candidate is allowed_type for allowed_type in allowed)
+
+
+def _exact_mapping_proxy_backing(
+    value: Any,
+    *,
+    name: str,
+) -> dict[Any, Any]:
+    """Return an exact backing dict without invoking mapping callbacks."""
+    if type(value) is not MappingProxyType:
+        raise _refuse(f"{name} must be an exact immutable mapping proxy")
+    referents = gc.get_referents(value)
+    if len(referents) != 1 or type(referents[0]) is not dict:
+        raise _refuse(f"{name} must wrap an exact dict backing map")
+    return referents[0]
+
+
+def _preflight_complete_stock_score_graph(
+    dispositions: tuple[StockScoreDisposition, ...],
+) -> None:
+    """Reject dynamic graph nodes before any domain method is invoked."""
+    stack: list[Any] = [dispositions]
+    seen: set[int] = set()
+    while stack:
+        current = stack.pop()
+        current_type = type(current)
+        if current is None or _is_one_exact_type(
+            current_type,
+            (str, int, bool),
+        ):
+            continue
+        if _is_one_exact_type(current_type, _EXACT_SCORE_GRAPH_ENUM_TYPES):
+            continue
+        identity = id(current)
+        if identity in seen:
+            continue
+        seen.add(identity)
+        if current_type is tuple or current_type is list:
+            stack.extend(current)
+            continue
+        if current_type is dict:
+            stack.extend(dict.keys(current))
+            stack.extend(dict.values(current))
+            continue
+        if current_type is MappingProxyType:
+            stack.append(
+                _exact_mapping_proxy_backing(
+                    current,
+                    name="score graph mapping proxy",
+                )
+            )
+            continue
+        if not _is_one_exact_type(
+            current_type,
+            _EXACT_SCORE_GRAPH_DATACLASS_TYPES,
+        ):
+            raise _refuse("score graph contains non-canonical type")
+        stack.extend(
+            object.__getattribute__(current, field.name)
+            for field in dataclasses.fields(current_type)
+        )
+        if current_type is StockFeatureSourceContext:
+            for name in (
+                "_readiness_by_event",
+                "_snapshot_by_event",
+                "_prior_by_event",
+                "_sha256_cache",
+            ):
+                try:
+                    stack.append(object.__getattribute__(current, name))
+                except AttributeError as exc:
+                    raise _refuse(
+                        f"score source context lacks canonical {name}"
+                    ) from exc
+
+
+def _selection_records_payload(
+    cohort: StockNormalizationCohort,
+) -> list[dict[str, str | None]]:
+    records = cohort._selection_records
+    if type(records) is not tuple:
+        raise _refuse("cohort selection records must be an exact tuple")
+    payload = []
+    for record in records:
+        if type(record) is not tuple or len(record) != 3:
+            raise _refuse("cohort selection record must be an exact triple")
+        event_id, state, selected_event_id = record
+        if (
+            type(event_id) is not str
+            or type(state) is not RevisionSelectionState
+            or (
+                selected_event_id is not None
+                and type(selected_event_id) is not str
+            )
+        ):
+            raise _refuse("cohort selection record has non-canonical types")
+        payload.append(
+            {
+                "event_id": event_id,
+                "selected_event_id": selected_event_id,
+                "state": state.value,
+            }
+        )
+    return payload
+
+
+def _context_lookup_maps_payload(
+    context: StockFeatureSourceContext,
+) -> dict[str, list[dict[str, Any]]]:
+    if type(context) is not StockFeatureSourceContext:
+        raise _refuse("score source context must be the exact context type")
+    map_specs = (
+        ("_readiness_by_event", StockDataReadiness, False),
+        ("_snapshot_by_event", ShortInterestSnapshot, False),
+        ("_prior_by_event", ShortInterestSnapshot, True),
+    )
+    payload: dict[str, list[dict[str, Any]]] = {}
+    for map_name, value_type, allows_none in map_specs:
+        lookup = object.__getattribute__(context, map_name)
+        backing = _exact_mapping_proxy_backing(
+            lookup,
+            name=f"score source context {map_name}",
+        )
+        keys = tuple(dict.keys(backing))
+        if not all(type(key) is str for key in keys):
+            raise _refuse(
+                "score source context lookup maps contain non-canonical key types"
+            )
+        records = []
+        for key in sorted(keys):
+            value = dict.__getitem__(backing, key)
+            if value is None:
+                if not allows_none:
+                    raise _refuse(
+                        "score source context lookup maps contain null values"
+                    )
+                value_payload = None
+            else:
+                if type(value) is not value_type:
+                    raise _refuse(
+                        "score source context lookup maps contain "
+                        "non-canonical value types"
+                    )
+                value_type.__post_init__(value)
+                value_payload = value_type.to_payload(value)
+            records.append({"event_id": key, "value": value_payload})
+        payload[map_name] = records
+    return payload
+
+
+def _require_canonical_source_context(
+    context: StockFeatureSourceContext,
+) -> None:
+    if type(context) is not StockFeatureSourceContext:
+        raise _refuse("score source context must be the exact context type")
+    if type(context.source_vintage) is not ShortInterestVintage:
+        raise _refuse("score source vintage must be the exact vintage type")
+    if type(context.reference_bundle) is not PitReferenceBundle:
+        raise _refuse("score reference bundle must be the exact bundle type")
+    canonical_vintage = dataclasses.replace(context.source_vintage)
+    if build_identity(context.source_vintage) != build_identity(
+        canonical_vintage
+    ):
+        raise _refuse("score source vintage does not match canonical state")
+    canonical_reference = dataclasses.replace(context.reference_bundle)
+    if (
+        context.reference_bundle.to_payload()
+        != canonical_reference.to_payload()
+        or context.reference_bundle.sha256 != canonical_reference.sha256
+    ):
+        raise _refuse("score reference bundle does not match canonical state")
+    canonical_context = dataclasses.replace(
+        context,
+        source_vintage=canonical_vintage,
+        reference_bundle=canonical_reference,
+    )
+    _require_sha256(context.sha256, name="source_context.sha256")
+    if (
+        StockFeatureSourceContext.to_payload(context)
+        != StockFeatureSourceContext.to_payload(canonical_context)
+        or context.sha256 != canonical_context.sha256
+    ):
+        raise _refuse("score source context does not match canonical state")
+    if _context_lookup_maps_payload(
+        context
+    ) != _context_lookup_maps_payload(canonical_context):
+        raise _refuse(
+            "score source context lookup maps do not match canonical state"
+        )
+
+
+def _revalidate_feature_disposition(
+    disposition: StockFeatureDisposition,
+) -> None:
+    if type(disposition) is not StockFeatureDisposition:
+        raise _refuse("stock feature disposition must be the exact contract type")
+    StockDataReadiness.__post_init__(disposition.readiness)
+    if disposition.prior_readiness is not None:
+        StockDataReadiness.__post_init__(disposition.prior_readiness)
+    if disposition.feature is not None:
+        if type(disposition.feature) is not PitStockRawFeature:
+            raise _refuse("stock feature must be the exact contract type")
+        PitStockRawFeature.__post_init__(disposition.feature)
+    StockFeatureDisposition.__post_init__(disposition)
+
+
+def _require_canonical_score_disposition(
+    disposition: StockScoreDisposition,
+    *,
+    validated_contexts: set[int],
+    validated_cohorts: set[int],
+) -> None:
+    if type(disposition) is not StockScoreDisposition:
+        raise _refuse("score disposition must be the exact contract type")
+    if type(disposition.current) is not StockFeatureDisposition:
+        raise _refuse("score current disposition must be the exact contract type")
+    if type(disposition.outcomes) is not tuple or not all(
+        type(item) is StockModelOutcome for item in disposition.outcomes
+    ):
+        raise _refuse("score outcomes must use exact contract types")
+    context = disposition.current.source_context
+    if type(context) is not StockFeatureSourceContext:
+        raise _refuse("score source context must be the exact context type")
+    cohort = disposition.cohort
+    if type(cohort) is not StockNormalizationCohort:
+        raise _refuse("score cohort must be the exact contract type")
+    if type(cohort.raw_dispositions) is not tuple or not all(
+        type(item) is StockFeatureDisposition
+        for item in cohort.raw_dispositions
+    ):
+        raise _refuse("cohort raw dispositions must use exact contract types")
+    derived_specs = (
+        ("candidate_members", StockNormalizationMember),
+        ("eligible_members", StockNormalizationMember),
+        ("winsor_bounds", StockWinsorBounds),
+    )
+    for name, item_type in derived_specs:
+        values = getattr(cohort, name)
+        if type(values) is not tuple or not all(
+            type(item) is item_type for item in values
+        ):
+            raise _refuse(
+                f"cohort {name} must use exact contract types"
+            )
+    if id(context) not in validated_contexts:
+        _require_canonical_source_context(context)
+        validated_contexts.add(id(context))
+
+    if id(cohort) not in validated_cohorts:
+        for raw_disposition in cohort.raw_dispositions:
+            raw_context = raw_disposition.source_context
+            if id(raw_context) not in validated_contexts:
+                _require_canonical_source_context(raw_context)
+                validated_contexts.add(id(raw_context))
+            _revalidate_feature_disposition(raw_disposition)
+        canonical_cohort = dataclasses.replace(cohort)
+        _require_sha256(cohort.sha256, name="cohort.sha256")
+        if (
+            StockNormalizationCohort.to_payload(cohort)
+            != StockNormalizationCohort.to_payload(canonical_cohort)
+            or cohort.sha256 != canonical_cohort.sha256
+        ):
+            raise _refuse("score cohort does not match canonical state")
+        if _selection_records_payload(
+            cohort
+        ) != _selection_records_payload(canonical_cohort):
+            raise _refuse(
+                "score cohort selection records do not match canonical state"
+            )
+        validated_cohorts.add(id(cohort))
+
+    if not any(
+        item is disposition.current for item in cohort.raw_dispositions
+    ):
+        raise _refuse(
+            "score current disposition is not its exact cohort inventory object"
+        )
+    if any(outcome.cohort is not cohort for outcome in disposition.outcomes):
+        raise _refuse(
+            "score outcomes do not retain the exact disposition cohort"
+        )
+
+    _revalidate_feature_disposition(disposition.current)
+    for outcome in disposition.outcomes:
+        StockModelOutcome.__post_init__(outcome)
+    StockScoreDisposition.__post_init__(disposition)
+
+
+def _authenticate_and_order_stock_score_dispositions(
+    dispositions: tuple[StockScoreDisposition, ...],
+) -> tuple[StockScoreDisposition, ...]:
+    if type(dispositions) is not tuple or not all(
+        type(item) is StockScoreDisposition for item in dispositions
+    ):
+        raise _refuse(
+            "dispositions must be an exact tuple of exact score dispositions"
+        )
+    if not dispositions:
+        raise _refuse("score batch cannot be empty")
+    try:
+        _preflight_complete_stock_score_graph(dispositions)
+        validated_cohorts: set[int] = set()
+        validated_contexts: set[int] = set()
+        for disposition in dispositions:
+            _require_canonical_score_disposition(
+                disposition,
+                validated_contexts=validated_contexts,
+                validated_cohorts=validated_cohorts,
+            )
+    except StockScoreBatchError:
+        raise
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise _refuse(f"score disposition failed revalidation: {exc}") from exc
+    return _validate_dispositions(dispositions)
+
+
+def require_complete_stock_score_dispositions(
+    dispositions: tuple[StockScoreDisposition, ...],
+) -> tuple[StockScoreDisposition, ...]:
+    """Authenticate and canonically order one complete SI-3C score inventory."""
+    return _authenticate_and_order_stock_score_dispositions(dispositions)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -1410,6 +1803,19 @@ def _expand_payload_v2(payload: dict[str, Any]) -> tuple[dict[str, Any], ...]:
     return validated.expanded_rows
 
 
+def expand_stock_score_batch_payload_v2(
+    payload: dict[str, Any],
+) -> tuple[dict[str, Any], ...]:
+    """Structurally expand one exact V2 payload snapshot.
+
+    This helper verifies the compact content-addressed structure; it does not
+    authenticate the payload's origin because content hashes are not
+    signatures.
+    """
+    submitted_payload, _ = _capture_exact_payload_snapshot(payload)
+    return _expand_payload_v2(submitted_payload)
+
+
 def _validate_compact_payload_v2(
     payload: dict[str, Any],
 ) -> _ValidatedStockScoreBatchPayload:
@@ -1417,6 +1823,63 @@ def _validate_compact_payload_v2(
     if validated.expanded_rows is not None:  # pragma: no cover - invariant guard
         raise _refuse("compact V2 score batch validation materialized legacy rows")
     return validated
+
+
+def project_stock_score_covering_sources_v2(
+    payload: dict[str, Any],
+) -> tuple[dict[str, Any], ...]:
+    """Return compact S1/decision facts from one verified V2 snapshot.
+
+    Full legacy rows are processed one at a time by V2 verification but are
+    never retained or returned by this projection.
+    """
+    submitted, _ = _capture_exact_payload_snapshot(payload)
+    _validate_compact_payload_v2(submitted)
+    member_sets = {
+        record["members_sha256"]: record["members"]
+        for record in submitted["member_sets"]
+    }
+    cohorts = {
+        record["cohort_sha256"]: record["cohort"]
+        for record in submitted["cohorts"]
+    }
+    projected: list[dict[str, Any]] = []
+    for row in submitted["rows"]:
+        source_s1 = row["outcomes"][1]
+        if source_s1["model"] != StockScoreModel.S1_DELTA.value:
+            raise _refuse("verified V2 row does not place S1 second")
+        try:
+            cohort = cohorts[row["cohort_sha256"]]
+            sector_members = member_sets[source_s1["sector_members_sha256"]]
+        except KeyError as exc:  # pragma: no cover - verified above
+            raise _refuse("verified V2 covering reference disappeared") from exc
+        full_s1 = deepcopy(source_s1)
+        full_s1["sector_members"] = deepcopy(sector_members)
+        projected.append(
+            {
+                "decision_at": cohort["decision_at"],
+                "decision_session": cohort["decision_session"],
+                "event_id": source_s1["event_id"],
+                "normalization_cohort_sha256": row["cohort_sha256"],
+                "normalization_policy_sha256": source_s1[
+                    "normalization_policy_sha256"
+                ],
+                "refusal_reasons": deepcopy(source_s1["refusal_reasons"]),
+                "revision_selection_state": source_s1[
+                    "revision_selection_state"
+                ],
+                "security_id": source_s1["security_id"],
+                "selected_event_id": source_s1["selected_event_id"],
+                "settlement_date": cohort["settlement_date"],
+                "source_disposition_sha256": row["disposition_sha256"],
+                "source_normalization_slot_id": source_s1[
+                    "normalization_slot_id"
+                ],
+                "source_s1_outcome_sha256": hash_payload(full_s1),
+                "source_s1_score": deepcopy(source_s1["score"]),
+            }
+        )
+    return tuple(projected)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -1544,6 +2007,21 @@ def build_stock_score_batch_envelope_v2(
 ) -> StockScoreBatchEnvelopeV2:
     """Build the additive synthetic-only content-addressed V2 envelope."""
     return StockScoreBatchEnvelopeV2(dispositions=dispositions)
+
+
+def build_authenticated_stock_score_batch_envelope_v2(
+    dispositions: tuple[StockScoreDisposition, ...],
+) -> StockScoreBatchEnvelopeV2:
+    """Authenticate the full object graph and atomically capture V2 evidence."""
+    ordered = _authenticate_and_order_stock_score_dispositions(dispositions)
+    before = StockScoreBatchEnvelopeV2(dispositions=ordered)
+    revalidated = _authenticate_and_order_stock_score_dispositions(ordered)
+    after = StockScoreBatchEnvelopeV2(dispositions=revalidated)
+    if before._payload_json_cache != after._payload_json_cache:
+        raise _refuse(
+            "authenticated dispositions changed during V2 evidence capture"
+        )
+    return after
 
 
 def verify_stock_score_batch_payload_v2(

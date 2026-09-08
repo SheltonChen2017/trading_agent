@@ -1,16 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE IB-2B COUNTER-REVIEW `c74a575`, BOUNDED IB-2C POINT-IN-TIME
-SECURITY MAPPING `3a5ec9f`, AND RECORD `d6f43bd8` ARE CLAUDE-REVIEWED AND
-ACCEPTED AFTER CORRECTION (SECTION 46): CORRECTION COMMIT `1496244` ADDS ONE
-REFUSAL CLAUSE TO THE IB-2C ROW CONSTRUCTOR AND PINS TEN PREVIOUSLY UNTESTED
-GUARDS. THE ROUND SNAPSHOT IS `d6f43bd8..THIS RECORD COMMIT`; CODEX
-COUNTER-REVIEW OF THOSE COMMITS IS THE NEXT GATE. IB-2C REMAINS AN OFFLINE,
-ZERO-AUTHORITY STRUCTURAL SLICE: NO OFFICIAL SECURITY MASTER, `qc_symbol_id`,
-AUTHENTICATED AMENDMENT SUPERSESSION, CANONICAL FILTERING, DEDUPLICATION,
-AGGREGATION, `$50,000` GATE, OUTCOMES, ETF/QC, DEPLOYMENT, CAPITAL, BROKER, OR
-TRADING AUTHORITY EXISTS. EVERY SUCH GATE REMAINS FALSE AND BOTH LOOK
-COUNTERS REMAIN ZERO. FULL IB-2 IS NOT COMPLETE.**
+Status: **CLAUDE'S EXACT IB-2C REVIEW RANGE `d6f43bd8..6383019` HAS BEEN
+COUNTER-REVIEWED COMMIT BY COMMIT AND ACCEPTED AFTER APPEND-ONLY CORRECTION.
+COMMIT `611dced` CLOSES IB2C-CR03..05; SECTION 47 CORRECTS FOUR REVIEW-RECORD
+PRECISION FINDINGS. BOUNDED OFFLINE IB-2D PROVISIONAL LOT DIAGNOSTICS ARE
+COMMITTED AT `68a7045`. THE ROUND IS `6383019..THIS RECORD COMMIT`; CLAUDE'S
+INDEPENDENT REVIEW OF EVERY COMMIT IN THAT EXACT PUSHED RANGE IS THE NEXT
+GATE. IB-2C/IB-2D REMAIN ZERO-AUTHORITY STRUCTURAL SLICES: NO OFFICIAL
+SECURITY MASTER, `qc_symbol_id`, AUTHENTICATED AMENDMENT SUPERSESSION,
+CANONICAL FILTERING, DEDUPLICATION, AUTHORIZED AGGREGATION OR `$50,000` GATE,
+OUTCOME, ETF/QC, DEPLOYMENT, CAPITAL, BROKER, OR TRADING AUTHORITY EXISTS.
+EVERY SUCH GATE REMAINS FALSE AND BOTH LOOK COUNTERS REMAIN ZERO. FULL IB-2
+AND IB-1 ARE NOT COMPLETE.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -158,7 +159,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-07 | Claude review | `0027d57d` -> `ff9d17f6` (test correction) -> `532e4cde` (review record) -> this hash-naming commit | Independent review of the IB-2A counter-review and the bounded IB-2B SEC entity grouping (`11d894b6..0027d57`, 4 commits, 0 merges, 6 lane-owned paths), with adversarial mutation of the eleven owner-named directions | First Insider review on the owner's Mac: built the Python 3.13.15 venv from the pinned requirements after the system interpreter ran zero tests. Fast-forwarded 19 commits to the exact remote head, dispositioned all four commits, reproduced every counter-review provenance claim (4 of 4 stable patch IDs, blob equality, absent "289", `IB1D-CR07A` defined), reconstructed the unnamed 1,062-test lane gate, ran 33 targeted mutants (12 caught, 21 survived), classified every survivor, and pinned fourteen untested guards with twelve additive tests (23 cases), each mutation-verified. Full detail in section 44. | Pushed tree: focused IB-2A/IB-2B **179 passed** (reproduces); eleven Insider files **985 passed**; reconstructed 13-file gate **1,062 collected**; complete suite **2 failed, 7,271 passed, 38 skipped, 28 warnings in 481.19s (0:08:01)**, both failures machine-local or load-induced and passing standalone (IBSH-CCR06, IBSH-CCR07). Final tree: IB-2B file **99 passed**; IB-2A plus IB-2B **202 passed**; lane gate plus boundary and separation suites **1,131 passed in 18.79s**; complete suite **7,296 passed, 38 skipped, 28 warnings, 0 failed in 417.61s (0:06:57)**; whole-repository compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | All four commits accepted, three after correction. **IB2B-CR01** (P3) fixed: fourteen guards on the named directions - grouping-level attribution consistency, single-owner binding, row-level quarantined-with-owner, output amendment-to-original binding, acceptance ambiguity, owner and transaction contiguity, transaction-to-issuer-candidate link, identity count partition, upstream projection depth/text/node, and two direct upstream-revalidation refusals - could be deleted with the file green; now pinned. IB2B-CR02 (P3): the A-to-B-to-A regression is single-threaded, not "two-thread". IB2B-CR03 (P3): the 1,054/8 gate names no file set. IB2B-CR04 (P3): the attribution rule is implemented twice; drift fails closed. IB2B-CR05: six survivors classified as redundant layers. IB2B-CR06 (P3): the counter-review ledger row understates IBSH-CCR01/02 to P3. IBSH-CCR06 and IBSH-CCR07 (P3, shared): `.DS_Store` not ignored; load-sensitive UI AppTest timeout. No production module changed; no test removed or weakened. | Review commits are local to the lane branch and not pushed (the owner authorizes pushes). Owner pushes or authorizes; Codex counter-reviews. No milestone started. |
 | 2026-09-07 | Codex counter-review + implementation | `0027d57..a898be5` reviewed; correction `c74a575`; IB-2C `3a5ec9f`; this lane-record commit follows | Counter-review of all three Claude commits plus bounded offline IB-2C point-in-time security mapping | Dispositioned every incoming commit, consolidated the duplicate IB-2B owner-attribution primitive, corrected the prior record append-only, added an exact process-local IB-2B provenance seal, and implemented exhaustive transaction-to-security/title/ticker mapping from caller-supplied dated reference intervals. The mapping is deterministic, replayed, resource-bounded, point-in-time sliced, CIK scoped, amendment-lineage retaining, and zero-authority. Full detail is in section 45. | Incoming exact head: IB-2B **99 passed** and named lane/boundary gate **1,131 passed**. Final code tree: IB-2C **68 passed**; IB-2B plus IB-2C **169 passed**; twelve Insider files plus active-document and module-hygiene gates **1,155 passed**; complete repository **7,366 passed, 38 skipped, 26 warnings, 0 failed in 360.48s**; whole-repository compileall exit 0; diff checks clean. Material reverse mutation: **1 failed as expected**, then **1 passed** after exact authority-guard restoration. Synthetic fixtures only; no research/data-system access; **0 research looks**. | All incoming findings are accepted, corrected, closed, or explicitly retained as shared debt. `IB2B-CR04` is fixed in `c74a575`; record precision issues are corrected in section 45. IB2C-R01..R12 are closed; IB2C-G01 explicitly defers QC-symbol/official-security-master completion. No open P0-P3 finding remains in the new lane code. Shared findings remain documented without changes. | Make the round's single combined push. Claude then independently reviews every commit in `a898be5..remote HEAD` on this same branch; Codex counter-reviews every resulting Claude commit before any later milestone. |
 | 2026-09-07 | Claude review | `d6f43bd8` -> `1496244` (correction) -> this review record | Independent review of the IB-2B counter-review, the bounded IB-2C point-in-time security mapping, and its record (`a898be5e..d6f43bd8`, 3 commits, 0 merges, 6 lane-owned paths), with adversarial mutation of the thirteen owner-named directions | Fast-forwarded to the exact remote tip, dispositioned all three commits, reproduced every counter-review record correction (13 functions / 23 cases from 76->99 collected; single-thread A-to-B-to-A; 1,062 collected from the eleven then-existing Insider files plus active-document and module-hygiene at `9fb017c`; IB2A-CR04/CR05 closed in 42.2; three commits pushed), verified one shared owner-attribution primitive, ran a 20,000-case randomized oracle against the listing-overlap validator (0 mismatches, both `date.max` probes correct), and ran 38 targeted mutants (24 caught, 14 survived, 0 invalid). Eleven survivors were genuine gaps and are now pinned or fixed; three are proven redundant/unreachable layers. Full detail in section 46. | Pushed tree `d6f43bd8`: complete suite **7,366 passed, 38 skipped, 28 warnings, 0 failed in 438.58s (0:07:18)** (Codex recorded 26 warnings; the two extra are environment notices); IB-2C **68 passed**, IB-2B+IB-2C **169 passed**, twelve Insider files + active-document + module-hygiene **1,155 passed** - all three reproduce exactly. Final tree: IB-2C **80 passed**; IB-2B+IB-2C **181 passed**; lane gate + import boundary **1,178 passed in 8.97s**; complete suite **7,378 passed, 38 skipped, 28 warnings, 0 failed in 401.89s (0:06:41)**; whole-repository compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | All three commits accepted, `3a5ec9f` after correction. **IB2C-CR01** (P3) fixed in `1496244`: the IB-2C row constructor accepted `SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED` beside a quarantine outcome with no owner, a shape IB-2B refuses; replay passes owner outcomes through, so the constructor was the only guard (red without the clause, green with it). **IB2C-CR02** (P3) fixed in `1496244`: ten guards could be deleted with the file green - row amendment lineage, mapped-row completeness, quarantined-row partial mapping, both owner-promotion shapes, canonical row order, row/upstream id uniqueness, manual-count binding, preflight-before-projection ordering (IB2C-R09's claim was not test-distinguishable), and the reference projection node and depth bounds - now pinned by nine additive tests (12 cases), each mutation-verified. IB2C-CR03 (P3, open): `reference_sha256` is a caller-asserted label bound only by shape, not to the captured reference content. IB2C-CR04 (P3, open, design limit): child intervals must sit inside one parent record, not the union of adjacent records. IB2C-CR05 (P3, open, nit): the module has no `__all__`. IB2C-N01..N03 are notes (tz database dependency, warning-count environment delta, three survivors proven redundant/unreachable). No production behavior weakened; no test removed or weakened. | Codex counter-reviews `1496244` and this record commit. `qc_symbol_id` and an official point-in-time security master remain deferred (IB2C-G01). Full IB-2 and IB-1 remain incomplete; no milestone started or authorized. |
-
+| 2026-09-08 | Codex counter-review + implementation | `6383019c` -> this record commit (`611dceda` counter-review correction; `68a70459` IB-2D; this record) | Counter-reviewed both Claude IB-2C commits, corrected four section-46 precision defects append-only, closed IB2C-CR03..05, and implemented bounded IB-2D provisional lot diagnostics | Accepted `1496244` and `6383019` after record correction; documented the external-reference hash contract, single-parent interval normalization, and exact IB-2C export surface; added exhaustive evidence-bound provisional lot rows/groups, complete supplied-amendment-family quarantine, exact Decimal aggregation diagnostics, and the non-authoritative post-grouping `$50,000` comparison. No canonical filter, supersession, deduplication, authorized aggregation, or operational behavior was added. | IB-2C **84 passed**; IB-2D **83 passed**; IB-2A through IB-2D **371 passed**; those four stages plus hygiene/import boundaries **390 passed**; lane gate **1,265 passed**; complete suite **7,465 passed, 38 skipped, 26 warnings, 0 failed in 359.84s (0:05:59)**; compileall exit 0; diff/status clean. No SEC/provider/credential/licensed-row/outcome/QC/broker/operator-database/scheduler/deployment/capital/order/trading access; **0 research looks**. | IB2C-CR01/02 accepted fixed; IB2C-CR03..05 and IB2C-CCR01..04 closed. IB2D-R01..R05 P2 and IB2D-R06..R11 P3 all corrected and red/green pinned before `68a7045`; final audit found no open new P0-P3. Existing lane gates and shared/out-of-lane findings remain open and unchanged. | Push this exact three-commit round once. Claude independently reviews `6383019c..THIS RECORD COMMIT` on the same branch; Codex counter-reviews every Claude commit before another milestone. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -5762,3 +5763,228 @@ is not complete and IB-1 remains incomplete.
 Review commits on this lane: correction `1496244` and this record commit.
 Next authorized step: Codex counter-reviews both. No milestone was started and
 none is authorized.
+
+
+## 47. Codex counter-review of the IB-2C review and bounded IB-2D provisional lot diagnostics (2026-09-08 UTC)
+
+### 47.1 Exact range and per-commit dispositions
+
+Codex stayed in the existing `codex/strategy-insider-buying` branch and
+worktree. A fresh fetch confirmed the exact pushed Claude range as
+`d6f43bd8bf92618e4bd0b7a797711a59974b7e8c..6383019c49cba902876bfe9da66483cd2c07055c`:
+two linear commits and zero merges. No side branch, worktree, rebase, force
+push, or project-wide document edit was used.
+
+| Incoming commit | Disposition | Counter-review basis |
+|---|---|---|
+| `1496244e9e8f5e503f6b2fe68df9b787567dfcc6` | **Accepted after record precision correction.** | The two-line constructor refusal is correct and fail-closed. The nine additive test functions collect as twelve cases, remove or weaken no test, and pin the intended guards. The missing-clause red/green and all eleven previously surviving genuine guard directions were independently reproduced. Its narrative misallocates one guard between IB2C-CR01 and IB2C-CR02, corrected append-only below. |
+| `6383019c49cba902876bfe9da66483cd2c07055c` | **Accepted after append-only record correction.** | The technical review, mutation classifications, randomized overlap oracle, authority conclusions, and access accounting reproduce. Four P3 precision defects concerning the direction count, keyword sweep, CR01/CR02 guard inventory, and next authorization are corrected below without rewriting section 46. |
+
+### 47.2 Counter-review reproduction and section-46 corrections
+
+Removing only the new
+`SINGLE_COMPLETE_OWNER_CIK_ATTRIBUTED`-beside-quarantine refusal made
+`test_row_constructor_refuses_owner_quarantine_promotion_shapes` fail because
+no exception was raised; exact restoration returned it green. The nine
+functions and twelve collected cases added in `1496244` were inspected and
+their eleven previously surviving guard directions were independently
+mutation-verified. The three IB2C-N03 survivors were also confirmed:
+
+- CIK-scoped title lookup is redundant for result correctness because candidate
+  pair keys use security IDs drawn from the issuer-filtered security inventory;
+- result-level quarantined-count binding follows from the identity partition
+  plus mapped-count binding; and
+- builder exhaustiveness is unreachable while rows remain a one-to-one
+  comprehension over the upstream transaction inventory.
+
+All three layers remain useful defense in depth and were retained.
+
+Section 46 is corrected append-only as follows:
+
+1. Section 45.5 names **thirteen**, not eleven, semicolon-delimited review
+   directions: provenance; pre/post mutation; replay; availability slicing;
+   Eastern-date ticker resolution; CIK/title/share-class isolation; amendment
+   lineage; ticker reuse and `date.max`; manual-title behavior; resource
+   bounds; mapping counts; authority flags; and look counters.
+2. On the exact reviewed tree `6383019`, the fixed-string sweep yields
+   `qc_symbol` 0, `50,000` 0, `aggregation` 9, `deduplication` 0,
+   `supersession` 0, `broker` 0, `deployment` 10, `order` 1, and
+   `QuantConnect` 0. The nonzero matches are the deliberately hard-false
+   aggregation/deployment authority fields and properties plus the canonical
+   row-order refusal. The exact-import AST test and semantic inspection—not
+   the overbroad "docstring only" sentence—establish the excluded surface.
+3. The complete `1496244` addition is nine functions / twelve cases. IB2C-CR01
+   owns the one-function/one-case owner-quarantine regression, which pins both
+   the pre-existing owner-promotion refusal and the newly added
+   SINGLE-beside-quarantine clause. IB2C-CR02 owns eight functions / eleven
+   cases covering ten guards: amendment lineage, mapped-row completeness,
+   quarantined-row partial mapping, canonical row order, row/upstream-ID
+   uniqueness, manual-count binding, preflight-before-projection, reference
+   node bound, reference depth bound, and closure-before-base availability.
+   Section 46 placed owner promotion in the CR02 inventory and omitted the
+   closure-before-base guard.
+4. Claude correctly stopped without starting another milestone, but "none is
+   authorized" conflicts with the owner's standing serialized loop and
+   explicit instruction to counter-review and implement the next milestone.
+   Once this review was accepted and no owner gate blocked offline work,
+   bounded IB-2D was authorized. No external-data, outcome, QC, operational,
+   or trading authority followed from that authorization.
+
+### 47.3 IB-2C retained findings ledger
+
+| ID | Priority | Status | Disposition |
+|---|---|---|---|
+| IB2C-CR01 | P3 | **Accepted as fixed in `1496244`.** | The row constructor now refuses SINGLE attribution beside any quarantine outcome; the new and pre-existing promotion directions are red/green pinned. |
+| IB2C-CR02 | P3 | **Accepted as fixed in `1496244`; inventory corrected here.** | Eight functions / eleven cases pin the ten guards listed in 47.2. |
+| IB2C-CR03 | P3 | **Closed in `611dceda77e20960cb0b596b29b496f5675def6e`.** | Module, identity, builder, and validation prose now define `reference_sha256` as the digest of the complete external artifact named by `reference_id` and `reference_version`, while the three inventory hashes bind the captured subset. A regression proves that changing external-artifact lineage changes `mapping_id` without changing the subset hashes. |
+| IB2C-CR04 | P3 | **Closed in `611dceda77e20960cb0b596b29b496f5675def6e`.** | The single-parent containment rule is now an explicit normalization contract: suppliers must split children at every parent boundary. Title and ticker intervals spanning adjacent same-security parents are both pinned as refused. |
+| IB2C-CR05 | P3 | **Closed in `611dceda77e20960cb0b596b29b496f5675def6e`.** | The module now has an exact public `__all__`, pinned against the package surface. |
+| IB2C-CCR01 | P3 | **Closed in this record.** | The owner handoff named thirteen directions, not eleven. |
+| IB2C-CCR02 | P3 | **Closed in this record.** | The keyword-sweep claim is replaced by the exact counts and semantic classification in 47.2. |
+| IB2C-CCR03 | P3 | **Closed in this record.** | The CR01/CR02 function, case, and guard allocation is corrected without changing the tests. |
+| IB2C-CCR04 | P3 | **Closed in this record.** | The standing owner loop had authorized the next bounded offline milestone after accepted counter-review. |
+| IB2C-N01 | Note | **Accepted.** | `zoneinfo` follows the repository's established timezone dependency pattern. |
+| IB2C-N02 | Note | **Accepted as environmental.** | The 28-versus-26 warning delta did not change pass, skip, or failure counts. |
+| IB2C-N03 | Note | **Confirmed.** | The three survivors are redundant or unreachable defense-in-depth layers, not correctness gaps. |
+
+No new P0, P1, or P2 finding arose from the counter-review. `IB2C-G01`
+remains an open gate: no official point-in-time security master or
+`qc_symbol_id` exists.
+
+### 47.4 Bounded IB-2D behavior
+
+Commit `68a7045949999aee65d4fadbf88148d38843b2bf` adds
+`form4_provisional_lot_diagnostics`, an offline, exhaustive, hash-bound
+diagnostic boundary. It composes the exact factory-created IB-1E evidence,
+IB-2A inventory, IB-2B grouping, and IB-2C mapping, rebuilds the IB-1G report
+from the original evidence using the inventory's builder lineage, and verifies
+the complete mapping -> grouping -> inventory -> evidence/report chain through
+detached snapshots, direct constructor replay, type-sensitive runtime
+fingerprints, final rechecks, and a process-local result seal.
+
+The result:
+
+- emits exactly one deterministic diagnostic row per mapping row, without
+  fan-out, deduplication, silent drop, or promotion;
+- retains accession, source, event, transaction, issuer, owner, mapped
+  security/share-class, title-kind, parser, identity, attribution, mapping,
+  economics, and quarantine lineage;
+- builds a separately sorted amendment-family accession inventory from supplied
+  filing evidence, including Form 4/A filings with zero transaction rows, and
+  quarantines every retained row in any supplied amended family;
+- accumulates parser, observed-identity, owner-attribution, security-mapping,
+  unavailable-economics, amendment-family, and non-ordinary-class reasons
+  without losing independent reasons;
+- admits only otherwise-clean rows whose provisional structural class is
+  `COMMON_STOCK`, `COMMON_SHARES`, or `ORDINARY_SHARES`; manual title mappings
+  remain explicit and never override a non-ordinary-class quarantine;
+- groups provisional candidates only by reporting-owner CIK, exact owner
+  candidate ID, permanent security ID, share-class ID, and transaction date—
+  never ticker or accession;
+- retains sorted member row IDs, issuer CIK, exact Decimal share and purchase
+  totals, and latest member acceptance for every provisional group; and
+- applies the exact `>= USD 50,000` comparison only as a diagnostic after
+  grouping. The `49,999.99`, `50,000`, and `50,000.01` boundaries are pinned,
+  and below-threshold groups remain retained rather than filtered.
+
+The implementation is resource bounded for rows, groups, amendment families,
+enum/reason tuples, projection depth/nodes/text, and Decimal digits/exponents.
+Public row, group, identity, and result objects are factory-only, replayable,
+canonically ordered, hash-bound, and explicitly exported.
+
+### 47.5 IB-2D implementation findings
+
+All findings were verified, generalized, corrected, and red/green pinned before
+`68a7045`. A final independent audit found no remaining P0-P3 issue.
+
+| ID | Priority | Status | Finding and correction |
+|---|---|---|---|
+| IB2D-R01 | P2 | **Closed in `68a7045`.** | Coherent replay could clear amendment-family quarantine and promote rows. Exact row/family membership and mandatory self-family inclusion for every Form 4/A now refuse the forgery; the exact-membership and self-family regressions are red/green pins. |
+| IB2D-R02 | P2 | **Closed in `68a7045`.** | `MAPPED_STRUCTURALLY` could remain a candidate with a missing normalized class or title-mapping kind. All retained mapping fields and transaction date are now mandatory; both omission directions are pinned. |
+| IB2D-R03 | P2 | **Closed in `68a7045`.** | A value-only result seal erased Enum-to-string, tuple-to-list, and equal-Decimal representation changes. The seal now includes type- and Decimal-representation-sensitive runtime state; the enum and tuple mutations were accepted red and refuse green, with the Decimal representation independently pinned. |
+| IB2D-R04 | P2 | **Closed in `68a7045`.** | Canonical IB-2A/IB-2B/IB-2C seals alone admitted equal-valued type corruption. IB-2D now directly replays every upstream public constructor and binds a separate runtime fingerprint for each stage before/after capture and in the final recheck. A mapping Enum-to-string mutation returned one row red and refuses green; six cross-stage cases pin the generalized fix. |
+| IB2D-R05 | P2 | **Closed in `68a7045`.** | Evidence Enum-to-string mutation after report rebuild evaded an equality-only TOCTOU comparison. A type-sensitive evidence runtime fingerprint and final recheck now refuse the exact red probe (`ACCEPTED 1 True str`) with `inventory and rebuilt evidence report disagree`. |
+| IB2D-R06 | P3 | **Closed in `68a7045`.** | Row replay admitted promotion-shaped owner/mapping fields beside quarantine outcomes and a purchase value beside a missing economic operand. Bidirectional owner/mapping shape and all-present-or-quarantined economics invariants now refuse those states; the two partial-economics directions failed red because no exception was raised and both pass green. |
+| IB2D-R07 | P3 | **Closed in `68a7045`.** | Amendment-family and enum tuples lacked early cardinality guards, and the family identity count used the transaction ceiling rather than the filing ceiling. Pre-scan caps and the exact filing-count binding are pinned before duplicate-set or element-scan work. |
+| IB2D-R08 | P3 | **Closed in `68a7045`.** | Decimal validation/projection could expand an extreme exponent disproportionately and did not charge generated Decimal text. The extreme probe expanded to 1,000,001 characters and a zero text budget accepted `Decimal("1")` red; coefficient/exponent caps and both projection budgets now pass three green regressions. |
+| IB2D-R09 | P3 | **Closed test gap in `68a7045`.** | All four direct row joins—mapping/attribution, attribution/inventory, mapping/issuer, and mapping/rebuilt report—could be removed while 62 tests stayed green. Four exact mismatch cases now pin them. |
+| IB2D-R10 | P3 | **Closed test gap in `68a7045`.** | Replacing per-family membership with `bool(amended_families)` kept 62 tests green and poisoned unrelated originals. An isolation regression now kills that mutant. |
+| IB2D-R11 | P3 | **Closed coverage gap in `68a7045`.** | The intersection of an entirely empty transaction inventory and a zero-row original/Form 4/A family was unpinned. A direct probe and retained regression verify two filings, zero rows/groups, and one exact family. |
+
+### 47.6 Validation, exclusions, and access accounting
+
+Counter-review reproduction on the received tree matched Claude's focused
+figures: IB-2C **80 passed**, IB-2B plus IB-2C **181 passed**, and the named
+lane/boundary gate **1,178 passed**. Claude's exact final-tree complete result
+remains **7,378 passed, 38 skipped, 28 warnings, 0 failed**.
+
+The exact current tree (`68a7045` code plus this record) produced:
+
+- IB-2C reference-contract and counter-review checks: **84 passed**;
+- IB-2D focused file: **83 passed**;
+- IB-2A through IB-2D: **371 passed**;
+- those four stages plus hygiene/import boundaries: **390 passed**;
+- complete lane/boundary gate: **1,265 passed**;
+- complete repository suite: **7,465 passed, 38 skipped, 26 warnings, 0 failed
+  in 359.84s (0:05:59)**; and
+- whole-repository compileall exit **0**, with final diff and status checks to
+  be clean before the single push.
+
+All counter-review and IB-2D mutations were restored byte-identically before
+commit. The 83-case IB-2D file covers exact Decimal aggregation and threshold
+boundaries, grouping-key dimensions, amendment-family quarantine including
+zero-row and unrelated-family cases, upstream quarantine accumulation,
+authority/factory gates, four-stage provenance and joins, constructor/result
+replay, bounded complexity, TOCTOU mutations, process seals, and the exact
+offline/API surface. The final independent audit found no remaining material
+mutation direction and no open P0-P3 issue.
+
+All official-profile, official-amendment-link, complete-amendment-coverage,
+official-security-master, authenticated-supersession, point-in-time identity,
+ordinary-equity, deduplication, canonical-filter, lot-aggregation,
+post-aggregation-minimum, SEC/provider, outcome, QC, deployment, and trading
+authority fields remain literal `False`. Authorized and consumed outcome
+looks remain exact integer zero.
+
+Access was limited to the local repository/toolchain and Git remote refresh.
+No SEC or EDGAR endpoint, provider, credential, licensed row, real filing,
+outcome, QuantConnect job or process, broker, operator database, scheduler,
+deployment, capital, order, or trading surface was accessed. **Research
+looks: 0.**
+
+`IB2C-G01`, official amendment authentication/completeness, and all earlier
+documented lane gates remain open. The shared/out-of-lane findings
+`IBSH-CCR01..07` and earlier retained lane debts remain unchanged and were not
+fixed. IB-2D performs no authenticated amendment supersession, canonical
+filtering, authorized deduplication or aggregation, operative `$50,000` gate,
+stock scoring, ETF construction, QC work, or operational action. Full IB-2
+and IB-1 remain incomplete.
+
+### 47.7 Copyable Claude review handoff
+
+> On `codex/strategy-insider-buying`, verify the remote tip and independently
+> review every commit in
+> `6383019c49cba902876bfe9da66483cd2c07055c..HEAD`: IB-2C contract correction
+> `611dceda77e20960cb0b596b29b496f5675def6e`, bounded IB-2D implementation
+> `68a7045949999aee65d4fadbf88148d38843b2bf`, and the lane-record commit
+> containing section 47. Give every commit an explicit disposition and retain
+> the P0-P3 ledger. Reproduce the IB-2C missing-clause red/green, the new-test
+> mutation sensitivity, the three redundancy proofs, the four append-only
+> section-46 corrections, and closures of IB2C-CR03..05. For IB-2D,
+> adversarially review the exact mapping/grouping/inventory/evidence chain;
+> direct replay and type-sensitive fingerprints; mid-build/final TOCTOU
+> checks; one-row-per-mapping-row exhaustiveness; owner/security/class/date
+> grouping key; exact Decimal sum/product; post-grouping diagnostic threshold;
+> complete supplied-amendment-family quarantine including zero-row 4/A and
+> unrelated-family isolation; latest-acceptance retention; manual-mapping
+> visibility; upstream-quarantine accumulation; constructor/result replay;
+> resource bounds; canonical order; public exports; every hard-false authority
+> field; and zero look counters. Confirm that no official security master,
+> `qc_symbol_id`, authenticated supersession, canonical filter, deduplication,
+> authorized aggregation or `$50,000` gate, outcome, ETF/QC, deployment,
+> capital, broker, or trading authority was added. Fix only confirmed
+> Insider-lane defects; document shared/out-of-lane findings without changing
+> shared behavior. Do not access SEC/provider data, credentials, licensed
+> rows, outcomes, QuantConnect, QC processes, brokers, operator databases,
+> deployment, capital, or trading systems. Commit and push the review on this
+> same branch for Codex's next counter-review.

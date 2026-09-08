@@ -1022,12 +1022,16 @@ def test_authority_bearing_successor_cannot_be_directly_constructed():
         module.StockPowerSuccessor()
 
 
-@pytest.mark.parametrize("interrupt", (KeyboardInterrupt, SystemExit))
+@pytest.mark.parametrize(
+    ("interrupt", "expected_args"),
+    ((KeyboardInterrupt, ()), (SystemExit, (7,))),
+)
 def test_receipt_parent_operator_interrupt_propagates_without_restricted_frame_locals(
     tmp_path: Path,
     parents: _Parents,
     monkeypatch: pytest.MonkeyPatch,
     interrupt: type[BaseException],
+    expected_args: tuple[object, ...],
 ) -> None:
     # ARV2R19-001: an operator interrupt during receipt-parent authentication
     # must not be swallowed into a domain refusal.  It propagates as a fresh
@@ -1046,7 +1050,8 @@ def test_receipt_parent_operator_interrupt_propagates_without_restricted_frame_l
         module._authenticate_parents(
             parents.stock_contract, source.protocol, source.overlay, receipt.value
         )
-    assert captured.value.args == (7,)
+    assert type(captured.value) is interrupt
+    assert captured.value.args == expected_args
     assert captured.value.__cause__ is None
     assert captured.value.__context__ is None
     forbidden_locals = {
@@ -1059,3 +1064,202 @@ def test_receipt_parent_operator_interrupt_propagates_without_restricted_frame_l
         traceback_cursor = traceback_cursor.tb_next
     assert not hasattr(module, "require_persisted_power_calibration_receipt")
     assert not hasattr(module, "power_calibration_receipt_artifact_sha256")
+
+
+@pytest.mark.parametrize("interrupt", (KeyboardInterrupt, SystemExit))
+def test_receipt_parent_operator_interrupt_cannot_export_restricted_arguments(
+    tmp_path: Path,
+    parents: _Parents,
+    monkeypatch: pytest.MonkeyPatch,
+    interrupt: type[BaseException],
+) -> None:
+    # ARV2CR20-001: sanitizing the traceback is insufficient if an arbitrary
+    # exception argument can carry a restricted facade export to the caller.
+    restricted = receipt_module.power_calibration_receipt_artifact_sha256
+
+    def interrupt_now(_value):
+        raise interrupt(restricted)
+
+    receipt = _persisted_receipt(tmp_path, parents)
+    monkeypatch.setattr(
+        receipt_module,
+        "require_persisted_power_calibration_receipt",
+        interrupt_now,
+    )
+    source = parents.receipt_parents
+    with pytest.raises(interrupt) as captured:
+        module._authenticate_parents(
+            parents.stock_contract, source.protocol, source.overlay, receipt.value
+        )
+
+    assert type(captured.value) is interrupt
+    assert restricted not in captured.value.args
+    helper_frames = []
+    traceback_cursor = captured.value.__traceback__
+    while traceback_cursor is not None:
+        if traceback_cursor.tb_frame.f_code.co_name == "_authenticate_receipt_parent":
+            helper_frames.append(traceback_cursor.tb_frame)
+        traceback_cursor = traceback_cursor.tb_next
+    assert len(helper_frames) == 1
+    for value in helper_frames[0].f_locals.values():
+        assert value is not restricted
+        if type(value) is tuple:
+            assert restricted not in value
+
+
+def test_receipt_parent_operator_interrupt_subclass_fails_closed_without_reconstruction(
+    tmp_path: Path,
+    parents: _Parents,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # A caller-controlled subclass constructor must not run again after the
+    # restricted handler has been left.
+    class FixtureKeyboardInterrupt(KeyboardInterrupt):
+        constructions = 0
+
+        def __init__(self, value):
+            type(self).constructions += 1
+            super().__init__(value)
+
+    def interrupt_now(_value):
+        raise FixtureKeyboardInterrupt("fixture-only")
+
+    receipt = _persisted_receipt(tmp_path, parents)
+    monkeypatch.setattr(
+        receipt_module,
+        "require_persisted_power_calibration_receipt",
+        interrupt_now,
+    )
+    assert module._authenticate_receipt_parent(receipt.value) is None
+    assert FixtureKeyboardInterrupt.constructions == 1
+
+
+def test_receipt_parent_operator_interrupt_subclass_arguments_are_not_read(
+    tmp_path: Path,
+    parents: _Parents,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Reading attacker-controlled exception attributes before the restricted
+    # bindings are cleared can itself raise an unsanitized exception frame.
+    class FixtureKeyboardInterrupt(KeyboardInterrupt):
+        args_reads = 0
+
+        def __getattribute__(self, name):
+            if name == "args":
+                type(self).args_reads += 1
+                raise RuntimeError("fixture exception arguments were read")
+            return super().__getattribute__(name)
+
+    def interrupt_now(_value):
+        raise FixtureKeyboardInterrupt("fixture-only")
+
+    receipt = _persisted_receipt(tmp_path, parents)
+    monkeypatch.setattr(
+        receipt_module,
+        "require_persisted_power_calibration_receipt",
+        interrupt_now,
+    )
+    assert module._authenticate_receipt_parent(receipt.value) is None
+    assert FixtureKeyboardInterrupt.args_reads == 0
+
+
+def test_receipt_parent_system_exit_subclass_code_is_not_read(
+    tmp_path: Path,
+    parents: _Parents,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The exact-type guard must run before the SystemExit code is inspected.
+    # An isinstance-based mutation would execute this hostile accessor.
+    class FixtureSystemExit(SystemExit):
+        code_reads = 0
+
+        def __getattribute__(self, name):
+            if name == "code":
+                type(self).code_reads += 1
+                raise RuntimeError("fixture system-exit code was read")
+            return super().__getattribute__(name)
+
+    def interrupt_now(_value):
+        raise FixtureSystemExit("fixture-only")
+
+    receipt = _persisted_receipt(tmp_path, parents)
+    monkeypatch.setattr(
+        receipt_module,
+        "require_persisted_power_calibration_receipt",
+        interrupt_now,
+    )
+
+    assert module._authenticate_receipt_parent(receipt.value) is None
+    assert FixtureSystemExit.code_reads == 0
+
+
+@pytest.mark.parametrize(
+    ("code", "expected_code"),
+    ((None, None), (-7, -7), (True, 1), ("fixture-only", 1)),
+)
+def test_receipt_parent_system_exit_preserves_only_inert_exact_status(
+    tmp_path: Path,
+    parents: _Parents,
+    monkeypatch: pytest.MonkeyPatch,
+    code: object,
+    expected_code: int | None,
+) -> None:
+    def interrupt_now(_value):
+        raise SystemExit(code)
+
+    receipt = _persisted_receipt(tmp_path, parents)
+    monkeypatch.setattr(
+        receipt_module,
+        "require_persisted_power_calibration_receipt",
+        interrupt_now,
+    )
+
+    with pytest.raises(SystemExit) as captured:
+        module._authenticate_receipt_parent(receipt.value)
+
+    assert type(captured.value) is SystemExit
+    assert captured.value.code == expected_code
+    if expected_code is not None:
+        assert type(captured.value.code) is int
+
+
+def test_receipt_parent_exception_destructor_cannot_observe_restricted_bindings(
+    tmp_path: Path,
+    parents: _Parents,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The caught object is released at the end of the except suite.  Its finalizer
+    # must run only after both restricted imports have been cleared.
+    observed_helper_locals: list[frozenset[str]] = []
+
+    class FixtureKeyboardInterrupt(KeyboardInterrupt):
+        def __del__(self):
+            frame = sys._getframe(1)
+            while (
+                frame is not None
+                and frame.f_code.co_name != "_authenticate_receipt_parent"
+            ):
+                frame = frame.f_back
+            if frame is not None:
+                observed_helper_locals.append(frozenset(frame.f_locals))
+
+    def interrupt_now(_value):
+        raise FixtureKeyboardInterrupt("fixture-only")
+
+    receipt = _persisted_receipt(tmp_path, parents)
+    monkeypatch.setattr(
+        receipt_module,
+        "require_persisted_power_calibration_receipt",
+        interrupt_now,
+    )
+
+    assert module._authenticate_receipt_parent(receipt.value) is None
+    assert observed_helper_locals
+    forbidden_locals = {
+        "power_calibration_receipt_artifact_sha256",
+        "require_persisted_power_calibration_receipt",
+    }
+    assert all(
+        forbidden_locals.isdisjoint(local_names)
+        for local_names in observed_helper_locals
+    )

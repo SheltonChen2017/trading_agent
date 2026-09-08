@@ -377,14 +377,16 @@ def _validate_power_amendment(value: object) -> None:
 
 def _authenticate_receipt_parent(power_receipt: Any) -> str | None:
     """Return only the closed artifact identity; never retain/raise the facade."""
-    # Restricted Python objects remain in this synchronous frame only.  No
-    # exception may carry the frame (and therefore its locals) to a caller.
-    # Operator interrupts are the one exception that must still propagate;
-    # they are re-raised as fresh instances outside the handler, after the
-    # restricted names are unbound, so the escaping traceback carries neither
-    # the original frames nor a context and this frame holds nothing restricted.
-    interrupt: type[BaseException] | None = None
-    interrupt_args: tuple[object, ...] = ()
+    # Restricted Python objects remain in this synchronous frame only.  A fresh
+    # escaping operator interrupt necessarily acquires this helper frame in its
+    # new traceback, but neither the caught traceback nor any restricted
+    # binding/object may survive there.  Never retain a subtype or arbitrary
+    # arguments: either can carry or execute a restricted object.  Clear the
+    # imported capabilities before the caught object is released, then raise a
+    # fresh exact built-in outside the handler.  An inert exact-integer
+    # SystemExit status may be preserved.
+    operator_interrupt = 0
+    system_exit_code: int | None = 1
     try:
         from .power_calibration_receipt import (
             power_calibration_receipt_artifact_sha256,
@@ -393,16 +395,22 @@ def _authenticate_receipt_parent(power_receipt: Any) -> str | None:
 
         require_persisted_power_calibration_receipt(power_receipt)
         return power_calibration_receipt_artifact_sha256(power_receipt)
-    except (KeyboardInterrupt, SystemExit) as exc:
-        interrupt = type(exc)
-        interrupt_args = tuple(exc.args)
-    except BaseException:
-        return None
-    power_calibration_receipt_artifact_sha256 = None
-    require_persisted_power_calibration_receipt = None
-    del power_calibration_receipt_artifact_sha256
-    del require_persisted_power_calibration_receipt
-    raise interrupt(*interrupt_args)
+    except BaseException as exc:
+        if type(exc) is KeyboardInterrupt:
+            operator_interrupt = 1
+        elif type(exc) is SystemExit:
+            operator_interrupt = 2
+            if exc.code is None or type(exc.code) is int:
+                system_exit_code = exc.code
+        power_calibration_receipt_artifact_sha256 = None
+        require_persisted_power_calibration_receipt = None
+        del power_calibration_receipt_artifact_sha256
+        del require_persisted_power_calibration_receipt
+        if operator_interrupt == 0:
+            return None
+    if operator_interrupt == 1:
+        raise KeyboardInterrupt() from None
+    raise SystemExit(system_exit_code) from None
 
 
 def _authenticate_parents(

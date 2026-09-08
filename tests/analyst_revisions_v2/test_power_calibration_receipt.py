@@ -2077,6 +2077,10 @@ def test_atomic_facade_resets_an_inherited_process_lock_after_fork(
     os.name == "nt" or not hasattr(os, "fork") or not hasattr(os, "fchmod"),
     reason="POSIX exact-mode publication check",
 )
+@pytest.mark.filterwarnings(
+    "ignore:This process .* is multi-threaded, use of fork\\(\\) may lead to "
+    "deadlocks in the child.:DeprecationWarning"
+)
 def test_atomic_facade_enforces_exact_mode_despite_restrictive_umask(
     tmp_path: Path,
 ) -> None:
@@ -2196,6 +2200,10 @@ def test_receipt_authority_locks_and_registries_fail_closed_after_fork(
 
 
 @pytest.mark.skipif(not hasattr(os, "fork"), reason="POSIX process interleaving")
+@pytest.mark.filterwarnings(
+    "ignore:This process .* is multi-threaded, use of fork\\(\\) may lead to "
+    "deadlocks in the child.:DeprecationWarning"
+)
 def test_atomic_facade_cooperatively_recovers_live_foreign_pre_link_temporary(
     tmp_path: Path,
 ) -> None:
@@ -2306,6 +2314,10 @@ def test_atomic_facade_cooperatively_recovers_live_foreign_pre_link_temporary(
 
 
 @pytest.mark.skipif(not hasattr(os, "fork"), reason="POSIX process interleaving")
+@pytest.mark.filterwarnings(
+    "ignore:This process .* is multi-threaded, use of fork\\(\\) may lead to "
+    "deadlocks in the child.:DeprecationWarning"
+)
 def test_atomic_facade_resyncs_after_live_foreign_post_link_cleanup(
     tmp_path: Path,
 ) -> None:

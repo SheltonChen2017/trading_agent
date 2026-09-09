@@ -18,7 +18,18 @@ import hashlib
 import json
 from collections import Counter
 from datetime import date
-from decimal import Context, Decimal, ROUND_HALF_EVEN, localcontext
+from decimal import (
+    Context,
+    Decimal,
+    DivisionByZero,
+    InvalidOperation,
+    MAX_EMAX,
+    MIN_EMIN,
+    Overflow,
+    ROUND_HALF_EVEN,
+    Underflow,
+    localcontext,
+)
 from functools import lru_cache
 from types import MappingProxyType
 from typing import Mapping
@@ -31,6 +42,7 @@ from .run_contract import (
     QcRunContractError,
     SyntheticPartitionBinding,
     SyntheticQcRunCandidate,
+    TERMINAL_PAYOFF_REINVESTMENT_POLICY_ID,
     require_synthetic_qc_run_candidate,
 )
 
@@ -71,6 +83,7 @@ _REFUSAL_REASONS = frozenset(
         "missing_benchmark_exit_open",
         "missing_terminal_requirement",
         "missing_terminal_shareholder_payoff",
+        "missing_benchmark_valuation_open",
         "missing_security_exit_open",
     }
 )
@@ -85,6 +98,16 @@ _ROW_INVARIANT_REFUSAL_REASONS = frozenset(
 _GEOMETRY_REFUSAL_REASONS = frozenset(
     {"outside_horizon_fold_test_interval", "immature_tail"}
 )
+
+
+def _terminal_payoff_reinvestment_policy_id() -> str:
+    if (
+        type(TERMINAL_PAYOFF_REINVESTMENT_POLICY_ID) is not str
+        or TERMINAL_PAYOFF_REINVESTMENT_POLICY_ID
+        != "arv2-terminal-payoff-benchmark-splice-v1"
+    ):
+        raise EventStudyInputError("terminal-payoff reinvestment policy changed")
+    return "arv2-terminal-payoff-benchmark-splice-v1"
 
 
 def _fold_bounds(
@@ -297,6 +320,7 @@ class EventStudyObservation:
     security_entry_total_return_index_value: Decimal
     security_exit_total_return_index_value: Decimal
     benchmark_entry_total_return_index_value: Decimal
+    benchmark_valuation_total_return_index_value: Decimal
     benchmark_exit_total_return_index_value: Decimal
     terminal_payoff_used: bool
     terminal_requirement_id: str | None
@@ -313,6 +337,7 @@ class EventStudyObservation:
     security_entry_source_sha256: str
     security_exit_source_sha256: str
     benchmark_entry_source_sha256: str
+    benchmark_valuation_source_sha256: str
     benchmark_exit_source_sha256: str
     security_total_return_series_id: str
     benchmark_total_return_series_id: str
@@ -343,6 +368,7 @@ class EventStudyBatch:
     security_lifecycle_coverages: tuple[SecurityLifecycleCoverage, ...]
     expected_decision_horizons: int
     candidate_declaration_hash: str
+    terminal_payoff_reinvestment_policy_id: str
     input_partition_set_sha256: str
     batch_hash: str
 
@@ -354,6 +380,9 @@ class EventStudyBatch:
         return MappingProxyType(
             {
                 "candidate_declaration_hash": self.candidate_declaration_hash,
+                "terminal_payoff_reinvestment_policy_id": (
+                    self.terminal_payoff_reinvestment_policy_id
+                ),
                 "input_partition_set_sha256": self.input_partition_set_sha256,
                 "batch_hash": self.batch_hash,
                 "expected_decision_horizons": self.expected_decision_horizons,
@@ -967,16 +996,90 @@ def _refusal(decision: DecisionRow, horizon: int, reason: str) -> EventStudyRefu
 
 def _returns(
     *, entry_security: Decimal, exit_security: Decimal,
-    entry_benchmark: Decimal, exit_benchmark: Decimal,
+    entry_benchmark: Decimal, valuation_benchmark: Decimal,
+    exit_benchmark: Decimal,
 ) -> tuple[Decimal, Decimal, Decimal]:
     # Construct, rather than copy, the arithmetic context on every call so
     # neither caller state nor a mutable module-global Context can alter math.
     context = _fresh_arithmetic_context()
-    with localcontext(context):
-        security_return = +(exit_security / entry_security - Decimal(1))
-        benchmark_return = +(exit_benchmark / entry_benchmark - Decimal(1))
-        excess_return = +(security_return - benchmark_return)
+    try:
+        with localcontext(context):
+            # Final cash, bankruptcy, and delisting payoffs are continued in
+            # the matching SPY total-return index from their valuation session
+            # to the scheduled horizon. For ordinary and successor-valued
+            # observations, valuation_benchmark == exit_benchmark and the
+            # continuation factor is exactly one.
+            security_return = +(
+                (exit_security / entry_security)
+                * (exit_benchmark / valuation_benchmark)
+                - Decimal(1)
+            )
+            benchmark_return = +(exit_benchmark / entry_benchmark - Decimal(1))
+            if _exact_decimal_products_equal(
+                exit_security,
+                entry_benchmark,
+                entry_security,
+                valuation_benchmark,
+            ):
+                # The security and benchmark gross wealth ratios are
+                # algebraically identical. Pin the two rounded results to the
+                # same value so separately rounded division paths cannot
+                # manufacture a one-ulp abnormal return.
+                security_return = benchmark_return
+            excess_return = +(security_return - benchmark_return)
+    except (DivisionByZero, InvalidOperation, Overflow, Underflow) as exc:
+        raise EventStudyInputError(
+            "return arithmetic exceeded the frozen domain"
+        ) from exc
     return security_return, benchmark_return, excess_return
+
+
+def _exact_decimal_products_equal(
+    left_first: Decimal,
+    left_second: Decimal,
+    right_first: Decimal,
+    right_second: Decimal,
+) -> bool:
+    """Compare two finite Decimal products without scaling large exponents."""
+
+    def exact_product_parts(first: Decimal, second: Decimal) -> tuple:
+        first_parts = first.as_tuple()
+        second_parts = second.as_tuple()
+        if not any(first_parts.digits) or not any(second_parts.digits):
+            return (0, (0,), 0)
+        precision = max(
+            1,
+            len(first_parts.digits) + len(second_parts.digits),
+        )
+        coefficient_context = Context(
+            prec=precision,
+            rounding=ROUND_HALF_EVEN,
+            Emin=MIN_EMIN,
+            Emax=MAX_EMAX,
+            capitals=1,
+            clamp=0,
+            flags=[],
+            traps=[DivisionByZero, InvalidOperation, Overflow, Underflow],
+        )
+        coefficient = coefficient_context.multiply(
+            Decimal((first_parts.sign, first_parts.digits, 0)),
+            Decimal((second_parts.sign, second_parts.digits, 0)),
+        )
+        coefficient_parts = coefficient.as_tuple()
+        digits = list(coefficient_parts.digits)
+        exponent = (
+            first_parts.exponent
+            + second_parts.exponent
+            + coefficient_parts.exponent
+        )
+        while len(digits) > 1 and digits[-1] == 0:
+            digits.pop()
+            exponent += 1
+        return (coefficient_parts.sign, tuple(digits), exponent)
+
+    return exact_product_parts(left_first, left_second) == exact_product_parts(
+        right_first, right_second
+    )
 
 
 def _fresh_arithmetic_context() -> Context:
@@ -988,12 +1091,13 @@ def _fresh_arithmetic_context() -> Context:
         capitals=1,
         clamp=0,
         flags=[],
-        traps=[],
+        traps=[DivisionByZero, InvalidOperation, Overflow, Underflow],
     )
 
 
 def _batch_hash(
-    *, candidate_hash: str, partition_set_sha256: str,
+    *, candidate_hash: str, terminal_payoff_reinvestment_policy_id: str,
+    partition_set_sha256: str,
     observations: tuple[EventStudyObservation, ...],
     refusals: tuple[EventStudyRefusal, ...],
     security_lifecycle_coverages: tuple[SecurityLifecycleCoverage, ...],
@@ -1001,6 +1105,9 @@ def _batch_hash(
 ) -> str:
     document = {
         "candidate_declaration_hash": candidate_hash,
+        "terminal_payoff_reinvestment_policy_id": (
+            terminal_payoff_reinvestment_policy_id
+        ),
         "input_partition_set_sha256": partition_set_sha256,
         "expected_decision_horizons": expected,
         "observations": observations,
@@ -1094,6 +1201,10 @@ def _validate_observation(value: EventStudyObservation) -> None:
         "observation benchmark entry total-return index value",
     )
     _require_positive_decimal(
+        value.benchmark_valuation_total_return_index_value,
+        "observation benchmark valuation total-return index value",
+    )
+    _require_positive_decimal(
         value.benchmark_exit_total_return_index_value,
         "observation benchmark exit total-return index value",
     )
@@ -1101,6 +1212,7 @@ def _validate_observation(value: EventStudyObservation) -> None:
         entry_security=value.security_entry_total_return_index_value,
         exit_security=value.security_exit_total_return_index_value,
         entry_benchmark=value.benchmark_entry_total_return_index_value,
+        valuation_benchmark=value.benchmark_valuation_total_return_index_value,
         exit_benchmark=value.benchmark_exit_total_return_index_value,
     )
     if expected_returns != (
@@ -1116,11 +1228,19 @@ def _validate_observation(value: EventStudyObservation) -> None:
         and value.security_total_return == Decimal("-1")
     ):
         raise EventStudyInputError("security total return violates payoff bounds")
+    if (
+        value.security_total_return == Decimal("-1")
+        and value.security_exit_total_return_index_value != 0
+    ):
+        raise EventStudyInputError(
+            "positive security value rounded to a total-loss return"
+        )
     for name in (
         "decision_input_sha256",
         "security_entry_source_sha256",
         "security_exit_source_sha256",
         "benchmark_entry_source_sha256",
+        "benchmark_valuation_source_sha256",
         "benchmark_exit_source_sha256",
     ):
         _require_sha256(getattr(value, name), f"observation {name}")
@@ -1128,6 +1248,15 @@ def _validate_observation(value: EventStudyObservation) -> None:
         raise EventStudyInputError("observation benchmark series identity changed")
     if value.total_return_value_basis != SYNTHETIC_TOTAL_RETURN_VALUE_BASIS:
         raise EventStudyInputError("observation return value basis changed")
+    if value.valuation_session == value.exit_session and (
+        value.benchmark_valuation_total_return_index_value
+        != value.benchmark_exit_total_return_index_value
+        or value.benchmark_valuation_source_sha256
+        != value.benchmark_exit_source_sha256
+    ):
+        raise EventStudyInputError(
+            "same-session benchmark valuation and exit facts differ"
+        )
     if not value.terminal_payoff_used:
         if any(
             item is not None
@@ -1281,6 +1410,13 @@ def require_synthetic_event_study_batch(batch: EventStudyBatch) -> EventStudyBat
         raise EventStudyInputError("event-study refusals changed type")
     if type(batch.security_lifecycle_coverages) is not tuple:
         raise EventStudyInputError("security lifecycle coverages changed type")
+    expected_terminal_policy_id = _terminal_payoff_reinvestment_policy_id()
+    if (
+        type(batch.terminal_payoff_reinvestment_policy_id) is not str
+        or batch.terminal_payoff_reinvestment_policy_id
+        != expected_terminal_policy_id
+    ):
+        raise EventStudyInputError("terminal-payoff reinvestment policy changed")
     for item in batch.observations:
         _validate_observation(item)
     for item in batch.refusals:
@@ -1356,6 +1492,7 @@ def require_synthetic_event_study_batch(batch: EventStudyBatch) -> EventStudyBat
     terminal_refusal_reasons = {
         "missing_terminal_requirement",
         "missing_terminal_shareholder_payoff",
+        "missing_benchmark_valuation_open",
     }
     pre_terminal_gate_refusal_reasons = (
         _GEOMETRY_REFUSAL_REASONS
@@ -1451,6 +1588,13 @@ def require_synthetic_event_study_batch(batch: EventStudyBatch) -> EventStudyBat
                             "stock-merger payoff traverses a terminal successor"
                         )
                 continue
+            if (
+                item.reason == "missing_benchmark_valuation_open"
+                and lifecycle.event_kind in {"stock_merger", "mixed_merger"}
+            ):
+                raise EventStudyInputError(
+                    "successor-valued merger cannot lack a terminal benchmark valuation"
+                )
             if item.reason not in (
                 pre_terminal_gate_refusal_reasons | terminal_refusal_reasons
             ):
@@ -1495,6 +1639,7 @@ def require_synthetic_event_study_batch(batch: EventStudyBatch) -> EventStudyBat
                 in {
                     "missing_terminal_requirement",
                     "missing_terminal_shareholder_payoff",
+                    "missing_benchmark_valuation_open",
                 }
             )
             if is_terminal_path:
@@ -1779,9 +1924,11 @@ def require_synthetic_event_study_batch(batch: EventStudyBatch) -> EventStudyBat
             terminal_lineage = lineage
             if item.terminal_event_kind not in {"stock_merger", "mixed_merger"}:
                 payoff_identity = (
-                    item.security_total_return,
+                    item.security_exit_total_return_index_value,
                     item.security_exit_source_sha256,
                     item.valuation_session,
+                    item.benchmark_valuation_total_return_index_value,
+                    item.benchmark_valuation_source_sha256,
                     item.valuation_security_id,
                     item.exit_listing_id,
                     item.exit_historical_ticker,
@@ -1837,6 +1984,11 @@ def require_synthetic_event_study_batch(batch: EventStudyBatch) -> EventStudyBat
                 item.benchmark_entry_source_sha256,
             ),
             (
+                item.valuation_session,
+                item.benchmark_valuation_total_return_index_value,
+                item.benchmark_valuation_source_sha256,
+            ),
+            (
                 item.exit_session,
                 item.benchmark_exit_total_return_index_value,
                 item.benchmark_exit_source_sha256,
@@ -1850,42 +2002,63 @@ def require_synthetic_event_study_batch(batch: EventStudyBatch) -> EventStudyBat
                 )
     benchmark_entry_proof_reasons = {
         "missing_benchmark_exit_open",
+        "missing_benchmark_valuation_open",
         "missing_terminal_requirement",
         "missing_terminal_shareholder_payoff",
         "missing_security_exit_open",
     }
     benchmark_exit_proof_reasons = {
+        "missing_benchmark_valuation_open",
         "missing_terminal_requirement",
         "missing_terminal_shareholder_payoff",
         "missing_security_exit_open",
     }
-    observed_sessions = {item.decision_session for item in batch.observations}
-    observed_sessions.update(
-        item.decision_session
-        for item in batch.refusals
-        if item.reason in benchmark_entry_proof_reasons
-    )
-    observed_horizons = set(benchmark_identities)
-    observed_horizons.update(
-        (item.decision_session, item.horizon_sessions)
-        for item in batch.refusals
-        if item.reason in benchmark_exit_proof_reasons
-    )
+    benchmark_availability_proof_sessions = {
+        session
+        for item in batch.observations
+        for session in (
+            item.decision_session,
+            item.valuation_session,
+            item.exit_session,
+        )
+    }
+    for item in batch.refusals:
+        if item.reason in benchmark_entry_proof_reasons:
+            benchmark_availability_proof_sessions.add(item.decision_session)
+        if item.reason in benchmark_exit_proof_reasons:
+            benchmark_availability_proof_sessions.add(
+                reviewed_axis[
+                    reviewed_index[item.decision_session]
+                    + item.horizon_sessions
+                ]
+            )
     for item in batch.refusals:
         if (
             item.reason == "missing_benchmark_entry_open"
-            and item.decision_session in observed_sessions
+            and item.decision_session in benchmark_availability_proof_sessions
         ):
             raise EventStudyInputError(
                 "benchmark entry availability changed across security rows"
             )
-        if (
-            item.reason == "missing_benchmark_exit_open"
-            and (item.decision_session, item.horizon_sessions) in observed_horizons
-        ):
-            raise EventStudyInputError(
-                "benchmark exit availability changed across security rows"
-            )
+        if item.reason == "missing_benchmark_exit_open":
+            exit_session = reviewed_axis[
+                reviewed_index[item.decision_session] + item.horizon_sessions
+            ]
+            if (
+                exit_session in benchmark_availability_proof_sessions
+            ):
+                raise EventStudyInputError(
+                    "benchmark exit availability changed across security rows"
+                )
+        if item.reason == "missing_benchmark_valuation_open":
+            lifecycle = lifecycle_by_security[item.security_id]
+            if (
+                lifecycle.terminal_session
+                in benchmark_availability_proof_sessions
+            ):
+                raise EventStudyInputError(
+                    "benchmark valuation availability changed across security rows"
+                )
 
     component_outputs: dict[
         str, list[EventStudyObservation | EventStudyRefusal]
@@ -1921,6 +2094,9 @@ def require_synthetic_event_study_batch(batch: EventStudyBatch) -> EventStudyBat
     _require_sha256(batch.batch_hash, "batch_hash")
     expected_hash = _batch_hash(
         candidate_hash=batch.candidate_declaration_hash,
+        terminal_payoff_reinvestment_policy_id=(
+            batch.terminal_payoff_reinvestment_policy_id
+        ),
         partition_set_sha256=batch.input_partition_set_sha256,
         observations=batch.observations,
         refusals=batch.refusals,
@@ -1956,6 +2132,7 @@ def collect_synthetic_event_study(
         require_synthetic_qc_run_candidate(run_candidate)
     except QcRunContractError as exc:
         raise EventStudyInputError("run candidate is not authenticated") from exc
+    terminal_policy_id = _terminal_payoff_reinvestment_policy_id()
     inputs = (
         (session_axis, "session_axis"),
         (decisions, "decisions"),
@@ -2343,6 +2520,7 @@ def collect_synthetic_event_study(
             successor_historical_ticker = None
             valuation_session = exit_session
             valuation_security_id = decision.security_id
+            valuation_benchmark = exit_benchmark
             if lifecycle is not None and (
                 session_index[lifecycle.terminal_session] <= exit_index
             ):
@@ -2388,6 +2566,17 @@ def collect_synthetic_event_study(
                 successor_historical_ticker = (
                     requirement.successor_historical_ticker
                 )
+                if requirement.event_kind not in {"stock_merger", "mixed_merger"}:
+                    valuation_benchmark = benchmark_by_session.get(valuation_session)
+                    if valuation_benchmark is None:
+                        refusals.append(
+                            _refusal(
+                                decision,
+                                horizon,
+                                "missing_benchmark_valuation_open",
+                            )
+                        )
+                        continue
             else:
                 exit_security = security_by_key.get((decision.security_id, exit_session))
                 if exit_security is None:
@@ -2412,6 +2601,9 @@ def collect_synthetic_event_study(
                 entry_security=entry_security.total_return_open_value,
                 exit_security=exit_security_value,
                 entry_benchmark=entry_benchmark.total_return_open_value,
+                valuation_benchmark=(
+                    valuation_benchmark.total_return_open_value
+                ),
                 exit_benchmark=exit_benchmark.total_return_open_value,
             )
             observations.append(
@@ -2440,6 +2632,9 @@ def collect_synthetic_event_study(
                     benchmark_entry_total_return_index_value=(
                         entry_benchmark.total_return_open_value
                     ),
+                    benchmark_valuation_total_return_index_value=(
+                        valuation_benchmark.total_return_open_value
+                    ),
                     benchmark_exit_total_return_index_value=(
                         exit_benchmark.total_return_open_value
                     ),
@@ -2458,6 +2653,9 @@ def collect_synthetic_event_study(
                     security_entry_source_sha256=entry_security.source_sha256,
                     security_exit_source_sha256=exit_source_sha256,
                     benchmark_entry_source_sha256=entry_benchmark.source_sha256,
+                    benchmark_valuation_source_sha256=(
+                        valuation_benchmark.source_sha256
+                    ),
                     benchmark_exit_source_sha256=exit_benchmark.source_sha256,
                     security_total_return_series_id=(
                         entry_security.total_return_series_id
@@ -2477,6 +2675,7 @@ def collect_synthetic_event_study(
     frozen_security_lifecycle_coverages = tuple(security_lifecycle_coverages)
     batch_hash = _batch_hash(
         candidate_hash=run_candidate.candidate_hash,
+        terminal_payoff_reinvestment_policy_id=terminal_policy_id,
         partition_set_sha256=partition_set_sha256,
         observations=frozen_observations,
         refusals=frozen_refusals,
@@ -2489,6 +2688,7 @@ def collect_synthetic_event_study(
         security_lifecycle_coverages=frozen_security_lifecycle_coverages,
         expected_decision_horizons=expected,
         candidate_declaration_hash=run_candidate.candidate_hash,
+        terminal_payoff_reinvestment_policy_id=terminal_policy_id,
         input_partition_set_sha256=partition_set_sha256,
         batch_hash=batch_hash,
     )

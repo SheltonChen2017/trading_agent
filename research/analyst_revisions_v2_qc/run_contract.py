@@ -22,15 +22,18 @@ class QcRunContractError(ValueError):
     """A structural QC run candidate is malformed or falsely authoritative."""
 
 
-SCHEMA = "arv2-qc-stock-event-study-run-candidate-v1"
+SCHEMA = "arv2-qc-stock-event-study-run-candidate-v2"
 STATUS = "synthetic_fixture_only_pending_independent_review_and_production_bindings"
 AUTHORITY = "structure_only_no_source_outcome_qc_result_deployment_or_trading_authority"
 EVALUATION_ID = "arv2-eval-stock-historical-qc-001"
-ALGORITHM_ID = "arv2-qc-stock-event-study-core-v1"
+ALGORITHM_ID = "arv2-qc-stock-event-study-core-v2"
 CORE_RELATIVE_PATH = "research/analyst_revisions_v2_qc/event_study.py"
 CORE_UPLOAD_NAME = "event_study.py"
 HORIZONS = (1, 5, 20, 60)
 PRIMARY_HORIZON = 20
+TERMINAL_PAYOFF_REINVESTMENT_POLICY_ID = (
+    "arv2-terminal-payoff-benchmark-splice-v1"
+)
 
 _HEX_40 = re.compile(r"[0-9a-f]{40}\Z")
 _HEX_64 = re.compile(r"[0-9a-f]{64}\Z")
@@ -187,6 +190,27 @@ def _require_static_contract() -> tuple[
 ]:
     """Refuse mutation of exported frozen records; return fresh literal values."""
 
+    scalar_identities = (
+        (SCHEMA, "arv2-qc-stock-event-study-run-candidate-v2"),
+        (
+            STATUS,
+            "synthetic_fixture_only_pending_independent_review_and_production_bindings",
+        ),
+        (
+            AUTHORITY,
+            "structure_only_no_source_outcome_qc_result_deployment_or_"
+            "trading_authority",
+        ),
+        (EVALUATION_ID, "arv2-eval-stock-historical-qc-001"),
+        (ALGORITHM_ID, "arv2-qc-stock-event-study-core-v2"),
+        (CORE_RELATIVE_PATH, "research/analyst_revisions_v2_qc/event_study.py"),
+        (CORE_UPLOAD_NAME, "event_study.py"),
+    )
+    if any(
+        type(actual) is not str or actual != expected
+        for actual, expected in scalar_identities
+    ):
+        raise QcRunContractError("static run-contract identity changed")
     if (
         type(HORIZONS) is not tuple
         or HORIZONS != (1, 5, 20, 60)
@@ -195,6 +219,12 @@ def _require_static_contract() -> tuple[
         or PRIMARY_HORIZON != 20
     ):
         raise QcRunContractError("reviewed horizon contract changed")
+    if (
+        type(TERMINAL_PAYOFF_REINVESTMENT_POLICY_ID) is not str
+        or TERMINAL_PAYOFF_REINVESTMENT_POLICY_ID
+        != "arv2-terminal-payoff-benchmark-splice-v1"
+    ):
+        raise QcRunContractError("terminal-payoff reinvestment policy changed")
 
     expected_parents = _expected_parent_artifacts()
     if type(PARENT_ARTIFACTS) is not tuple or len(PARENT_ARTIFACTS) != len(
@@ -473,6 +503,21 @@ def _candidate_document(
             ),
             "terminal_payoff_source_required_when_inventory_marks_terminal": True,
             "qc_delisting_price_is_terminal_shareholder_payoff": False,
+            "terminal_payoff_reinvestment": {
+                "policy_id": TERMINAL_PAYOFF_REINVESTMENT_POLICY_ID,
+                "applies_to": ["bankruptcy", "cash_merger", "delisting"],
+                "reinvestment_session": (
+                    "terminal_valuation_session_open_with_proven_economic_availability"
+                ),
+                "horizon_security_value": (
+                    "terminal_payoff_times_spy_horizon_open_divided_by_"
+                    "spy_reinvestment_open"
+                ),
+                "post_terminal_abnormal_exposure": "zero",
+                "scheduled_horizon_is_preserved": True,
+                "stock_and_mixed_mergers_follow_successor_to_horizon": True,
+                "terminal_date_alone_proves_economic_availability": False,
+            },
             "row_or_named_refusal_for_every_decision_horizon": True,
         },
         "result_policy": {
@@ -576,6 +621,10 @@ def build_synthetic_qc_run_candidate(
 ) -> SyntheticQcRunCandidate:
     """Identify a caller-declared fixture candidate without reading any bytes."""
 
+    # Authenticate exported identities before any caller-owned binding is
+    # compared with them. The exact-type checks in this preflight refuse a
+    # hostile ``str`` subclass without dispatching its comparison methods.
+    _require_static_contract()
     if type(code_files) is not tuple or not code_files:
         raise QcRunContractError("code_files must be a nonempty tuple")
     if type(synthetic_partitions) is not tuple or not synthetic_partitions:

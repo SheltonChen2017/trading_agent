@@ -24,6 +24,11 @@ from .artifact_io import (
     read_stable_regular as _read_artifact_stable_regular,
     revalidate_regular as _revalidate_artifact_regular,
 )
+from .canonical import (
+    FrozenContainerAuthority,
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 from .four_family_multiplicity import (
     OVERLAY_ARTIFACT_SHA256,
     FourFamilyMultiplicityError,
@@ -722,17 +727,14 @@ def _container_roots(value: StockPowerSuccessor) -> tuple[object, ...]:
 
 
 def _container_roots_are_current(
-    value: StockPowerSuccessor, expected_roots: tuple[object, ...]
+    value: StockPowerSuccessor, authority: FrozenContainerAuthority
 ) -> bool:
-    return len(_STOCK_POWER_SUCCESSOR_CONTAINER_FIELDS) == len(
-        expected_roots
-    ) and all(
-        getattr(value, name, None) is expected
-        for name, expected in zip(
-            _STOCK_POWER_SUCCESSOR_CONTAINER_FIELDS,
-            expected_roots,
-            strict=True,
-        )
+    return frozen_container_authority_is_current(
+        (
+            getattr(value, name, None)
+            for name in _STOCK_POWER_SUCCESSOR_CONTAINER_FIELDS
+        ),
+        authority,
     )
 
 
@@ -878,7 +880,9 @@ def load_stock_power_successor(
         "_authority": _LOADED_STOCK_POWER_SUCCESSOR_AUTHORITY,
     }.items():
         object.__setattr__(value, name, item)
-    container_roots = _container_roots(value)
+    container_authority = capture_frozen_container_authority(
+        _container_roots(value)
+    )
     fingerprint = _successor_fingerprint(value)
     key = id(value)
     reference = weakref.ref(
@@ -895,7 +899,7 @@ def load_stock_power_successor(
             power_receipt,
             before,
             fingerprint,
-            container_roots,
+            container_authority,
         )
     return value
 
@@ -920,7 +924,13 @@ def require_loaded_stock_power_successor(
         raise StockPowerSuccessorError(
             "stock power successor container roots changed after authentication"
         )
-    if _successor_fingerprint(successor) != record[8]:
+    try:
+        current_fingerprint = _successor_fingerprint(successor)
+    except AttributeError as exc:
+        raise StockPowerSuccessorError(
+            "stock power successor changed after authentication"
+        ) from exc
+    if current_fingerprint != record[8]:
         raise StockPowerSuccessorError(
             "stock power successor changed after authentication"
         )

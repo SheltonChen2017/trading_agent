@@ -452,6 +452,34 @@ def test_review_authority_rejects_equal_composite_root_replacements(
         require_reviewed_preregistration(spec)
 
 
+@pytest.mark.parametrize("field", ("cells", "looks"))
+def test_deleted_review_authority_composite_root_is_a_domain_refusal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    object.__delattr__(spec, field)
+
+    with pytest.raises(PreregistrationError, match="composite root changed"):
+        require_reviewed_preregistration(spec)
+
+
+def test_each_deleted_cell_value_root_is_a_domain_refusal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+
+    for cell in spec.cells:
+        original = cell.value
+        object.__delattr__(cell, "value")
+        with pytest.raises(PreregistrationError, match="cell value root changed"):
+            require_reviewed_preregistration(spec)
+        object.__setattr__(cell, "value", original)
+
+    assert require_reviewed_preregistration(spec) is spec
+
+
 def test_review_authority_refuses_hostile_cell_proxy_before_its_code_runs(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -485,6 +513,53 @@ def test_review_authority_refuses_hostile_cell_proxy_before_its_code_runs(
     object.__setattr__(cell, "value", replacement)
 
     with pytest.raises(PreregistrationError, match="cell value root changed"):
+        require_reviewed_preregistration(spec)
+    assert calls == []
+
+
+def test_review_authority_refuses_nested_mapping_replacement_before_hostile_code_runs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    topology = next(
+        cell.value for cell in spec.cells if cell.cell_id == "stock_topology"
+    )
+    nested_cell = topology["cells"][0]
+    calls: list[str] = []
+
+    class BackingDictLeak:
+        value: object | None = None
+
+        def __eq__(self, other: object) -> bool:
+            self.value = other
+            return False
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(("forged",))
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return 1
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return True
+
+        def items(self):
+            calls.append("items")
+            return (("forged", True),)
+
+    leak = BackingDictLeak()
+    assert (nested_cell == leak) is False
+    assert type(leak.value) is dict
+    leak.value["signal"] = MappingProxyType(SplitView())
+
+    with pytest.raises(
+        PreregistrationError, match="descendant container changed"
+    ):
         require_reviewed_preregistration(spec)
     assert calls == []
 
@@ -533,6 +608,63 @@ def test_equality_spoofed_nested_scalar_cannot_bypass_review_authority(
 
     with pytest.raises(PreregistrationError, match="noncanonical state"):
         require_reviewed_preregistration(spec)
+
+
+def test_deleted_nested_scalar_fingerprint_field_is_a_domain_refusal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    cell = spec.cells[0]
+    original = cell.source
+    object.__delattr__(cell, "source")
+    with pytest.raises(PreregistrationError, match="changed after spec verification"):
+        require_reviewed_preregistration(spec)
+    object.__setattr__(cell, "source", original)
+    assert require_reviewed_preregistration(spec) is spec
+
+
+def test_hostile_containers_in_review_scalars_refuse_before_traversal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class HostileScalar(Mapping[str, object]):
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def __getitem__(self, _key: str) -> object:
+            self.calls.append("getitem")
+            return "forged"
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(())
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return 0
+
+        def items(self):
+            self.calls.append("items")
+            return ().__iter__()
+
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    cases = (
+        (spec, "spec_id"),
+        (spec.cells[0], "source"),
+        (spec.looks[0], "look_id"),
+    )
+    for owner, field in cases:
+        original = getattr(owner, field)
+        hostile = HostileScalar()
+        object.__setattr__(owner, field, MappingProxyType(hostile))
+        try:
+            with pytest.raises(PreregistrationError, match="noncanonical state"):
+                require_reviewed_preregistration(spec)
+            assert hostile.calls == []
+        finally:
+            object.__setattr__(owner, field, original)
+        assert require_reviewed_preregistration(spec) is spec
 
 
 def test_hostile_nested_record_subclass_refuses_before_attribute_access(

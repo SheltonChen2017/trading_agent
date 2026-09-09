@@ -832,6 +832,27 @@ def test_dataclasses_replace_and_type_spoof_cannot_authenticate(overlay):
         require_loaded_four_family_multiplicity_overlay(overlay)
 
 
+def test_deleted_overlay_scalar_fingerprint_field_is_a_domain_refusal(overlay):
+    original = overlay.overlay_id
+    object.__delattr__(overlay, "overlay_id")
+    with pytest.raises(FourFamilyMultiplicityError, match="changed after loading"):
+        require_loaded_four_family_multiplicity_overlay(overlay)
+    object.__setattr__(overlay, "overlay_id", original)
+    assert require_loaded_four_family_multiplicity_overlay(overlay) is overlay
+
+
+@pytest.mark.parametrize("failure_type", (KeyboardInterrupt, SystemExit, RuntimeError))
+def test_non_attribute_fingerprint_failures_propagate(
+    overlay, monkeypatch, failure_type
+):
+    def fail(_overlay):
+        raise failure_type("sentinel fingerprint failure")
+
+    monkeypatch.setattr(module, "_overlay_fingerprint", fail)
+    with pytest.raises(failure_type, match="sentinel fingerprint failure"):
+        require_loaded_four_family_multiplicity_overlay(overlay)
+
+
 @pytest.mark.parametrize(
     "field,replacement",
     (
@@ -905,6 +926,51 @@ def test_hostile_split_view_definition_is_rejected_before_traversal(overlay):
     split_view.calls.clear()
 
     object.__setattr__(overlay, "definition", replacement)
+    with pytest.raises(FourFamilyMultiplicityError, match="container root changed"):
+        require_loaded_four_family_multiplicity_overlay(overlay)
+    assert split_view.calls == []
+
+
+def test_nested_split_view_in_disclosed_backing_refuses_before_traversal(overlay):
+    class BackingDictLeak:
+        def __init__(self) -> None:
+            self.value: object | None = None
+
+        def __eq__(self, other: object) -> bool:
+            self.value = other
+            return False
+
+    class SplitView(Mapping[str, object]):
+        def __init__(self, original: Mapping[str, object]) -> None:
+            self.original = original
+            self.calls: list[object] = []
+
+        def __getitem__(self, key: str) -> object:
+            self.calls.append(("getitem", key))
+            return True if key == "orders" else self.original[key]
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(self.original)
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return len(self.original)
+
+        def items(self):
+            self.calls.append("items")
+            return self.original.items()
+
+    root = overlay.definition
+    original = root["capabilities"]
+    assert type(original) is MappingProxyType
+    assert original["orders"] is False
+    leak = BackingDictLeak()
+    assert (root == leak) is False
+    assert type(leak.value) is dict
+    split_view = SplitView(original)
+    leak.value["capabilities"] = MappingProxyType(split_view)
+
     with pytest.raises(FourFamilyMultiplicityError, match="container root changed"):
         require_loaded_four_family_multiplicity_overlay(overlay)
     assert split_view.calls == []

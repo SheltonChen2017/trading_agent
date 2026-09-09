@@ -33,6 +33,11 @@ from .artifact_io import (
     read_stable_regular as _read_artifact_stable_regular,
     revalidate_regular as _revalidate_artifact_regular,
 )
+from .canonical import (
+    FrozenContainerAuthority,
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 
 from data.exchange_calendar import (
     ExchangeCalendarError,
@@ -820,7 +825,7 @@ _POWER_CALIBRATION_PROTOCOL_AUTHORITIES: dict[
         bytes,
         GlobalBenchmarkContract,
         tuple[object, ...],
-        tuple[object, ...],
+        FrozenContainerAuthority,
     ],
 ] = {}
 _POWER_CALIBRATION_PROTOCOL_AUTHORITIES_LOCK = threading.RLock()
@@ -954,7 +959,7 @@ def load_power_calibration_protocol(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _protocol_fingerprint(value)
-    container_roots = tuple(
+    container_authority = capture_frozen_container_authority(
         getattr(value, name) for name in _POWER_CALIBRATION_PROTOCOL_CONTAINER_FIELDS
     )
     identity = id(value)
@@ -966,7 +971,7 @@ def load_power_calibration_protocol(
             payload,
             parent,
             fingerprint,
-            container_roots,
+            container_authority,
         )
     return value
 
@@ -989,18 +994,21 @@ def require_loaded_power_calibration_protocol(
         raise PowerCalibrationProtocolError(
             "power protocol loader authority is absent"
         )
-    if any(
-        getattr(protocol, name, None) is not root
-        for name, root in zip(
-            _POWER_CALIBRATION_PROTOCOL_CONTAINER_FIELDS,
-            authority[5],
-            strict=True,
-        )
-    ):
+    current_roots = tuple(
+        getattr(protocol, name, None)
+        for name in _POWER_CALIBRATION_PROTOCOL_CONTAINER_FIELDS
+    )
+    if not frozen_container_authority_is_current(current_roots, authority[5]):
         raise PowerCalibrationProtocolError(
             "power protocol container root changed after authentication"
         )
-    if _protocol_fingerprint(protocol) != authority[4]:
+    try:
+        current_fingerprint = _protocol_fingerprint(protocol)
+    except AttributeError as exc:
+        raise PowerCalibrationProtocolError(
+            "power protocol changed after authentication"
+        ) from exc
+    if current_fingerprint != authority[4]:
         raise PowerCalibrationProtocolError(
             "power protocol changed after authentication"
         )

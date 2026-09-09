@@ -37,6 +37,10 @@ from .artifact_io import (
     read_stable_regular as _read_artifact_stable_regular,
     revalidate_regular as _revalidate_artifact_regular,
 )
+from .canonical import (
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 
 
 class PostPandemicEvaluationPlanError(ValueError):
@@ -1088,12 +1092,19 @@ class PostPandemicEvaluationPlan:
 
 
 def _plan_fingerprint(plan: PostPandemicEvaluationPlan) -> tuple[object, ...]:
+    scalar_values = (
+        plan.schema,
+        plan.status,
+        plan.authority,
+        plan.plan_id,
+        plan.plan_hash,
+    )
+    if any(type(item) is not str for item in scalar_values):
+        raise PostPandemicEvaluationPlanError(
+            "post-pandemic plan authority state is noncanonical"
+        )
     return (
-        _fingerprint_value(plan.schema),
-        _fingerprint_value(plan.status),
-        _fingerprint_value(plan.authority),
-        _fingerprint_value(plan.plan_id),
-        _fingerprint_value(plan.plan_hash),
+        *(_fingerprint_value(item) for item in scalar_values),
         _fingerprint_value(plan.parent_fold_manifest),
         _fingerprint_value(plan.parent_lineages),
         _fingerprint_value(plan.naming_contract),
@@ -1202,7 +1213,7 @@ def _loaded_plan(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _plan_fingerprint(value)
-    frozen_field_roots = tuple(
+    frozen_container_authority = capture_frozen_container_authority(
         fields[name] for name in _PLAN_FROZEN_FIELD_NAMES
     )
     identity = id(value)
@@ -1222,7 +1233,7 @@ def _loaded_plan(
             stock_evaluation_payload,
             qc_first_plan_payload,
             fingerprint,
-            frozen_field_roots,
+            frozen_container_authority,
         )
     return value
 
@@ -1256,18 +1267,23 @@ def require_loaded_post_pandemic_evaluation_plan(
         stock_payload,
         qc_payload,
         fingerprint,
-        frozen_field_roots,
+        frozen_container_authority,
     ) = authority
-    if any(
-        getattr(plan, name, None) is not expected
-        for name, expected in zip(
-            _PLAN_FROZEN_FIELD_NAMES, frozen_field_roots, strict=True
-        )
+    if not frozen_container_authority_is_current(
+        (getattr(plan, name, None) for name in _PLAN_FROZEN_FIELD_NAMES),
+        frozen_container_authority,
     ):
         raise PostPandemicEvaluationPlanError(
-            "post-pandemic plan frozen field root changed after authentication"
+            "post-pandemic plan frozen field root changed after authentication "
+            "or descendant container changed"
         )
-    if _plan_fingerprint(plan) != fingerprint:
+    try:
+        current_fingerprint = _plan_fingerprint(plan)
+    except AttributeError as exc:
+        raise PostPandemicEvaluationPlanError(
+            "post-pandemic plan changed after authentication"
+        ) from exc
+    if current_fingerprint != fingerprint:
         raise PostPandemicEvaluationPlanError(
             "post-pandemic plan changed after authentication"
         )

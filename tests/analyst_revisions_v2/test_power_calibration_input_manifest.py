@@ -120,6 +120,37 @@ class _FingerprintThenForgeMapping(Mapping[str, object]):
         return len(self._honest)
 
 
+class _BackingDictLeak:
+    def __init__(self) -> None:
+        self.value: object | None = None
+
+    def __eq__(self, other: object) -> bool:
+        self.value = other
+        return False
+
+
+def _replace_nested_mapping_below_same_root(
+    root: MappingProxyType,
+) -> tuple[dict[str, object], str, object, _FingerprintThenForgeMapping]:
+    leak = _BackingDictLeak()
+    assert (root == leak) is False
+    assert type(leak.value) is dict
+    backing = leak.value
+    child_key, child = next(
+        (key, item)
+        for key, item in root.items()
+        if type(item) is MappingProxyType and len(item) > 0
+    )
+    target = next(iter(child))
+    honest_item = child[target]
+    forged = not honest_item if type(honest_item) is bool else None
+    if honest_item is None:
+        forged = "forged-after-authentication"
+    attack = _FingerprintThenForgeMapping(child, target=target, forged=forged)
+    backing[child_key] = MappingProxyType(attack)
+    return backing, child_key, child, attack
+
+
 def _equal_distinct_container(value: object) -> object:
     if type(value) is MappingProxyType:
         return MappingProxyType(dict(value))
@@ -1062,6 +1093,86 @@ def test_equal_comparing_string_subclasses_cannot_spoof_authority(
         object.__setattr__(value, field, original)
 
 
+def test_deleted_scalar_fingerprint_fields_are_domain_refusals(
+    tmp_path, admission
+):
+    candidate = _load_candidate(admission, _write_candidate(tmp_path, admission))
+    cases = (
+        (
+            admission,
+            require_loaded_power_calibration_manifest_admission,
+            "admission_contract_id",
+            "B2 admission object changed",
+        ),
+        (
+            candidate,
+            require_loaded_production_calibration_input_manifest_candidate,
+            "manifest_id",
+            "manifest candidate changed",
+        ),
+    )
+    for value, checker, field, message in cases:
+        original = getattr(value, field)
+        object.__delattr__(value, field)
+        try:
+            with pytest.raises(PowerCalibrationInputManifestError, match=message):
+                checker(value)
+        finally:
+            object.__setattr__(value, field, original)
+        assert checker(value) is value
+
+
+def test_hostile_containers_in_manifest_scalars_refuse_before_traversal(
+    tmp_path, admission
+):
+    class HostileScalar(Mapping[str, object]):
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def __getitem__(self, _key: str) -> object:
+            self.calls.append("getitem")
+            return "forged"
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(())
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return 0
+
+        def items(self):
+            self.calls.append("items")
+            return ().__iter__()
+
+    candidate = _load_candidate(admission, _write_candidate(tmp_path, admission))
+    cases = (
+        (
+            admission,
+            require_loaded_power_calibration_manifest_admission,
+            "admission_contract_id",
+        ),
+        (
+            candidate,
+            require_loaded_production_calibration_input_manifest_candidate,
+            "manifest_id",
+        ),
+    )
+    for value, checker, field in cases:
+        original = getattr(value, field)
+        hostile = HostileScalar()
+        object.__setattr__(value, field, MappingProxyType(hostile))
+        try:
+            with pytest.raises(
+                PowerCalibrationInputManifestError, match="noncanonical"
+            ):
+                checker(value)
+            assert hostile.calls == []
+        finally:
+            object.__setattr__(value, field, original)
+        assert checker(value) is value
+
+
 def test_mapping_key_string_subclasses_cannot_spoof_candidate_definition(
     tmp_path, admission
 ):
@@ -1175,6 +1286,34 @@ def test_hostile_mapping_proxy_is_rejected_before_fingerprint_traversal(
         assert checker(value) is value
 
 
+def test_disclosed_backing_dict_cannot_replace_a_nested_container_below_same_root(
+    tmp_path, admission
+):
+    # ARV2CR26-002: mappingproxy equality exposes its exact backing dict without
+    # gc.  Poisoning below the still-identical root must refuse before the
+    # replacement mapping gets its one honest fingerprint pass.
+    candidate = _load_candidate(admission, _write_candidate(tmp_path, admission))
+    cases = (
+        (admission, require_loaded_power_calibration_manifest_admission),
+        (candidate, require_loaded_production_calibration_input_manifest_candidate),
+    )
+    for value, checker in cases:
+        root = value.definition
+        backing, child_key, original_child, attack = (
+            _replace_nested_mapping_below_same_root(root)
+        )
+        try:
+            with pytest.raises(
+                PowerCalibrationInputManifestError,
+                match="container roots changed",
+            ):
+                checker(value)
+            assert attack.touches == 0
+        finally:
+            backing[child_key] = original_child
+        assert checker(value) is value
+
+
 def test_weakref_cleanup_removes_candidate_authority(tmp_path, admission):
     candidate = _load_candidate(admission, _write_candidate(tmp_path, admission))
     identity = id(candidate)
@@ -1184,6 +1323,23 @@ def test_weakref_cleanup_removes_candidate_authority(tmp_path, admission):
     gc.collect()
     assert reference() is None
     assert identity not in module._CANDIDATE_AUTHORITIES
+
+
+def test_weakref_cleanup_removes_admission_authority(parents):
+    admission = load_power_calibration_manifest_admission(
+        SPEC_ROOT / ADMISSION_FILENAME,
+        input_schema=parents[0],
+        multiplicity_overlay=parents[1],
+    )
+    identity = id(admission)
+    reference = weakref.ref(admission)
+    assert identity in module._ADMISSION_AUTHORITIES
+
+    del admission
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in module._ADMISSION_AUTHORITIES
 
 
 @pytest.mark.parametrize(

@@ -18,6 +18,10 @@ from typing import Any, Mapping
 
 from data.exchange_calendar import ExchangeCalendarError, resolve_nth_session_after
 
+from .canonical import (
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 from .qc_first_plan import QcFirstStudyPlan, load_qc_first_study_plan
 
 
@@ -681,13 +685,20 @@ class StockEvaluationContract:
 
 
 def _contract_fingerprint(contract: StockEvaluationContract) -> tuple[object, ...]:
+    scalar_values = (
+        contract.spec_id,
+        contract.spec_hash,
+        contract.parent_plan_id,
+        contract.parent_plan_hash,
+    )
+    if any(type(item) is not str for item in scalar_values):
+        raise StockEvaluationContractError(
+            "stock evaluation contract has noncanonical authority state"
+        )
     return tuple(
         _fingerprint_value(item)
         for item in (
-            contract.spec_id,
-            contract.spec_hash,
-            contract.parent_plan_id,
-            contract.parent_plan_hash,
+            *scalar_values,
             contract.sections,
             contract.section_hashes,
             contract.external_bindings,
@@ -731,7 +742,7 @@ def _loaded_contract(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _contract_fingerprint(value)
-    frozen_field_roots = tuple(
+    frozen_container_authority = capture_frozen_container_authority(
         fields[name] for name in _CONTRACT_FROZEN_FIELD_NAMES
     )
     identity = id(value)
@@ -745,7 +756,7 @@ def _loaded_contract(
             source_path,
             qc_first_plan_path,
             fingerprint,
-            frozen_field_roots,
+            frozen_container_authority,
         )
     return value
 
@@ -767,19 +778,22 @@ def require_loaded_stock_evaluation_contract(
         raise StockEvaluationContractError(
             "stock evaluation contract loader authority is absent"
         )
-    _, source_path, qc_plan_path, fingerprint, frozen_field_roots = authority
-    if any(
-        getattr(contract, name, None) is not expected
-        for name, expected in zip(
-            _CONTRACT_FROZEN_FIELD_NAMES,
-            frozen_field_roots,
-            strict=True,
-        )
+    _, source_path, qc_plan_path, fingerprint, frozen_container_authority = authority
+    if not frozen_container_authority_is_current(
+        (getattr(contract, name, None) for name in _CONTRACT_FROZEN_FIELD_NAMES),
+        frozen_container_authority,
     ):
         raise StockEvaluationContractError(
-            "stock evaluation contract frozen field root changed after authentication"
+            "stock evaluation contract frozen field root changed after authentication "
+            "or descendant container changed"
         )
-    if _contract_fingerprint(contract) != fingerprint:
+    try:
+        current_fingerprint = _contract_fingerprint(contract)
+    except AttributeError as exc:
+        raise StockEvaluationContractError(
+            "stock evaluation contract changed after authentication"
+        ) from exc
+    if current_fingerprint != fingerprint:
         raise StockEvaluationContractError(
             "stock evaluation contract changed after authentication"
         )

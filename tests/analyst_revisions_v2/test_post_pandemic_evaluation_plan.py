@@ -1108,6 +1108,52 @@ def test_equal_comparing_metaclass_cannot_spoof_plan_authority() -> None:
         require_loaded_post_pandemic_evaluation_plan(plan)
 
 
+def test_deleted_plan_scalar_fingerprint_field_is_a_domain_refusal() -> None:
+    plan = _load()
+    original = plan.schema
+    object.__delattr__(plan, "schema")
+    with pytest.raises(
+        PostPandemicEvaluationPlanError, match="changed after authentication"
+    ):
+        require_loaded_post_pandemic_evaluation_plan(plan)
+    object.__setattr__(plan, "schema", original)
+    assert require_loaded_post_pandemic_evaluation_plan(plan) is plan
+
+
+def test_hostile_container_in_plan_scalar_refuses_before_traversal() -> None:
+    class HostileScalar(Mapping[str, object]):
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def __getitem__(self, _key: str) -> object:
+            self.calls.append("getitem")
+            return "forged"
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(())
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return 0
+
+        def items(self):
+            self.calls.append("items")
+            return ().__iter__()
+
+    plan = _load()
+    original = plan.schema
+    hostile = HostileScalar()
+    object.__setattr__(plan, "schema", MappingProxyType(hostile))
+    try:
+        with pytest.raises(PostPandemicEvaluationPlanError, match="noncanonical"):
+            require_loaded_post_pandemic_evaluation_plan(plan)
+        assert hostile.calls == []
+    finally:
+        object.__setattr__(plan, "schema", original)
+    assert require_loaded_post_pandemic_evaluation_plan(plan) is plan
+
+
 @pytest.mark.parametrize(
     "field_name",
     [
@@ -1169,6 +1215,48 @@ def test_hostile_proxy_mapping_refuses_before_replacement_code_runs() -> None:
 
     with pytest.raises(
         PostPandemicEvaluationPlanError, match="frozen field root changed"
+    ):
+        require_loaded_post_pandemic_evaluation_plan(plan)
+    assert calls == []
+
+
+def test_nested_mapping_replacement_refuses_before_hostile_code_runs() -> None:
+    plan = _load()
+    lineages = plan.parent_lineages
+    original = lineages["qc_first_plan"]
+    calls: list[str] = []
+
+    class BackingDictLeak:
+        value: object | None = None
+
+        def __eq__(self, other: object) -> bool:
+            self.value = other
+            return False
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return "forged"
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    leak = BackingDictLeak()
+    assert (lineages == leak) is False
+    assert type(leak.value) is dict
+    leak.value["qc_first_plan"] = MappingProxyType(SplitView())
+
+    with pytest.raises(
+        PostPandemicEvaluationPlanError, match="descendant container changed"
     ):
         require_loaded_post_pandemic_evaluation_plan(plan)
     assert calls == []

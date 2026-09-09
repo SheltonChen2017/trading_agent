@@ -24,6 +24,11 @@ from .artifact_io import (
     read_stable_regular as _read_artifact_stable_regular,
     revalidate_regular as _revalidate_artifact_regular,
 )
+from .canonical import (
+    FrozenContainerAuthority,
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 
 from .power_calibration_protocol import (
     CALIBRATION_AXIS_SHA256,
@@ -933,7 +938,7 @@ _POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES: dict[
         bytes,
         PowerCalibrationProtocol,
         tuple[object, ...],
-        tuple[object, ...],
+        FrozenContainerAuthority,
     ],
 ] = {}
 _POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES_LOCK = threading.RLock()
@@ -1047,7 +1052,7 @@ def load_power_calibration_input_schema(
     }.items():
         object.__setattr__(value, name, item)
     fingerprint = _schema_fingerprint(value)
-    container_roots = tuple(
+    container_authority = capture_frozen_container_authority(
         getattr(value, name)
         for name in _POWER_CALIBRATION_INPUT_SCHEMA_CONTAINER_FIELDS
     )
@@ -1060,7 +1065,7 @@ def load_power_calibration_input_schema(
             payload,
             power_protocol,
             fingerprint,
-            container_roots,
+            container_authority,
         )
     return value
 
@@ -1083,18 +1088,21 @@ def require_loaded_power_calibration_input_schema(
         raise PowerCalibrationInputSchemaError(
             "calibration input schema loader authority is absent"
         )
-    if any(
-        getattr(schema, name, None) is not root
-        for name, root in zip(
-            _POWER_CALIBRATION_INPUT_SCHEMA_CONTAINER_FIELDS,
-            authority[5],
-            strict=True,
-        )
-    ):
+    current_roots = tuple(
+        getattr(schema, name, None)
+        for name in _POWER_CALIBRATION_INPUT_SCHEMA_CONTAINER_FIELDS
+    )
+    if not frozen_container_authority_is_current(current_roots, authority[5]):
         raise PowerCalibrationInputSchemaError(
             "calibration input schema container root changed after authentication"
         )
-    if _schema_fingerprint(schema) != authority[4]:
+    try:
+        current_fingerprint = _schema_fingerprint(schema)
+    except AttributeError as exc:
+        raise PowerCalibrationInputSchemaError(
+            "calibration input schema changed after authentication"
+        ) from exc
+    if current_fingerprint != authority[4]:
         raise PowerCalibrationInputSchemaError(
             "calibration input schema changed after authentication"
         )

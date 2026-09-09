@@ -939,6 +939,52 @@ def test_hostile_split_view_schema_definition_is_rejected_before_traversal():
     assert split_view.calls == []
 
 
+def test_nested_split_view_in_disclosed_backing_refuses_before_traversal():
+    class BackingDictLeak:
+        def __init__(self) -> None:
+            self.value: object | None = None
+
+        def __eq__(self, other: object) -> bool:
+            self.value = other
+            return False
+
+    class SplitView(Mapping[str, object]):
+        def __init__(self, original: Mapping[str, object]) -> None:
+            self.original = original
+            self.calls: list[object] = []
+
+        def __getitem__(self, key: str) -> object:
+            self.calls.append(("getitem", key))
+            return True if key == "orders" else self.original[key]
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(self.original)
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return len(self.original)
+
+        def items(self):
+            self.calls.append("items")
+            return self.original.items()
+
+    loaded = _load_schema()
+    root = loaded.definition
+    original = root["capabilities"]
+    assert type(original) is MappingProxyType
+    assert original["orders"] is False
+    leak = BackingDictLeak()
+    assert (root == leak) is False
+    assert type(leak.value) is dict
+    split_view = SplitView(original)
+    leak.value["capabilities"] = MappingProxyType(split_view)
+
+    with pytest.raises(PowerCalibrationInputSchemaError, match="container root changed"):
+        require_loaded_power_calibration_input_schema(loaded)
+    assert split_view.calls == []
+
+
 def test_equality_spoofed_session_axis_replacement_is_detected_by_root_identity():
     class SpoofedStr(str):
         pass
@@ -949,6 +995,18 @@ def test_equality_spoofed_session_axis_replacement_is_detected_by_root_identity(
     object.__setattr__(loaded, "calibration_session_axis", tuple(axis))
     with pytest.raises(PowerCalibrationInputSchemaError, match="container root changed"):
         require_loaded_power_calibration_input_schema(loaded)
+
+
+def test_deleted_schema_scalar_fingerprint_field_is_a_domain_refusal():
+    loaded = _load_schema()
+    original = loaded.schema_contract_id
+    object.__delattr__(loaded, "schema_contract_id")
+    with pytest.raises(
+        PowerCalibrationInputSchemaError, match="changed after authentication"
+    ):
+        require_loaded_power_calibration_input_schema(loaded)
+    object.__setattr__(loaded, "schema_contract_id", original)
+    assert require_loaded_power_calibration_input_schema(loaded) is loaded
 
 
 def test_schema_authority_weakref_cleanup():

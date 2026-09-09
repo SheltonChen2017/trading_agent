@@ -855,6 +855,47 @@ def test_hostile_mapping_proxy_refuses_before_replacement_code_runs():
     assert calls == []
 
 
+def test_nested_mapping_replacement_refuses_before_hostile_code_runs():
+    contract = _load()
+    summary = contract.fold_axis_summaries[0]
+    calls: list[str] = []
+
+    class BackingDictLeak:
+        value: object | None = None
+
+        def __eq__(self, other: object) -> bool:
+            self.value = other
+            return False
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(("forged",))
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return 1
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return True
+
+        def items(self):
+            calls.append("items")
+            return (("forged", True),)
+
+    leak = BackingDictLeak()
+    assert (summary == leak) is False
+    assert type(leak.value) is dict
+    leak.value["session_axis_sha256"] = MappingProxyType(SplitView())
+
+    with pytest.raises(
+        GlobalBenchmarkContractError, match="descendant container changed"
+    ):
+        require_loaded_global_benchmark_contract(contract)
+    assert calls == []
+
+
 def test_retained_composite_roots_do_not_keep_contract_alive():
     contract = _load()
     identity = id(contract)
@@ -884,6 +925,17 @@ def test_equality_spoofed_identity_type_is_detected_before_comparison():
     object.__setattr__(contract, "map_hash", AlwaysEqualStr("0" * 64))
     with pytest.raises(GlobalBenchmarkContractError, match="changed type"):
         require_loaded_global_benchmark_contract(contract)
+
+
+def test_deleted_nested_scalar_fingerprint_field_is_a_domain_refusal():
+    contract = _load()
+    entry = contract.entries[0]
+    original = entry.canonical_label
+    object.__delattr__(entry, "canonical_label")
+    with pytest.raises(GlobalBenchmarkContractError, match="changed after authentication"):
+        require_loaded_global_benchmark_contract(contract)
+    object.__setattr__(entry, "canonical_label", original)
+    assert require_loaded_global_benchmark_contract(contract) is contract
 
 
 def test_malformed_authority_collection_type_is_rejected_by_root_pin():

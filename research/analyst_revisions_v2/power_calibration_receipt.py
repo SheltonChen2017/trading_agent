@@ -35,6 +35,11 @@ from .artifact_io import (
     _register_process_local_after_fork,
     revalidate_regular as _revalidate_artifact_regular,
 )
+from .canonical import (
+    FrozenContainerAuthority,
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 from .four_family_multiplicity import (
     FourFamilyMultiplicityError,
     FourFamilyMultiplicityOverlay,
@@ -608,7 +613,7 @@ def _fingerprint(value: object) -> object:
         return ("int", value)
     if type(value) is Decimal:
         return ("decimal", value.as_tuple())
-    if isinstance(value, ProvisionalPowerDisposition):
+    if type(value) is ProvisionalPowerDisposition:
         return ("disposition", value.value)
     if value is None:
         return ("none", None)
@@ -788,7 +793,7 @@ class _PowerReceiptAuthorityRecord:
     input_authority: weakref.ReferenceType[PowerCalibrationInputAuthority]
     beta_artifact: _ArtifactIdentity
     component_artifact: _ArtifactIdentity
-    container_roots: tuple[object, ...]
+    container_authority: FrozenContainerAuthority
     fingerprint: tuple[object, ...]
     persisted_receipt: _ArtifactIdentity | None
 
@@ -821,11 +826,11 @@ def _container_roots(
 def _container_roots_are_current(
     value: object,
     field_names: tuple[str, ...],
-    expected_roots: tuple[object, ...],
+    authority: FrozenContainerAuthority,
 ) -> bool:
-    return len(field_names) == len(expected_roots) and all(
-        getattr(value, name, None) is expected
-        for name, expected in zip(field_names, expected_roots, strict=True)
+    return frozen_container_authority_is_current(
+        (getattr(value, name, None) for name in field_names),
+        authority,
     )
 
 
@@ -879,9 +884,13 @@ def _forget_power_receipt_authority(key: int, ref: Any) -> None:
 
 
 def _contract_fingerprint(value: PowerCalibrationInputContentContract) -> tuple[object, ...]:
+    scalar_values = (value.content_contract_id, value.content_contract_hash)
+    if any(type(item) is not str for item in scalar_values):
+        raise PowerCalibrationReceiptError(
+            "authority state contains a noncanonical value"
+        )
     return (
-        _fingerprint(value.content_contract_id),
-        _fingerprint(value.content_contract_hash),
+        *(_fingerprint(item) for item in scalar_values),
         _fingerprint(value.calibration_session_axis),
         _fingerprint(value.definition),
         _fingerprint(value.capabilities),
@@ -995,7 +1004,9 @@ def load_power_calibration_input_content_contract(
         "_authority": _LOADED_CONTRACT,
     }.items():
         object.__setattr__(value, name, item)
-    container_roots = _container_roots(value, _CONTENT_CONTRACT_CONTAINER_FIELDS)
+    container_authority = capture_frozen_container_authority(
+        _container_roots(value, _CONTENT_CONTRACT_CONTAINER_FIELDS)
+    )
     fingerprint = _contract_fingerprint(value)
     key = id(value)
     ref = weakref.ref(
@@ -1013,7 +1024,7 @@ def load_power_calibration_input_content_contract(
             multiplicity_overlay,
             fingerprint,
             parent_snapshot_fingerprint,
-            container_roots,
+            container_authority,
         )
     return value
 
@@ -1033,7 +1044,13 @@ def require_loaded_power_calibration_input_content_contract(
         raise PowerCalibrationReceiptError(
             "input-content contract container roots changed"
         )
-    if _contract_fingerprint(contract) != record[7]:
+    try:
+        current_fingerprint = _contract_fingerprint(contract)
+    except AttributeError as exc:
+        raise PowerCalibrationReceiptError(
+            "input-content contract object changed"
+        ) from exc
+    if current_fingerprint != record[7]:
         raise PowerCalibrationReceiptError("input-content contract object changed")
     _revalidate(record[1], record[2], "input-content contract")
     try:
@@ -1508,20 +1525,24 @@ def render_power_calibration_input_authority(
 
 
 def _authority_fingerprint(value: PowerCalibrationInputAuthority) -> tuple[object, ...]:
+    scalar_values = (
+        value.authority_id,
+        value.authority_hash,
+        value.owner_authorization_id,
+        value.owner_authorization_evidence_sha256,
+        value.authorized_at_utc,
+        value.manifest_id,
+        value.production_truth_approval_id,
+        value.production_truth_approval_hash,
+        value.production_truth_approval_artifact_sha256,
+    )
+    if any(type(item) is not str for item in scalar_values):
+        raise PowerCalibrationReceiptError(
+            "authority state contains a noncanonical value"
+        )
     return tuple(
         _fingerprint(item)
-        for item in (
-            value.authority_id,
-            value.authority_hash,
-            value.owner_authorization_id,
-            value.owner_authorization_evidence_sha256,
-            value.authorized_at_utc,
-            value.manifest_id,
-            value.production_truth_approval_id,
-            value.production_truth_approval_hash,
-            value.production_truth_approval_artifact_sha256,
-            value.definition,
-        )
+        for item in (*scalar_values, value.definition)
     )
 
 
@@ -1619,7 +1640,9 @@ def load_power_calibration_input_authority(
         "_authority": _LOADED_INPUT_AUTHORITY,
     }.items():
         object.__setattr__(value, name, item)
-    container_roots = _container_roots(value, _INPUT_AUTHORITY_CONTAINER_FIELDS)
+    container_authority = capture_frozen_container_authority(
+        _container_roots(value, _INPUT_AUTHORITY_CONTAINER_FIELDS)
+    )
     fingerprint = _authority_fingerprint(value)
     key = id(value)
     ref = weakref.ref(
@@ -1637,7 +1660,7 @@ def load_power_calibration_input_authority(
             truth_identity,
             truth_review,
             construction_snapshot_digest,
-            container_roots,
+            container_authority,
         )
     return value
 
@@ -1657,7 +1680,13 @@ def require_loaded_power_calibration_input_authority(
         raise PowerCalibrationReceiptError(
             "input authority container roots changed"
         )
-    if _authority_fingerprint(authority) != record[5]:
+    try:
+        current_fingerprint = _authority_fingerprint(authority)
+    except AttributeError as exc:
+        raise PowerCalibrationReceiptError(
+            "input authority object changed"
+        ) from exc
+    if current_fingerprint != record[5]:
         raise PowerCalibrationReceiptError("input authority object changed")
     _revalidate(record[1], record[2], "input authority")
     try:
@@ -1922,6 +1951,42 @@ def _decimal_text(value: Decimal) -> str:
 
 
 def _receipt_fingerprint(value: PowerCalibrationReceipt) -> tuple[object, ...]:
+    string_fields = (
+        "receipt_id",
+        "receipt_hash",
+        "protocol_id",
+        "protocol_hash",
+        "content_contract_id",
+        "content_contract_hash",
+        "manifest_id",
+        "manifest_content_sha256",
+        "manifest_artifact_sha256",
+        "beta_input_id",
+        "beta_input_content_sha256",
+        "beta_input_artifact_sha256",
+        "component_input_id",
+        "component_input_content_sha256",
+        "component_input_artifact_sha256",
+        "component_count_census_sha256",
+    )
+    integer_fields = (
+        "valid_beta_date_count",
+        "component_count_census_session_count",
+        "q05_components_per_date",
+        "raw_required_valid_dates",
+        "required_valid_dates",
+        "required_connected_components",
+        "fixed_h20_test_session_capacity",
+    )
+    if (
+        any(type(getattr(value, name)) is not str for name in string_fields)
+        or any(type(getattr(value, name)) is not int for name in integer_fields)
+        or type(value.long_run_variance) is not Decimal
+        or type(value.disposition) is not ProvisionalPowerDisposition
+    ):
+        raise PowerCalibrationReceiptError(
+            "authority state contains a noncanonical value"
+        )
     return tuple(
         _fingerprint(getattr(value, field.name))
         for field in dataclasses.fields(PowerCalibrationReceipt)
@@ -2164,7 +2229,9 @@ def compute_power_calibration_receipt(
         "_authority": _LOADED_RECEIPT,
     }.items():
         object.__setattr__(value, name, item)
-    container_roots = _container_roots(value, _POWER_RECEIPT_CONTAINER_FIELDS)
+    container_authority = capture_frozen_container_authority(
+        _container_roots(value, _POWER_RECEIPT_CONTAINER_FIELDS)
+    )
     fingerprint = _receipt_fingerprint(value)
     key = id(value)
     ref = weakref.ref(
@@ -2191,7 +2258,7 @@ def compute_power_calibration_receipt(
                 byte_count=metadata[1]["byte_count"],
                 name="component-count input",
             ),
-            container_roots=container_roots,
+            container_authority=container_authority,
             fingerprint=fingerprint,
             persisted_receipt=None,
         )
@@ -2442,10 +2509,14 @@ def require_loaded_power_calibration_receipt(
     if record is None or record.reference() is not receipt:
         raise PowerCalibrationReceiptError("power receipt authority is absent")
     if not _container_roots_are_current(
-        receipt, _POWER_RECEIPT_CONTAINER_FIELDS, record.container_roots
+        receipt, _POWER_RECEIPT_CONTAINER_FIELDS, record.container_authority
     ):
         raise PowerCalibrationReceiptError("power receipt container roots changed")
-    if _receipt_fingerprint(receipt) != record.fingerprint:
+    try:
+        current_fingerprint = _receipt_fingerprint(receipt)
+    except AttributeError as exc:
+        raise PowerCalibrationReceiptError("power receipt object changed") from exc
+    if current_fingerprint != record.fingerprint:
         raise PowerCalibrationReceiptError("power receipt object changed")
     content_contract = record.content_contract()
     manifest_candidate = record.manifest_candidate()
@@ -2493,7 +2564,15 @@ def _require_closed_receipt_registry_state(
         record = _POWER_RECEIPT_AUTHORITIES.get(id(receipt))
     if record is None or record.reference() is not receipt:
         raise PowerCalibrationReceiptError("power receipt authority is absent")
-    if _receipt_fingerprint(receipt) != record.fingerprint:
+    if not _container_roots_are_current(
+        receipt, _POWER_RECEIPT_CONTAINER_FIELDS, record.container_authority
+    ):
+        raise PowerCalibrationReceiptError("power receipt container roots changed")
+    try:
+        current_fingerprint = _receipt_fingerprint(receipt)
+    except AttributeError as exc:
+        raise PowerCalibrationReceiptError("power receipt object changed") from exc
+    if current_fingerprint != record.fingerprint:
         raise PowerCalibrationReceiptError("power receipt object changed")
     content_contract = record.content_contract()
     manifest_candidate = record.manifest_candidate()

@@ -14,6 +14,10 @@ from typing import Callable, Mapping
 
 from data.exchange_calendar import ExchangeCalendarError, is_trading_session
 
+from .canonical import (
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 from .dataset import (
     DatasetVerificationError,
     capture_clean_git_lineage,
@@ -206,6 +210,7 @@ _PENDING_SOURCE_CELL_IDS = frozenset(
     {"corporate_action_contract", "universe_contract"}
 )
 _REVIEWED_AUTHORITY = object()
+_MISSING_REVIEWED_ROOT = object()
 _PERMIT_AUTHORITY = object()
 _REVIEWED_AUTHORITIES: dict[
     int,
@@ -443,12 +448,39 @@ def _authority_value(value: object) -> object:
 def _reviewed_fingerprint(
     spec: ReviewedPreregistration,
 ) -> tuple[object, ...]:
+    scalar_values = (
+        spec.spec_id,
+        spec.spec_hash,
+        spec.producing_commit,
+        spec.reviewed_by,
+        spec.reviewed_at,
+        spec.source_path,
+        spec.artifact_sha256,
+        spec.review_commit,
+    )
+    if any(type(item) is not str for item in scalar_values) or any(
+        type(cell.cell_id) is not str or type(cell.source) is not str
+        for cell in spec.cells
+    ) or any(
+        any(
+            type(getattr(look, name)) is not str
+            for name in (
+                "look_id",
+                "family_id",
+                "state",
+                "validation_start",
+                "validation_end",
+                "dataset_id",
+                "code_identity",
+                "cost_cell_hash",
+                "topology_id",
+            )
+        )
+        for look in spec.looks
+    ):
+        raise PreregistrationError("review authority contains noncanonical state")
     return (
-        _authority_value(spec.spec_id),
-        _authority_value(spec.spec_hash),
-        _authority_value(spec.producing_commit),
-        _authority_value(spec.reviewed_by),
-        _authority_value(spec.reviewed_at),
+        *(_authority_value(item) for item in scalar_values[:5]),
         (
             "cells",
             tuple(
@@ -477,9 +509,7 @@ def _reviewed_fingerprint(
                 for look in spec.looks
             ),
         ),
-        _authority_value(spec.source_path),
-        _authority_value(spec.artifact_sha256),
-        _authority_value(spec.review_commit),
+        *(_authority_value(item) for item in scalar_values[5:]),
     )
 
 
@@ -523,10 +553,12 @@ def _reviewed_preregistration(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _reviewed_fingerprint(value)
-    composite_roots = (
-        fields["cells"],
-        fields["looks"],
-        tuple(cell.value for cell in cells),
+    frozen_container_authority = capture_frozen_container_authority(
+        (
+            fields["cells"],
+            fields["looks"],
+            tuple(cell.value for cell in cells),
+        )
     )
     identity = id(value)
     reference = weakref.ref(
@@ -537,7 +569,7 @@ def _reviewed_preregistration(
             reference,
             Path(source_path),
             fingerprint,
-            composite_roots,
+            frozen_container_authority,
         )
     return value
 
@@ -727,26 +759,43 @@ def _assert_review_authority(spec: ReviewedPreregistration) -> None:
         raise PreregistrationError(
             "review authority is not registered to this loader-created object"
         )
-    _, original_path, expected_fingerprint, composite_roots = authority
-    cells_root, looks_root, cell_value_roots = composite_roots
-    if spec.cells is not cells_root or spec.looks is not looks_root:
+    _, original_path, expected_fingerprint, frozen_container_authority = authority
+    cells_root, looks_root, cell_value_roots = frozen_container_authority[0]
+    if (
+        getattr(spec, "cells", _MISSING_REVIEWED_ROOT) is not cells_root
+        or getattr(spec, "looks", _MISSING_REVIEWED_ROOT) is not looks_root
+    ):
         raise PreregistrationError(
             "review authority composite root changed after spec verification"
         )
-    if any(type(cell) is not PreregistrationCell for cell in spec.cells) or any(
-        type(look) is not RegisteredLook for look in spec.looks
+    if any(type(cell) is not PreregistrationCell for cell in cells_root) or any(
+        type(look) is not RegisteredLook for look in looks_root
     ):
         raise PreregistrationError(
             "review authority nested record changed type after spec verification"
         )
     if any(
-        cell.value is not expected
-        for cell, expected in zip(spec.cells, cell_value_roots, strict=True)
+        getattr(cell, "value", _MISSING_REVIEWED_ROOT) is not expected
+        for cell, expected in zip(cells_root, cell_value_roots, strict=True)
     ):
         raise PreregistrationError(
             "review authority cell value root changed after spec verification"
         )
-    if _reviewed_fingerprint(spec) != expected_fingerprint:
+    if not frozen_container_authority_is_current(
+        (cells_root, looks_root, cell_value_roots),
+        frozen_container_authority,
+    ):
+        raise PreregistrationError(
+            "review authority composite root or descendant container changed "
+            "after spec verification"
+        )
+    try:
+        current_fingerprint = _reviewed_fingerprint(spec)
+    except AttributeError as exc:
+        raise PreregistrationError(
+            "review authority changed after spec verification"
+        ) from exc
+    if current_fingerprint != expected_fingerprint:
         raise PreregistrationError("review authority changed after spec verification")
     reloaded = load_reviewed_preregistration(original_path)
     if _reviewed_fingerprint(reloaded) != expected_fingerprint:

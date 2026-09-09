@@ -130,6 +130,37 @@ class _FingerprintThenForgeMapping(Mapping[str, object]):
         return len(self._honest)
 
 
+class _BackingDictLeak:
+    def __init__(self) -> None:
+        self.value: object | None = None
+
+    def __eq__(self, other: object) -> bool:
+        self.value = other
+        return False
+
+
+def _replace_nested_mapping_below_same_root(
+    root: MappingProxyType,
+) -> tuple[dict[str, object], str, object, _FingerprintThenForgeMapping]:
+    leak = _BackingDictLeak()
+    assert (root == leak) is False
+    assert type(leak.value) is dict
+    backing = leak.value
+    child_key, child = next(
+        (key, item)
+        for key, item in root.items()
+        if type(item) is MappingProxyType and len(item) > 0
+    )
+    target = next(iter(child))
+    honest_item = child[target]
+    forged = not honest_item if type(honest_item) is bool else None
+    if honest_item is None:
+        forged = "forged-after-authentication"
+    attack = _FingerprintThenForgeMapping(child, target=target, forged=forged)
+    backing[child_key] = MappingProxyType(attack)
+    return backing, child_key, child, attack
+
+
 def _equal_distinct_container(value: object) -> object:
     if type(value) is MappingProxyType:
         return MappingProxyType(dict(value))
@@ -1623,6 +1654,141 @@ def test_nested_authority_state_is_immutable_and_extra_non_string_keys_refuse(
         object.__setattr__(receipt, "definition", original)
 
 
+def test_deleted_scalar_fingerprint_fields_are_domain_refusals(
+    tmp_path: Path, parents: _Parents
+):
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    receipt = _compute(parents, inputs)
+    cases = (
+        (
+            parents.content_contract,
+            module.require_loaded_power_calibration_input_content_contract,
+            "content_contract_id",
+            "input-content contract object changed",
+        ),
+        (
+            inputs.input_authority,
+            module.require_loaded_power_calibration_input_authority,
+            "authority_id",
+            "input authority object changed",
+        ),
+        (
+            receipt,
+            module.require_loaded_power_calibration_receipt,
+            "receipt_id",
+            "power receipt object changed",
+        ),
+    )
+    for value, checker, field, message in cases:
+        original = getattr(value, field)
+        object.__delattr__(value, field)
+        try:
+            with pytest.raises(module.PowerCalibrationReceiptError, match=message):
+                checker(value)
+        finally:
+            object.__setattr__(value, field, original)
+        assert checker(value) is value
+
+
+def test_hostile_containers_in_receipt_scalars_refuse_before_traversal(
+    tmp_path: Path, parents: _Parents
+):
+    class HostileScalar(Mapping[str, object]):
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def __getitem__(self, _key: str) -> object:
+            self.calls.append("getitem")
+            return "forged"
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(())
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return 0
+
+        def items(self):
+            self.calls.append("items")
+            return ().__iter__()
+
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    receipt = _compute(parents, inputs)
+    cases = (
+        (
+            parents.content_contract,
+            module.require_loaded_power_calibration_input_content_contract,
+            "content_contract_id",
+        ),
+        (
+            inputs.input_authority,
+            module.require_loaded_power_calibration_input_authority,
+            "authority_id",
+        ),
+        (
+            receipt,
+            module.require_loaded_power_calibration_receipt,
+            "receipt_id",
+        ),
+    )
+    for value, checker, field in cases:
+        original = getattr(value, field)
+        hostile = HostileScalar()
+        object.__setattr__(value, field, MappingProxyType(hostile))
+        try:
+            with pytest.raises(
+                module.PowerCalibrationReceiptError, match="noncanonical value"
+            ):
+                checker(value)
+            assert hostile.calls == []
+        finally:
+            object.__setattr__(value, field, original)
+        assert checker(value) is value
+
+
+def test_forged_disposition_class_cannot_spoof_receipt_fingerprint(
+    tmp_path: Path, parents: _Parents
+):
+    class ForgedDisposition:
+        @property
+        def __class__(self):
+            return ProvisionalPowerDisposition
+
+        def __init__(self, value: str) -> None:
+            self._value = value
+            self.value_reads = 0
+
+        @property
+        def value(self) -> str:
+            self.value_reads += 1
+            return self._value
+
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    receipt = _compute(parents, inputs)
+    destination = tmp_path / module.power_calibration_receipt_filename(receipt)
+    module.persist_power_calibration_receipt(receipt, destination)
+    original = receipt.disposition
+    forged = ForgedDisposition(original.value)
+    assert isinstance(forged, ProvisionalPowerDisposition)
+    assert forged.value_reads == 0
+    object.__setattr__(receipt, "disposition", forged)
+    try:
+        for checker in (
+            module.require_loaded_power_calibration_receipt,
+            module.require_persisted_power_calibration_receipt,
+        ):
+            with pytest.raises(
+                module.PowerCalibrationReceiptError, match="noncanonical value"
+            ):
+                checker(receipt)
+            assert forged.value_reads == 0
+    finally:
+        object.__setattr__(receipt, "disposition", original)
+    assert module.require_loaded_power_calibration_receipt(receipt) is receipt
+    assert module.require_persisted_power_calibration_receipt(receipt) is receipt
+
+
 def test_all_receipt_authorities_pin_every_exact_container_root(
     tmp_path: Path, parents: _Parents
 ):
@@ -1716,6 +1882,39 @@ def test_receipt_hostile_mapping_proxies_refuse_before_fingerprint_traversal(
         assert checker(value) is value
 
 
+def test_receipt_authorities_reject_nested_poison_below_same_disclosed_root(
+    tmp_path: Path, parents: _Parents
+):
+    # ARV2CR26-002: equality can disclose a mappingproxy's backing dict without
+    # gc.  Descendant identity is authenticated before a replacement proxy can
+    # present honest values to the semantic fingerprint.
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    receipt = _compute(parents, inputs)
+    cases = (
+        (
+            parents.content_contract,
+            module.require_loaded_power_calibration_input_content_contract,
+        ),
+        (inputs.input_authority, module.require_loaded_power_calibration_input_authority),
+        (receipt, module.require_loaded_power_calibration_receipt),
+    )
+    for value, checker in cases:
+        root = value.definition
+        backing, child_key, original_child, attack = (
+            _replace_nested_mapping_below_same_root(root)
+        )
+        try:
+            with pytest.raises(
+                module.PowerCalibrationReceiptError,
+                match="container roots changed",
+            ):
+                checker(value)
+            assert attack.touches == 0
+        finally:
+            backing[child_key] = original_child
+        assert checker(value) is value
+
+
 def test_receipt_registry_authority_is_removed_after_collection(
     tmp_path: Path, parents: _Parents
 ):
@@ -1728,6 +1927,44 @@ def test_receipt_registry_authority_is_removed_after_collection(
     gc.collect()
     assert reference() is None
     assert identity not in module._POWER_RECEIPT_AUTHORITIES
+
+
+def test_content_contract_registry_authority_is_removed_after_collection(
+    parents: _Parents,
+):
+    contract = module.load_power_calibration_input_content_contract(
+        SPEC_ROOT / CONTENT_CONTRACT_FILENAME,
+        power_protocol=parents.protocol,
+        input_schema=parents.input_schema,
+        manifest_admission=parents.admission,
+        multiplicity_overlay=parents.overlay,
+    )
+    identity = id(contract)
+    reference = weakref.ref(contract)
+    assert identity in module._CONTENT_CONTRACT_AUTHORITIES
+
+    del contract
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in module._CONTENT_CONTRACT_AUTHORITIES
+
+
+def test_input_authority_registry_authority_is_removed_after_collection(
+    tmp_path: Path, parents: _Parents
+):
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    authority = inputs.input_authority
+    identity = id(authority)
+    reference = weakref.ref(authority)
+    assert identity in module._INPUT_AUTHORITIES
+
+    del authority
+    del inputs
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in module._INPUT_AUTHORITIES
 
 
 def _strong_registry_values(value: object):
@@ -3060,6 +3297,29 @@ def test_closed_persisted_receipt_reauth_never_opens_calibration_inputs(
     )
     assert "date-beta input" not in opened
     assert "component-count input" not in opened
+
+
+def test_persisted_receipt_rejects_nested_poison_before_thaw_traversal(
+    tmp_path: Path, parents: _Parents
+):
+    inputs = _write_authorized_inputs(tmp_path / "inputs", parents)
+    receipt = _compute(parents, inputs)
+    destination = tmp_path / module.power_calibration_receipt_filename(receipt)
+    module.persist_power_calibration_receipt(receipt, destination)
+    root = receipt.definition
+    backing, child_key, original_child, attack = (
+        _replace_nested_mapping_below_same_root(root)
+    )
+    try:
+        with pytest.raises(
+            module.PowerCalibrationReceiptError,
+            match="container roots changed",
+        ):
+            module.require_persisted_power_calibration_receipt(receipt)
+        assert attack.touches == 0
+    finally:
+        backing[child_key] = original_child
+    assert module.require_persisted_power_calibration_receipt(receipt) is receipt
 
 
 @pytest.mark.parametrize("kind", ["unknown", "numeric", "identity", "noncanonical"])

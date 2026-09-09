@@ -22,6 +22,10 @@ from data.exchange_calendar import (
     trading_sessions,
 )
 
+from .canonical import (
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 from .qc_first_plan import (
     QcFirstPlanError,
     QcFirstStudyPlan,
@@ -474,20 +478,27 @@ def _fingerprint_value(value: object) -> object:
 
 
 def _manifest_fingerprint(manifest: StockFoldManifest) -> tuple[object, ...]:
+    scalar_values = (
+        manifest.manifest_id,
+        manifest.manifest_hash,
+        manifest.strategy_pdf_sha256,
+        manifest.parent_plan_id,
+        manifest.parent_plan_hash,
+        manifest.parent_plan_artifact_sha256,
+        manifest.parent_stock_spec_id,
+        manifest.parent_stock_spec_hash,
+        manifest.parent_stock_spec_artifact_sha256,
+        manifest.parent_history_section_sha256,
+        manifest.evaluation_id,
+    )
+    if any(type(item) is not str for item in scalar_values):
+        raise StockFoldManifestError(
+            "fold manifest contains noncanonical authority state"
+        )
     return tuple(
         _fingerprint_value(item)
         for item in (
-            manifest.manifest_id,
-            manifest.manifest_hash,
-            manifest.strategy_pdf_sha256,
-            manifest.parent_plan_id,
-            manifest.parent_plan_hash,
-            manifest.parent_plan_artifact_sha256,
-            manifest.parent_stock_spec_id,
-            manifest.parent_stock_spec_hash,
-            manifest.parent_stock_spec_artifact_sha256,
-            manifest.parent_history_section_sha256,
-            manifest.evaluation_id,
+            *scalar_values,
             manifest.calendar_contract,
             manifest.walk_forward_contract,
             manifest.cross_boundary_common_event_contract,
@@ -593,7 +604,7 @@ def _loaded_manifest(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _manifest_fingerprint(value)
-    frozen_field_roots = tuple(
+    frozen_container_authority = capture_frozen_container_authority(
         fields[name] for name in _FOLD_MANIFEST_FROZEN_FIELD_NAMES
     )
     identity = id(value)
@@ -610,7 +621,7 @@ def _loaded_manifest(
             stock_evaluation_payload,
             qc_first_plan_payload,
             fingerprint,
-            frozen_field_roots,
+            frozen_container_authority,
         )
     return value
 
@@ -637,20 +648,26 @@ def require_loaded_stock_fold_manifest(
         stock_payload,
         qc_plan_payload,
         fingerprint,
-        frozen_field_roots,
+        frozen_container_authority,
     ) = authority
-    if any(
-        getattr(manifest, name, None) is not expected
-        for name, expected in zip(
-            _FOLD_MANIFEST_FROZEN_FIELD_NAMES,
-            frozen_field_roots,
-            strict=True,
-        )
+    if not frozen_container_authority_is_current(
+        (
+            getattr(manifest, name, None)
+            for name in _FOLD_MANIFEST_FROZEN_FIELD_NAMES
+        ),
+        frozen_container_authority,
     ):
         raise StockFoldManifestError(
-            "fold manifest frozen field root changed after authentication"
+            "fold manifest frozen field root changed after authentication "
+            "or descendant container changed"
         )
-    if _manifest_fingerprint(manifest) != fingerprint:
+    try:
+        current_fingerprint = _manifest_fingerprint(manifest)
+    except AttributeError as exc:
+        raise StockFoldManifestError(
+            "fold manifest changed after authentication"
+        ) from exc
+    if current_fingerprint != fingerprint:
         raise StockFoldManifestError("fold manifest changed after authentication")
     _revalidate(qc_plan_path, qc_plan_payload, "QC-first parent")
     _revalidate(stock_path, stock_payload, "stock-evaluation parent")

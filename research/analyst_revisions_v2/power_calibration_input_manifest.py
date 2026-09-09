@@ -31,6 +31,11 @@ from .artifact_io import (
     read_stable_regular as _read_artifact_stable_regular,
     revalidate_regular as _revalidate_artifact_regular,
 )
+from .canonical import (
+    FrozenContainerAuthority,
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 
 from .four_family_multiplicity import (
     ANALYST_LANE_ID,
@@ -780,10 +785,15 @@ def _require_identity(
 
 
 def _policy_fingerprint(value: "PowerCalibrationManifestAdmission") -> tuple[object, ...]:
+    scalar_values = (
+        value.admission_contract_id,
+        value.admission_contract_hash,
+        value.owner_decision_id,
+    )
+    if any(type(item) is not str for item in scalar_values):
+        raise PowerCalibrationInputManifestError("authority state is noncanonical")
     return (
-        _fingerprint(value.admission_contract_id),
-        _fingerprint(value.admission_contract_hash),
-        _fingerprint(value.owner_decision_id),
+        *(_fingerprint(item) for item in scalar_values),
         _fingerprint(value.calibration_session_axis),
         _fingerprint(value.definition),
         _fingerprint(value.capabilities),
@@ -992,7 +1002,7 @@ _ADMISSION_AUTHORITIES: dict[
         PowerCalibrationInputSchema,
         FourFamilyMultiplicityOverlay,
         tuple[object, ...],
-        tuple[object, ...],
+        FrozenContainerAuthority,
     ],
 ] = {}
 _ADMISSION_AUTHORITIES_LOCK = threading.RLock()
@@ -1006,7 +1016,7 @@ _CANDIDATE_AUTHORITIES: dict[
         bytes,
         PowerCalibrationManifestAdmission,
         tuple[object, ...],
-        tuple[object, ...],
+        FrozenContainerAuthority,
     ],
 ] = {}
 _CANDIDATE_AUTHORITIES_LOCK = threading.RLock()
@@ -1021,11 +1031,11 @@ def _container_roots(
 def _container_roots_are_current(
     value: object,
     field_names: tuple[str, ...],
-    expected_roots: tuple[object, ...],
+    authority: FrozenContainerAuthority,
 ) -> bool:
-    return len(field_names) == len(expected_roots) and all(
-        getattr(value, name, None) is expected
-        for name, expected in zip(field_names, expected_roots, strict=True)
+    return frozen_container_authority_is_current(
+        (getattr(value, name, None) for name in field_names),
+        authority,
     )
 
 
@@ -1104,7 +1114,9 @@ def load_power_calibration_manifest_admission(
         "_authority": _LOADED_ADMISSION_AUTHORITY,
     }.items():
         object.__setattr__(value, name, item)
-    container_roots = _container_roots(value, _ADMISSION_CONTAINER_FIELDS)
+    container_authority = capture_frozen_container_authority(
+        _container_roots(value, _ADMISSION_CONTAINER_FIELDS)
+    )
     fingerprint = _policy_fingerprint(value)
     identity = id(value)
     reference = weakref.ref(
@@ -1118,7 +1130,7 @@ def load_power_calibration_manifest_admission(
             input_schema,
             multiplicity_overlay,
             fingerprint,
-            container_roots,
+            container_authority,
         )
     return value
 
@@ -1143,7 +1155,13 @@ def require_loaded_power_calibration_manifest_admission(
         raise PowerCalibrationInputManifestError(
             "B2 admission container roots changed"
         )
-    if _policy_fingerprint(admission) != authority[5]:
+    try:
+        current_fingerprint = _policy_fingerprint(admission)
+    except AttributeError as exc:
+        raise PowerCalibrationInputManifestError(
+            "B2 admission object changed"
+        ) from exc
+    if current_fingerprint != authority[5]:
         raise PowerCalibrationInputManifestError("B2 admission object changed")
     try:
         _revalidate(authority[1], authority[2], "B2 admission contract")
@@ -2145,16 +2163,24 @@ def _validate_manifest(
 def _candidate_fingerprint(
     value: ProductionCalibrationInputManifestCandidate,
 ) -> tuple[object, ...]:
+    string_values = (
+        value.manifest_id,
+        value.manifest_content_sha256,
+        value.manifest_artifact_sha256,
+        value.evidence_bundle_id,
+        value.evidence_bundle_content_sha256,
+        value.evidence_bundle_artifact_sha256,
+        value.evidence_epoch_id,
+        value.massive_benzinga_working_assumption_id,
+    )
+    if any(type(item) is not str for item in string_values) or type(
+        value.session_count
+    ) is not int:
+        raise PowerCalibrationInputManifestError("authority state is noncanonical")
     return (
-        _fingerprint(value.manifest_id),
-        _fingerprint(value.manifest_content_sha256),
-        _fingerprint(value.manifest_artifact_sha256),
-        _fingerprint(value.evidence_bundle_id),
-        _fingerprint(value.evidence_bundle_content_sha256),
-        _fingerprint(value.evidence_bundle_artifact_sha256),
-        _fingerprint(value.evidence_epoch_id),
+        *(_fingerprint(item) for item in string_values[:7]),
         _fingerprint(value.data_entitlement_audit_ids),
-        _fingerprint(value.massive_benzinga_working_assumption_id),
+        _fingerprint(string_values[7]),
         _fingerprint(value.session_count),
         _fingerprint(value.input_roles),
         _fingerprint(value.definition),
@@ -2220,7 +2246,9 @@ def load_production_calibration_input_manifest_candidate(
         "_authority": _LOADED_CANDIDATE_AUTHORITY,
     }.items():
         object.__setattr__(value, name, item)
-    container_roots = _container_roots(value, _CANDIDATE_CONTAINER_FIELDS)
+    container_authority = capture_frozen_container_authority(
+        _container_roots(value, _CANDIDATE_CONTAINER_FIELDS)
+    )
     fingerprint = _candidate_fingerprint(value)
     identity = id(value)
     reference = weakref.ref(
@@ -2235,7 +2263,7 @@ def load_production_calibration_input_manifest_candidate(
             evidence_payload,
             admission,
             fingerprint,
-            container_roots,
+            container_authority,
         )
     return value
 
@@ -2260,7 +2288,13 @@ def require_loaded_production_calibration_input_manifest_candidate(
         raise PowerCalibrationInputManifestError(
             "manifest candidate container roots changed"
         )
-    if _candidate_fingerprint(candidate) != authority[6]:
+    try:
+        current_fingerprint = _candidate_fingerprint(candidate)
+    except AttributeError as exc:
+        raise PowerCalibrationInputManifestError(
+            "manifest candidate changed"
+        ) from exc
+    if current_fingerprint != authority[6]:
         raise PowerCalibrationInputManifestError("manifest candidate changed")
     try:
         _revalidate(authority[1], authority[2], "production manifest candidate")

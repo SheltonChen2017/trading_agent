@@ -412,6 +412,48 @@ def test_hostile_mapping_proxy_refuses_before_replacement_code_runs() -> None:
     assert calls == []
 
 
+def test_nested_mapping_replacement_refuses_before_hostile_code_runs() -> None:
+    contract = _load()
+    sections = contract.sections
+    original = sections["control_definition"]
+    calls: list[str] = []
+
+    class BackingDictLeak:
+        value: object | None = None
+
+        def __eq__(self, other: object) -> bool:
+            self.value = other
+            return False
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return "forged"
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    leak = BackingDictLeak()
+    assert (sections == leak) is False
+    assert type(leak.value) is dict
+    leak.value["control_definition"] = MappingProxyType(SplitView())
+
+    with pytest.raises(
+        StockEvaluationContractError, match="descendant container changed"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+    assert calls == []
+
+
 def test_retained_mapping_roots_do_not_keep_contract_alive() -> None:
     contract = _load()
     identity = id(contract)
@@ -437,6 +479,54 @@ def test_equality_spoofed_scalar_type_cannot_bypass_contract_authority() -> None
         StockEvaluationContractError, match="noncanonical authority state"
     ):
         require_loaded_stock_evaluation_contract(contract)
+
+
+def test_deleted_contract_scalar_fingerprint_field_is_a_domain_refusal() -> None:
+    contract = _load()
+    original = contract.spec_id
+    object.__delattr__(contract, "spec_id")
+    with pytest.raises(
+        StockEvaluationContractError, match="changed after authentication"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+    object.__setattr__(contract, "spec_id", original)
+    assert require_loaded_stock_evaluation_contract(contract) is contract
+
+
+def test_hostile_container_in_contract_scalar_refuses_before_traversal() -> None:
+    class HostileScalar(Mapping[str, object]):
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def __getitem__(self, _key: str) -> object:
+            self.calls.append("getitem")
+            return "forged"
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(())
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return 0
+
+        def items(self):
+            self.calls.append("items")
+            return ().__iter__()
+
+    contract = _load()
+    original = contract.spec_id
+    hostile = HostileScalar()
+    object.__setattr__(contract, "spec_id", MappingProxyType(hostile))
+    try:
+        with pytest.raises(
+            StockEvaluationContractError, match="noncanonical authority state"
+        ):
+            require_loaded_stock_evaluation_contract(contract)
+        assert hostile.calls == []
+    finally:
+        object.__setattr__(contract, "spec_id", original)
+    assert require_loaded_stock_evaluation_contract(contract) is contract
 
 
 def _median(values: list[Decimal]) -> Decimal:

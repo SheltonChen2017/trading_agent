@@ -30,6 +30,10 @@ from .artifact_io import (
 
 from data.exchange_calendar import ExchangeCalendarError, trading_sessions
 
+from .canonical import (
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 from .fold_manifest import (
     StockFoldManifest,
     StockFoldManifestError,
@@ -1491,7 +1495,7 @@ def load_global_benchmark_contract(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _contract_fingerprint(value)
-    composite_roots = tuple(
+    frozen_container_authority = capture_frozen_container_authority(
         fields[name] for name in _GLOBAL_BENCHMARK_COMPOSITE_FIELD_NAMES
     )
     sources = (
@@ -1510,7 +1514,7 @@ def load_global_benchmark_contract(
             reference,
             sources,
             fingerprint,
-            composite_roots,
+            frozen_container_authority,
         )
     return value
 
@@ -1528,19 +1532,25 @@ def require_loaded_global_benchmark_contract(
         authority = _GLOBAL_BENCHMARK_AUTHORITIES.get(id(contract))
     if authority is None or authority[0]() is not contract:
         raise GlobalBenchmarkContractError("global benchmark loader authority is absent")
-    _, sources, fingerprint, composite_roots = authority
-    if any(
-        getattr(contract, name, None) is not expected
-        for name, expected in zip(
-            _GLOBAL_BENCHMARK_COMPOSITE_FIELD_NAMES,
-            composite_roots,
-            strict=True,
-        )
+    _, sources, fingerprint, frozen_container_authority = authority
+    if not frozen_container_authority_is_current(
+        (
+            getattr(contract, name, None)
+            for name in _GLOBAL_BENCHMARK_COMPOSITE_FIELD_NAMES
+        ),
+        frozen_container_authority,
     ):
         raise GlobalBenchmarkContractError(
-            "global benchmark composite root changed after authentication"
+            "global benchmark composite root changed after authentication "
+            "or descendant container changed"
         )
-    if _contract_fingerprint(contract) != fingerprint:
+    try:
+        current_fingerprint = _contract_fingerprint(contract)
+    except AttributeError as exc:
+        raise GlobalBenchmarkContractError(
+            "global benchmark changed after authentication"
+        ) from exc
+    if current_fingerprint != fingerprint:
         raise GlobalBenchmarkContractError("global benchmark changed after authentication")
     for path, payload, name in sources:
         _revalidate(path, payload, name)

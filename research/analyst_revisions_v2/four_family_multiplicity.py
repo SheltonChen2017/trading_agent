@@ -22,6 +22,11 @@ from .artifact_io import (
     read_stable_regular as _read_artifact_stable_regular,
     revalidate_regular as _revalidate_artifact_regular,
 )
+from .canonical import (
+    FrozenContainerAuthority,
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 
 from .qc_first_plan import (
     QcFirstPlanError,
@@ -630,7 +635,7 @@ _FOUR_FAMILY_MULTIPLICITY_AUTHORITIES: dict[
         Path,
         bytes,
         tuple[object, ...],
-        tuple[object, ...],
+        FrozenContainerAuthority,
     ],
 ] = {}
 _FOUR_FAMILY_MULTIPLICITY_AUTHORITIES_LOCK = threading.RLock()
@@ -738,7 +743,7 @@ def load_four_family_multiplicity_overlay(
     }.items():
         object.__setattr__(value, name, item)
     fingerprint = _overlay_fingerprint(value)
-    container_roots = tuple(
+    container_authority = capture_frozen_container_authority(
         getattr(value, name) for name in _FOUR_FAMILY_MULTIPLICITY_CONTAINER_FIELDS
     )
     identity = id(value)
@@ -755,7 +760,7 @@ def load_four_family_multiplicity_overlay(
             look_resolved,
             look_payload,
             fingerprint,
-            container_roots,
+            container_authority,
         )
     return value
 
@@ -776,18 +781,21 @@ def require_loaded_four_family_multiplicity_overlay(
         authority = _FOUR_FAMILY_MULTIPLICITY_AUTHORITIES.get(id(overlay))
     if authority is None or authority[0]() is not overlay:
         raise FourFamilyMultiplicityError("multiplicity overlay authority is absent")
-    if any(
-        getattr(overlay, name, None) is not root
-        for name, root in zip(
-            _FOUR_FAMILY_MULTIPLICITY_CONTAINER_FIELDS,
-            authority[10],
-            strict=True,
-        )
-    ):
+    current_roots = tuple(
+        getattr(overlay, name, None)
+        for name in _FOUR_FAMILY_MULTIPLICITY_CONTAINER_FIELDS
+    )
+    if not frozen_container_authority_is_current(current_roots, authority[10]):
         raise FourFamilyMultiplicityError(
             "multiplicity overlay container root changed after loading"
         )
-    if _overlay_fingerprint(overlay) != authority[9]:
+    try:
+        current_fingerprint = _overlay_fingerprint(overlay)
+    except AttributeError as exc:
+        raise FourFamilyMultiplicityError(
+            "multiplicity overlay changed after loading"
+        ) from exc
+    if current_fingerprint != authority[9]:
         raise FourFamilyMultiplicityError("multiplicity overlay changed after loading")
     _revalidate(authority[1], authority[2], "multiplicity overlay")
     _revalidate(authority[3], authority[4], "QC-first plan")

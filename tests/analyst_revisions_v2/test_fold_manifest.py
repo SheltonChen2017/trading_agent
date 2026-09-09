@@ -495,6 +495,48 @@ def test_hostile_mapping_proxy_refuses_before_replacement_code_runs() -> None:
     assert calls == []
 
 
+def test_nested_mapping_replacement_refuses_before_hostile_code_runs() -> None:
+    manifest = _load()
+    fold = manifest.walk_forward_contract["folds"][0]
+    original = fold["nominal_test_interval"]
+    calls: list[str] = []
+
+    class BackingDictLeak:
+        value: object | None = None
+
+        def __eq__(self, other: object) -> bool:
+            self.value = other
+            return False
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return "forged"
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    leak = BackingDictLeak()
+    assert (fold == leak) is False
+    assert type(leak.value) is dict
+    leak.value["nominal_test_interval"] = MappingProxyType(SplitView())
+
+    with pytest.raises(
+        StockFoldManifestError, match="descendant container changed"
+    ):
+        require_loaded_stock_fold_manifest(manifest)
+    assert calls == []
+
+
 def test_retained_mapping_roots_do_not_keep_manifest_alive() -> None:
     manifest = _load()
     identity = id(manifest)
@@ -518,6 +560,52 @@ def test_equality_spoofed_scalar_type_cannot_bypass_manifest_authority() -> None
 
     with pytest.raises(StockFoldManifestError, match="noncanonical authority state"):
         require_loaded_stock_fold_manifest(manifest)
+
+
+def test_deleted_scalar_fingerprint_field_is_a_domain_refusal() -> None:
+    manifest = _load()
+    original = manifest.manifest_id
+    object.__delattr__(manifest, "manifest_id")
+    with pytest.raises(StockFoldManifestError, match="changed after authentication"):
+        require_loaded_stock_fold_manifest(manifest)
+    object.__setattr__(manifest, "manifest_id", original)
+    assert require_loaded_stock_fold_manifest(manifest) is manifest
+
+
+def test_hostile_container_in_scalar_field_refuses_before_traversal() -> None:
+    class HostileScalar(Mapping[str, object]):
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def __getitem__(self, _key: str) -> object:
+            self.calls.append("getitem")
+            return "forged"
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(())
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return 0
+
+        def items(self):
+            self.calls.append("items")
+            return ().__iter__()
+
+    manifest = _load()
+    original = manifest.manifest_id
+    hostile = HostileScalar()
+    object.__setattr__(manifest, "manifest_id", MappingProxyType(hostile))
+    try:
+        with pytest.raises(
+            StockFoldManifestError, match="noncanonical authority state"
+        ):
+            require_loaded_stock_fold_manifest(manifest)
+        assert hostile.calls == []
+    finally:
+        object.__setattr__(manifest, "manifest_id", original)
+    assert require_loaded_stock_fold_manifest(manifest) is manifest
 
 
 @pytest.mark.parametrize(

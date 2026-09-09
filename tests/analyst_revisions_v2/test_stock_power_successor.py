@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import gc
 import hashlib
 import json
 import os
@@ -9,6 +10,7 @@ import pickle
 import signal
 import sys
 import threading
+import weakref
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -61,6 +63,37 @@ class _FingerprintThenForgeMapping(Mapping[str, object]):
     def __len__(self) -> int:
         self.touches += 1
         return len(self._honest)
+
+
+class _BackingDictLeak:
+    def __init__(self) -> None:
+        self.value: object | None = None
+
+    def __eq__(self, other: object) -> bool:
+        self.value = other
+        return False
+
+
+def _replace_nested_mapping_below_same_root(
+    root: MappingProxyType,
+) -> tuple[dict[str, object], str, object, _FingerprintThenForgeMapping]:
+    leak = _BackingDictLeak()
+    assert (root == leak) is False
+    assert type(leak.value) is dict
+    backing = leak.value
+    child_key, child = next(
+        (key, item)
+        for key, item in root.items()
+        if type(item) is MappingProxyType and len(item) > 0
+    )
+    target = next(iter(child))
+    honest_item = child[target]
+    forged = not honest_item if type(honest_item) is bool else None
+    if honest_item is None:
+        forged = "forged-after-authentication"
+    attack = _FingerprintThenForgeMapping(child, target=target, forged=forged)
+    backing[child_key] = MappingProxyType(attack)
+    return backing, child_key, child, attack
 
 
 def _equal_distinct_mapping(value: Mapping[str, object]) -> MappingProxyType:
@@ -916,6 +949,21 @@ def test_copy_reconstruction_pickle_replace_and_mutation_never_create_authority(
         module.require_loaded_stock_power_successor(successor)
 
 
+def test_deleted_successor_scalar_fingerprint_field_is_a_domain_refusal(
+    tmp_path: Path, parents: _Parents
+):
+    loaded = _loaded_successor(tmp_path, parents)
+    successor = loaded.value
+    original = successor.required_valid_dates
+    object.__delattr__(successor, "required_valid_dates")
+    with pytest.raises(
+        module.StockPowerSuccessorError, match="changed after authentication"
+    ):
+        module.require_loaded_stock_power_successor(successor)
+    object.__setattr__(successor, "required_valid_dates", original)
+    assert module.require_loaded_stock_power_successor(successor) is successor
+
+
 def test_successor_authority_pins_every_exact_container_root(
     tmp_path: Path, parents: _Parents
 ):
@@ -972,6 +1020,46 @@ def test_successor_hostile_mapping_proxy_refuses_before_fingerprint_traversal(
     finally:
         object.__setattr__(successor, "definition", original)
     assert module.require_loaded_stock_power_successor(successor) is successor
+
+
+def test_successor_rejects_nested_poison_below_same_disclosed_root(
+    tmp_path: Path, parents: _Parents
+):
+    # ARV2CR26-002: mappingproxy equality discloses the backing dict without
+    # gc; descendant identity must fail before a hostile nested view is read.
+    loaded = _loaded_successor(tmp_path, parents)
+    successor = loaded.value
+    root = successor.definition
+    backing, child_key, original_child, attack = (
+        _replace_nested_mapping_below_same_root(root)
+    )
+    try:
+        with pytest.raises(
+            module.StockPowerSuccessorError,
+            match="container roots changed",
+        ):
+            module.require_loaded_stock_power_successor(successor)
+        assert attack.touches == 0
+    finally:
+        backing[child_key] = original_child
+    assert module.require_loaded_stock_power_successor(successor) is successor
+
+
+def test_successor_registry_authority_is_removed_after_collection(
+    tmp_path: Path, parents: _Parents
+):
+    loaded = _loaded_successor(tmp_path, parents)
+    successor = loaded.value
+    identity = id(successor)
+    reference = weakref.ref(successor)
+    assert identity in module._STOCK_POWER_SUCCESSOR_AUTHORITIES
+
+    del successor
+    del loaded
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in module._STOCK_POWER_SUCCESSOR_AUTHORITIES
 
 
 def test_deep_low_level_object_mutation_refuses_before_recursive_traversal(

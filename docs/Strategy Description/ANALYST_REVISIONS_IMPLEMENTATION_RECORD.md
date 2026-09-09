@@ -69,7 +69,8 @@ CORRECTION SNAPSHOT IN SECTION 36; CODEX ACCEPTS CLAUDE'S PORTABILITY AND
 REVIEW COMMITS AFTER THE SECTION-37 CORRECTIONS. THE OWNER-DIRECTED,
 OUTCOME-FREE ARV2-4E-A POST-PANDEMIC EVALUATION SUPPLEMENT IS ACCEPTED BY
 INDEPENDENT CLAUDE REVIEW AFTER TWO P3 HARDENING AND COVERAGE CORRECTIONS
-(SECTION 39), PENDING CODEX COUNTER-REVIEW. THE
+(SECTION 39); THE CLAUDE REVIEW RANGE IS ACCEPTED AFTER THE SECTION-40 CODEX
+COUNTER-REVIEW CORRECTIONS. THE
 SECTION-32 COUNTER-REVIEW CLOSES RESTRICTED-
 EXPORT AND AUTHORITY-STATE CAPABILITY ESCAPES; SAME-THREAD, CROSS-PROCESS,
 FORK, MODE, DURABILITY, AND FINAL-CUSTODY DEFECTS IN ATOMIC PERSISTENCE; AND
@@ -160,8 +161,8 @@ completion.
 | Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. ARV2-2 now derives a revalidatable, fail-closed inventory of in-range merger/delisting terminal-return requirements and never silently omits an unavailable terminal name. No event has been joined to a later price or return; Databento remains unmeasured. | Production split/dividend, cost/ADV, and terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. | Outcome prerequisites implemented structurally; no outcome I/O and zero looks. |
 | ETF holdings/topology | PIT holdings, declared-versus-summed weight reconciliation, stale/incomplete refusal, fixed lag, 99% coverage, eligibility, and stock-score lineage primitives exist. | No authenticated production holdings or stock-score artifact exists, so no production reverse index, ETF score, or peer topology exists. | Consumer safety implemented; production topology remains zero-access. |
 | Cross-section and portfolio | Deterministic rank/hysteresis/tie/eviction/cap/overlap/cash allocator primitives and verified policy bindings exist. | No reviewed simultaneous rank/volatility derivation or authenticated rank/classification/cost source exists. The public boundary therefore refuses every nonempty portfolio and can return only the safe empty/all-cash result. | Dormant safety algorithm implemented; no research portfolio or QC result. |
-| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. ARV2-4E-A adds an inert, content-addressed 2021-2025 complete-fold sensitivity plus a separately hashed partial-2026 exploratory geometry; it preserves the formal primary, the superseded prospective period, and the shared holdout. | Later executable-spec integration remains required. No accepted production manifest/input package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged. Sections 36-37 complete the latest review/counter-review cycle. ARV2-4E-A is accepted by independent Claude review (section 39) pending Codex counter-review; all outcome/QC-result/deployment/order/trading authorizations refuse. |
-| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the receipt, stock-v3, and post-pandemic supplement modules are in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The atomic writer is callable only through one importer-scoped receipt call. The successor retains no receipt export: one exact synchronous helper imports only the persisted-requirement and artifact-hash functions locally, discards the requirement result, returns only the hash, catches every exception without exporting the caught traceback, a restricted binding/object, or an arbitrary interrupt argument, propagates only fresh exact built-in operator interrupts, and is sealed as a no-module-object facade. Process-local authority state and child-reset hooks are not general exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. The static firewall is a reviewed-closure control, not an OS sandbox; the broader pre-existing computed-reflection limitation is documented in section 32 rather than misrepresented as runtime isolation. | Accepted ancestry and section-34 production behavior remain unchanged; section 37 completes the Claude counter-review. ARV2-4E-A is inert and pending independent review. |
+| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. ARV2-4E-A adds an inert, content-addressed 2021-2025 complete-fold sensitivity plus a separately hashed partial-2026 exploratory geometry; it preserves the formal primary, the superseded prospective period, and the shared holdout. | Later executable-spec integration remains required. No accepted production manifest/input package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged. Section 40 completes the Codex counter-review of Claude's section-39 range and accepts it after lane-specific correction; all outcome/QC-result/deployment/order/trading authorizations refuse. |
+| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the receipt, stock-v3, and post-pandemic supplement modules are in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The atomic writer is callable only through one importer-scoped receipt call. The successor retains no receipt export: one exact synchronous helper imports only the persisted-requirement and artifact-hash functions locally, discards the requirement result, returns only the hash, catches every exception without exporting the caught traceback, a restricted binding/object, or an arbitrary interrupt argument, propagates only fresh exact built-in operator interrupts, and is sealed as a no-module-object facade. Process-local authority state and child-reset hooks are not general exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. The section-40 correction additionally authenticates every loader-created immutable container root by identity before semantic traversal, including hostile custom-mapping proxies. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. The static firewall is a reviewed-closure control, not an OS sandbox; the broader pre-existing computed-reflection limitation is documented in section 32 rather than misrepresented as runtime isolation. | Accepted ancestry and section-34 production behavior remain unchanged; ARV2-4E-A and Claude's review range are accepted after the section-40 Codex counter-review correction. |
 
 The production source, firm-ontology, security-master, classification, cost,
 and rank catalogs remain empty. The canonical source authority permits no
@@ -488,8 +489,9 @@ reviews the section-32 correction snapshot; section 34 accepts all three Claude
 commits after correction, section 36 independently accepts that correction
 snapshot, and section 37 counter-reviews Claude's section-36 commits after the
 bounded test and record corrections. Section 38 implements the owner-directed,
-outcome-free ARV2-4E-A post-pandemic evaluation supplement as a candidate
-pending Claude's independent review. The numeric production path remains
+outcome-free ARV2-4E-A post-pandemic evaluation supplement; sections 39 and 40
+complete its independent Claude review and Codex counter-review correction.
+The numeric production path remains
 fail-closed until its provider-dialect-specific evidence opener, reviewed truth
 approval, and operation-authority pin exist; outcome/result access, paper or
 funded deployment, orders, and trading remain unauthorized.
@@ -2109,6 +2111,7 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-09-08 | Codex counter-review and ARV2-4E-A implementation | `038a81c` -> `fd9a86d` (counter-review correction), `40f3ced` (implementation), and `0dde645` (record) | Accept Claude's section-36 range after correction, then freeze the owner-directed 2021-2026 post-pandemic evaluation geometry without opening data or outcomes | Counter-reviewed both Claude commits individually and cumulatively; narrowed broad link-capability skips and added executed Windows-junction coverage. Implemented an additive, content-addressed supplement selecting complete 2021-2025 folds for descriptive reporting and a separate fixed-cutoff, non-fold partial-2026 exploratory slice. It preserves the accepted 2020-2025 primary, the retired prospective-period tombstone, and the shared 2027-2029 holdout. | Counter-review affected battery **740 passed, 18 skipped** as received; corrected receipt battery **146 passed, 9 skipped**. Final new test **80 passed**; supplement plus firewall **252 passed**; complete package **1,747 passed, 29 skipped**; four root-level Analyst batteries **107 passed**; aggregate lane selection **1,854 passed, 29 skipped, 0 failed**. Python 3.13.14; renderer equality, compileall, active-document, and diff gates recorded in section 38. No credential, licensed row, price, return, outcome, QC, deployment, order, or trade; **0 research looks and 0 development evaluations**. | Counter-review: **1 P2 and 5 P3**, all corrected. ARV2-4E-A precommit review: **3 P2 and 5 P3**, all corrected; no open P0-P3. No new out-of-lane finding. | Push this exact same-lane three-commit range once after the remote-tip check. Claude independently reviews it; Codex then counter-reviews Claude before any actual QC backtest. Production input/QC/outcome access remains blocked by the exact section-34.4 truth, rights, terminal-payoff, authority, and numeric-receipt gates. |
 | 2026-09-08 | Claude review | `0dde645` -> `ec9ebbc` and `188b623` (corrections), `a36df23` (record), and the hash-naming head named in 39.1 | Independent review of the Codex counter-review correction `fd9a86d` and the ARV2-4E-A post-pandemic supplement `40f3ced` | Reviewed all three commits in `038a81c..0dde645` with explicit dispositions (section 39); accepted after one P3 correction. Verified rather than accepted: the 17,785-byte supplement reproduces from its renderer and its plan ID/hash recompute; the three parent artifact pins match the checked-in fold manifest, QC-first draft, and stock contract; the partial-2026 geometry (cutoff session, first post-cutoff session, four maturity boundaries, effective starts, validation starts, and eligible counts) recomputes independently from `data.exchange_calendar`; the contamination window matches its two parents; the three production gates remain null/false; frozen documents and accepted artifacts untouched. A 21-guard mutation matrix caught 7 outright and exposed 11 guards reachable only behind the exact-document comparison, now covered by `188b623`; 3 remain equivalent mutants. | Four batteries **472 passed, 2 skipped in 102.19 s** at `0dde645`; plan battery **92 passed** at `188b623`; complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries on `188b623` **1,888 passed, 7 skipped, 0 failed in 187.01 s (3:07)**; the complete repository suite was not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; compileall exit 0; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2; 2 P3 corrections (`ARV2R23-001` value-equality fingerprint, `ARV2R23-004` eleven bypass-mode guard gaps) with red/green regression tests; 2 P3 observations documented only. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews every Claude commit in this round before any actual QuantConnect backtest; ARV2-4E-A remains outcome-free and every section-34.4 production-input, truth, rights, terminal-payoff, receipt, and QC-operation gate remains closed. |
+| 2026-09-08 | Codex counter-review and authority-root hardening | `0dde645..03536e9` (four Claude commits) -> `0fc63b8` (correction) and this record commit | Counter-review Claude's ARV2-4E-A review range without starting the first 2021-based backtest | Counter-reviewed `ec9ebbc`, `188b623`, `a36df23`, and externally resolved head `03536e9` individually and cumulatively. Accepted all four after correction. Pinned every affected Analyst loader-created immutable container root before fingerprint traversal; exact-type fingerprints now refuse equality-spoofed scalars; the supplement constructor refuses direct construction; two omitted semantic-guard regressions were added; and the current/review record was reconciled. The 2021-2026 first-round window decision is preserved as sequencing/geometry only. | Direct pre-correction exploit accepted a hostile mapping proxy and exposed `orders=True`; the corrected tree refuses it. Final adversarial selection **40 passed, 1,170 deselected**; manifest/supplement metaclass and root selection **25 passed, 438 deselected**; complete Analyst V2 selection **1,943 passed, 7 skipped, 0 failed in 201.35 s (3:21)**; active-document gate **69 passed**; changed-scope compileall exit 0; final diff/status gates clean; Python 3.13.15. No complete repository suite was run. No credential, provider row, production input, price, return, outcome, terminal payoff, QuantConnect resource/job, broker, deployment, order, or trade was accessed; **zero research looks and zero development evaluations**. | **2 P2 and 6 P3** (`ARV2CR24-001..008`): six lane findings corrected and two process deviations documented without rewriting history. No shared/main issue was changed. Claude's performance observation `ARV2R23-003` remains documented only. | Push this exact same-lane counter-review range once. The next executable step remains blocked on the reviewed provider evidence opener, production truth/rights/input and operation-authority pins, terminal-return treatment, numeric receipt, executable run bindings, and explicit atomic QC evaluation authority. The fixed 2021 start does not grant data, outcome, QC, result, deployment, order, or trading authority. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -6323,7 +6326,7 @@ order, or trading authority remain separate and false.
 fast-forwarded into this same worktree from `9dbdac5`. The intervening
 commits `f6cd23b`, `d8f02a1`, `6ddc515`, `bd7e0c6`, and `038a81c` were
 already disposed in sections 36 and 37 and are not re-disposed here.
-**Disposition: ACCEPTED with two P3 corrections.** 0 P0, 0 P1, 0 P2.
+**Disposition: ACCEPTED AFTER CORRECTION with two P3 corrections.** 0 P0, 0 P1, 0 P2.
 `ec9ebbc` changes one fingerprint helper and its caller in
 `post_pandemic_evaluation_plan.py` and adds one regression test; `188b623`
 adds eleven bypass-mode regression cases to the plan battery; no artifact,
@@ -6349,7 +6352,7 @@ untouched across the range; the only spec change is the new supplement.
 | `ec9ebbc` | Claude correction | `ARV2R23-001`; the regression test fails against both the value-equality helper and the top-level bypass (39.4). |
 | `188b623` | Claude correction | `ARV2R23-004`; each of the eleven new cases fails when only its guard is disabled (39.4). |
 | `a36df23` | Claude record | This section, current-status and summary-row wording, ledger row. |
-| hash-naming commit | Claude record | Names `a36df23` in this table; its own hash is the branch head Codex counter-reviews. |
+| `03536e9` | Claude record | Names `a36df23` in this table; its exact externally resolved review-head identity is recorded by the Codex counter-review in section 40. |
 
 ### 39.2 Verified rather than accepted
 
@@ -6409,7 +6412,20 @@ untouched across the range; the only spec change is the new supplement.
 
 ### 39.4 Mutation matrix and regression verification
 
-Twenty-one single-guard removals were applied to `post_pandemic_evaluation_plan.py`, each followed by its battery and a restore. Caught outright at `ec9ebbc` (7): the pooled-inference flag, holdout consumption, the null power floors, the parent fold-manifest byte pin, the exact-document comparison, the fingerprint check, and the nested `require_loaded_stock_fold_manifest` call. Missed (14): eleven are `ARV2R23-004` and are now caught by `188b623`; three are equivalent mutants and remain documented only: the parent partial-2026 clause and the parent fold-order check (both parent-derived and byte-pinned), and the reload comparison in `require_loaded_*` (the preceding byte revalidation refuses first). The fold-overlap guard is reachable only if the H20 selection guard is also removed and is therefore covered by the selection case.
+Twenty-one single-guard removals were applied to
+`post_pandemic_evaluation_plan.py`, each followed by its battery and a restore.
+Caught outright at `ec9ebbc` (7): the pooled-inference flag, holdout
+consumption, the null power floors, the parent fold-manifest byte pin, the
+exact-document comparison, the fingerprint check, and the nested
+`require_loaded_stock_fold_manifest` call. Missed (14): eleven are
+`ARV2R23-004` and are now caught by `188b623`; three are equivalent mutants
+and remain documented only: the parent partial-2026 clause and the parent
+fold-order check (both parent-derived and byte-pinned), and the reload
+comparison in `require_loaded_*` (the preceding byte revalidation refuses
+first). The fold-overlap guard is reachable only if the H20 selection guard is
+also bypassed; section 40 records the focused two-guard regression added so
+the overlap check itself is asserted rather than credited indirectly to the
+selection check.
 
 With `_fingerprint_value` restored to the value-equality form, or with only the
 five top-level fields restored to direct comparison, the new regression test
@@ -6445,3 +6461,128 @@ production-truth and operation-authority pins, numeric calibration receipt,
 executable run bindings, and an explicit atomic QuantConnect evaluation
 authorization all remain outstanding, and result access, deployment, orders,
 and trading remain false.
+
+## 40. Codex counter-review of Claude's ARV2-4E-A review range, 2026-09-08
+
+**Exact Claude range counter-reviewed:**
+`0dde6455c71c1c4cd5421324d6b61d43722809c3..03536e968f1d6963c93f0a8329481d8af335be25`.
+The range contains `ec9ebbce9a681dc96af332b4083ecedc915d29fd`,
+`188b623780bdb4a80664361842a2e5cef9b8b3be`,
+`a36df23b8d41a2c38249621de0abaa877682b871`, and
+`03536e968f1d6963c93f0a8329481d8af335be25` in that order.
+
+**Disposition: ACCEPTED AFTER CORRECTION.** The counter-review finds 0 P0,
+0 P1, **2 P2**, and **6 P3**. Six lane-specific findings are corrected by
+`0fc63b807413d2b75c61bbe8a7aebbead9d3746f` and this record; two process
+deviations are documented without rewriting history. No shared/main behavior
+was changed.
+
+The owner's fixed first-round start in 2021 remains recorded as the
+2021-2025 complete-fold sensitivity plus separate partial-2026 exploratory
+geometry. It is a period and sequencing decision only. This counter-review
+did not open production data, outcomes, or QuantConnect, and it did not start
+a backtest.
+
+### 40.1 Per-commit dispositions
+
+| Commit | Disposition | Counter-review basis |
+|---|---|---|
+| `ec9ebbc` | **Accepted after correction** | The scalar exact-type correction is directionally correct and its regression is valid, but an exact `MappingProxyType` can still wrap a hostile custom `Mapping`. Fingerprinting through that proxy can observe one state while later indexed access exposes another. `0fc63b8` authenticates loader-created container-root identity before any traversal across the complete affected Analyst authority chain. |
+| `188b623` | **Accepted after correction** | All eleven added bypass-mode cases reach the guards they claim to exercise. The description of them as the remaining guards was incomplete: aggregation rescue/tuning/threshold selection and the fold-overlap check lacked independent focused regressions. Both are now pinned. |
+| `a36df23` | **Accepted after correction** | The artifact, geometry, authority, and validation evidence was independently consistent. The record nevertheless left one current-state row at “pending independent review” and used noncanonical/count-inconsistent disposition wording. The active narrative is reconciled here; the received historical summary row is not rewritten again, and this new row corrects it. |
+| `03536e9` | **Accepted after correction** | This record-only commit names the prior record commit but could not name itself while claiming the exact final review head was named. It also rewrote the already-appended Claude summary row despite the ledger's binding append-only rule. The externally resolved exact head and the historical process violation are recorded here without rewriting that row again. |
+| `0fc63b8` | **Codex correction** | Pins immutable authority roots for fourteen loaded contract types, makes the older authority fingerprints exact-type, closes metaclass-equality paths, refuses direct construction of the supplement plan, and adds the missing adversarial and semantic-guard regressions. |
+
+### 40.2 Findings ledger
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2CR24-001` | P2 | Lane-specific authority boundary | Claude's exact-type fingerprint still traversed `MappingProxyType.items()`. A proxy over a custom mapping can return canonical false values during fingerprinting and different values through `__getitem__`; replacing a frozen field with that proxy reauthenticated successfully and could expose `capabilities["orders"] is True`. The same root-substitution class existed in fourteen loader-authenticated Analyst contract types. | **Corrected in `0fc63b8`.** Every affected authority registry now retains the original immutable roots and checks each with `is` before fingerprint traversal. Hostile, stateful, equal-but-distinct, and mapping-proxy replacements refuse. |
+| `ARV2CR24-002` | P3 | Lane-specific API consistency | `PostPandemicEvaluationPlan()` produced a fieldless object even though the authority type is loader-only and sibling authority types refuse direct construction. | **Corrected in `0fc63b8`.** Direct construction raises exact `TypeError`; loader construction remains private and authenticated. |
+| `ARV2CR24-003` | P3 | Lane-specific test coverage | Claude's eleven new cases are valid, but `gate_rescue_tuning_or_threshold_selection_permitted` and the fold-overlap guard were not independently asserted. The latter was only rejected earlier by the H20 selection guard. | **Corrected in `0fc63b8`.** Added a rescue/tuning mutation case and a focused two-guard bypass proving the overlap guard itself refuses. |
+| `ARV2CR24-004` | P2 | Lane record/current state | The Architecture row and section-4 live overview still said ARV2-4E-A was pending independent review after section 39 had completed that review. A later session could repeat a completed stage or mis-sequence outcome work. | **Corrected in this record.** Current-state text now identifies sections 39-40 and keeps every outcome/action gate closed. |
+| `ARV2CR24-005` | P3 | Lane record/disposition | Section 39 used `ACCEPTED with two P3 corrections`, while its summary row said “accepted after one P3 correction.” | **Corrected in this record.** Section 39 uses canonical `ACCEPTED AFTER CORRECTION`; the received historical row is not rewritten again, and the new section-40 row records the exact two-correction history. |
+| `ARV2CR24-006` | P3 | Lane record/identity | The final Claude table retained “hash-naming commit,” so the exact externally resolved review head `03536e9` was not actually named despite the summary claim. | **Corrected in this record.** Section 39.1 and this section name `03536e9` explicitly without pretending a commit can self-name. |
+| `ARV2CR24-007` | P3 | Self-reported process note | One focused constructor diagnostic was accidentally invoked in the neighboring base checkout because an unset command-workdir binding omitted the designated lane path. It made no repository change. | **Documented.** That result was discarded and is not validation evidence. The diagnostic and every authoritative closing check were rerun in the exact Analyst V2 worktree and branch. |
+| `ARV2CR24-008` | P3 | Claude process/append-only ledger | Commit `03536e9` rewrote the Claude summary row that `a36df23` had already appended, even though the ledger requires “Append one row before every push. Never rewrite earlier rows.” | **Documented without another rewrite.** The historical row is preserved at the received head; this newly appended Codex row and section record the violation and corrected interpretation. |
+
+Claude's `ARV2R23-003` performance observation remains documented without a
+code change: full-parent reloading is currently a correct fail-closed
+reauthentication cost, not a correctness defect.
+
+### 40.3 Correction boundary and invariants
+
+The corrected registries cover the loader-created `StockFoldManifest`,
+`StockEvaluationContract`, `ReviewedPreregistration`,
+`GlobalBenchmarkContract`, `FourFamilyMultiplicityOverlay`,
+`PowerCalibrationInputSchema`, `PowerCalibrationProtocol`,
+`PowerCalibrationManifestAdmission`,
+`ProductionCalibrationInputManifestCandidate`,
+`PowerCalibrationInputContentContract`, `PowerCalibrationInputAuthority`,
+`PowerCalibrationReceipt`, `StockPowerSuccessor`, and
+`PostPandemicEvaluationPlan`.
+
+Each authority entry still owns only a weak reference to the top-level loaded
+object, preserving cleanup when that object is collected. It now also retains
+strong references to the exact immutable container roots needed to prevent
+replacement or backing-object collection. Reauthentication checks those roots
+by object identity before calling any potentially attacker-controlled mapping
+method. The preregistration boundary additionally pins the cells tuple, looks
+tuple, each cell-value root, and exact nested record types. Regression tests
+cover successful weak-reference cleanup and identity non-reuse, so the new
+pins do not turn the owner objects into permanent registry entries.
+
+The older fold, stock-contract, and preregistration fingerprints now use
+explicit tagged exact types for strings, booleans, integers, tuples, mappings,
+and null. The post-pandemic and input-manifest scalar helpers use explicit
+`type(value) is ...` branches rather than membership comparisons that a
+hostile metaclass can influence. No accepted JSON artifact, provider binding,
+source requirement, fold geometry, power formula, receipt schema, successor
+schema, firewall membership, or capability value changed. The supplement
+remains 17,785 bytes with SHA-256
+`caa837b1e2797095dcb4cf5f30e21b72cc9d4254ff851a4fe5fb8779678e5e14`,
+and its renderer remains byte-identical.
+
+### 40.4 Validation on the corrected lane tree
+
+- A direct pre-correction reproduction replaced `capabilities` with a hostile
+  exact mapping proxy: `orders` was visible as true, and
+  `require_loaded_post_pandemic_evaluation_plan` returned the forged object.
+  The corrected identity-first boundary refuses the replacement before
+  traversing it.
+- Final cross-contract adversarial selection: **40 passed, 1,170 deselected
+  in 20.67 s**.
+- Final input-manifest/supplement root and hostile-metaclass selection:
+  **25 passed, 438 deselected in 12.50 s**.
+- Complete Analyst V2 selection:
+  **1,943 passed, 7 skipped, 0 failed in 201.35 s (3:21)** using Python
+  **3.13.15**.
+- Active-document consistency: **69 passed**. Changed-scope `compileall`
+  exits 0; `git diff --check` and the final lane status checks are clean.
+- The complete repository suite was not run, per the owner-directed
+  Analyst-lane validation rule.
+
+No configured credential, licensed provider row, production input, price,
+return, outcome, terminal payoff, QuantConnect project or job, broker,
+operator database, deployment, order, or trade was accessed. **Zero research
+looks and zero development evaluations.**
+
+### 40.5 Claude review notes and exact next gate
+
+Claude next reviews the single pushed same-lane range after `03536e9`, with a
+separate disposition for correction commit
+`0fc63b807413d2b75c61bbe8a7aebbead9d3746f` and this record commit. The review
+should concentrate on identity-before-traversal ordering for all fourteen
+contract types; hostile and stateful custom mappings behind exact mapping
+proxies; equality-spoofed scalar and metaclass cases; registry weak-reference
+lifecycle; the two added semantic guards; and the unchanged frozen artifact,
+authority, and capability boundary.
+
+This completes counter-review, not backtesting. The next executable milestone
+still requires a separately reviewed provider-specific evidence opener and
+exact production truth, rights, lineage, input, operation-authority,
+terminal-return, numeric-receipt, and executable run-binding artifacts. Only
+after those gates are satisfied may the owner grant one explicit atomic
+QuantConnect evaluation authorization for the fixed 2021-based first round.
+Result reading/disposition and all deployment, order, and trading authorities
+remain separate and false.

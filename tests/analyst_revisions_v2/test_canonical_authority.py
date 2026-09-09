@@ -73,6 +73,23 @@ def test_descendant_removal_and_equivalent_replacement_are_not_current():
     assert frozen_container_authority_is_current((root,), authority) is False
 
 
+def test_equal_but_distinct_mapping_key_identity_is_not_current():
+    key = "authority_key_0123456789"
+    equal_but_distinct_key = bytearray(key, "utf-8").decode("utf-8")
+    assert type(equal_but_distinct_key) is str
+    assert equal_but_distinct_key == key
+    assert equal_but_distinct_key is not key
+
+    child = MappingProxyType({"value": False})
+    root = MappingProxyType({key: child})
+    authority = capture_frozen_container_authority((root,))
+    backing = _leak_backing_dict(root)
+
+    assert backing.pop(key) is child
+    backing[equal_but_distinct_key] = child
+    assert frozen_container_authority_is_current((root,), authority) is False
+
+
 def test_trusted_container_cannot_be_rewired_into_a_former_scalar_slot():
     root = MappingProxyType({"value": "safe"})
     authority = capture_frozen_container_authority((root,))

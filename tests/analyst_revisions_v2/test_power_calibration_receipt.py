@@ -1789,6 +1789,56 @@ def test_forged_disposition_class_cannot_spoof_receipt_fingerprint(
     assert module.require_persisted_power_calibration_receipt(receipt) is receipt
 
 
+def test_disposition_preflight_never_runs_post_topology_class_side_effects(
+    tmp_path: Path, parents: _Parents
+):
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    receipt = _compute(parents, inputs)
+    destination = tmp_path / module.power_calibration_receipt_filename(receipt)
+    module.persist_power_calibration_receipt(receipt, destination)
+    original_disposition = receipt.disposition
+
+    for checker in (
+        module.require_loaded_power_calibration_receipt,
+        module.require_persisted_power_calibration_receipt,
+    ):
+        state: dict[str, object] = {}
+
+        class SideEffectDisposition:
+            class_reads = 0
+
+            @property
+            def __class__(self):
+                self.class_reads += 1
+                state["replacement"] = _replace_nested_mapping_below_same_root(
+                    receipt.definition
+                )
+                object.__setattr__(
+                    receipt, "disposition", original_disposition
+                )
+                return ProvisionalPowerDisposition
+
+        forged = SideEffectDisposition()
+        object.__setattr__(receipt, "disposition", forged)
+        try:
+            with pytest.raises(
+                module.PowerCalibrationReceiptError, match="noncanonical value"
+            ):
+                checker(receipt)
+            assert forged.class_reads == 0
+            assert state == {}
+        finally:
+            replacement = state.get("replacement")
+            if replacement is not None:
+                backing, child_key, original_child, _ = replacement
+                backing[child_key] = original_child
+            object.__setattr__(receipt, "disposition", original_disposition)
+        assert module.require_loaded_power_calibration_receipt(receipt) is receipt
+        assert (
+            module.require_persisted_power_calibration_receipt(receipt) is receipt
+        )
+
+
 def test_all_receipt_authorities_pin_every_exact_container_root(
     tmp_path: Path, parents: _Parents
 ):

@@ -219,6 +219,7 @@ DEFAULT_FORBIDDEN_IMPORT_PREFIXES = frozenset(
         "data.price_target_data",
         "data.research_results",
         "research.acer",
+        "research.analyst_revisions_v2_qc",
         "research.assistant_results",
         "research.lean",
         "research.ml_specs",

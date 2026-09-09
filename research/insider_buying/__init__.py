@@ -16,6 +16,8 @@ The IB-2C boundary maps those exhaustive transactions against caller-supplied,
 dated security/title/ticker references while retaining zero external authority.
 IB-2D adds exhaustive provisional lot diagnostics and an exact USD 50,000
 comparison while retaining every downstream authority gate as false.
+IB-3A adds synthetic-only event-size, freshness, raw-score, and breadth
+equation diagnostics; it does not consume IB-2D or expose a canonical score.
 """
 
 from research.insider_buying.contracts import (
@@ -122,6 +124,35 @@ from research.insider_buying.form4_provisional_lot_diagnostics import (
     Form4ProvisionalLotQuarantineReason,
     Form4ProvisionalLotThresholdDiagnostic,
     build_form4_provisional_lot_diagnostics,
+)
+from research.insider_buying.form4_stock_signal_formula_diagnostics import (
+    FORM4_STOCK_SIGNAL_DECIMAL_PRECISION,
+    FORM4_STOCK_SIGNAL_DECIMAL_ROUNDING,
+    FORM4_STOCK_SIGNAL_DOLLAR_BREADTH_FORMULA,
+    FORM4_STOCK_SIGNAL_EVENT_SCORE_FORMULA,
+    FORM4_STOCK_SIGNAL_FORMULA_DIAGNOSTICS_VERSION,
+    FORM4_STOCK_SIGNAL_FRESHNESS_EVALUATION,
+    FORM4_STOCK_SIGNAL_FRESHNESS_FORMULA,
+    FORM4_STOCK_SIGNAL_HALF_LIFE_TRADING_DAYS,
+    FORM4_STOCK_SIGNAL_LOOKBACK_TRADING_DAYS,
+    FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD,
+    FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH,
+    FORM4_STOCK_SIGNAL_RAW_SCORE_FORMULA,
+    FORM4_STOCK_SIGNAL_SIZE_FORMULA,
+    MAX_FORM4_STOCK_SIGNAL_AGE_TRADING_DAYS,
+    MAX_FORM4_STOCK_SIGNAL_EVENTS,
+    MAX_FORM4_STOCK_SIGNAL_PROJECTION_DEPTH,
+    MAX_FORM4_STOCK_SIGNAL_PROJECTION_NODES,
+    MAX_FORM4_STOCK_SIGNAL_ROLES_PER_EVENT,
+    MAX_FORM4_STOCK_SIGNAL_TEXT_CHARACTERS,
+    Form4StockSignalBreadthDiagnostics,
+    Form4StockSignalEventContribution,
+    Form4StockSignalFixtureEvent,
+    Form4StockSignalFormulaDiagnostics,
+    Form4StockSignalFormulaDiagnosticsError,
+    Form4StockSignalFormulaIdentity,
+    build_form4_stock_signal_fixture_event,
+    build_form4_stock_signal_formula_diagnostics,
 )
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
@@ -311,4 +342,31 @@ __all__ = [
     "reconcile_sec_form4_amendments",
     "write_sec_bulk_snapshot",
     "write_form4_provisional_disposition_snapshot",
+    "FORM4_STOCK_SIGNAL_DECIMAL_PRECISION",
+    "FORM4_STOCK_SIGNAL_DECIMAL_ROUNDING",
+    "FORM4_STOCK_SIGNAL_DOLLAR_BREADTH_FORMULA",
+    "FORM4_STOCK_SIGNAL_EVENT_SCORE_FORMULA",
+    "FORM4_STOCK_SIGNAL_FORMULA_DIAGNOSTICS_VERSION",
+    "FORM4_STOCK_SIGNAL_FRESHNESS_EVALUATION",
+    "FORM4_STOCK_SIGNAL_FRESHNESS_FORMULA",
+    "FORM4_STOCK_SIGNAL_HALF_LIFE_TRADING_DAYS",
+    "FORM4_STOCK_SIGNAL_LOOKBACK_TRADING_DAYS",
+    "FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD",
+    "FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH",
+    "FORM4_STOCK_SIGNAL_RAW_SCORE_FORMULA",
+    "FORM4_STOCK_SIGNAL_SIZE_FORMULA",
+    "MAX_FORM4_STOCK_SIGNAL_AGE_TRADING_DAYS",
+    "MAX_FORM4_STOCK_SIGNAL_EVENTS",
+    "MAX_FORM4_STOCK_SIGNAL_PROJECTION_DEPTH",
+    "MAX_FORM4_STOCK_SIGNAL_PROJECTION_NODES",
+    "MAX_FORM4_STOCK_SIGNAL_ROLES_PER_EVENT",
+    "MAX_FORM4_STOCK_SIGNAL_TEXT_CHARACTERS",
+    "Form4StockSignalBreadthDiagnostics",
+    "Form4StockSignalEventContribution",
+    "Form4StockSignalFixtureEvent",
+    "Form4StockSignalFormulaDiagnostics",
+    "Form4StockSignalFormulaDiagnosticsError",
+    "Form4StockSignalFormulaIdentity",
+    "build_form4_stock_signal_fixture_event",
+    "build_form4_stock_signal_formula_diagnostics",
 ]

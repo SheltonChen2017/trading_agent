@@ -1727,3 +1727,14 @@ def test_terminal_lineage_node_cannot_parent_another_node(schema):
         validate_synthetic_calibration_input_manifest_fixture(
             schema, _fixture_bytes(schema, mutate)
         )
+
+@pytest.mark.parametrize(
+    "field", ("calibration_session_axis", "definition", "lineage_graph", "capabilities")
+)
+def test_deleted_schema_container_root_is_a_domain_refusal_not_attribute_error(field):
+    # ARV2R25-001: see the four-family sibling; the deleted attribute must
+    # refuse through PowerCalibrationInputSchemaError.
+    loaded = _load_schema()
+    object.__delattr__(loaded, field)
+    with pytest.raises(PowerCalibrationInputSchemaError, match="container root changed"):
+        require_loaded_power_calibration_input_schema(loaded)

@@ -990,7 +990,7 @@ def require_loaded_power_calibration_protocol(
             "power protocol loader authority is absent"
         )
     if any(
-        getattr(protocol, name) is not root
+        getattr(protocol, name, None) is not root
         for name, root in zip(
             _POWER_CALIBRATION_PROTOCOL_CONTAINER_FIELDS,
             authority[5],

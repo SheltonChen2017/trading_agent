@@ -1144,3 +1144,12 @@ def test_each_action_accessor_is_a_literal_false_constant(name):
     ]
     assert len(body) == 1 and isinstance(body[0], ast.Return)
     assert isinstance(body[0].value, ast.Constant) and body[0].value.value is False
+
+@pytest.mark.parametrize("field", ("definition", "fixed_lane_ids"))
+def test_deleted_container_root_is_a_domain_refusal_not_attribute_error(field):
+    # ARV2R25-001: a removed container attribute must refuse through the lane
+    # error like every other root-pin failure, not escape as AttributeError.
+    loaded = _load()
+    object.__delattr__(loaded, field)
+    with pytest.raises(FourFamilyMultiplicityError, match="container root changed"):
+        require_loaded_four_family_multiplicity_overlay(loaded)

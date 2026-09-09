@@ -777,7 +777,7 @@ def require_loaded_four_family_multiplicity_overlay(
     if authority is None or authority[0]() is not overlay:
         raise FourFamilyMultiplicityError("multiplicity overlay authority is absent")
     if any(
-        getattr(overlay, name) is not root
+        getattr(overlay, name, None) is not root
         for name, root in zip(
             _FOUR_FAMILY_MULTIPLICITY_CONTAINER_FIELDS,
             authority[10],

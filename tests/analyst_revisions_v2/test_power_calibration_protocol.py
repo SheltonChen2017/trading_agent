@@ -1067,3 +1067,14 @@ def test_weakref_callback_removes_loader_authority():
     gc.collect()
     assert reference() is None
     assert identity not in module._POWER_CALIBRATION_PROTOCOL_AUTHORITIES
+
+@pytest.mark.parametrize(
+    "field", ("calibration_session_axis", "definition", "lineage_graph", "capabilities")
+)
+def test_deleted_container_root_is_a_domain_refusal_not_attribute_error(field):
+    # ARV2R25-001: the deleted attribute must refuse through
+    # PowerCalibrationProtocolError, not escape as AttributeError.
+    loaded = _load()
+    object.__delattr__(loaded, field)
+    with pytest.raises(PowerCalibrationProtocolError, match="container root changed"):
+        require_loaded_power_calibration_protocol(loaded)

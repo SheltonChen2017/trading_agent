@@ -1084,7 +1084,7 @@ def require_loaded_power_calibration_input_schema(
             "calibration input schema loader authority is absent"
         )
     if any(
-        getattr(schema, name) is not root
+        getattr(schema, name, None) is not root
         for name, root in zip(
             _POWER_CALIBRATION_INPUT_SCHEMA_CONTAINER_FIELDS,
             authority[5],

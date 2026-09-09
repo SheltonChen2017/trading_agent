@@ -1081,3 +1081,150 @@ def test_equal_comparing_subclasses_cannot_spoof_plan_authority() -> None:
     object.__setattr__(plan, "capabilities", plan_module._freeze(nested))
     with pytest.raises(PostPandemicEvaluationPlanError, match="changed after"):
         require_loaded_post_pandemic_evaluation_plan(plan)
+
+
+def _shift_h20_maturity_consistently(raw: dict[str, object]) -> None:
+    partial = raw["partial_2026_exploratory_contract"]
+    partial["last_mature_decision_session_by_horizon"]["20"] = "2026-07-30"
+    boundary = partial["eligible_decision_bounds"][2]
+    boundary["last_mature_decision_session"] = "2026-07-30"
+    boundary["test_end_exclusive"] = "2026-07-31"
+    boundary["eligible_decision_session_count"] = 124
+
+
+@pytest.mark.parametrize(
+    ("mutate", "match"),
+    [
+        pytest.param(
+            lambda raw: raw["post_pandemic_complete_contract"][
+                "selected_complete_h20_folds"
+            ][0].update(h20_structural_fold_sha256="0" * 64),
+            "H20 fold selection",
+            id="h20-selection",
+        ),
+        pytest.param(
+            lambda raw: raw["post_pandemic_complete_contract"][
+                "complete_fold_aggregation_contract"
+            ].update(partial_2026_included=True),
+            "descriptive fold aggregation",
+            id="aggregate-partial",
+        ),
+        pytest.param(
+            _shift_h20_maturity_consistently,
+            "maturity boundary",
+            id="maturity-boundary",
+        ),
+        pytest.param(
+            lambda raw: raw["partial_2026_exploratory_contract"][
+                "eligible_decision_bounds"
+            ][2].update(eligible_decision_session_count=126),
+            "eligible decision bounds",
+            id="partial-count",
+        ),
+        pytest.param(
+            lambda raw: raw["fixed_cutoff_lock_contract"].update(
+                first_post_cutoff_session="2026-09-01"
+            ),
+            "post-cutoff boundary",
+            id="first-post-cutoff",
+        ),
+        pytest.param(_drop_primary_2020, "changed the primary", id="replace-primary"),
+    ],
+)
+def test_remaining_semantic_guards_survive_exact_literal_bypass(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutate,
+    match: str,
+) -> None:
+    # ARV2R23-004: these guards were reachable only behind the exact-document
+    # comparison; each is now exercised with that comparison bypassed.
+    raw = copy.deepcopy(json.loads(PLAN.read_text(encoding="utf-8")))
+    mutate(raw)
+    _rehash(raw)
+    monkeypatch.setattr(plan_module, "_EXPECTED_DOCUMENT", plan_module._freeze(raw))
+    with pytest.raises(PostPandemicEvaluationPlanError, match=match):
+        _load(_write(tmp_path, raw))
+
+
+def _recompute_plan_identity(raw: dict[str, object]) -> None:
+    raw["plan_id"] = None
+    raw["plan_hash"] = None
+    digest = hashlib.sha256(_canonical(raw)).hexdigest()
+    raw["plan_hash"] = digest
+    raw["plan_id"] = f"arv2-stock-post-pandemic-{digest[:16]}"
+
+
+def _tamper_plan_id(raw: dict[str, object]) -> None:
+    raw["plan_id"] = "arv2-stock-post-pandemic-" + "0" * 16
+
+
+def _tamper_section_hash(raw: dict[str, object]) -> None:
+    raw["section_hashes"]["naming_contract"] = "0" * 64
+    _recompute_plan_identity(raw)
+
+
+def _tamper_window_hash(raw: dict[str, object]) -> None:
+    partial = raw["partial_2026_exploratory_contract"]
+    partial["partial_window_sha256"] = "0" * 64
+    raw["section_hashes"]["partial_2026_exploratory_contract"] = hashlib.sha256(
+        _canonical(partial)
+    ).hexdigest()
+    _recompute_plan_identity(raw)
+
+
+def _tamper_boundary_set_hash(raw: dict[str, object]) -> None:
+    partial = raw["partial_2026_exploratory_contract"]
+    partial["boundary_set_sha256"] = "0" * 64
+    partial["partial_window_sha256"] = None
+    partial["partial_window_sha256"] = hashlib.sha256(
+        _canonical(partial)
+    ).hexdigest()
+    raw["section_hashes"]["partial_2026_exploratory_contract"] = hashlib.sha256(
+        _canonical(partial)
+    ).hexdigest()
+    _recompute_plan_identity(raw)
+
+
+def _tamper_boundary_hash(raw: dict[str, object]) -> None:
+    partial = raw["partial_2026_exploratory_contract"]
+    partial["eligible_decision_bounds"][1]["boundary_sha256"] = "0" * 64
+    partial["boundary_set_sha256"] = hashlib.sha256(
+        _canonical(partial["eligible_decision_bounds"])
+    ).hexdigest()
+    partial["partial_window_sha256"] = None
+    partial["partial_window_sha256"] = hashlib.sha256(
+        _canonical(partial)
+    ).hexdigest()
+    raw["section_hashes"]["partial_2026_exploratory_contract"] = hashlib.sha256(
+        _canonical(partial)
+    ).hexdigest()
+    _recompute_plan_identity(raw)
+
+
+@pytest.mark.parametrize(
+    ("tamper", "match"),
+    [
+        pytest.param(_tamper_plan_id, "not content-derived", id="plan-id"),
+        pytest.param(_tamper_section_hash, "section hash mismatch", id="section-hash"),
+        pytest.param(_tamper_window_hash, "window content hash", id="window-hash"),
+        pytest.param(
+            _tamper_boundary_set_hash, "boundary-set content hash", id="boundary-set-hash"
+        ),
+        pytest.param(_tamper_boundary_hash, "boundary content hash", id="boundary-hash"),
+    ],
+)
+def test_declared_hashes_are_recomputed_under_exact_literal_bypass(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    tamper,
+    match: str,
+) -> None:
+    # ARV2R23-004: each declared identity is recomputed even when the exact
+    # document comparison would accept the tampered value.
+    raw = copy.deepcopy(json.loads(PLAN.read_text(encoding="utf-8")))
+    _rehash(raw)
+    tamper(raw)
+    monkeypatch.setattr(plan_module, "_EXPECTED_DOCUMENT", plan_module._freeze(raw))
+    with pytest.raises(PostPandemicEvaluationPlanError, match=match):
+        _load(_write(tmp_path, raw))

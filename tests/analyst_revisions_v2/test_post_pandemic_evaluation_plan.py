@@ -10,8 +10,10 @@ import json
 import os
 import pickle
 import weakref
+from collections.abc import Mapping
 from datetime import date
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -837,6 +839,9 @@ def test_noncanonical_key_order_and_lone_surrogate_refuse(tmp_path: Path) -> Non
 
 
 def test_loader_only_identity_copy_forgery_and_mutation_refuse() -> None:
+    with pytest.raises(TypeError, match="loader-authenticated"):
+        PostPandemicEvaluationPlan()
+
     plan = _load()
 
     copied = copy.copy(plan)
@@ -1083,6 +1088,92 @@ def test_equal_comparing_subclasses_cannot_spoof_plan_authority() -> None:
         require_loaded_post_pandemic_evaluation_plan(plan)
 
 
+def test_equal_comparing_metaclass_cannot_spoof_plan_authority() -> None:
+    class EqualMeta(type):
+        def __eq__(cls, other: object) -> bool:
+            return True
+
+        def __getattribute__(cls, name: str) -> object:
+            if name == "__name__":
+                return "str"
+            return super().__getattribute__(name)
+
+    class Forged(metaclass=EqualMeta):
+        def __eq__(self, other: object) -> bool:
+            return True
+
+    plan = _load()
+    object.__setattr__(plan, "plan_id", Forged())
+    with pytest.raises(PostPandemicEvaluationPlanError, match="noncanonical"):
+        require_loaded_post_pandemic_evaluation_plan(plan)
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "parent_fold_manifest",
+        "parent_lineages",
+        "naming_contract",
+        "owner_partial_2026_amendment_contract",
+        "inherited_evaluation_rules_contract",
+        "power_and_sufficiency_reporting_contract",
+        "primary_evaluation_contract",
+        "post_pandemic_complete_contract",
+        "partial_2026_exploratory_contract",
+        "fixed_cutoff_lock_contract",
+        "future_shared_holdout_contract",
+        "section_hashes",
+        "external_bindings",
+        "capabilities",
+    ],
+)
+def test_equal_replacement_mapping_cannot_spoof_plan_authority(
+    field_name: str,
+) -> None:
+    plan = _load()
+    replacement = MappingProxyType(dict(getattr(plan, field_name)))
+    object.__setattr__(plan, field_name, replacement)
+
+    with pytest.raises(
+        PostPandemicEvaluationPlanError, match="frozen field root changed"
+    ):
+        require_loaded_post_pandemic_evaluation_plan(plan)
+
+
+def test_hostile_proxy_mapping_refuses_before_replacement_code_runs() -> None:
+    plan = _load()
+    original = dict(plan.capabilities)
+    calls: list[str] = []
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return True if key == "orders" else original[key]
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    replacement = MappingProxyType(SplitView())
+    assert replacement["orders"] is True
+    calls.clear()
+    object.__setattr__(plan, "capabilities", replacement)
+
+    with pytest.raises(
+        PostPandemicEvaluationPlanError, match="frozen field root changed"
+    ):
+        require_loaded_post_pandemic_evaluation_plan(plan)
+    assert calls == []
+
+
 def _shift_h20_maturity_consistently(raw: dict[str, object]) -> None:
     partial = raw["partial_2026_exploratory_contract"]
     partial["last_mature_decision_session_by_horizon"]["20"] = "2026-07-30"
@@ -1108,6 +1199,13 @@ def _shift_h20_maturity_consistently(raw: dict[str, object]) -> None:
             ].update(partial_2026_included=True),
             "descriptive fold aggregation",
             id="aggregate-partial",
+        ),
+        pytest.param(
+            lambda raw: raw["post_pandemic_complete_contract"][
+                "complete_fold_aggregation_contract"
+            ].update(gate_rescue_tuning_or_threshold_selection_permitted=True),
+            "descriptive fold aggregation",
+            id="aggregate-gate-rescue",
         ),
         pytest.param(
             _shift_h20_maturity_consistently,
@@ -1144,6 +1242,34 @@ def test_remaining_semantic_guards_survive_exact_literal_bypass(
     _rehash(raw)
     monkeypatch.setattr(plan_module, "_EXPECTED_DOCUMENT", plan_module._freeze(raw))
     with pytest.raises(PostPandemicEvaluationPlanError, match=match):
+        _load(_write(tmp_path, raw))
+
+
+def test_fold_overlap_guard_survives_exact_literal_bypass(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    raw = copy.deepcopy(json.loads(PLAN.read_text(encoding="utf-8")))
+    selected = raw["post_pandemic_complete_contract"][
+        "selected_complete_h20_folds"
+    ]
+    selected[1]["test_start"] = "2021-12-31"
+    _rehash(raw)
+    original_parent_h20_record = plan_module._parent_h20_record
+
+    def overlapping_parent_h20_record(fold):
+        record = original_parent_h20_record(fold)
+        if record["test_year"] == 2022:
+            record["test_start"] = "2021-12-31"
+        return record
+
+    monkeypatch.setattr(
+        plan_module, "_EXPECTED_DOCUMENT", plan_module._freeze(raw)
+    )
+    monkeypatch.setattr(
+        plan_module, "_parent_h20_record", overlapping_parent_h20_record
+    )
+    with pytest.raises(PostPandemicEvaluationPlanError, match="folds overlap"):
         _load(_write(tmp_path, raw))
 
 

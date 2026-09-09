@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import gc
 import hashlib
 import json
+import weakref
+from collections.abc import Mapping
 from datetime import date
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -448,6 +452,72 @@ def test_loader_provenance_copy_mutation_and_source_revalidation(
     path.write_bytes(path.read_bytes() + b" ")
     with pytest.raises(StockFoldManifestError):
         require_loaded_stock_fold_manifest(loaded)
+
+
+def test_loader_owned_mapping_root_rejects_equal_replacement() -> None:
+    manifest = _load()
+    replacement = MappingProxyType(dict(manifest.capabilities))
+    object.__setattr__(manifest, "capabilities", replacement)
+
+    with pytest.raises(StockFoldManifestError, match="frozen field root changed"):
+        require_loaded_stock_fold_manifest(manifest)
+
+
+def test_hostile_mapping_proxy_refuses_before_replacement_code_runs() -> None:
+    manifest = _load()
+    original = dict(manifest.capabilities)
+    calls: list[str] = []
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return True if key == "orders" else original[key]
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    replacement = MappingProxyType(SplitView())
+    assert replacement["orders"] is True
+    calls.clear()
+    object.__setattr__(manifest, "capabilities", replacement)
+
+    with pytest.raises(StockFoldManifestError, match="frozen field root changed"):
+        require_loaded_stock_fold_manifest(manifest)
+    assert calls == []
+
+
+def test_retained_mapping_roots_do_not_keep_manifest_alive() -> None:
+    manifest = _load()
+    identity = id(manifest)
+    reference = weakref.ref(manifest)
+    assert identity in manifest_module._FOLD_MANIFEST_AUTHORITIES
+
+    del manifest
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in manifest_module._FOLD_MANIFEST_AUTHORITIES
+
+
+def test_equality_spoofed_scalar_type_cannot_bypass_manifest_authority() -> None:
+    class AlwaysEqualStr(str):
+        def __eq__(self, _other: object) -> bool:
+            return True
+
+    manifest = _load()
+    object.__setattr__(manifest, "manifest_hash", AlwaysEqualStr("forged"))
+
+    with pytest.raises(StockFoldManifestError, match="noncanonical authority state"):
+        require_loaded_stock_fold_manifest(manifest)
 
 
 @pytest.mark.parametrize(

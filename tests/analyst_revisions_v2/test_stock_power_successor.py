@@ -9,6 +9,7 @@ import pickle
 import signal
 import sys
 import threading
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -26,6 +27,44 @@ from research.analyst_revisions_v2.power_calibration_protocol import (
     TEST_SESSION_CAPACITY,
     ProvisionalPowerDisposition,
 )
+
+
+class _FingerprintThenForgeMapping(Mapping[str, object]):
+    """Expose honest values for one fingerprint pass, then a forged value."""
+
+    def __init__(
+        self,
+        honest: Mapping[str, object],
+        *,
+        target: str,
+        forged: object,
+    ) -> None:
+        self._honest = dict(honest)
+        self._target = target
+        self._forged = forged
+        self._honest_reads_remaining = len(self._honest)
+        self.touches = 0
+
+    def __getitem__(self, key: str) -> object:
+        self.touches += 1
+        if self._honest_reads_remaining:
+            self._honest_reads_remaining -= 1
+            return self._honest[key]
+        if key == self._target:
+            return self._forged
+        return self._honest[key]
+
+    def __iter__(self):
+        self.touches += 1
+        return iter(self._honest)
+
+    def __len__(self) -> int:
+        self.touches += 1
+        return len(self._honest)
+
+
+def _equal_distinct_mapping(value: Mapping[str, object]) -> MappingProxyType:
+    return MappingProxyType(dict(value))
 
 
 SPEC_ROOT = receipt_helpers.SPEC_ROOT
@@ -877,7 +916,65 @@ def test_copy_reconstruction_pickle_replace_and_mutation_never_create_authority(
         module.require_loaded_stock_power_successor(successor)
 
 
-def test_deep_low_level_object_mutation_is_a_normalized_domain_error(
+def test_successor_authority_pins_every_exact_container_root(
+    tmp_path: Path, parents: _Parents
+):
+    loaded = _loaded_successor(tmp_path, parents)
+    successor = loaded.value
+    for field_name in module._STOCK_POWER_SUCCESSOR_CONTAINER_FIELDS:
+        original = getattr(successor, field_name)
+        replacement = _equal_distinct_mapping(original)
+        assert replacement is not original
+        assert replacement == original
+        object.__setattr__(successor, field_name, replacement)
+        try:
+            with pytest.raises(
+                module.StockPowerSuccessorError,
+                match="container roots changed",
+            ):
+                module.require_loaded_stock_power_successor(successor)
+        finally:
+            object.__setattr__(successor, field_name, original)
+        assert module.require_loaded_stock_power_successor(successor) is successor
+
+
+def test_successor_hostile_mapping_proxy_refuses_before_fingerprint_traversal(
+    tmp_path: Path, parents: _Parents
+):
+    loaded = _loaded_successor(tmp_path, parents)
+    successor = loaded.value
+    original = successor.definition
+    target = next(iter(original))
+    honest_item = original[target]
+    forged = not honest_item if type(honest_item) is bool else None
+    if honest_item is None:
+        forged = "forged-after-authentication"
+    assert forged != honest_item
+
+    probe_backing = _FingerprintThenForgeMapping(
+        original, target=target, forged=forged
+    )
+    probe = MappingProxyType(probe_backing)
+    assert module._fingerprint(probe) == module._fingerprint(original)
+    assert probe[target] == forged
+
+    attack_backing = _FingerprintThenForgeMapping(
+        original, target=target, forged=forged
+    )
+    object.__setattr__(successor, "definition", MappingProxyType(attack_backing))
+    try:
+        with pytest.raises(
+            module.StockPowerSuccessorError,
+            match="container roots changed",
+        ):
+            module.require_loaded_stock_power_successor(successor)
+        assert attack_backing.touches == 0
+    finally:
+        object.__setattr__(successor, "definition", original)
+    assert module.require_loaded_stock_power_successor(successor) is successor
+
+
+def test_deep_low_level_object_mutation_refuses_before_recursive_traversal(
     tmp_path: Path, parents: _Parents
 ):
     successor = _loaded_successor(tmp_path, parents).value
@@ -890,9 +987,13 @@ def test_deep_low_level_object_mutation_is_a_normalized_domain_error(
         MappingProxyType({"deep": deeply_nested}),
     )
     with pytest.raises(
-        module.StockPowerSuccessorError, match="too deeply nested"
+        module.StockPowerSuccessorError, match="container roots changed"
     ):
         module.require_loaded_stock_power_successor(successor)
+    with pytest.raises(
+        module.StockPowerSuccessorError, match="too deeply nested"
+    ):
+        module._successor_fingerprint(successor)
 
 
 def test_nested_definition_and_capabilities_are_recursively_immutable(

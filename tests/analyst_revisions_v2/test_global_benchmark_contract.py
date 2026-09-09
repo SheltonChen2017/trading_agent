@@ -1,10 +1,13 @@
 import dataclasses
+import gc
 import hashlib
 import json
 import shutil
+import weakref
+from collections.abc import Mapping
 from fractions import Fraction
 from pathlib import Path
-from types import SimpleNamespace
+from types import MappingProxyType, SimpleNamespace
 
 import pytest
 
@@ -800,6 +803,71 @@ def test_low_level_mutation_of_loaded_object_is_detected():
         require_loaded_global_benchmark_contract(contract)
 
 
+def test_loader_owned_composite_roots_reject_equal_replacements():
+    contract = _load()
+    object.__setattr__(
+        contract,
+        "capabilities",
+        MappingProxyType(dict(contract.capabilities)),
+    )
+    with pytest.raises(GlobalBenchmarkContractError, match="composite root changed"):
+        require_loaded_global_benchmark_contract(contract)
+
+    contract = _load()
+    object.__setattr__(
+        contract,
+        "measured_refusals",
+        tuple([*contract.measured_refusals]),
+    )
+    with pytest.raises(GlobalBenchmarkContractError, match="composite root changed"):
+        require_loaded_global_benchmark_contract(contract)
+
+
+def test_hostile_mapping_proxy_refuses_before_replacement_code_runs():
+    contract = _load()
+    original = dict(contract.capabilities)
+    calls: list[str] = []
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return True if key == "orders" else original[key]
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    replacement = MappingProxyType(SplitView())
+    assert replacement["orders"] is True
+    calls.clear()
+    object.__setattr__(contract, "capabilities", replacement)
+
+    with pytest.raises(GlobalBenchmarkContractError, match="composite root changed"):
+        require_loaded_global_benchmark_contract(contract)
+    assert calls == []
+
+
+def test_retained_composite_roots_do_not_keep_contract_alive():
+    contract = _load()
+    identity = id(contract)
+    reference = weakref.ref(contract)
+    assert identity in module._GLOBAL_BENCHMARK_AUTHORITIES
+
+    del contract
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in module._GLOBAL_BENCHMARK_AUTHORITIES
+
+
 def test_low_level_mutation_of_nested_map_entry_is_detected():
     contract = _load()
     object.__setattr__(contract.entries[0], "legacy_level", 4)
@@ -818,10 +886,10 @@ def test_equality_spoofed_identity_type_is_detected_before_comparison():
         require_loaded_global_benchmark_contract(contract)
 
 
-def test_malformed_authority_collection_type_is_detected():
+def test_malformed_authority_collection_type_is_rejected_by_root_pin():
     contract = _load()
     object.__setattr__(contract, "entries", list(contract.entries))
-    with pytest.raises(GlobalBenchmarkContractError, match="entries changed type"):
+    with pytest.raises(GlobalBenchmarkContractError, match="composite root changed"):
         require_loaded_global_benchmark_contract(contract)
 
 

@@ -15,6 +15,7 @@ import threading
 import time
 import traceback
 import weakref
+from collections.abc import Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
 from decimal import (
@@ -93,6 +94,50 @@ FIXTURE_TRUTH_REVIEW_EVIDENCE_SHA256 = hashlib.sha256(
     b"fixture-only truth evidence; never production approval"
 ).hexdigest()
 FIXTURE_TRUTH_REVIEWED_AT_UTC = "2026-09-07T19:59:00.000000Z"
+
+
+class _FingerprintThenForgeMapping(Mapping[str, object]):
+    """Expose honest values for one fingerprint pass, then a forged value."""
+
+    def __init__(
+        self,
+        honest: Mapping[str, object],
+        *,
+        target: str,
+        forged: object,
+    ) -> None:
+        self._honest = dict(honest)
+        self._target = target
+        self._forged = forged
+        self._honest_reads_remaining = len(self._honest)
+        self.touches = 0
+
+    def __getitem__(self, key: str) -> object:
+        self.touches += 1
+        if self._honest_reads_remaining:
+            self._honest_reads_remaining -= 1
+            return self._honest[key]
+        if key == self._target:
+            return self._forged
+        return self._honest[key]
+
+    def __iter__(self):
+        self.touches += 1
+        return iter(self._honest)
+
+    def __len__(self) -> int:
+        self.touches += 1
+        return len(self._honest)
+
+
+def _equal_distinct_container(value: object) -> object:
+    if type(value) is MappingProxyType:
+        return MappingProxyType(dict(value))
+    if type(value) is tuple:
+        replacement = tuple(item for item in value)
+        assert replacement is not value
+        return replacement
+    raise AssertionError("test field is not a loader-owned container")
 
 
 def _canonical(value: object) -> bytes:
@@ -1576,6 +1621,99 @@ def test_nested_authority_state_is_immutable_and_extra_non_string_keys_refuse(
             module.require_loaded_power_calibration_receipt(receipt)
     finally:
         object.__setattr__(receipt, "definition", original)
+
+
+def test_all_receipt_authorities_pin_every_exact_container_root(
+    tmp_path: Path, parents: _Parents
+):
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    receipt = _compute(parents, inputs)
+    cases = (
+        (
+            parents.content_contract,
+            module.require_loaded_power_calibration_input_content_contract,
+            module._CONTENT_CONTRACT_CONTAINER_FIELDS,
+        ),
+        (
+            inputs.input_authority,
+            module.require_loaded_power_calibration_input_authority,
+            module._INPUT_AUTHORITY_CONTAINER_FIELDS,
+        ),
+        (
+            receipt,
+            module.require_loaded_power_calibration_receipt,
+            module._POWER_RECEIPT_CONTAINER_FIELDS,
+        ),
+    )
+    for value, checker, field_names in cases:
+        for field_name in field_names:
+            original = getattr(value, field_name)
+            replacement = _equal_distinct_container(original)
+            assert replacement == original
+            object.__setattr__(value, field_name, replacement)
+            try:
+                with pytest.raises(
+                    module.PowerCalibrationReceiptError,
+                    match="container roots changed",
+                ):
+                    checker(value)
+            finally:
+                object.__setattr__(value, field_name, original)
+            assert checker(value) is value
+
+
+def test_receipt_hostile_mapping_proxies_refuse_before_fingerprint_traversal(
+    tmp_path: Path, parents: _Parents
+):
+    inputs = _write_authorized_inputs(tmp_path, parents)
+    receipt = _compute(parents, inputs)
+    cases = (
+        (
+            parents.content_contract,
+            module.require_loaded_power_calibration_input_content_contract,
+            "capabilities",
+        ),
+        (
+            inputs.input_authority,
+            module.require_loaded_power_calibration_input_authority,
+            "definition",
+        ),
+        (
+            receipt,
+            module.require_loaded_power_calibration_receipt,
+            "definition",
+        ),
+    )
+    for value, checker, field_name in cases:
+        original = getattr(value, field_name)
+        target = next(iter(original))
+        honest_item = original[target]
+        forged = not honest_item if type(honest_item) is bool else None
+        if honest_item is None:
+            forged = "forged-after-authentication"
+        assert forged != honest_item
+
+        probe_backing = _FingerprintThenForgeMapping(
+            original, target=target, forged=forged
+        )
+        probe = MappingProxyType(probe_backing)
+        assert module._fingerprint(probe) == module._fingerprint(original)
+        assert probe[target] == forged
+
+        attack_backing = _FingerprintThenForgeMapping(
+            original, target=target, forged=forged
+        )
+        object.__setattr__(value, field_name, MappingProxyType(attack_backing))
+        try:
+            with pytest.raises(
+                module.PowerCalibrationReceiptError,
+                match="container roots changed",
+            ):
+                checker(value)
+            assert attack_backing.touches == 0
+        finally:
+            object.__setattr__(value, field_name, original)
+        assert checker(value) is value
 
 
 def test_receipt_registry_authority_is_removed_after_collection(

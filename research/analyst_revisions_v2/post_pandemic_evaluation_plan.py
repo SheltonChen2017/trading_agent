@@ -1017,8 +1017,14 @@ def _fingerprint_value(value: object) -> object:
         )
     if type(value) is tuple:
         return ("tuple", tuple(_fingerprint_value(item) for item in value))
-    if type(value) in (str, bool, int) or value is None:
-        return (type(value).__name__, value)
+    if type(value) is str:
+        return ("str", value)
+    if type(value) is bool:
+        return ("bool", value)
+    if type(value) is int:
+        return ("int", value)
+    if value is None:
+        return ("NoneType", None)
     raise PostPandemicEvaluationPlanError(
         "post-pandemic plan authority state is noncanonical"
     )
@@ -1048,6 +1054,9 @@ class PostPandemicEvaluationPlan:
     external_bindings: Mapping[str, Any]
     capabilities: Mapping[str, bool]
     _authority: object = dataclasses.field(repr=False, compare=False)
+
+    def __init__(self) -> None:
+        raise TypeError("post-pandemic plans must be loader-authenticated")
 
     @property
     def source_access_available(self) -> bool:
@@ -1103,6 +1112,22 @@ def _plan_fingerprint(plan: PostPandemicEvaluationPlan) -> tuple[object, ...]:
 
 
 _LOADED_POST_PANDEMIC_PLAN_AUTHORITY = object()
+_PLAN_FROZEN_FIELD_NAMES = (
+    "parent_fold_manifest",
+    "parent_lineages",
+    "naming_contract",
+    "owner_partial_2026_amendment_contract",
+    "inherited_evaluation_rules_contract",
+    "power_and_sufficiency_reporting_contract",
+    "primary_evaluation_contract",
+    "post_pandemic_complete_contract",
+    "partial_2026_exploratory_contract",
+    "fixed_cutoff_lock_contract",
+    "future_shared_holdout_contract",
+    "section_hashes",
+    "external_bindings",
+    "capabilities",
+)
 _POST_PANDEMIC_PLAN_AUTHORITIES: dict[
     int,
     tuple[
@@ -1115,6 +1140,7 @@ _POST_PANDEMIC_PLAN_AUTHORITIES: dict[
         bytes,
         bytes,
         bytes,
+        tuple[object, ...],
         tuple[object, ...],
     ],
 ] = {}
@@ -1176,6 +1202,9 @@ def _loaded_plan(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _plan_fingerprint(value)
+    frozen_field_roots = tuple(
+        fields[name] for name in _PLAN_FROZEN_FIELD_NAMES
+    )
     identity = id(value)
     reference = weakref.ref(
         value,
@@ -1193,6 +1222,7 @@ def _loaded_plan(
             stock_evaluation_payload,
             qc_first_plan_payload,
             fingerprint,
+            frozen_field_roots,
         )
     return value
 
@@ -1226,7 +1256,17 @@ def require_loaded_post_pandemic_evaluation_plan(
         stock_payload,
         qc_payload,
         fingerprint,
+        frozen_field_roots,
     ) = authority
+    if any(
+        getattr(plan, name, None) is not expected
+        for name, expected in zip(
+            _PLAN_FROZEN_FIELD_NAMES, frozen_field_roots, strict=True
+        )
+    ):
+        raise PostPandemicEvaluationPlanError(
+            "post-pandemic plan frozen field root changed after authentication"
+        )
     if _plan_fingerprint(plan) != fingerprint:
         raise PostPandemicEvaluationPlanError(
             "post-pandemic plan changed after authentication"

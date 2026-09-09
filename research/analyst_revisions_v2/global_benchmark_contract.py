@@ -1191,11 +1191,19 @@ class GlobalBenchmarkContract:
 
 
 _LOADED_GLOBAL_BENCHMARK_AUTHORITY = object()
+_GLOBAL_BENCHMARK_COMPOSITE_FIELD_NAMES = (
+    "entries",
+    "measured_refusals",
+    "fold_axis_summaries",
+    "lineage_graph",
+    "capabilities",
+)
 _GLOBAL_BENCHMARK_AUTHORITIES: dict[
     int,
     tuple[
         weakref.ReferenceType[GlobalBenchmarkContract],
         tuple[tuple[Path, bytes, str], ...],
+        tuple[object, ...],
         tuple[object, ...],
     ],
 ] = {}
@@ -1483,6 +1491,9 @@ def load_global_benchmark_contract(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _contract_fingerprint(value)
+    composite_roots = tuple(
+        fields[name] for name in _GLOBAL_BENCHMARK_COMPOSITE_FIELD_NAMES
+    )
     sources = (
         (map_resolved, map_payload, "global rating map"),
         (matched_resolved, matched_payload, "matched comparison contract"),
@@ -1495,7 +1506,12 @@ def load_global_benchmark_contract(
     identity = id(value)
     reference = weakref.ref(value, lambda ref, key=identity: _forget_authority(key, ref))
     with _GLOBAL_BENCHMARK_AUTHORITIES_LOCK:
-        _GLOBAL_BENCHMARK_AUTHORITIES[identity] = (reference, sources, fingerprint)
+        _GLOBAL_BENCHMARK_AUTHORITIES[identity] = (
+            reference,
+            sources,
+            fingerprint,
+            composite_roots,
+        )
     return value
 
 
@@ -1512,9 +1528,21 @@ def require_loaded_global_benchmark_contract(
         authority = _GLOBAL_BENCHMARK_AUTHORITIES.get(id(contract))
     if authority is None or authority[0]() is not contract:
         raise GlobalBenchmarkContractError("global benchmark loader authority is absent")
-    if _contract_fingerprint(contract) != authority[2]:
+    _, sources, fingerprint, composite_roots = authority
+    if any(
+        getattr(contract, name, None) is not expected
+        for name, expected in zip(
+            _GLOBAL_BENCHMARK_COMPOSITE_FIELD_NAMES,
+            composite_roots,
+            strict=True,
+        )
+    ):
+        raise GlobalBenchmarkContractError(
+            "global benchmark composite root changed after authentication"
+        )
+    if _contract_fingerprint(contract) != fingerprint:
         raise GlobalBenchmarkContractError("global benchmark changed after authentication")
-    for path, payload, name in authority[1]:
+    for path, payload, name in sources:
         _revalidate(path, payload, name)
     return contract
 

@@ -11,7 +11,9 @@ import pickle
 import shutil
 import textwrap
 import weakref
+from collections.abc import Mapping
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -872,7 +874,72 @@ def test_low_level_schema_collection_substitution_is_detected(
         require_loaded_power_calibration_input_schema(loaded)
 
 
-def test_equality_spoofed_session_axis_member_is_detected():
+@pytest.mark.parametrize(
+    "field",
+    (
+        "calibration_session_axis",
+        "definition",
+        "lineage_graph",
+        "capabilities",
+    ),
+)
+def test_equal_schema_container_root_replacement_is_detected_before_fingerprinting(
+    field,
+):
+    loaded = _load_schema()
+    original = getattr(loaded, field)
+    replacement = (
+        tuple(list(original))
+        if type(original) is tuple
+        else MappingProxyType(dict(original))
+    )
+    assert replacement == original
+    assert replacement is not original
+
+    object.__setattr__(loaded, field, replacement)
+    with pytest.raises(PowerCalibrationInputSchemaError, match="container root changed"):
+        require_loaded_power_calibration_input_schema(loaded)
+
+
+def test_hostile_split_view_schema_definition_is_rejected_before_traversal():
+    class SplitView(Mapping[str, object]):
+        def __init__(self, original: Mapping[str, object]) -> None:
+            self.original = original
+            self.calls: list[object] = []
+
+        def __getitem__(self, key: str) -> object:
+            self.calls.append(("getitem", key))
+            if key == "schema_contract_id":
+                return "arv2-stock-power-calibration-input-schema-split-view"
+            return self.original[key]
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(self.original)
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return len(self.original)
+
+        def items(self):
+            self.calls.append("items")
+            return self.original.items()
+
+    loaded = _load_schema()
+    original = loaded.definition
+    split_view = SplitView(original)
+    replacement = MappingProxyType(split_view)
+    assert dict(replacement.items()) == dict(original.items())
+    assert replacement["schema_contract_id"] != original["schema_contract_id"]
+    split_view.calls.clear()
+
+    object.__setattr__(loaded, "definition", replacement)
+    with pytest.raises(PowerCalibrationInputSchemaError, match="container root changed"):
+        require_loaded_power_calibration_input_schema(loaded)
+    assert split_view.calls == []
+
+
+def test_equality_spoofed_session_axis_replacement_is_detected_by_root_identity():
     class SpoofedStr(str):
         pass
 
@@ -880,7 +947,7 @@ def test_equality_spoofed_session_axis_member_is_detected():
     axis = list(loaded.calibration_session_axis)
     axis[0] = SpoofedStr(axis[0])
     object.__setattr__(loaded, "calibration_session_axis", tuple(axis))
-    with pytest.raises(PowerCalibrationInputSchemaError, match="changed type"):
+    with pytest.raises(PowerCalibrationInputSchemaError, match="container root changed"):
         require_loaded_power_calibration_input_schema(loaded)
 
 

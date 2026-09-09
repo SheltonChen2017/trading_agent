@@ -14,7 +14,7 @@ import weakref
 from collections.abc import Mapping
 from fractions import Fraction
 from pathlib import Path
-from types import SimpleNamespace
+from types import MappingProxyType, SimpleNamespace
 
 import pytest
 
@@ -853,6 +853,61 @@ def test_valid_type_identity_mutation_is_detected(overlay, field):
     object.__setattr__(overlay, field, getattr(overlay, field) + "x")
     with pytest.raises(FourFamilyMultiplicityError, match="changed after"):
         require_loaded_four_family_multiplicity_overlay(overlay)
+
+
+@pytest.mark.parametrize("field", ("definition", "fixed_lane_ids"))
+def test_equal_container_root_replacement_is_detected_before_fingerprinting(
+    overlay, field
+):
+    original = getattr(overlay, field)
+    replacement = (
+        tuple(list(original))
+        if type(original) is tuple
+        else MappingProxyType(dict(original))
+    )
+    assert replacement == original
+    assert replacement is not original
+
+    object.__setattr__(overlay, field, replacement)
+    with pytest.raises(FourFamilyMultiplicityError, match="container root changed"):
+        require_loaded_four_family_multiplicity_overlay(overlay)
+
+
+def test_hostile_split_view_definition_is_rejected_before_traversal(overlay):
+    class SplitView(Mapping[str, object]):
+        def __init__(self, original: Mapping[str, object]) -> None:
+            self.original = original
+            self.calls: list[object] = []
+
+        def __getitem__(self, key: str) -> object:
+            self.calls.append(("getitem", key))
+            if key == "overlay_id":
+                return "arv2-four-family-multiplicity-split-view"
+            return self.original[key]
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(self.original)
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return len(self.original)
+
+        def items(self):
+            self.calls.append("items")
+            return self.original.items()
+
+    original = overlay.definition
+    split_view = SplitView(original)
+    replacement = MappingProxyType(split_view)
+    assert dict(replacement.items()) == dict(original.items())
+    assert replacement["overlay_id"] != original["overlay_id"]
+    split_view.calls.clear()
+
+    object.__setattr__(overlay, "definition", replacement)
+    with pytest.raises(FourFamilyMultiplicityError, match="container root changed"):
+        require_loaded_four_family_multiplicity_overlay(overlay)
+    assert split_view.calls == []
 
 
 def test_weakref_callback_removes_overlay_authority():

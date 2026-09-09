@@ -90,6 +90,14 @@ CAPABILITIES = {
 }
 
 _LOADED_FOLD_MANIFEST_AUTHORITY = object()
+_FOLD_MANIFEST_FROZEN_FIELD_NAMES = (
+    "calendar_contract",
+    "walk_forward_contract",
+    "cross_boundary_common_event_contract",
+    "section_hashes",
+    "external_bindings",
+    "capabilities",
+)
 _FOLD_MANIFEST_AUTHORITIES: dict[
     int,
     tuple[
@@ -99,6 +107,7 @@ _FOLD_MANIFEST_AUTHORITIES: dict[
         Path,
         bytes,
         bytes,
+        tuple[object, ...],
         tuple[object, ...],
     ],
 ] = {}
@@ -440,14 +449,53 @@ def _validate_fold_structure(raw: Mapping[str, Any]) -> None:
 
 
 def _fingerprint_value(value: object) -> object:
-    if isinstance(value, Mapping):
-        return tuple(
-            (key, _fingerprint_value(item))
-            for key, item in sorted(value.items())
+    if type(value) is MappingProxyType:
+        pairs: list[tuple[str, object]] = []
+        for key, item in value.items():
+            if type(key) is not str:
+                raise StockFoldManifestError(
+                    "fold manifest contains a noncanonical authority key"
+                )
+            pairs.append((key, _fingerprint_value(item)))
+        return ("mapping", tuple(sorted(pairs)))
+    if type(value) is tuple:
+        return ("tuple", tuple(_fingerprint_value(item) for item in value))
+    if type(value) is str:
+        return ("str", value)
+    if type(value) is bool:
+        return ("bool", value)
+    if type(value) is int:
+        return ("int", value)
+    if value is None:
+        return ("none", None)
+    raise StockFoldManifestError(
+        "fold manifest contains noncanonical authority state"
+    )
+
+
+def _manifest_fingerprint(manifest: StockFoldManifest) -> tuple[object, ...]:
+    return tuple(
+        _fingerprint_value(item)
+        for item in (
+            manifest.manifest_id,
+            manifest.manifest_hash,
+            manifest.strategy_pdf_sha256,
+            manifest.parent_plan_id,
+            manifest.parent_plan_hash,
+            manifest.parent_plan_artifact_sha256,
+            manifest.parent_stock_spec_id,
+            manifest.parent_stock_spec_hash,
+            manifest.parent_stock_spec_artifact_sha256,
+            manifest.parent_history_section_sha256,
+            manifest.evaluation_id,
+            manifest.calendar_contract,
+            manifest.walk_forward_contract,
+            manifest.cross_boundary_common_event_contract,
+            manifest.section_hashes,
+            manifest.external_bindings,
+            manifest.capabilities,
         )
-    if isinstance(value, tuple):
-        return tuple(_fingerprint_value(item) for item in value)
-    return value
+    )
 
 
 @dataclasses.dataclass(frozen=True, init=False)
@@ -498,28 +546,6 @@ class StockFoldManifest:
         return False
 
 
-def _manifest_fingerprint(manifest: StockFoldManifest) -> tuple[object, ...]:
-    return (
-        manifest.manifest_id,
-        manifest.manifest_hash,
-        manifest.strategy_pdf_sha256,
-        manifest.parent_plan_id,
-        manifest.parent_plan_hash,
-        manifest.parent_plan_artifact_sha256,
-        manifest.parent_stock_spec_id,
-        manifest.parent_stock_spec_hash,
-        manifest.parent_stock_spec_artifact_sha256,
-        manifest.parent_history_section_sha256,
-        manifest.evaluation_id,
-        _fingerprint_value(manifest.calendar_contract),
-        _fingerprint_value(manifest.walk_forward_contract),
-        _fingerprint_value(manifest.cross_boundary_common_event_contract),
-        _fingerprint_value(manifest.section_hashes),
-        _fingerprint_value(manifest.external_bindings),
-        _fingerprint_value(manifest.capabilities),
-    )
-
-
 def _forget_loaded_manifest(
     identity: int,
     reference: weakref.ReferenceType[StockFoldManifest],
@@ -567,6 +593,9 @@ def _loaded_manifest(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _manifest_fingerprint(value)
+    frozen_field_roots = tuple(
+        fields[name] for name in _FOLD_MANIFEST_FROZEN_FIELD_NAMES
+    )
     identity = id(value)
     reference = weakref.ref(
         value,
@@ -581,6 +610,7 @@ def _loaded_manifest(
             stock_evaluation_payload,
             qc_first_plan_payload,
             fingerprint,
+            frozen_field_roots,
         )
     return value
 
@@ -607,7 +637,19 @@ def require_loaded_stock_fold_manifest(
         stock_payload,
         qc_plan_payload,
         fingerprint,
+        frozen_field_roots,
     ) = authority
+    if any(
+        getattr(manifest, name, None) is not expected
+        for name, expected in zip(
+            _FOLD_MANIFEST_FROZEN_FIELD_NAMES,
+            frozen_field_roots,
+            strict=True,
+        )
+    ):
+        raise StockFoldManifestError(
+            "fold manifest frozen field root changed after authentication"
+        )
     if _manifest_fingerprint(manifest) != fingerprint:
         raise StockFoldManifestError("fold manifest changed after authentication")
     _revalidate(qc_plan_path, qc_plan_payload, "QC-first parent")

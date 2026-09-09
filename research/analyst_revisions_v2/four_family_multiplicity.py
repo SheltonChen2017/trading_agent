@@ -613,6 +613,10 @@ class FourFamilyMultiplicityOverlay:
 
 
 _LOADED_FOUR_FAMILY_MULTIPLICITY_AUTHORITY = object()
+_FOUR_FAMILY_MULTIPLICITY_CONTAINER_FIELDS = (
+    "definition",
+    "fixed_lane_ids",
+)
 _FOUR_FAMILY_MULTIPLICITY_AUTHORITIES: dict[
     int,
     tuple[
@@ -625,6 +629,7 @@ _FOUR_FAMILY_MULTIPLICITY_AUTHORITIES: dict[
         bytes,
         Path,
         bytes,
+        tuple[object, ...],
         tuple[object, ...],
     ],
 ] = {}
@@ -733,6 +738,9 @@ def load_four_family_multiplicity_overlay(
     }.items():
         object.__setattr__(value, name, item)
     fingerprint = _overlay_fingerprint(value)
+    container_roots = tuple(
+        getattr(value, name) for name in _FOUR_FAMILY_MULTIPLICITY_CONTAINER_FIELDS
+    )
     identity = id(value)
     reference = weakref.ref(value, lambda ref, key=identity: _forget_authority(key, ref))
     with _FOUR_FAMILY_MULTIPLICITY_AUTHORITIES_LOCK:
@@ -747,6 +755,7 @@ def load_four_family_multiplicity_overlay(
             look_resolved,
             look_payload,
             fingerprint,
+            container_roots,
         )
     return value
 
@@ -767,6 +776,17 @@ def require_loaded_four_family_multiplicity_overlay(
         authority = _FOUR_FAMILY_MULTIPLICITY_AUTHORITIES.get(id(overlay))
     if authority is None or authority[0]() is not overlay:
         raise FourFamilyMultiplicityError("multiplicity overlay authority is absent")
+    if any(
+        getattr(overlay, name) is not root
+        for name, root in zip(
+            _FOUR_FAMILY_MULTIPLICITY_CONTAINER_FIELDS,
+            authority[10],
+            strict=True,
+        )
+    ):
+        raise FourFamilyMultiplicityError(
+            "multiplicity overlay container root changed after loading"
+        )
     if _overlay_fingerprint(overlay) != authority[9]:
         raise FourFamilyMultiplicityError("multiplicity overlay changed after loading")
     _revalidate(authority[1], authority[2], "multiplicity overlay")

@@ -689,6 +689,11 @@ class StockPowerSuccessor:
 
 
 _LOADED_STOCK_POWER_SUCCESSOR_AUTHORITY = object()
+_STOCK_POWER_SUCCESSOR_CONTAINER_FIELDS = (
+    "direct_parent_projection",
+    "capabilities",
+    "definition",
+)
 _STOCK_POWER_SUCCESSOR_AUTHORITIES: dict[int, tuple[Any, ...]] = {}
 _STOCK_POWER_SUCCESSOR_AUTHORITIES_LOCK = threading.RLock()
 _INHERITED_STOCK_POWER_SUCCESSOR_AUTHORITY_QUARANTINE: list[object] = []
@@ -708,6 +713,27 @@ _register_process_local_after_fork(
     _reset_process_local_stock_power_successor_authorities_after_fork
 )
 del _register_process_local_after_fork
+
+
+def _container_roots(value: StockPowerSuccessor) -> tuple[object, ...]:
+    return tuple(
+        getattr(value, name) for name in _STOCK_POWER_SUCCESSOR_CONTAINER_FIELDS
+    )
+
+
+def _container_roots_are_current(
+    value: StockPowerSuccessor, expected_roots: tuple[object, ...]
+) -> bool:
+    return len(_STOCK_POWER_SUCCESSOR_CONTAINER_FIELDS) == len(
+        expected_roots
+    ) and all(
+        getattr(value, name, None) is expected
+        for name, expected in zip(
+            _STOCK_POWER_SUCCESSOR_CONTAINER_FIELDS,
+            expected_roots,
+            strict=True,
+        )
+    )
 
 
 def _successor_fingerprint(value: StockPowerSuccessor) -> tuple[object, ...]:
@@ -852,6 +878,7 @@ def load_stock_power_successor(
         "_authority": _LOADED_STOCK_POWER_SUCCESSOR_AUTHORITY,
     }.items():
         object.__setattr__(value, name, item)
+    container_roots = _container_roots(value)
     fingerprint = _successor_fingerprint(value)
     key = id(value)
     reference = weakref.ref(
@@ -868,6 +895,7 @@ def load_stock_power_successor(
             power_receipt,
             before,
             fingerprint,
+            container_roots,
         )
     return value
 
@@ -888,6 +916,10 @@ def require_loaded_stock_power_successor(
         record = _STOCK_POWER_SUCCESSOR_AUTHORITIES.get(id(successor))
     if record is None or record[0]() is not successor:
         raise StockPowerSuccessorError("stock power successor authority is absent")
+    if not _container_roots_are_current(successor, record[9]):
+        raise StockPowerSuccessorError(
+            "stock power successor container roots changed after authentication"
+        )
     if _successor_fingerprint(successor) != record[8]:
         raise StockPowerSuccessorError(
             "stock power successor changed after authentication"

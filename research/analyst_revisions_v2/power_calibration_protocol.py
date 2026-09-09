@@ -806,6 +806,12 @@ class ProvisionalPowerRequirement:
 
 
 _LOADED_POWER_CALIBRATION_PROTOCOL_AUTHORITY = object()
+_POWER_CALIBRATION_PROTOCOL_CONTAINER_FIELDS = (
+    "calibration_session_axis",
+    "definition",
+    "lineage_graph",
+    "capabilities",
+)
 _POWER_CALIBRATION_PROTOCOL_AUTHORITIES: dict[
     int,
     tuple[
@@ -813,6 +819,7 @@ _POWER_CALIBRATION_PROTOCOL_AUTHORITIES: dict[
         Path,
         bytes,
         GlobalBenchmarkContract,
+        tuple[object, ...],
         tuple[object, ...],
     ],
 ] = {}
@@ -947,6 +954,9 @@ def load_power_calibration_protocol(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _protocol_fingerprint(value)
+    container_roots = tuple(
+        getattr(value, name) for name in _POWER_CALIBRATION_PROTOCOL_CONTAINER_FIELDS
+    )
     identity = id(value)
     reference = weakref.ref(value, lambda ref, key=identity: _forget_authority(key, ref))
     with _POWER_CALIBRATION_PROTOCOL_AUTHORITIES_LOCK:
@@ -956,6 +966,7 @@ def load_power_calibration_protocol(
             payload,
             parent,
             fingerprint,
+            container_roots,
         )
     return value
 
@@ -977,6 +988,17 @@ def require_loaded_power_calibration_protocol(
     if authority is None or authority[0]() is not protocol:
         raise PowerCalibrationProtocolError(
             "power protocol loader authority is absent"
+        )
+    if any(
+        getattr(protocol, name) is not root
+        for name, root in zip(
+            _POWER_CALIBRATION_PROTOCOL_CONTAINER_FIELDS,
+            authority[5],
+            strict=True,
+        )
+    ):
+        raise PowerCalibrationProtocolError(
+            "power protocol container root changed after authentication"
         )
     if _protocol_fingerprint(protocol) != authority[4]:
         raise PowerCalibrationProtocolError(

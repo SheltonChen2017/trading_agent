@@ -12,6 +12,7 @@ import pickle
 import shutil
 import textwrap
 import weakref
+from collections.abc import Mapping
 from pathlib import Path
 from types import MappingProxyType
 
@@ -83,6 +84,50 @@ from research.analyst_revisions_v2.power_calibration_input_schema import (
 from research.analyst_revisions_v2.power_calibration_protocol import (
     load_power_calibration_protocol,
 )
+
+
+class _FingerprintThenForgeMapping(Mapping[str, object]):
+    """Expose honest values for one fingerprint pass, then a forged value."""
+
+    def __init__(
+        self,
+        honest: Mapping[str, object],
+        *,
+        target: str,
+        forged: object,
+    ) -> None:
+        self._honest = dict(honest)
+        self._target = target
+        self._forged = forged
+        self._honest_reads_remaining = len(self._honest)
+        self.touches = 0
+
+    def __getitem__(self, key: str) -> object:
+        self.touches += 1
+        if self._honest_reads_remaining:
+            self._honest_reads_remaining -= 1
+            return self._honest[key]
+        if key == self._target:
+            return self._forged
+        return self._honest[key]
+
+    def __iter__(self):
+        self.touches += 1
+        return iter(self._honest)
+
+    def __len__(self) -> int:
+        self.touches += 1
+        return len(self._honest)
+
+
+def _equal_distinct_container(value: object) -> object:
+    if type(value) is MappingProxyType:
+        return MappingProxyType(dict(value))
+    if type(value) is tuple:
+        replacement = tuple(item for item in value)
+        assert replacement is not value
+        return replacement
+    raise AssertionError("test field is not a loader-owned container")
 
 
 SPEC_ROOT = (
@@ -1030,6 +1075,104 @@ def test_mapping_key_string_subclasses_cannot_spoof_candidate_definition(
     object.__setattr__(candidate, "definition", MappingProxyType(changed))
     with pytest.raises(PowerCalibrationInputManifestError):
         require_loaded_production_calibration_input_manifest_candidate(candidate)
+
+
+def test_equal_comparing_metaclass_cannot_spoof_admission_authority(admission):
+    class EqualMeta(type):
+        def __eq__(cls, other: object) -> bool:
+            return True
+
+        def __getattribute__(cls, name: str) -> object:
+            if name == "__name__":
+                return "str"
+            return super().__getattribute__(name)
+
+    class Forged(metaclass=EqualMeta):
+        def __eq__(self, other: object) -> bool:
+            return True
+
+    original = admission.admission_contract_id
+    object.__setattr__(admission, "admission_contract_id", Forged())
+    try:
+        with pytest.raises(PowerCalibrationInputManifestError, match="noncanonical"):
+            require_loaded_power_calibration_manifest_admission(admission)
+    finally:
+        object.__setattr__(admission, "admission_contract_id", original)
+    assert require_loaded_power_calibration_manifest_admission(admission) is admission
+
+
+def test_loader_authorities_pin_every_exact_container_root(tmp_path, admission):
+    candidate = _load_candidate(admission, _write_candidate(tmp_path, admission))
+    cases = (
+        (
+            admission,
+            require_loaded_power_calibration_manifest_admission,
+            module._ADMISSION_CONTAINER_FIELDS,
+        ),
+        (
+            candidate,
+            require_loaded_production_calibration_input_manifest_candidate,
+            module._CANDIDATE_CONTAINER_FIELDS,
+        ),
+    )
+    for value, checker, field_names in cases:
+        for field_name in field_names:
+            original = getattr(value, field_name)
+            replacement = _equal_distinct_container(original)
+            assert replacement == original
+            object.__setattr__(value, field_name, replacement)
+            try:
+                with pytest.raises(
+                    PowerCalibrationInputManifestError,
+                    match="container roots changed",
+                ):
+                    checker(value)
+            finally:
+                object.__setattr__(value, field_name, original)
+            assert checker(value) is value
+
+
+def test_hostile_mapping_proxy_is_rejected_before_fingerprint_traversal(
+    tmp_path, admission
+):
+    candidate = _load_candidate(admission, _write_candidate(tmp_path, admission))
+    cases = (
+        (
+            admission,
+            require_loaded_power_calibration_manifest_admission,
+            "capabilities",
+        ),
+        (
+            candidate,
+            require_loaded_production_calibration_input_manifest_candidate,
+            "definition",
+        ),
+    )
+    for value, checker, field_name in cases:
+        original = getattr(value, field_name)
+        target = next(iter(original))
+        forged = not original[target] if type(original[target]) is bool else "forged"
+        probe_backing = _FingerprintThenForgeMapping(
+            original, target=target, forged=forged
+        )
+        probe = MappingProxyType(probe_backing)
+        assert module._fingerprint(probe) == module._fingerprint(original)
+        assert probe[target] == forged
+
+        attack_backing = _FingerprintThenForgeMapping(
+            original, target=target, forged=forged
+        )
+        object.__setattr__(value, field_name, MappingProxyType(attack_backing))
+        try:
+            with pytest.raises(
+                PowerCalibrationInputManifestError,
+                match="container roots changed",
+            ):
+                checker(value)
+            assert attack_backing.touches == 0
+        finally:
+            object.__setattr__(value, field_name, original)
+        assert checker(value) is value
 
 
 def test_weakref_cleanup_removes_candidate_authority(tmp_path, admission):

@@ -8,6 +8,7 @@ import json
 import pickle
 import shutil
 import weakref
+from collections.abc import Mapping
 from datetime import date
 from decimal import (
     Decimal,
@@ -21,6 +22,7 @@ from decimal import (
     localcontext,
 )
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -981,6 +983,69 @@ def test_equality_spoofed_scalar_subclass_is_detected(protocol):
     object.__setattr__(protocol, "protocol_id", SpoofedStr(protocol.protocol_id))
     with pytest.raises(PowerCalibrationProtocolError, match="changed type"):
         require_loaded_power_calibration_protocol(protocol)
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "calibration_session_axis",
+        "definition",
+        "lineage_graph",
+        "capabilities",
+    ),
+)
+def test_equal_container_root_replacement_is_detected_before_fingerprinting(
+    protocol, field
+):
+    original = getattr(protocol, field)
+    replacement = (
+        tuple(list(original))
+        if type(original) is tuple
+        else MappingProxyType(dict(original))
+    )
+    assert replacement == original
+    assert replacement is not original
+
+    object.__setattr__(protocol, field, replacement)
+    with pytest.raises(PowerCalibrationProtocolError, match="container root changed"):
+        require_loaded_power_calibration_protocol(protocol)
+
+
+def test_hostile_split_view_definition_is_rejected_before_traversal(protocol):
+    class SplitView(Mapping[str, object]):
+        def __init__(self, original: Mapping[str, object]) -> None:
+            self.original = original
+            self.calls: list[object] = []
+
+        def __getitem__(self, key: str) -> object:
+            self.calls.append(("getitem", key))
+            if key == "protocol_id":
+                return "arv2-stock-power-calibration-protocol-split-view"
+            return self.original[key]
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(self.original)
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return len(self.original)
+
+        def items(self):
+            self.calls.append("items")
+            return self.original.items()
+
+    original = protocol.definition
+    split_view = SplitView(original)
+    replacement = MappingProxyType(split_view)
+    assert dict(replacement.items()) == dict(original.items())
+    assert replacement["protocol_id"] != original["protocol_id"]
+    split_view.calls.clear()
+
+    object.__setattr__(protocol, "definition", replacement)
+    with pytest.raises(PowerCalibrationProtocolError, match="container root changed"):
+        require_loaded_power_calibration_protocol(protocol)
+    assert split_view.calls == []
 
 
 def test_provisional_helper_rejects_a_forged_protocol(protocol):

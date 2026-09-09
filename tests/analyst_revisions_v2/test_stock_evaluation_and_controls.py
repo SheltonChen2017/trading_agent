@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import gc
 import hashlib
 import json
+import weakref
+from collections.abc import Mapping
 from decimal import Decimal, ROUND_DOWN, ROUND_UP, getcontext, localcontext, setcontext
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -26,6 +30,7 @@ from research.analyst_revisions_v2.stock_evaluation_contract import (
     StockEvaluationContractError,
     build_stock_report_plan,
     load_stock_evaluation_contract,
+    require_loaded_stock_evaluation_contract,
 )
 from research.analyst_revisions_v2.stock_signal import (
     RESIDUALIZATION_BLOCK,
@@ -359,6 +364,79 @@ def test_contract_loader_provenance_is_required_and_reauthenticated() -> None:
     object.__setattr__(contract, "spec_hash", "a" * 64)
     with pytest.raises(StockEvaluationContractError, match="changed after authentication"):
         build_stock_report_plan(contract)
+
+
+def test_loader_owned_mapping_root_rejects_equal_replacement() -> None:
+    contract = _load()
+    replacement = MappingProxyType(dict(contract.external_bindings))
+    object.__setattr__(contract, "external_bindings", replacement)
+
+    with pytest.raises(
+        StockEvaluationContractError, match="frozen field root changed"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+
+
+def test_hostile_mapping_proxy_refuses_before_replacement_code_runs() -> None:
+    contract = _load()
+    original = dict(contract.external_bindings)
+    target_key = next(iter(original))
+    calls: list[str] = []
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return "forged" if key == target_key else original[key]
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    replacement = MappingProxyType(SplitView())
+    assert replacement[target_key] == "forged"
+    calls.clear()
+    object.__setattr__(contract, "external_bindings", replacement)
+
+    with pytest.raises(
+        StockEvaluationContractError, match="frozen field root changed"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+    assert calls == []
+
+
+def test_retained_mapping_roots_do_not_keep_contract_alive() -> None:
+    contract = _load()
+    identity = id(contract)
+    reference = weakref.ref(contract)
+    assert identity in contract_module._CONTRACT_AUTHORITIES
+
+    del contract
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in contract_module._CONTRACT_AUTHORITIES
+
+
+def test_equality_spoofed_scalar_type_cannot_bypass_contract_authority() -> None:
+    class AlwaysEqualStr(str):
+        def __eq__(self, _other: object) -> bool:
+            return True
+
+    contract = _load()
+    object.__setattr__(contract, "spec_hash", AlwaysEqualStr("forged"))
+
+    with pytest.raises(
+        StockEvaluationContractError, match="noncanonical authority state"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
 
 
 def _median(values: list[Decimal]) -> Decimal:

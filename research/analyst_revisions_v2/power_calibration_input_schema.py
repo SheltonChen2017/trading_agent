@@ -919,6 +919,12 @@ class SyntheticCalibrationInputManifestSummary:
 
 
 _LOADED_POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITY = object()
+_POWER_CALIBRATION_INPUT_SCHEMA_CONTAINER_FIELDS = (
+    "calibration_session_axis",
+    "definition",
+    "lineage_graph",
+    "capabilities",
+)
 _POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES: dict[
     int,
     tuple[
@@ -926,6 +932,7 @@ _POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES: dict[
         Path,
         bytes,
         PowerCalibrationProtocol,
+        tuple[object, ...],
         tuple[object, ...],
     ],
 ] = {}
@@ -1040,6 +1047,10 @@ def load_power_calibration_input_schema(
     }.items():
         object.__setattr__(value, name, item)
     fingerprint = _schema_fingerprint(value)
+    container_roots = tuple(
+        getattr(value, name)
+        for name in _POWER_CALIBRATION_INPUT_SCHEMA_CONTAINER_FIELDS
+    )
     identity = id(value)
     reference = weakref.ref(value, lambda ref, key=identity: _forget_authority(key, ref))
     with _POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES_LOCK:
@@ -1049,6 +1060,7 @@ def load_power_calibration_input_schema(
             payload,
             power_protocol,
             fingerprint,
+            container_roots,
         )
     return value
 
@@ -1070,6 +1082,17 @@ def require_loaded_power_calibration_input_schema(
     if authority is None or authority[0]() is not schema:
         raise PowerCalibrationInputSchemaError(
             "calibration input schema loader authority is absent"
+        )
+    if any(
+        getattr(schema, name) is not root
+        for name, root in zip(
+            _POWER_CALIBRATION_INPUT_SCHEMA_CONTAINER_FIELDS,
+            authority[5],
+            strict=True,
+        )
+    ):
+        raise PowerCalibrationInputSchemaError(
+            "calibration input schema container root changed after authentication"
         )
     if _schema_fingerprint(schema) != authority[4]:
         raise PowerCalibrationInputSchemaError(

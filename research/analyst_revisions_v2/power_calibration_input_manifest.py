@@ -802,8 +802,14 @@ def _fingerprint(value: object) -> object:
         return ("mapping", tuple(sorted(pairs)))
     if type(value) is tuple:
         return ("tuple", tuple(_fingerprint(item) for item in value))
-    if type(value) in (str, bool, int) or value is None:
-        return (type(value).__name__, value)
+    if type(value) is str:
+        return ("str", value)
+    if type(value) is bool:
+        return ("bool", value)
+    if type(value) is int:
+        return ("int", value)
+    if value is None:
+        return ("NoneType", None)
     raise PowerCalibrationInputManifestError("authority state is noncanonical")
 
 
@@ -967,6 +973,16 @@ class ProductionCalibrationInputManifestCandidate:
 
 _LOADED_ADMISSION_AUTHORITY = object()
 _LOADED_CANDIDATE_AUTHORITY = object()
+_ADMISSION_CONTAINER_FIELDS = (
+    "calibration_session_axis",
+    "definition",
+    "capabilities",
+)
+_CANDIDATE_CONTAINER_FIELDS = (
+    "data_entitlement_audit_ids",
+    "input_roles",
+    "definition",
+)
 _ADMISSION_AUTHORITIES: dict[
     int,
     tuple[
@@ -975,6 +991,7 @@ _ADMISSION_AUTHORITIES: dict[
         bytes,
         PowerCalibrationInputSchema,
         FourFamilyMultiplicityOverlay,
+        tuple[object, ...],
         tuple[object, ...],
     ],
 ] = {}
@@ -989,9 +1006,27 @@ _CANDIDATE_AUTHORITIES: dict[
         bytes,
         PowerCalibrationManifestAdmission,
         tuple[object, ...],
+        tuple[object, ...],
     ],
 ] = {}
 _CANDIDATE_AUTHORITIES_LOCK = threading.RLock()
+
+
+def _container_roots(
+    value: object, field_names: tuple[str, ...]
+) -> tuple[object, ...]:
+    return tuple(getattr(value, name) for name in field_names)
+
+
+def _container_roots_are_current(
+    value: object,
+    field_names: tuple[str, ...],
+    expected_roots: tuple[object, ...],
+) -> bool:
+    return len(field_names) == len(expected_roots) and all(
+        getattr(value, name, None) is expected
+        for name, expected in zip(field_names, expected_roots, strict=True)
+    )
 
 
 def _forget_admission(
@@ -1069,6 +1104,7 @@ def load_power_calibration_manifest_admission(
         "_authority": _LOADED_ADMISSION_AUTHORITY,
     }.items():
         object.__setattr__(value, name, item)
+    container_roots = _container_roots(value, _ADMISSION_CONTAINER_FIELDS)
     fingerprint = _policy_fingerprint(value)
     identity = id(value)
     reference = weakref.ref(
@@ -1082,6 +1118,7 @@ def load_power_calibration_manifest_admission(
             input_schema,
             multiplicity_overlay,
             fingerprint,
+            container_roots,
         )
     return value
 
@@ -1100,6 +1137,12 @@ def require_loaded_power_calibration_manifest_admission(
         authority = _ADMISSION_AUTHORITIES.get(id(admission))
     if authority is None or authority[0]() is not admission:
         raise PowerCalibrationInputManifestError("B2 admission authority is absent")
+    if not _container_roots_are_current(
+        admission, _ADMISSION_CONTAINER_FIELDS, authority[6]
+    ):
+        raise PowerCalibrationInputManifestError(
+            "B2 admission container roots changed"
+        )
     if _policy_fingerprint(admission) != authority[5]:
         raise PowerCalibrationInputManifestError("B2 admission object changed")
     try:
@@ -2177,6 +2220,7 @@ def load_production_calibration_input_manifest_candidate(
         "_authority": _LOADED_CANDIDATE_AUTHORITY,
     }.items():
         object.__setattr__(value, name, item)
+    container_roots = _container_roots(value, _CANDIDATE_CONTAINER_FIELDS)
     fingerprint = _candidate_fingerprint(value)
     identity = id(value)
     reference = weakref.ref(
@@ -2191,6 +2235,7 @@ def load_production_calibration_input_manifest_candidate(
             evidence_payload,
             admission,
             fingerprint,
+            container_roots,
         )
     return value
 
@@ -2209,6 +2254,12 @@ def require_loaded_production_calibration_input_manifest_candidate(
         authority = _CANDIDATE_AUTHORITIES.get(id(candidate))
     if authority is None or authority[0]() is not candidate:
         raise PowerCalibrationInputManifestError("manifest candidate authority is absent")
+    if not _container_roots_are_current(
+        candidate, _CANDIDATE_CONTAINER_FIELDS, authority[7]
+    ):
+        raise PowerCalibrationInputManifestError(
+            "manifest candidate container roots changed"
+        )
     if _candidate_fingerprint(candidate) != authority[6]:
         raise PowerCalibrationInputManifestError("manifest candidate changed")
     try:

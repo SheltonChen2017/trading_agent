@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import gc
 import hashlib
 import json
 import subprocess
+import weakref
+from collections.abc import Mapping
 from dataclasses import fields, replace
 from pathlib import Path
+from types import MappingProxyType
 from typing import Callable
 
 import pytest
@@ -430,6 +434,124 @@ def test_review_authority_cannot_be_token_cloned_or_mutated_in_place(
     object.__setattr__(spec, "looks", ())
     with pytest.raises(PreregistrationError, match="changed"):
         require_reviewed_preregistration(spec)
+
+
+def test_review_authority_rejects_equal_composite_root_replacements(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    object.__setattr__(spec, "cells", tuple([*spec.cells]))
+    with pytest.raises(PreregistrationError, match="composite root changed"):
+        require_reviewed_preregistration(spec)
+
+    spec = load_reviewed_preregistration(path)
+    cell = next(item for item in spec.cells if isinstance(item.value, Mapping))
+    object.__setattr__(cell, "value", MappingProxyType(dict(cell.value)))
+    with pytest.raises(PreregistrationError, match="cell value root changed"):
+        require_reviewed_preregistration(spec)
+
+
+def test_review_authority_refuses_hostile_cell_proxy_before_its_code_runs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    cell = next(item for item in spec.cells if isinstance(item.value, Mapping))
+    original = dict(cell.value)
+    target_key = next(iter(original))
+    calls: list[str] = []
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return "forged" if key == target_key else original[key]
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    replacement = MappingProxyType(SplitView())
+    assert replacement[target_key] == "forged"
+    calls.clear()
+    object.__setattr__(cell, "value", replacement)
+
+    with pytest.raises(PreregistrationError, match="cell value root changed"):
+        require_reviewed_preregistration(spec)
+    assert calls == []
+
+
+def test_retained_composite_roots_do_not_keep_review_authority_alive(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    identity = id(spec)
+    reference = weakref.ref(spec)
+    assert identity in preregistration._REVIEWED_AUTHORITIES
+
+    del spec
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in preregistration._REVIEWED_AUTHORITIES
+
+
+def test_equality_spoofed_top_level_scalar_cannot_bypass_review_authority(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class AlwaysEqualStr(str):
+        def __eq__(self, _other: object) -> bool:
+            return True
+
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    object.__setattr__(spec, "spec_hash", AlwaysEqualStr("forged"))
+
+    with pytest.raises(PreregistrationError, match="noncanonical state"):
+        require_reviewed_preregistration(spec)
+
+
+def test_equality_spoofed_nested_scalar_cannot_bypass_review_authority(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class AlwaysEqualStr(str):
+        def __eq__(self, _other: object) -> bool:
+            return True
+
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    object.__setattr__(spec.cells[0], "source", AlwaysEqualStr("forged"))
+
+    with pytest.raises(PreregistrationError, match="noncanonical state"):
+        require_reviewed_preregistration(spec)
+
+
+def test_hostile_nested_record_subclass_refuses_before_attribute_access(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls: list[str] = []
+
+    class HostileCell(preregistration.PreregistrationCell):
+        def __getattribute__(self, name: str) -> object:
+            calls.append(name)
+            raise AssertionError("hostile nested record was traversed")
+
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+    object.__setattr__(spec.cells[0], "__class__", HostileCell)
+
+    with pytest.raises(PreregistrationError, match="nested record changed type"):
+        require_reviewed_preregistration(spec)
+    assert calls == []
 
 
 def test_nested_cells_are_detached_and_recursively_immutable(

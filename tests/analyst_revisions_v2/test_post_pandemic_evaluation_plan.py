@@ -1045,3 +1045,39 @@ def test_plan_is_inside_the_outcome_free_import_closure() -> None:
     assert "research.quantconnect" not in reached
     assert "backtest" not in reached
     assert "execution" not in reached
+
+
+def test_equal_comparing_subclasses_cannot_spoof_plan_authority() -> None:
+    # ARV2R23-001: the fingerprint must be exact-type, so a field replaced by an
+    # equal-comparing (or always-equal) str subclass refuses reauthentication.
+    class Equal(str):
+        def __eq__(self, other: object) -> bool:
+            return True
+
+        __hash__ = str.__hash__
+
+    for field_name, spoof in (
+        ("plan_id", str),
+        ("plan_hash", Equal),
+        ("schema", Equal),
+    ):
+        plan = _load()
+        original = getattr(plan, field_name)
+        replacement = spoof(original) if spoof is str else spoof("forged")
+
+        class Same(str):
+            pass
+
+        if spoof is str:
+            replacement = Same(original)
+        object.__setattr__(plan, field_name, replacement)
+        with pytest.raises(
+            PostPandemicEvaluationPlanError, match="changed after|noncanonical"
+        ):
+            require_loaded_post_pandemic_evaluation_plan(plan)
+    plan = _load()
+    nested = dict(plan_module._thaw(plan.capabilities))
+    nested["orders"] = 0
+    object.__setattr__(plan, "capabilities", plan_module._freeze(nested))
+    with pytest.raises(PostPandemicEvaluationPlanError, match="changed after"):
+        require_loaded_post_pandemic_evaluation_plan(plan)

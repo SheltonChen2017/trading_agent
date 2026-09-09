@@ -1001,14 +1001,27 @@ def _validate_parent_and_semantics(
 
 
 def _fingerprint_value(value: object) -> object:
-    if isinstance(value, Mapping):
-        return tuple(
-            (key, _fingerprint_value(item))
-            for key, item in sorted(value.items())
+    # Exact-type fingerprints: an equal-comparing subclass or a lying __eq__
+    # must not reauthenticate, matching the B2/receipt/successor boundaries.
+    if type(value) is MappingProxyType:
+        if any(type(key) is not str for key in value):
+            raise PostPandemicEvaluationPlanError(
+                "post-pandemic plan authority state has a non-string key"
+            )
+        return (
+            "mapping",
+            tuple(
+                (key, _fingerprint_value(item))
+                for key, item in sorted(value.items())
+            ),
         )
-    if isinstance(value, tuple):
-        return tuple(_fingerprint_value(item) for item in value)
-    return value
+    if type(value) is tuple:
+        return ("tuple", tuple(_fingerprint_value(item) for item in value))
+    if type(value) in (str, bool, int) or value is None:
+        return (type(value).__name__, value)
+    raise PostPandemicEvaluationPlanError(
+        "post-pandemic plan authority state is noncanonical"
+    )
 
 
 @dataclasses.dataclass(frozen=True, init=False)
@@ -1067,11 +1080,11 @@ class PostPandemicEvaluationPlan:
 
 def _plan_fingerprint(plan: PostPandemicEvaluationPlan) -> tuple[object, ...]:
     return (
-        plan.schema,
-        plan.status,
-        plan.authority,
-        plan.plan_id,
-        plan.plan_hash,
+        _fingerprint_value(plan.schema),
+        _fingerprint_value(plan.status),
+        _fingerprint_value(plan.authority),
+        _fingerprint_value(plan.plan_id),
+        _fingerprint_value(plan.plan_hash),
         _fingerprint_value(plan.parent_fold_manifest),
         _fingerprint_value(plan.parent_lineages),
         _fingerprint_value(plan.naming_contract),

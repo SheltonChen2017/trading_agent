@@ -2847,3 +2847,41 @@ def test_outcome_free_core_cannot_reverse_import_the_qc_sibling(tmp_path: Path):
     )
     with pytest.raises(ImportBoundaryError, match="analyst_revisions_v2_qc"):
         _validate_import_closure(tmp_path, package_name="guarded")
+
+
+def test_off_horizon_stock_consideration_valuation_is_an_input_error_not_a_refusal():
+    # ARV2R31-002: a stock-consideration payoff valued on a session that is not
+    # a decision horizon must be an input error; without the guard it is
+    # silently unmatched and degrades to a missing-payoff refusal.
+    decisions, securities, benchmarks, requirements, payoffs = (
+        _covered_stock_merger_fixture()
+    )
+    (requirement,) = requirements
+    h20, h60 = payoffs
+    off_horizon = dataclasses.replace(
+        h20, valuation_session=_sessions()[_decision_index() + 21]
+    )
+    assert off_horizon.valuation_session > requirement.terminal_session
+    with pytest.raises(EventStudyInputError, match="not a decision horizon"):
+        _collect(
+            decisions=decisions,
+            security_opens=securities,
+            benchmark_opens=benchmarks,
+            terminal_requirements=requirements,
+            terminal_payoffs=(off_horizon, h60),
+        )
+
+
+@pytest.mark.parametrize(
+    "field_name", ["candidate_declaration_hash", "input_partition_set_sha256"]
+)
+def test_identity_tamper_without_rehash_is_caught_by_the_batch_hash_alone(field_name):
+    # ARV2R31-003: these two fields are only format-checked by the validator, so
+    # a tamper that keeps a valid SHA-256 shape must be refused by the batch
+    # hash recomputation itself.
+    batch = _collect()
+    forged = "0" * 64
+    assert getattr(batch, field_name) != forged
+    object.__setattr__(batch, field_name, forged)
+    with pytest.raises(EventStudyInputError, match="changed after construction"):
+        require_synthetic_event_study_batch(batch)

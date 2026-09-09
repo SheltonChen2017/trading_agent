@@ -179,8 +179,8 @@ def test_ib3a_contract_and_numeric_policy_are_frozen():
         "/ total_purchase_value"
     )
     assert signal_module.FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH == (
-        "16033b8f63cf55bfcbbc31b2b00a6cdf"
-        "4acd42a48aa4d46b9a7968b90135f737"
+        "56eddf2fd800f022102c8c705211dc402"
+        "fe52cef3a4ba7eb39ea8959d7b0ac2e"
     )
     assert signal_module.MAX_FORM4_STOCK_SIGNAL_EVENTS == 10_000
     assert signal_module.MAX_FORM4_STOCK_SIGNAL_ROLES_PER_EVENT == 16
@@ -446,6 +446,28 @@ def test_two_maximum_input_decimals_build_a_wider_exact_aggregate():
     assert result.breadth.total_purchase_value_usd == expected_total
     assert result.breadth.largest_buyer_purchase_value_usd == bounded_value
     assert result.breadth.dollar_breadth == Decimal("0.5")
+
+
+@pytest.mark.parametrize(
+    "smaller_value",
+    (
+        Decimal("50000"),
+        Decimal("9" * 256 + "e-251"),
+    ),
+)
+def test_mixed_exponent_inputs_build_their_wide_exact_aggregate(smaller_value):
+    large_value = Decimal("8" * 256 + "e256")
+    result = _build(
+        _event(1, buyer_id="buyer-1", purchase_value_usd=large_value),
+        _event(2, buyer_id="buyer-2", purchase_value_usd=smaller_value),
+    )
+    expected_total = exact_decimal_sum(
+        (large_value, smaller_value),
+        name="test IB-3A mixed-exponent aggregate",
+    )
+    assert result.breadth.total_purchase_value_usd == expected_total
+    assert result.breadth.largest_buyer_purchase_value_usd == large_value
+    assert result.raw_stock_score_diagnostic > 0
 
 
 def test_input_exponent_bound_builds_extreme_included_and_excluded_rows():

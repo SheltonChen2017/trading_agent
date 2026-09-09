@@ -79,8 +79,11 @@ AND CODEX ACCEPTS CLAUDE'S RECORD COMMIT AFTER THE TEST-COVERAGE AND
 LANE-RECORD CORRECTIONS IN SECTION 44; CLAUDE ACCEPTS THAT SNAPSHOT IN
 SECTION 45. CODEX ACCEPTS CLAUDE'S RECORD COMMIT AFTER THE SECTION-46
 LANE-RECORD CORRECTIONS. THE OWNER-AUTHORIZED, OUTCOME-FREE ARV2-4F-A
-LEAN-FACING SYNTHETIC RUN-CONTRACT AND EVENT-STUDY CORE IS THE CURRENT
-CANDIDATE PENDING INDEPENDENT CLAUDE REVIEW. IT IS NOT A QCALGORITHM, LEAN
+LEAN-FACING SYNTHETIC RUN-CONTRACT AND EVENT-STUDY CORE IS ACCEPTED BY
+INDEPENDENT CLAUDE REVIEW AFTER TWO P3 COVERAGE CORRECTIONS, WITH ONE P2
+ESTIMATOR-DEFINITION FINDING (TERMINAL PAYOFFS ARE NOT HORIZON-MATCHED TO THE
+BENCHMARK LEG) REFERRED TO THE OWNER AND CODEX FOR A FROZEN CONVENTION
+(SECTION 47), PENDING CODEX COUNTER-REVIEW. IT IS NOT A QCALGORITHM, LEAN
 ADAPTER, CLOUD PROJECT, COMPILE, JOB, RESULT, OR BACKTEST AUTHORIZATION. THE
 SECTION-32 COUNTER-REVIEW CLOSES RESTRICTED-
 EXPORT AND AUTHORITY-STATE CAPABILITY ESCAPES; SAME-THREAD, CROSS-PROCESS,
@@ -2142,6 +2145,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-09 | Codex counter-review and mutation-coverage correction | `61d15e7..5fce87f` (one Claude record commit) -> `30c83b4` (tests) and this record commit | Accept Claude's descendant-authority review after correcting two underclassified mutation survivors and the lane handoff; do not start backtesting | Counter-reviewed exact pushed `5fce87f` and accepted its substantive production-code disposition. Added focused regressions for equal-but-distinct mapping-key identity and for hostile receipt-disposition `__class__` execution between topology validation and fingerprinting. Corrected the section-43 mutation result to 24 attempts, 23 valid outcomes, 20 caught, 3 genuinely equivalent, and 1 retired; reconciled exact commit/validation identity, current-state rows, scalar-slot rationale, and the complete next gate. The frozen root Action Plan remains unchanged and its inherited stale Analyst summary is documented only. | New guards **2 passed in 2.55 s**; both changed batteries **169 passed, 2 skipped in 26.96 s**; complete Analyst lane **2,000 passed, 7 skipped, 0 failed in 247.16 s (4:07)**; active-document gate **69 passed**; changed-scope compileall and diff checks clean. Complete repository suite not run. No provider, credential, licensed row, production input, price, return, terminal payoff, outcome, QuantConnect resource/job, broker, deployment, order, or trade was accessed; **zero research looks and zero development evaluations**. | **1 P2 and 7 P3** (`ARV2CR28-001..008`): the P2 and six lane P3 findings corrected; one shared Action-Plan observation documented only. No production code defect. `ARV2R27-001` and `ARV2R27-002` are corrected; Claude's acceptance of `fe1f9ad` and `61d15e7` otherwise stands. | Push this exact same-lane two-commit range once after the remote-tip check. Claude reviews `30c83b4` and the record commit; Codex counter-reviews before any subsequent action. No implementable milestone or QC backtest is presently authorized: the section-34.4 external trust anchors, terminal-payoff source, reviewed opener/pins, numeric receipt, executable bindings, and explicit atomic QC evaluation authority remain absent. |
 | 2026-09-09 | Claude review | `eaa1795` -> this commit | Independent review of the Codex mutation-coverage correction `30c83b4` and its record `eaa1795` | Synced the lane worktree by fast-forward only and reviewed `5fce87f..eaa1795` commit by commit and cumulatively (section 45); accepted with no correction, so this push is record-only and the production tree stays at `fe1f9ad`. Verified rather than accepted: all four frozen identities in 44.4 reproduce exactly as Git object ids; `research/` is byte-identical to `fe1f9ad`; the three production gates remain `None`/`None`/`False`; the firewall closes at 39 modules with zero forbidden roots; the ledger is append-only (the 2026-09-09 Claude row is untouched) and the live current-state text names sections 43-44. Both of Codex's mutation reproductions were repeated in a detached scratch worktree: deleting only the key-identity guard makes the helper accept an equal-but-distinct key and the new regression is the only test that catches it; weakening only the receipt preflight to `isinstance` makes reauthentication accept a forged disposition (`DID NOT RAISE`). Six further hand-built topology cases, including a large-integer key and a key reorder that the battery does not cover, all refuse while the positive control passes. | Complete Analyst-lane suite on `eaa1795` **1,978 passed, 29 skipped, 0 failed in 25:54** (same 2,007-test collection as 44.4); the two changed batteries **162 passed, 9 skipped** (same 171-test collection as 44.4). Active-document gate **69 passed**; compileall exit 0; `git diff --check` clean. Zero research looks and zero development evaluations; no provider, credential, licensed row, production input, price, return, outcome, broker, operator database, QuantConnect, scheduler, deployment, order or trading access. | 0 P0, 0 P1, 0 P2, 0 P3. One observation documented only (`ARV2R29-001`): the record's last stated firewall size is 38 in section 36 while the closure is now 39 after ARV2-4E-A. | Codex counter-reviews this record commit. The next gate is unchanged from 44.5: no named milestone or QuantConnect backtest is authorised; the provider-specific opener still needs the section-34.4 evidence package and a `DLRET`-equivalent terminal-payoff source; result access, deployment, orders and trading remain separately false. |
 | 2026-09-09 | Codex counter-review and ARV2-4F-A implementation | `eaa1795..5246a41` (one Claude record commit) -> `c8e74f8` (implementation) and this record commit | Accept Claude's section-45 review after record correction; implement the owner-authorized synthetic LEAN-facing run-contract and stock event-study core without opening data or QC | Counter-reviewed `5246a41` and retained its substantive acceptance. Corrected stale sequencing, firewall history, interpreter provenance, and Windows skip attribution. Added a canonical-LF code/run candidate with seven exact synthetic partitions and a deterministic XNYS H1/H5/H20/H60 event-study core with permanent identities, complete lifecycle/successor coverage, explicit terminal-shareholder payoff, exhaustive refusals, exact Decimal arithmetic, full output revalidation, reverse-import isolation, and literal-false action capabilities. No accepted ancestor or root coordination document changed. | Final focused candidate **93 passed in 6.40 s**; core plus existing firewall **265 passed in 248.55 s** before one final assertion-only mutation regression; complete lane **2,071 passed, 29 skipped, 0 failed in 1,893.70 s (31:33)**; final active-document, compileall, diff/EOL, remote-tip, and status gates follow section 46. Python 3.13.14. Synthetic fixtures only: no credential, provider row, licensed artifact, production input, price, return, outcome, QuantConnect project/upload/compile/job/result, broker, deployment, order, or trade; **zero research looks and zero development evaluations**. | Counter-review: **1 P2 and 3 P3**, all lane-record corrections (`ARV2CR30-001..004`); inherited out-of-lane `ARV2CR28-008` remains documented only. Implementation: **5 P2 and 6 P3**, all corrected (`ARV2I4FA-001..011`). Three independent final audits found no remaining P0-P3 defect on the frozen focused tree. | Push this same-lane implementation/record range once after the remote-tip check. Claude independently reviews it; Codex counter-reviews before any production binding, LEAN adapter, compile, or run. Production truth/rights/input, terminal-payoff, numeric-receipt, QC-evaluation/result, deployment, order, and trading gates remain closed. |
+| 2026-09-09 | Claude review | `bf538d7` -> `df7b4ab` (tests) and the record commit that follows; Codex resolves the exact pushed head | Independent review of the ARV2-4F-A synthetic run contract and event-study core `c8e74f8` and its record `bf538d7` | Reviewed both commits in `5246a41..bf538d7` with explicit dispositions (section 47); accepted after two P3 coverage corrections, with one P2 estimator-definition finding documented and referred rather than changed unilaterally. Verified rather than accepted: all six parent artifact pins equal the checked-in spec bytes; the 3,435-session XNYS axis and its SHA-256 recompute from `data.exchange_calendar`; every hard-coded formal-fold horizon bound equals the fold manifest and every partial-2026 bound equals the plan; the package imports only the standard library, the exchange calendar, and its sibling; the lane firewall refuses the reverse import; no spec, plan, or handoff byte changed; every action accessor is a literal false. A 21-trial mutation matrix caught 15 (the reverse-import prefix through the QC battery), 4 are equivalent because the output validator repeats the collect-time check, 1 is unreachable by construction, and 2 escaped and are now isolated. | QC core plus firewall **265 passed in 33.45 s** at `bf538d7`; complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries **2,093 passed, 7 skipped in 243.74 s** at `bf538d7` and **2,096 passed, 7 skipped, 0 failed in 243.94 s (4:03)** at `df7b4ab`; complete repository suite not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1; 1 P2 estimator-definition finding (`ARV2R31-001`) documented and referred; 2 P3 coverage gaps corrected with red/green regressions; 2 P3 observations documented only. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews the two Claude commits; the owner and Codex decide the frozen terminal-payoff convention before any production estimator, adapter, compile, or run; every section-46.5 gate remains closed. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -7334,3 +7338,127 @@ requires all of the following as separate reviewed gates:
 The next bounded code step may define the production transport/global-input
 schema and then the LEAN adapter only after its exact authority is established.
 No gate above is inferred from possession of a QuantConnect subscription.
+
+## 47. Independent Claude review of the ARV2-4F-A synthetic run contract and event-study core, 2026-09-09
+
+**Range reviewed:** `5246a41..bf538d7`, two commits, fetched into this same
+worktree with no divergence.
+**Disposition: ACCEPTED AFTER CORRECTION, with one P2 finding referred.**
+0 P0, 0 P1; `ARV2R31-001` (P2) is an estimator-definition deviation from the
+frozen parent that this review documents and refers to the owner and Codex
+rather than changing unilaterally; two P3 coverage gaps are corrected in
+`df7b4ab`; two P3 observations are documented only. No
+production byte changed in the correction.
+**Zero research looks and zero development evaluations by this review.** No
+provider, credential, licensed row, production input, price, return, outcome,
+broker, operator database, QuantConnect resource, scheduler, deployment, or
+order surface was used. `docs/ACTION_PLAN_2026-08-20.md`,
+`docs/SESSION_HANDOFF.md`, and every accepted spec are untouched across the
+range. The ledger row is appended once and not rewritten.
+
+### 47.1 Commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `c8e74f8` | **Accepted after correction** | `run_contract.py`, `event_study.py`, the package initialiser, the lane firewall's reverse-import prefix, and the 80-function QC battery. Verified in 47.2 and 47.4; `ARV2R31-002` and `-003` correct two coverage gaps; `ARV2R31-001` is referred. |
+| `bf538d7` | **Accepted** | Record-only: section 46, the section-45 corrections, status wording, ledger row. Its validation claims reproduce here within host differences. |
+| `df7b4ab` | Claude correction | Three regression cases in the QC battery; each fails when only its guard is disabled (47.4). |
+| record commit | Claude record | This section, current-status wording, one appended ledger row. |
+
+### 47.2 Verified rather than accepted
+
+- **Parent, window, and partition bindings.** The six `PARENT_ARTIFACTS`
+  pins equal the SHA-256 of the checked-in QC-first draft, stock successor,
+  fold manifest, post-pandemic supplement, four-family overlay, and power
+  protocol; `_require_static_contract` rebuilds them and the three evaluation
+  windows on every candidate build. Every hard-coded formal-fold H1/H5/H20/H60
+  bound in `_EVALUATION_SEGMENT_HORIZON_BOUNDS` equals the fold manifest's
+  `test_start`/`test_end_exclusive`, and every partial-2026 bound equals the
+  plan's `effective_test_start`/`test_end_exclusive`. The reviewed axis
+  rebuilt from `data.exchange_calendar` has 3,435 sessions and the pinned
+  SHA-256. The seven partition roles are required exactly, each partition's
+  rows are re-hashed and compared with the candidate's declaration before any
+  arithmetic, and the candidate honestly declares that its code hash does not
+  authenticate loaded code.
+- **Permanent identities.** `bind_listing` and `bind_series` make listing to
+  (security, ticker) and series to security functional in both directions
+  across decisions, opens, lifecycles, requirements, and payoffs; the output
+  validator rebuilds the same maps from the batch; benchmark identities are
+  reserved. Ticker-only joins are impossible because every open is keyed by
+  permanent security and session, and an entry whose listing or ticker
+  differs from the decision is a named refusal.
+- **Lifecycle and successors.** Every decision security and every recursively
+  reachable merger successor must carry a complete lifecycle coverage through
+  2026-08-28 and nothing else may; successors must be distinct and later;
+  stock consideration is valued through the successor at a decision horizon
+  and refuses to traverse a successor's own terminal event; cash, bankruptcy,
+  and delisting payoffs are valued at the terminal session on the original
+  identity. A decision on or after its security's terminal session refuses.
+- **Terminal payoff source.** A payoff whose `source_role` is not the synthetic
+  total-shareholder-payoff source refuses, so QuantConnect's delisting price
+  has no accepted representation; payoff lineage must equal the requirement's
+  eleven-field lineage.
+- **Arithmetic.** Returns are `exit / entry - 1` under a freshly constructed
+  precision-50 `ROUND_HALF_EVEN` context; the validator recomputes all three
+  returns from the four retained raw values and refuses drift; a security
+  return of exactly -1 is admitted only for a terminal payoff.
+- **Refusals and census.** Every decision produces exactly one output per
+  horizon; the validator checks the closed vocabulary, per-reason geometry,
+  cross-date component completeness, row-invariant consistency, terminal-path
+  monotonicity, shared benchmark facts, and availability contradictions.
+- **Isolation.** The package imports only the standard library, the exchange
+  calendar, and its sibling; it has no file, environment, network, or
+  QuantConnect surface; the lane firewall lists
+  `research.analyst_revisions_v2_qc` as a forbidden prefix and the QC
+  battery's reverse-import test fails when that prefix is removed.
+- **Capabilities.** Every candidate and batch action accessor is a literal
+  `return False`; all 47 external bindings are null and all 12 capabilities
+  false.
+- **Validation claims.** QC core plus firewall battery: **265 passed in
+  33.45 s** at `bf538d7`.
+
+### 47.3 Findings ledger
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R31-001` | P2 | Estimator definition; **documented and referred, not changed** | The frozen stock contract defines the outcome as `matching_horizon_gross_SPY_excess_open_to_open_total_return` on an `eligible_decision_session_open_to_horizon_session_open` clock. For a terminal observation the kernel values the security leg at the terminal session (cash, bankruptcy, delisting) while the benchmark leg still runs to the horizon exit session, so the excess return subtracts returns over two different windows. The frozen parents specify no reinvestment or truncation convention, so the kernel had to choose one, and it chose a mismatch. The retained `exit_session`, `valuation_session`, and four raw values are sufficient for either standard repair: reinvest the terminal payoff in the benchmark from the valuation session to the horizon exit (Shumway-style), or truncate the benchmark leg to the valuation session. Because this is the estimator's frozen definition and the core is synthetic-only, the choice belongs to the owner and Codex before any production estimator freeze; changing it in review would alter a contract Codex just froze. | Open; decision required before section 46.5 gate 3. |
+| `ARV2R31-002` | P3 | Lane-specific test coverage; **corrected in `df7b4ab`** | Removing the check that a stock-consideration valuation session is one of the decision's horizon exits left the battery green: an off-horizon payoff record is simply never matched and the decision degrades to a `missing_terminal_shareholder_payoff` refusal instead of an input error, hiding a malformed fixture. `test_off_horizon_stock_consideration_valuation_is_an_input_error_not_a_refusal` values the H20 payoff at entry+21 and requires the input error. | Confirmed by mutation; fixed. |
+| `ARV2R31-003` | P3 | Lane-specific test coverage; **corrected in `df7b4ab`** | Removing the batch-hash comparison in `require_synthetic_event_study_batch` left the battery green because every existing tamper test either rehashes or trips a semantic check first. `candidate_declaration_hash` and `input_partition_set_sha256` are only format-checked, so a same-shape tamper is refused by the hash alone; `test_identity_tamper_without_rehash_is_caught_by_the_batch_hash_alone` pins both fields. | Confirmed by mutation; fixed. |
+| `ARV2R31-004` | P3 | Observation; **documented only** | `_fresh_arithmetic_context` sets `traps=[]`, so every Decimal signal, including `DivisionByZero` and `InvalidOperation`, is untrapped and would yield a non-finite value rather than raise. Inputs are validated positive and finite and every result is finite-checked, so no path reaches it, but the receipt worker traps those signals and the two contexts differ. | No change. |
+| `ARV2R31-005` | P3 | Observation; **documented only** | Four collect-time checks (successor-terminal traversal, lifecycle-coverage completeness, decision-after-terminal, and the census) are equivalent mutants because `require_synthetic_event_study_batch` repeats them on the constructed batch and `collect_synthetic_event_study` returns through that validator. They are redundant defenses in the safe direction. | No change. |
+
+### 47.4 Mutation matrix
+
+Twenty-one single-guard trials. Caught (15): the QC-delisting source
+refusal, payoff lineage equality, distinct successor, successor chronology,
+cross-date refusal, validator return recomputation, partition binding
+mismatch, session-axis equality, terminal requirement equals lifecycle,
+entry identity mismatch refusal, series functional identity, complete
+partition roles, candidate rebuild comparison, synthetic-only partition
+metadata, and the firewall's reverse-import prefix (caught by the QC
+battery's reverse-import test; the firewall battery alone does not exercise
+it). Equivalent (4): `ARV2R31-005`. Unreachable (1): the collect-time census
+check, since construction emits exactly one output per decision and horizon.
+Escaped and now isolated (2): `ARV2R31-002` and `-003`; with each guard
+removed only its new case fails, and the real code passes the battery
+(**96 passed**).
+
+### 47.5 Validation
+
+- QC core plus firewall battery at `bf538d7`: **265 passed in 33.45 s**.
+- Complete `tests/analyst_revisions_v2` plus the four root-level Analyst
+  batteries: **2,093 passed, 7 skipped in 243.74 s** at `bf538d7` and
+  **2,096 passed, 7 skipped, 0 failed in 243.94 s (4:03)** at `df7b4ab`,
+  exit 0; the three additions are the new cases. Codex's 2,071/29 on its
+  Windows host differs only by the POSIX-executed link and fork cases.
+- `git diff --check` clean; Python 3.13.15 in the pinned scratch virtualenv;
+  the complete repository suite was not run per the owner's lane-suite
+  instruction (34.6).
+
+### 47.6 Next gate
+
+Codex counter-reviews the two Claude commits. Before the estimator, adapter,
+compile, or run gates in section 46.5 can close, the owner and Codex must
+freeze the terminal-payoff convention named in `ARV2R31-001`. Nothing here
+authorises credential access, licensed rows, production inputs, outcomes, a
+QuantConnect project, compile, job, result, deployment, orders, or trading.

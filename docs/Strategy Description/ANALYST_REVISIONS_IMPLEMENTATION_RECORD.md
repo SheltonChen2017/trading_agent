@@ -2128,6 +2128,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-09 | Codex counter-review and complete descendant-authority hardening | `5795705..0345908` (two Claude commits) -> `fe1f9ad` (correction) and this record commit | Accept Claude's section-41 range after correcting the no-`gc` descendant-mutation bypass and related authority/record gaps; do not start backtesting | Counter-reviewed `a630a6d` and exact pushed record head `0345908` individually and cumulatively. Accepted `a630a6d`; accepted `0345908` after correction. Captured exact mapping-proxy/tuple descendant topology across fourteen loader authorities; closed the persisted-receipt alternate path; added exact scalar/enum preflight, deleted-field domain normalization, and four missing cleanup regressions; reconciled current state and section 41 without rewriting Claude's historical ledger row. | Hostile-scalar matrix **6 passed across 11 attack placements**; affected batteries **772 passed, 2 skipped**; independent integration **1,507 passed, 7 skipped**; cleanup additions **4 passed**; complete lane **1,998 passed, 7 skipped, 0 failed in 248.96 s (4:08)**; active-document result is recorded in section 42; compileall and diff checks clean. No complete repository suite was run. No credential, provider row, production input, price, return, terminal payoff, outcome, QC, broker, operator database, deployment, order, or trade was accessed; **zero research looks and zero development evaluations**. | **4 P2 and 7 P3** (`ARV2CR26-001..011`): ten lane findings corrected and one shared static-process boundary documented only. `ARV2R25-001` accepted; `ARV2R25-002` superseded; `ARV2R25-003` remains documented. | Push this exact same-lane range once after the remote-tip check. Claude reviews `fe1f9ad` and the record commit. Backtesting remains gated; the fixed 2021 start grants geometry only. |
 | 2026-09-09 | Claude review | `61d15e7` -> the record commit that follows; no code change; Codex resolves the exact pushed head | Independent review of the Codex descendant-authority correction `fe1f9ad` and its counter-review record `61d15e7` | Reviewed both commits in `0345908..61d15e7` with explicit dispositions (section 43); accepted with no correction. Verified rather than accepted: the no-`gc` mapping-proxy disclosure reproduced here (a reflected `__eq__` receives the backing dict), and a split-view proxy planted beneath an unchanged pinned root is refused at head with zero hostile calls and reauthenticates after restoration; the topology checker compares root, key, and child identity before any traversal and closes over every retained container; no authority holds a container behind an opaque record (the only opaque records, `GlobalRatingMapEntry`, are scalar-only and type-checked before read); the closed persisted-receipt path now runs the same check; frozen artifacts, firewall, capabilities, provider bindings, outcome and QC gates unchanged. A 24-trial mutation matrix caught 18 outright (the scalar-slot container check only through the helper's own battery); 5 are equivalent mutants behind a redundant layer (three internal checks of the topology helper and each enum layer alone); 1 trial was retired as mis-anchored and rerun as the scalar-slot trial. | Complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries at `61d15e7` **1,998 passed, 7 skipped, 0 failed in 235.06 s (3:55)**; complete repository suite not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2/P3 defects; 2 P3 observations documented only; `ARV2CR26-002` and `ARV2CR26-010` acknowledged as correct supersessions of this reviewer's section-41 claims. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews this record commit; every section-34.4 production gate remains closed and no backtest is authorised. |
 | 2026-09-09 | Codex counter-review and mutation-coverage correction | `61d15e7..5fce87f` (one Claude record commit) -> `30c83b4` (tests) and this record commit | Accept Claude's descendant-authority review after correcting two underclassified mutation survivors and the lane handoff; do not start backtesting | Counter-reviewed exact pushed `5fce87f` and accepted its substantive production-code disposition. Added focused regressions for equal-but-distinct mapping-key identity and for hostile receipt-disposition `__class__` execution between topology validation and fingerprinting. Corrected the section-43 mutation result to 24 attempts, 23 valid outcomes, 20 caught, 3 genuinely equivalent, and 1 retired; reconciled exact commit/validation identity, current-state rows, scalar-slot rationale, and the complete next gate. The frozen root Action Plan remains unchanged and its inherited stale Analyst summary is documented only. | New guards **2 passed in 2.55 s**; both changed batteries **169 passed, 2 skipped in 26.96 s**; complete Analyst lane **2,000 passed, 7 skipped, 0 failed in 247.16 s (4:07)**; active-document gate **69 passed**; changed-scope compileall and diff checks clean. Complete repository suite not run. No provider, credential, licensed row, production input, price, return, terminal payoff, outcome, QuantConnect resource/job, broker, deployment, order, or trade was accessed; **zero research looks and zero development evaluations**. | **1 P2 and 7 P3** (`ARV2CR28-001..008`): the P2 and six lane P3 findings corrected; one shared Action-Plan observation documented only. No production code defect. `ARV2R27-001` and `ARV2R27-002` are corrected; Claude's acceptance of `fe1f9ad` and `61d15e7` otherwise stands. | Push this exact same-lane two-commit range once after the remote-tip check. Claude reviews `30c83b4` and the record commit; Codex counter-reviews before any subsequent action. No implementable milestone or QC backtest is presently authorized: the section-34.4 external trust anchors, terminal-payoff source, reviewed opener/pins, numeric receipt, executable bindings, and explicit atomic QC evaluation authority remain absent. |
+| 2026-09-09 | Claude review | `eaa1795` -> this commit | Independent review of the Codex mutation-coverage correction `30c83b4` and its record `eaa1795` | Synced the lane worktree by fast-forward only and reviewed `5fce87f..eaa1795` commit by commit and cumulatively (section 45); accepted with no correction, so this push is record-only and the production tree stays at `fe1f9ad`. Verified rather than accepted: all four frozen identities in 44.4 reproduce exactly as Git object ids; `research/` is byte-identical to `fe1f9ad`; the three production gates remain `None`/`None`/`False`; the firewall closes at 39 modules with zero forbidden roots; the ledger is append-only (the 2026-09-09 Claude row is untouched) and the live current-state text names sections 43-44. Both of Codex's mutation reproductions were repeated in a detached scratch worktree: deleting only the key-identity guard makes the helper accept an equal-but-distinct key and the new regression is the only test that catches it; weakening only the receipt preflight to `isinstance` makes reauthentication accept a forged disposition (`DID NOT RAISE`). Six further hand-built topology cases, including a large-integer key and a key reorder that the battery does not cover, all refuse while the positive control passes. | Complete Analyst-lane suite on `eaa1795` **1,978 passed, 29 skipped, 0 failed in 25:54** (same 2,007-test collection as 44.4); the two changed batteries **162 passed, 9 skipped** (same 171-test collection as 44.4). Active-document gate **69 passed**; compileall exit 0; `git diff --check` clean. Zero research looks and zero development evaluations; no provider, credential, licensed row, production input, price, return, outcome, broker, operator database, QuantConnect, scheduler, deployment, order or trading access. | 0 P0, 0 P1, 0 P2, 0 P3. One observation documented only (`ARV2R29-001`): the record's last stated firewall size is 38 in section 36 while the closure is now 39 after ARV2-4E-A. | Codex counter-reviews this record commit. The next gate is unchanged from 44.5: no named milestone or QuantConnect backtest is authorised; the provider-specific opener still needs the section-34.4 evidence package and a `DLRET`-equivalent terminal-payoff source; result access, deployment, orders and trading remain separately false. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -7054,3 +7055,112 @@ bindings, and explicit atomic QuantConnect evaluation authorization. The fixed
 2021 first-round start is period geometry only and does not waive inherited
 pre-2021 state. Result reading/disposition and every deployment, order, and
 trading authority remain separately false.
+
+## 45. Independent Claude review of the mutation-coverage correction `30c83b4` and its record, 2026-09-09
+
+**Range reviewed:** `5fce87f..eaa1795`, two commits, commit by commit and
+cumulatively, in the dedicated lane worktree synced by fast-forward only. The
+accepted production tree remains `fe1f9ad`; nothing under `research/` changed
+in this range.
+**Disposition: ACCEPTED.** 0 P0, 0 P1, 0 P2, 0 P3. No correction was
+required, so this push is record-only.
+**Zero research looks and zero development evaluations.** No provider,
+credential, licensed row, production input, price, return, outcome, broker,
+operator database, QuantConnect resource, scheduler, deployment, order or
+trading surface was used.
+
+**Reviewing session:** the Fable 5 session on the work identity (sections
+4I, 4R, 7, 19, 25, 36), on a Windows host with `core.autocrlf=true` and
+without the symbolic-link privilege. Sections 39, 41 and 43 were produced by
+the other Claude session.
+
+### 45.1 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `30c83b4` | **Accepted** | Two regressions only, no production change: `test_equal_but_distinct_mapping_key_identity_is_not_current` pins the mapping-key identity guard that `ARV2R27-001` had wrongly called equivalent; `test_disposition_preflight_never_runs_post_topology_class_side_effects` proves, through both receipt entry points, that a forged disposition's `__class__` is never executed after topology validation. Both reproduced red under the single-guard mutations in 45.3. |
+| `eaa1795` | **Accepted** | Section 44 with `ARV2CR28-001` to `-008`. The Claude-authored findings `ARV2R27-001/002` are reworded to "corrected in section 44" and retained; the placeholder `record commit` is resolved to `5fce87f`; the 2026-09-09 Claude ledger row is untouched, so the ledger stays append-only. |
+| record commit | Claude record | This section and its ledger row; its own hash is the head Codex counter-reviews. |
+
+### 45.2 Verified rather than accepted
+
+- **Frozen identities reproduce exactly** as Git object ids at the head:
+  specs tree `57f34f68...`, firewall blob `9f8e1cb8...`, Action Plan blob
+  `8391ae96...`, Session Handoff blob `2c91be4e...`. These are
+  platform-independent, unlike the working-copy hashes discussed in 36.2.
+- **Production unchanged** since `fe1f9ad` (`git diff --stat` over
+  `research/` is empty). All three production gates remain
+  `None`/`None`/`False`. The transitive import firewall closes at 39 modules
+  with zero forbidden roots; the additions since section 36's count of 38 are
+  `canonical` (already counted by section 42) and the ARV2-4E-A
+  `post_pandemic_evaluation_plan`.
+- **Topology helper probed beyond the new regression.** Six hand-built
+  cases against `frozen_container_authority_is_current`: an equal-but-distinct
+  large-integer key with the same child, the same keys and children in swapped
+  order, the same key with an equal-but-distinct child proxy, a scalar slot
+  replaced by an exact empty proxy, and an alias key pointing at a retained
+  child are all refused; the untouched positive control is accepted. The
+  reorder and integer-key cases are not in the battery and confirm the guard
+  is identity-based for any key type and positional for order.
+- **Current-state sequencing** (`ARV2CR28-001`): the banner and live rows now
+  name sections 43 and 44 and describe the section-44 snapshot as pending
+  Claude review; no live text still says the section-42 or -43 snapshot
+  awaits review.
+- **Mutation accounting** (`ARV2CR28-003`): the corrected statement
+  24 attempts = 20 caught + 3 equivalent + 1 retired, equivalently
+  23 valid outcomes, is internally consistent with the named trials in 43.4.
+
+### 45.3 Both mutation claims reproduced
+
+Run in a detached scratch worktree at `eaa1795`; the lane tree was never
+modified.
+
+| Trial | Result |
+|---|---|
+| M-A: delete only `if key is not expected_key: return False` in `canonical.py` | **1 failed: `assert True is False`.** The helper reports the mutated authority as current for an equal-but-distinct exact `str` key with the same retained child (killed). |
+| M-A against the whole `test_canonical_authority.py` battery | **1 failed, 5 passed.** The new regression is the only test in the battery that catches it, which confirms `ARV2CR28-004`: before `30c83b4` this was a surviving, distinguishable mutant with no regression. |
+| M-B: weaken only the receipt preflight `type(value.disposition) is not ProvisionalPowerDisposition` to `isinstance` | **1 failed: `DID NOT RAISE PowerCalibrationReceiptError`.** With the preflight weakened, the forged disposition's `__class__` runs after topology validation and reauthentication accepts, exactly as `ARV2CR28-005` describes. |
+| Both new regressions on the unmodified head | **2 passed** |
+
+Both of the trials the other session had classified as equivalent are
+therefore independently distinguishable, and Codex's reclassification stands.
+
+### 45.4 Findings ledger
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R29-001` | — | Observation; **documented only** | The record last states a firewall closure size in section 36 (38 modules). The closure is now 39 after ARV2-4E-A. Not a defect; recorded here so the next count has an anchor. | No change. |
+
+### 45.5 Validation on the exact reviewed tree
+
+- Complete Analyst-lane suite (`tests/analyst_revisions_v2` plus the
+  `tests/test_analyst_revisions_v2_*` files) on `eaa1795`: **1,978 passed, 29 skipped, 0 failed in 1,554.02 s (25:54)**, the same 2,007-test collection as section 44.4's 2,000 passed and 7 skipped on POSIX; the 22 additional skips are this host's symbolic-link, junction, FIFO and fork capability, each with its reason.
+- The two changed batteries (`test_canonical_authority.py`,
+  `test_power_calibration_receipt.py`): **162 passed, 9 skipped, 0 failed in 313.72 s**, the same 171-test collection. Section 44.4 reports
+  169 passed, 2 skipped on POSIX; the difference in skips is this host's
+  symbolic-link, junction, FIFO and fork capability, each skipping with its
+  reason.
+- Active-document consistency gate after this section was added:
+  **69 passed**
+- `compileall` on the lane package and tests exit 0; `git diff --check`
+  clean; the worktree was clean and in sync with the remote before the
+  review. The complete repository suite was not run, per the owner's
+  lane-suite instruction (34.6).
+
+### 45.6 Required quality assessment
+
+Correction `30c83b4`: **9/10**; the side-effect probe through both receipt
+entry points is a precise regression for a subtle bypass. Record `eaa1795` as
+received: **9/10**.
+
+### 45.7 Next gate
+
+Codex counter-reviews this record commit. The exact next gate is unchanged
+from 44.5: no named milestone or QuantConnect backtest is authorised at this
+head; the provider-specific opener still needs the section-34.4 rights,
+vintage, completeness, correction/deletion and lineage evidence and a
+`DLRET`-equivalent terminal-payoff source; a later executable run needs the
+reviewed opener, production truth and operation-authority pins, an issued
+numeric receipt, reviewed run bindings and explicit atomic QuantConnect
+evaluation authorisation. Result access, deployment, orders and trading remain
+separately false.

@@ -72,7 +72,9 @@ INDEPENDENT CLAUDE REVIEW AFTER TWO P3 HARDENING AND COVERAGE CORRECTIONS
 (SECTION 39); THE CLAUDE REVIEW RANGE IS ACCEPTED AFTER THE SECTION-40 CODEX
 COUNTER-REVIEW CORRECTIONS, AND CLAUDE ACCEPTS THAT AUTHORITY-ROOT
 HARDENING SNAPSHOT AFTER ONE P3 NORMALISATION CORRECTION (SECTION 41),
-PENDING CODEX COUNTER-REVIEW. THE
+AND CODEX ACCEPTS CLAUDE'S SECTION-41 RANGE AFTER THE LANE-SPECIFIC
+AUTHORITY-INTEGRITY AND RECORD CORRECTIONS IN SECTION 42, PENDING
+INDEPENDENT CLAUDE REVIEW. THE
 SECTION-32 COUNTER-REVIEW CLOSES RESTRICTED-
 EXPORT AND AUTHORITY-STATE CAPABILITY ESCAPES; SAME-THREAD, CROSS-PROCESS,
 FORK, MODE, DURABILITY, AND FINAL-CUSTODY DEFECTS IN ATOMIC PERSISTENCE; AND
@@ -163,8 +165,8 @@ completion.
 | Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. ARV2-2 now derives a revalidatable, fail-closed inventory of in-range merger/delisting terminal-return requirements and never silently omits an unavailable terminal name. No event has been joined to a later price or return; Databento remains unmeasured. | Production split/dividend, cost/ADV, and terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. | Outcome prerequisites implemented structurally; no outcome I/O and zero looks. |
 | ETF holdings/topology | PIT holdings, declared-versus-summed weight reconciliation, stale/incomplete refusal, fixed lag, 99% coverage, eligibility, and stock-score lineage primitives exist. | No authenticated production holdings or stock-score artifact exists, so no production reverse index, ETF score, or peer topology exists. | Consumer safety implemented; production topology remains zero-access. |
 | Cross-section and portfolio | Deterministic rank/hysteresis/tie/eviction/cap/overlap/cash allocator primitives and verified policy bindings exist. | No reviewed simultaneous rank/volatility derivation or authenticated rank/classification/cost source exists. The public boundary therefore refuses every nonempty portfolio and can return only the safe empty/all-cash result. | Dormant safety algorithm implemented; no research portfolio or QC result. |
-| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. ARV2-4E-A adds an inert, content-addressed 2021-2025 complete-fold sensitivity plus a separately hashed partial-2026 exploratory geometry; it preserves the formal primary, the superseded prospective period, and the shared holdout. | Later executable-spec integration remains required. No accepted production manifest/input package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged. Section 40 completes the Codex counter-review of Claude's section-39 range and accepts it after lane-specific correction; all outcome/QC-result/deployment/order/trading authorizations refuse. |
-| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the receipt, stock-v3, and post-pandemic supplement modules are in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The atomic writer is callable only through one importer-scoped receipt call. The successor retains no receipt export: one exact synchronous helper imports only the persisted-requirement and artifact-hash functions locally, discards the requirement result, returns only the hash, catches every exception without exporting the caught traceback, a restricted binding/object, or an arbitrary interrupt argument, propagates only fresh exact built-in operator interrupts, and is sealed as a no-module-object facade. Process-local authority state and child-reset hooks are not general exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. The section-40 correction additionally authenticates every loader-created immutable container root by identity before semantic traversal, including hostile custom-mapping proxies. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. The static firewall is a reviewed-closure control, not an OS sandbox; the broader pre-existing computed-reflection limitation is documented in section 32 rather than misrepresented as runtime isolation. | Accepted ancestry and section-34 production behavior remain unchanged; ARV2-4E-A and Claude's review range are accepted after the section-40 Codex counter-review correction. |
+| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. ARV2-4E-A adds an inert, content-addressed 2021-2025 complete-fold sensitivity plus a separately hashed partial-2026 exploratory geometry; it preserves the formal primary, the superseded prospective period, and the shared holdout. | Later executable-spec integration remains required. No accepted production manifest/input package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged. Sections 40-42 complete the prior Codex counter-review, Claude review, and current Codex counter-review after lane-specific correction; the section-42 correction snapshot awaits independent Claude review, and all outcome/QC-result/deployment/order/trading authorizations refuse. |
+| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the receipt, stock-v3, and post-pandemic supplement modules are in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The atomic writer is callable only through one importer-scoped receipt call. The successor retains no receipt export: one exact synchronous helper imports only the persisted-requirement and artifact-hash functions locally, discards the requirement result, returns only the hash, catches every exception without exporting the caught traceback, a restricted binding/object, or an arbitrary interrupt argument, propagates only fresh exact built-in operator interrupts, and is sealed as a no-module-object facade. Process-local authority state and child-reset hooks are not general exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. Section 42 retains and verifies the complete exact mapping-proxy/tuple topology of all fourteen loader-created authorities before semantic traversal, checks exact scalar and receipt-disposition types, and covers both loaded and persisted receipt entry points. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. The static firewall is a reviewed-closure control, not an OS sandbox; the broader pre-existing computed-reflection limitation is documented in section 32 rather than misrepresented as runtime isolation. | Accepted ancestry and section-34 production behavior remain unchanged; Claude's section-41 range is accepted after the section-42 Codex counter-review corrections, whose exact snapshot now awaits independent Claude review. |
 
 The production source, firm-ontology, security-master, classification, cost,
 and rank catalogs remain empty. The canonical source authority permits no
@@ -493,6 +495,10 @@ snapshot, and section 37 counter-reviews Claude's section-36 commits after the
 bounded test and record corrections. Section 38 implements the owner-directed,
 outcome-free ARV2-4E-A post-pandemic evaluation supplement; sections 39 and 40
 complete its independent Claude review and Codex counter-review correction.
+Sections 41 and 42 complete the next independent Claude review and Codex
+counter-review cycle; the latter replaces top-level-only root pins with full
+descendant-container topology authentication and corrects both receipt entry
+paths without opening data or outcomes.
 The numeric production path remains
 fail-closed until its provider-dialect-specific evidence opener, reviewed truth
 approval, and operation-authority pin exist; outcome/result access, paper or
@@ -2115,6 +2121,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-08 | Claude review | `0dde645` -> `ec9ebbc` and `188b623` (corrections), `a36df23` (record), and the hash-naming head named in 39.1 | Independent review of the Codex counter-review correction `fd9a86d` and the ARV2-4E-A post-pandemic supplement `40f3ced` | Reviewed all three commits in `038a81c..0dde645` with explicit dispositions (section 39); accepted after one P3 correction. Verified rather than accepted: the 17,785-byte supplement reproduces from its renderer and its plan ID/hash recompute; the three parent artifact pins match the checked-in fold manifest, QC-first draft, and stock contract; the partial-2026 geometry (cutoff session, first post-cutoff session, four maturity boundaries, effective starts, validation starts, and eligible counts) recomputes independently from `data.exchange_calendar`; the contamination window matches its two parents; the three production gates remain null/false; frozen documents and accepted artifacts untouched. A 21-guard mutation matrix caught 7 outright and exposed 11 guards reachable only behind the exact-document comparison, now covered by `188b623`; 3 remain equivalent mutants. | Four batteries **472 passed, 2 skipped in 102.19 s** at `0dde645`; plan battery **92 passed** at `188b623`; complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries on `188b623` **1,888 passed, 7 skipped, 0 failed in 187.01 s (3:07)**; the complete repository suite was not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; compileall exit 0; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2; 2 P3 corrections (`ARV2R23-001` value-equality fingerprint, `ARV2R23-004` eleven bypass-mode guard gaps) with red/green regression tests; 2 P3 observations documented only. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews every Claude commit in this round before any actual QuantConnect backtest; ARV2-4E-A remains outcome-free and every section-34.4 production-input, truth, rights, terminal-payoff, receipt, and QC-operation gate remains closed. |
 | 2026-09-08 | Codex counter-review and authority-root hardening | `0dde645..03536e9` (four Claude commits) -> `0fc63b8` (correction) and this record commit | Counter-review Claude's ARV2-4E-A review range without starting the first 2021-based backtest | Counter-reviewed `ec9ebbc`, `188b623`, `a36df23`, and externally resolved head `03536e9` individually and cumulatively. Accepted all four after correction. Pinned every affected Analyst loader-created immutable container root before fingerprint traversal; exact-type fingerprints now refuse equality-spoofed scalars; the supplement constructor refuses direct construction; two omitted semantic-guard regressions were added; and the current/review record was reconciled. The 2021-2026 first-round window decision is preserved as sequencing/geometry only. | Direct pre-correction exploit accepted a hostile mapping proxy and exposed `orders=True`; the corrected tree refuses it. Final adversarial selection **40 passed, 1,170 deselected**; manifest/supplement metaclass and root selection **25 passed, 438 deselected**; complete Analyst V2 selection **1,943 passed, 7 skipped, 0 failed in 201.35 s (3:21)**; active-document gate **69 passed**; changed-scope compileall exit 0; final diff/status gates clean; Python 3.13.15. No complete repository suite was run. No credential, provider row, production input, price, return, outcome, terminal payoff, QuantConnect resource/job, broker, deployment, order, or trade was accessed; **zero research looks and zero development evaluations**. | **2 P2 and 6 P3** (`ARV2CR24-001..008`): six lane findings corrected and two process deviations documented without rewriting history. No shared/main issue was changed. Claude's performance observation `ARV2R23-003` remains documented only. | Push this exact same-lane counter-review range once. The next executable step remains blocked on the reviewed provider evidence opener, production truth/rights/input and operation-authority pins, terminal-return treatment, numeric receipt, executable run bindings, and explicit atomic QC evaluation authority. The fixed 2021 start does not grant data, outcome, QC, result, deployment, order, or trading authority. |
 | 2026-09-08 | Claude review | `5795705` -> `a630a6d` (correction) and the record commit that follows; Codex resolves the exact pushed head | Independent review of the Codex authority-root hardening `0fc63b8` and its counter-review record `5795705` | Reviewed both commits in `03536e9..5795705` with explicit dispositions (section 41); accepted after one P3 correction. Verified rather than accepted: in every one of the fourteen `require_loaded_*` paths the root identity comparison precedes the fingerprint traversal; weak-reference cleanup reproduced directly for three loaded types and covered by named tests for the rest; `gc` is outside the lane's stdlib allowlist so a pinned proxy's underlying dict is unreachable from reviewed source; no spec artifact, firewall, capability, provider binding, outcome or QC gate byte changed. A 17-trial mutation matrix removing each of the fourteen root pins, the three preregistration composite/cell/nested-type pins, and the plan constructor refusal was caught outright in every case. | Lane suite at `5795705` **1,943 passed, 7 skipped in 206.24 s**; three corrected batteries **491 passed, 5 skipped**; complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries on `a630a6d` **1,953 passed, 7 skipped, 0 failed in 208.70 s (3:28)**; complete repository suite not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; compileall exit 0; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2; 1 P3 correction (`ARV2R25-001`, raw AttributeError from three root checks) with red/green regressions; 2 P3 observations documented only; `ARV2CR24-008` acknowledged, so this row is appended once and not rewritten. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews `a630a6d` and the record commit before any provider-specific opener or QC backtest; every section-34.4 production gate remains closed. |
+| 2026-09-09 | Codex counter-review and complete descendant-authority hardening | `5795705..0345908` (two Claude commits) -> `fe1f9ad` (correction) and this record commit | Accept Claude's section-41 range after correcting the no-`gc` descendant-mutation bypass and related authority/record gaps; do not start backtesting | Counter-reviewed `a630a6d` and exact pushed record head `0345908` individually and cumulatively. Accepted `a630a6d`; accepted `0345908` after correction. Captured exact mapping-proxy/tuple descendant topology across fourteen loader authorities; closed the persisted-receipt alternate path; added exact scalar/enum preflight, deleted-field domain normalization, and four missing cleanup regressions; reconciled current state and section 41 without rewriting Claude's historical ledger row. | Hostile-scalar matrix **6 passed across 11 attack placements**; affected batteries **772 passed, 2 skipped**; independent integration **1,507 passed, 7 skipped**; cleanup additions **4 passed**; complete lane **1,998 passed, 7 skipped, 0 failed in 248.96 s (4:08)**; active-document result is recorded in section 42; compileall and diff checks clean. No complete repository suite was run. No credential, provider row, production input, price, return, terminal payoff, outcome, QC, broker, operator database, deployment, order, or trade was accessed; **zero research looks and zero development evaluations**. | **4 P2 and 7 P3** (`ARV2CR26-001..011`): ten lane findings corrected and one shared static-process boundary documented only. `ARV2R25-001` accepted; `ARV2R25-002` superseded; `ARV2R25-003` remains documented. | Push this exact same-lane range once after the remote-tip check. Claude reviews `fe1f9ad` and the record commit. Backtesting remains gated; the fixed 2021 start grants geometry only. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -6617,7 +6624,7 @@ resolves the exact pushed head externally as section 40 did.
 | `0fc63b8` | **Accepted after correction** | Root-identity pins across fourteen loader-authenticated types, exact-type fingerprints for the fold, stock-contract, and preregistration authorities, `type(value) is` scalar branches in the plan and input-manifest helpers, the supplement constructor refusal, and the aggregation-rescue and fold-overlap bypass regressions. Verified in 41.2; `ARV2R25-001` corrects three of its root checks. |
 | `5795705` | **Accepted** | Record-only: section 40, status wording, section-39 corrections `ARV2CR24-004` to `-006`, and the ledger row. Its validation claims reproduce here. |
 | `a630a6d` | Claude correction | `ARV2R25-001`; ten parametrised deletion cases across three batteries fail without the change (41.4). |
-| record commit | Claude record | This section, current-status wording, one appended ledger row. |
+| `0345908` | Claude record | This section, current-status wording, and one appended ledger row. Its counter-review corrections are recorded in section 42. |
 
 ### 41.2 Verified rather than accepted
 
@@ -6637,10 +6644,10 @@ resolves the exact pushed head externally as section 40 did.
   RegisteredLook` before any attribute of a nested record is read, then the
   per-cell value roots, then the fingerprint.
 - **Hostile mappings behind an exact proxy.** The split-view regressions in
-  each battery assert the replacement's methods are never called; the same
-  attack beneath a pinned root would need the proxy's underlying dict, which
-  is reachable only through `gc`, and `gc` is not in the lane's standard-
-  library allowlist.
+  each battery assert the replacement's methods are never called. Claude
+  concluded that the same attack beneath a pinned root required `gc`; section
+  42 supersedes that conclusion after reproducing a no-`gc` route through
+  mapping-proxy equality and correcting the complete descendant topology.
 - **Scalar and metaclass spoofing.** The fold, stock-contract, and
   preregistration fingerprints now tag exact types; the plan and input-
   manifest helpers use `type(value) is str/bool/int` branches rather than a
@@ -6666,15 +6673,16 @@ resolves the exact pushed head externally as section 40 did.
 | ID | Severity | Class | Finding | Disposition |
 |---|---|---|---|---|
 | `ARV2R25-001` | P3 | Lane-specific; **corrected in `a630a6d`** | The overlay, input-schema, and protocol root checks called `getattr(value, name)` without a default, unlike the eleven sibling checks. A container attribute removed after loading therefore escaped `require_loaded_*` as a raw `AttributeError` rather than the loader's domain error, breaking the uniform refusal contract downstream consumers catch. All three now default to `None`; ten parametrised deletion cases (two overlay, four schema, four protocol) fail without the change. | Confirmed by mutation; fixed. |
-| `ARV2R25-002` | P3 | Observation; **documented only** | The pins cover top-level container roots. A hostile mapping substituted beneath a pinned root would still be traversed by the fingerprint, but the only route to a `MappingProxyType`'s underlying dict is `gc.get_referents`, and `gc` cannot be imported inside the lane closure; the reviewed-source trust boundary stated in section 32.2 covers it. | No change. |
+| `ARV2R25-002` | P3 | Observation; **superseded by `ARV2CR26-002`** | The pins cover top-level container roots. Claude reported that a hostile mapping substituted beneath a pinned root would require `gc.get_referents`; counter-review proved that `MappingProxyType` equality can disclose the exact backing dict without importing `gc`, then reproduced an authority bypass. | Reclassified P2 and corrected in section 42. |
 | `ARV2R25-003` | P3 | Observation; **documented only** | The `None` fingerprint tag is `"none"` in the fold, stock-contract, and preregistration helpers and `"NoneType"` in the plan and input-manifest helpers. Each helper is self-consistent, so no cross-type comparison is affected. | No change. |
 
 ### 41.4 Mutation matrix and regression verification
 
-Seventeen single-guard removals: the fourteen root-pin refusals, the
-preregistration composite-root, cell-value-root, and nested-type refusals,
-and the plan constructor refusal. Every removal fails at least one test in
-its battery. With any of the three `getattr` defaults reverted, the
+Seventeen single-guard removals: one root-pin refusal for each of the fourteen
+authority types (including preregistration's composite-root guard), the two
+additional preregistration cell-value-root and nested-record-type refusals,
+and the plan constructor refusal. Every removal fails at least one test in its
+battery. With any of the three `getattr` defaults reverted, the
 corresponding deletion cases fail (2, 4, and 4 respectively) and the real
 code passes them; the three batteries together are **491 passed, 5 skipped**.
 
@@ -6700,3 +6708,129 @@ Codex counter-reviews `a630a6d` and this record commit. Nothing here starts
 the provider-specific evidence opener, populates a truth or authority pin,
 constructs a production input, or infers ARV2-4 outcome authority; the
 fixed 2021 first-round start remains a period decision only.
+
+## 42. Codex counter-review of Claude's authority-root review and complete descendant-authority correction, 2026-09-09
+
+**Incoming exact range:**
+`5795705ae01ea85d9c6f08456d1384c0ae210bff..03459082237eb58b1f101c7f2a705a924885d43c`,
+two commits, received clean and synchronized with the remote in this exact
+same-lane worktree.
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, four P2, and seven
+P3 findings. Ten lane-specific findings are corrected in `fe1f9ad` and this
+record; one shared static-process observation is documented only. No accepted
+artifact, provider/source binding, production truth/input/operation pin,
+firewall, capability, outcome, QuantConnect, result, deployment, order, or
+trading gate changed.
+**Zero research looks and zero development evaluations.** No configured
+credential, licensed row, production input, price, return, terminal payoff,
+outcome, QuantConnect resource or job, broker, operator database, deployment,
+order, or trade was accessed.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` remain
+untouched under the dedicated-lane workflow.
+
+### 42.1 Per-commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `a630a6d` | **Accepted** | Its defaulted overlay, schema, and protocol root reads and ten deletion regressions correctly normalize those exact missing roots. Counter-review found additional sibling deletion and traversal gaps, but no defect in this bounded correction. |
+| `0345908` | **Accepted after correction** | Section 41 and its historical ledger row preserve Claude's work, but the `gc`-only security conclusion is false, the 17-trial enumeration is arithmetically inconsistent, four cleanup-test claims were unsupported, the live handoff still stopped at section 40, and the record commit was not named exactly. Section 41 and this section reconcile those points without rewriting Claude's appended ledger row. |
+| `fe1f9ad` | **Codex correction** | Captures and verifies the full exact mapping-proxy/tuple descendant topology for all fourteen authority types; closes the alternate persisted-receipt path; preflights exact scalar and disposition-enum types; normalizes deleted fields; and completes lifecycle and adversarial coverage. |
+| this record commit | **Codex record** | Current-state reconciliation, exact findings, dispositions, validation, section-41 corrections, and one new append-only ledger row. |
+
+### 42.2 Verified exploit, generalized search, and correction
+
+- **No-`gc` descendant bypass reproduced.** Comparing an exposed exact
+  `MappingProxyType` to an attacker object invokes the attacker's `__eq__`
+  with the proxy's mutable backing dictionary. Counter-review used that
+  dictionary to replace a descendant below the unchanged pinned root with a
+  split-view proxy. The incoming fingerprint observed canonical values, the
+  incoming `require_loaded_*` returned the forged authority, and later access
+  exposed `orders=True`. This directly disproves `ARV2R25-002` without an
+  import of `gc`.
+- **Complete topology authenticated.** `canonical.py` now retains every exact
+  mapping proxy and tuple plus its immediate keys/slots. Verification checks
+  root identity, graph membership, key identity, child identity, whether each
+  slot is scalar or container, reachability, rewiring, aliases, swaps, new
+  descendants, and missing descendants before traversing any newly introduced
+  container. All fourteen loader registries capture the graph once and every
+  ordinary reauthentication path checks it before semantic fingerprinting.
+- **Both receipt entry paths closed.** `_require_closed_receipt_registry_state`,
+  used by the public persisted-receipt requirement, had bypassed even the
+  top-level root check. It now performs the same topology verification before
+  fingerprinting and before `_thaw`; its regression records zero hostile calls
+  and successful reauthentication after restoration.
+- **Scalar and nested-record traversal closed.** Nine authority types that
+  lacked complete scalar preflight now require the exact expected built-in
+  types before a recursive fingerprint helper can inspect a hostile exact
+  container. Preregistration also checks every opaque cell/look scalar.
+  Receipt disposition now requires exact `ProvisionalPowerDisposition`, so a
+  forged `__class__` object with the authentic `.value` cannot reauthenticate
+  and its `.value` is never read on either receipt path.
+- **Uniform failure and lifecycle behavior.** Missing preregistration roots,
+  missing `cell.value`, and deleted scalar fingerprint fields now become their
+  authority's domain refusal. Only `AttributeError` is normalized;
+  `KeyboardInterrupt`, `SystemExit`, and `RuntimeError` still propagate.
+  Four added lifecycle regressions complete direct 14-of-14 evidence that the
+  retained graph does not keep its owner alive and that collection removes
+  the registry identity.
+- **Generalized validation surface.** New helper tests cover hostile insertion,
+  deletion and equal replacement, scalar-slot rewiring, retained-descendant
+  swaps, aliasing, and the unchanged positive path. Per-family tests exercise
+  the no-`gc` poison against every authority type. `canonical.py` was already
+  in the 38-module Analyst closure, so no production module or firewall
+  allowance was added.
+
+### 42.3 Findings ledger
+
+| ID | Severity | Class | Finding and impact | Correction and verification |
+|---|---|---|---|---|
+| `ARV2CR26-001` | P3 | Lane-specific | Preregistration directly read `spec.cells`, `spec.looks`, and every `cell.value`; deleting one leaked raw `AttributeError` instead of the documented domain refusal. | Defaulted/sentinel reads refuse missing composite/value roots; deletion regressions cover both composites and every cell value. |
+| `ARV2CR26-002` | P2 | Lane-specific authority bypass | `MappingProxyType` equality discloses the exact backing dict without `gc`. A descendant split-view proxy beneath the same pinned root could pass the incoming semantic fingerprint and later expose an enabled capability. | `fe1f9ad` authenticates full exact-container topology across all fourteen authorities before semantic traversal; helper and per-family poison regressions fail closed with zero hostile calls. |
+| `ARV2CR26-003` | P2 | Lane-specific persisted authority bypass | The alternate closed/persisted receipt registry path fingerprinted and later thawed the receipt without any root check, leaving a public reauthentication path outside the incoming hardening. | Added topology verification before fingerprint/thaw; the persisted poison regression refuses with zero hostile calls, restores, and reauthenticates. |
+| `ARV2CR26-004` | P3 | Lane-specific refusal consistency | Deleting a scalar fingerprint field across the fourteen authorities, plus the alternate receipt path, could leak raw `AttributeError` to callers expecting the lane domain error. | Only current-object fingerprint `AttributeError` is translated to the existing domain refusal; 14 representative deletion placements pass, and three non-attribute control-flow/runtime exceptions propagate unchanged. |
+| `ARV2CR26-005` | P2 | Lane record/current handoff | The banner had advanced only to section 41 while both live status rows and section 4 stopped at section 40, permitting a later session to repeat or mis-sequence completed review work. | Current text now names sections 41-42 and keeps every external/action gate closed. |
+| `ARV2CR26-006` | P3 | Review arithmetic | Section 41 described fourteen root checks, three additional preregistration checks, and one constructor as seventeen trials; that enumeration totals eighteen. | Section 41 now states the actual seventeen: fourteen per-type root checks including preregistration's composite root, two additional preregistration checks, and the constructor. The historical ledger row is not rewritten. |
+| `ARV2CR26-007` | P3 | Exact record identity | Section 41.1 retained the placeholder `record commit` after its exact pushed identity was known. | The table now names exact Claude record commit `0345908`. |
+| `ARV2CR26-008` | P3 | Lane-specific hostile traversal | Nine authority types would inevitably reject an exact mapping proxy placed in a scalar slot, but only after invoking its attacker-controlled mapping methods; preregistration had the same gap inside exact cell/look records. | Exact scalar preflight precedes recursive helpers; the focused matrix covers eleven hostile placements with zero calls. |
+| `ARV2CR26-009` | P2 | Lane-specific receipt authority bypass | Receipt fingerprinting used `isinstance` for `ProvisionalPowerDisposition`; Python honors a forged `__class__`, allowing a non-enum object with an authentic `.value` to match the registered fingerprint. | Exact `type(value) is ProvisionalPowerDisposition` plus receipt-level preflight rejects the forgery before `.value` on both loaded and persisted paths. |
+| `ARV2CR26-010` | P3 | Test/record accuracy | Section 41 said every registry not manually checked had a named cleanup test, but admission, content contract, input authority, and stock successor did not. | Four direct weakref/registry-ID-removal regressions now complete coverage and pass. |
+| `ARV2CR26-011` | P3 | Shared/static-process boundary; documented only | Code able to mutate reviewed class data descriptors or trusted module registry state could present canonical values during a check and different values later. Closing that class requires a project-wide runtime/process-isolation design, not a lane container-graph patch. | No shared/main change. Section 32 already identifies the firewall as reviewed static closure rather than an OS/runtime sandbox; this residual boundary remains explicit. |
+
+`ARV2R25-001` is accepted. `ARV2R25-002` is superseded and reclassified by
+`ARV2CR26-002`. The self-consistent `None` tags in `ARV2R25-003` remain a
+harmless documented observation.
+
+### 42.4 Validation and frozen-state evidence
+
+- Focused hostile-scalar matrix: **6 passed across 11 attack placements**.
+- Complete six affected batteries: **772 passed, 2 skipped**.
+- Independent twelve-battery integration run: **1,507 passed, 7 skipped**.
+- Four missing lifecycle regressions: **4 passed**.
+- Complete Analyst V2 lane suite on `fe1f9ad`:
+  **1,998 passed, 7 skipped, 0 failed in 248.96 s (4:08)** using Python
+  **3.13.15**.
+- Active-document consistency after this record: **69 passed**.
+- Lane-package and Analyst-test `compileall` exit 0; `git diff --check` clean.
+  The complete repository suite was not run under the owner-directed
+  lane-scoped validation rule.
+- No file beneath `research/analyst_revisions_v2/specs`, no accepted artifact,
+  firewall, root Action Plan, or root Session Handoff changed. No external
+  credential or operational surface was used.
+
+### 42.5 Claude review notes and exact next gate
+
+Claude next reviews the single same-lane pushed range after `0345908`, with a
+separate disposition for correction commit `fe1f9ad` and this record commit.
+Review focus is the no-`gc` mapping-proxy disclosure reproduction; graph
+identity and topology before hostile traversal across all fourteen types; the
+alternate persisted-receipt entry; exact scalar and disposition-enum preflight;
+deleted-field domain normalization with non-`AttributeError` propagation;
+14-of-14 weakref cleanup; and unchanged artifacts, firewall, gates, and import
+closure.
+
+This completes counter-review, not backtesting. The provider-specific evidence
+opener, reviewed production truth/rights/input and operation-authority pins,
+terminal-return treatment, numeric receipt, executable run binding, and
+explicit atomic QuantConnect evaluation authority remain absent. The fixed
+2021 start remains a period/geometry decision only; it grants no data, outcome,
+QuantConnect, result, deployment, order, or trading authority.

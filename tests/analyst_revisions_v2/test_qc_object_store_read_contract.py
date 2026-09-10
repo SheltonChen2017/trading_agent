@@ -1291,3 +1291,21 @@ def test_plan_and_transcript_semantic_and_artifact_identities_reproduce():
             if isinstance(value, SyntheticQcObjectStoreReadPlan)
             else "transcript_artifact_sha256",
         )
+
+
+def test_receipt_identity_binds_the_plan_and_transcript_hashes_under_its_domain():
+    # ARV2R39-002: a retained plan admits exactly one valid transcript, so a
+    # receipt identity that silently stopped binding the transcript hash would
+    # be unobservable through acceptance alone. Pin the documented recipe.
+    _, _, plan, transcript, receipt = _loaded()
+    expected = hashlib.sha256(
+        b"arv2-qc-object-store-read-receipt-v1\x00"
+        + plan.plan_hash.encode("ascii")
+        + b"\x00"
+        + transcript.transcript_hash.encode("ascii")
+    ).hexdigest()
+    assert receipt.receipt_hash == expected
+    assert receipt.receipt_id == (
+        f"arv2-qc-object-store-read-receipt-{expected[:16]}"
+    )
+    assert require_synthetic_qc_object_store_read_receipt(receipt) is receipt

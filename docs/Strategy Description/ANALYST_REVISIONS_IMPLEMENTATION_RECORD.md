@@ -89,8 +89,9 @@ COMBINED WITH THE OWNER-AUTHORIZED, OUTCOME-FREE ARV2-4F-B1 GLOBAL-INPUT
 SCHEMA CANDIDATE IN SECTION 49, AND CLAUDE ACCEPTS THAT CUMULATIVE SNAPSHOT
 WITH NO CODE CORRECTION (SECTION 50). CODEX ACCEPTS CLAUDE'S RECORD COMMIT
 AFTER CURRENT-STATE CORRECTION AND IMPLEMENTS THE OUTCOME-FREE ARV2-4F-B2
-SYNTHETIC PAYLOAD-ADMISSION/CORE-COMPOSITION CANDIDATE IN SECTION 51,
-PENDING INDEPENDENT CLAUDE REVIEW. B1 FREEZES THE EXACT SEVEN
+SYNTHETIC PAYLOAD-ADMISSION/CORE-COMPOSITION CANDIDATE IN SECTION 51, AND
+CLAUDE ACCEPTS THAT CANDIDATE AFTER ONE P3 COVERAGE CORRECTION (SECTION 52), PENDING
+CODEX COUNTER-REVIEW. B1 FREEZES THE EXACT SEVEN
 PRODUCTION-SHAPED ROW,
 WIRE, DESCRIPTOR, AND CANONICAL SYNTHETIC-MANIFEST CONTRACTS IN MEMORY. IT
 DOES NOT READ OR VALIDATE A PARTITION PAYLOAD, AUTHENTICATE PRODUCTION TRUTH,
@@ -2187,6 +2188,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-09 | Codex continued counter-review round and ARV2-4F-B1 implementation | `6bdc235` -> `2b75c18`, `5fe920a`, `2e1b09a`, and this record commit | Preserve the completed ARV2-4F-A counter-review, then implement the owner-authorized synthetic global-input schema before Claude reviews the cumulative round | Retained section 48's dispositions and fixed-horizon benchmark splice. Added an exact seven-role production-shaped row/wire schema, domain/candidate-bound descriptors, canonical content-addressed synthetic manifest, strict in-memory metadata loader, independently derived topology, separate input/outcome authority scopes, and exhaustive null/false/no-I/O boundaries. No accepted ancestor, root plan/handoff, payload, provider, production input, outcome, or QC surface changed or was used. | Focused B1 **120 passed in 3.87 s**; QC core + B1 + firewall **415 passed in 36.48 s**; complete Analyst lane **2,243 passed, 7 skipped, 0 failed in 234.91 s (3:54)**; final mutation matrix **396/396 refused**; three independent audits report no remaining P0-P3; active-document, compile, diff/EOL, staged-blob, branch, remote-tip, and status gates follow section 49.4. Python 3.13.15. Complete repository suite not run. **Zero research looks and zero development evaluations.** | Implementation audit: **8 P2 and 6 P3** (`ARV2I4FB1-001..014`), all corrected before `2e1b09a`; no remaining P0-P3 and no out-of-lane change. | Make exactly one same-lane push after the remote-tip check. Claude reviews `6bdc235..<record head>` commit by commit and cumulatively. Production admission/payload reads, provider/outcome access, LEAN adapter, QC project/upload/compile/run/result, deployment, orders, and trading remain gated. |
 | 2026-09-09 | Claude review | `e43338e` -> the record commit that follows; no code change; Codex resolves the exact pushed head | Independent review of the section-48 terminal-payoff correction `2b75c18`, its record `5fe920a`, the ARV2-4F-B1 global-input schema `2e1b09a`, and its record `e43338e` | Reviewed all four commits in `6bdc235..e43338e` with explicit dispositions (section 50); accepted with no correction. Verified rather than accepted: the benchmark-splice formula reproduces hand values (a 50% payoff at a session where SPY has risen 10% and then rises to 21% yields security -0.45, benchmark 0.21, excess -0.66), the equal-wealth pin yields exactly zero excess, successor-valued mergers keep a unit factor, and overflow is trapped as a domain error; both canonical-LF source pins, the 3,435-row session-axis partition hash and byte count, and the schema's semantic and 24,440-byte artifact identities all recompute; the package still imports only the standard library, the exchange calendar, and its siblings; no spec, firewall, plan, or handoff byte changed. An 18-trial mutation matrix over the correction and the schema caught 11 outright and found 7 equivalent mutants behind redundant checks; none escaped. | QC core, B1, and firewall batteries **415 passed in 37.42 s**; complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries on `e43338e` **2,243 passed, 7 skipped, 0 failed in 237.55 s (3:57)**, matching section 49.4; complete repository suite not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2/P3 defects; 2 P3 observations documented only. `ARV2CR32-002` acknowledged: section 47's matrix arithmetic was wrong and the exact split is 15 caught, 3 equivalent, 1 unreachable, 2 escaped. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews the Claude commits of this round; every section-46.5 and 49.5 gate remains closed and no adapter, compile, run, or result read is authorised. |
 | 2026-09-10 | Codex counter-review and ARV2-4F-B2 implementation | `e43338e..ad03ba0` (one Claude record commit) -> `81c938d` (implementation) and this record commit | Accept Claude's B1 review after correcting its live handoff, then implement exact synthetic payload admission and pure-core composition without starting QuantConnect | Accepted `ad03ba0` after correcting the stale banner/section-2/4 state and recording the missing quality assessment. Added exact seven-role in-memory bytes/row admission, bounded strict tagged-JSONL decoding, canonical rerender, independent B1/candidate/descriptor/hash reconciliation, complete retained-bundle reauthentication, pure reviewed-core composition, full output shell/census validation, literal-false authorities, and fail-closed dependency topology. No accepted ancestor, spec, firewall, root coordination file, provider, production input, outcome, physical transport, or QC surface changed or was used. | Focused B2 **181 passed in 15.88 s**; core + B1 + B2 + firewall **596 passed in 53.12 s**; complete Analyst lane **2,424 passed, 7 skipped, 0 failed in 254.66 s (4:14)**; final independent high-risk selection **33 passed**; active-document **69 passed**; changed-scope compilation and diff/EOL checks clean. Complete repository suite not run. **Zero research looks and zero development evaluations.** | Counter-review: **1 P2 and 1 P3** (`ARV2CR34-001..002`), corrected. Implementation: **12 P2 and 3 P3** (`ARV2I4FB2-001..015`), corrected or explicitly bounded. Draft-record audit: **1 P2 and 4 P3** (`ARV2REC34-001..005`), corrected. Two exact-hash code audits and the final record audit report 0 remaining P0-P3. Claude review quality **8/10**; B2 implementation quality **9/10**. | Make exactly one same-lane push after the remote-tip check. Claude reviews `ad03ba0`, `81c938d`, and this record commit. Production truth/rights/PIT lineage, physical transport/adapter, QC project/upload/compile/run/result, deployment, orders, and trading remain gated. |
+| 2026-09-10 | Claude review | `422dc62` -> `460c1da` (tests) and the record commit that follows; Codex resolves the exact pushed head | Independent review of the ARV2-4F-B2 synthetic payload-admission and core-composition candidate `81c938d` and its record `422dc62` | Reviewed both commits in `ad03ba0..422dc62` with explicit dispositions (section 52); accepted after one P3 coverage correction. Verified rather than accepted: the 9,369-byte bundle schema, its semantic identity, the 94,959-byte B1 source pin, and both committed file hashes recompute; payload bytes are matched to the manifest descriptor by length and SHA-256 before any decoding; decoded rows are re-rendered to exact canonical JSONL and re-bound through the reviewed partition builder to the candidate's declared hash; the composer calls only the reviewed core and re-validates the batch, census, and policy; the module imports only the standard library and its two siblings; no spec, firewall, outcome-free package, plan, or handoff byte changed. An 18-trial mutation matrix caught 6 outright; 9 are equivalent mutants behind a redundant check, 1 is unreachable, and 2 seam guards escaped and are now isolated by `460c1da`. | LANESUITE_PLACEHOLDER | Review: 0 P0/P1/P2; 1 P3 coverage correction (`ARV2R35-001`) with red/green regressions; 3 P3 observations documented only; `ARV2CR34-001` acknowledged. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews the Claude commits of this round; B2 grants no physical transport, adapter, project, compile, run, result, deployment, order, or trading authority and every section-46.5 gate remains closed. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -8035,3 +8037,116 @@ project, upload, compile, launch, result, deployment, order, or trade. The next
 action is independent Claude review of this single pushed snapshot. Any later
 physical adapter/transport candidate, and any real QuantConnect backtest,
 remain separately gated and are not started by this round.
+
+## 52. Independent Claude review of the ARV2-4F-B2 synthetic payload-admission candidate, 2026-09-10
+
+**Range reviewed:** `ad03ba0..422dc62`, two commits, fetched into this same
+worktree with no divergence.
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, 0 P2; one P3
+coverage gap corrected in `460c1da`; three P3 observations documented only.
+No production byte changed in the correction.
+**Zero research looks and zero development evaluations by this review.** No
+provider, credential, licensed row, production input, partition payload
+beyond in-memory synthetic fixtures, price, return, outcome, broker, operator
+database, QuantConnect resource, scheduler, deployment, or order surface was
+used. `docs/ACTION_PLAN_2026-08-20.md`, `docs/SESSION_HANDOFF.md`, every
+accepted spec, the import firewall, and the outcome-free lane package are
+untouched across the range. The ledger row is appended once.
+
+**Acknowledgement.** `ARV2CR34-001` is correct: the section-50 record left
+the live banner and section-2/4 handoff stale. This section updates the live
+state as part of the same commit.
+
+### 52.1 Commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `81c938d` | **Accepted** | `global_input_bundle.py` and its 102-function battery: the seven-role strict tagged-JSONL decoder with byte, row, and depth limits; manifest-, candidate-, and descriptor-bound admission; canonical re-render and partition re-binding; complete retained-state reauthentication; pure-core composition with output-shell projection, census, and policy checks; nineteen literal-false accessors; and the in-process dependency pinning. Verified in 52.2 and 52.4. |
+| `422dc62` | **Accepted** | Record-only: section 51, the section-50 live-state correction, status wording, ledger row. Its validation claims reproduce here. |
+| `460c1da` | Claude correction | `ARV2R35-001`; each of the two new cases fails when only its guard is removed (52.4). |
+| record commit | Claude record | This section, current-status wording, one appended ledger row. |
+
+### 52.2 Verified rather than accepted
+
+- **Identities.** `render_qc_global_input_bundle_schema_bytes()` yields 9,369
+  bytes with the pinned artifact SHA-256 and reproduces the pinned semantic
+  hash and ID from the null-identity form; the canonical-LF bytes of
+  `global_input_schema.py` are 94,959 with the pinned SHA-256; the committed
+  module and battery hash to the section-51.2 identities; rendering is stable.
+- **Admission order.** `_load_bundle` requires exact `bytes` payloads in the
+  exact seven-role order, authenticates the manifest through the B1 loader,
+  applies the partition and bundle byte and row bounds, and compares each
+  payload's length and SHA-256 with its manifest descriptor before any line
+  is decoded. Only then does `_decode_partition` split lines, enforce the row
+  byte limit, decode strict UTF-8, parse with duplicate keys and all bare
+  numbers refused, enforce depth 16, require each line to equal its own
+  canonical re-serialisation, decode the tagged envelope into the exact
+  event-study dataclass, require canonical order without duplicates, and
+  require the whole partition to re-render to the input bytes.
+- **Candidate binding.** Each decoded row tuple is re-bound through the
+  reviewed `build_synthetic_partition_binding` and must equal the run
+  candidate's declared binding and the descriptor's census and hash, so a
+  payload cannot be swapped beneath a valid manifest.
+- **Reauthentication.** `require_synthetic_qc_global_input_bundle` checks
+  every scalar, hash shape, container, census, false accessor, per-role row
+  shell, and re-render before rebuilding from the retained manifest bytes and
+  candidate and comparing every scalar and the canonical document.
+- **Composition.** The composer reauthenticates the bundle, calls only
+  `collect_synthetic_event_study` with the decoded tuples, requires the
+  returned batch to be the exact reviewed type, projects every observation,
+  refusal, lifecycle, and nested lifecycle field before validation,
+  re-validates through `require_synthetic_event_study_batch`, and requires the
+  candidate lineage, the benchmark-splice policy, and the exact decision times
+  four horizon census.
+- **Boundary.** The module imports only the standard library and its two
+  siblings; the `__globals__` reflection it uses reaches only its own
+  package's event-study module to pin the calendar cache; no file,
+  environment, network, `QCAlgorithm`, Object Store, or result surface exists.
+- **Validation claims.** Bundle, B1, core, and firewall batteries: **596
+  passed in 55.98 s** at `422dc62`.
+
+### 52.3 Findings ledger
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R35-001` | P3 | Lane-specific test coverage; **corrected in `460c1da`** | The composer's candidate-lineage comparison and its `_validate_batch` call were unreachable by the battery: every existing injected-core case is refused first by the output-shell projections. With the real core both hold by construction, but the composer exposes the `_call_core` seam, so an injected core could return an internally valid batch that the reviewed core produced for a different bundle, or a real batch with a same-shape hash tamper. `test_composer_refuses_a_foreign_valid_batch_through_lineage_alone` and `test_composer_refuses_a_same_shape_hash_tamper_through_the_validator_alone` isolate each guard. | Confirmed by mutation; fixed. |
+| `ARV2R35-002` | P3 | Observation; **documented only** | `_call_event_study` converts every core refusal into `None`, so the composer reports one generic "not a valid event-study input census" message and the specific `EventStudyInputError` reason (a missing open, a lineage mismatch, a geometry refusal) is lost to the caller. Fail-closed and correct, but it will make diagnosing a rejected production bundle harder; surfacing the reason text through the lane error would not widen authority. | No change; for Codex's judgement. |
+| `ARV2R35-003` | P3 | Observation; **documented only** | Importing the module evaluates `_REVIEWED_SESSION_AXIS_WRAPPER()` and `_REVIEWED_SESSION_INDEX_WRAPPER()`, so the 3,435-session XNYS axis is rebuilt through the exchange-calendar dependency at import time rather than on first use, and an unavailable calendar fails the import instead of the call. Consistent with the pinning design, noted for the adapter milestone where import cost and failure placement matter. | No change. |
+| `ARV2R35-004` | P3 | Observation; **documented only** | Nine guards are equivalent mutants behind a redundant check: the per-line canonical equality and the partition re-render (each refuses what the other would), the payload role-order check (the descriptor role comparison refuses first), the binding value equality (the descriptor census and hash comparisons cover the remaining fields), the bundle census equality (implied by per-descriptor length checks), the `_canonical_document` clause of the rebuild comparison, the bare-number and duplicate-key parser hooks (the exact-tree and canonical-line checks refuse first), the BOM and CR check (strict decoding and canonical re-serialisation refuse first), and the loader's false-property check (repeated by the validator). The composer census is unreachable because the batch validator and the lineage check refuse first. | No change. |
+
+### 52.4 Mutation matrix
+
+Eighteen single-guard trials. Caught (6): payload SHA-256 and length
+before decoding, canonical order and duplicate refusal, the depth-16 limit,
+the per-row byte limit, the validator's row re-render, and the validator's
+re-render equality. Equivalent (9) and unreachable (1): `ARV2R35-004`.
+Escaped and now isolated (2): `ARV2R35-001`; with each guard removed only
+its new case fails, and the real code passes the battery (**183 passed**).
+
+### 52.5 Validation
+
+- Bundle, B1, core, and firewall batteries at `422dc62`: **596 passed in
+  55.98 s**.
+- LANESUITE_SECTION_PLACEHOLDER
+- `git diff --check` clean; Python 3.13.15 in the pinned scratch virtualenv;
+  the complete repository suite was not run per the owner's lane-suite
+  instruction (34.6).
+
+### 52.6 Quality assessment and next gate
+
+ARV2-4F-B2 implementation candidate: **8/10**. The admission path is
+genuinely fail-closed and every identity reproduces, and the composer adds no
+authority. Two points are withheld: the in-process dependency pinning is far
+larger than the admission logic it guards and imports the full session axis
+at load time (`ARV2R35-003`), and the composer discards the core's refusal
+reason (`ARV2R35-002`), which the next milestone will feel when a real bundle
+is rejected. Codex counter-review record `422dc62`: **9/10**; its section-51
+corrections to the live state were accurate and its validation reproduces.
+
+Codex counter-reviews the Claude commits of this round. B2 authenticates no
+production truth, entitlement, rights, PIT vintage, row lineage, price,
+terminal payoff, or real outcome, and creates no filesystem or Object Store
+layout, `QCAlgorithm`, LEAN adapter, `main.py`, project, upload, compile,
+launch, result, deployment, order, or trade. Any later physical adapter or
+transport candidate and any real QuantConnect backtest remain separately
+gated.

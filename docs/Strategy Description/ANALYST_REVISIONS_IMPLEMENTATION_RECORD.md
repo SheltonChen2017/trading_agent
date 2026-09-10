@@ -86,8 +86,8 @@ A FINAL CASH, BANKRUPTCY, OR DELISTING PAYOFF IS CONTINUED IN SPY FROM ITS
 PROVEN ECONOMIC-AVAILABILITY SESSION TO EACH FIXED HORIZON, WHILE STOCK AND
 MIXED MERGERS REMAIN SUCCESSOR-VALUED. THE SECTION-48 CORRECTION SNAPSHOT IS
 COMBINED WITH THE OWNER-AUTHORIZED, OUTCOME-FREE ARV2-4F-B1 GLOBAL-INPUT
-SCHEMA CANDIDATE IN SECTION 49, AND THAT CUMULATIVE SNAPSHOT IS PENDING
-INDEPENDENT CLAUDE REVIEW. B1 FREEZES THE EXACT SEVEN PRODUCTION-SHAPED ROW,
+SCHEMA CANDIDATE IN SECTION 49, AND CLAUDE ACCEPTS THAT CUMULATIVE SNAPSHOT
+WITH NO CODE CORRECTION (SECTION 50), PENDING CODEX COUNTER-REVIEW. B1 FREEZES THE EXACT SEVEN PRODUCTION-SHAPED ROW,
 WIRE, DESCRIPTOR, AND CANONICAL SYNTHETIC-MANIFEST CONTRACTS IN MEMORY. IT
 DOES NOT READ OR VALIDATE A PARTITION PAYLOAD, AUTHENTICATE PRODUCTION TRUTH,
 RIGHTS, ROW LINEAGE, OR OUTCOMES, OR PROVIDE A QCALGORITHM, LEAN ADAPTER,
@@ -2171,6 +2171,7 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-09-09 | Codex counter-review and ARV2-4F-A correction | `6bdc235` -> `2b75c18` (code/tests) and this record commit | Counter-review Claude's two commits and correct the referred fixed-horizon estimator without starting a later milestone or any QuantConnect action | Accepted Claude's three regressions, extended mixed-merger sensitivity, corrected the section-47 record, and froze `arv2-terminal-payoff-benchmark-splice-v1`: final cash/bankruptcy/delisting payoff is continued in SPY from its proven availability session to fixed H while stock/mixed mergers remain successor-valued. Added exact policy/hash/valuation lineage, cross-role physical-session availability reconciliation, trapped extreme Decimal failure, exact-zero cancellation, static-identity preflight, and adversarial regressions. Accepted ancestors and root coordination files are unchanged. | Focused core **123 passed in 6.45 s**; core plus firewall **295 passed in 232.62 s**; complete lane selection **2,101 passed, 29 skipped, 0 failed in 1,911.87 s (31:51)**; changed scope compileall exit 0; active-document, final diff/EOL, remote-tip, and status gates follow section 48.4. No credential, provider row, licensed artifact, production input, price, return, outcome, QuantConnect resource/job/result, broker, deployment, order, or trade; **zero research looks and zero development evaluations**. | 0 P0/P1; **2 P2 and 6 P3** (`ARV2CR32-001..008`), all lane-specific findings corrected. `ARV2R31-001` and `ARV2R31-004` are corrected; the 21-trial review arithmetic is reconciled. No new out-of-lane finding. | Push this two-commit same-lane correction range once after the remote-tip check. Claude independently reviews it. No subsequent milestone is authorized: ARV2-4F-B1, production transport, LEAN adapter, QC/project actions, outcomes, deployment, orders, and trading remain gated. |
 | 2026-09-09 | Codex continued counter-review round and ARV2-4F-B1 implementation | `6bdc235` -> `2b75c18`, `5fe920a`, `2e1b09a`, and this record commit | Preserve the completed ARV2-4F-A counter-review, then implement the owner-authorized synthetic global-input schema before Claude reviews the cumulative round | Retained section 48's dispositions and fixed-horizon benchmark splice. Added an exact seven-role production-shaped row/wire schema, domain/candidate-bound descriptors, canonical content-addressed synthetic manifest, strict in-memory metadata loader, independently derived topology, separate input/outcome authority scopes, and exhaustive null/false/no-I/O boundaries. No accepted ancestor, root plan/handoff, payload, provider, production input, outcome, or QC surface changed or was used. | Focused B1 **120 passed in 3.87 s**; QC core + B1 + firewall **415 passed in 36.48 s**; complete Analyst lane **2,243 passed, 7 skipped, 0 failed in 234.91 s (3:54)**; final mutation matrix **396/396 refused**; three independent audits report no remaining P0-P3; active-document, compile, diff/EOL, staged-blob, branch, remote-tip, and status gates follow section 49.4. Python 3.13.15. Complete repository suite not run. **Zero research looks and zero development evaluations.** | Implementation audit: **8 P2 and 6 P3** (`ARV2I4FB1-001..014`), all corrected before `2e1b09a`; no remaining P0-P3 and no out-of-lane change. | Make exactly one same-lane push after the remote-tip check. Claude reviews `6bdc235..<record head>` commit by commit and cumulatively. Production admission/payload reads, provider/outcome access, LEAN adapter, QC project/upload/compile/run/result, deployment, orders, and trading remain gated. |
+| 2026-09-09 | Claude review | `e43338e` -> the record commit that follows; no code change; Codex resolves the exact pushed head | Independent review of the section-48 terminal-payoff correction `2b75c18`, its record `5fe920a`, the ARV2-4F-B1 global-input schema `2e1b09a`, and its record `e43338e` | Reviewed all four commits in `6bdc235..e43338e` with explicit dispositions (section 50); accepted with no correction. Verified rather than accepted: the benchmark-splice formula reproduces hand values (a 50% payoff at a session where SPY has risen 10% and then rises to 21% yields security -0.45, benchmark 0.21, excess -0.66), the equal-wealth pin yields exactly zero excess, successor-valued mergers keep a unit factor, and overflow is trapped as a domain error; both canonical-LF source pins, the 3,435-row session-axis partition hash and byte count, and the schema's semantic and 24,440-byte artifact identities all recompute; the package still imports only the standard library, the exchange calendar, and its siblings; no spec, firewall, plan, or handoff byte changed. An 18-trial mutation matrix over the correction and the schema caught 11 outright and found 7 equivalent mutants behind redundant checks; none escaped. | QC core, B1, and firewall batteries **415 passed in 37.42 s**; complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries on `e43338e` **2,243 passed, 7 skipped, 0 failed in 237.55 s (3:57)**, matching section 49.4; complete repository suite not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2/P3 defects; 2 P3 observations documented only. `ARV2CR32-002` acknowledged: section 47's matrix arithmetic was wrong and the exact split is 15 caught, 3 equivalent, 1 unreachable, 2 escaped. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews the Claude commits of this round; every section-46.5 and 49.5 gate remains closed and no adapter, compile, run, or result read is authorised. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -7737,3 +7738,112 @@ Object Store layout, LEAN adapter, `QCAlgorithm`, `main.py`, project, upload,
 compile, launch, result, deployment, order, or trade. The exact next action is
 independent Claude review of this single pushed cumulative snapshot. No later
 milestone or QuantConnect backtest is started in this round.
+
+## 50. Independent Claude review of the terminal-payoff correction and the ARV2-4F-B1 global-input schema, 2026-09-09
+
+**Range reviewed:** `6bdc235..e43338e`, four commits, fetched into this same
+worktree with no divergence. The last independently reviewed baseline is
+`6bdc235`; the range combines the section-48 counter-review correction and
+the owner-authorized B1 candidate as section 49.1 requested.
+**Disposition: ACCEPTED.** 0 P0, 0 P1, 0 P2, 0 P3 defects; two P3
+observations documented only; no code correction and therefore no code
+commit this round.
+**Zero research looks and zero development evaluations by this review.** No
+provider, credential, licensed row, production input, partition payload,
+price, return, outcome, broker, operator database, QuantConnect resource,
+scheduler, deployment, or order surface was used. `docs/ACTION_PLAN_2026-08-20.md`,
+`docs/SESSION_HANDOFF.md`, every accepted spec, and the outcome-free lane
+package are untouched across the range. The ledger row is appended once.
+
+**Acknowledgement.** `ARV2CR32-002` is correct: section 47.4 mis-summed its
+own matrix. This session's retained log gives 15 caught, 3 equivalent
+(successor-terminal traversal, lifecycle completeness, decision-after-
+terminal), 1 unreachable (the collect-time census), and 2 escaped, which is
+21.
+
+### 50.1 Commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `2b75c18` | **Accepted** | Freezes `arv2-terminal-payoff-benchmark-splice-v1`, the option this reviewer recommended for `ARV2R31-001`: the security leg of a cash, bankruptcy, or delisting payoff is continued in SPY from its valuation session to the scheduled horizon, so both legs span the same window; stock and mixed mergers keep a unit factor. Adds the `missing_benchmark_valuation_open` refusal, session-keyed benchmark availability reconciliation, trapped extreme arithmetic normalised to the lane error, the equal-wealth zero-excess pin, the positive-payoff total-loss refusal, and the v2 schema and algorithm identities. Verified in 50.2 and 50.4. |
+| `5fe920a` | **Accepted** | Record-only: section 48, the section-47 corrections, status wording, ledger row. Its corrections to section 47 are accurate. |
+| `2e1b09a` | **Accepted** | `global_input_schema.py` and its 65-function battery. Seven ordered row contracts with exact fields, wire types, canonical order, and semantics; content-addressed schema with separate semantic and artifact identities; domain-separated descriptor derivation recomputed by an independent path; strict in-memory loader that admits only the builder's own bytes for the exact candidate; separate production-input and real-outcome authority scopes; 27 null bindings and 17 false capabilities. Verified in 50.2 and 50.4. |
+| `e43338e` | **Accepted** | Record-only: section 49, status wording, ledger row. Its validation claims reproduce here within host differences. |
+| record commit | Claude record | This section, current-status wording, one appended ledger row. |
+
+### 50.2 Verified rather than accepted
+
+- **Splice arithmetic.** `_returns(100, 50, 100, 110, 121)` gives security
+  -0.45, benchmark 0.21, excess -0.66, matching `(P_T/S_0)(B_H/B_T) - 1`
+  and `B_H/B_0 - 1` by hand; `(2, 6, 2, 6, 1)` gives -0.5, -0.5, and exactly
+  0 through the exact cross-product pin; a stock-merger shape with
+  `valuation_benchmark == exit_benchmark` keeps the unit factor; an
+  `1E-999990`/`1E999990` ratio raises the lane error rather than an untrapped
+  `Overflow`. In `collect_synthetic_event_study`, only cash, bankruptcy, and
+  delisting requirements look up SPY at the valuation session, and a missing
+  value there is a named refusal, not a silent unit factor.
+- **Validator coverage of the correction.** Every observation now retains
+  SPY's valuation-session value and source hash; the validator recomputes the
+  five-input arithmetic, requires same-session valuation and exit facts to
+  agree, keys benchmark availability proofs by physical session across entry,
+  valuation, and exit roles, and binds the policy ID into the batch hash and
+  census.
+- **B1 pins.** The canonical-LF SHA-256 and byte counts of `run_contract.py`
+  (28,825) and `event_study.py` (109,226) equal the committed files; the
+  session-axis partition built from the 3,435-session axis has the pinned
+  SHA-256 and 161,445 bytes; the schema renders to 24,440 bytes with the
+  pinned artifact SHA-256, and its `schema_id` and `schema_sha256` recompute
+  from the null-identity form; rendering is stable across calls.
+- **B1 topology and authority.** The seven `RowContract` field inventories
+  equal the event-study dataclasses field for field; the descriptor seed is
+  domain-separated by literal domain, schema SHA-256, candidate hash, ordinal,
+  and role; `_require_descriptor_matches_inputs` re-derives every descriptor
+  field from literals rather than the builder; the loader parses bounded,
+  canonical, duplicate-free, float-free bytes and then requires byte equality
+  with the builder's output for the supplied candidate; the manifest's
+  `session_axis` and `decision_rows` roles are the only production-input
+  roles and the five valuation and lifecycle roles require the separately
+  withheld real-outcome authority; every accessor is a literal `False`.
+- **Isolation.** The new module imports only the standard library and its
+  two siblings; no file, environment, network, `QCAlgorithm`, Object Store,
+  or result surface exists; the lane firewall and closure are unchanged and
+  no byte under `research/analyst_revisions_v2` changed.
+- **Validation claims.** QC core, B1, and firewall batteries: **415 passed
+  in 37.42 s** at `e43338e`.
+
+### 50.3 Findings ledger
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R33-001` | P3 | Observation; **documented only** | Seven guards are equivalent mutants behind a redundant check: the same-session valuation/exit fact comparison (the session-keyed benchmark fact map refuses first), the stock-merger branch that skips the valuation lookup (for successor-valued mergers the valuation session is the exit session, so the lookup returns the exit value), the schema-identity reproduction guard (the literal scalar comparisons refuse a changed constant first), the two `_canonical_document` equality clauses in the candidate copy and manifest rebuild comparisons (identity and hash clauses already bind them), the final wire-contract byte equality (every section is compared separately first), and the external-binding tuple equality (the per-item `is None` check leaves any admitted inventory inert). All are redundant defenses in the safe direction. | No change. |
+| `ARV2R33-002` | P3 | Observation; **documented only** | `require_synthetic_qc_global_input_manifest` compares identities, counts, descriptors, and canonical bytes with the rebuilt manifest but not the object's own `external_bindings` and `capabilities` tuples; those are checked only by the per-item `None`/`False` and exact-inventory tests earlier in the same function, so a shortened inventory with every value still null or false would be refused by the inventory equality and never by the rebuild. No authority can be gained either way. | No change. |
+
+### 50.4 Mutation matrix
+
+Eighteen single-guard trials. Caught (11): the splice continuation factor
+(dropping `B_H / B_T` fails the reinvestment test), the
+`missing_benchmark_valuation_open` refusal, the positive-payoff total-loss
+refusal, the trap normalisation, the equal-wealth pin, the policy ID in the
+validator, the static preflight before caller comparison, the independent
+descriptor re-derivation, the loader's exact-bytes equality, the accepted-core
+code pin, and the session-axis partition pin. Equivalent (7): `ARV2R33-001`.
+Escaped: none.
+
+### 50.5 Validation
+
+- QC core, B1, and firewall batteries at `e43338e`: **415 passed in 37.42 s**.
+- Complete `tests/analyst_revisions_v2` plus the four root-level Analyst
+  batteries on `e43338e`: **2,243 passed, 7 skipped, 0 failed in 237.55 s
+  (3:57)**, exit 0, matching section 49.4.
+- `git diff --check` clean; Python 3.13.15 in the pinned scratch virtualenv;
+  the complete repository suite was not run per the owner's lane-suite
+  instruction (34.6).
+
+### 50.6 Next gate
+
+Codex counter-reviews the Claude commits of this round. B1 authenticates no
+production manifest, partition, row, provider, price, terminal payoff, or
+outcome, and nothing here creates a physical Object Store layout, LEAN
+adapter, `QCAlgorithm`, project, upload, compile, launch, result, deployment,
+order, or trade. The section-46.5 gates and the newly explicit production-
+input versus real-outcome authority split remain closed.

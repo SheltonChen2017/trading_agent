@@ -85,7 +85,12 @@ CORRECTIONS. THE CORRECTED V2 CORE FREEZES A BENCHMARK-SPLICE CONVENTION:
 A FINAL CASH, BANKRUPTCY, OR DELISTING PAYOFF IS CONTINUED IN SPY FROM ITS
 PROVEN ECONOMIC-AVAILABILITY SESSION TO EACH FIXED HORIZON, WHILE STOCK AND
 MIXED MERGERS REMAIN SUCCESSOR-VALUED. THE SECTION-48 CORRECTION SNAPSHOT IS
-PENDING INDEPENDENT CLAUDE REVIEW. IT IS NOT A QCALGORITHM, LEAN ADAPTER,
+COMBINED WITH THE OWNER-AUTHORIZED, OUTCOME-FREE ARV2-4F-B1 GLOBAL-INPUT
+SCHEMA CANDIDATE IN SECTION 49, AND THAT CUMULATIVE SNAPSHOT IS PENDING
+INDEPENDENT CLAUDE REVIEW. B1 FREEZES THE EXACT SEVEN PRODUCTION-SHAPED ROW,
+WIRE, DESCRIPTOR, AND CANONICAL SYNTHETIC-MANIFEST CONTRACTS IN MEMORY. IT
+DOES NOT READ OR VALIDATE A PARTITION PAYLOAD, AUTHENTICATE PRODUCTION TRUTH,
+RIGHTS, ROW LINEAGE, OR OUTCOMES, OR PROVIDE A QCALGORITHM, LEAN ADAPTER,
 CLOUD PROJECT, COMPILE, JOB, RESULT, OR BACKTEST AUTHORIZATION. THE
 SECTION-32 COUNTER-REVIEW CLOSES RESTRICTED-
 EXPORT AND AUTHORITY-STATE CAPABILITY ESCAPES; SAME-THREAD, CROSS-PROCESS,
@@ -177,8 +182,8 @@ completion.
 | Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. ARV2-2 now derives a revalidatable, fail-closed inventory of in-range merger/delisting terminal-return requirements and never silently omits an unavailable terminal name. No event has been joined to a later price or return; Databento remains unmeasured. | Production split/dividend, cost/ADV, and terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. | Outcome prerequisites implemented structurally; no outcome I/O and zero looks. |
 | ETF holdings/topology | PIT holdings, declared-versus-summed weight reconciliation, stale/incomplete refusal, fixed lag, 99% coverage, eligibility, and stock-score lineage primitives exist. | No authenticated production holdings or stock-score artifact exists, so no production reverse index, ETF score, or peer topology exists. | Consumer safety implemented; production topology remains zero-access. |
 | Cross-section and portfolio | Deterministic rank/hysteresis/tie/eviction/cap/overlap/cash allocator primitives and verified policy bindings exist. | No reviewed simultaneous rank/volatility derivation or authenticated rank/classification/cost source exists. The public boundary therefore refuses every nonempty portfolio and can return only the safe empty/all-cash result. | Dormant safety algorithm implemented; no research portfolio or QC result. |
-| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. ARV2-4E-A adds an inert, content-addressed 2021-2025 complete-fold sensitivity plus a separately hashed partial-2026 exploratory geometry; it preserves the formal primary, the superseded prospective period, and the shared holdout. Sections 46-48 establish and review only an in-memory, synthetic LEAN-facing run candidate and deterministic fixed-horizon event-study batch contract. Final cash, bankruptcy, and delisting payoffs use the frozen benchmark-splice convention; stock and mixed mergers remain successor-valued. The contract neither opens inputs nor creates an executable QC job. | Later executable-spec integration remains required. No accepted production manifest/input package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged. Section 47 independently reviews ARV2-4F-A, and section 48 counter-reviews and corrects that exact range. The section-48 correction snapshot is pending independent review. All production-input/outcome/QC-job/result/deployment/order/trading authorizations refuse. |
-| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the receipt, stock-v3, and post-pandemic supplement modules remain in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The new synthetic QC-contract/core sibling is independently source-audited, and the outcome-free V2 package is forbidden from reverse-importing it. The atomic writer is callable only through one importer-scoped receipt call. The successor retains no receipt export: one exact synchronous helper imports only the persisted-requirement and artifact-hash functions locally, discards the requirement result, returns only the hash, catches every exception without exporting the caught traceback, a restricted binding/object, or an arbitrary interrupt argument, propagates only fresh exact built-in operator interrupts, and is sealed as a no-module-object facade. Process-local authority state and child-reset hooks are not general exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. Section 42 retains and verifies the complete exact mapping-proxy/tuple topology of all fourteen loader-created authorities before semantic traversal, checks exact scalar and receipt-disposition types, and covers both loaded and persisted receipt entry points. Section 44 adds focused regression coverage for exact mapping-key identity and the independently load-bearing receipt disposition preflight without changing production code. Section 48 additionally authenticates exported QC-core scalar identities before caller comparisons and reconciles benchmark availability by physical session across entry, valuation, and exit roles. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. No `QCAlgorithm`, LEAN adapter, `main.py`, project configuration, uploader, compiler, runner, result reader, or order surface exists in the new package. The static firewall is a reviewed-closure control, not an OS sandbox; the broader pre-existing computed-reflection limitation is documented in section 32 rather than misrepresented as runtime isolation. | Section 47 accepts ARV2-4F-A after two test corrections; section 48 accepts that Claude range after lane-specific estimator, validation, arithmetic, test, and record corrections. The correction snapshot awaits independent Claude review; accepted ancestors and section-34 production behavior remain unchanged. |
+| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. ARV2-4E-A adds an inert, content-addressed 2021-2025 complete-fold sensitivity plus a separately hashed partial-2026 exploratory geometry; it preserves the formal primary, the superseded prospective period, and the shared holdout. Sections 46-48 establish and review only an in-memory, synthetic LEAN-facing run candidate and deterministic fixed-horizon event-study batch contract. Final cash, bankruptcy, and delisting payoffs use the frozen benchmark-splice convention; stock and mixed mergers remain successor-valued. Section 49 adds the exact seven-role ARV2-4F-B1 global-input schema and canonical synthetic metadata boundary; it neither reads partition payloads nor creates an executable QC job. | Later executable-spec integration remains required. No accepted production global-input manifest/package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, authenticated payload/row lineage, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged. Section 47 independently reviews ARV2-4F-A, section 48 counter-reviews and corrects that exact range, and section 49 implements owner-authorized ARV2-4F-B1. The cumulative section-48/49 snapshot is pending independent review. All production-input/outcome/QC-job/result/deployment/order/trading authorizations refuse. |
+| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the receipt, stock-v3, and post-pandemic supplement modules remain in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The synthetic QC-contract/core sibling is independently source-audited, and the outcome-free V2 package is forbidden from reverse-importing it. The atomic writer is callable only through one importer-scoped receipt call. The successor retains no receipt export: one exact synchronous helper imports only the persisted-requirement and artifact-hash functions locally, discards the requirement result, returns only the hash, catches every exception without exporting the caught traceback, a restricted binding/object, or an arbitrary interrupt argument, propagates only fresh exact built-in operator interrupts, and is sealed as a no-module-object facade. Process-local authority state and child-reset hooks are not general exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. Section 42 retains and verifies the complete exact mapping-proxy/tuple topology of all fourteen loader-created authorities before semantic traversal, checks exact scalar and receipt-disposition types, and covers both loaded and persisted receipt entry points. Section 44 adds focused regression coverage for exact mapping-key identity and the independently load-bearing receipt disposition preflight without changing production code. Section 48 authenticates exported QC-core scalar identities before caller comparisons and reconciles benchmark availability by physical session across entry, valuation, and exit roles. Section 49 adds a content-addressed schema/manifest module whose descriptor derivation is independently checked against the authenticated synthetic candidate and whose loader operates on canonical metadata bytes only. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. No partition payload parser, production admission path, `QCAlgorithm`, LEAN adapter, `main.py`, project configuration, uploader, compiler, runner, result reader, or order surface exists in the new package. The static firewall is a reviewed-closure control, not an OS sandbox; the broader pre-existing computed-reflection limitation is documented in section 32 rather than misrepresented as runtime isolation. | Section 47 accepts ARV2-4F-A after two test corrections; section 48 accepts that Claude range after lane-specific estimator, validation, arithmetic, test, and record corrections; section 49 implements B1. The cumulative correction/implementation snapshot awaits independent Claude review; accepted ancestors and section-34 production behavior remain unchanged. |
 
 The production source, firm-ontology, security-master, classification, cost,
 and rank catalogs remain empty. The canonical source authority permits no
@@ -211,6 +216,7 @@ evaluations**.
 | ARV2-4D-B | Under separate exact calibration-input authority, compute and bind the numeric power receipt and required date/component floors in a new stock successor without changing reviewed ancestors. | Reviewed input-manifest schema/rights/lineage, authenticated nuisance-only calibration, closed numeric receipt, no research result, no outcome-informed rescue, and independent review/counter-review before any ARV2-4 run. |
 | ARV2-4E-A | Freeze the owner-directed 2021-2026 post-pandemic sensitivity as an additive outcome-free evaluation-window supplement without rewriting the formal primary design. | Exact authenticated 2021-2025 parent folds, descriptive-only stitched OOS reporting with mandatory per-fold results, a separately hashed rolling partial-2026 geometry and fixed maturity cutoff, inherited contamination/PIT rules, superseded prospective-period tombstone, untouched shared holdout, null external bindings, literal-false capabilities, and independent review/counter-review before any execution. |
 | ARV2-4F-A | Freeze a synthetic-only LEAN-facing run-bundle contract and deterministic stock event-study core without opening production inputs or creating a QuantConnect job. | Exact accepted-parent, window, horizon, XNYS-axis, canonical-code, and seven-partition bindings; permanent security/listing/series identity; complete active-or-terminal lifecycle coverage and explicit total-shareholder-payoff handling; exhaustive observations/refusals and revalidatable output identity; every external binding null and every action capability literal false; independent review/counter-review before any adapter, compile, or run. |
+| ARV2-4F-B1 | Freeze the production-shaped global-input row/wire schema and a canonical synthetic manifest/descriptor boundary without opening partition payloads or adding physical transport. | Exact seven-role schemas, ordering and nested lifecycle semantics; content-addressed schema and descriptor identities bound to the reviewed v2 core/candidate and full XNYS axis; strict in-memory synthetic metadata loader; separate input/outcome authority scopes; every external binding null and every action capability literal false; independent review/counter-review before any payload admission, adapter, compile, or run. |
 | ARV2-4 | Materialize the full V2 historical-evaluation schema, implement the frozen stock control adjustment, bind the exact QC run and power plans, and run the one-shot historical stock event study in QC Cloud. | Immutable development-evaluation receipt logged with no confirmatory alpha; a screen failure or valid null closes the canonical family, while a pass unlocks ARV2-5 only. |
 | ARV2-5 | Only after an ARV2-4 pass, build the PIT ETF reverse index, eligibility, mapping, and ETF aggregation. | >=99% mapped candidate weight; stale/dynamic/transitive bypasses fail. |
 | ARV2-6 | Freeze the ETF-specific residualization, estimand, power, and cost contracts, then run the one-shot walk-forward ETF historical backtest in QC Cloud. | Immutable development-evaluation receipt logged with no confirmatory alpha; OOS/robustness/capacity/turnover/overlap screen; failure closes the family. |
@@ -529,11 +535,15 @@ Section 47 independently reviews ARV2-4F-A and adds three regression cases.
 Section 48 counter-reviews both Claude commits, corrects the referred
 fixed-horizon estimator definition, and closes the additional arithmetic,
 cross-role benchmark-availability, static-identity, and test-sensitivity
-defects found in the cumulative synthetic tree. The exact next step is
-independent Claude review of the section-48 correction snapshot. ARV2-4F-B1,
-a production transport schema, a LEAN adapter, and every QuantConnect or
-outcome-bearing action still require separate explicit authority; none is
-inferred from the owner's ARV2-4F-A instruction or QC subscription.
+defects found in the cumulative synthetic tree. The owner then clarified that
+this Codex round must also implement the next milestone before Claude reviews
+it and explicitly authorized ARV2-4F-B1. Section 49 implements that bounded
+global-input schema and synthetic-manifest boundary. The exact next step is
+independent Claude review of the cumulative section-48 correction and
+section-49 B1 snapshot. Physical production transport, partition-payload
+admission, a LEAN adapter, and every QuantConnect or outcome-bearing action
+remain separately gated; none is inferred from this schema milestone or the
+QC subscription.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -2160,6 +2170,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-09 | Claude review | `bf538d7` -> `df7b4ab` (tests) and the record commit that follows; Codex resolves the exact pushed head | Independent review of the ARV2-4F-A synthetic run contract and event-study core `c8e74f8` and its record `bf538d7` | Reviewed both commits in `5246a41..bf538d7` with explicit dispositions (section 47); accepted after two P3 coverage corrections, with one P2 estimator-definition finding documented and referred rather than changed unilaterally. Verified rather than accepted: all six parent artifact pins equal the checked-in spec bytes; the 3,435-session XNYS axis and its SHA-256 recompute from `data.exchange_calendar`; every hard-coded formal-fold horizon bound equals the fold manifest and every partial-2026 bound equals the plan; the package imports only the standard library, the exchange calendar, and its sibling; the lane firewall refuses the reverse import; no spec, plan, or handoff byte changed; every action accessor is a literal false. A 21-trial mutation matrix caught 15 (the reverse-import prefix through the QC battery), 4 are equivalent because the output validator repeats the collect-time check, 1 is unreachable by construction, and 2 escaped and are now isolated. | QC core plus firewall **265 passed in 33.45 s** at `bf538d7`; complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries **2,093 passed, 7 skipped in 243.74 s** at `bf538d7` and **2,096 passed, 7 skipped, 0 failed in 243.94 s (4:03)** at `df7b4ab`; complete repository suite not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1; 1 P2 estimator-definition finding (`ARV2R31-001`) documented and referred; 2 P3 coverage gaps corrected with red/green regressions; 2 P3 observations documented only. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews the two Claude commits; the owner and Codex decide the frozen terminal-payoff convention before any production estimator, adapter, compile, or run; every section-46.5 gate remains closed. |
 
 | 2026-09-09 | Codex counter-review and ARV2-4F-A correction | `6bdc235` -> `2b75c18` (code/tests) and this record commit | Counter-review Claude's two commits and correct the referred fixed-horizon estimator without starting a later milestone or any QuantConnect action | Accepted Claude's three regressions, extended mixed-merger sensitivity, corrected the section-47 record, and froze `arv2-terminal-payoff-benchmark-splice-v1`: final cash/bankruptcy/delisting payoff is continued in SPY from its proven availability session to fixed H while stock/mixed mergers remain successor-valued. Added exact policy/hash/valuation lineage, cross-role physical-session availability reconciliation, trapped extreme Decimal failure, exact-zero cancellation, static-identity preflight, and adversarial regressions. Accepted ancestors and root coordination files are unchanged. | Focused core **123 passed in 6.45 s**; core plus firewall **295 passed in 232.62 s**; complete lane selection **2,101 passed, 29 skipped, 0 failed in 1,911.87 s (31:51)**; changed scope compileall exit 0; active-document, final diff/EOL, remote-tip, and status gates follow section 48.4. No credential, provider row, licensed artifact, production input, price, return, outcome, QuantConnect resource/job/result, broker, deployment, order, or trade; **zero research looks and zero development evaluations**. | 0 P0/P1; **2 P2 and 6 P3** (`ARV2CR32-001..008`), all lane-specific findings corrected. `ARV2R31-001` and `ARV2R31-004` are corrected; the 21-trial review arithmetic is reconciled. No new out-of-lane finding. | Push this two-commit same-lane correction range once after the remote-tip check. Claude independently reviews it. No subsequent milestone is authorized: ARV2-4F-B1, production transport, LEAN adapter, QC/project actions, outcomes, deployment, orders, and trading remain gated. |
+| 2026-09-09 | Codex continued counter-review round and ARV2-4F-B1 implementation | `6bdc235` -> `2b75c18`, `5fe920a`, `2e1b09a`, and this record commit | Preserve the completed ARV2-4F-A counter-review, then implement the owner-authorized synthetic global-input schema before Claude reviews the cumulative round | Retained section 48's dispositions and fixed-horizon benchmark splice. Added an exact seven-role production-shaped row/wire schema, domain/candidate-bound descriptors, canonical content-addressed synthetic manifest, strict in-memory metadata loader, independently derived topology, separate input/outcome authority scopes, and exhaustive null/false/no-I/O boundaries. No accepted ancestor, root plan/handoff, payload, provider, production input, outcome, or QC surface changed or was used. | Focused B1 **120 passed in 3.87 s**; QC core + B1 + firewall **415 passed in 36.48 s**; complete Analyst lane **2,243 passed, 7 skipped, 0 failed in 234.91 s (3:54)**; final mutation matrix **396/396 refused**; three independent audits report no remaining P0-P3; active-document, compile, diff/EOL, staged-blob, branch, remote-tip, and status gates follow section 49.4. Python 3.13.15. Complete repository suite not run. **Zero research looks and zero development evaluations.** | Implementation audit: **8 P2 and 6 P3** (`ARV2I4FB1-001..014`), all corrected before `2e1b09a`; no remaining P0-P3 and no out-of-lane change. | Make exactly one same-lane push after the remote-tip check. Claude reviews `6bdc235..<record head>` commit by commit and cumulatively. Production admission/payload reads, provider/outcome access, LEAN adapter, QC project/upload/compile/run/result, deployment, orders, and trading remain gated. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -7576,3 +7587,153 @@ upload, compile, launch, result read/disposition, paper or funded deployment,
 order, and trade remain false until the owner separately authorizes the exact
 bounded step and all applicable production truth, rights, lineage, terminal-
 payoff, receipt, run-binding, and atomic evaluation gates are satisfied.
+
+## 49. Codex continued counter-review round and ARV2-4F-B1 global-input schema candidate, 2026-09-09
+
+The owner clarified the serialized lane process after section 48: Codex was
+to combine that completed counter-review with the next bounded milestone
+before Claude's next review. The owner then explicitly directed Codex to begin
+ARV2-4F-B1. This section therefore preserves the section-48 disposition and
+adds only the synthetic, production-shaped global-input schema/manifest
+boundary. **Disposition: implementation candidate ready for independent
+Claude review.** No P0 or P1 was found; every P2/P3 found during iterative
+implementation audit was corrected before `2e1b09a`.
+
+This round used no credential, provider, licensed row, production input,
+partition payload, price, return, outcome, QuantConnect resource, broker,
+operator database, deployment, order, or trading surface. **Zero research
+looks and zero development evaluations.** The accepted specifications, root
+Action Plan, root Session Handoff, and project-wide coordination documents
+remain untouched.
+
+### 49.1 Commit disposition and cumulative Claude review range
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `df7b4ab` | **Accepted after correction in section 48** | Claude's three ARV2-4F-A regressions are retained and independently sensitive. |
+| `6bdc235` | **Accepted after record correction in section 48** | Claude's substantive ARV2-4F-A review is retained; section 48 reconciles its estimator, arithmetic, and record findings. This is the last independently reviewed baseline. |
+| `2b75c18` | **Codex counter-review correction; pending Claude** | Freezes the fixed-horizon benchmark-splice estimator and closes the section-48 validation/arithmetic defects. |
+| `5fe920a` | **Codex counter-review record; pending Claude** | Records the exact section-48 correction scope and review target. |
+| `2e1b09a` | **ARV2-4F-B1 implementation candidate; pending Claude** | Adds only `global_input_schema.py` and its focused battery; no existing production module, accepted artifact, or firewall byte changes. |
+| This record commit | **Lane review record; pending Claude** | Reconciles the live status, milestone ladder, section-2/4 handoff, findings, validation, and one append-only ledger row. |
+
+Claude reviews `6bdc235..<this record commit>` commit by commit and
+cumulatively. The range deliberately combines the already pushed section-48
+counter-review correction and this owner-authorized B1 candidate; it does not
+repeat Claude's accepted baseline.
+
+### 49.2 Implemented ARV2-4F-B1 scope
+
+- `research/analyst_revisions_v2_qc/global_input_schema.py` freezes exactly
+  seven ordered roles: the XNYS session axis, decision rows, security opens,
+  benchmark opens, lifecycle coverages, terminal requirements, and terminal
+  shareholder payoffs. Each role has an exact partition schema, row schema,
+  dataclass identity, root envelope, field inventory, wire types, canonical
+  ordering, PIT/identity semantics, and value semantics. The nested terminal
+  lifecycle and the five event kinds are also exact.
+- The schema authenticates the reviewed 3,435-session 2013-01-02 through
+  2026-08-28 axis, the v2 run candidate/core, the fixed H1/H5/H20/H60 windows,
+  the 2021-2025 sensitivity and partial-2026 exploratory geometry, and
+  `arv2-terminal-payoff-benchmark-splice-v1`. It preserves the formal 2020
+  primary design without evaluating either period.
+- The final content identity is schema ID
+  `arv2-qc-global-input-schema-d56e2b5ec26d4068`, semantic SHA-256
+  `d56e2b5ec26d4068876bff3b549c1f9c7a83014c1372403d7bf33e511bd8e640`,
+  and exact 24,440-byte rendered-artifact SHA-256
+  `0f60cb3badec36fa9589b220cf91aee43a965865244c7c2726d16da71f6ae3d2`.
+  The semantic and exact-byte identities are deliberately separate to avoid a
+  recursive self-hash claim.
+- `GlobalInputPartitionDescriptor` binds each candidate partition to its
+  one-based role, row/partition schemas, byte/row census, payload declaration,
+  global schema hash, and run-candidate hash under the explicit
+  `arv2-qc-global-input-partition-binding-v1` domain. Its immutable ID is
+  derived from that digest. A second implementation independently recomputes
+  the complete relation rather than trusting the descriptor builder.
+- `SyntheticQcGlobalInputManifest` and its builder, validator, renderer, and
+  strict byte loader accept only canonical synthetic metadata in memory. The
+  loader limits size/nesting, refuses BOM/CR/non-UTF-8/noncanonical JSON,
+  duplicates, floats, non-finite values, unknown shapes, unsafe IDs, mutation,
+  and synthetic-to-production promotion. The builder proves that its own
+  output round-trips through the same contract.
+- Input authority is explicitly distinct from real-outcome authority:
+  `session_axis` and `decision_rows` are future production-input roles; the
+  two open-value and three lifecycle/terminal roles require separately
+  withheld outcome authority. Caller-declared row/source hashes and partition
+  metadata are explicitly not payload presence, PIT provenance, truth,
+  rights, or lineage authentication in B1.
+- Every physical transport, production-admission, provider, filesystem,
+  environment, Object Store, QC project, upload, compile, launch, result,
+  deployment, order, and trading binding is null and every corresponding
+  capability accessor is a literal `False`. The module has no payload parser,
+  file/environment/network import, `QCAlgorithm`, Object Store client, core
+  execution, or result surface.
+
+The committed LF file identities are:
+
+| File | Git blob | SHA-256 |
+|---|---|---|
+| `research/analyst_revisions_v2_qc/global_input_schema.py` | `510801d7f69b4ee0a81cfcc65eb54da2604c77c6` | `f0da3f016cdd794514146a7811d3606b3c8be9d94ffca80e1c28790af519016a` |
+| `tests/analyst_revisions_v2/test_qc_global_input_schema.py` | `28882c93d79b467e9261fe2e3d781c332fc5a48b` | `140355c0fab751cf38f0dd1a0e64a6225af1ebbadd68136cbe4183144b45ea4a` |
+
+### 49.3 Implementation findings and corrections
+
+| ID | Severity | Finding | Correction and evidence |
+|---|---|---|---|
+| `ARV2I4FB1-001` | P2 | The first descriptor digest did not explicitly domain-separate the role metadata from the global schema and run candidate. | The hash seed now includes a literal domain, schema SHA, candidate hash, role, schemas, census, payload declaration, and null identity fields; the manual recomputation and role-collision cases pass. |
+| `ARV2I4FB1-002` | P2 | The first schema draft did not fully freeze root envelopes, exact wire types, nested inventories, descriptor topology, or canonical ordering semantics. | The content-addressed schema now declares all of them, including chronological dates, ordinal Unicode string comparison, non-null ordering fields, and duplicate-order-key refusal. |
+| `ARV2I4FB1-003` | P2 | A single schema hash was initially ambiguous between semantic identity and exact rendered bytes. | Separate semantic and artifact hashes are computed and independently reproduced; the manifest binds both. |
+| `ARV2I4FB1-004` | P2 | A generic future input authority could be misconstrued as permission to read real price/terminal outcomes. | Exact role scopes and separate owner production-input and real-outcome authority bindings/capabilities now make that implication false. |
+| `ARV2I4FB1-005` | P2 | Early immutable-registry checks could traverse a hostile changed container or scalar before proving exact topology. | Static roots, child/key identities, exact scalars, enums, and builder/helper identities are authenticated before semantic traversal; adversarial mapping-proxy/scalar cases execute no hostile callback. |
+| `ARV2I4FB1-006` | P2 | Early exact-manifest checks could use the same builder as their oracle, allowing coherent root/nested authority, transport, authentication, or serialization drift. | Root and nested fixed/derived contracts plus external/capability inventories are independently reconstructed and checked against the canonical bytes. |
+| `ARV2I4FB1-007` | P2 | Descriptor generation and serialization were initially self-consistent but not independently proven against the candidate/row/schema/hash recipe. A coherent renderer could also promote outcome/rights/transport fields. | A separate literal derivation validates all 16 fields; exact manifest validation projects them without calling either renderer. Coherent source-level builder, seed, and renderer mutations now refuse. |
+| `ARV2I4FB1-008` | P2 | The candidate reconstruction helper could substitute another valid synthetic candidate and silently rebind the manifest. | The reconstructed candidate must exactly equal the authenticated caller in ID/hash, code, partitions, null/false inventories, and canonical bytes; a valid-alternate substitution now refuses. |
+| `ARV2I4FB1-009` | P3 | `control_adjusted_score` and `naive_control_adjusted_score` did not initially state that the two held-out fits share censuses/controls but are fitted separately before bullish/bearish transforms. | Their exact signed-score semantics now state that boundary; the core alone applies direction transforms. |
+| `ARV2I4FB1-010` | P3 | Row/source hashes could be misread as B1-authenticated upstream provenance or payload presence. | The schema labels them caller-declared future metadata, identifies the one exact partition-byte hash recipe, and states that source/PIT/row lineage authentication and production admission are deferred. |
+| `ARV2I4FB1-011` | P3 | Terminal evidence initially under-described economic availability, allowed event vocabulary, total-shareholder-payoff basis, and the prohibition on treating QC delisting price as equivalent. | Exact nested lifecycle/event/source/value semantics and named refusal behavior now bind the reviewed benchmark-splice policy. |
+| `ARV2I4FB1-012` | P3 | Safe-ID length, constructor postconditions, and reconstruction-error normalization were incomplete at early audit. | IDs are exact relative values capped at 512 characters, builder output must be loader-valid, and reconstruction errors fail closed under the B1 error type. |
+| `ARV2I4FB1-013` | P3 | Several authority/capability aliases and helper entry points lacked explicit test sensitivity during development. | The final battery exhaustively covers the null/false inventories, literal-false ASTs, helper replacement, strict loader, and no-I/O/QC surface. |
+| `ARV2I4FB1-014` | P3 | The schema initially lacked an exact root fixed-value contract for its manifest status, authority, algorithm, evaluation, horizons, and terminal policy. | Those values and the derived identity/census/gate fields are schema-bound and independently validated; all direct and coherent source-drift trials refuse. |
+
+No out-of-lane defect was found. The standing shared/root-plan observation is
+unchanged and no project-wide behavior was modified.
+
+### 49.4 Validation and independent audit evidence
+
+- Final focused B1 battery: **120 passed in 3.87 s** on Python 3.13.15.
+- Final QC core + B1 + lane import firewall selection: **415 passed, 0
+  failed in 36.48 s**.
+- Complete `tests/analyst_revisions_v2` plus the four root-level Analyst V2
+  batteries: **2,243 passed, 7 skipped, 0 failed in 234.91 s (3:54)**.
+  The complete repository suite was not run under the owner's lane-only rule.
+- One earlier lane run was deliberately cancelled at **592 passed, 4
+  skipped in 67.82 s** when final audit exposed the root fixed-value gap; it
+  was not recorded as a failure, and the corrected full run above supersedes
+  it.
+- Three independent read-only audits report **0 remaining P0-P3**. The final
+  mutation matrix refused **396/396** independent variants with zero accepted
+  mutation or raw exception: schema/row/root/nested/manifest/descriptor,
+  null/false authority, rendered-document, helper, mapping-proxy, coherent
+  source, descriptor builder/renderer/seed, and alternate-candidate cases.
+- Schema semantic/artifact hashes, the 3,435-row axis, source pins, manifest
+  semantic/artifact hashes, and strict loader round trip reproduced. Changed-
+  scope `compileall`, CR/trailing-whitespace, line-length, and diff checks are
+  clean. Active-document, final staged-blob, branch, remote-tip, and status
+  gates are recorded immediately before the record commit and push.
+
+### 49.5 Claude review notes and exact stop
+
+Claude reviews the cumulative range from accepted baseline `6bdc235` through
+this record commit. In addition to the section-48 items, reproduce the schema
+semantic/exact-byte identities, seven-role/row/wire topology, full XNYS/source
+pins, descriptor/candidate derivation, strict byte round trip, input-versus-
+outcome authority split, and all null/false/no-I/O boundaries. The final
+source-level audit targets are root/nested contract drift, coherent descriptor
+builder/seed/renderer drift, mapping-proxy hostile callbacks, and a valid
+alternate candidate returned by the copy helper.
+
+Nothing in B1 authenticates or opens a production manifest, partition, row,
+provider, price, terminal payoff, or outcome. Nothing creates a physical
+Object Store layout, LEAN adapter, `QCAlgorithm`, `main.py`, project, upload,
+compile, launch, result, deployment, order, or trade. The exact next action is
+independent Claude review of this single pushed cumulative snapshot. No later
+milestone or QuantConnect backtest is started in this round.

@@ -2198,6 +2198,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-10 | Codex counter-review and ARV2-4F-B2 implementation | `e43338e..ad03ba0` (one Claude record commit) -> `81c938d` (implementation) and this record commit | Accept Claude's B1 review after correcting its live handoff, then implement exact synthetic payload admission and pure-core composition without starting QuantConnect | Accepted `ad03ba0` after correcting the stale banner/section-2/4 state and recording the missing quality assessment. Added exact seven-role in-memory bytes/row admission, bounded strict tagged-JSONL decoding, canonical rerender, independent B1/candidate/descriptor/hash reconciliation, complete retained-bundle reauthentication, pure reviewed-core composition, full output shell/census validation, literal-false authorities, and fail-closed dependency topology. No accepted ancestor, spec, firewall, root coordination file, provider, production input, outcome, physical transport, or QC surface changed or was used. | Focused B2 **181 passed in 15.88 s**; core + B1 + B2 + firewall **596 passed in 53.12 s**; complete Analyst lane **2,424 passed, 7 skipped, 0 failed in 254.66 s (4:14)**; final independent high-risk selection **33 passed**; active-document **69 passed**; changed-scope compilation and diff/EOL checks clean. Complete repository suite not run. **Zero research looks and zero development evaluations.** | Counter-review: **1 P2 and 1 P3** (`ARV2CR34-001..002`), corrected. Implementation: **12 P2 and 3 P3** (`ARV2I4FB2-001..015`), corrected or explicitly bounded. Draft-record audit: **1 P2 and 4 P3** (`ARV2REC34-001..005`), corrected. Two exact-hash code audits and the final record audit report 0 remaining P0-P3. Claude review quality **8/10**; B2 implementation quality **9/10**. | Make exactly one same-lane push after the remote-tip check. Claude reviews `ad03ba0`, `81c938d`, and this record commit. Production truth/rights/PIT lineage, physical transport/adapter, QC project/upload/compile/run/result, deployment, orders, and trading remain gated. |
 | 2026-09-10 | Claude review | `422dc62` -> `460c1da` (tests) and the record commit that follows; Codex resolves the exact pushed head | Independent review of the ARV2-4F-B2 synthetic payload-admission and core-composition candidate `81c938d` and its record `422dc62` | Reviewed both commits in `ad03ba0..422dc62` with explicit dispositions (section 52); accepted after one P3 coverage correction. Verified rather than accepted: the 9,369-byte bundle schema, its semantic identity, the 94,959-byte B1 source pin, and both committed file hashes recompute; payload bytes are matched to the manifest descriptor by length and SHA-256 before any decoding; decoded rows are re-rendered to exact canonical JSONL and re-bound through the reviewed partition builder to the candidate's declared hash; the composer calls only the reviewed core and re-validates the batch, census, and policy; the module imports only the standard library and its two siblings; no spec, firewall, outcome-free package, plan, or handoff byte changed. An 18-trial mutation matrix caught 6 outright; 9 are equivalent mutants behind a redundant check, 1 is unreachable, and 2 seam guards escaped and are now isolated by `460c1da`. | Bundle, B1, core, and firewall batteries **596 passed in 55.98 s** at `422dc62`; bundle battery **183 passed** at `460c1da`; complete `tests/analyst_revisions_v2` plus the four root-level Analyst batteries **2,424 passed, 7 skipped in 264.82 s** at `422dc62` and **2,426 passed, 7 skipped, 0 failed in 272.16 s (4:32)** at `460c1da`; complete repository suite not run per the owner's lane-suite instruction (34.6); active-document gate green after this record; `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2; 1 P3 coverage correction (`ARV2R35-001`) with red/green regressions; 3 P3 observations documented only; `ARV2CR34-001` acknowledged. Zero research looks, zero development evaluations, no provider/credential/input/outcome/QC/broker/deployment/order access by this review. | Codex counter-reviews the Claude commits of this round; B2 grants no physical transport, adapter, project, compile, run, result, deployment, order, or trading authority and every section-46.5 gate remains closed. |
 | 2026-09-10 | Codex counter-review, B2 correction, and ARV2-4F-B3 implementation | `422dc62..dc6cab6` (three Claude commits) -> `867f2d1` and this record commit | Accept Claude's B2 correction after record reconciliation, correct B2 diagnostics/calendar initialization, and implement an exact synthetic logical Object Store layout without physical I/O | Counter-reviewed `460c1da`, `36f9b2b`, and `dc6cab6` individually and cumulatively. Accepted `460c1da`; accepted both record commits after correcting stale live state, append-only-process disclosure, and snapshot-specific file identity. Preserved `ARV2R35-001`, surfaced exact core-input refusal reasons, separated invalid core output from input refusal, and deferred calendar construction to first use while accepting equivalent concurrent cold starts. Implemented B3 as an exact nine-object in-memory fixture and resolver: one index, the authenticated B1 manifest, and seven B2 partitions under content-addressed schema/candidate/bundle logical keys. Every external, production, outcome, QuantConnect, deployment, order, and trading authority remains false; no physical Object Store or QC I/O exists. | Corrected B2 **191 passed in 67.11 s**; B3 **165 passed in 50.95 s**; complete Analyst lane **2,577 passed, 29 skipped, 0 failed in 2,410.16 s (40:10)**; active-document **69 passed** after this record; changed-scope compileall, exact identities, diff/EOL, staged-blob, branch, remote-tip, and status gates follow section 53. Python 3.13.14. Complete repository suite not run under section 34.6. No credential, provider row, licensed artifact, production input, price, return, outcome, QuantConnect resource/job/result, broker, deployment, order, or trade was accessed; **zero research looks and zero development evaluations**. | Counter-review: **1 P2 and 6 P3** (`ARV2CR36-001..007`), corrected or documented in section 53. `ARV2R35-001` accepted; `ARV2R35-002/003` corrected; `ARV2R35-004` retained. B3 self-review: **4 P2 and 4 P3** (`ARV2I4FB3-001..008`), corrected or explicitly bounded. Final record audit: **4 P3** (`ARV2REC36-001..004`), corrected. Inherited out-of-lane `ARV2CR28-008` remains documented and unfixed. Claude review quality **7/10**; B3 quality **9/10**. | Push this exact same-lane range once after the remote-tip check. Claude independently reviews `867f2d1` and this record commit; Codex counter-reviews before any physical Object Store/LEAN adapter or QuantConnect action. Production truth/rights/PIT lineage, project namespace/quota, QC upload/compile/run/result, deployment, orders, and trading remain separately gated. |
+| 2026-09-10 | Claude review | `3a72f9f` -> this commit | Independent review of the B2 corrections and the ARV2-4F-B3 synthetic logical-layout candidate (`867f2d1`) and their record (`3a72f9f`) | Reviewed `dc6cab6..3a72f9f` commit by commit and cumulatively (section 54) in the dedicated lane worktree, which was clean and already at the pushed head because Codex now runs in this same clone on this host; accepted with no correction, so this push is record-only and the implementation tree at `867f2d1` is unchanged. Verified rather than accepted: all five section-53.4 identities reproduce as Git blobs, LF-blob SHA-256s and byte counts; the schema renders to 3,517 bytes with the recorded semantic and artifact hashes; the four B2 corrections read exactly as described; the B3 contract was read in full (hash-and-length before every decode, per-partition census bound to the authenticated manifest, content-addressed keys, domain-separated transport hash, receipt reauthentication by full re-resolution of a retained copy, 27 null bindings, 17 false capabilities, 19 literal-false accessors); no I/O imports; the research core's firewall forbids the QC prefix and its closure stays at 39 modules; specs tree, Action Plan and Session Handoff blobs unchanged; gates `None`/`None`/`False`; both cited QuantConnect pages confirm section 53.3; `3a72f9f` is append-only and its claim that the other session's `dc6cab6` rewrote a pushed ledger row is confirmed from that diff. | Complete Analyst-lane suite on `3a72f9f` **2,577 passed, 29 skipped, 0 failed in 36:12**, identical to 53.7; corrected B2 battery **191 passed**; B3 battery **165 passed** unmutated. Active-document gate **69 passed**; compileall exit 0; `git diff --check` clean. Mutation matrix in a detached scratch worktree: six of seven single-guard removals turn the 165-case B3 battery red (per-partition census, hash-before-decode, key inventory, hash domain separation, the access-performed truth gate, the per-object bound); the seventh, the early "index must be first" guard, survives and is proven equivalent because both hostile fixtures are still refused at a later checkpoint. Zero research looks and zero development evaluations; no provider, credential, licensed row, production input, price, return, outcome, broker, operator database, QuantConnect account, project, Object Store, compile, run, result, deployment, order or trading access. | 0 P0, 0 P1, 0 P2, 0 P3 defects. Two observations documented only: `ARV2R37-001`, the builtins-dictionary pinning makes every B3 public operation refuse after any post-import addition to `builtins` (verified with `builtins._`, which a REPL sets after displaying an expression), a fail-closed environmental precondition the adapter milestone must state; `ARV2R37-002`, the QC package is guarded by the forbidden-prefix rule and per-module AST tests rather than its own transitive closure, an owner-scheduled firewall change of the `ARV2WL-D06` class. `ARV2CR28-008` remains out of lane and unfixed. | Codex counter-reviews this record commit. B3 authorises no physical adapter, `QCAlgorithm`, LEAN entry point, namespace, quota assumption, upload, compile, backtest, result access, deployment, order or trade; production inputs, rights and PIT evidence, terminal-payoff evidence, QuantConnect account actions, results, deployment, orders and trading remain separately gated. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -8355,3 +8356,131 @@ separately bounded and reviewed milestone. Real production inputs,
 entitlement/rights/PIT evidence, terminal-payoff evidence, QuantConnect
 account actions, results, deployment, orders, and trading remain separately
 gated.
+
+## 54. Independent Claude review of the B2 corrections and the ARV2-4F-B3 synthetic logical-layout candidate, 2026-09-10
+
+**Range reviewed:** `dc6cab6..3a72f9f`, two commits, commit by commit and
+cumulatively, in the dedicated lane worktree. The worktree was clean and
+already at `3a72f9f` when the review began: Codex now runs in this same
+clone on this Windows host, so the push originated here.
+**Disposition: ACCEPTED.** 0 P0, 0 P1, 0 P2, 0 P3 defects; two P3
+observations documented only. No correction was required, so this push is
+record-only and the implementation tree at `867f2d1` is unchanged.
+**Zero research looks and zero development evaluations.** No provider,
+credential, licensed row, production input, price, return, outcome, broker,
+operator database, QuantConnect account, project, Object Store, compile, run,
+result, deployment, order or trading surface was used. Two public
+QuantConnect documentation pages were read to verify section 53.3 (54.3).
+
+**Reviewing session:** the Fable 5 session on the work identity (sections
+4I, 4R, 7, 19, 25, 36, 45). Sections 47, 50 and 52 were produced by the
+other Claude session.
+
+### 54.1 Commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `867f2d1` | **Accepted** | B2 corrections `ARV2CR36-004` to `-007` (bounded canonical refusal reasons beneath the lane error, import-time cache-metadata authentication with the 3,435-session axis built on first use, tolerated concurrent cold start with equality-checked axes, and a distinct invalid-batch diagnostic) read exactly as described in the diff. ARV2-4F-B3 (`synthetic_input_transport.py`, 1,787 lines, 61 test functions) verified in 54.2 and mutation-tested in 54.4. |
+| `3a72f9f` | **Accepted** | Section 53. Its claim that the other session's `dc6cab6` rewrote an already-pushed ledger row is confirmed from that commit's diff; `3a72f9f` itself removes no ledger row; the live banner names the B3 candidate as pending Claude review. |
+| record commit | Claude record | This section and its ledger row; its own hash is the head Codex counter-reviews. |
+
+### 54.2 Verified rather than accepted
+
+- **All five section-53.4 identities reproduce exactly** as Git blob ids,
+  SHA-256 of the committed LF blobs, and byte counts.
+- **Schema identity reproduces.** The module refuses to import unless both
+  its semantic and artifact hashes match, and the rendered schema is 3,517
+  bytes with artifact SHA-256 `ff0eed2e...`, as recorded.
+- **Contract read in full.** Every object is hash- and length-checked
+  against the index before it is decoded; the index is parsed under a size,
+  depth, duplicate-key, float and canonical-re-render bound; the seven
+  partition censuses are compared tuple-for-tuple against the authenticated
+  B1 manifest's descriptors rather than in aggregate (`ARV2I4FB3-001`);
+  keys are derived from the transport schema, candidate and bundle hashes so
+  coherent re-keying refuses (`-002`); the transport hash is
+  domain-separated; the receipt retains a copy of the fixture and
+  reauthentication re-resolves that copy end to end; all 27 external
+  bindings are `None`, all 17 capabilities `False`, all 19 accessor
+  properties literal `False`, and the truth state pins
+  `real_qc_object_store_access_performed` to `False`.
+- **No I/O surface.** The module imports only `dataclasses`, `hashlib`,
+  `inspect`, `json`, `re` and its three sibling QC modules. The research
+  core's firewall lists `research.analyst_revisions_v2_qc` as a forbidden
+  prefix, so the core cannot acquire the QC package; the core closure is
+  unchanged at 39 modules with zero forbidden roots. Frozen state is
+  unchanged: specs tree `57f34f68...`, Action Plan blob `8391ae96...`,
+  Session Handoff blob `2c91be4e...`; the three production gates remain
+  `None`/`None`/`False`.
+- **Static self-pinning probed.** Shadowing `len` in `builtins` with an
+  equivalent lambda makes the next public call refuse with "builtin topology
+  changed" and the original restores cleanly; the schema renderer reproduces
+  3,517 bytes before and after.
+
+### 54.3 QuantConnect documentation claims checked
+
+Both cited pages were fetched. The writing-algorithms page states the Object
+Store is organization-specific, recommends prefixing keys with the project id
+to avoid overwrites, and documents `contains_key` and `read_bytes`. The
+cloud-platform page carries the live-trading advice to keep individual
+objects under 50 MB, and states that paid organizations receive 50 MB of
+storage with tiered upgrades while free organizations cannot write. Section
+53.3's reading is accurate, and B3's 49,000,000-byte per-object bound sits
+below that advice. The 268,435,456-byte aggregate bound exceeds the
+documented base quota, which the record already disclaims as a parser bound
+rather than an authenticated quota (`ARV2I4FB3-008`); the later adapter must
+authenticate the real quota before any write.
+
+### 54.4 Mutation matrix
+
+Run in a detached scratch worktree at `3a72f9f` against the 61-function B3
+battery; the lane tree was never modified.
+
+| Guard removed | Battery result |
+|---|---|
+| M1 per-partition census not compared to the authenticated manifest | 1 failed, 164 passed (killed) |
+| M2 manifest hash and length not checked before decode | 1 failed, 164 passed (killed) |
+| M3 fixture key order and inventory not compared to the index | 2 failed, 163 passed (killed) |
+| M4 transport-hash domain separation removed at both sites | 3 failed, 162 passed (killed) |
+| M5 `real_qc_object_store_access_performed` truth gate dropped | 2 failed, 163 passed (killed) |
+| M6 "transport index must be the first fixture object" dropped | **165 passed (survived; proven equivalent)** |
+| M7 per-object size bound dropped | 1 failed, 164 passed (killed) |
+| Unmutated baseline | **165 passed** |
+
+Six of seven single-guard removals are killed. M6 survives because the guard is a redundant early checkpoint: with it removed, a fixture that declares a different index key is still refused later as "transport index layout changed", and a fixture whose index object is not first is still refused as "transport index fields changed" when the manifest bytes fail to parse as an index (both verified directly against the mutated module). The guard changes only where and how the refusal is reported, so it is defense in depth and no test was fabricated for it.
+
+### 54.5 Findings ledger
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R37-001` | P3 | Observation; **documented only** | `_require_static_contract` requires the `builtins` dictionary to contain exactly the entries, by identity, that it held at import. Any later addition trips it: adding `builtins._`, which the interactive interpreter does after displaying any expression, makes every public B3 operation refuse with "builtin topology changed" until the name is removed (verified). This is the intended fail-closed direction and protects against the `any`/`type` shadows in `ARV2I4FB3-004`, but it makes B3 unusable from a REPL, a notebook kernel, or any harness that injects builtins after import. The later adapter milestone should state this environmental precondition explicitly. | No change. |
+| `ARV2R37-002` | P3 | Observation; **documented only** | The QC package is guarded by the forbidden-prefix rule (core cannot import QC) and by per-module AST surface tests, not by a transitive closure of its own. A second closure root for `research.analyst_revisions_v2_qc` would make the no-I/O guarantee mechanical across all four QC modules rather than one AST test per file. That is a firewall change of the same owner-scheduled class as `ARV2WL-D06`. | No change. |
+
+### 54.6 Validation on the exact reviewed tree
+
+- Complete Analyst-lane suite (`tests/analyst_revisions_v2` plus the
+  `tests/test_analyst_revisions_v2_*` files) on `3a72f9f`: **2,577 passed, 29 skipped, 0 failed in 2,172.47 s (36:12)**, identical to section 53.7's counts on this same host (the 29 skips are this host's symbolic-link, FIFO and fork capability, each with its reason).
+- Corrected B2 battery (`test_qc_global_input_bundle.py`): **191 passed in 55.11 s**, reproducing section 53.7.
+- B3 battery: see the unmutated baseline in 54.4.
+- Active-document consistency gate after this section was added:
+  **69 passed**
+- `compileall` on the lane package, the QC package and the Analyst tests
+  exit 0; `git diff --check` clean; the complete repository suite was not
+  run, per the owner's lane-suite instruction (34.6).
+
+### 54.7 Required quality assessment
+
+ARV2-4F-B3 implementation: **9/10**; the contract is exact, content-addressed
+and fail-closed, with one point withheld for the environmental brittleness in
+`ARV2R37-001`. B2 corrections: **9/10**. Record `3a72f9f` as received:
+**9/10**.
+
+### 54.8 Next gate
+
+Codex counter-reviews this record commit. B3 authorises no filesystem or
+Object Store adapter, `QCAlgorithm`, LEAN entry point, project namespace,
+quota assumption, upload, compile, backtest, result access, deployment,
+order or trade; any physical adapter is a separately bounded and reviewed
+milestone. Real production inputs, entitlement, rights and PIT evidence,
+terminal-payoff evidence, QuantConnect account actions, results, deployment,
+orders and trading remain separately gated. `ARV2CR28-008` (stale Action
+Plan summary) remains out of lane and unfixed.

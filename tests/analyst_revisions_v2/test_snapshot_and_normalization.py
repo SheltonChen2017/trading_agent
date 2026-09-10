@@ -736,3 +736,32 @@ def test_normalization_rejects_loose_lists_and_provenance_drift(tmp_path):
             refusals=(refusal,),
             provenance=tampered,
         )
+
+
+def test_unauthenticated_sidecar_in_the_snapshot_root_refuses(tmp_path):
+    """The whole snapshot root must be authenticated, not only ``pages/``.
+
+    Previously the inventory reconciled ``pages/`` alone, so an unreferenced
+    sidecar beside the manifest was admitted into a VerifiedSnapshot and the
+    snapshot's identity did not cover everything the directory held
+    (ARV2WL-D08).
+    """
+    root = write_snapshot(
+        tmp_path / "snapshot",
+        rows_by_year={2020: [raw_row(2020, "a")]},
+        pages_per_year=1,
+    )
+    # Positive control: the untouched capture still authenticates.
+    assert load_verified_snapshot(root, verified_at=FIXED_VERIFIED_AT)
+
+    (root / "vendor_notes.txt").write_bytes(b"unauthenticated sidecar\n")
+    with pytest.raises(SnapshotVerificationError, match="unauthenticated sidecar"):
+        load_verified_snapshot(root, verified_at=FIXED_VERIFIED_AT)
+
+    # A nested sidecar outside pages/ is refused for the same reason.
+    (root / "vendor_notes.txt").unlink()
+    nested = root / "extra"
+    nested.mkdir()
+    (nested / "payload.jsonl").write_bytes(b"{}\n")
+    with pytest.raises(SnapshotVerificationError, match="unauthenticated sidecar"):
+        load_verified_snapshot(root, verified_at=FIXED_VERIFIED_AT)

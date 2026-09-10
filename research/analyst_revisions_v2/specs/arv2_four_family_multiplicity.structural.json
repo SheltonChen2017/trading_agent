@@ -1,0 +1,197 @@
+{
+  "acyclic_lineage": {
+    "accepted_ancestor_nodes_and_edges_unchanged": true,
+    "edge_direction": "child_to_parent",
+    "ordered_nodes": [
+      {
+        "node": "strategy_pdf",
+        "parents": []
+      },
+      {
+        "node": "qc_base",
+        "parents": [
+          "strategy_pdf"
+        ]
+      },
+      {
+        "node": "qc_first_plan",
+        "parents": [
+          "strategy_pdf",
+          "qc_base"
+        ]
+      },
+      {
+        "node": "four_family_multiplicity_overlay",
+        "parents": [
+          "strategy_pdf",
+          "qc_base",
+          "qc_first_plan"
+        ]
+      }
+    ],
+    "overlay_is_leaf": true,
+    "overlay_parent_set_excludes_power_protocol": true,
+    "power_protocol_relationship_not_bound_by_this_artifact": true
+  },
+  "analyst_lane_contract": {
+    "allocation_sum": {
+      "denominator": 80,
+      "numerator": 1
+    },
+    "assigned_lane_id": "analyst-revisions-v2",
+    "confirmatory_alpha_allocations": [
+      {
+        "allocation_level": "look",
+        "cell_binding_state": "deferred_exact_cell_and_estimand_required_before_first_observation",
+        "exact_estimand_sha256": null,
+        "look_id": "arv2-look-etf-paper-prospective-001",
+        "primary_cell_id": null,
+        "two_sided_alpha": {
+          "denominator": 80,
+          "numerator": 1
+        }
+      }
+    ],
+    "current_look_state": "planned_unbound_supersession_only",
+    "development_evaluations_consume_confirmatory_alpha": false,
+    "effective_alpha_commitment_timing": "sole_one_over_80_allocation_becomes_irrevocably_nonreusable_at_first_accepted_observation",
+    "effective_power_plan_alpha_field": "two_sided_alpha_one_over_80",
+    "external_append_only_authority_required": true,
+    "future_cell_or_look_policy": "reviewed_successor_must_bind_or_subdivide_this_allocation_never_add_alpha",
+    "lane_family_id": "arv2-rating-only-v2-qc-first",
+    "look_budget": 1,
+    "permanent_look_ids": [
+      "arv2-look-etf-paper-prospective-001"
+    ],
+    "within_lane_confirmatory_alpha_ceiling": {
+      "denominator": 80,
+      "numerator": 1
+    }
+  },
+  "authority": "multiplicity_policy_only_no_source_outcome_look_qc_deployment_or_order_authority",
+  "bound_ancestry": {
+    "qc_first_plan": {
+      "artifact_id": "arv2-qc-first-plan-36e455e72b8750fe",
+      "artifact_sha256": "8339238dd5ce32ed7b351aab2662fb408cc7d9a3c62ff89bf8b1d14f20acd081",
+      "content_sha256": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc"
+    },
+    "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193",
+    "superseded_qc_base": {
+      "artifact_id": "arv2-round0-candidate-8d13a0a4577df322",
+      "artifact_sha256": "b40a76f5f2f7726f328f1e444a41ecb0670234055a7c9c7245a26ffab601af2f",
+      "content_sha256": "8d13a0a4577df3223c96c4c11722457e059b4ade63f578ab860ce7364494e847"
+    }
+  },
+  "capabilities": {
+    "confirmatory_look_commitment": false,
+    "confirmatory_look_registration": false,
+    "confirmatory_look_spend": false,
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "external_bindings": {
+    "counter_review_commit": null,
+    "cross_lane_review_completion_receipt": null,
+    "dataset_id": null,
+    "evaluation_receipt_id": null,
+    "external_append_only_look_authority_id": null,
+    "external_zero_observation_receipt": null,
+    "funded_live_authority_id": null,
+    "independent_review_commit": null,
+    "look_spend_receipt_id": null,
+    "outcome_artifact_sha256": null,
+    "paper_epoch_id": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "source_rights_receipt_id": null
+  },
+  "future_composition_gate": {
+    "ARV2_4D_A_nonconfirmatory_planning_size_one_over_20_unchanged": true,
+    "ARV2_4D_B_authorized_by_this_overlay": false,
+    "all_four_lane_review_completion_receipt_required": true,
+    "every_outcome_bearing_successor_must_authenticate_reviewed_overlay": true,
+    "other_independent_lineage_leaves_must_be_authenticated_separately": true
+  },
+  "overlay_hash": "54ab0bb69fb6fa162ca3ba6764864b230136c68c017f1e6b669034dda75b806e",
+  "overlay_id": "arv2-four-family-multiplicity-54ab0bb69fb6fa16",
+  "owner_direction": {
+    "decision": "2026-08-30_four_named_strategy_selection_lanes",
+    "effective_policy_requires_this_overlay": true,
+    "missing_or_unauthenticated_overlay": "REFUSED_no_fallback_to_three_lane_policy",
+    "scope": "shared_selection_accounting_only_lane_families_epochs_and_look_inventories_remain_distinct"
+  },
+  "repository_zero_look_state": {
+    "authority_artifact_sha256": "819cb514dfcefd770bd1c0113cfa2484f521ac6dda0c0a36e98f977903ad5990",
+    "authority_entries": [],
+    "authority_id": "arv2-zero-access-no-external-authority",
+    "authority_mode": "zero_access",
+    "evidence_scope": "repository_gate_state_not_proof_of_unobserved_external_activity",
+    "parent_paper_deployment_authorized": false,
+    "parent_paper_end": null,
+    "parent_paper_evidence_epoch_id": null,
+    "parent_paper_start": null
+  },
+  "schema": "arv2-four-family-multiplicity-overlay-structural-v1",
+  "shared_family_contract": {
+    "allocation": "fixed_equal_bonferroni_across_four_permanent_lane_slots",
+    "fixed_lane_count": 4,
+    "fixed_lane_ids": [
+      "analyst-revisions-v2",
+      "insider-buying",
+      "short-interest",
+      "target-price-revisions"
+    ],
+    "lane_level_family_ids_look_budgets_and_evidence_epochs_remain_distinct": true,
+    "permanent_maximum_per_lane": {
+      "denominator": 80,
+      "numerator": 1
+    },
+    "slot_reallocation": {
+      "denominator_recomputation": "PROHIBITED",
+      "redistribution": "PROHIBITED",
+      "transferable": false,
+      "unused": "EXPIRES",
+      "withdrawn": "EXPIRES"
+    },
+    "two_sided_family_wise_alpha": {
+      "denominator": 20,
+      "numerator": 1
+    }
+  },
+  "status": "owner_approved_refreeze_frozen_outcome_free_pending_independent_review",
+  "supersession_contract": {
+    "ancestor_bytes_must_remain_unchanged": true,
+    "disposition": "superseded_unspent_nonrevivable",
+    "fallback_without_overlay": "REFUSED",
+    "predecessor_plan_hash": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc",
+    "predecessor_plan_id": "arv2-qc-first-plan-36e455e72b8750fe",
+    "predecessor_policy": {
+      "analyst_prospective_alpha": {
+        "denominator": 60,
+        "numerator": 1
+      },
+      "authorized_confirmatory_alpha_spent": false,
+      "lane_count": 3,
+      "look_id": "arv2-look-etf-paper-prospective-001",
+      "repository_recorded_accepted_observations": 0,
+      "state_at_supersession": "planned_unbound_before_period_or_epoch_freeze",
+      "state_provenance": "owner_record_plus_repository_zero_access_gate_without_external_zero_observation_receipt"
+    },
+    "revival": "PROHIBITED",
+    "superseded_parent_paths": [
+      "multiplicity_contract.three_lane_correction_factor",
+      "multiplicity_contract.prospective_permanent_look_alpha",
+      "multiplicity_contract.correction",
+      "prospective_paper_contract.power_plan_required_fields.two_sided_alpha_one_over_60",
+      "prospective_paper_contract.alpha_commitment_timing.sole_one_over_60",
+      "inheritance_contract.inherited_cell_ids.three_lane_selection_correction"
+    ]
+  }
+}

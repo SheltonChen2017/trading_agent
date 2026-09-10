@@ -13,6 +13,7 @@ import unicodedata
 from decimal import Decimal, InvalidOperation
 from datetime import date, datetime, timezone
 from pathlib import Path, PurePosixPath
+from types import MappingProxyType
 from typing import Any, Iterable, Mapping
 
 
@@ -28,6 +29,164 @@ _UTC_TIMESTAMP_RE = re.compile(
     r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z"
 )
 _DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+FrozenContainerAuthority = tuple[
+    tuple[object, ...],
+    tuple[tuple[object, tuple[object, ...]], ...],
+]
+_NON_CONTAINER = object()
+
+
+def _frozen_container_graph(
+    roots: tuple[object, ...],
+) -> tuple[tuple[object, tuple[object, ...]], ...]:
+    """Retain every exact immutable container and its immediate topology.
+
+    Authority loaders freeze JSON containers as exact ``mappingproxy`` and
+    ``tuple`` instances.  Retaining their identities closes a CPython escape
+    in which mappingproxy equality can disclose its mutable backing mapping:
+    a later mutation below an unchanged top-level root cannot introduce a new
+    container or rewire an existing one into a different slot.
+
+    Objects of any other type are deliberately opaque.  Callers must include
+    container-valued attributes held behind such objects as additional roots.
+    """
+    graph: list[tuple[object, tuple[object, ...]]] = []
+    seen: set[int] = set()
+    pending = list(reversed(roots))
+    while pending:
+        value = pending.pop()
+        if type(value) not in (MappingProxyType, tuple):
+            continue
+        identity = id(value)
+        if identity in seen:
+            continue
+        seen.add(identity)
+        if type(value) is MappingProxyType:
+            items = tuple(value.items())
+            edges = tuple(
+                (
+                    key,
+                    item
+                    if type(item) in (MappingProxyType, tuple)
+                    else _NON_CONTAINER,
+                )
+                for key, item in items
+            )
+            pending.extend(
+                item
+                for _, item in items
+                if type(item) in (MappingProxyType, tuple)
+            )
+        else:
+            edges = tuple(
+                item
+                if type(item) in (MappingProxyType, tuple)
+                else _NON_CONTAINER
+                for item in value
+            )
+            pending.extend(
+                item
+                for item in value
+                if type(item) in (MappingProxyType, tuple)
+            )
+        graph.append((value, edges))
+    return tuple(graph)
+
+
+def capture_frozen_container_authority(
+    roots: Iterable[object],
+) -> FrozenContainerAuthority:
+    """Capture top-level roots and their complete exact-container graph."""
+    retained_roots = tuple(roots)
+    return retained_roots, _frozen_container_graph(retained_roots)
+
+
+def frozen_container_authority_is_current(
+    current_roots: Iterable[object],
+    authority: FrozenContainerAuthority,
+) -> bool:
+    """Check root and descendant identities without traversing a new proxy.
+
+    The identity lookup happens before a container is traversed.  Therefore a
+    hostile mappingproxy inserted into a disclosed backing dict is rejected
+    without invoking that proxy's attacker-controlled backing mapping.
+    """
+    try:
+        expected_roots, expected_graph = authority
+        observed_roots = tuple(current_roots)
+    except (TypeError, ValueError):
+        return False
+    if len(observed_roots) != len(expected_roots) or any(
+        observed is not expected
+        for observed, expected in zip(
+            observed_roots,
+            expected_roots,
+            strict=True,
+        )
+    ):
+        return False
+
+    expected_by_identity: dict[int, tuple[object, tuple[object, ...]]] = {}
+    for value, edges in expected_graph:
+        if type(value) not in (MappingProxyType, tuple):
+            return False
+        identity = id(value)
+        if identity in expected_by_identity:
+            return False
+        expected_by_identity[identity] = (value, edges)
+
+    seen: set[int] = set()
+    pending = list(reversed(expected_roots))
+    try:
+        while pending:
+            value = pending.pop()
+            if type(value) not in (MappingProxyType, tuple):
+                continue
+            identity = id(value)
+            record = expected_by_identity.get(identity)
+            if record is None or record[0] is not value:
+                return False
+            if identity in seen:
+                continue
+            seen.add(identity)
+            expected_edges = record[1]
+            if type(value) is MappingProxyType:
+                observed_items = tuple(value.items())
+                if len(observed_items) != len(expected_edges):
+                    return False
+                for (key, item), expected_edge in zip(
+                    observed_items,
+                    expected_edges,
+                    strict=True,
+                ):
+                    if type(expected_edge) is not tuple or len(expected_edge) != 2:
+                        return False
+                    expected_key, expected_item = expected_edge
+                    if key is not expected_key:
+                        return False
+                    if expected_item is _NON_CONTAINER:
+                        if type(item) in (MappingProxyType, tuple):
+                            return False
+                    elif item is not expected_item:
+                        return False
+                    else:
+                        pending.append(item)
+            else:
+                if len(value) != len(expected_edges):
+                    return False
+                for item, expected_item in zip(value, expected_edges, strict=True):
+                    if expected_item is _NON_CONTAINER:
+                        if type(item) in (MappingProxyType, tuple):
+                            return False
+                    elif item is not expected_item:
+                        return False
+                    else:
+                        pending.append(item)
+    except (RuntimeError, TypeError):
+        return False
+    return len(seen) == len(expected_by_identity)
 
 
 def sha256_bytes(payload: bytes) -> str:

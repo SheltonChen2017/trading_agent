@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import gc
 import hashlib
 import json
+import weakref
+from collections.abc import Mapping
 from decimal import Decimal, ROUND_DOWN, ROUND_UP, getcontext, localcontext, setcontext
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -26,6 +30,7 @@ from research.analyst_revisions_v2.stock_evaluation_contract import (
     StockEvaluationContractError,
     build_stock_report_plan,
     load_stock_evaluation_contract,
+    require_loaded_stock_evaluation_contract,
 )
 from research.analyst_revisions_v2.stock_signal import (
     RESIDUALIZATION_BLOCK,
@@ -289,6 +294,33 @@ def test_contract_rejects_duplicate_float_nonfinite_and_unstable_bytes(
         )
 
 
+def test_contract_normalizes_parent_disappearance_after_nested_load(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = _write_spec(
+        tmp_path, json.loads(SPEC.read_text(encoding="utf-8"))
+    )
+    qc_plan = path.with_name("arv2_qc_first.draft.json")
+    real_loader = contract_module.load_qc_first_study_plan
+
+    def delete_after_load(parent_path: Path):
+        plan = real_loader(parent_path)
+        Path(parent_path).unlink()
+        return plan
+
+    monkeypatch.setattr(
+        contract_module,
+        "load_qc_first_study_plan",
+        delete_after_load,
+    )
+    with pytest.raises(
+        StockEvaluationContractError,
+        match="QC-first parent changed or disappeared",
+    ):
+        load_stock_evaluation_contract(path, qc_first_plan_path=qc_plan)
+
+
 def test_contract_recomputes_horizon_maturity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -332,6 +364,169 @@ def test_contract_loader_provenance_is_required_and_reauthenticated() -> None:
     object.__setattr__(contract, "spec_hash", "a" * 64)
     with pytest.raises(StockEvaluationContractError, match="changed after authentication"):
         build_stock_report_plan(contract)
+
+
+def test_loader_owned_mapping_root_rejects_equal_replacement() -> None:
+    contract = _load()
+    replacement = MappingProxyType(dict(contract.external_bindings))
+    object.__setattr__(contract, "external_bindings", replacement)
+
+    with pytest.raises(
+        StockEvaluationContractError, match="frozen field root changed"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+
+
+def test_hostile_mapping_proxy_refuses_before_replacement_code_runs() -> None:
+    contract = _load()
+    original = dict(contract.external_bindings)
+    target_key = next(iter(original))
+    calls: list[str] = []
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return "forged" if key == target_key else original[key]
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    replacement = MappingProxyType(SplitView())
+    assert replacement[target_key] == "forged"
+    calls.clear()
+    object.__setattr__(contract, "external_bindings", replacement)
+
+    with pytest.raises(
+        StockEvaluationContractError, match="frozen field root changed"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+    assert calls == []
+
+
+def test_nested_mapping_replacement_refuses_before_hostile_code_runs() -> None:
+    contract = _load()
+    sections = contract.sections
+    original = sections["control_definition"]
+    calls: list[str] = []
+
+    class BackingDictLeak:
+        value: object | None = None
+
+        def __eq__(self, other: object) -> bool:
+            self.value = other
+            return False
+
+    class SplitView(Mapping[str, object]):
+        def __iter__(self):
+            calls.append("iter")
+            return iter(original)
+
+        def __len__(self) -> int:
+            calls.append("len")
+            return len(original)
+
+        def __getitem__(self, key: str) -> object:
+            calls.append(f"getitem:{key}")
+            return "forged"
+
+        def items(self):
+            calls.append("items")
+            return original.items()
+
+    leak = BackingDictLeak()
+    assert (sections == leak) is False
+    assert type(leak.value) is dict
+    leak.value["control_definition"] = MappingProxyType(SplitView())
+
+    with pytest.raises(
+        StockEvaluationContractError, match="descendant container changed"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+    assert calls == []
+
+
+def test_retained_mapping_roots_do_not_keep_contract_alive() -> None:
+    contract = _load()
+    identity = id(contract)
+    reference = weakref.ref(contract)
+    assert identity in contract_module._CONTRACT_AUTHORITIES
+
+    del contract
+    gc.collect()
+
+    assert reference() is None
+    assert identity not in contract_module._CONTRACT_AUTHORITIES
+
+
+def test_equality_spoofed_scalar_type_cannot_bypass_contract_authority() -> None:
+    class AlwaysEqualStr(str):
+        def __eq__(self, _other: object) -> bool:
+            return True
+
+    contract = _load()
+    object.__setattr__(contract, "spec_hash", AlwaysEqualStr("forged"))
+
+    with pytest.raises(
+        StockEvaluationContractError, match="noncanonical authority state"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+
+
+def test_deleted_contract_scalar_fingerprint_field_is_a_domain_refusal() -> None:
+    contract = _load()
+    original = contract.spec_id
+    object.__delattr__(contract, "spec_id")
+    with pytest.raises(
+        StockEvaluationContractError, match="changed after authentication"
+    ):
+        require_loaded_stock_evaluation_contract(contract)
+    object.__setattr__(contract, "spec_id", original)
+    assert require_loaded_stock_evaluation_contract(contract) is contract
+
+
+def test_hostile_container_in_contract_scalar_refuses_before_traversal() -> None:
+    class HostileScalar(Mapping[str, object]):
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def __getitem__(self, _key: str) -> object:
+            self.calls.append("getitem")
+            return "forged"
+
+        def __iter__(self):
+            self.calls.append("iter")
+            return iter(())
+
+        def __len__(self) -> int:
+            self.calls.append("len")
+            return 0
+
+        def items(self):
+            self.calls.append("items")
+            return ().__iter__()
+
+    contract = _load()
+    original = contract.spec_id
+    hostile = HostileScalar()
+    object.__setattr__(contract, "spec_id", MappingProxyType(hostile))
+    try:
+        with pytest.raises(
+            StockEvaluationContractError, match="noncanonical authority state"
+        ):
+            require_loaded_stock_evaluation_contract(contract)
+        assert hostile.calls == []
+    finally:
+        object.__setattr__(contract, "spec_id", original)
+    assert require_loaded_stock_evaluation_contract(contract) is contract
 
 
 def _median(values: list[Decimal]) -> Decimal:
@@ -1022,3 +1217,49 @@ def test_adjusted_batch_rejects_forged_interval_and_out_of_range_rows() -> None:
     forged_rows = (forged_first, *result.rows[1:])
     with pytest.raises(StockControlError):
         dataclasses.replace(result, rows=forged_rows)
+
+
+def test_fit_and_apply_are_independent_of_ambient_decimal_context() -> None:
+    """Extend the ambient-context pin from build to the full fit/apply path.
+
+    The existing regression covers build_preopen_control_cross_section only;
+    a future edit dropping a localcontext inside _solve_ols or the frozen
+    application would not have been caught. Inputs are constructed once under
+    the normal context so only the production path runs under the hostile
+    contexts; identical model and batch hashes pin the whole pipeline.
+    """
+    contract = _load()
+    candidate, evidence = _candidate_and_evidence(session="2020-01-02")
+    validation_candidate, validation_evidence = _candidate_and_evidence(
+        session="2020-02-03"
+    )
+    fold = _fold()
+    original_context = getcontext().copy()
+    results = {}
+    try:
+        for label, (prec, rounding) in {
+            "low": (9, ROUND_DOWN),
+            "high": (85, ROUND_UP),
+        }.items():
+            getcontext().prec = prec
+            getcontext().rounding = rounding
+            training = build_preopen_control_cross_section(
+                contract, candidate, evidence
+            )
+            model = fit_structural_stock_control_model(
+                contract, fold, (training,)
+            )
+            validation = build_preopen_control_cross_section(
+                contract, validation_candidate, validation_evidence
+            )
+            applied = apply_structural_stock_control_model(
+                contract, model, fold, "validation", (validation,)
+            )
+            results[label] = (
+                model.model_hash,
+                tuple(model.coefficients),
+                applied.batch_sha256,
+            )
+    finally:
+        setcontext(original_context)
+    assert results["low"] == results["high"]

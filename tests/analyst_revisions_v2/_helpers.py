@@ -372,6 +372,7 @@ def clean_source_repository(tmp_path: Path, workspace_root: Path) -> tuple[Path,
     run_git(repository, "init", "--quiet")
     run_git(repository, "config", "user.email", "arv2-tests@example.invalid")
     run_git(repository, "config", "user.name", "ARV2 Tests")
+    run_git(repository, "config", "core.autocrlf", "false")
     run_git(repository, "add", "research")
     run_git(repository, "commit", "--quiet", "-m", "clean source fixture")
     lineage = capture_clean_git_lineage(repository)

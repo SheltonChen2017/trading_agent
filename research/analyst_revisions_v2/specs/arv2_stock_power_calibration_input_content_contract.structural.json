@@ -1,0 +1,185 @@
+{
+  "authority": "input_shape_and_closed_computation_only_no_input_rights_outcome_qc_deployment_or_trading_authority",
+  "authority_boundary": {
+    "B2_structural_candidate_or_owner_strings_authenticate_data_truth": false,
+    "caller_rendered_owner_provenance_grants_access": false,
+    "checked_in_contract_grants_input_rights": false,
+    "committed_input_operation_authority_artifact_sha256": null,
+    "committed_production_truth_approval_artifact_sha256": null,
+    "exact_manifest_evidence_and_input_bindings_required": true,
+    "external_signed_truth_aggregate_permitted": true,
+    "input_authority_is_separate_content_addressed_regular_file": true,
+    "input_authority_schema": "arv2-power-calibration-input-authority-v1",
+    "input_operation_authority_is_exactly_review_pinned": true,
+    "production_truth_approval_is_separately_reviewed_and_exactly_pinned": true,
+    "production_truth_approval_schema": "arv2-power-calibration-production-truth-approval-v1",
+    "production_truth_evidence_opener_implemented": false,
+    "receipt_is_not_outcome_evaluation_or_launch_authority": true,
+    "required_positive_production_truth_claims": [
+      "production_authorized",
+      "rights_authorized",
+      "vintage_proven",
+      "input_artifacts_authenticated",
+      "entitlement_truth_authenticated",
+      "production_lineage_complete"
+    ],
+    "truth_aggregate_pin_alone_grants_access": false
+  },
+  "bound_accepted_parents": {
+    "four_family_overlay": {
+      "artifact_id": "arv2-four-family-multiplicity-54ab0bb69fb6fa16",
+      "artifact_sha256": "2e9f390ec54f01e6635b67972711c38212a5f853489e16c1de2a508212278648",
+      "content_sha256": "54ab0bb69fb6fa162ca3ba6764864b230136c68c017f1e6b669034dda75b806e"
+    },
+    "input_manifest_schema": {
+      "artifact_id": "arv2-stock-power-calibration-input-schema-4032405d1773236e",
+      "artifact_sha256": "e642d06531b6ca024c3ee438ee88a113eef1483f2f6fca9d0e120afcfc5ed2f1",
+      "content_sha256": "4032405d1773236e61938a88c6ec77e62bbbd71ff8e24eb615565023c07f8e24"
+    },
+    "power_protocol": {
+      "artifact_id": "arv2-stock-power-calibration-protocol-0ba6b7d745783796",
+      "artifact_sha256": "ff16117a258a1864438d11178a2b31af1b04a3f8b27d1f39c9c33552627f4a13",
+      "content_sha256": "0ba6b7d7457837967b5b8b7966cc22c2ddd00f4dbf4a7269b9aaa562baac757f"
+    },
+    "production_manifest_admission": {
+      "artifact_id": "arv2-stock-power-calibration-manifest-admission-ed654e3289185180",
+      "artifact_sha256": "173d161b80447ee8bc0b28a1e5fef49cd00f1df1a53ef67fe195ebd1d153e811",
+      "content_sha256": "ed654e32891851806af318ba7baf88f7f5b7ee3a151cecf07b126792755e670c"
+    }
+  },
+  "calculation": {
+    "autocovariance": "stable_sum_valid_exact_lag_products_divided_by_N",
+    "bartlett_weight": "(21-lag)/21_for_lags_1_through_20",
+    "centering": "transient_stable_sum_valid_betas_divided_by_N",
+    "decimal_context": {
+      "Emax": 999999,
+      "Emin": -999999,
+      "capitals": 1,
+      "clamp": 0,
+      "flags_cleared": true,
+      "precision": 50,
+      "rounding": "ROUND_HALF_EVEN",
+      "traps": [
+        "InvalidOperation",
+        "DivisionByZero",
+        "Overflow"
+      ]
+    },
+    "lag_pair_requirement": "at_least_one_pair_at_every_lag_0_through_20",
+    "long_run_variance": "gamma_0_plus_2_times_stable_sum_weighted_gamma_1_through_20",
+    "maximum_lag_sessions": 20,
+    "missing_gap_rule": "exact_axis_positions_never_compressed_or_zero_filled",
+    "planning_arithmetic": "delegated_to_authenticated_ARV2_4D_A_public_helper",
+    "stable_sum_order": "ascending_absolute_value_then_signed_value",
+    "valid_beta_date_minimum": 50
+  },
+  "capabilities": {
+    "authoritative_power_receipt": false,
+    "funded_deployment": false,
+    "input_access": false,
+    "nuisance_calibration_compute": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "power_plan_binding": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "content_contract_hash": "e9915c73d9e78a01bdf114c1347621add0dd0cb1ada193bfb9a64dbe4b3df5a2",
+  "content_contract_id": "arv2-stock-power-calibration-input-content-e9915c73d9e78a01",
+  "external_bindings": {
+    "evaluation_receipt_id": null,
+    "numeric_receipt_sha256": null,
+    "outcome_artifact_sha256": null,
+    "owner_input_authority_artifact_sha256": null,
+    "owner_input_authority_evidence_sha256": null,
+    "owner_input_authority_id": null,
+    "production_truth_approval_artifact_sha256": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "stock_successor_v3_sha256": null
+  },
+  "input_content": {
+    "artifact_sha256": "sha256_exact_rendered_bytes",
+    "component_count": {
+      "all_sessions_including_zero_counts_required": true,
+      "connected_component_count": "exact_nonnegative_integer_not_bool",
+      "record_count": 483,
+      "record_fields": [
+        "decision_session",
+        "connected_component_count"
+      ],
+      "root_fields": [
+        "schema",
+        "records"
+      ],
+      "schema": "arv2-power-calibration-component-count-input-v1",
+      "session_axis_sha256": "22d38c7178f6863d4d9f5284eba9216b0f8499848b1188781316d1169b13a051"
+    },
+    "content_sha256": "sha256_compact_sorted_canonical_JSON",
+    "date_beta": {
+      "missing_gaps_are_preserved": true,
+      "missing_or_refused_beta_value": null,
+      "record_count": 483,
+      "record_fields": [
+        "decision_session",
+        "state",
+        "beta_value"
+      ],
+      "root_fields": [
+        "schema",
+        "records"
+      ],
+      "schema": "arv2-power-calibration-date-beta-input-v1",
+      "session_axis_sha256": "22d38c7178f6863d4d9f5284eba9216b0f8499848b1188781316d1169b13a051",
+      "states": [
+        "valid",
+        "missing",
+        "refused"
+      ],
+      "valid_beta_value": "canonical_finite_Decimal_string"
+    },
+    "duplicate_keys_binary_floats_and_nonfinite_constants_forbidden": true,
+    "exact_sorted_indented_utf8_json_with_one_trailing_newline": true,
+    "manifest_byte_count_and_all_state_count_inventories_must_match": true,
+    "maximum_bytes_each": 4194304
+  },
+  "receipt": {
+    "closed_numeric_output_fields": [
+      "valid_beta_date_count",
+      "lag_pair_counts_0_through_20",
+      "long_run_variance",
+      "component_count_census_sha256",
+      "component_count_census_session_count",
+      "q05_components_per_date",
+      "raw_required_valid_dates",
+      "required_valid_dates",
+      "required_connected_components",
+      "fixed_capacity_disposition"
+    ],
+    "date_betas_mean_centered_values_covariances_returns_outcomes_p_values_and_results": "FORBIDDEN",
+    "identity_bindings_only_besides_closed_outputs": true,
+    "required_receipt_fields": [
+      "protocol_id",
+      "protocol_hash",
+      "calibration_input_manifest_sha256",
+      "valid_beta_date_count",
+      "lag_pair_counts_0_through_20",
+      "long_run_variance",
+      "component_count_census_sha256",
+      "component_count_census_session_count",
+      "q05_components_per_date",
+      "raw_required_valid_dates",
+      "required_valid_dates",
+      "required_connected_components",
+      "fixed_capacity_disposition"
+    ],
+    "required_receipt_fields_are_one_exact_nested_mapping": true,
+    "schema": "arv2-stock-power-calibration-numeric-receipt-v1"
+  },
+  "schema": "arv2-stock-power-calibration-input-content-contract-structural-v1",
+  "status": "offline_candidate_pending_independent_review"
+}

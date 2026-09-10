@@ -1,0 +1,397 @@
+{
+  "authority": "structural_supplement_only_no_data_outcome_qc_or_action_authority",
+  "capabilities": {
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "result_read": false,
+    "source_access": false
+  },
+  "external_bindings": {
+    "counter_review_commit": null,
+    "deployment_id": null,
+    "evaluation_receipt_id": null,
+    "normalized_dataset_id": null,
+    "order_id": null,
+    "outcome_dataset_id": null,
+    "qc_compile_id": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "qc_upload_receipt_id": null,
+    "result_record_id": null,
+    "review_commit": null,
+    "source_rights_receipt_id": null,
+    "source_snapshot_id": null,
+    "terminal_return_dataset_id": null
+  },
+  "fixed_cutoff_lock_contract": {
+    "blind_extension": false,
+    "dynamic_rolling_now_boundary": false,
+    "first_post_cutoff_session": "2026-08-31",
+    "later_use_requires_new_content_addressed_reviewed_authority": true,
+    "outcome_cutoff_session": "2026-08-28",
+    "post_cutoff_data_disposition": "outside_this_supplement_no_access"
+  },
+  "future_shared_holdout_contract": {
+    "consumed_by_this_supplement": false,
+    "consumption_by_this_lane_prohibited": true,
+    "current_access_authorized": false,
+    "future_paper_period_authority_id": null,
+    "future_paper_period_end_inclusive": null,
+    "future_paper_period_start_inclusive": null,
+    "legacy_validation_period_disposition": "superseded_unspent_by_owner_qc_first_direction",
+    "legacy_validation_period_end_inclusive": "2027-08-31",
+    "legacy_validation_period_looks_consumed": 0,
+    "legacy_validation_period_prior_state": "planned_unbound",
+    "legacy_validation_period_revivable_by_this_supplement": false,
+    "legacy_validation_period_start_inclusive": "2026-09-01",
+    "pool_with_historical_or_partial_results": false,
+    "prospective_epoch_and_separate_review_required": true,
+    "scope": "shared_final_holdout_across_all_four_canonical_strategy_families",
+    "shared_final_holdout_cutoff_inclusive": "2027-08-31",
+    "shared_final_holdout_end_inclusive": "2029-08-31",
+    "shared_final_holdout_start_inclusive": "2027-09-01"
+  },
+  "inherited_evaluation_rules_contract": {
+    "applies_to": "complete_2021_2025_and_separate_partial_2026_reporting",
+    "confirmatory_or_prospective_claim_permitted": false,
+    "contamination_disclosure": "2019-07-16_through_2026-07-23_is_discovery_only_all_historical_inference_is_descriptive",
+    "evidence_role": "development_stop_go_not_prospective_confirmation",
+    "first_selected_2021_fold_uses_pre_2021_train_and_validation_inputs": true,
+    "historical_point_in_time_inputs_remain_required": true,
+    "inherited_without_local_override": [
+      "point_in_time_universe",
+      "controls_and_residualization",
+      "firm_specific_global_comparator",
+      "costs",
+      "metrics",
+      "inference",
+      "common_event_boundary_refusal",
+      "contamination_rules"
+    ],
+    "local_override_permitted": false,
+    "post_pandemic_results_are_descriptive": true,
+    "post_pandemic_slice_waives_historical_point_in_time_requirements": false,
+    "source": "exact_authenticated_parent_stock_fold_and_QC_first_artifacts"
+  },
+  "naming_contract": {
+    "dynamic_rolling_now_boundary": false,
+    "epidemiological_regime_claim": false,
+    "interpretation": "owner_shorthand_for_fixed_2021_through_2026_market_slice",
+    "label": "post_pandemic"
+  },
+  "owner_partial_2026_amendment_contract": {
+    "formal_primary_parent_clauses_remain_unchanged": true,
+    "grants_outcome_or_execution_authority": false,
+    "owner_direction": "start_fixed_2021_2026_post_pandemic_slice_after_counter_review",
+    "owner_direction_date": "2026-09-08",
+    "parent_artifacts_remain_byte_unchanged": true,
+    "parent_fold_clause": "excluded_from_fixed_cutoff_evaluation_locked_no_blind_extension",
+    "parent_stock_clause": "exclude_from_test_fold_until_full_test_interval_exists",
+    "promotes_partial_slice_to_parent_fold": false,
+    "rewrites_parent_fold_manifest": false,
+    "semantic_override_of_parent_partial_exclusion": true,
+    "semantic_override_scope": "separate_non_fold_exploratory_fixed_cutoff_slice_only"
+  },
+  "parent_fold_manifest": {
+    "artifact_id": "arv2-stock-folds-1002155dbe8e3e87",
+    "artifact_sha256": "fecd984ad937fed57b860b15fdcb9cc994ff59ab62c3b72d5160ab62b342953c",
+    "content_sha256": "1002155dbe8e3e87b220b7419039bff95f5c0812d2306c56a8ac51b76c5d7611"
+  },
+  "parent_lineages": {
+    "evaluation_id": "arv2-eval-stock-historical-qc-001",
+    "qc_first_plan": {
+      "artifact_id": "arv2-qc-first-plan-36e455e72b8750fe",
+      "artifact_sha256": "8339238dd5ce32ed7b351aab2662fb408cc7d9a3c62ff89bf8b1d14f20acd081",
+      "content_sha256": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc"
+    },
+    "stock_evaluation_contract": {
+      "artifact_id": "arv2-stock-historical-c5ff2a6a0dcf341e",
+      "artifact_sha256": "34d1e71548bc6850a02590596594944dad3fadb38954067f2cc2d00dcaa86bc8",
+      "content_sha256": "c5ff2a6a0dcf341e3c7bad4ea56e4a3c00f20faab5896c0fcd3bd7c291835a0b",
+      "history_section_sha256": "5db2a1bc09d7ecd2e8cb7e5044f0abc7f97b3eefb71803002d00f6b33cf984ca"
+    },
+    "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193"
+  },
+  "partial_2026_exploratory_contract": {
+    "blind_extension_to_later_outcomes": false,
+    "boundary_set_sha256": "75df12011bab8879578fd2719dd9c014e183b1086c8118200ca8adf5305750ac",
+    "calendar_year": 2026,
+    "classification": "exploratory_nonconfirmatory_not_a_complete_walk_forward_fold",
+    "common_event_boundary_refusal": "inherited_exactly_from_parent_manifest",
+    "current_execution_authorized": false,
+    "effective_test_start_rule": "horizon_sessions_after_nominal_start_matching_parent_embargo_semantics",
+    "eligible_decision_bounds": [
+      {
+        "boundary_sha256": "bd7ec7e590b0f340bebc9ff104084637a9abdcd4486d6c648e96cd6c3aee4291",
+        "effective_test_start": "2026-01-05",
+        "eligible_decision_session_count": 163,
+        "embargo_sessions": 1,
+        "horizon_sessions": 1,
+        "last_mature_decision_session": "2026-08-27",
+        "purge_sessions": 1,
+        "test_end_exclusive": "2026-08-28",
+        "train_end_exclusive": "2024-01-02",
+        "train_start": "2019-01-02",
+        "validation_end_exclusive": "2026-01-02",
+        "validation_start": "2024-01-03"
+      },
+      {
+        "boundary_sha256": "69b4237dfc0afd367186de4990daf7cc9a26d0b56e5dd92757e687a58e00f4c6",
+        "effective_test_start": "2026-01-09",
+        "eligible_decision_session_count": 155,
+        "embargo_sessions": 5,
+        "horizon_sessions": 5,
+        "last_mature_decision_session": "2026-08-21",
+        "purge_sessions": 5,
+        "test_end_exclusive": "2026-08-24",
+        "train_end_exclusive": "2024-01-02",
+        "train_start": "2019-01-02",
+        "validation_end_exclusive": "2026-01-02",
+        "validation_start": "2024-01-09"
+      },
+      {
+        "boundary_sha256": "df2345f57bbbf555f0f2114d79166640834f2f8b5a5ee3adfc2e08395917e4c6",
+        "effective_test_start": "2026-02-02",
+        "eligible_decision_session_count": 125,
+        "embargo_sessions": 20,
+        "horizon_sessions": 20,
+        "last_mature_decision_session": "2026-07-31",
+        "purge_sessions": 20,
+        "test_end_exclusive": "2026-08-03",
+        "train_end_exclusive": "2024-01-02",
+        "train_start": "2019-01-02",
+        "validation_end_exclusive": "2026-01-02",
+        "validation_start": "2024-01-31"
+      },
+      {
+        "boundary_sha256": "8cdc0ad662b33ce6f3c66a95f8b5d6c080be24a0a2a9e6e6ba546a5f52ac64a3",
+        "effective_test_start": "2026-03-31",
+        "eligible_decision_session_count": 45,
+        "embargo_sessions": 60,
+        "horizon_sessions": 60,
+        "last_mature_decision_session": "2026-06-03",
+        "purge_sessions": 60,
+        "test_end_exclusive": "2026-06-04",
+        "train_end_exclusive": "2024-01-02",
+        "train_start": "2019-01-02",
+        "validation_end_exclusive": "2026-01-02",
+        "validation_start": "2024-03-28"
+      }
+    ],
+    "fit_contract": {
+      "fit_scope": "training_only",
+      "test_application": "frozen_coefficients_model_and_thresholds",
+      "validation_application": "frozen_coefficients_model_and_thresholds",
+      "validation_or_test_refit": false
+    },
+    "fold_id": null,
+    "future_completion": "requires_new_content_addressed_reviewed_supplement",
+    "interval_semantics": "half_open_nyse_session_intervals",
+    "last_mature_decision_session_by_horizon": {
+      "1": "2026-08-27",
+      "20": "2026-07-31",
+      "5": "2026-08-21",
+      "60": "2026-06-03"
+    },
+    "later_decisions": "named_immature_refusals_never_dropped_or_filled",
+    "nominal_test_start_session": "2026-01-02",
+    "nominal_train_interval": {
+      "end_exclusive": "2024-01-02",
+      "start_inclusive": "2019-01-02"
+    },
+    "nominal_validation_interval": {
+      "end_exclusive": "2026-01-02",
+      "start_inclusive": "2024-01-02"
+    },
+    "ordered_horizons_sessions": [
+      1,
+      5,
+      20,
+      60
+    ],
+    "outcome_cutoff_session": "2026-08-28",
+    "partial_window_sha256": "aa9465c56811bd6ea488ddb69478af6ef1f712326ae851b3020c6ffa2afd6233",
+    "pool_with_complete_folds": false,
+    "pool_with_primary_evaluation": false,
+    "rescue_or_override_any_gate": false,
+    "result_binding_id": null,
+    "role": "separate_exploratory_incomplete_calendar_period_only",
+    "rolling_or_expanding_rule": "rolling",
+    "tune_or_select_from_partial_results": false
+  },
+  "plan_hash": "306ee0b427137cf6a2bd9a9576b472210fb46ccc77dadfda23f7fd60760fc62a",
+  "plan_id": "arv2-stock-post-pandemic-306ee0b427137cf6",
+  "post_pandemic_complete_contract": {
+    "complete_fold_aggregation_contract": {
+      "aggregate_completeness_and_coverage_report_required": true,
+      "aggregate_outputs": "descriptive_metrics_and_equity_curve_only",
+      "capital_path_interpretation": "not_uninterrupted_live_capital",
+      "fold_state_resets_disclosed": true,
+      "gate_rescue_tuning_or_threshold_selection_permitted": false,
+      "incomplete_aggregate_disposition": "follow_exact_parent_completeness_refusal_gate_if_any_required_parent_observation_invalidates_fold_or_horizon_aggregate_is_unavailable",
+      "mode": "descriptive_calendar_ordered_oos_concatenation_of_disjoint_complete_2021_2025_test_folds_only",
+      "observation_interval_rule": "for_each_horizon_use_only_exact_authenticated_parent_boundary_test_start_through_test_end_exclusive",
+      "ordered_parent_fold_ids": [
+        "arv2-wf-test-2021",
+        "arv2-wf-test-2022",
+        "arv2-wf-test-2023",
+        "arv2-wf-test-2024",
+        "arv2-wf-test-2025"
+      ],
+      "partial_2026_included": false,
+      "per_fold_and_calendar_year_reporting_required": true,
+      "pooled_inferential_p_value_or_gate_permitted": false,
+      "portfolio_return_fold_initial_and_terminal_costs_included": true,
+      "refusal_underfill_or_missing_expected_session": "retain_every_expected_session_and_refusal_in_census_and_coverage_never_silently_drop_skip_or_zero_fill_metric_denominator_exclusion_only_under_exact_parent_named_refusal_rule",
+      "unique_session_and_outcome_identity_required": true,
+      "valid_structural_no_position_return": "follow_exact_parent_semantics"
+    },
+    "cross_horizon_pooling": "forbidden_report_each_horizon_separately",
+    "current_execution_authorized": false,
+    "failed_fold_retries": "forbidden_owner_disposition_required",
+    "implementation_outcome_rows_accessed": false,
+    "ordered_h20_fold_ids": [
+      "arv2-wf-test-2021-h20",
+      "arv2-wf-test-2022-h20",
+      "arv2-wf-test-2023-h20",
+      "arv2-wf-test-2024-h20",
+      "arv2-wf-test-2025-h20"
+    ],
+    "ordered_parent_fold_ids": [
+      "arv2-wf-test-2021",
+      "arv2-wf-test-2022",
+      "arv2-wf-test-2023",
+      "arv2-wf-test-2024",
+      "arv2-wf-test-2025"
+    ],
+    "parent_horizon_order_sessions": [
+      1,
+      5,
+      20,
+      60
+    ],
+    "primary_result_rescue": "forbidden",
+    "primary_sensitivity_horizon_sessions": 20,
+    "role": "supplemental_calendar_selected_sensitivity_never_primary_or_rescue",
+    "secondary_descriptive_horizons_sessions": [
+      1,
+      5,
+      60
+    ],
+    "secondary_descriptive_selection_rule": "for_each_selected_parent_fold_use_its_exact_authenticated_parent_boundary_for_each_ordered_secondary_horizon",
+    "secondary_result_rescue": "forbidden",
+    "selected_complete_h20_folds": [
+      {
+        "h20_fold_id": "arv2-wf-test-2021-h20",
+        "h20_structural_fold_sha256": "08100307b01071fe1689e3a8414532bc7ca1f6210a1b4520b22850f658402060",
+        "parent_fold_id": "arv2-wf-test-2021",
+        "parent_fold_sha256": "5d39393886380681e2f271e44c0dd638ee494202829a6830a5f693fb8c956a64",
+        "test_end_exclusive": "2022-01-03",
+        "test_start": "2021-02-02",
+        "test_year": 2021
+      },
+      {
+        "h20_fold_id": "arv2-wf-test-2022-h20",
+        "h20_structural_fold_sha256": "663aaf425cb29796530ae830381cd38f36fbc851e98e6a4abcc7c70883bc0039",
+        "parent_fold_id": "arv2-wf-test-2022",
+        "parent_fold_sha256": "5f56a7215fa78cde28cdbee25e867ffce4ab567474bf4b907106effb631f3031",
+        "test_end_exclusive": "2023-01-03",
+        "test_start": "2022-02-01",
+        "test_year": 2022
+      },
+      {
+        "h20_fold_id": "arv2-wf-test-2023-h20",
+        "h20_structural_fold_sha256": "f7652b53db085b949f3019c2b94be90f912df3a24ea79fda08b58c228638a4f3",
+        "parent_fold_id": "arv2-wf-test-2023",
+        "parent_fold_sha256": "ebed6de3e92880546ddc892438ccbcb4c017296df3a431708b23d25e71ac9b3e",
+        "test_end_exclusive": "2024-01-02",
+        "test_start": "2023-02-01",
+        "test_year": 2023
+      },
+      {
+        "h20_fold_id": "arv2-wf-test-2024-h20",
+        "h20_structural_fold_sha256": "51b55a161641747d6ee7de7bb4d81efe3983e71596d6136a8428c8da47754852",
+        "parent_fold_id": "arv2-wf-test-2024",
+        "parent_fold_sha256": "9570dd6708c299df0253ea6b2326d6ab866f29f115476ed445f018e4ac398d3e",
+        "test_end_exclusive": "2025-01-02",
+        "test_start": "2024-01-31",
+        "test_year": 2024
+      },
+      {
+        "h20_fold_id": "arv2-wf-test-2025-h20",
+        "h20_structural_fold_sha256": "65eb4913bc9f75ede4123a08a810de3666342b60521d2800e920e91fcb49c030",
+        "parent_fold_id": "arv2-wf-test-2025",
+        "parent_fold_sha256": "0bca0526decc6b15274fe09c374d8b72e72386058700bd6384fb14872177130f",
+        "test_end_exclusive": "2026-01-02",
+        "test_start": "2025-02-03",
+        "test_year": 2025
+      }
+    ],
+    "selection_basis": "owner_directed_calendar_regime_sensitivity_before_this_run",
+    "selection_claimed_blind_to_market_outcomes": false,
+    "selection_rule": "complete_parent_folds_with_test_year_2021_through_2025",
+    "threshold_model_or_universe_tuning": "forbidden"
+  },
+  "power_and_sufficiency_reporting_contract": {
+    "applies_to": "complete_2021_2025_slice_and_partial_2026_separately",
+    "creates_new_gate_rescue_or_selection_authority": false,
+    "current_claim_to_meet_ARV2_4D_power_date_or_component_floors": false,
+    "each_report_required_fields": [
+      "evaluation_id",
+      "report_slice_id",
+      "horizon_sessions",
+      "independent_observation_unit",
+      "observed_independent_date_count",
+      "required_independent_date_count",
+      "observed_connected_component_count",
+      "required_connected_component_count",
+      "sufficient",
+      "insufficiency_reasons"
+    ],
+    "missing_required_floor_disposition": "insufficient_unavailable_never_infer",
+    "power_floor_receipt_id": null,
+    "required_connected_component_floor": null,
+    "required_floor_source": "separately_authenticated_ARV2_4D_numeric_receipt_before_result_reporting",
+    "required_independent_date_floor": null
+  },
+  "primary_evaluation_contract": {
+    "current_execution_authorized": false,
+    "evaluation_id": "arv2-eval-stock-historical-qc-001",
+    "ordered_complete_fold_ids": [
+      "arv2-wf-test-2020",
+      "arv2-wf-test-2021",
+      "arv2-wf-test-2022",
+      "arv2-wf-test-2023",
+      "arv2-wf-test-2024",
+      "arv2-wf-test-2025"
+    ],
+    "ordered_horizons_sessions": [
+      1,
+      5,
+      20,
+      60
+    ],
+    "primary_interval": "complete_2020_through_2025_parent_folds",
+    "replacement_or_reselection": false,
+    "role": "formal_primary_evaluation_unchanged_by_this_supplement"
+  },
+  "schema": "arv2-stock-post-pandemic-evaluation-structural-v1",
+  "section_hashes": {
+    "fixed_cutoff_lock_contract": "b65e4be5d0ccbdd0d2714b4cc2b03532eb7120efa6ca94075a85a258d1444171",
+    "future_shared_holdout_contract": "bf99f143e051c02c3ada4ae44c4b63be78bca0c86c4cfd906cdb51371f421612",
+    "inherited_evaluation_rules_contract": "55cb4efa77df32c84baadd6212af2d64a6a616428e19ec08c3d7ad3dad24fed0",
+    "naming_contract": "efed0e2aba38567cdf5561c13cba5fe8d9e936fe2e176add0f025898d4e404cd",
+    "owner_partial_2026_amendment_contract": "9cdb187782b8c8e2c12c5a7eb3e93ab7d97b8e93afee39d182bbb4d43bfe83e9",
+    "partial_2026_exploratory_contract": "af3cc149d6ee79dfc8ff7392b1fe05dcdacd325664f15f6b5862094e1a639316",
+    "post_pandemic_complete_contract": "d6f17d7045416045de66f71bbc72ce4240cfbb59f4d13ceaa6f7232e9df19a50",
+    "power_and_sufficiency_reporting_contract": "999ddc80132423d131a468098ead841a8486a214c2feb60b16170978ddbda031",
+    "primary_evaluation_contract": "6a8b2607da6cc1d88e75e159b50546e644e1dd94fc478980cd9a5221acf65a11"
+  },
+  "status": "outcome_free_preregistration_candidate_pending_independent_review"
+}

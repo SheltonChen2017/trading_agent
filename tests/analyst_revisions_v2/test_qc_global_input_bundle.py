@@ -4063,3 +4063,36 @@ def test_public_entrypoint_signatures_accept_only_in_memory_values():
         assert all(value is None for value in sealed.args.kw_defaults)
         assert sealed.args.vararg is None
         assert sealed.args.kwarg is None
+
+
+def test_composer_refuses_a_foreign_valid_batch_through_lineage_alone():
+    # ARV2R35-001: an injected core returning an internally valid batch that
+    # the reviewed core produced for a different bundle passes every shell
+    # projection and the batch validator; only the candidate-lineage check
+    # can refuse it.
+    active_bundle = _load(_active_rows())
+    terminal_bundle = _load(_terminal_rows())
+    foreign_batch = collect_synthetic_event_study_from_global_input_bundle(
+        terminal_bundle
+    )
+    assert require_synthetic_event_study_batch(foreign_batch) is foreign_batch
+    assert foreign_batch.candidate_declaration_hash != active_bundle.run_candidate_hash
+    with pytest.raises(QcGlobalInputBundleError, match="lineage changed"):
+        bundle_module._COMPOSER_IMPLEMENTATION(
+            active_bundle, _call_core=lambda _bundle: foreign_batch
+        )
+
+
+def test_composer_refuses_a_same_shape_hash_tamper_through_the_validator_alone():
+    # ARV2R35-001: a real batch whose batch_hash is replaced by a same-shape
+    # value keeps every projected type, lineage, and census invariant, so the
+    # composer's _validate_batch call is the only refusal.
+    bundle = _load(_active_rows())
+    batch = collect_synthetic_event_study_from_global_input_bundle(bundle)
+    object.__setattr__(batch, "batch_hash", "0" * 64)
+    with pytest.raises(
+        QcGlobalInputBundleError, match="not a valid event-study input census"
+    ):
+        bundle_module._COMPOSER_IMPLEMENTATION(
+            bundle, _call_core=lambda _bundle: batch
+        )

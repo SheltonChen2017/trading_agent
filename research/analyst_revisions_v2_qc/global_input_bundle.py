@@ -30,6 +30,7 @@ from .event_study import (
     EventStudyObservation,
     EventStudyRefusal,
     EventStudyInputError,
+    REVIEWED_AXIS_SESSION_COUNT,
     SecurityLifecycleCoverage,
     SecurityOpenValue,
     TerminalLifecycle,
@@ -1216,10 +1217,20 @@ def _require_static_contract() -> None:
                 raise _PINNED_BUNDLE_ERROR(
                     "bundle dependency class topology changed"
                 )
+    if (
+        type(REVIEWED_AXIS_SESSION_COUNT) is not int
+        or REVIEWED_AXIS_SESSION_COUNT != 3_435
+    ):
+        raise _PINNED_BUNDLE_ERROR("reviewed session count contract changed")
     axis_cache_info = _PINNED_REVIEWED_SESSION_AXIS_WRAPPER.cache_info()
     index_cache_info = _PINNED_REVIEWED_SESSION_INDEX_WRAPPER.cache_info()
     if (
-        _CACHE_INFO_CLASS is not _PINNED_CACHE_INFO_CLASS
+        _REVIEWED_SESSION_CACHE_STATE
+        is not _PINNED_REVIEWED_SESSION_CACHE_STATE
+        or type(_PINNED_REVIEWED_SESSION_CACHE_STATE) is not list
+        or _PINNED_LEN(_PINNED_REVIEWED_SESSION_CACHE_STATE) != 1
+        or type(_PINNED_REVIEWED_SESSION_CACHE_STATE[0]) is not bool
+        or _CACHE_INFO_CLASS is not _PINNED_CACHE_INFO_CLASS
         or type(axis_cache_info) is not _PINNED_CACHE_INFO_CLASS
         or type(index_cache_info) is not _PINNED_CACHE_INFO_CLASS
         or _PINNED_TUPLE_LEN(axis_cache_info) != 4
@@ -1229,13 +1240,20 @@ def _require_static_contract() -> None:
         or type(_PINNED_TUPLE_GETITEM(index_cache_info, 2)) is not int
         or type(_PINNED_TUPLE_GETITEM(index_cache_info, 3)) is not int
         or _PINNED_TUPLE_GETITEM(axis_cache_info, 2) != 1
-        or _PINNED_TUPLE_GETITEM(axis_cache_info, 3) != 1
+        or _PINNED_TUPLE_GETITEM(axis_cache_info, 3) not in (0, 1)
         or _PINNED_TUPLE_GETITEM(index_cache_info, 2) != 1
-        or _PINNED_TUPLE_GETITEM(index_cache_info, 3) != 1
-        or _PINNED_REVIEWED_SESSION_AXIS_WRAPPER()
-        is not _PINNED_REVIEWED_SESSION_AXIS
-        or _PINNED_REVIEWED_SESSION_INDEX_WRAPPER()
-        is not _PINNED_REVIEWED_SESSION_INDEX
+        or _PINNED_TUPLE_GETITEM(index_cache_info, 3) not in (0, 1)
+        or (
+            _PINNED_TUPLE_GETITEM(index_cache_info, 3) == 1
+            and _PINNED_TUPLE_GETITEM(axis_cache_info, 3) != 1
+        )
+        or (
+            _PINNED_REVIEWED_SESSION_CACHE_STATE[0]
+            and (
+                _PINNED_TUPLE_GETITEM(axis_cache_info, 3) != 1
+                or _PINNED_TUPLE_GETITEM(index_cache_info, 3) != 1
+            )
+        )
     ):
         raise _PINNED_BUNDLE_ERROR("reviewed session cache topology changed")
     if (
@@ -1360,6 +1378,44 @@ def _require_static_contract() -> None:
         )
     ):
         raise _PINNED_BUNDLE_ERROR("bundle dependency value graph changed")
+    try:
+        reviewed_axis = _PINNED_REVIEWED_SESSION_AXIS_WRAPPER()
+        reviewed_index = _PINNED_REVIEWED_SESSION_INDEX_WRAPPER()
+        cached_reviewed_axis = _PINNED_REVIEWED_SESSION_AXIS_WRAPPER()
+        cached_reviewed_index = _PINNED_REVIEWED_SESSION_INDEX_WRAPPER()
+    except (
+        EventStudyInputError,
+        TypeError,
+        ValueError,
+        AttributeError,
+    ):
+        raise _PINNED_BUNDLE_ERROR(
+            "reviewed session calendar is unavailable"
+        ) from None
+    if (
+        type(reviewed_axis) is not tuple
+        or type(reviewed_index) is not _PINNED_MAPPING_PROXY_TYPE
+        or type(cached_reviewed_axis) is not tuple
+        or type(cached_reviewed_index) is not _PINNED_MAPPING_PROXY_TYPE
+        or _PINNED_TUPLE_LEN(reviewed_axis) != 3_435
+        or _PINNED_LEN(reviewed_index) != 3_435
+        or cached_reviewed_axis != reviewed_axis
+        or tuple(cached_reviewed_index.items())
+        != tuple(reviewed_index.items())
+    ):
+        raise _PINNED_BUNDLE_ERROR("reviewed session cache topology changed")
+    _PINNED_REVIEWED_SESSION_CACHE_STATE[0] = True
+    axis_cache_info = _PINNED_REVIEWED_SESSION_AXIS_WRAPPER.cache_info()
+    index_cache_info = _PINNED_REVIEWED_SESSION_INDEX_WRAPPER.cache_info()
+    if (
+        type(axis_cache_info) is not _PINNED_CACHE_INFO_CLASS
+        or type(index_cache_info) is not _PINNED_CACHE_INFO_CLASS
+        or _PINNED_TUPLE_GETITEM(axis_cache_info, 2) != 1
+        or _PINNED_TUPLE_GETITEM(axis_cache_info, 3) != 1
+        or _PINNED_TUPLE_GETITEM(index_cache_info, 2) != 1
+        or _PINNED_TUPLE_GETITEM(index_cache_info, 3) != 1
+    ):
+        raise _PINNED_BUNDLE_ERROR("reviewed session cache topology changed")
     if (
         _EXPECTED_ROLE_ORDER is not _PINNED_EXPECTED_ROLE_ORDER
         or _EXPECTED_ROW_CONTRACTS is not _PINNED_EXPECTED_ROW_CONTRACTS
@@ -1468,6 +1524,7 @@ def _require_static_contract() -> None:
         raise QcGlobalInputBundleError("bundle static contract changed")
     integer_expectations = (
         (GLOBAL_INPUT_SCHEMA_SOURCE_BYTE_COUNT, 94_959),
+        (REVIEWED_AXIS_SESSION_COUNT, 3_435),
         (MAX_SYNTHETIC_PARTITION_BYTES, 67_108_864),
         (MAX_SYNTHETIC_BUNDLE_BYTES, 268_435_456),
         (MAX_SYNTHETIC_PARTITION_ROWS, 2_000_000),
@@ -2781,7 +2838,7 @@ def require_synthetic_qc_global_input_bundle(
     return bundle
 
 
-def _call_event_study(bundle: SyntheticQcGlobalInputBundle) -> EventStudyBatch | None:
+def _call_event_study(bundle: SyntheticQcGlobalInputBundle) -> EventStudyBatch:
     try:
         batch = _PINNED_COLLECT_EVENT_STUDY(
             run_candidate=bundle._run_candidate,
@@ -2793,6 +2850,25 @@ def _call_event_study(bundle: SyntheticQcGlobalInputBundle) -> EventStudyBatch |
             terminal_requirements=bundle.terminal_requirements,
             terminal_payoffs=bundle.terminal_payoffs,
         )
+    except EventStudyInputError as exc:
+        reason = exc.args[0] if len(exc.args) == 1 else None
+        if type(reason) is str and 0 < len(reason) <= 512:
+            raise QcGlobalInputBundleError(
+                f"event-study input refused: {reason}"
+            ) from None
+        raise QcGlobalInputBundleError(
+            "event-study input refused without a canonical reason"
+        ) from None
+    except (
+        QcRunContractError,
+        TypeError,
+        ValueError,
+        AttributeError,
+    ):
+        raise QcGlobalInputBundleError(
+            "synthetic bundle is not a valid event-study input census"
+        ) from None
+    try:
         return _PINNED_REQUIRE_EVENT_STUDY_BATCH(batch)
     except (
         EventStudyInputError,
@@ -2801,7 +2877,9 @@ def _call_event_study(bundle: SyntheticQcGlobalInputBundle) -> EventStudyBatch |
         ValueError,
         AttributeError,
     ):
-        return None
+        raise QcGlobalInputBundleError(
+            "event-study core returned an invalid batch"
+        ) from None
 
 
 def _event_study_batch_is_valid(value: object) -> bool:
@@ -3506,8 +3584,15 @@ _REVIEWED_SESSION_INDEX_WRAPPER = _EVENT_STUDY_GLOBALS[
 ]
 _PINNED_REVIEWED_SESSION_AXIS_WRAPPER = _REVIEWED_SESSION_AXIS_WRAPPER
 _PINNED_REVIEWED_SESSION_INDEX_WRAPPER = _REVIEWED_SESSION_INDEX_WRAPPER
-_PINNED_REVIEWED_SESSION_AXIS = _REVIEWED_SESSION_AXIS_WRAPPER()
-_PINNED_REVIEWED_SESSION_INDEX = _REVIEWED_SESSION_INDEX_WRAPPER()
+_axis_cache_info_at_import = _REVIEWED_SESSION_AXIS_WRAPPER.cache_info()
+_index_cache_info_at_import = _REVIEWED_SESSION_INDEX_WRAPPER.cache_info()
+_REVIEWED_SESSION_CACHE_STATE = [
+    _PINNED_TUPLE_GETITEM(_axis_cache_info_at_import, 3) == 1
+    and _PINNED_TUPLE_GETITEM(_index_cache_info_at_import, 3) == 1
+]
+_PINNED_REVIEWED_SESSION_CACHE_STATE = _REVIEWED_SESSION_CACHE_STATE
+del _axis_cache_info_at_import
+del _index_cache_info_at_import
 _CACHE_INFO_CLASS = type(
     _REVIEWED_SESSION_AXIS_WRAPPER.cache_info()
 )
@@ -3636,8 +3721,6 @@ _DEPENDENCY_GRAPH_RECORD_TYPES = (
 _PINNED_DEPENDENCY_GRAPH_RECORD_TYPES = _DEPENDENCY_GRAPH_RECORD_TYPES
 _DEPENDENCY_VALUE_ROOTS = tuple(
     (
-        _PINNED_REVIEWED_SESSION_AXIS,
-        _PINNED_REVIEWED_SESSION_INDEX,
         *(
             value
             for dependency_globals in _RUNTIME_DEPENDENCY_GLOBALS

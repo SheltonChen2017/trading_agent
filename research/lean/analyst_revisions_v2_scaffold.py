@@ -1,10 +1,11 @@
-"""Analyst Revisions V2 source-only LEAN scaffold. NO ALPHA STATISTIC.
+"""Analyst Revisions V2 offline-assembled LEAN scaffold. NO ALPHA STATISTIC.
 
-ARV2-4F-B5A establishes only the Python entry shape that a later reviewed
-QuantConnect project may use.  It deliberately refuses in ``initialize``
-before touching data, Object Store, results, portfolio state, or any other
-LEAN service.  The file is not upload, compile, launch, result, deployment,
-order, or trading authority.
+ARV2-4F-B5B lets a pure host-side contract authenticate these exact bytes as
+the prospective ``main.py`` member of an authenticated source inventory.  It
+deliberately refuses in ``initialize`` before touching data, Object Store,
+results, portfolio state, or any other LEAN service.  Source assembly is not
+project creation, upload, compile, launch, result, deployment, order, or
+trading authority, and no physical Object Store adapter is present here.
 
 The owner-directed first round is the descriptive 2021--2025 sensitivity.
 The separately frozen 2020--2025 formal primary remains authoritative and is
@@ -13,8 +14,9 @@ not replaced or rescued by this scaffold.
 from AlgorithmImports import *  # noqa: F403  (LEAN's documented entry point)
 
 
-SCAFFOLD_SCHEMA = "arv2-qc-lean-entry-scaffold-v1"
-STATUS = "source_only_not_authorized_for_upload_compile_or_run"
+SCAFFOLD_SCHEMA = "arv2-qc-lean-entry-scaffold-v2"
+SOURCE_ASSEMBLY_SCHEMA = "arv2-qc-lean-source-assembly-schema-v1"
+STATUS = "offline_source_inventory_authenticated_runtime_refuses"
 AUTHORITY = (
     "source_structure_only_no_credential_account_project_configuration_"
     "object_store_provider_input_outcome_upload_compile_launch_result_"
@@ -22,8 +24,12 @@ AUTHORITY = (
 )
 QC_CLOUD_ENTRY_NAME = "main.py"
 SCAFFOLD_ONLY_MARKER = (
-    "ARV2-4F-B5A SCAFFOLD_ONLY: QC execution is not authorized"
+    "ARV2-4F-B5B SOURCE_ASSEMBLY_ONLY: QC execution is not authorized"
 )
+PHYSICAL_ADAPTER_PRESENT = False
+REAL_QC_OBJECT_STORE_ACCESS_PERFORMED = False
+CLOUD_COMPILE_PERFORMED = False
+BACKTEST_PERFORMED = False
 
 EVALUATION_ID = "arv2-eval-stock-historical-qc-001"
 ALGORITHM_ID = "arv2-qc-stock-event-study-core-v2"

@@ -1,4 +1,4 @@
-"""Offline contract tests for the ARV2-4F-B5A LEAN source scaffold."""
+"""Offline contract tests for the ARV2-4F-B5B LEAN source scaffold."""
 from __future__ import annotations
 
 import ast
@@ -23,8 +23,9 @@ RUN_CONTRACT_SOURCE = (
 )
 
 EXPECTED_CONSTANTS = {
-    "SCAFFOLD_SCHEMA": "arv2-qc-lean-entry-scaffold-v1",
-    "STATUS": "source_only_not_authorized_for_upload_compile_or_run",
+    "SCAFFOLD_SCHEMA": "arv2-qc-lean-entry-scaffold-v2",
+    "SOURCE_ASSEMBLY_SCHEMA": "arv2-qc-lean-source-assembly-schema-v1",
+    "STATUS": "offline_source_inventory_authenticated_runtime_refuses",
     "AUTHORITY": (
         "source_structure_only_no_credential_account_project_configuration_"
         "object_store_provider_input_outcome_upload_compile_launch_result_"
@@ -32,8 +33,12 @@ EXPECTED_CONSTANTS = {
     ),
     "QC_CLOUD_ENTRY_NAME": "main.py",
     "SCAFFOLD_ONLY_MARKER": (
-        "ARV2-4F-B5A SCAFFOLD_ONLY: QC execution is not authorized"
+        "ARV2-4F-B5B SOURCE_ASSEMBLY_ONLY: QC execution is not authorized"
     ),
+    "PHYSICAL_ADAPTER_PRESENT": False,
+    "REAL_QC_OBJECT_STORE_ACCESS_PERFORMED": False,
+    "CLOUD_COMPILE_PERFORMED": False,
+    "BACKTEST_PERFORMED": False,
     "EVALUATION_ID": "arv2-eval-stock-historical-qc-001",
     "ALGORITHM_ID": "arv2-qc-stock-event-study-core-v2",
     "RUN_CONTRACT_SCHEMA": "arv2-qc-stock-event-study-run-candidate-v2",
@@ -214,7 +219,7 @@ def _load_with_stub() -> dict[str, object]:
     previous = sys.modules.get("AlgorithmImports")
     sys.modules["AlgorithmImports"] = fake
     try:
-        namespace: dict[str, object] = {"__name__": "arv2_b5a_test"}
+        namespace: dict[str, object] = {"__name__": "arv2_b5b_test"}
         source = _source_text()
         exec(compile(source, str(SOURCE), "exec"), namespace)
         return namespace
@@ -234,7 +239,7 @@ def test_scaffold_refuses_before_touching_any_lean_service() -> None:
     algorithm_type = namespace["AnalystRevisionsV2StockEventStudyScaffold"]
     algorithm = algorithm_type()
 
-    with pytest.raises(RuntimeError, match="^ARV2-4F-B5A SCAFFOLD_ONLY"):
+    with pytest.raises(RuntimeError, match="^ARV2-4F-B5B SOURCE_ASSEMBLY_ONLY"):
         algorithm.initialize()
     assert algorithm.on_end_of_algorithm() is None
 
@@ -284,9 +289,9 @@ def test_scaffold_pins_the_accepted_b4_and_run_contract_sources() -> None:
             1,
         ),
         lambda value: value.replace(
-            "SCAFFOLD_SCHEMA = \"arv2-qc-lean-entry-scaffold-v1\"",
+            "SCAFFOLD_SCHEMA = \"arv2-qc-lean-entry-scaffold-v2\"",
             "PROJECT_CREATION = DEPLOYMENT = True\n"
-            "SCAFFOLD_SCHEMA = \"arv2-qc-lean-entry-scaffold-v1\"",
+            "SCAFFOLD_SCHEMA = \"arv2-qc-lean-entry-scaffold-v2\"",
             1,
         ),
         lambda value: value.replace(

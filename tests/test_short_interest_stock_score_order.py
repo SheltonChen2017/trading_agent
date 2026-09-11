@@ -1248,3 +1248,42 @@ def test_score_order_rejects_coherently_rehashed_embedded_score_forgery():
     )
     with pytest.raises(StockScoreOrderError, match="detached from score batch"):
         forged_batch.to_payload()
+
+
+def test_score_order_row_refuses_a_negative_order_count():
+    """A negative count must fail even when the count identity still sums."""
+    scored = next(
+        item for item in _inventory().dispositions if item.score is not None
+    )
+    negative = _clone_disposition(
+        scored,
+        strictly_lower_count=scored.strictly_lower_count - 1,
+        equal_count=scored.equal_count + 1,
+    )
+    assert (
+        negative.strictly_lower_count
+        + negative.equal_count
+        + negative.strictly_higher_count
+        == negative.scoreable_count
+    )
+    assert negative.strictly_lower_count < 0
+    with pytest.raises(StockScoreOrderError, match="non-negative integer"):
+        negative.to_payload()
+
+
+def test_score_order_batch_refuses_a_swapped_role_pair():
+    """The two roles of one projection must stay in canonical order."""
+    inventory = _inventory()
+    rows = list(inventory.dispositions)
+    assert rows[0].role is StockScoreOrderRole.PRESSURE
+    assert rows[1].role is StockScoreOrderRole.COVERING
+    assert (
+        rows[0].source_covering_disposition_sha256
+        == rows[1].source_covering_disposition_sha256
+    )
+    swapped = _clone_batch(
+        inventory,
+        dispositions=tuple([rows[1], rows[0]] + rows[2:]),
+    )
+    with pytest.raises(StockScoreOrderError, match="canonically ordered"):
+        swapped.to_payload()

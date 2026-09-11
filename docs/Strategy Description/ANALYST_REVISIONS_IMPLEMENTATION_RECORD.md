@@ -109,9 +109,11 @@ CLAUDE REVIEW ARRIVED AFTER SECTION 60 BECAUSE THAT CODEX ROUND HAD NOT
 IMPLEMENTED A NEW MILESTONE. THE OWNER CLARIFIED THE PROCESS AND AUTHORIZED
 THE BOUNDED ARV2-4F-B5B OFFLINE SOURCE-ASSEMBLY MILESTONE. SECTION 61
 IMPLEMENTS THAT CANDIDATE, AND CLAUDE ACCEPTS THE CUMULATIVE
-`322c7ee..5375edd` RANGE IN SECTION 62 WITH NO CODE CORRECTION, PENDING CODEX
-COUNTER-REVIEW; THE PHYSICAL B5 ADAPTER AND EVERY QC ACCOUNT ACTION REMAIN
-BLOCKED. B1 FREEZES
+`322c7ee..5375edd` RANGE IN SECTION 62 WITH NO CODE CORRECTION. SECTION 63
+ACCEPTS CLAUDE'S RECORD COMMIT AFTER FIVE PROSPECTIVE P3 RECORD/PROCESS
+CORRECTIONS AND RECORDS THE OWNER'S MASSIVE-RELIABILITY AND CRSP-SOURCE
+DECISIONS; THE PHYSICAL B5 ADAPTER AND EVERY QC ACCOUNT ACTION REMAIN BLOCKED.
+B1 FREEZES
 THE EXACT SEVEN
 PRODUCTION-SHAPED ROW,
 WIRE, DESCRIPTOR, AND CANONICAL SYNTHETIC-MANIFEST CONTRACTS IN MEMORY. IT
@@ -135,10 +137,17 @@ SECTION-32 COUNTER-REVIEW CLOSES RESTRICTED-
 EXPORT AND AUTHORITY-STATE CAPABILITY ESCAPES; SAME-THREAD, CROSS-PROCESS,
 FORK, MODE, DURABILITY, AND FINAL-CUSTODY DEFECTS IN ATOMIC PERSISTENCE; AND
 THE REVIEW-RECORD/TEST-COVERAGE DEFECTS. THE OUTCOME-FREE SOURCE AUDIT FINDS
-THAT CURRENT
-OFFICIAL MASSIVE/QC DOCUMENTATION DOES NOT PROVE THE REQUIRED 2020 AS-OF
-REVISION/DELETION STATE OR AFTER-DELISTING SHAREHOLDER RETURN, SO ALL THREE
-PRODUCTION GATES REMAIN NULL/FALSE. ARV2-4
+THAT CURRENT OFFICIAL MASSIVE/QC DOCUMENTATION DOES NOT INDEPENDENTLY PROVE
+THE REQUIRED HISTORICAL REVISION/DELETION STATE OR AFTER-DELISTING SHAREHOLDER
+RETURN. ON 2026-09-11 THE OWNER EXPLICITLY ACCEPTED MASSIVE/BENZINGA
+HISTORICAL-DATA RELIABILITY AS AN ASSUMPTION FOR THE INITIAL 2021-START
+BACKTEST, WITHOUT WAITING FOR FURTHER VENDOR CONFIRMATION; CONTRARY FUTURE
+EVIDENCE INVALIDATES AND REQUIRES A FULL CORRECTED RERUN OF EVERY DEPENDENT
+RESULT. THE ORIGINAL IMMUTABLE DEVELOPMENT-EVALUATION ID, RESULT, AND AUDIT
+TRAIL REMAIN LOCKED AND THE RERUN IS LINKED AS A CORRECTION; THE FUTURE
+PERMANENT LOOK AND FORMAL ALPHA REMAIN UNSPENT/UNCHANGED. THE INDEPENDENT
+TERMINAL-PAYOFF SOURCE AND ALL UNPOPULATED PRODUCTION AUTHORITY PINS REMAIN
+OPEN/NULL. ARV2-4
 OUTCOME EVALUATION REMAINS EXPLICITLY UNAUTHORIZED, AS DO RESULT ACCESS/
 DISPOSITION, PAPER OR FUNDED DEPLOYMENT, ORDERS, AND TRADING.
 NO AUTHENTICATED PRODUCTION EVENT EXISTS. NO V2 SIGNAL/SCORE/CROSS-SECTION
@@ -209,20 +218,20 @@ completion.
 
 | Area | Current repository state | Remaining production/evidence gate | Disposition |
 |---|---|---|---|
-| Snapshot and source authority | V2 snapshot manifest v2 now binds the exact capture instant as well as complete/diagnostic type, partition/page/raw inventory, locator/hash, and clean producing lineage. Capture chronology cannot postdate verification and is part of every downstream manifest identity. The checked-in research-source authority remains an exact immutable `zero_access` declaration with no positive entries. ARV2-4D-B2 defines an outcome-free metadata shape for exact source-snapshot, correction-inventory, and reconstruction-attestation bindings without opening any such artifact. The owner has now confirmed both Massive subscriptions and locally configured Massive/QuantConnect credentials, and has authorized their narrowly stated calibration-input operations. Bounded checks returned HTTP 200 for Massive ratings, earnings, and guidance, while QC authentication/project-list succeeded and returned 90 projects; no credential or row value was retained/disclosed. | A separately governed, append-only production-source authority must still admit each exact real artifact after entitlement, semantics, completeness, retention, vintage, and lineage evidence are authenticated. Owner confirmation, endpoint reachability, and operation authorization do not substitute for the independently reviewed production-truth artifact, evidence opener, and exact input-authority artifact pins that remain null/false in section 30. | ARV2-1 structural ingest and accepted B2 metadata admission remain unchanged; the partial B scaffold is implemented, but production input access still refuses until its exact truth and authority gates are populated and reviewed. |
+| Snapshot and source authority | V2 snapshot manifest v2 now binds the exact capture instant as well as complete/diagnostic type, partition/page/raw inventory, locator/hash, and clean producing lineage. Capture chronology cannot postdate verification and is part of every downstream manifest identity. The checked-in research-source authority remains an exact immutable `zero_access` declaration with no positive entries. ARV2-4D-B2 defines an outcome-free metadata shape for exact source-snapshot, correction-inventory, and reconstruction-attestation bindings without opening any such artifact. The owner has confirmed both Massive subscriptions and locally configured Massive/QuantConnect credentials and authorized their narrowly stated calibration-input operations. Bounded checks returned HTTP 200 for Massive ratings, earnings, and guidance, while QC authentication/project-list succeeded and returned 90 projects; no credential or row value was retained/disclosed. On 2026-09-11 the owner explicitly accepted those Massive/Benzinga histories as sufficiently reliable for the initial 2021-start backtest without waiting for further vendor confirmation. | The owner's decision removes a further Massive historical-reliability attestation as a precondition for the initial run; it is a documented risk acceptance, not a vendor attestation. A separately governed, append-only production-source authority must still admit the exact immutable artifacts, captured acquisition time, query/response lineage, and correction inventory before use. The independently reviewed production-truth artifact, evidence opener, and exact input-authority pins remain null/false in section 30 until those artifacts are built and reviewed. | ARV2-1 structural ingest and accepted B2 metadata admission remain unchanged. Massive historical reliability is owner-accepted for the first run subject to the section-63 invalidation/rerun rule; production input access still refuses until its exact evidence and authority artifacts are populated and reviewed. |
 | Event normalization | In addition to the zero-access canonical-event/refusal/result contracts, V2 now has a content-addressed Massive/Benzinga provider contract, exact documented field/action parsing, one source-derived ingest disposition per raw row, duplicate-ID refusal, immutable raw-hash version IDs, two-snapshot correction/addition/disappearance lineage, and an exhaustive structural binding of accepted rows to PIT permanent identity or a named refusal. The firm/identity join retains the exact ARV2-1 rational mapping. Legacy `research/acer/` rows remain legacy evidence. | The production source, security-master, and firm-ontology registries are empty. The older zero-access `CanonicalSourceEvent` representation is not yet a publishable rational firm-score event, and no real event has passed production registration. | ARV2-1 accepted; ARV2-2 structural identity candidate implemented; accepted production events remain prohibited. |
 | Time semantics | Exchange-session availability rules, strict UTC instants, next-open handling, and the conservative date-only delay are implemented as deterministic contracts. | Provider clock semantics and actual timestamp completeness have not been authenticated for a production V2 snapshot. | Safety rule implemented; no production event admitted. |
 | Firm identity and rating ontology | A loader-authenticated, content-addressed mapping now requires firm ID/name, half-open valid date range, exact raw label, complete ordered rank/scale size, company/sector/absolute scope, mapping quality, reviewer, source evidence, and ontology version. It implements the blueprint score as an exact rational number, refuses unreviewed labels and periods, inventories observed labels without ordering them, admits only direction-consistent upgrades/downgrades, and keeps initiations, target-only actions, and terminations out of the rating-change channel. The committed production registry remains empty, and positive registration now also refuses until a separate non-self-referential approval receipt exists. | No production firm-specific ordered vocabulary, reviewed policy artifact, authenticated permanent firm/analyst identity mapping, or external registration-approval authority exists. No label is inferred from the public sample or legacy ACER map; documented `assumes` remains quarantined pending semantic review. | ARV2-1 accepted; production ontology access refuses. |
 | Canonical stock formula | ARV2-3 adds exact 20-session exponential decay without a hard cutoff, NYSE-session age derived inside the assembler, institution-stock-session dedupe, rational rating deltas, stable raw summation, absolute-mass institution/catalyst breadth, activity-aware sector median/MAD normalization with the frozen 1.4826 scale and symmetric ±4 clip, and the stock-specific `N_eff / (N_eff + 3) * q_data` reliability. ARV2-4A adds an authenticated structural stock-evaluation contract and fixture-only same-date robust control transform, training-only Decimal QR fit, and unchanged validation/test application with exact contract/fold/policy/refusal lineage, reauthenticated NYSE-open decision clocks, and process-local builder identity/digest authentication that refuses copied, reconstructed, or relabeled cross-sections. ARV2-4B adds the exact content-addressed six-fold NYSE walk-forward child manifest without wiring it into fit/apply. ARV2-4C adds the owner-approved, exact 39-alias naive global comparator, matched-row/coverage/bootstrap contract, and acyclic stock-contract successor while preserving the reviewed fold bytes and the predecessor's single-arm refusal rules. ARV2-4D-A adds the owner-approved, outcome-free power-calibration policy and authenticated provisional planning arithmetic; accepted B1 freezes its input schema, accepted B2 authenticates production-shaped metadata, and section 30 adds a strict 483-session input-content contract, a gated exact-Decimal HAC/q05/power worker, a closed 13-field receipt with atomic persistence, and an additive four-parent/six-field stock-v3 successor. | No authenticated production events, controls, institution/common-event mappings, PIT sector classifications, measured quality, executable fold integration, authenticated production input artifacts, issued production numeric receipt, outcomes, or production score artifact exists. The scaffold's production truth approval, evidence opener, and operation-authority pins remain absent, and every adjacent action capability is false. | ARV2-3 and ARV2-3Q accepted; corrected ARV2-4A, ARV2-4B, ARV2-4C, ARV2-4D-A, B1, and B2 accepted after independent review and Codex counter-review. The partial B scaffold and section-32 hardening are accepted by Claude in section 33; sections 34 and 36 complete the next correction/review cycle, and section 37 counter-reviews Claude's commits. No executable score exists. |
 | Consensus, novelty, targets, and EPS | Canonical-versus-diagnostic separation is contract-pinned; legacy target/timing runners are quarantined from V2 and from new outcome access. | No production historical active-rating state, novelty series, or decision-grade target/EPS extension has been built or authorized. | Deferred diagnostics/extensions; they cannot alter the canonical score. |
-| Provider-history boundary | Measured pre-2013 source rows retain the exact dominant quarantine even when another defect is present and cannot be laundered through a later partition. Chronologically captured snapshots compare stable IDs/raw hashes as unchanged, added, corrected, or missing-from-later-without-invented-withdrawal. In this round, owner-authorized credentialed entitlement probes returned HTTP 200 for Massive ratings, earnings, and guidance; one historical response row's availability/field shape was inspected without retaining or disclosing values. | These narrow reachability/shape observations do not authenticate provider coverage, backfill, correction, deletion, point-in-time completeness, or an immutable production snapshot. No production calibration input was admitted or read. | Structural lineage implemented; the exact authorized entitlement observations are recorded, while factual production-source/vintage admission still requires the reviewed artifacts and pins in section 30. |
+| Provider-history boundary | Measured pre-2013 source rows retain the exact dominant quarantine even when another defect is present and cannot be laundered through a later partition. Chronologically captured snapshots compare stable IDs/raw hashes as unchanged, added, corrected, or missing-from-later-without-invented-withdrawal. Owner-authorized credentialed entitlement probes returned HTTP 200 for Massive ratings, earnings, and guidance; one historical response row's availability/field shape was inspected without retaining or disclosing values. The owner now directs the lane to treat these Massive/Benzinga histories as reliable for the initial 2021-start backtest even though the vendor has not answered the historical point-in-time inquiry. | No further Massive vendor confirmation is required before that first run. The narrow reachability/shape observations still do not themselves prove provider coverage, backfill, correction, deletion, point-in-time completeness, or immutable snapshot identity, so the production builder must freeze every consumed response with acquisition time and lineage. Contrary future evidence invokes section 63's full invalidation and rerun rule. No production calibration input has yet been admitted or read. | Structural lineage is implemented and the exact entitlement observations and owner risk acceptance are recorded. Factual production admission now requires construction and review of the exact content-addressed artifacts and pins in section 30, not another Massive support response. |
 | Issuer/security identity | A canonical, content-addressed, loader-reauthenticated PIT master now separates issuers, securities, share classes, vendor/standard identifiers, listings, and lineage. It binds base and interval-closure availability, redacts future endpoints, resolves historical tickers by event date/cutoff, preserves ticker reuse and share classes, represents symbol/listing changes, mergers and delistings, refuses ambiguity/ineligibility/late evidence, and reports exhaustive integer coverage. The legacy name/ticker diagnostic's 768 deterministic interleavings remain a lower bound, not an allowlist; current-ticker joins are prohibited. | The committed production security-master registry is empty. No real source, rights/entitlement evidence, production vintage/correction builder, accepted mapping, or external registration-approval authority exists; structural fixtures cannot self-promote. | ARV2-2 structural identity work accepted; production identity access refuses. |
 | Sector/classification | Strict PIT classification evidence, freshness, content identity, and reauthentication boundaries exist. | The production classification source catalog is empty; no accepted PIT V2 taxonomy exists. | Consumer safety implemented; production classification access refuses. |
-| Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. ARV2-2 now derives a revalidatable, fail-closed inventory of in-range merger/delisting terminal-return requirements and never silently omits an unavailable terminal name. No event has been joined to a later price or return; Databento remains unmeasured. | Production split/dividend, cost/ADV, and terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. | Outcome prerequisites implemented structurally; no outcome I/O and zero looks. |
+| Prices, outcomes, and costs | Strict terminal-event and transaction-cost contracts enforce decimal arithmetic, one net security change, explicit ADV, and source reauthentication. ARV2-2 now derives a revalidatable, fail-closed inventory of in-range merger/delisting terminal-return requirements and never silently omits an unavailable terminal name. No event has been joined to a later price or return; Databento remains unmeasured. The owner reports that CRSP declined an individual-investor product and suggested the Fama-French Data Library, Robert Shiller data, and FRED. Those are useful factor, valuation, or macro series but do not supply security-level terminal shareholder consideration. | Production split/dividend, cost/ADV, and terminal-return catalogs are empty; owner-frozen outcome inputs and authorized permanent-look infrastructure do not exist. A CRSP-branded product is not required, but every in-scope delisting still needs equivalent evidence for successor value, cash/property distributions, or affirmative zero recovery; aggregate research or macro series cannot fill that role. | Outcome prerequisites are implemented structurally; no outcome I/O and zero looks. Section 63 records a recommended Sharadar-plus-primary-source route and EDI escalation option, but no terminal source is selected or admitted yet. |
 | ETF holdings/topology | PIT holdings, declared-versus-summed weight reconciliation, stale/incomplete refusal, fixed lag, 99% coverage, eligibility, and stock-score lineage primitives exist. | No authenticated production holdings or stock-score artifact exists, so no production reverse index, ETF score, or peer topology exists. | Consumer safety implemented; production topology remains zero-access. |
 | Cross-section and portfolio | Deterministic rank/hysteresis/tie/eviction/cap/overlap/cash allocator primitives and verified policy bindings exist. | No reviewed simultaneous rank/volatility derivation or authenticated rank/classification/cost source exists. The public boundary therefore refuses every nonempty portfolio and can return only the safe empty/all-cash result. | Dormant safety algorithm implemented; no research portfolio or QC result. |
-| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. ARV2-4E-A adds an inert, content-addressed 2021-2025 complete-fold sensitivity plus a separately hashed partial-2026 exploratory geometry; it preserves the formal primary, the superseded prospective period, and the shared holdout. Sections 46-48 establish and review only an in-memory, synthetic LEAN-facing run candidate and deterministic fixed-horizon event-study batch contract. Final cash, bankruptcy, and delisting payoffs use the frozen benchmark-splice convention; stock and mixed mergers remain successor-valued. Section 49 adds the exact seven-role ARV2-4F-B1 global-input schema and canonical synthetic metadata boundary; section 50 accepts that cumulative snapshot. Section 51 adds only caller-supplied synthetic payload admission and pure composition into the reviewed core; section 52 accepts it after a test correction. Section 53 corrects B2 diagnostics and lazy calendar initialization and adds an exact nine-object synthetic logical layout/resolver; section 54 accepts it. Section 55 adds only a fixed synthetic project namespace, synthetic quota observations, and an exact value-only read plan/transcript that delegates back through B3; none creates an executable QC job. Section 58 adds only an always-refusing QCAlgorithm source scaffold with inert accepted-identity and fold bindings. Section 61 adds an offline authenticated eleven-file source inventory and an inert eighteen-call Object Store projection while preserving that refusal. | Later executable-spec integration remains required. No accepted production global-input manifest/package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, authenticated production payload/row lineage, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged. Section 54 accepts B3; section 55 counter-reviews Claude's record and implements owner-authorized ARV2-4F-B4 as a candidate; section 56 accepts B4 after one P3 test-only correction, and section 57 completes Codex counter-review with no production-module correction. Section 58 implements source-only B5A; sections 59-60 accept it after counter-review corrections. Section 61 implements B5B as a Codex candidate pending Claude review. All production-input/outcome/QC-job/result/deployment/order/trading authorizations refuse. |
-| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the receipt, stock-v3, and post-pandemic supplement modules remain in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The synthetic QC-contract/core sibling is independently source-audited, and the outcome-free V2 package is forbidden from reverse-importing it. The atomic writer is callable only through one importer-scoped receipt call. The successor retains no receipt export: one exact synchronous helper imports only the persisted-requirement and artifact-hash functions locally, discards the requirement result, returns only the hash, catches every exception without exporting the caught traceback, a restricted binding/object, or an arbitrary interrupt argument, propagates only fresh exact built-in operator interrupts, and is sealed as a no-module-object facade. Process-local authority state and child-reset hooks are not general exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. Section 42 retains and verifies the complete exact mapping-proxy/tuple topology of all fourteen loader-created authorities before semantic traversal, checks exact scalar and receipt-disposition types, and covers both loaded and persisted receipt entry points. Section 44 adds focused regression coverage for exact mapping-key identity and the independently load-bearing receipt disposition preflight without changing production code. Section 48 authenticates exported QC-core scalar identities before caller comparisons and reconciles benchmark availability by physical session across entry, valuation, and exit roles. Section 49 adds a content-addressed schema/manifest module whose descriptor derivation is independently checked against the authenticated synthetic candidate and whose loader operates on canonical metadata bytes only. Section 51 adds a separate exact-byte decoder/bundle authority and pure core-composition boundary with bounded canonical rerendering and fail-closed dependency topology. Section 53 adds only a content-addressed nine-object logical namespace, immutable in-memory fixture, and exact resolver into B2. Section 55 adds a separate value-only Object Store read plan/transcript and test-side exact transitive closure for all QC-package modules. Section 58 adds one source-only QCAlgorithm scaffold whose initialization raises before this source invokes any LEAN service. Section 61 adds a separate pure source-assembly contract that authenticates exact local bytes and project paths, derives only inert future Object Store calls, and keeps `main.py` always refusing. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. No filesystem/provider/physical Object Store transport, production admission path, enabled LEAN adapter, QC project/configuration, uploader, compiler, runner, result reader, or order surface exists. The only `QCAlgorithm`/`main.py` surface is the inert B5B source/name scaffold; it is not a project or executable adapter. The static firewall and B5B bootstrap/source-authentication checks are reviewed pure-Python controls, not an OS sandbox; arbitrary debugger/tracer mutation of private frame locals or internal callable code at return is outside this contract. In-place mutation of dataclass reflective metadata is also not authenticated; explicit constructors, public fields, canonical bytes, and authority values remain the behavioral contract. The broader pre-existing computed-reflection limitation is documented in section 32 rather than misrepresented as runtime isolation. | Sections 56-57 accept B4 after one test-only correction and repair the lane record; no production module changed. Section 58 implements source-only B5A; sections 59-60 accept it after counter-review corrections. Section 61 implements offline B5B pending Claude review and adds its module to the exact QC-package no-I/O closure. The shared LEAN policy guard remains inside the standing lane collection. Accepted ancestors and section-34 production behavior remain unchanged. |
+| Preregistration and outcome gate | A strict draft-spec loader, semantic validator, reviewed-source checks, immutable lineage bindings, one-use period rules, and fail-closed outcome permit boundary exist. The retired 2026-09-01 through 2027-08-31 period refuses as superseded unspent. Exact loaders authenticate the accepted QC-first parent and corrected ARV2-4A/4B/4C/4D-A structural descendants while every side-effect capability remains literal false. ARV2-3Q-F adds an authenticated four-family multiplicity overlay with no fallback to the old `1/60` allocation. Accepted B1 adds the calibration-input manifest schema; accepted B2 adds production-shaped metadata admission. Section 30's partial B scaffold can authenticate and compute only after separate reviewed production truth and operation-authority artifacts are pinned, and its persisted receipt can feed only the inert stock-v3 successor. ARV2-4E-A adds an inert, content-addressed 2021-2025 complete-fold sensitivity plus a separately hashed partial-2026 exploratory geometry; it preserves the formal primary, the superseded prospective period, and the shared holdout. Sections 46-48 establish and review only an in-memory, synthetic LEAN-facing run candidate and deterministic fixed-horizon event-study batch contract. Final cash, bankruptcy, and delisting payoffs use the frozen benchmark-splice convention; stock and mixed mergers remain successor-valued. Section 49 adds the exact seven-role ARV2-4F-B1 global-input schema and canonical synthetic metadata boundary; section 50 accepts that cumulative snapshot. Section 51 adds only caller-supplied synthetic payload admission and pure composition into the reviewed core; section 52 accepts it after a test correction. Section 53 corrects B2 diagnostics and lazy calendar initialization and adds an exact nine-object synthetic logical layout/resolver; section 54 accepts it. Section 55 adds only a fixed synthetic project namespace, synthetic quota observations, and an exact value-only read plan/transcript that delegates back through B3; none creates an executable QC job. Section 58 adds only an always-refusing QCAlgorithm source scaffold with inert accepted-identity and fold bindings. Section 61 adds an offline authenticated eleven-file source inventory and an inert eighteen-call Object Store projection while preserving that refusal. | Later executable-spec integration remains required. No accepted production global-input manifest/package, reviewed production-truth approval, implemented evidence opener, exact operation-authority pin, issued production receipt/successor, authenticated production payload/row lineage, source/run binding, upload/compile/launch authority, evaluation authority, result-disposition authority, paper look, or deployment authority exists. Every future outcome-bearing composition must authenticate separately reviewed multiplicity and power-protocol leaves and obtain the separately withheld ARV2-4 outcome authority. | Old prospective candidate retired with zero looks; accepted structural milestones remain unchanged. Section 54 accepts B3; section 55 counter-reviews Claude's record and implements owner-authorized ARV2-4F-B4 as a candidate; section 56 accepts B4 after one P3 test-only correction, and section 57 completes Codex counter-review with no production-module correction. Section 58 implements source-only B5A; sections 59-60 accept it after counter-review corrections. Section 61 implements B5B; section 62 accepts it, and section 63 accepts Claude's record after prospective correction. All production-input/outcome/QC-job/result/deployment/order/trading authorizations refuse. |
+| Architecture and legacy quarantine | The V2 package is registered as a research entry point, guarded against reverse imports from legacy ACER, and keeps legacy outcome runners non-new/non-V2 with no network fallback. The accepted ancestry plus the receipt, stock-v3, and post-pandemic supplement modules remain in the exact transitive import firewall and reach neither outcomes, execution, QC transport, nor legacy ACER. The synthetic QC-contract/core sibling is independently source-audited, and the outcome-free V2 package is forbidden from reverse-importing it. The atomic writer is callable only through one importer-scoped receipt call. The successor retains no receipt export: one exact synchronous helper imports only the persisted-requirement and artifact-hash functions locally, discards the requirement result, returns only the hash, catches every exception without exporting the caught traceback, a restricted binding/object, or an arbitrary interrupt argument, propagates only fresh exact built-in operator interrupts, and is sealed as a no-module-object facade. Process-local authority state and child-reset hooks are not general exports. Structural evidence remains fixture-only and every consumer reauthenticates nested immutable lineage. Section 42 retains and verifies the complete exact mapping-proxy/tuple topology of all fourteen loader-created authorities before semantic traversal, checks exact scalar and receipt-disposition types, and covers both loaded and persisted receipt entry points. Section 44 adds focused regression coverage for exact mapping-key identity and the independently load-bearing receipt disposition preflight without changing production code. Section 48 authenticates exported QC-core scalar identities before caller comparisons and reconciles benchmark availability by physical session across entry, valuation, and exit roles. Section 49 adds a content-addressed schema/manifest module whose descriptor derivation is independently checked against the authenticated synthetic candidate and whose loader operates on canonical metadata bytes only. Section 51 adds a separate exact-byte decoder/bundle authority and pure core-composition boundary with bounded canonical rerendering and fail-closed dependency topology. Section 53 adds only a content-addressed nine-object logical namespace, immutable in-memory fixture, and exact resolver into B2. Section 55 adds a separate value-only Object Store read plan/transcript and test-side exact transitive closure for all QC-package modules. Section 58 adds one source-only QCAlgorithm scaffold whose initialization raises before this source invokes any LEAN service. Section 61 adds a separate pure source-assembly contract that authenticates exact local bytes and project paths, derives only inert future Object Store calls, and keeps `main.py` always refusing. | Production source, ontology, security-master, institution, common-event, classification, quality, truth/input authority, outcome, look, QC, and execution authorities remain absent or zero-access. No filesystem/provider/physical Object Store transport, production admission path, enabled LEAN adapter, QC project/configuration, uploader, compiler, runner, result reader, or order surface exists. The only `QCAlgorithm`/`main.py` surface is the inert B5B source/name scaffold; it is not a project or executable adapter. The static firewall and B5B bootstrap/source-authentication checks are reviewed pure-Python controls, not an OS sandbox; arbitrary debugger/tracer mutation of private frame locals or internal callable code at return is outside this contract. In-place mutation of dataclass reflective metadata is also not authenticated; explicit constructors, public fields, canonical bytes, and authority values remain the behavioral contract. The broader pre-existing computed-reflection limitation is documented in section 32 rather than misrepresented as runtime isolation. | Sections 56-57 accept B4 after one test-only correction and repair the lane record; no production module changed. Section 58 implements source-only B5A; sections 59-60 accept it after counter-review corrections. Section 61 implements offline B5B and adds its module to the exact QC-package no-I/O closure; section 62 accepts it and section 63 counter-reviews that record. The shared LEAN policy guard remains inside the standing lane collection. Accepted ancestors and section-34 production behavior remain unchanged. |
 
 The production source, firm-ontology, security-master, classification, cost,
 and rank catalogs remain empty. The canonical source authority permits no
@@ -616,12 +625,36 @@ implements owner-authorized ARV2-4F-B5B at `20f4811`: an offline authenticated
 source inventory and host-side future-call projection, not a physical adapter,
 QC-ready project, compile-ready project, or backtest-ready project. Claude reviewed that
 cumulative `322c7ee..5375edd` range in section 62 and accepted all four
-commits with no code correction; Codex counter-reviews section 62 next. Production truth,
-rights/PIT and terminal-payoff evidence, the physical adapter, authenticated
-runtime/project namespace/dependencies/quota, upload, cloud compile, atomic
-evaluation authority, launch, result access/disposition, deployment, orders,
-and trading remain separately closed. No QC account or provider action starts
-in this round.
+commits with no code correction. Section 63 accepts Claude's record-only commit
+`f45be5b` after five prospective P3 record/process corrections; no B5B code or
+test correction is required.
+
+The owner now directs the lane to treat the configured Massive/Benzinga
+Ratings, Earnings, and Corporate Guidance histories as sufficiently reliable
+for the initial 2021-start backtest without awaiting a vendor reply. Section 63
+records that as an owner risk acceptance rather than a vendor attestation. If
+contrary evidence later surfaces, every dependent result is invalidated, the
+affected inputs are rebuilt, and the complete affected backtest is rerun; the
+original immutable development-evaluation ID, result, and audit trail remain
+locked and the rerun is linked as a correction rather than a fresh blind retry.
+The prospective permanent look and formal alpha remain unspent and unchanged.
+Exact content-addressed source artifacts and their still-null truth/input
+authority pins must nevertheless be constructed and reviewed.
+
+The owner also reports that CRSP does not sell an individual-investor product.
+Its suggested Fama-French, Shiller, and FRED resources do not replace the
+security-level terminal shareholder payoff required here. The next recommended
+step is therefore a separately authorized, outcome-free terminal-event census.
+Its exact case count and event mix should decide whether to use a low-cost
+Sharadar corporate-action base plus an auditable SEC/FINRA/court-record
+exception ledger or seek one-off EDI and comparison quotes. No route is
+selected or purchased by this record-only round. The physical adapter,
+authenticated runtime/project namespace/dependencies/quota, upload, cloud
+compile, atomic evaluation authority, launch, result access/disposition,
+deployment, orders, and trading remain separately closed. No private
+credential, paid/licensed row, security-level outcome row, production endpoint,
+QC-account, or production-input action occurs in this round; only public web
+documentation and public provider metadata were read.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -2257,6 +2290,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-11 | Codex counter-review | `322c7ee` -> `fcc6d7c` and this record commit | Accept the B5A review after lane-record and validation-scope correction; no later milestone authorized | Counter-reviewed Claude's one record commit individually and cumulatively. Preserved its substantive B5A acceptance, corrected the stale section-4 handoff, qualified the reversed static-versus-behavioral coverage description, and closed `ARV2R41-001` with a lane-local collection bridge that inherits all shared LEAN policy cases. Added a generalized latest-section handoff regression. No production, B5A source, accepted ancestor, spec, firewall, root plan/handoff, credential, provider, input, outcome, physical Object Store, or QC surface changed or was used. | Received focused selection **170 passed**; stale-handoff regression red then green; bridge **84 passed** and bridge plus direct shared guard **168 passed**; complete Analyst lane **2,773 passed, 7 skipped, 0 failed in 373.93 s (6:13)** on Python 3.13.15. Complete repository suite not run. Zero research looks and zero development evaluations. | **1 P2 and 3 P3** (`ARV2CR42-001..004`), corrected, qualified, or documented prospectively. Claude review quality **7/10**; corrected B5A tree **9/10**. No out-of-lane finding. | Make exactly one same-lane push after the exact remote-tip and final validation checks. Claude reviews `fcc6d7c` and this record commit. The ladder has no authorized B5B; physical B5 and ARV2-4 remain gated. |
 | 2026-09-11 | Claude review | `5375edd` -> this record commit; no code change; Codex resolves the exact pushed head | Independent review of the section-60 counter-review `fcc6d7c`/`37a13b6` and the ARV2-4F-B5B offline source assembly `20f4811`/`5375edd` | Reviewed all four commits in `322c7ee..5375edd` with explicit dispositions (section 62); accepted with no code correction and no new P0-P2. Verified rather than accepted: the B5B schema identity, semantic hash and 6,733-byte artifact reproduce and re-render stably; the synthetic assembly ID, semantic hash and 16,231-byte artifact reproduce; the inventory is exactly 11 canonical-LF files totalling 509,109 bytes with a 140,983-byte largest member; `main.py` is byte-identical to the committed scaffold; the projection is 18 alternating `contains_key`/`read_bytes` data records over B4's 9 keys with neither method called; all seven safety flags, 27 null bindings and 17 false capabilities hold; the module has no execution primitive and is now inside the package no-I/O closure. Nine of nine independent single-guard mutations were caught. | Standing Analyst lane selection at `5375edd` **2,880 passed, 7 skipped, 0 failed in 501.81 s (8:21)**, reproducing section 61.4 exactly; five-file focused selection (assembly, scaffold, shared guard, lane-record, B4) **281 passed** on the clean committed tree; ML/import boundary **11 passed**; active-document plus lane-record gates **71 passed**; shared-guard bridge **84 collected** inside the standing selection; complete repository suite not run per the owner's lane-suite instruction (34.6); `git diff --check` clean; Python 3.13.15. | Review: 0 P0/P1/P2; 0 P3 defects; 1 P3 observation (`ARV2R43-001`, three shared project files are now pinned by exact SHA-256 inside the lane); all four `ARV2CR42` findings confirmed against this session's own section 59. Python 3.13.15. Zero research looks, zero development evaluations, no credential/provider/input/outcome/QC/Object Store/deployment/order access by this review. | Codex counter-reviews this record commit; the physical adapter, project, upload, compile, launch, result, deployment, order and trading gates all remain closed. |
 | 2026-09-11 | Codex ARV2-4F-B5B implementation | `37a13b6` -> `20f4811` and this record commit; Claude reviews cumulative `322c7ee` through this record | Complete the missing implementation half of the prior Codex round by adding an offline authenticated LEAN source inventory and future Object Store call projection, without a physical adapter or QC action | No new Claude review arrived after section 60. Preserved the already-pushed `fcc6d7c` counter-review and `37a13b6` record, then added `lean_source_assembly.py`, upgraded the inert `main.py` scaffold identity to B5B, and extended the QC-package no-I/O closure. The content-addressed assembly authenticates eleven exact canonical-LF Python sources, projects one entry plus nested project paths, rebuilds detached B2/B4 lineage, and derives eighteen alternating `contains_key`/`read_bytes` value bindings. A closure-bound bootstrap refuses coordinated registry/oracle bypass before hostile callbacks. Formal 2020-2025 primary and descriptive 2021-2025 sensitivity stay separate. No physical adapter, provider/input/outcome/QC/broker/deployment/order/trading surface was used. | B5B focused **195 passed in 224.15 s**; QC-adjacent slice **912 passed in 267.72 s**; import boundary **11 passed in 4.34 s**; complete Analyst lane **2,880 passed, 7 skipped in 498.47 s**; active-document/lane-record gate **71 passed**. Python 3.13.15. Complete repository suite not run. **Zero research looks and zero development evaluations.** | Implementation/audit findings `ARV2I4FB5B-001..010` are corrected; `ARV2I4FB5B-011` is the explicitly bounded P3 reflective-metadata observation. Final code audit found no remaining P0-P3 in the bounded behavioral scope. Mutation evidence: **65/65**, then **15/15**, then final bootstrap delta **6/6** non-equivalent mutants killed, zero survivors; interrupted/stale runs are not counted as failures. Inherited out-of-lane `ARV2CR28-008` remains documented and unfixed. | Make exactly one same-lane push after exact final checks. Claude disposes `fcc6d7c`, `37a13b6`, `20f4811`, and this record commit individually and cumulatively. Physical adapter, production evidence/authority, authenticated QC runtime/project constraints, upload, compile, backtest, result, deployment, order, and trading gates remain closed. |
+| 2026-09-11 | Codex counter-review and owner source-decision record | `f45be5b` -> this record commit | Accept the section-62 technical review after prospective record correction; record the owner's Massive reliability/rerun rule and CRSP-alternative assessment without opening data or outcomes | Counter-reviewed Claude's one record-only commit. Preserved its substantive B5B acceptance and already-pushed historical text while prospectively correcting the reversed append-only ledger order, 27-versus-37 binding count, shared-file workflow recommendation, and source-compilation/runtime-closure wording. Recorded the owner's decision to accept Massive/Benzinga historical reliability for the initial 2021-start backtest and to invalidate/rebuild/rerun if contrary evidence appears, retaining and linking the immutable original development evaluation while leaving the future permanent look/formal alpha unspent. Recorded the owner-reported CRSP response and evaluated public documentation plus public provider metadata for alternatives; no production/test code changed. | Counter-audit five-file B5B/record selection **281 passed**; active-document plus lane-record **71 passed**; ML/import boundary **11 passed**; identities and the exact 37-null/17-false authority census reproduced. Final complete Analyst-lane validation: **2,880 passed, 7 skipped, 0 failed in 524.19 s (8:44)**. The first in-progress run was deliberately cancelled after **2,186 passed, 7 skipped** because the draft record changed; it is not completion evidence. Complete repository suite not run. **Zero research looks and zero development evaluations.** No private credential, paid/licensed row, security-level outcome, production endpoint/input, QC, broker, deployment, order, or trading access. | Counter-review: **0 P0/P1/P2; 5 P3** (`ARV2CR44-001..005`), corrected, qualified, or documented prospectively. Draft-record self-review: **2 P2 and 4 P3 corrected** (`ARV2D44-001..006`). Claude review record **7/10**; B5B tree **9/10**. Massive reliability is owner-assumed for the first run, not vendor-attested. CRSP's suggested aggregate sources are not terminal-payoff substitutes. | Owner authorizes an outcome-free terminal-event census; its counts then determine the source route described in section 63 unless the owner selects sooner. Only a later, separately authorized round may construct content-addressed terminal-source artifacts and advance the physical-adapter/QC ladder. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -9548,3 +9582,277 @@ vintage, terminal payoff or outcome. The physical adapter, authenticated
 project namespace and quota, upload, cloud compile, atomic evaluation
 authority, launch, result access and disposition, deployment, orders and
 trading all remain separately gated and are not advanced by this acceptance.
+
+## 63. Codex counter-review and owner data-source decisions, 2026-09-11
+
+**Pushed Claude head counter-reviewed:**
+`f45be5b98894448e3e9abe7414f789d3aff352e9`, one record-only commit on
+`codex/strategy-analyst-revisions-v2`.
+**Disposition: ACCEPTED AFTER PROSPECTIVE RECORD CORRECTION.** Claude's
+substantive acceptance of `fcc6d7c`, `37a13b6`, `20f4811`, and `5375edd`
+stands. No B5B production or test correction is required. The received record
+has 0 P0, 0 P1, 0 P2, and five P3 documentation/process findings
+(`ARV2CR44-001..005`), corrected, qualified, or documented prospectively here
+without rewriting historical section 62 or its already-pushed ledger row.
+
+This is also the lane's durable record of two owner data-source decisions.
+It does not open a provider, production-input, outcome, QuantConnect, result,
+deployment, order, or trading capability. **Zero research looks and zero
+development evaluations** occurred in this round.
+
+### 63.1 Commit disposition and independent verification
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `f45be5b` | **Accepted after prospective record correction** | Changes only this lane record (`+164/-5`). The underlying B5B identities, projected source inventory, inert call projection, refusal boundary, authority exclusions, and focused validation reproduce. The five P3 record/process issues are reconciled below. |
+| this record commit | Codex record | Records the exact counter-review, corrects live-state interpretation prospectively, appends one new ledger row at the physical end of section 5, and records the owner's Massive and CRSP-source decisions. |
+
+The schema reproduces as 6,733 bytes with ID
+`arv2-qc-lean-source-assembly-ae4c1324f36cc6fc`, semantic SHA-256
+`ae4c1324f36cc6fca0218f474bdc091bf82862e8f21ada35e01a09b022bb77a5`,
+and artifact SHA-256
+`532aeb471fed96c525f8be9db84694c546c1cccc6008347a43efadfac678ac20`.
+The synthetic assembly reproduces as 16,231 bytes with ID
+`arv2-qc-lean-source-assembly-8303f3323ff16ab7`, semantic SHA-256
+`8303f3323ff16ab7da6c03c587bfbbf4a8d8ecb356eb8912307c2c78a75c1266`,
+and artifact SHA-256
+`56d3f77e731f6a13b5dbfb9bcbfcd8e89261a226400b744cf2c0fa3d3b400bdd`.
+
+All eleven source hashes reproduce; their aggregate is 509,109 bytes and the
+largest member is 140,983 bytes. `main.py` is byte-identical to the committed
+scaffold. The projection contains exactly eighteen alternating
+`contains_key`/`read_bytes` value records over B4's nine keys. The seven truth
+fields have their recorded values, all seventeen capabilities are false, and
+all **thirty-seven** external bindings are null.
+
+### 63.2 Counter-review findings
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| `ARV2CR44-001` | P3 | `f45be5b` inserted its Claude-review row immediately before the already-existing B5B implementation row even though section 5 requires every new row to be appended and section 62.2 calls it an appended row. This leaves the physical causal order reversed. | Documented prospectively. The pushed historical row is not moved or rewritten, consistent with the lane's treatment of prior append-only violations. This section's Codex row is appended after the B5B row, and future rows remain physical appends. |
+| `ARV2CR44-002` | P3 | The Claude ledger row says B5B has 27 null external bindings. Twenty-seven is B3's count; B4 has 32 and B5B adds five, for exactly 37. | Corrected prospectively here. Independent construction confirms 37 of 37 bindings are `None`; no code change is required. |
+| `ARV2CR44-003` | P3 | `ARV2R43-001` correctly observes that three shared-file byte identities are pinned, but overstates the workflow by saying a shared-file author necessarily would not run the Analyst lane and prescribes re-pinning after every change. No later shared-file synchronization is authorized by inference, and a hash trust root must not update automatically. | **Partially correct; closed after qualification.** If the owner authorizes changed shared bytes to enter this lane, the B5B-focused and complete Analyst-lane suites must run. `EXPECTED_SOURCE_FILES` changes only after review confirms that the exact changed bytes intentionally belong in the projected source inventory; otherwise the existing pin correctly refuses them. The current live-source test already detects drift, so no new test is required. |
+| `ARV2CR44-004` | P3 | Section 62.3 says the module contains no `compile`, although it deliberately pins and uses `re.compile`. | Corrected prospectively: it contains no built-in source-code compilation or execution primitive. Regex compilation is present and harmless. |
+| `ARV2CR44-005` | P3 | Section 62.3 calls the eleven files “the LEAN runtime closure.” That is not yet proved: `main.py` imports no QC sibling, the flat `event_study.py` upload binding remains unreconciled with the nested path, and nested-path acceptance, runtime dependencies, and project quota remain unauthenticated. | Corrected prospectively: the eleven files are the exact authenticated **projected source inventory** for a future adapter, not an authenticated executable LEAN runtime closure. All physical-adapter and QC-runtime gates remain closed. |
+
+### 63.2A Codex pre-commit record self-review
+
+The following defects were found in this section's uncommitted draft and
+corrected before validation. They are retained so Claude can review both the
+source decision and the precision of its record.
+
+| ID | Severity | Finding and evidence | Correction and verification |
+|---|---|---|---|
+| `ARV2D44-001` | P2 | The first draft said a corrected initial historical rerun left a permanent research look consumed. That contradicted the frozen QC plan: the historical run is development evaluation `arv2-eval-stock-historical-qc-001`; the permanent look and formal alpha remain unspent. | Corrected the banner, section 4, section 5, and 63.3 to retain/link the immutable development evaluation while leaving `confirmatory_alpha_spent=false` and `1/80` unchanged. The first in-progress lane run was intentionally cancelled after 2,186 passes and 7 skips because this record changed; it is not completion evidence. |
+| `ARV2D44-002` | P3 | The draft said Sharadar could automate ordinary cash, stock, and mixed terminal outcomes. The linked public documentation exposes generic action records but does not document a complete terminal-payoff field or prove the semantics and completeness needed for that conclusion. | Narrowed Sharadar to a census, price, and simple action/discovery aid; retained independent PIT identity, economic-availability, price-basis, successor-valuation, CVR/election, liquidation, later-distribution, and zero-recovery gates. |
+| `ARV2D44-003` | P3 | The draft called all five Claude findings corrected even though `ARV2CR44-001` is documented only and `ARV2CR44-003` is qualified. | Normalized the disposition to “corrected, qualified, or documented prospectively” everywhere. |
+| `ARV2D44-004` | P2 | The draft's live handoff required choosing Sharadar or EDI before the very outcome-free census meant to determine the case volume and source need. That reversed its evidence-led sequence. | Section 4, the ledger, and 63.6 now make separate authorization of the outcome-free terminal-event census the next recommendation; source selection follows its counts unless the owner chooses sooner. |
+| `ARV2D44-005` | P3 | The draft understated Sharadar's personal-license restrictions and claimed no provider endpoint was read, although public test-key action-type metadata was consulted. | Added the disclosure/retention/cloud/AI/artifact-rights caveats and accurately limits the exclusion to private credentials, paid/licensed rows, security-level outcomes, and production endpoints. |
+| `ARV2D44-006` | P3 | The draft blurred the lane's frozen payoff convention with literal CRSP behavior and overstated FINRA notices as a way to resolve OTC value. | Distinguished economic equivalence from row replication; recorded CRSP's qualifying later-price path and missing treatment; limited FINRA to chronology/action evidence; required a separately evidenced OTC price/payoff or unresolved refusal. |
+
+### 63.3 Owner Massive reliability and rerun decision
+
+The owner directs the lane to treat the configured Massive/Benzinga Analyst
+Ratings, Earnings, and Corporate Guidance historical data as sufficiently
+reliable for the initial owner-directed 2021-start backtest. The lane will not
+wait for a further Massive/Benzinga support response about original historical
+versions, corrections/deletions, or arrival semantics before constructing the
+first-run inputs. This is an explicit **owner assumption and risk acceptance**,
+not a representation that Massive supplied evidence it has not supplied.
+
+This decision retires only the pending vendor-confirmation blocker for that
+first run. It does not turn prior HTTP-200 probes into production evidence and
+does not self-populate the section-30 production-truth approval, evidence
+opener, input-authority pins, or any outcome/QC authority. When a later
+authorized builder consumes the data, it must still preserve the exact query,
+acquisition instant, raw response bytes or immutable export, content hashes,
+pagination/completeness evidence, and transformation lineage required by the
+existing contracts.
+
+If later evidence materially contradicts the reliability assumption, the lane
+must:
+
+1. mark every affected result invalid/superseded rather than silently editing
+   it;
+2. retain the original source and result audit trail;
+3. rebuild affected inputs from clean, corrected evidence; and
+4. rerun the complete affected backtest under the frozen specification.
+
+The initial historical QC run is the frozen development evaluation
+`arv2-eval-stock-historical-qc-001`, not the permanent confirmatory look. A
+rerun cannot erase an outcome already observed: the original immutable
+development-evaluation ID, result, and audit trail stay recorded and locked,
+and the corrected rerun is explicitly linked rather than treated as a fresh
+blind retry. The prospective permanent look remains unspent, its formal
+`1/80` alpha remains unchanged, and `confirmatory_alpha_spent` remains false.
+
+### 63.4 Owner-reported CRSP response and semantic requirement
+
+The owner reports that CRSP replied privately that it does not offer a product
+for individual investors and serves institutions, and suggested the
+Fama-French Data Library, Robert Shiller's PE10 data, and Federal Reserve
+Economic Data (FRED). This record treats the correspondence as an
+owner-reported vendor response; it does not publish or claim independent
+verification of the private email.
+
+Those suggestions do not fill this lane's terminal-return role. The official
+[Fama-French Data Library](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_Library.html)
+describes research factors and formed-portfolio returns,
+[Shiller's public data](https://www.econ.yale.edu/~shiller/data.htm) describes
+long-run market and valuation series, and
+[FRED](https://fred.stlouisfed.org/) describes macroeconomic series. Their
+official descriptions do not document per-security post-delisting
+consideration. They may be candidates only for a separately specified
+benchmark, factor, or macro control; they cannot be relabeled as a terminal
+shareholder-payoff source.
+
+The required semantics, rather than the CRSP brand, remain controlling. CRSP's
+[public stock-data description](https://www.crsp.org/crsp_pdf/crsp-us-stock-indexes-databases-data-descriptions-guide-crspaccess/)
+says valid delisting payment information may be a qualifying quoted/traded
+later price or a complete set of payments received for the shares, and reports
+missing when information is insufficient; its return treatment also accounts
+for applicable distributions between the last trade and payment. The lane's
+already-frozen convention is deliberately explicit about terminal payoff,
+successor valuation, and benchmark splicing; this route seeks economic
+equivalence for that convention, not byte-for-byte or row-for-row replication
+of CRSP `DLRET`. A last exchange close, a delisting flag, a last market cap, or
+an unevidenced zero is not an acceptable substitute. Zero requires affirmative
+worthlessness/share-cancellation or no-recovery evidence under the frozen
+contract; a genuinely unresolved case remains missing/refused.
+
+### 63.5 Recommended CRSP-alternative route
+
+No publicly documented retail product found in this review is a complete,
+drop-in CRSP delisting-return replacement. The recommended cost-controlled
+route is a staged evidence ledger:
+
+1. First construct an **outcome-free terminal-event census** for the fixed
+   2021-start first-round universe. It enumerates candidate terminal names and
+   dates and records a provisional event type only where already evidenced;
+   otherwise the type remains unknown pending source adjudication. The count
+   and known/unknown mix are measured before buying another feed. Constructing
+   or reading that production census remains a separately authorized future
+   operation.
+2. Use **Sharadar Direct Prices 10 Years** as the leading low-cost base
+   candidate if its license is cleared for the intended processing. As checked
+   on 2026-09-11, its [public plan page](https://sharadar.com/subscribe) lists
+   USD 19/month or USD 199/year and includes `tickers`, `stocks`, and `actions`. Its
+   [corporate-actions documentation](https://sharadar.com/docs/actions) says
+   the table covers active and delisted tickers, delisting dates/reasons,
+   acquisition counterparties, dividends, splits, spinoffs, and a maximum
+   table history beginning in 1998; the purchased 10-year entitlement is
+   rolling, and the five-year tier would omit early 2021. That supports the
+   event census, counterparty linkage, prices, and simple action discovery; it
+   does not document a CRSP-like terminal-return field. The generic
+   `date`/`action`/`value` fields must not be assigned cash, stock, payment-date,
+   liquidation-recovery, or finality semantics until those meanings and their
+   completeness are validated for each action type. The independent PIT
+   identity crosswalk, economic-availability date, raw price-adjustment basis,
+   successor valuation, CVRs/elections/proration, later distributions, and
+   affirmative zero recovery must therefore be proved separately. Unproved
+   cases remain unresolved rather than guessed.
+3. Resolve exceptions with authoritative primary records: SEC merger/tender/
+   liquidation filings through the
+   [EDGAR APIs](https://www.sec.gov/search-filings/edgar-application-programming-interfaces),
+   final/amended issuer or paying-agent notices, and bankruptcy plans/orders
+   through [PACER](https://www.uscourts.gov/court-records/find-a-case-pacer)
+   when necessary. FINRA OTC Daily List/UPC notices can corroborate additions,
+   deletions, identity changes, announced distributions, worthless
+   determinations, and updates/cancellations; they do not provide a qualifying
+   later OTC price or certify complete terminal payoff. A preliminary filing,
+   missing notice, or Form 25/15 never proves zero. Every adjudication must
+   carry document identity, dates, final-versus-interim status, extracted
+   consideration, reviewer, and a reproducible calculation under one frozen
+   outcome-observation cutoff. A security with unproved value at that cutoff,
+   especially a recent liquidation, remains explicitly unresolved.
+4. If the census shows too many unresolved or labor-intensive cases, request
+   a narrowly scoped **one-off EDI historical extract** before considering a
+   broad institutional feed. EDI publicly offers customized one-off historical
+   corporate-action/dividend purchases and lists bankruptcies, liquidations,
+   mergers, security swaps, returns of capital, and distributions among its
+   events; its API schema includes cash and noncash liquidation distributions.
+   A quote must be scoped to U.S. common-share/ADR delistings from 2021-01-01
+   through 2025-12-31 and explicitly confirm all subsequent payments through a
+   fixed observation cutoff, inactive/OTC securities,
+   actual/default consideration, elections/proration, CVRs, cash in lieu,
+   successor identifiers and ratios, revisions/cancellations,
+   final-versus-interim status, and evidenced zero recovery. Request sample
+   cases and written individual eligibility, retention, review/disclosure, and
+   QC/cloud/AI processing rights. The public schema proves fields named
+   `CashLiqDist` and `NoncashLiqDist`, not their completeness or fitness for
+   this lane. [EDI product](https://www.exchange-data.com/product/worldwide-corporate-actions-data/)
+   and [historical API schema](https://developer.exchange-data.com/api-documentation/world_corporate_actions/GetHistoricalCorporateActions).
+
+Sharadar's [Personal Use License](https://sharadar.com/terms) applies only
+to a natural person's personal, non-professional use, restricts sharing, and
+requires deletion of raw/cached/reproducible data within 30 days after
+termination while allowing retention of non-reconstructive backtest outputs.
+It also restricts external disclosure of conclusions about data value,
+usability, or fitness without written approval. Those terms do not expressly
+authorize QC/cloud/AI processing, persistent per-security derived artifacts,
+or Codex/Claude inspection of raw rows. Before using it, obtain written
+clearance for the exact local processing, artifact, review/disclosure,
+retention, and QC-upload model; absent that clearance, user-operated
+deterministic local processing must keep every raw row away from Codex, Claude,
+and QC, and even a derived artifact remains unapproved until its rights are
+clear. This question applies only if Sharadar is selected and does not reopen
+the owner's Massive decision.
+
+EDI is the first one-off quote;
+[LSEG Corporate Actions](https://www.lseg.com/en/data-catalogue/corporate-actions)
+is the comparison quote.
+[ICE Corporate Actions](https://developer.ice.com/fixed-income-data-services/catalog/ice-reference-data-corporate-actions)
+and S&P are lower-priority sales-contact candidates unless already licensed or
+competitive. [S&P Managed Corporate Actions](https://www.marketplace.spglobal.com/en/datasets/managed-corporate-actions-mca-%281666897737%29)
+is publicly marked non-point-in-time while point-in-time deal consideration is
+a separate Transactions product; this implies multiple feeds could be needed
+without yet proving complete terminal payoff. Individual eligibility and
+prices for all four institutional candidates remain unknown until quoted.
+Norgate explicitly documents that it
+provides neither a delisting return nor information after delisting and treats
+the final bar only as an approximation; ordinary delisted price feeds and the
+QuantConnect delisting event likewise cannot by themselves prove the complete
+shareholder outcome. [Norgate FAQ](https://norgatedata.com/data-package-faq.php)
+
+### 63.6 Validation, exclusions, and handoff to Claude
+
+- Counter-audit five-file B5B/record selection: **281 passed in 225.42 s**.
+- Active-document plus lane-record gates: **71 passed**.
+- ML/import boundary: **11 passed in 4.53 s**.
+- Schema, assembly, projected-source, flag, binding, capability, and projection
+  identities reproduced independently.
+- Final complete Analyst-lane selection: **2,880 passed, 7 skipped, 0 failed
+  in 524.19 s (8:44)**.
+- `git diff --check`: clean; Python **3.13.15**.
+- The complete repository suite was not run, per the owner's lane-suite rule.
+
+No implementation milestone, schema, contract, source module, test, accepted
+specification, firewall, root Action Plan, root Session Handoff, or shared file
+changed in this round. No private credential, paid/licensed row,
+security-level outcome row, production endpoint/input, QuantConnect
+account/project/Object Store, upload, compile, launch, result, broker,
+deployment, order, or trading surface was accessed. Public web documentation
+and Sharadar's public test-key action-type metadata were read for the source
+assessment.
+
+Claude should review this record commit, including all five prospective
+counter-review findings, all six corrected pre-commit record findings, the
+distinction between owner assumption and vendor attestation, the locked
+development-evaluation/no-alpha-spend rerun rule, and the terminal-source
+assessment. The next recommended action is owner authorization for an
+outcome-free terminal-event census; source selection follows its exact counts
+unless the owner chooses sooner. A later, separately authorized implementation
+round can then construct the exact content-addressed terminal-source artifacts
+and advance the still-closed physical-adapter/QC ladder. B5B remains an offline
+authenticated projected source inventory and inert host-side call projection,
+not a runtime closure, physical adapter, authenticated QC project, upload,
+compile, backtest, or result surface.
+
+### 63.7 Quality assessment
+
+Claude's substantive technical review is accepted, but the section-62 record
+is **7/10** because it reversed the append-only ledger order, inherited B3's
+binding count, overstated the shared-file workflow, and used two overly broad
+technical labels. The underlying B5B implementation remains **9/10** and
+requires no correction. This Codex round is documentation-only and is not a
+claim that the initial backtest or any production data path is ready.

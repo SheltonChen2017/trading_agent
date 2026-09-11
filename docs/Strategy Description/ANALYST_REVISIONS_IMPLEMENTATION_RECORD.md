@@ -590,10 +590,13 @@ the previously anticipated physical B5 boundary. Production transport, a real
 Object Store adapter, authenticated project namespace and account quota, and
 every QuantConnect or outcome-bearing action remain separately gated; none is
 inferred from the source scaffold, synthetic milestones, or QC subscription.
-Section 58 implements that exact B5A source candidate at `ed98623`, pending
-Claude's independent review. The next step is review of `acc30e9`, `ed98623`,
-and the section-58 record commit; no upload, cloud compile, launch, or result
-read starts in this round.
+Section 58 implements that exact B5A source candidate at `ed98623`; section 59
+accepts the section-57 counter-review and B5A snapshot. Codex now
+counter-reviews Claude's record commit `322c7ee`. No later bounded milestone
+is authorized: the ladder proceeds directly from B5A to the full ARV2-4
+evaluation, whose production-input, physical-adapter, atomic-QC-evaluation,
+and result-disposition gates remain closed. No upload, cloud compile, launch,
+or result read starts in this round.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 

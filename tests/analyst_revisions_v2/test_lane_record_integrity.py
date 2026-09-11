@@ -1,6 +1,7 @@
 """Structural checks for the Analyst Revisions V2 lane handoff record."""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 
@@ -25,3 +26,20 @@ def test_session_push_ledger_is_one_contiguous_gfm_table() -> None:
     assert len(lines) > 2
     assert lines[1].startswith("|---|")
     assert all(line.startswith("|") for line in lines)
+
+
+def test_exact_next_step_references_the_latest_numbered_section() -> None:
+    """A new review section must not leave the live handoff one round behind."""
+
+    text = RECORD.read_text(encoding="utf-8")
+    section_numbers = [
+        int(match.group(1))
+        for match in re.finditer(r"^## (\d+)\.", text, flags=re.MULTILINE)
+    ]
+    assert section_numbers
+    latest = max(section_numbers)
+    exact_next_step = text.split("## 4. Exact next step\n", 1)[1].split(
+        "\n## 4A.", 1
+    )[0]
+
+    assert f"section {latest}" in exact_next_step.casefold()

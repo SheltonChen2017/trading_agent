@@ -34,8 +34,22 @@ def test_session_push_ledger_is_one_contiguous_gfm_table() -> None:
     lines = table.splitlines()
 
     assert len(lines) > 2
-    assert lines[1].startswith("|---|")
+    assert lines[1] == "|---|---|---|---|---|---|---|---|"
     assert all(line.startswith("|") for line in lines)
+
+    header_width = lines[0].count("|")
+    assert header_width == 9
+    over_or_under_width = [
+        line for line in lines[2:] if line.count("|") != header_width
+    ]
+    assert len(over_or_under_width) == 1
+    immutable_legacy_row = over_or_under_width[0]
+    assert "`e40caf0` -> this record commit" in immutable_legacy_row
+    assert immutable_legacy_row.count("|") == header_width + 1
+    assert (
+        "| A 12-trial independent mutation matrix caught every trial:"
+        in immutable_legacy_row
+    )
 
 
 def test_exact_next_step_references_the_latest_numbered_section() -> None:

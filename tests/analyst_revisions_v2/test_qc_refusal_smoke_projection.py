@@ -1074,3 +1074,17 @@ def test_projection_does_not_claim_a_qc_strategy_or_evaluation() -> None:
         field.name in {"start_date", "end_date", "cash", "benchmark"}
         for field in dataclasses.fields(type(value))
     )
+
+
+def test_entry_source_identity_pin_rejects_an_ast_invisible_byte_change() -> None:
+    """The grammar cannot see a comment; only the pinned identity rejects one."""
+
+    _parent, value = _projection()
+    source = value.files[0].source_bytes
+
+    _require_refusal_entry_shape(source)
+
+    with pytest.raises(QcRefusalSmokeProjectionError) as excinfo:
+        _require_refusal_entry_shape(source + b"# AST-invisible trailing comment\n")
+
+    assert "entry source identity changed" in str(excinfo.value)

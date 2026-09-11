@@ -138,8 +138,14 @@ THE OWNER-AUTHORIZED PHYSICAL B5B REFUSAL-SMOKE PREFLIGHT CREATED ONE PRIVATE
 QC PROJECT AND CONFIRMED THREE SOURCE UPLOADS, BUT QC'S OBSERVED
 64,000-CHARACTER PER-FILE LIMIT REFUSED THE FOURTH FILE; NO CLOUD COMPILE OR
 BACKTEST WAS SUBMITTED AND ZERO RESEARCH LOOKS WERE CONSUMED. THE BOUNDED
-ARV2-4F-B5C ONE-FILE REFUSAL-SMOKE PROJECTION IS NOW IMPLEMENTED AND PENDING
-CLAUDE REVIEW. IT IS NOT A STRATEGY RUNTIME OR AN ARV2 EVALUATION.
+ARV2-4F-B5C ONE-FILE REFUSAL-SMOKE PROJECTION IS NOW IMPLEMENTED. IT IS NOT A
+STRATEGY RUNTIME OR AN ARV2 EVALUATION. SECTION 66 ACCEPTS THE WHOLE
+`ef6eb6b..c506cd9` RANGE AFTER TWO P3 TEST-COVERAGE CORRECTIONS: THE CORRECTED
+HANDOFF CLASSIFIER ACCEPTED A PAST-TENSE SENTENCE, AND B5C'S LOAD-BEARING
+ENTRY-SOURCE IDENTITY PIN WAS ISOLATED BY NO TEST. BOTH PHYSICAL RECEIPTS
+REPRODUCE THEIR RECORDED IDENTITIES AND CONFIRM ZERO COMPILES, ZERO
+BACKTESTS, AND ZERO RESEARCH LOOKS. THE AUTHORIZED PROJECT NAME WAS
+QC-NORMALIZED AND STILL AWAITS OWNER RATIFICATION.
 B1 FREEZES
 THE EXACT SEVEN
 PRODUCTION-SHAPED ROW,
@@ -737,6 +743,17 @@ oversized B5B modules before a full runtime can be uploaded. A change to
 `research/__init__.py`, `data/__init__.py`, or `data/exchange_calendar.py`
 from another lane still makes the B5B pin refuse until reviewed; no additional
 owner decision is needed to preserve that deliberate fail-closed behavior.
+
+Section 66 is the independent review of that range. It accepts all four
+commits after two P3 test-coverage corrections and adds one new B5C
+regression, leaving every production module, specification, artifact and gate
+unchanged. Codex counter-reviews section 66 next. Before the next authorized
+one-shot recovery touches project `36418640`, the owner should ratify the
+QC-normalized project name `1 ARV2_B5B_REFUSAL_SMOKE - 20260911`, because the
+authority named `1. ARV2_B5B_REFUSAL_SMOKE - 20260911` and no project bearing
+that exact name exists. The residual bytes at
+`research/analyst_revisions_v2_qc/event_study.py` in that project remain
+unauthenticated and must be removed, not compiled.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -2375,6 +2392,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-11 | Codex counter-review and owner source-decision record | `f45be5b` -> this record commit | Accept the section-62 technical review after prospective record correction; record the owner's Massive reliability/rerun rule and CRSP-alternative assessment without opening data or outcomes | Counter-reviewed Claude's one record-only commit. Preserved its substantive B5B acceptance and already-pushed historical text while prospectively correcting the reversed append-only ledger order, 27-versus-37 binding count, shared-file workflow recommendation, and source-compilation/runtime-closure wording. Recorded the owner's decision to accept Massive/Benzinga historical reliability for the initial 2021-start backtest and to invalidate/rebuild/rerun if contrary evidence appears, retaining and linking the immutable original development evaluation while leaving the future permanent look/formal alpha unspent. Recorded the owner-reported CRSP response and evaluated public documentation plus public provider metadata for alternatives; no production/test code changed. | Counter-audit five-file B5B/record selection **281 passed**; active-document plus lane-record **71 passed**; ML/import boundary **11 passed**; identities and the exact 37-null/17-false authority census reproduced. Final complete Analyst-lane validation: **2,880 passed, 7 skipped, 0 failed in 524.19 s (8:44)**. The first in-progress run was deliberately cancelled after **2,186 passed, 7 skipped** because the draft record changed; it is not completion evidence. Complete repository suite not run. **Zero research looks and zero development evaluations.** No private credential, paid/licensed row, security-level outcome, production endpoint/input, QC, broker, deployment, order, or trading access. | Counter-review: **0 P0/P1/P2; 5 P3** (`ARV2CR44-001..005`), corrected, qualified, or documented prospectively. Draft-record self-review: **2 P2 and 4 P3 corrected** (`ARV2D44-001..006`). Claude review record **7/10**; B5B tree **9/10**. Massive reliability is owner-assumed for the first run, not vendor-attested. CRSP's suggested aggregate sources are not terminal-payoff substitutes. | Owner authorizes an outcome-free terminal-event census; its counts then determine the source route described in section 63 unless the owner selects sooner. Only a later, separately authorized round may construct content-addressed terminal-source artifacts and advance the physical-adapter/QC ladder. |
 | 2026-09-11 | Claude review | `2961a1b` -> this record commit; no production or specification change; Codex resolves the exact pushed head | Independent review of the section-63 counter-review and the owner Massive/CRSP data-source decisions `2961a1b` | Reviewed the single commit in `f45be5b..2961a1b` with an explicit disposition (section 64); accepted with findings and with no change to any module, test, specification, artifact, firewall, gate, root Action Plan, root Session Handoff or shared file. Confirmed all five `ARV2CR44` findings against this session's own section 62, including that 27 was B3's binding count and 37 is B5B's. Verified rather than accepted: the 6,733-byte schema and its ID/semantic/artifact hashes, the 16,231-byte assembly document ending in one LF with ID `arv2-qc-lean-source-assembly-8303f3323ff16ab7`, the 11-file/509,109-byte/140,983-byte inventory with all 11 pins equal to the live files, `main.py` byte-identical to the 3,328-byte scaffold, 18 strictly alternating `contains_key`/`read_bytes` records over 9 keys, 7 truth fields, 37 of 37 null bindings, 17 of 17 false capabilities, the `+164/-5` diffstat attributed to `f45be5b`, the frozen `1/80` alpha and development-evaluation classification, and the presence of all six `ARV2D44` draft corrections in the committed text. Corrected two live-handoff defects this round and added one generalized lane-record regression. | Standing Analyst lane selection at `2961a1b` **2,880 passed, 7 skipped, 0 failed in 518.41 s (8:38)**, reproducing section 63.6; five-file B5B/record selection **281 passed in 229.93 s**; active-document plus lane-record gates **71 passed**; ML/import boundary **11 passed**; shared-guard bridge **84 collected**; `compileall` exit 0; `git diff --check` clean; Python 3.13.15. Final lane selection on the committed tree, which adds this round's regression: **2,881 passed, 7 skipped, 0 failed in 508.14 s (8:28)**; only the ledger sentence naming that result was written after it. Complete repository suite not run per the owner's lane-suite rule (34.6). **Zero research looks and zero development evaluations.** No credential, provider, licensed row, production input, outcome, QuantConnect, Object Store, upload, compile, launch, result, deployment, broker, order or trading access by this review, and no external page was fetched. | Review: 0 P0/P1; **1 P2 and 4 P3** (`ARV2R45-001..005`). `ARV2R45-001` (P2): the owner's Massive reliability acceptance is recorded as covering the 2021-start backtest while the frozen `qc_historical_contract.history_start` is 2013-01-02, and the banner's explicit 2020 as-of anchor was replaced with the unanchored word historical. `ARV2R45-002` (P3): 63.3's non-retirement list omits the still-unresolved Massive-to-QuantConnect processing right that the same commit demands in writing of Sharadar. `ARV2R45-003` and `ARV2R45-004` (P3) are live-handoff defects corrected here with a new regression. `ARV2R45-005` (P3): `ARV2R43-001` was closed without the owner decision it was routed for. Self-reported `ARV2R45` note: section 62.3 enumerated ten members of an eleven-file inventory; three package initialisers are pinned, not two. | Codex counter-reviews this record commit and should resolve `ARV2R45-001` and `ARV2R45-002` there; the owner rules on the cross-lane shared-file convention. The physical adapter, authenticated runtime/project namespace/dependencies/quota, upload, cloud compile, atomic evaluation authority, launch, result access/disposition, terminal-payoff source, production truth/rights/PIT vintage, deployment, orders and trading all remain closed. |
 | 2026-09-11 | Codex counter-review, physical QC preflight, ARV2-4F-B5C implementation, and owner data-risk decision | `ef6eb6b` -> `0154f3d`, `19b52d6`, `87de867`, and this record commit | Accept Claude's section-64 record after one lane-test correction; execute the exact owner-authorized B5B refusal-smoke preflight; convert the measured QC file-limit blocker into a one-file refusal projection; record Massive's written semantics and the owner's accepted-risk practical-backtest decision | Counter-reviewed Claude's record, corrected its test and disposition vocabulary, and retained shared-file drift as a documented fail-closed residual. The one-shot preflight created private project `36418640`; recovery removed only the default notebook, confirmed exact `main.py` plus two marker uploads, performed one metadata-only zero-backtest census, and locked when QC rejected `event_study.py` above 64,000 characters. No compile or backtest was submitted. B5C detaches exact 3,328-character `main.py` and seals the static source/AST/refusal boundary. Massive confirms that later same-ID touches overwrite earlier payloads, while separate analyst-action records remain; complete version/deletion history and historical ticker/clock fidelity are not established. The owner accepts this disclosed limitation and the illustrative one-day 15-of-228 (6.6%) later-touch exclusion as tolerable for the first practical, live-oriented backtest, without treating 6.6% as a proven worst-case/global/error bound. The run must compare current-row and conservative-censored views, disclose non-pristine-PIT status, and begin immutable forward capture. This source-risk decision opens no input, QC, outcome, result, deployment, order, or trading authority. | Initial B5C plus closure **25 passed in 34.09 s**; corrected focus **49 passed in 49.13 s**; complete Analyst code/test selection at `87de867` **2,930 passed, 7 skipped, 0 failed in 585.53 s (9:45)**; final active-document/lane-record gate passed; **`compileall` exit 0; `git diff --check` clean; exact lane root/branch and remote tip `ef6eb6b` verified**. Complete repository suite not run. QC: zero compile/backtest submissions, zero detail/log/result/statistic reads, zero provider/Object Store/outcome access, **zero research looks and zero development evaluations**. | Counter-review `ARV2CR46-001..002` corrected. B5C `ARV2I4FB5C-001..014` corrected or bounded; no open in-scope P0-P3. Record audit `ARV2D46-001..010` corrected/bounded/guarded. `ARV2DATA46-001` is confirmed as a P2 source limitation. It no longer blocks the first practical backtest because the owner explicitly accepts the risk; that acceptance is not proof of pristine PIT. Bulk QC-project deletion remains unsafe and was not performed. | Claude reviews section 65 and exact range `ef6eb6b..this record commit`; Codex then counter-reviews every Claude commit. With renewed owner authority, reconcile project `36418640` to exact one-file B5C, compile once, and launch at most one refusal-only smoke. Full-runtime sharding and the accepted-risk current-row/censored input successor remain separate milestones. Production truth/input pins, terminal payoffs, outcome/result authority, deployment, orders, and trading remain closed; pristine-PIT classification remains unavailable. |
+| 2026-09-11 | Claude review | `c506cd9` -> this record commit; two lane test corrections; no production module or specification change; Codex resolves the exact pushed head | Independent review of the section-65 counter-review `0154f3d`, the ARV2-4F-B5C refusal-smoke projection `19b52d6`, the ledger-width guard `87de867`, and the physical-preflight record `c506cd9` | Reviewed all four commits in `ef6eb6b..c506cd9` with an explicit disposition each (section 66); accepted after correction. Confirmed all three section-65 findings against section 64, including that the over-wide ledger row is this reviewer's own. Verified rather than accepted: both one-shot drivers and both receipts reproduce their recorded byte counts and SHA-256 values exactly; every receipt safety field is false or zero, including compile and backtest submission, conservative research looks, alpha cells, production inputs, market data, Object Store, orders, statistics and log reads; the two terminal states, the three confirmed uploads, the four mutation attempts, the 91-project census and the verbatim QC 64,000-character refusal all match; the uploaded `main.py` hash equals the B5C projection and committed scaffold hash; and B5C's schema, projection, module and test identities, its single 3,328-byte entry, 42 null bindings, 17 false capabilities and 19 literal-false access properties all reproduce. | Standing Analyst lane selection at `c506cd9` **2,930 passed, 7 skipped, 0 failed in 572.68 s (9:32)**, reproducing section 65.9; five-file selection **283 passed in 229.55 s**; B5C battery **48 passed** before and **49 passed** after this round's regression; active-document plus lane-record gate **73 passed**; ML/import boundary **11 passed**; `compileall` exit 0; `git diff --check` clean; Python 3.13.15. Final lane selection on the committed tree, which adds this round's B5C regression: **2,931 passed, 7 skipped, 0 failed in 567.60 s (9:27)**; only the ledger sentence naming that result was written after it. Nine-trial B5C mutation matrix: two caught outright, six masked by an identified sibling guard with the hostile input still refused, and one real gap corrected. Complete repository suite not run per 34.6. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect call, read no provider row, and fetched no external page. | Review: 0 P0/P1/P2; **3 P3** (`ARV2R47-001..003`). `ARV2R47-001`: the corrected handoff classifier admitted a bare past tense, so completed history satisfied the forward-review guard; corrected here, keeping Codex's exact-agent requirement. `ARV2R47-002`: removing B5C's entry-source SHA-256/byte-count pin turned no test red, and without it the boundary accepts the reviewed source plus an AST-invisible comment; corrected here with a regression red under exactly that mutation. `ARV2R47-003`: the authorized project name `1. ARV2_B5B_REFUSAL_SMOKE - 20260911` was QC-normalized, so the mutated project was identified by inference; owner ratification requested before the next recovery. `ARV2CR46-001`, `ARV2CR46-002` and the over-wide ledger row are confirmed against this session's own earlier text. | Codex counter-reviews this record commit. The owner ratifies the QC-normalized project name and the unauthenticated residual at the nested `event_study.py` path is removed rather than compiled. Cloud compile, refusal-only launch and its single conservative look remain closed until B5C is accepted, counter-reviewed, and owner authority is renewed; sharding, the accepted-risk input pair, terminal-event census, production-truth/input pins, terminal payoffs, evaluation authority, result access, deployment, orders and trading remain separate and closed. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -10590,3 +10608,221 @@ identity reconciliation, Sharadar terminal-event census and exception evidence,
 production-truth/input pins, terminal payoffs, atomic ARV2-4 evaluation
 authority, outcome execution, result access/disposition, deployment, orders,
 and trading all remain separate and closed.
+
+## 66. Independent Claude review of the section-65 counter-review, the physical QC preflight, and ARV2-4F-B5C, 2026-09-11
+
+**Range reviewed:** `ef6eb6b..c506cd9`, four commits, commit by commit and
+cumulatively, in the dedicated lane worktree on the same branch.
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, 0 P2, 3 P3
+(`ARV2R47-001..003`). Two are test-coverage defects corrected here with
+red/green evidence; one is an authorization-precision item referred to Codex
+and the owner. No production module, specification, artifact, firewall,
+capability, gate, root Action Plan, root Session Handoff or shared file was
+changed by this review.
+**Zero research looks and zero development evaluations by this review.** This
+review performed no QuantConnect call of any kind, read no provider row, and
+fetched no external page. It read the two host-local operation receipts as
+evidence. Validation used Python **3.13.15**.
+
+### 66.1 Acknowledgement of the section-65 findings against section 64
+
+| ID | Confirmed? | Independent verification |
+|---|---|---|
+| `ARV2CR46-001` (P3) | Yes | Reproduced by importing the section-64 version of the helper: it required only the token `reviews`, so "The process reviews section 64." passed with no agent named. The finding's conclusion is right. Its description is slightly off: the section-64 test required no actor text at all, not "any actor-like text plus review". |
+| `ARV2CR46-002` (P3) | Yes | `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` fixes the vocabulary as `accepted`, `accepted after correction`, or `rejected`. Section 64's "accepted with findings" is not one of them. This section uses the binding term. |
+| Over-wide `e40caf0` ledger row | Yes | Reproduced: exactly one ledger row carries ten pipes where the header carries nine, and it is this reviewer's own section-59 row. `87de867` pins it as an authenticated immutable exception and holds every other row to eight columns. |
+
+### 66.2 Commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `0154f3d` | **Accepted after correction** | Correctly requires an exact agent plus a review verb, which is strictly stronger than the section-64 test on that axis. It also widened the verb to `review(?:s|ed|ing)?`, which admits a completed-history sentence; corrected here as `ARV2R47-001`. |
+| `19b52d6` | **Accepted after correction** | B5C is pure, its identities reproduce, and its refusal boundary is genuinely layered. One load-bearing guard was isolated by no test; corrected here as `ARV2R47-002` with a new regression. No client, provider, Object Store, outcome, result, deployment, order or trading surface is added. |
+| `87de867` | **Accepted** | Preserves the immutable over-wide historical row, authenticates that exact exception by its content, and holds every other current and future row to the eight-column width. |
+| `c506cd9` | **Accepted** | Record-only. Every identity, count and exclusion checked below reproduces, and the live state is re-tensed honestly rather than left stale. |
+| this record commit | Claude record | This section, the live banner, section 4, one appended ledger row, and two test corrections. |
+
+### 66.3 The physical QC preflight, verified rather than accepted
+
+This is the first round in this lane in which a real account was mutated, so
+it was checked against primary evidence rather than against the record.
+
+- **Both receipts and both drivers reproduce their recorded identities
+  exactly.** `artifacts/arv2_qc_b5b_refusal_smoke_20260911/driver.py` is
+  38,973 bytes with SHA-256 `0f32c58f...`; its `receipt.json` is 5,458 bytes
+  with SHA-256 `6a843289...`; the recovery driver is 39,615 bytes with
+  SHA-256 `7ca0f271...`; its receipt is 6,426 bytes with SHA-256
+  `f2c3fd75...`. All four match section 65.4 and 65.5 to the byte.
+- **The receipts corroborate every safety claim.** In both:
+  `compile_submission_attempted` false, `backtest_submission_attempted`
+  false, `research_look_count_conservative` 0, `alpha_cells_emitted` 0,
+  `production_inputs_accessed` false, `market_data_accessed_by_algorithm`
+  false, `object_store_accessed_by_algorithm` false, `orders_permitted`
+  false, `performance_statistics_inspected` false, `log_read_attempts` 0. The
+  recovery receipt additionally carries `backtests_read_endpoint_called`
+  false. Neither receipt contains a credential, token, key or account
+  identifier field.
+- **The two terminal states are the recorded ones.** The first receipt stops
+  at `PROJECT_SUBMISSION_AMBIGUOUS` with `project_id` null and the error
+  "project response does not preserve the exact name". The second stops at
+  `UPLOADING_REVIEWED_SOURCE` with `project_id` 36418640 and the error
+  "cloud file bytes differ: research/analyst_revisions_v2_qc/event_study.py",
+  `confirmed_upload_count` 3, `file_mutation_attempt_count` 4,
+  `default_notebook_delete_confirmed` true, `cloud_source_authenticated`
+  false, `backtest_count_before_recovery` 0 and
+  `account_project_count_observed` 91.
+- **The QC refusal is quoted accurately.** The recorded ambiguity event is
+  "files/create failed (HTTP 200): File exceeds the maximum size of 64,000
+  characters by using 109,225." for the exact nested `event_study.py` path.
+  The HTTP 200 on a failed mutation is precisely why treating it as
+  ambiguous rather than as a clean rejection was correct.
+- **The uploaded entry is the reviewed entry.** The receipt's planned
+  `main.py` SHA-256 `327f1263...` equals the B5C projection's `main.py`
+  hash and the committed scaffold's hash.
+- **Fail-closed behaviour held in both drivers.** Driver one created a
+  project, could not confirm its exact name, and performed no follow-on
+  mutation. Driver two performed strictly fewer operations than the owner
+  authorized: no compile and no backtest, although both were within the
+  granted scope.
+- **The residual is bounded but unauthenticated.** Project `36418640` holds
+  three confirmed files plus unknown bytes at the nested `event_study.py`
+  path; the receipt preserves neither that residual's length nor its hash,
+  and 65.5 says so rather than claiming otherwise. Section 65.10's plan to
+  delete the three non-entry residual paths before any compile covers it, and
+  `cloud_source_authenticated` is false, so nothing downstream can treat the
+  cloud project as the authenticated inventory.
+
+### 66.4 ARV2-4F-B5C, verified rather than accepted
+
+- **Identities.** Schema 5,304 bytes, artifact SHA-256 `ddb152f6...`, ID
+  `arv2-qc-refusal-smoke-projection-1fe0201a3ccb8478`. Projection ID
+  `arv2-qc-refusal-smoke-projection-e78d3b936489b79d`, semantic
+  `e78d3b93...`, artifact `80e60f36...` over a 4,055-byte canonical document
+  ending in exactly one LF. Module SHA-256 `b038272f...` and focused-test
+  SHA-256 `eadf51cd...` both match. The parent triple pins the accepted B5B
+  assembly `arv2-qc-lean-source-assembly-8303f3323ff16ab7` with semantic
+  `8303f332...` and artifact `56d3f77e...`.
+- **Census.** Exactly one file: `main.py`, 3,328 bytes and 3,328 decoded
+  characters, SHA-256 `327f1263...`; totals and largest-member character
+  count agree. The declared export surface is exactly 26 names. There are
+  **42 external bindings, all `None`**, 17 capabilities all `False`, and 19
+  access properties all literal `False`, including `runtime_code_authenticated`,
+  `orders_available` and `trading_available`. Section 65.7 states the
+  binding set is null without giving a count; the count is 42.
+- **Truth fields.** `source_only` and `immediate_refusal` true; strategy
+  execution, evaluation-window application, physical adapter, project
+  creation, cloud compile, backtest and result access all false.
+- **Honest self-limitation.** 65.7's statement that B5C leaves
+  `runtime_code_authenticated` false and makes no transitive runtime-closure
+  claim is correct and is enforced by the literal property, not only by prose.
+
+### 66.5 Mutation matrix on the B5C entry boundary
+
+Nine single-guard removals were run serially against the 48-case B5C battery
+on an otherwise clean tree, each restored with `git checkout --` before the
+next. No mutation pass overlapped a validation run.
+
+| Trial | Guard removed | Battery | Classification |
+|---|---|---|---|
+| M1 | UTF-8 BOM refusal | 48 passed | Masked; the input is still refused by `ast.parse` as "entry source is not strict Python" |
+| M2 | CR refusal | 48 passed | Masked; still refused by the entry-source identity pin |
+| M3 | NUL refusal | 48 passed | Masked; still refused by `ast.parse` |
+| M4 | 64,000-character limit | **1 failed** | Caught outright |
+| M5 | `initialize` immediate-refusal check | 48 passed | Masked; a `return None` body is still refused as "entry call surface changed" |
+| M6 | import-shape check | 48 passed | Masked; an added `import os` is still refused as "entry module grammar changed" |
+| M7 | class-shape check | **1 failed** | Caught outright |
+| M8 | entry-source identity pin | 48 passed | **Real gap**; see `ARV2R47-002` |
+| M9 | identity pin and BOM refusal together | 48 passed | Masked by `ast.parse` |
+
+For each masked trial the refusing guard was identified by calling the
+boundary directly with the hostile input, so "masked" is a measured result
+rather than an assumption. Every mutated source was still refused in every
+trial; the boundary is deliberately over-determined. The consequence worth
+recording is maintenance sensitivity rather than a live hole: seven of these
+guards could be deleted by a future edit with no test turning red.
+
+M8 is different in kind. With that pin removed, the boundary **accepts** the
+exact B5B entry source with an appended `# AST-invisible trailing comment`
+line: the grammar cannot see a comment, so nothing else rejects it. The
+SHA-256 and byte-count pin is therefore the only guard standing between the
+projection and a source that satisfies every structural rule while not being
+the reviewed bytes, and no test exercised it.
+
+### 66.6 Corrections made in this round, with red/green evidence
+
+1. `ARV2R47-002`, in
+   `tests/analyst_revisions_v2/test_qc_refusal_smoke_projection.py`:
+   `test_entry_source_identity_pin_rejects_an_ast_invisible_byte_change`
+   feeds the projected entry source plus a trailing comment and requires the
+   exact "entry source identity changed" refusal. Red first with the pin
+   replaced by `pass` (1 failed, 48 passed), green on the restored module
+   (49 passed), and it is the only case that fails under that mutation.
+2. `ARV2R47-001`, in
+   `tests/analyst_revisions_v2/test_lane_record_integrity.py`: the review
+   verb now accepts present, gerund and passive-future or modal forms
+   ("reviews", "review", "reviewing", "will be reviewed", "must be
+   reviewed") and rejects a bare past tense. Codex's exact-agent requirement
+   is kept unchanged, so the corrected rule is stronger than either previous
+   version. Three past-tense cases were added to the classifier's own unit
+   test. Red first with the `0154f3d` pattern restored (that unit test
+   fails), green with the correction (4 passed).
+
+A residual limitation is recorded rather than hidden: a noun phrase that
+asserts completion, such as "Claude's review of section 66 is already
+complete", still satisfies the guard. This is a structural check on the live
+handoff, not a semantic one.
+
+### 66.7 Findings
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R47-001` | P3 | Test coverage; **corrected this round** | The corrected handoff classifier in `0154f3d` widened the verb to `review(?:s|ed|ing)?`, so "Claude reviewed section 64 in an earlier round", "Section 64 was reviewed by Codex last week" and "Codex has counter-reviewed section 64" all satisfy it. A stale live handoff reads exactly like completed history, so the guard admitted the defect class it exists to catch. The `ed` branch was also the one verb form absent from the new classifier unit test. | Corrected here with red/green evidence; Codex's agent requirement retained. |
+| `ARV2R47-002` | P3 | Test coverage; **corrected this round** | Removing B5C's entry-source SHA-256/byte-count pin turned no test red, and with it removed the boundary accepts the reviewed source plus an AST-invisible trailing comment. It is the only guard that authenticates the exact bytes once the grammar is satisfied. | Corrected here with a regression that is red under exactly that mutation. |
+| `ARV2R47-003` | P3 | Authorization precision; **for Codex and the owner** | The recorded authority names one project `1. ARV2_B5B_REFUSAL_SMOKE - 20260911`. QC normalized the name to `1 ARV2_B5B_REFUSAL_SMOKE - 20260911`, so no project bearing the authorized name exists. The first driver correctly refused to infer identity from that inexact response; the recovery driver then identified the project by inference (sole newly created private project, owner-only, idle, zero backtests) and mutated it. The inference is strong and 65.5 and section 2 disclose the actual name, but the repository rule is that an authorization covers the exact action stated, the project persists in the account, and 65.10 plans further mutation of it. **Recommendation:** obtain and record the owner's ratification of the actual project name before the next authorized recovery. | Open. Section 4 now carries the request. No code change. |
+
+### 66.8 Validation
+
+- Standing Analyst lane selection at `c506cd9`: **2,930 passed, 7 skipped, 0
+  failed in 572.68 s (9:32)**, reproducing section 65.9's count at
+  `87de867`.
+- Five-file B5B/record selection: **283 passed in 229.55 s**, reproducing
+  65.9.
+- B5C battery: **48 passed in 48.31 s** before this round's regression and
+  **49 passed** after it.
+- Active-document plus lane-record gate: **73 passed**, reproducing 65.9.
+- ML/import boundary: **11 passed**.
+- `compileall` over `research`, `tests` and `data`: exit 0. `git diff --check`
+  clean. Python **3.13.15**.
+- The complete repository suite was not run, per the owner's lane-suite rule
+  in 34.6.
+
+### 66.9 Quality assessment
+
+Section-65 round (`0154f3d`, `19b52d6`, `87de867`, `c506cd9`): **9/10**. The
+physical preflight is the strongest part: both drivers fail closed on an
+ambiguous response, both receipts record every capability as an explicit
+field rather than as prose, the drivers did strictly less than the owner
+authorized, and the account-touching claims verify against primary evidence
+to the byte. The 64,000-character discovery is a real finding that a
+paper-only design would have missed, and the response to it is the smallest
+honest successor rather than a workaround. The Massive disclosure is
+unusually candid: it retires the lane's own pristine-PIT claim, labels the
+owner's acceptance as risk tolerance rather than evidence, and refuses to
+treat 6.6% as a bound. The blanket QC-project deletion was correctly refused
+because it would destroy referenced evidence. One point is withheld for the
+two test-coverage gaps corrected here and for the unratified project name.
+
+### 66.10 Next gate
+
+Codex counter-reviews this record commit. Before the next authorized one-shot
+recovery, the owner should ratify the QC-normalized project name, and the
+unauthenticated residual at the nested `event_study.py` path in project
+`36418640` must be removed rather than compiled. A cloud compile, a
+refusal-only launch, and the single conservative research look it would spend
+all remain closed until B5C is accepted, this acceptance is counter-reviewed,
+and the owner renews authority. The full-runtime sharding milestone, the
+accepted-risk current-row/censored input pair, the Sharadar/QC identity
+reconciliation, the terminal-event census, production-truth and input pins,
+terminal payoffs, atomic ARV2-4 evaluation authority, outcome execution,
+result access and disposition, deployment, orders and trading all remain
+separate and closed.

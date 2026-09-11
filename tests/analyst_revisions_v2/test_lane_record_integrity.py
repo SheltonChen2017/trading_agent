@@ -13,8 +13,13 @@ RECORD = (
 )
 
 _REVIEW_AGENT = re.compile(r"\b(?:Codex|Claude)\b", flags=re.IGNORECASE)
+# A stale handoff reads as completed history ("Claude reviewed section 64"),
+# so a bare past tense must not satisfy the forward-looking step. Passive
+# future and modal forms ("will be reviewed", "must be reviewed") still do.
 _REVIEW_VERB = re.compile(
-    r"\b(?:counter[- ]?)?review(?:s|ed|ing)?\b",
+    r"\b(?:(?:will|shall|must|should|is to|are to|to)\s+be\s+"
+    r"(?:counter[- ]?)?reviewed"
+    r"|(?:counter[- ]?)?review(?:s|ing)?)\b",
     flags=re.IGNORECASE,
 )
 
@@ -105,6 +110,9 @@ def test_review_sentence_classifier_requires_agent_and_accepts_verb_forms() -> N
         "The process reviews section 64.",
         "Claude receives section 64.",
         "Review section 64 next.",
+        "Claude reviewed section 64 in an earlier round.",
+        "Section 64 was reviewed by Codex last week.",
+        "Codex has counter-reviewed section 64.",
     )
 
     assert all(_names_review_by_agent(sentence) for sentence in accepted)

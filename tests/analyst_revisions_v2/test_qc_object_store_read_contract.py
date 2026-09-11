@@ -1174,6 +1174,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.global_input_schema",
         "research.analyst_revisions_v2_qc.lean_source_assembly",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
+        "research.analyst_revisions_v2_qc.refusal_smoke_projection",
         "research.analyst_revisions_v2_qc.run_contract",
         "research.analyst_revisions_v2_qc.synthetic_input_transport",
     )
@@ -1185,6 +1186,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "global_input_schema.py",
         "lean_source_assembly.py",
         "object_store_read_contract.py",
+        "refusal_smoke_projection.py",
         "run_contract.py",
         "synthetic_input_transport.py",
     )

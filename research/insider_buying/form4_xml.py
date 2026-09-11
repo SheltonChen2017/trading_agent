@@ -39,6 +39,85 @@ _RANGE_WORDS = ("price range", "range of prices", "prices ranging")
 _PLAN_WORDS = ("10b5-1", "10b5 1")
 _DECIMAL_RE = re.compile(r"^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$")
 _DATE_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+_COMMON_STOCK_TITLE_RE = re.compile(
+    r"^(?:class\s+(?:[a-z]|[0-9]{1,2})\s+)?common stock"
+    r"(?:,\s*(?:"
+    r"no par value|"
+    r"par value\s+\$?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)"
+    r"(?:\s+per share)?|"
+    r"\$?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)\s+par value"
+    r"(?:\s+per share)?"
+    r"))?$",
+    re.IGNORECASE | re.ASCII,
+)
+_PRICE_NUMBER_BODY = (
+    r"(?:[0-9]{1,3}(?:,[0-9]{3})+(?:\.[0-9]+)?|"
+    r"[0-9]+(?:\.[0-9]+)?|\.[0-9]+)"
+)
+_PRICE_NUMBER_CORE = r"\$?" + _PRICE_NUMBER_BODY
+_PRICE_CURRENCY_CORE = r"\$" + _PRICE_NUMBER_BODY
+_PRICE_NUMBER_TOKEN = (
+    r"(?<![0-9A-Za-z_])" + _PRICE_NUMBER_CORE + r"(?![0-9A-Za-z_])"
+)
+_PRICE_CURRENCY_TOKEN = (
+    r"(?<![0-9A-Za-z_])" + _PRICE_CURRENCY_CORE + r"(?![0-9A-Za-z_])"
+)
+_PRICE_RANGE_PATTERNS = (
+    re.compile(
+        r"\bprices?(?:\s+per\s+share)?\s+"
+        r"(?:"
+        r"(?:(?:that|which)\s+)?"
+        r"(?:range(?:d|s|ing)?|var(?:y|ies|ied|ying))\b|"
+        r"(?:of|paid\s+for)\s+the\s+shares\s+"
+        r"(?:range(?:d|s|ing)?|var(?:y|ies|ied|ying))\b|"
+        r"(?:in|within)\s+(?:(?:the|a)\s+)?range\b|"
+        r"reflects?\s+executions?\s+in\s+(?:a\s+)?range\b"
+        r")",
+        re.IGNORECASE | re.ASCII,
+    ),
+    re.compile(
+        r"\bprices?(?:\s+per\s+share)?\s+"
+        r"(?:(?:was|were|is|are)\s+)?"
+        r"(?:"
+        r"(?:between|from)\s+"
+        + _PRICE_NUMBER_TOKEN
+        + r"\s+(?:and|to|through)\s+"
+        + _PRICE_NUMBER_TOKEN
+        + r"|"
+        + _PRICE_NUMBER_TOKEN
+        + r"\s+(?:to|through)\s+"
+        + _PRICE_NUMBER_TOKEN
+        + r")\b",
+        re.IGNORECASE | re.ASCII,
+    ),
+    re.compile(
+        r"(?:"
+        r"\b(?:between|from)\s+"
+        + _PRICE_NUMBER_TOKEN
+        + r"\s+(?:and|to|through)\s+"
+        + _PRICE_NUMBER_TOKEN
+        + r"|"
+        + _PRICE_NUMBER_TOKEN
+        + r"\s*(?:-|\u2013|\u2014|and|to|through)\s*"
+        + _PRICE_NUMBER_TOKEN
+        + r")\s+per\s+share\b",
+        re.IGNORECASE | re.ASCII,
+    ),
+    re.compile(
+        r"\bprices?(?:\s+per\s+share)?\s+"
+        r"(?:"
+        r"(?:(?:was|were|is|are|of)\s+)?"
+        + _PRICE_CURRENCY_TOKEN
+        + r"\s*(?:-|\u2013|\u2014|and)\s*"
+        + _PRICE_CURRENCY_TOKEN
+        + r"\b|as\s+low\s+as\s+"
+        + _PRICE_CURRENCY_TOKEN
+        + r"\s+and\s+as\s+high\s+as\s+"
+        + _PRICE_CURRENCY_TOKEN
+        + r"\b)",
+        re.IGNORECASE | re.ASCII,
+    ),
+)
 _MAX_DECIMAL_TEXT_LENGTH = 128
 _MAX_DECIMAL_DIGITS = 64
 _MAX_DECIMAL_SCALE = 64
@@ -77,7 +156,13 @@ def _text(element: ElementTree.Element | None, name: str) -> str | None:
     if element is None:
         return None
     target = _first(element, name)
-    if target is None or target.text is None:
+    if target is None:
+        return None
+    if list(target) or (target.tail is not None and target.tail.strip()):
+        raise Form4ParseError(
+            f"REFUSED: XML scalar field contains mixed content: {name}"
+        )
+    if target.text is None:
         return None
     value = target.text.strip()
     return value or None
@@ -85,6 +170,42 @@ def _text(element: ElementTree.Element | None, name: str) -> str | None:
 
 def _value(element: ElementTree.Element, container_name: str) -> str | None:
     container = _first(element, container_name)
+    if container is None:
+        return None
+    if (
+        container.attrib
+        or (container.text is not None and container.text.strip())
+        or (container.tail is not None and container.tail.strip())
+    ):
+        raise Form4ParseError(
+            f"REFUSED: XML value container contains mixed content: {container_name}"
+        )
+    for child in container:
+        child_name = _local_name(child.tag)
+        if child_name not in {"value", "footnoteId"}:
+            raise Form4ParseError(
+                "REFUSED: XML value container has an unsupported child: "
+                f"{container_name}"
+            )
+        if child_name == "value" and child.attrib:
+            raise Form4ParseError(
+                f"REFUSED: XML value field has unsupported attributes: {container_name}"
+            )
+        if child_name == "footnoteId":
+            if "id" not in child.attrib or not child.attrib["id"].strip():
+                raise Form4ParseError(
+                    "REFUSED: transaction footnote reference id is missing"
+                )
+            if (
+                list(child)
+                or (child.text is not None and child.text.strip())
+                or (child.tail is not None and child.tail.strip())
+                or set(child.attrib) != {"id"}
+            ):
+                raise Form4ParseError(
+                    "REFUSED: XML value footnote reference is malformed: "
+                    f"{container_name}"
+                )
     return _text(container, "value")
 
 
@@ -189,15 +310,89 @@ def _availability(value: datetime | date) -> PublicAvailability:
 
 
 def _common_stock(title: str | None) -> bool:
+    """Recognize only a narrow provisional common-stock title grammar.
+
+    Raw filing text cannot establish a point-in-time security/share-class
+    identity.  This guard therefore accepts only an explicit common-stock
+    title (with an optional class and par-value suffix) and fails closed on
+    rights, units, warrants, options, and other compound instruments.
+    """
+
     if title is None:
         return False
-    normalized = re.sub(r"\s+", " ", title.strip().lower())
-    if "common stock" not in normalized:
-        return False
-    return not any(
-        word in normalized
-        for word in ("preferred", "option", "warrant", "unit", "phantom")
+    normalized = re.sub(r"\s+", " ", title.strip())
+    return _COMMON_STOCK_TITLE_RE.fullmatch(normalized) is not None
+
+
+def _footnote_features(text: str) -> tuple[bool, bool, bool]:
+    """Classify one immutable footnote once, without cross-footnote synthesis."""
+
+    normalized = re.sub(r"\s+", " ", text.strip())
+    lowered = normalized.lower()
+    price_range_mentioned = any(word in lowered for word in _RANGE_WORDS) or any(
+        pattern.search(normalized) is not None
+        for pattern in _PRICE_RANGE_PATTERNS
     )
+    private_purchase_mentioned = any(word in lowered for word in _PRIVATE_WORDS)
+    plan_mentioned = any(word in lowered for word in _PLAN_WORDS)
+    return price_range_mentioned, private_purchase_mentioned, plan_mentioned
+
+
+def _flat_footnote_definitions(
+    root: ElementTree.Element,
+) -> tuple[ElementTree.Element, ...]:
+    """Return one flat, root-level footnote inventory or refuse the XML.
+
+    ``Element.itertext()`` on nested ``footnote`` elements repeats every
+    descendant's prose in each ancestor.  Besides crossing footnote lineage,
+    that permits quadratic retained text and regex work inside a bounded raw
+    XML envelope.  The provisional parser therefore accepts only one plain
+    root-level ``footnotes`` container whose children are flat definitions.
+    """
+
+    containers = _descendants(root, "footnotes")
+    definitions = _descendants(root, "footnote")
+    if not containers:
+        if definitions:
+            raise Form4ParseError(
+                "REFUSED: footnote XML structure is incomplete or ambiguous"
+            )
+        return ()
+
+    direct_containers = _children(root, "footnotes")
+    if len(containers) != 1 or len(direct_containers) != 1:
+        raise Form4ParseError(
+            "REFUSED: footnote XML structure is incomplete or ambiguous"
+        )
+    container = containers[0]
+    if direct_containers[0] is not container:
+        raise Form4ParseError(
+            "REFUSED: footnote XML structure is incomplete or ambiguous"
+        )
+
+    direct_definitions = _children(container, "footnote")
+    if (
+        container.attrib
+        or (container.text is not None and container.text.strip())
+        or (container.tail is not None and container.tail.strip())
+        or len(direct_definitions) != len(container)
+        or tuple(id(node) for node in direct_definitions)
+        != tuple(id(node) for node in definitions)
+    ):
+        raise Form4ParseError(
+            "REFUSED: footnote XML structure is incomplete or ambiguous"
+        )
+
+    for node in direct_definitions:
+        if (
+            set(node.attrib) != {"id"}
+            or list(node)
+            or (node.tail is not None and node.tail.strip())
+        ):
+            raise Form4ParseError(
+                "REFUSED: footnote XML structure is incomplete or ambiguous"
+            )
+    return tuple(direct_definitions)
 
 
 def _footnote_references(element: ElementTree.Element) -> tuple[str, ...]:
@@ -225,7 +420,7 @@ def _classify(
     price: Decimal | None,
     purchase_value: Decimal | None,
     direct_indirect: str | None,
-    footnote_texts: tuple[str, ...],
+    price_range_mentioned: bool,
     unresolved_footnote: bool,
 ) -> tuple[ClassificationOutcome, ...]:
     reasons: list[ClassificationOutcome] = []
@@ -276,8 +471,7 @@ def _classify(
     if shares is None or shares <= 0:
         add(ClassificationOutcome.EXCLUDE_NONPOSITIVE_SHARES)
 
-    combined_footnotes = " ".join(footnote_texts).lower()
-    if any(word in combined_footnotes for word in _RANGE_WORDS):
+    if price_range_mentioned:
         add(ClassificationOutcome.EXCLUDE_PRICE_RANGE)
     if price is None or price <= 0:
         add(ClassificationOutcome.EXCLUDE_MISSING_OR_NONPOSITIVE_PRICE)
@@ -294,7 +488,8 @@ def _classify(
 def _diagnostics(
     *,
     owners: tuple[ReportingOwner, ...],
-    footnote_texts: tuple[str, ...],
+    private_purchase_mentioned: bool,
+    plan_mentioned: bool,
     aff10b5_one: bool | None,
 ) -> tuple[TransactionDiagnostic, ...]:
     """Return retained PDF-defined features without changing eligibility."""
@@ -305,10 +500,8 @@ def _diagnostics(
         if flag not in flags:
             flags.append(flag)
 
-    combined_footnotes = " ".join(footnote_texts).lower()
-    if any(word in combined_footnotes for word in _PRIVATE_WORDS):
+    if private_purchase_mentioned:
         add(TransactionDiagnostic.PRIVATE_PURCHASE_FOOTNOTE_MENTION)
-    plan_mentioned = any(word in combined_footnotes for word in _PLAN_WORDS)
     if aff10b5_one is True:
         add(TransactionDiagnostic.TEN_B5_1_PLAN)
     elif plan_mentioned:
@@ -402,14 +595,16 @@ def parse_form4_xml(
     owner_tuple = tuple(owners)
 
     footnote_map: dict[str, str] = {}
-    for node in _descendants(root, "footnote"):
+    footnote_feature_map: dict[str, tuple[bool, bool, bool]] = {}
+    for node in _flat_footnote_definitions(root):
         footnote_id = node.attrib.get("id", "").strip()
-        text = " ".join(part.strip() for part in node.itertext() if part.strip())
+        text = (node.text or "").strip()
         if not footnote_id or not text:
             raise Form4ParseError("REFUSED: footnote id/text is incomplete")
         if footnote_id in footnote_map:
             raise Form4ParseError(f"REFUSED: duplicate footnote id {footnote_id}")
         footnote_map[footnote_id] = text
+        footnote_feature_map[footnote_id] = _footnote_features(text)
 
     source_sha256 = hashlib.sha256(xml_bytes).hexdigest()
     envelope = FilingEnvelope(
@@ -467,6 +662,14 @@ def parse_form4_xml(
         references = _footnote_references(row)
         unresolved = any(reference not in footnote_map for reference in references)
         texts = tuple(footnote_map[item] for item in references if item in footnote_map)
+        features = tuple(
+            footnote_feature_map[item]
+            for item in references
+            if item in footnote_feature_map
+        )
+        price_range_mentioned = any(item[0] for item in features)
+        private_purchase_mentioned = any(item[1] for item in features)
+        plan_mentioned = any(item[2] for item in features)
         aff10b5_one = _parse_bool(_text(row, "aff10b5One"))
         purchase_value = _multiply_decimals(shares, price)
         outcomes = _classify(
@@ -481,12 +684,13 @@ def parse_form4_xml(
             price=price,
             purchase_value=purchase_value,
             direct_indirect=direct_indirect,
-            footnote_texts=texts,
+            price_range_mentioned=price_range_mentioned,
             unresolved_footnote=unresolved,
         )
         diagnostics = _diagnostics(
             owners=owner_tuple,
-            footnote_texts=texts,
+            private_purchase_mentioned=private_purchase_mentioned,
+            plan_mentioned=plan_mentioned,
             aff10b5_one=aff10b5_one,
         )
         event_id = hashlib.sha256(

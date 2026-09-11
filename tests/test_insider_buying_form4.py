@@ -17,6 +17,7 @@ from research.insider_buying import (
     build_filing_corpus,
     parse_form4_xml,
 )
+from research.insider_buying import form4_xml as form4_module
 from research.insider_buying.contracts import (
     AvailabilityPrecision,
     ContractError,
@@ -120,6 +121,107 @@ def test_canonical_fixture_has_one_structurally_eligible_hashed_decimal_row():
     assert transaction.purchase_value_usd == Decimal("62500.00")
     assert transaction.aff10b5_one is None
     assert transaction.event_id == _parse_original(payload).transactions[0].event_id
+
+
+@pytest.mark.parametrize(
+    "security_title",
+    [
+        "Common Stock",
+        "Class A Common Stock",
+        "Class 1 Common Stock, par value $0.01 per share",
+        "Common Stock, $0.001 par value per share",
+        "Common Stock, no par value",
+    ],
+)
+def test_narrow_provisional_common_stock_title_grammar_is_eligible(
+    security_title,
+):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<securityTitle><value>Common Stock</value></securityTitle>",
+        f"<securityTitle><value>{security_title}</value></securityTitle>".encode(),
+    )
+    transaction = _parse_original(payload).transactions[0]
+    assert transaction.outcomes == (
+        ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,
+    )
+
+
+@pytest.mark.parametrize(
+    "security_title",
+    [
+        "Common Stock Purchase Rights",
+        "Right to Purchase Common Stock",
+        "Common Stock Warrant",
+        "Common Stock Option",
+        "Class A Common Stock Units",
+        "Series A Preferred Stock convertible into Common Stock",
+        "Class Preferred Common Stock",
+        "Class Option Common Stock",
+        "Class Warrant Common Stock",
+        "Class Unit Common Stock",
+        "Class Phantom Common Stock",
+        "Class 123 Common Stock",
+    ],
+)
+def test_compound_instruments_cannot_pass_the_raw_common_stock_title_guard(
+    security_title,
+):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<securityTitle><value>Common Stock</value></securityTitle>",
+        f"<securityTitle><value>{security_title}</value></securityTitle>".encode(),
+    )
+    transaction = _parse_original(payload).transactions[0]
+    assert transaction.outcomes == (
+        ClassificationOutcome.EXCLUDE_NON_COMMON_STOCK,
+    )
+
+
+@pytest.mark.parametrize(
+    "mixed_title",
+    [
+        b"<securityTitle><value>Common Stock<instrumentType/> Warrant</value></securityTitle>",
+        b"<securityTitle><value>Common Stock</value> Warrant</securityTitle>",
+        b"<securityTitle>Warrant <value>Common Stock</value></securityTitle>",
+        (
+            b"<securityTitle><instrumentType>Warrant</instrumentType>"
+            b"<value>Common Stock</value></securityTitle>"
+        ),
+        (
+            b"<securityTitle><value>Common Stock</value>"
+            b"<instrumentType>Warrant</instrumentType></securityTitle>"
+        ),
+        b"<securityTitle><value>Common Stock</value></securityTitle> Warrant",
+        b'<securityTitle instrumentType="Warrant"><value>Common Stock</value></securityTitle>',
+        b'<securityTitle><value instrumentType="Warrant">Common Stock</value></securityTitle>',
+        (
+            b'<securityTitle><value>Common Stock</value><footnoteId id="F1">'
+            b"<instrumentType>Warrant</instrumentType>"
+            b"</footnoteId></securityTitle>"
+        ),
+        (
+            b'<securityTitle><value>Common Stock</value><footnoteId id="F1">'
+            b"Warrant</footnoteId></securityTitle>"
+        ),
+        (
+            b'<securityTitle><value>Common Stock</value><footnoteId id="F1"/> '
+            b"Warrant</securityTitle>"
+        ),
+        (
+            b'<securityTitle><value>Common Stock</value><footnoteId id="F1" '
+            b'instrumentType="Warrant"/></securityTitle>'
+        ),
+    ],
+)
+def test_mixed_content_cannot_hide_a_compound_security_title(mixed_title):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<securityTitle><value>Common Stock</value></securityTitle>",
+        mixed_title,
+    )
+    with pytest.raises(Form4ParseError, match="mixed content|unsupported|malformed"):
+        _parse_original(payload)
 
 
 def test_same_date_lots_are_deferred_to_aggregation_before_the_value_gate():
@@ -247,6 +349,47 @@ def test_non_purchase_codes_receive_specific_named_outcomes(code, expected):
     transaction = _parse_original(payload).transactions[0]
     assert expected in transaction.outcomes
     assert not transaction.eligible_for_lot_aggregation
+
+
+@pytest.mark.parametrize("raw_code", ["D", "d", "a", "X", ""])
+def test_non_acquired_code_cannot_enter_provisional_lot_aggregation(raw_code):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<transactionAcquiredDisposedCode><value>A</value></transactionAcquiredDisposedCode>",
+        f"<transactionAcquiredDisposedCode><value>{raw_code}</value>"
+        f"</transactionAcquiredDisposedCode>".encode(),
+    )
+    transaction = _parse_original(payload).transactions[0]
+    assert transaction.outcomes == (
+        ClassificationOutcome.EXCLUDE_NOT_ACQUIRED,
+    )
+
+
+@pytest.mark.parametrize("raw_shares", ["0", "-1"])
+def test_nonpositive_shares_cannot_enter_provisional_lot_aggregation(raw_shares):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<transactionShares><value>5000</value></transactionShares>",
+        f"<transactionShares><value>{raw_shares}</value></transactionShares>".encode(),
+    )
+    transaction = _parse_original(payload).transactions[0]
+    assert transaction.outcomes == (
+        ClassificationOutcome.EXCLUDE_NONPOSITIVE_SHARES,
+    )
+
+
+@pytest.mark.parametrize("raw_price", ["0", "-1"])
+def test_nonpositive_price_cannot_enter_provisional_lot_aggregation(raw_price):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<transactionPricePerShare><value>12.50</value></transactionPricePerShare>",
+        f"<transactionPricePerShare><value>{raw_price}</value>"
+        f"</transactionPricePerShare>".encode(),
+    )
+    transaction = _parse_original(payload).transactions[0]
+    assert transaction.outcomes == (
+        ClassificationOutcome.EXCLUDE_MISSING_OR_NONPOSITIVE_PRICE,
+    )
 
 
 @pytest.mark.parametrize("code", ["p", "s", "g", "a"])
@@ -603,6 +746,226 @@ def test_ambiguous_footnote_semantics_are_named_not_suppressed():
         TransactionDiagnostic.TEN_B5_1_FOOTNOTE_MENTION,
     )
     assert transaction.footnote_ids == ("F1",)
+
+
+def test_separate_footnotes_cannot_synthesize_a_price_range():
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<transactionPricePerShare><value>12.50</value></transactionPricePerShare>",
+        b'<transactionPricePerShare><value>12.50</value>'
+        b'<footnoteId id="F1"/><footnoteId id="F2"/>'
+        b"</transactionPricePerShare>",
+    )
+    payload = _replace_once(
+        payload,
+        b"</ownershipDocument>",
+        b'<footnotes><footnote id="F1">The fixed purchase price</footnote>'
+        b'<footnote id="F2">Range-based vesting applies to an unrelated award.'
+        b"</footnote></footnotes></ownershipDocument>",
+    )
+    transaction = _parse_original(payload).transactions[0]
+    assert transaction.eligible_for_lot_aggregation
+    assert ClassificationOutcome.EXCLUDE_PRICE_RANGE not in transaction.outcomes
+    assert transaction.footnote_ids == ("F1", "F2")
+
+
+def test_unreferenced_footnote_features_cannot_contaminate_a_transaction():
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"</ownershipDocument>",
+        b'<footnotes><footnote id="F9">Price range under a private purchase '
+        b"and 10b5-1 plan.</footnote></footnotes></ownershipDocument>",
+    )
+    transaction = _parse_original(payload).transactions[0]
+    assert transaction.eligible_for_lot_aggregation
+    assert transaction.footnote_ids == ()
+    assert transaction.diagnostics == ()
+
+
+def test_nested_footnote_definition_cannot_leak_into_referenced_parent(
+    monkeypatch,
+):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"<transactionPricePerShare><value>12.50</value></transactionPricePerShare>",
+        b'<transactionPricePerShare><value>12.50</value><footnoteId id="F2"/>'
+        b"</transactionPricePerShare>",
+    )
+    payload = _replace_once(
+        payload,
+        b"</ownershipDocument>",
+        b'<footnotes><footnote id="F2">Fixed purchase price.'
+        b'<footnote id="F1">Price range from 10 to 15.</footnote>'
+        b"</footnote></footnotes></ownershipDocument>",
+    )
+
+    calls = 0
+    original = form4_module._footnote_features
+
+    def counting_features(text):
+        nonlocal calls
+        calls += 1
+        return original(text)
+
+    monkeypatch.setattr(form4_module, "_footnote_features", counting_features)
+    with pytest.raises(Form4ParseError, match="footnote XML structure"):
+        _parse_original(payload)
+    assert calls == 0
+
+
+@pytest.mark.parametrize(
+    "footnote_block",
+    [
+        b'<footnote id="F1">Text outside a footnotes container.</footnote>',
+        (
+            b"<wrapper><footnotes><footnote id=\"F1\">Wrapped container.</footnote>"
+            b"</footnotes></wrapper>"
+        ),
+        (
+            b"<footnotes><wrapper><footnote id=\"F1\">Nested definition.</footnote>"
+            b"</wrapper></footnotes>"
+        ),
+        (
+            b'<footnotes><footnote id="F1">One.</footnote></footnotes>'
+            b'<footnotes><footnote id="F2">Two.</footnote></footnotes>'
+        ),
+        (
+            b'<footnotes source="unexpected"><footnote id="F1">Text.</footnote>'
+            b"</footnotes>"
+        ),
+        b'<footnotes>prefix<footnote id="F1">Text.</footnote></footnotes>',
+        (
+            b'<footnotes><footnote id="F1" extra="unexpected">Text.</footnote>'
+            b"</footnotes>"
+        ),
+        (
+            b'<footnotes><footnote id="F1">Text <em>with markup</em>.</footnote>'
+            b"</footnotes>"
+        ),
+        b'<footnotes><footnote id="F1">Text.</footnote>tail</footnotes>',
+    ],
+)
+def test_footnote_definitions_require_one_flat_root_container(footnote_block):
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"</ownershipDocument>",
+        footnote_block + b"</ownershipDocument>",
+    )
+    with pytest.raises(Form4ParseError, match="footnote XML structure"):
+        _parse_original(payload)
+
+
+def test_nested_footnote_depth_cannot_amplify_retained_text():
+    depth = 16
+    opens = b"".join(
+        b'<footnote id="N' + str(index).encode() + b'">'
+        for index in range(depth)
+    )
+    payload = _replace_once(
+        _fixture("form4_original.xml"),
+        b"</ownershipDocument>",
+        b"<footnotes>"
+        + opens
+        + b"9" * 4096
+        + b"</footnote>" * depth
+        + b"</footnotes></ownershipDocument>",
+    )
+    with pytest.raises(Form4ParseError, match="footnote XML structure"):
+        _parse_original(payload)
+
+
+def test_reused_footnote_features_are_computed_once_per_filing(monkeypatch):
+    payload = _with_footnote("Privately negotiated purchase.")
+    row_start = payload.index(b"<nonDerivativeTransaction>")
+    row_end = payload.index(b"</nonDerivativeTransaction>") + len(
+        b"</nonDerivativeTransaction>"
+    )
+    row = payload[row_start:row_end]
+    payload = payload[:row_end] + row * 7 + payload[row_end:]
+
+    calls = 0
+    original = form4_module._footnote_features
+
+    def counting_features(text):
+        nonlocal calls
+        calls += 1
+        return original(text)
+
+    monkeypatch.setattr(form4_module, "_footnote_features", counting_features)
+    filing = _parse_original(payload)
+    assert len(filing.transactions) == 8
+    assert calls == 1
+    assert all(item.eligible_for_lot_aggregation for item in filing.transactions)
+
+
+@pytest.mark.parametrize(
+    "range_text",
+    [
+        "Price range was reported in the filing.",
+        "A range of prices was reported in the filing.",
+        "Prices ranging from 10 to 15 were reported in the filing.",
+        "Prices were between 10 and 15 per share.",
+        "Prices were between 10 and 15.",
+        "Prices were from 10 through 15.",
+        "Price was from $10 to $15 per share.",
+        "The consideration was between 10 and 15 per share.",
+        "Purchase prices range from 10 to 15.",
+        "Purchase prices ranged as described in the broker schedule.",
+        "The execution prices that ranged from 10 to 15.",
+        "The weighted-average purchase price reflects executions in a range from 10 to 15.",
+        "The price was 10-15 per share.",
+        "The consideration was $10-$15 per share.",
+        "The purchase price was $10-$15.",
+        "The shares were acquired at $10 and $15 per share.",
+        "The consideration was 10 through 15 per share.",
+        "The consideration was 10–15 per share.",
+        "The consideration was 10—15 per share.",
+        "The consideration was between 10.25 and 15.75 per share.",
+        "The consideration was from .25 to .75 per share.",
+        "Individual prices were 10 to 15.",
+        "Purchase price varied from $10 to $15.",
+        "Purchase prices varied between $10 and $15.",
+        "The price of the shares ranged from $10 to $15.",
+        "The price paid for the shares ranged from $10 to $15.",
+        "Prices of $10 and $15 were paid.",
+        "Prices were $10 and $15.",
+        "Prices as low as $10 and as high as $15 were paid.",
+        "Prices in the range of $10 to $15 were paid.",
+        "Prices within a range of $10 to $15 were paid.",
+        "Prices were from 1,000 to 1,100 per share.",
+        "The consideration was between 1,000 and 1,500 per share.",
+    ],
+)
+def test_each_frozen_price_range_shape_is_quarantined(range_text):
+    transaction = _parse_original(_with_footnote(range_text)).transactions[0]
+    assert ClassificationOutcome.EXCLUDE_PRICE_RANGE in transaction.outcomes
+    assert not transaction.eligible_for_lot_aggregation
+
+
+@pytest.mark.parametrize(
+    "non_range_text",
+    [
+        "The officer served from 2020 through 2022.",
+        "The price reflects a discount from market value.",
+        "The price was determined by agreement between the issuer and purchaser.",
+        "The purchase price was calculated from the issuer book value.",
+        "The purchase price was 10 and the shares were acquired from the issuer.",
+        "The price was determined under a Rule 10b5-1 plan.",
+        "The price was based on the market price on 2020-01-01.",
+        "The price was based on the market price in 2020-01.",
+        (
+            "The private purchase price was fixed for participants whose service "
+            "ranged from 10 to 15 years under a 10b5-1 plan."
+        ),
+        "The private purchase price was fixed under Sections 10 through 15 of the agreement.",
+        "The private purchase price was fixed and the plan covered classes 10 to 15.",
+        "The purchase price was $10 and 5,000 shares were acquired.",
+    ],
+)
+def test_non_range_footnote_does_not_become_a_price_range(non_range_text):
+    transaction = _parse_original(_with_footnote(non_range_text)).transactions[0]
+    assert transaction.eligible_for_lot_aggregation
+    assert ClassificationOutcome.EXCLUDE_PRICE_RANGE not in transaction.outcomes
 
 
 def test_private_and_10b5_1_purchases_are_retained_as_features_not_excluded():

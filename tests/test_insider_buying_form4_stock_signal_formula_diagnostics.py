@@ -1368,3 +1368,306 @@ def test_public_exports_are_explicit_and_package_bound():
         getattr(insider_package, name) is getattr(signal_module, name)
         for name in expected
     )
+
+
+# --- Claude review additions (2026-09-10): guards that survived targeted mutation ---
+
+
+def _rehash_contribution(contribution, **updates):
+    changed = _forge(contribution, **updates)
+    return _forge(
+        changed,
+        contribution_id=hash_payload(
+            signal_module._project_output(changed.lineage_payload())
+        ),
+    )
+
+
+def _replay_result(result) -> None:
+    type(result).__post_init__(result, signal_module._RESULT_FACTORY_TOKEN)
+
+
+def _replay_contribution(contribution) -> None:
+    type(contribution).__post_init__(
+        contribution,
+        signal_module._CONTRIBUTION_FACTORY_TOKEN,
+    )
+
+
+def _replay_breadth(breadth) -> None:
+    type(breadth).__post_init__(breadth, signal_module._BREADTH_FACTORY_TOKEN)
+
+
+def _replay_identity(identity) -> None:
+    type(identity).__post_init__(identity, signal_module._IDENTITY_FACTORY_TOKEN)
+
+
+def _identity_for(result, *, events=None, contributions=None, breadth=None, raw=None):
+    """Rebuild a replay-consistent identity for forged result parts."""
+    return signal_module._build_identity(
+        events=result.events if events is None else events,
+        contributions=result.contributions if contributions is None else contributions,
+        breadth=result.breadth if breadth is None else breadth,
+        raw_stock_score_diagnostic=(
+            result.raw_stock_score_diagnostic if raw is None else raw
+        ),
+        builder_git_commit=result.identity.builder_git_commit,
+    )
+
+
+def test_frozen_decimal_context_isolates_trapping_default_context():
+    """IB3A-R06's dangerous direction: a trapping DefaultContext must not refuse
+    a valid event.  The existing pre-import test disables every trap, so it
+    cannot detect the loss of the explicit ``flags``/``traps`` arguments."""
+    code = """
+from datetime import date
+from decimal import DefaultContext, Decimal, Inexact, Rounded
+
+DefaultContext.traps[Inexact] = True
+DefaultContext.traps[Rounded] = True
+
+from research.insider_buying.form4_stock_signal_formula_diagnostics import (
+    build_form4_stock_signal_fixture_event,
+    build_form4_stock_signal_formula_diagnostics,
+)
+
+event = build_form4_stock_signal_fixture_event(
+    source_event_id="a" * 64,
+    issuer_cik="0000123456",
+    security_id="security-common",
+    share_class_id="share-class-common",
+    buyer_id="buyer-1",
+    transaction_date=date(2026, 8, 18),
+    purchase_value_usd=Decimal("50000"),
+    age_trading_days=1,
+    normalized_role_ids=("director",),
+)
+result = build_form4_stock_signal_formula_diagnostics(
+    (event,),
+    builder_git_commit="d" * 40,
+)
+print(result.contributions[0].freshness)
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=MODULE_PATH.parents[2],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    expected = _build(_event(1, age_trading_days=1)).contributions[0].freshness
+    assert completed.stdout.strip() == str(expected)
+
+
+def test_process_seal_detects_in_place_equal_decimal_representation_change():
+    """The sealed-event fingerprint is the only guard here: ``decimal_text``
+    canonicalizes the representation, so the fixture-event ID still binds."""
+    event = _event(1)
+    decimal_tuple = event.purchase_value_usd.as_tuple()
+    variant = Decimal(
+        (decimal_tuple.sign, decimal_tuple.digits + (0,), decimal_tuple.exponent - 1)
+    )
+    assert variant == event.purchase_value_usd
+    assert variant.as_tuple() != decimal_tuple
+
+    object.__setattr__(event, "purchase_value_usd", variant)
+    assert event.fixture_event_id == hash_payload(
+        signal_module._project_output(event.lineage_payload())
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="unsealed or mutated",
+    ):
+        _build(event)
+
+
+@pytest.mark.parametrize(
+    "updates",
+    (
+        {"meets_minimum_purchase_value": False},
+        {"inside_lookback": False},
+        {"included_in_raw_score": False},
+    ),
+    ids=("minimum", "lookback", "included"),
+)
+def test_contribution_constructor_refuses_forged_routing_flags(updates):
+    result = _build(_event(1))
+    forged = _rehash_contribution(result.contributions[0], **updates)
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="threshold or lookback routing is inconsistent",
+    ):
+        _replay_contribution(forged)
+
+
+def test_result_replay_refuses_a_self_consistent_substituted_contribution():
+    """A contribution can be internally coherent yet describe another event."""
+    result = _build(_event(1, purchase_value_usd=Decimal("50000")))
+    other = _build(_event(2, purchase_value_usd=Decimal("100000")))
+    substituted = _rehash_contribution(
+        other.contributions[0],
+        source_event_id=result.contributions[0].source_event_id,
+        fixture_event_id=result.contributions[0].fixture_event_id,
+    )
+    _replay_contribution(substituted)
+
+    contributions = (substituted,)
+    forged = _forge(
+        result,
+        contributions=contributions,
+        identity=_identity_for(result, contributions=contributions),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="do not replay from their fixture events",
+    ):
+        _replay_result(forged)
+
+
+def test_result_replay_requires_canonical_event_order():
+    result = _build(_event(1), _event(2, buyer_id="buyer-2"))
+    events = tuple(reversed(result.events))
+    contributions = tuple(reversed(result.contributions))
+    forged = _forge(
+        result,
+        events=events,
+        contributions=contributions,
+        identity=_identity_for(result, events=events, contributions=contributions),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="canonical order",
+    ):
+        _replay_result(forged)
+
+
+def test_result_replay_refuses_a_self_consistent_substituted_breadth():
+    result = _build(_event(1), _event(2, buyer_id="buyer-2"))
+    other = _build(
+        _event(1),
+        _event(2, buyer_id="buyer-2", purchase_value_usd=Decimal("150000")),
+    )
+    assert other.breadth.total_purchase_value_usd != result.breadth.total_purchase_value_usd
+    _replay_breadth(other.breadth)
+
+    forged = _forge(
+        result,
+        breadth=other.breadth,
+        identity=_identity_for(result, breadth=other.breadth),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="breadth diagnostics do not replay",
+    ):
+        _replay_result(forged)
+
+
+def test_result_replay_refuses_a_self_consistent_substituted_identity():
+    result = _build(_event(1))
+    forged_identity = _rehash_identity(result.identity, issuer_cik="0000654321")
+    _replay_identity(forged_identity)
+
+    forged = _forge(result, identity=forged_identity)
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="identity does not replay",
+    ):
+        _replay_result(forged)
+
+
+def test_result_replay_binds_the_raw_score_to_its_included_contributions():
+    result = _build(_event(1))
+    inflated = result.raw_stock_score_diagnostic + Decimal("1")
+    forged = _forge(result, raw_stock_score_diagnostic=inflated)
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="raw stock-score diagnostic is inconsistent",
+    ):
+        _replay_result(forged)
+
+
+@pytest.mark.parametrize("field_name", ("security_id", "share_class_id"))
+def test_result_replay_binds_the_stock_key_to_its_events(field_name):
+    result = _build(_event(1))
+    forged = _forge(result, **{field_name: "substituted-identifier"})
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="result stock key is inconsistent",
+    ):
+        _replay_result(forged)
+
+
+def test_seal_detects_representation_drift_during_formula_evaluation(
+    monkeypatch,
+):
+    """An equal-valued representation change replays identically through every
+    formula, so only a fingerprint comparison can see it.  The refusal comes
+    from the result constructor's own seal check, which makes the later
+    post-build recheck defence in depth rather than the load-bearing guard."""
+    event = _event(1)
+    decimal_tuple = event.purchase_value_usd.as_tuple()
+    variant = Decimal(
+        (decimal_tuple.sign, decimal_tuple.digits + (0,), decimal_tuple.exponent - 1)
+    )
+    real_build_identity = signal_module._build_identity
+
+    def mutate_then_build(**kwargs):
+        object.__setattr__(event, "purchase_value_usd", variant)
+        return real_build_identity(**kwargs)
+
+    monkeypatch.setattr(signal_module, "_build_identity", mutate_then_build)
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="changed during formula evaluation|unsealed or mutated",
+    ):
+        _build(event)
+
+
+@pytest.mark.parametrize(
+    ("updates", "expected"),
+    (
+        ({"buyer_breadth": 2}, "buyer breadth count is inconsistent"),
+        ({"role_breadth": 2}, "role breadth count is inconsistent"),
+        ({"date_breadth": 2}, "date breadth count is inconsistent"),
+    ),
+)
+def test_breadth_counts_are_bound_to_their_inventories(updates, expected):
+    result = _build(_event(1))
+    forged = _rehash_breadth(result.breadth, **updates)
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match=expected,
+    ):
+        _replay_breadth(forged)
+
+
+def test_breadth_buyer_count_cannot_exceed_the_included_event_count():
+    result = _build(_event(1), _event(2, buyer_id="buyer-2"))
+    breadth = result.breadth
+    assert breadth.buyer_breadth == breadth.included_event_count == 2
+    forged = _rehash_breadth(breadth, included_event_count=1)
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="buyer breadth exceeds included event count",
+    ):
+        _replay_breadth(forged)
+
+
+@pytest.mark.parametrize(
+    "updates",
+    (
+        {"contribution_count": 2},
+        {"included_event_count": 2},
+        {"included_event_count": 0},
+    ),
+    ids=("contribution-count", "included-above-fixture", "included-zero"),
+)
+def test_identity_counts_are_mutually_consistent(updates):
+    result = _build(_event(1))
+    assert result.identity.fixture_event_count == 1
+    forged = _rehash_identity(result.identity, **updates)
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="identity counts are inconsistent",
+    ):
+        _replay_identity(forged)

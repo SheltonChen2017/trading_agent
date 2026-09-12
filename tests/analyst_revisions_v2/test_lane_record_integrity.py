@@ -29,6 +29,11 @@ _PASSIVE_REVIEW_ACTION = re.compile(
     r"(?:counter[- ]?)?reviewed\b[^.]{0,80}\bby\s+(?:Codex|Claude)\b",
     flags=re.IGNORECASE,
 )
+_EXPLICIT_OWNER_REVIEW_WAIVER = re.compile(
+    r"\bowner\s+explicitly\s+waives\b[^.]{0,120}"
+    r"\bClaude\s+review\s+of\s+section\s+\d+\b",
+    flags=re.IGNORECASE,
+)
 
 
 def _names_review_by_agent(sentence: str) -> bool:
@@ -36,6 +41,10 @@ def _names_review_by_agent(sentence: str) -> bool:
         _ACTIVE_REVIEW_ACTION.search(sentence)
         or _PASSIVE_REVIEW_ACTION.search(sentence)
     )
+
+
+def _names_explicit_owner_review_waiver(sentence: str) -> bool:
+    return bool(_EXPLICIT_OWNER_REVIEW_WAIVER.search(sentence))
 
 
 def test_session_push_ledger_is_one_contiguous_gfm_table() -> None:
@@ -84,8 +93,8 @@ def test_exact_next_step_references_the_latest_numbered_section() -> None:
     assert f"section {latest}" in exact_next_step.casefold()
 
 
-def test_exact_next_step_names_the_review_of_the_latest_section() -> None:
-    """The live handoff must name both a reviewer and the review action."""
+def test_exact_next_step_names_review_or_owner_waiver_of_latest_section() -> None:
+    """The live handoff must name review or an exact owner review exception."""
 
     text = RECORD.read_text(encoding="utf-8")
     section_numbers = [
@@ -103,9 +112,13 @@ def test_exact_next_step_names_the_review_of_the_latest_section() -> None:
         rf"[^.]*\bsection {latest}\b[^.]*\.", normalized, flags=re.IGNORECASE
     )
     assert sentences, f"the exact next step never names section {latest}"
-    assert any(_names_review_by_agent(sentence) for sentence in sentences), (
-        f"the exact next step cites section {latest} but never says who reviews "
-        "it; the alternating review step must not drop out of the live handoff"
+    assert any(
+        _names_review_by_agent(sentence)
+        or _names_explicit_owner_review_waiver(sentence)
+        for sentence in sentences
+    ), (
+        f"the exact next step cites section {latest} but names neither an "
+        "active review nor an explicit owner waiver"
     )
 
 
@@ -161,3 +174,22 @@ def test_review_sentence_classifier_requires_agent_and_accepts_verb_forms() -> N
 
     assert all(_names_review_by_agent(sentence) for sentence in accepted)
     assert not any(_names_review_by_agent(sentence) for sentence in rejected)
+
+
+def test_owner_review_waiver_classifier_is_exact_and_section_shaped() -> None:
+    accepted = (
+        "The owner explicitly waives an additional Claude review of section 68.",
+        "Owner explicitly waives the Claude review of section 7 before C1.",
+    )
+    rejected = (
+        "Claude review of section 68 is complete.",
+        "The owner may waive a Claude review of section 68.",
+        "The reviewer explicitly waives Claude review of section 68.",
+        "The owner explicitly waives a review of section 68.",
+        "The owner explicitly waives Claude review of an unspecified section.",
+    )
+
+    assert all(_names_explicit_owner_review_waiver(value) for value in accepted)
+    assert not any(
+        _names_explicit_owner_review_waiver(value) for value in rejected
+    )

@@ -1126,10 +1126,12 @@ def _qc_transitive_import_closure() -> tuple[str, ...]:
     visited: set[str] = set()
     allowed_external_roots = {
         *DEFAULT_ALLOWED_STDLIB_ROOTS,
+        "base64",
         "functools",
         "inspect",
         "pandas",
         "pandas_market_calendars",
+        "textwrap",
     }
     forbidden = DEFAULT_FORBIDDEN_IMPORT_PREFIXES - {
         "research.analyst_revisions_v2_qc"
@@ -1176,6 +1178,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.object_store_read_contract",
         "research.analyst_revisions_v2_qc.refusal_smoke_projection",
         "research.analyst_revisions_v2_qc.run_contract",
+        "research.analyst_revisions_v2_qc.runtime_shard_projection",
         "research.analyst_revisions_v2_qc.synthetic_input_transport",
     )
     sources = tuple(sorted(PACKAGE.glob("*.py")))
@@ -1188,6 +1191,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "object_store_read_contract.py",
         "refusal_smoke_projection.py",
         "run_contract.py",
+        "runtime_shard_projection.py",
         "synthetic_input_transport.py",
     )
     assert {

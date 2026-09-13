@@ -25,9 +25,13 @@ from research.analyst_revisions_v2.four_family_multiplicity import (
     ANALYST_LANE_ID,
     ANALYST_LOOK_ID,
     FIXED_LANE_IDS,
+    FIXED_LANE_COUNT,
     ID_PREFIX,
     OVERLAY_ARTIFACT_SHA256,
+    PERMANENT_LANE_ALPHA,
     QC_PLAN_ARTIFACT_SHA256,
+    SHARED_FAMILY_ALPHA,
+    SUPERSEDED_ANALYST_ALPHA,
     SUPERSEDED_PARENT_PATHS,
     ZERO_LOOK_AUTHORITY_ARTIFACT_SHA256,
     FourFamilyMultiplicityError,
@@ -215,6 +219,10 @@ def test_exact_four_family_contract_and_within_lane_arithmetic(overlay):
         "target-price-revisions",
     )
     assert FIXED_LANE_IDS == expected_lanes
+    assert FIXED_LANE_COUNT == len(FIXED_LANE_IDS) == 4
+    assert SHARED_FAMILY_ALPHA == Fraction(1, 20)
+    assert PERMANENT_LANE_ALPHA == Fraction(1, 80)
+    assert SUPERSEDED_ANALYST_ALPHA == Fraction(1, 60)
     assert overlay.fixed_lane_ids == expected_lanes
     assert shared["fixed_lane_count"] == 4
     assert shared["two_sided_family_wise_alpha"] == {

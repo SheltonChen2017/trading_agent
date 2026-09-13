@@ -67,6 +67,514 @@ MODULE = PACKAGE / "object_store_read_contract.py"
 B3_MODULE = PACKAGE / "synthetic_input_transport.py"
 
 
+# Keep the QC package boundary exhaustive.  The first ten B4-era modules were
+# all pure, so the historical guard could apply one package-wide no-I/O rule.
+# The formal-run milestones deliberately add three different kinds of source:
+# pure/value projections, host-only adapters, and one source file that executes
+# inside QC.  Every file must remain in exactly one class; adding a module can
+# therefore never make it disappear from the guard merely because it performs
+# I/O.
+_PINNED_QC_PACKAGE_SOURCES = tuple(
+    """
+    __init__.py event_study.py formal_cloud_evaluator.py
+    formal_economic_execution_definition.py formal_evaluation.py
+    formal_evaluation_bridge.py formal_input_bundle.py formal_input_composer.py
+    formal_qc_transport.py formal_report_contract.py formal_run_protocol.py
+    formal_runtime_projection.py
+    formal_streaming_bridge.py formal_streaming_input.py
+    formal_submission_adapter.py formal_terminal_disposition_builder.py
+    fundamental_universe_discovery.py
+    fundamental_universe_discovery_runtime.py
+    fundamental_universe_discovery_submission_adapter.py
+    fundamental_universe_discovery_worker.py global_input_bundle.py
+    global_input_schema.py lean_source_assembly.py object_store_read_contract.py
+    owner_signature_authority.py power_calibration_bridge.py
+    power_calibration_runtime.py power_calibration_submission_adapter.py
+    power_calibration_worker.py pre_qc_orchestrator.py
+    preopen_control_acquisition_io.py
+    preopen_control_runtime.py preopen_control_stage.py
+    preopen_control_submission_adapter.py preopen_control_worker.py
+    preopen_quality_worker.py production_evidence_acquisition_io.py
+    production_evidence_composer.py refusal_smoke_projection.py run_contract.py
+    runtime_shard_projection.py synthetic_input_transport.py
+    """.split()
+)
+
+_ZERO_EXTERNAL_IO_IMPORTS = {
+    "__init__.py": (),
+    "event_study.py": tuple(
+        """
+        __future__ dataclasses hashlib json collections datetime decimal
+        functools types typing data.exchange_calendar
+        research.analyst_revisions_v2_qc.run_contract
+        """.split()
+    ),
+    "formal_report_contract.py": tuple(
+        "__future__ dataclasses hashlib json re threading weakref typing".split()
+    ),
+    "formal_input_composer.py": tuple(
+        """
+        __future__ dataclasses hashlib json re threading weakref collections
+        datetime decimal collections.abc
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2.production_scoring
+        research.analyst_revisions_v2.production_truth_gate
+        research.analyst_revisions_v2_qc.event_study
+        research.analyst_revisions_v2_qc.formal_input_bundle
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        research.analyst_revisions_v2_qc.formal_runtime_projection
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        """.split()
+    ),
+    "formal_runtime_projection.py": tuple(
+        """
+        __future__ ast base64 dataclasses gzip hashlib json re textwrap datetime
+        typing research.analyst_revisions_v2_qc.formal_run_protocol
+        """.split()
+    ),
+    "global_input_bundle.py": tuple(
+        """
+        __future__ dataclasses hashlib json re collections datetime decimal types
+        research.analyst_revisions_v2_qc.event_study
+        research.analyst_revisions_v2_qc.global_input_schema
+        research.analyst_revisions_v2_qc.run_contract
+        """.split()
+    ),
+    "global_input_schema.py": tuple(
+        """
+        __future__ dataclasses hashlib json re datetime types
+        research.analyst_revisions_v2_qc.event_study
+        research.analyst_revisions_v2_qc.run_contract
+        """.split()
+    ),
+    "lean_source_assembly.py": tuple(
+        """
+        __future__ ast dataclasses hashlib json re
+        research.analyst_revisions_v2_qc.object_store_read_contract
+        research.analyst_revisions_v2_qc.run_contract
+        research.analyst_revisions_v2_qc.synthetic_input_transport
+        """.split()
+    ),
+    "object_store_read_contract.py": tuple(
+        """
+        __future__ dataclasses hashlib inspect json re
+        research.analyst_revisions_v2_qc.run_contract
+        research.analyst_revisions_v2_qc.synthetic_input_transport
+        """.split()
+    ),
+    "fundamental_universe_discovery_worker.py": tuple(
+        "__future__ hashlib json re datetime decimal".split()
+    ),
+    "power_calibration_runtime.py": tuple(
+        """
+        __future__ ast dataclasses hashlib json textwrap
+        research.analyst_revisions_v2_qc.power_calibration_bridge
+        """.split()
+    ),
+    "power_calibration_worker.py": tuple(
+        "__future__ hashlib json decimal".split()
+    ),
+    "preopen_control_worker.py": tuple(
+        """
+        __future__ hashlib json re datetime decimal zoneinfo
+        preopen_quality_worker
+        """.split()
+    ),
+    "preopen_quality_worker.py": tuple(
+        "__future__ hashlib json re datetime decimal".split()
+    ),
+    "refusal_smoke_projection.py": tuple(
+        """
+        __future__ ast dataclasses hashlib json
+        research.analyst_revisions_v2_qc.lean_source_assembly
+        """.split()
+    ),
+    "run_contract.py": tuple(
+        "__future__ dataclasses hashlib json re types typing".split()
+    ),
+    "runtime_shard_projection.py": tuple(
+        """
+        __future__ ast base64 dataclasses hashlib json re textwrap
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.lean_source_assembly
+        """.split()
+    ),
+    "synthetic_input_transport.py": tuple(
+        """
+        __future__ dataclasses hashlib inspect json re
+        research.analyst_revisions_v2_qc.global_input_bundle
+        research.analyst_revisions_v2_qc.global_input_schema
+        research.analyst_revisions_v2_qc.run_contract
+        """.split()
+    ),
+}
+_ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
+
+# The dependency tuple for every host-only adapter is exact, not a broad
+# package exemption.  This both documents why the file is outside the pure
+# class and makes any new dependency a review event.
+_HOST_ONLY_ADAPTER_IMPORTS = {
+    # These three modules remain external-I/O-free in behavior, but their
+    # process-bound authority registries deliberately import ``os`` for PID/
+    # fork authentication.  Classify that capability-bearing import here so
+    # it cannot disappear into the zero-capability source class.
+    "formal_cloud_evaluator.py": tuple(
+        """
+        __future__ dataclasses base64 gzip hashlib json os re sys threading
+        weakref zlib collections datetime decimal fractions typing zoneinfo
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_evaluation
+        """.split()
+    ),
+    "formal_economic_execution_definition.py": tuple(
+        """
+        __future__ dataclasses hashlib json os re sys threading weakref datetime
+        typing data.exchange_calendar
+        research.analyst_revisions_v2.stock_evaluation_contract
+        """.split()
+    ),
+    "formal_evaluation.py": tuple(
+        """
+        __future__ dataclasses hashlib json os re threading weakref collections
+        datetime decimal fractions enum types typing
+        """.split()
+    ),
+    "formal_evaluation_bridge.py": tuple(
+        """
+        __future__ base64 dataclasses hashlib json os re sys threading weakref
+        zlib collections.abc research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_cloud_evaluator
+        research.analyst_revisions_v2_qc.formal_report_contract
+        research.analyst_revisions_v2_qc.formal_runtime_projection
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.formal_streaming_input
+        """.split()
+    ),
+    "formal_input_bundle.py": tuple(
+        """
+        __future__ dataclasses heapq hashlib itertools json os re sys threading
+        weakref bisect collections datetime decimal enum fractions
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.formulas data.exchange_calendar
+        research.analyst_revisions_v2.power_calibration_receipt
+        research.analyst_revisions_v2.power_calibration_protocol
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2.global_benchmark_contract
+        research.analyst_revisions_v2.production_truth_gate
+        research.analyst_revisions_v2.production_scoring
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        research.analyst_revisions_v2_qc.power_calibration_bridge
+        """.split()
+    ),
+    "formal_qc_transport.py": tuple(
+        """
+        __future__ base64 hashlib json math os re ssl sys threading time typing
+        urllib research.quantconnect
+        """.split()
+    ),
+    "formal_run_protocol.py": tuple(
+        "__future__ dataclasses hashlib json os re stat datetime pathlib types typing".split()
+    ),
+    "formal_streaming_input.py": tuple(
+        """
+        __future__ dataclasses gzip hashlib itertools heapq io json os stat sys
+        tempfile threading weakref bisect collections collections.abc datetime
+        decimal enum fractions pathlib typing
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.global_benchmark_contract
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2.production_evidence_acquisition
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2.production_scoring
+        research.analyst_revisions_v2.production_truth_gate scripts
+        scripts.build_arv2_historical_preopen_bridge data.exchange_calendar
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.preopen_control_acquisition_io
+        research.analyst_revisions_v2_qc.formal_input_bundle
+        research.analyst_revisions_v2_qc.formal_economic_execution_definition
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        research.analyst_revisions_v2_qc.formal_report_contract
+        research.analyst_revisions_v2_qc.formal_runtime_projection
+        research.analyst_revisions_v2_qc.formal_input_composer
+        research.analyst_revisions_v2_qc.formal_terminal_disposition_builder
+        """.split()
+    ),
+    "formal_streaming_bridge.py": tuple(
+        """
+        __future__ dataclasses gzip hashlib os sqlite3 sys tempfile threading
+        weakref collections collections.abc datetime pathlib
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_runtime_projection
+        research.analyst_revisions_v2_qc.formal_economic_execution_definition
+        research.analyst_revisions_v2_qc.formal_report_contract
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        research.analyst_revisions_v2_qc.formal_streaming_input
+        research.analyst_revisions_v2_qc.formal_terminal_disposition_builder
+        """.split()
+    ),
+    "formal_submission_adapter.py": tuple(
+        """
+        __future__ base64 dataclasses hashlib json os re stat sys threading time
+        weakref zlib datetime pathlib typing
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        research.analyst_revisions_v2_qc.formal_runtime_projection
+        research.analyst_revisions_v2_qc.formal_economic_execution_definition
+        research.analyst_revisions_v2_qc.formal_report_contract
+        research.analyst_revisions_v2_qc.runtime_shard_projection
+        research.analyst_revisions_v2_qc.formal_streaming_bridge
+        research.analyst_revisions_v2_qc.power_calibration_bridge
+        research.analyst_revisions_v2_qc.formal_cloud_evaluator
+        """.split()
+    ),
+    "formal_terminal_disposition_builder.py": tuple(
+        """
+        __future__ dataclasses hashlib os sqlite3 stat threading weakref
+        collections datetime pathlib typing urllib.parse data.exchange_calendar
+        research.analyst_revisions_v2.canonical scripts
+        scripts.build_arv2_historical_preopen_bridge
+        research.analyst_revisions_v2_qc.formal_input_composer
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        research.analyst_revisions_v2_qc.formal_runtime_projection
+        """.split()
+    ),
+    "fundamental_universe_discovery.py": tuple(
+        """
+        __future__ ast dataclasses gzip hashlib io json os re stat threading
+        weakref datetime decimal pathlib typing zoneinfo
+        """.split()
+    ),
+    "fundamental_universe_discovery_submission_adapter.py": tuple(
+        """
+        __future__ base64 dataclasses hashlib json os re stat sys threading time
+        weakref datetime pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.fundamental_universe_discovery
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        """.split()
+    ),
+    "owner_signature_authority.py": tuple(
+        "__future__ base64 binascii dataclasses hashlib os re stat subprocess tempfile pathlib types json".split()
+    ),
+    "preopen_control_acquisition_io.py": tuple(
+        """
+        __future__ gzip hashlib io json os stat sys heapq datetime decimal pathlib
+        typing zoneinfo research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2_qc.preopen_quality_worker
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        inspect
+        """.split()
+    ),
+    "preopen_control_stage.py": tuple(
+        """
+        __future__ ast dataclasses gzip hashlib io json os re stat threading weakref
+        datetime pathlib typing zoneinfo
+        research.analyst_revisions_v2.preopen_control_acquisition
+        """.split()
+    ),
+    "preopen_control_submission_adapter.py": tuple(
+        """
+        __future__ base64 dataclasses hashlib json os re stat sys threading time
+        weakref datetime pathlib
+        research.analyst_revisions_v2
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.preopen_control_acquisition_io
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.formal_streaming_input
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        research.analyst_revisions_v2_qc.preopen_control_stage
+        """.split()
+    ),
+    "production_evidence_acquisition_io.py": tuple(
+        """
+        __future__ os stat sys pathlib research.analyst_revisions_v2.artifact_io
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2
+        research.analyst_revisions_v2.production_evidence_acquisition
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        inspect json
+        """.split()
+    ),
+    "production_evidence_composer.py": tuple(
+        """
+        __future__ dataclasses os re sqlite3 stat tempfile threading weakref
+        collections datetime decimal pathlib typing
+        research.analyst_revisions_v2 research.analyst_revisions_v2.firm_ontology
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2.production_evidence_acquisition
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2.production_truth_gate scripts
+        scripts.build_arv2_historical_preopen_bridge
+        research.analyst_revisions_v2_qc.formal_streaming_input
+        """.split()
+    ),
+    "power_calibration_bridge.py": tuple(
+        """
+        __future__ dataclasses gzip hashlib json os re stat sys threading weakref
+        datetime decimal enum pathlib typing data.exchange_calendar
+        research.analyst_revisions_v2.power_calibration_protocol
+        research.analyst_revisions_v2.power_calibration_input_schema
+        research.analyst_revisions_v2.production_scoring
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2_qc.formal_terminal_disposition_builder
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_streaming_input
+        research.analyst_revisions_v2.production_evidence_acquisition
+        research.analyst_revisions_v2_qc.formal_input_bundle
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        """.split()
+    ),
+    "power_calibration_submission_adapter.py": tuple(
+        """
+        __future__ base64 dataclasses hashlib json os sys threading time weakref
+        datetime pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.power_calibration_bridge
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        research.analyst_revisions_v2_qc.power_calibration_runtime
+        """.split()
+    ),
+    "pre_qc_orchestrator.py": tuple(
+        """
+        __future__ dataclasses hashlib json os re sys enum types typing
+        scripts.build_arv2_historical_preopen_bridge
+        research.analyst_revisions_v2.production_evidence_acquisition
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        research.analyst_revisions_v2_qc.formal_streaming_bridge
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        research.analyst_revisions_v2_qc.formal_terminal_disposition_builder
+        research.analyst_revisions_v2_qc.power_calibration_bridge
+        """.split()
+    ),
+}
+
+_HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "formal_cloud_evaluator.py": ("import:os",),
+    "formal_economic_execution_definition.py": ("import:os",),
+    "formal_evaluation_bridge.py": ("import:os",),
+    "formal_evaluation.py": ("import:os",),
+    "formal_input_bundle.py": ("import:os",),
+    "formal_qc_transport.py": ("import:os", "import:urllib"),
+    "formal_run_protocol.py": ("call:open", "import:os", "import:pathlib"),
+    "formal_streaming_bridge.py": ("call:open", "import:os", "import:pathlib"),
+    "formal_streaming_input.py": ("call:open", "import:os", "import:pathlib"),
+    "formal_submission_adapter.py": (
+        "call:open",
+        "call:read_bytes",
+        "import:os",
+        "import:pathlib",
+    ),
+    "formal_terminal_disposition_builder.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+        "import:urllib",
+    ),
+    "fundamental_universe_discovery.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "fundamental_universe_discovery_submission_adapter.py": (
+        "call:open",
+        "call:read_bytes",
+        "import:os",
+        "import:pathlib",
+    ),
+    "owner_signature_authority.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+        "import:subprocess",
+    ),
+    "preopen_control_acquisition_io.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "preopen_control_stage.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "preopen_control_submission_adapter.py": (
+        "call:open",
+        "call:read_bytes",
+        "import:os",
+        "import:pathlib",
+    ),
+    "production_evidence_acquisition_io.py": ("import:os", "import:pathlib"),
+    "production_evidence_composer.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "power_calibration_bridge.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "power_calibration_submission_adapter.py": ("import:os", "import:pathlib"),
+    "pre_qc_orchestrator.py": ("import:os",),
+}
+
+_QC_RUNTIME_IMPORTS = {
+    "fundamental_universe_discovery_runtime.py": tuple(
+        """
+        __future__ gzip hashlib io json datetime zoneinfo AlgorithmImports
+        fundamental_universe_discovery_worker
+        """.split()
+    ),
+    "preopen_control_runtime.py": tuple(
+        "__future__ gzip hashlib heapq io json datetime itertools zoneinfo "
+        "AlgorithmImports preopen_control_worker".split()
+    )
+}
+_QC_RUNTIME_IO_SURFACE = {
+    "fundamental_universe_discovery_runtime.py": (
+        "call:history",
+        "call:read_bytes",
+        "call:save_bytes",
+        "call:set_summary_statistic",
+        "import:algorithmimports",
+    ),
+    "preopen_control_runtime.py": (
+        "call:history",
+        "call:read_bytes",
+        "call:save_bytes",
+        "call:set_summary_statistic",
+        "import:algorithmimports",
+    )
+}
+
+_PINNED_ZERO_IO_TO_ACTION_BEARING_EDGES = frozenset(
+    tuple(line.split())
+    for line in """
+research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2_qc.formal_input_bundle
+research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2_qc.formal_run_protocol
+research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2_qc.formal_submission_adapter
+research.analyst_revisions_v2_qc.formal_runtime_projection research.analyst_revisions_v2_qc.formal_run_protocol
+research.analyst_revisions_v2_qc.power_calibration_runtime research.analyst_revisions_v2_qc.power_calibration_bridge
+""".strip().splitlines()
+)
+
+
 def _plan(*, max_size: int | None = None, max_files: int = 1000):
     candidate, _, _, fixture = _b3_fixture()
     total = sum(len(item.payload) for item in fixture.entries)
@@ -983,7 +1491,6 @@ def _no_io_violations(source: str) -> tuple[str, ...]:
     tree = ast.parse(source)
     forbidden_import_roots = {
         "builtins",
-        "io",
         "os",
         "pathlib",
         "subprocess",
@@ -1009,11 +1516,16 @@ def _no_io_violations(source: str) -> tuple[str, ...]:
         "write_text",
         "put",
         "save",
+        "save_bytes",
         "delete",
         "create_project",
         "compile_project",
         "backtest",
         "launch",
+        "history",
+        "add_equity",
+        "remove_security",
+        "set_summary_statistic",
         "submit_order",
     }
     violations: set[str] = set()
@@ -1116,7 +1628,99 @@ def _resolved_imports(
     return tuple(dict.fromkeys(imports))
 
 
-def _qc_transitive_import_closure() -> tuple[str, ...]:
+_PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
+    tuple(line.split())
+    for line in """
+research.analyst_revisions_v2_qc.formal_economic_execution_definition research.analyst_revisions_v2.stock_evaluation_contract
+research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.formulas
+research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.global_benchmark_contract
+research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.power_calibration_protocol
+research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.power_calibration_receipt
+research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.production_scoring
+research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.production_truth_gate
+research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2.production_scoring
+research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2.production_truth_gate
+research.analyst_revisions_v2_qc.formal_qc_transport research.quantconnect
+research.analyst_revisions_v2_qc.formal_streaming_bridge research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.formal_streaming_bridge research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.global_benchmark_contract
+research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.production_evidence_acquisition
+research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.production_scoring
+research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.production_truth_gate
+research.analyst_revisions_v2_qc.formal_streaming_input scripts.build_arv2_historical_preopen_bridge
+research.analyst_revisions_v2_qc.formal_terminal_disposition_builder research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.formal_terminal_disposition_builder scripts.build_arv2_historical_preopen_bridge
+research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime fundamental_universe_discovery_worker
+research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.power_calibration_input_schema
+research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.power_calibration_protocol
+research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.production_evidence_acquisition
+research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.production_scoring
+research.analyst_revisions_v2_qc.pre_qc_orchestrator research.analyst_revisions_v2.production_evidence_acquisition
+research.analyst_revisions_v2_qc.pre_qc_orchestrator research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.pre_qc_orchestrator scripts.build_arv2_historical_preopen_bridge
+research.analyst_revisions_v2_qc.preopen_control_acquisition_io research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.preopen_control_acquisition_io research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.preopen_control_acquisition_io research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.preopen_control_runtime preopen_control_worker
+research.analyst_revisions_v2_qc.preopen_control_stage research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.preopen_control_submission_adapter research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.preopen_control_submission_adapter research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.preopen_control_worker preopen_quality_worker
+research.analyst_revisions_v2_qc.production_evidence_acquisition_io research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.production_evidence_acquisition_io research.analyst_revisions_v2.artifact_io
+research.analyst_revisions_v2_qc.production_evidence_acquisition_io research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.production_evidence_acquisition_io research.analyst_revisions_v2.production_evidence_acquisition
+research.analyst_revisions_v2_qc.production_evidence_acquisition_io research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.production_evidence_composer research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.production_evidence_composer research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.production_evidence_composer research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.production_evidence_composer research.analyst_revisions_v2.firm_ontology
+research.analyst_revisions_v2_qc.production_evidence_composer research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.production_evidence_composer research.analyst_revisions_v2.production_evidence_acquisition
+research.analyst_revisions_v2_qc.production_evidence_composer research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.production_evidence_composer research.analyst_revisions_v2.production_truth_gate
+research.analyst_revisions_v2_qc.production_evidence_composer scripts.build_arv2_historical_preopen_bridge
+""".strip().splitlines()
+)
+
+_PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
+    {
+        (
+            "research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime",
+            "fundamental_universe_discovery_worker",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.preopen_control_runtime",
+            "preopen_control_worker",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.preopen_control_worker",
+            "preopen_quality_worker",
+        ),
+    }
+)
+
+
+def _qc_source_name(module_name: str) -> str:
+    if module_name == "research.analyst_revisions_v2_qc":
+        return "__init__.py"
+    return f"{module_name.rsplit('.', 1)[-1]}.py"
+
+
+def _qc_transitive_import_closure(
+) -> tuple[
+    tuple[str, ...],
+    tuple[tuple[str, str], ...],
+    frozenset[tuple[str, str]],
+]:
     pending = [
         "research.analyst_revisions_v2_qc"
         if path.name == "__init__.py"
@@ -1124,14 +1728,20 @@ def _qc_transitive_import_closure() -> tuple[str, ...]:
         for path in sorted(PACKAGE.glob("*.py"))
     ]
     visited: set[str] = set()
-    allowed_external_roots = {
+    boundary_edges: set[tuple[str, str]] = set()
+    zero_io_to_action_edges: set[tuple[str, str]] = set()
+    zero_io_external_roots = {
         *DEFAULT_ALLOWED_STDLIB_ROOTS,
         "base64",
         "functools",
+        "gzip",
         "inspect",
+        "io",
+        "itertools",
         "pandas",
         "pandas_market_calendars",
         "textwrap",
+        "zoneinfo",
     }
     forbidden = DEFAULT_FORBIDDEN_IMPORT_PREFIXES - {
         "research.analyst_revisions_v2_qc"
@@ -1144,60 +1754,154 @@ def _qc_transitive_import_closure() -> tuple[str, ...]:
         assert located is not None, module_name
         path, is_package = located
         visited.add(module_name)
-        for imported in _resolved_imports(
-            path.read_text(encoding="utf-8"),
+        source = path.read_text(encoding="utf-8")
+        imports = _resolved_imports(
+            source,
             module_name=module_name,
             is_package=is_package,
-        ):
+        )
+        if module_name.startswith("research.analyst_revisions_v2_qc"):
+            source_name = _qc_source_name(module_name)
+            if source_name in _HOST_ONLY_ADAPTER_IMPORTS:
+                assert imports == _HOST_ONLY_ADAPTER_IMPORTS[source_name]
+                assert _no_io_violations(source) == (
+                    _HOST_ONLY_ADAPTER_IO_SURFACE[source_name]
+                )
+            elif source_name in _QC_RUNTIME_IMPORTS:
+                assert imports == _QC_RUNTIME_IMPORTS[source_name]
+                assert _no_io_violations(source) == _QC_RUNTIME_IO_SURFACE[source_name]
+            else:
+                assert source_name in _ZERO_EXTERNAL_IO_SOURCES
+                assert imports == _ZERO_EXTERNAL_IO_IMPORTS[source_name]
+                assert _no_io_violations(source) == ()
+        else:
+            assert module_name == "data.exchange_calendar"
+            assert _no_io_violations(source) == ()
+
+        for imported in imports:
+            local = _local_module_path(imported)
+            if local is not None:
+                if imported.startswith("research.analyst_revisions_v2_qc") or (
+                    imported == "data.exchange_calendar"
+                ):
+                    if (
+                        module_name.startswith("research.analyst_revisions_v2_qc")
+                        and _qc_source_name(module_name)
+                        in _ZERO_EXTERNAL_IO_SOURCES
+                        and imported.startswith(
+                            "research.analyst_revisions_v2_qc."
+                        )
+                        and _qc_source_name(imported)
+                        in (
+                            frozenset(_HOST_ONLY_ADAPTER_IMPORTS)
+                            | frozenset(_QC_RUNTIME_IMPORTS)
+                        )
+                    ):
+                        zero_io_to_action_edges.add((module_name, imported))
+                    pending.append(imported)
+                else:
+                    boundary_edges.add((module_name, imported))
+                continue
+            if (module_name, imported) in _PINNED_PROJECTED_SIBLING_IMPORTS:
+                boundary_edges.add((module_name, imported))
+                continue
+            if module_name.startswith("research.analyst_revisions_v2_qc"):
+                source_name = _qc_source_name(module_name)
+                if source_name in _HOST_ONLY_ADAPTER_IMPORTS or (
+                    source_name in _QC_RUNTIME_IMPORTS
+                ):
+                    # Exact tuples above are the complete permitted dependency
+                    # surface for action-bearing source.
+                    continue
             assert not any(
                 imported == prefix or imported.startswith(prefix + ".")
                 for prefix in forbidden
             ), f"forbidden import {module_name} -> {imported}"
-            local = _local_module_path(imported)
-            if local is not None:
-                assert imported.startswith("research.analyst_revisions_v2_qc") or (
-                    imported == "data.exchange_calendar"
-                ), f"unapproved local import {module_name} -> {imported}"
-                pending.append(imported)
-                continue
-            assert imported.partition(".")[0] in allowed_external_roots, (
+            assert imported.partition(".")[0] in zero_io_external_roots, (
                 f"unapproved external import {module_name} -> {imported}"
             )
-    return tuple(sorted(visited))
+    return (
+        tuple(sorted(visited)),
+        tuple(sorted(boundary_edges)),
+        frozenset(zero_io_to_action_edges),
+    )
 
 
 def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
-    reached = _qc_transitive_import_closure()
+    sources = tuple(sorted(PACKAGE.glob("*.py")))
+    assert tuple(path.name for path in sources) == _PINNED_QC_PACKAGE_SOURCES
+    classified = (
+        _ZERO_EXTERNAL_IO_SOURCES
+        | frozenset(_HOST_ONLY_ADAPTER_IMPORTS)
+        | frozenset(_QC_RUNTIME_IMPORTS)
+    )
+    assert classified == frozenset(_PINNED_QC_PACKAGE_SOURCES)
+    assert not (
+        _ZERO_EXTERNAL_IO_SOURCES & frozenset(_HOST_ONLY_ADAPTER_IMPORTS)
+    )
+    assert not (_ZERO_EXTERNAL_IO_SOURCES & frozenset(_QC_RUNTIME_IMPORTS))
+    assert not (
+        frozenset(_HOST_ONLY_ADAPTER_IMPORTS) & frozenset(_QC_RUNTIME_IMPORTS)
+    )
+
+    reached, boundary_edges, zero_io_to_action_edges = (
+        _qc_transitive_import_closure()
+    )
     assert reached == (
         "data.exchange_calendar",
         "research.analyst_revisions_v2_qc",
         "research.analyst_revisions_v2_qc.event_study",
+        "research.analyst_revisions_v2_qc.formal_cloud_evaluator",
+        "research.analyst_revisions_v2_qc.formal_economic_execution_definition",
+        "research.analyst_revisions_v2_qc.formal_evaluation",
+        "research.analyst_revisions_v2_qc.formal_evaluation_bridge",
+        "research.analyst_revisions_v2_qc.formal_input_bundle",
+        "research.analyst_revisions_v2_qc.formal_input_composer",
+        "research.analyst_revisions_v2_qc.formal_qc_transport",
+        "research.analyst_revisions_v2_qc.formal_report_contract",
+        "research.analyst_revisions_v2_qc.formal_run_protocol",
+        "research.analyst_revisions_v2_qc.formal_runtime_projection",
+        "research.analyst_revisions_v2_qc.formal_streaming_bridge",
+        "research.analyst_revisions_v2_qc.formal_streaming_input",
+        "research.analyst_revisions_v2_qc.formal_submission_adapter",
+        "research.analyst_revisions_v2_qc.formal_terminal_disposition_builder",
+        "research.analyst_revisions_v2_qc.fundamental_universe_discovery",
+        "research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime",
+        "research.analyst_revisions_v2_qc.fundamental_universe_discovery_submission_adapter",
+        "research.analyst_revisions_v2_qc.fundamental_universe_discovery_worker",
         "research.analyst_revisions_v2_qc.global_input_bundle",
         "research.analyst_revisions_v2_qc.global_input_schema",
         "research.analyst_revisions_v2_qc.lean_source_assembly",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
+        "research.analyst_revisions_v2_qc.owner_signature_authority",
+        "research.analyst_revisions_v2_qc.power_calibration_bridge",
+        "research.analyst_revisions_v2_qc.power_calibration_runtime",
+        "research.analyst_revisions_v2_qc.power_calibration_submission_adapter",
+        "research.analyst_revisions_v2_qc.power_calibration_worker",
+        "research.analyst_revisions_v2_qc.pre_qc_orchestrator",
+        "research.analyst_revisions_v2_qc.preopen_control_acquisition_io",
+        "research.analyst_revisions_v2_qc.preopen_control_runtime",
+        "research.analyst_revisions_v2_qc.preopen_control_stage",
+        "research.analyst_revisions_v2_qc.preopen_control_submission_adapter",
+        "research.analyst_revisions_v2_qc.preopen_control_worker",
+        "research.analyst_revisions_v2_qc.preopen_quality_worker",
+        "research.analyst_revisions_v2_qc.production_evidence_acquisition_io",
+        "research.analyst_revisions_v2_qc.production_evidence_composer",
         "research.analyst_revisions_v2_qc.refusal_smoke_projection",
         "research.analyst_revisions_v2_qc.run_contract",
         "research.analyst_revisions_v2_qc.runtime_shard_projection",
         "research.analyst_revisions_v2_qc.synthetic_input_transport",
     )
-    sources = tuple(sorted(PACKAGE.glob("*.py")))
-    assert tuple(path.name for path in sources) == (
-        "__init__.py",
-        "event_study.py",
-        "global_input_bundle.py",
-        "global_input_schema.py",
-        "lean_source_assembly.py",
-        "object_store_read_contract.py",
-        "refusal_smoke_projection.py",
-        "run_contract.py",
-        "runtime_shard_projection.py",
-        "synthetic_input_transport.py",
+    assert boundary_edges == _PINNED_REPOSITORY_BOUNDARY_EDGES
+    assert (
+        zero_io_to_action_edges
+        == _PINNED_ZERO_IO_TO_ACTION_BEARING_EDGES
     )
     assert {
         path.name: _no_io_violations(path.read_text(encoding="utf-8"))
         for path in sources
-    } == {path.name: () for path in sources}
+        if path.name in _ZERO_EXTERNAL_IO_SOURCES
+    } == {name: () for name in _ZERO_EXTERNAL_IO_SOURCES}
 
 
 def test_no_io_guard_detects_transitive_and_attribute_call_mutants():
@@ -1215,6 +1919,22 @@ def test_no_io_guard_detects_transitive_and_attribute_call_mutants():
         ),
     ):
         assert _no_io_violations(source) == ("call:read_bytes",)
+    assert _no_io_violations(
+        "import io\ndef memory_only(payload):\n"
+        "    return io.BytesIO(payload).read()\n"
+    ) == ()
+    assert _no_io_violations(
+        "import io\ndef filesystem(path):\n    return io.open(path).read()\n"
+    ) == ("call:open",)
+    for method in (
+        "add_equity",
+        "history",
+        "remove_security",
+        "save_bytes",
+        "set_summary_statistic",
+    ):
+        source = f"def hidden(runtime):\n    return runtime.{method}('x')\n"
+        assert _no_io_violations(source) == (f"call:{method}",)
 
 
 def test_b4_module_has_no_public_action_shaped_entrypoint():

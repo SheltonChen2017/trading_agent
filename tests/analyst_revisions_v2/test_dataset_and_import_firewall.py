@@ -33,7 +33,11 @@ from research.analyst_revisions_v2.contracts import EventState, RevisionKind
 from research.analyst_revisions_v2.import_firewall import (
     DEFAULT_ALLOWED_STDLIB_ROOTS,
     ImportBoundaryError,
+    _ALLOWED_EXTERNAL_IMPORT_ROOTS,
     _FORBIDDEN_RUNTIME_ATTRIBUTES,
+    _PROCESS_BOUND_AUTHORITY_IMPORTERS,
+    _PROCESS_BOUND_AUTHORITY_RUNTIME_ATTRIBUTES,
+    _PROCESS_BOUND_AUTHORITY_RUNTIME_NAMES,
     _validate_import_closure,
     validate_transitive_import_closure,
 )
@@ -62,6 +66,7 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "data.financial_primitives",
     "research",
     "research.analyst_revisions_v2",
+    "research.analyst_revisions_v2.accepted_risk_input_pair",
     "research.analyst_revisions_v2.artifact_io",
     "research.analyst_revisions_v2.availability",
     "research.analyst_revisions_v2.canonical",
@@ -84,8 +89,13 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "research.analyst_revisions_v2.power_calibration_input_schema",
     "research.analyst_revisions_v2.power_calibration_protocol",
     "research.analyst_revisions_v2.power_calibration_receipt",
+    "research.analyst_revisions_v2.preopen_control_acquisition",
     "research.analyst_revisions_v2.preregistration",
+    "research.analyst_revisions_v2.production_evidence_acquisition",
+    "research.analyst_revisions_v2.production_input_pipeline",
     "research.analyst_revisions_v2.production_registry",
+    "research.analyst_revisions_v2.production_scoring",
+    "research.analyst_revisions_v2.production_truth_gate",
     "research.analyst_revisions_v2.provider_history",
     "research.analyst_revisions_v2.qc_first_plan",
     "research.analyst_revisions_v2.ratings_ingest",
@@ -552,6 +562,65 @@ def test_current_v2_package_transitive_import_closure_is_outcome_free():
     assert "data.exchange_calendar" in reached
     assert "execution" not in reached
     assert "research.acer" not in reached
+
+
+def test_process_bound_authority_reflection_allowance_is_exact_and_audited():
+    expected_importers = frozenset(
+        {
+            "research.analyst_revisions_v2.preopen_control_acquisition",
+            "research.analyst_revisions_v2.production_evidence_acquisition",
+        }
+    )
+    assert _PROCESS_BOUND_AUTHORITY_IMPORTERS == expected_importers
+    assert _PROCESS_BOUND_AUTHORITY_RUNTIME_NAMES == frozenset(
+        {"globals", "vars"}
+    )
+    assert _PROCESS_BOUND_AUTHORITY_RUNTIME_ATTRIBUTES == frozenset(
+        {
+            "__closure__",
+            "__globals__",
+            "__module__",
+            "cell_contents",
+            "f_globals",
+            "f_locals",
+        }
+    )
+    for module_name in sorted(expected_importers):
+        assert _ALLOWED_EXTERNAL_IMPORT_ROOTS[module_name] == frozenset(
+            {"inspect", "os", "sys"}
+        )
+        source_path = WORKSPACE_ROOT / Path(*module_name.split(".")).with_suffix(
+            ".py"
+        )
+        tree = ast.parse(source_path.read_text(encoding="utf-8"))
+        runtime_names = tuple(
+            sorted(
+                node.id
+                for node in ast.walk(tree)
+                if isinstance(node, ast.Name)
+                and node.id in _PROCESS_BOUND_AUTHORITY_RUNTIME_NAMES
+            )
+        )
+        runtime_attributes = tuple(
+            sorted(
+                node.attr
+                for node in ast.walk(tree)
+                if isinstance(node, ast.Attribute)
+                and node.attr in _PROCESS_BOUND_AUTHORITY_RUNTIME_ATTRIBUTES
+            )
+        )
+        # Each authority now captures ``vars`` once as a sealed lexical
+        # primitive and reuses it for both module-identity checks.
+        assert runtime_names == ("globals", "vars")
+        assert runtime_attributes == (
+            "__closure__",
+            "__globals__",
+            "__module__",
+            "cell_contents",
+            "f_globals",
+            "f_globals",
+            "f_locals",
+        )
 
 
 def test_safe_looking_facade_cannot_hide_a_forbidden_transitive_import(tmp_path):
@@ -1660,6 +1729,10 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
     """
     package = Path(__file__).resolve().parents[2] / "research" / "analyst_revisions_v2"
     expected = {
+        "accepted_risk_input_pair.py": {
+            "_CAPTURE_AUTHORITIES",
+            "_PAIR_AUTHORITIES",
+        },
         "dataset.py": {"_DATASET_AUTHORITIES"},
         "fold_manifest.py": {"_FOLD_MANIFEST_AUTHORITIES"},
         "firm_ontology.py": {"_ONTOLOGY_AUTHORITIES"},
@@ -1672,6 +1745,17 @@ def test_every_authority_registry_is_guarded_by_its_own_lock():
         "post_pandemic_evaluation_plan.py": {
             "_POST_PANDEMIC_PLAN_AUTHORITIES"
         },
+        "production_input_pipeline.py": {
+            "_BATCH_AUTHORITIES",
+            "_EVIDENCE_AUTHORITIES",
+        },
+        "production_scoring.py": {
+            "_MODEL_AUTHORITIES",
+            "_PRECONTROL_AUTHORITIES",
+            "_RESULT_AUTHORITIES",
+            "_SCORING_AUTHORITIES",
+        },
+        "production_truth_gate.py": {"_PRODUCTION_TRUTH_AUTHORITIES"},
         "power_calibration_input_manifest.py": {
             "_ADMISSION_AUTHORITIES",
             "_CANDIDATE_AUTHORITIES",

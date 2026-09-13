@@ -4096,3 +4096,266 @@ def test_composer_refuses_a_same_shape_hash_tamper_through_the_validator_alone()
         bundle_module._COMPOSER_IMPLEMENTATION(
             bundle, _call_core=lambda _bundle: batch
         )
+
+
+def test_composer_preserves_a_canonical_core_input_refusal_reason():
+    rows = _active_rows()
+    first = rows["decision_rows"][0]
+    rows["decision_rows"] = (
+        first,
+        dataclasses.replace(
+            first,
+            security_id="security-2",
+            listing_id="listing-2",
+            historical_ticker="BBB",
+            input_row_sha256=_sha("e"),
+        ),
+    )
+    candidate, manifest_bytes, partition_payloads = _wire_inputs(rows)
+    bundle = load_synthetic_qc_global_input_bundle(
+        run_candidate=candidate,
+        manifest_bytes=manifest_bytes,
+        partition_payloads=partition_payloads,
+    )
+    with pytest.raises(
+        QcGlobalInputBundleError,
+        match="event-study input refused: decision row_id must be unique",
+    ):
+        collect_synthetic_event_study_from_global_input_bundle(bundle)
+
+
+def test_composer_preserves_more_than_one_canonical_core_refusal_reason():
+    rows = _active_rows()
+    first = rows["security_open_values"][0]
+    rows["security_open_values"] = tuple(
+        sorted(
+            (
+                *rows["security_open_values"],
+                dataclasses.replace(
+                    first,
+                    listing_id="listing-2",
+                    source_sha256=_sha("e"),
+                ),
+            ),
+            key=lambda item: (
+                item.session,
+                item.security_id,
+                item.listing_id,
+                item.total_return_series_id,
+            ),
+        )
+    )
+    candidate, manifest_bytes, partition_payloads = _wire_inputs(rows)
+    bundle = load_synthetic_qc_global_input_bundle(
+        run_candidate=candidate,
+        manifest_bytes=manifest_bytes,
+        partition_payloads=partition_payloads,
+    )
+    with pytest.raises(
+        QcGlobalInputBundleError,
+        match="event-study input refused: security-open keys must be unique",
+    ):
+        collect_synthetic_event_study_from_global_input_bundle(bundle)
+
+
+def test_core_output_validation_failure_is_not_mislabeled_as_an_input_refusal(
+    monkeypatch,
+):
+    bundle = _load(_active_rows())
+
+    def refuse_output(_batch):
+        raise event_study_module.EventStudyInputError(
+            "event-study batch type changed"
+        )
+
+    monkeypatch.setattr(
+        bundle_module,
+        "_PINNED_REQUIRE_EVENT_STUDY_BATCH",
+        refuse_output,
+    )
+    with pytest.raises(
+        QcGlobalInputBundleError,
+        match="event-study core returned an invalid batch",
+    ):
+        bundle_module._call_event_study(bundle)
+
+
+def test_reviewed_session_count_is_typed_before_any_comparison(monkeypatch):
+    class HostileCount:
+        def __eq__(self, _other):
+            raise RuntimeError("hostile count comparison executed")
+
+    monkeypatch.setattr(bundle_module, "REVIEWED_AXIS_SESSION_COUNT", HostileCount())
+    with pytest.raises(
+        QcGlobalInputBundleError,
+        match="reviewed session count contract changed",
+    ):
+        bundle_module.render_qc_global_input_bundle_schema_bytes()
+
+
+def test_bundle_import_defers_reviewed_calendar_construction_subprocess():
+    script = r'''
+from research.analyst_revisions_v2_qc import event_study
+
+event_study._reviewed_session_axis.cache_clear()
+event_study._reviewed_session_index.cache_clear()
+assert event_study._reviewed_session_axis.cache_info().currsize == 0
+assert event_study._reviewed_session_index.cache_info().currsize == 0
+
+from research.analyst_revisions_v2_qc import global_input_bundle  # noqa: F401
+
+assert event_study._reviewed_session_axis.cache_info().currsize == 0
+assert event_study._reviewed_session_index.cache_info().currsize == 0
+'''
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+
+
+def test_unavailable_calendar_fails_at_first_operation_not_import_subprocess():
+    script = r'''
+from data import exchange_calendar
+from research.analyst_revisions_v2_qc import event_study
+
+event_study._reviewed_session_axis.cache_clear()
+event_study._reviewed_session_index.cache_clear()
+calendar = exchange_calendar._NYSE
+missing = object()
+original = vars(calendar).get("schedule", missing)
+calls = []
+
+def unavailable(*args, **kwargs):
+    calls.append((args, kwargs))
+    raise exchange_calendar.ExchangeCalendarError("calendar unavailable")
+
+setattr(calendar, "schedule", unavailable)
+try:
+    from research.analyst_revisions_v2_qc import global_input_bundle
+    if calls:
+        raise AssertionError("calendar was called while importing the bundle module")
+    try:
+        global_input_bundle.render_qc_global_input_bundle_schema_bytes()
+    except global_input_bundle.QcGlobalInputBundleError as exc:
+        if str(exc) != "reviewed session calendar is unavailable":
+            raise AssertionError(f"unexpected refusal: {exc}")
+    else:
+        raise AssertionError("first operation accepted an unavailable calendar")
+    if len(calls) != 1:
+        raise AssertionError(f"expected one calendar attempt, got {len(calls)}")
+finally:
+    if original is missing:
+        delattr(calendar, "schedule")
+    else:
+        setattr(calendar, "schedule", original)
+'''
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+
+
+def test_first_public_operation_primes_exact_calendar_once_subprocess():
+    script = r'''
+from research.analyst_revisions_v2_qc import event_study
+
+event_study._reviewed_session_axis.cache_clear()
+event_study._reviewed_session_index.cache_clear()
+from research.analyst_revisions_v2_qc import global_input_bundle
+
+assert event_study._reviewed_session_axis.cache_info().currsize == 0
+assert event_study._reviewed_session_index.cache_info().currsize == 0
+global_input_bundle.render_qc_global_input_bundle_schema_bytes()
+axis_first = event_study._reviewed_session_axis.cache_info()
+index_first = event_study._reviewed_session_index.cache_info()
+assert axis_first.currsize == 1 and axis_first.misses == 1
+assert index_first.currsize == 1 and index_first.misses == 1
+assert len(event_study._reviewed_session_axis()) == 3435
+global_input_bundle.render_qc_global_input_bundle_schema_bytes()
+axis_second = event_study._reviewed_session_axis.cache_info()
+index_second = event_study._reviewed_session_index.cache_info()
+assert axis_second.currsize == 1 and axis_second.misses == 1
+assert index_second.currsize == 1 and index_second.misses == 1
+'''
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+
+
+def test_concurrent_first_public_operations_share_equivalent_calendar_subprocess():
+    script = r'''
+import threading
+
+from data import exchange_calendar
+from research.analyst_revisions_v2_qc import event_study
+
+event_study._reviewed_session_axis.cache_clear()
+event_study._reviewed_session_index.cache_clear()
+from research.analyst_revisions_v2_qc import global_input_bundle
+
+global_input_bundle._REVIEWED_SESSION_CACHE_STATE[0] = False
+calendar = exchange_calendar._NYSE
+original = calendar.schedule
+barrier = threading.Barrier(2)
+calls = []
+results = []
+errors = []
+
+def synchronized_schedule(*args, **kwargs):
+    calls.append((args, kwargs))
+    barrier.wait(timeout=10)
+    return original(*args, **kwargs)
+
+def render():
+    try:
+        results.append(
+            global_input_bundle.render_qc_global_input_bundle_schema_bytes()
+        )
+    except BaseException as exc:
+        errors.append(exc)
+
+setattr(calendar, "schedule", synchronized_schedule)
+try:
+    threads = [threading.Thread(target=render) for _ in range(2)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=20)
+    if any(thread.is_alive() for thread in threads):
+        raise AssertionError("concurrent calendar construction did not finish")
+    if errors:
+        raise AssertionError(f"valid concurrent first call was refused: {errors!r}")
+    if len(results) != 2 or results[0] != results[1]:
+        raise AssertionError("concurrent schema renders changed")
+    if len(calls) != 2:
+        raise AssertionError(f"expected two cold computations, got {len(calls)}")
+    axis_info = event_study._reviewed_session_axis.cache_info()
+    index_info = event_study._reviewed_session_index.cache_info()
+    if axis_info.currsize != 1 or axis_info.misses != 2:
+        raise AssertionError(f"unexpected axis cache state: {axis_info!r}")
+    if index_info.currsize != 1:
+        raise AssertionError(f"unexpected index cache state: {index_info!r}")
+finally:
+    setattr(calendar, "schedule", original)
+'''
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr

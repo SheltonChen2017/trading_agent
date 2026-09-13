@@ -30,6 +30,7 @@ DEFAULT_ALLOWED_STDLIB_ROOTS = frozenset(
         "enum",
         "fractions",
         "hashlib",
+        "heapq",
         "json",
         "math",
         "pathlib",
@@ -71,14 +72,20 @@ _AUTHORITY_PRIVATE_RUNTIME_ATTRIBUTES = frozenset(
     {
         "_ADMISSION_AUTHORITIES",
         "_ADMISSION_AUTHORITIES_LOCK",
+        "_CAPTURE_AUTHORITIES",
+        "_CAPTURE_AUTHORITIES_LOCK",
         "_CANDIDATE_AUTHORITIES",
         "_CANDIDATE_AUTHORITIES_LOCK",
         "_CONTENT_CONTRACT_AUTHORITIES",
         "_CONTENT_CONTRACT_AUTHORITIES_LOCK",
         "_CONTRACT_AUTHORITIES",
         "_CONTRACT_AUTHORITIES_LOCK",
+        "_BATCH_AUTHORITIES",
+        "_BATCH_AUTHORITIES_LOCK",
         "_DATASET_AUTHORITIES",
         "_DATASET_AUTHORITIES_LOCK",
+        "_EVIDENCE_AUTHORITIES",
+        "_EVIDENCE_AUTHORITIES_LOCK",
         "_FIRM_ONTOLOGY_AUTHORITIES",
         "_FIRM_ONTOLOGY_AUTHORITIES_LOCK",
         "_FOLD_MANIFEST_AUTHORITIES",
@@ -93,6 +100,10 @@ _AUTHORITY_PRIVATE_RUNTIME_ATTRIBUTES = frozenset(
         "_ONTOLOGY_AUTHORITIES_LOCK",
         "_POLICY_AUTHORITIES",
         "_POLICY_AUTHORITIES_LOCK",
+        "_PAIR_AUTHORITIES",
+        "_PAIR_AUTHORITIES_LOCK",
+        "_PREOPEN_ACQUISITION_AUTHORITIES",
+        "_PREOPEN_ACQUISITION_AUTHORITIES_LOCK",
         "_POST_PANDEMIC_PLAN_AUTHORITIES",
         "_POST_PANDEMIC_PLAN_AUTHORITIES_LOCK",
         "_POWER_CALIBRATION_INPUT_SCHEMA_AUTHORITIES",
@@ -101,10 +112,22 @@ _AUTHORITY_PRIVATE_RUNTIME_ATTRIBUTES = frozenset(
         "_POWER_CALIBRATION_PROTOCOL_AUTHORITIES_LOCK",
         "_POWER_RECEIPT_AUTHORITIES",
         "_POWER_RECEIPT_AUTHORITIES_LOCK",
+        "_PRODUCTION_EVIDENCE_ACQUISITION_AUTHORITIES",
+        "_PRODUCTION_EVIDENCE_ACQUISITION_AUTHORITIES_LOCK",
+        "_PRECONTROL_AUTHORITIES",
+        "_PRECONTROL_AUTHORITIES_LOCK",
         "_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES",
         "_PREOPEN_CONTROL_CROSS_SECTION_AUTHORITIES_LOCK",
+        "_MODEL_AUTHORITIES",
+        "_MODEL_AUTHORITIES_LOCK",
         "_REVIEWED_AUTHORITIES",
         "_REVIEWED_AUTHORITIES_LOCK",
+        "_RESULT_AUTHORITIES",
+        "_RESULT_AUTHORITIES_LOCK",
+        "_SCORING_AUTHORITIES",
+        "_SCORING_AUTHORITIES_LOCK",
+        "_PRODUCTION_TRUTH_AUTHORITIES",
+        "_PRODUCTION_TRUTH_AUTHORITIES_LOCK",
         "_SECURITY_MASTER_AUTHORITIES",
         "_SECURITY_MASTER_AUTHORITIES_LOCK",
         "_SNAPSHOT_AUTHORITIES",
@@ -201,6 +224,23 @@ _RESTRICTED_CAPABILITY_NAMES = frozenset(
 )
 _CAPABILITY_IMPORTER = "research.analyst_revisions_v2.dataset"
 _ARTIFACT_IO_FACADE = "research.analyst_revisions_v2.artifact_io"
+_PROCESS_BOUND_AUTHORITY_IMPORTERS = frozenset(
+    {
+        "research.analyst_revisions_v2.preopen_control_acquisition",
+        "research.analyst_revisions_v2.production_evidence_acquisition",
+    }
+)
+_PROCESS_BOUND_AUTHORITY_RUNTIME_NAMES = frozenset({"globals", "vars"})
+_PROCESS_BOUND_AUTHORITY_RUNTIME_ATTRIBUTES = frozenset(
+    {
+        "__closure__",
+        "__globals__",
+        "__module__",
+        "cell_contents",
+        "f_globals",
+        "f_locals",
+    }
+)
 _POWER_RECEIPT_FACADE = (
     "research.analyst_revisions_v2.power_calibration_receipt"
 )
@@ -293,6 +333,10 @@ DEFAULT_FORBIDDEN_IMPORT_PREFIXES = frozenset(
 _ALLOWED_EXTERNAL_IMPORT_ROOTS = {
     _CAPABILITY_IMPORTER: frozenset({"os", "shutil", "subprocess", "uuid"}),
     _ARTIFACT_IO_FACADE: frozenset({"os", "stat"}),
+    **{
+        importer: frozenset({"inspect", "os", "sys"})
+        for importer in _PROCESS_BOUND_AUTHORITY_IMPORTERS
+    },
     "data.exchange_calendar": frozenset({"pandas", "pandas_market_calendars"}),
 }
 
@@ -577,6 +621,49 @@ def _reject_runtime_import_indirection(
         for parent in ast.walk(tree)
         for child in ast.iter_child_nodes(parent)
     }
+
+    def allowed_process_authority_name(node: ast.Name) -> bool:
+        """Permit exact calls and one sealed ``vars`` capture per authority."""
+
+        if (
+            module.name not in _PROCESS_BOUND_AUTHORITY_IMPORTERS
+            or node.id not in _PROCESS_BOUND_AUTHORITY_RUNTIME_NAMES
+        ):
+            return False
+        parent = parents.get(node)
+        if (
+            node.id == "vars"
+            and isinstance(parent, ast.Assign)
+            and parent.value is node
+            and len(parent.targets) == 1
+            and isinstance(parent.targets[0], ast.Name)
+            and parent.targets[0].id == "read_vars"
+        ):
+            expected_factory = (
+                "_make_preopen_acquisition_receipt_authority"
+                if module.name.endswith(".preopen_control_acquisition")
+                else "_make_production_evidence_receipt_authority"
+            )
+            current: ast.AST = parent
+            while current in parents:
+                current = parents[current]
+                if isinstance(current, ast.FunctionDef):
+                    return current.name == expected_factory
+            return False
+        if not isinstance(parent, ast.Call) or parent.func is not node:
+            return False
+        if node.id == "globals":
+            return not parent.args and not parent.keywords
+        return len(parent.args) == 1 and not parent.keywords
+
+    def allowed_process_authority_attribute(node: ast.Attribute) -> bool:
+        """Permit exact read-only frame/function identity fields at two authorities."""
+
+        return (
+            module.name in _PROCESS_BOUND_AUTHORITY_IMPORTERS
+            and isinstance(node.ctx, ast.Load)
+            and node.attr in _PROCESS_BOUND_AUTHORITY_RUNTIME_ATTRIBUTES
+        )
 
     lexical_scope_types = (
         ast.FunctionDef,
@@ -980,7 +1067,11 @@ def _reject_runtime_import_indirection(
             )
         ):
             primitive = f"sensitive literal {node.value!r}"
-        elif isinstance(node, ast.Name) and node.id in _FORBIDDEN_RUNTIME_NAMES:
+        elif (
+            isinstance(node, ast.Name)
+            and node.id in _FORBIDDEN_RUNTIME_NAMES
+            and not allowed_process_authority_name(node)
+        ):
             primitive = node.id
         elif (
             isinstance(node, ast.Name)
@@ -1058,6 +1149,7 @@ def _reject_runtime_import_indirection(
         elif (
             isinstance(node, ast.Attribute)
             and node.attr in _FORBIDDEN_RUNTIME_ATTRIBUTES
+            and not allowed_process_authority_attribute(node)
         ):
             primitive = node.attr
         elif (

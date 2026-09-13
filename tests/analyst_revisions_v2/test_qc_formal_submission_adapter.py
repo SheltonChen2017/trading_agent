@@ -2672,6 +2672,50 @@ def test_ambiguous_result_read_consumes_authority_before_network_retry(
     assert events.count("request:backtests/read") == first_read_count
 
 
+@pytest.mark.parametrize(
+    ("failure", "expected"),
+    [
+        pytest.param(
+            transport_module.FormalQcTransportError(
+                "QuantConnect network request failed"
+            ),
+            "network_ambiguous",
+            id="network-ambiguity",
+        ),
+        pytest.param(
+            transport_module.FormalQcTransportError(
+                "QuantConnect backtests/create request was refused"
+            ),
+            "refused",
+            id="definite-provider-refusal",
+        ),
+        pytest.param(
+            transport_module.FormalQcTransportError(
+                "QuantConnect response is not UTF-8 JSON"
+            ),
+            "envelope",
+            id="invalid-provider-envelope",
+        ),
+        pytest.param(
+            adapter.FormalQcSubmissionError("compile response changed"),
+            "envelope",
+            id="validated-response-envelope",
+        ),
+        pytest.param(RuntimeError("fixture detail"), "network_ambiguous", id="unknown"),
+    ],
+)
+def test_spent_action_failure_class_is_coarse_and_value_free(failure, expected):
+    assert adapter._failure_outcome_class(failure) == expected
+    locked = adapter.FormalQcSubmissionLocked(
+        "submission",
+        "permit-fixture",
+        type(failure).__name__,
+        outcome_class=expected,
+    )
+    assert locked.outcome_class == expected
+    assert "fixture detail" not in str(locked)
+
+
 def test_submission_plan_mutation_is_refused(monkeypatch):
     candidate, reviewed, _, projection, plan, _ = _fixture(monkeypatch)
     changed = dataclasses.replace(plan, include_statistics=True)

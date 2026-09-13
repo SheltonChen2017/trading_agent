@@ -46,6 +46,7 @@ from .formal_qc_transport import (
     RESULT_FAMILY_READ_CAPABILITY_SCHEMA,
     TRANSPORT_SCHEMA,
     FormalQcTransport,
+    FormalQcTransportError,
     _claim_adapter_capability_minter,
 )
 from .formal_run_protocol import (
@@ -122,10 +123,39 @@ class FormalQcSubmissionError(ValueError):
 class FormalQcSubmissionLocked(RuntimeError):
     """The formal look is spent and an external action became ambiguous."""
 
-    def __init__(self, phase: str, permit_id: str, message: str) -> None:
+    def __init__(
+        self,
+        phase: str,
+        permit_id: str,
+        message: str,
+        *,
+        outcome_class: str = "refused",
+    ) -> None:
+        if outcome_class not in {
+            "refused", "envelope", "network_ambiguous"
+        }:
+            raise ValueError("formal submission lock outcome class is invalid")
         super().__init__(f"{phase}: {message}; formal look remains consumed")
         self.phase = phase
         self.permit_id = permit_id
+        self.outcome_class = outcome_class
+
+
+def _failure_outcome_class(exc: BaseException) -> str:
+    """Classify a spent action without retaining exception or response values."""
+
+    if type(exc) is FormalQcTransportError:
+        message = str(exc)
+        if message == "QuantConnect network request failed":
+            return "network_ambiguous"
+        if message.startswith("QuantConnect ") and message.endswith(
+            " request was refused"
+        ):
+            return "refused"
+        return "envelope"
+    if type(exc) is FormalQcSubmissionError:
+        return "envelope"
+    return "network_ambiguous"
 
 
 def _make_formal_action_global_binding_guard():
@@ -3635,7 +3665,10 @@ def _execute_streamed_formal_qc_submission_once_impl(
         # Content objects uploaded before a failure remain content-addressed;
         # the manifest is ordered last, and every ambiguity consumes the look.
         raise FormalQcSubmissionLocked(
-            "streamed_submission", permit.permit_id, type(exc).__name__
+            "streamed_submission",
+            permit.permit_id,
+            type(exc).__name__,
+            outcome_class=_failure_outcome_class(exc),
         ) from exc
 
 
@@ -3866,7 +3899,12 @@ def _execute_formal_qc_submission_once_impl(
     except Exception as exc:
         if isinstance(exc, FormalQcSubmissionLocked):
             raise
-        raise FormalQcSubmissionLocked("submission", permit.permit_id, type(exc).__name__) from exc
+        raise FormalQcSubmissionLocked(
+            "submission",
+            permit.permit_id,
+            type(exc).__name__,
+            outcome_class=_failure_outcome_class(exc),
+        ) from exc
 
 
 def require_formal_qc_launch_receipt(
@@ -4086,7 +4124,12 @@ def _inspect_statistics_free_terminal_status_impl(
                 expected_backtest_name=launch.backtest_name,
             )
         except Exception as exc:
-            raise FormalQcSubmissionLocked("terminal_status", permit.permit_id, type(exc).__name__) from exc
+            raise FormalQcSubmissionLocked(
+                "terminal_status",
+                permit.permit_id,
+                type(exc).__name__,
+                outcome_class=_failure_outcome_class(exc),
+            ) from exc
         if status.status in BACKTEST_TERMINAL_STATUSES:
             return _authority_register_terminal(
                 _terminal_receipt(
@@ -4286,7 +4329,10 @@ def _inspect_streamed_statistics_free_terminal_status_impl(
             )
         except Exception as exc:
             raise FormalQcSubmissionLocked(
-                "streamed_terminal_status", permit.permit_id, type(exc).__name__
+                "streamed_terminal_status",
+                permit.permit_id,
+                type(exc).__name__,
+                outcome_class=_failure_outcome_class(exc),
             ) from exc
         if status.status in BACKTEST_TERMINAL_STATUSES:
             return _authority_register_terminal(
@@ -6569,7 +6615,10 @@ def _read_formal_qc_summary_result_once_impl(
         )
     except Exception as exc:
         raise FormalQcSubmissionLocked(
-            "result_read", permit.permit_id, type(exc).__name__
+            "result_read",
+            permit.permit_id,
+            type(exc).__name__,
+            outcome_class=_failure_outcome_class(exc),
         ) from exc
 
 
@@ -6783,7 +6832,10 @@ def _read_streamed_formal_qc_summary_result_once_impl(
         )
     except Exception as exc:
         raise FormalQcSubmissionLocked(
-            "streamed_result_read", permit.permit_id, type(exc).__name__
+            "streamed_result_read",
+            permit.permit_id,
+            type(exc).__name__,
+            outcome_class=_failure_outcome_class(exc),
         ) from exc
 
 

@@ -172,7 +172,7 @@ def _verify_fixture_signature(
     }
 
 
-def test_production_registry_keeps_power_calibration_purpose_unpinned():
+def test_production_registry_pins_every_owner_authorized_preformal_purpose():
     assert len(authority._REVIEWED_OWNER_PUBLIC_KEYS) == 1
     pin = authority._REVIEWED_OWNER_PUBLIC_KEYS[0]
     blob, allowed = authority._validate_reviewed_pin(pin)
@@ -187,8 +187,8 @@ def test_production_registry_keeps_power_calibration_purpose_unpinned():
         authority.PREOPEN_EXECUTION_PURPOSE,
         authority.PREOPEN_ACQUISITION_REVIEW_PURPOSE,
         authority.PRODUCTION_EVIDENCE_REVIEW_PURPOSE,
+        authority.POWER_CALIBRATION_EXECUTION_PURPOSE,
     )
-    assert authority.POWER_CALIBRATION_EXECUTION_PURPOSE not in pin.purposes
     assert allowed == (
         b"arv2-owner ssh-ed25519 "
         b"AAAAC3NzaC1lZDI1NTE5AAAAIA2kYwmz2Tc/F2tfAqo7xQlM/doV0nI1viXyOvUkcsQE\n"
@@ -282,9 +282,9 @@ def test_production_registry_rejects_an_unreviewed_key_supplied_by_caller(
             "preopen_qc_execution": 1,
             "preopen_control_acquisition_review": 1,
             "production_evidence_review": 1,
-            "power_calibration_qc_execution": 0,
+                "power_calibration_qc_execution": 1,
         },
-        "all_positive_paths_enabled": False,
+        "all_positive_paths_enabled": True,
         "production_signing_implemented": False,
         "private_key_access_implemented": False,
     }
@@ -329,7 +329,7 @@ def test_rebinding_pin_selector_and_crypto_runner_cannot_admit_attacker_key(
     assert verifier_calls == []
 
 
-def test_production_power_calibration_gate_refuses_before_crypto_verifier(
+def test_production_power_calibration_gate_refuses_unreviewed_fixture_key(
     tmp_path, signer, monkeypatch,
 ):
     private, public_key_base64 = signer
@@ -364,7 +364,7 @@ def test_production_power_calibration_gate_refuses_before_crypto_verifier(
     assert calls == []
     assert authority.reviewed_owner_signature_registry_status()[
         "gate_key_counts"
-    ][authority.POWER_CALIBRATION_EXECUTION_PURPOSE] == 0
+    ][authority.POWER_CALIBRATION_EXECUTION_PURPOSE] == 1
 
 
 def test_rebinding_registry_and_public_verifier_path_cannot_replace_or_redirect_gate(
@@ -791,7 +791,7 @@ def test_mutating_review_facing_pin_object_cannot_reseal_production_gate(
             "preopen_qc_execution": 1,
             "preopen_control_acquisition_review": 1,
             "production_evidence_review": 1,
-            "power_calibration_qc_execution": 0,
+                "power_calibration_qc_execution": 1,
         }
     finally:
         object.__setattr__(published_pin, "key_id", original[0])
@@ -1320,7 +1320,7 @@ def test_reflected_namespace_and_captured_pin_mutation_cannot_reseal_any_gate(
             "preopen_qc_execution": 1,
             "preopen_control_acquisition_review": 1,
             "production_evidence_review": 1,
-            "power_calibration_qc_execution": 0,
+                "power_calibration_qc_execution": 1,
         }
 
         if hasattr(os, "fork"):
@@ -1384,7 +1384,7 @@ def test_signature_namespaces_are_immutable_and_production_closure_pinned(
         "preopen_qc_execution": 1,
         "preopen_control_acquisition_review": 1,
         "production_evidence_review": 1,
-        "power_calibration_qc_execution": 0,
+            "power_calibration_qc_execution": 1,
     }
     loaded = _verify_fixture_signature(
         purpose=purpose,

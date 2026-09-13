@@ -358,7 +358,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         """.split()
     ),
     "owner_signature_authority.py": tuple(
-        "__future__ base64 binascii dataclasses hashlib os re stat subprocess tempfile pathlib types json".split()
+        "__future__ base64 binascii dataclasses hashlib os re signal stat subprocess tempfile time pathlib types json".split()
     ),
     "preopen_control_acquisition_io.py": tuple(
         """

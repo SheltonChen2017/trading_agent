@@ -90,7 +90,10 @@ def _make_lane_local_production_primitives():
     """Close production clock and HTTP calls over their exact primitives."""
 
     request_constructor = request.Request
-    open_url = request.urlopen
+    build_opener = request.build_opener
+    proxy_handler = request.ProxyHandler
+    https_handler = request.HTTPSHandler
+    redirect_handler = request.HTTPRedirectHandler
     add_unredirected_header = request.Request.add_unredirected_header
     make_tls_context = ssl.create_default_context
     http_error = error.HTTPError
@@ -101,10 +104,22 @@ def _make_lane_local_production_primitives():
     transport_error = FormalQcTransportError
     time_source = time.time
 
+    def refuse_redirect(req, fp, code, msg, headers, newurl):
+        del req, fp, code, msg, headers, newurl
+        return None
+
     def prepare_production_http_transport():
         # Creating the verified TLS context can read system trust files.  Do it
         # request-locally, before credential acquisition, never at import.
         tls_context = make_tls_context()
+        no_redirect = redirect_handler()
+        no_redirect.redirect_request = refuse_redirect
+        opener = build_opener(
+            proxy_handler({}),
+            https_handler(context=tls_context),
+            no_redirect,
+        )
+        open_url = opener.open
 
         def prepared_http_transport(
             url: str,
@@ -119,11 +134,7 @@ def _make_lane_local_production_primitives():
             for header_name, header_value in exact_dict(headers).items():
                 add_unredirected_header(req, header_name, header_value)
             try:
-                with open_url(
-                    req,
-                    timeout=timeout,
-                    context=tls_context,
-                ) as response:
+                with open_url(req, timeout=timeout) as response:
                     raw = response.read(response_limit + 1)
                     return response.getcode(), raw
             except http_error as exc:
@@ -249,17 +260,34 @@ def _build_transport_capability_authority():
         (
             request,
             (
-                "Request", "urlopen", "HTTPSHandler", "build_opener",
+                "Request", "ProxyHandler", "HTTPSHandler",
+                "HTTPRedirectHandler", "OpenerDirector", "build_opener",
                 "_opener",
             ),
         ),
         (request.Request, ("__new__", "__init__", "add_unredirected_header")),
         (
+            request.ProxyHandler,
+            ("__new__", "__init__", "proxy_open"),
+        ),
+        (
             request.HTTPSHandler,
             ("__new__", "__init__", "https_open"),
         ),
         (
-            request.urlopen,
+            request.HTTPRedirectHandler,
+            (
+                "__new__", "__init__", "http_error_301", "http_error_302",
+                "http_error_303", "http_error_307", "http_error_308",
+                "redirect_request",
+            ),
+        ),
+        (
+            request.OpenerDirector,
+            ("__new__", "__init__", "add_handler", "open"),
+        ),
+        (
+            request.build_opener,
             ("__code__", "__globals__", "__defaults__", "__closure__"),
         ),
         (error, ("HTTPError",)),
@@ -282,7 +310,10 @@ def _build_transport_capability_authority():
         json.JSONDecoder,
         json.JSONEncoder,
         request.Request,
+        request.ProxyHandler,
         request.HTTPSHandler,
+        request.HTTPRedirectHandler,
+        request.OpenerDirector,
     )
 
     def load_production_credential_material() -> tuple[str, str]:
@@ -1582,6 +1613,10 @@ class FormalQcTransport:
         )
         if type(status) is not int or type(raw) is not bytes or len(raw) > MAX_RESPONSE_BYTES:
             raise FormalQcTransportError("QuantConnect response envelope exceeded its bound")
+        if status < 200 or status >= 300:
+            raise FormalQcTransportError(
+                f"QuantConnect {path} request was refused"
+            )
         try:
             value = json_loader(
                 raw.decode("utf-8"),
@@ -1590,7 +1625,10 @@ class FormalQcTransport:
             )
         except (UnicodeError, ValueError, RecursionError) as exc:
             raise FormalQcTransportError("QuantConnect response is not UTF-8 JSON") from exc
-        if type(value) is not dict or value.get("success") is not True or status >= 400:
+        if (
+            type(value) is not dict
+            or value.get("success") is not True
+        ):
             # Values are intentionally not copied into this exception.
             raise FormalQcTransportError(f"QuantConnect {path} request was refused")
         return value

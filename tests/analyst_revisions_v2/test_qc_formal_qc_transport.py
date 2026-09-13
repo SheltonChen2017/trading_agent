@@ -843,7 +843,7 @@ def test_child_resets_inherited_held_private_authority_lock():
     assert len(calls) == 1
 
 
-def _loopback_servers():
+def _loopback_servers(redirect_code):
     import http.server
 
     seen = {"first": None, "second": None}
@@ -872,7 +872,7 @@ def _loopback_servers():
         def do_POST(self):
             seen["first"] = {name.lower(): value for name, value in self.headers.items()}
             self.rfile.read(int(self.headers.get("Content-Length", "0")))
-            self.send_response(302)
+            self.send_response(redirect_code)
             self.send_header(
                 "Location", f"http://127.0.0.1:{second.server_port}/collect"
             )
@@ -886,10 +886,11 @@ def _loopback_servers():
     return first, second, seen
 
 
-def test_production_http_primitive_never_forwards_headers_across_a_redirect():
-    """A 3xx from the pinned host must not carry Authorization to another host."""
+@pytest.mark.parametrize("redirect_code", (301, 302, 303, 307, 308))
+def test_production_http_primitive_refuses_every_redirect(redirect_code):
+    """A 3xx from the pinned host must never issue a second request."""
 
-    first, second, seen = _loopback_servers()
+    first, second, seen = _loopback_servers(redirect_code)
     workers = [
         threading.Thread(target=server.serve_forever, daemon=True)
         for server in (first, second)
@@ -897,7 +898,7 @@ def test_production_http_primitive_never_forwards_headers_across_a_redirect():
     for worker in workers:
         worker.start()
     try:
-        transport._prepare_production_http_transport()(
+        status, raw = transport._prepare_production_http_transport()(
             f"http://127.0.0.1:{first.server_port}/authenticate",
             b"{}",
             {"Authorization": "Basic fixture-only", "Timestamp": "1"},
@@ -910,15 +911,17 @@ def test_production_http_primitive_never_forwards_headers_across_a_redirect():
 
     assert seen["first"]["authorization"] == "Basic fixture-only"
     assert seen["first"]["timestamp"] == "1"
-    assert seen["second"] is not None
-    assert "authorization" not in seen["second"]
-    assert "timestamp" not in seen["second"]
+    assert seen["second"] is None
+    assert status == redirect_code
+    assert raw == b""
 
 
 @pytest.mark.parametrize(
     ("status", "body", "message"),
     [
         (200, b'{"success":false,"errors":["fixture"]}', "request was refused"),
+        (199, b'{"success":true}', "request was refused"),
+        (301, b'{"success":true}', "request was refused"),
         (403, b'{"success":true}', "request was refused"),
         (200, b"not json", "not UTF-8 JSON"),
     ],

@@ -1025,3 +1025,18 @@ def test_production_module_has_no_signing_or_private_key_surface():
     assert "arv2-owner-ed25519-21d1ae9d964ec350" in source
     assert "AAAAC3NzaC1lZDI1NTE5AAAAIA2kYwmz2Tc/F2tfAqo7xQlM/doV0nI1viXyOvUkcsQE" in source
     assert shutil.which("ssh-keygen") is not None
+
+
+def test_trusted_verifier_snapshot_refuses_a_user_owned_writable_executable(
+    tmp_path,
+):
+    """Root ownership and non-writability are the only tie to the OS verifier."""
+
+    fake = tmp_path / "ssh-keygen"
+    fake.write_bytes(b"#!/bin/sh\nexit 0\n")
+    fake.chmod(0o777)
+
+    with pytest.raises(authority.OwnerSignatureAuthorityError) as excinfo:
+        authority._snapshot_trusted_verifier(_sealed_path=fake)
+
+    assert "root-owned nonwritable executable" in str(excinfo.value)

@@ -159,16 +159,19 @@ PROVIDER, MARKET-DATA, OR OBJECT STORE VALUE WAS ACCESSED; THE SUBMISSION IS
 NOT A VERIFIED REFUSAL AND NOT AN ARV2 RESULT. SECTION 68 ALSO IMPLEMENTS THE
 PROVIDER-FREE ARV2-4F-B5D CANDIDATE: IT PROJECTS THE EXACT REVIEWED RUNTIME AS
 23 SIZE-COMPLIANT SOURCE FILES AND AUTHENTICATES OFFLINE RECONSTRUCTION, WHILE
-CLOUD RUNTIME EXECUTION AND EVERY ACTION AUTHORITY REMAIN FALSE PENDING CLAUDE
-REVIEW AND CODEX COUNTER-REVIEW.
+CLOUD RUNTIME EXECUTION AND EVERY ACTION AUTHORITY REMAIN FALSE; SECTION 70
+ACCEPTS B5D AFTER REPRODUCING ALL FOUR BYTE-EXACT RECONSTRUCTIONS.
 SECTION 69 IMPLEMENTS, BUT DOES NOT YET ACCEPT, THE COMPLETE PRE-FORMAL
 SOFTWARE CANDIDATE. IT ADDS THE OWNER-ACCEPTED SAME-CAPTURE CURRENT-ROW AND
 CONSERVATIVELY CENSORED INPUT PAIR; BOUNDED MASSIVE, SHARADAR, AND QC
 DISCOVERY ADAPTERS; PERMANENT-IDENTITY, PRE-OPEN CONTROL, PRODUCTION EVIDENCE,
 TRUTH, SCORING, AND NUISANCE-POWER PATHS; EXHAUSTIVE NAMED TERMINAL REFUSALS;
 AND THE STREAMED FORMAL EVALUATION, PROJECT, TRANSPORT, ONE-USE SUBMISSION,
-SEPARATE RESULT-READ, AND 25-GATE PRE-QC BOUNDARIES. THE CANDIDATE IS PENDING
-CLAUDE REVIEW AND CODEX COUNTER-REVIEW. NO PHYSICAL INPUT, CONTROL, POWER,
+SEPARATE RESULT-READ, AND 25-GATE PRE-QC BOUNDARIES. SECTION 70 ACCEPTS THE
+CANDIDATE AFTER ONE P3 TEST-COVERAGE CORRECTION, REPRODUCES THE COMPLETE
+ANALYST LANE AT `26b3711` (3,974 PASSED, 7 SKIPPED, 0 FAILED), AND RECORDS
+THAT THE SPENT INFRASTRUCTURE LOOK STILL HAS NO MACHINE-READABLE LEDGER ENTRY;
+CODEX COUNTER-REVIEWS SECTION 70 NEXT. NO PHYSICAL INPUT, CONTROL, POWER,
 CAPACITY, FORMAL-RUN, OR RESULT ARTIFACT WAS CREATED IN THIS IMPLEMENTATION
 STAGE; NO NEW RESEARCH LOOK WAS CONSUMED. THE REVIEWED PUBLIC KEY HAS FIVE
 PURPOSES, WHILE POWER-CALIBRATION EXECUTION REMAINS DELIBERATELY UNPINNED
@@ -802,10 +805,18 @@ power, terminal-refusal, streamed formal runtime, status/result, and final
 pre-QC boundaries now exist as one unaccepted candidate. No real source or
 outcome artifact has passed those boundaries.
 
-The immediate next step is that Claude reviews section 69 and the five commits
-after `37e2e64` through this record commit; Codex then counter-reviews every
-Claude commit in this same worktree and branch. Only afterward may physical
-pre-QC construction begin. The reviewed owner key still lacks the exact
+Section 70 is the independent review of that range. It accepts all five
+commits after one P3 test-coverage correction, verifies the physical B5C-002
+receipt and every B5D and formal-candidate identity against primary evidence,
+and reproduces the complete Analyst lane at `26b3711` (3,974 passed, 7
+skipped, 0 failed in 1:04:34), the run the owner had deferred. The immediate
+next step is that Codex counter-reviews section 70 and every Claude commit in
+this same worktree and branch. Only afterward may physical pre-QC
+construction begin. Two items remain for that counter-review and the owner:
+the one spent infrastructure research look is recorded only in prose and in
+a host-local receipt, with no machine-readable ledger entry and no category in
+the frozen multiplicity contract; and the unmarked all-fold rehearsal now
+makes the standing lane selection a one-hour run. The reviewed owner key still lacks the exact
 power-calibration execution purpose, and every physical artifact, external
 review pin, detached signature, capacity receipt, and exclusive claim must be
 supplied and reauthenticated before one formal submission. Formal result read
@@ -2456,6 +2467,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-11 | Codex counter-review and renewed B5C physical authority | `37e2e64` -> this counter-review commit | Accept Claude's section-66 review after prospective record and handoff-test correction; record the owner's exact-name ratification and one-shot B5C recovery authority without touching QC yet | Counter-reviewed Claude's sole commit. Retained both useful test additions, removed the stale section-65 live handoff, bound the named reviewer to the action, disclosed without value the ignored receipt's organization-ID field, and qualified the mutation matrix as eight single removals plus one combined trial with the helper pin serving defense in depth. The owner ratified project `36418640` under its QC-normalized name and authorized the exact one-file refusal recovery described in section 67. No production module, accepted artifact, specification, root plan/handoff, provider, input, outcome, or QC state changed. | New checks red before correction: **2 failed, 3 passed**. Corrected lane-record plus B5C selection: **54 passed in 47.64 s**, with one sandbox-only pytest cache warning. Complete final Analyst lane validation deferred until the physical receipt and B5D tree settle; complete repository suite not run. Zero QC calls, research looks, and development evaluations. | **1 P2 and 3 P3** (`ARV2CR48-001..004`), all corrected or qualified prospectively. Claude commit `37e2e64` accepted after correction; `ARV2R47-003` resolved by owner ratification. | Commit locally without pushing; execute only the newly audited one-shot B5C refusal recovery, then implement provider-free ARV2-4F-B5D sharding. Claude reviews the combined pushed range afterward. Accepted-risk inputs, terminal payoffs, production pins, outcome execution/results, leverage, deployment, orders, and trading remain later gates. |
 | 2026-09-12 | Codex counter-review, B5C infrastructure run, and ARV2-4F-B5D implementation | `37e2e64` -> `4b5e4e6`, `c767965`, and this record commit | Accept Claude's B5C review after four prospective corrections, execute the exact one-shot data-free refusal smoke, and project the full reviewed source below QC's measured file limit | The physical driver removed only the three authorized residuals, authenticated sole `main.py`, compiled once to `BuildSuccess`, and submitted once; status then locked on an unexpected result-shaped list field before terminal/log access, with no retry. B5D emits 23 offline project files as 7 retained, 4 facades, and 12 data-only carriers, preserving exact B5B schema/assembly lineage and all closed authority gates. | Counter-review selection 54 passed; corrected B5D/package selection 115 passed locally and 115 passed independently; five isolated imports and nine semantic samples passed; compile and diff checks green. Complete Analyst lane suite owner-deferred, not failed; complete repository suite not run. One conservative infrastructure research look and zero ARV2 development evaluations; no production input, provider row, market datum, outcome, performance statistic, result disposition, deployment, order, or trade accessed. | `ARV2CR48-001..004` corrected/qualified; `ARV2QC48-001` locked/documented; two P2 and two P3 B5D findings corrected before commit; one P3 reflective-boundary observation documented. Independent Codex re-audit returned GO with no remaining P0-P2. | Owner waives an interim Claude review for this data-free infrastructure step and directs immediate ARV2-4F-C1 accepted-risk input-pair work toward formal 2021-2025 testing; identity, terminal payoff, production pins, atomic outcome authority, executable adapter, status/result access, leverage, deployment, orders, and trading remain later gates. |
 | 2026-09-13 | Codex pre-formal implementation | `37e2e64` -> `4b5e4e6`, `c767965`, `6052ea4`, `dc87b02`, and this record commit | Complete the accepted-risk and full pre-formal software candidate without performing the formal run | Added same-capture Massive views, bounded Massive/Sharadar capture adapters, QC universe discovery, historical identity/pre-open construction, signed evidence/truth/scoring, nuisance power, terminal refusals, streamed formal inputs/evaluation/reporting, exact QC transport, separate result read, owner-signature roots, and a 25-gate pre-QC orchestrator. | Final focused results are listed in section 69; changed-source compilation and diff gates pass. Complete Analyst and repository suites were owner-deferred. This implementation consumed zero new looks; the cumulative range retains only section 68's one data-free infrastructure look, and the formal alpha remains unspent. | Eight generalized P1 classes corrected before commit; no open P0-P2; two P3 items corrected or bounded as documented. | Push once after the remote-tip check. Claude reviews the five commits after `37e2e64` through this record commit; Codex counter-reviews, the owner resolves the unpinned power purpose, and only then may the physical pre-QC chain precede one formal submission. |
+| 2026-09-13 | Claude review | `26b3711` -> this record commit; one lane test added; no production module or specification change; Codex resolves the exact pushed head | Independent review of the section-67 counter-review `4b5e4e6`, the B5C physical refusal run and ARV2-4F-B5D `c767965`/`6052ea4`, and the complete pre-formal candidate `dc87b02`/`26b3711` | Reviewed all five commits in `37e2e64..26b3711` with an explicit disposition each (section 70); accepted after correction. Confirmed all four `ARV2CR48` findings against section 66, including this reviewer's third stale live handoff. Verified rather than accepted: the B5C-002 driver and receipt reproduce their recorded identities to the byte and record one compile, one submission, one conservative infrastructure look, no status/log/statistic/detail read, and no order, market, Object Store or provider access; B5D reconstructs all four sharded modules byte-exact and every schema/projection identity and count reproduces; the candidate's owner key id, five purposes, sealed `/usr/bin/ssh-keygen` verifier, spend-before-network ordering, six/five fold sets, 28-file projection, 18-path host closure, 26+1 result reads, economic constants, exhaustive terminal refusals, censoring comparisons, 3,270-session axis and pinned firewall carve-out all reproduce from code; no order, live, deploy or brokerage primitive exists in any new module and no execution-capable package imports the lane. | Complete standing Analyst lane at `26b3711`, the run the owner had deferred: **3,974 passed, 7 skipped, 0 failed, 24 warnings in 3,874.21 s (1:04:34)**; owner-signature battery **35 passed** before and **36 passed** after this round's regression; every other focused battery green on the clean tree; `compileall` exit 0; `git diff --check` clean; Python 3.13.15. Eleven-trial serial mutation matrix: nine caught, one masked by the spend boundary's own re-check, one real gap corrected. Final complete lane selection on the committed tree, which adds this round's regression: **3,975 passed, 7 skipped, 0 failed, 24 warnings in 3,794.09 s (1:03:14)**; only the ledger sentence naming that result was written after it. Complete repository suite not run per 34.6. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1/P2; **2 P3** (`ARV2R49-001..002`). `ARV2R49-001`: the verifier snapshot's root-owned/non-writable requirement was isolated by no test and, once removed, accepted a user-owned world-writable script; corrected here with a regression red under exactly that mutation. `ARV2R49-002`: the spent infrastructure look exists only in prose and a host-local receipt; the permanent look authority is still `zero_access`, the frozen plan still says `looks_consumed: 0`, and the multiplicity contract has no infrastructure-look category. `ARV2CR48-001..004` confirmed against this session's own section 66. | Codex counter-reviews this record commit and, with the owner, decides how the infrastructure look becomes a machine-readable fact before any further look is spent; the owner still decides the `power_calibration_qc_execution` purpose. No physical pre-QC artifact exists; the exclusive formal claim, the single formal submission, the separately signed result read, deployment, orders and trading remain closed. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -11417,3 +11429,267 @@ terminal, streaming, and capacity artifacts. Only when every gate is satisfied
 may the exclusive formal claim be created and at most one formal submission
 launched. A separate owner-signed result-read action remains required
 afterward.
+
+## 70. Independent Claude review of the section-67 counter-review, the B5C physical refusal run, ARV2-4F-B5D, and the complete pre-formal candidate, 2026-09-12
+
+**Range reviewed:** `37e2e64..26b3711`, five commits, commit by commit and
+cumulatively, in the dedicated lane worktree on the same branch. The range
+adds 139,330 lines across 79 files: 45 production modules, 30 test modules,
+three lane-record test edits and four record commits.
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, 0 P2, 2 P3
+(`ARV2R49-001`, `ARV2R49-002`). One is a test-coverage gap corrected here with
+red/green evidence; one is a look-accounting gap referred to Codex and the
+owner. No production module, specification, artifact, firewall, capability,
+gate, root Action Plan, root Session Handoff or shared file was changed by
+this review.
+**Zero research looks and zero development evaluations by this review.** It
+made no QuantConnect, Massive or Sharadar call, read no provider row, opened
+no credential, and fetched no external page. It read the three host-local
+operation receipts and drivers as evidence. Validation used Python
+**3.13.15**.
+
+The owner had waived the interim Claude review of B5D and deferred the
+complete Analyst lane run. Both are covered here: B5D is reviewed in 70.4, and
+the complete lane selection was run at `26b3711` and is green (70.7).
+
+### 70.1 Acknowledgement of the section-67 findings against section 66
+
+| ID | Confirmed? | Independent verification |
+|---|---|---|
+| `ARV2CR48-001` (P2) | Yes | `git show 37e2e64` line 733 of this record still read "The immediate next step is Claude's independent review of section 65" after section 66 had completed that review. This is the third time this reviewer has left the live handoff one step behind (`ARV2CR42-001`, then the class it caught against Codex as `ARV2R45-004`, now this). The new `test_exact_next_step_has_no_stale_immediate_review_direction` is the right generalization: any "immediate next step" sentence must name the latest section. |
+| `ARV2CR48-002` (P3) | Yes | Both earlier receipts carry a `project_organization_id` key; the recovery receipt's value is non-null. Section 66's "neither receipt contains ... an account identifier field" was wrong. The value was never printed or reproduced, and the B5C-002 receipt schema omits the key. |
+| `ARV2CR48-003` (P3) | Yes | Section 66 counted seven deletable guards; only six distinct single-guard removals passed (M1, M2, M3, M5, M6, M8) because M9 removed two guards already counted. The defense-in-depth qualification of M8 is accepted. |
+| `ARV2CR48-004` (P3) | Yes | Section 66's classifier searched for an agent token and a verb token independently, so "Claude must not review section 64", "Claude's review ... is complete" and an unrelated "the process reviews" clause after a Codex mention all passed. `0154f3d`'s bound `_ACTIVE_REVIEW_ACTION`/`_PASSIVE_REVIEW_ACTION` relation is the correct fix. |
+
+### 70.2 Commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `4b5e4e6` | **Accepted** | Corrects the stale handoff and the bound reviewer relation, adds the stale-direction guard, and records the owner's exact one-shot authority. No QC call. Every finding it raises against section 66 is confirmed above. |
+| `c767965` | **Accepted** | ARV2-4F-B5D. Pure host-side sharding whose four rebuilt modules equal the reviewed B5B bytes exactly; verified in 70.4 and by trial T10. |
+| `6052ea4` | **Accepted** | Record-only, plus the exact-shaped owner-waiver classifier in the lane-record test. The physical receipt it records reproduces (70.3). |
+| `dc87b02` | **Accepted after correction** | The complete pre-formal candidate. Every identity, count, boundary and ordering checked in 70.5 reproduces; one test-coverage gap in the owner-signature verifier snapshot is corrected here (`ARV2R49-001`). |
+| `26b3711` | **Accepted** | Record-only. Its counts, exclusions and the eleven-item review focus are answered in this section. |
+| this record commit | Claude record | This section, the live banner, section 4, one appended ledger row, and one regression test. |
+
+### 70.3 The B5C physical refusal run, verified against primary evidence
+
+- **Identities.** `artifacts/arv2_qc_b5c_refusal_smoke_002_20260911/driver.py`
+  is 34,882 bytes, SHA-256 `b19a489a...`; its `receipt.json` is 3,639 bytes,
+  SHA-256 `6cef656b...`. Both match section 68.2 to the byte. The receipt's
+  `prior_receipt_sha256` equals the recovery receipt `f2c3fd75...`, so the
+  chain of the three physical actions is closed.
+- **What the receipt says happened.** `compile_submission_count` 1 with
+  `compile_state` `BuildSuccess`; `backtest_submission_count` 1 with a
+  backtest id; `research_look_count_conservative` 1;
+  `sole_main_authenticated_before_compile` true; `deletion_attempts` three;
+  `project_id` 36418640 under the ratified name
+  `1 ARV2_B5B_REFUSAL_SMOKE - 20260911`; terminal `status`
+  `LOCKED_BACKTEST_STATUS_AMBIGUITY` with error "backtests/list returned a
+  forbidden statistics/result field".
+- **What it says did not happen.** `backtest_terminal_status` null and
+  `backtest_terminal_status_accessed` false; `backtest_detail_endpoint_called`
+  false; `performance_statistics_inspected` false; `log_operation_count` 0,
+  `redacted_log_accessed` false, `marker_observed` false;
+  `production_inputs_accessed`, `market_data_accessed_by_algorithm`,
+  `object_store_accessed_by_algorithm` and `orders_permitted` all false. No
+  credential, token, key or organization-identifier field is present.
+- **Driver capability census.** The driver references exactly the endpoint
+  families `projects/read`, `files/read`, `files/delete`, `compile/create`,
+  `compile/read`, `backtests/create`, `backtests/list` and
+  `backtests/read/log`. The log endpoint was within the owner's authority
+  and was never called. No `backtests/read` detail, live, deploy or order
+  surface exists in the driver.
+- **Judgement.** The driver did strictly less than authorized: it stopped at
+  a statistics-shaped field in the list response rather than read past it.
+  The expected initialization refusal is therefore unverified, exactly as 68.2
+  says, and the submission is not a strategy result.
+
+### 70.4 ARV2-4F-B5D, verified rather than accepted
+
+- Schema 6,479 bytes, artifact `3cbafe22...`, ID
+  `arv2-qc-runtime-shard-projection-schema-2909a08c686f8015`. Projection ID
+  `arv2-qc-runtime-shard-projection-ab0f9f5466759097`, semantic `ab0f9f54...`,
+  artifact `b109548c...` over a 12,175-byte canonical document. The parent
+  triple pins the accepted B5B assembly. All reproduce.
+- 23 projected files, 12 carriers, 695,302 bytes, largest 57,361 characters,
+  every file at or below 60,000 characters; 42 null bindings; 18 false
+  capabilities; `canonical_runtime_source_reconstruction_authenticated` true
+  with cloud execution, adapter, compile and backtest all false.
+- **All four sharded modules reconstruct byte-exact** through
+  `reconstruct_canonical_module_bytes`: `event_study.py` 109,226 bytes from 3
+  carriers, `global_input_bundle.py` 140,983 from 4, `global_input_schema.py`
+  94,959 from 3, `synthetic_input_transport.py` 65,144 from 2. The seven
+  retained files are byte-identical to B5B and the generator is not among the
+  projected files.
+- The emitted facade validates decoded length and SHA-256 before `compile`
+  and `exec`; removing that check turns the battery red (trial T10). The
+  host-side module contains `exec` and `compile` only inside emitted source
+  strings.
+
+### 70.5 The pre-formal candidate `dc87b02`, verified rather than accepted
+
+Answered against the eleven review-focus items of 69.8.
+
+- **Authorization and irreversibility.** No new module contains an order,
+  holdings, liquidation, brokerage, live or deploy primitive; the only match
+  in the whole lane is a `False` literal in the QC-first plan. No
+  execution-capable package imports the lane. `requirements.txt` is unchanged
+  and every new import is standard library. The capture scripts read
+  provider keys from the environment as physical tools must, and their tests
+  drive `_request_page` through an injected `FakeSession`, so no test reaches
+  a network. `scripts/run_arv2_pre_qc.py` only renders the default closed-gate
+  report and can return exit 2; it cannot supply data, review, signature or
+  launch authority.
+- **Owner signature.** The checked-in key
+  `arv2-owner-ed25519-21d1ae9d964ec350` recomputes as
+  `sha256(blob)[:16]` of its ssh-ed25519 blob, carries exactly five purposes,
+  and `power_calibration_qc_execution` is a namespace but not a grant. No
+  private key material is tracked. Verification shells out only to the sealed
+  default `/usr/bin/ssh-keygen -Y verify` with `env={"PATH":
+  "/usr/bin:/bin", ...}`, requires a root-owned, non-writable, executable
+  regular file, and re-snapshots the binary after use.
+- **Spend before network.** In the streamed submission path the order is:
+  `require_formal_look_claim`, the no-action `_preflight_streamed_upload`,
+  `begin_formal_submission_once` (which spends the permit and itself re-checks
+  the claim), then the transport capability is minted and `authenticate` is
+  the first network call. Result read carries `retry_after_ambiguity=False`,
+  `include_statistics` false, and
+  `logs_charts_orders_trades_value_selection_forbidden` true.
+- **Geometry.** `FORMAL_FOLD_IDS` are the six 2020-2025 folds and
+  `DESCRIPTIVE_FOLD_IDS` the five 2021-2025 folds; the projection carries two
+  source views and four horizons; 28 projected source files with a 59,259
+  character maximum; `REQUIRED_HOST_CODE_PATHS` is 18; 13 report families give
+  `FORMAL_RESULT_FAMILY_OBJECT_COUNT` 26, plus one root read. Project and
+  backtest names match 69.4.
+- **Economic definition.** `HOLDING_SESSIONS` 20, `MINIMUM_SLEEVE_SIZE` 5,
+  costs (0, 5, 10, 20) with 10 primary, HAC lag 20, block 20, 19,999
+  resamples; leverage, short positions and borrowed cash all false.
+- **Terminals.** `terminal_payoff_count` 0,
+  `named_terminal_refusal_count` equal to the terminal count,
+  `terminal_payoff_source_available` false and
+  `merger_bankruptcy_successor_payoff_inferred` false. `Delisting` appears
+  nowhere in the QC package outside one docstring.
+- **Censoring.** The censored view keeps a row only when `updated <=` the
+  decision cutoff; guidance keeps a row only when its `last_updated`
+  calendar date strictly precedes the eligible session, which is the third
+  NYSE session strictly after the event date; a duplicate provider event ID
+  refuses the complete three-role capture; control fits use
+  `active_training_rows_only` with parameter-floor refusals.
+- **Axes and power.** The 3,270-session 2013-01-02 to 2025-12-31 axis
+  recomputes from `data.exchange_calendar`; the power bridge composes the
+  483-session H20 input against the frozen `TEST_SESSION_CAPACITY` of 1,388.
+- **Firewall.** `heapq` joins the stdlib allowlist, and exactly two modules
+  gain `inspect`/`os`/`sys` plus AST-shaped read-only access to frame,
+  closure and globals identity for loader provenance. The importer set is
+  pinned by `test_dataset_and_import_firewall`, and neither module reads the
+  environment or spawns a process.
+- **Record.** The ledger is 82 contiguous rows with only the pinned legacy row
+  over-wide; the ledger's UTC dates agree with the commits' UTC timestamps
+  (`dc87b02` and `26b3711` are 2026-09-13 UTC); the frozen root documents,
+  strategy register and specs are unchanged in the range; section 2 now states
+  the one compile, one submission and one infrastructure look honestly.
+
+### 70.6 Mutation matrix
+
+Eleven single-guard trials, each run serially against the owning focused
+battery on an otherwise clean tree and restored before the next; none
+overlapped a validation run.
+
+| Trial | Guard removed or weakened | Battery | Result |
+|---|---|---|---|
+| T1 | `MINIMUM_SLEEVE_SIZE` 5 to 4 | economic definition | caught |
+| T2 | 2020 dropped from `FORMAL_FOLD_IDS` | formal evaluation | caught |
+| T3 | terminal census `terminal_payoff_source_available` to true | terminal builder | caught |
+| T4 | duplicate provider ID refusal removed | accepted-risk pair | caught |
+| T5 | censored view accepts any `last_updated` | accepted-risk pair | caught |
+| T6 | verifier root-owned/non-writable check removed | owner signature | **escaped**: 35 passed |
+| T7 | verifier `PATH` sanitization removed | owner signature | caught |
+| T8 | first `require_formal_look_claim` in the streamed path removed | submission adapter | escaped, **masked**: `begin_formal_submission_once` re-runs the same check before spending |
+| T9 | orchestrator `ready` ignores blocking gates | pre-QC orchestrator | caught |
+| T10 | facade length/SHA-256 check removed from emitted source | B5D | caught |
+| T11 | `include_statistics` false to true at the submission census | submission adapter | caught |
+
+T6 was probed directly: with the check removed,
+`_snapshot_trusted_verifier(_sealed_path=<user-owned, mode 0o777 script>)`
+returned a snapshot with `owner_uid` 501 and mode `0o777`. Nothing else in
+the module rejects it, so that check is the only tie between signature
+verification and a root-owned operating-system binary, and no test isolated
+it. The sealed default path means exploitation needs an already-compromised
+host, which is why this is P3 rather than higher.
+
+### 70.7 Validation
+
+- Complete standing Analyst lane selection at `26b3711`: **3,974 passed, 7
+  skipped, 0 failed, 24 warnings in 3,874.21 s (1:04:34)**. The 24 warnings
+  are `DeprecationWarning` occurrences from the single fork-child receipt test
+  in `test_qc_preopen_control_stage.py`. This is the complete lane run the
+  owner deferred in sections 68 and 69; it includes the unmarked all-fold
+  rehearsal that Codex deselected.
+- Focused batteries during the matrix, on the clean tree: economic
+  definition, formal evaluation, terminal builder, accepted-risk pair,
+  orchestrator, B5D and submission adapter all green; owner signature **35
+  passed** before and **36 passed** after this round's regression.
+- Final complete lane selection on the committed tree, which adds this
+  round's regression: **3,975 passed, 7 skipped, 0 failed, 24 warnings in
+  3,794.09 s (1:03:14)**. Only this sentence and the matching ledger sentence
+  were written after that run.
+- `compileall` over `research`, `scripts`, `tests` and `data`: exit 0.
+  `git diff --check` clean. Python **3.13.15**.
+- The complete repository suite was not run, per the owner's lane-suite rule
+  in 34.6.
+
+### 70.8 Correction made in this round, with red/green evidence
+
+`ARV2R49-001`, in `tests/analyst_revisions_v2/test_qc_owner_signature_authority.py`:
+`test_trusted_verifier_snapshot_refuses_a_user_owned_writable_executable`
+writes a user-owned, mode `0o777` shell script under `tmp_path`, passes it as
+`_sealed_path`, and requires the exact "root-owned nonwritable executable"
+refusal. Green on the real module (36 passed); with the refusal replaced by
+`pass` it is the only failing case (1 failed, 35 passed); green again on the
+restored module. No production code changed.
+
+### 70.9 Findings
+
+| ID | Severity | Class | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R49-001` | P3 | Test coverage; **corrected this round** | The owner-signature verifier snapshot requires `/usr/bin/ssh-keygen` to be a root-owned, non-writable, executable regular file, and that requirement was isolated by no test: removing it left the battery green and the boundary accepted a user-owned world-writable script. | Corrected here; see 70.8. |
+| `ARV2R49-002` | P3 | Look accounting; **for Codex and the owner** | Section 68.2 counts the B5C submission as one conservative infrastructure research look, and sections 68, 69 and the ledger repeat it, but the count exists only in prose and in a host-local receipt. `research/analyst_revisions_v2/specs/permanent_look_authority.json` is still `zero_access` with no entries, the frozen QC-first plan still records `looks_consumed: 0`, and the four-family multiplicity contract has no category for an infrastructure look at all. The repository rule is to count every research look; a look that lives only in narrative cannot be reconciled by code. **Recommendation:** either add an append-only, content-addressed infrastructure-look ledger that the preregistration loader reads, or record in the frozen contract that data-free infrastructure submissions are outside the family alpha and why, so the count is enforced rather than remembered. | Open; documented, not corrected here, because the right home is a frozen-spec decision. |
+
+Observations recorded without a finding: the owner-waiver classifier added
+in `6052ea4` is exact-shaped ("owner explicitly waives ... Claude review of
+section N") and section 4 does not currently rely on it; the all-fold
+rehearsal `test_public_candidate_runs_all_folds_to_reopenable_physical_shards`
+is unmarked, so the standing lane selection is now a one-hour run and the
+owner's lane-suite rule should decide whether it stays in the standing
+selection or is marked and run separately; and `formal_cloud_evaluator.py`
+is a wrapper that uploads alongside the unchanged `formal_evaluation.py`, so
+the cloud carries one implementation of the statistical rules, not two.
+
+### 70.10 Quality assessment
+
+Section-67 counter-review and B5C physical run (`4b5e4e6`, `6052ea4`):
+**9/10**. All four findings against section 66 are true and the generalized
+handoff guards are the right fix; the third driver did strictly less than
+authorized and stopped at the first ambiguity.
+
+ARV2-4F-B5D (`c767965`): **9/10**. Byte-exact reconstruction, a validated
+facade, and every inherited gate carried forward.
+
+Pre-formal candidate (`dc87b02`, `26b3711`): **8/10**. The spend-before-network
+ordering, one-use claims, exhaustive terminal refusals, six-versus-five fold
+isolation and sealed verifier path are all real in code, and the eight
+precommit P1 classes were found by Codex's own audit rather than by this
+review. Two points are withheld: one security-relevant guard had no isolating
+test, and the spent look is not yet a machine-readable fact.
+
+### 70.11 Next gate
+
+Codex counter-reviews this record commit. `ARV2R49-002` needs a decision from
+Codex and the owner before any further look can be spent. The reviewed owner
+key still lacks `power_calibration_qc_execution`, and no physical pre-QC
+artifact exists. Every gate named in 69.8 remains closed: physical Massive,
+Sharadar, QC-universe, pre-open, evidence, power, terminal, streaming and
+capacity artifacts; external review pins; detached signatures; the exclusive
+formal claim; the single formal submission; the separately signed result read;
+deployment; orders; and trading.

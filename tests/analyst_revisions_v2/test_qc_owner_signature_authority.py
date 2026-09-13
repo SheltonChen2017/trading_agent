@@ -1900,3 +1900,170 @@ def test_production_posix_runner_streams_the_maximum_payload(
         signature.read_bytes(),
         authority.PURPOSE_NAMESPACES[purpose],
     )
+
+
+def _production_closure(name):
+    functions = {
+        id(value): value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType and value.__name__ == name
+    }
+    assert len(functions) == 1
+    return next(iter(functions.values()))
+
+
+def _fake_verifier_lstat(
+    *,
+    verifier_uid=0,
+    verifier_mode=stat.S_IFREG | 0o755,
+    parent_uid=0,
+    parent_mode=stat.S_IFDIR | 0o755,
+):
+    def fake_lstat(path):
+        if path == "/usr/bin/ssh-keygen":
+            return SimpleNamespace(
+                st_mode=verifier_mode, st_uid=verifier_uid, st_nlink=1,
+                st_size=1, st_dev=1, st_ino=2, st_mtime_ns=3, st_ctime_ns=4,
+            )
+        return SimpleNamespace(
+            st_mode=parent_mode, st_uid=parent_uid, st_nlink=1, st_dev=1,
+            st_ino=5, st_mtime_ns=6, st_ctime_ns=7,
+        )
+
+    return fake_lstat
+
+
+def test_sealed_verifier_snapshot_refuses_untrusted_verifier_or_parent():
+    """The sealed snapshot, not the public helper, ties verification to a root binary."""
+
+    snapshot = _production_closure("snapshot_trusted_verifier")
+    accepted = _with_closure_values(snapshot, lstat=_fake_verifier_lstat())()
+    assert accepted[1][0] == "/usr/bin/ssh-keygen"
+
+    user_uid = os.getuid() or 501
+    for lstat in (
+        _fake_verifier_lstat(verifier_uid=user_uid),
+        _fake_verifier_lstat(verifier_mode=stat.S_IFREG | 0o777),
+        _fake_verifier_lstat(verifier_mode=stat.S_IFREG | 0o644),
+    ):
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="root-owned nonwritable executable",
+        ):
+            _with_closure_values(snapshot, lstat=lstat)()
+
+    for lstat in (
+        _fake_verifier_lstat(parent_mode=stat.S_IFDIR | 0o777),
+        _fake_verifier_lstat(parent_uid=user_uid),
+    ):
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="verifier parent is not root-controlled",
+        ):
+            _with_closure_values(snapshot, lstat=lstat)()
+
+
+def test_sealed_loader_refuses_untrusted_verifier_before_spawning(tmp_path, signer):
+    private, public_key_base64 = signer
+    purpose = authority.FORMAL_EXECUTION_PURPOSE
+    payload = b'{"formal_execution":"untrusted-verifier"}\n'
+    allowed, signature = _signed_controls(
+        tmp_path,
+        private_key=private,
+        public_key_base64=public_key_base64,
+        payload=payload,
+        namespace=authority.PURPOSE_NAMESPACES[purpose],
+        stem="untrusted-verifier",
+    )
+    pin = _pin(public_key_base64, purpose)
+    reviewed_pin_records = (
+        (
+            pin.key_id,
+            pin.public_key_base64,
+            pin.purposes,
+            base64.b64decode(pin.public_key_base64, validate=True),
+        ),
+    )
+    spawned = []
+
+    def refuse_spawn(*args, **kwargs):
+        spawned.append((args, kwargs))
+        raise AssertionError("an untrusted verifier must never be spawned")
+
+    untrusted_snapshot = _with_closure_values(
+        _production_closure("snapshot_trusted_verifier"),
+        lstat=_fake_verifier_lstat(verifier_uid=os.getuid() or 501),
+    )
+    loader = _with_closure_values(
+        _production_closure("load_with_reviewed_path_texts"),
+        snapshot_trusted_verifier=untrusted_snapshot,
+        run_signature_verifier=refuse_spawn,
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="root-owned nonwritable executable",
+    ):
+        loader(
+            purpose=purpose,
+            authority_payload=payload,
+            allowed_signers_path=str(allowed),
+            signature_path=str(signature),
+            reviewed_pin_records=reviewed_pin_records,
+        )
+    assert spawned == []
+
+
+def test_sealed_loader_refuses_a_verifier_that_changes_during_use(tmp_path, signer):
+    private, public_key_base64 = signer
+    purpose = authority.FORMAL_EXECUTION_PURPOSE
+    payload = b'{"formal_execution":"verifier-changed-during-use"}\n'
+    allowed, signature = _signed_controls(
+        tmp_path,
+        private_key=private,
+        public_key_base64=public_key_base64,
+        payload=payload,
+        namespace=authority.PURPOSE_NAMESPACES[purpose],
+        stem="verifier-changed",
+    )
+    pin = _pin(public_key_base64, purpose)
+    reviewed_pin_records = (
+        (
+            pin.key_id,
+            pin.public_key_base64,
+            pin.purposes,
+            base64.b64decode(pin.public_key_base64, validate=True),
+        ),
+    )
+    snapshots = iter((
+        _fake_verifier_lstat(),
+        _fake_verifier_lstat(verifier_mode=stat.S_IFREG | 0o555),
+    ))
+    sealed_snapshot = _production_closure("snapshot_trusted_verifier")
+
+    def changing_snapshot():
+        return _with_closure_values(sealed_snapshot, lstat=next(snapshots))()
+
+    verified = []
+    loader = _with_closure_values(
+        _production_closure("load_with_reviewed_path_texts"),
+        snapshot_trusted_verifier=changing_snapshot,
+        run_signature_verifier=lambda *args: verified.append(args),
+        require_trusted_verifier_unchanged=_with_closure_values(
+            _production_closure("require_trusted_verifier_unchanged"),
+            snapshot_trusted_verifier=changing_snapshot,
+        ),
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="trusted ssh-keygen verifier changed during use",
+    ):
+        loader(
+            purpose=purpose,
+            authority_payload=payload,
+            allowed_signers_path=str(allowed),
+            signature_path=str(signature),
+            reviewed_pin_records=reviewed_pin_records,
+        )
+    assert len(verified) == 1

@@ -841,3 +841,106 @@ def test_child_resets_inherited_held_private_authority_lock():
         capability, PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
     )
     assert len(calls) == 1
+
+
+def _loopback_servers():
+    import http.server
+
+    seen = {"first": None, "second": None}
+
+    class Second(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self._answer()
+
+        def do_POST(self):
+            self._answer()
+
+        def _answer(self):
+            seen["second"] = {name.lower(): value for name, value in self.headers.items()}
+            body = b'{"success":true}'
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    second = http.server.HTTPServer(("127.0.0.1", 0), Second)
+
+    class First(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            seen["first"] = {name.lower(): value for name, value in self.headers.items()}
+            self.rfile.read(int(self.headers.get("Content-Length", "0")))
+            self.send_response(302)
+            self.send_header(
+                "Location", f"http://127.0.0.1:{second.server_port}/collect"
+            )
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
+        def log_message(self, *args):
+            pass
+
+    first = http.server.HTTPServer(("127.0.0.1", 0), First)
+    return first, second, seen
+
+
+def test_production_http_primitive_never_forwards_headers_across_a_redirect():
+    """A 3xx from the pinned host must not carry Authorization to another host."""
+
+    first, second, seen = _loopback_servers()
+    workers = [
+        threading.Thread(target=server.serve_forever, daemon=True)
+        for server in (first, second)
+    ]
+    for worker in workers:
+        worker.start()
+    try:
+        transport._prepare_production_http_transport()(
+            f"http://127.0.0.1:{first.server_port}/authenticate",
+            b"{}",
+            {"Authorization": "Basic fixture-only", "Timestamp": "1"},
+            5.0,
+        )
+    finally:
+        for server in (first, second):
+            server.shutdown()
+            server.server_close()
+
+    assert seen["first"]["authorization"] == "Basic fixture-only"
+    assert seen["first"]["timestamp"] == "1"
+    assert seen["second"] is not None
+    assert "authorization" not in seen["second"]
+    assert "timestamp" not in seen["second"]
+
+
+@pytest.mark.parametrize(
+    ("status", "body", "message"),
+    [
+        (200, b'{"success":false,"errors":["fixture"]}', "request was refused"),
+        (403, b'{"success":true}', "request was refused"),
+        (200, b"not json", "not UTF-8 JSON"),
+    ],
+)
+def test_request_json_refuses_failed_envelopes_and_error_statuses(
+    status, body, message
+):
+    client = _client(lambda *args: (status, body))
+    capability = transport._mint_offline_test_capability(
+        client, scope="submission", call_budget={"authenticate": 1}
+    )
+    with pytest.raises(transport.FormalQcTransportError, match=message):
+        client._request_json(capability, "authenticate", {})
+
+
+def test_production_http_primitive_wraps_network_failure_without_detail():
+    with pytest.raises(transport.FormalQcTransportError) as excinfo:
+        transport._prepare_production_http_transport()(
+            "http://127.0.0.1:1/authenticate",
+            b"{}",
+            {"Authorization": "Basic fixture-only"},
+            2.0,
+        )
+    assert str(excinfo.value) == "QuantConnect network request failed"
+    assert excinfo.value.__cause__ is None

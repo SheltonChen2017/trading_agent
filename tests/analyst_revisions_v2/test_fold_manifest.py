@@ -666,7 +666,7 @@ def test_manifest_loader_refuses_symlink_and_toctou_change(
     try:
         linked.symlink_to(path)
     except OSError:
-        pass
+        pytest.skip("symlink creation is unavailable on this host")
     else:
         with pytest.raises(StockFoldManifestError, match="symlink"):
             _load(linked)

@@ -91,6 +91,7 @@ def _make_lane_local_production_primitives():
 
     request_constructor = request.Request
     open_url = request.urlopen
+    add_unredirected_header = request.Request.add_unredirected_header
     make_tls_context = ssl.create_default_context
     http_error = error.HTTPError
     exact_dict = dict
@@ -111,12 +112,12 @@ def _make_lane_local_production_primitives():
             headers: Mapping[str, str],
             timeout: float,
         ) -> tuple[int, bytes]:
-            req = request_constructor(
-                url,
-                data=body,
-                headers=exact_dict(headers),
-                method="POST",
-            )
+            req = request_constructor(url, data=body, method="POST")
+            # Unredirected headers travel to the pinned host only.  urllib's
+            # default opener follows 3xx answers and would otherwise forward
+            # Authorization and Timestamp to whatever host Location names.
+            for header_name, header_value in exact_dict(headers).items():
+                add_unredirected_header(req, header_name, header_value)
             try:
                 with open_url(
                     req,
@@ -252,7 +253,7 @@ def _build_transport_capability_authority():
                 "_opener",
             ),
         ),
-        (request.Request, ("__new__", "__init__")),
+        (request.Request, ("__new__", "__init__", "add_unredirected_header")),
         (
             request.HTTPSHandler,
             ("__new__", "__init__", "https_open"),

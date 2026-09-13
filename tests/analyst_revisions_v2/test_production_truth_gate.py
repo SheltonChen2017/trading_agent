@@ -248,3 +248,47 @@ def test_non_event_day_q_data_cannot_be_replaced_by_caller_evidence() -> None:
             refusals=truth.refusals,
             q_data_measurements=measurement_tuple,
         )
+
+
+def test_formal_session_geometry_refuses_fold_boundaries_outside_reviewed_bounds(
+    monkeypatch,
+):
+    """The reviewed 2013..2025 bounds must hold even if the fold constant drifts."""
+
+    from research.analyst_revisions_v2 import production_truth_gate as gate
+
+    def shifted(boundaries, *, train_start=None, test_end=None):
+        return tuple(
+            (
+                fold_id,
+                train_start or original_train_start,
+                train_end,
+                validation_start,
+                validation_end,
+                test_start,
+                test_end or original_test_end,
+            )
+            for (
+                fold_id,
+                original_train_start,
+                train_end,
+                validation_start,
+                validation_end,
+                test_start,
+                original_test_end,
+            ) in boundaries
+        )
+
+    reviewed = gate.FORMAL_FOLD_BOUNDARIES
+    assert gate._formal_session_geometry()[0] == gate.HISTORY_START
+
+    for drifted in (
+        shifted(reviewed, train_start="2014-01-02"),
+        shifted(reviewed, test_end="2026-07-01"),
+    ):
+        monkeypatch.setattr(gate, "FORMAL_FOLD_BOUNDARIES", drifted)
+        with pytest.raises(
+            gate.ProductionTruthError,
+            match="formal truth geometry escaped reviewed 2013..2025 bounds",
+        ):
+            gate._formal_session_geometry()

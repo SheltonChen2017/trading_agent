@@ -1007,3 +1007,72 @@ def test_empty_complete_capture_is_represented_but_empty_pair_refuses():
     assert capture.total_row_count == 0
     with pytest.raises(AcceptedRiskInputError, match="cannot be empty"):
         build_accepted_risk_input_pair(capture)
+
+
+def test_event_outside_exchange_calendar_authority_excludes_both_views():
+    """An unresolvable cutoff must exclude the row from both views, never include it."""
+
+    far = "2036-12-31"
+    pair = build_accepted_risk_input_pair(
+        _capture(
+            pages=(
+                _page(
+                    MassiveSourceRole.ANALYST_RATINGS,
+                    [_row("rating-far", event_date="2035-12-31")],
+                    last=far,
+                ),
+                _page(
+                    MassiveSourceRole.EARNINGS,
+                    [_row("earnings-far", event_date="2035-12-31", action="earnings")],
+                    last=far,
+                ),
+                _page(
+                    MassiveSourceRole.CORPORATE_GUIDANCE,
+                    [_row("guidance-far", event_date="2035-12-31", action="guidance")],
+                    last=far,
+                ),
+            )
+        )
+    )
+    assert len(pair.rows) == 3
+    for row in pair.rows:
+        for view in (row.current_view, row.censored_view):
+            assert view.included is False
+            assert view.disposition is (
+                RowDisposition.EVENT_OUTSIDE_EXCHANGE_CALENDAR_AUTHORITY
+            )
+
+
+def test_guidance_row_post_init_guards_refuse_inconsistent_views():
+    """Hand-built guidance rows cannot claim inclusion their cutoff does not support."""
+
+    pair = build_accepted_risk_input_pair(
+        _capture(
+            guidance=[
+                _row(
+                    "guidance-consistent",
+                    last_updated="2020-01-06 12:00:00",
+                    action="raises_guidance",
+                )
+            ]
+        )
+    )
+    guidance = pair.rows[-1]
+    assert guidance.censored_view.included is True
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match="censored guidance did not precede its delayed session",
+    ):
+        dataclasses.replace(guidance, last_updated_calendar_date="2020-01-07")
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match="guidance did not retain its conservative date-only cutoff",
+    ):
+        dataclasses.replace(
+            guidance,
+            current_view=dataclasses.replace(
+                guidance.current_view, eligible_session="2020-01-06"
+            ),
+        )

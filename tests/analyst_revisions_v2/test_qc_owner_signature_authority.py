@@ -22,6 +22,19 @@ from research.analyst_revisions_v2_qc import owner_signature_authority as author
 
 
 SSH_KEYGEN = Path("/usr/bin/ssh-keygen")
+POSIX_RUNNER_AVAILABLE = all(
+    hasattr(os, name)
+    for name in (
+        "getuid", "kill", "pipe", "posix_spawn", "waitpid",
+        "waitstatus_to_exitcode", "POSIX_SPAWN_OPEN", "POSIX_SPAWN_DUP2",
+        "WNOHANG",
+    )
+) and hasattr(signal, "SIGKILL")
+POSIX_ONLY = pytest.mark.skipif(
+    not POSIX_RUNNER_AVAILABLE,
+    reason="owner-signature process boundary is POSIX-only",
+)
+OWNER_UID_FOR_TEST = getattr(os, "getuid", lambda: 501)() or 501
 
 
 def _private_file(path: Path, payload: bytes) -> Path:
@@ -918,6 +931,7 @@ def test_production_gate_code_has_no_runtime_global_or_builtin_lookup():
                 ), (candidate.__qualname__, code.co_name)
 
 
+@POSIX_ONLY
 def test_production_verifier_captures_anonymous_pipe_process_boundary():
     reachable = _reachable_closure_values(
         authority.load_formal_execution_owner_signature
@@ -1661,6 +1675,7 @@ def test_production_loader_does_not_resolve_critical_builtins_at_runtime(
     assert calls == []
 
 
+@POSIX_ONLY
 def test_production_loader_does_not_use_rebound_pipe_or_spawn(
     tmp_path,
     monkeypatch,
@@ -1713,6 +1728,7 @@ def test_raw_verifier_runner_refuses_an_alternate_root_executable(tmp_path):
     assert calls == []
 
 
+@POSIX_ONLY
 def test_production_posix_runner_pins_spawn_contract_and_never_kills_after_echild():
     pipe_pairs = iter(((10, 11), (12, 13), (14, 15)))
     spawn_calls = []
@@ -1775,6 +1791,7 @@ def test_production_posix_runner_pins_spawn_contract_and_never_kills_after_echil
     assert kill_calls == []
 
 
+@POSIX_ONLY
 def test_production_posix_runner_refuses_any_broken_input_stream():
     pipe_pairs = iter(((10, 11), (12, 13), (14, 15)))
     kill_calls = []
@@ -1804,6 +1821,7 @@ def test_production_posix_runner_refuses_any_broken_input_stream():
     assert kill_calls == []
 
 
+@POSIX_ONLY
 def test_production_posix_runner_timeout_is_wall_clock_not_idle_only():
     pipe_pairs = iter(((10, 11), (12, 13), (14, 15)))
     clock = iter((0.0, 1.0, 11.0))
@@ -1836,6 +1854,7 @@ def test_production_posix_runner_timeout_is_wall_clock_not_idle_only():
     assert wait_calls == [(424242, 0)]
 
 
+@POSIX_ONLY
 def test_production_posix_runner_accepts_a_valid_fixture_signature(
     tmp_path,
     signer,
@@ -1869,6 +1888,7 @@ def test_production_posix_runner_accepts_a_valid_fixture_signature(
     )
 
 
+@POSIX_ONLY
 def test_production_posix_runner_streams_the_maximum_payload(
     tmp_path,
     signer,
@@ -1914,6 +1934,45 @@ def _production_closure(name):
     return next(iter(functions.values()))
 
 
+def test_module_initialization_does_not_require_unix_only_attributes():
+    tree = ast.parse(Path(authority.__file__).read_text(encoding="utf-8"))
+    factory = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_make_reviewed_pin_operations"
+    )
+    direct_unix_lookups = {
+        (node.value.id, node.attr)
+        for node in ast.walk(factory)
+        if isinstance(node, ast.Attribute)
+        and isinstance(node.value, ast.Name)
+        and (node.value.id, node.attr)
+        in {("os", "getuid"), ("os", "kill"), ("signal", "SIGKILL")}
+    }
+    assert direct_unix_lookups == set()
+
+
+def test_sealed_operations_refuse_missing_posix_primitives_at_call_time():
+    read_control = _with_closure_values(
+        _production_closure("read_private_control"), getuid=None
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="trusted POSIX verifier process boundary is unavailable",
+    ):
+        read_control("/not-opened", 1, "fixture control")
+
+    runner = _with_closure_values(
+        _production_closure("run_signature_verifier"), sigkill=None
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="trusted POSIX verifier process boundary is unavailable",
+    ):
+        runner(b"payload", b"allowed", b"signature", "namespace")
+
+
 def _fake_verifier_lstat(
     *,
     verifier_uid=0,
@@ -1942,7 +2001,7 @@ def test_sealed_verifier_snapshot_refuses_untrusted_verifier_or_parent():
     accepted = _with_closure_values(snapshot, lstat=_fake_verifier_lstat())()
     assert accepted[1][0] == "/usr/bin/ssh-keygen"
 
-    user_uid = os.getuid() or 501
+    user_uid = OWNER_UID_FOR_TEST
     for lstat in (
         _fake_verifier_lstat(verifier_uid=user_uid),
         _fake_verifier_lstat(verifier_mode=stat.S_IFREG | 0o777),
@@ -1994,7 +2053,7 @@ def test_sealed_loader_refuses_untrusted_verifier_before_spawning(tmp_path, sign
 
     untrusted_snapshot = _with_closure_values(
         _production_closure("snapshot_trusted_verifier"),
-        lstat=_fake_verifier_lstat(verifier_uid=os.getuid() or 501),
+        lstat=_fake_verifier_lstat(verifier_uid=OWNER_UID_FOR_TEST),
     )
     loader = _with_closure_values(
         _production_closure("load_with_reviewed_path_texts"),

@@ -526,7 +526,7 @@ def _make_reviewed_pin_operations():
     close_file = os.close
     pipe_file = os.pipe
     set_blocking = os.set_blocking
-    getuid = os.getuid
+    getuid = getattr(os, "getuid", None)
     read_flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
     if hasattr(os, "O_NOFOLLOW"):
         read_flags |= os.O_NOFOLLOW
@@ -537,14 +537,19 @@ def _make_reviewed_pin_operations():
     symlink_file_type = 0o120000
     posix_spawn = getattr(os, "posix_spawn", None)
     waitpid = getattr(os, "waitpid", None)
-    kill = os.kill
+    kill = getattr(os, "kill", None)
     waitstatus_to_exitcode = getattr(os, "waitstatus_to_exitcode", None)
     monotonic = time.monotonic
     sleep = time.sleep
     spawn_open = getattr(os, "POSIX_SPAWN_OPEN", -1)
     spawn_dup2 = getattr(os, "POSIX_SPAWN_DUP2", -1)
     wnohang = getattr(os, "WNOHANG", -1)
-    sigkill = integer_type(signal.SIGKILL)
+    raw_sigkill = getattr(signal, "SIGKILL", None)
+    sigkill = (
+        integer_type(raw_sigkill)
+        if raw_sigkill is not None
+        else None
+    )
     o_wronly = os.O_WRONLY
     devnull = string_type(os.devnull)
     timeout_seconds = VERIFY_TIMEOUT_SECONDS
@@ -745,6 +750,10 @@ def _make_reviewed_pin_operations():
         maximum_bytes: int,
         name: str,
     ) -> tuple[object, ...]:
+        if getuid is None:
+            raise error_type(
+                "trusted POSIX verifier process boundary is unavailable"
+            )
         parts = (
             path_text.split("/")
             if exact_type(path_text) is string_type
@@ -916,6 +925,7 @@ def _make_reviewed_pin_operations():
         if (
             posix_spawn is None
             or waitpid is None
+            or kill is None
             or waitstatus_to_exitcode is None
             or exact_type(spawn_open) is not integer_type
             or spawn_open < 0
@@ -923,6 +933,8 @@ def _make_reviewed_pin_operations():
             or spawn_dup2 < 0
             or exact_type(wnohang) is not integer_type
             or wnohang < 0
+            or exact_type(sigkill) is not integer_type
+            or sigkill <= 0
         ):
             raise error_type(
                 "trusted POSIX verifier process boundary is unavailable"

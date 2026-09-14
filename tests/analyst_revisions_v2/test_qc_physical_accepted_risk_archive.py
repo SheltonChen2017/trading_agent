@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import json
 import os
 import re
 from pathlib import Path
@@ -11,8 +12,10 @@ import pytest
 
 from research.analyst_revisions_v2 import accepted_risk_input_pair as c1_module
 from research.analyst_revisions_v2.accepted_risk_input_pair import (
+    InputView,
     MAX_CAPTURE_PAGE_BYTES,
     MassiveSourceRole,
+    RowDisposition,
 )
 from research.analyst_revisions_v2.canonical import canonical_json_bytes
 from research.analyst_revisions_v2_qc import (
@@ -44,6 +47,8 @@ from tests.analyst_revisions_v2.test_massive_capture_adapter import (
     ROLE_ORDER,
     _endpoint,
     _payload,
+    _rebind_manifest_physical_identity,
+    _rewrite_manifest,
     _row,
     _spooled_capture,
 )
@@ -188,6 +193,41 @@ def test_disk_archive_matches_the_legacy_c1_oracle_byte_for_byte(tmp_path):
     )
 
 
+def test_disk_archive_authenticates_predecessor_physical_identity_and_derives_current_c1(
+    tmp_path,
+):
+    capture, _session = _spooled_capture(tmp_path)
+
+    def rebind(value):
+        _rebind_manifest_physical_identity(
+            value,
+            contract_sha256=(
+                capture_module.PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256
+            ),
+        )
+
+    _rewrite_manifest(capture.artifact_path, rebind)
+    rewritten = json.loads((capture.artifact_path / "manifest.json").read_bytes())
+
+    archive = _build_physical_accepted_risk_archive_for_test(
+        source_artifact_path=capture.artifact_path,
+        output_root=tmp_path / "accepted-risk",
+    )
+    legacy = _build_massive_accepted_risk_input_pair_for_test(
+        capture.artifact_path
+    )
+
+    assert archive.physical_capture_id == rewritten["capture_id"]
+    assert archive.physical_capture_sha256 == rewritten["capture_sha256"]
+    assert archive.capture_id == legacy.pair.capture.capture_id
+    assert archive.capture_sha256 == legacy.pair.capture.capture_sha256
+    assert archive.capture_id != archive.physical_capture_id
+    assert archive.pair_id == legacy.pair.pair_id
+    assert [
+        row.to_record() for row in iter_physical_accepted_risk_rows(archive)
+    ] == [row.to_record() for row in legacy.pair.rows]
+
+
 def test_disk_archive_matches_oracle_across_censoring_and_refusal_rows(tmp_path):
     revised = _row("revised", role=ROLE_ORDER[0])
     revised["last_updated"] = "2022-01-01T00:00:00Z"
@@ -315,6 +355,74 @@ def test_disk_archive_refuses_cross_page_duplicate_provider_id(tmp_path):
         )
 
 
+def test_disk_archive_refuses_duplicate_earnings_provider_id(tmp_path):
+    responses = [
+        FakeResponse(
+            _payload([_row("rating", role=ROLE_ORDER[0])]),
+            _endpoint(ROLE_ORDER[0]),
+        ),
+        FakeResponse(
+            _payload(
+                [
+                    _row("duplicate", role=ROLE_ORDER[1]),
+                    _row("duplicate", role=ROLE_ORDER[1]),
+                ]
+            ),
+            _endpoint(ROLE_ORDER[1]),
+        ),
+        FakeResponse(
+            _payload([_row("guidance", role=ROLE_ORDER[2])]),
+            _endpoint(ROLE_ORDER[2]),
+        ),
+    ]
+    capture, _session = _spooled_capture(tmp_path, responses=responses)
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("duplicate or conflicting benzinga_id invalidates the capture"),
+    ):
+        _build_physical_accepted_risk_archive_for_test(
+            source_artifact_path=capture.artifact_path,
+            output_root=tmp_path / "accepted-risk",
+        )
+
+
+def test_provider_id_census_refuses_wrong_role_types_and_incomplete_lookup(
+    tmp_path,
+):
+    connection = physical_module._open_spool(tmp_path / "census.sqlite3")
+    try:
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact("provider-ID census source role changed type"),
+        ):
+            physical_module._insert_provider_id(
+                connection,
+                _row("guidance", role=ROLE_ORDER[2]),
+                "corporate_guidance",  # type: ignore[arg-type]
+            )
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact("provider-ID lookup source role changed type"),
+        ):
+            physical_module._is_duplicate_guidance_provider_id(
+                connection,
+                _row("guidance", role=ROLE_ORDER[2]),
+                "corporate_guidance",  # type: ignore[arg-type]
+            )
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact("guidance duplicate-ID census is incomplete"),
+        ):
+            physical_module._is_duplicate_guidance_provider_id(
+                connection,
+                _row("guidance", role=ROLE_ORDER[2]),
+                MassiveSourceRole.CORPORATE_GUIDANCE,
+            )
+    finally:
+        connection.close()
+
+
 def test_disk_archive_refuses_cross_role_duplicate_provider_id(tmp_path):
     responses = [
         FakeResponse(
@@ -340,6 +448,98 @@ def test_disk_archive_refuses_cross_role_duplicate_provider_id(tmp_path):
             source_artifact_path=capture.artifact_path,
             output_root=tmp_path / "accepted-risk",
         )
+
+
+@pytest.mark.parametrize("conflicting_payload", [False, True])
+def test_disk_archive_matches_legacy_when_guidance_duplicate_is_quarantined(
+    tmp_path, conflicting_payload
+):
+    duplicate_first = _row("guidance-duplicate", role=ROLE_ORDER[2])
+    duplicate_second = dict(duplicate_first)
+    if conflicting_payload:
+        duplicate_second.update(
+            {
+                "date": "2021-02-04",
+                "last_updated": "2021-02-04 09:30:00",
+                "min_revenue_guidance": 1,
+            }
+        )
+    unique = _row("guidance-unique", role=ROLE_ORDER[2])
+    responses = [
+        FakeResponse(
+            _payload([_row("rating", role=ROLE_ORDER[0])]),
+            _endpoint(ROLE_ORDER[0]),
+        ),
+        FakeResponse(
+            _payload([_row("earnings", role=ROLE_ORDER[1])]),
+            _endpoint(ROLE_ORDER[1]),
+        ),
+        FakeResponse(
+            _payload([duplicate_first, duplicate_second, unique]),
+            _endpoint(ROLE_ORDER[2]),
+        ),
+    ]
+    capture, _session = _spooled_capture(tmp_path, responses=responses)
+
+    archive = _build_physical_accepted_risk_archive_for_test(
+        source_artifact_path=capture.artifact_path,
+        output_root=tmp_path / "accepted-risk",
+    )
+    legacy = _build_massive_accepted_risk_input_pair_for_test(
+        capture.artifact_path
+    )
+    rows = tuple(iter_physical_accepted_risk_rows(archive))
+    guidance = tuple(
+        row
+        for row in rows
+        if row.locator.source_role is MassiveSourceRole.CORPORATE_GUIDANCE
+    )
+    duplicated = tuple(
+        row for row in guidance if row.provider_event_id == "guidance-duplicate"
+    )
+    retained_unique = next(
+        row for row in guidance if row.provider_event_id == "guidance-unique"
+    )
+
+    assert len(rows) == archive.source_row_count == 5
+    assert len(duplicated) == 2
+    assert tuple(row.locator.row_offset for row in duplicated) == (0, 1)
+    assert tuple(row.raw_row_bytes for row in duplicated) == (
+        canonical_json_bytes(duplicate_first),
+        canonical_json_bytes(duplicate_second),
+    )
+    assert all(
+        row.current_view.disposition
+        is RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        and row.censored_view.disposition
+        is RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        and not row.current_view.included
+        and not row.censored_view.included
+        for row in duplicated
+    )
+    assert retained_unique.current_view.included is True
+    assert retained_unique.censored_view.included is True
+    assert [row.to_record() for row in rows] == [
+        row.to_record() for row in legacy.pair.rows
+    ]
+    assert archive.pair_id == legacy.pair.pair_id
+    assert archive.pair_sha256 == legacy.pair.pair_sha256
+    assert archive.current_included_count == 3
+    assert archive.censored_included_count == 3
+    report = legacy.pair.report
+    counts = {
+        (item.view, item.disposition): item.count
+        for item in report.disposition_counts
+    }
+    assert counts[
+        (InputView.CURRENT_ROW, RowDisposition.DUPLICATE_PROVIDER_EVENT_ID)
+    ] == 2
+    assert counts[
+        (
+            InputView.CONSERVATIVE_CENSORED,
+            RowDisposition.DUPLICATE_PROVIDER_EVENT_ID,
+        )
+    ] == 2
 
 
 def test_disk_archive_refuses_unreviewed_rating_action(tmp_path):
@@ -521,7 +721,9 @@ def test_disk_archive_refuses_physical_capture_identity_substitution(tmp_path):
 
     with pytest.raises(
         PhysicalAcceptedRiskArchiveError,
-        match=_exact("capture visitor physical identity did not reconstruct"),
+        match=_exact(
+            "physical capture identity does not match an admitted contract"
+        ),
     ):
         _build_physical_accepted_risk_archive_for_test(
             source_artifact_path=capture.artifact_path,

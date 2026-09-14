@@ -137,6 +137,13 @@ _PINNED_C1_SCALARS = (
     _PINNED_MAX_CAPTURE_PAGE_BYTES,
     _PINNED_MAX_PROVIDER_ROWS_PER_PAGE,
 ) = _PINNED_C1_SCALARS
+_PINNED_PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256 = (
+    _massive.PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256
+)
+_PINNED_PHYSICAL_CAPTURE_CONTRACT_SHA256S = (
+    _PINNED_INPUT_PAIR_CONTRACT_SHA256,
+    _PINNED_PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256,
+)
 
 
 ARCHIVE_SCHEMA = "arv2-physical-accepted-risk-archive-v1"
@@ -204,6 +211,10 @@ def _require_dependency_bindings() -> None:
             or _massive.TEST_TRANSPORT != _PINNED_TEST_TRANSPORT
             or _massive.REPOSITORY_ARTIFACTS_ROOT
             is not _PINNED_REPOSITORY_ARTIFACTS_ROOT
+            or type(_massive.PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256)
+            is not str
+            or _massive.PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256
+            != _PINNED_PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256
             or _massive.ENDPOINT_PATHS is not _PINNED_ENDPOINT_PATHS_OBJECT
             or tuple(
                 (role, _massive.ENDPOINT_PATHS[role]) for role in _ROLE_ORDER
@@ -481,6 +492,40 @@ def _iter_provider_rows(payload: bytes) -> Iterator[tuple[dict[str, Any], bytes]
         start = end + 1
 
 
+def _semantic_requires_duplicate_guidance_quarantine(payload: bytes) -> bool:
+    """Recover the authenticated census decision used to build one row.
+
+    The physical source shards are the preserved capture and the semantic
+    shards are the derived C1 authority.  A duplicate decision cannot be
+    recovered from one source row in isolation, so iterator reauthentication
+    reads only this joint-exclusion marker from the already authenticated
+    semantic shard before independently rederiving and byte-comparing the
+    complete row.  New semantic authority is still created only after the
+    builder's complete SQLite provider-ID census.
+    """
+
+    if type(payload) is not bytes:
+        return False
+    try:
+        value = strict_json_loads(
+            decode_utf8(payload, "accepted-risk semantic row"),
+            "accepted-risk semantic row",
+        )
+    except CanonicalEvidenceError:
+        return False
+    if type(value) is not dict:
+        return False
+    current = value.get("current_view")
+    censored = value.get("censored_view")
+    if type(current) is not dict or type(censored) is not dict:
+        return False
+    expected = RowDisposition.DUPLICATE_PROVIDER_EVENT_ID.value
+    return (
+        current.get("disposition") == expected
+        and censored.get("disposition") == expected
+    )
+
+
 def _write_private(
     path: Path, chunks: Iterable[bytes], *, maximum_bytes: int
 ) -> tuple[int, str]:
@@ -661,7 +706,9 @@ def _open_spool(path: Path) -> sqlite3.Connection:
         PRAGMA synchronous=FULL;
         PRAGMA temp_store=FILE;
         CREATE TABLE provider_ids (
-            provider_event_id TEXT PRIMARY KEY
+            provider_event_id TEXT PRIMARY KEY,
+            source_role_ordinal INTEGER NOT NULL,
+            occurrence_count INTEGER NOT NULL CHECK (occurrence_count >= 1)
         ) WITHOUT ROWID;
         CREATE TABLE breakdowns (
             dimension_ordinal INTEGER NOT NULL,
@@ -678,20 +725,91 @@ def _open_spool(path: Path) -> sqlite3.Connection:
     return connection
 
 
-def _insert_provider_id(connection: sqlite3.Connection, row: dict[str, Any]) -> None:
+def _insert_provider_id(
+    connection: sqlite3.Connection,
+    row: dict[str, Any],
+    source_role: MassiveSourceRole,
+) -> None:
+    if type(source_role) is not MassiveSourceRole:
+        raise PhysicalAcceptedRiskArchiveError(
+            "provider-ID census source role changed type"
+        )
     try:
         provider_id = require_identifier(row.get("benzinga_id"), "benzinga_id")
     except CanonicalEvidenceError:
         return
+    role_ordinal = _ROLE_ORDER.index(source_role)
     try:
         connection.execute(
-            "INSERT INTO provider_ids(provider_event_id) VALUES (?)",
-            (provider_id,),
+            "INSERT INTO provider_ids(provider_event_id, source_role_ordinal, "
+            "occurrence_count) VALUES (?, ?, 1)",
+            (provider_id, role_ordinal),
         )
     except sqlite3.IntegrityError as exc:
+        prior = connection.execute(
+            "SELECT source_role_ordinal, occurrence_count FROM provider_ids "
+            "WHERE provider_event_id = ?",
+            (provider_id,),
+        ).fetchone()
+        guidance_ordinal = _ROLE_ORDER.index(
+            MassiveSourceRole.CORPORATE_GUIDANCE
+        )
+        if (
+            type(prior) is not tuple
+            or len(prior) != 2
+            or type(prior[0]) is not int
+            or type(prior[1]) is not int
+            or prior[0] != guidance_ordinal
+            or role_ordinal != guidance_ordinal
+            or prior[1] < 1
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "duplicate or conflicting benzinga_id invalidates the capture"
+            ) from exc
+        cursor = connection.execute(
+            "UPDATE provider_ids SET occurrence_count = occurrence_count + 1 "
+            "WHERE provider_event_id = ? AND source_role_ordinal = ?",
+            (provider_id, guidance_ordinal),
+        )
+        if cursor.rowcount != 1:
+            raise PhysicalAcceptedRiskArchiveError(
+                "guidance duplicate-ID census update was ambiguous"
+            ) from exc
+
+
+def _is_duplicate_guidance_provider_id(
+    connection: sqlite3.Connection,
+    row: dict[str, Any],
+    source_role: MassiveSourceRole,
+) -> bool:
+    if type(source_role) is not MassiveSourceRole:
         raise PhysicalAcceptedRiskArchiveError(
-            "duplicate or conflicting benzinga_id invalidates the capture"
-        ) from exc
+            "provider-ID lookup source role changed type"
+        )
+    if source_role is not MassiveSourceRole.CORPORATE_GUIDANCE:
+        return False
+    try:
+        provider_id = require_identifier(row.get("benzinga_id"), "benzinga_id")
+    except CanonicalEvidenceError:
+        return False
+    census = connection.execute(
+        "SELECT source_role_ordinal, occurrence_count FROM provider_ids "
+        "WHERE provider_event_id = ?",
+        (provider_id,),
+    ).fetchone()
+    guidance_ordinal = _ROLE_ORDER.index(MassiveSourceRole.CORPORATE_GUIDANCE)
+    if (
+        type(census) is not tuple
+        or len(census) != 2
+        or type(census[0]) is not int
+        or type(census[1]) is not int
+        or census[0] != guidance_ordinal
+        or census[1] < 1
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "guidance duplicate-ID census is incomplete"
+        )
+    return census[1] > 1
 
 
 def _breakdown_keys(row: AcceptedRiskSourceRow) -> tuple[tuple[int, str, str], ...]:
@@ -889,8 +1007,17 @@ def _capture_record(
     requested_first_event_date: str,
     requested_last_event_date: str,
     raw_response_extraction_verified: bool,
+    contract_sha256: str,
 ) -> dict[str, object]:
-    """Reproduce the C1 capture semantic record without retaining page bytes."""
+    """Reproduce one admitted C1 capture record without retaining page bytes."""
+
+    if (
+        type(contract_sha256) is not str
+        or contract_sha256 not in _PINNED_PHYSICAL_CAPTURE_CONTRACT_SHA256S
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "physical capture contract hash is not an admitted exact version"
+        )
 
     counts: Counter[MassiveSourceRole] = Counter()
     for item in pages:
@@ -898,7 +1025,7 @@ def _capture_record(
     return {
         "schema": _PINNED_CAPTURE_SCHEMA,
         "contract_id": _PINNED_INPUT_PAIR_CONTRACT_ID,
-        "contract_sha256": _PINNED_INPUT_PAIR_CONTRACT_SHA256,
+        "contract_sha256": contract_sha256,
         "capture_started_at": capture_started_at,
         "capture_completed_at": capture_completed_at,
         "requested_first_event_date": requested_first_event_date,
@@ -941,6 +1068,45 @@ def _capture_record(
 def _capture_identity(record: dict[str, object]) -> tuple[str, str]:
     digest = sha256_bytes(canonical_json_bytes(record))
     return f"arv2-capture-{digest[:24]}", digest
+
+
+def _authenticate_physical_capture_identity(
+    *,
+    pages: tuple[_CopiedPage, ...],
+    capture_started_at: str,
+    capture_completed_at: str,
+    requested_first_event_date: str,
+    requested_last_event_date: str,
+    expected_capture_id: str,
+    expected_capture_sha256: str,
+) -> tuple[str, str]:
+    """Authenticate physical bytes under exactly current or measured predecessor.
+
+    This admits the predecessor only for the immutable artifact's physical
+    identity.  Every successor capture and pair derived from those bytes uses
+    the current C1 contract hash at its separate call site.
+    """
+
+    matches: list[tuple[str, str]] = []
+    for contract_sha256 in _PINNED_PHYSICAL_CAPTURE_CONTRACT_SHA256S:
+        candidate = _capture_identity(
+            _capture_record(
+                pages=pages,
+                capture_started_at=capture_started_at,
+                capture_completed_at=capture_completed_at,
+                requested_first_event_date=requested_first_event_date,
+                requested_last_event_date=requested_last_event_date,
+                raw_response_extraction_verified=True,
+                contract_sha256=contract_sha256,
+            )
+        )
+        if candidate == (expected_capture_id, expected_capture_sha256):
+            matches.append(candidate)
+    if len(matches) != 1:
+        raise PhysicalAcceptedRiskArchiveError(
+            "physical capture identity does not match an admitted contract"
+        )
+    return matches[0]
 
 
 def _archive_seed(
@@ -1146,7 +1312,7 @@ class _AcceptedRiskArchiveStage:
         page_rows = 0
         for row, _raw in _iter_provider_rows(page.provider_rows_bytes):
             page_rows += 1
-            _insert_provider_id(self.connection, row)
+            _insert_provider_id(self.connection, row, page.source_role)
             if page.source_role is MassiveSourceRole.ANALYST_RATINGS:
                 try:
                     raw_action = row.get("rating_action")
@@ -1385,6 +1551,13 @@ def _derive_semantic_shards(
                         row_offset=offset,
                         row=raw,
                         raw_row_bytes=raw_bytes,
+                        duplicate_provider_event_id=(
+                            _is_duplicate_guidance_provider_id(
+                                stage.connection,
+                                raw,
+                                copied.source_role,
+                            )
+                        ),
                     )
                 except (AcceptedRiskInputError, CanonicalEvidenceError) as exc:
                     raise PhysicalAcceptedRiskArchiveError(
@@ -1579,23 +1752,17 @@ def _build_with_capture_visitor(
             raise PhysicalAcceptedRiskArchiveError(
                 "capture traversal did not establish one query contract"
             )
-        physical_capture_id, physical_capture_sha256 = _capture_identity(
-            _capture_record(
+        physical_capture_id, physical_capture_sha256 = (
+            _authenticate_physical_capture_identity(
                 pages=tuple(state.copied_pages),
                 capture_started_at=summary.capture_started_at,
                 capture_completed_at=summary.capture_completed_at,
                 requested_first_event_date=state.requested_first_event_date,
                 requested_last_event_date=state.requested_last_event_date,
-                raw_response_extraction_verified=True,
+                expected_capture_id=summary.capture_id,
+                expected_capture_sha256=summary.capture_sha256,
             )
         )
-        if (
-            physical_capture_id != summary.capture_id
-            or physical_capture_sha256 != summary.capture_sha256
-        ):
-            raise PhysicalAcceptedRiskArchiveError(
-                "capture visitor physical identity did not reconstruct"
-            )
         derived_capture_id, derived_capture_sha256 = _capture_identity(
             _capture_record(
                 pages=tuple(state.copied_pages),
@@ -1604,6 +1771,7 @@ def _build_with_capture_visitor(
                 requested_first_event_date=state.requested_first_event_date,
                 requested_last_event_date=state.requested_last_event_date,
                 raw_response_extraction_verified=False,
+                contract_sha256=_PINNED_INPUT_PAIR_CONTRACT_SHA256,
             )
         )
         (
@@ -3173,14 +3341,15 @@ def _preflight_archive_shape(value: PhysicalAcceptedRiskArchive) -> None:
         raise PhysicalAcceptedRiskArchiveError(
             "accepted-risk shard aggregate or source root changed"
         )
-    physical_capture_id, physical_capture_sha256 = _capture_identity(
-        _capture_record(
+    physical_capture_id, physical_capture_sha256 = (
+        _authenticate_physical_capture_identity(
             pages=tuple(copied),
             capture_started_at=value.capture_started_at,
             capture_completed_at=value.capture_completed_at,
             requested_first_event_date=value.requested_first_event_date,
             requested_last_event_date=value.requested_last_event_date,
-            raw_response_extraction_verified=True,
+            expected_capture_id=value.physical_capture_id,
+            expected_capture_sha256=value.physical_capture_sha256,
         )
     )
     derived_capture_id, derived_capture_sha256 = _capture_identity(
@@ -3191,6 +3360,7 @@ def _preflight_archive_shape(value: PhysicalAcceptedRiskArchive) -> None:
             requested_first_event_date=value.requested_first_event_date,
             requested_last_event_date=value.requested_last_event_date,
             raw_response_extraction_verified=False,
+            contract_sha256=_PINNED_INPUT_PAIR_CONTRACT_SHA256,
         )
     )
     receipts = tuple(
@@ -3694,6 +3864,11 @@ def iter_physical_accepted_risk_rows(
                                 row_offset=offset,
                                 row=raw,
                                 raw_row_bytes=raw_bytes,
+                                duplicate_provider_event_id=(
+                                    _semantic_requires_duplicate_guidance_quarantine(
+                                        semantic
+                                    )
+                                ),
                             )
                         except (
                             AcceptedRiskInputError,

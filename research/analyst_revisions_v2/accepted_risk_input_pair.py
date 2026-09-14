@@ -149,6 +149,7 @@ class RowDisposition(str, Enum):
         "included_conservative_censored_non_pristine"
     )
     INVALID_PROVIDER_EVENT_ID = "invalid_provider_event_id"
+    DUPLICATE_PROVIDER_EVENT_ID = "duplicate_provider_event_id"
     INVALID_EVENT_DATE = "invalid_event_date"
     INVALID_EVENT_TIME = "invalid_event_time"
     EVENT_OUTSIDE_REQUESTED_CAPTURE_RANGE = "event_outside_requested_capture_range"
@@ -236,7 +237,16 @@ def accepted_risk_input_pair_contract_record() -> dict[str, Any]:
             "session_lag": GUIDANCE_CONSERVATIVE_SESSION_LAG,
             "earlier_version_imputation_performed": False,
         },
-        "duplicate_provider_id_policy": "refuse_entire_three_role_capture",
+        "duplicate_provider_id_policy": {
+            "analyst_ratings": "refuse_entire_three_role_capture",
+            "earnings": "refuse_entire_three_role_capture",
+            "corporate_guidance": (
+                "preserve_every_raw_occurrence_and_jointly_exclude_every_"
+                "occurrence_of_a_duplicated_id"
+            ),
+            "cross_role": "refuse_entire_three_role_capture",
+            "selection_or_synthetic_identity": False,
+        },
         "ticker_policy": "current_restated_label_only_not_security_identity",
         "earlier_version_imputation_performed": False,
         "pristine_point_in_time": False,
@@ -422,7 +432,8 @@ def _require_static_contract() -> None:
         or _PINNED_CAPTURE_MANIFEST_RECORD is not _capture_manifest_record
         or _PINNED_CAPTURE_FINGERPRINT is not _capture_fingerprint
         or _PINNED_VALIDATE_PAGE_SEQUENCE is not _validate_page_sequence
-        or _PINNED_REFUSE_DUPLICATE_PROVIDER_IDS is not _refuse_duplicate_provider_ids
+        or _PINNED_VALIDATE_AND_COLLECT_DUPLICATE_GUIDANCE_PROVIDER_IDS
+        is not _validate_and_collect_duplicate_guidance_provider_ids
         or _PINNED_DERIVE_SOURCE_ROW is not _derive_source_row
         or _PINNED_DERIVE_ROWS is not _derive_rows
         or _PINNED_BUILD_REPORT is not _build_report
@@ -1040,28 +1051,49 @@ def _candidate_provider_event_id(row: dict[str, Any]) -> str | None:
         return None
 
 
-def _refuse_duplicate_provider_ids(pages: tuple[CapturePageBinding, ...]) -> None:
-    # Massive describes benzinga_id as the stable record identifier, not as a
-    # role-local display field.  C1 therefore refuses an ID repeated anywhere
-    # in the three-role capture instead of guessing that two equal strings in
-    # different endpoints denote different records.
-    seen: dict[str, tuple[MassiveSourceRole, int, int]] = {}
+def _validate_and_collect_duplicate_guidance_provider_ids(
+    pages: tuple[CapturePageBinding, ...],
+) -> frozenset[str]:
+    """Return the complete duplicated-guidance ID set after strict validation.
+
+    Massive documents ``benzinga_id`` as a unique record identifier.  One
+    authenticated production capture nevertheless contains a conflicting
+    same-page Corporate Guidance reuse.  Guidance duplicates are therefore
+    preserved but jointly quarantined downstream.  A duplicate in either
+    other role, or an ID shared by different roles, still invalidates the
+    complete capture: neither role-prefixing nor a synthetic row-hash identity
+    can repair those unsupported identity semantics.
+    """
+
+    seen: dict[str, MassiveSourceRole] = {}
+    duplicate_guidance_ids: set[str] = set()
     for page in pages:
-        for offset, row in enumerate(page.parsed_rows):
+        for row in page.parsed_rows:
             provider_event_id = _candidate_provider_event_id(row)
             if provider_event_id is None:
                 continue
-            if provider_event_id in seen:
-                raise AcceptedRiskInputError(
-                    "duplicate provider event ID invalidates the complete capture"
-                )
-            seen[provider_event_id] = (page.source_role, page.page_number, offset)
+            prior_role = seen.get(provider_event_id)
+            if prior_role is None:
+                seen[provider_event_id] = page.source_role
+                continue
+            if (
+                prior_role is MassiveSourceRole.CORPORATE_GUIDANCE
+                and page.source_role is MassiveSourceRole.CORPORATE_GUIDANCE
+            ):
+                duplicate_guidance_ids.add(provider_event_id)
+                continue
+            raise AcceptedRiskInputError(
+                "duplicate provider event ID invalidates the complete capture"
+            )
+    return frozenset(duplicate_guidance_ids)
 
 
 _PINNED_CAPTURE_MANIFEST_RECORD = _capture_manifest_record
 _PINNED_CAPTURE_FINGERPRINT = _capture_fingerprint
 _PINNED_VALIDATE_PAGE_SEQUENCE = _validate_page_sequence
-_PINNED_REFUSE_DUPLICATE_PROVIDER_IDS = _refuse_duplicate_provider_ids
+_PINNED_VALIDATE_AND_COLLECT_DUPLICATE_GUIDANCE_PROVIDER_IDS = (
+    _validate_and_collect_duplicate_guidance_provider_ids
+)
 
 
 def _preflight_capture_scalar_types(capture: CaptureBinding) -> None:
@@ -1122,7 +1154,7 @@ def build_capture_binding(
         raise AcceptedRiskInputError("capture page receipt times must be nondecreasing")
     if any(instant < started or instant > completed for instant in received):
         raise AcceptedRiskInputError("capture page receipt falls outside capture chronology")
-    _PINNED_REFUSE_DUPLICATE_PROVIDER_IDS(pages)
+    _PINNED_VALIDATE_AND_COLLECT_DUPLICATE_GUIDANCE_PROVIDER_IDS(pages)
 
     manifest = _PINNED_CAPTURE_MANIFEST_RECORD(
         capture_started_at=capture_started_at,
@@ -1197,7 +1229,7 @@ def require_capture_binding(capture: CaptureBinding) -> CaptureBinding:
     first_date, last_date = _PINNED_VALIDATE_PAGE_SEQUENCE(capture.pages)
     if _PINNED_CAPTURE_FINGERPRINT(capture) != authority[1]:
         raise AcceptedRiskInputError("capture changed after authentication")
-    _PINNED_REFUSE_DUPLICATE_PROVIDER_IDS(capture.pages)
+    _PINNED_VALIDATE_AND_COLLECT_DUPLICATE_GUIDANCE_PROVIDER_IDS(capture.pages)
     expected_manifest = _PINNED_CAPTURE_MANIFEST_RECORD(
         capture_started_at=capture.capture_started_at,
         capture_completed_at=capture.capture_completed_at,
@@ -1277,6 +1309,7 @@ class ViewEligibility:
         allowed_current = {
             RowDisposition.INCLUDED_CURRENT_ROW_NON_PRISTINE,
             RowDisposition.INVALID_PROVIDER_EVENT_ID,
+            RowDisposition.DUPLICATE_PROVIDER_EVENT_ID,
             RowDisposition.INVALID_EVENT_DATE,
             RowDisposition.INVALID_EVENT_TIME,
             RowDisposition.EVENT_OUTSIDE_REQUESTED_CAPTURE_RANGE,
@@ -1369,6 +1402,21 @@ class AcceptedRiskSourceRow:
             raise AcceptedRiskInputError("source row view order is not exact")
         if self.censored_view.included and not self.current_view.included:
             raise AcceptedRiskInputError("censored inclusion cannot exceed current-row inclusion")
+        duplicate_disposition = RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        if (
+            self.current_view.disposition is duplicate_disposition
+            or self.censored_view.disposition is duplicate_disposition
+        ) and (
+            self.locator.source_role is not MassiveSourceRole.CORPORATE_GUIDANCE
+            or self.provider_event_id is None
+            or self.current_view.disposition is not duplicate_disposition
+            or self.censored_view.disposition is not duplicate_disposition
+            or self.current_view.included
+            or self.censored_view.included
+        ):
+            raise AcceptedRiskInputError(
+                "duplicate-ID quarantine is valid only for jointly excluded guidance rows"
+            )
         if self.locator.source_role is MassiveSourceRole.CORPORATE_GUIDANCE:
             if self.current_view.included:
                 if self.event_date is None:
@@ -1787,7 +1835,12 @@ def _derive_source_row(
     row_offset: int,
     row: dict[str, Any],
     raw_row_bytes: bytes,
+    duplicate_provider_event_id: bool,
 ) -> AcceptedRiskSourceRow:
+    if type(duplicate_provider_event_id) is not bool:
+        raise AcceptedRiskInputError(
+            "duplicate_provider_event_id must be an exact boolean"
+        )
     locator = CaptureRowLocator(
         capture_id=capture.capture_id,
         source_role=page.source_role,
@@ -1823,7 +1876,18 @@ def _derive_source_row(
     )
     action, firm, security = _row_dimension_labels(page.source_role, row)
 
-    if provider_event_id is None:
+    if duplicate_provider_event_id:
+        if (
+            page.source_role is not MassiveSourceRole.CORPORATE_GUIDANCE
+            or provider_event_id is None
+        ):
+            raise AcceptedRiskInputError(
+                "duplicate-ID quarantine applies only to identified guidance rows"
+            )
+        current, censored = _joint_exclusion(
+            RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        )
+    elif provider_event_id is None:
         current, censored = _joint_exclusion(RowDisposition.INVALID_PROVIDER_EVENT_ID)
     elif parsed_event_date is None:
         current, censored = _joint_exclusion(RowDisposition.INVALID_EVENT_DATE)
@@ -2036,6 +2100,11 @@ _PINNED_DERIVE_SOURCE_ROW = _derive_source_row
 
 
 def _derive_rows(capture: CaptureBinding) -> tuple[AcceptedRiskSourceRow, ...]:
+    duplicate_guidance_ids = (
+        _PINNED_VALIDATE_AND_COLLECT_DUPLICATE_GUIDANCE_PROVIDER_IDS(
+            capture.pages
+        )
+    )
     rows = tuple(
         _PINNED_DERIVE_SOURCE_ROW(
             capture=capture,
@@ -2043,6 +2112,10 @@ def _derive_rows(capture: CaptureBinding) -> tuple[AcceptedRiskSourceRow, ...]:
             row_offset=offset,
             row=row,
             raw_row_bytes=raw_row_bytes,
+            duplicate_provider_event_id=(
+                page.source_role is MassiveSourceRole.CORPORATE_GUIDANCE
+                and _candidate_provider_event_id(row) in duplicate_guidance_ids
+            ),
         )
         for page in capture.pages
         for offset, (row, raw_row_bytes) in enumerate(
@@ -2578,7 +2651,7 @@ def _current_local_callables() -> tuple[object, ...]:
         _forget_capture,
         _validate_page_sequence,
         _candidate_provider_event_id,
-        _refuse_duplicate_provider_ids,
+        _validate_and_collect_duplicate_guidance_provider_ids,
         _preflight_capture_scalar_types,
         _capture_container_roots,
         build_capture_binding,

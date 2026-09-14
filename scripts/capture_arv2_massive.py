@@ -88,6 +88,20 @@ PRODUCTION_TRANSPORT = "massive_https_bearer_default_session"
 TEST_TRANSPORT = "offline_test_double"
 _TRANSPORTS = frozenset({PRODUCTION_TRANSPORT, TEST_TRANSPORT})
 
+# The first immutable production capture was written under this exact C1
+# contract before a measured Corporate Guidance ID reuse required the
+# successor quarantine policy.  Artifact-v2 did not persist its contract hash
+# as a separate field, so readers authenticate physical capture identity
+# against only the current contract or this one measured predecessor.  The
+# predecessor is never used to derive a successor C1 capture or input pair.
+PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256 = (
+    "6d4ae82e33a0f871de40269ee2ee78e1553320c641930f4dc90292e5583d5697"
+)
+_PHYSICAL_CAPTURE_CONTRACT_SHA256S = (
+    INPUT_PAIR_CONTRACT_SHA256,
+    PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256,
+)
+
 ROLE_ORDER = (
     MassiveSourceRole.ANALYST_RATINGS,
     MassiveSourceRole.EARNINGS,
@@ -204,6 +218,11 @@ class MassiveCaptureError(ValueError):
 class LoadedMassiveCapture:
     artifact_path: Path
     manifest_sha256: str
+    # These identify the immutable bytes on disk.  For the one admitted
+    # predecessor artifact they intentionally differ from ``capture`` below,
+    # which is always rederived under the current C1 contract.
+    physical_capture_id: str
+    physical_capture_sha256: str
     capture: CaptureBinding
     accepted_risk_input_pair: AcceptedRiskInputPair | None
     capture_transport: str
@@ -705,7 +724,15 @@ def _logical_capture_record(
     requested_first_event_date: str,
     requested_last_event_date: str,
     pages: tuple[dict[str, object], ...],
+    contract_sha256: str = INPUT_PAIR_CONTRACT_SHA256,
 ) -> dict[str, object]:
+    if (
+        type(contract_sha256) is not str
+        or contract_sha256 not in _PHYSICAL_CAPTURE_CONTRACT_SHA256S
+    ):
+        raise MassiveCaptureError(
+            "physical capture contract hash is not an admitted exact version"
+        )
     counts = {
         role: sum(
             int(page["row_count"])
@@ -717,7 +744,7 @@ def _logical_capture_record(
     return {
         "schema": CAPTURE_SCHEMA,
         "contract_id": INPUT_PAIR_CONTRACT_ID,
-        "contract_sha256": INPUT_PAIR_CONTRACT_SHA256,
+        "contract_sha256": contract_sha256,
         "capture_started_at": capture_started_at,
         "capture_completed_at": capture_completed_at,
         "requested_first_event_date": requested_first_event_date,
@@ -736,6 +763,35 @@ def _logical_capture_record(
         "point_in_time_ticker_identity": False,
         "pristine_point_in_time": False,
     }
+
+
+def _authenticate_physical_capture_identity(
+    *,
+    manifest: dict[str, Any],
+    pages: tuple[dict[str, object], ...],
+) -> str:
+    """Return the sole exact contract hash authenticating artifact-v2 identity."""
+
+    matches: list[str] = []
+    for contract_sha256 in _PHYSICAL_CAPTURE_CONTRACT_SHA256S:
+        logical = _logical_capture_record(
+            capture_started_at=manifest["capture_started_at"],
+            capture_completed_at=manifest["capture_completed_at"],
+            requested_first_event_date=manifest["requested_first_event_date"],
+            requested_last_event_date=manifest["requested_last_event_date"],
+            pages=pages,
+            contract_sha256=contract_sha256,
+        )
+        candidate_sha256 = sha256_bytes(canonical_json_bytes(logical))
+        if (
+            manifest["capture_sha256"] == candidate_sha256
+            and manifest["capture_id"]
+            == f"arv2-capture-{candidate_sha256[:24]}"
+        ):
+            matches.append(contract_sha256)
+    if len(matches) != 1:
+        raise MassiveCaptureError("manifest logical capture identity changed")
+    return matches[0]
 
 
 def _manifest_from_page_records(
@@ -760,6 +816,7 @@ def _manifest_from_page_records(
         requested_first_event_date=requested_first_event_date,
         requested_last_event_date=requested_last_event_date,
         pages=page_records,
+        contract_sha256=INPUT_PAIR_CONTRACT_SHA256,
     )
     capture_sha256 = sha256_bytes(canonical_json_bytes(logical))
     role_counts: list[dict[str, object]] = []
@@ -1925,6 +1982,8 @@ def _persist_and_return(
     return LoadedMassiveCapture(
         artifact_path=artifact_path,
         manifest_sha256=manifest_sha256,
+        physical_capture_id=capture.capture_id,
+        physical_capture_sha256=capture.capture_sha256,
         capture=capture,
         accepted_risk_input_pair=None,
         capture_transport=capture_transport,
@@ -2457,19 +2516,10 @@ def _preflight_visitor_manifest(
         or manifest["provider_rows_total_byte_count"] != rows_total
     ):
         raise MassiveCaptureError("manifest aggregate counts do not match pages")
-    logical = _logical_capture_record(
-        capture_started_at=manifest["capture_started_at"],
-        capture_completed_at=manifest["capture_completed_at"],
-        requested_first_event_date=manifest["requested_first_event_date"],
-        requested_last_event_date=manifest["requested_last_event_date"],
+    _authenticate_physical_capture_identity(
+        manifest=manifest,
         pages=tuple(page_records),
     )
-    capture_sha256 = sha256_bytes(canonical_json_bytes(logical))
-    if (
-        manifest["capture_sha256"] != capture_sha256
-        or manifest["capture_id"] != f"arv2-capture-{capture_sha256[:24]}"
-    ):
-        raise MassiveCaptureError("manifest logical capture identity changed")
     return (
         tuple(page_records),
         query_bytes,
@@ -3019,6 +3069,10 @@ def _load_massive_capture_artifact_from_fds(
         or manifest["provider_rows_total_byte_count"] != rows_total
     ):
         raise MassiveCaptureError("manifest aggregate counts do not match pages")
+    physical_contract_sha256 = _authenticate_physical_capture_identity(
+        manifest=manifest,
+        pages=tuple(manifest["pages"]),
+    )
     try:
         capture = build_capture_binding(
             capture_started_at=manifest["capture_started_at"],
@@ -3028,17 +3082,23 @@ def _load_massive_capture_artifact_from_fds(
     except (AcceptedRiskInputError, CanonicalEvidenceError) as exc:
         raise MassiveCaptureError("persisted capture failed authentication") from exc
     if (
-        capture.capture_id != manifest["capture_id"]
-        or capture.capture_sha256 != manifest["capture_sha256"]
+        capture.contract_sha256 != INPUT_PAIR_CONTRACT_SHA256
         or capture.requested_first_event_date
         != manifest["requested_first_event_date"]
         or capture.requested_last_event_date != manifest["requested_last_event_date"]
+    ):
+        raise MassiveCaptureError("current capture identity does not reconstruct")
+    if physical_contract_sha256 == INPUT_PAIR_CONTRACT_SHA256 and (
+        capture.capture_id != manifest["capture_id"]
+        or capture.capture_sha256 != manifest["capture_sha256"]
     ):
         raise MassiveCaptureError("manifest capture identity does not reconstruct")
     _validate_inventory_at(root_fd, pages_fd, expected_page_files)
     return LoadedMassiveCapture(
         artifact_path=root,
         manifest_sha256=sha256_bytes(manifest_bytes),
+        physical_capture_id=manifest["capture_id"],
+        physical_capture_sha256=manifest["capture_sha256"],
         capture=capture,
         accepted_risk_input_pair=None,
         capture_transport=manifest["capture_transport"],

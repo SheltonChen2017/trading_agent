@@ -18,6 +18,8 @@ import pytest
 
 from research.analyst_revisions_v2.accepted_risk_input_pair import (
     CapturePageBinding,
+    INPUT_PAIR_CONTRACT_SHA256,
+    InputView,
     MassiveSourceRole,
     RowDisposition,
     require_capture_binding,
@@ -27,6 +29,7 @@ from scripts.capture_arv2_massive import (
     BASE_URL,
     ENDPOINT_PATHS,
     PRODUCTION_TRANSPORT,
+    PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256,
     ROLE_ORDER,
     TEST_TRANSPORT,
     MassiveCaptureError,
@@ -219,6 +222,24 @@ def _rewrite_manifest(path: Path, mutate) -> None:
     )
 
 
+def _rebind_manifest_physical_identity(
+    value: dict[str, object],
+    *,
+    contract_sha256: str,
+) -> None:
+    logical = _logical_capture_record(
+        capture_started_at=value["capture_started_at"],
+        capture_completed_at=value["capture_completed_at"],
+        requested_first_event_date=value["requested_first_event_date"],
+        requested_last_event_date=value["requested_last_event_date"],
+        pages=tuple(value["pages"]),
+        contract_sha256=contract_sha256,
+    )
+    capture_sha256 = sha256_bytes(canonical_json_bytes(logical))
+    value["capture_sha256"] = capture_sha256
+    value["capture_id"] = f"arv2-capture-{capture_sha256[:24]}"
+
+
 def _exact_error(message: str) -> str:
     return f"^{re.escape(message)}$"
 
@@ -248,6 +269,116 @@ def test_streaming_bridge_visitor_authenticates_and_visits_once_in_order(tmp_pat
         (ROLE_ORDER[1], 1, 1),
         (ROLE_ORDER[2], 1, 1),
     ]
+
+
+def test_streaming_bridge_visitor_authenticates_current_c1_physical_identity(
+    tmp_path,
+):
+    spooled, _ = _spooled_capture(tmp_path)
+    manifest = json.loads((spooled.artifact_path / "manifest.json").read_bytes())
+    expected = dict(manifest)
+    _rebind_manifest_physical_identity(
+        expected,
+        contract_sha256=INPUT_PAIR_CONTRACT_SHA256,
+    )
+    assert manifest["capture_id"] == expected["capture_id"]
+    assert manifest["capture_sha256"] == expected["capture_sha256"]
+
+    observed_pages = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal observed_pages
+        observed_pages += 1
+
+    summary = _visit_authenticated_massive_capture_pages_for_bridge(
+        spooled.artifact_path,
+        expected_transport=TEST_TRANSPORT,
+        visit_page=visit,
+    )
+    assert summary.capture_id == manifest["capture_id"]
+    assert observed_pages == 4
+
+
+def test_streaming_bridge_visitor_authenticates_exact_predecessor_physical_identity(
+    tmp_path,
+):
+    spooled, _ = _spooled_capture(tmp_path)
+
+    def rebind(value):
+        _rebind_manifest_physical_identity(
+            value,
+            contract_sha256=PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256,
+        )
+
+    _rewrite_manifest(spooled.artifact_path, rebind)
+    rewritten = json.loads(
+        (spooled.artifact_path / "manifest.json").read_bytes()
+    )
+    observed_pages = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal observed_pages
+        observed_pages += 1
+
+    summary = _visit_authenticated_massive_capture_pages_for_bridge(
+        spooled.artifact_path,
+        expected_transport=TEST_TRANSPORT,
+        visit_page=visit,
+    )
+    assert summary.capture_id == rewritten["capture_id"]
+    assert summary.capture_sha256 == rewritten["capture_sha256"]
+    assert observed_pages == 4
+
+
+def test_streaming_bridge_visitor_refuses_arbitrary_physical_contract_identity(
+    tmp_path,
+):
+    spooled, _ = _spooled_capture(tmp_path)
+    arbitrary_sha256 = "a" * 64
+    assert arbitrary_sha256 not in {
+        INPUT_PAIR_CONTRACT_SHA256,
+        PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256,
+    }
+
+    def bind_arbitrary_identity(value):
+        logical = _logical_capture_record(
+            capture_started_at=value["capture_started_at"],
+            capture_completed_at=value["capture_completed_at"],
+            requested_first_event_date=value["requested_first_event_date"],
+            requested_last_event_date=value["requested_last_event_date"],
+            pages=tuple(value["pages"]),
+        )
+        logical["contract_sha256"] = arbitrary_sha256
+        capture_sha256 = sha256_bytes(canonical_json_bytes(logical))
+        value["capture_sha256"] = capture_sha256
+        value["capture_id"] = f"arv2-capture-{capture_sha256[:24]}"
+
+    _rewrite_manifest(spooled.artifact_path, bind_arbitrary_identity)
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+
+    expected = "manifest logical capture identity changed"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == 0
+
+    expected = "physical capture contract hash is not an admitted exact version"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _logical_capture_record(
+            capture_started_at="2026-09-12T12:34:56.123456Z",
+            capture_completed_at="2026-09-12T12:34:56.123456Z",
+            requested_first_event_date=FIRST_DATE,
+            requested_last_event_date=LAST_DATE,
+            pages=(),
+            contract_sha256=arbitrary_sha256,
+        )
 
 
 def test_streaming_bridge_visitor_leaves_global_duplicate_ids_to_c1_consumer(
@@ -735,6 +866,37 @@ def test_v2_spooling_preserves_legacy_oracle_logical_capture_identity(
     assert spooled_manifest["full_capture_retained_in_memory"] is False
     reloaded = load_massive_capture_artifact(spooled.artifact_path)
     assert reloaded.capture.capture_id == oracle.capture.capture_id
+
+
+def test_legacy_loader_authenticates_predecessor_physical_identity_but_derives_current_c1(
+    tmp_path,
+):
+    spooled, _ = _spooled_capture(tmp_path)
+
+    def rebind(value):
+        _rebind_manifest_physical_identity(
+            value,
+            contract_sha256=PREDECESSOR_PHYSICAL_CAPTURE_CONTRACT_SHA256,
+        )
+
+    _rewrite_manifest(spooled.artifact_path, rebind)
+    rewritten = json.loads(
+        (spooled.artifact_path / "manifest.json").read_bytes()
+    )
+
+    loaded = load_massive_capture_artifact(spooled.artifact_path)
+    bridge = _build_massive_accepted_risk_input_pair_for_test(
+        spooled.artifact_path
+    )
+
+    assert loaded.physical_capture_id == rewritten["capture_id"]
+    assert loaded.physical_capture_sha256 == rewritten["capture_sha256"]
+    assert loaded.capture.contract_sha256 == INPUT_PAIR_CONTRACT_SHA256
+    assert loaded.capture.capture_id != loaded.physical_capture_id
+    assert bridge.physical_capture_id == loaded.physical_capture_id
+    assert bridge.physical_capture_sha256 == loaded.physical_capture_sha256
+    assert bridge.derived_capture_id == bridge.pair.capture.capture_id
+    assert bridge.derived_capture_id != bridge.physical_capture_id
 
 
 def test_v1_manifest_is_explicitly_outside_the_v2_loader_contract(tmp_path):
@@ -2167,6 +2329,89 @@ def test_physical_bridge_builds_exhaustive_two_view_pair_without_raw_responses(
     assert bridge.quantconnect_io_performed is False
     assert bridge.outcome_access_performed is False
     assert MAX_BRIDGE_SOURCE_PAYLOAD_PEAK_BYTES == 264 * 1024 * 1024
+
+
+@pytest.mark.parametrize("conflicting_payload", [False, True])
+def test_legacy_bridge_jointly_quarantines_every_guidance_duplicate_occurrence(
+    tmp_path, monkeypatch, conflicting_payload
+):
+    first = _row("guidance-duplicate", role=ROLE_ORDER[2])
+    second = dict(first)
+    if conflicting_payload:
+        second.update(
+            {
+                "date": "2021-02-04",
+                "last_updated": "2021-02-04 09:30:00",
+                "min_revenue_guidance": 1,
+            }
+        )
+    responses = [
+        FakeResponse(
+            _payload([_row("rating", role=ROLE_ORDER[0])]),
+            _endpoint(ROLE_ORDER[0]),
+        ),
+        FakeResponse(
+            _payload([_row("earnings", role=ROLE_ORDER[1])]),
+            _endpoint(ROLE_ORDER[1]),
+        ),
+        FakeResponse(
+            _payload(
+                [
+                    first,
+                    second,
+                    _row("guidance-unique", role=ROLE_ORDER[2]),
+                ]
+            ),
+            _endpoint(ROLE_ORDER[2]),
+        ),
+    ]
+    loaded, _ = _capture(tmp_path, monkeypatch, responses=responses)
+
+    bridge = _build_massive_accepted_risk_input_pair_for_test(
+        loaded.artifact_path
+    )
+    guidance = tuple(
+        row
+        for row in bridge.pair.rows
+        if row.locator.source_role is MassiveSourceRole.CORPORATE_GUIDANCE
+    )
+    duplicated = tuple(
+        row for row in guidance if row.provider_event_id == "guidance-duplicate"
+    )
+    unique = next(
+        row for row in guidance if row.provider_event_id == "guidance-unique"
+    )
+
+    assert bridge.source_row_count == len(bridge.pair.rows) == 5
+    assert tuple(row.locator.row_offset for row in duplicated) == (0, 1)
+    assert tuple(row.raw_row_bytes for row in duplicated) == (
+        canonical_json_bytes(first),
+        canonical_json_bytes(second),
+    )
+    assert all(
+        row.current_view.disposition
+        is RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        and row.censored_view.disposition
+        is RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        and not row.current_view.included
+        and not row.censored_view.included
+        for row in duplicated
+    )
+    assert unique.current_view.included is True
+    assert unique.censored_view.included is True
+    counts = {
+        (view, disposition): count
+        for view, disposition, count in bridge.disposition_counts
+    }
+    assert counts[
+        (InputView.CURRENT_ROW, RowDisposition.DUPLICATE_PROVIDER_EVENT_ID)
+    ] == 2
+    assert counts[
+        (
+            InputView.CONSERVATIVE_CENSORED,
+            RowDisposition.DUPLICATE_PROVIDER_EVENT_ID,
+        )
+    ] == 2
 
 
 def test_physical_bridge_is_deterministic_for_the_same_capture(tmp_path, monkeypatch):

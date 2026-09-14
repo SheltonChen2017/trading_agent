@@ -355,7 +355,7 @@ def test_static_contract_binds_c1_and_keeps_every_external_capability_closed():
     assert sha256_bytes(render_production_input_contract_bytes()) == PRODUCTION_INPUT_CONTRACT_SHA256
     assert PRODUCTION_INPUT_CONTRACT_ID.endswith(PRODUCTION_INPUT_CONTRACT_SHA256[:16])
     assert record["parent"]["contract_sha256"] == (
-        "6d4ae82e33a0f871de40269ee2ee78e1553320c641930f4dc90292e5583d5697"
+        "65c92186f85cdf82318b538b58701d215fc160b24d3a154d95411ec1ed37edad"
     )
     assert record["source_role_is_signal_arm"] is False
     assert record["accepted_risk"]["pristine_point_in_time"] is False

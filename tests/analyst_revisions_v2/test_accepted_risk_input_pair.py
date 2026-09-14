@@ -216,13 +216,23 @@ def test_one_capture_derives_both_explicitly_non_pristine_views():
 def test_static_c1_contract_is_content_addressed_and_bound_into_both_artifacts():
     payload = pair_module.render_accepted_risk_input_pair_contract_bytes()
     assert pair_module.INPUT_PAIR_CONTRACT_SHA256 == (
-        "6d4ae82e33a0f871de40269ee2ee78e1553320c641930f4dc90292e5583d5697"
+        "65c92186f85cdf82318b538b58701d215fc160b24d3a154d95411ec1ed37edad"
     )
     assert sha256_bytes(payload) == pair_module.INPUT_PAIR_CONTRACT_SHA256
     record = pair_module.accepted_risk_input_pair_contract_record()
     assert record["capture"]["transactional_snapshot"] is False
     assert record["capture"]["last_updated_filter_applied"] is False
     assert record["pristine_point_in_time"] is False
+    assert record["duplicate_provider_id_policy"] == {
+        "analyst_ratings": "refuse_entire_three_role_capture",
+        "earnings": "refuse_entire_three_role_capture",
+        "corporate_guidance": (
+            "preserve_every_raw_occurrence_and_jointly_exclude_every_"
+            "occurrence_of_a_duplicated_id"
+        ),
+        "cross_role": "refuse_entire_three_role_capture",
+        "selection_or_synthetic_identity": False,
+    }
     capture = _capture()
     pair = build_accepted_risk_input_pair(capture)
     assert capture.contract_id == pair_module.INPUT_PAIR_CONTRACT_ID
@@ -907,12 +917,132 @@ def test_duplicate_provider_id_within_a_source_role_invalidates_whole_capture():
         )
 
 
+def test_duplicate_provider_id_within_earnings_invalidates_whole_capture():
+    with pytest.raises(AcceptedRiskInputError, match="duplicate provider event ID"):
+        _capture(
+            earnings=[
+                _row("duplicate", action="earnings"),
+                _row("duplicate", action="earnings", ticker="BBB"),
+            ]
+        )
+
+
 def test_duplicate_provider_id_across_endpoints_also_invalidates_capture():
     with pytest.raises(AcceptedRiskInputError, match="duplicate provider event ID"):
         _capture(
             ratings=[_row("global-id")],
             earnings=[_row("global-id", action="earnings")],
         )
+
+
+def test_duplicate_quarantine_flag_refuses_wrong_type_and_non_guidance_use():
+    capture = _capture()
+    ratings_page = capture.pages[0]
+    ratings_row = ratings_page.parsed_rows[0]
+    ratings_bytes = canonical_json_bytes(ratings_row)
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match="duplicate_provider_event_id must be an exact boolean",
+    ):
+        pair_module._derive_source_row(
+            capture=capture,
+            page=ratings_page,
+            row_offset=0,
+            row=ratings_row,
+            raw_row_bytes=ratings_bytes,
+            duplicate_provider_event_id=1,
+        )
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match="duplicate-ID quarantine applies only to identified guidance rows",
+    ):
+        pair_module._derive_source_row(
+            capture=capture,
+            page=ratings_page,
+            row_offset=0,
+            row=ratings_row,
+            raw_row_bytes=ratings_bytes,
+            duplicate_provider_event_id=True,
+        )
+
+
+@pytest.mark.parametrize("conflicting_payload", [False, True])
+def test_duplicate_guidance_ids_preserve_and_jointly_exclude_every_occurrence(
+    conflicting_payload,
+):
+    first = _row("guidance-duplicate", action="guidance")
+    second = dict(first)
+    if conflicting_payload:
+        second.update(
+            {
+                "date": "2020-02-03",
+                "last_updated": "2020-02-04T12:00:00Z",
+                "min_revenue_guidance": 1,
+            }
+        )
+    unique = _row("guidance-unique", action="guidance")
+    capture = _capture(guidance=[first, second, unique])
+    pair = build_accepted_risk_input_pair(capture)
+
+    guidance_rows = tuple(
+        row
+        for row in pair.rows
+        if row.locator.source_role is MassiveSourceRole.CORPORATE_GUIDANCE
+    )
+    duplicated = tuple(
+        row for row in guidance_rows if row.provider_event_id == "guidance-duplicate"
+    )
+    retained_unique = next(
+        row for row in guidance_rows if row.provider_event_id == "guidance-unique"
+    )
+
+    assert len(pair.rows) == pair.report.total_row_count == 5
+    assert len(guidance_rows) == 3
+    assert len(duplicated) == 2
+    assert tuple(row.locator.row_offset for row in duplicated) == (0, 1)
+    assert tuple(row.raw_row_bytes for row in duplicated) == (
+        canonical_json_bytes(first),
+        canonical_json_bytes(second),
+    )
+    assert all(not row.current_view.included for row in duplicated)
+    assert all(not row.censored_view.included for row in duplicated)
+    assert all(
+        row.current_view.disposition
+        is RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        and row.censored_view.disposition
+        is RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        for row in duplicated
+    )
+    assert retained_unique.current_view.included is True
+    assert retained_unique.censored_view.included is True
+    assert pair.report.current_included_count == 3
+    assert pair.report.censored_included_count == 3
+    assert pair.report.disagreement_count == 0
+    assert {
+        (item.view, item.disposition): item.count
+        for item in pair.report.disposition_counts
+    }[
+        (InputView.CURRENT_ROW, RowDisposition.DUPLICATE_PROVIDER_EVENT_ID)
+    ] == 2
+    assert {
+        (item.view, item.disposition): item.count
+        for item in pair.report.disposition_counts
+    }[
+        (
+            InputView.CONSERVATIVE_CENSORED,
+            RowDisposition.DUPLICATE_PROVIDER_EVENT_ID,
+        )
+    ] == 2
+    guidance_breakdown = next(
+        item
+        for item in pair.report.breakdowns
+        if item.dimension is BreakdownDimension.SOURCE_ROLE
+        and item.key == MassiveSourceRole.CORPORATE_GUIDANCE.value
+    )
+    assert guidance_breakdown.total_count == 3
+    assert guidance_breakdown.current_included_count == 1
+    assert guidance_breakdown.censored_included_count == 1
 
 
 def test_capture_identity_binds_pages_queries_receipts_counts_and_hashes():
@@ -1040,7 +1170,7 @@ def test_static_guard_and_inner_duplicate_helper_are_identity_pinned():
     [
         "_PINNED_DERIVE_EVENT_AVAILABILITY",
         "_PINNED_RESOLVE_DELAYED_DATE_ONLY_SESSION_OPEN",
-        "_PINNED_REFUSE_DUPLICATE_PROVIDER_IDS",
+        "_PINNED_VALIDATE_AND_COLLECT_DUPLICATE_GUIDANCE_PROVIDER_IDS",
         "_PINNED_VALIDATE_PAGE_SEQUENCE",
         "_PINNED_DERIVE_ROWS",
         "_PINNED_BUILD_REPORT",

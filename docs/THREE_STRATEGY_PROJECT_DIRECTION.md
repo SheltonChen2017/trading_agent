@@ -237,7 +237,9 @@ run. Strategy development does not authorize physical repository extraction,
 change the planned two-product-plus-tiny-shared-contract topology, or resolve
 any SEP-3 blocker. SEP may resume only by a later owner instruction.
 
-`paper-epoch-006` remains untouched. Nothing in this direction changes the
+`paper-epoch-006` was closed by owner instruction on 2026-09-14 (recorded in
+`docs/operations/OPERATIONAL_FACTS.md`); strategy work neither caused nor
+changes that. Nothing in this direction changes the
 current assistant's human-approval, paper-only, policy, exposure,
 reconciliation, or execution-gate boundaries.
 

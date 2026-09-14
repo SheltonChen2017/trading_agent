@@ -222,7 +222,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 
 | Stream | State | Authority |
 |---|---|---|
-| Paper evidence | **`paper-epoch-006` is active** since 2026-08-19 on deployed `c9d0740`; first observation verified the same day; 60-session / 30-order clock counting | `docs/operations/OPERATIONAL_FACTS.md` |
+| Paper evidence | **`paper-epoch-006` CLOSED 2026-09-14 by owner instruction** after 12 observations / 0 orders on deployed `c9d0740` (active 2026-08-19 → 2026-09-14); the four paper tasks are disabled and no host runs the cadence; no new epoch authorized | `docs/operations/OPERATIONAL_FACTS.md` |
 | Overlay shadow | `overlay-epoch-001` (defensive carry) registered with a 2026-07-31 baseline; 24-month sufficiency floor; tasks reinstalled Interactive after the S4U failure | `docs/Archive/Plans/SHADOW_OBSERVATION_DESIGN.md` |
 | Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first verified capture.** Code, tests and installer remain, but the read-only host measurement found the task absent and zero capture artifacts. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. | `docs/operations/OPERATIONAL_FACTS.md` |
 
@@ -621,9 +621,13 @@ level-based hypothesis could revive them under a fresh preregistration.
 
 These cost little but are the only prospective evidence the project owns.
 
-1. **`paper-epoch-006`**: leave it alone. Any deployment changes `code_commit`
-   and closes the epoch, discarding its accumulated sessions. No roll without
-   an explicit owner instruction and the runbook order.
+1. **`paper-epoch-006`: CLOSED 2026-09-14 by owner instruction** ("this
+   computer won't be used for epoch anymore"), with the paper tasks disabled
+   in runbook order; 12 observations and 0 orders are retained as an
+   incomplete record. No host runs the paper cadence and no epoch is
+   authorized to start; a future epoch needs a fresh owner instruction, the
+   roll runbook, and a deploy decision. See
+   `docs/operations/OPERATIONAL_FACTS.md`.
 2. **Overlay tasks: CLOSED 2026-08-20.** The first *automatic* firing after
    the Interactive reinstall succeeded — Observe 14:45, Mature 14:55,
    Sufficiency 15:05 local, all `LastTaskResult=0`, next occurrences rolled to

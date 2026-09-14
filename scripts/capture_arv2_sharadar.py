@@ -54,7 +54,7 @@ from research.analyst_revisions_v2.canonical import (
 
 
 BASE_URL = "https://api.sharadar.com"
-ARTIFACT_SCHEMA = "arv2-sharadar-source-capture-artifact-v1"
+ARTIFACT_SCHEMA = "arv2-sharadar-source-capture-artifact-v2"
 MANIFEST_FILENAME = "manifest.json"
 MANIFEST_DIGEST_FILENAME = "manifest.sha256"
 MAX_MANIFEST_BYTES = 8 * 1024 * 1024
@@ -182,6 +182,9 @@ _REDIRECT_HOST_SUFFIXES = (
     ".googleusercontent.com",
     ".sharadar.com",
 )
+_REDIRECT_EXACT_HOSTS = frozenset(
+    {"static-sharadar.nyc3.digitaloceanspaces.com"}
+)
 _ALLOWED_ZIP_COMPRESSION = frozenset({zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED})
 
 _MANIFEST_KEYS = frozenset(
@@ -210,6 +213,7 @@ _MANIFEST_KEYS = frozenset(
         "actions_availability_semantics",
         "fundamentals_availability_semantics",
         "tickers_contains_active_and_delisted",
+        "tickers_unknown_delisting_flag_row_count",
         "fundamentals_dimension",
         "pit_security_master_constructed",
         "terminal_payoff_constructed",
@@ -233,6 +237,9 @@ _ARCHIVE_KEYS = frozenset(
         "member_count",
         "uncompressed_byte_count",
         "row_count",
+        "active_ticker_row_count",
+        "delisted_ticker_row_count",
+        "unknown_ticker_delisting_flag_row_count",
         "redirect_used",
         "members",
     }
@@ -273,6 +280,9 @@ class SharadarArchiveBinding:
     archive_file: str
     archive_byte_count: int
     archive_sha256: str
+    active_ticker_row_count: int
+    delisted_ticker_row_count: int
+    unknown_ticker_delisting_flag_row_count: int
     redirect_used: bool
     members: tuple[SharadarMemberBinding, ...]
 
@@ -305,6 +315,7 @@ class LoadedSharadarCapture:
 class _DatasetCensus:
     active: int = 0
     delisted: int = 0
+    unknown_delisting_flag: int = 0
     rows: int = 0
 
 
@@ -549,8 +560,11 @@ def _validate_redirect_url(url: object, key: str) -> str:
         pass
     else:
         raise SharadarCaptureError("provider redirect used an IP literal")
-    if hostname in {"localhost", "localhost.localdomain"} or not any(
-        hostname.endswith(suffix) for suffix in _REDIRECT_HOST_SUFFIXES
+    if hostname in {"localhost", "localhost.localdomain"} or (
+        hostname not in _REDIRECT_EXACT_HOSTS
+        and not any(
+            hostname.endswith(suffix) for suffix in _REDIRECT_HOST_SUFFIXES
+        )
     ):
         raise SharadarCaptureError("provider redirect host is not reviewed")
     encoded = url.encode("utf-8")
@@ -1007,6 +1021,13 @@ def _inspect_csv_member(
                     census.delisted += 1
                 elif state in {"n", "no", "0", "false"}:
                     census.active += 1
+                elif state == "":
+                    # Sharadar's production TICKERS export contains blank
+                    # isdelisted values.  A blank is retained as unknown: it
+                    # is neither evidence that a security is active nor that
+                    # it is delisted.  The exact count is authenticated in the
+                    # archive and top-level manifests below.
+                    census.unknown_delisting_flag += 1
                 else:
                     raise SharadarCaptureError("TICKERS delisting flag is unreviewed")
             elif dataset is SharadarDataset.ACTIONS:
@@ -1055,7 +1076,7 @@ def _inspect_zip_fd(
     remaining_uncompressed: int,
     remaining_rows: int,
     remaining_members: int,
-) -> tuple[SharadarMemberBinding, ...]:
+) -> tuple[tuple[SharadarMemberBinding, ...], _DatasetCensus]:
     try:
         os.lseek(descriptor, 0, os.SEEK_SET)
         with os.fdopen(os.dup(descriptor), "rb", closefd=True) as source:
@@ -1097,7 +1118,7 @@ def _inspect_zip_fd(
         raise SharadarCaptureError(
             "TICKERS snapshot does not demonstrate active and delisted coverage"
         )
-    return members
+    return members, census
 
 
 def _capture_one_archive(
@@ -1125,7 +1146,7 @@ def _capture_one_archive(
             key=key,
             remaining_total=remaining_archive,
         )
-        members = _inspect_zip_fd(
+        members, census = _inspect_zip_fd(
             descriptor,
             dataset,
             remaining_uncompressed=remaining_uncompressed,
@@ -1151,6 +1172,9 @@ def _capture_one_archive(
         archive_file=filename,
         archive_byte_count=byte_count,
         archive_sha256=archive_sha256,
+        active_ticker_row_count=census.active,
+        delisted_ticker_row_count=census.delisted,
+        unknown_ticker_delisting_flag_row_count=census.unknown_delisting_flag,
         redirect_used=redirected,
         members=members,
     )
@@ -1179,6 +1203,11 @@ def _archive_record(archive: SharadarArchiveBinding) -> dict[str, object]:
         "member_count": archive.member_count,
         "uncompressed_byte_count": archive.uncompressed_byte_count,
         "row_count": archive.row_count,
+        "active_ticker_row_count": archive.active_ticker_row_count,
+        "delisted_ticker_row_count": archive.delisted_ticker_row_count,
+        "unknown_ticker_delisting_flag_row_count": (
+            archive.unknown_ticker_delisting_flag_row_count
+        ),
         "redirect_used": archive.redirect_used,
         "members": [_member_record(member) for member in archive.members],
     }
@@ -1235,6 +1264,11 @@ def _manifest(
         "actions_availability_semantics": ACTIONS_AVAILABILITY,
         "fundamentals_availability_semantics": FUNDAMENTALS_AVAILABILITY,
         "tickers_contains_active_and_delisted": True,
+        "tickers_unknown_delisting_flag_row_count": next(
+            archive.unknown_ticker_delisting_flag_row_count
+            for archive in archives
+            if archive.dataset is SharadarDataset.TICKERS
+        ),
         "fundamentals_dimension": "ART",
         "pit_security_master_constructed": False,
         "terminal_payoff_constructed": False,
@@ -1548,6 +1582,24 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
             maximum=MAX_ARCHIVE_BYTES,
         )
         archive_sha256 = require_sha256(value["archive_sha256"], "archive sha256")
+        active_ticker_rows = require_int(
+            value["active_ticker_row_count"],
+            "active_ticker_row_count",
+            minimum=0,
+            maximum=MAX_TOTAL_ROWS,
+        )
+        delisted_ticker_rows = require_int(
+            value["delisted_ticker_row_count"],
+            "delisted_ticker_row_count",
+            minimum=0,
+            maximum=MAX_TOTAL_ROWS,
+        )
+        unknown_ticker_rows = require_int(
+            value["unknown_ticker_delisting_flag_row_count"],
+            "unknown_ticker_delisting_flag_row_count",
+            minimum=0,
+            maximum=MAX_TOTAL_ROWS,
+        )
         require_exact_bool(value["redirect_used"], "redirect_used")
         members_raw = value["members"]
         if (
@@ -1569,6 +1621,27 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
         ):
             if require_int(value[key], key, minimum=1) != actual:
                 raise SharadarCaptureError(f"manifest {key} does not match members")
+        if expected is SharadarDataset.TICKERS:
+            if (
+                active_ticker_rows < 1
+                or delisted_ticker_rows < 1
+                or active_ticker_rows + delisted_ticker_rows + unknown_ticker_rows
+                != sum(member.row_count for member in members)
+            ):
+                raise SharadarCaptureError(
+                    "manifest TICKERS delisting-flag census is inconsistent"
+                )
+        elif any(
+            count != 0
+            for count in (
+                active_ticker_rows,
+                delisted_ticker_rows,
+                unknown_ticker_rows,
+            )
+        ):
+            raise SharadarCaptureError(
+                "non-TICKERS archive carries a delisting-flag census"
+            )
     except CanonicalEvidenceError as exc:
         raise SharadarCaptureError("manifest archive field is invalid") from exc
     return SharadarArchiveBinding(
@@ -1578,6 +1651,9 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
         archive_file=value["archive_file"],
         archive_byte_count=archive_bytes,
         archive_sha256=archive_sha256,
+        active_ticker_row_count=active_ticker_rows,
+        delisted_ticker_row_count=delisted_ticker_rows,
+        unknown_ticker_delisting_flag_row_count=unknown_ticker_rows,
         redirect_used=value["redirect_used"],
         members=members,
     )
@@ -1677,6 +1753,19 @@ def _parse_manifest(payload: bytes, artifact_path: Path) -> tuple[dict[str, obje
             require_exact_bool(value[key], key)
             if value[key] is not expected:
                 raise SharadarCaptureError(f"manifest {key} boundary changed")
+        tickers_archive = archives[0]
+        if (
+            require_int(
+                value["tickers_unknown_delisting_flag_row_count"],
+                "tickers_unknown_delisting_flag_row_count",
+                minimum=0,
+                maximum=MAX_TOTAL_ROWS,
+            )
+            != tickers_archive.unknown_ticker_delisting_flag_row_count
+        ):
+            raise SharadarCaptureError(
+                "manifest unknown TICKERS delisting-flag count changed"
+            )
         require_exact_bool(value["provider_io_read_only"], "provider_io_read_only")
         if value["provider_io_read_only"] is not (value["capture_transport"] == PRODUCTION_TRANSPORT):
             raise SharadarCaptureError("manifest provider-I/O classification changed")
@@ -1731,7 +1820,7 @@ def load_sharadar_capture_artifact(artifact_path: Path) -> LoadedSharadarCapture
                     digest_hasher.update(chunk)
                 if byte_count != declared.archive_byte_count or digest_hasher.hexdigest() != declared.archive_sha256:
                     raise SharadarCaptureError("archive bytes do not match manifest")
-                members = _inspect_zip_fd(
+                members, census = _inspect_zip_fd(
                     descriptor,
                     declared.dataset,
                     remaining_uncompressed=MAX_TOTAL_UNCOMPRESSED_BYTES - uncompressed_total,
@@ -1746,7 +1835,15 @@ def load_sharadar_capture_artifact(artifact_path: Path) -> LoadedSharadarCapture
                     raise SharadarCaptureError("archive changed while being read")
             finally:
                 os.close(descriptor)
-            rebuilt = dataclasses.replace(declared, members=members)
+            rebuilt = dataclasses.replace(
+                declared,
+                members=members,
+                active_ticker_row_count=census.active,
+                delisted_ticker_row_count=census.delisted,
+                unknown_ticker_delisting_flag_row_count=(
+                    census.unknown_delisting_flag
+                ),
+            )
             if rebuilt != declared:
                 raise SharadarCaptureError("ZIP member census differs from manifest")
             observed.append(rebuilt)

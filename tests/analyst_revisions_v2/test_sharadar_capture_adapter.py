@@ -215,6 +215,7 @@ def test_manifest_is_honest_about_snapshot_and_nonconstruction_boundaries(tmp_pa
     assert manifest["fundamentals_availability_semantics"] == FUNDAMENTALS_AVAILABILITY
     assert manifest["fundamentals_dimension"] == "ART"
     assert manifest["tickers_contains_active_and_delisted"] is True
+    assert manifest["tickers_unknown_delisting_flag_row_count"] == 0
     assert manifest["pit_security_master_constructed"] is False
     assert manifest["terminal_payoff_constructed"] is False
     assert manifest["backtest_input_constructed"] is False
@@ -241,6 +242,20 @@ def test_key_and_request_or_redirect_urls_are_not_persisted(tmp_path):
     assert _manifest(result)["api_key_persisted"] is False
     assert _manifest(result)["redirect_url_persisted"] is False
     assert result.archives[0].redirect_used is True
+
+
+def test_current_sharadar_bulk_redirect_host_is_exactly_allowlisted():
+    url = (
+        "https://static-sharadar.nyc3.digitaloceanspaces.com/"
+        "exports/tickers.zip?signature=fixture"
+    )
+    assert adapter._validate_redirect_url(url, KEY) == url
+    with pytest.raises(SharadarCaptureError, match="host is not reviewed"):
+        adapter._validate_redirect_url(
+            "https://lookalike-static-sharadar.nyc3.digitaloceanspaces.com/"
+            "exports/tickers.zip?signature=fixture",
+            KEY,
+        )
 
 
 def test_public_signature_has_no_session_clock_or_key_injection():
@@ -445,6 +460,36 @@ def test_tickers_must_demonstrate_active_and_delisted_coverage(tmp_path):
     )
     with pytest.raises(SharadarCaptureError, match="active and delisted"):
         _capture(tmp_path, FakeSession([FakeResponse(archive)]))
+
+
+def test_blank_tickers_delisting_flag_is_retained_as_authenticated_unknown(tmp_path):
+    tickers = TICKERS + (
+        b"fundamentals,UNK,100003,,Unknown State Corp,Domestic Common Stock,NYSE,"
+        b"Industrials,Machinery,BBG000UNK333,2015-01-02,\n"
+    )
+    responses = [
+        FakeResponse(_zip_bytes(SharadarDataset.TICKERS, csv_bytes=tickers)),
+        *_valid_responses()[1:],
+    ]
+    result, _ = _capture(tmp_path, FakeSession(responses))
+    reloaded = load_sharadar_capture_artifact(result.artifact_path)
+    tickers_archive = reloaded.archives[0]
+
+    assert tickers_archive.active_ticker_row_count == 1
+    assert tickers_archive.delisted_ticker_row_count == 1
+    assert tickers_archive.unknown_ticker_delisting_flag_row_count == 1
+    assert _manifest(result)["tickers_unknown_delisting_flag_row_count"] == 1
+
+
+def test_nonblank_unreviewed_tickers_delisting_flag_still_refuses(tmp_path):
+    tickers = TICKERS.replace(b",AAA,100001,N,", b",AAA,100001,MAYBE,")
+    with pytest.raises(SharadarCaptureError, match="delisting flag is unreviewed"):
+        _capture(
+            tmp_path,
+            FakeSession(
+                [FakeResponse(_zip_bytes(SharadarDataset.TICKERS, csv_bytes=tickers))]
+            ),
+        )
 
 
 def test_fundamentals_must_be_art_and_retain_required_fields(tmp_path):

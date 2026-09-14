@@ -566,6 +566,20 @@ def test_epoch_host_bullet_agrees_with_the_current_active_epoch():
         facts,
         flags=re.IGNORECASE,
     )
+    if not plan_active:
+        # Owner closed paper-epoch-006 on 2026-09-14 with no successor. The
+        # standing bullet must not claim a running epoch, and must say the
+        # paper cadence is disabled so an operator does not expect one.
+        assert match is None, (
+            "the action plan lists no active epoch but the standing "
+            f"epoch-host bullet still claims to run {match.group(1)!r}"
+        )
+        # _text() collapses whitespace, so sibling bullets follow as " - **".
+        bullet = re.search(r"\*\*Epoch host\*\*.*?(?= - \*\*)", facts)
+        assert bullet, "OPERATIONAL_FACTS has no standing epoch-host bullet"
+        assert "DISABLED" in bullet.group(0)
+        assert "no host currently runs the operational cadence" in bullet.group(0)
+        return
     assert match, "OPERATIONAL_FACTS has no standing epoch-host status bullet"
     assert {match.group(1)} == plan_active, (
         "the standing epoch-host bullet disagrees with the action plan: "

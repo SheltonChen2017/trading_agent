@@ -9,6 +9,26 @@ deferred-remediation state below. The original three strategy lanes remain
 independent; this amendment changes shared coordination only and does not edit
 their lane-owned artifacts.
 
+## 0D. `paper-epoch-006` closed and the paper cadence disabled, 2026-09-14
+
+- Owner instruction on the epoch host: close the epoch; this computer will
+  not be used for an epoch anymore; disable the epoch's scheduled tasks.
+  Executed in runbook order by Claude: the four `TradingAgent-Paper-*` tasks
+  disabled (elevated), then `paper-epoch-close paper-epoch-006` run from the
+  frozen operational checkout `c9d0740`. **Closed at 2026-09-14T16:54:14Z**
+  on its original lineage `9cbca809…` with **12 observations
+  (2026-08-19 → 2026-09-10) and 0 orders** — an honest, incomplete record
+  against the 60-session / 30-order floor, never to be pooled with a later
+  epoch. The overlay-shadow tasks and `overlay-epoch-001` were not touched.
+  Full detail, verification, and what remains unacknowledged:
+  `docs/operations/OPERATIONAL_FACTS.md` (top of section 2).
+- **No host now runs the paper cadence and no active epoch exists.** Any
+  future epoch is a separate owner decision requiring the roll runbook and
+  a deploy choice.
+- Branch `user/claude/close-epoch-006-20260914` off `origin/main`
+  `dd6d1b89`; documentation only. This is an owner-directed operational
+  update to the frozen coordination records, not lane work.
+
 ## 0C. Post-integration review of `main`, 2026-09-05
 
 - Owner-directed: sync `main`, review the seven commits of PR #331
@@ -605,7 +625,8 @@ non-assistant operator-store importers, 42 integration tests, non-test
 documentation ownership, equivalence-test placement, and runtime topology
 remain open. Strategy work neither advances nor weakens SEP-3.
 
-`paper-epoch-006` remains untouched. Nothing in this baseline authorizes
+`paper-epoch-006` was closed by owner instruction on 2026-09-14 (section
+0D); no active epoch exists. Nothing in this baseline authorizes
 provider credential access, licensed-row retrieval, broker access, operator
 database changes, scheduled tasks, deployment, backtests, outcomes, evidence
 epochs, paper orders, or live trading.
@@ -679,7 +700,8 @@ dispositions. Access no provider, credential, licensed row, outcome,
 QuantConnect job, broker, operator database, live scheduler, deployment,
 paper-order, live-order, evidence-epoch or SEP-3 surface by inference.
 Provider/outcome access remains an open owner decision; obtain that
-authorization before any such audit or run. Preserve zero looks,
-paper-epoch-006, the untouched shared final holdout, and the frozen SEP-3
+authorization before any such audit or run. Preserve zero looks, the closed
+paper-epoch-006 record (start no epoch and re-enable no paper task without an
+owner instruction), the untouched shared final holdout, and the frozen SEP-3
 manifest.
 ```

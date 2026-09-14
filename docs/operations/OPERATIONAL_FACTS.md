@@ -103,7 +103,59 @@ for separating a tech style bet from selection — never as the record.
 
 Not derivable from the repository, and expensive to rediscover.
 
-### `paper-epoch-006` is active; the epoch-006 roll was executed (2026-08-19)
+### `paper-epoch-006` is CLOSED and the paper cadence is DISABLED on this host (2026-09-14)
+
+Owner instruction, 2026-09-14: "close the epoch for now. this computer won't
+be used for epoch anymore" and "disable the auto task for epoch on this
+computer." Executed the same morning on the epoch host (`REDMOND\sheltonchen`)
+in runbook order, timings UTC:
+
+- Pre-close state, read through a read-only `sqlite3` URI: epoch-006
+  `active` on lineage `9cbca809…` at `c9d0740`; **12 observations**
+  (sessions 2026-08-19 through 2026-09-10); **0 orders** submitted during the
+  epoch; last reconciliation 2026-09-13T09:15Z matched with 0 mismatches;
+  the operational checkout clean at `c9d0740`.
+- The four `TradingAgent-Paper-*` tasks (OperationsCycle, OrderMonitor,
+  PaperObservation, Watchdog) were **disabled** via an elevated
+  `Disable-ScheduledTask` (unelevated attempts return "Access is denied" on
+  this host, as during the epoch-006 roll). Post-state verified from the
+  elevated session and again unelevated: all four `Disabled`. Their last
+  runs were 2026-09-13 02:15–02:16 local; none has fired since. The three
+  `TradingAgent-Overlay-Shadow-*` tasks were **not touched** and remain
+  `Ready` — they belong to `overlay-epoch-001`, a separate evidence stream.
+- **`paper-epoch-006` closed at 2026-09-14T16:54:14Z** with
+  `python scripts/run_personal_assistant.py --database <operator DB>
+  paper-epoch-close paper-epoch-006` run from the frozen operational
+  checkout at `c9d0740`, while that runtime was still checked out. The
+  returned record shows `status: closed`, unchanged lineage hash
+  `9cbca809…`, and the same `policy_fingerprint` `4086365c…` the roll
+  recorded. Post-close read-only check: 0 active epochs; all 12 epoch-006
+  observations retained.
+
+What this does and does not mean:
+
+- The epoch reached **12 of the 60-session floor and 0 of the 30-order
+  floor**. It is an honest, incomplete evidence record, not a sufficiency
+  result; it must not be pooled with any later epoch.
+- Of the 17 NYSE sessions from 2026-08-19 through 2026-09-11 (2026-09-07
+  was Labor Day), exactly 5 have no observation — 2026-08-24, 2026-08-26,
+  2026-09-03, 2026-09-04, 2026-09-11 — measured read-only against the
+  session calendar. The documented `WakeToRun=False` sleep gaps explain
+  them; the fail-closed pre-close refusal on 2026-08-25 is the visible
+  trace. Those sessions are lost, not recoverable.
+- **No host now runs the paper cadence.** The two-machine section below
+  still describes this host as the epoch host historically; it is no longer
+  one. Starting any future epoch is a separate owner instruction that needs
+  the roll runbook (tasks re-enabled with Interactive logon, first firing
+  verified) and a deploy decision — `c9d0740` dates from 2026-08-19, while
+  the `main` tip at closure (`dd6d1b89`) dates from 2026-09-12.
+- The open operational alerts (the sleep-window freshness family, Alpaca
+  connectivity blips, the 2026-08-25 pre-close refusal) were **not
+  acknowledged**; nothing else in the operator database was changed. The
+  Streamlit app and `launch_trading_app.ps1` are unaffected, but the app's
+  paper-evidence surfaces will now report no active epoch.
+
+### `paper-epoch-006` ran here 2026-08-19 → 2026-09-14 (closed; see above); the epoch-006 roll was executed (2026-08-19)
 
 Owner-authorized (option (b) of handoff §7at) and executed in runbook
 order on the epoch host, starting ~12:43 local — nearly four hours clear
@@ -569,12 +621,13 @@ facts out of a branch rather than citing the branch is the durable habit.)
 Everything in this section is host-specific; re-measure rather than assume
 which one you are on. `whoami` distinguishes them.
 
-- **Epoch host** (`REDMOND\sheltonchen`) — runs the active
-  `paper-epoch-006` (at `c9d0740` since 2026-08-19). The four
-  `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
-  only host that may run the operational cadence. The bullets below this
-  section (launch script, epoch-swap script, lock files, backups) describe
-  THIS host.
+- **Epoch host** (`REDMOND\sheltonchen`) — ran `paper-epoch-006` (at
+  `c9d0740`, 2026-08-19 → closed 2026-09-14). The four
+  `TradingAgent-Paper-*` tasks are installed here but **DISABLED since
+  2026-09-14** by owner instruction; no host currently runs the operational
+  cadence. Were a cadence ever restarted, this remains the only host
+  configured for it. The bullets below this section (launch script,
+  epoch-swap script, lock files, backups) describe THIS host.
 - **The installed PaperObservation trigger is 16:30 LOCAL, not the
   installer's current rule** (measured 2026-08-13:
   `StartBoundary = 2026-08-05T16:30:00-07:00`, and every recorded
@@ -679,8 +732,9 @@ section below), which is exactly why that section says to re-measure rather
 than assume.
 
 Measured read-only during the CDR review: `whoami` returns
-`REDMOND\sheltonchen`, so this is the **epoch host** — the machine running
-`paper-epoch-006` and the four `TradingAgent-Paper-*` tasks.
+`REDMOND\sheltonchen`, so this is the **epoch host** — the machine that ran
+`paper-epoch-006` and the four `TradingAgent-Paper-*` tasks (closed and
+disabled 2026-09-14; see the section at the top of this part).
 `C:\QuantConnect\ACER` exists and contains `lean.json`, `data`, `storage`,
 and the generated `InstallationTest`.
 

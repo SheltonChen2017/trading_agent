@@ -1,6 +1,10 @@
 # Session handoff — current project state
 
-Prepared: 2026-08-29 by Codex after the owner directed a separate
+Latest generic-workflow update: **2026-09-14, Fundamental Inflection Alpha
+four-version design candidate**, recorded in section 0D below. Existing
+strategy-lane implementation state remains in each lane's own record.
+
+Historical baseline preparation: 2026-08-29 by Codex after the owner directed a separate
 Target-Price Revision planning lane and revised research/QC plan; amended by
 the owner-coordinated shared-family/final-holdout decision and the approved
 TPR-0A implementation round through 2026-08-30. This remains the canonical
@@ -8,6 +12,69 @@ generic-workflow handoff for the root project and preserves the 2026-08-28
 deferred-remediation state below. The original three strategy lanes remain
 independent; this amendment changes shared coordination only and does not edit
 their lane-owned artifacts.
+
+## 0D. Fundamental Inflection Alpha design, 2026-09-14
+
+- Owner scope: design four strategies from the preceding small-cap
+  fundamental screen, following the existing strategy-blueprint structure:
+  balanced ETFs, leveraged ETFs, direct stocks, and leveraged stocks.
+  The later owner message allows higher drawdowns for riskier versions.
+  The candidate consequently proposes 15% / 35% / 25% / 40% limits; these
+  revised exact values are assumptions, not an owner freeze.
+- Exact base and local `origin/main` at session start:
+  `dd6d1b897215946dd2e0ed80f3512a7798637dac`.
+  Branch: `codex/fundamental-inflection-four-versions-20260914`.
+  Design commit: `4edfe84faac072f0bcf9d427b92efc16e1bbba98`.
+  Repository: `https://github.com/SheltonChen2017/trading_agent`.
+  **Local-only: no push, PR or merge. Another computer cannot retrieve this
+  new branch with `git fetch` until it is published or otherwise transferred.**
+- Associated record:
+  `docs/Strategy Description/FUNDAMENTAL_INFLECTION_DESIGN_RECORD.md`.
+  Design source:
+  `docs/Strategy Description/FUNDAMENTAL_INFLECTION_ALPHA_FOUR_VERSIONS_BLUEPRINT_EN.md`.
+  Reading edition:
+  `output/pdf/FUNDAMENTAL_INFLECTION_ALPHA_FOUR_VERSIONS_BLUEPRINT_EN.pdf`.
+  The PDF is 24 pages, 145,298 bytes, SHA-256
+  `349a313b47838ee5033f90fff32a8be31d173f51bfb8d970ff7f8656ec045ebe`.
+- Content: fixed financial definitions and scoring; dated evidence and
+  missing-data rules; ETF qualifying NAV and overlap; four entry/exit and
+  allocation policies; incremental financing; realistic costs, capacity,
+  stress and six explicit net-performance comparisons. A proposed seven-claim
+  family remains unallocated. The old four-lane budget and reserved holdout
+  are not reused. The Action Plan and all existing lane files are unchanged.
+- Status: design delivered, independently unreviewed, no executable strategy
+  implementation and no empirical alpha result. Advisory subagent checks are
+  author QA, not Claude review. Material corrections addressed volatility
+  units, spread and cash double counting, V4 financed-sleeve allocation, ETF
+  ranking/daily gates, stress consistency and statistical accounting.
+- Validation: bundled Python 3.12.14; strict PDF reopen, 20 bookmarks, all
+  24 rendered pages visually checked, no outside-page glyphs, arithmetic and
+  structure checks passed. `git diff --cached --check` passed for the design
+  commit. Narrow secret-shape scan of new Markdown files found no matches.
+  Full pytest/compileall were not run for this documentation-only change.
+- Unrelated pre-existing `.tmp_tpr_counterreview_edit_20260831/` and `tmp/`
+  remain untouched. Existing Git permission warnings for scratch directories
+  and the global ignore file remain. PDF builder and visual QA intermediates
+  are local in this task's Codex visualization directory and are not required
+  to read the committed design source/PDF.
+- No source purchase, licensed dataset download, provider credential read,
+  outcome job, QuantConnect action, broker call, operator-database change,
+  scheduler change, deployment or trade occurred in this design round.
+- Next step for this design: review the exact specification and resolve
+  semantic/data feasibility before an owner freeze. A formal independent
+  review follows the generic exact-pushed-snapshot workflow after separately
+  authorized publishing. Proposed FIA milestones do not schedule themselves.
+  Read `CLAUDE.md`, the current Action Plan, the associated record, then the
+  new blueprint. Existing lane work retains its own sequencing.
+
+Copyable resume prompt:
+
+> Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md, Session Handoff section 0D,
+> and the Fundamental Inflection design record and blueprint. Establish the
+> exact branch/status first. Continue only the owner's specified design or
+> review scope; the four versions have no performance evidence or outcome
+> access allocation. Preserve existing lane contracts, reserved holdout and
+> unrelated work. Follow the generic independent-review workflow.
 
 ## 0C. Post-integration review of `main`, 2026-09-05
 

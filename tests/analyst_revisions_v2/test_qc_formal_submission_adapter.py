@@ -7,6 +7,7 @@ import hashlib
 import importlib
 import json
 import os
+import re
 import threading
 import types
 import weakref
@@ -3418,3 +3419,380 @@ def test_project_capacity_is_checked_against_exact_projection(monkeypatch):
             monkeypatch,
             {"max_project_source_character_count": character_count - 1},
         )
+
+
+@pytest.mark.parametrize(
+    ("binding", "message"),
+    (
+        (
+            "power",
+            "streamed launch lacks an authenticated power-floor binding",
+        ),
+        (
+            "economic",
+            "streamed economic execution binding did not authenticate",
+        ),
+        (
+            "report",
+            "streamed formal report contract did not authenticate",
+        ),
+    ),
+)
+def test_streamed_launch_binding_authentication_refusals_are_isolated(
+    monkeypatch: pytest.MonkeyPatch,
+    binding: str,
+    message: str,
+):
+    if binding == "power":
+        from research.analyst_revisions_v2_qc import power_calibration_bridge
+
+        def refuse_power(_value):
+            raise power_calibration_bridge.AcceptedRiskPowerCalibrationError(
+                "offline invalid binding"
+            )
+
+        monkeypatch.setattr(
+            power_calibration_bridge,
+            "require_authenticated_power_floor_binding",
+            refuse_power,
+        )
+        action = lambda: adapter._require_streamed_authenticated_power_floor(
+            object(), object()
+        )
+    elif binding == "economic":
+        def refuse_economic(_value):
+            raise adapter.FormalEconomicExecutionDefinitionError(
+                "offline invalid binding"
+            )
+
+        monkeypatch.setattr(
+            adapter,
+            "require_formal_economic_execution_binding",
+            refuse_economic,
+        )
+        action = lambda: adapter._require_streamed_economic_execution(
+            object(), object()
+        )
+    else:
+        economic = types.SimpleNamespace(definition_sha256="1" * 64)
+        bridge = types.SimpleNamespace(economic_execution=economic)
+        monkeypatch.setattr(
+            adapter,
+            "_require_streamed_runtime_bridge",
+            lambda _value: bridge,
+        )
+        monkeypatch.setattr(
+            adapter,
+            "_require_streamed_economic_execution",
+            lambda *_args: economic,
+        )
+
+        def refuse_report(*_args, **_kwargs):
+            raise adapter.FormalReportContractError("offline invalid binding")
+
+        monkeypatch.setattr(adapter, "require_formal_report_contract", refuse_report)
+        action = lambda: adapter._require_streamed_report_contract(
+            object(), bridge
+        )
+
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        action()
+
+
+def _fresh_host_closure(monkeypatch: pytest.MonkeyPatch):
+    fake_b5d = types.SimpleNamespace(
+        projection_id="arv2-b5d-test-source-set",
+        projection_sha256="1" * 64,
+        projection_artifact_sha256="2" * 64,
+        project_file_count=11,
+        total_projected_source_byte_count=1000,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "require_synthetic_qc_runtime_shard_projection",
+        lambda value: value,
+    )
+    return adapter.build_formal_qc_host_closure_binding(
+        worktree_root=ROOT,
+        b5d_project_source_set=fake_b5d,
+    )
+
+
+def test_host_source_manifest_closure_identity_and_live_change_are_isolated(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    closure = _fresh_host_closure(monkeypatch)
+    cases = (
+        (
+            dataclasses.replace(closure, sources=closure.sources[:-1]),
+            "host closure source manifest changed",
+        ),
+        (
+            dataclasses.replace(closure, _canonical_document=b"{}\n"),
+            "host closure changed",
+        ),
+    )
+    for changed, message in cases:
+        with pytest.raises(
+            adapter.FormalQcSubmissionError,
+            match=re.escape(message),
+        ):
+            adapter.require_formal_qc_host_closure_binding(changed)
+
+    raw = json.loads(closure._canonical_document)
+    raw["closure_sha256"] = "0" * 64
+    wrong_identity = dataclasses.replace(
+        closure,
+        closure_sha256="0" * 64,
+        _canonical_document=_canonical(raw),
+    )
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match=re.escape("host closure identity changed"),
+    ):
+        adapter.require_formal_qc_host_closure_binding(wrong_identity)
+
+    live_verifier = _closure_value(
+        adapter.verify_formal_qc_host_closure_live,
+        "implementation",
+    )
+    monkeypatch.setattr(
+        adapter,
+        "require_formal_qc_host_closure_binding",
+        lambda value: value,
+    )
+    monkeypatch.setattr(adapter, "_read_live_host_sources", lambda _root: ())
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match=re.escape("live host code closure changed"),
+    ):
+        live_verifier(closure)
+
+
+def test_streamed_execution_owner_pin_binding_is_isolated(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    candidate = object()
+    bridge = types.SimpleNamespace(formal_run_candidate=candidate)
+    reviewed = types.SimpleNamespace(
+        owner_outcome_authority_receipt_id="different-authority"
+    )
+    receipt = _canonical({"authority_id": "expected-authority"})
+    monkeypatch.setattr(
+        adapter,
+        "_require_streamed_runtime_bridge",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "require_reviewed_formal_run_authority",
+        lambda *_args: reviewed,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "render_streamed_formal_qc_execution_authority_candidate",
+        lambda **_kwargs: receipt,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "_require_non_self_mintable_execution_trust_root",
+        lambda *_args: None,
+    )
+    message = "owner review pin does not bind this exact streamed execution authority"
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        adapter.load_streamed_formal_qc_execution_authority(
+            runtime_bridge=bridge,  # type: ignore[arg-type]
+            reviewed_authority=reviewed,  # type: ignore[arg-type]
+            host_code_closure=object(),  # type: ignore[arg-type]
+            transport=object(),  # type: ignore[arg-type]
+            organization_id="test-organization",
+            receipt_bytes=receipt,
+        )
+
+
+def _isolated_streamed_launch_context(
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+):
+    entry = adapter.FormalQcUploadEntry(
+        role="input_shard",
+        object_store_key="arv2/formal/input/test.json.gz",
+        content_sha256=hashlib.sha256(b"x").hexdigest(),
+        content_md5=hashlib.md5(b"x", usedforsecurity=False).hexdigest(),
+        byte_count=1,
+        payload=b"x",
+    )
+    upload_entries = (entry,) if failure == "object-metadata" else ()
+    projection = types.SimpleNamespace(source_files=())
+    plan = types.SimpleNamespace(
+        plan_id="streamed-plan",
+        plan_sha256="1" * 64,
+        organization_id="test-organization-001",
+        project_name="ARV2_FORMAL_STOCK_2020_2025_20260911",
+        backtest_name="ARV2 formal stock outcomes",
+        upload_entry_count=len(upload_entries),
+        compile_poll_limit=2,
+        compile_poll_interval_seconds=0,
+    )
+    candidate = types.SimpleNamespace(candidate_sha256="2" * 64)
+    authority = types.SimpleNamespace(authority_sha256="3" * 64)
+    economic = types.SimpleNamespace(
+        binding_sha256="4" * 64,
+        definition_sha256="5" * 64,
+    )
+    report = types.SimpleNamespace(
+        contract_sha256="6" * 64,
+        artifact_sha256="7" * 64,
+        stock_bootstrap_seed_sha256="8" * 64,
+    )
+    runtime_bridge = types.SimpleNamespace(
+        bridge_sha256="9" * 64,
+        runtime_projection=projection,
+    )
+    execution = types.SimpleNamespace(
+        _owner_signature=None,
+        _receipt_bytes=b"receipt",
+        host_code_closure=object(),
+    )
+    permit = types.SimpleNamespace(
+        permit_id="permit-test",
+        permit_sha256="a" * 64,
+    )
+    submitted = types.SimpleNamespace(
+        bridge_sha256="b" * 64,
+        formal_run_candidate=candidate,
+        reviewed_authority=authority,
+        plan=plan,
+        runtime_bridge=runtime_bridge,
+        execution_authority=execution,
+        authenticated_power_floor=types.SimpleNamespace(binding_sha256="c" * 64),
+        economic_execution=economic,
+        report_contract=report,
+    )
+    project = {
+        "projectId": 123,
+        "organizationId": plan.organization_id,
+        "name": plan.project_name,
+        "language": "Py",
+        "owner": True,
+        "codeRunning": False,
+        "collaborators": [],
+        "libraries": [],
+    }
+    project_reads = 0
+    file_reads = 0
+
+    def transport_call(_client, _capability, method, *args, **_kwargs):
+        nonlocal project_reads, file_reads
+        if method == "_set_object_multipart":
+            return {"success": True}
+        if method == "_read_object_properties":
+            return {
+                "success": True,
+                "metadata": {
+                    "key": entry.object_store_key,
+                    "size": entry.byte_count,
+                    "md5": "0" * 32,
+                },
+            }
+        assert method == "_request_json"
+        endpoint = args[0]
+        if endpoint == "authenticate":
+            return {"success": True}
+        if endpoint == "projects/read":
+            project_reads += 1
+            if project_reads == 1:
+                return {
+                    "success": True,
+                    "projects": [project] if failure == "pre-existing" else [],
+                }
+            return {"success": True, "projects": [project]}
+        if endpoint == "projects/create":
+            return {"success": True, "projects": [project]}
+        if endpoint == "files/read":
+            file_reads += 1
+            files = (
+                [{"name": "unexpected.py", "content": "pass\n"}]
+                if failure == "extra-file" and file_reads == 1
+                else []
+            )
+            return {"success": True, "files": files}
+        if endpoint == "compile/create":
+            return {"success": True, "compileId": "compile-test"}
+        if endpoint == "compile/read":
+            return {
+                "success": True,
+                "compileId": "compile-test",
+                "state": "BuildError",
+            }
+        raise AssertionError(endpoint)
+
+    for name, replacement in (
+        ("require_streamed_formal_submission_adapter_bridge", lambda value: value),
+        ("_require_non_self_mintable_execution_trust_root", lambda *_args: None),
+        ("require_streamed_formal_qc_submission_plan", lambda **_kwargs: plan),
+        ("require_formal_look_claim", lambda *_args: object()),
+        ("_require_concrete_transport", lambda value: value),
+        ("verify_formal_qc_host_closure_live", lambda _value: None),
+        ("_preflight_streamed_upload", lambda _value: None),
+        ("_require_streamed_authenticated_power_floor", lambda *_args: object()),
+        ("_require_streamed_economic_execution", lambda *_args: object()),
+        ("_require_streamed_report_contract", lambda *_args: object()),
+        ("begin_formal_submission_once", lambda **_kwargs: permit),
+        ("_iter_streamed_upload_entries", lambda _value: iter(upload_entries)),
+        ("_external", lambda _closure, action: action()),
+        ("_transport_call", transport_call),
+    ):
+        monkeypatch.setattr(adapter, name, replacement)
+    implementation = _closure_value(
+        adapter.execute_streamed_formal_qc_submission_once,
+        "streamed_execute_implementation",
+    )
+    return implementation, submitted
+
+
+@pytest.mark.parametrize(
+    ("failure", "message"),
+    (
+        ("pre-existing", "exact formal project already exists"),
+        ("extra-file", "new project contains an unexpected source file"),
+        (
+            "object-metadata",
+            "Object Store metadata does not authenticate uploaded bytes",
+        ),
+        ("compile", "formal source did not compile successfully"),
+    ),
+)
+def test_streamed_remote_launch_refusals_are_isolated(
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+    message: str,
+):
+    implementation, submitted = _isolated_streamed_launch_context(
+        monkeypatch,
+        failure,
+    )
+    with pytest.raises(adapter.FormalQcSubmissionLocked) as raised:
+        implementation(
+            submission_bridge=submitted,
+            claim=object(),
+            client=object(),
+            submission_started_at_utc="2026-09-12T12:01:00.000000Z",
+            _authority_register_launch=lambda *_args, **_kwargs: pytest.fail(
+                "launch receipt must not be created"
+            ),
+            _transport_capability_minter=lambda **_kwargs: object(),
+        )
+    assert type(raised.value.__cause__) is adapter.FormalQcSubmissionError
+    assert str(raised.value.__cause__) == message
+
+
+def test_result_read_ledger_refuses_non_private_file_mode(tmp_path: Path):
+    ledger = (tmp_path / "result-read-ledger.json").absolute()
+    ledger.write_bytes(b"{}\n")
+    ledger.chmod(0o644)
+    message = (
+        "result-read ledger entry is not a bounded private mode-0600 regular file"
+    )
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        adapter._read_private_result_control(ledger, "result-read ledger entry")

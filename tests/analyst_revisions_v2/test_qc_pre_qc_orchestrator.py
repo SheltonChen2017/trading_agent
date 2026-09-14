@@ -5,6 +5,7 @@ import ast
 import dataclasses
 import json
 import os
+import re
 import subprocess
 import sys
 import types
@@ -1249,6 +1250,280 @@ def test_root_change_while_claim_is_written_consumes_claim_but_refuses_qc():
             submission_started_at_utc="2026-09-12T12:00:01Z",
         )
     assert calls == {"roots": 3, "claim": 1, "adapter": 0}
+
+
+def _isolated_launch_evidence():
+    historical = types.SimpleNamespace(
+        bridge_id="historical-bridge",
+        bridge_sha256="1" * 64,
+    )
+    terminal = types.SimpleNamespace(
+        build_id="terminal-build",
+        build_sha256="2" * 64,
+        historical_bridge=historical,
+    )
+    power = types.SimpleNamespace(
+        binding_id="power-binding",
+        binding_sha256="3" * 64,
+    )
+    runtime = types.SimpleNamespace(
+        bridge_id="runtime-bridge",
+        bridge_sha256="4" * 64,
+    )
+    candidate = types.SimpleNamespace(
+        candidate_id="formal-candidate",
+        candidate_sha256="5" * 64,
+    )
+    authority = types.SimpleNamespace(
+        authority_id="reviewed-authority",
+        authority_sha256="6" * 64,
+    )
+    host = types.SimpleNamespace(
+        closure_id="host-closure",
+        closure_sha256="7" * 64,
+    )
+    execution = types.SimpleNamespace(
+        authority_id="execution-authority",
+        authority_sha256="8" * 64,
+        host_code_closure=host,
+    )
+    plan = types.SimpleNamespace(
+        plan_id="submission-plan",
+        plan_sha256="9" * 64,
+    )
+    economic = types.SimpleNamespace(
+        binding_id="economic-binding",
+        binding_sha256="a" * 64,
+        definition_id="economic-definition",
+        definition_sha256="b" * 64,
+    )
+    report = types.SimpleNamespace(
+        contract_id="report-contract",
+        contract_sha256="c" * 64,
+        artifact_sha256="d" * 64,
+    )
+    submitted = types.SimpleNamespace(
+        bridge_id="submission-bridge",
+        bridge_sha256="e" * 64,
+        formal_run_candidate=candidate,
+        reviewed_authority=authority,
+        execution_authority=execution,
+        plan=plan,
+        authenticated_power_floor=power,
+        economic_execution=economic,
+        report_contract=report,
+    )
+    evidence = PreQcExecutionEvidence(
+        historical_bridge=historical,  # type: ignore[arg-type]
+        terminal_disposition_build=terminal,  # type: ignore[arg-type]
+        authenticated_power_floor=power,  # type: ignore[arg-type]
+        runtime_bridge=runtime,  # type: ignore[arg-type]
+        submission_bridge=submitted,  # type: ignore[arg-type]
+    )
+    return evidence, submitted
+
+
+def _isolated_current_roots(*, registry_status, **replacements):
+    require_roots = _closure_value(
+        module.execute_pre_qc_formal_submission_once,
+        "require_current_roots",
+    )
+    defaults = {
+        "historical_requirer": lambda value: value,
+        "runtime_requirer": lambda value: value,
+        "terminal_requirer": lambda value: value,
+        "power_requirer": lambda value: value,
+        "submission_requirer": lambda value: value,
+        "historical_runtime_matcher": lambda *_args: True,
+        "terminal_runtime_matcher": lambda *_args: True,
+        "power_runtime_matcher": lambda *_args: True,
+        "submission_identity_matcher": lambda *_args: True,
+        "host_closure_verifier": lambda _value: None,
+        "post_launch_capability_builder": lambda _value: object(),
+        "post_launch_capability_matcher": lambda *_args: True,
+        "owner_registry_status": lambda: registry_status,
+    }
+    defaults.update(replacements)
+    return _with_closure_values(require_roots, **defaults)
+
+
+@pytest.mark.parametrize(
+    "gate_key_counts",
+    (
+        {"formal_qc_execution": 0, "formal_qc_result_read": 1},
+        {"formal_qc_execution": 1, "formal_qc_result_read": 2},
+        {"formal_qc_execution": True, "formal_qc_result_read": 1},
+    ),
+)
+def test_launch_requires_exactly_one_execution_and_result_read_key(
+    gate_key_counts,
+):
+    evidence, _submitted = _isolated_launch_evidence()
+    require_roots = _isolated_current_roots(
+        registry_status={"gate_key_counts": gate_key_counts}
+    )
+    message = "reviewed formal execution or result-read key is not pinned"
+
+    with pytest.raises(module.PreQcOrchestrationError, match=re.escape(message)):
+        require_roots(evidence)
+
+
+def test_launch_isolates_lineage_and_live_root_reauthentication_changes():
+    registry = {
+        "gate_key_counts": {
+            "formal_qc_execution": 1,
+            "formal_qc_result_read": 1,
+        }
+    }
+    evidence, _submitted = _isolated_launch_evidence()
+    original_historical = evidence.historical_bridge
+    replacement = types.SimpleNamespace(
+        bridge_id="other-historical",
+        bridge_sha256="f" * 64,
+    )
+
+    lineage_requirer = _isolated_current_roots(
+        registry_status=registry,
+        historical_requirer=lambda _value: replacement,
+    )
+    with pytest.raises(
+        module.PreQcOrchestrationError,
+        match=re.escape("pre-QC execution roots changed lineage or identity"),
+    ):
+        lineage_requirer(evidence)
+
+    def mutate_but_return_original(value):
+        object.__setattr__(evidence, "historical_bridge", replacement)
+        return value
+
+    live_requirer = _isolated_current_roots(
+        registry_status=registry,
+        historical_requirer=mutate_but_return_original,
+    )
+    object.__setattr__(evidence, "historical_bridge", original_historical)
+    with pytest.raises(
+        module.PreQcOrchestrationError,
+        match=re.escape("pre-QC evidence roots changed during reauthentication"),
+    ):
+        live_requirer(evidence)
+
+    object.__setattr__(evidence, "historical_bridge", original_historical)
+    stable_requirer = _isolated_current_roots(registry_status=registry)
+    _submitted, snapshot = stable_requirer(evidence)
+    original_id = original_historical.bridge_id
+    original_historical.bridge_id = "changed-historical-id"
+    try:
+        with pytest.raises(
+            module.PreQcOrchestrationError,
+            match=re.escape(
+                "pre-QC evidence changed across the formal claim boundary"
+            ),
+        ):
+            stable_requirer(evidence, snapshot)
+    finally:
+        original_historical.bridge_id = original_id
+
+
+def test_launch_requires_exact_concrete_transport_before_preflight():
+    message = "exact concrete QC transport is required"
+    with pytest.raises(module.PreQcOrchestrationError, match=re.escape(message)):
+        module.execute_pre_qc_formal_submission_once(
+            evidence=PreQcExecutionEvidence(),
+            client=object(),  # type: ignore[arg-type]
+            claimed_at_utc="2026-09-12T12:00:00Z",
+            submission_started_at_utc="2026-09-12T12:00:01Z",
+        )
+
+
+def test_launch_isolates_report_and_submission_bridge_toctou_guards():
+    evidence = PreQcExecutionEvidence()
+    client = FormalQcTransport(http_transport=lambda *_args: None, clock=lambda: 1)
+    report = _fully_open_report()
+    changed_report = dataclasses.replace(report, report_sha256="0" * 64)
+    submitted = types.SimpleNamespace(
+        formal_run_candidate=object(),
+        reviewed_authority=object(),
+    )
+    replacement = types.SimpleNamespace(
+        formal_run_candidate=object(),
+        reviewed_authority=object(),
+    )
+
+    reports = iter((report, changed_report))
+    report_action = _with_closure_values(
+        module.execute_pre_qc_formal_submission_once,
+        report_builder=lambda _value: next(reports),
+        report_requirer=lambda value: value,
+        require_current_roots=lambda *_args: (submitted, ((), ())),
+    )
+    with pytest.raises(
+        module.PreQcOrchestrationError,
+        match=re.escape("pre-QC evidence changed during live reauthentication"),
+    ):
+        report_action(
+            evidence=evidence,
+            client=client,
+            claimed_at_utc="2026-09-12T12:00:00Z",
+            submission_started_at_utc="2026-09-12T12:00:01Z",
+        )
+
+    root_calls = 0
+
+    def before_claim_roots(*_args):
+        nonlocal root_calls
+        root_calls += 1
+        return (
+            submitted if root_calls == 1 else replacement,
+            ((), ()),
+        )
+
+    before_action = _with_closure_values(
+        module.execute_pre_qc_formal_submission_once,
+        report_builder=lambda _value: report,
+        report_requirer=lambda value: value,
+        require_current_roots=before_claim_roots,
+        invoke_claim=lambda **_kwargs: pytest.fail("claim must remain unspent"),
+    )
+    with pytest.raises(
+        module.PreQcOrchestrationError,
+        match=re.escape("submission bridge changed immediately before claim"),
+    ):
+        before_action(
+            evidence=evidence,
+            client=client,
+            claimed_at_utc="2026-09-12T12:00:00Z",
+            submission_started_at_utc="2026-09-12T12:00:01Z",
+        )
+
+    root_calls = 0
+    claim = object()
+
+    def after_claim_roots(*_args):
+        nonlocal root_calls
+        root_calls += 1
+        return (
+            submitted if root_calls < 3 else replacement,
+            ((), ()),
+        )
+
+    after_action = _with_closure_values(
+        module.execute_pre_qc_formal_submission_once,
+        report_builder=lambda _value: report,
+        report_requirer=lambda value: value,
+        require_current_roots=after_claim_roots,
+        invoke_claim=lambda **_kwargs: claim,
+        invoke_submission=lambda **_kwargs: pytest.fail("QC must remain inert"),
+    )
+    with pytest.raises(
+        module.PreQcOrchestrationError,
+        match=re.escape("submission bridge changed after formal claim"),
+    ):
+        after_action(
+            evidence=evidence,
+            client=client,
+            claimed_at_utc="2026-09-12T12:00:00Z",
+            submission_started_at_utc="2026-09-12T12:00:01Z",
+        )
 
 
 def test_reflected_irreversible_invokers_refuse_direct_calls():

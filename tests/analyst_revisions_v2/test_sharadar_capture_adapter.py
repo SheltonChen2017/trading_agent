@@ -5,6 +5,7 @@ import io
 import json
 import os
 import re
+import shutil
 import stat
 import zipfile
 from datetime import datetime, timezone
@@ -27,6 +28,7 @@ from scripts.capture_arv2_sharadar import (
     SharadarCaptureError,
     SharadarDataset,
     _capture_sharadar_history_for_test,
+    _visit_authenticated_sharadar_capture_rows_for_bridge,
     capture_sharadar_history,
     load_sharadar_capture_artifact,
 )
@@ -182,6 +184,223 @@ def _capture(tmp_path: Path, session: FakeSession | None = None):
 
 def _manifest(result) -> dict[str, object]:
     return json.loads((result.artifact_path / adapter.MANIFEST_FILENAME).read_text())
+
+
+def _exact_error(message: str) -> str:
+    return f"^{re.escape(message)}$"
+
+
+def test_streaming_bridge_visitor_authenticates_and_visits_every_row(tmp_path):
+    result, _ = _capture(tmp_path)
+    observed: list[tuple[SharadarDataset, str, int, dict[str, str]]] = []
+
+    def visit(dataset, member, ordinal, row):
+        assert type(row) is dict
+        observed.append((dataset, member.name, ordinal, row))
+
+    summary = _visit_authenticated_sharadar_capture_rows_for_bridge(
+        result.artifact_path,
+        expected_transport=adapter.TEST_TRANSPORT,
+        visit_row=visit,
+    )
+
+    assert summary == result
+    assert [(dataset, ordinal) for dataset, _member, ordinal, _row in observed] == [
+        (SharadarDataset.TICKERS, 0),
+        (SharadarDataset.TICKERS, 1),
+        (SharadarDataset.ACTIONS, 0),
+        (SharadarDataset.FUNDAMENTALS, 0),
+        (SharadarDataset.FUNDAMENTALS, 1),
+    ]
+    assert observed[0][3]["ticker"] == "AAA"
+    assert observed[-1][3]["dimension"] == "ART"
+
+
+def test_streaming_bridge_visitor_rejects_arguments_before_filesystem(tmp_path):
+    missing = tmp_path / "never-opened"
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error("expected capture transport is not reviewed"),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            missing,
+            expected_transport="unreviewed",
+            visit_row=lambda *_args: None,
+        )
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error("capture row visitor must be callable"),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            missing,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=None,
+        )
+    assert not missing.exists()
+
+
+def test_streaming_bridge_visitor_authenticates_all_archives_before_callback(
+    tmp_path,
+):
+    result, _ = _capture(tmp_path)
+    actions = result.artifact_path / result.archives[1].archive_file
+    corrupted = bytearray(actions.read_bytes())
+    corrupted[len(corrupted) // 2] ^= 1
+    actions.write_bytes(corrupted)
+    callbacks = 0
+
+    def visit(*_args):
+        nonlocal callbacks
+        callbacks += 1
+
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error(
+            "archive bytes do not match manifest before visitation"
+        ),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert callbacks == 0
+
+
+def test_streaming_bridge_visitor_propagates_callback_failure_unchanged(tmp_path):
+    result, _ = _capture(tmp_path)
+    failure = RuntimeError("consumer refused a Sharadar row")
+    callbacks = 0
+
+    def visit(*_args):
+        nonlocal callbacks
+        callbacks += 1
+        raise failure
+
+    with pytest.raises(RuntimeError) as captured:
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert captured.value is failure
+    assert callbacks == 1
+
+
+def test_streaming_bridge_visitor_does_not_reclassify_callback_oserror(tmp_path):
+    result, _ = _capture(tmp_path)
+    failure = OSError("consumer-owned output failed")
+
+    def visit(*_args):
+        raise failure
+
+    with pytest.raises(OSError) as captured:
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert captured.value is failure
+
+
+def test_streaming_bridge_visitor_never_delivers_post_auth_source_mutation(
+    tmp_path,
+):
+    session = FakeSession(
+        [
+            FakeResponse(
+                _zip_bytes(dataset, compression=zipfile.ZIP_STORED)
+            )
+            for dataset in adapter.DATASET_ORDER
+        ]
+    )
+    result, _ = _capture(tmp_path, session)
+    actions = result.artifact_path / result.archives[1].archive_file
+    callbacks = 0
+    action_tickers: list[str] = []
+
+    def visit(dataset, _member, _ordinal, row):
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            payload = actions.read_bytes()
+            assert b",OLD," in payload
+            with actions.open("r+b") as target:
+                target.write(payload.replace(b",OLD,", b",BAD,", 1))
+                target.flush()
+                os.fsync(target.fileno())
+        if dataset is SharadarDataset.ACTIONS:
+            action_tickers.append(row["ticker"])
+
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error(
+            "Sharadar actions archive identity changed after visitation"
+        ),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert callbacks == 5
+    assert action_tickers == ["OLD"]
+
+
+def test_streaming_bridge_visitor_rechecks_visited_leaf_identity(tmp_path):
+    result, _ = _capture(tmp_path)
+    target = result.artifact_path / result.archives[0].archive_file
+    moved = result.artifact_path.parent / (target.name + ".moved")
+    callbacks = 0
+
+    def visit(*_args):
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            target.rename(moved)
+            shutil.copyfile(moved, target)
+            target.chmod(0o600)
+
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error(
+            "Sharadar tickers archive identity changed after visitation"
+        ),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert callbacks == 5
+
+
+def test_streaming_bridge_visitor_rechecks_artifact_path_identity(tmp_path):
+    result, _ = _capture(tmp_path)
+    original = result.artifact_path
+    moved = original.with_name(original.name + ".moved")
+    callbacks = 0
+
+    def visit(*_args):
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            original.rename(moved)
+            original.mkdir(mode=0o700)
+            original.chmod(0o700)
+
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error(
+            "capture artifact path identity changed during visitation"
+        ),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            original,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert callbacks == 5
 
 
 def _rewrite_manifest(path: Path, mutator) -> None:

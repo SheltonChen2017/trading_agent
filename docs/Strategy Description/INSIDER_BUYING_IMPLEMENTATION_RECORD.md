@@ -1,24 +1,20 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE CODEX COUNTER-REVIEW `5db0f3d`, BOUNDED SYNTHETIC IB-3A
-FORMULA DIAGNOSTICS `17e613d`, ITS AGGREGATE-BOUND CORRECTION `6c03d7e`, AND
-RECORD `8f61557` ARE CLAUDE-REVIEWED AND ACCEPTED, `17e613d` AFTER A
-TEST-ONLY CORRECTION (SECTION 51): COMMIT `94ea25c` PINS TWELVE PREVIOUSLY
-UNTESTED IB-3A GUARDS, INCLUDING THE IB3A-R06 TRAP ISOLATION WHOSE OWN
-REGRESSION DID NOT EXERCISE ITS DANGEROUS DIRECTION; NO PRODUCTION MODULE
-CHANGED. ALL FOUR SECTION-49 CORRECTIONS TO SECTION 48 ARE ACCEPTED, TWO OF
-THEM GENUINE ERRORS OF THIS REVIEWER (NINETEEN PRIVATE UPSTREAM IMPORTS, NOT
-NINE; A RENAME FAILS LOUDLY WITH `ImportError`). THE ROUND SNAPSHOT IS
-`8f61557..THIS RECORD COMMIT`; CODEX COUNTER-REVIEW OF THOSE COMMITS IS THE
-NEXT GATE. IB-3A REMAINS SYNTHETIC EQUATION-CONFORMANCE EVIDENCE ONLY: NO
-OFFICIAL SECURITY MASTER, `qc_symbol_id`, AUTHENTICATED AMENDMENT
-SUPERSESSION, CANONICAL FILTERING, DEDUPLICATION, AUTHORIZED AGGREGATION OR
-`$50,000` GATE, CANONICAL STOCK SCORE, CROSS-SECTIONAL NORMALIZATION, SEED
-SELECTION, OUTCOME, ETF/QC, DEPLOYMENT, CAPITAL, BROKER, OR TRADING
-AUTHORITY EXISTS. TWENTY-SEVEN AUTHORITY FLAGS ARE FALSE ON EVERY PUBLIC
-OBJECT, `stock_score` IS HARD `None`, AND BOTH LOOK COUNTERS ARE EXACT ZERO.
-FULL IB-2 AND CANONICAL IB-3 REMAIN INCOMPLETE AND BLOCKED ON THEIR DATA
-AUTHORITIES.**
+Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `94ea25c` AND `4c834e1` AND
+ACCEPTED BOTH ONLY AFTER LANE-SPECIFIC CORRECTION (SECTION 52). THE REVIEW
+CONFIRMED THREE P2 INTEGRITY GAPS: CALLER-ALIASED/ABA-MUTABLE FIXTURE EVENTS,
+IMPOSSIBLE STANDALONE BREADTH CLAIMS, AND RAW-SCORE IDENTITIES OUTSIDE THE
+ATTAINABLE EVENT ENVELOPE. VALIDATED FACTORY-BOUND SNAPSHOTS NOW SEVER CALLER
+ALIASES; REPLAY NOW ENFORCES EVENT/VALUE, BUYER/DATE, CONCENTRATION, AND
+RAW-SCORE ENVELOPES. FIVE P3 REVIEW-PRECISION DEFECTS ARE CORRECTED OR
+RETAINED APPEND-ONLY, INCLUDING THE FINAL SEAL'S LOAD-BEARING STATUS, THE
+772-DIGIT/2-DIGIT-SLACK AGGREGATE DERIVATION, AND THE 50-DIGIT WHOLE-HALF-LIFE
+PROJECTION DESCRIPTION. IB-3A REMAINS SYNTHETIC, OFFLINE, ZERO-LOOK EVIDENCE
+ONLY; `stock_score` IS HARD `None` AND ALL OPERATIONAL AUTHORITIES REMAIN
+FALSE. THE NEXT COHERENT SLICE, IB-3B SYNTHETIC CROSS-SECTIONAL NORMALIZATION,
+IS BLOCKED ON OWNER CHOICES FOR POPULATION, WINSORIZATION, QUANTILES, VARIANCE,
+MINIMUM-N, ZERO-DISPERSION, AND MISSING/INELIGIBLE HANDLING. NO SUCH CHOICE OR
+ANY DATA, OUTCOME, QC, PAPER, LIVE, OR TRADING AUTHORITY IS INFERRED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -171,7 +167,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-08 | Codex counter-review | `84c9ebe1..9a93d09` reviewed; this counter-review record commit follows | Claude IB-2D counter-review | Counter-reviewed both Claude commits, accepted the additive IB-2D test hardening, and corrected the review's mutation accounting, guard classification, scope-gate claim, private-import inventory, and open-lane-finding disposition append-only in section 49. No production code changed. | Exact received/remote head `9a93d09`; IB-2D **92 passed**; IB-2C + IB-2D **176 passed**; complete thirteen-file Insider + active-document + module-hygiene + import-boundary gate **1,274 passed**. Five representative in-memory reverse mutations went red and restored green. No SEC/provider/credential/licensed-row/outcome/QC/broker/operator-database/scheduler/deployment/capital/order/trading access; **0 research looks**. | `5655759` accepted with no new finding; `9a93d09` accepted after four P3 record corrections. IB2D-CR01 is accepted fixed; CR02 is closed as a non-blocking scope note; CR03 is closed as intentional design coupling. IB2D-CCR01..04 are closed in section 49. No P0-P3 finding remains open in the incoming range. | Keep this checkpoint local. Do not invent IB-2E or start canonical IB-3. Owner defines the next bounded offline IB-2 contract or expressly authorizes the coordinated security-master/amendment audit; implementation and the round's one combined push then continue. |
 | 2026-09-09 | Codex counter-review + implementation | `9a93d095..5db0f3d1` counter-reviewed; `17e613d4` IB-3A; `6c03d7e7` correction; this record commit follows | Claude IB-2D counter-review plus bounded synthetic/offline IB-3A stock-signal formula diagnostics | Accepted both Claude commits after the append-only section-49 corrections, then applied the owner's express "implement the next milestone, then push" direction only to a synthetic caller-age equation-conformance slice. Added factory-sealed events, fixed 50-digit Decimal size/freshness/event-score equations, inclusive `$50,000` and age-30 routing with all rows retained, exact raw-score summation, separate buyer/role/date/dollar breadth, canonical-order/hash replay, resource bounds, duplicate post-lot-key refusal, explicit caller-declared role provenance, and hard-unavailable `stock_score`. Exact IB-2D results are refused before formula work. | Focused IB-3A **142 passed**; complete Insider/active-document/module-hygiene/import-boundary lane gate **1,416 passed in 12.30s**; complete exact-final-tree repository suite **7,616 passed, 38 skipped, 26 warnings, 0 failed in 411.45s (0:06:51)**; whole-repository compileall including `research` exit 0; source compilation and `git diff --check` clean. Red/green evidence and hashes are in section 50. No SEC/provider/credential/licensed-row/real-filing/outcome/QC/broker/operator-database/scheduler/deployment/capital/order/trading access; **0 research looks**. | `5655759` accepted with no finding; `9a93d09` accepted after four P3 record corrections. IB3A-R01 through R08 are closed; the post-commit mixed-exponent P2 is fixed in `6c03d7e` and independently reproduced red/green. Three independent final audits report no open P0-P3 finding. Full IB-2/canonical IB-3 remain blocked on official security-master/`qc_symbol_id`, authenticated amendment, PIT identity/classification, calendar, and role-normalization authority. | Commit this lane record and make the round's one push to `origin/codex/strategy-insider-buying`. Claude independently reviews every commit in `9a93d09..PUSHED_HEAD` on this same branch; Codex counter-reviews every Claude commit before any later milestone. |
 | 2026-09-10 | Claude review | `8f61557` -> `94ea25c` (test correction) -> this review record | Independent review of the IB-2D counter-review, the bounded synthetic IB-3A formula diagnostics, its aggregate-bound correction, and the record (`9a93d09..8f61557`, 4 commits, 0 merges, 4 lane-owned paths), with adversarial mutation of the owner-named directions | Fast-forwarded to the exact remote tip and dispositioned all four commits. Recomputed the numeric-policy hash, derived the 774-digit aggregate bound from first principles (773 required, slack 1, below the shared 4,096 ceiling), reproduced IB3A-R08 as a real defect (512- and 763-digit totals both exceeded the old 272-digit cap) and its fix against an exact-sum oracle, checked the formulas against an independent direct-exponential oracle, confirmed ambient-context and boundary behavior, and ran 64 targeted mutants plus 10 combined mutants. Twelve survivors were genuine untested guards and are now pinned; thirteen are proven redundant or unreachable. Full detail in section 51. | Pushed tree `8f61557`: complete suite **7,616 passed, 38 skipped, 28 warnings, 0 failed in 485.90s (0:08:05)** (Codex recorded 26 warnings); focused IB-3A **142 passed**; lane/boundary gate **1,416 passed** - every recorded figure reproduces exactly. Final tree: IB-3A **162 passed**; lane/boundary gate **1,436 passed in 11.97s**; complete suite **7,636 passed, 38 skipped, 28 warnings, 0 failed in 440.88s (0:07:20)**; whole-repository compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | All four commits accepted, `17e613d` after a test-only correction. **IB3A-CR01** (P3) fixed in `94ea25c`: twelve guards could be deleted with the file green, most importantly the explicit Decimal `flags=[]`/`traps=[]` that isolate a trapping `DefaultContext` - the IB3A-R06 regression sets every trap to `False`, the harmless direction, so a trapping context provably refused a valid age-one event with the guard removed while all 142 tests passed - and the sealed-event fingerprint comparison, whose own named test forges a new object and is therefore caught by `registered is None`, leaving the in-place equal-valued representation change provably accepted. The other ten are contribution routing, contribution/breadth/identity replay, canonical event order, the result raw-score and stock-key bindings, breadth count-to-inventory binding, the breadth buyer-count bound, and identity count consistency. Thirteen additive tests (20 cases), each mutation-verified; six previously surviving combined pairs are now caught. **IB3A-CR02** (P3, open, record precision): the pre-commit red/green evidence cited for IB3A-R01..R07 is not independently reproducible because those corrections were squashed into `17e613d` before commit, so the final guards were verified by mutation instead. IB3A-N01..N04 are notes (freshness split-vs-direct divergence of 2.4e-48 relative at age 10,000, disclosed by the frozen evaluation string; thirteen classified survivors; the warning delta; the unreachable `_runtime_value` repr fallback). All four section-49 corrections accepted, two being genuine errors of this reviewer. No production module changed; no test removed or weakened. | Codex counter-reviews `94ea25c` and this record commit. `qc_symbol_id`, an official security master, authenticated amendment supersession, an authoritative calendar, and an authorized role taxonomy remain deferred. Full IB-2 and canonical IB-3 remain incomplete; no milestone started. |
-
+| 2026-09-14 | Codex counter-review | `4c834e1` -> this counter-review commit | Claude IB-3A review counter-review; next milestone held for owner choice | Fast-forwarded without switching, reviewed `94ea25c` and `4c834e1` in order, reproduced a caller-alias/ABA P2 plus impossible standalone breadth and raw-score identity P2s, corrected them with validated factory-bound snapshots and exact necessary envelopes, pinned the independently load-bearing final seal, and corrected numeric-policy wording without changing formula arithmetic. No later milestone was implemented because the blueprint does not freeze a unique cross-sectional normalization policy. | Focused corrected IB-3A **177 passed**; lane/boundary **1,443 passed, 8 skipped**; complete repository **2 shared-EOL failures, 7,672 passed, 15 skipped**; compileall 0. Deterministic final-seal deletion mutant failed red; 500 valid randomized batches passed independently. No external data or operations; **0 research looks**. | `94ea25c` and `4c834e1` accepted after correction. IB3A-CCR01..CCR08 are closed; Claude's IB3A-CR02 remains open as retained record precision. `IBSH-CCR08` records the two shared/out-of-lane EOL failures without fixing them. The next code slice is an owner choice, not a P0-P3 defect. | Commit and make the round's one push. Owner chooses synthetic IB-3B policy or canonical IB-2 authority work before implementation resumes; Claude reviews this exact pushed counter-review snapshot. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -6641,3 +6637,148 @@ those data authorities.
 Review commits on this lane: test correction `94ea25c` and this record
 commit. Next authorized step: Codex counter-reviews both. No milestone was
 started and none is authorized by this review.
+
+
+## 52. Codex counter-review - Claude IB-3A review and next-scope gate (2026-09-14)
+
+Codex worked only in `C:\git\customizedAgent\trading_agent_insider` on the
+existing `codex/strategy-insider-buying` branch. The worktree began clean at
+`0027d57d80f4b6be461ed8a0794e88b354cb0aba`; a read-only remote query found
+`4c834e11bdee699a4c1049e9c97f34a28112df25`, the local commit was verified as
+a strict ancestor, and the lane was fetched and fast-forwarded to that exact
+head without switching branches. The formal counter-review range is
+`8f615572fd920c563d79f7a561d098dd416533d5..4c834e11bdee699a4c1049e9c97f34a28112df25`:
+two commits, zero merges, and only the IB-3A test file plus this lane record.
+
+### 52.1 Commit-by-commit dispositions
+
+| Commit | Change | Codex disposition |
+|---|---|---|
+| `94ea25c18a390ed836b154f70deb59a4eee9a0a0` | Add 13 IB-3A regression tests / 20 cases | **Accepted after correction.** The additions are useful and do not weaken prior tests. Eleven claimed guard directions reach their intended clauses. The trapping-context case pins `traps=[]`, while `flags=[]` is deterministic hygiene whose omission changes sticky flags but no observed formula result. The review missed caller aliasing, A-to-B-to-A mutation, the final post-construction seal, and impossible standalone replay shapes; the counter-review tests and production corrections below close those gaps. |
+| `4c834e11bdee699a4c1049e9c97f34a28112df25` | Record Claude's review in section 51 | **Accepted after correction.** The range, hashes, path inventory, test arithmetic, 27-field authority inventory, and most formula claims reproduce. The no-P2 conclusion, four-column ledger, aggregate-width arithmetic, final-seal classification, whole-half-life wording, and flags/traps sensitivity statement require the append-only corrections below. Historical section 51 is retained unchanged. |
+
+### 52.2 Retained P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3A-CCR01 | P2 | **CLOSED in this counter-review commit** | Review gap after `94ea25c`; accepted production through `4c834e1` | `research/insider_buying/form4_stock_signal_formula_diagnostics.py`, fixture registry and public builder/result payload | The builder computed from and returned the caller's exact event objects. A caller could mutate a frozen event through `object.__setattr__` after a seal check or after return, producing an accepted result whose event, contribution, breadth, fixture ID, and inventory identity disagreed. A transient A-to-B-to-A change could also evade all three sampled fingerprints. | A deterministic old-tree probe exposed registered `$50,000` state A only during all three real seal checks and `$100,000` state B between checks; the builder accepted event `$50,000` with contribution `$100,000`. Post-return mutation also changed `result.to_payload()` under stale hashes. | Caller detachment and immutable, hash-bound artifacts are mandatory; sampled pre/post fingerprints cannot make a mutable alias a coherent computational source. | Copy every exact immutable event field into a constructor-validated snapshot, compare that snapshot's runtime fingerprint directly with the original object's factory registry seal, register the snapshot, and evaluate/store only snapshots. Preserve the final live-input seal as a separate fail-closed check. | New post-return alias, unequal-value ABA, equal-value/different-representation ABA, and final-post-construction mutation cases pass. Removing the final loop makes its dedicated test fail red. The complete focused file passes. |
+| IB3A-CCR02 | P2 | **CLOSED in this counter-review commit** | Generalized instance of `IB3A-R02`, missed by `94ea25c` / `4c834e1` | `Form4StockSignalBreadthDiagnostics.__post_init__` | Standalone replay accepted impossible breadth claims: totals above the maximum admitted event value, `total > largest_buyer * buyer_count`, insufficient value for other named buyers, insufficient largest-buyer value under pigeonhole counting, excess value for one buyer/date capacity, and more events than unique buyer/date aggregation keys can represent. Rehashed impossible objects could therefore present valid IDs. | Exact pre-correction probes accepted a one-event value above the input maximum, a two-buyer `$1,000,000` total with `$100,000` largest buyer, and the logically impossible `N=10,000`, one-buyer/one-date shape. | Public standalone constructors are documented and tested as replayable; their hash binding must not bless claims that cannot arise from the admitted event contract. | Enforce exact minimum/maximum total envelopes, `N <= buyers * dates`, minimum largest buyer by `ceil(N / buyers)`, maximum largest buyer by remaining-event and per-date capacity, `total <= largest * buyers`, and the minimum value held by all other buyers. | Maximum valid one- and two-event boundaries pass; isolated upper-envelope, buyer/date capacity, concentration, other-buyer minimum, pigeonhole minimum, and per-date maximum cases refuse. An independent 500-batch valid randomized oracle found zero false refusals. |
+| IB3A-CCR03 | P2 | **CLOSED in this counter-review commit** | Generalized standalone replay gap missed by `94ea25c` / `4c834e1` | `Form4StockSignalFormulaIdentity.__post_init__` | A rehashed standalone identity accepted any positive bounded Decimal as `raw_stock_score_diagnostic`, including `1e-256` and `1e256` for one included event, although neither can arise from the admitted purchase, age, and event-count bounds. | Both one-event probes replayed successfully before correction. | A factory-token replay check must bind numerical claims to the attainable formula envelope, not only type, positivity, and hash shape. | Derive exact per-event lower score at `$50,000`, age 30 and upper score at the maximum admitted purchase, age zero; multiply each by the exact included-event count and refuse values outside that closed interval. | Valid minimum, one-event maximum, and 10,000-event maximum identities replay; independently rehashed values below and above the envelope refuse. |
+| IB3A-CCR04 | P3 | **CLOSED in tests and this record** | `4c834e1` | Section 51.4; builder final input loop | Section 51 called the final post-build fixture recheck redundant/defence in depth. It is independently load-bearing for mutation after result construction returns but before builder return. | A wrapper mutating the caller event immediately after the real result constructor is accepted if the final loop is deleted and refused when it is present. | Deleting a reachable final integrity gate based on the record's classification would weaken fail-closed behavior. | Retain the loop and add a dedicated regression for the exact timing window. | The test passes on the corrected tree and failed red under the isolated deletion mutant; the module was restored before further work. |
+| IB3A-CCR05 | P3 | **CLOSED in this record** | `4c834e1` | Section 51.5 | Claude used a four-column finding table, omitting six fields required by `GENERAL_CODE_REVIEW_INSTRUCTIONS.md`. | The binding schema is `ID / Priority / Status / Commit / Location / Issue and impact / Evidence / Reason for fix / Correction / Verification`. | Complete provenance and verification are required for later counter-review and handoff. | Retain section 51 unchanged and use the mandatory ten-column schema in this superseding ledger. | This table contains all ten required columns and retains both Claude findings plus all counter-review findings. |
+| IB3A-CCR06 | P3 | **CLOSED in this record** | `4c834e1` | Sections 51.1 and 51.3 aggregate-bound derivation | The 774-digit cap is safe, but the record says 773 digits are required with one digit of slack. Ten thousand addends add four decimal orders, not five: the exact worst-case coefficient width is 772, leaving two digits of slack. | Integer reconstruction gives one aligned addend width 768, 10,000-addend width 772, cap 774, slack 2. | An incorrect derivation undermines the evidence for a safety/resource bound even when the bound itself remains conservative. | Correct the arithmetic append-only here; leave the safe 774 cap unchanged. | The 512- and 763-digit regression totals still pass; the corrected derivation is reproduced independently. |
+| IB3A-CCR07 | P3 | **CLOSED in code, tests, and this record** | `4c834e1` confirms an older public descriptor | `FORM4_STOCK_SIGNAL_FRESHNESS_EVALUATION`; sections 50.3, 51.3, 51.7 | “Exact whole half-lives” is false over the admitted age range: `0.5 ** 500` has a 350-digit exact coefficient and is rounded inside the 50-digit context. Formula results were deterministic, but the hash-bound policy text overstated exactness. | At age 10,000, production equals the 50-digit context projection and differs from a 400-digit oracle. | The policy hash must describe the actual evaluation order and precision rather than a mathematically false property. | Rename the descriptor to `50-digit whole- and fractional-half-life projection`; retain arithmetic unchanged and update the frozen policy hash. | The age-10,000 test distinguishes the two values; focused policy-hash and formula tests pass. Historical wording remains append-only corrected here. |
+| IB3A-CCR08 | P3 | **CLOSED in this record** | `94ea25c`, described by `4c834e1` | Section 51.4 explicit `flags=[]` / `traps=[]` row | The review groups both constructor arguments as independently mutation-pinned. The subprocess test proves `traps=[]` is load-bearing; omitting only `flags=[]` inherits sticky flags that are never observed by this module, so output remains identical. | A trapping `DefaultContext` refuses a valid age-one event without `traps=[]`; a sticky-flag-only probe changes local flags but not any returned result. | Mutation claims must distinguish an operative guard from deterministic hygiene. | Retain both explicit arguments; classify only `traps=[]` as directly pinned and `flags=[]` as redundant deterministic hygiene. | Claude's subprocess case remains green and its dangerous direction remains protected; no production change was needed. |
+| IB3A-CR02 | P3 | **OPEN - retained record precision** | `4c834e1` | Sections 50.4 and 51.5 | The transient pre-commit `117 passed, 3 failed` evidence for squashed IB3A-R01..R07 changes cannot be reconstructed from Git objects. | The final committed guards are mutation-verified, but the named transient tree is absent. | Historical claims must distinguish committed/reproducible evidence from ephemeral development runs. | Retain Claude's finding; no code correction can recreate the missing tree. | Current committed guards are covered by focused and mutation evidence; this historical precision item remains explicitly open. |
+| IBSH-CCR08 | P3 | **OPEN - shared/out of lane; not fixed here** | Pre-existing worktree state, exposed by final full-suite validation | `research/ml_specs/volatility-discovery-v1.json`, `research/ml_specs/volatility-discovery-v1.review-request.json`, and `tests/test_shared_research_eol_attributes.py` | Two shared ML-spec working copies are CRLF while their index blobs and enforced `-text` state are LF, so the complete repository suite cannot be zero-failure in this checkout. This is unrelated to Insider Buying behavior. | `git ls-files --eol` reports `i/lf w/crlf attr/-text` for both paths; those are the only two failures in the 7,689-result repository run. | The owner expressly requires non-lane findings to be documented but not fixed in this lane. Healing shared working-copy bytes belongs in a coordinated shared-remediation session. | No file change. Retain the exact paths, failure messages, and test counts for the later shared-fix session. | Insider lane/boundary gate passes 1,443/8; full suite reports exactly these 2 failures, 7,672 passes, and 15 skips. Neither shared file appears in this round's diff. |
+
+No P0 or P1 finding was found. All confirmed P2 findings are closed in the
+counter-review correction. `IBSH-CCR08` and existing shared/out-of-lane
+findings are documented but were not changed or fixed.
+
+### 52.3 Corrected behavior and scope
+
+The correction is deliberately confined to the existing synthetic IB-3A
+boundary:
+
+- caller events remain exact factory-created, process-sealed fixtures, but
+  formula evaluation and returned artifacts now consume detached validated
+  snapshots rather than caller-owned aliases;
+- the final original-input recheck remains in addition to snapshot binding,
+  so persistent late mutation refuses while a perfectly transient ABA cannot
+  corrupt the detached result;
+- standalone breadth and formula-identity replay enforce necessary exact
+  numerical/cardinality envelopes implied by the already-frozen input bounds,
+  post-lot key, threshold, age, and event-count contract;
+- freshness arithmetic did not change. Only its public description now says
+  that both whole and fractional half-life factors are 50-digit projections,
+  and the policy hash changes accordingly; and
+- `stock_score` remains hard `None`; all 27 authority flags remain false and
+  both look counters remain exact integer zero.
+
+No SEC/EDGAR endpoint, provider, credential, licensed row, real filing,
+security master, outcome, ETF holding, QuantConnect, broker, operator
+database, scheduler, deployment, capital, order, or trading surface was
+accessed. **Research looks: 0.** No shared or project-wide file was changed.
+
+### 52.4 Validation
+
+Final corrected-tree evidence before the one push:
+
+- Python **3.13.14**, pytest **9.1.1**;
+- focused IB-3A: **177 passed**;
+- independent valid-input oracle: **500 deterministic batches passed** with
+  zero false refusal;
+- final-seal deletion mutation: the dedicated case changed from green to red
+  (`DID NOT RAISE`) and returned green after exact restoration;
+- exact-final lane/boundary gate: **1,443 passed, 8 skipped in 370.51s
+  (0:06:10)**;
+- complete repository suite on the final code/test tree, before this
+  record-only evidence update: **2 failed, 7,672 passed, 15 skipped, 25
+  warnings in 2,682.62s (0:44:42)**. Both failures are the exact shared/out-
+  of-lane CRLF/LF mismatches in `IBSH-CCR08`; no other test failed. The exact
+  final record is covered again by the lane/boundary and active-document gate;
+- whole-repository `compileall`, including `research`: **exit 0**; and
+- `git diff --check`: clean apart from line-ending conversion notices.
+  Committed source-blob SHA-256 is
+  `60f2e4e279bc974c24bf566a36748fe4b0b6cb588d6e118a8f223285ea9e3f8c`;
+  committed focused-test-blob SHA-256 is
+  `3b59d36bf4845e1e7e6236c494a5aa3b4b483d8c7eef531fb37c2cc8add38108`.
+  Final branch/remote/status are checked on the exact commit before push.
+
+### 52.5 Next milestone and owner-decision register
+
+The next blueprint operation after raw stock diagnostics is a winsorized
+cross-sectional z-score. Neither the blueprint nor the current frozen
+contract specifies a unique implementation. Starting numerical IB-3B now
+would silently choose research methodology, so no new milestone is included
+in this round. The owner must first choose one of these sequences:
+
+1. **Synthetic continuation:** authorize bounded, caller-declared, offline
+   IB-3B cross-sectional-normalization diagnostics with no canonical score,
+   ranking, seed, outcomes, provider, QC, or trading authority; or
+2. **Canonical progression:** return to IB-2 authority completion/audit before
+   any canonical IB-3 consumer.
+
+For synthetic IB-3B, the owner must freeze the eligible cross-sectional
+population (including whether zero-signal names enter), winsor cutoffs,
+quantile/interpolation and tie rules, population-versus-sample variance,
+minimum cohort size, zero-dispersion behavior, Decimal precision/rounding,
+missing/ineligible dispositions, and explicit deferral or definition of seed
+top-decile rounding/ties.
+
+Canonical IB-2 additionally requires an authoritative point-in-time security
+master and durable `qc_symbol_id`, authenticated amendment completeness and
+supersession, the ordinary-equity/manual-exception dictionary, normalized
+role taxonomy, authoritative trading calendar and acceptance-to-session
+mapping, and an explicit choice between owner-supplied immutable snapshots
+and authorized external retrieval. Any shared-file implementation needs a
+separate coordinated shared-surface exception.
+
+External data/research requires separate authorization for SEC/EDGAR scope
+and fair-access/storage policy, provider credentials/licensed rows, QC data
+entitlements, final data vintages/cutoffs, and permanent outcome-look IDs and
+alpha allocation. QC processing/upload/backtests require explicit job and
+artifact authority. Paper deployment requires a later reviewed promotion
+gate plus account, broker sandbox, credentials, capital/risk, scheduler,
+operator database, monitoring, alerts, and kill-switch authority. Live or
+autopiloted trading is a distinct later authorization for live capital,
+orders, limits, windows, rollback, incident response, and restart control;
+research, QC, or paper permission never implies it.
+
+### 52.6 Copyable Claude review handoff
+
+Claude should fast-forward the same lane worktree to the exact pushed head,
+without switching branches, and review the single Codex counter-review commit
+after `4c834e11bdee699a4c1049e9c97f34a28112df25`. Reproduce each row in section
+52.2, especially caller detachment, unequal/equal-representation ABA,
+post-result-construction final sealing, standalone breadth cardinality and
+concentration, raw-score lower/upper envelopes, the 772/774 aggregate-width
+arithmetic, the age-10,000 policy wording, and the flags-versus-traps
+distinction. Verify the focused, lane, full-suite, compile, diff, hash, and
+zero-look claims on the exact commit. Apply only Insider-lane corrections;
+document shared/out-of-lane issues without fixing them. Do not infer authority
+to begin IB-3B: return the owner-decision register unchanged unless the owner
+has separately frozen those choices. Update only this lane record, commit on
+the same branch, and make the review round's one push; Codex then
+counter-reviews every Claude commit.

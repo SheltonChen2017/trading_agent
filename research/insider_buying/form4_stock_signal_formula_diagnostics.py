@@ -43,7 +43,7 @@ FORM4_STOCK_SIGNAL_FRESHNESS_FORMULA = (
     "exp(-ln(2) * age_trading_days / 20)"
 )
 FORM4_STOCK_SIGNAL_FRESHNESS_EVALUATION = (
-    "exact whole half-lives times a 50-digit fractional-half-life projection"
+    "50-digit whole- and fractional-half-life projection"
 )
 FORM4_STOCK_SIGNAL_EVENT_SCORE_FORMULA = "event_size * freshness"
 FORM4_STOCK_SIGNAL_RAW_SCORE_FORMULA = (
@@ -69,6 +69,13 @@ _MAX_FORM4_STOCK_SIGNAL_AGGREGATE_DECIMAL_DIGITS = (
 )
 _MAX_FORM4_STOCK_SIGNAL_DERIVED_DECIMAL_ABS_EXPONENT = 1_024
 _MAX_FORM4_STOCK_SIGNAL_DECIMAL_TEXT_CHARACTERS = 2_048
+_MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD = Decimal(
+    (
+        0,
+        (9,) * _MAX_FORM4_STOCK_SIGNAL_DECIMAL_DIGITS,
+        _MAX_FORM4_STOCK_SIGNAL_DECIMAL_ABS_EXPONENT,
+    )
+)
 _CIK_RE = re.compile(r"^[0-9]{10}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _GIT_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
@@ -632,6 +639,27 @@ def _register_fixture_event(value: Form4StockSignalFixtureEvent) -> None:
         _EVENT_REGISTRY[identity] = (reference, fingerprint)
 
 
+def _matches_registered_fixture_event_fingerprint(
+    value: object,
+    observed_fingerprint: str,
+) -> bool:
+    """Match one captured state to the exact factory-created input object."""
+
+    if (
+        type(value) is not Form4StockSignalFixtureEvent
+        or type(observed_fingerprint) is not str
+        or _SHA256_RE.fullmatch(observed_fingerprint) is None
+    ):
+        return False
+    with _EVENT_REGISTRY_LOCK:
+        registered = _EVENT_REGISTRY.get(id(value))
+        return (
+            registered is not None
+            and registered[0]() is value
+            and registered[1] == observed_fingerprint
+        )
+
+
 def _require_factory_fixture_event(value: object) -> str:
     if type(value) is not Form4StockSignalFixtureEvent:
         raise Form4StockSignalFormulaDiagnosticsError(
@@ -642,17 +670,45 @@ def _require_factory_fixture_event(value: object) -> str:
         _FIXTURE_EVENT_FACTORY_TOKEN,
     )
     actual = _runtime_fingerprint(value)
-    with _EVENT_REGISTRY_LOCK:
-        registered = _EVENT_REGISTRY.get(id(value))
-        if (
-            registered is None
-            or registered[0]() is not value
-            or registered[1] != actual
-        ):
-            raise Form4StockSignalFormulaDiagnosticsError(
-                "REFUSED: synthetic fixture event is unsealed or mutated"
-            )
+    if not _matches_registered_fixture_event_fingerprint(value, actual):
+        raise Form4StockSignalFormulaDiagnosticsError(
+            "REFUSED: synthetic fixture event is unsealed or mutated"
+        )
     return actual
+
+
+def _snapshot_factory_fixture_event(
+    value: object,
+) -> tuple[Form4StockSignalFixtureEvent, str]:
+    """Copy and bind immutable event state before any formula consumes it."""
+
+    if type(value) is not Form4StockSignalFixtureEvent:
+        raise Form4StockSignalFormulaDiagnosticsError(
+            "REFUSED: inputs must contain exact synthetic fixture events"
+        )
+    snapshot = Form4StockSignalFixtureEvent(
+        source_event_id=value.source_event_id,
+        issuer_cik=value.issuer_cik,
+        security_id=value.security_id,
+        share_class_id=value.share_class_id,
+        buyer_id=value.buyer_id,
+        transaction_date=value.transaction_date,
+        purchase_value_usd=value.purchase_value_usd,
+        age_trading_days=value.age_trading_days,
+        normalized_role_ids=value.normalized_role_ids,
+        fixture_event_id=value.fixture_event_id,
+        _verified_factory_token=_FIXTURE_EVENT_FACTORY_TOKEN,
+    )
+    snapshot_fingerprint = _runtime_fingerprint(snapshot)
+    if not _matches_registered_fixture_event_fingerprint(
+        value,
+        snapshot_fingerprint,
+    ):
+        raise Form4StockSignalFormulaDiagnosticsError(
+            "REFUSED: captured synthetic fixture event is unsealed or mutated"
+        )
+    _register_fixture_event(snapshot)
+    return snapshot, snapshot_fingerprint
 
 
 def _post_lot_aggregation_key(
@@ -1058,6 +1114,10 @@ class Form4StockSignalBreadthDiagnostics(_ZeroAuthority):
             raise Form4StockSignalFormulaDiagnosticsError(
                 "REFUSED: breadth role or date cardinality exceeds per-event bounds"
             )
+        if self.included_event_count > self.buyer_breadth * self.date_breadth:
+            raise Form4StockSignalFormulaDiagnosticsError(
+                "REFUSED: event count exceeds the buyer/date aggregation-key capacity"
+            )
         expected_dollar_breadth = _dollar_breadth(
             self.total_purchase_value_usd,
             self.largest_buyer_purchase_value_usd,
@@ -1067,10 +1127,50 @@ class Form4StockSignalBreadthDiagnostics(_ZeroAuthority):
             self.included_event_count,
             name="IB-3A minimum breadth total purchase value",
         )
+        maximum_total_purchase_value = exact_decimal_multiply(
+            _MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD,
+            self.included_event_count,
+            name="IB-3A maximum breadth total purchase value",
+        )
+        minimum_largest_buyer_value = exact_decimal_multiply(
+            FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD,
+            (self.included_event_count + self.buyer_breadth - 1)
+            // self.buyer_breadth,
+            name="IB-3A minimum largest-buyer purchase value",
+        )
+        maximum_largest_buyer_value = exact_decimal_multiply(
+            _MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD,
+            min(
+                self.included_event_count - self.buyer_breadth + 1,
+                self.date_breadth,
+            ),
+            name="IB-3A maximum largest-buyer purchase value",
+        )
+        maximum_total_from_largest_buyer = exact_decimal_multiply(
+            self.largest_buyer_purchase_value_usd,
+            self.buyer_breadth,
+            name="IB-3A maximum total implied by largest buyer",
+        )
+        minimum_other_buyer_value = exact_decimal_multiply(
+            FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD,
+            self.buyer_breadth - 1,
+            name="IB-3A minimum other-buyer purchase value",
+        )
+        other_buyer_value = exact_decimal_subtract(
+            self.total_purchase_value_usd,
+            self.largest_buyer_purchase_value_usd,
+            name="IB-3A other-buyer purchase value",
+        )
         if (
             self.total_purchase_value_usd < minimum_total_purchase_value
+            or self.total_purchase_value_usd > maximum_total_purchase_value
             or self.largest_buyer_purchase_value_usd
-            < FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD
+            < minimum_largest_buyer_value
+            or self.largest_buyer_purchase_value_usd
+            > maximum_largest_buyer_value
+            or self.total_purchase_value_usd
+            > maximum_total_from_largest_buyer
+            or other_buyer_value < minimum_other_buyer_value
             or (
                 self.buyer_breadth == 1
                 and self.largest_buyer_purchase_value_usd
@@ -1380,6 +1480,28 @@ class Form4StockSignalFormulaIdentity:
         if raw_score <= 0:
             raise Form4StockSignalFormulaDiagnosticsError(
                 "REFUSED: raw stock-score diagnostic must be positive"
+            )
+        maximum_event_score = _event_formula(
+            _MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD,
+            0,
+        )[2]
+        minimum_event_score = _event_formula(
+            FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD,
+            FORM4_STOCK_SIGNAL_LOOKBACK_TRADING_DAYS,
+        )[2]
+        maximum_raw_score = exact_decimal_multiply(
+            maximum_event_score,
+            self.included_event_count,
+            name="IB-3A maximum raw stock-score diagnostic",
+        )
+        minimum_raw_score = exact_decimal_multiply(
+            minimum_event_score,
+            self.included_event_count,
+            name="IB-3A minimum raw stock-score diagnostic",
+        )
+        if raw_score < minimum_raw_score or raw_score > maximum_raw_score:
+            raise Form4StockSignalFormulaDiagnosticsError(
+                "REFUSED: raw stock-score diagnostic is outside the admitted event envelope"
             )
         _require_zero_authority(self)
         expected_id = (
@@ -1712,10 +1834,14 @@ def build_form4_stock_signal_formula_diagnostics(
     _require_frozen_policy()
 
     fingerprints_by_identity: dict[int, str] = {}
+    validated_events: list[Form4StockSignalFixtureEvent] = []
     for event in events:
-        fingerprint = _require_factory_fixture_event(event)
+        snapshot, fingerprint = _snapshot_factory_fixture_event(event)
         fingerprints_by_identity[id(event)] = fingerprint
-    ordered_events = tuple(sorted(events, key=lambda event: event.source_event_id))
+        validated_events.append(snapshot)
+    ordered_events = tuple(
+        sorted(validated_events, key=lambda event: event.source_event_id)
+    )
     source_event_ids = tuple(event.source_event_id for event in ordered_events)
     fixture_event_ids = tuple(event.fixture_event_id for event in ordered_events)
     if (
@@ -1777,7 +1903,7 @@ def build_form4_stock_signal_formula_diagnostics(
         stock_score=None,
         _verified_factory_token=_RESULT_FACTORY_TOKEN,
     )
-    for event in ordered_events:
+    for event in events:
         if _require_factory_fixture_event(event) != fingerprints_by_identity[id(event)]:
             raise Form4StockSignalFormulaDiagnosticsError(
                 "REFUSED: synthetic fixture event changed during formula evaluation"

@@ -11,7 +11,13 @@ import subprocess
 import sys
 from dataclasses import fields
 from datetime import date, datetime
-from decimal import Decimal, DivisionByZero, InvalidOperation, localcontext
+from decimal import (
+    Context,
+    Decimal,
+    DivisionByZero,
+    InvalidOperation,
+    localcontext,
+)
 from pathlib import Path
 
 import pytest
@@ -164,8 +170,7 @@ def test_ib3a_contract_and_numeric_policy_are_frozen():
         "exp(-ln(2) * age_trading_days / 20)"
     )
     assert signal_module.FORM4_STOCK_SIGNAL_FRESHNESS_EVALUATION == (
-        "exact whole half-lives times a 50-digit fractional-half-life "
-        "projection"
+        "50-digit whole- and fractional-half-life projection"
     )
     assert signal_module.FORM4_STOCK_SIGNAL_EVENT_SCORE_FORMULA == (
         "event_size * freshness"
@@ -179,8 +184,8 @@ def test_ib3a_contract_and_numeric_policy_are_frozen():
         "/ total_purchase_value"
     )
     assert signal_module.FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH == (
-        "56eddf2fd800f022102c8c705211dc402"
-        "fe52cef3a4ba7eb39ea8959d7b0ac2e"
+        "a514e5d9548fe4b7a9cc010767ff06e5"
+        "0ee3831b5225fd4ddc38d95ec4c1f11d"
     )
     assert signal_module.MAX_FORM4_STOCK_SIGNAL_EVENTS == 10_000
     assert signal_module.MAX_FORM4_STOCK_SIGNAL_ROLES_PER_EVENT == 16
@@ -1242,6 +1247,217 @@ def test_breadth_replay_refuses_impossible_included_value_claims(updates):
         )
 
 
+@pytest.mark.parametrize("included_event_count", (1, 2))
+def test_standalone_breadth_replay_enforces_the_input_value_envelope(
+    included_event_count,
+):
+    maximum_input = signal_module._MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD
+    events = (
+        (_event(1, purchase_value_usd=maximum_input),)
+        if included_event_count == 1
+        else (
+            _event(1, purchase_value_usd=maximum_input),
+            _event(
+                2,
+                transaction_date=date(2026, 8, 19),
+                purchase_value_usd=maximum_input,
+            ),
+        )
+    )
+    maximum_total = signal_module.exact_decimal_multiply(
+        maximum_input,
+        included_event_count,
+        name="test maximum breadth total",
+    )
+    boundary = _build(*events).breadth
+    assert boundary.total_purchase_value_usd == maximum_total
+    assert boundary.largest_buyer_purchase_value_usd == maximum_total
+    _replay_breadth(boundary)
+
+    impossible = signal_module.exact_decimal_add(
+        maximum_total,
+        Decimal("1e256"),
+        name="test impossible breadth total",
+    )
+    forged = _rehash_breadth(
+        boundary,
+        total_purchase_value_usd=impossible,
+        largest_buyer_purchase_value_usd=impossible,
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="cannot arise from qualifying buyers",
+    ):
+        _replay_breadth(forged)
+
+
+def test_standalone_breadth_replay_binds_event_count_to_buyer_date_capacity():
+    result = _build(_event(1))
+    forged = _rehash_breadth(
+        result.breadth,
+        included_event_count=2,
+        total_purchase_value_usd=Decimal("100000"),
+        largest_buyer_purchase_value_usd=Decimal("100000"),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="aggregation-key capacity",
+    ):
+        _replay_breadth(forged)
+
+
+@pytest.mark.parametrize(
+    ("total", "largest", "dollar_breadth"),
+    (
+        (Decimal("1000000"), Decimal("100000"), Decimal("0.9")),
+        (Decimal("100000"), Decimal("75000"), Decimal("0.25")),
+    ),
+    ids=("total-exceeds-largest-times-buyers", "other-buyer-below-minimum"),
+)
+def test_standalone_breadth_replay_refuses_impossible_buyer_concentration(
+    total,
+    largest,
+    dollar_breadth,
+):
+    result = _build(_event(1), _event(2, buyer_id="buyer-2"))
+    forged = _rehash_breadth(
+        result.breadth,
+        total_purchase_value_usd=total,
+        largest_buyer_purchase_value_usd=largest,
+        dollar_breadth=dollar_breadth,
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="cannot arise from qualifying buyers",
+    ):
+        _replay_breadth(forged)
+
+
+def test_standalone_breadth_replay_enforces_pigeonhole_largest_buyer_minimum():
+    result = _build(
+        _event(1),
+        _event(2, transaction_date=date(2026, 8, 19)),
+        _event(3, buyer_id="buyer-2"),
+    )
+    forged = _rehash_breadth(
+        result.breadth,
+        largest_buyer_purchase_value_usd=Decimal("75000"),
+        dollar_breadth=Decimal("0.5"),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="cannot arise from qualifying buyers",
+    ):
+        _replay_breadth(forged)
+
+
+def test_standalone_breadth_replay_enforces_per_buyer_date_maximum():
+    result = _build(_event(1), _event(2, buyer_id="buyer-2"))
+    maximum_input = signal_module._MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD
+    total = signal_module.exact_decimal_multiply(
+        maximum_input,
+        2,
+        name="test two-event maximum total",
+    )
+    impossible_largest = signal_module.exact_decimal_multiply(
+        maximum_input,
+        Decimal("1.5"),
+        name="test impossible one-date buyer total",
+    )
+    forged = _rehash_breadth(
+        result.breadth,
+        total_purchase_value_usd=total,
+        largest_buyer_purchase_value_usd=impossible_largest,
+        dollar_breadth=Decimal("0.25"),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="cannot arise from qualifying buyers",
+    ):
+        _replay_breadth(forged)
+
+
+@pytest.mark.parametrize("included_event_count", (1, 10_000))
+def test_standalone_identity_replay_enforces_the_event_score_envelope(
+    included_event_count,
+):
+    maximum_event_score = signal_module._event_formula(
+        signal_module._MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD,
+        0,
+    )[2]
+    maximum_raw_score = signal_module.exact_decimal_multiply(
+        maximum_event_score,
+        included_event_count,
+        name="test maximum raw score",
+    )
+    boundary = _rehash_identity(
+        _build(_event(1)).identity,
+        fixture_event_count=included_event_count,
+        contribution_count=included_event_count,
+        included_event_count=included_event_count,
+        raw_stock_score_diagnostic=maximum_raw_score,
+    )
+    _replay_identity(boundary)
+
+    impossible = signal_module.exact_decimal_add(
+        maximum_raw_score,
+        Decimal("1e-60"),
+        name="test impossible raw score",
+    )
+    forged = _rehash_identity(
+        boundary,
+        raw_stock_score_diagnostic=impossible,
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="outside the admitted event envelope",
+    ):
+        _replay_identity(forged)
+
+
+def test_standalone_identity_replay_enforces_the_minimum_event_score_envelope():
+    minimum_raw_score = signal_module._event_formula(
+        signal_module.FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD,
+        signal_module.FORM4_STOCK_SIGNAL_LOOKBACK_TRADING_DAYS,
+    )[2]
+    result = _build(
+        _event(
+            1,
+            age_trading_days=signal_module.FORM4_STOCK_SIGNAL_LOOKBACK_TRADING_DAYS,
+        )
+    )
+    assert result.identity.raw_stock_score_diagnostic == minimum_raw_score
+    _replay_identity(result.identity)
+
+    forged = _rehash_identity(
+        result.identity,
+        raw_stock_score_diagnostic=Decimal("1e-256"),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="outside the admitted event envelope",
+    ):
+        _replay_identity(forged)
+
+
+def test_maximum_age_freshness_uses_the_frozen_50_digit_projection():
+    freshness = signal_module._event_formula(
+        signal_module.FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD,
+        signal_module.MAX_FORM4_STOCK_SIGNAL_AGE_TRADING_DAYS,
+    )[1]
+    whole_half_lives = (
+        signal_module.MAX_FORM4_STOCK_SIGNAL_AGE_TRADING_DAYS
+        // signal_module.FORM4_STOCK_SIGNAL_HALF_LIFE_TRADING_DAYS
+    )
+    with localcontext(signal_module._new_decimal_context()):
+        projected = Decimal("0.5") ** whole_half_lives
+    with localcontext(Context(prec=400)):
+        higher_precision = Decimal("0.5") ** whole_half_lives
+
+    assert freshness == projected
+    assert freshness != higher_precision
+
+
 def test_event_count_preflight_runs_before_any_formula_work(monkeypatch):
     monkeypatch.setattr(signal_module, "MAX_FORM4_STOCK_SIGNAL_EVENTS", 1)
 
@@ -1621,6 +1837,92 @@ def test_seal_detects_representation_drift_during_formula_evaluation(
         match="changed during formula evaluation|unsealed or mutated",
     ):
         _build(event)
+
+
+def test_builder_consumes_a_snapshot_not_the_callers_mutable_alias():
+    event = _event(1)
+    result = _build(event)
+
+    object.__setattr__(event, "purchase_value_usd", Decimal("100000"))
+    try:
+        assert result.events[0] is not event
+        assert result.events[0].purchase_value_usd == Decimal("50000")
+        assert result.contributions[0].purchase_value_usd == Decimal("50000")
+        assert result.breadth.total_purchase_value_usd == Decimal("50000")
+        assert result.to_payload()["events"][0]["purchase_value_usd"] == "50000"
+        _replay_result(result)
+    finally:
+        object.__setattr__(event, "purchase_value_usd", Decimal("50000"))
+
+
+@pytest.mark.parametrize(
+    "transient_value",
+    (
+        Decimal("100000"),
+        Decimal((0, (5, 0, 0, 0, 0, 0, 0), -2)),
+    ),
+    ids=("different-value", "equal-value-different-representation"),
+)
+def test_transient_aba_mutation_cannot_change_the_consumed_snapshot(
+    monkeypatch,
+    transient_value,
+):
+    event = _event(1)
+    original_value = event.purchase_value_usd
+    original_tuple = original_value.as_tuple()
+    real_require = signal_module._require_factory_fixture_event
+
+    def expose_registered_state_only_during_seal_check(value):
+        if value is not event:
+            return real_require(value)
+        object.__setattr__(event, "purchase_value_usd", original_value)
+        fingerprint = real_require(value)
+        object.__setattr__(event, "purchase_value_usd", transient_value)
+        return fingerprint
+
+    monkeypatch.setattr(
+        signal_module,
+        "_require_factory_fixture_event",
+        expose_registered_state_only_during_seal_check,
+    )
+    try:
+        result = _build(event)
+        assert result.events[0] is not event
+        assert result.events[0].purchase_value_usd.as_tuple() == original_tuple
+        assert result.contributions[0].purchase_value_usd.as_tuple() == original_tuple
+        assert result.breadth.total_purchase_value_usd.as_tuple() == original_tuple
+        _replay_result(result)
+    finally:
+        object.__setattr__(event, "purchase_value_usd", original_value)
+
+
+def test_final_input_seal_check_detects_mutation_after_result_construction(
+    monkeypatch,
+):
+    event = _event(1)
+    result_type = signal_module.Form4StockSignalFormulaDiagnostics
+
+    def mutate_after_result_construction(**kwargs):
+        result = result_type(**kwargs)
+        object.__setattr__(event, "purchase_value_usd", Decimal("100000"))
+        return result
+
+    monkeypatch.setattr(
+        signal_module,
+        "Form4StockSignalFormulaDiagnostics",
+        mutate_after_result_construction,
+    )
+    try:
+        with pytest.raises(
+            signal_module.Form4StockSignalFormulaDiagnosticsError,
+            match=(
+                "changed during formula evaluation|unsealed or mutated|"
+                "fixture event ID is inconsistent"
+            ),
+        ):
+            _build(event)
+    finally:
+        object.__setattr__(event, "purchase_value_usd", Decimal("50000"))
 
 
 @pytest.mark.parametrize(

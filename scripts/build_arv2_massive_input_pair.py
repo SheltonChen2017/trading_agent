@@ -80,8 +80,8 @@ _CLOCK_SEMANTICS = (
     ),
     (
         MassiveSourceRole.CORPORATE_GUIDANCE,
-        "unresolved_intraday_timezones_date_only_three_session_lag_and_prior_"
-        "calendar_date_censoring",
+        "unresolved_intraday_timezones_date_only_three_session_lag_and_"
+        "exact_offset_or_prior_calendar_date_censoring",
     ),
 )
 _KNOWN_RATING_ACTIONS = frozenset(

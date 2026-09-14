@@ -87,13 +87,14 @@ class _ReviewedOwnerPublicKey:
 # Security boundary: installing a key requires editing and independently
 # reviewing this exact source file.  Do not populate this registry from an
 # environment variable, CLI flag, file, network response, or caller argument.
-# Owner-created 2026-09-12.  This is public verification material only; the
+# Owner-rotated 2026-09-13 after the original key's passphrase was lost.  This
+# is public verification material only; the
 # private key and its passphrase are neither read nor stored by this lane.
 _REVIEWED_OWNER_PUBLIC_KEYS: tuple[_ReviewedOwnerPublicKey, ...] = (
     _ReviewedOwnerPublicKey(
-        key_id="arv2-owner-ed25519-21d1ae9d964ec350",
+        key_id="arv2-owner-ed25519-4ba35c490d6bd18d",
         public_key_base64=(
-            "AAAAC3NzaC1lZDI1NTE5AAAAIA2kYwmz2Tc/F2tfAqo7xQlM/doV0nI1viXyOvUkcsQE"
+            "AAAAC3NzaC1lZDI1NTE5AAAAIMscSpkCpc6Wb6zXpZjYm7CIXgtH7H0cq4Yryfcvacji"
         ),
         purposes=(
             FORMAL_EXECUTION_PURPOSE,

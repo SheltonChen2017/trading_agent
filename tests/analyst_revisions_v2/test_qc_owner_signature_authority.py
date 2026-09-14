@@ -177,9 +177,9 @@ def test_production_registry_pins_every_owner_authorized_preformal_purpose():
     pin = authority._REVIEWED_OWNER_PUBLIC_KEYS[0]
     blob, allowed = authority._validate_reviewed_pin(pin)
 
-    assert pin.key_id == "arv2-owner-ed25519-21d1ae9d964ec350"
+    assert pin.key_id == "arv2-owner-ed25519-4ba35c490d6bd18d"
     assert hashlib.sha256(blob).hexdigest() == (
-        "21d1ae9d964ec3503e483135254bfff4e25781de75fbad4413f0d0b71211f77e"
+        "4ba35c490d6bd18d790642ebd401d6c6832822d3c3f607d978ab0a046353f27e"
     )
     assert pin.purposes == (
         authority.FORMAL_EXECUTION_PURPOSE,
@@ -191,7 +191,7 @@ def test_production_registry_pins_every_owner_authorized_preformal_purpose():
     )
     assert allowed == (
         b"arv2-owner ssh-ed25519 "
-        b"AAAAC3NzaC1lZDI1NTE5AAAAIA2kYwmz2Tc/F2tfAqo7xQlM/doV0nI1viXyOvUkcsQE\n"
+        b"AAAAC3NzaC1lZDI1NTE5AAAAIMscSpkCpc6Wb6zXpZjYm7CIXgtH7H0cq4Yryfcvacji\n"
     )
 
 
@@ -1409,8 +1409,8 @@ def test_production_module_has_no_signing_or_private_key_surface():
         and node.value in {"sign", "-t", "ed25519", "-N"}
         for node in ast.walk(tree)
     )
-    assert "arv2-owner-ed25519-21d1ae9d964ec350" in source
-    assert "AAAAC3NzaC1lZDI1NTE5AAAAIA2kYwmz2Tc/F2tfAqo7xQlM/doV0nI1viXyOvUkcsQE" in source
+    assert "arv2-owner-ed25519-4ba35c490d6bd18d" in source
+    assert "AAAAC3NzaC1lZDI1NTE5AAAAIMscSpkCpc6Wb6zXpZjYm7CIXgtH7H0cq4Yryfcvacji" in source
     assert shutil.which("ssh-keygen") is not None
 
 

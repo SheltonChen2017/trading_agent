@@ -1,18 +1,20 @@
 # Short Interest ETF Strategy — implementation and session record
 
 Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `c9d6923` AND `ba64d61`
-COMMIT BY COMMIT (SECTION 47): THE TEST-ONLY CORRECTION IS ACCEPTED; THE
-RECORD COMMIT IS ACCEPTED AFTER FOUR P3 RECORD-ONLY CORRECTIONS. INDEPENDENT
-REMOVAL OF EACH PINNED GUARD TURNS ITS NEW TEST RED, AND BOTH TESTS PASS ON THE
-RESTORED EXACT TREE. NO PRODUCTION OR TEST CORRECTION WAS REQUIRED AND NO
-IN-LANE P0, P1 OR P2 WAS FOUND. THE SHARED P2 `SI-CR5-005` /
-`SI-CCR16-007` REMAINS OPEN FOR THE OWNER. THE NEXT TECHNICAL TRANCHE WOULD BE
-SI-3E-P1 EXACT STOCK PERCENTILE/SEED POLICY, BUT IT IS BLOCKED PENDING THE
-OWNER'S FREEZE OF THE PERCENTILE DENOMINATOR/ENDPOINTS, BOUNDARY-TIE RULE,
-SMALL-N BEHAVIOR, PRESSURE/COVERING SYMMETRY, AND INVESTABILITY PARAMETERS;
-NO MILESTONE WAS STARTED. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED;
-AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL PROVIDER,
-LICENSED-DATA, OUTCOME, HOLDOUT, PERCENTILE/RANKING/SEEDING, INVESTABILITY,
+COMMIT BY COMMIT (SECTION 47) AND IMPLEMENTED THE OWNER-FROZEN SI-3E-P1A
+EXACT STRUCTURAL STOCK-PERCENTILE PROJECTION AT `0f8600d` (SECTION 48).
+SI-3E-P1A USES EXACT `p=(2L+E)/(2N)`, INDIVISIBLE TIES, INCLUSIVE 90TH/10TH
+BOUNDARIES, PERCENTILES FOR `N>=1`, AND THRESHOLD CLASSIFICATION ONLY FOR
+`N>=10`. PAIRED PRESSURE-ROLE AND COVERING-ROLE `role_percentile` VALUES ARE
+MECHANICAL COMPLEMENTS; BOTH ROWS CARRY THE SAME PRESSURE-ORIENTED
+`pressure_percentile`. FUTURE OUTCOMES MUST BE EVALUATED INDEPENDENTLY.
+INVESTABILITY REMAINS FALSE,
+EVERY CANDIDATE IS STRUCTURAL ONLY, AND SEED-SELECTION AUTHORITY REMAINS
+FALSE. SI-3E-P1A IS PENDING THIS LANE-RECORD COMMIT, THE ROUND'S SINGLE
+COMBINED PUSH, AND THEN CLAUDE'S INDEPENDENT REVIEW. THE SHARED P2
+`SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN FOR THE OWNER. NO PERMANENT CELL OR
+OUTCOME LOOK HAS BEEN ALLOCATED; AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN
+ZERO. ALL PROVIDER, LICENSED-DATA, OUTCOME, HOLDOUT, SEEDING, INVESTABILITY,
 ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
 PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
 
@@ -164,6 +166,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-09 | Codex counter-review | `d774195` -> `9047375` reviewed; this record commit follows | Counter-review of Claude's SI-3D test correction and review record | Dispositioned both Claude commits individually. Accepted the two reachable-guard tests after independent focused, mutation, scope and error-contract checks. Superseded three record inaccuracies, closed the unreachable-guard and quadratic-read advisories as non-defect observations under the current contract, and recorded the owner's lane-only validation direction. No production or test file changed. | Exact nine-file Short Interest lane on the unchanged code/test tree: **527 passed in 1,178.80s (19m38s)**. New-test focus: **2 passed in 41.54s**; seven independent in-memory guard-removal probes confirmed the tests are load-bearing. Final active-document, compile, diff and status results follow in section 44. Synthetic/offline only; **0 authorized looks, 0 consumed looks**. No complete-repository suite was run. | `SI-CCR18-001..004` P3 closed by section 44. `SI-CR6-002` and `SI-CR6-003` closed as non-defect observations. Shared `SI-CR5-005` / `SI-CCR16-007` remains open and out of lane. | The owner's subsequent instruction authorizes one parameter-free SI-3E-P0 score-order/tie-inventory milestone, followed by one lane-only push. No provider, outcome, ETF or QuantConnect gate is lifted. |
 | 2026-09-09 | Codex implementation | `9047375` -> `dc2055c` (counter-review record `22a889d`, code/test snapshot `dc2055c`; this lane-record commit follows) | SI-3E-P0 exact stock score-order/tie inventory and Claude review handoff | Added a parameter-free, content-addressed exact sufficient statistic over authenticated SI-3D: release-local lower/equal/higher/scoreable counts for pressure and covering roles, terminal-row retention, exact tie-equivalence witnesses, complete embedded lineage verification, detached callback-free capture, coherent-forgery refusal and fail-before-every-yield sabotage detection. It deliberately emits no percentile, rank, seed, investability, ETF, outcome or operational decision. | Exact ten-file Short Interest lane: **570 passed in 1,534.57s (25m34s)**. Final focused hardening selectors and red/green evidence are in section 45; active-document, lane compilation, diff and status checks are recorded there. Two independent exact-byte audits accepted after correction with no open in-lane P0-P3. Synthetic/offline only; **0 authorized looks, 0 consumed looks**. No complete-repository suite was run. | `SI3EP0-REV-001..010` are closed in section 45. The O(N²) iterator scan is retained as a bounded non-defect tradeoff under the current fail-before-every-yield contract. Shared `SI-CR5-005` / `SI-CCR16-007` remains open and out of lane. | Commit this record, verify exact root/branch/remote, then make exactly one push to `origin/codex/strategy-short-interest`. Claude reviews every commit in `9047375..pushed HEAD` independently. No later strategy, data, outcome, ETF, QC or operational milestone is authorized by inference. |
 | 2026-09-11 | Claude review | `9047375` -> `e1f7e48` reviewed; test-only correction at `c9d6923` (this record commit follows) | Independent review of the SI-3D counter-review record and the SI-3E-P0 exact score-order inventory | Reviewed the three pushed commits individually on the macOS lane worktree; local `HEAD` already equalled the fetched remote. Confirmed all four `SI-CCR18` corrections against the prior Claude record. Re-derived every exact `lower/equal/higher/scoreable` count with an independent naive O(N^2) oracle over single-release, four-release and tie-heavy fixtures (36 tie groups), and independently recomputed the equivalence-group, row and batch identities. Verified the pressure/covering mirror identity, terminal-row exclusion from denominators, the one-argument signature, the unexported package root, and the absence of any network, file, environment or subprocess surface. Removed 17 candidate guards together, then attributed each one individually to isolate three survivors, of which two fail open and are now pinned. | Ten-file lane **572 passed in 1,515.52s**; focused SI-3E-P0 file **45 passed in 368.33s**; active-document **69 passed**; compileall **exit 0**; `git diff --check` clean. Seventeen-guard removal **7 failed, 36 passed in 423.64s**, confirming the recorded 43 collected tests. No complete-repository suite, per the dedicated-lane direction. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0/P1/P2 in lane. `SI-CR7-001` (P3, closed, test-only), `SI-CR7-002` (P3, advisory, layered guard not pinned), `SI-CR7-003` (P3, process, self-reported), `SI-CR7-004` (P3, this ledger's own column count, self-reported). Shared `SI-CR5-005` stays open. | Codex counter-reviews `c9d6923` and this record commit before any next milestone; the percentile/tie policy, seed selection, investability universe and every provider, outcome, ETF, QC and trading gate remain closed. |
+| 2026-09-14 | Codex counter-review + implementation | `ba64d61` -> `0f8600d` (counter-review record `67cd803`, code/test snapshot `0f8600d`; this lane-record commit follows) | Counter-review of Claude's SI-3E-P0 correction + owner-approved SI-3E-P1A exact structural stock percentiles | Accepted `c9d6923`; accepted `ba64d61` after four record-only P3 corrections. Implemented a frozen, content-addressed exact percentile projection over the authenticated SI-3E-P0 inventory using `p=(2L+E)/(2N)`, indivisible ties, inclusive 90th/10th boundaries, percentile calculation for `N>=1`, and classification only for `N>=10`. Paired pressure-role and covering-role role percentiles are mechanical complements; both rows carry the same pressure-oriented percentile, while future outcomes must be evaluated independently. Output is structural threshold-candidate evidence only; investability and seed-selection authority remain false. | Exact eleven-file Short Interest lane: **615 passed in 6,115.14s (1h41m55s)**. Final focused SI-3E-P1A file: **43 passed in 635.08s (10m35s)**; exact-policy/boundary selection **18 passed**; final adversarial selection **6 passed**; active-document **69 passed** before and after the record update, including post-update runs in **46.74s** and **2.35s**; compileall exit 0; six dangerous-direction mutations turned their intended guards red and every file was restored byte-exact; final `git diff --check` clean. No complete-repository suite was run. Synthetic/offline only; **0 authorized looks, 0 consumed looks**. | `SI-CCR19-001..004` are closed in section 47. `SI3EP1A-REV-001..005` are closed; `REV-006` is an open nonblocking P3 advisory; `REV-007` is closed as a false-alarm/out-of-threat-model non-defect; `REV-008` is closed as a non-defect observation. Shared `SI-CR5-005` / `SI-CCR16-007` remains open and out of lane. | Commit this record, verify the remote remains `ba64d61`, and make the round's single push. Claude reviews every commit in `ba64d61..pushed HEAD`. Any investability/seed conversion, licensed/provider or outcome work, SI-4 ETF work, QuantConnect job, or operational action requires the applicable owner choice or authorization listed in section 48.8. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -6618,3 +6621,243 @@ lane, active-document, compile and diff validation; record commit; and the
 round's single push. Licensed SI-1/full SI-2, `S2`-`S4`, DTC delta/window `K`,
 SI-4 ETF work, outcomes, portfolios, QuantConnect jobs and all operational
 actions remain separately gated.
+
+## 48. SI-3E-P1A exact structural stock percentiles - 2026-09-14
+
+Codex implemented this milestone only after the owner's exact policy freeze on
+2026-09-14. This section supersedes section 47.4's pre-decision statement that
+the percentile tranche was blocked. It does not supersede any source,
+investability, outcome, QuantConnect or operational gate.
+
+### 48.1 Exact scope, snapshots and disposition
+
+| Item | Exact value |
+|---|---|
+| Counter-review base | `e1f7e48c137ba2f70201d076a46537c0954ae0cd` |
+| Synced Claude head | `ba64d611f890dc2d7f303f5eae88134f3e4b781f` |
+| Counter-review record | `67cd803cfb4a86e576b097fe9c5dd9ef79682db6` |
+| SI-3E-P1A code/test snapshot | `0f8600d2ece4d1a3c248aba0f8670ccccaf4ce39` |
+| Percentile policy ID | `si-stock-percentile-policy-v1` |
+| Percentile projection ID | `si-stock-percentile-projection-v1` |
+| Percentile policy SHA-256 | `08899fe5a586fe9472da859cfa9d89934b7771d47d8c3f552031ad1012c4f9d7` |
+| Production file SHA-256 | `5688c6099ec057a853c66e29adb39fefdbf0dd7306ab1aacb2e4af5efb357a0e` |
+| Test file SHA-256 | `d43c880ae44bfe209c07b2026d3f68fc80dd8f016dcc0ffd71080ad76b4f0438` |
+
+The two Claude commits remain dispositioned exactly as section 47 records:
+`c9d6923` is **accepted** and `ba64d61` is **accepted after record-only
+correction**. The implementation commit `0f8600d` is a stable Codex snapshot
+pending Claude's independent review; this section does not self-accept it.
+
+The milestone adds only:
+
+- `research/short_interest_etf/stock_percentile.py`; and
+- `tests/test_short_interest_stock_percentile.py`.
+
+No shared file, frozen project-wide document, provider adapter, outcome join,
+ETF aggregation, QuantConnect artifact or execution surface changed.
+
+### 48.2 Owner-frozen mathematical and policy contract
+
+For one authenticated, release-local, scoreable role population, let `L` be
+the number of values strictly below a row, `E` its exact tie-group size, and
+`N` the scoreable population. SI-3E-P1A freezes all of the following:
+
+1. The role percentile is the exact reduced rational
+   `p=(2L+E)/(2N)`. No float, interpolation or rounding enters the contract.
+2. Every exact equivalence group is indivisible. A threshold never splits a
+   tie group and the implementation does not force-fill a 10% quota.
+3. Percentiles are calculated for every scoreable population with `N>=1`.
+   Threshold classification is withheld for `1<=N<10` and begins at exactly
+   `N=10`.
+4. The boundaries are inclusive. A pressure-role row is a structural
+   candidate when its role/pressure percentile is at least `9/10`. A
+   covering-role row is a structural candidate when its covering-role
+   percentile is at least `9/10`, equivalently when its pressure percentile
+   is at most `1/10`.
+5. For paired pressure/covering rows, the pressure-role and covering-role
+   `role_percentile` values are mechanical complements because `C=-B`; both
+   rows carry the same pressure-oriented `pressure_percentile`. That arithmetic
+   identity does not assume symmetric return effects: any future pressure and
+   covering outcomes must be evaluated independently.
+6. The population is the authenticated structural scoreable population only.
+   No investability screen is applied. `threshold_candidate` means exactly
+   `threshold_candidate_not_seed`; seed-selection authority remains false.
+7. Terminal SI-3E-P0 rows remain present with no invented percentile or
+   threshold decision.
+
+The immutable policy binds the blueprint, preregistration, SI-0M research
+gate, SI-3C normalization policy, SI-3E-P0 inventory/schema versions,
+population scope, candidate meaning, thresholds, exact arithmetic, and its
+policy-level withheld authorities into one content-addressed payload. Row and
+batch payloads separately serialize every listed empirical and operational
+authority as false.
+
+### 48.3 Implemented safety and lineage contract
+
+`build_stock_percentile_projection` accepts exactly one exact
+`StockScoreOrderBatch`. It validates the SI-0M gate and canonical percentile
+policy, captures a detached callback-free copy of the complete authenticated
+SI-3E-P0 batch, and emits one canonically ordered disposition for every source
+row. The complete source batch is embedded once at batch level rather than
+duplicated in each row.
+
+Each disposition binds its source batch, source disposition, source slot,
+covering and S1 lineage, normalization cohort/policy, role, exact score-order
+counts, exact equivalence-group witness, percentile policy and projection ID.
+Slot and record identities separately bind semantic position and the exact
+source disposition. Row and batch payload key sets, schemas, enums, scalar
+types, aggregate counts and source order are closed and revalidated before
+serialization or exposure. The policy is frozen and self-validating; output
+row/batch types are frozen and closed-constructor. Returned payloads are
+detached; malformed, subclassed, coherently re-addressed, mutated or incomplete
+inputs fail closed. The builder remains unexported from the package root.
+
+The output carries explicit structural-calculation flags while every empirical
+and operational authority is false: network, FINRA, provider, source request,
+credential, licensed row, outcome, shared holdout, QuantConnect upload,
+processing, job and backtest, research-input execution, common-family outcome
+evaluation, integration, capital, broker, operator database, scheduler, paper
+and live trading, deployment, trading and production authority; no
+action-shaped order field is present.
+
+### 48.4 Mandatory P0-P3 implementation-review ledger
+
+Resolved reports and non-defect observations are retained rather than erased.
+There is no open in-lane P0, P1 or P2 at the committed snapshot.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for correction or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI3EP1A-REV-001 | P2 | Closed before implementation commit | `0f8600d` | row/batch structural validation | Equality-compatible integers, booleans and string subclasses could initially impersonate authenticated scalar values, including `0 == False` and `True == 1`; this weakened the exact serialized contract. | Read-only probes admitted integer `0` as a false candidate, boolean `True` as count 1, and `str` subclasses for schema/authority. | Financial/security contract values must be exact runtime types before equality or serialization. | Added exact-type preflight for every source-bound scalar, count, candidate, schema, authority, tuple and digest before comparison. | The focused adversarial scalar/subclass tests pass; mutating the candidate guard to admit integer `0` makes the exact-scalar regression fail because no refusal is raised. |
+| SI3EP1A-REV-002 | P2 | Closed before implementation commit | `0f8600d` | `StockPercentileCandidateState` validation | A caller able to mutate enum singleton state could make object identity, iteration and serialized state disagree. | Adversarial singleton-sabotage probe reproduced the divergence against the draft. | Candidate state is behavior-bearing and must remain a closed canonical enum. | Validation now pins the exact enum type, exact member dictionary keys, member identities and values before use. | Singleton-sabotage regression passes and restores the canonical enum in a `finally` path. |
+| SI3EP1A-REV-003 | P2 | Closed before implementation commit | `0f8600d` | percentile policy digest | Draft payloads emitted population scope and candidate meaning without hashing them into the policy identity. | A draft policy mutation could change those semantics without changing the policy digest. | Both fields decide what is classified and whether output can be mistaken for a seed. | Added `population_scope` and `candidate_semantic` as exact immutable policy fields and hash inputs; rows/batches emit them from the authenticated policy. | Omitting `candidate_semantic` from the policy hash makes the owner-policy regression red. |
+| SI3EP1A-REV-004 | P3 | Closed before implementation commit | `0f8600d` | row identity and output schemas | The draft did not bind an explicit projection ID into row identity and did not pin exact policy, row and batch payload key sets. Action-shaped additions or cross-projection ambiguity could escape focused assertions. | Independent schema/identity review found no recursive exact-key assertion and no row projection component. | Structural evidence needs a closed namespace and exact no-action payload surface. | Bound the projection ID into row slots/records; added exact policy/row/batch key-set tests, forbidden-key recursion, exact candidate-state values and a one-copy complete-source assertion. | Final schema/identity tests pass and the policy, row and batch payloads expose only their pinned keys. |
+| SI3EP1A-REV-005 | P3 | Closed before implementation commit | `0f8600d` | source/output capture and exposure tests | Draft tests did not cover several callback/TOCTOU directions inherited from earlier lane tranches. | Independent test review identified source serializer/property/iterator dispatch, mutation during gate callbacks, post-build source drift, coherent rehashing and fail-before-yield sabotage as dangerous directions. | The projection must authenticate one stable source view and refuse before exposing mutated output. | Added detached source capture, callback-free internal payload construction, post-callback revalidation, coherent-forgery checks, output-gate mutation checks and fail-before-next-yield tests. | Final adversarial selection **6 passed**; focused file **43 passed**. |
+| SI3EP1A-REV-006 | P3 | Open advisory; nonblocking | `0f8600d` | boundary-tie test topology | Exact 10th/90th boundary arithmetic is exercised by the count kernel and public-builder tests prove tie indivisibility, but one authentic public-builder fixture does not combine both properties at an exact boundary. | The upstream normalization fixture/minimum constraints make a compact authentic combined case disproportionately large; separate public and kernel paths cover the two invariants. | This is test-topology depth, not a known behavior defect. Weakening upstream contracts or fabricating unauthenticated rows would be worse evidence. | No production change. Retain for a later bounded fixture-hardening tranche if a compact authenticated construction becomes available. | All boundary, public tie, independent-oracle and complete-lane tests pass. |
+| SI3EP1A-REV-007 | P1 report, reclassified | Closed as false alarm/out-of-threat-model non-defect | `0f8600d` | module-global `hash_payload` | One nested review proposed that replacing the trusted module-global hash primitive with arbitrary executable code could mutate a previously validated frozen row during later hashing. | The attack requires modifying trusted imported module code rather than supplying a supported caller-owned input or callback; the primitive receives only exact built-in payload data. The established SI-3E-P0 path uses the same trusted primitive boundary. | Arbitrary in-process replacement of trusted validation code can bypass any Python validator and is not an exposed caller contract. Treating it as an input boundary would require a repository-wide runtime-integrity design, not a lane-local patch. | No code change. Recorded rather than silently discarded. | Separate callback-bearing boundaries and caller-owned values are covered by `REV-001`, `REV-002` and `REV-005`; no supported input can install this replacement. |
+| SI3EP1A-REV-008 | P3 | Closed as a non-defect observation | `0f8600d` | output authority wording | The payload carries `structural_threshold_classification_applied=true` when applicable while retaining the broader `ranking_decision_authorized=false`; a reviewer considered the latter name potentially ambiguous. | `candidate_semantic=threshold_candidate_not_seed`, `seed_selection_authorized=false`, `investability_screen_applied=false` and the structural-only authority appear in the same closed payload. | Calculation of a structural percentile is distinct from authorization to make a downstream investability/ranking/seed decision. The complete payload makes that separation explicit and no authority is admitted. | No schema churn before independent review. The observation is retained for naming consideration only if a later owner-approved schema version is created. | Exact payload-key and false-authority tests pass. |
+
+No new unrelated implementation defect was found. The pre-existing shared P2
+`SI-CR5-005` / `SI-CCR16-007` remains out of lane and deliberately unfixed.
+
+### 48.5 Validation and dangerous-direction evidence
+
+- Intended red state: before the new module existed, focused collection failed
+  with `ModuleNotFoundError`.
+- Exact final focused SI-3E-P1A file: **43 passed in 635.08s (10m35s)**.
+- Fast exact-policy/boundary selection: **18 passed**.
+- Final corrected adversarial selection: **6 passed**.
+- Exact complete eleven-file Short Interest lane: **615 passed in 6,115.14s
+  (1h41m55s)**. The eleven files are the availability, contracts, dataset,
+  import-boundary, PIT-eligibility, research-gate, stock-acceleration,
+  stock-features, stock-normalization, stock-score-order and stock-percentile
+  suites.
+- Active-document consistency: **69 passed in 16.15s** before the record and
+  **69 passed** after the section-48 update in **46.74s** and **2.35s**.
+- Lane-scoped compileall over `research/short_interest_etf` and `tests`: exit
+  **0**. `git diff --check`: clean after the final record update.
+
+Six dangerous-direction mutations were run separately and restored before any
+commit. Replacing `2L+E` with `2L` produced 13 focused failures; changing the
+inclusive threshold to strict `>` produced 4; starting classification at
+`N=9` produced 2; applying the pressure high-tail comparator to covering
+produced 3; omitting candidate meaning from the policy hash made the policy
+test fail; and accepting integer `0` as a false candidate made the exact-type
+test fail because no exception was raised. Git blob identities after restore
+were exactly `74806a12a303d8aa466361efeaaf1027b289aca2` for production and
+`4d6b6b5cb7caef884600a8f036804f8eb84a936a` for tests.
+
+Per the dedicated-lane direction, no complete-repository suite was run or
+claimed. The lane result says only that the Short Interest structural contract
+is internally guarded on synthetic/offline fixtures; it is not evidence of
+market efficacy.
+
+### 48.6 Access, looks and authority accounting
+
+All work used tracked documents, committed source and synthetic/offline
+fixtures. There was no credential, network/provider/programmatic FINRA request,
+licensed row, price, return/outcome, shared holdout or ETF holdings access; no
+QuantConnect artifact, upload, compile, processing, job or backtest; and no
+broker, capital, operator database, scheduler, integration, deployment,
+paper/live, order or trading action. **Permanent Short Interest cell/look:
+unallocated. Authorized outcome looks: 0. Consumed outcome looks: 0.**
+
+### 48.7 Quality, limits and independent-review handoff
+
+**SI-3E-P1A implementation quality: 9/10.** Exact financial arithmetic,
+owner-frozen boundaries, source lineage, authority separation, adversarial
+type/identity/callback defenses and dangerous-direction sensitivity are all
+pinned. The withheld point is the nonblocking public-builder boundary-tie
+fixture depth in `SI3EP1A-REV-006`, not a known arithmetic or authority defect.
+
+Claude must independently review every commit in `ba64d61..pushed HEAD`, with
+particular attention to:
+
+1. the exact `p=(2L+E)/(2N)` oracle and reduced-rational serialization;
+2. indivisible ties and inclusive exact 90th/10th boundary behavior;
+3. the `N>=1` calculation versus `N>=10` classification split;
+4. paired role-percentile complements and identical pressure-oriented
+   percentiles without assuming return symmetry;
+5. complete SI-3E-P0 lineage, source retention and release-local denominators;
+6. exact-type, closed-schema, enum, coherent-forgery and callback defenses;
+7. structural-candidate-only semantics with investability and seed authority
+   false; and
+8. the declared access/authority and validation accounting.
+
+Claude should retain every mandatory P0-P3 finding in this record, make only
+authorized Short Interest/QC-lane corrections, commit on this same branch and
+push once. Codex then counter-reviews every Claude commit before any subsequent
+milestone.
+
+### 48.8 Owner choices and authorizations still required
+
+SI-3E-P1A resolves only the five percentile-policy questions named in section
+47.4. The following remain owner gates; none is inferred from this milestone:
+
+1. **Shared-history disposition.** Decide how and where to record the missing
+   durable owner sentence for the 2026-09-05 follow-up fix and `13079d5`
+   alignment (`SI-CR5-005` / `SI-CCR16-007`). This lane may not repair shared
+   history itself.
+2. **Investability and seed conversion.** Freeze the stock investability
+   universe and PIT source/timing for price, volume/ADV, liquidity, market cap
+   and any security-type exclusions; choose lookback windows, thresholds,
+   missing/stale handling and whether threshold candidates can become actual
+   top/bottom seeds. Until then, investability and seed selection stay false.
+3. **Licensed source route.** Select and authorize the canonical historical
+   short-interest provider and any archived FINRA dissemination evidence;
+   confirm entitlement, credential handling, retention, redistribution,
+   revision, identifier, denominator and delisted-name coverage before full
+   SI-1/SI-2 ingest.
+4. **Research cell/look allocation.** Allocate the permanent within-lane
+   confirmatory alpha allocation and permanent look ID under the already frozen
+   common cutoff and shared-holdout terms before any outcome access. The
+   current maximum and familywise gate do not self-allocate a look.
+5. **Outcome design and access.** Honor the already frozen 20-session primary
+   horizon and next-release holding diagnostic; freeze the remaining benchmark,
+   exact outcome-label/join, corporate-action/delisting, censoring and
+   missing/terminal rules; and authorize the applicable price/outcome and
+   shared-holdout access. Pressure and covering effects must be tested
+   independently even though the paired role percentiles are mechanical
+   complements.
+6. **Later stock-score extensions.** Approve exact `S2`-`S4` formulas,
+   preregistration/weights and the DTC delta/window `K` before any such feature
+   or composite-score milestone.
+7. **ETF topology and rights.** Authorize the PIT ETF-holdings source and
+   usage rights, then freeze any still-open reverse-index, eligibility,
+   mapping, coverage, concentration and aggregation choices before SI-4.
+8. **QuantConnect processing.** Authorize a specific QC project/data
+   entitlement and each artifact upload, processing/compile, research job or
+   backtest. Local structural readiness grants none of these actions.
+9. **Paper/live operations.** Separately authorize integration ownership,
+   operator-database and scheduler access, deployment/monitoring/rollback,
+   broker/account access, capital, risk/position/order/execution limits and a
+   paper-trading promotion. A later live/autopilot promotion requires another
+   explicit owner sign-off after the prescribed evidence and reviews.
+10. **Inverse or leverage variants.** Any inverse-ETF implementation remains
+    contingent on the blueprint's negative absolute OOS result and a new
+    owner-approved 1x milestone. Leverage is not authorized in canonical V1.
+
+The next possible bounded code milestone is therefore an owner-defined
+investability/seed tranche or another explicitly sequenced Short Interest
+tranche. It is not authorized merely because SI-3E-P1A is complete. The
+immediate next action after the single push is Claude's independent review of
+this exact snapshot.

@@ -409,6 +409,47 @@ def test_reviewed_legacy_spec_is_retired_even_without_external_authority(
         authorize_outcome_access(spec, _request(raw))
 
 
+def test_reviewed_preregistration_binds_and_reauthenticates_infrastructure_ledger(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ledger_path = tmp_path / preregistration.INFRASTRUCTURE_LOOK_LEDGER_FILENAME
+    ledger_path.write_bytes(
+        preregistration.INFRASTRUCTURE_LOOK_LEDGER_PATH.read_bytes()
+    )
+    monkeypatch.setattr(
+        preregistration, "INFRASTRUCTURE_LOOK_LEDGER_PATH", ledger_path
+    )
+    path, raw = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+
+    assert tuple(look.look_id for look in spec.looks) == (LOOK_ID,)
+    with pytest.raises(PreregistrationError, match="superseded unspent"):
+        authorize_outcome_access(spec, _request(raw))
+
+    ledger_path.write_bytes(b"{}\n")
+    with pytest.raises(PreregistrationError, match="infrastructure-look ledger"):
+        require_reviewed_preregistration(spec)
+
+
+def test_reviewed_preregistration_refuses_ledger_path_substitution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    first = tmp_path / "first" / preregistration.INFRASTRUCTURE_LOOK_LEDGER_FILENAME
+    second = tmp_path / "second" / preregistration.INFRASTRUCTURE_LOOK_LEDGER_FILENAME
+    first.parent.mkdir()
+    second.parent.mkdir()
+    payload = preregistration.INFRASTRUCTURE_LOOK_LEDGER_PATH.read_bytes()
+    first.write_bytes(payload)
+    second.write_bytes(payload)
+    monkeypatch.setattr(preregistration, "INFRASTRUCTURE_LOOK_LEDGER_PATH", first)
+    path, _ = _anchored_spec(tmp_path, monkeypatch)
+    spec = load_reviewed_preregistration(path)
+
+    monkeypatch.setattr(preregistration, "INFRASTRUCTURE_LOOK_LEDGER_PATH", second)
+    with pytest.raises(PreregistrationError, match="infrastructure-look ledger"):
+        require_reviewed_preregistration(spec)
+
+
 def test_direct_spec_and_permit_forgery_refuse(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -791,7 +832,10 @@ def test_substituted_repository_authority_cannot_enable_access(
     monkeypatch.setattr(
         preregistration, "PERMANENT_LOOK_AUTHORITY_PATH", substituted
     )
-    with pytest.raises(PreregistrationError, match="superseded unspent"):
+    with pytest.raises(
+        PreregistrationError,
+        match="infrastructure-look ledger frozen ancestor changed",
+    ):
         authorize_outcome_access(spec, _request(raw))
 
 

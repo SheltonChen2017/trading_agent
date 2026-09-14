@@ -273,7 +273,10 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         """.split()
     ),
     "formal_run_protocol.py": tuple(
-        "__future__ dataclasses hashlib json os re stat datetime pathlib types typing".split()
+        """
+        __future__ dataclasses hashlib json os re stat datetime pathlib types typing
+        research.analyst_revisions_v2.preregistration
+        """.split()
     ),
     "formal_streaming_input.py": tuple(
         """
@@ -470,7 +473,7 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     "formal_evaluation_bridge.py": ("import:os",),
     "formal_evaluation.py": ("import:os",),
     "formal_input_bundle.py": ("import:os",),
-    "formal_qc_transport.py": ("import:os", "import:urllib"),
+    "formal_qc_transport.py": ("call:open", "import:os", "import:urllib"),
     "formal_run_protocol.py": ("call:open", "import:os", "import:pathlib"),
     "formal_streaming_bridge.py": ("call:open", "import:os", "import:pathlib"),
     "formal_streaming_input.py": ("call:open", "import:os", "import:pathlib"),
@@ -1644,6 +1647,7 @@ research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revision
 research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2.production_scoring
 research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2.production_truth_gate
 research.analyst_revisions_v2_qc.formal_qc_transport research.quantconnect
+research.analyst_revisions_v2_qc.formal_run_protocol research.analyst_revisions_v2.preregistration
 research.analyst_revisions_v2_qc.formal_streaming_bridge research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.formal_streaming_bridge research.analyst_revisions_v2.preopen_control_acquisition
 research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.canonical

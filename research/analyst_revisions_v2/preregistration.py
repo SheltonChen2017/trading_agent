@@ -14,9 +14,17 @@ from typing import Callable, Mapping
 
 from data.exchange_calendar import ExchangeCalendarError, is_trading_session
 
+from .artifact_io import (
+    ArtifactIOError,
+    read_stable_regular,
+    revalidate_regular,
+)
 from .canonical import (
+    CanonicalEvidenceError,
+    canonical_json_bytes,
     capture_frozen_container_authority,
     frozen_container_authority_is_current,
+    require_canonical_json_bytes,
 )
 from .dataset import (
     DatasetVerificationError,
@@ -186,6 +194,41 @@ PERMANENT_LOOK_AUTHORITY_PATH = (
     / "specs"
     / "permanent_look_authority.json"
 )
+INFRASTRUCTURE_LOOK_LEDGER_SCHEMA = "arv2-infrastructure-look-ledger-v1"
+INFRASTRUCTURE_LOOK_LEDGER_ID_PREFIX = "arv2-infrastructure-look-ledger-"
+INFRASTRUCTURE_LOOK_LEDGER_HASH = (
+    "ff61ca806563510dbe384d8801d2537c3655fe1432651f4d94673e14a7648457"
+)
+INFRASTRUCTURE_LOOK_LEDGER_FILENAME = (
+    f"arv2_infrastructure_look_ledger.{INFRASTRUCTURE_LOOK_LEDGER_HASH}.json"
+)
+INFRASTRUCTURE_LOOK_LEDGER_PATH = (
+    Path(__file__).resolve().parent / "specs" / INFRASTRUCTURE_LOOK_LEDGER_FILENAME
+)
+INFRASTRUCTURE_LOOK_LEDGER_ARTIFACT_SHA256 = (
+    "9502bc3b1662b5f2838d42d4adf6c8c91141395b89c9ba77edcd31542bd7d14f"
+)
+INFRASTRUCTURE_LOOK_LEDGER_MAX_BYTES = 64 * 1024
+INFRASTRUCTURE_LOOK_OWNER_DECISION_ID = (
+    "arv2-owner-arv2r49-002-accounting-20260913"
+)
+_QC_FIRST_PLAN_PATH = (
+    Path(__file__).resolve().parent / "specs" / "arv2_qc_first.draft.json"
+)
+_FOUR_FAMILY_MULTIPLICITY_PATH = (
+    Path(__file__).resolve().parent
+    / "specs"
+    / "arv2_four_family_multiplicity.structural.json"
+)
+_PERMANENT_LOOK_AUTHORITY_ARTIFACT_SHA256 = (
+    "819cb514dfcefd770bd1c0113cfa2484f521ac6dda0c0a36e98f977903ad5990"
+)
+_QC_FIRST_PLAN_ARTIFACT_SHA256 = (
+    "8339238dd5ce32ed7b351aab2662fb408cc7d9a3c62ff89bf8b1d14f20acd081"
+)
+_FOUR_FAMILY_MULTIPLICITY_ARTIFACT_SHA256 = (
+    "2e9f390ec54f01e6635b67972711c38212a5f853489e16c1de2a508212278648"
+)
 REVIEW_REGISTRY_SCHEMA = "arv2-reviewed-spec-registry-v1"
 PERMANENT_LOOK_AUTHORITY_SCHEMA = "arv2-permanent-look-authority-v1"
 ZERO_ACCESS_AUTHORITY_ID = "arv2-zero-access-no-external-authority"
@@ -219,6 +262,7 @@ _REVIEWED_AUTHORITIES: dict[
         Path,
         tuple[object, ...],
         tuple[object, ...],
+        "InfrastructureLookLedgerBinding",
     ],
 ] = {}
 _REVIEWED_AUTHORITIES_LOCK = threading.RLock()
@@ -381,6 +425,260 @@ def _canonical_payload(raw: Mapping[str, object]) -> bytes:
     ).encode("utf-8")
 
 
+def _infrastructure_look_ledger_seed() -> dict[str, object]:
+    """Return the owner-confirmed accounting record without its identity."""
+
+    return {
+        "schema": INFRASTRUCTURE_LOOK_LEDGER_SCHEMA,
+        "status": "owner_confirmed_frozen_infrastructure_look_accounting",
+        "authority": (
+            "accounting_only_no_source_outcome_alpha_family_qc_result_"
+            "deployment_order_or_trading_authority"
+        ),
+        "ledger_id": None,
+        "ledger_hash": None,
+        "ledger_sequence": 1,
+        "append_only_contract": {
+            "entry_count": 1,
+            "predecessor_entry_count": 0,
+            "predecessor_ledger_artifact_sha256": None,
+            "successor_must_retain_every_prior_entry": True,
+        },
+        "owner_decision": {
+            "decision_id": INFRASTRUCTURE_LOOK_OWNER_DECISION_ID,
+            "b5c_consumed_one_infrastructure_research_look": True,
+            "development_family_permanent_and_alpha_counts_remain_unchanged": True,
+            "ambiguous_submission_is_spent_and_nonretryable": True,
+            "this_accounting_artifact_grants_no_access_or_action_authority": True,
+        },
+        "frozen_ancestor_bindings": {
+            "permanent_look_authority": {
+                "artifact_sha256": _PERMANENT_LOOK_AUTHORITY_ARTIFACT_SHA256,
+                "authority_id": ZERO_ACCESS_AUTHORITY_ID,
+                "authority_mode": "zero_access",
+                "path": (
+                    "research/analyst_revisions_v2/specs/"
+                    "permanent_look_authority.json"
+                ),
+            },
+            "qc_first_plan": {
+                "artifact_sha256": _QC_FIRST_PLAN_ARTIFACT_SHA256,
+                "path": (
+                    "research/analyst_revisions_v2/specs/"
+                    "arv2_qc_first.draft.json"
+                ),
+                "plan_hash": (
+                    "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc"
+                ),
+            },
+            "four_family_multiplicity": {
+                "artifact_sha256": _FOUR_FAMILY_MULTIPLICITY_ARTIFACT_SHA256,
+                "overlay_hash": (
+                    "54ab0bb69fb6fa162ca3ba6764864b230136c68c017f1e6b669034dda75b806e"
+                ),
+                "path": (
+                    "research/analyst_revisions_v2/specs/"
+                    "arv2_four_family_multiplicity.structural.json"
+                ),
+            },
+        },
+        "entries": [
+            {
+                "accounting_id": "arv2-infrastructure-look-b5c-refusal-smoke-002",
+                "operation_id": "arv2-qc-b5c-refusal-smoke-002",
+                "look_class": "data_free_infrastructure_research_look",
+                "status": "LOCKED_BACKTEST_STATUS_AMBIGUITY",
+                "phase": "POLLING_STATS_FREE_TERMINAL_STATUS",
+                "started_at_utc": "2026-09-12T00:22:40.194284Z",
+                "finished_at_utc": "2026-09-12T00:22:47.656173Z",
+                "receipt_schema": "arv2-qc-b5c-refusal-smoke-receipt-v1",
+                "receipt_artifact_sha256": (
+                    "6cef656b40ac988afb1d81cf81784fcfad3ca7381ccfea0baabe4e14a6740fb3"
+                ),
+                "receipt_byte_count": 3639,
+                "driver_artifact_sha256": (
+                    "b19a489aca60394a2605363be5a1963a9401c37164c5f0da41ea2d45f39b70c0"
+                ),
+                "driver_byte_count": 34882,
+                "prior_receipt_artifact_sha256": (
+                    "f2c3fd7536100bb4a1e1e9a8f5e4b349ff73196d286de7916c8bed5d9930a7ae"
+                ),
+                "compile_state": "BuildSuccess",
+                "compile_submission_count": 1,
+                "backtest_submission_count": 1,
+                "conservative_research_look_count": 1,
+                "spent_before_submission": True,
+                "ambiguous_submission_consumes_look": True,
+                "retry_authorized": False,
+                "organization_binding_authenticated": True,
+                "sole_main_authenticated_before_compile": True,
+                "backtest_terminal_status_accessed": False,
+                "backtest_detail_endpoint_called": False,
+                "redacted_log_access_attempted": False,
+                "redacted_log_accessed": False,
+                "performance_statistics_inspected": False,
+                "production_inputs_accessed": False,
+                "market_data_accessed_by_algorithm": False,
+                "object_store_accessed_by_algorithm": False,
+                "provider_rows_accessed": False,
+                "orders_permitted": False,
+                "development_evaluation_consumed": False,
+                "permanent_family_look_consumed": False,
+                "confirmatory_alpha_consumed": False,
+                "error": (
+                    "backtests/list returned a forbidden statistics/result field"
+                ),
+            }
+        ],
+        "totals": {
+            "infrastructure_research_looks_spent": 1,
+            "development_evaluations_spent": 0,
+            "permanent_family_looks_spent": 0,
+            "confirmatory_alpha_spent": False,
+            "prospective_permanent_looks_remaining": 1,
+        },
+        "capabilities": {
+            "grants_source_access": False,
+            "grants_provider_access": False,
+            "grants_outcome_access": False,
+            "grants_infrastructure_look_authority": False,
+            "grants_development_evaluation_authority": False,
+            "grants_permanent_family_look_authority": False,
+            "grants_confirmatory_alpha_authority": False,
+            "grants_qc_access": False,
+            "grants_result_access": False,
+            "grants_deployment": False,
+            "grants_orders": False,
+            "grants_trading": False,
+        },
+    }
+
+
+def _identify_infrastructure_look_ledger(
+    seed: Mapping[str, object],
+) -> dict[str, object]:
+    document = dict(seed)
+    document["ledger_id"] = None
+    document["ledger_hash"] = None
+    digest = hashlib.sha256(canonical_json_bytes(document)).hexdigest()
+    document["ledger_hash"] = digest
+    document["ledger_id"] = INFRASTRUCTURE_LOOK_LEDGER_ID_PREFIX + digest[:24]
+    return document
+
+
+def _infrastructure_look_ledger_document() -> dict[str, object]:
+    return _identify_infrastructure_look_ledger(
+        _infrastructure_look_ledger_seed()
+    )
+
+
+@dataclasses.dataclass(frozen=True)
+class InfrastructureLookLedgerBinding:
+    path: Path
+    payload: bytes
+    ledger_id: str
+    ledger_hash: str
+    artifact_sha256: str
+
+
+def load_infrastructure_look_ledger() -> InfrastructureLookLedgerBinding:
+    """Authenticate the additive accounting sidecar and frozen ancestors."""
+
+    try:
+        resolved, payload = read_stable_regular(
+            INFRASTRUCTURE_LOOK_LEDGER_PATH,
+            name="infrastructure-look ledger",
+            maximum_bytes=INFRASTRUCTURE_LOOK_LEDGER_MAX_BYTES,
+        )
+    except ArtifactIOError as exc:
+        raise PreregistrationError("infrastructure-look ledger is unavailable") from exc
+    artifact_sha256 = hashlib.sha256(payload).hexdigest()
+    if artifact_sha256 != INFRASTRUCTURE_LOOK_LEDGER_ARTIFACT_SHA256:
+        raise PreregistrationError("infrastructure-look ledger artifact hash changed")
+    try:
+        raw = require_canonical_json_bytes(payload, "infrastructure-look ledger")
+    except CanonicalEvidenceError as exc:
+        raise PreregistrationError("infrastructure-look ledger is not canonical") from exc
+    if not isinstance(raw, dict):
+        raise PreregistrationError("infrastructure-look ledger must be an object")
+    expected = _infrastructure_look_ledger_document()
+    expected_payload = canonical_json_bytes(expected)
+    if payload != expected_payload:
+        raise PreregistrationError("infrastructure-look ledger content changed")
+    if (
+        expected["ledger_hash"] != INFRASTRUCTURE_LOOK_LEDGER_HASH
+        or resolved.name != INFRASTRUCTURE_LOOK_LEDGER_FILENAME
+    ):
+        raise PreregistrationError("infrastructure-look ledger identity changed")
+
+    ancestor_specs = (
+        (
+            PERMANENT_LOOK_AUTHORITY_PATH,
+            _PERMANENT_LOOK_AUTHORITY_ARTIFACT_SHA256,
+            "permanent-look authority ancestor",
+        ),
+        (
+            _QC_FIRST_PLAN_PATH,
+            _QC_FIRST_PLAN_ARTIFACT_SHA256,
+            "QC-first plan ancestor",
+        ),
+        (
+            _FOUR_FAMILY_MULTIPLICITY_PATH,
+            _FOUR_FAMILY_MULTIPLICITY_ARTIFACT_SHA256,
+            "four-family multiplicity ancestor",
+        ),
+    )
+    authenticated_ancestors: list[tuple[Path, bytes, str]] = []
+    try:
+        for path, digest, name in ancestor_specs:
+            ancestor_path, ancestor_payload = read_stable_regular(
+                path,
+                name=name,
+                maximum_bytes=INFRASTRUCTURE_LOOK_LEDGER_MAX_BYTES,
+            )
+            if hashlib.sha256(ancestor_payload).hexdigest() != digest:
+                raise PreregistrationError(
+                    "infrastructure-look ledger frozen ancestor changed"
+                )
+            authenticated_ancestors.append((ancestor_path, ancestor_payload, name))
+        _require_zero_access_authority()
+        for ancestor_path, ancestor_payload, name in authenticated_ancestors:
+            revalidate_regular(
+                ancestor_path,
+                ancestor_payload,
+                name=name,
+                maximum_bytes=INFRASTRUCTURE_LOOK_LEDGER_MAX_BYTES,
+            )
+        revalidate_regular(
+            resolved,
+            payload,
+            name="infrastructure-look ledger",
+            maximum_bytes=INFRASTRUCTURE_LOOK_LEDGER_MAX_BYTES,
+        )
+    except ArtifactIOError as exc:
+        raise PreregistrationError(
+            "infrastructure-look ledger or frozen ancestor changed"
+        ) from exc
+    return InfrastructureLookLedgerBinding(
+        path=resolved,
+        payload=payload,
+        ledger_id=str(expected["ledger_id"]),
+        ledger_hash=str(expected["ledger_hash"]),
+        artifact_sha256=artifact_sha256,
+    )
+
+
+def require_infrastructure_look_ledger(
+    binding: InfrastructureLookLedgerBinding,
+) -> InfrastructureLookLedgerBinding:
+    if type(binding) is not InfrastructureLookLedgerBinding:
+        raise PreregistrationError("infrastructure-look ledger binding changed")
+    loaded = load_infrastructure_look_ledger()
+    if loaded != binding:
+        raise PreregistrationError("infrastructure-look ledger binding changed")
+    return binding
+
+
 @dataclasses.dataclass(frozen=True)
 class PreregistrationCell:
     cell_id: str
@@ -535,7 +833,9 @@ def _reviewed_preregistration(
     source_path: str,
     artifact_sha256: str,
     review_commit: str,
+    infrastructure_look_ledger: InfrastructureLookLedgerBinding,
 ) -> ReviewedPreregistration:
+    require_infrastructure_look_ledger(infrastructure_look_ledger)
     value = object.__new__(ReviewedPreregistration)
     fields = {
         "spec_id": spec_id,
@@ -570,6 +870,7 @@ def _reviewed_preregistration(
             Path(source_path),
             fingerprint,
             frozen_container_authority,
+            infrastructure_look_ledger,
         )
     return value
 
@@ -759,7 +1060,14 @@ def _assert_review_authority(spec: ReviewedPreregistration) -> None:
         raise PreregistrationError(
             "review authority is not registered to this loader-created object"
         )
-    _, original_path, expected_fingerprint, frozen_container_authority = authority
+    (
+        _,
+        original_path,
+        expected_fingerprint,
+        frozen_container_authority,
+        infrastructure_look_ledger,
+    ) = authority
+    require_infrastructure_look_ledger(infrastructure_look_ledger)
     cells_root, looks_root, cell_value_roots = frozen_container_authority[0]
     if (
         getattr(spec, "cells", _MISSING_REVIEWED_ROOT) is not cells_root
@@ -1403,6 +1711,7 @@ def load_reviewed_preregistration(path: Path) -> ReviewedPreregistration:
     multiplicity = mutable_by_id["multiplicity_family"]
     if tuple(multiplicity["permanent_look_ids"]) != tuple(look.look_id for look in looks):
         raise PreregistrationError("multiplicity family does not cover every registered look")
+    infrastructure_look_ledger = load_infrastructure_look_ledger()
     source_path, artifact_hash, review_commit = _review_anchor(path, raw)
     return _reviewed_preregistration(
         spec_id=str(raw["spec_id"]),
@@ -1415,6 +1724,7 @@ def load_reviewed_preregistration(path: Path) -> ReviewedPreregistration:
         source_path=source_path,
         artifact_sha256=artifact_hash,
         review_commit=review_commit,
+        infrastructure_look_ledger=infrastructure_look_ledger,
     )
 
 

@@ -1180,3 +1180,30 @@ before any rerun; reruns will be new R-numbers.
 - Every historical conclusion remains unusable. A clean rerun begins only
   from the final independently counter-reviewed pushed head and is appended
   as R-005 or later; no old statistic may be copied forward.
+
+## R-030 — Analyst Revisions V2 B5C data-free infrastructure smoke (SPENT; LOCKED AMBIGUOUS; NO OUTCOME)
+
+This entry records an already-spent action; it does not launch a run, grant
+access, or authorize a retry. The intended initialization-refusal smoke used
+no production input and is not evidence about the strategy.
+
+| Field | Value |
+|---|---|
+| **Purpose / classification** | `data_free_infrastructure_research_look`; B5C one-file initialization-refusal smoke only |
+| **Research-look accounting** | Counted once (shared run-level look count **30 → 31**; ARV2 infrastructure looks **0 → 1**). **Zero** development evaluations, permanent-family looks, confirmatory-alpha looks, or alpha cells; the lifetime alpha-cell exposure floor remains **452**. |
+| **Source identity** | B5C projection introduced at `19b52d6`, independently reviewed through `37e2e64`, and counter-reviewed at `4b5e4e6`; uploaded sole `main.py` 3,328 bytes, SHA-256 `327f126311c12e9f37297f229a3946a6cb1f2bbe26ed6c746cf140b26c2e6bf9` |
+| **QC project / compile / backtest** | Project `36418640`, `1 ARV2_B5B_REFUSAL_SMOKE - 20260911`; compile `5e6230184c123e9e72b693bbe372641b-3af05f1ebc45736c49793d84adf33bc1` (`BuildSuccess`); backtest `c27cacff90618a3277387096219ab2fb` |
+| **Execution interval (UTC)** | 2026-09-12T00:22:40.194284Z → 2026-09-12T00:22:47.656173Z |
+| **Receipt state** | `LOCKED_BACKTEST_STATUS_AMBIGUITY`: the statistics-free list envelope contained a forbidden result/statistic-shaped field, so the driver stopped before reading its value, terminal status, or logs. The expected initialization refusal was **not authenticated**. |
+| **Access exclusions** | No provider row, production input, Object Store object, market datum, outcome, performance statistic, result value, terminal backtest status, detail endpoint, or log was accessed; no order was permitted. |
+| **Durable evidence** | Driver: 34,882 bytes, SHA-256 `b19a489aca60394a2605363be5a1963a9401c37164c5f0da41ea2d45f39b70c0`. Receipt: 3,639 bytes, schema `arv2-qc-b5c-refusal-smoke-receipt-v1`, SHA-256 `6cef656b40ac988afb1d81cf81784fcfad3ca7381ccfea0baabe4e14a6740fb3`. Full evidence and endpoint counts are recorded in Analyst Revisions V2 section 68.2. |
+| **Retry / inference** | **No retry.** Ambiguity consumes the one infrastructure look. This is neither a formal ARV2 outcome nor evidence for or against alpha. |
+
+**Cumulative ledger state after R-030:** **31** run-level looks are recorded:
+the 30 prior real-market runs through R-029 plus this one data-free
+infrastructure look. The cross-sectional lifetime alpha-cell exposure floor
+remains **452**, and APQ's separate three-cell family is unchanged. For ARV2,
+one infrastructure look is spent; development evaluations and
+permanent-family looks remain zero; confirmatory alpha remains unspent; one
+prospective permanent look remains. This accounting grants no provider, QC,
+outcome, result, deployment, order, or trading authority.

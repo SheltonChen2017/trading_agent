@@ -26,6 +26,13 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Mapping
 
+from research.analyst_revisions_v2.preregistration import (
+    InfrastructureLookLedgerBinding,
+    PreregistrationError,
+    load_infrastructure_look_ledger,
+    require_infrastructure_look_ledger,
+)
+
 
 class FormalRunProtocolError(ValueError):
     """A formal-run input, review receipt, or one-use claim is invalid."""
@@ -36,8 +43,8 @@ STATUS = "candidate_pending_independent_review_and_counterreview"
 AUTHORITY = "pre_submission_structure_only_no_qc_or_outcome_action_authority"
 EVALUATION_ID = "arv2-eval-stock-historical-qc-001"
 OWNER_DECISION_ID = "arv2-owner-first-formal-primary-plus-2021-2025-20260911"
-REVIEW_RECEIPT_SCHEMA = "arv2-formal-run-reviewed-authority-v1"
-EXTERNAL_REVIEW_PIN_SCHEMA = "arv2-formal-run-external-review-pin-v1"
+REVIEW_RECEIPT_SCHEMA = "arv2-formal-run-reviewed-authority-v2"
+EXTERNAL_REVIEW_PIN_SCHEMA = "arv2-formal-run-external-review-pin-v2"
 CLAIM_RECEIPT_SCHEMA = "arv2-formal-run-one-use-claim-v1"
 CLAIM_FILENAME = "arv2-formal-run-one-use-claim.json"
 SUBMISSION_PERMIT_SCHEMA = "arv2-formal-run-submission-permit-v1"
@@ -163,6 +170,37 @@ def _require_claim_directory_text(value: object) -> str:
     if not path.is_absolute() or str(path) != value or ".." in path.parts:
         raise FormalRunProtocolError("claim directory is not canonical absolute text")
     return value
+
+
+def _load_reconciled_infrastructure_look_ledger() -> InfrastructureLookLedgerBinding:
+    try:
+        return load_infrastructure_look_ledger()
+    except PreregistrationError as exc:
+        raise FormalRunProtocolError(
+            "infrastructure-look ledger reconciliation failed"
+        ) from exc
+
+
+def _require_reconciled_infrastructure_look_ledger(
+    binding: InfrastructureLookLedgerBinding,
+) -> InfrastructureLookLedgerBinding:
+    try:
+        return require_infrastructure_look_ledger(binding)
+    except PreregistrationError as exc:
+        raise FormalRunProtocolError(
+            "infrastructure-look ledger reconciliation failed"
+        ) from exc
+
+
+def _infrastructure_look_ledger_fields(
+    binding: InfrastructureLookLedgerBinding,
+) -> dict[str, str]:
+    binding = _require_reconciled_infrastructure_look_ledger(binding)
+    return {
+        "infrastructure_look_ledger_id": binding.ledger_id,
+        "infrastructure_look_ledger_hash": binding.ledger_hash,
+        "infrastructure_look_ledger_artifact_sha256": binding.artifact_sha256,
+    }
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -709,6 +747,9 @@ class ReviewedFormalRunAuthority:
     result_read_requires_separate_terminal_gate: bool
     _receipt_bytes: bytes = dataclasses.field(repr=False)
     _external_pin: "ExternalReviewPin" = dataclasses.field(repr=False)
+    _infrastructure_look_ledger: InfrastructureLookLedgerBinding | None = (
+        dataclasses.field(default=None, repr=False)
+    )
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -734,6 +775,9 @@ class ExternalReviewPin:
     claim_directory: Path
     _pin_bytes: bytes = dataclasses.field(repr=False)
     _pin_path: Path = dataclasses.field(repr=False)
+    _infrastructure_look_ledger: InfrastructureLookLedgerBinding | None = (
+        dataclasses.field(default=None, repr=False)
+    )
 
 
 _REVIEW_FIELDS = frozenset(
@@ -753,6 +797,9 @@ _REVIEW_FIELDS = frozenset(
         "codex_counterreview_evidence_sha256",
         "owner_decision_id",
         "owner_outcome_authority_receipt_id",
+        "infrastructure_look_ledger_id",
+        "infrastructure_look_ledger_hash",
+        "infrastructure_look_ledger_artifact_sha256",
         "claim_directory",
         "maximum_submissions",
         "ambiguous_submission_consumes_look",
@@ -775,6 +822,9 @@ _EXTERNAL_PIN_FIELDS = frozenset(
         "claude_review_commit",
         "codex_counterreview_commit",
         "owner_outcome_authority_receipt_id",
+        "infrastructure_look_ledger_id",
+        "infrastructure_look_ledger_hash",
+        "infrastructure_look_ledger_artifact_sha256",
         "claim_directory",
         "maximum_submissions",
         "ambiguous_submission_consumes_look",
@@ -788,6 +838,7 @@ _EXTERNAL_PIN_FIELDS = frozenset(
 def _review_seed(
     candidate: FormalRunCandidate,
     *,
+    infrastructure_look_ledger: InfrastructureLookLedgerBinding,
     claude_review_commit: str,
     claude_review_evidence_sha256: str,
     codex_counterreview_commit: str,
@@ -796,6 +847,9 @@ def _review_seed(
     claim_directory: str,
 ) -> dict[str, object]:
     require_formal_run_candidate(candidate)
+    ledger_fields = _infrastructure_look_ledger_fields(
+        infrastructure_look_ledger
+    )
     _require_commit(claude_review_commit, "Claude review commit")
     _require_sha256(claude_review_evidence_sha256, "Claude review evidence")
     _require_commit(codex_counterreview_commit, "Codex counterreview commit")
@@ -830,6 +884,7 @@ def _review_seed(
         "codex_counterreview_evidence_sha256": codex_counterreview_evidence_sha256,
         "owner_decision_id": OWNER_DECISION_ID,
         "owner_outcome_authority_receipt_id": owner_outcome_authority_receipt_id,
+        **ledger_fields,
         "claim_directory": claim_directory,
         "maximum_submissions": 1,
         "ambiguous_submission_consumes_look": True,
@@ -855,9 +910,11 @@ def render_formal_review_receipt_candidate(
 ) -> bytes:
     """Render bytes for later pinning; rendering does not grant authority."""
 
+    infrastructure_look_ledger = _load_reconciled_infrastructure_look_ledger()
     return _canonical_bytes(
         _review_seed(
             candidate,
+            infrastructure_look_ledger=infrastructure_look_ledger,
             claude_review_commit=claude_review_commit,
             claude_review_evidence_sha256=claude_review_evidence_sha256,
             codex_counterreview_commit=codex_counterreview_commit,
@@ -875,6 +932,7 @@ def render_formal_review_receipt_candidate(
 def _external_pin_seed(
     *,
     candidate: FormalRunCandidate,
+    infrastructure_look_ledger: InfrastructureLookLedgerBinding,
     review_receipt_artifact_sha256: str,
     claude_review_commit: str,
     codex_counterreview_commit: str,
@@ -882,6 +940,9 @@ def _external_pin_seed(
     claim_directory: str,
 ) -> dict[str, object]:
     require_formal_run_candidate(candidate)
+    ledger_fields = _infrastructure_look_ledger_fields(
+        infrastructure_look_ledger
+    )
     _require_sha256(review_receipt_artifact_sha256, "review receipt artifact")
     _require_commit(claude_review_commit, "Claude review commit")
     _require_commit(codex_counterreview_commit, "Codex counterreview commit")
@@ -903,6 +964,7 @@ def _external_pin_seed(
         "claude_review_commit": claude_review_commit,
         "codex_counterreview_commit": codex_counterreview_commit,
         "owner_outcome_authority_receipt_id": owner_outcome_authority_receipt_id,
+        **ledger_fields,
         "claim_directory": claim_directory,
         "maximum_submissions": 1,
         "ambiguous_submission_consumes_look": True,
@@ -935,20 +997,29 @@ def render_external_review_pin_candidate(
 
     if type(review_receipt_bytes) is not bytes:
         raise FormalRunProtocolError("review receipt must be exact bytes")
-    expected_review = render_formal_review_receipt_candidate(
-        candidate,
-        claude_review_commit=claude_review_commit,
-        claude_review_evidence_sha256=claude_review_evidence_sha256,
-        codex_counterreview_commit=codex_counterreview_commit,
-        codex_counterreview_evidence_sha256=codex_counterreview_evidence_sha256,
-        owner_outcome_authority_receipt_id=owner_outcome_authority_receipt_id,
-        claim_directory=claim_directory,
+    infrastructure_look_ledger = _load_reconciled_infrastructure_look_ledger()
+    expected_review = _canonical_bytes(
+        _review_seed(
+            candidate,
+            infrastructure_look_ledger=infrastructure_look_ledger,
+            claude_review_commit=claude_review_commit,
+            claude_review_evidence_sha256=claude_review_evidence_sha256,
+            codex_counterreview_commit=codex_counterreview_commit,
+            codex_counterreview_evidence_sha256=(
+                codex_counterreview_evidence_sha256
+            ),
+            owner_outcome_authority_receipt_id=(
+                owner_outcome_authority_receipt_id
+            ),
+            claim_directory=claim_directory,
+        )
     )
     if review_receipt_bytes != expected_review:
         raise FormalRunProtocolError("review receipt does not match the reviewed identities")
     return _canonical_bytes(
         _external_pin_seed(
             candidate=candidate,
+            infrastructure_look_ledger=infrastructure_look_ledger,
             review_receipt_artifact_sha256=hashlib.sha256(
                 review_receipt_bytes
             ).hexdigest(),
@@ -1010,6 +1081,7 @@ def load_external_review_pin(
     """Load the post-review owner trust root from a private regular file."""
 
     require_formal_run_candidate(candidate)
+    infrastructure_look_ledger = _load_reconciled_infrastructure_look_ledger()
     payload = _read_private_regular(
         pin_path,
         maximum_bytes=MAX_REVIEW_RECEIPT_BYTES,
@@ -1032,6 +1104,7 @@ def load_external_review_pin(
         raise FormalRunProtocolError("external review pin is not canonical bytes")
     expected = _external_pin_seed(
         candidate=candidate,
+        infrastructure_look_ledger=infrastructure_look_ledger,
         review_receipt_artifact_sha256=_require_sha256(
             raw["review_receipt_artifact_sha256"], "review receipt artifact"
         ),
@@ -1068,6 +1141,7 @@ def load_external_review_pin(
         claim_directory=Path(str(raw["claim_directory"])),
         _pin_bytes=payload,
         _pin_path=pin_path,
+        _infrastructure_look_ledger=infrastructure_look_ledger,
     )
 
 
@@ -1078,6 +1152,14 @@ def _load_reviewed_authority_with_pin(
 ) -> ReviewedFormalRunAuthority:
     require_formal_run_candidate(candidate)
     external_pin = require_external_review_pin(candidate, external_pin)
+    infrastructure_look_ledger = external_pin._infrastructure_look_ledger
+    if type(infrastructure_look_ledger) is not InfrastructureLookLedgerBinding:
+        raise FormalRunProtocolError(
+            "infrastructure-look ledger reconciliation failed"
+        )
+    _require_reconciled_infrastructure_look_ledger(
+        infrastructure_look_ledger
+    )
     if type(receipt_bytes) is not bytes or not receipt_bytes:
         raise FormalRunProtocolError("review receipt must be exact nonempty bytes")
     if len(receipt_bytes) > MAX_REVIEW_RECEIPT_BYTES:
@@ -1109,6 +1191,7 @@ def _load_reviewed_authority_with_pin(
     )
     expected = _review_seed(
         candidate,
+        infrastructure_look_ledger=infrastructure_look_ledger,
         claude_review_commit=claude_commit,
         claude_review_evidence_sha256=_require_sha256(
             raw["claude_review_evidence_sha256"], "Claude review evidence"
@@ -1150,6 +1233,7 @@ def _load_reviewed_authority_with_pin(
         result_read_requires_separate_terminal_gate=True,
         _receipt_bytes=bytes(receipt_bytes),
         _external_pin=external_pin,
+        _infrastructure_look_ledger=infrastructure_look_ledger,
     )
 
 
@@ -1185,6 +1269,14 @@ def require_external_review_pin(
     require_formal_run_candidate(candidate)
     if type(external_pin) is not ExternalReviewPin:
         raise FormalRunProtocolError("external review pin type changed")
+    infrastructure_look_ledger = external_pin._infrastructure_look_ledger
+    if type(infrastructure_look_ledger) is not InfrastructureLookLedgerBinding:
+        raise FormalRunProtocolError(
+            "infrastructure-look ledger reconciliation failed"
+        )
+    _require_reconciled_infrastructure_look_ledger(
+        infrastructure_look_ledger
+    )
     try:
         loaded = load_external_review_pin(candidate, external_pin._pin_path)
     except (AttributeError, TypeError, ValueError) as exc:
@@ -1202,6 +1294,14 @@ def require_reviewed_formal_run_authority(
     require_formal_run_candidate(candidate)
     if type(authority) is not ReviewedFormalRunAuthority:
         raise FormalRunProtocolError("reviewed formal-run authority type changed")
+    infrastructure_look_ledger = authority._infrastructure_look_ledger
+    if type(infrastructure_look_ledger) is not InfrastructureLookLedgerBinding:
+        raise FormalRunProtocolError(
+            "infrastructure-look ledger reconciliation failed"
+        )
+    _require_reconciled_infrastructure_look_ledger(
+        infrastructure_look_ledger
+    )
     if (
         type(authority.maximum_submissions) is not int
         or authority.maximum_submissions != 1
@@ -1581,6 +1681,8 @@ def formal_run_protocol_record() -> Mapping[str, object]:
                 REVIEWED_AUTHORITY_ARTIFACT_SHA256
             ),
             "review_pin_is_external_owner_controlled": True,
+            "infrastructure_look_ledger_bound_in_review_authority": True,
+            "infrastructure_look_ledger_reauthenticated_before_claim": True,
             "submission_permit_filename": SUBMISSION_PERMIT_FILENAME,
             "maximum_submissions": 1,
             "ambiguous_submission_consumes_look": True,

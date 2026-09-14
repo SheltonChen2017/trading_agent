@@ -4,9 +4,13 @@ import dataclasses
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 
 import pytest
+
+from research.analyst_revisions_v2 import preregistration as look_accounting
+from research.analyst_revisions_v2_qc import formal_run_protocol as protocol
 
 from research.analyst_revisions_v2_qc.formal_run_protocol import (
     CLAIM_FILENAME,
@@ -273,10 +277,19 @@ def test_unreviewed_candidate_cannot_activate_or_spend(tmp_path: Path):
 
 def test_review_receipt_is_content_addressed_and_candidate_bound(tmp_path: Path):
     first = _candidate()
-    authority, _directory, receipt, pin, _pin_path = _activate(tmp_path, first)
+    authority, _directory, receipt, pin, pin_path = _activate(tmp_path, first)
     assert authority.candidate_id == first.candidate_id
     assert authority.maximum_submissions == 1
     assert authority.result_read_requires_separate_terminal_gate is True
+    receipt_raw = json.loads(receipt)
+    pin_raw = json.loads(pin_path.read_bytes())
+    expected_ledger = look_accounting.load_infrastructure_look_ledger()
+    for raw in (receipt_raw, pin_raw):
+        assert raw["infrastructure_look_ledger_id"] == expected_ledger.ledger_id
+        assert raw["infrastructure_look_ledger_hash"] == expected_ledger.ledger_hash
+        assert raw["infrastructure_look_ledger_artifact_sha256"] == (
+            expected_ledger.artifact_sha256
+        )
     second = build_formal_run_candidate(
         code_projection=_artifact("code-projection", "changed"),
         production_input_package=first.production_input_package,
@@ -288,6 +301,53 @@ def test_review_receipt_is_content_addressed_and_candidate_bound(tmp_path: Path)
     )
     with pytest.raises(FormalRunProtocolError):
         load_reviewed_formal_run_authority(second, receipt, pin)
+
+
+def test_infrastructure_look_ledger_mutation_blocks_formal_claim(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ledger_path = tmp_path / look_accounting.INFRASTRUCTURE_LOOK_LEDGER_FILENAME
+    ledger_path.write_bytes(
+        look_accounting.INFRASTRUCTURE_LOOK_LEDGER_PATH.read_bytes()
+    )
+    monkeypatch.setattr(
+        look_accounting, "INFRASTRUCTURE_LOOK_LEDGER_PATH", ledger_path
+    )
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, _pin_path = _activate(tmp_path, candidate)
+
+    ledger_path.write_bytes(b"{}\n")
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="infrastructure-look ledger reconciliation failed",
+    ):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-12T00:00:00.000000Z",
+        )
+    assert not (directory / CLAIM_FILENAME).exists()
+
+
+def test_external_pin_cannot_rebind_the_spent_infrastructure_look(
+    tmp_path: Path,
+) -> None:
+    candidate = _candidate()
+    _authority, _directory, _receipt, _pin, pin_path = _activate(
+        tmp_path, candidate
+    )
+    raw = json.loads(pin_path.read_bytes())
+    raw["infrastructure_look_ledger_artifact_sha256"] = "0" * 64
+    raw["pin_id"] = None
+    raw["pin_sha256"] = None
+    digest = hashlib.sha256(protocol._canonical_bytes(raw)).hexdigest()
+    raw["pin_sha256"] = digest
+    raw["pin_id"] = f"arv2-formal-external-pin-{digest[:24]}"
+    pin_path.write_bytes(protocol._canonical_bytes(raw))
+    pin_path.chmod(0o600)
+
+    with pytest.raises(FormalRunProtocolError, match="external review pin content changed"):
+        load_external_review_pin(candidate, pin_path)
 
 
 def test_duplicate_float_and_noncanonical_external_pins_refuse(tmp_path: Path):
@@ -420,6 +480,8 @@ def test_static_record_discloses_unreviewed_zero_authority():
     record = formal_run_protocol_record()
     assert record["reviewed_authority_artifact_sha256"] is None
     assert record["review_pin_is_external_owner_controlled"] is True
+    assert record["infrastructure_look_ledger_bound_in_review_authority"] is True
+    assert record["infrastructure_look_ledger_reauthenticated_before_claim"] is True
     assert record["maximum_submissions"] == 1
     assert record["retry_after_ambiguity"] is False
     assert record["result_read_requires_separate_terminal_gate"] is True
@@ -432,3 +494,152 @@ def test_exact_scalar_types_refuse_bool_counts():
         _power(required_valid_dates=True)
     with pytest.raises(FormalRunProtocolError, match="integer census"):
         _power(h20_test_session_capacity=True)
+
+
+def test_c1_accepted_risk_binding_exactly_refuses_pristine_pit():
+    message = "accepted-risk input cannot claim pristine PIT"
+    with pytest.raises(FormalRunProtocolError, match=re.escape(message)):
+        _accepted_risk(pristine_point_in_time=True)
+
+
+@pytest.mark.parametrize(
+    ("failure", "message"),
+    (
+        ("create", "formal ledger entry could not be created"),
+        ("stall", "formal ledger write stalled"),
+        (
+            "reauthenticate",
+            "formal ledger entry cannot be reauthenticated after creation",
+        ),
+        ("changed", "formal ledger entry changed after creation"),
+    ),
+)
+def test_exclusive_ledger_write_isolates_each_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+    message: str,
+):
+    directory = (tmp_path / failure).absolute()
+    directory.mkdir(mode=0o700)
+
+    if failure == "create":
+        monkeypatch.setattr(
+            protocol.os,
+            "open",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(OSError("offline")),
+        )
+    elif failure == "stall":
+        monkeypatch.setattr(protocol.os, "write", lambda *_args: 0)
+    elif failure == "reauthenticate":
+        monkeypatch.setattr(
+            protocol,
+            "_read_private_regular",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(OSError("offline")),
+        )
+    else:
+        monkeypatch.setattr(
+            protocol,
+            "_read_private_regular",
+            lambda *_args, **_kwargs: b"different",
+        )
+
+    with pytest.raises(FormalRunProtocolError, match=re.escape(message)):
+        protocol._exclusive_private_write(directory, "ledger.json", b"payload\n")
+
+
+def test_claim_type_path_unavailable_and_change_have_distinct_refusals(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, _pin_path = _activate(tmp_path, candidate)
+    claim = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-12T00:00:00.000000Z",
+    )
+
+    with pytest.raises(
+        FormalRunProtocolError,
+        match=re.escape("formal look claim type changed"),
+    ):
+        require_formal_look_claim(candidate, authority, object())  # type: ignore[arg-type]
+    wrong_path = dataclasses.replace(
+        claim,
+        claim_path=directory / "wrong-claim.json",
+    )
+    with pytest.raises(
+        FormalRunProtocolError,
+        match=re.escape("formal look claim path changed"),
+    ):
+        require_formal_look_claim(candidate, authority, wrong_path)
+
+    claim.claim_path.unlink()
+    with pytest.raises(
+        FormalRunProtocolError,
+        match=re.escape("formal look claim is unavailable"),
+    ):
+        require_formal_look_claim(candidate, authority, claim)
+
+    claim.claim_path.write_bytes(claim._claim_bytes)
+    claim.claim_path.chmod(0o600)
+    changed = dataclasses.replace(claim, claim_sha256="0" * 64)
+    with pytest.raises(
+        FormalRunProtocolError,
+        match=re.escape("formal look claim changed"),
+    ):
+        require_formal_look_claim(candidate, authority, changed)
+
+
+def test_permit_type_path_unavailable_and_change_have_distinct_refusals(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, _pin_path = _activate(tmp_path, candidate)
+    claim = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-12T00:00:00.000000Z",
+    )
+    permit = begin_formal_submission_once(
+        candidate=candidate,
+        authority=authority,
+        claim=claim,
+        submission_started_at_utc="2026-09-12T00:00:01.000000Z",
+    )
+
+    with pytest.raises(
+        FormalRunProtocolError,
+        match=re.escape("formal submission permit type changed"),
+    ):
+        require_formal_submission_permit(
+            candidate,
+            authority,
+            claim,
+            object(),  # type: ignore[arg-type]
+        )
+    wrong_path = dataclasses.replace(
+        permit,
+        permit_path=directory / "wrong-permit.json",
+    )
+    with pytest.raises(
+        FormalRunProtocolError,
+        match=re.escape("formal submission permit path changed"),
+    ):
+        require_formal_submission_permit(candidate, authority, claim, wrong_path)
+
+    permit.permit_path.unlink()
+    with pytest.raises(
+        FormalRunProtocolError,
+        match=re.escape("formal submission permit is unavailable"),
+    ):
+        require_formal_submission_permit(candidate, authority, claim, permit)
+
+    permit.permit_path.write_bytes(permit._permit_bytes)
+    permit.permit_path.chmod(0o600)
+    changed = dataclasses.replace(permit, permit_sha256="0" * 64)
+    with pytest.raises(
+        FormalRunProtocolError,
+        match=re.escape("formal submission permit changed"),
+    ):
+        require_formal_submission_permit(candidate, authority, claim, changed)

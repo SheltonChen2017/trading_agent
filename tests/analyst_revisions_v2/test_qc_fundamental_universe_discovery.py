@@ -7,6 +7,7 @@ import hashlib
 import inspect
 import json
 import os
+import stat
 import sys
 import types
 import weakref
@@ -1284,6 +1285,539 @@ def test_offline_submission_ambiguity_consumes_permit_and_forbids_retry(
     assert backend.events == observed
 
 
+def _load_projects_read_schema_diagnostic(plan):
+    path = plan.archive_root / submission.PROJECT_SCHEMA_DIAGNOSTIC_FILENAME
+    payload = path.read_bytes()
+    return path, payload, json.loads(payload)
+
+
+def test_projects_read_diagnostic_requires_exact_phase_and_plan_bound_permit(
+    monkeypatch, tmp_path
+):
+    plan, _claim, _owner_signature, _client, _backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    hostile_response = object()
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="phase changed",
+    ):
+        submission._persist_projects_read_schema_diagnostic(
+            plan=plan,
+            permit=object(),
+            phase="files/read",
+            response=hostile_response,
+        )
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="permit changed",
+    ):
+        submission._persist_projects_read_schema_diagnostic(
+            plan=plan,
+            permit=object(),
+            phase="initial_inventory",
+            response=hostile_response,
+        )
+    assert not plan.archive_root.exists()
+
+
+def test_projects_read_top_level_refusal_persists_keys_only_diagnostic(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_request = backend.request
+    forbidden_values = (
+        "PRIVATE PROJECT NAME MUST NOT LEAK",
+        "PRIVATE CONTENT MUST NOT LEAK",
+    )
+
+    def request(path, payload):
+        if path == "projects/read":
+            backend.events.append(path)
+            return {
+                "success": True,
+                "projects": [
+                    {
+                        "name": forbidden_values[0],
+                        "content": forbidden_values[1],
+                        "newProjectField": 17,
+                    }
+                ],
+                "newTopLevelField": forbidden_values[1],
+            }
+        return original_request(path, payload)
+
+    backend.request = request
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ) as caught:
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:00:00.000000Z",
+        )
+    assert type(caught.value.__cause__) is submission.formal.FormalQcSubmissionError
+
+    path, payload, receipt = _load_projects_read_schema_diagnostic(plan)
+    assert stat.S_IMODE(plan.archive_root.stat().st_mode) == 0o700
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+    assert path.stat().st_nlink == 1
+    assert receipt["schema"] == submission.PROJECT_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA
+    assert receipt["phase"] == "initial_inventory"
+    assert receipt["response_values_retained"] is False
+    assert receipt["project_names_or_content_retained"] is False
+    assert receipt["results_statistics_logs_orders_retained"] is False
+    assert receipt["observation"]["top_level"]["fields"] == [
+        {"field_name": "newTopLevelField", "json_type": "string"},
+        {"field_name": "projects", "json_type": "array"},
+        {"field_name": "success", "json_type": "boolean"},
+    ]
+    assert receipt["observation"]["project_record_shapes"] == [
+        {
+            "json_type": "object",
+            "fields": [
+                {"field_name": "content", "json_type": "string"},
+                {"field_name": "name", "json_type": "string"},
+                {"field_name": "newProjectField", "json_type": "number"},
+            ],
+        }
+    ]
+    assert all(value.encode("utf-8") not in payload for value in forbidden_values)
+    assert backend.events == ["authenticate", "projects/read"]
+    assert (plan.review_directory / submission.PERMIT_FILENAME).exists()
+
+
+def test_projects_read_project_record_refusal_persists_keys_only_diagnostic(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_project = backend.project
+    forbidden_value = "PRIVATE READBACK VALUE MUST NOT LEAK"
+
+    def project():
+        return {
+            **original_project(),
+            "newProjectField": forbidden_value,
+        }
+
+    backend.project = project
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ):
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:00:00.000000Z",
+        )
+
+    _path, payload, receipt = _load_projects_read_schema_diagnostic(plan)
+    assert receipt["phase"] == "created_project_readback"
+    fields = receipt["observation"]["project_record_shapes"][0]["fields"]
+    assert {item["field_name"] for item in fields} == {
+        "codeRunning",
+        "collaborators",
+        "language",
+        "libraries",
+        "name",
+        "newProjectField",
+        "organizationId",
+        "owner",
+        "projectId",
+    }
+    assert forbidden_value.encode("utf-8") not in payload
+    assert plan.project_name.encode("utf-8") not in payload
+    assert backend.events[:4] == [
+        "authenticate",
+        "projects/read",
+        "projects/create",
+        "projects/read",
+    ]
+    assert "files/read" not in backend.events
+    assert "compile/create" not in backend.events
+    assert "backtests/create" not in backend.events
+
+
+def test_projects_read_created_readback_top_level_refusal_persists_diagnostic(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_request = backend.request
+    forbidden_value = "PRIVATE READBACK VALUE MUST NOT LEAK"
+
+    def request(path, payload):
+        if path == "projects/read" and backend.created:
+            backend.events.append(path)
+            return {
+                "success": True,
+                "projects": [backend.project()],
+                "newTopLevelField": forbidden_value,
+            }
+        return original_request(path, payload)
+
+    backend.request = request
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ) as caught:
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:00:00.000000Z",
+        )
+    assert type(caught.value.__cause__) is submission.formal.FormalQcSubmissionError
+
+    _path, payload, receipt = _load_projects_read_schema_diagnostic(plan)
+    assert receipt["phase"] == "created_project_readback"
+    assert receipt["observation"]["top_level"]["fields"] == [
+        {"field_name": "newTopLevelField", "json_type": "string"},
+        {"field_name": "projects", "json_type": "array"},
+        {"field_name": "success", "json_type": "boolean"},
+    ]
+    assert forbidden_value.encode("utf-8") not in payload
+    assert plan.project_name.encode("utf-8") not in payload
+    assert backend.events == [
+        "authenticate",
+        "projects/read",
+        "projects/create",
+        "projects/read",
+    ]
+    assert "files/read" not in backend.events
+    assert "compile/create" not in backend.events
+    assert "backtests/create" not in backend.events
+
+
+def test_projects_read_identity_refusal_does_not_masquerade_as_schema_diagnostic(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_project = backend.project
+
+    def project():
+        return {**original_project(), "owner": False}
+
+    backend.project = project
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ) as caught:
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:00:00.000000Z",
+        )
+    assert type(caught.value.__cause__) is submission.formal.FormalQcSubmissionError
+    assert not plan.archive_root.exists()
+    assert backend.events == [
+        "authenticate",
+        "projects/read",
+        "projects/create",
+        "projects/read",
+    ]
+    assert (plan.review_directory / submission.PERMIT_FILENAME).exists()
+
+
+@pytest.mark.parametrize(
+    "hostile_kind", ("unsafe_name", "oversized_name", "oversized_inventory")
+)
+def test_projects_read_diagnostic_redacts_hostile_field_inventory(
+    monkeypatch, tmp_path, hostile_kind
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_request = backend.request
+    secret = "PRIVATE VALUE MUST NOT LEAK"
+    unsafe_name = "../unsafe\nprivate-project-name"
+    oversized_name = "x" * 129
+
+    def request(path, payload):
+        if path == "projects/read":
+            backend.events.append(path)
+            if hostile_kind == "unsafe_name":
+                return {
+                    "success": True,
+                    "projects": [],
+                    unsafe_name: secret,
+                }
+            if hostile_kind == "oversized_name":
+                return {
+                    "success": True,
+                    "projects": [],
+                    oversized_name: secret,
+                }
+            return {
+                **{
+                    f"field{index:03d}": secret
+                    for index in range(
+                        submission.MAX_PROJECT_SCHEMA_DIAGNOSTIC_FIELDS + 1
+                    )
+                },
+                "success": True,
+                "projects": [],
+            }
+        return original_request(path, payload)
+
+    backend.request = request
+    with pytest.raises(submission.FundamentalDiscoverySubmissionLocked):
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:00:00.000000Z",
+        )
+    _path, payload, receipt = _load_projects_read_schema_diagnostic(plan)
+    fields = receipt["observation"]["top_level"]["fields"]
+    expected_marker = (
+        "__unsafe_field_name_redacted__"
+        if hostile_kind in {"unsafe_name", "oversized_name"}
+        else "__oversized_field_inventory_refused__"
+    )
+    assert expected_marker in {item["field_name"] for item in fields}
+    assert secret.encode("utf-8") not in payload
+    assert unsafe_name.encode("utf-8") not in payload
+    assert oversized_name.encode("utf-8") not in payload
+    assert len(payload) <= submission.MAX_PROJECT_SCHEMA_DIAGNOSTIC_BYTES
+
+
+def test_projects_read_diagnostic_bounds_unique_project_shapes(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_request = backend.request
+    secret = "PRIVATE PROJECT VALUE MUST NOT LEAK"
+
+    def request(path, payload):
+        if path == "projects/read":
+            backend.events.append(path)
+            return {
+                "success": True,
+                "projects": [
+                    {f"uniqueField{index}": secret}
+                    for index in range(
+                        submission.MAX_PROJECT_SCHEMA_DIAGNOSTIC_UNIQUE_SHAPES
+                        + 1
+                    )
+                ],
+                "newTopLevelField": True,
+            }
+        return original_request(path, payload)
+
+    backend.request = request
+    with pytest.raises(submission.FundamentalDiscoverySubmissionLocked):
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:00:00.000000Z",
+        )
+    _path, payload, receipt = _load_projects_read_schema_diagnostic(plan)
+    assert receipt["observation"]["project_record_shapes"] == [
+        {
+            "json_type": "object",
+            "fields": [
+                {
+                    "field_name": "__unique_shape_limit_refused__",
+                    "json_type": "object",
+                }
+            ],
+        }
+    ]
+    assert secret.encode("utf-8") not in payload
+    assert len(payload) <= submission.MAX_PROJECT_SCHEMA_DIAGNOSTIC_BYTES
+
+
+def test_projects_read_diagnostic_bounds_project_record_inventory(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_request = backend.request
+    secret = "PRIVATE PROJECT VALUE MUST NOT LEAK"
+
+    def request(path, payload):
+        if path == "projects/read":
+            backend.events.append(path)
+            return {
+                "success": True,
+                "projects": [
+                    {"newProjectField": secret}
+                    for _index in range(
+                        submission.MAX_PROJECT_SCHEMA_DIAGNOSTIC_RECORDS + 1
+                    )
+                ],
+                "newTopLevelField": True,
+            }
+        return original_request(path, payload)
+
+    backend.request = request
+    with pytest.raises(submission.FundamentalDiscoverySubmissionLocked):
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:00:00.000000Z",
+        )
+    _path, payload, receipt = _load_projects_read_schema_diagnostic(plan)
+    assert receipt["observation"]["project_record_shapes"] == [
+        {
+            "json_type": "array",
+            "fields": [
+                {
+                    "field_name": "__oversized_project_inventory_refused__",
+                    "json_type": "array",
+                }
+            ],
+        }
+    ]
+    assert secret.encode("utf-8") not in payload
+    assert len(payload) <= submission.MAX_PROJECT_SCHEMA_DIAGNOSTIC_BYTES
+
+
+def test_atomic_schema_diagnostic_publication_is_owner_only_and_no_replace(
+    tmp_path,
+):
+    tmp_path.chmod(0o700)
+    path = tmp_path / submission.PROJECT_SCHEMA_DIAGNOSTIC_FILENAME
+    payload = b'{"safe":"schema-only"}'
+    submission._write_private_file_atomically(path, payload, "test diagnostic")
+    assert path.read_bytes() == payload
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+    assert path.stat().st_nlink == 1
+    assert not (tmp_path / ("." + path.name + ".staging")).exists()
+
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="already exists",
+    ):
+        submission._write_private_file_atomically(
+            path, b'{"different":true}', "test diagnostic"
+        )
+    assert path.read_bytes() == payload
+    assert not (tmp_path / ("." + path.name + ".staging")).exists()
+
+
+def test_atomic_schema_diagnostic_names_post_link_fsync_ambiguity(
+    monkeypatch, tmp_path,
+):
+    tmp_path.chmod(0o700)
+    path = tmp_path / submission.PROJECT_SCHEMA_DIAGNOSTIC_FILENAME
+    payload = b'{"safe":"schema-only"}'
+    real_fsync = submission.os.fsync
+    calls = 0
+
+    def fail_first_directory_fsync(descriptor):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("injected directory fsync failure")
+        return real_fsync(descriptor)
+
+    monkeypatch.setattr(submission.os, "fsync", fail_first_directory_fsync)
+    with pytest.raises(
+        submission.FundamentalDiscoveryDiagnosticPublicationAmbiguous,
+        match="linked completely.*durability is ambiguous",
+    ):
+        submission._write_private_file_atomically(
+            path, payload, "test diagnostic"
+        )
+    staging = tmp_path / ("." + path.name + ".staging")
+    assert path.read_bytes() == payload
+    assert staging.read_bytes() == payload
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+    assert path.stat().st_ino == staging.stat().st_ino
+
+
+def test_projects_read_diagnostic_names_archive_root_fsync_ambiguity(
+    monkeypatch, tmp_path,
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_request = backend.request
+
+    def request(path, payload):
+        if path == "projects/read":
+            backend.events.append(path)
+            return {
+                "success": True,
+                "projects": [],
+                "newTopLevelField": True,
+            }
+        return original_request(path, payload)
+
+    backend.request = request
+    real_fsync = submission.os.fsync
+
+    def fail_directory_fsync(descriptor):
+        if stat.S_ISDIR(os.fstat(descriptor).st_mode):
+            raise OSError("injected archive-parent fsync failure")
+        return real_fsync(descriptor)
+
+    monkeypatch.setattr(submission.os, "fsync", fail_directory_fsync)
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ) as caught:
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:00:00.000000Z",
+        )
+    assert type(caught.value.__cause__) is (
+        submission.FundamentalDiscoveryArchiveRootPublicationAmbiguous
+    )
+    assert type(caught.value.__cause__.__cause__) is OSError
+    assert type(caught.value.__cause__.__cause__.__context__) is (
+        submission.formal.FormalQcSubmissionError
+    )
+    assert plan.archive_root.is_dir()
+    assert stat.S_IMODE(plan.archive_root.stat().st_mode) == 0o700
+    assert not (
+        plan.archive_root / submission.PROJECT_SCHEMA_DIAGNOSTIC_FILENAME
+    ).exists()
+    assert (plan.review_directory / submission.PERMIT_FILENAME).exists()
+    observed_events = list(backend.events)
+
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit already spent or unavailable",
+    ):
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-13T12:01:00.000000Z",
+        )
+    assert backend.events == observed_events
+
+
 def test_owner_signature_gate_precedes_permit_credentials_and_transport(
     monkeypatch, tmp_path
 ):
@@ -1524,12 +2058,13 @@ def test_discovery_submission_refuses_rebound_helper_or_constructor_before_mint(
     assert tuple(submission._LAUNCH_AUTHORITIES.items()) == prior
 
 
+@pytest.mark.parametrize("name", ("_created_project", "_PROJECT_RECORD_KEYS"))
 def test_discovery_submission_refuses_rebound_transport_dependency_before_mint(
-    monkeypatch,
+    monkeypatch, name,
 ) -> None:
     production_execute = submission.execute_fundamental_discovery_submission_once
     prior = tuple(submission._LAUNCH_AUTHORITIES.items())
-    monkeypatch.setattr(submission.formal, "_created_project", object())
+    monkeypatch.setattr(submission.formal, name, object())
     with pytest.raises(
         submission.FundamentalDiscoverySubmissionError,
         match="action dependency authority changed",
@@ -1549,6 +2084,9 @@ def test_discovery_submission_refuses_rebound_transport_dependency_before_mint(
     (
         (submission.Path, "open", None),
         (submission.os, "O_EXCL", 0),
+        (submission.os, "O_RDONLY", object()),
+        (submission.os, "link", None),
+        (submission.os, "unlink", None),
         (submission.json.JSONDecoder, "decode", None),
     ),
 )

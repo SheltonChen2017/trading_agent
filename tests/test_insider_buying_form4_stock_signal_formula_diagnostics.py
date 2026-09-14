@@ -1973,3 +1973,49 @@ def test_identity_counts_are_mutually_consistent(updates):
         match="identity counts are inconsistent",
     ):
         _replay_identity(forged)
+
+
+def test_standalone_breadth_replay_enforces_the_upper_total_envelope_alone():
+    """Claude review regression (2026-09-14): the upper total envelope must
+    refuse on its own. The existing value-envelope case forges total and
+    largest-buyer together, so the per-buyer maximum and concentration clauses
+    would still refuse it if the upper-total clause were deleted. Three events
+    across two buyers and two dates keep the largest buyer inside its own
+    envelope (2 * max), keep total <= largest * buyers, keep the other buyer
+    above the minimum, and satisfy the pigeonhole and capacity bounds, while
+    the total exceeds N * max. Only the upper-total clause can refuse it, and
+    dollar breadth is recomputed so that check cannot fire instead."""
+    maximum_input = signal_module._MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD
+    boundary = _build(
+        _event(1, buyer_id="buyer-1"),
+        _event(2, buyer_id="buyer-1", transaction_date=date(2026, 8, 19)),
+        _event(3, buyer_id="buyer-2"),
+    ).breadth
+    assert (
+        boundary.buyer_breadth,
+        boundary.date_breadth,
+        boundary.included_event_count,
+    ) == (2, 2, 3)
+    largest_within_envelope = signal_module.exact_decimal_multiply(
+        maximum_input, 2, name="test largest buyer inside its envelope"
+    )
+    impossible_total = signal_module.exact_decimal_add(
+        signal_module.exact_decimal_multiply(
+            maximum_input, 3, name="test maximum breadth total"
+        ),
+        Decimal("1e256"),
+        name="test total above the event envelope",
+    )
+    forged = _rehash_breadth(
+        boundary,
+        total_purchase_value_usd=impossible_total,
+        largest_buyer_purchase_value_usd=largest_within_envelope,
+        dollar_breadth=signal_module._dollar_breadth(
+            impossible_total, largest_within_envelope
+        ),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="cannot arise from qualifying buyers",
+    ):
+        _replay_breadth(forged)

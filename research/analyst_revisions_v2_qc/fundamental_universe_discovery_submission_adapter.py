@@ -1,11 +1,14 @@
 """One-shot, outcome-free QC transport for Fundamentals discovery.
 
 Importing and building objects in this module performs no I/O other than
-explicit local review-pin/ledger/archive operations.  The production path
-accepts only the concrete :class:`FormalQcTransport`, authenticates the exact
-live host closure, requires both an owner-only independent-review claim and a
-detached owner signature for ``PREOPEN_EXECUTION``, spends a durable one-use
-permit, and then executes the exact project/upload/compile/run choreography.
+explicit local authorization-pin/ledger/archive operations.  The production
+path accepts only the concrete :class:`FormalQcTransport`, authenticates the
+exact live host closure, requires an owner-only claim that records the narrow
+section-72 review waiver truthfully plus a detached owner signature for
+``PREOPEN_EXECUTION``, spends a durable one-use permit, and then executes the
+exact project/upload/compile/run choreography.  The waiver does not represent
+an independent review and records the independent-review debt after the first
+formal backtest.
 
 Status inspection uses ``backtests/list`` with ``includeStatistics=False``.
 It never calls ``backtests/read`` or accesses results, statistics, charts,
@@ -85,7 +88,7 @@ class FundamentalDiscoveryArchiveRootPublicationAmbiguous(RuntimeError):
 
 
 PLAN_SCHEMA = "arv2-qc-fundamental-discovery-submission-plan-v1"
-REVIEW_CLAIM_SCHEMA = "arv2-qc-fundamental-discovery-review-claim-v1"
+REVIEW_CLAIM_SCHEMA = "arv2-qc-fundamental-discovery-review-claim-v2"
 PERMIT_SCHEMA = "arv2-qc-fundamental-discovery-one-use-permit-v1"
 LAUNCH_SCHEMA = "arv2-qc-fundamental-discovery-launch-receipt-v1"
 TERMINAL_STATUS_SCHEMA = "arv2-qc-fundamental-discovery-terminal-status-v1"
@@ -93,9 +96,12 @@ REFUSAL_RECEIPT_SCHEMA = "arv2-qc-fundamental-discovery-refusal-receipt-v1"
 PROJECT_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA = (
     "arv2-qc-projects-read-schema-diagnostic-receipt-v1"
 )
-EXECUTION_AUTHORITY_SCHEMA = "arv2-qc-fundamental-discovery-execution-authority-v1"
+EXECUTION_AUTHORITY_SCHEMA = "arv2-qc-fundamental-discovery-execution-authority-v2"
 HOST_CLOSURE_SCHEMA = "arv2-qc-fundamental-discovery-host-closure-v1"
-REVIEW_CLAIM_FILENAME = "arv2-qc-fundamental-discovery-review-claim-v1.json"
+REVIEW_CLAIM_FILENAME = "arv2-qc-fundamental-discovery-review-claim-v2.json"
+OWNER_REVIEW_WAIVER_ID = "arv2-owner-review-waiver-section-72-v1"
+OWNER_REVIEW_WAIVER_SCOPE = "SECTION_72_THROUGH_FIRST_FORMAL_BACKTEST"
+OWNER_REVIEW_WAIVER_BASIS = "OWNER_EXPLICIT_REVIEW_WAIVER"
 PERMIT_FILENAME = "arv2-qc-fundamental-discovery-one-use-permit-v1.json"
 REFUSAL_FILENAME = "named-refusal.json"
 PROJECT_SCHEMA_DIAGNOSTIC_FILENAME = "projects-read-schema-diagnostic.json"
@@ -795,9 +801,13 @@ def _review_claim_document(plan):
         "projection_sha256": plan.projection_sha256,
         "project_source_set_sha256": plan.project_source_set_sha256,
         "discovery_plan_artifact_sha256": plan.discovery_plan_artifact_sha256,
-        "review_disposition": "GO",
-        "independent_review_complete": True,
-        "private_review_pin": True,
+        "review_disposition": "NOT_PERFORMED_OWNER_WAIVED",
+        "independent_review_complete": False,
+        "authorization_basis": OWNER_REVIEW_WAIVER_BASIS,
+        "owner_review_waiver_id": OWNER_REVIEW_WAIVER_ID,
+        "owner_review_waiver_scope": OWNER_REVIEW_WAIVER_SCOPE,
+        "post_first_formal_backtest_independent_review_required": True,
+        "private_authorization_pin": True,
         "maximum_backtest_submissions": 1,
         "full_pit_universe_claim_scoped_to_qc_source": True,
         "production_preopen_input_available": False,
@@ -811,7 +821,12 @@ def _review_claim_document(plan):
 
 
 def render_fundamental_discovery_review_claim_candidate(plan) -> bytes:
-    """Render bytes an independent reviewer must place in the private pin file."""
+    """Render the exact private pin for the owner's bounded review waiver.
+
+    These bytes expressly do not claim that independent review is complete.
+    Execution still requires the owner's detached signature over an authority
+    payload that repeats and binds this waiver state.
+    """
 
     return _canonical(_review_claim_document(plan))
 
@@ -822,6 +837,12 @@ class FundamentalDiscoveryReviewClaim:
     claim_sha256: str
     plan_id: str
     plan_sha256: str
+    review_disposition: str
+    independent_review_complete: bool
+    authorization_basis: str
+    owner_review_waiver_id: str
+    owner_review_waiver_scope: str
+    post_first_formal_backtest_independent_review_required: bool
     pin_path: Path
     pin_content_sha256: str
     pin_byte_count: int
@@ -842,6 +863,14 @@ def load_fundamental_discovery_review_claim(plan):
         claim_sha256=record["claim_sha256"],
         plan_id=plan.plan_id,
         plan_sha256=plan.plan_sha256,
+        review_disposition=record["review_disposition"],
+        independent_review_complete=record["independent_review_complete"],
+        authorization_basis=record["authorization_basis"],
+        owner_review_waiver_id=record["owner_review_waiver_id"],
+        owner_review_waiver_scope=record["owner_review_waiver_scope"],
+        post_first_formal_backtest_independent_review_required=(
+            record["post_first_formal_backtest_independent_review_required"]
+        ),
         pin_path=path,
         pin_content_sha256=hashlib.sha256(payload).hexdigest(),
         pin_byte_count=len(payload),
@@ -871,6 +900,18 @@ def _execution_authority_candidate(plan, claim, closure):
             "review_claim_id": claim.claim_id,
             "review_claim_sha256": claim.claim_sha256,
             "review_pin_content_sha256": claim.pin_content_sha256,
+            "review_authorization": {
+                "review_disposition": claim.review_disposition,
+                "independent_review_complete": (
+                    claim.independent_review_complete
+                ),
+                "authorization_basis": claim.authorization_basis,
+                "owner_review_waiver_id": claim.owner_review_waiver_id,
+                "owner_review_waiver_scope": claim.owner_review_waiver_scope,
+                "post_first_formal_backtest_independent_review_required": (
+                    claim.post_first_formal_backtest_independent_review_required
+                ),
+            },
             "projection_id": plan.projection_id,
             "projection_sha256": plan.projection_sha256,
             "discovery_plan_id": plan.discovery_plan_id,
@@ -2963,10 +3004,15 @@ del _require_discovery_action_global_bindings
 
 __all__ = (
     "EXECUTION_ACTIONS",
+    "EXECUTION_AUTHORITY_SCHEMA",
+    "OWNER_REVIEW_WAIVER_BASIS",
+    "OWNER_REVIEW_WAIVER_ID",
+    "OWNER_REVIEW_WAIVER_SCOPE",
     "PERMIT_FILENAME",
     "PROJECT_SCHEMA_DIAGNOSTIC_FILENAME",
     "PROJECT_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA",
     "REQUIRED_HOST_CODE_PATHS",
+    "REVIEW_CLAIM_SCHEMA",
     "REVIEW_CLAIM_FILENAME",
     "FundamentalDiscoveryHostClosureBinding",
     "FundamentalDiscoveryArchiveRootPublicationAmbiguous",

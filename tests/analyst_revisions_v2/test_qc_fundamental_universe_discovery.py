@@ -1192,6 +1192,140 @@ def _submission_fixture(monkeypatch, tmp_path):
     return plan, claim, _offline_owner_signature(), client, backend
 
 
+def test_discovery_review_claim_truthfully_records_exact_owner_waiver(
+    monkeypatch, tmp_path,
+) -> None:
+    plan, claim, _owner_signature, _client, _backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    raw = json.loads(
+        submission.render_fundamental_discovery_review_claim_candidate(plan)
+    )
+    assert raw["schema"] == (
+        "arv2-qc-fundamental-discovery-review-claim-v2"
+    )
+    assert raw["review_disposition"] == "NOT_PERFORMED_OWNER_WAIVED"
+    assert raw["independent_review_complete"] is False
+    assert raw["authorization_basis"] == "OWNER_EXPLICIT_REVIEW_WAIVER"
+    assert raw["owner_review_waiver_id"] == (
+        "arv2-owner-review-waiver-section-72-v1"
+    )
+    assert raw["owner_review_waiver_scope"] == (
+        "SECTION_72_THROUGH_FIRST_FORMAL_BACKTEST"
+    )
+    assert raw["post_first_formal_backtest_independent_review_required"] is True
+    assert raw["private_authorization_pin"] is True
+    assert "private_review_pin" not in raw
+    assert raw["maximum_backtest_submissions"] == 1
+    assert raw["outcome_result_statistics_log_order_access"] is False
+    assert raw["retry_after_ambiguity"] is False
+    assert claim.review_disposition == raw["review_disposition"]
+    assert claim.independent_review_complete is False
+    assert claim.authorization_basis == raw["authorization_basis"]
+    assert claim.owner_review_waiver_id == raw["owner_review_waiver_id"]
+    assert claim.owner_review_waiver_scope == raw["owner_review_waiver_scope"]
+    assert (
+        claim.post_first_formal_backtest_independent_review_required is True
+    )
+
+
+def _legacy_discovery_review_claim_v1_bytes(plan) -> bytes:
+    legacy = {
+        "schema": "arv2-qc-fundamental-discovery-review-claim-v1",
+        "claim_id": None,
+        "claim_sha256": None,
+        "plan_id": plan.plan_id,
+        "plan_sha256": plan.plan_sha256,
+        "projection_id": plan.projection_id,
+        "projection_sha256": plan.projection_sha256,
+        "project_source_set_sha256": plan.project_source_set_sha256,
+        "discovery_plan_artifact_sha256": plan.discovery_plan_artifact_sha256,
+        "review_disposition": "GO",
+        "independent_review_complete": True,
+        "private_review_pin": True,
+        "maximum_backtest_submissions": 1,
+        "full_pit_universe_claim_scoped_to_qc_source": True,
+        "production_preopen_input_available": False,
+        "outcome_result_statistics_log_order_access": False,
+        "retry_after_ambiguity": False,
+    }
+    digest = hashlib.sha256(submission._canonical(legacy)).hexdigest()
+    legacy["claim_id"] = (
+        "arv2-qc-fundamental-discovery-review-" + digest[:24]
+    )
+    legacy["claim_sha256"] = digest
+    return submission._canonical(legacy)
+
+
+def test_discovery_review_claim_rejects_exact_legacy_v1_go_document(
+    monkeypatch, tmp_path,
+) -> None:
+    plan, _claim, _owner_signature, _client, _backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    claim_path = tmp_path / submission.REVIEW_CLAIM_FILENAME
+    claim_path.write_bytes(_legacy_discovery_review_claim_v1_bytes(plan))
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="discovery review claim changed",
+    ):
+        submission.load_fundamental_discovery_review_claim(plan)
+
+
+def test_discovery_review_claim_rejects_legacy_v1_filename_only(
+    monkeypatch, tmp_path,
+) -> None:
+    plan, _claim, _owner_signature, _client, _backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    (tmp_path / submission.REVIEW_CLAIM_FILENAME).unlink()
+    legacy_path = (
+        tmp_path / "arv2-qc-fundamental-discovery-review-claim-v1.json"
+    )
+    legacy_path.write_bytes(_legacy_discovery_review_claim_v1_bytes(plan))
+    legacy_path.chmod(0o600)
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="discovery review claim is unavailable",
+    ):
+        submission.load_fundamental_discovery_review_claim(plan)
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement"),
+    (
+        ("independent_review_complete", True),
+        ("owner_review_waiver_id", "arv2-owner-review-waiver-section-73-v1"),
+        ("owner_review_waiver_scope", "SECTION_72_ONLY"),
+        ("post_first_formal_backtest_independent_review_required", False),
+    ),
+)
+def test_discovery_waiver_pin_tamper_refuses_before_permit_or_network(
+    monkeypatch, tmp_path, field, replacement,
+) -> None:
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    claim_path = tmp_path / submission.REVIEW_CLAIM_FILENAME
+    tampered = json.loads(claim_path.read_bytes())
+    tampered[field] = replacement
+    claim_path.write_bytes(submission._canonical(tampered))
+
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="discovery review claim changed",
+    ):
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-12T12:00:00.000000Z",
+        )
+    assert backend.events == []
+    assert not (tmp_path / submission.PERMIT_FILENAME).exists()
+
+
 def test_offline_submission_adapter_executes_exact_outcome_free_flow(
     monkeypatch, tmp_path
 ):
@@ -1204,10 +1338,27 @@ def test_offline_submission_adapter_executes_exact_outcome_free_flow(
         )
     )
     assert plan.maximum_output_object_reads == 3_302
+    assert authority["schema"] == (
+        "arv2-qc-fundamental-discovery-execution-authority-v2"
+    )
     assert authority["review_claim_sha256"] == claim.claim_sha256
+    assert authority["review_authorization"] == {
+        "review_disposition": "NOT_PERFORMED_OWNER_WAIVED",
+        "independent_review_complete": False,
+        "authorization_basis": "OWNER_EXPLICIT_REVIEW_WAIVER",
+        "owner_review_waiver_id": (
+            "arv2-owner-review-waiver-section-72-v1"
+        ),
+        "owner_review_waiver_scope": (
+            "SECTION_72_THROUGH_FIRST_FORMAL_BACKTEST"
+        ),
+        "post_first_formal_backtest_independent_review_required": True,
+    }
     assert authority["actions"] == list(submission.EXECUTION_ACTIONS)
+    assert authority["maximum_backtest_submissions"] == 1
     assert authority["include_statistics"] is False
     assert authority["outcome_result_statistics_log_order_access"] is False
+    assert authority["retry_after_ambiguity"] is False
     permit, launch = submission.execute_fundamental_discovery_submission_once(
         plan=plan,
         review_claim=claim,

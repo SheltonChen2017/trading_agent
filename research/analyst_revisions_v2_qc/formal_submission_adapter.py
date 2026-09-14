@@ -886,6 +886,40 @@ _HEX_64 = re.compile(r"[0-9a-f]{64}\Z")
 _HEX_32 = re.compile(r"[0-9a-f]{32}\Z")
 _SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/ -]{0,511}\Z")
 _SAFE_PATH = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,1023}\Z")
+_PROJECT_LIST_RESPONSE_KEYS = frozenset(
+    {"success", "errors", "messages", "projects", "versions"}
+)
+_PROJECT_RECORD_KEYS = frozenset(
+    {
+        "projectId",
+        "organizationId",
+        "name",
+        "modified",
+        "created",
+        "ownerId",
+        "language",
+        "collaborators",
+        "leanVersionId",
+        "leanPinnedToMaster",
+        "owner",
+        "description",
+        "channelId",
+        "parameters",
+        "libraries",
+        "grid",
+        "liveGrid",
+        "paperEquity",
+        "lastLiveDeployment",
+        "liveForm",
+        "encrypted",
+        "codeRunning",
+        "leanEnvironment",
+        "encryptionKey",
+        "isPinned",
+        "maxFileSize",
+        "sharingTokenBacktest",
+    }
+)
 _TOP_STATUS_KEYS = frozenset({"success", "errors", "messages", "backtests", "count"})
 _BACKTEST_STATUS_KEYS = frozenset(
     {
@@ -2971,10 +3005,7 @@ def _success(value: object, allowed: frozenset[str], name: str) -> dict[str, obj
 
 
 def _project_record(value: object, *, name: str, organization_id: str) -> dict[str, object]:
-    allowed = frozenset(
-        {"projectId", "organizationId", "name", "language", "owner", "codeRunning", "collaborators", "libraries", "leanVersionId"}
-    )
-    record = _exact_dict(value, allowed, "project")
+    record = _exact_dict(value, _PROJECT_RECORD_KEYS, "project")
     if (
         type(record.get("projectId")) is not int
         or record["projectId"] <= 0
@@ -2992,7 +3023,10 @@ def _project_record(value: object, *, name: str, organization_id: str) -> dict[s
 
 
 def _created_project(value: object, *, name: str, organization_id: str) -> dict[str, object]:
-    raw = _success(value, frozenset({"success", "errors", "messages", "projects"}), "projects/create")
+    raw = _success(value, _PROJECT_LIST_RESPONSE_KEYS, "projects/create")
+    versions = raw.get("versions")
+    if versions is not None and type(versions) is not list:
+        raise FormalQcSubmissionError("projects/create versions envelope changed")
     projects = raw.get("projects")
     if type(projects) is not list or len(projects) != 1:
         raise FormalQcSubmissionError("projects/create did not return one project")
@@ -3010,7 +3044,10 @@ def _created_project(value: object, *, name: str, organization_id: str) -> dict[
 
 
 def _read_project_inventory(value: object) -> list[dict[str, object]]:
-    raw = _success(value, frozenset({"success", "errors", "messages", "projects"}), "projects/read")
+    raw = _success(value, _PROJECT_LIST_RESPONSE_KEYS, "projects/read")
+    versions = raw.get("versions")
+    if versions is not None and type(versions) is not list:
+        raise FormalQcSubmissionError("projects/read versions envelope changed")
     projects = raw.get("projects")
     if type(projects) is not list:
         raise FormalQcSubmissionError("projects/read omitted its project list")

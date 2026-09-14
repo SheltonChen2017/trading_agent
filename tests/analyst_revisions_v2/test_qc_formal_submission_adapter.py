@@ -93,6 +93,131 @@ def _canonical(value: object) -> bytes:
     ).encode()
 
 
+def test_project_list_parsers_accept_documented_lean_versions_metadata():
+    response = {
+        "success": True,
+        "projects": [],
+        "versions": [
+            {
+                "id": 1,
+                "created": "2026-09-13T00:00:00Z",
+                "description": "discarded",
+                "leanHash": "discarded",
+                "leanCloudHash": "discarded",
+                "name": "discarded",
+                "ref": "discarded",
+                "public": True,
+            }
+        ],
+    }
+
+    assert adapter._read_project_inventory(response) == []
+    created = adapter._created_project(
+        {
+            **response,
+            "projects": [
+                {"projectId": 123, "name": "exact", "language": "Py"}
+            ],
+        },
+        name="exact",
+        organization_id="organization-test",
+    )
+    assert created["projectId"] == 123
+
+
+@pytest.mark.parametrize(
+    ("parser", "message"),
+    (
+        (
+            lambda value: adapter._read_project_inventory(value),
+            "projects/read versions envelope changed",
+        ),
+        (
+            lambda value: adapter._created_project(
+                {**value, "projects": [
+                    {"projectId": 123, "name": "exact", "language": "Py"}
+                ]},
+                name="exact",
+                organization_id="organization-test",
+            ),
+            "projects/create versions envelope changed",
+        ),
+    ),
+)
+def test_project_list_parsers_isolate_non_list_versions_refusal(parser, message):
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        parser({"success": True, "projects": [], "versions": {}})
+
+
+def test_project_inventory_still_refuses_undocumented_top_level_keys():
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="projects/read envelope changed",
+    ):
+        adapter._read_project_inventory(
+            {"success": True, "projects": [], "versions": [], "unknown": None}
+        )
+
+
+def test_project_record_accepts_current_documented_discard_only_fields():
+    record = {
+        "projectId": 123,
+        "organizationId": "organization-test",
+        "name": "exact",
+        "modified": "2026-09-13T00:00:00Z",
+        "created": "2026-09-13T00:00:00Z",
+        "ownerId": 1,
+        "language": "Py",
+        "collaborators": [{"owner": True}],
+        "leanVersionId": 1,
+        "leanPinnedToMaster": False,
+        "owner": True,
+        "description": "discarded",
+        "channelId": "discarded",
+        "parameters": {},
+        "libraries": [],
+        "grid": {},
+        "liveGrid": {},
+        "paperEquity": 0,
+        "lastLiveDeployment": None,
+        "liveForm": {},
+        "encrypted": False,
+        "codeRunning": False,
+        "leanEnvironment": 0,
+        "encryptionKey": None,
+        "isPinned": False,
+        "maxFileSize": 1,
+        "sharingTokenBacktest": "discarded",
+    }
+
+    assert adapter._project_record(
+        record,
+        name="exact",
+        organization_id="organization-test",
+    ) is record
+
+
+def test_project_record_still_refuses_undocumented_keys():
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="project envelope changed",
+    ):
+        adapter._project_record(
+            {
+                "projectId": 123,
+                "organizationId": "organization-test",
+                "name": "exact",
+                "language": "Py",
+                "collaborators": [{"owner": True}],
+                "owner": True,
+                "codeRunning": False,
+                "unknown": None,
+            },
+            name="exact",
+            organization_id="organization-test",
+        )
+
+
 def _closure_value(function, name: str):
     assert function.__closure__ is not None
     cells = dict(

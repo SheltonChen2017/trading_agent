@@ -1,17 +1,16 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED THE THREE-COMMIT RANGE `9047375..e1f7e48`
-COMMIT BY COMMIT (SECTION 46): COUNTER-REVIEW RECORD `22a889d` ACCEPTED;
-SI-3E-P0 `dc2055c` ACCEPTED AFTER A TEST-ONLY CORRECTION THAT PINS THE
-NON-NEGATIVE COUNT GUARD AND THE BATCH CANONICAL-ORDERING GUARD; RECORD
-COMMIT `e1f7e48` ACCEPTED. NO IN-LANE P0, P1 OR P2. ALL FOUR `SI-CCR18`
-CORRECTIONS AGAINST THE PRIOR CLAUDE RECORD ARE CONFIRMED AND ACCEPTED. EVERY
-EXACT ORDER COUNT WAS RE-DERIVED BY AN INDEPENDENT NAIVE O(N^2) ORACLE ACROSS
-SINGLE-RELEASE, FOUR-RELEASE AND TIE-HEAVY FIXTURES, AND THE COVERING ROLE IS
-THE EXACT MIRROR OF THE PRESSURE ROLE. THE EXACT TEN-FILE SHORT INTEREST LANE
-IS 572 PASSED; THE FOCUSED SI-3E-P0 FILE IS 45 PASSED. THE SHARED P2
-`SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN FOR THE OWNER. CODEX COUNTER-REVIEW
-OF THE CLAUDE COMMITS IS NEXT. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED;
+Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `c9d6923` AND `ba64d61`
+COMMIT BY COMMIT (SECTION 47): THE TEST-ONLY CORRECTION IS ACCEPTED; THE
+RECORD COMMIT IS ACCEPTED AFTER FOUR P3 RECORD-ONLY CORRECTIONS. INDEPENDENT
+REMOVAL OF EACH PINNED GUARD TURNS ITS NEW TEST RED, AND BOTH TESTS PASS ON THE
+RESTORED EXACT TREE. NO PRODUCTION OR TEST CORRECTION WAS REQUIRED AND NO
+IN-LANE P0, P1 OR P2 WAS FOUND. THE SHARED P2 `SI-CR5-005` /
+`SI-CCR16-007` REMAINS OPEN FOR THE OWNER. THE NEXT TECHNICAL TRANCHE WOULD BE
+SI-3E-P1 EXACT STOCK PERCENTILE/SEED POLICY, BUT IT IS BLOCKED PENDING THE
+OWNER'S FREEZE OF THE PERCENTILE DENOMINATOR/ENDPOINTS, BOUNDARY-TIE RULE,
+SMALL-N BEHAVIOR, PRESSURE/COVERING SYMMETRY, AND INVESTABILITY PARAMETERS;
+NO MILESTONE WAS STARTED. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED;
 AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL PROVIDER,
 LICENSED-DATA, OUTCOME, HOLDOUT, PERCENTILE/RANKING/SEEDING, INVESTABILITY,
 ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
@@ -6499,3 +6498,123 @@ was accessed. **Authorized outcome looks: 0. Consumed outcome looks: 0.**
    `K`, SI-4 ETF reverse index/eligibility/coverage/aggregation, every outcome
    join, portfolio stages and every QuantConnect artifact/upload/compile/job
    remain gated. No milestone is started here.
+
+## 47. Codex counter-review of Claude SI-3E-P0 correction - 2026-09-14
+
+Reviewer: Codex, in the dedicated Windows worktree
+`C:\git\customizedAgent\trading_agent_short_interest` on
+`codex/strategy-short-interest`. The worktree was clean at local and the
+previously fetched tracking baseline
+`eda11b1583bb6ae2f072f0fa7ee5912d7a2baeb5`; Codex fetched only
+`origin/codex/strategy-short-interest` and fast-forwarded the same branch to
+`ba64d611f890dc2d7f303f5eae88134f3e4b781f`. No branch was switched and no
+temporary worktree was created.
+
+**Disposition: accepted after record-only correction.** The test-only commit
+is accepted unchanged. The record commit is accepted after the four P3
+accuracy/process corrections below. No production or test file changed in
+this counter-review, no in-lane P0, P1 or P2 was found, and the retained shared
+P2 remains documented and unfixed under the owner's lane boundary.
+
+### 47.1 Exact reviewed snapshot and commit dispositions
+
+| Item | Exact value |
+|---|---|
+| Counter-review base | `e1f7e48c137ba2f70201d076a46537c0954ae0cd` |
+| Synced/reviewed head | `ba64d611f890dc2d7f303f5eae88134f3e4b781f` |
+| Ordered Claude range | `e1f7e48..ba64d61` (2 commits, no merge commit) |
+| Production blob SHA-256 at base/correction/review head | `07c08a9dd1ae9de99b597fb55f3bd09afb04e58f39e819d9304fe67431f84959` |
+| Test blob SHA-256 at base | `009f00a788b86e5d9ac2f725663fe5f084b781cbbca29157da456bac8dd32ffe` |
+| Test blob SHA-256 at correction/review head | `6c3ca2e70df55873b4a5c91dac75a4115d3cee09f78d3c3de1e6edee8af22603` |
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `c9d6923` | Add two SI-3E-P0 dangerous-direction regressions | **accepted** |
+| 2 | `ba64d61` | Record Claude's review and handoff | **accepted after record-only correction** (`SI-CCR19-001..004`) |
+
+`c9d6923` is the direct child of `e1f7e48` and changes only
+`tests/test_short_interest_stock_score_order.py` by adding 39 lines. Its two
+tests isolate the sole non-negative optional-count guard and the sole canonical
+pressure/covering tuple-order guard without changing a public API, production
+behavior, import boundary or authority flag. `ba64d61` is the direct child of
+`c9d6923` and changes only this lane record. Code and test bytes remain
+unchanged through the reviewed head.
+
+### 47.2 Mandatory P0-P3 counter-review ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for correction or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CCR19-001 | P3 | Closed by section 47 | `ba64d61` | section 46 / required final-review report | The review omitted the mandatory honest 1-10 implementation-quality rating. | Step 9 of `CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` requires that rating. | The durable review record must carry every required handoff field. | Added the rating in section 47.4 without rewriting the historical Claude section. | Section 47.4. |
+| SI-CCR19-002 | P3 | Closed as a non-defect observation | `ba64d61` | `SI-CR7-002` in section 46.5 | The layered normalization-policy guard was left `Open` even though the same row requests no change, proves another layer refuses the attack and cites the analogous closed disposition. | Removing the guard changes which layer refuses but does not admit the coherently rebound row. | A retained defence-in-depth observation is not an unresolved defect or action. | Supersede `Open` with **closed as a non-defect observation; no change**. | Section 46's own direct probe and rationale; no source change. |
+| SI-CCR19-003 | P3 | Closed by section 47 | `ba64d61` | section 46.4, declared exclusions | “No payload field carries a cutoff value” is overbroad because `revision_selection_state` deliberately carries release-cutoff states. | The stock-order payload retains values including `selected_at_release_cutoff`, `superseded_at_release_cutoff` and `not_visible_at_release_cutoff`. | The intended exclusion concerns percentile/ranking thresholds, not already-authenticated PIT revision timing. | Read the claim as no **percentile/ranking-threshold cutoff value**; release-timing cutoff state remains present. | Static payload inspection; production blob unchanged. |
+| SI-CCR19-004 | P3 | Closed by section 47 | `ba64d61` | sections 46.4-46.6, mutation scope | The combined seventeen-guard mutant leaving 36 tests green does not prove each of those 36 independently detects none of every removed guard; guard interactions can mask individual behavior. Only the selected eight-test attribution was run per guard. | Combined run: 7 failed / 36 passed. Individual attribution: 8 passed / 35 deselected for each of the three survivors. | Mutation conclusions must not exceed the executed isolation scope. | Narrow the evidence: 36 tests stayed green under the **combined** mutant; the selected eight-test per-guard attribution isolated three survivors. | Independent counter-review isolates both newly pinned guards below. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A (pre-existing) | shared integration history | The durable owner sentence covering the 2026-09-05 follow-up fix and `13079d5` alignment remains absent from lane-visible shared history. | Sections 41.5, 43.5, 44.2 and 46.5. | Owner decision; this lane may document but not edit the shared project history. | None in this lane. | Open. |
+| SI47-REV-001 | P3 | Closed before counter-review commit | uncommitted section-47 draft | section 47.2 shared-P2 row | The draft placed `shared integration history` in the Commit cell and therefore carried nine cells under a ten-column header. | Independent final read-only audit counted the row cells after all substantive edits. | The mandatory issue ledger must remain mechanically and visually self-describing. | Inserted `N/A (pre-existing)` as Commit and retained `shared integration history` as Location. | Final row count and active-document validation below. |
+
+### 47.3 Independent code review and validation
+
+- Baseline on exact reviewed head `ba64d61`: the two new tests **2 passed in
+  56.81s**. A second independent reviewer reproduced **2 passed in 52.42s**.
+- Removing only `_checked_optional_count`'s `value < 0` clause made
+  `test_score_order_row_refuses_a_negative_order_count` fail because no
+  exception was raised: **1 failed in 70.86s**. The committed source was then
+  restored.
+- Removing only the batch `actual_keys != expected_keys` canonical-ordering
+  guard made `test_score_order_batch_refuses_a_swapped_role_pair` fail because
+  no exception was raised: **1 failed in 67.92s**. The committed source was
+  then restored.
+- On the restored exact production bytes, both new tests returned **2 passed
+  in 64.28s**. The production Git blob remains byte-identical to the reviewed
+  head and `git diff --check` is clean.
+- Pre-record active-document consistency returned **69 passed in 3.55s**;
+  two post-correction checks returned **69 passed in 1.87s** and **69 passed
+  in 2.13s**. Lane-scoped
+  compileall over `research/short_interest_etf` and the focused test file
+  exited **0**. Claude's exact final code/test snapshot already records the
+  complete ten-file lane at **572 passed** and the focused file at **45
+  passed**; this counter-review did not rerun the complete repository suite
+  because the changes are lane-local tests/record and the dedicated-lane rule
+  requires Short-Interest-scoped validation.
+
+All validation used tracked documents and synthetic/offline fixtures. No
+credential, provider, programmatic FINRA request, licensed row, price, market
+outcome, holdout, ETF data, QuantConnect artifact/upload/compile/job, broker,
+operator database, scheduler, deployment, paper/live, order or trading surface
+was accessed. **Authorized outcome looks: 0. Consumed outcome looks: 0.**
+
+### 47.4 Quality, limits and next milestone gate
+
+**Claude's test-only correction quality: 10/10.** Each test targets a reachable
+dangerous direction, turns red only when its sole admission guard is removed,
+and preserves every production byte and authority boundary. **Claude's overall
+review submission quality: 9/10.** The substantive code review was strong; the
+withheld point reflects four P3 record-scope/process inaccuracies corrected
+above. SI-3E-P0 remains synthetic structural evidence, not market evidence.
+
+The next technical tranche would be **SI-3E-P1 exact stock percentile/seed
+policy and synthetic projection**, consuming SI-3E-P0's authenticated exact
+order inventory. It cannot begin without inventing financial-policy choices.
+The owner blueprint specifies eligible-universe percentile ranks and 90th/10th
+percentile seed thresholds, but neither it nor a later owner amendment freezes:
+
+1. the percentile denominator and endpoint/estimator convention;
+2. the exact boundary-tie treatment;
+3. small-N refusal, rounding or minimum-population behavior;
+4. whether pressure and covering use symmetric or separately evaluated rules;
+5. the investability universe, price/volume lookback, and market-cap/liquidity
+   minima, or an explicit authorization for a non-seed structural candidate
+   that keeps investability false.
+
+The strategy-document README says ambiguity is a stop condition, and sections
+45.7 and 46.7 reserve these choices to the owner. Therefore no SI-3E-P1 source,
+test, fixture or schema was started and there is no milestone implementation
+commit or push in this round yet. After an owner freeze, the bounded definition
+of done is an immutable content-addressed policy bound to SI-0M, the
+normalization policy and the blueprint; deterministic release-local pressure
+and covering dispositions over the authenticated SI-3E-P0 batch; complete tie
+group and terminal/refusal retention; strict malformed/coherent-forgery
+refusal; every empirical and operational authority false; focused, complete
+lane, active-document, compile and diff validation; record commit; and the
+round's single push. Licensed SI-1/full SI-2, `S2`-`S4`, DTC delta/window `K`,
+SI-4 ETF work, outcomes, portfolios, QuantConnect jobs and all operational
+actions remain separately gated.

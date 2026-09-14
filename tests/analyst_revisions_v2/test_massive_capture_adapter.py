@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import dataclasses
+import gc
 import inspect
 import json
 import os
+import re
 import stat
-from datetime import datetime, timezone
+import weakref
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import urlencode
@@ -26,7 +29,9 @@ from scripts.capture_arv2_massive import (
     ROLE_ORDER,
     TEST_TRANSPORT,
     MassiveCaptureError,
+    SpooledMassiveCapture,
     _capture_massive_history_for_test,
+    _capture_massive_history_spooled_for_test,
     _redact_url,
     capture_massive_history,
     load_massive_capture_artifact,
@@ -180,6 +185,26 @@ def _capture(
     return loaded, fake
 
 
+def _spooled_capture(
+    tmp_path: Path,
+    *,
+    responses: list[FakeResponse] | None = None,
+    session: FakeSession | None = None,
+    page_limit: int = 50_000,
+):
+    fake = session or FakeSession(responses or _success_responses())
+    loaded = _capture_massive_history_spooled_for_test(
+        requested_first_event_date=FIRST_DATE,
+        requested_last_event_date=LAST_DATE,
+        artifact_root=tmp_path / "spooled-captures",
+        page_limit=page_limit,
+        session=fake,
+        clock=lambda: NOW,
+        api_key=KEY,
+    )
+    return loaded, fake
+
+
 def _rewrite_manifest(path: Path, mutate) -> None:
     manifest_path = path / "manifest.json"
     value = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -189,6 +214,629 @@ def _rewrite_manifest(path: Path, mutate) -> None:
     (path / "manifest.sha256").write_bytes(
         (sha256_bytes(payload) + "\n").encode("ascii")
     )
+
+
+def _exact_error(message: str) -> str:
+    return f"^{re.escape(message)}$"
+
+
+def test_v2_spooling_persists_each_page_before_the_next_request(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    capture_root = tmp_path / "spooled-captures"
+    inventories_before_request: list[tuple[str, ...]] = []
+    checkpoint_count = 0
+    original_sync = module._fsync_fd
+
+    def observe_sync(descriptor: int, name: str) -> None:
+        nonlocal checkpoint_count
+        original_sync(descriptor, name)
+        if name == "capture pages checkpoint":
+            checkpoint_count += 1
+
+    monkeypatch.setattr(module, "_fsync_fd", observe_sync)
+
+    class PersistenceObservingSession(FakeSession):
+        def get(self, url: str, **kwargs: object) -> FakeResponse:
+            if self.calls:
+                assert checkpoint_count == len(self.calls)
+                staging = list(capture_root.glob(".*.incomplete"))
+                assert len(staging) == 1
+                pages = staging[0] / "pages"
+                inventories_before_request.append(
+                    tuple(sorted(path.name for path in pages.iterdir()))
+                )
+            return super().get(url, **kwargs)
+
+    session = PersistenceObservingSession(_success_responses())
+    loaded, _ = _spooled_capture(tmp_path, session=session)
+
+    assert type(loaded) is SpooledMassiveCapture
+    assert not hasattr(loaded, "capture")
+    assert inventories_before_request[0] == (
+        "01-analyst_ratings-page-000001.raw.json",
+        "01-analyst_ratings-page-000001.rows.jsonl",
+    )
+    assert len(inventories_before_request) == 3
+    manifest_bytes = (loaded.artifact_path / "manifest.json").read_bytes()
+    manifest = json.loads(manifest_bytes)
+    assert manifest["page_spooled_before_next_request"] is True
+    assert manifest["full_capture_retained_in_memory"] is False
+    assert manifest["stored_capture_byte_limit"] == 8 * 1024 * 1024 * 1024
+    assert (
+        manifest["raw_response_total_byte_count"]
+        + manifest["provider_rows_total_byte_count"]
+        + len(manifest_bytes)
+        + 65
+        <= manifest["stored_capture_byte_limit"]
+    )
+    assert list(capture_root.iterdir()) == [loaded.artifact_path]
+
+
+def test_v2_spooling_releases_the_prior_bound_page_before_next_request(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_bind = module.bind_capture_page
+    prior_page: weakref.ReferenceType[object] | None = None
+
+    def remember_bound_page(**kwargs):
+        nonlocal prior_page
+        page = original_bind(**kwargs)
+        prior_page = weakref.ref(page)
+        return page
+
+    class PageLifetimeObservingSession(FakeSession):
+        def get(self, url: str, **kwargs: object) -> FakeResponse:
+            if self.calls:
+                gc.collect()
+                assert prior_page is not None
+                assert prior_page() is None
+            return super().get(url, **kwargs)
+
+    monkeypatch.setattr(module, "bind_capture_page", remember_bound_page)
+    _spooled_capture(
+        tmp_path,
+        session=PageLifetimeObservingSession(_success_responses()),
+    )
+
+
+def test_v2_spooling_preserves_legacy_oracle_logical_capture_identity(
+    tmp_path, monkeypatch
+):
+    oracle, _ = _capture(tmp_path / "oracle", monkeypatch)
+    spooled, _ = _spooled_capture(tmp_path / "spooled")
+
+    assert spooled.capture_id == oracle.capture.capture_id
+    assert spooled.capture_sha256 == oracle.capture.capture_sha256
+    assert spooled.total_page_count == oracle.capture.total_page_count
+    assert spooled.total_row_count == oracle.capture.total_row_count
+    assert spooled.role_row_counts == oracle.capture.role_row_counts
+    oracle_manifest = json.loads(
+        (oracle.artifact_path / "manifest.json").read_bytes()
+    )
+    spooled_manifest = json.loads(
+        (spooled.artifact_path / "manifest.json").read_bytes()
+    )
+    assert spooled_manifest["pages"] == oracle_manifest["pages"]
+    assert spooled_manifest["role_counts"] == oracle_manifest["role_counts"]
+    assert oracle_manifest["page_spooled_before_next_request"] is False
+    assert oracle_manifest["full_capture_retained_in_memory"] is True
+    assert spooled_manifest["page_spooled_before_next_request"] is True
+    assert spooled_manifest["full_capture_retained_in_memory"] is False
+    reloaded = load_massive_capture_artifact(spooled.artifact_path)
+    assert reloaded.capture.capture_id == oracle.capture.capture_id
+
+
+def test_v1_manifest_is_explicitly_outside_the_v2_loader_contract(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+    _rewrite_manifest(
+        spooled.artifact_path,
+        lambda value: value.__setitem__(
+            "schema", "arv2-massive-three-role-capture-artifact-v1"
+        ),
+    )
+    with pytest.raises(
+        MassiveCaptureError,
+        match=_exact_error("capture manifest schema changed"),
+    ):
+        load_massive_capture_artifact(spooled.artifact_path)
+
+
+@pytest.mark.parametrize("kind", ["raw", "rows", "order"])
+def test_v2_spooled_artifact_tamper_or_order_change_refuses(
+    tmp_path, kind
+):
+    spooled, _ = _spooled_capture(tmp_path)
+    root = spooled.artifact_path
+    manifest = json.loads((root / "manifest.json").read_bytes())
+    if kind == "raw":
+        target = root / manifest["pages"][0]["raw_response_file"]
+        target.write_bytes(target.read_bytes() + b" ")
+    elif kind == "rows":
+        target = root / manifest["pages"][0]["provider_rows_file"]
+        target.write_bytes(target.read_bytes().replace(b"AAPL", b"MSFT"))
+    else:
+        _rewrite_manifest(
+            root,
+            lambda value: value["pages"].__setitem__(
+                slice(0, 2), list(reversed(value["pages"][:2]))
+            ),
+        )
+    with pytest.raises(MassiveCaptureError):
+        load_massive_capture_artifact(root)
+
+
+def test_v2_spooled_duplicate_provider_id_is_only_a_source_candidate(tmp_path):
+    responses = _success_responses()
+    ratings_cursor = (
+        _endpoint(MassiveSourceRole.ANALYST_RATINGS) + "?cursor=ratings-2"
+    )
+    responses[1] = FakeResponse(
+        _payload([_row("rating-1", role=ROLE_ORDER[0])]),
+        ratings_cursor,
+    )
+
+    spooled, _ = _spooled_capture(tmp_path, responses=responses)
+
+    assert spooled.artifact_path.is_dir()
+    assert not hasattr(spooled, "capture")
+    with pytest.raises(
+        MassiveCaptureError,
+        match=_exact_error("persisted capture failed authentication"),
+    ):
+        load_massive_capture_artifact(spooled.artifact_path)
+    with pytest.raises(
+        MassiveInputPairBridgeError,
+        match=_exact_error("Massive artifact failed physical authentication"),
+    ):
+        _build_massive_accepted_risk_input_pair_for_test(spooled.artifact_path)
+
+
+def test_v2_spooled_cursor_cycle_has_no_publication_or_staging(tmp_path):
+    cursor = _endpoint(ROLE_ORDER[0]) + "?cursor=repeat"
+    session = FakeSession(
+        [
+            FakeResponse(
+                _payload([_row("rating-1", role=ROLE_ORDER[0])], cursor),
+                _endpoint(ROLE_ORDER[0]),
+            ),
+            FakeResponse(
+                _payload([_row("rating-2", role=ROLE_ORDER[0])], cursor),
+                cursor,
+            ),
+        ]
+    )
+    expected = "provider cursor repeats or cycles"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path, session=session)
+    assert len(session.calls) == 2
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_clock_regression_has_no_publication_or_staging(tmp_path):
+    instants = iter((NOW, NOW - timedelta(microseconds=1)))
+    session = FakeSession(_success_responses())
+    expected = "capture page receipt times must be nondecreasing"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _capture_massive_history_spooled_for_test(
+            requested_first_event_date=FIRST_DATE,
+            requested_last_event_date=LAST_DATE,
+            artifact_root=tmp_path / "spooled-captures",
+            session=session,
+            clock=lambda: next(instants),
+            api_key=KEY,
+        )
+    assert session.headers == {}
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+@pytest.mark.parametrize(
+    ("limit_name", "limit", "message"),
+    [
+        (
+            "MAX_CAPTURE_STORED_BYTES",
+            1,
+            "capture exceeded the reviewed stored-byte budget",
+        ),
+        (
+            "MAX_CAPTURE_ROWS",
+            0,
+            "capture exceeded the reviewed stored-row budget",
+        ),
+        ("MAX_ARTIFACT_PAGES", 1, "capture exceeded the bounded page count"),
+    ],
+)
+def test_v2_spooled_aggregate_limits_leave_no_publication(
+    tmp_path, monkeypatch, limit_name, limit, message
+):
+    import scripts.capture_arv2_massive as module
+
+    monkeypatch.setattr(module, limit_name, limit)
+    session = FakeSession(_success_responses())
+    with pytest.raises(MassiveCaptureError, match=_exact_error(message)):
+        _spooled_capture(tmp_path, session=session)
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_write_failure_leaves_no_publication_or_staging(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_write = module._exclusive_private_write_at
+    writes = 0
+
+    def interrupted_write(
+        parent_fd: int, filename: str, payload: bytes, name: str
+    ) -> None:
+        nonlocal writes
+        writes += 1
+        if writes == 2:
+            raise MassiveCaptureError("synthetic spooled storage interruption")
+        original_write(parent_fd, filename, payload, name)
+
+    monkeypatch.setattr(module, "_exclusive_private_write_at", interrupted_write)
+    expected = "synthetic spooled storage interruption"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_staging_open_failure_removes_the_just_created_empty_directory(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_open = module._open_private_child_directory
+
+    def fail_staging_open(parent_fd: int, child_name: str, name: str) -> int:
+        if name == "capture staging directory":
+            raise OSError("synthetic staging descriptor failure")
+        return original_open(parent_fd, child_name, name)
+
+    monkeypatch.setattr(module, "_open_private_child_directory", fail_staging_open)
+    expected = "timestamped capture staging could not be created"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_capture_replay_refusal_is_isolated_and_cleans_staging(
+    tmp_path,
+):
+    cursor = _endpoint(ROLE_ORDER[0]) + "?cursor=replayed"
+    raw = _payload([_row("rating-1", role=ROLE_ORDER[0])], cursor)
+    session = FakeSession(
+        [
+            FakeResponse(raw, _endpoint(ROLE_ORDER[0])),
+            FakeResponse(raw, cursor),
+        ]
+    )
+    expected = "provider replayed a response page"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path, session=session)
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_page_binding_refusal_is_isolated_and_cleans_staging(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    def refuse_page_binding(**kwargs):
+        raise module.AcceptedRiskInputError("synthetic page-binding refusal")
+
+    monkeypatch.setattr(module, "bind_capture_page", refuse_page_binding)
+    expected = "provider page failed capture binding"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_completion_clock_regression_is_isolated_and_cleans_staging(
+    tmp_path,
+):
+    instants = iter((NOW, NOW, NOW, NOW, NOW, NOW - timedelta(microseconds=1)))
+    session = FakeSession(_success_responses())
+    expected = "capture chronology is reversed"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _capture_massive_history_spooled_for_test(
+            requested_first_event_date=FIRST_DATE,
+            requested_last_event_date=LAST_DATE,
+            artifact_root=tmp_path / "spooled-captures",
+            session=session,
+            clock=lambda: next(instants),
+            api_key=KEY,
+        )
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_manifest_size_refusal_is_isolated_and_cleans_staging(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    monkeypatch.setattr(module, "MAX_MANIFEST_BYTES", 1)
+    expected = "capture manifest exceeds the byte limit"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_total_stored_file_ceiling_includes_manifest_and_digest(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_manifest = module._manifest_from_page_records
+
+    def render_then_narrow_limit(**kwargs):
+        manifest = original_manifest(**kwargs)
+        page_bytes = (
+            manifest["raw_response_total_byte_count"]
+            + manifest["provider_rows_total_byte_count"]
+        )
+        required = page_bytes + len(canonical_json_bytes(manifest)) + 65
+        monkeypatch.setattr(module, "MAX_CAPTURE_STORED_BYTES", required - 1)
+        return manifest
+
+    monkeypatch.setattr(module, "_manifest_from_page_records", render_then_narrow_limit)
+    expected = "capture exceeds the reviewed stored-byte budget"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_publication_failure_is_isolated_and_cleans_staging(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_inventory = module._validate_inventory_at
+
+    def refuse_rename(*args, **kwargs):
+        raise OSError("synthetic rename failure")
+
+    def validate_then_arm_rename(*args, **kwargs):
+        original_inventory(*args, **kwargs)
+        monkeypatch.setattr(module.os, "rename", refuse_rename)
+
+    monkeypatch.setattr(module, "_validate_inventory_at", validate_then_arm_rename)
+    expected = "capture publication failed"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_ambiguous_publication_refusal_is_isolated(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_rename = module.os.rename
+    original_sync = module._fsync_fd
+    original_inventory = module._validate_inventory_at
+    rename_count = 0
+
+    def fail_only_rollback(*args, **kwargs):
+        nonlocal rename_count
+        rename_count += 1
+        if rename_count == 2:
+            raise OSError("synthetic rollback failure")
+        return original_rename(*args, **kwargs)
+
+    def fail_root_sync(descriptor: int, name: str) -> None:
+        if name == "capture root publication":
+            raise MassiveCaptureError("synthetic root sync failure")
+        original_sync(descriptor, name)
+
+    def validate_then_arm_rename(*args, **kwargs):
+        original_inventory(*args, **kwargs)
+        monkeypatch.setattr(module.os, "rename", fail_only_rollback)
+
+    monkeypatch.setattr(module, "_validate_inventory_at", validate_then_arm_rename)
+    monkeypatch.setattr(module, "_fsync_fd", fail_root_sync)
+    expected = "capture publication state is ambiguous after root-sync failure"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    assert rename_count == 2
+
+
+def test_v2_spooled_post_rename_identity_failure_is_explicitly_ambiguous(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_identity_check = module._require_pinned_child_identity
+
+    def fail_published_identity(parent_fd, child, child_fd, name):
+        if name == "published capture artifact":
+            raise MassiveCaptureError("synthetic published identity failure")
+        return original_identity_check(parent_fd, child, child_fd, name)
+
+    monkeypatch.setattr(
+        module, "_require_pinned_child_identity", fail_published_identity
+    )
+    expected = (
+        "capture publication state is ambiguous after identity verification failure"
+    )
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    entries = list((tmp_path / "spooled-captures").iterdir())
+    assert len(entries) == 1
+    assert not entries[0].name.startswith(".")
+
+
+def test_v2_spooled_root_sync_rollback_is_durable_before_cleanup(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_sync = module._fsync_fd
+    sync_names: list[str] = []
+
+    def fail_publication_sync(descriptor: int, name: str) -> None:
+        sync_names.append(name)
+        if name == "capture root publication":
+            raise MassiveCaptureError("synthetic root sync failure")
+        original_sync(descriptor, name)
+
+    monkeypatch.setattr(module, "_fsync_fd", fail_publication_sync)
+    with pytest.raises(
+        MassiveCaptureError,
+        match=_exact_error("synthetic root sync failure"),
+    ):
+        _spooled_capture(tmp_path)
+    assert sync_names[-2:] == ["capture root publication", "capture root rollback"]
+    assert list((tmp_path / "spooled-captures").iterdir()) == []
+
+
+def test_v2_spooled_rollback_sync_failure_preserves_hidden_artifact(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    original_sync = module._fsync_fd
+    sync_names: list[str] = []
+
+    def fail_both_root_syncs(descriptor: int, name: str) -> None:
+        sync_names.append(name)
+        if name in {"capture root publication", "capture root rollback"}:
+            raise MassiveCaptureError(f"synthetic {name} failure")
+        original_sync(descriptor, name)
+
+    monkeypatch.setattr(module, "_fsync_fd", fail_both_root_syncs)
+    expected = "capture publication state is ambiguous after rollback sync failure"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path)
+    assert sync_names[-2:] == ["capture root publication", "capture root rollback"]
+    entries = list((tmp_path / "spooled-captures").iterdir())
+    assert len(entries) == 1
+    assert entries[0].name.startswith(".")
+    assert entries[0].name.endswith(".incomplete")
+
+
+def test_v2_spooled_collision_refusal_is_isolated_before_provider_io(tmp_path):
+    first, _ = _spooled_capture(tmp_path)
+    session = FakeSession(_success_responses())
+    expected = "timestamped capture or incomplete staging already exists"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _spooled_capture(tmp_path, session=session)
+    assert session.calls == []
+    assert list((tmp_path / "spooled-captures").iterdir()) == [
+        first.artifact_path
+    ]
+
+
+def test_v2_spooled_configuration_refusal_is_isolated_before_provider_io(
+    tmp_path,
+):
+    import scripts.capture_arv2_massive as module
+
+    session = FakeSession(_success_responses())
+    expected = "spooled capture configuration is not reviewed"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        module._capture_massive_history_spooled_core(
+            requested_first_event_date=FIRST_DATE,
+            requested_last_event_date=LAST_DATE,
+            artifact_root=tmp_path / "spooled-captures",
+            page_limit=50_000,
+            session=session,
+            clock=lambda: NOW,
+            api_key=KEY,
+            capture_transport="unreviewed-transport",
+            close_owned_session=False,
+        )
+    assert session.calls == []
+    assert not (tmp_path / "spooled-captures").exists()
+
+
+def test_v2_manifest_construction_refusals_are_isolated(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    expected = "capture page did not retain exact raw response bytes"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        module._artifact_page_record(
+            SimpleNamespace(source_role=ROLE_ORDER[0], raw_response_bytes=None)
+        )
+
+    expected = "capture storage mode must be an exact boolean"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        module._manifest_from_page_records(
+            artifact_id="arv2-massive-three-role-20260912T123456123456Z",
+            capture_started_at="2026-09-12T12:34:56.123456Z",
+            capture_completed_at="2026-09-12T12:34:56.123456Z",
+            requested_first_event_date=FIRST_DATE,
+            requested_last_event_date=LAST_DATE,
+            page_records=(),
+            page_limit=50_000,
+            capture_transport=TEST_TRANSPORT,
+            page_spooled_before_next_request=1,
+        )
+
+    loaded, _ = _capture(tmp_path, monkeypatch)
+    original_logical_record = module._logical_capture_record
+
+    def changed_logical_record(**kwargs):
+        value = original_logical_record(**kwargs)
+        value["contract_id"] = "changed-contract"
+        return value
+
+    monkeypatch.setattr(module, "_logical_capture_record", changed_logical_record)
+    expected = "artifact manifest changed logical capture identity"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        module._manifest_record(
+            loaded.artifact_path.name,
+            loaded.capture,
+            50_000,
+            TEST_TRANSPORT,
+        )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected"),
+    [
+        ("stored_byte_limit", "manifest stored-byte budget changed"),
+        ("stored_row_limit", "manifest stored-row budget changed"),
+        ("inconsistent_storage", "manifest capture storage mode is inconsistent"),
+        ("production_not_spooled", "production capture was not page-spooled"),
+        ("stored_bytes_exceeded", "manifest exceeds the stored-byte budget"),
+        ("stored_rows_exceeded", "manifest exceeds the stored-row budget"),
+    ],
+)
+def test_v2_manifest_storage_refusals_are_isolated(
+    tmp_path, mutation, expected
+):
+    import scripts.capture_arv2_massive as module
+
+    spooled, _ = _spooled_capture(tmp_path)
+
+    def mutate(value):
+        if mutation == "stored_byte_limit":
+            value["stored_capture_byte_limit"] -= 1
+        elif mutation == "stored_row_limit":
+            value["stored_capture_row_limit"] -= 1
+        elif mutation == "inconsistent_storage":
+            value["full_capture_retained_in_memory"] = True
+        elif mutation == "production_not_spooled":
+            value["capture_transport"] = PRODUCTION_TRANSPORT
+            value["provider_io_read_only"] = True
+            value["page_spooled_before_next_request"] = False
+            value["full_capture_retained_in_memory"] = True
+        elif mutation == "stored_bytes_exceeded":
+            value["raw_response_total_byte_count"] = 8 * 1024 * 1024 * 1024
+        else:
+            value["total_row_count"] = value["stored_capture_row_limit"] + 1
+
+    _rewrite_manifest(spooled.artifact_path, mutate)
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        load_massive_capture_artifact(spooled.artifact_path)
 
 
 def test_three_roles_pagination_private_persistence_and_reload(
@@ -944,6 +1592,16 @@ def test_owned_production_session_is_closed_before_publication(
     monkeypatch.setattr(module, "REPOSITORY_ARTIFACTS_ROOT", tmp_path)
     monkeypatch.setattr(module, "_new_session", lambda: session)
     monkeypatch.setenv("MASSIVE_API_KEY", "production-test-key-never-real")
+    original_identity_check = module._require_pinned_child_identity
+
+    def require_closed_at_publication(parent_fd, child, child_fd, name):
+        if name == "published capture artifact":
+            assert session.close_count == 1
+        return original_identity_check(parent_fd, child, child_fd, name)
+
+    monkeypatch.setattr(
+        module, "_require_pinned_child_identity", require_closed_at_publication
+    )
     loaded = capture_massive_history(
         requested_first_event_date=FIRST_DATE,
         requested_last_event_date=LAST_DATE,
@@ -955,6 +1613,60 @@ def test_owned_production_session_is_closed_before_publication(
     assert loaded.capture_transport == PRODUCTION_TRANSPORT
     assert manifest["capture_transport"] == PRODUCTION_TRANSPORT
     assert manifest["provider_io_read_only"] is True
+
+
+def test_owned_production_session_close_failure_is_not_retried(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    class RaisingCloseSession(FakeSession):
+        def close(self) -> None:
+            self.close_count += 1
+            raise RuntimeError("secret-bearing synthetic close detail")
+
+    session = RaisingCloseSession(_success_responses())
+    monkeypatch.setattr(module, "REPOSITORY_ARTIFACTS_ROOT", tmp_path)
+    monkeypatch.setattr(module, "_new_session", lambda: session)
+    monkeypatch.setenv("MASSIVE_API_KEY", "production-test-key-never-real")
+    with pytest.raises(MassiveCaptureError, match="details redacted") as caught:
+        capture_massive_history(
+            requested_first_event_date=FIRST_DATE,
+            requested_last_event_date=LAST_DATE,
+            artifact_root=tmp_path / "captures",
+        )
+    assert "secret-bearing" not in str(caught.value)
+    assert session.close_count == 1
+
+
+def test_owned_production_session_closes_if_core_preflight_changes(
+    tmp_path, monkeypatch
+):
+    import scripts.capture_arv2_massive as module
+
+    session = FakeSession(_success_responses())
+    original_validate = module._validated_capture_arguments
+    validations = 0
+
+    def refuse_second_validation(**kwargs):
+        nonlocal validations
+        validations += 1
+        if validations == 2:
+            raise MassiveCaptureError("synthetic core preflight failure")
+        return original_validate(**kwargs)
+
+    monkeypatch.setattr(module, "REPOSITORY_ARTIFACTS_ROOT", tmp_path)
+    monkeypatch.setattr(module, "_new_session", lambda: session)
+    monkeypatch.setattr(module, "_validated_capture_arguments", refuse_second_validation)
+    monkeypatch.setenv("MASSIVE_API_KEY", "production-test-key-never-real")
+    with pytest.raises(MassiveCaptureError, match="core preflight failure"):
+        capture_massive_history(
+            requested_first_event_date=FIRST_DATE,
+            requested_last_event_date=LAST_DATE,
+            artifact_root=tmp_path / "captures",
+        )
+    assert session.close_count == 1
+    assert session.calls == []
 
 
 def test_root_sync_failure_rolls_publication_back_to_hidden_staging(

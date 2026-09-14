@@ -29,7 +29,12 @@ from typing import Any, Callable
 from urllib.parse import parse_qsl, quote, urlencode, urlsplit, urlunsplit
 
 from research.analyst_revisions_v2.accepted_risk_input_pair import (
+    CAPTURE_PAGE_SCHEMA,
+    CAPTURE_SCHEMA,
+    INPUT_PAIR_CONTRACT_ID,
+    INPUT_PAIR_CONTRACT_SHA256,
     MAX_PROVIDER_ROWS_PER_PAGE,
+    OWNER_DECISION_ID,
     AcceptedRiskInputError,
     AcceptedRiskInputPair,
     CaptureBinding,
@@ -58,7 +63,7 @@ from research.analyst_revisions_v2.canonical import (
 
 
 BASE_URL = "https://api.massive.com"
-ARTIFACT_SCHEMA = "arv2-massive-three-role-capture-artifact-v1"
+ARTIFACT_SCHEMA = "arv2-massive-three-role-capture-artifact-v2"
 MANIFEST_FILENAME = "manifest.json"
 MANIFEST_DIGEST_FILENAME = "manifest.sha256"
 DEFAULT_PAGE_LIMIT = MAX_PROVIDER_ROWS_PER_PAGE
@@ -66,7 +71,15 @@ MAX_MANIFEST_BYTES = 16 * 1024 * 1024
 MAX_RAW_RESPONSE_BYTES = 72 * 1024 * 1024
 MAX_PROVIDER_ROWS_BYTES = 64 * 1024 * 1024
 MAX_ARTIFACT_PAGES = 512
+# Production capture is page-spooled to private storage under this aggregate
+# regular-file payload-byte ceiling.  Filesystem metadata and allocation-unit
+# overhead are outside this logical-byte bound; this is not a RAM allowance.
+MAX_CAPTURE_STORED_BYTES = 8 * 1024 * 1024 * 1024
+# The legacy in-memory loader and offline oracle remain narrowly bounded.  A
+# production artifact above this limit must be consumed by the streaming
+# physical bridge rather than materialized as one CaptureBinding.
 MAX_CAPTURE_RETAINED_BYTES = 512 * 1024 * 1024
+MAX_CAPTURE_ROWS = MAX_ARTIFACT_PAGES * MAX_PROVIDER_ROWS_PER_PAGE
 REQUEST_TIMEOUT_SECONDS = 60
 RESPONSE_CHUNK_BYTES = 64 * 1024
 
@@ -146,7 +159,10 @@ _MANIFEST_KEYS = frozenset(
         "total_row_count",
         "raw_response_total_byte_count",
         "provider_rows_total_byte_count",
-        "retained_capture_byte_limit",
+        "stored_capture_byte_limit",
+        "stored_capture_row_limit",
+        "page_spooled_before_next_request",
+        "full_capture_retained_in_memory",
         "capture_transport",
         "immutable",
         "private_artifact",
@@ -190,6 +206,40 @@ class LoadedMassiveCapture:
     capture: CaptureBinding
     accepted_risk_input_pair: AcceptedRiskInputPair | None
     capture_transport: str
+
+
+@dataclasses.dataclass(frozen=True)
+class SpooledMassiveCapture:
+    """A lightweight binding to a page-spooled production capture.
+
+    It intentionally carries no response or provider-row bytes.  Consumers
+    must authenticate the immutable artifact through the physical bridge.
+    """
+
+    artifact_path: Path
+    manifest_sha256: str
+    capture_id: str
+    capture_sha256: str
+    total_page_count: int
+    total_row_count: int
+    role_row_counts: tuple[tuple[MassiveSourceRole, int], ...]
+    capture_transport: str
+
+
+class _OwnedSessionGuard:
+    """Make the production Session close-once across every preflight path."""
+
+    def __init__(self, session: object) -> None:
+        self._session = session
+        self._closed = False
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self._session, name)
+
+    def close(self) -> None:
+        if not self._closed:
+            self._closed = True
+            self._session.close()
 
 
 def _api_key() -> str:
@@ -600,72 +650,152 @@ def _role_page_filename(
     return f"{role_index:02d}-{source_role.value}-page-{page_number:06d}.{suffix}"
 
 
-def _manifest_record(
+def _artifact_page_record(page: object) -> dict[str, object]:
+    source_role = page.source_role
+    raw_response = page.raw_response_bytes
+    if raw_response is None:
+        raise MassiveCaptureError("capture page did not retain exact raw response bytes")
+    raw_name = _role_page_filename(source_role, page.page_number, "raw.json")
+    rows_name = _role_page_filename(source_role, page.page_number, "rows.jsonl")
+    return {
+        "source_role": source_role.value,
+        "endpoint_path": ENDPOINT_PATHS[source_role],
+        "endpoint_identifier": page.endpoint_identifier,
+        "redacted_query_sha256": page.redacted_query_sha256,
+        "page_number": page.page_number,
+        "request_cursor_sha256": page.request_cursor_sha256,
+        "next_cursor_sha256": page.next_cursor_sha256,
+        "terminal_page": page.terminal_page,
+        "response_received_at": page.response_received_at,
+        "raw_response_file": f"pages/{raw_name}",
+        "raw_response_byte_count": len(raw_response),
+        "raw_response_sha256": page.raw_response_sha256,
+        "provider_rows_file": f"pages/{rows_name}",
+        "provider_rows_byte_count": len(page.provider_rows_bytes),
+        "provider_rows_sha256": page.provider_rows_sha256,
+        "row_count": page.row_count,
+    }
+
+
+def _capture_lineage_page_record(page: dict[str, object]) -> dict[str, object]:
+    return {
+        "schema": CAPTURE_PAGE_SCHEMA,
+        "source_role": page["source_role"],
+        "endpoint_identifier": page["endpoint_identifier"],
+        "redacted_query_sha256": page["redacted_query_sha256"],
+        "page_number": page["page_number"],
+        "request_cursor_sha256": page["request_cursor_sha256"],
+        "next_cursor_sha256": page["next_cursor_sha256"],
+        "terminal_page": page["terminal_page"],
+        "response_received_at": page["response_received_at"],
+        "raw_response_sha256": page["raw_response_sha256"],
+        "raw_response_extraction_verified": True,
+        "provider_rows_sha256": page["provider_rows_sha256"],
+        "row_count": page["row_count"],
+    }
+
+
+def _logical_capture_record(
+    *,
+    capture_started_at: str,
+    capture_completed_at: str,
+    requested_first_event_date: str,
+    requested_last_event_date: str,
+    pages: tuple[dict[str, object], ...],
+) -> dict[str, object]:
+    counts = {
+        role: sum(
+            int(page["row_count"])
+            for page in pages
+            if page["source_role"] == role.value
+        )
+        for role in ROLE_ORDER
+    }
+    return {
+        "schema": CAPTURE_SCHEMA,
+        "contract_id": INPUT_PAIR_CONTRACT_ID,
+        "contract_sha256": INPUT_PAIR_CONTRACT_SHA256,
+        "capture_started_at": capture_started_at,
+        "capture_completed_at": capture_completed_at,
+        "requested_first_event_date": requested_first_event_date,
+        "requested_last_event_date": requested_last_event_date,
+        "pages": [_capture_lineage_page_record(page) for page in pages],
+        "total_page_count": len(pages),
+        "total_row_count": sum(int(page["row_count"]) for page in pages),
+        "role_row_counts": [
+            {"source_role": role.value, "row_count": counts[role]}
+            for role in ROLE_ORDER
+        ],
+        "owner_decision_id": OWNER_DECISION_ID,
+        "transactional_snapshot": False,
+        "complete_version_history": False,
+        "complete_deletion_tombstones": False,
+        "point_in_time_ticker_identity": False,
+        "pristine_point_in_time": False,
+    }
+
+
+def _manifest_from_page_records(
+    *,
     artifact_id: str,
-    capture: CaptureBinding,
+    capture_started_at: str,
+    capture_completed_at: str,
+    requested_first_event_date: str,
+    requested_last_event_date: str,
+    page_records: tuple[dict[str, object], ...],
     page_limit: int,
     capture_transport: str,
+    page_spooled_before_next_request: bool,
 ) -> dict[str, Any]:
     if type(capture_transport) is not str or capture_transport not in _TRANSPORTS:
         raise MassiveCaptureError("capture transport is not reviewed")
+    if type(page_spooled_before_next_request) is not bool:
+        raise MassiveCaptureError("capture storage mode must be an exact boolean")
+    logical = _logical_capture_record(
+        capture_started_at=capture_started_at,
+        capture_completed_at=capture_completed_at,
+        requested_first_event_date=requested_first_event_date,
+        requested_last_event_date=requested_last_event_date,
+        pages=page_records,
+    )
+    capture_sha256 = sha256_bytes(canonical_json_bytes(logical))
     role_counts: list[dict[str, object]] = []
     for role in ROLE_ORDER:
-        role_pages = tuple(page for page in capture.pages if page.source_role is role)
+        role_pages = tuple(
+            page for page in page_records if page["source_role"] == role.value
+        )
         role_counts.append(
             {
                 "source_role": role.value,
                 "page_count": len(role_pages),
-                "row_count": sum(page.row_count for page in role_pages),
-            }
-        )
-    pages: list[dict[str, object]] = []
-    for page in capture.pages:
-        raw_name = _role_page_filename(page.source_role, page.page_number, "raw.json")
-        rows_name = _role_page_filename(page.source_role, page.page_number, "rows.jsonl")
-        if page.raw_response_bytes is None:
-            raise MassiveCaptureError("capture page did not retain exact raw response bytes")
-        pages.append(
-            {
-                "source_role": page.source_role.value,
-                "endpoint_path": ENDPOINT_PATHS[page.source_role],
-                "endpoint_identifier": page.endpoint_identifier,
-                "redacted_query_sha256": page.redacted_query_sha256,
-                "page_number": page.page_number,
-                "request_cursor_sha256": page.request_cursor_sha256,
-                "next_cursor_sha256": page.next_cursor_sha256,
-                "terminal_page": page.terminal_page,
-                "response_received_at": page.response_received_at,
-                "raw_response_file": f"pages/{raw_name}",
-                "raw_response_byte_count": len(page.raw_response_bytes),
-                "raw_response_sha256": page.raw_response_sha256,
-                "provider_rows_file": f"pages/{rows_name}",
-                "provider_rows_byte_count": len(page.provider_rows_bytes),
-                "provider_rows_sha256": page.provider_rows_sha256,
-                "row_count": page.row_count,
+                "row_count": sum(int(page["row_count"]) for page in role_pages),
             }
         )
     return {
         "schema": ARTIFACT_SCHEMA,
         "artifact_id": artifact_id,
-        "capture_id": capture.capture_id,
-        "capture_sha256": capture.capture_sha256,
-        "capture_started_at": capture.capture_started_at,
-        "capture_completed_at": capture.capture_completed_at,
-        "requested_first_event_date": capture.requested_first_event_date,
-        "requested_last_event_date": capture.requested_last_event_date,
+        "capture_id": f"arv2-capture-{capture_sha256[:24]}",
+        "capture_sha256": capture_sha256,
+        "capture_started_at": capture_started_at,
+        "capture_completed_at": capture_completed_at,
+        "requested_first_event_date": requested_first_event_date,
+        "requested_last_event_date": requested_last_event_date,
         "page_limit": page_limit,
         "role_order": [role.value for role in ROLE_ORDER],
         "role_counts": role_counts,
-        "pages": pages,
-        "total_page_count": capture.total_page_count,
-        "total_row_count": capture.total_row_count,
+        "pages": list(page_records),
+        "total_page_count": len(page_records),
+        "total_row_count": sum(int(page["row_count"]) for page in page_records),
         "raw_response_total_byte_count": sum(
-            len(page.raw_response_bytes or b"") for page in capture.pages
+            int(page["raw_response_byte_count"]) for page in page_records
         ),
         "provider_rows_total_byte_count": sum(
-            len(page.provider_rows_bytes) for page in capture.pages
+            int(page["provider_rows_byte_count"]) for page in page_records
         ),
-        "retained_capture_byte_limit": MAX_CAPTURE_RETAINED_BYTES,
+        "stored_capture_byte_limit": MAX_CAPTURE_STORED_BYTES,
+        "stored_capture_row_limit": MAX_CAPTURE_ROWS,
+        "page_spooled_before_next_request": page_spooled_before_next_request,
+        "full_capture_retained_in_memory": not page_spooled_before_next_request,
         "capture_transport": capture_transport,
         "immutable": True,
         "private_artifact": True,
@@ -674,6 +804,32 @@ def _manifest_record(
         "outcome_access_performed": False,
         "quantconnect_io_performed": False,
     }
+
+
+def _manifest_record(
+    artifact_id: str,
+    capture: CaptureBinding,
+    page_limit: int,
+    capture_transport: str,
+) -> dict[str, Any]:
+    page_records = tuple(_artifact_page_record(page) for page in capture.pages)
+    manifest = _manifest_from_page_records(
+        artifact_id=artifact_id,
+        capture_started_at=capture.capture_started_at,
+        capture_completed_at=capture.capture_completed_at,
+        requested_first_event_date=capture.requested_first_event_date,
+        requested_last_event_date=capture.requested_last_event_date,
+        page_records=page_records,
+        page_limit=page_limit,
+        capture_transport=capture_transport,
+        page_spooled_before_next_request=False,
+    )
+    if (
+        manifest["capture_id"] != capture.capture_id
+        or manifest["capture_sha256"] != capture.capture_sha256
+    ):
+        raise MassiveCaptureError("artifact manifest changed logical capture identity")
+    return manifest
 
 
 def _require_operational_artifact_scope(path: Path) -> None:
@@ -689,7 +845,7 @@ def _require_operational_artifact_scope(path: Path) -> None:
 
 
 def _require_dirfd_support() -> None:
-    required = (os.open, os.mkdir, os.rename, os.stat)
+    required = (os.open, os.mkdir, os.rename, os.stat, os.unlink, os.rmdir)
     if (
         os.name == "nt"
         or not hasattr(os, "O_DIRECTORY")
@@ -1097,9 +1253,14 @@ def _persist_capture(
             raise MassiveCaptureError(
                 "timestamped capture publication failed or overwrite was refused"
             ) from exc
-        _require_pinned_child_identity(
-            root_fd, artifact_id, staging_fd, "published capture artifact"
-        )
+        try:
+            _require_pinned_child_identity(
+                root_fd, artifact_id, staging_fd, "published capture artifact"
+            )
+        except MassiveCaptureError as identity_error:
+            raise MassiveCaptureError(
+                "capture publication state is ambiguous after identity verification failure"
+            ) from identity_error
         try:
             _fsync_fd(root_fd, "capture root publication")
         except MassiveCaptureError as sync_error:
@@ -1117,6 +1278,425 @@ def _persist_capture(
             raise sync_error
         return artifact_path, manifest_sha256
     finally:
+        if pages_fd is not None:
+            os.close(pages_fd)
+        if staging_fd is not None:
+            os.close(staging_fd)
+        os.close(root_fd)
+
+
+def _best_effort_cleanup_spooled_staging(
+    *,
+    root_fd: int,
+    staging_name: str,
+    staging_fd: int | None,
+    pages_fd: int | None,
+    expected_page_files: set[str],
+) -> None:
+    """Remove only private files created by a failed spooled capture.
+
+    Unexpected or link-like entries are deliberately left in the hidden
+    staging directory rather than deleted.  Cleanup must never replace the
+    primary provider or publication refusal.
+    """
+
+    if staging_fd is None:
+        # ``mkdir`` may have succeeded immediately before opening the pinned
+        # descriptor failed.  Remove only that still-empty, private,
+        # owner-held directory; a substituted or populated entry is left
+        # untouched and remains non-publishable.
+        try:
+            metadata = os.stat(
+                staging_name, dir_fd=root_fd, follow_symlinks=False
+            )
+            if (
+                stat.S_ISDIR(metadata.st_mode)
+                and stat.S_IMODE(metadata.st_mode) == 0o700
+                and (
+                    not hasattr(os, "getuid") or metadata.st_uid == os.getuid()
+                )
+            ):
+                os.rmdir(staging_name, dir_fd=root_fd)
+        except OSError:
+            pass
+        return
+    if pages_fd is not None:
+        try:
+            names = set(os.listdir(pages_fd))
+        except OSError:
+            names = set()
+        for filename in sorted(names.intersection(expected_page_files)):
+            try:
+                metadata = os.stat(filename, dir_fd=pages_fd, follow_symlinks=False)
+                if (
+                    stat.S_ISREG(metadata.st_mode)
+                    and stat.S_IMODE(metadata.st_mode) == 0o600
+                    and metadata.st_nlink == 1
+                    and (
+                        not hasattr(os, "getuid")
+                        or metadata.st_uid == os.getuid()
+                    )
+                ):
+                    os.unlink(filename, dir_fd=pages_fd)
+            except OSError:
+                pass
+    for filename in (MANIFEST_FILENAME, MANIFEST_DIGEST_FILENAME):
+        try:
+            metadata = os.stat(filename, dir_fd=staging_fd, follow_symlinks=False)
+            if (
+                stat.S_ISREG(metadata.st_mode)
+                and stat.S_IMODE(metadata.st_mode) == 0o600
+                and metadata.st_nlink == 1
+                and (
+                    not hasattr(os, "getuid") or metadata.st_uid == os.getuid()
+                )
+            ):
+                os.unlink(filename, dir_fd=staging_fd)
+        except OSError:
+            pass
+    try:
+        os.rmdir("pages", dir_fd=staging_fd)
+    except OSError:
+        pass
+    try:
+        os.rmdir(staging_name, dir_fd=root_fd)
+    except OSError:
+        pass
+
+
+def _capture_massive_history_spooled_core(
+    *,
+    requested_first_event_date: str,
+    requested_last_event_date: str,
+    artifact_root: Path,
+    page_limit: int,
+    session: object,
+    clock: Callable[[], datetime],
+    api_key: str,
+    capture_transport: str,
+    close_owned_session: bool,
+) -> SpooledMassiveCapture:
+    """Acquire one capture while retaining at most one source page in memory."""
+
+    first, last, root = _validated_capture_arguments(
+        requested_first_event_date=requested_first_event_date,
+        requested_last_event_date=requested_last_event_date,
+        artifact_root=Path(artifact_root),
+        page_limit=page_limit,
+        build_input_pair=False,
+    )
+    if (
+        type(api_key) is not str
+        or not api_key
+        or type(capture_transport) is not str
+        or capture_transport not in _TRANSPORTS
+        or type(close_owned_session) is not bool
+    ):
+        raise MassiveCaptureError("spooled capture configuration is not reviewed")
+
+    started_at = _now_utc(clock)
+    last_observed_at = parse_utc_timestamp(started_at, "capture_started_at")
+    artifact_id = _artifact_id_from_timestamp(started_at)
+    root, root_fd = _open_directory_path(root, create=True, name="artifact root")
+    assert root_fd is not None
+    artifact_path = root / artifact_id
+    staging_name = f".{artifact_id}.incomplete"
+    staging_fd: int | None = None
+    pages_fd: int | None = None
+    expected_page_files: set[str] = set()
+    published = False
+    cleanup_safe = True
+    session_closed = False
+    headers: object | None = None
+    had_previous = False
+    previous: object | None = None
+    authorization_active = False
+    try:
+        if _entry_exists_at(root_fd, artifact_id) or _entry_exists_at(
+            root_fd, staging_name
+        ):
+            raise MassiveCaptureError(
+                "timestamped capture or incomplete staging already exists"
+            )
+        try:
+            os.mkdir(staging_name, 0o700, dir_fd=root_fd)
+            staging_fd = _open_private_child_directory(
+                root_fd, staging_name, "capture staging directory"
+            )
+            os.mkdir("pages", 0o700, dir_fd=staging_fd)
+            pages_fd = _open_private_child_directory(
+                staging_fd, "pages", "capture pages"
+            )
+        except OSError as exc:
+            raise MassiveCaptureError(
+                "timestamped capture staging could not be created"
+            ) from exc
+
+        headers, had_previous, previous = _set_session_authorization(
+            session, api_key
+        )
+        authorization_active = True
+        page_records: list[dict[str, object]] = []
+        stored_bytes = 0
+        stored_rows = 0
+        seen_cursor_hashes: dict[MassiveSourceRole, set[str]] = {
+            role: set() for role in ROLE_ORDER
+        }
+        seen_response_hashes: dict[MassiveSourceRole, set[str]] = {
+            role: set() for role in ROLE_ORDER
+        }
+
+        for role in ROLE_ORDER:
+            endpoint = BASE_URL + ENDPOINT_PATHS[role]
+            query_bytes = render_redacted_capture_query_bytes(
+                source_role=role,
+                requested_first_event_date=first.isoformat(),
+                requested_last_event_date=last.isoformat(),
+                limit=page_limit,
+            )
+            request_url = endpoint
+            request_cursor_sha256: str | None = None
+            first_request = True
+            page_number = 1
+            while True:
+                if len(page_records) >= MAX_ARTIFACT_PAGES:
+                    raise MassiveCaptureError(
+                        "capture exceeded the bounded page count"
+                    )
+                params: dict[str, object] | None = None
+                if first_request:
+                    params = {
+                        "date.gte": first.isoformat(),
+                        "date.lte": last.isoformat(),
+                        "limit": page_limit,
+                        "sort": "date.asc",
+                    }
+                raw_response = _request_page(
+                    session,
+                    request_url,
+                    params=params,
+                    source_role=role,
+                )
+                _assert_response_does_not_echo_credential(raw_response, api_key)
+                received_at = _now_utc(clock)
+                received_instant = parse_utc_timestamp(
+                    received_at, "response_received_at"
+                )
+                if received_instant < last_observed_at:
+                    raise MassiveCaptureError(
+                        "capture page receipt times must be nondecreasing"
+                    )
+                last_observed_at = received_instant
+                response_sha256 = sha256_bytes(raw_response)
+                if response_sha256 in seen_response_hashes[role]:
+                    raise MassiveCaptureError("provider replayed a response page")
+                seen_response_hashes[role].add(response_sha256)
+                provider_rows_bytes, next_url = _response_rows_and_next_url(
+                    raw_response, page_limit=page_limit
+                )
+                next_cursor_sha256: str | None = None
+                validated_next_url: str | None = None
+                if next_url is not None:
+                    next_cursor_sha256, validated_next_url = (
+                        _cursor_hash_and_validated_url(
+                            next_url,
+                            source_role=role,
+                            requested_first_event_date=first.isoformat(),
+                            requested_last_event_date=last.isoformat(),
+                            page_limit=page_limit,
+                        )
+                    )
+                    if next_cursor_sha256 in seen_cursor_hashes[role]:
+                        raise MassiveCaptureError(
+                            "provider cursor repeats or cycles"
+                        )
+                    seen_cursor_hashes[role].add(next_cursor_sha256)
+                try:
+                    page = bind_capture_page(
+                        source_role=role,
+                        redacted_query_bytes=query_bytes,
+                        page_number=page_number,
+                        request_cursor_sha256=request_cursor_sha256,
+                        next_cursor_sha256=next_cursor_sha256,
+                        terminal_page=next_url is None,
+                        response_received_at=received_at,
+                        raw_response_sha256=response_sha256,
+                        provider_rows_bytes=provider_rows_bytes,
+                        raw_response_bytes=raw_response,
+                    )
+                except (AcceptedRiskInputError, CanonicalEvidenceError) as exc:
+                    raise MassiveCaptureError(
+                        "provider page failed capture binding"
+                    ) from exc
+                record = _artifact_page_record(page)
+                candidate_bytes = (
+                    stored_bytes + len(raw_response) + len(provider_rows_bytes)
+                )
+                candidate_rows = stored_rows + page.row_count
+                if candidate_bytes > MAX_CAPTURE_STORED_BYTES:
+                    raise MassiveCaptureError(
+                        "capture exceeded the reviewed stored-byte budget"
+                    )
+                if candidate_rows > MAX_CAPTURE_ROWS:
+                    raise MassiveCaptureError(
+                        "capture exceeded the reviewed stored-row budget"
+                    )
+                raw_name = Path(str(record["raw_response_file"])).name
+                rows_name = Path(str(record["provider_rows_file"])).name
+                expected_page_files.update((raw_name, rows_name))
+                _exclusive_private_write_at(
+                    pages_fd,
+                    raw_name,
+                    raw_response,
+                    "raw response page",
+                )
+                _exclusive_private_write_at(
+                    pages_fd,
+                    rows_name,
+                    provider_rows_bytes,
+                    "canonical provider-row page",
+                )
+                _require_pinned_child_identity(
+                    staging_fd, "pages", pages_fd, "capture pages"
+                )
+                # The file bodies and their directory entries are durable
+                # before another provider response is requested.
+                _fsync_fd(pages_fd, "capture pages checkpoint")
+                page_records.append(record)
+                stored_bytes = candidate_bytes
+                stored_rows = candidate_rows
+                # No response or normalized page bytes survive into the next
+                # request.  Only the small immutable lineage record remains.
+                del page, record, raw_response, provider_rows_bytes
+                if validated_next_url is None:
+                    break
+                request_url = validated_next_url
+                request_cursor_sha256 = next_cursor_sha256
+                first_request = False
+                page_number += 1
+
+        completed_at = _now_utc(clock)
+        if parse_utc_timestamp(
+            completed_at, "capture_completed_at"
+        ) < last_observed_at:
+            raise MassiveCaptureError("capture chronology is reversed")
+        assert headers is not None
+        _restore_session_authorization(
+            headers, had_previous, previous, suppress=False
+        )
+        authorization_active = False
+        if close_owned_session:
+            try:
+                session.close()
+            except Exception as exc:
+                raise MassiveCaptureError(_sanitized_provider_failure(exc)) from None
+            session_closed = True
+        page_records_tuple = tuple(page_records)
+        manifest = _manifest_from_page_records(
+            artifact_id=artifact_id,
+            capture_started_at=started_at,
+            capture_completed_at=completed_at,
+            requested_first_event_date=first.isoformat(),
+            requested_last_event_date=last.isoformat(),
+            page_records=page_records_tuple,
+            page_limit=page_limit,
+            capture_transport=capture_transport,
+            page_spooled_before_next_request=True,
+        )
+        manifest_bytes = canonical_json_bytes(manifest)
+        if len(manifest_bytes) > MAX_MANIFEST_BYTES:
+            raise MassiveCaptureError("capture manifest exceeds the byte limit")
+        if stored_bytes + len(manifest_bytes) + 65 > MAX_CAPTURE_STORED_BYTES:
+            raise MassiveCaptureError(
+                "capture exceeds the reviewed stored-byte budget"
+            )
+        _exclusive_private_write_at(
+            staging_fd, MANIFEST_FILENAME, manifest_bytes, "capture manifest"
+        )
+        manifest_sha256 = sha256_bytes(manifest_bytes)
+        _exclusive_private_write_at(
+            staging_fd,
+            MANIFEST_DIGEST_FILENAME,
+            (manifest_sha256 + "\n").encode("ascii"),
+            "capture manifest digest",
+        )
+        _validate_inventory_at(staging_fd, pages_fd, expected_page_files)
+        _require_pinned_child_identity(
+            root_fd, staging_name, staging_fd, "capture staging directory"
+        )
+        _fsync_fd(staging_fd, "capture staging artifact")
+        try:
+            os.rename(
+                staging_name,
+                artifact_id,
+                src_dir_fd=root_fd,
+                dst_dir_fd=root_fd,
+            )
+        except OSError as exc:
+            raise MassiveCaptureError("capture publication failed") from exc
+        cleanup_safe = False
+        try:
+            _require_pinned_child_identity(
+                root_fd, artifact_id, staging_fd, "published capture artifact"
+            )
+        except MassiveCaptureError as identity_error:
+            raise MassiveCaptureError(
+                "capture publication state is ambiguous after identity verification failure"
+            ) from identity_error
+        try:
+            _fsync_fd(root_fd, "capture root publication")
+        except MassiveCaptureError as sync_error:
+            try:
+                os.rename(
+                    artifact_id,
+                    staging_name,
+                    src_dir_fd=root_fd,
+                    dst_dir_fd=root_fd,
+                )
+            except OSError as rollback_error:
+                raise MassiveCaptureError(
+                    "capture publication state is ambiguous after root-sync failure"
+                ) from rollback_error
+            try:
+                _fsync_fd(root_fd, "capture root rollback")
+            except MassiveCaptureError as rollback_sync_error:
+                raise MassiveCaptureError(
+                    "capture publication state is ambiguous after rollback sync failure"
+                ) from rollback_sync_error
+            cleanup_safe = True
+            raise sync_error
+        published = True
+        return SpooledMassiveCapture(
+            artifact_path=artifact_path,
+            manifest_sha256=manifest_sha256,
+            capture_id=str(manifest["capture_id"]),
+            capture_sha256=str(manifest["capture_sha256"]),
+            total_page_count=int(manifest["total_page_count"]),
+            total_row_count=int(manifest["total_row_count"]),
+            role_row_counts=tuple(
+                (MassiveSourceRole(item["source_role"]), int(item["row_count"]))
+                for item in manifest["role_counts"]
+            ),
+            capture_transport=capture_transport,
+        )
+    finally:
+        if authorization_active and headers is not None:
+            _restore_session_authorization(
+                headers, had_previous, previous, suppress=True
+            )
+        if close_owned_session and not session_closed:
+            try:
+                session.close()
+            except Exception:
+                pass
+        if not published and cleanup_safe:
+            _best_effort_cleanup_spooled_staging(
+                root_fd=root_fd,
+                staging_name=staging_name,
+                staging_fd=staging_fd,
+                pages_fd=pages_fd,
+                expected_page_files=expected_page_files,
+            )
         if pages_fd is not None:
             os.close(pages_fd)
         if staging_fd is not None:
@@ -1353,11 +1933,11 @@ def capture_massive_history(
     artifact_root: Path = DEFAULT_ARTIFACT_ROOT,
     page_limit: int = DEFAULT_PAGE_LIMIT,
     build_input_pair: bool = False,
-) -> LoadedMassiveCapture:
-    """Capture through one owned default-TLS Session and publish atomically."""
+) -> SpooledMassiveCapture:
+    """Page-spool through one owned default-TLS Session and publish atomically."""
 
     _require_operational_artifact_scope(Path(artifact_root))
-    first, last, preflight_root = _validated_capture_arguments(
+    _first, _last, preflight_root = _validated_capture_arguments(
         requested_first_event_date=requested_first_event_date,
         requested_last_event_date=requested_last_event_date,
         artifact_root=Path(artifact_root),
@@ -1365,32 +1945,24 @@ def capture_massive_history(
         build_input_pair=build_input_pair,
     )
     key = _api_key()
-    session = _new_session()
+    session = _OwnedSessionGuard(_new_session())
     try:
-        capture = _acquire_with_authorization(
-            first=first,
-            last=last,
+        return _capture_massive_history_spooled_core(
+            requested_first_event_date=requested_first_event_date,
+            requested_last_event_date=requested_last_event_date,
+            artifact_root=preflight_root,
             page_limit=page_limit,
             session=session,
-            key=key,
             clock=lambda: datetime.now(timezone.utc),
+            api_key=key,
+            capture_transport=PRODUCTION_TRANSPORT,
+            close_owned_session=True,
         )
-    except BaseException:
+    finally:
         try:
             session.close()
         except Exception:
             pass
-        raise
-    try:
-        session.close()
-    except Exception as exc:
-        raise MassiveCaptureError(_sanitized_provider_failure(exc)) from None
-    return _persist_and_return(
-        artifact_root=preflight_root,
-        capture=capture,
-        page_limit=page_limit,
-        capture_transport=PRODUCTION_TRANSPORT,
-    )
 
 
 def _capture_massive_history_for_test(
@@ -1428,6 +2000,33 @@ def _capture_massive_history_for_test(
         capture=capture,
         page_limit=page_limit,
         capture_transport=TEST_TRANSPORT,
+    )
+
+
+def _capture_massive_history_spooled_for_test(
+    *,
+    requested_first_event_date: str,
+    requested_last_event_date: str,
+    artifact_root: Path,
+    page_limit: int = DEFAULT_PAGE_LIMIT,
+    session: object,
+    clock: Callable[[], datetime],
+    api_key: str,
+) -> SpooledMassiveCapture:
+    """Offline seam over the exact production page-spooling implementation."""
+
+    if type(api_key) is not str or not api_key.startswith("offline-test-"):
+        raise MassiveCaptureError("offline test transport requires a synthetic key")
+    return _capture_massive_history_spooled_core(
+        requested_first_event_date=requested_first_event_date,
+        requested_last_event_date=requested_last_event_date,
+        artifact_root=Path(artifact_root),
+        page_limit=page_limit,
+        session=session,
+        clock=clock,
+        api_key=api_key,
+        capture_transport=TEST_TRANSPORT,
+        close_owned_session=False,
     )
 
 
@@ -1472,13 +2071,20 @@ def _parse_manifest(payload: bytes, artifact_path: Path) -> dict[str, Any]:
             minimum=1,
             maximum=MAX_PROVIDER_ROWS_PER_PAGE,
         )
-        retained_limit = require_int(
-            value["retained_capture_byte_limit"],
-            "retained_capture_byte_limit",
+        stored_limit = require_int(
+            value["stored_capture_byte_limit"],
+            "stored_capture_byte_limit",
             minimum=1,
         )
-        if retained_limit != MAX_CAPTURE_RETAINED_BYTES:
-            raise MassiveCaptureError("manifest retained-byte budget changed")
+        if stored_limit != MAX_CAPTURE_STORED_BYTES:
+            raise MassiveCaptureError("manifest stored-byte budget changed")
+        stored_row_limit = require_int(
+            value["stored_capture_row_limit"],
+            "stored_capture_row_limit",
+            minimum=1,
+        )
+        if stored_row_limit != MAX_CAPTURE_ROWS:
+            raise MassiveCaptureError("manifest stored-row budget changed")
         if (
             type(value["capture_transport"]) is not str
             or value["capture_transport"] not in _TRANSPORTS
@@ -1494,6 +2100,20 @@ def _parse_manifest(payload: bytes, artifact_path: Path) -> dict[str, Any]:
             require_exact_bool(value[key], key)
             if value[key] is not expected:
                 raise MassiveCaptureError(f"manifest {key} boundary changed")
+        for key in (
+            "page_spooled_before_next_request",
+            "full_capture_retained_in_memory",
+        ):
+            require_exact_bool(value[key], key)
+        if value["page_spooled_before_next_request"] is value[
+            "full_capture_retained_in_memory"
+        ]:
+            raise MassiveCaptureError("manifest capture storage mode is inconsistent")
+        if value["capture_transport"] == PRODUCTION_TRANSPORT and (
+            value["page_spooled_before_next_request"] is not True
+            or value["full_capture_retained_in_memory"] is not False
+        ):
+            raise MassiveCaptureError("production capture was not page-spooled")
         require_exact_bool(value["provider_io_read_only"], "provider_io_read_only")
         if value["provider_io_read_only"] is not (
             value["capture_transport"] == PRODUCTION_TRANSPORT
@@ -1511,9 +2131,13 @@ def _parse_manifest(payload: bytes, artifact_path: Path) -> dict[str, Any]:
         if (
             value["raw_response_total_byte_count"]
             + value["provider_rows_total_byte_count"]
-            > MAX_CAPTURE_RETAINED_BYTES
+            + len(payload)
+            + 65
+            > MAX_CAPTURE_STORED_BYTES
         ):
-            raise MassiveCaptureError("manifest exceeds the retained-byte budget")
+            raise MassiveCaptureError("manifest exceeds the stored-byte budget")
+        if value["total_row_count"] > MAX_CAPTURE_ROWS:
+            raise MassiveCaptureError("manifest exceeds the stored-row budget")
     except CanonicalEvidenceError as exc:
         raise MassiveCaptureError("capture manifest field is invalid") from exc
     if type(value["role_counts"]) is not list or len(value["role_counts"]) != 3:
@@ -1958,9 +2582,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"REFUSED: {exc}", file=sys.stderr)
         return 2
     print(f"artifact: {loaded.artifact_path}")
-    print(f"capture_id: {loaded.capture.capture_id}")
-    print(f"pages: {loaded.capture.total_page_count}")
-    print(f"rows: {loaded.capture.total_row_count}")
+    print(f"capture_id: {loaded.capture_id}")
+    print(f"pages: {loaded.total_page_count}")
+    print(f"rows: {loaded.total_row_count}")
     print("point_in_time_classification: non_pristine_current_version")
     return 0
 
@@ -1971,11 +2595,13 @@ if __name__ == "__main__":
 
 __all__ = [
     "ARTIFACT_SCHEMA",
+    "MAX_CAPTURE_STORED_BYTES",
     "BASE_URL",
     "DEFAULT_ARTIFACT_ROOT",
     "DEFAULT_PAGE_LIMIT",
     "ENDPOINT_PATHS",
     "LoadedMassiveCapture",
+    "SpooledMassiveCapture",
     "MassiveCaptureError",
     "ROLE_ORDER",
     "capture_massive_history",

@@ -17,6 +17,7 @@ import scripts.capture_arv2_sharadar as adapter
 from research.analyst_revisions_v2.canonical import canonical_json_bytes, sha256_bytes
 from scripts.capture_arv2_sharadar import (
     ACTIONS_AVAILABILITY,
+    FUNDAMENTALS_ADMITTED_DIMENSION,
     FUNDAMENTALS_AVAILABILITY,
     PRODUCTION_TRANSPORT,
     TEST_TRANSPORT,
@@ -203,7 +204,8 @@ def test_success_streams_three_full_exports_and_reloads_deterministically(tmp_pa
     assert all(response.close_count == 1 for response in session.served)
     assert session.close_count == 0
     assert all(call["params"]["years"] == "full" for call in session.calls)
-    assert session.calls[2]["params"]["dimension"] == "ART"
+    assert "dimension" not in session.calls[2]["params"]
+    assert result.archives[2].fundamental_dimension_counts == (("ART", 2),)
 
 
 def test_manifest_is_honest_about_snapshot_and_nonconstruction_boundaries(tmp_path):
@@ -213,7 +215,13 @@ def test_manifest_is_honest_about_snapshot_and_nonconstruction_boundaries(tmp_pa
     assert manifest["tickers_availability_semantics"] == TICKERS_AVAILABILITY
     assert manifest["actions_availability_semantics"] == ACTIONS_AVAILABILITY
     assert manifest["fundamentals_availability_semantics"] == FUNDAMENTALS_AVAILABILITY
-    assert manifest["fundamentals_dimension"] == "ART"
+    assert manifest["fundamentals_archive_dimensions"] == ["ART"]
+    assert manifest["fundamentals_bulk_request_unfiltered_by_dimension"] is True
+    assert (
+        manifest["fundamentals_downstream_admitted_dimension"]
+        == FUNDAMENTALS_ADMITTED_DIMENSION
+    )
+    assert manifest["fundamentals_non_admitted_dimensions_retained"] is False
     assert manifest["tickers_contains_active_and_delisted"] is True
     assert manifest["tickers_unknown_delisting_flag_row_count"] == 0
     assert manifest["pit_security_master_constructed"] is False
@@ -492,13 +500,112 @@ def test_nonblank_unreviewed_tickers_delisting_flag_still_refuses(tmp_path):
         )
 
 
-def test_fundamentals_must_be_art_and_retain_required_fields(tmp_path):
-    bad = FUNDAMENTALS.replace(b",ART,", b",MRY,")
+def test_fundamentals_refuse_an_unreviewed_dimension(tmp_path):
+    bad = FUNDAMENTALS.replace(b",ART,", b",BAD,")
     responses = _valid_responses()[:2] + [
         FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=bad))
     ]
-    with pytest.raises(SharadarCaptureError, match="non-ART"):
+    with pytest.raises(SharadarCaptureError, match="unreviewed dimension"):
         _capture(tmp_path, FakeSession(responses))
+
+
+def test_fundamentals_retain_and_authenticate_all_reviewed_dimensions(tmp_path):
+    mixed = FUNDAMENTALS + (
+        b"AAA,MRY,2021-12-31,2022-02-10,2021-12-31,2022-02-10,"
+        b"1000000,5000000,9000000\n"
+    )
+    responses = _valid_responses()[:2] + [
+        FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=mixed))
+    ]
+
+    result, _ = _capture(tmp_path, FakeSession(responses))
+    reloaded = load_sharadar_capture_artifact(result.artifact_path)
+    manifest = _manifest(result)
+
+    assert result == reloaded
+    assert reloaded.archives[2].fundamental_dimension_counts == (
+        ("ART", 2),
+        ("MRY", 1),
+    )
+    assert manifest["fundamentals_archive_dimensions"] == ["ART", "MRY"]
+    assert manifest["fundamentals_non_admitted_dimensions_retained"] is True
+
+
+def test_reload_recomputes_the_fundamental_dimension_census(tmp_path):
+    mixed = FUNDAMENTALS + (
+        b"AAA,MRY,2021-12-31,2022-02-10,2021-12-31,2022-02-10,"
+        b"1000000,5000000,9000000\n"
+    )
+    responses = _valid_responses()[:2] + [
+        FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=mixed))
+    ]
+    result, _ = _capture(tmp_path, FakeSession(responses))
+
+    def forge_dimension_counts(value):
+        value["archives"][2]["fundamental_dimension_counts"] = [
+            {"dimension": "ART", "row_count": 1},
+            {"dimension": "MRY", "row_count": 2},
+        ]
+        identity = adapter._capture_identity_document(
+            value["capture_started_at"],
+            value["capture_completed_at"],
+            value["capture_transport"],
+            tuple(
+                adapter._parse_archive(raw, role)
+                for raw, role in zip(
+                    value["archives"], adapter.DATASET_ORDER, strict=True
+                )
+            ),
+        )
+        capture_sha256 = sha256_bytes(canonical_json_bytes(identity))
+        value["capture_sha256"] = capture_sha256
+        value["capture_id"] = f"arv2-sharadar-source-{capture_sha256[:16]}"
+
+    _rewrite_manifest(result.artifact_path, forge_dimension_counts)
+
+    with pytest.raises(SharadarCaptureError, match="member census differs"):
+        load_sharadar_capture_artifact(result.artifact_path)
+
+
+@pytest.mark.parametrize(
+    "field, replacement, message",
+    (
+        ("fundamentals_archive_dimensions", ["ART"], "dimension inventory"),
+        (
+            "fundamentals_bulk_request_unfiltered_by_dimension",
+            False,
+            "boundary changed",
+        ),
+        (
+            "fundamentals_downstream_admitted_dimension",
+            "MRY",
+            "changed",
+        ),
+        (
+            "fundamentals_non_admitted_dimensions_retained",
+            False,
+            "boundary changed",
+        ),
+    ),
+)
+def test_reload_refuses_rehashed_fundamental_dimension_claims(
+    tmp_path, field, replacement, message
+):
+    mixed = FUNDAMENTALS + (
+        b"AAA,MRY,2021-12-31,2022-02-10,2021-12-31,2022-02-10,"
+        b"1000000,5000000,9000000\n"
+    )
+    responses = _valid_responses()[:2] + [
+        FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=mixed))
+    ]
+    result, _ = _capture(tmp_path, FakeSession(responses))
+    _rewrite_manifest(
+        result.artifact_path,
+        lambda value: value.__setitem__(field, replacement),
+    )
+
+    with pytest.raises(SharadarCaptureError, match=message):
+        load_sharadar_capture_artifact(result.artifact_path)
 
 
 def test_legacy_fundamental_field_names_cannot_masquerade_as_current_schema(

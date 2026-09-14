@@ -1,12 +1,14 @@
 """Bounded source-only capture of the three Sharadar inputs used by ARV2.
 
 The adapter retains exact bulk ZIP responses for TICKERS, ACTIONS, and
-FUNDAMENTALS.  It deliberately does *not* construct a point-in-time security
-master, infer a terminal shareholder payoff, or build a backtest input.  The
-TICKERS export is labelled as a capture-time snapshot even though it includes
-active and delisted securities; ACTIONS is discovery evidence only; and the
-FUNDAMENTALS request is restricted to the point-in-time As-Reported ``ART``
-dimension.
+FUNDAMENTALS.  Sharadar's ``years=full`` FUNDAMENTALS response is a complete
+multi-dimension bulk export, so every reviewed dimension is retained and an
+authenticated dimension census is recorded.  Only point-in-time As-Reported
+``ART`` rows are admitted by the downstream ARV2 composer.  This module does
+*not* construct a point-in-time security master, infer a terminal shareholder
+payoff, or build a backtest input.  TICKERS is a capture-time snapshot even
+though it includes active and delisted securities; ACTIONS is discovery
+evidence only.
 
 Operational capture is POSIX-only and publishes one private, immutable-style
 directory below the repository's ignored ``artifacts/`` tree.  Downloads and
@@ -30,6 +32,7 @@ import stat
 import subprocess
 import sys
 import zipfile
+from collections import Counter
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path, PurePosixPath
@@ -82,9 +85,11 @@ ACTIONS_AVAILABILITY = (
     "full_history_current_export_for_identity_and_terminal_event_discovery_only"
 )
 FUNDAMENTALS_AVAILABILITY = (
-    "point_in_time_as_reported_art_full_history_date_fields_only_"
-    "no_intraday_availability"
+    "full_history_multi_dimension_bulk_archive_downstream_admits_only_"
+    "point_in_time_as_reported_ART_date_fields_no_intraday_availability"
 )
+REVIEWED_FUNDAMENTAL_DIMENSIONS = ("ARQ", "ART", "ARY", "MRQ", "MRT", "MRY")
+FUNDAMENTALS_ADMITTED_DIMENSION = "ART"
 
 
 class SharadarDataset(str, Enum):
@@ -105,10 +110,7 @@ REQUEST_QUERIES = MappingProxyType(
     {
         SharadarDataset.TICKERS: (("years", "full"),),
         SharadarDataset.ACTIONS: (("years", "full"),),
-        SharadarDataset.FUNDAMENTALS: (
-            ("dimension", "ART"),
-            ("years", "full"),
-        ),
+        SharadarDataset.FUNDAMENTALS: (("years", "full"),),
     }
 )
 REQUIRED_FIELDS = MappingProxyType(
@@ -214,7 +216,10 @@ _MANIFEST_KEYS = frozenset(
         "fundamentals_availability_semantics",
         "tickers_contains_active_and_delisted",
         "tickers_unknown_delisting_flag_row_count",
-        "fundamentals_dimension",
+        "fundamentals_archive_dimensions",
+        "fundamentals_bulk_request_unfiltered_by_dimension",
+        "fundamentals_downstream_admitted_dimension",
+        "fundamentals_non_admitted_dimensions_retained",
         "pit_security_master_constructed",
         "terminal_payoff_constructed",
         "backtest_input_constructed",
@@ -240,6 +245,7 @@ _ARCHIVE_KEYS = frozenset(
         "active_ticker_row_count",
         "delisted_ticker_row_count",
         "unknown_ticker_delisting_flag_row_count",
+        "fundamental_dimension_counts",
         "redirect_used",
         "members",
     }
@@ -255,6 +261,7 @@ _MEMBER_KEYS = frozenset(
         "columns",
     }
 )
+_DIMENSION_COUNT_KEYS = frozenset({"dimension", "row_count"})
 
 
 class SharadarCaptureError(ValueError):
@@ -283,6 +290,7 @@ class SharadarArchiveBinding:
     active_ticker_row_count: int
     delisted_ticker_row_count: int
     unknown_ticker_delisting_flag_row_count: int
+    fundamental_dimension_counts: tuple[tuple[str, int], ...]
     redirect_used: bool
     members: tuple[SharadarMemberBinding, ...]
 
@@ -316,6 +324,9 @@ class _DatasetCensus:
     active: int = 0
     delisted: int = 0
     unknown_delisting_flag: int = 0
+    fundamental_dimensions: Counter[str] = dataclasses.field(
+        default_factory=Counter
+    )
     rows: int = 0
 
 
@@ -1034,8 +1045,12 @@ def _inspect_csv_member(
                 if any(not row[indexes[field]] for field in ("date", "action", "ticker")):
                     raise SharadarCaptureError("ACTIONS row lacks discovery identity")
             else:
-                if row[indexes["dimension"]] != "ART":
-                    raise SharadarCaptureError("FUNDAMENTALS contains a non-ART row")
+                dimension = row[indexes["dimension"]]
+                if dimension not in REVIEWED_FUNDAMENTAL_DIMENSIONS:
+                    raise SharadarCaptureError(
+                        "FUNDAMENTALS contains an unreviewed dimension"
+                    )
+                census.fundamental_dimensions[dimension] += 1
                 if any(
                     not row[indexes[field]]
                     for field in (
@@ -1118,6 +1133,13 @@ def _inspect_zip_fd(
         raise SharadarCaptureError(
             "TICKERS snapshot does not demonstrate active and delisted coverage"
         )
+    if (
+        dataset is SharadarDataset.FUNDAMENTALS
+        and census.fundamental_dimensions[FUNDAMENTALS_ADMITTED_DIMENSION] == 0
+    ):
+        raise SharadarCaptureError(
+            "FUNDAMENTALS archive does not contain the admitted ART dimension"
+        )
     return members, census
 
 
@@ -1175,6 +1197,11 @@ def _capture_one_archive(
         active_ticker_row_count=census.active,
         delisted_ticker_row_count=census.delisted,
         unknown_ticker_delisting_flag_row_count=census.unknown_delisting_flag,
+        fundamental_dimension_counts=tuple(
+            (dimension, census.fundamental_dimensions[dimension])
+            for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+            if census.fundamental_dimensions[dimension]
+        ),
         redirect_used=redirected,
         members=members,
     )
@@ -1208,6 +1235,10 @@ def _archive_record(archive: SharadarArchiveBinding) -> dict[str, object]:
         "unknown_ticker_delisting_flag_row_count": (
             archive.unknown_ticker_delisting_flag_row_count
         ),
+        "fundamental_dimension_counts": [
+            {"dimension": dimension, "row_count": row_count}
+            for dimension, row_count in archive.fundamental_dimension_counts
+        ],
         "redirect_used": archive.redirect_used,
         "members": [_member_record(member) for member in archive.members],
     }
@@ -1269,7 +1300,22 @@ def _manifest(
             for archive in archives
             if archive.dataset is SharadarDataset.TICKERS
         ),
-        "fundamentals_dimension": "ART",
+        "fundamentals_archive_dimensions": [
+            dimension
+            for archive in archives
+            if archive.dataset is SharadarDataset.FUNDAMENTALS
+            for dimension, _row_count in archive.fundamental_dimension_counts
+        ],
+        "fundamentals_bulk_request_unfiltered_by_dimension": True,
+        "fundamentals_downstream_admitted_dimension": (
+            FUNDAMENTALS_ADMITTED_DIMENSION
+        ),
+        "fundamentals_non_admitted_dimensions_retained": any(
+            dimension != FUNDAMENTALS_ADMITTED_DIMENSION
+            for archive in archives
+            if archive.dataset is SharadarDataset.FUNDAMENTALS
+            for dimension, _row_count in archive.fundamental_dimension_counts
+        ),
         "pit_security_master_constructed": False,
         "terminal_payoff_constructed": False,
         "backtest_input_constructed": False,
@@ -1600,6 +1646,53 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
             minimum=0,
             maximum=MAX_TOTAL_ROWS,
         )
+        raw_dimension_counts = value["fundamental_dimension_counts"]
+        if type(raw_dimension_counts) is not list:
+            raise SharadarCaptureError(
+                "manifest fundamental dimension census is invalid"
+            )
+        dimension_counts: list[tuple[str, int]] = []
+        for item in raw_dimension_counts:
+            if type(item) is not dict:
+                raise SharadarCaptureError(
+                    "manifest fundamental dimension census is invalid"
+                )
+            require_exact_keys(
+                item,
+                _DIMENSION_COUNT_KEYS,
+                "fundamental dimension census",
+            )
+            dimension = item["dimension"]
+            if (
+                type(dimension) is not str
+                or dimension not in REVIEWED_FUNDAMENTAL_DIMENSIONS
+            ):
+                raise SharadarCaptureError(
+                    "manifest fundamental dimension is unreviewed"
+                )
+            dimension_counts.append(
+                (
+                    dimension,
+                    require_int(
+                        item["row_count"],
+                        "fundamental dimension row_count",
+                        minimum=1,
+                        maximum=MAX_TOTAL_ROWS,
+                    ),
+                )
+            )
+        expected_dimension_order = tuple(
+            dimension
+            for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+            if any(name == dimension for name, _count in dimension_counts)
+        )
+        if (
+            tuple(name for name, _count in dimension_counts)
+            != expected_dimension_order
+        ):
+            raise SharadarCaptureError(
+                "manifest fundamental dimension census is not canonical"
+            )
         require_exact_bool(value["redirect_used"], "redirect_used")
         members_raw = value["members"]
         if (
@@ -1642,6 +1735,20 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
             raise SharadarCaptureError(
                 "non-TICKERS archive carries a delisting-flag census"
             )
+        if expected is SharadarDataset.FUNDAMENTALS:
+            if (
+                FUNDAMENTALS_ADMITTED_DIMENSION
+                not in {dimension for dimension, _count in dimension_counts}
+                or sum(count for _dimension, count in dimension_counts)
+                != sum(member.row_count for member in members)
+            ):
+                raise SharadarCaptureError(
+                    "manifest FUNDAMENTALS dimension census is inconsistent"
+                )
+        elif dimension_counts:
+            raise SharadarCaptureError(
+                "non-FUNDAMENTALS archive carries a dimension census"
+            )
     except CanonicalEvidenceError as exc:
         raise SharadarCaptureError("manifest archive field is invalid") from exc
     return SharadarArchiveBinding(
@@ -1654,6 +1761,7 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
         active_ticker_row_count=active_ticker_rows,
         delisted_ticker_row_count=delisted_ticker_rows,
         unknown_ticker_delisting_flag_row_count=unknown_ticker_rows,
+        fundamental_dimension_counts=tuple(dimension_counts),
         redirect_used=value["redirect_used"],
         members=members,
     )
@@ -1735,12 +1843,34 @@ def _parse_manifest(payload: bytes, artifact_path: Path) -> tuple[dict[str, obje
             ("tickers_availability_semantics", TICKERS_AVAILABILITY),
             ("actions_availability_semantics", ACTIONS_AVAILABILITY),
             ("fundamentals_availability_semantics", FUNDAMENTALS_AVAILABILITY),
-            ("fundamentals_dimension", "ART"),
+            (
+                "fundamentals_downstream_admitted_dimension",
+                FUNDAMENTALS_ADMITTED_DIMENSION,
+            ),
         ):
             if value[key] != expected:
                 raise SharadarCaptureError(f"manifest {key} changed")
+        fundamentals_archive = archives[2]
+        archive_dimensions = [
+            dimension
+            for dimension, _row_count in (
+                fundamentals_archive.fundamental_dimension_counts
+            )
+        ]
+        if value["fundamentals_archive_dimensions"] != archive_dimensions:
+            raise SharadarCaptureError(
+                "manifest FUNDAMENTALS dimension inventory changed"
+            )
         for key, expected in (
             ("tickers_contains_active_and_delisted", True),
+            ("fundamentals_bulk_request_unfiltered_by_dimension", True),
+            (
+                "fundamentals_non_admitted_dimensions_retained",
+                any(
+                    dimension != FUNDAMENTALS_ADMITTED_DIMENSION
+                    for dimension in archive_dimensions
+                ),
+            ),
             ("pit_security_master_constructed", False),
             ("terminal_payoff_constructed", False),
             ("backtest_input_constructed", False),
@@ -1842,6 +1972,11 @@ def load_sharadar_capture_artifact(artifact_path: Path) -> LoadedSharadarCapture
                 delisted_ticker_row_count=census.delisted,
                 unknown_ticker_delisting_flag_row_count=(
                     census.unknown_delisting_flag
+                ),
+                fundamental_dimension_counts=tuple(
+                    (dimension, census.fundamental_dimensions[dimension])
+                    for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+                    if census.fundamental_dimensions[dimension]
                 ),
             )
             if rebuilt != declared:

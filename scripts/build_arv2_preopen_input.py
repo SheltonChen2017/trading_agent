@@ -79,6 +79,7 @@ from scripts.build_arv2_massive_input_pair import (
 )
 from scripts.capture_arv2_sharadar import (
     ACTIONS_AVAILABILITY,
+    FUNDAMENTALS_ADMITTED_DIMENSION,
     FUNDAMENTALS_AVAILABILITY,
     MAX_ARCHIVE_BYTES,
     MAX_CSV_FIELD_BYTES,
@@ -978,7 +979,7 @@ def _fundamental_rows(
         if security is None:
             continue
         try:
-            if row.get("dimension") != "ART":
+            if row.get("dimension") != FUNDAMENTALS_ADMITTED_DIMENSION:
                 raise PhysicalPreopenInputError("non-ART fundamental")
             period = _date_text(row.get("calendardate"), "calendardate")
             if period < earliest or period > last_session:

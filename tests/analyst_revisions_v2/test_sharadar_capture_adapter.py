@@ -4,6 +4,7 @@ import inspect
 import io
 import json
 import os
+import re
 import stat
 import zipfile
 from datetime import datetime, timezone
@@ -22,6 +23,7 @@ from scripts.capture_arv2_sharadar import (
     PRODUCTION_TRANSPORT,
     TEST_TRANSPORT,
     TICKERS_AVAILABILITY,
+    REVIEWED_FUNDAMENTAL_DIMENSIONS,
     SharadarCaptureError,
     SharadarDataset,
     _capture_sharadar_history_for_test,
@@ -509,11 +511,30 @@ def test_fundamentals_refuse_an_unreviewed_dimension(tmp_path):
         _capture(tmp_path, FakeSession(responses))
 
 
+def test_fundamentals_require_the_admitted_art_dimension(tmp_path):
+    non_art = FUNDAMENTALS.replace(b",ART,", b",MRY,")
+    responses = _valid_responses()[:2] + [
+        FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=non_art))
+    ]
+    with pytest.raises(
+        SharadarCaptureError,
+        match=re.escape(
+            "FUNDAMENTALS archive does not contain the admitted ART dimension"
+        ),
+    ):
+        _capture(tmp_path, FakeSession(responses))
+
+
 def test_fundamentals_retain_and_authenticate_all_reviewed_dimensions(tmp_path):
-    mixed = FUNDAMENTALS + (
-        b"AAA,MRY,2021-12-31,2022-02-10,2021-12-31,2022-02-10,"
-        b"1000000,5000000,9000000\n"
+    extra_dimensions = b"".join(
+        (
+            f"AAA,{dimension},2021-12-31,2022-02-10,2021-12-31,"
+            "2022-02-10,1000000,5000000,9000000\n"
+        ).encode("ascii")
+        for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+        if dimension != FUNDAMENTALS_ADMITTED_DIMENSION
     )
+    mixed = FUNDAMENTALS + extra_dimensions
     responses = _valid_responses()[:2] + [
         FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=mixed))
     ]
@@ -523,11 +544,21 @@ def test_fundamentals_retain_and_authenticate_all_reviewed_dimensions(tmp_path):
     manifest = _manifest(result)
 
     assert result == reloaded
-    assert reloaded.archives[2].fundamental_dimension_counts == (
-        ("ART", 2),
-        ("MRY", 1),
+    assert REVIEWED_FUNDAMENTAL_DIMENSIONS == (
+        "ARQ",
+        "ART",
+        "ARY",
+        "MRQ",
+        "MRT",
+        "MRY",
     )
-    assert manifest["fundamentals_archive_dimensions"] == ["ART", "MRY"]
+    assert reloaded.archives[2].fundamental_dimension_counts == tuple(
+        (dimension, 2 if dimension == "ART" else 1)
+        for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+    )
+    assert manifest["fundamentals_archive_dimensions"] == list(
+        REVIEWED_FUNDAMENTAL_DIMENSIONS
+    )
     assert manifest["fundamentals_non_admitted_dimensions_retained"] is True
 
 

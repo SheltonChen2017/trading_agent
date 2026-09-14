@@ -107,6 +107,7 @@ def _physical_sources(
     empty_role=None,
     requested_first="2013-01-02",
     requested_last="2025-12-31",
+    fundamentals=FUNDAMENTALS,
 ):
     base = "https://api.massive.com"
     rows = []
@@ -145,7 +146,7 @@ def _physical_sources(
                 ),
                 SharadarResponse(
                     _zip_bytes(
-                        SharadarDataset.FUNDAMENTALS, csv_bytes=FUNDAMENTALS
+                        SharadarDataset.FUNDAMENTALS, csv_bytes=fundamentals
                     )
                 ),
             ]
@@ -279,6 +280,30 @@ def test_completeness_and_seed_candidates_are_source_derived(tmp_path):
     assert tuple(inspect.signature(
         build_physical_preopen_input_candidate
     ).parameters) == ("bridge", "sharadar_capture")
+
+
+def test_non_art_source_rows_are_retained_but_never_enter_fundamental_seeds(
+    tmp_path,
+):
+    mixed = FUNDAMENTALS + (
+        b"AAA,MRY,2020-12-31,2021-02-10,2020-12-31,2021-02-10,"
+        b"7777777,8888888,9999999\n"
+    )
+    bridge, sharadar = _physical_sources(tmp_path, fundamentals=mixed)
+    assert sharadar.archives[2].fundamental_dimension_counts == (
+        ("ART", 2),
+        ("MRY", 1),
+    )
+
+    candidate = build_physical_preopen_input_candidate(bridge, sharadar)
+    report = json.loads(candidate.composition_report_bytes)
+    fundamentals = json.loads(candidate.fundamental_seed_inventory_bytes)
+
+    assert report["fundamental_refusal_counts"]["non-ART fundamental"] == 1
+    assert fundamentals["seed_count"] == 1
+    assert fundamentals["seed_rows"][0]["shares_outstanding"] == "1000000"
+    assert fundamentals["seed_rows"][0]["book_equity_usd"] == "5000000"
+    assert fundamentals["seed_rows"][0]["revenue_ttm_usd"] == "9000000"
 
 
 def test_potentially_relevant_malformed_rating_downgrades_completeness(tmp_path):

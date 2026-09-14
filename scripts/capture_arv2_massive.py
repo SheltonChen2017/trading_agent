@@ -38,6 +38,7 @@ from research.analyst_revisions_v2.accepted_risk_input_pair import (
     AcceptedRiskInputError,
     AcceptedRiskInputPair,
     CaptureBinding,
+    CapturePageBinding,
     MassiveSourceRole,
     bind_capture_page,
     build_capture_binding,
@@ -220,6 +221,8 @@ class SpooledMassiveCapture:
     manifest_sha256: str
     capture_id: str
     capture_sha256: str
+    capture_started_at: str
+    capture_completed_at: str
     total_page_count: int
     total_row_count: int
     role_row_counts: tuple[tuple[MassiveSourceRole, int], ...]
@@ -1671,6 +1674,8 @@ def _capture_massive_history_spooled_core(
             manifest_sha256=manifest_sha256,
             capture_id=str(manifest["capture_id"]),
             capture_sha256=str(manifest["capture_sha256"]),
+            capture_started_at=started_at,
+            capture_completed_at=completed_at,
             total_page_count=int(manifest["total_page_count"]),
             total_row_count=int(manifest["total_row_count"]),
             role_row_counts=tuple(
@@ -2198,6 +2203,482 @@ def _validate_inventory_at(
         raise
     except OSError as exc:
         raise MassiveCaptureError("capture artifact inventory changed") from exc
+
+
+def _regular_file_identity(metadata: os.stat_result) -> tuple[int, int, int, int, int]:
+    return (
+        metadata.st_dev,
+        metadata.st_ino,
+        metadata.st_size,
+        metadata.st_mtime_ns,
+        metadata.st_ctime_ns,
+    )
+
+
+def _read_and_pin_private_regular_at(
+    parent_fd: int,
+    filename: str,
+    *,
+    maximum_bytes: int,
+    name: str,
+) -> tuple[bytes, tuple[int, int, int, int, int]]:
+    """Read one private leaf and bind its identity across the authenticated read."""
+
+    try:
+        before = os.stat(filename, dir_fd=parent_fd, follow_symlinks=False)
+    except OSError as exc:
+        raise MassiveCaptureError(f"{name} identity is unavailable") from exc
+    _require_private_regular_metadata(before, name)
+    if before.st_size < 0 or before.st_size > maximum_bytes:
+        raise MassiveCaptureError(f"{name} exceeds its authenticated byte bound")
+    payload = _read_private_regular_at(
+        parent_fd,
+        filename,
+        maximum_bytes=maximum_bytes,
+        name=name,
+    )
+    try:
+        after = os.stat(filename, dir_fd=parent_fd, follow_symlinks=False)
+    except OSError as exc:
+        raise MassiveCaptureError(f"{name} identity changed during visitation") from exc
+    _require_private_regular_metadata(after, name)
+    identity = _regular_file_identity(before)
+    if _regular_file_identity(after) != identity:
+        raise MassiveCaptureError(f"{name} identity changed during visitation")
+    return payload, identity
+
+
+def _require_visited_file_identity_at(
+    parent_fd: int,
+    filename: str,
+    expected_identity: tuple[int, int, int, int, int],
+    name: str,
+) -> None:
+    try:
+        current = os.stat(filename, dir_fd=parent_fd, follow_symlinks=False)
+    except OSError as exc:
+        raise MassiveCaptureError(f"{name} identity changed after visitation") from exc
+    _require_private_regular_metadata(current, name)
+    if _regular_file_identity(current) != expected_identity:
+        raise MassiveCaptureError(f"{name} identity changed after visitation")
+
+
+def _require_reopened_artifact_identity(root: Path, root_fd: int) -> None:
+    reopened_fd: int | None = None
+    try:
+        _reopened_root, reopened_fd = _open_directory_path(
+            root, create=False, name="capture artifact final path"
+        )
+        assert reopened_fd is not None
+        if _directory_identity(os.fstat(reopened_fd)) != _directory_identity(
+            os.fstat(root_fd)
+        ):
+            raise MassiveCaptureError(
+                "capture artifact path identity changed during visitation"
+            )
+    finally:
+        if reopened_fd is not None:
+            os.close(reopened_fd)
+
+
+def _preflight_visitor_manifest(
+    manifest: dict[str, Any],
+) -> tuple[
+    tuple[dict[str, object], ...],
+    dict[MassiveSourceRole, bytes],
+    set[str],
+    tuple[tuple[MassiveSourceRole, int], ...],
+]:
+    """Authenticate all bounded metadata before the first visitor callback."""
+
+    try:
+        started = parse_utc_timestamp(
+            manifest["capture_started_at"], "capture_started_at"
+        )
+        completed = parse_utc_timestamp(
+            manifest["capture_completed_at"], "capture_completed_at"
+        )
+    except CanonicalEvidenceError as exc:
+        raise MassiveCaptureError("manifest chronology is invalid") from exc
+    if started > completed:
+        raise MassiveCaptureError("manifest capture chronology is reversed")
+
+    role_counts: list[dict[str, object]] = []
+    for index, raw_count in enumerate(manifest["role_counts"]):
+        if type(raw_count) is not dict:
+            raise MassiveCaptureError("manifest role count must be an object")
+        try:
+            require_exact_keys(raw_count, _ROLE_COUNT_KEYS, "manifest role count")
+            role = ROLE_ORDER[index]
+            if raw_count["source_role"] != role.value:
+                raise MassiveCaptureError("manifest role counts are out of order")
+            require_int(raw_count["page_count"], "role page_count", minimum=1)
+            require_int(raw_count["row_count"], "role row_count", minimum=0)
+        except CanonicalEvidenceError as exc:
+            raise MassiveCaptureError("manifest role count is invalid") from exc
+        role_counts.append(raw_count)
+
+    query_bytes = {
+        role: render_redacted_capture_query_bytes(
+            source_role=role,
+            requested_first_event_date=manifest["requested_first_event_date"],
+            requested_last_event_date=manifest["requested_last_event_date"],
+            limit=manifest["page_limit"],
+        )
+        for role in ROLE_ORDER
+    }
+    expected_page_files: set[str] = set()
+    observed_role_pages = {role: 0 for role in ROLE_ORDER}
+    observed_role_rows = {role: 0 for role in ROLE_ORDER}
+    seen_cursor_hashes = {role: set() for role in ROLE_ORDER}
+    seen_response_hashes = {role: set() for role in ROLE_ORDER}
+    prior_role_index = -1
+    expected_page_number = 0
+    prior_next_cursor: str | None = None
+    prior_terminal = True
+    prior_received = started
+    raw_total = 0
+    rows_total = 0
+    page_records: list[dict[str, object]] = []
+
+    for raw_page in manifest["pages"]:
+        if type(raw_page) is not dict:
+            raise MassiveCaptureError("manifest page must be an object")
+        try:
+            require_exact_keys(raw_page, _PAGE_KEYS, "manifest page")
+            role = MassiveSourceRole(raw_page["source_role"])
+        except (CanonicalEvidenceError, TypeError, ValueError) as exc:
+            raise MassiveCaptureError("manifest page source role is invalid") from exc
+        role_index = ROLE_ORDER.index(role)
+        try:
+            page_number = require_int(
+                raw_page["page_number"], "page_number", minimum=1
+            )
+        except CanonicalEvidenceError as exc:
+            raise MassiveCaptureError("manifest page number is invalid") from exc
+        if role_index < prior_role_index:
+            raise MassiveCaptureError("manifest pages are not in canonical role order")
+        if role_index != prior_role_index:
+            if role_index != prior_role_index + 1:
+                raise MassiveCaptureError("manifest skipped a source role")
+            if prior_role_index >= 0 and not prior_terminal:
+                raise MassiveCaptureError("manifest role page chain did not terminate")
+            expected_page_number = 1
+            prior_next_cursor = None
+            prior_terminal = False
+            prior_role_index = role_index
+        elif prior_terminal:
+            raise MassiveCaptureError("manifest terminal page was followed")
+        if page_number != expected_page_number:
+            raise MassiveCaptureError("manifest pages are not contiguous from one")
+        expected_page_number += 1
+        if raw_page["endpoint_path"] != ENDPOINT_PATHS[role]:
+            raise MassiveCaptureError("manifest endpoint path changed")
+        if raw_page["redacted_query_sha256"] != sha256_bytes(query_bytes[role]):
+            raise MassiveCaptureError("manifest query binding changed")
+        expected_raw, expected_rows = _expected_page_names(role, page_number)
+        if (
+            raw_page["raw_response_file"] != expected_raw
+            or raw_page["provider_rows_file"] != expected_rows
+        ):
+            raise MassiveCaptureError("manifest page filenames are not canonical")
+        expected_page_files.update(
+            {Path(expected_raw).name, Path(expected_rows).name}
+        )
+        try:
+            raw_byte_count = require_int(
+                raw_page["raw_response_byte_count"],
+                "raw response byte count",
+                minimum=0,
+                maximum=MAX_RAW_RESPONSE_BYTES,
+            )
+            rows_byte_count = require_int(
+                raw_page["provider_rows_byte_count"],
+                "provider rows byte count",
+                minimum=0,
+                maximum=MAX_PROVIDER_ROWS_BYTES,
+            )
+            require_sha256(raw_page["raw_response_sha256"], "raw response sha256")
+            require_sha256(
+                raw_page["provider_rows_sha256"], "provider rows sha256"
+            )
+            row_count = require_int(
+                raw_page["row_count"],
+                "row_count",
+                minimum=0,
+                maximum=manifest["page_limit"],
+            )
+            require_exact_bool(raw_page["terminal_page"], "terminal_page")
+            received = parse_utc_timestamp(
+                raw_page["response_received_at"], "response_received_at"
+            )
+            for key in ("request_cursor_sha256", "next_cursor_sha256"):
+                if raw_page[key] is not None:
+                    require_sha256(raw_page[key], key)
+        except CanonicalEvidenceError as exc:
+            raise MassiveCaptureError("manifest page field is invalid") from exc
+        if received < prior_received or received < started or received > completed:
+            raise MassiveCaptureError("manifest page chronology is invalid")
+        prior_received = received
+        if raw_page["request_cursor_sha256"] != prior_next_cursor:
+            raise MassiveCaptureError("manifest cursor chain is discontinuous")
+        next_cursor = raw_page["next_cursor_sha256"]
+        terminal = raw_page["terminal_page"]
+        if terminal is not (next_cursor is None):
+            raise MassiveCaptureError("manifest terminal-page state is inconsistent")
+        if next_cursor is not None:
+            if next_cursor in seen_cursor_hashes[role]:
+                raise MassiveCaptureError("manifest cursor chain repeats or cycles")
+            seen_cursor_hashes[role].add(next_cursor)
+        response_hash = raw_page["raw_response_sha256"]
+        if response_hash in seen_response_hashes[role]:
+            raise MassiveCaptureError("manifest repeats a raw response page")
+        seen_response_hashes[role].add(response_hash)
+        prior_next_cursor = next_cursor
+        prior_terminal = terminal
+        observed_role_pages[role] += 1
+        observed_role_rows[role] += row_count
+        raw_total += raw_byte_count
+        rows_total += rows_byte_count
+        page_records.append(raw_page)
+
+    if prior_role_index != len(ROLE_ORDER) - 1 or not prior_terminal:
+        raise MassiveCaptureError("manifest did not complete every source role")
+    for index, role in enumerate(ROLE_ORDER):
+        if (
+            role_counts[index]["page_count"] != observed_role_pages[role]
+            or role_counts[index]["row_count"] != observed_role_rows[role]
+        ):
+            raise MassiveCaptureError("manifest role counts do not match pages")
+    if (
+        manifest["total_page_count"] != len(page_records)
+        or manifest["total_row_count"] != sum(observed_role_rows.values())
+        or manifest["raw_response_total_byte_count"] != raw_total
+        or manifest["provider_rows_total_byte_count"] != rows_total
+    ):
+        raise MassiveCaptureError("manifest aggregate counts do not match pages")
+    logical = _logical_capture_record(
+        capture_started_at=manifest["capture_started_at"],
+        capture_completed_at=manifest["capture_completed_at"],
+        requested_first_event_date=manifest["requested_first_event_date"],
+        requested_last_event_date=manifest["requested_last_event_date"],
+        pages=tuple(page_records),
+    )
+    capture_sha256 = sha256_bytes(canonical_json_bytes(logical))
+    if (
+        manifest["capture_sha256"] != capture_sha256
+        or manifest["capture_id"] != f"arv2-capture-{capture_sha256[:24]}"
+    ):
+        raise MassiveCaptureError("manifest logical capture identity changed")
+    return (
+        tuple(page_records),
+        query_bytes,
+        expected_page_files,
+        tuple(
+            (role, observed_role_rows[role])
+            for role in ROLE_ORDER
+        ),
+    )
+
+
+def _visit_authenticated_massive_capture_pages_for_bridge(
+    artifact_path: Path,
+    *,
+    expected_transport: str,
+    visit_page: Callable[[CapturePageBinding], None],
+) -> SpooledMassiveCapture:
+    """Visit each authenticated physical page without retaining full history.
+
+    The callback may deliberately persist or transform a page, but this
+    adapter releases its own page and source-byte references before reading
+    the next one.  Callback exceptions propagate unchanged.
+    """
+
+    if type(expected_transport) is not str or expected_transport not in _TRANSPORTS:
+        raise MassiveCaptureError("expected capture transport is not reviewed")
+    if not callable(visit_page):
+        raise MassiveCaptureError("capture page visitor must be callable")
+    root, root_fd = _open_directory_path(
+        Path(artifact_path), create=False, name="capture artifact"
+    )
+    assert root_fd is not None
+    try:
+        pages_fd = _open_private_child_directory(root_fd, "pages", "capture pages")
+    except BaseException:
+        os.close(root_fd)
+        raise
+    try:
+        _require_pinned_child_identity(root_fd, "pages", pages_fd, "capture pages")
+        manifest_bytes, manifest_identity = _read_and_pin_private_regular_at(
+            root_fd,
+            MANIFEST_FILENAME,
+            maximum_bytes=MAX_MANIFEST_BYTES,
+            name="capture manifest",
+        )
+        digest_bytes, digest_identity = _read_and_pin_private_regular_at(
+            root_fd,
+            MANIFEST_DIGEST_FILENAME,
+            maximum_bytes=65,
+            name="capture manifest digest",
+        )
+        manifest_sha256 = sha256_bytes(manifest_bytes)
+        if (
+            len(digest_bytes) != 65
+            or digest_bytes[-1:] != b"\n"
+            or re.fullmatch(rb"[0-9a-f]{64}\n", digest_bytes) is None
+            or digest_bytes[:-1].decode("ascii") != manifest_sha256
+        ):
+            raise MassiveCaptureError(
+                "capture manifest digest does not authenticate bytes"
+            )
+        manifest = _parse_manifest(manifest_bytes, root)
+        if manifest["capture_transport"] != expected_transport:
+            raise MassiveCaptureError(
+                "capture transport does not match bridge expectation"
+            )
+        (
+            page_records,
+            query_bytes,
+            expected_page_files,
+            role_row_counts,
+        ) = _preflight_visitor_manifest(manifest)
+        _validate_inventory_at(root_fd, pages_fd, expected_page_files)
+
+        visited_file_identities: dict[
+            str, tuple[tuple[int, int, int, int, int], str]
+        ] = {}
+        visited_page_count = 0
+        visited_row_count = 0
+        visited_role_rows = {role: 0 for role in ROLE_ORDER}
+        for raw_page in page_records:
+            role = MassiveSourceRole(raw_page["source_role"])
+            page_number = int(raw_page["page_number"])
+            expected_raw, expected_rows = _expected_page_names(role, page_number)
+            raw_filename = Path(expected_raw).name
+            rows_filename = Path(expected_rows).name
+            raw_bytes, raw_identity = _read_and_pin_private_regular_at(
+                pages_fd,
+                raw_filename,
+                maximum_bytes=int(raw_page["raw_response_byte_count"]),
+                name="raw response page",
+            )
+            rows_bytes, rows_identity = _read_and_pin_private_regular_at(
+                pages_fd,
+                rows_filename,
+                maximum_bytes=int(raw_page["provider_rows_byte_count"]),
+                name="canonical provider-row page",
+            )
+            if (
+                len(raw_bytes) != raw_page["raw_response_byte_count"]
+                or sha256_bytes(raw_bytes) != raw_page["raw_response_sha256"]
+                or len(rows_bytes) != raw_page["provider_rows_byte_count"]
+                or sha256_bytes(rows_bytes) != raw_page["provider_rows_sha256"]
+            ):
+                raise MassiveCaptureError("persisted page byte count or hash changed")
+            reconstructed_rows, raw_next_url = _response_rows_and_next_url(
+                raw_bytes, page_limit=manifest["page_limit"]
+            )
+            if reconstructed_rows != rows_bytes:
+                raise MassiveCaptureError(
+                    "persisted provider rows are not the canonical ordered extraction"
+                )
+            if raw_next_url is None:
+                reconstructed_next_cursor_sha256 = None
+            else:
+                reconstructed_next_cursor_sha256, _ = _cursor_hash_and_validated_url(
+                    raw_next_url,
+                    source_role=role,
+                    requested_first_event_date=manifest[
+                        "requested_first_event_date"
+                    ],
+                    requested_last_event_date=manifest[
+                        "requested_last_event_date"
+                    ],
+                    page_limit=manifest["page_limit"],
+                )
+            if reconstructed_next_cursor_sha256 != raw_page["next_cursor_sha256"]:
+                raise MassiveCaptureError(
+                    "manifest cursor hash does not match the exact provider response"
+                )
+            try:
+                page = bind_capture_page(
+                    source_role=role,
+                    redacted_query_bytes=query_bytes[role],
+                    page_number=page_number,
+                    request_cursor_sha256=raw_page["request_cursor_sha256"],
+                    next_cursor_sha256=raw_page["next_cursor_sha256"],
+                    terminal_page=raw_page["terminal_page"],
+                    response_received_at=raw_page["response_received_at"],
+                    raw_response_sha256=raw_page["raw_response_sha256"],
+                    provider_rows_bytes=rows_bytes,
+                    raw_response_bytes=raw_bytes,
+                )
+            except (AcceptedRiskInputError, CanonicalEvidenceError) as exc:
+                raise MassiveCaptureError("persisted page failed capture binding") from exc
+            if page.row_count != raw_page["row_count"]:
+                raise MassiveCaptureError(
+                    "manifest page row count does not match authenticated bytes"
+                )
+            if page.endpoint_identifier != raw_page["endpoint_identifier"]:
+                raise MassiveCaptureError("manifest endpoint identifier changed")
+            visited_file_identities[raw_filename] = (
+                raw_identity,
+                "raw response page",
+            )
+            visited_file_identities[rows_filename] = (
+                rows_identity,
+                "canonical provider-row page",
+            )
+            visit_page(page)
+            visited_page_count += 1
+            visited_row_count += page.row_count
+            visited_role_rows[role] += page.row_count
+            del page, raw_bytes, rows_bytes, reconstructed_rows
+
+        if (
+            visited_page_count != manifest["total_page_count"]
+            or visited_row_count != manifest["total_row_count"]
+            or tuple(
+                (role, visited_role_rows[role])
+                for role in ROLE_ORDER
+            )
+            != role_row_counts
+        ):
+            raise MassiveCaptureError("capture visitation was not exhaustive")
+        _validate_inventory_at(root_fd, pages_fd, expected_page_files)
+        _require_visited_file_identity_at(
+            root_fd,
+            MANIFEST_FILENAME,
+            manifest_identity,
+            "capture manifest",
+        )
+        _require_visited_file_identity_at(
+            root_fd,
+            MANIFEST_DIGEST_FILENAME,
+            digest_identity,
+            "capture manifest digest",
+        )
+        for filename, (identity, name) in visited_file_identities.items():
+            _require_visited_file_identity_at(
+                pages_fd, filename, identity, name
+            )
+        _require_pinned_child_identity(root_fd, "pages", pages_fd, "capture pages")
+        _require_reopened_artifact_identity(root, root_fd)
+        return SpooledMassiveCapture(
+            artifact_path=root,
+            manifest_sha256=manifest_sha256,
+            capture_id=manifest["capture_id"],
+            capture_sha256=manifest["capture_sha256"],
+            capture_started_at=manifest["capture_started_at"],
+            capture_completed_at=manifest["capture_completed_at"],
+            total_page_count=visited_page_count,
+            total_row_count=visited_row_count,
+            role_row_counts=role_row_counts,
+            capture_transport=manifest["capture_transport"],
+        )
+    finally:
+        os.close(pages_fd)
+        os.close(root_fd)
 
 
 def load_massive_capture_artifact(

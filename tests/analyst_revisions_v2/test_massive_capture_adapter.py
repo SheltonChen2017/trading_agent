@@ -17,6 +17,7 @@ from urllib.parse import urlencode
 import pytest
 
 from research.analyst_revisions_v2.accepted_risk_input_pair import (
+    CapturePageBinding,
     MassiveSourceRole,
     RowDisposition,
     require_capture_binding,
@@ -32,7 +33,9 @@ from scripts.capture_arv2_massive import (
     SpooledMassiveCapture,
     _capture_massive_history_for_test,
     _capture_massive_history_spooled_for_test,
+    _logical_capture_record,
     _redact_url,
+    _visit_authenticated_massive_capture_pages_for_bridge,
     capture_massive_history,
     load_massive_capture_artifact,
 )
@@ -218,6 +221,409 @@ def _rewrite_manifest(path: Path, mutate) -> None:
 
 def _exact_error(message: str) -> str:
     return f"^{re.escape(message)}$"
+
+
+def test_streaming_bridge_visitor_authenticates_and_visits_once_in_order(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+    observed: list[tuple[MassiveSourceRole, int, int]] = []
+
+    def visit(page: CapturePageBinding) -> None:
+        assert type(page) is CapturePageBinding
+        assert page.raw_response_bytes is not None
+        page.__post_init__()
+        observed.append((page.source_role, page.page_number, page.row_count))
+
+    summary = _visit_authenticated_massive_capture_pages_for_bridge(
+        spooled.artifact_path,
+        expected_transport=TEST_TRANSPORT,
+        visit_page=visit,
+    )
+
+    assert type(summary) is SpooledMassiveCapture
+    assert summary == spooled
+    assert summary.artifact_path == spooled.artifact_path.absolute()
+    assert observed == [
+        (ROLE_ORDER[0], 1, 1),
+        (ROLE_ORDER[0], 2, 1),
+        (ROLE_ORDER[1], 1, 1),
+        (ROLE_ORDER[2], 1, 1),
+    ]
+
+
+def test_streaming_bridge_visitor_leaves_global_duplicate_ids_to_c1_consumer(
+    tmp_path,
+):
+    duplicate = "same-provider-id-across-roles"
+    responses = [
+        FakeResponse(
+            _payload([_row(duplicate, role=ROLE_ORDER[0])]),
+            _endpoint(ROLE_ORDER[0]),
+        ),
+        FakeResponse(
+            _payload([_row(duplicate, role=ROLE_ORDER[1])]),
+            _endpoint(ROLE_ORDER[1]),
+        ),
+        FakeResponse(
+            _payload([_row("guidance-unique", role=ROLE_ORDER[2])]),
+            _endpoint(ROLE_ORDER[2]),
+        ),
+    ]
+    spooled, _ = _spooled_capture(tmp_path, responses=responses)
+    observed_ids: list[str] = []
+
+    def visit(page: CapturePageBinding) -> None:
+        observed_ids.extend(str(row["benzinga_id"]) for row in page.parsed_rows)
+
+    summary = _visit_authenticated_massive_capture_pages_for_bridge(
+        spooled.artifact_path,
+        expected_transport=TEST_TRANSPORT,
+        visit_page=visit,
+    )
+    assert summary.total_row_count == 3
+    assert observed_ids.count(duplicate) == 2
+
+
+def test_streaming_bridge_visitor_rejects_invalid_call_surface_before_filesystem(
+    tmp_path,
+):
+    missing = tmp_path / "never-opened"
+    expected = "expected capture transport is not reviewed"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            missing,
+            expected_transport="unreviewed-transport",
+            visit_page=lambda _page: None,
+        )
+    expected = "capture page visitor must be callable"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            missing,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=None,  # type: ignore[arg-type]
+        )
+    assert not missing.exists()
+
+
+@pytest.mark.parametrize("kind", ["raw", "rows"])
+def test_streaming_bridge_visitor_tamper_refuses_before_callback(tmp_path, kind):
+    spooled, _ = _spooled_capture(tmp_path)
+    manifest = json.loads((spooled.artifact_path / "manifest.json").read_bytes())
+    key = "raw_response_file" if kind == "raw" else "provider_rows_file"
+    target = spooled.artifact_path / manifest["pages"][0][key]
+    target.write_bytes(target.read_bytes().replace(b"AAPL", b"MSFT", 1))
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+
+    expected = "persisted page byte count or hash changed"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == 0
+
+
+def test_streaming_bridge_visitor_manifest_order_refuses_before_callback(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+
+    def reverse_first_two(value):
+        value["pages"][0], value["pages"][1] = (
+            value["pages"][1],
+            value["pages"][0],
+        )
+
+    _rewrite_manifest(spooled.artifact_path, reverse_first_two)
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+
+    expected = "manifest pages are not contiguous from one"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == 0
+
+
+def test_streaming_bridge_visitor_refuses_per_page_row_count_redistribution(
+    tmp_path,
+):
+    spooled, _ = _spooled_capture(tmp_path)
+
+    def redistribute_and_rebind_identity(value):
+        value["pages"][0]["row_count"] = 0
+        value["pages"][1]["row_count"] = 2
+        logical = _logical_capture_record(
+            capture_started_at=value["capture_started_at"],
+            capture_completed_at=value["capture_completed_at"],
+            requested_first_event_date=value["requested_first_event_date"],
+            requested_last_event_date=value["requested_last_event_date"],
+            pages=tuple(value["pages"]),
+        )
+        capture_sha256 = sha256_bytes(canonical_json_bytes(logical))
+        value["capture_sha256"] = capture_sha256
+        value["capture_id"] = f"arv2-capture-{capture_sha256[:24]}"
+
+    _rewrite_manifest(spooled.artifact_path, redistribute_and_rebind_identity)
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+
+    expected = "manifest page row count does not match authenticated bytes"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == 0
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected"),
+    [
+        ("chronology_reversed", "manifest capture chronology is reversed"),
+        ("role_count_nonobject", "manifest role count must be an object"),
+        ("role_count_order", "manifest role counts are out of order"),
+        ("role_count_invalid", "manifest role count is invalid"),
+        ("page_nonobject", "manifest page must be an object"),
+        ("page_source", "manifest page source role is invalid"),
+        ("page_number", "manifest page number is invalid"),
+        ("role_order_backwards", "manifest pages are not in canonical role order"),
+        ("skipped_role", "manifest skipped a source role"),
+        ("unterminated_role", "manifest role page chain did not terminate"),
+        ("terminal_followed", "manifest terminal page was followed"),
+        ("endpoint", "manifest endpoint path changed"),
+        ("query", "manifest query binding changed"),
+        ("filename", "manifest page filenames are not canonical"),
+        ("page_field", "manifest page field is invalid"),
+        ("page_chronology", "manifest page chronology is invalid"),
+        ("cursor_discontinuous", "manifest cursor chain is discontinuous"),
+        ("terminal_state", "manifest terminal-page state is inconsistent"),
+        ("cursor_cycle", "manifest cursor chain repeats or cycles"),
+        ("response_replay", "manifest repeats a raw response page"),
+        ("incomplete_roles", "manifest did not complete every source role"),
+        ("role_counts", "manifest role counts do not match pages"),
+        ("aggregates", "manifest aggregate counts do not match pages"),
+        ("logical_identity", "manifest logical capture identity changed"),
+    ],
+)
+def test_streaming_bridge_visitor_preflight_refusals_are_isolated(
+    tmp_path, mutation, expected
+):
+    spooled, _ = _spooled_capture(tmp_path)
+
+    def mutate(value):
+        pages = value["pages"]
+        if mutation == "chronology_reversed":
+            value["capture_completed_at"] = "2020-01-01T00:00:00.000000Z"
+        elif mutation == "role_count_nonobject":
+            value["role_counts"][0] = []
+        elif mutation == "role_count_order":
+            value["role_counts"][0]["source_role"] = ROLE_ORDER[1].value
+        elif mutation == "role_count_invalid":
+            value["role_counts"][0]["page_count"] = 0
+        elif mutation == "page_nonobject":
+            pages[0] = []
+        elif mutation == "page_source":
+            pages[0]["source_role"] = "unknown-role"
+        elif mutation == "page_number":
+            pages[0]["page_number"] = 0
+        elif mutation == "role_order_backwards":
+            pages[0]["terminal_page"] = True
+            pages[0]["next_cursor_sha256"] = None
+            pages[:] = [pages[0], pages[2], pages[1], pages[3]]
+        elif mutation == "skipped_role":
+            pages[:] = pages[:2] + pages[3:]
+        elif mutation == "unterminated_role":
+            pages[1]["terminal_page"] = False
+            pages[1]["next_cursor_sha256"] = "0" * 64
+        elif mutation == "terminal_followed":
+            pages[0]["terminal_page"] = True
+            pages[0]["next_cursor_sha256"] = None
+        elif mutation == "endpoint":
+            pages[0]["endpoint_path"] = ENDPOINT_PATHS[ROLE_ORDER[1]]
+        elif mutation == "query":
+            pages[0]["redacted_query_sha256"] = "0" * 64
+        elif mutation == "filename":
+            pages[0]["raw_response_file"] = "pages/not-canonical.raw.json"
+        elif mutation == "page_field":
+            pages[0]["terminal_page"] = "false"
+        elif mutation == "page_chronology":
+            pages[0]["response_received_at"] = "2020-01-01T00:00:00.000000Z"
+        elif mutation == "cursor_discontinuous":
+            pages[1]["request_cursor_sha256"] = "0" * 64
+        elif mutation == "terminal_state":
+            pages[1]["next_cursor_sha256"] = "0" * 64
+        elif mutation == "cursor_cycle":
+            pages[1]["terminal_page"] = False
+            pages[1]["next_cursor_sha256"] = pages[0]["next_cursor_sha256"]
+        elif mutation == "response_replay":
+            pages[1]["raw_response_sha256"] = pages[0]["raw_response_sha256"]
+        elif mutation == "incomplete_roles":
+            pages.pop()
+        elif mutation == "role_counts":
+            value["role_counts"][0]["row_count"] += 1
+        elif mutation == "aggregates":
+            value["total_page_count"] += 1
+        else:
+            value["capture_sha256"] = "0" * 64
+
+    _rewrite_manifest(spooled.artifact_path, mutate)
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == 0
+
+
+def test_streaming_bridge_visitor_propagates_callback_failure_unchanged(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+    failure = RuntimeError("consumer refused a duplicate provider ID")
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+        raise failure
+
+    with pytest.raises(RuntimeError) as captured:
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert captured.value is failure
+    assert callbacks == 1
+
+
+def test_streaming_bridge_visitor_transport_mismatch_refuses_before_callback(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+
+    expected = "capture transport does not match bridge expectation"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=PRODUCTION_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == 0
+
+
+def test_streaming_bridge_visitor_rechecks_visited_leaf_identity(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+    manifest = json.loads((spooled.artifact_path / "manifest.json").read_bytes())
+    first_raw = spooled.artifact_path / manifest["pages"][0]["raw_response_file"]
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            first_raw.write_bytes(first_raw.read_bytes().replace(b"AAPL", b"MSFT", 1))
+
+    expected = "raw response page identity changed after visitation"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == spooled.total_page_count
+
+
+def test_streaming_bridge_visitor_rechecks_artifact_path_identity(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+    replacement = spooled.artifact_path
+    moved = replacement.with_name(replacement.name + "-moved")
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            replacement.rename(moved)
+            replacement.mkdir(mode=0o700)
+            replacement.chmod(0o700)
+
+    expected = "capture artifact path identity changed during visitation"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            replacement,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == spooled.total_page_count
+
+
+def test_streaming_bridge_visitor_rechecks_pages_container_identity(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+    pages = spooled.artifact_path / "pages"
+    moved = spooled.artifact_path.parent / "visitor-pages-moved"
+    callbacks = 0
+
+    def visit(_page: CapturePageBinding) -> None:
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            pages.rename(moved)
+            pages.mkdir(mode=0o700)
+            pages.chmod(0o700)
+
+    expected = "capture pages directory identity changed"
+    with pytest.raises(MassiveCaptureError, match=_exact_error(expected)):
+        _visit_authenticated_massive_capture_pages_for_bridge(
+            spooled.artifact_path,
+            expected_transport=TEST_TRANSPORT,
+            visit_page=visit,
+        )
+    assert callbacks == spooled.total_page_count
+
+
+def test_streaming_bridge_visitor_releases_each_page_after_callback(tmp_path):
+    spooled, _ = _spooled_capture(tmp_path)
+    prior: weakref.ReferenceType[CapturePageBinding] | None = None
+    observed = 0
+
+    def visit(page: CapturePageBinding) -> None:
+        nonlocal observed, prior
+        gc.collect()
+        if prior is not None:
+            assert prior() is None
+        prior = weakref.ref(page)
+        observed += 1
+
+    summary = _visit_authenticated_massive_capture_pages_for_bridge(
+        spooled.artifact_path,
+        expected_transport=TEST_TRANSPORT,
+        visit_page=visit,
+    )
+    gc.collect()
+    assert observed == summary.total_page_count
+    assert prior is not None and prior() is None
 
 
 def test_v2_spooling_persists_each_page_before_the_next_request(

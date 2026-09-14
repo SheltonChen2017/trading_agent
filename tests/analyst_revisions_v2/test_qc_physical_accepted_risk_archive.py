@@ -368,6 +368,83 @@ def test_disk_archive_refuses_unreviewed_rating_action(tmp_path):
         )
 
 
+@pytest.mark.parametrize(
+    ("rating_action", "remove_field"),
+    [
+        (None, True),
+        (None, False),
+        ("", False),
+    ],
+)
+def test_disk_archive_preserves_missing_or_exact_empty_action_for_c2_disposition(
+    tmp_path, rating_action, remove_field
+):
+    rating = _row("rating-missing-action", role=ROLE_ORDER[0])
+    if remove_field:
+        rating.pop("rating_action")
+    else:
+        rating["rating_action"] = rating_action
+    responses = [
+        FakeResponse(_payload([rating]), _endpoint(ROLE_ORDER[0])),
+        FakeResponse(
+            _payload([_row("earnings", role=ROLE_ORDER[1])]),
+            _endpoint(ROLE_ORDER[1]),
+        ),
+        FakeResponse(
+            _payload([_row("guidance", role=ROLE_ORDER[2])]),
+            _endpoint(ROLE_ORDER[2]),
+        ),
+    ]
+    capture, _session = _spooled_capture(tmp_path, responses=responses)
+
+    archive = _build_physical_accepted_risk_archive_for_test(
+        source_artifact_path=capture.artifact_path,
+        output_root=tmp_path / "accepted-risk",
+    )
+    legacy = _build_massive_accepted_risk_input_pair_for_test(
+        capture.artifact_path
+    )
+    rows = tuple(iter_physical_accepted_risk_rows(archive))
+    source = rows[0]
+
+    assert len(rows) == archive.source_row_count == 3
+    assert source.raw_row_bytes == canonical_json_bytes(rating)
+    assert source.action_label == "__missing_rating_or_target_action__"
+    assert source.current_view.included is True
+    assert source.censored_view.included is True
+    assert [row.to_record() for row in rows] == [
+        row.to_record() for row in legacy.pair.rows
+    ]
+    assert archive.pair_id == legacy.pair.pair_id
+    assert archive.pair_sha256 == legacy.pair.pair_sha256
+
+
+def test_disk_archive_refuses_whitespace_rating_action(tmp_path):
+    rating = _row("rating-whitespace-action", role=ROLE_ORDER[0])
+    rating["rating_action"] = "   "
+    responses = [
+        FakeResponse(_payload([rating]), _endpoint(ROLE_ORDER[0])),
+        FakeResponse(
+            _payload([_row("earnings", role=ROLE_ORDER[1])]),
+            _endpoint(ROLE_ORDER[1]),
+        ),
+        FakeResponse(
+            _payload([_row("guidance", role=ROLE_ORDER[2])]),
+            _endpoint(ROLE_ORDER[2]),
+        ),
+    ]
+    capture, _session = _spooled_capture(tmp_path, responses=responses)
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("rating_action is not a reviewed provider action"),
+    ):
+        _build_physical_accepted_risk_archive_for_test(
+            source_artifact_path=capture.artifact_path,
+            output_root=tmp_path / "accepted-risk",
+        )
+
+
 def test_disk_archive_refuses_an_empty_capture(tmp_path):
     capture, _session = _spooled_capture(tmp_path, responses=[
         FakeResponse(_payload([]), _endpoint(role)) for role in ROLE_ORDER
@@ -1137,6 +1214,26 @@ def test_builder_refuses_rebound_rating_action_whitelist_before_io(
         pair_builder_module,
         "_KNOWN_RATING_ACTIONS",
         frozenset(tuple(pair_builder_module._KNOWN_RATING_ACTIONS)),
+    )
+    output_root = tmp_path / "accepted-risk"
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("physical accepted-risk dependency binding changed"),
+    ):
+        _build_physical_accepted_risk_archive_for_test(
+            source_artifact_path=tmp_path / "capture",
+            output_root=output_root,
+        )
+    assert not output_root.exists()
+
+
+def test_builder_refuses_rebound_missing_rating_action_classifier_before_io(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(
+        physical_module,
+        "_rating_action_is_missing",
+        lambda _value: True,
     )
     output_root = tmp_path / "accepted-risk"
     with pytest.raises(

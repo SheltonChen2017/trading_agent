@@ -246,6 +246,12 @@ def _optional_text(
         raise _RowRefusal(RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD) from exc
 
 
+def _rating_action_is_missing(value: object) -> bool:
+    """Recognize only absence and the provider's observed exact-empty value."""
+
+    return value is None or (type(value) is str and value == "")
+
+
 def _required_identifier(
     record: Mapping[str, Any], key: str, reason: RatingsIngestRefusalReason
 ) -> str:
@@ -271,6 +277,10 @@ def _parse_provider_timestamp(value: object) -> str:
 
 def _validate_optional_provider_fields(record: Mapping[str, Any]) -> None:
     for key in _TEXT_FIELDS:
+        if key == "rating_action" and _rating_action_is_missing(
+            record.get(key)
+        ):
+            continue
         maximum = 8192 if key == "notes" else 2048
         _optional_text(record, key, maximum_length=maximum)
     for key in _NUMERIC_FIELDS:
@@ -435,7 +445,12 @@ def _parse_source_row(source_row: VerifiedSourceRow) -> BenzingaRatingRecord:
     except CanonicalEvidenceError as exc:
         raise _RowRefusal(RatingsIngestRefusalReason.INVALID_TICKER) from exc
 
-    raw_action = _optional_text(record, "rating_action")
+    raw_action_value = record.get("rating_action")
+    raw_action = (
+        None
+        if _rating_action_is_missing(raw_action_value)
+        else _optional_text(record, "rating_action")
+    )
     price_target_action = _optional_text(
         record, "price_target_action", maximum_length=256
     )

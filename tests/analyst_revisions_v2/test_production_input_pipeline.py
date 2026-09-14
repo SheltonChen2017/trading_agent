@@ -608,6 +608,70 @@ def test_unknown_provider_field_or_invalid_directional_row_never_reaches_normali
 
 
 @pytest.mark.parametrize(
+    ("rating_action", "remove_field"),
+    [
+        (None, True),
+        (None, False),
+        ("", False),
+    ],
+)
+@pytest.mark.parametrize(
+    ("price_target_action", "expected_disposition", "potential_directional"),
+    [
+        (None, AdmissionDisposition.INVALID_RATING_ROW, True),
+        ("raises", AdmissionDisposition.NON_DIRECTIONAL_RATING_ACTION, False),
+    ],
+)
+def test_missing_or_exact_empty_action_has_an_existing_c2_terminal_disposition(
+    rating_action,
+    remove_field,
+    price_target_action,
+    expected_disposition,
+    potential_directional,
+):
+    row = _rating_row("missing-action")
+    if remove_field:
+        row.pop("rating_action")
+    else:
+        row["rating_action"] = rating_action
+    if price_target_action is not None:
+        row["price_target_action"] = price_target_action
+    pair = _pair(ratings=[row])
+    authority = _authority(pair, rows=())
+
+    batch = build_production_input_batch(
+        authority, signal_arm=SignalArm.CURRENT_VINTAGE
+    )
+    admission = batch.admissions[0]
+
+    assert batch.total_source_row_count == len(pair.rows) == 3
+    assert admission.disposition is expected_disposition
+    assert admission.normalized_row is None
+    assert admission.potential_directional is potential_directional
+    assert batch.directional_candidate_count == int(potential_directional)
+    assert batch.refused_directional_count == int(potential_directional)
+
+
+def test_whitespace_action_remains_an_invalid_c2_row_not_target_only():
+    row = _rating_row(
+        "whitespace-action",
+        action="   ",
+        price_target_action="raises",
+    )
+    pair = _pair(ratings=[row])
+    authority = _authority(pair, rows=())
+
+    batch = build_production_input_batch(
+        authority, signal_arm=SignalArm.CURRENT_VINTAGE
+    )
+    admission = batch.admissions[0]
+
+    assert admission.disposition is AdmissionDisposition.INVALID_RATING_ROW
+    assert admission.normalized_row is None
+    assert admission.potential_directional is True
+
+
+@pytest.mark.parametrize(
     "changes",
     [
         {"price_target": "12.5"},
@@ -961,6 +1025,7 @@ def test_comparison_report_is_pre_return_exhaustive_and_dimension_complete():
     "binding_name",
     [
         "_at_or_after_cutoff",
+        "_rating_action_is_missing",
         "_validate_row_evidence_topology",
         "build_production_input_batch",
     ],

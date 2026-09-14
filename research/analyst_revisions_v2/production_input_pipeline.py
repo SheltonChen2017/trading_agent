@@ -1630,11 +1630,23 @@ def _optional_text_value(record: dict[str, Any], key: str) -> str | None:
         raise _RatingRowRefusal(AdmissionDisposition.INVALID_RATING_ROW) from exc
 
 
+def _rating_action_is_missing(value: object) -> bool:
+    """Treat absent and the provider's observed exact-empty value identically."""
+
+    return value is None or (type(value) is str and value == "")
+
+
 def _validate_optional_rating_values(record: dict[str, Any]) -> None:
     try:
         for key in _RATING_TEXT_FIELDS:
             value = record.get(key)
-            if value is not None:
+            if (
+                value is not None
+                and not (
+                    key == "rating_action"
+                    and _rating_action_is_missing(value)
+                )
+            ):
                 require_text(
                     value,
                     key,
@@ -1701,7 +1713,13 @@ def _potential_directional_action(source: AcceptedRiskSourceRow) -> bool:
     raw_action = value.get("rating_action")
     if type(raw_action) is str and raw_action in _KNOWN_NON_DIRECTIONAL_ACTIONS:
         return False
-    if raw_action is None and type(value.get("price_target_action")) is str:
+    action_missing = _rating_action_is_missing(raw_action)
+    price_target_action = value.get("price_target_action")
+    if (
+        action_missing
+        and type(price_target_action) is str
+        and bool(price_target_action.strip())
+    ):
         return False
     return True
 
@@ -1724,7 +1742,8 @@ def _parse_rating_row(source: AcceptedRiskSourceRow) -> _ParsedRatingRow:
     firm_id = _required_identifier_value(value, "benzinga_firm_id")
     firm_name = _required_text_value(value, "firm")
     raw_action = value.get("rating_action")
-    if raw_action is None:
+    action_missing = _rating_action_is_missing(raw_action)
+    if action_missing:
         price_target_action = _optional_text_value(value, "price_target_action")
         if price_target_action is None:
             raise _RatingRowRefusal(AdmissionDisposition.INVALID_RATING_ROW)
@@ -3254,6 +3273,7 @@ def _current_local_callables() -> tuple[object, ...]:
         _required_identifier_value,
         _required_text_value,
         _optional_text_value,
+        _rating_action_is_missing,
         _validate_optional_rating_values,
         _normalize_provider_timestamp,
         _potential_directional_action,

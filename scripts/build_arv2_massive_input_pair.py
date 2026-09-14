@@ -194,6 +194,12 @@ def _canonical_rating_action(value: object) -> str:
     return normalized
 
 
+def _rating_action_is_missing(value: object) -> bool:
+    """Classify only absent or exactly empty actions; never infer an action."""
+
+    return value is None or (type(value) is str and value == "")
+
+
 def _iter_page_rows(payload: bytes):
     """Parse one bounded JSONL row at a time without a second page-sized list."""
 
@@ -304,11 +310,10 @@ def _slim_authenticated_capture(
                         "duplicate or conflicting benzinga_id invalidates the capture"
                     )
                 seen_provider_ids.add(provider_id)
-            if (
-                page.source_role is MassiveSourceRole.ANALYST_RATINGS
-                and row.get("rating_action") is not None
-            ):
-                _canonical_rating_action(row["rating_action"])
+            if page.source_role is MassiveSourceRole.ANALYST_RATINGS:
+                raw_action = row.get("rating_action")
+                if not _rating_action_is_missing(raw_action):
+                    _canonical_rating_action(raw_action)
         if page_rows != page.row_count:
             raise MassiveInputPairBridgeError(
                 "streamed page census does not match its authenticated row count"

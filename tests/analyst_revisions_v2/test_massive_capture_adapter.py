@@ -2303,6 +2303,69 @@ def test_bridge_unknown_rating_action_refuses_without_pair(tmp_path, monkeypatch
         _build_massive_accepted_risk_input_pair_for_test(loaded.artifact_path)
 
 
+@pytest.mark.parametrize(
+    ("rating_action", "remove_field"),
+    [
+        (None, True),
+        (None, False),
+        ("", False),
+    ],
+)
+def test_bridge_preserves_missing_or_exact_empty_action_for_c2_disposition(
+    tmp_path, monkeypatch, rating_action, remove_field
+):
+    rating = _row("rating-missing-action", role=ROLE_ORDER[0])
+    if remove_field:
+        rating.pop("rating_action")
+    else:
+        rating["rating_action"] = rating_action
+    responses = [
+        FakeResponse(_payload([rating]), _endpoint(ROLE_ORDER[0])),
+        FakeResponse(
+            _payload([_row("earnings-1", role=ROLE_ORDER[1])]),
+            _endpoint(ROLE_ORDER[1]),
+        ),
+        FakeResponse(
+            _payload([_row("guidance-1", role=ROLE_ORDER[2])]),
+            _endpoint(ROLE_ORDER[2]),
+        ),
+    ]
+    loaded, _ = _capture(tmp_path, monkeypatch, responses=responses)
+
+    bridge = _build_massive_accepted_risk_input_pair_for_test(
+        loaded.artifact_path
+    )
+    source = bridge.pair.rows[0]
+
+    assert bridge.source_row_count == len(bridge.pair.rows) == 3
+    assert source.raw_row_bytes == canonical_json_bytes(rating)
+    assert source.action_label == "__missing_rating_or_target_action__"
+    assert source.current_view.included is True
+    assert source.censored_view.included is True
+
+
+def test_bridge_refuses_whitespace_rating_action(tmp_path, monkeypatch):
+    rating = _row("rating-whitespace-action", role=ROLE_ORDER[0])
+    rating["rating_action"] = "   "
+    responses = [
+        FakeResponse(_payload([rating]), _endpoint(ROLE_ORDER[0])),
+        FakeResponse(
+            _payload([_row("earnings-1", role=ROLE_ORDER[1])]),
+            _endpoint(ROLE_ORDER[1]),
+        ),
+        FakeResponse(
+            _payload([_row("guidance-1", role=ROLE_ORDER[2])]),
+            _endpoint(ROLE_ORDER[2]),
+        ),
+    ]
+    loaded, _ = _capture(tmp_path, monkeypatch, responses=responses)
+
+    with pytest.raises(
+        MassiveInputPairBridgeError, match="reviewed provider action"
+    ):
+        _build_massive_accepted_risk_input_pair_for_test(loaded.artifact_path)
+
+
 def test_bridge_preserves_missing_id_and_later_touch_as_named_dispositions(
     tmp_path, monkeypatch
 ):

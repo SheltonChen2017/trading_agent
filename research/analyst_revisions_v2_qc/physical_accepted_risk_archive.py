@@ -63,6 +63,7 @@ from scripts.build_arv2_massive_input_pair import (
     MAX_BRIDGE_ROW_BYTES,
     MassiveInputPairBridgeError,
     _canonical_rating_action,
+    _rating_action_is_missing,
 )
 
 from .accepted_risk_pair_bridge import PAIR_ARTIFACT_DOMAIN
@@ -81,6 +82,7 @@ _PINNED_DERIVE_SOURCE_ROW = _c1._derive_source_row
 _PINNED_VALIDATE_REDACTED_QUERY = _c1._validate_redacted_query
 _PINNED_REQUIRE_C1_STATIC_CONTRACT = _c1._require_static_contract
 _PINNED_CANONICAL_RATING_ACTION = _canonical_rating_action
+_PINNED_RATING_ACTION_IS_MISSING = _rating_action_is_missing
 _PINNED_KNOWN_RATING_ACTIONS_OBJECT = _pair_builder._KNOWN_RATING_ACTIONS
 _PINNED_KNOWN_RATING_ACTIONS = frozenset(_PINNED_KNOWN_RATING_ACTIONS_OBJECT)
 _PINNED_ACTION_SPACE_RE_OBJECT = _pair_builder._ACTION_SPACE_RE
@@ -234,6 +236,7 @@ def _require_dependency_bindings() -> None:
             or strict_json_loads is not _PINNED_STRICT_JSON_LOADS
             or hashlib.sha256 is not _PINNED_HASHLIB_SHA256
             or _canonical_rating_action is not _PINNED_CANONICAL_RATING_ACTION
+            or _rating_action_is_missing is not _PINNED_RATING_ACTION_IS_MISSING
             or _pair_builder._KNOWN_RATING_ACTIONS
             is not _PINNED_KNOWN_RATING_ACTIONS_OBJECT
             or type(_pair_builder._KNOWN_RATING_ACTIONS) is not frozenset
@@ -1144,12 +1147,11 @@ class _AcceptedRiskArchiveStage:
         for row, _raw in _iter_provider_rows(page.provider_rows_bytes):
             page_rows += 1
             _insert_provider_id(self.connection, row)
-            if (
-                page.source_role is MassiveSourceRole.ANALYST_RATINGS
-                and row.get("rating_action") is not None
-            ):
+            if page.source_role is MassiveSourceRole.ANALYST_RATINGS:
                 try:
-                    _PINNED_CANONICAL_RATING_ACTION(row["rating_action"])
+                    raw_action = row.get("rating_action")
+                    if not _PINNED_RATING_ACTION_IS_MISSING(raw_action):
+                        _PINNED_CANONICAL_RATING_ACTION(raw_action)
                 except MassiveInputPairBridgeError as exc:
                     raise PhysicalAcceptedRiskArchiveError(
                         "rating_action is not a reviewed provider action"

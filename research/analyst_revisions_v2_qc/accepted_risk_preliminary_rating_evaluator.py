@@ -1081,10 +1081,16 @@ class PreliminaryRatingEvaluationRuntime:
                     )
         return result
 
-    def _score_session(self, position: int) -> None:
+    def _score_cross_section(
+        self, position: int
+    ) -> tuple[
+        tuple[SecurityMembership, ...],
+        dict[tuple[str, str], dict[str, Decimal]],
+        defaultdict[tuple[str, str], int],
+    ]:
+        """Build the unchanged R055 score cross-section for one session."""
         for index in self._live_contribution_indices.get(position, ()):
             self._apply_contribution(self._input.contributions[index])
-        session = self._input.session_axis[position]
         memberships = tuple(
             item for item in self._input.memberships
             if item.first_session_index <= position < item.last_session_index_exclusive
@@ -1143,6 +1149,11 @@ class PreliminaryRatingEvaluationRuntime:
                             state, "global_comparator", quality[security], decay_factor
                         ),
                     )
+        return memberships, scores, sector_refused
+
+    def _score_session(self, position: int) -> None:
+        _memberships, scores, sector_refused = self._score_cross_section(position)
+        session = self._input.session_axis[position]
         outcome_sessions = tuple(
             self._input.session_axis[position + horizon] for horizon in HORIZONS
         )

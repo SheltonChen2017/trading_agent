@@ -86,6 +86,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_preliminary_submission_adapter.py
     accepted_risk_preopen_terminal_authority.py
     accepted_risk_qc_symbol_resolution.py
+    accepted_risk_regime_rating_evaluator.py
     accepted_risk_security_master_admission.py
     accepted_risk_terminal_disposition.py event_study.py
     firm_ontology_candidate_builder.py firm_ontology_owner_decision.py
@@ -148,6 +149,14 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_policy
         datetime
+        """.split()
+    ),
+    "accepted_risk_regime_rating_evaluator.py": tuple(
+        """
+        dataclasses json collections decimal types
+        accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
         """.split()
     ),
     "accepted_risk_preliminary_rating_policy.py": (),
@@ -297,6 +306,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator
         """.split()
     ),
     "accepted_risk_preliminary_submission_adapter.py": tuple(
@@ -309,6 +319,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_projection
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator
         research.analyst_revisions_v2_qc.formal_submission_adapter
         research.analyst_revisions_v2_qc.formal_qc_transport
         research.analyst_revisions_v2_qc.owner_signature_authority
@@ -987,9 +998,12 @@ _QC_RUNTIME_IMPORTS = {
         """
         dataclasses gzip hashlib io json math re time datetime decimal types
         accepted_risk_preliminary_rating_evaluator
-        accepted_risk_preliminary_qc_figi research.analyst_revisions_v2_qc
+        accepted_risk_preliminary_qc_figi
+        accepted_risk_regime_rating_evaluator
+        research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator
         """.split()
     ),
     "fundamental_universe_discovery_runtime.py": tuple(
@@ -2105,10 +2119,12 @@ research.analyst_revisions_v2_qc.accepted_risk_preliminary_package research.anal
 research.analyst_revisions_v2_qc.accepted_risk_preliminary_package scripts.build_arv2_massive_input_pair
 research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime accepted_risk_preliminary_qc_figi
 research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime accepted_risk_preliminary_rating_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime accepted_risk_regime_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator accepted_risk_preliminary_rating_policy
 research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter research.analyst_revisions_v2.preregistration
 research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator accepted_risk_preliminary_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_security_master_admission research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.accepted_risk_security_master_admission research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition research.analyst_revisions_v2.canonical
@@ -2246,6 +2262,14 @@ _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
         (
             "research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator",
             "accepted_risk_preliminary_rating_policy",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime",
+            "accepted_risk_regime_rating_evaluator",
         ),
         (
             "research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime",
@@ -2434,6 +2458,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter",
         "research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority",
         "research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution",
+        "research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_security_master_admission",
         "research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition",
         "research.analyst_revisions_v2_qc.event_study",

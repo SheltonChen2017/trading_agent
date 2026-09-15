@@ -11,13 +11,14 @@ from pathlib import Path
 
 from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_preliminary_qc_runtime as runtime_builder
+from . import accepted_risk_regime_rating_evaluator as regime_evaluator
 
 
 class AcceptedRiskPreliminaryQcProjectionError(ValueError):
     """The compact QC source set or its bound input activation is inexact."""
 
 
-PROJECTION_SCHEMA = "arv2-accepted-risk-preliminary-qc-source-projection-v1"
+PROJECTION_SCHEMA = "arv2-accepted-risk-preliminary-qc-source-projection-v2"
 SOURCE_SCHEMA = "arv2-accepted-risk-preliminary-qc-source-file-v1"
 MAX_SOURCE_FILE_BYTES = 60_000
 MAX_TOTAL_SOURCE_BYTES = 180_000
@@ -26,6 +27,7 @@ ALGORITHM_END = (2026, 9, 11)
 PROJECT_SOURCE_PATHS = (
     "accepted_risk_preliminary_rating_policy.py",
     "accepted_risk_preliminary_rating_evaluator.py",
+    "accepted_risk_regime_rating_evaluator.py",
     "accepted_risk_preliminary_qc_figi.py",
     "accepted_risk_preliminary_qc_runtime.py",
 )
@@ -51,6 +53,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_preliminary_qc_runtime",
     "accepted_risk_preliminary_rating_evaluator",
     "accepted_risk_preliminary_rating_policy",
+    "accepted_risk_regime_rating_evaluator",
     "collections",
     "collections.abc",
     "dataclasses",
@@ -336,6 +339,8 @@ class AcceptedRiskPreliminaryQcProjection:
     activation_manifest_key: str
     activation_manifest_sha256: str
     activation_manifest_byte_count: int
+    evaluation_profile_id: str | None
+    evaluation_profile_sha256: str | None
     source_files: tuple[PreliminaryQcSourceFile, ...]
     total_source_byte_count: int
     train_work_units_per_slice: int
@@ -356,6 +361,8 @@ class AcceptedRiskPreliminaryQcProjection:
             "activation_manifest_key": self.activation_manifest_key,
             "activation_manifest_sha256": self.activation_manifest_sha256,
             "activation_manifest_byte_count": self.activation_manifest_byte_count,
+            "evaluation_profile_id": self.evaluation_profile_id,
+            "evaluation_profile_sha256": self.evaluation_profile_sha256,
             "source_files": [item.to_record() for item in self.source_files],
             "total_source_byte_count": self.total_source_byte_count,
             "train_work_units_per_slice": self.train_work_units_per_slice,
@@ -368,7 +375,13 @@ class AcceptedRiskPreliminaryQcProjection:
         }
 
 
-def _main_source(*, activation_key: str, activation_sha256: str, activation_bytes: int) -> bytes:
+def _main_source(
+    *,
+    activation_key: str,
+    activation_sha256: str,
+    activation_bytes: int,
+    evaluation_profile_id: str | None,
+) -> bytes:
     source = f'''from AlgorithmImports import *
 from accepted_risk_preliminary_qc_runtime import (
     AcceptedRiskPreliminaryQcDriver,
@@ -400,6 +413,7 @@ class ARV2AcceptedRiskPreliminaryAlgorithm(QCAlgorithm):
             trade_bar_type=TradeBar,
             daily_resolution=Resolution.DAILY,
             total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
+            evaluation_profile_id={evaluation_profile_id!r},
         )
 
     def on_data(self, _data):
@@ -459,10 +473,17 @@ def _validate_source(project_path: str, source: bytes) -> PreliminaryQcSourceFil
 
 def build_accepted_risk_preliminary_qc_projection(
     package: package_builder.AcceptedRiskPreliminaryPackage,
+    *,
+    evaluation_profile_id: str | None = None,
 ) -> AcceptedRiskPreliminaryQcProjection:
-    """Bind the compact activation to five exact flat QC source files."""
+    """Bind the compact activation to an exact flat QC source set."""
 
     package = package_builder.require_accepted_risk_preliminary_package(package)
+    profile = (
+        None
+        if evaluation_profile_id is None
+        else regime_evaluator.require_regime_profile(evaluation_profile_id)
+    )
     activation = package.upload_objects[-1]
     if (
         activation.role != "activation_manifest"
@@ -489,6 +510,7 @@ def build_accepted_risk_preliminary_qc_projection(
                 activation_key=activation.object_store_key,
                 activation_sha256=activation.content_sha256,
                 activation_bytes=activation.byte_count,
+                evaluation_profile_id=evaluation_profile_id,
             ),
         )
     )
@@ -507,6 +529,10 @@ def build_accepted_risk_preliminary_qc_projection(
         "activation_manifest_key": activation.object_store_key,
         "activation_manifest_sha256": activation.content_sha256,
         "activation_manifest_byte_count": activation.byte_count,
+        "evaluation_profile_id": evaluation_profile_id,
+        "evaluation_profile_sha256": (
+            None if profile is None else profile["profile_sha256"]
+        ),
         "source_files": [item.to_record() for item in files],
         "total_source_byte_count": total,
         "train_work_units_per_slice": runtime_builder.TRAIN_WORK_UNITS_PER_SLICE,
@@ -527,6 +553,8 @@ def build_accepted_risk_preliminary_qc_projection(
         activation.object_store_key,
         activation.content_sha256,
         activation.byte_count,
+        evaluation_profile_id,
+        None if profile is None else profile["profile_sha256"],
         tuple(files),
         total,
         runtime_builder.TRAIN_WORK_UNITS_PER_SLICE,
@@ -548,14 +576,21 @@ def require_accepted_risk_preliminary_qc_projection(
         raise AcceptedRiskPreliminaryQcProjectionError(
             "preliminary QC projection type changed"
         )
+    profile = (
+        None
+        if value.evaluation_profile_id is None
+        else regime_evaluator.require_regime_profile(value.evaluation_profile_id)
+    )
     if (
         value.schema != PROJECTION_SCHEMA
         or type(value.source_files) is not tuple
-        or len(value.source_files) != 5
+        or len(value.source_files) != 6
         or tuple(item.project_path for item in value.source_files)
         != tuple(sorted((*PROJECT_SOURCE_PATHS, MAIN_PROJECT_PATH)))
         or value.total_source_byte_count
         != sum(item.byte_count for item in value.source_files)
+        or value.evaluation_profile_sha256
+        != (None if profile is None else profile["profile_sha256"])
         or value.total_source_byte_count > MAX_TOTAL_SOURCE_BYTES
         or value.train_work_units_per_slice
         != runtime_builder.TRAIN_WORK_UNITS_PER_SLICE
@@ -579,6 +614,20 @@ def require_accepted_risk_preliminary_qc_projection(
     if rebuilt != value.source_files:
         raise AcceptedRiskPreliminaryQcProjectionError(
             "preliminary QC projected source identity changed"
+        )
+    main_source = next(
+        item.source_bytes
+        for item in value.source_files
+        if item.project_path == MAIN_PROJECT_PATH
+    )
+    if main_source != _main_source(
+        activation_key=value.activation_manifest_key,
+        activation_sha256=value.activation_manifest_sha256,
+        activation_bytes=value.activation_manifest_byte_count,
+        evaluation_profile_id=value.evaluation_profile_id,
+    ):
+        raise AcceptedRiskPreliminaryQcProjectionError(
+            "preliminary QC main source diverged from its bound activation or profile"
         )
     semantic = value.to_record()
     semantic["projection_id"] = None

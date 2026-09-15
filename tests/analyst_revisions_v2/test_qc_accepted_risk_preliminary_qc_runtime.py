@@ -26,6 +26,9 @@ from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_rating_evaluator as evaluator,
 )
 from research.analyst_revisions_v2_qc import (
+    accepted_risk_regime_rating_evaluator as regime_evaluator,
+)
+from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_package as package_builder,
 )
 SHA = "a" * 64
@@ -854,7 +857,7 @@ def test_daily_dedupe_keeps_valid_censored_arm_when_current_arm_conflicts():
     connection.close()
 
 
-def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monkeypatch):
+def test_projection_is_six_small_flat_files_and_compiles_after_qc_prelude(monkeypatch):
     activation = SimpleNamespace(
         role="activation_manifest",
         activation_manifest=True,
@@ -879,6 +882,7 @@ def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monke
         "main.py",
         "accepted_risk_preliminary_rating_policy.py",
         "accepted_risk_preliminary_rating_evaluator.py",
+        "accepted_risk_regime_rating_evaluator.py",
         "accepted_risk_preliminary_qc_figi.py",
         "accepted_risk_preliminary_qc_runtime.py",
     }
@@ -902,6 +906,103 @@ def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monke
     assert "advance_training_slice" not in initialize
     assert "transport-manifest.json" in main
     assert "order(" not in main.lower()
+
+
+def test_projection_binds_one_exact_regime_profile_into_identity_and_main(monkeypatch):
+    activation = SimpleNamespace(
+        role="activation_manifest",
+        activation_manifest=True,
+        object_store_key="arv2/preliminary-rating/fixture/transport-manifest.json",
+        content_sha256="f" * 64,
+        byte_count=1234,
+    )
+    package = SimpleNamespace(
+        package_id="arv2-preliminary-qc-package-fixture",
+        package_sha256="e" * 64,
+        upload_objects=(activation,),
+    )
+    monkeypatch.setattr(
+        package_builder,
+        "require_accepted_risk_preliminary_package",
+        lambda value: value,
+    )
+    legacy = projection.build_accepted_risk_preliminary_qc_projection(package)
+    profile_id = "arv2-stock-ic-2019-2023"
+    value = projection.build_accepted_risk_preliminary_qc_projection(
+        package,
+        evaluation_profile_id=profile_id,
+    )
+    main = next(
+        item.source_bytes.decode("ascii")
+        for item in value.source_files
+        if item.project_path == "main.py"
+    )
+
+    assert value.evaluation_profile_id == profile_id
+    assert value.evaluation_profile_sha256 is not None
+    assert value.projection_sha256 != legacy.projection_sha256
+    assert f"evaluation_profile_id={profile_id!r}" in main
+    assert projection.require_accepted_risk_preliminary_qc_projection(value) is value
+
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_preliminary_qc_projection(
+            dataclasses.replace(value, evaluation_profile_sha256="0" * 64)
+        )
+
+    with pytest.raises(ValueError, match="exact fixed profile id"):
+        projection.build_accepted_risk_preliminary_qc_projection(
+            package,
+            evaluation_profile_id="arv2-stock-ic-owner-supplied-window",
+        )
+
+
+def test_projection_refuses_cross_profile_main_substitution(monkeypatch):
+    activation = SimpleNamespace(
+        role="activation_manifest",
+        activation_manifest=True,
+        object_store_key="arv2/preliminary-rating/fixture/transport-manifest.json",
+        content_sha256="f" * 64,
+        byte_count=1234,
+    )
+    package = SimpleNamespace(
+        package_id="arv2-preliminary-qc-package-fixture",
+        package_sha256="e" * 64,
+        upload_objects=(activation,),
+    )
+    monkeypatch.setattr(
+        package_builder,
+        "require_accepted_risk_preliminary_package",
+        lambda value: value,
+    )
+    first = projection.build_accepted_risk_preliminary_qc_projection(
+        package,
+        evaluation_profile_id="arv2-stock-ic-2019-2023",
+    )
+    second_profile = regime_evaluator.require_regime_profile(
+        "arv2-stock-ic-2023-2025"
+    )
+    semantic = first.to_record()
+    semantic["evaluation_profile_id"] = second_profile["profile_id"]
+    semantic["evaluation_profile_sha256"] = second_profile["profile_sha256"]
+    semantic["projection_id"] = None
+    semantic["projection_sha256"] = None
+    digest = hashlib.sha256(projection._canonical(semantic)).hexdigest()
+    mismatched = dataclasses.replace(
+        first,
+        projection_id="arv2-preliminary-qc-projection-" + digest[:24],
+        projection_sha256=digest,
+        evaluation_profile_id=second_profile["profile_id"],
+        evaluation_profile_sha256=second_profile["profile_sha256"],
+    )
+
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="main source diverged",
+    ):
+        projection.require_accepted_risk_preliminary_qc_projection(mismatched)
 
 
 def test_projection_future_import_guard_is_an_isolated_compile_refusal():
@@ -1361,6 +1462,20 @@ class _DriverRuntime:
         self.phase = evaluator.RuntimePhase.CLOSED
 
 
+class _RegimeDriverRuntime(_DriverRuntime):
+    def __init__(self, complete_after, profile_id):
+        super().__init__(complete_after)
+        self.profile_id = profile_id
+
+    def custom_summary_statistics(self):
+        return {
+            key: "exact"
+            for key in regime_evaluator.expected_custom_summary_statistic_names(
+                self.profile_id
+            )
+        }
+
+
 def _driver_with_runtime(complete_after):
     algorithm = _DriverAlgorithm()
     driver = runtime.AcceptedRiskPreliminaryQcDriver(
@@ -1411,6 +1526,143 @@ def test_driver_completes_in_bounded_train_slice_emits_once_and_closes_cleanly()
     driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 1)
     assert len(algorithm.statistics) == 34
     assert driver.require_completed_at_end() is True
+
+
+def test_runtime_result_inventory_is_exact_for_each_fixed_regime_profile():
+    assert runtime.expected_custom_summary_statistic_names(None) == (
+        runtime.EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
+    )
+    for profile_id in regime_evaluator.REGIME_PROFILE_IDS:
+        expected = runtime.expected_custom_summary_statistic_names(profile_id)
+        assert len(expected) == 18
+        assert runtime.RUNTIME_META_STATISTIC in expected
+        assert set(expected) == {
+            *regime_evaluator.expected_custom_summary_statistic_names(profile_id),
+            runtime.RUNTIME_META_STATISTIC,
+        }
+
+    with pytest.raises(ValueError, match="exact fixed profile id"):
+        runtime.expected_custom_summary_statistic_names(
+            "arv2-stock-ic-owner-supplied-window"
+        )
+
+
+def test_driver_initialization_selects_regime_runtime_and_exact_named_refusals(
+    monkeypatch,
+):
+    profile_id = "arv2-stock-ic-2019-2023"
+    evaluator_input = SimpleNamespace(
+        source_lineage_sha256s={"security_master_admission_sha256": "a" * 64},
+        benchmark_security_id="benchmark",
+        memberships=(
+            SimpleNamespace(security_id="security-b"),
+            SimpleNamespace(security_id="security-a"),
+        ),
+        session_axis=("2019-01-02",),
+    )
+    package = SimpleNamespace(
+        evaluator_input=evaluator_input,
+        runtime_symbol_bindings=("binding",),
+    )
+
+    class Resolution:
+        def symbol_for_security(self, security_id):
+            return None if security_id == "security-b" else object()
+
+    captured = {}
+
+    class Loader:
+        def __init__(self, _algorithm, **kwargs):
+            captured["loader"] = kwargs
+
+    class RegimeRuntime:
+        def __init__(self, value, **kwargs):
+            captured["runtime"] = (value, kwargs)
+
+    monkeypatch.setattr(
+        runtime,
+        "load_accepted_risk_preliminary_package",
+        lambda *_args, **_kwargs: package,
+    )
+    monkeypatch.setattr(
+        figi,
+        "resolve_preliminary_qc_figis",
+        lambda *_args, **_kwargs: Resolution(),
+    )
+    monkeypatch.setattr(runtime, "QcTotalReturnOpenHistoryLoader", Loader)
+    monkeypatch.setattr(
+        regime_evaluator,
+        "RegimeRatingEvaluationRuntime",
+        RegimeRuntime,
+    )
+    algorithm = SimpleNamespace(composite_figi=object())
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        algorithm,
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=profile_id,
+    )
+
+    driver._initialize_in_training()
+
+    assert captured["runtime"] == (
+        evaluator_input,
+        {
+            "profile_id": profile_id,
+            "named_figi_resolution_refusals": ("security-b",),
+        },
+    )
+    assert captured["loader"]["permitted_security_ids"] == (
+        "benchmark",
+        "security-b",
+        "security-a",
+    )
+    assert driver._runtime.__class__ is RegimeRuntime
+
+
+def test_driver_emits_profile_bound_runtime_metadata_without_training_alias():
+    profile_id = "arv2-stock-ic-2023-2025"
+    profile = regime_evaluator.require_regime_profile(profile_id)
+    algorithm = _DriverAlgorithm()
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        algorithm,
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=profile_id,
+    )
+    driver._package = SimpleNamespace(
+        package_id="package-one",
+        package_sha256="b" * 64,
+        activation_manifest_sha256="c" * 64,
+    )
+    driver._resolution = SimpleNamespace(
+        resolution_id="resolution-one",
+        resolution_sha256="d" * 64,
+        resolved_count=1,
+        named_refusal_count=0,
+    )
+    driver._history_loader = object()
+    driver._runtime = _RegimeDriverRuntime(1, profile_id)
+
+    driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+
+    assert len(algorithm.statistics) == 18
+    values = dict(algorithm.statistics)
+    meta = json.loads(values[runtime.RUNTIME_META_STATISTIC])
+    assert meta["evaluation_profile_id"] == profile_id
+    assert meta["evaluation_profile_sha256"] == profile["profile_sha256"]
+    assert meta["runtime_slice_count"] == 1
+    assert "training_slice_count" not in meta
 
 
 def test_full_geometry_completes_in_41_unslowed_daily_slices():

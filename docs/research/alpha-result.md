@@ -1207,3 +1207,103 @@ one infrastructure look is spent; development evaluations and
 permanent-family looks remain zero; confirmatory alpha remains unspent; one
 prospective permanent look remains. This accounting grants no provider, QC,
 outcome, result, deployment, order, or trading authority.
+
+## R-031 through R-052 — Analyst Revisions V2 QC fundamental-universe discovery launches (RETROACTIVELY RECONCILED; NO OUTCOME READ)
+
+This additive reconciliation records every prior QC discovery backtest launch
+that had not yet been entered in the shared ledger. On 2026-09-14 the owner
+authorized the lane to proceed toward the first outcome-bearing evaluation.
+Before that evaluation, an authenticated, statistics-free inventory of the
+lane's discovery projects found 22 distinct backtest launches. The inventory
+read only project/run identities and terminal status: no performance
+statistics, result values, charts, logs, orders, provider rows, or strategy
+outcomes were requested or inspected. Attempts 5, 6, and 13 created projects
+but launched no backtest; attempts 16 and 17 stopped during local preparation.
+Those five attempts therefore consume no look and receive no R-number.
+
+| Entry | Discovery attempt | QC project | QC backtest | Terminal status |
+|---|---:|---:|---|---|
+| R-031 | 7 | `36536115` | `0014d18dc88f67f958d559a183079a86` | Runtime Error |
+| R-032 | 8 | `36536326` | `1054c989da3711446af17a557b637733` | Runtime Error |
+| R-033 | 9 | `36536574` | `73a386ec1c1b7b026afacb85a42fddba` | Runtime Error |
+| R-034 | 10 | `36536795` | `44d6fe47dfa9406b3b03215f4dae3306` | Runtime Error |
+| R-035 | 12 | `36544563` | `3711535499f0da3fee6977c66375acbf` | Runtime Error |
+| R-036 | 14 | `36548449` | `a7a5622f29a92bb18be0e52224683743` | Runtime Error |
+| R-037 | 15 | `36548598` | `526c6affd022a6d3ab95e54adc5d9eed` | Runtime Error |
+| R-038 | 18 | `36548747` | `5409fcd91a1f3618ce071425591750e5` | Runtime Error |
+| R-039 | 19 | `36548862` | `9493b882011a4b51cc1333b6709e14ad` | Runtime Error |
+| R-040 | 20 | `36549142` | `4937c65e0e7d442fd4268102d4cd0d42` | Runtime Error |
+| R-041 | 21 | `36549260` | `c2138164f23169cbd1188e8349b9558d` | Runtime Error |
+| R-042 | 22 | `36549367` | `c042d1cf806c5e28b291bb87e0673ac3` | Runtime Error |
+| R-043 | 23 | `36549502` | `962664739f6c769f7eea78083deee4d9` | Runtime Error |
+| R-044 | 24 | `36549608` | `736d365c3275b072246c47a92bb15752` | Runtime Error |
+| R-045 | 25 | `36549752` | `1501f80835f2a9f763343ca53e34db56` | Runtime Error |
+| R-046 | 26 | `36549861` | `564537e6ea7831465eaf2c37cb59190e` | Runtime Error |
+| R-047 | 27 | `36549947` | `3c0bd1ff2d1afa826ed1259b59064272` | Runtime Error |
+| R-048 | 28 | `36550029` | `18b9eb494c5e843a74ec62de2da831a6` | Runtime Error |
+| R-049 | 29 | `36550151` | `1db646acc22f79250827b5896f2b7824` | Runtime Error |
+| R-050 | 30 | `36550309` | `d81e7304db805a9d5fea3f8159bc23d6` | Runtime Error |
+| R-051 | 31 | `36550360` | `0cd205c129624cb83e0e87a580cd5b34` | Runtime Error |
+| R-052 | 32 | `36550482` | `1d1ee522af4176cdf8bfeae487d91e03` | Completed. |
+
+All 22 launches are conservatively classified as outcome-free QC
+fundamental-universe-discovery infrastructure research looks. Each is a
+distinct spent look and cannot be overwritten or retried under the same
+entry. The machine-readable successor ledger is
+`arv2_infrastructure_look_ledger.11987a12b72d06ea612b442e342ce0b1d2f28c503f0a3b1ca2cf721d8aaa7810.json`
+(40,360 bytes; SHA-256
+`b1018c54128b9cea5ff0c960e0c6adeab803b085b9dde359f323246d0f82e802`),
+which preserves R-030 and binds the statistics-free reconciliation receipt
+(SHA-256
+`67071bcafa3ec65912983ba0c0834a5980ffaac63c0c2c75bb2f4c3720460a15`).
+
+**Cumulative ledger state after R-052:** **53** run-level looks are recorded;
+ARV2 has spent **23** infrastructure looks. ARV2 development evaluations,
+permanent-family looks, and confirmatory-alpha looks remain zero. The
+cross-sectional lifetime alpha-cell exposure floor remains **452** and one
+prospective permanent ARV2 look remains. The next launched outcome-bearing
+ARV2 evaluation must be recorded as **R-053**, even if it refuses or errors.
+
+## R-053 — Analyst Revisions V2 accepted-risk preliminary stock IC (COMPLETED; INCONCLUSIVE UNDERFILLED)
+
+This is the first outcome-bearing Analyst Revisions V2 development evaluation.
+It is an accepted-risk preliminary stock-IC diagnostic, not the frozen formal
+ARV2 result, an ETF backtest, a leveraged test, or a deployment/trading run.
+
+| Field | Value |
+|---|---|
+| **Purpose / classification** | `development_evaluation`; `arv2-eval-stock-historical-qc-001`; preliminary current-vintage stock IC only |
+| **Research-look accounting** | Counted once (shared run-level look count **53 -> 54**; ARV2 development evaluations **0 -> 1**). ARV2 infrastructure looks remain **23**; permanent-family and confirmatory-alpha looks remain zero. The 32 authenticated preliminary cells raise the lifetime alpha-cell exposure floor **452 -> 484**. |
+| **Input package** | `arv2-preliminary-qc-package-c381be822c5082fa438fa79c`; SHA-256 `c381be822c5082fa438fa79c01f2f8191b8c93ff872239c49149413ce569d520`; six activation-ordered private QC Object Store objects |
+| **QC source projection** | `arv2-preliminary-qc-projection-ddc9747bc25d0cb275a7e165`; SHA-256 `ddc9747bc25d0cb275a7e165fc26b539189e75f2fb82c4e6fd086c515b85be84`; five files, 131,372 bytes; live compilation `BuildSuccess` |
+| **Execution identity** | Plan `arv2-preliminary-qc-submission-64c4b1877721635b4f4258f0`; execution permit `arv2-preliminary-qc-execution-permit-d679932f3b21a29b15bc1b97`; launch receipt `arv2-preliminary-qc-launch-c8417014e4a4291ddf83afcc` |
+| **QC project / compile / backtest** | Project `36561856`, `1 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260914_R053B_c381be82`; compile `c5a35b93b4cbd5f89ec2ead1290dc3b4-63219dfcf4a70009a48cec609faa255d`; backtest `f3bd9f3fc3c2627784e93d761382cd04`, `ARV2 R053 accepted-risk preliminary stock IC 2021-2025 c381be82` |
+| **Launch / terminal** | Launched `2026-09-15T05:20:50Z` at `In Queue...`; statistics-free polling authenticated `Completed.` after 6 polls; terminal receipt SHA-256 `17454854e39e1a0d6e05b714b9f1c2b6aeb9048c4732a8e23d1d71c3d4a02498` |
+| **Aggregate-only result** | Exactly 34 expected `ARV2_*` statistics authenticated once: 32 IC cells plus preliminary/runtime metadata. Result receipt `arv2-preliminary-qc-result-750f1ffe69523bb3adbf3ea6`, SHA-256 `750f1ffe69523bb3adbf3ea69bc64ccb5881169d4a9aa9385895d615e643993b`; custom-statistics SHA-256 `80cb59930b7c97c822fc92ec6a348240e29f3e51a9b066d8b31e786a28db2ac3`. |
+| **Windows / cells** | 2020-01-02 through 2025-12-31 primary preliminary window and owner-requested 2021-01-04 through 2025-12-31 descriptive sensitivity; two source views x two rating arms x four horizons x two windows = 32 cells |
+| **Result** | **32/32 `INCONCLUSIVE_UNDERFILLED`; 0 valid IC dates.** The primary window had 1,508 invalid dates per cell and the 2021-2025 sensitivity had 1,255. Consequently every IC and cross-sectional mean-return statistic is null; there is no favorable, unfavorable, or zero-alpha estimate to interpret. |
+| **Coverage diagnostics** | QC resolved 5,113 securities and retained 1,038 named security refusals. Current-row view: 41,628 eligible score rows; accepted outcome pairs H1/H5/H20/H60 = 38,178 / 38,141 / 38,006 / 37,646 (91.71% / 91.62% / 91.30% / 90.43%). Conservatively censored view: 31,940 eligible rows; accepted pairs = 29,252 / 29,220 / 29,125 / 28,902 (91.58% / 91.48% / 91.19% / 90.49%). The reviewed evaluator invalidates a whole date if any sector is refused, any eligible outcome pair is missing, or the cross-section is too small; those strict completeness conditions were not satisfied on any date. |
+| **Evidence limitations** | Inputs are current-vintage, non-pristine-PIT Massive rows and current-snapshot Sharadar identity/sector attributes under the owner's accepted-risk decision. The run omits a PIT security master, PIT sector history, measured session-specific quality, formal walk-forward residualization, terminal-payoff/successor authority, multiplicity inference, an economic portfolio, ETF construction, and leverage. |
+| **Access exclusions** | The result action selected no raw provider row, raw price row, security-level outcome, unrestricted log, chart, trade, order, deployment, broker action, or trading action. |
+| **Disposition** | **Technically valid completion; economically inconclusive because every cell was underfilled.** Do not treat `Completed.` as a strategy pass. Preserve R-053 as spent and send the exact lane snapshot and completeness behavior through independent Claude review before any corrected evaluation or later-window/ETF/leverage work. |
+
+A deterministic package-only diagnostic replay, performed without another QC
+or outcome read, reproduced the decisive refusal. In the current-row view,
+1,021 dates had all sectors refused and 487 were partially scored; in the
+conservatively censored view the counts were 1,132 and 376. Neither view had a
+single date on which every sector was admitted. All 16,101 current-row and
+16,212 censored sector-date refusals arose from zero sector MAD with
+nonconstant sparse scores, not from the total-name or active-name floors. The
+year 2020 had all eleven sectors refused on all 253 sessions, so it adds
+invalid dates and 1,044,899 refused member-sessions but no eligible or accepted
+outcome pairs. This explains why those pair totals match the 2021-2025
+sensitivity while the window date counts do not. The behavior matches the
+reviewed complete-cross-section rule and its isolated regression; changing
+that rule is a new preregistered evaluation and a new R-number, not a technical
+retry or reinterpretation of R-053.
+
+**Cumulative ledger state after R-053:** **54** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **1** development evaluation.
+The lifetime alpha-cell exposure floor is **484**. No permanent-family or
+confirmatory-alpha look has been spent, and no paper/live authority follows
+from this preliminary result.

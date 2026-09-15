@@ -246,9 +246,11 @@ REVIEW RECORD AFTER SIX PROSPECTIVE RECORD CORRECTIONS. IN PARTICULAR, THE
 R-055 AGGREGATE PROVES ONLY THAT EACH REPORTED METRIC CONDITIONS ON SECURITY
 AND SPY PRICE AVAILABILITY AT BOTH ENDPOINTS. ITS SINGLE MISSING-PAIR COUNTER
 CANNOT IDENTIFY SYMBOL-RESOLUTION FAILURES, ENTRY OR EXIT DATA GAPS,
-MEMBERSHIP ENDS, DELISTINGS, ACQUISITIONS, OR TERMINAL PAYOFFS. THE NEXT
-BOUNDED MILESTONE ADDS MUTUALLY EXCLUSIVE AVAILABILITY COUNTERS AND FIXED-RULE
-REGIME WINDOWS BEFORE ANY NEW RESULT IS READ. ETF CONSTRUCTION AND ACTUAL OR
+MEMBERSHIP ENDS, DELISTINGS, ACQUISITIONS, OR TERMINAL PAYOFFS. SECTION 78
+IMPLEMENTS AND PREREGISTERS THREE FIXED-RULE STOCK WINDOWS WITH MUTUALLY
+EXCLUSIVE AVAILABILITY COUNTERS. R-057, THE 2019-2023 WINDOW, IS THE ONLY NEXT
+RUN; R-058 MAY BE BUILT AND SIGNED ONLY AFTER R-057'S AGGREGATE RECEIPT
+AUTHENTICATES, AND R-059 ONLY AFTER R-058. ETF CONSTRUCTION AND ACTUAL OR
 SYNTHETIC LEVERAGE REMAIN CLOSED UNTIL THE STOCK-WINDOW EVIDENCE IS RECORDED
 AND REVIEWED. PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING
 REMAIN CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
@@ -891,18 +893,18 @@ tally, commit mapping, timestamp characterization, false independent-date
 observation, and unsupported causal interpretation of the undifferentiated
 missing-pair count. The substantive preregistration fact still holds: the
 counts-only gate text and code are ancestral to the result record and are
-bound by signed prelaunch artifacts. The next bounded milestone implements
-the owner-planned fixed-rule stock windows and an authenticated missing-pair
-breakdown. The preliminary metrics remain explicitly conditioned on observed
-security and benchmark endpoint prices; no terminal payoff is inferred.
-The owner explicitly waived another independent pre-run review of section 77
-by directing Codex to proceed from this counter-review into those fixed-rule
-diagnostics; Claude reviews the resulting pushed snapshot and outcomes next.
-Unlevered and leveraged ETF work remains behind the stock-window evidence and
-its next review.
-This preliminary stock-IC result is neither a formal alpha acceptance nor an
-economic portfolio backtest. Paper/live deployment, broker access, orders,
-and trading remain closed.
+bound by signed prelaunch artifacts. Section 78 implements and preregisters
+the owner-planned fixed-rule stock windows and authenticated missing-pair
+breakdown. The exact next step is the signed R-057 run and aggregate-only read
+defined in section 78; R-058 and R-059 remain conditional successors. The
+preliminary metrics remain explicitly conditioned on observed security and
+benchmark endpoint prices; no terminal payoff is inferred. The owner
+explicitly waived another independent pre-run review of section 77 and
+section 78 by directing Codex to proceed from this counter-review into those
+fixed-rule diagnostics; Claude reviews the resulting pushed snapshot and
+outcomes next. Unlevered and leveraged ETF work remains behind the
+stock-window evidence and its next review.
+
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -13691,3 +13693,111 @@ read, and ledger entry. The R-055 score rule is not tuned from its observed
 IC. Unlevered ETF construction, actual 3x ETF histories, synthetic daily-reset
 3x exposure, deployment, orders, and trading remain closed during these stock
 diagnostics.
+
+## 78. Fixed-window stock diagnostics and pre-outcome registration, 2026-09-15
+
+**Implementation commit:** `e0ad90c` (`Add fixed-window ARV2 stock
+diagnostics`). This milestone makes no provider or QuantConnect call and reads
+no new outcome. It reuses the exact R-055 package and score rule, adds one
+small projected evaluator instead of extending the already-large R-055
+evaluator, and keeps every output aggregate-only. The owner explicitly
+directed this counter-review round to proceed into the fixed-window QC runs
+without an intervening Claude review; Claude reviews the implementation and
+results after the stock-window sequence.
+
+### 78.1 Frozen input, signal and result surface
+
+All three runs use package
+`arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`, SHA-256
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`,
+without rebuilding or reopening Massive/Benzinga or Sharadar inputs. The
+rating state, current/censored views, firm-specific/global-comparator arms,
+active-name median/MAD normalization, structural zeros, reliability, and
+Spearman calculation all call the exact R-055 cross-section implementation.
+No observed R-055 sign or magnitude changes the rule.
+
+Each run emits exactly 18 custom summary statistics: 16 cells from two source
+views by two score arms by horizons H1/H5/H20/H60, one profile evaluator meta
+record, and one runtime meta record. Every cell must account for exactly every
+fixed decision session as valid or invalid. Missing score/outcome pairs are
+split with this fixed precedence: unavailable SPY endpoint; named FIGI
+resolution refusal; unavailable security entry; unavailable security exit
+after membership ended; unavailable security exit while membership continues.
+The categories are mutually exclusive and must sum exactly to the missing-pair
+total. A membership end is not evidence of delisting, acquisition, or a
+terminal payoff. Every reported IC remains conditioned on observed security
+and SPY entry and exit prices; the bias direction is unknown and no terminal
+payoff is applied.
+
+### 78.2 Fixed profiles and prospective look accounting
+
+| Entry | Profile / fixed decision window | Session count | Profile SHA-256 | Projection SHA-256 | Prospective accounting after an authenticated result |
+|---|---|---:|---|---|---|
+| `R-057` | `arv2-stock-ic-2019-2023`, 2019-01-02 through 2023-12-29 | 1,258 | `42366b610b0ddd63579791225bd1c26f703c29e77bcf78914de52b56b643a323` | `6bb1660efbf5e3dea22a643695fa42915e801f80bb2a0fb2985b27f485959faf` | 57 run looks, 4 ARV2 development evaluations, 532 lifetime cells |
+| `R-058` | `arv2-stock-ic-2023-2025`, 2023-01-03 through 2025-12-31 | 752 | `6ca72efefec6e4cb24b0d7297eedbb59ba42947e1cac2aca739bb081d500ae90` | `0f869299d009ca57bc9de17f4b2064e238f2f68ba85500df1afa8a7956fa5423` | 58 run looks, 5 ARV2 development evaluations, 548 lifetime cells |
+| `R-059` | `arv2-stock-ic-2013-2019`, 2013-01-02 through 2019-12-31 | 1,762 | `d7fba86e99d75876172c10cb64f7285dacc30b242d0c0508ec50f41d0222a0d3` | `860fc41ceb0854eb5c02bf4a57ef30d5200f08aba43db17bcbcf2b2619e4f1a1` | 59 run looks, 6 ARV2 development evaluations, 564 lifetime cells |
+
+The project/backtest names are fixed prospectively as follows:
+
+| Entry | Private QC project | Backtest name |
+|---|---|---|
+| `R-057` | `3 ARV2_REGIME_R057_2019_2023 - 20260915` | `ARV2 R057 2019-2023 fixed-window e9851c2f` |
+| `R-058` | `4 ARV2_REGIME_R058_2023_2025 - 20260915` | `ARV2 R058 2023-2025 fixed-window e9851c2f` |
+| `R-059` | `5 ARV2_REGIME_R059_2013_2019 - 20260915` | `ARV2 R059 2013-2019 fixed-window e9851c2f` |
+
+Only R-057 may be planned and signed now. R-058 is created and signed just in
+time only after R-057 reaches authenticated `Completed.` status and its one
+aggregate-only result read authenticates; R-059 follows the same rule after
+R-058. No unconditional successor authority is pre-signed. A technical,
+terminal-status, signature, receipt, result-validation, or result-read failure
+stops the sequence before a later run is created. This serialized operational
+precondition is necessary because the single-run adapter binds one selected
+profile but does not itself authenticate a predecessor receipt. One eligible
+B2-8 QC backtest node means the runs are sequential in any event.
+
+### 78.3 Counter-review findings and proof
+
+Implementation audit found and corrected two P2 defects before launch. First,
+the projection verifier formerly authenticated the profile fields and
+`main.py` independently, so a rehashed object could label R-057 source as
+R-058; it now reconstructs exact `main.py` from the bound activation and
+profile. Second, the aggregate validator formerly required the 16 cells to
+agree on a date count without requiring the selected window's exact count;
+the hashed profile, runtime and host validator now independently bind 1,258,
+752, or 1,762 sessions. The corresponding cross-profile and one-date mutants
+are red.
+
+The isolated battery also pins all five missing categories and their overlap
+precedence; exact first/last/contiguous profile positions; runtime selection
+and the sorted named-FIGI-refusal handoff; runtime profile id/hash; cell
+profile/start/end axes; terminal/formal/raw-output scope flags; source
+lineage; and summary identity. The implementation-focused selection passes
+**329 tests** on Python 3.13.15. `py_compile` and `git diff --check` are clean.
+An outcome-free replay of the exact authenticated package with an empty
+history loader and the prior 1,038-refusal census completed all three
+profiles: R-057 used 333/333 callbacks in 88.407 seconds, R-058 used 232/232
+in 57.698 seconds, and R-059 used 434/434 in 67.854 seconds. Each emitted the
+exact 17 evaluator records (18 after runtime metadata), with a maximum value
+of 3,949 bytes under QC's 4,096-byte bound. This replay made no network,
+provider, QuantConnect, or outcome-data access.
+The authenticated package has 1,038 named resolution refusals at the prior
+R-055 census. At that census the largest R-059 profile allocates 9,317,708 of
+the 10,000,000 reviewed history slots and needs 434 evaluator callbacks,
+about 44 of 113 allowed runtime slices. A material QC mapping change that
+leaves fewer than 664 refusals fails closed before price History is requested;
+it does not silently change the sample.
+
+### 78.4 Next authorized action
+
+Create the exact R-057 private plan and signed execution authority from the
+committed `e0ad90c` closure, upload the exact six-file profile-bound source and
+already-authenticated package, compile, launch one backtest, inspect only
+statistics-free terminal state, and—only after authenticated `Completed.`—use
+a separately signed, one-use authority to read the 18 aggregate custom
+statistics. The owner has already authorized the lane-local QC operations,
+retries needed to reach a technically valid backtest, and the outcome-bearing
+aggregate read. Raw provider rows, raw price rows, logs, charts, orders,
+deployment and trading remain unauthorized and outside the adapter.
+This preliminary stock-IC result is neither a formal alpha acceptance nor an
+economic portfolio backtest. Paper/live deployment, broker access, orders,
+and trading remain closed.

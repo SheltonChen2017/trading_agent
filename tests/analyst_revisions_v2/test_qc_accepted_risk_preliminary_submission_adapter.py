@@ -31,18 +31,18 @@ _EXPECTED_LOOK_ACCOUNTING = {
     "schema": "arv2-qc-research-look-accounting-v1",
     "classification": "development_evaluation",
     "evaluation_id": "arv2-eval-stock-historical-qc-001",
-    "shared_look_ledger_entry_id": "R-053",
+    "shared_look_ledger_entry_id": "R-054",
     "accounting_stage": "reservation",
-    "run_level_looks_before": 53,
-    "run_level_looks_after": 53,
-    "planned_run_level_looks_after_launch": 54,
-    "arv2_development_evaluations_before": 0,
-    "arv2_development_evaluations_after": 0,
-    "planned_arv2_development_evaluations_after_launch": 1,
+    "run_level_looks_before": 54,
+    "run_level_looks_after": 54,
+    "planned_run_level_looks_after_launch": 55,
+    "arv2_development_evaluations_before": 1,
+    "arv2_development_evaluations_after": 1,
+    "planned_arv2_development_evaluations_after_launch": 2,
     "planned_maximum_preliminary_ic_cell_count": 32,
     "emitted_preliminary_ic_cell_count": 0,
-    "lifetime_alpha_cell_floor_before": 452,
-    "lifetime_alpha_cell_floor_after": 452,
+    "lifetime_alpha_cell_floor_before": 484,
+    "lifetime_alpha_cell_floor_after": 484,
     "aggregate_result_authenticated": False,
     "infrastructure_looks_before": 23,
     "infrastructure_looks_after": 23,
@@ -73,11 +73,11 @@ def _look_accounting_at(stage):
     result = dict(_EXPECTED_LOOK_ACCOUNTING)
     result["accounting_stage"] = stage
     if stage in {"launch", "result"}:
-        result["run_level_looks_after"] = 54
-        result["arv2_development_evaluations_after"] = 1
+        result["run_level_looks_after"] = 55
+        result["arv2_development_evaluations_after"] = 2
     if stage == "result":
         result["emitted_preliminary_ic_cell_count"] = 32
-        result["lifetime_alpha_cell_floor_after"] = 484
+        result["lifetime_alpha_cell_floor_after"] = 516
         result["aggregate_result_authenticated"] = True
     return result
 
@@ -782,7 +782,7 @@ def test_ambiguous_create_recovery_refuses_zero_or_multiple_runs(plan, count):
     assert tuple(backend.events) == before_retry
 
 
-def test_r053_development_look_accounting_is_bound_end_to_end(plan):
+def test_r054_development_look_accounting_is_bound_end_to_end(plan):
     signature = _offline_signature()
     backend = _Backend(plan)
     execution_authority = json.loads(
@@ -1186,7 +1186,7 @@ def test_terminal_failure_is_distinct_and_never_reads_result(plan):
     ] == 0
     assert launch_record["look_accounting"][
         "lifetime_alpha_cell_floor_after"
-    ] == 452
+    ] == 484
     assert not any(plan.control_directory.glob("aggregate-result-*.json"))
 
 

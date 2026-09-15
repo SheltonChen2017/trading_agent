@@ -1322,7 +1322,7 @@ sector floors, complete-sector requirement, horizons, views, arms, and
 |---|---|
 | **Research-look accounting if launched** | Shared run-level look **54 -> 55**; ARV2 development evaluations **1 -> 2**; 32 cells raise lifetime alpha-cell exposure floor **484 -> 516** |
 | **Input package** | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
-| **QC source projection** | `arv2-preliminary-qc-projection-53682e52f353851ed05193d6`; SHA-256 `53682e52f353851ed05193d69348210e436ae9c07a1a740a84506c18df6c56dc`; five files, 131,793 bytes |
+| **QC source projection** | `arv2-preliminary-qc-projection-1c017bc130a6da1903070220`; SHA-256 `1c017bc130a6da1903070220dc04fb3b685241c8d0a70e3cb6b64ab48b40de14`; five files, 131,880 bytes |
 | **Primary practical gate** | 2021-01-04 through 2025-12-31 must return at least 50 valid dates and non-null authenticated IC/return aggregates before any later-window or leverage run |
 | **Decision independence** | Launch/further-relaxation decisions use only count/sufficiency status, never observed alpha sign or magnitude |
 | **Not authorized by this entry** | Formal/confirmatory inference, ETF construction, leverage, deployment, orders, or trading |
@@ -1332,3 +1332,10 @@ price or return and found all 1,255 gate-window dates feasible in both source
 views and score arms. If the launched result remains underfilled, the
 predeclared R-055 counts-only relaxation in Analyst lane section 75 applies;
 later periods and leverage remain closed.
+
+Before launch, a further empty-history replay traversed the complete signal
+path on all 1,508 evaluation dates. It exposed and corrected a one-ULP Decimal
+breadth refusal and then completed 1,508/1,508 without opening an outcome. The
+submission binding was also advanced from the spent R-053 counters to the
+R-054 values in the table. The re-pinned projection above and both corrections
+were committed before any R-054 signature, permit, QC call, or outcome access.

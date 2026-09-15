@@ -13165,6 +13165,8 @@ without erasing that independently authored record:
 | `ARV2CR75-006` | P3 | Focused validation found the submission wrapper used the mutable global `type` before running its global-binding guard. The guard now runs first, producing the named refusal rather than an uncontrolled `TypeError`. |
 | `ARV2CR75-007` | P2 | Added one isolating test for each of the four runtime limits in `ARV2R74-004`: transport-object count, per-object decompression, total decompression, and twelve-hour runtime. |
 | `ARV2CR75-008` | P3 | Section 74's arithmetic and summary row were inconsistent. Its table contains one stated P1, five P2 and eight P3, not 1/4/9 or 0/4/7; after downgrading `-012` as above the reviewed findings are **0 P1, 6 P2 and 8 P3**. Its three `accepted with findings` phrases also use a prohibited disposition. This prospective correction supplies the binding interpretation. |
+| `ARV2CR75-009` | P2 | The first full source-path replay caught two equal 51-digit contributor masses whose independently rounded numerator and denominator differed by one Decimal context ULP, causing a false breadth refusal on 2021-09-02 before any outcome read. The compact helper now validates finite Decimal masses, computes the inverse-Herfindahl ratio, and applies its analytical `[1,n]` clamp instead of rejecting harmless boundary rounding. The exact masses are an isolating regression. |
+| `ARV2CR75-010` | P2 | The preliminary submission adapter still labelled every new plan `R-053` with pre-R-053 look counters. Before any signature or network call it was advanced to `R-054`, run looks 54-to-55, development evaluations 1-to-2, and authenticated cell floor 484-to-516; the historical evaluation-family id remains `arv2-eval-stock-historical-qc-001`. |
 
 The exact pristine reproduction before corrections was **10 failed, 120
 passed**. `ARV2R74-008` (owner-adjudication CLI input pin), `ARV2R74-009`
@@ -13194,6 +13196,13 @@ Across those four combinations the 10th-percentile accepted sector count was
 11, the accepted-row count was at least 4,256, and active-signal count was at
 least 1,100. The replay opened no price, return, statistic or other outcome.
 
+A second outcome-free replay then traversed the complete signal path for all
+**1,508 of 1,508** evaluation dates from 2020-01-02 through 2025-12-31 with an
+empty history loader. It caught and corrected `ARV2CR75-009` before launch;
+after correction every date completed without opening a price or return. The
+submission-accounting correction `ARV2CR75-010` was likewise made before an
+owner signature, permit, QC call, or research look.
+
 | R-054 preregistration field | Frozen value |
 |---|---|
 | Evaluation | `R-054`; `development_evaluation`; accepted-risk stock IC only |
@@ -13201,7 +13210,7 @@ least 1,100. The replay opened no price, return, statistic or other outcome.
 | Companion window | 2020-01-02 through 2025-12-31, retained from the same fixed 32-cell output inventory |
 | Input package | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
 | Evaluator manifest | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
-| QC projection | `arv2-preliminary-qc-projection-53682e52f353851ed05193d6`; SHA-256 `53682e52f353851ed05193d69348210e436ae9c07a1a740a84506c18df6c56dc`; five files, 131,793 bytes |
+| QC projection | `arv2-preliminary-qc-projection-1c017bc130a6da1903070220`; SHA-256 `1c017bc130a6da1903070220dc04fb3b685241c8d0a70e3cb6b64ab48b40de14`; five files, 131,880 bytes |
 | Result inventory | Two views x two arms x four horizons x two windows = 32 cells, plus two aggregate metadata records |
 | Later-work gate | No later period and no ETF/leverage evaluation unless the 2021-2025 cells contain tangible actual-return evidence. |
 

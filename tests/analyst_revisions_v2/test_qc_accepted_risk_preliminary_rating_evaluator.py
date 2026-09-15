@@ -207,6 +207,16 @@ def test_compact_cloud_arithmetic_matches_frozen_host_primitives():
     )
 
 
+def test_effective_contributors_clamps_equal_high_precision_masses():
+    # These exact source-derived masses used to put the rounded numerator one
+    # context ULP above the analytical two-contributor ceiling.
+    mass = Decimal(
+        "360075880259001175615391431632916.90514411444460021"
+    )
+
+    assert subject._effective_contributors((mass, mass)) == Decimal(2)
+
+
 def test_authoritative_arithmetic_ignores_hostile_ambient_decimal_context():
     raw = {
         f"s-{index:02d}": Decimal(index - 9) / Decimal(7)

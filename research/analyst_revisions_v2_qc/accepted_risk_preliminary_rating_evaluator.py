@@ -281,17 +281,19 @@ def _fraction_decimal(value: Fraction) -> Decimal:
 
 def _effective_contributors(values: Iterable[Decimal]) -> Decimal:
     with localcontext(_context()):
-        absolute = [abs(value) for value in values]
+        absolute = []
+        for value in values:
+            if type(value) is not Decimal or not value.is_finite():
+                raise _Error("effective contributor mass is invalid")
+            absolute.append(abs(value))
         total = _stable_sum(absolute)
         if total <= NUMERICAL_ZERO:
             return Decimal(0)
         positive = tuple(value for value in absolute if value > 0)
         squares = _stable_sum(value * value for value in positive)
-        numerator = +(total * total)
-        maximum = +(Decimal(len(positive)) * squares)
-        if numerator < squares or numerator > maximum:
+        result = +((total * total) / squares)
+        if not result.is_finite() or result <= 0:
             raise _Error("effective breadth violated bounds")
-        result = +(numerator / squares)
         return max(Decimal(1), min(Decimal(len(positive)), result))
 
 

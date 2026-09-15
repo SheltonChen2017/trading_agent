@@ -238,20 +238,21 @@ LOOKS, 3 ARV2 DEVELOPMENT EVALUATIONS, 0 PERMANENT-FAMILY LOOKS, 0
 CONFIRMATORY LOOKS, AND A LIFETIME ALPHA-CELL FLOOR OF 516. R-056'S
 COUNTS-ONLY RELAXATION WAS CANCELLED UNLAUNCHED AND UNSPENT BECAUSE R-055
 PASSED THE GATE; NO OBSERVED SIGN OR MAGNITUDE SELECTED THAT DECISION.
-CLAUDE'S INDEPENDENT REVIEW OF THE EXACT SECTION-75 SNAPSHOT IS THE NEXT GATE,
-FOLLOWED BY CODEX COUNTER-REVIEW. LATER WINDOWS, ETF CONSTRUCTION, AND ACTUAL
-OR SYNTHETIC LEVERAGE REMAIN CLOSED UNTIL THAT REVIEW CYCLE COMPLETES. PAPER
-OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN CLOSED. NO V2
-SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.
 THE INDEPENDENT CLAUDE REVIEW OF THE R-054/R-055 RANGE (SECTION 76) ACCEPTS
 ALL FOUR COMMITS AFTER ONE CORRECTION, CONFIRMS ALL FIVE SECTION-75 FINDINGS
-AGAINST SECTION 74 INCLUDING ONE RED/GREEN PROOF THAT SECTION 74 RECORDED
-WRONGLY, AND VERIFIES THAT THE R-055 TANGIBLE-EVIDENCE GATE WAS COMMITTED TO
-GIT TEN MINUTES BEFORE THE BACKTEST EXISTED AND IS COUNTS-ONLY. IT RECORDS
-THAT EVERY REPORTED IC IS CONDITIONED ON PRICE SURVIVAL, SINCE 11.5 TO 12.6
-PERCENT OF OUTCOME PAIRS ARE EXCLUDED WITHOUT IMPUTATION AND THE
-HORIZON-INCREASING PART MATCHES REAL DELISTING RATES. NO ALPHA IS CLAIMED AND
-EVERY LATER GATE REMAINS CLOSED.**
+AGAINST SECTION 74, AND CORRECTS THE BENIGN PROJECTION-TO-RUNTIME IMPORT PIN.
+CODEX'S SECTION-77 COUNTER-REVIEW ACCEPTS THAT TEST CORRECTION AND ACCEPTS THE
+REVIEW RECORD AFTER SIX PROSPECTIVE RECORD CORRECTIONS. IN PARTICULAR, THE
+R-055 AGGREGATE PROVES ONLY THAT EACH REPORTED METRIC CONDITIONS ON SECURITY
+AND SPY PRICE AVAILABILITY AT BOTH ENDPOINTS. ITS SINGLE MISSING-PAIR COUNTER
+CANNOT IDENTIFY SYMBOL-RESOLUTION FAILURES, ENTRY OR EXIT DATA GAPS,
+MEMBERSHIP ENDS, DELISTINGS, ACQUISITIONS, OR TERMINAL PAYOFFS. THE NEXT
+BOUNDED MILESTONE ADDS MUTUALLY EXCLUSIVE AVAILABILITY COUNTERS AND FIXED-RULE
+REGIME WINDOWS BEFORE ANY NEW RESULT IS READ. ETF CONSTRUCTION AND ACTUAL OR
+SYNTHETIC LEVERAGE REMAIN CLOSED UNTIL THE STOCK-WINDOW EVIDENCE IS RECORDED
+AND REVIEWED. PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING
+REMAIN CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
+PRODUCTION-EXECUTABLE.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -883,16 +884,22 @@ are `PRELIMINARY_DESCRIPTIVE_AVAILABLE`, have 1,255 valid dates and zero
 invalid dates, and contain all five preregistered non-null IC/return metrics.
 The tangible-evidence gate succeeds. R-056 is cancelled unlaunched and
 unspent because the counts were sufficient, independently of the observed
-alpha signs. Section 76 is that independent review. It accepts all four commits after one
-correction, confirms every section-75 finding against section 74, and verifies
-that the tangible-evidence gate was committed to git ten minutes before the
-backtest was created and decides on counts alone. It also records that the
-closure test was still red at `f950fe8` on an unpinned import edge, now
-corrected, and that every reported IC is conditioned on price survival because
-11.5 to 12.6 percent of outcome pairs are excluded without imputation. The
-immediate next step is that Codex counter-reviews section 76. Only then may the
-owner-planned later windows and subsequent unlevered/leveraged ETF work begin,
-and the survival conditioning should be settled first.
+alpha signs. Section 76 is that independent review, and section 77 is Codex's
+counter-review. The benign import-pin correction is accepted. The review
+record is accepted after prospectively correcting its stale handoff, finding
+tally, commit mapping, timestamp characterization, false independent-date
+observation, and unsupported causal interpretation of the undifferentiated
+missing-pair count. The substantive preregistration fact still holds: the
+counts-only gate text and code are ancestral to the result record and are
+bound by signed prelaunch artifacts. The next bounded milestone implements
+the owner-planned fixed-rule stock windows and an authenticated missing-pair
+breakdown. The preliminary metrics remain explicitly conditioned on observed
+security and benchmark endpoint prices; no terminal payoff is inferred.
+The owner explicitly waived another independent pre-run review of section 77
+by directing Codex to proceed from this counter-review into those fixed-rule
+diagnostics; Claude reviews the resulting pushed snapshot and outcomes next.
+Unlevered and leveraged ETF work remains behind the stock-window evidence and
+its next review.
 This preliminary stock-IC result is neither a formal alpha acceptance nor an
 economic portfolio backtest. Paper/live deployment, broker access, orders,
 and trading remain closed.
@@ -13627,3 +13634,60 @@ built on them and the lane already owns the policy that values the excluded
 names. `ARV2R74-008`, `ARV2R74-009` and the lane-wide `ARV2R50-022` debt
 remain open. No paper or live deployment, broker access, order or trading
 authority follows from R-055.
+
+## 77. Codex counter-review of Claude section 76, 2026-09-15
+
+**Range counter-reviewed:** `f950fe8..82897d7`, commits `28f7d83` and
+`82897d7`, individually and cumulatively in the designated Analyst Revisions
+V2 worktree and branch. **Disposition:** `28f7d83` is accepted;
+`82897d7` is accepted after the prospective record corrections in this
+section. The earlier implementation range `baef134..f950fe8` remains accepted
+after correction. Counter-review found **0 P0, 0 P1, 2 P2, and 4 P3** issues.
+It made no provider or QuantConnect call and read no new outcome.
+
+### 77.1 Commit dispositions and reproduced evidence
+
+| Commit | Counter-review disposition | Evidence |
+|---|---|---|
+| `28f7d83` | **Accepted.** | Its one-line pin matches the real host-only projection to QC-runtime dependency. The focused closure check passed, the full Object Store contract battery passed 72 tests, removing the pin reproduced the failure, and injecting the forbidden zero-I/O to host-only direction remained red. |
+| `82897d7` | **Accepted after correction.** | The range, receipt hashes, 34-statistic inventory, R-054/R-055 accounting, active-only median/MAD rule, structural zeros, and 16-of-16 tangible-evidence gate reproduce. The six record defects below are prospectively superseded; the commit message and historical section-76 text remain immutable evidence of what Claude wrote. |
+
+The correct implementation-commit mapping is: `34f62a1` is accepted after
+the corrections in `d5457a8`; `d5457a8` is accepted; `2d71cb3` is accepted
+after `28f7d83` corrects `ARV2R76-001`; and `f950fe8` is accepted with the
+availability-conditioning and compatibility-field observations documented.
+The only section-76 code correction belongs to `2d71cb3`, where the new
+projection-to-runtime edge was introduced, not to `34f62a1` or `f950fe8`.
+
+### 77.2 Counter-review findings
+
+| ID | P | Finding | Disposition |
+|---|---:|---|---|
+| `ARV2CR77-001` | P2 | The live banner still called Claude's already-complete review the next gate and contradicted the text immediately below it. | **Corrected** by replacing the stale handoff with this counter-review and the bounded regime-window milestone. |
+| `ARV2CR77-002` | P2 | `ARV2R76-002` correctly noticed endpoint-price conditioning but did not prove its causal labels. The evaluator increments one counter when any security-start, security-end, SPY-start, or SPY-end price is absent, while the QC loader also omits every named FIGI-resolution refusal. The aggregate therefore does not prove that the 11.53% floor is unique names with no QC coverage, that the H1-to-H60 difference follows the same pairs, that it annualizes to a terminal-event rate, or that the omitted rows are precisely the frozen terminal-policy population. | **Corrected prospectively.** The durable interpretation is only that R-055 conditions on availability of all four endpoint-price entries. The next diagnostic contract separately counts benchmark endpoint gaps, named resolution refusals, missing security entries, membership-ended missing exits, and within-membership missing exits. A membership end is not called a confirmed delisting, acquisition, or terminal payoff. No fixed-rule later stock window is blocked by this correction; no formal or ETF result may silently inherit the undifferentiated treatment. |
+| `ARV2CR77-003` | P3 | Section 76 states `1 P2 + 3 P3`, while its own table contains two P2 and two P3 rows. | **Corrected prospectively:** Claude's four numbered findings are two P2 and two P3; this counter-review has the independent six-finding tally stated above. |
+| `ARV2CR77-004` | P3 | Section 76 attached `ARV2R76-001` to the wrong implementation commit and called `f950fe8` corrected by findings that were only documented. | **Corrected** by the exact hash-to-disposition map in 77.1. |
+| `ARV2CR77-005` | P3 | The review called the 10:13 Git author time an immutable timestamp and the strongest proof of preregistration, but `2d71cb3` is unsigned and no trusted prelaunch remote anchor was cited. | **Corrected prospectively.** Ancestry proves that the exact gate text preceded the result-record commit, and the separately signed prelaunch projection and authority artifacts bind the counts-only implementation. Git's author/committer time is recorded as metadata, not trusted wall-clock publication proof. |
+| `ARV2CR77-006` | P3 | `ARV2R76-003` said no independent-date count appeared beside the aggregates, but the paragraph immediately above the table gives exactly 1,255 valid and zero invalid dates for every owner-window cell. It also called all five outputs IC aggregates although two are cross-section return summaries. | **Closed as a false alarm.** Repeating the date count in every table row is optional ergonomics, not a missing evidentiary fact. The result remains explicitly preliminary, descriptive, and non-formal. |
+
+### 77.3 Validation and next bounded milestone
+
+Counter-review validation on Python 3.13.15: the Object Store closure/runtime/
+evaluator selection passed **182 tests**; the active-document and lane-record
+gate passed **75 tests**; and `git diff --check` was clean before this record
+correction. The complete 5,415-test lane selection from Claude's corrected
+head is accepted as review evidence, but this implementation round will run
+the standing lane selection again on its final code tree before the single
+push.
+
+The next milestone reuses the exact authenticated R-055 provider package and
+signal rule, fixes three owner-requested diagnostic windows before outcome
+access (`2019-01-02..2023-12-29`, `2023-01-03..2025-12-31`, and
+`2013-01-02..2019-12-31`), and adds the mutually exclusive availability
+census described above. QuantConnect exposed one eligible B2-8 backtest node
+at the capacity check, so separately preregistered jobs run sequentially. Each
+job has its own R-number, permit, terminal receipt, single aggregate-result
+read, and ledger entry. The R-055 score rule is not tuned from its observed
+IC. Unlevered ETF construction, actual 3x ETF histories, synthetic daily-reset
+3x exposure, deployment, orders, and trading remain closed during these stock
+diagnostics.

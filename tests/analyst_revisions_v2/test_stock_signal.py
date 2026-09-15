@@ -22,11 +22,14 @@ from research.analyst_revisions_v2.formulas import (
     ActivityAwareObservation,
     ActivityObservationState,
     FormulaError,
+    ObservationState,
+    SignalObservation,
     analyst_reliability,
     analyst_decimal_context,
     derive_verified_analyst_policy,
     rating_decay_weight,
     robust_activity_group_normalize,
+    robust_group_normalize,
     stock_reliability,
 )
 from research.analyst_revisions_v2.ratings_ingest import (
@@ -1727,3 +1730,66 @@ def test_frozen_candidate_contract_rejects_weakened_records(tmp_path, policy):
             refusing,
             sector_normalizations=scoring.sector_normalizations,
         )
+
+
+def test_sector_normalization_density_threshold_is_pinned_and_load_bearing(policy):
+    """ARV2R74-001: the frozen MAD rule needs a strict majority of scored names.
+
+    R-053 returned 32/32 INCONCLUSIVE_UNDERFILLED with zero valid dates. The
+    decisive cause is arithmetic, not data: when a sector's cross-section
+    contains structural zeros for every name an analyst did not touch, the
+    median is zero and so is the median absolute deviation as soon as half or
+    more of the names are unscored. The evaluator then invalidates the whole
+    date because one sector refused. This test pins that threshold so the
+    feasibility of any complete-cross-section evaluation is a visible,
+    asserted property rather than something discovered by spending a look.
+    """
+
+    def group(total, scored):
+        values = [Decimal(0)] * (total - scored) + [
+            Decimal(index + 1) for index in range(scored)
+        ]
+        return [
+            SignalObservation(
+                security_id=f"S{index:04d}",
+                value=value,
+                state=(
+                    ObservationState.SIGNAL
+                    if value != 0
+                    else ObservationState.STRUCTURAL_ZERO
+                ),
+            )
+            for index, value in enumerate(values)
+        ]
+
+    # The sector refuses whenever unscored names strictly outnumber scored
+    # ones: the median is then zero and so is the median absolute deviation.
+    for scored, expected in ((5, False), (20, False), (24, False), (25, True), (30, True)):
+        result = robust_group_normalize(group(50, scored), policy=policy)
+        assert result.available is expected, (scored, result.reason)
+        if not expected:
+            assert result.reason == "zero_mad"
+            assert result.mad == 0
+
+    # The same boundary holds for an odd-sized group.
+    assert robust_group_normalize(group(51, 25), policy=policy).available is False
+    assert robust_group_normalize(group(51, 26), policy=policy).available is True
+
+    # The refusal must never be rescued by an epsilon or a market fallback:
+    # a sector in which only a handful of names were touched stays refused no
+    # matter how large those few scores are.
+    extreme = robust_group_normalize(
+        [
+            SignalObservation(
+                security_id=f"X{index:04d}",
+                value=Decimal("1000") if index < 5 else Decimal(0),
+                state=(
+                    ObservationState.SIGNAL if index < 5 else ObservationState.STRUCTURAL_ZERO
+                ),
+            )
+            for index in range(60)
+        ],
+        policy=policy,
+    )
+    assert extreme.available is False
+    assert extreme.reason == "zero_mad"

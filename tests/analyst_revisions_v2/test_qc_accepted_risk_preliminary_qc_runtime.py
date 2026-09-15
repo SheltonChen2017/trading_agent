@@ -1362,3 +1362,75 @@ def test_driver_enforces_monotonic_clock_soft_bound_and_train_slice_census():
         reversed_driver.advance_training_slice(
             monotonic=lambda: next(reversed_clock)
         )
+
+
+def test_preliminary_projection_size_bounds_are_load_bearing_and_have_headroom():
+    """ARV2R74-002: the per-file bound exists to respect QC's 64,000-char limit.
+
+    Removing it turns no other test red, and the largest projected module
+    already occupies 96% of the bound, so the next edit to the evaluator can
+    cross it.  Pin both the refusal and the remaining headroom.
+    """
+    from pathlib import Path
+
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_preliminary_qc_projection as projection,
+    )
+
+    # The lane bound must stay strictly under QuantConnect's observed limit.
+    assert projection.MAX_SOURCE_FILE_BYTES < 64_000
+
+    body = b"X = 1\n"
+    filler = b"# " + b"f" * 60 + b"\n"
+    oversized = body + filler * (
+        (projection.MAX_SOURCE_FILE_BYTES // len(filler)) + 2
+    )
+    assert len(oversized) > projection.MAX_SOURCE_FILE_BYTES
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="size, path, or future-import guard",
+    ):
+        projection._validate_source("oversized.py", oversized)
+
+    # A file exactly at the bound is admitted; one byte more is refused.
+    exact = body + b"#" * (projection.MAX_SOURCE_FILE_BYTES - len(body) - 1) + b"\n"
+    assert len(exact) == projection.MAX_SOURCE_FILE_BYTES
+    projection._validate_source("exact.py", exact)
+    with pytest.raises(projection.AcceptedRiskPreliminaryQcProjectionError):
+        projection._validate_source("over.py", exact + b"#\n")
+
+    # Every live projected module must stay inside the bound, and the tightest
+    # one must retain real headroom rather than sitting on the boundary.
+    base = Path(__file__).resolve().parents[2] / "research" / "analyst_revisions_v2_qc"
+    sizes = {
+        name: len((base / name).read_bytes())
+        for name in projection.PROJECT_SOURCE_PATHS
+    }
+    assert max(sizes.values()) <= projection.MAX_SOURCE_FILE_BYTES, sizes
+    assert sum(sizes.values()) <= projection.MAX_TOTAL_SOURCE_BYTES, sizes
+
+
+def test_preliminary_projection_requires_compilation_under_the_qc_prelude():
+    """ARV2R74-003: QC injects a prelude, so standalone compilation is not enough.
+
+    QuantConnect prepends its own import prelude to every project file. A
+    source that compiles alone but breaks once a prelude precedes it would be
+    accepted locally and fail only at cloud compile, after a look is spent.
+    Removing the prelude compilation turns no other lane test red, so pin it.
+    """
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_preliminary_qc_projection as projection,
+    )
+
+    # A bare `return` outside a function is legal nowhere; a leading future
+    # import is legal only as the very first statement, so any injected
+    # prelude makes it a SyntaxError while the file alone compiles today.
+    prelude_hostile = b'"""Doc."""\nfrom __future__ import annotations\nX = 1\n'
+    compile(prelude_hostile.decode("ascii"), "probe.py", "exec")  # fine alone
+    with pytest.raises(projection.AcceptedRiskPreliminaryQcProjectionError):
+        projection._validate_source("prelude_hostile.py", prelude_hostile)
+
+    # An ordinary module compiles both alone and under a prelude.
+    benign = b'"""Doc."""\n\n\ndef f():\n    return 1\n'
+    compile(benign.decode("ascii"), "probe.py", "exec")
+    projection._validate_source("benign.py", benign)

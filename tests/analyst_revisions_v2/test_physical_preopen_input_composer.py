@@ -51,9 +51,9 @@ SHARADAR_KEY = "offline-test-sharadar-physical-preopen-NEVER-REAL"
 TICKERS = (
     b"table,ticker,permaticker,isdelisted,name,category,exchange,sector,industry,"
     b"firstpricedate,lastpricedate,figi,cusips\n"
-    b"fundamentals,AAA,100001,N,Active Corp,Domestic Common Stock,NASDAQ,"
+    b"SF1,AAA,100001,N,Active Corp,Domestic Common Stock,NASDAQ,"
     b"Technology,Software,2010-01-04,,BBG001AAA111,000000AA0\n"
-    b"fundamentals,OLD,100002,Y,Old Corp,Domestic Common Stock,NYSE,"
+    b"SF1,OLD,100002,Y,Old Corp,Domestic Common Stock,NYSE,"
     b"Industrials,Machinery,2000-01-03,2020-12-31,BBG001OLD222,000000BB8\n"
 )
 ACTIONS = (
@@ -107,6 +107,8 @@ def _physical_sources(
     empty_role=None,
     requested_first="2013-01-02",
     requested_last="2025-12-31",
+    fundamentals=FUNDAMENTALS,
+    tickers=TICKERS,
 ):
     base = "https://api.massive.com"
     rows = []
@@ -138,14 +140,14 @@ def _physical_sources(
         session=SharadarSession(
             [
                 SharadarResponse(
-                    _zip_bytes(SharadarDataset.TICKERS, csv_bytes=TICKERS)
+                    _zip_bytes(SharadarDataset.TICKERS, csv_bytes=tickers)
                 ),
                 SharadarResponse(
                     _zip_bytes(SharadarDataset.ACTIONS, csv_bytes=ACTIONS)
                 ),
                 SharadarResponse(
                     _zip_bytes(
-                        SharadarDataset.FUNDAMENTALS, csv_bytes=FUNDAMENTALS
+                        SharadarDataset.FUNDAMENTALS, csv_bytes=fundamentals
                     )
                 ),
             ]
@@ -154,6 +156,23 @@ def _physical_sources(
         api_key=SHARADAR_KEY,
     )
     return bridge, sharadar
+
+
+def test_ticker_universe_admits_only_documented_sf1_fundamentals_alias(tmp_path):
+    mixed = TICKERS.replace(b"SF1,OLD", b"SEP,OLD")
+    candidate = build_physical_preopen_input_candidate(
+        *_physical_sources(tmp_path, tickers=mixed)
+    )
+    universe = json.loads(candidate.eligible_universe_artifact_bytes)
+    report = json.loads(candidate.composition_report_bytes)
+
+    assert universe["candidate_security_count"] == 1
+    assert universe["candidate_security_rows"][0][
+        "current_snapshot_ticker_display"
+    ] == "AAA"
+    assert report["ticker_candidate_refusal_counts"] == {
+        "ticker row is outside the documented Sharadar SF1 fundamentals table": 1
+    }
 
 
 def test_physical_sources_produce_authenticated_hard_refusal_candidate(tmp_path):
@@ -279,6 +298,30 @@ def test_completeness_and_seed_candidates_are_source_derived(tmp_path):
     assert tuple(inspect.signature(
         build_physical_preopen_input_candidate
     ).parameters) == ("bridge", "sharadar_capture")
+
+
+def test_non_art_source_rows_are_retained_but_never_enter_fundamental_seeds(
+    tmp_path,
+):
+    mixed = FUNDAMENTALS + (
+        b"AAA,MRY,2020-12-31,2021-02-10,2020-12-31,2021-02-10,"
+        b"7777777,8888888,9999999\n"
+    )
+    bridge, sharadar = _physical_sources(tmp_path, fundamentals=mixed)
+    assert sharadar.archives[2].fundamental_dimension_counts == (
+        ("ART", 2),
+        ("MRY", 1),
+    )
+
+    candidate = build_physical_preopen_input_candidate(bridge, sharadar)
+    report = json.loads(candidate.composition_report_bytes)
+    fundamentals = json.loads(candidate.fundamental_seed_inventory_bytes)
+
+    assert report["fundamental_refusal_counts"]["non-ART fundamental"] == 1
+    assert fundamentals["seed_count"] == 1
+    assert fundamentals["seed_rows"][0]["shares_outstanding"] == "1000000"
+    assert fundamentals["seed_rows"][0]["book_equity_usd"] == "5000000"
+    assert fundamentals["seed_rows"][0]["revenue_ttm_usd"] == "9000000"
 
 
 def test_potentially_relevant_malformed_rating_downgrades_completeness(tmp_path):

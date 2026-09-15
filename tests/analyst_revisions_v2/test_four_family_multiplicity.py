@@ -25,9 +25,13 @@ from research.analyst_revisions_v2.four_family_multiplicity import (
     ANALYST_LANE_ID,
     ANALYST_LOOK_ID,
     FIXED_LANE_IDS,
+    FIXED_LANE_COUNT,
     ID_PREFIX,
     OVERLAY_ARTIFACT_SHA256,
+    PERMANENT_LANE_ALPHA,
     QC_PLAN_ARTIFACT_SHA256,
+    SHARED_FAMILY_ALPHA,
+    SUPERSEDED_ANALYST_ALPHA,
     SUPERSEDED_PARENT_PATHS,
     ZERO_LOOK_AUTHORITY_ARTIFACT_SHA256,
     FourFamilyMultiplicityError,
@@ -215,6 +219,10 @@ def test_exact_four_family_contract_and_within_lane_arithmetic(overlay):
         "target-price-revisions",
     )
     assert FIXED_LANE_IDS == expected_lanes
+    assert FIXED_LANE_COUNT == len(FIXED_LANE_IDS) == 4
+    assert SHARED_FAMILY_ALPHA == Fraction(1, 20)
+    assert PERMANENT_LANE_ALPHA == Fraction(1, 80)
+    assert SUPERSEDED_ANALYST_ALPHA == Fraction(1, 60)
     assert overlay.fixed_lane_ids == expected_lanes
     assert shared["fixed_lane_count"] == 4
     assert shared["two_sided_family_wise_alpha"] == {
@@ -807,13 +815,11 @@ def test_copy_reconstruction_pickle_and_low_level_mutation_never_create_authorit
     with pytest.raises(FourFamilyMultiplicityError):
         require_loaded_four_family_multiplicity_overlay(forged)
 
-    try:
-        round_trip = pickle.loads(pickle.dumps(overlay))
-    except (TypeError, pickle.PicklingError):
-        round_trip = None
-    if round_trip is not None:
-        with pytest.raises(FourFamilyMultiplicityError):
-            require_loaded_four_family_multiplicity_overlay(round_trip)
+    # The authority holds a mappingproxy, so it cannot be pickled at all; a
+    # successor that made it picklable would have to prove the round trip
+    # still fails reauthentication instead of silently skipping this branch.
+    with pytest.raises(TypeError):
+        pickle.dumps(overlay)
 
     object.__setattr__(overlay, "overlay_id", overlay.overlay_id + "x")
     with pytest.raises(FourFamilyMultiplicityError, match="changed after"):
@@ -1219,3 +1225,38 @@ def test_deleted_container_root_is_a_domain_refusal_not_attribute_error(field):
     object.__delattr__(loaded, field)
     with pytest.raises(FourFamilyMultiplicityError, match="container root changed"):
         require_loaded_four_family_multiplicity_overlay(loaded)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        ("duplicated_lane", "lane inventory changed"),
+        ("wrong_lane_count", "lane count changed"),
+        ("allocations_not_a_list", "allocations must be a list"),
+        ("foreign_allocation_look", "allocation inventory changed"),
+    ],
+)
+def test_remaining_arithmetic_guards_are_load_bearing_after_exact_match(
+    tmp_path, monkeypatch, mutation, message
+):
+    """Each semantic guard refuses on its own once the literal match is bypassed."""
+
+    root = _clone(tmp_path)
+
+    def mutate(raw):
+        shared = raw["shared_family_contract"]
+        analyst = raw["analyst_lane_contract"]
+        if mutation == "duplicated_lane":
+            shared["fixed_lane_ids"] = [shared["fixed_lane_ids"][0]] * 4
+        elif mutation == "wrong_lane_count":
+            shared["fixed_lane_count"] = 5
+        elif mutation == "allocations_not_a_list":
+            analyst["confirmatory_alpha_allocations"] = {
+                "look_id": analyst["permanent_look_ids"][0]
+            }
+        else:
+            analyst["confirmatory_alpha_allocations"][0]["look_id"] = "arv2-foreign-look"
+
+    _bypass_exact_contract(monkeypatch, root, mutate)
+    with pytest.raises(FourFamilyMultiplicityError, match=message):
+        _load(root)

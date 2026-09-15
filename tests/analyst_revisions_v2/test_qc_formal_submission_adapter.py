@@ -5,17 +5,21 @@ import dataclasses
 import gc
 import hashlib
 import importlib
+import io
 import json
 import os
+import re
 import threading
 import types
 import weakref
+import zipfile
 from datetime import date
 from pathlib import Path
 
 import pytest
 
 from research.analyst_revisions_v2_qc import formal_submission_adapter as adapter
+from research.analyst_revisions_v2_qc import formal_cloud_evaluator as cloud_evaluator
 from research.analyst_revisions_v2_qc import formal_evaluation_bridge
 from research.analyst_revisions_v2_qc import formal_qc_transport as transport_module
 from research.analyst_revisions_v2.stock_evaluation_contract import (
@@ -43,6 +47,8 @@ from research.analyst_revisions_v2_qc.formal_run_protocol import (
     ReviewedFormalRunAuthority,
     TerminalCensusBinding,
     build_formal_run_candidate,
+    formal_independent_review_record,
+    formal_owner_review_waiver_record,
 )
 from research.analyst_revisions_v2_qc.formal_runtime_projection import (
     CAPACITY_LIMIT_NAMES,
@@ -74,6 +80,15 @@ from research.analyst_revisions_v2_qc.formal_runtime_projection import (
 )
 
 
+def test_formal_result_object_keys_use_qc_legal_single_extension():
+    formula = adapter.FORMAL_RESULT_FAMILY_KEY_FORMULA
+    assert formula.endswith("-{compressed_sha256}-json.gz")
+    assert ".json.gz" not in formula
+    evaluator_source = Path(cloud_evaluator.__file__).read_text(encoding="utf-8")
+    assert '+ ".json.gz"' not in evaluator_source
+    assert evaluator_source.count('+ "-json.gz"') == 3
+
+
 ROOT = Path(__file__).resolve().parents[2]
 _REAL_EXECUTION_TRUST_GATE = (
     adapter._require_non_self_mintable_execution_trust_root
@@ -90,6 +105,433 @@ def _canonical(value: object) -> bytes:
         json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
         + "\n"
     ).encode()
+
+
+def test_project_list_parsers_accept_documented_lean_versions_metadata():
+    response = {
+        "success": True,
+        "projects": [],
+        "count": 0,
+        "versions": [
+            {
+                "id": 1,
+                "created": "2026-09-13T00:00:00Z",
+                "description": "discarded",
+                "leanHash": "discarded",
+                "leanCloudHash": "discarded",
+                "name": "discarded",
+                "ref": "discarded",
+                "public": True,
+            }
+        ],
+    }
+
+    assert adapter._read_project_inventory(response) == []
+    created = adapter._created_project(
+        {
+            **response,
+            "projects": [
+                {"projectId": 123, "name": "exact", "language": "Py"}
+            ],
+            "count": 1,
+        },
+        name="exact",
+        organization_id="organization-test",
+    )
+    assert created["projectId"] == 123
+
+
+@pytest.mark.parametrize(
+    ("parser", "message"),
+    (
+        (
+            lambda value: adapter._read_project_inventory(value),
+            "projects/read versions envelope changed",
+        ),
+        (
+            lambda value: adapter._created_project(
+                {**value, "projects": [
+                    {"projectId": 123, "name": "exact", "language": "Py"}
+                ]},
+                name="exact",
+                organization_id="organization-test",
+            ),
+            "projects/create versions envelope changed",
+        ),
+    ),
+)
+def test_project_list_parsers_isolate_non_list_versions_refusal(parser, message):
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        parser({"success": True, "projects": [], "versions": {}})
+
+
+def test_project_inventory_still_refuses_undocumented_top_level_keys():
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="projects/read envelope changed",
+    ):
+        adapter._read_project_inventory(
+            {
+                "success": True,
+                "projects": [],
+                "versions": [],
+                "count": 0,
+                "unknown": None,
+            }
+        )
+
+
+@pytest.mark.parametrize("count", (True, -1, 1))
+def test_project_inventory_refuses_nonexact_or_incomplete_count(count):
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="projects/read count changed",
+    ):
+        adapter._read_project_inventory(
+            {
+                "success": True,
+                "projects": [],
+                "versions": [],
+                "count": count,
+            }
+        )
+
+
+def test_project_record_accepts_current_documented_discard_only_fields():
+    record = {
+        "projectId": 123,
+        "organizationId": "organization-test",
+        "name": "exact",
+        "modified": "2026-09-13T00:00:00Z",
+        "created": "2026-09-13T00:00:00Z",
+        "ownerId": 1,
+        "language": "Py",
+        "collaborators": [{"owner": True}],
+        "leanVersionId": 1,
+        "leanPinnedToMaster": False,
+        "owner": True,
+        "description": "discarded",
+        "channelId": "discarded",
+        "parameters": {},
+        "libraries": [],
+        "grid": {},
+        "liveGrid": {},
+        "paperEquity": 0,
+        "lastLiveDeployment": None,
+        "liveForm": {},
+        "encrypted": False,
+        "codeRunning": False,
+        "leanEnvironment": 0,
+        "encryptionKey": None,
+        "isPinned": False,
+        "maxFileSize": 1,
+        "sharingTokenBacktest": "discarded",
+    }
+
+    assert adapter._project_record(
+        record,
+        name="exact",
+        organization_id="organization-test",
+    ) is record
+
+
+def test_project_record_still_refuses_undocumented_keys():
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="project envelope changed",
+    ):
+        adapter._project_record(
+            {
+                "projectId": 123,
+                "organizationId": "organization-test",
+                "name": "exact",
+                "language": "Py",
+                "collaborators": [{"owner": True}],
+                "owner": True,
+                "codeRunning": False,
+                "unknown": None,
+            },
+            name="exact",
+            organization_id="organization-test",
+        )
+
+
+def test_files_read_accepts_only_documented_project_file_metadata_and_discards_it():
+    response = {
+        "success": True,
+        "files": [
+            {
+                "id": None,
+                "projectId": 123,
+                "name": "main.py",
+                "content": "print('reviewed')\n",
+                "modified": "2026-09-14T00:00:00Z",
+                "open": False,
+                "isLibrary": False,
+            }
+        ],
+    }
+
+    assert adapter._read_files(response, expected_project_id=123) == {
+        "main.py": "print('reviewed')\n"
+    }
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("id", True),
+        ("id", "1"),
+        ("projectId", True),
+        ("projectId", 124),
+        ("modified", None),
+        ("open", 0),
+        ("isLibrary", 1),
+    ),
+)
+def test_files_read_refuses_changed_documented_metadata(field, value):
+    item = {
+        "id": 1,
+        "projectId": 123,
+        "name": "main.py",
+        "content": "pass\n",
+        "modified": "2026-09-14T00:00:00Z",
+        "open": False,
+        "isLibrary": False,
+    }
+    item[field] = value
+
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="files/read item metadata changed",
+    ):
+        adapter._read_files(
+            {"success": True, "files": [item]},
+            expected_project_id=123,
+        )
+
+
+def test_files_read_still_refuses_unknown_item_and_top_level_fields():
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="files/read item changed",
+    ):
+        adapter._read_files(
+            {
+                "success": True,
+                "files": [
+                    {"name": "main.py", "content": "pass\n", "unknown": None}
+                ],
+            },
+            expected_project_id=123,
+        )
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="files/read envelope changed",
+    ):
+        adapter._read_files(
+            {"success": True, "files": [], "unknown": None},
+            expected_project_id=123,
+        )
+
+
+def _documented_compile_create_response(**replacements):
+    response = {
+        "success": True,
+        "errors": [],
+        "compileId": "compile-test",
+        "state": "InQueue",
+        "parameters": [],
+        "projectId": 123,
+        "signature": "compile-signature",
+        "signatureOrder": [],
+    }
+    response.update(replacements)
+    return response
+
+
+def test_compile_create_accepts_documented_metadata_without_retaining_parameters():
+    class Explosive:
+        def __repr__(self):
+            raise AssertionError("discard-only compile parameter was accessed")
+
+        def __eq__(self, _other):
+            raise AssertionError("discard-only compile parameter was compared")
+
+    response = _documented_compile_create_response(parameters=[Explosive()])
+    assert adapter._compile_id(response, expected_project_id=123) == "compile-test"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("projectId", True),
+        ("projectId", 124),
+        ("state", "Unknown"),
+        ("parameters", ()),
+        ("signature", None),
+        ("signatureOrder", ()),
+        ("signatureOrder", [1]),
+        ("errors", "changed"),
+        ("messages", "changed"),
+    ),
+)
+def test_compile_create_refuses_changed_documented_metadata(field, value):
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="compile/create metadata changed",
+    ):
+        adapter._compile_id(
+            _documented_compile_create_response(**{field: value}),
+            expected_project_id=123,
+        )
+
+
+def test_compile_create_refuses_unknown_fields_and_non_exact_expected_project_id():
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="compile/create envelope changed",
+    ):
+        adapter._compile_id(
+            _documented_compile_create_response(unknown=None),
+            expected_project_id=123,
+        )
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="expected project id",
+    ):
+        adapter._compile_id(
+            _documented_compile_create_response(),
+            expected_project_id=True,
+        )
+
+
+def test_compile_read_accepts_logs_by_type_without_reading_or_retaining_contents():
+    class Explosive:
+        def __repr__(self):
+            raise AssertionError("compile log content was accessed")
+
+        def __eq__(self, _other):
+            raise AssertionError("compile log content was compared")
+
+    assert adapter._compile_state(
+        {
+            "success": True,
+            "errors": [],
+            "compileId": "compile-test",
+            "state": "BuildSuccess",
+            "logs": [Explosive()],
+        },
+        "compile-test",
+    ) == "BuildSuccess"
+
+
+@pytest.mark.parametrize(
+    "replacement",
+    (
+        {"logs": ()},
+        {"errors": "changed"},
+        {"messages": "changed"},
+        {"compileId": "another-compile"},
+        {"state": "Unknown"},
+        {"unknown": None},
+    ),
+)
+def test_compile_read_refuses_wrong_types_identity_state_and_unknown_fields(
+    replacement,
+):
+    response = {
+        "success": True,
+        "compileId": "compile-test",
+        "state": "BuildSuccess",
+        "logs": [],
+    }
+    response.update(replacement)
+    with pytest.raises(adapter.FormalQcSubmissionError, match="compile/read"):
+        adapter._compile_state(response, "compile-test")
+
+
+def test_backtest_create_accepts_full_documented_shape_without_reading_results():
+    class Explosive:
+        def __repr__(self):
+            raise AssertionError("discard-only backtest result was accessed")
+
+        def __eq__(self, _other):
+            raise AssertionError("discard-only backtest result was compared")
+
+    row = {
+        "backtestId": "backtest-test",
+        "name": "expected",
+        "projectId": 123,
+        "status": "In Queue...",
+    }
+    row.update(
+        {
+            key: Explosive()
+            for key in adapter._DISCARDED_BACKTEST_SUMMARY_KEYS
+        }
+    )
+    assert adapter._created_backtest(
+        {
+            "success": True,
+            "errors": [],
+            "debugging": False,
+            "backtest": row,
+        },
+        project_id=123,
+        name="expected",
+    ) == ("backtest-test", "In Queue...")
+
+
+@pytest.mark.parametrize(
+    "response",
+    (
+        {
+            "success": True,
+            "backtest": {
+                "backtestId": "backtest-test",
+                "name": "expected",
+                "projectId": 123,
+                "status": "In Queue...",
+            },
+            "unknown": None,
+        },
+        {
+            "success": True,
+            "debugging": 0,
+            "backtest": {
+                "backtestId": "backtest-test",
+                "name": "expected",
+                "projectId": 123,
+                "status": "In Queue...",
+            },
+        },
+        {
+            "success": True,
+            "backtest": {
+                "backtestId": "backtest-test",
+                "name": "expected",
+                "projectId": 123,
+                "status": "In Queue...",
+                "unknown": None,
+            },
+        },
+        {
+            "success": True,
+            "backtest": {
+                "backtestId": "backtest-test",
+                "name": "expected",
+                "projectId": True,
+                "status": "In Queue...",
+            },
+        },
+    ),
+)
+def test_backtest_create_refuses_unknown_fields_wrong_debugging_and_bool_project(
+    response,
+):
+    with pytest.raises(adapter.FormalQcSubmissionError, match="backtests/create"):
+        adapter._created_backtest(response, project_id=123, name="expected")
 
 
 def _closure_value(function, name: str):
@@ -204,6 +646,41 @@ def _install_offline_action_authority(monkeypatch):
         public_action = _with_closure_value(
             public_action, registrar_name, registrar
         )
+        if "record_terminal_disposition" in public_action.__code__.co_freevars:
+            recorder = _closure_value(
+                public_action, "record_terminal_disposition"
+            )
+            launch_authority = _closure_value(
+                recorder, "_require_launch_receipt_authority"
+            )
+            terminal_authority = _closure_value(
+                recorder, "_require_terminal_status_receipt_authority"
+            )
+            launch_authority = _with_closure_value(
+                launch_authority,
+                "process_current_launch",
+                local_current_launch,
+            )
+            terminal_authority = _with_closure_value(
+                terminal_authority,
+                "process_current_terminal",
+                local_current_terminal,
+            )
+            recorder = _with_closure_value(
+                recorder,
+                "_require_launch_receipt_authority",
+                launch_authority,
+            )
+            recorder = _with_closure_value(
+                recorder,
+                "_require_terminal_status_receipt_authority",
+                terminal_authority,
+            )
+            public_action = _with_closure_value(
+                public_action,
+                "record_terminal_disposition",
+                recorder,
+            )
         monkeypatch.setattr(adapter, name, public_action)
 
     localize_action(
@@ -326,6 +803,7 @@ def _raw_streamed_receipts(monkeypatch):
             host_code_closure=types.SimpleNamespace(closure_sha256="4" * 64)
         ),
         backtest_name="backtest-test",
+        project_name="project-test",
         upload_entry_count=1,
         source_manifest=(),
         status_poll_limit=3,
@@ -335,6 +813,7 @@ def _raw_streamed_receipts(monkeypatch):
     launch = adapter._streamed_launch_receipt(
         permit=permit,
         plan=plan,
+        project_name=plan.project_name,
         project_id=123,
         compile_id="compile-test",
         backtest_id="backtest-test",
@@ -423,6 +902,8 @@ def _genuine_offline_process_receipts(monkeypatch):
         "_register_terminal_status_receipt_authority_impl",
         "_mint_summary_result_receipt_authority_impl",
         "_mint_completed_summary_read_receipt_impl",
+        "_record_authenticated_formal_backtest_completion",
+        "_record_authenticated_formal_backtest_terminal_failure",
     ),
 )
 def test_process_receipt_authority_minters_are_not_module_addressable(name):
@@ -445,6 +926,52 @@ def _reflected_process_receipt_registers():
         _closure_value(register_terminal, "process_register_terminal"),
         _closure_value(mint_summary, "process_register_summary"),
     )
+
+
+def _process_receipt_provenance_names(kind: str):
+    if kind == "launch":
+        registrar = _closure_value(
+            adapter.execute_streamed_formal_qc_submission_once,
+            "register_launch",
+        )
+        process_register = _closure_value(
+            registrar,
+            "process_register_launch",
+        )
+    else:
+        registrar = _closure_value(
+            adapter.inspect_streamed_statistics_free_terminal_status,
+            "register_terminal",
+        )
+        process_register = _closure_value(
+            registrar,
+            "process_register_terminal",
+        )
+    register = _closure_value(process_register, "register")
+    caller_is_exact = _closure_value(register, "caller_is_exact")
+    provenance = _closure_value(caller_is_exact, "register_provenance")
+    alternatives = next(value for name, value in provenance if name == kind)
+    return tuple(
+        tuple(item[2] for item in chain)
+        for chain in alternatives
+    )
+
+
+def test_cross_process_recovery_has_exact_launch_and_terminal_registrar_provenance():
+    assert (
+        "register_launch",
+        "_register_launch_receipt_authority_impl",
+        "register_launch",
+        "_inspect_streamed_statistics_free_terminal_status_impl",
+        "recover_streamed_formal_qc_attempt",
+    ) in _process_receipt_provenance_names("launch")
+    assert (
+        "register_terminal",
+        "_register_terminal_status_receipt_authority_impl",
+        "register_terminal",
+        "_inspect_streamed_statistics_free_terminal_status_impl",
+        "recover_streamed_formal_qc_attempt",
+    ) in _process_receipt_provenance_names("terminal")
 
 
 @pytest.mark.parametrize("register_index", range(3))
@@ -539,13 +1066,22 @@ def test_formal_action_guard_survives_all_exact_downstream_claims(
     claim_names = (
         "_claim_fundamental_discovery_transport_capability_minter",
         "_claim_preopen_transport_capability_minter",
+        "_claim_preopen_physical_upload_transport_capability_minter",
+        "_claim_preopen_prereview_transport_capability_minter",
         "_claim_power_calibration_transport_capability_minter",
+        "_claim_accepted_risk_preliminary_transport_capability_minter",
     )
     for module_name in (
         "research.analyst_revisions_v2_qc."
         "fundamental_universe_discovery_submission_adapter",
         "research.analyst_revisions_v2_qc.preopen_control_submission_adapter",
+        "research.analyst_revisions_v2_qc."
+        "physical_preopen_submission_adapter",
+        "research.analyst_revisions_v2_qc."
+        "preopen_control_prereview_downloader",
         "research.analyst_revisions_v2_qc.power_calibration_submission_adapter",
+        "research.analyst_revisions_v2_qc."
+        "accepted_risk_preliminary_submission_adapter",
     ):
         importlib.import_module(module_name)
     assert all(name not in vars(adapter) for name in claim_names)
@@ -764,6 +1300,7 @@ def test_public_receipt_constructors_cannot_mint_process_authority(monkeypatch):
     direct_launch = adapter._streamed_launch_receipt(
         permit=permit,
         plan=plan,
+        project_name=plan.project_name,
         project_id=123,
         compile_id="compile-direct",
         backtest_id="backtest-direct",
@@ -1436,6 +1973,13 @@ def _fixture(monkeypatch: pytest.MonkeyPatch, capacity_overrides=None):
         authority_sha256="2" * 64,
         candidate_id=candidate.candidate_id,
         candidate_sha256=candidate.candidate_sha256,
+        review_disposition="GO_INDEPENDENTLY_REVIEWED_AND_COUNTERREVIEWED",
+        independent_review_complete=True,
+        authorization_basis="INDEPENDENT_CLAUDE_REVIEW_AND_CODEX_COUNTERREVIEW",
+        owner_review_waiver_id=None,
+        owner_review_waiver_scope=None,
+        waiver_ends_after_first_technically_completed_formal_backtest=False,
+        post_first_formal_backtest_independent_review_required=False,
         claude_review_commit="a" * 40,
         codex_counterreview_commit="b" * 40,
         owner_decision_id="arv2-owner-test",
@@ -1546,7 +2090,15 @@ class _FakeBackend:
             self.files[str(payload["name"])] = str(payload["content"])
             return {"success": True}
         if path == "compile/create":
-            return {"success": True, "compileId": "compile-test"}
+            return {
+                "success": True,
+                "compileId": "compile-test",
+                "state": "InQueue",
+                "parameters": [],
+                "projectId": 123,
+                "signature": "fixture-signature",
+                "signatureOrder": [],
+            }
         if path == "compile/read":
             self.compile_reads += 1
             return {
@@ -1557,6 +2109,7 @@ class _FakeBackend:
                     if self.compile_reads <= self.compile_pending_reads
                     else "BuildSuccess"
                 ),
+                "logs": ["discard-only compile fixture"],
             }
         if path == "backtests/create":
             return {
@@ -2010,6 +2563,11 @@ def test_status_parser_discards_documented_result_fields_without_interpreting_pa
                 "charts": Explosive(),
                 "sharpeRatio": Explosive(),
                 "parameterSet": Explosive(),
+                "success": Explosive(),
+                "errors": Explosive(),
+                "snapShotId": Explosive(),
+                "public": Explosive(),
+                "sparkline": Explosive(),
             }
         ],
     }
@@ -2021,6 +2579,147 @@ def test_status_parser_discards_documented_result_fields_without_interpreting_pa
     )
     assert status.status == "Completed."
     assert status.project_id == 123
+
+
+def test_recovery_parser_selects_only_one_exact_named_project_run_without_results():
+    class Explosive:
+        def __repr__(self):
+            raise AssertionError("recovery inspected a discard-only result")
+
+        def __eq__(self, _other):
+            raise AssertionError("recovery compared a discard-only result")
+
+    row = {
+        "backtestId": "backtest-recovered-exact",
+        "name": "ARV2 formal stock outcomes",
+        "projectId": 321,
+        "status": "Completed.",
+    }
+    row.update(
+        {
+            key: Explosive()
+            for key in adapter._DISCARDED_BACKTEST_SUMMARY_KEYS
+        }
+    )
+    status = adapter._parse_statistics_free_unique_project_run(
+        {"success": True, "count": 1, "backtests": [row]},
+        expected_project_id=321,
+        expected_backtest_name="ARV2 formal stock outcomes",
+    )
+
+    assert status.backtest_id == "backtest-recovered-exact"
+    assert status.project_id == 321
+    assert status.status == "Completed."
+
+
+@pytest.mark.parametrize(
+    ("rows", "message"),
+    (
+        ([], "found no run; consumed attempt remains locked"),
+        (
+            [
+                {
+                    "backtestId": "run-one",
+                    "name": "ARV2 formal stock outcomes",
+                    "projectId": 321,
+                    "status": "Completed.",
+                },
+                {
+                    "backtestId": "run-two",
+                    "name": "ARV2 formal stock outcomes",
+                    "projectId": 321,
+                    "status": "Completed.",
+                },
+            ],
+            "found multiple runs; identity is ambiguous",
+        ),
+        (
+            [
+                {
+                    "backtestId": "run-one",
+                    "name": "wrong backtest name",
+                    "projectId": 321,
+                    "status": "Completed.",
+                }
+            ],
+            "run is not the exact named project run",
+        ),
+        (
+            [
+                {
+                    "backtestId": "run-one",
+                    "name": "ARV2 formal stock outcomes",
+                    "projectId": 654,
+                    "status": "Completed.",
+                }
+            ],
+            "run is not the exact named project run",
+        ),
+    ),
+)
+def test_recovery_parser_refuses_zero_multiple_or_nonexact_runs(rows, message):
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        adapter._parse_statistics_free_unique_project_run(
+            {"success": True, "count": len(rows), "backtests": rows},
+            expected_project_id=321,
+            expected_backtest_name="ARV2 formal stock outcomes",
+        )
+
+
+def test_status_parser_accepts_documented_float_progress_and_bool_completed():
+    status = adapter.parse_statistics_free_backtest_list(
+        {
+            "success": True,
+            "errors": [],
+            "count": 1,
+            "backtests": [
+                {
+                    "backtestId": "backtest-test",
+                    "name": "expected",
+                    "projectId": 123,
+                    "status": "In Progress...",
+                    "created": "2026-09-14T00:00:00Z",
+                    "note": None,
+                    "completed": False,
+                    "progress": 0.25,
+                    "public": False,
+                    "sparkline": [],
+                }
+            ],
+        },
+        expected_project_id=123,
+        expected_backtest_id="backtest-test",
+        expected_backtest_name="expected",
+    )
+    assert status.status == "In Progress..."
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("progress", True, "progress shape changed"),
+        ("completed", "false", "completed shape changed"),
+        ("created", None, "ignored field shape changed"),
+        ("note", 0, "ignored field shape changed"),
+    ),
+)
+def test_status_parser_refuses_wrong_documented_metadata_types(
+    field, value, message,
+):
+    row = {
+        "backtestId": "backtest-test",
+        "name": "expected",
+        "projectId": 123,
+        "status": "In Progress...",
+        field: value,
+    }
+    with pytest.raises(adapter.FormalQcSubmissionError, match=message):
+        adapter.parse_statistics_free_backtest_list(
+            {"success": True, "count": 1, "backtests": [row]},
+            expected_project_id=123,
+            expected_backtest_id="backtest-test",
+            expected_backtest_name="expected",
+        )
 
 
 def test_status_parser_rejects_unknown_or_nested_status_metadata():
@@ -2211,6 +2910,18 @@ def test_terminal_status_is_statistics_free_and_result_gate_stays_disabled(monke
     assert adapter.formal_qc_submission_adapter_record()[
         "separate_result_read_gate_present"
     ] is True
+    assert adapter.formal_qc_submission_adapter_record()[
+        "owner_waiver_execution_authority_requires_owner_signature"
+    ] is True
+    assert adapter.formal_qc_submission_adapter_record()[
+        "automatic_retry_loop_present"
+    ] is False
+    assert adapter.formal_qc_submission_adapter_record()[
+        "fresh_retry_requires_authenticated_runtime_error"
+    ] is True
+    assert adapter.formal_qc_submission_adapter_record()[
+        "pending_or_ambiguous_attempt_authorizes_parallel_retry"
+    ] is False
 
 
 def _completed_result_context(monkeypatch, tmp_path):
@@ -2672,6 +3383,50 @@ def test_ambiguous_result_read_consumes_authority_before_network_retry(
     assert events.count("request:backtests/read") == first_read_count
 
 
+@pytest.mark.parametrize(
+    ("failure", "expected"),
+    [
+        pytest.param(
+            transport_module.FormalQcTransportError(
+                "QuantConnect network request failed"
+            ),
+            "network_ambiguous",
+            id="network-ambiguity",
+        ),
+        pytest.param(
+            transport_module.FormalQcTransportError(
+                "QuantConnect backtests/create request was refused"
+            ),
+            "refused",
+            id="definite-provider-refusal",
+        ),
+        pytest.param(
+            transport_module.FormalQcTransportError(
+                "QuantConnect response is not UTF-8 JSON"
+            ),
+            "envelope",
+            id="invalid-provider-envelope",
+        ),
+        pytest.param(
+            adapter.FormalQcSubmissionError("compile response changed"),
+            "envelope",
+            id="validated-response-envelope",
+        ),
+        pytest.param(RuntimeError("fixture detail"), "network_ambiguous", id="unknown"),
+    ],
+)
+def test_spent_action_failure_class_is_coarse_and_value_free(failure, expected):
+    assert adapter._failure_outcome_class(failure) == expected
+    locked = adapter.FormalQcSubmissionLocked(
+        "submission",
+        "permit-fixture",
+        type(failure).__name__,
+        outcome_class=expected,
+    )
+    assert locked.outcome_class == expected
+    assert "fixture detail" not in str(locked)
+
+
 def test_submission_plan_mutation_is_refused(monkeypatch):
     candidate, reviewed, _, projection, plan, _ = _fixture(monkeypatch)
     changed = dataclasses.replace(plan, include_statistics=True)
@@ -2796,7 +3551,7 @@ def test_streamed_result_transaction_reads_root_then_exact_26_bound_objects(
         compressed_sha256 = hashlib.sha256(payload).hexdigest()
         suffix = (
             "arv2/formal/output/report-families/"
-            f"{input_manifest_sha256}/{ordinal:02d}-{compressed_sha256}.json.gz"
+            f"{input_manifest_sha256}/{ordinal:02d}-{compressed_sha256}-json.gz"
         )
         record = {
             "ordinal": ordinal,
@@ -2847,24 +3602,62 @@ def test_streamed_result_transaction_reads_root_then_exact_26_bound_objects(
         f"{project_id}/{item.object_store_key_suffix}": payload
         for item, payload in zip(descriptors, payloads, strict=True)
     }
+    pending_jobs: dict[str, str] = {}
+    pending_downloads: dict[str, str] = {}
+    object_get_serial = 0
 
     def http(url, body, headers, timeout):
-        del headers, timeout
+        nonlocal object_get_serial
+        del timeout
+        if url in pending_downloads:
+            assert body == b""
+            assert headers == {}
+            events.append("network:object/download")
+            output = io.BytesIO()
+            key = pending_downloads.pop(url)
+            with zipfile.ZipFile(
+                output, "w", compression=zipfile.ZIP_DEFLATED
+            ) as archive:
+                archive.writestr(key, payload_by_key[key])
+            return 200, output.getvalue()
         path = url.split("/api/v2/", 1)[1]
         events.append("network:" + path)
         if path == "backtests/read":
             response = {"success": True, "backtest": {}}
-        elif path == "object/read":
+        elif path == "object/get":
             request = json.loads(body)
-            key = request["key"]
-            payload = payload_by_key[key]
-            response = {
-                "success": True,
-                "object": {
-                    "key": key,
-                    "objectData": base64.b64encode(payload).decode("ascii"),
-                },
-            }
+            assert request["organizationId"] == organization_id
+            if set(request) == {"organizationId", "keys"}:
+                assert (
+                    type(request["keys"]) is list
+                    and len(request["keys"]) == 1
+                )
+                key = request["keys"][0]
+                assert key in payload_by_key
+                object_get_serial += 1
+                job_id = f"formal-family-job-{object_get_serial:03d}"
+                pending_jobs[job_id] = key
+                response = {
+                    "jobId": job_id,
+                    "url": None,
+                    "success": True,
+                    "errors": [],
+                }
+            else:
+                assert set(request) == {"organizationId", "jobId"}
+                job_id = request["jobId"]
+                key = pending_jobs.pop(job_id)
+                signed_url = (
+                    "https://object-download.quantconnect.com/"
+                    f"{job_id}.zip?signature=offline-fixture"
+                )
+                pending_downloads[signed_url] = key
+                response = {
+                    "jobId": job_id,
+                    "url": signed_url,
+                    "success": True,
+                    "errors": [],
+                }
         else:  # pragma: no cover - exact path inventory is asserted below
             raise AssertionError(path)
         return 200, json.dumps(response, separators=(",", ":")).encode("ascii")
@@ -2994,7 +3787,7 @@ def test_streamed_result_transaction_reads_root_then_exact_26_bound_objects(
 
     def derive_read_plan(_root, *, expected_preknown_bindings):
         assert expected_preknown_bindings == {"preknown": True}
-        assert not any(item == "network:object/read" for item in events)
+        assert not any(item == "network:object/get" for item in events)
         events.append("validate:root-read-plan")
         return bindings, descriptors
 
@@ -3020,7 +3813,8 @@ def test_streamed_result_transaction_reads_root_then_exact_26_bound_objects(
     def validate_aggregate(_root, *, expected_bindings, report_family_object_payloads):
         assert expected_bindings is bindings
         assert tuple(report_family_object_payloads.values()) == payloads
-        assert events.count("network:object/read") == 26
+        assert events.count("network:object/get") == 52
+        assert events.count("network:object/download") == 26
         events.append("validate:aggregate")
 
     monkeypatch.setattr(
@@ -3054,8 +3848,9 @@ def test_streamed_result_transaction_reads_root_then_exact_26_bound_objects(
         "validate:root-read-plan",
     ]
     assert events.count("network:backtests/read") == 1
-    assert events.count("network:object/read") == 26
-    assert sum(item.startswith("network:") for item in events) == 27
+    assert events.count("network:object/get") == 52
+    assert events.count("network:object/download") == 26
+    assert sum(item.startswith("network:") for item in events) == 79
     assert validated_ordinals == list(range(26))
     assert events == [
         "network:backtests/read",
@@ -3066,7 +3861,9 @@ def test_streamed_result_transaction_reads_root_then_exact_26_bound_objects(
             item
             for ordinal in range(26)
             for item in (
-                "network:object/read",
+                "network:object/get",
+                "network:object/get",
+                "network:object/download",
                 f"validate:family:{ordinal:02d}",
             )
         ),
@@ -3104,9 +3901,37 @@ def test_streamed_result_transaction_reads_root_then_exact_26_bound_objects(
 @pytest.mark.skipif(not hasattr(os, "fork"), reason="POSIX fork is unavailable")
 def test_transport_capabilities_and_production_minter_do_not_cross_fork():
     calls = []
+    pending_downloads: dict[str, str] = {}
 
     def http(url, body, headers, timeout):
         calls.append((url, body, headers, timeout))
+        if url in pending_downloads:
+            assert body == b""
+            assert headers == {}
+            output = io.BytesIO()
+            key = pending_downloads.pop(url)
+            with zipfile.ZipFile(
+                output, "w", compression=zipfile.ZIP_DEFLATED
+            ) as archive:
+                archive.writestr(key, b"fork-authority-fixture")
+            return 200, output.getvalue()
+        if url.endswith("/object/get"):
+            request = json.loads(body)
+            key = request["keys"][0]
+            signed_url = (
+                "https://object-download.quantconnect.com/"
+                f"fork-{len(calls)}.zip?signature=offline-fixture"
+            )
+            pending_downloads[signed_url] = key
+            return 200, json.dumps(
+                {
+                    "jobId": f"fork-job-{len(calls)}",
+                    "url": signed_url,
+                    "success": True,
+                    "errors": [],
+                },
+                separators=(",", ":"),
+            ).encode("ascii")
         return 200, b'{"success":true}'
 
     client = transport_module.FormalQcTransport(
@@ -3135,11 +3960,16 @@ def test_transport_capabilities_and_production_minter_do_not_cross_fork():
         os.close(read_descriptor)
         outcomes = []
         for capability, (_scope, path) in zip(capabilities, scoped, strict=True):
+            body = (
+                b'{"organizationId":"fork-test-org","key":"fork/test.json"}'
+                if path == "object/read"
+                else b"{}"
+            )
             try:
                 client._post(
                     capability,
                     path=path,
-                    body=b"{}",
+                    body=body,
                     content_type="application/json",
                 )
             except transport_module.FormalQcTransportError:
@@ -3168,13 +3998,18 @@ def test_transport_capabilities_and_production_minter_do_not_cross_fork():
     assert outcome == b"refused,refused,refused,refused,refused,minter-refused"
     assert calls == []
     for capability, (_scope, path) in zip(capabilities, scoped, strict=True):
+        body = (
+            b'{"organizationId":"fork-test-org","key":"fork/test.json"}'
+            if path == "object/read"
+            else b"{}"
+        )
         client._post(
             capability,
             path=path,
-            body=b"{}",
+            body=body,
             content_type="application/json",
         )
-    assert len(calls) == len(scoped)
+    assert len(calls) == len(scoped) + 2
 
 
 def test_transport_one_call_budget_is_atomic_across_threads():
@@ -3374,3 +4209,1592 @@ def test_project_capacity_is_checked_against_exact_projection(monkeypatch):
             monkeypatch,
             {"max_project_source_character_count": character_count - 1},
         )
+
+
+@pytest.mark.parametrize(
+    ("binding", "message"),
+    (
+        (
+            "power",
+            "streamed launch lacks an authenticated power-floor binding",
+        ),
+        (
+            "economic",
+            "streamed economic execution binding did not authenticate",
+        ),
+        (
+            "report",
+            "streamed formal report contract did not authenticate",
+        ),
+    ),
+)
+def test_streamed_launch_binding_authentication_refusals_are_isolated(
+    monkeypatch: pytest.MonkeyPatch,
+    binding: str,
+    message: str,
+):
+    if binding == "power":
+        from research.analyst_revisions_v2_qc import power_calibration_bridge
+
+        def refuse_power(_value):
+            raise power_calibration_bridge.AcceptedRiskPowerCalibrationError(
+                "offline invalid binding"
+            )
+
+        monkeypatch.setattr(
+            power_calibration_bridge,
+            "require_authenticated_power_floor_binding",
+            refuse_power,
+        )
+        action = lambda: adapter._require_streamed_authenticated_power_floor(
+            object(), object()
+        )
+    elif binding == "economic":
+        def refuse_economic(_value):
+            raise adapter.FormalEconomicExecutionDefinitionError(
+                "offline invalid binding"
+            )
+
+        monkeypatch.setattr(
+            adapter,
+            "require_formal_economic_execution_binding",
+            refuse_economic,
+        )
+        action = lambda: adapter._require_streamed_economic_execution(
+            object(), object()
+        )
+    else:
+        economic = types.SimpleNamespace(definition_sha256="1" * 64)
+        bridge = types.SimpleNamespace(economic_execution=economic)
+        monkeypatch.setattr(
+            adapter,
+            "_require_streamed_runtime_bridge",
+            lambda _value: bridge,
+        )
+        monkeypatch.setattr(
+            adapter,
+            "_require_streamed_economic_execution",
+            lambda *_args: economic,
+        )
+
+        def refuse_report(*_args, **_kwargs):
+            raise adapter.FormalReportContractError("offline invalid binding")
+
+        monkeypatch.setattr(adapter, "require_formal_report_contract", refuse_report)
+        action = lambda: adapter._require_streamed_report_contract(
+            object(), bridge
+        )
+
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        action()
+
+
+def _fresh_host_closure(monkeypatch: pytest.MonkeyPatch):
+    fake_b5d = types.SimpleNamespace(
+        projection_id="arv2-b5d-test-source-set",
+        projection_sha256="1" * 64,
+        projection_artifact_sha256="2" * 64,
+        project_file_count=11,
+        total_projected_source_byte_count=1000,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "require_synthetic_qc_runtime_shard_projection",
+        lambda value: value,
+    )
+    return adapter.build_formal_qc_host_closure_binding(
+        worktree_root=ROOT,
+        b5d_project_source_set=fake_b5d,
+    )
+
+
+def test_host_source_manifest_closure_identity_and_live_change_are_isolated(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    closure = _fresh_host_closure(monkeypatch)
+    cases = (
+        (
+            dataclasses.replace(closure, sources=closure.sources[:-1]),
+            "host closure source manifest changed",
+        ),
+        (
+            dataclasses.replace(closure, _canonical_document=b"{}\n"),
+            "host closure changed",
+        ),
+    )
+    for changed, message in cases:
+        with pytest.raises(
+            adapter.FormalQcSubmissionError,
+            match=re.escape(message),
+        ):
+            adapter.require_formal_qc_host_closure_binding(changed)
+
+    raw = json.loads(closure._canonical_document)
+    raw["closure_sha256"] = "0" * 64
+    wrong_identity = dataclasses.replace(
+        closure,
+        closure_sha256="0" * 64,
+        _canonical_document=_canonical(raw),
+    )
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match=re.escape("host closure identity changed"),
+    ):
+        adapter.require_formal_qc_host_closure_binding(wrong_identity)
+
+    live_verifier = _closure_value(
+        adapter.verify_formal_qc_host_closure_live,
+        "implementation",
+    )
+    monkeypatch.setattr(
+        adapter,
+        "require_formal_qc_host_closure_binding",
+        lambda value: value,
+    )
+    monkeypatch.setattr(adapter, "_read_live_host_sources", lambda _root: ())
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match=re.escape("live host code closure changed"),
+    ):
+        live_verifier(closure)
+
+
+def test_streamed_execution_owner_pin_binding_is_isolated(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    candidate = object()
+    bridge = types.SimpleNamespace(formal_run_candidate=candidate)
+    reviewed = types.SimpleNamespace(
+        owner_outcome_authority_receipt_id="different-authority"
+    )
+    receipt = _canonical({"authority_id": "expected-authority"})
+    monkeypatch.setattr(
+        adapter,
+        "_require_streamed_runtime_bridge",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "require_reviewed_formal_run_authority",
+        lambda *_args: reviewed,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "render_streamed_formal_qc_execution_authority_candidate",
+        lambda **_kwargs: receipt,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "_require_non_self_mintable_execution_trust_root",
+        lambda *_args: None,
+    )
+    message = "owner review pin does not bind this exact streamed execution authority"
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        adapter.load_streamed_formal_qc_execution_authority(
+            runtime_bridge=bridge,  # type: ignore[arg-type]
+            reviewed_authority=reviewed,  # type: ignore[arg-type]
+            host_code_closure=object(),  # type: ignore[arg-type]
+            transport=object(),  # type: ignore[arg-type]
+            organization_id="test-organization",
+            receipt_bytes=receipt,
+        )
+
+
+def test_owner_waiver_is_repeated_in_separately_signed_execution_payload():
+    artifact = types.SimpleNamespace(artifact_sha256="1" * 64)
+    candidate = types.SimpleNamespace(
+        candidate_id="arv2-formal-candidate-test",
+        candidate_sha256="2" * 64,
+        code_projection=artifact,
+        production_input_package=types.SimpleNamespace(
+            artifact_sha256="3" * 64
+        ),
+        current_view_partition_set=types.SimpleNamespace(
+            artifact_sha256="4" * 64
+        ),
+        censored_view_partition_set=types.SimpleNamespace(
+            artifact_sha256="5" * 64
+        ),
+        accepted_risk=types.SimpleNamespace(
+            pair=types.SimpleNamespace(artifact_sha256="6" * 64)
+        ),
+        power_floor=types.SimpleNamespace(
+            numeric_receipt=types.SimpleNamespace(artifact_sha256="7" * 64),
+            stock_successor=types.SimpleNamespace(artifact_sha256="8" * 64),
+        ),
+        terminal_census=types.SimpleNamespace(
+            census=types.SimpleNamespace(artifact_sha256="9" * 64)
+        ),
+    )
+    economic = types.SimpleNamespace(
+        binding_id="arv2-economic-binding-test",
+        binding_sha256="a" * 64,
+        definition_id="arv2-economic-definition-test",
+        definition_sha256="b" * 64,
+    )
+    report = types.SimpleNamespace(
+        contract_id="arv2-report-contract-test",
+        contract_sha256="c" * 64,
+        artifact_sha256="d" * 64,
+        economic_execution_definition_sha256="b" * 64,
+        secondary_hypothesis_registry_sha256="e" * 64,
+        deflated_sharpe_trial_registry_sha256="f" * 64,
+        stock_bootstrap_seed_sha256="0" * 64,
+        report_family_count=26,
+        secondary_hypothesis_count=10,
+        strategy_trial_count=12,
+    )
+    projection = types.SimpleNamespace(
+        projection_id="arv2-runtime-projection-test",
+        projection_sha256="1" * 64,
+        project_source_set_sha256="2" * 64,
+        evaluator_source_closure_sha256="3" * 64,
+        project_name="ARV2_FORMAL_STOCK_2020_2025_20260911",
+        backtest_name="ARV2 formal stock outcomes",
+    )
+    bridge = types.SimpleNamespace(
+        bridge_id="arv2-runtime-bridge-test",
+        bridge_sha256="4" * 64,
+        formal_run_candidate=candidate,
+        runtime_projection=projection,
+        economic_execution=economic,
+        report_contract=report,
+        upload_projection_sha256="5" * 64,
+        upload_entry_count=2,
+        upload_total_byte_count=100,
+        input_manifest=types.SimpleNamespace(content_sha256="6" * 64),
+    )
+    host = types.SimpleNamespace(
+        closure_id="arv2-host-closure-test",
+        closure_sha256="7" * 64,
+    )
+    transport = types.SimpleNamespace(
+        to_record=lambda: {
+            "schema": "arv2-formal-qc-transport-binding-test",
+            "binding_sha256": "8" * 64,
+        }
+    )
+
+    raw = adapter._streamed_execution_document(
+        bridge=bridge,
+        host_code_closure=host,
+        transport=transport,
+        organization_id="test-organization",
+        owner_review_waiver=True,
+    )
+    review = raw["review_authorization"]
+    assert raw["schema"] == (
+        adapter.OWNER_WAIVED_STREAMED_EXECUTION_AUTHORITY_SCHEMA
+    )
+    assert review["independent_review_complete"] is False
+    assert review["owner_review_waiver_scope"] == (
+        "SECTION_72_THROUGH_FIRST_FORMAL_BACKTEST"
+    )
+    assert review[
+        "waiver_ends_after_first_technically_completed_formal_backtest"
+    ] is True
+    assert review["post_first_formal_backtest_independent_review_required"] is True
+    assert raw["retry_policy"]["automatic_retry_loop_authorized"] is False
+    assert raw["retry_policy"]["identical_frozen_lineage_required"] is True
+    assert raw["retry_policy"]["result_driven_changes_authorized"] is False
+    assert raw["retry_lineage_sha256"] == (
+        adapter._streamed_retry_lineage_sha256(bridge)
+    )
+    assert raw["result_read_authorized"] is False
+    assert raw["deployment_orders_trading_authorized"] is False
+
+
+def test_tampered_owner_waiver_execution_payload_refuses_before_signature_or_network(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    bridge = types.SimpleNamespace(formal_run_candidate=object())
+    reviewed = object()
+    legitimate = _canonical(
+        {
+            "schema": adapter.OWNER_WAIVED_STREAMED_EXECUTION_AUTHORITY_SCHEMA,
+            "authority_id": "arv2-owner-waived-authority-test",
+            "review_authorization": formal_owner_review_waiver_record(),
+        }
+    )
+    tampered_raw = json.loads(legitimate)
+    tampered_raw["review_authorization"]["independent_review_complete"] = True
+    tampered = _canonical(tampered_raw)
+    calls = {"signature": 0}
+    monkeypatch.setattr(
+        adapter,
+        "_require_streamed_runtime_bridge",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "require_reviewed_formal_run_authority",
+        lambda *_args: reviewed,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "render_owner_waived_streamed_formal_qc_execution_authority_candidate",
+        lambda **_kwargs: legitimate,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "_require_non_self_mintable_execution_trust_root",
+        lambda *_args: calls.__setitem__("signature", calls["signature"] + 1),
+    )
+
+    with pytest.raises(
+        adapter.FormalQcSubmissionError,
+        match="execution authority receipt bytes changed",
+    ):
+        adapter.load_streamed_formal_qc_execution_authority(
+            runtime_bridge=bridge,  # type: ignore[arg-type]
+            reviewed_authority=reviewed,  # type: ignore[arg-type]
+            host_code_closure=object(),  # type: ignore[arg-type]
+            transport=object(),  # type: ignore[arg-type]
+            organization_id="test-organization",
+            receipt_bytes=tampered,
+        )
+    assert calls["signature"] == 0
+
+
+def _isolated_streamed_launch_context(
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+    *,
+    preexisting_project_name: str | None = None,
+):
+    entry = adapter.FormalQcUploadEntry(
+        role="input_shard",
+        object_store_key="arv2/formal/input/test-json.gz",
+        content_sha256=hashlib.sha256(b"x").hexdigest(),
+        content_md5=hashlib.md5(b"x", usedforsecurity=False).hexdigest(),
+        byte_count=1,
+        payload=b"x",
+    )
+    upload_entries = (entry,) if failure == "object-metadata" else ()
+    projection = types.SimpleNamespace(source_files=())
+    plan = types.SimpleNamespace(
+        plan_id="streamed-plan",
+        plan_sha256="1" * 64,
+        projection_id="projection-test",
+        projection_sha256="0" * 64,
+        organization_id="test-organization-001",
+        project_name="ARV2_FORMAL_STOCK_2020_2025_20260911",
+        backtest_name="ARV2 formal stock outcomes",
+        upload_entry_count=len(upload_entries),
+        source_manifest=(),
+        compile_poll_limit=2,
+        compile_poll_interval_seconds=0,
+    )
+    candidate = types.SimpleNamespace(candidate_sha256="2" * 64)
+    authority = types.SimpleNamespace(authority_sha256="3" * 64)
+    economic = types.SimpleNamespace(
+        binding_id="economic-execution-test",
+        binding_sha256="4" * 64,
+        definition_id="economic-definition-test",
+        definition_sha256="5" * 64,
+    )
+    report = types.SimpleNamespace(
+        contract_sha256="6" * 64,
+        artifact_sha256="7" * 64,
+        stock_bootstrap_seed_sha256="8" * 64,
+    )
+    runtime_bridge = types.SimpleNamespace(
+        bridge_sha256="9" * 64,
+        runtime_projection=projection,
+    )
+    execution = types.SimpleNamespace(
+        _owner_signature=None,
+        _receipt_bytes=b"receipt",
+        host_code_closure=types.SimpleNamespace(closure_sha256="f" * 64),
+    )
+    plan.economic_execution = economic
+    plan.execution_authority = execution
+    permit = types.SimpleNamespace(
+        permit_id="permit-test",
+        permit_sha256="a" * 64,
+    )
+    submitted = types.SimpleNamespace(
+        bridge_sha256="b" * 64,
+        formal_run_candidate=candidate,
+        reviewed_authority=authority,
+        plan=plan,
+        runtime_bridge=runtime_bridge,
+        execution_authority=execution,
+        authenticated_power_floor=types.SimpleNamespace(binding_sha256="c" * 64),
+        economic_execution=economic,
+        report_contract=report,
+        _created_project_names=[],
+    )
+    project = {
+        "projectId": 123,
+        "organizationId": plan.organization_id,
+        "name": preexisting_project_name or plan.project_name,
+        "language": "Py",
+        "owner": True,
+        "codeRunning": False,
+        "collaborators": [],
+        "libraries": [],
+    }
+    project_reads = 0
+    file_reads = 0
+
+    def transport_call(_client, _capability, method, *args, **_kwargs):
+        nonlocal project_reads, file_reads
+        if method == "_set_object_multipart":
+            return {"success": True}
+        if method == "_read_object_properties":
+            return {
+                "success": True,
+                "metadata": {
+                    "key": entry.object_store_key,
+                    "size": entry.byte_count,
+                    "md5": "0" * 32,
+                },
+            }
+        assert method == "_request_json"
+        endpoint = args[0]
+        if endpoint == "authenticate":
+            return {"success": True}
+        if endpoint == "projects/read":
+            project_reads += 1
+            if project_reads == 1:
+                return {
+                    "success": True,
+                    "projects": [project] if failure == "pre-existing" else [],
+                }
+            return {"success": True, "projects": [project]}
+        if endpoint == "projects/create":
+            project["name"] = args[1]["name"]
+            submitted._created_project_names.append(project["name"])
+            return {"success": True, "projects": [project]}
+        if endpoint == "files/read":
+            file_reads += 1
+            files = (
+                [{"name": "unexpected.py", "content": "pass\n"}]
+                if failure == "extra-file" and file_reads == 1
+                else []
+            )
+            return {"success": True, "files": files}
+        if endpoint == "compile/create":
+            return {
+                "success": True,
+                "compileId": "compile-test",
+                "state": "InQueue",
+                "parameters": [],
+                "projectId": project["projectId"],
+                "signature": "fixture-signature",
+                "signatureOrder": [],
+            }
+        if endpoint == "compile/read":
+            return {
+                "success": True,
+                "compileId": "compile-test",
+                "state": "BuildSuccess" if failure == "success" else "BuildError",
+                "logs": ["discard-only compile fixture"],
+            }
+        if endpoint == "backtests/create" and failure == "success":
+            return {
+                "success": True,
+                "backtest": {
+                    "backtestId": "backtest-test",
+                    "name": plan.backtest_name,
+                    "projectId": project["projectId"],
+                    "status": "In Queue...",
+                },
+            }
+        raise AssertionError(endpoint)
+
+    for name, replacement in (
+        ("require_streamed_formal_submission_adapter_bridge", lambda value: value),
+        (
+            "formal_review_authorization_record",
+            lambda _value: formal_independent_review_record(),
+        ),
+        ("_require_non_self_mintable_execution_trust_root", lambda *_args: None),
+        ("require_streamed_formal_qc_submission_plan", lambda **_kwargs: plan),
+        ("require_formal_look_claim", lambda *_args: object()),
+        ("_require_concrete_transport", lambda value: value),
+        ("verify_formal_qc_host_closure_live", lambda _value: None),
+        ("_preflight_streamed_upload", lambda _value: None),
+        ("_require_streamed_authenticated_power_floor", lambda *_args: object()),
+        ("_require_streamed_economic_execution", lambda *_args: object()),
+        ("_require_streamed_report_contract", lambda *_args: object()),
+        ("begin_formal_submission_once", lambda **_kwargs: permit),
+        (
+            "_persist_streamed_compiled_attempt_control",
+            lambda **_kwargs: object(),
+        ),
+        (
+            "_persist_streamed_launch_control",
+            lambda **kwargs: kwargs["launch"],
+        ),
+        ("_iter_streamed_upload_entries", lambda _value: iter(upload_entries)),
+        ("_external", lambda _closure, action: action()),
+        ("_transport_call", transport_call),
+    ):
+        monkeypatch.setattr(adapter, name, replacement)
+    implementation = _closure_value(
+        adapter.execute_streamed_formal_qc_submission_once,
+        "streamed_execute_implementation",
+    )
+    return implementation, submitted
+
+
+def _owner_waived_isolated_claim(submitted):
+    review = formal_owner_review_waiver_record()
+    execution = submitted.execution_authority
+    for name, value in review.items():
+        setattr(execution, name, value)
+    execution.retry_lineage_sha256 = "d" * 64
+    return types.SimpleNamespace(
+        claim_id="arv2-owner-waived-claim-test",
+        claim_sha256="e" * 64,
+        attempt_ordinal=1,
+        retry_lineage_sha256=execution.retry_lineage_sha256,
+        submission_plan_id=submitted.plan.plan_id,
+        submission_plan_sha256=submitted.plan.plan_sha256,
+        outcome_look_consumed=False,
+        submission_count_reserved=0,
+    )
+
+
+def _durable_recovery_control_context(monkeypatch: pytest.MonkeyPatch):
+    candidate = types.SimpleNamespace(
+        candidate_id="arv2-formal-candidate-recovery-test",
+        candidate_sha256="1" * 64,
+    )
+    authority = types.SimpleNamespace(
+        authority_id="arv2-owner-waiver-authority-recovery-test",
+        authority_sha256="2" * 64,
+    )
+    economic = types.SimpleNamespace(
+        binding_id="arv2-economic-recovery-test",
+        binding_sha256="3" * 64,
+        definition_id="arv2-economic-definition-recovery-test",
+        definition_sha256="4" * 64,
+    )
+    closure = types.SimpleNamespace(closure_sha256="5" * 64)
+    execution = types.SimpleNamespace(
+        host_code_closure=closure,
+        retry_lineage_sha256="6" * 64,
+        _owner_signature=None,
+        _receipt_bytes=b"owner-signed-recovery-test",
+    )
+    for name, value in formal_owner_review_waiver_record().items():
+        setattr(execution, name, value)
+    plan = types.SimpleNamespace(
+        plan_id="arv2-streamed-recovery-plan-test",
+        plan_sha256="7" * 64,
+        projection_id="arv2-streamed-recovery-projection-test",
+        projection_sha256="8" * 64,
+        organization_id="arv2-recovery-organization-test",
+        project_name="ARV2_FORMAL_STOCK_2020_2025_RECOVERY_TEST",
+        backtest_name="ARV2 formal stock outcomes",
+        upload_entry_count=2,
+        source_manifest=("main.py", "evaluator.py"),
+        compile_poll_limit=2,
+        compile_poll_interval_seconds=0,
+        status_poll_limit=2,
+        status_poll_interval_seconds=0,
+        execution_authority=execution,
+        economic_execution=economic,
+    )
+    submitted = types.SimpleNamespace(
+        bridge_id="arv2-submission-recovery-test",
+        bridge_sha256="9" * 64,
+        formal_run_candidate=candidate,
+        reviewed_authority=authority,
+        plan=plan,
+        runtime_bridge=types.SimpleNamespace(
+            bridge_id="arv2-runtime-recovery-test",
+            bridge_sha256="a" * 64,
+            runtime_projection=types.SimpleNamespace(source_files=()),
+        ),
+        execution_authority=execution,
+        authenticated_power_floor=types.SimpleNamespace(
+            binding_id="arv2-power-recovery-test",
+            binding_sha256="b" * 64,
+        ),
+        economic_execution=economic,
+        report_contract=types.SimpleNamespace(
+            contract_sha256="c" * 64,
+            artifact_sha256="d" * 64,
+            stock_bootstrap_seed_sha256="e" * 64,
+        ),
+    )
+    claim = types.SimpleNamespace(
+        claim_id="arv2-owner-waived-claim-recovery-test",
+        claim_sha256="f" * 64,
+        attempt_ordinal=1,
+        retry_lineage_sha256=execution.retry_lineage_sha256,
+        submission_plan_id=plan.plan_id,
+        submission_plan_sha256=plan.plan_sha256,
+        outcome_look_consumed=False,
+        submission_count_reserved=0,
+    )
+    permit = types.SimpleNamespace(
+        permit_id="arv2-owner-waived-permit-recovery-test",
+        permit_sha256="0" * 64,
+        claim_id=claim.claim_id,
+        claim_sha256=claim.claim_sha256,
+        attempt_ordinal=claim.attempt_ordinal,
+        retry_lineage_sha256=claim.retry_lineage_sha256,
+        submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+        submission_attempt_count=1,
+        consumption_reason="backtests_create_attempt",
+    )
+    storage: dict[str, bytes] = {}
+
+    def publish(*, control_kind: str, payload: bytes, **_kwargs):
+        if control_kind in storage:
+            raise AssertionError("immutable control was published twice")
+        storage[control_kind] = payload
+        return Path(f"/private/tmp/{control_kind}-control-test")
+
+    def read(*, control_kind: str, **_kwargs):
+        return storage[control_kind]
+
+    monkeypatch.setattr(
+        adapter,
+        "require_streamed_formal_submission_adapter_bridge",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "_publish_formal_retry_adapter_control_once",
+        publish,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "_read_formal_retry_adapter_control",
+        read,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "_formal_retry_adapter_control_exists",
+        lambda *, control_kind, **_kwargs: control_kind in storage,
+    )
+    project_name = adapter._streamed_attempt_project_name(
+        plan=plan,
+        claim=claim,
+        owner_waived=True,
+    )
+    control = adapter._persist_streamed_compiled_attempt_control(
+        submission_bridge=submitted,
+        claim=claim,
+        project_name=project_name,
+        project_id=321,
+        compile_id="compile-recovery-test",
+    )
+    launch = adapter._streamed_launch_receipt(
+        permit=permit,
+        plan=plan,
+        project_name=project_name,
+        project_id=321,
+        compile_id="compile-recovery-test",
+        backtest_id="backtest-recovery-test",
+        initial_status="In Queue...",
+    )
+    launch = adapter._persist_streamed_launch_control(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        control=control,
+        launch=launch,
+    )
+    terminal = adapter._streamed_terminal_receipt(
+        submission_bridge=submitted,
+        launch=launch,
+        permit=permit,
+        terminal_status="Completed.",
+        status_poll_count=1,
+    )
+    terminal = adapter._persist_streamed_terminal_control(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        control=control,
+        launch=launch,
+        terminal=terminal,
+    )
+    return submitted, claim, permit, control, launch, terminal, storage
+
+
+def test_durable_recovery_controls_roundtrip_exact_non_result_identities(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    submitted, claim, permit, control, launch, terminal, storage = (
+        _durable_recovery_control_context(monkeypatch)
+    )
+
+    assert adapter._load_streamed_compiled_attempt_control(
+        submission_bridge=submitted,
+        claim=claim,
+    ) == control
+    assert adapter._load_streamed_launch_control(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        control=control,
+    ) == launch
+    assert adapter._load_streamed_terminal_control(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        control=control,
+        launch=launch,
+    ) == terminal
+    assert set(storage) == {"compiled", "launch", "terminal"}
+    assert control.backtests_create_attempted is False
+    assert control.statistics_results_logs_orders_access_authorized is False
+    assert launch.include_statistics is False
+    assert launch.result_read_authorized is False
+    terminal_raw = json.loads(storage["terminal"])
+    assert terminal_raw["statistics_or_result_values_selected_or_inspected"] is False
+
+
+@pytest.mark.parametrize(
+    ("control_kind", "field", "replacement", "message"),
+    (
+        (
+            "compiled",
+            "project_id",
+            654,
+            "formal compiled-attempt control changed exact identity",
+        ),
+        (
+            "launch",
+            "backtest_id",
+            "backtest-tampered",
+            "formal durable launch control changed exact identity",
+        ),
+        (
+            "terminal",
+            "terminal_status",
+            "Runtime Error",
+            "formal durable terminal control changed exact identity",
+        ),
+    ),
+)
+def test_durable_recovery_controls_refuse_exact_identity_tamper(
+    monkeypatch: pytest.MonkeyPatch,
+    control_kind: str,
+    field: str,
+    replacement: object,
+    message: str,
+):
+    submitted, claim, permit, control, launch, _terminal, storage = (
+        _durable_recovery_control_context(monkeypatch)
+    )
+    raw = json.loads(storage[control_kind])
+    raw[field] = replacement
+    storage[control_kind] = _canonical(raw)
+
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        if control_kind == "compiled":
+            adapter._load_streamed_compiled_attempt_control(
+                submission_bridge=submitted,
+                claim=claim,
+            )
+        elif control_kind == "launch":
+            adapter._load_streamed_launch_control(
+                submission_bridge=submitted,
+                claim=claim,
+                permit=permit,
+                control=control,
+            )
+        else:
+            adapter._load_streamed_terminal_control(
+                submission_bridge=submitted,
+                claim=claim,
+                permit=permit,
+                control=control,
+                launch=launch,
+            )
+
+
+def test_public_recovery_reconciles_one_exact_run_and_reissues_process_receipts(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    _install_offline_action_authority(monkeypatch)
+    local_register_launch = _closure_value(
+        adapter.execute_streamed_formal_qc_submission_once,
+        "register_launch",
+    )
+    local_register_terminal = _closure_value(
+        adapter.inspect_streamed_statistics_free_terminal_status,
+        "register_terminal",
+    )
+    submitted, claim, permit, control, _launch, _terminal, storage = (
+        _durable_recovery_control_context(monkeypatch)
+    )
+    del storage["launch"]
+    del storage["terminal"]
+    calls: list[tuple[str, object]] = []
+    dispositions: list[tuple[object, object]] = []
+
+    class Explosive:
+        def __repr__(self):
+            raise AssertionError("formal recovery represented a result value")
+
+        def __eq__(self, _other):
+            raise AssertionError("formal recovery compared a result value")
+
+    exact_project = {
+        "projectId": control.project_id,
+        "organizationId": control.organization_id,
+        "name": control.project_name,
+        "language": "Py",
+        "owner": True,
+        "codeRunning": False,
+        "collaborators": [],
+    }
+
+    def transport_call(_client, _capability, method, *args, **_kwargs):
+        assert method == "_request_json"
+        endpoint, payload = args
+        calls.append((endpoint, payload))
+        if endpoint == "authenticate":
+            return {"success": True}
+        if endpoint == "projects/read":
+            assert payload == {"projectId": control.project_id}
+            return {
+                "success": True,
+                "count": 1,
+                "projects": [exact_project],
+            }
+        if endpoint == "backtests/list":
+            assert payload == {
+                "projectId": control.project_id,
+                "includeStatistics": False,
+            }
+            return {
+                "success": True,
+                "count": 1,
+                "backtests": [
+                    {
+                        "backtestId": "backtest-recovered-public-test",
+                        "name": control.backtest_name,
+                        "projectId": control.project_id,
+                        "status": "Completed.",
+                        "results": Explosive(),
+                    }
+                ],
+            }
+        raise AssertionError(endpoint)
+
+    for name, replacement in (
+        (
+            "formal_review_authorization_record",
+            lambda _authority: formal_owner_review_waiver_record(),
+        ),
+        ("_require_non_self_mintable_execution_trust_root", lambda *_args: None),
+        ("require_streamed_formal_qc_submission_plan", lambda **kwargs: kwargs["value"]),
+        ("require_formal_look_claim", lambda *_args: claim),
+        ("require_formal_submission_permit", lambda *_args: permit),
+        ("_require_concrete_transport", lambda value: value),
+        ("verify_formal_qc_host_closure_live", lambda _value: None),
+        ("_require_streamed_authenticated_power_floor", lambda *_args: object()),
+        ("_require_streamed_economic_execution", lambda *_args: object()),
+        ("_require_streamed_report_contract", lambda *_args: object()),
+        ("_external", lambda _closure, action: action()),
+        ("_transport_call", transport_call),
+        (
+            "load_consumed_formal_retry_attempt",
+            lambda **_kwargs: (claim, permit),
+        ),
+    ):
+        monkeypatch.setattr(adapter, name, replacement)
+
+    def record_disposition(**kwargs):
+        adapter._require_launch_self_identity(kwargs["launch"])
+        adapter._require_terminal_self_identity(kwargs["terminal"])
+        dispositions.append((kwargs["launch"], kwargs["terminal"]))
+
+    recover = _with_closure_value(
+        adapter.recover_streamed_formal_qc_attempt,
+        "binding_guard",
+        lambda _kind: None,
+    )
+    recover = _with_closure_value(
+        recover,
+        "transport_capability_minter",
+        lambda **_kwargs: object(),
+    )
+    recover = _with_closure_value(
+        recover,
+        "record_terminal_disposition",
+        record_disposition,
+    )
+    recover = _with_closure_value(
+        recover,
+        "register_launch",
+        local_register_launch,
+    )
+    recover = _with_closure_value(
+        recover,
+        "register_terminal",
+        local_register_terminal,
+    )
+    recovered_claim, recovered_permit, launch, terminal = recover(
+        submission_bridge=submitted,
+        attempt_ordinal=1,
+        client=object(),
+    )
+
+    assert recovered_claim is claim
+    assert recovered_permit is permit
+    assert launch.project_id == control.project_id
+    assert launch.project_name == control.project_name
+    assert launch.backtest_id == "backtest-recovered-public-test"
+    assert launch.initial_status == adapter.RECOVERED_LAUNCH_INITIAL_STATUS
+    assert terminal.terminal_status == "Completed."
+    assert dispositions == [(launch, terminal)]
+    assert [endpoint for endpoint, _payload in calls] == [
+        "authenticate",
+        "projects/read",
+        "backtests/list",
+    ]
+    assert set(storage) == {"compiled", "launch", "terminal"}
+
+    _claim_again, _permit_again, launch_again, terminal_again = recover(
+        submission_bridge=submitted,
+        attempt_ordinal=1,
+        client=object(),
+    )
+    assert launch_again == launch
+    assert launch_again is not launch
+    assert terminal_again == terminal
+    assert terminal_again is not terminal
+    assert dispositions == [(launch, terminal), (launch_again, terminal_again)]
+    assert [endpoint for endpoint, _payload in calls] == [
+        "authenticate",
+        "projects/read",
+        "backtests/list",
+        "authenticate",
+        "projects/read",
+        "backtests/list",
+    ]
+
+
+def test_recovery_parser_preserves_pending_as_pending_without_result_access():
+    status = adapter._parse_statistics_free_unique_project_run(
+        {
+            "success": True,
+            "count": 1,
+            "backtests": [
+                {
+                    "backtestId": "backtest-pending-recovery-test",
+                    "name": "ARV2 formal stock outcomes",
+                    "projectId": 321,
+                    "status": "In Progress...",
+                }
+            ],
+        },
+        expected_project_id=321,
+        expected_backtest_name="ARV2 formal stock outcomes",
+    )
+
+    assert status.status == "In Progress..."
+
+
+def test_owner_waiver_uses_a_fresh_claim_bound_project_for_every_attempt():
+    plan = types.SimpleNamespace(project_name="ARV2_FORMAL_STOCK_2020_2025")
+    first = types.SimpleNamespace(attempt_ordinal=1, claim_sha256="a" * 64)
+    second = types.SimpleNamespace(attempt_ordinal=2, claim_sha256="b" * 64)
+
+    assert adapter._streamed_attempt_project_name(
+        plan=plan,
+        claim=first,
+        owner_waived=True,
+    ) == "ARV2_FORMAL_STOCK_2020_2025_A000001_" + "a" * 64
+    assert adapter._streamed_attempt_project_name(
+        plan=plan,
+        claim=second,
+        owner_waived=True,
+    ) == "ARV2_FORMAL_STOCK_2020_2025_A000002_" + "b" * 64
+    assert adapter._streamed_attempt_project_name(
+        plan=plan,
+        claim=first,
+        owner_waived=False,
+    ) == plan.project_name
+
+
+def test_owner_waiver_launch_receipt_binds_the_exact_fresh_attempt_project(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    implementation, submitted = _isolated_streamed_launch_context(
+        monkeypatch,
+        "success",
+    )
+    claim = _owner_waived_isolated_claim(submitted)
+    waiver = formal_owner_review_waiver_record()
+    monkeypatch.setattr(
+        adapter,
+        "formal_review_authorization_record",
+        lambda _authority: waiver,
+    )
+    permit, launch = implementation(
+        submission_bridge=submitted,
+        claim=claim,
+        client=object(),
+        submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+        _authority_register_launch=lambda value, **_kwargs: value,
+        _transport_capability_minter=lambda **_kwargs: object(),
+    )
+
+    expected_name = (
+        submitted.plan.project_name + "_A000001_" + claim.claim_sha256
+    )
+    assert permit.permit_id == "permit-test"
+    assert submitted._created_project_names == [expected_name]
+    assert launch.project_name == expected_name
+    assert launch.backtest_submission_count == 1
+
+
+@pytest.mark.parametrize(
+    ("failure", "message"),
+    (
+        ("pre-existing", "exact formal project already exists"),
+        ("extra-file", "new project contains an unexpected source file"),
+        (
+            "object-metadata",
+            "Object Store metadata does not authenticate uploaded bytes",
+        ),
+        ("compile", "formal source did not compile successfully"),
+    ),
+)
+def test_streamed_remote_launch_refusals_are_isolated(
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+    message: str,
+):
+    implementation, submitted = _isolated_streamed_launch_context(
+        monkeypatch,
+        failure,
+    )
+    with pytest.raises(adapter.FormalQcSubmissionLocked) as raised:
+        implementation(
+            submission_bridge=submitted,
+            claim=object(),
+            client=object(),
+            submission_started_at_utc="2026-09-12T12:01:00.000000Z",
+            _authority_register_launch=lambda *_args, **_kwargs: pytest.fail(
+                "launch receipt must not be created"
+            ),
+            _transport_capability_minter=lambda **_kwargs: object(),
+        )
+    assert type(raised.value.__cause__) is adapter.FormalQcSubmissionError
+    assert str(raised.value.__cause__) == message
+
+
+def test_owner_waiver_known_pre_create_refusal_records_no_outcome_failure(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    implementation, submitted = _isolated_streamed_launch_context(
+        monkeypatch,
+        "pre-existing",
+        preexisting_project_name=(
+            "ARV2_FORMAL_STOCK_2020_2025_20260911_A000001_" + "e" * 64
+        ),
+    )
+    claim = _owner_waived_isolated_claim(submitted)
+    waiver = formal_owner_review_waiver_record()
+    failures = []
+    monkeypatch.setattr(
+        adapter,
+        "formal_review_authorization_record",
+        lambda _authority: waiver,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "begin_formal_submission_once",
+        lambda **_kwargs: pytest.fail(
+            "known pre-create refusal must not consume an outcome look"
+        ),
+    )
+
+    def record_failure(**kwargs):
+        failures.append(kwargs)
+        return types.SimpleNamespace(failure_id="arv2-precreate-failure-test")
+
+    monkeypatch.setattr(
+        adapter,
+        "record_definite_pre_submission_failure",
+        record_failure,
+    )
+    with pytest.raises(adapter.FormalQcPreSubmissionFailed) as raised:
+        implementation(
+            submission_bridge=submitted,
+            claim=claim,
+            client=object(),
+            submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+            _authority_register_launch=lambda *_args, **_kwargs: pytest.fail(
+                "launch receipt must not be created"
+            ),
+            _transport_capability_minter=lambda **_kwargs: object(),
+        )
+    assert raised.value.outcome_look_consumed is False
+    assert raised.value.retry_with_fresh_attempt_authorized is True
+    assert len(failures) == 1
+    assert failures[0]["claim"] is claim
+    assert failures[0]["phase"] == "streamed_pre_backtests_create"
+    assert failures[0]["failure_class"] == "FormalQcSubmissionError"
+
+
+def test_owner_waiver_compile_failure_leaves_only_its_fresh_attempt_project(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    implementation, submitted = _isolated_streamed_launch_context(
+        monkeypatch,
+        "compile",
+    )
+    claim = _owner_waived_isolated_claim(submitted)
+    waiver = formal_owner_review_waiver_record()
+    monkeypatch.setattr(
+        adapter,
+        "formal_review_authorization_record",
+        lambda _authority: waiver,
+    )
+    monkeypatch.setattr(
+        adapter,
+        "record_definite_pre_submission_failure",
+        lambda **_kwargs: types.SimpleNamespace(failure_id="compile-failure"),
+    )
+
+    with pytest.raises(adapter.FormalQcPreSubmissionFailed):
+        implementation(
+            submission_bridge=submitted,
+            claim=claim,
+            client=object(),
+            submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+            _authority_register_launch=lambda *_args, **_kwargs: pytest.fail(
+                "launch receipt must not be created"
+            ),
+            _transport_capability_minter=lambda **_kwargs: object(),
+        )
+
+    first_name = submitted._created_project_names[0]
+    assert first_name.endswith("_A000001_" + "e" * 64)
+    next_claim = types.SimpleNamespace(
+        attempt_ordinal=2,
+        claim_sha256="f" * 64,
+    )
+    assert adapter._streamed_attempt_project_name(
+        plan=submitted.plan,
+        claim=next_claim,
+        owner_waived=True,
+    ).endswith("_A000002_" + "f" * 64)
+    assert adapter._streamed_attempt_project_name(
+        plan=submitted.plan,
+        claim=next_claim,
+        owner_waived=True,
+    ) != first_name
+
+
+def test_owner_waiver_consumes_attempt_immediately_before_backtests_create(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    implementation, submitted = _isolated_streamed_launch_context(
+        monkeypatch,
+        "compile",
+    )
+    claim = _owner_waived_isolated_claim(submitted)
+    waiver = formal_owner_review_waiver_record()
+    events = []
+    original_transport_call = adapter._transport_call
+    original_begin = adapter.begin_formal_submission_once
+    monkeypatch.setattr(
+        adapter,
+        "formal_review_authorization_record",
+        lambda _authority: waiver,
+    )
+
+    def transport_call(client, capability, method, *args, **kwargs):
+        if method == "_request_json" and args[0] == "compile/read":
+            return {
+                "success": True,
+                "compileId": "compile-test",
+                "state": "BuildSuccess",
+            }
+        if method == "_request_json" and args[0] == "backtests/create":
+            events.append("backtests/create")
+            raise transport_module.FormalQcTransportError(
+                "QuantConnect network request failed"
+            )
+        return original_transport_call(
+            client,
+            capability,
+            method,
+            *args,
+            **kwargs,
+        )
+
+    def begin_attempt(**kwargs):
+        events.append("consume-attempt")
+        assert kwargs["consumption_reason"] == "backtests_create_attempt"
+        return original_begin(**kwargs)
+
+    monkeypatch.setattr(adapter, "_transport_call", transport_call)
+    monkeypatch.setattr(adapter, "begin_formal_submission_once", begin_attempt)
+    monkeypatch.setattr(
+        adapter,
+        "record_definite_pre_submission_failure",
+        lambda **_kwargs: pytest.fail(
+            "post-create-attempt ambiguity cannot become a no-outcome failure"
+        ),
+    )
+
+    with pytest.raises(adapter.FormalQcSubmissionLocked) as raised:
+        implementation(
+            submission_bridge=submitted,
+            claim=claim,
+            client=object(),
+            submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+            _authority_register_launch=lambda *_args, **_kwargs: pytest.fail(
+                "launch receipt must not be created"
+            ),
+            _transport_capability_minter=lambda **_kwargs: object(),
+        )
+    assert events == ["consume-attempt", "backtests/create"]
+    assert raised.value.permit_id == "permit-test"
+
+
+@pytest.mark.parametrize(
+    "terminal_status",
+    ("Completed.", "Runtime Error"),
+)
+def test_owner_waiver_terminal_is_authenticated_before_its_durable_disposition(
+    monkeypatch: pytest.MonkeyPatch,
+    terminal_status: str,
+):
+    events: list[str] = []
+    candidate = types.SimpleNamespace(candidate_sha256="1" * 64)
+    authority = types.SimpleNamespace(authority_sha256="2" * 64)
+    claim = object()
+    permit = types.SimpleNamespace(
+        permit_id="arv2-permit-test",
+        permit_sha256="3" * 64,
+    )
+    launch = types.SimpleNamespace(
+        project_id=123,
+        backtest_id="arv2-backtest-test",
+        backtest_name="ARV2 formal stock outcomes",
+        receipt_sha256="4" * 64,
+    )
+    terminal = types.SimpleNamespace(terminal_status=terminal_status)
+    plan = types.SimpleNamespace(
+        plan_sha256="5" * 64,
+        status_poll_limit=1,
+        status_poll_interval_seconds=0,
+    )
+    submitted = types.SimpleNamespace(
+        formal_run_candidate=candidate,
+        reviewed_authority=authority,
+        plan=plan,
+        execution_authority=types.SimpleNamespace(
+            _owner_signature=None,
+            _receipt_bytes=b"signed",
+            host_code_closure=object(),
+        ),
+        runtime_bridge=types.SimpleNamespace(bridge_sha256="6" * 64),
+        bridge_sha256="7" * 64,
+        authenticated_power_floor=types.SimpleNamespace(binding_sha256="8" * 64),
+        economic_execution=types.SimpleNamespace(
+            binding_sha256="9" * 64,
+            definition_sha256="a" * 64,
+        ),
+        report_contract=types.SimpleNamespace(
+            contract_sha256="b" * 64,
+            artifact_sha256="c" * 64,
+            stock_bootstrap_seed_sha256="d" * 64,
+        ),
+    )
+
+    for name, replacement in (
+        ("require_streamed_formal_submission_adapter_bridge", lambda value: value),
+        ("_require_non_self_mintable_execution_trust_root", lambda *_args: None),
+        ("require_formal_submission_permit", lambda *_args: permit),
+        (
+            "require_streamed_formal_qc_launch_receipt",
+            lambda **_kwargs: launch,
+        ),
+        ("_require_streamed_authenticated_power_floor", lambda *_args: object()),
+        ("_require_streamed_economic_execution", lambda *_args: object()),
+        ("_require_streamed_report_contract", lambda *_args: object()),
+        ("_require_concrete_transport", lambda value: value),
+        ("_external", lambda _closure, action: action()),
+        (
+            "_transport_call",
+            lambda *_args, **_kwargs: events.append("status") or object(),
+        ),
+        (
+            "parse_statistics_free_backtest_list",
+            lambda *_args, **_kwargs: types.SimpleNamespace(
+                status=terminal_status
+            ),
+        ),
+        ("_streamed_terminal_receipt", lambda **_kwargs: terminal),
+        (
+            "_load_streamed_compiled_attempt_control",
+            lambda **_kwargs: object(),
+        ),
+        (
+            "_formal_retry_adapter_control_exists",
+            lambda **_kwargs: False,
+        ),
+        (
+            "_persist_streamed_terminal_control",
+            lambda **kwargs: kwargs["terminal"],
+        ),
+        (
+            "formal_review_authorization_record",
+            lambda _authority: formal_owner_review_waiver_record(),
+        ),
+    ):
+        monkeypatch.setattr(adapter, name, replacement)
+
+    def register(value, **_kwargs):
+        events.append("register")
+        assert value is terminal
+        return value
+
+    def require_registered(**kwargs):
+        events.append("require-registered")
+        assert kwargs["terminal"] is terminal
+        return terminal
+
+    def record_disposition(**kwargs):
+        events.append("disposition")
+        assert kwargs["launch"] is launch
+        assert kwargs["terminal"] is terminal
+
+    monkeypatch.setattr(
+        adapter,
+        "require_streamed_formal_qc_terminal_status_receipt",
+        require_registered,
+    )
+    implementation = _closure_value(
+        adapter.inspect_streamed_statistics_free_terminal_status,
+        "streamed_status_implementation",
+    )
+    result = implementation(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        launch=launch,
+        client=object(),
+        _authority_register_terminal=register,
+        _authority_record_terminal_disposition=record_disposition,
+        _transport_capability_minter=lambda **_kwargs: object(),
+    )
+
+    assert result is terminal
+    assert events == ["status", "register", "require-registered", "disposition"]
+
+
+def test_owner_waiver_terminal_disposition_requires_process_launch_and_terminal():
+    recorder = _closure_value(
+        adapter.inspect_streamed_statistics_free_terminal_status,
+        "record_terminal_disposition",
+    )
+    fake_launch = object.__new__(adapter.FormalQcLaunchReceipt)
+    fake_terminal = object.__new__(adapter.FormalQcTerminalStatusReceipt)
+    kwargs = {
+        "candidate": object(),
+        "authority": object(),
+        "claim": object(),
+        "permit": object(),
+        "launch": fake_launch,
+        "terminal": fake_terminal,
+        "plan": object(),
+        "context": (object(), object()),
+        "recorded_at_utc": "2026-09-14T00:00:02.000000Z",
+    }
+    with pytest.raises(adapter.FormalQcSubmissionError, match="process-return"):
+        recorder(**kwargs)
+
+    terminal_only = _with_closure_value(
+        recorder,
+        "_require_launch_receipt_authority",
+        lambda *_args, **_kwargs: (),
+    )
+    with pytest.raises(adapter.FormalQcSubmissionError, match="process-return"):
+        terminal_only(**kwargs)
+
+
+@pytest.mark.parametrize(
+    ("terminal_status", "expected_route"),
+    (("Completed.", "completion"), ("Runtime Error", "terminal-failure")),
+)
+def test_owner_waiver_terminal_disposition_routes_exact_authenticated_status(
+    terminal_status: str,
+    expected_route: str,
+):
+    recorder = _closure_value(
+        adapter.inspect_streamed_statistics_free_terminal_status,
+        "record_terminal_disposition",
+    )
+    calls: list[tuple[str, dict[str, object]]] = []
+
+    def record_completion(**kwargs):
+        calls.append(("completion", kwargs))
+        return "completed-marker"
+
+    def record_terminal_failure(**kwargs):
+        calls.append(("terminal-failure", kwargs))
+        return "terminal-failure-marker"
+
+    for name, replacement in (
+        ("_require_launch_receipt_authority", lambda *_args, **_kwargs: ()),
+        (
+            "_require_terminal_status_receipt_authority",
+            lambda *_args, **_kwargs: (),
+        ),
+        ("completion_record_implementation", record_completion),
+        ("terminal_failure_record_implementation", record_terminal_failure),
+    ):
+        recorder = _with_closure_value(recorder, name, replacement)
+
+    candidate = object()
+    authority = object()
+    claim = object()
+    permit = object()
+    launch = object()
+    terminal = types.SimpleNamespace(terminal_status=terminal_status)
+    result = recorder(
+        candidate=candidate,
+        authority=authority,
+        claim=claim,
+        permit=permit,
+        launch=launch,
+        terminal=terminal,
+        plan=object(),
+        context=(object(), object()),
+        recorded_at_utc="2026-09-14T00:00:02.000000Z",
+    )
+
+    assert result == (
+        "completed-marker"
+        if expected_route == "completion"
+        else "terminal-failure-marker"
+    )
+    assert len(calls) == 1
+    route, kwargs = calls[0]
+    assert route == expected_route
+    assert kwargs["candidate"] is candidate
+    assert kwargs["authority"] is authority
+    assert kwargs["claim"] is claim
+    assert kwargs["permit"] is permit
+    assert kwargs["launch_receipt"] is launch
+    assert kwargs["terminal_receipt"] is terminal
+
+
+@pytest.mark.parametrize(
+    "pending_state",
+    ("Queued", "Running", "Unknown", "transport-ambiguous"),
+)
+def test_owner_waiver_pending_or_ambiguous_status_never_records_a_disposition(
+    monkeypatch: pytest.MonkeyPatch,
+    pending_state: str,
+):
+    candidate = types.SimpleNamespace(candidate_sha256="1" * 64)
+    authority = types.SimpleNamespace(authority_sha256="2" * 64)
+    claim = object()
+    permit = types.SimpleNamespace(
+        permit_id="arv2-permit-test",
+        permit_sha256="3" * 64,
+    )
+    launch = types.SimpleNamespace(
+        project_id=123,
+        backtest_id="arv2-backtest-test",
+        backtest_name="ARV2 formal stock outcomes",
+        receipt_sha256="4" * 64,
+    )
+    plan = types.SimpleNamespace(
+        plan_sha256="5" * 64,
+        status_poll_limit=1,
+        status_poll_interval_seconds=0,
+    )
+    submitted = types.SimpleNamespace(
+        formal_run_candidate=candidate,
+        reviewed_authority=authority,
+        plan=plan,
+        execution_authority=types.SimpleNamespace(
+            _owner_signature=None,
+            _receipt_bytes=b"signed",
+            host_code_closure=object(),
+        ),
+        runtime_bridge=types.SimpleNamespace(bridge_sha256="6" * 64),
+        bridge_sha256="7" * 64,
+        authenticated_power_floor=types.SimpleNamespace(binding_sha256="8" * 64),
+        economic_execution=types.SimpleNamespace(
+            binding_sha256="9" * 64,
+            definition_sha256="a" * 64,
+        ),
+        report_contract=types.SimpleNamespace(
+            contract_sha256="b" * 64,
+            artifact_sha256="c" * 64,
+            stock_bootstrap_seed_sha256="d" * 64,
+        ),
+    )
+
+    def transport_call(*_args, **_kwargs):
+        if pending_state == "transport-ambiguous":
+            raise transport_module.FormalQcTransportError(
+                "QuantConnect network request failed"
+            )
+        return object()
+
+    for name, replacement in (
+        ("require_streamed_formal_submission_adapter_bridge", lambda value: value),
+        ("_require_non_self_mintable_execution_trust_root", lambda *_args: None),
+        ("require_formal_submission_permit", lambda *_args: permit),
+        (
+            "require_streamed_formal_qc_launch_receipt",
+            lambda **_kwargs: launch,
+        ),
+        ("_require_streamed_authenticated_power_floor", lambda *_args: object()),
+        ("_require_streamed_economic_execution", lambda *_args: object()),
+        ("_require_streamed_report_contract", lambda *_args: object()),
+        ("_require_concrete_transport", lambda value: value),
+        ("_external", lambda _closure, action: action()),
+        ("_transport_call", transport_call),
+        (
+            "parse_statistics_free_backtest_list",
+            lambda *_args, **_kwargs: types.SimpleNamespace(status=pending_state),
+        ),
+    ):
+        monkeypatch.setattr(adapter, name, replacement)
+
+    implementation = _closure_value(
+        adapter.inspect_streamed_statistics_free_terminal_status,
+        "streamed_status_implementation",
+    )
+    with pytest.raises(adapter.FormalQcSubmissionLocked) as raised:
+        implementation(
+            submission_bridge=submitted,
+            claim=claim,
+            permit=permit,
+            launch=launch,
+            client=object(),
+            _authority_register_terminal=lambda *_args, **_kwargs: pytest.fail(
+                "nonterminal state must not authenticate a terminal receipt"
+            ),
+            _authority_record_terminal_disposition=lambda **_kwargs: pytest.fail(
+                "nonterminal state must not persist a terminal disposition"
+            ),
+            _transport_capability_minter=lambda **_kwargs: object(),
+        )
+    assert raised.value.permit_id == permit.permit_id
+
+
+def test_result_read_ledger_refuses_non_private_file_mode(tmp_path: Path):
+    ledger = (tmp_path / "result-read-ledger.json").absolute()
+    ledger.write_bytes(b"{}\n")
+    ledger.chmod(0o644)
+    message = (
+        "result-read ledger entry is not a bounded private mode-0600 regular file"
+    )
+    with pytest.raises(adapter.FormalQcSubmissionError, match=re.escape(message)):
+        adapter._read_private_result_control(ledger, "result-read ledger entry")

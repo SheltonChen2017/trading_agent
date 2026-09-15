@@ -7481,7 +7481,7 @@ def _report_family_object(
         + str(ordinal).zfill(2)
         + "-"
         + compressed_sha256
-        + ".json.gz"
+        + "-json.gz"
     )
     descriptor = {
         "schema": REPORT_FAMILY_OBJECT_REFERENCE_SCHEMA,
@@ -7647,7 +7647,7 @@ def _decode_report_family_object(
         + str(reference["ordinal"]).zfill(2)
         + "-"
         + _sha(reference["compressed_sha256"], "compressed family hash")
-        + ".json.gz"
+        + "-json.gz"
     )
     if reference["object_store_key_suffix"] != expected_suffix:
         raise FormalCloudEvaluationError(
@@ -12622,7 +12622,7 @@ def formal_cloud_evaluation_family_object_read_plan(
                 + str(ordinal).zfill(2)
                 + "-"
                 + raw["compressed_sha256"]
-                + ".json.gz"
+                + "-json.gz"
             )
             or raw["object_store_key_suffix"] in suffixes
         ):

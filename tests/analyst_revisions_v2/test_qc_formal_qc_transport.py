@@ -1,10 +1,12 @@
 import base64
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import sys
 import threading
+import zipfile
 
 import pytest
 
@@ -19,8 +21,12 @@ OBJECT_KEYS = tuple(
     "24680/arv2/formal/output/report-families/"
     + f"{ordinal:02d}-"
     + f"{ordinal:064x}"
-    + ".json.gz"
+    + "-json.gz"
     for ordinal in range(transport.FORMAL_RESULT_FAMILY_OBJECT_READ_COUNT)
+)
+OBJECT_GET_JOB_ID = "2585354eb2e23cbbc4ba714332884650"
+SIGNED_DOWNLOAD_URL = (
+    "https://object-download.quantconnect.com/arv2-object.zip?signature=fixture"
 )
 
 
@@ -41,17 +47,54 @@ def _binding(
     }
 
 
-def _response(key, payload=b"formal-family-gzip-placeholder"):
+def _object_get_response(*, job_id=OBJECT_GET_JOB_ID, url=SIGNED_DOWNLOAD_URL, **extra):
     return json.dumps(
         {
+            "jobId": job_id,
+            "url": url,
             "success": True,
-            "object": {
-                "key": key,
-                "objectData": base64.b64encode(payload).decode("ascii"),
-            },
+            "errors": [],
+            **extra,
         },
         separators=(",", ":"),
     ).encode("ascii")
+
+
+def _object_archive(
+    key, payload=b"formal-family-gzip-placeholder", *, member_name=None,
+):
+    return _object_archive_members(
+        ((key if member_name is None else member_name, payload),)
+    )
+
+
+def _object_archive_members(members):
+    output = io.BytesIO()
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for name, payload in members:
+            archive.writestr(name, payload)
+    return output.getvalue()
+
+
+def _ready_object_http(calls, *, payload=b"formal-family-gzip-placeholder"):
+    state = {}
+
+    def http(url, body, headers, timeout):
+        calls.append((url, body, dict(headers), timeout))
+        if url.endswith("/object/get"):
+            request = json.loads(body)
+            assert request == {
+                "organizationId": ORGANIZATION_ID,
+                "keys": [request["keys"][0]],
+            }
+            state["key"] = request["keys"][0]
+            return 200, _object_get_response()
+        assert url == SIGNED_DOWNLOAD_URL
+        assert body == b""
+        assert headers == {}
+        return 200, _object_archive(state.pop("key"), payload)
+
+    return http
 
 
 def _client(http):
@@ -239,7 +282,7 @@ def test_result_family_scope_cannot_cross_result_or_object_routes():
 
     def http(*args):
         calls.append(args)
-        return 200, _response(OBJECT_KEYS[0])
+        return 200, b'{"success":true}'
 
     client = _client(http)
     family = _capability(client)
@@ -269,16 +312,61 @@ def test_result_family_scope_cannot_cross_result_or_object_routes():
     assert calls == []
 
 
-def test_result_family_read_enforces_project_organization_and_ordered_keys():
+def test_files_delete_requires_exact_submission_scope_and_one_call_budget():
     calls = []
 
-    def http(url, body, headers, timeout):
-        del url, headers, timeout
-        request = json.loads(body)
-        calls.append(request)
-        return 200, _response(request["key"])
+    def http(url, body, _headers, _timeout):
+        calls.append((url, json.loads(body)))
+        return 200, b'{"success":true}'
 
     client = _client(http)
+    capability = transport._mint_offline_test_capability(
+        client,
+        scope="submission",
+        call_budget={"files/delete": 1},
+    )
+    payload = {"projectId": PROJECT_ID, "name": "research.ipynb"}
+    assert client._request_json(capability, "files/delete", payload) == {
+        "success": True
+    }
+    assert calls == [
+        (
+            "https://www.quantconnect.com/api/v2/files/delete",
+            payload,
+        )
+    ]
+
+    with pytest.raises(transport.FormalQcTransportError, match="budget"):
+        client._request_json(capability, "files/delete", payload)
+    unbudgeted = transport._mint_offline_test_capability(
+        client,
+        scope="submission",
+        call_budget={"authenticate": 1},
+    )
+    with pytest.raises(transport.FormalQcTransportError, match="budget"):
+        client._request_json(unbudgeted, "files/delete", payload)
+    for scope in (
+        "status",
+        "preopen_output_read",
+        "power_calibration_output_read",
+        "result_read",
+        "result_family_read",
+    ):
+        with pytest.raises(
+            transport.FormalQcTransportError,
+            match="path budget changed",
+        ):
+            transport._mint_offline_test_capability(
+                client,
+                scope=scope,
+                call_budget={"files/delete": 1},
+            )
+    assert len(calls) == 1
+
+
+def test_result_family_read_enforces_project_organization_and_ordered_keys():
+    calls = []
+    client = _client(_ready_object_http(calls))
     capability = _capability(client)
     hostile_routes = (
         (PROJECT_ID + 1, ORGANIZATION_ID, OBJECT_KEYS[0]),
@@ -304,21 +392,17 @@ def test_result_family_read_enforces_project_organization_and_ordered_keys():
         capability, PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[1]
     )
     assert second["object"]["key"] == OBJECT_KEYS[1]
-    assert calls == [
-        {"organizationId": ORGANIZATION_ID, "key": OBJECT_KEYS[0]},
-        {"organizationId": ORGANIZATION_ID, "key": OBJECT_KEYS[1]},
+    assert [json.loads(body) for url, body, _headers, _timeout in calls
+            if url.endswith("/object/get")] == [
+        {"organizationId": ORGANIZATION_ID, "keys": [OBJECT_KEYS[0]]},
+        {"organizationId": ORGANIZATION_ID, "keys": [OBJECT_KEYS[1]]},
     ]
+    assert len(calls) == 4
 
 
 def test_result_family_capability_permits_exactly_26_ordered_reads():
     calls = []
-
-    def http(_url, body, _headers, _timeout):
-        key = json.loads(body)["key"]
-        calls.append(key)
-        return 200, _response(key)
-
-    client = _client(http)
+    client = _client(_ready_object_http(calls))
     capability = _capability(client)
     for key in OBJECT_KEYS:
         client._read_formal_result_family_object_bounded(
@@ -330,32 +414,253 @@ def test_result_family_capability_permits_exactly_26_ordered_reads():
         client._read_formal_result_family_object_bounded(
             capability, PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[-1]
         )
-    assert calls == list(OBJECT_KEYS)
+    assert [
+        json.loads(body)["keys"][0]
+        for url, body, _headers, _timeout in calls
+        if url.endswith("/object/get")
+    ] == list(OBJECT_KEYS)
+    assert len(calls) == 2 * len(OBJECT_KEYS)
+
+
+def test_object_get_nullable_url_polls_same_org_and_job_then_synthesizes_envelope():
+    calls = []
+
+    def http(url, body, headers, timeout):
+        calls.append((url, body, dict(headers), timeout))
+        if len(calls) == 1:
+            return 200, _object_get_response(url=None)
+        if len(calls) == 2:
+            # The official response model makes jobId optional.  The request
+            # remains bound to the original job even when QC omits the echo.
+            return 200, _object_get_response(job_id=None)
+        return 200, _object_archive(OBJECT_KEYS[0], b"exact-object")
+
+    client = _client(http)
+    response = client._read_formal_result_family_object_bounded(
+        _capability(client), PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
+    )
+    assert response == {
+        "success": True,
+        "object": {
+            "key": OBJECT_KEYS[0],
+            "objectData": base64.b64encode(b"exact-object").decode("ascii"),
+        },
+    }
+    assert json.loads(calls[0][1]) == {
+        "organizationId": ORGANIZATION_ID,
+        "keys": [OBJECT_KEYS[0]],
+    }
+    assert json.loads(calls[1][1]) == {
+        "organizationId": ORGANIZATION_ID,
+        "jobId": OBJECT_GET_JOB_ID,
+    }
+    assert calls[0][0].endswith("/object/get")
+    assert calls[1][0].endswith("/object/get")
+    assert calls[2][0] == SIGNED_DOWNLOAD_URL
+    assert calls[2][1] == b""
+    assert calls[2][2] == {}
+    assert "Authorization" in calls[0][2]
+    assert "Timestamp" in calls[0][2]
+
+
+def test_object_get_immediate_url_accepts_documented_nullable_job_id():
+    calls = []
+
+    def http(url, body, headers, timeout):
+        calls.append((url, body, dict(headers), timeout))
+        if url.endswith("/object/get"):
+            return 200, _object_get_response(job_id=None)
+        return 200, _object_archive(OBJECT_KEYS[0], b"ready")
+
+    client = _client(http)
+    response = client._read_formal_result_family_object_bounded(
+        _capability(client), PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
+    )
+    assert base64.b64decode(response["object"]["objectData"]) == b"ready"
+    assert len(calls) == 2
+
+
+def test_object_get_poll_rejects_changed_job_identity_before_download():
+    calls = []
+
+    def http(url, body, headers, timeout):
+        calls.append((url, body, dict(headers), timeout))
+        if len(calls) == 1:
+            return 200, _object_get_response(url=None)
+        return 200, _object_get_response(job_id="different-job")
+
+    client = _client(http)
+    with pytest.raises(
+        transport.FormalQcTransportError, match="job identity"
+    ):
+        client._read_formal_result_family_object_bounded(
+            _capability(client), PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
+        )
+    assert len(calls) == 2
+    assert json.loads(calls[1][1]) == {
+        "organizationId": ORGANIZATION_ID,
+        "jobId": OBJECT_GET_JOB_ID,
+    }
+
+
+def test_object_get_poll_budget_is_finite_and_spends_one_logical_read():
+    calls = []
+
+    def http(url, body, headers, timeout):
+        calls.append((url, body, dict(headers), timeout))
+        return 200, _object_get_response(url=None)
+
+    client = _client(http)
+    capability = transport._mint_offline_test_capability(
+        client,
+        scope="preopen_output_read",
+        call_budget={"object/read": 1},
+    )
+    with pytest.raises(
+        transport.FormalQcTransportError, match="poll budget exhausted"
+    ):
+        client._read_object_bounded(
+            capability, ORGANIZATION_ID, OBJECT_KEYS[0]
+        )
+    assert len(calls) == transport.OBJECT_GET_MAX_API_CALLS
+    assert json.loads(calls[0][1]) == {
+        "organizationId": ORGANIZATION_ID,
+        "keys": [OBJECT_KEYS[0]],
+    }
+    assert all(
+        json.loads(body) == {
+            "organizationId": ORGANIZATION_ID,
+            "jobId": OBJECT_GET_JOB_ID,
+        }
+        for _url, body, _headers, _timeout in calls[1:]
+    )
+    with pytest.raises(transport.FormalQcTransportError, match="budget"):
+        client._read_object_bounded(
+            capability, ORGANIZATION_ID, OBJECT_KEYS[0]
+        )
+    assert len(calls) == transport.OBJECT_GET_MAX_API_CALLS
+
+
+def test_generic_bounded_reader_accepts_compressed_object_above_json_response_cap():
+    payload = b"x" * (transport.MAX_RESPONSE_BYTES + 1)
+    calls = []
+    client = _client(_ready_object_http(calls, payload=payload))
+    capability = transport._mint_offline_test_capability(
+        client,
+        scope="preopen_output_read",
+        call_budget={"object/read": 1},
+    )
+    response = client._read_object_bounded(
+        capability, ORGANIZATION_ID, OBJECT_KEYS[0]
+    )
+    assert base64.b64decode(response["object"]["objectData"]) == payload
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize(
+    "url",
+    (
+        "http://object-download.quantconnect.com/object.zip?signature=x",
+        "https://evil.example/object.zip?signature=x",
+        "https://127.0.0.1/object.zip?signature=x",
+        "https://user@object-download.quantconnect.com/object.zip?signature=x",
+        "https://object-download.quantconnect.com:444/object.zip?signature=x",
+        "https://object-download.quantconnect.com/object.zip#fragment",
+    ),
+)
+def test_signed_download_rejects_unsafe_scheme_host_authority_and_fragment(url):
+    calls = []
+
+    def http(*args):
+        calls.append(args)
+        return 200, _object_get_response(url=url)
+
+    client = _client(http)
+    with pytest.raises(transport.FormalQcTransportError, match="URL is not safe"):
+        client._read_formal_result_family_object_bounded(
+            _capability(client), PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
+        )
+    assert len(calls) == 1
+
+
+def test_signed_download_redirect_is_refused_without_forwarding_credentials():
+    calls = []
+
+    def http(url, body, headers, timeout):
+        calls.append((url, body, dict(headers), timeout))
+        if url.endswith("/object/get"):
+            return 200, _object_get_response()
+        return 302, b"redirect body"
+
+    client = _client(http)
+    with pytest.raises(transport.FormalQcTransportError, match="download was refused"):
+        client._read_formal_result_family_object_bounded(
+            _capability(client), PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
+        )
+    assert len(calls) == 2
+    assert calls[1][0] == SIGNED_DOWNLOAD_URL
+    assert calls[1][1] == b""
+    assert calls[1][2] == {}
+
+
+def test_signed_download_archive_and_member_bounds_are_enforced_before_decode():
+    calls = []
+    maximum_archive = (
+        transport.MAX_FORMAL_RESULT_FAMILY_OBJECT_BYTES
+        + transport.MAX_OBJECT_GET_ARCHIVE_OVERHEAD_BYTES
+    )
+
+    def http(url, body, headers, timeout):
+        calls.append((url, body, dict(headers), timeout))
+        if url.endswith("/object/get"):
+            return 200, _object_get_response()
+        return 200, b"x" * (maximum_archive + 1)
+
+    client = _client(http)
+    with pytest.raises(transport.FormalQcTransportError, match="byte bound"):
+        client._read_formal_result_family_object_bounded(
+            _capability(client), PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
+        )
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize(
+    "archive_bytes",
+    (
+        _object_archive(OBJECT_KEYS[0], member_name="wrong-key"),
+        _object_archive_members(
+            ((OBJECT_KEYS[0], b"one"), (OBJECT_KEYS[1], b"two"))
+        ),
+    ),
+)
+def test_object_get_archive_rejects_wrong_or_malformed_inventory(archive_bytes):
+    calls = []
+
+    def http(url, body, headers, timeout):
+        calls.append((url, body, dict(headers), timeout))
+        if url.endswith("/object/get"):
+            return 200, _object_get_response()
+        return 200, archive_bytes
+
+    client = _client(http)
+    with pytest.raises(transport.FormalQcTransportError):
+        client._read_formal_result_family_object_bounded(
+            _capability(client), PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
+        )
+    assert len(calls) == 2
 
 
 @pytest.mark.parametrize(
     "response",
     (
-        b'{"success":true,"unexpected":true}',
-        b'{"success":true,"object":{"key":"wrong","objectData":"YQ=="}}',
-        (
-            b'{"success":true,"object":{"key":"'
-            + OBJECT_KEYS[0].encode("ascii")
-            + b'","objectData":"YQ==","extra":false}}'
-        ),
-        (
-            b'{"success":true,"object":{"key":"'
-            + OBJECT_KEYS[0].encode("ascii")
-            + b'","objectData":"not base64"}}'
-        ),
-        (
-            b'{"success":true,"object":{"key":"'
-            + OBJECT_KEYS[0].encode("ascii")
-            + b'","objectData":""}}'
-        ),
+        _object_get_response(unexpected=True),
+        _object_get_response(job_id=True),
+        _object_get_response(url=True),
+        _object_get_response(url=""),
+        b'{"jobId":"fixture","url":null,"success":true,"errors":"wrong"}',
     ),
 )
-def test_result_family_read_rejects_hostile_object_envelopes(response):
+def test_result_family_read_rejects_hostile_object_get_envelopes(response):
     calls = []
 
     def http(*args):
@@ -375,11 +680,8 @@ def test_result_family_read_rejects_hostile_object_envelopes(response):
 
 def test_result_family_read_rejects_decoded_object_above_4_2_mb():
     oversized = b"x" * (transport.MAX_FORMAL_RESULT_FAMILY_OBJECT_BYTES + 1)
-
-    def http(*_args):
-        return 200, _response(OBJECT_KEYS[0], oversized)
-
-    client = _client(http)
+    calls = []
+    client = _client(_ready_object_http(calls, payload=oversized))
     with pytest.raises(
         transport.FormalQcTransportError, match="byte bound"
     ):
@@ -415,12 +717,7 @@ def test_result_family_read_rejects_transport_response_above_16_mib():
 
 def test_result_family_capability_mutation_revokes_before_http():
     calls = []
-
-    def http(*args):
-        calls.append(args)
-        return 200, _response(OBJECT_KEYS[0])
-
-    client = _client(http)
+    client = _client(_ready_object_http(calls))
     capability = _capability(client)
     capability.result_family_route = (
         PROJECT_ID,
@@ -754,12 +1051,7 @@ def test_transport_authority_seals_exact_module_name_census():
 @pytest.mark.skipif(not hasattr(os, "fork"), reason="POSIX fork is unavailable")
 def test_result_family_capability_is_cleared_in_child_and_remains_live_in_parent():
     calls = []
-
-    def http(*args):
-        calls.append(args)
-        return 200, _response(OBJECT_KEYS[0])
-
-    client = _client(http)
+    client = _client(_ready_object_http(calls))
     capability = _capability(client)
     read_descriptor, write_descriptor = os.pipe()
     child = os.fork()
@@ -786,7 +1078,7 @@ def test_result_family_capability_is_cleared_in_child_and_remains_live_in_parent
     client._read_formal_result_family_object_bounded(
         capability, PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
     )
-    assert len(calls) == 1
+    assert len(calls) == 2
 
 
 @pytest.mark.skipif(
@@ -795,12 +1087,7 @@ def test_result_family_capability_is_cleared_in_child_and_remains_live_in_parent
 )
 def test_child_resets_inherited_held_private_authority_lock():
     calls = []
-
-    def http(*args):
-        calls.append(args)
-        return 200, _response(OBJECT_KEYS[0])
-
-    client = _client(http)
+    client = _client(_ready_object_http(calls))
     capability = _capability(client)
     entered = threading.Event()
     release = threading.Event()
@@ -840,4 +1127,182 @@ def test_child_resets_inherited_held_private_authority_lock():
     client._read_formal_result_family_object_bounded(
         capability, PROJECT_ID, ORGANIZATION_ID, OBJECT_KEYS[0]
     )
-    assert len(calls) == 1
+    assert len(calls) == 2
+
+
+def _loopback_servers(redirect_code):
+    import http.server
+
+    seen = {"first": None, "second": None}
+
+    class Second(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self._answer()
+
+        def do_POST(self):
+            self._answer()
+
+        def _answer(self):
+            seen["second"] = {name.lower(): value for name, value in self.headers.items()}
+            body = b'{"success":true}'
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    second = http.server.HTTPServer(("127.0.0.1", 0), Second)
+
+    class First(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self._redirect()
+
+        def do_POST(self):
+            self.rfile.read(int(self.headers.get("Content-Length", "0")))
+            self._redirect()
+
+        def _redirect(self):
+            seen["first"] = {name.lower(): value for name, value in self.headers.items()}
+            self.send_response(redirect_code)
+            self.send_header(
+                "Location", f"http://127.0.0.1:{second.server_port}/collect"
+            )
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
+        def log_message(self, *args):
+            pass
+
+    first = http.server.HTTPServer(("127.0.0.1", 0), First)
+    return first, second, seen
+
+
+@pytest.mark.parametrize("redirect_code", (301, 302, 303, 307, 308))
+def test_production_http_primitive_refuses_every_redirect(redirect_code):
+    """A 3xx from the pinned host must never issue a second request."""
+
+    first, second, seen = _loopback_servers(redirect_code)
+    workers = [
+        threading.Thread(target=server.serve_forever, daemon=True)
+        for server in (first, second)
+    ]
+    for worker in workers:
+        worker.start()
+    try:
+        status, raw = transport._prepare_production_http_transport()(
+            f"http://127.0.0.1:{first.server_port}/authenticate",
+            b"{}",
+            {"Authorization": "Basic fixture-only", "Timestamp": "1"},
+            5.0,
+        )
+    finally:
+        for server in (first, second):
+            server.shutdown()
+            server.server_close()
+
+    assert seen["first"]["authorization"] == "Basic fixture-only"
+    assert seen["first"]["timestamp"] == "1"
+    assert seen["second"] is None
+    assert status == redirect_code
+    assert raw == b""
+
+
+@pytest.mark.parametrize("redirect_code", (301, 302, 303, 307, 308))
+def test_production_signed_download_refuses_redirect_without_auth(redirect_code):
+    first, second, seen = _loopback_servers(redirect_code)
+    workers = [
+        threading.Thread(target=server.serve_forever, daemon=True)
+        for server in (first, second)
+    ]
+    for worker in workers:
+        worker.start()
+    try:
+        status, raw = transport._prepare_production_download_transport()(
+            f"http://127.0.0.1:{first.server_port}/signed-object",
+            5.0,
+            1024,
+        )
+    finally:
+        for server in (first, second):
+            server.shutdown()
+            server.server_close()
+
+    assert "authorization" not in seen["first"]
+    assert "timestamp" not in seen["first"]
+    assert seen["second"] is None
+    assert status == redirect_code
+    assert raw == b""
+
+
+def test_production_signed_download_caps_chunked_body_with_one_sentinel_byte():
+    import http.server
+
+    seen = {}
+
+    class Chunked(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            seen.update(
+                {name.lower(): value for name, value in self.headers.items()}
+            )
+            payload = b"x" * 2048
+            self.send_response(200)
+            self.send_header("Transfer-Encoding", "chunked")
+            self.end_headers()
+            self.wfile.write(f"{len(payload):x}\r\n".encode("ascii"))
+            self.wfile.write(payload + b"\r\n0\r\n\r\n")
+
+        def log_message(self, *args):
+            pass
+
+    server = http.server.HTTPServer(("127.0.0.1", 0), Chunked)
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    worker.start()
+    try:
+        status, raw = transport._prepare_production_download_transport()(
+            f"http://127.0.0.1:{server.server_port}/chunked-object",
+            5.0,
+            1024,
+        )
+    finally:
+        server.shutdown()
+        server.server_close()
+
+    assert status == 200
+    assert len(raw) == 1025
+    assert "authorization" not in seen
+    assert "timestamp" not in seen
+
+
+@pytest.mark.parametrize(
+    ("status", "body", "message"),
+    [
+        (200, b'{"success":false,"errors":["fixture"]}', "request was refused"),
+        (199, b'{"success":true}', "request was refused"),
+        (301, b'{"success":true}', "request was refused"),
+        (403, b'{"success":true}', "request was refused"),
+        (200, b"not json", "not UTF-8 JSON"),
+    ],
+)
+def test_request_json_refuses_failed_envelopes_and_error_statuses(
+    status, body, message
+):
+    client = _client(lambda *args: (status, body))
+    capability = transport._mint_offline_test_capability(
+        client, scope="submission", call_budget={"authenticate": 1}
+    )
+    with pytest.raises(transport.FormalQcTransportError, match=message):
+        client._request_json(capability, "authenticate", {})
+
+
+def test_production_http_primitive_wraps_network_failure_without_detail():
+    with pytest.raises(transport.FormalQcTransportError) as excinfo:
+        transport._prepare_production_http_transport()(
+            "http://127.0.0.1:1/authenticate",
+            b"{}",
+            {"Authorization": "Basic fixture-only"},
+            2.0,
+        )
+    assert str(excinfo.value) == "QuantConnect network request failed"
+    assert excinfo.value.__cause__ is None

@@ -207,6 +207,7 @@ class AcceptedRiskPowerCalibrationInput:
     source_archive: object = dataclasses.field(repr=False)
     production_evidence: object = dataclasses.field(repr=False)
     terminal_build: object = dataclasses.field(repr=False)
+    physical_scoring_stream: object | None = dataclasses.field(repr=False)
     terminal_build_id: str
     terminal_build_sha256: str
     terminal_package_id: str
@@ -453,16 +454,18 @@ def _make_power_artifact_authority():
         return registry
 
     def expected_caller(kind: str, frame: object) -> None:
-        match = next(
-            (item for item in register_callers if item[0] == kind),
-            None,
+        matches = tuple(
+            item for item in register_callers if item[0] == kind
         )
         if (
-            match is None
+            not matches
             or getpid() != authority_pid
-            or frame.f_code is not match[1]
-            or id(frame.f_globals) != match[2]
-            or realpath(frame.f_code.co_filename) != match[3]
+            or not any(
+                frame.f_code is match[1]
+                and id(frame.f_globals) == match[2]
+                and realpath(frame.f_code.co_filename) == match[3]
+                for match in matches
+            )
         ):
             raise AcceptedRiskPowerCalibrationError(
                 "power artifact registration caller changed"
@@ -538,12 +541,18 @@ def _make_power_artifact_authority():
             return private
 
     def seal_builder_callers(
-        *, input_builder: object, output_loader: object,
+        *, input_builder: object, physical_input_builder: object,
+        output_loader: object,
         receipt_builder: object, successor_builder: object,
     ) -> None:
         nonlocal register_callers
         specifications = (
             ("input", input_builder, "_build_accepted_risk_power_calibration_input_impl"),
+            (
+                "input",
+                physical_input_builder,
+                "_build_physical_accepted_risk_power_calibration_input_impl",
+            ),
             ("output", output_loader, "_load_accepted_risk_power_calibration_output_impl"),
             ("receipt", receipt_builder, "_compute_accepted_risk_power_calibration_receipt_impl"),
             ("successor", successor_builder, "_build_accepted_risk_stock_power_successor_impl"),
@@ -578,6 +587,7 @@ def _make_power_artifact_authority():
         archive: object,
         evidence: object,
         terminal_build: object,
+        physical_scoring_stream: object | None,
         manifest_bytes: bytes,
         path_fingerprints: tuple[tuple[int, ...], ...],
     ) -> None:
@@ -591,6 +601,11 @@ def _make_power_artifact_authority():
             weakref.ref(archive),
             weakref.ref(evidence),
             weakref.ref(terminal_build),
+            (
+                None
+                if physical_scoring_stream is None
+                else weakref.ref(physical_scoring_stream)
+            ),
             manifest_bytes,
             path_fingerprints,
         )
@@ -1415,7 +1430,7 @@ def _calibration_session_record(
 
 
 def _require_calibration_terminal_recorder_lineage(
-    recorder: object, state: object,
+    recorder: object, *, preopen: object, evidence: object,
 ) -> object:
     """Bind the lifecycle recorder to the scorer's exact reviewed sources."""
 
@@ -1428,12 +1443,53 @@ def _require_calibration_terminal_recorder_lineage(
 
     recorder = require_fresh_formal_terminal_disposition_recorder(recorder)
     bridge = recorder.historical_bridge
-    preopen = state.archive.preopen_acquisition_receipt
+    from . import physical_production_evidence_acquisition as physical_acquisition
+    from . import physical_production_evidence_bridge as physical_bridge_module
+    from . import preopen_control_prereview_downloader as prereview
+
+    if (
+        type(evidence)
+        is physical_acquisition.PhysicalProductionEvidenceAcquisitionReceipt
+        and evidence.review_mode
+        == physical_acquisition.SECTION72_OWNER_WAIVED_REVIEW_MODE
+    ):
+        try:
+            physical_receipt = (
+                physical_acquisition
+                .require_section72_owner_waived_production_evidence_receipt(
+                    evidence
+                )
+            )
+            physical_bridge = (
+                physical_bridge_module.require_physical_production_evidence_bridge(
+                    physical_receipt.bridge
+                )
+            )
+            prereview_archive = prereview.require_preopen_control_prereview_archive(
+                preopen
+            )
+        except (AttributeError, TypeError, ValueError, OSError) as exc:
+            raise AcceptedRiskPowerCalibrationError(
+                "section-72 calibration lifecycle parents changed"
+            ) from exc
+        if (
+            physical_receipt.preopen_acquisition_receipt is not prereview_archive
+            or physical_bridge.preopen_acquisition_receipt is not prereview_archive
+            or physical_bridge.terminal_archive is not prereview_archive
+            or physical_bridge.historical_bridge is not bridge
+            or recorder.historical_bridge_id != bridge.bridge_id
+            or recorder.historical_bridge_sha256 != bridge.bridge_sha256
+        ):
+            raise AcceptedRiskPowerCalibrationError(
+                "section-72 calibration lifecycle and scorer sources differ"
+            )
+        return recorder
+
     sources = {
         item["kind"]: (item["artifact_id"], item["artifact_sha256"])
         for item in acquisition_truth_source_binding_records(preopen)
     }
-    pair = state.evidence.authority.pair
+    pair = evidence.authority.pair
     if (
         bridge.pair_id != pair.pair_id
         or bridge.pair_sha256 != pair.pair_sha256
@@ -1463,6 +1519,163 @@ def _require_calibration_terminal_recorder_lineage(
     return recorder
 
 
+def _construct_accepted_risk_power_calibration_input(
+    *,
+    protocol: PowerCalibrationProtocol,
+    source_archive: object,
+    production_evidence: object,
+    terminal_build: object,
+    physical_scoring_stream: object | None,
+    benchmark_security_id: str,
+    model: object,
+    axis: tuple[str, ...],
+    paths: tuple[Path, ...],
+    descriptors: tuple[CalibrationShardDescriptor, ...],
+    resource_counts: Mapping[str, int],
+) -> tuple[
+    AcceptedRiskPowerCalibrationInput,
+    bytes,
+    tuple[tuple[int, ...], ...],
+]:
+    """Construct the common legacy/physical input surface without authority."""
+
+    from .formal_terminal_disposition_builder import (
+        formal_terminal_disposition_build_record,
+    )
+
+    archive_id = getattr(source_archive, "archive_id", None)
+    archive_sha256 = getattr(source_archive, "archive_sha256", None)
+    if archive_id is None and archive_sha256 is None:
+        archive_id = getattr(source_archive, "capture_id", None)
+        archive_sha256 = getattr(source_archive, "capture_sha256", None)
+    archive_id = _safe(archive_id, "calibration source archive id")
+    archive_sha256 = _sha(
+        archive_sha256, "calibration source archive SHA-256"
+    )
+
+    physical_record = None
+    if physical_scoring_stream is not None:
+        try:
+            physical_record = physical_scoring_stream.to_record()
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise AcceptedRiskPowerCalibrationError(
+                "physical calibration stream could not be projected"
+            ) from exc
+    required_counts = {
+        "calibration_session_count",
+        "scored_row_count",
+        "preoutcome_refusal_count",
+        "component_instance_count",
+        "minute_requirement_count",
+    }
+    if (
+        type(resource_counts) is not dict
+        or set(resource_counts) != required_counts
+        or any(type(item) is not int or item < 0 for item in resource_counts.values())
+        or resource_counts["calibration_session_count"] != len(axis)
+        or type(paths) is not tuple
+        or type(descriptors) is not tuple
+        or len(paths) != len(descriptors)
+        or not descriptors
+        or len(descriptors) > MAX_INPUT_SHARDS
+    ):
+        raise AcceptedRiskPowerCalibrationError(
+            "calibration input resource census changed"
+        )
+    seed = {
+        "schema": INPUT_SCHEMA,
+        "protocol_id": protocol.protocol_id,
+        "protocol_sha256": protocol.protocol_hash,
+        "calibration_fold_id": CALIBRATION_FOLD_ID,
+        "calibration_fold_sha256": CALIBRATION_FOLD_HASH,
+        "calibration_axis_sha256": CALIBRATION_AXIS_SHA256,
+        "calibration_sessions": list(axis),
+        "benchmark_security_id": benchmark_security_id,
+        "source_archive_id": archive_id,
+        "source_archive_sha256": archive_sha256,
+        "production_evidence_receipt_id": production_evidence.receipt_id,
+        "production_evidence_receipt_sha256": production_evidence.receipt_sha256,
+        "terminal_disposition_build": (
+            formal_terminal_disposition_build_record(terminal_build)
+        ),
+        "model": model.to_record(),
+        "shards": [item.to_record() for item in descriptors],
+        "resource_census": {
+            **resource_counts,
+            "maximum_session_security_count": MAX_SESSION_SECURITY_COUNT,
+            "maximum_session_minute_requirement_count": (
+                MAX_SESSION_MINUTE_REQUIREMENTS
+            ),
+            "maximum_input_shard_byte_count": MAX_INPUT_SHARD_BYTES,
+        },
+        "market_contract": {
+            "stock_return": "20_session_open_to_open_total_return",
+            "benchmark_return": "SPY_20_session_open_to_open_total_return",
+            "publication_price": (
+                "last_tradable_minute_with_bar_end_strictly_before_publication"
+            ),
+            "terminal_disposition_precedes_numeric_market_bar": True,
+            "terminal_payoff_source_available": False,
+            "qc_delisting_price_used": False,
+            "merger_bankruptcy_successor_payoff_inferred": False,
+        },
+        "formal_outcome_evaluation": False,
+        "result_statistics_read": False,
+        "orders_authorized": False,
+    }
+    if physical_record is not None:
+        seed["physical_scoring_stream"] = physical_record
+    digest = hashlib.sha256(canonical_json_bytes(seed)).hexdigest()
+    manifest = {
+        **seed,
+        "input_id": f"arv2-accepted-risk-power-input-{digest[:24]}",
+        "input_sha256": digest,
+    }
+    manifest_bytes = canonical_json_bytes(manifest)
+    if len(manifest_bytes) > MAX_MANIFEST_BYTES:
+        raise AcceptedRiskPowerCalibrationError(
+            "calibration manifest exceeded capacity"
+        )
+    path_fingerprints = tuple(_path_fingerprint(item) for item in paths)
+    value = object.__new__(AcceptedRiskPowerCalibrationInput)
+    values: dict[str, object] = {
+        "input_id": manifest["input_id"],
+        "input_sha256": digest,
+        "protocol_id": protocol.protocol_id,
+        "protocol_sha256": protocol.protocol_hash,
+        "source_archive_id": archive_id,
+        "source_archive_sha256": archive_sha256,
+        "production_evidence_receipt_id": production_evidence.receipt_id,
+        "production_evidence_receipt_sha256": production_evidence.receipt_sha256,
+        "protocol": protocol,
+        "source_archive": source_archive,
+        "production_evidence": production_evidence,
+        "terminal_build": terminal_build,
+        "physical_scoring_stream": physical_scoring_stream,
+        "terminal_build_id": terminal_build.build_id,
+        "terminal_build_sha256": terminal_build.build_sha256,
+        "terminal_package_id": terminal_build.terminal_package.package_id,
+        "terminal_package_sha256": terminal_build.terminal_package.package_sha256,
+        "terminal_requirement_count": terminal_build.terminal_requirement_count,
+        "benchmark_security_id": benchmark_security_id,
+        "manifest_bytes": manifest_bytes,
+        "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        "shard_paths": paths,
+        "shard_descriptors": descriptors,
+        "path_fingerprints": path_fingerprints,
+        **resource_counts,
+        "outcome_access": False,
+        "quantconnect_access": False,
+    }
+    if set(values) != {item.name for item in dataclasses.fields(value)}:
+        raise AcceptedRiskPowerCalibrationError(
+            "calibration input field inventory changed"
+        )
+    for name, item in values.items():
+        object.__setattr__(value, name, item)
+    return value, manifest_bytes, path_fingerprints
+
+
 def _build_accepted_risk_power_calibration_input_impl(
     *, scoring_builder: object, protocol: PowerCalibrationProtocol,
     terminal_recorder: object, benchmark_security_id: str,
@@ -1482,7 +1695,6 @@ def _build_accepted_risk_power_calibration_input_impl(
     from research.analyst_revisions_v2_qc import formal_streaming_input as stream
     from .formal_terminal_disposition_builder import (
         finalize_formal_terminal_disposition_recording,
-        formal_terminal_disposition_build_record,
         record_formal_terminal_security,
         record_formal_terminal_slot,
         require_formal_terminal_disposition_build,
@@ -1513,7 +1725,9 @@ def _build_accepted_risk_power_calibration_input_impl(
         try:
             authenticated_terminal_recorder = (
                 _require_calibration_terminal_recorder_lineage(
-                    terminal_recorder, state
+                    terminal_recorder,
+                    preopen=state.archive.preopen_acquisition_receipt,
+                    evidence=state.evidence,
                 )
             )
         except (TypeError, ValueError, OSError) as exc:
@@ -1700,112 +1914,46 @@ def _build_accepted_risk_power_calibration_input_impl(
             ))
         if not descriptors or len(descriptors) > MAX_INPUT_SHARDS:
             raise AcceptedRiskPowerCalibrationError("calibration input shard count changed")
-        seed = {
-            "schema": INPUT_SCHEMA,
-            "protocol_id": protocol.protocol_id,
-            "protocol_sha256": protocol.protocol_hash,
-            "calibration_fold_id": CALIBRATION_FOLD_ID,
-            "calibration_fold_sha256": CALIBRATION_FOLD_HASH,
-            "calibration_axis_sha256": CALIBRATION_AXIS_SHA256,
-            "calibration_sessions": list(axis),
-            "benchmark_security_id": benchmark_security_id,
-            "source_archive_id": state.archive.archive_id,
-            "source_archive_sha256": state.archive.archive_sha256,
-            "production_evidence_receipt_id": state.evidence.receipt_id,
-            "production_evidence_receipt_sha256": state.evidence.receipt_sha256,
-            "terminal_disposition_build": (
-                formal_terminal_disposition_build_record(terminal_build)
+        resource_counts = {
+            "calibration_session_count": len(all_records),
+            "scored_row_count": sum(
+                len(item["decisions"]) for item in all_records
             ),
-            "model": model.to_record(),
-            "shards": [item.to_record() for item in descriptors],
-            "resource_census": {
-                "calibration_session_count": len(all_records),
-                "scored_row_count": sum(len(item["decisions"]) for item in all_records),
-                "preoutcome_refusal_count": sum(
-                    len(item["preoutcome_refusal_sha256s"]) for item in all_records
-                ),
-                "component_instance_count": sum(
-                    item["connected_component_count"] for item in all_records
-                ),
-                "minute_requirement_count": sum(
-                    item["minute_requirement_count"] for item in all_records
-                ),
-                "maximum_session_security_count": MAX_SESSION_SECURITY_COUNT,
-                "maximum_session_minute_requirement_count": (
-                    MAX_SESSION_MINUTE_REQUIREMENTS
-                ),
-                "maximum_input_shard_byte_count": MAX_INPUT_SHARD_BYTES,
-            },
-            "market_contract": {
-                "stock_return": "20_session_open_to_open_total_return",
-                "benchmark_return": "SPY_20_session_open_to_open_total_return",
-                "publication_price": (
-                    "last_tradable_minute_with_bar_end_strictly_before_publication"
-                ),
-                "terminal_disposition_precedes_numeric_market_bar": True,
-                "terminal_payoff_source_available": False,
-                "qc_delisting_price_used": False,
-                "merger_bankruptcy_successor_payoff_inferred": False,
-            },
-            "formal_outcome_evaluation": False,
-            "result_statistics_read": False,
-            "orders_authorized": False,
-        }
-        digest = hashlib.sha256(canonical_json_bytes(seed)).hexdigest()
-        manifest = {
-            **seed,
-            "input_id": f"arv2-accepted-risk-power-input-{digest[:24]}",
-            "input_sha256": digest,
-        }
-        manifest_bytes = canonical_json_bytes(manifest)
-        if len(manifest_bytes) > MAX_MANIFEST_BYTES:
-            raise AcceptedRiskPowerCalibrationError("calibration manifest exceeded capacity")
-        value = object.__new__(AcceptedRiskPowerCalibrationInput)
-        counts = seed["resource_census"]
-        values: dict[str, object] = {
-            "input_id": manifest["input_id"], "input_sha256": digest,
-            "protocol_id": protocol.protocol_id,
-            "protocol_sha256": protocol.protocol_hash,
-            "source_archive_id": state.archive.archive_id,
-            "source_archive_sha256": state.archive.archive_sha256,
-            "production_evidence_receipt_id": state.evidence.receipt_id,
-            "production_evidence_receipt_sha256": state.evidence.receipt_sha256,
-            "protocol": protocol,
-            "source_archive": state.archive,
-            "production_evidence": state.evidence,
-            "terminal_build": terminal_build,
-            "terminal_build_id": terminal_build.build_id,
-            "terminal_build_sha256": terminal_build.build_sha256,
-            "terminal_package_id": terminal_build.terminal_package.package_id,
-            "terminal_package_sha256": (
-                terminal_build.terminal_package.package_sha256
+            "preoutcome_refusal_count": sum(
+                len(item["preoutcome_refusal_sha256s"])
+                for item in all_records
             ),
-            "terminal_requirement_count": (
-                terminal_build.terminal_requirement_count
+            "component_instance_count": sum(
+                item["connected_component_count"] for item in all_records
             ),
-            "benchmark_security_id": benchmark_security_id,
-            "manifest_bytes": manifest_bytes,
-            "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
-            "shard_paths": tuple(paths),
-            "shard_descriptors": tuple(descriptors),
-            "path_fingerprints": tuple(_path_fingerprint(item) for item in paths),
-            "calibration_session_count": counts["calibration_session_count"],
-            "scored_row_count": counts["scored_row_count"],
-            "preoutcome_refusal_count": counts["preoutcome_refusal_count"],
-            "component_instance_count": counts["component_instance_count"],
-            "minute_requirement_count": counts["minute_requirement_count"],
-            "outcome_access": False, "quantconnect_access": False,
+            "minute_requirement_count": sum(
+                item["minute_requirement_count"] for item in all_records
+            ),
         }
-        for name, item in values.items():
-            object.__setattr__(value, name, item)
+        value, manifest_bytes, path_fingerprints = (
+            _construct_accepted_risk_power_calibration_input(
+                protocol=protocol,
+                source_archive=state.archive,
+                production_evidence=state.evidence,
+                terminal_build=terminal_build,
+                physical_scoring_stream=None,
+                benchmark_security_id=benchmark_security_id,
+                model=model,
+                axis=axis,
+                paths=tuple(paths),
+                descriptors=tuple(descriptors),
+                resource_counts=resource_counts,
+            )
+        )
         _authority_register(
             value,
             protocol,
             state.archive,
             state.evidence,
             terminal_build,
+            None,
             manifest_bytes,
-            tuple(_path_fingerprint(item) for item in paths),
+            path_fingerprints,
         )
         return require_accepted_risk_power_calibration_input(value)
 
@@ -1821,9 +1969,347 @@ def _build_accepted_risk_power_calibration_input_impl(
         ) from exc
 
 
+def _build_physical_accepted_risk_power_calibration_input_impl(
+    *,
+    scoring_builder: object,
+    accepted_risk_binding: object,
+    protocol: PowerCalibrationProtocol,
+    terminal_recorder: object,
+    benchmark_security_id: str,
+    output_directory: Path,
+    _authority_register: object,
+    _physical_operations: tuple[object, object, object],
+) -> AcceptedRiskPowerCalibrationInput:
+    """Compose H20 calibration input from the reviewed physical scorer."""
+
+    from .formal_terminal_disposition_builder import (
+        finalize_formal_terminal_disposition_recording,
+        record_formal_terminal_security,
+        record_formal_terminal_slot,
+        require_formal_terminal_disposition_build,
+    )
+
+    context_fn, run_stream, require_stream = _physical_operations
+    try:
+        protocol = require_loaded_power_calibration_protocol(protocol)
+        context = context_fn(
+            scoring_builder,
+            accepted_risk_binding=accepted_risk_binding,
+        )
+    except (PowerCalibrationProtocolError, TypeError, ValueError) as exc:
+        raise AcceptedRiskPowerCalibrationError(
+            "physical calibration parents did not authenticate"
+        ) from exc
+    axis = calibration_axis()
+    if (
+        protocol.protocol_id != POWER_PROTOCOL_ID
+        or protocol.protocol_hash != POWER_PROTOCOL_HASH
+        or tuple(protocol.calibration_session_axis) != axis
+        or context.accepted_risk_binding is not accepted_risk_binding
+        or context.next_fold_index != 0
+        or context.active_fold
+        or context.finalized
+    ):
+        raise AcceptedRiskPowerCalibrationError(
+            "physical calibration protocol or context changed"
+        )
+    benchmark_security_id = _safe(
+        benchmark_security_id, "benchmark security id"
+    )
+    directory = _require_output_directory(output_directory)
+    evidence = context.capacity.production_evidence_receipt
+    try:
+        authenticated_terminal_recorder = (
+            _require_calibration_terminal_recorder_lineage(
+                terminal_recorder,
+                preopen=context.preopen_acquisition_receipt,
+                evidence=evidence,
+            )
+        )
+    except (TypeError, ValueError, OSError) as exc:
+        raise AcceptedRiskPowerCalibrationError(
+            "physical calibration lifecycle recorder did not authenticate"
+        ) from exc
+
+    preliminary_paths: list[Path] = []
+    preliminary_descriptors: list[CalibrationShardDescriptor] = []
+    final_paths: list[Path] = []
+    final_descriptors: list[CalibrationShardDescriptor] = []
+    pending_rows: list[dict[str, object]] = []
+    recorded_securities: set[str] = set()
+    resource_counts = {
+        "calibration_session_count": 0,
+        "scored_row_count": 0,
+        "preoutcome_refusal_count": 0,
+        "component_instance_count": 0,
+        "minute_requirement_count": 0,
+    }
+    succeeded = False
+
+    def flush_preliminary() -> None:
+        if not pending_rows:
+            return
+        compressed, content_hash, raw_count = _gzip_rows(pending_rows)
+        if len(compressed) > MAX_INPUT_SHARD_BYTES:
+            raise AcceptedRiskPowerCalibrationError(
+                "one preliminary physical calibration shard exceeded capacity"
+            )
+        ordinal = len(preliminary_descriptors)
+        compressed_hash = hashlib.sha256(compressed).hexdigest()
+        path = directory / (
+            f"preliminary-{ordinal:03d}-{compressed_hash}.jsonl.gz"
+        )
+        _write_private(path, compressed)
+        preliminary_paths.append(path)
+        preliminary_descriptors.append(CalibrationShardDescriptor(
+            ordinal=ordinal,
+            object_store_key="preliminary-only",
+            content_sha256=content_hash,
+            compressed_sha256=compressed_hash,
+            row_count=len(pending_rows),
+            uncompressed_byte_count=raw_count,
+            compressed_byte_count=len(compressed),
+            first_session=pending_rows[0]["decision_session"],
+            last_session=pending_rows[-1]["decision_session"],
+        ))
+        pending_rows.clear()
+
+    def consume(block: object) -> None:
+        position = resource_counts["calibration_session_count"]
+        if (
+            position >= len(axis)
+            or getattr(block, "decision_session", None) != axis[position]
+            or getattr(block, "session_position", None) != position
+            or type(getattr(block, "accepted", None)) is not tuple
+            or type(getattr(block, "refused", None)) is not tuple
+        ):
+            raise AcceptedRiskPowerCalibrationError(
+                "physical calibration callback block changed"
+            )
+        accepted = block.accepted
+        refused = block.refused
+        for decision in accepted:
+            if decision.security_id not in recorded_securities:
+                record_formal_terminal_security(
+                    authenticated_terminal_recorder,
+                    security_id=decision.security_id,
+                )
+                recorded_securities.add(decision.security_id)
+            record_formal_terminal_slot(
+                authenticated_terminal_recorder,
+                slot_kind="decision_horizon",
+                slot_id=_calibration_terminal_slot_id(decision.row_sha256),
+                horizon_sessions=20,
+                security_id=decision.security_id,
+                first_session=date.fromisoformat(block.decision_session),
+                last_session=date.fromisoformat(
+                    resolve_nth_session_after(block.decision_session, 20)
+                ),
+            )
+        record = _calibration_session_record(
+            session=block.decision_session,
+            position=position,
+            accepted=accepted,
+            refused=refused,
+            benchmark_security_id=benchmark_security_id,
+            terminal_by_slot={},
+        )
+        pending_rows.append(record)
+        resource_counts["calibration_session_count"] += 1
+        resource_counts["scored_row_count"] += len(record["decisions"])
+        resource_counts["preoutcome_refusal_count"] += len(
+            record["preoutcome_refusal_sha256s"]
+        )
+        resource_counts["component_instance_count"] += record[
+            "connected_component_count"
+        ]
+        resource_counts["minute_requirement_count"] += record[
+            "minute_requirement_count"
+        ]
+        if (
+            len(pending_rows) == SHARD_SESSION_WIDTH
+            or position + 1 == len(axis)
+        ):
+            flush_preliminary()
+
+    try:
+        physical_stream = run_stream(
+            scoring_builder,
+            accepted_risk_binding=accepted_risk_binding,
+            calibration_fold=_calibration_fold(),
+            calibration_fold_sha256=CALIBRATION_FOLD_HASH,
+            calibration_sessions=axis,
+            calibration_axis_sha256=CALIBRATION_AXIS_SHA256,
+            consumer=consume,
+        )
+        physical_stream = require_stream(physical_stream)
+        if (
+            resource_counts["calibration_session_count"] != len(axis)
+            or physical_stream.calibration_session_count != len(axis)
+            or physical_stream.accepted_decision_count
+            != resource_counts["scored_row_count"]
+            or physical_stream.preoutcome_refusal_count
+            != resource_counts["preoutcome_refusal_count"]
+            or len(preliminary_paths) != len(preliminary_descriptors)
+            or len(preliminary_paths) > MAX_INPUT_SHARDS
+        ):
+            raise AcceptedRiskPowerCalibrationError(
+                "physical calibration stream and preliminary census differ"
+            )
+        terminal_build = finalize_formal_terminal_disposition_recording(
+            recorder=authenticated_terminal_recorder,
+            calculation_as_of_date=date.fromisoformat(
+                CALIBRATION_TERMINAL_CALCULATION_AS_OF
+            ),
+        )
+        terminal_build = require_formal_terminal_disposition_build(
+            terminal_build
+        )
+        terminal_by_slot: dict[str, dict[str, object]] = {}
+        for item in terminal_build.terminal_package.rows:
+            if item.slot_kind != "decision_horizon" or item.horizon_sessions != 20:
+                raise AcceptedRiskPowerCalibrationError(
+                    "physical calibration terminal package escaped H20"
+                )
+            terminal_by_slot[item.slot_id] = {
+                "disposition": item.disposition,
+                "stock_return": (
+                    None
+                    if item.stock_return is None
+                    else _decimal_text(item.stock_return)
+                ),
+                "reason": item.reason,
+                "terminal_lineage_sha256": item.terminal_lineage_sha256,
+                "available_at_utc": item.available_at_utc,
+            }
+        if len(terminal_by_slot) != len(terminal_build.terminal_package.rows):
+            raise AcceptedRiskPowerCalibrationError(
+                "physical calibration terminal package repeated a slot"
+            )
+        used_terminal_slots: set[str] = set()
+        output_security_terminal_count = 0
+        expected_session_position = 0
+        for preliminary_path, preliminary_descriptor in zip(
+            preliminary_paths, preliminary_descriptors, strict=True
+        ):
+            payload, _fingerprint = _read_private(
+                preliminary_path, MAX_INPUT_SHARD_BYTES
+            )
+            rows = list(_iter_gzip_rows(payload, preliminary_descriptor))
+            finalized_rows: list[dict[str, object]] = []
+            for row in rows:
+                if (
+                    row.get("decision_session") != axis[expected_session_position]
+                    or row.get("session_position") != expected_session_position
+                    or type(row.get("decisions")) is not list
+                ):
+                    raise AcceptedRiskPowerCalibrationError(
+                        "preliminary physical calibration session changed"
+                    )
+                seed = dict(row)
+                seed.pop("input_session_sha256", None)
+                finalized_decisions: list[dict[str, object]] = []
+                for raw_decision in row["decisions"]:
+                    if type(raw_decision) is not dict:
+                        raise AcceptedRiskPowerCalibrationError(
+                            "preliminary physical calibration decision changed"
+                        )
+                    decision = dict(raw_decision)
+                    slot_id = _calibration_terminal_slot_id(
+                        decision.get("decision_lineage_sha256")
+                    )
+                    disposition = terminal_by_slot.get(slot_id)
+                    if disposition is not None:
+                        used_terminal_slots.add(slot_id)
+                    decision["terminal_disposition"] = disposition
+                    finalized_decisions.append(decision)
+                seed["decisions"] = finalized_decisions
+                digest = hashlib.sha256(canonical_json_bytes(seed)).hexdigest()
+                finalized_rows.append(
+                    {**seed, "input_session_sha256": digest}
+                )
+                output_security_terminal_count += seed["security_terminal_count"]
+                expected_session_position += 1
+            compressed, content_hash, raw_count = _gzip_rows(finalized_rows)
+            if len(compressed) > MAX_INPUT_SHARD_BYTES:
+                raise AcceptedRiskPowerCalibrationError(
+                    "one physical calibration input shard exceeded capacity"
+                )
+            ordinal = len(final_descriptors)
+            compressed_hash = hashlib.sha256(compressed).hexdigest()
+            key = f"{INPUT_PREFIX}content/{compressed_hash}.jsonl.gz"
+            path = directory / f"input-{ordinal:03d}-{compressed_hash}.jsonl.gz"
+            _write_private(path, compressed)
+            final_paths.append(path)
+            final_descriptors.append(CalibrationShardDescriptor(
+                ordinal=ordinal,
+                object_store_key=key,
+                content_sha256=content_hash,
+                compressed_sha256=compressed_hash,
+                row_count=len(finalized_rows),
+                uncompressed_byte_count=raw_count,
+                compressed_byte_count=len(compressed),
+                first_session=finalized_rows[0]["decision_session"],
+                last_session=finalized_rows[-1]["decision_session"],
+            ))
+            preliminary_path.unlink()
+        if (
+            expected_session_position != len(axis)
+            or used_terminal_slots != set(terminal_by_slot)
+            or output_security_terminal_count
+            != terminal_build.terminal_requirement_count
+        ):
+            raise AcceptedRiskPowerCalibrationError(
+                "physical calibration terminal census is not exact"
+            )
+        value, manifest_bytes, path_fingerprints = (
+            _construct_accepted_risk_power_calibration_input(
+                protocol=protocol,
+                source_archive=physical_stream.terminal_archive,
+                production_evidence=(
+                    physical_stream.capacity.production_evidence_receipt
+                ),
+                terminal_build=terminal_build,
+                physical_scoring_stream=physical_stream,
+                benchmark_security_id=benchmark_security_id,
+                model=physical_stream.model,
+                axis=axis,
+                paths=tuple(final_paths),
+                descriptors=tuple(final_descriptors),
+                resource_counts=resource_counts,
+            )
+        )
+        _authority_register(
+            value,
+            protocol,
+            physical_stream.terminal_archive,
+            physical_stream.capacity.production_evidence_receipt,
+            terminal_build,
+            physical_stream,
+            manifest_bytes,
+            path_fingerprints,
+        )
+        value = require_accepted_risk_power_calibration_input(value)
+        succeeded = True
+        return value
+    except AcceptedRiskPowerCalibrationError:
+        raise
+    except (AttributeError, TypeError, ValueError, OSError) as exc:
+        raise AcceptedRiskPowerCalibrationError(
+            "physical calibration stream could not be consumed"
+        ) from exc
+    finally:
+        for path in (*preliminary_paths, *final_paths):
+            try:
+                if path.exists() and (path in preliminary_paths or not succeeded):
+                    path.unlink()
+            except OSError:
+                pass
+
+
 def _require_accepted_risk_power_calibration_input_impl(
     value: AcceptedRiskPowerCalibrationInput,
-    *, _authority_current: object,
+    *, _authority_current: object, _resolve_physical: object,
 ) -> AcceptedRiskPowerCalibrationInput:
     from research.analyst_revisions_v2_qc import formal_streaming_input as stream
     from research.analyst_revisions_v2.production_evidence_acquisition import (
@@ -1841,27 +2327,62 @@ def _require_accepted_risk_power_calibration_input_impl(
     protocol, archive, evidence, terminal_build = (
         registered[index]() for index in (1, 2, 3, 4)
     )
+    physical_reference = registered[5]
+    physical_stream = (
+        None if physical_reference is None else physical_reference()
+    )
     if any(
         item is None for item in (protocol, archive, evidence, terminal_build)
-    ):
+    ) or (physical_reference is not None and physical_stream is None):
         raise AcceptedRiskPowerCalibrationError("calibration input parent was released")
     try:
         require_loaded_power_calibration_protocol(protocol)
-        if type(archive) is stream.PhysicalPreopenTerminalArchive:
-            stream.require_physical_preopen_terminal_archive(archive)
-        elif type(archive) is stream.PhysicalProductionEvidenceTerminalArchive:
-            stream.require_physical_production_evidence_terminal_archive(archive)
+        if physical_stream is not None:
+            if _resolve_physical()[2](physical_stream) is not physical_stream:
+                raise AcceptedRiskPowerCalibrationError(
+                    "physical calibration stream verifier changed identity"
+                )
         else:
-            raise AcceptedRiskPowerCalibrationError("calibration archive type changed")
-        require_production_evidence_acquisition_receipt(evidence)
+            if type(archive) is stream.PhysicalPreopenTerminalArchive:
+                stream.require_physical_preopen_terminal_archive(archive)
+            elif type(archive) is stream.PhysicalProductionEvidenceTerminalArchive:
+                stream.require_physical_production_evidence_terminal_archive(archive)
+            else:
+                raise AcceptedRiskPowerCalibrationError(
+                    "calibration archive type changed"
+                )
+            require_production_evidence_acquisition_receipt(evidence)
         require_formal_terminal_disposition_build(terminal_build)
     except (TypeError, ValueError) as exc:
         raise AcceptedRiskPowerCalibrationError("calibration input parent changed") from exc
+    try:
+        manifest = _strict_object(value.manifest_bytes, "calibration input manifest")
+        physical_record = (
+            None if physical_stream is None else physical_stream.to_record()
+        )
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise AcceptedRiskPowerCalibrationError(
+            "calibration input physical lineage changed"
+        ) from exc
     if (
         value.protocol is not protocol
         or value.source_archive is not archive
         or value.production_evidence is not evidence
         or value.terminal_build is not terminal_build
+        or value.physical_scoring_stream is not physical_stream
+        or (
+            physical_stream is not None
+            and (
+                physical_stream.terminal_archive is not archive
+                or physical_stream.capacity.production_evidence_receipt
+                is not evidence
+            )
+        )
+        or manifest.get("physical_scoring_stream") != physical_record
+        or (
+            physical_stream is None
+            and "physical_scoring_stream" in manifest
+        )
         or value.terminal_build_id != terminal_build.build_id
         or value.terminal_build_sha256 != terminal_build.build_sha256
         or value.terminal_package_id != terminal_build.terminal_package.package_id
@@ -1869,9 +2390,9 @@ def _require_accepted_risk_power_calibration_input_impl(
         != terminal_build.terminal_package.package_sha256
         or value.terminal_requirement_count
         != terminal_build.terminal_requirement_count
-        or value.manifest_bytes != registered[5]
-        or value.path_fingerprints != registered[6]
-        or registered[7] != os.getpid()
+        or value.manifest_bytes != registered[6]
+        or value.path_fingerprints != registered[7]
+        or registered[8] != os.getpid()
         or value.manifest_sha256 != hashlib.sha256(value.manifest_bytes).hexdigest()
         or value.calibration_session_count != CALIBRATION_SESSION_COUNT
         or value.outcome_access is not False
@@ -3096,6 +3617,7 @@ def _require_authenticated_power_floor_binding_impl(
 def _bind_power_artifact_authority(
     *,
     build_input_impl: object,
+    build_physical_input_impl: object,
     require_input_impl: object,
     load_output_impl: object,
     require_output_impl: object,
@@ -3113,8 +3635,62 @@ def _bind_power_artifact_authority(
     register_successor: object,
     current_successor: object,
     current_terminal: object,
+    system_module: object,
+    module_registry: object,
 ) -> tuple[object, ...]:
     """Bind every artifact transition to the closure-private authority vault."""
+
+    physical_module_name = (
+        "research.analyst_revisions_v2_qc.physical_streaming_scoring"
+    )
+    physical_names = (
+        "physical_streaming_scoring_composition_context",
+        "run_physical_power_calibration_stream",
+        "require_physical_power_calibration_stream",
+    )
+    physical_authority: tuple[object, tuple[object, ...]] | None = None
+
+    def resolve_physical() -> tuple[object, object, object]:
+        nonlocal physical_authority
+        try:
+            module = module_registry.get(physical_module_name)
+            registry_is_current = system_module.modules is module_registry
+            operations = tuple(getattr(module, name) for name in physical_names)
+        except (AttributeError, TypeError) as exc:
+            raise AcceptedRiskPowerCalibrationError(
+                "physical calibration scorer is unavailable"
+            ) from exc
+        if (
+            module is None
+            or not registry_is_current
+            or any(
+                not callable(operation)
+                or getattr(operation, "__module__", None) != physical_module_name
+                or getattr(operation, "__name__", None) != name
+                for operation, name in zip(
+                    operations, physical_names, strict=True
+                )
+            )
+        ):
+            raise AcceptedRiskPowerCalibrationError(
+                "physical calibration operations changed before use"
+            )
+        if physical_authority is None:
+            physical_authority = (module, operations)
+        elif (
+            physical_authority[0] is not module
+            or module_registry.get(physical_module_name) is not module
+            or any(
+                operation is not expected
+                for operation, expected in zip(
+                    operations, physical_authority[1], strict=True
+                )
+            )
+        ):
+            raise AcceptedRiskPowerCalibrationError(
+                "sealed physical calibration operations changed"
+            )
+        return operations  # type: ignore[return-value]
 
     def build_input(
         *, scoring_builder: object, protocol: PowerCalibrationProtocol,
@@ -3135,7 +3711,31 @@ def _bind_power_artifact_authority(
     def require_input(
         value: AcceptedRiskPowerCalibrationInput,
     ) -> AcceptedRiskPowerCalibrationInput:
-        return require_input_impl(value, _authority_current=current_input)
+        return require_input_impl(
+            value,
+            _authority_current=current_input,
+            _resolve_physical=resolve_physical,
+        )
+
+    def build_physical_accepted_risk_power_calibration_input(
+        *,
+        scoring_builder: object,
+        accepted_risk_binding: object,
+        protocol: PowerCalibrationProtocol,
+        terminal_recorder: object,
+        benchmark_security_id: str,
+        output_directory: Path,
+    ) -> AcceptedRiskPowerCalibrationInput:
+        return build_physical_input_impl(
+            scoring_builder=scoring_builder,
+            accepted_risk_binding=accepted_risk_binding,
+            protocol=protocol,
+            terminal_recorder=terminal_recorder,
+            benchmark_security_id=benchmark_security_id,
+            output_directory=output_directory,
+            _authority_register=register_input,
+            _physical_operations=resolve_physical(),
+        )
 
     def load_output(
         *, calibration_input: AcceptedRiskPowerCalibrationInput,
@@ -3192,6 +3792,7 @@ def _bind_power_artifact_authority(
 
     return (
         build_input,
+        build_physical_accepted_risk_power_calibration_input,
         require_input,
         load_output,
         require_output,
@@ -3205,6 +3806,9 @@ def _bind_power_artifact_authority(
 
 _seal_power_artifact_builder_callers(
     input_builder=_build_accepted_risk_power_calibration_input_impl,
+    physical_input_builder=(
+        _build_physical_accepted_risk_power_calibration_input_impl
+    ),
     output_loader=_load_accepted_risk_power_calibration_output_impl,
     receipt_builder=_compute_accepted_risk_power_calibration_receipt_impl,
     successor_builder=_build_accepted_risk_stock_power_successor_impl,
@@ -3213,6 +3817,7 @@ _seal_power_artifact_builder_callers(
 
 (
     build_accepted_risk_power_calibration_input,
+    build_physical_accepted_risk_power_calibration_input,
     require_accepted_risk_power_calibration_input,
     load_accepted_risk_power_calibration_output,
     require_accepted_risk_power_calibration_output,
@@ -3223,6 +3828,9 @@ _seal_power_artifact_builder_callers(
     require_power_calibration_qc_terminal_receipt,
 ) = _bind_power_artifact_authority(
     build_input_impl=_build_accepted_risk_power_calibration_input_impl,
+    build_physical_input_impl=(
+        _build_physical_accepted_risk_power_calibration_input_impl
+    ),
     require_input_impl=_require_accepted_risk_power_calibration_input_impl,
     load_output_impl=_load_accepted_risk_power_calibration_output_impl,
     require_output_impl=_require_accepted_risk_power_calibration_output_impl,
@@ -3240,10 +3848,13 @@ _seal_power_artifact_builder_callers(
     register_successor=_power_artifact_register_successor,
     current_successor=_power_artifact_current_successor,
     current_terminal=_power_artifact_current_terminal,
+    system_module=sys,
+    module_registry=sys.modules,
 )
 
 del _bind_power_artifact_authority
 del _build_accepted_risk_power_calibration_input_impl
+del _build_physical_accepted_risk_power_calibration_input_impl
 del _require_accepted_risk_power_calibration_input_impl
 del _load_accepted_risk_power_calibration_output_impl
 del _require_accepted_risk_power_calibration_output_impl
@@ -3368,6 +3979,7 @@ __all__ = [
     "PROJECT_NAME",
     "PowerCalibrationQcTerminalReceipt",
     "build_accepted_risk_power_calibration_input",
+    "build_physical_accepted_risk_power_calibration_input",
     "build_accepted_risk_stock_power_successor",
     "build_authenticated_formal_test_power_census",
     "build_authenticated_power_floor_binding",

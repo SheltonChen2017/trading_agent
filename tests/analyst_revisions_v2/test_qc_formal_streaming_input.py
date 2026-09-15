@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import dataclasses
+import gc
 import json
 import os
+import re
 import select
 import signal
 import threading
@@ -37,6 +39,7 @@ from research.analyst_revisions_v2_qc import formal_submission_adapter as submis
 from research.analyst_revisions_v2_qc import formal_streaming_bridge as bridge_module
 from research.analyst_revisions_v2_qc import formal_streaming_input as streaming_module
 from research.analyst_revisions_v2_qc import power_calibration_bridge as power_bridge
+from research.analyst_revisions_v2_qc import physical_streaming_scoring as physical_scoring_module
 from research.analyst_revisions_v2_qc.formal_economic_execution_definition import (
     HOLDING_SESSIONS,
     SOURCE_VIEW_IDS,
@@ -1724,6 +1727,363 @@ def test_disk_builder_refuses_reordering_and_named_block_overflow(tmp_path):
         overflow.add_block("decision_joins", [row, second])
 
 
+def _driver_block(fold_id: str, marker: object | None = None):
+    return streaming_module.StreamedTestSessionBlock(
+        schema=streaming_module.STREAMING_SESSION_BLOCK_SCHEMA,
+        block_id=f"fixture-{fold_id}",
+        block_sha256="a" * 64,
+        fold_id=fold_id,
+        decision_session=date(2020, 1, 2),
+        current_accepted=(() if marker is None else (marker,)),
+        current_refused=(),
+        censored_accepted=(),
+        censored_refused=(),
+        matched_terminal_count=0,
+        matched_terminal_sha256="b" * 64,
+    )
+
+
+def test_physical_formal_driver_exhausts_six_folds_serially_and_retains_no_block():
+    class Marker:
+        pass
+
+    builder = object()
+    lineage = object()
+    events: list[str] = []
+    marker_refs: list[weakref.ReferenceType[Marker]] = []
+
+    def iterate(value):
+        assert value is builder
+        fold_id = streaming_module.FORMAL_PRIMARY_FOLD_IDS[len(marker_refs)]
+        marker = Marker()
+        marker_refs.append(weakref.ref(marker))
+        events.append(f"start:{fold_id}")
+        yield _driver_block(fold_id, marker)
+        events.append(f"end:{fold_id}")
+
+    artifact = object()
+
+    def finish(value):
+        assert value is builder
+        events.append("finish")
+        return artifact
+
+    def require(value, *, expected_lineage):
+        assert value is artifact
+        assert expected_lineage is lineage
+        events.append("require")
+        return value
+
+    driver = streaming_module._PhysicalFormalScoringDriver(
+        builder=builder,
+        operations=(lambda *_args, **_kwargs: None, iterate, finish, require),
+        lineage=lineage,
+    )
+    for fold_id in streaming_module.FORMAL_PRIMARY_FOLD_IDS:
+        for block in driver.iterate_fold(builder):
+            assert block.fold_id == fold_id
+        del block
+        gc.collect()
+        assert marker_refs[-1]() is None
+    assert driver.finish(builder) is artifact
+    assert events == [
+        item
+        for fold_id in streaming_module.FORMAL_PRIMARY_FOLD_IDS
+        for item in (f"start:{fold_id}", f"end:{fold_id}")
+    ] + ["finish", "require"]
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("physical formal scoring cannot seal a partial transition"),
+    ):
+        driver.finish(builder)
+    assert events[-2:] == ["finish", "require"]
+
+
+@pytest.mark.parametrize("mode", ("partial", "error"))
+def test_physical_formal_driver_never_seals_after_partial_or_error(mode: str):
+    builder = object()
+    transitions = {"finish": 0, "require": 0}
+
+    def iterate(_value):
+        yield _driver_block(streaming_module.FORMAL_PRIMARY_FOLD_IDS[0])
+        if mode == "error":
+            raise RuntimeError("fixture fold failed")
+
+    def finish(_value):
+        transitions["finish"] += 1
+        return object()
+
+    def require(value, *, expected_lineage):
+        transitions["require"] += 1
+        return value
+
+    driver = streaming_module._PhysicalFormalScoringDriver(
+        builder=builder,
+        operations=(lambda *_args, **_kwargs: None, iterate, finish, require),
+        lineage=object(),
+    )
+    generator = driver.iterate_fold(builder)
+    next(generator)
+    if mode == "partial":
+        generator.close()
+    else:
+        with pytest.raises(RuntimeError, match="fixture fold failed"):
+            next(generator)
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("physical formal scoring cannot seal a partial transition"),
+    ):
+        driver.finish(builder)
+    assert transitions == {"finish": 0, "require": 0}
+
+
+def test_physical_candidate_entry_seals_lazy_transition_operations(monkeypatch, tmp_path):
+    kwargs = {
+        "scoring_builder": object(),
+        "accepted_risk": object(),
+        "formal_power": object(),
+        "power_floor": object(),
+        "economic_execution": object(),
+        "terminal_package": object(),
+        "benchmark_security_id": "fixture-benchmark",
+        "calculation_as_of_date": date(2026, 9, 14),
+        "output_directory": tmp_path / "never-written",
+    }
+    with pytest.raises(ValueError):
+        streaming_module.build_physical_streamed_formal_input_candidate(**kwargs)
+
+    original = physical_scoring_module.iter_physical_streaming_scoring_fold
+
+    def replacement(*_args, **_kwargs):
+        return iter(())
+
+    replacement.__module__ = original.__module__
+    replacement.__name__ = original.__name__
+    monkeypatch.setattr(
+        physical_scoring_module,
+        "iter_physical_streaming_scoring_fold",
+        replacement,
+    )
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("sealed physical scoring operations changed"),
+    ):
+        streaming_module.build_physical_streamed_formal_input_candidate(**kwargs)
+    assert not kwargs["output_directory"].exists()
+
+
+def test_physical_capacity_resolver_is_absence_rebinding_and_registry_safe():
+    resolver = streaming_module._resolve_physical_capacity
+    missing_registry = {}
+    missing = _with_closure_value(resolver, "authority", None)
+    missing = _with_closure_value(missing, "module_registry", missing_registry)
+    missing = _with_closure_value(
+        missing, "system_module", types.SimpleNamespace(modules=missing_registry)
+    )
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("physical scoring capacity verifier is unavailable"),
+    ):
+        missing()
+
+    module_name = "research.analyst_revisions_v2_qc.physical_streaming_scoring"
+    operation_name = "require_physical_streaming_scoring_capacity"
+    module = types.SimpleNamespace()
+
+    def template(value):
+        return value
+
+    operation = types.FunctionType(template.__code__, {})
+    operation.__module__ = module_name
+    operation.__name__ = operation_name
+    setattr(module, operation_name, operation)
+    registry = {module_name: module}
+    sealed = _with_closure_value(resolver, "authority", None)
+    sealed = _with_closure_value(sealed, "module_registry", registry)
+    sealed = _with_closure_value(
+        sealed, "system_module", types.SimpleNamespace(modules=registry)
+    )
+    assert sealed() is operation
+
+    replacement = types.FunctionType(template.__code__, {})
+    replacement.__module__ = module_name
+    replacement.__name__ = operation_name
+    setattr(module, operation_name, replacement)
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("sealed physical scoring capacity verifier changed"),
+    ):
+        sealed()
+
+    false_registry = {module_name: module}
+    false_system = types.SimpleNamespace(modules={module_name: module})
+    false = _with_closure_value(resolver, "authority", None)
+    false = _with_closure_value(false, "module_registry", false_registry)
+    false = _with_closure_value(false, "system_module", false_system)
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("physical scoring capacity verifier changed before use"),
+    ):
+        false()
+
+
+def test_physical_capacity_refusal_and_preopen_identity_have_distinct_messages():
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("physical scoring capacity did not authenticate"),
+    ):
+        streaming_module._require_streaming_capacity(object())
+
+    assert streaming_module._streaming_preopen_identity(
+        types.SimpleNamespace(artifact_id="reviewed-preopen", artifact_sha256="1" * 64)
+    ) == ("reviewed-preopen", "1" * 64)
+    assert streaming_module._streaming_preopen_identity(
+        types.SimpleNamespace(capture_id="waived-preopen", capture_sha256="2" * 64)
+    ) == ("waived-preopen", "2" * 64)
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("streaming preopen parent identity changed"),
+    ):
+        streaming_module._streaming_preopen_identity(
+            types.SimpleNamespace(capture_id="waived-preopen", capture_sha256="bad")
+        )
+
+
+def _section72_physical_formal_context():
+    preopen = types.SimpleNamespace(
+        capture_id="arv2-section72-preopen-test",
+        capture_sha256="1" * 64,
+    )
+    evidence = types.SimpleNamespace(
+        receipt_id="arv2-section72-evidence-test",
+        receipt_sha256="2" * 64,
+    )
+    capacity = types.SimpleNamespace(
+        receipt_id="arv2-section72-capacity-test",
+        receipt_sha256="3" * 64,
+        preopen_acquisition_receipt=preopen,
+        production_evidence_receipt=evidence,
+        capacity_authority_mode=(
+            physical_scoring_module.SECTION72_PHYSICAL_CAPACITY_AUTHORITY_MODE
+        ),
+        independently_reviewed=False,
+        owner_review_waived=True,
+        historical_availability_claimed=False,
+        post_first_formal_backtest_independent_review_required=True,
+    )
+    accepted_record = {"fixture": "accepted-risk"}
+    accepted = types.SimpleNamespace(
+        pair=types.SimpleNamespace(
+            artifact_id="arv2-accepted-pair-test",
+            content_sha256="4" * 64,
+        ),
+        capture_id="arv2-capture-test",
+        capture_sha256="5" * 64,
+        current_source_included_count=7,
+        censored_source_included_count=7,
+        current_admitted_decision_count=6,
+        censored_admitted_decision_count=6,
+        to_record=lambda: accepted_record,
+    )
+    contract = types.SimpleNamespace(map_id="arv2-global-test", map_hash="6" * 64)
+    lineage_record = {
+        "schema": physical_scoring_module.PHYSICAL_SCORING_LINEAGE_SCHEMA,
+        "index_id": "arv2-index-test",
+        "index_sha256": "7" * 64,
+        "physical_production_evidence_receipt_id": evidence.receipt_id,
+        "physical_production_evidence_receipt_sha256": evidence.receipt_sha256,
+        "production_input_archive_id": "arv2-c2-test",
+        "production_input_archive_sha256": "8" * 64,
+        "accepted_risk_binding_sha256": sha256_bytes(
+            canonical_json_bytes(accepted_record)
+        ),
+        "terminal_archive_id": preopen.capture_id,
+        "terminal_archive_sha256": preopen.capture_sha256,
+        "preopen_acquisition_id": preopen.capture_id,
+        "preopen_acquisition_sha256": preopen.capture_sha256,
+        "capacity_receipt_id": capacity.receipt_id,
+        "capacity_receipt_sha256": capacity.receipt_sha256,
+        "global_map_id": contract.map_id,
+        "global_map_sha256": contract.map_hash,
+        "session_count": 10,
+        "current_row_count": accepted.current_admitted_decision_count,
+        "censored_row_count": accepted.censored_admitted_decision_count,
+        "review_mode": "section72_owner_waived",
+        "terminal_parent_kind": "section72_owner_waived_prereview_archive",
+        "capacity_authority_mode": capacity.capacity_authority_mode,
+        "independently_reviewed": False,
+        "owner_review_waived": True,
+        "historical_availability_claimed": False,
+        "post_first_formal_backtest_independent_review_required": True,
+    }
+    lineage = types.SimpleNamespace(to_record=lambda: dict(lineage_record))
+    context = types.SimpleNamespace(
+        accepted_risk_binding=accepted,
+        capacity=capacity,
+        preopen_acquisition_receipt=preopen,
+        global_contract=contract,
+        lineage=lineage,
+        next_fold_index=0,
+        active_fold=False,
+        finalized=False,
+    )
+    return context, accepted, capacity, contract, lineage_record
+
+
+def test_section72_physical_formal_context_is_truthful_and_cross_source_closed(
+    monkeypatch,
+):
+    context, accepted, capacity, contract, lineage_record = (
+        _section72_physical_formal_context()
+    )
+    monkeypatch.setattr(
+        streaming_module, "_require_streaming_capacity", lambda value: value
+    )
+    monkeypatch.setattr(
+        streaming_module,
+        "require_loaded_global_benchmark_contract",
+        lambda value: value,
+    )
+    projected = streaming_module._physical_formal_scoring_composer_context(
+        context, accepted_risk=accepted
+    )
+    assert projected.capacity is capacity
+    assert projected.preopen_acquisition_id == lineage_record[
+        "preopen_acquisition_id"
+    ]
+    assert projected.global_contract is contract
+
+    lineage_record["preopen_acquisition_sha256"] = "9" * 64
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("physical formal scoring context crossed its parent lineage"),
+    ):
+        streaming_module._physical_formal_scoring_composer_context(
+            context, accepted_risk=accepted
+        )
+
+
+def test_section72_physical_formal_context_normalizes_unprojectable_lineage(
+    monkeypatch,
+):
+    context, accepted, _capacity, _contract, _lineage_record = (
+        _section72_physical_formal_context()
+    )
+    context.lineage = types.SimpleNamespace(
+        to_record=lambda: (_ for _ in ()).throw(AttributeError("hostile"))
+    )
+    monkeypatch.setattr(
+        streaming_module, "_require_streaming_capacity", lambda value: value
+    )
+    with pytest.raises(
+        FormalStreamingInputError,
+        match=re.escape("physical formal scoring context did not authenticate"),
+    ):
+        streaming_module._physical_formal_scoring_composer_context(
+            context, accepted_risk=accepted
+        )
+
+
 def test_public_candidate_runs_all_folds_to_reopenable_physical_shards(
     tmp_path, monkeypatch
 ):
@@ -2321,14 +2681,14 @@ def test_public_candidate_runs_all_folds_to_reopenable_physical_shards(
     )
     offline_descriptors = tuple(
         types.SimpleNamespace(
-            object_store_key_suffix=f"offline/result-family-{ordinal:02d}.json.gz",
+            object_store_key_suffix=f"offline/result-family-{ordinal:02d}-json.gz",
             uncompressed_byte_count=len(f"family-{ordinal:02d}") + 1,
             compressed_byte_count=len(f"family-{ordinal:02d}"),
             to_record=(
                 lambda index=ordinal: {
                     "ordinal": index,
                     "object_store_key_suffix": (
-                        f"offline/result-family-{index:02d}.json.gz"
+                        f"offline/result-family-{index:02d}-json.gz"
                     ),
                 }
             ),

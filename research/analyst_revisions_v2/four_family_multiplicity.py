@@ -84,9 +84,10 @@ ANALYST_LANE_ID = "analyst-revisions-v2"
 ANALYST_FAMILY_ID = "arv2-rating-only-v2-qc-first"
 ANALYST_LOOK_ID = "arv2-look-etf-paper-prospective-001"
 
-SHARED_FAMILY_ALPHA = {"numerator": 1, "denominator": 20}
-PERMANENT_LANE_ALPHA = {"numerator": 1, "denominator": 80}
-SUPERSEDED_ANALYST_ALPHA = {"numerator": 1, "denominator": 60}
+SHARED_FAMILY_ALPHA = Fraction(1, 20)
+PERMANENT_LANE_ALPHA = Fraction(1, 80)
+SUPERSEDED_ANALYST_ALPHA = Fraction(1, 60)
+FIXED_LANE_COUNT = len(FIXED_LANE_IDS)
 
 SUPERSEDED_PARENT_PATHS = (
     "multiplicity_contract.three_lane_correction_factor",
@@ -182,6 +183,10 @@ def _binding(
     }
 
 
+def _rational_record(value: Fraction) -> dict[str, int]:
+    return {"numerator": value.numerator, "denominator": value.denominator}
+
+
 def _overlay_document() -> dict[str, Any]:
     raw: dict[str, Any] = {
         "schema": SCHEMA,
@@ -213,9 +218,13 @@ def _overlay_document() -> dict[str, Any]:
         },
         "shared_family_contract": {
             "fixed_lane_ids": list(FIXED_LANE_IDS),
-            "fixed_lane_count": 4,
-            "two_sided_family_wise_alpha": dict(SHARED_FAMILY_ALPHA),
-            "permanent_maximum_per_lane": dict(PERMANENT_LANE_ALPHA),
+            "fixed_lane_count": FIXED_LANE_COUNT,
+            "two_sided_family_wise_alpha": _rational_record(
+                SHARED_FAMILY_ALPHA
+            ),
+            "permanent_maximum_per_lane": _rational_record(
+                PERMANENT_LANE_ALPHA
+            ),
             "allocation": "fixed_equal_bonferroni_across_four_permanent_lane_slots",
             "lane_level_family_ids_look_budgets_and_evidence_epochs_remain_distinct": True,
             "slot_reallocation": {
@@ -229,7 +238,9 @@ def _overlay_document() -> dict[str, Any]:
         "analyst_lane_contract": {
             "assigned_lane_id": ANALYST_LANE_ID,
             "lane_family_id": ANALYST_FAMILY_ID,
-            "within_lane_confirmatory_alpha_ceiling": dict(PERMANENT_LANE_ALPHA),
+            "within_lane_confirmatory_alpha_ceiling": _rational_record(
+                PERMANENT_LANE_ALPHA
+            ),
             "permanent_look_ids": [ANALYST_LOOK_ID],
             "confirmatory_alpha_allocations": [
                 {
@@ -241,10 +252,12 @@ def _overlay_document() -> dict[str, Any]:
                         "deferred_exact_cell_and_estimand_required_before_"
                         "first_observation"
                     ),
-                    "two_sided_alpha": dict(PERMANENT_LANE_ALPHA),
+                    "two_sided_alpha": _rational_record(
+                        PERMANENT_LANE_ALPHA
+                    ),
                 }
             ],
-            "allocation_sum": dict(PERMANENT_LANE_ALPHA),
+            "allocation_sum": _rational_record(PERMANENT_LANE_ALPHA),
             "look_budget": 1,
             "current_look_state": "planned_unbound_supersession_only",
             "external_append_only_authority_required": True,
@@ -264,7 +277,9 @@ def _overlay_document() -> dict[str, Any]:
             "predecessor_plan_hash": QC_PLAN_HASH,
             "predecessor_policy": {
                 "lane_count": 3,
-                "analyst_prospective_alpha": dict(SUPERSEDED_ANALYST_ALPHA),
+                "analyst_prospective_alpha": _rational_record(
+                    SUPERSEDED_ANALYST_ALPHA
+                ),
                 "look_id": ANALYST_LOOK_ID,
                 "state_at_supersession": "planned_unbound_before_period_or_epoch_freeze",
                 "repository_recorded_accepted_observations": 0,
@@ -454,12 +469,12 @@ def _validate_arithmetic(raw: Mapping[str, Any]) -> None:
         raise FourFamilyMultiplicityError("fixed strategy lane inventory changed")
     if (
         type(shared["fixed_lane_count"]) is not int
-        or shared["fixed_lane_count"] != len(FIXED_LANE_IDS)
+        or shared["fixed_lane_count"] != FIXED_LANE_COUNT
     ):
         raise FourFamilyMultiplicityError("fixed strategy lane count changed")
-    if family_alpha != Fraction(1, 20) or lane_alpha != Fraction(1, 80):
+    if family_alpha != SHARED_FAMILY_ALPHA or lane_alpha != PERMANENT_LANE_ALPHA:
         raise FourFamilyMultiplicityError("four-family alpha constants changed")
-    if len(FIXED_LANE_IDS) * lane_alpha != family_alpha:
+    if FIXED_LANE_COUNT * lane_alpha != family_alpha:
         raise FourFamilyMultiplicityError("four-family alpha arithmetic does not close")
     # The lane may never define its own ceiling: it is the shared slot itself.
     # Without this, a lane contract could raise its ceiling above 1/80 while
@@ -510,7 +525,7 @@ def _validate_parent_state(plan: QcFirstStudyPlan) -> None:
             dict(multiplicity["prospective_permanent_look_alpha"]),
             "superseded Analyst alpha",
         )
-        != Fraction(1, 60)
+        != SUPERSEDED_ANALYST_ALPHA
         or multiplicity["correction"]
         != "bonferroni_three_lanes_for_one_prospective_lane_look"
         or tuple(multiplicity["prospective_permanent_look_ids"])
@@ -576,17 +591,17 @@ class FourFamilyMultiplicityOverlay:
     @property
     def shared_family_alpha(self) -> Fraction:
         require_loaded_four_family_multiplicity_overlay(self)
-        return Fraction(1, 20)
+        return SHARED_FAMILY_ALPHA
 
     @property
     def analyst_confirmatory_alpha_ceiling(self) -> Fraction:
         require_loaded_four_family_multiplicity_overlay(self)
-        return Fraction(1, 80)
+        return PERMANENT_LANE_ALPHA
 
     @property
     def analyst_prospective_look_alpha(self) -> Fraction:
         require_loaded_four_family_multiplicity_overlay(self)
-        return Fraction(1, 80)
+        return PERMANENT_LANE_ALPHA
 
     @property
     def grants_action_authority(self) -> bool:

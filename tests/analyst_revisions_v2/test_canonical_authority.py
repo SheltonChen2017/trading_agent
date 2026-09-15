@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from types import MappingProxyType
 
+import pytest
+
 from research.analyst_revisions_v2.canonical import (
+    CanonicalEvidenceError,
+    canonical_json_bytes,
     capture_frozen_container_authority,
     frozen_container_authority_is_current,
 )
@@ -116,3 +120,13 @@ def test_exact_captured_container_graph_remains_current():
     authority = capture_frozen_container_authority((root,))
 
     assert frozen_container_authority_is_current((root,), authority) is True
+
+
+def test_canonical_json_bytes_refuses_non_finite_floats():
+    """The encoder must refuse NaN and infinity, not emit non-JSON tokens."""
+
+    import math
+
+    for value in (math.nan, math.inf, -math.inf):
+        with pytest.raises(CanonicalEvidenceError, match="not canonically JSON serializable"):
+            canonical_json_bytes({"value": value})

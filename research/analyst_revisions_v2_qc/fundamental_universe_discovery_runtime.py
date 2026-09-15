@@ -1,12 +1,11 @@
 """Bounded LEAN runtime for ARV2 US Fundamentals universe discovery.
 
-Only ``History[Fundamentals]`` and private Object Store are used.  The runtime
-does not subscribe to securities, request prices, inspect results, touch a
+Only a dedicated US-fundamental ``Universe`` history request and private
+Object Store are used.  The universe selector admits no securities, so the
+runtime does not subscribe to security prices, inspect results, touch a
 portfolio, or place orders.  Success and refusal both produce a redacted
 terminal package whose payload contains hashes, counts, and safe reason IDs.
 """
-from __future__ import annotations
-
 import gzip
 import hashlib
 import io
@@ -14,7 +13,6 @@ import json
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
-from AlgorithmImports import Fundamentals
 from fundamental_universe_discovery_worker import build_collection_terminals
 
 
@@ -47,6 +45,21 @@ MIN_OBJECT_STORE_CAPACITY_BYTES = (
 MIN_OBJECT_STORE_FILE_CAPACITY = MAX_TERMINAL_SHARDS + 3
 NEW_YORK = ZoneInfo("America/New_York")
 
+_CAPACITY_SIZE_BUCKETS = (
+    (50 * 1024 * 1024, "size_lt_50mib"),
+    (2 * 1024 * 1024 * 1024, "size_50mib_to_lt_2gib"),
+    (5 * 1024 * 1024 * 1024, "size_2gib_to_lt_5gib"),
+    (10 * 1024 * 1024 * 1024, "size_5gib_to_lt_10gib"),
+    (50 * 1024 * 1024 * 1024, "size_10gib_to_lt_50gib"),
+)
+_CAPACITY_FILE_BUCKETS = (
+    (1_000, "files_lt_1000"),
+    (20_000, "files_1000_to_lt_20000"),
+    (50_000, "files_20000_to_lt_50000"),
+    (100_000, "files_50000_to_lt_100000"),
+    (500_000, "files_100000_to_lt_500000"),
+)
+
 
 def _canonical(value):
     return (
@@ -73,7 +86,7 @@ def _save_exact(algorithm, key, payload):
     _read_back_exact(algorithm, key, payload)
 
 
-def _require_object_store_capacity(algorithm):
+def _require_object_store_capacity(algorithm, plan):
     try:
         maximum_bytes = algorithm.object_store.max_size
         maximum_files = algorithm.object_store.max_files
@@ -82,10 +95,47 @@ def _require_object_store_capacity(algorithm):
     if (
         type(maximum_bytes) is not int
         or type(maximum_files) is not int
-        or maximum_bytes < MIN_OBJECT_STORE_CAPACITY_BYTES
-        or maximum_files < MIN_OBJECT_STORE_FILE_CAPACITY
     ):
-        raise ValueError("Object Store capacity is below the reviewed bound")
+        raise ValueError("Object Store capacity metadata has an invalid type")
+    planned_session_count = len(plan["decision_sessions"])
+    planned_minimum_bytes = min(
+        MIN_OBJECT_STORE_CAPACITY_BYTES,
+        planned_session_count * MAX_COMPRESSED_SHARD_BYTES
+        + 8 * 1024 * 1024
+        + 64 * 1024
+        + MAX_PLAN_BYTES,
+    )
+    planned_minimum_files = min(
+        MIN_OBJECT_STORE_FILE_CAPACITY,
+        planned_session_count + 3,
+    )
+    if (
+        maximum_bytes < planned_minimum_bytes
+        or maximum_files < planned_minimum_files
+    ):
+        size_bucket = next(
+            (
+                label
+                for ceiling, label in _CAPACITY_SIZE_BUCKETS
+                if maximum_bytes < ceiling
+            ),
+            "size_gte_50gib",
+        )
+        file_bucket = next(
+            (
+                label
+                for ceiling, label in _CAPACITY_FILE_BUCKETS
+                if maximum_files < ceiling
+            ),
+            "files_gte_500000",
+        )
+        raise ValueError(
+            "Object Store capacity is below the reviewed bound ["
+            + size_bucket
+            + "_"
+            + file_bucket
+            + "]"
+        )
 
 
 def _strict_plan(payload, constants):
@@ -134,8 +184,10 @@ def _strict_plan(payload, constants):
     return value
 
 
-def _collection_geometry(collection):
-    observed = collection.time
+def _collection_geometry(history_index):
+    if not isinstance(history_index, tuple) or len(history_index) != 2:
+        raise ValueError("Fundamentals history index is not (universe, time)")
+    observed = history_index[1]
     if not isinstance(observed, datetime):
         raise ValueError("Fundamentals collection time is not datetime")
     if observed.tzinfo is None or observed.utcoffset() is None:
@@ -171,13 +223,15 @@ def _persist_terminal_shard(
     ):
         raise ValueError("terminal shard capacity changed")
     digest = hashlib.sha256(payload).hexdigest()
+    # LEAN's Object Store path grammar permits one final alphanumeric
+    # extension; keep the format marker before that sole dot.
     key = (
         OUTPUT_PREFIX
         + "terminal-shards/"
         + constants["PLAN_SHA256"]
         + "/"
         + digest
-        + ".jsonl.gz"
+        + "-jsonl.gz"
     )
     _save_exact(algorithm, key, payload)
     descriptors.append(
@@ -219,14 +273,107 @@ def _success_package(manifest_key, manifest_payload, manifest):
     }
 
 
-def _persist_failure(algorithm, constants, phase):
+def _safe_refusal_id(error):
+    """Return a value-free diagnostic identity for one runtime refusal.
+
+    The digest lets the host compare a cloud refusal with the finite set of
+    reviewed constant guard messages without exporting a provider value, a
+    security identifier, or arbitrary exception text.  The exception class is
+    retained only when it is a bounded Python identifier.
+    """
+
+    kind = type(error).__name__
+    if (
+        type(kind) is not str
+        or not kind
+        or len(kind) > 64
+        or not kind.replace("_", "a").isalnum()
+    ):
+        kind = "Exception"
+    try:
+        message = str(error)
+    except Exception:
+        message = "unprintable"
+    capacity_prefix = "Object Store capacity is below the reviewed bound ["
+    if (
+        kind == "ValueError"
+        and message.startswith(capacity_prefix)
+        and message.endswith("]")
+    ):
+        bucket = message[len(capacity_prefix):-1]
+        size_labels = tuple(label for _ceiling, label in _CAPACITY_SIZE_BUCKETS) + (
+            "size_gte_50gib",
+        )
+        file_labels = tuple(label for _ceiling, label in _CAPACITY_FILE_BUCKETS) + (
+            "files_gte_500000",
+        )
+        if any(
+            bucket == size_label + "_" + file_label
+            for size_label in size_labels
+            for file_label in file_labels
+        ):
+            return "discovery_runtime_refused_capacity_" + bucket
+    coverage_prefix = "Fundamentals history coverage changed ["
+    if (
+        kind == "ValueError"
+        and message.startswith(coverage_prefix)
+        and message.endswith("]")
+    ):
+        bucket = message[len(coverage_prefix):-1]
+        if (
+            bucket
+            and len(bucket) <= 256
+            and all(
+                character == "_"
+                or (character.isascii() and character.islower())
+                or character.isdigit()
+                for character in bucket
+            )
+            and bucket.startswith("missing_")
+            and "_matched_" in bucket
+            and "_before_" in bucket
+            and "_after_" in bucket
+            and "_inside_" in bucket
+        ):
+            return "discovery_runtime_refused_history_coverage_" + bucket
+    location = "unknown"
+    try:
+        traceback = error.__traceback__
+        while traceback is not None and traceback.tb_next is not None:
+            traceback = traceback.tb_next
+        if traceback is not None:
+            function = traceback.tb_frame.f_code.co_name
+            line = traceback.tb_lineno
+            if (
+                type(function) is str
+                and function
+                and len(function) <= 64
+                and function.replace("_", "a").isalnum()
+                and type(line) is int
+                and 1 <= line <= 100_000
+            ):
+                location = function + "_line_" + str(line)
+    except Exception:
+        pass
+    digest = hashlib.sha256(message.encode("utf-8", errors="replace")).hexdigest()
+    return (
+        "discovery_runtime_refused_"
+        + kind
+        + "_at_"
+        + location
+        + "_"
+        + digest[:16]
+    )
+
+
+def _persist_failure(algorithm, constants, safe_reason):
     failure = {
         "schema": FAILURE_SCHEMA,
         "contract_sha256": CONTRACT_SHA256,
         "status": "named_refusal",
         "plan_id": constants["PLAN_ID"],
         "plan_sha256": constants["PLAN_SHA256"],
-        "safe_reason": "discovery_runtime_refused_at_" + phase,
+        "safe_reason": safe_reason,
         "outcome_access_performed": False,
         "price_or_return_access_performed": False,
         "orders_or_portfolio_actions_performed": False,
@@ -248,18 +395,6 @@ def _persist_failure(algorithm, constants, phase):
     }
     package_bytes = _canonical(package)
     _save_exact(algorithm, constants["TERMINAL_PACKAGE_KEY"], package_bytes)
-    algorithm.set_summary_statistic(
-        constants["SUMMARY_NAME"],
-        json.dumps(
-            {
-                "status": "named_refusal",
-                "package_sha256": hashlib.sha256(package_bytes).hexdigest(),
-                "package_byte_count": len(package_bytes),
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-        ),
-    )
 
 
 def _run(algorithm, constants):
@@ -267,7 +402,7 @@ def _run(algorithm, constants):
         algorithm.object_store.read_bytes(constants["PLAN_OBJECT_STORE_KEY"])
     )
     plan = _strict_plan(plan_payload, constants)
-    _require_object_store_capacity(algorithm)
+    _require_object_store_capacity(algorithm, plan)
     chunks = plan["history_chunks"]
     if not chunks or len(chunks) > MAX_HISTORY_CALLS:
         raise ValueError("history call count exceeds reviewed bound")
@@ -281,36 +416,88 @@ def _run(algorithm, constants):
 
     for chunk in chunks:
         requested_sequence = list(chunk["decision_sessions"])
-        requested_sessions = set(requested_sequence)
         start = datetime.fromisoformat(chunk["request_start"])
         end = datetime.fromisoformat(chunk["request_end_exclusive"])
-        history = algorithm.history[Fundamentals](start, end)
+        history = algorithm.history(
+            algorithm._arv2_fundamental_universe,
+            start,
+            end,
+            flatten=False,
+        )
         pending_raw = b""
         pending_payload = b""
         pending_first = None
         pending_last = None
         pending_rows = 0
-        requested_index = 0
         collection_count = 0
-        for collection in history:
+        available_collections = {}
+        observed_chunk_sessions = []
+        try:
+            history_items = history.items()
+        except AttributeError as exc:
+            raise ValueError("Fundamentals history is not an item series") from exc
+        for history_index, collection_members in history_items:
             collection_count += 1
             if collection_count > MAX_COLLECTIONS_PER_HISTORY_CALL:
                 raise ValueError("one history call returned too many collections")
-            session, collection_time = _collection_geometry(collection)
-            if session not in requested_sessions:
+            session, collection_time = _collection_geometry(history_index)
+            observed_chunk_sessions.append(session)
+            if session > requested_sequence[-1]:
                 continue
-            if (
-                requested_index >= len(requested_sequence)
-                or session != requested_sequence[requested_index]
-            ):
-                raise ValueError(
-                    "requested Fundamentals collections are not in session order"
-                )
-            requested_index += 1
-            if session in observed_sessions:
-                raise ValueError("history repeated a requested decision session")
+            if session in available_collections:
+                raise ValueError("history repeated a Fundamentals collection date")
+            available_collections[session] = (
+                collection_time,
+                list(collection_members),
+            )
+
+        selected_collections = {}
+        for session in requested_sequence:
+            candidates = [
+                collection_session
+                for collection_session in available_collections
+                if collection_session <= session
+            ]
+            if candidates:
+                selected_collections[session] = available_collections[max(candidates)]
+        if len(selected_collections) != len(requested_sequence):
+            missing = [
+                str(index)
+                for index, session in enumerate(requested_sequence)
+                if session not in selected_collections
+            ]
+            first_requested = requested_sequence[0]
+            last_requested = requested_sequence[-1]
+            matched = len(selected_collections)
+            before = sum(
+                session < first_requested for session in observed_chunk_sessions
+            )
+            after = sum(
+                session > last_requested for session in observed_chunk_sessions
+            )
+            inside = collection_count - matched - before - after
+            raise ValueError(
+                "Fundamentals history coverage changed [missing_"
+                + "_".join(missing)
+                + "_matched_"
+                + str(matched)
+                + "_before_"
+                + str(before)
+                + "_after_"
+                + str(after)
+                + "_inside_"
+                + str(inside)
+                + "]"
+            )
+
+        # Consume the exact requested sessions in the already-authenticated
+        # plan order.  A reused collection is necessarily the latest snapshot
+        # already available no later than that session; no future collection
+        # can enter the selection.
+        for session in requested_sequence:
+            collection_time, collection_members = selected_collections[session]
             geometry = sessions[session]
-            members = list(collection.data)
+            members = list(collection_members)
             if not members:
                 raise ValueError("requested Fundamentals collection is empty")
             if len(members) > MAX_COLLECTION_ROWS:
@@ -366,8 +553,6 @@ def _run(algorithm, constants):
                 raise ValueError("total compressed output cap exceeded")
             session_censuses.append(census)
             observed_sessions.add(session)
-        if requested_index != len(requested_sequence):
-            raise ValueError("history omitted a requested decision session")
         total_compressed_bytes += _persist_terminal_shard(
             algorithm, constants, descriptors, pending_raw, pending_payload,
             pending_first, pending_last,
@@ -488,18 +673,15 @@ def _run(algorithm, constants):
     package = _success_package(manifest_key, manifest_payload, manifest)
     package_payload = _canonical(package)
     _save_exact(algorithm, constants["TERMINAL_PACKAGE_KEY"], package_payload)
-    algorithm.set_summary_statistic(
-        constants["SUMMARY_NAME"],
-        json.dumps(
-            {
-                "status": "completed",
-                "package_sha256": hashlib.sha256(package_payload).hexdigest(),
-                "package_byte_count": len(package_payload),
-                "terminal_count": counts["terminal_count"],
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-        ),
+    algorithm._arv2_fundamental_discovery_summary = json.dumps(
+        {
+            "status": "completed",
+            "package_sha256": hashlib.sha256(package_payload).hexdigest(),
+            "package_byte_count": len(package_payload),
+            "terminal_count": counts["terminal_count"],
+        },
+        sort_keys=True,
+        separators=(",", ":"),
     )
     return manifest
 
@@ -507,18 +689,20 @@ def _run(algorithm, constants):
 def execute_fundamental_universe_discovery(algorithm, constants):
     """Execute once, persisting either a complete manifest or safe refusal."""
 
-    phase = "bounded_discovery"
     try:
         manifest = _run(algorithm, constants)
         algorithm._arv2_fundamental_discovery_completed = True
         return manifest
-    except Exception:
+    except Exception as error:
         algorithm._arv2_fundamental_discovery_completed = False
+        safe_reason = _safe_refusal_id(error)
         try:
-            _persist_failure(algorithm, constants, phase)
+            _persist_failure(algorithm, constants, safe_reason)
         except Exception:
             pass
-        raise RuntimeError("ARV2 fundamental-universe discovery refused") from None
+        raise RuntimeError(
+            "ARV2 fundamental-universe discovery refused [" + safe_reason + "]"
+        ) from None
 
 
 __all__ = ["execute_fundamental_universe_discovery"]

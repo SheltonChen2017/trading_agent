@@ -2,13 +2,19 @@ from __future__ import annotations
 
 import ast
 import base64
+import builtins
+import dataclasses
+import dis
 import hashlib
+import json
 import os
 import shutil
+import signal
 import stat
 import subprocess
+import tempfile
 from pathlib import Path
-from types import FunctionType, MappingProxyType
+from types import CodeType, FunctionType, MappingProxyType, SimpleNamespace
 
 import pytest
 
@@ -16,6 +22,19 @@ from research.analyst_revisions_v2_qc import owner_signature_authority as author
 
 
 SSH_KEYGEN = Path("/usr/bin/ssh-keygen")
+POSIX_RUNNER_AVAILABLE = all(
+    hasattr(os, name)
+    for name in (
+        "getuid", "kill", "pipe", "posix_spawn", "waitpid",
+        "waitstatus_to_exitcode", "POSIX_SPAWN_OPEN", "POSIX_SPAWN_DUP2",
+        "WNOHANG",
+    )
+) and hasattr(signal, "SIGKILL")
+POSIX_ONLY = pytest.mark.skipif(
+    not POSIX_RUNNER_AVAILABLE,
+    reason="owner-signature process boundary is POSIX-only",
+)
+OWNER_UID_FOR_TEST = getattr(os, "getuid", lambda: 501)() or 501
 
 
 def _private_file(path: Path, payload: bytes) -> Path:
@@ -123,7 +142,7 @@ def _verify_fixture_signature(
         allowed_signers=allowed._content,
         signature=signature._content,
         namespace=namespace,
-        verifier=verifier,
+        verifier_path=verifier[0],
     )
     allowed_after = _read_private_file(
         allowed_signers_path,
@@ -149,18 +168,18 @@ def _verify_fixture_signature(
         "authority_payload_sha256": hashlib.sha256(authority_payload).hexdigest(),
         "allowed_signers_path": allowed.path,
         "signature_path": signature.path,
-        "verifier_path": verifier.path,
+        "verifier_path": verifier[0],
     }
 
 
-def test_production_registry_keeps_power_calibration_purpose_unpinned():
+def test_production_registry_pins_every_owner_authorized_preformal_purpose():
     assert len(authority._REVIEWED_OWNER_PUBLIC_KEYS) == 1
     pin = authority._REVIEWED_OWNER_PUBLIC_KEYS[0]
     blob, allowed = authority._validate_reviewed_pin(pin)
 
-    assert pin.key_id == "arv2-owner-ed25519-21d1ae9d964ec350"
+    assert pin.key_id == "arv2-owner-ed25519-4ba35c490d6bd18d"
     assert hashlib.sha256(blob).hexdigest() == (
-        "21d1ae9d964ec3503e483135254bfff4e25781de75fbad4413f0d0b71211f77e"
+        "4ba35c490d6bd18d790642ebd401d6c6832822d3c3f607d978ab0a046353f27e"
     )
     assert pin.purposes == (
         authority.FORMAL_EXECUTION_PURPOSE,
@@ -168,11 +187,11 @@ def test_production_registry_keeps_power_calibration_purpose_unpinned():
         authority.PREOPEN_EXECUTION_PURPOSE,
         authority.PREOPEN_ACQUISITION_REVIEW_PURPOSE,
         authority.PRODUCTION_EVIDENCE_REVIEW_PURPOSE,
+        authority.POWER_CALIBRATION_EXECUTION_PURPOSE,
     )
-    assert authority.POWER_CALIBRATION_EXECUTION_PURPOSE not in pin.purposes
     assert allowed == (
         b"arv2-owner ssh-ed25519 "
-        b"AAAAC3NzaC1lZDI1NTE5AAAAIA2kYwmz2Tc/F2tfAqo7xQlM/doV0nI1viXyOvUkcsQE\n"
+        b"AAAAC3NzaC1lZDI1NTE5AAAAIMscSpkCpc6Wb6zXpZjYm7CIXgtH7H0cq4Yryfcvacji\n"
     )
 
 
@@ -263,9 +282,9 @@ def test_production_registry_rejects_an_unreviewed_key_supplied_by_caller(
             "preopen_qc_execution": 1,
             "preopen_control_acquisition_review": 1,
             "production_evidence_review": 1,
-            "power_calibration_qc_execution": 0,
+                "power_calibration_qc_execution": 1,
         },
-        "all_positive_paths_enabled": False,
+        "all_positive_paths_enabled": True,
         "production_signing_implemented": False,
         "private_key_access_implemented": False,
     }
@@ -310,7 +329,7 @@ def test_rebinding_pin_selector_and_crypto_runner_cannot_admit_attacker_key(
     assert verifier_calls == []
 
 
-def test_production_power_calibration_gate_refuses_before_crypto_verifier(
+def test_production_power_calibration_gate_refuses_unreviewed_fixture_key(
     tmp_path, signer, monkeypatch,
 ):
     private, public_key_base64 = signer
@@ -345,7 +364,7 @@ def test_production_power_calibration_gate_refuses_before_crypto_verifier(
     assert calls == []
     assert authority.reviewed_owner_signature_registry_status()[
         "gate_key_counts"
-    ][authority.POWER_CALIBRATION_EXECUTION_PURPOSE] == 0
+    ][authority.POWER_CALIBRATION_EXECUTION_PURPOSE] == 1
 
 
 def test_rebinding_registry_and_public_verifier_path_cannot_replace_or_redirect_gate(
@@ -379,7 +398,7 @@ def test_rebinding_registry_and_public_verifier_path_cannot_replace_or_redirect_
         signature_path=signature,
         reviewed_pins=(pin,),
     )
-    assert fixture_authority["verifier_path"] == Path("/usr/bin/ssh-keygen")
+    assert fixture_authority["verifier_path"] == "/usr/bin/ssh-keygen"
 
 
 def test_wrong_payload_namespace_or_key_never_authenticates(tmp_path, signer):
@@ -628,7 +647,7 @@ def test_verifier_command_is_fixed_clean_and_output_is_never_disclosed(
             allowed_signers=allowed.read_bytes(),
             signature=signature.read_bytes(),
             namespace=authority.PURPOSE_NAMESPACES[purpose],
-            verifier=verifier,
+            verifier_path=verifier[0],
             _run_process=fake_run,
         )
     message = str(failure.value)
@@ -657,13 +676,13 @@ def _forged_authority(tmp_path: Path, purpose: str, payload: bytes):
         "public_key_blob_sha256": "0" * 64,
         "authority_payload_sha256": hashlib.sha256(payload).hexdigest(),
         "authority_payload_byte_count": len(payload),
-        "allowed_signers_path": tmp_path / "missing.allowed_signers",
+        "allowed_signers_path": str(tmp_path / "missing.allowed_signers"),
         "allowed_signers_sha256": "0" * 64,
         "allowed_signers_byte_count": 1,
-        "signature_path": tmp_path / "missing.sig",
+        "signature_path": str(tmp_path / "missing.sig"),
         "signature_sha256": "0" * 64,
         "signature_byte_count": 1,
-        "verifier_path": SSH_KEYGEN,
+        "verifier_path": str(SSH_KEYGEN),
         "_authority_payload": payload,
         "_allowed_signers_snapshot": None,
         "_signature_snapshot": None,
@@ -772,7 +791,7 @@ def test_mutating_review_facing_pin_object_cannot_reseal_production_gate(
             "preopen_qc_execution": 1,
             "preopen_control_acquisition_review": 1,
             "production_evidence_review": 1,
-            "power_calibration_qc_execution": 0,
+                "power_calibration_qc_execution": 1,
         }
     finally:
         object.__setattr__(published_pin, "key_id", original[0])
@@ -789,6 +808,12 @@ def _reachable_closure_values(function):
         if id(current) in seen:
             continue
         seen.add(id(current))
+        defaults = current.__defaults__ or ()
+        kwdefaults = current.__kwdefaults__ or {}
+        for value in (*defaults, *kwdefaults.keys(), *kwdefaults.values()):
+            observed.append(value)
+            if type(value) is FunctionType:
+                pending.append(value)
         closure = current.__closure__ or ()
         for cell in closure:
             try:
@@ -799,6 +824,49 @@ def _reachable_closure_values(function):
             if type(value) is FunctionType:
                 pending.append(value)
     return tuple(observed)
+
+
+def _closure_cell(value):
+    return (lambda: value).__closure__[0]
+
+
+def _with_closure_values(function, **replacements):
+    names = function.__code__.co_freevars
+    unknown = set(replacements) - set(names)
+    assert unknown == set()
+    cells = tuple(
+        _closure_cell(replacements.get(name, cell.cell_contents))
+        for name, cell in zip(names, function.__closure__, strict=True)
+    )
+    clone = FunctionType(
+        function.__code__,
+        function.__globals__,
+        name=function.__name__,
+        argdefs=function.__defaults__,
+        closure=cells,
+    )
+    clone.__kwdefaults__ = function.__kwdefaults__
+    return clone
+
+
+def _production_signature_runner():
+    runners = tuple(
+        value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType
+        and value.__name__ == "run_signature_verifier"
+    )
+    assert len(runners) == 1
+    return runners[0]
+
+
+def _nested_code_objects(code):
+    yield code
+    for value in code.co_consts:
+        if type(value) is CodeType:
+            yield from _nested_code_objects(value)
 
 
 def test_production_signature_closures_capture_only_immutable_scalar_pin_state():
@@ -822,8 +890,327 @@ def test_production_signature_closures_capture_only_immutable_scalar_pin_state()
         assert not any(
             type(value) is authority._ReviewedOwnerPublicKey
             or isinstance(value, MappingProxyType)
+            or isinstance(value, Path)
             or type(value) in (dict, list, set)
             for value in reachable
+        )
+
+
+def test_production_gate_code_has_no_runtime_global_or_builtin_lookup():
+    public_gates = (
+        authority.load_formal_execution_owner_signature,
+        authority.require_formal_execution_owner_signature,
+        authority.load_formal_result_read_owner_signature,
+        authority.require_formal_result_read_owner_signature,
+        authority.load_preopen_execution_owner_signature,
+        authority.require_preopen_execution_owner_signature,
+        authority.load_preopen_acquisition_review_owner_signature,
+        authority.require_preopen_acquisition_review_owner_signature,
+        authority.load_production_evidence_review_owner_signature,
+        authority.require_production_evidence_review_owner_signature,
+        authority.load_power_calibration_execution_owner_signature,
+        authority.require_power_calibration_execution_owner_signature,
+        authority.reviewed_owner_signature_registry_status,
+    )
+    inspected = set()
+    for operation in public_gates:
+        reachable = (operation, *_reachable_closure_values(operation))
+        for candidate in reachable:
+            if (
+                type(candidate) is not FunctionType
+                or candidate.__module__ != authority.__name__
+                or id(candidate) in inspected
+            ):
+                continue
+            inspected.add(id(candidate))
+            for code in _nested_code_objects(candidate.__code__):
+                assert not any(
+                    instruction.opname
+                    in {"IMPORT_NAME", "LOAD_GLOBAL", "LOAD_NAME"}
+                    for instruction in dis.get_instructions(code)
+                ), (candidate.__qualname__, code.co_name)
+
+
+@POSIX_ONLY
+def test_production_verifier_captures_anonymous_pipe_process_boundary():
+    reachable = _reachable_closure_values(
+        authority.load_formal_execution_owner_signature
+    )
+
+    assert os.pipe in reachable
+    assert os.posix_spawn in reachable
+    assert tempfile.TemporaryDirectory not in reachable
+    assert dataclasses.fields not in reachable
+
+
+def test_sealed_json_string_encoder_matches_canonical_json_boundaries():
+    encoders = tuple(
+        value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType
+        and value.__name__ == "canonical_json_string"
+    )
+    assert len(encoders) == 1
+    samples = (
+        "",
+        'plain / quote " slash \\',
+        "\x00\b\t\n\f\r\x1f",
+        "~\x7f\x80\u2028\ud800\U0001f600",
+    )
+
+    for sample in samples:
+        assert encoders[0](sample) == json.dumps(sample, ensure_ascii=True)
+
+
+def test_production_fixture_loader_seals_identity_from_json_and_import_rebinding(
+    tmp_path,
+    signer,
+):
+    private, public_key_base64 = signer
+    purpose = authority.FORMAL_EXECUTION_PURPOSE
+    namespace = authority.PURPOSE_NAMESPACES[purpose]
+    payload = b'{"formal_execution":"sealed-identity"}\n'
+    allowed, signature = _signed_controls(
+        tmp_path,
+        private_key=private,
+        public_key_base64=public_key_base64,
+        payload=payload,
+        namespace=namespace,
+        stem="sealed-identity",
+    )
+    pin = _pin(public_key_base64, purpose)
+    reviewed_pin_records = (
+        (
+            pin.key_id,
+            pin.public_key_base64,
+            pin.purposes,
+            base64.b64decode(pin.public_key_base64, validate=True),
+        ),
+    )
+    loaders = tuple(
+        value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType
+        and value.__name__ == "load_with_reviewed_pins"
+    )
+    assert len(loaders) == 1
+    calls = []
+    original_dumps = json.dumps
+    original_import = builtins.__import__
+
+    def refuse_dependency(*args, **kwargs):
+        calls.append((args, kwargs))
+        raise AssertionError("production identity resolved an external encoder")
+
+    try:
+        json.dumps = refuse_dependency
+        builtins.__import__ = refuse_dependency
+        loaded = loaders[0](
+            purpose=purpose,
+            authority_payload=payload,
+            allowed_signers_path=allowed,
+            signature_path=signature,
+            reviewed_pin_records=reviewed_pin_records,
+        )
+    finally:
+        json.dumps = original_dumps
+        builtins.__import__ = original_import
+
+    identity = {
+        "schema": loaded.schema,
+        "authority_id": None,
+        "authority_sha256": None,
+        "purpose": loaded.purpose,
+        "namespace": loaded.namespace,
+        "principal": loaded.principal,
+        "reviewed_key_id": loaded.reviewed_key_id,
+        "public_key_blob_sha256": loaded.public_key_blob_sha256,
+        "authority_payload_sha256": loaded.authority_payload_sha256,
+        "authority_payload_byte_count": loaded.authority_payload_byte_count,
+        "allowed_signers_path": str(loaded.allowed_signers_path),
+        "allowed_signers_sha256": loaded.allowed_signers_sha256,
+        "allowed_signers_byte_count": loaded.allowed_signers_byte_count,
+        "signature_path": str(loaded.signature_path),
+        "signature_sha256": loaded.signature_sha256,
+        "signature_byte_count": loaded.signature_byte_count,
+        "verifier_path": str(loaded.verifier_path),
+    }
+    expected_digest = hashlib.sha256(
+        authority._canonical_identity_bytes(identity)
+    ).hexdigest()
+    assert calls == []
+    assert loaded.authority_sha256 == expected_digest
+    assert loaded.authority_id == (
+        "arv2-owner-signature-authority-" + expected_digest[:24]
+    )
+
+
+def test_production_authority_construction_and_reauthentication_seal_type_state(
+    tmp_path,
+    signer,
+):
+    private, public_key_base64 = signer
+    purpose = authority.FORMAL_EXECUTION_PURPOSE
+    payload = b'{"formal_execution":"sealed-authority-type"}\n'
+    allowed, signature = _signed_controls(
+        tmp_path,
+        private_key=private,
+        public_key_base64=public_key_base64,
+        payload=payload,
+        namespace=authority.PURPOSE_NAMESPACES[purpose],
+        stem="sealed-authority-type",
+    )
+    pin = _pin(public_key_base64, purpose)
+    reviewed_pin_records = (
+        (
+            pin.key_id,
+            pin.public_key_base64,
+            pin.purposes,
+            base64.b64decode(pin.public_key_base64, validate=True),
+        ),
+    )
+    loaders = tuple(
+        value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType
+        and value.__name__ == "load_with_reviewed_pins"
+    )
+    requirers = tuple(
+        value
+        for value in _reachable_closure_values(
+            authority.require_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType
+        and value.__name__ == "require_with_reviewed_pins"
+    )
+    assert len(loaders) == len(requirers) == 1
+    loader = loaders[0]
+    requirer = requirers[0]
+
+    path_type = type(Path())
+    path_new_was_local = "__new__" in path_type.__dict__
+    original_path_new = path_type.__dict__.get("__new__")
+    path_constructor_calls = []
+
+    def poisoned_path_new(*args, **kwargs):
+        path_constructor_calls.append((args, kwargs))
+        raise AssertionError("authenticated authority paths must remain scalars")
+
+    setattr(path_type, "__new__", poisoned_path_new)
+    try:
+        loaded = loader(
+            purpose=purpose,
+            authority_payload=payload,
+            allowed_signers_path=allowed,
+            signature_path=signature,
+            reviewed_pin_records=reviewed_pin_records,
+        )
+        assert type(loaded.allowed_signers_path) is str
+        assert loaded.allowed_signers_path == str(allowed)
+        assert type(loaded.signature_path) is str
+        assert loaded.signature_path == str(signature)
+        assert type(loaded.verifier_path) is str
+        assert loaded.verifier_path == "/usr/bin/ssh-keygen"
+        assert requirer(
+            loaded,
+            purpose=purpose,
+            authority_payload=payload,
+            reviewed_pin_records=reviewed_pin_records,
+        ) is loaded
+        assert path_constructor_calls == []
+    finally:
+        if path_new_was_local:
+            setattr(path_type, "__new__", original_path_new)
+        else:
+            delattr(path_type, "__new__")
+
+    authority_type = authority.OwnerSignatureAuthority
+    original_init = authority_type.__dict__["__init__"]
+    constructor_calls = []
+
+    def poisoned_authority_init(*args, **kwargs):
+        constructor_calls.append((args, kwargs))
+
+    setattr(authority_type, "__init__", poisoned_authority_init)
+    try:
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="owner signature authority type changed",
+        ):
+            loader(
+                purpose=purpose,
+                authority_payload=payload,
+                allowed_signers_path=allowed,
+                signature_path=signature,
+                reviewed_pin_records=reviewed_pin_records,
+            )
+        assert constructor_calls == []
+    finally:
+        setattr(authority_type, "__init__", original_init)
+
+    loaded = loader(
+        purpose=purpose,
+        authority_payload=payload,
+        allowed_signers_path=allowed,
+        signature_path=signature,
+        reviewed_pin_records=reviewed_pin_records,
+    )
+    authority_id_slot = authority_type.__dict__["authority_id"]
+    setattr(authority_type, "authority_id", "attacker-presentation")
+    try:
+        assert loaded.authority_id == "attacker-presentation"
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="exact owner signature authority is required",
+        ):
+            requirer(
+                loaded,
+                purpose=purpose,
+                authority_payload=payload,
+                reviewed_pin_records=reviewed_pin_records,
+            )
+    finally:
+        setattr(authority_type, "authority_id", authority_id_slot)
+
+    class SplitViewAuthorityId:
+        def __get__(self, instance, _owner):
+            if instance is None:
+                return authority_id_slot
+            return "attacker-split-presentation"
+
+    setattr(authority_type, "authority_id", SplitViewAuthorityId())
+    try:
+        assert authority_type.authority_id is authority_id_slot
+        assert loaded.authority_id == "attacker-split-presentation"
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="exact owner signature authority is required",
+        ):
+            requirer(
+                loaded,
+                purpose=purpose,
+                authority_payload=payload,
+                reviewed_pin_records=reviewed_pin_records,
+            )
+    finally:
+        setattr(authority_type, "authority_id", authority_id_slot)
+
+    authority_id_slot.__set__(loaded, "forged-underlying-identity")
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="owner signature authority changed",
+    ):
+        requirer(
+            loaded,
+            purpose=purpose,
+            authority_payload=payload,
+            reviewed_pin_records=reviewed_pin_records,
         )
 
 
@@ -917,8 +1304,8 @@ def test_reflected_namespace_and_captured_pin_mutation_cannot_reseal_any_gate(
                     signature_path=signature,
                 )
             forged = _forged_authority(tmp_path, purpose, payload)
-            object.__setattr__(forged, "allowed_signers_path", allowed)
-            object.__setattr__(forged, "signature_path", signature)
+            object.__setattr__(forged, "allowed_signers_path", str(allowed))
+            object.__setattr__(forged, "signature_path", str(signature))
             with pytest.raises(
                 authority.OwnerSignatureAuthorityError,
                 match="no unique independently",
@@ -933,7 +1320,7 @@ def test_reflected_namespace_and_captured_pin_mutation_cannot_reseal_any_gate(
             "preopen_qc_execution": 1,
             "preopen_control_acquisition_review": 1,
             "production_evidence_review": 1,
-            "power_calibration_qc_execution": 0,
+                "power_calibration_qc_execution": 1,
         }
 
         if hasattr(os, "fork"):
@@ -997,7 +1384,7 @@ def test_signature_namespaces_are_immutable_and_production_closure_pinned(
         "preopen_qc_execution": 1,
         "preopen_control_acquisition_review": 1,
         "production_evidence_review": 1,
-        "power_calibration_qc_execution": 0,
+            "power_calibration_qc_execution": 1,
     }
     loaded = _verify_fixture_signature(
         purpose=purpose,
@@ -1022,6 +1409,720 @@ def test_production_module_has_no_signing_or_private_key_surface():
         and node.value in {"sign", "-t", "ed25519", "-N"}
         for node in ast.walk(tree)
     )
-    assert "arv2-owner-ed25519-21d1ae9d964ec350" in source
-    assert "AAAAC3NzaC1lZDI1NTE5AAAAIA2kYwmz2Tc/F2tfAqo7xQlM/doV0nI1viXyOvUkcsQE" in source
+    assert "arv2-owner-ed25519-4ba35c490d6bd18d" in source
+    assert "AAAAC3NzaC1lZDI1NTE5AAAAIMscSpkCpc6Wb6zXpZjYm7CIXgtH7H0cq4Yryfcvacji" in source
     assert shutil.which("ssh-keygen") is not None
+
+
+def test_trusted_verifier_snapshot_refuses_a_user_owned_world_writable_executable(
+    tmp_path,
+):
+    """Exercise the combined invalid-ownership and writable-mode case."""
+
+    fake = tmp_path / "ssh-keygen"
+    fake.write_bytes(b"#!/bin/sh\nexit 0\n")
+    fake.chmod(0o777)
+
+    with pytest.raises(authority.OwnerSignatureAuthorityError) as excinfo:
+        authority._snapshot_verifier_path(str(fake))
+
+    assert "root-owned nonwritable executable" in str(excinfo.value)
+
+
+def test_trusted_verifier_snapshot_refuses_user_owned_nonwritable_executable(
+    tmp_path,
+):
+    fake = tmp_path / "ssh-keygen"
+    fake.write_bytes(b"#!/bin/sh\nexit 0\n")
+    fake.chmod(0o555)
+
+    with pytest.raises(authority.OwnerSignatureAuthorityError) as excinfo:
+        authority._snapshot_verifier_path(str(fake))
+
+    assert "root-owned nonwritable executable" in str(excinfo.value)
+
+
+def test_trusted_verifier_snapshot_refuses_root_owned_writable_metadata(
+    monkeypatch,
+):
+    observed = SimpleNamespace(
+        st_mode=stat.S_IFREG | 0o777,
+        st_uid=0,
+        st_nlink=1,
+        st_size=1,
+        st_dev=1,
+        st_ino=1,
+        st_mtime_ns=1,
+        st_ctime_ns=1,
+    )
+    monkeypatch.setattr(
+        authority,
+        "os",
+        SimpleNamespace(lstat=lambda _path: observed),
+    )
+
+    with pytest.raises(authority.OwnerSignatureAuthorityError) as excinfo:
+        authority._snapshot_verifier_path("/usr/bin/ssh-keygen")
+
+    assert "root-owned nonwritable executable" in str(excinfo.value)
+
+
+def test_trusted_verifier_snapshot_is_primitive_and_exact_path():
+    snapshot = authority._snapshot_trusted_verifier()
+
+    assert type(snapshot) is tuple
+    assert snapshot[0] == "/usr/bin/ssh-keygen"
+    assert all(type(value) in (str, int) for value in snapshot)
+
+
+def _unsigned_controls_for_reviewed_owner(root: Path) -> tuple[Path, Path]:
+    allowed = _private_file(
+        root / "unsigned.allowed_signers",
+        (
+            f"{authority.PRINCIPAL} ssh-ed25519 "
+            f"{authority._REVIEWED_OWNER_PUBLIC_KEYS[0].public_key_base64}\n"
+        ).encode("ascii"),
+    )
+    signature = _private_file(
+        root / "unsigned.sig",
+        (
+            b"-----BEGIN SSH SIGNATURE-----\n"
+            b"AAAA\n"
+            b"-----END SSH SIGNATURE-----\n"
+        ),
+    )
+    return allowed, signature
+
+
+def test_production_loader_ignores_mutated_verifier_path_defaults(tmp_path):
+    payload = b'{"formal_execution":"mutated-verifier-default"}\n'
+    allowed, signature = _unsigned_controls_for_reviewed_owner(tmp_path)
+    original_defaults = authority._snapshot_trusted_verifier.__defaults__
+    assert original_defaults is None
+
+    try:
+        authority._snapshot_trusted_verifier.__defaults__ = (
+            Path("/usr/bin/true"),
+            object(),
+        )
+        assert authority._snapshot_trusted_verifier()[0] == "/usr/bin/ssh-keygen"
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="detached owner signature verification failed",
+        ):
+            authority.load_formal_execution_owner_signature(
+                authority_payload=payload,
+                allowed_signers_path=allowed,
+                signature_path=signature,
+            )
+    finally:
+        authority._snapshot_trusted_verifier.__defaults__ = original_defaults
+
+
+def test_production_loader_ignores_mutated_public_verifier_path_storage(tmp_path):
+    payload = b'{"formal_execution":"mutated-public-path-storage"}\n'
+    allowed, signature = _unsigned_controls_for_reviewed_owner(tmp_path)
+    published_path = authority.TRUSTED_SSH_KEYGEN_PATH
+    original_raw_paths = list(published_path._raw_paths)
+
+    try:
+        published_path._raw_paths[:] = ["/usr/bin/true"]
+        assert published_path._raw_paths == ["/usr/bin/true"]
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="detached owner signature verification failed",
+        ):
+            authority.load_formal_execution_owner_signature(
+                authority_payload=payload,
+                allowed_signers_path=allowed,
+                signature_path=signature,
+            )
+    finally:
+        published_path._raw_paths[:] = original_raw_paths
+
+
+def test_production_loader_ignores_mutated_crypto_runner_defaults(tmp_path):
+    payload = b'{"formal_execution":"mutated-runner-default"}\n'
+    allowed, signature = _unsigned_controls_for_reviewed_owner(tmp_path)
+    original_kwdefaults = dict(authority._run_ssh_keygen_verify.__kwdefaults__)
+    calls = []
+
+    def false_success(*args, **kwargs):
+        calls.append((args, kwargs))
+        return subprocess.CompletedProcess(args=args, returncode=0)
+
+    try:
+        authority._run_ssh_keygen_verify.__kwdefaults__["_run_process"] = (
+            false_success
+        )
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="detached owner signature verification failed",
+        ):
+            authority.load_formal_execution_owner_signature(
+                authority_payload=payload,
+                allowed_signers_path=allowed,
+                signature_path=signature,
+            )
+        assert calls == []
+    finally:
+        authority._run_ssh_keygen_verify.__kwdefaults__.clear()
+        authority._run_ssh_keygen_verify.__kwdefaults__.update(original_kwdefaults)
+
+
+def test_production_loader_does_not_use_rebound_subprocess_popen(
+    tmp_path,
+    monkeypatch,
+):
+    payload = b'{"formal_execution":"rebound-popen"}\n'
+    allowed, signature = _unsigned_controls_for_reviewed_owner(tmp_path)
+    calls = []
+
+    def false_success(*args, **kwargs):
+        calls.append((args, kwargs))
+        raise AssertionError("production must not reach subprocess.Popen")
+
+    monkeypatch.setattr(subprocess, "Popen", false_success)
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="detached owner signature verification failed",
+    ):
+        authority.load_formal_execution_owner_signature(
+            authority_payload=payload,
+            allowed_signers_path=allowed,
+            signature_path=signature,
+        )
+    assert calls == []
+
+
+def test_production_loader_does_not_use_rebound_builtin_memoryview(
+    tmp_path,
+    monkeypatch,
+):
+    payload = b'{"formal_execution":"rebound-memoryview"}\n'
+    allowed, signature = _unsigned_controls_for_reviewed_owner(tmp_path)
+    calls = []
+
+    def substitute_payload(value):
+        calls.append(value)
+        raise AssertionError("production must retain the captured memoryview type")
+
+    monkeypatch.setattr(builtins, "memoryview", substitute_payload)
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="detached owner signature verification failed",
+    ):
+        authority.load_formal_execution_owner_signature(
+            authority_payload=payload,
+            allowed_signers_path=allowed,
+            signature_path=signature,
+        )
+    assert calls == []
+
+
+def test_production_loader_does_not_resolve_critical_builtins_at_runtime(
+    tmp_path,
+):
+    payload = b'{"formal_execution":"rebound-critical-builtins"}\n'
+    allowed, signature = _unsigned_controls_for_reviewed_owner(tmp_path)
+    names = (
+        "type",
+        "tuple",
+        "bytes",
+        "int",
+        "len",
+        "any",
+        "all",
+        "set",
+        "min",
+        "getattr",
+        "object",
+        "memoryview",
+        "AttributeError",
+        "UnicodeError",
+        "ValueError",
+    )
+    originals = {name: getattr(builtins, name) for name in names}
+    calls = []
+
+    def substitute_builtin(name):
+        def substitute(*args, **kwargs):
+            calls.append((name, args, kwargs))
+            raise AssertionError(
+                f"production resolved mutable builtin {name}"
+            )
+
+        return substitute
+
+    failure = None
+    try:
+        for name in names:
+            setattr(builtins, name, substitute_builtin(name))
+        try:
+            authority.load_formal_execution_owner_signature(
+                authority_payload=payload,
+                allowed_signers_path=allowed,
+                signature_path=signature,
+            )
+        except BaseException as exc:
+            failure = exc
+    finally:
+        for name, original in originals.items():
+            setattr(builtins, name, original)
+
+    assert type(failure) is authority.OwnerSignatureAuthorityError
+    assert "detached owner signature verification failed" in str(failure)
+    assert calls == []
+
+
+@POSIX_ONLY
+def test_production_loader_does_not_use_rebound_pipe_or_spawn(
+    tmp_path,
+    monkeypatch,
+):
+    payload = b'{"formal_execution":"rebound-pipe-spawn"}\n'
+    allowed, signature = _unsigned_controls_for_reviewed_owner(tmp_path)
+    calls = []
+
+    def substitute_boundary(*args, **kwargs):
+        calls.append((args, kwargs))
+        raise AssertionError("production must retain captured POSIX primitives")
+
+    monkeypatch.setattr(os, "pipe", substitute_boundary)
+    monkeypatch.setattr(os, "posix_spawn", substitute_boundary)
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="detached owner signature verification failed",
+    ):
+        authority.load_formal_execution_owner_signature(
+            authority_payload=payload,
+            allowed_signers_path=allowed,
+            signature_path=signature,
+        )
+    assert calls == []
+
+
+def test_raw_verifier_runner_refuses_an_alternate_root_executable(tmp_path):
+    payload = b'{"formal_execution":"alternate-root-executable"}\n'
+    allowed, signature = _unsigned_controls_for_reviewed_owner(tmp_path)
+    calls = []
+
+    def false_success(*args, **kwargs):
+        calls.append((args, kwargs))
+        return subprocess.CompletedProcess(args=args, returncode=0)
+
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="trusted ssh-keygen verifier path changed",
+    ):
+        authority._run_ssh_keygen_verify(
+            authority_payload=payload,
+            allowed_signers=allowed.read_bytes(),
+            signature=signature.read_bytes(),
+            namespace=authority.PURPOSE_NAMESPACES[
+                authority.FORMAL_EXECUTION_PURPOSE
+            ],
+            verifier_path="/usr/bin/true",
+            _run_process=false_success,
+        )
+    assert calls == []
+
+
+@POSIX_ONLY
+def test_production_posix_runner_pins_spawn_contract_and_never_kills_after_echild():
+    pipe_pairs = iter(((10, 11), (12, 13), (14, 15)))
+    spawn_calls = []
+    wait_calls = []
+    kill_calls = []
+
+    def fake_spawn(path, arguments, environment, **kwargs):
+        spawn_calls.append((path, arguments, environment, kwargs))
+        return 424242
+
+    def already_reaped(pid, options):
+        wait_calls.append((pid, options))
+        raise ChildProcessError("already reaped")
+
+    runner = _with_closure_values(
+        _production_signature_runner(),
+        pipe_file=lambda: next(pipe_pairs),
+        set_blocking=lambda *_args: None,
+        posix_spawn=fake_spawn,
+        write_file=lambda _descriptor, view: len(view),
+        close_file=lambda _descriptor: None,
+        waitpid=already_reaped,
+        kill=lambda *args: kill_calls.append(args),
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="detached owner signature verifier was unavailable",
+    ):
+        runner(b"payload", b"allowed", b"signature", "namespace")
+
+    assert spawn_calls == [
+        (
+            "/usr/bin/ssh-keygen",
+            (
+                "/usr/bin/ssh-keygen",
+                "-Y",
+                "verify",
+                "-f",
+                "/dev/fd/3",
+                "-I",
+                "arv2-owner",
+                "-n",
+                "namespace",
+                "-s",
+                "/dev/fd/4",
+            ),
+            {"PATH": "/usr/bin:/bin", "LANG": "C", "LC_ALL": "C"},
+            {
+                "file_actions": (
+                    (os.POSIX_SPAWN_DUP2, 10, 0),
+                    (os.POSIX_SPAWN_DUP2, 12, 3),
+                    (os.POSIX_SPAWN_DUP2, 14, 4),
+                    (os.POSIX_SPAWN_OPEN, 1, "/dev/null", os.O_WRONLY, 0),
+                    (os.POSIX_SPAWN_OPEN, 2, "/dev/null", os.O_WRONLY, 0),
+                )
+            },
+        )
+    ]
+    assert wait_calls == [(424242, os.WNOHANG)]
+    assert kill_calls == []
+
+
+@POSIX_ONLY
+def test_production_posix_runner_refuses_any_broken_input_stream():
+    pipe_pairs = iter(((10, 11), (12, 13), (14, 15)))
+    kill_calls = []
+
+    def write_with_broken_allowed(descriptor, view):
+        if descriptor == 13:
+            raise BrokenPipeError("closed")
+        return len(view)
+
+    runner = _with_closure_values(
+        _production_signature_runner(),
+        pipe_file=lambda: next(pipe_pairs),
+        set_blocking=lambda *_args: None,
+        posix_spawn=lambda *_args, **_kwargs: 424242,
+        write_file=write_with_broken_allowed,
+        close_file=lambda _descriptor: None,
+        waitpid=lambda _pid, _options: (424242, 0),
+        waitstatus_to_exitcode=lambda _status: 0,
+        kill=lambda *args: kill_calls.append(args),
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="detached owner signature verification failed",
+    ):
+        runner(b"payload", b"allowed", b"signature", "namespace")
+
+    assert kill_calls == []
+
+
+@POSIX_ONLY
+def test_production_posix_runner_timeout_is_wall_clock_not_idle_only():
+    pipe_pairs = iter(((10, 11), (12, 13), (14, 15)))
+    clock = iter((0.0, 1.0, 11.0))
+    kill_calls = []
+    wait_calls = []
+
+    def fake_wait(pid, options):
+        wait_calls.append((pid, options))
+        return (pid, 0) if options == 0 else (0, 0)
+
+    runner = _with_closure_values(
+        _production_signature_runner(),
+        pipe_file=lambda: next(pipe_pairs),
+        set_blocking=lambda *_args: None,
+        posix_spawn=lambda *_args, **_kwargs: 424242,
+        write_file=lambda _descriptor, _view: 1,
+        close_file=lambda _descriptor: None,
+        monotonic=lambda: next(clock),
+        sleep=lambda _seconds: None,
+        waitpid=fake_wait,
+        kill=lambda *args: kill_calls.append(args),
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="detached owner signature verifier timed out",
+    ):
+        runner(b"payload", b"allowed", b"signature", "namespace")
+
+    assert kill_calls == [(424242, int(signal.SIGKILL))]
+    assert wait_calls == [(424242, 0)]
+
+
+@POSIX_ONLY
+def test_production_posix_runner_accepts_a_valid_fixture_signature(
+    tmp_path,
+    signer,
+):
+    private, public_key_base64 = signer
+    purpose = authority.FORMAL_EXECUTION_PURPOSE
+    payload = b'{"formal_execution":"posix-runner-fixture"}\n'
+    allowed, signature = _signed_controls(
+        tmp_path,
+        private_key=private,
+        public_key_base64=public_key_base64,
+        payload=payload,
+        namespace=authority.PURPOSE_NAMESPACES[purpose],
+        stem="posix-runner",
+    )
+    runners = tuple(
+        value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType
+        and value.__name__ == "run_signature_verifier"
+    )
+    assert len(runners) == 1
+
+    runners[0](
+        payload,
+        allowed.read_bytes(),
+        signature.read_bytes(),
+        authority.PURPOSE_NAMESPACES[purpose],
+    )
+
+
+@POSIX_ONLY
+def test_production_posix_runner_streams_the_maximum_payload(
+    tmp_path,
+    signer,
+):
+    private, public_key_base64 = signer
+    purpose = authority.FORMAL_EXECUTION_PURPOSE
+    payload = b"x" * authority.MAX_AUTHORITY_PAYLOAD_BYTES
+    allowed, signature = _signed_controls(
+        tmp_path,
+        private_key=private,
+        public_key_base64=public_key_base64,
+        payload=payload,
+        namespace=authority.PURPOSE_NAMESPACES[purpose],
+        stem="maximum-payload",
+    )
+    runners = tuple(
+        value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType
+        and value.__name__ == "run_signature_verifier"
+    )
+    assert len(runners) == 1
+
+    runners[0](
+        payload,
+        allowed.read_bytes(),
+        signature.read_bytes(),
+        authority.PURPOSE_NAMESPACES[purpose],
+    )
+
+
+def _production_closure(name):
+    functions = {
+        id(value): value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType and value.__name__ == name
+    }
+    assert len(functions) == 1
+    return next(iter(functions.values()))
+
+
+def test_module_initialization_does_not_require_unix_only_attributes():
+    tree = ast.parse(Path(authority.__file__).read_text(encoding="utf-8"))
+    factory = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_make_reviewed_pin_operations"
+    )
+    direct_unix_lookups = {
+        (node.value.id, node.attr)
+        for node in ast.walk(factory)
+        if isinstance(node, ast.Attribute)
+        and isinstance(node.value, ast.Name)
+        and (node.value.id, node.attr)
+        in {("os", "getuid"), ("os", "kill"), ("signal", "SIGKILL")}
+    }
+    assert direct_unix_lookups == set()
+
+
+def test_sealed_operations_refuse_missing_posix_primitives_at_call_time():
+    read_control = _with_closure_values(
+        _production_closure("read_private_control"), getuid=None
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="trusted POSIX verifier process boundary is unavailable",
+    ):
+        read_control("/not-opened", 1, "fixture control")
+
+    runner = _with_closure_values(
+        _production_closure("run_signature_verifier"), sigkill=None
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="trusted POSIX verifier process boundary is unavailable",
+    ):
+        runner(b"payload", b"allowed", b"signature", "namespace")
+
+
+def _fake_verifier_lstat(
+    *,
+    verifier_uid=0,
+    verifier_mode=stat.S_IFREG | 0o755,
+    parent_uid=0,
+    parent_mode=stat.S_IFDIR | 0o755,
+):
+    def fake_lstat(path):
+        if path == "/usr/bin/ssh-keygen":
+            return SimpleNamespace(
+                st_mode=verifier_mode, st_uid=verifier_uid, st_nlink=1,
+                st_size=1, st_dev=1, st_ino=2, st_mtime_ns=3, st_ctime_ns=4,
+            )
+        return SimpleNamespace(
+            st_mode=parent_mode, st_uid=parent_uid, st_nlink=1, st_dev=1,
+            st_ino=5, st_mtime_ns=6, st_ctime_ns=7,
+        )
+
+    return fake_lstat
+
+
+def test_sealed_verifier_snapshot_refuses_untrusted_verifier_or_parent():
+    """The sealed snapshot, not the public helper, ties verification to a root binary."""
+
+    snapshot = _production_closure("snapshot_trusted_verifier")
+    accepted = _with_closure_values(snapshot, lstat=_fake_verifier_lstat())()
+    assert accepted[1][0] == "/usr/bin/ssh-keygen"
+
+    user_uid = OWNER_UID_FOR_TEST
+    for lstat in (
+        _fake_verifier_lstat(verifier_uid=user_uid),
+        _fake_verifier_lstat(verifier_mode=stat.S_IFREG | 0o777),
+        _fake_verifier_lstat(verifier_mode=stat.S_IFREG | 0o644),
+    ):
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="root-owned nonwritable executable",
+        ):
+            _with_closure_values(snapshot, lstat=lstat)()
+
+    for lstat in (
+        _fake_verifier_lstat(parent_mode=stat.S_IFDIR | 0o777),
+        _fake_verifier_lstat(parent_uid=user_uid),
+    ):
+        with pytest.raises(
+            authority.OwnerSignatureAuthorityError,
+            match="verifier parent is not root-controlled",
+        ):
+            _with_closure_values(snapshot, lstat=lstat)()
+
+
+def test_sealed_loader_refuses_untrusted_verifier_before_spawning(tmp_path, signer):
+    private, public_key_base64 = signer
+    purpose = authority.FORMAL_EXECUTION_PURPOSE
+    payload = b'{"formal_execution":"untrusted-verifier"}\n'
+    allowed, signature = _signed_controls(
+        tmp_path,
+        private_key=private,
+        public_key_base64=public_key_base64,
+        payload=payload,
+        namespace=authority.PURPOSE_NAMESPACES[purpose],
+        stem="untrusted-verifier",
+    )
+    pin = _pin(public_key_base64, purpose)
+    reviewed_pin_records = (
+        (
+            pin.key_id,
+            pin.public_key_base64,
+            pin.purposes,
+            base64.b64decode(pin.public_key_base64, validate=True),
+        ),
+    )
+    spawned = []
+
+    def refuse_spawn(*args, **kwargs):
+        spawned.append((args, kwargs))
+        raise AssertionError("an untrusted verifier must never be spawned")
+
+    untrusted_snapshot = _with_closure_values(
+        _production_closure("snapshot_trusted_verifier"),
+        lstat=_fake_verifier_lstat(verifier_uid=OWNER_UID_FOR_TEST),
+    )
+    loader = _with_closure_values(
+        _production_closure("load_with_reviewed_path_texts"),
+        snapshot_trusted_verifier=untrusted_snapshot,
+        run_signature_verifier=refuse_spawn,
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="root-owned nonwritable executable",
+    ):
+        loader(
+            purpose=purpose,
+            authority_payload=payload,
+            allowed_signers_path=str(allowed),
+            signature_path=str(signature),
+            reviewed_pin_records=reviewed_pin_records,
+        )
+    assert spawned == []
+
+
+def test_sealed_loader_refuses_a_verifier_that_changes_during_use(tmp_path, signer):
+    private, public_key_base64 = signer
+    purpose = authority.FORMAL_EXECUTION_PURPOSE
+    payload = b'{"formal_execution":"verifier-changed-during-use"}\n'
+    allowed, signature = _signed_controls(
+        tmp_path,
+        private_key=private,
+        public_key_base64=public_key_base64,
+        payload=payload,
+        namespace=authority.PURPOSE_NAMESPACES[purpose],
+        stem="verifier-changed",
+    )
+    pin = _pin(public_key_base64, purpose)
+    reviewed_pin_records = (
+        (
+            pin.key_id,
+            pin.public_key_base64,
+            pin.purposes,
+            base64.b64decode(pin.public_key_base64, validate=True),
+        ),
+    )
+    snapshots = iter((
+        _fake_verifier_lstat(),
+        _fake_verifier_lstat(verifier_mode=stat.S_IFREG | 0o555),
+    ))
+    sealed_snapshot = _production_closure("snapshot_trusted_verifier")
+
+    def changing_snapshot():
+        return _with_closure_values(sealed_snapshot, lstat=next(snapshots))()
+
+    verified = []
+    loader = _with_closure_values(
+        _production_closure("load_with_reviewed_path_texts"),
+        snapshot_trusted_verifier=changing_snapshot,
+        run_signature_verifier=lambda *args: verified.append(args),
+        require_trusted_verifier_unchanged=_with_closure_values(
+            _production_closure("require_trusted_verifier_unchanged"),
+            snapshot_trusted_verifier=changing_snapshot,
+        ),
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="trusted ssh-keygen verifier changed during use",
+    ):
+        loader(
+            purpose=purpose,
+            authority_payload=payload,
+            allowed_signers_path=str(allowed),
+            signature_path=str(signature),
+            reviewed_pin_records=reviewed_pin_records,
+        )
+    assert len(verified) == 1

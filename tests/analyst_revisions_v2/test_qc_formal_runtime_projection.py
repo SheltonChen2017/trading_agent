@@ -730,7 +730,7 @@ def test_generated_runtime_writes_reopens_and_only_then_publishes_root(
         suffix = (
             REPORT_FAMILY_OBJECT_KEY_SUFFIX_PREFIX
             + input_sha256
-            + f"/{ordinal:02d}-{compressed_sha256}.json.gz"
+            + f"/{ordinal:02d}-{compressed_sha256}-json.gz"
         )
         reference = {
             "schema": REPORT_FAMILY_OBJECT_REFERENCE_SCHEMA,

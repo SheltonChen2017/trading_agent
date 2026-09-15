@@ -339,6 +339,39 @@ def test_target_only_is_separate_and_pre_2013_is_quarantined(tmp_path):
     )
 
 
+def test_exact_empty_action_uses_existing_missing_and_target_only_terminals(
+    tmp_path,
+):
+    target_only = _rating_row(
+        "target-empty", action="", rating=None, previous_rating=None
+    )
+    target_only["price_target_action"] = "raises"
+    target_audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(tmp_path / "target-empty", [target_only])
+    )
+    assert len(target_audit.records) == 1
+    assert target_audit.records[0].action is RatingAction.TARGET_ONLY
+    assert not target_audit.refusals
+
+    no_target = _rating_row("no-target-empty", action="")
+    no_target_audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(tmp_path / "no-target-empty", [no_target])
+    )
+    assert not no_target_audit.records
+    assert no_target_audit.refusals[0].reason is (
+        RatingsIngestRefusalReason.MISSING_RATING_ACTION
+    )
+
+    whitespace = _rating_row("whitespace-action", action="   ")
+    whitespace_audit = audit_benzinga_snapshot(
+        _benzinga_snapshot(tmp_path / "whitespace-action", [whitespace])
+    )
+    assert not whitespace_audit.records
+    assert whitespace_audit.refusals[0].reason is (
+        RatingsIngestRefusalReason.INVALID_PROVIDER_FIELD
+    )
+
+
 def test_vocabulary_inventory_preserves_firm_ids_names_counts_and_labels(tmp_path):
     first = _rating_row("event-1")
     second = _rating_row(

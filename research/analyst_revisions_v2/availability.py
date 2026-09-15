@@ -108,6 +108,38 @@ def derive_event_availability(
         raise AvailabilityError(str(exc)) from exc
 
 
+def resolve_delayed_date_only_session_open(
+    *, public_date: str, session_lag: int
+) -> tuple[str, datetime]:
+    """Resolve a market-open cutoff after a caller-selected date-only lag.
+
+    Keeping these direct exchange-calendar facade calls inside the package's
+    availability boundary lets authority-bearing callers identity-pin this
+    helper instead of retaining those facade exports as first-class values.
+    """
+
+    # Resolve these two facade call targets inside the function so rebinding a
+    # module-level import cannot redirect an already identity-pinned wrapper.
+    # The lane firewall still permits each facade export only as a direct call
+    # target; it is never retained as first-class authority here.
+    from data.exchange_calendar import (
+        resolve_nth_session_after as _resolve_guidance_session_after,
+        session_open_instant as _guidance_session_open,
+    )
+
+    parsed_date = _canonical_date(public_date, "public_date")
+    if type(session_lag) is not int or session_lag < 1:
+        raise AvailabilityError("session_lag must be a positive exact integer")
+    try:
+        session = _resolve_guidance_session_after(
+            parsed_date.isoformat(), session_lag
+        )
+        market_open = _guidance_session_open(session).astimezone(timezone.utc)
+    except ExchangeCalendarError as exc:
+        raise AvailabilityError(str(exc)) from exc
+    return session, market_open
+
+
 def prove_timing_order(
     *,
     effective_at: str,

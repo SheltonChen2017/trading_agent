@@ -1,11 +1,14 @@
 """One-shot, outcome-free QC transport for Fundamentals discovery.
 
 Importing and building objects in this module performs no I/O other than
-explicit local review-pin/ledger/archive operations.  The production path
-accepts only the concrete :class:`FormalQcTransport`, authenticates the exact
-live host closure, requires both an owner-only independent-review claim and a
-detached owner signature for ``PREOPEN_EXECUTION``, spends a durable one-use
-permit, and then executes the exact project/upload/compile/run choreography.
+explicit local authorization-pin/ledger/archive operations.  The production
+path accepts only the concrete :class:`FormalQcTransport`, authenticates the
+exact live host closure, requires an owner-only claim that records the narrow
+section-72 review waiver truthfully plus a detached owner signature for
+``PREOPEN_EXECUTION``, spends a durable one-use permit, and then executes the
+exact project/upload/compile/run choreography.  The waiver does not represent
+an independent review and records the independent-review debt after the first
+formal backtest.
 
 Status inspection uses ``backtests/list`` with ``includeStatistics=False``.
 It never calls ``backtests/read`` or accesses results, statistics, charts,
@@ -76,18 +79,54 @@ class FundamentalDiscoverySubmissionLocked(RuntimeError):
         self.permit_id = permit_id
 
 
-PLAN_SCHEMA = "arv2-qc-fundamental-discovery-submission-plan-v1"
-REVIEW_CLAIM_SCHEMA = "arv2-qc-fundamental-discovery-review-claim-v1"
+class FundamentalDiscoveryDiagnosticPublicationAmbiguous(RuntimeError):
+    """A complete receipt was linked but directory durability is ambiguous."""
+
+
+class FundamentalDiscoveryArchiveRootPublicationAmbiguous(RuntimeError):
+    """The private archive root exists but parent durability is ambiguous."""
+
+
+PLAN_SCHEMA = "arv2-qc-fundamental-discovery-submission-plan-v3"
+REVIEW_CLAIM_SCHEMA = "arv2-qc-fundamental-discovery-review-claim-v4"
 PERMIT_SCHEMA = "arv2-qc-fundamental-discovery-one-use-permit-v1"
 LAUNCH_SCHEMA = "arv2-qc-fundamental-discovery-launch-receipt-v1"
 TERMINAL_STATUS_SCHEMA = "arv2-qc-fundamental-discovery-terminal-status-v1"
 REFUSAL_RECEIPT_SCHEMA = "arv2-qc-fundamental-discovery-refusal-receipt-v1"
-EXECUTION_AUTHORITY_SCHEMA = "arv2-qc-fundamental-discovery-execution-authority-v1"
+PROJECT_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA = (
+    "arv2-qc-projects-read-schema-diagnostic-receipt-v1"
+)
+FILES_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA = (
+    "arv2-qc-files-read-schema-diagnostic-receipt-v1"
+)
+BACKTEST_LIST_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA = (
+    "arv2-qc-backtests-list-schema-diagnostic-receipt-v1"
+)
+EXECUTION_AUTHORITY_SCHEMA = "arv2-qc-fundamental-discovery-execution-authority-v4"
 HOST_CLOSURE_SCHEMA = "arv2-qc-fundamental-discovery-host-closure-v1"
-REVIEW_CLAIM_FILENAME = "arv2-qc-fundamental-discovery-review-claim-v1.json"
+REVIEW_CLAIM_FILENAME = "arv2-qc-fundamental-discovery-review-claim-v4.json"
+OWNER_REVIEW_WAIVER_ID = "arv2-owner-review-waiver-section-72-v1"
+OWNER_REVIEW_WAIVER_SCOPE = "SECTION_72_THROUGH_FIRST_FORMAL_BACKTEST"
+OWNER_REVIEW_WAIVER_BASIS = "OWNER_EXPLICIT_REVIEW_WAIVER"
 PERMIT_FILENAME = "arv2-qc-fundamental-discovery-one-use-permit-v1.json"
 REFUSAL_FILENAME = "named-refusal.json"
+PROJECT_SCHEMA_DIAGNOSTIC_FILENAME = "projects-read-schema-diagnostic.json"
+FILES_SCHEMA_DIAGNOSTIC_FILENAME = "files-read-schema-diagnostic.json"
+BACKTEST_LIST_SCHEMA_DIAGNOSTIC_FILENAME = (
+    "backtests-list-schema-diagnostic.json"
+)
 MAX_CONTROL_BYTES = 1024 * 1024
+MAX_PROJECT_SCHEMA_DIAGNOSTIC_BYTES = 64 * 1024
+MAX_PROJECT_SCHEMA_DIAGNOSTIC_FIELDS = 64
+MAX_PROJECT_SCHEMA_DIAGNOSTIC_RECORDS = 1024
+MAX_PROJECT_SCHEMA_DIAGNOSTIC_UNIQUE_SHAPES = 4
+MAX_FILES_SCHEMA_DIAGNOSTIC_RECORDS = 1024
+MAX_FILES_SCHEMA_DIAGNOSTIC_UNIQUE_SHAPES = 4
+MAX_BACKTEST_LIST_SCHEMA_DIAGNOSTIC_RECORDS = 1024
+MAX_BACKTEST_LIST_SCHEMA_DIAGNOSTIC_UNIQUE_SHAPES = 4
+MAX_DISCOVERY_PROJECT_NAME_BYTES = 100
+QC_DEFAULT_RESEARCH_NOTEBOOK_PATH = "research.ipynb"
+MAX_DEFAULT_NOTEBOOK_DELETIONS = 1
 MAX_COMPILE_POLLS = 120
 MAX_STATUS_POLLS = 240
 COMPILE_POLL_SECONDS = 2
@@ -95,6 +134,9 @@ STATUS_POLL_SECONDS = 30
 _HEX = re.compile(r"[0-9a-f]{64}\Z")
 _SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/ -]{0,511}\Z")
 _SAFE_KEY = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,1023}\Z")
+_SAFE_DIAGNOSTIC_FIELD_NAME = re.compile(
+    r"[A-Za-z][A-Za-z0-9_.-]{0,63}\Z"
+)
 
 EXECUTION_ACTIONS = (
     "authenticate",
@@ -103,12 +145,14 @@ EXECUTION_ACTIONS = (
     "object/set_exact_content_addressed_discovery_plan",
     "object/properties_verify_exact_discovery_plan",
     "files/read_exact_inventory",
-    "files/create_exact_reviewed_projection",
+    "files/delete_exact_new_project_default_research_notebook_once",
+    "files/create_or_update_exact_reviewed_projection",
     "files/readback_exact_bytes",
     "compile/create_once",
     "compile/read_state_only_with_bounded_wait",
     "backtests/create_once",
     "backtests/list_identity_status_includeStatistics_false",
+    "write_bounded_backtests_list_schema_diagnostic_on_refusal",
     "object/read_exact_terminal_package_manifest_and_shards_once",
     "write_owner_only_content_addressed_local_archive",
 )
@@ -266,6 +310,446 @@ def _write_private_file(path: Path, payload: bytes, name: str) -> None:
         raise FundamentalDiscoverySubmissionError(f"{name} could not be created") from exc
 
 
+def _write_private_file_atomically(path: Path, payload: bytes, name: str) -> None:
+    """Publish one immutable owner-only file after all bytes are durable.
+
+    The hard-link publication is the POSIX no-replace primitive available on
+    every supported lane host.  A colliding final or staging name refuses; it
+    never overwrites an earlier diagnostic.
+    """
+
+    parent = _private_directory(path.parent, f"{name} parent")
+    if path.parent.resolve(strict=True) != parent:
+        raise FundamentalDiscoverySubmissionError(f"{name} parent changed")
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        pass
+    except OSError as exc:
+        raise FundamentalDiscoverySubmissionError(
+            f"{name} destination is unavailable"
+        ) from exc
+    else:
+        raise FundamentalDiscoverySubmissionError(f"{name} already exists")
+
+    staging = parent / ("." + path.name + ".staging")
+    _write_private_file(staging, payload, f"{name} staging")
+    try:
+        os.link(staging, path, follow_symlinks=False)
+    except OSError as exc:
+        raise FundamentalDiscoverySubmissionError(
+            f"{name} could not be published"
+        ) from exc
+
+    # From this point the final name refers to the already-fsynced complete
+    # inode.  Failure to fsync either directory transition is not a partial
+    # receipt, but its crash durability is unknown and must be named as such.
+    try:
+        directory_descriptor = os.open(
+            parent, os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
+        )
+        try:
+            os.fsync(directory_descriptor)
+        finally:
+            os.close(directory_descriptor)
+        os.unlink(staging)
+        directory_descriptor = os.open(
+            parent, os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
+        )
+        try:
+            os.fsync(directory_descriptor)
+        finally:
+            os.close(directory_descriptor)
+    except OSError as exc:
+        raise FundamentalDiscoveryDiagnosticPublicationAmbiguous(
+            f"{name} was linked completely but publication durability is ambiguous"
+        ) from exc
+
+    observed, _identity = _read_private_file(
+        path, name, MAX_PROJECT_SCHEMA_DIAGNOSTIC_BYTES
+    )
+    if observed != payload:
+        raise FundamentalDiscoverySubmissionError(f"{name} bytes changed")
+
+
+def _json_type_label(value: object) -> str:
+    if value is None:
+        return "null"
+    if type(value) is bool:
+        return "boolean"
+    if type(value) in (int, float):
+        return "number"
+    if type(value) is str:
+        return "string"
+    if type(value) is list:
+        return "array"
+    if type(value) is dict:
+        return "object"
+    raise FundamentalDiscoverySubmissionError(
+        "projects/read diagnostic observed a non-JSON value"
+    )
+
+
+def _diagnostic_field_inventory(value: object) -> dict[str, object]:
+    label = _json_type_label(value)
+    if type(value) is not dict:
+        return {"json_type": label, "fields": []}
+    if len(value) > MAX_PROJECT_SCHEMA_DIAGNOSTIC_FIELDS:
+        return {
+            "json_type": "object",
+            "fields": [
+                {
+                    "field_name": "__oversized_field_inventory_refused__",
+                    "json_type": "object",
+                }
+            ],
+        }
+    fields = []
+    for key, child in value.items():
+        child_label = _json_type_label(child)
+        if (
+            type(key) is str
+            and _SAFE_DIAGNOSTIC_FIELD_NAME.fullmatch(key) is not None
+        ):
+            field_name = key
+        else:
+            field_name = "__unsafe_field_name_redacted__"
+        fields.append({"field_name": field_name, "json_type": child_label})
+    fields.sort(key=lambda item: (item["field_name"], item["json_type"]))
+    return {"json_type": "object", "fields": fields}
+
+
+def _projects_read_schema_diagnostic_observation(
+    response: object,
+) -> dict[str, object]:
+    top_level = _diagnostic_field_inventory(response)
+    project_shapes = []
+    if type(response) is dict and type(response.get("projects")) is list:
+        projects = response["projects"]
+        if len(projects) > MAX_PROJECT_SCHEMA_DIAGNOSTIC_RECORDS:
+            project_shapes = [
+                {
+                    "json_type": "array",
+                    "fields": [
+                        {
+                            "field_name": (
+                                "__oversized_project_inventory_refused__"
+                            ),
+                            "json_type": "array",
+                        }
+                    ],
+                }
+            ]
+        else:
+            encoded_shapes = set()
+            for project in projects:
+                shape = _diagnostic_field_inventory(project)
+                encoded = _canonical(shape)
+                if encoded not in encoded_shapes:
+                    if (
+                        len(encoded_shapes)
+                        == MAX_PROJECT_SCHEMA_DIAGNOSTIC_UNIQUE_SHAPES
+                    ):
+                        project_shapes = [
+                            {
+                                "json_type": "object",
+                                "fields": [
+                                    {
+                                        "field_name": (
+                                            "__unique_shape_limit_refused__"
+                                        ),
+                                        "json_type": "object",
+                                    }
+                                ],
+                            }
+                        ]
+                        break
+                    encoded_shapes.add(encoded)
+                    project_shapes.append(shape)
+            else:
+                project_shapes.sort(key=_canonical)
+    return {
+        "top_level": top_level,
+        "project_record_shapes": project_shapes,
+    }
+
+
+def _project_record_schema_refused(value: object) -> bool:
+    return type(value) is not dict or not set(value).issubset(
+        formal._PROJECT_RECORD_KEYS
+    )
+
+
+def _persist_projects_read_schema_diagnostic(
+    *, plan, permit, phase: str, response: object,
+) -> Path:
+    if phase not in {"initial_inventory", "created_project_readback"}:
+        raise FundamentalDiscoverySubmissionError(
+            "projects/read diagnostic phase changed"
+        )
+    if (
+        type(permit) is not FundamentalDiscoverySubmissionPermit
+        or permit.plan_id != plan.plan_id
+        or permit.plan_sha256 != plan.plan_sha256
+    ):
+        raise FundamentalDiscoverySubmissionError(
+            "projects/read diagnostic permit changed"
+        )
+    observation = _projects_read_schema_diagnostic_observation(response)
+    record = {
+        "plan_id": plan.plan_id,
+        "plan_sha256": plan.plan_sha256,
+        "permit_id": permit.permit_id,
+        "permit_sha256": permit.permit_sha256,
+        "operation": "projects/read",
+        "phase": phase,
+        "refusal_type": "FormalQcSubmissionError",
+        "observation": observation,
+        "response_values_retained": False,
+        "project_names_or_content_retained": False,
+        "results_statistics_logs_orders_retained": False,
+    }
+    receipt_id, digest = _identified(
+        PROJECT_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA,
+        "arv2-qc-project-schema-diagnostic-",
+        record,
+    )
+    payload = _canonical(
+        {
+            "schema": PROJECT_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA,
+            "receipt_id": receipt_id,
+            "receipt_sha256": digest,
+            **record,
+        }
+    )
+    if len(payload) > MAX_PROJECT_SCHEMA_DIAGNOSTIC_BYTES:
+        raise FundamentalDiscoverySubmissionError(
+            "projects/read diagnostic receipt is oversized"
+        )
+    archive_root = _prepare_archive_root(plan)
+    _private_directory(archive_root, "projects/read diagnostic archive")
+    path = archive_root / PROJECT_SCHEMA_DIAGNOSTIC_FILENAME
+    _write_private_file_atomically(path, payload, "projects/read diagnostic")
+    return path
+
+
+def _files_read_schema_diagnostic_observation(
+    response: object,
+) -> dict[str, object]:
+    top_level = _diagnostic_field_inventory(response)
+    file_shapes = []
+    if type(response) is dict and type(response.get("files")) is list:
+        files = response["files"]
+        if len(files) > MAX_FILES_SCHEMA_DIAGNOSTIC_RECORDS:
+            file_shapes = [
+                {
+                    "json_type": "array",
+                    "fields": [
+                        {
+                            "field_name": (
+                                "__oversized_file_inventory_refused__"
+                            ),
+                            "json_type": "array",
+                        }
+                    ],
+                }
+            ]
+        else:
+            encoded_shapes = set()
+            for item in files:
+                shape = _diagnostic_field_inventory(item)
+                encoded = _canonical(shape)
+                if encoded not in encoded_shapes:
+                    if (
+                        len(encoded_shapes)
+                        == MAX_FILES_SCHEMA_DIAGNOSTIC_UNIQUE_SHAPES
+                    ):
+                        file_shapes = [
+                            {
+                                "json_type": "object",
+                                "fields": [
+                                    {
+                                        "field_name": (
+                                            "__unique_shape_limit_refused__"
+                                        ),
+                                        "json_type": "object",
+                                    }
+                                ],
+                            }
+                        ]
+                        break
+                    encoded_shapes.add(encoded)
+                    file_shapes.append(shape)
+            else:
+                file_shapes.sort(key=_canonical)
+    return {
+        "top_level": top_level,
+        "file_record_shapes": file_shapes,
+    }
+
+
+def _backtests_list_schema_diagnostic_observation(
+    response: object,
+) -> dict[str, object]:
+    top_level = _diagnostic_field_inventory(response)
+    backtest_shapes = []
+    if type(response) is dict and type(response.get("backtests")) is list:
+        backtests = response["backtests"]
+        if len(backtests) > MAX_BACKTEST_LIST_SCHEMA_DIAGNOSTIC_RECORDS:
+            backtest_shapes = [
+                {
+                    "json_type": "array",
+                    "fields": [
+                        {
+                            "field_name": (
+                                "__oversized_backtest_inventory_refused__"
+                            ),
+                            "json_type": "array",
+                        }
+                    ],
+                }
+            ]
+        else:
+            encoded_shapes = set()
+            for item in backtests:
+                shape = _diagnostic_field_inventory(item)
+                encoded = _canonical(shape)
+                if encoded not in encoded_shapes:
+                    if (
+                        len(encoded_shapes)
+                        == MAX_BACKTEST_LIST_SCHEMA_DIAGNOSTIC_UNIQUE_SHAPES
+                    ):
+                        backtest_shapes = [
+                            {
+                                "json_type": "object",
+                                "fields": [
+                                    {
+                                        "field_name": (
+                                            "__unique_shape_limit_refused__"
+                                        ),
+                                        "json_type": "object",
+                                    }
+                                ],
+                            }
+                        ]
+                        break
+                    encoded_shapes.add(encoded)
+                    backtest_shapes.append(shape)
+            else:
+                backtest_shapes.sort(key=_canonical)
+    return {
+        "top_level": top_level,
+        "backtest_record_shapes": backtest_shapes,
+    }
+
+
+def _persist_files_read_schema_diagnostic(
+    *, plan, permit, phase: str, response: object,
+) -> Path:
+    if phase not in {"initial_source_inventory", "source_readback"}:
+        raise FundamentalDiscoverySubmissionError(
+            "files/read diagnostic phase changed"
+        )
+    if (
+        type(permit) is not FundamentalDiscoverySubmissionPermit
+        or permit.plan_id != plan.plan_id
+        or permit.plan_sha256 != plan.plan_sha256
+    ):
+        raise FundamentalDiscoverySubmissionError(
+            "files/read diagnostic permit changed"
+        )
+    record = {
+        "plan_id": plan.plan_id,
+        "plan_sha256": plan.plan_sha256,
+        "permit_id": permit.permit_id,
+        "permit_sha256": permit.permit_sha256,
+        "operation": "files/read",
+        "phase": phase,
+        "refusal_type": "FormalQcSubmissionError",
+        "observation": _files_read_schema_diagnostic_observation(response),
+        "response_values_retained": False,
+        "file_names_or_content_retained": False,
+        "source_or_project_values_retained": False,
+        "results_statistics_logs_orders_retained": False,
+    }
+    receipt_id, digest = _identified(
+        FILES_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA,
+        "arv2-qc-file-schema-diagnostic-",
+        record,
+    )
+    payload = _canonical(
+        {
+            "schema": FILES_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA,
+            "receipt_id": receipt_id,
+            "receipt_sha256": digest,
+            **record,
+        }
+    )
+    if len(payload) > MAX_PROJECT_SCHEMA_DIAGNOSTIC_BYTES:
+        raise FundamentalDiscoverySubmissionError(
+            "files/read diagnostic receipt is oversized"
+        )
+    archive_root = _prepare_archive_root(plan)
+    _private_directory(archive_root, "files/read diagnostic archive")
+    path = archive_root / FILES_SCHEMA_DIAGNOSTIC_FILENAME
+    _write_private_file_atomically(path, payload, "files/read diagnostic")
+    return path
+
+
+def _persist_backtests_list_schema_diagnostic(
+    *, plan, permit, launch, response: object, _require_launch_receipt,
+) -> Path:
+    _require_launch_receipt(launch, plan, permit)
+    if (
+        type(permit) is not FundamentalDiscoverySubmissionPermit
+        or type(launch) is not FundamentalDiscoveryLaunchReceipt
+        or permit.plan_id != plan.plan_id
+        or permit.plan_sha256 != plan.plan_sha256
+        or launch.permit_sha256 != permit.permit_sha256
+        or launch.plan_sha256 != plan.plan_sha256
+    ):
+        raise FundamentalDiscoverySubmissionError(
+            "backtests/list diagnostic authority changed"
+        )
+    record = {
+        "plan_id": plan.plan_id,
+        "plan_sha256": plan.plan_sha256,
+        "permit_id": permit.permit_id,
+        "permit_sha256": permit.permit_sha256,
+        "launch_receipt_id": launch.receipt_id,
+        "launch_receipt_sha256": launch.receipt_sha256,
+        "operation": "backtests/list",
+        "phase": "terminal_status_poll",
+        "refusal_type": "FormalQcSubmissionError",
+        "observation": _backtests_list_schema_diagnostic_observation(response),
+        "response_values_retained": False,
+        "backtest_names_or_identifiers_retained": False,
+        "results_statistics_logs_orders_retained": False,
+    }
+    receipt_id, digest = _identified(
+        BACKTEST_LIST_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA,
+        "arv2-qc-backtest-list-schema-diagnostic-",
+        record,
+    )
+    payload = _canonical(
+        {
+            "schema": BACKTEST_LIST_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA,
+            "receipt_id": receipt_id,
+            "receipt_sha256": digest,
+            **record,
+        }
+    )
+    if len(payload) > MAX_PROJECT_SCHEMA_DIAGNOSTIC_BYTES:
+        raise FundamentalDiscoverySubmissionError(
+            "backtests/list diagnostic receipt is oversized"
+        )
+    archive_root = _prepare_archive_root(plan)
+    _private_directory(archive_root, "backtests/list diagnostic archive")
+    path = archive_root / BACKTEST_LIST_SCHEMA_DIAGNOSTIC_FILENAME
+    _write_private_file_atomically(path, payload, "backtests/list diagnostic")
+    return path
+
+
 @dataclasses.dataclass(frozen=True, slots=True)
 class FundamentalDiscoveryHostSourceBinding:
     path: str
@@ -387,7 +871,11 @@ class FundamentalDiscoverySubmissionPlan:
     plan_sha256: str
     organization_id: str
     organization_id_sha256: str
+    attempt_ordinal: int
+    attempt_binding_sha256: str
     project_name: str
+    qc_default_research_notebook_path: str
+    maximum_default_notebook_deletions: int
     backtest_name: str
     projection_id: str
     projection_sha256: str
@@ -435,13 +923,22 @@ def _rebuild_projection(projection):
 def _plan_record(
     *, projection, organization_id_sha256: str, review_directory: Path,
     archive_root: Path, upload_entry: FundamentalDiscoveryUploadEntry,
+    attempt_ordinal: int, attempt_binding_sha256: str, project_name: str,
 ):
     return {
         "schema": PLAN_SCHEMA,
         "plan_id": None,
         "plan_sha256": None,
         "organization_id_sha256": organization_id_sha256,
-        "project_name": projection.project_name,
+        "attempt_ordinal": attempt_ordinal,
+        "attempt_binding_sha256": attempt_binding_sha256,
+        "project_name": project_name,
+        "qc_default_research_notebook_path": (
+            QC_DEFAULT_RESEARCH_NOTEBOOK_PATH
+        ),
+        "maximum_default_notebook_deletions": (
+            MAX_DEFAULT_NOTEBOOK_DELETIONS
+        ),
         "backtest_name": projection.backtest_name,
         "projection_id": projection.projection_id,
         "projection_sha256": projection.projection_sha256,
@@ -467,6 +964,7 @@ def _plan_record(
 def build_fundamental_discovery_submission_plan(
     *, projection: FundamentalUniverseDiscoveryQcProjection,
     organization_id: str, review_directory: Path, archive_root: Path,
+    attempt_ordinal: int,
 ) -> FundamentalDiscoverySubmissionPlan:
     projection = _rebuild_projection(projection)
     _safe_id(organization_id, "organization_id")
@@ -491,12 +989,44 @@ def build_fundamental_discovery_submission_plan(
         payload=payload,
     )
     organization_hash = hashlib.sha256(organization_id.encode("utf-8")).hexdigest()
+    if (
+        type(attempt_ordinal) is not int
+        or not 1 <= attempt_ordinal <= 999_999
+    ):
+        raise FundamentalDiscoverySubmissionError(
+            "discovery attempt ordinal changed"
+        )
+    attempt_binding_sha256 = hashlib.sha256(
+        _canonical(
+            {
+                "schema": "arv2-qc-fundamental-discovery-attempt-binding-v1",
+                "attempt_ordinal": attempt_ordinal,
+                "projection_id": projection.projection_id,
+                "projection_sha256": projection.projection_sha256,
+                "organization_id_sha256": organization_hash,
+                "review_directory": str(review_root),
+                "archive_root": str(archive_root.absolute()),
+            }
+        )
+    ).hexdigest()
+    project_name = _safe_id(
+        f"{projection.project_name}_A{attempt_ordinal:06d}_"
+        f"{attempt_binding_sha256[:32]}",
+        "attempt-specific discovery project name",
+    )
+    if len(project_name.encode("utf-8")) > MAX_DISCOVERY_PROJECT_NAME_BYTES:
+        raise FundamentalDiscoverySubmissionError(
+            "attempt-specific discovery project name is oversized"
+        )
     record = _plan_record(
         projection=projection,
         organization_id_sha256=organization_hash,
         review_directory=review_root,
         archive_root=archive_root.absolute(),
         upload_entry=upload,
+        attempt_ordinal=attempt_ordinal,
+        attempt_binding_sha256=attempt_binding_sha256,
+        project_name=project_name,
     )
     digest = hashlib.sha256(_canonical(record)).hexdigest()
     record["plan_id"] = "arv2-qc-fundamental-discovery-submission-" + digest[:24]
@@ -506,7 +1036,15 @@ def build_fundamental_discovery_submission_plan(
         plan_sha256=digest,
         organization_id=organization_id,
         organization_id_sha256=organization_hash,
-        project_name=projection.project_name,
+        attempt_ordinal=attempt_ordinal,
+        attempt_binding_sha256=attempt_binding_sha256,
+        project_name=project_name,
+        qc_default_research_notebook_path=(
+            QC_DEFAULT_RESEARCH_NOTEBOOK_PATH
+        ),
+        maximum_default_notebook_deletions=(
+            MAX_DEFAULT_NOTEBOOK_DELETIONS
+        ),
         backtest_name=projection.backtest_name,
         projection_id=projection.projection_id,
         projection_sha256=projection.projection_sha256,
@@ -535,6 +1073,7 @@ def require_fundamental_discovery_submission_plan(value):
         organization_id=value.organization_id,
         review_directory=value.review_directory,
         archive_root=value.archive_root,
+        attempt_ordinal=value.attempt_ordinal,
     )
     if rebuilt != value:
         raise FundamentalDiscoverySubmissionError("discovery submission plan changed")
@@ -549,13 +1088,26 @@ def _review_claim_document(plan):
         "claim_sha256": None,
         "plan_id": plan.plan_id,
         "plan_sha256": plan.plan_sha256,
+        "attempt_ordinal": plan.attempt_ordinal,
+        "attempt_binding_sha256": plan.attempt_binding_sha256,
+        "project_name": plan.project_name,
+        "qc_default_research_notebook_path": (
+            plan.qc_default_research_notebook_path
+        ),
+        "maximum_default_notebook_deletions": (
+            plan.maximum_default_notebook_deletions
+        ),
         "projection_id": plan.projection_id,
         "projection_sha256": plan.projection_sha256,
         "project_source_set_sha256": plan.project_source_set_sha256,
         "discovery_plan_artifact_sha256": plan.discovery_plan_artifact_sha256,
-        "review_disposition": "GO",
-        "independent_review_complete": True,
-        "private_review_pin": True,
+        "review_disposition": "NOT_PERFORMED_OWNER_WAIVED",
+        "independent_review_complete": False,
+        "authorization_basis": OWNER_REVIEW_WAIVER_BASIS,
+        "owner_review_waiver_id": OWNER_REVIEW_WAIVER_ID,
+        "owner_review_waiver_scope": OWNER_REVIEW_WAIVER_SCOPE,
+        "post_first_formal_backtest_independent_review_required": True,
+        "private_authorization_pin": True,
         "maximum_backtest_submissions": 1,
         "full_pit_universe_claim_scoped_to_qc_source": True,
         "production_preopen_input_available": False,
@@ -569,7 +1121,12 @@ def _review_claim_document(plan):
 
 
 def render_fundamental_discovery_review_claim_candidate(plan) -> bytes:
-    """Render bytes an independent reviewer must place in the private pin file."""
+    """Render the exact private pin for the owner's bounded review waiver.
+
+    These bytes expressly do not claim that independent review is complete.
+    Execution still requires the owner's detached signature over an authority
+    payload that repeats and binds this waiver state.
+    """
 
     return _canonical(_review_claim_document(plan))
 
@@ -580,6 +1137,12 @@ class FundamentalDiscoveryReviewClaim:
     claim_sha256: str
     plan_id: str
     plan_sha256: str
+    review_disposition: str
+    independent_review_complete: bool
+    authorization_basis: str
+    owner_review_waiver_id: str
+    owner_review_waiver_scope: str
+    post_first_formal_backtest_independent_review_required: bool
     pin_path: Path
     pin_content_sha256: str
     pin_byte_count: int
@@ -600,6 +1163,14 @@ def load_fundamental_discovery_review_claim(plan):
         claim_sha256=record["claim_sha256"],
         plan_id=plan.plan_id,
         plan_sha256=plan.plan_sha256,
+        review_disposition=record["review_disposition"],
+        independent_review_complete=record["independent_review_complete"],
+        authorization_basis=record["authorization_basis"],
+        owner_review_waiver_id=record["owner_review_waiver_id"],
+        owner_review_waiver_scope=record["owner_review_waiver_scope"],
+        post_first_formal_backtest_independent_review_required=(
+            record["post_first_formal_backtest_independent_review_required"]
+        ),
         pin_path=path,
         pin_content_sha256=hashlib.sha256(payload).hexdigest(),
         pin_byte_count=len(payload),
@@ -629,13 +1200,33 @@ def _execution_authority_candidate(plan, claim, closure):
             "review_claim_id": claim.claim_id,
             "review_claim_sha256": claim.claim_sha256,
             "review_pin_content_sha256": claim.pin_content_sha256,
+            "review_authorization": {
+                "review_disposition": claim.review_disposition,
+                "independent_review_complete": (
+                    claim.independent_review_complete
+                ),
+                "authorization_basis": claim.authorization_basis,
+                "owner_review_waiver_id": claim.owner_review_waiver_id,
+                "owner_review_waiver_scope": claim.owner_review_waiver_scope,
+                "post_first_formal_backtest_independent_review_required": (
+                    claim.post_first_formal_backtest_independent_review_required
+                ),
+            },
             "projection_id": plan.projection_id,
             "projection_sha256": plan.projection_sha256,
             "discovery_plan_id": plan.discovery_plan_id,
             "discovery_plan_artifact_sha256": plan.discovery_plan_artifact_sha256,
             "project_source_set_sha256": plan.project_source_set_sha256,
             "organization_id_sha256": plan.organization_id_sha256,
+            "attempt_ordinal": plan.attempt_ordinal,
+            "attempt_binding_sha256": plan.attempt_binding_sha256,
             "project_name": plan.project_name,
+            "qc_default_research_notebook_path": (
+                plan.qc_default_research_notebook_path
+            ),
+            "maximum_default_notebook_deletions": (
+                plan.maximum_default_notebook_deletions
+            ),
             "backtest_name": plan.backtest_name,
             "terminal_package_key": plan.terminal_package_key,
             "archive_root": str(plan.archive_root),
@@ -905,6 +1496,8 @@ def _execute_fundamental_discovery_submission_once_impl(
             "object/properties": 1,
             "files/read": 2,
             "files/create": len(plan.source_files),
+            "files/update": len(plan.source_files),
+            "files/delete": plan.maximum_default_notebook_deletions,
             "compile/create": 1,
             "compile/read": plan.compile_poll_limit,
             "backtests/create": 1,
@@ -912,11 +1505,19 @@ def _execute_fundamental_discovery_submission_once_impl(
     )
     try:
         _transport_call(closure, client, capability, "_request_json", "authenticate", {})
-        inventory = formal._read_project_inventory(
-            _transport_call(
-                closure, client, capability, "_request_json", "projects/read", {}
-            )
+        inventory_response = _transport_call(
+            closure, client, capability, "_request_json", "projects/read", {}
         )
+        try:
+            inventory = formal._read_project_inventory(inventory_response)
+        except formal.FormalQcSubmissionError:
+            _persist_projects_read_schema_diagnostic(
+                plan=plan,
+                permit=permit,
+                phase="initial_inventory",
+                response=inventory_response,
+            )
+            raise
         if any(
             type(item) is dict and item.get("name") == plan.project_name
             for item in inventory
@@ -937,23 +1538,43 @@ def _execute_fundamental_discovery_submission_once_impl(
             organization_id=plan.organization_id,
         )
         project_id = int(created["projectId"])
-        exact = formal._read_project_inventory(
-            _transport_call(
-                closure,
-                client,
-                capability,
-                "_request_json",
-                "projects/read",
-                {"projectId": project_id},
-            )
+        exact_response = _transport_call(
+            closure,
+            client,
+            capability,
+            "_request_json",
+            "projects/read",
+            {"projectId": project_id},
         )
+        try:
+            exact = formal._read_project_inventory(exact_response)
+        except formal.FormalQcSubmissionError:
+            _persist_projects_read_schema_diagnostic(
+                plan=plan,
+                permit=permit,
+                phase="created_project_readback",
+                response=exact_response,
+            )
+            raise
         if len(exact) != 1:
             raise FundamentalDiscoverySubmissionError(
                 "created discovery project identity is ambiguous"
             )
-        formal._project_record(
-            exact[0], name=plan.project_name, organization_id=plan.organization_id
-        )
+        try:
+            formal._project_record(
+                exact[0],
+                name=plan.project_name,
+                organization_id=plan.organization_id,
+            )
+        except formal.FormalQcSubmissionError:
+            if _project_record_schema_refused(exact[0]):
+                _persist_projects_read_schema_diagnostic(
+                    plan=plan,
+                    permit=permit,
+                    phase="created_project_readback",
+                    response=exact_response,
+                )
+            raise
         entry = plan.upload_entry
         _transport_call(
             closure,
@@ -975,41 +1596,86 @@ def _execute_fundamental_discovery_submission_once_impl(
             ),
             entry,
         )
-        existing = formal._read_files(
-            _transport_call(
-                closure, client, capability, "_request_json", "files/read",
-                {"projectId": project_id},
-            )
+        initial_files_response = _transport_call(
+            closure, client, capability, "_request_json", "files/read",
+            {"projectId": project_id},
         )
-        if existing:
+        try:
+            existing = formal._read_files(
+                initial_files_response,
+                expected_project_id=project_id,
+            )
+        except formal.FormalQcSubmissionError:
+            _persist_files_read_schema_diagnostic(
+                plan=plan,
+                permit=permit,
+                phase="initial_source_inventory",
+                response=initial_files_response,
+            )
+            raise
+        projected = {item.project_path: item for item in plan.source_files}
+        unexpected = set(existing) - set(projected)
+        if unexpected - {plan.qc_default_research_notebook_path}:
             raise FundamentalDiscoverySubmissionError(
-                "new discovery project is not empty"
+                "new discovery project contains an unprojected source"
             )
-        for source in plan.source_files:
-            _transport_call(
-                closure,
-                client,
-                capability,
-                "_request_json",
-                "files/create",
-                {
-                    "projectId": project_id,
-                    "name": source.project_path,
-                    "content": source.content.decode("utf-8"),
-                },
+        if plan.qc_default_research_notebook_path in unexpected:
+            formal._success(
+                _transport_call(
+                    closure,
+                    client,
+                    capability,
+                    "_request_json",
+                    "files/delete",
+                    {
+                        "projectId": project_id,
+                        "name": plan.qc_default_research_notebook_path,
+                    },
+                ),
+                frozenset({"success", "errors", "messages"}),
+                "files/delete",
             )
-        observed = formal._read_files(
-            _transport_call(
-                closure, client, capability, "_request_json", "files/read",
-                {"projectId": project_id},
+        for path, source in projected.items():
+            endpoint = "files/update" if path in existing else "files/create"
+            formal._success(
+                _transport_call(
+                    closure,
+                    client,
+                    capability,
+                    "_request_json",
+                    endpoint,
+                    {
+                        "projectId": project_id,
+                        "name": path,
+                        "content": source.content.decode("utf-8"),
+                    },
+                ),
+                frozenset({"success", "errors", "messages"}),
+                endpoint,
             )
+        source_readback_response = _transport_call(
+            closure, client, capability, "_request_json", "files/read",
+            {"projectId": project_id},
         )
-        if set(observed) != {item.project_path for item in plan.source_files}:
+        try:
+            observed = formal._read_files(
+                source_readback_response,
+                expected_project_id=project_id,
+            )
+        except formal.FormalQcSubmissionError:
+            _persist_files_read_schema_diagnostic(
+                plan=plan,
+                permit=permit,
+                phase="source_readback",
+                response=source_readback_response,
+            )
+            raise
+        if set(observed) != set(projected):
             raise FundamentalDiscoverySubmissionError(
                 "discovery project source inventory changed"
             )
-        for source in plan.source_files:
-            payload = observed[source.project_path].encode("utf-8")
+        for path, source in projected.items():
+            payload = observed[path].encode("utf-8")
             if (
                 len(payload) != source.byte_count
                 or hashlib.sha256(payload).hexdigest() != source.content_sha256
@@ -1021,7 +1687,8 @@ def _execute_fundamental_discovery_submission_once_impl(
             _transport_call(
                 closure, client, capability, "_request_json", "compile/create",
                 {"projectId": project_id},
-            )
+            ),
+            expected_project_id=project_id,
         )
         state = ""
         for index in range(plan.compile_poll_limit):
@@ -1178,19 +1845,30 @@ def _inspect_fundamental_discovery_terminal_status_impl(
     )
     for index in range(plan.status_poll_limit):
         try:
-            status = formal.parse_statistics_free_backtest_list(
-                _transport_call(
-                    closure,
-                    client,
-                    capability,
-                    "_request_json",
-                    "backtests/list",
-                    {"projectId": launch.project_id, "includeStatistics": False},
-                ),
-                expected_project_id=launch.project_id,
-                expected_backtest_id=launch.backtest_id,
-                expected_backtest_name=launch.backtest_name,
+            response = _transport_call(
+                closure,
+                client,
+                capability,
+                "_request_json",
+                "backtests/list",
+                {"projectId": launch.project_id, "includeStatistics": False},
             )
+            try:
+                status = formal.parse_statistics_free_backtest_list(
+                    response,
+                    expected_project_id=launch.project_id,
+                    expected_backtest_id=launch.backtest_id,
+                    expected_backtest_name=launch.backtest_name,
+                )
+            except formal.FormalQcSubmissionError:
+                _persist_backtests_list_schema_diagnostic(
+                    plan=plan,
+                    permit=permit,
+                    launch=launch,
+                    response=response,
+                    _require_launch_receipt=_require_launch_receipt,
+                )
+                raise
         except Exception as exc:
             raise FundamentalDiscoverySubmissionLocked(
                 "terminal_status", permit.permit_id, type(exc).__name__
@@ -1259,10 +1937,71 @@ def _prepare_archive_root(plan):
     if plan.archive_root.parent.resolve(strict=True) != parent:
         raise FundamentalDiscoverySubmissionError("archive parent changed")
     try:
-        os.mkdir(plan.archive_root, 0o700)
+        descriptor = os.open(
+            parent,
+            os.O_RDONLY
+            | getattr(os, "O_CLOEXEC", 0)
+            | getattr(os, "O_NOFOLLOW", 0),
+        )
     except OSError as exc:
         raise FundamentalDiscoverySubmissionError(
+            "archive parent could not be authenticated"
+        ) from exc
+    try:
+        opened = os.fstat(descriptor)
+        observed = parent.lstat()
+        if (
+            opened.st_dev != observed.st_dev
+            or opened.st_ino != observed.st_ino
+            or not stat.S_ISDIR(opened.st_mode)
+            or opened.st_uid != os.getuid()
+            or stat.S_IMODE(opened.st_mode) != 0o700
+        ):
+            raise FundamentalDiscoverySubmissionError(
+                "archive parent identity changed"
+            )
+    except (OSError, FundamentalDiscoverySubmissionError):
+        try:
+            os.close(descriptor)
+        except OSError:
+            pass
+        raise
+    try:
+        os.mkdir(plan.archive_root.name, 0o700, dir_fd=descriptor)
+    except OSError as exc:
+        try:
+            os.close(descriptor)
+        except OSError:
+            pass
+        raise FundamentalDiscoverySubmissionError(
             "archive already exists or could not be created; retry is forbidden"
+        ) from exc
+    try:
+        os.fsync(descriptor)
+    except OSError as exc:
+        try:
+            os.close(descriptor)
+        except OSError:
+            pass
+        raise FundamentalDiscoveryArchiveRootPublicationAmbiguous(
+            "archive root was created but publication durability is ambiguous"
+        ) from exc
+    try:
+        os.close(descriptor)
+    except OSError as exc:
+        raise FundamentalDiscoveryArchiveRootPublicationAmbiguous(
+            "archive root was created but publication durability is ambiguous"
+        ) from exc
+    try:
+        after = parent.lstat()
+        if after.st_dev != opened.st_dev or after.st_ino != opened.st_ino:
+            raise FundamentalDiscoverySubmissionError(
+                "archive parent identity changed"
+            )
+        _private_directory(plan.archive_root, "discovery archive root")
+    except (OSError, FundamentalDiscoverySubmissionError) as exc:
+        raise FundamentalDiscoveryArchiveRootPublicationAmbiguous(
+            "archive root was created but publication durability is ambiguous"
         ) from exc
     return plan.archive_root
 
@@ -1644,7 +2383,7 @@ def _download_and_review_fundamental_discovery_archive_impl(
                 raise FundamentalDiscoverySubmissionError("terminal shard bytes changed")
             path = archive_root / ARCHIVE_SHARD_DIRECTORY / (
                 f'{descriptor["ordinal"]:04d}-'
-                f'{descriptor["compressed_sha256"]}.jsonl.gz'
+                f'{descriptor["compressed_sha256"]}-jsonl.gz'
             )
             _write_private_file(path, shard, "archived terminal shard")
             del shard
@@ -1739,6 +2478,7 @@ def _make_discovery_action_global_binding_guard():
                 "_read_project_inventory",
                 "_created_project",
                 "_project_record",
+                "_PROJECT_RECORD_KEYS",
                 "_object_metadata_matches",
                 "_read_files",
                 "_compile_id",
@@ -1759,14 +2499,17 @@ def _make_discovery_action_global_binding_guard():
                 "O_CREAT",
                 "O_EXCL",
                 "O_NOFOLLOW",
+                "O_RDONLY",
                 "O_WRONLY",
                 "close",
                 "fstat",
                 "fsync",
                 "getpid",
                 "getuid",
+                "link",
                 "mkdir",
                 "open",
+                "unlink",
                 "write",
             ),
         ),
@@ -2628,10 +3371,19 @@ del _require_discovery_action_global_bindings
 
 __all__ = (
     "EXECUTION_ACTIONS",
+    "EXECUTION_AUTHORITY_SCHEMA",
+    "OWNER_REVIEW_WAIVER_BASIS",
+    "OWNER_REVIEW_WAIVER_ID",
+    "OWNER_REVIEW_WAIVER_SCOPE",
     "PERMIT_FILENAME",
+    "PROJECT_SCHEMA_DIAGNOSTIC_FILENAME",
+    "PROJECT_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA",
     "REQUIRED_HOST_CODE_PATHS",
+    "REVIEW_CLAIM_SCHEMA",
     "REVIEW_CLAIM_FILENAME",
     "FundamentalDiscoveryHostClosureBinding",
+    "FundamentalDiscoveryArchiveRootPublicationAmbiguous",
+    "FundamentalDiscoveryDiagnosticPublicationAmbiguous",
     "FundamentalDiscoveryLaunchReceipt",
     "FundamentalDiscoveryNamedRefusalReceipt",
     "FundamentalDiscoveryReviewClaim",

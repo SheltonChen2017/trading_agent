@@ -1610,6 +1610,11 @@ def iter_reviewed_historical_preopen_input_shards(
             compressed_sha256=binding.sha256,
             compressed_byte_count=binding.byte_count, payload=payload,
         )
+        # Release the prior physical block before the next bounded read.  The
+        # production upload adapter consumes the yielded shard synchronously;
+        # retaining this local would otherwise overlap two maximum-size input
+        # blocks while the next ``_read_private`` call allocates its result.
+        del payload
 
 
 def _read_evidence_binding(value, binding, *, schema, fields):

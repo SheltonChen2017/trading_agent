@@ -76,7 +76,9 @@ B3_MODULE = PACKAGE / "synthetic_input_transport.py"
 # I/O.
 _PINNED_QC_PACKAGE_SOURCES = tuple(
     """
-    __init__.py event_study.py formal_cloud_evaluator.py
+    __init__.py accepted_risk_pair_bridge.py event_study.py
+    firm_ontology_candidate_builder.py firm_ontology_proposal_generator.py
+    formal_cloud_evaluator.py
     formal_economic_execution_definition.py formal_evaluation.py
     formal_evaluation_bridge.py formal_input_bundle.py formal_input_composer.py
     formal_qc_transport.py formal_report_contract.py formal_run_protocol.py
@@ -87,11 +89,21 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     fundamental_universe_discovery_runtime.py
     fundamental_universe_discovery_submission_adapter.py
     fundamental_universe_discovery_worker.py global_input_bundle.py
-    global_input_schema.py lean_source_assembly.py object_store_read_contract.py
-    owner_signature_authority.py power_calibration_bridge.py
+    global_input_schema.py historical_preopen_input_adapter.py
+    lean_source_assembly.py object_store_read_contract.py
+    owner_signature_authority.py physical_accepted_risk_archive.py
+    physical_firm_ontology_candidate_archive.py
+    physical_firm_ontology_review_packet.py
+    physical_historical_preopen_bridge.py physical_preopen_seed_archive.py
+    physical_preopen_submission_adapter.py
+    physical_production_evidence_acquisition.py
+    physical_production_evidence_bridge.py physical_production_input_archive.py
+    physical_production_session_index.py
+    physical_streaming_scoring.py
+    power_calibration_bridge.py
     power_calibration_runtime.py power_calibration_submission_adapter.py
     power_calibration_worker.py pre_qc_orchestrator.py
-    preopen_control_acquisition_io.py
+    preopen_control_acquisition_io.py preopen_control_prereview_downloader.py
     preopen_control_runtime.py preopen_control_stage.py
     preopen_control_submission_adapter.py preopen_control_worker.py
     preopen_quality_worker.py production_evidence_acquisition_io.py
@@ -102,6 +114,16 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
 
 _ZERO_EXTERNAL_IO_IMPORTS = {
     "__init__.py": (),
+    "accepted_risk_pair_bridge.py": tuple(
+        """
+        __future__ hashlib
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.production_input_pipeline
+        scripts.build_arv2_massive_input_pair
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        """.split()
+    ),
     "event_study.py": tuple(
         """
         __future__ dataclasses hashlib json collections datetime decimal
@@ -214,6 +236,27 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "firm_ontology_candidate_builder.py": tuple(
+        """
+        __future__ dataclasses enum os stat threading weakref collections
+        datetime pathlib typing research.analyst_revisions_v2
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.firm_ontology
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet
+        research.analyst_revisions_v2_qc.production_evidence_composer
+        """.split()
+    ),
+    "firm_ontology_proposal_generator.py": tuple(
+        """
+        __future__ dataclasses hashlib json os stat threading weakref collections
+        pathlib typing research.analyst_revisions_v2
+        research.analyst_revisions_v2.global_benchmark_contract
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet
+        """.split()
+    ),
     # These three modules remain external-I/O-free in behavior, but their
     # process-bound authority registries deliberately import ``os`` for PID/
     # fork authentication.  Classify that capability-bearing import here so
@@ -268,12 +311,16 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
     ),
     "formal_qc_transport.py": tuple(
         """
-        __future__ base64 hashlib json math os re ssl sys threading time typing
-        urllib research.quantconnect
+        __future__ base64 hashlib io json math os re ssl sys threading time
+        zipfile typing urllib research.quantconnect
         """.split()
     ),
     "formal_run_protocol.py": tuple(
-        "__future__ dataclasses hashlib json os re stat datetime pathlib types typing".split()
+        """
+        __future__ dataclasses fcntl hashlib json os re stat tempfile datetime
+        pathlib types typing
+        research.analyst_revisions_v2.preregistration
+        """.split()
     ),
     "formal_streaming_input.py": tuple(
         """
@@ -357,8 +404,162 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.owner_signature_authority
         """.split()
     ),
+    "historical_preopen_input_adapter.py": tuple(
+        """
+        __future__ dataclasses hashlib json os threading weakref typing
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc.preopen_control_stage scripts
+        scripts.build_arv2_historical_preopen_bridge
+        """.split()
+    ),
     "owner_signature_authority.py": tuple(
-        "__future__ base64 binascii dataclasses hashlib os re stat subprocess tempfile pathlib types json".split()
+        "__future__ base64 binascii dataclasses hashlib os re signal stat subprocess tempfile time pathlib types json".split()
+    ),
+    "physical_accepted_risk_archive.py": tuple(
+        """
+        __future__ dataclasses hashlib os secrets sqlite3 stat sys threading
+        weakref collections pathlib typing research.analyst_revisions_v2
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc.formal_run_protocol scripts
+        scripts.capture_arv2_massive scripts.build_arv2_massive_input_pair
+        research.analyst_revisions_v2_qc.accepted_risk_pair_bridge
+        """.split()
+    ),
+    "physical_firm_ontology_candidate_archive.py": tuple(
+        """
+        __future__ dataclasses os secrets shutil stat threading weakref pathlib
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.firm_ontology_candidate_builder
+        research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet
+        """.split()
+    ),
+    "physical_firm_ontology_review_packet.py": tuple(
+        """
+        __future__ dataclasses ctypes errno hashlib os secrets shutil sqlite3
+        stat sys threading weakref pathlib typing
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        research.analyst_revisions_v2_qc.physical_preopen_seed_archive
+        """.split()
+    ),
+    "physical_historical_preopen_bridge.py": tuple(
+        """
+        __future__ dataclasses ctypes errno hashlib json os secrets shutil
+        sqlite3 stat sys tempfile weakref collections.abc datetime pathlib
+        types data.exchange_calendar
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.fundamental_universe_discovery
+        research.analyst_revisions_v2_qc.physical_preopen_seed_archive
+        research.analyst_revisions_v2_qc.preopen_control_stage scripts
+        scripts.build_arv2_historical_preopen_bridge
+        """.split()
+    ),
+    "physical_preopen_seed_archive.py": tuple(
+        """
+        __future__ dataclasses hashlib json os secrets sqlite3 stat threading
+        weakref collections datetime pathlib typing zoneinfo
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.fundamental_universe_discovery
+        research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        research.analyst_revisions_v2_qc.preopen_control_stage scripts
+        scripts.build_arv2_preopen_input scripts.capture_arv2_sharadar bisect
+        """.split()
+    ),
+    "physical_preopen_submission_adapter.py": tuple(
+        """
+        __future__ dataclasses hashlib json os stat threading weakref pathlib
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.historical_preopen_input_adapter
+        research.analyst_revisions_v2_qc.preopen_control_submission_adapter
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        research.analyst_revisions_v2_qc.preopen_control_stage scripts
+        scripts.build_arv2_historical_preopen_bridge
+        """.split()
+    ),
+    "physical_production_evidence_acquisition.py": tuple(
+        """
+        __future__ dataclasses os threading weakref typing
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_production_evidence_bridge
+        research.analyst_revisions_v2_qc.physical_production_input_archive
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        """.split()
+    ),
+    "physical_production_evidence_bridge.py": tuple(
+        """
+        __future__ dataclasses hashlib os sqlite3 tempfile threading weakref
+        collections.abc pathlib research.analyst_revisions_v2
+        research.analyst_revisions_v2.firm_ontology
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2.production_scoring
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        research.analyst_revisions_v2_qc.physical_production_input_archive
+        research.analyst_revisions_v2_qc.production_evidence_composer scripts
+        scripts.build_arv2_historical_preopen_bridge
+        """.split()
+    ),
+    "physical_production_input_archive.py": tuple(
+        """
+        __future__ dataclasses ctypes errno hashlib os secrets sqlite3 stat sys
+        threading weakref collections.abc decimal fractions pathlib typing
+        research.analyst_revisions_v2
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.production_evidence_acquisition
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        """.split()
+    ),
+    "physical_production_session_index.py": tuple(
+        """
+        __future__ dataclasses hashlib os sqlite3 stat tempfile threading weakref
+        bisect collections.abc pathlib typing
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2.production_scoring
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_production_evidence_acquisition
+        research.analyst_revisions_v2_qc.physical_production_evidence_bridge
+        research.analyst_revisions_v2_qc.physical_production_input_archive
+        research.analyst_revisions_v2_qc.formal_streaming_input
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        """.split()
+    ),
+    "physical_streaming_scoring.py": tuple(
+        """
+        __future__ dataclasses hashlib os shutil sqlite3 stat sys tempfile
+        threading weakref collections collections.abc datetime decimal fractions
+        pathlib typing research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.global_benchmark_contract
+        research.analyst_revisions_v2.production_input_pipeline
+        research.analyst_revisions_v2.production_scoring
+        research.analyst_revisions_v2.production_truth_gate
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_input_bundle
+        research.analyst_revisions_v2_qc.formal_streaming_input
+        research.analyst_revisions_v2_qc.physical_production_input_archive
+        research.analyst_revisions_v2_qc.physical_production_session_index
+        research.analyst_revisions_v2_qc.physical_production_evidence_bridge
+        """.split()
     ),
     "preopen_control_acquisition_io.py": tuple(
         """
@@ -369,6 +570,20 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.preopen_quality_worker
         research.analyst_revisions_v2_qc.owner_signature_authority
         inspect
+        """.split()
+    ),
+    "preopen_control_prereview_downloader.py": tuple(
+        """
+        __future__ dataclasses hashlib json os stat threading weakref pathlib
+        typing research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.preopen_control_acquisition_io
+        research.analyst_revisions_v2_qc.preopen_control_submission_adapter
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.owner_signature_authority
         """.split()
     ),
     "preopen_control_stage.py": tuple(
@@ -465,12 +680,22 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "firm_ontology_candidate_builder.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "firm_ontology_proposal_generator.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
     "formal_cloud_evaluator.py": ("import:os",),
     "formal_economic_execution_definition.py": ("import:os",),
     "formal_evaluation_bridge.py": ("import:os",),
     "formal_evaluation.py": ("import:os",),
     "formal_input_bundle.py": ("import:os",),
-    "formal_qc_transport.py": ("import:os", "import:urllib"),
+    "formal_qc_transport.py": ("call:open", "import:os", "import:urllib"),
     "formal_run_protocol.py": ("call:open", "import:os", "import:pathlib"),
     "formal_streaming_bridge.py": ("call:open", "import:os", "import:pathlib"),
     "formal_streaming_input.py": ("call:open", "import:os", "import:pathlib"),
@@ -497,13 +722,69 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "import:os",
         "import:pathlib",
     ),
+    "historical_preopen_input_adapter.py": ("import:os",),
     "owner_signature_authority.py": (
         "call:open",
         "import:os",
         "import:pathlib",
         "import:subprocess",
     ),
+    "physical_accepted_risk_archive.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_firm_ontology_candidate_archive.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_firm_ontology_review_packet.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_historical_preopen_bridge.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_preopen_seed_archive.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_preopen_submission_adapter.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_production_evidence_acquisition.py": ("import:os",),
+    "physical_production_evidence_bridge.py": (
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_production_input_archive.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_production_session_index.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "physical_streaming_scoring.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
     "preopen_control_acquisition_io.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "preopen_control_prereview_downloader.py": (
         "call:open",
         "import:os",
         "import:pathlib",
@@ -571,6 +852,7 @@ research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revision
 research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2_qc.formal_submission_adapter
 research.analyst_revisions_v2_qc.formal_runtime_projection research.analyst_revisions_v2_qc.formal_run_protocol
 research.analyst_revisions_v2_qc.power_calibration_runtime research.analyst_revisions_v2_qc.power_calibration_bridge
+research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2_qc.formal_run_protocol
 """.strip().splitlines()
 )
 
@@ -1631,6 +1913,16 @@ def _resolved_imports(
 _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
     tuple(line.split())
     for line in """
+research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.accepted_risk_pair_bridge scripts.build_arv2_massive_input_pair
+research.analyst_revisions_v2_qc.firm_ontology_candidate_builder research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.firm_ontology_candidate_builder research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.firm_ontology_candidate_builder research.analyst_revisions_v2.firm_ontology
+research.analyst_revisions_v2_qc.firm_ontology_proposal_generator research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.firm_ontology_proposal_generator research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.firm_ontology_proposal_generator research.analyst_revisions_v2.global_benchmark_contract
 research.analyst_revisions_v2_qc.formal_economic_execution_definition research.analyst_revisions_v2.stock_evaluation_contract
 research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.accepted_risk_input_pair
 research.analyst_revisions_v2_qc.formal_input_bundle research.analyst_revisions_v2.formulas
@@ -1644,6 +1936,7 @@ research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revision
 research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2.production_scoring
 research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revisions_v2.production_truth_gate
 research.analyst_revisions_v2_qc.formal_qc_transport research.quantconnect
+research.analyst_revisions_v2_qc.formal_run_protocol research.analyst_revisions_v2.preregistration
 research.analyst_revisions_v2_qc.formal_streaming_bridge research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.formal_streaming_bridge research.analyst_revisions_v2.preopen_control_acquisition
 research.analyst_revisions_v2_qc.formal_streaming_input research.analyst_revisions_v2.canonical
@@ -1657,6 +1950,48 @@ research.analyst_revisions_v2_qc.formal_streaming_input scripts.build_arv2_histo
 research.analyst_revisions_v2_qc.formal_terminal_disposition_builder research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.formal_terminal_disposition_builder scripts.build_arv2_historical_preopen_bridge
 research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime fundamental_universe_discovery_worker
+research.analyst_revisions_v2_qc.historical_preopen_input_adapter research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.historical_preopen_input_adapter scripts.build_arv2_historical_preopen_bridge
+research.analyst_revisions_v2_qc.physical_accepted_risk_archive research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.physical_accepted_risk_archive research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.physical_accepted_risk_archive research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_accepted_risk_archive scripts.build_arv2_massive_input_pair
+research.analyst_revisions_v2_qc.physical_accepted_risk_archive scripts.capture_arv2_massive
+research.analyst_revisions_v2_qc.physical_firm_ontology_candidate_archive research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_historical_preopen_bridge research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.physical_historical_preopen_bridge research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_historical_preopen_bridge scripts.build_arv2_historical_preopen_bridge
+research.analyst_revisions_v2_qc.physical_preopen_seed_archive research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.physical_preopen_seed_archive research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_preopen_seed_archive research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.physical_preopen_seed_archive scripts.build_arv2_preopen_input
+research.analyst_revisions_v2_qc.physical_preopen_seed_archive scripts.capture_arv2_sharadar
+research.analyst_revisions_v2_qc.physical_preopen_submission_adapter research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_preopen_submission_adapter scripts.build_arv2_historical_preopen_bridge
+research.analyst_revisions_v2_qc.physical_production_evidence_acquisition research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_production_evidence_bridge research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.physical_production_evidence_bridge research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.physical_production_evidence_bridge research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_production_evidence_bridge research.analyst_revisions_v2.firm_ontology
+research.analyst_revisions_v2_qc.physical_production_evidence_bridge research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.physical_production_evidence_bridge research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.physical_production_evidence_bridge research.analyst_revisions_v2.production_scoring
+research.analyst_revisions_v2_qc.physical_production_evidence_bridge scripts.build_arv2_historical_preopen_bridge
+research.analyst_revisions_v2_qc.physical_production_input_archive research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.physical_production_input_archive research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.physical_production_input_archive research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_production_input_archive research.analyst_revisions_v2.production_evidence_acquisition
+research.analyst_revisions_v2_qc.physical_production_input_archive research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.physical_production_session_index research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_production_session_index research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.physical_production_session_index research.analyst_revisions_v2.production_scoring
+research.analyst_revisions_v2_qc.physical_streaming_scoring research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.physical_streaming_scoring research.analyst_revisions_v2.global_benchmark_contract
+research.analyst_revisions_v2_qc.physical_streaming_scoring research.analyst_revisions_v2.production_input_pipeline
+research.analyst_revisions_v2_qc.physical_streaming_scoring research.analyst_revisions_v2.production_scoring
+research.analyst_revisions_v2_qc.physical_streaming_scoring research.analyst_revisions_v2.production_truth_gate
 research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.power_calibration_input_schema
 research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.power_calibration_protocol
 research.analyst_revisions_v2_qc.power_calibration_bridge research.analyst_revisions_v2.preopen_control_acquisition
@@ -1669,6 +2004,9 @@ research.analyst_revisions_v2_qc.pre_qc_orchestrator scripts.build_arv2_historic
 research.analyst_revisions_v2_qc.preopen_control_acquisition_io research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.preopen_control_acquisition_io research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.preopen_control_acquisition_io research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.preopen_control_prereview_downloader research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.preopen_control_prereview_downloader research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.preopen_control_prereview_downloader research.analyst_revisions_v2.preopen_control_acquisition
 research.analyst_revisions_v2_qc.preopen_control_runtime preopen_control_worker
 research.analyst_revisions_v2_qc.preopen_control_stage research.analyst_revisions_v2.preopen_control_acquisition
 research.analyst_revisions_v2_qc.preopen_control_submission_adapter research.analyst_revisions_v2
@@ -1850,7 +2188,10 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
     assert reached == (
         "data.exchange_calendar",
         "research.analyst_revisions_v2_qc",
-        "research.analyst_revisions_v2_qc.event_study",
+        "research.analyst_revisions_v2_qc.accepted_risk_pair_bridge",
+            "research.analyst_revisions_v2_qc.event_study",
+            "research.analyst_revisions_v2_qc.firm_ontology_candidate_builder",
+            "research.analyst_revisions_v2_qc.firm_ontology_proposal_generator",
         "research.analyst_revisions_v2_qc.formal_cloud_evaluator",
         "research.analyst_revisions_v2_qc.formal_economic_execution_definition",
         "research.analyst_revisions_v2_qc.formal_evaluation",
@@ -1871,15 +2212,28 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery_worker",
         "research.analyst_revisions_v2_qc.global_input_bundle",
         "research.analyst_revisions_v2_qc.global_input_schema",
+        "research.analyst_revisions_v2_qc.historical_preopen_input_adapter",
         "research.analyst_revisions_v2_qc.lean_source_assembly",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
         "research.analyst_revisions_v2_qc.owner_signature_authority",
+        "research.analyst_revisions_v2_qc.physical_accepted_risk_archive",
+        "research.analyst_revisions_v2_qc.physical_firm_ontology_candidate_archive",
+        "research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet",
+        "research.analyst_revisions_v2_qc.physical_historical_preopen_bridge",
+        "research.analyst_revisions_v2_qc.physical_preopen_seed_archive",
+        "research.analyst_revisions_v2_qc.physical_preopen_submission_adapter",
+        "research.analyst_revisions_v2_qc.physical_production_evidence_acquisition",
+        "research.analyst_revisions_v2_qc.physical_production_evidence_bridge",
+            "research.analyst_revisions_v2_qc.physical_production_input_archive",
+            "research.analyst_revisions_v2_qc.physical_production_session_index",
+            "research.analyst_revisions_v2_qc.physical_streaming_scoring",
         "research.analyst_revisions_v2_qc.power_calibration_bridge",
         "research.analyst_revisions_v2_qc.power_calibration_runtime",
         "research.analyst_revisions_v2_qc.power_calibration_submission_adapter",
         "research.analyst_revisions_v2_qc.power_calibration_worker",
         "research.analyst_revisions_v2_qc.pre_qc_orchestrator",
         "research.analyst_revisions_v2_qc.preopen_control_acquisition_io",
+        "research.analyst_revisions_v2_qc.preopen_control_prereview_downloader",
         "research.analyst_revisions_v2_qc.preopen_control_runtime",
         "research.analyst_revisions_v2_qc.preopen_control_stage",
         "research.analyst_revisions_v2_qc.preopen_control_submission_adapter",

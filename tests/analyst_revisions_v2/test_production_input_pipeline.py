@@ -35,7 +35,11 @@ from research.analyst_revisions_v2.production_input_pipeline import (
     ProductionInputBatch,
     ProductionInputError,
     ProductionRowEvidence,
+    SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE,
+    SECTION72_OWNER_WAIVER_SCOPE,
     SectorClassificationEvidence,
+    Section72OwnerWaivedFirmOntologyEvidence,
+    Section72OwnerWaivedFirmSourceBinding,
     SecurityIdentityEvidence,
     SignalArm,
     build_production_evidence_authority,
@@ -207,6 +211,31 @@ def _sources(
     )
 
 
+def _section72_sources():
+    return tuple(
+        Section72OwnerWaivedFirmSourceBinding(
+            kind=kind,
+            artifact_id=SOURCE_IDS[kind],
+            artifact_sha256=SOURCE_HASHES[kind],
+            reviewed=False,
+            point_in_time=False,
+            admission_mode=SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE,
+            owner_waiver_scope=SECTION72_OWNER_WAIVER_SCOPE,
+            independently_reviewed=False,
+            historical_availability_claimed=False,
+        )
+        if kind is EvidenceSourceKind.FIRM_ONTOLOGY
+        else EvidenceSourceBinding(
+            kind=kind,
+            artifact_id=SOURCE_IDS[kind],
+            artifact_sha256=SOURCE_HASHES[kind],
+            reviewed=True,
+            point_in_time=True,
+        )
+        for kind in EvidenceSourceKind
+    )
+
+
 def _row_evidence(source, *, security_id: str, historical_ticker: str):
     raw = source.locator.raw_row_sha256
     action = "downgrades" if source.provider_event_id == "rating-late" else "upgrades"
@@ -309,6 +338,30 @@ def _row_evidence(source, *, security_id: str, historical_ticker: str):
     )
 
 
+def _section72_row_evidence(source):
+    row = _row_evidence(
+        source, security_id="security-meta", historical_ticker="FB"
+    )
+    normal = row.firm
+    assert type(normal) is FirmOntologyEvidence
+    common = {
+        field.name: getattr(normal, field.name)
+        for field in dataclasses.fields(FirmOntologyEvidence)
+    }
+    common["ontology_reviewed"] = False
+    common["labels_reviewed"] = False
+    firm = Section72OwnerWaivedFirmOntologyEvidence(
+        **common,
+        admission_mode=SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE,
+        owner_waiver_scope=SECTION72_OWNER_WAIVER_SCOPE,
+        independently_reviewed=False,
+        historical_availability_claimed=False,
+        deterministic_default=True,
+        named_refusal=False,
+    )
+    return dataclasses.replace(row, firm=firm)
+
+
 def _evidence_rows(pair):
     up = next(row for row in pair.rows if row.provider_event_id == "rating-up")
     late = next(row for row in pair.rows if row.provider_event_id == "rating-late")
@@ -355,12 +408,188 @@ def test_static_contract_binds_c1_and_keeps_every_external_capability_closed():
     assert sha256_bytes(render_production_input_contract_bytes()) == PRODUCTION_INPUT_CONTRACT_SHA256
     assert PRODUCTION_INPUT_CONTRACT_ID.endswith(PRODUCTION_INPUT_CONTRACT_SHA256[:16])
     assert record["parent"]["contract_sha256"] == (
-        "b2b78be3e11a8c0f7995af6a14f819a1bc5283ca1c51638e9e92130590c6b4b0"
+        "65c92186f85cdf82318b538b58701d215fc160b24d3a154d95411ec1ed37edad"
     )
     assert record["source_role_is_signal_arm"] is False
     assert record["accepted_risk"]["pristine_point_in_time"] is False
     assert set(record["external_bindings"].values()) == {None}
     assert set(record["capabilities"].values()) == {False}
+
+
+def test_section72_firm_mode_is_explicit_and_normal_records_are_byte_compatible():
+    pair = _pair(ratings=[_rating_row("rating-up")])
+    source = next(
+        item for item in pair.rows if item.provider_event_id == "rating-up"
+    )
+    normal_source = _sources()[1]
+    normal_firm = _row_evidence(
+        source, security_id="security-meta", historical_ticker="FB"
+    ).firm
+    assert set(normal_source.to_record()) == {
+        "kind", "artifact_id", "artifact_sha256", "reviewed", "point_in_time",
+    }
+    assert "admission_mode" not in normal_firm.to_record()
+
+    waived_source = _section72_sources()[1]
+    waived_firm = _section72_row_evidence(source).firm
+    assert waived_source.to_record()["admission_mode"] == (
+        SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE
+    )
+    assert waived_source.to_record()["reviewed"] is False
+    assert waived_source.to_record()["point_in_time"] is False
+    assert waived_firm.to_record()["independently_reviewed"] is False
+    assert waived_firm.to_record()["historical_availability_claimed"] is False
+    assert waived_firm.to_record()["ontology_reviewed"] is False
+    assert waived_firm.to_record()["labels_reviewed"] is False
+
+
+def test_section72_exact_false_claims_admit_a_clean_owner_default():
+    pair = _pair(ratings=[_rating_row("rating-up")])
+    source = next(
+        item for item in pair.rows if item.provider_event_id == "rating-up"
+    )
+    row = _section72_row_evidence(source)
+    authority = _authority(
+        pair, rows=(row,), sources=_section72_sources()
+    )
+
+    batch = build_production_input_batch(
+        authority, signal_arm=SignalArm.CURRENT_VINTAGE
+    )
+
+    admission = _rating_up_admission(batch)
+    assert admission.disposition is (
+        AdmissionDisposition.INCLUDED_DIRECTIONAL_RATING_REVISION
+    )
+    assert admission.normalized_row is not None
+
+
+@pytest.mark.parametrize("source_mode", ("normal", "section72"))
+def test_section72_firm_source_and_row_modes_cannot_be_mixed(source_mode):
+    pair = _pair(ratings=[_rating_row("rating-up")])
+    source = next(
+        item for item in pair.rows if item.provider_event_id == "rating-up"
+    )
+    if source_mode == "normal":
+        sources = _sources()
+        row = _section72_row_evidence(source)
+    else:
+        sources = _section72_sources()
+        row = _row_evidence(
+            source, security_id="security-meta", historical_ticker="FB"
+        )
+    batch = build_production_input_batch(
+        _authority(pair, rows=(row,), sources=sources),
+        signal_arm=SignalArm.CURRENT_VINTAGE,
+    )
+
+    assert _rating_up_admission(batch).disposition is (
+        AdmissionDisposition.FIRM_OWNER_WAIVER_BINDING_MISMATCH
+    )
+
+
+@pytest.mark.parametrize(
+    ("change", "message"),
+    (
+        (
+            {"kind": EvidenceSourceKind.SECURITY_MASTER},
+            "section-72 owner waiver may bind only the firm ontology source",
+        ),
+        (
+            {"admission_mode": "hostile"},
+            "section-72 firm source admission mode changed",
+        ),
+        (
+            {"owner_waiver_scope": "hostile"},
+            "section-72 firm source owner-waiver scope changed",
+        ),
+        (
+            {"reviewed": True},
+            "section-72 firm source made a prohibited review or PIT claim",
+        ),
+        (
+            {"point_in_time": True},
+            "section-72 firm source made a prohibited review or PIT claim",
+        ),
+        (
+            {"independently_reviewed": True},
+            "section-72 firm source made a prohibited review or PIT claim",
+        ),
+        (
+            {"historical_availability_claimed": True},
+            "section-72 firm source made a prohibited review or PIT claim",
+        ),
+    ),
+)
+def test_section72_firm_source_isolates_every_authority_guard(change, message):
+    values = {
+        "kind": EvidenceSourceKind.FIRM_ONTOLOGY,
+        "artifact_id": SOURCE_IDS[EvidenceSourceKind.FIRM_ONTOLOGY],
+        "artifact_sha256": SOURCE_HASHES[EvidenceSourceKind.FIRM_ONTOLOGY],
+        "reviewed": False,
+        "point_in_time": False,
+        "admission_mode": SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE,
+        "owner_waiver_scope": SECTION72_OWNER_WAIVER_SCOPE,
+        "independently_reviewed": False,
+        "historical_availability_claimed": False,
+    }
+    values.update(change)
+
+    with pytest.raises(ProductionInputError, match=f"^{message}$"):
+        Section72OwnerWaivedFirmSourceBinding(**values)
+
+
+@pytest.mark.parametrize(
+    ("change", "message"),
+    (
+        (
+            {"admission_mode": "hostile"},
+            "section-72 firm evidence admission mode changed",
+        ),
+        (
+            {"owner_waiver_scope": "hostile"},
+            "section-72 firm evidence owner-waiver scope changed",
+        ),
+        (
+            {"ontology_reviewed": True},
+            "section-72 firm evidence made a prohibited authority claim",
+        ),
+        (
+            {"labels_reviewed": True},
+            "section-72 firm evidence made a prohibited authority claim",
+        ),
+        (
+            {"independently_reviewed": True},
+            "section-72 firm evidence made a prohibited authority claim",
+        ),
+        (
+            {"historical_availability_claimed": True},
+            "section-72 firm evidence made a prohibited authority claim",
+        ),
+        (
+            {"deterministic_default": False},
+            "section-72 firm evidence made a prohibited authority claim",
+        ),
+        (
+            {"named_refusal": True},
+            "section-72 firm evidence made a prohibited authority claim",
+        ),
+    ),
+)
+def test_section72_firm_evidence_isolates_every_authority_guard(change, message):
+    pair = _pair(ratings=[_rating_row("rating-up")])
+    source = next(
+        item for item in pair.rows if item.provider_event_id == "rating-up"
+    )
+    firm = _section72_row_evidence(source).firm
+    values = {
+        field.name: getattr(firm, field.name)
+        for field in dataclasses.fields(firm)
+    }
+    values.update(change)
+
+    with pytest.raises(ProductionInputError, match=f"^{message}$"):
+        Section72OwnerWaivedFirmOntologyEvidence(**values)
 
 
 def test_current_and_censored_arms_share_pair_but_have_distinct_exact_censuses():
@@ -605,6 +834,70 @@ def test_unknown_provider_field_or_invalid_directional_row_never_reaches_normali
         authority, signal_arm=SignalArm.CURRENT_VINTAGE
     )
     assert _rating_up_admission(batch).disposition is AdmissionDisposition.INVALID_RATING_ROW
+
+
+@pytest.mark.parametrize(
+    ("rating_action", "remove_field"),
+    [
+        (None, True),
+        (None, False),
+        ("", False),
+    ],
+)
+@pytest.mark.parametrize(
+    ("price_target_action", "expected_disposition", "potential_directional"),
+    [
+        (None, AdmissionDisposition.INVALID_RATING_ROW, True),
+        ("raises", AdmissionDisposition.NON_DIRECTIONAL_RATING_ACTION, False),
+    ],
+)
+def test_missing_or_exact_empty_action_has_an_existing_c2_terminal_disposition(
+    rating_action,
+    remove_field,
+    price_target_action,
+    expected_disposition,
+    potential_directional,
+):
+    row = _rating_row("missing-action")
+    if remove_field:
+        row.pop("rating_action")
+    else:
+        row["rating_action"] = rating_action
+    if price_target_action is not None:
+        row["price_target_action"] = price_target_action
+    pair = _pair(ratings=[row])
+    authority = _authority(pair, rows=())
+
+    batch = build_production_input_batch(
+        authority, signal_arm=SignalArm.CURRENT_VINTAGE
+    )
+    admission = batch.admissions[0]
+
+    assert batch.total_source_row_count == len(pair.rows) == 3
+    assert admission.disposition is expected_disposition
+    assert admission.normalized_row is None
+    assert admission.potential_directional is potential_directional
+    assert batch.directional_candidate_count == int(potential_directional)
+    assert batch.refused_directional_count == int(potential_directional)
+
+
+def test_whitespace_action_remains_an_invalid_c2_row_not_target_only():
+    row = _rating_row(
+        "whitespace-action",
+        action="   ",
+        price_target_action="raises",
+    )
+    pair = _pair(ratings=[row])
+    authority = _authority(pair, rows=())
+
+    batch = build_production_input_batch(
+        authority, signal_arm=SignalArm.CURRENT_VINTAGE
+    )
+    admission = batch.admissions[0]
+
+    assert admission.disposition is AdmissionDisposition.INVALID_RATING_ROW
+    assert admission.normalized_row is None
+    assert admission.potential_directional is True
 
 
 @pytest.mark.parametrize(
@@ -961,6 +1254,7 @@ def test_comparison_report_is_pre_return_exhaustive_and_dimension_complete():
     "binding_name",
     [
         "_at_or_after_cutoff",
+        "_rating_action_is_missing",
         "_validate_row_evidence_topology",
         "build_production_input_batch",
     ],

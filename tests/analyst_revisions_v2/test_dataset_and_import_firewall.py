@@ -1943,6 +1943,10 @@ def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
     # artifact byte-canonical would overstate its real loader contract.
     canonical_required = {
         "firm_ontology_registry.json",
+        (
+            "arv2_infrastructure_look_ledger."
+            "ff61ca806563510dbe384d8801d2537c3655fe1432651f4d94673e14a7648457.json"
+        ),
         "research_source_authority.json",
         "security_master_registry.json",
     }
@@ -1955,7 +1959,10 @@ def test_canonical_production_artifacts_survive_checkout_as_exact_bytes():
             "on exact bytes"
         )
         raw = require_canonical_json_bytes(payload, name)
-        assert raw["schema"].endswith("-v2")
+        if name.startswith("arv2_infrastructure_look_ledger."):
+            assert raw["schema"] == "arv2-infrastructure-look-ledger-v1"
+        else:
+            assert raw["schema"].endswith("-v2")
 
 
 def test_zero_access_declarations_are_actually_verified_not_merely_unreadable():

@@ -79,6 +79,7 @@ from scripts.build_arv2_massive_input_pair import (
 )
 from scripts.capture_arv2_sharadar import (
     ACTIONS_AVAILABILITY,
+    FUNDAMENTALS_ADMITTED_DIMENSION,
     FUNDAMENTALS_AVAILABILITY,
     MAX_ARCHIVE_BYTES,
     MAX_CSV_FIELD_BYTES,
@@ -149,6 +150,7 @@ _ALLOWED_COMMON_STOCK_CATEGORIES = frozenset(
         "domestic common stock secondary class",
     }
 )
+_SHARADAR_FUNDAMENTALS_TABLE_ALIAS = "SF1"
 _SHARADAR_EXCHANGE_TO_MIC = {
     "AMEX": "XASE",
     "NASDAQ": "XNAS",
@@ -630,9 +632,9 @@ def _ticker_candidates(
         try:
             table = _text(row.get("table"), "Sharadar table")
             assert table is not None
-            if table.casefold() != "fundamentals":
+            if table != _SHARADAR_FUNDAMENTALS_TABLE_ALIAS:
                 raise PhysicalPreopenInputError(
-                    "ticker row is outside the Sharadar fundamentals table"
+                    "ticker row is outside the documented Sharadar SF1 fundamentals table"
                 )
             ticker = _text(row.get("ticker"), "Sharadar ticker")
             assert ticker is not None
@@ -978,7 +980,7 @@ def _fundamental_rows(
         if security is None:
             continue
         try:
-            if row.get("dimension") != "ART":
+            if row.get("dimension") != FUNDAMENTALS_ADMITTED_DIMENSION:
                 raise PhysicalPreopenInputError("non-ART fundamental")
             period = _date_text(row.get("calendardate"), "calendardate")
             if period < earliest or period > last_session:

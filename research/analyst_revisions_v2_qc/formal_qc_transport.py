@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import io
 import json
 import math
 import os
@@ -23,8 +24,9 @@ import ssl
 import sys
 import threading
 import time
+import zipfile
 from typing import Callable, Mapping
-from urllib import error, request
+from urllib import error, parse, request
 
 from research.quantconnect import (
     API_BASE,
@@ -54,11 +56,16 @@ _JSON_ENDPOINTS = frozenset(
         "files/read",
         "files/create",
         "files/update",
+        "files/delete",
         "compile/create",
         "compile/read",
         "backtests/create",
         "backtests/list",
         "object/properties",
+        # ``object/read`` is the lane's logical, capability-budgeted read
+        # action.  The wire implementation below exclusively uses QC's
+        # current two-phase ``/object/get`` endpoint and never downgrades to a
+        # legacy network endpoint.
         "object/read",
     }
 )
@@ -81,6 +88,18 @@ RESULT_FAMILY_READ_CAPABILITY_SCHEMA = (
     "arv2-formal-qc-result-family-read-transport-capability-v1"
 )
 PRODUCTION_TIMEOUT_SECONDS = 30.0
+OBJECT_GET_MAX_API_CALLS = 101
+OBJECT_GET_MAX_ELAPSED_SECONDS = 300.0
+OBJECT_GET_POLL_INTERVAL_SECONDS = 3.0
+MAX_OBJECT_GET_ARCHIVE_OVERHEAD_BYTES = 64 * 1024
+MAX_SIGNED_URL_BYTES = 16 * 1024
+_SIGNED_DOWNLOAD_HOST_SUFFIXES = (
+    "quantconnect.com",
+    "amazonaws.com",
+    "cloudfront.net",
+    "blob.core.windows.net",
+    "storage.googleapis.com",
+)
 _OFFLINE_TEST_CREDENTIALS = QuantConnectCredentials(
     user_id="offline-test-user", api_token="offline-test-token-not-a-secret"
 )
@@ -90,7 +109,11 @@ def _make_lane_local_production_primitives():
     """Close production clock and HTTP calls over their exact primitives."""
 
     request_constructor = request.Request
-    open_url = request.urlopen
+    build_opener = request.build_opener
+    proxy_handler = request.ProxyHandler
+    https_handler = request.HTTPSHandler
+    redirect_handler = request.HTTPRedirectHandler
+    add_unredirected_header = request.Request.add_unredirected_header
     make_tls_context = ssl.create_default_context
     http_error = error.HTTPError
     exact_dict = dict
@@ -100,10 +123,59 @@ def _make_lane_local_production_primitives():
     transport_error = FormalQcTransportError
     time_source = time.time
 
+    def prepare_production_download_transport():
+        """Build a credential-free, redirect-refusing bounded GET."""
+
+        tls_context = make_tls_context()
+        no_redirect = redirect_handler()
+        no_redirect.redirect_request = refuse_redirect
+        opener = build_opener(
+            proxy_handler({}),
+            https_handler(context=tls_context),
+            no_redirect,
+        )
+        open_url = opener.open
+
+        def prepared_download_transport(
+            url: str,
+            timeout: float,
+            maximum_bytes: int,
+        ) -> tuple[int, bytes]:
+            # Deliberately add no QC Authorization/Timestamp headers.  The
+            # complete authorization for this GET is carried only by the
+            # short-lived signed URL returned by QC.
+            req = request_constructor(url, method="GET")
+            try:
+                with open_url(req, timeout=timeout) as response:
+                    # One sentinel byte is the finite probe needed to reject a
+                    # chunked response whose size exceeds the exact bound.
+                    raw = response.read(maximum_bytes + 1)
+                    return response.getcode(), raw
+            except http_error as exc:
+                return exc.code, exc.read(maximum_bytes + 1)
+            except base_exception:
+                raise transport_error(
+                    "QuantConnect signed download failed"
+                ) from None
+
+        return prepared_download_transport
+
+    def refuse_redirect(req, fp, code, msg, headers, newurl):
+        del req, fp, code, msg, headers, newurl
+        return None
+
     def prepare_production_http_transport():
         # Creating the verified TLS context can read system trust files.  Do it
         # request-locally, before credential acquisition, never at import.
         tls_context = make_tls_context()
+        no_redirect = redirect_handler()
+        no_redirect.redirect_request = refuse_redirect
+        opener = build_opener(
+            proxy_handler({}),
+            https_handler(context=tls_context),
+            no_redirect,
+        )
+        open_url = opener.open
 
         def prepared_http_transport(
             url: str,
@@ -111,18 +183,14 @@ def _make_lane_local_production_primitives():
             headers: Mapping[str, str],
             timeout: float,
         ) -> tuple[int, bytes]:
-            req = request_constructor(
-                url,
-                data=body,
-                headers=exact_dict(headers),
-                method="POST",
-            )
+            req = request_constructor(url, data=body, method="POST")
+            # Unredirected headers travel to the pinned host only.  urllib's
+            # default opener follows 3xx answers and would otherwise forward
+            # Authorization and Timestamp to whatever host Location names.
+            for header_name, header_value in exact_dict(headers).items():
+                add_unredirected_header(req, header_name, header_value)
             try:
-                with open_url(
-                    req,
-                    timeout=timeout,
-                    context=tls_context,
-                ) as response:
+                with open_url(req, timeout=timeout) as response:
                     raw = response.read(response_limit + 1)
                     return response.getcode(), raw
             except http_error as exc:
@@ -154,6 +222,7 @@ def _make_lane_local_production_primitives():
         default_http_transport,
         production_clock,
         prepare_production_http_transport,
+        prepare_production_download_transport,
     )
 
 
@@ -161,6 +230,7 @@ def _make_lane_local_production_primitives():
     _default_http_transport,
     _production_clock,
     _prepare_production_http_transport,
+    _prepare_production_download_transport,
 ) = (
     _make_lane_local_production_primitives()
 )
@@ -225,6 +295,7 @@ def _build_transport_capability_authority():
     external_specs = (
         (base64, ("b64decode", "b64encode")),
         (hashlib, ("sha256",)),
+        (io, ("BytesIO",)),
         (
             json,
             ("dumps", "loads", "JSONDecoder", "_default_decoder"),
@@ -245,27 +316,52 @@ def _build_transport_capability_authority():
         ),
         (os, ("getpid",)),
         (os.path, ("realpath",)),
+        (parse, ("SplitResult", "urlsplit")),
         (
             request,
             (
-                "Request", "urlopen", "HTTPSHandler", "build_opener",
+                "Request", "ProxyHandler", "HTTPSHandler",
+                "HTTPRedirectHandler", "OpenerDirector", "build_opener",
                 "_opener",
             ),
         ),
-        (request.Request, ("__new__", "__init__")),
+        (request.Request, ("__new__", "__init__", "add_unredirected_header")),
+        (
+            request.ProxyHandler,
+            ("__new__", "__init__", "proxy_open"),
+        ),
         (
             request.HTTPSHandler,
             ("__new__", "__init__", "https_open"),
         ),
         (
-            request.urlopen,
+            request.HTTPRedirectHandler,
+            (
+                "__new__", "__init__", "http_error_301", "http_error_302",
+                "http_error_303", "http_error_307", "http_error_308",
+                "redirect_request",
+            ),
+        ),
+        (
+            request.OpenerDirector,
+            ("__new__", "__init__", "add_handler", "open"),
+        ),
+        (
+            request.build_opener,
             ("__code__", "__globals__", "__defaults__", "__closure__"),
         ),
         (error, ("HTTPError",)),
         (ssl, ("create_default_context",)),
         (sys, ("_getframe", "modules")),
         (threading, ("RLock",)),
-        (time, ("time",)),
+        (time, ("time", "monotonic", "sleep")),
+        (
+            zipfile,
+            (
+                "BadZipFile", "LargeZipFile", "ZipFile",
+                "ZipExtFile", "ZipInfo", "ZIP_DEFLATED", "ZIP_STORED",
+            ),
+        ),
     )
     credential_environment = os.environ
     environment_getitem = credential_environment.__getitem__
@@ -281,7 +377,14 @@ def _build_transport_capability_authority():
         json.JSONDecoder,
         json.JSONEncoder,
         request.Request,
+        request.ProxyHandler,
         request.HTTPSHandler,
+        request.HTTPRedirectHandler,
+        request.OpenerDirector,
+        parse.SplitResult,
+        zipfile.ZipFile,
+        zipfile.ZipExtFile,
+        zipfile.ZipInfo,
     )
 
     def load_production_credential_material() -> tuple[str, str]:
@@ -395,11 +498,14 @@ def _build_transport_capability_authority():
             current["_default_http_transport"],
             current["_production_clock"],
             current["_prepare_production_http_transport"],
+            current["_prepare_production_download_transport"],
             load_production_credential_material,
             build_lane_local_auth_headers,
             get_attribute(json, "loads"),
             current["_strict_response_object"],
             current["_reject_nonstandard_json_constant"],
+            get_attribute(time, "monotonic"),
+            get_attribute(time, "sleep"),
         )
 
     def require_module_bindings() -> None:
@@ -1020,7 +1126,15 @@ def _build_transport_capability_authority():
             require_module_bindings()
             caller_frame = get_frame(1)
             if (
-                adapter_key not in {"fundamental", "preopen", "power"}
+                adapter_key
+                not in {
+                    "fundamental",
+                    "preopen",
+                    "preopen_physical_upload",
+                    "preopen_prereview",
+                    "power",
+                    "accepted_risk_preliminary",
+                }
                 or any(
                     key == adapter_key
                     for key, _provenance in delegated_minter_provenance
@@ -1376,6 +1490,173 @@ def _safe_key(value: object) -> str:
     return value
 
 
+def _validate_object_get_response(
+    value: object, *, expected_job_id: str | None,
+) -> tuple[str | None, str | None]:
+    """Validate the current documented ``GetObjectStoreResponse`` shape."""
+
+    if (
+        type(value) is not dict
+        or "success" not in value
+        or not set(value).issubset({"jobId", "url", "success", "errors"})
+        or value.get("success") is not True
+    ):
+        raise FormalQcTransportError(
+            "QuantConnect object/get response schema changed"
+        )
+    errors = value.get("errors")
+    if (
+        errors is not None
+        and (
+            type(errors) is not list
+            or any(type(item) is not str for item in errors)
+        )
+    ):
+        raise FormalQcTransportError(
+            "QuantConnect object/get response schema changed"
+        )
+    if errors:
+        raise FormalQcTransportError("QuantConnect object/get request was refused")
+    raw_job_id = value.get("jobId")
+    if raw_job_id is None:
+        job_id = None
+    else:
+        job_id = _safe_id(raw_job_id, "object_get_job_id")
+    url = value.get("url")
+    if url is not None and (type(url) is not str or not url):
+        raise FormalQcTransportError(
+            "QuantConnect object/get response schema changed"
+        )
+    # ``jobId`` is optional in the published response model.  When QC echoes
+    # it, it must be the exact job we polled; when omitted/null, identity is
+    # still fixed by our same-organization request containing the bound job.
+    if (
+        expected_job_id is not None
+        and job_id is not None
+        and job_id != expected_job_id
+    ):
+        raise FormalQcTransportError(
+            "QuantConnect object/get job identity changed"
+        )
+    if expected_job_id is None and job_id is None and url is None:
+        raise FormalQcTransportError(
+            "QuantConnect object/get response omitted job and URL"
+        )
+    return job_id, url
+
+
+def _validated_signed_download_url(value: object) -> str:
+    """Accept only bounded HTTPS URLs on vetted QC/storage DNS suffixes."""
+
+    try:
+        encoded_size = len(value.encode("utf-8")) if type(value) is str else 0
+    except UnicodeError:
+        encoded_size = MAX_SIGNED_URL_BYTES + 1
+    if (
+        type(value) is not str
+        or not value
+        or encoded_size > MAX_SIGNED_URL_BYTES
+        or any(
+            ord(character) < 0x21
+            or ord(character) == 0x7F
+            or character == "\\"
+            for character in value
+        )
+    ):
+        raise FormalQcTransportError(
+            "QuantConnect signed download URL is not safe"
+        )
+    try:
+        parsed = parse.urlsplit(value)
+        hostname = parsed.hostname
+        port = parsed.port
+        if hostname is not None:
+            hostname.encode("ascii")
+    except (UnicodeError, ValueError):
+        raise FormalQcTransportError(
+            "QuantConnect signed download URL is not safe"
+        ) from None
+    if (
+        parsed.scheme != "https"
+        or type(hostname) is not str
+        or not hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or port not in (None, 443)
+        or not parsed.path.startswith("/")
+        or parsed.fragment
+        or not any(
+            hostname == suffix or hostname.endswith("." + suffix)
+            for suffix in _SIGNED_DOWNLOAD_HOST_SUFFIXES
+        )
+    ):
+        raise FormalQcTransportError(
+            "QuantConnect signed download URL is not safe"
+        )
+    return value
+
+
+def _extract_object_get_archive(
+    archive_bytes: object, *, key: str, maximum_object_bytes: int,
+) -> bytes:
+    """Extract exactly one named member without an unbounded ZIP read."""
+
+    maximum_archive_bytes = min(
+        MAX_OBJECT_BYTES + MAX_OBJECT_GET_ARCHIVE_OVERHEAD_BYTES,
+        maximum_object_bytes + MAX_OBJECT_GET_ARCHIVE_OVERHEAD_BYTES,
+    )
+    if (
+        type(archive_bytes) is not bytes
+        or not archive_bytes
+        or len(archive_bytes) > maximum_archive_bytes
+    ):
+        raise FormalQcTransportError(
+            "QuantConnect Object Store archive exceeds its byte bound"
+        )
+    try:
+        with zipfile.ZipFile(io.BytesIO(archive_bytes), "r") as archive:
+            members = archive.infolist()
+            if len(members) != 1:
+                raise FormalQcTransportError(
+                    "QuantConnect Object Store archive inventory changed"
+                )
+            member = members[0]
+            unix_file_type = (member.external_attr >> 16) & 0o170000
+            if not 0 < member.file_size <= maximum_object_bytes:
+                raise FormalQcTransportError(
+                    "QuantConnect Object Store object exceeds its byte bound"
+                )
+            if (
+                member.filename != key
+                or member.is_dir()
+                or member.flag_bits & 0x1
+                or member.compress_type
+                not in (zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED)
+                or unix_file_type not in (0, 0o100000)
+                or member.compress_size < 0
+                or member.compress_size > maximum_archive_bytes
+            ):
+                raise FormalQcTransportError(
+                    "QuantConnect Object Store archive member changed"
+                )
+            with archive.open(member, "r") as stream:
+                payload = stream.read(member.file_size + 1)
+            if len(payload) != member.file_size:
+                raise FormalQcTransportError(
+                    "QuantConnect Object Store archive member changed"
+                )
+    except FormalQcTransportError:
+        raise
+    except (
+        EOFError, OSError, RuntimeError, ValueError,
+        zipfile.BadZipFile, zipfile.LargeZipFile,
+    ) as exc:
+        raise FormalQcTransportError(
+            "QuantConnect Object Store download is not a valid ZIP archive"
+        ) from exc
+    return payload
+
+
 def _exact_json_tree(value: object, depth: int = 0) -> bool:
     if depth > 16:
         return False
@@ -1489,7 +1770,7 @@ class FormalQcTransport:
         )
         if (
             type(request_context) is not tuple
-            or len(request_context) != 15
+            or len(request_context) != 18
             or not callable(_sealed_binding_guard)
         ):
             raise FormalQcTransportError(
@@ -1506,11 +1787,14 @@ class FormalQcTransport:
             production_http_transport,
             production_clock,
             production_http_preparer,
+            production_download_preparer,
             credential_loader,
             auth_header_builder,
             json_loader,
             strict_response_object,
             reject_json_constant,
+            monotonic_clock,
+            wait,
         ) = request_context
         if (
             (path == "object/set" and re.fullmatch(
@@ -1537,21 +1821,11 @@ class FormalQcTransport:
             if production_transport is True
             else http_transport
         )
-        timestamp = clock()
-        _sealed_binding_guard(capability)
-        if type(timestamp) is not int or timestamp <= 0:
-            raise FormalQcTransportError("transport clock returned an invalid timestamp")
-        if (
-            self._production_ready is not production_transport
-            or self._http is not http_transport
-            or self._base_url is not base_url
-            or self._clock is not clock
-            or self._timeout is not timeout
-            or self._credentials is not credential_boundary
-        ):
-            raise FormalQcTransportError(
-                "transport configuration changed during request"
-            )
+        prepared_download_transport = (
+            production_download_preparer()
+            if production_transport is True and path == "object/read"
+            else None
+        )
         if production_transport is True:
             if (
                 http_transport is not production_http_transport
@@ -1559,6 +1833,10 @@ class FormalQcTransport:
                 or credential_boundary is not None
                 or offline_credential_material is not None
                 or not callable(prepared_http_transport)
+                or (
+                    path == "object/read"
+                    and not callable(prepared_download_transport)
+                )
             ):
                 raise FormalQcTransportError(
                     "production transport authority changed"
@@ -1571,28 +1849,243 @@ class FormalQcTransport:
             or len(credential_material) != 2
         ):
             raise FormalQcTransportError("QuantConnect credentials boundary changed")
-        headers = auth_header_builder(credential_material, timestamp)
-        headers["Content-Type"] = content_type
-        status, raw = prepared_http_transport(
-            base_url + "/" + path,
-            body,
-            headers,
-            timeout,
-        )
-        if type(status) is not int or type(raw) is not bytes or len(raw) > MAX_RESPONSE_BYTES:
-            raise FormalQcTransportError("QuantConnect response envelope exceeded its bound")
+
+        def require_unchanged_configuration() -> None:
+            _sealed_binding_guard(capability)
+            if (
+                self._production_ready is not production_transport
+                or self._http is not http_transport
+                or self._base_url is not base_url
+                or self._clock is not clock
+                or self._timeout is not timeout
+                or self._credentials is not credential_boundary
+            ):
+                raise FormalQcTransportError(
+                    "transport configuration changed during request"
+                )
+
+        started = monotonic_clock()
+        if (
+            type(started) not in (int, float)
+            or not math.isfinite(started)
+        ):
+            raise FormalQcTransportError("transport monotonic clock changed")
+
+        def remaining_timeout(*, bounded_object_read: bool) -> float:
+            if not bounded_object_read:
+                return timeout
+            elapsed = monotonic_clock() - started
+            if (
+                type(elapsed) not in (int, float)
+                or not math.isfinite(elapsed)
+                or elapsed < 0
+                or elapsed >= OBJECT_GET_MAX_ELAPSED_SECONDS
+            ):
+                raise FormalQcTransportError(
+                    "QuantConnect object/get time budget exhausted"
+                )
+            return min(timeout, OBJECT_GET_MAX_ELAPSED_SECONDS - elapsed)
+
+        def authenticated_json_post(
+            endpoint: str, exact_body: bytes, *, bounded_object_read: bool,
+        ) -> dict[str, object]:
+            timestamp = clock()
+            require_unchanged_configuration()
+            if type(timestamp) is not int or timestamp <= 0:
+                raise FormalQcTransportError(
+                    "transport clock returned an invalid timestamp"
+                )
+            headers = auth_header_builder(credential_material, timestamp)
+            headers["Content-Type"] = "application/json"
+            status, raw = prepared_http_transport(
+                base_url + "/" + endpoint,
+                exact_body,
+                headers,
+                remaining_timeout(
+                    bounded_object_read=bounded_object_read
+                ),
+            )
+            require_unchanged_configuration()
+            if (
+                type(status) is not int
+                or type(raw) is not bytes
+                or len(raw) > MAX_RESPONSE_BYTES
+            ):
+                raise FormalQcTransportError(
+                    "QuantConnect response envelope exceeded its bound"
+                )
+            if status < 200 or status >= 300:
+                raise FormalQcTransportError(
+                    f"QuantConnect {endpoint} request was refused"
+                )
+            try:
+                value = json_loader(
+                    raw.decode("utf-8"),
+                    object_pairs_hook=strict_response_object,
+                    parse_constant=reject_json_constant,
+                )
+            except (UnicodeError, ValueError, RecursionError) as exc:
+                raise FormalQcTransportError(
+                    "QuantConnect response is not UTF-8 JSON"
+                ) from exc
+            if type(value) is not dict or value.get("success") is not True:
+                raise FormalQcTransportError(
+                    f"QuantConnect {endpoint} request was refused"
+                )
+            return value
+
+        if path != "object/read":
+            if content_type != "application/json":
+                # Multipart requests retain their already-reviewed single
+                # authenticated POST implementation.
+                timestamp = clock()
+                require_unchanged_configuration()
+                if type(timestamp) is not int or timestamp <= 0:
+                    raise FormalQcTransportError(
+                        "transport clock returned an invalid timestamp"
+                    )
+                headers = auth_header_builder(credential_material, timestamp)
+                headers["Content-Type"] = content_type
+                status, raw = prepared_http_transport(
+                    base_url + "/" + path, body, headers, timeout
+                )
+                require_unchanged_configuration()
+                if (
+                    type(status) is not int
+                    or type(raw) is not bytes
+                    or len(raw) > MAX_RESPONSE_BYTES
+                ):
+                    raise FormalQcTransportError(
+                        "QuantConnect response envelope exceeded its bound"
+                    )
+                if status < 200 or status >= 300:
+                    raise FormalQcTransportError(
+                        f"QuantConnect {path} request was refused"
+                    )
+                try:
+                    value = json_loader(
+                        raw.decode("utf-8"),
+                        object_pairs_hook=strict_response_object,
+                        parse_constant=reject_json_constant,
+                    )
+                except (UnicodeError, ValueError, RecursionError) as exc:
+                    raise FormalQcTransportError(
+                        "QuantConnect response is not UTF-8 JSON"
+                    ) from exc
+                if type(value) is not dict or value.get("success") is not True:
+                    raise FormalQcTransportError(
+                        f"QuantConnect {path} request was refused"
+                    )
+                return value
+            return authenticated_json_post(
+                path, body, bounded_object_read=False
+            )
+
         try:
-            value = json_loader(
-                raw.decode("utf-8"),
+            logical_request = json_loader(
+                body.decode("utf-8"),
                 object_pairs_hook=strict_response_object,
                 parse_constant=reject_json_constant,
             )
         except (UnicodeError, ValueError, RecursionError) as exc:
-            raise FormalQcTransportError("QuantConnect response is not UTF-8 JSON") from exc
-        if type(value) is not dict or value.get("success") is not True or status >= 400:
-            # Values are intentionally not copied into this exception.
-            raise FormalQcTransportError(f"QuantConnect {path} request was refused")
-        return value
+            raise FormalQcTransportError(
+                "Object Store logical read request changed"
+            ) from exc
+        if type(logical_request) is not dict or set(logical_request) != {
+            "organizationId", "key"
+        }:
+            raise FormalQcTransportError(
+                "Object Store logical read request changed"
+            )
+        organization = _safe_id(
+            logical_request.get("organizationId"), "organization_id"
+        )
+        object_key = _safe_key(logical_request.get("key"))
+        maximum_object_bytes = (
+            MAX_FORMAL_RESULT_FAMILY_OBJECT_BYTES
+            if _result_family_route is not None
+            else MAX_OBJECT_BYTES
+        )
+        maximum_archive_bytes = min(
+            MAX_OBJECT_BYTES + MAX_OBJECT_GET_ARCHIVE_OVERHEAD_BYTES,
+            maximum_object_bytes + MAX_OBJECT_GET_ARCHIVE_OVERHEAD_BYTES,
+        )
+        initial = authenticated_json_post(
+            "object/get",
+            _json_bytes({"organizationId": organization, "keys": [object_key]}),
+            bounded_object_read=True,
+        )
+        job_id, signed_url = _validate_object_get_response(
+            initial, expected_job_id=None
+        )
+        api_call_count = 1
+        while signed_url is None:
+            if job_id is None:
+                raise FormalQcTransportError(
+                    "QuantConnect object/get response omitted its job identity"
+                )
+            if api_call_count >= OBJECT_GET_MAX_API_CALLS:
+                raise FormalQcTransportError(
+                    "QuantConnect object/get poll budget exhausted"
+                )
+            if production_transport is True:
+                remaining = remaining_timeout(bounded_object_read=True)
+                if remaining <= OBJECT_GET_POLL_INTERVAL_SECONDS:
+                    raise FormalQcTransportError(
+                        "QuantConnect object/get time budget exhausted"
+                    )
+                wait(OBJECT_GET_POLL_INTERVAL_SECONDS)
+                require_unchanged_configuration()
+            polled = authenticated_json_post(
+                "object/get",
+                _json_bytes(
+                    {"organizationId": organization, "jobId": job_id}
+                ),
+                bounded_object_read=True,
+            )
+            _polled_job_id, signed_url = _validate_object_get_response(
+                polled, expected_job_id=job_id
+            )
+            api_call_count += 1
+
+        download_url = _validated_signed_download_url(signed_url)
+        download_timeout = remaining_timeout(bounded_object_read=True)
+        if production_transport is True:
+            download_status, archive_bytes = prepared_download_transport(
+                download_url, download_timeout, maximum_archive_bytes
+            )
+        else:
+            # The existing injected four-argument callback remains the sole
+            # offline seam.  Empty body and headers unambiguously denote the
+            # credential-free signed GET in focused tests.
+            download_status, archive_bytes = http_transport(
+                download_url, b"", {}, download_timeout
+            )
+        require_unchanged_configuration()
+        if (
+            type(download_status) is not int
+            or type(archive_bytes) is not bytes
+            or len(archive_bytes) > maximum_archive_bytes
+        ):
+            raise FormalQcTransportError(
+                "QuantConnect signed download exceeded its byte bound"
+            )
+        if download_status < 200 or download_status >= 300:
+            raise FormalQcTransportError(
+                "QuantConnect signed download was refused"
+            )
+        payload = _extract_object_get_archive(
+            archive_bytes,
+            key=object_key,
+            maximum_object_bytes=maximum_object_bytes,
+        )
+        return {
+            "success": True,
+            "object": {
+                "key": object_key,
+                "objectData": base64.b64encode(payload).decode("ascii"),
+            },
+        }
 
     def _request_json(
         self, capability: object,

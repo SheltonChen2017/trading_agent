@@ -444,7 +444,7 @@ def build_formal_qc_compressed_shard(
     if len(payload) > ABSOLUTE_MAX_SHARD_COMPRESSED_BYTES:
         raise FormalQcRuntimeProjectionError("compressed shard exceeds an absolute safety bound")
     digest = hashlib.sha256(payload).hexdigest()
-    key = f"{FORMAL_INPUT_CONTENT_PREFIX}{role}/{ordinal:04d}-{digest}.jsonl.gz"
+    key = f"{FORMAL_INPUT_CONTENT_PREFIX}{role}/{ordinal:04d}-{digest}-jsonl.gz"
     return FormalQcCompressedShard(
         role=role,
         ordinal=ordinal,

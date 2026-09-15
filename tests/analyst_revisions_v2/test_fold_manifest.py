@@ -97,6 +97,21 @@ def _write(tmp_path: Path, raw: dict[str, object]) -> Path:
     return path
 
 
+def _rehash_root_only(raw: dict[str, object]) -> None:
+    raw["manifest_id"] = None
+    raw["manifest_hash"] = None
+    digest = hashlib.sha256(_canonical(raw)).hexdigest()
+    raw["manifest_hash"] = digest
+    raw["manifest_id"] = f"arv2-stock-folds-{digest[:16]}"
+
+
+def _rehash_walk_forward_and_root(raw: dict[str, object]) -> None:
+    raw["section_hashes"]["walk_forward_contract"] = hashlib.sha256(
+        _canonical(raw["walk_forward_contract"])
+    ).hexdigest()
+    _rehash_root_only(raw)
+
+
 def _load(path: Path = SPEC):
     return load_stock_fold_manifest(
         path,
@@ -350,6 +365,115 @@ def test_correctly_rehashed_semantic_weakening_refuses(
     mutate(raw)
     _rehash(raw)
     with pytest.raises(StockFoldManifestError, match="frozen definition"):
+        _load(_write(tmp_path, raw))
+
+
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        pytest.param(
+            lambda raw: raw["walk_forward_contract"]["ordered_fold_ids"].reverse(),
+            "ordered fold identities changed",
+            id="ordered-fold-identities",
+        ),
+        pytest.param(
+            lambda raw: raw["walk_forward_contract"]["folds"][0][
+                "ordered_horizons_sessions"
+            ].reverse(),
+            "ordered fold horizons changed",
+            id="ordered-horizons",
+        ),
+        pytest.param(
+            lambda raw: raw["walk_forward_contract"]["folds"][1][
+                "nominal_test_interval"
+            ].update(start_inclusive="2020-12-31"),
+            "nominal test intervals overlap",
+            id="overlapping-tests",
+        ),
+        pytest.param(
+            lambda raw: raw["walk_forward_contract"]["folds"][0][
+                "horizon_boundaries"
+            ][0].update(purge_sessions="invalid"),
+            "horizon boundary is not structurally authentic",
+            id="invalid-boundary",
+        ),
+        pytest.param(
+            lambda raw: raw["walk_forward_contract"]["folds"][0][
+                "horizon_boundaries"
+            ][0].update(fold_id="different-fold"),
+            "horizon boundary identity changed",
+            id="boundary-identity",
+        ),
+    ],
+)
+def test_structural_guards_are_isolated_from_exact_document_comparison(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutate,
+    message: str,
+) -> None:
+    raw = copy.deepcopy(json.loads(SPEC.read_text(encoding="utf-8")))
+    mutate(raw)
+    _rehash(raw)
+    monkeypatch.setattr(manifest_module, "_require_exact", lambda *_args: None)
+    with pytest.raises(StockFoldManifestError, match=message):
+        _load(_write(tmp_path, raw))
+
+
+def test_fold_content_hash_guard_isolated_from_exact_document_comparison(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    raw = copy.deepcopy(json.loads(SPEC.read_text(encoding="utf-8")))
+    raw["walk_forward_contract"]["folds"][0]["fold_sha256"] = "a" * 64
+    _rehash_walk_forward_and_root(raw)
+    monkeypatch.setattr(manifest_module, "_require_exact", lambda *_args: None)
+    with pytest.raises(StockFoldManifestError, match="fold content hash mismatch"):
+        _load(_write(tmp_path, raw))
+
+
+@pytest.mark.parametrize("section_name", SECTION_NAMES)
+def test_section_hash_guards_are_isolated_from_exact_document_comparison(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    section_name: str,
+) -> None:
+    raw = copy.deepcopy(json.loads(SPEC.read_text(encoding="utf-8")))
+    raw["section_hashes"][section_name] = "a" * 64
+    _rehash_root_only(raw)
+    monkeypatch.setattr(manifest_module, "_require_exact", lambda *_args: None)
+    with pytest.raises(
+        StockFoldManifestError,
+        match=rf"{section_name} section hash mismatch",
+    ):
+        _load(_write(tmp_path, raw))
+
+
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        pytest.param(
+            lambda raw: raw.update(status="changed"),
+            "stock fold manifest content hash mismatch",
+            id="root-content-hash",
+        ),
+        pytest.param(
+            lambda raw: raw.update(manifest_id="arv2-stock-folds-" + "0" * 16),
+            "manifest_id is not content-derived",
+            id="root-content-id",
+        ),
+    ],
+)
+def test_root_identity_guards_are_isolated_from_exact_document_comparison(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutate,
+    message: str,
+) -> None:
+    raw = copy.deepcopy(json.loads(SPEC.read_text(encoding="utf-8")))
+    mutate(raw)
+    monkeypatch.setattr(manifest_module, "_require_exact", lambda *_args: None)
+    with pytest.raises(StockFoldManifestError, match=message):
         _load(_write(tmp_path, raw))
 
 
@@ -666,7 +790,7 @@ def test_manifest_loader_refuses_symlink_and_toctou_change(
     try:
         linked.symlink_to(path)
     except OSError:
-        pass
+        pytest.skip("symlink creation is unavailable on this host")
     else:
         with pytest.raises(StockFoldManifestError, match="symlink"):
             _load(linked)

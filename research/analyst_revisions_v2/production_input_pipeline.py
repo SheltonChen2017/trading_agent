@@ -70,6 +70,10 @@ COMPARISON_REPORT_SCHEMA = "arv2-production-input-comparison-report-v1"
 ELIGIBILITY_CROSS_SECTION_SCOPE = (
     "eligibility_session_audit_only_not_reusable_for_later_decision_sessions"
 )
+SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE = (
+    "section72_owner_adjudicated_deterministic_default"
+)
+SECTION72_OWNER_WAIVER_SCOPE = "SECTION_72_THROUGH_FIRST_FORMAL_BACKTEST"
 
 
 class ProductionInputError(CanonicalEvidenceError):
@@ -128,6 +132,7 @@ class AdmissionDisposition(str, Enum):
     FIRM_ONTOLOGY_UNREVIEWED = "firm_ontology_unreviewed"
     MISSING_FIRM_ONTOLOGY_EVIDENCE = "missing_firm_ontology_evidence"
     FIRM_LABEL_UNREVIEWED = "firm_label_unreviewed"
+    FIRM_OWNER_WAIVER_BINDING_MISMATCH = "firm_owner_waiver_binding_mismatch"
     FIRM_MAPPING_AMBIGUOUS = "firm_mapping_ambiguous"
     FIRM_MAPPING_MISMATCH = "firm_mapping_mismatch"
     FIRM_MAPPING_LATE = "firm_mapping_late"
@@ -296,6 +301,61 @@ class EvidenceSourceBinding:
 
 
 @dataclasses.dataclass(frozen=True)
+class Section72OwnerWaivedFirmSourceBinding(EvidenceSourceBinding):
+    """Exact firm-source binding admitted by the bounded owner waiver only."""
+
+    admission_mode: str
+    owner_waiver_scope: str
+    independently_reviewed: bool
+    historical_availability_claimed: bool
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        _require_exact_strings(
+            self,
+            ("admission_mode", "owner_waiver_scope"),
+            "section72_firm_source",
+        )
+        require_exact_bool(self.independently_reviewed, "independently_reviewed")
+        require_exact_bool(
+            self.historical_availability_claimed,
+            "historical_availability_claimed",
+        )
+        if self.kind is not EvidenceSourceKind.FIRM_ONTOLOGY:
+            raise ProductionInputError(
+                "section-72 owner waiver may bind only the firm ontology source"
+            )
+        if self.admission_mode != SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE:
+            raise ProductionInputError(
+                "section-72 firm source admission mode changed"
+            )
+        if self.owner_waiver_scope != SECTION72_OWNER_WAIVER_SCOPE:
+            raise ProductionInputError(
+                "section-72 firm source owner-waiver scope changed"
+            )
+        if (
+            self.reviewed is not False
+            or self.point_in_time is not False
+            or self.independently_reviewed is not False
+            or self.historical_availability_claimed is not False
+        ):
+            raise ProductionInputError(
+                "section-72 firm source made a prohibited review or PIT claim"
+            )
+
+    def to_record(self) -> dict[str, Any]:
+        return {
+            **super().to_record(),
+            "admission_mode": self.admission_mode,
+            "owner_waiver_scope": self.owner_waiver_scope,
+            "independently_reviewed": self.independently_reviewed,
+            "historical_availability_claimed": (
+                self.historical_availability_claimed
+            ),
+        }
+
+
+@dataclasses.dataclass(frozen=True)
 class SecurityIdentityEvidence:
     provider_event_id: str
     source_current_restated_ticker: str
@@ -456,6 +516,65 @@ class FirmOntologyEvidence:
             "candidate_count": self.candidate_count,
             "ontology_reviewed": self.ontology_reviewed,
             "labels_reviewed": self.labels_reviewed,
+        }
+
+
+@dataclasses.dataclass(frozen=True)
+class Section72OwnerWaivedFirmOntologyEvidence(FirmOntologyEvidence):
+    """Owner-adjudicated default with no independent-review/PIT assertion."""
+
+    admission_mode: str
+    owner_waiver_scope: str
+    independently_reviewed: bool
+    historical_availability_claimed: bool
+    deterministic_default: bool
+    named_refusal: bool
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        _require_exact_strings(
+            self,
+            ("admission_mode", "owner_waiver_scope"),
+            "section72_firm",
+        )
+        for name in (
+            "independently_reviewed",
+            "historical_availability_claimed",
+            "deterministic_default",
+            "named_refusal",
+        ):
+            require_exact_bool(getattr(self, name), name)
+        if self.admission_mode != SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE:
+            raise ProductionInputError(
+                "section-72 firm evidence admission mode changed"
+            )
+        if self.owner_waiver_scope != SECTION72_OWNER_WAIVER_SCOPE:
+            raise ProductionInputError(
+                "section-72 firm evidence owner-waiver scope changed"
+            )
+        if (
+            self.ontology_reviewed is not False
+            or self.labels_reviewed is not False
+            or self.independently_reviewed is not False
+            or self.historical_availability_claimed is not False
+            or self.deterministic_default is not True
+            or self.named_refusal is not False
+        ):
+            raise ProductionInputError(
+                "section-72 firm evidence made a prohibited authority claim"
+            )
+
+    def to_record(self) -> dict[str, Any]:
+        return {
+            **super().to_record(),
+            "admission_mode": self.admission_mode,
+            "owner_waiver_scope": self.owner_waiver_scope,
+            "independently_reviewed": self.independently_reviewed,
+            "historical_availability_claimed": (
+                self.historical_availability_claimed
+            ),
+            "deterministic_default": self.deterministic_default,
+            "named_refusal": self.named_refusal,
         }
 
 
@@ -640,7 +759,9 @@ class DataQualityEvidence:
 class ProductionRowEvidence:
     locator: CaptureRowLocator
     security: SecurityIdentityEvidence | None
-    firm: FirmOntologyEvidence | None
+    firm: (
+        FirmOntologyEvidence | Section72OwnerWaivedFirmOntologyEvidence | None
+    )
     common_event: CommonEventIdentityEvidence | None
     sector: SectorClassificationEvidence | None
     control: PreopenControlEvidence | None
@@ -651,14 +772,19 @@ class ProductionRowEvidence:
             raise ProductionInputError("row evidence locator must have exact type")
         typed = (
             (self.security, SecurityIdentityEvidence, "security"),
-            (self.firm, FirmOntologyEvidence, "firm"),
+            (
+                self.firm,
+                (FirmOntologyEvidence, Section72OwnerWaivedFirmOntologyEvidence),
+                "firm",
+            ),
             (self.common_event, CommonEventIdentityEvidence, "common_event"),
             (self.sector, SectorClassificationEvidence, "sector"),
             (self.control, PreopenControlEvidence, "control"),
             (self.q_data, DataQualityEvidence, "q_data"),
         )
         for value, expected, name in typed:
-            if value is not None and type(value) is not expected:
+            expected_types = expected if type(expected) is tuple else (expected,)
+            if value is not None and type(value) not in expected_types:
                 raise ProductionInputError(f"{name} evidence must have exact type or be null")
 
     def to_record(self) -> dict[str, Any]:
@@ -911,8 +1037,12 @@ def _validate_authority_surface(authority: ProductionEvidenceAuthority) -> None:
 
 
 def _validate_sources(sources: tuple[EvidenceSourceBinding, ...]) -> None:
+    allowed_types = (
+        EvidenceSourceBinding,
+        Section72OwnerWaivedFirmSourceBinding,
+    )
     if type(sources) is not tuple or any(
-        type(item) is not EvidenceSourceBinding for item in sources
+        type(item) not in allowed_types for item in sources
     ):
         raise ProductionInputError("source bindings must be an exact typed tuple")
     if tuple(item.kind for item in sources) != _SOURCE_ORDER:
@@ -921,6 +1051,17 @@ def _validate_sources(sources: tuple[EvidenceSourceBinding, ...]) -> None:
         )
     for item in sources:
         item.__post_init__()
+    waived = tuple(
+        item for item in sources
+        if type(item) is Section72OwnerWaivedFirmSourceBinding
+    )
+    if waived and (
+        len(waived) != 1
+        or waived[0].kind is not EvidenceSourceKind.FIRM_ONTOLOGY
+    ):
+        raise ProductionInputError(
+            "section-72 source bindings overlap or escape firm ontology"
+        )
 
 
 def _remember_consistent_fact(
@@ -1109,6 +1250,28 @@ def _validate_row_evidence_topology(
                 )
         firm = item.firm
         if firm is not None:
+            if type(firm) is Section72OwnerWaivedFirmOntologyEvidence:
+                ontology_authority: object = (
+                    firm.admission_mode,
+                    firm.owner_waiver_scope,
+                    firm.independently_reviewed,
+                    firm.historical_availability_claimed,
+                    firm.deterministic_default,
+                    firm.named_refusal,
+                    firm.ontology_reviewed,
+                )
+                label_authority: object = (
+                    firm.admission_mode,
+                    firm.owner_waiver_scope,
+                    firm.independently_reviewed,
+                    firm.historical_availability_claimed,
+                    firm.deterministic_default,
+                    firm.named_refusal,
+                    firm.labels_reviewed,
+                )
+            else:
+                ontology_authority = firm.ontology_reviewed
+                label_authority = firm.labels_reviewed
             _remember_consistent_fact(
                 facts,
                 key=("firm", firm.provider_firm_id, source.event_date),
@@ -1121,7 +1284,7 @@ def _validate_row_evidence_topology(
                     firm.valid_to_available_at,
                     firm.available_at,
                     firm.candidate_count,
-                    firm.ontology_reviewed,
+                    ontology_authority,
                 ),
                 label="firm/date ontology",
             )
@@ -1139,7 +1302,7 @@ def _validate_row_evidence_topology(
                     firm.current_score,
                     firm.previous_score,
                     firm.ontology_entry_sha256,
-                    firm.labels_reviewed,
+                    label_authority,
                 ),
                 label="firm/rating-scale/date",
             )
@@ -1419,6 +1582,8 @@ _PINNED_STATIC_SCALARS = (
     PROVIDER_VERSION_PREFIX,
     COMPARISON_REPORT_SCHEMA,
     ELIGIBILITY_CROSS_SECTION_SCOPE,
+    SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE,
+    SECTION72_OWNER_WAIVER_SCOPE,
     PRODUCTION_INPUT_CONTRACT_ID,
     PRODUCTION_INPUT_CONTRACT_SHA256,
     INPUT_PAIR_CONTRACT_ID,
@@ -1480,6 +1645,8 @@ def _require_static_contract() -> None:
         PROVIDER_VERSION_PREFIX,
         COMPARISON_REPORT_SCHEMA,
         ELIGIBILITY_CROSS_SECTION_SCOPE,
+        SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE,
+        SECTION72_OWNER_WAIVER_SCOPE,
         PRODUCTION_INPUT_CONTRACT_ID,
         PRODUCTION_INPUT_CONTRACT_SHA256,
         INPUT_PAIR_CONTRACT_ID,
@@ -1630,11 +1797,23 @@ def _optional_text_value(record: dict[str, Any], key: str) -> str | None:
         raise _RatingRowRefusal(AdmissionDisposition.INVALID_RATING_ROW) from exc
 
 
+def _rating_action_is_missing(value: object) -> bool:
+    """Treat absent and the provider's observed exact-empty value identically."""
+
+    return value is None or (type(value) is str and value == "")
+
+
 def _validate_optional_rating_values(record: dict[str, Any]) -> None:
     try:
         for key in _RATING_TEXT_FIELDS:
             value = record.get(key)
-            if value is not None:
+            if (
+                value is not None
+                and not (
+                    key == "rating_action"
+                    and _rating_action_is_missing(value)
+                )
+            ):
                 require_text(
                     value,
                     key,
@@ -1701,7 +1880,13 @@ def _potential_directional_action(source: AcceptedRiskSourceRow) -> bool:
     raw_action = value.get("rating_action")
     if type(raw_action) is str and raw_action in _KNOWN_NON_DIRECTIONAL_ACTIONS:
         return False
-    if raw_action is None and type(value.get("price_target_action")) is str:
+    action_missing = _rating_action_is_missing(raw_action)
+    price_target_action = value.get("price_target_action")
+    if (
+        action_missing
+        and type(price_target_action) is str
+        and bool(price_target_action.strip())
+    ):
         return False
     return True
 
@@ -1724,7 +1909,8 @@ def _parse_rating_row(source: AcceptedRiskSourceRow) -> _ParsedRatingRow:
     firm_id = _required_identifier_value(value, "benzinga_firm_id")
     firm_name = _required_text_value(value, "firm")
     raw_action = value.get("rating_action")
-    if raw_action is None:
+    action_missing = _rating_action_is_missing(raw_action)
+    if action_missing:
         price_target_action = _optional_text_value(value, "price_target_action")
         if price_target_action is None:
             raise _RatingRowRefusal(AdmissionDisposition.INVALID_RATING_ROW)
@@ -2256,12 +2442,36 @@ def _admit_directional_rating(
 
     if evidence is None:
         return refuse(AdmissionDisposition.MISSING_ROW_EVIDENCE)
-    if not sources[EvidenceSourceKind.FIRM_ONTOLOGY].reviewed:
-        return refuse(AdmissionDisposition.FIRM_ONTOLOGY_UNREVIEWED)
-    if any(not binding.reviewed for binding in sources.values()):
-        return refuse(AdmissionDisposition.UNREVIEWED_EVIDENCE_SOURCE)
-    if any(not binding.point_in_time for binding in sources.values()):
-        return refuse(AdmissionDisposition.NON_PIT_EVIDENCE_SOURCE)
+    firm_source = sources[EvidenceSourceKind.FIRM_ONTOLOGY]
+    section72_firm = (
+        type(firm_source) is Section72OwnerWaivedFirmSourceBinding
+    )
+    if section72_firm:
+        if any(
+            kind is not EvidenceSourceKind.FIRM_ONTOLOGY
+            and (
+                type(binding) is not EvidenceSourceBinding
+                or not binding.reviewed
+            )
+            for kind, binding in sources.items()
+        ):
+            return refuse(AdmissionDisposition.UNREVIEWED_EVIDENCE_SOURCE)
+        if any(
+            kind is not EvidenceSourceKind.FIRM_ONTOLOGY
+            and (
+                type(binding) is not EvidenceSourceBinding
+                or not binding.point_in_time
+            )
+            for kind, binding in sources.items()
+        ):
+            return refuse(AdmissionDisposition.NON_PIT_EVIDENCE_SOURCE)
+    else:
+        if not firm_source.reviewed:
+            return refuse(AdmissionDisposition.FIRM_ONTOLOGY_UNREVIEWED)
+        if any(not binding.reviewed for binding in sources.values()):
+            return refuse(AdmissionDisposition.UNREVIEWED_EVIDENCE_SOURCE)
+        if any(not binding.point_in_time for binding in sources.values()):
+            return refuse(AdmissionDisposition.NON_PIT_EVIDENCE_SOURCE)
 
     security = evidence.security
     if security is None:
@@ -2298,10 +2508,30 @@ def _admit_directional_rating(
     firm = evidence.firm
     if firm is None:
         return refuse(AdmissionDisposition.MISSING_FIRM_ONTOLOGY_EVIDENCE)
-    if not firm.ontology_reviewed:
-        return refuse(AdmissionDisposition.FIRM_ONTOLOGY_UNREVIEWED)
-    if not firm.labels_reviewed:
-        return refuse(AdmissionDisposition.FIRM_LABEL_UNREVIEWED)
+    if section72_firm:
+        if (
+            type(firm) is not Section72OwnerWaivedFirmOntologyEvidence
+            or firm.admission_mode != firm_source.admission_mode
+            or firm.owner_waiver_scope != firm_source.owner_waiver_scope
+            or firm.independently_reviewed is not False
+            or firm.historical_availability_claimed is not False
+            or firm.deterministic_default is not True
+            or firm.named_refusal is not False
+            or firm.ontology_reviewed is not False
+            or firm.labels_reviewed is not False
+        ):
+            return refuse(
+                AdmissionDisposition.FIRM_OWNER_WAIVER_BINDING_MISMATCH
+            )
+    else:
+        if type(firm) is not FirmOntologyEvidence:
+            return refuse(
+                AdmissionDisposition.FIRM_OWNER_WAIVER_BINDING_MISMATCH
+            )
+        if not firm.ontology_reviewed:
+            return refuse(AdmissionDisposition.FIRM_ONTOLOGY_UNREVIEWED)
+        if not firm.labels_reviewed:
+            return refuse(AdmissionDisposition.FIRM_LABEL_UNREVIEWED)
     if firm.candidate_count != 1:
         return refuse(AdmissionDisposition.FIRM_MAPPING_AMBIGUOUS)
     if (
@@ -3222,10 +3452,14 @@ def _current_local_callables() -> tuple[object, ...]:
         _contains_visible_interval,
         EvidenceSourceBinding.__post_init__,
         EvidenceSourceBinding.to_record,
+        Section72OwnerWaivedFirmSourceBinding.__post_init__,
+        Section72OwnerWaivedFirmSourceBinding.to_record,
         SecurityIdentityEvidence.__post_init__,
         SecurityIdentityEvidence.to_record,
         FirmOntologyEvidence.__post_init__,
         FirmOntologyEvidence.to_record,
+        Section72OwnerWaivedFirmOntologyEvidence.__post_init__,
+        Section72OwnerWaivedFirmOntologyEvidence.to_record,
         CommonEventIdentityEvidence.__post_init__,
         CommonEventIdentityEvidence.to_record,
         SectorClassificationEvidence.__post_init__,
@@ -3254,6 +3488,7 @@ def _current_local_callables() -> tuple[object, ...]:
         _required_identifier_value,
         _required_text_value,
         _optional_text_value,
+        _rating_action_is_missing,
         _validate_optional_rating_values,
         _normalize_provider_timestamp,
         _potential_directional_action,
@@ -3303,8 +3538,10 @@ def _current_record_types() -> tuple[type[object], ...]:
         AdmissionDisposition,
         ComparisonDimension,
         EvidenceSourceBinding,
+        Section72OwnerWaivedFirmSourceBinding,
         SecurityIdentityEvidence,
         FirmOntologyEvidence,
+        Section72OwnerWaivedFirmOntologyEvidence,
         CommonEventIdentityEvidence,
         SectorClassificationEvidence,
         PreopenControlEvidence,
@@ -3353,6 +3590,10 @@ __all__ = [
     "ProductionInputError",
     "ProductionRowEvidence",
     "RowAdmission",
+    "SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE",
+    "SECTION72_OWNER_WAIVER_SCOPE",
+    "Section72OwnerWaivedFirmOntologyEvidence",
+    "Section72OwnerWaivedFirmSourceBinding",
     "SectorClassificationEvidence",
     "SecurityIdentityEvidence",
     "SignalArm",

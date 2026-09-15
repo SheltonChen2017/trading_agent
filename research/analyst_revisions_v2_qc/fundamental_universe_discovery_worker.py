@@ -2,7 +2,7 @@
 
 The worker deliberately accepts already-returned ``Fundamentals`` members and
 does not import LEAN.  The runtime is the only module allowed to request
-``History[Fundamentals]``.  Every source member becomes exactly one accepted,
+the dedicated US-fundamental universe history.  Every source member becomes exactly one accepted,
 out-of-scope, or named-refusal terminal.  No price, volume, return, portfolio,
 order, or result attribute is inspected.
 
@@ -13,8 +13,6 @@ reviewed market open.  The governing host manifest identifies this policy and
 the narrower guarantee: a point-in-time census inside QC's US Fundamentals
 dataset, not a universal security master or vendor revision archive.
 """
-from __future__ import annotations
-
 import hashlib
 import json
 import re
@@ -555,8 +553,30 @@ def build_collection_terminals(
     observed_sids = [
         row["qc_security_id"] for row in rows if row["qc_security_id"] is not None
     ]
-    if len(observed_sids) != len(set(observed_sids)):
-        raise ValueError("Fundamentals collection repeats a QC SecurityIdentifier")
+    sid_counts = {}
+    for sid in observed_sids:
+        sid_counts[sid] = sid_counts.get(sid, 0) + 1
+    duplicate_sids = {sid for sid, count in sid_counts.items() if count > 1}
+    if duplicate_sids:
+        rows = [
+            _named_refusal(
+                _base_terminal(
+                    session=session,
+                    ordinal=decision_session_ordinal,
+                    opened=decision_open_utc,
+                    source_ordinal=row["source_ordinal"],
+                ),
+                "duplicate_qc_security_identifier_in_collection",
+            )
+            if row["qc_security_id"] in duplicate_sids
+            else row
+            for row in rows
+        ]
+        observed_sids = [
+            row["qc_security_id"]
+            for row in rows
+            if row["qc_security_id"] is not None
+        ]
     counts = {
         disposition: sum(row["disposition"] == disposition for row in rows)
         for disposition in ("accepted", "out_of_scope", "named_refusal")

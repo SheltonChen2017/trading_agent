@@ -1,12 +1,14 @@
 """Bounded source-only capture of the three Sharadar inputs used by ARV2.
 
 The adapter retains exact bulk ZIP responses for TICKERS, ACTIONS, and
-FUNDAMENTALS.  It deliberately does *not* construct a point-in-time security
-master, infer a terminal shareholder payoff, or build a backtest input.  The
-TICKERS export is labelled as a capture-time snapshot even though it includes
-active and delisted securities; ACTIONS is discovery evidence only; and the
-FUNDAMENTALS request is restricted to the point-in-time As-Reported ``ART``
-dimension.
+FUNDAMENTALS.  Sharadar's ``years=full`` FUNDAMENTALS response is a complete
+multi-dimension bulk export, so every reviewed dimension is retained and an
+authenticated dimension census is recorded.  Only point-in-time As-Reported
+``ART`` rows are admitted by the downstream ARV2 composer.  This module does
+*not* construct a point-in-time security master, infer a terminal shareholder
+payoff, or build a backtest input.  TICKERS is a capture-time snapshot even
+though it includes active and delisted securities; ACTIONS is discovery
+evidence only.
 
 Operational capture is POSIX-only and publishes one private, immutable-style
 directory below the repository's ignored ``artifacts/`` tree.  Downloads and
@@ -29,7 +31,9 @@ import re
 import stat
 import subprocess
 import sys
+import tempfile
 import zipfile
+from collections import Counter
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path, PurePosixPath
@@ -54,7 +58,7 @@ from research.analyst_revisions_v2.canonical import (
 
 
 BASE_URL = "https://api.sharadar.com"
-ARTIFACT_SCHEMA = "arv2-sharadar-source-capture-artifact-v1"
+ARTIFACT_SCHEMA = "arv2-sharadar-source-capture-artifact-v2"
 MANIFEST_FILENAME = "manifest.json"
 MANIFEST_DIGEST_FILENAME = "manifest.sha256"
 MAX_MANIFEST_BYTES = 8 * 1024 * 1024
@@ -82,9 +86,11 @@ ACTIONS_AVAILABILITY = (
     "full_history_current_export_for_identity_and_terminal_event_discovery_only"
 )
 FUNDAMENTALS_AVAILABILITY = (
-    "point_in_time_as_reported_art_full_history_date_fields_only_"
-    "no_intraday_availability"
+    "full_history_multi_dimension_bulk_archive_downstream_admits_only_"
+    "point_in_time_as_reported_ART_date_fields_no_intraday_availability"
 )
+REVIEWED_FUNDAMENTAL_DIMENSIONS = ("ARQ", "ART", "ARY", "MRQ", "MRT", "MRY")
+FUNDAMENTALS_ADMITTED_DIMENSION = "ART"
 
 
 class SharadarDataset(str, Enum):
@@ -105,10 +111,7 @@ REQUEST_QUERIES = MappingProxyType(
     {
         SharadarDataset.TICKERS: (("years", "full"),),
         SharadarDataset.ACTIONS: (("years", "full"),),
-        SharadarDataset.FUNDAMENTALS: (
-            ("dimension", "ART"),
-            ("years", "full"),
-        ),
+        SharadarDataset.FUNDAMENTALS: (("years", "full"),),
     }
 )
 REQUIRED_FIELDS = MappingProxyType(
@@ -182,6 +185,9 @@ _REDIRECT_HOST_SUFFIXES = (
     ".googleusercontent.com",
     ".sharadar.com",
 )
+_REDIRECT_EXACT_HOSTS = frozenset(
+    {"static-sharadar.nyc3.digitaloceanspaces.com"}
+)
 _ALLOWED_ZIP_COMPRESSION = frozenset({zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED})
 
 _MANIFEST_KEYS = frozenset(
@@ -210,7 +216,11 @@ _MANIFEST_KEYS = frozenset(
         "actions_availability_semantics",
         "fundamentals_availability_semantics",
         "tickers_contains_active_and_delisted",
-        "fundamentals_dimension",
+        "tickers_unknown_delisting_flag_row_count",
+        "fundamentals_archive_dimensions",
+        "fundamentals_bulk_request_unfiltered_by_dimension",
+        "fundamentals_downstream_admitted_dimension",
+        "fundamentals_non_admitted_dimensions_retained",
         "pit_security_master_constructed",
         "terminal_payoff_constructed",
         "backtest_input_constructed",
@@ -233,6 +243,10 @@ _ARCHIVE_KEYS = frozenset(
         "member_count",
         "uncompressed_byte_count",
         "row_count",
+        "active_ticker_row_count",
+        "delisted_ticker_row_count",
+        "unknown_ticker_delisting_flag_row_count",
+        "fundamental_dimension_counts",
         "redirect_used",
         "members",
     }
@@ -248,6 +262,7 @@ _MEMBER_KEYS = frozenset(
         "columns",
     }
 )
+_DIMENSION_COUNT_KEYS = frozenset({"dimension", "row_count"})
 
 
 class SharadarCaptureError(ValueError):
@@ -273,6 +288,10 @@ class SharadarArchiveBinding:
     archive_file: str
     archive_byte_count: int
     archive_sha256: str
+    active_ticker_row_count: int
+    delisted_ticker_row_count: int
+    unknown_ticker_delisting_flag_row_count: int
+    fundamental_dimension_counts: tuple[tuple[str, int], ...]
     redirect_used: bool
     members: tuple[SharadarMemberBinding, ...]
 
@@ -305,6 +324,10 @@ class LoadedSharadarCapture:
 class _DatasetCensus:
     active: int = 0
     delisted: int = 0
+    unknown_delisting_flag: int = 0
+    fundamental_dimensions: Counter[str] = dataclasses.field(
+        default_factory=Counter
+    )
     rows: int = 0
 
 
@@ -549,8 +572,11 @@ def _validate_redirect_url(url: object, key: str) -> str:
         pass
     else:
         raise SharadarCaptureError("provider redirect used an IP literal")
-    if hostname in {"localhost", "localhost.localdomain"} or not any(
-        hostname.endswith(suffix) for suffix in _REDIRECT_HOST_SUFFIXES
+    if hostname in {"localhost", "localhost.localdomain"} or (
+        hostname not in _REDIRECT_EXACT_HOSTS
+        and not any(
+            hostname.endswith(suffix) for suffix in _REDIRECT_HOST_SUFFIXES
+        )
     ):
         raise SharadarCaptureError("provider redirect host is not reviewed")
     encoded = url.encode("utf-8")
@@ -887,6 +913,75 @@ def _open_private_regular(
         raise SharadarCaptureError(f"{label} is unavailable or link-like") from exc
 
 
+def _entry_identity(metadata: os.stat_result) -> tuple[int, int, int, int, int]:
+    return (
+        metadata.st_dev,
+        metadata.st_ino,
+        metadata.st_size,
+        metadata.st_mtime_ns,
+        metadata.st_ctime_ns,
+    )
+
+
+def _directory_identity(metadata: os.stat_result) -> tuple[int, int]:
+    return metadata.st_dev, metadata.st_ino
+
+
+def _read_open_private_regular(
+    descriptor: int,
+    *,
+    maximum: int,
+    label: str,
+) -> tuple[bytes, tuple[int, int, int, int, int]]:
+    """Read one already-open leaf while retaining its exact identity."""
+
+    try:
+        before = os.fstat(descriptor)
+        _regular_metadata(before, label, maximum)
+        os.lseek(descriptor, 0, os.SEEK_SET)
+        chunks: list[bytes] = []
+        remaining = maximum + 1
+        while remaining:
+            chunk = os.read(descriptor, min(RESPONSE_CHUNK_BYTES, remaining))
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
+        payload = b"".join(chunks)
+        after = os.fstat(descriptor)
+    except OSError as exc:
+        raise SharadarCaptureError(f"{label} could not be read safely") from exc
+    _regular_metadata(after, label, maximum)
+    identity = _entry_identity(before)
+    if len(payload) != before.st_size or _entry_identity(after) != identity:
+        raise SharadarCaptureError(f"{label} changed while being read")
+    return payload, identity
+
+
+def _require_open_leaf_identity(
+    parent_fd: int,
+    filename: str,
+    descriptor: int,
+    identity: tuple[int, int, int, int, int],
+    *,
+    maximum: int,
+    label: str,
+) -> None:
+    """Reauthenticate both a held descriptor and its directory entry."""
+
+    try:
+        opened = os.fstat(descriptor)
+        named = os.stat(filename, dir_fd=parent_fd, follow_symlinks=False)
+    except OSError as exc:
+        raise SharadarCaptureError(
+            f"{label} identity is unavailable after visitation"
+        ) from exc
+    _regular_metadata(opened, label, maximum)
+    _regular_metadata(named, label, maximum)
+    if _entry_identity(opened) != identity or _entry_identity(named) != identity:
+        raise SharadarCaptureError(f"{label} identity changed after visitation")
+
+
 def _stream_archive(
     response: object,
     descriptor: int,
@@ -1007,14 +1102,25 @@ def _inspect_csv_member(
                     census.delisted += 1
                 elif state in {"n", "no", "0", "false"}:
                     census.active += 1
+                elif state == "":
+                    # Sharadar's production TICKERS export contains blank
+                    # isdelisted values.  A blank is retained as unknown: it
+                    # is neither evidence that a security is active nor that
+                    # it is delisted.  The exact count is authenticated in the
+                    # archive and top-level manifests below.
+                    census.unknown_delisting_flag += 1
                 else:
                     raise SharadarCaptureError("TICKERS delisting flag is unreviewed")
             elif dataset is SharadarDataset.ACTIONS:
                 if any(not row[indexes[field]] for field in ("date", "action", "ticker")):
                     raise SharadarCaptureError("ACTIONS row lacks discovery identity")
             else:
-                if row[indexes["dimension"]] != "ART":
-                    raise SharadarCaptureError("FUNDAMENTALS contains a non-ART row")
+                dimension = row[indexes["dimension"]]
+                if dimension not in REVIEWED_FUNDAMENTAL_DIMENSIONS:
+                    raise SharadarCaptureError(
+                        "FUNDAMENTALS contains an unreviewed dimension"
+                    )
+                census.fundamental_dimensions[dimension] += 1
                 if any(
                     not row[indexes[field]]
                     for field in (
@@ -1055,7 +1161,7 @@ def _inspect_zip_fd(
     remaining_uncompressed: int,
     remaining_rows: int,
     remaining_members: int,
-) -> tuple[SharadarMemberBinding, ...]:
+) -> tuple[tuple[SharadarMemberBinding, ...], _DatasetCensus]:
     try:
         os.lseek(descriptor, 0, os.SEEK_SET)
         with os.fdopen(os.dup(descriptor), "rb", closefd=True) as source:
@@ -1097,7 +1203,14 @@ def _inspect_zip_fd(
         raise SharadarCaptureError(
             "TICKERS snapshot does not demonstrate active and delisted coverage"
         )
-    return members
+    if (
+        dataset is SharadarDataset.FUNDAMENTALS
+        and census.fundamental_dimensions[FUNDAMENTALS_ADMITTED_DIMENSION] == 0
+    ):
+        raise SharadarCaptureError(
+            "FUNDAMENTALS archive does not contain the admitted ART dimension"
+        )
+    return members, census
 
 
 def _capture_one_archive(
@@ -1125,7 +1238,7 @@ def _capture_one_archive(
             key=key,
             remaining_total=remaining_archive,
         )
-        members = _inspect_zip_fd(
+        members, census = _inspect_zip_fd(
             descriptor,
             dataset,
             remaining_uncompressed=remaining_uncompressed,
@@ -1151,6 +1264,14 @@ def _capture_one_archive(
         archive_file=filename,
         archive_byte_count=byte_count,
         archive_sha256=archive_sha256,
+        active_ticker_row_count=census.active,
+        delisted_ticker_row_count=census.delisted,
+        unknown_ticker_delisting_flag_row_count=census.unknown_delisting_flag,
+        fundamental_dimension_counts=tuple(
+            (dimension, census.fundamental_dimensions[dimension])
+            for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+            if census.fundamental_dimensions[dimension]
+        ),
         redirect_used=redirected,
         members=members,
     )
@@ -1179,6 +1300,15 @@ def _archive_record(archive: SharadarArchiveBinding) -> dict[str, object]:
         "member_count": archive.member_count,
         "uncompressed_byte_count": archive.uncompressed_byte_count,
         "row_count": archive.row_count,
+        "active_ticker_row_count": archive.active_ticker_row_count,
+        "delisted_ticker_row_count": archive.delisted_ticker_row_count,
+        "unknown_ticker_delisting_flag_row_count": (
+            archive.unknown_ticker_delisting_flag_row_count
+        ),
+        "fundamental_dimension_counts": [
+            {"dimension": dimension, "row_count": row_count}
+            for dimension, row_count in archive.fundamental_dimension_counts
+        ],
         "redirect_used": archive.redirect_used,
         "members": [_member_record(member) for member in archive.members],
     }
@@ -1235,7 +1365,27 @@ def _manifest(
         "actions_availability_semantics": ACTIONS_AVAILABILITY,
         "fundamentals_availability_semantics": FUNDAMENTALS_AVAILABILITY,
         "tickers_contains_active_and_delisted": True,
-        "fundamentals_dimension": "ART",
+        "tickers_unknown_delisting_flag_row_count": next(
+            archive.unknown_ticker_delisting_flag_row_count
+            for archive in archives
+            if archive.dataset is SharadarDataset.TICKERS
+        ),
+        "fundamentals_archive_dimensions": [
+            dimension
+            for archive in archives
+            if archive.dataset is SharadarDataset.FUNDAMENTALS
+            for dimension, _row_count in archive.fundamental_dimension_counts
+        ],
+        "fundamentals_bulk_request_unfiltered_by_dimension": True,
+        "fundamentals_downstream_admitted_dimension": (
+            FUNDAMENTALS_ADMITTED_DIMENSION
+        ),
+        "fundamentals_non_admitted_dimensions_retained": any(
+            dimension != FUNDAMENTALS_ADMITTED_DIMENSION
+            for archive in archives
+            if archive.dataset is SharadarDataset.FUNDAMENTALS
+            for dimension, _row_count in archive.fundamental_dimension_counts
+        ),
         "pit_security_master_constructed": False,
         "terminal_payoff_constructed": False,
         "backtest_input_constructed": False,
@@ -1548,6 +1698,71 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
             maximum=MAX_ARCHIVE_BYTES,
         )
         archive_sha256 = require_sha256(value["archive_sha256"], "archive sha256")
+        active_ticker_rows = require_int(
+            value["active_ticker_row_count"],
+            "active_ticker_row_count",
+            minimum=0,
+            maximum=MAX_TOTAL_ROWS,
+        )
+        delisted_ticker_rows = require_int(
+            value["delisted_ticker_row_count"],
+            "delisted_ticker_row_count",
+            minimum=0,
+            maximum=MAX_TOTAL_ROWS,
+        )
+        unknown_ticker_rows = require_int(
+            value["unknown_ticker_delisting_flag_row_count"],
+            "unknown_ticker_delisting_flag_row_count",
+            minimum=0,
+            maximum=MAX_TOTAL_ROWS,
+        )
+        raw_dimension_counts = value["fundamental_dimension_counts"]
+        if type(raw_dimension_counts) is not list:
+            raise SharadarCaptureError(
+                "manifest fundamental dimension census is invalid"
+            )
+        dimension_counts: list[tuple[str, int]] = []
+        for item in raw_dimension_counts:
+            if type(item) is not dict:
+                raise SharadarCaptureError(
+                    "manifest fundamental dimension census is invalid"
+                )
+            require_exact_keys(
+                item,
+                _DIMENSION_COUNT_KEYS,
+                "fundamental dimension census",
+            )
+            dimension = item["dimension"]
+            if (
+                type(dimension) is not str
+                or dimension not in REVIEWED_FUNDAMENTAL_DIMENSIONS
+            ):
+                raise SharadarCaptureError(
+                    "manifest fundamental dimension is unreviewed"
+                )
+            dimension_counts.append(
+                (
+                    dimension,
+                    require_int(
+                        item["row_count"],
+                        "fundamental dimension row_count",
+                        minimum=1,
+                        maximum=MAX_TOTAL_ROWS,
+                    ),
+                )
+            )
+        expected_dimension_order = tuple(
+            dimension
+            for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+            if any(name == dimension for name, _count in dimension_counts)
+        )
+        if (
+            tuple(name for name, _count in dimension_counts)
+            != expected_dimension_order
+        ):
+            raise SharadarCaptureError(
+                "manifest fundamental dimension census is not canonical"
+            )
         require_exact_bool(value["redirect_used"], "redirect_used")
         members_raw = value["members"]
         if (
@@ -1569,6 +1784,41 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
         ):
             if require_int(value[key], key, minimum=1) != actual:
                 raise SharadarCaptureError(f"manifest {key} does not match members")
+        if expected is SharadarDataset.TICKERS:
+            if (
+                active_ticker_rows < 1
+                or delisted_ticker_rows < 1
+                or active_ticker_rows + delisted_ticker_rows + unknown_ticker_rows
+                != sum(member.row_count for member in members)
+            ):
+                raise SharadarCaptureError(
+                    "manifest TICKERS delisting-flag census is inconsistent"
+                )
+        elif any(
+            count != 0
+            for count in (
+                active_ticker_rows,
+                delisted_ticker_rows,
+                unknown_ticker_rows,
+            )
+        ):
+            raise SharadarCaptureError(
+                "non-TICKERS archive carries a delisting-flag census"
+            )
+        if expected is SharadarDataset.FUNDAMENTALS:
+            if (
+                FUNDAMENTALS_ADMITTED_DIMENSION
+                not in {dimension for dimension, _count in dimension_counts}
+                or sum(count for _dimension, count in dimension_counts)
+                != sum(member.row_count for member in members)
+            ):
+                raise SharadarCaptureError(
+                    "manifest FUNDAMENTALS dimension census is inconsistent"
+                )
+        elif dimension_counts:
+            raise SharadarCaptureError(
+                "non-FUNDAMENTALS archive carries a dimension census"
+            )
     except CanonicalEvidenceError as exc:
         raise SharadarCaptureError("manifest archive field is invalid") from exc
     return SharadarArchiveBinding(
@@ -1578,6 +1828,10 @@ def _parse_archive(value: object, expected: SharadarDataset) -> SharadarArchiveB
         archive_file=value["archive_file"],
         archive_byte_count=archive_bytes,
         archive_sha256=archive_sha256,
+        active_ticker_row_count=active_ticker_rows,
+        delisted_ticker_row_count=delisted_ticker_rows,
+        unknown_ticker_delisting_flag_row_count=unknown_ticker_rows,
+        fundamental_dimension_counts=tuple(dimension_counts),
         redirect_used=value["redirect_used"],
         members=members,
     )
@@ -1659,12 +1913,34 @@ def _parse_manifest(payload: bytes, artifact_path: Path) -> tuple[dict[str, obje
             ("tickers_availability_semantics", TICKERS_AVAILABILITY),
             ("actions_availability_semantics", ACTIONS_AVAILABILITY),
             ("fundamentals_availability_semantics", FUNDAMENTALS_AVAILABILITY),
-            ("fundamentals_dimension", "ART"),
+            (
+                "fundamentals_downstream_admitted_dimension",
+                FUNDAMENTALS_ADMITTED_DIMENSION,
+            ),
         ):
             if value[key] != expected:
                 raise SharadarCaptureError(f"manifest {key} changed")
+        fundamentals_archive = archives[2]
+        archive_dimensions = [
+            dimension
+            for dimension, _row_count in (
+                fundamentals_archive.fundamental_dimension_counts
+            )
+        ]
+        if value["fundamentals_archive_dimensions"] != archive_dimensions:
+            raise SharadarCaptureError(
+                "manifest FUNDAMENTALS dimension inventory changed"
+            )
         for key, expected in (
             ("tickers_contains_active_and_delisted", True),
+            ("fundamentals_bulk_request_unfiltered_by_dimension", True),
+            (
+                "fundamentals_non_admitted_dimensions_retained",
+                any(
+                    dimension != FUNDAMENTALS_ADMITTED_DIMENSION
+                    for dimension in archive_dimensions
+                ),
+            ),
             ("pit_security_master_constructed", False),
             ("terminal_payoff_constructed", False),
             ("backtest_input_constructed", False),
@@ -1677,12 +1953,512 @@ def _parse_manifest(payload: bytes, artifact_path: Path) -> tuple[dict[str, obje
             require_exact_bool(value[key], key)
             if value[key] is not expected:
                 raise SharadarCaptureError(f"manifest {key} boundary changed")
+        tickers_archive = archives[0]
+        if (
+            require_int(
+                value["tickers_unknown_delisting_flag_row_count"],
+                "tickers_unknown_delisting_flag_row_count",
+                minimum=0,
+                maximum=MAX_TOTAL_ROWS,
+            )
+            != tickers_archive.unknown_ticker_delisting_flag_row_count
+        ):
+            raise SharadarCaptureError(
+                "manifest unknown TICKERS delisting-flag count changed"
+            )
         require_exact_bool(value["provider_io_read_only"], "provider_io_read_only")
         if value["provider_io_read_only"] is not (value["capture_transport"] == PRODUCTION_TRANSPORT):
             raise SharadarCaptureError("manifest provider-I/O classification changed")
     except CanonicalEvidenceError as exc:
         raise SharadarCaptureError("capture manifest field is invalid") from exc
     return value, archives
+
+
+def _hash_open_private_regular(
+    descriptor: int,
+    *,
+    maximum: int,
+    label: str,
+) -> tuple[int, str, tuple[int, int, int, int, int]]:
+    """Hash one held leaf without materializing it and pin its metadata."""
+
+    try:
+        before = os.fstat(descriptor)
+        _regular_metadata(before, label, maximum)
+        os.lseek(descriptor, 0, os.SEEK_SET)
+        digest = hashlib.sha256()
+        byte_count = 0
+        while True:
+            chunk = os.read(descriptor, RESPONSE_CHUNK_BYTES)
+            if not chunk:
+                break
+            byte_count += len(chunk)
+            if byte_count > maximum:
+                raise SharadarCaptureError(f"{label} exceeds byte limit")
+            digest.update(chunk)
+        after = os.fstat(descriptor)
+    except SharadarCaptureError:
+        raise
+    except OSError as exc:
+        raise SharadarCaptureError(f"{label} could not be hashed safely") from exc
+    _regular_metadata(after, label, maximum)
+    identity = _entry_identity(before)
+    if byte_count != before.st_size or _entry_identity(after) != identity:
+        raise SharadarCaptureError(f"{label} changed while being hashed")
+    return byte_count, digest.hexdigest(), identity
+
+
+def _snapshot_sharadar_member(
+    archive: zipfile.ZipFile,
+    info: zipfile.ZipInfo,
+    *,
+    declared: SharadarMemberBinding,
+) -> tuple[int, tuple[int, int, int, int, int]]:
+    """Copy one authenticated member into an unlinked private snapshot."""
+
+    _safe_zip_member(info)
+    if (
+        info.filename != declared.name
+        or info.compress_size != declared.compressed_byte_count
+        or info.file_size != declared.uncompressed_byte_count
+        or info.CRC != declared.crc32
+    ):
+        raise SharadarCaptureError("ZIP member metadata changed before snapshot")
+    snapshot = tempfile.TemporaryFile(mode="w+b")
+    snapshot_fd = snapshot.fileno()
+    observed = 0
+    digest = hashlib.sha256()
+    try:
+        os.fchmod(snapshot_fd, 0o600)
+        with archive.open(info, "r") as source:
+            while True:
+                chunk = source.read(RESPONSE_CHUNK_BYTES)
+                if not chunk:
+                    break
+                if type(chunk) is not bytes:
+                    raise SharadarCaptureError(
+                        "ZIP member snapshot source yielded non-bytes"
+                    )
+                observed += len(chunk)
+                if observed > declared.uncompressed_byte_count:
+                    raise SharadarCaptureError(
+                        "ZIP member snapshot exceeds authenticated size"
+                    )
+                _write_all(snapshot_fd, chunk, "Sharadar member snapshot")
+                digest.update(chunk)
+        if (
+            observed != declared.uncompressed_byte_count
+            or digest.hexdigest() != declared.content_sha256
+        ):
+            raise SharadarCaptureError(
+                "ZIP member bytes changed before snapshot completion"
+            )
+        os.fsync(snapshot_fd)
+        metadata = os.fstat(snapshot_fd)
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or stat.S_IMODE(metadata.st_mode) != 0o600
+            or metadata.st_uid != os.getuid()
+            or metadata.st_nlink not in {0, 1}
+            or metadata.st_size != observed
+        ):
+            raise SharadarCaptureError(
+                "Sharadar member snapshot is not a private bounded regular file"
+            )
+        retained = os.dup(snapshot_fd)
+        os.lseek(retained, 0, os.SEEK_SET)
+        identity = _entry_identity(os.fstat(retained))
+    except BaseException:
+        snapshot.close()
+        raise
+    snapshot.close()
+    return retained, identity
+
+
+def _visit_sharadar_snapshot_rows(
+    descriptor: int,
+    *,
+    dataset: SharadarDataset,
+    declared: SharadarMemberBinding,
+    expected_identity: tuple[int, int, int, int, int],
+    visit_row: Callable[
+        [SharadarDataset, SharadarMemberBinding, int, dict[str, str]], None
+    ],
+) -> int:
+    """Visit one private snapshot in zero-based source-row order."""
+
+    before = os.fstat(descriptor)
+    if (
+        _entry_identity(before) != expected_identity
+        or not stat.S_ISREG(before.st_mode)
+        or stat.S_IMODE(before.st_mode) != 0o600
+        or before.st_uid != os.getuid()
+        or before.st_nlink not in {0, 1}
+        or before.st_size != declared.uncompressed_byte_count
+    ):
+        raise SharadarCaptureError(
+            "Sharadar member snapshot changed before visitation"
+        )
+    os.lseek(descriptor, 0, os.SEEK_SET)
+    source = os.fdopen(os.dup(descriptor), "rb", closefd=True)
+    hashing = _HashingRawReader(source)
+    buffered = io.BufferedReader(hashing, buffer_size=RESPONSE_CHUNK_BYTES)
+    text = io.TextIOWrapper(buffered, encoding="utf-8-sig", newline="")
+    callback_member = dataclasses.replace(declared)
+    previous_limit = csv.field_size_limit()
+    try:
+        csv.field_size_limit(MAX_CSV_FIELD_BYTES)
+        rows = csv.reader(text, strict=True)
+        try:
+            header = next(rows)
+        except StopIteration:
+            raise SharadarCaptureError("CSV member became empty during visitation") from None
+        except (csv.Error, UnicodeError) as exc:
+            raise SharadarCaptureError(
+                "ZIP member is not bounded strict UTF-8 CSV during visitation"
+            ) from exc
+        if tuple(header) != declared.columns:
+            raise SharadarCaptureError("CSV member header changed before visitation")
+        row_count = 0
+        while True:
+            try:
+                row = next(rows)
+            except StopIteration:
+                break
+            except (csv.Error, UnicodeError) as exc:
+                raise SharadarCaptureError(
+                    "ZIP member is not bounded strict UTF-8 CSV during visitation"
+                ) from exc
+            if len(row) != len(header):
+                raise SharadarCaptureError(
+                    "CSV row width changed before visitation"
+                )
+            if row_count >= declared.row_count:
+                raise SharadarCaptureError(
+                    "CSV member row count exceeds authenticated census"
+                )
+            exact_row = dict(zip(header, row, strict=True))
+            visit_row(dataset, callback_member, row_count, exact_row)
+            row_count += 1
+            del exact_row, row
+    finally:
+        csv.field_size_limit(previous_limit)
+        text.close()
+    if (
+        row_count != declared.row_count
+        or hashing.byte_count != declared.uncompressed_byte_count
+        or hashing.sha256 != declared.content_sha256
+        or _entry_identity(os.fstat(descriptor)) != expected_identity
+    ):
+        raise SharadarCaptureError(
+            "CSV member snapshot bytes or row count changed during visitation"
+        )
+    return row_count
+
+
+def _visit_authenticated_sharadar_capture_rows_for_bridge(
+    artifact_path: Path,
+    *,
+    expected_transport: str,
+    visit_row: Callable[
+        [SharadarDataset, SharadarMemberBinding, int, dict[str, str]], None
+    ],
+) -> LoadedSharadarCapture:
+    """Visit every fully authenticated Sharadar row with bounded memory.
+
+    All three archive byte streams, ZIP inventories, member hashes, schemas,
+    dataset censuses, and aggregate counts are authenticated before the first
+    callback.  The callback then receives one fresh exact-string row mapping
+    at a time in archive/member/source order.  Its zero-based ordinal resets
+    for each CSV member.  Callback exceptions propagate unchanged.
+    """
+
+    if type(expected_transport) is not str or expected_transport not in _TRANSPORTS:
+        raise SharadarCaptureError("expected capture transport is not reviewed")
+    if not callable(visit_row):
+        raise SharadarCaptureError("capture row visitor must be callable")
+
+    root, root_fd = _open_directory_path(
+        Path(artifact_path), create=False, name="capture artifact"
+    )
+    assert root_fd is not None
+    root_identity = _directory_identity(os.fstat(root_fd))
+    held: list[
+        tuple[
+            str,
+            int,
+            int,
+            str,
+            tuple[int, int, int, int, int],
+        ]
+    ] = []
+    snapshots: list[
+        tuple[
+            SharadarDataset,
+            SharadarMemberBinding,
+            int,
+            tuple[int, int, int, int, int],
+        ]
+    ] = []
+    try:
+        manifest_fd = _open_private_regular(
+            root_fd,
+            MANIFEST_FILENAME,
+            maximum=MAX_MANIFEST_BYTES,
+            label="Sharadar capture manifest",
+        )
+        held.append(
+            (
+                MANIFEST_FILENAME,
+                manifest_fd,
+                MAX_MANIFEST_BYTES,
+                "Sharadar capture manifest",
+                _entry_identity(os.fstat(manifest_fd)),
+            )
+        )
+        digest_fd = _open_private_regular(
+            root_fd,
+            MANIFEST_DIGEST_FILENAME,
+            maximum=65,
+            label="Sharadar capture manifest digest",
+        )
+        held.append(
+            (
+                MANIFEST_DIGEST_FILENAME,
+                digest_fd,
+                65,
+                "Sharadar capture manifest digest",
+                _entry_identity(os.fstat(digest_fd)),
+            )
+        )
+        manifest_bytes, manifest_identity = _read_open_private_regular(
+            manifest_fd,
+            maximum=MAX_MANIFEST_BYTES,
+            label="Sharadar capture manifest",
+        )
+        digest_bytes, digest_identity = _read_open_private_regular(
+            digest_fd,
+            maximum=65,
+            label="Sharadar capture manifest digest",
+        )
+        held[0] = (
+            MANIFEST_FILENAME,
+            manifest_fd,
+            MAX_MANIFEST_BYTES,
+            "Sharadar capture manifest",
+            manifest_identity,
+        )
+        held[1] = (
+            MANIFEST_DIGEST_FILENAME,
+            digest_fd,
+            65,
+            "Sharadar capture manifest digest",
+            digest_identity,
+        )
+        manifest_sha256 = sha256_bytes(manifest_bytes)
+        if digest_bytes != (manifest_sha256 + "\n").encode("ascii"):
+            raise SharadarCaptureError(
+                "capture manifest digest does not authenticate bytes"
+            )
+        manifest, declared_archives = _parse_manifest(manifest_bytes, root)
+        if manifest["capture_transport"] != expected_transport:
+            raise SharadarCaptureError(
+                "capture transport does not match bridge expectation"
+            )
+
+        observed: list[SharadarArchiveBinding] = []
+        archive_total = uncompressed_total = row_total = member_total = 0
+        for declared in declared_archives:
+            descriptor = _open_private_regular(
+                root_fd,
+                declared.archive_file,
+                maximum=MAX_ARCHIVE_BYTES,
+                label=f"Sharadar {declared.dataset.value} archive",
+            )
+            try:
+                byte_count, archive_sha256, identity = _hash_open_private_regular(
+                    descriptor,
+                    maximum=MAX_ARCHIVE_BYTES,
+                    label=f"Sharadar {declared.dataset.value} archive",
+                )
+                if (
+                    byte_count != declared.archive_byte_count
+                    or archive_sha256 != declared.archive_sha256
+                ):
+                    raise SharadarCaptureError(
+                        "archive bytes do not match manifest before visitation"
+                    )
+                members, census = _inspect_zip_fd(
+                    descriptor,
+                    declared.dataset,
+                    remaining_uncompressed=(
+                        MAX_TOTAL_UNCOMPRESSED_BYTES - uncompressed_total
+                    ),
+                    remaining_rows=MAX_TOTAL_ROWS - row_total,
+                    remaining_members=MAX_TOTAL_ZIP_MEMBERS - member_total,
+                )
+                rebuilt = dataclasses.replace(
+                    declared,
+                    members=members,
+                    active_ticker_row_count=census.active,
+                    delisted_ticker_row_count=census.delisted,
+                    unknown_ticker_delisting_flag_row_count=(
+                        census.unknown_delisting_flag
+                    ),
+                    fundamental_dimension_counts=tuple(
+                        (dimension, census.fundamental_dimensions[dimension])
+                        for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+                        if census.fundamental_dimensions[dimension]
+                    ),
+                )
+                if rebuilt != declared:
+                    raise SharadarCaptureError(
+                        "ZIP member census differs from manifest before visitation"
+                    )
+                try:
+                    os.lseek(descriptor, 0, os.SEEK_SET)
+                    with os.fdopen(os.dup(descriptor), "rb", closefd=True) as source:
+                        with zipfile.ZipFile(source, "r", allowZip64=True) as archive:
+                            infos = archive.infolist()
+                            if len(infos) != len(declared.members):
+                                raise SharadarCaptureError(
+                                    "ZIP member inventory changed before snapshot"
+                                )
+                            pairs = zip(infos, declared.members, strict=True)
+                            for info, member in pairs:
+                                snapshot_fd, snapshot_identity = (
+                                    _snapshot_sharadar_member(
+                                        archive,
+                                        info,
+                                        declared=member,
+                                    )
+                                )
+                                snapshots.append(
+                                    (
+                                        declared.dataset,
+                                        member,
+                                        snapshot_fd,
+                                        snapshot_identity,
+                                    )
+                                )
+                except SharadarCaptureError:
+                    raise
+                except (
+                    OSError,
+                    RuntimeError,
+                    zipfile.BadZipFile,
+                    zipfile.LargeZipFile,
+                ) as exc:
+                    raise SharadarCaptureError(
+                        "archive changed or could not be snapshotted"
+                    ) from exc
+                held.append(
+                    (
+                        declared.archive_file,
+                        descriptor,
+                        MAX_ARCHIVE_BYTES,
+                        f"Sharadar {declared.dataset.value} archive",
+                        identity,
+                    )
+                )
+                observed.append(rebuilt)
+                archive_total += byte_count
+                uncompressed_total += rebuilt.uncompressed_byte_count
+                row_total += rebuilt.row_count
+                member_total += rebuilt.member_count
+                descriptor = -1
+            finally:
+                if descriptor >= 0:
+                    os.close(descriptor)
+        if (
+            tuple(observed) != declared_archives
+            or archive_total > MAX_TOTAL_ARCHIVE_BYTES
+            or uncompressed_total > MAX_TOTAL_UNCOMPRESSED_BYTES
+            or row_total > MAX_TOTAL_ROWS
+            or member_total > MAX_TOTAL_ZIP_MEMBERS
+            or len(snapshots) != member_total
+        ):
+            raise SharadarCaptureError(
+                "capture aggregate differs from authenticated manifest"
+            )
+        _validate_inventory(
+            root_fd,
+            {item.archive_file for item in observed},
+            published=True,
+        )
+        for filename, descriptor, maximum, label, identity in held:
+            _require_open_leaf_identity(
+                root_fd,
+                filename,
+                descriptor,
+                identity,
+                maximum=maximum,
+                label=label,
+            )
+
+        visited_rows = 0
+        for dataset, member, descriptor, identity in snapshots:
+            visited_rows += _visit_sharadar_snapshot_rows(
+                descriptor,
+                dataset=dataset,
+                declared=member,
+                expected_identity=identity,
+                visit_row=visit_row,
+            )
+        if visited_rows != row_total:
+            raise SharadarCaptureError("capture visitation was not exhaustive")
+
+        _validate_inventory(
+            root_fd,
+            {item.archive_file for item in observed},
+            published=True,
+        )
+        for filename, descriptor, maximum, label, identity in held:
+            _require_open_leaf_identity(
+                root_fd,
+                filename,
+                descriptor,
+                identity,
+                maximum=maximum,
+                label=label,
+            )
+        reopened_fd: int | None = None
+        try:
+            _reopened_root, reopened_fd = _open_directory_path(
+                root,
+                create=False,
+                name="capture artifact final path",
+            )
+            assert reopened_fd is not None
+            if _directory_identity(os.fstat(reopened_fd)) != root_identity:
+                raise SharadarCaptureError(
+                    "capture artifact path identity changed during visitation"
+                )
+        finally:
+            if reopened_fd is not None:
+                os.close(reopened_fd)
+        return LoadedSharadarCapture(
+            artifact_path=root,
+            manifest_sha256=manifest_sha256,
+            capture_id=manifest["capture_id"],
+            capture_sha256=manifest["capture_sha256"],
+            capture_started_at=manifest["capture_started_at"],
+            capture_completed_at=manifest["capture_completed_at"],
+            capture_transport=manifest["capture_transport"],
+            archives=tuple(observed),
+        )
+    finally:
+        for _dataset, _member, descriptor, _identity in reversed(snapshots):
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
+        for _filename, descriptor, _maximum, _label, _identity in reversed(held):
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
+        os.close(root_fd)
 
 
 def load_sharadar_capture_artifact(artifact_path: Path) -> LoadedSharadarCapture:
@@ -1731,7 +2507,7 @@ def load_sharadar_capture_artifact(artifact_path: Path) -> LoadedSharadarCapture
                     digest_hasher.update(chunk)
                 if byte_count != declared.archive_byte_count or digest_hasher.hexdigest() != declared.archive_sha256:
                     raise SharadarCaptureError("archive bytes do not match manifest")
-                members = _inspect_zip_fd(
+                members, census = _inspect_zip_fd(
                     descriptor,
                     declared.dataset,
                     remaining_uncompressed=MAX_TOTAL_UNCOMPRESSED_BYTES - uncompressed_total,
@@ -1746,7 +2522,20 @@ def load_sharadar_capture_artifact(artifact_path: Path) -> LoadedSharadarCapture
                     raise SharadarCaptureError("archive changed while being read")
             finally:
                 os.close(descriptor)
-            rebuilt = dataclasses.replace(declared, members=members)
+            rebuilt = dataclasses.replace(
+                declared,
+                members=members,
+                active_ticker_row_count=census.active,
+                delisted_ticker_row_count=census.delisted,
+                unknown_ticker_delisting_flag_row_count=(
+                    census.unknown_delisting_flag
+                ),
+                fundamental_dimension_counts=tuple(
+                    (dimension, census.fundamental_dimensions[dimension])
+                    for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+                    if census.fundamental_dimensions[dimension]
+                ),
+            )
             if rebuilt != declared:
                 raise SharadarCaptureError("ZIP member census differs from manifest")
             observed.append(rebuilt)

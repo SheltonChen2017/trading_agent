@@ -4,6 +4,8 @@ import inspect
 import io
 import json
 import os
+import re
+import shutil
 import stat
 import zipfile
 from datetime import datetime, timezone
@@ -17,13 +19,16 @@ import scripts.capture_arv2_sharadar as adapter
 from research.analyst_revisions_v2.canonical import canonical_json_bytes, sha256_bytes
 from scripts.capture_arv2_sharadar import (
     ACTIONS_AVAILABILITY,
+    FUNDAMENTALS_ADMITTED_DIMENSION,
     FUNDAMENTALS_AVAILABILITY,
     PRODUCTION_TRANSPORT,
     TEST_TRANSPORT,
     TICKERS_AVAILABILITY,
+    REVIEWED_FUNDAMENTAL_DIMENSIONS,
     SharadarCaptureError,
     SharadarDataset,
     _capture_sharadar_history_for_test,
+    _visit_authenticated_sharadar_capture_rows_for_bridge,
     capture_sharadar_history,
     load_sharadar_capture_artifact,
 )
@@ -35,9 +40,9 @@ KEY = "offline-test-sharadar-key-NEVER-REAL"
 TICKERS = (
     b"table,ticker,permaticker,isdelisted,name,category,exchange,sector,industry,"
     b"figi,firstpricedate,lastpricedate\n"
-    b"fundamentals,AAA,100001,N,Active Corp,Domestic Common Stock,NASDAQ,"
+    b"SF1,AAA,100001,N,Active Corp,Domestic Common Stock,NASDAQ,"
     b"Technology,Software,BBG000AAA111,2010-01-04,\n"
-    b"fundamentals,OLD,100002,Y,Old Corp,Domestic Common Stock,NYSE,"
+    b"SF1,OLD,100002,Y,Old Corp,Domestic Common Stock,NYSE,"
     b"Industrials,Machinery,BBG000OLD222,2000-01-03,2020-12-31\n"
 )
 ACTIONS = (
@@ -181,6 +186,223 @@ def _manifest(result) -> dict[str, object]:
     return json.loads((result.artifact_path / adapter.MANIFEST_FILENAME).read_text())
 
 
+def _exact_error(message: str) -> str:
+    return f"^{re.escape(message)}$"
+
+
+def test_streaming_bridge_visitor_authenticates_and_visits_every_row(tmp_path):
+    result, _ = _capture(tmp_path)
+    observed: list[tuple[SharadarDataset, str, int, dict[str, str]]] = []
+
+    def visit(dataset, member, ordinal, row):
+        assert type(row) is dict
+        observed.append((dataset, member.name, ordinal, row))
+
+    summary = _visit_authenticated_sharadar_capture_rows_for_bridge(
+        result.artifact_path,
+        expected_transport=adapter.TEST_TRANSPORT,
+        visit_row=visit,
+    )
+
+    assert summary == result
+    assert [(dataset, ordinal) for dataset, _member, ordinal, _row in observed] == [
+        (SharadarDataset.TICKERS, 0),
+        (SharadarDataset.TICKERS, 1),
+        (SharadarDataset.ACTIONS, 0),
+        (SharadarDataset.FUNDAMENTALS, 0),
+        (SharadarDataset.FUNDAMENTALS, 1),
+    ]
+    assert observed[0][3]["ticker"] == "AAA"
+    assert observed[-1][3]["dimension"] == "ART"
+
+
+def test_streaming_bridge_visitor_rejects_arguments_before_filesystem(tmp_path):
+    missing = tmp_path / "never-opened"
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error("expected capture transport is not reviewed"),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            missing,
+            expected_transport="unreviewed",
+            visit_row=lambda *_args: None,
+        )
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error("capture row visitor must be callable"),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            missing,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=None,
+        )
+    assert not missing.exists()
+
+
+def test_streaming_bridge_visitor_authenticates_all_archives_before_callback(
+    tmp_path,
+):
+    result, _ = _capture(tmp_path)
+    actions = result.artifact_path / result.archives[1].archive_file
+    corrupted = bytearray(actions.read_bytes())
+    corrupted[len(corrupted) // 2] ^= 1
+    actions.write_bytes(corrupted)
+    callbacks = 0
+
+    def visit(*_args):
+        nonlocal callbacks
+        callbacks += 1
+
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error(
+            "archive bytes do not match manifest before visitation"
+        ),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert callbacks == 0
+
+
+def test_streaming_bridge_visitor_propagates_callback_failure_unchanged(tmp_path):
+    result, _ = _capture(tmp_path)
+    failure = RuntimeError("consumer refused a Sharadar row")
+    callbacks = 0
+
+    def visit(*_args):
+        nonlocal callbacks
+        callbacks += 1
+        raise failure
+
+    with pytest.raises(RuntimeError) as captured:
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert captured.value is failure
+    assert callbacks == 1
+
+
+def test_streaming_bridge_visitor_does_not_reclassify_callback_oserror(tmp_path):
+    result, _ = _capture(tmp_path)
+    failure = OSError("consumer-owned output failed")
+
+    def visit(*_args):
+        raise failure
+
+    with pytest.raises(OSError) as captured:
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert captured.value is failure
+
+
+def test_streaming_bridge_visitor_never_delivers_post_auth_source_mutation(
+    tmp_path,
+):
+    session = FakeSession(
+        [
+            FakeResponse(
+                _zip_bytes(dataset, compression=zipfile.ZIP_STORED)
+            )
+            for dataset in adapter.DATASET_ORDER
+        ]
+    )
+    result, _ = _capture(tmp_path, session)
+    actions = result.artifact_path / result.archives[1].archive_file
+    callbacks = 0
+    action_tickers: list[str] = []
+
+    def visit(dataset, _member, _ordinal, row):
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            payload = actions.read_bytes()
+            assert b",OLD," in payload
+            with actions.open("r+b") as target:
+                target.write(payload.replace(b",OLD,", b",BAD,", 1))
+                target.flush()
+                os.fsync(target.fileno())
+        if dataset is SharadarDataset.ACTIONS:
+            action_tickers.append(row["ticker"])
+
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error(
+            "Sharadar actions archive identity changed after visitation"
+        ),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert callbacks == 5
+    assert action_tickers == ["OLD"]
+
+
+def test_streaming_bridge_visitor_rechecks_visited_leaf_identity(tmp_path):
+    result, _ = _capture(tmp_path)
+    target = result.artifact_path / result.archives[0].archive_file
+    moved = result.artifact_path.parent / (target.name + ".moved")
+    callbacks = 0
+
+    def visit(*_args):
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            target.rename(moved)
+            shutil.copyfile(moved, target)
+            target.chmod(0o600)
+
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error(
+            "Sharadar tickers archive identity changed after visitation"
+        ),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            result.artifact_path,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert callbacks == 5
+
+
+def test_streaming_bridge_visitor_rechecks_artifact_path_identity(tmp_path):
+    result, _ = _capture(tmp_path)
+    original = result.artifact_path
+    moved = original.with_name(original.name + ".moved")
+    callbacks = 0
+
+    def visit(*_args):
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == 1:
+            original.rename(moved)
+            original.mkdir(mode=0o700)
+            original.chmod(0o700)
+
+    with pytest.raises(
+        SharadarCaptureError,
+        match=_exact_error(
+            "capture artifact path identity changed during visitation"
+        ),
+    ):
+        _visit_authenticated_sharadar_capture_rows_for_bridge(
+            original,
+            expected_transport=adapter.TEST_TRANSPORT,
+            visit_row=visit,
+        )
+    assert callbacks == 5
+
+
 def _rewrite_manifest(path: Path, mutator) -> None:
     manifest_path = path / adapter.MANIFEST_FILENAME
     value = json.loads(manifest_path.read_text())
@@ -203,7 +425,8 @@ def test_success_streams_three_full_exports_and_reloads_deterministically(tmp_pa
     assert all(response.close_count == 1 for response in session.served)
     assert session.close_count == 0
     assert all(call["params"]["years"] == "full" for call in session.calls)
-    assert session.calls[2]["params"]["dimension"] == "ART"
+    assert "dimension" not in session.calls[2]["params"]
+    assert result.archives[2].fundamental_dimension_counts == (("ART", 2),)
 
 
 def test_manifest_is_honest_about_snapshot_and_nonconstruction_boundaries(tmp_path):
@@ -213,8 +436,15 @@ def test_manifest_is_honest_about_snapshot_and_nonconstruction_boundaries(tmp_pa
     assert manifest["tickers_availability_semantics"] == TICKERS_AVAILABILITY
     assert manifest["actions_availability_semantics"] == ACTIONS_AVAILABILITY
     assert manifest["fundamentals_availability_semantics"] == FUNDAMENTALS_AVAILABILITY
-    assert manifest["fundamentals_dimension"] == "ART"
+    assert manifest["fundamentals_archive_dimensions"] == ["ART"]
+    assert manifest["fundamentals_bulk_request_unfiltered_by_dimension"] is True
+    assert (
+        manifest["fundamentals_downstream_admitted_dimension"]
+        == FUNDAMENTALS_ADMITTED_DIMENSION
+    )
+    assert manifest["fundamentals_non_admitted_dimensions_retained"] is False
     assert manifest["tickers_contains_active_and_delisted"] is True
+    assert manifest["tickers_unknown_delisting_flag_row_count"] == 0
     assert manifest["pit_security_master_constructed"] is False
     assert manifest["terminal_payoff_constructed"] is False
     assert manifest["backtest_input_constructed"] is False
@@ -241,6 +471,20 @@ def test_key_and_request_or_redirect_urls_are_not_persisted(tmp_path):
     assert _manifest(result)["api_key_persisted"] is False
     assert _manifest(result)["redirect_url_persisted"] is False
     assert result.archives[0].redirect_used is True
+
+
+def test_current_sharadar_bulk_redirect_host_is_exactly_allowlisted():
+    url = (
+        "https://static-sharadar.nyc3.digitaloceanspaces.com/"
+        "exports/tickers.zip?signature=fixture"
+    )
+    assert adapter._validate_redirect_url(url, KEY) == url
+    with pytest.raises(SharadarCaptureError, match="host is not reviewed"):
+        adapter._validate_redirect_url(
+            "https://lookalike-static-sharadar.nyc3.digitaloceanspaces.com/"
+            "exports/tickers.zip?signature=fixture",
+            KEY,
+        )
 
 
 def test_public_signature_has_no_session_clock_or_key_injection():
@@ -441,19 +685,177 @@ def test_csv_missing_required_field_refuses(tmp_path):
 def test_tickers_must_demonstrate_active_and_delisted_coverage(tmp_path):
     archive = _zip_bytes(
         SharadarDataset.TICKERS,
-        csv_bytes=TICKERS.split(b"fundamentals,OLD", 1)[0],
+        csv_bytes=TICKERS.split(b"SF1,OLD", 1)[0],
     )
     with pytest.raises(SharadarCaptureError, match="active and delisted"):
         _capture(tmp_path, FakeSession([FakeResponse(archive)]))
 
 
-def test_fundamentals_must_be_art_and_retain_required_fields(tmp_path):
-    bad = FUNDAMENTALS.replace(b",ART,", b",MRY,")
+def test_blank_tickers_delisting_flag_is_retained_as_authenticated_unknown(tmp_path):
+    tickers = TICKERS + (
+        b"SF1,UNK,100003,,Unknown State Corp,Domestic Common Stock,NYSE,"
+        b"Industrials,Machinery,BBG000UNK333,2015-01-02,\n"
+    )
+    responses = [
+        FakeResponse(_zip_bytes(SharadarDataset.TICKERS, csv_bytes=tickers)),
+        *_valid_responses()[1:],
+    ]
+    result, _ = _capture(tmp_path, FakeSession(responses))
+    reloaded = load_sharadar_capture_artifact(result.artifact_path)
+    tickers_archive = reloaded.archives[0]
+
+    assert tickers_archive.active_ticker_row_count == 1
+    assert tickers_archive.delisted_ticker_row_count == 1
+    assert tickers_archive.unknown_ticker_delisting_flag_row_count == 1
+    assert _manifest(result)["tickers_unknown_delisting_flag_row_count"] == 1
+
+
+def test_nonblank_unreviewed_tickers_delisting_flag_still_refuses(tmp_path):
+    tickers = TICKERS.replace(b",AAA,100001,N,", b",AAA,100001,MAYBE,")
+    with pytest.raises(SharadarCaptureError, match="delisting flag is unreviewed"):
+        _capture(
+            tmp_path,
+            FakeSession(
+                [FakeResponse(_zip_bytes(SharadarDataset.TICKERS, csv_bytes=tickers))]
+            ),
+        )
+
+
+def test_fundamentals_refuse_an_unreviewed_dimension(tmp_path):
+    bad = FUNDAMENTALS.replace(b",ART,", b",BAD,")
     responses = _valid_responses()[:2] + [
         FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=bad))
     ]
-    with pytest.raises(SharadarCaptureError, match="non-ART"):
+    with pytest.raises(SharadarCaptureError, match="unreviewed dimension"):
         _capture(tmp_path, FakeSession(responses))
+
+
+def test_fundamentals_require_the_admitted_art_dimension(tmp_path):
+    non_art = FUNDAMENTALS.replace(b",ART,", b",MRY,")
+    responses = _valid_responses()[:2] + [
+        FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=non_art))
+    ]
+    with pytest.raises(
+        SharadarCaptureError,
+        match=re.escape(
+            "FUNDAMENTALS archive does not contain the admitted ART dimension"
+        ),
+    ):
+        _capture(tmp_path, FakeSession(responses))
+
+
+def test_fundamentals_retain_and_authenticate_all_reviewed_dimensions(tmp_path):
+    extra_dimensions = b"".join(
+        (
+            f"AAA,{dimension},2021-12-31,2022-02-10,2021-12-31,"
+            "2022-02-10,1000000,5000000,9000000\n"
+        ).encode("ascii")
+        for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+        if dimension != FUNDAMENTALS_ADMITTED_DIMENSION
+    )
+    mixed = FUNDAMENTALS + extra_dimensions
+    responses = _valid_responses()[:2] + [
+        FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=mixed))
+    ]
+
+    result, _ = _capture(tmp_path, FakeSession(responses))
+    reloaded = load_sharadar_capture_artifact(result.artifact_path)
+    manifest = _manifest(result)
+
+    assert result == reloaded
+    assert REVIEWED_FUNDAMENTAL_DIMENSIONS == (
+        "ARQ",
+        "ART",
+        "ARY",
+        "MRQ",
+        "MRT",
+        "MRY",
+    )
+    assert reloaded.archives[2].fundamental_dimension_counts == tuple(
+        (dimension, 2 if dimension == "ART" else 1)
+        for dimension in REVIEWED_FUNDAMENTAL_DIMENSIONS
+    )
+    assert manifest["fundamentals_archive_dimensions"] == list(
+        REVIEWED_FUNDAMENTAL_DIMENSIONS
+    )
+    assert manifest["fundamentals_non_admitted_dimensions_retained"] is True
+
+
+def test_reload_recomputes_the_fundamental_dimension_census(tmp_path):
+    mixed = FUNDAMENTALS + (
+        b"AAA,MRY,2021-12-31,2022-02-10,2021-12-31,2022-02-10,"
+        b"1000000,5000000,9000000\n"
+    )
+    responses = _valid_responses()[:2] + [
+        FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=mixed))
+    ]
+    result, _ = _capture(tmp_path, FakeSession(responses))
+
+    def forge_dimension_counts(value):
+        value["archives"][2]["fundamental_dimension_counts"] = [
+            {"dimension": "ART", "row_count": 1},
+            {"dimension": "MRY", "row_count": 2},
+        ]
+        identity = adapter._capture_identity_document(
+            value["capture_started_at"],
+            value["capture_completed_at"],
+            value["capture_transport"],
+            tuple(
+                adapter._parse_archive(raw, role)
+                for raw, role in zip(
+                    value["archives"], adapter.DATASET_ORDER, strict=True
+                )
+            ),
+        )
+        capture_sha256 = sha256_bytes(canonical_json_bytes(identity))
+        value["capture_sha256"] = capture_sha256
+        value["capture_id"] = f"arv2-sharadar-source-{capture_sha256[:16]}"
+
+    _rewrite_manifest(result.artifact_path, forge_dimension_counts)
+
+    with pytest.raises(SharadarCaptureError, match="member census differs"):
+        load_sharadar_capture_artifact(result.artifact_path)
+
+
+@pytest.mark.parametrize(
+    "field, replacement, message",
+    (
+        ("fundamentals_archive_dimensions", ["ART"], "dimension inventory"),
+        (
+            "fundamentals_bulk_request_unfiltered_by_dimension",
+            False,
+            "boundary changed",
+        ),
+        (
+            "fundamentals_downstream_admitted_dimension",
+            "MRY",
+            "changed",
+        ),
+        (
+            "fundamentals_non_admitted_dimensions_retained",
+            False,
+            "boundary changed",
+        ),
+    ),
+)
+def test_reload_refuses_rehashed_fundamental_dimension_claims(
+    tmp_path, field, replacement, message
+):
+    mixed = FUNDAMENTALS + (
+        b"AAA,MRY,2021-12-31,2022-02-10,2021-12-31,2022-02-10,"
+        b"1000000,5000000,9000000\n"
+    )
+    responses = _valid_responses()[:2] + [
+        FakeResponse(_zip_bytes(SharadarDataset.FUNDAMENTALS, csv_bytes=mixed))
+    ]
+    result, _ = _capture(tmp_path, FakeSession(responses))
+    _rewrite_manifest(
+        result.artifact_path,
+        lambda value: value.__setitem__(field, replacement),
+    )
+
+    with pytest.raises(SharadarCaptureError, match=message):
+        load_sharadar_capture_artifact(result.artifact_path)
 
 
 def test_legacy_fundamental_field_names_cannot_masquerade_as_current_schema(

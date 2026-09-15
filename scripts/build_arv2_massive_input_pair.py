@@ -80,8 +80,8 @@ _CLOCK_SEMANTICS = (
     ),
     (
         MassiveSourceRole.CORPORATE_GUIDANCE,
-        "unresolved_intraday_timezones_date_only_three_session_lag_and_prior_"
-        "calendar_date_censoring",
+        "unresolved_intraday_timezones_date_only_three_session_lag_and_"
+        "exact_offset_or_prior_calendar_date_censoring",
     ),
 )
 _KNOWN_RATING_ACTIONS = frozenset(
@@ -194,6 +194,12 @@ def _canonical_rating_action(value: object) -> str:
     return normalized
 
 
+def _rating_action_is_missing(value: object) -> bool:
+    """Classify only absent or exactly empty actions; never infer an action."""
+
+    return value is None or (type(value) is str and value == "")
+
+
 def _iter_page_rows(payload: bytes):
     """Parse one bounded JSONL row at a time without a second page-sized list."""
 
@@ -277,7 +283,7 @@ def _slim_authenticated_capture(
             "Massive artifact transport does not match this bridge entry point"
         )
 
-    seen_provider_ids: set[str] = set()
+    seen_provider_ids: dict[str, MassiveSourceRole] = {}
     observed_rows = 0
     raw_total = 0
     rows_total = 0
@@ -299,16 +305,20 @@ def _slim_authenticated_capture(
             except CanonicalEvidenceError:
                 provider_id = None
             if provider_id is not None:
-                if provider_id in seen_provider_ids:
+                prior_role = seen_provider_ids.get(provider_id)
+                if prior_role is None:
+                    seen_provider_ids[provider_id] = page.source_role
+                elif not (
+                    prior_role is MassiveSourceRole.CORPORATE_GUIDANCE
+                    and page.source_role is MassiveSourceRole.CORPORATE_GUIDANCE
+                ):
                     raise MassiveInputPairBridgeError(
                         "duplicate or conflicting benzinga_id invalidates the capture"
                     )
-                seen_provider_ids.add(provider_id)
-            if (
-                page.source_role is MassiveSourceRole.ANALYST_RATINGS
-                and row.get("rating_action") is not None
-            ):
-                _canonical_rating_action(row["rating_action"])
+            if page.source_role is MassiveSourceRole.ANALYST_RATINGS:
+                raw_action = row.get("rating_action")
+                if not _rating_action_is_missing(raw_action):
+                    _canonical_rating_action(raw_action)
         if page_rows != page.row_count:
             raise MassiveInputPairBridgeError(
                 "streamed page census does not match its authenticated row count"
@@ -347,8 +357,8 @@ def _slim_authenticated_capture(
         artifact_id=loaded.artifact_path.name,
         manifest_sha256=loaded.manifest_sha256,
         capture_transport=loaded.capture_transport,
-        physical_capture_id=physical.capture_id,
-        physical_capture_sha256=physical.capture_sha256,
+        physical_capture_id=loaded.physical_capture_id,
+        physical_capture_sha256=loaded.physical_capture_sha256,
         source_page_root_sha256=source_page_root,
         source_page_count=physical.total_page_count,
         source_row_count=physical.total_row_count,

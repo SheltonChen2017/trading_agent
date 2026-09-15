@@ -650,7 +650,7 @@ def build_preopen_input_shard(
     digest = hashlib.sha256(payload).hexdigest()
     key = (
         f"{INPUT_PREFIX}content/security-batch-{security_batch_ordinal:04d}/{role}/"
-        f"{ordinal:04d}-{digest}.jsonl.gz"
+        f"{ordinal:04d}-{digest}-jsonl.gz"
     )
     return PreopenInputShard(
         role=role,
@@ -729,7 +729,7 @@ def build_preopen_input_manifest_bytes(
             f"{INPUT_PREFIX}content/security-batch-"
             f"{shard.security_batch_ordinal:04d}/"
             f"{shard.role}/{shard.ordinal:04d}-"
-            f"{shard.compressed_sha256}.jsonl.gz"
+            f"{shard.compressed_sha256}-jsonl.gz"
         )
         if shard.object_store_key != expected_key:
             raise PreopenControlStageError("input shard key is not content-derived")
@@ -1450,7 +1450,7 @@ def build_preopen_output_shard(
             f"{OUTPUT_PREFIX}content/control_terminals/"
             f"chunk-{decision_chunk_ordinal:04d}/"
             f"security-batch-{security_batch_ordinal:04d}/"
-            f"{digest}.jsonl.gz"
+            f"{digest}-jsonl.gz"
         ),
         compressed_sha256=digest,
         compressed_byte_count=len(payload),
@@ -2050,7 +2050,7 @@ class AnalystRevisionsV2PreopenControlConstruction(QCAlgorithm):
         digest = hashlib.sha256(compressed).hexdigest()
         ordinal = len(self._output_shards)
         key = (_C["OUTPUT_PREFIX"] + "content/control_terminals/" +
-            str(ordinal).zfill(4) + "-" + digest + ".jsonl.gz")
+            str(ordinal).zfill(4) + "-" + digest + "-jsonl.gz")
         if not self.object_store.save_bytes(key, compressed):
             raise ValueError("pre-open terminal shard persistence failed")
         self._output_shards.append({{"schema": _C["OUTPUT_SHARD_SCHEMA"],

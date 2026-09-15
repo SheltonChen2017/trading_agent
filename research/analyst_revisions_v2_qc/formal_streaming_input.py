@@ -209,6 +209,16 @@ from .formal_terminal_disposition_builder import (
     require_formal_terminal_disposition_build,
     require_fresh_formal_terminal_disposition_recorder,
 )
+from .accepted_risk_terminal_disposition import (
+    AcceptedRiskTerminalDispositionBuild,
+    AcceptedRiskTerminalDispositionError,
+    AcceptedRiskTerminalDispositionRecorder,
+    finalize_accepted_risk_terminal_disposition_recording,
+    record_accepted_risk_terminal_security,
+    record_accepted_risk_terminal_slot,
+    require_accepted_risk_terminal_disposition_build,
+    require_fresh_accepted_risk_terminal_disposition_recorder,
+)
 
 
 class FormalStreamingInputError(ValueError):
@@ -846,6 +856,84 @@ del _require_formal_streaming_capacity_binding_impl
 del _capacity_authority_register
 del _capacity_authority_current
 del _make_capacity_binding_authority
+
+
+def _make_physical_capacity_resolver(*, module_registry: object, system_module: object):
+    module_name = "research.analyst_revisions_v2_qc.physical_streaming_scoring"
+    operation_name = "require_physical_streaming_scoring_capacity"
+    authority: tuple[object, object] | None = None
+
+    def resolve() -> object:
+        nonlocal authority
+        try:
+            module = module_registry.get(module_name)
+            registry_is_current = system_module.modules is module_registry
+            operation = getattr(module, operation_name)
+        except (AttributeError, TypeError) as exc:
+            raise FormalStreamingInputError(
+                "physical scoring capacity verifier is unavailable"
+            ) from exc
+        if (
+            module is None
+            or not registry_is_current
+            or not callable(operation)
+            or getattr(operation, "__module__", None) != module_name
+            or getattr(operation, "__name__", None) != operation_name
+        ):
+            raise FormalStreamingInputError(
+                "physical scoring capacity verifier changed before use"
+            )
+        if authority is None:
+            authority = (module, operation)
+        elif (
+            authority[0] is not module
+            or authority[1] is not operation
+            or module_registry.get(module_name) is not module
+        ):
+            raise FormalStreamingInputError(
+                "sealed physical scoring capacity verifier changed"
+            )
+        return operation
+
+    return resolve
+
+
+_resolve_physical_capacity = _make_physical_capacity_resolver(
+    module_registry=sys.modules,
+    system_module=sys,
+)
+del _make_physical_capacity_resolver
+
+
+def _require_streaming_capacity(value: object) -> object:
+    if type(value) is FormalStreamingCapacityBinding:
+        return require_formal_streaming_capacity_binding(value)
+    operation = _resolve_physical_capacity()
+    try:
+        return operation(value)
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise FormalStreamingInputError(
+            "physical scoring capacity did not authenticate"
+        ) from exc
+
+
+def _streaming_preopen_identity(value: object) -> tuple[str, str]:
+    identity = getattr(value, "artifact_id", None)
+    digest = getattr(value, "artifact_sha256", None)
+    if identity is None and digest is None:
+        identity = getattr(value, "capture_id", None)
+        digest = getattr(value, "capture_sha256", None)
+    if type(identity) is not str or not identity or type(digest) is not str:
+        raise FormalStreamingInputError(
+            "streaming preopen parent identity changed"
+        )
+    try:
+        require_sha256(digest, "streaming preopen parent")
+    except ValueError as exc:
+        raise FormalStreamingInputError(
+            "streaming preopen parent identity changed"
+        ) from exc
+    return identity, digest
 
 
 @dataclasses.dataclass(frozen=True, slots=True, weakref_slot=True)
@@ -1719,9 +1807,9 @@ class _DiskBackedDecimalMgs:
         self._spool_files = 1
         self.peak_spool_files = 1
         self._solved = False
-        self._temporary = tempfile.TemporaryDirectory(
-            prefix="arv2-formal-mgs-", dir="/private/tmp"
-        )
+        # LEAN cloud workers are Linux hosts without macOS' /private/tmp.
+        # Let the runtime select its portable writable scratch directory.
+        self._temporary = tempfile.TemporaryDirectory(prefix="arv2-formal-mgs-")
         self._directory = Path(self._temporary.name)
         os.chmod(self._directory, 0o700)
         self._design_path = self._directory / "design.jsonl"
@@ -4281,6 +4369,8 @@ def _require_authoritative_scoring_replay(
     authoritative: StreamedProductionScoringArtifact,
     replay: StreamedProductionScoringArtifact,
     expected_global_contract: GlobalBenchmarkContract,
+    _artifact_require: object | None = None,
+    _replay_already_authenticated: bool = False,
 ) -> StreamedProductionScoringArtifact:
     """Authenticate exact replay equivalence while retaining one authority.
 
@@ -4291,8 +4381,11 @@ def _require_authoritative_scoring_replay(
     the candidate retains the census object's exact identity.
     """
 
-    authoritative = require_streamed_production_scoring_artifact(authoritative)
-    replay = require_streamed_production_scoring_artifact(replay)
+    if _artifact_require is None:
+        _artifact_require = require_streamed_production_scoring_artifact
+    authoritative = _artifact_require(authoritative)
+    if not _replay_already_authenticated:
+        replay = _artifact_require(replay)
     try:
         authoritative_record = canonical_json_bytes(authoritative.to_record())
         replay_record = canonical_json_bytes(replay.to_record())
@@ -4351,7 +4444,7 @@ class PhysicalFormalShardArchive:
     archive_id: str
     archive_sha256: str
     schema: str
-    capacity: FormalStreamingCapacityBinding
+    capacity: object
     descriptors: tuple[PhysicalFormalShardDescriptor, ...]
     shard_paths: tuple[Path, ...] = dataclasses.field(repr=False)
     path_fingerprints: tuple[tuple[object, ...], ...] = dataclasses.field(repr=False)
@@ -4432,9 +4525,9 @@ class _BoundedFormalDiskBuilder:
         self,
         *,
         output_directory: Path,
-        capacity: FormalStreamingCapacityBinding,
+        capacity: object,
     ) -> None:
-        self.capacity = require_formal_streaming_capacity_binding(capacity)
+        self.capacity = _require_streaming_capacity(capacity)
         if type(output_directory) is not type(Path()) or not output_directory.is_absolute():
             raise FormalStreamingInputError("formal shard directory must be absolute")
         if output_directory.exists():
@@ -4536,7 +4629,7 @@ class _BoundedFormalDiskBuilder:
         digest = sha256_bytes(payload)
         object_key = (
             f"{FORMAL_INPUT_CONTENT_PREFIX}{role}/"
-            f"{ordinal:04d}-{digest}.jsonl.gz"
+            f"{ordinal:04d}-{digest}-jsonl.gz"
         )
         path = self.output_directory / (
             f"{SHARD_ROLE_ORDER.index(role):02d}-{role}-{ordinal:04d}-{digest}.jsonl.gz"
@@ -4712,7 +4805,7 @@ def require_physical_formal_shard_archive(
         raise FormalStreamingInputError(
             "physical formal archive is not writer-authenticated"
         )
-    require_formal_streaming_capacity_binding(value.capacity)
+    _require_streaming_capacity(value.capacity)
     record = _formal_archive_record(value)
     digest = sha256_bytes(canonical_json_bytes(record))
     topology = (
@@ -5117,6 +5210,7 @@ class StreamedFormalInputCandidate:
     report_contract: FormalReportContract
     terminal_package: FormalTerminalDispositionPackage
     terminal_build: FormalTerminalDispositionBuild | None
+    physical_scoring_lineage: object | None
     benchmark_security_id: str
     calculation_as_of_date: date
     source_view_partitions: tuple[dict[str, object], dict[str, object]]
@@ -5131,7 +5225,7 @@ class StreamedFormalInputCandidate:
     qc_launch_available: bool
 
     def to_record(self) -> dict[str, object]:
-        return {
+        record = {
             "schema": self.schema,
             "streamed_scoring_id": self.scoring.artifact_id,
             "streamed_scoring_sha256": self.scoring.artifact_sha256,
@@ -5180,6 +5274,182 @@ class StreamedFormalInputCandidate:
             "physical_shard_payloads_retained": self.physical_shard_payloads_retained,
             "qc_launch_available": self.qc_launch_available,
         }
+        if self.physical_scoring_lineage is not None:
+            record["physical_scoring_lineage"] = (
+                self.physical_scoring_lineage.to_record()
+            )
+        return record
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class _FormalScoringComposerContext:
+    """Flattened, already-authenticated scoring parents used by composition."""
+
+    next_fold_index: int
+    active_fold: bool
+    finalized: bool
+    current_pair_id: str
+    current_pair_sha256: str
+    censored_pair_id: str
+    censored_pair_sha256: str
+    capture_id: str
+    capture_sha256: str
+    current_source_included_count: int
+    censored_source_included_count: int
+    current_normalized_row_count: int
+    censored_normalized_row_count: int
+    capacity: object
+    preopen_acquisition_receipt: object
+    preopen_acquisition_id: str
+    preopen_acquisition_sha256: str
+    global_contract: GlobalBenchmarkContract
+    physical_scoring_lineage: object | None
+
+
+class _PhysicalFormalScoringDriver:
+    """One-use six-fold transition driver for the physical scorer.
+
+    It retains no yielded block.  Closing or failing a fold permanently
+    prevents sealing, and the artifact is accepted only after the exact
+    physical finisher and matching physical verifier each run once.
+    """
+
+    __slots__ = (
+        "_builder", "_iterate", "_finish", "_require", "_lineage",
+        "_next_fold", "_active", "_failed", "_sealed",
+        "_finish_calls", "_require_calls",
+    )
+
+    def __init__(
+        self,
+        *,
+        builder: object,
+        operations: tuple[object, object, object, object],
+        lineage: object,
+    ) -> None:
+        if type(operations) is not tuple or len(operations) != 4:
+            raise FormalStreamingInputError(
+                "physical scoring operation census changed"
+            )
+        _context, iterate, finish, require = operations
+        if not all(callable(item) for item in (iterate, finish, require)):
+            raise FormalStreamingInputError(
+                "physical scoring transition operation changed type"
+            )
+        self._builder = builder
+        self._iterate = iterate
+        self._finish = finish
+        self._require = require
+        self._lineage = lineage
+        self._next_fold = 0
+        self._active = False
+        self._failed = False
+        self._sealed = False
+        self._finish_calls = 0
+        self._require_calls = 0
+
+    def iterate_fold(self, builder: object) -> Iterator[StreamedTestSessionBlock]:
+        if (
+            builder is not self._builder
+            or self._failed
+            or self._sealed
+            or self._active
+            or self._next_fold >= len(FORMAL_PRIMARY_FOLD_IDS)
+        ):
+            self._failed = True
+            raise FormalStreamingInputError(
+                "physical formal fold transition is partial, repeated, or reordered"
+            )
+        expected_fold = FORMAL_PRIMARY_FOLD_IDS[self._next_fold]
+        self._active = True
+        completed = False
+        saw_block = False
+        try:
+            for block in self._iterate(builder):
+                if (
+                    type(block) is not StreamedTestSessionBlock
+                    or block.fold_id != expected_fold
+                ):
+                    raise FormalStreamingInputError(
+                        "physical formal TEST block crossed its fold"
+                    )
+                saw_block = True
+                yield block
+            if not saw_block:
+                raise FormalStreamingInputError(
+                    "physical formal fold emitted no TEST blocks"
+                )
+            completed = True
+        finally:
+            self._active = False
+            if completed:
+                self._next_fold += 1
+            else:
+                self._failed = True
+
+    def require_artifact(self, value: object) -> object:
+        self._require_calls += 1
+        return self._require(value, expected_lineage=self._lineage)
+
+    def finish(self, builder: object) -> object:
+        if (
+            builder is not self._builder
+            or self._failed
+            or self._active
+            or self._sealed
+            or self._next_fold != len(FORMAL_PRIMARY_FOLD_IDS)
+            or self._finish_calls != 0
+            or self._require_calls != 0
+        ):
+            self._failed = True
+            raise FormalStreamingInputError(
+                "physical formal scoring cannot seal a partial transition"
+            )
+        self._finish_calls += 1
+        self._sealed = True
+        try:
+            artifact = self._finish(builder)
+            return self.require_artifact(artifact)
+        except BaseException:
+            self._failed = True
+            raise
+
+
+def _legacy_formal_scoring_composer_context(
+    scoring_builder: StreamedProductionScoringBuilder,
+) -> _FormalScoringComposerContext:
+    state = _state(scoring_builder)
+    return _FormalScoringComposerContext(
+        next_fold_index=state.next_fold_index,
+        active_fold=state.active_fold,
+        finalized=state.finalized,
+        current_pair_id=state.current_batch.pair_id,
+        current_pair_sha256=state.current_batch.pair_sha256,
+        censored_pair_id=state.censored_batch.pair_id,
+        censored_pair_sha256=state.censored_batch.pair_sha256,
+        capture_id=state.evidence.authority.pair.capture.capture_id,
+        capture_sha256=state.evidence.authority.pair.capture.capture_sha256,
+        current_source_included_count=(
+            state.current_batch.source_view_included_count
+        ),
+        censored_source_included_count=(
+            state.censored_batch.source_view_included_count
+        ),
+        current_normalized_row_count=state.current_batch.normalized_row_count,
+        censored_normalized_row_count=state.censored_batch.normalized_row_count,
+        capacity=state.archive.capacity,
+        preopen_acquisition_receipt=(
+            state.archive.preopen_acquisition_receipt
+        ),
+        preopen_acquisition_id=(
+            state.archive.preopen_acquisition_receipt.artifact_id
+        ),
+        preopen_acquisition_sha256=(
+            state.archive.preopen_acquisition_receipt.artifact_sha256
+        ),
+        global_contract=state.global_contract,
+        physical_scoring_lineage=None,
+    )
 
 
 _STREAMED_FORMAL_CANDIDATES: dict[
@@ -5612,7 +5882,9 @@ def _build_streamed_formal_contract_record(
     economic_execution: FormalEconomicExecutionBinding,
     report_contract: FormalReportContract,
     terminal_package: FormalTerminalDispositionPackage,
-    preopen_acquisition_receipt: PreopenControlAcquisitionReceipt,
+    preopen_acquisition_receipt: object,
+    preopen_acquisition_id: str,
+    preopen_acquisition_sha256: str,
     source_view_partitions: tuple[dict[str, object], dict[str, object]],
     benchmark_security_id: str,
     calculation_as_of_date: date,
@@ -5646,10 +5918,8 @@ def _build_streamed_formal_contract_record(
         "physical_preopen_archive": {
             "archive_id": scoring.archive_id,
             "archive_sha256": scoring.archive_sha256,
-            "preopen_acquisition_id": preopen_acquisition_receipt.artifact_id,
-            "preopen_acquisition_sha256": (
-                preopen_acquisition_receipt.artifact_sha256
-            ),
+            "preopen_acquisition_id": preopen_acquisition_id,
+            "preopen_acquisition_sha256": preopen_acquisition_sha256,
         },
         "production_evidence_receipt": {
             "receipt_id": scoring.production_evidence_receipt_id,
@@ -5686,18 +5956,27 @@ def _build_streamed_formal_contract_record(
 
 def _build_streamed_formal_input_candidate_impl(
     *,
-    scoring_builder: StreamedProductionScoringBuilder,
+    scoring_builder: object,
+    scoring_context: _FormalScoringComposerContext,
     authoritative_scoring_artifact: StreamedProductionScoringArtifact | None,
     accepted_risk: AcceptedRiskPairBinding,
     formal_power: FormalPowerCalibrationBinding,
     power_floor: PowerFloorBinding,
     economic_execution: FormalEconomicExecutionBinding,
     terminal_package: FormalTerminalDispositionPackage | None,
-    terminal_recorder: FormalTerminalDispositionRecorder | None,
+    terminal_recorder: (
+        FormalTerminalDispositionRecorder
+        | AcceptedRiskTerminalDispositionRecorder
+        | None
+    ),
     benchmark_security_id: str,
     calculation_as_of_date: date,
     output_directory: Path,
     _candidate_register: object,
+    _iterate_scoring_fold: object,
+    _finish_scoring: object,
+    _artifact_require: object,
+    _accepted_risk_build_consumer: object | None = None,
 ) -> StreamedFormalInputCandidate:
     """Run six folds and persist every formal role without retaining payloads.
 
@@ -5706,8 +5985,13 @@ def _build_streamed_formal_input_candidate_impl(
     residue; no archive/candidate authority is minted for that directory.
     """
 
-    state = _state(scoring_builder)
-    if state.next_fold_index != 0 or state.active_fold or state.finalized:
+    if type(scoring_context) is not _FormalScoringComposerContext:
+        raise FormalStreamingInputError("formal scoring composer context changed")
+    if (
+        scoring_context.next_fold_index != 0
+        or scoring_context.active_fold
+        or scoring_context.finalized
+    ):
         raise FormalStreamingInputError("formal streaming requires a fresh scorer")
     try:
         accepted_risk = require_accepted_risk_pair_binding(accepted_risk)
@@ -5741,44 +6025,58 @@ def _build_streamed_formal_input_candidate_impl(
         raise FormalStreamingInputError(
             "exactly one terminal package or lifecycle recorder is required"
         )
+    accepted_risk_terminal_recorder = (
+        type(terminal_recorder) is AcceptedRiskTerminalDispositionRecorder
+    )
     try:
         if terminal_recorder is None:
             assert terminal_package is not None
             terminal_package = require_formal_terminal_disposition_package(
                 terminal_package
             )
-        else:
+        elif type(terminal_recorder) is FormalTerminalDispositionRecorder:
             require_fresh_formal_terminal_disposition_recorder(terminal_recorder)
+        elif accepted_risk_terminal_recorder:
+            require_fresh_accepted_risk_terminal_disposition_recorder(
+                terminal_recorder
+            )
+            if not callable(_accepted_risk_build_consumer):
+                raise FormalStreamingInputError(
+                    "accepted-risk terminal recorder lacks its explicit build sink"
+                )
+        else:
+            raise FormalStreamingInputError(
+                "formal terminal recorder changed exact authority type"
+            )
     except (TypeError, ValueError) as exc:
         raise FormalStreamingInputError(
             "formal terminal input did not authenticate"
         ) from exc
     if (
-        accepted_risk.pair.artifact_id != state.current_batch.pair_id
-        or accepted_risk.pair.content_sha256 != state.current_batch.pair_sha256
-        or state.current_batch.pair_id != state.censored_batch.pair_id
-        or state.current_batch.pair_sha256 != state.censored_batch.pair_sha256
-        or accepted_risk.capture_id
-        != state.evidence.authority.pair.capture.capture_id
-        or accepted_risk.capture_sha256
-        != state.evidence.authority.pair.capture.capture_sha256
+        accepted_risk.pair.artifact_id != scoring_context.current_pair_id
+        or accepted_risk.pair.content_sha256 != scoring_context.current_pair_sha256
+        or scoring_context.current_pair_id != scoring_context.censored_pair_id
+        or scoring_context.current_pair_sha256
+        != scoring_context.censored_pair_sha256
+        or accepted_risk.capture_id != scoring_context.capture_id
+        or accepted_risk.capture_sha256 != scoring_context.capture_sha256
         or accepted_risk.current_source_included_count
-        != state.current_batch.source_view_included_count
+        != scoring_context.current_source_included_count
         or accepted_risk.censored_source_included_count
-        != state.censored_batch.source_view_included_count
+        != scoring_context.censored_source_included_count
         or accepted_risk.current_admitted_decision_count
-        != state.current_batch.normalized_row_count
+        != scoring_context.current_normalized_row_count
         or accepted_risk.current_named_preoutcome_refusal_count
         != (
-            state.current_batch.source_view_included_count
-            - state.current_batch.normalized_row_count
+            scoring_context.current_source_included_count
+            - scoring_context.current_normalized_row_count
         )
         or accepted_risk.censored_admitted_decision_count
-        != state.censored_batch.normalized_row_count
+        != scoring_context.censored_normalized_row_count
         or accepted_risk.censored_named_preoutcome_refusal_count
         != (
-            state.censored_batch.source_view_included_count
-            - state.censored_batch.normalized_row_count
+            scoring_context.censored_source_included_count
+            - scoring_context.censored_normalized_row_count
         )
         or accepted_risk.guidance_admitted_count != 0
         or accepted_risk.pre_2013_admitted_count != 0
@@ -5808,9 +6106,9 @@ def _build_streamed_formal_input_candidate_impl(
     economic_geometry = _economic_fold_observation_geometry(
         economic_execution, axis, positions
     )
-    limits = dict(state.archive.capacity.limits)
+    limits = dict(scoring_context.capacity.limits)
     writer = _BoundedFormalDiskBuilder(
-        output_directory=output_directory, capacity=state.archive.capacity
+        output_directory=output_directory, capacity=scoring_context.capacity
     )
     minute_rows: dict[tuple[str, str], dict[str, object]] = {}
     daily_rows: dict[tuple[str, str], dict[str, object]] = {}
@@ -5917,7 +6215,12 @@ def _build_streamed_formal_input_candidate_impl(
                 )
                 unmatched_terminal.discard(("economic_daily", slot_id, None))
                 if terminal_recorder is not None:
-                    inserted = record_formal_terminal_slot(
+                    record_slot = (
+                        record_accepted_risk_terminal_slot
+                        if accepted_risk_terminal_recorder
+                        else record_formal_terminal_slot
+                    )
+                    inserted = record_slot(
                         terminal_recorder,
                         slot_kind="economic_daily",
                         slot_id=slot_id,
@@ -5948,7 +6251,7 @@ def _build_streamed_formal_input_candidate_impl(
 
     for fold_index in range(6):
         expected_fold = FORMAL_PRIMARY_FOLD_IDS[fold_index]
-        for block in iter_streamed_production_scoring_fold(scoring_builder):
+        for block in _iterate_scoring_fold(scoring_builder):
             if block.fold_id != expected_fold:
                 raise FormalStreamingInputError("streamed fold order changed")
             position = positions.get(block.decision_session)
@@ -5980,7 +6283,12 @@ def _build_streamed_formal_input_candidate_impl(
                         terminal_recorder is not None
                         and item.security_id not in securities
                     ):
-                        record_formal_terminal_security(
+                        record_security = (
+                            record_accepted_risk_terminal_security
+                            if accepted_risk_terminal_recorder
+                            else record_formal_terminal_security
+                        )
+                        record_security(
                             terminal_recorder, security_id=item.security_id
                         )
                     securities.add(item.security_id)
@@ -6027,7 +6335,12 @@ def _build_streamed_formal_input_candidate_impl(
                             ("decision_horizon", slot_id, horizon)
                         )
                         if terminal_recorder is not None:
-                            inserted = record_formal_terminal_slot(
+                            record_slot = (
+                                record_accepted_risk_terminal_slot
+                                if accepted_risk_terminal_recorder
+                                else record_formal_terminal_slot
+                            )
+                            inserted = record_slot(
                                 terminal_recorder,
                                 slot_kind="decision_horizon",
                                 slot_id=slot_id,
@@ -6091,7 +6404,7 @@ def _build_streamed_formal_input_candidate_impl(
         ]
         writer.add_block("economic_joins", economic_block)
         counts["economic_joins"] += len(economic_block)
-    replay_scoring = finish_streamed_production_scoring(scoring_builder)
+    replay_scoring = _finish_scoring(scoring_builder)
     scoring = replay_scoring
     if authoritative_scoring_artifact is not None:
         # The replay exists only to emit the bounded physical shards.  The
@@ -6100,7 +6413,11 @@ def _build_streamed_formal_input_candidate_impl(
         scoring = _require_authoritative_scoring_replay(
             authoritative=authoritative_scoring_artifact,
             replay=replay_scoring,
-            expected_global_contract=state.global_contract,
+            expected_global_contract=scoring_context.global_contract,
+            _artifact_require=_artifact_require,
+            _replay_already_authenticated=(
+                scoring_context.physical_scoring_lineage is not None
+            ),
         )
     all_coverages = (
         *(
@@ -6139,18 +6456,36 @@ def _build_streamed_formal_input_candidate_impl(
     terminal_build: FormalTerminalDispositionBuild | None = None
     if terminal_recorder is not None:
         try:
-            terminal_build = finalize_formal_terminal_disposition_recording(
-                recorder=terminal_recorder,
-                calculation_as_of_date=calculation_as_of_date,
-            )
-        except FormalTerminalDispositionBuildError as exc:
+            if accepted_risk_terminal_recorder:
+                accepted_terminal_build = (
+                    finalize_accepted_risk_terminal_disposition_recording(
+                        recorder=terminal_recorder,
+                        calculation_as_of_date=calculation_as_of_date,
+                    )
+                )
+                assert callable(_accepted_risk_build_consumer)
+                _accepted_risk_build_consumer(accepted_terminal_build)
+                terminal_package = accepted_terminal_build.terminal_package
+                built_slot_count = accepted_terminal_build.actual_slot_count
+                built_security_count = accepted_terminal_build.security_count
+            else:
+                terminal_build = finalize_formal_terminal_disposition_recording(
+                    recorder=terminal_recorder,
+                    calculation_as_of_date=calculation_as_of_date,
+                )
+                terminal_package = terminal_build.terminal_package
+                built_slot_count = terminal_build.actual_slot_count
+                built_security_count = terminal_build.security_count
+        except (
+            AcceptedRiskTerminalDispositionError,
+            FormalTerminalDispositionBuildError,
+        ) as exc:
             raise FormalStreamingInputError(
-                "lifecycle-derived terminal package could not be finalized"
+                "terminal package could not be finalized from its exact recorder"
             ) from exc
-        terminal_package = terminal_build.terminal_package
         if (
-            terminal_build.actual_slot_count != actual_terminal_slot_count
-            or terminal_build.security_count != len(securities)
+            built_slot_count != actual_terminal_slot_count
+            or built_security_count != len(securities)
         ):
             raise FormalStreamingInputError(
                 "lifecycle-derived terminal build disagrees with streamed slots"
@@ -6192,11 +6527,15 @@ def _build_streamed_formal_input_candidate_impl(
         raise FormalStreamingInputError(
             "streamed formal role census is empty or source views are unmatched"
         )
-    if authoritative_scoring_artifact is not None:
+    if (
+        authoritative_scoring_artifact is not None
+        and scoring_context.physical_scoring_lineage is None
+    ):
         scoring = _require_authoritative_scoring_replay(
             authoritative=authoritative_scoring_artifact,
             replay=replay_scoring,
-            expected_global_contract=state.global_contract,
+            expected_global_contract=scoring_context.global_contract,
+            _artifact_require=_artifact_require,
         )
     contract = _build_streamed_formal_contract_record(
         scoring=scoring,
@@ -6206,7 +6545,13 @@ def _build_streamed_formal_input_candidate_impl(
         economic_execution=economic_execution,
         report_contract=report_contract,
         terminal_package=terminal_package,
-        preopen_acquisition_receipt=state.archive.preopen_acquisition_receipt,
+        preopen_acquisition_receipt=(
+            scoring_context.preopen_acquisition_receipt
+        ),
+        preopen_acquisition_id=scoring_context.preopen_acquisition_id,
+        preopen_acquisition_sha256=(
+            scoring_context.preopen_acquisition_sha256
+        ),
         source_view_partitions=source_partitions,
         benchmark_security_id=benchmark_security_id,
         calculation_as_of_date=calculation_as_of_date,
@@ -6241,6 +6586,15 @@ def _build_streamed_formal_input_candidate_impl(
             None if terminal_build is None else terminal_build.build_sha256
         ),
         "lifecycle_derived_terminal_build": terminal_build is not None,
+        **(
+            {}
+            if scoring_context.physical_scoring_lineage is None
+            else {
+                "physical_scoring_lineage": (
+                    scoring_context.physical_scoring_lineage.to_record()
+                )
+            }
+        ),
         "benchmark_security_id": benchmark_security_id,
         "calculation_as_of_date": calculation_as_of_date.isoformat(),
         "source_view_partitions": list(source_partitions),
@@ -6264,6 +6618,9 @@ def _build_streamed_formal_input_candidate_impl(
         "report_contract": report_contract,
         "terminal_package": terminal_package,
         "terminal_build": terminal_build,
+        "physical_scoring_lineage": (
+            scoring_context.physical_scoring_lineage
+        ),
         "benchmark_security_id": benchmark_security_id,
         "calculation_as_of_date": calculation_as_of_date,
         "source_view_partitions": source_partitions,
@@ -6286,6 +6643,7 @@ def _build_streamed_formal_input_candidate_impl(
         id(value.report_contract),
         id(value.terminal_package),
         id(value.terminal_build),
+        id(value.physical_scoring_lineage),
         id(value.source_view_partitions),
     )
     _candidate_register(value, canonical_json_bytes(record), topology)
@@ -6311,6 +6669,7 @@ def _build_streamed_formal_input_candidate_public_impl(
 
     return _candidate_builder(
         scoring_builder=scoring_builder,
+        scoring_context=_legacy_formal_scoring_composer_context(scoring_builder),
         authoritative_scoring_artifact=authoritative_scoring_artifact,
         accepted_risk=accepted_risk,
         formal_power=formal_power,
@@ -6322,6 +6681,9 @@ def _build_streamed_formal_input_candidate_public_impl(
         calculation_as_of_date=calculation_as_of_date,
         output_directory=output_directory,
         _candidate_register=_candidate_register,
+        _iterate_scoring_fold=iter_streamed_production_scoring_fold,
+        _finish_scoring=finish_streamed_production_scoring,
+        _artifact_require=require_streamed_production_scoring_artifact,
     )
 
 
@@ -6345,6 +6707,9 @@ def _build_lifecycle_streamed_formal_input_candidate_impl(
     try:
         return _candidate_builder(
             scoring_builder=scoring_builder,
+            scoring_context=_legacy_formal_scoring_composer_context(
+                scoring_builder
+            ),
             authoritative_scoring_artifact=authoritative_scoring_artifact,
             accepted_risk=accepted_risk,
             formal_power=formal_power,
@@ -6356,6 +6721,9 @@ def _build_lifecycle_streamed_formal_input_candidate_impl(
             calculation_as_of_date=calculation_as_of_date,
             output_directory=output_directory,
             _candidate_register=_candidate_register,
+            _iterate_scoring_fold=iter_streamed_production_scoring_fold,
+            _finish_scoring=finish_streamed_production_scoring,
+            _artifact_require=require_streamed_production_scoring_artifact,
         )
     except FormalTerminalDispositionBuildError as exc:
         raise FormalStreamingInputError(
@@ -6407,10 +6775,353 @@ def _build_streamed_formal_input_candidate_from_reviewed_lifecycle_impl(
     )
 
 
+def _physical_formal_scoring_composer_context(
+    physical_context: object,
+    *,
+    accepted_risk: AcceptedRiskPairBinding,
+) -> _FormalScoringComposerContext:
+    """Translate only the authenticated physical context's bounded scalars."""
+
+    try:
+        lineage_record = physical_context.lineage.to_record()
+        capacity = _require_streaming_capacity(physical_context.capacity)
+        if type(capacity) is FormalStreamingCapacityBinding:
+            preopen = require_reviewed_preopen_control_acquisition_receipt(
+                physical_context.preopen_acquisition_receipt
+            )
+            preopen_id, preopen_sha256 = _streaming_preopen_identity(preopen)
+            truthful_capacity = (
+                lineage_record.get("capacity_authority_mode")
+                == "independently_reviewed"
+                and lineage_record.get("independently_reviewed") is True
+                and lineage_record.get("owner_review_waived") is False
+                and lineage_record.get("historical_availability_claimed") is True
+                and lineage_record.get(
+                    "post_first_formal_backtest_independent_review_required"
+                ) is False
+            )
+        else:
+            preopen = capacity.preopen_acquisition_receipt
+            preopen_id, preopen_sha256 = _streaming_preopen_identity(preopen)
+            truthful_capacity = (
+                capacity.capacity_authority_mode
+                == lineage_record.get("capacity_authority_mode")
+                and capacity.independently_reviewed is False
+                and capacity.owner_review_waived is True
+                and capacity.historical_availability_claimed is False
+                and capacity.post_first_formal_backtest_independent_review_required
+                is True
+                and lineage_record.get("independently_reviewed") is False
+                and lineage_record.get("owner_review_waived") is True
+                and lineage_record.get("historical_availability_claimed") is False
+                and lineage_record.get(
+                    "post_first_formal_backtest_independent_review_required"
+                ) is True
+            )
+        contract = require_loaded_global_benchmark_contract(
+            physical_context.global_contract
+        )
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise FormalStreamingInputError(
+            "physical formal scoring context did not authenticate"
+        ) from exc
+    expected_lineage_keys = {
+        "schema", "index_id", "index_sha256",
+        "physical_production_evidence_receipt_id",
+        "physical_production_evidence_receipt_sha256",
+        "production_input_archive_id", "production_input_archive_sha256",
+        "accepted_risk_binding_sha256", "terminal_archive_id",
+        "terminal_archive_sha256", "preopen_acquisition_id",
+        "preopen_acquisition_sha256", "capacity_receipt_id",
+        "capacity_receipt_sha256", "global_map_id", "global_map_sha256",
+        "session_count", "current_row_count", "censored_row_count",
+        "review_mode", "terminal_parent_kind", "capacity_authority_mode",
+        "independently_reviewed", "owner_review_waived",
+        "historical_availability_claimed",
+        "post_first_formal_backtest_independent_review_required",
+    }
+    if (
+        physical_context.accepted_risk_binding is not accepted_risk
+        or type(lineage_record) is not dict
+        or set(lineage_record) != expected_lineage_keys
+        or physical_context.next_fold_index != 0
+        or type(physical_context.active_fold) is not bool
+        or type(physical_context.finalized) is not bool
+        or capacity.preopen_acquisition_receipt is not preopen
+        or physical_context.preopen_acquisition_receipt is not preopen
+        or not truthful_capacity
+        or preopen_id != lineage_record["preopen_acquisition_id"]
+        or preopen_sha256 != lineage_record["preopen_acquisition_sha256"]
+        or contract.map_id != lineage_record["global_map_id"]
+        or contract.map_hash != lineage_record["global_map_sha256"]
+        or accepted_risk.current_admitted_decision_count
+        != lineage_record["current_row_count"]
+        or accepted_risk.censored_admitted_decision_count
+        != lineage_record["censored_row_count"]
+        or sha256_bytes(canonical_json_bytes(accepted_risk.to_record()))
+        != lineage_record["accepted_risk_binding_sha256"]
+        or capacity.receipt_id != lineage_record["capacity_receipt_id"]
+        or capacity.receipt_sha256 != lineage_record["capacity_receipt_sha256"]
+    ):
+        raise FormalStreamingInputError(
+            "physical formal scoring context crossed its parent lineage"
+        )
+    return _FormalScoringComposerContext(
+        next_fold_index=physical_context.next_fold_index,
+        active_fold=physical_context.active_fold,
+        finalized=physical_context.finalized,
+        current_pair_id=accepted_risk.pair.artifact_id,
+        current_pair_sha256=accepted_risk.pair.content_sha256,
+        censored_pair_id=accepted_risk.pair.artifact_id,
+        censored_pair_sha256=accepted_risk.pair.content_sha256,
+        capture_id=accepted_risk.capture_id,
+        capture_sha256=accepted_risk.capture_sha256,
+        current_source_included_count=(
+            accepted_risk.current_source_included_count
+        ),
+        censored_source_included_count=(
+            accepted_risk.censored_source_included_count
+        ),
+        current_normalized_row_count=(
+            accepted_risk.current_admitted_decision_count
+        ),
+        censored_normalized_row_count=(
+            accepted_risk.censored_admitted_decision_count
+        ),
+        capacity=capacity,
+        preopen_acquisition_receipt=preopen,
+        preopen_acquisition_id=preopen_id,
+        preopen_acquisition_sha256=preopen_sha256,
+        global_contract=contract,
+        physical_scoring_lineage=physical_context.lineage,
+    )
+
+
+def _build_physical_streamed_formal_input_candidate_impl(
+    *,
+    scoring_builder: object,
+    authoritative_scoring_artifact: StreamedProductionScoringArtifact | None,
+    accepted_risk: AcceptedRiskPairBinding,
+    formal_power: FormalPowerCalibrationBinding,
+    power_floor: PowerFloorBinding,
+    economic_execution: FormalEconomicExecutionBinding,
+    terminal_package: FormalTerminalDispositionPackage,
+    benchmark_security_id: str,
+    calculation_as_of_date: date,
+    output_directory: Path,
+    _candidate_register: object,
+    _candidate_builder: object,
+    _physical_operations: tuple[object, object, object, object],
+) -> StreamedFormalInputCandidate:
+    """Compose directly from the retained production physical scorer."""
+
+    accepted_risk = require_accepted_risk_pair_binding(accepted_risk)
+    context_fn = _physical_operations[0]
+    try:
+        physical_context = context_fn(
+            scoring_builder,
+            accepted_risk_binding=accepted_risk,
+        )
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise FormalStreamingInputError(
+            "physical scorer refused formal composition parents"
+        ) from exc
+    context = _physical_formal_scoring_composer_context(
+        physical_context,
+        accepted_risk=accepted_risk,
+    )
+    driver = _PhysicalFormalScoringDriver(
+        builder=scoring_builder,
+        operations=_physical_operations,
+        lineage=context.physical_scoring_lineage,
+    )
+
+    return _candidate_builder(
+        scoring_builder=scoring_builder,
+        scoring_context=context,
+        authoritative_scoring_artifact=authoritative_scoring_artifact,
+        accepted_risk=accepted_risk,
+        formal_power=formal_power,
+        power_floor=power_floor,
+        economic_execution=economic_execution,
+        terminal_package=terminal_package,
+        terminal_recorder=None,
+        benchmark_security_id=benchmark_security_id,
+        calculation_as_of_date=calculation_as_of_date,
+        output_directory=output_directory,
+        _candidate_register=_candidate_register,
+        _iterate_scoring_fold=driver.iterate_fold,
+        _finish_scoring=driver.finish,
+        _artifact_require=driver.require_artifact,
+    )
+
+
+def _build_physical_streamed_formal_input_candidate_from_reviewed_lifecycle_impl(
+    *,
+    scoring_builder: object,
+    authoritative_scoring_artifact: StreamedProductionScoringArtifact | None,
+    accepted_risk: AcceptedRiskPairBinding,
+    formal_power: FormalPowerCalibrationBinding,
+    power_floor: PowerFloorBinding,
+    economic_execution: FormalEconomicExecutionBinding,
+    historical_bridge: historical_module.ReviewedHistoricalUniverseToPreopenBridge,
+    terminal_output_directory: Path,
+    benchmark_security_id: str,
+    calculation_as_of_date: date,
+    output_directory: Path,
+    _candidate_register: object,
+    _candidate_builder: object,
+    _physical_operations: tuple[object, object, object, object],
+) -> StreamedFormalInputCandidate:
+    """Production physical entry with the reviewed lifecycle sidecar."""
+
+    accepted_risk = require_accepted_risk_pair_binding(accepted_risk)
+    context_fn = _physical_operations[0]
+    try:
+        physical_context = context_fn(
+            scoring_builder,
+            accepted_risk_binding=accepted_risk,
+        )
+        recorder = begin_formal_terminal_disposition_recording(
+            historical_bridge=historical_bridge,
+            output_directory=terminal_output_directory,
+        )
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise FormalStreamingInputError(
+            "reviewed physical lifecycle composition could not begin"
+        ) from exc
+    context = _physical_formal_scoring_composer_context(
+        physical_context,
+        accepted_risk=accepted_risk,
+    )
+    driver = _PhysicalFormalScoringDriver(
+        builder=scoring_builder,
+        operations=_physical_operations,
+        lineage=context.physical_scoring_lineage,
+    )
+
+    try:
+        return _candidate_builder(
+            scoring_builder=scoring_builder,
+            scoring_context=context,
+            authoritative_scoring_artifact=authoritative_scoring_artifact,
+            accepted_risk=accepted_risk,
+            formal_power=formal_power,
+            power_floor=power_floor,
+            economic_execution=economic_execution,
+            terminal_package=None,
+            terminal_recorder=recorder,
+            benchmark_security_id=benchmark_security_id,
+            calculation_as_of_date=calculation_as_of_date,
+            output_directory=output_directory,
+            _candidate_register=_candidate_register,
+            _iterate_scoring_fold=driver.iterate_fold,
+            _finish_scoring=driver.finish,
+            _artifact_require=driver.require_artifact,
+        )
+    except FormalTerminalDispositionBuildError as exc:
+        raise FormalStreamingInputError(
+            "physical lifecycle terminal recording failed during streamed emission"
+        ) from exc
+
+
+def _require_owner_accepted_terminal_candidate_pair(
+    candidate: StreamedFormalInputCandidate,
+    retained_builds: list[AcceptedRiskTerminalDispositionBuild],
+) -> AcceptedRiskTerminalDispositionBuild:
+    """Keep the preliminary terminal authority distinct from reviewed lifecycle."""
+
+    if type(retained_builds) is not list or len(retained_builds) != 1:
+        raise FormalStreamingInputError(
+            "owner-accepted terminal build was not retained exactly once"
+        )
+    terminal_build = require_accepted_risk_terminal_disposition_build(
+        retained_builds[0]
+    )
+    if (
+        candidate.terminal_build is not None
+        or candidate.terminal_package is not terminal_build.terminal_package
+        or terminal_build.reviewed_lifecycle_authority is not False
+        or terminal_build.preliminary_evaluation_only is not True
+    ):
+        raise FormalStreamingInputError(
+            "owner-accepted terminal build was mislabeled as reviewed lifecycle"
+        )
+    return terminal_build
+
+
+def _build_physical_streamed_formal_input_candidate_from_accepted_risk_terminal_impl(
+    *,
+    scoring_builder: object,
+    authoritative_scoring_artifact: StreamedProductionScoringArtifact | None,
+    accepted_risk: AcceptedRiskPairBinding,
+    formal_power: FormalPowerCalibrationBinding,
+    power_floor: PowerFloorBinding,
+    economic_execution: FormalEconomicExecutionBinding,
+    terminal_recorder: AcceptedRiskTerminalDispositionRecorder,
+    benchmark_security_id: str,
+    calculation_as_of_date: date,
+    output_directory: Path,
+    _candidate_register: object,
+    _candidate_builder: object,
+    _physical_operations: tuple[object, object, object, object],
+) -> tuple[StreamedFormalInputCandidate, AcceptedRiskTerminalDispositionBuild]:
+    """Preliminary physical entry retaining its distinct owner-risk build."""
+
+    accepted_risk = require_accepted_risk_pair_binding(accepted_risk)
+    context_fn = _physical_operations[0]
+    try:
+        physical_context = context_fn(
+            scoring_builder,
+            accepted_risk_binding=accepted_risk,
+        )
+        require_fresh_accepted_risk_terminal_disposition_recorder(
+            terminal_recorder
+        )
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise FormalStreamingInputError(
+            "owner-accepted physical terminal composition could not begin"
+        ) from exc
+    context = _physical_formal_scoring_composer_context(
+        physical_context,
+        accepted_risk=accepted_risk,
+    )
+    driver = _PhysicalFormalScoringDriver(
+        builder=scoring_builder,
+        operations=_physical_operations,
+        lineage=context.physical_scoring_lineage,
+    )
+    retained_build: list[AcceptedRiskTerminalDispositionBuild] = []
+    candidate = _candidate_builder(
+        scoring_builder=scoring_builder,
+        scoring_context=context,
+        authoritative_scoring_artifact=authoritative_scoring_artifact,
+        accepted_risk=accepted_risk,
+        formal_power=formal_power,
+        power_floor=power_floor,
+        economic_execution=economic_execution,
+        terminal_package=None,
+        terminal_recorder=terminal_recorder,
+        benchmark_security_id=benchmark_security_id,
+        calculation_as_of_date=calculation_as_of_date,
+        output_directory=output_directory,
+        _candidate_register=_candidate_register,
+        _iterate_scoring_fold=driver.iterate_fold,
+        _finish_scoring=driver.finish,
+        _artifact_require=driver.require_artifact,
+        _accepted_risk_build_consumer=retained_build.append,
+    )
+    terminal_build = _require_owner_accepted_terminal_candidate_pair(
+        candidate, retained_build
+    )
+    return candidate, terminal_build
+
+
 def _require_streamed_formal_input_candidate_impl(
     value: StreamedFormalInputCandidate,
     *,
     _candidate_current: object,
+    _resolve_physical: object,
 ) -> StreamedFormalInputCandidate:
     if type(value) is not StreamedFormalInputCandidate:
         raise FormalStreamingInputError("streamed formal candidate changed type")
@@ -6419,7 +7130,14 @@ def _require_streamed_formal_input_candidate_impl(
         raise FormalStreamingInputError(
             "streamed formal candidate is not builder-authenticated"
         )
-    require_streamed_production_scoring_artifact(value.scoring)
+    if value.physical_scoring_lineage is None:
+        require_streamed_production_scoring_artifact(value.scoring)
+    else:
+        physical = _resolve_physical()
+        physical[3](
+            value.scoring,
+            expected_lineage=value.physical_scoring_lineage,
+        )
     all_coverages = (
         *(
             coverage
@@ -6435,7 +7153,13 @@ def _require_streamed_formal_input_candidate_impl(
         raise FormalStreamingInputError(
             "streamed candidate global-comparator coverage gate is closed"
         )
-    require_physical_formal_shard_archive(value.shards)
+    shards = require_physical_formal_shard_archive(value.shards)
+    capacity = _require_streaming_capacity(shards.capacity)
+    physical_preopen_identity: tuple[str, str] | None = None
+    if value.physical_scoring_lineage is not None:
+        physical_preopen_identity = _streaming_preopen_identity(
+            capacity.preopen_acquisition_receipt
+        )
     require_accepted_risk_pair_binding(value.accepted_risk)
     require_formal_power_calibration_binding(value.formal_power)
     require_power_floor_binding(value.power_floor)
@@ -6471,6 +7195,7 @@ def _require_streamed_formal_input_candidate_impl(
         id(value.report_contract),
         id(value.terminal_package),
         id(value.terminal_build),
+        id(value.physical_scoring_lineage),
         id(value.source_view_partitions),
     )
     if (
@@ -6478,6 +7203,34 @@ def _require_streamed_formal_input_candidate_impl(
         or registered[2] != topology
         or value.candidate_sha256 != digest
         or value.candidate_id != f"arv2-formal-streamed-input-{digest[:24]}"
+        or (
+            value.physical_scoring_lineage is not None
+            and (
+                value.physical_scoring_lineage.terminal_archive_id
+                != value.scoring.archive_id
+                or value.physical_scoring_lineage.terminal_archive_sha256
+                != value.scoring.archive_sha256
+                or value.physical_scoring_lineage.capacity_receipt_id
+                != value.scoring.capacity_receipt_id
+                or value.physical_scoring_lineage.capacity_receipt_sha256
+                != value.scoring.capacity_receipt_sha256
+                or capacity.receipt_id
+                != value.physical_scoring_lineage.capacity_receipt_id
+                or capacity.receipt_sha256
+                != value.physical_scoring_lineage.capacity_receipt_sha256
+                or physical_preopen_identity
+                != (
+                    value.physical_scoring_lineage.preopen_acquisition_id,
+                    value.physical_scoring_lineage.preopen_acquisition_sha256,
+                )
+                or capacity.production_evidence_receipt.receipt_id
+                != value.scoring.production_evidence_receipt_id
+                or capacity.production_evidence_receipt.receipt_sha256
+                != value.scoring.production_evidence_receipt_sha256
+                or value.physical_scoring_lineage.accepted_risk_binding_sha256
+                != sha256_bytes(canonical_json_bytes(value.accepted_risk.to_record()))
+            )
+        )
         or (
             value.terminal_build is not None
             and (
@@ -6509,14 +7262,79 @@ def _bind_streamed_formal_candidate_authority(
     build_impl: object,
     lifecycle_impl: object,
     reviewed_lifecycle_impl: object,
+    physical_build_impl: object,
+    physical_reviewed_lifecycle_impl: object,
+    physical_accepted_risk_terminal_impl: object,
     require_impl: object,
     register: object,
     current: object,
-) -> tuple[object, object, object, object]:
+    system_module: object,
+    module_registry: object,
+) -> tuple[object, object, object, object, object, object, object]:
     """Expose construction while keeping the candidate minter lexical."""
 
+    physical_module_name = (
+        "research.analyst_revisions_v2_qc.physical_streaming_scoring"
+    )
+    physical_names = (
+        "physical_streaming_scoring_composition_context",
+        "iter_physical_streaming_scoring_fold",
+        "finish_physical_streaming_scoring",
+        "require_physical_streamed_production_scoring_artifact",
+    )
+    physical_authority: tuple[object, tuple[object, ...]] | None = None
+
+    def resolve_physical() -> tuple[object, object, object, object]:
+        nonlocal physical_authority
+
+        try:
+            module = module_registry.get(physical_module_name)
+            registry_is_current = system_module.modules is module_registry
+            operations = tuple(getattr(module, name) for name in physical_names)
+        except (AttributeError, TypeError) as exc:
+            raise FormalStreamingInputError(
+                "physical scoring module is unavailable to the sealed composer"
+            ) from exc
+        if (
+            module is None
+            or not registry_is_current
+            or len(operations) != len(physical_names)
+            or any(
+                not callable(operation)
+                or getattr(operation, "__module__", None) != physical_module_name
+                or getattr(operation, "__name__", None) != name
+                for operation, name in zip(
+                    operations, physical_names, strict=True
+                )
+            )
+        ):
+            raise FormalStreamingInputError(
+                "physical scoring operations changed before composition"
+            )
+        if physical_authority is None:
+            physical_authority = (module, operations)
+        elif (
+            physical_authority[0] is not module
+            or not registry_is_current
+            or module_registry.get(physical_module_name) is not module
+            or any(
+                current_operation is not expected_operation
+                for current_operation, expected_operation in zip(
+                    operations, physical_authority[1], strict=True
+                )
+            )
+        ):
+            raise FormalStreamingInputError(
+                "sealed physical scoring operations changed"
+            )
+        return operations  # type: ignore[return-value]
+
     def finish(value: StreamedFormalInputCandidate) -> StreamedFormalInputCandidate:
-        return require_impl(value, _candidate_current=current)
+        return require_impl(
+            value,
+            _candidate_current=current,
+            _resolve_physical=resolve_physical,
+        )
 
     def build(
         *,
@@ -6608,13 +7426,118 @@ def _bind_streamed_formal_candidate_authority(
         )
         return finish(value)
 
-    return build, build_lifecycle, build_reviewed_lifecycle, finish
+    def build_physical(
+        *,
+        scoring_builder: object,
+        authoritative_scoring_artifact: StreamedProductionScoringArtifact | None = None,
+        accepted_risk: AcceptedRiskPairBinding,
+        formal_power: FormalPowerCalibrationBinding,
+        power_floor: PowerFloorBinding,
+        economic_execution: FormalEconomicExecutionBinding,
+        terminal_package: FormalTerminalDispositionPackage,
+        benchmark_security_id: str,
+        calculation_as_of_date: date,
+        output_directory: Path,
+    ) -> StreamedFormalInputCandidate:
+        value = physical_build_impl(
+            scoring_builder=scoring_builder,
+            authoritative_scoring_artifact=authoritative_scoring_artifact,
+            accepted_risk=accepted_risk,
+            formal_power=formal_power,
+            power_floor=power_floor,
+            economic_execution=economic_execution,
+            terminal_package=terminal_package,
+            benchmark_security_id=benchmark_security_id,
+            calculation_as_of_date=calculation_as_of_date,
+            output_directory=output_directory,
+            _candidate_register=register,
+            _candidate_builder=candidate_builder,
+            _physical_operations=resolve_physical(),
+        )
+        return finish(value)
+
+    def build_physical_reviewed_lifecycle(
+        *,
+        scoring_builder: object,
+        authoritative_scoring_artifact: StreamedProductionScoringArtifact | None = None,
+        accepted_risk: AcceptedRiskPairBinding,
+        formal_power: FormalPowerCalibrationBinding,
+        power_floor: PowerFloorBinding,
+        economic_execution: FormalEconomicExecutionBinding,
+        historical_bridge: historical_module.ReviewedHistoricalUniverseToPreopenBridge,
+        terminal_output_directory: Path,
+        benchmark_security_id: str,
+        calculation_as_of_date: date,
+        output_directory: Path,
+    ) -> StreamedFormalInputCandidate:
+        value = physical_reviewed_lifecycle_impl(
+            scoring_builder=scoring_builder,
+            authoritative_scoring_artifact=authoritative_scoring_artifact,
+            accepted_risk=accepted_risk,
+            formal_power=formal_power,
+            power_floor=power_floor,
+            economic_execution=economic_execution,
+            historical_bridge=historical_bridge,
+            terminal_output_directory=terminal_output_directory,
+            benchmark_security_id=benchmark_security_id,
+            calculation_as_of_date=calculation_as_of_date,
+            output_directory=output_directory,
+            _candidate_register=register,
+            _candidate_builder=candidate_builder,
+            _physical_operations=resolve_physical(),
+        )
+        return finish(value)
+
+    def build_physical_accepted_risk_terminal(
+        *,
+        scoring_builder: object,
+        authoritative_scoring_artifact: StreamedProductionScoringArtifact | None = None,
+        accepted_risk: AcceptedRiskPairBinding,
+        formal_power: FormalPowerCalibrationBinding,
+        power_floor: PowerFloorBinding,
+        economic_execution: FormalEconomicExecutionBinding,
+        terminal_recorder: AcceptedRiskTerminalDispositionRecorder,
+        benchmark_security_id: str,
+        calculation_as_of_date: date,
+        output_directory: Path,
+    ) -> tuple[StreamedFormalInputCandidate, AcceptedRiskTerminalDispositionBuild]:
+        candidate, terminal_build = physical_accepted_risk_terminal_impl(
+            scoring_builder=scoring_builder,
+            authoritative_scoring_artifact=authoritative_scoring_artifact,
+            accepted_risk=accepted_risk,
+            formal_power=formal_power,
+            power_floor=power_floor,
+            economic_execution=economic_execution,
+            terminal_recorder=terminal_recorder,
+            benchmark_security_id=benchmark_security_id,
+            calculation_as_of_date=calculation_as_of_date,
+            output_directory=output_directory,
+            _candidate_register=register,
+            _candidate_builder=candidate_builder,
+            _physical_operations=resolve_physical(),
+        )
+        return finish(candidate), require_accepted_risk_terminal_disposition_build(
+            terminal_build
+        )
+
+    return (
+        build,
+        build_lifecycle,
+        build_reviewed_lifecycle,
+        build_physical,
+        build_physical_reviewed_lifecycle,
+        build_physical_accepted_risk_terminal,
+        finish,
+    )
 
 
 (
     build_streamed_formal_input_candidate,
     build_lifecycle_streamed_formal_input_candidate,
     build_streamed_formal_input_candidate_from_reviewed_lifecycle,
+    build_physical_streamed_formal_input_candidate,
+    build_physical_streamed_formal_input_candidate_from_reviewed_lifecycle,
+    build_physical_streamed_formal_input_candidate_from_accepted_risk_terminal,
     require_streamed_formal_input_candidate,
 ) = _bind_streamed_formal_candidate_authority(
     candidate_builder=_build_streamed_formal_input_candidate_impl,
@@ -6623,9 +7546,18 @@ def _bind_streamed_formal_candidate_authority(
     reviewed_lifecycle_impl=(
         _build_streamed_formal_input_candidate_from_reviewed_lifecycle_impl
     ),
+    physical_build_impl=_build_physical_streamed_formal_input_candidate_impl,
+    physical_reviewed_lifecycle_impl=(
+        _build_physical_streamed_formal_input_candidate_from_reviewed_lifecycle_impl
+    ),
+    physical_accepted_risk_terminal_impl=(
+        _build_physical_streamed_formal_input_candidate_from_accepted_risk_terminal_impl
+    ),
     require_impl=_require_streamed_formal_input_candidate_impl,
     register=_candidate_authority_register,
     current=_candidate_authority_current,
+    system_module=sys,
+    module_registry=sys.modules,
 )
 
 del _bind_streamed_formal_candidate_authority
@@ -6633,6 +7565,9 @@ del _build_streamed_formal_input_candidate_impl
 del _build_streamed_formal_input_candidate_public_impl
 del _build_lifecycle_streamed_formal_input_candidate_impl
 del _build_streamed_formal_input_candidate_from_reviewed_lifecycle_impl
+del _build_physical_streamed_formal_input_candidate_impl
+del _build_physical_streamed_formal_input_candidate_from_reviewed_lifecycle_impl
+del _build_physical_streamed_formal_input_candidate_from_accepted_risk_terminal_impl
 del _require_streamed_formal_input_candidate_impl
 del _candidate_authority_register
 del _candidate_authority_current
@@ -6645,6 +7580,14 @@ def streamed_formal_contract_record(
     """Reauthenticate a candidate and reproduce its single contract row."""
 
     candidate = require_streamed_formal_input_candidate(value)
+    preopen = candidate.shards.capacity.preopen_acquisition_receipt
+    if candidate.physical_scoring_lineage is None:
+        preopen_id, preopen_sha256 = _streaming_preopen_identity(preopen)
+    else:
+        preopen_id = candidate.physical_scoring_lineage.preopen_acquisition_id
+        preopen_sha256 = (
+            candidate.physical_scoring_lineage.preopen_acquisition_sha256
+        )
     return _build_streamed_formal_contract_record(
         scoring=candidate.scoring,
         accepted_risk=candidate.accepted_risk,
@@ -6653,9 +7596,9 @@ def streamed_formal_contract_record(
         economic_execution=candidate.economic_execution,
         report_contract=candidate.report_contract,
         terminal_package=candidate.terminal_package,
-        preopen_acquisition_receipt=(
-            candidate.shards.capacity.preopen_acquisition_receipt
-        ),
+        preopen_acquisition_receipt=preopen,
+        preopen_acquisition_id=preopen_id,
+        preopen_acquisition_sha256=preopen_sha256,
         source_view_partitions=candidate.source_view_partitions,
         benchmark_security_id=candidate.benchmark_security_id,
         calculation_as_of_date=candidate.calculation_as_of_date,
@@ -6851,6 +7794,9 @@ __all__ = (
     "StreamedTestSessionBlock",
     "begin_streamed_production_scoring",
     "build_lifecycle_streamed_formal_input_candidate",
+    "build_physical_streamed_formal_input_candidate",
+    "build_physical_streamed_formal_input_candidate_from_accepted_risk_terminal",
+    "build_physical_streamed_formal_input_candidate_from_reviewed_lifecycle",
     "build_streamed_formal_input_candidate",
     "build_streamed_formal_input_candidate_from_reviewed_lifecycle",
     "finish_streamed_production_scoring",

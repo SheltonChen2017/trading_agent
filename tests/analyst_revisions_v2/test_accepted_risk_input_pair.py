@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import ast
 import dataclasses
+import re
 from fractions import Fraction
 from pathlib import Path
 
 import pytest
 
 from research.analyst_revisions_v2 import accepted_risk_input_pair as pair_module
+from research.analyst_revisions_v2 import availability as availability_module
 from research.analyst_revisions_v2.accepted_risk_input_pair import (
     AcceptedRiskInputError,
     AcceptedRiskInputPair,
@@ -105,6 +107,31 @@ def _page(
     )
 
 
+def _ratings_page_from_bytes(
+    provider_rows_bytes: bytes, *, raw_response_bytes: bytes | None = None
+) -> CapturePageBinding:
+    return bind_capture_page(
+        source_role=MassiveSourceRole.ANALYST_RATINGS,
+        redacted_query_bytes=render_redacted_capture_query_bytes(
+            source_role=MassiveSourceRole.ANALYST_RATINGS,
+            requested_first_event_date=FIRST,
+            requested_last_event_date=LAST,
+        ),
+        page_number=1,
+        request_cursor_sha256=None,
+        next_cursor_sha256=None,
+        terminal_page=True,
+        response_received_at=ROLE_TIMES[MassiveSourceRole.ANALYST_RATINGS],
+        raw_response_sha256=(
+            sha256_bytes(raw_response_bytes)
+            if raw_response_bytes is not None
+            else ROLE_HASHES[MassiveSourceRole.ANALYST_RATINGS]
+        ),
+        raw_response_bytes=raw_response_bytes,
+        provider_rows_bytes=provider_rows_bytes,
+    )
+
+
 def _capture(
     *,
     ratings=None,
@@ -189,13 +216,23 @@ def test_one_capture_derives_both_explicitly_non_pristine_views():
 def test_static_c1_contract_is_content_addressed_and_bound_into_both_artifacts():
     payload = pair_module.render_accepted_risk_input_pair_contract_bytes()
     assert pair_module.INPUT_PAIR_CONTRACT_SHA256 == (
-        "b2b78be3e11a8c0f7995af6a14f819a1bc5283ca1c51638e9e92130590c6b4b0"
+        "65c92186f85cdf82318b538b58701d215fc160b24d3a154d95411ec1ed37edad"
     )
     assert sha256_bytes(payload) == pair_module.INPUT_PAIR_CONTRACT_SHA256
     record = pair_module.accepted_risk_input_pair_contract_record()
     assert record["capture"]["transactional_snapshot"] is False
     assert record["capture"]["last_updated_filter_applied"] is False
     assert record["pristine_point_in_time"] is False
+    assert record["duplicate_provider_id_policy"] == {
+        "analyst_ratings": "refuse_entire_three_role_capture",
+        "earnings": "refuse_entire_three_role_capture",
+        "corporate_guidance": (
+            "preserve_every_raw_occurrence_and_jointly_exclude_every_"
+            "occurrence_of_a_duplicated_id"
+        ),
+        "cross_role": "refuse_entire_three_role_capture",
+        "selection_or_synthetic_identity": False,
+    }
     capture = _capture()
     pair = build_accepted_risk_input_pair(capture)
     assert capture.contract_id == pair_module.INPUT_PAIR_CONTRACT_ID
@@ -295,6 +332,74 @@ def test_guidance_naive_last_updated_is_censored_by_calendar_date_only():
     assert on_cutoff.censored_view.disposition is (
         RowDisposition.CENSORED_LAST_TOUCH_AFTER_DECISION_CUTOFF
     )
+
+
+def test_guidance_explicit_offset_last_updated_uses_exact_delayed_open_cutoff():
+    pair = build_accepted_risk_input_pair(
+        _capture(
+            guidance=[
+                _row(
+                    "guidance-at-open",
+                    last_updated="2020-01-07T09:30:00-05:00",
+                    action="raises_guidance",
+                ),
+                _row(
+                    "guidance-after-open",
+                    last_updated="2020-01-07T09:30:00.000001-05:00",
+                    action="lowers_guidance",
+                ),
+            ]
+        )
+    )
+    at_cutoff, after = pair.rows[-2:]
+
+    assert at_cutoff.last_updated_calendar_date == "2020-01-07"
+    assert at_cutoff.normalized_last_updated_at == "2020-01-07T14:30:00.000000Z"
+    assert at_cutoff.censored_view.included is True
+    assert at_cutoff.censored_view.last_updated_not_after_cutoff is True
+    assert after.normalized_last_updated_at == "2020-01-07T14:30:00.000001Z"
+    assert after.censored_view.included is False
+    assert after.censored_view.disposition is (
+        RowDisposition.CENSORED_LAST_TOUCH_AFTER_DECISION_CUTOFF
+    )
+
+
+def test_last_updated_must_not_postdate_its_own_page_receipt():
+    pair = build_accepted_risk_input_pair(
+        _capture(
+            ratings=[
+                _row(
+                    "inside-capture-after-page",
+                    last_updated="2026-09-11T18:01:00.000001Z",
+                )
+            ]
+        )
+    )
+    row = pair.rows[0]
+
+    assert row.current_view.disposition is RowDisposition.LAST_UPDATED_AFTER_CAPTURE
+    assert row.censored_view.disposition is RowDisposition.LAST_UPDATED_AFTER_CAPTURE
+    assert row.current_view.included is False
+
+
+def test_naive_guidance_future_calendar_date_is_structurally_refused():
+    pair = build_accepted_risk_input_pair(
+        _capture(
+            guidance=[
+                _row(
+                    "guidance-naive-after-page",
+                    last_updated="2026-09-12 00:00:00",
+                    action="raises_guidance",
+                )
+            ]
+        )
+    )
+    row = pair.rows[-1]
+
+    assert row.normalized_last_updated_at is None
+    assert row.last_updated_calendar_date == "2026-09-12"
+    assert row.current_view.disposition is RowDisposition.LAST_UPDATED_AFTER_CAPTURE
+    assert row.censored_view.disposition is RowDisposition.LAST_UPDATED_AFTER_CAPTURE
 
 
 def test_pre_2013_rows_are_quarantined_in_both_views():
@@ -467,6 +572,75 @@ def test_page_binding_authenticates_exact_jsonl_bytes_hash_and_count():
         )
 
 
+def test_provider_row_page_requires_lf_terminated_jsonl():
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("provider row page must use LF-terminated JSONL"),
+    ):
+        _ratings_page_from_bytes(b"{}")
+
+
+def test_provider_row_page_refuses_a_blank_jsonl_row():
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("provider row page contains a blank JSONL row"),
+    ):
+        _ratings_page_from_bytes(b"{}\n\n")
+
+
+def test_provider_row_page_refuses_json_beyond_the_nesting_bound():
+    depth = pair_module.MAX_PROVIDER_JSON_DEPTH + 1
+    payload = b'{"nested":' * depth + b"null" + b"}" * depth + b"\n"
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("provider row exceeds the JSON nesting bound"),
+    ):
+        _ratings_page_from_bytes(payload)
+
+
+def test_provider_row_page_refuses_more_than_fifty_thousand_rows():
+    payload = b"{}\n" * (pair_module.MAX_PROVIDER_ROWS_PER_PAGE + 1)
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("provider row page exceeds 50,000 rows"),
+    ):
+        _ratings_page_from_bytes(payload)
+
+
+def test_provider_row_page_refuses_bytes_beyond_the_c1_limit():
+    payload = b" " * pair_module.MAX_CAPTURE_PAGE_BYTES + b"\n"
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("provider row page exceeds the C1 byte limit"),
+    ):
+        _ratings_page_from_bytes(payload)
+
+
+def test_raw_response_requires_one_ordered_results_array():
+    raw_response = canonical_json_bytes({"status": "OK"})
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape(
+            "raw provider response must contain one ordered results array"
+        ),
+    ):
+        _ratings_page_from_bytes(b"", raw_response_bytes=raw_response)
+
+
+def test_raw_response_results_must_all_be_objects():
+    raw_response = canonical_json_bytes({"results": [1], "status": "OK"})
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("raw provider response results must be objects"),
+    ):
+        _ratings_page_from_bytes(b"", raw_response_bytes=raw_response)
+
+
 def test_raw_response_bytes_prove_complete_ordered_results_extraction_when_present():
     rows = [_row("raw-1"), _row("raw-2", ticker="BBB")]
     raw_response = canonical_json_bytes(
@@ -609,8 +783,64 @@ def test_cursor_self_loop_and_raw_response_replay_refuse_capture():
         _capture(pages=(first, middle, replay, *remaining))
 
 
-@pytest.mark.parametrize("mutation", ["first_cursor", "unterminated", "gap"])
-def test_cursor_and_page_topology_refuses_ambiguous_capture(mutation):
+def test_role_pages_must_share_one_exact_redacted_base_query():
+    cursor = "a" * 64
+    first = _page(
+        MassiveSourceRole.ANALYST_RATINGS,
+        [_row("r1")],
+        page_number=1,
+        next_cursor_sha256=cursor,
+        terminal_page=False,
+        raw_response_sha256="4" * 64,
+    )
+    second = _page(
+        MassiveSourceRole.ANALYST_RATINGS,
+        [_row("r2")],
+        page_number=2,
+        request_cursor_sha256=cursor,
+        first="2013-01-01",
+        raw_response_sha256="5" * 64,
+    )
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape(
+            "analyst_ratings pages do not share one redacted base query"
+        ),
+    ):
+        _capture(pages=(first, second, *_capture().pages[1:]))
+
+
+def test_terminal_page_cannot_be_followed_within_a_role():
+    first = _page(
+        MassiveSourceRole.ANALYST_RATINGS,
+        [_row("r1")],
+        page_number=1,
+        raw_response_sha256="4" * 64,
+    )
+    second = _page(
+        MassiveSourceRole.ANALYST_RATINGS,
+        [_row("r2")],
+        page_number=2,
+        raw_response_sha256="5" * 64,
+    )
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("a terminal page cannot be followed"),
+    ):
+        _capture(pages=(first, second, *_capture().pages[1:]))
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        ("first_cursor", "the first page in a role must not request a cursor"),
+        ("unterminated", "every source-role page chain must terminate"),
+        ("gap", "analyst_ratings pages must be contiguous and ordered from one"),
+    ],
+)
+def test_cursor_and_page_topology_refuses_ambiguous_capture(mutation, message):
     first = _page(MassiveSourceRole.ANALYST_RATINGS, [_row("r")])
     if mutation == "first_cursor":
         first = dataclasses.replace(first, request_cursor_sha256="a" * 64)
@@ -620,7 +850,7 @@ def test_cursor_and_page_topology_refuses_ambiguous_capture(mutation):
         )
     else:
         first = dataclasses.replace(first, page_number=2)
-    with pytest.raises(AcceptedRiskInputError):
+    with pytest.raises(AcceptedRiskInputError, match=re.escape(message)):
         _capture(
             pages=(
                 first,
@@ -628,6 +858,34 @@ def test_cursor_and_page_topology_refuses_ambiguous_capture(mutation):
                 _page(MassiveSourceRole.CORPORATE_GUIDANCE, [_row("g")]),
             )
         )
+
+
+def test_source_role_page_groups_must_be_contiguous():
+    cursor = "a" * 64
+    ratings_first = _page(
+        MassiveSourceRole.ANALYST_RATINGS,
+        [_row("r1")],
+        page_number=1,
+        next_cursor_sha256=cursor,
+        terminal_page=False,
+        raw_response_sha256="4" * 64,
+    )
+    ratings_second = _page(
+        MassiveSourceRole.ANALYST_RATINGS,
+        [],
+        page_number=2,
+        request_cursor_sha256=cursor,
+        received_at="2026-09-11T18:02:30.000000Z",
+        raw_response_sha256="5" * 64,
+    )
+    earnings = _page(MassiveSourceRole.EARNINGS, [_row("e")])
+    guidance = _page(MassiveSourceRole.CORPORATE_GUIDANCE, [_row("g")])
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("capture pages for each source role must be contiguous"),
+    ):
+        _capture(pages=(ratings_first, earnings, ratings_second, guidance))
 
 
 def test_every_required_role_and_one_date_range_are_mandatory():
@@ -643,7 +901,12 @@ def test_every_required_role_and_one_date_range_are_mandatory():
     changed_earnings = _page(
         MassiveSourceRole.EARNINGS, [_row("e")], last="2024-12-31"
     )
-    with pytest.raises(AcceptedRiskInputError, match="same requested"):
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape(
+            "all source roles must cover the same requested event-date range"
+        ),
+    ):
         _capture(pages=(pages[0], changed_earnings, pages[2]))
 
 
@@ -654,12 +917,132 @@ def test_duplicate_provider_id_within_a_source_role_invalidates_whole_capture():
         )
 
 
+def test_duplicate_provider_id_within_earnings_invalidates_whole_capture():
+    with pytest.raises(AcceptedRiskInputError, match="duplicate provider event ID"):
+        _capture(
+            earnings=[
+                _row("duplicate", action="earnings"),
+                _row("duplicate", action="earnings", ticker="BBB"),
+            ]
+        )
+
+
 def test_duplicate_provider_id_across_endpoints_also_invalidates_capture():
     with pytest.raises(AcceptedRiskInputError, match="duplicate provider event ID"):
         _capture(
             ratings=[_row("global-id")],
             earnings=[_row("global-id", action="earnings")],
         )
+
+
+def test_duplicate_quarantine_flag_refuses_wrong_type_and_non_guidance_use():
+    capture = _capture()
+    ratings_page = capture.pages[0]
+    ratings_row = ratings_page.parsed_rows[0]
+    ratings_bytes = canonical_json_bytes(ratings_row)
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match="duplicate_provider_event_id must be an exact boolean",
+    ):
+        pair_module._derive_source_row(
+            capture=capture,
+            page=ratings_page,
+            row_offset=0,
+            row=ratings_row,
+            raw_row_bytes=ratings_bytes,
+            duplicate_provider_event_id=1,
+        )
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match="duplicate-ID quarantine applies only to identified guidance rows",
+    ):
+        pair_module._derive_source_row(
+            capture=capture,
+            page=ratings_page,
+            row_offset=0,
+            row=ratings_row,
+            raw_row_bytes=ratings_bytes,
+            duplicate_provider_event_id=True,
+        )
+
+
+@pytest.mark.parametrize("conflicting_payload", [False, True])
+def test_duplicate_guidance_ids_preserve_and_jointly_exclude_every_occurrence(
+    conflicting_payload,
+):
+    first = _row("guidance-duplicate", action="guidance")
+    second = dict(first)
+    if conflicting_payload:
+        second.update(
+            {
+                "date": "2020-02-03",
+                "last_updated": "2020-02-04T12:00:00Z",
+                "min_revenue_guidance": 1,
+            }
+        )
+    unique = _row("guidance-unique", action="guidance")
+    capture = _capture(guidance=[first, second, unique])
+    pair = build_accepted_risk_input_pair(capture)
+
+    guidance_rows = tuple(
+        row
+        for row in pair.rows
+        if row.locator.source_role is MassiveSourceRole.CORPORATE_GUIDANCE
+    )
+    duplicated = tuple(
+        row for row in guidance_rows if row.provider_event_id == "guidance-duplicate"
+    )
+    retained_unique = next(
+        row for row in guidance_rows if row.provider_event_id == "guidance-unique"
+    )
+
+    assert len(pair.rows) == pair.report.total_row_count == 5
+    assert len(guidance_rows) == 3
+    assert len(duplicated) == 2
+    assert tuple(row.locator.row_offset for row in duplicated) == (0, 1)
+    assert tuple(row.raw_row_bytes for row in duplicated) == (
+        canonical_json_bytes(first),
+        canonical_json_bytes(second),
+    )
+    assert all(not row.current_view.included for row in duplicated)
+    assert all(not row.censored_view.included for row in duplicated)
+    assert all(
+        row.current_view.disposition
+        is RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        and row.censored_view.disposition
+        is RowDisposition.DUPLICATE_PROVIDER_EVENT_ID
+        for row in duplicated
+    )
+    assert retained_unique.current_view.included is True
+    assert retained_unique.censored_view.included is True
+    assert pair.report.current_included_count == 3
+    assert pair.report.censored_included_count == 3
+    assert pair.report.disagreement_count == 0
+    assert {
+        (item.view, item.disposition): item.count
+        for item in pair.report.disposition_counts
+    }[
+        (InputView.CURRENT_ROW, RowDisposition.DUPLICATE_PROVIDER_EVENT_ID)
+    ] == 2
+    assert {
+        (item.view, item.disposition): item.count
+        for item in pair.report.disposition_counts
+    }[
+        (
+            InputView.CONSERVATIVE_CENSORED,
+            RowDisposition.DUPLICATE_PROVIDER_EVENT_ID,
+        )
+    ] == 2
+    guidance_breakdown = next(
+        item
+        for item in pair.report.breakdowns
+        if item.dimension is BreakdownDimension.SOURCE_ROLE
+        and item.key == MassiveSourceRole.CORPORATE_GUIDANCE.value
+    )
+    assert guidance_breakdown.total_count == 3
+    assert guidance_breakdown.current_included_count == 1
+    assert guidance_breakdown.censored_included_count == 1
 
 
 def test_capture_identity_binds_pages_queries_receipts_counts_and_hashes():
@@ -786,7 +1169,8 @@ def test_static_guard_and_inner_duplicate_helper_are_identity_pinned():
     "alias_name",
     [
         "_PINNED_DERIVE_EVENT_AVAILABILITY",
-        "_PINNED_REFUSE_DUPLICATE_PROVIDER_IDS",
+        "_PINNED_RESOLVE_DELAYED_DATE_ONLY_SESSION_OPEN",
+        "_PINNED_VALIDATE_AND_COLLECT_DUPLICATE_GUIDANCE_PROVIDER_IDS",
         "_PINNED_VALIDATE_PAGE_SEQUENCE",
         "_PINNED_DERIVE_ROWS",
         "_PINNED_BUILD_REPORT",
@@ -810,6 +1194,35 @@ def test_every_live_pinned_helper_alias_rebinding_refuses(alias_name):
                 )
     finally:
         setattr(pair_module, alias_name, original)
+
+
+def test_guidance_availability_import_rebinding_is_refused_before_derivation():
+    original = pair_module.resolve_delayed_date_only_session_open
+    pair_module.resolve_delayed_date_only_session_open = (
+        lambda **kwargs: ("2020-01-03", object())
+    )
+    try:
+        with pytest.raises(
+            AcceptedRiskInputError,
+            match=re.escape("accepted-risk static contract changed"),
+        ):
+            build_accepted_risk_input_pair(_capture())
+    finally:
+        pair_module.resolve_delayed_date_only_session_open = original
+
+
+def test_guidance_wrapper_ignores_rebinding_of_its_module_level_facade_alias():
+    original = availability_module.resolve_nth_session_after
+    availability_module.resolve_nth_session_after = (
+        lambda *_args, **_kwargs: "2020-01-03"
+    )
+    try:
+        pair = build_accepted_risk_input_pair(_capture())
+        guidance = pair.rows[-1]
+        assert guidance.current_view.eligible_session == "2020-01-07"
+        assert guidance.current_view.eligible_at == "2020-01-07T14:30:00.000000Z"
+    finally:
+        availability_module.resolve_nth_session_after = original
 
 
 def test_capture_authority_detects_nested_page_replacement():
@@ -919,6 +1332,33 @@ def test_capture_chronology_is_strict_and_page_receipts_are_ordered():
     with pytest.raises(AcceptedRiskInputError, match="nondecreasing"):
         _capture(pages=pages)
 
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("capture page receipt falls outside capture chronology"),
+    ):
+        _capture(started="2026-09-11T18:01:00.000001Z")
+
+
+def test_capture_role_row_counts_are_recomputed_and_refused_by_exact_message():
+    capture = _capture()
+    wrong_counts = tuple((role, 0) for role in pair_module._ROLE_ORDER)
+    object.__setattr__(capture, "role_row_counts", wrong_counts)
+    with pair_module._CAPTURE_AUTHORITIES_LOCK:
+        reference = pair_module._CAPTURE_AUTHORITIES[id(capture)][0]
+        pair_module._CAPTURE_AUTHORITIES[id(capture)] = (
+            reference,
+            pair_module._capture_fingerprint(capture),
+            pair_module.capture_frozen_container_authority(
+                pair_module._capture_container_roots(capture)
+            ),
+        )
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape("capture role row counts are not exact"),
+    ):
+        require_capture_binding(capture)
+
 
 def test_pair_is_deterministic_and_bound_to_every_row_disposition():
     first = build_accepted_risk_input_pair(_capture())
@@ -1007,3 +1447,95 @@ def test_empty_complete_capture_is_represented_but_empty_pair_refuses():
     assert capture.total_row_count == 0
     with pytest.raises(AcceptedRiskInputError, match="cannot be empty"):
         build_accepted_risk_input_pair(capture)
+
+
+def test_event_outside_exchange_calendar_authority_excludes_both_views():
+    """An unresolvable cutoff must exclude the row from both views, never include it."""
+
+    far = "2036-12-31"
+    pair = build_accepted_risk_input_pair(
+        _capture(
+            pages=(
+                _page(
+                    MassiveSourceRole.ANALYST_RATINGS,
+                    [_row("rating-far", event_date="2035-12-31")],
+                    last=far,
+                ),
+                _page(
+                    MassiveSourceRole.EARNINGS,
+                    [_row("earnings-far", event_date="2035-12-31", action="earnings")],
+                    last=far,
+                ),
+                _page(
+                    MassiveSourceRole.CORPORATE_GUIDANCE,
+                    [_row("guidance-far", event_date="2035-12-31", action="guidance")],
+                    last=far,
+                ),
+            )
+        )
+    )
+    assert len(pair.rows) == 3
+    for row in pair.rows:
+        for view in (row.current_view, row.censored_view):
+            assert view.included is False
+            assert view.disposition is (
+                RowDisposition.EVENT_OUTSIDE_EXCHANGE_CALENDAR_AUTHORITY
+            )
+
+
+def test_guidance_row_post_init_guards_refuse_inconsistent_views():
+    """Hand-built guidance rows cannot claim inclusion their cutoff does not support."""
+
+    pair = build_accepted_risk_input_pair(
+        _capture(
+            guidance=[
+                _row(
+                    "guidance-consistent",
+                    last_updated="2020-01-06 12:00:00",
+                    action="raises_guidance",
+                )
+            ]
+        )
+    )
+    guidance = pair.rows[-1]
+    assert guidance.censored_view.included is True
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match="censored guidance did not precede its delayed session",
+    ):
+        dataclasses.replace(guidance, last_updated_calendar_date="2020-01-07")
+
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match="guidance did not retain its conservative date-only cutoff",
+    ):
+        dataclasses.replace(
+            guidance,
+            current_view=dataclasses.replace(
+                guidance.current_view, eligible_session="2020-01-06"
+            ),
+        )
+
+    exact_guidance = build_accepted_risk_input_pair(
+        _capture(
+            guidance=[
+                _row(
+                    "guidance-exact",
+                    last_updated="2020-01-07T09:29:59-05:00",
+                    action="raises_guidance",
+                )
+            ]
+        )
+    ).rows[-1]
+    assert exact_guidance.censored_view.included is True
+    with pytest.raises(
+        AcceptedRiskInputError,
+        match=re.escape(
+            "censored guidance exact last_updated exceeded its delayed cutoff"
+        ),
+    ):
+        dataclasses.replace(
+            exact_guidance,
+            normalized_last_updated_at="2020-01-07T14:30:00.000001Z",
+        )

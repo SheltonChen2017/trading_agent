@@ -26,6 +26,10 @@ INTERMEDIATE_SCHEMA = (
 QUALITY_PROJECTION_SCHEMA = "arv2-qdata-physical-measurement-projection-v1"
 PEER_PROJECTION_SCHEMA = "arv2-preopen-control-peer-aggregate-projection-v1"
 MARKET_PROJECTION_SCHEMA = "arv2-preopen-control-market-session-projection-v1"
+DIRECT_EMISSION_SUMMARY_SCHEMA = (
+    "arv2-owner-accepted-risk-direct-preopen-emission-summary-v1"
+)
+DIRECT_PROGRESS_SCHEMA = "arv2-owner-accepted-risk-direct-preopen-progress-v1"
 
 
 def _canonical(value):
@@ -85,6 +89,7 @@ def initialize_runtime_state(algorithm):
     algorithm._benchmark_rows = None
     algorithm._peer_records = None
     algorithm._market_records = None
+    algorithm._direct_preopen_state = None
 
 
 def _read_security_batch(algorithm, batch):
@@ -220,8 +225,74 @@ def _resolution_refusal(seed, detail):
     }
 
 
+def _apply_accepted_risk_runtime_bindings(algorithm, inputs):
+    """Bind current-snapshot symbols without altering the frozen default path."""
+
+    bindings = getattr(algorithm, "_accepted_risk_history_bindings", None)
+    if bindings is None:
+        return inputs
+    output = {role: [dict(row) for row in rows] for role, rows in inputs.items()}
+    rebound = []
+    for seed in output["universe"]:
+        if seed.get("disposition") != "accepted":
+            rebound.append(seed)
+            continue
+        reason = bindings.named_refusal_reason(seed["security_id"])
+        if reason is not None:
+            rebound.append(_resolution_refusal(seed, reason))
+            continue
+        symbol = bindings.symbol_for_history_request(
+            security_id=seed["security_id"],
+            decision_session=seed["decision_session"],
+            historical_ticker=seed["historical_ticker"],
+            issuer_id=seed["issuer_id"],
+            share_class_id=seed["share_class_id"],
+            listing_id=seed["listing_id"],
+            security_master_row_sha256=seed["security_master_row_sha256"],
+            runtime_binding_row_sha256=seed["qc_sid_mapping_row_sha256"],
+        )
+        updated = dict(seed)
+        updated["qc_security_id"] = str(symbol.id)
+        rebound.append(updated)
+    output["universe"] = rebound
+    return output
+
+
 def _reviewed_batch_symbols(algorithm, inputs):
     """Deserialize only exact prebound SIDs; a display ticker has no authority."""
+
+    accepted_risk = getattr(algorithm, "_accepted_risk_history_bindings", None)
+    if accepted_risk is not None:
+        symbols = []
+        sid_to_logical = {}
+        for seed in inputs["universe"]:
+            if seed.get("disposition") != "accepted":
+                continue
+            symbol = accepted_risk.symbol_for_history_request(
+                security_id=seed["security_id"],
+                decision_session=seed["decision_session"],
+                historical_ticker=seed["historical_ticker"],
+                issuer_id=seed["issuer_id"],
+                share_class_id=seed["share_class_id"],
+                listing_id=seed["listing_id"],
+                security_master_row_sha256=seed["security_master_row_sha256"],
+                runtime_binding_row_sha256=seed["qc_sid_mapping_row_sha256"],
+            )
+            encoded_sid = str(symbol.id)
+            if seed.get("qc_security_id") != encoded_sid:
+                raise ValueError(
+                    "accepted-risk universe QC SecurityIdentifier changed after binding"
+                )
+            logical = seed["security_id"]
+            current = sid_to_logical.get(encoded_sid)
+            if current is not None and current != logical:
+                raise ValueError(
+                    "accepted-risk QC SecurityIdentifier maps to distinct logical securities"
+                )
+            if current is None:
+                sid_to_logical[encoded_sid] = logical
+                symbols.append(symbol)
+        return symbols, sid_to_logical
 
     mappings = sorted(inputs["sid_mapping"], key=lambda row: row["row_sha256"])
     by_security = {}
@@ -376,70 +447,449 @@ def _market_records(algorithm, state):
     return records
 
 
-def _market_pass(algorithm, *, emit_terminals, peer_records_by_session=None,
-                 market_records_by_session=None):
-    peer_state = {}
-    market_state = {}
+def _market_batch(algorithm, *, batch, peer_state, market_state, emit_terminals,
+                  peer_records_by_session=None, market_records_by_session=None,
+                  terminal_consumer=None, emission_state=None):
+    """Process exactly one reviewed security batch in one deterministic pass."""
+
     start, last = _market_bounds(algorithm)
     session_index = {item["decision_session"]: index for index, item in enumerate(
         algorithm._manifest["resource_census"]["decision_sessions"])}
-    for batch in algorithm._manifest["resource_census"]["security_batches"]:
-        inputs = _read_security_batch(algorithm, batch)
-        static_roots = {role: hashlib.sha256(_canonical(inputs[role])).hexdigest()
-            for role in ("universe", "sid_mapping", "fundamentals", "earnings",
-                         "guidance", "ratings")}
-        stock_rows = _stock_history(algorithm, inputs, start, last)
-        buffers = {}
-        sessions = sorted({row["decision_session"] for row in inputs["universe"]})
-        if len(sessions) != batch["decision_session_count"]:
-            raise ValueError("security-batch decision-session census changed")
-        for session in sessions:
-            rows, (summaries, lineages) = _summaries(
-                algorithm, inputs, session, stock_rows,
-            )
-            accumulate_peer_aggregates(
-                state=peer_state, universe_rows=rows,
-                market_control_summaries=summaries,
-            )
-            _update_market_state(
-                market_state, session, lineages,
-                algorithm._manifest["benchmark_security_id"],
-            )
-            if emit_terminals:
-                market_commitment = market_records_by_session[session]
-                roots = dict(static_roots)
-                roots["market_observations"] = market_commitment["commitment_sha256"]
-                opened = datetime.fromisoformat(
-                    rows[0]["decision_open_utc"].replace("Z", "+00:00")
-                )
-                policy = algorithm._manifest["source_policy"]
-                terminals = build_security_batch_terminals(
-                    universe_rows=rows, market_control_summaries=summaries,
-                    market_session_commitment=market_commitment,
-                    peer_aggregate_rows=peer_records_by_session.get(session, []),
-                    benchmark_security_id=algorithm._manifest["benchmark_security_id"],
-                    fundamental_rows=inputs["fundamentals"],
-                    earnings_rows=inputs["earnings"],
-                    guidance_rows=inputs["guidance"], rating_rows=inputs["ratings"],
-                    observed_at_utc=(opened - timedelta(microseconds=1)).strftime(
-                        "%Y-%m-%dT%H:%M:%S.%fZ"
-                    ),
-                    rating_source_complete=policy["rating_source_complete"],
-                    earnings_source_complete=policy["earnings_source_complete"],
-                    guidance_source_complete=policy["guidance_source_complete"],
-                    input_roots=roots,
-                )
-                chunk = session_index[session] // algorithm._manifest[
-                    "resource_census"
-                ]["decision_chunk_session_count"]
-                buffers.setdefault(chunk, []).extend(terminals)
+    inputs = _read_security_batch(algorithm, batch)
+    inputs = _apply_accepted_risk_runtime_bindings(algorithm, inputs)
+    static_roots = {role: hashlib.sha256(_canonical(inputs[role])).hexdigest()
+        for role in ("universe", "sid_mapping", "fundamentals", "earnings",
+                     "guidance", "ratings")}
+    stock_rows = _stock_history(algorithm, inputs, start, last)
+    buffers = {}
+    direct_chunk = None
+    direct_rows = []
+    sessions = sorted({row["decision_session"] for row in inputs["universe"]})
+    if len(sessions) != batch["decision_session_count"]:
+        raise ValueError("security-batch decision-session census changed")
+    for session in sessions:
+        rows, (summaries, lineages) = _summaries(
+            algorithm, inputs, session, stock_rows,
+        )
+        accumulate_peer_aggregates(
+            state=peer_state, universe_rows=rows,
+            market_control_summaries=summaries,
+        )
+        _update_market_state(
+            market_state, session, lineages,
+            algorithm._manifest["benchmark_security_id"],
+        )
         if emit_terminals:
-            for chunk in sorted(buffers):
-                _flush_physical_shard(
-                    algorithm, chunk, batch["security_batch_ordinal"], buffers[chunk],
-                )
-        del stock_rows, inputs
+            market_commitment = market_records_by_session[session]
+            roots = dict(static_roots)
+            roots["market_observations"] = market_commitment["commitment_sha256"]
+            opened = datetime.fromisoformat(
+                rows[0]["decision_open_utc"].replace("Z", "+00:00")
+            )
+            policy = algorithm._manifest["source_policy"]
+            terminals = build_security_batch_terminals(
+                universe_rows=rows, market_control_summaries=summaries,
+                market_session_commitment=market_commitment,
+                peer_aggregate_rows=peer_records_by_session.get(session, []),
+                benchmark_security_id=algorithm._manifest["benchmark_security_id"],
+                fundamental_rows=inputs["fundamentals"],
+                earnings_rows=inputs["earnings"],
+                guidance_rows=inputs["guidance"], rating_rows=inputs["ratings"],
+                observed_at_utc=(opened - timedelta(microseconds=1)).strftime(
+                    "%Y-%m-%dT%H:%M:%S.%fZ"
+                ),
+                rating_source_complete=policy["rating_source_complete"],
+                earnings_source_complete=policy["earnings_source_complete"],
+                guidance_source_complete=policy["guidance_source_complete"],
+                input_roots=roots,
+            )
+            chunk = session_index[session] // algorithm._manifest[
+                "resource_census"
+            ]["decision_chunk_session_count"]
+            if terminal_consumer is None:
+                buffers.setdefault(chunk, []).extend(terminals)
+            else:
+                if direct_chunk is not None and chunk != direct_chunk:
+                    _emit_direct_terminal_rows(
+                        terminal_consumer, direct_rows, emission_state
+                    )
+                    direct_rows = []
+                direct_chunk = chunk
+                direct_rows.extend(terminals)
+    if direct_rows:
+        _emit_direct_terminal_rows(terminal_consumer, direct_rows, emission_state)
+    if emit_terminals:
+        for chunk in sorted(buffers):
+            _flush_physical_shard(
+                algorithm, chunk, batch["security_batch_ordinal"], buffers[chunk],
+            )
+    del stock_rows, inputs
+
+
+def _emit_direct_terminal_rows(consumer, rows, emission_state):
+    if (
+        type(emission_state) is not dict
+        or set(emission_state) != {"terminal_emission_count"}
+        or type(emission_state["terminal_emission_count"]) is not int
+        or emission_state["terminal_emission_count"] < 0
+    ):
+        raise ValueError("direct pre-open emission state changed")
+    ordered = sorted(
+        rows, key=lambda row: (row["decision_session"], row["security_id"])
+    )
+    batch_consumer = getattr(consumer, "consume_terminal_batch", None)
+    if callable(batch_consumer):
+        batch_consumer(ordered)
+        emission_state["terminal_emission_count"] += len(ordered)
+        return
+    if not callable(consumer):
+        raise ValueError("direct pre-open terminal consumer is not callable")
+    for row in ordered:
+        consumer(row)
+        emission_state["terminal_emission_count"] += 1
+
+
+def _valid_direct_terminal_consumer(value):
+    try:
+        return callable(value) or callable(getattr(value, "consume_terminal_batch", None))
+    except Exception:
+        return False
+
+
+def _market_pass(algorithm, *, emit_terminals, peer_records_by_session=None,
+                 market_records_by_session=None, terminal_consumer=None,
+                 emission_state=None):
+    peer_state = {}
+    market_state = {}
+    for batch in algorithm._manifest["resource_census"]["security_batches"]:
+        _market_batch(
+            algorithm,
+            batch=batch,
+            peer_state=peer_state,
+            market_state=market_state,
+            emit_terminals=emit_terminals,
+            peer_records_by_session=peer_records_by_session,
+            market_records_by_session=market_records_by_session,
+            terminal_consumer=terminal_consumer,
+            emission_state=emission_state,
+        )
     return peer_aggregate_records(peer_state), _market_records(algorithm, market_state)
+
+
+def _require_direct_history_bindings(algorithm, expected=None):
+    bindings = getattr(algorithm, "_accepted_risk_history_bindings", None)
+    if bindings is None or (expected is not None and bindings is not expected):
+        raise ValueError("direct pre-open run lacks or changed accepted-risk History bindings")
+    try:
+        from accepted_risk_qc_symbol_resolution import (
+            require_accepted_risk_qc_history_bindings,
+        )
+    except ImportError:
+        from research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution import (
+            require_accepted_risk_qc_history_bindings,
+        )
+    return require_accepted_risk_qc_history_bindings(bindings)
+
+
+def _direct_emission_summary(algorithm, bindings, first_peer, first_market, count):
+    if type(count) is not int or count < 1:
+        raise ValueError("direct pre-open construction emitted no terminals")
+    peer_hash = hashlib.sha256(_canonical({
+        "schema": PEER_PROJECTION_SCHEMA, "records": first_peer,
+    })).hexdigest()
+    market_hash = hashlib.sha256(_canonical({
+        "schema": MARKET_PROJECTION_SCHEMA, "records": first_market,
+    })).hexdigest()
+    seed = {
+        "schema": DIRECT_EMISSION_SUMMARY_SCHEMA,
+        "summary_id": None,
+        "summary_sha256": None,
+        "source_input_manifest_sha256": hashlib.sha256(
+            _canonical(algorithm._manifest)
+        ).hexdigest(),
+        "symbol_resolution_sha256": bindings.resolution_sha256,
+        "terminal_emission_count": count,
+        "peer_aggregate_projection_sha256": peer_hash,
+        "market_session_projection_sha256": market_hash,
+        "emission_order": (
+            "security_batch_then_decision_chunk_then_decision_session_then_security_id"
+        ),
+        "object_store_terminal_writes": 0,
+        "preliminary_evaluation_only": True,
+        "formal_security_master_authority": False,
+        "frozen_formal_evaluation_completed": False,
+    }
+    digest = hashlib.sha256(_canonical(seed)).hexdigest()
+    seed["summary_id"] = "arv2-direct-preopen-emission-" + digest[:24]
+    seed["summary_sha256"] = digest
+    return seed
+
+
+_DIRECT_STATE_FIELDS = {
+    "schema", "phase", "source_input_manifest_sha256", "bindings",
+    "terminal_consumer", "security_batches", "next_batch_index",
+    "completed_batch_passes", "peer_state", "market_state", "first_peer",
+    "first_market", "peer_by_session", "market_by_session", "emission_state",
+    "summary",
+}
+
+
+def _require_direct_state(algorithm):
+    state = getattr(algorithm, "_direct_preopen_state", None)
+    if type(state) is not dict or set(state) != _DIRECT_STATE_FIELDS:
+        raise ValueError("direct pre-open incremental state is absent or changed")
+    if (
+        state["schema"] != "arv2-owner-accepted-risk-direct-preopen-state-v1"
+        or state["phase"] not in {"first_pass", "second_pass", "complete", "failed"}
+        or type(state["source_input_manifest_sha256"]) is not str
+        or state["source_input_manifest_sha256"]
+        != hashlib.sha256(_canonical(algorithm._manifest)).hexdigest()
+        or type(state["security_batches"]) is not tuple
+        or not state["security_batches"]
+        or type(state["next_batch_index"]) is not int
+        or not 0 <= state["next_batch_index"] <= len(state["security_batches"])
+        or type(state["completed_batch_passes"]) is not int
+        or state["completed_batch_passes"] < 0
+        or type(state["emission_state"]) is not dict
+        or set(state["emission_state"]) != {"terminal_emission_count"}
+        or type(state["emission_state"]["terminal_emission_count"]) is not int
+        or not _valid_direct_terminal_consumer(state["terminal_consumer"])
+    ):
+        raise ValueError("direct pre-open incremental state scalar changed")
+    _require_direct_history_bindings(algorithm, state["bindings"])
+    return state
+
+
+def _direct_progress(state):
+    total = len(state["security_batches"]) * 2
+    completed = state["completed_batch_passes"]
+    record = {
+        "schema": DIRECT_PROGRESS_SCHEMA,
+        "phase": state["phase"],
+        "completed_security_batch_passes": completed,
+        "total_security_batch_passes": total,
+        "remaining_security_batch_passes": total - completed,
+        "terminal_emission_count": state["emission_state"]["terminal_emission_count"],
+        "complete": state["phase"] == "complete",
+        "failed": state["phase"] == "failed",
+        "object_store_terminal_writes": 0,
+        "preliminary_evaluation_only": True,
+        "frozen_formal_evaluation_completed": False,
+    }
+    return record
+
+
+def begin_preopen_control_construction_in_process(algorithm, terminal_consumer):
+    """Begin a two-pass construction without doing an unbounded batch loop."""
+
+    if not _valid_direct_terminal_consumer(terminal_consumer):
+        raise ValueError("direct pre-open terminal consumer is not callable")
+    if getattr(algorithm, "_direct_preopen_state", None) is not None:
+        raise ValueError("direct pre-open incremental state already exists")
+    if getattr(algorithm, "_output_shards", None):
+        raise ValueError("direct pre-open run began after terminal persistence")
+    bindings = _require_direct_history_bindings(algorithm)
+    raw_batches = algorithm._manifest["resource_census"]["security_batches"]
+    if type(raw_batches) is not list or not raw_batches or any(
+        type(item) is not dict for item in raw_batches
+    ):
+        raise ValueError("direct pre-open security batch inventory changed")
+    batches = tuple(dict(item) for item in raw_batches)
+    if tuple(item.get("security_batch_ordinal") for item in batches) != tuple(
+        range(len(batches))
+    ):
+        raise ValueError("direct pre-open security batch order changed")
+    start, last = _market_bounds(algorithm)
+    algorithm._benchmark_rows = _benchmark_history(algorithm, start, last)
+    state = {
+        "schema": "arv2-owner-accepted-risk-direct-preopen-state-v1",
+        "phase": "first_pass",
+        "source_input_manifest_sha256": hashlib.sha256(
+            _canonical(algorithm._manifest)
+        ).hexdigest(),
+        "bindings": bindings,
+        "terminal_consumer": terminal_consumer,
+        "security_batches": batches,
+        "next_batch_index": 0,
+        "completed_batch_passes": 0,
+        "peer_state": {},
+        "market_state": {},
+        "first_peer": None,
+        "first_market": None,
+        "peer_by_session": None,
+        "market_by_session": None,
+        "emission_state": {"terminal_emission_count": 0},
+        "summary": None,
+    }
+    algorithm._direct_preopen_state = state
+    return _direct_progress(_require_direct_state(algorithm))
+
+
+def advance_preopen_control_construction_in_process(
+    algorithm, *, maximum_security_batches=1,
+):
+    """Process at most ``maximum_security_batches`` across both passes."""
+
+    if (
+        type(maximum_security_batches) is not int
+        or not 1 <= maximum_security_batches <= 8
+    ):
+        raise ValueError("direct pre-open callback batch limit changed")
+    state = _require_direct_state(algorithm)
+    if state["phase"] == "failed":
+        raise ValueError("direct pre-open incremental state is failed")
+    if state["phase"] == "complete":
+        return _direct_progress(state)
+    remaining = maximum_security_batches
+    try:
+        while remaining and state["phase"] in {"first_pass", "second_pass"}:
+            batch = state["security_batches"][state["next_batch_index"]]
+            emit = state["phase"] == "second_pass"
+            prior_count = state["emission_state"]["terminal_emission_count"]
+            _market_batch(
+                algorithm,
+                batch=batch,
+                peer_state=state["peer_state"],
+                market_state=state["market_state"],
+                emit_terminals=emit,
+                peer_records_by_session=state["peer_by_session"],
+                market_records_by_session=state["market_by_session"],
+                terminal_consumer=state["terminal_consumer"] if emit else None,
+                emission_state=state["emission_state"] if emit else None,
+            )
+            if state["emission_state"]["terminal_emission_count"] < prior_count:
+                raise ValueError("direct pre-open emission count moved backwards")
+            state["next_batch_index"] += 1
+            state["completed_batch_passes"] += 1
+            remaining -= 1
+            if state["next_batch_index"] != len(state["security_batches"]):
+                continue
+            peer = peer_aggregate_records(state["peer_state"])
+            market = _market_records(algorithm, state["market_state"])
+            if state["phase"] == "first_pass":
+                state["first_peer"] = peer
+                state["first_market"] = market
+                peer_by_session = {}
+                for row in peer:
+                    peer_by_session.setdefault(row["decision_session"], []).append(row)
+                state["peer_by_session"] = peer_by_session
+                state["market_by_session"] = {
+                    row["decision_session"]: row for row in market
+                }
+                state["peer_state"] = {}
+                state["market_state"] = {}
+                state["next_batch_index"] = 0
+                state["phase"] = "second_pass"
+            else:
+                if peer != state["first_peer"] or market != state["first_market"]:
+                    raise ValueError("direct second market pass changed its commitments")
+                bindings = _require_direct_history_bindings(
+                    algorithm, state["bindings"]
+                )
+                state["summary"] = _direct_emission_summary(
+                    algorithm,
+                    bindings,
+                    state["first_peer"],
+                    state["first_market"],
+                    state["emission_state"]["terminal_emission_count"],
+                )
+                algorithm._peer_records = state["first_peer"]
+                algorithm._market_records = state["first_market"]
+                state["phase"] = "complete"
+    except Exception:
+        state["phase"] = "failed"
+        raise
+    return _direct_progress(_require_direct_state(algorithm))
+
+
+def finalized_preopen_control_construction_in_process(algorithm):
+    """Return the exact nonformal summary only after every bounded batch."""
+
+    state = _require_direct_state(algorithm)
+    if state["phase"] != "complete" or type(state["summary"]) is not dict:
+        raise ValueError("direct pre-open incremental construction is incomplete")
+    return dict(state["summary"])
+
+
+def run_preopen_control_construction_in_process(algorithm, terminal_consumer):
+    """Run both deterministic passes and emit no terminal Object Store shard.
+
+    The consumer receives batch-major rows and is responsible for bounded
+    process-local spooling, global ordering, semantic validation, and final
+    authority.  This summary is transport evidence only; it cannot open the
+    frozen formal gate.
+    """
+
+    if not _valid_direct_terminal_consumer(terminal_consumer):
+        raise ValueError("direct pre-open terminal consumer is not callable")
+    bindings = getattr(algorithm, "_accepted_risk_history_bindings", None)
+    if bindings is None:
+        raise ValueError("direct pre-open run lacks accepted-risk History bindings")
+    if algorithm._output_shards:
+        raise ValueError("direct pre-open run began after terminal persistence")
+    start, last = _market_bounds(algorithm)
+    algorithm._benchmark_rows = _benchmark_history(algorithm, start, last)
+    first_peer, first_market = _market_pass(algorithm, emit_terminals=False)
+    peer_by_session = {}
+    for row in first_peer:
+        peer_by_session.setdefault(row["decision_session"], []).append(row)
+    market_by_session = {row["decision_session"]: row for row in first_market}
+    emission_state = {"terminal_emission_count": 0}
+    second_peer, second_market = _market_pass(
+        algorithm,
+        emit_terminals=True,
+        peer_records_by_session=peer_by_session,
+        market_records_by_session=market_by_session,
+        terminal_consumer=terminal_consumer,
+        emission_state=emission_state,
+    )
+    if second_peer != first_peer or second_market != first_market:
+        raise ValueError("direct second market pass changed its commitments")
+    if emission_state["terminal_emission_count"] < 1:
+        raise ValueError("direct pre-open construction emitted no terminals")
+    bindings_after = getattr(algorithm, "_accepted_risk_history_bindings", None)
+    if bindings_after is not bindings:
+        raise ValueError("accepted-risk History bindings changed during direct run")
+    try:
+        from accepted_risk_qc_symbol_resolution import (
+            require_accepted_risk_qc_history_bindings,
+        )
+    except ImportError:
+        from research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution import (
+            require_accepted_risk_qc_history_bindings,
+        )
+    require_accepted_risk_qc_history_bindings(bindings)
+    algorithm._peer_records = first_peer
+    algorithm._market_records = first_market
+    peer_hash = hashlib.sha256(_canonical({
+        "schema": PEER_PROJECTION_SCHEMA, "records": first_peer,
+    })).hexdigest()
+    market_hash = hashlib.sha256(_canonical({
+        "schema": MARKET_PROJECTION_SCHEMA, "records": first_market,
+    })).hexdigest()
+    seed = {
+        "schema": DIRECT_EMISSION_SUMMARY_SCHEMA,
+        "summary_id": None,
+        "summary_sha256": None,
+        "source_input_manifest_sha256": hashlib.sha256(
+            _canonical(algorithm._manifest)
+        ).hexdigest(),
+        "symbol_resolution_sha256": bindings.resolution_sha256,
+        "terminal_emission_count": emission_state["terminal_emission_count"],
+        "peer_aggregate_projection_sha256": peer_hash,
+        "market_session_projection_sha256": market_hash,
+        "emission_order": (
+            "security_batch_then_decision_chunk_then_decision_session_then_security_id"
+        ),
+        "object_store_terminal_writes": 0,
+        "preliminary_evaluation_only": True,
+        "formal_security_master_authority": False,
+        "frozen_formal_evaluation_completed": False,
+    }
+    digest = hashlib.sha256(_canonical(seed)).hexdigest()
+    seed["summary_id"] = "arv2-direct-preopen-emission-" + digest[:24]
+    seed["summary_sha256"] = digest
+    return seed
 
 
 def _flush_physical_shard(algorithm, chunk, batch, rows):
@@ -456,7 +906,7 @@ def _flush_physical_shard(algorithm, chunk, batch, rows):
     key = (
         "arv2/preopen/output/content/control_terminals/chunk-"
         + str(chunk).zfill(4) + "/security-batch-" + str(batch).zfill(4)
-        + "/" + digest + ".jsonl.gz"
+        + "/" + digest + "-jsonl.gz"
     )
     if not algorithm.object_store.save_bytes(key, compressed):
         raise ValueError("pre-open physical terminal shard persistence failed")
@@ -829,6 +1279,11 @@ def finalize_preopen_control_construction(algorithm, config, contract_id, contra
 
 
 __all__ = [
+    "DIRECT_EMISSION_SUMMARY_SCHEMA",
+    "DIRECT_PROGRESS_SCHEMA",
+    "advance_preopen_control_construction_in_process",
+    "begin_preopen_control_construction_in_process",
     "finalize_preopen_control_construction", "initialize_runtime_state",
-    "run_preopen_control_construction",
+    "finalized_preopen_control_construction_in_process",
+    "run_preopen_control_construction", "run_preopen_control_construction_in_process",
 ]

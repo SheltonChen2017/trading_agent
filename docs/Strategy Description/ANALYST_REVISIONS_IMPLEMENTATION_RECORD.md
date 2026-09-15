@@ -233,9 +233,9 @@ CURRENT-VINTAGE, NON-PRISTINE-PIT, ACCEPTED-RISK STOCK-IC EVIDENCE, NOT A
 FORMAL/CONFIRMATORY RESULT, ECONOMIC PORTFOLIO RETURN, ETF BACKTEST, OR
 TRADING AUTHORITY. THE CROSS-SECTION MEAN-EXCESS-RETURN FIELDS ARE UNIVERSE
 OUTCOME DIAGNOSTICS AND ARE NOT A SCORE-SORTED PORTFOLIO P&L.
-THE SHARED LEDGER NOW RECORDS 56 RUN-LEVEL LOOKS: 23 ARV2 INFRASTRUCTURE
-LOOKS, 3 ARV2 DEVELOPMENT EVALUATIONS, 0 PERMANENT-FAMILY LOOKS, 0
-CONFIRMATORY LOOKS, AND A LIFETIME ALPHA-CELL FLOOR OF 516. R-056'S
+THE SHARED LEDGER NOW RECORDS 59 RUN-LEVEL LOOKS: 23 ARV2 INFRASTRUCTURE
+LOOKS, 6 ARV2 DEVELOPMENT EVALUATIONS, 0 PERMANENT-FAMILY LOOKS, 0
+CONFIRMATORY LOOKS, AND A LIFETIME ALPHA-CELL FLOOR OF 564. R-056'S
 COUNTS-ONLY RELAXATION WAS CANCELLED UNLAUNCHED AND UNSPENT BECAUSE R-055
 PASSED THE GATE; NO OBSERVED SIGN OR MAGNITUDE SELECTED THAT DECISION.
 THE INDEPENDENT CLAUDE REVIEW OF THE R-054/R-055 RANGE (SECTION 76) ACCEPTS
@@ -248,13 +248,16 @@ AND SPY PRICE AVAILABILITY AT BOTH ENDPOINTS. ITS SINGLE MISSING-PAIR COUNTER
 CANNOT IDENTIFY SYMBOL-RESOLUTION FAILURES, ENTRY OR EXIT DATA GAPS,
 MEMBERSHIP ENDS, DELISTINGS, ACQUISITIONS, OR TERMINAL PAYOFFS. SECTION 78
 IMPLEMENTS AND PREREGISTERS THREE FIXED-RULE STOCK WINDOWS WITH MUTUALLY
-EXCLUSIVE AVAILABILITY COUNTERS. R-057, THE 2019-2023 WINDOW, IS THE ONLY NEXT
-RUN; R-058 MAY BE BUILT AND SIGNED ONLY AFTER R-057'S AGGREGATE RECEIPT
-AUTHENTICATES, AND R-059 ONLY AFTER R-058. ETF CONSTRUCTION AND ACTUAL OR
-SYNTHETIC LEVERAGE REMAIN CLOSED UNTIL THE STOCK-WINDOW EVIDENCE IS RECORDED
-AND REVIEWED. PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING
-REMAIN CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
-PRODUCTION-EXECUTABLE.**
+EXCLUSIVE AVAILABILITY COUNTERS. SECTION 79 RECORDS AUTHENTICATED COMPLETION
+AND ONE AGGREGATE-ONLY READ EACH FOR R-057 (2019-2023), R-058 (2023-2025),
+AND R-059 (2013-2019). ALL 48 CELLS ARE DESCRIPTIVELY AVAILABLE AND EVERY
+MEAN IC IS POSITIVE; R-059 HAS 1,072 VALID AND 690 INVALID DATES PER CELL,
+WITH ITS VALID IC EVIDENCE BEGINNING 2015-09-29. THESE ARE SMALL,
+REGIME-DEPENDENT STOCK-RANKING ASSOCIATIONS, NOT ECONOMIC PORTFOLIO RETURNS.
+CLAUDE REVIEW AND CODEX COUNTER-REVIEW ARE THE NEXT GATE. ETF CONSTRUCTION
+AND ACTUAL OR SYNTHETIC LEVERAGE REMAIN CLOSED UNTIL THAT GATE. PAPER OR
+FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN CLOSED. NO V2
+SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -893,17 +896,18 @@ tally, commit mapping, timestamp characterization, false independent-date
 observation, and unsupported causal interpretation of the undifferentiated
 missing-pair count. The substantive preregistration fact still holds: the
 counts-only gate text and code are ancestral to the result record and are
-bound by signed prelaunch artifacts. Section 78 implements and preregisters
-the owner-planned fixed-rule stock windows and authenticated missing-pair
-breakdown. The exact next step is the signed R-057 run and aggregate-only read
-defined in section 78; R-058 and R-059 remain conditional successors. The
-preliminary metrics remain explicitly conditioned on observed security and
-benchmark endpoint prices; no terminal payoff is inferred. The owner
-explicitly waived another independent pre-run review of section 77 and
-section 78 by directing Codex to proceed from this counter-review into those
-fixed-rule diagnostics; Claude reviews the resulting pushed snapshot and
-outcomes next. Unlevered and leveraged ETF work remains behind the
-stock-window evidence and its next review.
+bound by signed prelaunch artifacts. Section 78 preregistered the
+owner-planned fixed-rule stock windows and authenticated missing-pair
+breakdown. Claude reviews section 79 now; it supersedes that now-complete
+live step with authenticated R-057, R-058, and R-059 receipts and the
+shared-ledger entries.
+Every available cell has positive mean and median IC, but the preliminary
+metrics remain explicitly conditioned on observed security and benchmark
+endpoint prices; no terminal payoff or portfolio return is inferred. The
+owner explicitly waived another independent pre-run review of sections 77-78
+by directing Codex to proceed into those fixed-rule diagnostics. Claude's
+review covers the resulting pushed snapshot and outcomes; Codex
+counter-reviews before any unlevered or leveraged ETF work begins.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -13801,3 +13805,120 @@ deployment and trading remain unauthorized and outside the adapter.
 This preliminary stock-IC result is neither a formal alpha acceptance nor an
 economic portfolio backtest. Paper/live deployment, broker access, orders,
 and trading remain closed.
+
+## 79. Authenticated fixed-window QC results, 2026-09-15
+
+R-057, R-058, and R-059 completed sequentially under the section-78
+preregistration. All three reused the exact R-055 input package, evaluator,
+and sparse-signal rule; no observed sign, magnitude, or availability result
+changed a later run's rule. Each job reached authenticated `Completed.`,
+emitted exactly 18 expected custom statistics, and was opened exactly once
+under a separately signed aggregate-result authority. No raw provider row,
+raw price row, security-level outcome, unrestricted log, chart, order,
+deployment, broker, paper, live, or trading surface was selected.
+
+### 79.1 Execution and receipt identity
+
+| Entry | Window / sessions | QC project / compile / backtest | Authenticated receipt chain |
+|---|---|---|---|
+| `R-057` | `arv2-stock-ic-2019-2023`; 2019-01-02 through 2023-12-29; 1,258 sessions | Project `36588837`; compile `5442e2cb06ed0f49d6bdbe42754877b2-f80a7ba5ecb832e38e3143452bf8befa`; backtest `067d22ef131633df7002057c796a67f6` | Plan `6518eb27435c5966a1b837d63abbfe80a18adb22e8f5835a36654602a83a3b24`; permit `212ad3eb882ba82e81e75ed4eb3b8a30f448cd2c8f5295655a7620e476295c03`; launch `b11dee9bd901a673aef3fa25f4b3b373bdc7bb76cd21645163038ac3e8e6131c`; terminal `37b64f14e50896e2e4d96f8f2d7ec489379eb136214020407f417a2c39bc4e1e` after 42 polls; result permit `817688ac5d53235360cb1e34bce547e314dc2189d806316125f2cbd9cce814f1`; result `2c69d6102e53ca4ab95e5c1e30565ba493882d85dc9ad2a9b6e952aa3a0512e6`; persisted file `ef18cbc613b661d9fa9b38ed341f0c44b02e7882103c1f13ef9da1cd1a9664f7`; statistics `b94d132a96db401782a5f88ad9585bc3c5a31993968d270143fc390fa6530900` |
+| `R-058` | `arv2-stock-ic-2023-2025`; 2023-01-03 through 2025-12-31; 752 sessions | Project `36589846`; compile `ea42ccbfa6ac47ee195bed14c3fd3027-d2282698abac486a07364fd59c3a90db`; backtest `f07ac3b86cd703103a2cf2ac48598fea` | Plan `d4e12f2bc7c24c8088b9d4df555c06703ea7adb09e3d2841fd82ba24ab1b5bb4`; permit `239df091d4086728f21111585b36e7e7717304856762592d381c4d8fd75226b1`; launch `68176d778ba2241e73d2b812abaf08833745edec0cab53b59be6e452144c08d3`; terminal `8406b2295e5057db9550cad55ba483f4e8c5c553502cce41d038b992064ac181` after 26 polls; result permit `b3b28065a79e415ded45a09d472649422e4676a35dbfa4221565d68e007dd928`; result `2c83071d8a6d5fb0637243db9457e83a4e6f70527648fb76ba247e3a62e773d0`; persisted file `a8e92f9cade96be133a390db29dbef4ef854d8d418487d9fae79807eba08e202`; statistics `eb680ddc7f486ac7ab8d81ac6871404fdf2a709f2eef7548329bf00358b99854` |
+| `R-059` | `arv2-stock-ic-2013-2019`; 2013-01-02 through 2019-12-31; 1,762 sessions | Project `36590411`; compile `96d0d401b9ce8c8bdf3dd327eb91cbfc-3a5aed546bf9f132b7fd3890c7cf89c6`; backtest `1d8c28f4279694c4389ec415a23d6d20` | Plan `0b172beae8d9350dacd65cfe0296e6f807294fd0380ab78d1c6882796105f4fa`; permit `5e32b74278dd29d3371b36e1bd22be84a6158ef30af01e26b8d583658c2e10bf`; launch `228966a43d2f233ebe1c234bb7932a8051e487e82b50cf31821b52011ae6c551`; terminal `862ea6647dcdb6880f227209edf3a480500c5e15a1bc637b3a686f78ca01005e` after 26 polls; result permit `4c41f2ff6411403869ae73c6c2af80afe8f76a18b6ad84236aa7cd29de49ccf1`; result `f6f6e841e1eae7b73d9fc62b5b8826de7efc70244d4899e2d6575ec7b2e2d016`; persisted file `480915b1bf42f30868c0ddbb6f74f973ab48fbd1571e219ec1e1a4a1fc2e15fa`; statistics `93d6cd7fe4a6298347aa64335762f0397e633147e5c448ea4eb0644493d4cfa8` |
+
+The three official chains were reloaded and authenticated locally after
+completion. The runtime reconciled 5,113 resolved securities plus 1,038
+named resolution refusals to 6,151 inputs and 12,244 contributions in each
+run. R-057 completed 333 evaluator callbacks in 34 compatibility slices;
+R-058 completed 232 in 24; R-059 completed 434 in 44.
+
+### 79.2 Aggregate results
+
+The following ranges span the current-row and conservatively censored source
+views and the firm-specific and global-comparator score arms. `Mean IC` and
+`median IC` are daily cross-sectional rank correlations: positive means the
+score tended to rank later winners above later losers. `Positive dates` is
+the share of valid decision dates with IC above zero. The final two columns
+are the accepted and missing security/horizon pairs. The universe return
+columns are shown only to preserve the receipt: they are unweighted outcomes
+for all accepted pairs, not a score-sorted portfolio or strategy P&L.
+
+| Run | H | Valid / invalid dates per cell | Mean IC range | Median IC range | Positive dates | Accepted pairs | Missing pairs | Universe mean / median SPY-excess return |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| R-057 | 1 | 1,258 / 0 | .002342-.002609 | .001888-.002390 | 53.66%-55.41% | 4,638,761 | 902,126 | +.00016184 / -.00011362 |
+| R-057 | 5 | 1,258 / 0 | .003686-.004090 | .003563-.003907 | 56.20%-57.31% | 4,635,682 | 905,205 | +.00006403 / -.00150257 |
+| R-057 | 20 | 1,258 / 0 | .005211-.005831 | .003688-.004679 | 56.44%-57.63% | 4,629,410 | 911,477 | -.00184647 / -.00756773 |
+| R-057 | 60 | 1,258 / 0 | .006073-.007705 | .004346-.005699 | 58.27%-59.86% | 4,614,063 | 926,824 | -.00785586 / -.02707818 |
+| R-058 | 1 | 752 / 0 | .003369-.003413 | .003092-.003516 | 55.85%-56.38% | 3,004,567 | 321,292 | -.00007998 / -.00043970 |
+| R-058 | 5 | 752 / 0 | .004438-.004562 | .004021-.004782 | 59.18%-60.37% | 2,999,672 | 326,187 | -.00100965 / -.00167422 |
+| R-058 | 20 | 752 / 0 | .004716-.005126 | .003584-.004639 | 57.31%-59.04% | 2,985,453 | 340,406 | -.00602093 / -.00705310 |
+| R-058 | 60 | 752 / 0 | .003324-.004483 | .001314-.001921 | 52.66%-55.59% | 2,948,639 | 377,220 | -.02012744 / -.01684937 |
+| R-059 | 1 | 1,072 / 690 | .001503-.001597 | .002006-.002448 | 53.64%-55.13% | 4,462,932-4,478,095 | 1,530,158-1,535,432 | +.01169027 / +.00002230 |
+| R-059 | 5 | 1,072 / 690 | .001979-.002152 | .002153-.002547 | 54.94%-56.25% | 4,460,944-4,476,101 | 1,532,146-1,537,426 | +.01179100 / -.00003191 |
+| R-059 | 20 | 1,072 / 690 | .003321-.003491 | .002279-.003029 | 54.85%-55.69% | 4,458,052-4,473,214 | 1,535,038-1,540,313 | +.00803578 / -.00108390 |
+| R-059 | 60 | 1,072 / 690 | .004502-.004689 | .004998-.005872 | 59.33%-60.82% | 4,452,964-4,468,127 | 1,540,126-1,545,400 | +.00563154 / -.00634795 |
+
+Every one of the 48 result cells is `PRELIMINARY_DESCRIPTIVE_AVAILABLE`, and
+every mean and median IC is positive. R-057 is strongest at H60. R-058 is
+strongest at H5/H20 and weakens at H60. R-059 is weakest at H1/H5 but again
+strongest at H60. This is small, directionally persistent ranking evidence
+across the pre-AI, COVID/mixed, and recent AI-era windows; it does not select
+one horizon and does not establish implementable profitability.
+
+R-059's nominal 2013-2019 window does not supply 2013-2015 IC evidence. An
+outcome-free replay of the exact authenticated input showed that the first
+690 sessions, 2013-01-02 through 2015-09-28, failed the unchanged minimum of
+five active analyst signals in at least one sector. All 1,072 sessions from
+2015-09-29 through 2019-12-31 were valid. The current-row view also had 28
+zero-MAD firm degeneracies, all on already-invalid dates. The large R-059
+mean/median universe-return divergence also shows strong skew/outliers; those
+fields must not be read as portfolio returns.
+
+### 79.3 Availability census and limitations
+
+The missing categories below are ordered H1/H5/H20/H60. Benchmark endpoint
+refusals are zero throughout. Counts are mutually exclusive and reconcile to
+each result row's missing total.
+
+| Run / view | Eligible pairs | Named FIGI refusal | Entry unavailable | Membership ended / exit unavailable | Within-membership exit unavailable |
+|---|---:|---|---|---|---|
+| R-057 | 5,540,887 | 630,250 / 630,250 / 630,250 / 630,250 | 254,343 / 254,343 / 254,343 / 254,343 | 240 / 1,251 / 5,182 / 16,799 | 17,293 / 19,361 / 21,702 / 25,432 |
+| R-058 | 3,325,859 | 179,101 / 179,101 / 179,101 / 179,101 | 131,389 / 131,389 / 131,389 / 131,389 | 759 / 4,059 / 16,608 / 51,462 | 10,043 / 11,638 / 13,308 / 15,268 |
+| R-059 censored | 5,993,090 | 1,196,764 / 1,196,764 / 1,196,764 / 1,196,764 | 314,038 / 314,038 / 314,038 / 314,038 | 35 / 205 / 969 / 3,561 | 19,321 / 21,139 / 23,267 / 25,763 |
+| R-059 current | 6,013,527 | 1,201,044 / 1,201,044 / 1,201,044 / 1,201,044 | 314,975 / 314,975 / 314,975 / 314,975 | 35 / 205 / 969 / 3,566 | 19,378 / 21,202 / 23,325 / 25,815 |
+
+The results remain current-vintage, non-pristine point-in-time evidence. They
+use Massive/Benzinga history and current-snapshot Sharadar identity/sector
+attributes under the owner's accepted-risk decision, condition every IC on
+available security and SPY endpoints, and do not apply the terminal-payoff
+splice or infer delisting/acquisition outcomes. They contain no formal
+controls or multiplicity inference, no economic portfolio construction, no
+ETF return, and no leverage. Metadata remains `formal_result=false`,
+`alpha_claim_authorized=false`, and `economic_portfolio_evaluation=false`.
+
+After the exact R-057 source had compiled and its backtest had launched, a
+literal `thanks` appeared at the start of QC `main.py`. The owner reported
+that this was probably an accidental editor action and removed it. It caused
+four later editor-build syntax errors and one later successful editor build;
+it did not alter the already-pinned compile or the sole launched R-057 job.
+No retry, duplicate run, result read, or additional research look followed.
+
+### 79.4 Accounting, validation, and next gate
+
+R-057 moves shared run looks 56 to 57, ARV2 development evaluations 3 to 4,
+and the lifetime cell floor 516 to 532. R-058 moves them to 58, 5, and 548;
+R-059 moves them to 59, 6, and 564. Infrastructure looks remain 23;
+permanent-family and confirmatory looks remain zero.
+
+The complete standing Analyst Revisions V2 selection passed **5,401 tests,
+7 skipped, 0 failed, 35 warnings in 6,273.64 seconds (1:44:33)** on Python
+3.13.15 after the final implementation commit. The documentation-only final
+record was then checked with the active-document/lane-record selection and
+`git diff --check` before the round's single push.
+
+Claude independently reviews the exact range after `82897d7` through this
+record commit; Codex then counter-reviews every review commit. Only after that
+gate may the lane implement the unlevered ETF/economic-portfolio baseline.
+Actual 3x ETF histories and a separately modelled synthetic daily-reset 3x
+exposure remain later diagnostics conditional on a usable unlevered baseline.
+No deployment, order, broker, paper, live, or trading authority follows from
+these stock-ranking results.

@@ -4,12 +4,14 @@ import ast
 import copy
 import dataclasses
 import hashlib
+import io
 import json
 import os
 import sys
 import types
 import base64
 import weakref
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -1527,8 +1529,24 @@ class _PreopenQcBackend:
 
 
 def _preopen_fake_client(backend):
+    signed_download_url = (
+        "https://object-download.quantconnect.com/"
+        "arv2-preopen-output.zip?signature=fixture"
+    )
+    pending_download_keys = []
+
     def http(url, body, headers, timeout):
         del timeout
+        if url == signed_download_url:
+            assert body == b""
+            assert headers == {}
+            key = pending_download_keys.pop(0)
+            output = io.BytesIO()
+            with zipfile.ZipFile(
+                output, "w", compression=zipfile.ZIP_DEFLATED
+            ) as archive:
+                archive.writestr(key, backend.package_bytes)
+            return 200, output.getvalue()
         assert "Authorization" in headers
         path = url.split("/api/v2/", 1)[1]
         if path == "object/set":
@@ -1554,6 +1572,17 @@ def _preopen_fake_client(backend):
                     "key": payload["key"], "size": len(stored),
                     "md5": hashlib.md5(stored, usedforsecurity=False).hexdigest(),
                 }}
+            elif path == "object/get":
+                assert set(payload) == {"organizationId", "keys"}
+                assert len(payload["keys"]) == 1
+                pending_download_keys.append(payload["keys"][0])
+                backend.events.append("object/read")
+                result = {
+                    "success": True,
+                    "errors": [],
+                    "jobId": "2585354eb2e23cbbc4ba714332884650",
+                    "url": signed_download_url,
+                }
             else:
                 result = backend.request(path, payload)
         return 200, json.dumps(result, separators=(",", ":")).encode()

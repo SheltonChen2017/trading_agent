@@ -1307,3 +1307,28 @@ ARV2 has spent **23** infrastructure looks and **1** development evaluation.
 The lifetime alpha-cell exposure floor is **484**. No permanent-family or
 confirmatory-alpha look has been spent, and no paper/live authority follows
 from this preliminary result.
+
+## R-054 — Analyst Revisions V2 sparse-signal accepted-risk stock IC (PREREGISTERED; NOT YET LAUNCHED)
+
+This entry was committed before any R-054 QuantConnect launch or outcome read.
+R-054 is a new development evaluation, not an R-053 retry. The exact v2 rule
+normalizes each sector from its live analyst-signal names while retaining
+unscored names as structural zero, and excludes unavailable price pairs
+without imputation when at least 20 actual pairs remain. The 20-name/5-active
+sector floors, complete-sector requirement, horizons, views, arms, and
+2020-2025 plus 2021-2025 windows remain fixed.
+
+| Field | Preregistered value |
+|---|---|
+| **Research-look accounting if launched** | Shared run-level look **54 -> 55**; ARV2 development evaluations **1 -> 2**; 32 cells raise lifetime alpha-cell exposure floor **484 -> 516** |
+| **Input package** | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
+| **QC source projection** | `arv2-preliminary-qc-projection-53682e52f353851ed05193d6`; SHA-256 `53682e52f353851ed05193d69348210e436ae9c07a1a740a84506c18df6c56dc`; five files, 131,793 bytes |
+| **Primary practical gate** | 2021-01-04 through 2025-12-31 must return at least 50 valid dates and non-null authenticated IC/return aggregates before any later-window or leverage run |
+| **Decision independence** | Launch/further-relaxation decisions use only count/sufficiency status, never observed alpha sign or magnitude |
+| **Not authorized by this entry** | Formal/confirmatory inference, ETF construction, leverage, deployment, orders, or trading |
+
+An exact source-only feasibility replay, before this preregistration, used no
+price or return and found all 1,255 gate-window dates feasible in both source
+views and score arms. If the launched result remains underfilled, the
+predeclared R-055 counts-only relaxation in Analyst lane section 75 applies;
+later periods and leverage remain closed.

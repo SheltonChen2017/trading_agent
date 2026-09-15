@@ -2340,7 +2340,7 @@ def _validate_cell_semantics(record: dict[str, object]) -> int:
     if (
         eligible != accepted + missing
         or accepted < valid * preliminary_evaluator.MINIMUM_IC_ROWS
-        or ((missing > 0 or sector_refused > 0) and invalid == 0)
+        or (sector_refused > 0 and invalid == 0)
     ):
         _error("preliminary aggregate cell count invariants changed")
     expected_status = (

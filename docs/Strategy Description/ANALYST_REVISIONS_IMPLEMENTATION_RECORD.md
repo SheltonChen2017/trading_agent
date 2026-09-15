@@ -13144,3 +13144,70 @@ and `ARV2R74-008` are the other two worth closing first. Later windows, ETF
 construction, leverage, deployment, orders and trading all remain closed,
 and the independent-review debt recorded by `8391dd8` falls due after the
 first formal backtest.
+
+## 75. Codex counter-review and R-054 preregistration, 2026-09-15
+
+### 75.1 Counter-review disposition
+
+Codex counter-reviewed Claude commits `a247423` and `baef134` on the same
+lane branch. Both are **accepted after correction**. The useful source-size
+test and the review's principal warning about sparse normalization are
+retained. The following corrections supersede inaccurate parts of section 74
+without erasing that independently authored record:
+
+| ID | P | Finding and disposition |
+|---|---:|---|
+| `ARV2CR75-001` | P2 | The density regression exercised the host/formal normalizer, not the compact QC normalizer that ran R-053, so it did not close `ARV2R74-001`. R-054 versions the compact contract and directly tests the actual QC normalizer. |
+| `ARV2CR75-002` | P3 | Claude's future-import fixture was stopped by the earlier explicit future-import guard and never reached prelude compilation. The replacement `global QC_PRELUDE_SENTINEL` fixture passes prior guards and fails only after the simulated QC prelude. |
+| `ARV2CR75-003` | P2 | The fourteen-module I/O inventory drift was real but did not establish an unsafe execution path; Claude itself verified the property still held. It is P2, not P1. All fourteen modules and their exact edges are now classified, and the closure test reaches its assertions. |
+| `ARV2CR75-004` | P2 | The stale pre-open fake implemented legacy `object/read`, leaving eight current two-phase `object/get` paths red. It now serves a credential-free signed ZIP download and preserves the logical read event. |
+| `ARV2CR75-005` | P3 | `ARV2R74-014` reversed expected and actual: the expected CUSIP ambiguity was already present, while obsolete `fundamentals` fixture rows were filtered after the production route became exact `SF1`. The fixture now uses `SF1` and passes the explicit ticker rows to the builder, so the ambiguity path is genuinely covered. |
+| `ARV2CR75-006` | P3 | Focused validation found the submission wrapper used the mutable global `type` before running its global-binding guard. The guard now runs first, producing the named refusal rather than an uncontrolled `TypeError`. |
+| `ARV2CR75-007` | P2 | Added one isolating test for each of the four runtime limits in `ARV2R74-004`: transport-object count, per-object decompression, total decompression, and twelve-hour runtime. |
+| `ARV2CR75-008` | P3 | Section 74's arithmetic and summary row were inconsistent. Its table contains one stated P1, five P2 and eight P3, not 1/4/9 or 0/4/7; after downgrading `-012` as above the reviewed findings are **0 P1, 6 P2 and 8 P3**. Its three `accepted with findings` phrases also use a prohibited disposition. This prospective correction supplies the binding interpretation. |
+
+The exact pristine reproduction before corrections was **10 failed, 120
+passed**. `ARV2R74-008` (owner-adjudication CLI input pin), `ARV2R74-009`
+(shared-ledger attempt prose), and the lane-wide `ARV2R50-022` test-isolation
+debt remain documented. They do not alter the R-054 evaluator or QC runtime.
+
+### 75.2 R-054 rule fixed before any outcome access
+
+R-054 is a new `development_evaluation`, not a retry or reinterpretation of
+R-053. Its only rule changes are:
+
+1. Within each otherwise eligible sector, compute median and MAD from names
+   carrying a live analyst signal. Names with no live signal remain exact
+   structural zero. The 20-total-name and 5-active-name floors, MAD scale,
+   score clip, sector completeness requirement, views, arms, horizons and
+   dates are unchanged.
+2. Count an unavailable QC price pair and exclude it without imputation. A
+   date remains eligible when every sector normalized and at least 20 actual
+   security/outcome pairs remain. No missing price becomes zero and no
+   security lacking an actual pair enters the IC.
+
+The compact evaluator/manifest/summary contract is version 2. Before any QC
+launch or result read, an outcome-free replay over the exact 6,151 memberships
+and 12,244 contributions found **1,255 of 1,255** 2021-2025 dates
+normalization-feasible for each of the two source views and two score arms.
+Across those four combinations the 10th-percentile accepted sector count was
+11, the accepted-row count was at least 4,256, and active-signal count was at
+least 1,100. The replay opened no price, return, statistic or other outcome.
+
+| R-054 preregistration field | Frozen value |
+|---|---|
+| Evaluation | `R-054`; `development_evaluation`; accepted-risk stock IC only |
+| Gate window | 2021-01-04 through 2025-12-31; tangible means at least 50 valid dates and non-null authenticated IC/return aggregates |
+| Companion window | 2020-01-02 through 2025-12-31, retained from the same fixed 32-cell output inventory |
+| Input package | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
+| Evaluator manifest | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
+| QC projection | `arv2-preliminary-qc-projection-53682e52f353851ed05193d6`; SHA-256 `53682e52f353851ed05193d69348210e436ae9c07a1a740a84506c18df6c56dc`; five files, 131,793 bytes |
+| Result inventory | Two views x two arms x four horizons x two windows = 32 cells, plus two aggregate metadata records |
+| Later-work gate | No later period and no ETF/leverage evaluation unless the 2021-2025 cells contain tangible actual-return evidence. |
+
+If R-054 is still underfilled, its alpha sign or magnitude will not select the
+next rule. A separately numbered R-055 may exclude refused sectors rather
+than invalidate the date, but must still require at least two admitted
+sectors, 20 actual outcome pairs, and five live-signal names. That counts-only
+coverage trigger is fixed here before R-054 and does not authorize later
+windows or leverage.

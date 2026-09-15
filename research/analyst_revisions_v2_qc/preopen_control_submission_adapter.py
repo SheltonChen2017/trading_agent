@@ -3524,6 +3524,7 @@ def _bind_transport_capability_consumers(
         ledger_directory: Path, started_at_utc: str,
         owner_signature: OwnerSignatureAuthority | None,
     ) -> tuple[PreopenQcSubmissionPermit, PreopenQcLaunchReceipt]:
+        binding_guard("submission")
         if type(plan) is PhysicalPreopenQcSubmissionPlan and (
             type(execute_preuploaded_impl) is not type(lambda: None)
             or execute_preuploaded_impl.__code__ is not execute_preuploaded_code
@@ -3536,7 +3537,6 @@ def _bind_transport_capability_consumers(
             raise PreopenQcSubmissionError(
                 "physical pre-open execution dependency changed"
             )
-        binding_guard("submission")
         return execute_impl(
             plan=plan,
             client=client,

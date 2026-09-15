@@ -631,6 +631,87 @@ def test_cloud_loader_reads_activation_first_authenticates_each_object_and_never
     assert len(calls) == 1
 
 
+def test_transport_object_count_bound_is_load_bearing():
+    _values, key, activation, _roles = _transport_fixture()
+    value = json.loads(activation)
+    template = next(
+        item for item in value["objects"] if item["role"] == "session_axis"
+    )
+    prefix = key.rsplit("/", 1)[0]
+
+    # Five objects already exist.  Add valid, uniquely named session shards
+    # through the exact boundary, then one more.  This keeps every later
+    # descriptor/ordinal check satisfiable so only this bound can refuse.
+    for ordinal in range(1, runtime.MAX_TRANSPORT_OBJECT_COUNT - 4):
+        item = dict(template)
+        item["ordinal"] = ordinal
+        item["object_store_key"] = (
+            f"{prefix}/session_axis-{ordinal:04d}-jsonl.gz"
+        )
+        item["relative_path"] = f"session_axis-{ordinal:04d}-jsonl.gz"
+        item["content_sha256"] = hashlib.sha256(
+            item["object_store_key"].encode("ascii")
+        ).hexdigest()
+        value["objects"].append(item)
+
+    def reidentify(candidate):
+        candidate["package_id"] = None
+        candidate["package_sha256"] = None
+        digest = hashlib.sha256(runtime._canonical(candidate)).hexdigest()
+        candidate["package_id"] = "arv2-preliminary-qc-package-" + digest[:24]
+        candidate["package_sha256"] = digest
+
+    reidentify(value)
+    assert len(value["objects"]) == runtime.MAX_TRANSPORT_OBJECT_COUNT
+    runtime._validate_transport(value, key)
+
+    ordinal = runtime.MAX_TRANSPORT_OBJECT_COUNT - 4
+    extra = dict(template)
+    extra["ordinal"] = ordinal
+    extra["object_store_key"] = f"{prefix}/session_axis-{ordinal:04d}-jsonl.gz"
+    extra["relative_path"] = f"session_axis-{ordinal:04d}-jsonl.gz"
+    extra["content_sha256"] = hashlib.sha256(
+        extra["object_store_key"].encode("ascii")
+    ).hexdigest()
+    value["objects"].append(extra)
+    reidentify(value)
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="transport object inventory changed",
+    ):
+        runtime._validate_transport(value, key)
+
+
+def test_per_object_decompression_bound_is_load_bearing(monkeypatch):
+    raw = b'{}\n' * 100
+    monkeypatch.setattr(runtime, "MAX_DECOMPRESSED_OBJECT_BYTES", len(raw) - 1)
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="compressed object exceeded decompression bound",
+    ):
+        runtime._gzip_rows(gzip.compress(raw), 100, "session_axis")
+
+
+def test_total_decompression_bound_is_load_bearing(monkeypatch):
+    values, key, activation, _roles = _transport_fixture()
+    monkeypatch.setattr(runtime, "MAX_TOTAL_DECOMPRESSED_BYTES", 1)
+    monkeypatch.setattr(
+        evaluator,
+        "load_preliminary_rating_input",
+        lambda *_items: SimpleNamespace(marker="must not be reached"),
+    )
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="package exceeded total decompression bound",
+    ):
+        runtime.load_accepted_risk_preliminary_package(
+            SimpleNamespace(object_store=_Store(values)),
+            activation_manifest_key=key,
+            activation_manifest_sha256=hashlib.sha256(activation).hexdigest(),
+            activation_manifest_byte_count=len(activation),
+        )
+
+
 def test_cloud_loader_stops_on_first_object_hash_mismatch(monkeypatch):
     values, key, activation, _roles = _transport_fixture()
     first_data_key = next(item for item in values if item.endswith("session_axis-0000-jsonl.gz"))
@@ -1364,6 +1445,18 @@ def test_driver_enforces_monotonic_clock_soft_bound_and_train_slice_census():
         )
 
 
+def test_driver_backtest_runtime_bound_is_load_bearing():
+    driver, _algorithm = _driver_with_runtime(100)
+    driver._runtime_started_monotonic = 0
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="exceeded twelve-hour backtest bound",
+    ):
+        driver.advance_training_slice(
+            monotonic=lambda: runtime.MAX_BACKTEST_RUNTIME_SECONDS + 1
+        )
+
+
 def test_preliminary_projection_size_bounds_are_load_bearing_and_have_headroom():
     """ARV2R74-002: the per-file bound exists to respect QC's 64,000-char limit.
 
@@ -1410,27 +1503,19 @@ def test_preliminary_projection_size_bounds_are_load_bearing_and_have_headroom()
     assert sum(sizes.values()) <= projection.MAX_TOTAL_SOURCE_BYTES, sizes
 
 
-def test_preliminary_projection_requires_compilation_under_the_qc_prelude():
-    """ARV2R74-003: QC injects a prelude, so standalone compilation is not enough.
-
-    QuantConnect prepends its own import prelude to every project file. A
-    source that compiles alone but breaks once a prelude precedes it would be
-    accepted locally and fail only at cloud compile, after a look is spent.
-    Removing the prelude compilation turns no other lane test red, so pin it.
-    """
+def test_preliminary_projection_invokes_qc_prelude_compilation():
+    """ARV2R74-003: isolate the prelude compile after earlier guards pass."""
     from research.analyst_revisions_v2_qc import (
         accepted_risk_preliminary_qc_projection as projection,
     )
 
-    # A bare `return` outside a function is legal nowhere; a leading future
-    # import is legal only as the very first statement, so any injected
-    # prelude makes it a SyntaxError while the file alone compiles today.
-    prelude_hostile = b'"""Doc."""\nfrom __future__ import annotations\nX = 1\n'
-    compile(prelude_hostile.decode("ascii"), "probe.py", "exec")  # fine alone
-    with pytest.raises(projection.AcceptedRiskPreliminaryQcProjectionError):
+    # This is valid on its own and passes every earlier source audit. Once the
+    # QC sentinel is prepended, its global declaration follows an assignment
+    # to that name and Python must reject it.
+    prelude_hostile = b"global QC_PRELUDE_SENTINEL\nX = 1\n"
+    compile(prelude_hostile.decode("ascii"), "probe.py", "exec")
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="after QC prelude",
+    ):
         projection._validate_source("prelude_hostile.py", prelude_hostile)
-
-    # An ordinary module compiles both alone and under a prelude.
-    benign = b'"""Doc."""\n\n\ndef f():\n    return 1\n'
-    compile(benign.decode("ascii"), "probe.py", "exec")
-    projection._validate_source("benign.py", benign)

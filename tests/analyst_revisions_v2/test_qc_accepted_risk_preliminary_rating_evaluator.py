@@ -671,6 +671,12 @@ def test_summary_is_aggregate_only_and_loudly_enumerates_omissions(completed_run
     assert summary["accepted_risk_disclosures"][
         "complete_cross_section_required_for_each_date_ic"
     ] is True
+    assert summary["accepted_risk_disclosures"][
+        "sector_normalization_uses_active_signals_only"
+    ] is True
+    assert summary["accepted_risk_disclosures"][
+        "missing_price_rows_excluded_without_imputation"
+    ] is True
     assert set(summary["omitted_formal_components"]) == set(
         subject.OMITTED_FORMAL_COMPONENTS
     )
@@ -711,16 +717,16 @@ def test_completed_runtime_destroys_the_ephemeral_history_matrix(completed_run):
     assert runtime._history_sessions == ()
 
 
-def test_ephemeral_history_matrix_preserves_the_pre_fix_summary_golden(completed_run):
+def test_ephemeral_history_matrix_preserves_the_current_summary_golden(completed_run):
     _value, runtime, _requests, _progress, _scratch = completed_run
     summary = subject._canonical_bytes(runtime.aggregate_summary())
     statistics = subject._canonical_bytes(runtime.custom_summary_statistics())
 
     assert hashlib.sha256(summary).hexdigest() == (
-        "5c1853d46efb93a2430c8791485587fcdf716ce442d4622b2183da0fa2654b96"
+        "e5acc4e59efa7c81c2599181332e8a7929a48354ce9a8478c08ed159faa37fd6"
     )
     assert hashlib.sha256(statistics).hexdigest() == (
-        "ed3f81d02197ad5e7547d768dfa6229881bf6ab167ac1f283c99063d94ca3e28"
+        "7f154773d289c0f05820197e8913412899cd0a73a1ddb186d60dbbb04d4d1c81"
     )
 
 
@@ -844,13 +850,27 @@ def test_missing_total_return_rows_are_counted_not_substituted(tmp_path):
     cell = run("omitted", ("perm-security-00", "2020-01-03"))
     assert cell["missing_outcome_pair_count"] >= 1
     assert cell["accepted_outcome_pair_count"] < cell["eligible_score_row_count"]
-    affected_dates = cell["invalid_ic_date_count"] - baseline["invalid_ic_date_count"]
-    assert affected_dates == 2
-    assert cell["valid_ic_date_count"] == baseline["valid_ic_date_count"] - affected_dates
-    # Twenty survivors still meet MINIMUM_IC_ROWS; only the missing-row guard
-    # invalidates the prior-entry and same-day-entry H1 cross-sections.
+    assert cell["invalid_ic_date_count"] == baseline["invalid_ic_date_count"]
+    assert cell["valid_ic_date_count"] == baseline["valid_ic_date_count"]
+    # Twenty survivors still meet MINIMUM_IC_ROWS. The absent row is counted
+    # and excluded without imputation; it cannot invalidate the usable pairs.
     assert cell["eligible_score_row_count"] - cell["accepted_outcome_pair_count"] >= 1
     assert subject.MINIMUM_IC_ROWS == 20
+
+
+def test_sparse_sector_normalizes_active_signals_and_keeps_structural_zeros():
+    members = tuple(f"security-{index:02d}" for index in range(60))
+    active = set(members[:5])
+    raw = {
+        security: Decimal(index + 1) if security in active else Decimal(0)
+        for index, security in enumerate(members)
+    }
+
+    normalized = subject._normalize_sector(raw, active, members)
+
+    assert normalized is not None
+    assert {normalized[item] for item in members[5:]} == {Decimal(0)}
+    assert len({normalized[item] for item in members[:5]}) > 1
 
 
 def test_one_refused_sector_invalidates_otherwise_sufficient_date_ic(tmp_path):

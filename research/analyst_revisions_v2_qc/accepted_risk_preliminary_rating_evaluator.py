@@ -324,18 +324,22 @@ def _normalize_sector(
         item in active for item in members
     ) < MINIMUM_ACTIVE_NAMES:
         return None
+    # Analyst events are sparse.  Estimate location and scale from the names
+    # carrying a live signal; structural-zero names remain exact zero in the
+    # returned cross-section and never manufacture dispersion.
+    active_members = tuple(item for item in members if item in active)
     with localcontext(_context()):
-        median = _median(raw[item] for item in members)
-        mad = _median(abs(raw[item] - median) for item in members)
+        median = _median(raw[item] for item in active_members)
+        mad = _median(abs(raw[item] - median) for item in active_members)
         if mad == 0:
             if min(raw[item] for item in members) == max(raw[item] for item in members):
                 return {item: Decimal(0) for item in members}
             return None
         scale = +(MAD_SCALE * mad)
         return {
-            item: max(
-                -SCORE_CLIP,
-                min(SCORE_CLIP, +((raw[item] - median) / scale)),
+            item: (
+                max(-SCORE_CLIP, min(SCORE_CLIP, +((raw[item] - median) / scale)))
+                if item in active else Decimal(0)
             )
             for item in members
         }
@@ -1171,7 +1175,6 @@ class PreliminaryRatingEvaluationRuntime:
                         cell.sector_refused_rows += sector_refused[(view, arm)]
                         if (
                             sector_refused[(view, arm)]
-                            or missing
                             or len(pairs) < MINIMUM_IC_ROWS
                         ):
                             cell.invalid_ic_dates += 1

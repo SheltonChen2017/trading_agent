@@ -4,12 +4,14 @@ import hashlib
 import io
 import json
 import sqlite3
-from datetime import datetime
+from datetime import date, datetime
 from fractions import Fraction
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
+
+from data.exchange_calendar import trading_sessions
 
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_qc_figi as figi,
@@ -884,8 +886,13 @@ def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monke
     assert all(b"from __future__ import" not in item.source_bytes for item in value.source_files)
     assert all(b"sqlite3" not in item.source_bytes for item in value.source_files)
     main = by_name["main.py"].source_bytes.decode("ascii")
-    assert "self.train(self._arv2_advance_training_slice)" in main
+    assert "self._arv2_advance_training_slice()" in main
+    assert "self.train(" not in main
     assert "def _arv2_advance_training_slice" in main
+    assert value.maximum_train_slice_count == runtime.MAX_TRAIN_SLICE_COUNT == 113
+    assert len(
+        trading_sessions(date(*projection.ALGORITHM_START), date(*projection.ALGORITHM_END))
+    ) == value.maximum_train_slice_count
     assert "set_start_date(2026, 4, 1)" in main
     assert "set_end_date(2026, 9, 11)" in main
     assert 'self.set_time_zone("America/New_York")' in main
@@ -1406,6 +1413,26 @@ def test_driver_completes_in_bounded_train_slice_emits_once_and_closes_cleanly()
     assert driver.require_completed_at_end() is True
 
 
+def test_full_geometry_completes_in_41_unslowed_daily_slices():
+    driver, algorithm = _driver_with_runtime(400)
+    planned_runtime = driver._runtime
+    driver._runtime = None
+    driver._initialize_in_training = lambda: setattr(
+        driver, "_runtime", planned_runtime
+    )
+
+    for _ in range(40):
+        driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+    assert driver.completed is False
+    assert driver._runtime.calls == 399
+
+    driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+    assert driver.completed is True
+    assert driver._runtime.calls == 400
+    assert driver._training_slice_count == 41
+    assert len(algorithm.statistics) == 34
+
+
 def test_driver_end_refuses_incomplete_runtime_and_aborts_cache():
     driver, _algorithm = _driver_with_runtime(100)
 
@@ -1430,7 +1457,7 @@ def test_driver_enforces_monotonic_clock_soft_bound_and_train_slice_census():
     driver._training_slice_count = runtime.MAX_TRAIN_SLICE_COUNT
     with pytest.raises(
         runtime.AcceptedRiskPreliminaryQcRuntimeError,
-        match="Train-slice census",
+        match="runtime-slice census",
     ):
         driver.advance_training_slice(monotonic=lambda: 242)
 

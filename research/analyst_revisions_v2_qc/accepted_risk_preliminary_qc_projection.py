@@ -10,6 +10,7 @@ import re
 from pathlib import Path
 
 from . import accepted_risk_preliminary_package as package_builder
+from . import accepted_risk_preliminary_qc_runtime as runtime_builder
 
 
 class AcceptedRiskPreliminaryQcProjectionError(ValueError):
@@ -403,7 +404,7 @@ class ARV2AcceptedRiskPreliminaryAlgorithm(QCAlgorithm):
 
     def on_data(self, _data):
         if not self._arv2_driver.completed:
-            self.train(self._arv2_advance_training_slice)
+            self._arv2_advance_training_slice()
 
     def _arv2_advance_training_slice(self):
         self._arv2_driver.advance_training_slice(
@@ -508,8 +509,8 @@ def build_accepted_risk_preliminary_qc_projection(
         "activation_manifest_byte_count": activation.byte_count,
         "source_files": [item.to_record() for item in files],
         "total_source_byte_count": total,
-        "train_work_units_per_slice": 10,
-        "maximum_train_slice_count": 64,
+        "train_work_units_per_slice": runtime_builder.TRAIN_WORK_UNITS_PER_SLICE,
+        "maximum_train_slice_count": runtime_builder.MAX_TRAIN_SLICE_COUNT,
         "preliminary": True,
         "formal": False,
         "outcome_result_transport": "aggregate_only_custom_summary_statistics",
@@ -528,8 +529,8 @@ def build_accepted_risk_preliminary_qc_projection(
         activation.byte_count,
         tuple(files),
         total,
-        10,
-        64,
+        runtime_builder.TRAIN_WORK_UNITS_PER_SLICE,
+        runtime_builder.MAX_TRAIN_SLICE_COUNT,
         True,
         False,
         "aggregate_only_custom_summary_statistics",
@@ -556,9 +557,10 @@ def require_accepted_risk_preliminary_qc_projection(
         or value.total_source_byte_count
         != sum(item.byte_count for item in value.source_files)
         or value.total_source_byte_count > MAX_TOTAL_SOURCE_BYTES
-        or value.train_work_units_per_slice != 10
+        or value.train_work_units_per_slice
+        != runtime_builder.TRAIN_WORK_UNITS_PER_SLICE
         or type(value.train_work_units_per_slice) is not int
-        or value.maximum_train_slice_count != 64
+        or value.maximum_train_slice_count != runtime_builder.MAX_TRAIN_SLICE_COUNT
         or type(value.maximum_train_slice_count) is not int
         or value.preliminary is not True
         or value.formal is not False

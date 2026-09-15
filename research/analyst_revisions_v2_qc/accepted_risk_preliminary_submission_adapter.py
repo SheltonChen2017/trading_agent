@@ -209,14 +209,14 @@ def _look_accounting(*, stage: str = "reservation") -> dict[str, object]:
         "schema": "arv2-qc-research-look-accounting-v1",
         "classification": "development_evaluation",
         "evaluation_id": "arv2-eval-stock-historical-qc-001",
-        "shared_look_ledger_entry_id": "R-054",
+        "shared_look_ledger_entry_id": "R-055",
         "accounting_stage": stage,
-        "run_level_looks_before": 54,
-        "run_level_looks_after": 55 if launched else 54,
-        "planned_run_level_looks_after_launch": 55,
-        "arv2_development_evaluations_before": 1,
-        "arv2_development_evaluations_after": 2 if launched else 1,
-        "planned_arv2_development_evaluations_after_launch": 2,
+        "run_level_looks_before": 55,
+        "run_level_looks_after": 56 if launched else 55,
+        "planned_run_level_looks_after_launch": 56,
+        "arv2_development_evaluations_before": 2,
+        "arv2_development_evaluations_after": 3 if launched else 2,
+        "planned_arv2_development_evaluations_after_launch": 3,
         "planned_maximum_preliminary_ic_cell_count": 32,
         "emitted_preliminary_ic_cell_count": (
             32 if aggregate_authenticated else 0
@@ -2418,7 +2418,8 @@ def _validate_aggregate_records(records: Mapping[str, dict[str, object]], plan) 
         + runtime_meta["named_security_refusal_count"]
         != plan.package.runtime_symbol_binding_count
         or type(runtime_meta.get("training_slice_count")) is not int
-        or not 1 <= runtime_meta["training_slice_count"] <= 64
+        or not 1 <= runtime_meta["training_slice_count"]
+        <= preliminary_runtime.MAX_TRAIN_SLICE_COUNT
     ):
         _error("preliminary runtime aggregate metadata changed")
     cells_by_axis = {}

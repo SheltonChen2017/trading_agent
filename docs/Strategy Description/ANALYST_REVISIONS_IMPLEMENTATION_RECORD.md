@@ -849,15 +849,21 @@ tests of its own standing lane selection, reproduced on a pristine export of
 that commit: eight stale wire-level fakes left by this range's own Object Store
 protocol migration, one stale refusal-reason expectation, and the pinned
 no-external-I/O closure over the QC package, which now aborts before it checks
-anything. The production paths are unaffected. The immediate next step is that
-Codex counter-reviews section 74 and both Claude commits and makes the standing
-lane selection green again; no R-054 or later evaluation may be launched while
-the QC-package I/O closure is unproven. Any
-change to the zero-MAD normalization or complete-cross-section rule is a newly
-preregistered development evaluation with a new R-number, not an R-053
-technical retry. Later windows, ETF construction, actual or synthetic
+anything. Section 75 counter-reviews and corrects those issues, preregisters
+and spends R-054 on the owner-approved sparse-signal rule, and records its
+technical QC runtime failure without any result read. R-055 is now
+preregistered as the same-rule scheduling correction: direct bounded daily
+runtime slices replace the exhausted `Train(...)` path, with all 113 harness
+sessions available and the result reader bound to the same limit. The
+immediate next step is the already owner-authorized single R-055 launch from a
+new private project. The owner explicitly waives Claude review of section 75
+until after this first tangible 2021-2025 backtest. If it completes, exactly
+one separately signed aggregate
+read applies the 2021-2025 tangible-evidence gate. If it completes underfilled,
+only the predeclared counts-based R-056 relaxation may follow; no alpha sign
+may select that choice. Later windows, ETF construction, actual or synthetic
 leverage, paper/live deployment, broker access, orders, and trading remain
-closed.
+closed until the 2021-2025 tangible-evidence gate succeeds.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -13214,9 +13220,85 @@ owner signature, permit, QC call, or research look.
 | Result inventory | Two views x two arms x four horizons x two windows = 32 cells, plus two aggregate metadata records |
 | Later-work gate | No later period and no ETF/leverage evaluation unless the 2021-2025 cells contain tangible actual-return evidence. |
 
-If R-054 is still underfilled, its alpha sign or magnitude will not select the
-next rule. A separately numbered R-055 may exclude refused sectors rather
-than invalidate the date, but must still require at least two admitted
-sectors, 20 actual outcome pairs, and five live-signal names. That counts-only
-coverage trigger is fixed here before R-054 and does not authorize later
-windows or leverage.
+At preregistration, the counts-only contingency was that an underfilled R-054
+would not use alpha sign or magnitude to select the next rule: a separately
+numbered R-055 could exclude refused sectors rather than invalidate the date,
+but still require at least two admitted sectors, 20 actual outcome pairs, and
+five live-signal names. Section 75.3 records that R-054 produced no result, so
+that contingency was not triggered; section 75.4 moves it prospectively to
+R-056 and uses R-055 for a same-rule technical scheduling retry.
+
+### 75.3 R-054 terminal disposition
+
+R-054 was launched exactly once. The one-use permit began
+`2026-09-15T15:55:12Z`; project `36578018`,
+`2 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260915_R054A_e9851c2f`, compiled as
+`f9268585923d032f45dfa71adefd7b26-3f2c18c888039d6893340cd16f93eb1f`
+and created backtest `30d1a096d2ef7c69c820460d7ad39971`,
+`ARV2 R054 sparse-signal accepted-risk preliminary stock IC 2021-2025
+e9851c2f`. The exact plan was
+`arv2-preliminary-qc-submission-c455edf2b3bf16085a5e27b7`, SHA-256
+`c455edf2b3bf16085a5e27b73b9852816ac5a20bd99d8880a0792097afacddcc`.
+
+After 104 statistics-free polls, the authenticated terminal state was
+`Runtime Error`. Terminal receipt
+`arv2-preliminary-qc-terminal-fab47d71f30c0f7e95684460`, SHA-256
+`fab47d71f30c0f7e95684460e3a56caf79d54f5e22c3e3cf098c6c8de800d9a7`,
+records `include_statistics=false` and `result_values_selected=false`. No
+result authority was rendered or signed and no aggregate or security-level
+outcome was read. QC's terminal reported at 2026-05-26 16:00:00 that one
+algorithm time loop exceeded ten minutes in `Isolator.cs:line 190`; the UI
+later reported 3,186.19 seconds total runtime and 6,084,172 processed data
+points. This is a technical scheduling failure, not an alpha or underfill
+result.
+
+R-054 therefore spends one run look and one development evaluation: shared
+run-level looks are **55**, ARV2 infrastructure looks remain **23**, and ARV2
+development evaluations are **2**. Because no result was authenticated, the
+lifetime alpha-cell exposure floor remains **484**. The 2021-2025 tangible-
+evidence gate was not tested and remains unmet; later windows, ETF/leverage,
+deployment, orders, and trading remain closed.
+
+| ID | P | Finding and disposition |
+|---|---:|---|
+| `ARV2CR75-011` | P2 | The fixed workload was scheduled through repeated `Train(...)` callbacks. It advanced to the 38th NYSE harness session but exhausted QC's execution allowance before completing, producing a technical runtime error after 104 statistics-free polls. R-055 removes only this scheduling dependency; no evaluator, signal, input, arithmetic, date, threshold, output-inventory, or decision rule changes. |
+
+### 75.4 R-055 same-rule scheduling retry fixed before launch
+
+R-055 is preregistered as a new `development_evaluation` in historical family
+`arv2-eval-stock-historical-qc-001`. It preserves the R-054 input package,
+evaluator manifest, v2 signal rule, 2020-2025 companion window, 2021-2025 gate
+window, two source views, two rating arms, four horizons, and exact 32-cell
+plus two-metadata output inventory. No observed alpha selected this change,
+because R-054 exposed none.
+
+Only scheduling changes. The projected algorithm invokes the bounded advance
+slice directly from ordinary `OnData` rather than through `Train(...)`, so the
+work does not consume QC's training quota. Each invocation retains the ten-
+work-unit and 240-second soft bounds. The maximum slice count rises from 64 to
+113, exactly the complete NYSE-session inventory in the harness. The fixed
+geometry is 401 work units including initialization and normally completes in
+41 full slices; local empty-history scoring completed all 302 scoring callbacks
+in 106.39 seconds with a 0.485-second maximum callback. The ordinary ten-minute
+QC time-loop ceiling still applies to every call.
+
+| R-055 preregistration field | Frozen value |
+|---|---|
+| Evaluation | `R-055`; `development_evaluation`; same-rule accepted-risk stock IC scheduling retry |
+| Accounting if launched | Shared run-level looks **55 -> 56**; ARV2 development evaluations **2 -> 3**; lifetime alpha-cell exposure floor **484 -> 516** only if the aggregate result is authenticated and read |
+| Gate window | 2021-01-04 through 2025-12-31; tangible means at least 50 valid dates and non-null authenticated IC/return aggregates |
+| Companion window | 2020-01-02 through 2025-12-31, retained in the same fixed output inventory |
+| Input package | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
+| Evaluator manifest | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
+| QC projection | `arv2-preliminary-qc-projection-8d194f3486f961601111d49d`; SHA-256 `8d194f3486f961601111d49d5cabcdaba33c095f95858f03a1143280b76ef5bb`; five files, 132,028 bytes |
+| Runtime bounds | Direct `OnData` advancement; at most ten work units and 240 soft seconds per call; at most 113 slices across 113 harness sessions |
+| Later-work gate | No later period and no ETF/leverage evaluation unless the 2021-2025 cells contain tangible actual-return evidence. |
+
+The counts-only contingency originally assigned R-055 in section 75.2 was not
+triggered, because R-054 produced no result. It moves prospectively to R-056:
+only if R-055 completes but remains underfilled may that successor exclude
+refused sectors rather than invalidate the date, while still requiring at
+least two admitted sectors, 20 actual outcome pairs, and five live-signal
+names. That decision must use counts and sufficiency only, never alpha sign or
+magnitude. This preregistration itself authorizes no later window, ETF,
+leverage, deployment, order, or trading action.

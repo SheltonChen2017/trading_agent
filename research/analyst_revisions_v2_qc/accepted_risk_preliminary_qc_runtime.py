@@ -4,7 +4,7 @@ This module is intentionally flat-importable inside a QuantConnect project.
 It authenticates the activation manifest and every compact input object from
 Object Store, resolves admitted composite FIGIs with an exact QC round trip,
 loads adjusted daily opens through typed ``History[TradeBar]`` requests, and
-advances the aggregate-only evaluator in bounded Train slices.
+advances the aggregate-only evaluator in bounded daily runtime slices.
 
 It is not the frozen formal evaluator.  It emits only compact preliminary
 custom summary statistics and has no order, portfolio, deployment, or Object
@@ -50,7 +50,9 @@ MAX_DECOMPRESSED_OBJECT_BYTES = 192 * 1024 * 1024
 MAX_TOTAL_DECOMPRESSED_BYTES = 768 * 1024 * 1024
 TRAIN_WORK_UNITS_PER_SLICE = 10
 TRAIN_SLICE_SOFT_SECONDS = 240
-MAX_TRAIN_SLICE_COUNT = 64
+# The persisted field retains its original ``training_slice_count`` name for
+# receipt compatibility, but R055 advances it directly from daily OnData.
+MAX_TRAIN_SLICE_COUNT = 113
 MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
 EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
@@ -728,7 +730,7 @@ class QcTotalReturnOpenHistoryLoader:
 
 
 class AcceptedRiskPreliminaryQcDriver:
-    """Resumeless in-memory state machine advanced only from QC Train calls."""
+    """Resumeless state machine advanced in bounded QC runtime slices."""
 
     def __init__(
         self,
@@ -824,7 +826,7 @@ class AcceptedRiskPreliminaryQcDriver:
             or not 1 <= soft_seconds <= TRAIN_SLICE_SOFT_SECONDS
             or not callable(monotonic)
         ):
-            _error("preliminary Train slice bound changed")
+            _error("preliminary runtime slice bound changed")
         if self.completed:
             return None
         started = monotonic()
@@ -839,7 +841,7 @@ class AcceptedRiskPreliminaryQcDriver:
             _error("preliminary evaluation exceeded twelve-hour backtest bound")
         self._training_slice_count += 1
         if self._training_slice_count > MAX_TRAIN_SLICE_COUNT:
-            _error("preliminary evaluation exceeded deterministic Train-slice census")
+            _error("preliminary evaluation exceeded deterministic runtime-slice census")
         work = 0
         if self._runtime is None:
             self._initialize_in_training()

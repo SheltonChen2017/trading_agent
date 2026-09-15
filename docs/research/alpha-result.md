@@ -1308,34 +1308,67 @@ The lifetime alpha-cell exposure floor is **484**. No permanent-family or
 confirmatory-alpha look has been spent, and no paper/live authority follows
 from this preliminary result.
 
-## R-054 — Analyst Revisions V2 sparse-signal accepted-risk stock IC (PREREGISTERED; NOT YET LAUNCHED)
+## R-054 — Analyst Revisions V2 sparse-signal accepted-risk stock IC (LAUNCHED; TECHNICAL RUNTIME ERROR; NO RESULT READ)
 
-This entry was committed before any R-054 QuantConnect launch or outcome read.
-R-054 is a new development evaluation, not an R-053 retry. The exact v2 rule
-normalizes each sector from its live analyst-signal names while retaining
-unscored names as structural zero, and excludes unavailable price pairs
-without imputation when at least 20 actual pairs remain. The 20-name/5-active
-sector floors, complete-sector requirement, horizons, views, arms, and
-2020-2025 plus 2021-2025 windows remain fixed.
+R-054 was preregistered and launched as a new development evaluation. Its
+exact v2 rule normalizes each sector from its live analyst-signal names while
+retaining unscored names as structural zero, and excludes unavailable price
+pairs without imputation when at least 20 actual pairs remain. The 20-name / 5-
+active sector floors, complete-sector requirement, horizons, views, arms, and
+2020-2025 plus 2021-2025 windows stayed fixed.
+
+| Field | Recorded value |
+|---|---|
+| **Research-look accounting** | Counted once: shared run-level looks **54 -> 55** and ARV2 development evaluations **1 -> 2**. Because no aggregate result was authenticated or read, the lifetime alpha-cell exposure floor remains **484**, rather than rising to the preregistered conditional value of 516. |
+| **Input package** | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
+| **Evaluator manifest** | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
+| **QC source projection** | `arv2-preliminary-qc-projection-1c017bc130a6da1903070220`; SHA-256 `1c017bc130a6da1903070220dc04fb3b685241c8d0a70e3cb6b64ab48b40de14`; five files, 131,880 bytes |
+| **Execution identity** | Plan `arv2-preliminary-qc-submission-c455edf2b3bf16085a5e27b7`, SHA-256 `c455edf2b3bf16085a5e27b73b9852816ac5a20bd99d8880a0792097afacddcc`; execution permit `arv2-preliminary-qc-execution-permit-4a31edebb6a005070bfde0ab`; launch receipt `arv2-preliminary-qc-launch-412cd2296e621e50581f98d3` |
+| **QC project / compile / backtest** | Project `36578018`, `2 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260915_R054A_e9851c2f`; compile `f9268585923d032f45dfa71adefd7b26-3f2c18c888039d6893340cd16f93eb1f`; backtest `30d1a096d2ef7c69c820460d7ad39971`, `ARV2 R054 sparse-signal accepted-risk preliminary stock IC 2021-2025 e9851c2f` |
+| **Launch / terminal** | The one-use permit began `2026-09-15T15:55:12Z`. The launch entered `In Queue...`; 104 statistics-free polls authenticated terminal `Runtime Error`. Terminal receipt `arv2-preliminary-qc-terminal-fab47d71f30c0f7e95684460`, SHA-256 `fab47d71f30c0f7e95684460e3a56caf79d54f5e22c3e3cf098c6c8de800d9a7`. |
+| **QC runtime evidence** | The QC terminal reported at 2026-05-26 16:00:00 that one algorithm time loop exceeded ten minutes (`Isolator.cs:line 190`). The UI later reported 3,186.19 seconds total runtime and 6,084,172 processed data points. These messages diagnose scheduling/runtime exhaustion, not an alpha result. |
+| **Outcome access** | `include_statistics=false` and `result_values_selected=false` throughout terminal polling. No result authority was rendered or signed; no aggregate statistic, valid-date count, security-level outcome, raw provider row, order, deployment, or trading action was read. |
+| **Disposition** | **Spent technical development evaluation; no economic result.** The tangible-evidence gate was not tested and remains unmet. No alpha sign, magnitude, sufficiency status, or underfill conclusion may be inferred from this runtime error. |
+
+The prior source-only feasibility replay remains valid evidence about the
+signal path: it found all 1,255 gate-window dates feasible in both source
+views and score arms, and the empty-history replay completed all 1,508 dates.
+Neither replay opened an outcome. The cloud run instead exhausted the QC
+execution schedule while advancing the same fixed workload through repeated
+`Train(...)` callbacks. Therefore the next action is a scheduling-only retry,
+not a strategy-rule relaxation.
+
+**Cumulative ledger state after R-054:** **55** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **2** development evaluations.
+The lifetime alpha-cell exposure floor remains **484**. No permanent-family or
+confirmatory-alpha look has been spent.
+
+## R-055 — Analyst Revisions V2 same-rule scheduling retry (PREREGISTERED; NOT YET LAUNCHED)
+
+R-055 preserves R-054's exact package, evaluator, v2 signal rule, dates,
+views, rating arms, horizons, output inventory, and tangible-result gate. Its
+only substantive change is execution scheduling: bounded work slices run
+directly from ordinary `OnData` calls instead of being submitted through
+`Train(...)`. Each invocation remains limited to at most ten work units and a
+240-second soft budget, while the maximum slice count rises from 64 to 113,
+equal to the complete NYSE-session inventory in the harness. The evaluator,
+input, score, return, threshold, window, and output cells remain byte-identical.
 
 | Field | Preregistered value |
 |---|---|
-| **Research-look accounting if launched** | Shared run-level look **54 -> 55**; ARV2 development evaluations **1 -> 2**; 32 cells raise lifetime alpha-cell exposure floor **484 -> 516** |
+| **Research-look accounting if launched** | Shared run-level looks **55 -> 56**; ARV2 development evaluations **2 -> 3**. The same 32-cell inventory raises the lifetime alpha-cell exposure floor **484 -> 516** only if an aggregate result is authenticated and read. |
+| **Evaluation family** | `arv2-eval-stock-historical-qc-001`; accepted-risk preliminary stock IC, not a formal or confirmatory evaluation |
 | **Input package** | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
-| **QC source projection** | `arv2-preliminary-qc-projection-1c017bc130a6da1903070220`; SHA-256 `1c017bc130a6da1903070220dc04fb3b685241c8d0a70e3cb6b64ab48b40de14`; five files, 131,880 bytes |
-| **Primary practical gate** | 2021-01-04 through 2025-12-31 must return at least 50 valid dates and non-null authenticated IC/return aggregates before any later-window or leverage run |
-| **Decision independence** | Launch/further-relaxation decisions use only count/sufficiency status, never observed alpha sign or magnitude |
+| **Evaluator manifest** | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
+| **QC source projection** | `arv2-preliminary-qc-projection-8d194f3486f961601111d49d`; SHA-256 `8d194f3486f961601111d49d5cabcdaba33c095f95858f03a1143280b76ef5bb`; five files, 132,028 bytes |
+| **Primary practical gate** | 2021-01-04 through 2025-12-31 must return at least 50 valid dates and non-null authenticated IC/return aggregates before any later-window or leverage run. |
+| **Decision independence** | Any later relaxation decision uses only count/sufficiency status, never observed alpha sign or magnitude. |
 | **Not authorized by this entry** | Formal/confirmatory inference, ETF construction, leverage, deployment, orders, or trading |
 
-An exact source-only feasibility replay, before this preregistration, used no
-price or return and found all 1,255 gate-window dates feasible in both source
-views and score arms. If the launched result remains underfilled, the
-predeclared R-055 counts-only relaxation in Analyst lane section 75 applies;
-later periods and leverage remain closed.
-
-Before launch, a further empty-history replay traversed the complete signal
-path on all 1,508 evaluation dates. It exposed and corrected a one-ULP Decimal
-breadth refusal and then completed 1,508/1,508 without opening an outcome. The
-submission binding was also advanced from the spent R-053 counters to the
-R-054 values in the table. The re-pinned projection above and both corrections
-were committed before any R-054 signature, permit, QC call, or outcome access.
+Because R-054 produced no result, its preregistered counts-only underfill
+contingency was not triggered. If R-055 completes but remains underfilled, the
+separately numbered R-056 may exclude refused sectors rather than invalidate
+the date, while still requiring at least two admitted sectors, 20 actual
+outcome pairs, and five live-signal names. Later periods and leverage remain
+closed until the primary practical gate produces tangible actual-return
+evidence.

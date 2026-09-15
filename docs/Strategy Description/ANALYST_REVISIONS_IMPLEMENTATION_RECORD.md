@@ -242,7 +242,16 @@ CLAUDE'S INDEPENDENT REVIEW OF THE EXACT SECTION-75 SNAPSHOT IS THE NEXT GATE,
 FOLLOWED BY CODEX COUNTER-REVIEW. LATER WINDOWS, ETF CONSTRUCTION, AND ACTUAL
 OR SYNTHETIC LEVERAGE REMAIN CLOSED UNTIL THAT REVIEW CYCLE COMPLETES. PAPER
 OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN CLOSED. NO V2
-SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
+SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.
+THE INDEPENDENT CLAUDE REVIEW OF THE R-054/R-055 RANGE (SECTION 76) ACCEPTS
+ALL FOUR COMMITS AFTER ONE CORRECTION, CONFIRMS ALL FIVE SECTION-75 FINDINGS
+AGAINST SECTION 74 INCLUDING ONE RED/GREEN PROOF THAT SECTION 74 RECORDED
+WRONGLY, AND VERIFIES THAT THE R-055 TANGIBLE-EVIDENCE GATE WAS COMMITTED TO
+GIT TEN MINUTES BEFORE THE BACKTEST EXISTED AND IS COUNTS-ONLY. IT RECORDS
+THAT EVERY REPORTED IC IS CONDITIONED ON PRICE SURVIVAL, SINCE 11.5 TO 12.6
+PERCENT OF OUTCOME PAIRS ARE EXCLUDED WITHOUT IMPUTATION AND THE
+HORIZON-INCREASING PART MATCHES REAL DELISTING RATES. NO ALPHA IS CLAIMED AND
+EVERY LATER GATE REMAINS CLOSED.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -874,9 +883,16 @@ are `PRELIMINARY_DESCRIPTIVE_AVAILABLE`, have 1,255 valid dates and zero
 invalid dates, and contain all five preregistered non-null IC/return metrics.
 The tangible-evidence gate succeeds. R-056 is cancelled unlaunched and
 unspent because the counts were sufficient, independently of the observed
-alpha signs. Claude must now independently review section 75 and the exact
-committed snapshot, after which Codex counter-reviews it. Only then may the
-owner-planned later windows and subsequent unlevered/leveraged ETF work begin.
+alpha signs. Section 76 is that independent review. It accepts all four commits after one
+correction, confirms every section-75 finding against section 74, and verifies
+that the tangible-evidence gate was committed to git ten minutes before the
+backtest was created and decides on counts alone. It also records that the
+closure test was still red at `f950fe8` on an unpinned import edge, now
+corrected, and that every reported IC is conditioned on price survival because
+11.5 to 12.6 percent of outcome pairs are excluded without imputation. The
+immediate next step is that Codex counter-reviews section 76. Only then may the
+owner-planned later windows and subsequent unlevered/leveraged ETF work begin,
+and the survival conditioning should be settled first.
 This preliminary stock-IC result is neither a formal alpha acceptance nor an
 economic portfolio backtest. Paper/live deployment, broker access, orders,
 and trading remain closed.
@@ -2526,6 +2542,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-13 | Claude whole-lane review | `f9979e9` -> `331cce5` (one production transport correction and nine test-file corrections) and this record commit; Codex resolves the exact pushed head | Owner-directed whole-lane review of `cf136e2..f9979e9` (120 commits) and of the unrecorded verifier commit `f9979e9` before Codex's counter-review and the first real QuantConnect backtest | Every lane commit dispositioned (section 71.2); `f9979e9` read line by line; three finished line-by-line packets (accepted-risk pair, fold manifest, four-family overlay), three cross-cutting audits and this reviewer's own primary-evidence checks; a sixteen-trial serial mutation matrix in a scratch export; the multi-agent fan-out was cut down twice by the account session limit and the coverage actually achieved is stated in 71.9. | Standing Analyst lane selection at `f9979e9` **3,996 passed, 7 skipped, 0 failed, 24 warnings in 3,801.71 s (1:03:21)**; focused batteries on the corrected worktree **303 passed, 4 skipped**, then **97 passed** and **373 passed in 156.81 s** after the guidance-pin revert; final complete lane selection on the committed tree **4,013 passed, 7 skipped, 0 failed, 24 warnings in 3,762.45 s (1:02:42)**; `compileall` exit 0; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **5 P2 and 17 P3** (`ARV2R50-001..022`); ten corrected here with red/green evidence, twelve documented with recommendations or referred; `ARV2R49-002` stays open. `ARV2R50-001` reopens `ARV2R49-001`: after `f9979e9` the sealed verifier checks had no isolating test again. `ARV2R50-019`: the only QC network primitive forwarded `Authorization` across a redirect; corrected. | Codex counter-reviews this record commit and every Claude commit in the range, decides `ARV2R50-003`, `-010..-018`, `-021` and `-022`, and with the owner makes the infrastructure look machine-readable; the exclusive formal claim, the single formal submission, the separately signed result read, deployment, orders and trading remain closed. |
 | 2026-09-15 | Codex counter-review, accepted-risk physical implementation, and first QC development evaluation | `d09fea1` -> `e5b89a2`, `e4d3048`, `9223278`, and this record commit | Accept Claude's whole-lane review after correction, complete the accepted-risk preliminary QC path, reconcile every discovery look, and execute R-053 | Resolved Claude's referred lane findings; built and authenticated the physical Massive/Sharadar inputs, security and firm admissions, compact six-object package, five-file QC runtime, signed one-use submission/result-read adapters, and append-only infrastructure ledger. Corrected QC injected-`__future__`, non-whitelisted-`sqlite3`, and legacy Object Store shard-suffix blockers. R-053 project `36561856`, backtest `f3bd9f3fc3c2627784e93d761382cd04`, reached `Completed.` and returned exactly 34 authenticated aggregate statistics. | Preliminary package/evaluator/runtime/submission **140 passed in 52.03 s**; least-privilege evaluator/runtime **101 passed in 19.85 s**; corrected pre-review path **22 passed, 1 warning in 69.84 s**; compileall exit 0; live compile `BuildSuccess`; terminal `Completed.`; aggregate read 34/34. A wider formal selection reached **358 passed** before its intentionally owner-deferred all-six-fold replay was cancelled; complete repository and full Analyst-lane suites were not run. R-031..R-052 add 22 infrastructure looks; R-053 adds one development evaluation and 32 exposed cells. Totals: 54 runs, 23 infrastructure, 1 development, 0 permanent, 0 confirmatory, cell floor 484. | No open P0/P1/P2. `ARV2CR51-001` P3 documented: 32/32 cells are inferentially inconclusive because the frozen complete-cross-section rule admitted zero dates after zero-MAD sector refusals. No alpha conclusion. | Push this same-lane range exactly once. Claude reviews the whole pushed snapshot; Codex counter-reviews before any new evaluation, later window, ETF/leverage test, deployment, order, or trade. |
 | 2026-09-15 | Claude review | `7bc8098` -> this record commit; three lane test corrections; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the accepted-risk QC evaluation range `d09fea1..7bc8098`, including the first outcome-bearing development evaluation R-053 and the retroactive R-031 to R-052 reconciliation | Dispositioned all 30 commits individually and cumulatively (section 74.2); accepted after correction. Verified rather than accepted: the redirect and proxy boundary reproduced with two loopback servers under hostile proxy environment variables; one-use permits refused reuse, overwrite, symlink, hardlink and a world-writable parent; the rotated owner key id recomputes and the superseded key is absent from the tree; the sequence-2 look ledger retains R-030 byte-identically, hash-chains to its predecessor and carries 23 unique entries with every alpha, order and statistics field false; all four projected modules pass the projection's own validator and twelve escape probes are refused; the pinned result inventory is exactly the 32-cell cross product plus two metadata records; and all 32 discovery attempts are dispositioned in this record. | Final complete Analyst lane selection on the corrected tree **10 failed, 5,397 passed, 7 skipped, 34 warnings in 5,739.56 s (1:35:39)**, every failure reproduced on a pristine export of `7bc8098` and therefore pre-existing; two touched batteries **125 passed**; eight-trial mutation matrix (three caught, three masked by an identified sibling guard, two real gaps corrected) plus five red/green correction trials in a scratch export; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **4 P2 and 7 P3** (`ARV2R74-001..011`); three corrected here with red/green evidence, eight documented or referred. `ARV2R74-001` raises the range's own `ARV2CR51-001` from P3 to P2: the frozen zero-MAD rule plus the complete-cross-section rule are unsatisfiable for an event-driven signal, so R-053's zero valid dates was the only reachable outcome and was determinable before the look was spent. `ARV2R50-022` remains open. | Codex counter-reviews this record commit and both Claude commits, and with the owner settles a satisfiable preregistered normalization before any R-054; later windows, ETF construction, leverage, deployment, orders and trading remain closed. |
+| 2026-09-15 | Claude review | `f950fe8` -> this record commit; one lane test correction; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the R-054/R-055 range `baef134..f950fe8`, including the first tangible preliminary stock-IC evidence | Dispositioned all four commits (76.2); accepted after correction. Confirmed all five section-75 findings against section 74, including that section 74 recorded a red/green proof its own evidence contradicts. Verified rather than accepted: the tangible-evidence gate wording is in git at `2d71cb3` (10:13 PDT), ten minutes before the backtest was created (10:23 PDT) and an hour before the single aggregate read (11:10 PDT), and decides on valid-date counts and non-null availability alone; the v2 rule computes median and MAD from active names only and gives structural zeros exact zero, with contract, manifest, summary and cell schemas all versioned; nine of the ten section-74 failures are fixed; and look accounting reconciles at 56 run looks, 3 development evaluations, 23 infrastructure looks and a 516 alpha-cell floor. | Final complete Analyst lane selection on the corrected tree **5,415 passed, 7 skipped, 0 failed, 35 warnings in 5,768.32 s (1:36:08)**, the first complete green run since the accepted-risk path began; focused three-file reproduction at `f950fe8` **1 failed, 129 passed** before the correction and the object-store battery **72 passed** after; six-trial mutation matrix, six of six caught; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **1 P2 and 3 P3** (`ARV2R76-001..004`); one corrected here with red/green evidence. `ARV2R76-001`: the no-external-I/O closure test was still red at the pushed head on an import edge added by `2d71cb3`, recorded as closed because the complete lane selection was again not run. `ARV2R76-002`: every reported IC is conditioned on price survival. | Codex counter-reviews this record commit; the complete lane selection should be run once per round before a push; the survival conditioning should be settled before later windows and ETF construction; later windows, ETF construction, leverage, deployment, orders and trading remain closed. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -13451,3 +13468,162 @@ bounded milestone implement the owner-planned later historical windows,
 followed by unlevered ETF construction and the separately specified actual and
 synthetic 3x leverage diagnostics. No paper/live deployment, broker access,
 orders, or trading is authorized.
+
+## 76. Independent Claude review of the R-054/R-055 range `baef134..f950fe8`, 2026-09-15
+
+**Range reviewed:** `baef134..f950fe8`, four commits, individually and
+cumulatively, in the dedicated lane worktree on the same branch: 14 files,
++981/-140. The range answers section 74, fixes the sparse-normalization
+defect under a new preregistration, and produces the lane's first tangible
+preliminary stock-IC evidence.
+**Disposition: ACCEPTED AFTER CORRECTION.** 0 P0, 0 P1, **1 P2 and 3 P3**
+(`ARV2R76-001..004`). One is corrected here with red/green evidence. All five
+of Codex's findings against section 74 are confirmed against this reviewer's
+own text, and one of them is worse than Codex stated (76.1).
+**Zero research looks and zero development evaluations by this review.** It
+made no QuantConnect, Massive or Sharadar call, read no provider row, opened
+no credential, and fetched no external page. Validation used Python
+**3.13.15**.
+
+### 76.1 Acknowledgement of the section-75 findings against section 74
+
+All five are confirmed. Each was checked against this reviewer's own
+committed text or by direct execution, not accepted on assertion.
+
+| ID | Confirmed? | Independent verification |
+|---|---|---|
+| `ARV2CR75-001` (P2) | Yes | `accepted_risk_preliminary_rating_evaluator.py` defines its own `MAD_SCALE` and normalization and never imports `robust_group_normalize`. Section 74's density regression exercised `research/analyst_revisions_v2/formulas.py`, a different module from the one that ran R-053, so it did not close `ARV2R74-001`. The finding was right and the test was aimed at the wrong code path. |
+| `ARV2CR75-002` (P3) | Yes, **and worse than stated** | The fixture `from __future__ import annotations` is matched by the explicit `_FUTURE` regex and refused before any `compile` call, so the test passed for the wrong reason. Worse: re-running section 74's own mutation on a pristine export of `baef134` shows the test **passes with the prelude compilation removed** (`1 passed`). Section 74 recorded a red/green proof for `ARV2R74-003` that its own evidence contradicts; this reviewer misread a passing line as red. That is the same discipline failure this reviewer has repeatedly flagged in others, and it is recorded here rather than quietly repaired. |
+| `ARV2CR75-003` (P2) | Yes, on severity | Section 74 rated the I/O inventory drift P1. The lane rubric reserves P1 for a fail-open on a safety, authorization, look-accounting or point-in-time boundary. An unverified-but-holding property is not a fail-open, and section 74 itself established that the property held. P2 is correct and this reviewer accepts the downgrade. The underlying defect was real and is only now fully closed (`ARV2R76-001`). |
+| `ARV2CR75-005` (P3) | Yes | `ARV2R74-014` reported the expected refusal reason as missing when it was already present; the actual cause was obsolete `fundamentals` fixture rows filtered once the production route became exact `SF1`. Section 74 reversed expected and actual. |
+| `ARV2CR75-008` (P3) | Yes | Section 74's own table contains 1 P1, 5 P2 and 8 P3; its summary line and ledger row claimed 1 P1, 4 P2 and 9 P3. It also used the phrase "accepted with findings" three times, which is not in the binding disposition vocabulary. Both are confirmed errors of this reviewer. |
+
+### 76.2 Commit dispositions
+
+| # | Commit | Subject | Disposition |
+|---|---|---|---|
+| 1 | `34f62a1` | Counter-review Claude and preregister sparse-signal R054 | **Accepted after correction** (`ARV2R76-001`). Fixes nine of the ten section-74 failures, versions the evaluator contract v1 to v2, and changes the normalization rule correctly. |
+| 2 | `d5457a8` | Pin R054 accounting and numerical boundary | **Accepted**. Corrects the stale `R-053` plan labelling and look counters before any signature or network call, and fixes a one-ULP false breadth refusal found by full-path replay. |
+| 3 | `2d71cb3` | Preregister R055 runtime scheduling retry | **Accepted**. Freezes the R-055 rule and the tangible-evidence gate before launch; imports the projection's slice constants from one runtime definition instead of hand-copying them, which is the change that left the unpinned edge in `ARV2R76-001`. |
+| 4 | `f950fe8` | Record tangible R055 preliminary result | **Accepted after correction** (`ARV2R76-002`, `-003`, `-004` documented). Record only. |
+
+### 76.3 Verified rather than accepted
+
+- **The pass gate was genuinely preregistered.** The exact wording, "tangible
+  means at least 50 valid dates and non-null authenticated IC/return
+  aggregates", is present in the record at commit `2d71cb3`, authored
+  10:13 PDT. The QC backtest was created at 17:23Z (10:23 PDT) and the single
+  aggregate result read at 18:10Z (11:10 PDT). The gate is therefore in git,
+  immutably timestamped, ten minutes before the job existed and an hour
+  before any outcome was read. This is the strongest form of the discipline
+  the lane is built on and it holds.
+- **The gate is counts-only.** It uses valid-date counts and non-null
+  availability, never the sign or magnitude of any metric, so a favourable
+  or unfavourable result could not have changed the pass decision.
+- **The v2 rule change is correct and versioned.** Median and MAD are now
+  computed from `active_members` only; structural-zero names receive exact
+  `Decimal(0)` rather than a manufactured z-score; contract, manifest,
+  summary and cell schemas all move v1 to v2, so a v1 artifact cannot be
+  mistaken for a v2 one.
+- **The v2 rule is isolated by tests.** Five independent single-guard
+  mutations were all caught: reverting to the v1 all-member median/MAD,
+  giving structural zeros a manufactured z-score, silently reverting the
+  contract id to v1, and falsifying each of the two new disclosure flags.
+  This is the coverage section 74 claimed but did not achieve.
+- **Nine of the ten section-74 failures are fixed.** A focused run of the
+  three affected files at `f950fe8` returns **1 failed, 129 passed**; the
+  single remaining failure is `ARV2R76-001`.
+- **Look accounting reconciles.** R-054 spent one run look and one
+  development evaluation with no result read, so the alpha-cell floor stayed
+  484; R-055 spent one more of each and moved the floor to 516. Shared run
+  looks 54 to 56, ARV2 development evaluations 1 to 3, infrastructure looks
+  unchanged at 23, permanent and confirmatory looks still zero.
+
+### 76.4 Findings
+
+| ID | P | Where | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R76-001` | P2 | `tests/analyst_revisions_v2/test_qc_object_store_read_contract.py`, projection pin | The QC-package no-external-I/O closure test still fails at `f950fe8`. `ARV2CR75-003` records it as closed and says "the closure test reaches its assertions"; the first half is true and is real progress, because the inventory pin and all three tier classifications now pass, but the test then fails deeper. `2d71cb3` made `accepted_risk_preliminary_qc_projection.py` import the runtime's slice constants instead of hand-copying them, a change this review endorses, and did not add that edge to the projection's pinned import list. Because the complete lane selection was again not run, a correction was recorded as complete on evidence that contradicts it. This is the second consecutive round in which the only defect reaching the pushed head is one the complete lane run would have shown. | **Corrected**: the edge `research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime` is added to the projection's pin. Green afterwards. The guard remains load-bearing: injecting the dangerous direction, a zero-I/O module importing a host-only adapter, still turns the test red. The edge itself is benign and in the safe direction, host-only to QC-runtime, so no unsafe execution path existed at any point. |
+| `ARV2R76-002` | P2 | `accepted_risk_preliminary_rating_evaluator.py` v2 rule 2; record 75.5 result table | The v2 rule excludes an unavailable price pair without imputation, and the reported ICs are therefore conditioned on price availability at both endpoints. The exclusion is large and structured, not incidental: on a constant denominator of 5,641,251 decision-security pairs, missing pairs run 650,493 at H1 (11.53%) rising monotonically to 713,049 at H60 (12.64%). The 11.5% floor is a level effect, names with no QC price coverage at all; the additional 1.11 percentage points from H1 to H60 is horizon attrition, and at roughly 4.4% annualized it is the order of real US delisting and acquisition rates. Those are precisely the names the lane's frozen `arv2-terminal-payoff-benchmark-splice-v1` policy exists to value, and the preliminary evaluator contains no reference to it. The record lists missing terminal payoff among the accepted-risk disclosures but never connects it to these counts, and never states that every reported IC is survival-conditioned in an unknown direction. | Documented, for Codex and the owner. Recommendation: before any formal evaluation or ETF construction, split the missing-pair census into no-coverage and terminal-event components, and either apply the frozen splice policy or state the survival conditioning explicitly alongside each IC. A preliminary diagnostic may accept this; a formal result may not inherit it unexamined. |
+| `ARV2R76-003` | P3 | Record 75.5 result table | The five IC aggregates are reported with no dispersion, interval or independent-date count beside them, which is correct for a development evaluation because inference belongs to the formal run. The consequence is that a reader sees sixteen positive mean ICs and a positive-date share rising monotonically from 0.56 at H1 to 0.69 at H60 with nothing indicating how much of that is sampling noise. The magnitudes are small in absolute terms, 0.0039 to 0.0118. | Documented. Recommendation: carry the preregistered independent-date count next to each aggregate, as the monitoring rules in the repository guidance already require for any monitoring conclusion, so the numbers cannot be read as an effect size. |
+| `ARV2R76-004` | P3 | Record 75.5 | `training_slice_count` is reported as 41 while the same paragraph states R-055 performed those slices through ordinary `OnData` and not QC `Train(...)`. The field is described as compatibility metadata, so the value is not wrong, but a field named for a mechanism the run did not use is a trap for a later reader or a later automated check. | Documented. Recommendation: rename or explicitly mark the field as a compatibility carry-over in the v3 contract. |
+
+### 76.5 Observations, not defects
+
+- The cross-section mean SPY-excess returns are negative at every horizon and
+  grow more negative with horizon, from -0.0001 at H1 to -0.0263 at H60.
+  Codex states correctly that these are aggregate universe outcomes, identical
+  across view and arm, and are not the return of any investable portfolio.
+  They describe the universe underperforming SPY over the window, not the
+  signal. Nothing in the record reads them as strategy performance.
+- R-056 was cancelled before implementation because R-055 passed by a wide
+  count margin, spending no look, evaluation or cell, and retired rather than
+  made reusable. That is the correct use of a preregistered contingency.
+- Codex found and corrected two defects by outcome-free replay before the
+  look was spent: a one-ULP false breadth refusal and stale `R-053` plan
+  labelling. Replaying the complete signal path over all 1,508 dates with an
+  empty history loader before launching is the feasibility discipline section
+  74 recommended, applied more thoroughly than recommended.
+
+### 76.6 Mutation matrix
+
+Six single-guard trials in a `git archive` export of `f950fe8`, each restored
+before the next; the worktree was never mutated.
+
+| Trial | Guard removed | Result |
+|---|---|---|
+| N1 | v2 rule reverts to the v1 all-member median and MAD, the R-053 defect | Caught |
+| N2 | Structural zeros receive a manufactured z-score instead of exact zero | Caught |
+| N3 | Evaluator contract id silently reverts to v1 | Caught |
+| N4 | `sector_normalization_uses_active_signals_only` misreports the rule | Caught |
+| N5 | `missing_price_rows_excluded_without_imputation` misreports the rule | Caught |
+| N6 | A zero-I/O module imports a host-only adapter, the forbidden direction | Caught, after the `ARV2R76-001` pin correction |
+
+Six of six caught. The v2 normalization rule is properly isolated, which is
+the coverage section 74 claimed for the wrong module.
+
+### 76.7 Correction made in this round, with red/green evidence
+
+Test-only; no production module, specification, artifact, capability, gate or
+shared file was changed by this review.
+
+1. `tests/analyst_revisions_v2/test_qc_object_store_read_contract.py`: the
+   projection's pinned import list gains
+   `research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime`
+   (`ARV2R76-001`). Red before, on a pristine export of `f950fe8`, with the
+   closure test failing on the unpinned edge; green after, with the battery
+   at **72 passed**; and still red when the dangerous zero-I/O to host-only
+   direction is injected, so the guard is not weakened by the correction.
+
+### 76.8 Validation
+
+- Complete standing Analyst lane selection on the corrected tree:
+  **5,415 passed, 7 skipped, 0 failed, 35 warnings in 5,768.32 s (1:36:08)**.
+  This is the first complete green run of the selection since section 73
+  began the accepted-risk path; the ten failures recorded in section 74 and
+  the one in `ARV2R76-001` are all resolved. Only this sentence and the
+  matching ledger sentence were written after that run.
+- Focused three-file reproduction at `f950fe8` before the correction:
+  **1 failed, 129 passed**; the object-store battery after the correction:
+  **72 passed**.
+- Six-trial single-guard mutation matrix in a `git archive` export, plus the
+  red/green trials for the correction; the export was restored after each.
+- `git diff --check` clean. Python **3.13.15**.
+- A baseline run of the same selection was started at `f950fe8` and stopped
+  at 23% once the correction was ready, because the one failure it would
+  have reported is already established by the focused reproduction above and
+  a single complete run on the final tree measures what matters.
+
+### 76.9 Next gate
+
+Codex counter-reviews section 76 and this reviewer's commits. The standing
+lane selection should be run to completion at least once per round before a
+push: two consecutive rounds have now ended with the only defect at the
+pushed head being one that run would have surfaced, and in both cases a
+correction had already been recorded as complete. Before the owner-planned
+later historical windows and ETF construction, `ARV2R76-002` should be
+settled, because survival-conditioned inputs propagate into any portfolio
+built on them and the lane already owns the policy that values the excluded
+names. `ARV2R74-008`, `ARV2R74-009` and the lane-wide `ARV2R50-022` debt
+remain open. No paper or live deployment, broker access, order or trading
+authority follows from R-055.

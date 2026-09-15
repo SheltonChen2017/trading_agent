@@ -5,12 +5,15 @@ import base64
 import dataclasses
 import hashlib
 import inspect
+import io
 import json
 import os
+import re
 import stat
 import sys
 import types
 import weakref
+import zipfile
 from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -385,6 +388,10 @@ def _projection(count: int = 2, *, sessions=None):
 
 class _Node:
     def __init__(self, **values):
+        if "time" in values and "Time" not in values:
+            values["Time"] = values["time"]
+        if "data" in values and "Data" not in values:
+            values["Data"] = values["data"]
         self.__dict__.update(values)
 
 
@@ -464,25 +471,24 @@ class _HistoryGateway:
         self.collections = collections
         self.calls: list[tuple[datetime, datetime]] = []
 
-    def __getitem__(self, item):
-        if item is not self.marker:
-            raise AssertionError("runtime requested a non-Fundamentals dataset")
-
-        def request(start: datetime, end: datetime):
-            self.calls.append((start, end))
-            return [
-                item
-                for item in self.collections
-                if start.date() <= item.time.date() < end.date()
-            ]
-
-        return request
+    def __call__(self, universe, start: datetime, end: datetime, *, flatten):
+        if universe is not self.marker:
+            raise AssertionError("runtime requested a non-Fundamentals universe")
+        if flatten is not False:
+            raise AssertionError("runtime requested flattened universe history")
+        self.calls.append((start, end))
+        return {
+            (self.marker, item.Time): item.Data
+            for item in self.collections
+            if start.date() < item.Time.date() < end.date()
+        }
 
 
 class _Algorithm:
     def __init__(self, store: _ObjectStore, history: _HistoryGateway):
         self.object_store = store
         self.history = history
+        self._arv2_fundamental_universe = history.marker
         self.summary: dict[str, str] = {}
         self._arv2_fundamental_discovery_completed = False
 
@@ -528,11 +534,11 @@ def _runtime_fixture(
     )
     collections = [
         _Node(
-            time=datetime.combine(
+            Time=datetime.combine(
                 date.fromisoformat(geometry["decision_session"]),
                 time(collection_hour),
             ),
-            data=[_fundamental(index)],
+            Data=[_fundamental(index)],
         )
         for index, geometry in enumerate(sessions, start=1)
     ]
@@ -577,7 +583,7 @@ def _write_archive(tmp_path: Path, projection, store: _ObjectStore) -> Path:
         payload = store.values[descriptor["object_store_key"]]
         path = shard_root / (
             f'{descriptor["ordinal"]:04d}-'
-            f'{descriptor["compressed_sha256"]}.jsonl.gz'
+            f'{descriptor["compressed_sha256"]}-jsonl.gz'
         )
         path.write_bytes(payload)
         path.chmod(0o600)
@@ -594,6 +600,51 @@ def _assert_no_duplicate_literal_dict_keys(source: str) -> None:
             if isinstance(key, ast.Constant) and type(key.value) is str
         ]
         assert len(keys) == len(set(keys))
+
+
+def _replace_project_source(projection, path: str, old: bytes, new: bytes):
+    sources = []
+    replaced = False
+    for source in projection.source_files:
+        if source.project_path != path:
+            sources.append(source)
+            continue
+        payload = source.content.replace(old, new, 1)
+        assert payload != source.content
+        replaced = True
+        sources.append(
+            discovery.FundamentalDiscoveryProjectSource(
+                project_path=source.project_path,
+                content_sha256=hashlib.sha256(payload).hexdigest(),
+                byte_count=len(payload),
+                character_count=len(payload.decode("utf-8")),
+                content=payload,
+            )
+        )
+    assert replaced is True
+    return tuple(sources)
+
+
+def test_projected_sources_compile_after_qc_prelude_injection():
+    """Guard the later QC IDE build failure caused by its injected prelude."""
+
+    _sessions, _plan, projection = _projection(2)
+    qc_prelude = "from AlgorithmImports import *\n"
+    for source in projection.source_files:
+        text = source.content.decode("utf-8")
+        assert "from __future__ import" not in text
+        compile(qc_prelude + text, source.project_path, "exec")
+
+
+def test_qc_projection_refuses_a_future_import_before_upload():
+    with pytest.raises(
+        FundamentalUniverseDiscoveryError,
+        match="QC project source contains an unsupported future import",
+    ):
+        discovery._source(
+            "incompatible.py",
+            b"from __future__ import annotations\nVALUE = 1\n",
+        )
 
 
 def test_contract_plan_and_projection_are_scoped_bounded_and_outcome_free():
@@ -638,12 +689,30 @@ def test_contract_plan_and_projection_are_scoped_bounded_and_outcome_free():
     assert projection.reads_prices_or_returns is False
     assert projection.reads_outcomes_or_results is False
     assert projection.places_orders_or_touches_portfolio is False
-    assert len(json.loads(plan)["history_chunks"]) == 1
+    plan_record = json.loads(plan)
+    assert len(plan_record["history_chunks"]) == 1
+    assert plan_record["history_chunks"][0]["request_start"] == (
+        "2020-12-21T00:00:00"
+    )
+    assert plan_record["history_chunks"][0]["request_end_exclusive"] == (
+        "2021-01-06T00:00:00"
+    )
     assert all(source.character_count <= 60_000 for source in projection.source_files)
     source_text = "\n".join(
         source.content.decode("utf-8") for source in projection.source_files
     )
-    assert source_text.count("algorithm.history[Fundamentals]") == 1
+    assert source_text.count(
+        "algorithm.history(\n            algorithm._arv2_fundamental_universe,"
+    ) == 1
+    assert source_text.count(
+        "self._arv2_fundamental_universe = self.AddUniverse(lambda fundamentals: [])"
+    ) == 1
+    assert source_text.count("self.set_summary_statistic(\n") == 1
+    assert source_text.index("def on_end_of_algorithm(self):") < source_text.index(
+        "self.set_summary_statistic(\n"
+    )
+    runtime_text = _project_source(projection, discovery.RUNTIME_PATH)
+    assert "algorithm.set_summary_statistic(" not in runtime_text
     assert "set_time_zone(\"America/New_York\")" in source_text
     for source in projection.source_files:
         _assert_no_duplicate_literal_dict_keys(source.content.decode("utf-8"))
@@ -660,6 +729,44 @@ def test_contract_plan_and_projection_are_scoped_bounded_and_outcome_free():
             decision_sessions=noncontiguous,
             calculation_session="2021-01-06",
         )
+
+
+@pytest.mark.parametrize(
+    ("path", "old", "new", "message"),
+    (
+        (
+            discovery.RUNTIME_PATH,
+            b"algorithm.history(\n",
+            b"algorithm.History(\n",
+            "history request is not the exact reviewed unflattened universe date-range call",
+        ),
+        (
+            discovery.ENTRY_PATH,
+            b"self.AddUniverse(lambda fundamentals: [])",
+            b"self.AddUniverse(lambda fundamentals: [fundamentals[0].symbol])",
+            "fundamental universe constructor is not the exact no-selection call",
+        ),
+        (
+            discovery.RUNTIME_PATH,
+            b"algorithm.history(\n",
+            b"algorithm.FetchUniverseHistory(\n",
+            "project must contain exactly one fundamental universe history request",
+        ),
+        (
+            discovery.ENTRY_PATH,
+            b"self.AddUniverse(lambda fundamentals: [])",
+            b"self.BuildUniverse(lambda fundamentals: [])",
+            "project must contain exactly one no-selection fundamental universe",
+        ),
+    ),
+)
+def test_source_audit_isolates_each_universe_history_guard(
+    path, old, new, message
+):
+    _sessions, _plan, projection = _projection(1)
+    sources = _replace_project_source(projection, path, old, new)
+    with pytest.raises(FundamentalUniverseDiscoveryError, match=re.escape(message)):
+        discovery._audit_source_capabilities(sources)
 
 
 def test_source_axis_capacity_admits_3300_sessions_but_refuses_3301():
@@ -816,16 +923,26 @@ def test_worker_terminalizes_named_refusals_and_exact_out_of_scope_reason():
     assert census["out_of_scope_count"] == 1
     assert census["named_refusal_count"] == 1
 
-    with pytest.raises(ValueError, match="repeats a QC SecurityIdentifier"):
-        worker["build_collection_terminals"](
-            fundamentals=[
-                _fundamental(1, qc_sid="DUPLICATE"),
-                _fundamental(2, qc_sid="DUPLICATE"),
-            ],
-            decision_session=geometry["decision_session"],
-            decision_session_ordinal=geometry["decision_session_ordinal"],
-            decision_open_utc=geometry["decision_open_utc"],
-        )
+    duplicate_rows, duplicate_census = worker["build_collection_terminals"](
+        fundamentals=[
+            _fundamental(1, qc_sid="DUPLICATE"),
+            _fundamental(2, qc_sid="DUPLICATE"),
+        ],
+        decision_session=geometry["decision_session"],
+        decision_session_ordinal=geometry["decision_session_ordinal"],
+        decision_open_utc=geometry["decision_open_utc"],
+    )
+    assert [row["disposition"] for row in duplicate_rows] == [
+        "named_refusal",
+        "named_refusal",
+    ]
+    assert {
+        row["refusal_reason"] for row in duplicate_rows
+    } == {"duplicate_qc_security_identifier_in_collection"}
+    assert all(row["qc_security_id"] is None for row in duplicate_rows)
+    assert duplicate_census["source_member_count"] == 2
+    assert duplicate_census["terminal_count"] == 2
+    assert duplicate_census["named_refusal_count"] == 2
 
 
 def test_runtime_archive_loader_and_streaming_receipt_are_exact(monkeypatch, tmp_path):
@@ -884,6 +1001,91 @@ def test_runtime_archive_loader_and_streaming_receipt_are_exact(monkeypatch, tmp
         match="owner-only regular file|identity changed",
     ):
         require_reviewed_fundamental_universe_discovery_receipt(receipt)
+
+
+def test_runtime_refuses_a_non_series_history_with_its_distinct_message(monkeypatch):
+    (
+        _sessions,
+        _plan,
+        _projection,
+        runtime,
+        algorithm,
+        constants,
+    ) = _runtime_fixture(monkeypatch, count=1)
+    algorithm.history = lambda _universe, _start, _end, **_kwargs: object()
+    with pytest.raises(ValueError, match="Fundamentals history is not an item series"):
+        runtime._run(algorithm, constants)
+
+
+def test_runtime_refuses_a_non_pair_history_index_with_its_distinct_message(
+    monkeypatch,
+):
+    (
+        _sessions,
+        _plan,
+        _projection,
+        runtime,
+        _algorithm,
+        _constants,
+    ) = _runtime_fixture(monkeypatch, count=1)
+    with pytest.raises(
+        ValueError,
+        match=r"Fundamentals history index is not \(universe, time\)",
+    ):
+        runtime._collection_geometry(("only-one-item",))
+
+
+def test_runtime_reports_only_position_counts_for_missing_history(monkeypatch):
+    (
+        _sessions,
+        _plan,
+        projection,
+        runtime,
+        algorithm,
+        constants,
+    ) = _runtime_fixture(monkeypatch, count=2)
+    algorithm.history.collections = algorithm.history.collections[1:]
+    expected_reason = (
+        "discovery_runtime_refused_history_coverage_"
+        "missing_0_matched_1_before_0_after_0_inside_0"
+    )
+    with pytest.raises(RuntimeError, match=expected_reason):
+        runtime.execute_fundamental_universe_discovery(algorithm, constants)
+    package = json.loads(
+        algorithm.object_store.values[projection.terminal_package_key]
+    )
+    failure = json.loads(
+        algorithm.object_store.values[package["failure_key"]]
+    )
+    assert failure["safe_reason"] == expected_reason
+
+
+def test_runtime_carries_only_the_latest_prior_snapshot_across_a_weekend(
+    monkeypatch,
+):
+    (
+        _sessions,
+        _plan,
+        _projection,
+        runtime,
+        algorithm,
+        constants,
+    ) = _runtime_fixture(monkeypatch, count=2)
+    algorithm.history.collections[0].Time = datetime(2021, 1, 2)
+    manifest = runtime.execute_fundamental_universe_discovery(
+        algorithm, constants
+    )
+    censuses = manifest["decision_session_censuses"]
+    assert [row["decision_session"] for row in censuses] == [
+        "2021-01-04",
+        "2021-01-05",
+    ]
+    assert censuses[0]["qc_history_collection_time"].startswith(
+        "2021-01-02T00:00:00"
+    )
+    assert censuses[1]["qc_history_collection_time"].startswith(
+        "2021-01-05T00:00:00"
+    )
 
 
 def test_loader_and_iterator_support_seven_shards_without_payload_mapping(
@@ -954,14 +1156,78 @@ def test_runtime_refuses_insufficient_object_store_capacity_before_history(
         constants,
     ) = _runtime_fixture(monkeypatch, count=1)
     setattr(algorithm.object_store, capacity_field, 1)
-    with pytest.raises(RuntimeError, match="discovery refused"):
+    expected_reason = (
+        "discovery_runtime_refused_capacity_size_lt_50mib_"
+        "files_1000_to_lt_20000"
+        if capacity_field == "max_size"
+        else "discovery_runtime_refused_capacity_size_10gib_to_lt_50gib_"
+        "files_lt_1000"
+    )
+    with pytest.raises(RuntimeError, match=re.escape(expected_reason)):
         runtime.execute_fundamental_universe_discovery(algorithm, constants)
     assert algorithm.history.calls == []
     package = json.loads(
         algorithm.object_store.values[projection.terminal_package_key]
     )
     assert package["status"] == "named_refusal"
+    failure = json.loads(
+        algorithm.object_store.values[package["failure_key"]]
+    )
+    assert failure["safe_reason"] == expected_reason
     assert package["outcome_access_performed"] is False
+
+
+def test_runtime_capacity_preflight_uses_the_exact_planned_session_census(
+    monkeypatch,
+):
+    (
+        _sessions,
+        _plan,
+        _projection,
+        runtime,
+        algorithm,
+        constants,
+    ) = _runtime_fixture(monkeypatch, count=3)
+    algorithm.object_store.max_size = 50 * 1024 * 1024
+    algorithm.object_store.max_files = 1_000
+
+    manifest = runtime.execute_fundamental_universe_discovery(
+        algorithm, constants
+    )
+
+    assert manifest["census"]["decision_session_count"] == 3
+    assert algorithm._arv2_fundamental_discovery_completed is True
+
+
+def test_runtime_unexpected_refusal_identity_exposes_location_but_not_message(
+    monkeypatch,
+):
+    (
+        _sessions,
+        _plan,
+        _projection,
+        runtime,
+        _algorithm,
+        _constants,
+    ) = _runtime_fixture(monkeypatch, count=1)
+    secret = "fixture-sensitive-value-must-not-leave-runtime"
+
+    def _boom():
+        raise TypeError(secret)
+
+    try:
+        _boom()
+    except TypeError as error:
+        reason = runtime._safe_refusal_id(error)
+
+    assert re.fullmatch(
+        r"discovery_runtime_refused_TypeError_at_"
+        r"_boom_"
+        r"line_[0-9]+_[0-9a-f]{16}",
+        reason,
+    )
+    assert reason.endswith(hashlib.sha256(secret.encode()).hexdigest()[:16])
+    assert secret not in reason
 
 
 def test_archive_leaf_symlink_and_unreviewed_receipt_are_refused(
@@ -999,6 +1265,7 @@ class _DiscoveryQcBackend:
         self.events: list[str] = []
         self.fail_authenticate = False
         self.terminal_status = "Completed."
+        self.backtest_list_extra: dict[str, object] = {}
 
     def project(self):
         return {
@@ -1035,16 +1302,28 @@ class _DiscoveryQcBackend:
                     for name, content in sorted(self.files.items())
                 ],
             }
-        if path == "files/create":
+        if path in {"files/create", "files/update"}:
             self.files[payload["name"]] = payload["content"]
             return {"success": True}
+        if path == "files/delete":
+            del self.files[payload["name"]]
+            return {"success": True}
         if path == "compile/create":
-            return {"success": True, "compileId": "discovery-compile"}
+            return {
+                "success": True,
+                "compileId": "discovery-compile",
+                "state": "InQueue",
+                "parameters": [],
+                "projectId": 987,
+                "signature": "discovery-signature",
+                "signatureOrder": [],
+            }
         if path == "compile/read":
             return {
                 "success": True,
                 "compileId": "discovery-compile",
                 "state": "BuildSuccess",
+                "logs": ["discard-only compile fixture"],
             }
         if path == "backtests/create":
             return {
@@ -1058,19 +1337,19 @@ class _DiscoveryQcBackend:
             }
         if path == "backtests/list":
             assert payload["includeStatistics"] is False
+            row = {
+                "backtestId": "discovery-backtest",
+                "name": self.plan.backtest_name,
+                "projectId": 987,
+                "status": self.terminal_status,
+                # The status parser permits but never indexes this value.
+                "statistics": {"Sharpe Ratio": "forbidden-result"},
+                **self.backtest_list_extra,
+            }
             return {
                 "success": True,
                 "count": 1,
-                "backtests": [
-                    {
-                        "backtestId": "discovery-backtest",
-                        "name": self.plan.backtest_name,
-                        "projectId": 987,
-                        "status": self.terminal_status,
-                        # The status parser permits but never indexes this value.
-                        "statistics": {"Sharpe Ratio": "forbidden-result"},
-                    }
-                ],
+                "backtests": [row],
             }
         if path == "object/read":
             value = self.objects[payload["key"]]
@@ -1085,8 +1364,26 @@ class _DiscoveryQcBackend:
 
 
 def _discovery_transport(backend: _DiscoveryQcBackend):
+    job_keys: dict[str, str] = {}
+    download_keys: dict[str, str] = {}
+    job_serial = 0
+
+    def archive_for(key: str) -> bytes:
+        output = io.BytesIO()
+        with zipfile.ZipFile(
+            output, "w", compression=zipfile.ZIP_DEFLATED
+        ) as archive:
+            archive.writestr(key, backend.objects[key])
+        return output.getvalue()
+
     def http(url, body, headers, timeout):
+        nonlocal job_serial
         del timeout
+        if url in download_keys:
+            assert body == b""
+            assert headers == {}
+            backend.events.append("object/download")
+            return 200, archive_for(download_keys.pop(url))
         assert "Authorization" in headers
         path = url.split("/api/v2/", 1)[1]
         if path == "object/set":
@@ -1105,7 +1402,41 @@ def _discovery_transport(backend: _DiscoveryQcBackend):
             result = {"success": True}
         else:
             payload = json.loads(body)
-            if path == "object/properties":
+            if path == "object/get":
+                backend.events.append(path)
+                assert payload["organizationId"] == backend.plan.organization_id
+                if set(payload) == {"organizationId", "keys"}:
+                    assert (
+                        type(payload["keys"]) is list
+                        and len(payload["keys"]) == 1
+                    )
+                    key = payload["keys"][0]
+                    assert key in backend.objects
+                    job_serial += 1
+                    job_id = f"discovery-object-job-{job_serial}"
+                    job_keys[job_id] = key
+                    result = {
+                        "jobId": job_id,
+                        "url": None,
+                        "success": True,
+                        "errors": [],
+                    }
+                else:
+                    assert set(payload) == {"organizationId", "jobId"}
+                    job_id = payload["jobId"]
+                    key = job_keys.pop(job_id)
+                    signed_url = (
+                        "https://object-download.quantconnect.com/"
+                        f"{job_id}.zip?signature=offline-fixture"
+                    )
+                    download_keys[signed_url] = key
+                    result = {
+                        "jobId": job_id,
+                        "url": signed_url,
+                        "success": True,
+                        "errors": [],
+                    }
+            elif path == "object/properties":
                 stored = backend.objects[payload["key"]]
                 backend.events.append(path)
                 result = {
@@ -1150,6 +1481,7 @@ def _submission_fixture(monkeypatch, tmp_path):
         organization_id="discovery-test-organization",
         review_directory=tmp_path,
         archive_root=tmp_path / "fundamental-universe-discovery-archive",
+        attempt_ordinal=1,
     )
     claim_path = tmp_path / submission.REVIEW_CLAIM_FILENAME
     claim_path.write_bytes(
@@ -1192,6 +1524,89 @@ def _submission_fixture(monkeypatch, tmp_path):
     return plan, claim, _offline_owner_signature(), client, backend
 
 
+def test_discovery_attempt_ordinal_derives_a_fresh_bounded_project_name(
+    monkeypatch, tmp_path,
+) -> None:
+    plan, _claim, _owner_signature, _client, _backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    second_review_root = tmp_path / "attempt-two"
+    second_review_root.mkdir(mode=0o700)
+    second = submission.build_fundamental_discovery_submission_plan(
+        projection=plan.projection,
+        organization_id=plan.organization_id,
+        review_directory=second_review_root,
+        archive_root=(
+            second_review_root / "fundamental-universe-discovery-archive"
+        ),
+        attempt_ordinal=2,
+    )
+
+    assert plan.project_name != plan.projection.project_name
+    assert second.project_name != plan.projection.project_name
+    assert plan.project_name != second.project_name
+    assert "_A000001_" in plan.project_name
+    assert "_A000002_" in second.project_name
+    assert plan.project_name.endswith(plan.attempt_binding_sha256[:32])
+    assert second.project_name.endswith(second.attempt_binding_sha256[:32])
+    assert len(plan.project_name.encode("utf-8")) <= (
+        submission.MAX_DISCOVERY_PROJECT_NAME_BYTES
+    )
+    assert len(second.project_name.encode("utf-8")) <= (
+        submission.MAX_DISCOVERY_PROJECT_NAME_BYTES
+    )
+    assert plan.attempt_binding_sha256 != second.attempt_binding_sha256
+    assert plan.plan_sha256 != second.plan_sha256
+
+
+@pytest.mark.parametrize("attempt_ordinal", [False, 0, 1_000_000])
+def test_discovery_attempt_ordinal_refuses_non_exact_or_out_of_range_values(
+    monkeypatch, tmp_path, attempt_ordinal,
+) -> None:
+    plan, _claim, _owner_signature, _client, _backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    second_review_root = tmp_path / f"invalid-{attempt_ordinal!s}"
+    second_review_root.mkdir(mode=0o700)
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="attempt ordinal changed",
+    ):
+        submission.build_fundamental_discovery_submission_plan(
+            projection=plan.projection,
+            organization_id=plan.organization_id,
+            review_directory=second_review_root,
+            archive_root=(
+                second_review_root / "fundamental-universe-discovery-archive"
+            ),
+            attempt_ordinal=attempt_ordinal,
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement"),
+    (
+        ("attempt_ordinal", 2),
+        ("attempt_binding_sha256", "0" * 64),
+        ("project_name", "1 ARV2_COLLISION"),
+        ("qc_default_research_notebook_path", "Research.ipynb"),
+        ("maximum_default_notebook_deletions", 0),
+    ),
+)
+def test_discovery_attempt_identity_tamper_refuses_reauthentication(
+    monkeypatch, tmp_path, field, replacement,
+) -> None:
+    plan, _claim, _owner_signature, _client, _backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    tampered = dataclasses.replace(plan, **{field: replacement})
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="discovery submission plan changed",
+    ):
+        submission.require_fundamental_discovery_submission_plan(tampered)
+
+
 def test_discovery_review_claim_truthfully_records_exact_owner_waiver(
     monkeypatch, tmp_path,
 ) -> None:
@@ -1201,9 +1616,10 @@ def test_discovery_review_claim_truthfully_records_exact_owner_waiver(
     raw = json.loads(
         submission.render_fundamental_discovery_review_claim_candidate(plan)
     )
-    assert raw["schema"] == (
-        "arv2-qc-fundamental-discovery-review-claim-v2"
-    )
+    assert raw["schema"] == submission.REVIEW_CLAIM_SCHEMA
+    assert raw["attempt_ordinal"] == plan.attempt_ordinal
+    assert raw["attempt_binding_sha256"] == plan.attempt_binding_sha256
+    assert raw["project_name"] == plan.project_name
     assert raw["review_disposition"] == "NOT_PERFORMED_OWNER_WAIVED"
     assert raw["independent_review_complete"] is False
     assert raw["authorization_basis"] == "OWNER_EXPLICIT_REVIEW_WAIVER"
@@ -1338,9 +1754,10 @@ def test_offline_submission_adapter_executes_exact_outcome_free_flow(
         )
     )
     assert plan.maximum_output_object_reads == 3_302
-    assert authority["schema"] == (
-        "arv2-qc-fundamental-discovery-execution-authority-v2"
-    )
+    assert authority["schema"] == submission.EXECUTION_AUTHORITY_SCHEMA
+    assert authority["attempt_ordinal"] == plan.attempt_ordinal
+    assert authority["attempt_binding_sha256"] == plan.attempt_binding_sha256
+    assert authority["project_name"] == plan.project_name
     assert authority["review_claim_sha256"] == claim.claim_sha256
     assert authority["review_authorization"] == {
         "review_disposition": "NOT_PERFORMED_OWNER_WAIVED",
@@ -1356,6 +1773,10 @@ def test_offline_submission_adapter_executes_exact_outcome_free_flow(
     }
     assert authority["actions"] == list(submission.EXECUTION_ACTIONS)
     assert authority["maximum_backtest_submissions"] == 1
+    assert plan.maximum_default_notebook_deletions == 1
+    assert plan.qc_default_research_notebook_path == "research.ipynb"
+    assert authority["maximum_default_notebook_deletions"] == 1
+    assert authority["qc_default_research_notebook_path"] == "research.ipynb"
     assert authority["include_statistics"] is False
     assert authority["outcome_result_statistics_log_order_access"] is False
     assert authority["retry_after_ambiguity"] is False
@@ -1396,7 +1817,8 @@ def test_offline_submission_adapter_executes_exact_outcome_free_flow(
     assert receipt.production_preopen_input_available is False
     assert receipt.outcome_access_performed is False
     assert backend.events.count("backtests/create") == 1
-    assert backend.events.count("object/read") == 3
+    assert backend.events.count("object/get") == 6
+    assert backend.events.count("object/download") == 3
     assert "backtests/read" not in backend.events
     assert "projects/delete" not in backend.events
     assert set(backend.files) == {item.project_path for item in plan.source_files}
@@ -1436,10 +1858,451 @@ def test_offline_submission_ambiguity_consumes_permit_and_forbids_retry(
     assert backend.events == observed
 
 
+def test_new_private_project_updates_only_an_existing_projected_default_file(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    projected = {item.project_path: item for item in plan.source_files}
+    assert "main.py" in projected
+    backend.files["main.py"] = "# QuantConnect default\n"
+
+    submission.execute_fundamental_discovery_submission_once(
+        plan=plan,
+        review_claim=claim,
+        owner_signature=owner_signature,
+        client=client,
+        started_at_utc="2026-09-14T00:00:00.000000Z",
+    )
+
+    assert backend.events.count("files/update") == 1
+    assert backend.events.count("files/create") == len(projected) - 1
+    assert "files/delete" not in backend.events
+    assert set(backend.files) == set(projected)
+    assert all(
+        backend.files[path].encode("utf-8") == source.content
+        for path, source in projected.items()
+    )
+
+
+def test_new_private_project_deletes_only_the_exact_qc_default_notebook(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    projected = {item.project_path: item for item in plan.source_files}
+    backend.files.update(
+        {
+            "main.py": "# QuantConnect default\n",
+            "research.ipynb": '{"cells": []}',
+        }
+    )
+
+    submission.execute_fundamental_discovery_submission_once(
+        plan=plan,
+        review_claim=claim,
+        owner_signature=owner_signature,
+        client=client,
+        started_at_utc="2026-09-14T00:00:00.000000Z",
+    )
+
+    assert backend.events.count("files/delete") == 1
+    assert backend.events.count("files/update") == 1
+    assert backend.events.count("files/create") == len(projected) - 1
+    assert "research.ipynb" not in backend.files
+    assert set(backend.files) == set(projected)
+
+
+@pytest.mark.parametrize(
+    "unprojected_paths",
+    (
+        ("Research.ipynb",),
+        ("notebooks/research.ipynb",),
+        ("research.ipynb", "unexpected.py"),
+    ),
+)
+def test_new_private_project_refuses_wrong_or_additional_default_paths_before_delete(
+    monkeypatch, tmp_path, unprojected_paths
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    backend.files.update({path: "UNPROJECTED" for path in unprojected_paths})
+
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ) as caught:
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-14T00:00:00.000000Z",
+        )
+
+    assert type(caught.value.__cause__) is (
+        submission.FundamentalDiscoverySubmissionError
+    )
+    assert "unprojected source" in str(caught.value.__cause__)
+    assert "files/delete" not in backend.events
+    assert "files/create" not in backend.events
+    assert "files/update" not in backend.events
+
+
+def test_preexisting_project_name_refuses_before_any_default_notebook_delete(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    backend.created = True
+    backend.files["research.ipynb"] = '{"cells": []}'
+
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ) as caught:
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-14T00:00:00.000000Z",
+        )
+
+    assert type(caught.value.__cause__) is (
+        submission.FundamentalDiscoverySubmissionError
+    )
+    assert "already exists" in str(caught.value.__cause__)
+    assert "projects/create" not in backend.events
+    assert "files/read" not in backend.events
+    assert "files/delete" not in backend.events
+
+
+def test_new_private_project_refuses_every_unprojected_existing_file(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    backend.files["unprojected.ipynb"] = "PRIVATE UNPROJECTED CONTENT"
+
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ) as caught:
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-14T00:00:00.000000Z",
+        )
+    assert type(caught.value.__cause__) is (
+        submission.FundamentalDiscoverySubmissionError
+    )
+    assert "unprojected source" in str(caught.value.__cause__)
+    assert "files/create" not in backend.events
+    assert "files/update" not in backend.events
+    assert "files/delete" not in backend.events
+    assert "compile/create" not in backend.events
+    assert "backtests/create" not in backend.events
+
+
 def _load_projects_read_schema_diagnostic(plan):
     path = plan.archive_root / submission.PROJECT_SCHEMA_DIAGNOSTIC_FILENAME
     payload = path.read_bytes()
     return path, payload, json.loads(payload)
+
+
+def _load_files_read_schema_diagnostic(plan):
+    path = plan.archive_root / submission.FILES_SCHEMA_DIAGNOSTIC_FILENAME
+    payload = path.read_bytes()
+    return path, payload, json.loads(payload)
+
+
+def _load_backtests_list_schema_diagnostic(plan):
+    path = plan.archive_root / submission.BACKTEST_LIST_SCHEMA_DIAGNOSTIC_FILENAME
+    payload = path.read_bytes()
+    return path, payload, json.loads(payload)
+
+
+def test_backtests_list_unknown_item_persists_bounded_types_only_diagnostic(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    permit, launch = submission.execute_fundamental_discovery_submission_once(
+        plan=plan,
+        review_claim=claim,
+        owner_signature=owner_signature,
+        client=client,
+        started_at_utc="2026-09-14T00:00:00.000000Z",
+    )
+    forbidden = "PRIVATE RESULT VALUE MUST NOT BE RETAINED"
+    backend.backtest_list_extra = {
+        "futureSummaryField": {"private": forbidden}
+    }
+
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="terminal_status",
+    ) as caught:
+        submission.inspect_fundamental_discovery_terminal_status(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            permit=permit,
+            launch=launch,
+            client=client,
+        )
+    assert type(caught.value.__cause__) is (
+        submission.formal.FormalQcSubmissionError
+    )
+    path, payload, receipt = _load_backtests_list_schema_diagnostic(plan)
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+    assert forbidden.encode("utf-8") not in payload
+    assert plan.project_name.encode("utf-8") not in payload
+    assert plan.backtest_name.encode("utf-8") not in payload
+    assert receipt["operation"] == "backtests/list"
+    assert receipt["phase"] == "terminal_status_poll"
+    assert receipt["response_values_retained"] is False
+    assert receipt["backtest_names_or_identifiers_retained"] is False
+    assert receipt["results_statistics_logs_orders_retained"] is False
+    shapes = receipt["observation"]["backtest_record_shapes"]
+    assert any(
+        {"field_name": "futureSummaryField", "json_type": "object"}
+        in shape["fields"]
+        for shape in shapes
+    )
+
+
+def test_files_read_diagnostic_requires_exact_phase_and_plan_bound_permit(
+    monkeypatch, tmp_path
+):
+    plan, _claim, _owner_signature, _client, _backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="phase changed",
+    ):
+        submission._persist_files_read_schema_diagnostic(
+            plan=plan,
+            permit=object(),
+            phase="projects/read",
+            response=object(),
+        )
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionError,
+        match="permit changed",
+    ):
+        submission._persist_files_read_schema_diagnostic(
+            plan=plan,
+            permit=object(),
+            phase="initial_source_inventory",
+            response=object(),
+        )
+    assert not plan.archive_root.exists()
+
+
+def test_files_read_item_refusal_persists_types_only_and_stays_one_use(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_request = backend.request
+    forbidden_values = (
+        "PRIVATE FILE NAME MUST NOT LEAK",
+        "PRIVATE SOURCE CONTENT MUST NOT LEAK",
+        "PRIVATE UNKNOWN VALUE MUST NOT LEAK",
+    )
+
+    def request(path, payload):
+        if path == "files/read":
+            backend.events.append(path)
+            return {
+                "success": True,
+                "files": [
+                    {
+                        "id": None,
+                        "projectId": 987,
+                        "name": forbidden_values[0],
+                        "content": forbidden_values[1],
+                        "modified": "2026-09-14T00:00:00Z",
+                        "open": False,
+                        "isLibrary": False,
+                        "newFileField": forbidden_values[2],
+                    }
+                ],
+            }
+        return original_request(path, payload)
+
+    backend.request = request
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit remains consumed",
+    ) as caught:
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-14T00:00:00.000000Z",
+        )
+    assert type(caught.value.__cause__) is submission.formal.FormalQcSubmissionError
+
+    path, payload, receipt = _load_files_read_schema_diagnostic(plan)
+    assert stat.S_IMODE(plan.archive_root.stat().st_mode) == 0o700
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+    assert path.stat().st_nlink == 1
+    assert receipt["schema"] == submission.FILES_SCHEMA_DIAGNOSTIC_RECEIPT_SCHEMA
+    assert receipt["operation"] == "files/read"
+    assert receipt["phase"] == "initial_source_inventory"
+    assert receipt["response_values_retained"] is False
+    assert receipt["file_names_or_content_retained"] is False
+    assert receipt["source_or_project_values_retained"] is False
+    assert receipt["results_statistics_logs_orders_retained"] is False
+    assert receipt["observation"]["top_level"]["fields"] == [
+        {"field_name": "files", "json_type": "array"},
+        {"field_name": "success", "json_type": "boolean"},
+    ]
+    assert receipt["observation"]["file_record_shapes"] == [
+        {
+            "json_type": "object",
+            "fields": [
+                {"field_name": "content", "json_type": "string"},
+                {"field_name": "id", "json_type": "null"},
+                {"field_name": "isLibrary", "json_type": "boolean"},
+                {"field_name": "modified", "json_type": "string"},
+                {"field_name": "name", "json_type": "string"},
+                {"field_name": "newFileField", "json_type": "string"},
+                {"field_name": "open", "json_type": "boolean"},
+                {"field_name": "projectId", "json_type": "number"},
+            ],
+        }
+    ]
+    assert all(value.encode("utf-8") not in payload for value in forbidden_values)
+    assert plan.project_name.encode("utf-8") not in payload
+    assert "files/create" not in backend.events
+    assert "compile/create" not in backend.events
+    assert "backtests/create" not in backend.events
+    assert (plan.review_directory / submission.PERMIT_FILENAME).exists()
+
+    observed_events = list(backend.events)
+    with pytest.raises(
+        submission.FundamentalDiscoverySubmissionLocked,
+        match="permit already spent or unavailable",
+    ):
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-14T00:01:00.000000Z",
+        )
+    assert backend.events == observed_events
+    assert path.read_bytes() == payload
+
+
+def test_files_readback_schema_refusal_records_distinct_phase_without_values(
+    monkeypatch, tmp_path
+):
+    plan, claim, owner_signature, client, backend = _submission_fixture(
+        monkeypatch, tmp_path
+    )
+    original_request = backend.request
+    reads = 0
+    forbidden_value = "PRIVATE READBACK VALUE MUST NOT LEAK"
+
+    def request(path, payload):
+        nonlocal reads
+        if path == "files/read":
+            reads += 1
+            if reads == 2:
+                backend.events.append(path)
+                return {
+                    "success": True,
+                    "files": [
+                        {
+                            "name": name,
+                            "content": content,
+                            "newReadbackField": forbidden_value,
+                        }
+                        for name, content in sorted(backend.files.items())
+                    ],
+                }
+        return original_request(path, payload)
+
+    backend.request = request
+    with pytest.raises(submission.FundamentalDiscoverySubmissionLocked):
+        submission.execute_fundamental_discovery_submission_once(
+            plan=plan,
+            review_claim=claim,
+            owner_signature=owner_signature,
+            client=client,
+            started_at_utc="2026-09-14T00:00:00.000000Z",
+        )
+
+    _path, payload, receipt = _load_files_read_schema_diagnostic(plan)
+    assert receipt["phase"] == "source_readback"
+    fields = receipt["observation"]["file_record_shapes"][0]["fields"]
+    assert {item["field_name"] for item in fields} == {
+        "content",
+        "name",
+        "newReadbackField",
+    }
+    assert forbidden_value.encode("utf-8") not in payload
+    assert all(
+        source.content not in payload
+        for source in plan.source_files
+    )
+    assert "compile/create" not in backend.events
+    assert "backtests/create" not in backend.events
+
+
+@pytest.mark.parametrize("hostile_kind", ("too_many_records", "too_many_shapes"))
+def test_files_read_diagnostic_bounds_file_record_inventory(
+    hostile_kind,
+):
+    secret = "PRIVATE FILE VALUE MUST NOT LEAK"
+    if hostile_kind == "too_many_records":
+        files = [
+            {"name": secret, "content": secret}
+            for _index in range(
+                submission.MAX_FILES_SCHEMA_DIAGNOSTIC_RECORDS + 1
+            )
+        ]
+        expected_marker = "__oversized_file_inventory_refused__"
+        expected_type = "array"
+    else:
+        files = [
+            {f"uniqueField{index}": secret}
+            for index in range(
+                submission.MAX_FILES_SCHEMA_DIAGNOSTIC_UNIQUE_SHAPES + 1
+            )
+        ]
+        expected_marker = "__unique_shape_limit_refused__"
+        expected_type = "object"
+
+    observation = submission._files_read_schema_diagnostic_observation(
+        {"success": True, "files": files}
+    )
+
+    assert observation["file_record_shapes"] == [
+        {
+            "json_type": expected_type,
+            "fields": [
+                {"field_name": expected_marker, "json_type": expected_type}
+            ],
+        }
+    ]
+    assert secret.encode("utf-8") not in submission._canonical(observation)
 
 
 def test_projects_read_diagnostic_requires_exact_phase_and_plan_bound_permit(

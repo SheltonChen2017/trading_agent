@@ -197,7 +197,7 @@ PERMANENT_LOOK_AUTHORITY_PATH = (
 INFRASTRUCTURE_LOOK_LEDGER_SCHEMA = "arv2-infrastructure-look-ledger-v1"
 INFRASTRUCTURE_LOOK_LEDGER_ID_PREFIX = "arv2-infrastructure-look-ledger-"
 INFRASTRUCTURE_LOOK_LEDGER_HASH = (
-    "ff61ca806563510dbe384d8801d2537c3655fe1432651f4d94673e14a7648457"
+    "11987a12b72d06ea612b442e342ce0b1d2f28c503f0a3b1ca2cf721d8aaa7810"
 )
 INFRASTRUCTURE_LOOK_LEDGER_FILENAME = (
     f"arv2_infrastructure_look_ledger.{INFRASTRUCTURE_LOOK_LEDGER_HASH}.json"
@@ -206,11 +206,43 @@ INFRASTRUCTURE_LOOK_LEDGER_PATH = (
     Path(__file__).resolve().parent / "specs" / INFRASTRUCTURE_LOOK_LEDGER_FILENAME
 )
 INFRASTRUCTURE_LOOK_LEDGER_ARTIFACT_SHA256 = (
-    "9502bc3b1662b5f2838d42d4adf6c8c91141395b89c9ba77edcd31542bd7d14f"
+    "b1018c54128b9cea5ff0c960e0c6adeab803b085b9dde359f323246d0f82e802"
 )
 INFRASTRUCTURE_LOOK_LEDGER_MAX_BYTES = 64 * 1024
 INFRASTRUCTURE_LOOK_OWNER_DECISION_ID = (
-    "arv2-owner-arv2r49-002-accounting-20260913"
+    "arv2-owner-discovery-look-reconciliation-20260914"
+)
+_DISCOVERY_RECONCILIATION_ARTIFACT_SHA256 = (
+    "67071bcafa3ec65912983ba0c0834a5980ffaac63c0c2c75bb2f4c3720460a15"
+)
+# Each tuple is: shared ledger ordinal, discovery attempt ordinal, QC project
+# id, QC backtest id, terminal status, one-use-permit start, plan SHA-256,
+# preparation-summary artifact SHA-256, and execution-permit artifact SHA-256.
+# These are identity/status-only facts from a statistics-free reconciliation;
+# no result, statistic, log, chart, order, provider row, or outcome was read.
+_DISCOVERY_INFRASTRUCTURE_LOOKS = (
+    (31, 7, 36536115, "0014d18dc88f67f958d559a183079a86", "Runtime Error", "2026-09-14T15:08:30.552233Z", "9493a2e0644e3cabd50d25a1f574e89678111f087dfcb9ec96aff5307657dc6a", "732f5eba253a6ff2f4cff8a9e878e5092c50cecc52e93a57f2301a13f9f0a873", "48a334b445075da5ef6fa967cbfbafdb29cbfe0374b3ac1cf9c38b85feb7c2e7"),
+    (32, 8, 36536326, "1054c989da3711446af17a557b637733", "Runtime Error", "2026-09-14T15:14:33.142831Z", "68646eb3b6c0505d9372ff2e0e8ba895d18523135f06977d56169772bf927132", "9dab0bdae7eb237eb72da29191b04a2fa6960931c6e664c6524861f6ba6c7d9d", "f2f1ad9c4017a537f42c751646f38a835da91651dc449b58777dea10bc69d4d9"),
+    (33, 9, 36536574, "73a386ec1c1b7b026afacb85a42fddba", "Runtime Error", "2026-09-14T15:20:43.298730Z", "1cd49971111096dc7826b226f0cb5731bf166cce580ffe9805e0f6a0cd6dcd2d", "4075cb8df1bc2d4f2956fbfccd97f3eb17796656d7f9ff0ad1083a67918b08c7", "cb9752cb3150a5292cdca12674a87d9b3dd8c4a08a97aef89b1416823dd7fccf"),
+    (34, 10, 36536795, "44d6fe47dfa9406b3b03215f4dae3306", "Runtime Error", "2026-09-14T15:26:52.820042Z", "03e54b4ad6dadf0157b20bc2d0f34d271f277c1906e93df8b0e36d1f355497a4", "46086d5da7f00328a51ed816ddd0db8523dd5af46adbeeec0ee1b6fcb82ab0ce", "7d6d3e7ad17d535f60ac57cc54774b929f9b3f69fb9a2d00702138b6b17369c7"),
+    (35, 12, 36544563, "3711535499f0da3fee6977c66375acbf", "Runtime Error", "2026-09-14T19:08:35.288780Z", "882ff93134754f517813f3b08207285d3eab5a68d9538cafac4663908f2c82cc", "8a919b417246de1a30e79d8bd55a8823d1f54e13c980e1eba8d26d32ed2bc85b", "5db1e2c77b0a6638f56a989d12b8649494eddfeb77b7636b288e8d4c3acff453"),
+    (36, 14, 36548449, "a7a5622f29a92bb18be0e52224683743", "Runtime Error", "2026-09-14T20:52:30.669515Z", "7727af3f5a67f53d0a60962b9d6bc354cae2c5b92bbc2838da9c2189cb4c2c01", "8a6b32e4496b404565a5a77d993d1c23aa30139bc4ab374963a5c0756dba6f0c", "b4afdca2fdbf87d71536ae47344c9ba05e9f2659ff5f9054da098b5f1201d3df"),
+    (37, 15, 36548598, "526c6affd022a6d3ab95e54adc5d9eed", "Runtime Error", "2026-09-14T20:57:30.007693Z", "c1222692935ca7f047b330bbe79bb2544fe6db4e8bc74f88f3ace70b699a4559", "c836f7e818bc794ebc126e19f1e451fc18177568c1dc86f3e474c7dc9b7f06af", "fbe6f2a84a22aa61482ad4c148888bbbd17c2c1c27e4745919220dc1460fa3cf"),
+    (38, 18, 36548747, "5409fcd91a1f3618ce071425591750e5", "Runtime Error", "2026-09-14T21:02:41.854770Z", "18a5bbd1544a74b4464fa612a711365856e6b95905c5c8f0952ef3e598695ab5", "f9d751449ed50fdebd9274dd1e5c6b77f7b32f249bfe7735cbd05abab285eca2", "23aa1bce3749339795c7afbfa5a07f80abc86fb402827b4f4ea77fbe47cde0e6"),
+    (39, 19, 36548862, "9493b882011a4b51cc1333b6709e14ad", "Runtime Error", "2026-09-14T21:06:14.325121Z", "2dd2c00c81487830d1d41d2db41804ac6b82210865d725c95f49cf0bd1a96c20", "a2cc3f15740a5fb7ad2a8a405c26ca1b7d21b4f75afed2124fcc5bbec237a1b1", "1d4c4a14d41cc60d98ba728a8aedb2241856fa1a912b6faa4dc647574291dae7"),
+    (40, 20, 36549142, "4937c65e0e7d442fd4268102d4cd0d42", "Runtime Error", "2026-09-14T21:15:01.031776Z", "efefbaeadd865346600b0f47d0c34d03bb9cfb294f949a6950fb59734b908ad4", "0350e042d0586cc2aa5f3a84da68f9cc6dec0244bd1ad419c8e93b9208769602", "da31020c70dba83bd1f57856f0b1225fa38da8ed76edbae89dfa6308a06028b0"),
+    (41, 21, 36549260, "c2138164f23169cbd1188e8349b9558d", "Runtime Error", "2026-09-14T21:19:25.374328Z", "ef70b8efaafb7170acc3bfce8c08ce7c814870f0ef0c8186db9deba92e866b3b", "3691d4deaa014b081828b4e2502f4a4971f55f8be8c73111a54cff18608801a4", "32d7519e56431464de2800e91f5ec823ab3ecbfe92dd9548d33a1711d053be47"),
+    (42, 22, 36549367, "c042d1cf806c5e28b291bb87e0673ac3", "Runtime Error", "2026-09-14T21:23:07.172869Z", "9c1bff27b6652dbd93a4871954199c196de08c997cf3a56959eff433becc6def", "fcc9efc10d164b9c928878da57a47feb597817953e9e4d94d482db876412be44", "1e4f8bb36fe126a185cad837a4ad689ef5d8d9a77e350e7dfa7d82bb2b566963"),
+    (43, 23, 36549502, "962664739f6c769f7eea78083deee4d9", "Runtime Error", "2026-09-14T21:27:13.473771Z", "51e642bcbcf68808ff75d4ee36af0026a62f0ada43cfac947c289cd791ecc9f4", "7d9d099d70f30eadd45952e5d6c664af0ba011dc45a18d181d53b5122c8345cc", "6a5c712bbd5079735b10c401f90bfe8fe06cb5f43a4b9f509a37a023d10e5dd1"),
+    (44, 24, 36549608, "736d365c3275b072246c47a92bb15752", "Runtime Error", "2026-09-14T21:30:59.423804Z", "f5158cfb42789653c4c76018c0dbeacb44daa496da28a829219dc59e757d9638", "89b531576dbb7ca545993599f8f4253bc3cc307b15dbeb9640e5699617705da0", "91f27f958256d1e9d449dcb945004f858409df5d2acd3852f7c3a7aa8a988279"),
+    (45, 25, 36549752, "1501f80835f2a9f763343ca53e34db56", "Runtime Error", "2026-09-14T21:35:46.449525Z", "d8bc2a69ef4e6b81c322b24b929fb36bcf52857f58648364044a58d540ee3ad1", "11a4ec4dad22d7e7d76215578f54f24bb5ff325dd4b1cb1e0d4b845cd348f223", "fdda19d5900c776ab6f8f2343548612c4511b338574362eda48cc6dbc917293f"),
+    (46, 26, 36549861, "564537e6ea7831465eaf2c37cb59190e", "Runtime Error", "2026-09-14T21:39:54.588192Z", "26469244b335274ce6ef17a05191705bcade018c931922bcbfa2882cd5146d96", "fe2a6a8637b75418ac07073692d1d0db88ee2927f8552f6f1dd59fec8a37a7f2", "5bbb0eba936bd175b602796b34fdab95ba78d16bb2f9c55111b7748fbcf3b8ab"),
+    (47, 27, 36549947, "3c0bd1ff2d1afa826ed1259b59064272", "Runtime Error", "2026-09-14T21:43:02.830087Z", "fa981c59a6fc0c9e043b386f3457ec803758f9a993204e045d0a10017b7aa8fd", "07a0d7325e9685b6b12d92a58cd87abf28fc990f30d6877732859f88063492fb", "48b2789ed929d8410c420a79cc88e2bdc6f2223a57f630c29a1ea10f27f35f3d"),
+    (48, 28, 36550029, "18b9eb494c5e843a74ec62de2da831a6", "Runtime Error", "2026-09-14T21:45:42.893554Z", "877a5183c2d2db491807e32d75beca1b5fe28c314c66b91db29cb11d7cccfed3", "4281c70be28deb1d8e66a08745eefe8931961c67f164f5241f9fe1ac75f25dd8", "f1993d33dc558bfd5922731d0f0b4c34e9e108e0fac6916419582b93da09f519"),
+    (49, 29, 36550151, "1db646acc22f79250827b5896f2b7824", "Runtime Error", "2026-09-14T21:50:40.433171Z", "82d23cd3ff57407f05e9cc1674a1677047d800658c9387d5d435b6c7fc58fbe3", "d7c7b3e54b3716e98c3f0a7e44cd219ef10941f74b01c6c426a1e9d3b6321aa9", "89a8ccb4b32db37995d03bbe8594b612d447b279ac367f1d92c2c5019e1970db"),
+    (50, 30, 36550309, "d81e7304db805a9d5fea3f8159bc23d6", "Runtime Error", "2026-09-14T21:56:10.292118Z", "77ce0d8960ce40a0f1e7dd12e0512419b66033af49217b980811421d9b076dec", "68096c9bc77a048af89b8f39a23d433f32b8d5363da5e7f69d92d57a807249a9", "afcd8aee2d42b54a06393235c99a8239918ced0e388d1b2eef3b1f9d41fb5ed3"),
+    (51, 31, 36550360, "0cd205c129624cb83e0e87a580cd5b34", "Runtime Error", "2026-09-14T21:58:27.152407Z", "478236be3c8e2fa5b4e93cb6d1d8c55a643b14c0ead45ba12599a6d8b3f7047e", "61d754bc67a8605f0432e466b1f805b53d5a7a05e026298532724f54f13b00ef", "9102cfbf0e1f28240951df1bc630878de7bc578d9fed7e1db9670bedec5c7f48"),
+    (52, 32, 36550482, "1d1ee522af4176cdf8bfeae487d91e03", "Completed.", "2026-09-14T22:03:03.554521Z", "e785951f72883f6e092609732b75cc439b777e5d186bb09119113663ab2f5164", "46449e3eef693faaf4a6cf02e04eb08a4bca41e22af0c6d2f32eecaf96717273", "59eb61ef8e23fd402b000a940df893f28d1cc074120a57a17dc72ea03a46a77d"),
 )
 _QC_FIRST_PLAN_PATH = (
     Path(__file__).resolve().parent / "specs" / "arv2_qc_first.draft.json"
@@ -425,6 +457,81 @@ def _canonical_payload(raw: Mapping[str, object]) -> bytes:
     ).encode("utf-8")
 
 
+def _reconciled_discovery_infrastructure_entries() -> list[dict[str, object]]:
+    """Project the 22 authenticated, statistics-free discovery run identities."""
+
+    entries: list[dict[str, object]] = []
+    for position, row in enumerate(_DISCOVERY_INFRASTRUCTURE_LOOKS):
+        (
+            shared_ordinal,
+            attempt_ordinal,
+            project_id,
+            backtest_id,
+            terminal_status,
+            started_at_utc,
+            plan_sha256,
+            preparation_summary_sha256,
+            execution_permit_sha256,
+        ) = row
+        if shared_ordinal != 31 + position:
+            raise PreregistrationError(
+                "discovery infrastructure-look sequence changed"
+            )
+        entries.append(
+            {
+                "accounting_id": (
+                    f"arv2-infrastructure-look-fundamental-discovery-"
+                    f"a{attempt_ordinal:06d}"
+                ),
+                "operation_id": (
+                    f"arv2-qc-fundamental-discovery-a{attempt_ordinal:06d}"
+                ),
+                "shared_look_ledger_entry_id": f"R-{shared_ordinal:03d}",
+                "look_class": (
+                    "outcome_free_qc_fundamental_universe_discovery_"
+                    "infrastructure_research_look"
+                ),
+                "status": terminal_status,
+                "phase": "STATISTICS_FREE_TERMINAL_STATUS_RECONCILED",
+                "started_at_utc": started_at_utc,
+                "finished_at_utc": None,
+                "attempt_ordinal": attempt_ordinal,
+                "project_id": project_id,
+                "backtest_id": backtest_id,
+                "plan_sha256": plan_sha256,
+                "preparation_summary_artifact_sha256": (
+                    preparation_summary_sha256
+                ),
+                "execution_permit_artifact_sha256": execution_permit_sha256,
+                "statistics_free_reconciliation_artifact_sha256": (
+                    _DISCOVERY_RECONCILIATION_ARTIFACT_SHA256
+                ),
+                "compile_state": "BuildSuccess",
+                "compile_submission_count": 1,
+                "backtest_submission_count": 1,
+                "conservative_research_look_count": 1,
+                "spent_before_submission": True,
+                "same_entry_retry_permitted": False,
+                "later_fresh_attempt_permitted": True,
+                "organization_binding_authenticated": True,
+                "backtest_terminal_status_accessed": True,
+                "backtest_detail_endpoint_called": False,
+                "performance_statistics_inspected": False,
+                "result_values_inspected": False,
+                "redacted_log_accessed": False,
+                "production_inputs_accessed": False,
+                "qc_fundamental_data_access_possible": True,
+                "provider_rows_retained_or_disclosed": False,
+                "outcomes_accessed": False,
+                "orders_permitted": False,
+                "development_evaluation_consumed": False,
+                "permanent_family_look_consumed": False,
+                "confirmatory_alpha_consumed": False,
+            }
+        )
+    return entries
+
+
 def _infrastructure_look_ledger_seed() -> dict[str, object]:
     """Return the owner-confirmed accounting record without its identity."""
 
@@ -437,16 +544,20 @@ def _infrastructure_look_ledger_seed() -> dict[str, object]:
         ),
         "ledger_id": None,
         "ledger_hash": None,
-        "ledger_sequence": 1,
+        "ledger_sequence": 2,
         "append_only_contract": {
-            "entry_count": 1,
-            "predecessor_entry_count": 0,
-            "predecessor_ledger_artifact_sha256": None,
+            "entry_count": 23,
+            "predecessor_entry_count": 1,
+            "predecessor_ledger_artifact_sha256": (
+                "9502bc3b1662b5f2838d42d4adf6c8c91141395b89c9ba77edcd31542bd7d14f"
+            ),
             "successor_must_retain_every_prior_entry": True,
         },
         "owner_decision": {
             "decision_id": INFRASTRUCTURE_LOOK_OWNER_DECISION_ID,
             "b5c_consumed_one_infrastructure_research_look": True,
+            "discovery_backtests_counted_conservatively": 22,
+            "each_launch_retained_as_a_distinct_non_overwriting_look": True,
             "development_family_permanent_and_alpha_counts_remain_unchanged": True,
             "ambiguous_submission_is_spent_and_nonretryable": True,
             "this_accounting_artifact_grants_no_access_or_action_authority": True,
@@ -529,9 +640,10 @@ def _infrastructure_look_ledger_seed() -> dict[str, object]:
                     "backtests/list returned a forbidden statistics/result field"
                 ),
             }
-        ],
+        ]
+        + _reconciled_discovery_infrastructure_entries(),
         "totals": {
-            "infrastructure_research_looks_spent": 1,
+            "infrastructure_research_looks_spent": 23,
             "development_evaluations_spent": 0,
             "permanent_family_looks_spent": 0,
             "confirmatory_alpha_spent": False,

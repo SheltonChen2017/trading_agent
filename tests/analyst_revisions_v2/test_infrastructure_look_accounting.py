@@ -43,11 +43,12 @@ def _reidentify(raw: dict[str, object]) -> None:
     )
 
 
-def test_committed_infrastructure_look_is_exact_accounting_without_authority() -> None:
+def test_committed_infrastructure_looks_are_exact_accounting_without_authority() -> None:
     binding = preregistration.load_infrastructure_look_ledger()
     payload = binding.payload
     raw = json.loads(payload)
     entry = raw["entries"][0]
+    discovery_entries = raw["entries"][1:]
 
     assert binding.path == _artifact_path().resolve(strict=True)
     assert binding.artifact_sha256 == hashlib.sha256(payload).hexdigest()
@@ -56,7 +57,7 @@ def test_committed_infrastructure_look_is_exact_accounting_without_authority() -
     assert raw["totals"] == {
         "confirmatory_alpha_spent": False,
         "development_evaluations_spent": 0,
-        "infrastructure_research_looks_spent": 1,
+        "infrastructure_research_looks_spent": 23,
         "permanent_family_looks_spent": 0,
         "prospective_permanent_looks_remaining": 1,
     }
@@ -75,6 +76,49 @@ def test_committed_infrastructure_look_is_exact_accounting_without_authority() -
     )
     assert entry["receipt_byte_count"] == 3639
     assert entry["driver_byte_count"] == 34882
+    assert raw["ledger_sequence"] == 2
+    assert raw["append_only_contract"] == {
+        "entry_count": 23,
+        "predecessor_entry_count": 1,
+        "predecessor_ledger_artifact_sha256": (
+            "9502bc3b1662b5f2838d42d4adf6c8c91141395b89c9ba77edcd31542bd7d14f"
+        ),
+        "successor_must_retain_every_prior_entry": True,
+    }
+    predecessor = _artifact_path().with_name(
+        "arv2_infrastructure_look_ledger."
+        "ff61ca806563510dbe384d8801d2537c3655fe1432651f4d94673e14a7648457.json"
+    )
+    assert hashlib.sha256(predecessor.read_bytes()).hexdigest() == (
+        raw["append_only_contract"]["predecessor_ledger_artifact_sha256"]
+    )
+    assert len(discovery_entries) == 22
+    assert [item["shared_look_ledger_entry_id"] for item in discovery_entries] == [
+        f"R-{ordinal:03d}" for ordinal in range(31, 53)
+    ]
+    assert [item["attempt_ordinal"] for item in discovery_entries] == [
+        7,
+        8,
+        9,
+        10,
+        12,
+        14,
+        15,
+        *range(18, 33),
+    ]
+    assert [item["status"] for item in discovery_entries[:-1]] == [
+        "Runtime Error"
+    ] * 21
+    assert discovery_entries[-1]["status"] == "Completed."
+    assert all(item["conservative_research_look_count"] == 1 for item in discovery_entries)
+    assert all(item["spent_before_submission"] is True for item in discovery_entries)
+    assert all(item["same_entry_retry_permitted"] is False for item in discovery_entries)
+    assert all(item["development_evaluation_consumed"] is False for item in discovery_entries)
+    assert all(item["permanent_family_look_consumed"] is False for item in discovery_entries)
+    assert all(item["confirmatory_alpha_consumed"] is False for item in discovery_entries)
+    assert all(item["performance_statistics_inspected"] is False for item in discovery_entries)
+    assert all(item["result_values_inspected"] is False for item in discovery_entries)
+    assert all(item["outcomes_accessed"] is False for item in discovery_entries)
     assert raw["capabilities"] and all(
         value is False for value in raw["capabilities"].values()
     )
@@ -106,6 +150,15 @@ def test_committed_infrastructure_look_is_exact_accounting_without_authority() -
         lambda raw: raw["entries"][0].__setitem__(
             "confirmatory_alpha_consumed", True
         ),
+        lambda raw: raw["append_only_contract"].__setitem__("entry_count", 22),
+        lambda raw: raw["owner_decision"].__setitem__(
+            "discovery_backtests_counted_conservatively", 21
+        ),
+        lambda raw: raw["entries"][1].__setitem__(
+            "shared_look_ledger_entry_id", "R-999"
+        ),
+        lambda raw: raw["entries"][1].__setitem__("outcomes_accessed", True),
+        lambda raw: raw["entries"][-1].__setitem__("status", "Runtime Error"),
         lambda raw: raw["capabilities"].__setitem__(
             "grants_provider_access", True
         ),

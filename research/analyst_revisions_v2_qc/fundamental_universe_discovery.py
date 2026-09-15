@@ -76,6 +76,7 @@ FORMAL_SOURCE_AXIS_LAST_SESSION = "2025-12-31"
 FORMAL_SOURCE_AXIS_DECISION_SESSION_COUNT = 3_270
 MAX_DECISION_SESSIONS = 3_300
 HISTORY_CHUNK_SESSION_COUNT = 20
+HISTORY_ASOF_LOOKBACK_CALENDAR_DAYS = 14
 MAX_HISTORY_CALLS = 165
 MAX_COLLECTION_ROWS = 25_000
 MAX_TOTAL_SOURCE_ROWS = MAX_DECISION_SESSIONS * MAX_COLLECTION_ROWS
@@ -147,7 +148,7 @@ def fundamental_universe_discovery_contract_record() -> dict[str, object]:
         "source": {
             "provider": "QuantConnect",
             "dataset": "Morningstar US Fundamentals",
-            "request": "History[Fundamentals]",
+            "request": "History(fundamental_universe,start,end,flatten=False)",
             "all_us_equities_including_delisted": True,
             "documented_point_in_time_snapshots": True,
             "current_ticker_is_not_identity": True,
@@ -451,7 +452,15 @@ def build_fundamental_universe_discovery_plan_bytes(
                 "ordinal": ordinal,
                 "first_session": first.isoformat(),
                 "last_session": last.isoformat(),
-                "request_start": first.isoformat() + "T00:00:00",
+                # LEAN indexes daily BaseDataCollection universe history by
+                # EndTime, makes fundamentals for T available on T+1, and
+                # applies the request start as an exclusive lower boundary.
+                # A bounded lookback supplies the last already-available
+                # snapshot across weekends and exchange closures.
+                "request_start": (
+                    first - timedelta(days=HISTORY_ASOF_LOOKBACK_CALENDAR_DAYS)
+                ).isoformat()
+                + "T00:00:00",
                 "request_end_exclusive": (last + timedelta(days=1)).isoformat()
                 + "T00:00:00",
                 "decision_sessions": [item["decision_session"] for item in group],
@@ -673,9 +682,16 @@ def _source(path: str, payload: bytes) -> FundamentalDiscoveryProjectSource:
             "project source exceeds the reviewed character cap"
         )
     try:
-        ast.parse(text, filename=path)
+        tree = ast.parse(text, filename=path)
     except SyntaxError as exc:
         raise FundamentalUniverseDiscoveryError("project source is invalid Python") from exc
+    if any(
+        isinstance(node, ast.ImportFrom) and node.module == "__future__"
+        for node in tree.body
+    ):
+        raise FundamentalUniverseDiscoveryError(
+            "QC project source contains an unsupported future import"
+        )
     return FundamentalDiscoveryProjectSource(
         project_path=path,
         content_sha256=hashlib.sha256(payload).hexdigest(),
@@ -718,7 +734,8 @@ def _audit_source_capabilities(files: tuple[FundamentalDiscoveryProjectSource, .
         "market_cap",
         "holdings",
     }
-    history_subscripts = 0
+    history_calls = 0
+    universe_calls = 0
     for item in files:
         if (
             type(item) is not FundamentalDiscoveryProjectSource
@@ -753,18 +770,61 @@ def _audit_source_capabilities(files: tuple[FundamentalDiscoveryProjectSource, .
                     "project source acquired a price/order/portfolio attribute"
                 )
             if (
-                isinstance(node, ast.Subscript)
-                and isinstance(node.value, ast.Attribute)
-                and node.value.attr == "history"
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr in {"History", "history"}
             ):
-                history_subscripts += 1
-                if not isinstance(node.slice, ast.Name) or node.slice.id != "Fundamentals":
+                history_calls += 1
+                exact_history_call = (
+                    node.func.attr == "history"
+                    and isinstance(node.func.value, ast.Name)
+                    and node.func.value.id == "algorithm"
+                    and len(node.args) == 3
+                    and isinstance(node.args[0], ast.Attribute)
+                    and isinstance(node.args[0].value, ast.Name)
+                    and node.args[0].value.id == "algorithm"
+                    and node.args[0].attr == "_arv2_fundamental_universe"
+                    and isinstance(node.args[1], ast.Name)
+                    and node.args[1].id == "start"
+                    and isinstance(node.args[2], ast.Name)
+                    and node.args[2].id == "end"
+                    and len(node.keywords) == 1
+                    and node.keywords[0].arg == "flatten"
+                    and isinstance(node.keywords[0].value, ast.Constant)
+                    and node.keywords[0].value.value is False
+                )
+                if not exact_history_call:
                     raise FundamentalUniverseDiscoveryError(
-                        "history request is not exactly History[Fundamentals]"
+                        "history request is not the exact reviewed unflattened universe date-range call"
                     )
-    if history_subscripts != 1:
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr in {"AddUniverse", "add_universe"}
+            ):
+                universe_calls += 1
+                exact_universe_call = (
+                    node.func.attr == "AddUniverse"
+                    and isinstance(node.func.value, ast.Name)
+                    and node.func.value.id == "self"
+                    and len(node.args) == 1
+                    and not node.keywords
+                    and isinstance(node.args[0], ast.Lambda)
+                    and len(node.args[0].args.args) == 1
+                    and isinstance(node.args[0].body, ast.List)
+                    and not node.args[0].body.elts
+                )
+                if not exact_universe_call:
+                    raise FundamentalUniverseDiscoveryError(
+                        "fundamental universe constructor is not the exact no-selection call"
+                    )
+    if history_calls != 1:
         raise FundamentalUniverseDiscoveryError(
-            "project must contain exactly one Fundamentals history request"
+            "project must contain exactly one fundamental universe history request"
+        )
+    if universe_calls != 1:
+        raise FundamentalUniverseDiscoveryError(
+            "project must contain exactly one no-selection fundamental universe"
         )
 
 
@@ -799,12 +859,19 @@ class Arv2FundamentalUniverseDiscovery(QCAlgorithm):
         self.set_time_zone("America/New_York")
         self.set_start_date({calculation.year}, {calculation.month}, {calculation.day})
         self.set_end_date({calculation_end.year}, {calculation_end.month}, {calculation_end.day})
+        self._arv2_fundamental_universe = self.AddUniverse(lambda fundamentals: [])
         self._arv2_fundamental_discovery_completed = False
+        self._arv2_fundamental_discovery_summary = None
         execute_fundamental_universe_discovery(self, _C)
 
     def on_end_of_algorithm(self):
         if self._arv2_fundamental_discovery_completed is not True:
             raise RuntimeError("ARV2 fundamental-universe discovery did not complete")
+        if type(self._arv2_fundamental_discovery_summary) is not str:
+            raise RuntimeError("ARV2 fundamental-universe discovery summary is unavailable")
+        self.set_summary_statistic(
+            _C["SUMMARY_NAME"], self._arv2_fundamental_discovery_summary
+        )
 '''.encode("utf-8")
 
 
@@ -1337,7 +1404,7 @@ def _read_private_file(path: Path, name: str, maximum: int) -> tuple[bytes, tupl
 def _shard_relative_path(ordinal: int, digest: str) -> str:
     _count(ordinal, "archive shard ordinal")
     _sha(digest, "archive shard hash")
-    return f"{ARCHIVE_SHARD_DIRECTORY}/{ordinal:04d}-{digest}.jsonl.gz"
+    return f"{ARCHIVE_SHARD_DIRECTORY}/{ordinal:04d}-{digest}-jsonl.gz"
 
 
 _DESCRIPTOR_FIELDS = {
@@ -1832,7 +1899,7 @@ def load_reviewed_fundamental_universe_discovery_receipt(
             + hashlib.sha256(plan_bytes).hexdigest()
             + "/"
             + descriptor["compressed_sha256"]
-            + ".jsonl.gz"
+            + "-jsonl.gz"
         ):
             raise FundamentalUniverseDiscoveryError("terminal shard identity changed")
         raw = _bounded_gzip(payload, raw_size, "terminal shard")

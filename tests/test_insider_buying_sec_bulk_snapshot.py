@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import io
 import json
 import stat
@@ -831,6 +832,56 @@ def test_regular_file_reader_refuses_a_version_change_during_read(
         )
 
 
+@pytest.mark.parametrize(
+    ("observation", "error_pattern"),
+    (
+        ("opened", "changed while it was opened"),
+        ("after_read", "changed while it was read"),
+        ("after_path", "changed while it was read"),
+    ),
+)
+def test_single_link_reader_refuses_every_observed_link_count_change(
+    monkeypatch, tmp_path, observation, error_pattern
+):
+    """Every sampled link count is part of the immutable-read invariant."""
+
+    path = tmp_path / "member.bin"
+    path.write_bytes(b"bounded bytes")
+    real_fstat = snapshot_module.os.fstat
+    real_lstat = Path.lstat
+    fstat_calls = 0
+    lstat_calls = 0
+
+    def observed_fstat(descriptor):
+        nonlocal fstat_calls
+        fstat_calls += 1
+        status = real_fstat(descriptor)
+        if observation == "opened" and fstat_calls == 1:
+            return _stat_like(status, st_nlink=2)
+        if observation == "after_read" and fstat_calls == 2:
+            return _stat_like(status, st_nlink=2)
+        return status
+
+    def observed_lstat(candidate):
+        nonlocal lstat_calls
+        status = real_lstat(candidate)
+        if candidate == path:
+            lstat_calls += 1
+            if observation == "after_path" and lstat_calls == 2:
+                return _stat_like(status, st_nlink=2)
+        return status
+
+    monkeypatch.setattr(snapshot_module.os, "fstat", observed_fstat)
+    monkeypatch.setattr(Path, "lstat", observed_lstat)
+    with pytest.raises(SecBulkSnapshotError, match=error_pattern):
+        snapshot_module._read_regular_bytes(
+            path,
+            label="synthetic committed member",
+            max_bytes=100,
+            require_single_link=True,
+        )
+
+
 def test_hash_valid_but_false_member_manifest_cannot_relabel_raw_bytes(tmp_path):
     identity = write_sec_bulk_snapshot(_archive(), _source(), tmp_path)
     target = tmp_path / identity.snapshot_id
@@ -1183,3 +1234,67 @@ def test_retry_preserves_and_refuses_unverified_commit_temp(tmp_path):
     with pytest.raises(SecBulkSnapshotError, match="unverified files"):
         write_sec_bulk_snapshot(archive, _source(), tmp_path)
     assert abandoned.read_bytes() == b"different bytes"
+
+
+def test_committed_archive_with_a_hard_link_alias_refuses_load(tmp_path):
+    """A second name for a committed artifact means it is not uniquely owned.
+
+    IB-1C and IB-1H already refuse this; IB-1A did not, so the hardening that
+    later milestones adopted had not propagated back to the raw boundary.
+    """
+    archive = _archive()
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    directory = tmp_path / identity.snapshot_id
+
+    alias = tmp_path / "alias-archive"
+    try:
+        os.link(directory / "archive.zip", alias)
+    except (OSError, NotImplementedError, AttributeError):  # pragma: no cover
+        pytest.skip("hard links are unavailable on this filesystem")
+
+    with pytest.raises(
+        SecBulkSnapshotError, match="regular immutable file"
+    ):
+        load_sec_bulk_snapshot(directory)
+
+
+def test_committed_manifest_with_a_hard_link_alias_refuses_load(tmp_path):
+    archive = _archive()
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    directory = tmp_path / identity.snapshot_id
+
+    alias = tmp_path / "alias-manifest"
+    try:
+        os.link(directory / "manifest.json", alias)
+    except (OSError, NotImplementedError, AttributeError):  # pragma: no cover
+        pytest.skip("hard links are unavailable on this filesystem")
+
+    with pytest.raises(
+        SecBulkSnapshotError, match="regular immutable file"
+    ):
+        load_sec_bulk_snapshot(directory)
+
+
+def test_committed_marker_with_a_hard_link_alias_refuses_load(tmp_path):
+    archive = _archive()
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    directory = tmp_path / identity.snapshot_id
+
+    alias = tmp_path / "alias-commit-marker"
+    try:
+        os.link(directory / "snapshot.commit.json", alias)
+    except (OSError, NotImplementedError, AttributeError):  # pragma: no cover
+        pytest.skip("hard links are unavailable on this filesystem")
+
+    with pytest.raises(
+        SecBulkSnapshotError, match="regular immutable file"
+    ):
+        load_sec_bulk_snapshot(directory)
+
+
+def test_single_link_committed_snapshot_still_loads(tmp_path):
+    """The guard must refuse aliased artifacts without refusing ordinary ones."""
+    archive = _archive()
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    loaded = load_sec_bulk_snapshot(tmp_path / identity.snapshot_id)
+    assert loaded.identity == identity

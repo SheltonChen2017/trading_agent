@@ -76,8 +76,20 @@ B3_MODULE = PACKAGE / "synthetic_input_transport.py"
 # I/O.
 _PINNED_QC_PACKAGE_SOURCES = tuple(
     """
-    __init__.py accepted_risk_pair_bridge.py event_study.py
-    firm_ontology_candidate_builder.py firm_ontology_proposal_generator.py
+    __init__.py accepted_risk_pair_bridge.py
+    accepted_risk_preliminary_package.py
+    accepted_risk_preliminary_qc_figi.py
+    accepted_risk_preliminary_qc_projection.py
+    accepted_risk_preliminary_qc_runtime.py
+    accepted_risk_preliminary_rating_evaluator.py
+    accepted_risk_preliminary_rating_policy.py
+    accepted_risk_preliminary_submission_adapter.py
+    accepted_risk_preopen_terminal_authority.py
+    accepted_risk_qc_symbol_resolution.py
+    accepted_risk_security_master_admission.py
+    accepted_risk_terminal_disposition.py event_study.py
+    firm_ontology_candidate_builder.py firm_ontology_owner_decision.py
+    firm_ontology_proposal_generator.py
     formal_cloud_evaluator.py
     formal_economic_execution_definition.py formal_evaluation.py
     formal_evaluation_bridge.py formal_input_bundle.py formal_input_composer.py
@@ -90,6 +102,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     fundamental_universe_discovery_submission_adapter.py
     fundamental_universe_discovery_worker.py global_input_bundle.py
     global_input_schema.py historical_preopen_input_adapter.py
+    in_qc_preopen_terminal_stream.py
     lean_source_assembly.py object_store_read_contract.py
     owner_signature_authority.py physical_accepted_risk_archive.py
     physical_firm_ontology_candidate_archive.py
@@ -106,7 +119,8 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     preopen_control_acquisition_io.py preopen_control_prereview_downloader.py
     preopen_control_runtime.py preopen_control_stage.py
     preopen_control_submission_adapter.py preopen_control_worker.py
-    preopen_quality_worker.py production_evidence_acquisition_io.py
+    preopen_quality_worker.py preopen_terminal_semantics.py
+    production_evidence_acquisition_io.py
     production_evidence_composer.py refusal_smoke_projection.py run_contract.py
     runtime_shard_projection.py synthetic_input_transport.py
     """.split()
@@ -123,6 +137,22 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
         scripts.build_arv2_massive_input_pair
         research.analyst_revisions_v2_qc.formal_run_protocol
         """.split()
+    ),
+    "accepted_risk_preliminary_qc_figi.py": tuple(
+        "dataclasses hashlib json re datetime types".split()
+    ),
+    "accepted_risk_preliminary_rating_evaluator.py": tuple(
+        """
+        dataclasses hashlib json re collections collections.abc decimal enum
+        fractions types typing accepted_risk_preliminary_rating_policy
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_policy
+        datetime
+        """.split()
+    ),
+    "accepted_risk_preliminary_rating_policy.py": (),
+    "accepted_risk_qc_symbol_resolution.py": tuple(
+        "dataclasses hashlib json re collections.abc datetime types".split()
     ),
     "event_study.py": tuple(
         """
@@ -185,7 +215,7 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
         """.split()
     ),
     "fundamental_universe_discovery_worker.py": tuple(
-        "__future__ hashlib json re datetime decimal".split()
+        "hashlib json re datetime decimal".split()
     ),
     "power_calibration_runtime.py": tuple(
         """
@@ -204,6 +234,14 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
     ),
     "preopen_quality_worker.py": tuple(
         "__future__ hashlib json re datetime decimal".split()
+    ),
+    "preopen_terminal_semantics.py": tuple(
+        """
+        __future__ hashlib json re datetime decimal zoneinfo
+        preopen_control_worker preopen_quality_worker
+        research.analyst_revisions_v2.preopen_control_acquisition
+        research.analyst_revisions_v2_qc.preopen_quality_worker
+        """.split()
     ),
     "refusal_smoke_projection.py": tuple(
         """
@@ -236,6 +274,75 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "accepted_risk_preliminary_package.py": tuple(
+        """
+        __future__ dataclasses gzip hashlib json os shutil sqlite3 stat tempfile
+        threading weakref collections collections.abc datetime fractions pathlib
+        typing data.exchange_calendar
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.global_benchmark_contract
+        scripts.build_arv2_massive_input_pair research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_security_master_admission
+        research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        research.analyst_revisions_v2_qc.physical_preopen_seed_archive
+        research.analyst_revisions_v2_qc.production_evidence_composer
+        """.split()
+    ),
+    "accepted_risk_preliminary_qc_projection.py": tuple(
+        """
+        __future__ dataclasses ast hashlib json re pathlib
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime
+        """.split()
+    ),
+    "accepted_risk_preliminary_submission_adapter.py": tuple(
+        """
+        __future__ dataclasses hashlib json os re stat threading time weakref
+        datetime decimal pathlib typing research.analyst_revisions_v2
+        research.analyst_revisions_v2.preregistration
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        """.split()
+    ),
+    "accepted_risk_preopen_terminal_authority.py": tuple(
+        """
+        dataclasses hashlib hmac json os re sqlite3 tempfile threading weakref
+        zlib collections.abc enum pathlib types
+        research.analyst_revisions_v2.canonical research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.preopen_terminal_semantics
+        research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution
+        research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream
+        research.analyst_revisions_v2_qc.formal_streaming_input datetime
+        """.split()
+    ),
+    "accepted_risk_security_master_admission.py": tuple(
+        """
+        __future__ dataclasses os re threading weakref collections datetime typing
+        research.analyst_revisions_v2 research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_preopen_seed_archive
+        """.split()
+    ),
+    "accepted_risk_terminal_disposition.py": tuple(
+        """
+        dataclasses hashlib os re sqlite3 tempfile threading weakref collections
+        datetime enum research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc.accepted_risk_security_master_admission
+        research.analyst_revisions_v2_qc.formal_input_composer
+        research.analyst_revisions_v2_qc.formal_run_protocol
+        research.analyst_revisions_v2_qc.formal_runtime_projection
+        """.split()
+    ),
     "firm_ontology_candidate_builder.py": tuple(
         """
         __future__ dataclasses enum os stat threading weakref collections
@@ -254,6 +361,16 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2.global_benchmark_contract
         research.analyst_revisions_v2.canonical
         research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet
+        """.split()
+    ),
+    "firm_ontology_owner_decision.py": tuple(
+        """
+        __future__ dataclasses enum os threading weakref typing
+        research.analyst_revisions_v2
+        research.analyst_revisions_v2.availability
+        research.analyst_revisions_v2.canonical research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.firm_ontology_proposal_generator
         research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet
         """.split()
     ),
@@ -344,6 +461,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.formal_runtime_projection
         research.analyst_revisions_v2_qc.formal_input_composer
         research.analyst_revisions_v2_qc.formal_terminal_disposition_builder
+        research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition
         """.split()
     ),
     "formal_streaming_bridge.py": tuple(
@@ -410,6 +528,15 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2.canonical
         research.analyst_revisions_v2_qc.preopen_control_stage scripts
         scripts.build_arv2_historical_preopen_bridge
+        """.split()
+    ),
+    "in_qc_preopen_terminal_stream.py": tuple(
+        """
+        __future__ dataclasses gzip hashlib heapq io json os re threading weakref
+        collections.abc datetime itertools accepted_risk_qc_symbol_resolution
+        preopen_terminal_semantics
+        research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution
+        research.analyst_revisions_v2_qc.preopen_terminal_semantics
         """.split()
     ),
     "owner_signature_authority.py": tuple(
@@ -500,7 +627,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
     ),
     "physical_production_evidence_bridge.py": tuple(
         """
-        __future__ dataclasses hashlib os sqlite3 tempfile threading weakref
+        __future__ dataclasses heapq hashlib os sqlite3 tempfile threading weakref
         collections.abc pathlib research.analyst_revisions_v2
         research.analyst_revisions_v2.firm_ontology
         research.analyst_revisions_v2.accepted_risk_input_pair
@@ -511,7 +638,10 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.physical_accepted_risk_archive
         research.analyst_revisions_v2_qc.physical_production_input_archive
-        research.analyst_revisions_v2_qc.production_evidence_composer scripts
+        research.analyst_revisions_v2_qc.production_evidence_composer
+        research.analyst_revisions_v2_qc.preopen_control_acquisition_io
+        research.analyst_revisions_v2_qc.preopen_control_prereview_downloader
+        research.analyst_revisions_v2_qc.formal_streaming_input scripts
         scripts.build_arv2_historical_preopen_bridge
         """.split()
     ),
@@ -556,8 +686,10 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.formal_input_bundle
         research.analyst_revisions_v2_qc.formal_streaming_input
+        research.analyst_revisions_v2_qc.physical_production_evidence_acquisition
         research.analyst_revisions_v2_qc.physical_production_input_archive
         research.analyst_revisions_v2_qc.physical_production_session_index
+        research.analyst_revisions_v2_qc.preopen_control_prereview_downloader
         research.analyst_revisions_v2_qc.physical_production_evidence_bridge
         """.split()
     ),
@@ -595,7 +727,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
     ),
     "preopen_control_submission_adapter.py": tuple(
         """
-        __future__ base64 dataclasses hashlib json os re stat sys threading time
+        __future__ base64 dataclasses hashlib importlib json os re stat sys threading time
         weakref datetime pathlib
         research.analyst_revisions_v2
         research.analyst_revisions_v2.preopen_control_acquisition
@@ -622,7 +754,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
     "production_evidence_composer.py": tuple(
         """
         __future__ dataclasses os re sqlite3 stat tempfile threading weakref
-        collections datetime decimal pathlib typing
+        collections datetime decimal fractions pathlib typing
         research.analyst_revisions_v2 research.analyst_revisions_v2.firm_ontology
         research.analyst_revisions_v2.accepted_risk_input_pair
         research.analyst_revisions_v2.canonical
@@ -631,6 +763,9 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2.production_input_pipeline
         research.analyst_revisions_v2.production_truth_gate scripts
         scripts.build_arv2_historical_preopen_bridge
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.firm_ontology_owner_decision
+        research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet
         research.analyst_revisions_v2_qc.formal_streaming_input
         """.split()
     ),
@@ -643,8 +778,11 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2.production_scoring
         research.analyst_revisions_v2.preopen_control_acquisition
         research.analyst_revisions_v2_qc.formal_terminal_disposition_builder
-        research.analyst_revisions_v2.production_input_pipeline
         research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_production_evidence_acquisition
+        research.analyst_revisions_v2_qc.physical_production_evidence_bridge
+        research.analyst_revisions_v2_qc.preopen_control_prereview_downloader
+        research.analyst_revisions_v2.production_input_pipeline
         research.analyst_revisions_v2_qc.formal_streaming_input
         research.analyst_revisions_v2.production_evidence_acquisition
         research.analyst_revisions_v2_qc.formal_input_bundle
@@ -680,6 +818,30 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "accepted_risk_preliminary_package.py": (
+        "call:__import__",
+        "call:compile",
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "accepted_risk_preliminary_qc_projection.py": (
+        "call:compile",
+        "call:read_bytes",
+        "import:pathlib",
+    ),
+    "accepted_risk_preliminary_submission_adapter.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "accepted_risk_preopen_terminal_authority.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
+    "accepted_risk_security_master_admission.py": ("import:os",),
+    "accepted_risk_terminal_disposition.py": ("import:os",),
     "firm_ontology_candidate_builder.py": (
         "call:open",
         "import:os",
@@ -690,6 +852,7 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "import:os",
         "import:pathlib",
     ),
+    "firm_ontology_owner_decision.py": ("import:os",),
     "formal_cloud_evaluator.py": ("import:os",),
     "formal_economic_execution_definition.py": ("import:os",),
     "formal_evaluation_bridge.py": ("import:os",),
@@ -723,6 +886,10 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "import:pathlib",
     ),
     "historical_preopen_input_adapter.py": ("import:os",),
+    "in_qc_preopen_terminal_stream.py": (
+        "call:read_bytes",
+        "import:os",
+    ),
     "owner_signature_authority.py": (
         "call:open",
         "import:os",
@@ -816,24 +983,39 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
 }
 
 _QC_RUNTIME_IMPORTS = {
+    "accepted_risk_preliminary_qc_runtime.py": tuple(
+        """
+        dataclasses gzip hashlib io json math re time datetime decimal types
+        accepted_risk_preliminary_rating_evaluator
+        accepted_risk_preliminary_qc_figi research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        """.split()
+    ),
     "fundamental_universe_discovery_runtime.py": tuple(
         """
-        __future__ gzip hashlib io json datetime zoneinfo AlgorithmImports
+        gzip hashlib io json datetime zoneinfo
         fundamental_universe_discovery_worker
         """.split()
     ),
     "preopen_control_runtime.py": tuple(
         "__future__ gzip hashlib heapq io json datetime itertools zoneinfo "
-        "AlgorithmImports preopen_control_worker".split()
+        "AlgorithmImports preopen_control_worker accepted_risk_qc_symbol_resolution "
+        "research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution".split()
     )
 }
 _QC_RUNTIME_IO_SURFACE = {
+    "accepted_risk_preliminary_qc_runtime.py": (
+        "call:contains_key",
+        "call:history",
+        "call:open",
+        "call:read_bytes",
+        "call:set_summary_statistic",
+    ),
     "fundamental_universe_discovery_runtime.py": (
         "call:history",
         "call:read_bytes",
         "call:save_bytes",
-        "call:set_summary_statistic",
-        "import:algorithmimports",
     ),
     "preopen_control_runtime.py": (
         "call:history",
@@ -1917,9 +2099,25 @@ research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revi
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.production_input_pipeline
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge scripts.build_arv2_massive_input_pair
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_package research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_package research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_package research.analyst_revisions_v2.global_benchmark_contract
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_package scripts.build_arv2_massive_input_pair
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime accepted_risk_preliminary_qc_figi
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime accepted_risk_preliminary_rating_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator accepted_risk_preliminary_rating_policy
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter research.analyst_revisions_v2.preregistration
+research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_security_master_admission research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.accepted_risk_security_master_admission research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.firm_ontology_candidate_builder research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.firm_ontology_candidate_builder research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.firm_ontology_candidate_builder research.analyst_revisions_v2.firm_ontology
+research.analyst_revisions_v2_qc.firm_ontology_owner_decision research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.firm_ontology_owner_decision research.analyst_revisions_v2.availability
+research.analyst_revisions_v2_qc.firm_ontology_owner_decision research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.firm_ontology_proposal_generator research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.firm_ontology_proposal_generator research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.firm_ontology_proposal_generator research.analyst_revisions_v2.global_benchmark_contract
@@ -1952,6 +2150,8 @@ research.analyst_revisions_v2_qc.formal_terminal_disposition_builder scripts.bui
 research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime fundamental_universe_discovery_worker
 research.analyst_revisions_v2_qc.historical_preopen_input_adapter research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.historical_preopen_input_adapter scripts.build_arv2_historical_preopen_bridge
+research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream accepted_risk_qc_symbol_resolution
+research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream preopen_terminal_semantics
 research.analyst_revisions_v2_qc.physical_accepted_risk_archive research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.physical_accepted_risk_archive research.analyst_revisions_v2.accepted_risk_input_pair
 research.analyst_revisions_v2_qc.physical_accepted_risk_archive research.analyst_revisions_v2.canonical
@@ -2007,11 +2207,15 @@ research.analyst_revisions_v2_qc.preopen_control_acquisition_io research.analyst
 research.analyst_revisions_v2_qc.preopen_control_prereview_downloader research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.preopen_control_prereview_downloader research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.preopen_control_prereview_downloader research.analyst_revisions_v2.preopen_control_acquisition
+research.analyst_revisions_v2_qc.preopen_control_runtime accepted_risk_qc_symbol_resolution
 research.analyst_revisions_v2_qc.preopen_control_runtime preopen_control_worker
 research.analyst_revisions_v2_qc.preopen_control_stage research.analyst_revisions_v2.preopen_control_acquisition
 research.analyst_revisions_v2_qc.preopen_control_submission_adapter research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.preopen_control_submission_adapter research.analyst_revisions_v2.preopen_control_acquisition
 research.analyst_revisions_v2_qc.preopen_control_worker preopen_quality_worker
+research.analyst_revisions_v2_qc.preopen_terminal_semantics preopen_control_worker
+research.analyst_revisions_v2_qc.preopen_terminal_semantics preopen_quality_worker
+research.analyst_revisions_v2_qc.preopen_terminal_semantics research.analyst_revisions_v2.preopen_control_acquisition
 research.analyst_revisions_v2_qc.production_evidence_acquisition_io research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.production_evidence_acquisition_io research.analyst_revisions_v2.artifact_io
 research.analyst_revisions_v2_qc.production_evidence_acquisition_io research.analyst_revisions_v2.preopen_control_acquisition
@@ -2032,8 +2236,32 @@ research.analyst_revisions_v2_qc.production_evidence_composer scripts.build_arv2
 _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
     {
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator",
+            "accepted_risk_preliminary_rating_policy",
+        ),
+        (
             "research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime",
             "fundamental_universe_discovery_worker",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream",
+            "accepted_risk_qc_symbol_resolution",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream",
+            "preopen_terminal_semantics",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.preopen_control_runtime",
+            "accepted_risk_qc_symbol_resolution",
         ),
         (
             "research.analyst_revisions_v2_qc.preopen_control_runtime",
@@ -2041,6 +2269,14 @@ _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
         ),
         (
             "research.analyst_revisions_v2_qc.preopen_control_worker",
+            "preopen_quality_worker",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.preopen_terminal_semantics",
+            "preopen_control_worker",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.preopen_terminal_semantics",
             "preopen_quality_worker",
         ),
     }
@@ -2189,9 +2425,21 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "data.exchange_calendar",
         "research.analyst_revisions_v2_qc",
         "research.analyst_revisions_v2_qc.accepted_risk_pair_bridge",
-            "research.analyst_revisions_v2_qc.event_study",
-            "research.analyst_revisions_v2_qc.firm_ontology_candidate_builder",
-            "research.analyst_revisions_v2_qc.firm_ontology_proposal_generator",
+        "research.analyst_revisions_v2_qc.accepted_risk_preliminary_package",
+        "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi",
+        "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_projection",
+        "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator",
+        "research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_policy",
+        "research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter",
+        "research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority",
+        "research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution",
+        "research.analyst_revisions_v2_qc.accepted_risk_security_master_admission",
+        "research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition",
+        "research.analyst_revisions_v2_qc.event_study",
+        "research.analyst_revisions_v2_qc.firm_ontology_candidate_builder",
+        "research.analyst_revisions_v2_qc.firm_ontology_owner_decision",
+        "research.analyst_revisions_v2_qc.firm_ontology_proposal_generator",
         "research.analyst_revisions_v2_qc.formal_cloud_evaluator",
         "research.analyst_revisions_v2_qc.formal_economic_execution_definition",
         "research.analyst_revisions_v2_qc.formal_evaluation",
@@ -2213,6 +2461,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.global_input_bundle",
         "research.analyst_revisions_v2_qc.global_input_schema",
         "research.analyst_revisions_v2_qc.historical_preopen_input_adapter",
+        "research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream",
         "research.analyst_revisions_v2_qc.lean_source_assembly",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
         "research.analyst_revisions_v2_qc.owner_signature_authority",
@@ -2239,6 +2488,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.preopen_control_submission_adapter",
         "research.analyst_revisions_v2_qc.preopen_control_worker",
         "research.analyst_revisions_v2_qc.preopen_quality_worker",
+        "research.analyst_revisions_v2_qc.preopen_terminal_semantics",
         "research.analyst_revisions_v2_qc.production_evidence_acquisition_io",
         "research.analyst_revisions_v2_qc.production_evidence_composer",
         "research.analyst_revisions_v2_qc.refusal_smoke_projection",

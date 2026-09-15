@@ -4,12 +4,14 @@ import hashlib
 import io
 import json
 import sqlite3
-from datetime import datetime
+from datetime import date, datetime
 from fractions import Fraction
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
+
+from data.exchange_calendar import trading_sessions
 
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_qc_figi as figi,
@@ -631,6 +633,87 @@ def test_cloud_loader_reads_activation_first_authenticates_each_object_and_never
     assert len(calls) == 1
 
 
+def test_transport_object_count_bound_is_load_bearing():
+    _values, key, activation, _roles = _transport_fixture()
+    value = json.loads(activation)
+    template = next(
+        item for item in value["objects"] if item["role"] == "session_axis"
+    )
+    prefix = key.rsplit("/", 1)[0]
+
+    # Five objects already exist.  Add valid, uniquely named session shards
+    # through the exact boundary, then one more.  This keeps every later
+    # descriptor/ordinal check satisfiable so only this bound can refuse.
+    for ordinal in range(1, runtime.MAX_TRANSPORT_OBJECT_COUNT - 4):
+        item = dict(template)
+        item["ordinal"] = ordinal
+        item["object_store_key"] = (
+            f"{prefix}/session_axis-{ordinal:04d}-jsonl.gz"
+        )
+        item["relative_path"] = f"session_axis-{ordinal:04d}-jsonl.gz"
+        item["content_sha256"] = hashlib.sha256(
+            item["object_store_key"].encode("ascii")
+        ).hexdigest()
+        value["objects"].append(item)
+
+    def reidentify(candidate):
+        candidate["package_id"] = None
+        candidate["package_sha256"] = None
+        digest = hashlib.sha256(runtime._canonical(candidate)).hexdigest()
+        candidate["package_id"] = "arv2-preliminary-qc-package-" + digest[:24]
+        candidate["package_sha256"] = digest
+
+    reidentify(value)
+    assert len(value["objects"]) == runtime.MAX_TRANSPORT_OBJECT_COUNT
+    runtime._validate_transport(value, key)
+
+    ordinal = runtime.MAX_TRANSPORT_OBJECT_COUNT - 4
+    extra = dict(template)
+    extra["ordinal"] = ordinal
+    extra["object_store_key"] = f"{prefix}/session_axis-{ordinal:04d}-jsonl.gz"
+    extra["relative_path"] = f"session_axis-{ordinal:04d}-jsonl.gz"
+    extra["content_sha256"] = hashlib.sha256(
+        extra["object_store_key"].encode("ascii")
+    ).hexdigest()
+    value["objects"].append(extra)
+    reidentify(value)
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="transport object inventory changed",
+    ):
+        runtime._validate_transport(value, key)
+
+
+def test_per_object_decompression_bound_is_load_bearing(monkeypatch):
+    raw = b'{}\n' * 100
+    monkeypatch.setattr(runtime, "MAX_DECOMPRESSED_OBJECT_BYTES", len(raw) - 1)
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="compressed object exceeded decompression bound",
+    ):
+        runtime._gzip_rows(gzip.compress(raw), 100, "session_axis")
+
+
+def test_total_decompression_bound_is_load_bearing(monkeypatch):
+    values, key, activation, _roles = _transport_fixture()
+    monkeypatch.setattr(runtime, "MAX_TOTAL_DECOMPRESSED_BYTES", 1)
+    monkeypatch.setattr(
+        evaluator,
+        "load_preliminary_rating_input",
+        lambda *_items: SimpleNamespace(marker="must not be reached"),
+    )
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="package exceeded total decompression bound",
+    ):
+        runtime.load_accepted_risk_preliminary_package(
+            SimpleNamespace(object_store=_Store(values)),
+            activation_manifest_key=key,
+            activation_manifest_sha256=hashlib.sha256(activation).hexdigest(),
+            activation_manifest_byte_count=len(activation),
+        )
+
+
 def test_cloud_loader_stops_on_first_object_hash_mismatch(monkeypatch):
     values, key, activation, _roles = _transport_fixture()
     first_data_key = next(item for item in values if item.endswith("session_axis-0000-jsonl.gz"))
@@ -803,8 +886,13 @@ def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monke
     assert all(b"from __future__ import" not in item.source_bytes for item in value.source_files)
     assert all(b"sqlite3" not in item.source_bytes for item in value.source_files)
     main = by_name["main.py"].source_bytes.decode("ascii")
-    assert "self.train(self._arv2_advance_training_slice)" in main
+    assert "self._arv2_advance_training_slice()" in main
+    assert "self.train(" not in main
     assert "def _arv2_advance_training_slice" in main
+    assert value.maximum_train_slice_count == runtime.MAX_TRAIN_SLICE_COUNT == 113
+    assert len(
+        trading_sessions(date(*projection.ALGORITHM_START), date(*projection.ALGORITHM_END))
+    ) == value.maximum_train_slice_count
     assert "set_start_date(2026, 4, 1)" in main
     assert "set_end_date(2026, 9, 11)" in main
     assert 'self.set_time_zone("America/New_York")' in main
@@ -1325,6 +1413,26 @@ def test_driver_completes_in_bounded_train_slice_emits_once_and_closes_cleanly()
     assert driver.require_completed_at_end() is True
 
 
+def test_full_geometry_completes_in_41_unslowed_daily_slices():
+    driver, algorithm = _driver_with_runtime(400)
+    planned_runtime = driver._runtime
+    driver._runtime = None
+    driver._initialize_in_training = lambda: setattr(
+        driver, "_runtime", planned_runtime
+    )
+
+    for _ in range(40):
+        driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+    assert driver.completed is False
+    assert driver._runtime.calls == 399
+
+    driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+    assert driver.completed is True
+    assert driver._runtime.calls == 400
+    assert driver._training_slice_count == 41
+    assert len(algorithm.statistics) == 34
+
+
 def test_driver_end_refuses_incomplete_runtime_and_aborts_cache():
     driver, _algorithm = _driver_with_runtime(100)
 
@@ -1349,7 +1457,7 @@ def test_driver_enforces_monotonic_clock_soft_bound_and_train_slice_census():
     driver._training_slice_count = runtime.MAX_TRAIN_SLICE_COUNT
     with pytest.raises(
         runtime.AcceptedRiskPreliminaryQcRuntimeError,
-        match="Train-slice census",
+        match="runtime-slice census",
     ):
         driver.advance_training_slice(monotonic=lambda: 242)
 
@@ -1362,3 +1470,79 @@ def test_driver_enforces_monotonic_clock_soft_bound_and_train_slice_census():
         reversed_driver.advance_training_slice(
             monotonic=lambda: next(reversed_clock)
         )
+
+
+def test_driver_backtest_runtime_bound_is_load_bearing():
+    driver, _algorithm = _driver_with_runtime(100)
+    driver._runtime_started_monotonic = 0
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="exceeded twelve-hour backtest bound",
+    ):
+        driver.advance_training_slice(
+            monotonic=lambda: runtime.MAX_BACKTEST_RUNTIME_SECONDS + 1
+        )
+
+
+def test_preliminary_projection_size_bounds_are_load_bearing_and_have_headroom():
+    """ARV2R74-002: the per-file bound exists to respect QC's 64,000-char limit.
+
+    Removing it turns no other test red, and the largest projected module
+    already occupies 96% of the bound, so the next edit to the evaluator can
+    cross it.  Pin both the refusal and the remaining headroom.
+    """
+    from pathlib import Path
+
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_preliminary_qc_projection as projection,
+    )
+
+    # The lane bound must stay strictly under QuantConnect's observed limit.
+    assert projection.MAX_SOURCE_FILE_BYTES < 64_000
+
+    body = b"X = 1\n"
+    filler = b"# " + b"f" * 60 + b"\n"
+    oversized = body + filler * (
+        (projection.MAX_SOURCE_FILE_BYTES // len(filler)) + 2
+    )
+    assert len(oversized) > projection.MAX_SOURCE_FILE_BYTES
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="size, path, or future-import guard",
+    ):
+        projection._validate_source("oversized.py", oversized)
+
+    # A file exactly at the bound is admitted; one byte more is refused.
+    exact = body + b"#" * (projection.MAX_SOURCE_FILE_BYTES - len(body) - 1) + b"\n"
+    assert len(exact) == projection.MAX_SOURCE_FILE_BYTES
+    projection._validate_source("exact.py", exact)
+    with pytest.raises(projection.AcceptedRiskPreliminaryQcProjectionError):
+        projection._validate_source("over.py", exact + b"#\n")
+
+    # Every live projected module must stay inside the bound, and the tightest
+    # one must retain real headroom rather than sitting on the boundary.
+    base = Path(__file__).resolve().parents[2] / "research" / "analyst_revisions_v2_qc"
+    sizes = {
+        name: len((base / name).read_bytes())
+        for name in projection.PROJECT_SOURCE_PATHS
+    }
+    assert max(sizes.values()) <= projection.MAX_SOURCE_FILE_BYTES, sizes
+    assert sum(sizes.values()) <= projection.MAX_TOTAL_SOURCE_BYTES, sizes
+
+
+def test_preliminary_projection_invokes_qc_prelude_compilation():
+    """ARV2R74-003: isolate the prelude compile after earlier guards pass."""
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_preliminary_qc_projection as projection,
+    )
+
+    # This is valid on its own and passes every earlier source audit. Once the
+    # QC sentinel is prepended, its global declaration follows an assignment
+    # to that name and Python must reject it.
+    prelude_hostile = b"global QC_PRELUDE_SENTINEL\nX = 1\n"
+    compile(prelude_hostile.decode("ascii"), "probe.py", "exec")
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="after QC prelude",
+    ):
+        projection._validate_source("prelude_hostile.py", prelude_hostile)

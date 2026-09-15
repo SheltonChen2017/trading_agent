@@ -209,21 +209,21 @@ def _look_accounting(*, stage: str = "reservation") -> dict[str, object]:
         "schema": "arv2-qc-research-look-accounting-v1",
         "classification": "development_evaluation",
         "evaluation_id": "arv2-eval-stock-historical-qc-001",
-        "shared_look_ledger_entry_id": "R-053",
+        "shared_look_ledger_entry_id": "R-055",
         "accounting_stage": stage,
-        "run_level_looks_before": 53,
-        "run_level_looks_after": 54 if launched else 53,
-        "planned_run_level_looks_after_launch": 54,
-        "arv2_development_evaluations_before": 0,
-        "arv2_development_evaluations_after": 1 if launched else 0,
-        "planned_arv2_development_evaluations_after_launch": 1,
+        "run_level_looks_before": 55,
+        "run_level_looks_after": 56 if launched else 55,
+        "planned_run_level_looks_after_launch": 56,
+        "arv2_development_evaluations_before": 2,
+        "arv2_development_evaluations_after": 3 if launched else 2,
+        "planned_arv2_development_evaluations_after_launch": 3,
         "planned_maximum_preliminary_ic_cell_count": 32,
         "emitted_preliminary_ic_cell_count": (
             32 if aggregate_authenticated else 0
         ),
-        "lifetime_alpha_cell_floor_before": 452,
+        "lifetime_alpha_cell_floor_before": 484,
         "lifetime_alpha_cell_floor_after": (
-            484 if aggregate_authenticated else 452
+            516 if aggregate_authenticated else 484
         ),
         "aggregate_result_authenticated": aggregate_authenticated,
         "infrastructure_looks_before": 23,
@@ -2340,7 +2340,7 @@ def _validate_cell_semantics(record: dict[str, object]) -> int:
     if (
         eligible != accepted + missing
         or accepted < valid * preliminary_evaluator.MINIMUM_IC_ROWS
-        or ((missing > 0 or sector_refused > 0) and invalid == 0)
+        or (sector_refused > 0 and invalid == 0)
     ):
         _error("preliminary aggregate cell count invariants changed")
     expected_status = (
@@ -2418,7 +2418,8 @@ def _validate_aggregate_records(records: Mapping[str, dict[str, object]], plan) 
         + runtime_meta["named_security_refusal_count"]
         != plan.package.runtime_symbol_binding_count
         or type(runtime_meta.get("training_slice_count")) is not int
-        or not 1 <= runtime_meta["training_slice_count"] <= 64
+        or not 1 <= runtime_meta["training_slice_count"]
+        <= preliminary_runtime.MAX_TRAIN_SLICE_COUNT
     ):
         _error("preliminary runtime aggregate metadata changed")
     cells_by_axis = {}

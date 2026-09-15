@@ -1,12 +1,12 @@
 """Static disclosures for the accepted-risk preliminary rating evaluator."""
 
-CONTRACT_ID = "arv2-accepted-risk-preliminary-rating-evaluator-v1"
-MANIFEST_SCHEMA = "arv2-accepted-risk-preliminary-rating-manifest-v1"
+CONTRACT_ID = "arv2-accepted-risk-preliminary-rating-evaluator-v2"
+MANIFEST_SCHEMA = "arv2-accepted-risk-preliminary-rating-manifest-v2"
 SESSION_SCHEMA = "arv2-preliminary-rating-session-v1"
 MEMBERSHIP_SCHEMA = "arv2-preliminary-rating-membership-v1"
 CONTRIBUTION_SCHEMA = "arv2-preliminary-rating-contribution-v1"
-SUMMARY_SCHEMA = "arv2-accepted-risk-preliminary-rating-summary-v1"
-CELL_SCHEMA = "arv2-accepted-risk-preliminary-rating-summary-cell-v1"
+SUMMARY_SCHEMA = "arv2-accepted-risk-preliminary-rating-summary-v2"
+CELL_SCHEMA = "arv2-accepted-risk-preliminary-rating-summary-cell-v2"
 HISTORY_REQUEST_SCHEMA = "arv2-preliminary-total-return-history-request-v1"
 HISTORY_OBSERVATION_SCHEMA = "arv2-preliminary-total-return-open-observation-v1"
 SOURCE_LINEAGE_FIELDS = (
@@ -98,6 +98,8 @@ ACCEPTED_RISK_DISCLOSURE_ITEMS = (
     ("rating_half_life_sessions", 20),
     ("byte_identical_formal_per_event_decay_replay", False),
     ("complete_cross_section_required_for_each_date_ic", True),
+    ("sector_normalization_uses_active_signals_only", True),
+    ("missing_price_rows_excluded_without_imputation", True),
     ("owner_waived_uniform_q_data", True),
     ("historical_point_in_time_security_master", False),
     ("historical_point_in_time_sector_classification", False),

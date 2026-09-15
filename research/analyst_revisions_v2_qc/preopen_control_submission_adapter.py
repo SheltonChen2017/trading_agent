@@ -9,6 +9,7 @@ from __future__ import annotations
 import base64
 import dataclasses
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -70,11 +71,23 @@ class PreopenQcSubmissionLocked(RuntimeError):
 
 
 PLAN_SCHEMA = "arv2-preopen-qc-submission-plan-v1"
+PHYSICAL_PLAN_SCHEMA = "arv2-physical-preopen-qc-submission-plan-v1"
 PERMIT_SCHEMA = "arv2-preopen-qc-one-use-permit-v1"
 LAUNCH_SCHEMA = "arv2-preopen-qc-launch-receipt-v1"
 TERMINAL_SCHEMA = "arv2-preopen-qc-terminal-status-v1"
 OUTPUT_RECEIPT_SCHEMA = "arv2-preopen-qc-terminal-package-receipt-v1"
 EXECUTION_AUTHORITY_SCHEMA = "arv2-preopen-qc-execution-authority-v1"
+PHYSICAL_EXECUTION_AUTHORITY_SCHEMA = (
+    "arv2-physical-preopen-qc-execution-authority-v1"
+)
+OWNER_REVIEW_WAIVER_ID = "arv2-owner-review-waiver-section-72-v1"
+OWNER_REVIEW_WAIVER_SCOPE = "SECTION_72_THROUGH_FIRST_FORMAL_BACKTEST"
+OWNER_REVIEW_WAIVER_BASIS = "OWNER_EXPLICIT_REVIEW_WAIVER"
+OWNER_REVIEW_WAIVER_DISPOSITION = "NOT_PERFORMED_OWNER_WAIVED"
+PHYSICAL_INPUT_UPLOAD_DISPOSITION = (
+    "REUSE_PROCESS_AUTHENTICATED_PHYSICAL_PREOPEN_UPLOAD"
+)
+QC_DEFAULT_RESEARCH_NOTEBOOK_PATH = "research.ipynb"
 PERMIT_FILENAME = "arv2-preopen-qc-one-use-permit-v1.json"
 OUTPUT_ARCHIVE_DIRECTORY_NAME = "preopen-control-terminal-archive"
 OUTPUT_ARCHIVE_MANIFEST_NAME = "output-manifest.json"
@@ -110,6 +123,22 @@ PREOPEN_EXECUTION_ACTIONS = (
     "write_owner_only_terminal_archive_manifest_last",
     "load_authenticated_physical_preopen_terminal_archive",
 )
+PHYSICAL_PREOPEN_EXECUTION_ACTIONS = (
+    "authenticate",
+    "projects/read_exact_name_inventory",
+    "projects/create_private_exact_name_once",
+    "object/properties_verify_process_authenticated_preuploaded_input",
+    "files/read_exact_inventory",
+    "files/delete_exact_new_project_default_research_notebook_once",
+    "files/create_exact_projection",
+    "compile/create_once",
+    "compile/read_state_only_with_bounded_wait",
+    "backtests/create_once",
+    "backtests/list_identity_status_includeStatistics_false",
+    "object/read_exact_named_terminal_package_once",
+    "object/read_exact_pre_review_manifest_then_content_addressed_terminal_shards_once",
+    "write_owner_only_inert_pre_review_capture_manifest_last",
+)
 PREOPEN_REQUIRED_HOST_CODE_PATHS = tuple(dict.fromkeys((
     *formal.REQUIRED_HOST_CODE_PATHS,
     "research/analyst_revisions_v2/canonical.py",
@@ -118,6 +147,12 @@ PREOPEN_REQUIRED_HOST_CODE_PATHS = tuple(dict.fromkeys((
     "research/analyst_revisions_v2_qc/preopen_control_acquisition_io.py",
     "research/analyst_revisions_v2_qc/preopen_control_stage.py",
     "research/analyst_revisions_v2_qc/preopen_control_submission_adapter.py",
+)))
+PHYSICAL_PREOPEN_REQUIRED_HOST_CODE_PATHS = tuple(dict.fromkeys((
+    *PREOPEN_REQUIRED_HOST_CODE_PATHS,
+    "research/analyst_revisions_v2_qc/historical_preopen_input_adapter.py",
+    "research/analyst_revisions_v2_qc/physical_preopen_submission_adapter.py",
+    "research/analyst_revisions_v2_qc/preopen_control_prereview_downloader.py",
 )))
 
 
@@ -169,6 +204,7 @@ def _make_preopen_action_global_binding_guard():
         "_transport_capability_minter",
         "_seal_transport_capability_callers",
         "_execute_preopen_qc_submission_once_impl",
+        "_execute_preuploaded_preopen_qc_submission_once_impl",
         "_inspect_preopen_qc_terminal_status_impl",
         "_retrieve_preopen_qc_terminal_package_impl",
         "_download_and_load_preopen_qc_terminal_archive_impl",
@@ -974,6 +1010,85 @@ def verify_preopen_qc_host_closure_live(
         raise PreopenQcSubmissionError("live pre-open host source closure changed")
 
 
+def _read_physical_preopen_host_sources(
+    _sealed_root: Path = Path(__file__).resolve().parents[2],
+    _sealed_paths: tuple[str, ...] = PHYSICAL_PREOPEN_REQUIRED_HOST_CODE_PATHS,
+) -> tuple[PreopenQcHostSourceBinding, ...]:
+    result = []
+    for relative in _sealed_paths:
+        try:
+            path = (_sealed_root / relative).resolve(strict=True)
+            path.relative_to(_sealed_root)
+            payload = path.read_bytes()
+        except (OSError, ValueError) as exc:
+            raise PreopenQcSubmissionError(
+                "physical pre-open host source closure is unavailable"
+            ) from exc
+        if not payload or b"\r" in payload or not payload.endswith(b"\n"):
+            raise PreopenQcSubmissionError(
+                f"physical pre-open host source is not canonical LF: {relative}"
+            )
+        result.append(PreopenQcHostSourceBinding(
+            path=relative,
+            content_sha256=hashlib.sha256(payload).hexdigest(),
+            byte_count=len(payload),
+        ))
+    return tuple(result)
+
+
+def build_physical_preopen_qc_host_closure_binding(
+) -> PreopenQcHostClosureBinding:
+    sources = _read_physical_preopen_host_sources()
+    seed = {
+        "schema": "arv2-physical-preopen-qc-host-closure-v1",
+        "closure_id": None,
+        "closure_sha256": None,
+        "sources": [item.to_record() for item in sources],
+    }
+    digest = hashlib.sha256(_canonical(seed)).hexdigest()
+    return PreopenQcHostClosureBinding(
+        closure_id="arv2-physical-preopen-qc-host-closure-" + digest[:24],
+        closure_sha256=digest,
+        sources=sources,
+    )
+
+
+def verify_physical_preopen_qc_host_closure_live(
+    value: PreopenQcHostClosureBinding,
+) -> None:
+    if (
+        type(value) is not PreopenQcHostClosureBinding
+        or tuple(item.path for item in value.sources)
+        != PHYSICAL_PREOPEN_REQUIRED_HOST_CODE_PATHS
+        or any(
+            type(item) is not PreopenQcHostSourceBinding
+            or _HEX.fullmatch(item.content_sha256) is None
+            or type(item.byte_count) is not int
+            or item.byte_count < 1
+            for item in value.sources
+        )
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open host source closure changed"
+        )
+    seed = {
+        "schema": "arv2-physical-preopen-qc-host-closure-v1",
+        "closure_id": None,
+        "closure_sha256": None,
+        "sources": [item.to_record() for item in value.sources],
+    }
+    digest = hashlib.sha256(_canonical(seed)).hexdigest()
+    if (
+        value.closure_sha256 != digest
+        or value.closure_id
+        != "arv2-physical-preopen-qc-host-closure-" + digest[:24]
+        or _read_physical_preopen_host_sources() != value.sources
+    ):
+        raise PreopenQcSubmissionError(
+            "live physical pre-open host source closure changed"
+        )
+
+
 def _preopen_transport_call(
     closure: PreopenQcHostClosureBinding,
     client: FormalQcTransport,
@@ -982,7 +1097,14 @@ def _preopen_transport_call(
     *args,
     **kwargs,
 ) -> object:
-    verify_preopen_qc_host_closure_live(closure)
+    if (
+        type(closure) is PreopenQcHostClosureBinding
+        and tuple(item.path for item in closure.sources)
+        == PHYSICAL_PREOPEN_REQUIRED_HOST_CODE_PATHS
+    ):
+        verify_physical_preopen_qc_host_closure_live(closure)
+    else:
+        verify_preopen_qc_host_closure_live(closure)
     return formal._transport_call(client, capability, method, *args, **kwargs)
 
 
@@ -1074,6 +1196,67 @@ class PreopenQcSubmissionPlan:
     input_shards: tuple[PreopenInputShard, ...] = dataclasses.field(repr=False)
     projection: PreopenControlQcProjection = dataclasses.field(repr=False)
     run_authority: PreopenControlRunAuthority = dataclasses.field(repr=False)
+
+
+@dataclasses.dataclass(frozen=True, slots=True, weakref_slot=True)
+class PhysicalPreopenQcSubmissionPlan:
+    """Payload-free QC plan backed by one authenticated physical upload."""
+
+    plan_id: str
+    plan_sha256: str
+    organization_id: str
+    project_name: str
+    backtest_name: str
+    projection_id: str
+    projection_sha256: str
+    input_manifest_sha256: str
+    project_source_set_sha256: str
+    run_authority_id: str
+    run_authority_sha256: str
+    terminal_package_key: str
+    physical_upload_receipt_id: str
+    physical_upload_receipt_sha256: str
+    physical_upload_plan_id: str
+    physical_upload_plan_sha256: str
+    physical_upload_permit_id: str
+    physical_upload_permit_sha256: str
+    physical_stream_id: str
+    physical_stream_sha256: str
+    input_source_inventory_sha256: str
+    preuploaded_object_inventory_sha256: str
+    preuploaded_input_shard_count: int
+    preuploaded_object_count: int
+    preuploaded_byte_count: int
+    input_upload_disposition: str
+    review_disposition: str
+    independent_review_complete: bool
+    authorization_basis: str
+    owner_review_waiver_id: str
+    owner_review_waiver_scope: str
+    post_first_formal_backtest_independent_review_required: bool
+    source_files: tuple[object, ...]
+    compile_poll_limit: int
+    status_poll_limit: int
+    maximum_backtest_submissions: int
+    maximum_output_manifest_bytes: int
+    maximum_output_shard_reads: int
+    maximum_output_shard_read_bytes: int
+    output_archive_root: Path | None
+    outcome_result_statistics_log_order_access_authorized: bool
+    deployment_order_trading_authorized: bool
+    _preuploaded_objects: tuple[object, ...] = dataclasses.field(repr=False)
+    _input_manifest_bytes: bytes = dataclasses.field(repr=False)
+    projection: PreopenControlQcProjection = dataclasses.field(repr=False)
+    run_authority: PreopenControlRunAuthority = dataclasses.field(repr=False)
+    _physical_upload_receipt: object = dataclasses.field(repr=False)
+    _physical_receipt_requirer: object = dataclasses.field(repr=False)
+
+
+_PHYSICAL_PLAN_AUTHORITIES: dict[
+    int, tuple[weakref.ReferenceType[PhysicalPreopenQcSubmissionPlan], str, int]
+] = {}
+_PHYSICAL_PLAN_AUTHORITY_LOCK = threading.RLock()
+_PHYSICAL_PLAN_AUTHORITY_PID = os.getpid()
 
 
 def _entry(role: str, key: str, payload: bytes) -> PreopenQcUploadEntry:
@@ -1264,9 +1447,428 @@ def build_preopen_qc_submission_plan(
     )
 
 
+def _physical_plan_record(
+    *, upload_receipt, upload_plan, preuploaded_objects: tuple[object, ...],
+    projection: PreopenControlQcProjection,
+    run_authority: PreopenControlRunAuthority,
+    maximum_output_shard_reads: int,
+    output_archive_root: Path | None,
+) -> dict[str, object]:
+    return {
+        "schema": PHYSICAL_PLAN_SCHEMA,
+        "plan_id": None,
+        "plan_sha256": None,
+        "organization_id_sha256": hashlib.sha256(
+            upload_plan.organization_id.encode("utf-8")
+        ).hexdigest(),
+        "project_name": projection.project_name,
+        "backtest_name": projection.backtest_name,
+        "projection_id": projection.projection_id,
+        "projection_sha256": projection.projection_sha256,
+        "input_manifest_sha256": projection.input_manifest_sha256,
+        "project_source_set_sha256": projection.project_source_set_sha256,
+        "run_authority_id": run_authority.pin_id,
+        "run_authority_sha256": run_authority.pin_sha256,
+        "terminal_package_key": projection.terminal_package_key,
+        "physical_upload_receipt_id": upload_receipt.receipt_id,
+        "physical_upload_receipt_sha256": upload_receipt.receipt_sha256,
+        "physical_upload_plan_id": upload_receipt.plan_id,
+        "physical_upload_plan_sha256": upload_receipt.plan_sha256,
+        "physical_upload_permit_id": upload_receipt.permit_id,
+        "physical_upload_permit_sha256": upload_receipt.permit_sha256,
+        "physical_stream_id": upload_receipt.stream_id,
+        "physical_stream_sha256": upload_receipt.stream_sha256,
+        "input_source_inventory_sha256": (
+            upload_receipt.input_source_inventory_sha256
+        ),
+        "preuploaded_object_inventory_sha256": hashlib.sha256(
+            _canonical([item.to_record() for item in preuploaded_objects])
+        ).hexdigest(),
+        "preuploaded_input_shard_count": (
+            upload_receipt.uploaded_input_shard_count
+        ),
+        "preuploaded_object_count": upload_receipt.uploaded_object_count,
+        "preuploaded_byte_count": upload_receipt.uploaded_byte_count,
+        "input_upload_disposition": PHYSICAL_INPUT_UPLOAD_DISPOSITION,
+        "review_authorization": {
+            "review_disposition": OWNER_REVIEW_WAIVER_DISPOSITION,
+            "independent_review_complete": False,
+            "authorization_basis": OWNER_REVIEW_WAIVER_BASIS,
+            "owner_review_waiver_id": OWNER_REVIEW_WAIVER_ID,
+            "owner_review_waiver_scope": OWNER_REVIEW_WAIVER_SCOPE,
+            "post_first_formal_backtest_independent_review_required": True,
+        },
+        "source_files": [item.to_record() for item in projection.source_files],
+        "qc_default_research_notebook_path": (
+            QC_DEFAULT_RESEARCH_NOTEBOOK_PATH
+        ),
+        "maximum_default_notebook_deletions": 1,
+        "compile_poll_limit": MAX_COMPILE_POLLS,
+        "status_poll_limit": MAX_STATUS_POLLS,
+        "maximum_backtest_submissions": 1,
+        "maximum_output_manifest_bytes": MAX_OUTPUT_MANIFEST_BYTES,
+        "maximum_output_shard_reads": maximum_output_shard_reads,
+        "maximum_output_shard_read_bytes": MAX_OUTPUT_SHARD_READ_BYTES,
+        "output_archive_root": (
+            None if output_archive_root is None else str(output_archive_root)
+        ),
+        "preuploaded_payloads_retained": False,
+        "input_objects_reuploaded": False,
+        "outcome_result_statistics_log_order_access_authorized": False,
+        "deployment_order_trading_authorized": False,
+    }
+
+
+def _physical_plan_fingerprint(value: PhysicalPreopenQcSubmissionPlan) -> str:
+    public = {
+        field.name: (
+            None
+            if field.name == "output_archive_root"
+            and value.output_archive_root is None
+            else str(value.output_archive_root)
+            if field.name == "output_archive_root"
+            else getattr(value, field.name)
+        )
+        for field in dataclasses.fields(value)
+        if not field.name.startswith("_")
+        and field.name not in {"source_files", "projection", "run_authority"}
+    }
+    return hashlib.sha256(_canonical({
+        "public": public,
+        "source_files_tuple_identity": id(value.source_files),
+        "source_file_identities": [
+            id(item) for item in value.source_files
+        ],
+        "preuploaded_objects_tuple_identity": id(
+            value._preuploaded_objects
+        ),
+        "preuploaded_object_identities": [
+            id(item) for item in value._preuploaded_objects
+        ],
+        "projection_identity": id(value.projection),
+        "run_authority_identity": id(value.run_authority),
+        "upload_receipt_identity": id(value._physical_upload_receipt),
+        "receipt_requirer_identity": id(value._physical_receipt_requirer),
+    })).hexdigest()
+
+
+def _physical_output_archive_root(
+    output_archive_root: Path | None,
+) -> Path | None:
+    if output_archive_root is None:
+        return None
+    if (
+        type(output_archive_root) is not type(Path())
+        or not output_archive_root.is_absolute()
+        or ".." in output_archive_root.parts
+        or output_archive_root.name != OUTPUT_ARCHIVE_DIRECTORY_NAME
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open output archive must be the exact absolute archive child"
+        )
+    try:
+        parent = output_archive_root.parent.resolve(strict=True)
+        parent_stat = parent.stat(follow_symlinks=False)
+        if output_archive_root.parent != parent:
+            raise PreopenQcSubmissionError(
+                "physical pre-open output archive parent is not canonical"
+            )
+        try:
+            leaf_stat = output_archive_root.lstat()
+        except FileNotFoundError:
+            leaf_stat = None
+    except OSError as exc:
+        raise PreopenQcSubmissionError(
+            "physical pre-open output archive parent is unavailable"
+        ) from exc
+    if (
+        not stat.S_ISDIR(parent_stat.st_mode)
+        or stat.S_IMODE(parent_stat.st_mode) != 0o700
+        or (hasattr(os, "getuid") and parent_stat.st_uid != os.getuid())
+        or (
+            leaf_stat is not None
+            and (
+                stat.S_ISLNK(leaf_stat.st_mode)
+                or not stat.S_ISDIR(leaf_stat.st_mode)
+                or stat.S_IMODE(leaf_stat.st_mode) != 0o700
+                or (
+                    hasattr(os, "getuid")
+                    and leaf_stat.st_uid != os.getuid()
+                )
+            )
+        )
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open output archive parent or leaf is not owner-only"
+        )
+    return parent / OUTPUT_ARCHIVE_DIRECTORY_NAME
+
+
+def build_preopen_qc_submission_plan_from_physical_upload(
+    *, physical_upload_receipt: object,
+    output_archive_root: Path | None = None,
+) -> PhysicalPreopenQcSubmissionPlan:
+    """Bind a process-authenticated completed upload without retaining shards."""
+
+    try:
+        physical = importlib.import_module(
+            "research.analyst_revisions_v2_qc.physical_preopen_submission_adapter"
+        )
+        receipt_requirer = physical.require_physical_preopen_upload_receipt
+        upload_receipt = receipt_requirer(physical_upload_receipt)
+    except Exception as exc:
+        raise PreopenQcSubmissionError(
+            "physical pre-open upload receipt is not process-authenticated"
+        ) from exc
+    upload_plan = upload_receipt._plan
+    projection = upload_plan._projection
+    run_authority = upload_plan._run_authority
+    input_manifest_bytes = upload_plan._input_manifest_bytes
+    _safe(upload_plan.organization_id, "organization_id")
+    _rebuild_projection(projection, input_manifest_bytes, run_authority)
+    output_archive_root = _physical_output_archive_root(output_archive_root)
+    try:
+        manifest = json.loads(input_manifest_bytes.decode("utf-8"))
+    except (UnicodeError, ValueError) as exc:
+        raise PreopenQcSubmissionError(
+            "physical pre-open activated input manifest is not JSON"
+        ) from exc
+    resource_census = manifest.get("resource_census")
+    maximum_output_shard_reads = (
+        resource_census.get("projected_output_shard_count")
+        if type(resource_census) is dict
+        else None
+    )
+    if (
+        _canonical(manifest) != input_manifest_bytes
+        or type(maximum_output_shard_reads) is not int
+        or not 1 <= maximum_output_shard_reads <= MAX_OUTPUT_SHARD_READS
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open activated manifest or output census changed"
+        )
+    descriptors = manifest.get("shards")
+    preuploaded_objects = upload_plan.upload_objects
+    if (
+        type(descriptors) is not list
+        or type(preuploaded_objects) is not tuple
+        or len(preuploaded_objects) != len(descriptors) + 1
+        or upload_receipt.uploaded_input_shard_count != len(descriptors)
+        or upload_receipt.uploaded_object_count != len(preuploaded_objects)
+        or upload_receipt.uploaded_byte_count
+        != sum(item.byte_count for item in preuploaded_objects)
+        or upload_receipt.input_manifest_sha256
+        != projection.input_manifest_sha256
+        or upload_receipt.input_source_inventory_sha256
+        != manifest.get("input_source_inventory_sha256")
+        or upload_receipt.activated_manifest_published_last is not True
+        or upload_receipt.maximum_backtest_submissions != 0
+        or upload_receipt.outcome_result_statistics_log_order_accessed is not False
+        or upload_receipt.deployment_order_trading_authorized is not False
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open upload receipt census or gates changed"
+        )
+    for ordinal, (descriptor, uploaded) in enumerate(
+        zip(descriptors, preuploaded_objects[:-1], strict=True)
+    ):
+        if (
+            type(descriptor) is not dict
+            or uploaded.role != "input_" + str(descriptor.get("role"))
+            or uploaded.object_store_key != descriptor.get("object_store_key")
+            or uploaded.content_sha256 != descriptor.get("compressed_sha256")
+            or uploaded.byte_count != descriptor.get("compressed_byte_count")
+        ):
+            raise PreopenQcSubmissionError(
+                f"physical pre-open preuploaded shard {ordinal} lineage changed"
+            )
+    activated = preuploaded_objects[-1]
+    if (
+        activated.role != "input_manifest"
+        or activated.object_store_key != projection.input_manifest_key
+        or activated.content_sha256 != projection.input_manifest_sha256
+        or activated.byte_count != projection.input_manifest_byte_count
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open preuploaded manifest lineage changed"
+        )
+    record = _physical_plan_record(
+        upload_receipt=upload_receipt,
+        upload_plan=upload_plan,
+        preuploaded_objects=preuploaded_objects,
+        projection=projection,
+        run_authority=run_authority,
+        maximum_output_shard_reads=maximum_output_shard_reads,
+        output_archive_root=output_archive_root,
+    )
+    digest = hashlib.sha256(_canonical(record)).hexdigest()
+    record["plan_id"] = "arv2-physical-preopen-qc-plan-" + digest[:24]
+    record["plan_sha256"] = digest
+    value = PhysicalPreopenQcSubmissionPlan(
+        plan_id=record["plan_id"],
+        plan_sha256=digest,
+        organization_id=upload_plan.organization_id,
+        project_name=projection.project_name,
+        backtest_name=projection.backtest_name,
+        projection_id=projection.projection_id,
+        projection_sha256=projection.projection_sha256,
+        input_manifest_sha256=projection.input_manifest_sha256,
+        project_source_set_sha256=projection.project_source_set_sha256,
+        run_authority_id=run_authority.pin_id,
+        run_authority_sha256=run_authority.pin_sha256,
+        terminal_package_key=projection.terminal_package_key,
+        physical_upload_receipt_id=upload_receipt.receipt_id,
+        physical_upload_receipt_sha256=upload_receipt.receipt_sha256,
+        physical_upload_plan_id=upload_receipt.plan_id,
+        physical_upload_plan_sha256=upload_receipt.plan_sha256,
+        physical_upload_permit_id=upload_receipt.permit_id,
+        physical_upload_permit_sha256=upload_receipt.permit_sha256,
+        physical_stream_id=upload_receipt.stream_id,
+        physical_stream_sha256=upload_receipt.stream_sha256,
+        input_source_inventory_sha256=(
+            upload_receipt.input_source_inventory_sha256
+        ),
+        preuploaded_object_inventory_sha256=record[
+            "preuploaded_object_inventory_sha256"
+        ],
+        preuploaded_input_shard_count=(
+            upload_receipt.uploaded_input_shard_count
+        ),
+        preuploaded_object_count=upload_receipt.uploaded_object_count,
+        preuploaded_byte_count=upload_receipt.uploaded_byte_count,
+        input_upload_disposition=PHYSICAL_INPUT_UPLOAD_DISPOSITION,
+        review_disposition=OWNER_REVIEW_WAIVER_DISPOSITION,
+        independent_review_complete=False,
+        authorization_basis=OWNER_REVIEW_WAIVER_BASIS,
+        owner_review_waiver_id=OWNER_REVIEW_WAIVER_ID,
+        owner_review_waiver_scope=OWNER_REVIEW_WAIVER_SCOPE,
+        post_first_formal_backtest_independent_review_required=True,
+        source_files=projection.source_files,
+        compile_poll_limit=MAX_COMPILE_POLLS,
+        status_poll_limit=MAX_STATUS_POLLS,
+        maximum_backtest_submissions=1,
+        maximum_output_manifest_bytes=MAX_OUTPUT_MANIFEST_BYTES,
+        maximum_output_shard_reads=maximum_output_shard_reads,
+        maximum_output_shard_read_bytes=MAX_OUTPUT_SHARD_READ_BYTES,
+        output_archive_root=output_archive_root,
+        outcome_result_statistics_log_order_access_authorized=False,
+        deployment_order_trading_authorized=False,
+        _preuploaded_objects=preuploaded_objects,
+        _input_manifest_bytes=input_manifest_bytes,
+        projection=projection,
+        run_authority=run_authority,
+        _physical_upload_receipt=upload_receipt,
+        _physical_receipt_requirer=receipt_requirer,
+    )
+    reference = weakref.ref(
+        value,
+        lambda _reference, key=id(value): _PHYSICAL_PLAN_AUTHORITIES.pop(
+            key, None
+        ),
+    )
+    with _PHYSICAL_PLAN_AUTHORITY_LOCK:
+        _PHYSICAL_PLAN_AUTHORITIES[id(value)] = (
+            reference,
+            _physical_plan_fingerprint(value),
+            os.getpid(),
+        )
+    return value
+
+
+def require_preopen_qc_physical_submission_plan(
+    value: PhysicalPreopenQcSubmissionPlan,
+) -> PhysicalPreopenQcSubmissionPlan:
+    if type(value) is not PhysicalPreopenQcSubmissionPlan:
+        raise PreopenQcSubmissionError(
+            "physical pre-open QC submission plan type changed"
+        )
+    with _PHYSICAL_PLAN_AUTHORITY_LOCK:
+        registered = _PHYSICAL_PLAN_AUTHORITIES.get(id(value))
+    if (
+        os.getpid() != _PHYSICAL_PLAN_AUTHORITY_PID
+        or registered is None
+        or registered[0]() is not value
+        or registered[2] != os.getpid()
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open QC submission plan lacks process authority"
+        )
+    if (
+        type(value.source_files) is not tuple
+        or type(value._preuploaded_objects) is not tuple
+        or type(value._input_manifest_bytes) is not bytes
+        or type(value.output_archive_root) not in (type(None), type(Path()))
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open QC submission plan container types changed"
+        )
+    try:
+        fingerprint = _physical_plan_fingerprint(value)
+    except Exception as exc:
+        raise PreopenQcSubmissionError(
+            "physical pre-open QC submission plan scalar types changed"
+        ) from exc
+    if registered[1] != fingerprint:
+        raise PreopenQcSubmissionError(
+            "physical pre-open QC submission plan changed"
+        )
+    try:
+        receipt = value._physical_receipt_requirer(
+            value._physical_upload_receipt
+        )
+    except Exception as exc:
+        raise PreopenQcSubmissionError(
+            "physical pre-open upload receipt changed after plan construction"
+        ) from exc
+    upload_plan = receipt._plan
+    projection = upload_plan._projection
+    run_authority = upload_plan._run_authority
+    input_manifest_bytes = upload_plan._input_manifest_bytes
+    try:
+        manifest = json.loads(input_manifest_bytes.decode("utf-8"))
+        maximum_output_shard_reads = manifest["resource_census"][
+            "projected_output_shard_count"
+        ]
+        expected_root = _physical_output_archive_root(
+            value.output_archive_root
+        )
+        expected_record = _physical_plan_record(
+            upload_receipt=receipt,
+            upload_plan=upload_plan,
+            preuploaded_objects=upload_plan.upload_objects,
+            projection=projection,
+            run_authority=run_authority,
+            maximum_output_shard_reads=maximum_output_shard_reads,
+            output_archive_root=expected_root,
+        )
+        expected_digest = hashlib.sha256(
+            _canonical(expected_record)
+        ).hexdigest()
+    except Exception as exc:
+        raise PreopenQcSubmissionError(
+            "physical pre-open upload lineage changed after plan construction"
+        ) from exc
+    if (
+        value.plan_id
+        != "arv2-physical-preopen-qc-plan-" + expected_digest[:24]
+        or value.plan_sha256 != expected_digest
+        or value._preuploaded_objects is not upload_plan.upload_objects
+        or value._input_manifest_bytes is not input_manifest_bytes
+        or value.projection is not projection
+        or value.run_authority is not run_authority
+        or expected_root != value.output_archive_root
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open QC submission plan changed"
+        )
+    return value
+
+
 def require_preopen_qc_submission_plan(
-    value: PreopenQcSubmissionPlan,
-) -> PreopenQcSubmissionPlan:
+    value: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+) -> PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan:
+    if type(value) is PhysicalPreopenQcSubmissionPlan:
+        return require_preopen_qc_physical_submission_plan(value)
     if type(value) is not PreopenQcSubmissionPlan:
         raise PreopenQcSubmissionError("pre-open submission plan type changed")
     rebuilt = build_preopen_qc_submission_plan(
@@ -1282,10 +1884,95 @@ def require_preopen_qc_submission_plan(
 
 
 def _render_preopen_qc_execution_authority_candidate(
-    plan: PreopenQcSubmissionPlan,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
     host_closure: PreopenQcHostClosureBinding,
 ) -> bytes:
     require_preopen_qc_submission_plan(plan)
+    if type(plan) is PhysicalPreopenQcSubmissionPlan:
+        verify_physical_preopen_qc_host_closure_live(host_closure)
+        return _canonical({
+            "schema": PHYSICAL_EXECUTION_AUTHORITY_SCHEMA,
+            "plan_id": plan.plan_id,
+            "plan_sha256": plan.plan_sha256,
+            "review_authorization": {
+                "review_disposition": plan.review_disposition,
+                "independent_review_complete": plan.independent_review_complete,
+                "authorization_basis": plan.authorization_basis,
+                "owner_review_waiver_id": plan.owner_review_waiver_id,
+                "owner_review_waiver_scope": plan.owner_review_waiver_scope,
+                "post_first_formal_backtest_independent_review_required": (
+                    plan.post_first_formal_backtest_independent_review_required
+                ),
+            },
+            "physical_upload_receipt_id": plan.physical_upload_receipt_id,
+            "physical_upload_receipt_sha256": (
+                plan.physical_upload_receipt_sha256
+            ),
+            "physical_upload_plan_id": plan.physical_upload_plan_id,
+            "physical_upload_plan_sha256": plan.physical_upload_plan_sha256,
+            "physical_upload_permit_id": plan.physical_upload_permit_id,
+            "physical_upload_permit_sha256": (
+                plan.physical_upload_permit_sha256
+            ),
+            "physical_stream_id": plan.physical_stream_id,
+            "physical_stream_sha256": plan.physical_stream_sha256,
+            "input_source_inventory_sha256": (
+                plan.input_source_inventory_sha256
+            ),
+            "preuploaded_object_inventory_sha256": (
+                plan.preuploaded_object_inventory_sha256
+            ),
+            "preuploaded_input_shard_count": (
+                plan.preuploaded_input_shard_count
+            ),
+            "preuploaded_object_count": plan.preuploaded_object_count,
+            "preuploaded_byte_count": plan.preuploaded_byte_count,
+            "input_upload_disposition": plan.input_upload_disposition,
+            "projection_id": plan.projection_id,
+            "projection_sha256": plan.projection_sha256,
+            "input_manifest_sha256": plan.input_manifest_sha256,
+            "project_source_set_sha256": plan.project_source_set_sha256,
+            "run_authority_id": plan.run_authority_id,
+            "run_authority_sha256": plan.run_authority_sha256,
+            "organization_id_sha256": hashlib.sha256(
+                plan.organization_id.encode("utf-8")
+            ).hexdigest(),
+            "project_name": plan.project_name,
+            "backtest_name": plan.backtest_name,
+            "terminal_package_key": plan.terminal_package_key,
+            "qc_default_research_notebook_path": (
+                QC_DEFAULT_RESEARCH_NOTEBOOK_PATH
+            ),
+            "maximum_default_notebook_deletions": 1,
+            "output_archive_root": (
+                None
+                if plan.output_archive_root is None
+                else str(plan.output_archive_root)
+            ),
+            "host_closure": {
+                "closure_id": host_closure.closure_id,
+                "closure_sha256": host_closure.closure_sha256,
+                "sources": [
+                    item.to_record() for item in host_closure.sources
+                ],
+            },
+            "actions": list(PHYSICAL_PREOPEN_EXECUTION_ACTIONS),
+            "object_store_key_allowlist": [
+                item.object_store_key for item in plan._preuploaded_objects
+            ],
+            "maximum_backtest_submissions": 1,
+            "maximum_output_manifest_bytes": (
+                plan.maximum_output_manifest_bytes
+            ),
+            "maximum_output_shard_reads": plan.maximum_output_shard_reads,
+            "maximum_output_shard_read_bytes": (
+                plan.maximum_output_shard_read_bytes
+            ),
+            "preuploaded_payloads_retained": False,
+            "input_objects_reuploaded": False,
+            "outcome_result_statistics_log_order_access": False,
+            "deployment_order_trading_authorized": False,
+        })
     verify_preopen_qc_host_closure_live(host_closure)
     return _canonical({
         "schema": EXECUTION_AUTHORITY_SCHEMA,
@@ -1323,13 +2010,16 @@ def _render_preopen_qc_execution_authority_candidate(
 
 
 def render_preopen_qc_execution_authority_candidate(
-    plan: PreopenQcSubmissionPlan,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
 ) -> bytes:
     """Render the exact bytes the owner must sign for this pre-open QC run."""
 
-    return _render_preopen_qc_execution_authority_candidate(
-        plan, build_preopen_qc_host_closure_binding()
+    closure = (
+        build_physical_preopen_qc_host_closure_binding()
+        if type(plan) is PhysicalPreopenQcSubmissionPlan
+        else build_preopen_qc_host_closure_binding()
     )
+    return _render_preopen_qc_execution_authority_candidate(plan, closure)
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -1347,7 +2037,8 @@ class PreopenQcSubmissionPermit:
 
 
 def _spend_permit(
-    plan: PreopenQcSubmissionPlan, ledger_directory: Path, started_at_utc: str,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+    ledger_directory: Path, started_at_utc: str,
 ) -> PreopenQcSubmissionPermit:
     require_preopen_qc_submission_plan(plan)
     _utc(started_at_utc, "submission started_at")
@@ -1395,7 +2086,8 @@ def _spend_permit(
 
 
 def require_preopen_qc_submission_permit(
-    permit: PreopenQcSubmissionPermit, plan: PreopenQcSubmissionPlan,
+    permit: PreopenQcSubmissionPermit,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
 ) -> PreopenQcSubmissionPermit:
     require_preopen_qc_submission_plan(plan)
     if type(permit) is not PreopenQcSubmissionPermit:
@@ -1451,16 +2143,22 @@ def _identified(schema: str, prefix: str, record: dict[str, object]):
 
 
 def _launch(
-    plan: PreopenQcSubmissionPlan, permit: PreopenQcSubmissionPermit,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+    permit: PreopenQcSubmissionPermit,
     project_id: int, compile_id: str, backtest_id: str, status: str,
 ) -> PreopenQcLaunchReceipt:
+    uploaded_object_count = (
+        0
+        if type(plan) is PhysicalPreopenQcSubmissionPlan
+        else len(plan.upload_entries)
+    )
     record = {
         "permit_id": permit.permit_id, "permit_sha256": permit.permit_sha256,
         "plan_id": plan.plan_id, "plan_sha256": plan.plan_sha256,
         "project_id": project_id, "compile_id": compile_id,
         "backtest_id": backtest_id, "backtest_name": plan.backtest_name,
         "initial_status": status,
-        "uploaded_object_count": len(plan.upload_entries),
+        "uploaded_object_count": uploaded_object_count,
         "uploaded_source_count": len(plan.source_files),
         "submission_count": 1,
     }
@@ -1476,7 +2174,8 @@ def _register_launch_process_return(
 
 
 def _require_launch_receipt(
-    launch: PreopenQcLaunchReceipt, plan: PreopenQcSubmissionPlan,
+    launch: PreopenQcLaunchReceipt,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
     permit: PreopenQcSubmissionPermit,
 ) -> PreopenQcLaunchReceipt:
     registered = _process_receipt_authority_current("launch", launch)
@@ -1500,20 +2199,88 @@ def _wait(seconds: int) -> None:
 
 
 def _execute_preopen_qc_submission_once_impl(
-    *, plan: PreopenQcSubmissionPlan, client: FormalQcTransport,
+    *, plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+    client: FormalQcTransport,
     ledger_directory: Path, started_at_utc: str,
     owner_signature: OwnerSignatureAuthority | None,
-    _transport_capability_minter,
+    _transport_capability_minter, _execute_preuploaded_impl=None,
 ) -> tuple[PreopenQcSubmissionPermit, PreopenQcLaunchReceipt]:
-    host_closure = build_preopen_qc_host_closure_binding()
+    host_closure = (
+        build_physical_preopen_qc_host_closure_binding()
+        if type(plan) is PhysicalPreopenQcSubmissionPlan
+        else build_preopen_qc_host_closure_binding()
+    )
     _require_external_execution_trust_root(
         owner_signature,
         _render_preopen_qc_execution_authority_candidate(plan, host_closure),
     )
-    verify_preopen_qc_host_closure_live(host_closure)
+    if type(plan) is PhysicalPreopenQcSubmissionPlan:
+        verify_physical_preopen_qc_host_closure_live(host_closure)
+    else:
+        verify_preopen_qc_host_closure_live(host_closure)
     require_preopen_qc_submission_plan(plan)
     formal._require_concrete_transport(client)
+    if (
+        type(plan) is PhysicalPreopenQcSubmissionPlan
+        and type(_execute_preuploaded_impl) is not type(lambda: None)
+    ):
+        raise PreopenQcSubmissionError(
+            "physical pre-open execution authority is unavailable"
+        )
     permit = _spend_permit(plan, ledger_directory, started_at_utc)
+    if type(plan) is PhysicalPreopenQcSubmissionPlan:
+        capability = _transport_capability_minter(
+            transport=client,
+            scope="submission",
+            binding_record={
+                "schema": "arv2-physical-preopen-qc-submission-capability-v1",
+                "plan_sha256": plan.plan_sha256,
+                "permit_sha256": permit.permit_sha256,
+                "physical_upload_receipt_sha256": (
+                    plan.physical_upload_receipt_sha256
+                ),
+                "preuploaded_object_inventory_sha256": (
+                    plan.preuploaded_object_inventory_sha256
+                ),
+                "review_disposition": plan.review_disposition,
+                "independent_review_complete": (
+                    plan.independent_review_complete
+                ),
+                "owner_review_waiver_scope": plan.owner_review_waiver_scope,
+                "input_objects_reuploaded": False,
+            },
+            call_budget={
+                "authenticate": 1,
+                "object/properties": plan.preuploaded_object_count,
+                "projects/read": 2,
+                "projects/create": 1,
+                "files/read": 2,
+                "files/delete": 1,
+                "files/create": len(plan.source_files),
+                "compile/create": 1,
+                "compile/read": plan.compile_poll_limit,
+                "backtests/create": 1,
+            },
+        )
+        try:
+            launch = _execute_preuploaded_impl(
+                plan=plan,
+                client=client,
+                host_closure=host_closure,
+                permit=permit,
+                capability=capability,
+            )
+            return permit, _register_launch_process_return(launch)
+        except PreopenQcSubmissionLocked:
+            raise
+        except PreopenQcSubmissionError as exc:
+            raise PreopenQcSubmissionLocked(
+                "physical_submission", permit.permit_id, str(exc)
+            ) from exc
+        except Exception as exc:
+            raise PreopenQcSubmissionLocked(
+                "physical_submission", permit.permit_id, type(exc).__name__
+            ) from exc
     capability = _transport_capability_minter(
         transport=client, scope="submission",
         binding_record={
@@ -1570,10 +2337,13 @@ def _execute_preopen_qc_submission_once_impl(
                     plan.organization_id, entry.object_store_key,
                 ), entry,
             )
-        existing = formal._read_files(_preopen_transport_call(
-            host_closure, client, capability, "_request_json", "files/read",
-            {"projectId": project_id},
-        ))
+        existing = formal._read_files(
+            _preopen_transport_call(
+                host_closure, client, capability, "_request_json", "files/read",
+                {"projectId": project_id},
+            ),
+            expected_project_id=project_id,
+        )
         if existing:
             raise PreopenQcSubmissionError("new pre-open project is not empty")
         for source in plan.source_files:
@@ -1584,10 +2354,13 @@ def _execute_preopen_qc_submission_once_impl(
                     "content": source.content.decode("utf-8"),
                 },
             )
-        observed = formal._read_files(_preopen_transport_call(
-            host_closure, client, capability, "_request_json", "files/read",
-            {"projectId": project_id},
-        ))
+        observed = formal._read_files(
+            _preopen_transport_call(
+                host_closure, client, capability, "_request_json", "files/read",
+                {"projectId": project_id},
+            ),
+            expected_project_id=project_id,
+        )
         if set(observed) != {item.project_path for item in plan.source_files}:
             raise PreopenQcSubmissionError("project source inventory changed")
         for source in plan.source_files:
@@ -1600,7 +2373,7 @@ def _execute_preopen_qc_submission_once_impl(
         compile_id = formal._compile_id(_preopen_transport_call(
             host_closure, client, capability, "_request_json", "compile/create",
             {"projectId": project_id},
-        ))
+        ), expected_project_id=project_id)
         compile_state = ""
         for index in range(plan.compile_poll_limit):
             compile_state = formal._compile_state(
@@ -1636,6 +2409,233 @@ def _execute_preopen_qc_submission_once_impl(
         ) from exc
 
 
+def _execute_preuploaded_preopen_qc_submission_once_impl(
+    *, plan: PhysicalPreopenQcSubmissionPlan, client: FormalQcTransport,
+    host_closure: PreopenQcHostClosureBinding,
+    permit: PreopenQcSubmissionPermit,
+    capability: object,
+) -> PreopenQcLaunchReceipt:
+    """Use metadata-only input checks, then create, compile, and launch."""
+
+    try:
+        _preopen_transport_call(
+            host_closure,
+            client,
+            capability,
+            "_request_json",
+            "authenticate",
+            {},
+        )
+        for ordinal, expected in enumerate(plan._preuploaded_objects):
+            try:
+                metadata = _preopen_transport_call(
+                    host_closure,
+                    client,
+                    capability,
+                    "_read_object_properties",
+                    plan.organization_id,
+                    expected.object_store_key,
+                )
+                formal._object_metadata_matches(metadata, expected)
+            except Exception as exc:
+                raise PreopenQcSubmissionError(
+                    f"physical pre-open preuploaded object {ordinal} metadata changed"
+                ) from exc
+        inventory = formal._read_project_inventory(
+            _preopen_transport_call(
+                host_closure,
+                client,
+                capability,
+                "_request_json",
+                "projects/read",
+                {},
+            )
+        )
+        if any(
+            type(item) is dict and item.get("name") == plan.project_name
+            for item in inventory
+        ):
+            raise PreopenQcSubmissionError(
+                "exact physical pre-open project already exists"
+            )
+        project = formal._created_project(
+            _preopen_transport_call(
+                host_closure,
+                client,
+                capability,
+                "_request_json",
+                "projects/create",
+                {"name": plan.project_name, "language": "Py"},
+            ),
+            name=plan.project_name,
+            organization_id=plan.organization_id,
+        )
+        project_id = int(project["projectId"])
+        exact = formal._read_project_inventory(
+            _preopen_transport_call(
+                host_closure,
+                client,
+                capability,
+                "_request_json",
+                "projects/read",
+                {"projectId": project_id},
+            )
+        )
+        if len(exact) != 1:
+            raise PreopenQcSubmissionError(
+                "created physical pre-open project identity is ambiguous"
+            )
+        created_project = formal._project_record(
+            exact[0],
+            name=plan.project_name,
+            organization_id=plan.organization_id,
+        )
+        if created_project["projectId"] != project_id:
+            raise PreopenQcSubmissionError(
+                "created physical pre-open project identifier changed"
+            )
+        existing = formal._read_files(
+            _preopen_transport_call(
+                host_closure,
+                client,
+                capability,
+                "_request_json",
+                "files/read",
+                {"projectId": project_id},
+            ),
+            expected_project_id=project_id,
+        )
+        if set(existing) - {QC_DEFAULT_RESEARCH_NOTEBOOK_PATH}:
+            raise PreopenQcSubmissionError(
+                "new physical pre-open project contains an unprojected source"
+            )
+        if QC_DEFAULT_RESEARCH_NOTEBOOK_PATH in existing:
+            formal._success(
+                _preopen_transport_call(
+                    host_closure,
+                    client,
+                    capability,
+                    "_request_json",
+                    "files/delete",
+                    {
+                        "projectId": project_id,
+                        "name": QC_DEFAULT_RESEARCH_NOTEBOOK_PATH,
+                    },
+                ),
+                frozenset({"success", "errors", "messages"}),
+                "files/delete",
+            )
+        for source in plan.source_files:
+            formal._success(
+                _preopen_transport_call(
+                    host_closure,
+                    client,
+                    capability,
+                    "_request_json",
+                    "files/create",
+                    {
+                        "projectId": project_id,
+                        "name": source.project_path,
+                        "content": source.content.decode("utf-8"),
+                    },
+                ),
+                frozenset({"success", "errors", "messages"}),
+                "files/create",
+            )
+        observed = formal._read_files(
+            _preopen_transport_call(
+                host_closure,
+                client,
+                capability,
+                "_request_json",
+                "files/read",
+                {"projectId": project_id},
+            ),
+            expected_project_id=project_id,
+        )
+        if set(observed) != {
+            item.project_path for item in plan.source_files
+        }:
+            raise PreopenQcSubmissionError(
+                "physical pre-open project source inventory changed"
+            )
+        for source in plan.source_files:
+            payload = observed[source.project_path].encode("utf-8")
+            if (
+                len(payload) != source.byte_count
+                or hashlib.sha256(payload).hexdigest()
+                != source.content_sha256
+            ):
+                raise PreopenQcSubmissionError(
+                    "physical pre-open project source bytes changed"
+                )
+        compile_id = formal._compile_id(
+            _preopen_transport_call(
+                host_closure,
+                client,
+                capability,
+                "_request_json",
+                "compile/create",
+                {"projectId": project_id},
+            ),
+            expected_project_id=project_id,
+        )
+        compile_state = ""
+        for index in range(plan.compile_poll_limit):
+            compile_state = formal._compile_state(
+                _preopen_transport_call(
+                    host_closure,
+                    client,
+                    capability,
+                    "_request_json",
+                    "compile/read",
+                    {"projectId": project_id, "compileId": compile_id},
+                ),
+                compile_id,
+            )
+            if compile_state in formal.COMPILE_TERMINAL_STATES:
+                break
+            if index + 1 == plan.compile_poll_limit:
+                raise PreopenQcSubmissionError(
+                    "physical pre-open compile polling exhausted"
+                )
+            _wait(COMPILE_POLL_SECONDS)
+        if compile_state != "BuildSuccess":
+            raise PreopenQcSubmissionError(
+                "physical pre-open project did not compile"
+            )
+        backtest_id, status = formal._created_backtest(
+            _preopen_transport_call(
+                host_closure,
+                client,
+                capability,
+                "_request_json",
+                "backtests/create",
+                {
+                    "projectId": project_id,
+                    "compileId": compile_id,
+                    "backtestName": plan.backtest_name,
+                },
+            ),
+            project_id=project_id,
+            name=plan.backtest_name,
+        )
+        return _launch(
+            plan,
+            permit,
+            project_id,
+            compile_id,
+            backtest_id,
+            status,
+        )
+    except PreopenQcSubmissionError:
+        raise
+    except Exception as exc:
+        raise PreopenQcSubmissionLocked(
+            "physical_submission", permit.permit_id, type(exc).__name__
+        ) from exc
+
+
 @dataclasses.dataclass(frozen=True, slots=True, weakref_slot=True)
 class PreopenQcTerminalStatusReceipt:
     receipt_id: str
@@ -1652,7 +2652,8 @@ class PreopenQcTerminalStatusReceipt:
 
 
 def _terminal_receipt(
-    *, plan: PreopenQcSubmissionPlan, permit: PreopenQcSubmissionPermit,
+    *, plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+    permit: PreopenQcSubmissionPermit,
     launch: PreopenQcLaunchReceipt, status: str, count: int,
 ) -> PreopenQcTerminalStatusReceipt:
     record = {
@@ -1682,17 +2683,25 @@ def _register_terminal_process_return(
 
 
 def _inspect_preopen_qc_terminal_status_impl(
-    *, plan: PreopenQcSubmissionPlan, permit: PreopenQcSubmissionPermit,
+    *, plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+    permit: PreopenQcSubmissionPermit,
     launch: PreopenQcLaunchReceipt, client: FormalQcTransport,
     owner_signature: OwnerSignatureAuthority | None,
     _transport_capability_minter,
 ) -> PreopenQcTerminalStatusReceipt:
-    host_closure = build_preopen_qc_host_closure_binding()
+    host_closure = (
+        build_physical_preopen_qc_host_closure_binding()
+        if type(plan) is PhysicalPreopenQcSubmissionPlan
+        else build_preopen_qc_host_closure_binding()
+    )
     _require_external_execution_trust_root(
         owner_signature,
         _render_preopen_qc_execution_authority_candidate(plan, host_closure),
     )
-    verify_preopen_qc_host_closure_live(host_closure)
+    if type(plan) is PhysicalPreopenQcSubmissionPlan:
+        verify_physical_preopen_qc_host_closure_live(host_closure)
+    else:
+        verify_preopen_qc_host_closure_live(host_closure)
     require_preopen_qc_submission_permit(permit, plan)
     _require_launch_receipt(launch, plan, permit)
     capability = _transport_capability_minter(
@@ -1779,7 +2788,8 @@ class PreopenQcOutputPackageReceipt:
 
 
 def _require_terminal_receipt(
-    terminal: PreopenQcTerminalStatusReceipt, plan: PreopenQcSubmissionPlan,
+    terminal: PreopenQcTerminalStatusReceipt,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
     permit: PreopenQcSubmissionPermit, launch: PreopenQcLaunchReceipt,
 ) -> PreopenQcTerminalStatusReceipt:
     _require_launch_receipt(launch, plan, permit)
@@ -1833,7 +2843,8 @@ def _object_payload(
 
 
 def _build_output_package_receipt(
-    *, plan: PreopenQcSubmissionPlan, permit: PreopenQcSubmissionPermit,
+    *, plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+    permit: PreopenQcSubmissionPermit,
     launch: PreopenQcLaunchReceipt, terminal: PreopenQcTerminalStatusReceipt,
     package_bytes: bytes,
 ) -> PreopenQcOutputPackageReceipt:
@@ -1963,7 +2974,8 @@ def _register_output_process_return(
 
 
 def require_preopen_qc_output_package_receipt(
-    value: PreopenQcOutputPackageReceipt, *, plan: PreopenQcSubmissionPlan,
+    value: PreopenQcOutputPackageReceipt, *,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
     permit: PreopenQcSubmissionPermit, launch: PreopenQcLaunchReceipt,
     terminal: PreopenQcTerminalStatusReceipt,
 ) -> PreopenQcOutputPackageReceipt:
@@ -1986,18 +2998,26 @@ def require_preopen_qc_output_package_receipt(
 
 
 def _retrieve_preopen_qc_terminal_package_impl(
-    *, plan: PreopenQcSubmissionPlan, permit: PreopenQcSubmissionPermit,
+    *, plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+    permit: PreopenQcSubmissionPermit,
     launch: PreopenQcLaunchReceipt,
     terminal: PreopenQcTerminalStatusReceipt, client: FormalQcTransport,
     owner_signature: OwnerSignatureAuthority | None,
     _transport_capability_minter,
 ) -> PreopenQcOutputPackageReceipt:
-    host_closure = build_preopen_qc_host_closure_binding()
+    host_closure = (
+        build_physical_preopen_qc_host_closure_binding()
+        if type(plan) is PhysicalPreopenQcSubmissionPlan
+        else build_preopen_qc_host_closure_binding()
+    )
     _require_external_execution_trust_root(
         owner_signature,
         _render_preopen_qc_execution_authority_candidate(plan, host_closure),
     )
-    verify_preopen_qc_host_closure_live(host_closure)
+    if type(plan) is PhysicalPreopenQcSubmissionPlan:
+        verify_physical_preopen_qc_host_closure_live(host_closure)
+    else:
+        verify_preopen_qc_host_closure_live(host_closure)
     require_preopen_qc_submission_permit(permit, plan)
     _require_terminal_receipt(terminal, plan, permit, launch)
     if (
@@ -2247,7 +3267,8 @@ def _read_private_archive_file(
 
 
 def _prepare_output_archive(
-    plan: PreopenQcSubmissionPlan, *, permit_id: str,
+    plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+    *, permit_id: str,
 ) -> tuple[Path, Path]:
     root = plan.output_archive_root
     if root is None:
@@ -2487,16 +3508,34 @@ def _download_and_load_preopen_qc_terminal_archive_impl(
 
 
 def _bind_transport_capability_consumers(
-    minter, execute_impl, inspect_impl, retrieve_impl, download_impl,
-    binding_guard,
+    minter, execute_impl, execute_preuploaded_impl, inspect_impl,
+    retrieve_impl, download_impl, binding_guard,
 ):
     """Keep the restricted production minter lexical to reviewed actions."""
 
+    execute_preuploaded_code = execute_preuploaded_impl.__code__
+    execute_preuploaded_globals = execute_preuploaded_impl.__globals__
+    execute_preuploaded_defaults = execute_preuploaded_impl.__defaults__
+    execute_preuploaded_kwdefaults = execute_preuploaded_impl.__kwdefaults__
+
     def execute_preopen_qc_submission_once(
-        *, plan: PreopenQcSubmissionPlan, client: FormalQcTransport,
+        *, plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+        client: FormalQcTransport,
         ledger_directory: Path, started_at_utc: str,
         owner_signature: OwnerSignatureAuthority | None,
     ) -> tuple[PreopenQcSubmissionPermit, PreopenQcLaunchReceipt]:
+        if type(plan) is PhysicalPreopenQcSubmissionPlan and (
+            type(execute_preuploaded_impl) is not type(lambda: None)
+            or execute_preuploaded_impl.__code__ is not execute_preuploaded_code
+            or execute_preuploaded_impl.__globals__ is not execute_preuploaded_globals
+            or execute_preuploaded_impl.__defaults__ is not execute_preuploaded_defaults
+            or execute_preuploaded_impl.__kwdefaults__
+            is not execute_preuploaded_kwdefaults
+            or execute_preuploaded_impl.__closure__ is not None
+        ):
+            raise PreopenQcSubmissionError(
+                "physical pre-open execution dependency changed"
+            )
         binding_guard("submission")
         return execute_impl(
             plan=plan,
@@ -2505,10 +3544,12 @@ def _bind_transport_capability_consumers(
             started_at_utc=started_at_utc,
             owner_signature=owner_signature,
             _transport_capability_minter=minter,
+            _execute_preuploaded_impl=execute_preuploaded_impl,
         )
 
     def inspect_preopen_qc_terminal_status(
-        *, plan: PreopenQcSubmissionPlan, permit: PreopenQcSubmissionPermit,
+        *, plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+        permit: PreopenQcSubmissionPermit,
         launch: PreopenQcLaunchReceipt, client: FormalQcTransport,
         owner_signature: OwnerSignatureAuthority | None,
     ) -> PreopenQcTerminalStatusReceipt:
@@ -2523,7 +3564,8 @@ def _bind_transport_capability_consumers(
         )
 
     def retrieve_preopen_qc_terminal_package(
-        *, plan: PreopenQcSubmissionPlan, permit: PreopenQcSubmissionPermit,
+        *, plan: PreopenQcSubmissionPlan | PhysicalPreopenQcSubmissionPlan,
+        permit: PreopenQcSubmissionPermit,
         launch: PreopenQcLaunchReceipt,
         terminal: PreopenQcTerminalStatusReceipt, client: FormalQcTransport,
         owner_signature: OwnerSignatureAuthority | None,
@@ -2586,6 +3628,7 @@ def _bind_transport_capability_consumers(
 ) = _bind_transport_capability_consumers(
     _transport_capability_minter,
     _execute_preopen_qc_submission_once_impl,
+    _execute_preuploaded_preopen_qc_submission_once_impl,
     _inspect_preopen_qc_terminal_status_impl,
     _retrieve_preopen_qc_terminal_package_impl,
     _download_and_load_preopen_qc_terminal_archive_impl,
@@ -2705,6 +3748,7 @@ del _process_receipt_frame_provenance
 del _transport_capability_minter
 del _seal_transport_capability_callers
 del _execute_preopen_qc_submission_once_impl
+del _execute_preuploaded_preopen_qc_submission_once_impl
 del _inspect_preopen_qc_terminal_status_impl
 del _retrieve_preopen_qc_terminal_package_impl
 del _download_and_load_preopen_qc_terminal_archive_impl
@@ -2717,21 +3761,36 @@ del _require_preopen_action_global_bindings
 
 
 __all__ = (
-    "EXECUTION_AUTHORITY_SCHEMA", "PREOPEN_EXECUTION_ACTIONS",
+    "EXECUTION_AUTHORITY_SCHEMA", "PHYSICAL_EXECUTION_AUTHORITY_SCHEMA",
+    "PREOPEN_EXECUTION_ACTIONS", "PHYSICAL_PREOPEN_EXECUTION_ACTIONS",
+    "OWNER_REVIEW_WAIVER_ID", "OWNER_REVIEW_WAIVER_SCOPE",
+    "OWNER_REVIEW_WAIVER_BASIS", "OWNER_REVIEW_WAIVER_DISPOSITION",
+    "PHYSICAL_INPUT_UPLOAD_DISPOSITION", "PHYSICAL_PLAN_SCHEMA",
+    "QC_DEFAULT_RESEARCH_NOTEBOOK_PATH",
     "MAX_OUTPUT_MANIFEST_BYTES", "MAX_OUTPUT_SHARD_READ_BYTES",
     "MAX_OUTPUT_SHARD_READS", "OUTPUT_ARCHIVE_DIRECTORY_NAME",
     "OUTPUT_ARCHIVE_MANIFEST_NAME", "OUTPUT_ARCHIVE_SHARD_DIRECTORY",
-    "PREOPEN_REQUIRED_HOST_CODE_PATHS", "PreopenQcHostClosureBinding",
+    "PREOPEN_REQUIRED_HOST_CODE_PATHS",
+    "PHYSICAL_PREOPEN_REQUIRED_HOST_CODE_PATHS",
+    "PreopenQcHostClosureBinding",
     "PreopenQcHostSourceBinding",
-    "PreopenQcLaunchReceipt", "PreopenQcOutputPackageReceipt",
+    "PhysicalPreopenQcSubmissionPlan", "PreopenQcLaunchReceipt",
+    "PreopenQcOutputPackageReceipt",
     "PreopenQcSubmissionError", "PreopenQcSubmissionLocked",
     "PreopenQcSubmissionPermit", "PreopenQcSubmissionPlan",
-    "PreopenQcTerminalStatusReceipt", "build_preopen_qc_host_closure_binding",
+    "PreopenQcTerminalStatusReceipt",
+    "build_physical_preopen_qc_host_closure_binding",
+    "build_preopen_qc_host_closure_binding",
     "build_preopen_qc_submission_plan",
+    "build_preopen_qc_submission_plan_from_physical_upload",
     "download_and_load_preopen_qc_terminal_archive",
-    "execute_preopen_qc_submission_once", "inspect_preopen_qc_terminal_status",
+    "execute_preopen_qc_submission_once",
+    "inspect_preopen_qc_terminal_status",
     "require_preopen_qc_output_package_receipt",
+    "require_preopen_qc_physical_submission_plan",
     "require_preopen_qc_submission_permit", "require_preopen_qc_submission_plan",
     "render_preopen_qc_execution_authority_candidate",
-    "retrieve_preopen_qc_terminal_package", "verify_preopen_qc_host_closure_live",
+    "retrieve_preopen_qc_terminal_package",
+    "verify_physical_preopen_qc_host_closure_live",
+    "verify_preopen_qc_host_closure_live",
 )

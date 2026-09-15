@@ -1,10 +1,13 @@
 """One-use ARV2 formal QC submission, status, and separate result-read gates.
 
 The adapter is intentionally narrow.  It accepts the reviewed concrete
-``FormalQcTransport`` only, authenticates the full live host/source closure,
-creates the durable one-use permit immediately before authentication, uploads
-exact compact input objects with multipart + metadata verification, uploads
-the exact projected source set, compiles, and launches at most one backtest.
+``FormalQcTransport`` only and authenticates the full live host/source closure.
+The ordinary reviewed path creates its durable one-use permit before network
+access; the exact owner-waiver path records a no-outcome prelaunch disposition
+or irreversibly consumes its attempt immediately before ``backtests/create``.
+It uploads exact compact input objects with multipart + metadata verification,
+uploads the exact projected source set, compiles, and launches at most one
+backtest per immutable attempt.
 
 Status polling never enters a result/statistics payload.  A completed status
 only creates a disabled result-gate candidate.  A distinct owner-pinned result
@@ -52,9 +55,20 @@ from .formal_qc_transport import (
 from .formal_run_protocol import (
     FormalLookClaim,
     FormalRunCandidate,
+    FormalRunProtocolError,
     FormalSubmissionPermit,
     ReviewedFormalRunAuthority,
     begin_formal_submission_once,
+    formal_owner_review_waiver_record,
+    formal_retry_policy_record,
+    formal_review_authorization_record,
+    load_consumed_formal_retry_attempt,
+    record_definite_pre_submission_failure,
+    _formal_retry_adapter_control_exists,
+    _publish_formal_retry_adapter_control_once,
+    _read_formal_retry_adapter_control,
+    _record_authenticated_formal_backtest_completion,
+    _record_authenticated_formal_backtest_terminal_failure,
     require_formal_look_claim,
     require_formal_run_candidate,
     require_formal_submission_permit,
@@ -141,6 +155,20 @@ class FormalQcSubmissionLocked(RuntimeError):
         self.outcome_class = outcome_class
 
 
+class FormalQcPreSubmissionFailed(RuntimeError):
+    """A definite pre-``backtests/create`` failure consumed no outcome look."""
+
+    def __init__(self, phase: str, claim_id: str, failure_id: str) -> None:
+        super().__init__(
+            f"{phase}: definite pre-submission failure; fresh attempt required"
+        )
+        self.phase = phase
+        self.claim_id = claim_id
+        self.failure_id = failure_id
+        self.outcome_look_consumed = False
+        self.retry_with_fresh_attempt_authorized = True
+
+
 def _failure_outcome_class(exc: BaseException) -> str:
     """Classify a spent action without retaining exception or response values."""
 
@@ -186,7 +214,10 @@ def _make_formal_action_global_binding_guard():
         "_require_formal_action_global_bindings",
         "_claim_fundamental_discovery_transport_capability_minter",
         "_claim_preopen_transport_capability_minter",
+        "_claim_preopen_physical_upload_transport_capability_minter",
+        "_claim_preopen_prereview_transport_capability_minter",
         "_claim_power_calibration_transport_capability_minter",
+        "_claim_accepted_risk_preliminary_transport_capability_minter",
     )
     os_external_names = (
         "close", "fstat", "fsync", "getpid", "open", "read",
@@ -450,6 +481,10 @@ UPLOAD_BUNDLE_SCHEMA = "arv2-formal-qc-compact-upload-bundle-v2"
 SUBMISSION_PLAN_SCHEMA = "arv2-formal-qc-submission-plan-v2"
 LAUNCH_RECEIPT_SCHEMA = "arv2-formal-qc-launch-receipt-v2"
 TERMINAL_STATUS_SCHEMA = "arv2-formal-qc-terminal-status-v3"
+COMPILED_ATTEMPT_CONTROL_SCHEMA = "arv2-formal-qc-compiled-attempt-control-v1"
+DURABLE_LAUNCH_CONTROL_SCHEMA = "arv2-formal-qc-durable-launch-control-v1"
+DURABLE_TERMINAL_CONTROL_SCHEMA = "arv2-formal-qc-durable-terminal-control-v1"
+RECOVERED_LAUNCH_INITIAL_STATUS = "CrossProcessReconciled"
 RESULT_GATE_CANDIDATE_SCHEMA = "arv2-formal-qc-result-gate-candidate-v4"
 RESULT_READ_AUTHORITY_SCHEMA = "arv2-formal-qc-result-read-authority-v3"
 RESULT_READ_EXTERNAL_PIN_SCHEMA = "arv2-formal-qc-result-read-external-pin-v3"
@@ -460,6 +495,12 @@ HOST_CLOSURE_SCHEMA = "arv2-formal-qc-host-closure-v2"
 TRANSPORT_BINDING_SCHEMA = "arv2-formal-qc-transport-binding-v2"
 STREAMED_EXECUTION_AUTHORITY_SCHEMA = (
     "arv2-streamed-formal-qc-execution-authority-v1"
+)
+OWNER_WAIVED_STREAMED_EXECUTION_AUTHORITY_SCHEMA = (
+    "arv2-streamed-formal-qc-owner-review-waiver-execution-authority-v1"
+)
+OWNER_WAIVED_ATTEMPT_PROJECT_NAME_FORMAT = (
+    "{base}_A{ordinal:06d}_{claim_sha256}"
 )
 STREAMED_SUBMISSION_PLAN_SCHEMA = "arv2-streamed-formal-qc-submission-plan-v1"
 STREAMED_SUBMISSION_BRIDGE_SCHEMA = (
@@ -866,7 +907,7 @@ FORMAL_RESULT_FAMILY_MAXIMUM_UNCOMPRESSED_BYTE_COUNT = 4_194_304
 FORMAL_RESULT_FAMILY_TOTAL_MAXIMUM_UNCOMPRESSED_BYTE_COUNT = 109_051_904
 FORMAL_RESULT_FAMILY_KEY_FORMULA = (
     "{project_id}/arv2/formal/output/report-families/"
-    "{input_manifest_sha256}/{ordinal:02d}-{compressed_sha256}.json.gz"
+    "{input_manifest_sha256}/{ordinal:02d}-{compressed_sha256}-json.gz"
 )
 EXECUTION_ACTIONS = (
     "authenticate",
@@ -887,7 +928,7 @@ _HEX_32 = re.compile(r"[0-9a-f]{32}\Z")
 _SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/ -]{0,511}\Z")
 _SAFE_PATH = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,1023}\Z")
 _PROJECT_LIST_RESPONSE_KEYS = frozenset(
-    {"success", "errors", "messages", "projects", "versions"}
+    {"success", "errors", "messages", "projects", "versions", "count"}
 )
 _PROJECT_RECORD_KEYS = frozenset(
     {
@@ -919,6 +960,9 @@ _PROJECT_RECORD_KEYS = frozenset(
         "maxFileSize",
         "sharingTokenBacktest",
     }
+)
+_PROJECT_FILE_RECORD_KEYS = frozenset(
+    {"id", "projectId", "name", "content", "modified", "open", "isLibrary"}
 )
 _TOP_STATUS_KEYS = frozenset({"success", "errors", "messages", "backtests", "count"})
 _BACKTEST_STATUS_KEYS = frozenset(
@@ -964,6 +1008,7 @@ _DISCARDED_BACKTEST_SUMMARY_KEYS = frozenset(
         "parameterSet",
         "portfolioStatistics",
         "profitLoss",
+        "public",
         "researchGuide",
         "result",
         "results",
@@ -971,8 +1016,12 @@ _DISCARDED_BACKTEST_SUMMARY_KEYS = frozenset(
         "runtimeStatistics",
         "serverStatistics",
         "snapshotId",
+        "snapShotId",
+        "sparkline",
         "stacktrace",
         "statistics",
+        "success",
+        "errors",
         "tags",
         "totalFees",
         "totalNetProfit",
@@ -998,7 +1047,7 @@ _DISCARDED_BACKTEST_SUMMARY_KEYS = frozenset(
 def _make_downstream_transport_minter_claims(
     root_minter, root_register_delegated_minter,
 ):
-    """Issue least-authority minters only to three exact adapter imports."""
+    """Issue least-authority minters only to exact reviewed adapter imports."""
 
     get_pid = os.getpid
     get_frame = sys._getframe
@@ -1055,6 +1104,32 @@ def _make_downstream_transport_minter_claims(
             "_claim_preopen_transport_capability_minter",
         ),
         (
+            "preopen_physical_upload",
+            "research.analyst_revisions_v2_qc."
+            "physical_preopen_submission_adapter",
+            "physical_preopen_submission_adapter.py",
+            (
+                (
+                    "submission",
+                    ("_execute_physical_preopen_input_upload_once_impl",),
+                ),
+            ),
+            "_claim_preopen_physical_upload_transport_capability_minter",
+        ),
+        (
+            "preopen_prereview",
+            "research.analyst_revisions_v2_qc."
+            "preopen_control_prereview_downloader",
+            "preopen_control_prereview_downloader.py",
+            (
+                (
+                    "preopen_output_read",
+                    ("_download_preopen_control_outputs_for_review_impl",),
+                ),
+            ),
+            "_claim_preopen_prereview_transport_capability_minter",
+        ),
+        (
             "power",
             "research.analyst_revisions_v2_qc."
             "power_calibration_submission_adapter",
@@ -1074,6 +1149,34 @@ def _make_downstream_transport_minter_claims(
                 ),
             ),
             "_claim_power_calibration_transport_capability_minter",
+        ),
+        (
+            "accepted_risk_preliminary",
+            "research.analyst_revisions_v2_qc."
+            "accepted_risk_preliminary_submission_adapter",
+            "accepted_risk_preliminary_submission_adapter.py",
+            (
+                (
+                    "submission",
+                    (
+                        "_execute_accepted_risk_preliminary_submission_once_impl",
+                    ),
+                ),
+                (
+                    "status",
+                    (
+                        "_inspect_accepted_risk_preliminary_terminal_status_impl",
+                        "_recover_accepted_risk_preliminary_launch_once_impl",
+                    ),
+                ),
+                (
+                    "result_read",
+                    (
+                        "_read_accepted_risk_preliminary_result_once_impl",
+                    ),
+                ),
+            ),
+            "_claim_accepted_risk_preliminary_transport_capability_minter",
         ),
     )
 
@@ -1358,7 +1461,10 @@ def _make_downstream_transport_minter_claims(
     return (
         make_claim("fundamental"),
         make_claim("preopen"),
+        make_claim("preopen_physical_upload"),
+        make_claim("preopen_prereview"),
         make_claim("power"),
+        make_claim("accepted_risk_preliminary"),
     )
 
 
@@ -2261,6 +2367,14 @@ class StreamedFormalQcExecutionAuthority:
     status_poll_limit: int
     status_poll_interval_seconds: int
     sequential_reopen_rehash_upload_required: bool
+    review_disposition: str
+    independent_review_complete: bool
+    authorization_basis: str
+    owner_review_waiver_id: str | None
+    owner_review_waiver_scope: str | None
+    waiver_ends_after_first_technically_completed_formal_backtest: bool
+    post_first_formal_backtest_independent_review_required: bool
+    retry_lineage_sha256: str
     qc_outcome_execution_authorized: bool
     status_only_access_authorized: bool
     result_read_authorized: bool
@@ -2276,17 +2390,105 @@ class StreamedFormalQcExecutionAuthority:
     _owner_signature: OwnerSignatureAuthority | None = dataclasses.field(repr=False)
 
 
+def _streamed_retry_lineage_sha256(bridge: StreamedFormalRuntimeBridge) -> str:
+    """Bind every frozen strategy/input/projection identity across retries."""
+
+    candidate = bridge.formal_run_candidate
+    projection = bridge.runtime_projection
+    return hashlib.sha256(
+        _canonical(
+            {
+                "schema": "arv2-formal-retry-lineage-v1",
+                "candidate_sha256": candidate.candidate_sha256,
+                "code_projection_artifact_sha256": (
+                    candidate.code_projection.artifact_sha256
+                ),
+                "production_input_package_artifact_sha256": (
+                    candidate.production_input_package.artifact_sha256
+                ),
+                "current_view_partition_set_artifact_sha256": (
+                    candidate.current_view_partition_set.artifact_sha256
+                ),
+                "censored_view_partition_set_artifact_sha256": (
+                    candidate.censored_view_partition_set.artifact_sha256
+                ),
+                "accepted_risk_pair_artifact_sha256": (
+                    candidate.accepted_risk.pair.artifact_sha256
+                ),
+                "power_numeric_receipt_artifact_sha256": (
+                    candidate.power_floor.numeric_receipt.artifact_sha256
+                ),
+                "power_stock_successor_artifact_sha256": (
+                    candidate.power_floor.stock_successor.artifact_sha256
+                ),
+                "terminal_census_artifact_sha256": (
+                    candidate.terminal_census.census.artifact_sha256
+                ),
+                "runtime_bridge_sha256": bridge.bridge_sha256,
+                "runtime_projection_sha256": projection.projection_sha256,
+                "project_source_set_sha256": projection.project_source_set_sha256,
+                "evaluator_source_closure_sha256": (
+                    projection.evaluator_source_closure_sha256
+                ),
+                "upload_projection_sha256": bridge.upload_projection_sha256,
+                "economic_execution_binding_sha256": (
+                    bridge.economic_execution.binding_sha256
+                ),
+                "economic_execution_definition_sha256": (
+                    bridge.economic_execution.definition_sha256
+                ),
+                "formal_report_contract_sha256": (
+                    bridge.report_contract.contract_sha256
+                ),
+                "formal_report_contract_artifact_sha256": (
+                    bridge.report_contract.artifact_sha256
+                ),
+            }
+        )
+    ).hexdigest()
+
+
+def _streamed_attempt_project_name(
+    *,
+    plan: StreamedFormalQcSubmissionPlan,
+    claim: FormalLookClaim,
+    owner_waived: bool,
+) -> str:
+    """Return the immutable fresh-project name for one owner-waived attempt."""
+
+    base = _safe_id(plan.project_name, "formal base project name")
+    if not owner_waived:
+        return base
+    ordinal = _positive_int(claim.attempt_ordinal, "formal attempt ordinal")
+    if ordinal > 999_999:
+        raise FormalQcSubmissionError("formal attempt ordinal exceeds its fixed bound")
+    claim_sha256 = _sha(claim.claim_sha256, "formal attempt claim")
+    return _safe_id(
+        OWNER_WAIVED_ATTEMPT_PROJECT_NAME_FORMAT.format(
+            base=base,
+            ordinal=ordinal,
+            claim_sha256=claim_sha256,
+        ),
+        "formal attempt project name",
+    )
+
+
 def _streamed_execution_document(
     *,
     bridge: StreamedFormalRuntimeBridge,
     host_code_closure: FormalQcHostClosureBinding,
     transport: FormalQcTransportBinding,
     organization_id: str,
+    owner_review_waiver: bool = False,
 ) -> dict[str, object]:
     candidate = bridge.formal_run_candidate
     projection = bridge.runtime_projection
     seed = {
-        "schema": STREAMED_EXECUTION_AUTHORITY_SCHEMA,
+        "schema": (
+            OWNER_WAIVED_STREAMED_EXECUTION_AUTHORITY_SCHEMA
+            if owner_review_waiver
+            else STREAMED_EXECUTION_AUTHORITY_SCHEMA
+        ),
         "status": "requires_exact_owner_external_pin",
         "authority_id": None,
         "authority_sha256": None,
@@ -2366,6 +2568,10 @@ def _streamed_execution_document(
         "log_access_authorized": False,
         "deployment_orders_trading_authorized": False,
     }
+    if owner_review_waiver:
+        seed["review_authorization"] = formal_owner_review_waiver_record()
+        seed["retry_policy"] = formal_retry_policy_record()
+        seed["retry_lineage_sha256"] = _streamed_retry_lineage_sha256(bridge)
     digest = hashlib.sha256(_canonical(seed)).hexdigest()
     seed["authority_sha256"] = digest
     seed["authority_id"] = "arv2-owner-streamed-outcome-qc-authority-" + digest
@@ -2394,6 +2600,31 @@ def render_streamed_formal_qc_execution_authority_candidate(
     )
 
 
+def render_owner_waived_streamed_formal_qc_execution_authority_candidate(
+    *,
+    runtime_bridge: StreamedFormalRuntimeBridge,
+    host_code_closure: FormalQcHostClosureBinding,
+    transport: FormalQcTransportBinding,
+    organization_id: str,
+) -> bytes:
+    """Render the separately signed authority that repeats the exact waiver."""
+
+    bridge = _require_streamed_runtime_bridge(runtime_bridge)
+    _require_streamed_upload_projection_capacity(bridge)
+    require_formal_qc_host_closure_binding(host_code_closure)
+    require_formal_qc_transport_binding(transport, host_code_closure)
+    _safe_id(organization_id, "organization_id")
+    return _canonical(
+        _streamed_execution_document(
+            bridge=bridge,
+            host_code_closure=host_code_closure,
+            transport=transport,
+            organization_id=organization_id,
+            owner_review_waiver=True,
+        )
+    )
+
+
 def load_streamed_formal_qc_execution_authority(
     *,
     runtime_bridge: StreamedFormalRuntimeBridge,
@@ -2407,7 +2638,20 @@ def load_streamed_formal_qc_execution_authority(
     bridge = _require_streamed_runtime_bridge(runtime_bridge)
     candidate = bridge.formal_run_candidate
     require_reviewed_formal_run_authority(candidate, reviewed_authority)
-    expected = render_streamed_formal_qc_execution_authority_candidate(
+    if type(receipt_bytes) is not bytes:
+        raise FormalQcSubmissionError(
+            "streamed execution authority receipt bytes changed"
+        )
+    raw = _json_object(receipt_bytes, "streamed execution authority receipt")
+    owner_waived = raw.get("schema") == (
+        OWNER_WAIVED_STREAMED_EXECUTION_AUTHORITY_SCHEMA
+    )
+    render_authority = (
+        render_owner_waived_streamed_formal_qc_execution_authority_candidate
+        if owner_waived
+        else render_streamed_formal_qc_execution_authority_candidate
+    )
+    expected = render_authority(
         runtime_bridge=bridge,
         host_code_closure=host_code_closure,
         transport=transport,
@@ -2418,10 +2662,25 @@ def load_streamed_formal_qc_execution_authority(
             "streamed execution authority receipt bytes changed"
         )
     _require_non_self_mintable_execution_trust_root(owner_signature, expected)
-    raw = _json_object(receipt_bytes, "streamed execution authority receipt")
     if reviewed_authority.owner_outcome_authority_receipt_id != raw["authority_id"]:
         raise FormalQcSubmissionError(
             "owner review pin does not bind this exact streamed execution authority"
+        )
+    review_authorization = formal_review_authorization_record(reviewed_authority)
+    if owner_waived != (
+        review_authorization == formal_owner_review_waiver_record()
+    ):
+        raise FormalQcSubmissionError(
+            "signed execution review authorization does not match its formal pin"
+        )
+    if owner_waived and (
+        raw.get("review_authorization") != review_authorization
+        or raw.get("retry_policy") != formal_retry_policy_record()
+        or raw.get("retry_lineage_sha256")
+        != _streamed_retry_lineage_sha256(bridge)
+    ):
+        raise FormalQcSubmissionError(
+            "owner review waiver or retry lineage changed in signed authority"
         )
     projection = bridge.runtime_projection
     return StreamedFormalQcExecutionAuthority(
@@ -2482,6 +2741,32 @@ def load_streamed_formal_qc_execution_authority(
         status_poll_limit=MAX_STATUS_POLLS,
         status_poll_interval_seconds=STATUS_POLL_INTERVAL_SECONDS,
         sequential_reopen_rehash_upload_required=True,
+        review_disposition=str(review_authorization["review_disposition"]),
+        independent_review_complete=bool(
+            review_authorization["independent_review_complete"]
+        ),
+        authorization_basis=str(review_authorization["authorization_basis"]),
+        owner_review_waiver_id=(
+            str(review_authorization["owner_review_waiver_id"])
+            if review_authorization["owner_review_waiver_id"] is not None
+            else None
+        ),
+        owner_review_waiver_scope=(
+            str(review_authorization["owner_review_waiver_scope"])
+            if review_authorization["owner_review_waiver_scope"] is not None
+            else None
+        ),
+        waiver_ends_after_first_technically_completed_formal_backtest=bool(
+            review_authorization[
+                "waiver_ends_after_first_technically_completed_formal_backtest"
+            ]
+        ),
+        post_first_formal_backtest_independent_review_required=bool(
+            review_authorization[
+                "post_first_formal_backtest_independent_review_required"
+            ]
+        ),
+        retry_lineage_sha256=_streamed_retry_lineage_sha256(bridge),
         qc_outcome_execution_authorized=True,
         status_only_access_authorized=True,
         result_read_authorized=False,
@@ -3030,6 +3315,12 @@ def _created_project(value: object, *, name: str, organization_id: str) -> dict[
     projects = raw.get("projects")
     if type(projects) is not list or len(projects) != 1:
         raise FormalQcSubmissionError("projects/create did not return one project")
+    if "count" in raw and (
+        type(raw["count"]) is not int
+        or raw["count"] < 0
+        or raw["count"] != len(projects)
+    ):
+        raise FormalQcSubmissionError("projects/create count changed")
     record = projects[0]
     if (
         type(record) is not dict
@@ -3051,21 +3342,61 @@ def _read_project_inventory(value: object) -> list[dict[str, object]]:
     projects = raw.get("projects")
     if type(projects) is not list:
         raise FormalQcSubmissionError("projects/read omitted its project list")
+    if "count" in raw and (
+        type(raw["count"]) is not int
+        or raw["count"] < 0
+        or raw["count"] != len(projects)
+    ):
+        raise FormalQcSubmissionError("projects/read count changed")
     return projects
 
 
-def _read_files(value: object) -> dict[str, str]:
+def _read_files(
+    value: object,
+    *,
+    expected_project_id: int,
+) -> dict[str, str]:
+    _positive_int(expected_project_id, "files/read expected project id")
     raw = _success(value, frozenset({"success", "errors", "messages", "files"}), "files/read")
     items = raw.get("files")
     if type(items) is not list:
         raise FormalQcSubmissionError("files/read omitted its file list")
     result: dict[str, str] = {}
     for item in items:
-        if type(item) is not dict or not set(item).issubset({"name", "content"}):
+        if type(item) is not dict or not set(item).issubset(
+            _PROJECT_FILE_RECORD_KEYS
+        ):
             raise FormalQcSubmissionError("files/read item changed")
         name, content = item.get("name"), item.get("content")
         if type(name) is not str or type(content) is not str or name in result:
             raise FormalQcSubmissionError("files/read item identity changed")
+        if (
+            (
+                "id" in item
+                and item["id"] is not None
+                and type(item["id"]) is not int
+            )
+            or (
+                "projectId" in item
+                and (
+                    type(item["projectId"]) is not int
+                    or item["projectId"] != expected_project_id
+                )
+            )
+            or (
+                "modified" in item
+                and type(item["modified"]) is not str
+            )
+            or (
+                "open" in item
+                and type(item["open"]) is not bool
+            )
+            or (
+                "isLibrary" in item
+                and type(item["isLibrary"]) is not bool
+            )
+        ):
+            raise FormalQcSubmissionError("files/read item metadata changed")
         result[name] = content
     return result
 
@@ -3087,14 +3418,57 @@ def _object_metadata_matches(value: object, entry: FormalQcUploadEntry) -> None:
         raise FormalQcSubmissionError("Object Store metadata does not authenticate uploaded bytes")
 
 
-def _compile_id(value: object) -> str:
-    raw = _success(value, frozenset({"success", "errors", "messages", "compileId"}), "compile/create")
+def _compile_id(value: object, *, expected_project_id: int) -> str:
+    _positive_int(expected_project_id, "compile/create expected project id")
+    raw = _success(
+        value,
+        frozenset(
+            {
+                "success",
+                "errors",
+                "messages",
+                "compileId",
+                "state",
+                "parameters",
+                "projectId",
+                "signature",
+                "signatureOrder",
+            }
+        ),
+        "compile/create",
+    )
+    if (
+        type(raw.get("projectId")) is not int
+        or raw["projectId"] != expected_project_id
+        or raw.get("state")
+        not in COMPILE_PENDING_STATES | COMPILE_TERMINAL_STATES
+        or type(raw.get("parameters")) is not list
+        or type(raw.get("signature")) is not str
+        or type(raw.get("signatureOrder")) is not list
+        or any(type(item) is not str for item in raw["signatureOrder"])
+        or ("errors" in raw and type(raw["errors"]) is not list)
+        or ("messages" in raw and type(raw["messages"]) is not list)
+    ):
+        raise FormalQcSubmissionError("compile/create metadata changed")
     return _safe_id(raw.get("compileId"), "compile_id")
 
 
 def _compile_state(value: object, compile_id: str) -> str:
-    raw = _success(value, frozenset({"success", "errors", "messages", "compileId", "state"}), "compile/read")
-    if raw.get("compileId") != compile_id or raw.get("state") not in COMPILE_PENDING_STATES | COMPILE_TERMINAL_STATES:
+    raw = _success(
+        value,
+        frozenset(
+            {"success", "errors", "messages", "compileId", "state", "logs"}
+        ),
+        "compile/read",
+    )
+    if (
+        raw.get("compileId") != compile_id
+        or raw.get("state")
+        not in COMPILE_PENDING_STATES | COMPILE_TERMINAL_STATES
+        or ("logs" in raw and type(raw["logs"]) is not list)
+        or ("errors" in raw and type(raw["errors"]) is not list)
+        or ("messages" in raw and type(raw["messages"]) is not list)
+    ):
         raise FormalQcSubmissionError("compile/read state envelope changed")
     return str(raw["state"])
 
@@ -3177,15 +3551,25 @@ def parse_statistics_free_backtest_list(
             raise FormalQcSubmissionError(
                 "backtests/list projectId shape changed"
             )
-        for key in ("created", "completed", "note"):
-            if key in row and row[key] is not None and type(row[key]) is not str:
-                raise FormalQcSubmissionError(
-                    "backtests/list ignored field shape changed"
-                )
+        if "created" in row and type(row["created"]) is not str:
+            raise FormalQcSubmissionError(
+                "backtests/list ignored field shape changed"
+            )
+        if (
+            "note" in row
+            and row["note"] is not None
+            and type(row["note"]) is not str
+        ):
+            raise FormalQcSubmissionError(
+                "backtests/list ignored field shape changed"
+            )
+        if "completed" in row and type(row["completed"]) is not bool:
+            raise FormalQcSubmissionError(
+                "backtests/list completed shape changed"
+            )
         if (
             "progress" in row
-            and row["progress"] is not None
-            and type(row["progress"]) not in (str, int)
+            and type(row["progress"]) not in (int, float)
         ):
             raise FormalQcSubmissionError("backtests/list progress shape changed")
         if row.get("backtestId") == expected_backtest_id:
@@ -3208,13 +3592,105 @@ def parse_statistics_free_backtest_list(
     )
 
 
+def _parse_statistics_free_unique_project_run(
+    value: object,
+    *,
+    expected_project_id: int,
+    expected_backtest_name: str,
+) -> StatisticsFreeBacktestStatus:
+    """Reconcile one fresh attempt project without guessing a run identity."""
+
+    _positive_int(expected_project_id, "recovery expected project id")
+    _safe_id(expected_backtest_name, "recovery expected backtest name")
+    _status_keys_without_values(
+        value,
+        allowed=_TOP_STATUS_KEYS,
+        discard_only=frozenset(),
+        name="backtests/list recovery",
+    )
+    raw = value
+    items = raw.get("backtests")
+    if type(items) is not list:
+        raise FormalQcSubmissionError(
+            "backtests/list recovery omitted its run inventory"
+        )
+    if not items:
+        raise FormalQcSubmissionError(
+            "backtests/list recovery found no run; consumed attempt remains locked"
+        )
+    if len(items) != 1:
+        raise FormalQcSubmissionError(
+            "backtests/list recovery found multiple runs; identity is ambiguous"
+        )
+    row = items[0]
+    _status_keys_without_values(
+        row,
+        allowed=_BACKTEST_STATUS_KEYS,
+        discard_only=_DISCARDED_BACKTEST_SUMMARY_KEYS,
+        name="backtests/list recovery item",
+    )
+    if type(row) is not dict:
+        raise FormalQcSubmissionError("backtests/list recovery item changed")
+    backtest_id = _safe_id(
+        row.get("backtestId"),
+        "recovered exact backtest id",
+    )
+    if (
+        type(row.get("projectId")) is not int
+        or row["projectId"] != expected_project_id
+        or row.get("name") != expected_backtest_name
+    ):
+        raise FormalQcSubmissionError(
+            "backtests/list recovery run is not the exact named project run"
+        )
+    return parse_statistics_free_backtest_list(
+        value,
+        expected_project_id=expected_project_id,
+        expected_backtest_id=backtest_id,
+        expected_backtest_name=expected_backtest_name,
+    )
+
+
 def _created_backtest(value: object, *, project_id: int, name: str) -> tuple[str, str]:
-    raw = _success(value, frozenset({"success", "errors", "messages", "backtest"}), "backtests/create")
+    _positive_int(project_id, "backtests/create expected project id")
+    _safe_id(name, "backtests/create expected name")
+    _status_keys_without_values(
+        value,
+        allowed=frozenset(
+            {"success", "errors", "messages", "backtest", "debugging"}
+        ),
+        discard_only=frozenset(),
+        name="backtests/create",
+    )
+    raw = value
+    if raw.get("success") is not True:
+        raise FormalQcSubmissionError("backtests/create was not successful")
+    for key in ("errors", "messages"):
+        if key in raw and (
+            type(raw[key]) is not list
+            or any(type(item) is not str for item in raw[key])
+        ):
+            raise FormalQcSubmissionError(
+                "backtests/create message envelope changed"
+            )
+    if "debugging" in raw and type(raw["debugging"]) is not bool:
+        raise FormalQcSubmissionError("backtests/create debugging shape changed")
     row = raw.get("backtest")
-    if type(row) is not dict or not set(row).issubset(_BACKTEST_STATUS_KEYS):
-        raise FormalQcSubmissionError("backtests/create envelope changed")
+    _status_keys_without_values(
+        row,
+        allowed=_BACKTEST_STATUS_KEYS,
+        discard_only=_DISCARDED_BACKTEST_SUMMARY_KEYS,
+        name="backtests/create item",
+    )
     backtest_id = _safe_id(row.get("backtestId"), "backtest_id")
-    if row.get("name") != name or row.get("projectId") != project_id or row.get("status") not in BACKTEST_PENDING_STATUSES:
+    if (
+        type(row.get("name")) is not str
+        or row["name"] != name
+        or type(row.get("projectId")) is not int
+        or row["projectId"] != project_id
+        or type(row.get("status")) is not str
+        or row["status"] not in BACKTEST_PENDING_STATUSES
+    ):
         raise FormalQcSubmissionError("backtests/create identity changed")
     return backtest_id, str(row["status"])
 
@@ -3234,6 +3710,7 @@ class FormalQcLaunchReceipt:
     economic_execution_definition_id: str | None
     economic_execution_definition_sha256: str | None
     host_closure_sha256: str
+    project_name: str
     project_id: int
     compile_id: str
     compile_state: str
@@ -3248,9 +3725,196 @@ class FormalQcLaunchReceipt:
     orders_authorized: bool
 
 
+@dataclasses.dataclass(frozen=True, slots=True)
+class FormalQcCompiledAttemptControl:
+    """Immutable pre-``backtests/create`` identity for restart recovery."""
+
+    control_id: str
+    control_sha256: str
+    claim_id: str
+    claim_sha256: str
+    authority_id: str
+    authority_sha256: str
+    candidate_id: str
+    candidate_sha256: str
+    attempt_ordinal: int
+    retry_lineage_sha256: str
+    plan_id: str
+    plan_sha256: str
+    organization_id: str
+    project_name: str
+    project_id: int
+    compile_id: str
+    compile_state: str
+    backtest_name: str
+    input_object_count: int
+    source_file_count: int
+    backtests_create_attempted: bool
+    statistics_results_logs_orders_access_authorized: bool
+
+
 def _identified_receipt(prefix: str, schema: str, record: dict[str, object]) -> tuple[str, str]:
     digest = hashlib.sha256(_canonical({"schema": schema, **record})).hexdigest()
     return prefix + digest[:24], digest
+
+
+def _compiled_attempt_control_record(
+    value: FormalQcCompiledAttemptControl,
+) -> dict[str, object]:
+    return {
+        field.name: getattr(value, field.name)
+        for field in dataclasses.fields(value)
+        if field.name not in {"control_id", "control_sha256"}
+    }
+
+
+def _compiled_attempt_control_document(
+    value: FormalQcCompiledAttemptControl,
+) -> dict[str, object]:
+    return {
+        "schema": COMPILED_ATTEMPT_CONTROL_SCHEMA,
+        "status": "compiled_exact_project_before_backtests_create",
+        "control_id": value.control_id,
+        "control_sha256": value.control_sha256,
+        **_compiled_attempt_control_record(value),
+    }
+
+
+def _streamed_compiled_attempt_control(
+    *,
+    submission_bridge: StreamedFormalSubmissionAdapterBridge,
+    claim: FormalLookClaim,
+    project_name: str,
+    project_id: int,
+    compile_id: str,
+) -> FormalQcCompiledAttemptControl:
+    submitted = require_streamed_formal_submission_adapter_bridge(
+        submission_bridge
+    )
+    candidate = submitted.formal_run_candidate
+    authority = submitted.reviewed_authority
+    plan = submitted.plan
+    if (
+        type(claim.attempt_ordinal) is not int
+        or claim.retry_lineage_sha256
+        != submitted.execution_authority.retry_lineage_sha256
+        or claim.submission_plan_id != plan.plan_id
+        or claim.submission_plan_sha256 != plan.plan_sha256
+    ):
+        raise FormalQcSubmissionError(
+            "compiled attempt control claim lineage changed"
+        )
+    expected_name = _streamed_attempt_project_name(
+        plan=plan,
+        claim=claim,
+        owner_waived=True,
+    )
+    if project_name != expected_name:
+        raise FormalQcSubmissionError(
+            "compiled attempt control project name changed"
+        )
+    _positive_int(project_id, "compiled attempt project id")
+    _safe_id(compile_id, "compiled attempt compile id")
+    record = {
+        "claim_id": claim.claim_id,
+        "claim_sha256": claim.claim_sha256,
+        "authority_id": authority.authority_id,
+        "authority_sha256": authority.authority_sha256,
+        "candidate_id": candidate.candidate_id,
+        "candidate_sha256": candidate.candidate_sha256,
+        "attempt_ordinal": claim.attempt_ordinal,
+        "retry_lineage_sha256": claim.retry_lineage_sha256,
+        "plan_id": plan.plan_id,
+        "plan_sha256": plan.plan_sha256,
+        "organization_id": plan.organization_id,
+        "project_name": expected_name,
+        "project_id": project_id,
+        "compile_id": compile_id,
+        "compile_state": "BuildSuccess",
+        "backtest_name": plan.backtest_name,
+        "input_object_count": plan.upload_entry_count,
+        "source_file_count": len(plan.source_manifest),
+        "backtests_create_attempted": False,
+        "statistics_results_logs_orders_access_authorized": False,
+    }
+    control_id, digest = _identified_receipt(
+        "arv2-formal-qc-compiled-attempt-",
+        COMPILED_ATTEMPT_CONTROL_SCHEMA,
+        record,
+    )
+    return FormalQcCompiledAttemptControl(
+        control_id=control_id,
+        control_sha256=digest,
+        **record,
+    )
+
+
+def _persist_streamed_compiled_attempt_control(
+    *,
+    submission_bridge: StreamedFormalSubmissionAdapterBridge,
+    claim: FormalLookClaim,
+    project_name: str,
+    project_id: int,
+    compile_id: str,
+) -> FormalQcCompiledAttemptControl:
+    submitted = require_streamed_formal_submission_adapter_bridge(
+        submission_bridge
+    )
+    control = _streamed_compiled_attempt_control(
+        submission_bridge=submitted,
+        claim=claim,
+        project_name=project_name,
+        project_id=project_id,
+        compile_id=compile_id,
+    )
+    _publish_formal_retry_adapter_control_once(
+        candidate=submitted.formal_run_candidate,
+        authority=submitted.reviewed_authority,
+        claim=claim,
+        control_kind="compiled",
+        payload=_canonical(_compiled_attempt_control_document(control)),
+    )
+    return _load_streamed_compiled_attempt_control(
+        submission_bridge=submitted,
+        claim=claim,
+    )
+
+
+def _load_streamed_compiled_attempt_control(
+    *,
+    submission_bridge: StreamedFormalSubmissionAdapterBridge,
+    claim: FormalLookClaim,
+) -> FormalQcCompiledAttemptControl:
+    submitted = require_streamed_formal_submission_adapter_bridge(
+        submission_bridge
+    )
+    payload = _read_formal_retry_adapter_control(
+        candidate=submitted.formal_run_candidate,
+        authority=submitted.reviewed_authority,
+        claim=claim,
+        control_kind="compiled",
+    )
+    raw = _json_object(payload, "formal compiled-attempt control")
+    try:
+        control = _streamed_compiled_attempt_control(
+            submission_bridge=submitted,
+            claim=claim,
+            project_name=raw.get("project_name"),
+            project_id=raw.get("project_id"),
+            compile_id=raw.get("compile_id"),
+        )
+    except (AttributeError, TypeError, ValueError) as exc:
+        if isinstance(exc, FormalQcSubmissionError):
+            raise
+        raise FormalQcSubmissionError(
+            "formal compiled-attempt control changed"
+        ) from exc
+    expected = _compiled_attempt_control_document(control)
+    if raw != expected or payload != _canonical(expected):
+        raise FormalQcSubmissionError(
+            "formal compiled-attempt control changed exact identity"
+        )
+    return control
 
 
 def _launch_receipt_record(value: FormalQcLaunchReceipt) -> dict[str, object]:
@@ -3320,6 +3984,7 @@ def _launch_receipt(
         "economic_execution_definition_id": None,
         "economic_execution_definition_sha256": None,
         "host_closure_sha256": plan.execution_authority.host_code_closure.closure_sha256,
+        "project_name": plan.project_name,
         "project_id": project_id, "compile_id": compile_id,
         "compile_state": "BuildSuccess", "backtest_id": backtest_id,
         "backtest_name": plan.backtest_name, "initial_status": initial_status,
@@ -3345,11 +4010,22 @@ def _streamed_launch_receipt(
     *,
     permit: FormalSubmissionPermit,
     plan: StreamedFormalQcSubmissionPlan,
+    project_name: str,
     project_id: int,
     compile_id: str,
     backtest_id: str,
     initial_status: str,
 ) -> FormalQcLaunchReceipt:
+    _positive_int(project_id, "formal launch project id")
+    _safe_id(compile_id, "formal launch compile id")
+    _safe_id(backtest_id, "formal launch backtest id")
+    if (
+        type(initial_status) is not str
+        or initial_status not in (
+            BACKTEST_PENDING_STATUSES | {RECOVERED_LAUNCH_INITIAL_STATUS}
+        )
+    ):
+        raise FormalQcSubmissionError("formal launch initial status changed")
     record = {
         "permit_id": permit.permit_id,
         "permit_sha256": permit.permit_sha256,
@@ -3368,6 +4044,7 @@ def _streamed_launch_receipt(
         "host_closure_sha256": (
             plan.execution_authority.host_code_closure.closure_sha256
         ),
+        "project_name": _safe_id(project_name, "formal project name"),
         "project_id": project_id,
         "compile_id": compile_id,
         "compile_state": "BuildSuccess",
@@ -3389,6 +4066,128 @@ def _streamed_launch_receipt(
     )
 
 
+def _durable_streamed_launch_document(
+    *,
+    claim: FormalLookClaim,
+    permit: FormalSubmissionPermit,
+    control: FormalQcCompiledAttemptControl,
+    launch: FormalQcLaunchReceipt,
+) -> dict[str, object]:
+    return {
+        "schema": DURABLE_LAUNCH_CONTROL_SCHEMA,
+        "status": "exact_backtests_create_receipt_persisted",
+        "attempt_ordinal": claim.attempt_ordinal,
+        "claim_id": claim.claim_id,
+        "claim_sha256": claim.claim_sha256,
+        "permit_id": permit.permit_id,
+        "permit_sha256": permit.permit_sha256,
+        "compiled_control_id": control.control_id,
+        "compiled_control_sha256": control.control_sha256,
+        "launch_receipt_schema": LAUNCH_RECEIPT_SCHEMA,
+        "launch_receipt_id": launch.receipt_id,
+        "launch_receipt_sha256": launch.receipt_sha256,
+        **_launch_receipt_record(launch),
+    }
+
+
+def _persist_streamed_launch_control(
+    *,
+    submission_bridge: StreamedFormalSubmissionAdapterBridge,
+    claim: FormalLookClaim,
+    permit: FormalSubmissionPermit,
+    control: FormalQcCompiledAttemptControl,
+    launch: FormalQcLaunchReceipt,
+) -> FormalQcLaunchReceipt:
+    submitted = require_streamed_formal_submission_adapter_bridge(
+        submission_bridge
+    )
+    expected_control = _load_streamed_compiled_attempt_control(
+        submission_bridge=submitted,
+        claim=claim,
+    )
+    if control != expected_control:
+        raise FormalQcSubmissionError(
+            "formal launch compiled-attempt control changed"
+        )
+    expected_launch = _streamed_launch_receipt(
+        permit=permit,
+        plan=submitted.plan,
+        project_name=control.project_name,
+        project_id=control.project_id,
+        compile_id=control.compile_id,
+        backtest_id=launch.backtest_id,
+        initial_status=launch.initial_status,
+    )
+    if launch != expected_launch:
+        raise FormalQcSubmissionError("formal durable launch receipt changed")
+    _publish_formal_retry_adapter_control_once(
+        candidate=submitted.formal_run_candidate,
+        authority=submitted.reviewed_authority,
+        claim=claim,
+        control_kind="launch",
+        payload=_canonical(
+            _durable_streamed_launch_document(
+                claim=claim,
+                permit=permit,
+                control=control,
+                launch=launch,
+            )
+        ),
+    )
+    return _load_streamed_launch_control(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        control=control,
+    )
+
+
+def _load_streamed_launch_control(
+    *,
+    submission_bridge: StreamedFormalSubmissionAdapterBridge,
+    claim: FormalLookClaim,
+    permit: FormalSubmissionPermit,
+    control: FormalQcCompiledAttemptControl,
+) -> FormalQcLaunchReceipt:
+    submitted = require_streamed_formal_submission_adapter_bridge(
+        submission_bridge
+    )
+    if control != _load_streamed_compiled_attempt_control(
+        submission_bridge=submitted,
+        claim=claim,
+    ):
+        raise FormalQcSubmissionError(
+            "formal durable launch compiled control changed"
+        )
+    payload = _read_formal_retry_adapter_control(
+        candidate=submitted.formal_run_candidate,
+        authority=submitted.reviewed_authority,
+        claim=claim,
+        control_kind="launch",
+    )
+    raw = _json_object(payload, "formal durable launch control")
+    launch = _streamed_launch_receipt(
+        permit=permit,
+        plan=submitted.plan,
+        project_name=control.project_name,
+        project_id=control.project_id,
+        compile_id=control.compile_id,
+        backtest_id=raw.get("backtest_id"),
+        initial_status=raw.get("initial_status"),
+    )
+    expected = _durable_streamed_launch_document(
+        claim=claim,
+        permit=permit,
+        control=control,
+        launch=launch,
+    )
+    if raw != expected or payload != _canonical(expected):
+        raise FormalQcSubmissionError(
+            "formal durable launch control changed exact identity"
+        )
+    return launch
+
+
 def _execute_streamed_formal_qc_submission_once_impl(
     *,
     submission_bridge: StreamedFormalSubmissionAdapterBridge,
@@ -3397,7 +4196,8 @@ def _execute_streamed_formal_qc_submission_once_impl(
     submission_started_at_utc: str,
     _authority_register_launch: Callable[..., FormalQcLaunchReceipt],
     _transport_capability_minter: Callable[..., object],
-) -> tuple[FormalSubmissionPermit, FormalQcLaunchReceipt]:
+    _recovery_permit: FormalSubmissionPermit | None = None,
+) -> tuple[FormalSubmissionPermit, FormalQcLaunchReceipt] | FormalQcCompiledAttemptControl:
     """Execute the exact one-shot flow without retaining the input payload set."""
 
     submitted = require_streamed_formal_submission_adapter_bridge(
@@ -3408,6 +4208,8 @@ def _execute_streamed_formal_qc_submission_once_impl(
     plan = submitted.plan
     projection = submitted.runtime_bridge.runtime_projection
     execution = submitted.execution_authority
+    review_authorization = formal_review_authorization_record(authority)
+    owner_waived = review_authorization == formal_owner_review_waiver_record()
     _require_non_self_mintable_execution_trust_root(
         execution._owner_signature, execution._receipt_bytes
     )
@@ -3415,9 +4217,132 @@ def _execute_streamed_formal_qc_submission_once_impl(
         value=plan, authority=authority
     )
     require_formal_look_claim(candidate, authority, claim)
+    if owner_waived and (
+        execution.review_disposition != review_authorization["review_disposition"]
+        or execution.independent_review_complete is not False
+        or execution.authorization_basis != review_authorization["authorization_basis"]
+        or execution.owner_review_waiver_id
+        != review_authorization["owner_review_waiver_id"]
+        or execution.owner_review_waiver_scope
+        != review_authorization["owner_review_waiver_scope"]
+        or execution.waiver_ends_after_first_technically_completed_formal_backtest
+        is not True
+        or execution.post_first_formal_backtest_independent_review_required
+        is not True
+        or claim.retry_lineage_sha256 != execution.retry_lineage_sha256
+        or claim.submission_plan_id != plan.plan_id
+        or claim.submission_plan_sha256 != plan.plan_sha256
+        or claim.outcome_look_consumed is not False
+        or claim.submission_count_reserved != 0
+    ):
+        raise FormalQcSubmissionError(
+            "owner review waiver or retry lineage changed before transport"
+        )
+    attempt_project_name = _streamed_attempt_project_name(
+        plan=plan,
+        claim=claim,
+        owner_waived=owner_waived,
+    )
     _require_concrete_transport(client)
     closure = execution.host_code_closure
     verify_formal_qc_host_closure_live(closure)
+
+    if _recovery_permit is not None:
+        if not owner_waived:
+            raise FormalQcSubmissionError(
+                "formal cross-process recovery requires the owner-review waiver"
+            )
+        permit = require_formal_submission_permit(
+            candidate,
+            authority,
+            claim,
+            _recovery_permit,
+        )
+        if permit.consumption_reason != "backtests_create_attempt":
+            raise FormalQcSubmissionError(
+                "formal recovery permit lacks one backtests/create attempt"
+            )
+        _require_streamed_authenticated_power_floor(
+            submitted.authenticated_power_floor,
+            submitted.runtime_bridge,
+        )
+        _require_streamed_economic_execution(
+            submitted.economic_execution,
+            submitted.runtime_bridge,
+        )
+        _require_streamed_report_contract(
+            submitted.report_contract,
+            submitted.runtime_bridge,
+        )
+        control = _load_streamed_compiled_attempt_control(
+            submission_bridge=submitted,
+            claim=claim,
+        )
+        if control.project_name != attempt_project_name:
+            raise FormalQcSubmissionError(
+                "formal recovery project name changed from its compiled control"
+            )
+        recovery_capability = _transport_capability_minter(
+            transport=client,
+            scope="submission",
+            binding_record={
+                "schema": "arv2-streamed-formal-qc-recovery-project-capability-v1",
+                "candidate_sha256": candidate.candidate_sha256,
+                "reviewed_authority_sha256": authority.authority_sha256,
+                "runtime_bridge_sha256": submitted.runtime_bridge.bridge_sha256,
+                "submission_adapter_bridge_sha256": submitted.bridge_sha256,
+                "plan_sha256": plan.plan_sha256,
+                "claim_sha256": claim.claim_sha256,
+                "permit_sha256": permit.permit_sha256,
+                "compiled_control_sha256": control.control_sha256,
+                "exact_project_name": control.project_name,
+                "exact_project_id": control.project_id,
+            },
+            call_budget={"authenticate": 1, "projects/read": 1},
+        )
+        try:
+            _transport_call(
+                client,
+                recovery_capability,
+                "_request_json",
+                "authenticate",
+                {},
+            )
+            recovery_inventory = _read_project_inventory(
+                _external(
+                    closure,
+                    lambda: _transport_call(
+                        client,
+                        recovery_capability,
+                        "_request_json",
+                        "projects/read",
+                        {"projectId": control.project_id},
+                    ),
+                )
+            )
+            if len(recovery_inventory) != 1:
+                raise FormalQcSubmissionError(
+                    "formal recovery project inventory is not exactly one"
+                )
+            recovered_project = _project_record(
+                recovery_inventory[0],
+                name=control.project_name,
+                organization_id=control.organization_id,
+            )
+            if recovered_project["projectId"] != control.project_id:
+                raise FormalQcSubmissionError(
+                    "formal recovery project id changed from its compiled control"
+                )
+        except Exception as exc:
+            if isinstance(exc, FormalQcSubmissionLocked):
+                raise
+            raise FormalQcSubmissionLocked(
+                "streamed_recovery_project",
+                permit.permit_id,
+                type(exc).__name__,
+                outcome_class=_failure_outcome_class(exc),
+            ) from exc
+        return control
 
     # Re-open and authenticate the entire physical inventory before spending
     # the look.  This pass holds one payload at a time and performs no action.
@@ -3432,42 +4357,61 @@ def _execute_streamed_formal_qc_submission_once_impl(
     _require_streamed_report_contract(
         submitted.report_contract, submitted.runtime_bridge
     )
-    permit = begin_formal_submission_once(
-        candidate=candidate,
-        authority=authority,
-        claim=claim,
-        submission_started_at_utc=submission_started_at_utc,
-    )
+    permit = None
+    compiled_control = None
+    if not owner_waived:
+        permit = begin_formal_submission_once(
+            candidate=candidate,
+            authority=authority,
+            claim=claim,
+            submission_started_at_utc=submission_started_at_utc,
+        )
+    capability_binding = {
+        "schema": "arv2-streamed-formal-qc-submission-transport-capability-v1",
+        "candidate_sha256": candidate.candidate_sha256,
+        "reviewed_authority_sha256": authority.authority_sha256,
+        "runtime_bridge_sha256": submitted.runtime_bridge.bridge_sha256,
+        "submission_adapter_bridge_sha256": submitted.bridge_sha256,
+        "authenticated_power_floor_sha256": (
+            submitted.authenticated_power_floor.binding_sha256
+        ),
+        "economic_execution_binding_sha256": (
+            submitted.economic_execution.binding_sha256
+        ),
+        "economic_execution_definition_sha256": (
+            submitted.economic_execution.definition_sha256
+        ),
+        "formal_report_contract_sha256": (
+            submitted.report_contract.contract_sha256
+        ),
+        "formal_report_contract_artifact_sha256": (
+            submitted.report_contract.artifact_sha256
+        ),
+        "formal_report_contract_stock_bootstrap_seed_sha256": (
+            submitted.report_contract.stock_bootstrap_seed_sha256
+        ),
+        "plan_sha256": plan.plan_sha256,
+        "attempt_project_name": attempt_project_name,
+        "permit_sha256": (
+            permit.permit_sha256 if permit is not None else None
+        ),
+    }
+    if owner_waived:
+        capability_binding.update(
+            {
+                "schema": (
+                    "arv2-streamed-formal-qc-retry-attempt-transport-"
+                    "capability-v1"
+                ),
+                "attempt_ordinal": claim.attempt_ordinal,
+                "attempt_claim_sha256": claim.claim_sha256,
+                "retry_lineage_sha256": execution.retry_lineage_sha256,
+            }
+        )
     transport_capability = _transport_capability_minter(
         transport=client,
         scope="submission",
-        binding_record={
-            "schema": "arv2-streamed-formal-qc-submission-transport-capability-v1",
-            "candidate_sha256": candidate.candidate_sha256,
-            "reviewed_authority_sha256": authority.authority_sha256,
-            "runtime_bridge_sha256": submitted.runtime_bridge.bridge_sha256,
-            "submission_adapter_bridge_sha256": submitted.bridge_sha256,
-            "authenticated_power_floor_sha256": (
-                submitted.authenticated_power_floor.binding_sha256
-            ),
-            "economic_execution_binding_sha256": (
-                submitted.economic_execution.binding_sha256
-            ),
-            "economic_execution_definition_sha256": (
-                submitted.economic_execution.definition_sha256
-            ),
-            "formal_report_contract_sha256": (
-                submitted.report_contract.contract_sha256
-            ),
-            "formal_report_contract_artifact_sha256": (
-                submitted.report_contract.artifact_sha256
-            ),
-            "formal_report_contract_stock_bootstrap_seed_sha256": (
-                submitted.report_contract.stock_bootstrap_seed_sha256
-            ),
-            "plan_sha256": plan.plan_sha256,
-            "permit_sha256": permit.permit_sha256,
-        },
+        binding_record=capability_binding,
         call_budget={
             "authenticate": 1,
             "projects/read": 2,
@@ -3496,10 +4440,10 @@ def _execute_streamed_formal_qc_submission_once_impl(
                     "projects/read",
                     {},
                 ),
-            )
+            ),
         )
         if any(
-            type(item) is dict and item.get("name") == plan.project_name
+            type(item) is dict and item.get("name") == attempt_project_name
             for item in inventory
         ):
             raise FormalQcSubmissionError("exact formal project already exists")
@@ -3511,10 +4455,10 @@ def _execute_streamed_formal_qc_submission_once_impl(
                     transport_capability,
                     "_request_json",
                     "projects/create",
-                    {"name": plan.project_name, "language": "Py"},
+                    {"name": attempt_project_name, "language": "Py"},
                 ),
             ),
-            name=plan.project_name,
+            name=attempt_project_name,
             organization_id=plan.organization_id,
         )
         project_id = int(project["projectId"])
@@ -3528,7 +4472,7 @@ def _execute_streamed_formal_qc_submission_once_impl(
                     "projects/read",
                     {"projectId": project_id},
                 ),
-            )
+            ),
         )
         if len(exact_inventory) != 1:
             raise FormalQcSubmissionError(
@@ -3536,7 +4480,7 @@ def _execute_streamed_formal_qc_submission_once_impl(
             )
         _project_record(
             exact_inventory[0],
-            name=plan.project_name,
+            name=attempt_project_name,
             organization_id=plan.organization_id,
         )
 
@@ -3581,7 +4525,8 @@ def _execute_streamed_formal_qc_submission_once_impl(
                     "files/read",
                     {"projectId": project_id},
                 ),
-            )
+            ),
+            expected_project_id=project_id,
         )
         projected = {item.project_path: item for item in projection.source_files}
         if not set(existing).issubset({"main.py"}):
@@ -3618,7 +4563,8 @@ def _execute_streamed_formal_qc_submission_once_impl(
                     "files/read",
                     {"projectId": project_id},
                 ),
-            )
+            ),
+            expected_project_id=project_id,
         )
         if set(observed) != set(projected):
             raise FormalQcSubmissionError("QC project source inventory changed")
@@ -3639,7 +4585,8 @@ def _execute_streamed_formal_qc_submission_once_impl(
                     "compile/create",
                     {"projectId": project_id},
                 ),
-            )
+            ),
+            expected_project_id=project_id,
         )
         compile_state = ""
         for index in range(plan.compile_poll_limit):
@@ -3665,6 +4612,23 @@ def _execute_streamed_formal_qc_submission_once_impl(
             raise FormalQcSubmissionError(
                 "formal source did not compile successfully"
             )
+        if owner_waived:
+            compiled_control = _persist_streamed_compiled_attempt_control(
+                submission_bridge=submitted,
+                claim=claim,
+                project_name=attempt_project_name,
+                project_id=project_id,
+                compile_id=compile_id,
+            )
+            permit = begin_formal_submission_once(
+                candidate=candidate,
+                authority=authority,
+                claim=claim,
+                submission_started_at_utc=submission_started_at_utc,
+                consumption_reason="backtests_create_attempt",
+            )
+        if permit is None:
+            raise FormalQcSubmissionError("formal submission permit is unavailable")
         backtest_id, initial_status = _created_backtest(
             _external(
                 closure,
@@ -3683,15 +4647,29 @@ def _execute_streamed_formal_qc_submission_once_impl(
             project_id=project_id,
             name=plan.backtest_name,
         )
-        return permit, _authority_register_launch(
-            _streamed_launch_receipt(
+        launch = _streamed_launch_receipt(
+            permit=permit,
+            plan=plan,
+            project_name=attempt_project_name,
+            project_id=project_id,
+            compile_id=compile_id,
+            backtest_id=backtest_id,
+            initial_status=initial_status,
+        )
+        if owner_waived:
+            if compiled_control is None:
+                raise FormalQcSubmissionError(
+                    "formal compiled-attempt control is unavailable"
+                )
+            launch = _persist_streamed_launch_control(
+                submission_bridge=submitted,
+                claim=claim,
                 permit=permit,
-                plan=plan,
-                project_id=project_id,
-                compile_id=compile_id,
-                backtest_id=backtest_id,
-                initial_status=initial_status,
-            ),
+                control=compiled_control,
+                launch=launch,
+            )
+        return permit, _authority_register_launch(
+            launch,
             permit=permit,
             plan=plan,
             streamed=True,
@@ -3699,6 +4677,42 @@ def _execute_streamed_formal_qc_submission_once_impl(
     except Exception as exc:
         if isinstance(exc, FormalQcSubmissionLocked):
             raise
+        if owner_waived and permit is None:
+            if isinstance(exc, FormalRunProtocolError):
+                raise
+            outcome_class = _failure_outcome_class(exc)
+            if outcome_class == "network_ambiguous":
+                consumed = begin_formal_submission_once(
+                    candidate=candidate,
+                    authority=authority,
+                    claim=claim,
+                    submission_started_at_utc=submission_started_at_utc,
+                    consumption_reason="external_state_ambiguous",
+                )
+                raise FormalQcSubmissionLocked(
+                    "streamed_pre_submission_ambiguity",
+                    consumed.permit_id,
+                    type(exc).__name__,
+                    outcome_class=outcome_class,
+                ) from exc
+            recorded_at_utc = (
+                datetime.now(timezone.utc)
+                .isoformat(timespec="microseconds")
+                .replace("+00:00", "Z")
+            )
+            failure = record_definite_pre_submission_failure(
+                candidate=candidate,
+                authority=authority,
+                claim=claim,
+                phase="streamed_pre_backtests_create",
+                failure_class=type(exc).__name__,
+                recorded_at_utc=recorded_at_utc,
+            )
+            raise FormalQcPreSubmissionFailed(
+                "streamed_pre_backtests_create",
+                claim.claim_id,
+                failure.failure_id,
+            ) from exc
         # Content objects uploaded before a failure remain content-addressed;
         # the manifest is ordered last, and every ambiguity consumes the look.
         raise FormalQcSubmissionLocked(
@@ -3723,6 +4737,11 @@ def require_streamed_formal_qc_launch_receipt(
     expected = _streamed_launch_receipt(
         permit=permit,
         plan=plan,
+        project_name=_streamed_attempt_project_name(
+            plan=plan,
+            claim=permit,
+            owner_waived=permit.attempt_ordinal is not None,
+        ),
         project_id=value.project_id,
         compile_id=value.compile_id,
         backtest_id=value.backtest_id,
@@ -3851,13 +4870,16 @@ def _execute_formal_qc_submission_once_impl(
                     item.object_store_key),
             )
             _object_metadata_matches(metadata, entry)
-        existing = _read_files(_external(
-            closure,
-            lambda: _transport_call(
-                client, transport_capability, "_request_json", "files/read",
-                {"projectId": project_id}
+        existing = _read_files(
+            _external(
+                closure,
+                lambda: _transport_call(
+                    client, transport_capability, "_request_json", "files/read",
+                    {"projectId": project_id}
+                ),
             ),
-        ))
+            expected_project_id=project_id,
+        )
         projected = {item.project_path: item for item in projection.source_files}
         if not set(existing).issubset({"main.py"}):
             raise FormalQcSubmissionError("new project contains an unexpected source file")
@@ -3873,13 +4895,16 @@ def _execute_formal_qc_submission_once_impl(
                 ),
                 frozenset({"success", "errors", "messages"}), endpoint,
             )
-        observed = _read_files(_external(
-            closure,
-            lambda: _transport_call(
-                client, transport_capability, "_request_json", "files/read",
-                {"projectId": project_id}
+        observed = _read_files(
+            _external(
+                closure,
+                lambda: _transport_call(
+                    client, transport_capability, "_request_json", "files/read",
+                    {"projectId": project_id}
+                ),
             ),
-        ))
+            expected_project_id=project_id,
+        )
         if set(observed) != set(projected):
             raise FormalQcSubmissionError("QC project source inventory changed")
         for path, source in projected.items():
@@ -3892,7 +4917,7 @@ def _execute_formal_qc_submission_once_impl(
                 client, transport_capability, "_request_json", "compile/create",
                 {"projectId": project_id}
             ),
-        ))
+        ), expected_project_id=project_id)
         compile_state = ""
         for index in range(plan.compile_poll_limit):
             compile_state = _compile_state(
@@ -4274,16 +5299,154 @@ def _streamed_terminal_receipt(
     )
 
 
+def _durable_streamed_terminal_document(
+    *,
+    claim: FormalLookClaim,
+    permit: FormalSubmissionPermit,
+    control: FormalQcCompiledAttemptControl,
+    launch: FormalQcLaunchReceipt,
+    terminal: FormalQcTerminalStatusReceipt,
+) -> dict[str, object]:
+    return {
+        "schema": DURABLE_TERMINAL_CONTROL_SCHEMA,
+        "status": "exact_statistics_free_terminal_receipt_persisted",
+        "attempt_ordinal": claim.attempt_ordinal,
+        "claim_id": claim.claim_id,
+        "claim_sha256": claim.claim_sha256,
+        "permit_id": permit.permit_id,
+        "permit_sha256": permit.permit_sha256,
+        "compiled_control_id": control.control_id,
+        "compiled_control_sha256": control.control_sha256,
+        "launch_receipt_id": launch.receipt_id,
+        "launch_receipt_sha256": launch.receipt_sha256,
+        "terminal_receipt_schema": TERMINAL_STATUS_SCHEMA,
+        "terminal_receipt_id": terminal.receipt_id,
+        "terminal_receipt_sha256": terminal.receipt_sha256,
+        **_terminal_receipt_record(terminal),
+    }
+
+
+def _persist_streamed_terminal_control(
+    *,
+    submission_bridge: StreamedFormalSubmissionAdapterBridge,
+    claim: FormalLookClaim,
+    permit: FormalSubmissionPermit,
+    control: FormalQcCompiledAttemptControl,
+    launch: FormalQcLaunchReceipt,
+    terminal: FormalQcTerminalStatusReceipt,
+) -> FormalQcTerminalStatusReceipt:
+    submitted = require_streamed_formal_submission_adapter_bridge(
+        submission_bridge
+    )
+    persisted_launch = _load_streamed_launch_control(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        control=control,
+    )
+    if launch != persisted_launch:
+        raise FormalQcSubmissionError(
+            "formal terminal launch control changed"
+        )
+    expected_terminal = _streamed_terminal_receipt(
+        submission_bridge=submitted,
+        launch=launch,
+        permit=permit,
+        terminal_status=terminal.terminal_status,
+        status_poll_count=terminal.status_poll_count,
+    )
+    if terminal != expected_terminal:
+        raise FormalQcSubmissionError(
+            "formal durable terminal receipt changed"
+        )
+    _publish_formal_retry_adapter_control_once(
+        candidate=submitted.formal_run_candidate,
+        authority=submitted.reviewed_authority,
+        claim=claim,
+        control_kind="terminal",
+        payload=_canonical(
+            _durable_streamed_terminal_document(
+                claim=claim,
+                permit=permit,
+                control=control,
+                launch=launch,
+                terminal=terminal,
+            )
+        ),
+    )
+    return _load_streamed_terminal_control(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        control=control,
+        launch=launch,
+    )
+
+
+def _load_streamed_terminal_control(
+    *,
+    submission_bridge: StreamedFormalSubmissionAdapterBridge,
+    claim: FormalLookClaim,
+    permit: FormalSubmissionPermit,
+    control: FormalQcCompiledAttemptControl,
+    launch: FormalQcLaunchReceipt,
+) -> FormalQcTerminalStatusReceipt:
+    submitted = require_streamed_formal_submission_adapter_bridge(
+        submission_bridge
+    )
+    if launch != _load_streamed_launch_control(
+        submission_bridge=submitted,
+        claim=claim,
+        permit=permit,
+        control=control,
+    ):
+        raise FormalQcSubmissionError(
+            "formal durable terminal launch identity changed"
+        )
+    payload = _read_formal_retry_adapter_control(
+        candidate=submitted.formal_run_candidate,
+        authority=submitted.reviewed_authority,
+        claim=claim,
+        control_kind="terminal",
+    )
+    raw = _json_object(payload, "formal durable terminal control")
+    terminal = _streamed_terminal_receipt(
+        submission_bridge=submitted,
+        launch=launch,
+        permit=permit,
+        terminal_status=raw.get("terminal_status"),
+        status_poll_count=raw.get("status_poll_count"),
+    )
+    expected = _durable_streamed_terminal_document(
+        claim=claim,
+        permit=permit,
+        control=control,
+        launch=launch,
+        terminal=terminal,
+    )
+    if raw != expected or payload != _canonical(expected):
+        raise FormalQcSubmissionError(
+            "formal durable terminal control changed exact identity"
+        )
+    return terminal
+
+
 def _inspect_streamed_statistics_free_terminal_status_impl(
     *,
     submission_bridge: StreamedFormalSubmissionAdapterBridge,
     claim: FormalLookClaim,
     permit: FormalSubmissionPermit,
-    launch: FormalQcLaunchReceipt,
+    launch: FormalQcLaunchReceipt | None,
     client: FormalQcTransport,
     _authority_register_terminal: Callable[..., FormalQcTerminalStatusReceipt],
+    _authority_record_terminal_disposition: Callable[..., object],
     _transport_capability_minter: Callable[..., object],
-) -> FormalQcTerminalStatusReceipt:
+    _authority_register_launch: Callable[..., FormalQcLaunchReceipt] | None = None,
+    _recovery_control: FormalQcCompiledAttemptControl | None = None,
+) -> (
+    FormalQcTerminalStatusReceipt
+    | tuple[FormalQcLaunchReceipt, FormalQcTerminalStatusReceipt]
+):
     """Poll only identity/status for the exact authenticated streamed run."""
 
     submitted = require_streamed_formal_submission_adapter_bridge(
@@ -4297,9 +5460,59 @@ def _inspect_streamed_statistics_free_terminal_status_impl(
         submitted.execution_authority._receipt_bytes,
     )
     require_formal_submission_permit(candidate, authority, claim, permit)
-    require_streamed_formal_qc_launch_receipt(
-        value=launch, permit=permit, plan=plan
-    )
+    recovering = _recovery_control is not None
+    if recovering:
+        if (
+            formal_review_authorization_record(authority)
+            != formal_owner_review_waiver_record()
+            or launch is not None
+            or _authority_register_launch is None
+        ):
+            raise FormalQcSubmissionError(
+                "formal cross-process status recovery authority changed"
+            )
+        control = _load_streamed_compiled_attempt_control(
+            submission_bridge=submitted,
+            claim=claim,
+        )
+        if _recovery_control != control:
+            raise FormalQcSubmissionError(
+                "formal recovery compiled-attempt control changed"
+            )
+        if _formal_retry_adapter_control_exists(
+            candidate=candidate,
+            authority=authority,
+            claim=claim,
+            control_kind="launch",
+        ):
+            launch = _load_streamed_launch_control(
+                submission_bridge=submitted,
+                claim=claim,
+                permit=permit,
+                control=control,
+            )
+            launch = _authority_register_launch(
+                launch,
+                permit=permit,
+                plan=plan,
+                streamed=True,
+            )
+            require_streamed_formal_qc_launch_receipt(
+                value=launch,
+                permit=permit,
+                plan=plan,
+            )
+    else:
+        if launch is None:
+            raise FormalQcSubmissionError(
+                "streamed status requires an exact launch receipt"
+            )
+        require_streamed_formal_qc_launch_receipt(
+            value=launch,
+            permit=permit,
+            plan=plan,
+        )
+        control = None
     _require_streamed_authenticated_power_floor(
         submitted.authenticated_power_floor, submitted.runtime_bridge
     )
@@ -4311,81 +5524,213 @@ def _inspect_streamed_statistics_free_terminal_status_impl(
     )
     _require_concrete_transport(client)
     closure = submitted.execution_authority.host_code_closure
+    status_binding = {
+        "schema": "arv2-streamed-formal-qc-status-transport-capability-v1",
+        "candidate_sha256": candidate.candidate_sha256,
+        "reviewed_authority_sha256": authority.authority_sha256,
+        "runtime_bridge_sha256": submitted.runtime_bridge.bridge_sha256,
+        "submission_adapter_bridge_sha256": submitted.bridge_sha256,
+        "authenticated_power_floor_sha256": (
+            submitted.authenticated_power_floor.binding_sha256
+        ),
+        "economic_execution_binding_sha256": (
+            submitted.economic_execution.binding_sha256
+        ),
+        "economic_execution_definition_sha256": (
+            submitted.economic_execution.definition_sha256
+        ),
+        "formal_report_contract_sha256": (
+            submitted.report_contract.contract_sha256
+        ),
+        "formal_report_contract_artifact_sha256": (
+            submitted.report_contract.artifact_sha256
+        ),
+        "formal_report_contract_stock_bootstrap_seed_sha256": (
+            submitted.report_contract.stock_bootstrap_seed_sha256
+        ),
+        "plan_sha256": plan.plan_sha256,
+        "permit_sha256": permit.permit_sha256,
+        "launch_receipt_sha256": (
+            launch.receipt_sha256 if launch is not None else None
+        ),
+    }
+    if recovering:
+        assert control is not None
+        status_binding.update(
+            {
+                "schema": (
+                    "arv2-streamed-formal-qc-recovery-status-capability-v1"
+                ),
+                "compiled_control_sha256": control.control_sha256,
+                "exact_project_name": control.project_name,
+                "exact_project_id": control.project_id,
+            }
+        )
     transport_capability = _transport_capability_minter(
         transport=client,
         scope="status",
-        binding_record={
-            "schema": "arv2-streamed-formal-qc-status-transport-capability-v1",
-            "candidate_sha256": candidate.candidate_sha256,
-            "reviewed_authority_sha256": authority.authority_sha256,
-            "runtime_bridge_sha256": submitted.runtime_bridge.bridge_sha256,
-            "submission_adapter_bridge_sha256": submitted.bridge_sha256,
-            "authenticated_power_floor_sha256": (
-                submitted.authenticated_power_floor.binding_sha256
-            ),
-            "economic_execution_binding_sha256": (
-                submitted.economic_execution.binding_sha256
-            ),
-            "economic_execution_definition_sha256": (
-                submitted.economic_execution.definition_sha256
-            ),
-            "formal_report_contract_sha256": (
-                submitted.report_contract.contract_sha256
-            ),
-            "formal_report_contract_artifact_sha256": (
-                submitted.report_contract.artifact_sha256
-            ),
-            "formal_report_contract_stock_bootstrap_seed_sha256": (
-                submitted.report_contract.stock_bootstrap_seed_sha256
-            ),
-            "plan_sha256": plan.plan_sha256,
-            "permit_sha256": permit.permit_sha256,
-            "launch_receipt_sha256": launch.receipt_sha256,
-        },
+        binding_record=status_binding,
         call_budget={"backtests/list": plan.status_poll_limit},
     )
     for index in range(plan.status_poll_limit):
         try:
-            status = parse_statistics_free_backtest_list(
-                _external(
-                    closure,
-                    lambda: _transport_call(
-                        client,
-                        transport_capability,
-                        "_request_json",
-                        "backtests/list",
-                        {
-                            "projectId": launch.project_id,
-                            "includeStatistics": False,
-                        },
-                    ),
-                ),
-                expected_project_id=launch.project_id,
-                expected_backtest_id=launch.backtest_id,
-                expected_backtest_name=launch.backtest_name,
+            expected_project_id = (
+                control.project_id
+                if launch is None and control is not None
+                else launch.project_id
             )
+            response = _external(
+                closure,
+                lambda: _transport_call(
+                    client,
+                    transport_capability,
+                    "_request_json",
+                    "backtests/list",
+                    {
+                        "projectId": expected_project_id,
+                        "includeStatistics": False,
+                    },
+                ),
+            )
+            if launch is None:
+                if control is None or _authority_register_launch is None:
+                    raise FormalQcSubmissionError(
+                        "formal recovery lost its compiled launch identity"
+                    )
+                status = _parse_statistics_free_unique_project_run(
+                    response,
+                    expected_project_id=control.project_id,
+                    expected_backtest_name=control.backtest_name,
+                )
+                recovered_launch = _streamed_launch_receipt(
+                    permit=permit,
+                    plan=plan,
+                    project_name=control.project_name,
+                    project_id=control.project_id,
+                    compile_id=control.compile_id,
+                    backtest_id=status.backtest_id,
+                    initial_status=RECOVERED_LAUNCH_INITIAL_STATUS,
+                )
+                recovered_launch = _persist_streamed_launch_control(
+                    submission_bridge=submitted,
+                    claim=claim,
+                    permit=permit,
+                    control=control,
+                    launch=recovered_launch,
+                )
+                launch = _authority_register_launch(
+                    recovered_launch,
+                    permit=permit,
+                    plan=plan,
+                    streamed=True,
+                )
+                require_streamed_formal_qc_launch_receipt(
+                    value=launch,
+                    permit=permit,
+                    plan=plan,
+                )
+            else:
+                status = parse_statistics_free_backtest_list(
+                    response,
+                    expected_project_id=launch.project_id,
+                    expected_backtest_id=launch.backtest_id,
+                    expected_backtest_name=launch.backtest_name,
+                )
         except Exception as exc:
             raise FormalQcSubmissionLocked(
-                "streamed_terminal_status",
+                (
+                    "streamed_recovery_status"
+                    if recovering
+                    else "streamed_terminal_status"
+                ),
                 permit.permit_id,
                 type(exc).__name__,
                 outcome_class=_failure_outcome_class(exc),
             ) from exc
         if status.status in BACKTEST_TERMINAL_STATUSES:
-            return _authority_register_terminal(
-                _streamed_terminal_receipt(
+            if launch is None:
+                raise AssertionError("terminal recovery lost its launch receipt")
+            if control is None and (
+                formal_review_authorization_record(authority)
+                == formal_owner_review_waiver_record()
+            ):
+                control = _load_streamed_compiled_attempt_control(
+                    submission_bridge=submitted,
+                    claim=claim,
+                )
+            if control is not None and _formal_retry_adapter_control_exists(
+                candidate=candidate,
+                authority=authority,
+                claim=claim,
+                control_kind="terminal",
+            ):
+                terminal = _load_streamed_terminal_control(
+                    submission_bridge=submitted,
+                    claim=claim,
+                    permit=permit,
+                    control=control,
+                    launch=launch,
+                )
+                if terminal.terminal_status != status.status:
+                    raise FormalQcSubmissionLocked(
+                        "streamed_recovery_terminal",
+                        permit.permit_id,
+                        "persisted terminal status changed from live exact run",
+                    )
+            else:
+                terminal = _streamed_terminal_receipt(
                     submission_bridge=submitted,
                     launch=launch,
                     permit=permit,
                     terminal_status=status.status,
                     status_poll_count=index + 1,
-                ),
+                )
+                if control is not None:
+                    terminal = _persist_streamed_terminal_control(
+                        submission_bridge=submitted,
+                        claim=claim,
+                        permit=permit,
+                        control=control,
+                        launch=launch,
+                        terminal=terminal,
+                    )
+            authenticated_terminal = _authority_register_terminal(
+                terminal,
                 launch=launch,
                 permit=permit,
                 plan=plan,
                 streamed=True,
                 context=(submitted, claim),
             )
+            authenticated_terminal = require_streamed_formal_qc_terminal_status_receipt(
+                terminal=authenticated_terminal,
+                submission_bridge=submitted,
+                claim=claim,
+                permit=permit,
+                launch=launch,
+            )
+            if (
+                formal_review_authorization_record(authority)
+                == formal_owner_review_waiver_record()
+            ):
+                _authority_record_terminal_disposition(
+                    candidate=candidate,
+                    authority=authority,
+                    claim=claim,
+                    permit=permit,
+                    launch=launch,
+                    terminal=authenticated_terminal,
+                    plan=plan,
+                    context=(submitted, claim),
+                    recorded_at_utc=(
+                        datetime.now(timezone.utc)
+                        .isoformat(timespec="microseconds")
+                        .replace("+00:00", "Z")
+                    ),
+                )
+            if recovering:
+                return launch, authenticated_terminal
+            return authenticated_terminal
         if index + 1 == plan.status_poll_limit:
             raise FormalQcSubmissionLocked(
                 "streamed_terminal_status",
@@ -7020,6 +8365,8 @@ def _bind_process_receipt_authorities(
     completed_mint_implementation: Callable[
         ..., FormalQcSummaryResultReadReceipt
     ],
+    completion_record_implementation: Callable[..., object],
+    terminal_failure_record_implementation: Callable[..., object],
     streamed_execute_implementation: Callable[
         ..., tuple[FormalSubmissionPermit, FormalQcLaunchReceipt]
     ],
@@ -7106,6 +8453,49 @@ def _bind_process_receipt_authorities(
             streamed=streamed,
             context=context,
             _authority_current=process_current_terminal,
+        )
+
+    def record_terminal_disposition(
+        *,
+        candidate: FormalRunCandidate,
+        authority: ReviewedFormalRunAuthority,
+        claim: FormalLookClaim,
+        permit: FormalSubmissionPermit,
+        launch: FormalQcLaunchReceipt,
+        terminal: FormalQcTerminalStatusReceipt,
+        plan: StreamedFormalQcSubmissionPlan,
+        context: tuple[object, ...],
+        recorded_at_utc: str,
+    ) -> object:
+        """Persist the exact process-authenticated terminal disposition."""
+
+        _require_launch_receipt_authority(
+            launch,
+            permit=permit,
+            plan=plan,
+            streamed=True,
+        )
+        _require_terminal_status_receipt_authority(
+            terminal,
+            launch=launch,
+            permit=permit,
+            plan=plan,
+            streamed=True,
+            context=context,
+        )
+        implementation = (
+            completion_record_implementation
+            if terminal.terminal_status == "Completed."
+            else terminal_failure_record_implementation
+        )
+        return implementation(
+            candidate=candidate,
+            authority=authority,
+            claim=claim,
+            permit=permit,
+            launch_receipt=launch,
+            terminal_receipt=terminal,
+            recorded_at_utc=recorded_at_utc,
         )
 
     def mint_summary(
@@ -7228,8 +8618,73 @@ def _bind_process_receipt_authorities(
             launch=launch,
             client=client,
             _authority_register_terminal=register_terminal,
+            _authority_record_terminal_disposition=record_terminal_disposition,
             _transport_capability_minter=transport_capability_minter,
         )
+
+    def recover_streamed_formal_qc_attempt(
+        *,
+        submission_bridge: StreamedFormalSubmissionAdapterBridge,
+        attempt_ordinal: int,
+        client: FormalQcTransport,
+    ) -> tuple[
+        FormalLookClaim,
+        FormalSubmissionPermit,
+        FormalQcLaunchReceipt,
+        FormalQcTerminalStatusReceipt,
+    ]:
+        """Recover one exact consumed run after process loss and poll it closed."""
+
+        binding_guard("streamed cross-process recovery")
+        submitted = require_streamed_formal_submission_adapter_bridge(
+            submission_bridge
+        )
+        claim, permit = load_consumed_formal_retry_attempt(
+            candidate=submitted.formal_run_candidate,
+            authority=submitted.reviewed_authority,
+            attempt_ordinal=attempt_ordinal,
+            retry_lineage_sha256=(
+                submitted.execution_authority.retry_lineage_sha256
+            ),
+            submission_plan_id=submitted.plan.plan_id,
+            submission_plan_sha256=submitted.plan.plan_sha256,
+        )
+        control = streamed_execute_implementation(
+            submission_bridge=submitted,
+            claim=claim,
+            client=client,
+            submission_started_at_utc=permit.submission_started_at_utc,
+            _authority_register_launch=register_launch,
+            _transport_capability_minter=transport_capability_minter,
+            _recovery_permit=permit,
+        )
+        if type(control) is not FormalQcCompiledAttemptControl:
+            raise FormalQcSubmissionError(
+                "formal recovery did not return its compiled-attempt control"
+            )
+        recovered = streamed_status_implementation(
+            submission_bridge=submitted,
+            claim=claim,
+            permit=permit,
+            launch=None,
+            client=client,
+            _authority_register_terminal=register_terminal,
+            _authority_record_terminal_disposition=record_terminal_disposition,
+            _transport_capability_minter=transport_capability_minter,
+            _authority_register_launch=register_launch,
+            _recovery_control=control,
+        )
+        if (
+            type(recovered) is not tuple
+            or len(recovered) != 2
+            or type(recovered[0]) is not FormalQcLaunchReceipt
+            or type(recovered[1]) is not FormalQcTerminalStatusReceipt
+        ):
+            raise FormalQcSubmissionError(
+                "formal recovery did not return exact launch and terminal receipts"
+            )
+        launch, terminal = recovered
+        return claim, permit, launch, terminal
 
     def inspect_statistics_free_terminal_status(
         *,
@@ -7333,6 +8788,7 @@ def _bind_process_receipt_authorities(
         execute_streamed_formal_qc_submission_once,
         execute_formal_qc_submission_once,
         inspect_streamed_statistics_free_terminal_status,
+        recover_streamed_formal_qc_attempt,
         inspect_statistics_free_terminal_status,
         read_streamed_formal_qc_summary_result_once,
         read_formal_qc_summary_result_once,
@@ -7342,6 +8798,7 @@ def _bind_process_receipt_authorities(
             register_terminal,
             mint_summary,
             mint_completed,
+            record_terminal_disposition,
         ),
     )
 
@@ -7387,7 +8844,10 @@ globals().pop("_claim_adapter_capability_minter", None)
 (
     _claim_fundamental_discovery_transport_capability_minter,
     _claim_preopen_transport_capability_minter,
+    _claim_preopen_physical_upload_transport_capability_minter,
+    _claim_preopen_prereview_transport_capability_minter,
     _claim_power_calibration_transport_capability_minter,
+    _claim_accepted_risk_preliminary_transport_capability_minter,
 ) = _make_downstream_transport_minter_claims(
     _mint_transport_capability,
     _register_downstream_transport_capability_minter,
@@ -7402,6 +8862,7 @@ del _register_downstream_transport_capability_minter
     execute_streamed_formal_qc_submission_once,
     execute_formal_qc_submission_once,
     inspect_streamed_statistics_free_terminal_status,
+    recover_streamed_formal_qc_attempt,
     inspect_statistics_free_terminal_status,
     read_streamed_formal_qc_summary_result_once,
     read_formal_qc_summary_result_once,
@@ -7422,6 +8883,8 @@ del _register_downstream_transport_capability_minter
     _require_terminal_status_receipt_authority_impl,
     _mint_summary_result_receipt_authority_impl,
     _mint_completed_summary_read_receipt_impl,
+    _record_authenticated_formal_backtest_completion,
+    _record_authenticated_formal_backtest_terminal_failure,
     _execute_streamed_formal_qc_submission_once_impl,
     _execute_formal_qc_submission_once_impl,
     _inspect_streamed_statistics_free_terminal_status_impl,
@@ -7439,6 +8902,10 @@ _seal_formal_transport_capability_callers((
                 execute_streamed_formal_qc_submission_once,
             ),
             (
+                _execute_streamed_formal_qc_submission_once_impl,
+                recover_streamed_formal_qc_attempt,
+            ),
+            (
                 _execute_formal_qc_submission_once_impl,
                 execute_formal_qc_submission_once,
             ),
@@ -7450,6 +8917,10 @@ _seal_formal_transport_capability_callers((
             (
                 _inspect_streamed_statistics_free_terminal_status_impl,
                 inspect_streamed_statistics_free_terminal_status,
+            ),
+            (
+                _inspect_streamed_statistics_free_terminal_status_impl,
+                recover_streamed_formal_qc_attempt,
             ),
             (
                 _inspect_statistics_free_terminal_status_impl,
@@ -7499,6 +8970,10 @@ _seal_process_receipt_authority_provenance((
                     execute_streamed_formal_qc_submission_once,
                 ),
                 (
+                    _inspect_streamed_statistics_free_terminal_status_impl,
+                    recover_streamed_formal_qc_attempt,
+                ),
+                (
                     _execute_formal_qc_submission_once_impl,
                     execute_formal_qc_submission_once,
                 ),
@@ -7519,6 +8994,10 @@ _seal_process_receipt_authority_provenance((
                 (
                     _inspect_streamed_statistics_free_terminal_status_impl,
                     inspect_streamed_statistics_free_terminal_status,
+                ),
+                (
+                    _inspect_streamed_statistics_free_terminal_status_impl,
+                    recover_streamed_formal_qc_attempt,
                 ),
                 (
                     _inspect_statistics_free_terminal_status_impl,
@@ -7562,6 +9041,8 @@ del _inspect_streamed_statistics_free_terminal_status_impl
 del _make_process_receipt_authority_vault
 del _mint_completed_summary_read_receipt_impl
 del _mint_summary_result_receipt_authority_impl
+del _record_authenticated_formal_backtest_completion
+del _record_authenticated_formal_backtest_terminal_failure
 del _mint_transport_capability
 del _process_authority_current_launch
 del _process_authority_current_summary
@@ -7610,6 +9091,16 @@ def formal_qc_submission_adapter_record() -> dict[str, object]:
         "legacy_materialized_external_action_paths_retired": True,
         "streamed_statistics_free_terminal_path_present": True,
         "streamed_authenticated_power_floor_required": True,
+        "bounded_owner_review_waiver_authority_present": True,
+        "owner_waiver_execution_authority_requires_owner_signature": True,
+        "owner_waiver_pre_create_failure_can_close_without_outcome_look": True,
+        "backtests_create_or_ambiguous_external_state_consumes_attempt": True,
+        "fresh_retry_requires_authenticated_runtime_error": True,
+        "cross_process_consumed_attempt_recovery_present": True,
+        "compiled_project_identity_persisted_before_backtests_create": True,
+        "launch_and_terminal_receipts_durably_reauthenticated": True,
+        "pending_or_ambiguous_attempt_authorizes_parallel_retry": False,
+        "automatic_retry_loop_present": False,
         "streamed_selected_summary_only_result_path_present": True,
         "separate_result_read_gate_present": True,
         "external_private_result_read_pin_required": True,
@@ -7625,17 +9116,19 @@ def formal_qc_submission_adapter_record() -> dict[str, object]:
 __all__ = (
     "AUTHORITY", "BACKTEST_PENDING_STATUSES", "BACKTEST_TERMINAL_STATUSES",
     "COMPILE_POLL_INTERVAL_SECONDS", "EXECUTION_ACTIONS",
-    "FormalQcExecutionAuthority", "FormalQcHostClosureBinding",
+    "FormalQcCompiledAttemptControl", "FormalQcExecutionAuthority", "FormalQcHostClosureBinding",
     "FormalQcHostSourceBinding", "FormalQcLaunchReceipt",
     "FormalQcResultGateCandidate", "FormalQcResultReadAuthority",
     "FormalQcResultReadExternalPin", "FormalQcResultReadPermit",
-    "FormalQcSubmissionError", "FormalQcSubmissionLocked",
+    "FormalQcPreSubmissionFailed", "FormalQcSubmissionError",
+    "FormalQcSubmissionLocked",
     "FormalQcSubmissionPlan", "FormalQcSummaryResultReadReceipt",
     "FormalQcTerminalStatusReceipt", "FormalQcTransportBinding",
     "FormalQcUploadBundle", "FormalQcUploadEntry", "MAX_COMPILE_POLLS",
     "StreamedFormalQcExecutionAuthority", "StreamedFormalQcSubmissionPlan",
     "StreamedFormalSubmissionAdapterBridge",
-    "MAX_STATUS_POLLS", "REQUIRED_HOST_CODE_PATHS",
+    "MAX_STATUS_POLLS", "OWNER_WAIVED_STREAMED_EXECUTION_AUTHORITY_SCHEMA",
+    "REQUIRED_HOST_CODE_PATHS",
     "RESULT_READ_EXTERNAL_PIN_FILENAME", "RESULT_READ_LEDGER_FILENAME", "SCHEMA",
     "STATUS", "STATUS_POLL_INTERVAL_SECONDS", "TRANSPORT_REQUEST_SURFACE",
     "build_formal_qc_host_closure_binding", "build_formal_qc_result_gate_candidate",
@@ -7648,12 +9141,14 @@ __all__ = (
     "execute_streamed_formal_qc_submission_once",
     "formal_qc_submission_adapter_record", "inspect_statistics_free_terminal_status",
     "inspect_streamed_statistics_free_terminal_status",
+    "recover_streamed_formal_qc_attempt",
     "load_formal_qc_execution_authority", "load_formal_qc_result_read_authority",
     "load_streamed_formal_qc_execution_authority",
     "load_formal_qc_result_read_external_pin",
     "parse_statistics_free_backtest_list", "read_formal_qc_summary_result_once",
     "read_streamed_formal_qc_summary_result_once",
     "render_formal_qc_execution_authority_candidate",
+    "render_owner_waived_streamed_formal_qc_execution_authority_candidate",
     "render_streamed_formal_qc_execution_authority_candidate",
     "render_formal_qc_result_read_external_pin_candidate",
     "render_formal_qc_result_read_authority_candidate",

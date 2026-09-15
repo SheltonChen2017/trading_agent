@@ -22,16 +22,31 @@ from research.analyst_revisions_v2.production_input_pipeline import SignalArm
 from research.analyst_revisions_v2.production_scoring import (
     FinalDecisionInput,
     FoldPartition,
+    ProductionScoringFold,
     ScoreState,
     formal_horizon_fold_boundary,
 )
 from research.analyst_revisions_v2_qc import formal_input_bundle
+from research.analyst_revisions_v2_qc import formal_terminal_disposition_builder as terminal_builder
 from research.analyst_revisions_v2_qc import formal_submission_adapter as formal_submit
 from research.analyst_revisions_v2_qc import power_calibration_bridge as bridge
 from research.analyst_revisions_v2_qc import power_calibration_runtime as runtime
+from research.analyst_revisions_v2_qc import physical_streaming_scoring as physical
+from research.analyst_revisions_v2_qc import (
+    physical_production_evidence_acquisition as physical_acquisition,
+)
+from research.analyst_revisions_v2_qc import (
+    physical_production_evidence_bridge as physical_evidence_bridge,
+)
+from research.analyst_revisions_v2_qc import (
+    preopen_control_prereview_downloader as prereview,
+)
 from research.analyst_revisions_v2_qc import power_calibration_submission_adapter as submit
 from research.analyst_revisions_v2_qc import power_calibration_worker as worker
 from research.analyst_revisions_v2_qc.formal_run_protocol import PowerFloorBinding
+from research.analyst_revisions_v2_qc.formal_streaming_input import (
+    StreamedControlModel,
+)
 
 
 def _closure_cell(value: object):
@@ -1557,12 +1572,21 @@ def _install_power_submission_transport(
         if endpoint in {"files/create", "files/update"}:
             return {"success": True}
         if endpoint == "compile/create":
-            return {"success": True, "compileId": "compile-test"}
+            return {
+                "success": True,
+                "compileId": "compile-test",
+                "state": "InQueue",
+                "parameters": [],
+                "projectId": 123,
+                "signature": "fixture-signature",
+                "signatureOrder": [],
+            }
         if endpoint == "compile/read":
             return {
                 "success": True,
                 "compileId": "compile-test",
                 "state": "BuildSuccess",
+                "logs": ["discard-only compile fixture"],
             }
         if endpoint == "backtests/create":
             return {
@@ -1818,6 +1842,7 @@ def test_power_artifact_authority_mutators_and_terminal_minter_are_not_exposed()
         "_power_artifact_current_terminal",
         "_claim_power_calibration_terminal_minter",
         "_build_accepted_risk_power_calibration_input_impl",
+        "_build_physical_accepted_risk_power_calibration_input_impl",
         "_load_accepted_risk_power_calibration_output_impl",
         "_compute_accepted_risk_power_calibration_receipt_impl",
     ):
@@ -2053,7 +2078,13 @@ def test_extracted_power_artifact_registrars_cannot_mint_directly() -> None:
             bridge.build_accepted_risk_power_calibration_input,
             "register_input",
             bridge.AcceptedRiskPowerCalibrationInput,
-            (object(), object(), object(), object(), b"candidate", ()),
+            (object(), object(), object(), object(), None, b"candidate", ()),
+        ),
+        (
+            bridge.build_physical_accepted_risk_power_calibration_input,
+            "register_input",
+            bridge.AcceptedRiskPowerCalibrationInput,
+            (object(), object(), object(), object(), object(), b"candidate", ()),
         ),
         (
             bridge.load_accepted_risk_power_calibration_output,
@@ -2094,6 +2125,520 @@ def test_extracted_power_artifact_registrars_cannot_mint_directly() -> None:
             match="registration caller changed",
         ):
             registrar(value, *arguments)
+
+
+def _physical_input_test_parents():
+    axis = bridge.calibration_axis()
+    accepted_risk = object()
+    protocol = types.SimpleNamespace(
+        protocol_id=bridge.POWER_PROTOCOL_ID,
+        protocol_hash=bridge.POWER_PROTOCOL_HASH,
+        calibration_session_axis=axis,
+    )
+    evidence = types.SimpleNamespace()
+    context = types.SimpleNamespace(
+        accepted_risk_binding=accepted_risk,
+        capacity=types.SimpleNamespace(production_evidence_receipt=evidence),
+        preopen_acquisition_receipt=object(),
+        next_fold_index=0,
+        active_fold=False,
+        finalized=False,
+    )
+    return axis, accepted_risk, protocol, evidence, context
+
+
+def test_physical_power_input_refuses_cross_source_before_stream_or_write(
+    monkeypatch, tmp_path
+) -> None:
+    axis, accepted_risk, protocol, _evidence, context = (
+        _physical_input_test_parents()
+    )
+    del axis
+    calls = {"stream": 0, "register": 0}
+    implementation = _direct_closure_value(
+        bridge.build_physical_accepted_risk_power_calibration_input,
+        "build_physical_input_impl",
+    )
+    monkeypatch.setattr(
+        bridge, "require_loaded_power_calibration_protocol", lambda value: value
+    )
+    output = tmp_path / "physical-cross-source"
+    output.mkdir(mode=0o700)
+
+    def run_stream(*_args, **_kwargs):
+        calls["stream"] += 1
+
+    def register(*_args):
+        calls["register"] += 1
+
+    with pytest.raises(
+        bridge.AcceptedRiskPowerCalibrationError,
+        match="physical calibration protocol or context changed",
+    ):
+        implementation(
+            scoring_builder=object(),
+            accepted_risk_binding=accepted_risk,
+            protocol=protocol,
+            terminal_recorder=object(),
+            benchmark_security_id="SPY",
+            output_directory=output,
+            _authority_register=register,
+            _physical_operations=(
+                lambda *_args, **_kwargs: types.SimpleNamespace(
+                    **{
+                        **vars(context),
+                        "accepted_risk_binding": object(),
+                    }
+                ),
+                run_stream,
+                lambda value: value,
+            ),
+        )
+    assert calls == {"stream": 0, "register": 0}
+    assert list(output.iterdir()) == []
+
+
+def test_physical_power_input_refuses_changed_callback_block_without_artifact(
+    monkeypatch, tmp_path
+) -> None:
+    _axis, accepted_risk, protocol, _evidence, context = (
+        _physical_input_test_parents()
+    )
+    implementation = _direct_closure_value(
+        bridge.build_physical_accepted_risk_power_calibration_input,
+        "build_physical_input_impl",
+    )
+    monkeypatch.setattr(
+        bridge, "require_loaded_power_calibration_protocol", lambda value: value
+    )
+    monkeypatch.setattr(
+        bridge,
+        "_require_calibration_terminal_recorder_lineage",
+        lambda recorder, **_kwargs: recorder,
+    )
+    output = tmp_path / "physical-changed-callback-block"
+    output.mkdir(mode=0o700)
+    registered: list[object] = []
+
+    def run_stream(_builder, **kwargs):
+        kwargs["consumer"](types.SimpleNamespace(
+            decision_session="not-an-axis-session",
+            session_position=0,
+            accepted=(),
+            refused=(),
+        ))
+
+    with pytest.raises(
+        bridge.AcceptedRiskPowerCalibrationError,
+        match="physical calibration callback block changed",
+    ):
+        implementation(
+            scoring_builder=object(),
+            accepted_risk_binding=accepted_risk,
+            protocol=protocol,
+            terminal_recorder=object(),
+            benchmark_security_id="SPY",
+            output_directory=output,
+            _authority_register=lambda *args: registered.append(args[0]),
+            _physical_operations=(
+                lambda *_args, **_kwargs: context,
+                run_stream,
+                lambda value: value,
+            ),
+        )
+    assert registered == []
+    assert list(output.iterdir()) == []
+
+
+def test_physical_power_operation_resolver_refuses_absence_and_rebinding() -> None:
+    resolver = _direct_closure_value(
+        bridge.build_physical_accepted_risk_power_calibration_input,
+        "resolve_physical",
+    )
+    missing_registry = {}
+    missing = _with_closure_value(
+        _with_closure_value(resolver, "module_registry", missing_registry),
+        "system_module",
+        types.SimpleNamespace(modules=missing_registry),
+    )
+    with pytest.raises(
+        bridge.AcceptedRiskPowerCalibrationError,
+        match="physical calibration scorer is unavailable",
+    ):
+        missing()
+
+    module_name = (
+        "research.analyst_revisions_v2_qc.physical_streaming_scoring"
+    )
+    module = types.SimpleNamespace()
+
+    def operation():
+        return None
+
+    names = (
+        "physical_streaming_scoring_composition_context",
+        "run_physical_power_calibration_stream",
+        "require_physical_power_calibration_stream",
+    )
+    for name in names:
+        value = types.FunctionType(operation.__code__, {})
+        value.__module__ = module_name
+        value.__name__ = name
+        setattr(module, name, value)
+    registry = {module_name: module}
+    sealed = _with_closure_value(resolver, "physical_authority", None)
+    sealed = _with_closure_value(sealed, "module_registry", registry)
+    sealed = _with_closure_value(
+        sealed, "system_module", types.SimpleNamespace(modules=registry)
+    )
+    assert len(sealed()) == 3
+    replacement = types.FunctionType(operation.__code__, {})
+    replacement.__module__ = module_name
+    replacement.__name__ = names[1]
+    setattr(module, names[1], replacement)
+    with pytest.raises(
+        bridge.AcceptedRiskPowerCalibrationError,
+        match="sealed physical calibration operations changed",
+    ):
+        sealed()
+
+
+def _section72_terminal_lineage_fixture(monkeypatch):
+    archive = object()
+    historical = types.SimpleNamespace(
+        bridge_id="arv2-historical-test", bridge_sha256="1" * 64
+    )
+    physical_bridge = types.SimpleNamespace(
+        preopen_acquisition_receipt=archive,
+        terminal_archive=archive,
+        historical_bridge=historical,
+    )
+    evidence = object.__new__(
+        physical_acquisition.PhysicalProductionEvidenceAcquisitionReceipt
+    )
+    for name, value in {
+        "review_mode": physical_acquisition.SECTION72_OWNER_WAIVED_REVIEW_MODE,
+        "bridge": physical_bridge,
+        "preopen_acquisition_receipt": archive,
+    }.items():
+        object.__setattr__(evidence, name, value)
+    recorder = types.SimpleNamespace(
+        historical_bridge=historical,
+        historical_bridge_id=historical.bridge_id,
+        historical_bridge_sha256=historical.bridge_sha256,
+    )
+    monkeypatch.setattr(
+        terminal_builder,
+        "require_fresh_formal_terminal_disposition_recorder",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        physical_acquisition,
+        "require_section72_owner_waived_production_evidence_receipt",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        physical_evidence_bridge,
+        "require_physical_production_evidence_bridge",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        prereview,
+        "require_preopen_control_prereview_archive",
+        lambda value: value,
+    )
+    return recorder, archive, evidence, physical_bridge, historical
+
+
+def test_section72_calibration_terminal_lineage_accepts_exact_physical_parents(
+    monkeypatch,
+) -> None:
+    recorder, archive, evidence, _bridge, _historical = (
+        _section72_terminal_lineage_fixture(monkeypatch)
+    )
+    assert bridge._require_calibration_terminal_recorder_lineage(
+        recorder, preopen=archive, evidence=evidence
+    ) is recorder
+
+
+def test_section72_calibration_terminal_lineage_refuses_cross_source(
+    monkeypatch,
+) -> None:
+    recorder, archive, evidence, physical_bridge, _historical = (
+        _section72_terminal_lineage_fixture(monkeypatch)
+    )
+    physical_bridge.historical_bridge = types.SimpleNamespace(
+        bridge_id="arv2-other-historical", bridge_sha256="2" * 64
+    )
+    with pytest.raises(
+        bridge.AcceptedRiskPowerCalibrationError,
+        match="section-72 calibration lifecycle and scorer sources differ",
+    ):
+        bridge._require_calibration_terminal_recorder_lineage(
+            recorder, preopen=archive, evidence=evidence
+        )
+
+
+def test_section72_calibration_terminal_lineage_normalizes_parent_failure(
+    monkeypatch,
+) -> None:
+    recorder, archive, evidence, _bridge, _historical = (
+        _section72_terminal_lineage_fixture(monkeypatch)
+    )
+    monkeypatch.setattr(
+        physical_acquisition,
+        "require_section72_owner_waived_production_evidence_receipt",
+        lambda _value: (_ for _ in ()).throw(ValueError("hostile parent")),
+    )
+    with pytest.raises(
+        bridge.AcceptedRiskPowerCalibrationError,
+        match="section-72 calibration lifecycle parents changed",
+    ):
+        bridge._require_calibration_terminal_recorder_lineage(
+            recorder, preopen=archive, evidence=evidence
+        )
+
+
+def test_physical_calibration_input_requirer_delegates_section72_archive_authority(
+    monkeypatch,
+) -> None:
+    implementation = _direct_closure_value(
+        bridge.require_accepted_risk_power_calibration_input,
+        "require_input_impl",
+    )
+    value = object.__new__(bridge.AcceptedRiskPowerCalibrationInput)
+    protocol = object()
+    archive = object()
+    evidence = object()
+    terminal_build = object()
+    physical_stream = types.SimpleNamespace(
+        terminal_archive=archive,
+        capacity=types.SimpleNamespace(production_evidence_receipt=evidence),
+    )
+    registered = (
+        lambda: value,
+        lambda: protocol,
+        lambda: archive,
+        lambda: evidence,
+        lambda: terminal_build,
+        lambda: physical_stream,
+    )
+    calls = []
+    monkeypatch.setattr(
+        bridge, "require_loaded_power_calibration_protocol", lambda item: item
+    )
+    monkeypatch.setattr(
+        terminal_builder,
+        "require_formal_terminal_disposition_build",
+        lambda _item: (_ for _ in ()).throw(ValueError("stop after parents")),
+    )
+
+    def require_stream(item):
+        calls.append(item)
+        return item
+
+    with pytest.raises(
+        bridge.AcceptedRiskPowerCalibrationError,
+        match="calibration input parent changed",
+    ):
+        implementation(
+            value,
+            _authority_current=lambda _value: registered,
+            _resolve_physical=lambda: (None, None, require_stream),
+        )
+    assert calls == [physical_stream]
+
+
+@pytest.mark.parametrize("failure", ("partial", "writer"))
+def test_physical_power_input_partial_and_writer_failures_mint_nothing(
+    monkeypatch, tmp_path, failure
+) -> None:
+    axis, accepted_risk, protocol, _evidence, context = (
+        _physical_input_test_parents()
+    )
+    implementation = _direct_closure_value(
+        bridge.build_physical_accepted_risk_power_calibration_input,
+        "build_physical_input_impl",
+    )
+    monkeypatch.setattr(
+        bridge, "require_loaded_power_calibration_protocol", lambda value: value
+    )
+    monkeypatch.setattr(
+        bridge,
+        "_require_calibration_terminal_recorder_lineage",
+        lambda recorder, **_kwargs: recorder,
+    )
+    if failure == "writer":
+        monkeypatch.setattr(
+            bridge,
+            "_write_private",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                OSError("isolated physical writer failure")
+            ),
+        )
+    output = tmp_path / f"physical-{failure}"
+    output.mkdir(mode=0o700)
+    registered: list[object] = []
+
+    def run_stream(_builder, **kwargs):
+        consumer = kwargs["consumer"]
+        count = 1 if failure == "partial" else bridge.SHARD_SESSION_WIDTH
+        for position, session in enumerate(axis[:count]):
+            consumer(types.SimpleNamespace(
+                decision_session=session,
+                session_position=position,
+                accepted=(),
+                refused=(),
+            ))
+        if failure == "partial":
+            raise ValueError("isolated partial physical stream")
+        raise OSError("writer should already have refused")
+
+    with pytest.raises(
+        bridge.AcceptedRiskPowerCalibrationError,
+        match="physical calibration stream could not be consumed",
+    ):
+        implementation(
+            scoring_builder=object(),
+            accepted_risk_binding=accepted_risk,
+            protocol=protocol,
+            terminal_recorder=object(),
+            benchmark_security_id="SPY",
+            output_directory=output,
+            _authority_register=lambda *args: registered.append(args[0]),
+            _physical_operations=(
+                lambda *_args, **_kwargs: context,
+                run_stream,
+                lambda value: value,
+            ),
+        )
+    assert registered == []
+    assert list(output.iterdir()) == []
+
+
+def test_physical_power_input_serializes_complete_axis_without_object_graph(
+    monkeypatch, tmp_path
+) -> None:
+    axis, accepted_risk, protocol, evidence, context = (
+        _physical_input_test_parents()
+    )
+    evidence.receipt_id = "fixture-evidence"
+    evidence.receipt_sha256 = "1" * 64
+    archive = types.SimpleNamespace(
+        archive_id="fixture-physical-terminal-archive",
+        archive_sha256="2" * 64,
+        capacity=context.capacity,
+    )
+    model = types.SimpleNamespace(
+        to_record=lambda: {
+            "schema": "fixture-model",
+            "model_id": "fixture-model",
+            "model_sha256": "3" * 64,
+        }
+    )
+    stream = types.SimpleNamespace(
+        calibration_session_count=len(axis),
+        accepted_decision_count=0,
+        preoutcome_refusal_count=0,
+        terminal_archive=archive,
+        capacity=archive.capacity,
+        model=model,
+        to_record=lambda: {
+            "schema": "fixture-physical-power-stream",
+            "stream_id": "fixture-stream",
+            "stream_sha256": "4" * 64,
+        },
+    )
+    package = types.SimpleNamespace(
+        package_id="fixture-terminal-package",
+        package_sha256="5" * 64,
+        rows=(),
+    )
+    terminal_build = types.SimpleNamespace(
+        build_id="fixture-terminal-build",
+        build_sha256="6" * 64,
+        terminal_package=package,
+        terminal_requirement_count=0,
+    )
+    implementation = _direct_closure_value(
+        bridge.build_physical_accepted_risk_power_calibration_input,
+        "build_physical_input_impl",
+    )
+    monkeypatch.setattr(
+        bridge, "require_loaded_power_calibration_protocol", lambda value: value
+    )
+    monkeypatch.setattr(
+        bridge,
+        "_require_calibration_terminal_recorder_lineage",
+        lambda recorder, **_kwargs: recorder,
+    )
+    monkeypatch.setattr(
+        bridge, "require_accepted_risk_power_calibration_input", lambda value: value
+    )
+    monkeypatch.setattr(
+        terminal_builder,
+        "finalize_formal_terminal_disposition_recording",
+        lambda **_kwargs: terminal_build,
+    )
+    monkeypatch.setattr(
+        terminal_builder,
+        "require_formal_terminal_disposition_build",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        terminal_builder,
+        "formal_terminal_disposition_build_record",
+        lambda value: {
+            "build_id": value.build_id,
+            "build_sha256": value.build_sha256,
+        },
+    )
+    output = tmp_path / "physical-complete-axis"
+    output.mkdir(mode=0o700)
+    registrations = []
+    peak_live_blocks = 0
+    live_blocks = weakref.WeakSet()
+
+    def run_stream(_builder, **kwargs):
+        nonlocal peak_live_blocks
+        consumer = kwargs["consumer"]
+        for position, session in enumerate(axis):
+            block = physical.PhysicalPowerCalibrationSessionBlock(
+                decision_session=session,
+                session_position=position,
+                accepted=(),
+                refused=(),
+                block_sha256="7" * 64,
+            )
+            live_blocks.add(block)
+            consumer(block)
+            peak_live_blocks = max(peak_live_blocks, len(live_blocks))
+        return stream
+
+    value = implementation(
+        scoring_builder=object(),
+        accepted_risk_binding=accepted_risk,
+        protocol=protocol,
+        terminal_recorder=object(),
+        benchmark_security_id="SPY",
+        output_directory=output,
+        _authority_register=lambda *args: registrations.append(args),
+        _physical_operations=(
+            lambda *_args, **_kwargs: context,
+            run_stream,
+            lambda value: value,
+        ),
+    )
+    rows = tuple(bridge.iter_accepted_risk_power_calibration_input_rows(value))
+    manifest = json.loads(value.manifest_bytes)
+    assert len(rows) == len(axis)
+    assert tuple(row["decision_session"] for row in rows) == axis
+    assert len(value.shard_paths) == 49
+    assert not any(path.name.startswith("preliminary-") for path in output.iterdir())
+    assert manifest["physical_scoring_stream"] == stream.to_record()
+    assert value.physical_scoring_stream is stream
+    assert peak_live_blocks == 1
+    assert len(registrations) == 1
 
 
 def test_extracted_power_terminal_minter_and_registrar_cannot_mint_directly() -> None:

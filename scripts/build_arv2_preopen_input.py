@@ -150,6 +150,7 @@ _ALLOWED_COMMON_STOCK_CATEGORIES = frozenset(
         "domestic common stock secondary class",
     }
 )
+_SHARADAR_FUNDAMENTALS_TABLE_ALIAS = "SF1"
 _SHARADAR_EXCHANGE_TO_MIC = {
     "AMEX": "XASE",
     "NASDAQ": "XNAS",
@@ -631,9 +632,9 @@ def _ticker_candidates(
         try:
             table = _text(row.get("table"), "Sharadar table")
             assert table is not None
-            if table.casefold() != "fundamentals":
+            if table != _SHARADAR_FUNDAMENTALS_TABLE_ALIAS:
                 raise PhysicalPreopenInputError(
-                    "ticker row is outside the Sharadar fundamentals table"
+                    "ticker row is outside the documented Sharadar SF1 fundamentals table"
                 )
             ticker = _text(row.get("ticker"), "Sharadar ticker")
             assert ticker is not None

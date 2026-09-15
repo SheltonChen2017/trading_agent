@@ -1345,9 +1345,13 @@ def _execute_power_calibration_submission_once_impl(
                     plan.organization_id, entry.object_store_key,
                 ), entry,
             )
-        existing = formal._read_files(_call(
-            client, capability, "_request_json", "files/read", {"projectId": project_id}
-        ))
+        existing = formal._read_files(
+            _call(
+                client, capability, "_request_json", "files/read",
+                {"projectId": project_id},
+            ),
+            expected_project_id=project_id,
+        )
         if not set(existing).issubset({"main.py"}):
             raise PowerCalibrationSubmissionError(
                 "new calibration project contains an unexpected source"
@@ -1361,9 +1365,13 @@ def _execute_power_calibration_submission_once_impl(
                 "projectId": project_id, "name": source.project_path,
                 "content": source.content.decode("utf-8"),
             }), frozenset({"success", "errors", "messages"}), endpoint)
-        files = formal._read_files(_call(
-            client, capability, "_request_json", "files/read", {"projectId": project_id}
-        ))
+        files = formal._read_files(
+            _call(
+                client, capability, "_request_json", "files/read",
+                {"projectId": project_id},
+            ),
+            expected_project_id=project_id,
+        )
         expected_sources = {
             item.project_path: item for item in plan.source_files
         }
@@ -1386,7 +1394,7 @@ def _execute_power_calibration_submission_once_impl(
                 )
         compile_id = formal._compile_id(_call(
             client, capability, "_request_json", "compile/create", {"projectId": project_id}
-        ))
+        ), expected_project_id=project_id)
         compile_state = ""
         for index in range(plan.compile_poll_limit):
             compile_state = formal._compile_state(_call(

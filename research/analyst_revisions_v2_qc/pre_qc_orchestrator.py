@@ -41,6 +41,9 @@ from .formal_run_protocol import (
     FormalLookClaim,
     FormalSubmissionPermit,
     claim_formal_run_once,
+    formal_owner_review_waiver_record,
+    formal_review_authorization_record,
+    record_definite_pre_submission_failure,
 )
 from .formal_streaming_bridge import (
     FormalStreamingBridgeError,
@@ -49,7 +52,9 @@ from .formal_streaming_bridge import (
 )
 from .formal_submission_adapter import (
     FormalQcLaunchReceipt,
+    FormalQcPreSubmissionFailed,
     FormalQcSubmissionError,
+    FormalQcSubmissionLocked,
     StreamedFormalSubmissionAdapterBridge,
     execute_streamed_formal_qc_submission_once,
     require_streamed_formal_submission_adapter_bridge,
@@ -636,6 +641,12 @@ def _submission_identities_match(
     runtime_bridge: StreamedFormalRuntimeBridge,
     authenticated_power_floor: AuthenticatedPowerFloorBinding | None,
 ) -> bool:
+    try:
+        review_authorization = formal_review_authorization_record(
+            submitted.reviewed_authority
+        )
+    except (AttributeError, TypeError, ValueError):
+        return False
     return (
         authenticated_power_floor is not None
         and submitted.runtime_bridge is runtime_bridge
@@ -659,6 +670,24 @@ def _submission_identities_match(
         and submitted.execution_authority.runtime_bridge_id == runtime_bridge.bridge_id
         and submitted.execution_authority.runtime_bridge_sha256
         == runtime_bridge.bridge_sha256
+        and submitted.execution_authority.review_disposition
+        == review_authorization["review_disposition"]
+        and submitted.execution_authority.independent_review_complete
+        is review_authorization["independent_review_complete"]
+        and submitted.execution_authority.authorization_basis
+        == review_authorization["authorization_basis"]
+        and submitted.execution_authority.owner_review_waiver_id
+        == review_authorization["owner_review_waiver_id"]
+        and submitted.execution_authority.owner_review_waiver_scope
+        == review_authorization["owner_review_waiver_scope"]
+        and submitted.execution_authority.waiver_ends_after_first_technically_completed_formal_backtest
+        is review_authorization[
+            "waiver_ends_after_first_technically_completed_formal_backtest"
+        ]
+        and submitted.execution_authority.post_first_formal_backtest_independent_review_required
+        is review_authorization[
+            "post_first_formal_backtest_independent_review_required"
+        ]
     )
 
 
@@ -671,10 +700,16 @@ def _record_submission_bridge(
     host = execution.host_code_closure
     transport = execution.transport
     plan = submitted.plan
+    review_authorization = formal_review_authorization_record(authority)
+    owner_waived = review_authorization == formal_owner_review_waiver_record()
     results["formal_candidate_review_and_counterreview_pin"] = _result(
         "formal_candidate_review_and_counterreview_pin",
         GateStatus.SATISFIED,
-        "independent_review_and_counterreview_pin_authenticated",
+        (
+            "owner_review_waiver_pin_authenticated_review_pending_after_first_backtest"
+            if owner_waived
+            else "independent_review_and_counterreview_pin_authenticated"
+        ),
         artifact_id=authority.authority_id,
         artifact_sha256=authority.authority_sha256,
     )
@@ -1139,6 +1174,11 @@ def _bind_pre_qc_formal_submission_boundary(
     owner_registry_status,
     host_closure_verifier,
     claim_once,
+    failure_recorder,
+    review_authorization_builder,
+    owner_waiver_record_builder,
+    pre_submission_failed_type,
+    submission_locked_type,
     submit_once,
     evidence_type,
     transport_type,
@@ -1309,8 +1349,27 @@ def _bind_pre_qc_formal_submission_boundary(
         finally:
             del caller
 
-    def invoke_claim(*, candidate, authority, claimed_at_utc):
+    def invoke_claim(
+        *,
+        candidate,
+        authority,
+        claimed_at_utc,
+        attempt_ordinal=1,
+        retry_lineage_sha256=None,
+        submission_plan_id=None,
+        submission_plan_sha256=None,
+    ):
         exact_public_action_caller()
+        if review_authorization_builder(authority) == owner_waiver_record_builder():
+            return claim_once(
+                candidate=candidate,
+                authority=authority,
+                claimed_at_utc=claimed_at_utc,
+                attempt_ordinal=attempt_ordinal,
+                retry_lineage_sha256=retry_lineage_sha256,
+                submission_plan_id=submission_plan_id,
+                submission_plan_sha256=submission_plan_sha256,
+            )
         return claim_once(
             candidate=candidate,
             authority=authority,
@@ -1334,6 +1393,7 @@ def _bind_pre_qc_formal_submission_boundary(
         client: FormalQcTransport,
         claimed_at_utc: str,
         submission_started_at_utc: str,
+        attempt_ordinal: int = 1,
     ) -> tuple[FormalLookClaim, FormalSubmissionPermit, FormalQcLaunchReceipt]:
         """Claim once and invoke the streamed adapter once after every live gate."""
 
@@ -1366,23 +1426,66 @@ def _bind_pre_qc_formal_submission_boundary(
             candidate=submitted.formal_run_candidate,
             authority=submitted.reviewed_authority,
             claimed_at_utc=claimed_at_utc,
+            attempt_ordinal=attempt_ordinal,
+            retry_lineage_sha256=(
+                submitted.execution_authority.retry_lineage_sha256
+            ),
+            submission_plan_id=submitted.plan.plan_id,
+            submission_plan_sha256=submitted.plan.plan_sha256,
         )
 
-        # A failed post-claim check intentionally consumes the look but cannot
-        # reach QC.  This is the safe disposition for any mutation concurrent
-        # with the exclusive filesystem claim.
-        require_same_process()
-        submitted_after_claim, _ = require_current_roots(evidence, snapshot)
-        if submitted_after_claim is not submitted:
-            raise orchestration_error_type(
-                "submission bridge changed after formal claim"
+        try:
+            require_same_process()
+            submitted_after_claim, _ = require_current_roots(evidence, snapshot)
+            if submitted_after_claim is not submitted:
+                raise orchestration_error_type(
+                    "submission bridge changed after formal claim"
+                )
+        except Exception as exc:
+            if (
+                review_authorization_builder(submitted.reviewed_authority)
+                == owner_waiver_record_builder()
+            ):
+                failure_recorder(
+                    candidate=submitted.formal_run_candidate,
+                    authority=submitted.reviewed_authority,
+                    claim=claim,
+                    phase="pre_qc_post_claim_reauthentication",
+                    failure_class=type(exc).__name__,
+                    recorded_at_utc=submission_started_at_utc,
+                )
+            raise
+        try:
+            permit, launch = invoke_submission(
+                submission_bridge=submitted,
+                claim=claim,
+                client=client,
+                submission_started_at_utc=submission_started_at_utc,
             )
-        permit, launch = invoke_submission(
-            submission_bridge=submitted,
-            claim=claim,
-            client=client,
-            submission_started_at_utc=submission_started_at_utc,
-        )
+        except Exception as exc:
+            if isinstance(
+                exc,
+                (pre_submission_failed_type, submission_locked_type),
+            ):
+                raise
+            if (
+                review_authorization_builder(submitted.reviewed_authority)
+                == owner_waiver_record_builder()
+            ):
+                failure = failure_recorder(
+                    candidate=submitted.formal_run_candidate,
+                    authority=submitted.reviewed_authority,
+                    claim=claim,
+                    phase="pre_qc_adapter_before_attempt_consumption",
+                    failure_class=type(exc).__name__,
+                    recorded_at_utc=submission_started_at_utc,
+                )
+                raise pre_submission_failed_type(
+                    "pre_qc_adapter_before_attempt_consumption",
+                    claim.claim_id,
+                    failure.failure_id,
+                ) from exc
+            raise
         return claim, permit, launch
 
     public_execute = execute_pre_qc_formal_submission_once
@@ -1414,6 +1517,11 @@ execute_pre_qc_formal_submission_once = _bind_pre_qc_formal_submission_boundary(
     owner_registry_status=reviewed_owner_signature_registry_status,
     host_closure_verifier=verify_formal_qc_host_closure_live,
     claim_once=claim_formal_run_once,
+    failure_recorder=record_definite_pre_submission_failure,
+    review_authorization_builder=formal_review_authorization_record,
+    owner_waiver_record_builder=formal_owner_review_waiver_record,
+    pre_submission_failed_type=FormalQcPreSubmissionFailed,
+    submission_locked_type=FormalQcSubmissionLocked,
     submit_once=execute_streamed_formal_qc_submission_once,
     evidence_type=PreQcExecutionEvidence,
     transport_type=FormalQcTransport,
@@ -1449,6 +1557,10 @@ def pre_qc_orchestrator_record() -> Mapping[str, object]:
             "exact_public_action_caller_provenance": True,
             "typed_root_reauthentication_immediately_before_claim": True,
             "typed_root_reauthentication_after_claim_before_qc": True,
+            "truthful_owner_review_waiver_variant_supported": True,
+            "owner_waiver_post_claim_local_failure_recorded_no_outcome": True,
+            "retry_attempt_ordinal_is_explicit": True,
+            "automatic_retry_loop_present": False,
             "legacy_materializing_upload_bundle_dependency": False,
             "legacy_stream_iterator_tuple_materialization_permitted": False,
             "historical_universe_bridge_interface_available": True,

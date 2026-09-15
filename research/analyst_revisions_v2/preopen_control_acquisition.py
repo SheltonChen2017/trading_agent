@@ -661,7 +661,7 @@ def _validate_output_shards(value: object) -> list[dict[str, Any]]:
         expected_key = (
             "arv2/preopen/output/content/control_terminals/"
             f"chunk-{chunk:04d}/security-batch-{batch:04d}/"
-            f"{compressed_hash}.jsonl.gz"
+            f"{compressed_hash}-jsonl.gz"
         )
         if key != expected_key:
             raise PreopenControlAcquisitionError("output shard key is not content-derived")

@@ -1487,9 +1487,22 @@ class _PreopenQcBackend:
             self.files[payload["name"]] = payload["content"]
             return {"success": True}
         if path == "compile/create":
-            return {"success": True, "compileId": "preopen-compile"}
+            return {
+                "success": True,
+                "compileId": "preopen-compile",
+                "state": "InQueue",
+                "parameters": [],
+                "projectId": 321,
+                "signature": "fixture-signature",
+                "signatureOrder": [],
+            }
         if path == "compile/read":
-            return {"success": True, "compileId": "preopen-compile", "state": "BuildSuccess"}
+            return {
+                "success": True,
+                "compileId": "preopen-compile",
+                "state": "BuildSuccess",
+                "logs": ["discard-only compile fixture"],
+            }
         if path == "backtests/create":
             return {"success": True, "backtest": {
                 "backtestId": "preopen-backtest", "name": payload["backtestName"],

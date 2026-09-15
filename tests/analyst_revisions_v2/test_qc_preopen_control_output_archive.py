@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import io
 import json
 import os
 import stat
 import types
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -106,25 +108,46 @@ def _executed_output_context(monkeypatch, tmp_path, *, corrupt_shard=False):
         ),
     }
     object_reads = []
-    original_request = backend.request
+    original_http = client._http
+    pending_download_keys = []
+    signed_download_url = (
+        "https://object-download.quantconnect.com/"
+        "arv2-preopen-output.zip?signature=fixture"
+    )
 
-    def request(path, payload):
-        if path != "object/read":
-            return original_request(path, payload)
-        events.append(path)
-        assert (run_directory / submission.PERMIT_FILENAME).exists()
-        key = payload["key"]
-        object_reads.append(key)
-        value = objects[key]
-        return {
-            "success": True,
-            "object": {
-                "key": key,
-                "objectData": base64.b64encode(value).decode("ascii"),
-            },
+    def http(url, body, headers, timeout):
+        if not url.endswith("/object/get") and url != signed_download_url:
+            return original_http(url, body, headers, timeout)
+        if url == signed_download_url:
+            assert body == b""
+            assert headers == {}
+            key = pending_download_keys.pop(0)
+            output = io.BytesIO()
+            with zipfile.ZipFile(
+                output, "w", compression=zipfile.ZIP_DEFLATED
+            ) as archive:
+                archive.writestr(key, objects[key])
+            return 200, output.getvalue()
+        payload = json.loads(body)
+        assert payload == {
+            "organizationId": plan.organization_id,
+            "keys": [payload["keys"][0]],
         }
+        events.append("object/read")
+        assert (run_directory / submission.PERMIT_FILENAME).exists()
+        key = payload["keys"][0]
+        object_reads.append(key)
+        assert key in objects
+        pending_download_keys.append(key)
+        value = {
+            "jobId": "2585354eb2e23cbbc4ba714332884650",
+            "url": signed_download_url,
+            "success": True,
+            "errors": [],
+        }
+        return 200, json.dumps(value, separators=(",", ":")).encode("ascii")
 
-    backend.request = request
+    client._http = http
     permit, launch = submission.execute_preopen_qc_submission_once(
         plan=plan,
         client=client,

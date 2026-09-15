@@ -460,7 +460,7 @@ def test_bridge_reconstructs_the_multipart_root_metadata_contract(monkeypatch):
         suffix = (
             module.REPORT_FAMILY_OBJECT_KEY_SUFFIX_PREFIX
             + input_manifest_sha256
-            + f"/{ordinal:02d}-{compressed_sha256}.json.gz"
+            + f"/{ordinal:02d}-{compressed_sha256}-json.gz"
         )
         record = {
             "ordinal": ordinal,

@@ -155,9 +155,7 @@ class _DiskResourceGeometry:
 
     def __init__(self, maximum_spool_bytes: int) -> None:
         self.maximum_spool_bytes = maximum_spool_bytes
-        self.directory = Path(
-            tempfile.mkdtemp(prefix="arv2-runtime-resource-", dir="/private/tmp")
-        )
+        self.directory = Path(tempfile.mkdtemp(prefix="arv2-runtime-resource-"))
         os.chmod(self.directory, 0o700)
         self.path = self.directory / "resource.sqlite3"
         descriptor = os.open(

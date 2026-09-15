@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+import types
 from pathlib import Path
 
 import pytest
@@ -40,6 +41,10 @@ from research.analyst_revisions_v2_qc.formal_run_protocol import (
     require_formal_run_candidate,
     require_formal_submission_permit,
 )
+
+
+OWNER_PLAN_ID = "arv2-streamed-formal-plan-test"
+OWNER_PLAN_SHA256 = "a" * 64
 
 
 def _artifact(name: str, marker: str) -> ArtifactBinding:
@@ -142,6 +147,29 @@ def _activate(tmp_path: Path, candidate):
         **parameters,
     )
     pin_path = (tmp_path / "external-review-pin.json").absolute()
+    pin_path.write_bytes(pin_bytes)
+    pin_path.chmod(0o600)
+    pin = load_external_review_pin(candidate, pin_path)
+    authority = load_reviewed_formal_run_authority(candidate, receipt, pin)
+    return authority, directory, receipt, pin, pin_path
+
+
+def _activate_owner_review_waiver(tmp_path: Path, candidate):
+    directory = (tmp_path / "waiver-claim").absolute()
+    directory.mkdir(mode=0o700)
+    owner_authority_id = "arv2-owner-waived-formal-execution-authority-test"
+    receipt = protocol.render_formal_owner_review_waiver_receipt_candidate(
+        candidate,
+        owner_outcome_authority_receipt_id=owner_authority_id,
+        claim_directory=str(directory),
+    )
+    pin_bytes = protocol.render_owner_review_waiver_external_pin_candidate(
+        candidate=candidate,
+        review_receipt_bytes=receipt,
+        owner_outcome_authority_receipt_id=owner_authority_id,
+        claim_directory=str(directory),
+    )
+    pin_path = (tmp_path / "owner-review-waiver-pin.json").absolute()
     pin_path.write_bytes(pin_bytes)
     pin_path.chmod(0o600)
     pin = load_external_review_pin(candidate, pin_path)
@@ -476,6 +504,1037 @@ def test_review_and_counterreview_must_be_distinct(tmp_path: Path):
         render_formal_review_receipt_candidate(candidate, **parameters)
 
 
+def test_owner_review_waiver_is_truthful_and_false_review_claim_refuses(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, directory, receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    raw = json.loads(receipt)
+    assert raw["independent_review_complete"] is False
+    assert raw["review_disposition"] == "NOT_PERFORMED_OWNER_WAIVED"
+    assert raw["owner_review_waiver_scope"] == (
+        "SECTION_72_THROUGH_FIRST_FORMAL_BACKTEST"
+    )
+    assert raw[
+        "waiver_ends_after_first_technically_completed_formal_backtest"
+    ] is True
+    assert raw["post_first_formal_backtest_independent_review_required"] is True
+    assert raw["result_read_requires_separate_terminal_gate"] is True
+    assert raw["deployment_orders_trading_authorized"] is False
+    assert "claude_review_commit" not in raw
+    assert "codex_counterreview_commit" not in raw
+    assert authority.claude_review_commit is None
+    assert authority.codex_counterreview_commit is None
+
+    falsely_reviewed = dataclasses.replace(
+        authority,
+        independent_review_complete=True,
+    )
+    with pytest.raises(FormalRunProtocolError, match="review authorization changed"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=falsely_reviewed,
+            claimed_at_utc="2026-09-14T00:00:00.000000Z",
+            attempt_ordinal=1,
+            retry_lineage_sha256="e" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+    assert list(directory.iterdir()) == []
+
+
+def test_owner_review_waiver_tamper_refuses_before_attempt_is_spent(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    raw = json.loads(pin_path.read_bytes())
+    raw["owner_review_waiver_scope"] = "UNBOUNDED"
+    raw["pin_id"] = None
+    raw["pin_sha256"] = None
+    digest = hashlib.sha256(protocol._canonical_bytes(raw)).hexdigest()
+    raw["pin_sha256"] = digest
+    raw["pin_id"] = f"arv2-formal-owner-waiver-pin-{digest[:24]}"
+    pin_path.write_bytes(protocol._canonical_bytes(raw))
+    pin_path.chmod(0o600)
+
+    with pytest.raises(FormalRunProtocolError, match="external review pin content changed"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:00.000000Z",
+            attempt_ordinal=1,
+            retry_lineage_sha256="e" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+    assert list(directory.iterdir()) == []
+
+
+def test_definite_pre_submission_failure_spends_no_outcome_and_allows_fresh_retry(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    lineage = "e" * 64
+    first = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    failure = protocol.record_definite_pre_submission_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=first,
+        phase="pre_qc_reauthentication",
+        failure_class="FormalQcSubmissionError",
+        recorded_at_utc="2026-09-14T00:00:01.000000Z",
+    )
+    protocol.require_definite_pre_submission_failure(
+        candidate, authority, first, failure
+    )
+    failure_raw = json.loads(failure.failure_path.read_bytes())
+    assert failure_raw["backtests_create_attempted"] is False
+    assert failure_raw["outcome_look_consumed"] is False
+    assert failure_raw["retry_with_fresh_attempt_authorized"] is True
+
+    second = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:02.000000Z",
+        attempt_ordinal=2,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    second_raw = json.loads(second.claim_path.read_bytes())
+    assert second_raw["prior_attempt_count"] == 1
+    assert second_raw["prior_no_outcome_failure_count"] == 1
+    assert second_raw["prior_consumed_attempt_count"] == 0
+    assert second_raw["outcome_look_consumed"] is False
+    assert {path.name for path in directory.iterdir()} == {
+        "arv2-formal-attempt-000001-claim.json",
+        "arv2-formal-attempt-000001-definite-pre-submission-failure.json",
+        "arv2-formal-attempt-000001.lock",
+        "arv2-formal-attempt-000002-claim.json",
+        "arv2-formal-attempt-000002.lock",
+    }
+
+
+def test_interruption_immediately_after_claim_publish_resumes_exact_open_claim(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    original_write = protocol._exclusive_private_write
+    published: dict[str, bytes] = {}
+
+    def interrupt_after_claim_publish(
+        actual_directory: Path,
+        filename: str,
+        payload: bytes,
+    ) -> Path:
+        target = original_write(actual_directory, filename, payload)
+        if filename == "arv2-formal-attempt-000001-claim.json":
+            published["claim"] = target.read_bytes()
+            raise RuntimeError("simulated interruption after claim publication")
+        return target
+
+    monkeypatch.setattr(
+        protocol,
+        "_exclusive_private_write",
+        interrupt_after_claim_publish,
+    )
+    with pytest.raises(RuntimeError, match="after claim publication"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:00.000000Z",
+            attempt_ordinal=1,
+            retry_lineage_sha256="e" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+    monkeypatch.setattr(protocol, "_exclusive_private_write", original_write)
+
+    resumed = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:09.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256="e" * 64,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    assert resumed.resumed_after_interruption is True
+    assert resumed.claimed_at_utc == "2026-09-14T00:00:00.000000Z"
+    assert resumed._claim_bytes == published["claim"]
+    assert resumed.claim_path.read_bytes() == published["claim"]
+    protocol.record_definite_pre_submission_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=resumed,
+        phase="post_claim_process_interruption",
+        failure_class="RuntimeError",
+        recorded_at_utc="2026-09-14T00:00:10.000000Z",
+    )
+    assert not any(".pending-" in path.name for path in directory.iterdir())
+
+
+def test_live_open_claim_cannot_be_concurrently_resumed(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    first = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256="e" * 64,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    original = first.claim_path.read_bytes()
+
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="active in another execution",
+    ):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:01.000000Z",
+            attempt_ordinal=1,
+            retry_lineage_sha256="e" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+    assert first.claim_path.read_bytes() == original
+    protocol.record_definite_pre_submission_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=first,
+        phase="concurrency_test_cleanup",
+        failure_class="FormalRunProtocolError",
+        recorded_at_utc="2026-09-14T00:00:02.000000Z",
+    )
+
+
+def test_interrupted_failure_write_retains_lease_then_resumes_after_process_loss(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    first = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256="e" * 64,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    original_os_write = protocol.os.write
+    interrupted = False
+
+    def interrupt_staging_write(descriptor: int, payload: bytes) -> int:
+        nonlocal interrupted
+        if not interrupted:
+            interrupted = True
+            original_os_write(descriptor, payload[: max(1, len(payload) // 2)])
+            raise OSError("simulated process loss during failure write")
+        return original_os_write(descriptor, payload)
+
+    monkeypatch.setattr(protocol.os, "write", interrupt_staging_write)
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="staging write failed before publication",
+    ):
+        protocol.record_definite_pre_submission_failure(
+            candidate=candidate,
+            authority=authority,
+            claim=first,
+            phase="pre_qc_reauthentication",
+            failure_class="FormalQcSubmissionError",
+            recorded_at_utc="2026-09-14T00:00:01.000000Z",
+        )
+    monkeypatch.setattr(protocol.os, "write", original_os_write)
+    assert not (
+        directory
+        / "arv2-formal-attempt-000001-definite-pre-submission-failure.json"
+    ).exists()
+    assert not any(".pending-" in path.name for path in directory.iterdir())
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="active in another execution",
+    ):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:02.000000Z",
+            attempt_ordinal=1,
+            retry_lineage_sha256="e" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+
+    protocol._release_retry_attempt_lock(first)
+    resumed = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:03.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256="e" * 64,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    assert resumed.resumed_after_interruption is True
+    failure = protocol.record_definite_pre_submission_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=resumed,
+        phase="pre_qc_reauthentication",
+        failure_class="FormalQcSubmissionError",
+        recorded_at_utc="2026-09-14T00:00:04.000000Z",
+    )
+    protocol.require_definite_pre_submission_failure(
+        candidate,
+        authority,
+        resumed,
+        failure,
+    )
+
+
+def test_open_claim_resume_refuses_changed_plan_and_persisted_tamper(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    first = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256="e" * 64,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    original = first.claim_path.read_bytes()
+    protocol._release_retry_attempt_lock(first)
+
+    with pytest.raises(FormalRunProtocolError, match="changed lineage or plan"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:01.000000Z",
+            attempt_ordinal=1,
+            retry_lineage_sha256="e" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256="b" * 64,
+        )
+    assert first.claim_path.read_bytes() == original
+
+    raw = json.loads(original)
+    raw["submission_plan_id"] = "arv2-tampered-plan"
+    first.claim_path.write_bytes(protocol._canonical_bytes(raw))
+    first.claim_path.chmod(0o600)
+    with pytest.raises(FormalRunProtocolError, match="changed lineage or plan"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:02.000000Z",
+            attempt_ordinal=1,
+            retry_lineage_sha256="e" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+
+
+def test_open_claim_process_lease_refuses_forked_or_reconstructed_pid(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    claim = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256="e" * 64,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    changed_pid = dataclasses.replace(
+        claim,
+        _attempt_lock_pid=claim._attempt_lock_pid + 1,
+    )
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="process lease changed",
+    ):
+        require_formal_look_claim(candidate, authority, changed_pid)
+    protocol.record_definite_pre_submission_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=claim,
+        phase="fork_test_cleanup",
+        failure_class="FormalRunProtocolError",
+        recorded_at_utc="2026-09-14T00:00:01.000000Z",
+    )
+
+
+def test_backtests_create_permit_alone_cannot_authorize_a_fresh_attempt(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    lineage = "e" * 64
+    first = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    permit = begin_formal_submission_once(
+        candidate=candidate,
+        authority=authority,
+        claim=first,
+        submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+        consumption_reason="backtests_create_attempt",
+    )
+    require_formal_submission_permit(candidate, authority, first, permit)
+    permit_raw = json.loads(permit.permit_path.read_bytes())
+    assert permit_raw["backtests_create_attempted"] is True
+    assert permit_raw["outcome_look_consumed"] is True
+    assert permit_raw["current_attempt_reuse_authorized"] is False
+    assert permit_raw["attempt_deletion_authorized"] is False
+    with pytest.raises(FormalRunProtocolError, match="already spent"):
+        begin_formal_submission_once(
+            candidate=candidate,
+            authority=authority,
+            claim=first,
+            submission_started_at_utc="2026-09-14T00:00:02.000000Z",
+        )
+
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="lacks an authenticated terminal failure",
+    ):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:03.000000Z",
+            attempt_ordinal=2,
+            retry_lineage_sha256=lineage,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+
+
+def test_ambiguous_external_state_is_consumed_but_cannot_start_parallel_retry(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    lineage = "e" * 64
+    first = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    permit = begin_formal_submission_once(
+        candidate=candidate,
+        authority=authority,
+        claim=first,
+        submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+        consumption_reason="external_state_ambiguous",
+    )
+    raw = json.loads(permit.permit_path.read_bytes())
+    assert raw["backtests_create_attempted"] is False
+    assert raw["external_state_ambiguous"] is True
+    assert raw["submission_attempt_count"] == 0
+    assert raw["outcome_look_consumed"] is True
+    assert raw["attempt_deletion_authorized"] is False
+
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="lacks an authenticated terminal failure",
+    ):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:02.000000Z",
+            attempt_ordinal=2,
+            retry_lineage_sha256=lineage,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+
+
+def test_only_successful_completed_status_ends_waiver_and_blocks_retry(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    lineage = "e" * 64
+    claim = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    permit = begin_formal_submission_once(
+        candidate=candidate,
+        authority=authority,
+        claim=claim,
+        submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+    )
+    raw = protocol._retry_attempt_success_document(
+        candidate,
+        authority,
+        claim,
+        permit_id=permit.permit_id,
+        permit_sha256=permit.permit_sha256,
+        launch_receipt_id="arv2-launch-receipt-test",
+        launch_receipt_sha256="1" * 64,
+        backtest_id="arv2-backtest-test",
+        terminal_receipt_id="arv2-terminal-receipt-test",
+        terminal_receipt_sha256="2" * 64,
+        recorded_at_utc="2026-09-14T00:00:02.000000Z",
+    )
+    completion_path = protocol._exclusive_private_write(
+        authority.claim_directory,
+        protocol._retry_attempt_path(
+            authority.claim_directory,
+            protocol._RETRY_ATTEMPT_SUCCESS_TEMPLATE,
+            claim.attempt_ordinal,
+        ).name,
+        protocol._canonical_bytes(raw),
+    )
+    completion_raw = json.loads(completion_path.read_bytes())
+    assert completion_raw["qc_terminal_status"] == "Completed."
+    assert completion_raw["runtime_error_ends_owner_review_waiver"] is False
+    assert completion_raw["owner_review_waiver_ended"] is True
+    assert completion_raw["fresh_retry_authorized"] is False
+    with pytest.raises(FormalRunProtocolError, match="waiver ended"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:03.000000Z",
+            attempt_ordinal=2,
+            retry_lineage_sha256=lineage,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+
+
+def test_runtime_error_does_not_end_waiver_and_fresh_attempt_opens(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    lineage = "e" * 64
+    first = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    permit = begin_formal_submission_once(
+        candidate=candidate,
+        authority=authority,
+        claim=first,
+        submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+    )
+    launch = types.SimpleNamespace(
+        receipt_id="arv2-launch-receipt-test",
+        receipt_sha256="1" * 64,
+        permit_id=permit.permit_id,
+        permit_sha256=permit.permit_sha256,
+        backtest_id="arv2-backtest-test",
+    )
+    terminal = types.SimpleNamespace(
+        receipt_id="arv2-terminal-receipt-test",
+        receipt_sha256="2" * 64,
+        launch_receipt_id=launch.receipt_id,
+        launch_receipt_sha256=launch.receipt_sha256,
+        permit_id=permit.permit_id,
+        permit_sha256=permit.permit_sha256,
+        backtest_id=launch.backtest_id,
+        terminal_status="Runtime Error",
+    )
+    disposition = protocol._record_authenticated_formal_backtest_terminal_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=first,
+        permit=permit,
+        launch_receipt=launch,
+        terminal_receipt=terminal,
+        recorded_at_utc="2026-09-14T00:00:02.000000Z",
+    )
+    disposition_raw = json.loads(disposition.disposition_path.read_bytes())
+    assert disposition_raw["qc_terminal_status"] == "Runtime Error"
+    assert disposition_raw["fresh_retry_authorized"] is True
+    assert disposition_raw[
+        "queued_running_unknown_or_ambiguous_retry_authorized"
+    ] is False
+    second = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:03.000000Z",
+        attempt_ordinal=2,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    assert second.attempt_ordinal == 2
+    assert second.outcome_look_consumed is False
+
+
+def _consumed_owner_waiver_attempt(tmp_path: Path):
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    lineage = "e" * 64
+    claim = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    permit = begin_formal_submission_once(
+        candidate=candidate,
+        authority=authority,
+        claim=claim,
+        submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+        consumption_reason="backtests_create_attempt",
+    )
+    return candidate, authority, directory, lineage, claim, permit
+
+
+def _load_consumed_owner_waiver_attempt(candidate, authority, lineage: str):
+    return protocol.load_consumed_formal_retry_attempt(
+        candidate=candidate,
+        authority=authority,
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+
+
+@pytest.mark.skipif(not hasattr(os, "fork"), reason="requires POSIX fork")
+def test_consumed_attempt_reauthenticates_in_a_fork_without_in_memory_identity(
+    tmp_path: Path,
+):
+    candidate, authority, _directory, lineage, claim, permit = (
+        _consumed_owner_waiver_attempt(tmp_path)
+    )
+    read_descriptor, write_descriptor = os.pipe()
+    child_pid = os.fork()
+    if child_pid == 0:
+        os.close(read_descriptor)
+        try:
+            recovered_claim, recovered_permit = (
+                _load_consumed_owner_waiver_attempt(
+                    candidate,
+                    authority,
+                    lineage,
+                )
+            )
+            payload = protocol._canonical_bytes(
+                {
+                    "claim_id": recovered_claim.claim_id,
+                    "claim_sha256": recovered_claim.claim_sha256,
+                    "permit_id": recovered_permit.permit_id,
+                    "permit_sha256": recovered_permit.permit_sha256,
+                    "claim_has_process_lock": (
+                        recovered_claim._attempt_lock_descriptor is not None
+                        or recovered_claim._attempt_lock_pid is not None
+                    ),
+                }
+            )
+            os.write(write_descriptor, payload)
+            os.close(write_descriptor)
+            os._exit(0)
+        except BaseException as exc:
+            os.write(
+                write_descriptor,
+                f"{type(exc).__name__}: {exc}".encode("utf-8"),
+            )
+            os.close(write_descriptor)
+            os._exit(1)
+    os.close(write_descriptor)
+    child_payload = b""
+    while True:
+        chunk = os.read(read_descriptor, 4096)
+        if not chunk:
+            break
+        child_payload += chunk
+    os.close(read_descriptor)
+    _waited_pid, child_status = os.waitpid(child_pid, 0)
+
+    assert os.waitstatus_to_exitcode(child_status) == 0, child_payload.decode()
+    recovered = json.loads(child_payload)
+    assert recovered == {
+        "claim_has_process_lock": False,
+        "claim_id": claim.claim_id,
+        "claim_sha256": claim.claim_sha256,
+        "permit_id": permit.permit_id,
+        "permit_sha256": permit.permit_sha256,
+    }
+
+
+@pytest.mark.parametrize(
+    ("artifact", "field", "replacement", "message"),
+    (
+        (
+            "claim",
+            "submission_plan_id",
+            "arv2-tampered-recovery-plan",
+            "recoverable formal retry claim changed lineage or plan",
+        ),
+        (
+            "permit",
+            "consumption_reason",
+            "external_state_ambiguous",
+            "recoverable formal submission permit changed",
+        ),
+    ),
+)
+def test_consumed_attempt_recovery_refuses_persisted_identity_tamper(
+    tmp_path: Path,
+    artifact: str,
+    field: str,
+    replacement: str,
+    message: str,
+):
+    candidate, authority, _directory, lineage, claim, permit = (
+        _consumed_owner_waiver_attempt(tmp_path)
+    )
+    path = claim.claim_path if artifact == "claim" else permit.permit_path
+    raw = json.loads(path.read_bytes())
+    raw[field] = replacement
+    path.write_bytes(protocol._canonical_bytes(raw))
+    path.chmod(0o600)
+
+    with pytest.raises(FormalRunProtocolError, match=message):
+        _load_consumed_owner_waiver_attempt(candidate, authority, lineage)
+
+
+def test_consumed_attempt_recovery_refuses_missing_or_nonexact_run_authority(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    lineage = "e" * 64
+    open_claim = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="recoverable formal submission permit",
+    ):
+        _load_consumed_owner_waiver_attempt(candidate, authority, lineage)
+
+    ambiguity_permit = begin_formal_submission_once(
+        candidate=candidate,
+        authority=authority,
+        claim=open_claim,
+        submission_started_at_utc="2026-09-14T00:00:01.000000Z",
+        consumption_reason="external_state_ambiguous",
+    )
+    assert ambiguity_permit.submission_attempt_count == 0
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="external-state ambiguity has no recoverable exact QC run",
+    ):
+        _load_consumed_owner_waiver_attempt(candidate, authority, lineage)
+
+
+def test_recovered_attempt_cannot_resubmit_or_be_relabelled_no_outcome(
+    tmp_path: Path,
+):
+    candidate, authority, _directory, lineage, _claim, _permit = (
+        _consumed_owner_waiver_attempt(tmp_path)
+    )
+    recovered_claim, _recovered_permit = _load_consumed_owner_waiver_attempt(
+        candidate,
+        authority,
+        lineage,
+    )
+
+    with pytest.raises(FormalRunProtocolError, match="already spent"):
+        begin_formal_submission_once(
+            candidate=candidate,
+            authority=authority,
+            claim=recovered_claim,
+            submission_started_at_utc="2026-09-14T00:00:02.000000Z",
+            consumption_reason="backtests_create_attempt",
+        )
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="consumed formal attempt cannot become a no-outcome failure",
+    ):
+        protocol.record_definite_pre_submission_failure(
+            candidate=candidate,
+            authority=authority,
+            claim=recovered_claim,
+            phase="forbidden_reclassification",
+            failure_class="FormalQcSubmissionError",
+            recorded_at_utc="2026-09-14T00:00:03.000000Z",
+        )
+
+
+def test_no_outcome_attempt_has_no_consumed_run_to_recover(tmp_path: Path):
+    candidate = _candidate()
+    authority, _directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    lineage = "e" * 64
+    claim = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    protocol.record_definite_pre_submission_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=claim,
+        phase="known_no_run",
+        failure_class="FormalQcSubmissionError",
+        recorded_at_utc="2026-09-14T00:00:01.000000Z",
+    )
+    with pytest.raises(
+        FormalRunProtocolError,
+        match="no-outcome formal attempt has no consumed run to recover",
+    ):
+        _load_consumed_owner_waiver_attempt(candidate, authority, lineage)
+
+
+def _terminal_receipt_pair(permit, terminal_status: str):
+    launch = types.SimpleNamespace(
+        receipt_id="arv2-launch-receipt-test",
+        receipt_sha256="1" * 64,
+        permit_id=permit.permit_id,
+        permit_sha256=permit.permit_sha256,
+        backtest_id="arv2-backtest-test",
+    )
+    terminal = types.SimpleNamespace(
+        receipt_id="arv2-terminal-receipt-test",
+        receipt_sha256="2" * 64,
+        launch_receipt_id=launch.receipt_id,
+        launch_receipt_sha256=launch.receipt_sha256,
+        permit_id=permit.permit_id,
+        permit_sha256=permit.permit_sha256,
+        backtest_id=launch.backtest_id,
+        terminal_status=terminal_status,
+    )
+    return launch, terminal
+
+
+def test_runtime_error_disposition_remints_exactly_and_allows_next_ordinal(
+    tmp_path: Path,
+):
+    candidate, authority, _directory, lineage, claim, permit = (
+        _consumed_owner_waiver_attempt(tmp_path)
+    )
+    launch, terminal = _terminal_receipt_pair(permit, "Runtime Error")
+    first = protocol._record_authenticated_formal_backtest_terminal_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=claim,
+        permit=permit,
+        launch_receipt=launch,
+        terminal_receipt=terminal,
+        recorded_at_utc="2026-09-14T00:00:02.000000Z",
+    )
+    recovered_claim, recovered_permit = _load_consumed_owner_waiver_attempt(
+        candidate,
+        authority,
+        lineage,
+    )
+    reminted = protocol._record_authenticated_formal_backtest_terminal_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=recovered_claim,
+        permit=recovered_permit,
+        launch_receipt=launch,
+        terminal_receipt=terminal,
+        recorded_at_utc="2026-09-14T00:00:09.000000Z",
+    )
+    assert reminted == first
+    assert reminted.recorded_at_utc == "2026-09-14T00:00:02.000000Z"
+
+    next_claim = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:10.000000Z",
+        attempt_ordinal=2,
+        retry_lineage_sha256=lineage,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    assert next_claim.attempt_ordinal == 2
+
+
+def test_completed_disposition_remints_exactly_and_keeps_waiver_closed(
+    tmp_path: Path,
+):
+    candidate, authority, _directory, lineage, claim, permit = (
+        _consumed_owner_waiver_attempt(tmp_path)
+    )
+    launch, terminal = _terminal_receipt_pair(permit, "Completed.")
+    first = protocol._record_authenticated_formal_backtest_completion(
+        candidate=candidate,
+        authority=authority,
+        claim=claim,
+        permit=permit,
+        launch_receipt=launch,
+        terminal_receipt=terminal,
+        recorded_at_utc="2026-09-14T00:00:02.000000Z",
+    )
+    recovered_claim, recovered_permit = _load_consumed_owner_waiver_attempt(
+        candidate,
+        authority,
+        lineage,
+    )
+    reminted = protocol._record_authenticated_formal_backtest_completion(
+        candidate=candidate,
+        authority=authority,
+        claim=recovered_claim,
+        permit=recovered_permit,
+        launch_receipt=launch,
+        terminal_receipt=terminal,
+        recorded_at_utc="2026-09-14T00:00:09.000000Z",
+    )
+    assert reminted == first
+    assert reminted.recorded_at_utc == "2026-09-14T00:00:02.000000Z"
+    with pytest.raises(FormalRunProtocolError, match="waiver ended"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:10.000000Z",
+            attempt_ordinal=2,
+            retry_lineage_sha256=lineage,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+
+
+def test_successful_completion_recorder_is_not_a_public_protocol_action():
+    assert not hasattr(protocol, "record_successful_formal_backtest_completion")
+    assert "record_successful_formal_backtest_completion" not in protocol.__all__
+
+
+def test_retry_requires_identical_frozen_lineage_and_sequential_identity(
+    tmp_path: Path,
+):
+    candidate = _candidate()
+    authority, directory, _receipt, _pin, _pin_path = (
+        _activate_owner_review_waiver(tmp_path, candidate)
+    )
+    first = claim_formal_run_once(
+        candidate=candidate,
+        authority=authority,
+        claimed_at_utc="2026-09-14T00:00:00.000000Z",
+        attempt_ordinal=1,
+        retry_lineage_sha256="e" * 64,
+        submission_plan_id=OWNER_PLAN_ID,
+        submission_plan_sha256=OWNER_PLAN_SHA256,
+    )
+    protocol.record_definite_pre_submission_failure(
+        candidate=candidate,
+        authority=authority,
+        claim=first,
+        phase="pre_qc_reauthentication",
+        failure_class="FormalQcSubmissionError",
+        recorded_at_utc="2026-09-14T00:00:01.000000Z",
+    )
+    with pytest.raises(FormalRunProtocolError, match="crossed lineage"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:02.000000Z",
+            attempt_ordinal=2,
+            retry_lineage_sha256="f" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+    with pytest.raises(FormalRunProtocolError, match="unavailable"):
+        claim_formal_run_once(
+            candidate=candidate,
+            authority=authority,
+            claimed_at_utc="2026-09-14T00:00:03.000000Z",
+            attempt_ordinal=3,
+            retry_lineage_sha256="e" * 64,
+            submission_plan_id=OWNER_PLAN_ID,
+            submission_plan_sha256=OWNER_PLAN_SHA256,
+        )
+    assert not (directory / "arv2-formal-attempt-000002-claim.json").exists()
+    assert not (directory / "arv2-formal-attempt-000003-claim.json").exists()
+
+
 def test_static_record_discloses_unreviewed_zero_authority():
     record = formal_run_protocol_record()
     assert record["reviewed_authority_artifact_sha256"] is None
@@ -484,6 +1543,18 @@ def test_static_record_discloses_unreviewed_zero_authority():
     assert record["infrastructure_look_ledger_reauthenticated_before_claim"] is True
     assert record["maximum_submissions"] == 1
     assert record["retry_after_ambiguity"] is False
+    assert record["owner_waiver_fresh_attempt_after_counted_ambiguity"] is True
+    assert record["same_attempt_reuse_or_deletion_authorized"] is False
+    assert record["owner_review_waiver"]["independent_review_complete"] is False
+    assert record["owner_standing_retry_policy"][
+        "automatic_retry_loop_authorized"
+    ] is False
+    assert record["owner_standing_retry_policy"][
+        "fresh_retry_requires_authenticated_terminal_failure"
+    ] is True
+    assert record["owner_standing_retry_policy"][
+        "transport_ambiguity_authorizes_fresh_retry"
+    ] is False
     assert record["result_read_requires_separate_terminal_gate"] is True
 
 
@@ -546,6 +1617,12 @@ def test_exclusive_ledger_write_isolates_each_failure(
 
     with pytest.raises(FormalRunProtocolError, match=re.escape(message)):
         protocol._exclusive_private_write(directory, "ledger.json", b"payload\n")
+    target = directory / "ledger.json"
+    if failure in {"create", "stall"}:
+        assert not target.exists()
+    else:
+        assert target.read_bytes() == b"payload\n"
+    assert not any(".pending-" in path.name for path in directory.iterdir())
 
 
 def test_claim_type_path_unavailable_and_change_have_distinct_refusals(

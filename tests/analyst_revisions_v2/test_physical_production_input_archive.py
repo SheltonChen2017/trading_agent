@@ -16,6 +16,9 @@ from research.analyst_revisions_v2.production_evidence_acquisition import (
     render_production_evidence_package_bytes,
 )
 from research.analyst_revisions_v2.production_input_pipeline import (
+    EvidenceSourceKind,
+    Section72OwnerWaivedFirmOntologyEvidence,
+    Section72OwnerWaivedFirmSourceBinding,
     SignalArm,
     build_production_evidence_authority,
     build_production_input_batch,
@@ -47,6 +50,10 @@ from tests.analyst_revisions_v2.test_production_input_pipeline import _authority
 from tests.analyst_revisions_v2.test_production_input_pipeline import _pair
 from tests.analyst_revisions_v2.test_production_input_pipeline import _rating_row
 from tests.analyst_revisions_v2.test_production_input_pipeline import _row_evidence
+from tests.analyst_revisions_v2.test_production_input_pipeline import (
+    _section72_row_evidence,
+    _section72_sources,
+)
 from tests.analyst_revisions_v2.test_production_input_pipeline import _sources
 from tests.analyst_revisions_v2.test_qc_physical_accepted_risk_archive import (
     _build as _physical_c1,
@@ -96,6 +103,64 @@ def test_fixture_archive_is_byte_exact_to_every_legacy_c2_hash(oracle):
     report = archive.archive_path / archive.comparison_report.relative_path
     assert package.read_bytes() == render_production_evidence_package_bytes(authority)
     assert report.read_bytes() == canonical_json_bytes(comparison.to_record())
+
+
+def test_section72_firm_authority_round_trips_with_explicit_false_claims():
+    sources = _section72_sources()
+    snapshot = disk._snapshot_source_bindings(sources)
+    firm_source = next(
+        item
+        for item in snapshot
+        if item.kind is EvidenceSourceKind.FIRM_ONTOLOGY
+    )
+    assert type(firm_source) is Section72OwnerWaivedFirmSourceBinding
+    assert firm_source.reviewed is False
+    assert firm_source.point_in_time is False
+    assert firm_source.independently_reviewed is False
+    assert firm_source.historical_availability_claimed is False
+    assert disk._source_binding_record(firm_source) == firm_source.to_record()
+
+    pair = _pair(ratings=[_rating_row("rating-section72-round-trip")])
+    source = next(
+        item
+        for item in pair.rows
+        if item.provider_event_id == "rating-section72-round-trip"
+    )
+    firm = _section72_row_evidence(source).firm
+    assert type(firm) is Section72OwnerWaivedFirmOntologyEvidence
+    reconstructed = disk._construct_component("firm", firm.to_record())
+    assert type(reconstructed) is Section72OwnerWaivedFirmOntologyEvidence
+    assert reconstructed == firm
+
+
+def test_physical_c2_refuses_unregistered_source_binding_record_type():
+    class UnregisteredSourceBinding:
+        pass
+
+    with pytest.raises(
+        PhysicalProductionInputArchiveError,
+        match=r"^source binding changed exact admission type$",
+    ):
+        disk._source_binding_record(UnregisteredSourceBinding())
+
+
+@pytest.mark.parametrize(
+    "name",
+    (
+        "Section72OwnerWaivedFirmSourceBinding",
+        "Section72OwnerWaivedFirmOntologyEvidence",
+        "_source_binding_record",
+    ),
+)
+def test_physical_c2_isolates_section72_dependency_rebinding(
+    monkeypatch, name
+):
+    monkeypatch.setattr(disk, name, object())
+    with pytest.raises(
+        PhysicalProductionInputArchiveError,
+        match=r"^physical C2 static contract changed$",
+    ):
+        disk._require_static_contract()
 
 
 def test_decimal_scale_variants_preserve_legacy_numeric_topology_and_exact_hashes(

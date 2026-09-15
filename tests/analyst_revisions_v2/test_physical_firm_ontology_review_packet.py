@@ -5,6 +5,7 @@ import ast
 import dataclasses
 import os
 import re
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -29,6 +30,7 @@ from research.analyst_revisions_v2_qc.physical_firm_ontology_review_packet impor
     PhysicalFirmOntologyReviewPacketError,
     PhysicalFirmOntologyReviewPacketPublicationAmbiguityError,
     _build_physical_firm_ontology_review_packet_for_test,
+    _load_test_fixture_physical_firm_ontology_review_packet,
     iter_physical_firm_ontology_review_rows,
     iter_physical_firm_owner_adjudication_template,
     require_physical_firm_ontology_review_packet,
@@ -723,6 +725,24 @@ def test_output_separation_and_exact_optional_seed_cross_check(
     assert packet.preopen_seed_cross_checked is True
     assert packet.preopen_seed_archive_id == seed.archive_id
     assert packet.preopen_seed_archive_sha256 == seed.archive_sha256
+    packet_module._reset_authorities_after_fork()
+    reloaded = _load_test_fixture_physical_firm_ontology_review_packet(
+        archive_path=packet.archive_path,
+        expected_packet_sha256=packet.packet_sha256,
+        accepted_risk_archive=exact_c1,
+        preopen_seed_archive=seed,
+    )
+    assert require_physical_firm_ontology_review_packet(reloaded) is reloaded
+    packet_module._reset_authorities_after_fork()
+    with pytest.raises(
+        PhysicalFirmOntologyReviewPacketError,
+        match="pre-open seed binding changed",
+    ):
+        _load_test_fixture_physical_firm_ontology_review_packet(
+            archive_path=packet.archive_path,
+            expected_packet_sha256=packet.packet_sha256,
+            accepted_risk_archive=exact_c1,
+        )
 
     with pytest.raises(
         PhysicalFirmOntologyReviewPacketError,
@@ -759,6 +779,219 @@ def test_tampering_and_forged_authority_are_refused(tmp_path: Path) -> None:
         match="entry identity changed|JSONL file changed",
     ):
         require_physical_firm_ontology_review_packet(packet)
+
+
+def test_reset_then_strict_reload_restores_exact_packet_authority(
+    tmp_path: Path,
+) -> None:
+    c1 = _c1(tmp_path, _diagnostic_ratings())
+    packet = _build_physical_firm_ontology_review_packet_for_test(
+        accepted_risk_archive=c1,
+        output_root=tmp_path / "review",
+    )
+    expected_rows = list(iter_physical_firm_ontology_review_rows(packet))
+    packet_module._reset_authorities_after_fork()
+    with pytest.raises(
+        PhysicalFirmOntologyReviewPacketError,
+        match="not current builder authority",
+    ):
+        require_physical_firm_ontology_review_packet(packet)
+
+    reloaded = _load_test_fixture_physical_firm_ontology_review_packet(
+        archive_path=packet.archive_path,
+        expected_packet_sha256=packet.packet_sha256,
+        accepted_risk_archive=c1,
+    )
+
+    assert reloaded is not packet
+    assert reloaded.packet_id == packet.packet_id
+    assert reloaded.packet_sha256 == packet.packet_sha256
+    assert reloaded.files == packet.files
+    assert list(iter_physical_firm_ontology_review_rows(reloaded)) == expected_rows
+    assert require_physical_firm_ontology_review_packet(reloaded) is reloaded
+
+
+def test_reload_streams_jsonl_without_whole_file_private_reader(
+    tmp_path: Path, monkeypatch
+) -> None:
+    c1 = _c1(tmp_path, _diagnostic_ratings())
+    packet = _build_physical_firm_ontology_review_packet_for_test(
+        accepted_risk_archive=c1,
+        output_root=tmp_path / "review",
+    )
+    packet_module._reset_authorities_after_fork()
+    original = packet_module._read_private
+
+    def no_jsonl_whole_read(path, **kwargs):
+        if path.suffix == ".jsonl":
+            raise AssertionError("JSONL verifier attempted a whole-file read")
+        return original(path, **kwargs)
+
+    monkeypatch.setattr(packet_module, "_read_private", no_jsonl_whole_read)
+    reloaded = _load_test_fixture_physical_firm_ontology_review_packet(
+        archive_path=packet.archive_path,
+        expected_packet_sha256=packet.packet_sha256,
+        accepted_risk_archive=c1,
+    )
+    assert reloaded.packet_sha256 == packet.packet_sha256
+
+
+@pytest.mark.parametrize(
+    "mutation", ("payload", "extra", "symlink", "hardlink", "mode")
+)
+def test_reload_refuses_disk_tamper_before_minting_authority(
+    tmp_path: Path, mutation: str
+) -> None:
+    c1 = _c1(tmp_path / "source", _diagnostic_ratings())
+    packet = _build_physical_firm_ontology_review_packet_for_test(
+        accepted_risk_archive=c1,
+        output_root=tmp_path / "review",
+    )
+    copied_parent = tmp_path / f"copied-{mutation}"
+    copied_parent.mkdir(mode=0o700)
+    archive = copied_parent / packet.packet_id
+    shutil.copytree(packet.archive_path, archive)
+    firm_path = archive / FIRM_ROWS_FILENAME
+    if mutation == "payload":
+        firm_path.write_bytes(firm_path.read_bytes() + b"{}\n")
+    elif mutation == "extra":
+        extra = archive / "unexpected.txt"
+        extra.write_bytes(b"unexpected")
+        extra.chmod(0o600)
+    elif mutation == "symlink":
+        firm_path.unlink()
+        firm_path.symlink_to(packet.archive_path / FIRM_ROWS_FILENAME)
+    elif mutation == "hardlink":
+        os.link(firm_path, copied_parent / "second-link")
+    else:
+        firm_path.chmod(0o640)
+    packet_module._reset_authorities_after_fork()
+
+    with pytest.raises(PhysicalFirmOntologyReviewPacketError):
+        _load_test_fixture_physical_firm_ontology_review_packet(
+            archive_path=archive,
+            expected_packet_sha256=packet.packet_sha256,
+            accepted_risk_archive=c1,
+        )
+    assert packet_module._AUTHORITIES == {}
+
+
+def test_reload_refuses_wrong_external_pin_and_wrong_c1_before_mint(
+    tmp_path: Path,
+) -> None:
+    c1 = _c1(tmp_path / "source", _diagnostic_ratings())
+    other_c1 = _c1(
+        tmp_path / "other-source",
+        [
+            _rating(
+                "other",
+                firm_id="other-firm",
+                firm_name="Other Firm",
+                action="upgrades",
+                rating="Buy",
+                previous_rating="Hold",
+            )
+        ],
+    )
+    packet = _build_physical_firm_ontology_review_packet_for_test(
+        accepted_risk_archive=c1,
+        output_root=tmp_path / "review",
+    )
+    packet_module._reset_authorities_after_fork()
+    with pytest.raises(PhysicalFirmOntologyReviewPacketError):
+        _load_test_fixture_physical_firm_ontology_review_packet(
+            archive_path=packet.archive_path,
+            expected_packet_sha256="f" * 64,
+            accepted_risk_archive=c1,
+        )
+    with pytest.raises(
+        PhysicalFirmOntologyReviewPacketError,
+        match="exact accepted-risk archive",
+    ):
+        _load_test_fixture_physical_firm_ontology_review_packet(
+            archive_path=packet.archive_path,
+            expected_packet_sha256=packet.packet_sha256,
+            accepted_risk_archive=other_c1,
+        )
+    assert packet_module._AUTHORITIES == {}
+
+
+def test_reload_failure_after_mint_removes_only_new_authority(
+    tmp_path: Path,
+) -> None:
+    c1 = _c1(tmp_path, _diagnostic_ratings())
+    packet = _build_physical_firm_ontology_review_packet_for_test(
+        accepted_risk_archive=c1,
+        output_root=tmp_path / "review",
+    )
+    packet_module._reset_authorities_after_fork()
+
+    def fail_after_mint(value):
+        assert packet_module._AUTHORITIES[id(value)][0]() is value
+        raise PhysicalFirmOntologyReviewPacketError("injected final refusal")
+
+    with pytest.raises(
+        PhysicalFirmOntologyReviewPacketError,
+        match=_exact("injected final refusal"),
+    ):
+        _load_test_fixture_physical_firm_ontology_review_packet(
+            archive_path=packet.archive_path,
+            expected_packet_sha256=packet.packet_sha256,
+            accepted_risk_archive=c1,
+            final_require=fail_after_mint,
+        )
+    assert packet_module._AUTHORITIES == {}
+
+
+def test_packet_creator_pid_guard_is_an_isolated_refusal(
+    tmp_path: Path, monkeypatch
+) -> None:
+    c1 = _c1(tmp_path, _diagnostic_ratings())
+    packet = _build_physical_firm_ontology_review_packet_for_test(
+        accepted_risk_archive=c1,
+        output_root=tmp_path / "review",
+    )
+    monkeypatch.setattr(packet_module, "_AUTHORITY_PID", os.getpid() + 1)
+    with pytest.raises(
+        PhysicalFirmOntologyReviewPacketError,
+        match=_exact("firm-review packet process authority changed"),
+    ):
+        require_physical_firm_ontology_review_packet(packet)
+
+
+@pytest.mark.skipif(not hasattr(os, "fork"), reason="POSIX fork is unavailable")
+def test_packet_registry_and_lock_reset_after_fork(tmp_path: Path) -> None:
+    c1 = _c1(tmp_path, _diagnostic_ratings())
+    packet = _build_physical_firm_ontology_review_packet_for_test(
+        accepted_risk_archive=c1,
+        output_root=tmp_path / "review",
+    )
+    read_descriptor, write_descriptor = os.pipe()
+    child = os.fork()
+    if child == 0:
+        os.close(read_descriptor)
+        reset = (
+            packet_module._AUTHORITY_PID == os.getpid()
+            and packet_module._AUTHORITIES == {}
+        )
+        try:
+            require_physical_firm_ontology_review_packet(packet)
+        except PhysicalFirmOntologyReviewPacketError:
+            refused = True
+        else:
+            refused = False
+        os.write(write_descriptor, b"ok" if reset and refused else b"bad")
+        os.close(write_descriptor)
+        os._exit(0)
+    os.close(write_descriptor)
+    try:
+        result = os.read(read_descriptor, 3)
+    finally:
+        os.close(read_descriptor)
+    waited, status = os.waitpid(child, 0)
+    assert waited == child and os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0
+    assert result == b"ok"
+    assert require_physical_firm_ontology_review_packet(packet) is packet
 
 
 def test_packet_exposes_no_provider_qc_outcome_or_action_capability(

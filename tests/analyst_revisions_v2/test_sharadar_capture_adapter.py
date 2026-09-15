@@ -40,9 +40,9 @@ KEY = "offline-test-sharadar-key-NEVER-REAL"
 TICKERS = (
     b"table,ticker,permaticker,isdelisted,name,category,exchange,sector,industry,"
     b"figi,firstpricedate,lastpricedate\n"
-    b"fundamentals,AAA,100001,N,Active Corp,Domestic Common Stock,NASDAQ,"
+    b"SF1,AAA,100001,N,Active Corp,Domestic Common Stock,NASDAQ,"
     b"Technology,Software,BBG000AAA111,2010-01-04,\n"
-    b"fundamentals,OLD,100002,Y,Old Corp,Domestic Common Stock,NYSE,"
+    b"SF1,OLD,100002,Y,Old Corp,Domestic Common Stock,NYSE,"
     b"Industrials,Machinery,BBG000OLD222,2000-01-03,2020-12-31\n"
 )
 ACTIONS = (
@@ -685,7 +685,7 @@ def test_csv_missing_required_field_refuses(tmp_path):
 def test_tickers_must_demonstrate_active_and_delisted_coverage(tmp_path):
     archive = _zip_bytes(
         SharadarDataset.TICKERS,
-        csv_bytes=TICKERS.split(b"fundamentals,OLD", 1)[0],
+        csv_bytes=TICKERS.split(b"SF1,OLD", 1)[0],
     )
     with pytest.raises(SharadarCaptureError, match="active and delisted"):
         _capture(tmp_path, FakeSession([FakeResponse(archive)]))
@@ -693,7 +693,7 @@ def test_tickers_must_demonstrate_active_and_delisted_coverage(tmp_path):
 
 def test_blank_tickers_delisting_flag_is_retained_as_authenticated_unknown(tmp_path):
     tickers = TICKERS + (
-        b"fundamentals,UNK,100003,,Unknown State Corp,Domestic Common Stock,NYSE,"
+        b"SF1,UNK,100003,,Unknown State Corp,Domestic Common Stock,NYSE,"
         b"Industrials,Machinery,BBG000UNK333,2015-01-02,\n"
     )
     responses = [

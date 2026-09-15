@@ -100,13 +100,25 @@ def _massive_row(identifier: str, role: MassiveSourceRole) -> dict[str, object]:
     return value
 
 
-def _sources(tmp_path: Path, *, fundamentals: bytes = FUNDAMENTALS):
+def _sources(
+    tmp_path: Path,
+    *,
+    fundamentals: bytes = FUNDAMENTALS,
+    tickers: bytes = TICKERS,
+    rating_rows: tuple[dict[str, object], ...] | None = None,
+):
     responses = []
     for role in MassiveSourceRole:
         endpoint = BASE_URL + ENDPOINT_PATHS[role]
+        rows = (
+            rating_rows
+            if role is MassiveSourceRole.ANALYST_RATINGS
+            and rating_rows is not None
+            else (_massive_row(f"{role.value}-1", role),)
+        )
         responses.append(
             MassiveResponse(
-                massive_payload([_massive_row(f"{role.value}-1", role)]),
+                massive_payload(list(rows)),
                 endpoint,
             )
         )
@@ -127,7 +139,7 @@ def _sources(tmp_path: Path, *, fundamentals: bytes = FUNDAMENTALS):
         session=SharadarSession(
             [
                 SharadarResponse(
-                    _zip_bytes(SharadarDataset.TICKERS, csv_bytes=TICKERS)
+                    _zip_bytes(SharadarDataset.TICKERS, csv_bytes=tickers)
                 ),
                 SharadarResponse(
                     _zip_bytes(SharadarDataset.ACTIONS, csv_bytes=ACTIONS)
@@ -143,6 +155,52 @@ def _sources(tmp_path: Path, *, fundamentals: bytes = FUNDAMENTALS):
         api_key=SHARADAR_KEY,
     )
     return massive, c1, sharadar
+
+
+def test_disk_seed_admits_only_documented_sf1_fundamentals_alias(tmp_path):
+    _massive, c1, sharadar = _sources(
+        tmp_path, tickers=TICKERS.replace(b"SF1,OLD", b"SEP,OLD")
+    )
+    seed = _build_physical_preopen_seed_archive_for_test(
+        c1, sharadar, tmp_path / "preopen-seeds"
+    )
+    report = read_physical_preopen_composition_report(seed)
+
+    assert seed.candidate_security_count == 1
+    assert report["ticker_candidate_refusal_counts"] == {
+        "ticker row is outside the documented Sharadar SF1 fundamentals table": 1
+    }
+
+
+def test_disk_seed_aggregates_multiple_names_for_one_firm_without_overwrite(
+    tmp_path,
+):
+    first = _massive_row("analyst_ratings-1", MassiveSourceRole.ANALYST_RATINGS)
+    second = _massive_row("analyst_ratings-2", MassiveSourceRole.ANALYST_RATINGS)
+    second["firm"] = "Example Firm LLC"
+    second["rating"] = "Strong Buy"
+    _massive, c1, sharadar = _sources(
+        tmp_path, rating_rows=(first, second)
+    )
+
+    seed = _build_physical_preopen_seed_archive_for_test(
+        c1, sharadar, tmp_path / "preopen-seeds"
+    )
+    firms = list(iter_physical_firm_rows(seed))
+
+    assert seed.firm_count == 1
+    assert len(firms) == 1
+    assert firms[0]["provider_firm_id"] == "firm-1"
+    assert firms[0]["observed_firm_names"] == [
+        "Example Firm",
+        "Example Firm LLC",
+    ]
+    assert firms[0]["source_row_count"] == 2
+    assert firms[0]["observed_labels"] == [
+        {"field": "previous_rating", "observed_count": 2, "raw_label": "Hold"},
+        {"field": "rating", "observed_count": 1, "raw_label": "Buy"},
+        {"field": "rating", "observed_count": 1, "raw_label": "Strong Buy"},
+    ]
 
 
 def _built(tmp_path: Path, *, fundamentals: bytes = FUNDAMENTALS):

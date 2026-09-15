@@ -141,6 +141,7 @@ _PINNED_LEGACY_CONSTANTS = (
     _legacy.STATUS_BLOCKED,
     _legacy.FULL_PIT_UNIVERSE_REFUSAL,
     _legacy.FIRM_ONTOLOGY_REFUSAL,
+    _legacy._SHARADAR_FUNDAMENTALS_TABLE_ALIAS,
     tuple(sorted(_legacy._ALLOWED_COMMON_STOCK_CATEGORIES)),
     tuple(sorted(_legacy._SHARADAR_EXCHANGE_TO_MIC.items())),
 )
@@ -319,6 +320,7 @@ def _require_dependencies() -> None:
                 _legacy.STATUS_BLOCKED,
                 _legacy.FULL_PIT_UNIVERSE_REFUSAL,
                 _legacy.FIRM_ONTOLOGY_REFUSAL,
+                _legacy._SHARADAR_FUNDAMENTALS_TABLE_ALIAS,
                 tuple(sorted(_legacy._ALLOWED_COMMON_STOCK_CATEGORIES)),
                 tuple(sorted(_legacy._SHARADAR_EXCHANGE_TO_MIC.items())),
             )
@@ -806,9 +808,9 @@ class _BuildState:
         try:
             table = _legacy._text(row.get("table"), "Sharadar table")
             assert table is not None
-            if table.casefold() != "fundamentals":
+            if table != _legacy._SHARADAR_FUNDAMENTALS_TABLE_ALIAS:
                 raise _legacy.PhysicalPreopenInputError(
-                    "ticker row is outside the Sharadar fundamentals table"
+                    "ticker row is outside the documented Sharadar SF1 fundamentals table"
                 )
             ticker = _legacy._text(row.get("ticker"), "Sharadar ticker")
             assert ticker is not None
@@ -1525,7 +1527,7 @@ class _BuildState:
 
     def derive_firm_rows(self) -> None:
         for (firm_id,) in self.connection.execute(
-            "SELECT firm_id FROM firm_names ORDER BY firm_id"
+            "SELECT DISTINCT firm_id FROM firm_names ORDER BY firm_id"
         ):
             names = [
                 name

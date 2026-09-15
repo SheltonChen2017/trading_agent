@@ -22,8 +22,9 @@ import tempfile
 import threading
 import weakref
 from collections import Counter
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
+from fractions import Fraction
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
@@ -68,6 +69,9 @@ from research.analyst_revisions_v2.production_input_pipeline import (
     EvidenceSourceBinding,
     EvidenceSourceKind,
     FirmOntologyEvidence,
+    SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE,
+    SECTION72_OWNER_WAIVER_SCOPE as C2_SECTION72_OWNER_WAIVER_SCOPE,
+    Section72OwnerWaivedFirmOntologyEvidence,
     PreopenControlEvidence,
     ProductionEvidenceAuthority,
     ProductionRowEvidence,
@@ -78,6 +82,11 @@ from research.analyst_revisions_v2.production_input_pipeline import (
 )
 from research.analyst_revisions_v2.production_truth_gate import QUALITY_METHOD_ID
 from scripts import build_arv2_historical_preopen_bridge as historical_module
+
+from . import firm_ontology_owner_decision as _firm_decision
+from .firm_ontology_owner_decision import FirmOntologyOwnerDecisionArtifact
+from . import physical_firm_ontology_review_packet as _firm_packet
+from .physical_firm_ontology_review_packet import PhysicalFirmOntologyReviewPacket
 
 from .formal_streaming_input import (
     PhysicalPreopenTerminalArchive,
@@ -98,6 +107,10 @@ FIRM_AVAILABILITY_REVIEW_STATUS = (
 )
 COMPOSER_SCHEMA = "arv2-physical-production-evidence-composer-candidate-v1"
 COMPOSITION_TERMINAL_SCHEMA = "arv2-production-evidence-composition-terminal-v1"
+SECTION72_FIRM_ADMISSION_SCHEMA = (
+    "arv2-section72-owner-waived-firm-admission-v1"
+)
+SECTION72_OWNER_WAIVER_SCOPE = C2_SECTION72_OWNER_WAIVER_SCOPE
 
 MAX_FIRM_AVAILABILITY_BYTES = 64 * 1024 * 1024
 MAX_FIRM_AVAILABILITY_REVIEW_BYTES = 1024 * 1024
@@ -181,6 +194,531 @@ class ProductionEvidenceComposerError(ValueError):
 
 class ProductionEvidenceComposerCapacityRefusal(ProductionEvidenceComposerError):
     """A fixed host capacity ceiling was exceeded without truncation."""
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class OwnerWaivedFirmMapping:
+    """One exact proposal mapping admitted under the bounded owner waiver."""
+
+    provider_firm_id: str
+    firm_name: str
+    raw_label: str
+    ordered_rank: int
+    scale_size: int
+    scope: str
+    valid_from: str
+    valid_to: str | None
+    mapping_role: str
+    source_evidence_id: str
+    source_evidence_sha256: str
+    proxy_kind: str
+    proxy_open_at: str
+    mapping_sha256: str
+
+    @property
+    def normalized_score(self) -> Fraction:
+        return Fraction(
+            2 * (self.ordered_rank - 1) - (self.scale_size - 1),
+            self.scale_size - 1,
+        )
+
+    def semantic_record(self) -> dict[str, object]:
+        return {
+            "provider_firm_id": self.provider_firm_id,
+            "firm_name": self.firm_name,
+            "raw_label": self.raw_label,
+            "ordered_rank": self.ordered_rank,
+            "scale_size": self.scale_size,
+            "scope": self.scope,
+            "valid_from": self.valid_from,
+            "valid_to": self.valid_to,
+            "mapping_role": self.mapping_role,
+            "source_evidence_id": self.source_evidence_id,
+            "source_evidence_sha256": self.source_evidence_sha256,
+            "proxy_kind": self.proxy_kind,
+            "proxy_open_at": self.proxy_open_at,
+        }
+
+    def to_record(self) -> dict[str, object]:
+        return {**self.semantic_record(), "mapping_sha256": self.mapping_sha256}
+
+
+@dataclasses.dataclass(frozen=True, slots=True, weakref_slot=True, init=False)
+class OwnerWaivedAcceptedRiskFirmAdmission:
+    """Non-registry admission candidate for the exact section-72 waiver.
+
+    This object deliberately does not assert independent review or true
+    historical availability.  A later owner-signed physical acquisition
+    receipt must bind it before a formal session index can be admitted.
+    """
+
+    schema: str
+    admission_id: str
+    admission_sha256: str
+    owner_decision: FirmOntologyOwnerDecisionArtifact = dataclasses.field(
+        repr=False
+    )
+    review_packet: PhysicalFirmOntologyReviewPacket = dataclasses.field(repr=False)
+    review_packet_id: str
+    review_packet_sha256: str
+    owner_decision_id: str
+    owner_decision_sha256: str
+    owner_decision_payload_sha256: str
+    refusal_ledger_id: str
+    refusal_ledger_sha256: str
+    refusal_ledger_payload_sha256: str
+    mappings: tuple[OwnerWaivedFirmMapping, ...]
+    refused_provider_firm_ids: tuple[str, ...]
+    mapping_projection_sha256: str
+    refusal_projection_sha256: str
+    accepted_firm_count: int
+    refused_firm_count: int
+    mapping_count: int
+    owner_waiver_scope: str
+    deterministic_defaults_only: bool
+    named_refusals_excluded: bool
+    conservative_availability_proxy_only: bool
+    owner_signature_required_downstream: bool
+    independently_reviewed: bool
+    historical_availability_claimed: bool
+    normal_registry_populated: bool
+    production_authority: bool
+
+    def to_record(self) -> dict[str, object]:
+        return _owner_waived_admission_record(self)
+
+
+_OWNER_WAIVED_FIRM_ADMISSIONS: dict[
+    int,
+    tuple[
+        weakref.ReferenceType[OwnerWaivedAcceptedRiskFirmAdmission],
+        bytes,
+        tuple[object, ...],
+        weakref.ReferenceType[FirmOntologyOwnerDecisionArtifact],
+        int,
+    ],
+] = {}
+_OWNER_WAIVED_FIRM_LOCK = threading.RLock()
+
+
+def _forget_owner_waived_firm_admission(identity: int, reference: object) -> None:
+    with _OWNER_WAIVED_FIRM_LOCK:
+        current = _OWNER_WAIVED_FIRM_ADMISSIONS.get(identity)
+        if current is not None and current[0] is reference:
+            _OWNER_WAIVED_FIRM_ADMISSIONS.pop(identity, None)
+
+
+def _owner_waived_mapping(
+    *,
+    decision_row: Mapping[str, object],
+    proposal_mapping: Mapping[str, object],
+    proxy: Mapping[str, object],
+    mapping_role: str,
+) -> OwnerWaivedFirmMapping:
+    defaults = decision_row.get("accepted_proposal_defaults")
+    if type(defaults) is not dict:
+        raise ProductionEvidenceComposerError(
+            "owner-waived accepted firm lost authenticated proposal defaults"
+        )
+    evidence = proposal_mapping.get("mapping_evidence")
+    if type(evidence) is not dict:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm mapping lost authenticated proposal evidence"
+        )
+    if (
+        proxy.get("mapping_role") != mapping_role
+        or proxy.get("provider_firm_id") != decision_row.get("provider_firm_id")
+        or proxy.get("raw_label") != proposal_mapping.get("raw_label")
+        or proxy.get("proposed_ordered_rank")
+        != proposal_mapping.get("proposed_ordered_rank")
+        or proxy.get("source_evidence_id") != evidence.get("evidence_id")
+        or proxy.get("source_evidence_sha256") != evidence.get("evidence_sha256")
+        or proxy.get("proxy_kind") != _firm_decision.AVAILABILITY_PROXY_KIND
+        or proxy.get("historical_availability_claimed") is not False
+    ):
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm mapping proxy lost exact proposal lineage"
+        )
+    values: dict[str, object] = {
+        "provider_firm_id": decision_row.get("provider_firm_id"),
+        "firm_name": defaults.get("canonical_firm_name"),
+        "raw_label": proposal_mapping.get("raw_label"),
+        "ordered_rank": proposal_mapping.get("proposed_ordered_rank"),
+        "scale_size": proposal_mapping.get("proposed_scale_size"),
+        "scope": defaults.get("scope"),
+        "valid_from": proposal_mapping.get("valid_from"),
+        "valid_to": proposal_mapping.get("valid_to"),
+        "mapping_role": mapping_role,
+        "source_evidence_id": evidence.get("evidence_id"),
+        "source_evidence_sha256": evidence.get("evidence_sha256"),
+        "proxy_kind": proxy.get("proxy_kind"),
+        "proxy_open_at": proxy.get("proxy_open_at"),
+    }
+    if (
+        any(type(values[name]) is not str or not values[name] for name in (
+            "provider_firm_id", "firm_name", "raw_label", "scope",
+            "valid_from", "mapping_role", "source_evidence_id",
+            "source_evidence_sha256", "proxy_kind", "proxy_open_at",
+        ))
+        or type(values["ordered_rank"]) is not int
+        or type(values["scale_size"]) is not int
+        or not 1 <= values["ordered_rank"] <= values["scale_size"]
+        or values["scale_size"] < 2
+        or values["valid_to"] is not None
+        or mapping_role not in {"ordered_scale", "alias_mapping"}
+    ):
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm mapping scalar contract changed"
+        )
+    parse_date(values["valid_from"], "owner-waived firm valid_from")
+    try:
+        proxy_timestamp = datetime.fromisoformat(values["proxy_open_at"])
+    except ValueError as exc:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm proxy timestamp changed"
+        ) from exc
+    if (
+        proxy_timestamp.tzinfo is None
+        or proxy_timestamp.utcoffset() != timedelta(0)
+        or proxy_timestamp.isoformat() != values["proxy_open_at"]
+    ):
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm proxy timestamp changed"
+        )
+    require_identifier(values["provider_firm_id"], "owner-waived provider firm")
+    require_identifier(values["source_evidence_id"], "owner-waived evidence")
+    require_sha256(values["source_evidence_sha256"], "owner-waived evidence")
+    digest = sha256_bytes(canonical_json_bytes(values))
+    return OwnerWaivedFirmMapping(**values, mapping_sha256=digest)
+
+
+def _owner_waived_admission_material(
+    decision: FirmOntologyOwnerDecisionArtifact,
+) -> tuple[tuple[OwnerWaivedFirmMapping, ...], tuple[str, ...]]:
+    decision = _firm_decision.require_firm_ontology_owner_decision(decision)
+    mappings: list[OwnerWaivedFirmMapping] = []
+    refusals: list[str] = []
+    seen_mapping_keys: set[tuple[str, str]] = set()
+    seen_firms: set[str] = set()
+    rows = tuple(_firm_decision.iter_firm_ontology_owner_decisions(decision))
+    if len(rows) != _firm_decision.EXPECTED_FIRM_COUNT:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission requires exact 74-firm coverage"
+        )
+    for row in rows:
+        if type(row) is not dict:
+            raise ProductionEvidenceComposerError(
+                "owner-waived firm decision row changed type"
+            )
+        firm_id = row.get("provider_firm_id")
+        if type(firm_id) is not str or not firm_id or firm_id in seen_firms:
+            raise ProductionEvidenceComposerError(
+                "owner-waived firm decision coverage overlaps"
+            )
+        seen_firms.add(firm_id)
+        status = row.get("decision_status")
+        if status == "named_refusal":
+            if (
+                row.get("accepted_proposal_defaults") is not None
+                or row.get("availability_proxies") != []
+                or type(row.get("refusal_id")) is not str
+                or type(row.get("refusal_sha256")) is not str
+            ):
+                raise ProductionEvidenceComposerError(
+                    "owner-waived named refusal carried mappings or lost identity"
+                )
+            refusals.append(firm_id)
+            continue
+        if status != "accepted_deterministic_default":
+            raise ProductionEvidenceComposerError(
+                "owner-waived firm decision status changed"
+            )
+        defaults = row.get("accepted_proposal_defaults")
+        proxies = row.get("availability_proxies")
+        if type(defaults) is not dict or type(proxies) is not list:
+            raise ProductionEvidenceComposerError(
+                "owner-waived accepted firm lost mappings or proxies"
+            )
+        proposal_rows: list[tuple[str, Mapping[str, object]]] = []
+        for role, key in (
+            ("ordered_scale", "ordered_scale"),
+            ("alias_mapping", "alias_mappings"),
+        ):
+            values = defaults.get(key)
+            if type(values) is not list:
+                raise ProductionEvidenceComposerError(
+                    "owner-waived accepted firm mapping collection changed type"
+                )
+            if any(type(item) is not dict for item in values):
+                raise ProductionEvidenceComposerError(
+                    "owner-waived accepted firm mapping row changed type"
+                )
+            proposal_rows.extend((role, item) for item in values)
+        if len(proposal_rows) != len(proxies):
+            raise ProductionEvidenceComposerError(
+                "owner-waived accepted firm mapping/proxy census changed"
+            )
+        for (role, proposal_mapping), proxy in zip(
+            proposal_rows, proxies, strict=True
+        ):
+            if type(proxy) is not dict:
+                raise ProductionEvidenceComposerError(
+                    "owner-waived firm availability proxy changed type"
+                )
+            mapping = _owner_waived_mapping(
+                decision_row=row,
+                proposal_mapping=proposal_mapping,
+                proxy=proxy,
+                mapping_role=role,
+            )
+            key = (mapping.provider_firm_id, mapping.raw_label)
+            if key in seen_mapping_keys:
+                raise ProductionEvidenceComposerError(
+                    "owner-waived firm admission repeats a firm-label mapping"
+                )
+            seen_mapping_keys.add(key)
+            mappings.append(mapping)
+    if (
+        len(seen_firms) != _firm_decision.EXPECTED_FIRM_COUNT
+        or len(seen_firms) != decision.accepted_firm_count + decision.refused_firm_count
+        or len(refusals) != decision.refused_firm_count
+        or len(mappings) != decision.availability_proxy_count
+    ):
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission census contradicts its decision"
+        )
+    _firm_decision.require_firm_ontology_owner_decision(decision)
+    return tuple(mappings), tuple(refusals)
+
+
+def _owner_waived_admission_record(
+    value: OwnerWaivedAcceptedRiskFirmAdmission,
+) -> dict[str, object]:
+    return {
+        "schema": value.schema,
+        "owner_decision_id": value.owner_decision_id,
+        "owner_decision_sha256": value.owner_decision_sha256,
+        "owner_decision_payload_sha256": value.owner_decision_payload_sha256,
+        "review_packet_id": value.review_packet_id,
+        "review_packet_sha256": value.review_packet_sha256,
+        "refusal_ledger_id": value.refusal_ledger_id,
+        "refusal_ledger_sha256": value.refusal_ledger_sha256,
+        "refusal_ledger_payload_sha256": value.refusal_ledger_payload_sha256,
+        "mapping_projection_sha256": value.mapping_projection_sha256,
+        "refusal_projection_sha256": value.refusal_projection_sha256,
+        "accepted_firm_count": value.accepted_firm_count,
+        "refused_firm_count": value.refused_firm_count,
+        "mapping_count": value.mapping_count,
+        "owner_waiver_scope": value.owner_waiver_scope,
+        "deterministic_defaults_only": value.deterministic_defaults_only,
+        "named_refusals_excluded": value.named_refusals_excluded,
+        "conservative_availability_proxy_only": (
+            value.conservative_availability_proxy_only
+        ),
+        "owner_signature_required_downstream": (
+            value.owner_signature_required_downstream
+        ),
+        "independently_reviewed": value.independently_reviewed,
+        "historical_availability_claimed": value.historical_availability_claimed,
+        "normal_registry_populated": value.normal_registry_populated,
+        "production_authority": value.production_authority,
+    }
+
+
+def build_section72_owner_waived_firm_admission(
+    *,
+    decision: FirmOntologyOwnerDecisionArtifact,
+    review_packet: PhysicalFirmOntologyReviewPacket,
+) -> OwnerWaivedAcceptedRiskFirmAdmission:
+    """Admit exact clean defaults; retain every exception as a refusal."""
+
+    if type(decision) is not FirmOntologyOwnerDecisionArtifact:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission requires exact owner-decision type"
+        )
+    if type(review_packet) is not PhysicalFirmOntologyReviewPacket:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission requires exact review-packet type"
+        )
+    try:
+        decision = _firm_decision.require_firm_ontology_owner_decision(decision)
+        review_packet = _firm_packet.require_physical_firm_ontology_review_packet(
+            review_packet
+        )
+        mappings, refusals = _owner_waived_admission_material(decision)
+    except (_firm_decision.FirmOntologyOwnerDecisionError, TypeError, ValueError) as exc:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm decision did not authenticate"
+        ) from exc
+    if (
+        decision.packet_id != review_packet.packet_id
+        or decision.packet_sha256 != review_packet.packet_sha256
+    ):
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm decision and review packet do not bind"
+        )
+    value = object.__new__(OwnerWaivedAcceptedRiskFirmAdmission)
+    fields: dict[str, object] = {
+        "schema": SECTION72_FIRM_ADMISSION_SCHEMA,
+        "admission_id": "",
+        "admission_sha256": "",
+        "owner_decision": decision,
+        "review_packet": review_packet,
+        "review_packet_id": review_packet.packet_id,
+        "review_packet_sha256": review_packet.packet_sha256,
+        "owner_decision_id": decision.decision_id,
+        "owner_decision_sha256": decision.decision_sha256,
+        "owner_decision_payload_sha256": decision.decision_payload_sha256,
+        "refusal_ledger_id": decision.refusal_ledger_id,
+        "refusal_ledger_sha256": decision.refusal_ledger_sha256,
+        "refusal_ledger_payload_sha256": decision.refusal_ledger_payload_sha256,
+        "mappings": mappings,
+        "refused_provider_firm_ids": refusals,
+        "mapping_projection_sha256": sha256_bytes(canonical_json_bytes(
+            [item.to_record() for item in mappings]
+        )),
+        "refusal_projection_sha256": sha256_bytes(canonical_json_bytes(
+            list(refusals)
+        )),
+        "accepted_firm_count": decision.accepted_firm_count,
+        "refused_firm_count": decision.refused_firm_count,
+        "mapping_count": len(mappings),
+        "owner_waiver_scope": SECTION72_OWNER_WAIVER_SCOPE,
+        "deterministic_defaults_only": True,
+        "named_refusals_excluded": True,
+        "conservative_availability_proxy_only": True,
+        "owner_signature_required_downstream": True,
+        "independently_reviewed": False,
+        "historical_availability_claimed": False,
+        "normal_registry_populated": False,
+        "production_authority": False,
+    }
+    if set(fields) != {item.name for item in dataclasses.fields(value)}:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission field inventory changed"
+        )
+    for name, item in fields.items():
+        object.__setattr__(value, name, item)
+    digest = sha256_bytes(canonical_json_bytes(_owner_waived_admission_record(value)))
+    object.__setattr__(value, "admission_sha256", digest)
+    object.__setattr__(
+        value, "admission_id", f"arv2-section72-firm-admission-{digest[:24]}"
+    )
+    identity = id(value)
+    reference = weakref.ref(
+        value,
+        lambda ref, key=identity: _forget_owner_waived_firm_admission(key, ref),
+    )
+    with _OWNER_WAIVED_FIRM_LOCK:
+        _OWNER_WAIVED_FIRM_ADMISSIONS[identity] = (
+            reference,
+            canonical_json_bytes(_owner_waived_admission_record(value)),
+            (
+                id(value.owner_decision), id(value.review_packet),
+                id(value.mappings),
+                *(id(item) for item in value.mappings),
+                id(value.refused_provider_firm_ids),
+            ),
+            weakref.ref(decision),
+            os.getpid(),
+        )
+    return require_section72_owner_waived_firm_admission(value)
+
+
+def require_section72_owner_waived_firm_admission(
+    value: OwnerWaivedAcceptedRiskFirmAdmission,
+) -> OwnerWaivedAcceptedRiskFirmAdmission:
+    if type(value) is not OwnerWaivedAcceptedRiskFirmAdmission:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission changed type"
+        )
+    with _OWNER_WAIVED_FIRM_LOCK:
+        authority = _OWNER_WAIVED_FIRM_ADMISSIONS.get(id(value))
+    topology = (
+        id(value.owner_decision), id(value.review_packet),
+        id(value.mappings),
+        *(id(item) for item in value.mappings),
+        id(value.refused_provider_firm_ids),
+    )
+    if (
+        authority is None
+        or authority[0]() is not value
+        or authority[1] != canonical_json_bytes(_owner_waived_admission_record(value))
+        or authority[2] != topology
+        or authority[3]() is not value.owner_decision
+        or authority[4] != os.getpid()
+    ):
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission lost builder authority"
+        )
+    try:
+        decision = _firm_decision.require_firm_ontology_owner_decision(
+            value.owner_decision
+        )
+        packet = _firm_packet.require_physical_firm_ontology_review_packet(
+            value.review_packet
+        )
+        mappings, refusals = _owner_waived_admission_material(decision)
+    except (_firm_decision.FirmOntologyOwnerDecisionError, TypeError, ValueError) as exc:
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission parent did not reauthenticate"
+        ) from exc
+    true_flags = (
+        value.deterministic_defaults_only,
+        value.named_refusals_excluded,
+        value.conservative_availability_proxy_only,
+        value.owner_signature_required_downstream,
+    )
+    false_flags = (
+        value.independently_reviewed,
+        value.historical_availability_claimed,
+        value.normal_registry_populated,
+        value.production_authority,
+    )
+    digest = sha256_bytes(canonical_json_bytes(_owner_waived_admission_record(value)))
+    if (
+        any(type(item) is not bool or item is not True for item in true_flags)
+        or any(type(item) is not bool or item is not False for item in false_flags)
+        or value.schema != SECTION72_FIRM_ADMISSION_SCHEMA
+        or value.owner_waiver_scope != SECTION72_OWNER_WAIVER_SCOPE
+        or value.owner_decision_id != decision.decision_id
+        or value.owner_decision_sha256 != decision.decision_sha256
+        or value.owner_decision_payload_sha256 != decision.decision_payload_sha256
+        or value.review_packet_id != packet.packet_id
+        or value.review_packet_sha256 != packet.packet_sha256
+        or decision.packet_id != packet.packet_id
+        or decision.packet_sha256 != packet.packet_sha256
+        or value.refusal_ledger_id != decision.refusal_ledger_id
+        or value.refusal_ledger_sha256 != decision.refusal_ledger_sha256
+        or value.refusal_ledger_payload_sha256
+        != decision.refusal_ledger_payload_sha256
+        or value.mappings != mappings
+        or value.refused_provider_firm_ids != refusals
+        or value.mapping_projection_sha256 != sha256_bytes(canonical_json_bytes(
+            [item.to_record() for item in mappings]
+        ))
+        or value.refusal_projection_sha256 != sha256_bytes(canonical_json_bytes(
+            list(refusals)
+        ))
+        or value.accepted_firm_count != decision.accepted_firm_count
+        or value.refused_firm_count != decision.refused_firm_count
+        or value.mapping_count != len(mappings)
+        or value.admission_sha256 != digest
+        or value.admission_id
+        != f"arv2-section72-firm-admission-{digest[:24]}"
+    ):
+        raise ProductionEvidenceComposerError(
+            "owner-waived firm admission semantic binding changed"
+        )
+    return value
+
+
+def iter_section72_owner_waived_firm_mappings(
+    value: OwnerWaivedAcceptedRiskFirmAdmission,
+) -> Iterator[OwnerWaivedFirmMapping]:
+    admission = require_section72_owner_waived_firm_admission(value)
+    yield from admission.mappings
+    require_section72_owner_waived_firm_admission(admission)
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -1165,6 +1703,120 @@ def _firm_component(
     ), "accepted"
 
 
+def _owner_waived_firm_component(
+    *,
+    source: AcceptedRiskSourceRow,
+    raw: dict[str, Any] | None,
+    admission: OwnerWaivedAcceptedRiskFirmAdmission,
+) -> tuple[FirmOntologyEvidence | None, str]:
+    """Resolve only exact accepted defaults under the section-72 waiver."""
+
+    admission = require_section72_owner_waived_firm_admission(admission)
+    if raw is None or source.event_date is None or source.provider_event_id is None:
+        return None, "missing"
+    provider_firm_id = raw.get("benzinga_firm_id")
+    firm_name = raw.get("firm")
+    current_label = raw.get("rating")
+    previous_label = raw.get("previous_rating")
+    if any(type(item) is not str or not item for item in (
+        provider_firm_id, firm_name, current_label, previous_label
+    )):
+        return None, "missing"
+    if provider_firm_id in admission.refused_provider_firm_ids:
+        return None, "upstream_named_refusal"
+    when = parse_date(source.event_date, "rating event date")
+    active = tuple(
+        item for item in admission.mappings
+        if item.provider_firm_id == provider_firm_id
+        and parse_date(item.valid_from, "owner-waived firm valid_from") <= when
+        and (
+            item.valid_to is None
+            or when < parse_date(item.valid_to, "owner-waived firm valid_to")
+        )
+    )
+    current = tuple(item for item in active if item.raw_label == current_label)
+    previous = tuple(item for item in active if item.raw_label == previous_label)
+    if len(current) != 1 or len(previous) != 1:
+        return None, "unreviewed_or_unavailable"
+    current_entry, previous_entry = current[0], previous[0]
+    scale_identity = lambda item: (
+        item.provider_firm_id,
+        item.firm_name,
+        item.valid_from,
+        item.valid_to,
+        item.scale_size,
+        item.scope,
+    )
+    if (
+        scale_identity(current_entry) != scale_identity(previous_entry)
+        or current_entry.firm_name != firm_name
+        or provider_firm_id != source.firm_label
+    ):
+        return None, "ambiguous"
+    def canonical_proxy(value: str) -> str:
+        try:
+            parsed = datetime.fromisoformat(value)
+        except ValueError as exc:
+            raise ProductionEvidenceComposerError(
+                "owner-waived firm proxy timestamp changed"
+            ) from exc
+        if parsed.tzinfo is None or parsed.utcoffset() != timedelta(0):
+            raise ProductionEvidenceComposerError(
+                "owner-waived firm proxy timestamp changed"
+            )
+        return parsed.astimezone(timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%S.%fZ"
+        )
+
+    available_at = max(
+        (canonical_proxy(current_entry.proxy_open_at),
+         canonical_proxy(previous_entry.proxy_open_at)),
+        key=lambda value: parse_utc_timestamp(
+            value, "owner-waived firm proxy availability"
+        ),
+    )
+    evidence_hash = sha256_bytes(canonical_json_bytes({
+        "admission_id": admission.admission_id,
+        "admission_sha256": admission.admission_sha256,
+        "owner_decision_id": admission.owner_decision_id,
+        "owner_decision_sha256": admission.owner_decision_sha256,
+        "refusal_ledger_id": admission.refusal_ledger_id,
+        "refusal_ledger_sha256": admission.refusal_ledger_sha256,
+        "current": current_entry.to_record(),
+        "previous": previous_entry.to_record(),
+        "availability_semantics": (
+            "conservative_proxy_not_true_historical_availability"
+        ),
+        "independently_reviewed": False,
+    }))
+    return Section72OwnerWaivedFirmOntologyEvidence(
+        provider_event_id=source.provider_event_id,
+        provider_firm_id=provider_firm_id,
+        raw_firm_name=firm_name,
+        raw_current_label=current_label,
+        raw_previous_label=previous_label,
+        institution_id=provider_firm_id,
+        ontology_id=admission.admission_id,
+        ontology_sha256=admission.admission_sha256,
+        ontology_entry_sha256=evidence_hash,
+        valid_from=current_entry.valid_from,
+        valid_to=current_entry.valid_to,
+        valid_to_available_at=None,
+        available_at=available_at,
+        current_score=current_entry.normalized_score,
+        previous_score=previous_entry.normalized_score,
+        candidate_count=1,
+        ontology_reviewed=False,
+        labels_reviewed=False,
+        admission_mode=SECTION72_OWNER_WAIVED_FIRM_ADMISSION_MODE,
+        owner_waiver_scope=SECTION72_OWNER_WAIVER_SCOPE,
+        independently_reviewed=False,
+        historical_availability_claimed=False,
+        deterministic_default=True,
+        named_refusal=False,
+    ), "accepted"
+
+
 def _max_timestamp(*values: str) -> str:
     return max(values, key=lambda item: parse_utc_timestamp(item, "evidence availability"))
 
@@ -1375,7 +2027,7 @@ def build_physical_production_evidence_candidate(
     evidence_rows: list[ProductionRowEvidence] = []
     composition: list[ProductionEvidenceCompositionTerminal] = []
     with tempfile.TemporaryDirectory(
-        prefix="arv2-production-evidence-", dir="/private/tmp"
+        prefix="arv2-production-evidence-"
     ) as directory_text:
         directory = Path(directory_text)
         os.chmod(directory, 0o700)
@@ -1642,13 +2294,20 @@ __all__ = (
     "FIRM_AVAILABILITY_REVIEW_SCHEMA",
     "FIRM_AVAILABILITY_SCHEMA",
     "FirmOntologyAvailabilityEntry",
+    "OwnerWaivedAcceptedRiskFirmAdmission",
+    "OwnerWaivedFirmMapping",
     "ProductionEvidenceComposerCandidate",
     "ProductionEvidenceComposerCapacityRefusal",
     "ProductionEvidenceComposerError",
     "ProductionEvidenceCompositionTerminal",
     "ReviewedFirmOntologyAvailability",
+    "SECTION72_FIRM_ADMISSION_SCHEMA",
+    "SECTION72_OWNER_WAIVER_SCOPE",
+    "build_section72_owner_waived_firm_admission",
     "build_physical_production_evidence_candidate",
     "load_reviewed_firm_ontology_availability",
+    "iter_section72_owner_waived_firm_mappings",
     "require_physical_production_evidence_candidate",
     "require_reviewed_firm_ontology_availability",
+    "require_section72_owner_waived_firm_admission",
 )

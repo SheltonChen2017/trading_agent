@@ -22,6 +22,7 @@ import os
 import secrets
 import sqlite3
 import stat
+import sys
 import threading
 import weakref
 from collections import Counter
@@ -160,6 +161,96 @@ MAX_SEMANTIC_ROW_BYTES = 2 * 1024 * 1024
 IO_CHUNK_BYTES = 1024 * 1024
 
 _ROLE_ORDER = tuple(MassiveSourceRole)
+_RELOAD_MANIFEST_KEYS = (
+    "accepted_risk",
+    "archive_id",
+    "archive_sha256",
+    "capabilities",
+    "capture_completed_at",
+    "capture_id",
+    "capture_sha256",
+    "capture_started_at",
+    "capture_transport",
+    "censored_included_count",
+    "current_included_count",
+    "disagreement_count",
+    "maximum_semantic_page_byte_count",
+    "maximum_source_page_byte_count",
+    "page_limit",
+    "pair_artifact",
+    "physical_capture_id",
+    "physical_capture_sha256",
+    "report",
+    "requested_first_event_date",
+    "requested_last_event_date",
+    "role_row_counts",
+    "schema",
+    "shards",
+    "source_artifact_id",
+    "source_manifest_sha256",
+    "source_page_count",
+    "source_page_root_sha256",
+    "source_row_count",
+    "storage",
+)
+_RELOAD_ROLE_COUNT_KEYS = ("row_count", "source_role")
+_RELOAD_PAIR_ARTIFACT_KEYS = (
+    "artifact_id",
+    "artifact_sha256",
+    "byte_count",
+    "content_sha256",
+)
+_RELOAD_REPORT_KEYS = ("byte_count", "relative_path", "sha256")
+_RELOAD_SHARD_KEYS = (
+    "endpoint_identifier",
+    "next_cursor_sha256",
+    "page_number",
+    "raw_response_sha256",
+    "redacted_query_sha256",
+    "request_cursor_sha256",
+    "response_received_at",
+    "row_count",
+    "semantic_byte_count",
+    "semantic_relative_path",
+    "semantic_sha256",
+    "source_byte_count",
+    "source_relative_path",
+    "source_role",
+    "source_sha256",
+    "terminal_page",
+)
+_RELOAD_STORAGE = (
+    ("full_capture_materialized", False),
+    ("one_source_page_derived_at_a_time", True),
+    ("source_pages_copied_before_derivation", True),
+)
+_RELOAD_ACCEPTED_RISK = (
+    ("pristine_point_in_time", False),
+    ("views_share_one_capture", True),
+)
+_RELOAD_CAPABILITIES = tuple(
+    (name, False)
+    for name in (
+        "credential_access",
+        "deployment",
+        "orders",
+        "outcome_access",
+        "provider_access",
+        "quantconnect_access",
+        "result_access",
+        "trading",
+    )
+)
+_PINNED_RELOAD_CONTRACT = (
+    _RELOAD_MANIFEST_KEYS,
+    _RELOAD_ROLE_COUNT_KEYS,
+    _RELOAD_PAIR_ARTIFACT_KEYS,
+    _RELOAD_REPORT_KEYS,
+    _RELOAD_SHARD_KEYS,
+    _RELOAD_STORAGE,
+    _RELOAD_ACCEPTED_RISK,
+    _RELOAD_CAPABILITIES,
+)
 
 
 class PhysicalAcceptedRiskArchiveError(ValueError):
@@ -263,6 +354,17 @@ def _require_dependency_bindings() -> None:
             or PAIR_ARTIFACT_DOMAIN is not _PINNED_PAIR_ARTIFACT_DOMAIN
             or current_scalars != _PINNED_C1_SCALARS
             or _ROLE_ORDER != tuple(_PINNED_SOURCE_ROLE_TYPE)
+            or (
+                _RELOAD_MANIFEST_KEYS,
+                _RELOAD_ROLE_COUNT_KEYS,
+                _RELOAD_PAIR_ARTIFACT_KEYS,
+                _RELOAD_REPORT_KEYS,
+                _RELOAD_SHARD_KEYS,
+                _RELOAD_STORAGE,
+                _RELOAD_ACCEPTED_RISK,
+                _RELOAD_CAPABILITIES,
+            )
+            != _PINNED_RELOAD_CONTRACT
         )
     except (AttributeError, KeyError, TypeError, ValueError):
         changed = True
@@ -367,6 +469,15 @@ class _CaptureContext:
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class _PinnedArchiveLeaf:
+    identity: tuple[int, int, int, int, int, int, int, int]
+    maximum_bytes: int
+    expected_byte_count: int
+    expected_sha256: str
+    name: str
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class _CopiedPage:
     source_role: MassiveSourceRole
     page_number: int
@@ -402,6 +513,7 @@ _AUTHORITIES: dict[
         tuple[object, ...],
         tuple[object, ...],
         tuple[tuple[int, int], tuple[int, int], tuple[int, int]],
+        int,
     ],
 ] = {}
 _AUTHORITY_LOCK = threading.RLock()
@@ -1978,6 +2090,7 @@ def _build_with_capture_visitor(
                     _directory_identity(os.fstat(source_fd)),
                     _directory_identity(os.fstat(rows_fd)),
                 ),
+                os.getpid(),
             )
         authenticated = require_physical_accepted_risk_archive(value)
         _require_dependency_bindings()
@@ -2076,6 +2189,67 @@ def _regular_file_identity(
         metadata.st_mtime_ns,
         metadata.st_ctime_ns,
     )
+
+
+def _archive_leaf_identity(
+    metadata: os.stat_result,
+) -> tuple[int, int, int, int, int, int, int, int]:
+    """Return every cross-read metadata field retained for archive leaves."""
+
+    return (
+        metadata.st_dev,
+        metadata.st_ino,
+        metadata.st_size,
+        metadata.st_mtime_ns,
+        metadata.st_ctime_ns,
+        stat.S_IMODE(metadata.st_mode),
+        metadata.st_uid,
+        metadata.st_nlink,
+    )
+
+
+def _observe_archive_leaf(
+    parent_fd: int,
+    filename: str,
+    *,
+    maximum_bytes: int,
+    name: str,
+) -> tuple[int, int, int, int, int, int, int, int]:
+    """Capture one stable descriptor/path identity."""
+
+    descriptor, _metadata = _open_private_regular_at(
+        parent_fd,
+        filename,
+        maximum_bytes=maximum_bytes,
+        name=name,
+    )
+    try:
+        for _attempt in range(4):
+            before = os.fstat(descriptor)
+            after = os.fstat(descriptor)
+            named = os.stat(filename, dir_fd=parent_fd, follow_symlinks=False)
+            identities = {
+                _archive_leaf_identity(before),
+                _archive_leaf_identity(after),
+                _archive_leaf_identity(named),
+            }
+            if len(identities) == 1:
+                return identities.pop()
+    except OSError as exc:
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk archive named leaf identity changed"
+        ) from exc
+    finally:
+        os.close(descriptor)
+    raise PhysicalAcceptedRiskArchiveError(
+        "accepted-risk archive named leaf identity changed"
+    )
+
+
+def _without_archive_leaf_ctime(
+    identity: tuple[int, int, int, int, int, int, int, int],
+) -> tuple[int, int, int, int, int, int, int]:
+    return (*identity[:4], *identity[5:])
 
 
 def _require_safe_child_name(name: str, label: str) -> None:
@@ -2833,25 +3007,70 @@ def _iter_verified_jsonl_fragments_at(
             )
     except OSError as exc:
         raise PhysicalAcceptedRiskArchiveError(f"{name} could not be read") from exc
-    if (
-        count != before.st_size
-        or count != expected_byte_count
-        or rows != expected_row_count
-        or digest.hexdigest() != expected_sha256
-        or len(
-            {
-                _regular_file_identity(before),
-                _regular_file_identity(after),
-                _regular_file_identity(named),
-            }
-        )
-        != 1
-        or not stat.S_ISREG(named.st_mode)
-        or stat.S_IMODE(named.st_mode) != 0o600
-        or named.st_nlink != 1
-    ):
+    if count != before.st_size:
         raise PhysicalAcceptedRiskArchiveError(
-            f"{name} row count, byte count, hash, or identity changed"
+            f"{name} streamed byte count changed from opened size"
+        )
+    if count != expected_byte_count:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} streamed byte count does not match expected byte count"
+        )
+    if rows != expected_row_count:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} row count does not match expected row count"
+        )
+    if digest.hexdigest() != expected_sha256:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} content SHA-256 does not match expected SHA-256"
+        )
+    if not stat.S_ISREG(after.st_mode):
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} exhausted descriptor is not a regular file"
+        )
+    if not stat.S_ISREG(named.st_mode):
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} named entry is not a regular file"
+        )
+    if stat.S_IMODE(after.st_mode) != 0o600:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} exhausted descriptor mode is not 0600"
+        )
+    if stat.S_IMODE(named.st_mode) != 0o600:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} named entry mode is not 0600"
+        )
+    if after.st_nlink != 1:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} exhausted descriptor link count is not one"
+        )
+    if named.st_nlink != 1:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} named entry link count is not one"
+        )
+    if hasattr(os, "getuid") and named.st_uid != os.getuid():
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} named entry is not owner-held"
+        )
+    opened_identity = _regular_file_identity(before)
+    after_identity = _regular_file_identity(after)
+    named_identity = _regular_file_identity(named)
+    opened_ctime_only = (
+        sys.platform == "darwin"
+        and opened_identity[:4] == after_identity[:4]
+        and opened_identity[4] != after_identity[4]
+    )
+    if opened_identity != after_identity and not opened_ctime_only:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} opened descriptor identity changed during iteration"
+        )
+    named_ctime_only = (
+        sys.platform == "darwin"
+        and after_identity[:4] == named_identity[:4]
+        and after_identity[4] != named_identity[4]
+    )
+    if after_identity != named_identity and not named_ctime_only:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} named entry identity changed during iteration"
         )
 
 
@@ -3414,13 +3633,381 @@ def _archive_seed_from_value(
     )
 
 
+def _reload_exact_object(
+    value: object,
+    keys: tuple[str, ...],
+    name: str,
+) -> dict[str, Any]:
+    if type(value) is not dict or tuple(sorted(value)) != keys:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} has unknown, missing, or non-string keys"
+        )
+    return value
+
+
+def _reload_exact_flags(
+    value: object,
+    expected: tuple[tuple[str, bool], ...],
+    name: str,
+) -> dict[str, Any]:
+    raw = _reload_exact_object(value, tuple(key for key, _ in expected), name)
+    if any(
+        type(raw[key]) is not bool or raw[key] is not item
+        for key, item in expected
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} changed type or immutable value"
+        )
+    return raw
+
+
+def _strict_reload_json_object(payload: bytes, name: str) -> dict[str, Any]:
+    if type(payload) is not bytes or not 0 < len(payload) <= MAX_ARCHIVE_MANIFEST_BYTES:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} is not bounded exact bytes"
+        )
+    try:
+        value = strict_json_loads(decode_utf8(payload, name), name)
+        canonical = canonical_json_bytes(value)
+    except (RecursionError, TypeError, UnicodeError, ValueError) as exc:
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} is not strict UTF-8 JSON"
+        ) from exc
+    if type(value) is not dict or canonical != payload:
+        raise PhysicalAcceptedRiskArchiveError(f"{name} is not canonical JSON")
+    return value
+
+
+def _archive_from_reload_manifest(
+    *,
+    manifest_bytes: bytes,
+    archive_path: Path,
+    source_artifact_path: Path,
+) -> PhysicalAcceptedRiskArchive:
+    raw = _reload_exact_object(
+        _strict_reload_json_object(
+            manifest_bytes, "accepted-risk reload manifest"
+        ),
+        _RELOAD_MANIFEST_KEYS,
+        "accepted-risk reload manifest",
+    )
+    string_names = (
+        "archive_id",
+        "archive_sha256",
+        "capture_completed_at",
+        "capture_id",
+        "capture_sha256",
+        "capture_started_at",
+        "capture_transport",
+        "physical_capture_id",
+        "physical_capture_sha256",
+        "requested_first_event_date",
+        "requested_last_event_date",
+        "schema",
+        "source_artifact_id",
+        "source_manifest_sha256",
+        "source_page_root_sha256",
+    )
+    integer_names = (
+        "censored_included_count",
+        "current_included_count",
+        "disagreement_count",
+        "maximum_semantic_page_byte_count",
+        "maximum_source_page_byte_count",
+        "page_limit",
+        "source_page_count",
+        "source_row_count",
+    )
+    if any(type(raw[name]) is not str for name in string_names):
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload manifest scalar changed type"
+        )
+    if any(type(raw[name]) is not int for name in integer_names):
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload manifest count changed type"
+        )
+    if archive_path.name != raw["archive_id"]:
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload archive path does not bind the manifest"
+        )
+    if source_artifact_path.name != raw["source_artifact_id"]:
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload source path does not bind the manifest"
+        )
+    if type(raw["role_row_counts"]) is not list:
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload role census changed type"
+        )
+    role_counts: list[tuple[MassiveSourceRole, int]] = []
+    for item in raw["role_row_counts"]:
+        entry = _reload_exact_object(
+            item,
+            _RELOAD_ROLE_COUNT_KEYS,
+            "accepted-risk reload role census entry",
+        )
+        if (
+            type(entry["source_role"]) is not str
+            or type(entry["row_count"]) is not int
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload role census entry changed type"
+            )
+        try:
+            role = MassiveSourceRole(entry["source_role"])
+        except ValueError as exc:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload role census has an unknown role"
+            ) from exc
+        role_counts.append((role, entry["row_count"]))
+
+    artifact_raw = _reload_exact_object(
+        raw["pair_artifact"],
+        _RELOAD_PAIR_ARTIFACT_KEYS,
+        "accepted-risk reload pair artifact",
+    )
+    if (
+        type(artifact_raw["artifact_id"]) is not str
+        or type(artifact_raw["content_sha256"]) is not str
+        or type(artifact_raw["artifact_sha256"]) is not str
+        or type(artifact_raw["byte_count"]) is not int
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload pair artifact changed type"
+        )
+    try:
+        pair_artifact = ArtifactBinding(
+            artifact_id=artifact_raw["artifact_id"],
+            content_sha256=artifact_raw["content_sha256"],
+            artifact_sha256=artifact_raw["artifact_sha256"],
+            byte_count=artifact_raw["byte_count"],
+        )
+    except (TypeError, ValueError) as exc:
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload pair artifact is invalid"
+        ) from exc
+
+    report = _reload_exact_object(
+        raw["report"], _RELOAD_REPORT_KEYS, "accepted-risk reload report"
+    )
+    if (
+        type(report["relative_path"]) is not str
+        or type(report["sha256"]) is not str
+        or type(report["byte_count"]) is not int
+        or report["relative_path"] != REPORT_FILENAME
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload report changed type or path"
+        )
+
+    if type(raw["shards"]) is not list:
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload shard inventory changed type"
+        )
+    shards: list[AcceptedRiskShardDescriptor] = []
+    shard_string_names = (
+        "endpoint_identifier",
+        "raw_response_sha256",
+        "redacted_query_sha256",
+        "response_received_at",
+        "semantic_relative_path",
+        "semantic_sha256",
+        "source_relative_path",
+        "source_sha256",
+        "source_role",
+    )
+    shard_integer_names = (
+        "page_number",
+        "row_count",
+        "semantic_byte_count",
+        "source_byte_count",
+    )
+    for item in raw["shards"]:
+        entry = _reload_exact_object(
+            item,
+            _RELOAD_SHARD_KEYS,
+            "accepted-risk reload shard entry",
+        )
+        if any(type(entry[name]) is not str for name in shard_string_names):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload shard scalar changed type"
+            )
+        if any(type(entry[name]) is not int for name in shard_integer_names):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload shard count changed type"
+            )
+        if type(entry["terminal_page"]) is not bool or any(
+            type(entry[name]) not in (str, type(None))
+            for name in ("request_cursor_sha256", "next_cursor_sha256")
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload shard nullable field changed type"
+            )
+        try:
+            role = MassiveSourceRole(entry["source_role"])
+        except ValueError as exc:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload shard has an unknown role"
+            ) from exc
+        shards.append(
+            AcceptedRiskShardDescriptor(
+                source_role=role,
+                page_number=entry["page_number"],
+                source_relative_path=entry["source_relative_path"],
+                source_byte_count=entry["source_byte_count"],
+                source_sha256=entry["source_sha256"],
+                semantic_relative_path=entry["semantic_relative_path"],
+                semantic_byte_count=entry["semantic_byte_count"],
+                semantic_sha256=entry["semantic_sha256"],
+                row_count=entry["row_count"],
+                endpoint_identifier=entry["endpoint_identifier"],
+                redacted_query_sha256=entry["redacted_query_sha256"],
+                request_cursor_sha256=entry["request_cursor_sha256"],
+                next_cursor_sha256=entry["next_cursor_sha256"],
+                terminal_page=entry["terminal_page"],
+                response_received_at=entry["response_received_at"],
+                raw_response_sha256=entry["raw_response_sha256"],
+            )
+        )
+
+    storage = _reload_exact_flags(
+        raw["storage"], _RELOAD_STORAGE, "accepted-risk reload storage"
+    )
+    accepted_risk = _reload_exact_flags(
+        raw["accepted_risk"],
+        _RELOAD_ACCEPTED_RISK,
+        "accepted-risk reload risk flags",
+    )
+    capabilities = _reload_exact_flags(
+        raw["capabilities"],
+        _RELOAD_CAPABILITIES,
+        "accepted-risk reload capabilities",
+    )
+    value = object.__new__(PhysicalAcceptedRiskArchive)
+    values: dict[str, object] = {
+        "schema": raw["schema"],
+        "archive_id": raw["archive_id"],
+        "archive_sha256": raw["archive_sha256"],
+        "archive_path": archive_path,
+        "source_artifact_path": source_artifact_path,
+        "source_artifact_id": raw["source_artifact_id"],
+        "source_manifest_sha256": raw["source_manifest_sha256"],
+        "capture_transport": raw["capture_transport"],
+        "physical_capture_id": raw["physical_capture_id"],
+        "physical_capture_sha256": raw["physical_capture_sha256"],
+        "capture_started_at": raw["capture_started_at"],
+        "capture_completed_at": raw["capture_completed_at"],
+        "capture_id": raw["capture_id"],
+        "capture_sha256": raw["capture_sha256"],
+        "requested_first_event_date": raw["requested_first_event_date"],
+        "requested_last_event_date": raw["requested_last_event_date"],
+        "page_limit": raw["page_limit"],
+        "source_page_root_sha256": raw["source_page_root_sha256"],
+        "source_page_count": raw["source_page_count"],
+        "source_row_count": raw["source_row_count"],
+        "role_row_counts": tuple(role_counts),
+        "pair_id": pair_artifact.artifact_id,
+        "pair_sha256": pair_artifact.content_sha256,
+        "pair_artifact": pair_artifact,
+        "report_sha256": report["sha256"],
+        "report_byte_count": report["byte_count"],
+        "current_included_count": raw["current_included_count"],
+        "censored_included_count": raw["censored_included_count"],
+        "disagreement_count": raw["disagreement_count"],
+        "shards": tuple(shards),
+        "maximum_source_page_byte_count": raw[
+            "maximum_source_page_byte_count"
+        ],
+        "maximum_semantic_page_byte_count": raw[
+            "maximum_semantic_page_byte_count"
+        ],
+        "full_capture_materialized": storage["full_capture_materialized"],
+        "views_share_one_capture": accepted_risk["views_share_one_capture"],
+        "pristine_point_in_time": accepted_risk["pristine_point_in_time"],
+        "provider_access": capabilities["provider_access"],
+        "credential_access": capabilities["credential_access"],
+        "quantconnect_access": capabilities["quantconnect_access"],
+        "outcome_access": capabilities["outcome_access"],
+        "result_access": capabilities["result_access"],
+        "deployment": capabilities["deployment"],
+        "orders": capabilities["orders"],
+        "trading": capabilities["trading"],
+    }
+    if set(values) != {field.name for field in dataclasses.fields(value)}:
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload field inventory changed"
+        )
+    for name, item in values.items():
+        object.__setattr__(value, name, item)
+    _preflight_archive_shape(value)
+    return value
+
+
+def _pin_reload_source_manifest_leaves(
+    source_fd: int,
+) -> dict[str, tuple[int, int, int, int, int]]:
+    identities: dict[str, tuple[int, int, int, int, int]] = {}
+    for filename, maximum, name in (
+        (ARCHIVE_MANIFEST, MAX_ARCHIVE_MANIFEST_BYTES, "source capture manifest"),
+        (ARCHIVE_MANIFEST_DIGEST, 65, "source capture manifest digest"),
+    ):
+        descriptor, metadata = _open_private_regular_at(
+            source_fd,
+            filename,
+            maximum_bytes=maximum,
+            name=name,
+        )
+        try:
+            identities[filename] = _regular_file_identity(metadata)
+        finally:
+            os.close(descriptor)
+    return identities
+
+
+def _require_reload_source_manifest_leaves(
+    source_fd: int,
+    expected: Mapping[str, tuple[int, int, int, int, int]],
+) -> None:
+    for filename, identity in expected.items():
+        try:
+            metadata = os.stat(filename, dir_fd=source_fd, follow_symlinks=False)
+        except OSError as exc:
+            raise PhysicalAcceptedRiskArchiveError(
+                "source capture manifest identity changed"
+            ) from exc
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or stat.S_IMODE(metadata.st_mode) != 0o600
+            or metadata.st_nlink != 1
+            or _regular_file_identity(metadata) != identity
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "source capture manifest identity changed"
+            )
+
+
+def _require_exact_reload_path(value: object, name: str) -> Path:
+    if (
+        type(value) is not _PATH_TYPE
+        or not value.is_absolute()
+        or ".." in value.parts
+        or value != Path(os.path.abspath(value))
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            f"{name} must be an exact absolute Path"
+        )
+    return value
+
+
 def _require_inventory(
     root_fd: int,
     source_fd: int,
     rows_fd: int,
     value: PhysicalAcceptedRiskArchive,
 ) -> None:
-    expected = {_descriptor_filename(item.source_role, item.page_number) for item in value.shards}
+    expected = {
+        _descriptor_filename(item.source_role, item.page_number)
+        for item in value.shards
+    }
     try:
         root_names = set(os.listdir(root_fd))
         source_names = set(os.listdir(source_fd))
@@ -3451,8 +4038,18 @@ def _pin_archive_leaf_identities(
     source_fd: int,
     rows_fd: int,
     value: PhysicalAcceptedRiskArchive,
-) -> dict[tuple[str, str], tuple[int, int, int, int, int]]:
-    identities: dict[tuple[str, str], tuple[int, int, int, int, int]] = {}
+) -> dict[tuple[str, str], _PinnedArchiveLeaf]:
+    identities: dict[tuple[str, str], _PinnedArchiveLeaf] = {}
+    expected_manifest = canonical_json_bytes(
+        {
+            **_archive_seed_from_value(value),
+            "archive_id": value.archive_id,
+            "archive_sha256": value.archive_sha256,
+        }
+    )
+    expected_manifest_digest = (
+        sha256_bytes(expected_manifest) + "\n"
+    ).encode("ascii")
 
     def pin(
         area: str,
@@ -3460,17 +4057,22 @@ def _pin_archive_leaf_identities(
         filename: str,
         maximum_bytes: int,
         name: str,
+        expected_byte_count: int,
+        expected_sha256: str,
     ) -> None:
-        descriptor, metadata = _open_private_regular_at(
+        identity = _observe_archive_leaf(
             parent_fd,
             filename,
             maximum_bytes=maximum_bytes,
             name=name,
         )
-        try:
-            identities[(area, filename)] = _regular_file_identity(metadata)
-        finally:
-            os.close(descriptor)
+        identities[(area, filename)] = _PinnedArchiveLeaf(
+            identity=identity,
+            maximum_bytes=maximum_bytes,
+            expected_byte_count=expected_byte_count,
+            expected_sha256=expected_sha256,
+            name=name,
+        )
 
     pin(
         "root",
@@ -3478,6 +4080,8 @@ def _pin_archive_leaf_identities(
         ARCHIVE_MANIFEST,
         MAX_ARCHIVE_MANIFEST_BYTES,
         "accepted-risk archive manifest",
+        len(expected_manifest),
+        sha256_bytes(expected_manifest),
     )
     pin(
         "root",
@@ -3485,6 +4089,8 @@ def _pin_archive_leaf_identities(
         ARCHIVE_MANIFEST_DIGEST,
         65,
         "accepted-risk archive manifest digest",
+        len(expected_manifest_digest),
+        sha256_bytes(expected_manifest_digest),
     )
     pin(
         "root",
@@ -3492,6 +4098,8 @@ def _pin_archive_leaf_identities(
         REPORT_FILENAME,
         MAX_REPORT_BYTES,
         "accepted-risk report",
+        value.report_byte_count,
+        value.report_sha256,
     )
     for descriptor in value.shards:
         filename = _descriptor_filename(
@@ -3503,6 +4111,8 @@ def _pin_archive_leaf_identities(
             filename,
             _PINNED_MAX_CAPTURE_PAGE_BYTES,
             "accepted-risk source shard",
+            descriptor.source_byte_count,
+            descriptor.source_sha256,
         )
         pin(
             "rows",
@@ -3510,6 +4120,8 @@ def _pin_archive_leaf_identities(
             filename,
             MAX_DERIVED_SHARD_BYTES,
             "accepted-risk semantic shard",
+            descriptor.semantic_byte_count,
+            descriptor.semantic_sha256,
         )
     return identities
 
@@ -3518,29 +4130,112 @@ def _require_archive_leaf_identities(
     root_fd: int,
     source_fd: int,
     rows_fd: int,
-    expected: Mapping[tuple[str, str], tuple[int, int, int, int, int]],
+    expected: dict[tuple[str, str], _PinnedArchiveLeaf],
 ) -> None:
+    if type(expected) is not dict or any(
+        type(key) is not tuple
+        or len(key) != 2
+        or type(pin) is not _PinnedArchiveLeaf
+        for key, pin in expected.items()
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk archive leaf authority changed type"
+        )
     parents = {"root": root_fd, "source": source_fd, "rows": rows_fd}
-    for (area, filename), identity in expected.items():
+    for (area, filename), pin in tuple(expected.items()):
         try:
-            metadata = os.stat(
+            observed_identity = _observe_archive_leaf(
+                parents[area],
                 filename,
-                dir_fd=parents[area],
-                follow_symlinks=False,
+                maximum_bytes=pin.maximum_bytes,
+                name=pin.name,
             )
-        except (KeyError, OSError) as exc:
+        except (KeyError, OSError, PhysicalAcceptedRiskArchiveError) as exc:
             raise PhysicalAcceptedRiskArchiveError(
                 "accepted-risk archive named leaf identity changed"
             ) from exc
+        root_manifest_leaf = area == "root" and filename in {
+            ARCHIVE_MANIFEST,
+            ARCHIVE_MANIFEST_DIGEST,
+        }
+        if observed_identity == pin.identity:
+            continue
+        non_ctime_changed = (
+            _without_archive_leaf_ctime(observed_identity)
+            != _without_archive_leaf_ctime(pin.identity)
+        )
+        manifest_ctime_only = (
+            root_manifest_leaf
+            and not non_ctime_changed
+            and observed_identity[4] != pin.identity[4]
+        )
+        darwin_ctime_only = (
+            sys.platform == "darwin"
+            and not non_ctime_changed
+            and observed_identity[4] != pin.identity[4]
+        )
+        if not (manifest_ctime_only or darwin_ctime_only):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk archive named leaf identity changed"
+            )
+        try:
+            _hash_private_regular_at(
+                parents[area],
+                filename,
+                maximum_bytes=pin.maximum_bytes,
+                expected_byte_count=pin.expected_byte_count,
+                expected_sha256=pin.expected_sha256,
+                name=pin.name,
+            )
+        except PhysicalAcceptedRiskArchiveError as exc:
+            if root_manifest_leaf:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "accepted-risk archive manifest does not authenticate"
+                ) from exc
+            raise
+        final_identity = _observe_archive_leaf(
+            parents[area],
+            filename,
+            maximum_bytes=pin.maximum_bytes,
+            name=pin.name,
+        )
         if (
-            not stat.S_ISREG(metadata.st_mode)
-            or stat.S_IMODE(metadata.st_mode) != 0o600
-            or metadata.st_nlink != 1
-            or _regular_file_identity(metadata) != identity
+            final_identity != observed_identity
         ):
             raise PhysicalAcceptedRiskArchiveError(
                 "accepted-risk archive named leaf identity changed"
             )
+        expected[(area, filename)] = dataclasses.replace(
+            pin,
+            identity=final_identity,
+        )
+
+
+def _require_exact_archive_manifest_bytes(
+    root_fd: int,
+    expected_manifest: bytes,
+) -> None:
+    """Reauthenticate root manifests after allowing macOS-only ctime drift."""
+
+    manifest = _read_private_regular_at(
+        root_fd,
+        ARCHIVE_MANIFEST,
+        maximum_bytes=MAX_ARCHIVE_MANIFEST_BYTES,
+        name="accepted-risk archive manifest",
+    )
+    digest = _read_private_regular_at(
+        root_fd,
+        ARCHIVE_MANIFEST_DIGEST,
+        maximum_bytes=65,
+        name="accepted-risk archive manifest digest",
+    )
+    if (
+        manifest != expected_manifest
+        or digest != (sha256_bytes(expected_manifest) + "\n").encode("ascii")
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk archive manifest does not authenticate"
+        )
 
 
 def _pair_binding_from_archive_fds(
@@ -3594,6 +4289,7 @@ def require_physical_accepted_risk_archive(
         or authority[0]() is not value
         or _archive_topology(value) != authority[2]
         or _archive_fingerprint(value) != authority[1]
+        or authority[4] != os.getpid()
     ):
         raise PhysicalAcceptedRiskArchiveError(
             "accepted-risk archive is not current builder authority"
@@ -3695,6 +4391,7 @@ def require_physical_accepted_risk_archive(
                     rows_fd,
                     leaf_identities,
                 )
+                _require_exact_archive_manifest_bytes(root_fd, expected_manifest)
                 _require_pinned_child_identity(
                     root_fd,
                     SOURCE_DIRECTORY,
@@ -3723,12 +4420,359 @@ def require_physical_accepted_risk_archive(
     return value
 
 
+def _load_physical_accepted_risk_archive(
+    *,
+    archive_path: Path,
+    source_artifact_path: Path,
+    expected_archive_sha256: str,
+    expected_source_manifest_sha256: str,
+    expected_transport: str,
+    require_repository_paths: bool,
+) -> PhysicalAcceptedRiskArchive:
+    """Reauthenticate and mint process-local authority for persisted C1 bytes.
+
+    The reload is deliberately not a derivation.  It reconstructs only the
+    bounded manifest object graph, pins all archive directory and leaf
+    identities, then delegates full source/hash/pair verification to
+    :func:`require_physical_accepted_risk_archive` before returning authority.
+    """
+
+    _require_dependency_bindings()
+    try:
+        require_sha256(
+            expected_archive_sha256,
+            "accepted-risk reload expected archive SHA-256",
+        )
+        require_sha256(
+            expected_source_manifest_sha256,
+            "accepted-risk reload expected source-manifest SHA-256",
+        )
+    except (CanonicalEvidenceError, TypeError, ValueError) as exc:
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload external trust pin is invalid"
+        ) from exc
+    if (
+        type(expected_transport) is not str
+        or expected_transport not in (
+            _PINNED_PRODUCTION_TRANSPORT,
+            _PINNED_TEST_TRANSPORT,
+        )
+        or type(require_repository_paths) is not bool
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload trust policy changed"
+        )
+    archive = _require_exact_reload_path(
+        archive_path, "accepted-risk reload archive path"
+    )
+    source = _require_exact_reload_path(
+        source_artifact_path, "accepted-risk reload source path"
+    )
+    if (
+        archive == source
+        or archive in source.parents
+        or source in archive.parents
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "accepted-risk reload archive and source paths overlap"
+        )
+    if require_repository_paths and (
+        not _within_repository_artifacts(archive, permit_root=False)
+        or not _within_repository_artifacts(source, permit_root=False)
+    ):
+        raise PhysicalAcceptedRiskArchiveError(
+            "production accepted-risk reload paths must remain under artifacts"
+        )
+
+    root_fd: int | None = None
+    archived_source_fd: int | None = None
+    rows_fd: int | None = None
+    capture_fd: int | None = None
+    registered_identity: int | None = None
+    registered_reference: weakref.ReferenceType[PhysicalAcceptedRiskArchive] | None = (
+        None
+    )
+    try:
+        root_fd = _open_private_directory(archive, "accepted-risk reload archive")
+        _require_reopened_directory_identity(
+            archive,
+            root_fd,
+            name="accepted-risk reload archive",
+            private_final=True,
+        )
+        archived_source_fd = _open_private_child_directory(
+            root_fd, SOURCE_DIRECTORY
+        )
+        rows_fd = _open_private_child_directory(root_fd, ROW_DIRECTORY)
+        _require_pinned_child_identity(
+            root_fd,
+            SOURCE_DIRECTORY,
+            archived_source_fd,
+            "accepted-risk reload source directory",
+        )
+        _require_pinned_child_identity(
+            root_fd,
+            ROW_DIRECTORY,
+            rows_fd,
+            "accepted-risk reload row directory",
+        )
+        manifest = _read_private_regular_at(
+            root_fd,
+            ARCHIVE_MANIFEST,
+            maximum_bytes=MAX_ARCHIVE_MANIFEST_BYTES,
+            name="accepted-risk reload manifest",
+        )
+        manifest_digest = _read_private_regular_at(
+            root_fd,
+            ARCHIVE_MANIFEST_DIGEST,
+            maximum_bytes=65,
+            name="accepted-risk reload manifest digest",
+        )
+        if manifest_digest != (sha256_bytes(manifest) + "\n").encode("ascii"):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload manifest digest changed"
+            )
+        value = _archive_from_reload_manifest(
+            manifest_bytes=manifest,
+            archive_path=archive,
+            source_artifact_path=source,
+        )
+        if (
+            value.archive_sha256 != expected_archive_sha256
+            or value.source_manifest_sha256
+            != expected_source_manifest_sha256
+            or value.capture_transport != expected_transport
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload does not match its external trust pin"
+            )
+        seed = _archive_seed_from_value(value)
+        if (
+            sha256_bytes(canonical_json_bytes(seed)) != value.archive_sha256
+            or manifest
+            != canonical_json_bytes(
+                {
+                    **seed,
+                    "archive_id": value.archive_id,
+                    "archive_sha256": value.archive_sha256,
+                }
+            )
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload manifest content root changed"
+            )
+        _require_inventory(root_fd, archived_source_fd, rows_fd, value)
+        archive_leaf_identities = _pin_archive_leaf_identities(
+            root_fd, archived_source_fd, rows_fd, value
+        )
+
+        capture_fd = _open_private_directory(
+            source, "accepted-risk reload source artifact"
+        )
+        _require_reopened_directory_identity(
+            source,
+            capture_fd,
+            name="accepted-risk reload source artifact",
+            private_final=True,
+        )
+        source_leaf_identities = _pin_reload_source_manifest_leaves(capture_fd)
+        source_manifest = _read_private_regular_at(
+            capture_fd,
+            ARCHIVE_MANIFEST,
+            maximum_bytes=MAX_ARCHIVE_MANIFEST_BYTES,
+            name="source capture manifest",
+        )
+        source_manifest_digest = _read_private_regular_at(
+            capture_fd,
+            ARCHIVE_MANIFEST_DIGEST,
+            maximum_bytes=65,
+            name="source capture manifest digest",
+        )
+        source_raw = _strict_reload_json_object(
+            source_manifest, "source capture manifest"
+        )
+        expected_source_role_counts = [
+            {
+                "source_role": role.value,
+                "page_count": sum(
+                    item.source_role is role for item in value.shards
+                ),
+                "row_count": count,
+            }
+            for role, count in value.role_row_counts
+        ]
+        if (
+            sha256_bytes(source_manifest)
+            != expected_source_manifest_sha256
+            or value.source_manifest_sha256
+            != expected_source_manifest_sha256
+            or source_manifest_digest
+            != (expected_source_manifest_sha256 + "\n").encode("ascii")
+            or type(source_raw.get("artifact_id")) is not str
+            or source_raw["artifact_id"] != value.source_artifact_id
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload source manifest does not authenticate"
+            )
+        if (
+            type(source_raw.get("capture_transport")) is not str
+            or source_raw["capture_transport"] != expected_transport
+            or source_raw.get("capture_id") != value.physical_capture_id
+            or source_raw.get("capture_sha256")
+            != value.physical_capture_sha256
+            or source_raw.get("capture_started_at") != value.capture_started_at
+            or source_raw.get("capture_completed_at")
+            != value.capture_completed_at
+            or source_raw.get("requested_first_event_date")
+            != value.requested_first_event_date
+            or source_raw.get("requested_last_event_date")
+            != value.requested_last_event_date
+            or source_raw.get("page_limit") != value.page_limit
+            or source_raw.get("total_page_count") != value.source_page_count
+            or source_raw.get("total_row_count") != value.source_row_count
+            or source_raw.get("role_order")
+            != [role.value for role in _ROLE_ORDER]
+            or source_raw.get("role_counts") != expected_source_role_counts
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk reload source manifest identity is inconsistent"
+            )
+        _require_reload_source_manifest_leaves(
+            capture_fd, source_leaf_identities
+        )
+
+        directory_identities = (
+            _directory_identity(os.fstat(root_fd)),
+            _directory_identity(os.fstat(archived_source_fd)),
+            _directory_identity(os.fstat(rows_fd)),
+        )
+        identity = id(value)
+        registered_identity = identity
+        registered_reference = weakref.ref(
+            value, lambda ref, key=identity: _forget(key, ref)
+        )
+        with _AUTHORITY_LOCK:
+            _AUTHORITIES[identity] = (
+                registered_reference,
+                _archive_fingerprint(value),
+                _archive_topology(value),
+                directory_identities,
+                os.getpid(),
+            )
+        authenticated = require_physical_accepted_risk_archive(value)
+        _require_inventory(root_fd, archived_source_fd, rows_fd, value)
+        _require_archive_leaf_identities(
+            root_fd,
+            archived_source_fd,
+            rows_fd,
+            archive_leaf_identities,
+        )
+        _require_exact_archive_manifest_bytes(root_fd, manifest)
+        _require_pinned_child_identity(
+            root_fd,
+            SOURCE_DIRECTORY,
+            archived_source_fd,
+            "accepted-risk reload source directory",
+        )
+        _require_pinned_child_identity(
+            root_fd,
+            ROW_DIRECTORY,
+            rows_fd,
+            "accepted-risk reload row directory",
+        )
+        _require_reopened_directory_identity(
+            archive,
+            root_fd,
+            name="accepted-risk reload archive",
+            private_final=True,
+        )
+        _require_reload_source_manifest_leaves(
+            capture_fd, source_leaf_identities
+        )
+        _require_reopened_directory_identity(
+            source,
+            capture_fd,
+            name="accepted-risk reload source artifact",
+            private_final=True,
+        )
+        _require_dependency_bindings()
+        return authenticated
+    except BaseException:
+        if registered_identity is not None:
+            with _AUTHORITY_LOCK:
+                current = _AUTHORITIES.get(registered_identity)
+                if (
+                    current is not None
+                    and current[0] is registered_reference
+                ):
+                    _AUTHORITIES.pop(registered_identity, None)
+        raise
+    finally:
+        for descriptor in (
+            capture_fd,
+            rows_fd,
+            archived_source_fd,
+            root_fd,
+        ):
+            if descriptor is not None:
+                try:
+                    os.close(descriptor)
+                except OSError:
+                    pass
+
+
+def load_physical_accepted_risk_archive(
+    *,
+    archive_path: Path,
+    source_artifact_path: Path,
+    expected_archive_sha256: str,
+    expected_source_manifest_sha256: str,
+) -> PhysicalAcceptedRiskArchive:
+    """Load production C1 only under owner/reviewer-supplied external pins."""
+
+    return _load_physical_accepted_risk_archive(
+        archive_path=archive_path,
+        source_artifact_path=source_artifact_path,
+        expected_archive_sha256=expected_archive_sha256,
+        expected_source_manifest_sha256=expected_source_manifest_sha256,
+        expected_transport=_PINNED_PRODUCTION_TRANSPORT,
+        require_repository_paths=True,
+    )
+
+
+def _load_test_fixture_physical_accepted_risk_archive(
+    *,
+    archive_path: Path,
+    source_artifact_path: Path,
+    expected_archive_sha256: str,
+    expected_source_manifest_sha256: str,
+) -> PhysicalAcceptedRiskArchive:
+    """Explicit offline seam; its test transport remains production-ineligible."""
+
+    return _load_physical_accepted_risk_archive(
+        archive_path=archive_path,
+        source_artifact_path=source_artifact_path,
+        expected_archive_sha256=expected_archive_sha256,
+        expected_source_manifest_sha256=expected_source_manifest_sha256,
+        expected_transport=_PINNED_TEST_TRANSPORT,
+        require_repository_paths=False,
+    )
+
+
 def iter_physical_accepted_risk_rows(
     value: PhysicalAcceptedRiskArchive,
 ) -> Iterator[AcceptedRiskSourceRow]:
     """Yield every authenticated C1 row in exact legacy ``pair.rows`` order."""
 
     archive = require_physical_accepted_risk_archive(value)
+    archive_seed = _archive_seed_from_value(archive)
+    expected_manifest = canonical_json_bytes(
+        {
+            **archive_seed,
+            "archive_id": archive.archive_id,
+            "archive_sha256": archive.archive_sha256,
+        }
+    )
     with _AUTHORITY_LOCK:
         physical_authority = _AUTHORITIES.get(id(archive))
     if physical_authority is None or physical_authority[0]() is not archive:
@@ -3919,6 +4963,7 @@ def iter_physical_accepted_risk_rows(
                 _require_archive_leaf_identities(
                     root_fd, source_fd, rows_fd, leaf_identities
                 )
+                _require_exact_archive_manifest_bytes(root_fd, expected_manifest)
                 _require_pinned_child_identity(
                     root_fd,
                     SOURCE_DIRECTORY,
@@ -4015,5 +5060,6 @@ __all__ = [
     "PhysicalAcceptedRiskArchiveError",
     "build_physical_accepted_risk_archive",
     "iter_physical_accepted_risk_rows",
+    "load_physical_accepted_risk_archive",
     "require_physical_accepted_risk_archive",
 ]

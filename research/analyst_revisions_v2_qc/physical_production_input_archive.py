@@ -65,6 +65,8 @@ from research.analyst_revisions_v2.production_input_pipeline import (
     PreopenControlEvidence,
     ProductionEvidenceAuthority,
     ProductionRowEvidence,
+    Section72OwnerWaivedFirmOntologyEvidence,
+    Section72OwnerWaivedFirmSourceBinding,
     SectorClassificationEvidence,
     SecurityIdentityEvidence,
     SignalArm,
@@ -139,6 +141,13 @@ _PINNED_LOCATOR_TO_RECORD = CaptureRowLocator.to_record
 _PINNED_SOURCE_BINDING_TYPE = EvidenceSourceBinding
 _PINNED_SOURCE_BINDING_POST_INIT = EvidenceSourceBinding.__post_init__
 _PINNED_SOURCE_BINDING_TO_RECORD = EvidenceSourceBinding.to_record
+_PINNED_SECTION72_SOURCE_BINDING_TYPE = Section72OwnerWaivedFirmSourceBinding
+_PINNED_SECTION72_SOURCE_BINDING_POST_INIT = (
+    Section72OwnerWaivedFirmSourceBinding.__post_init__
+)
+_PINNED_SECTION72_SOURCE_BINDING_TO_RECORD = (
+    Section72OwnerWaivedFirmSourceBinding.to_record
+)
 _PINNED_EVIDENCE_ROW_TYPE = ProductionRowEvidence
 _PINNED_EVIDENCE_ROW_POST_INIT = ProductionRowEvidence.__post_init__
 _PINNED_EVIDENCE_ROW_TO_RECORD = ProductionRowEvidence.to_record
@@ -155,6 +164,13 @@ _PINNED_COMPONENT_POST_INITS = tuple(
 )
 _PINNED_COMPONENT_TO_RECORDS = tuple(
     component_type.to_record for component_type in _PINNED_COMPONENT_TYPES
+)
+_PINNED_SECTION72_FIRM_TYPE = Section72OwnerWaivedFirmOntologyEvidence
+_PINNED_SECTION72_FIRM_POST_INIT = (
+    Section72OwnerWaivedFirmOntologyEvidence.__post_init__
+)
+_PINNED_SECTION72_FIRM_TO_RECORD = (
+    Section72OwnerWaivedFirmOntologyEvidence.to_record
 )
 
 
@@ -1618,6 +1634,12 @@ def _construct_component(name: str, value: object) -> object | None:
         "q_data": DataQualityEvidence,
     }
     component_type = classes[name]
+    if (
+        name == "firm"
+        and type(value) is dict
+        and "admission_mode" in value
+    ):
+        component_type = _PINNED_SECTION72_FIRM_TYPE
     expected = frozenset(
         field.name for field in dataclasses.fields(component_type)
     )
@@ -1699,8 +1721,12 @@ def _decode_normalized_record(value: object) -> NormalizedPreOutcomeRow:
 def _validate_source_bindings(
     source_bindings: tuple[EvidenceSourceBinding, ...],
 ) -> None:
+    allowed_types = (
+        EvidenceSourceBinding,
+        _PINNED_SECTION72_SOURCE_BINDING_TYPE,
+    )
     if type(source_bindings) is not tuple or any(
-        type(item) is not EvidenceSourceBinding for item in source_bindings
+        type(item) not in allowed_types for item in source_bindings
     ):
         raise PhysicalProductionInputArchiveError(
             "source bindings must be an exact typed tuple"
@@ -1718,6 +1744,19 @@ def _validate_source_bindings(
         ) from exc
 
 
+def _source_binding_record(item: EvidenceSourceBinding) -> dict[str, object]:
+    if type(item) is EvidenceSourceBinding:
+        return _PINNED_SOURCE_BINDING_TO_RECORD(item)
+    if type(item) is _PINNED_SECTION72_SOURCE_BINDING_TYPE:
+        return _PINNED_SECTION72_SOURCE_BINDING_TO_RECORD(item)
+    raise PhysicalProductionInputArchiveError(
+        "source binding changed exact admission type"
+    )
+
+
+_PINNED_SOURCE_BINDING_RECORD = _source_binding_record
+
+
 def _snapshot_source_bindings(
     source_bindings: tuple[EvidenceSourceBinding, ...],
 ) -> tuple[EvidenceSourceBinding, ...]:
@@ -1732,6 +1771,20 @@ def _snapshot_source_bindings(
             artifact_sha256=item.artifact_sha256,
             reviewed=item.reviewed,
             point_in_time=item.point_in_time,
+        )
+        if type(item) is EvidenceSourceBinding
+        else _PINNED_SECTION72_SOURCE_BINDING_TYPE(
+            kind=item.kind,
+            artifact_id=item.artifact_id,
+            artifact_sha256=item.artifact_sha256,
+            reviewed=item.reviewed,
+            point_in_time=item.point_in_time,
+            admission_mode=item.admission_mode,
+            owner_waiver_scope=item.owner_waiver_scope,
+            independently_reviewed=item.independently_reviewed,
+            historical_availability_claimed=(
+                item.historical_availability_claimed
+            ),
         )
         for item in source_bindings
     )
@@ -2388,7 +2441,7 @@ def _authority_fields(
         "contract_sha256": _c2.PRODUCTION_INPUT_CONTRACT_SHA256,
         "pair_id": pair_id,
         "pair_sha256": pair_sha256,
-        "source_bindings": [item.to_record() for item in sources],
+        "source_bindings": [_source_binding_record(item) for item in sources],
         "row_evidence": _JsonArray(evidence_items),
         "pristine_point_in_time": False,
         "current_ticker_identity_allowed": False,
@@ -2425,7 +2478,7 @@ def _package_fields(
         "schema": PACKAGE_SCHEMA,
         "pair_id": pair_id,
         "pair_sha256": pair_sha256,
-        "source_bindings": [item.to_record() for item in sources],
+        "source_bindings": [_source_binding_record(item) for item in sources],
         "row_evidence": _JsonArray(evidence_items),
         "source_count": len(sources),
         "row_count": evidence_row_count,
@@ -2534,7 +2587,9 @@ def _manifest_semantic_record(
         "pair_sha256": pair_sha256,
         "evidence_authority_id": evidence_authority_id,
         "evidence_authority_sha256": evidence_authority_sha256,
-        "source_bindings": [item.to_record() for item in source_bindings],
+        "source_bindings": [
+            _source_binding_record(item) for item in source_bindings
+        ],
         "source_projection_sha256": source_projection_sha256,
         "row_projection_sha256": row_projection_sha256,
         "evidence_row_count": evidence_row_count,
@@ -2615,6 +2670,13 @@ def _require_static_contract() -> None:
             is not _PINNED_SOURCE_BINDING_POST_INIT
             or EvidenceSourceBinding.to_record
             is not _PINNED_SOURCE_BINDING_TO_RECORD
+            or Section72OwnerWaivedFirmSourceBinding
+            is not _PINNED_SECTION72_SOURCE_BINDING_TYPE
+            or Section72OwnerWaivedFirmSourceBinding.__post_init__
+            is not _PINNED_SECTION72_SOURCE_BINDING_POST_INIT
+            or Section72OwnerWaivedFirmSourceBinding.to_record
+            is not _PINNED_SECTION72_SOURCE_BINDING_TO_RECORD
+            or _source_binding_record is not _PINNED_SOURCE_BINDING_RECORD
             or ProductionRowEvidence is not _PINNED_EVIDENCE_ROW_TYPE
             or ProductionRowEvidence.__post_init__
             is not _PINNED_EVIDENCE_ROW_POST_INIT
@@ -2639,6 +2701,12 @@ def _require_static_contract() -> None:
                 for component_type in _PINNED_COMPONENT_TYPES
             )
             != _PINNED_COMPONENT_TO_RECORDS
+            or Section72OwnerWaivedFirmOntologyEvidence
+            is not _PINNED_SECTION72_FIRM_TYPE
+            or Section72OwnerWaivedFirmOntologyEvidence.__post_init__
+            is not _PINNED_SECTION72_FIRM_POST_INIT
+            or Section72OwnerWaivedFirmOntologyEvidence.to_record
+            is not _PINNED_SECTION72_FIRM_TO_RECORD
             or _NATIVE_RENAME_NOREPLACE
             is not _PINNED_NATIVE_RENAME_NOREPLACE
             or _NATIVE_RENAME_NOREPLACE_FLAG
@@ -2682,7 +2750,9 @@ def _source_projection(source_bindings: tuple[EvidenceSourceBinding, ...]) -> st
         canonical_json_bytes(
             {
                 "schema": SOURCE_PROJECTION_SCHEMA,
-                "sources": [item.to_record() for item in source_bindings],
+                "sources": [
+                    _source_binding_record(item) for item in source_bindings
+                ],
             }
         )
     )
@@ -2858,7 +2928,7 @@ def _build_physical_archive(
     root = archive_root.absolute()
     source_bindings = _snapshot_source_bindings(source_bindings)
     source_binding_bytes = canonical_json_bytes(
-        [_PINNED_SOURCE_BINDING_TO_RECORD(item) for item in source_bindings]
+        [_source_binding_record(item) for item in source_bindings]
     )
     try:
         require_identifier(parent_archive_id, "parent_archive_id")
@@ -3207,7 +3277,7 @@ def _build_physical_archive(
 
         _validate_source_bindings(source_bindings)
         if canonical_json_bytes(
-            [_PINNED_SOURCE_BINDING_TO_RECORD(item) for item in source_bindings]
+            [_source_binding_record(item) for item in source_bindings]
         ) != source_binding_bytes:
             raise PhysicalProductionInputArchiveError(
                 "source bindings changed during physical C2 construction"

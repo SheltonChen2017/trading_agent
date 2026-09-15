@@ -7,6 +7,7 @@ import json
 import os
 import re
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -32,6 +33,7 @@ from research.analyst_revisions_v2_qc.physical_accepted_risk_archive import (
     _RawJson,
     _build_physical_accepted_risk_archive_for_test,
     _iter_canonical_object,
+    _load_test_fixture_physical_accepted_risk_archive,
     _write_private,
     build_physical_accepted_risk_archive,
     iter_physical_accepted_risk_rows,
@@ -58,13 +60,64 @@ def _exact(message: str) -> str:
     return f"^{re.escape(message)}$"
 
 
+def _stat_with(metadata, **changes):
+    names = (
+        "st_mode",
+        "st_ino",
+        "st_dev",
+        "st_nlink",
+        "st_uid",
+        "st_gid",
+        "st_size",
+        "st_atime_ns",
+        "st_mtime_ns",
+        "st_ctime_ns",
+    )
+    values = {name: getattr(metadata, name) for name in names}
+    values.update(changes)
+    return SimpleNamespace(**values)
+
+
+_TEST_RELOAD_PINS: dict[Path, tuple[str, str]] = {}
+
+
+def load_physical_accepted_risk_archive(
+    *, archive_path: Path, source_artifact_path: Path
+):
+    pins = _TEST_RELOAD_PINS.get(archive_path)
+    if pins is None:
+        pins = _TEST_RELOAD_PINS.get(source_artifact_path)
+    assert pins is not None
+    return _load_test_fixture_physical_accepted_risk_archive(
+        archive_path=archive_path,
+        source_artifact_path=source_artifact_path,
+        expected_archive_sha256=pins[0],
+        expected_source_manifest_sha256=pins[1],
+    )
+
+
 def _build(tmp_path: Path):
     capture, _session = _spooled_capture(tmp_path)
     archive = _build_physical_accepted_risk_archive_for_test(
         source_artifact_path=capture.artifact_path,
         output_root=tmp_path / "accepted-risk",
     )
+    pins = (archive.archive_sha256, archive.source_manifest_sha256)
+    _TEST_RELOAD_PINS[archive.archive_path] = pins
+    _TEST_RELOAD_PINS[capture.artifact_path] = pins
     return capture, archive
+
+
+def _rewrite_archive_manifest(archive, transform) -> None:
+    manifest = archive.archive_path / physical_module.ARCHIVE_MANIFEST
+    digest = archive.archive_path / physical_module.ARCHIVE_MANIFEST_DIGEST
+    value = json.loads(manifest.read_bytes())
+    transform(value)
+    payload = canonical_json_bytes(value)
+    manifest.write_bytes(payload)
+    manifest.chmod(0o600)
+    digest.write_bytes((hashlib.sha256(payload).hexdigest() + "\n").encode())
+    digest.chmod(0o600)
 
 
 def _visitor_pages(capture):
@@ -113,6 +166,391 @@ def _close_publication_tree(tree) -> None:
             os.close(tree[name])
         except OSError:
             pass
+
+
+def _verified_jsonl_fixture(tmp_path: Path):
+    directory = tmp_path / "verified-jsonl"
+    directory.mkdir(mode=0o700)
+    payload = b'{"row":1}\n{"row":2}\n'
+    leaf = directory / "rows.jsonl"
+    leaf.write_bytes(payload)
+    leaf.chmod(0o600)
+    parent_fd = os.open(directory, physical_module._DIRECTORY_OPEN_FLAGS)
+    return parent_fd, payload
+
+
+def _verified_jsonl_fragments(parent_fd: int, payload: bytes, **overrides):
+    arguments = {
+        "maximum_bytes": 4096,
+        "maximum_line_bytes": 1024,
+        "expected_byte_count": len(payload),
+        "expected_sha256": hashlib.sha256(payload).hexdigest(),
+        "expected_row_count": 2,
+        "name": "test JSONL shard",
+    }
+    arguments.update(overrides)
+    return physical_module._iter_verified_jsonl_fragments_at(
+        parent_fd,
+        "rows.jsonl",
+        **arguments,
+    )
+
+
+def test_verified_jsonl_terminal_refuses_streamed_byte_count_vs_opened_size(
+    tmp_path, monkeypatch
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    original_fstat = os.fstat
+    calls = 0
+
+    def changed_opened_size(descriptor):
+        nonlocal calls
+        metadata = original_fstat(descriptor)
+        calls += 1
+        if calls == 1:
+            return _stat_with(metadata, st_size=metadata.st_size + 1)
+        return metadata
+
+    monkeypatch.setattr(physical_module.os, "fstat", changed_opened_size)
+    try:
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(
+                "test JSONL shard streamed byte count changed from opened size"
+            ),
+        ):
+            tuple(_verified_jsonl_fragments(parent_fd, payload))
+    finally:
+        os.close(parent_fd)
+
+
+@pytest.mark.parametrize(
+    ("overrides", "message"),
+    (
+        (
+            {"expected_byte_count": 1},
+            "test JSONL shard streamed byte count does not match expected byte count",
+        ),
+        (
+            {"expected_row_count": 1},
+            "test JSONL shard row count does not match expected row count",
+        ),
+        (
+            {"expected_sha256": "0" * 64},
+            "test JSONL shard content SHA-256 does not match expected SHA-256",
+        ),
+    ),
+    ids=("expected-byte-count", "expected-row-count", "expected-sha256"),
+)
+def test_verified_jsonl_terminal_expected_value_refusals_are_distinctive(
+    tmp_path, overrides, message
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    try:
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(message),
+        ):
+            tuple(_verified_jsonl_fragments(parent_fd, payload, **overrides))
+    finally:
+        os.close(parent_fd)
+
+
+@pytest.mark.parametrize(
+    ("snapshot", "mutation", "message"),
+    (
+        (
+            "after",
+            "type",
+            "test JSONL shard exhausted descriptor is not a regular file",
+        ),
+        (
+            "named",
+            "type",
+            "test JSONL shard named entry is not a regular file",
+        ),
+        (
+            "after",
+            "mode",
+            "test JSONL shard exhausted descriptor mode is not 0600",
+        ),
+        (
+            "named",
+            "mode",
+            "test JSONL shard named entry mode is not 0600",
+        ),
+        (
+            "after",
+            "links",
+            "test JSONL shard exhausted descriptor link count is not one",
+        ),
+        (
+            "named",
+            "links",
+            "test JSONL shard named entry link count is not one",
+        ),
+        (
+            "named",
+            "owner",
+            "test JSONL shard named entry is not owner-held",
+        ),
+    ),
+    ids=(
+        "after-type",
+        "named-type",
+        "after-mode",
+        "named-mode",
+        "after-links",
+        "named-links",
+        "named-owner",
+    ),
+)
+def test_verified_jsonl_terminal_metadata_refusals_are_distinctive(
+    tmp_path, monkeypatch, snapshot, mutation, message
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    original_fstat = os.fstat
+    original_stat = os.stat
+    fstat_calls = 0
+    stat_calls = 0
+
+    def mutate(metadata):
+        if mutation == "type":
+            return _stat_with(
+                metadata,
+                st_mode=physical_module.stat.S_IFDIR | 0o600,
+            )
+        if mutation == "mode":
+            return _stat_with(metadata, st_mode=metadata.st_mode | 0o040)
+        if mutation == "owner":
+            return _stat_with(metadata, st_uid=metadata.st_uid + 1)
+        return _stat_with(metadata, st_nlink=2)
+
+    def changed_fstat(descriptor):
+        nonlocal fstat_calls
+        metadata = original_fstat(descriptor)
+        fstat_calls += 1
+        if snapshot == "after" and fstat_calls == 2:
+            return mutate(metadata)
+        return metadata
+
+    def changed_stat(path, *args, **kwargs):
+        nonlocal stat_calls
+        metadata = original_stat(path, *args, **kwargs)
+        if path == "rows.jsonl" and kwargs.get("dir_fd") == parent_fd:
+            stat_calls += 1
+            if snapshot == "named" and stat_calls == 2:
+                return mutate(metadata)
+        return metadata
+
+    monkeypatch.setattr(physical_module.os, "fstat", changed_fstat)
+    monkeypatch.setattr(physical_module.os, "stat", changed_stat)
+    try:
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(message),
+        ):
+            tuple(_verified_jsonl_fragments(parent_fd, payload))
+    finally:
+        os.close(parent_fd)
+
+
+def test_verified_jsonl_terminal_refuses_descriptor_identity_change_at_exhaustion(
+    tmp_path, monkeypatch
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    original_fstat = os.fstat
+    calls = 0
+
+    def changed_after_identity(descriptor):
+        nonlocal calls
+        metadata = original_fstat(descriptor)
+        calls += 1
+        if calls == 2:
+            return _stat_with(
+                metadata, st_mtime_ns=metadata.st_mtime_ns + 1
+            )
+        return metadata
+
+    monkeypatch.setattr(physical_module.os, "fstat", changed_after_identity)
+    iterator = _verified_jsonl_fragments(parent_fd, payload)
+    try:
+        assert next(iterator) == b'{"row":1}'
+        assert next(iterator) == b'{"row":2}'
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(
+                "test JSONL shard opened descriptor identity changed during iteration"
+            ),
+        ):
+            next(iterator)
+    finally:
+        iterator.close()
+        os.close(parent_fd)
+
+
+def test_verified_jsonl_terminal_refuses_named_identity_change_at_exhaustion(
+    tmp_path, monkeypatch
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    original_stat = os.stat
+    calls = 0
+
+    def changed_named_identity(path, *args, **kwargs):
+        nonlocal calls
+        metadata = original_stat(path, *args, **kwargs)
+        if path == "rows.jsonl" and kwargs.get("dir_fd") == parent_fd:
+            calls += 1
+            if calls == 2:
+                return _stat_with(
+                    metadata, st_mtime_ns=metadata.st_mtime_ns + 1
+                )
+        return metadata
+
+    monkeypatch.setattr(physical_module.os, "stat", changed_named_identity)
+    iterator = _verified_jsonl_fragments(parent_fd, payload)
+    try:
+        assert next(iterator) == b'{"row":1}'
+        assert next(iterator) == b'{"row":2}'
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(
+                "test JSONL shard named entry identity changed during iteration"
+            ),
+        ):
+            next(iterator)
+    finally:
+        iterator.close()
+        os.close(parent_fd)
+
+
+@pytest.mark.parametrize(
+    ("platform", "accepted"),
+    (("darwin", True), ("linux", False)),
+)
+def test_verified_jsonl_same_mode_fchmod_ctime_drift_is_darwin_only(
+    tmp_path, monkeypatch, platform, accepted
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    original_fdopen = os.fdopen
+    opened_descriptors = []
+
+    def capture_descriptor(descriptor, *args, **kwargs):
+        opened_descriptors.append(descriptor)
+        return original_fdopen(descriptor, *args, **kwargs)
+
+    monkeypatch.setattr(physical_module.os, "fdopen", capture_descriptor)
+    monkeypatch.setattr(
+        physical_module, "sys", SimpleNamespace(platform=platform)
+    )
+    iterator = _verified_jsonl_fragments(parent_fd, payload)
+    try:
+        assert next(iterator) == b'{"row":1}'
+        assert len(opened_descriptors) == 1
+        descriptor = opened_descriptors[0]
+        ctime_before = os.fstat(descriptor).st_ctime_ns
+        os.fchmod(descriptor, 0o600)
+        assert os.fstat(descriptor).st_ctime_ns != ctime_before
+        if accepted:
+            assert tuple(iterator) == (b'{"row":2}',)
+        else:
+            with pytest.raises(
+                PhysicalAcceptedRiskArchiveError,
+                match=_exact(
+                    "test JSONL shard opened descriptor identity changed during iteration"
+                ),
+            ):
+                tuple(iterator)
+    finally:
+        iterator.close()
+        os.close(parent_fd)
+
+
+def test_verified_jsonl_real_content_mutation_during_iteration_is_refused(
+    tmp_path, monkeypatch
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    original_fdopen = os.fdopen
+    opened_descriptors = []
+
+    def capture_descriptor(descriptor, *args, **kwargs):
+        opened_descriptors.append(descriptor)
+        return original_fdopen(descriptor, *args, **kwargs)
+
+    monkeypatch.setattr(physical_module.os, "fdopen", capture_descriptor)
+    iterator = _verified_jsonl_fragments(parent_fd, payload)
+    writer = None
+    try:
+        assert next(iterator) == b'{"row":1}'
+        descriptor = opened_descriptors[0]
+        mtime_before = os.fstat(descriptor).st_mtime_ns
+        writer = os.open(
+            tmp_path / "verified-jsonl" / "rows.jsonl", os.O_WRONLY
+        )
+        assert os.pwrite(writer, b"9", 7) == 1
+        os.close(writer)
+        writer = None
+        assert os.fstat(descriptor).st_mtime_ns != mtime_before
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(
+                "test JSONL shard opened descriptor identity changed during iteration"
+            ),
+        ):
+            tuple(iterator)
+    finally:
+        if writer is not None:
+            os.close(writer)
+        iterator.close()
+        os.close(parent_fd)
+
+
+def test_verified_jsonl_real_mode_mutation_during_iteration_is_refused(
+    tmp_path
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    leaf = tmp_path / "verified-jsonl" / "rows.jsonl"
+    iterator = _verified_jsonl_fragments(parent_fd, payload)
+    try:
+        assert next(iterator) == b'{"row":1}'
+        leaf.chmod(0o640)
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(
+                "test JSONL shard exhausted descriptor mode is not 0600"
+            ),
+        ):
+            tuple(iterator)
+    finally:
+        iterator.close()
+        os.close(parent_fd)
+
+
+def test_verified_jsonl_real_named_replacement_during_iteration_is_refused(
+    tmp_path, monkeypatch
+):
+    parent_fd, payload = _verified_jsonl_fixture(tmp_path)
+    leaf = tmp_path / "verified-jsonl" / "rows.jsonl"
+    held = leaf.with_name("held-rows.jsonl")
+    monkeypatch.setattr(
+        physical_module, "sys", SimpleNamespace(platform="darwin")
+    )
+    iterator = _verified_jsonl_fragments(parent_fd, payload)
+    try:
+        assert next(iterator) == b'{"row":1}'
+        leaf.rename(held)
+        leaf.write_bytes(payload)
+        leaf.chmod(0o600)
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(
+                "test JSONL shard named entry identity changed during iteration"
+            ),
+        ):
+            tuple(iterator)
+    finally:
+        iterator.close()
+        os.close(parent_fd)
 
 
 def test_streamed_canonical_object_is_byte_exact_for_nested_fragments(tmp_path):
@@ -191,6 +629,804 @@ def test_disk_archive_matches_the_legacy_c1_oracle_byte_for_byte(tmp_path):
             "trading",
         )
     )
+
+
+def test_disk_archive_reloads_after_process_local_authority_reset(tmp_path):
+    capture, archive = _build(tmp_path)
+    expected_records = tuple(
+        row.to_record() for row in iter_physical_accepted_risk_rows(archive)
+    )
+    expected_fields = {
+        field.name: getattr(archive, field.name)
+        for field in dataclasses.fields(archive)
+    }
+
+    physical_module._AUTHORITIES.clear()
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk archive is not current builder authority"),
+    ):
+        require_physical_accepted_risk_archive(archive)
+
+    reloaded = load_physical_accepted_risk_archive(
+        archive_path=archive.archive_path,
+        source_artifact_path=capture.artifact_path,
+    )
+
+    assert reloaded is not archive
+    assert type(reloaded) is type(archive)
+    assert type(reloaded.pair_artifact) is type(archive.pair_artifact)
+    assert type(reloaded.role_row_counts) is tuple
+    assert type(reloaded.shards) is tuple
+    assert all(
+        type(item) is physical_module.AcceptedRiskShardDescriptor
+        for item in reloaded.shards
+    )
+    assert {
+        field.name: getattr(reloaded, field.name)
+        for field in dataclasses.fields(reloaded)
+    } == expected_fields
+    authority = physical_module._AUTHORITIES[id(reloaded)]
+    assert authority[0]() is reloaded
+    assert require_physical_accepted_risk_archive(reloaded) is reloaded
+    assert tuple(
+        row.to_record() for row in iter_physical_accepted_risk_rows(reloaded)
+    ) == expected_records
+
+
+def test_disk_archive_builder_authority_is_process_local(tmp_path, monkeypatch):
+    _capture, archive = _build(tmp_path)
+    builder_pid = os.getpid()
+    monkeypatch.setattr(physical_module.os, "getpid", lambda: builder_pid + 1)
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk archive is not current builder authority"),
+    ):
+        require_physical_accepted_risk_archive(archive)
+
+
+@pytest.mark.skipif(not hasattr(os, "fork"), reason="requires POSIX fork")
+def test_disk_archive_authority_cannot_be_inherited_across_fork(tmp_path):
+    _capture, archive = _build(tmp_path)
+    read_fd, write_fd = os.pipe()
+    child_pid = os.fork()
+    if child_pid == 0:  # pragma: no cover - assertions run in the parent
+        os.close(read_fd)
+        try:
+            require_physical_accepted_risk_archive(archive)
+        except BaseException as exc:
+            payload = f"{type(exc).__name__}:{exc}".encode("utf-8")
+        else:
+            payload = b"accepted"
+        try:
+            os.write(write_fd, payload)
+        finally:
+            os.close(write_fd)
+            os._exit(0)
+
+    os.close(write_fd)
+    try:
+        observed = os.read(read_fd, 4096).decode("utf-8")
+    finally:
+        os.close(read_fd)
+    waited_pid, status = os.waitpid(child_pid, 0)
+
+    assert waited_pid == child_pid
+    assert os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0
+    assert observed == (
+        "PhysicalAcceptedRiskArchiveError:"
+        "accepted-risk archive is not current builder authority"
+    )
+
+
+def test_disk_archive_reload_requires_external_archive_pin(tmp_path):
+    capture, archive = _build(tmp_path)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk reload does not match its external trust pin"),
+    ):
+        _load_test_fixture_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+            expected_archive_sha256="0" * 64,
+            expected_source_manifest_sha256=archive.source_manifest_sha256,
+        )
+
+
+def test_disk_archive_reload_cannot_self_promote_test_capture_transport(tmp_path):
+    capture, archive = _build(tmp_path)
+    manifest_path = archive.archive_path / physical_module.ARCHIVE_MANIFEST
+    digest_path = archive.archive_path / physical_module.ARCHIVE_MANIFEST_DIGEST
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest["capture_transport"] = capture_module.PRODUCTION_TRANSPORT
+    seed = dict(manifest)
+    seed.pop("archive_id")
+    seed.pop("archive_sha256")
+    promoted_sha256 = hashlib.sha256(canonical_json_bytes(seed)).hexdigest()
+    promoted_id = f"arv2-physical-accepted-risk-{promoted_sha256[:24]}"
+    manifest["archive_id"] = promoted_id
+    manifest["archive_sha256"] = promoted_sha256
+    payload = canonical_json_bytes(manifest)
+    manifest_path.write_bytes(payload)
+    manifest_path.chmod(0o600)
+    digest_path.write_bytes((hashlib.sha256(payload).hexdigest() + "\n").encode())
+    digest_path.chmod(0o600)
+    promoted_path = archive.archive_path.with_name(promoted_id)
+    archive.archive_path.rename(promoted_path)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload source manifest identity is inconsistent"
+        ),
+    ):
+        physical_module._load_physical_accepted_risk_archive(
+            archive_path=promoted_path,
+            source_artifact_path=capture.artifact_path,
+            expected_archive_sha256=promoted_sha256,
+            expected_source_manifest_sha256=archive.source_manifest_sha256,
+            expected_transport=capture_module.PRODUCTION_TRANSPORT,
+            require_repository_paths=False,
+        )
+
+
+def test_root_manifest_ctime_drift_is_accepted_only_with_exact_bytes(
+    tmp_path, monkeypatch
+):
+    _capture, archive = _build(tmp_path)
+    original_pair = physical_module._pair_binding_from_archive_fds
+    paths = (
+        archive.archive_path / physical_module.ARCHIVE_MANIFEST,
+        archive.archive_path / physical_module.ARCHIVE_MANIFEST_DIGEST,
+    )
+    before = {path: path.stat() for path in paths}
+    after = {}
+
+    def finish_pair(*args, **kwargs):
+        value = original_pair(*args, **kwargs)
+        for path in paths:
+            path.chmod(0o600)
+            after[path] = path.stat()
+        return value
+
+    monkeypatch.setattr(
+        physical_module, "_pair_binding_from_archive_fds", finish_pair
+    )
+
+    assert require_physical_accepted_risk_archive(archive) is archive
+    assert set(after) == set(paths)
+    assert all(
+        (
+            after[path].st_dev,
+            after[path].st_ino,
+            after[path].st_size,
+            after[path].st_mtime_ns,
+        )
+        == (
+            before[path].st_dev,
+            before[path].st_ino,
+            before[path].st_size,
+            before[path].st_mtime_ns,
+        )
+        and after[path].st_ctime_ns != before[path].st_ctime_ns
+        for path in paths
+    )
+
+
+def test_root_manifest_content_change_is_refused_despite_restored_mtime(
+    tmp_path, monkeypatch
+):
+    _capture, archive = _build(tmp_path)
+    original_pair = physical_module._pair_binding_from_archive_fds
+    manifest_path = archive.archive_path / physical_module.ARCHIVE_MANIFEST
+    digest_path = archive.archive_path / physical_module.ARCHIVE_MANIFEST_DIGEST
+
+    def corrupt_after_pair(*args, **kwargs):
+        value = original_pair(*args, **kwargs)
+        manifest_metadata = manifest_path.stat()
+        digest_metadata = digest_path.stat()
+        payload = manifest_path.read_bytes()
+        replacement_id = "x" + archive.archive_id[1:]
+        changed = payload.replace(
+            archive.archive_id.encode("ascii"),
+            replacement_id.encode("ascii"),
+            1,
+        )
+        assert changed != payload and len(changed) == len(payload)
+        manifest_path.write_bytes(changed)
+        digest_path.write_bytes(
+            (hashlib.sha256(changed).hexdigest() + "\n").encode("ascii")
+        )
+        os.utime(
+            manifest_path,
+            ns=(manifest_metadata.st_atime_ns, manifest_metadata.st_mtime_ns),
+        )
+        os.utime(
+            digest_path,
+            ns=(digest_metadata.st_atime_ns, digest_metadata.st_mtime_ns),
+        )
+        return value
+
+    monkeypatch.setattr(
+        physical_module, "_pair_binding_from_archive_fds", corrupt_after_pair
+    )
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk archive manifest does not authenticate"),
+    ):
+        require_physical_accepted_risk_archive(archive)
+
+
+@pytest.mark.parametrize("changed_field", ["st_ino", "st_mtime_ns"])
+def test_root_manifest_inode_or_mtime_drift_remains_refused(
+    tmp_path, monkeypatch, changed_field
+):
+    _capture, archive = _build(tmp_path)
+    root_fd = physical_module._open_private_directory(
+        archive.archive_path, "test archive"
+    )
+    source_fd = physical_module._open_private_child_directory(
+        root_fd, physical_module.SOURCE_DIRECTORY
+    )
+    rows_fd = physical_module._open_private_child_directory(
+        root_fd, physical_module.ROW_DIRECTORY
+    )
+    original_stat = os.stat
+    try:
+        identities = physical_module._pin_archive_leaf_identities(
+            root_fd, source_fd, rows_fd, archive
+        )
+
+        def changed_stat(path, *args, **kwargs):
+            metadata = original_stat(path, *args, **kwargs)
+            if (
+                path == physical_module.ARCHIVE_MANIFEST
+                and kwargs.get("dir_fd") == root_fd
+            ):
+                return _stat_with(
+                    metadata,
+                    **{changed_field: getattr(metadata, changed_field) + 1},
+                )
+            return metadata
+
+        monkeypatch.setattr(physical_module.os, "stat", changed_stat)
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact("accepted-risk archive named leaf identity changed"),
+        ):
+            physical_module._require_archive_leaf_identities(
+                root_fd, source_fd, rows_fd, identities
+            )
+    finally:
+        os.close(rows_fd)
+        os.close(source_fd)
+        os.close(root_fd)
+
+
+def test_data_shard_ctime_drift_remains_refused(tmp_path, monkeypatch):
+    _capture, archive = _build(tmp_path)
+    root_fd = physical_module._open_private_directory(
+        archive.archive_path, "test archive"
+    )
+    source_fd = physical_module._open_private_child_directory(
+        root_fd, physical_module.SOURCE_DIRECTORY
+    )
+    rows_fd = physical_module._open_private_child_directory(
+        root_fd, physical_module.ROW_DIRECTORY
+    )
+    original_stat = os.stat
+    shard_name = Path(archive.shards[0].source_relative_path).name
+    try:
+        identities = physical_module._pin_archive_leaf_identities(
+            root_fd, source_fd, rows_fd, archive
+        )
+
+        def changed_stat(path, *args, **kwargs):
+            metadata = original_stat(path, *args, **kwargs)
+            if path == shard_name and kwargs.get("dir_fd") == source_fd:
+                return _stat_with(metadata, st_ctime_ns=metadata.st_ctime_ns + 1)
+            return metadata
+
+        monkeypatch.setattr(physical_module.os, "stat", changed_stat)
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact("accepted-risk archive named leaf identity changed"),
+        ):
+            physical_module._require_archive_leaf_identities(
+                root_fd, source_fd, rows_fd, identities
+            )
+    finally:
+        os.close(rows_fd)
+        os.close(source_fd)
+        os.close(root_fd)
+
+
+def test_darwin_data_ctime_reconciliation_rehashes_once_then_repins(
+    tmp_path, monkeypatch
+):
+    _capture, archive = _build(tmp_path)
+    root_fd = physical_module._open_private_directory(
+        archive.archive_path, "test archive"
+    )
+    source_fd = physical_module._open_private_child_directory(
+        root_fd, physical_module.SOURCE_DIRECTORY
+    )
+    rows_fd = physical_module._open_private_child_directory(
+        root_fd, physical_module.ROW_DIRECTORY
+    )
+    filename = Path(archive.shards[0].source_relative_path).name
+    key = ("source", filename)
+    try:
+        all_pins = physical_module._pin_archive_leaf_identities(
+            root_fd, source_fd, rows_fd, archive
+        )
+        original = all_pins[key]
+        pin = dataclasses.replace(
+            original,
+            identity=(
+                *original.identity[:4],
+                original.identity[4] - 1,
+                *original.identity[5:],
+            ),
+        )
+        observed = original.identity
+        original_observe = physical_module._observe_archive_leaf
+        original_hash = physical_module._hash_private_regular_at
+        rehashes = []
+
+        def observe(parent_fd, leaf, **kwargs):
+            if parent_fd == source_fd and leaf == filename:
+                return observed
+            return original_observe(parent_fd, leaf, **kwargs)
+
+        def rehash(parent_fd, leaf, **kwargs):
+            if parent_fd == source_fd and leaf == filename:
+                rehashes.append(leaf)
+            return original_hash(parent_fd, leaf, **kwargs)
+
+        monkeypatch.setattr(
+            physical_module, "sys", SimpleNamespace(platform="darwin")
+        )
+        monkeypatch.setattr(physical_module, "_observe_archive_leaf", observe)
+        monkeypatch.setattr(physical_module, "_hash_private_regular_at", rehash)
+        pins = {key: pin}
+
+        physical_module._require_archive_leaf_identities(
+            root_fd, source_fd, rows_fd, pins
+        )
+        assert pins[key].identity == observed
+        assert rehashes == [filename]
+
+        physical_module._require_archive_leaf_identities(
+            root_fd, source_fd, rows_fd, pins
+        )
+        assert rehashes == [filename]
+    finally:
+        os.close(rows_fd)
+        os.close(source_fd)
+        os.close(root_fd)
+
+
+@pytest.mark.parametrize("identity_index", [0, 1, 2, 3, 5, 6, 7])
+def test_darwin_ctime_reconciliation_preserves_every_nonctime_identity_field(
+    tmp_path, monkeypatch, identity_index
+):
+    _capture, archive = _build(tmp_path)
+    root_fd = physical_module._open_private_directory(
+        archive.archive_path, "test archive"
+    )
+    source_fd = physical_module._open_private_child_directory(
+        root_fd, physical_module.SOURCE_DIRECTORY
+    )
+    rows_fd = physical_module._open_private_child_directory(
+        root_fd, physical_module.ROW_DIRECTORY
+    )
+    filename = Path(archive.shards[0].source_relative_path).name
+    key = ("source", filename)
+    try:
+        pin = physical_module._pin_archive_leaf_identities(
+            root_fd, source_fd, rows_fd, archive
+        )[key]
+        changed = list(pin.identity)
+        changed[identity_index] += 1
+        changed[4] += 1
+        monkeypatch.setattr(
+            physical_module, "sys", SimpleNamespace(platform="darwin")
+        )
+        monkeypatch.setattr(
+            physical_module,
+            "_observe_archive_leaf",
+            lambda *_args, **_kwargs: tuple(changed),
+        )
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact("accepted-risk archive named leaf identity changed"),
+        ):
+            physical_module._require_archive_leaf_identities(
+                root_fd, source_fd, rows_fd, {key: pin}
+            )
+    finally:
+        os.close(rows_fd)
+        os.close(source_fd)
+        os.close(root_fd)
+
+
+def test_disk_archive_reload_requires_exact_absolute_path_objects(tmp_path):
+    capture, archive = _build(tmp_path)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload archive path must be an exact absolute Path"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=str(archive.archive_path),
+            source_artifact_path=capture.artifact_path,
+        )
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload source path must be an exact absolute Path"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=Path(capture.artifact_path.name),
+        )
+
+
+def test_disk_archive_reload_refuses_rebound_parser_contract_before_io(
+    tmp_path, monkeypatch
+):
+    capture, archive = _build(tmp_path)
+    physical_module._AUTHORITIES.clear()
+    monkeypatch.setattr(
+        physical_module,
+        "_RELOAD_MANIFEST_KEYS",
+        (*physical_module._RELOAD_MANIFEST_KEYS, "unexpected"),
+    )
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("physical accepted-risk dependency binding changed"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_unknown_manifest_key(tmp_path):
+    capture, archive = _build(tmp_path)
+    _rewrite_archive_manifest(
+        archive, lambda value: value.__setitem__("unexpected", False)
+    )
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload manifest has unknown, missing, or "
+            "non-string keys"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_unknown_nested_manifest_key(tmp_path):
+    capture, archive = _build(tmp_path)
+
+    def add_unknown_key(value):
+        value["shards"][0]["unexpected"] = False
+
+    _rewrite_archive_manifest(archive, add_unknown_key)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload shard entry has unknown, missing, or "
+            "non-string keys"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_boolean_in_integer_field(tmp_path):
+    capture, archive = _build(tmp_path)
+    _rewrite_archive_manifest(
+        archive, lambda value: value.__setitem__("source_page_count", True)
+    )
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk reload manifest count changed type"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_unknown_role_before_minting(tmp_path):
+    capture, archive = _build(tmp_path)
+
+    def change_role(value):
+        value["role_row_counts"][0]["source_role"] = "unknown-role"
+
+    _rewrite_archive_manifest(archive, change_role)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk reload role census has an unknown role"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_noncanonical_manifest_bytes(tmp_path):
+    capture, archive = _build(tmp_path)
+    manifest = archive.archive_path / physical_module.ARCHIVE_MANIFEST
+    digest = archive.archive_path / physical_module.ARCHIVE_MANIFEST_DIGEST
+    payload = manifest.read_bytes()[:-1] + b" \n"
+    manifest.write_bytes(payload)
+    manifest.chmod(0o600)
+    digest.write_bytes((hashlib.sha256(payload).hexdigest() + "\n").encode())
+    digest.chmod(0o600)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk reload manifest is not canonical JSON"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_manifest_digest_tamper(tmp_path):
+    capture, archive = _build(tmp_path)
+    digest = archive.archive_path / physical_module.ARCHIVE_MANIFEST_DIGEST
+    digest.write_bytes(b"0" * 64 + b"\n")
+    digest.chmod(0o600)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk reload manifest digest changed"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_changed_immutable_flag(tmp_path):
+    capture, archive = _build(tmp_path)
+
+    def grant_provider_access(value):
+        value["capabilities"]["provider_access"] = True
+
+    _rewrite_archive_manifest(archive, grant_provider_access)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload capabilities changed type or immutable value"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_nonprivate_archive_directory(tmp_path):
+    capture, archive = _build(tmp_path)
+    archive.archive_path.chmod(0o750)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload archive is not an owner-private directory"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_symlinked_manifest_leaf(tmp_path):
+    capture, archive = _build(tmp_path)
+    manifest = archive.archive_path / physical_module.ARCHIVE_MANIFEST
+    held = archive.archive_path / ".held-manifest"
+    manifest.rename(held)
+    manifest.symlink_to(held.name)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk reload manifest is unavailable"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_source_path_substitution(tmp_path):
+    capture, archive = _build(tmp_path)
+    substituted = capture.artifact_path.with_name("substituted-source")
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload source path does not bind the manifest"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=substituted,
+        )
+
+
+def test_disk_archive_reload_refuses_source_manifest_digest_tamper(tmp_path):
+    capture, archive = _build(tmp_path)
+    digest = capture.artifact_path / physical_module.ARCHIVE_MANIFEST_DIGEST
+    digest.write_bytes(b"0" * 64 + b"\n")
+    digest.chmod(0o600)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload source manifest does not authenticate"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_noncanonical_source_manifest(tmp_path):
+    capture, archive = _build(tmp_path)
+    manifest = capture.artifact_path / physical_module.ARCHIVE_MANIFEST
+    digest = capture.artifact_path / physical_module.ARCHIVE_MANIFEST_DIGEST
+    payload = manifest.read_bytes()[:-1] + b" \n"
+    manifest.write_bytes(payload)
+    manifest.chmod(0o600)
+    digest.write_bytes((hashlib.sha256(payload).hexdigest() + "\n").encode())
+    digest.chmod(0o600)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("source capture manifest is not canonical JSON"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_archive_path_substitution(tmp_path):
+    capture, archive = _build(tmp_path)
+    substituted = archive.archive_path.with_name("substituted-archive")
+    archive.archive_path.rename(substituted)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk reload archive path does not bind the manifest"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=substituted,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_refuses_semantic_shard_tamper(tmp_path):
+    capture, archive = _build(tmp_path)
+    shard = archive.archive_path / archive.shards[0].semantic_relative_path
+    shard.write_bytes(shard.read_bytes() + b"{}\n")
+    shard.chmod(0o600)
+    physical_module._AUTHORITIES.clear()
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "accepted-risk semantic shard streamed byte count does not match "
+            "expected byte count"
+        ),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+
+def test_disk_archive_reload_removes_authority_after_full_reauth_failure(
+    tmp_path, monkeypatch
+):
+    capture, archive = _build(tmp_path)
+    observed = []
+
+    def fail_pair(value, **_kwargs):
+        observed.append(value)
+        raise PhysicalAcceptedRiskArchiveError("injected pair reauth failure")
+
+    physical_module._AUTHORITIES.clear()
+    monkeypatch.setattr(
+        physical_module, "_pair_binding_from_archive_fds", fail_pair
+    )
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("injected pair reauth failure"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+    assert len(observed) == 1
+    assert id(observed[0]) not in physical_module._AUTHORITIES
+
+
+def test_disk_archive_reload_refuses_path_swap_and_removes_authority(
+    tmp_path, monkeypatch
+):
+    capture, archive = _build(tmp_path)
+    original_pair = physical_module._pair_binding_from_archive_fds
+    held = archive.archive_path.with_name(f"{archive.archive_id}-held")
+    observed = []
+
+    def swap_after_pair(value, **kwargs):
+        result = original_pair(value, **kwargs)
+        observed.append(value)
+        archive.archive_path.rename(held)
+        archive.archive_path.mkdir(mode=0o700)
+        return result
+
+    physical_module._AUTHORITIES.clear()
+    monkeypatch.setattr(
+        physical_module, "_pair_binding_from_archive_fds", swap_after_pair
+    )
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact("accepted-risk archive path identity changed"),
+    ):
+        load_physical_accepted_risk_archive(
+            archive_path=archive.archive_path,
+            source_artifact_path=capture.artifact_path,
+        )
+
+    assert len(observed) == 1
+    assert id(observed[0]) not in physical_module._AUTHORITIES
 
 
 def test_disk_archive_authenticates_predecessor_physical_identity_and_derives_current_c1(
@@ -765,7 +2001,8 @@ def test_disk_archive_refuses_changed_semantic_shard(tmp_path):
     with pytest.raises(
         PhysicalAcceptedRiskArchiveError,
         match=_exact(
-            "accepted-risk semantic shard row count, byte count, hash, or identity changed"
+            "accepted-risk semantic shard streamed byte count does not match "
+            "expected byte count"
         ),
     ):
         require_physical_accepted_risk_archive(archive)

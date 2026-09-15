@@ -38,7 +38,10 @@ from research.analyst_revisions_v2.canonical import (
     CanonicalEvidenceError,
     canonical_json_bytes,
     decode_utf8,
+    require_exact_keys,
     require_identifier,
+    require_int,
+    require_sha256,
     sha256_bytes,
     strict_json_loads,
 )
@@ -88,7 +91,58 @@ _PINNED_CANONICAL_JSON_BYTES = canonical_json_bytes
 _PINNED_SHA256_BYTES = sha256_bytes
 _PINNED_DECODE_UTF8 = decode_utf8
 _PINNED_STRICT_JSON_LOADS = strict_json_loads
+_PINNED_REQUIRE_EXACT_KEYS = require_exact_keys
+_PINNED_REQUIRE_INT = require_int
+_PINNED_REQUIRE_SHA256 = require_sha256
 _PINNED_HASHLIB_SHA256 = hashlib.sha256
+
+_CENSUS_FIELDS = (
+    "source_row_count",
+    "analyst_rating_source_row_count",
+    "valid_firm_source_row_count",
+    "invalid_firm_identity_row_count",
+    "current_admitted_firm_row_count",
+    "censored_admitted_firm_row_count",
+    "exact_censored_source_clock_row_count",
+    "firm_count",
+    "observed_firm_name_count",
+    "observed_label_count",
+    "observed_transition_count",
+    "ranked_firm_count",
+    "adjudication_firm_count",
+)
+_FALSE_CAPABILITY_FIELDS = (
+    "ordering_inferred",
+    "scope_inferred",
+    "ontology_reviewed",
+    "availability_reviewed",
+    "production_authority",
+    "provider_access",
+    "credential_access",
+    "quantconnect_access",
+    "outcome_access",
+    "result_access",
+    "deployment",
+    "orders",
+    "trading",
+)
+_RELOAD_STORAGE = {
+    "source_rows_exhausted": True,
+    "sqlite_used_only_as_bounded_construction_spool": True,
+    "sqlite_retained": False,
+    "raw_provider_rows_retained": False,
+    "private_files": True,
+    "content_addressed": True,
+}
+_RELOAD_FILE_CONTRACT = (
+    ("firm_evidence", FIRM_ROWS_FILENAME, "provider_firm_id"),
+    (
+        "owner_adjudication_template",
+        ADJUDICATION_TEMPLATE_FILENAME,
+        "ranking_ordinal",
+    ),
+)
+_REPOSITORY_ARTIFACTS_ROOT = Path(__file__).resolve().parents[2] / "artifacts"
 
 
 class PhysicalFirmOntologyReviewPacketError(ValueError):
@@ -184,6 +238,8 @@ class _FileIdentity:
     modified_ns: int
     changed_ns: int
     mode: int
+    owner: int
+    links: int
 
 
 _AUTHORITIES: dict[
@@ -193,9 +249,24 @@ _AUTHORITIES: dict[
         tuple[object, ...],
         _FileIdentity,
         tuple[tuple[str, _FileIdentity], ...],
+        int,
     ],
 ] = {}
 _AUTHORITY_LOCK = threading.RLock()
+_AUTHORITY_PID = os.getpid()
+
+
+def _reset_authorities_after_fork() -> None:
+    """Discard inherited packet authority and an optionally orphaned lock."""
+
+    global _AUTHORITIES, _AUTHORITY_LOCK, _AUTHORITY_PID
+    _AUTHORITIES = {}
+    _AUTHORITY_LOCK = threading.RLock()
+    _AUTHORITY_PID = os.getpid()
+
+
+if hasattr(os, "register_at_fork"):
+    os.register_at_fork(after_in_child=_reset_authorities_after_fork)
 
 
 def _forget(identity: int, reference: object) -> None:
@@ -218,6 +289,9 @@ def _require_dependencies() -> None:
         or sha256_bytes is not _PINNED_SHA256_BYTES
         or decode_utf8 is not _PINNED_DECODE_UTF8
         or strict_json_loads is not _PINNED_STRICT_JSON_LOADS
+        or require_exact_keys is not _PINNED_REQUIRE_EXACT_KEYS
+        or require_int is not _PINNED_REQUIRE_INT
+        or require_sha256 is not _PINNED_REQUIRE_SHA256
         or hashlib.sha256 is not _PINNED_HASHLIB_SHA256
         or type(_DIRECTIONAL_ACTIONS) is not frozenset
         or _DIRECTIONAL_ACTIONS != frozenset({"upgrades", "downgrades"})
@@ -232,6 +306,19 @@ def _fingerprint(value: PhysicalFirmOntologyReviewPacket) -> tuple[object, ...]:
     return tuple(getattr(value, field.name) for field in dataclasses.fields(value))
 
 
+def _identity_from_stat(metadata: os.stat_result) -> _FileIdentity:
+    return _FileIdentity(
+        metadata.st_dev,
+        metadata.st_ino,
+        metadata.st_size,
+        metadata.st_mtime_ns,
+        metadata.st_ctime_ns,
+        stat.S_IMODE(metadata.st_mode),
+        metadata.st_uid,
+        metadata.st_nlink,
+    )
+
+
 def _identity(path: Path, *, directory: bool) -> _FileIdentity:
     try:
         metadata = path.stat(follow_symlinks=False)
@@ -243,18 +330,16 @@ def _identity(path: Path, *, directory: bool) -> _FileIdentity:
         metadata.st_mode
     )
     required_mode = 0o700 if directory else 0o600
-    if path.is_symlink() or not expected or stat.S_IMODE(metadata.st_mode) != required_mode:
+    if (
+        not expected
+        or stat.S_IMODE(metadata.st_mode) != required_mode
+        or (not directory and metadata.st_nlink != 1)
+        or (hasattr(os, "getuid") and metadata.st_uid != os.getuid())
+    ):
         raise PhysicalFirmOntologyReviewPacketError(
             "firm-review archive entries must remain private regular objects"
         )
-    return _FileIdentity(
-        metadata.st_dev,
-        metadata.st_ino,
-        metadata.st_size,
-        metadata.st_mtime_ns,
-        metadata.st_ctime_ns,
-        stat.S_IMODE(metadata.st_mode),
-    )
+    return _identity_from_stat(metadata)
 
 
 def _write_all(descriptor: int, payload: bytes) -> None:
@@ -417,8 +502,18 @@ def _read_private(
         raise PhysicalFirmOntologyReviewPacketCapacityError(
             "firm-review archive entry exceeds its byte bound"
         )
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
-    descriptor = os.open(path, flags)
+    flags = (
+        os.O_RDONLY
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_CLOEXEC", 0)
+        | getattr(os, "O_BINARY", 0)
+    )
+    try:
+        descriptor = os.open(path, flags)
+    except OSError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review archive entry is unavailable"
+        ) from exc
     try:
         data = bytearray()
         while len(data) <= maximum_bytes:
@@ -427,14 +522,7 @@ def _read_private(
                 break
             data.extend(chunk)
         metadata = os.fstat(descriptor)
-        after = _FileIdentity(
-            metadata.st_dev,
-            metadata.st_ino,
-            metadata.st_size,
-            metadata.st_mtime_ns,
-            metadata.st_ctime_ns,
-            stat.S_IMODE(metadata.st_mode),
-        )
+        after = _identity_from_stat(metadata)
     finally:
         os.close(descriptor)
     named_after = _identity(path, directory=False)
@@ -1405,6 +1493,7 @@ def _mint(
             _fingerprint(value),
             root_identity,
             file_identities,
+            os.getpid(),
         )
     return value
 
@@ -1680,37 +1769,7 @@ def _preflight(value: PhysicalFirmOntologyReviewPacket) -> None:
         raise PhysicalFirmOntologyReviewPacketError(
             "firm-review packet requires exact authority type"
         )
-    false_fields = (
-        "sqlite_retained",
-        "ordering_inferred",
-        "scope_inferred",
-        "ontology_reviewed",
-        "availability_reviewed",
-        "production_authority",
-        "provider_access",
-        "credential_access",
-        "quantconnect_access",
-        "outcome_access",
-        "result_access",
-        "deployment",
-        "orders",
-        "trading",
-    )
-    count_fields = (
-        "source_row_count",
-        "analyst_rating_source_row_count",
-        "valid_firm_source_row_count",
-        "invalid_firm_identity_row_count",
-        "current_admitted_firm_row_count",
-        "censored_admitted_firm_row_count",
-        "exact_censored_source_clock_row_count",
-        "firm_count",
-        "observed_firm_name_count",
-        "observed_label_count",
-        "observed_transition_count",
-        "ranked_firm_count",
-        "adjudication_firm_count",
-    )
+    false_fields = ("sqlite_retained", *_FALSE_CAPABILITY_FIELDS)
     if (
         value.schema != ARCHIVE_SCHEMA
         or value.packet_id
@@ -1725,7 +1784,7 @@ def _preflight(value: PhysicalFirmOntologyReviewPacket) -> None:
         or any(type(item) is not FirmReviewFileDescriptor for item in value.files)
         or any(
             type(getattr(value, name)) is not int or getattr(value, name) < 0
-            for name in count_fields
+            for name in _CENSUS_FIELDS
         )
         or value.valid_firm_source_row_count + value.invalid_firm_identity_row_count
         != value.analyst_rating_source_row_count
@@ -1756,21 +1815,7 @@ def _manifest_seed_from_value(
 ) -> dict[str, object]:
     counts = {
         name: getattr(value, name)
-        for name in (
-            "source_row_count",
-            "analyst_rating_source_row_count",
-            "valid_firm_source_row_count",
-            "invalid_firm_identity_row_count",
-            "current_admitted_firm_row_count",
-            "censored_admitted_firm_row_count",
-            "exact_censored_source_clock_row_count",
-            "firm_count",
-            "observed_firm_name_count",
-            "observed_label_count",
-            "observed_transition_count",
-            "ranked_firm_count",
-            "adjudication_firm_count",
-        )
+        for name in _CENSUS_FIELDS
     }
     return _descriptor_seed(
         accepted_risk_archive_id=value.accepted_risk_archive_id,
@@ -1784,52 +1829,411 @@ def _manifest_seed_from_value(
     )
 
 
+def _require_exact_reload_path(value: object) -> Path:
+    if (
+        type(value) is not _PATH_TYPE
+        or not value.is_absolute()
+        or ".." in value.parts
+        or value != Path(os.path.abspath(value))
+    ):
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload path must be an exact absolute Path"
+        )
+    return value
+
+
+def _strict_reload_object(
+    value: object, keys: tuple[str, ...], name: str
+) -> dict[str, object]:
+    if type(value) is not dict:
+        raise PhysicalFirmOntologyReviewPacketError(
+            f"{name} must be an exact JSON object"
+        )
+    try:
+        require_exact_keys(value, keys, name)
+    except CanonicalEvidenceError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            f"{name} key inventory changed"
+        ) from exc
+    return value
+
+
+def _reload_descriptor(
+    raw: object,
+    expected: tuple[str, str, str],
+    *,
+    expected_row_count: int,
+) -> FirmReviewFileDescriptor:
+    record = _strict_reload_object(
+        raw,
+        (
+            "role",
+            "relative_path",
+            "byte_count",
+            "content_sha256",
+            "row_count",
+            "sort_key",
+        ),
+        "firm-review reload file descriptor",
+    )
+    role, relative_path, sort_key = expected
+    try:
+        byte_count = require_int(
+            record["byte_count"],
+            "firm-review reload file byte count",
+            minimum=0,
+            maximum=MAX_ARCHIVE_FILE_BYTES,
+        )
+        row_count = require_int(
+            record["row_count"],
+            "firm-review reload file row count",
+            minimum=0,
+            maximum=MAX_SOURCE_ROWS,
+        )
+        content_sha256 = require_sha256(
+            record["content_sha256"],
+            "firm-review reload file SHA-256",
+        )
+    except CanonicalEvidenceError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload file descriptor is invalid"
+        ) from exc
+    if (
+        record["role"] != role
+        or record["relative_path"] != relative_path
+        or record["sort_key"] != sort_key
+        or row_count != expected_row_count
+        or (row_count == 0) != (byte_count == 0)
+    ):
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload file descriptor changed"
+        )
+    return FirmReviewFileDescriptor(
+        role=role,
+        relative_path=relative_path,
+        byte_count=byte_count,
+        content_sha256=content_sha256,
+        row_count=row_count,
+        sort_key=sort_key,
+    )
+
+
+def _reload_manifest_components(
+    manifest: bytes,
+    *,
+    expected_packet_sha256: str,
+    c1: PhysicalAcceptedRiskArchive,
+    seed: PhysicalPreopenSeedArchive | None,
+) -> tuple[dict[str, int], tuple[FirmReviewFileDescriptor, ...]]:
+    try:
+        raw = strict_json_loads(
+            decode_utf8(manifest, "firm-review reload manifest"),
+            "firm-review reload manifest",
+        )
+    except CanonicalEvidenceError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload manifest is not strict JSON"
+        ) from exc
+    top = _strict_reload_object(
+        raw,
+        ("schema", "packet_id", "packet_sha256", "packet_seed"),
+        "firm-review reload manifest",
+    )
+    if canonical_json_bytes(top) != manifest:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload manifest is not canonical"
+        )
+    packet_id = f"arv2-firm-ontology-review-{expected_packet_sha256[:24]}"
+    if (
+        top["schema"] != ARCHIVE_SCHEMA
+        or top["packet_id"] != packet_id
+        or top["packet_sha256"] != expected_packet_sha256
+    ):
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload does not match its external trust pin"
+        )
+    packet_seed = _strict_reload_object(
+        top["packet_seed"],
+        (
+            "schema",
+            "accepted_risk",
+            "preopen_seed",
+            "ranking",
+            "census",
+            "files",
+            "storage",
+            "capabilities",
+        ),
+        "firm-review reload packet seed",
+    )
+    accepted = _strict_reload_object(
+        packet_seed["accepted_risk"],
+        ("archive_id", "archive_sha256", "pair_id", "pair_sha256"),
+        "firm-review reload accepted-risk binding",
+    )
+    if accepted != {
+        "archive_id": c1.archive_id,
+        "archive_sha256": c1.archive_sha256,
+        "pair_id": c1.pair_id,
+        "pair_sha256": c1.pair_sha256,
+    }:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload does not bind the exact accepted-risk archive"
+        )
+
+    raw_seed = packet_seed["preopen_seed"]
+    if raw_seed is None:
+        if seed is not None:
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload pre-open seed binding changed"
+            )
+    else:
+        seed_record = _strict_reload_object(
+            raw_seed,
+            ("archive_id", "archive_sha256", "cross_checked"),
+            "firm-review reload pre-open seed binding",
+        )
+        if seed is None or seed_record != {
+            "archive_id": seed.archive_id,
+            "archive_sha256": seed.archive_sha256,
+            "cross_checked": True,
+        }:
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload pre-open seed binding changed"
+            )
+
+    ranking = _strict_reload_object(
+        packet_seed["ranking"],
+        (
+            "first_date",
+            "last_date",
+            "method",
+            "top_firm_count",
+            "ranked_firm_count",
+            "adjudication_firm_count",
+        ),
+        "firm-review reload ranking",
+    )
+    census_record = _strict_reload_object(
+        packet_seed["census"],
+        _CENSUS_FIELDS,
+        "firm-review reload census",
+    )
+    counts: dict[str, int] = {}
+    try:
+        for name in _CENSUS_FIELDS:
+            counts[name] = require_int(
+                census_record[name],
+                f"firm-review reload {name}",
+                minimum=0,
+                maximum=MAX_SOURCE_ROWS,
+            )
+        top_firm_count = require_int(
+            ranking["top_firm_count"],
+            "firm-review reload top-firm count",
+            minimum=TOP_FIRM_COUNT,
+            maximum=TOP_FIRM_COUNT,
+        )
+    except CanonicalEvidenceError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload census is invalid"
+        ) from exc
+    if (
+        packet_seed["schema"] != ARCHIVE_SCHEMA
+        or ranking["first_date"] != RANKING_FIRST_DATE
+        or ranking["last_date"] != RANKING_LAST_DATE
+        or ranking["method"] != RANKING_METHOD
+        or top_firm_count != TOP_FIRM_COUNT
+        or ranking["ranked_firm_count"] != counts["ranked_firm_count"]
+        or ranking["adjudication_firm_count"]
+        != counts["adjudication_firm_count"]
+        or counts["source_row_count"] != c1.source_row_count
+        or counts["analyst_rating_source_row_count"]
+        > counts["source_row_count"]
+        or counts["valid_firm_source_row_count"]
+        + counts["invalid_firm_identity_row_count"]
+        != counts["analyst_rating_source_row_count"]
+        or counts["current_admitted_firm_row_count"]
+        > counts["valid_firm_source_row_count"]
+        or counts["censored_admitted_firm_row_count"]
+        > counts["valid_firm_source_row_count"]
+        or counts["exact_censored_source_clock_row_count"]
+        > counts["valid_firm_source_row_count"]
+        or counts["firm_count"] > counts["valid_firm_source_row_count"]
+        or counts["observed_firm_name_count"]
+        > counts["valid_firm_source_row_count"]
+        or counts["observed_label_count"]
+        > 2 * counts["valid_firm_source_row_count"]
+        or counts["observed_transition_count"]
+        > counts["valid_firm_source_row_count"]
+        or counts["ranked_firm_count"] > counts["firm_count"]
+        or counts["adjudication_firm_count"]
+        != min(TOP_FIRM_COUNT, counts["ranked_firm_count"])
+    ):
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload census relationships changed"
+        )
+
+    raw_files = packet_seed["files"]
+    if type(raw_files) is not list or len(raw_files) != len(_RELOAD_FILE_CONTRACT):
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload file inventory changed"
+        )
+    files = tuple(
+        _reload_descriptor(
+            raw_descriptor,
+            contract,
+            expected_row_count=(
+                counts["firm_count"]
+                if index == 0
+                else counts["adjudication_firm_count"]
+            ),
+        )
+        for index, (raw_descriptor, contract) in enumerate(
+            zip(raw_files, _RELOAD_FILE_CONTRACT, strict=True)
+        )
+    )
+    storage = _strict_reload_object(
+        packet_seed["storage"],
+        tuple(_RELOAD_STORAGE),
+        "firm-review reload storage",
+    )
+    capabilities = _strict_reload_object(
+        packet_seed["capabilities"],
+        _FALSE_CAPABILITY_FIELDS,
+        "firm-review reload capabilities",
+    )
+    if storage != _RELOAD_STORAGE or capabilities != {
+        name: False for name in _FALSE_CAPABILITY_FIELDS
+    }:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload non-authorizing contract changed"
+        )
+    expected_seed = _descriptor_seed(
+        accepted_risk_archive_id=c1.archive_id,
+        accepted_risk_archive_sha256=c1.archive_sha256,
+        pair_id=c1.pair_id,
+        pair_sha256=c1.pair_sha256,
+        preopen_seed_archive_id=None if seed is None else seed.archive_id,
+        preopen_seed_archive_sha256=None
+        if seed is None
+        else seed.archive_sha256,
+        counts=counts,
+        files=files,
+    )
+    if (
+        packet_seed != expected_seed
+        or sha256_bytes(canonical_json_bytes(expected_seed))
+        != expected_packet_sha256
+        or top
+        != {
+            "schema": ARCHIVE_SCHEMA,
+            "packet_id": packet_id,
+            "packet_sha256": expected_packet_sha256,
+            "packet_seed": expected_seed,
+        }
+    ):
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload manifest content root changed"
+        )
+    return counts, files
+
+
 def _validate_jsonl(
     path: Path,
     descriptor: FirmReviewFileDescriptor,
     identity: _FileIdentity,
 ) -> None:
-    payload = _read_private(
-        path, maximum_bytes=MAX_ARCHIVE_FILE_BYTES, expected=identity
-    )
+    before = _identity(path, directory=False)
     if (
-        len(payload) != descriptor.byte_count
-        or sha256_bytes(payload) != descriptor.content_sha256
-        or (payload and (not payload.endswith(b"\n") or b"\r" in payload))
+        before != identity
+        or identity.size != descriptor.byte_count
+        or descriptor.byte_count > MAX_ARCHIVE_FILE_BYTES
     ):
         raise PhysicalFirmOntologyReviewPacketError(
             "firm-review JSONL file changed"
         )
-    lines = () if not payload else payload[:-1].split(b"\n")
-    if len(lines) != descriptor.row_count:
+    flags = (
+        os.O_RDONLY
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_CLOEXEC", 0)
+        | getattr(os, "O_BINARY", 0)
+    )
+    try:
+        raw_descriptor = os.open(path, flags)
+    except OSError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review JSONL file is unavailable"
+        ) from exc
+    digest = hashlib.sha256()
+    byte_count = 0
+    row_count = 0
+    prior: object | None = None
+    expected_key_type = (
+        str if descriptor.role == "firm_evidence" else int
+    )
+    handle = os.fdopen(raw_descriptor, "rb", buffering=0)
+    try:
+        while True:
+            line = handle.readline(MAX_REVIEW_ROW_BYTES + 1)
+            if not line:
+                break
+            if (
+                len(line) > MAX_REVIEW_ROW_BYTES
+                or not line.endswith(b"\n")
+                or b"\r" in line
+            ):
+                raise PhysicalFirmOntologyReviewPacketCapacityError(
+                    "one firm-review row exceeds its byte bound"
+                )
+            byte_count += len(line)
+            row_count += 1
+            if (
+                byte_count > MAX_ARCHIVE_FILE_BYTES
+                or byte_count > descriptor.byte_count
+                or row_count > descriptor.row_count
+            ):
+                raise PhysicalFirmOntologyReviewPacketError(
+                    "firm-review JSONL file changed"
+                )
+            digest.update(line)
+            try:
+                row = strict_json_loads(
+                    decode_utf8(line[:-1], "firm-review JSONL row"),
+                    "firm-review JSONL row",
+                )
+            except CanonicalEvidenceError as exc:
+                raise PhysicalFirmOntologyReviewPacketError(
+                    "firm-review JSONL row is not strict JSON"
+                ) from exc
+            if type(row) is not dict or canonical_json_bytes(row) != line:
+                raise PhysicalFirmOntologyReviewPacketError(
+                    "firm-review JSONL row is not canonical"
+                )
+            key = row.get(descriptor.sort_key)
+            if type(key) is not expected_key_type or (
+                prior is not None and key <= prior
+            ):
+                raise PhysicalFirmOntologyReviewPacketError(
+                    "firm-review JSONL order changed"
+                )
+            prior = key
+        after = _identity_from_stat(os.fstat(handle.fileno()))
+    finally:
+        handle.close()
+    named_after = _identity(path, directory=False)
+    if before != after or before != named_after:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review JSONL file changed while read"
+        )
+    if (
+        byte_count != descriptor.byte_count
+        or row_count != descriptor.row_count
+        or digest.hexdigest() != descriptor.content_sha256
+    ):
         raise PhysicalFirmOntologyReviewPacketError(
             "firm-review JSONL row census changed"
         )
-    prior: object | None = None
-    for line in lines:
-        if len(line) + 1 > MAX_REVIEW_ROW_BYTES:
-            raise PhysicalFirmOntologyReviewPacketCapacityError(
-                "one firm-review row exceeds its byte bound"
-            )
-        try:
-            row = strict_json_loads(
-                decode_utf8(line, "firm-review JSONL row"),
-                "firm-review JSONL row",
-            )
-        except CanonicalEvidenceError as exc:
-            raise PhysicalFirmOntologyReviewPacketError(
-                "firm-review JSONL row is not strict JSON"
-            ) from exc
-        if type(row) is not dict or canonical_json_bytes(row) != line + b"\n":
-            raise PhysicalFirmOntologyReviewPacketError(
-                "firm-review JSONL row is not canonical"
-            )
-        key = row.get(descriptor.sort_key)
-        if type(key) not in (str, int) or (prior is not None and key <= prior):
-            raise PhysicalFirmOntologyReviewPacketError(
-                "firm-review JSONL order changed"
-            )
-        prior = key
 
 
 def require_physical_firm_ontology_review_packet(
@@ -1839,6 +2243,11 @@ def require_physical_firm_ontology_review_packet(
 
     _require_dependencies()
     _preflight(value)
+    current_pid = os.getpid()
+    if current_pid != _AUTHORITY_PID:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review packet process authority changed"
+        )
     with _AUTHORITY_LOCK:
         authority = _AUTHORITIES.get(id(value))
     if (
@@ -1846,6 +2255,7 @@ def require_physical_firm_ontology_review_packet(
         or authority[0]() is not value
         or authority[1] != _fingerprint(value)
         or authority[2] != _identity(value.archive_path, directory=True)
+        or authority[4] != current_pid
     ):
         raise PhysicalFirmOntologyReviewPacketError(
             "firm-review packet is not current builder authority"
@@ -1900,6 +2310,287 @@ def require_physical_firm_ontology_review_packet(
             identities[descriptor.relative_path],
         )
     return value
+
+
+def _within_repository_artifacts(path: Path) -> bool:
+    try:
+        path.relative_to(_REPOSITORY_ARTIFACTS_ROOT)
+    except ValueError:
+        return False
+    return path != _REPOSITORY_ARTIFACTS_ROOT
+
+
+def _open_reload_directory(path: Path) -> tuple[int, _FileIdentity]:
+    before = _identity(path, directory=True)
+    flags = (
+        os.O_RDONLY
+        | getattr(os, "O_DIRECTORY", 0)
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_CLOEXEC", 0)
+    )
+    try:
+        descriptor = os.open(path, flags)
+    except OSError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload directory is unavailable"
+        ) from exc
+    after = _identity_from_stat(os.fstat(descriptor))
+    if before != after:
+        os.close(descriptor)
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload directory identity changed"
+        )
+    return descriptor, before
+
+
+def _require_reload_directory_current(
+    path: Path, descriptor: int, expected: _FileIdentity
+) -> None:
+    try:
+        opened = _identity_from_stat(os.fstat(descriptor))
+        named = _identity(path, directory=True)
+    except OSError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload directory identity changed"
+        ) from exc
+    if opened != expected or named != expected:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload directory identity changed"
+        )
+
+
+def _require_reload_inventory(
+    descriptor: int,
+    expected_names: set[str],
+) -> None:
+    try:
+        observed_names = set(os.listdir(descriptor))
+    except OSError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload inventory is unavailable"
+        ) from exc
+    if observed_names != expected_names:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload inventory changed"
+        )
+
+
+def _load_physical_firm_ontology_review_packet(
+    *,
+    archive_path: Path,
+    expected_packet_sha256: str,
+    accepted_risk_archive: PhysicalAcceptedRiskArchive,
+    preopen_seed_archive: PhysicalPreopenSeedArchive | None,
+    require_repository_path: bool,
+    final_require: Callable[
+        [PhysicalFirmOntologyReviewPacket], PhysicalFirmOntologyReviewPacket
+    ],
+) -> PhysicalFirmOntologyReviewPacket:
+    """Mint process-local authority only after complete disk reauthentication."""
+
+    _require_dependencies()
+    if type(expected_packet_sha256) is not str:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload external trust pin is invalid"
+        )
+    try:
+        require_sha256(
+            expected_packet_sha256,
+            "firm-review reload expected packet SHA-256",
+        )
+    except CanonicalEvidenceError as exc:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload external trust pin is invalid"
+        ) from exc
+    if (
+        type(accepted_risk_archive) is not _PINNED_C1_TYPE
+        or type(require_repository_path) is not bool
+    ):
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload trust policy changed"
+        )
+    c1 = _PINNED_C1_REQUIRE(accepted_risk_archive)
+    seed = preopen_seed_archive
+    if seed is not None:
+        if type(seed) is not _PINNED_SEED_TYPE:
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload requires exact pre-open seed authority"
+            )
+        seed = _PINNED_SEED_REQUIRE(seed)
+        if (
+            seed.accepted_risk_archive_id != c1.archive_id
+            or seed.accepted_risk_archive_sha256 != c1.archive_sha256
+            or seed.pair_id != c1.pair_id
+            or seed.pair_sha256 != c1.pair_sha256
+            or seed.massive_source_row_count != c1.source_row_count
+        ):
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload pre-open seed does not bind accepted risk"
+            )
+    archive = _require_exact_reload_path(archive_path)
+    expected_id = f"arv2-firm-ontology-review-{expected_packet_sha256[:24]}"
+    if archive.name != expected_id:
+        raise PhysicalFirmOntologyReviewPacketError(
+            "firm-review reload directory name changed"
+        )
+    if require_repository_path and not _within_repository_artifacts(archive):
+        raise PhysicalFirmOntologyReviewPacketError(
+            "production firm-review reload path must remain under artifacts"
+        )
+    for source_path in (
+        c1.archive_path,
+        None if seed is None else seed.archive_path,
+    ):
+        if source_path is not None and (
+            archive == source_path
+            or archive in source_path.parents
+            or source_path in archive.parents
+        ):
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload source and archive paths overlap"
+            )
+
+    root_fd: int | None = None
+    registered_identity: int | None = None
+    registered_reference: weakref.ReferenceType[
+        PhysicalFirmOntologyReviewPacket
+    ] | None = None
+    try:
+        root_fd, root_identity = _open_reload_directory(archive)
+        expected_names = {
+            ARCHIVE_MANIFEST,
+            ARCHIVE_MANIFEST_DIGEST,
+            FIRM_ROWS_FILENAME,
+            ADJUDICATION_TEMPLATE_FILENAME,
+        }
+        _require_reload_inventory(root_fd, expected_names)
+        leaf_identities = {
+            name: _identity(archive / name, directory=False)
+            for name in expected_names
+        }
+        manifest = _read_private(
+            archive / ARCHIVE_MANIFEST,
+            maximum_bytes=MAX_ARCHIVE_MANIFEST_BYTES,
+            expected=leaf_identities[ARCHIVE_MANIFEST],
+        )
+        digest = _read_private(
+            archive / ARCHIVE_MANIFEST_DIGEST,
+            maximum_bytes=65,
+            expected=leaf_identities[ARCHIVE_MANIFEST_DIGEST],
+        )
+        if digest != (sha256_bytes(manifest) + "\n").encode("ascii"):
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload manifest digest changed"
+            )
+        counts, files = _reload_manifest_components(
+            manifest,
+            expected_packet_sha256=expected_packet_sha256,
+            c1=c1,
+            seed=seed,
+        )
+        for file_descriptor in files:
+            _validate_jsonl(
+                archive / file_descriptor.relative_path,
+                file_descriptor,
+                leaf_identities[file_descriptor.relative_path],
+            )
+        _require_reload_inventory(root_fd, expected_names)
+        if {
+            name: _identity(archive / name, directory=False)
+            for name in expected_names
+        } != leaf_identities:
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload leaf identity changed"
+            )
+        _require_reload_directory_current(archive, root_fd, root_identity)
+        _PINNED_C1_REQUIRE(c1)
+        if seed is not None:
+            _PINNED_SEED_REQUIRE(seed)
+        value = _mint(
+            archive_path=archive,
+            packet_sha256=expected_packet_sha256,
+            c1=c1,
+            seed=seed,
+            counts=counts,
+            files=files,
+        )
+        registered_identity = id(value)
+        with _AUTHORITY_LOCK:
+            authority = _AUTHORITIES.get(registered_identity)
+        if authority is None or authority[0]() is not value:
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload mint did not register exact authority"
+            )
+        registered_reference = authority[0]
+        authenticated = final_require(value)
+        if authenticated is not value:
+            raise PhysicalFirmOntologyReviewPacketError(
+                "firm-review reload final authenticator changed authority"
+            )
+        _require_reload_inventory(root_fd, expected_names)
+        _require_reload_directory_current(archive, root_fd, root_identity)
+        _PINNED_C1_REQUIRE(c1)
+        if seed is not None:
+            _PINNED_SEED_REQUIRE(seed)
+        _require_dependencies()
+        return authenticated
+    except BaseException:
+        if registered_identity is not None:
+            with _AUTHORITY_LOCK:
+                current = _AUTHORITIES.get(registered_identity)
+                if (
+                    current is not None
+                    and current[0] is registered_reference
+                ):
+                    _AUTHORITIES.pop(registered_identity, None)
+        raise
+    finally:
+        if root_fd is not None:
+            try:
+                os.close(root_fd)
+            except OSError:
+                pass
+
+
+def load_physical_firm_ontology_review_packet(
+    *,
+    archive_path: Path,
+    expected_packet_sha256: str,
+    accepted_risk_archive: PhysicalAcceptedRiskArchive,
+    preopen_seed_archive: PhysicalPreopenSeedArchive | None = None,
+) -> PhysicalFirmOntologyReviewPacket:
+    """Reload a production packet under owner/reviewer and exact C1 pins."""
+
+    return _load_physical_firm_ontology_review_packet(
+        archive_path=archive_path,
+        expected_packet_sha256=expected_packet_sha256,
+        accepted_risk_archive=accepted_risk_archive,
+        preopen_seed_archive=preopen_seed_archive,
+        require_repository_path=True,
+        final_require=require_physical_firm_ontology_review_packet,
+    )
+
+
+def _load_test_fixture_physical_firm_ontology_review_packet(
+    *,
+    archive_path: Path,
+    expected_packet_sha256: str,
+    accepted_risk_archive: PhysicalAcceptedRiskArchive,
+    preopen_seed_archive: PhysicalPreopenSeedArchive | None = None,
+    final_require: Callable[
+        [PhysicalFirmOntologyReviewPacket], PhysicalFirmOntologyReviewPacket
+    ] = require_physical_firm_ontology_review_packet,
+) -> PhysicalFirmOntologyReviewPacket:
+    """Offline seam; it changes only the repository-path policy/finalizer."""
+
+    return _load_physical_firm_ontology_review_packet(
+        archive_path=archive_path,
+        expected_packet_sha256=expected_packet_sha256,
+        accepted_risk_archive=accepted_risk_archive,
+        preopen_seed_archive=preopen_seed_archive,
+        require_repository_path=False,
+        final_require=final_require,
+    )
 
 
 def _iter_file(
@@ -1987,5 +2678,6 @@ __all__ = [
     "build_physical_firm_ontology_review_packet",
     "iter_physical_firm_ontology_review_rows",
     "iter_physical_firm_owner_adjudication_template",
+    "load_physical_firm_ontology_review_packet",
     "require_physical_firm_ontology_review_packet",
 ]

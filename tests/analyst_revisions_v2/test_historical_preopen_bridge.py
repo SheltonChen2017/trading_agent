@@ -117,13 +117,14 @@ def _discovery_receipt(monkeypatch, tmp_path):
 
 def _physical_candidate(monkeypatch, tmp_path):
     extra = (
-        b"fundamentals,DUP1,100003,N,Dup One,Domestic Common Stock,NASDAQ,"
+        b"SF1,DUP1,100003,N,Dup One,Domestic Common Stock,NASDAQ,"
         b"Technology,Software,2010-01-04,,BBG001DUP111,000000CC6\n"
-        b"fundamentals,DUP2,100004,N,Dup Two,Domestic Common Stock,NYSE,"
+        b"SF1,DUP2,100004,N,Dup Two,Domestic Common Stock,NYSE,"
         b"Technology,Software,2010-01-04,,BBG001DUP222,000000CC6\n"
     )
-    monkeypatch.setattr(physical, "TICKERS", physical.TICKERS + extra)
-    return build_physical_preopen_input_candidate(*physical._physical_sources(tmp_path))
+    return build_physical_preopen_input_candidate(
+        *physical._physical_sources(tmp_path, tickers=physical.TICKERS + extra)
+    )
 
 
 def _json_lines(payload: bytes):

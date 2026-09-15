@@ -281,17 +281,19 @@ def _fraction_decimal(value: Fraction) -> Decimal:
 
 def _effective_contributors(values: Iterable[Decimal]) -> Decimal:
     with localcontext(_context()):
-        absolute = [abs(value) for value in values]
+        absolute = []
+        for value in values:
+            if type(value) is not Decimal or not value.is_finite():
+                raise _Error("effective contributor mass is invalid")
+            absolute.append(abs(value))
         total = _stable_sum(absolute)
         if total <= NUMERICAL_ZERO:
             return Decimal(0)
         positive = tuple(value for value in absolute if value > 0)
         squares = _stable_sum(value * value for value in positive)
-        numerator = +(total * total)
-        maximum = +(Decimal(len(positive)) * squares)
-        if numerator < squares or numerator > maximum:
+        result = +((total * total) / squares)
+        if not result.is_finite() or result <= 0:
             raise _Error("effective breadth violated bounds")
-        result = +(numerator / squares)
         return max(Decimal(1), min(Decimal(len(positive)), result))
 
 
@@ -324,18 +326,22 @@ def _normalize_sector(
         item in active for item in members
     ) < MINIMUM_ACTIVE_NAMES:
         return None
+    # Analyst events are sparse.  Estimate location and scale from the names
+    # carrying a live signal; structural-zero names remain exact zero in the
+    # returned cross-section and never manufacture dispersion.
+    active_members = tuple(item for item in members if item in active)
     with localcontext(_context()):
-        median = _median(raw[item] for item in members)
-        mad = _median(abs(raw[item] - median) for item in members)
+        median = _median(raw[item] for item in active_members)
+        mad = _median(abs(raw[item] - median) for item in active_members)
         if mad == 0:
             if min(raw[item] for item in members) == max(raw[item] for item in members):
                 return {item: Decimal(0) for item in members}
             return None
         scale = +(MAD_SCALE * mad)
         return {
-            item: max(
-                -SCORE_CLIP,
-                min(SCORE_CLIP, +((raw[item] - median) / scale)),
+            item: (
+                max(-SCORE_CLIP, min(SCORE_CLIP, +((raw[item] - median) / scale)))
+                if item in active else Decimal(0)
             )
             for item in members
         }
@@ -1075,10 +1081,16 @@ class PreliminaryRatingEvaluationRuntime:
                     )
         return result
 
-    def _score_session(self, position: int) -> None:
+    def _score_cross_section(
+        self, position: int
+    ) -> tuple[
+        tuple[SecurityMembership, ...],
+        dict[tuple[str, str], dict[str, Decimal]],
+        defaultdict[tuple[str, str], int],
+    ]:
+        """Build the unchanged R055 score cross-section for one session."""
         for index in self._live_contribution_indices.get(position, ()):
             self._apply_contribution(self._input.contributions[index])
-        session = self._input.session_axis[position]
         memberships = tuple(
             item for item in self._input.memberships
             if item.first_session_index <= position < item.last_session_index_exclusive
@@ -1137,6 +1149,11 @@ class PreliminaryRatingEvaluationRuntime:
                             state, "global_comparator", quality[security], decay_factor
                         ),
                     )
+        return memberships, scores, sector_refused
+
+    def _score_session(self, position: int) -> None:
+        _memberships, scores, sector_refused = self._score_cross_section(position)
+        session = self._input.session_axis[position]
         outcome_sessions = tuple(
             self._input.session_axis[position + horizon] for horizon in HORIZONS
         )
@@ -1171,7 +1188,6 @@ class PreliminaryRatingEvaluationRuntime:
                         cell.sector_refused_rows += sector_refused[(view, arm)]
                         if (
                             sector_refused[(view, arm)]
-                            or missing
                             or len(pairs) < MINIMUM_IC_ROWS
                         ):
                             cell.invalid_ic_dates += 1

@@ -4,7 +4,7 @@ This module is intentionally flat-importable inside a QuantConnect project.
 It authenticates the activation manifest and every compact input object from
 Object Store, resolves admitted composite FIGIs with an exact QC round trip,
 loads adjusted daily opens through typed ``History[TradeBar]`` requests, and
-advances the aggregate-only evaluator in bounded Train slices.
+advances the aggregate-only evaluator in bounded daily runtime slices.
 
 It is not the frozen formal evaluator.  It emits only compact preliminary
 custom summary statistics and has no order, portfolio, deployment, or Object
@@ -26,11 +26,15 @@ from types import MappingProxyType
 try:
     import accepted_risk_preliminary_rating_evaluator as evaluator
     import accepted_risk_preliminary_qc_figi as figi_authority
+    import accepted_risk_regime_rating_evaluator as regime_evaluator
 except ImportError:
     from research.analyst_revisions_v2_qc import (
         accepted_risk_preliminary_rating_evaluator as evaluator,
     )
     from research.analyst_revisions_v2_qc import accepted_risk_preliminary_qc_figi as figi_authority
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_regime_rating_evaluator as regime_evaluator,
+    )
 
 
 class AcceptedRiskPreliminaryQcRuntimeError(ValueError):
@@ -50,7 +54,9 @@ MAX_DECOMPRESSED_OBJECT_BYTES = 192 * 1024 * 1024
 MAX_TOTAL_DECOMPRESSED_BYTES = 768 * 1024 * 1024
 TRAIN_WORK_UNITS_PER_SLICE = 10
 TRAIN_SLICE_SOFT_SECONDS = 240
-MAX_TRAIN_SLICE_COUNT = 64
+# The persisted field retains its original ``training_slice_count`` name for
+# receipt compatibility, but R055 advances it directly from daily OnData.
+MAX_TRAIN_SLICE_COUNT = 113
 MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
 EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
@@ -61,6 +67,22 @@ EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
         )
     )
 )
+
+
+def expected_custom_summary_statistic_names(evaluation_profile_id=None):
+    if evaluation_profile_id is None:
+        return EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
+    regime_evaluator.require_regime_profile(evaluation_profile_id)
+    return tuple(
+        sorted(
+            (
+                *regime_evaluator.expected_custom_summary_statistic_names(
+                    evaluation_profile_id
+                ),
+                RUNTIME_META_STATISTIC,
+            )
+        )
+    )
 
 _HEX = re.compile(r"[0-9a-f]{64}\Z")
 _SAFE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,1023}\Z")
@@ -728,7 +750,7 @@ class QcTotalReturnOpenHistoryLoader:
 
 
 class AcceptedRiskPreliminaryQcDriver:
-    """Resumeless in-memory state machine advanced only from QC Train calls."""
+    """Resumeless state machine advanced in bounded QC runtime slices."""
 
     def __init__(
         self,
@@ -741,7 +763,13 @@ class AcceptedRiskPreliminaryQcDriver:
         trade_bar_type,
         daily_resolution,
         total_return_normalization,
+        evaluation_profile_id=None,
     ):
+        profile = (
+            None
+            if evaluation_profile_id is None
+            else regime_evaluator.require_regime_profile(evaluation_profile_id)
+        )
         self._algorithm = algorithm
         self._activation_manifest_key = activation_manifest_key
         self._activation_manifest_sha256 = activation_manifest_sha256
@@ -750,6 +778,10 @@ class AcceptedRiskPreliminaryQcDriver:
         self._trade_bar_type = trade_bar_type
         self._daily_resolution = daily_resolution
         self._total_return_normalization = total_return_normalization
+        self._evaluation_profile_id = evaluation_profile_id
+        self._evaluation_profile_sha256 = (
+            None if profile is None else profile["profile_sha256"]
+        )
         self._package = None
         self._resolution = None
         self._history_loader = None
@@ -802,9 +834,26 @@ class AcceptedRiskPreliminaryQcDriver:
             permitted_security_ids=tuple(dict.fromkeys(permitted_ids)),
             permitted_sessions=package.evaluator_input.session_axis,
         )
-        runtime = evaluator.PreliminaryRatingEvaluationRuntime(
-            package.evaluator_input
-        )
+        if self._evaluation_profile_id is None:
+            runtime = evaluator.PreliminaryRatingEvaluationRuntime(
+                package.evaluator_input
+            )
+        else:
+            input_security_ids = tuple(
+                sorted(
+                    {item.security_id for item in package.evaluator_input.memberships}
+                )
+            )
+            named_refusals = tuple(
+                security_id
+                for security_id in input_security_ids
+                if resolution.symbol_for_security(security_id) is None
+            )
+            runtime = regime_evaluator.RegimeRatingEvaluationRuntime(
+                package.evaluator_input,
+                profile_id=self._evaluation_profile_id,
+                named_figi_resolution_refusals=named_refusals,
+            )
         self._package = package
         self._resolution = resolution
         self._history_loader = history_loader
@@ -824,7 +873,7 @@ class AcceptedRiskPreliminaryQcDriver:
             or not 1 <= soft_seconds <= TRAIN_SLICE_SOFT_SECONDS
             or not callable(monotonic)
         ):
-            _error("preliminary Train slice bound changed")
+            _error("preliminary runtime slice bound changed")
         if self.completed:
             return None
         started = monotonic()
@@ -839,7 +888,7 @@ class AcceptedRiskPreliminaryQcDriver:
             _error("preliminary evaluation exceeded twelve-hour backtest bound")
         self._training_slice_count += 1
         if self._training_slice_count > MAX_TRAIN_SLICE_COUNT:
-            _error("preliminary evaluation exceeded deterministic Train-slice census")
+            _error("preliminary evaluation exceeded deterministic runtime-slice census")
         work = 0
         if self._runtime is None:
             self._initialize_in_training()
@@ -863,14 +912,25 @@ class AcceptedRiskPreliminaryQcDriver:
         if self._emitted:
             return
         statistics = self._runtime.custom_summary_statistics()
+        expected_evaluator_names = (
+            evaluator.EVALUATOR_CUSTOM_SUMMARY_STATISTIC_NAMES
+            if self._evaluation_profile_id is None
+            else regime_evaluator.expected_custom_summary_statistic_names(
+                self._evaluation_profile_id
+            )
+        )
         if (
             type(statistics) is not dict
             or tuple(sorted(statistics))
-            != evaluator.EVALUATOR_CUSTOM_SUMMARY_STATISTIC_NAMES
+            != expected_evaluator_names
         ):
             _error("preliminary evaluator custom summary inventory changed")
         meta = {
-            "schema": "arv2-accepted-risk-preliminary-qc-runtime-meta-v1",
+            "schema": (
+                "arv2-accepted-risk-preliminary-qc-runtime-meta-v1"
+                if self._evaluation_profile_id is None
+                else "arv2-accepted-risk-regime-qc-runtime-meta-v1"
+            ),
             "status": "PRELIMINARY_ACCEPTED_RISK_STOCK_IC_ONLY_COMPLETED",
             "package_id": self._package.package_id,
             "package_sha256": self._package.package_sha256,
@@ -879,7 +939,6 @@ class AcceptedRiskPreliminaryQcDriver:
             "symbol_resolution_sha256": self._resolution.resolution_sha256,
             "resolved_security_count": self._resolution.resolved_count,
             "named_security_refusal_count": self._resolution.named_refusal_count,
-            "training_slice_count": self._training_slice_count,
             "result_transport": "aggregate_only_custom_summary_statistics",
             "host_object_store_export_required": False,
             "preliminary": True,
@@ -892,10 +951,18 @@ class AcceptedRiskPreliminaryQcDriver:
             "orders": False,
             "trading": False,
         }
+        if self._evaluation_profile_id is None:
+            meta["training_slice_count"] = self._training_slice_count
+        else:
+            meta["evaluation_profile_id"] = self._evaluation_profile_id
+            meta["evaluation_profile_sha256"] = self._evaluation_profile_sha256
+            meta["runtime_slice_count"] = self._training_slice_count
         statistics[RUNTIME_META_STATISTIC] = _canonical(meta).decode("ascii")
         if (
             tuple(sorted(statistics))
-            != EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
+            != expected_custom_summary_statistic_names(
+                self._evaluation_profile_id
+            )
             or any(
                 type(key) is not str
                 or type(value) is not str

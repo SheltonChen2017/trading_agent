@@ -1,16 +1,17 @@
 """Signed, one-use host adapter for the accepted-risk preliminary QC run.
 
 The adapter is intentionally narrower than the formal evaluator adapter.  It
-binds one already-authenticated compact package and its exact five-file QC
+binds one already-authenticated compact package and its exact QC source
 projection, spends an owner-only local permit before any network access,
 creates one new private project, uploads the package activation object last,
 compiles, and creates exactly one backtest.  Status polling is statistics-free.
 
 After a completed run, a separately signed ``formal_qc_result_read`` authority
 spends a second one-use local permit before exactly one ``backtests/read``
-call.  Only the 34 preliminary ``ARV2_*`` aggregate custom statistics are
-selected, validated, returned, and persisted.  Raw provider rows, price rows,
-logs, charts, orders, trades, deployment, and trading are outside this module.
+call.  Only the exact profile-bound preliminary ``ARV2_*`` aggregate custom
+statistics are selected, validated, returned, and persisted.  Raw provider
+rows, price rows, logs, charts, orders, trades, deployment, and trading are
+outside this module.
 """
 from __future__ import annotations
 
@@ -34,6 +35,7 @@ from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_preliminary_qc_projection as projection_builder
 from . import accepted_risk_preliminary_qc_runtime as preliminary_runtime
 from . import accepted_risk_preliminary_rating_evaluator as preliminary_evaluator
+from . import accepted_risk_regime_rating_evaluator as regime_evaluator
 from . import formal_submission_adapter as formal
 from .formal_qc_transport import FormalQcTransport
 from .owner_signature_authority import (
@@ -70,6 +72,7 @@ class AcceptedRiskPreliminaryTerminalFailure(RuntimeError):
 
 
 PLAN_SCHEMA = "arv2-accepted-risk-preliminary-qc-submission-plan-v1"
+REGIME_PLAN_SCHEMA = "arv2-accepted-risk-preliminary-qc-submission-plan-v2"
 EXECUTION_AUTHORITY_SCHEMA = (
     "arv2-accepted-risk-preliminary-qc-execution-authority-v1"
 )
@@ -143,6 +146,10 @@ _PINNED_REQUIRE_PROJECTION = (
 _PINNED_EXPECTED_RESULT_NAMES = tuple(
     preliminary_runtime.EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
 )
+_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE = (
+    preliminary_runtime.expected_custom_summary_statistic_names
+)
+_PINNED_REQUIRE_REGIME_PROFILE = regime_evaluator.require_regime_profile
 _PINNED_REQUIRE_EXECUTION_SIGNATURE = require_formal_execution_owner_signature
 _PINNED_REQUIRE_RESULT_SIGNATURE = require_formal_result_read_owner_signature
 _PINNED_LOAD_INFRASTRUCTURE_LEDGER = preregistration.load_infrastructure_look_ledger
@@ -180,8 +187,8 @@ EXECUTION_ACTIONS = (
     "object/properties_verify_exact_key_size_md5",
     "files/read_exact_inventory",
     "files/delete_only_exact_default_research_ipynb",
-    "files/create_or_update_exact_five_file_projection",
-    "files/readback_exact_five_source_bytes",
+    "files/create_or_update_exact_profile_bound_projection",
+    "files/readback_exact_profile_bound_source_bytes",
     "compile/create_once",
     "compile/read_state_only_with_bounded_wait",
     "persist_authenticated_pre_create_control",
@@ -196,34 +203,152 @@ RESULT_ACTIONS = (
 )
 
 
-def _look_accounting(*, stage: str = "reservation") -> dict[str, object]:
+@dataclasses.dataclass(frozen=True, slots=True)
+class _EvaluationRunSpec:
+    profile_id: str | None
+    evaluation_id: str
+    ledger_entry_id: str
+    run_level_looks_before: int
+    run_level_looks_after: int
+    development_evaluations_before: int
+    development_evaluations_after: int
+    cell_count: int
+    lifetime_alpha_cell_floor_before: int
+    lifetime_alpha_cell_floor_after: int
+
+
+# The R-058/R-059 baselines are conditional ledger successors.  The host
+# orchestrator creates either plan only after authenticating the preceding
+# aggregate receipt; this adapter binds one selected run and does not claim to
+# authenticate a predecessor receipt that it is not given.
+_EVALUATION_RUN_SPECS = (
+    _EvaluationRunSpec(
+        None,
+        "arv2-eval-stock-historical-qc-001",
+        "R-055",
+        55,
+        56,
+        2,
+        3,
+        32,
+        484,
+        516,
+    ),
+    _EvaluationRunSpec(
+        "arv2-stock-ic-2019-2023",
+        "arv2-eval-stock-historical-qc-002",
+        "R-057",
+        56,
+        57,
+        3,
+        4,
+        16,
+        516,
+        532,
+    ),
+    _EvaluationRunSpec(
+        "arv2-stock-ic-2023-2025",
+        "arv2-eval-stock-historical-qc-003",
+        "R-058",
+        57,
+        58,
+        4,
+        5,
+        16,
+        532,
+        548,
+    ),
+    _EvaluationRunSpec(
+        "arv2-stock-ic-2013-2019",
+        "arv2-eval-stock-historical-qc-004",
+        "R-059",
+        58,
+        59,
+        5,
+        6,
+        16,
+        548,
+        564,
+    ),
+)
+
+
+def _run_spec(evaluation_profile_id: str | None) -> _EvaluationRunSpec:
+    for spec in _EVALUATION_RUN_SPECS:
+        if spec.profile_id == evaluation_profile_id:
+            if evaluation_profile_id is not None:
+                _PINNED_REQUIRE_REGIME_PROFILE(evaluation_profile_id)
+            return spec
+    _error("preliminary evaluation profile is not allowlisted")
+
+
+def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]:
+    spec = _run_spec(evaluation_profile_id)
+    names = (
+        _PINNED_EXPECTED_RESULT_NAMES
+        if evaluation_profile_id is None
+        else tuple(_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE(evaluation_profile_id))
+    )
+    if (
+        type(names) is not tuple
+        or len(names) != spec.cell_count + 2
+        or names != tuple(sorted(names))
+        or len(set(names)) != len(names)
+        or "ARV2_RUNTIME_META" not in names
+    ):
+        _error("preliminary expected result inventory changed")
+    return names
+
+
+def _look_accounting(
+    *,
+    stage: str = "reservation",
+    evaluation_profile_id: str | None = None,
+) -> dict[str, object]:
     """Return prospective, launched, or authenticated-result look accounting."""
     if stage not in {"reservation", "launch", "result"}:
         _error("preliminary look-accounting stage changed")
     launched = stage in {"launch", "result"}
     aggregate_authenticated = stage == "result"
+    spec = _run_spec(evaluation_profile_id)
     binding = _PINNED_REQUIRE_INFRASTRUCTURE_LEDGER(
         _PINNED_INFRASTRUCTURE_LEDGER
     )
     return {
         "schema": "arv2-qc-research-look-accounting-v1",
         "classification": "development_evaluation",
-        "evaluation_id": "arv2-eval-stock-historical-qc-001",
-        "shared_look_ledger_entry_id": "R-053",
+        "evaluation_id": spec.evaluation_id,
+        "shared_look_ledger_entry_id": spec.ledger_entry_id,
         "accounting_stage": stage,
-        "run_level_looks_before": 53,
-        "run_level_looks_after": 54 if launched else 53,
-        "planned_run_level_looks_after_launch": 54,
-        "arv2_development_evaluations_before": 0,
-        "arv2_development_evaluations_after": 1 if launched else 0,
-        "planned_arv2_development_evaluations_after_launch": 1,
-        "planned_maximum_preliminary_ic_cell_count": 32,
-        "emitted_preliminary_ic_cell_count": (
-            32 if aggregate_authenticated else 0
+        "run_level_looks_before": spec.run_level_looks_before,
+        "run_level_looks_after": (
+            spec.run_level_looks_after
+            if launched
+            else spec.run_level_looks_before
         ),
-        "lifetime_alpha_cell_floor_before": 452,
+        "planned_run_level_looks_after_launch": spec.run_level_looks_after,
+        "arv2_development_evaluations_before": (
+            spec.development_evaluations_before
+        ),
+        "arv2_development_evaluations_after": (
+            spec.development_evaluations_after
+            if launched
+            else spec.development_evaluations_before
+        ),
+        "planned_arv2_development_evaluations_after_launch": (
+            spec.development_evaluations_after
+        ),
+        "planned_maximum_preliminary_ic_cell_count": spec.cell_count,
+        "emitted_preliminary_ic_cell_count": (
+            spec.cell_count if aggregate_authenticated else 0
+        ),
+        "lifetime_alpha_cell_floor_before": (
+            spec.lifetime_alpha_cell_floor_before
+        ),
         "lifetime_alpha_cell_floor_after": (
-            484 if aggregate_authenticated else 452
+            spec.lifetime_alpha_cell_floor_after
+            if aggregate_authenticated
+            else spec.lifetime_alpha_cell_floor_before
         ),
         "aggregate_result_authenticated": aggregate_authenticated,
         "infrastructure_looks_before": 23,
@@ -658,6 +783,8 @@ class AcceptedRiskPreliminarySubmissionPlan:
     upload_entries: tuple[AcceptedRiskPreliminaryUploadEntry, ...]
     projection_id: str
     projection_sha256: str
+    evaluation_profile_id: str | None
+    evaluation_profile_sha256: str | None
     project_source_set_sha256: str
     source_files: tuple[projection_builder.PreliminaryQcSourceFile, ...]
     host_closure: AcceptedRiskPreliminaryHostClosureBinding
@@ -709,11 +836,18 @@ def _plan_record(
 ) -> dict[str, object]:
     source_records = [item.to_record() for item in projection.source_files]
     source_hash = hashlib.sha256(_canonical(source_records)).hexdigest()
+    expected_result_names = _expected_result_names(
+        projection.evaluation_profile_id
+    )
     names_hash = hashlib.sha256(
-        _canonical(list(_PINNED_EXPECTED_RESULT_NAMES))
+        _canonical(list(expected_result_names))
     ).hexdigest()
-    return {
-        "schema": PLAN_SCHEMA,
+    record = {
+        "schema": (
+            PLAN_SCHEMA
+            if projection.evaluation_profile_id is None
+            else REGIME_PLAN_SCHEMA
+        ),
         "plan_id": None,
         "plan_sha256": None,
         "organization_id_sha256": organization_hash,
@@ -732,9 +866,11 @@ def _plan_record(
         "project_source_set_sha256": source_hash,
         "source_files": source_records,
         "host_code_closure": host_closure.to_record(),
-        "expected_custom_statistic_names": list(_PINNED_EXPECTED_RESULT_NAMES),
+        "expected_custom_statistic_names": list(expected_result_names),
         "expected_custom_statistic_names_sha256": names_hash,
-        "look_accounting": _look_accounting(),
+        "look_accounting": _look_accounting(
+            evaluation_profile_id=projection.evaluation_profile_id
+        ),
         "compile_poll_limit": MAX_COMPILE_POLLS,
         "status_poll_limit": MAX_STATUS_POLLS,
         "maximum_backtest_submissions": 1,
@@ -747,6 +883,10 @@ def _plan_record(
         "trading": False,
         "retry_inside_adapter": False,
     }
+    if projection.evaluation_profile_id is not None:
+        record["evaluation_profile_id"] = projection.evaluation_profile_id
+        record["evaluation_profile_sha256"] = projection.evaluation_profile_sha256
+    return record
 
 
 def build_accepted_risk_preliminary_submission_plan(
@@ -768,11 +908,12 @@ def build_accepted_risk_preliminary_submission_plan(
     if (
         projection.package_id != package.package_id
         or projection.package_sha256 != package.package_sha256
-        or len(projection.source_files) != 5
+        or len(projection.source_files)
+        != len(projection_builder.PROJECT_SOURCE_PATHS) + 1
         or tuple(item.project_path for item in projection.source_files)
         != tuple(sorted(projection_builder.PROJECT_SOURCE_PATHS + ("main.py",)))
     ):
-        _error("preliminary package and five-file projection are not exact peers")
+        _error("preliminary package and profile-bound projection are not exact peers")
     uploads = _upload_entries(package)
     host_closure = _build_host_closure(worktree_root)
     organization_hash = hashlib.sha256(organization_id.encode("utf-8")).hexdigest()
@@ -807,10 +948,12 @@ def build_accepted_risk_preliminary_submission_plan(
         uploads,
         projection.projection_id,
         projection.projection_sha256,
+        projection.evaluation_profile_id,
+        projection.evaluation_profile_sha256,
         source_hash,
         projection.source_files,
         host_closure,
-        _PINNED_EXPECTED_RESULT_NAMES,
+        _expected_result_names(projection.evaluation_profile_id),
         names_hash,
         MAX_COMPILE_POLLS,
         MAX_STATUS_POLLS,
@@ -937,37 +1080,41 @@ def load_accepted_risk_preliminary_submission_plan(
 
 def _execution_authority(plan: AcceptedRiskPreliminarySubmissionPlan) -> bytes:
     plan = require_accepted_risk_preliminary_submission_plan(plan)
-    return _canonical(
-        {
-            "schema": EXECUTION_AUTHORITY_SCHEMA,
-            "signature_purpose": "formal_qc_execution",
-            "plan_id": plan.plan_id,
-            "plan_sha256": plan.plan_sha256,
-            "organization_id_sha256": plan.organization_id_sha256,
-            "project_name": plan.project_name,
-            "backtest_name": plan.backtest_name,
-            "package_id": plan.package_id,
-            "package_sha256": plan.package_sha256,
-            "activation_manifest_sha256": plan.activation_manifest_sha256,
-            "projection_id": plan.projection_id,
-            "projection_sha256": plan.projection_sha256,
-            "project_source_set_sha256": plan.project_source_set_sha256,
-            "package_upload_count": len(plan.upload_entries),
-            "project_source_count": len(plan.source_files),
-            "host_code_closure": _require_host_closure(
-                plan.host_closure
-            ).to_record(),
-            "look_accounting": _look_accounting(),
-            "actions": list(EXECUTION_ACTIONS),
-            "maximum_backtest_submissions": 1,
-            "statistics_free_status": True,
-            "result_read_authority_separate": True,
-            "retries_inside_adapter": 0,
-            "deployment": False,
-            "orders": False,
-            "trading": False,
-        }
-    )
+    record = {
+        "schema": EXECUTION_AUTHORITY_SCHEMA,
+        "signature_purpose": "formal_qc_execution",
+        "plan_id": plan.plan_id,
+        "plan_sha256": plan.plan_sha256,
+        "organization_id_sha256": plan.organization_id_sha256,
+        "project_name": plan.project_name,
+        "backtest_name": plan.backtest_name,
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "activation_manifest_sha256": plan.activation_manifest_sha256,
+        "projection_id": plan.projection_id,
+        "projection_sha256": plan.projection_sha256,
+        "project_source_set_sha256": plan.project_source_set_sha256,
+        "package_upload_count": len(plan.upload_entries),
+        "project_source_count": len(plan.source_files),
+        "host_code_closure": _require_host_closure(
+            plan.host_closure
+        ).to_record(),
+        "look_accounting": _look_accounting(
+            evaluation_profile_id=plan.projection.evaluation_profile_id
+        ),
+        "actions": list(EXECUTION_ACTIONS),
+        "maximum_backtest_submissions": 1,
+        "statistics_free_status": True,
+        "result_read_authority_separate": True,
+        "retries_inside_adapter": 0,
+        "deployment": False,
+        "orders": False,
+        "trading": False,
+    }
+    if plan.evaluation_profile_id is not None:
+        record["evaluation_profile_id"] = plan.evaluation_profile_id
+        record["evaluation_profile_sha256"] = plan.evaluation_profile_sha256
+    return _canonical(record)
 
 
 def render_accepted_risk_preliminary_execution_authority_candidate(
@@ -1022,7 +1169,9 @@ def _build_execution_permit(plan, signature, started_at_utc):
         "owner_signature_sha256": _sha(
             signature.authority_sha256, "execution signature authority"
         ),
-        "look_accounting": _look_accounting(),
+        "look_accounting": _look_accounting(
+            evaluation_profile_id=plan.projection.evaluation_profile_id
+        ),
         "started_at_utc": started_at_utc,
         "submission_attempt_count": 1,
         "ambiguous_submission_consumes_permit": True,
@@ -1094,7 +1243,10 @@ def _require_execution_permit_bytes(
         raw.get("schema") != EXECUTION_PERMIT_SCHEMA
         or raw.get("plan_sha256") != plan.plan_sha256
         or raw.get("owner_signature_sha256") != value.owner_signature_sha256
-        or raw.get("look_accounting") != _look_accounting()
+        or raw.get("look_accounting")
+        != _look_accounting(
+            evaluation_profile_id=plan.projection.evaluation_profile_id
+        )
         or raw.get("started_at_utc") != value.started_at_utc
         or raw.get("submission_attempt_count") != 1
         or raw.get("ambiguous_submission_consumes_permit") is not True
@@ -1165,7 +1317,10 @@ def _build_precreate_control(plan, permit, project_id, compile_id):
         "project_id": project_id,
         "compile_id": compile_id,
         "backtest_name": plan.backtest_name,
-        "look_accounting": _look_accounting(stage="launch"),
+        "look_accounting": _look_accounting(
+            stage="launch",
+            evaluation_profile_id=plan.projection.evaluation_profile_id,
+        ),
         "backtests_create_call_limit": 1,
         "backtests_create_may_have_occurred": True,
         "statistics_free_recovery_only": True,
@@ -1219,7 +1374,11 @@ def _require_precreate_control(value, plan, permit):
         or raw.get("project_id") != value.project_id
         or raw.get("compile_id") != value.compile_id
         or raw.get("backtest_name") != value.backtest_name
-        or raw.get("look_accounting") != _look_accounting(stage="launch")
+        or raw.get("look_accounting")
+        != _look_accounting(
+            stage="launch",
+            evaluation_profile_id=plan.projection.evaluation_profile_id,
+        )
         or raw.get("backtests_create_call_limit") != 1
         or raw.get("backtests_create_may_have_occurred") is not True
         or raw.get("statistics_free_recovery_only") is not True
@@ -1261,7 +1420,10 @@ def _launch_recovery_permit_record(plan, permit, control):
         "plan_sha256": plan.plan_sha256,
         "permit_sha256": permit.permit_sha256,
         "precreate_control_sha256": control.control_sha256,
-        "look_accounting": _look_accounting(stage="launch"),
+        "look_accounting": _look_accounting(
+            stage="launch",
+            evaluation_profile_id=plan.projection.evaluation_profile_id,
+        ),
         "statistics_free_backtests_list_call_limit": 1,
         "retry_inside_adapter": False,
     }
@@ -1371,13 +1533,19 @@ class AcceptedRiskPreliminaryAggregateResult:
     orders_selected: bool
 
 
-def _launch_record(value: AcceptedRiskPreliminaryLaunchReceipt) -> dict[str, object]:
+def _launch_record(
+    value: AcceptedRiskPreliminaryLaunchReceipt,
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+) -> dict[str, object]:
     return {
         "plan_sha256": value.plan_sha256,
         "permit_sha256": value.permit_sha256,
         "precreate_control_sha256": value.precreate_control_sha256,
         "launch_recovery_permit_sha256": value.launch_recovery_permit_sha256,
-        "look_accounting": _look_accounting(stage="launch"),
+        "look_accounting": _look_accounting(
+            stage="launch",
+            evaluation_profile_id=plan.projection.evaluation_profile_id,
+        ),
         "project_id": value.project_id,
         "compile_id": value.compile_id,
         "backtest_id": value.backtest_id,
@@ -1400,13 +1568,19 @@ def _terminal_record(value: AcceptedRiskPreliminaryTerminalStatus) -> dict[str, 
     }
 
 
-def _result_record(value: AcceptedRiskPreliminaryAggregateResult) -> dict[str, object]:
+def _result_record(
+    value: AcceptedRiskPreliminaryAggregateResult,
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+) -> dict[str, object]:
     return {
         "plan_sha256": value.plan_sha256,
         "launch_sha256": value.launch_sha256,
         "terminal_sha256": value.terminal_sha256,
         "result_permit_sha256": value.result_permit_sha256,
-        "look_accounting": _look_accounting(stage="result"),
+        "look_accounting": _look_accounting(
+            stage="result",
+            evaluation_profile_id=plan.projection.evaluation_profile_id,
+        ),
         "project_id": value.project_id,
         "backtest_id": value.backtest_id,
         "custom_statistics": [list(item) for item in value.custom_statistics],
@@ -1442,11 +1616,14 @@ def _identified_receipt_bytes(
     return payload
 
 
-def _launch_receipt_bytes(value: AcceptedRiskPreliminaryLaunchReceipt) -> bytes:
+def _launch_receipt_bytes(
+    value: AcceptedRiskPreliminaryLaunchReceipt,
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+) -> bytes:
     return _identified_receipt_bytes(
         schema=LAUNCH_SCHEMA,
         prefix="arv2-preliminary-qc-launch-",
-        record=_launch_record(value),
+        record=_launch_record(value, plan),
         receipt_id=value.receipt_id,
         receipt_sha256=value.receipt_sha256,
     )
@@ -1489,7 +1666,11 @@ def _load_launch_receipt_impl(*, plan, permit, register_launch):
         or value.precreate_control_sha256 != control.control_sha256
         or value.project_id != control.project_id
         or value.compile_id != control.compile_id
-        or raw.get("look_accounting") != _look_accounting(stage="launch")
+        or raw.get("look_accounting")
+        != _look_accounting(
+            stage="launch",
+            evaluation_profile_id=plan.projection.evaluation_profile_id,
+        )
         or type(value.project_id) is not int
         or value.project_id <= 0
         or value.backtest_name != plan.backtest_name
@@ -1507,7 +1688,7 @@ def _load_launch_receipt_impl(*, plan, permit, register_launch):
     _safe_name(value.compile_id, "persisted compile id", 512)
     _safe_name(value.backtest_id, "persisted backtest id", 512)
     _safe_name(value.initial_status, "persisted initial status", 512)
-    if payload != _launch_receipt_bytes(value):
+    if payload != _launch_receipt_bytes(value, plan):
         _error("persisted preliminary launch receipt changed")
     register_launch(value, plan, permit)
     return value
@@ -1562,7 +1743,8 @@ def _make_return_authority():
     def register_launch(value, plan, permit):
         with lock:
             launch_state[id(value)] = (
-                weakref.ref(value), plan, permit, _canonical(_launch_record(value)),
+                weakref.ref(value), plan, permit,
+                _canonical(_launch_record(value, plan)),
                 authority_pid,
             )
 
@@ -1576,11 +1758,16 @@ def _make_return_authority():
             or state[0]() is not value
             or state[1] is not plan
             or state[2] is not permit
-            or state[3] != _canonical(_launch_record(value))
+            or state[3] != _canonical(_launch_record(value, plan))
             or state[4] != os.getpid()
         ):
             _error("preliminary launch receipt lacks process-return authority")
-        seed = {"schema": LAUNCH_SCHEMA, "id": None, "sha256": None, **_launch_record(value)}
+        seed = {
+            "schema": LAUNCH_SCHEMA,
+            "id": None,
+            "sha256": None,
+            **_launch_record(value, plan),
+        }
         digest = hashlib.sha256(_canonical(seed)).hexdigest()
         if value.receipt_sha256 != digest or value.receipt_id != "arv2-preliminary-qc-launch-" + digest[:24]:
             _error("preliminary launch receipt identity changed")
@@ -1621,7 +1808,7 @@ def _make_return_authority():
         with lock:
             result_state[id(value)] = (
                 weakref.ref(value), plan, permit, launch, terminal, result_permit,
-                _canonical(_result_record(value)), authority_pid,
+                _canonical(_result_record(value, plan)), authority_pid,
             )
 
     def require_result(value, plan, permit, launch, terminal, result_permit):
@@ -1638,11 +1825,16 @@ def _make_return_authority():
             or state[3] is not launch
             or state[4] is not terminal
             or state[5] is not result_permit
-            or state[6] != _canonical(_result_record(value))
+            or state[6] != _canonical(_result_record(value, plan))
             or state[7] != os.getpid()
         ):
             _error("preliminary result receipt lacks process-return authority")
-        seed = {"schema": RESULT_RECEIPT_SCHEMA, "id": None, "sha256": None, **_result_record(value)}
+        seed = {
+            "schema": RESULT_RECEIPT_SCHEMA,
+            "id": None,
+            "sha256": None,
+            **_result_record(value, plan),
+        }
         digest = hashlib.sha256(_canonical(seed)).hexdigest()
         if value.receipt_sha256 != digest or value.receipt_id != "arv2-preliminary-qc-result-" + digest[:24]:
             _error("preliminary result receipt identity changed")
@@ -1694,7 +1886,13 @@ def _new_launch(
     identity, digest, _payload = _identified(
         LAUNCH_SCHEMA,
         "arv2-preliminary-qc-launch-",
-        {**record, "look_accounting": _look_accounting(stage="launch")},
+        {
+            **record,
+            "look_accounting": _look_accounting(
+                stage="launch",
+                evaluation_profile_id=plan.projection.evaluation_profile_id,
+            ),
+        },
     )
     return AcceptedRiskPreliminaryLaunchReceipt(identity, digest, **record)
 
@@ -1913,7 +2111,7 @@ def _execute_accepted_risk_preliminary_submission_once_impl(
         launch = _new_launch(plan, permit, control, backtest_id, initial)
         _write_private_once(
             _launch_receipt_path(plan),
-            _launch_receipt_bytes(launch),
+            _launch_receipt_bytes(launch, plan),
             "launch receipt",
         )
         register_launch(launch, plan, permit)
@@ -1987,7 +2185,7 @@ def _recover_accepted_risk_preliminary_launch_once_impl(
         )
         _write_private_once(
             launch_path,
-            _launch_receipt_bytes(launch),
+            _launch_receipt_bytes(launch, plan),
             "launch receipt",
         )
         register_launch(launch, plan, permit)
@@ -2272,6 +2470,84 @@ _PRELIMINARY_META_FIELDS = frozenset(
         "summary_sha256",
     }
 )
+_REGIME_RUNTIME_META_FIELDS = frozenset(
+    (_RUNTIME_META_FIELDS - {"training_slice_count"})
+    | {
+        "evaluation_profile_id",
+        "evaluation_profile_sha256",
+        "runtime_slice_count",
+    }
+)
+_REGIME_CELL_FIELDS = frozenset(
+    {
+        "schema",
+        "source_view_id",
+        "score_arm",
+        "horizon_sessions",
+        "profile_id",
+        "window_start_session",
+        "window_end_session",
+        "status",
+        "eligible_score_row_count",
+        "accepted_outcome_pair_count",
+        "missing_outcome_pair_count",
+        "benchmark_endpoint_unavailable_pair_count",
+        "named_figi_resolution_refusal_pair_count",
+        "security_entry_unavailable_pair_count",
+        "membership_ended_by_exit_with_exit_unavailable_pair_count",
+        "within_membership_exit_unavailable_pair_count",
+        "missing_pair_counter_sum_matches_total",
+        "sector_refused_row_count",
+        "valid_ic_date_count",
+        "invalid_ic_date_count",
+        "mean_daily_spearman_ic",
+        "median_daily_spearman_ic",
+        "positive_ic_date_share",
+        "mean_of_daily_cross_section_mean_excess_returns",
+        "median_of_daily_cross_section_mean_excess_returns",
+        "outcome_definition",
+        "endpoint_price_conditioning",
+        "membership_ended_by_exit_interpretation",
+        "formal_accept_reject_disposition",
+    }
+)
+_REGIME_META_FIELDS = frozenset(
+    {
+        "schema",
+        "contract_id",
+        "input_contract_id",
+        "manifest_id",
+        "manifest_sha256",
+        "status",
+        "source_lineage_sha256s",
+        "profile",
+        "source_view_ids",
+        "score_arms",
+        "horizons",
+        "outcome_definition",
+        "history_normalization_mode",
+        "history_value_field",
+        "decay_state_method",
+        "benchmark_role",
+        "q_data_policy_id",
+        "input_security_count",
+        "input_contribution_count",
+        "named_figi_resolution_refusal_count",
+        "completed_callback_count",
+        "r055_signal_rule_changed",
+        "outcome_availability_disclosures",
+        "accepted_risk_disclosures",
+        "raw_provider_rows_in_summary",
+        "raw_security_outcome_rows_in_summary",
+        "raw_price_rows_in_summary",
+        "terminal_payoff_applied",
+        "economic_portfolio_evaluation",
+        "formal_result",
+        "alpha_claim_authorized",
+        "summary_id",
+        "summary_sha256",
+    }
+)
 _CELL_COUNT_FIELDS = (
     "eligible_score_row_count",
     "accepted_outcome_pair_count",
@@ -2280,12 +2556,46 @@ _CELL_COUNT_FIELDS = (
     "valid_ic_date_count",
     "invalid_ic_date_count",
 )
+_REGIME_MISSING_COUNT_FIELDS = (
+    "benchmark_endpoint_unavailable_pair_count",
+    "named_figi_resolution_refusal_pair_count",
+    "security_entry_unavailable_pair_count",
+    "membership_ended_by_exit_with_exit_unavailable_pair_count",
+    "within_membership_exit_unavailable_pair_count",
+)
 _CELL_METRIC_FIELDS = (
     "mean_daily_spearman_ic",
     "median_daily_spearman_ic",
     "positive_ic_date_share",
     "mean_of_daily_cross_section_mean_excess_returns",
     "median_of_daily_cross_section_mean_excess_returns",
+)
+_REGIME_PROFILE_NAME_TOKENS = (
+    ("arv2-stock-ic-2019-2023", "2019_2023"),
+    ("arv2-stock-ic-2023-2025", "2023_2025"),
+    ("arv2-stock-ic-2013-2019", "2013_2019"),
+)
+_EXPECTED_OUTCOME_AVAILABILITY_DISCLOSURES = (
+    ("reported_ic_conditioned_on_endpoint_price_availability", True),
+    (
+        "endpoint_price_conditioning",
+        "security_and_benchmark_entry_and_exit_prices_required",
+    ),
+    ("endpoint_price_conditioning_direction", "unknown"),
+    ("missing_pair_categories_mutually_exclusive", True),
+    (
+        "missing_pair_classification_precedence",
+        (
+            "benchmark_endpoint_then_named_figi_refusal_then_security_entry_"
+            "then_exit_membership_state"
+        ),
+    ),
+    ("membership_ended_by_exit_is_confirmed_terminal", False),
+    (
+        "membership_ended_by_exit_interpretation",
+        "membership_end_is_not_a_confirmed_terminal_or_terminal_payoff",
+    ),
+    ("terminal_payoff_policy_applied", False),
 )
 _DECIMAL_METRIC = re.compile(r"-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?\Z")
 
@@ -2325,6 +2635,14 @@ def _cell_metric(value: object, name: str) -> Decimal:
     return parsed
 
 
+def _outcome_availability_disclosures() -> dict[str, object]:
+    expected = dict(_EXPECTED_OUTCOME_AVAILABILITY_DISCLOSURES)
+    observed = dict(regime_evaluator.OUTCOME_AVAILABILITY_DISCLOSURES)
+    if observed != expected:
+        _error("preliminary regime outcome disclosure contract changed")
+    return expected
+
+
 def _validate_cell_semantics(record: dict[str, object]) -> int:
     if any(
         type(record.get(name)) is not int or record[name] < 0
@@ -2340,7 +2658,7 @@ def _validate_cell_semantics(record: dict[str, object]) -> int:
     if (
         eligible != accepted + missing
         or accepted < valid * preliminary_evaluator.MINIMUM_IC_ROWS
-        or ((missing > 0 or sector_refused > 0) and invalid == 0)
+        or (sector_refused > 0 and invalid == 0)
     ):
         _error("preliminary aggregate cell count invariants changed")
     expected_status = (
@@ -2370,17 +2688,24 @@ def _validate_cell_semantics(record: dict[str, object]) -> int:
     return valid + invalid
 
 
-def _validate_aggregate_records(records: Mapping[str, dict[str, object]], plan) -> None:
-    authenticated_manifest = _authenticated_evaluator_manifest(plan)
-    runtime_meta = records.get("ARV2_RUNTIME_META")
-    preliminary_meta = records.get("ARV2_PRELIMINARY_META")
-    if type(runtime_meta) is not dict or type(preliminary_meta) is not dict:
-        _error("preliminary aggregate metadata is absent")
+def _require_runtime_meta(
+    runtime_meta: object,
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+    profile: dict[str, object] | None,
+) -> dict[str, object]:
+    expected_fields = (
+        _RUNTIME_META_FIELDS if profile is None else _REGIME_RUNTIME_META_FIELDS
+    )
+    expected_schema = (
+        "arv2-accepted-risk-preliminary-qc-runtime-meta-v1"
+        if profile is None
+        else "arv2-accepted-risk-regime-qc-runtime-meta-v1"
+    )
+    slice_field = "training_slice_count" if profile is None else "runtime_slice_count"
     if (
-        set(runtime_meta) != _RUNTIME_META_FIELDS
-        or set(preliminary_meta) != _PRELIMINARY_META_FIELDS
-        or runtime_meta.get("schema")
-        != "arv2-accepted-risk-preliminary-qc-runtime-meta-v1"
+        type(runtime_meta) is not dict
+        or set(runtime_meta) != expected_fields
+        or runtime_meta.get("schema") != expected_schema
         or runtime_meta.get("status")
         != "PRELIMINARY_ACCEPTED_RISK_STOCK_IC_ONLY_COMPLETED"
         or runtime_meta.get("package_id") != plan.package_id
@@ -2405,9 +2730,14 @@ def _validate_aggregate_records(records: Mapping[str, dict[str, object]], plan) 
         or any(
             runtime_meta.get(name) is not False
             for name in (
-                "point_in_time", "formal", "control_residualized",
-                "economic_portfolio", "etf_or_leverage", "deployment",
-                "orders", "trading",
+                "point_in_time",
+                "formal",
+                "control_residualized",
+                "economic_portfolio",
+                "etf_or_leverage",
+                "deployment",
+                "orders",
+                "trading",
             )
         )
         or type(runtime_meta.get("resolved_security_count")) is not int
@@ -2417,10 +2747,38 @@ def _validate_aggregate_records(records: Mapping[str, dict[str, object]], plan) 
         or runtime_meta["resolved_security_count"]
         + runtime_meta["named_security_refusal_count"]
         != plan.package.runtime_symbol_binding_count
-        or type(runtime_meta.get("training_slice_count")) is not int
-        or not 1 <= runtime_meta["training_slice_count"] <= 64
+        or type(runtime_meta.get(slice_field)) is not int
+        or not 1
+        <= runtime_meta[slice_field]
+        <= preliminary_runtime.MAX_TRAIN_SLICE_COUNT
+        or (
+            profile is not None
+            and (
+                runtime_meta.get("evaluation_profile_id")
+                != profile["profile_id"]
+                or runtime_meta.get("evaluation_profile_sha256")
+                != profile["profile_sha256"]
+            )
+        )
     ):
         _error("preliminary runtime aggregate metadata changed")
+    return runtime_meta
+
+
+def _validate_legacy_aggregate_records(
+    records: Mapping[str, dict[str, object]],
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+) -> None:
+    authenticated_manifest = _authenticated_evaluator_manifest(plan)
+    runtime_meta = records.get("ARV2_RUNTIME_META")
+    preliminary_meta = records.get("ARV2_PRELIMINARY_META")
+    if type(runtime_meta) is not dict or type(preliminary_meta) is not dict:
+        _error("preliminary aggregate metadata is absent")
+    _require_runtime_meta(runtime_meta, plan, None)
+    if (
+        set(preliminary_meta) != _PRELIMINARY_META_FIELDS
+    ):
+        _error("preliminary evaluator aggregate metadata changed")
     cells_by_axis = {}
     date_geometry: dict[str, set[int]] = {}
     score_geometry: dict[tuple[str, str], set[tuple[int, int]]] = {}
@@ -2555,6 +2913,243 @@ def _validate_aggregate_records(records: Mapping[str, dict[str, object]], plan) 
         _error("preliminary evaluator summary identity changed")
 
 
+def _regime_axis_inventory(evaluation_profile_id: str):
+    profile = _PINNED_REQUIRE_REGIME_PROFILE(evaluation_profile_id)
+    token = next(
+        (
+            candidate
+            for profile_id, candidate in _REGIME_PROFILE_NAME_TOKENS
+            if profile_id == evaluation_profile_id
+        ),
+        None,
+    )
+    if token is None:
+        _error("preliminary evaluation profile is not allowlisted")
+    axes = tuple(
+        (
+            "ARV2_REGIME_"
+            + token
+            + "_"
+            + ("CUR" if view == preliminary_evaluator.SOURCE_VIEW_IDS[0] else "CEN")
+            + "_"
+            + ("FIRM" if arm == "firm_specific" else "GLOBAL")
+            + "_H"
+            + str(horizon),
+            (view, arm, horizon),
+        )
+        for view in preliminary_evaluator.SOURCE_VIEW_IDS
+        for arm in preliminary_evaluator.SCORE_ARMS
+        for horizon in preliminary_evaluator.HORIZONS
+    )
+    meta_name = "ARV2_REGIME_" + token + "_META"
+    expected_names = _expected_result_names(evaluation_profile_id)
+    if set(expected_names) != {
+        "ARV2_RUNTIME_META",
+        meta_name,
+        *(name for name, _axis in axes),
+    }:
+        _error("preliminary regime result-name binding changed")
+    return profile, meta_name, axes
+
+
+def _validate_regime_cell_semantics(record: dict[str, object]) -> int:
+    date_count = _validate_cell_semantics(record)
+    if (
+        any(
+            type(record.get(name)) is not int or record[name] < 0
+            for name in _REGIME_MISSING_COUNT_FIELDS
+        )
+        or sum(record[name] for name in _REGIME_MISSING_COUNT_FIELDS)
+        != record["missing_outcome_pair_count"]
+        or record.get("missing_pair_counter_sum_matches_total") is not True
+    ):
+        _error("preliminary regime missing-outcome census changed")
+    disclosures = _outcome_availability_disclosures()
+    if (
+        record.get("endpoint_price_conditioning")
+        != disclosures["endpoint_price_conditioning"]
+        or record.get("membership_ended_by_exit_interpretation")
+        != disclosures["membership_ended_by_exit_interpretation"]
+    ):
+        _error("preliminary regime outcome conditioning changed")
+    return date_count
+
+
+def _validate_regime_aggregate_records(
+    records: Mapping[str, dict[str, object]],
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+    evaluation_profile_id: str,
+) -> None:
+    authenticated_manifest = _authenticated_evaluator_manifest(plan)
+    profile, meta_name, named_axes = _regime_axis_inventory(
+        evaluation_profile_id
+    )
+    runtime_meta = _require_runtime_meta(
+        records.get("ARV2_RUNTIME_META"), plan, profile
+    )
+    regime_meta = records.get(meta_name)
+    if type(regime_meta) is not dict or set(regime_meta) != _REGIME_META_FIELDS:
+        _error("preliminary regime aggregate metadata changed")
+
+    cells_by_axis = {}
+    date_geometry: set[int] = set()
+    score_geometry: dict[str, set[tuple[int, int]]] = {}
+    availability_geometry: dict[
+        tuple[str, int], set[tuple[int, ...]]
+    ] = {}
+    for name, axis in named_axes:
+        record = records.get(name)
+        if type(record) is not dict or set(record) != _REGIME_CELL_FIELDS:
+            _error("preliminary regime aggregate cell fields changed")
+        view, arm, horizon = axis
+        if (
+            record.get("schema") != regime_evaluator.REGIME_CELL_SCHEMA
+            or record.get("source_view_id") != view
+            or record.get("score_arm") != arm
+            or record.get("horizon_sessions") != horizon
+            or record.get("profile_id") != evaluation_profile_id
+            or record.get("window_start_session") != profile["start_session"]
+            or record.get("window_end_session") != profile["end_session"]
+            or record.get("outcome_definition")
+            != preliminary_evaluator.HISTORY_OBSERVATION
+            or record.get("formal_accept_reject_disposition") is not None
+        ):
+            _error("preliminary regime aggregate cell axis changed")
+        date_geometry.add(_validate_regime_cell_semantics(record))
+        score_geometry.setdefault(view, set()).add(
+            (
+                record["eligible_score_row_count"],
+                record["sector_refused_row_count"],
+            )
+        )
+        availability_geometry.setdefault((view, horizon), set()).add(
+            tuple(record[field] for field in _REGIME_MISSING_COUNT_FIELDS)
+        )
+        cells_by_axis[axis] = record
+    expected_axes = tuple(axis for _name, axis in named_axes)
+    if (
+        set(cells_by_axis) != set(expected_axes)
+        or len(date_geometry) != 1
+        or date_geometry != {profile["expected_session_count"]}
+        or any(len(values) != 1 for values in score_geometry.values())
+        or any(len(values) != 1 for values in availability_geometry.values())
+        or (
+            runtime_meta["named_security_refusal_count"] == 0
+            and any(
+                record["named_figi_resolution_refusal_pair_count"] != 0
+                for record in cells_by_axis.values()
+            )
+        )
+    ):
+        _error("preliminary regime aggregate cell geometry changed")
+
+    disclosures = _outcome_availability_disclosures()
+    if (
+        regime_meta.get("schema") != regime_evaluator.REGIME_SUMMARY_SCHEMA
+        or regime_meta.get("contract_id") != regime_evaluator.REGIME_CONTRACT_ID
+        or regime_meta.get("input_contract_id")
+        != preliminary_evaluator.CONTRACT_ID
+        or regime_meta.get("manifest_id") != plan.evaluator_manifest_id
+        or regime_meta.get("manifest_sha256") != plan.evaluator_manifest_sha256
+        or regime_meta.get("status")
+        != "PRELIMINARY_ACCEPTED_RISK_STOCK_IC_REGIME_ONLY"
+        or regime_meta.get("profile") != profile
+        or regime_meta.get("source_view_ids")
+        != list(preliminary_evaluator.SOURCE_VIEW_IDS)
+        or regime_meta.get("score_arms")
+        != list(preliminary_evaluator.SCORE_ARMS)
+        or regime_meta.get("horizons")
+        != list(preliminary_evaluator.HORIZONS)
+        or regime_meta.get("outcome_definition")
+        != preliminary_evaluator.HISTORY_OBSERVATION
+        or regime_meta.get("history_normalization_mode") != "TOTAL_RETURN"
+        or regime_meta.get("history_value_field") != "open"
+        or regime_meta.get("decay_state_method")
+        != (
+            "R055_sparse_positive_common_scale_mathematically_equivalent_"
+            "not_byte_identical_to_formal_per_event_replay"
+        )
+        or regime_meta.get("benchmark_role")
+        != "matching_SPY_open_to_open_total_return"
+        or regime_meta.get("q_data_policy_id")
+        != preliminary_evaluator.Q_DATA_POLICY_ID
+        or regime_meta.get("outcome_availability_disclosures") != disclosures
+        or regime_meta.get("accepted_risk_disclosures")
+        != dict(preliminary_evaluator.ACCEPTED_RISK_DISCLOSURES)
+        or any(
+            type(regime_meta.get(name)) is not int
+            or regime_meta[name] < 0
+            for name in (
+                "input_security_count",
+                "input_contribution_count",
+                "named_figi_resolution_refusal_count",
+                "completed_callback_count",
+            )
+        )
+        or regime_meta.get("input_security_count")
+        != plan.package.runtime_symbol_binding_count
+        or regime_meta.get("input_contribution_count")
+        != authenticated_manifest.get("contribution_row_count")
+        or regime_meta.get("named_figi_resolution_refusal_count")
+        != runtime_meta["named_security_refusal_count"]
+        or regime_meta.get("completed_callback_count") == 0
+        or regime_meta.get("r055_signal_rule_changed") is not False
+        or regime_meta.get("terminal_payoff_applied") is not False
+        or regime_meta.get("economic_portfolio_evaluation") is not False
+        or regime_meta.get("formal_result") is not False
+        or regime_meta.get("alpha_claim_authorized") is not False
+        or any(
+            regime_meta.get(name) is not False
+            for name in (
+                "raw_provider_rows_in_summary",
+                "raw_security_outcome_rows_in_summary",
+                "raw_price_rows_in_summary",
+            )
+        )
+    ):
+        _error("preliminary regime evaluator aggregate metadata changed")
+    lineage = regime_meta.get("source_lineage_sha256s")
+    if (
+        type(lineage) is not dict
+        or set(lineage) != set(preliminary_evaluator._SOURCE_LINEAGE_FIELDS)
+        or any(_sha(lineage[name], name) != lineage[name] for name in lineage)
+        or lineage != authenticated_manifest.get("source_lineage_sha256s")
+    ):
+        _error("preliminary regime evaluator source lineage changed")
+    summary_id = regime_meta.get("summary_id")
+    summary_sha = regime_meta.get("summary_sha256")
+    if type(summary_id) is not str or type(summary_sha) is not str:
+        _error("preliminary regime evaluator summary identity is absent")
+    record = {
+        key: value
+        for key, value in regime_meta.items()
+        if key not in {"summary_id", "summary_sha256"}
+    }
+    record["cells"] = [cells_by_axis[axis] for axis in expected_axes]
+    digest = hashlib.sha256(_canonical(record)).hexdigest()
+    if (
+        summary_sha != digest
+        or summary_id != "arv2-regime-rating-summary-" + digest[:24]
+    ):
+        _error("preliminary regime evaluator summary identity changed")
+
+
+def _validate_aggregate_records(
+    records: Mapping[str, dict[str, object]],
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+) -> None:
+    profile_id = plan.projection.evaluation_profile_id
+    if (
+        type(records) is not dict
+        or tuple(sorted(records)) != plan.expected_custom_statistic_names
+    ):
+        _error("preliminary aggregate result inventory changed")
+    if profile_id is None:
+        _validate_legacy_aggregate_records(records, plan)
+        return
+    _validate_regime_aggregate_records(records, plan, profile_id)
+
+
 def _result_receipt_path(plan):
     return plan.control_directory / (
         "aggregate-result-" + plan.plan_sha256[:24] + ".json"
@@ -2626,7 +3221,11 @@ def _load_result_receipt_impl(
         or value.launch_sha256 != launch.receipt_sha256
         or value.terminal_sha256 != terminal.receipt_sha256
         or value.result_permit_sha256 != result_permit.permit_sha256
-        or raw.get("look_accounting") != _look_accounting(stage="result")
+        or raw.get("look_accounting")
+        != _look_accounting(
+            stage="result",
+            evaluation_profile_id=plan.projection.evaluation_profile_id,
+        )
         or value.project_id != launch.project_id
         or value.backtest_id != launch.backtest_id
         or value.custom_statistics_sha256 != pairs_hash
@@ -2639,7 +3238,7 @@ def _load_result_receipt_impl(
         or payload != _identified_receipt_bytes(
             schema=RESULT_RECEIPT_SCHEMA,
             prefix="arv2-preliminary-qc-result-",
-            record=_result_record(value),
+            record=_result_record(value, plan),
             receipt_id=value.receipt_id,
             receipt_sha256=value.receipt_sha256,
         )
@@ -2715,7 +3314,10 @@ def _read_accepted_risk_preliminary_result_once_impl(
             "launch_sha256": launch.receipt_sha256,
             "terminal_sha256": terminal.receipt_sha256,
             "result_permit_sha256": result_permit.permit_sha256,
-            "look_accounting": _look_accounting(stage="result"),
+            "look_accounting": _look_accounting(
+                stage="result",
+                evaluation_profile_id=plan.projection.evaluation_profile_id,
+            ),
             "project_id": launch.project_id,
             "backtest_id": launch.backtest_id,
             "custom_statistics": [list(item) for item in pairs],
@@ -2766,37 +3368,46 @@ def _result_authority_bound(plan, permit, launch, terminal, require_launch, requ
     require_terminal(terminal, plan, permit, launch)
     if terminal.terminal_status != "Completed.":
         _error("preliminary result-read authority requires Completed.")
-    return _canonical(
-        {
-            "schema": RESULT_AUTHORITY_SCHEMA,
-            "signature_purpose": "formal_qc_result_read",
-            "plan_id": plan.plan_id,
-            "plan_sha256": plan.plan_sha256,
-            "package_id": plan.package_id,
-            "package_sha256": plan.package_sha256,
-            "evaluator_manifest_id": plan.evaluator_manifest_id,
-            "evaluator_manifest_sha256": plan.evaluator_manifest_sha256,
-            "projection_id": plan.projection_id,
-            "projection_sha256": plan.projection_sha256,
-            "launch_receipt_sha256": launch.receipt_sha256,
-            "terminal_receipt_sha256": terminal.receipt_sha256,
-            "project_id": launch.project_id,
-            "backtest_id": launch.backtest_id,
-            "terminal_status": terminal.terminal_status,
-            "expected_custom_statistic_names": list(plan.expected_custom_statistic_names),
-            "expected_custom_statistic_names_sha256": plan.expected_custom_statistic_names_sha256,
-            "host_code_closure": _require_host_closure(
-                plan.host_closure
-            ).to_record(),
-            "look_accounting": _look_accounting(stage="launch"),
-            "actions": list(RESULT_ACTIONS),
-            "maximum_backtests_read_calls": 1,
-            "raw_provider_price_rows_logs_charts_orders_selected": False,
-            "deployment": False,
-            "orders": False,
-            "trading": False,
-        }
-    )
+    record = {
+        "schema": RESULT_AUTHORITY_SCHEMA,
+        "signature_purpose": "formal_qc_result_read",
+        "plan_id": plan.plan_id,
+        "plan_sha256": plan.plan_sha256,
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "evaluator_manifest_id": plan.evaluator_manifest_id,
+        "evaluator_manifest_sha256": plan.evaluator_manifest_sha256,
+        "projection_id": plan.projection_id,
+        "projection_sha256": plan.projection_sha256,
+        "launch_receipt_sha256": launch.receipt_sha256,
+        "terminal_receipt_sha256": terminal.receipt_sha256,
+        "project_id": launch.project_id,
+        "backtest_id": launch.backtest_id,
+        "terminal_status": terminal.terminal_status,
+        "expected_custom_statistic_names": list(
+            plan.expected_custom_statistic_names
+        ),
+        "expected_custom_statistic_names_sha256": (
+            plan.expected_custom_statistic_names_sha256
+        ),
+        "host_code_closure": _require_host_closure(
+            plan.host_closure
+        ).to_record(),
+        "look_accounting": _look_accounting(
+            stage="launch",
+            evaluation_profile_id=plan.projection.evaluation_profile_id,
+        ),
+        "actions": list(RESULT_ACTIONS),
+        "maximum_backtests_read_calls": 1,
+        "raw_provider_price_rows_logs_charts_orders_selected": False,
+        "deployment": False,
+        "orders": False,
+        "trading": False,
+    }
+    if plan.evaluation_profile_id is not None:
+        record["evaluation_profile_id"] = plan.evaluation_profile_id
+        record["evaluation_profile_sha256"] = plan.evaluation_profile_sha256
+    return _canonical(record)
 
 
 def _make_action_guard():
@@ -2976,7 +3587,7 @@ def _bind_public_actions(
                 "schema": RESULT_RECEIPT_SCHEMA,
                 "id": value.receipt_id,
                 "sha256": value.receipt_sha256,
-                **_result_record(value),
+                **_result_record(value, plan),
             }
         ):
             _error("persisted preliminary aggregate result changed")
@@ -3103,6 +3714,8 @@ _seal_action_bindings(
         "_PINNED_ITER_UPLOADS",
         "_PINNED_REQUIRE_PROJECTION",
         "_PINNED_EXPECTED_RESULT_NAMES",
+        "_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE",
+        "_PINNED_REQUIRE_REGIME_PROFILE",
         "_PINNED_REQUIRE_EXECUTION_SIGNATURE",
         "_PINNED_REQUIRE_RESULT_SIGNATURE",
         "_PINNED_LOAD_INFRASTRUCTURE_LEDGER",
@@ -3128,6 +3741,7 @@ _seal_action_bindings(
         "_PINNED_COMPILE_TERMINAL_STATES",
         "_PINNED_BACKTEST_TERMINAL_STATES",
         "PLAN_SCHEMA",
+        "REGIME_PLAN_SCHEMA",
         "EXECUTION_AUTHORITY_SCHEMA",
         "EXECUTION_PERMIT_SCHEMA",
         "PRECREATE_CONTROL_SCHEMA",
@@ -3159,8 +3773,14 @@ _seal_action_bindings(
         "_CELL_FIELDS",
         "_RUNTIME_META_FIELDS",
         "_PRELIMINARY_META_FIELDS",
+        "_REGIME_RUNTIME_META_FIELDS",
+        "_REGIME_CELL_FIELDS",
+        "_REGIME_META_FIELDS",
         "_CELL_COUNT_FIELDS",
+        "_REGIME_MISSING_COUNT_FIELDS",
         "_CELL_METRIC_FIELDS",
+        "_REGIME_PROFILE_NAME_TOKENS",
+        "_EXPECTED_OUTCOME_AVAILABILITY_DISCLOSURES",
         "_DECIMAL_METRIC",
         "AcceptedRiskPreliminarySubmissionError",
         "AcceptedRiskPreliminarySubmissionLocked",
@@ -3175,6 +3795,8 @@ _seal_action_bindings(
         "AcceptedRiskPreliminaryTerminalStatus",
         "AcceptedRiskPreliminaryResultReadPermit",
         "AcceptedRiskPreliminaryAggregateResult",
+        "_EvaluationRunSpec",
+        "_EVALUATION_RUN_SPECS",
         "_error",
         "_canonical",
         "_strict_object",
@@ -3226,11 +3848,19 @@ _seal_action_bindings(
         "_parse_custom_result",
         "_authenticated_evaluator_manifest",
         "_cell_metric",
+        "_outcome_availability_disclosures",
         "_validate_cell_semantics",
+        "_require_runtime_meta",
+        "_validate_legacy_aggregate_records",
+        "_regime_axis_inventory",
+        "_validate_regime_cell_semantics",
+        "_validate_regime_aggregate_records",
         "_validate_aggregate_records",
         "_result_receipt_path",
         "_result_authority_bound",
         "_look_accounting",
+        "_run_spec",
+        "_expected_result_names",
         "dataclasses",
         "hashlib",
         "json",
@@ -3250,6 +3880,7 @@ _seal_action_bindings(
         "preregistration",
         "preliminary_runtime",
         "preliminary_evaluator",
+        "regime_evaluator",
         "formal",
         "FormalQcTransport",
         "OwnerSignatureAuthority",

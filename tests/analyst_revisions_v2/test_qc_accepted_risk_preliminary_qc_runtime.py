@@ -4,12 +4,14 @@ import hashlib
 import io
 import json
 import sqlite3
-from datetime import datetime
+from datetime import date, datetime
 from fractions import Fraction
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
+
+from data.exchange_calendar import trading_sessions
 
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_qc_figi as figi,
@@ -22,6 +24,9 @@ from research.analyst_revisions_v2_qc import (
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_rating_evaluator as evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_regime_rating_evaluator as regime_evaluator,
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_package as package_builder,
@@ -631,6 +636,87 @@ def test_cloud_loader_reads_activation_first_authenticates_each_object_and_never
     assert len(calls) == 1
 
 
+def test_transport_object_count_bound_is_load_bearing():
+    _values, key, activation, _roles = _transport_fixture()
+    value = json.loads(activation)
+    template = next(
+        item for item in value["objects"] if item["role"] == "session_axis"
+    )
+    prefix = key.rsplit("/", 1)[0]
+
+    # Five objects already exist.  Add valid, uniquely named session shards
+    # through the exact boundary, then one more.  This keeps every later
+    # descriptor/ordinal check satisfiable so only this bound can refuse.
+    for ordinal in range(1, runtime.MAX_TRANSPORT_OBJECT_COUNT - 4):
+        item = dict(template)
+        item["ordinal"] = ordinal
+        item["object_store_key"] = (
+            f"{prefix}/session_axis-{ordinal:04d}-jsonl.gz"
+        )
+        item["relative_path"] = f"session_axis-{ordinal:04d}-jsonl.gz"
+        item["content_sha256"] = hashlib.sha256(
+            item["object_store_key"].encode("ascii")
+        ).hexdigest()
+        value["objects"].append(item)
+
+    def reidentify(candidate):
+        candidate["package_id"] = None
+        candidate["package_sha256"] = None
+        digest = hashlib.sha256(runtime._canonical(candidate)).hexdigest()
+        candidate["package_id"] = "arv2-preliminary-qc-package-" + digest[:24]
+        candidate["package_sha256"] = digest
+
+    reidentify(value)
+    assert len(value["objects"]) == runtime.MAX_TRANSPORT_OBJECT_COUNT
+    runtime._validate_transport(value, key)
+
+    ordinal = runtime.MAX_TRANSPORT_OBJECT_COUNT - 4
+    extra = dict(template)
+    extra["ordinal"] = ordinal
+    extra["object_store_key"] = f"{prefix}/session_axis-{ordinal:04d}-jsonl.gz"
+    extra["relative_path"] = f"session_axis-{ordinal:04d}-jsonl.gz"
+    extra["content_sha256"] = hashlib.sha256(
+        extra["object_store_key"].encode("ascii")
+    ).hexdigest()
+    value["objects"].append(extra)
+    reidentify(value)
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="transport object inventory changed",
+    ):
+        runtime._validate_transport(value, key)
+
+
+def test_per_object_decompression_bound_is_load_bearing(monkeypatch):
+    raw = b'{}\n' * 100
+    monkeypatch.setattr(runtime, "MAX_DECOMPRESSED_OBJECT_BYTES", len(raw) - 1)
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="compressed object exceeded decompression bound",
+    ):
+        runtime._gzip_rows(gzip.compress(raw), 100, "session_axis")
+
+
+def test_total_decompression_bound_is_load_bearing(monkeypatch):
+    values, key, activation, _roles = _transport_fixture()
+    monkeypatch.setattr(runtime, "MAX_TOTAL_DECOMPRESSED_BYTES", 1)
+    monkeypatch.setattr(
+        evaluator,
+        "load_preliminary_rating_input",
+        lambda *_items: SimpleNamespace(marker="must not be reached"),
+    )
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="package exceeded total decompression bound",
+    ):
+        runtime.load_accepted_risk_preliminary_package(
+            SimpleNamespace(object_store=_Store(values)),
+            activation_manifest_key=key,
+            activation_manifest_sha256=hashlib.sha256(activation).hexdigest(),
+            activation_manifest_byte_count=len(activation),
+        )
+
+
 def test_cloud_loader_stops_on_first_object_hash_mismatch(monkeypatch):
     values, key, activation, _roles = _transport_fixture()
     first_data_key = next(item for item in values if item.endswith("session_axis-0000-jsonl.gz"))
@@ -771,7 +857,7 @@ def test_daily_dedupe_keeps_valid_censored_arm_when_current_arm_conflicts():
     connection.close()
 
 
-def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monkeypatch):
+def test_projection_is_six_small_flat_files_and_compiles_after_qc_prelude(monkeypatch):
     activation = SimpleNamespace(
         role="activation_manifest",
         activation_manifest=True,
@@ -796,6 +882,7 @@ def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monke
         "main.py",
         "accepted_risk_preliminary_rating_policy.py",
         "accepted_risk_preliminary_rating_evaluator.py",
+        "accepted_risk_regime_rating_evaluator.py",
         "accepted_risk_preliminary_qc_figi.py",
         "accepted_risk_preliminary_qc_runtime.py",
     }
@@ -803,8 +890,13 @@ def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monke
     assert all(b"from __future__ import" not in item.source_bytes for item in value.source_files)
     assert all(b"sqlite3" not in item.source_bytes for item in value.source_files)
     main = by_name["main.py"].source_bytes.decode("ascii")
-    assert "self.train(self._arv2_advance_training_slice)" in main
+    assert "self._arv2_advance_training_slice()" in main
+    assert "self.train(" not in main
     assert "def _arv2_advance_training_slice" in main
+    assert value.maximum_train_slice_count == runtime.MAX_TRAIN_SLICE_COUNT == 113
+    assert len(
+        trading_sessions(date(*projection.ALGORITHM_START), date(*projection.ALGORITHM_END))
+    ) == value.maximum_train_slice_count
     assert "set_start_date(2026, 4, 1)" in main
     assert "set_end_date(2026, 9, 11)" in main
     assert 'self.set_time_zone("America/New_York")' in main
@@ -814,6 +906,103 @@ def test_projection_is_five_small_flat_files_and_compiles_after_qc_prelude(monke
     assert "advance_training_slice" not in initialize
     assert "transport-manifest.json" in main
     assert "order(" not in main.lower()
+
+
+def test_projection_binds_one_exact_regime_profile_into_identity_and_main(monkeypatch):
+    activation = SimpleNamespace(
+        role="activation_manifest",
+        activation_manifest=True,
+        object_store_key="arv2/preliminary-rating/fixture/transport-manifest.json",
+        content_sha256="f" * 64,
+        byte_count=1234,
+    )
+    package = SimpleNamespace(
+        package_id="arv2-preliminary-qc-package-fixture",
+        package_sha256="e" * 64,
+        upload_objects=(activation,),
+    )
+    monkeypatch.setattr(
+        package_builder,
+        "require_accepted_risk_preliminary_package",
+        lambda value: value,
+    )
+    legacy = projection.build_accepted_risk_preliminary_qc_projection(package)
+    profile_id = "arv2-stock-ic-2019-2023"
+    value = projection.build_accepted_risk_preliminary_qc_projection(
+        package,
+        evaluation_profile_id=profile_id,
+    )
+    main = next(
+        item.source_bytes.decode("ascii")
+        for item in value.source_files
+        if item.project_path == "main.py"
+    )
+
+    assert value.evaluation_profile_id == profile_id
+    assert value.evaluation_profile_sha256 is not None
+    assert value.projection_sha256 != legacy.projection_sha256
+    assert f"evaluation_profile_id={profile_id!r}" in main
+    assert projection.require_accepted_risk_preliminary_qc_projection(value) is value
+
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_preliminary_qc_projection(
+            dataclasses.replace(value, evaluation_profile_sha256="0" * 64)
+        )
+
+    with pytest.raises(ValueError, match="exact fixed profile id"):
+        projection.build_accepted_risk_preliminary_qc_projection(
+            package,
+            evaluation_profile_id="arv2-stock-ic-owner-supplied-window",
+        )
+
+
+def test_projection_refuses_cross_profile_main_substitution(monkeypatch):
+    activation = SimpleNamespace(
+        role="activation_manifest",
+        activation_manifest=True,
+        object_store_key="arv2/preliminary-rating/fixture/transport-manifest.json",
+        content_sha256="f" * 64,
+        byte_count=1234,
+    )
+    package = SimpleNamespace(
+        package_id="arv2-preliminary-qc-package-fixture",
+        package_sha256="e" * 64,
+        upload_objects=(activation,),
+    )
+    monkeypatch.setattr(
+        package_builder,
+        "require_accepted_risk_preliminary_package",
+        lambda value: value,
+    )
+    first = projection.build_accepted_risk_preliminary_qc_projection(
+        package,
+        evaluation_profile_id="arv2-stock-ic-2019-2023",
+    )
+    second_profile = regime_evaluator.require_regime_profile(
+        "arv2-stock-ic-2023-2025"
+    )
+    semantic = first.to_record()
+    semantic["evaluation_profile_id"] = second_profile["profile_id"]
+    semantic["evaluation_profile_sha256"] = second_profile["profile_sha256"]
+    semantic["projection_id"] = None
+    semantic["projection_sha256"] = None
+    digest = hashlib.sha256(projection._canonical(semantic)).hexdigest()
+    mismatched = dataclasses.replace(
+        first,
+        projection_id="arv2-preliminary-qc-projection-" + digest[:24],
+        projection_sha256=digest,
+        evaluation_profile_id=second_profile["profile_id"],
+        evaluation_profile_sha256=second_profile["profile_sha256"],
+    )
+
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="main source diverged",
+    ):
+        projection.require_accepted_risk_preliminary_qc_projection(mismatched)
 
 
 def test_projection_future_import_guard_is_an_isolated_compile_refusal():
@@ -1273,6 +1462,20 @@ class _DriverRuntime:
         self.phase = evaluator.RuntimePhase.CLOSED
 
 
+class _RegimeDriverRuntime(_DriverRuntime):
+    def __init__(self, complete_after, profile_id):
+        super().__init__(complete_after)
+        self.profile_id = profile_id
+
+    def custom_summary_statistics(self):
+        return {
+            key: "exact"
+            for key in regime_evaluator.expected_custom_summary_statistic_names(
+                self.profile_id
+            )
+        }
+
+
 def _driver_with_runtime(complete_after):
     algorithm = _DriverAlgorithm()
     driver = runtime.AcceptedRiskPreliminaryQcDriver(
@@ -1325,6 +1528,163 @@ def test_driver_completes_in_bounded_train_slice_emits_once_and_closes_cleanly()
     assert driver.require_completed_at_end() is True
 
 
+def test_runtime_result_inventory_is_exact_for_each_fixed_regime_profile():
+    assert runtime.expected_custom_summary_statistic_names(None) == (
+        runtime.EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
+    )
+    for profile_id in regime_evaluator.REGIME_PROFILE_IDS:
+        expected = runtime.expected_custom_summary_statistic_names(profile_id)
+        assert len(expected) == 18
+        assert runtime.RUNTIME_META_STATISTIC in expected
+        assert set(expected) == {
+            *regime_evaluator.expected_custom_summary_statistic_names(profile_id),
+            runtime.RUNTIME_META_STATISTIC,
+        }
+
+    with pytest.raises(ValueError, match="exact fixed profile id"):
+        runtime.expected_custom_summary_statistic_names(
+            "arv2-stock-ic-owner-supplied-window"
+        )
+
+
+def test_driver_initialization_selects_regime_runtime_and_exact_named_refusals(
+    monkeypatch,
+):
+    profile_id = "arv2-stock-ic-2019-2023"
+    evaluator_input = SimpleNamespace(
+        source_lineage_sha256s={"security_master_admission_sha256": "a" * 64},
+        benchmark_security_id="benchmark",
+        memberships=(
+            SimpleNamespace(security_id="security-b"),
+            SimpleNamespace(security_id="security-a"),
+        ),
+        session_axis=("2019-01-02",),
+    )
+    package = SimpleNamespace(
+        evaluator_input=evaluator_input,
+        runtime_symbol_bindings=("binding",),
+    )
+
+    class Resolution:
+        def symbol_for_security(self, security_id):
+            return None if security_id == "security-b" else object()
+
+    captured = {}
+
+    class Loader:
+        def __init__(self, _algorithm, **kwargs):
+            captured["loader"] = kwargs
+
+    class RegimeRuntime:
+        def __init__(self, value, **kwargs):
+            captured["runtime"] = (value, kwargs)
+
+    monkeypatch.setattr(
+        runtime,
+        "load_accepted_risk_preliminary_package",
+        lambda *_args, **_kwargs: package,
+    )
+    monkeypatch.setattr(
+        figi,
+        "resolve_preliminary_qc_figis",
+        lambda *_args, **_kwargs: Resolution(),
+    )
+    monkeypatch.setattr(runtime, "QcTotalReturnOpenHistoryLoader", Loader)
+    monkeypatch.setattr(
+        regime_evaluator,
+        "RegimeRatingEvaluationRuntime",
+        RegimeRuntime,
+    )
+    algorithm = SimpleNamespace(composite_figi=object())
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        algorithm,
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=profile_id,
+    )
+
+    driver._initialize_in_training()
+
+    assert captured["runtime"] == (
+        evaluator_input,
+        {
+            "profile_id": profile_id,
+            "named_figi_resolution_refusals": ("security-b",),
+        },
+    )
+    assert captured["loader"]["permitted_security_ids"] == (
+        "benchmark",
+        "security-b",
+        "security-a",
+    )
+    assert driver._runtime.__class__ is RegimeRuntime
+
+
+def test_driver_emits_profile_bound_runtime_metadata_without_training_alias():
+    profile_id = "arv2-stock-ic-2023-2025"
+    profile = regime_evaluator.require_regime_profile(profile_id)
+    algorithm = _DriverAlgorithm()
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        algorithm,
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=profile_id,
+    )
+    driver._package = SimpleNamespace(
+        package_id="package-one",
+        package_sha256="b" * 64,
+        activation_manifest_sha256="c" * 64,
+    )
+    driver._resolution = SimpleNamespace(
+        resolution_id="resolution-one",
+        resolution_sha256="d" * 64,
+        resolved_count=1,
+        named_refusal_count=0,
+    )
+    driver._history_loader = object()
+    driver._runtime = _RegimeDriverRuntime(1, profile_id)
+
+    driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+
+    assert len(algorithm.statistics) == 18
+    values = dict(algorithm.statistics)
+    meta = json.loads(values[runtime.RUNTIME_META_STATISTIC])
+    assert meta["evaluation_profile_id"] == profile_id
+    assert meta["evaluation_profile_sha256"] == profile["profile_sha256"]
+    assert meta["runtime_slice_count"] == 1
+    assert "training_slice_count" not in meta
+
+
+def test_full_geometry_completes_in_41_unslowed_daily_slices():
+    driver, algorithm = _driver_with_runtime(400)
+    planned_runtime = driver._runtime
+    driver._runtime = None
+    driver._initialize_in_training = lambda: setattr(
+        driver, "_runtime", planned_runtime
+    )
+
+    for _ in range(40):
+        driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+    assert driver.completed is False
+    assert driver._runtime.calls == 399
+
+    driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+    assert driver.completed is True
+    assert driver._runtime.calls == 400
+    assert driver._training_slice_count == 41
+    assert len(algorithm.statistics) == 34
+
+
 def test_driver_end_refuses_incomplete_runtime_and_aborts_cache():
     driver, _algorithm = _driver_with_runtime(100)
 
@@ -1349,7 +1709,7 @@ def test_driver_enforces_monotonic_clock_soft_bound_and_train_slice_census():
     driver._training_slice_count = runtime.MAX_TRAIN_SLICE_COUNT
     with pytest.raises(
         runtime.AcceptedRiskPreliminaryQcRuntimeError,
-        match="Train-slice census",
+        match="runtime-slice census",
     ):
         driver.advance_training_slice(monotonic=lambda: 242)
 
@@ -1362,3 +1722,79 @@ def test_driver_enforces_monotonic_clock_soft_bound_and_train_slice_census():
         reversed_driver.advance_training_slice(
             monotonic=lambda: next(reversed_clock)
         )
+
+
+def test_driver_backtest_runtime_bound_is_load_bearing():
+    driver, _algorithm = _driver_with_runtime(100)
+    driver._runtime_started_monotonic = 0
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="exceeded twelve-hour backtest bound",
+    ):
+        driver.advance_training_slice(
+            monotonic=lambda: runtime.MAX_BACKTEST_RUNTIME_SECONDS + 1
+        )
+
+
+def test_preliminary_projection_size_bounds_are_load_bearing_and_have_headroom():
+    """ARV2R74-002: the per-file bound exists to respect QC's 64,000-char limit.
+
+    Removing it turns no other test red, and the largest projected module
+    already occupies 96% of the bound, so the next edit to the evaluator can
+    cross it.  Pin both the refusal and the remaining headroom.
+    """
+    from pathlib import Path
+
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_preliminary_qc_projection as projection,
+    )
+
+    # The lane bound must stay strictly under QuantConnect's observed limit.
+    assert projection.MAX_SOURCE_FILE_BYTES < 64_000
+
+    body = b"X = 1\n"
+    filler = b"# " + b"f" * 60 + b"\n"
+    oversized = body + filler * (
+        (projection.MAX_SOURCE_FILE_BYTES // len(filler)) + 2
+    )
+    assert len(oversized) > projection.MAX_SOURCE_FILE_BYTES
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="size, path, or future-import guard",
+    ):
+        projection._validate_source("oversized.py", oversized)
+
+    # A file exactly at the bound is admitted; one byte more is refused.
+    exact = body + b"#" * (projection.MAX_SOURCE_FILE_BYTES - len(body) - 1) + b"\n"
+    assert len(exact) == projection.MAX_SOURCE_FILE_BYTES
+    projection._validate_source("exact.py", exact)
+    with pytest.raises(projection.AcceptedRiskPreliminaryQcProjectionError):
+        projection._validate_source("over.py", exact + b"#\n")
+
+    # Every live projected module must stay inside the bound, and the tightest
+    # one must retain real headroom rather than sitting on the boundary.
+    base = Path(__file__).resolve().parents[2] / "research" / "analyst_revisions_v2_qc"
+    sizes = {
+        name: len((base / name).read_bytes())
+        for name in projection.PROJECT_SOURCE_PATHS
+    }
+    assert max(sizes.values()) <= projection.MAX_SOURCE_FILE_BYTES, sizes
+    assert sum(sizes.values()) <= projection.MAX_TOTAL_SOURCE_BYTES, sizes
+
+
+def test_preliminary_projection_invokes_qc_prelude_compilation():
+    """ARV2R74-003: isolate the prelude compile after earlier guards pass."""
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_preliminary_qc_projection as projection,
+    )
+
+    # This is valid on its own and passes every earlier source audit. Once the
+    # QC sentinel is prepended, its global declaration follows an assignment
+    # to that name and Python must reject it.
+    prelude_hostile = b"global QC_PRELUDE_SENTINEL\nX = 1\n"
+    compile(prelude_hostile.decode("ascii"), "probe.py", "exec")
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="after QC prelude",
+    ):
+        projection._validate_source("prelude_hostile.py", prelude_hostile)

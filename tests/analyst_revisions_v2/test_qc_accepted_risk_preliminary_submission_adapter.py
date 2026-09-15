@@ -16,7 +16,13 @@ from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_qc_projection as projection_builder,
 )
 from research.analyst_revisions_v2_qc import (
+    accepted_risk_preliminary_qc_runtime as runtime,
+)
+from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_rating_evaluator as evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_regime_rating_evaluator as regime_evaluator,
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_submission_adapter as adapter,
@@ -31,18 +37,18 @@ _EXPECTED_LOOK_ACCOUNTING = {
     "schema": "arv2-qc-research-look-accounting-v1",
     "classification": "development_evaluation",
     "evaluation_id": "arv2-eval-stock-historical-qc-001",
-    "shared_look_ledger_entry_id": "R-053",
+    "shared_look_ledger_entry_id": "R-055",
     "accounting_stage": "reservation",
-    "run_level_looks_before": 53,
-    "run_level_looks_after": 53,
-    "planned_run_level_looks_after_launch": 54,
-    "arv2_development_evaluations_before": 0,
-    "arv2_development_evaluations_after": 0,
-    "planned_arv2_development_evaluations_after_launch": 1,
+    "run_level_looks_before": 55,
+    "run_level_looks_after": 55,
+    "planned_run_level_looks_after_launch": 56,
+    "arv2_development_evaluations_before": 2,
+    "arv2_development_evaluations_after": 2,
+    "planned_arv2_development_evaluations_after_launch": 3,
     "planned_maximum_preliminary_ic_cell_count": 32,
     "emitted_preliminary_ic_cell_count": 0,
-    "lifetime_alpha_cell_floor_before": 452,
-    "lifetime_alpha_cell_floor_after": 452,
+    "lifetime_alpha_cell_floor_before": 484,
+    "lifetime_alpha_cell_floor_after": 484,
     "aggregate_result_authenticated": False,
     "infrastructure_looks_before": 23,
     "infrastructure_looks_after": 23,
@@ -73,11 +79,11 @@ def _look_accounting_at(stage):
     result = dict(_EXPECTED_LOOK_ACCOUNTING)
     result["accounting_stage"] = stage
     if stage in {"launch", "result"}:
-        result["run_level_looks_after"] = 54
-        result["arv2_development_evaluations_after"] = 1
+        result["run_level_looks_after"] = 56
+        result["arv2_development_evaluations_after"] = 3
     if stage == "result":
         result["emitted_preliminary_ic_cell_count"] = 32
-        result["lifetime_alpha_cell_floor_after"] = 484
+        result["lifetime_alpha_cell_floor_after"] = 516
         result["aggregate_result_authenticated"] = True
     return result
 
@@ -150,9 +156,9 @@ def _offline_action(function, *, result=False):
     return _replace_closure(function, **replacements)
 
 
-@pytest.fixture
-def plan(monkeypatch, tmp_path):
-    root = tmp_path.resolve()
+def _build_plan(monkeypatch, tmp_path, evaluation_profile_id=None):
+    root = (tmp_path / (evaluation_profile_id or "legacy-r055")).resolve()
+    root.mkdir()
     root.chmod(0o700)
     control = root / "control"
     control.mkdir(mode=0o700)
@@ -184,7 +190,8 @@ def plan(monkeypatch, tmp_path):
         contribution_census={"accepted": 1},
     )
     projection = projection_builder.build_accepted_risk_preliminary_qc_projection(
-        package
+        package,
+        evaluation_profile_id=evaluation_profile_id,
     )
     return adapter.build_accepted_risk_preliminary_submission_plan(
         package=package,
@@ -195,6 +202,16 @@ def plan(monkeypatch, tmp_path):
         control_directory=control,
         worktree_root=Path(adapter.__file__).resolve().parents[2],
     )
+
+
+@pytest.fixture
+def plan(monkeypatch, tmp_path):
+    return _build_plan(monkeypatch, tmp_path)
+
+
+@pytest.fixture(params=regime_evaluator.REGIME_PROFILE_IDS)
+def regime_plan(request, monkeypatch, tmp_path):
+    return _build_plan(monkeypatch, tmp_path, request.param)
 
 
 def _aggregate_statistics(plan):
@@ -299,6 +316,127 @@ def _aggregate_statistics(plan):
     return statistics
 
 
+def _regime_aggregate_statistics(plan):
+    profile_id = plan.projection.evaluation_profile_id
+    profile, meta_name, named_axes = adapter._regime_axis_inventory(profile_id)
+    cells = []
+    statistics = {}
+    disclosures = dict(regime_evaluator.OUTCOME_AVAILABILITY_DISCLOSURES)
+    for name, (view, arm, horizon) in named_axes:
+        row = {
+            "schema": regime_evaluator.REGIME_CELL_SCHEMA,
+            "source_view_id": view,
+            "score_arm": arm,
+            "horizon_sessions": horizon,
+            "profile_id": profile_id,
+            "window_start_session": profile["start_session"],
+            "window_end_session": profile["end_session"],
+            "status": "INCONCLUSIVE_UNDERFILLED",
+            "eligible_score_row_count": 0,
+            "accepted_outcome_pair_count": 0,
+            "missing_outcome_pair_count": 0,
+            "benchmark_endpoint_unavailable_pair_count": 0,
+            "named_figi_resolution_refusal_pair_count": 0,
+            "security_entry_unavailable_pair_count": 0,
+            "membership_ended_by_exit_with_exit_unavailable_pair_count": 0,
+            "within_membership_exit_unavailable_pair_count": 0,
+            "missing_pair_counter_sum_matches_total": True,
+            "sector_refused_row_count": 0,
+            "valid_ic_date_count": 0,
+            "invalid_ic_date_count": profile["expected_session_count"],
+            "mean_daily_spearman_ic": None,
+            "median_daily_spearman_ic": None,
+            "positive_ic_date_share": None,
+            "mean_of_daily_cross_section_mean_excess_returns": None,
+            "median_of_daily_cross_section_mean_excess_returns": None,
+            "outcome_definition": evaluator.HISTORY_OBSERVATION,
+            "endpoint_price_conditioning": disclosures[
+                "endpoint_price_conditioning"
+            ],
+            "membership_ended_by_exit_interpretation": disclosures[
+                "membership_ended_by_exit_interpretation"
+            ],
+            "formal_accept_reject_disposition": None,
+        }
+        statistics[name] = _canonical(row).decode("ascii")
+        cells.append(row)
+    summary = {
+        "schema": regime_evaluator.REGIME_SUMMARY_SCHEMA,
+        "contract_id": regime_evaluator.REGIME_CONTRACT_ID,
+        "input_contract_id": evaluator.CONTRACT_ID,
+        "manifest_id": plan.evaluator_manifest_id,
+        "manifest_sha256": plan.evaluator_manifest_sha256,
+        "status": "PRELIMINARY_ACCEPTED_RISK_STOCK_IC_REGIME_ONLY",
+        "source_lineage_sha256s": {
+            name: "f" * 64 for name in evaluator._SOURCE_LINEAGE_FIELDS
+        },
+        "profile": profile,
+        "source_view_ids": list(evaluator.SOURCE_VIEW_IDS),
+        "score_arms": list(evaluator.SCORE_ARMS),
+        "horizons": list(evaluator.HORIZONS),
+        "outcome_definition": evaluator.HISTORY_OBSERVATION,
+        "history_normalization_mode": "TOTAL_RETURN",
+        "history_value_field": "open",
+        "decay_state_method": (
+            "R055_sparse_positive_common_scale_mathematically_equivalent_"
+            "not_byte_identical_to_formal_per_event_replay"
+        ),
+        "benchmark_role": "matching_SPY_open_to_open_total_return",
+        "q_data_policy_id": evaluator.Q_DATA_POLICY_ID,
+        "input_security_count": 1,
+        "input_contribution_count": 1,
+        "named_figi_resolution_refusal_count": 0,
+        "completed_callback_count": 1,
+        "r055_signal_rule_changed": False,
+        "outcome_availability_disclosures": disclosures,
+        "accepted_risk_disclosures": dict(evaluator.ACCEPTED_RISK_DISCLOSURES),
+        "raw_provider_rows_in_summary": False,
+        "raw_security_outcome_rows_in_summary": False,
+        "raw_price_rows_in_summary": False,
+        "terminal_payoff_applied": False,
+        "economic_portfolio_evaluation": False,
+        "formal_result": False,
+        "alpha_claim_authorized": False,
+        "cells": cells,
+    }
+    digest = hashlib.sha256(_canonical(summary)).hexdigest()
+    metadata = {
+        **{key: value for key, value in summary.items() if key != "cells"},
+        "summary_id": "arv2-regime-rating-summary-" + digest[:24],
+        "summary_sha256": digest,
+    }
+    statistics[meta_name] = _canonical(metadata).decode("ascii")
+    runtime_meta = {
+        "schema": "arv2-accepted-risk-regime-qc-runtime-meta-v1",
+        "status": "PRELIMINARY_ACCEPTED_RISK_STOCK_IC_ONLY_COMPLETED",
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "activation_manifest_sha256": plan.activation_manifest_sha256,
+        "symbol_resolution_id": "resolution-one",
+        "symbol_resolution_sha256": "e" * 64,
+        "resolved_security_count": 1,
+        "named_security_refusal_count": 0,
+        "result_transport": "aggregate_only_custom_summary_statistics",
+        "host_object_store_export_required": False,
+        "preliminary": True,
+        "point_in_time": False,
+        "formal": False,
+        "control_residualized": False,
+        "economic_portfolio": False,
+        "etf_or_leverage": False,
+        "deployment": False,
+        "orders": False,
+        "trading": False,
+        "evaluation_profile_id": profile_id,
+        "evaluation_profile_sha256": profile["profile_sha256"],
+        "runtime_slice_count": 1,
+    }
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    assert tuple(sorted(statistics)) == plan.expected_custom_statistic_names
+    assert all(len(value) <= 4_096 for value in statistics.values())
+    return statistics
+
+
 def _rehash_preliminary_summary(statistics):
     metadata = json.loads(statistics["ARV2_PRELIMINARY_META"])
     cells = []
@@ -322,6 +460,23 @@ def _rehash_preliminary_summary(statistics):
     statistics["ARV2_PRELIMINARY_META"] = _canonical(metadata).decode("ascii")
 
 
+def _rehash_regime_summary(plan, statistics):
+    _profile, meta_name, named_axes = adapter._regime_axis_inventory(
+        plan.projection.evaluation_profile_id
+    )
+    metadata = json.loads(statistics[meta_name])
+    summary = {
+        key: value
+        for key, value in metadata.items()
+        if key not in {"summary_id", "summary_sha256"}
+    }
+    summary["cells"] = [json.loads(statistics[name]) for name, _axis in named_axes]
+    digest = hashlib.sha256(_canonical(summary)).hexdigest()
+    metadata["summary_id"] = "arv2-regime-rating-summary-" + digest[:24]
+    metadata["summary_sha256"] = digest
+    statistics[meta_name] = _canonical(metadata).decode("ascii")
+
+
 def _mutate_first_cell(statistics, mutation):
     name = next(key for key in sorted(statistics) if key.startswith("ARV2_IC_"))
     cell = json.loads(statistics[name])
@@ -330,11 +485,464 @@ def _mutate_first_cell(statistics, mutation):
     _rehash_preliminary_summary(statistics)
 
 
+def _mutate_first_regime_cell(plan, statistics, mutation):
+    _profile, _meta_name, named_axes = adapter._regime_axis_inventory(
+        plan.projection.evaluation_profile_id
+    )
+    name = named_axes[0][0]
+    cell = json.loads(statistics[name])
+    mutation(cell)
+    statistics[name] = _canonical(cell).decode("ascii")
+    _rehash_regime_summary(plan, statistics)
+
+
 def _validate_statistics(plan, statistics):
     adapter._validate_aggregate_records(
         {name: json.loads(value) for name, value in statistics.items()},
         plan,
     )
+
+
+_REGIME_ACCOUNTING = {
+    "arv2-stock-ic-2019-2023": ("R-057", 56, 57, 3, 4, 516, 532),
+    "arv2-stock-ic-2023-2025": ("R-058", 57, 58, 4, 5, 532, 548),
+    "arv2-stock-ic-2013-2019": ("R-059", 58, 59, 5, 6, 548, 564),
+}
+
+
+def test_regime_profile_allowlist_refuses_unknown_profile():
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="evaluation profile is not allowlisted",
+    ):
+        adapter._look_accounting(evaluation_profile_id="arv2-stock-ic-unregistered")
+
+
+def test_regime_expected_result_inventory_guard_is_isolated(monkeypatch):
+    monkeypatch.setattr(
+        adapter,
+        "_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE",
+        lambda _profile_id: ("ARV2_RUNTIME_META",),
+    )
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="expected result inventory changed",
+    ):
+        adapter._expected_result_names(regime_evaluator.REGIME_PROFILE_IDS[0])
+
+
+def test_regime_exact_outcome_disclosure_contract_guard_is_isolated(monkeypatch):
+    monkeypatch.setattr(
+        regime_evaluator,
+        "OUTCOME_AVAILABILITY_DISCLOSURES",
+        {"endpoint_price_conditioning_direction": "positive"},
+    )
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="outcome disclosure contract changed",
+    ):
+        adapter._outcome_availability_disclosures()
+
+
+@pytest.mark.parametrize(
+    "binding_name",
+    (
+        "_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE",
+        "_PINNED_REQUIRE_REGIME_PROFILE",
+        "_run_spec",
+        "_expected_result_names",
+    ),
+)
+def test_new_profile_authority_binding_mutation_refuses_before_network(
+    plan, monkeypatch, binding_name,
+):
+    backend = _Backend(plan)
+    monkeypatch.setattr(adapter, binding_name, lambda *_items, **_kwargs: None)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-14T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(plan.control_directory.iterdir())
+
+
+def test_regime_profile_names_hashes_and_look_accounting_are_exact(regime_plan):
+    profile_id = regime_plan.projection.evaluation_profile_id
+    profile = regime_evaluator.require_regime_profile(profile_id)
+    expected = _REGIME_ACCOUNTING[profile_id]
+    assert regime_plan.projection.evaluation_profile_sha256 == profile["profile_sha256"]
+    assert regime_plan.evaluation_profile_id == profile_id
+    assert regime_plan.evaluation_profile_sha256 == profile["profile_sha256"]
+    assert regime_plan.expected_custom_statistic_names == (
+        runtime.expected_custom_summary_statistic_names(profile_id)
+    )
+    assert len(regime_plan.expected_custom_statistic_names) == 18
+    for stage in ("reservation", "launch", "result"):
+        accounting = adapter._look_accounting(
+            stage=stage,
+            evaluation_profile_id=profile_id,
+        )
+        launched = stage in {"launch", "result"}
+        authenticated = stage == "result"
+        assert accounting["shared_look_ledger_entry_id"] == expected[0]
+        assert accounting["run_level_looks_before"] == expected[1]
+        assert accounting["run_level_looks_after"] == (
+            expected[2] if launched else expected[1]
+        )
+        assert accounting["arv2_development_evaluations_before"] == expected[3]
+        assert accounting["arv2_development_evaluations_after"] == (
+            expected[4] if launched else expected[3]
+        )
+        assert accounting["planned_maximum_preliminary_ic_cell_count"] == 16
+        assert accounting["emitted_preliminary_ic_cell_count"] == (
+            16 if authenticated else 0
+        )
+        assert accounting["lifetime_alpha_cell_floor_before"] == expected[5]
+        assert accounting["lifetime_alpha_cell_floor_after"] == (
+            expected[6] if authenticated else expected[5]
+        )
+    persisted = json.loads(
+        adapter.persist_accepted_risk_preliminary_submission_plan(
+            regime_plan
+        ).read_bytes()
+    )
+    assert persisted["schema"] == adapter.REGIME_PLAN_SCHEMA
+    assert persisted["evaluation_profile_id"] == profile_id
+    assert persisted["evaluation_profile_sha256"] == profile["profile_sha256"]
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("evaluation_profile_id", "arv2-stock-ic-2019-2023-tampered"),
+        ("evaluation_profile_sha256", "0" * 64),
+    ),
+)
+def test_regime_plan_profile_binding_tamper_is_refused(regime_plan, field, value):
+    original = getattr(regime_plan, field)
+    object.__setattr__(regime_plan, field, value)
+    try:
+        with pytest.raises(
+            adapter.AcceptedRiskPreliminarySubmissionError,
+            match="submission plan changed",
+        ):
+            adapter.require_accepted_risk_preliminary_submission_plan(regime_plan)
+    finally:
+        object.__setattr__(regime_plan, field, original)
+
+
+def test_regime_statistics_validate_with_exact_conditioning_disclosures(regime_plan):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _validate_statistics(regime_plan, statistics)
+    records = {name: json.loads(value) for name, value in statistics.items()}
+    cell = next(
+        records[name]
+        for name in regime_plan.expected_custom_statistic_names
+        if "_H" in name
+    )
+    disclosures = dict(regime_evaluator.OUTCOME_AVAILABILITY_DISCLOSURES)
+    assert disclosures["reported_ic_conditioned_on_endpoint_price_availability"] is True
+    assert disclosures["endpoint_price_conditioning_direction"] == "unknown"
+    assert disclosures["membership_ended_by_exit_is_confirmed_terminal"] is False
+    assert disclosures["terminal_payoff_policy_applied"] is False
+    assert cell["endpoint_price_conditioning"] == disclosures[
+        "endpoint_price_conditioning"
+    ]
+    assert cell["membership_ended_by_exit_interpretation"] == disclosures[
+        "membership_ended_by_exit_interpretation"
+    ]
+
+
+def test_regime_self_consistent_wrong_fixed_window_date_count_is_refused(regime_plan):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _profile, _meta_name, named_axes = adapter._regime_axis_inventory(
+        regime_plan.projection.evaluation_profile_id
+    )
+    for name, _axis in named_axes:
+        cell = json.loads(statistics[name])
+        cell["invalid_ic_date_count"] = 1
+        statistics[name] = _canonical(cell).decode("ascii")
+    _rehash_regime_summary(regime_plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate cell geometry changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("evaluation_profile_id", "arv2-stock-ic-2019-2023-tampered"),
+        ("evaluation_profile_sha256", "0" * 64),
+    ),
+)
+def test_regime_runtime_profile_binding_mutant_is_refused(
+    regime_plan, field, value
+):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    metadata = json.loads(statistics["ARV2_RUNTIME_META"])
+    metadata[field] = value
+    statistics["ARV2_RUNTIME_META"] = _canonical(metadata).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="runtime aggregate metadata changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("profile_id", "arv2-stock-ic-2019-2023-tampered"),
+        ("window_start_session", "2019-01-03"),
+        ("window_end_session", "2023-12-28"),
+    ),
+)
+def test_regime_cell_profile_or_window_axis_mutant_is_refused(
+    regime_plan, field, value
+):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _mutate_first_regime_cell(
+        regime_plan,
+        statistics,
+        lambda cell: cell.__setitem__(field, value),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate cell axis changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+def test_regime_all_five_mutually_exclusive_missing_categories_reconcile(regime_plan):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _profile, meta_name, named_axes = adapter._regime_axis_inventory(
+        regime_plan.projection.evaluation_profile_id
+    )
+    for name, _axis in named_axes:
+        cell = json.loads(statistics[name])
+        cell.update(
+            {
+                "eligible_score_row_count": 5,
+                "missing_outcome_pair_count": 5,
+                "benchmark_endpoint_unavailable_pair_count": 1,
+                "named_figi_resolution_refusal_pair_count": 1,
+                "security_entry_unavailable_pair_count": 1,
+                "membership_ended_by_exit_with_exit_unavailable_pair_count": 1,
+                "within_membership_exit_unavailable_pair_count": 1,
+            }
+        )
+        statistics[name] = _canonical(cell).decode("ascii")
+    runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+    runtime_meta["resolved_security_count"] = 0
+    runtime_meta["named_security_refusal_count"] = 1
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    summary_meta = json.loads(statistics[meta_name])
+    summary_meta["named_figi_resolution_refusal_count"] = 1
+    statistics[meta_name] = _canonical(summary_meta).decode("ascii")
+    _rehash_regime_summary(regime_plan, statistics)
+
+    _validate_statistics(regime_plan, statistics)
+
+
+def test_regime_named_figi_pair_requires_a_named_resolution_refusal(regime_plan):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _mutate_first_regime_cell(
+        regime_plan,
+        statistics,
+        lambda cell: cell.update(
+            {
+                "eligible_score_row_count": 1,
+                "missing_outcome_pair_count": 1,
+                "named_figi_resolution_refusal_pair_count": 1,
+            }
+        ),
+    )
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate cell geometry changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        (
+            "benchmark_endpoint_unavailable_pair_count",
+            1,
+            "missing-outcome census changed",
+        ),
+        (
+            "missing_pair_counter_sum_matches_total",
+            False,
+            "missing-outcome census changed",
+        ),
+        (
+            "endpoint_price_conditioning",
+            "unconditioned",
+            "outcome conditioning changed",
+        ),
+        (
+            "membership_ended_by_exit_interpretation",
+            "confirmed_terminal",
+            "outcome conditioning changed",
+        ),
+    ),
+)
+def test_regime_self_consistent_missing_census_or_disclosure_mutant_is_refused(
+    regime_plan, field, value, message,
+):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _mutate_first_regime_cell(
+        regime_plan,
+        statistics,
+        lambda cell: cell.__setitem__(field, value),
+    )
+    with pytest.raises(adapter.AcceptedRiskPreliminarySubmissionError, match=message):
+        _validate_statistics(regime_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("endpoint_price_conditioning_direction", "positive"),
+        ("terminal_payoff_policy_applied", True),
+        ("membership_ended_by_exit_is_confirmed_terminal", True),
+    ),
+)
+def test_regime_summary_conditioning_or_terminal_claim_mutant_is_refused(
+    regime_plan, field, value,
+):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _profile, meta_name, _named_axes = adapter._regime_axis_inventory(
+        regime_plan.projection.evaluation_profile_id
+    )
+    metadata = json.loads(statistics[meta_name])
+    metadata["outcome_availability_disclosures"][field] = value
+    statistics[meta_name] = _canonical(metadata).decode("ascii")
+    _rehash_regime_summary(regime_plan, statistics)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="regime evaluator aggregate metadata changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+def test_regime_summary_profile_hash_mutant_is_refused(regime_plan):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _profile, meta_name, _named_axes = adapter._regime_axis_inventory(
+        regime_plan.projection.evaluation_profile_id
+    )
+    metadata = json.loads(statistics[meta_name])
+    metadata["profile"]["profile_sha256"] = "0" * 64
+    statistics[meta_name] = _canonical(metadata).decode("ascii")
+    _rehash_regime_summary(regime_plan, statistics)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="regime evaluator aggregate metadata changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("terminal_payoff_applied", True),
+        ("formal_result", True),
+        ("raw_price_rows_in_summary", True),
+    ),
+)
+def test_regime_top_level_scope_flag_mutant_is_refused(regime_plan, field, value):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _profile, meta_name, _named_axes = adapter._regime_axis_inventory(
+        regime_plan.projection.evaluation_profile_id
+    )
+    metadata = json.loads(statistics[meta_name])
+    metadata[field] = value
+    statistics[meta_name] = _canonical(metadata).decode("ascii")
+    _rehash_regime_summary(regime_plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="regime evaluator aggregate metadata changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+def test_regime_source_lineage_mutant_is_refused(regime_plan):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _profile, meta_name, _named_axes = adapter._regime_axis_inventory(
+        regime_plan.projection.evaluation_profile_id
+    )
+    metadata = json.loads(statistics[meta_name])
+    key = next(iter(metadata["source_lineage_sha256s"]))
+    metadata["source_lineage_sha256s"][key] = "0" * 64
+    statistics[meta_name] = _canonical(metadata).decode("ascii")
+    _rehash_regime_summary(regime_plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="source lineage changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+def test_regime_summary_identity_mutant_is_refused(regime_plan):
+    statistics = _regime_aggregate_statistics(regime_plan)
+    _profile, meta_name, _named_axes = adapter._regime_axis_inventory(
+        regime_plan.projection.evaluation_profile_id
+    )
+    metadata = json.loads(statistics[meta_name])
+    metadata["summary_sha256"] = "0" * 64
+    statistics[meta_name] = _canonical(metadata).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="summary identity changed",
+    ):
+        _validate_statistics(regime_plan, statistics)
+
+
+def test_regime_result_from_another_profile_is_refused(monkeypatch, tmp_path):
+    first = _build_plan(
+        monkeypatch, tmp_path, regime_evaluator.REGIME_PROFILE_IDS[0]
+    )
+    second = _build_plan(
+        monkeypatch, tmp_path, regime_evaluator.REGIME_PROFILE_IDS[1]
+    )
+    statistics = _regime_aggregate_statistics(first)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="result inventory changed",
+    ):
+        _validate_statistics(second, statistics)
+
+
+def test_runtime_slice_result_boundary_is_shared_with_cloud_runtime(plan):
+    statistics = _aggregate_statistics(plan)
+    runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+    runtime_meta["training_slice_count"] = runtime.MAX_TRAIN_SLICE_COUNT
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    _validate_statistics(plan, statistics)
+
+    runtime_meta["training_slice_count"] += 1
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="runtime aggregate metadata changed",
+    ):
+        _validate_statistics(plan, statistics)
 
 
 def _reachable_local_python_paths(root, initial_paths):
@@ -402,7 +1010,11 @@ class _Backend:
         self.objects = {}
         self.compile_state = "BuildSuccess"
         self.terminal_status = "Completed."
-        self.statistics = _aggregate_statistics(plan)
+        self.statistics = (
+            _aggregate_statistics(plan)
+            if plan.projection.evaluation_profile_id is None
+            else _regime_aggregate_statistics(plan)
+        )
         self.extra_initial_source = None
         self.backtest_inventory = None
 
@@ -645,6 +1257,88 @@ def test_offline_exact_submission_status_and_single_aggregate_read(plan):
     ) is result
 
 
+def test_regime_offline_submission_reads_only_its_eighteen_statistics(regime_plan):
+    signature = _offline_signature()
+    backend = _Backend(regime_plan)
+    profile_id = regime_plan.projection.evaluation_profile_id
+    reservation_accounting = adapter._look_accounting(
+        evaluation_profile_id=profile_id
+    )
+    launch_accounting = adapter._look_accounting(
+        stage="launch", evaluation_profile_id=profile_id
+    )
+    result_accounting = adapter._look_accounting(
+        stage="result", evaluation_profile_id=profile_id
+    )
+    execution_authority = json.loads(
+        adapter.render_accepted_risk_preliminary_execution_authority_candidate(
+            regime_plan
+        )
+    )
+    assert execution_authority["look_accounting"] == reservation_accounting
+    assert execution_authority["evaluation_profile_id"] == profile_id
+    assert execution_authority["evaluation_profile_sha256"] == (
+        regime_plan.evaluation_profile_sha256
+    )
+    permit, launch = _execute(regime_plan, backend, signature)
+    terminal = _complete(regime_plan, backend, signature, permit, launch)
+    result_authority = json.loads(
+        adapter.render_accepted_risk_preliminary_result_read_authority_candidate(
+            plan=regime_plan,
+            permit=permit,
+            launch=launch,
+            terminal=terminal,
+        )
+    )
+    assert result_authority["look_accounting"] == launch_accounting
+    assert result_authority["evaluation_profile_id"] == profile_id
+    assert result_authority["evaluation_profile_sha256"] == (
+        regime_plan.evaluation_profile_sha256
+    )
+    result_permit, result = _read(
+        regime_plan, backend, signature, permit, launch, terminal
+    )
+
+    assert terminal.terminal_status == "Completed."
+    assert backend.events.count("backtests/create") == 1
+    assert backend.events.count("backtests/read") == 1
+    assert len(result.custom_statistics) == 18
+    assert tuple(name for name, _value in result.custom_statistics) == (
+        regime_plan.expected_custom_statistic_names
+    )
+    plan_record = json.loads(
+        adapter.persist_accepted_risk_preliminary_submission_plan(
+            regime_plan
+        ).read_bytes()
+    )
+    permit_record = json.loads(permit.permit_path.read_bytes())
+    precreate_record = json.loads(
+        next(regime_plan.control_directory.glob("pre-create-control-*.json")).read_bytes()
+    )
+    launch_record = json.loads(
+        next(regime_plan.control_directory.glob("launch-receipt-*.json")).read_bytes()
+    )
+    persisted = json.loads(result.persisted_path.read_bytes())
+    assert plan_record["look_accounting"] == reservation_accounting
+    assert permit_record["look_accounting"] == reservation_accounting
+    assert precreate_record["look_accounting"] == launch_accounting
+    assert launch_record["look_accounting"] == launch_accounting
+    assert persisted["look_accounting"] == result_accounting
+    expected = _REGIME_ACCOUNTING[regime_plan.projection.evaluation_profile_id]
+    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == expected[0]
+    assert persisted["look_accounting"]["lifetime_alpha_cell_floor_after"] == (
+        expected[6]
+    )
+    assert adapter.require_accepted_risk_preliminary_aggregate_result(
+        result,
+        plan=regime_plan,
+        execution_permit=permit,
+        launch=launch,
+        terminal=terminal,
+        result_permit=result_permit,
+    ) is result
+
+
 def test_durable_receipts_rehydrate_every_phase_for_cross_process_recovery(plan):
     signature = _offline_signature()
     backend = _Backend(plan)
@@ -782,13 +1476,15 @@ def test_ambiguous_create_recovery_refuses_zero_or_multiple_runs(plan, count):
     assert tuple(backend.events) == before_retry
 
 
-def test_r053_development_look_accounting_is_bound_end_to_end(plan):
+def test_r055_development_look_accounting_is_bound_end_to_end(plan):
     signature = _offline_signature()
     backend = _Backend(plan)
     execution_authority = json.loads(
         adapter.render_accepted_risk_preliminary_execution_authority_candidate(plan)
     )
     assert execution_authority["look_accounting"] == _EXPECTED_LOOK_ACCOUNTING
+    assert "evaluation_profile_id" not in execution_authority
+    assert "evaluation_profile_sha256" not in execution_authority
 
     permit, launch = _execute(plan, backend, signature)
     terminal = _complete(plan, backend, signature, permit, launch)
@@ -803,6 +1499,9 @@ def test_r053_development_look_accounting_is_bound_end_to_end(plan):
     )
     for record in (plan_record, permit_record):
         assert record["look_accounting"] == _EXPECTED_LOOK_ACCOUNTING
+    assert plan_record["schema"] == adapter.PLAN_SCHEMA
+    assert "evaluation_profile_id" not in plan_record
+    assert "evaluation_profile_sha256" not in plan_record
     assert launch_record["look_accounting"] == _look_accounting_at("launch")
 
     result_authority = json.loads(
@@ -814,6 +1513,8 @@ def test_r053_development_look_accounting_is_bound_end_to_end(plan):
         )
     )
     assert result_authority["look_accounting"] == _look_accounting_at("launch")
+    assert "evaluation_profile_id" not in result_authority
+    assert "evaluation_profile_sha256" not in result_authority
     _result_permit, result = _read(
         plan, backend, signature, permit, launch, terminal
     )
@@ -1186,7 +1887,7 @@ def test_terminal_failure_is_distinct_and_never_reads_result(plan):
     ] == 0
     assert launch_record["look_accounting"][
         "lifetime_alpha_cell_floor_after"
-    ] == 452
+    ] == 484
     assert not any(plan.control_directory.glob("aggregate-result-*.json"))
 
 

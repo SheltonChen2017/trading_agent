@@ -1307,3 +1307,167 @@ ARV2 has spent **23** infrastructure looks and **1** development evaluation.
 The lifetime alpha-cell exposure floor is **484**. No permanent-family or
 confirmatory-alpha look has been spent, and no paper/live authority follows
 from this preliminary result.
+
+## R-054 — Analyst Revisions V2 sparse-signal accepted-risk stock IC (LAUNCHED; TECHNICAL RUNTIME ERROR; NO RESULT READ)
+
+R-054 was preregistered and launched as a new development evaluation. Its
+exact v2 rule normalizes each sector from its live analyst-signal names while
+retaining unscored names as structural zero, and excludes unavailable price
+pairs without imputation when at least 20 actual pairs remain. The 20-name / 5-
+active sector floors, complete-sector requirement, horizons, views, arms, and
+2020-2025 plus 2021-2025 windows stayed fixed.
+
+| Field | Recorded value |
+|---|---|
+| **Research-look accounting** | Counted once: shared run-level looks **54 -> 55** and ARV2 development evaluations **1 -> 2**. Because no aggregate result was authenticated or read, the lifetime alpha-cell exposure floor remains **484**, rather than rising to the preregistered conditional value of 516. |
+| **Input package** | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
+| **Evaluator manifest** | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
+| **QC source projection** | `arv2-preliminary-qc-projection-1c017bc130a6da1903070220`; SHA-256 `1c017bc130a6da1903070220dc04fb3b685241c8d0a70e3cb6b64ab48b40de14`; five files, 131,880 bytes |
+| **Execution identity** | Plan `arv2-preliminary-qc-submission-c455edf2b3bf16085a5e27b7`, SHA-256 `c455edf2b3bf16085a5e27b73b9852816ac5a20bd99d8880a0792097afacddcc`; execution permit `arv2-preliminary-qc-execution-permit-4a31edebb6a005070bfde0ab`; launch receipt `arv2-preliminary-qc-launch-412cd2296e621e50581f98d3` |
+| **QC project / compile / backtest** | Project `36578018`, `2 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260915_R054A_e9851c2f`; compile `f9268585923d032f45dfa71adefd7b26-3f2c18c888039d6893340cd16f93eb1f`; backtest `30d1a096d2ef7c69c820460d7ad39971`, `ARV2 R054 sparse-signal accepted-risk preliminary stock IC 2021-2025 e9851c2f` |
+| **Launch / terminal** | The one-use permit began `2026-09-15T15:55:12Z`. The launch entered `In Queue...`; 104 statistics-free polls authenticated terminal `Runtime Error`. Terminal receipt `arv2-preliminary-qc-terminal-fab47d71f30c0f7e95684460`, SHA-256 `fab47d71f30c0f7e95684460e3a56caf79d54f5e22c3e3cf098c6c8de800d9a7`. |
+| **QC runtime evidence** | The QC terminal reported at 2026-05-26 16:00:00 that one algorithm time loop exceeded ten minutes (`Isolator.cs:line 190`). The UI later reported 3,186.19 seconds total runtime and 6,084,172 processed data points. These messages diagnose scheduling/runtime exhaustion, not an alpha result. |
+| **Outcome access** | `include_statistics=false` and `result_values_selected=false` throughout terminal polling. No result authority was rendered or signed; no aggregate statistic, valid-date count, security-level outcome, raw provider row, order, deployment, or trading action was read. |
+| **Disposition** | **Spent technical development evaluation; no economic result.** The tangible-evidence gate was not tested and remains unmet. No alpha sign, magnitude, sufficiency status, or underfill conclusion may be inferred from this runtime error. |
+
+The prior source-only feasibility replay remains valid evidence about the
+signal path: it found all 1,255 gate-window dates feasible in both source
+views and score arms, and the empty-history replay completed all 1,508 dates.
+Neither replay opened an outcome. The cloud run instead exhausted the QC
+execution schedule while advancing the same fixed workload through repeated
+`Train(...)` callbacks. Therefore the next action is a scheduling-only retry,
+not a strategy-rule relaxation.
+
+**Cumulative ledger state after R-054:** **55** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **2** development evaluations.
+The lifetime alpha-cell exposure floor remains **484**. No permanent-family or
+confirmatory-alpha look has been spent.
+
+## R-055 — Analyst Revisions V2 same-rule scheduling retry (COMPLETED; TANGIBLE PRELIMINARY STOCK-IC EVIDENCE)
+
+R-055 preserved R-054's exact package, evaluator, v2 signal rule, dates,
+views, rating arms, horizons, output inventory, and tangible-result gate. Its
+only substantive change was execution scheduling: bounded work slices ran
+directly from ordinary `OnData` calls instead of through `Train(...)`. The
+evaluator, input, score, return, threshold, window, and output cells remained
+byte-identical.
+
+| Field | Recorded value |
+|---|---|
+| **Purpose / classification** | `development_evaluation`; `arv2-eval-stock-historical-qc-001`; accepted-risk preliminary stock IC only, not a formal, confirmatory, ETF, economic-portfolio, deployment, or trading result |
+| **Research-look accounting** | Counted once: shared run-level looks **55 -> 56** and ARV2 development evaluations **2 -> 3**. ARV2 infrastructure looks remain **23**; permanent-family and confirmatory-alpha looks remain zero. The 32 authenticated preliminary cells raise the lifetime alpha-cell exposure floor **484 -> 516**. |
+| **Input package** | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
+| **Evaluator manifest** | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
+| **QC source projection** | `arv2-preliminary-qc-projection-8d194f3486f961601111d49d`; SHA-256 `8d194f3486f961601111d49d5cabcdaba33c095f95858f03a1143280b76ef5bb`; five files, 132,028 bytes |
+| **Execution identity** | Plan `arv2-preliminary-qc-submission-d0fe1c6ae7ae01749426a187`, SHA-256 `d0fe1c6ae7ae01749426a1873692b2a264440d5b83f4cc516136a6954eecd68f`; execution permit `arv2-preliminary-qc-execution-permit-556ebf6e2d9ca90400d2f861`, SHA-256 `556ebf6e2d9ca90400d2f86163a7c97f3e77cd91c813bc19b7560eed2ea82035`; launch receipt `arv2-preliminary-qc-launch-6613f6a03413246c5a6ede3f`, SHA-256 `6613f6a03413246c5a6ede3f5a72dc128ea504e220036a41f8ecaaba6a9f86f0` |
+| **QC project / compile / backtest** | Project `36580858`, `3 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260915_R055B_e9851c2f`; compile `8d11a427fa02d5a3b7575e6e95673680-b411ae097d26f7fe858a57eb6b31ec73`, `BuildSuccess`; backtest `de2d5930528b5c3bdcc8a802f1332eaa`, `ARV2 R055B direct-runtime accepted-risk stock IC 2021-2025 e9851c2f` |
+| **Launch / terminal** | Permit began `2026-09-15T17:23:13Z`; 89 statistics-free polls authenticated exact `Completed.` Terminal receipt `arv2-preliminary-qc-terminal-7461e9c26ebc02d53d119af2`, SHA-256 `7461e9c26ebc02d53d119af2c78d20e503cad5416ca3e0b8dc3faf605ba22cf2`, records `include_statistics=false` and `result_values_selected=false`. |
+| **Aggregate-only result** | One-use result permit `arv2-preliminary-qc-result-permit-c8069ece67f6c52bb1a90cd8`, SHA-256 `c8069ece67f6c52bb1a90cd8ecfea836602a573e35b7ef59af134264fdb0bc3c`, made exactly one `backtests/read` call. Exactly 34 expected `ARV2_*` statistics were authenticated: 32 cells plus two metadata records. Result receipt `arv2-preliminary-qc-result-e670b7f94eb993969defc260`, semantic SHA-256 `e670b7f94eb993969defc260bc34932280fb6a9ec9bd12d7d61400b8725a91ec`; persisted-file SHA-256 `05e347c3f8fad101d4c195b3ae8003c73598533364f3c7e256cfda41a7cf5214`; custom-statistics SHA-256 `b37867f0d629714b9c9dede95bc87725585d647aa7dfb17502ae9a8e0f4f2e01`. |
+| **Runtime coverage** | QC resolved 5,113 securities and retained 1,038 named refusals, reconciling to 6,151 inputs; 12,244 contributions and all 400 evaluator callbacks completed. Compatibility field `training_slice_count=41`, although R-055 advanced through `OnData`, not `Train(...)`. |
+| **2021-2025 gate result** | **16/16 `PRELIMINARY_DESCRIPTIVE_AVAILABLE`; each has 1,255 valid dates, zero invalid dates, and all five preregistered IC/return aggregates non-null.** Accepted actual outcome pairs are 4,990,758 / 4,984,886 / 4,968,962 / 4,928,202 at H1/H5/H20/H60. Mean IC ranges across view/arm are 0.003910-0.004114 / 0.006235-0.006651 / 0.008213-0.009194 / 0.009774-0.011841; positive-IC date share ranges 56.18%-57.45% / 61.59%-62.63% / 63.82%-65.26% / 66.22%-69.08%. |
+| **2020-2025 companion** | **16/16 available; each has 1,508 valid and zero invalid dates.** Accepted pairs range from 5,823,350 at H1 to 5,759,773 at H60. Every mean and median IC is positive, but this companion period is not an independent confirmation of the owner-window result. |
+| **Return interpretation** | The authenticated actual-outcome fields exist, satisfying the tangible-evidence gate. Their cross-section mean SPY-excess returns at H1/H5/H20/H60 are -0.00010055 / -0.00116854 / -0.00672225 / -0.02626635 (medians -0.00040116 / -0.00225874 / -0.00876165 / -0.02449505). They are aggregate universe outcomes, identical across views/arms at a horizon, and **not** a score-sorted portfolio or ETF P&L. |
+| **Evidence limitations** | Metadata remains `formal_result=false`, `alpha_claim_authorized=false`, and `economic_portfolio_evaluation=false`. Inputs are current-vintage, non-pristine-PIT Massive rows and current-snapshot Sharadar identity/sector attributes. The run omits formal controls/inference, terminal-payoff/successor authority, an economic portfolio, ETF construction, and leverage. |
+| **Access exclusions** | The result action selected no raw provider row, raw price row, security-level outcome, unrestricted log, chart, trade, order, deployment, broker action, or trading action. |
+| **Disposition** | **Technically successful and tangibly populated preliminary stock-IC diagnostic.** The fixed count/status gate passes 16/16, so no counts-only relaxation is permitted or needed. This is encouraging ranking evidence, not yet an investable-return result or formal alpha acceptance. |
+
+The first signed `_01` control attempt failed locally before any QC request
+because generic organization discovery occurred after the formal transport had
+sealed its runtime namespace. It created no QC project or job and consumed no
+look or result. The successful `_02` path instead read the existing private
+host binding before importing the sealed transport; no guard was weakened.
+
+R-056's preregistered counts-only underfill contingency is **cancelled
+unlaunched and unspent** because R-055 passed the gate by counts and non-null
+availability. No observed alpha sign or magnitude selected that decision.
+R-056 is retired; any later new evaluation begins no earlier than R-057.
+
+**Cumulative ledger state after R-055:** **56** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **3** development evaluations.
+The lifetime alpha-cell exposure floor is **516**. No permanent-family or
+confirmatory-alpha look has been spent. Independent Claude review of the exact
+R-055 snapshot and Codex counter-review are required before later windows,
+ETF construction, actual or synthetic leverage, deployment, orders, or
+trading.
+
+## R-057 — Analyst Revisions V2 fixed 2019-2023 stock-IC diagnostic (COMPLETED)
+
+R-057 is a preregistered `development_evaluation`, evaluation
+`arv2-eval-stock-historical-qc-002`, over 2019-01-02 through 2023-12-29
+(1,258 decision sessions). It reused R-055 package
+`arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`, SHA-256
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`,
+and the exact R-055 score rule.
+
+| Field | Recorded value |
+|---|---|
+| **Accounting** | Shared run looks **56 -> 57**; ARV2 development evaluations **3 -> 4**; lifetime cell floor **516 -> 532**. Infrastructure remains 23; permanent and confirmatory looks remain zero. |
+| **QC identity** | Project `36588837`, `3 ARV2_REGIME_R057_2019_2023 - 20260915`; compile `5442e2cb06ed0f49d6bdbe42754877b2-f80a7ba5ecb832e38e3143452bf8befa`; backtest `067d22ef131633df7002057c796a67f6` |
+| **Signed execution chain** | Plan SHA-256 `6518eb27435c5966a1b837d63abbfe80a18adb22e8f5835a36654602a83a3b24`; permit `212ad3eb882ba82e81e75ed4eb3b8a30f448cd2c8f5295655a7620e476295c03`; launch `b11dee9bd901a673aef3fa25f4b3b373bdc7bb76cd21645163038ac3e8e6131c`; authenticated `Completed.` terminal `37b64f14e50896e2e4d96f8f2d7ec489379eb136214020407f417a2c39bc4e1e` after 42 statistics-free polls |
+| **Single aggregate read** | Result permit `817688ac5d53235360cb1e34bce547e314dc2189d806316125f2cbd9cce814f1`; exactly one `backtests/read`; exactly 18 expected statistics; result SHA-256 `2c69d6102e53ca4ab95e5c1e30565ba493882d85dc9ad2a9b6e952aa3a0512e6`; persisted file `ef18cbc613b661d9fa9b38ed341f0c44b02e7882103c1f13ef9da1cd1a9664f7`; custom-statistics `b94d132a96db401782a5f88ad9585bc3c5a31993968d270143fc390fa6530900` |
+| **Result** | All 16 cells available, each with 1,258 valid and zero invalid dates. H1/H5/H20/H60 mean-IC ranges: `.002342-.002609` / `.003686-.004090` / `.005211-.005831` / `.006073-.007705`; positive-date shares: `53.66%-55.41%` / `56.20%-57.31%` / `56.44%-57.63%` / `58.27%-59.86%`. Every mean and median IC is positive. |
+| **Conditioning** | Accepted pairs decline from 4,638,761 at H1 to 4,614,063 at H60; missing pairs rise from 902,126 to 926,824. The mutually exclusive census has zero benchmark refusals and is recorded in Analyst lane section 79. |
+| **Disposition** | **Technically successful, descriptively encouraging stock-ranking evidence.** This is not a formal alpha result, score-sorted portfolio, ETF return, or trading authority. |
+
+The QC editor later contained a literal `thanks` before the import in
+`main.py`, which the owner reported was probably accidental and removed. It
+caused four later editor-build errors and one later successful build, but did
+not alter the pinned compile or the sole launched R-057 backtest. It consumed
+no retry, duplicate run, read, or additional look.
+
+## R-058 — Analyst Revisions V2 fixed 2023-2025 stock-IC diagnostic (COMPLETED)
+
+R-058 is the conditional preregistered `development_evaluation`, evaluation
+`arv2-eval-stock-historical-qc-003`, over 2023-01-03 through 2025-12-31
+(752 decision sessions). Its plan was created only after R-057's authenticated
+aggregate receipt, with the same package and score rule.
+
+| Field | Recorded value |
+|---|---|
+| **Accounting** | Shared run looks **57 -> 58**; ARV2 development evaluations **4 -> 5**; lifetime cell floor **532 -> 548**. Infrastructure remains 23; permanent and confirmatory looks remain zero. |
+| **QC identity** | Project `36589846`, `4 ARV2_REGIME_R058_2023_2025 - 20260915`; compile `ea42ccbfa6ac47ee195bed14c3fd3027-d2282698abac486a07364fd59c3a90db`; backtest `f07ac3b86cd703103a2cf2ac48598fea` |
+| **Signed execution chain** | Plan SHA-256 `d4e12f2bc7c24c8088b9d4df555c06703ea7adb09e3d2841fd82ba24ab1b5bb4`; permit `239df091d4086728f21111585b36e7e7717304856762592d381c4d8fd75226b1`; launch `68176d778ba2241e73d2b812abaf08833745edec0cab53b59be6e452144c08d3`; authenticated `Completed.` terminal `8406b2295e5057db9550cad55ba483f4e8c5c553502cce41d038b992064ac181` after 26 statistics-free polls |
+| **Single aggregate read** | Result permit `b3b28065a79e415ded45a09d472649422e4676a35dbfa4221565d68e007dd928`; exactly one `backtests/read`; exactly 18 expected statistics; result SHA-256 `2c83071d8a6d5fb0637243db9457e83a4e6f70527648fb76ba247e3a62e773d0`; persisted file `a8e92f9cade96be133a390db29dbef4ef854d8d418487d9fae79807eba08e202`; custom-statistics `eb680ddc7f486ac7ab8d81ac6871404fdf2a709f2eef7548329bf00358b99854` |
+| **Result** | All 16 cells available, each with 752 valid and zero invalid dates. H1/H5/H20/H60 mean-IC ranges: `.003369-.003413` / `.004438-.004562` / `.004716-.005126` / `.003324-.004483`; positive-date shares: `55.85%-56.38%` / `59.18%-60.37%` / `57.31%-59.04%` / `52.66%-55.59%`. Every mean and median IC is positive. |
+| **Conditioning** | Accepted pairs decline from 3,004,567 at H1 to 2,948,639 at H60; missing pairs rise from 321,292 to 377,220. The mutually exclusive census has zero benchmark refusals and is recorded in Analyst lane section 79. |
+| **Disposition** | **Technically successful, descriptively encouraging recent-regime ranking evidence.** H5/H20 are strongest and H60 weakens; this is not a formal alpha result, portfolio return, ETF return, or trading authority. |
+
+## R-059 — Analyst Revisions V2 fixed 2013-2019 stock-IC diagnostic (COMPLETED; EFFECTIVE IC START 2015-09-29)
+
+R-059 is the conditional preregistered `development_evaluation`, evaluation
+`arv2-eval-stock-historical-qc-004`, nominally over 2013-01-02 through
+2019-12-31 (1,762 decision sessions). Its plan was created only after R-058's
+authenticated aggregate receipt, with the same package and score rule.
+
+| Field | Recorded value |
+|---|---|
+| **Accounting** | Shared run looks **58 -> 59**; ARV2 development evaluations **5 -> 6**; lifetime cell floor **548 -> 564**. Infrastructure remains 23; permanent and confirmatory looks remain zero. |
+| **QC identity** | Project `36590411`, `5 ARV2_REGIME_R059_2013_2019 - 20260915`; compile `96d0d401b9ce8c8bdf3dd327eb91cbfc-3a5aed546bf9f132b7fd3890c7cf89c6`; backtest `1d8c28f4279694c4389ec415a23d6d20` |
+| **Signed execution chain** | Plan SHA-256 `0b172beae8d9350dacd65cfe0296e6f807294fd0380ab78d1c6882796105f4fa`; permit `5e32b74278dd29d3371b36e1bd22be84a6158ef30af01e26b8d583658c2e10bf`; launch `228966a43d2f233ebe1c234bb7932a8051e487e82b50cf31821b52011ae6c551`; authenticated `Completed.` terminal `862ea6647dcdb6880f227209edf3a480500c5e15a1bc637b3a686f78ca01005e` after 26 statistics-free polls |
+| **Single aggregate read** | Result permit `4c41f2ff6411403869ae73c6c2af80afe8f76a18b6ad84236aa7cd29de49ccf1`; exactly one `backtests/read`; exactly 18 expected statistics; result SHA-256 `f6f6e841e1eae7b73d9fc62b5b8826de7efc70244d4899e2d6575ec7b2e2d016`; persisted file `480915b1bf42f30868c0ddbb6f74f973ab48fbd1571e219ec1e1a4a1fc2e15fa`; custom-statistics `93d6cd7fe4a6298347aa64335762f0397e633147e5c448ea4eb0644493d4cfa8` |
+| **Result** | All 16 cells available, each with 1,072 valid and 690 invalid dates. H1/H5/H20/H60 mean-IC ranges: `.001503-.001597` / `.001979-.002152` / `.003321-.003491` / `.004502-.004689`; positive-date shares: `53.64%-55.13%` / `54.94%-56.25%` / `54.85%-55.69%` / `59.33%-60.82%`. Every mean and median IC is positive. |
+| **Effective evidence period** | An outcome-free exact-input replay showed every date from 2013-01-02 through 2015-09-28 invalid because at least one sector had fewer than five active analyst signals. Every date from 2015-09-29 through 2019-12-31 was valid. The result therefore does not support an IC claim for 2013-2015. |
+| **Conditioning** | Accepted coverage is 74.30%-74.47%; missing coverage is 25.53%-25.70%, dominated by named FIGI refusals and unavailable entry prices. Benchmark refusals are zero. Exact censored/current census is in Analyst lane section 79. |
+| **Disposition** | **Technically successful and positive pre-AI robustness evidence from 2015-09-29 onward.** Large mean/median universe-return divergence warns of skew and outliers. It is not a formal result, portfolio P&L, ETF return, or trading authority. |
+
+Across R-057 through R-059, all 48 cells are populated and have positive mean
+and median IC. The association is small and horizon-sensitive: 2019-2023 and
+the effective pre-2020 sample strengthen toward H60, while 2023-2025 is
+strongest at H5/H20 and weakens at H60. This is evidence that the score has
+some ranking content across regimes, not proof that an investable portfolio
+survives turnover, costs, concentration, capacity, endpoint conditioning, or
+leverage.
+
+All three results remain current-vintage, non-pristine point-in-time,
+endpoint-conditioned accepted-risk diagnostics. They omit a PIT security
+master, terminal-payoff splice, formal controls and inference, economic
+portfolio construction, ETF mapping, transaction costs, and leverage. No raw
+row, security-level outcome, unrestricted log, chart, order, deployment,
+broker, paper, live, or trading action was selected.
+
+**Cumulative ledger state after R-059:** **59** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **6** development evaluations.
+The lifetime alpha-cell exposure floor is **564**. Permanent-family and
+confirmatory-alpha looks remain zero. Independent Claude review and Codex
+counter-review are required before unlevered ETF/economic-portfolio work;
+actual or synthetic 3x leverage remains conditional on that baseline.

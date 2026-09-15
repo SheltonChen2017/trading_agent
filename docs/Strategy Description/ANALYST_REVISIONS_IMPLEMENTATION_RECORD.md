@@ -215,34 +215,34 @@ PRACTICAL BACKTEST AND DOES NOT REQUIRE A REPLACEMENT ARCHIVE FIRST. THE
 SUPPLIED 15-OF-228, 6.6% ONE-DAY LATER-TOUCH EXAMPLE IS TOLERABLE TO THE OWNER
 BUT IS NOT A PROVEN WORST-CASE, GLOBAL MISSING-RATE, OR SIGNAL-ERROR BOUND.
 SECTION 73 RECORDS THE FIRST OUTCOME-BEARING ACCEPTED-RISK DEVELOPMENT
-EVALUATION, `R-053`, USING CURRENT-VINTAGE MASSIVE AND SHARADAR INPUTS UNDER
-THE OWNER'S DISCLOSED-RISK DECISION. QUANTCONNECT PROJECT `36561856` AND
-BACKTEST `f3bd9f3fc3c2627784e93d761382cd04` REACHED AUTHENTICATED TERMINAL STATUS
-`COMPLETED.`; THE SEPARATELY AUTHORIZED AGGREGATE-ONLY RESULT READ IS SPENT.
-ALL 32 PRELIMINARY STOCK-IC CELLS ARE `INCONCLUSIVE_UNDERFILLED`, WITH ZERO
-VALID IC DATES, SO THIS RUN PROVIDES NO EVIDENCE FOR OR AGAINST STRATEGY
-ALPHA. EVERY RESULT MUST DISCLOSE THE CURRENT-VINTAGE LIMITATION, COMPARE
-CURRENT-ROW AND CONSERVATIVELY CENSORED TREATMENTS, AND BE SUPPLEMENTED BY
-IMMUTABLE FORWARD CAPTURE BEFORE PAPER/LIVE DECISIONS.
-THE SHARED LEDGER NOW RECORDS 54 RUN-LEVEL LOOKS: 23 ARV2 INFRASTRUCTURE
-LOOKS, 1 ARV2 DEVELOPMENT EVALUATION, 0 PERMANENT-FAMILY LOOKS, 0
-CONFIRMATORY LOOKS, AND A LIFETIME ALPHA-CELL FLOOR OF 484. THE PERMANENT
-LOOK AND FORMAL ALPHA REMAIN UNSPENT/UNCHANGED. CLAUDE'S INDEPENDENT REVIEW
-OF SECTION 73 AND THE EXACT PUSHED RANGE IS THE NEXT GATE, FOLLOWED BY CODEX
-COUNTER-REVIEW. ANY CHANGE TO THE ZERO-MAD OR COMPLETE-CROSS-SECTION RULE IS
-A NEWLY PREREGISTERED EVALUATION WITH A NEW R-NUMBER, NOT AN `R-053` RETRY.
-NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE; R-053 IS
-PRELIMINARY AND INFERENTIALLY INCONCLUSIVE.
-PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN CLOSED.
-THE INDEPENDENT CLAUDE REVIEW OF THE ACCEPTED-RISK QC EVALUATION RANGE
-`d09fea1..7bc8098` (SECTION 74) ACCEPTS ALL 30 COMMITS AFTER THREE
-TEST-COVERAGE CORRECTIONS, AND RAISES THE ZERO-MAD/COMPLETE-CROSS-SECTION
-FINDING TO P2 BECAUSE THE FROZEN RULE IS UNSATISFIABLE FOR A SPARSE EVENT
-SIGNAL AND R-053 COULD NOT HAVE RETURNED ANY VALID DATE. IT ALSO RECORDS ONE
-P1: THE PUSHED HEAD FAILS TEN TESTS OF ITS OWN STANDING LANE SELECTION,
-INCLUDING THE PINNED NO-EXTERNAL-I/O CLOSURE OVER THE QC PACKAGE, SO THAT
-BOUNDARY IS UNPROVEN UNTIL CODEX MAKES THE SELECTION GREEN. NO ALPHA EVIDENCE
-EXISTS AND EVERY LATER GATE REMAINS CLOSED.**
+EVALUATION, `R-053`, WHICH COMPLETED BUT RETURNED 32 UNDERFILLED CELLS WITH
+ZERO VALID DATES. SECTION 74 INDEPENDENTLY REVIEWED THAT RANGE AND IDENTIFIED
+THE UNSATISFIABLE SPARSE-SIGNAL NORMALIZATION. SECTION 75 COUNTER-REVIEWS AND
+CORRECTS THE REVIEWED TREE, RECORDS `R-054` AS A SPENT TECHNICAL FAILURE UNDER
+QC'S SYNCHRONOUS-TRAINING ALLOWANCE, AND RECORDS `R-055` AS THE SAME-RULE
+DIRECT-`ONDATA` SCHEDULING RETRY. PRIVATE QC PROJECT `36580858` AND BACKTEST
+`de2d5930528b5c3bdcc8a802f1332eaa` REACHED AUTHENTICATED TERMINAL STATUS
+`COMPLETED.`; THE SEPARATELY SIGNED AGGREGATE-ONLY RESULT READ SUCCEEDED
+EXACTLY ONCE.
+ALL 32 R-055 PRELIMINARY STOCK-IC CELLS ARE
+`PRELIMINARY_DESCRIPTIVE_AVAILABLE`. THE SIXTEEN 2021-2025 GATE CELLS EACH
+HAVE 1,255 VALID DATES, ZERO INVALID DATES, AND NON-NULL IC AND ACTUAL-RETURN
+AGGREGATES; THE PREREGISTERED TANGIBLE-EVIDENCE GATE THEREFORE SUCCEEDS BY
+COUNTS AND AVAILABILITY. THE OBSERVED IC IS SMALL AND POSITIVE, BUT THIS IS
+CURRENT-VINTAGE, NON-PRISTINE-PIT, ACCEPTED-RISK STOCK-IC EVIDENCE, NOT A
+FORMAL/CONFIRMATORY RESULT, ECONOMIC PORTFOLIO RETURN, ETF BACKTEST, OR
+TRADING AUTHORITY. THE CROSS-SECTION MEAN-EXCESS-RETURN FIELDS ARE UNIVERSE
+OUTCOME DIAGNOSTICS AND ARE NOT A SCORE-SORTED PORTFOLIO P&L.
+THE SHARED LEDGER NOW RECORDS 56 RUN-LEVEL LOOKS: 23 ARV2 INFRASTRUCTURE
+LOOKS, 3 ARV2 DEVELOPMENT EVALUATIONS, 0 PERMANENT-FAMILY LOOKS, 0
+CONFIRMATORY LOOKS, AND A LIFETIME ALPHA-CELL FLOOR OF 516. R-056'S
+COUNTS-ONLY RELAXATION WAS CANCELLED UNLAUNCHED AND UNSPENT BECAUSE R-055
+PASSED THE GATE; NO OBSERVED SIGN OR MAGNITUDE SELECTED THAT DECISION.
+CLAUDE'S INDEPENDENT REVIEW OF THE EXACT SECTION-75 SNAPSHOT IS THE NEXT GATE,
+FOLLOWED BY CODEX COUNTER-REVIEW. LATER WINDOWS, ETF CONSTRUCTION, AND ACTUAL
+OR SYNTHETIC LEVERAGE REMAIN CLOSED UNTIL THAT REVIEW CYCLE COMPLETES. PAPER
+OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN CLOSED. NO V2
+SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -354,6 +354,17 @@ was opened. Exactly one data-free refusal-smoke job was submitted and counts as
 one conservative infrastructure research look; its terminal state is
 ambiguous. Zero ARV2 development evaluations were performed, and the formal
 outcome look remains unspent.
+
+**Section-75 live-state supersession.** The two paragraphs immediately above
+are retained as section-69 historical state and are no longer current. The
+accepted-risk physical chain subsequently captured and authenticated the
+owner-approved Massive/Sharadar inputs, R-053 through R-055 spent three ARV2
+development evaluations, and R-055 produced 32 populated preliminary stock-IC
+cells. The current totals are 56 run-level looks, 23 ARV2 infrastructure
+looks, three ARV2 development evaluations, and a 516-cell lifetime exposure
+floor; permanent and confirmatory looks remain zero. This does not populate
+the formal production registries or transform the preliminary result into a
+formal, ETF, portfolio, deployment, order, or trading result.
 
 ## 3. Milestone ladder
 
@@ -849,21 +860,26 @@ tests of its own standing lane selection, reproduced on a pristine export of
 that commit: eight stale wire-level fakes left by this range's own Object Store
 protocol migration, one stale refusal-reason expectation, and the pinned
 no-external-I/O closure over the QC package, which now aborts before it checks
-anything. Section 75 counter-reviews and corrects those issues, preregisters
-and spends R-054 on the owner-approved sparse-signal rule, and records its
-technical QC runtime failure without any result read. R-055 is now
-preregistered as the same-rule scheduling correction: direct bounded daily
-runtime slices replace the exhausted `Train(...)` path, with all 113 harness
-sessions available and the result reader bound to the same limit. The
-immediate next step is the already owner-authorized single R-055 launch from a
-new private project. The owner explicitly waives Claude review of section 75
-until after this first tangible 2021-2025 backtest. If it completes, exactly
-one separately signed aggregate
-read applies the 2021-2025 tangible-evidence gate. If it completes underfilled,
-only the predeclared counts-based R-056 relaxation may follow; no alpha sign
-may select that choice. Later windows, ETF construction, actual or synthetic
-leverage, paper/live deployment, broker access, orders, and trading remain
-closed until the 2021-2025 tangible-evidence gate succeeds.
+anything. Section 75 counter-reviews and corrects those issues, spends R-054
+on the owner-approved sparse-signal rule, and records its technical QC runtime
+failure without a result read. The owner then waived interim Claude review
+only through the first tangible 2021-2025 result. R-055 preserved the exact
+R-054 evaluator, package, views, arms, horizons, dates, and output inventory,
+while direct bounded `OnData` slices replaced the exhausted `Train(...)`
+schedule. Project `36580858` and backtest
+`de2d5930528b5c3bdcc8a802f1332eaa` reached authenticated `Completed.` after
+89 statistics-free polls; one separately signed `backtests/read` authenticated
+the exact 32 cells plus two metadata records. All sixteen 2021-2025 gate cells
+are `PRELIMINARY_DESCRIPTIVE_AVAILABLE`, have 1,255 valid dates and zero
+invalid dates, and contain all five preregistered non-null IC/return metrics.
+The tangible-evidence gate succeeds. R-056 is cancelled unlaunched and
+unspent because the counts were sufficient, independently of the observed
+alpha signs. Claude must now independently review section 75 and the exact
+committed snapshot, after which Codex counter-reviews it. Only then may the
+owner-planned later windows and subsequent unlevered/leveraged ETF work begin.
+This preliminary stock-IC result is neither a formal alpha acceptance nor an
+economic portfolio backtest. Paper/live deployment, broker access, orders,
+and trading remain closed.
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -13151,7 +13167,7 @@ construction, leverage, deployment, orders and trading all remain closed,
 and the independent-review debt recorded by `8391dd8` falls due after the
 first formal backtest.
 
-## 75. Codex counter-review and R-054 preregistration, 2026-09-15
+## 75. Codex counter-review and R-054/R-055 evaluations, 2026-09-15
 
 ### 75.1 Counter-review disposition
 
@@ -13302,3 +13318,136 @@ least two admitted sectors, 20 actual outcome pairs, and five live-signal
 names. That decision must use counts and sufficiency only, never alpha sign or
 magnitude. This preregistration itself authorizes no later window, ETF,
 leverage, deployment, order, or trading action.
+
+### 75.5 R-055 execution, authenticated result, and tangible-evidence gate
+
+The first local R-055 control directory, suffix `_01`, rendered and signed plan
+`arv2-preliminary-qc-submission-6840e8174dd28924775ffffc`, SHA-256
+`6840e8174dd28924775ffffc8c5a91bc26528a5d5df08844f1cfe704a1497487`,
+and spent execution permit
+`arv2-preliminary-qc-execution-permit-e2202f216ae7936d981bf357`, SHA-256
+`e2202f216ae7936d981bf3577e21184af1d4e1c0114f1125a319f322026567d1`.
+It then refused locally with `transport capability authority changed` before
+any QC request. The generic organization lookup had occurred after import of
+the formal transport, whose sealed `urllib` namespace correctly detected that
+ordering change. No project, upload, compile, `backtests/create`, status poll,
+result read, outcome, look, development evaluation, or cell exposure exists
+for `_01`. The successful control path did not weaken that guard: it read and
+hash-authenticated the already private host-binding scalar before importing
+the sealed transport.
+
+The distinct `_02` plan is
+`arv2-preliminary-qc-submission-d0fe1c6ae7ae01749426a187`, SHA-256
+`d0fe1c6ae7ae01749426a1873692b2a264440d5b83f4cc516136a6954eecd68f`.
+Execution permit
+`arv2-preliminary-qc-execution-permit-556ebf6e2d9ca90400d2f861`, SHA-256
+`556ebf6e2d9ca90400d2f86163a7c97f3e77cd91c813bc19b7560eed2ea82035`,
+began at `2026-09-15T17:23:13Z`. It created private project `36580858`,
+`3 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260915_R055B_e9851c2f`, compiled as
+`8d11a427fa02d5a3b7575e6e95673680-b411ae097d26f7fe858a57eb6b31ec73`
+with `BuildSuccess`, and created backtest
+`de2d5930528b5c3bdcc8a802f1332eaa`,
+`ARV2 R055B direct-runtime accepted-risk stock IC 2021-2025 e9851c2f`.
+Launch receipt `arv2-preliminary-qc-launch-6613f6a03413246c5a6ede3f`,
+SHA-256
+`6613f6a03413246c5a6ede3f5a72dc128ea504e220036a41f8ecaaba6a9f86f0`,
+records the initial `In Queue...` state. After 89 statistics-free polls,
+terminal receipt `arv2-preliminary-qc-terminal-7461e9c26ebc02d53d119af2`,
+SHA-256
+`7461e9c26ebc02d53d119af2c78d20e503cad5416ca3e0b8dc3faf605ba22cf2`,
+authenticated exact `Completed.` with `include_statistics=false` and
+`result_values_selected=false`.
+
+The result authority was then rendered and signed separately. One-use result
+permit `arv2-preliminary-qc-result-permit-c8069ece67f6c52bb1a90cd8`, SHA-256
+`c8069ece67f6c52bb1a90cd8ecfea836602a573e35b7ef59af134264fdb0bc3c`,
+began at `2026-09-15T18:10:06Z` and made exactly one `backtests/read` call.
+It selected no log, chart, order, raw provider row, or security-level result.
+Aggregate receipt `arv2-preliminary-qc-result-e670b7f94eb993969defc260` has
+semantic SHA-256
+`e670b7f94eb993969defc260bc34932280fb6a9ec9bd12d7d61400b8725a91ec`;
+its persisted JSON file has physical SHA-256
+`05e347c3f8fad101d4c195b3ae8003c73598533364f3c7e256cfda41a7cf5214`.
+The authenticated custom-statistics inventory has SHA-256
+`b37867f0d629714b9c9dede95bc87725585d647aa7dfb17502ae9a8e0f4f2e01`
+and contains exactly 34 expected `ARV2_*` values: 32 cells and two metadata
+records.
+
+The runtime resolved 5,113 securities and retained 1,038 named refusals,
+reconciling to all 6,151 input securities. It consumed 12,244 pre-normalized
+contributions and completed all 400 evaluator callbacks. The compatibility
+metadata field `training_slice_count` is 41, but R-055 performed those slices
+through ordinary `OnData`, not QC `Train(...)`.
+
+All sixteen 2021-2025 gate cells have exact status
+`PRELIMINARY_DESCRIPTIVE_AVAILABLE`, 1,255 valid dates, zero invalid dates,
+zero sector-refused rows, and all five preregistered IC/return aggregates
+non-null. Accepted and missing actual outcome pairs and the ranges across the
+two source views and two score arms are:
+
+| Horizon | Accepted pairs | Missing pairs | Mean Spearman IC range | Median Spearman IC range | Positive-IC date-share range | Mean daily cross-section mean SPY-excess return | Median daily cross-section mean SPY-excess return |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 4,990,758 | 650,493 | 0.00391026 to 0.00411426 | 0.00379776 to 0.00395062 | 0.561753 to 0.574502 | -0.0001005503 | -0.0004011634 |
+| 5 | 4,984,886 | 656,365 | 0.00623496 to 0.00665086 | 0.00602147 to 0.00654950 | 0.615936 to 0.626295 | -0.0011685413 | -0.0022587441 |
+| 20 | 4,968,962 | 672,289 | 0.00821333 to 0.00919372 | 0.00777839 to 0.00890371 | 0.638247 to 0.652590 | -0.0067222462 | -0.0087616508 |
+| 60 | 4,928,202 | 713,049 | 0.00977409 to 0.01184136 | 0.00870815 to 0.01050533 | 0.662151 to 0.690837 | -0.0262663541 | -0.0244950518 |
+
+The companion 2020-2025 window also has sixteen of sixteen available cells,
+each with 1,508 valid and zero invalid dates; accepted pairs range from
+5,823,350 at H1 to 5,759,773 at H60. In both windows every mean and median IC
+is positive, and the 2021-2025 IC/positive-date-share values are higher than
+their matched 2020-2025 cells. Firm-specific mean IC is modestly higher than
+the global comparator in every 2021-2025 match, and the current-row view is
+modestly higher than the conservative-censored view in every mean-IC match.
+Those are descriptive sensitivities, not independent confirmations.
+
+The primary practical gate was fixed before the result as all sixteen owner-
+window cells having at least 50 valid dates and non-null mean/median IC,
+positive-date share, and mean/median cross-section mean excess-return values.
+R-055 passes **16 of 16**. This decision uses only status, counts, and non-null
+availability, not the favorable or unfavorable sign of any metric. The
+cross-section return columns are aggregate universe outcomes and are identical
+across view/arm at a horizon; they are not the return of a long/short, ETF, or
+investable portfolio. Metadata remains exact `formal_result=false`,
+`alpha_claim_authorized=false`, and `economic_portfolio_evaluation=false`.
+The accepted-risk current-vintage/non-pristine-PIT, missing-terminal-payoff,
+and omitted-control disclosures remain in force.
+
+R-055 therefore moves the shared run count **55 -> 56**, ARV2 development
+evaluations **2 -> 3**, and the lifetime alpha-cell floor **484 -> 516**.
+ARV2 infrastructure looks remain 23; permanent and confirmatory looks remain
+zero. Because R-055 passed by a wide count margin, the prospective R-056
+counts-only relaxation is cancelled before source implementation, signature,
+permit, QC action, or result. It spends zero looks, evaluations, and cells.
+R-056 is retired rather than reusable; any genuinely new evaluation begins no
+earlier than R-057.
+
+### 75.6 Review handoff and validation scope
+
+The scheduling correction is commit `2d71cb3`; this record commit follows it.
+The correction deliberately does not touch the 57,963-byte evaluator or add a
+new refusal surface. Its isolating tests prove direct `OnData` advancement with
+no `Train(...)`, the exact 113-session harness, normal completion in 41 slices,
+and the 113-accepted/114-refused result boundary. Projection slice constants
+are imported from one runtime definition rather than hand-copied again. This
+bounded change answers the review's relevant thin-proof and duplication
+concerns without attempting to pay down the separately documented lane-wide
+`ARV2R50-022` test-isolation debt in the backtest round.
+
+Focused validation on Python 3.13.15 is **110 passed in 32.21 s** for the
+R-055 runtime and submission-adapter batteries and **75 passed in 0.76 s** for
+the active-document and lane-record gates. Focused compilation and
+`git diff --check` both exit zero. The live QC compile was `BuildSuccess`, the
+backtest reached authenticated `Completed.`, and the aggregate reader selected
+34 of 34 expected values exactly once. Per the owner's lane-scoped direction,
+neither the complete Analyst suite nor the complete repository suite was run.
+
+Claude must independently review the exact committed section-75 snapshot,
+including the source/test commit, the authenticated private R-055 receipt
+chain, the 16-of-16 gate calculation, the distinction between positive IC and
+non-portfolio cross-section returns, and the cancellation of R-056. Codex then
+counter-reviews Claude's exact commit. Only after that cycle may the next
+bounded milestone implement the owner-planned later historical windows,
+followed by unlevered ETF construction and the separately specified actual and
+synthetic 3x leverage diagnostics. No paper/live deployment, broker access,
+orders, or trading is authorized.

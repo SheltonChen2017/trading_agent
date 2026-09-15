@@ -296,6 +296,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         __future__ dataclasses ast hashlib json re pathlib
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime
         """.split()
     ),
     "accepted_risk_preliminary_submission_adapter.py": tuple(

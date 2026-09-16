@@ -39,6 +39,11 @@ class EtfMappingCoverageError(AcceptedRiskEtfBaselineError):
 PROFILE_SCHEMA = "arv2-accepted-risk-etf-sector-baseline-profile-v1"
 PROFILE_ID = "arv2-etf-sector-baseline-2021-2025"
 CONTRACT_ID = "arv2-accepted-risk-etf-sector-baseline-v1"
+# R060/R061 keep their original identity and economic admission behavior.
+# The corrected profile is local/review-only until a new run is preregistered.
+CORRECTED_PROFILE_ID = "arv2-etf-sector-baseline-2021-2025-admission-v2"
+CORRECTED_PROFILE_SCHEMA = "arv2-accepted-risk-etf-sector-baseline-profile-v2"
+CORRECTED_CONTRACT_ID = "arv2-accepted-risk-etf-sector-baseline-v2"
 SUMMARY_SCHEMA = "arv2-accepted-risk-etf-sector-baseline-summary-v1"
 IC_CELL_SCHEMA = "arv2-accepted-risk-etf-sector-baseline-ic-cell-v1"
 PORTFOLIO_CELL_SCHEMA = (
@@ -255,12 +260,34 @@ def _profile_record():
 _PROFILE = MappingProxyType(_profile_record())
 
 
+def _corrected_profile_record():
+    semantic = _profile_record()
+    semantic.pop("profile_sha256")
+    semantic.update(
+        schema=CORRECTED_PROFILE_SCHEMA,
+        profile_id=CORRECTED_PROFILE_ID,
+        portfolio_admission="percentile_hysteresis_independent_of_ic_count",
+        minimum_etf_ic_rows=MINIMUM_ETF_IC_ROWS,
+        singleton_percentile="50",
+        tie_policy="average_rank",
+        cash_return="0",
+    )
+    return {**semantic, "profile_sha256": _sha(semantic)}
+
+
+_CORRECTED_PROFILE = MappingProxyType(_corrected_profile_record())
+
+
 def require_etf_baseline_profile(profile_id):
-    if type(profile_id) is not str or profile_id != PROFILE_ID:
+    if type(profile_id) is not str or profile_id not in (
+        PROFILE_ID, CORRECTED_PROFILE_ID,
+    ):
         raise AcceptedRiskEtfBaselineError(
             "ETF baseline profile must be the exact frozen profile"
         )
-    return dict(_PROFILE)
+    profile = _PROFILE if profile_id == PROFILE_ID else _CORRECTED_PROFILE
+    # Return independent nested lists as well as an independent root mapping.
+    return json.loads(_canonical(dict(profile)).decode("ascii"))
 
 
 def expected_custom_summary_statistic_names(profile_id=PROFILE_ID):
@@ -478,10 +505,14 @@ def _score_etf(
 
 
 def _percentiles(scores):
-    if type(scores) is not dict or len(scores) < MINIMUM_ETF_IC_ROWS:
-        raise AcceptedRiskEtfBaselineError(
-            "ETF cross-section has fewer than five eligible funds"
-        )
+    if type(scores) is not dict:
+        raise AcceptedRiskEtfBaselineError("ETF scores must be an exact dictionary")
+    if not scores:
+        return {}
+    if len(scores) == 1:
+        # A singleton has no relative rank: do not manufacture a top-percentile
+        # signal. Equal-score cross-sections likewise receive neutral midranks.
+        return {ticker: Decimal(50) for ticker in scores}
     ordered = tuple(sorted(scores))
     values = tuple(scores[ticker] for ticker in ordered)
     ranks = _stock._average_ranks(values)
@@ -616,10 +647,17 @@ class AcceptedRiskEtfBaselineRuntime:
         self,
         value,
         *,
+        evaluation_profile_id,
         qc_sid_to_security_id,
         package_id,
         package_sha256,
     ):
+        self._profile = require_etf_baseline_profile(evaluation_profile_id)
+        self._contract_id = (
+            CONTRACT_ID
+            if evaluation_profile_id == PROFILE_ID
+            else CORRECTED_CONTRACT_ID
+        )
         if type(qc_sid_to_security_id) is not dict or any(
             type(key) is not str or type(item) is not str
             for key, item in qc_sid_to_security_id.items()
@@ -817,9 +855,12 @@ class AcceptedRiskEtfBaselineRuntime:
             etf_scores[ticker] = score
             snapshot_weights[ticker] = weights
             sector_exposures[ticker] = exposures
-        if len(etf_scores) < MINIMUM_ETF_IC_ROWS:
+        if (
+            self._profile["profile_id"] == PROFILE_ID
+            and len(etf_scores) < MINIMUM_ETF_IC_ROWS
+        ):
+            # Historical R060/R061 only; never re-label their economic rule.
             self._pending_weights = {}
-            self._score_history[session] = None
         else:
             self._pending_weights, _percentile_map = _target_weights(
                 etf_scores,
@@ -827,7 +868,10 @@ class AcceptedRiskEtfBaselineRuntime:
                 sector_exposures,
                 frozenset(self._active_weights),
             )
-            self._score_history[session] = dict(etf_scores)
+        # Statistical sufficiency is separate from admitting economic targets.
+        self._score_history[session] = (
+            dict(etf_scores) if len(etf_scores) >= MINIMUM_ETF_IC_ROWS else None
+        )
         if self._pending_weights:
             self._selected_decision_session_count += 1
         self._decision_session_count += 1
@@ -926,7 +970,7 @@ class AcceptedRiskEtfBaselineRuntime:
             values.append(value)
         return {
             "schema": IC_CELL_SCHEMA,
-            "profile_id": PROFILE_ID,
+            "profile_id": self._profile["profile_id"],
             "horizon_sessions": horizon,
             "status": (
                 "PRELIMINARY_DESCRIPTIVE_AVAILABLE"
@@ -981,7 +1025,7 @@ class AcceptedRiskEtfBaselineRuntime:
             cumulative_excess = +(accumulator.wealth - self._spy_wealth)
         return {
             "schema": PORTFOLIO_CELL_SCHEMA,
-            "profile_id": PROFILE_ID,
+            "profile_id": self._profile["profile_id"],
             "cost_bps_per_side": cost,
             "primary_cost_scenario": cost == PRIMARY_COST_BPS,
             "status": (
@@ -1065,8 +1109,8 @@ class AcceptedRiskEtfBaselineRuntime:
             )
         record = {
             "schema": SUMMARY_SCHEMA,
-            "contract_id": CONTRACT_ID,
-            "profile": dict(_PROFILE),
+            "contract_id": self._contract_id,
+            "profile": dict(self._profile),
             "package_id": self._package_id,
             "package_sha256": self._package_sha256,
             "input_manifest_id": self._input.manifest_id,
@@ -1148,7 +1192,9 @@ class AcceptedRiskEtfBaselineRuntime:
             output[
                 "ARV2_ETF_PORTFOLIO_COST_" + str(cell["cost_bps_per_side"])
             ] = _canonical(cell).decode("ascii")
-        if tuple(sorted(output)) != expected_custom_summary_statistic_names():
+        if tuple(sorted(output)) != expected_custom_summary_statistic_names(
+            self._profile["profile_id"]
+        ):
             raise AcceptedRiskEtfBaselineError(
                 "ETF custom summary statistic inventory changed"
             )
@@ -1164,6 +1210,9 @@ __all__ = (
     "AcceptedRiskEtfBaselineRuntime",
     "CANDIDATE_ETFS",
     "CONTRACT_ID",
+    "CORRECTED_CONTRACT_ID",
+    "CORRECTED_PROFILE_ID",
+    "CORRECTED_PROFILE_SCHEMA",
     "ConstituentWeight",
     "COST_BPS_SCENARIOS",
     "DECISION_END_SESSION",

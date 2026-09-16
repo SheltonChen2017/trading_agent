@@ -115,6 +115,230 @@ def _snapshot(ticker, session, *, total=Decimal("1"), offset=0):
     )
 
 
+def _sparse_decision_runtime(
+    monkeypatch, scores, profile_id, *, sector_refused=False
+):
+    value = _input()
+    runtime = subject.AcceptedRiskEtfBaselineRuntime(
+        value,
+        evaluation_profile_id=profile_id,
+        qc_sid_to_security_id={
+            f"QC SID {index:02d}": f"perm-security-{index:02d}"
+            for index in range(20)
+        },
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+    )
+    stock_scores = {
+        f"perm-security-{index:02d}": Decimal(scores[index // 5])
+        for index in range(5 * len(scores))
+    }
+    arm = (subject.PRIMARY_SOURCE_VIEW_ID, subject.PRIMARY_SCORE_ARM)
+    monkeypatch.setattr(
+        runtime._replay,
+        "score",
+        lambda _session: (
+            value.memberships, {arm: stock_scores}, {arm: sector_refused}
+        ),
+    )
+    tickers = subject.CANDIDATE_ETFS[:len(scores)]
+    for index, ticker in enumerate(tickers):
+        runtime._liquidity[ticker] = [Decimal("6000000")] * 20
+        runtime._available_snapshots[ticker] = _snapshot(
+            ticker, "2021-01-01", offset=index * 5
+        )
+    return runtime, tickers
+
+
+def test_historical_profile_hash_and_corrected_policy_are_separate_and_immutable():
+    historical = subject.require_etf_baseline_profile(subject.PROFILE_ID)
+    corrected = subject.require_etf_baseline_profile(subject.CORRECTED_PROFILE_ID)
+    assert historical["profile_sha256"] == (
+        "eadb6aba26495ceb8d11417364e80a18b9860a2488519ee9c692a7031cfa59dd"
+    )
+    assert historical["schema"] == subject.PROFILE_SCHEMA
+    assert corrected["schema"] == subject.CORRECTED_PROFILE_SCHEMA
+    assert corrected["profile_sha256"] != historical["profile_sha256"]
+    assert corrected["portfolio_admission"] == (
+        "percentile_hysteresis_independent_of_ic_count"
+    )
+    assert corrected["minimum_etf_ic_rows"] == 5
+    assert corrected["singleton_percentile"] == "50"
+    assert corrected["tie_policy"] == "average_rank"
+    assert corrected["cash_return"] == "0"
+    for profile_id, profile in (
+        (subject.PROFILE_ID, historical),
+        (subject.CORRECTED_PROFILE_ID, corrected),
+    ):
+        frozen_bytes = subject._canonical(profile)
+        semantic = dict(profile)
+        digest = semantic.pop("profile_sha256")
+        assert subject._sha(semantic) == digest
+        profile["candidate_etfs"].append("NOT-A-FROZEN-ETF")
+        profile["horizons"].append(999)
+        profile["cost_bps_scenarios"].append(999)
+        try:
+            assert subject._canonical(
+                subject.require_etf_baseline_profile(profile_id)
+            ) == frozen_bytes
+        finally:
+            for name in ("candidate_etfs", "horizons", "cost_bps_scenarios"):
+                profile[name].pop()
+
+
+def test_runtime_requires_an_explicit_supported_profile():
+    kwargs = {
+        "qc_sid_to_security_id": {},
+        "package_id": "arv2-test-package",
+        "package_sha256": "a" * 64,
+    }
+    with pytest.raises(TypeError, match="evaluation_profile_id"):
+        subject.AcceptedRiskEtfBaselineRuntime(_input(), **kwargs)
+    with pytest.raises(subject.AcceptedRiskEtfBaselineError, match="exact frozen"):
+        subject.AcceptedRiskEtfBaselineRuntime(
+            _input(), evaluation_profile_id="unsupported", **kwargs
+        )
+
+
+def test_sparse_percentiles_are_empty_or_neutral_then_use_average_ranks():
+    assert subject._percentiles({}) == {}
+    assert subject._percentiles({"AIQ": Decimal(7)}) == {"AIQ": Decimal(50)}
+    assert subject._percentiles({"AIQ": Decimal(1), "BOTZ": Decimal(2)}) == {
+        "AIQ": Decimal(0), "BOTZ": Decimal(100)
+    }
+    assert subject._percentiles({"AIQ": Decimal(3), "BOTZ": Decimal(3)}) == {
+        "AIQ": Decimal(50), "BOTZ": Decimal(50)
+    }
+    assert subject._percentiles(
+        {"AIQ": Decimal(1), "BOTZ": Decimal(2), "FINX": Decimal(3)}
+    ) == {"AIQ": Decimal(0), "BOTZ": Decimal(50), "FINX": Decimal(100)}
+    tied = subject._percentiles(
+        {"AIQ": Decimal(1), "BOTZ": Decimal(2), "FINX": Decimal(3), "IBB": Decimal(3)}
+    )
+    assert tied["FINX"] == tied["IBB"]
+    assert Decimal(83) < tied["FINX"] < Decimal(84)
+
+
+@pytest.mark.parametrize("count", range(5))
+def test_sparse_economic_admission_is_independent_of_ic_minimum(monkeypatch, count):
+    runtime, tickers = _sparse_decision_runtime(
+        monkeypatch, tuple(range(1, count + 1)), subject.CORRECTED_PROFILE_ID
+    )
+    runtime._decision(subject.DECISION_START_SESSION)
+
+    expected = {} if count < 2 else {tickers[-1]: Decimal("0.20")}
+    assert runtime._pending_weights == expected
+    assert runtime._active_weights == {}
+    assert runtime._eligible_etf_count_sum == count
+    assert runtime._selected_etf_count_sum == len(expected)
+    assert runtime._selected_decision_session_count == int(bool(expected))
+    assert runtime._score_history[subject.DECISION_START_SESSION] is None
+    for horizon in subject.HORIZONS:
+        cell = runtime._ic_cell(horizon)
+        assert cell["valid_ic_date_count"] == 0
+        assert cell["invalid_ic_date_count"] == 1
+        assert cell["accepted_outcome_pair_count"] == 0
+        assert cell["missing_outcome_pair_count"] == 0
+
+
+@pytest.mark.parametrize("count", (2, 3, 4))
+def test_historical_sparse_profile_still_exits_to_cash(monkeypatch, count):
+    runtime, tickers = _sparse_decision_runtime(
+        monkeypatch, tuple(range(1, count + 1)), subject.PROFILE_ID
+    )
+    runtime._active_weights = {tickers[-1]: Decimal("0.20")}
+    runtime._decision(subject.DECISION_START_SESSION)
+    assert runtime._pending_weights == {}
+    assert runtime._active_weights == {tickers[-1]: Decimal("0.20")}
+    assert runtime._score_history[subject.DECISION_START_SESSION] is None
+    assert runtime._eligible_etf_count_sum == count
+    assert runtime._selected_etf_count_sum == 0
+
+
+@pytest.mark.parametrize("scores", ((-4, -3, -2, -1), (0, 0, 0, 0)))
+def test_sparse_selection_is_relative_without_an_absolute_positive_cutoff(
+    monkeypatch, scores
+):
+    runtime, tickers = _sparse_decision_runtime(
+        monkeypatch, scores, subject.CORRECTED_PROFILE_ID
+    )
+    runtime._decision(subject.DECISION_START_SESSION)
+    expected = {} if len(set(scores)) == 1 else {tickers[-1]: Decimal("0.20")}
+    assert runtime._pending_weights == expected
+    assert runtime._score_history[subject.DECISION_START_SESSION] is None
+
+
+def test_sparse_tied_incumbent_is_retained_without_new_tied_entry(monkeypatch):
+    runtime, tickers = _sparse_decision_runtime(
+        monkeypatch, (1, 2, 3, 3), subject.CORRECTED_PROFILE_ID
+    )
+    runtime._active_weights = {tickers[-2]: Decimal("0.20")}
+    runtime._decision(subject.DECISION_START_SESSION)
+    assert runtime._pending_weights == {tickers[-2]: Decimal("0.20")}
+    assert tickers[-1] not in runtime._pending_weights
+
+
+def test_sparse_incumbent_exit_and_entry_execute_at_next_open_with_cost(monkeypatch):
+    runtime, tickers = _sparse_decision_runtime(
+        monkeypatch, (1, 2, 3, 4), subject.CORRECTED_PROFILE_ID
+    )
+    runtime._active_weights = {tickers[-2]: Decimal("0.20")}
+    runtime._previous_opens = {
+        ticker: Decimal(100) for ticker in (*tickers, "SPY")
+    }
+    runtime._decision(subject.DECISION_START_SESSION)
+    assert runtime._active_weights == {tickers[-2]: Decimal("0.20")}
+    assert runtime._pending_weights == {tickers[-1]: Decimal("0.20")}
+    assert runtime._return_accumulators[10].returns == []
+    runtime.process_session(
+        "2021-01-05",
+        tuple(
+            subject.EtfDailyBar(
+                ticker,
+                "2021-01-05",
+                Decimal(100),
+                Decimal(100),
+                Decimal(1000000),
+            )
+            for ticker in sorted((*tickers, "SPY"))
+        ),
+    )
+    assert runtime._active_weights == {tickers[-1]: Decimal("0.20")}
+    assert runtime._turnover_sum == Decimal("0.40")
+    assert runtime._return_accumulators[0].returns == [Decimal(0)]
+    assert runtime._return_accumulators[10].returns == [Decimal("-0.0004")]
+
+
+@pytest.mark.parametrize("refusal", ("zero_eligible", "singleton", "stock_sector"))
+def test_sparse_cash_target_clears_incumbent_and_stale_pending_weights(
+    monkeypatch, refusal
+):
+    scores = () if refusal == "zero_eligible" else (1,)
+    runtime, _tickers = _sparse_decision_runtime(
+        monkeypatch,
+        scores,
+        subject.CORRECTED_PROFILE_ID,
+        sector_refused=refusal == "stock_sector",
+    )
+    runtime._active_weights = {"AIQ": Decimal("0.20")}
+    runtime._pending_weights = {"BOTZ": Decimal("0.20")}
+    runtime._previous_opens = {"AIQ": Decimal(100), "SPY": Decimal(100)}
+    runtime._decision(subject.DECISION_START_SESSION)
+    assert runtime._pending_weights == {}
+    assert runtime._active_weights == {"AIQ": Decimal("0.20")}
+    assert runtime._score_history[subject.DECISION_START_SESSION] is None
+    assert runtime._stock_sector_refusal_session_count == int(
+        refusal == "stock_sector"
+    )
+    runtime._record_portfolio_return(
+        "2021-01-05", {"AIQ": Decimal(100), "SPY": Decimal(100)}
+    )
+    assert runtime._active_weights == {}
+    assert runtime._pending_weights is None
+    assert runtime._turnover_sum == Decimal("0.20")
+    assert runtime._return_accumulators[10].returns == [Decimal("-0.0002")]
+
+
 def test_profile_freezes_unlevered_supported_sleeve_and_result_inventory():
     profile = subject.require_etf_baseline_profile(subject.PROFILE_ID)
 
@@ -276,6 +500,24 @@ def test_projection_has_one_compact_etf_entry_and_no_order_surface():
     )
 
 
+def test_corrected_profile_remains_outside_qc_projection_and_submission():
+    with pytest.raises(
+        projection.regime_evaluator.RegimeRatingEvaluationError,
+        match="exact fixed profile",
+    ):
+        projection.project_source_paths_for_profile(subject.CORRECTED_PROFILE_ID)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="not allowlisted",
+    ):
+        adapter._run_spec(subject.CORRECTED_PROFILE_ID)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="not allowlisted",
+    ):
+        adapter._expected_result_names(subject.CORRECTED_PROFILE_ID)
+
+
 def test_h1_snapshot_guard_and_snapshot_monotonicity_are_isolated():
     value = _input()
     mapping = {
@@ -284,6 +526,7 @@ def test_h1_snapshot_guard_and_snapshot_monotonicity_are_isolated():
     }
     runtime = subject.AcceptedRiskEtfBaselineRuntime(
         value,
+        evaluation_profile_id=subject.CORRECTED_PROFILE_ID,
         qc_sid_to_security_id=mapping,
         package_id="arv2-test-package",
         package_sha256="a" * 64,
@@ -304,6 +547,7 @@ def test_h1_snapshot_guard_and_snapshot_monotonicity_are_isolated():
 
     monotone = subject.AcceptedRiskEtfBaselineRuntime(
         value,
+        evaluation_profile_id=subject.CORRECTED_PROFILE_ID,
         qc_sid_to_security_id=mapping,
         package_id="arv2-test-package",
         package_sha256="a" * 64,
@@ -317,6 +561,7 @@ def test_unchanged_target_still_charges_drift_rebalancing_turnover():
     value = _input()
     runtime = subject.AcceptedRiskEtfBaselineRuntime(
         value,
+        evaluation_profile_id=subject.CORRECTED_PROFILE_ID,
         qc_sid_to_security_id={},
         package_id="arv2-test-package",
         package_sha256="a" * 64,
@@ -377,6 +622,49 @@ def test_qc_driver_accepts_constituent_and_tradebar_envelopes():
     assert tuple(row.ticker for row in fake.sessions[0][1]) == ("AIQ", "SPY")
 
 
+def test_qc_driver_explicitly_constructs_historical_runtime(monkeypatch):
+    value = _input()
+    package = SimpleNamespace(
+        evaluator_input=value,
+        runtime_symbol_bindings=(),
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+    )
+    resolution = SimpleNamespace(
+        resolved=tuple(
+            {
+                "qc_security_id": f"QC SID {index:02d}",
+                "security_id": f"perm-security-{index:02d}",
+            }
+            for index in range(20)
+        )
+    )
+    monkeypatch.setattr(
+        qc_runtime.package_runtime,
+        "load_accepted_risk_preliminary_package",
+        lambda *_args, **_kwargs: package,
+    )
+    monkeypatch.setattr(
+        qc_runtime.figi_authority,
+        "resolve_preliminary_qc_figis",
+        lambda *_args, **_kwargs: resolution,
+    )
+    driver = qc_runtime.AcceptedRiskEtfBaselineQcDriver(
+        SimpleNamespace(composite_figi=lambda _value: None),
+        activation_manifest_key="arv2/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=123,
+        benchmark_symbol="SPY",
+        etf_symbols={ticker: ticker for ticker in subject.CANDIDATE_ETFS},
+    )
+    driver._initialize_once()
+    assert type(driver._runtime) is subject.AcceptedRiskEtfBaselineRuntime
+    assert driver._runtime._profile == subject.require_etf_baseline_profile(
+        subject.PROFILE_ID
+    )
+    assert driver._runtime._contract_id == subject.CONTRACT_ID
+
+
 def test_etf_run_spec_and_look_accounting_are_frozen_before_outcomes():
     spec = adapter._run_spec(subject.PROFILE_ID)
     accounting = adapter._look_accounting(
@@ -398,8 +686,12 @@ def test_etf_run_spec_and_look_accounting_are_frozen_before_outcomes():
     )
 
 
-@pytest.fixture(scope="module")
-def completed_runtime():
+@pytest.fixture(
+    scope="module",
+    params=(subject.PROFILE_ID, subject.CORRECTED_PROFILE_ID),
+    ids=("historical", "corrected"),
+)
+def completed_runtime(request):
     value = _input()
     mapping = {
         f"QC SID {index:02d}": f"perm-security-{index:02d}"
@@ -407,6 +699,7 @@ def completed_runtime():
     }
     runtime = subject.AcceptedRiskEtfBaselineRuntime(
         value,
+        evaluation_profile_id=request.param,
         qc_sid_to_security_id=mapping,
         package_id="arv2-test-package",
         package_sha256="a" * 64,
@@ -441,6 +734,17 @@ def completed_runtime():
         )
         prior_session = session
     runtime.complete()
+    summary = runtime.aggregate_summary()
+    assert summary["profile"] == subject.require_etf_baseline_profile(request.param)
+    assert summary["contract_id"] == (
+        subject.CONTRACT_ID
+        if request.param == subject.PROFILE_ID
+        else subject.CORRECTED_CONTRACT_ID
+    )
+    assert all(
+        cell["profile_id"] == request.param
+        for cell in (*summary["ic_cells"], *summary["portfolio_cells"])
+    )
     return value, runtime
 
 
@@ -449,6 +753,7 @@ def all_cash_runtime():
     value = _input()
     runtime = subject.AcceptedRiskEtfBaselineRuntime(
         value,
+        evaluation_profile_id=subject.CORRECTED_PROFILE_ID,
         qc_sid_to_security_id={},
         package_id="arv2-test-package",
         package_sha256="a" * 64,
@@ -586,6 +891,16 @@ def test_host_validator_accepts_exact_etf_summary_and_rejects_one_guard(
             "manifest_sha256": value.manifest_sha256,
         },
     )
+    if (
+        runtime.aggregate_summary()["profile"]["profile_id"]
+        == subject.CORRECTED_PROFILE_ID
+    ):
+        with pytest.raises(
+            adapter.AcceptedRiskPreliminarySubmissionError,
+            match="aggregate metadata semantics changed",
+        ):
+            adapter._validate_etf_aggregate_records(records, plan)
+        return
     adapter._validate_etf_aggregate_records(records, plan)
 
     records["ARV2_RUNTIME_META"]["leverage"] = True

@@ -118,6 +118,7 @@ class AcceptedRiskEtfBaselineQcDriver:
         }
         runtime = etf_evaluator.AcceptedRiskEtfBaselineRuntime(
             package.evaluator_input,
+            evaluation_profile_id=etf_evaluator.PROFILE_ID,
             qc_sid_to_security_id=sid_map,
             package_id=package.package_id,
             package_sha256=package.package_sha256,

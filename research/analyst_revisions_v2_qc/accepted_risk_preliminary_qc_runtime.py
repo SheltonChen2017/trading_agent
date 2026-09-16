@@ -19,7 +19,7 @@ import json
 import math
 import re
 import time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from types import MappingProxyType
 
@@ -60,6 +60,21 @@ MAX_TRAIN_SLICE_COUNT = 113
 MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
 STOCK_PORTFOLIO_PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
+STOCK_UNIVERSE_PROFILE_IDS = (
+    "arv2-stock-long-only-spy-holdings-proxy-2021-2025-r066-v1",
+    "arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1",
+    "arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1",
+)
+STOCK_PORTFOLIO_PROFILE_IDS = (
+    STOCK_PORTFOLIO_PROFILE_ID,
+    *STOCK_UNIVERSE_PROFILE_IDS,
+)
+CONSTITUENT_HISTORY_START = datetime(2020, 12, 1)
+CONSTITUENT_HISTORY_END = datetime(2026, 1, 1)
+MINIMUM_CONSTITUENT_TOTAL_WEIGHT = Decimal("0.95")
+MAXIMUM_CONSTITUENT_TOTAL_WEIGHT = Decimal("1.05")
+MINIMUM_CONSTITUENT_MAPPED_WEIGHT_FRACTION = Decimal("0.99")
+MAXIMUM_CONSTITUENT_SNAPSHOT_AGE = timedelta(days=10)
 EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
     sorted(
         (
@@ -83,8 +98,13 @@ def _stock_portfolio_module():
 def expected_custom_summary_statistic_names(evaluation_profile_id=None):
     if evaluation_profile_id is None:
         return EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
-    if evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+    if (
+        type(evaluation_profile_id) is str
+        and evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS
+    ):
         stock_portfolio = _stock_portfolio_module()
+        if stock_portfolio.PROFILE_IDS != STOCK_PORTFOLIO_PROFILE_IDS:
+            _error("stock portfolio profile inventory binding changed")
         if stock_portfolio.PROFILE_ID != STOCK_PORTFOLIO_PROFILE_ID:
             _error("stock portfolio profile binding changed")
         evaluator_names = (
@@ -771,6 +791,318 @@ class QcTotalReturnOpenHistoryLoader:
         return tuple(sorted(rows, key=lambda item: (item.security_id, item.session)))
 
 
+def _constituent_midnight(value, name):
+    if not isinstance(value, datetime):
+        _error(name + " is not a datetime")
+    try:
+        aware = value.tzinfo is not None and value.utcoffset() is not None
+        clock = (value.hour, value.minute, value.second, value.microsecond)
+        normalized = datetime(value.year, value.month, value.day)
+    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
+        raise AcceptedRiskPreliminaryQcRuntimeError(name + " is unreadable") from exc
+    if aware:
+        _error(name + " is timezone-aware")
+    if clock != (0, 0, 0, 0):
+        _error(name + " is not a daily midnight EndTime")
+    return normalized
+
+
+def _constituent_decimal(value, name):
+    if value is None:
+        return None
+    try:
+        parsed = Decimal(str(value))
+    except (InvalidOperation, ValueError) as exc:
+        raise AcceptedRiskPreliminaryQcRuntimeError(name + " is not decimal") from exc
+    if not parsed.is_finite():
+        _error(name + " is not finite")
+    return parsed if parsed > 0 else None
+
+
+def _constituent_last_update(value):
+    if isinstance(value, datetime):
+        if value.tzinfo is not None and value.utcoffset() is not None:
+            _error("constituent-history LastUpdate is timezone-aware")
+        if value.time() != datetime.min.time():
+            _error("constituent-history LastUpdate is not midnight")
+        return datetime(value.year, value.month, value.day)
+    if type(value) is date:
+        return datetime(value.year, value.month, value.day)
+    _error("constituent-history LastUpdate is not a calendar date")
+
+
+def _universe_symbol_sid(value, name):
+    try:
+        sid = str(value.symbol.id)
+    except Exception as exc:
+        raise AcceptedRiskPreliminaryQcRuntimeError(name + " symbol is unreadable") from exc
+    if type(sid) is not str or not sid:
+        _error(name + " symbol identity changed")
+    return sid
+
+
+class QcEtfConstituentEligibilityLoader:
+    def __init__(
+        self,
+        algorithm,
+        *,
+        resolution,
+        daily_resolution,
+        evaluation_profile_id,
+        constituent_universes,
+    ):
+        stock_portfolio = _stock_portfolio_module()
+        if (
+            type(evaluation_profile_id) is not str
+            or evaluation_profile_id not in stock_portfolio.UNIVERSE_PROFILE_IDS
+        ):
+            _error("constituent-history profile binding changed")
+        tickers = stock_portfolio.constituent_etf_tickers_for_profile(
+            evaluation_profile_id
+        )
+        if (
+            type(tickers) is not tuple
+            or not tickers
+            or tuple(sorted(set(tickers))) != tuple(sorted(tickers))
+            or any(ticker not in ("SPY", "QQQ") for ticker in tickers)
+            or type(constituent_universes) is not dict
+            or tuple(sorted(constituent_universes)) != tuple(sorted(tickers))
+        ):
+            _error("constituent-history universe inventory changed")
+        authenticated = figi_authority.require_preliminary_qc_figi_resolution(resolution)
+        universe_sids = {
+            ticker: _universe_symbol_sid(
+                constituent_universes[ticker],
+                "constituent-history " + ticker + " universe",
+            )
+            for ticker in tickers
+        }
+        if len(set(universe_sids.values())) != len(universe_sids):
+            _error("constituent-history universe SID inventory collided")
+        try:
+            security_by_sid = {
+                item["qc_security_id"]: item["security_id"]
+                for item in authenticated.resolved
+            }
+        except Exception as exc:
+            raise AcceptedRiskPreliminaryQcRuntimeError(
+                "constituent-history resolution inventory is unreadable"
+            ) from exc
+        if (
+            len(security_by_sid) != authenticated.resolved_count
+            or any(
+                type(sid) is not str
+                or not sid
+                or type(security_id) is not str
+                or not security_id
+                for sid, security_id in security_by_sid.items()
+            )
+        ):
+            _error("constituent-history resolution inventory changed")
+        self._algorithm = algorithm
+        self._resolution = authenticated
+        self._security_by_sid = security_by_sid
+        self._daily_resolution = daily_resolution
+        self._tickers = tickers
+        self._universes = dict(constituent_universes)
+        self._universe_sids = universe_sids
+
+    def _mapped_snapshot(self, collection_time, constituents):
+        try:
+            rows = tuple(constituents)
+        except Exception as exc:
+            raise AcceptedRiskPreliminaryQcRuntimeError(
+                "constituent-history collection is unreadable"
+            ) from exc
+        if not rows:
+            _error("constituent-history collection is empty")
+        weights = {}
+        mapped = {}
+        last_updates = []
+        for row in rows:
+            try:
+                row_end_time = row.end_time
+                sid = str(row.symbol.id)
+                weight_value = row.weight
+            except Exception as exc:
+                raise AcceptedRiskPreliminaryQcRuntimeError(
+                    "constituent-history row is unreadable"
+                ) from exc
+            if (
+                _constituent_midnight(
+                    row_end_time, "constituent-history row EndTime"
+                )
+                != collection_time
+            ):
+                _error("constituent-history row EndTime differs from collection")
+            weight = _constituent_decimal(weight_value, "constituent-history weight")
+            if weight is None:
+                continue
+            try:
+                last_update_value = row.last_update
+            except Exception as exc:
+                raise AcceptedRiskPreliminaryQcRuntimeError(
+                    "constituent-history row is unreadable"
+                ) from exc
+            last_update = _constituent_last_update(last_update_value)
+            if last_update > collection_time:
+                _error("constituent-history LastUpdate is after collection EndTime")
+            last_updates.append(last_update)
+            if type(sid) is not str or not sid or sid in weights:
+                _error("constituent-history collection duplicated a QC SID")
+            weights[sid] = weight
+            security_id = self._security_by_sid.get(sid)
+            if security_id is None:
+                continue
+            if type(security_id) is not str or not security_id:
+                _error("constituent-history reverse mapping changed")
+            try:
+                reversed_sid = str(
+                    self._resolution.symbol_for_security(security_id).id
+                )
+            except Exception as exc:
+                raise AcceptedRiskPreliminaryQcRuntimeError(
+                    "constituent-history reverse mapping is unreadable"
+                ) from exc
+            if reversed_sid != sid or security_id in mapped:
+                _error("constituent-history exact SID mapping changed")
+            mapped[security_id] = weight
+        total_weight = sum(weights.values(), Decimal(0))
+        if not (
+            MINIMUM_CONSTITUENT_TOTAL_WEIGHT
+            <= total_weight
+            <= MAXIMUM_CONSTITUENT_TOTAL_WEIGHT
+        ):
+            _error("constituent-history total positive weight escaped bounds")
+        mapped_weight = sum(mapped.values(), Decimal(0))
+        if (
+            not mapped
+            or mapped_weight
+            < total_weight * MINIMUM_CONSTITUENT_MAPPED_WEIGHT_FRACTION
+        ):
+            _error("constituent-history exact SID mapped weight is below 99%")
+        return tuple(sorted(mapped)), min(last_updates)
+
+    def _load_ticker(self, ticker):
+        universe = self._universes[ticker]
+        try:
+            history = self._algorithm.history(
+                universe,
+                CONSTITUENT_HISTORY_START,
+                CONSTITUENT_HISTORY_END,
+                flatten=False,
+            )
+            if history is None or not callable(history.items):
+                _error("constituent-history result is not a Series-like object")
+            items = history.items()
+        except AcceptedRiskPreliminaryQcRuntimeError:
+            raise
+        except Exception as exc:
+            raise AcceptedRiskPreliminaryQcRuntimeError(
+                "constituent-history call failed"
+            ) from exc
+        snapshots = {}
+        try:
+            for item in items:
+                if type(item) is not tuple or len(item) != 2:
+                    _error("constituent-history Series item shape changed")
+                key, constituents = item
+                if type(key) is not tuple or len(key) != 2:
+                    _error("constituent-history Series index shape changed")
+                universe_symbol, raw_collection_time = key
+                try:
+                    collection_universe_sid = str(universe_symbol.id)
+                except Exception as exc:
+                    raise AcceptedRiskPreliminaryQcRuntimeError(
+                        "constituent-history Series universe is unreadable"
+                    ) from exc
+                if collection_universe_sid != self._universe_sids[ticker]:
+                    _error("constituent-history Series universe changed")
+                collection_time = _constituent_midnight(
+                    raw_collection_time,
+                    "constituent-history collection EndTime",
+                )
+                if not (
+                    CONSTITUENT_HISTORY_START
+                    <= collection_time
+                    < CONSTITUENT_HISTORY_END
+                ):
+                    _error("constituent-history collection escaped query bounds")
+                if collection_time in snapshots:
+                    _error("constituent-history duplicated a collection EndTime")
+                snapshots[collection_time] = self._mapped_snapshot(
+                    collection_time, constituents
+                )
+        except AcceptedRiskPreliminaryQcRuntimeError:
+            raise
+        except Exception as exc:
+            raise AcceptedRiskPreliminaryQcRuntimeError(
+                "constituent-history Series traversal failed"
+            ) from exc
+        if not snapshots:
+            _error("constituent-history contains no authenticated snapshots")
+        return tuple(sorted(snapshots.items()))
+
+    @staticmethod
+    def _decision_times(decision_sessions):
+        if (
+            type(decision_sessions) is not tuple
+            or not decision_sessions
+            or any(type(session) is not str for session in decision_sessions)
+            or tuple(sorted(set(decision_sessions))) != decision_sessions
+        ):
+            _error("constituent-history decision-session inventory changed")
+        parsed = []
+        try:
+            for session in decision_sessions:
+                value = datetime.strptime(session, "%Y-%m-%d")
+                if value.strftime("%Y-%m-%d") != session:
+                    _error("constituent-history decision session is not canonical")
+                parsed.append((session, value))
+        except ValueError as exc:
+            raise AcceptedRiskPreliminaryQcRuntimeError(
+                "constituent-history decision session is invalid"
+            ) from exc
+        return tuple(parsed)
+
+    def build_eligibility(self, decision_sessions):
+        decision_times = self._decision_times(decision_sessions)
+        figi_authority.require_preliminary_qc_figi_resolution(self._resolution)
+        by_ticker = {
+            ticker: self._load_ticker(ticker) for ticker in self._tickers
+        }
+        result = {}
+        for session, decision_time in decision_times:
+            eligible = set()
+            for ticker in self._tickers:
+                prior = tuple(
+                    item
+                    for item in by_ticker[ticker]
+                    if item[0] < decision_time
+                )
+                if not prior:
+                    _error(
+                        "constituent-history has no snapshot strictly before decision"
+                    )
+                collection_time, snapshot = prior[-1]
+                security_ids, oldest_last_update = snapshot
+                age = decision_time - collection_time
+                if age <= timedelta(0) or age > MAXIMUM_CONSTITUENT_SNAPSHOT_AGE:
+                    _error("constituent-history prior snapshot is stale")
+                if (
+                    decision_time - oldest_last_update
+                    > MAXIMUM_CONSTITUENT_SNAPSHOT_AGE
+                ):
+                    _error("constituent-history LastUpdate is stale")
+                eligible.update(security_ids)
+            value = tuple(sorted(eligible))
+            if not value:
+                _error("constituent-history decision eligibility is empty")
+            result[session] = value
+        figi_authority.require_preliminary_qc_figi_resolution(self._resolution)
+        return result
+
+
 class AcceptedRiskPreliminaryQcDriver:
     """Resumeless state machine advanced in bounded QC runtime slices."""
 
@@ -786,11 +1118,17 @@ class AcceptedRiskPreliminaryQcDriver:
         daily_resolution,
         total_return_normalization,
         evaluation_profile_id=None,
+        constituent_universes=None,
     ):
         if evaluation_profile_id is None:
             profile = None
-        elif evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+        elif (
+            type(evaluation_profile_id) is str
+            and evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS
+        ):
             stock_portfolio = _stock_portfolio_module()
+            if stock_portfolio.PROFILE_IDS != STOCK_PORTFOLIO_PROFILE_IDS:
+                _error("stock portfolio profile inventory binding changed")
             if stock_portfolio.PROFILE_ID != STOCK_PORTFOLIO_PROFILE_ID:
                 _error("stock portfolio profile binding changed")
             profile = stock_portfolio.require_stock_portfolio_profile(
@@ -800,6 +1138,27 @@ class AcceptedRiskPreliminaryQcDriver:
             profile = regime_evaluator.require_regime_profile(
                 evaluation_profile_id
             )
+        required_constituent_tickers = (
+            ()
+            if profile is None
+            else stock_portfolio.constituent_etf_tickers_for_profile(
+                evaluation_profile_id
+            )
+            if evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS
+            else ()
+        )
+        if required_constituent_tickers:
+            if (
+                type(constituent_universes) is not dict
+                or tuple(sorted(constituent_universes))
+                != tuple(sorted(required_constituent_tickers))
+            ):
+                _error("constituent-history driver universe inventory changed")
+            frozen_constituent_universes = dict(constituent_universes)
+        else:
+            if constituent_universes is not None:
+                _error("non-universe profile received constituent universes")
+            frozen_constituent_universes = None
         self._algorithm = algorithm
         self._activation_manifest_key = activation_manifest_key
         self._activation_manifest_sha256 = activation_manifest_sha256
@@ -812,6 +1171,7 @@ class AcceptedRiskPreliminaryQcDriver:
         self._evaluation_profile_sha256 = (
             None if profile is None else profile["profile_sha256"]
         )
+        self._constituent_universes = frozen_constituent_universes
         self._package = None
         self._resolution = None
         self._history_loader = None
@@ -881,13 +1241,33 @@ class AcceptedRiskPreliminaryQcDriver:
             runtime = evaluator.PreliminaryRatingEvaluationRuntime(
                 package.evaluator_input
             )
-        elif self._evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
-            runtime = _stock_portfolio_module().StockPortfolioEvaluationRuntime(
+        elif self._evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
+            stock_portfolio = _stock_portfolio_module()
+            if stock_portfolio.PROFILE_IDS != STOCK_PORTFOLIO_PROFILE_IDS:
+                _error("stock portfolio profile inventory binding changed")
+            runtime_kwargs = {
+                "profile_id": self._evaluation_profile_id,
+                "package_id": package.package_id,
+                "package_sha256": package.package_sha256,
+                "named_figi_resolution_refusals": named_refusals,
+            }
+            if self._evaluation_profile_id in stock_portfolio.UNIVERSE_PROFILE_IDS:
+                constituent_loader = QcEtfConstituentEligibilityLoader(
+                    self._algorithm,
+                    resolution=resolution,
+                    daily_resolution=self._daily_resolution,
+                    evaluation_profile_id=self._evaluation_profile_id,
+                    constituent_universes=self._constituent_universes,
+                )
+                decision_sessions = stock_portfolio.decision_sessions_for_input(
+                    package.evaluator_input
+                )
+                runtime_kwargs["eligible_security_ids_by_decision_session"] = (
+                    constituent_loader.build_eligibility(decision_sessions)
+                )
+            runtime = stock_portfolio.StockPortfolioEvaluationRuntime(
                 package.evaluator_input,
-                profile_id=self._evaluation_profile_id,
-                package_id=package.package_id,
-                package_sha256=package.package_sha256,
-                named_figi_resolution_refusals=named_refusals,
+                **runtime_kwargs,
             )
         else:
             runtime = regime_evaluator.RegimeRatingEvaluationRuntime(
@@ -955,7 +1335,7 @@ class AcceptedRiskPreliminaryQcDriver:
         statistics = self._runtime.custom_summary_statistics()
         if self._evaluation_profile_id is None:
             expected_evaluator_names = evaluator.EVALUATOR_CUSTOM_SUMMARY_STATISTIC_NAMES
-        elif self._evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+        elif self._evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
             expected_evaluator_names = (
                 _stock_portfolio_module().expected_custom_summary_statistic_names(
                     self._evaluation_profile_id
@@ -968,7 +1348,9 @@ class AcceptedRiskPreliminaryQcDriver:
                 )
             )
         stock_portfolio = (
-            self._evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID
+            type(self._evaluation_profile_id) is str
+            and self._evaluation_profile_id
+            in STOCK_PORTFOLIO_PROFILE_IDS
         )
         if (
             type(statistics) is not dict
@@ -1053,11 +1435,20 @@ __all__ = (
     "AcceptedRiskPreliminaryQcRuntimeError",
     "BENCHMARK_SECURITY_ID",
     "BENCHMARK_TICKER",
+    "CONSTITUENT_HISTORY_END",
+    "CONSTITUENT_HISTORY_START",
     "EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES",
     "LoadedAcceptedRiskPreliminaryPackage",
+    "MAXIMUM_CONSTITUENT_SNAPSHOT_AGE",
+    "MAXIMUM_CONSTITUENT_TOTAL_WEIGHT",
+    "MINIMUM_CONSTITUENT_MAPPED_WEIGHT_FRACTION",
+    "MINIMUM_CONSTITUENT_TOTAL_WEIGHT",
+    "QcEtfConstituentEligibilityLoader",
     "QcTotalReturnOpenHistoryLoader",
     "RUNTIME_META_STATISTIC",
     "STOCK_PORTFOLIO_PROFILE_ID",
+    "STOCK_PORTFOLIO_PROFILE_IDS",
+    "STOCK_UNIVERSE_PROFILE_IDS",
     "MAX_BACKTEST_RUNTIME_SECONDS",
     "MAX_TRAIN_SLICE_COUNT",
     "TRAIN_SLICE_SOFT_SECONDS",

@@ -3,6 +3,7 @@ import json
 from datetime import date
 from decimal import Decimal, localcontext
 from fractions import Fraction
+from types import SimpleNamespace
 
 import pytest
 
@@ -135,18 +136,34 @@ def _complete(
     *,
     omissions=frozenset(),
     named_figi_resolution_refusals=(),
+    profile_id=subject.PROFILE_ID,
+    eligible_security_ids_by_decision_session=None,
 ):
     runtime = subject.StockPortfolioEvaluationRuntime(
         value,
-        profile_id=subject.PROFILE_ID,
+        profile_id=profile_id,
         package_id="arv2-test-package",
         package_sha256="a" * 64,
         named_figi_resolution_refusals=named_figi_resolution_refusals,
+        eligible_security_ids_by_decision_session=(
+            eligible_security_ids_by_decision_session
+        ),
     )
     loader = _history_loader(value, omissions=omissions)
     while runtime.phase is not base.RuntimePhase.COMPLETED:
         runtime.run_callback(loader)
     return runtime
+
+
+def _eligibility_map(value, security_ids=None):
+    if security_ids is None:
+        security_ids = tuple(
+            sorted(membership.security_id for membership in value.memberships)
+        )
+    return {
+        session: security_ids
+        for session in subject.decision_sessions_for_input(value)
+    }
 
 
 def test_profile_freezes_one_mathematically_consistent_stock_rule():
@@ -187,6 +204,104 @@ def test_profile_freezes_one_mathematically_consistent_stock_rule():
     assert profile["expected_return_session_count"] == 1254
 
 
+def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
+    assert subject.ALL_PROFILE_IDS == (
+        subject.PROFILE_ID,
+        subject.SP500_PROFILE_ID,
+        subject.NASDAQ100_PROFILE_ID,
+        subject.UNION_PROFILE_ID,
+    )
+    assert subject.PROFILE_IDS == subject.ALL_PROFILE_IDS
+    assert subject.UNIVERSE_PROFILE_IDS == subject.VARIANT_PROFILE_IDS
+    assert subject.constituent_etf_tickers_for_profile(subject.PROFILE_ID) == ()
+    expected_tickers = {
+        subject.SP500_PROFILE_ID: ("SPY",),
+        subject.NASDAQ100_PROFILE_ID: ("QQQ",),
+        subject.UNION_PROFILE_ID: ("SPY", "QQQ"),
+    }
+    for profile_id in subject.VARIANT_PROFILE_IDS:
+        profile = subject.require_stock_portfolio_profile(profile_id)
+        digest = profile.pop("profile_sha256")
+        assert subject._sha(profile) == digest
+        assert profile["profile_id"] == profile_id
+        assert tuple(profile["constituent_etf_tickers"]) == expected_tickers[
+            profile_id
+        ]
+        assert profile["constituent_source"] == (
+            "QuantConnect_US_ETF_Constituents"
+        )
+        assert profile["constituent_snapshot_selection"] == (
+            "latest_collection_EndTime_strictly_before_decision_midnight_"
+            "America_New_York"
+        )
+        assert profile["maximum_constituent_snapshot_age_calendar_days"] == 10
+        assert profile["constituent_last_update_required"] is True
+        assert profile["constituent_last_update_not_after_collection"] is True
+        assert profile[
+            "maximum_constituent_last_update_age_calendar_days"
+        ] == 10
+        assert profile["constituent_positive_weight_only"] is True
+        assert profile["minimum_constituent_total_positive_weight"] == "0.95"
+        assert profile["maximum_constituent_total_positive_weight"] == "1.05"
+        assert profile["constituent_mapping_key"] == (
+            "exact_QuantConnect_security_identifier"
+        )
+        assert profile["minimum_mapped_positive_weight_fraction"] == "0.99"
+        assert profile[
+            "eligibility_security_ids_by_decision_session_required"
+        ] is True
+        assert subject.constituent_etf_tickers_for_profile(profile_id) == (
+            expected_tickers[profile_id]
+        )
+        assert profile["cost_bps_per_side"] == [0, 5, 10, 20]
+        assert profile["target_gross_exposure"] == "0.98"
+        assert profile["leverage"] is False
+    assert "not_all_Nasdaq_listed" in subject.require_stock_portfolio_profile(
+        subject.NASDAQ100_PROFILE_ID
+    )["universe_scope_disclaimer"]
+    assert subject.require_stock_portfolio_profile(subject.UNION_PROFILE_ID)[
+        "multi_etf_combination"
+    ] == "deduplicate_by_authenticated_security_id_union"
+
+
+def test_decision_session_helper_refuses_a_missing_authenticated_axis():
+    with pytest.raises(
+        subject.AcceptedRiskStockPortfolioError,
+        match="lacks its authenticated session axis",
+    ):
+        subject.decision_sessions_for_input(object())
+
+
+def test_decision_session_helper_refuses_a_non_tuple_axis():
+    with pytest.raises(
+        subject.AcceptedRiskStockPortfolioError,
+        match="authenticated session axis changed",
+    ):
+        subject.decision_sessions_for_input(
+            SimpleNamespace(session_axis=[subject.DECISION_START_SESSION])
+        )
+
+
+def test_decision_session_helper_refuses_a_malformed_iso_date():
+    with pytest.raises(
+        subject.AcceptedRiskStockPortfolioError,
+        match="authenticated session axis changed",
+    ):
+        subject.decision_sessions_for_input(
+            SimpleNamespace(session_axis=("2021-13-01",))
+        )
+
+
+def test_decision_session_helper_refuses_changed_weekly_geometry():
+    with pytest.raises(
+        subject.AcceptedRiskStockPortfolioError,
+        match="decision schedule geometry changed",
+    ):
+        subject.decision_sessions_for_input(
+            SimpleNamespace(session_axis=(subject.DECISION_START_SESSION,))
+        )
+
+
 def test_profile_refuses_implicit_or_unknown_selection():
     with pytest.raises(TypeError, match="profile_id"):
         subject.StockPortfolioEvaluationRuntime(
@@ -203,6 +318,152 @@ def test_profile_refuses_implicit_or_unknown_selection():
             package_sha256="a" * 64,
             named_figi_resolution_refusals=(),
         )
+
+
+def test_r065_refuses_a_constituent_universe_map_and_variants_require_one():
+    value = _input()
+    eligibility = _eligibility_map(value)
+    with pytest.raises(
+        subject.AcceptedRiskStockPortfolioError,
+        match="R065 does not accept",
+    ):
+        subject.StockPortfolioEvaluationRuntime(
+            value,
+            profile_id=subject.PROFILE_ID,
+            package_id="arv2-test-package",
+            package_sha256="a" * 64,
+            named_figi_resolution_refusals=(),
+            eligible_security_ids_by_decision_session=eligibility,
+        )
+    for profile_id in subject.VARIANT_PROFILE_IDS:
+        with pytest.raises(
+            subject.AcceptedRiskStockPortfolioError,
+            match="must be an exact dict",
+        ):
+            subject.StockPortfolioEvaluationRuntime(
+                value,
+                profile_id=profile_id,
+                package_id="arv2-test-package",
+                package_sha256="a" * 64,
+                named_figi_resolution_refusals=(),
+            )
+
+
+def test_universe_variant_requires_every_exact_weekly_decision_session():
+    value = _input()
+    eligibility = _eligibility_map(value)
+    eligibility.pop(min(eligibility))
+    with pytest.raises(
+        subject.AcceptedRiskStockPortfolioError,
+        match="sessions are not exhaustive",
+    ):
+        subject.StockPortfolioEvaluationRuntime(
+            value,
+            profile_id=subject.SP500_PROFILE_ID,
+            package_id="arv2-test-package",
+            package_sha256="a" * 64,
+            named_figi_resolution_refusals=(),
+            eligible_security_ids_by_decision_session=eligibility,
+        )
+
+
+@pytest.mark.parametrize(
+    ("security_ids", "message"),
+    (
+        ((), "sorted unique nonempty tuples"),
+        (["perm-security-00"], "sorted unique nonempty tuples"),
+        (
+            ("perm-security-01", "perm-security-00"),
+            "sorted unique nonempty tuples",
+        ),
+        (
+            ("perm-security-00", "perm-security-00"),
+            "sorted unique nonempty tuples",
+        ),
+        (("not-an-input-security",), "escaped input securities"),
+    ),
+)
+def test_universe_variant_refuses_invalid_session_eligibility_values(
+    security_ids, message
+):
+    value = _input()
+    with pytest.raises(subject.AcceptedRiskStockPortfolioError, match=message):
+        subject.StockPortfolioEvaluationRuntime(
+            value,
+            profile_id=subject.SP500_PROFILE_ID,
+            package_id="arv2-test-package",
+            package_sha256="a" * 64,
+            named_figi_resolution_refusals=(),
+            eligible_security_ids_by_decision_session=_eligibility_map(
+                value, security_ids
+            ),
+        )
+
+
+def test_universe_variant_filters_scores_before_both_ranking_and_matching():
+    value = _input()
+    eligible = ("perm-security-00", "perm-security-19")
+    eligibility = _eligibility_map(value, eligible)
+    runtime = subject.StockPortfolioEvaluationRuntime(
+        value,
+        profile_id=subject.SP500_PROFILE_ID,
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+        named_figi_resolution_refusals=(),
+        eligible_security_ids_by_decision_session=eligibility,
+    )
+    # Prove the constructor detached itself from caller-owned mutable state.
+    eligibility[subject.DECISION_START_SESSION] = ("perm-security-01",)
+    position = value.session_axis.index(subject.DECISION_START_SESSION)
+    axis = (subject.PRIMARY_SOURCE_VIEW_ID, subject.PRIMARY_SCORE_ARM)
+    scores = {
+        f"perm-security-{index:02d}": Decimal(index) for index in range(20)
+    }
+
+    runtime._after_score_cross_section(
+        position,
+        value.memberships,
+        {axis: scores},
+        {axis: 0},
+    )
+
+    selected, matched = runtime._decisions[subject.DECISION_START_SESSION]
+    assert selected == ("perm-security-19",)
+    assert matched == eligible
+    assert runtime._eligible_score_count_sum == 2
+    assert runtime._selected_name_count_sum == 1
+
+
+def test_universe_variant_named_figi_refusal_still_precedes_ranking():
+    value = _input()
+    eligibility = _eligibility_map(
+        value, ("perm-security-18", "perm-security-19")
+    )
+    runtime = subject.StockPortfolioEvaluationRuntime(
+        value,
+        profile_id=subject.NASDAQ100_PROFILE_ID,
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+        named_figi_resolution_refusals=("perm-security-19",),
+        eligible_security_ids_by_decision_session=eligibility,
+    )
+    position = value.session_axis.index(subject.DECISION_START_SESSION)
+    axis = (subject.PRIMARY_SOURCE_VIEW_ID, subject.PRIMARY_SCORE_ARM)
+    scores = {
+        f"perm-security-{index:02d}": Decimal(index) for index in range(20)
+    }
+
+    runtime._after_score_cross_section(
+        position,
+        value.memberships,
+        {axis: scores},
+        {axis: 0},
+    )
+
+    assert runtime._decisions[subject.DECISION_START_SESSION] == (
+        ("perm-security-18",),
+        ("perm-security-18",),
+    )
 
 
 def test_weekly_decisions_rank_negative_scores_without_an_absolute_gate():
@@ -478,6 +739,32 @@ def test_completed_stock_portfolio_is_aggregate_only_and_cost_ordered():
     assert "profile" not in metadata
     assert metadata["profile_id"] == subject.PROFILE_ID
     assert metadata["profile_sha256"] == subject._PROFILE["profile_sha256"]
+
+
+def test_completed_universe_variant_binds_its_own_profile_to_every_result():
+    value = _input()
+    runtime = _complete(
+        value,
+        profile_id=subject.UNION_PROFILE_ID,
+        eligible_security_ids_by_decision_session=_eligibility_map(value),
+    )
+    summary = runtime.aggregate_summary()
+    statistics = runtime.custom_summary_statistics()
+
+    assert summary["profile"] == subject.require_stock_portfolio_profile(
+        subject.UNION_PROFILE_ID
+    )
+    assert {
+        cell["profile_id"] for cell in summary["portfolio_cells"]
+    } == {subject.UNION_PROFILE_ID}
+    assert tuple(statistics) == subject.expected_custom_summary_statistic_names(
+        subject.UNION_PROFILE_ID
+    )
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    assert metadata["profile_id"] == subject.UNION_PROFILE_ID
+    assert metadata["profile_sha256"] == subject.require_stock_portfolio_profile(
+        subject.UNION_PROFILE_ID
+    )["profile_sha256"]
 
 
 def test_matched_comparator_freezes_decision_weights_and_leaves_failed_entry_cash():

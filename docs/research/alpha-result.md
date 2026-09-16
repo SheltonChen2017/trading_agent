@@ -1707,15 +1707,81 @@ signal after seeing R-064.
 
 | Field | Prospective value |
 |---|---|
-| **Accounting if created** | Shared run looks **64 -> 65**; ARV2 development evaluations **11 -> 12**. A successful aggregate read exposes one primary cell and moves the lifetime alpha-cell floor **575 -> 576**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
-| **Profile** | `arv2-stock-long-only-2021-2025-r065-v1`, SHA-256 `1cbd758a984100c89ed4ccd3fbf682980d93c27c3711bdc244a5579591c92a19`; projection `arv2-preliminary-qc-projection-b2a5e4fd70ccc2a719056e66`, SHA-256 `b2a5e4fd70ccc2a719056e6655fde422403ba1097e62f9e01b5d2b7af5885698`. |
+| **Accounting if created** | Shared run looks **64 -> 65**; ARV2 development evaluations **11 -> 12**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **575 -> 579**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-2021-2025-r065-v2`, SHA-256 `39773415f5d936166b3a224a5e26c55e4dc20a7e8052fb65c796f9fd3ce65678`; projection `arv2-preliminary-qc-projection-c67cee15e9972c595ebfa22a`, SHA-256 `c67cee15e9972c595ebfa22a7483b72c14d8e0f919364070cb269c06528ef1c5`, seven files, 232,391 total bytes and a 59,683-byte maximum. |
 | **Only economic correction** | A within-membership held name without a current price retains its prior mark and drifted weight. It books no impossible trade or turnover. Priceable holdings and targets continue to rebalance inside the remaining gross budget; missing new entries stay cash. When a price resumes, the cumulative prior-mark-to-current return is booked once. The same rule applies to signal and matched accounts. |
-| **Diagnostic output** | One 10-bps-per-side primary cell, plus compact runtime and portfolio metadata: signal, corrected all-eligible matched comparator and SPY returns; signal-minus-matched and signal-minus-SPY; risk, drawdown, turnover, cash and explicit per-name stale/partial-rebalance counters. The prior four-cost ladder is not repeated because R-064 already showed costs were not binding. |
-| **QC identity if launched after review** | Private project `11 ARV2_STOCK_R065_2021_2025 - 20260916`; backtest `ARV2 R065 corrected comparator attribution e9851c2f`. |
-| **Frozen decision rule** | If either account does not execute all 261 decisions or the result does not reconcile, classify a technical failure. If signal-minus-matched is non-positive, do not tune this same window. If signal beats matched but both trail SPY, the next separately preregistered question is weighting/exposure, not a silent score change. Leverage remains closed unless an unlevered construction first clears its benchmark gate. |
-| **Access boundary** | At most one reviewed create/compile/backtest and one separately signed read of exactly three aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+| **Diagnostic output** | Exactly six aggregate statistics: compact runtime metadata, portfolio metadata, and one cell for each frozen 0/5/10/20-bps-per-side cost. The 10-bps cell remains primary. The validator requires cross-cell path invariance, monotone cost drag, and closed-form annual cost arithmetic from the 0-bps anchor. Each cell reports signal, corrected all-eligible matched comparator and SPY returns; signal-minus-matched and signal-minus-SPY; risk, drawdown, turnover, cash and explicit per-name stale/partial-rebalance counters. |
+| **QC identity if launched after review** | Private project `11 ARV2_STOCK_R065_2021_2025 - 20260916`; backtest `ARV2 R065 corrected comparator e9851c2f`. |
+| **Frozen decision rule** | An unreconciled result or failure of the authenticated stale/partial-counter relations is a technical failure. The zero account-wide-deferral and 261-execution checks remain round-trip integrity checks, not data-discriminating evidence. If primary-cost signal-minus-matched is non-positive, do not tune this same window. A positive difference is only a conditional selection effect for this construction, not formal alpha acceptance; SPY remains external absolute-return context. Leverage remains closed unless an unlevered construction first clears a credible benchmark gate. |
+| **Access boundary** | At most one reviewed create/compile/backtest and one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
 
 This rule block is frozen before project creation, launch, or outcome read.
 This code/review round spends **zero** research looks and does not access QC or
-provider data. Claude review and Codex counter-review are required before the
+provider data. Claude review and Codex counter-review are complete before the
 one R-065 launch.
+
+## R-066 — Analyst Revisions V2 historical SPY-holdings eligibility diagnostic (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-066 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-spy-holdings-qc-005`. It preserves the R-065 signal,
+portfolio, execution, missing-price, cost and result-integrity rules. Its only
+economic-scope change is to filter the score-bearing input securities before
+both top-decile ranking and matched-comparator construction to the exact
+authenticated security IDs in historical SPY ETF constituent snapshots. This
+is an **S&P 500 holdings proxy**, not official S&P 500 index membership.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **65 -> 66**; ARV2 development evaluations **12 -> 13**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **579 -> 583**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-spy-holdings-proxy-2021-2025-r066-v1`, SHA-256 `1bd852c327c50d7d410cdac870febcf6ae3b0fb39ddf0f3554363697d1b21660`; projection `arv2-preliminary-qc-projection-deb4ced481a55fd93f7a545f`, SHA-256 `deb4ced481a55fd93f7a545f32b652126fad6af0926435c422974811e8cda143`, seven files, 233,095 total bytes and a 59,683-byte maximum. |
+| **Eligibility authority** | QuantConnect US ETF Constituents for SPY. For each of the 261 weekly decisions, select the latest collection `EndTime` strictly before New York decision-date midnight. The collection and every positive-weight constituent `LastUpdate` must be no more than 10 calendar days old at the decision, and `LastUpdate` cannot follow its collection. Nullable, zero and negative finite weights are excluded; malformed or non-finite non-null weights refuse. The positive-weight snapshot must total 0.95-1.05 and at least 99% of that weight must map by exact QC security ID into the authenticated input universe. Missing, stale, malformed, duplicated or insufficiently mapped evidence refuses. |
+| **Diagnostic output** | Exactly six aggregate statistics: runtime metadata, portfolio metadata and four 0/5/10/20-bps cost cells, with 10 bps primary and the same cross-cell/path/cost checks as R-065. |
+| **QC identity** | Private project `12 ARV2_STOCK_R066_SPY_2021_2025 - 20260916`; backtest `ARV2 R066 SPY holdings proxy e9851c2f`. |
+| **Access boundary** | One create/compile/backtest with statistics-free terminal polling, followed only after `Completed.` by one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+
+## R-067 — Analyst Revisions V2 historical QQQ-holdings eligibility diagnostic (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-067 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-qqq-holdings-qc-006`. It changes R-065 only by applying the
+same authenticated historical-constituent filter using QQQ. This is a
+**Nasdaq-100 holdings proxy**. It is explicitly **not all Nasdaq-listed
+stocks**, and no result may be described that way.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **66 -> 67**; ARV2 development evaluations **13 -> 14**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **583 -> 587**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1`, SHA-256 `4c2fd34f2255bb05adfccec5afc5c7dd408b7c64d3ebc25854a39b92c78c2796`; projection `arv2-preliminary-qc-projection-d34ae49468b502c97b76a095`, SHA-256 `d34ae49468b502c97b76a09528eb607aed573a5851400a72f2337f49fb124d53`, seven files, 233,384 total bytes and a 59,683-byte maximum. |
+| **Eligibility authority** | QuantConnect US ETF Constituents for QQQ under the exact same strictly-prior, 10-calendar-day collection/`LastUpdate`, 0.95-1.05 positive-weight and 99%-mapped-weight rules frozen for R-066. The filter applies before both signal ranking and matched-comparator construction. |
+| **Diagnostic output** | Exactly six aggregate statistics: runtime metadata, portfolio metadata and four 0/5/10/20-bps cost cells, with 10 bps primary and the same cross-cell/path/cost checks as R-065. |
+| **QC identity** | Private project `13 ARV2_STOCK_R067_QQQ_2021_2025 - 20260916`; backtest `ARV2 R067 QQQ holdings proxy e9851c2f`. |
+| **Access boundary** | One create/compile/backtest with statistics-free terminal polling, followed only after `Completed.` by one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+
+## R-068 — Analyst Revisions V2 historical SPY-plus-QQQ union diagnostic (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-068 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-spy-qqq-union-qc-007`. It changes R-065 only by filtering to
+the exact authenticated-QC-security-ID union of the R-066 SPY and R-067 QQQ
+snapshots at each decision. A name present in both is included once. This is a
+union of two ETF-holdings proxies, not official S&P 500 membership or all
+Nasdaq-listed stocks.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **67 -> 68**; ARV2 development evaluations **14 -> 15**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **587 -> 591**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1`, SHA-256 `333e26b9645a8f6c3d35886ec7e9cece172d3bb166db22e76037d7b2b9b740e1`; projection `arv2-preliminary-qc-projection-cff9302f23b98bc2bb174682`, SHA-256 `cff9302f23b98bc2bb174682aa48f46ad65ac4206418e19545a0167f0d9f107c`, seven files, 233,385 total bytes and a 59,683-byte maximum. |
+| **Eligibility authority** | Both SPY and QQQ snapshots must independently satisfy the exact R-066/R-067 time, source-vintage, weight and mapping rules. Their mapped security IDs are then unioned and sorted exactly before the filter is applied to signal and comparator. |
+| **Diagnostic output** | Exactly six aggregate statistics: runtime metadata, portfolio metadata and four 0/5/10/20-bps cost cells, with 10 bps primary and the same cross-cell/path/cost checks as R-065. |
+| **QC identity** | Private project `14 ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`; backtest `ARV2 R068 SPY QQQ union e9851c2f`. |
+| **Access boundary** | One create/compile/backtest with statistics-free terminal polling, followed only after `Completed.` by one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+
+R-066 through R-068 are descriptive same-window diagnostics, not a candidate
+tournament. Their outcomes will not be used to call the best of the three a
+winner, tune the score or silently promote a universe. Any promotion or
+holdout claim requires a separately preregistered future evaluation. All four
+runs retain the accepted-risk package's current-vintage/non-pristine-PIT
+Massive signal limitation. No leverage run is unlocked by merely completing
+them; leverage remains closed until an unlevered construction establishes a
+credible benchmark result. At this preregistration snapshot no R-065 through
+R-068 QC project has been created or launched, no result has been read, and
+accounting remains **64 shared looks, 11 ARV2 development evaluations, 23
+infrastructure looks, and a 575-cell lifetime floor**.

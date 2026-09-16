@@ -227,6 +227,11 @@ def stock_portfolio_plan(monkeypatch, tmp_path):
     )
 
 
+@pytest.fixture(params=stock_portfolio_evaluator.VARIANT_PROFILE_IDS)
+def stock_universe_plan(request, monkeypatch, tmp_path):
+    return _build_plan(monkeypatch, tmp_path, request.param)
+
+
 def _aggregate_statistics(plan):
     cells = []
     statistics = {}
@@ -453,8 +458,9 @@ def _regime_aggregate_statistics(plan):
 def _stock_portfolio_aggregate_statistics(
     plan, *, proxy=False, zero_recovery=False
 ):
+    profile_id = plan.projection.evaluation_profile_id
     profile = stock_portfolio_evaluator.require_stock_portfolio_profile(
-        stock_portfolio_evaluator.PROFILE_ID
+        profile_id
     )
     status = (
         "PRELIMINARY_DESCRIPTIVE_LOWER_BOUND_WITH_ZERO_RECOVERY"
@@ -495,7 +501,7 @@ def _stock_portfolio_aggregate_statistics(
         matched_return = matched_returns[cost]
         cell = {
             "schema": stock_portfolio_evaluator.PORTFOLIO_CELL_SCHEMA,
-            "profile_id": stock_portfolio_evaluator.PROFILE_ID,
+            "profile_id": profile_id,
             "cost_bps_per_side": cost,
             "primary_cost_scenario": cost == 10,
             "status": status,
@@ -646,7 +652,7 @@ def _stock_portfolio_aggregate_statistics(
         "deployment": False,
         "orders": False,
         "trading": False,
-        "evaluation_profile_id": stock_portfolio_evaluator.PROFILE_ID,
+        "evaluation_profile_id": profile_id,
         "evaluation_profile_sha256": profile["profile_sha256"],
         "runtime_slice_count": 1,
     }
@@ -710,7 +716,7 @@ def _rehash_stock_portfolio_summary(statistics):
         }
     }
     summary["profile"] = stock_portfolio_evaluator.require_stock_portfolio_profile(
-        stock_portfolio_evaluator.PROFILE_ID
+        metadata["profile_id"]
     )
     summary["portfolio_cells"] = [
         json.loads(statistics["ARV2_STOCK_PORTFOLIO_COST_" + str(cost)])
@@ -756,6 +762,39 @@ _REGIME_ACCOUNTING = {
     "arv2-stock-ic-2013-2019": ("R-059", 58, 59, 5, 6, 548, 564),
 }
 
+_STOCK_UNIVERSE_ACCOUNTING = {
+    stock_portfolio_evaluator.SP500_PROFILE_ID: (
+        "arv2-eval-stock-spy-holdings-qc-005",
+        "R-066",
+        65,
+        66,
+        12,
+        13,
+        579,
+        583,
+    ),
+    stock_portfolio_evaluator.NASDAQ100_PROFILE_ID: (
+        "arv2-eval-stock-qqq-holdings-qc-006",
+        "R-067",
+        66,
+        67,
+        13,
+        14,
+        583,
+        587,
+    ),
+    stock_portfolio_evaluator.UNION_PROFILE_ID: (
+        "arv2-eval-stock-spy-qqq-union-qc-007",
+        "R-068",
+        67,
+        68,
+        14,
+        15,
+        587,
+        591,
+    ),
+}
+
 
 def test_regime_profile_allowlist_refuses_unknown_profile():
     with pytest.raises(
@@ -791,6 +830,155 @@ def test_stock_portfolio_profile_has_one_exact_r065_look_budget(stock_portfolio_
         "ARV2_STOCK_PORTFOLIO_COST_5",
         "ARV2_STOCK_PORTFOLIO_META",
     )
+
+
+def test_each_stock_universe_profile_has_its_exact_four_cell_run_spec(
+    stock_universe_plan,
+):
+    profile_id = stock_universe_plan.projection.evaluation_profile_id
+    (
+        evaluation_id,
+        ledger_entry_id,
+        looks_before,
+        looks_after,
+        evaluations_before,
+        evaluations_after,
+        floor_before,
+        floor_after,
+    ) = _STOCK_UNIVERSE_ACCOUNTING[profile_id]
+    spec = adapter._run_spec(profile_id)
+    reservation = adapter._look_accounting(evaluation_profile_id=profile_id)
+    result = adapter._look_accounting(
+        stage="result", evaluation_profile_id=profile_id
+    )
+    profile = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        profile_id
+    )
+
+    assert spec.evaluation_id == evaluation_id
+    assert spec.ledger_entry_id == ledger_entry_id
+    assert spec.cell_count == 4
+    assert reservation["run_level_looks_before"] == looks_before
+    assert reservation["planned_run_level_looks_after_launch"] == looks_after
+    assert reservation["arv2_development_evaluations_before"] == (
+        evaluations_before
+    )
+    assert reservation[
+        "planned_arv2_development_evaluations_after_launch"
+    ] == evaluations_after
+    assert reservation["lifetime_alpha_cell_floor_before"] == floor_before
+    assert result["lifetime_alpha_cell_floor_after"] == floor_after
+    assert stock_universe_plan.evaluation_profile_id == profile_id
+    assert stock_universe_plan.evaluation_profile_sha256 == profile[
+        "profile_sha256"
+    ]
+    assert stock_universe_plan.expected_custom_statistic_names == (
+        "ARV2_RUNTIME_META",
+        "ARV2_STOCK_PORTFOLIO_COST_0",
+        "ARV2_STOCK_PORTFOLIO_COST_10",
+        "ARV2_STOCK_PORTFOLIO_COST_20",
+        "ARV2_STOCK_PORTFOLIO_COST_5",
+        "ARV2_STOCK_PORTFOLIO_META",
+    )
+    assert tuple(
+        item.project_path for item in stock_universe_plan.source_files
+    ) == tuple(
+        sorted(
+            projection_builder.STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
+            + ("main.py",)
+        )
+    )
+
+
+def test_stock_shaped_profile_outside_exact_r065_r068_allowlist_refuses():
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="evaluation profile is not allowlisted",
+    ):
+        adapter._run_spec(
+            "arv2-stock-long-only-spy-holdings-proxy-2021-2025-r069-v1"
+        )
+
+
+def test_each_stock_universe_result_binds_exact_profile_and_hash(
+    stock_universe_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_universe_plan)
+    profile_id = stock_universe_plan.evaluation_profile_id
+    profile = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        profile_id
+    )
+
+    _validate_statistics(stock_universe_plan, statistics)
+
+    runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    cells = {
+        json.loads(statistics[name])["profile_id"]
+        for name in statistics
+        if name.startswith("ARV2_STOCK_PORTFOLIO_COST_")
+    }
+    assert runtime_meta["evaluation_profile_id"] == profile_id
+    assert runtime_meta["evaluation_profile_sha256"] == profile[
+        "profile_sha256"
+    ]
+    assert metadata["profile_id"] == profile_id
+    assert metadata["profile_sha256"] == profile["profile_sha256"]
+    assert cells == {profile_id}
+
+
+@pytest.mark.parametrize(
+    ("target", "message"),
+    (
+        ("runtime_profile_id", "stock-portfolio runtime metadata changed"),
+        ("runtime_profile_sha256", "stock-portfolio runtime metadata changed"),
+        ("metadata_profile_id", "aggregate metadata semantics changed"),
+        ("metadata_profile_sha256", "aggregate metadata semantics changed"),
+        ("cell_profile_id", "stock-portfolio cell semantics changed"),
+    ),
+)
+def test_each_stock_universe_result_refuses_r065_profile_substitution(
+    stock_universe_plan,
+    target,
+    message,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_universe_plan)
+    r065 = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        stock_portfolio_evaluator.PROFILE_ID
+    )
+    if target.startswith("runtime_"):
+        runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+        key = (
+            "evaluation_profile_id"
+            if target.endswith("_id")
+            else "evaluation_profile_sha256"
+        )
+        runtime_meta[key] = (
+            r065["profile_id"]
+            if key.endswith("_id")
+            else r065["profile_sha256"]
+        )
+        statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode(
+            "ascii"
+        )
+    elif target.startswith("metadata_"):
+        metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+        key = "profile_id" if target.endswith("_id") else "profile_sha256"
+        metadata[key] = r065[key]
+        statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+            "ascii"
+        )
+    else:
+        name = "ARV2_STOCK_PORTFOLIO_COST_10"
+        cell = json.loads(statistics[name])
+        cell["profile_id"] = r065["profile_id"]
+        statistics[name] = _canonical(cell).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(stock_universe_plan, statistics)
 
 
 @pytest.mark.parametrize(
@@ -1326,6 +1514,70 @@ def test_stock_projection_hostile_source_tuple_refuses_before_iteration(
     assert not any(stock_portfolio_plan.control_directory.iterdir())
 
 
+@pytest.mark.parametrize("mutation", ("profile_ids", "profile_hash"))
+def test_stock_universe_projection_identity_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+    mutation,
+):
+    backend = _Backend(stock_universe_plan)
+    profile_id = stock_universe_plan.evaluation_profile_id
+    if mutation == "profile_ids":
+        monkeypatch.setattr(
+            projection_builder,
+            "STOCK_PORTFOLIO_PROFILE_IDS",
+            projection_builder.STOCK_PORTFOLIO_PROFILE_IDS
+            + ("arv2-unrelated-stock-profile",),
+        )
+    else:
+        hashes = dict(projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256S)
+        hashes[profile_id] = "0" * 64
+        monkeypatch.setattr(
+            projection_builder,
+            "STOCK_PORTFOLIO_PROFILE_SHA256S",
+            hashes,
+        )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_runtime_profile_inventory_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        runtime,
+        "STOCK_PORTFOLIO_PROFILE_IDS",
+        runtime.STOCK_PORTFOLIO_PROFILE_IDS
+        + ("arv2-unrelated-stock-profile",),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
 def test_regime_expected_result_inventory_guard_is_isolated(monkeypatch):
     monkeypatch.setattr(
         adapter,
@@ -1821,7 +2073,7 @@ class _Backend:
         profile_id = plan.projection.evaluation_profile_id
         if profile_id is None:
             self.statistics = _aggregate_statistics(plan)
-        elif profile_id == stock_portfolio_evaluator.PROFILE_ID:
+        elif profile_id in stock_portfolio_evaluator.PROFILE_IDS:
             self.statistics = _stock_portfolio_aggregate_statistics(plan)
         else:
             self.statistics = _regime_aggregate_statistics(plan)
@@ -2111,6 +2363,51 @@ def test_stock_portfolio_offline_launch_result_read_and_reload_are_exact(
     assert accounting["run_level_looks_after"] == 65
     assert accounting["arv2_development_evaluations_after"] == 12
     assert accounting["lifetime_alpha_cell_floor_after"] == 579
+
+
+def test_each_stock_universe_offline_result_uses_stock_parser_and_run_spec(
+    stock_universe_plan,
+):
+    signature = _offline_signature()
+    backend = _Backend(stock_universe_plan)
+    profile_id = stock_universe_plan.evaluation_profile_id
+    expected = _STOCK_UNIVERSE_ACCOUNTING[profile_id]
+
+    permit, launch = _execute(stock_universe_plan, backend, signature)
+    terminal = _complete(
+        stock_universe_plan, backend, signature, permit, launch
+    )
+    _result_permit, result = _read(
+        stock_universe_plan,
+        backend,
+        signature,
+        permit,
+        launch,
+        terminal,
+    )
+
+    assert backend.events.count("backtests/create") == 1
+    assert backend.events.count("backtests/read") == 1
+    assert len(result.custom_statistics) == 6
+    receipt = json.loads(result.persisted_path.read_bytes())
+    persisted_statistics = dict(receipt["custom_statistics"])
+    persisted_runtime = json.loads(persisted_statistics["ARV2_RUNTIME_META"])
+    persisted_meta = json.loads(
+        persisted_statistics["ARV2_STOCK_PORTFOLIO_META"]
+    )
+    assert persisted_runtime["evaluation_profile_id"] == profile_id
+    assert persisted_runtime["evaluation_profile_sha256"] == (
+        stock_universe_plan.evaluation_profile_sha256
+    )
+    assert persisted_meta["profile_id"] == profile_id
+    assert persisted_meta["profile_sha256"] == (
+        stock_universe_plan.evaluation_profile_sha256
+    )
+    accounting = receipt["look_accounting"]
+    assert accounting["shared_look_ledger_entry_id"] == expected[1]
+    assert accounting["run_level_looks_after"] == expected[3]
+    assert accounting["arv2_development_evaluations_after"] == expected[5]
+    assert accounting["lifetime_alpha_cell_floor_after"] == expected[7]
 
 
 def test_regime_offline_submission_reads_only_its_eighteen_statistics(regime_plan):

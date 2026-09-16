@@ -25,6 +25,23 @@ class AcceptedRiskStockPortfolioError(_base.PreliminaryRatingEvaluationError):
 
 PROFILE_SCHEMA = "arv2-accepted-risk-stock-portfolio-profile-v2"
 PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
+SP500_PROFILE_ID = (
+    "arv2-stock-long-only-spy-holdings-proxy-2021-2025-r066-v1"
+)
+NASDAQ100_PROFILE_ID = (
+    "arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1"
+)
+UNION_PROFILE_ID = (
+    "arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1"
+)
+VARIANT_PROFILE_IDS = (
+    SP500_PROFILE_ID,
+    NASDAQ100_PROFILE_ID,
+    UNION_PROFILE_ID,
+)
+UNIVERSE_PROFILE_IDS = VARIANT_PROFILE_IDS
+ALL_PROFILE_IDS = (PROFILE_ID, *VARIANT_PROFILE_IDS)
+PROFILE_IDS = ALL_PROFILE_IDS
 CONTRACT_ID = "arv2-accepted-risk-stock-portfolio-v2"
 SUMMARY_SCHEMA = "arv2-accepted-risk-stock-portfolio-summary-v4"
 PORTFOLIO_CELL_SCHEMA = "arv2-accepted-risk-stock-portfolio-cell-v2"
@@ -42,6 +59,46 @@ PRIMARY_COST_BPS = 10
 COST_BPS_SCENARIOS = (0, 5, PRIMARY_COST_BPS, 20)
 MINIMUM_INVESTED_RETURN_SESSIONS = 50
 ANNUALIZATION_SESSIONS = Decimal("252")
+
+_UNIVERSE_VARIANT_CONFIGS = (
+    (
+        SP500_PROFILE_ID,
+        "spy_holdings_proxy_for_sp500",
+        ("SPY",),
+        (
+            "SPY_holdings_proxy_not_official_SP500_index_membership"
+        ),
+        None,
+    ),
+    (
+        NASDAQ100_PROFILE_ID,
+        "qqq_holdings_proxy_for_nasdaq_100",
+        ("QQQ",),
+        (
+            "QQQ_holdings_proxy_for_Nasdaq_100_not_all_Nasdaq_listed_stocks"
+        ),
+        None,
+    ),
+    (
+        UNION_PROFILE_ID,
+        "spy_qqq_holdings_security_id_union",
+        ("SPY", "QQQ"),
+        (
+            "union_of_SPY_and_QQQ_holdings_proxies_not_official_SP500_or_all_"
+            "Nasdaq_listed_membership"
+        ),
+        (
+            "deduplicate_by_authenticated_security_id_union"
+        ),
+    ),
+)
+
+
+def _universe_variant_config(profile_id):
+    for config in _UNIVERSE_VARIANT_CONFIGS:
+        if config[0] == profile_id:
+            return config
+    return None
 
 
 def _canonical(value):
@@ -66,10 +123,14 @@ def _decimal_text(value):
     return format(value, "f")
 
 
-def _profile_record():
+def _profile_record(profile_id):
+    if type(profile_id) is not str or profile_id not in ALL_PROFILE_IDS:
+        raise AcceptedRiskStockPortfolioError(
+            "stock portfolio profile is not the exact frozen profile"
+        )
     record = {
         "schema": PROFILE_SCHEMA,
-        "profile_id": PROFILE_ID,
+        "profile_id": profile_id,
         "contract_id": CONTRACT_ID,
         "decision_start_session": DECISION_START_SESSION,
         "decision_end_session": DECISION_END_SESSION,
@@ -118,19 +179,108 @@ def _profile_record():
         "terminal_payoff_applied": False,
         "leverage": False,
     }
+    variant = _universe_variant_config(profile_id)
+    if variant is not None:
+        (
+            _variant_profile_id,
+            universe_id,
+            constituent_etf_tickers,
+            universe_scope_disclaimer,
+            multi_etf_combination,
+        ) = variant
+        record.update(
+            {
+                "eligibility_universe": universe_id,
+                "constituent_source": "QuantConnect_US_ETF_Constituents",
+                "constituent_etf_tickers": list(constituent_etf_tickers),
+                "constituent_snapshot_selection": (
+                    "latest_collection_EndTime_strictly_before_decision_"
+                    "midnight_America_New_York"
+                ),
+                "maximum_constituent_snapshot_age_calendar_days": 10,
+                "constituent_last_update_required": True,
+                "constituent_last_update_not_after_collection": True,
+                "maximum_constituent_last_update_age_calendar_days": 10,
+                "constituent_positive_weight_only": True,
+                "minimum_constituent_total_positive_weight": "0.95",
+                "maximum_constituent_total_positive_weight": "1.05",
+                "constituent_mapping_key": (
+                    "exact_QuantConnect_security_identifier"
+                ),
+                "minimum_mapped_positive_weight_fraction": "0.99",
+                "multi_etf_combination": multi_etf_combination,
+                "universe_scope_disclaimer": universe_scope_disclaimer,
+                "eligibility_security_ids_by_decision_session_required": True,
+                "eligibility_filter_application": (
+                    "before_top_decile_ranking_and_matched_comparator"
+                ),
+            }
+        )
     digest = _sha(record)
     return {**record, "profile_sha256": digest}
 
 
-_PROFILE = _profile_record()
+_PROFILE_CANONICAL_ROWS = tuple(
+    (profile_id, _canonical(_profile_record(profile_id)))
+    for profile_id in ALL_PROFILE_IDS
+)
+_PROFILE = json.loads(_PROFILE_CANONICAL_ROWS[0][1].decode("ascii"))
 
 
 def require_stock_portfolio_profile(profile_id):
-    if type(profile_id) is not str or profile_id != PROFILE_ID:
+    if type(profile_id) is not str or profile_id not in ALL_PROFILE_IDS:
         raise AcceptedRiskStockPortfolioError(
             "stock portfolio profile is not the exact frozen profile"
         )
-    return json.loads(_canonical(_PROFILE).decode("ascii"))
+    for candidate_profile_id, profile_bytes in _PROFILE_CANONICAL_ROWS:
+        if candidate_profile_id == profile_id:
+            return json.loads(profile_bytes.decode("ascii"))
+    raise AcceptedRiskStockPortfolioError(
+        "stock portfolio profile is not the exact frozen profile"
+    )
+
+
+def constituent_etf_tickers_for_profile(profile_id):
+    require_stock_portfolio_profile(profile_id)
+    variant = _universe_variant_config(profile_id)
+    return () if variant is None else tuple(variant[2])
+
+
+def decision_sessions_for_input(value):
+    try:
+        session_axis = value.session_axis
+    except AttributeError as exc:
+        raise AcceptedRiskStockPortfolioError(
+            "stock portfolio input lacks its authenticated session axis"
+        ) from exc
+    if (
+        type(session_axis) is not tuple
+        or any(type(session) is not str for session in session_axis)
+        or tuple(sorted(set(session_axis))) != session_axis
+    ):
+        raise AcceptedRiskStockPortfolioError(
+            "stock portfolio authenticated session axis changed"
+        )
+    prior_week = None
+    sessions = []
+    try:
+        for session in session_axis:
+            if not (DECISION_START_SESSION <= session <= DECISION_END_SESSION):
+                continue
+            parsed = date.fromisoformat(session)
+            week = (parsed.isocalendar().year, parsed.isocalendar().week)
+            if week != prior_week:
+                sessions.append(session)
+                prior_week = week
+    except ValueError as exc:
+        raise AcceptedRiskStockPortfolioError(
+            "stock portfolio authenticated session axis changed"
+        ) from exc
+    if len(sessions) != EXPECTED_DECISION_SESSION_COUNT:
+        raise AcceptedRiskStockPortfolioError(
+            "stock portfolio decision schedule geometry changed"
+        )
+    return tuple(sessions)
 
 
 def expected_custom_summary_statistic_names(profile_id=PROFILE_ID):
@@ -234,6 +384,7 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
         package_id,
         package_sha256,
         named_figi_resolution_refusals,
+        eligible_security_ids_by_decision_session=None,
         scratch_directory=None,
     ):
         self._profile = require_stock_portfolio_profile(profile_id)
@@ -278,6 +429,49 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
         self._named_figi_resolution_refusals = frozenset(
             named_figi_resolution_refusals
         )
+        expected_decision_sessions = decision_sessions_for_input(value)
+        if profile_id == PROFILE_ID:
+            if eligible_security_ids_by_decision_session is not None:
+                raise AcceptedRiskStockPortfolioError(
+                    "R065 does not accept a constituent-universe eligibility map"
+                )
+            self._eligible_security_ids_by_decision_session = None
+        else:
+            mapping = eligible_security_ids_by_decision_session
+            if type(mapping) is not dict:
+                raise AcceptedRiskStockPortfolioError(
+                    "universe-variant eligibility map must be an exact dict"
+                )
+            if (
+                any(type(session) is not str for session in mapping)
+                or set(mapping) != set(expected_decision_sessions)
+                or len(mapping) != EXPECTED_DECISION_SESSION_COUNT
+            ):
+                raise AcceptedRiskStockPortfolioError(
+                    "universe-variant eligibility sessions are not exhaustive"
+                )
+            normalized = {}
+            for session in expected_decision_sessions:
+                security_ids = mapping[session]
+                if (
+                    type(security_ids) is not tuple
+                    or not security_ids
+                    or any(
+                        type(security_id) is not str or not security_id
+                        for security_id in security_ids
+                    )
+                    or tuple(sorted(set(security_ids))) != security_ids
+                ):
+                    raise AcceptedRiskStockPortfolioError(
+                        "universe-variant eligibility values must be sorted "
+                        "unique nonempty tuples"
+                    )
+                if not set(security_ids).issubset(input_security_ids):
+                    raise AcceptedRiskStockPortfolioError(
+                        "universe-variant eligibility escaped input securities"
+                    )
+                normalized[session] = frozenset(security_ids)
+            self._eligible_security_ids_by_decision_session = normalized
         intervals = {}
         for membership in value.memberships:
             if membership.security_id in intervals:
@@ -292,21 +486,12 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
         self._decision_positions = frozenset(self._weekly_decision_positions())
 
     def _weekly_decision_positions(self):
-        prior_week = None
-        positions = []
-        for position, session in enumerate(self._input.session_axis):
-            if not (DECISION_START_SESSION <= session <= DECISION_END_SESSION):
-                continue
-            parsed = date.fromisoformat(session)
-            week = (parsed.isocalendar().year, parsed.isocalendar().week)
-            if week != prior_week:
-                positions.append(position)
-                prior_week = week
-        if len(positions) != EXPECTED_DECISION_SESSION_COUNT:
-            raise AcceptedRiskStockPortfolioError(
-                "stock portfolio decision schedule geometry changed"
-            )
-        return tuple(positions)
+        sessions = frozenset(decision_sessions_for_input(self._input))
+        return tuple(
+            position
+            for position, session in enumerate(self._input.session_axis)
+            if session in sessions
+        )
 
     def _after_score_cross_section(
         self, position, memberships, scores, sector_refused
@@ -315,10 +500,18 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             return
         session = self._input.session_axis[position]
         axis = (PRIMARY_SOURCE_VIEW_ID, PRIMARY_SCORE_ARM)
+        universe_eligible = self._eligible_security_ids_by_decision_session
+        eligible_security_ids = (
+            None if universe_eligible is None else universe_eligible[session]
+        )
         arm_scores = {
             security_id: score
             for security_id, score in scores[axis].items()
             if security_id not in self._named_figi_resolution_refusals
+            and (
+                eligible_security_ids is None
+                or security_id in eligible_security_ids
+            )
         }
         refused = sector_refused[axis]
         self._decision_session_count += 1
@@ -743,7 +936,7 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             matched_cash = +(matched.cash_weight_sum / Decimal(return_count))
         return {
             "schema": PORTFOLIO_CELL_SCHEMA,
-            "profile_id": PROFILE_ID,
+            "profile_id": self._profile["profile_id"],
             "cost_bps_per_side": cost,
             "primary_cost_scenario": cost == PRIMARY_COST_BPS,
             "status": self._cell_status(signal, matched, return_count),
@@ -1001,7 +1194,10 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
         summary = self.aggregate_summary()
         cells = summary.pop("portfolio_cells")
         profile = summary.pop("profile")
-        if profile != _PROFILE:
+        expected_profile = require_stock_portfolio_profile(
+            self._profile["profile_id"]
+        )
+        if profile != expected_profile:
             raise AcceptedRiskStockPortfolioError(
                 "stock portfolio summary profile changed"
             )
@@ -1021,7 +1217,9 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             output[
                 "ARV2_STOCK_PORTFOLIO_COST_" + str(cell["cost_bps_per_side"])
             ] = _canonical(cell).decode("ascii")
-        if tuple(sorted(output)) != expected_custom_summary_statistic_names():
+        if tuple(sorted(output)) != expected_custom_summary_statistic_names(
+            self._profile["profile_id"]
+        ):
             raise AcceptedRiskStockPortfolioError(
                 "stock portfolio custom summary inventory changed"
             )
@@ -1034,6 +1232,7 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
 
 __all__ = (
     "AcceptedRiskStockPortfolioError",
+    "ALL_PROFILE_IDS",
     "CONTRACT_ID",
     "COST_BPS_SCENARIOS",
     "DECISION_END_SESSION",
@@ -1043,14 +1242,22 @@ __all__ = (
     "MAXIMUM_HOLDINGS",
     "MEASUREMENT_END_SESSION",
     "MINIMUM_INVESTED_RETURN_SESSIONS",
+    "NASDAQ100_PROFILE_ID",
     "PORTFOLIO_CELL_SCHEMA",
     "PRIMARY_COST_BPS",
     "PROFILE_ID",
+    "PROFILE_IDS",
     "PROFILE_SCHEMA",
+    "SP500_PROFILE_ID",
     "STOCK_WEIGHT_CAP",
     "SUMMARY_SCHEMA",
     "TARGET_GROSS_EXPOSURE",
+    "UNION_PROFILE_ID",
+    "UNIVERSE_PROFILE_IDS",
+    "VARIANT_PROFILE_IDS",
     "StockPortfolioEvaluationRuntime",
+    "constituent_etf_tickers_for_profile",
+    "decision_sessions_for_input",
     "expected_custom_summary_statistic_names",
     "require_stock_portfolio_profile",
 )

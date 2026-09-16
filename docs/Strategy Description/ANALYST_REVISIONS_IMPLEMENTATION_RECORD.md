@@ -282,20 +282,20 @@ SIGNAL-MINUS-MATCHED DIFFERENCE MEASURES TRADING AGAINST NOT TRADING. R-064
 THEREFORE CANNOT ATTRIBUTE ITS RETURN DIFFERENCE TO THE SCORE, ALTHOUGH ITS
 EXACT IMPLEMENTED SLEEVE STILL MATERIALLY UNDERPERFORMS SPY. SECTION 86
 COUNTER-REVIEWS BOTH CLAUDE COMMITS, CORRECTS THE SECTION-85 RECORD, AND
-IMPLEMENTS/PREREGISTERS R-065 AS A NEW ONE-CELL, 10-BPS ATTRIBUTION
-DIAGNOSTIC. R-065 CHANGES ONLY PER-NAME STALE-PRICE REBALANCING: AN UNPRICED
-HELD NAME REMAINS LOCKED WHILE PRICEABLE NAMES CONTINUE TO REBALANCE. IT HAS
-NOT BEEN LAUNCHED AND SPENDS NO LOOK. SECTION 87 IS THE INDEPENDENT CLAUDE
-REVIEW OF THAT RANGE AND ACCEPTS BOTH COMMITS, ONE AFTER CORRECTION. IT
-PROVES BY MUTATION THAT THE FROZEN FIFTY-HOLDING CAP WAS UNPINNED WHENEVER A
-LOCKED NAME IS PRESENT: THE SLEEVE COULD TAKE A FIFTY-FIRST POSITION WITH THE
-WHOLE BATTERY GREEN. IT RAISES ONE P1: NARROWING THE COST LADDER TO A SINGLE
-10-BPS CELL ALSO DELETED THE STOCK PATH'S CROSS-CELL PATH-INVARIANCE,
-COST-MONOTONICITY AND CLOSED-FORM COST-ARITHMETIC CHECKS, UNDISCLOSED, SO
-R-065'S ONE REPORTED NUMBER CANNOT BE CROSS-CHECKED AGAINST ITS OWN
-TURNOVER, AND R-064'S LADDER CANNOT STAND IN BECAUSE IT MEASURED A
-COMPARATOR THAT EXECUTED TWO OF 261 REBALANCES. THAT IS CORRECTABLE AT ZERO
-LOOK COST BEFORE LAUNCH. CODEX COUNTER-REVIEW IS NEXT. PAPER OR FUNDED
+IMPLEMENTS/PREREGISTERS THE FIRST R-065 CANDIDATE WITH PER-NAME STALE-PRICE
+LOCKING. SECTION 87 IS THE INDEPENDENT CLAUDE REVIEW OF THAT RANGE AND
+ACCEPTS BOTH COMMITS, ONE AFTER A TEST-ONLY CORRECTION. SECTION 88
+COUNTER-REVIEWS BOTH CLAUDE COMMITS, ACCEPTS THAT CORRECTION, RESTORES THE
+FULL 0/5/10/20-BPS LADDER AND ITS CROSS-CELL PATH, COST-MONOTONICITY AND
+CLOSED-FORM COST-ARITHMETIC CHECKS UNDER THE NEW R-065 V2 IDENTITY, AND
+PREREGISTERS THREE OWNER-DIRECTED ELIGIBILITY DIAGNOSTICS BEFORE ANY NEW
+OUTCOME IS READ: POINT-IN-TIME SPY HOLDINGS AS AN S&P 500 PROXY, POINT-IN-
+TIME QQQ HOLDINGS AS A NASDAQ-100 PROXY, AND THEIR AUTHENTICATED-SECURITY-ID
+UNION. QQQ IS NOT ALL NASDAQ-LISTED STOCKS. ALL FOUR RUNS REMAIN CURRENT-
+VINTAGE/NON-PRISTINE-PIT BECAUSE THEIR MASSIVE-BASED SIGNAL INPUT IS THE
+SAME ACCEPTED-RISK PACKAGE. NONE HAS BEEN LAUNCHED AT THIS PREREGISTRATION
+SNAPSHOT; ACCOUNTING THEREFORE REMAINS 64 SHARED LOOKS, 11 ARV2 DEVELOPMENT
+EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 575-CELL FLOOR. PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
 
@@ -981,26 +981,32 @@ assertion, which a shared guard detects and which is restored. Section 85.4
 also offers a rough overlap-adjusted interpretation of the stock information
 coefficients; section 86 qualifies that heuristic and corrects its period and
 turnover claims. Section 86 counter-reviews both Claude commits and implements
-R-065, a new preregistered diagnostic that replaces account-wide stale-price
-freezing with per-name locking while leaving the signal, window, schedule,
-holdings cap, exposure, membership-end rule and primary cost unchanged. Section 87 is
-that independent Claude review: it accepts both commits, one after
-correction, pins the fifty-holding cap that no test bound, and leaves one P1
-open: the cost-ladder narrowing also removed the stock path's cross-cell and
-cost-arithmetic validator checks, which should be resolved before R-065 is
-launched. The immediate next step is that
-Codex counter-reviews section 87 and the exact pushed range. After that
-counter-review, the single R-065 QC evaluation may launch. In that same owner-authorized round, before reading or
-tuning on any new outcome, Codex may bind and preregister three historical
-constituent diagnostics: SPY holdings as an S&P 500 proxy, QQQ holdings as a
-Nasdaq-100 proxy, and the security-identifier-deduplicated union of both. Those
-three variants may then run without another interim Claude review. They must
-fail closed if their point-in-time constituent snapshots or identifier mapping
-cannot be authenticated; QQQ holdings must not be described as all
-Nasdaq-listed stocks. The supplied updated strategy remains an assessed
-proposal rather than an automatic replacement of the frozen score. Later
-windows, leverage, deployment, orders, broker, paper/live, and trading remain
-closed.
+the first R-065 candidate, replacing account-wide stale-price freezing with
+per-name locking while leaving the signal, window, schedule, holdings cap,
+exposure and membership-end rule unchanged. Section 87 is that independent
+Claude review: it accepts both commits, one after a test-only correction that
+genuinely pins the already-correct fifty-holding cap, and identifies the
+candidate's removal of the full cost ladder and three associated result-
+integrity checks. Section 88 counter-reviews both Claude commits. It accepts
+the cap regression, treats the cost-ladder omission as P2 rather than an
+execution/security P1, and corrects it before launch under R-065 v2 by
+restoring the 0/5/10/20-bps cells, cross-cell path invariance, cost
+monotonicity, and closed-form annual cost arithmetic. Section 88 also freezes
+three owner-directed 2021-2025 diagnostics before any new outcome read: point-
+in-time SPY holdings as an S&P 500 proxy, point-in-time QQQ holdings as a
+Nasdaq-100 proxy, and their exact-security-ID-deduplicated union. The
+constituent collection and source-vintage timestamps must be available
+strictly before each weekly decision and no more than ten calendar days old;
+each snapshot must carry 95%-105% total positive weight and map at least 99%
+of that weight exactly to authenticated input securities. Each filter applies
+before both ranking and matched-comparator construction. QQQ is not all
+Nasdaq-listed stocks, and all four diagnostics retain the current-vintage/non-
+pristine-PIT Massive signal limitation. The immediate next step is the one
+sequential signed QC sequence R-065 through R-068, followed by one aggregate-
+only read per run and durable result/accounting records. The owner explicitly
+waives Claude review of section 88 before that sequence and directs Claude to
+review the single pushed completed round afterward. Later windows, leverage,
+deployment, orders, broker, paper/live, and trading remain closed.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -15337,3 +15343,214 @@ unchanged by this round.
   re-run on the exact final bytes.
 - `python -m compileall` over the lane's research and test paths exited 0;
   `git diff --check` clean.
+
+## 88. Codex counter-review of section 87 and prospective R-065 through R-068 diagnostics, 2026-09-16
+
+**Range counter-reviewed:** `a45733a..cf33165`, commits `6b8b771` and
+`cf33165`, individually and cumulatively at the exact pushed remote head
+`cf33165b74afe698699ce4abe02bce01878db355`. **Disposition: ACCEPTED AFTER
+CORRECTION.** The test-only correction in `6b8b771` genuinely pins the
+already-correct fifty-holding cap and is accepted. The immutable section-87
+record in `cf33165` is accepted as a faithful independent-review record; its
+findings receive the narrower counter-review dispositions below. Local commit
+`27c6fd4` corrects the only pre-launch production/result-contract issue by
+restoring the full cost ladder and its integrity checks under a new R-065 v2
+identity. This same round then implements and preregisters three
+owner-directed eligibility diagnostics, R-066 through R-068, before any new
+outcome is read.
+
+**Zero research looks and zero development evaluations have been spent at
+this preregistration snapshot.** No R-065, R-066, R-067 or R-068 QuantConnect
+project has been created, compiled or launched; no result or provider row has
+been read. No broker, deployment, order, paper/live state or trading surface
+was accessed. Accounting therefore remains 64 shared looks, 11 ARV2
+development evaluations, 23 infrastructure looks and a 575-cell lifetime
+floor.
+
+### 88.1 Per-commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `6b8b771` | **Accepted** | The sub-cap locked-weight regression separates the fifty-position slot reservation from the 98%-gross budget, fails when the reservation is removed, and leaves production unchanged because production already enforced the cap. This closes a P3 evidence-isolation gap rather than a P2 production defect. |
+| `cf33165` | **Accepted as the independent-review record, with counter-review qualifications** | It accurately preserves Claude's evidence, mutation procedure and own finding severities. The cost-ladder substance is confirmed and corrected before launch; the severity and two record-attribution findings are narrowed below without rewriting section 87. |
+| `27c6fd4` | **Accepted as the pre-launch R-065 correction** | Restores 0/5/10/20-bps cells, the 0-bps anchor, cross-cell path invariance, monotone cost drag and closed-form annual cost arithmetic. R-065 was never launched under v1, so versioning it to v2 and updating its prospective accounting spends no look. |
+
+### 88.2 Counter-review of `ARV2R87-001..006`
+
+| Finding | Counter-review disposition |
+|---|---|
+| `ARV2R87-001` | **Confirmed as P3 and corrected by Claude.** The original test could not isolate the holdings-slot guard, but the production code was already correct, no execution path was unsafe, and `6b8b771` supplies the missing red/green sensitivity. |
+| `ARV2R87-002` | **Confirmed in substance; severity P2, corrected before launch.** Removing the ladder did delete material research-result validation and left corrected-comparator cost sensitivity unmeasured. It did not expose a live, execution, security or trading path, and no R-065 result existed. `27c6fd4` restores all four cells and the three lost integrity relations. |
+| `ARV2R87-003` | **Confirmed P3; preregistration strengthened.** The zero account-wide-deferral count and 261 execution count remain useful round-trip checks but are primarily code invariants. The prospective rule now names the falsifiable stale/partial-counter zero biconditionals, ordering, per-decision ceilings and mean-locked-gross relations as the technical gate. |
+| `ARV2R87-004` | **Accepted as a P3 safe redundancy.** The explicit stale-name turnover exclusion is behaviorally redundant while locked target weight equals pre-trade weight, but is retained as defense in depth against a future rescaling rule. |
+| `ARV2R87-005` | **False alarm.** Section 85.2's `ARV2R85-001` row contains the exact phrase “within rounding of R-064's reported comparator behaviour.” The underlying qualification remains correct: the fixture proves the mechanism, not equality of the integer counts. |
+| `ARV2R87-006` | **Partially correct.** Section 85.1 correctly describes the evaluator as 914 lines at commit `2dcd449`. Section 85.3 separately and incorrectly describes the final reviewed module as 914 lines when it had reached 930; the counter-review's final-tree qualification therefore remains valid for that later statement. |
+
+### 88.3 R-065 v2 cost-ladder correction
+
+R-065 v2 preserves the exact R-055 conservative-censored firm-specific score,
+authenticated accepted-risk package, 2021-2025 dates, 261 weekly next-open
+decisions, top-decile signal capped at fifty holdings, 1.96% per-name cap, 98%
+target gross, zero-yield cash, named-FIGI refusals, SPY context,
+membership-end zero-recovery rule and the per-position stale-price correction
+already reviewed in sections 86-87. It changes no score coefficient,
+threshold, horizon, sector rule or provider input.
+
+The result contract again requires four cost cells at 0, 5, 10 and 20 basis
+points per side, with 10 bps primary. The validator requires the SPY return,
+signal and matched turnover, cash and all other path-only fields to be
+identical across cost cells; cumulative and annualized returns must be
+monotone with cost; and each annualized return must equal its 0-bps value less
+the exact reported turnover times the per-side cost. Runtime metadata,
+portfolio metadata and the four cells make exactly six aggregate statistics.
+The v1 one-cell profile has never been launched and is not accepted by the v2
+contract.
+
+### 88.4 Historical ETF-constituent eligibility contract
+
+R-066, R-067 and R-068 use the same score and portfolio economics as R-065.
+They differ only in eligibility, which is applied before both top-decile
+ranking and construction of the equal-weight matched comparator:
+
+- R-066 uses historical SPY ETF holdings as an S&P 500 **proxy**, not official
+  S&P 500 index membership.
+- R-067 uses historical QQQ ETF holdings as a Nasdaq-100 **proxy**, explicitly
+  **not all Nasdaq-listed stocks**.
+- R-068 uses the sorted union of the two snapshots, deduplicated by exact
+  authenticated QuantConnect security ID. It is neither official S&P 500
+  membership nor all Nasdaq-listed stocks.
+
+The QC runtime creates only the empty-selection ETF constituent universes
+needed by the selected profile; R-065 creates none. It requests daily
+historical universe data with explicit `flatten=False`. QuantConnect's current
+official historical-universe documentation describes the default Python
+return as an unflattened Series keyed by `(universe_symbol, time)`, while
+`flatten=True` returns a DataFrame; the explicit argument freezes the relied-
+upon shape rather than inheriting a mutable default. The references checked
+for this implementation are [ETF Constituents
+Universes](https://www.quantconnect.com/docs/v2/writing-algorithms/universes/equity/etf-constituents-universes),
+[US ETF Constituents](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-etf-constituents),
+and [Historical Universe
+Data](https://www.quantconnect.com/docs/v2/writing-algorithms/historical-data/universe-data).
+
+For every one of the 261 decision sessions, each required ETF selects the
+latest collection `EndTime` strictly before that decision's midnight in
+`America/New_York`. The collection must be positive-age and no more than ten
+calendar days old. Each positive-weight constituent row must carry a calendar-
+midnight `LastUpdate` no later than its collection, and the oldest positive-
+weight row `LastUpdate` must also be no more than ten calendar days old at the
+decision. Rows must share the collection `EndTime`; collection/index shape,
+universe SID, query bounds, uniqueness and exact reverse mapping are
+authenticated. Documented nullable, zero and negative finite weights are
+excluded; malformed or non-finite non-null weights refuse. Total positive
+weight must be 0.95 through 1.05, and exact QC-security-ID mapping into the
+authenticated input census must cover at least 99% of that weight. Missing or
+empty collections, duplicate positive-weight identifiers, stale or future-
+dated positive-weight evidence, malformed evidence, or insufficient mapping
+refuses rather than falling back to a current constituent list. R-065 rejects
+any eligibility map; the variants require an exhaustive exact map for all 261
+decisions.
+
+These constituent controls are point-in-time controls for the eligibility
+proxy only. All four runs retain the same accepted-risk Massive input, so all
+remain current-vintage/non-pristine-PIT diagnostics rather than pristine
+historical reconstructions.
+
+### 88.5 Frozen prospective identities and accounting
+
+| Ledger | Profile and SHA-256 | Final projection | If launched and read successfully | Exact aggregate inventory |
+|---|---|---|---|---|
+| `R-065`; `arv2-eval-stock-portfolio-historical-qc-004` | `arv2-stock-long-only-2021-2025-r065-v2`; `39773415f5d936166b3a224a5e26c55e4dc20a7e8052fb65c796f9fd3ce65678` | `arv2-preliminary-qc-projection-c67cee15e9972c595ebfa22a`; `c67cee15e9972c595ebfa22a7483b72c14d8e0f919364070cb269c06528ef1c5`; seven files, 232,391 total / 59,683 max bytes | Shared looks 64 -> 65; development evaluations 11 -> 12; cells 575 -> 579 | Runtime metadata, portfolio metadata, cost cells 0/5/10/20 bps |
+| `R-066`; `arv2-eval-stock-spy-holdings-qc-005` | `arv2-stock-long-only-spy-holdings-proxy-2021-2025-r066-v1`; `1bd852c327c50d7d410cdac870febcf6ae3b0fb39ddf0f3554363697d1b21660` | `arv2-preliminary-qc-projection-deb4ced481a55fd93f7a545f`; `deb4ced481a55fd93f7a545f32b652126fad6af0926435c422974811e8cda143`; seven files, 233,095 total / 59,683 max bytes | Shared looks 65 -> 66; development evaluations 12 -> 13; cells 579 -> 583 | Runtime metadata, portfolio metadata, cost cells 0/5/10/20 bps |
+| `R-067`; `arv2-eval-stock-qqq-holdings-qc-006` | `arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1`; `4c2fd34f2255bb05adfccec5afc5c7dd408b7c64d3ebc25854a39b92c78c2796` | `arv2-preliminary-qc-projection-d34ae49468b502c97b76a095`; `d34ae49468b502c97b76a09528eb607aed573a5851400a72f2337f49fb124d53`; seven files, 233,384 total / 59,683 max bytes | Shared looks 66 -> 67; development evaluations 13 -> 14; cells 583 -> 587 | Runtime metadata, portfolio metadata, cost cells 0/5/10/20 bps |
+| `R-068`; `arv2-eval-stock-spy-qqq-union-qc-007` | `arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1`; `333e26b9645a8f6c3d35886ec7e9cece172d3bb166db22e76037d7b2b9b740e1` | `arv2-preliminary-qc-projection-cff9302f23b98bc2bb174682`; `cff9302f23b98bc2bb174682aa48f46ad65ac4206418e19545a0167f0d9f107c`; seven files, 233,385 total / 59,683 max bytes | Shared looks 67 -> 68; development evaluations 14 -> 15; cells 587 -> 591 | Runtime metadata, portfolio metadata, cost cells 0/5/10/20 bps |
+
+The prospective private QC names are, sequentially, `11
+ARV2_STOCK_R065_2021_2025 - 20260916`, `12
+ARV2_STOCK_R066_SPY_2021_2025 - 20260916`, `13
+ARV2_STOCK_R067_QQQ_2021_2025 - 20260916`, and `14
+ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`. Their backtest names are
+`ARV2 R065 corrected comparator e9851c2f`, `ARV2 R066 SPY holdings proxy
+e9851c2f`, `ARV2 R067 QQQ holdings proxy e9851c2f`, and `ARV2 R068 SPY QQQ
+union e9851c2f`. One subscribed QC node makes the sequence serial, not
+parallel. Each launch receives statistics-free terminal polling and, after an
+authenticated `Completed.`, one separately signed read of exactly six
+aggregate statistics. Raw rows, unrestricted logs/charts, deployments,
+brokers, orders, paper/live state and trading remain outside the authority.
+
+### 88.6 Prospective interpretation rules
+
+For R-065, failure to authenticate/reconcile the result or failure of the
+stale/partial-counter relational gates is a technical failure. The returned
+zero account-wide-deferral count and 261 executions remain required for
+round-trip integrity but are not treated as independent economic evidence. If
+the primary-cost signal-minus-matched return is non-positive, there is no
+same-window signal tuning. If it is positive, it is interpreted only as a
+selection effect conditional on the exact universe, equal-weight construction,
+current-vintage signal and accepted missing-data rules. SPY is external
+absolute-return context, not the matched attribution benchmark.
+
+R-066 through R-068 are descriptive diagnostics, not a same-window candidate
+tournament. No universe will be called a winner or selected for promotion
+because it has the best 2021-2025 result. Any promotion, score change or
+holdout claim requires a new prospective identity and a separately frozen
+evaluation. Completing these runs does not unlock actual or synthetic 3x
+leverage; leverage remains closed until an unlevered construction establishes
+a credible benchmark result.
+
+### 88.7 In-round process deviation
+
+During preparation of a local sequential-run helper, one recursive filename-
+only search traversed ignored artifacts, including the path of the R-064
+aggregate receipt. The command emitted filenames only. No outcome value,
+provider row, receipt payload or market datum was displayed, extracted or
+used, and the search stopped once detected. This is recorded as a P3 process
+deviation, not a research look. Subsequent inspection is confined to tracked
+source/tests and explicitly named sanitized aggregate receipts.
+
+### 88.8 In-round implementation audit and corrections
+
+The initial prospective implementation passed its focused battery, then a
+read-only guard audit found two launch-relevant P2 evidence defects and one P3
+class of structurally shadowed defenses before any QC action:
+
+- `ARV2D88-001` (**P2, corrected**) — the first constituent-history adapter
+  passed an explicit positional resolution to `history(universe, start, end,
+  ..., flatten=False)`, while this lane's physically demonstrated universe-
+  history path uses `history(universe, start, end, flatten=False)` and carries
+  daily resolution in `UniverseSettings`. The call and its fake now use that
+  demonstrated signature, still pin `flatten=False`, and all four projection
+  identities in 88.5 bind the corrected bytes.
+- `ARV2D88-002` (**P2, corrected**) — twenty newly added runtime refusal
+  expressions initially had no execution evidence. Seventeen exact-message
+  cases now isolate the reachable history-call, Series-traversal, collection,
+  row, timestamp, universe-symbol, resolution-inventory, reverse-mapping,
+  driver-topology and runtime-profile-inventory branches. The focused new
+  cases are **17 passed** and the complete runtime file is **129 passed**.
+- `ARV2D88-003` (**P3, documented**) — several remaining refusals are
+  deliberately defense in depth or structurally shadowed by earlier exact
+  allowlists: an impossible non-string value after `str`, a post-construction
+  private-state mutation check, decision-session checks already authenticated
+  by the evaluator, the impossible empty union after nonempty mapped-weight
+  validation, and private helper fallbacks behind public routing. They are not
+  counted as isolated evidence and were not given artificial tests.
+
+The audit also caught a pre-freeze interoperability issue from QuantConnect's
+documented nullable constituent weight: the initial loader rejected the whole
+collection. The corrected positive-weight-only rule excludes nullable, zero
+and negative finite rows; positive rows alone drive total weight, exact-SID
+mapping and `LastUpdate` freshness, while malformed and non-finite non-null
+weights refuse. Isolated tests cover both acceptance and refusal sides.
+
+### 88.9 Gate at this preregistration snapshot
+
+The four prospective rule blocks above and the shared `alpha-result.md`
+entries are written before project creation, launch or outcome read. The
+projection identities and byte counts in 88.5 reproduce the frozen source
+tree and must remain exact through each QC submission. The final pre-launch
+evaluator/runtime/submission battery is **370 passed in 150.45 seconds**; the
+no-external-I/O/import closure is **13 passed in 12.55 seconds**; compilation,
+document gates and `git diff --check` are green. Complete-lane validation, the
+four QC receipts, aggregate-only results, final accounting and the section-5
+handoff row will be appended later in this same round. Nothing in this
+prospective section asserts a positive or negative result.

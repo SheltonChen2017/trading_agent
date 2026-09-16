@@ -153,6 +153,18 @@ _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE = (
 _PINNED_PROJECTION_STOCK_SOURCE_PATHS = tuple(
     projection_builder.STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
 )
+_PINNED_PROJECTION_STOCK_PROFILE_IDS = tuple(
+    projection_builder.STOCK_PORTFOLIO_PROFILE_IDS
+)
+_PINNED_PROJECTION_STOCK_UNIVERSE_PROFILE_IDS = tuple(
+    projection_builder.STOCK_UNIVERSE_PROFILE_IDS
+)
+_PINNED_PROJECTION_STOCK_PROFILE_SHA256S_OBJECT = (
+    projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256S
+)
+_PINNED_PROJECTION_STOCK_PROFILE_SHA256_ROWS = tuple(
+    sorted(_PINNED_PROJECTION_STOCK_PROFILE_SHA256S_OBJECT.items())
+)
 _PINNED_EXPECTED_RESULT_NAMES = tuple(
     preliminary_runtime.EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
 )
@@ -160,6 +172,15 @@ _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE = (
     preliminary_runtime.expected_custom_summary_statistic_names
 )
 _PINNED_MAX_TRAIN_SLICE_COUNT = preliminary_runtime.MAX_TRAIN_SLICE_COUNT
+_PINNED_RUNTIME_STOCK_PORTFOLIO_PROFILE_ID = (
+    preliminary_runtime.STOCK_PORTFOLIO_PROFILE_ID
+)
+_PINNED_RUNTIME_STOCK_PORTFOLIO_PROFILE_IDS = tuple(
+    preliminary_runtime.STOCK_PORTFOLIO_PROFILE_IDS
+)
+_PINNED_RUNTIME_STOCK_UNIVERSE_PROFILE_IDS = tuple(
+    preliminary_runtime.STOCK_UNIVERSE_PROFILE_IDS
+)
 _PINNED_REQUIRE_REGIME_PROFILE = regime_evaluator.require_regime_profile
 _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE = (
     stock_portfolio_evaluator.require_stock_portfolio_profile
@@ -167,8 +188,23 @@ _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE = (
 _PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE = (
     stock_portfolio_evaluator.expected_custom_summary_statistic_names
 )
+_PINNED_STOCK_PORTFOLIO_CONSTITUENT_TICKERS_CALLABLE = (
+    stock_portfolio_evaluator.constituent_etf_tickers_for_profile
+)
 _PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT = stock_portfolio_evaluator._PROFILE
 _PINNED_STOCK_PORTFOLIO_PROFILE_ID = stock_portfolio_evaluator.PROFILE_ID
+_PINNED_STOCK_PORTFOLIO_PROFILE_IDS = tuple(
+    stock_portfolio_evaluator.PROFILE_IDS
+)
+_PINNED_STOCK_PORTFOLIO_VARIANT_PROFILE_IDS = tuple(
+    stock_portfolio_evaluator.VARIANT_PROFILE_IDS
+)
+_PINNED_STOCK_PORTFOLIO_UNIVERSE_PROFILE_IDS = tuple(
+    stock_portfolio_evaluator.UNIVERSE_PROFILE_IDS
+)
+_PINNED_STOCK_PORTFOLIO_CANONICAL_ROWS_OBJECT = (
+    stock_portfolio_evaluator._PROFILE_CANONICAL_ROWS
+)
 _PINNED_STOCK_PORTFOLIO_CONTRACT_ID = stock_portfolio_evaluator.CONTRACT_ID
 _PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA = stock_portfolio_evaluator.SUMMARY_SCHEMA
 _PINNED_STOCK_PORTFOLIO_CELL_SCHEMA = (
@@ -195,27 +231,40 @@ _PINNED_STOCK_PORTFOLIO_PRIMARY_COST = (
 _PINNED_STOCK_PORTFOLIO_ANNUALIZATION_SESSIONS = (
     stock_portfolio_evaluator.ANNUALIZATION_SESSIONS
 )
-_PINNED_STOCK_PORTFOLIO_PROFILE_BYTES = json.dumps(
-    _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE(
-        _PINNED_STOCK_PORTFOLIO_PROFILE_ID
-    ),
-    sort_keys=True,
-    separators=(",", ":"),
-    ensure_ascii=True,
-    allow_nan=False,
-).encode("ascii")
-_PINNED_STOCK_PORTFOLIO_PROFILE_SHA256 = (
-    _PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT["profile_sha256"]
-)
-_PINNED_STOCK_PORTFOLIO_RESULT_NAMES = tuple(
-    sorted(
-        (
-            *_PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE(
-                _PINNED_STOCK_PORTFOLIO_PROFILE_ID
-            ),
-            "ARV2_RUNTIME_META",
-        )
+_PINNED_STOCK_PORTFOLIO_PROFILE_BINDINGS = tuple(
+    (
+        profile_id,
+        json.dumps(
+            _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE(profile_id),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode("ascii"),
+        _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE(profile_id)[
+            "profile_sha256"
+        ],
+        tuple(
+            sorted(
+                (
+                    *_PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE(
+                        profile_id
+                    ),
+                    "ARV2_RUNTIME_META",
+                )
+            )
+        ),
     )
+    for profile_id in _PINNED_STOCK_PORTFOLIO_PROFILE_IDS
+)
+_PINNED_STOCK_PORTFOLIO_PROFILE_BYTES = (
+    _PINNED_STOCK_PORTFOLIO_PROFILE_BINDINGS[0][1]
+)
+_PINNED_STOCK_PORTFOLIO_PROFILE_SHA256 = (
+    _PINNED_STOCK_PORTFOLIO_PROFILE_BINDINGS[0][2]
+)
+_PINNED_STOCK_PORTFOLIO_RESULT_NAMES = (
+    _PINNED_STOCK_PORTFOLIO_PROFILE_BINDINGS[0][3]
 )
 _PINNED_JSON_DUMPS = json.dumps
 _PINNED_REQUIRE_EXECUTION_SIGNATURE = require_formal_execution_owner_signature
@@ -283,6 +332,20 @@ class _EvaluationRunSpec:
     cell_count: int
     lifetime_alpha_cell_floor_before: int
     lifetime_alpha_cell_floor_after: int
+
+
+def _stock_portfolio_profile_binding(
+    profile_id: str,
+) -> tuple[bytes, str, tuple[str, ...]]:
+    for (
+        candidate_profile_id,
+        profile_bytes,
+        profile_sha256,
+        result_names,
+    ) in _PINNED_STOCK_PORTFOLIO_PROFILE_BINDINGS:
+        if candidate_profile_id == profile_id:
+            return profile_bytes, profile_sha256, result_names
+    _error("stock portfolio profile is not allowlisted")
 
 
 # The R-058/R-059 baselines are conditional ledger successors.  The host
@@ -362,17 +425,55 @@ _EVALUATION_RUN_SPECS = (
         575,
         579,
     ),
+    _EvaluationRunSpec(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        "arv2-eval-stock-spy-holdings-qc-005",
+        "R-066",
+        65,
+        66,
+        12,
+        13,
+        4,
+        579,
+        583,
+    ),
+    _EvaluationRunSpec(
+        stock_portfolio_evaluator.NASDAQ100_PROFILE_ID,
+        "arv2-eval-stock-qqq-holdings-qc-006",
+        "R-067",
+        66,
+        67,
+        13,
+        14,
+        4,
+        583,
+        587,
+    ),
+    _EvaluationRunSpec(
+        stock_portfolio_evaluator.UNION_PROFILE_ID,
+        "arv2-eval-stock-spy-qqq-union-qc-007",
+        "R-068",
+        67,
+        68,
+        14,
+        15,
+        4,
+        587,
+        591,
+    ),
 )
 
 
 def _run_spec(evaluation_profile_id: str | None) -> _EvaluationRunSpec:
+    if evaluation_profile_id is not None and type(evaluation_profile_id) is not str:
+        _error("preliminary evaluation profile is not allowlisted")
     for spec in _EVALUATION_RUN_SPECS:
         if spec.profile_id == evaluation_profile_id:
             if evaluation_profile_id == etf_evaluator.PROFILE_ID:
                 etf_evaluator.require_etf_baseline_profile(
                     evaluation_profile_id
                 )
-            elif evaluation_profile_id == _PINNED_STOCK_PORTFOLIO_PROFILE_ID:
+            elif evaluation_profile_id in _PINNED_STOCK_PORTFOLIO_PROFILE_IDS:
                 if not _stock_portfolio_contract_bindings_are_current():
                     _error("stock portfolio financial contract changed")
             elif evaluation_profile_id is not None:
@@ -391,8 +492,10 @@ def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]
                 evaluation_profile_id
             )
         )
-    elif evaluation_profile_id == _PINNED_STOCK_PORTFOLIO_PROFILE_ID:
-        names = _PINNED_STOCK_PORTFOLIO_RESULT_NAMES
+    elif evaluation_profile_id in _PINNED_STOCK_PORTFOLIO_PROFILE_IDS:
+        _profile_bytes, _profile_sha256, names = (
+            _stock_portfolio_profile_binding(evaluation_profile_id)
+        )
     else:
         names = tuple(
             _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE(evaluation_profile_id)
@@ -498,7 +601,7 @@ def _canonical(value: object) -> bytes:
 
 
 def _stock_portfolio_contract_bindings_are_current() -> bool:
-    """Refuse in-memory weakening of the R-065 financial/result contract."""
+    """Refuse in-memory weakening of any exact R-065--R-068 contract."""
 
     namespace = stock_portfolio_evaluator.__dict__
     if type(namespace) is not dict:
@@ -575,32 +678,162 @@ def _stock_portfolio_contract_bindings_are_current() -> bool:
         return False
     try:
         profile = namespace.get("_PROFILE")
-        return (
+        profile_ids = namespace.get("PROFILE_IDS")
+        variant_profile_ids = namespace.get("VARIANT_PROFILE_IDS")
+        universe_profile_ids = namespace.get("UNIVERSE_PROFILE_IDS")
+        projection_profile_ids = projection_builder.STOCK_PORTFOLIO_PROFILE_IDS
+        projection_universe_profile_ids = (
+            projection_builder.STOCK_UNIVERSE_PROFILE_IDS
+        )
+        projection_hashes = (
+            projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256S
+        )
+        if (
             namespace.get("require_stock_portfolio_profile")
-            is _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE
-            and namespace.get("expected_custom_summary_statistic_names")
-            is _PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE
-            and projection_builder._profile
-            is _PINNED_PROJECTION_PROFILE_CALLABLE
-            and projection_builder.project_source_paths_for_profile
-            is _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE
-            and type(projection_builder.STOCK_PORTFOLIO_PROFILE_ID) is str
-            and projection_builder.STOCK_PORTFOLIO_PROFILE_ID
-            == _PINNED_STOCK_PORTFOLIO_PROFILE_ID
-            and type(projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256) is str
-            and projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256
-            == _PINNED_STOCK_PORTFOLIO_PROFILE_SHA256
-            and profile is _PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT
-            and exact_json_tree(profile)
-            and _PINNED_JSON_DUMPS(
+            is not _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE
+            or namespace.get("expected_custom_summary_statistic_names")
+            is not _PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE
+            or namespace.get("constituent_etf_tickers_for_profile")
+            is not _PINNED_STOCK_PORTFOLIO_CONSTITUENT_TICKERS_CALLABLE
+            or projection_builder._profile
+            is not _PINNED_PROJECTION_PROFILE_CALLABLE
+            or projection_builder.project_source_paths_for_profile
+            is not _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE
+            or preliminary_runtime.expected_custom_summary_statistic_names
+            is not _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE
+            or type(preliminary_runtime.STOCK_PORTFOLIO_PROFILE_ID) is not str
+            or preliminary_runtime.STOCK_PORTFOLIO_PROFILE_ID
+            != _PINNED_RUNTIME_STOCK_PORTFOLIO_PROFILE_ID
+            or preliminary_runtime.STOCK_PORTFOLIO_PROFILE_ID
+            != _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+            or type(preliminary_runtime.STOCK_PORTFOLIO_PROFILE_IDS)
+            is not tuple
+            or preliminary_runtime.STOCK_PORTFOLIO_PROFILE_IDS
+            != _PINNED_RUNTIME_STOCK_PORTFOLIO_PROFILE_IDS
+            or preliminary_runtime.STOCK_PORTFOLIO_PROFILE_IDS != profile_ids
+            or type(preliminary_runtime.STOCK_UNIVERSE_PROFILE_IDS)
+            is not tuple
+            or preliminary_runtime.STOCK_UNIVERSE_PROFILE_IDS
+            != _PINNED_RUNTIME_STOCK_UNIVERSE_PROFILE_IDS
+            or preliminary_runtime.STOCK_UNIVERSE_PROFILE_IDS
+            != universe_profile_ids
+            or type(profile_ids) is not tuple
+            or profile_ids != _PINNED_STOCK_PORTFOLIO_PROFILE_IDS
+            or namespace.get("ALL_PROFILE_IDS") != profile_ids
+            or type(variant_profile_ids) is not tuple
+            or variant_profile_ids
+            != _PINNED_STOCK_PORTFOLIO_VARIANT_PROFILE_IDS
+            or type(universe_profile_ids) is not tuple
+            or universe_profile_ids
+            != _PINNED_STOCK_PORTFOLIO_UNIVERSE_PROFILE_IDS
+            or variant_profile_ids != profile_ids[1:]
+            or universe_profile_ids != variant_profile_ids
+            or (
+                namespace.get("SP500_PROFILE_ID"),
+                namespace.get("NASDAQ100_PROFILE_ID"),
+                namespace.get("UNION_PROFILE_ID"),
+            )
+            != variant_profile_ids
+            or any(type(item) is not str for item in profile_ids)
+            or len(set(profile_ids)) != 4
+            or namespace.get("_PROFILE_CANONICAL_ROWS")
+            is not _PINNED_STOCK_PORTFOLIO_CANONICAL_ROWS_OBJECT
+            or type(projection_profile_ids) is not tuple
+            or projection_profile_ids
+            != _PINNED_PROJECTION_STOCK_PROFILE_IDS
+            or projection_profile_ids != profile_ids
+            or type(projection_universe_profile_ids) is not tuple
+            or projection_universe_profile_ids
+            != _PINNED_PROJECTION_STOCK_UNIVERSE_PROFILE_IDS
+            or projection_universe_profile_ids != universe_profile_ids
+            or type(projection_hashes) is not dict
+            or projection_hashes
+            is not _PINNED_PROJECTION_STOCK_PROFILE_SHA256S_OBJECT
+            or tuple(sorted(projection_hashes.items()))
+            != _PINNED_PROJECTION_STOCK_PROFILE_SHA256_ROWS
+            or type(projection_builder.STOCK_PORTFOLIO_PROFILE_ID) is not str
+            or projection_builder.STOCK_PORTFOLIO_PROFILE_ID
+            != _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+            or type(projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256) is not str
+            or projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256
+            != _PINNED_STOCK_PORTFOLIO_PROFILE_SHA256
+            or profile is not _PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT
+            or not exact_json_tree(profile)
+            or _PINNED_JSON_DUMPS(
                 profile,
                 sort_keys=True,
                 separators=(",", ":"),
                 ensure_ascii=True,
                 allow_nan=False,
             ).encode("ascii")
-            == _PINNED_STOCK_PORTFOLIO_PROFILE_BYTES
-        )
+            != _PINNED_STOCK_PORTFOLIO_PROFILE_BYTES
+        ):
+            return False
+        for (
+            profile_id,
+            expected_profile_bytes,
+            expected_profile_sha256,
+            expected_result_names,
+        ) in _PINNED_STOCK_PORTFOLIO_PROFILE_BINDINGS:
+            observed_profile = _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE(
+                profile_id
+            )
+            observed_result_names = tuple(
+                sorted(
+                    (
+                        *_PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE(
+                            profile_id
+                        ),
+                        "ARV2_RUNTIME_META",
+                    )
+                )
+            )
+            observed_projection_profile = (
+                _PINNED_PROJECTION_PROFILE_CALLABLE(profile_id)
+            )
+            observed_runtime_result_names = (
+                _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE(profile_id)
+            )
+            observed_source_paths = (
+                _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE(profile_id)
+            )
+            expected_tickers = tuple(
+                observed_profile.get("constituent_etf_tickers", ())
+            )
+            if (
+                not exact_json_tree(observed_profile)
+                or _PINNED_JSON_DUMPS(
+                    observed_profile,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    ensure_ascii=True,
+                    allow_nan=False,
+                ).encode("ascii")
+                != expected_profile_bytes
+                or observed_profile.get("profile_id") != profile_id
+                or observed_profile.get("profile_sha256")
+                != expected_profile_sha256
+                or projection_hashes.get(profile_id)
+                != expected_profile_sha256
+                or observed_projection_profile
+                != {
+                    "profile_id": profile_id,
+                    "profile_sha256": expected_profile_sha256,
+                }
+                or type(observed_source_paths) is not tuple
+                or observed_source_paths
+                != _PINNED_PROJECTION_STOCK_SOURCE_PATHS
+                or observed_result_names != expected_result_names
+                or observed_runtime_result_names != expected_result_names
+                or _PINNED_STOCK_PORTFOLIO_CONSTITUENT_TICKERS_CALLABLE(
+                    profile_id
+                )
+                != expected_tickers
+                or (profile_id == _PINNED_STOCK_PORTFOLIO_PROFILE_ID)
+                is not (expected_tickers == ())
+            ):
+                return False
+        return True
     except (Exception, RecursionError):
         return False
 
@@ -3893,6 +4126,16 @@ def _validate_stock_portfolio_aggregate_records(
     records: Mapping[str, dict[str, object]],
     plan: AcceptedRiskPreliminarySubmissionPlan,
 ) -> None:
+    profile_id = plan.projection.evaluation_profile_id
+    profile_bytes, profile_sha256, _result_names = (
+        _stock_portfolio_profile_binding(profile_id)
+    )
+    if (
+        plan.evaluation_profile_id != profile_id
+        or plan.evaluation_profile_sha256 != profile_sha256
+        or plan.projection.evaluation_profile_sha256 != profile_sha256
+    ):
+        _error("preliminary stock-portfolio plan profile binding changed")
     runtime_meta = records.get("ARV2_RUNTIME_META")
     if (
         type(runtime_meta) is not dict
@@ -3902,9 +4145,9 @@ def _validate_stock_portfolio_aggregate_records(
         or runtime_meta.get("status")
         != "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO_COMPLETED"
         or runtime_meta.get("evaluation_profile_id")
-        != _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+        != profile_id
         or runtime_meta.get("evaluation_profile_sha256")
-        != _PINNED_STOCK_PORTFOLIO_PROFILE_SHA256
+        != profile_sha256
         or runtime_meta.get("package_id") != plan.package_id
         or runtime_meta.get("package_sha256") != plan.package_sha256
         or runtime_meta.get("activation_manifest_sha256")
@@ -3995,9 +4238,9 @@ def _validate_stock_portfolio_aggregate_records(
     if (
         meta.get("schema") != _PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA
         or meta.get("contract_id") != _PINNED_STOCK_PORTFOLIO_CONTRACT_ID
-        or meta.get("profile_id") != _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+        or meta.get("profile_id") != profile_id
         or meta.get("profile_sha256")
-        != _PINNED_STOCK_PORTFOLIO_PROFILE_SHA256
+        != profile_sha256
         or meta.get("package_id") != plan.package_id
         or meta.get("package_sha256") != plan.package_sha256
         or meta.get("input_manifest_id") != plan.evaluator_manifest_id
@@ -4250,7 +4493,7 @@ def _validate_stock_portfolio_aggregate_records(
         if (
             cell.get("schema")
             != _PINNED_STOCK_PORTFOLIO_CELL_SCHEMA
-            or cell.get("profile_id") != _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+            or cell.get("profile_id") != profile_id
             or cell.get("cost_bps_per_side") != cost
             or cell.get("primary_cost_scenario")
             is not (cost == _PINNED_STOCK_PORTFOLIO_PRIMARY_COST)
@@ -4500,7 +4743,7 @@ def _validate_stock_portfolio_aggregate_records(
         }
     }
     record["profile"] = json.loads(
-        _PINNED_STOCK_PORTFOLIO_PROFILE_BYTES.decode("ascii")
+        profile_bytes.decode("ascii")
     )
     record["portfolio_cells"] = cells
     digest = hashlib.sha256(_canonical(record)).hexdigest()
@@ -4527,7 +4770,7 @@ def _validate_aggregate_records(
     if profile_id == etf_evaluator.PROFILE_ID:
         _validate_etf_aggregate_records(records, plan)
         return
-    if profile_id == _PINNED_STOCK_PORTFOLIO_PROFILE_ID:
+    if profile_id in _PINNED_STOCK_PORTFOLIO_PROFILE_IDS:
         _validate_stock_portfolio_aggregate_records(records, plan)
         return
     _validate_regime_aggregate_records(records, plan, profile_id)
@@ -5110,14 +5353,26 @@ _seal_action_bindings(
         "_PINNED_PROJECTION_PROFILE_CALLABLE",
         "_PINNED_PROJECTION_SOURCE_PATHS_CALLABLE",
         "_PINNED_PROJECTION_STOCK_SOURCE_PATHS",
+        "_PINNED_PROJECTION_STOCK_PROFILE_IDS",
+        "_PINNED_PROJECTION_STOCK_UNIVERSE_PROFILE_IDS",
+        "_PINNED_PROJECTION_STOCK_PROFILE_SHA256S_OBJECT",
+        "_PINNED_PROJECTION_STOCK_PROFILE_SHA256_ROWS",
         "_PINNED_EXPECTED_RESULT_NAMES",
         "_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE",
         "_PINNED_MAX_TRAIN_SLICE_COUNT",
+        "_PINNED_RUNTIME_STOCK_PORTFOLIO_PROFILE_ID",
+        "_PINNED_RUNTIME_STOCK_PORTFOLIO_PROFILE_IDS",
+        "_PINNED_RUNTIME_STOCK_UNIVERSE_PROFILE_IDS",
         "_PINNED_REQUIRE_REGIME_PROFILE",
         "_PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE",
         "_PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE",
+        "_PINNED_STOCK_PORTFOLIO_CONSTITUENT_TICKERS_CALLABLE",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_ID",
+        "_PINNED_STOCK_PORTFOLIO_PROFILE_IDS",
+        "_PINNED_STOCK_PORTFOLIO_VARIANT_PROFILE_IDS",
+        "_PINNED_STOCK_PORTFOLIO_UNIVERSE_PROFILE_IDS",
+        "_PINNED_STOCK_PORTFOLIO_CANONICAL_ROWS_OBJECT",
         "_PINNED_STOCK_PORTFOLIO_CONTRACT_ID",
         "_PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA",
         "_PINNED_STOCK_PORTFOLIO_CELL_SCHEMA",
@@ -5128,6 +5383,7 @@ _seal_action_bindings(
         "_PINNED_STOCK_PORTFOLIO_COSTS",
         "_PINNED_STOCK_PORTFOLIO_PRIMARY_COST",
         "_PINNED_STOCK_PORTFOLIO_ANNUALIZATION_SESSIONS",
+        "_PINNED_STOCK_PORTFOLIO_PROFILE_BINDINGS",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_BYTES",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_SHA256",
         "_PINNED_STOCK_PORTFOLIO_RESULT_NAMES",
@@ -5220,6 +5476,7 @@ _seal_action_bindings(
         "AcceptedRiskPreliminaryAggregateResult",
         "_EvaluationRunSpec",
         "_EVALUATION_RUN_SPECS",
+        "_stock_portfolio_profile_binding",
         "_error",
         "_canonical",
         "_stock_portfolio_contract_bindings_are_current",

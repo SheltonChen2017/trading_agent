@@ -47,10 +47,16 @@ STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS = (
     "accepted_risk_stock_portfolio_evaluator.py",
 )
 STOCK_PORTFOLIO_PROFILE_ID = stock_portfolio_evaluator.PROFILE_ID
-STOCK_PORTFOLIO_PROFILE_SHA256 = (
-    stock_portfolio_evaluator.require_stock_portfolio_profile(
-        STOCK_PORTFOLIO_PROFILE_ID
+STOCK_PORTFOLIO_PROFILE_IDS = stock_portfolio_evaluator.PROFILE_IDS
+STOCK_UNIVERSE_PROFILE_IDS = stock_portfolio_evaluator.UNIVERSE_PROFILE_IDS
+STOCK_PORTFOLIO_PROFILE_SHA256S = {
+    profile_id: stock_portfolio_evaluator.require_stock_portfolio_profile(
+        profile_id
     )["profile_sha256"]
+    for profile_id in STOCK_PORTFOLIO_PROFILE_IDS
+}
+STOCK_PORTFOLIO_PROFILE_SHA256 = (
+    STOCK_PORTFOLIO_PROFILE_SHA256S[STOCK_PORTFOLIO_PROFILE_ID]
 )
 MAIN_PROJECT_PATH = "main.py"
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
@@ -412,6 +418,13 @@ def _main_source(
             activation_sha256=activation_sha256,
             activation_bytes=activation_bytes,
         )
+    if evaluation_profile_id in STOCK_UNIVERSE_PROFILE_IDS:
+        return _stock_universe_main_source(
+            activation_key=activation_key,
+            activation_sha256=activation_sha256,
+            activation_bytes=activation_bytes,
+            evaluation_profile_id=evaluation_profile_id,
+        )
     source = f'''from AlgorithmImports import *
 from accepted_risk_preliminary_qc_runtime import (
     AcceptedRiskPreliminaryQcDriver,
@@ -445,6 +458,97 @@ class ARV2AcceptedRiskPreliminaryAlgorithm(QCAlgorithm):
             total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
             evaluation_profile_id={evaluation_profile_id!r},
         )
+
+    def on_data(self, _data):
+        if not self._arv2_driver.completed:
+            self._arv2_advance_training_slice()
+
+    def _arv2_advance_training_slice(self):
+        self._arv2_driver.advance_training_slice(
+            maximum_work_units=TRAIN_WORK_UNITS_PER_SLICE,
+            soft_seconds=TRAIN_SLICE_SOFT_SECONDS,
+        )
+
+    def on_end_of_algorithm(self):
+        self._arv2_driver.require_completed_at_end()
+'''
+    return source.encode("ascii")
+
+
+def _stock_universe_main_source(
+    *,
+    activation_key: str,
+    activation_sha256: str,
+    activation_bytes: int,
+    evaluation_profile_id: str,
+) -> bytes:
+    tickers = stock_portfolio_evaluator.constituent_etf_tickers_for_profile(
+        evaluation_profile_id
+    )
+    if evaluation_profile_id not in STOCK_UNIVERSE_PROFILE_IDS or not tickers:
+        raise AcceptedRiskPreliminaryQcProjectionError(
+            "stock-universe QC main profile binding changed"
+        )
+    qqq_setup = ""
+    if "QQQ" in tickers:
+        qqq_setup = '''        constituent_symbols["QQQ"] = self.add_equity(
+            "QQQ",
+            Resolution.DAILY,
+            fill_forward=False,
+            leverage=1,
+            extended_market_hours=False,
+            data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
+        ).symbol
+'''
+    source = f'''from AlgorithmImports import *
+from accepted_risk_preliminary_qc_runtime import (
+    AcceptedRiskPreliminaryQcDriver,
+    TRAIN_SLICE_SOFT_SECONDS,
+    TRAIN_WORK_UNITS_PER_SLICE,
+)
+
+
+class ARV2AcceptedRiskPreliminaryAlgorithm(QCAlgorithm):
+    def initialize(self):
+        self.set_time_zone("America/New_York")
+        self.settings.daily_precise_end_time = True
+        self.set_start_date({ALGORITHM_START[0]}, {ALGORITHM_START[1]}, {ALGORITHM_START[2]})
+        self.set_end_date({ALGORITHM_END[0]}, {ALGORITHM_END[1]}, {ALGORITHM_END[2]})
+        self.universe_settings.asynchronous = False
+        self.universe_settings.resolution = Resolution.DAILY
+        benchmark = self.add_equity(
+            "SPY",
+            Resolution.DAILY,
+            fill_forward=False,
+            leverage=1,
+            extended_market_hours=False,
+            data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
+        ).symbol
+        constituent_symbols = {{"SPY": benchmark}}
+{qqq_setup}        self._arv2_constituent_universes = {{}}
+        for ticker in {tickers!r}:
+            self._arv2_constituent_universes[ticker] = self.add_universe(
+                self.universe.etf(
+                    constituent_symbols[ticker],
+                    self.universe_settings,
+                    self._arv2_empty_constituent_selection,
+                )
+            )
+        self._arv2_driver = AcceptedRiskPreliminaryQcDriver(
+            self,
+            activation_manifest_key={activation_key!r},
+            activation_manifest_sha256={activation_sha256!r},
+            activation_manifest_byte_count={activation_bytes},
+            benchmark_symbol=benchmark,
+            trade_bar_type=TradeBar,
+            daily_resolution=Resolution.DAILY,
+            total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
+            evaluation_profile_id={evaluation_profile_id!r},
+            constituent_universes=self._arv2_constituent_universes,
+        )
+
+    def _arv2_empty_constituent_selection(self, _constituents):
+        return []
 
     def on_data(self, _data):
         if not self._arv2_driver.completed:
@@ -548,10 +652,12 @@ def _profile(evaluation_profile_id):
         return etf_evaluator.require_etf_baseline_profile(
             evaluation_profile_id
         )
-    if evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+    if evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
         return {
-            "profile_id": STOCK_PORTFOLIO_PROFILE_ID,
-            "profile_sha256": STOCK_PORTFOLIO_PROFILE_SHA256,
+            "profile_id": evaluation_profile_id,
+            "profile_sha256": STOCK_PORTFOLIO_PROFILE_SHA256S[
+                evaluation_profile_id
+            ],
         }
     return regime_evaluator.require_regime_profile(evaluation_profile_id)
 
@@ -560,7 +666,7 @@ def project_source_paths_for_profile(evaluation_profile_id):
     _profile(evaluation_profile_id)
     if evaluation_profile_id == etf_evaluator.PROFILE_ID:
         return ETF_PROJECT_SOURCE_PATHS
-    if evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+    if evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
         return STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
     return PROJECT_SOURCE_PATHS
 

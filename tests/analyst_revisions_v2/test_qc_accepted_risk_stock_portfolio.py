@@ -762,3 +762,47 @@ def test_base_runtime_hook_is_noop_and_preserves_existing_summary_shape():
         )
         is None
     )
+
+
+def test_one_held_name_going_untradable_freezes_the_whole_matched_comparator():
+    """ARV2R84-001: deferral is all-or-nothing per account, so it scales with sleeve size.
+
+    A rebalance defers when ANY held name lacks a current price, and the whole
+    session is marked stale. The signal sleeve holds at most fifty names, so it
+    is rarely affected; the matched comparator holds every resolvable
+    score-bearing member, so a single held name that stops pricing freezes it
+    for the remainder of the run. That is the mechanism behind R-064's
+    comparator reporting two executed rebalances against the sleeve's 261, and
+    it is why the signal-minus-matched difference measures trading against not
+    trading rather than the signal against its universe.
+    """
+    value = _input()
+    later = tuple(
+        session
+        for session in value.session_axis
+        if "2021-02-01" <= session <= "2025-12-31"
+    )
+    # perm-security-00 is held by the matched comparator but never selected
+    # into the signal sleeve, and it prices normally until 2021-02-01.
+    runtime = _complete(
+        value,
+        omissions=frozenset(("perm-security-00", session) for session in later),
+    )
+    summary = runtime.aggregate_summary()
+
+    # The signal sleeve is untouched: every weekly decision still executes.
+    assert summary["rebalance_execution_count"] == 261
+    assert summary["deferred_rebalance_count"] == 0
+    assert summary["stale_mark_session_count"] == 0
+
+    # One name freezes the comparator almost completely.
+    assert summary["matched_rebalance_execution_count"] == 4
+    assert summary["matched_deferred_rebalance_count"] == 257
+    assert summary["matched_stale_mark_session_count"] == 1236
+
+    # The comparator is therefore not a like-for-like benchmark here, and the
+    # summary must keep saying its metrics are proxy-conditioned.
+    assert all(
+        cell["risk_metrics_are_price_proxy_conditioned"] is True
+        for cell in summary["portfolio_cells"]
+    )

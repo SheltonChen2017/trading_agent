@@ -1026,3 +1026,41 @@ def test_one_held_name_going_untradable_does_not_freeze_matched_comparator():
         cell["risk_metrics_are_price_proxy_conditioned"] is True
         for cell in summary["portfolio_cells"]
     )
+
+
+def test_sub_cap_locked_weight_still_binds_the_fifty_holding_cap():
+    """ARV2R87-001: the holdings cap must bind by slot, not only by budget."""
+    value = _input(security_count=64)
+    runtime = subject.StockPortfolioEvaluationRuntime(
+        value,
+        profile_id=subject.PROFILE_ID,
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+        named_figi_resolution_refusals=(),
+    )
+    stale = "perm-security-00"
+    desired = tuple(f"perm-security-{index:02d}" for index in range(14, 64))
+    position = value.session_axis.index("2021-01-12")
+    history_position = runtime._history_session_positions["2021-01-12"]
+    for security_id in desired:
+        runtime._history_prices[history_position][
+            runtime._history_security_positions[security_id]
+        ] = "100"
+    # Half a cap unit. The remaining 97.02% budget would fund all fifty
+    # tradable names at or below the 1.96% cap, so only the slot reservation
+    # for the locked name can hold the sleeve at fifty holdings.
+    account = subject._Account(
+        "signal",
+        weights={stale: Decimal("0.0098")},
+        marks={stale: Decimal("100")},
+    )
+
+    runtime._advance_account(account, position, desired)
+
+    assert len(account.weights) == subject.MAXIMUM_HOLDINGS
+    assert stale in account.weights
+    assert desired[-1] not in account.weights
+    assert tuple(
+        security_id for security_id in desired if security_id in account.weights
+    ) == desired[: subject.MAXIMUM_HOLDINGS - 1]
+    assert sum(account.weights.values()) <= subject.TARGET_GROSS_EXPOSURE

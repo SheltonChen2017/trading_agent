@@ -1471,3 +1471,31 @@ The lifetime alpha-cell exposure floor is **564**. Permanent-family and
 confirmatory-alpha looks remain zero. Independent Claude review and Codex
 counter-review are required before unlevered ETF/economic-portfolio work;
 actual or synthetic 3x leverage remains conditional on that baseline.
+
+## R-060 — Analyst Revisions V2 unlevered ETF sector baseline (PREREGISTERED; NOT YET LAUNCHED)
+
+R-060 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-etf-sector-baseline-qc-001`. Before any ETF outcome read, commit
+`9164146` freezes a 54-fund unlevered US sector/industry sleeve, the exact
+conservative-censored firm-specific R-055 stock score, H1-observed QC
+constituents, 99% exact mapping, 20-session/$5 million liquidity, 90/70
+hysteresis, five 20% slots, constituent-look-through sector and transitive
+overlap-cluster caps, next-open execution, drift-adjusted turnover, and
+0/5/10/20 bps cost cases. The profile SHA-256 is
+`eadb6aba26495ceb8d11417364e80a18b9860a2488519ee9c692a7031cfa59dd`;
+the projection SHA-256 is
+`1e0a091aabed725f4a5ed598de488eaec098141866a6d5c015184baaa5b5778d`.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **59 -> 60**; ARV2 development evaluations **6 -> 7**. An authenticated aggregate read exposes three ETF IC cells plus four portfolio-cost cells and moves the lifetime cell floor **564 -> 571**. Until create succeeds or is ambiguous, the recorded totals remain 59 / 6 / 564. |
+| **Window** | Warmup 2020-12-01; 1,253 decisions from 2021-01-04 through 2025-12-29; returns through 2025-12-31; H5/H20/H60 outcomes mature by 2026-03-31. |
+| **QC identity** | Private project `6 ARV2_ETF_R060_2021_2025 - 20260915`; backtest `ARV2 R060 unlevered ETF sector baseline e9851c2f`. |
+| **Tangible-evidence gate** | Each IC cell must account for all decision dates. Portfolio evidence is descriptive only with at least 252 return sessions and 50 actually invested sessions; an all-cash result is underfilled. |
+| **Limitations** | Fixed sleeve rather than exhaustive reverse-index discovery; no reliable PIT AUM filter; no direct-stock or industry comparator; current-vintage non-pristine-PIT provider input; endpoint-conditioned outcomes; no terminal-payoff splice; not formal ARV2-5/6. |
+| **Access boundary** | One backtest create, statistics-free terminal polling, then at most one separately authorized read of nine aggregate custom statistics. No raw rows, raw constituents, security-level outcomes, unrestricted logs/charts, leverage, deployment, orders, broker access, paper/live state, or trading. |
+
+This preregistration supersedes the prior text requiring an intervening Claude
+review only because the owner explicitly directed this one ETF round to run
+first and be reviewed afterward. Actual and synthetic 3x work remains closed
+until R-060 yields usable unlevered evidence and a later reviewed milestone.

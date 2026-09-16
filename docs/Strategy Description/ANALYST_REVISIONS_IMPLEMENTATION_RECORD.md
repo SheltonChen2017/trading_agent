@@ -896,18 +896,23 @@ tally, commit mapping, timestamp characterization, false independent-date
 observation, and unsupported causal interpretation of the undifferentiated
 missing-pair count. The substantive preregistration fact still holds: the
 counts-only gate text and code are ancestral to the result record and are
-bound by signed prelaunch artifacts. Section 78 preregistered the
-owner-planned fixed-rule stock windows and authenticated missing-pair
-breakdown. Claude reviews section 79 now; it supersedes that now-complete
-live step with authenticated R-057, R-058, and R-059 receipts and the
-shared-ledger entries.
-Every available cell has positive mean and median IC, but the preliminary
-metrics remain explicitly conditioned on observed security and benchmark
-endpoint prices; no terminal payoff or portfolio return is inferred. The
-owner explicitly waived another independent pre-run review of sections 77-78
-by directing Codex to proceed into those fixed-rule diagnostics. Claude's
-review covers the resulting pushed snapshot and outcomes; Codex
-counter-reviews before any unlevered or leveraged ETF work begins.
+bound by signed prelaunch artifacts. Section 78 preregistered the owner-
+planned fixed-rule stock windows; section 79 records authenticated R-057,
+R-058, and R-059 receipts and the shared-ledger entries. Every available cell
+has positive mean and median IC, but the preliminary metrics remain explicitly
+conditioned on observed security and benchmark endpoint prices; no terminal
+payoff or portfolio return is inferred.
+
+Section 80 preregisters the bounded R-060 unlevered ETF baseline and its exact
+all-cash, IC-census, H1-holdings, look-through-cap, overlap-cluster, drift-
+turnover, coverage, and aggregate-result guards. The owner explicitly waives
+an additional Claude review of section 80 before the one R-060 run; Claude
+will review section 80 and its result afterward. The immediate next step is to
+commit this preregistration, create and sign the exact private R-060 plan,
+launch one QC backtest, poll statistics-free terminal state, and—only after
+authenticated `Completed.`—read its nine aggregate custom statistics once.
+Actual and synthetic leverage remain closed until usable unlevered evidence
+exists and a later reviewed milestone explicitly opens them.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -13922,3 +13927,100 @@ Actual 3x ETF histories and a separately modelled synthetic daily-reset 3x
 exposure remain later diagnostics conditional on a usable unlevered baseline.
 No deployment, order, broker, paper, live, or trading authority follows from
 these stock-ranking results.
+
+## 80. R-060 accepted-risk unlevered ETF baseline preregistration, 2026-09-15
+
+**Implementation commit:** `9164146` (`Add accepted-risk ARV2 ETF baseline`).
+At the owner's direction, this bounded ETF phase proceeds to one QC run before
+the next independent client review. That one-round sequencing exception does
+not waive later review and does not authorize leverage, paper/live deployment,
+orders, broker access, or trading.
+
+### 80.1 Frozen purpose, input and topology
+
+R-060 is a `development_evaluation`, evaluation
+`arv2-eval-etf-sector-baseline-qc-001`, and shared ledger entry `R-060`. It
+reuses without rebuilding the authenticated R-055 package
+`arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`, SHA-256
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+The stock signal is the exact conservative-censored, firm-specific R-055
+cross-section. No R-055/R-057/R-058/R-059 sign or magnitude selected or tuned
+the ETF rule.
+
+The preliminary topology is a fixed, prospectively frozen sleeve of 54
+long-only, unlevered US sector/industry ETFs supported by QuantConnect's US ETF
+Constituents feed. It is a practical baseline, not the blueprint's exhaustive
+daily reverse index. The candidate inventory is bound by sector-row SHA-256
+`f2e4cab7b4b79712bed1ca1b7ef87f0e67e01b2287bbb8e15dcb155a4f666c42`.
+Reliable point-in-time AUM is unavailable, so the AUM filter is omitted and
+named. The first baseline also omits the direct-stock and industry comparators;
+SPY total return is the market benchmark. These omissions prohibit describing
+R-060 as formal ARV2-5/6 evidence.
+
+### 80.2 Frozen rule before outcome access
+
+- Window: warmup begins 2020-12-01; decisions run 2021-01-04 through
+  2025-12-29 (1,253 authenticated sessions); returns are measured through
+  2025-12-31. The earlier decision stop gives the final target one complete
+  open-to-open holding interval and avoids an unmeasured terminal rebalance.
+- Holdings: only a QC constituent callback observed on the exact immediately
+  preceding authenticated session is eligible. Each snapshot must total
+  95%-105%, and at least 99% of original constituent weight must map to an
+  active authenticated stock score. Both gates use exact rational
+  cross-multiplication; stale, incomplete, unmapped, liquidity, and stock-
+  sector refusals are counted separately.
+- Eligibility and score: trailing 20-session median dollar volume must be at
+  least $5 million. The ETF score is the mapped-weight-normalized constituent
+  score multiplied by `sqrt(coverage) * min(1, sqrt(N_eff / 5))`.
+- Selection: rank the fixed sleeve daily; enter at the 90th percentile, retain
+  incumbents through the 70th percentile, hold at most five, and assign 20%
+  per selected ETF with residual cash. The 40% sector cap is applied to mapped
+  constituent look-through exposures. The 30% overlap-cluster cap uses
+  deterministic transitive connected components at a 60% holdings-overlap
+  threshold, not pairwise-only exclusion.
+- Execution simulation: each decision target becomes effective at the next
+  session open. Turnover compares the new target with return-drifted pretrade
+  weights. Costs are 0/5/10/20 bps per side, with 10 bps primary. No QC order
+  API is projected or called.
+- Evidence: three ETF cross-sectional IC cells use H5/H20/H60 next-open
+  SPY-excess outcomes; four economic cells report the unlevered portfolio at
+  the cost grid. Every IC cell must census all 1,253 decision dates as valid or
+  invalid. A portfolio cell is descriptive only with at least 252 return
+  sessions and 50 actually invested sessions; an all-cash calendar history is
+  explicitly `INCONCLUSIVE_UNDERFILLED`.
+
+The profile is `arv2-etf-sector-baseline-2021-2025`, SHA-256
+`eadb6aba26495ceb8d11417364e80a18b9860a2488519ee9c692a7031cfa59dd`.
+The eight-file QC projection is
+`arv2-preliminary-qc-projection-1e0a091aabed725f4a5ed598`, SHA-256
+`1e0a091aabed725f4a5ed598de488eaec098141866a6d5c015184baaa5b5778d`,
+219,587 bytes total; its largest file is 58,389 bytes. The private project name
+is fixed as `6 ARV2_ETF_R060_2021_2025 - 20260915`; the backtest name is
+`ARV2 R060 unlevered ETF sector baseline e9851c2f`.
+
+### 80.3 Prospective accounting, validation and access boundary
+
+Creating the sole R-060 backtest consumes run-level look **59 -> 60** and ARV2
+development evaluation **6 -> 7**, whether it succeeds, fails, or is ambiguous.
+An authenticated single aggregate read exposes exactly seven result cells
+(three IC plus four portfolio-cost cells) and raises the lifetime cell floor
+**564 -> 571**. The historical accounting field still calls this maximum
+`preliminary_ic_cell_count`; for R-060 it means all seven result cells, not
+seven ICs. Infrastructure remains 23; permanent-family and confirmatory-alpha
+looks remain zero.
+
+Before this preregistration, 11 ETF-focused tests and the exhaustive QC source-
+closure guard passed; the affected accepted-risk/runtime/adapter/closure
+selection passed **324 tests** on Python 3.13.15. Adversarial review found and
+corrected all-cash misclassification, an incomplete IC census, stale H1
+snapshots, coarse sector caps, free drift rebalancing, rounded 99% coverage,
+and non-transitive overlap grouping before any QC project or outcome access.
+
+The adapter may upload only the exact projection and existing package, compile,
+launch one backtest, poll statistics-free terminal state, and after exact
+`Completed.` use one separately signed authority to read the nine expected
+aggregate custom statistics (seven cells plus evaluator and runtime metadata).
+Raw provider rows, raw constituents, security-level prices/outcomes,
+unrestricted logs, charts, deployment, orders, brokerage, paper/live state,
+and trading remain closed. Actual and synthetic 3x tests remain conditional on
+usable unlevered R-060 evidence and a later reviewed milestone.
